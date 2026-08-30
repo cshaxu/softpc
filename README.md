@@ -48,6 +48,10 @@ This is intentionally a compact fixed PC, not a complete BIOS or controller
 emulation: CMOS/RTC, VGA graphics, floppy-controller commands, sound, and
 simultaneous floppy-plus-hard-disk attachment are not implemented yet.
 
+Keyboard input is delivered through the fixed 8042-style queue and IRQ1, then
+consumed through `INT 16h`; enabling guest interrupts therefore does not turn
+ordinary console or window keystrokes into an unhandled interrupt.
+
 For a real-media, non-interactive boot probe (not part of the default test
 suite), run `build/softpc-real-boot-smoke --floppy disk.img` or replace
 `--floppy` with `--hdd`. It succeeds when the guest reaches printable text

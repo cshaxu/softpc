@@ -215,6 +215,12 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0xb0u, 0x20u, 0xe6u, 0x20u, 0xcfu
     };
     static const unsigned char irq0_vector[] = { 0x00u, 0x04u, 0x00u, 0xf0u };
+    /* IRQ1 leaves the controller's queued scan code for INT 16h, acknowledges
+       the master PIC, and returns to the interrupted guest. */
+    static const unsigned char irq1_rom[] = {
+        0xb0u, 0x20u, 0xe6u, 0x20u, 0xcfu
+    };
+    static const unsigned char irq1_vector[] = { 0x20u, 0x04u, 0x00u, 0xf0u };
     static const unsigned char bootstrap_vector[] = { 0x10u, 0x04u, 0x00u, 0xf0u };
     static const unsigned char hdd_bootstrap_rom[] = {
         0xeau, 0x00u, 0x00u, 0x00u, 0xf0u
@@ -267,6 +273,10 @@ static softpc_machine_result softpc_machine_install_reset_rom(
             sizeof(irq0_rom)) ||
         !softpc_platform_write_physical(0x20u, irq0_vector,
             sizeof(irq0_vector)) ||
+        !softpc_platform_write_physical(0xf0420u, irq1_rom,
+            sizeof(irq1_rom)) ||
+        !softpc_platform_write_physical(0x24u, irq1_vector,
+            sizeof(irq1_vector)) ||
         !softpc_platform_write_physical(0x60u, bootstrap_vector,
             sizeof(bootstrap_vector)) ||
         !softpc_platform_write_physical(0x64u, bootstrap_vector,

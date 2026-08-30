@@ -82,6 +82,23 @@ static void write_int16_ascii_boot_image(const char *path)
     assert(fclose(file) == 0);
 }
 
+static void write_irq1_int16_boot_image(const char *path)
+{
+    unsigned char sector[512] = { 0 };
+    FILE *file;
+    /* Enable interrupts; IRQ1 must return cleanly before INT 16h reads A. */
+    unsigned char program[] = {
+        0xfbu, 0x90u, 0x30u, 0xe4u, 0xcdu, 0x16u, 0x88u, 0xe0u,
+        0xa2u, 0x00u, 0x05u, 0xebu, 0xfeu
+    };
+    memcpy(sector, program, sizeof(program));
+    sector[510] = 0x55u; sector[511] = 0xaau;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
+    assert(fclose(file) == 0);
+}
+
 static void write_int16_check_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
@@ -526,6 +543,21 @@ static void run_int16_ascii_boot_image(const char *path)
     softpc_machine_destroy(machine);
 }
 
+static void run_irq1_int16_boot_image(const char *path)
+{
+    unsigned char marker = 0;
+    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_key_scancode(machine, 0x1eu) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 128u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x500u, &marker,
+        1u) == SOFTPC_MACHINE_OK);
+    assert(marker == 0x1eu);
+    softpc_machine_destroy(machine);
+}
+
 static void run_int16_check_boot_image(const char *path)
 {
     unsigned char marker = 0;
@@ -779,6 +811,7 @@ int main(void)
     const char *int16 = "softpc-machine-int16-smoke.img";
     const char *int15_memory = "softpc-machine-int15-memory-smoke.img";
     const char *int16_ascii = "softpc-machine-int16-ascii-smoke.img";
+    const char *irq1_int16 = "softpc-machine-irq1-int16-smoke.img";
     const char *int16_check = "softpc-machine-int16-check-smoke.img";
     const char *timer = "softpc-machine-timer-smoke.img";
     const char *text = "softpc-machine-text-smoke.img";
@@ -810,6 +843,7 @@ int main(void)
     write_int16_boot_image(int16);
     write_int15_memory_boot_image(int15_memory);
     write_int16_ascii_boot_image(int16_ascii);
+    write_irq1_int16_boot_image(irq1_int16);
     write_int16_check_boot_image(int16_check);
     write_timer_boot_image(timer);
     write_text_boot_image(text);
@@ -841,6 +875,7 @@ int main(void)
     run_int16_boot_image(int16);
     run_int15_memory_boot_image(int15_memory);
     run_int16_ascii_boot_image(int16_ascii);
+    run_irq1_int16_boot_image(irq1_int16);
     run_int16_check_boot_image(int16_check);
     run_timer_boot_image(timer);
     run_text_boot_image(text);
@@ -870,6 +905,7 @@ int main(void)
     assert(remove(int16) == 0);
     assert(remove(int15_memory) == 0);
     assert(remove(int16_ascii) == 0);
+    assert(remove(irq1_int16) == 0);
     assert(remove(int16_check) == 0);
     assert(remove(timer) == 0);
     assert(remove(text) == 0);
