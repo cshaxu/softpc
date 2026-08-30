@@ -8,6 +8,7 @@
 #include "cpu4.h"
 #include "cpu_vid.h"
 #include "error.h"
+#include "fdisk.h"
 #include "ios.h"
 #include "ica.h"
 #include "timestmp.h"
@@ -50,12 +51,20 @@ void host_disable_timer2_sound(void)
  * A standalone fixed machine exposes no mutable product configuration: its
  * concrete media and memory are already supplied by softpc_machine_options. */
 static CHAR softpc_empty_config_value[] = "";
+static const CHAR *softpc_hdd_config_paths[2];
+#define SOFTPC_CONFIG_HARD_DISK1_NAME 25u
+#define SOFTPC_CONFIG_HARD_DISK2_NAME 26u
 void *config_inquire(host_id, values)
 UTINY host_id;
 void *values;
 {
-    UNUSED(host_id);
     UNUSED(values);
+    if (host_id == SOFTPC_CONFIG_HARD_DISK1_NAME)
+        return (void *)(softpc_hdd_config_paths[0] != NULL ?
+            softpc_hdd_config_paths[0] : softpc_empty_config_value);
+    if (host_id == SOFTPC_CONFIG_HARD_DISK2_NAME)
+        return (void *)(softpc_hdd_config_paths[1] != NULL ?
+            softpc_hdd_config_paths[1] : softpc_empty_config_value);
     return softpc_empty_config_value;
 }
 
@@ -475,18 +484,28 @@ int softpc_platform_hdd_attach(const char *floppy_path, const char *hard_disk_pa
     softpc_hdd_transfer_bytes = 0u;
     softpc_hdd_write_active = 0;
     softpc_hdd_write_drive = 0u;
-    if (!softpc_hdd_attach_media(&softpc_hdd_media[0], floppy_path)) return 0;
-    if (!softpc_hdd_attach_media(&softpc_hdd_media[1], hard_disk_path)) {
+    /* The temporary bootstrap still supplies a floppy image as its first
+       block device.  Preserve that ordering until the original FDC/BIOS
+       path replaces the bootstrap, while the port controller itself is the
+       original SoftPC fdisk implementation. */
+    softpc_hdd_config_paths[0] = floppy_path != NULL ? floppy_path : hard_disk_path;
+    softpc_hdd_config_paths[1] = floppy_path != NULL ? hard_disk_path : NULL;
+    if (!softpc_hdd_attach_media(&softpc_hdd_media[0], softpc_hdd_config_paths[0])) return 0;
+    if (!softpc_hdd_attach_media(&softpc_hdd_media[1], softpc_hdd_config_paths[1])) {
         if (softpc_hdd_media[0].file != NULL) fclose(softpc_hdd_media[0].file);
         softpc_hdd_media[0].file = NULL;
+        softpc_hdd_config_paths[0] = NULL;
+        softpc_hdd_config_paths[1] = NULL;
         return 0;
     }
+    hda_init();
     return 1;
 }
 
 void softpc_platform_hdd_detach(void)
 {
     unsigned int index;
+    fdisk_iodetach();
     for (index = 0u; index < 2u; ++index) {
         if (softpc_hdd_media[index].file != NULL)
             fclose(softpc_hdd_media[index].file);
@@ -499,17 +518,94 @@ void softpc_platform_hdd_detach(void)
     softpc_hdd_transfer_bytes = 0;
     softpc_hdd_write_active = 0;
     softpc_hdd_write_drive = 0u;
+    softpc_hdd_config_paths[0] = NULL;
+    softpc_hdd_config_paths[1] = NULL;
 }
 
 void softpc_platform_hdd_init(void)
 {
-    io_addr port;
-    io_define_in_routines(HDA_ADAPTOR, softpc_hdd_inb, softpc_hdd_inw, 0, 0);
-    io_define_out_routines(HDA_ADAPTOR, softpc_hdd_outb, softpc_hdd_outw,
-        0, 0);
-    for (port = 0x1f0u; port <= 0x1f7u; ++port)
-        io_connect_port(port, HDA_ADAPTOR, IO_READ | IO_WRITE);
-    io_connect_port(0x3f6u, HDA_ADAPTOR, IO_READ | IO_WRITE);
+    /* hda_init runs after the concrete image paths are attached. */
+}
+
+void host_fdisk_get_params(driveid, cylinders, heads, sectors)
+int driveid;
+int *cylinders;
+int *heads;
+int *sectors;
+{
+    IU32 total_sectors = 0u;
+    if (driveid >= 0 && driveid < 2)
+        total_sectors = softpc_hdd_media[driveid].total_sectors;
+    *heads = 16;
+    *sectors = 63;
+    *cylinders = (int)(total_sectors / ((IU32)*heads * (IU32)*sectors));
+    if (*cylinders < 1) *cylinders = 1;
+    if (*cylinders > 16383) *cylinders = 16383;
+}
+
+int host_fdisk_rd(driveid, offset, sectors, buffer)
+int driveid;
+int offset;
+int sectors;
+char *buffer;
+{
+    softpc_ata_media *media;
+    size_t bytes;
+    if (driveid < 0 || driveid >= 2 || sectors < 0) return 0;
+    media = &softpc_hdd_media[driveid];
+    bytes = (size_t)sectors * SOFTPC_ATA_SECTOR_BYTES;
+    if (media->file == NULL || fseek(media->file, (long)offset, SEEK_SET) != 0 ||
+        fread(buffer, 1u, bytes, media->file) != bytes) {
+        if (media->file != NULL) clearerr(media->file);
+        return 0;
+    }
+    return 1;
+}
+
+int host_fdisk_wt(driveid, offset, sectors, buffer)
+int driveid;
+int offset;
+int sectors;
+char *buffer;
+{
+    softpc_ata_media *media;
+    size_t bytes;
+    if (driveid < 0 || driveid >= 2 || sectors < 0) return 0;
+    media = &softpc_hdd_media[driveid];
+    bytes = (size_t)sectors * SOFTPC_ATA_SECTOR_BYTES;
+    if (media->file == NULL || !media->writable ||
+        fseek(media->file, (long)offset, SEEK_SET) != 0 ||
+        fwrite(buffer, 1u, bytes, media->file) != bytes || fflush(media->file) != 0) {
+        if (media->file != NULL) clearerr(media->file);
+        return 0;
+    }
+    return 1;
+}
+
+void host_fdisk_seek0(driveid)
+int driveid;
+{
+    if (driveid >= 0 && driveid < 2 && softpc_hdd_media[driveid].file != NULL)
+        (void)fseek(softpc_hdd_media[driveid].file, 0L, SEEK_SET);
+}
+
+void fast_disk_bios_attach(driveid)
+int driveid;
+{
+    UNUSED(driveid);
+}
+
+void fast_disk_bios_detach(driveid)
+int driveid;
+{
+    UNUSED(driveid);
+}
+
+void patch_rom(address, value)
+IU32 address;
+IU8 value;
+{
+    if (address < softpc_ram_size) softpc_ram[address] = value;
 }
 
 UTINY *host_sas_init(sys_addr size)

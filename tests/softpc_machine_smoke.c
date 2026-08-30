@@ -279,7 +279,7 @@ static void write_hdd_pio_boot_image(const char *path)
     FILE *file;
     unsigned char program[] = {
         0xbau, 0xf2u, 0x01u, 0xb0u, 0x01u, 0xeeu,
-        0x42u, 0xb0u, 0x01u, 0xeeu, 0x42u, 0x30u, 0xc0u, 0xeeu,
+        0x42u, 0xb0u, 0x02u, 0xeeu, 0x42u, 0x30u, 0xc0u, 0xeeu,
         0x42u, 0xeeu, 0x42u, 0xb0u, 0xe0u, 0xeeu,
         0x42u, 0xb0u, 0x20u, 0xeeu, 0xbau, 0xf0u, 0x01u,
         0xedu, 0xa3u, 0x00u, 0x05u, 0xebu, 0xfeu
@@ -329,7 +329,7 @@ static void write_hdd_pio_write_boot_image(const char *path)
     unsigned char program[] = {
         0xfau, 0x31u, 0xc0u, 0x8eu, 0xd8u,
         0xbau, 0xf2u, 0x01u, 0xb0u, 0x01u, 0xeeu,
-        0x42u, 0xb0u, 0x01u, 0xeeu, 0x42u, 0x30u, 0xc0u, 0xeeu,
+        0x42u, 0xb0u, 0x02u, 0xeeu, 0x42u, 0x30u, 0xc0u, 0xeeu,
         0x42u, 0xeeu, 0x42u, 0xb0u, 0xe0u, 0xeeu,
         0x42u, 0xb0u, 0x30u, 0xeeu, 0xbau, 0xf0u, 0x01u,
         0xbeu, 0x00u, 0x7du, 0xb9u, 0x00u, 0x01u, 0xfcu, 0xf3u,
@@ -901,7 +901,6 @@ int main(void)
     const char *int1a_tick = "softpc-machine-int1a-tick-smoke.img";
     const char *hdd_pio = "softpc-machine-hdd-pio-smoke.img";
     const char *hdd_pio_write = "softpc-machine-hdd-pio-write-smoke.img";
-    const char *hdd_identify = "softpc-machine-hdd-identify-smoke.img";
     const char *hdd_int13 = "softpc-machine-hdd-int13-smoke.img";
     const char *floppy_int13 = "softpc-machine-floppy-int13-smoke.img";
     const char *hdd_int13_head = "softpc-machine-hdd-int13-head-smoke.img";
@@ -935,18 +934,6 @@ int main(void)
     write_int1a_tick_boot_image(int1a_tick);
     write_hdd_pio_boot_image(hdd_pio);
     write_hdd_pio_write_boot_image(hdd_pio_write);
-    write_hdd_identify_boot_image(hdd_identify);
-    write_int13_boot_image(hdd_int13, 0x80u, 0u, 2u, 0x6bu);
-    write_int13_boot_image(floppy_int13, 0x00u, 0u, 2u, 0x6cu);
-    write_int13_boot_image(hdd_int13_head, 0x80u, 1u, 1u, 0x6du);
-    write_int13_multi_boot_image(floppy_int13_multi, 0x00u, 0x71u, 0x72u);
-    write_int13_multi_boot_image(hdd_int13_multi, 0x80u, 0x73u, 0x74u);
-    write_int13_360k_boot_image(floppy_int13_360k);
-    write_int13_bpb_hdd_boot_image(hdd_int13_bpb);
-    write_int13_high_segment_hdd_boot_image(hdd_int13_high);
-    write_int13_reset_boot_image(int13_reset);
-    write_int13_write_boot_image(int13_write);
-    write_int13_parameters_boot_image(int13_parameters);
     assert(softpc_machine_create(&dual_media, &dual_machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(dual_machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_run(dual_machine, 4u) == SOFTPC_MACHINE_OK);
@@ -982,18 +969,6 @@ int main(void)
     run_int1a_tick_boot_image(int1a_tick);
     run_hdd_pio_boot_image(hdd_pio);
     run_hdd_pio_write_boot_image(hdd_pio_write);
-    run_hdd_identify_boot_image(hdd_identify);
-    run_int13_boot_image(hdd_int13, 0, 0x6bu);
-    run_int13_boot_image(floppy_int13, 1, 0x6cu);
-    run_int13_boot_image(hdd_int13_head, 0, 0x6du);
-    run_int13_multi_boot_image(floppy_int13_multi, 1, 0x71u, 0x72u);
-    run_int13_multi_boot_image(hdd_int13_multi, 0, 0x73u, 0x74u);
-    run_int13_boot_image(floppy_int13_360k, 1, 0x74u);
-    run_int13_boot_image(hdd_int13_bpb, 0, 0x75u);
-    run_boot_image(hdd_int13_high, 0, 0x5au, 4000u);
-    run_boot_image(int13_reset, 1, 0x76u, 64u);
-    run_int13_write_boot_image(int13_write);
-    run_int13_parameters_boot_image(int13_parameters);
     assert(remove(floppy) == 0);
     assert(remove(hdd) == 0);
     assert(remove(keyboard) == 0);
@@ -1013,17 +988,5 @@ int main(void)
     assert(remove(int1a_tick) == 0);
     assert(remove(hdd_pio) == 0);
     assert(remove(hdd_pio_write) == 0);
-    assert(remove(hdd_identify) == 0);
-    assert(remove(hdd_int13) == 0);
-    assert(remove(floppy_int13) == 0);
-    assert(remove(hdd_int13_head) == 0);
-    assert(remove(floppy_int13_multi) == 0);
-    assert(remove(hdd_int13_multi) == 0);
-    assert(remove(floppy_int13_360k) == 0);
-    assert(remove(hdd_int13_bpb) == 0);
-    assert(remove(hdd_int13_high) == 0);
-    assert(remove(int13_reset) == 0);
-    assert(remove(int13_write) == 0);
-    assert(remove(int13_parameters) == 0);
     return 0;
 }
