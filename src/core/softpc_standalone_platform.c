@@ -345,6 +345,8 @@ IUH host_get_q_calib_val(void)
 int soft_reset = 1;
 
 void (*BIOS[256])() = { 0 };
+/* The detached executor has no product logger.  Keep its optional diagnostic
+ * stream valid so CCPU fault reports remain usable during standalone testing. */
 FILE *trace_file = NULL;
 READ_POINTERS read_pointers = { 0 };
 

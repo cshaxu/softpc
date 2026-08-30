@@ -3439,6 +3439,10 @@ TYPEC4:
       D_Ib(0);
       UPDATE_INTEL_IP(p);
       start_trap = 0;   /* clear any pending TF exception */
+      if (getenv("SOFTPC_TRACE_INTERRUPTS") != NULL)
+         fprintf(stderr, "(%04x:%08lx)Software interrupt:- %02x.\n",
+            GET_CS_SELECTOR(), (unsigned long)GET_EIP(),
+            (unsigned int)ops[0].sng);
       INTx(ops[0].sng);
       CANCEL_HOST_IP();
       PIG_SYNCH(CHECK_ALL);

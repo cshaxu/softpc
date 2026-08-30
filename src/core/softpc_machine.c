@@ -31,6 +31,7 @@ extern void softpc_platform_timer_advance(unsigned long instructions);
 extern void softpc_platform_hdd_init(void);
 extern int softpc_platform_hdd_attach(const char *path);
 extern void softpc_platform_hdd_detach(void);
+extern FILE *trace_file;
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
 #define SOFTPC_BOOT_SECTOR_BYTES 512u
@@ -166,6 +167,11 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u
     };
     static const unsigned char int16_vector[] = { 0x00u, 0x03u, 0x00u, 0xf0u };
+    /* INT 12h reports the fixed machine's conventional-memory extent. */
+    static const unsigned char int12_memory_rom[] = {
+        0xb8u, 0x80u, 0x02u, 0xcfu
+    };
+    static const unsigned char int12_vector[] = { 0x00u, 0x05u, 0x00u, 0xf0u };
     /* IRQ0 acknowledges the fixed master PIC and returns to guest code. */
     static const unsigned char irq0_rom[] = {
         0xb0u, 0x20u, 0xe6u, 0x20u, 0xcfu
@@ -201,6 +207,10 @@ static softpc_machine_result softpc_machine_install_reset_rom(
             sizeof(int16_keyboard_rom)) ||
         !softpc_platform_write_physical(0x58u, int16_vector,
             sizeof(int16_vector)) ||
+        !softpc_platform_write_physical(0xf0500u, int12_memory_rom,
+            sizeof(int12_memory_rom)) ||
+        !softpc_platform_write_physical(0x48u, int12_vector,
+            sizeof(int12_vector)) ||
         !softpc_platform_write_physical(0xf0400u, irq0_rom,
             sizeof(irq0_rom)) ||
         !softpc_platform_write_physical(0x20u, irq0_vector,
@@ -269,6 +279,9 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         softpc_platform_hdd_init();
         machine->hardware_initialized = 1;
     }
+    /* CCPU owns the optional fault trace; the standalone machine owns its
+       concrete stream rather than relying on a historical host logger. */
+    trace_file = stderr;
     c_cpu_init();
     c_cpu_reset();
     /* The original product's BIOS POST programmed the two 8259 PICs after

@@ -25,13 +25,16 @@ int main(int argc, char **argv)
     uint16_t cs = 0u;
     uint32_t eip = 0u;
     unsigned int index;
+    int trace = 0;
     softpc_machine_result result;
 
-    if (argc != 3 || (strcmp(argv[1], "--floppy") != 0 &&
-        strcmp(argv[1], "--hdd") != 0)) {
-        fprintf(stderr, "Usage: %s (--floppy|--hdd) image.img\n", argv[0]);
+    if ((argc != 3 && argc != 4) || (strcmp(argv[1], "--floppy") != 0 &&
+        strcmp(argv[1], "--hdd") != 0) ||
+        (argc == 4 && strcmp(argv[3], "--trace") != 0)) {
+        fprintf(stderr, "Usage: %s (--floppy|--hdd) image.img [--trace]\n", argv[0]);
         return 2;
     }
+    trace = argc == 4;
     if (strcmp(argv[1], "--floppy") == 0) options.floppy_path = argv[2];
     else options.hard_disk_path = argv[2];
     result = softpc_machine_create(&options, &machine);
@@ -39,8 +42,21 @@ int main(int argc, char **argv)
     result = softpc_machine_reset(machine);
     if (result != SOFTPC_MACHINE_OK) goto failed;
     for (index = 0u; index < SOFTPC_BOOT_SLICES; ++index) {
-        result = softpc_machine_run(machine, SOFTPC_SLICE_INSTRUCTIONS);
+        result = softpc_machine_run(machine, trace ? 100u :
+            SOFTPC_SLICE_INSTRUCTIONS);
         if (result != SOFTPC_MACHINE_OK) goto failed;
+        if (trace) {
+            unsigned char instruction[8];
+            (void)softpc_machine_instruction_pointer(machine, &cs, &eip);
+            fprintf(stderr, "%03u %04x:%08x\n", index,
+                (unsigned int)cs, (unsigned int)eip);
+            if (cs == 0u && eip < 0x1000u &&
+                softpc_machine_read_physical(machine, eip, instruction,
+                    sizeof(instruction)) == SOFTPC_MACHINE_OK)
+                fprintf(stderr, "    %02x %02x %02x %02x %02x %02x %02x %02x\n",
+                    instruction[0], instruction[1], instruction[2], instruction[3],
+                    instruction[4], instruction[5], instruction[6], instruction[7]);
+        }
         if (softpc_machine_read_physical(machine, 0xb8000u, text,
                 sizeof(text)) == SOFTPC_MACHINE_OK &&
             text_has_printable_character(text)) {
