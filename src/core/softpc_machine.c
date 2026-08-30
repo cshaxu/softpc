@@ -173,6 +173,12 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0xb8u, 0x80u, 0x02u, 0xcfu
     };
     static const unsigned char int12_vector[] = { 0x00u, 0x05u, 0x00u, 0xf0u };
+    /* INT 11h exposes the fixed display/FPU equipment plus the attached
+       removable drive, if this boot has one. */
+    static unsigned char int11_equipment_rom[] = {
+        0xb8u, 0x22u, 0x00u, 0xcfu
+    };
+    static const unsigned char int11_vector[] = { 0x00u, 0x07u, 0x00u, 0xf0u };
     /* INT 1Ah/AH=00h reads the BIOS data area's IRQ0-maintained tick count. */
     static const unsigned char int1a_clock_rom[] = {
         0x1eu, 0x80u, 0xfcu, 0x00u, 0x75u, 0x11u, 0x31u, 0xc0u,
@@ -204,6 +210,8 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         (unsigned char)(machine->sectors_per_track & 0xffu);
     hdd_int13_rom[sizeof(hdd_int13_rom) - 1u] =
         (unsigned char)(machine->sectors_per_track >> 8u);
+    int11_equipment_rom[1] = machine->options.floppy_path != NULL ?
+        0x23u : 0x22u;
     if (!softpc_platform_write_physical(0xf0100u, hdd_int13_rom,
             sizeof(hdd_int13_rom)) ||
         !softpc_platform_write_physical(0x4cu, hdd_int13_vector,
@@ -220,6 +228,10 @@ static softpc_machine_result softpc_machine_install_reset_rom(
             sizeof(int12_memory_rom)) ||
         !softpc_platform_write_physical(0x48u, int12_vector,
             sizeof(int12_vector)) ||
+        !softpc_platform_write_physical(0xf0700u, int11_equipment_rom,
+            sizeof(int11_equipment_rom)) ||
+        !softpc_platform_write_physical(0x44u, int11_vector,
+            sizeof(int11_vector)) ||
         !softpc_platform_write_physical(0xf0600u, int1a_clock_rom,
             sizeof(int1a_clock_rom)) ||
         !softpc_platform_write_physical(0x68u, int1a_vector,

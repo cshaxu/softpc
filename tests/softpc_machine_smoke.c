@@ -150,6 +150,22 @@ static void write_int12_boot_image(const char *path)
     assert(fclose(file) == 0);
 }
 
+static void write_int11_boot_image(const char *path)
+{
+    unsigned char sector[512] = { 0 };
+    FILE *file;
+    /* INT 11h; store equipment word at 0500h; jmp $. */
+    unsigned char program[] = {
+        0xcdu, 0x11u, 0xa3u, 0x00u, 0x05u, 0xebu, 0xfeu
+    };
+    memcpy(sector, program, sizeof(program));
+    sector[510] = 0x55u; sector[511] = 0xaau;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
+    assert(fclose(file) == 0);
+}
+
 static void write_int1a_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
@@ -483,6 +499,23 @@ static void run_int12_boot_image(const char *path)
     softpc_machine_destroy(machine);
 }
 
+static void run_int11_boot_image(const char *path, int floppy,
+    unsigned char expected)
+{
+    unsigned char equipment[2] = { 0, 0 };
+    softpc_machine_options options = { NULL, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    if (floppy) options.floppy_path = path;
+    else options.hard_disk_path = path;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, floppy ? 64u : 1000u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x500u, equipment,
+        sizeof(equipment)) == SOFTPC_MACHINE_OK);
+    assert(equipment[0] == expected && equipment[1] == 0u);
+    softpc_machine_destroy(machine);
+}
+
 static void run_int1a_boot_image(const char *path)
 {
     unsigned char ticks[4] = { 0xffu, 0xffu, 0xffu, 0xffu };
@@ -572,6 +605,7 @@ int main(void)
     const char *text = "softpc-machine-text-smoke.img";
     const char *int10 = "softpc-machine-int10-smoke.img";
     const char *int12 = "softpc-machine-int12-smoke.img";
+    const char *int11 = "softpc-machine-int11-smoke.img";
     const char *int1a = "softpc-machine-int1a-smoke.img";
     const char *int1a_tick = "softpc-machine-int1a-tick-smoke.img";
     const char *hdd_pio = "softpc-machine-hdd-pio-smoke.img";
@@ -597,6 +631,7 @@ int main(void)
     write_text_boot_image(text);
     write_int10_boot_image(int10);
     write_int12_boot_image(int12);
+    write_int11_boot_image(int11);
     write_int1a_boot_image(int1a);
     write_int1a_tick_boot_image(int1a_tick);
     write_hdd_pio_boot_image(hdd_pio);
@@ -622,6 +657,8 @@ int main(void)
     run_text_boot_image(text);
     run_int10_boot_image(int10);
     run_int12_boot_image(int12);
+    run_int11_boot_image(int11, 1, 0x23u);
+    run_int11_boot_image(int11, 0, 0x22u);
     run_int1a_boot_image(int1a);
     run_int1a_tick_boot_image(int1a_tick);
     run_hdd_pio_boot_image(hdd_pio);
@@ -644,6 +681,7 @@ int main(void)
     assert(remove(text) == 0);
     assert(remove(int10) == 0);
     assert(remove(int12) == 0);
+    assert(remove(int11) == 0);
     assert(remove(int1a) == 0);
     assert(remove(int1a_tick) == 0);
     assert(remove(hdd_pio) == 0);
