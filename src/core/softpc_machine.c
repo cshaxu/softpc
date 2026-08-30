@@ -21,6 +21,7 @@ extern void ica1_init(void);
 extern void dma_init(void);
 extern void dma_post(void);
 extern void cmos_init(void);
+extern void rom_init(void);
 extern void ppi_init(void);
 extern void ica0_post(void);
 extern void ica1_post(void);
@@ -430,6 +431,10 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     trace_file = stderr;
     c_cpu_init();
     c_cpu_reset();
+    /* Restore the original BIOS and V7 video ROM images first.  The current
+       temporary reset overlay remains only until every original ROM BOP
+       service is registered. */
+    rom_init();
     /* The original product's BIOS POST programmed the two 8259 PICs after
        their port glue was registered.  A standalone reset owns that hardware
        action directly; it is not a guest-service operation. */

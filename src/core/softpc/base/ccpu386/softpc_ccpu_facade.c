@@ -96,10 +96,6 @@ void cpu_simulate()
 }
 #endif
 
-void copyROM()
-{
-}
-
 IHPE Cpu_outb_function;
 IHPE GDP;
 
@@ -122,6 +118,14 @@ double get_287_reg_as_double(int n) { return((double)n); }
 int get_287_sp() { return(0); }
 ULONG get_287_status_word() { return(0L); }
 word get_287_tag_word() { return(0); }
+
+/* ROM discovery invokes its initialisation entry in real mode.  The restored
+ * CPU_40 interface expects this spelling even though the stripped executor
+ * no longer exports the generic helper. */
+IU32 c_effective_addr IFN2(IU16, selector, IU32, offset)
+{
+    return ((IU32)selector << 4) + offset;
+}
 
 
 #include "sas.h"

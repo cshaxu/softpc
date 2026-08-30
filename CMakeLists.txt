@@ -33,6 +33,7 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/system/at_dma.c
     src/core/softpc/base/system/cmos.c
     src/core/softpc/base/system/idetect.c
+    src/core/softpc/base/system/rom.c
     src/core/softpc/base/keymouse/ppi.c
     src/core/softpc/base/keymouse/keyba.c
     src/core/softpc/base/keymouse/keybd_io.c

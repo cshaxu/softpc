@@ -28,6 +28,9 @@ static UTINY *softpc_ram;
 static sys_addr softpc_ram_size;
 IU32 softpc_ccpu_instruction_budget = 0;
 
+#define SOFTPC_CONFIG_GFX_ADAPTER 54u
+#define SOFTPC_VGA_ADAPTER 5u
+
 static void softpc_timer2_gate(port, value)
 io_addr port;
 half_word value;
@@ -74,6 +77,8 @@ UTINY host_id;
 void *values;
 {
     UNUSED(values);
+    if (host_id == SOFTPC_CONFIG_GFX_ADAPTER)
+        return (void *)(ULONG_PTR)SOFTPC_VGA_ADAPTER;
     if (host_id == SOFTPC_CONFIG_HARD_DISK1_NAME)
         return (void *)(softpc_hdd_config_paths[0] != NULL ?
             softpc_hdd_config_paths[0] : softpc_empty_config_value);
@@ -81,6 +86,35 @@ void *values;
         return (void *)(softpc_hdd_config_paths[1] != NULL ?
             softpc_hdd_config_paths[1] : softpc_empty_config_value);
     return softpc_empty_config_value;
+}
+
+/* Original ROM loading is a machine resource lookup.  The standalone VM has
+   a fixed firmware directory rather than an NT resource provider. */
+long host_read_resource(resource_id, name, destination, maximum, binary)
+int resource_id;
+char *name;
+host_addr destination;
+int maximum;
+int binary;
+{
+    char path[260];
+    FILE *file;
+    size_t bytes;
+
+    UNUSED(resource_id);
+    UNUSED(binary);
+    if (name == NULL || destination == 0 || maximum <= 0 ||
+        (strcmp(name, "bios1.rom") != 0 &&
+         strcmp(name, "bios4.rom") != 0 &&
+         strcmp(name, "v7vga.rom") != 0))
+        return 0L;
+    sprintf(path, "firmware/roms/%s", name);
+    file = fopen(path, "rb");
+    if (file == NULL)
+        return 0L;
+    bytes = fread((void *)destination, 1u, (size_t)maximum, file);
+    fclose(file);
+    return (long)bytes;
 }
 
 void config_get(host_id, values)
@@ -426,13 +460,6 @@ int driveid;
     UNUSED(driveid);
 }
 
-void patch_rom(address, value)
-IU32 address;
-IU8 value;
-{
-    if (address < softpc_ram_size) softpc_ram[address] = value;
-}
-
 UTINY *host_sas_init(sys_addr size)
 {
     softpc_ram = (UTINY *)calloc((size_t)size + 0x2000u, 1u);
@@ -560,8 +587,4 @@ void LIM_w_write(sys_addr intel_addr)
 void host_simulate(void)
 {
     c_cpu_simulate();
-}
-
-void rom_init(void)
-{
 }
