@@ -605,7 +605,7 @@ static void run_int13_parameters_boot_image(const char *path)
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    assert(softpc_machine_run(machine, 64u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 256u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, values, sizeof(values)) == SOFTPC_MACHINE_OK);
     assert(values[0] == 18u && values[1] == 1u);
     softpc_machine_destroy(machine);
@@ -883,9 +883,9 @@ int main(void)
     const char *int13_reset = "softpc-machine-int13-reset-smoke.img";
     const char *int13_write = "softpc-machine-int13-write-smoke.img";
     const char *int13_parameters = "softpc-machine-int13-parameters-smoke.img";
-    softpc_machine_options conflicting_media = { floppy, hdd,
+    softpc_machine_options dual_media = { floppy, hdd,
         SOFTPC_PRESENTATION_CONSOLE };
-    softpc_machine *conflicting_machine = NULL;
+    softpc_machine *dual_machine = NULL;
     write_boot_image(floppy, 0x42u);
     write_boot_image(hdd, 0x77u);
     write_keyboard_boot_image(keyboard);
@@ -916,9 +916,19 @@ int main(void)
     write_int13_reset_boot_image(int13_reset);
     write_int13_write_boot_image(int13_write);
     write_int13_parameters_boot_image(int13_parameters);
-    assert(softpc_machine_create(&conflicting_media, &conflicting_machine) ==
-        SOFTPC_MACHINE_INVALID_ARGUMENT);
-    assert(conflicting_machine == NULL);
+    assert(softpc_machine_create(&dual_media, &dual_machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(dual_machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(dual_machine, 4u) == SOFTPC_MACHINE_OK);
+    {
+        unsigned char marker = 0u;
+        unsigned char fixed_disk_count = 0u;
+        assert(softpc_machine_read_physical(dual_machine, 0x500u, &marker, 1u) ==
+            SOFTPC_MACHINE_OK);
+        assert(softpc_machine_read_physical(dual_machine, 0x475u,
+            &fixed_disk_count, 1u) == SOFTPC_MACHINE_OK);
+        assert(marker == 0x42u && fixed_disk_count == 1u);
+    }
+    softpc_machine_destroy(dual_machine);
     run_boot_image(floppy, 1, 0x42u, 4u);
     run_boot_image(hdd, 0, 0x77u, 1000u);
     run_keyboard_boot_image(keyboard);

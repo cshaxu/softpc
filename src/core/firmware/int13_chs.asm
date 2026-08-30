@@ -1,11 +1,11 @@
-; Fixed-machine INT 13h CHS read/write service.
-; The ROM is assembled to a byte array embedded by softpc_machine.c.  It is
-; deliberately firmware code, not a host callback or service escape.
+; Fixed-machine INT 13h CHS service. A: is DL=00h (2 heads, 18 sectors)
+; and C: is DL=80h (16 heads, 63 sectors). The ATA drive bit selects the
+; corresponding raw-media backend; no product callback is used.
 
 BITS 16
 ORG 0x0100
 
-int13_read:
+int13:
     push ax
     push bx
     push cx
@@ -14,62 +14,77 @@ int13_read:
     push di
     push bp
     push ds
-    push ax                       ; retain AH=function and AL=count
-    cmp ah, 0x00                  ; controller reset
+    push ax
+    cmp ah, 0x00
     je reset
-    cmp ah, 0x08                  ; drive parameters
+    cmp ah, 0x08
     je parameters
-    mov di, bx                    ; ES:DI destination / source offset
-    cmp ah, 0x02                  ; read sectors
+    mov di, bx
+    cmp ah, 0x02
     je transfer
-    cmp ah, 0x03                  ; write sectors
+    cmp ah, 0x03
     jne fail
 transfer:
     or al, al
     jz fail
-    cmp al, 128                   ; standalone ATA PIO transfer limit
+    cmp al, 128
     ja fail
-
-    mov ax, cx                    ; CH + CL[7:6] form the cylinder
+    mov ax, cx
     xchg al, ah
     and ah, 0xc0
     shr ah, 6
     mov bx, dx
-    mov bl, bh                    ; head
+    mov bl, bh
     xor bh, bh
-    mov si, [cs:heads]
-    mov bp, [cs:sectors_per_track]
-    mul si                        ; cylinder * heads
+    mov si, dx
+    and si, 0x00ff
+    cmp si, 0x80
+    je hard_geometry
+    or si, si
+    jne fail
+    mov si, 2
+    mov bp, 18
+    jmp short geometry_ready
+hard_geometry:
+    mov si, 16
+    mov bp, 63
+geometry_ready:
+    mul si
     add ax, bx
-    mul bp                        ; (cylinder * heads + head) * sectors
+    mul bp
     mov bx, cx
     and bl, 0x3f
     dec bx
-    add ax, bx                    ; LBA in AX (fixed profile stays < 64K)
+    add ax, bx
     mov bx, ax
-
     mov dx, 0x1f2
     pop cx
     mov ax, cx
-    out dx, al                    ; ATA sector count
+    out dx, al
     inc dx
     mov ax, bx
-    out dx, al                    ; LBA[7:0]
+    out dx, al
     inc dx
     mov al, ah
-    out dx, al                    ; LBA[15:8]
+    out dx, al
     inc dx
     xor al, al
-    out dx, al                    ; LBA[23:16]
+    out dx, al
     inc dx
+    mov ax, bp
+    cmp al, 63
+    jne floppy_select
+    mov al, 0xf0
+    jmp short drive_ready
+floppy_select:
     mov al, 0xe0
-    out dx, al                    ; master, LBA mode
+drive_ready:
+    out dx, al
     inc dx
     cmp ch, 0x03
     je write_command
     mov al, 0x20
-    out dx, al                    ; read sectors
-
+    out dx, al
     mov dx, 0x1f0
     xor ch, ch
 read_sector:
@@ -83,11 +98,9 @@ read_word:
     pop cx
     loop read_sector
     jmp success
-
 write_command:
     mov al, 0x30
-    out dx, al                    ; write sectors
-
+    out dx, al
     mov dx, 0x1f0
     xor ch, ch
     push es
@@ -100,7 +113,6 @@ write_sector:
     rep outsw
     pop cx
     loop write_sector
-
 success:
     pop ds
     pop bp
@@ -113,39 +125,8 @@ success:
     xor ah, ah
     clc
     iret
-reset:
-    pop ax
-    pop ds
-    pop bp
-    pop di
-    pop si
-    pop dx
-    pop cx
-    pop bx
-    pop ax
-    xor ah, ah
-    clc
-    iret
-parameters:
-    pop ax
-    pop ds
-    pop bp
-    pop di
-    pop si
-    pop dx
-    pop cx
-    pop bx
-    pop ax
-    mov ch, 0xff
-    mov cl, [cs:sectors_per_track]
-    mov dh, [cs:heads]
-    dec dh
-    mov dl, 1
-    xor ah, ah
-    clc
-    iret
 fail:
-    pop cx
+    pop ax
     pop ds
     pop bp
     pop di
@@ -157,8 +138,38 @@ fail:
     mov ah, 0x01
     stc
     iret
-
-heads:
-    dw 16
-sectors_per_track:
-    dw 63
+reset:
+    pop ax
+    jmp short success
+parameters:
+    pop ax
+    pop ds
+    pop bp
+    pop di
+    pop si
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    cmp dl, 0x80
+    je hard_parameters
+    or dl, dl
+    jne fail_result
+    mov ch, 79
+    mov cl, 18
+    mov dh, 1
+    mov dl, 1
+    jmp short parameters_ready
+hard_parameters:
+    mov ch, 0xff
+    mov cl, 63
+    mov dh, 15
+    mov dl, 1
+parameters_ready:
+    xor ah, ah
+    clc
+    iret
+fail_result:
+    mov ah, 0x01
+    stc
+    iret

@@ -5,24 +5,27 @@ source, without NTVDM, DOS/WOW, VDD, BOP service dispatch, or an NTVDM host
 process.  The machine shape is fixed to the currently selected SoftPC
 configuration; users supply boot media rather than select a machine profile.
 
-Build and start the VM with:
+Build the VM, then set the fixed machine defaults in `softpc.yaml`:
 
 ```text
 cmake -S . -B build
 cmake --build build
-softpcvm --floppy disk.img
-softpcvm --hdd disk.img
-softpcvm --floppy disk.img --window
+softpcvm
 ```
 
-Console presentation is the default and runs continuously; press `Esc` to
-leave it. `--window` selects the equivalent Win32 text window. The current
+`softpc.yaml` has exactly four top-level keys: `memory_mb`, `floppy`,
+`hard_disk`, and `display` (`console` or `window`). Both media keys may be
+set together, creating fixed `A:` and `C:` slots; the machine boots `A:`
+first, then `C:`. Use `--config path.yaml` only to point at another fixed
+machine-default file. Console presentation runs continuously; press `Esc` to
+leave it. The current
 core links the detached CCPU, SAS, I/O, PIC and event packages through
 standalone host ports. The fixed firmware, raw-media storage path, and
 console/Win32 text presentation are machine-owned rather than supplied by a
 product host.
 
-Exactly one boot medium is accepted. The fixed machine has 16 MiB RAM, master
+The fixed machine has 16 MiB RAM by default (configurable through
+`memory_mb`), master
 and slave 8259 PICs, PIT channel 0, an 8042-style keyboard queue, text video
 at `B800:0000`, and one ATA PIO backend with sector read/write and identify
 support. Its ROM boots a floppy
@@ -53,8 +56,8 @@ firmware uses sectors-per-track and heads from the first partition's BPB;
 unrecognised hard disks retain the fixed 16×63 compatibility geometry.
 
 This is intentionally a compact fixed PC, not a complete BIOS or controller
-emulation: CMOS/RTC, VGA graphics, floppy-controller commands, sound, and
-simultaneous floppy-plus-hard-disk attachment are not implemented yet.
+emulation: CMOS/RTC, VGA graphics, floppy-controller commands, and sound are
+not implemented yet.
 
 Keyboard input is delivered through the fixed 8042-style queue and IRQ1, then
 consumed through `INT 16h`; enabling guest interrupts therefore does not turn

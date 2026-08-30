@@ -31,27 +31,33 @@ extern void softpc_platform_timer_init(void);
 extern void softpc_platform_timer_advance(unsigned long instructions);
 extern unsigned long softpc_platform_timer_ticks(void);
 extern void softpc_platform_hdd_init(void);
-extern int softpc_platform_hdd_attach(const char *path);
+extern int softpc_platform_hdd_attach(const char *floppy_path,
+    const char *hard_disk_path);
 extern void softpc_platform_hdd_detach(void);
 extern FILE *trace_file;
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
+#define SOFTPC_MINIMUM_RAM_BYTES (1024ul * 1024ul)
 #define SOFTPC_BOOT_SECTOR_BYTES 512u
 #define SOFTPC_BOOT_SECTOR_ADDRESS 0x7c00u
 #define SOFTPC_RESET_VECTOR_ADDRESS 0xffff0u
-
-struct softpc_machine {
-    softpc_machine_options options;
-    unsigned short sectors_per_track;
-    unsigned short heads;
-    int reset;
-    int hardware_initialized;
-};
 
 static int softpc_machine_floppy_geometry(const char *path,
     unsigned short *sectors_per_track, unsigned short *heads);
 static int softpc_machine_hdd_geometry(const char *path,
     unsigned short *sectors_per_track, unsigned short *heads);
+
+struct softpc_machine {
+    softpc_machine_options options;
+    unsigned short floppy_sectors_per_track;
+    unsigned short floppy_heads;
+    unsigned short hard_disk_sectors_per_track;
+    unsigned short hard_disk_heads;
+    unsigned long memory_bytes;
+    int reset;
+    int hardware_initialized;
+};
+
 
 static int softpc_machine_media_exists(const char *path)
 {
@@ -94,14 +100,17 @@ static softpc_machine_result softpc_machine_install_reset_rom(
     static const unsigned char hdd_boot_rom[] = {
         0xbau, 0xf2u, 0x01u, 0xb0u, 0x01u, 0xeeu,
         0x42u, 0x30u, 0xc0u, 0xeeu, 0x42u, 0xeeu, 0x42u, 0xeeu,
-        0x42u, 0xb0u, 0xe0u, 0xeeu, 0x42u, 0xb0u, 0x20u, 0xeeu,
+        0x42u, 0xb0u, 0xf0u, 0xeeu, 0x42u, 0xb0u, 0x20u, 0xeeu,
         0xbau, 0xf0u, 0x01u, 0xbfu, 0x00u, 0x7cu, 0xb9u, 0x00u, 0x01u,
         0xfcu, 0xedu, 0xabu, 0xe2u, 0xfcu, 0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
     };
-    /* Assembled from firmware/int13_chs.asm.  Keep the checked-in assembly
-       source and this freestanding C initializer in lockstep so the normal C
-       build has no assembler-toolchain dependency. */
+    /* Assembled from firmware/int13_chs.asm. The checked-in byte include
+       preserves an assembler-free normal build. */
     static unsigned char hdd_int13_rom[] = {
+#include "firmware/int13_chs.inc"
+    };
+#if 0
+    static unsigned char retired_int13_rom[] = {
         0x50u, 0x53u, 0x51u, 0x52u, 0x56u, 0x57u, 0x55u, 0x1eu,
         0x50u, 0x80u, 0xfcu, 0x00u, 0x0fu, 0x84u, 0xa0u, 0x00u,
         0x80u, 0xfcu, 0x08u, 0x0fu, 0x84u, 0xa6u, 0x00u, 0x89u,
@@ -133,7 +142,8 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0x59u, 0x5bu, 0x58u, 0xb4u, 0x01u, 0xf9u, 0xcfu, 0x10u,
         0x00u, 0x3fu, 0x00u,
     };
-    static const unsigned char hdd_int13_vector[] = { 0x00u, 0x01u, 0x00u, 0xf0u };
+#endif
+    static const unsigned char hdd_int13_vector[] = { 0x00u, 0x0du, 0x00u, 0xf0u };
     /* Assembled from firmware/int10_teletype.asm; embedding keeps the normal
        C build independent of an assembler installation. */
     static const unsigned char int10_teletype_rom[] = {
@@ -208,7 +218,7 @@ static softpc_machine_result softpc_machine_install_reset_rom(
     };
     static const unsigned char int1a_vector[] = { 0x00u, 0x06u, 0x00u, 0xf0u };
     /* INT 15h/AH=88h reports the fixed RAM above the first MiB. */
-    static const unsigned char int15_memory_rom[] = {
+    static unsigned char int15_memory_rom[] = {
         0x80u, 0xfcu, 0x88u, 0x75u, 0x05u, 0xb8u, 0x00u, 0x3cu,
         0xf8u, 0xcfu, 0xb4u, 0x86u, 0xf9u, 0xcfu
     };
@@ -251,16 +261,27 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
     };
     static const unsigned char floppy_reset_vector[] = {
-        0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
+        0xb2u, 0x00u, 0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
     };
-    hdd_int13_rom[sizeof(hdd_int13_rom) - 4u] =
-        (unsigned char)(machine->heads & 0xffu);
-    hdd_int13_rom[sizeof(hdd_int13_rom) - 3u] =
-        (unsigned char)(machine->heads >> 8u);
-    hdd_int13_rom[sizeof(hdd_int13_rom) - 2u] =
-        (unsigned char)(machine->sectors_per_track & 0xffu);
-    hdd_int13_rom[sizeof(hdd_int13_rom) - 1u] =
-        (unsigned char)(machine->sectors_per_track >> 8u);
+    hdd_int13_rom[0x52u] = (unsigned char)machine->floppy_heads;
+    hdd_int13_rom[0x53u] = (unsigned char)(machine->floppy_heads >> 8u);
+    hdd_int13_rom[0x55u] = (unsigned char)machine->floppy_sectors_per_track;
+    hdd_int13_rom[0x56u] = (unsigned char)(machine->floppy_sectors_per_track >> 8u);
+    hdd_int13_rom[0x5au] = (unsigned char)machine->hard_disk_heads;
+    hdd_int13_rom[0x5bu] = (unsigned char)(machine->hard_disk_heads >> 8u);
+    hdd_int13_rom[0x5du] = (unsigned char)machine->hard_disk_sectors_per_track;
+    hdd_int13_rom[0x5eu] = (unsigned char)(machine->hard_disk_sectors_per_track >> 8u);
+    hdd_int13_rom[0xf3u] = (unsigned char)machine->floppy_sectors_per_track;
+    hdd_int13_rom[0xf5u] = (unsigned char)(machine->floppy_heads - 1u);
+    hdd_int13_rom[0xfdu] = (unsigned char)machine->hard_disk_sectors_per_track;
+    hdd_int13_rom[0xffu] = (unsigned char)(machine->hard_disk_heads - 1u);
+    {
+        unsigned long extended_kib = (machine->memory_bytes -
+            SOFTPC_MINIMUM_RAM_BYTES) / 1024ul;
+        if (extended_kib > 0xfffful) extended_kib = 0xfffful;
+        int15_memory_rom[6] = (unsigned char)extended_kib;
+        int15_memory_rom[7] = (unsigned char)(extended_kib >> 8u);
+    }
     int11_equipment_rom[1] = machine->options.floppy_path != NULL ?
         0x23u : 0x22u;
     bda_configuration[0] = int11_equipment_rom[1];
@@ -269,7 +290,7 @@ static softpc_machine_result softpc_machine_install_reset_rom(
     bda_configuration[3] = 0x02u;
     bda_configuration[4] = 0u;
     bda_fixed_disk_count = machine->options.hard_disk_path != NULL ? 1u : 0u;
-    if (!softpc_platform_write_physical(0xf0100u, hdd_int13_rom,
+    if (!softpc_platform_write_physical(0xf0d00u, hdd_int13_rom,
             sizeof(hdd_int13_rom)) ||
         !softpc_platform_write_physical(0x4cu, hdd_int13_vector,
             sizeof(hdd_int13_vector)) ||
@@ -347,21 +368,31 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
     if (machine_out != NULL) *machine_out = NULL;
     if (options == NULL || machine_out == NULL ||
         (options->floppy_path == NULL && options->hard_disk_path == NULL) ||
-        (options->floppy_path != NULL && options->hard_disk_path != NULL) ||
         !softpc_machine_media_exists(options->floppy_path) ||
         !softpc_machine_media_exists(options->hard_disk_path))
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     machine = calloc(1u, sizeof(*machine));
     if (machine == NULL) return SOFTPC_MACHINE_IO_ERROR;
     machine->options = *options;
-    if (options->floppy_path != NULL) {
-        if (!softpc_machine_floppy_geometry(options->floppy_path,
-                &machine->sectors_per_track, &machine->heads)) {
-            free(machine);
-            return SOFTPC_MACHINE_IO_ERROR;
-        }
-    } else if (!softpc_machine_hdd_geometry(options->hard_disk_path,
-            &machine->sectors_per_track, &machine->heads)) {
+    machine->memory_bytes = options->memory_bytes == 0u ?
+        SOFTPC_FIXED_RAM_BYTES : (unsigned long)options->memory_bytes;
+    if (machine->memory_bytes < SOFTPC_MINIMUM_RAM_BYTES) {
+        free(machine);
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    }
+    machine->floppy_sectors_per_track = 18u;
+    machine->floppy_heads = 2u;
+    machine->hard_disk_sectors_per_track = 63u;
+    machine->hard_disk_heads = 16u;
+    if (options->floppy_path != NULL && !softpc_machine_floppy_geometry(
+            options->floppy_path, &machine->floppy_sectors_per_track,
+            &machine->floppy_heads)) {
+        free(machine);
+        return SOFTPC_MACHINE_IO_ERROR;
+    }
+    if (options->hard_disk_path != NULL && !softpc_machine_hdd_geometry(
+            options->hard_disk_path, &machine->hard_disk_sectors_per_track,
+            &machine->hard_disk_heads)) {
         free(machine);
         return SOFTPC_MACHINE_IO_ERROR;
     }
@@ -373,7 +404,7 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
 {
     if (machine == NULL) return SOFTPC_MACHINE_INVALID_ARGUMENT;
     if (!machine->hardware_initialized) {
-        sas_init(SOFTPC_FIXED_RAM_BYTES);
+        sas_init(machine->memory_bytes);
         io_init();
         SWPIC_init_funcptrs();
         ica0_init();
@@ -393,8 +424,8 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
        action directly; it is not a guest-service operation. */
     ica0_post();
     ica1_post();
-    if (!softpc_platform_hdd_attach(machine->options.hard_disk_path != NULL ?
-            machine->options.hard_disk_path : machine->options.floppy_path))
+    if (!softpc_platform_hdd_attach(machine->options.floppy_path,
+            machine->options.hard_disk_path))
         return SOFTPC_MACHINE_IO_ERROR;
     {
         softpc_machine_result result = SOFTPC_MACHINE_OK;

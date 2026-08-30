@@ -21,6 +21,7 @@ typedef struct softpc_machine_options {
     const char *floppy_path;
     const char *hard_disk_path;
     softpc_presentation presentation;
+    uint32_t memory_bytes;
 } softpc_machine_options;
 
 softpc_machine_result softpc_machine_create(const softpc_machine_options *options,

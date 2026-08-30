@@ -145,7 +145,13 @@ int softpc_platform_keyboard_scancode(IU8 scan_code)
     return 1;
 }
 
-static FILE *softpc_hdd_file;
+typedef struct softpc_ata_media {
+    FILE *file;
+    int writable;
+    IU32 total_sectors;
+} softpc_ata_media;
+
+static softpc_ata_media softpc_hdd_media[2];
 static IU8 softpc_hdd_sector_count;
 static IU8 softpc_hdd_lba_low;
 static IU8 softpc_hdd_lba_mid;
@@ -158,8 +164,13 @@ static IU8 softpc_hdd_buffer[SOFTPC_ATA_SECTOR_BYTES * SOFTPC_ATA_MAX_SECTORS];
 static IU32 softpc_hdd_buffer_offset;
 static IU32 softpc_hdd_transfer_bytes;
 static int softpc_hdd_write_active;
-static int softpc_hdd_writable;
-static IU32 softpc_hdd_total_sectors;
+static unsigned int softpc_hdd_write_drive;
+
+static unsigned int softpc_hdd_selected_drive(void)
+{
+    if ((softpc_hdd_drive_head & 0x10u) != 0u) return 1u;
+    return softpc_hdd_media[0].file != NULL ? 0u : 1u;
+}
 
 static void softpc_hdd_inb(port, value)
 io_addr port;
@@ -191,10 +202,12 @@ word *value;
 static void softpc_hdd_read_sectors(void)
 {
     unsigned long lba;
+    softpc_ata_media *media;
     IU32 sectors = softpc_hdd_sector_count;
     IU32 transfer_bytes;
     if (sectors == 0u) sectors = 256u;
-    if (softpc_hdd_file == NULL || sectors > SOFTPC_ATA_MAX_SECTORS) {
+    media = &softpc_hdd_media[softpc_hdd_selected_drive()];
+    if (media->file == NULL || sectors > SOFTPC_ATA_MAX_SECTORS) {
         softpc_hdd_status = 0x41u;
         return;
     }
@@ -203,9 +216,9 @@ static void softpc_hdd_read_sectors(void)
         ((unsigned long)softpc_hdd_lba_mid << 8u) |
         ((unsigned long)softpc_hdd_lba_high << 16u) |
         ((unsigned long)(softpc_hdd_drive_head & 0x0fu) << 24u);
-    if (fseek(softpc_hdd_file, (long)(lba * SOFTPC_ATA_SECTOR_BYTES), SEEK_SET) != 0 ||
-        fread(softpc_hdd_buffer, 1u, transfer_bytes, softpc_hdd_file) != transfer_bytes) {
-        clearerr(softpc_hdd_file);
+    if (fseek(media->file, (long)(lba * SOFTPC_ATA_SECTOR_BYTES), SEEK_SET) != 0 ||
+        fread(softpc_hdd_buffer, 1u, transfer_bytes, media->file) != transfer_bytes) {
+        clearerr(media->file);
         softpc_hdd_status = 0x41u;
         return;
     }
@@ -225,8 +238,11 @@ static unsigned long softpc_hdd_lba(void)
 static void softpc_hdd_begin_write(void)
 {
     IU32 sectors = softpc_hdd_sector_count;
+    softpc_ata_media *media;
     if (sectors == 0u) sectors = 256u;
-    if (softpc_hdd_file == NULL || !softpc_hdd_writable ||
+    softpc_hdd_write_drive = softpc_hdd_selected_drive();
+    media = &softpc_hdd_media[softpc_hdd_write_drive];
+    if (media->file == NULL || !media->writable ||
         sectors > SOFTPC_ATA_MAX_SECTORS) {
         softpc_hdd_status = 0x41u;
         return;
@@ -246,12 +262,13 @@ static void softpc_hdd_put_identify_word(IU32 word_index, word value)
 static void softpc_hdd_identify(void)
 {
     IU32 cylinders;
-    if (softpc_hdd_file == NULL) {
+    softpc_ata_media *media = &softpc_hdd_media[softpc_hdd_selected_drive()];
+    if (media->file == NULL) {
         softpc_hdd_status = 0x41u;
         return;
     }
     memset(softpc_hdd_buffer, 0, SOFTPC_ATA_SECTOR_BYTES);
-    cylinders = softpc_hdd_total_sectors / (16u * 63u);
+    cylinders = media->total_sectors / (16u * 63u);
     if (cylinders == 0u) cylinders = 1u;
     if (cylinders > 16383u) cylinders = 16383u;
     softpc_hdd_put_identify_word(0u, 0x0040u);
@@ -260,8 +277,8 @@ static void softpc_hdd_identify(void)
     softpc_hdd_put_identify_word(6u, 63u);
     softpc_hdd_put_identify_word(49u, 0x0200u);
     softpc_hdd_put_identify_word(53u, 0x0001u);
-    softpc_hdd_put_identify_word(60u, (word)softpc_hdd_total_sectors);
-    softpc_hdd_put_identify_word(61u, (word)(softpc_hdd_total_sectors >> 16u));
+    softpc_hdd_put_identify_word(60u, (word)media->total_sectors);
+    softpc_hdd_put_identify_word(61u, (word)(media->total_sectors >> 16u));
     softpc_hdd_buffer_offset = 0u;
     softpc_hdd_transfer_bytes = SOFTPC_ATA_SECTOR_BYTES;
     softpc_hdd_write_active = 0;
@@ -271,16 +288,18 @@ static void softpc_hdd_identify(void)
 static void softpc_hdd_data_write(IU8 value)
 {
     unsigned long lba;
+    softpc_ata_media *media;
     if (!softpc_hdd_write_active || softpc_hdd_status != 0x48u ||
         softpc_hdd_buffer_offset >= softpc_hdd_transfer_bytes) return;
     softpc_hdd_buffer[softpc_hdd_buffer_offset++] = value;
     if (softpc_hdd_buffer_offset != softpc_hdd_transfer_bytes) return;
     lba = softpc_hdd_lba();
-    if (fseek(softpc_hdd_file, (long)(lba * SOFTPC_ATA_SECTOR_BYTES), SEEK_SET) != 0 ||
+    media = &softpc_hdd_media[softpc_hdd_write_drive];
+    if (fseek(media->file, (long)(lba * SOFTPC_ATA_SECTOR_BYTES), SEEK_SET) != 0 ||
         fwrite(softpc_hdd_buffer, 1u, softpc_hdd_transfer_bytes,
-            softpc_hdd_file) != softpc_hdd_transfer_bytes ||
-        fflush(softpc_hdd_file) != 0) {
-        clearerr(softpc_hdd_file);
+            media->file) != softpc_hdd_transfer_bytes ||
+        fflush(media->file) != 0) {
+        clearerr(media->file);
         softpc_hdd_status = 0x41u;
     } else softpc_hdd_status = 0x40u;
     softpc_hdd_write_active = 0;
@@ -318,47 +337,71 @@ word value;
     } else softpc_hdd_outb(port, (IU8)value);
 }
 
-int softpc_platform_hdd_attach(const char *path)
+static int softpc_hdd_attach_media(softpc_ata_media *media, const char *path)
 {
-    if (softpc_hdd_file != NULL) fclose(softpc_hdd_file);
-    softpc_hdd_file = NULL;
-    softpc_hdd_status = 0x40u;
-    softpc_hdd_buffer_offset = 0;
-    softpc_hdd_transfer_bytes = 0;
-    softpc_hdd_write_active = 0;
-    softpc_hdd_writable = 0;
-    softpc_hdd_total_sectors = 0u;
+    media->file = NULL;
+    media->writable = 0;
+    media->total_sectors = 0u;
     if (path == NULL) return 1;
-    softpc_hdd_file = fopen(path, "rb+");
-    if (softpc_hdd_file != NULL) softpc_hdd_writable = 1;
-    else softpc_hdd_file = fopen(path, "rb");
-    if (softpc_hdd_file != NULL) {
+    media->file = fopen(path, "rb+");
+    if (media->file != NULL) media->writable = 1;
+    else media->file = fopen(path, "rb");
+    if (media->file != NULL) {
         long bytes;
-        if (fseek(softpc_hdd_file, 0L, SEEK_END) != 0) goto attach_failed;
-        bytes = ftell(softpc_hdd_file);
-        if (bytes < 0 || fseek(softpc_hdd_file, 0L, SEEK_SET) != 0)
+        if (fseek(media->file, 0L, SEEK_END) != 0) goto attach_failed;
+        bytes = ftell(media->file);
+        if (bytes < 0 || fseek(media->file, 0L, SEEK_SET) != 0)
             goto attach_failed;
-        softpc_hdd_total_sectors = (IU32)((unsigned long)bytes /
+        media->total_sectors = (IU32)((unsigned long)bytes /
             SOFTPC_ATA_SECTOR_BYTES);
     }
-    return softpc_hdd_file != NULL;
+    return 1;
 attach_failed:
-    fclose(softpc_hdd_file);
-    softpc_hdd_file = NULL;
-    softpc_hdd_writable = 0;
+    fclose(media->file);
+    media->file = NULL;
+    media->writable = 0;
     return 0;
+}
+
+int softpc_platform_hdd_attach(const char *floppy_path, const char *hard_disk_path)
+{
+    unsigned int index;
+    for (index = 0u; index < 2u; ++index) {
+        if (softpc_hdd_media[index].file != NULL)
+            fclose(softpc_hdd_media[index].file);
+        softpc_hdd_media[index].file = NULL;
+        softpc_hdd_media[index].writable = 0;
+        softpc_hdd_media[index].total_sectors = 0u;
+    }
+    softpc_hdd_status = 0x40u;
+    softpc_hdd_buffer_offset = 0u;
+    softpc_hdd_transfer_bytes = 0u;
+    softpc_hdd_write_active = 0;
+    softpc_hdd_write_drive = 0u;
+    if (!softpc_hdd_attach_media(&softpc_hdd_media[0], floppy_path)) return 0;
+    if (!softpc_hdd_attach_media(&softpc_hdd_media[1], hard_disk_path)) {
+        if (softpc_hdd_media[0].file != NULL) fclose(softpc_hdd_media[0].file);
+        softpc_hdd_media[0].file = NULL;
+        return 0;
+    }
+    return 1;
 }
 
 void softpc_platform_hdd_detach(void)
 {
-    if (softpc_hdd_file != NULL) fclose(softpc_hdd_file);
-    softpc_hdd_file = NULL;
+    unsigned int index;
+    for (index = 0u; index < 2u; ++index) {
+        if (softpc_hdd_media[index].file != NULL)
+            fclose(softpc_hdd_media[index].file);
+        softpc_hdd_media[index].file = NULL;
+        softpc_hdd_media[index].writable = 0;
+        softpc_hdd_media[index].total_sectors = 0u;
+    }
     softpc_hdd_status = 0x40u;
     softpc_hdd_buffer_offset = 0;
     softpc_hdd_transfer_bytes = 0;
     softpc_hdd_write_active = 0;
-    softpc_hdd_writable = 0;
-    softpc_hdd_total_sectors = 0u;
+    softpc_hdd_write_drive = 0u;
 }
 
 void softpc_platform_hdd_init(void)
