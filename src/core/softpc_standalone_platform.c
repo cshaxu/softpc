@@ -242,6 +242,16 @@ BOOL req_state;
     UNUSED(req_state);
 }
 
+BOOL config_get_active(host_id)
+UTINY host_id;
+{
+    if (host_id < SOFTPC_CONFIG_HARD_DISK1_NAME ||
+        host_id > SOFTPC_CONFIG_HARD_DISK2_NAME)
+        return FALSE;
+    return softpc_hdd_config_paths[host_id -
+        SOFTPC_CONFIG_HARD_DISK1_NAME] != NULL;
+}
+
 SHORT host_gfi_rdiskette_valid(host_id, values, error)
 UTINY host_id;
 ConfigValues *values;
@@ -543,12 +553,11 @@ int softpc_platform_hdd_attach(const char *floppy_path, const char *hard_disk_pa
         softpc_hdd_media[index].writable = 0;
         softpc_hdd_media[index].total_sectors = 0u;
     }
-    /* The temporary bootstrap still supplies a floppy image as its first
-       block device.  Preserve that ordering until the original FDC/BIOS
-       path replaces the bootstrap, while the port controller itself is the
-       original SoftPC fdisk implementation. */
-    softpc_hdd_config_paths[0] = floppy_path != NULL ? floppy_path : hard_disk_path;
-    softpc_hdd_config_paths[1] = floppy_path != NULL ? hard_disk_path : NULL;
+    /* Fixed disks belong solely to the original fixed-disk controller.
+       Removable media is attached separately through original FLA/GFI/FDC. */
+    UNUSED(floppy_path);
+    softpc_hdd_config_paths[0] = hard_disk_path;
+    softpc_hdd_config_paths[1] = NULL;
     if (!softpc_hdd_attach_media(&softpc_hdd_media[0], softpc_hdd_config_paths[0])) return 0;
     if (!softpc_hdd_attach_media(&softpc_hdd_media[1], softpc_hdd_config_paths[1])) {
         if (softpc_hdd_media[0].file != NULL) fclose(softpc_hdd_media[0].file);
@@ -641,18 +650,6 @@ int driveid;
 {
     if (driveid >= 0 && driveid < 2 && softpc_hdd_media[driveid].file != NULL)
         (void)fseek(softpc_hdd_media[driveid].file, 0L, SEEK_SET);
-}
-
-void fast_disk_bios_attach(driveid)
-int driveid;
-{
-    UNUSED(driveid);
-}
-
-void fast_disk_bios_detach(driveid)
-int driveid;
-{
-    UNUSED(driveid);
 }
 
 UTINY *host_sas_init(sys_addr size)

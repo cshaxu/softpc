@@ -49,6 +49,7 @@ extern void printer_init(int adapter);
 extern void printer_post(int adapter);
 extern void com_init(int adapter);
 extern void com_post(int adapter);
+extern void disk_post(void);
 extern void softpc_platform_hdd_init(void);
 extern int softpc_platform_hdd_attach(const char *floppy_path,
     const char *hard_disk_path);
@@ -128,11 +129,6 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0xbau, 0xf0u, 0x01u, 0xbfu, 0x00u, 0x7cu, 0xb9u, 0x00u, 0x01u,
         0xfcu, 0xedu, 0xabu, 0xe2u, 0xfcu, 0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
     };
-    /* Assembled from firmware/int13_chs.asm. The checked-in byte include
-       preserves an assembler-free normal build. */
-    static unsigned char hdd_int13_rom[] = {
-#include "firmware/int13_chs.inc"
-    };
 #if 0
     static unsigned char retired_int13_rom[] = {
         0x50u, 0x53u, 0x51u, 0x52u, 0x56u, 0x57u, 0x55u, 0x1eu,
@@ -167,7 +163,6 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0x00u, 0x3fu, 0x00u,
     };
 #endif
-    static const unsigned char hdd_int13_vector[] = { 0x00u, 0x0du, 0x00u, 0xf0u };
     /* Assembled from firmware/int10_teletype.asm; embedding keeps the normal
        C build independent of an assembler installation. */
     static const unsigned char int10_teletype_rom[] = {
@@ -281,18 +276,6 @@ static softpc_machine_result softpc_machine_install_reset_rom(
     static const unsigned char floppy_reset_vector[] = {
         0xb2u, 0x00u, 0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
     };
-    hdd_int13_rom[0x52u] = (unsigned char)machine->floppy_heads;
-    hdd_int13_rom[0x53u] = (unsigned char)(machine->floppy_heads >> 8u);
-    hdd_int13_rom[0x55u] = (unsigned char)machine->floppy_sectors_per_track;
-    hdd_int13_rom[0x56u] = (unsigned char)(machine->floppy_sectors_per_track >> 8u);
-    hdd_int13_rom[0x5au] = (unsigned char)machine->hard_disk_heads;
-    hdd_int13_rom[0x5bu] = (unsigned char)(machine->hard_disk_heads >> 8u);
-    hdd_int13_rom[0x5du] = (unsigned char)machine->hard_disk_sectors_per_track;
-    hdd_int13_rom[0x5eu] = (unsigned char)(machine->hard_disk_sectors_per_track >> 8u);
-    hdd_int13_rom[0xf3u] = (unsigned char)machine->floppy_sectors_per_track;
-    hdd_int13_rom[0xf5u] = (unsigned char)(machine->floppy_heads - 1u);
-    hdd_int13_rom[0xfdu] = (unsigned char)machine->hard_disk_sectors_per_track;
-    hdd_int13_rom[0xffu] = (unsigned char)(machine->hard_disk_heads - 1u);
     {
         unsigned long extended_kib = (machine->memory_bytes -
             SOFTPC_MINIMUM_RAM_BYTES) / 1024ul;
@@ -308,11 +291,7 @@ static softpc_machine_result softpc_machine_install_reset_rom(
     bda_configuration[3] = 0x02u;
     bda_configuration[4] = 0u;
     bda_fixed_disk_count = machine->options.hard_disk_path != NULL ? 1u : 0u;
-    if (!softpc_platform_write_physical(0xf0d00u, hdd_int13_rom,
-            sizeof(hdd_int13_rom)) ||
-        !softpc_platform_write_physical(0x4cu, hdd_int13_vector,
-            sizeof(hdd_int13_vector)) ||
-        !softpc_platform_write_physical(0xf0200u, int10_teletype_rom,
+    if (!softpc_platform_write_physical(0xf0200u, int10_teletype_rom,
             sizeof(int10_teletype_rom)) ||
         !softpc_platform_write_physical(0x40u, int10_vector,
             sizeof(int10_vector)) ||
@@ -476,6 +455,7 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     if (!softpc_platform_hdd_attach(machine->options.floppy_path,
             machine->options.hard_disk_path))
         return SOFTPC_MACHINE_IO_ERROR;
+    disk_post();
     if (!softpc_platform_floppy_attach(machine->options.floppy_path))
         return SOFTPC_MACHINE_IO_ERROR;
     {

@@ -61,6 +61,7 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/disks/floppy.c
     src/core/softpc/base/disks/floppy_i.c
     src/core/softpc/base/disks/fdisk.c
+    src/core/softpc/base/disks/diskbios.c
     src/core/softpc/base/video/ega_mode.c
     src/core/softpc/base/video/ega_prts.c
     src/core/softpc/base/video/ega_vide.c

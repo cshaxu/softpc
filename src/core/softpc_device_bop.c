@@ -29,6 +29,7 @@ void softpc_device_bop_register_machine_services IFN0()
     extern void ega_video_io IPT0();
     extern void printer_io IPT0();
     extern void rs232_io IPT0();
+    extern void disk_io IPT0();
 
     BIOS[BIOS_KB_INT] = keyboard_int;
     BIOS[BIOS_KEYBOARD_IO] = keyboard_io;
@@ -37,4 +38,5 @@ void softpc_device_bop_register_machine_services IFN0()
     BIOS[BIOS_VIDEO_IO] = ega_video_io;
     BIOS[BIOS_PRINTER_IO] = printer_io;
     BIOS[BIOS_RS232_IO] = rs232_io;
+    BIOS[BIOS_DISK_IO] = disk_io;
 }
