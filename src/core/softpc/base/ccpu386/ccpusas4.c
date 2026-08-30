@@ -1323,7 +1323,7 @@ c_GetPhyAdd IFN1(PHY_ADDR, addr)
 	uint32_t translated_address;
 
 	/* Standalone machine hook for future ROM/MMIO or explicitly attached
-	 * physical regions.  It intentionally has no NTVDM EMS or VDM mapping
+* physical regions.  It intentionally has no product-shell mapping
 	 * semantics; normal SoftPC RAM retains the original direct fast path. */
 	if (softpc_physical_mapping_translate(addr, &translated_address))
 		addr = (PHY_ADDR)translated_address;

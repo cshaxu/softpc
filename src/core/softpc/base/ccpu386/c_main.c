@@ -29,10 +29,6 @@ Actual worker routines are spun off elsewhere.
 /* #include "event.h" */	/* Event Manager         */
 #include  <debug.h>
 #include  <config.h>
-#ifdef NTVDM
-#include <ntthread.h>
-#endif
-
 #include <c_main.h>	/* C CPU definitions-interfaces */
 /* DIVERGENCE(MVDM-HOST-DIV-072): publish the existing owner headers whose
  * declarations the historical executor previously inferred implicitly. */
@@ -784,13 +780,7 @@ IFN1(
 #endif	/* PIG */
 
    /* somewhere for exceptions to return to */
-#ifdef NTVDM
-   /* DIVERGENCE(MVDM-HOST-DIV-073): the helper returns jmp_buf *, while
-    * modern setjmp requires the referred-to jmp_buf array object. */
-   setjmp(*ccpu386ThrdExptnPtr());
-#else
    setjmp(next_inst[simulate_level-1]);
-#endif
 
 #ifdef SYNCH_TIMERS
    /* If we have taken a fault the EDL Cpu will have checked on
@@ -4643,10 +4633,6 @@ LOCAL VOID
       }
 #endif	/* PIG */
 
-#ifdef NTVDM
-      ccpu386InitThreadStuff();
-#endif
-
       c_cpu_reset();
       SET_POP_DISP(0);
       doing_contributory = FALSE;
@@ -4797,11 +4783,7 @@ LOCAL VOID
 	 fprintf(stderr, "Stack overflow in host_simulate()!\n");
 
       /* Save current context and invoke a new CPU level */
-#ifdef NTVDM
-      if ( setjmp(*ccpu386SimulatePtr()) == 0)
-#else
       if ( setjmp(longjmp_env_stack[simulate_level++]) == 0 )
-#endif
 	 {
 	 in_C = 0;
 	 ccpu(FALSE);
@@ -4814,11 +4796,7 @@ LOCAL VOID
    GLOBAL VOID
    c_cpu_continue IFN0()
       {
-#ifdef NTVDM
-      ccpu386GotoThrdExptnPt();
-#else
       longjmp(next_inst[simulate_level-1], 1);
-#endif
       }
 
    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -4828,9 +4806,6 @@ LOCAL VOID
    GLOBAL VOID
    c_cpu_unsimulate IFN0()
       {
-#ifdef NTVDM
-      ccpu386Unsimulate();
-#else
       if (simulate_level == 0)
          {
 	 fprintf(stderr, "host_unsimulate() - already at base of stack!\n");
@@ -4844,7 +4819,6 @@ LOCAL VOID
 	 in_C = 1;
 	 longjmp(longjmp_env_stack[--simulate_level], 1);
 	 }
-#endif
       }
 
 #ifdef	PIG
@@ -4863,11 +4837,7 @@ LOCAL VOID
 	 fprintf(stderr, "Stack overflow in c_do_interrupt()!\n");
 
       /* Save current context and invoke a new CPU level */
-#ifdef NTVDM
-      if ( setjmp(*ccpu386SimulatePtr()) == 0)
-#else
       if ( setjmp(longjmp_env_stack[simulate_level++]) == 0 )
-#endif
 	 {
 	 in_C = 0;
 	 EXT = EXTERNAL;

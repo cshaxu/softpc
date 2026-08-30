@@ -191,15 +191,6 @@ IFN3(
    {
    SET_EIP(CCPU_save_EIP);
 
-#ifdef NTVDM
-   {
-   extern BOOL host_exint_hook IPT2(IS32, exp_no, IS32, error_code);
-
-   if(GET_PE() && host_exint_hook((IS32) nmbr, NULL_ERROR_CODE))
-	c_cpu_continue();	/* DOES NOT RETURN */
-   }
-#endif
-
    /* Set default mode up */
    SET_OPERAND_SIZE(GET_SR_AR_X(CS_REG));
    SET_ADDRESS_SIZE(GET_SR_AR_X(CS_REG));
@@ -249,16 +240,6 @@ IFN3(
    error_code = (selector & 0xfffc) | EXT;
 
    SET_EIP(CCPU_save_EIP);
-
-#ifdef NTVDM
-    {
-	extern BOOL host_exint_hook IPT2(IS32, exp_no, IS32, error_code);
-
-	if(GET_PE() && host_exint_hook((IS32) nmbr, (IS32)error_code))
-        doing_contributory = FALSE;
-	    c_cpu_continue();	    /* DOES NOT RETURN */
-    }
-#endif
 
    /* Set default mode up */
    SET_OPERAND_SIZE(GET_SR_AR_X(CS_REG));
@@ -310,16 +291,6 @@ IFN3(
 
    SET_EIP(CCPU_save_EIP);
 
-#ifdef NTVDM
-      {
-	  extern BOOL host_exint_hook IPT2(IS32, exp_no, IS32, error_code);
-
-	  if(GET_PE() && host_exint_hook((IS32) nmbr, (IS32)error_code))
-          doing_contributory = FALSE;
-	      c_cpu_continue();	/* DOES NOT RETURN */
-      }
-#endif
-
    /* Set default mode up */
    SET_OPERAND_SIZE(GET_SR_AR_X(CS_REG));
    SET_ADDRESS_SIZE(GET_SR_AR_X(CS_REG));
@@ -370,16 +341,6 @@ IFN1(
       }
 
    SET_EIP(CCPU_save_EIP);
-
-#ifdef NTVDM
-      {
-	  extern BOOL host_exint_hook IPT2(IS32, exp_no, IS32, error_code);
-
-	  if(GET_PE() && host_exint_hook((IS32) DF_INT_NR, (IS32)NULL_ERROR_CODE))
-            doing_double_fault = FALSE;
-		    c_cpu_continue(); /* DOES NOT RETURN */
-      }
-#endif
 
    /* Set default mode up */
    SET_OPERAND_SIZE(GET_SR_AR_X(CS_REG));
@@ -434,17 +395,6 @@ GLOBAL VOID Int0 IFN0 ()
       }
 
    SET_EIP(CCPU_save_EIP);
-
-#ifdef NTVDM
-      {
-	  extern BOOL host_exint_hook IPT2(IS32, exp_no, IS32, error_code);
-
-	  if(GET_PE() && host_exint_hook((IS32) I0_INT_NR, (IS32)NULL_ERROR_CODE))
-          doing_fault = FALSE;
-          doing_contributory = FALSE;
-	      c_cpu_continue(); /* DOES NOT RETURN */
-      }
-#endif
 
    /* Set default mode up */
    SET_OPERAND_SIZE(GET_SR_AR_X(CS_REG));
@@ -580,17 +530,6 @@ IFN2(
    doing_page_fault = TRUE;
 
    SET_EIP(CCPU_save_EIP);
-
-#ifdef NTVDM
-      {
-	  extern BOOL host_exint_hook IPT2(IS32, exp_no, IS32, error_code);
-
-	  if(GET_PE() && host_exint_hook((IS32) PF_INT_NR, (IS32)page_error))
-          doing_fault = FALSE;
-          doing_page_fault = FALSE;
-	      c_cpu_continue(); /* DOES NOT RETURN */
-      }
-#endif
 
    /* Set default mode up */
    SET_OPERAND_SIZE(GET_SR_AR_X(CS_REG));
