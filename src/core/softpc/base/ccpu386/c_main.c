@@ -19,7 +19,7 @@ Actual worker routines are spun off elsewhere.
 #include <stdlib.h>
 #include <setjmp.h>
 
-#include  <xt.h>		/* needed by bios.h */
+#include  <xt.h>
 #include  <sas.h>	/* need memory(M)     */
 #include  <ccpusas4.h>	/* the cpu internal sas bits */
 #ifdef	PIG
@@ -27,7 +27,6 @@ Actual worker routines are spun off elsewhere.
 #endif	/* PIG */
 #include CpuH
 /* #include "event.h" */	/* Event Manager         */
-#include  <bios.h>	/* need access to bop */
 #include  <debug.h>
 #include  <config.h>
 #ifdef NTVDM
@@ -64,14 +63,6 @@ Actual worker routines are spun off elsewhere.
  */
 extern void force_yoda(void);
 extern void TakeNpxExceptionInt(void);
-/* DIVERGENCE(MVDM-HOST-DIV-127): the selected original CCPU executor reaches
- * this source-missing extended BOP fallback. Preserve its exact void/ULONG
- * call contract; the registered NTVDMx64 patch keeps the original debug-break
- * disposition until an owner-approved runtime implementation exists. */
-#if !defined(SOFTPC_STANDALONE)
-extern void EDL_fast_bop(ULONG immed);
-#endif
-
 #include  <aaa.h>	/* The workers */
 #include  <aad.h>	/*     ...     */
 #include  <aam.h>	/*     ...     */
@@ -818,8 +809,7 @@ IFN1(
 DO_INST:
 
 #ifdef SOFTPC_STANDALONE
-   /* A standalone run slice returns by instruction budget, never through a
-      BOP FE product escape. */
+   /* A standalone run slice returns when its instruction budget is spent. */
    {
    extern IU32 softpc_ccpu_instruction_budget;
    if (softpc_ccpu_instruction_budget == 0)
@@ -3336,72 +3326,12 @@ TYPEC3:
 TYPEC4:
 
       modRM = GET_INST_BYTE(p);
-      if (((modRM & 0xfc) == 0xc4) && (instp32p32 == LES)) {
-         /*
-          * It's a c4c? BOP.
-	  * The bop routine itself will read the argument, but
-	  * we read it here so that we get the next EIP correct.
-          */
-	  int nField, i;
-
-          D_Ib(0);
-	  nField = modRM & 3;
-	  immed = 0;
-	  for (i = 0; i < nField; i++)
-	  {
-		  immed |= (ULONG)GET_INST_BYTE(p);
-		  immed <<= 8;
-	  }
-          immed |= ops[0].sng;
-#ifdef	PIG
-          if (immed == 0xfe)
-	     SET_EIP(CCPU_save_EIP);
-	  else
-	     UPDATE_INTEL_IP(p);
-	  CANCEL_HOST_IP();
-	  PIG_SYNCH(CHECK_NO_EXEC);	/* Everything checkable up to this point */
-#else	/* PIG */
-	  UPDATE_INTEL_IP(p);
-#if defined(SOFTPC_STANDALONE)
-          /* C4/C4 BOP is an NTVDM product escape, not an x86 instruction.
-             A standalone machine has no service dispatcher; leave the CCPU
-             executor instead of interpreting a selector as host semantics. */
-          c_cpu_unsimulate();
-#else
-          if ((immed & 0xff) == 0xfe)
-          {
-		  switch(immed)
-		  {
-#if defined(SFELLOW)
-		  case 0x03fe:
-			    SfdelayUSecs();
-			    break;
-		  case 0x05fe:
-			    SfsasTouchBop();
-			    break;
-		  case 0x06fe:
-			    SfscatterGatherSasTouch();
-			    break;
-#endif /* SFELLOW */
-		  case 0xfe:
-			  c_cpu_unsimulate();
-			  /* Never returns (?) */
-		  default:
-			  EDL_fast_bop(immed);
-			  break;
-		  }
-	  }
-	  else
-	  {
-	      in_C = 1;
-	      bop(ops[0].sng);
-	      in_C = 0;
-	  }
-#endif /* SOFTPC_STANDALONE */
-          CANCEL_HOST_IP();
-	  SYNCH_TICK();
-#endif	/* PIG */
-          break;
+      /* LES requires a memory operand.  The historical product used this
+         invalid register encoding as a host escape; standalone hardware
+         exposes the architectural invalid-opcode fault instead. */
+      if (((modRM & 0xc0) == 0xc0) && (instp32p32 == LES)) {
+         Int6();
+         break;
       }
       if ( GET_OPERAND_SIZE() == USE16 )
 	 {
@@ -3676,26 +3606,8 @@ TYPED4:
 
    case 0xd5:   /* T2 AAD Ib */   inst32 = AAD;   goto TYPED4;
 
-   case 0xd6:   /* T2 BOP Ib */
-      D_Ib(0);
-      UPDATE_INTEL_IP(p);
-
-      PIG_SYNCH(CHECK_NO_EXEC);
-
-#if defined(SOFTPC_STANDALONE)
-      /* D6 is SoftPC's pseudo instruction, not guest x86. */
-      c_cpu_unsimulate();
-#elif !defined(PIG)
-      if (ops[0].sng == 0xfe)
-      {
-	      c_cpu_unsimulate();
-      }
-      in_C = 1;
-      bop(ops[0].sng);
-      in_C = 0;
-      CANCEL_HOST_IP();
-#endif	/* PIG */
-      SYNCH_TICK();
+   case 0xd6:   /* SALC is not part of the fixed 386 instruction subset. */
+      Int6();
       break;
 
    case 0xd7:   /* T2 XLAT Z */
@@ -4911,8 +4823,7 @@ LOCAL VOID
 
    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
    /* Exit point from CPU.                                               */
-   /* Called from CPU via 'BOP FE' to exit the current CPU invocation    */
-   /* Or from CPU via '0F 0F' for the PIG_TESTER.                        */
+   /* Return from a bounded standalone CPU invocation. */
    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
    GLOBAL VOID
    c_cpu_unsimulate IFN0()
