@@ -52,7 +52,8 @@ static void write_hdd_pio_boot_image(const char *path)
     assert(fclose(file) == 0);
 }
 
-static void run_boot_image(const char *path, int floppy, unsigned char expected)
+static void run_boot_image(const char *path, int floppy, unsigned char expected,
+    uint64_t instruction_budget)
 {
     unsigned char marker = 0;
     softpc_machine_options options = { NULL, NULL,
@@ -62,7 +63,7 @@ static void run_boot_image(const char *path, int floppy, unsigned char expected)
     else options.hard_disk_path = path;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    assert(softpc_machine_run(machine, 4u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, instruction_budget) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
     assert(marker == expected);
     softpc_machine_destroy(machine);
@@ -89,7 +90,7 @@ static void run_hdd_pio_boot_image(const char *path)
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    assert(softpc_machine_run(machine, 40u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 1100u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
     assert(marker == 0x5au);
     softpc_machine_destroy(machine);
@@ -105,8 +106,8 @@ int main(void)
     write_boot_image(hdd, 0x77u);
     write_keyboard_boot_image(keyboard);
     write_hdd_pio_boot_image(hdd_pio);
-    run_boot_image(floppy, 1, 0x42u);
-    run_boot_image(hdd, 0, 0x77u);
+    run_boot_image(floppy, 1, 0x42u, 4u);
+    run_boot_image(hdd, 0, 0x77u, 1000u);
     run_keyboard_boot_image(keyboard);
     run_hdd_pio_boot_image(hdd_pio);
     assert(remove(floppy) == 0);

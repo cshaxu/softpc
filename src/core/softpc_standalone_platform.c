@@ -99,6 +99,17 @@ IU8 *value;
     }
 }
 
+static void softpc_hdd_inw(port, value)
+io_addr port;
+word *value;
+{
+    IU8 low;
+    IU8 high;
+    softpc_hdd_inb(port, &low);
+    softpc_hdd_inb(port, &high);
+    *value = (word)((IU16)low | ((IU16)high << 8u));
+}
+
 static void softpc_hdd_read_sector(void)
 {
     unsigned long lba;
@@ -164,7 +175,7 @@ void softpc_platform_hdd_detach(void)
 void softpc_platform_hdd_init(void)
 {
     io_addr port;
-    io_define_inb(HDA_ADAPTOR, softpc_hdd_inb);
+    io_define_in_routines(HDA_ADAPTOR, softpc_hdd_inb, softpc_hdd_inw, 0, 0);
     io_define_outb(HDA_ADAPTOR, softpc_hdd_outb);
     for (port = 0x1f0u; port <= 0x1f7u; ++port)
         io_connect_port(port, HDA_ADAPTOR, IO_READ | IO_WRITE);

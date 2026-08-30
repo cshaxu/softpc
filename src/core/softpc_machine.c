@@ -67,12 +67,33 @@ static softpc_machine_result softpc_machine_load_boot_sector(
     return SOFTPC_MACHINE_OK;
 }
 
-static softpc_machine_result softpc_machine_install_reset_rom(void)
+static softpc_machine_result softpc_machine_install_reset_rom(
+    const softpc_machine *machine)
 {
-    /* far jmp 0000:7c00 -- architectural reset enters here at f000:fff0 */
-    static const unsigned char reset_vector[] = { 0xeau, 0x00u, 0x7cu, 0x00u, 0x00u };
-    return softpc_platform_write_physical(SOFTPC_RESET_VECTOR_ADDRESS,
-        reset_vector, sizeof(reset_vector)) ? SOFTPC_MACHINE_OK : SOFTPC_MACHINE_IO_ERROR;
+    /* Architectural reset enters at f000:fff0. HDD boot uses ATA PIO to
+       fetch LBA 0; floppy remains on the temporary sector-load path. */
+    static const unsigned char hdd_reset_vector[] = { 0xeau, 0x00u, 0x00u, 0x00u, 0xf0u };
+    static const unsigned char hdd_boot_rom[] = {
+        0xbau, 0xf2u, 0x01u, 0xb0u, 0x01u, 0xeeu,
+        0x42u, 0x30u, 0xc0u, 0xeeu, 0x42u, 0xeeu, 0x42u, 0xeeu,
+        0x42u, 0xb0u, 0xe0u, 0xeeu, 0x42u, 0xb0u, 0x20u, 0xeeu,
+        0xbau, 0xf0u, 0x01u, 0xbfu, 0x00u, 0x7cu, 0xb9u, 0x00u, 0x01u,
+        0xfcu, 0xedu, 0xabu, 0xe2u, 0xfcu, 0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
+    };
+    static const unsigned char floppy_reset_vector[] = {
+        0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
+    };
+    if (machine->options.floppy_path == NULL) {
+        if (!softpc_platform_write_physical(0xf0000u, hdd_boot_rom,
+                sizeof(hdd_boot_rom)) ||
+            !softpc_platform_write_physical(SOFTPC_RESET_VECTOR_ADDRESS,
+                hdd_reset_vector, sizeof(hdd_reset_vector)))
+            return SOFTPC_MACHINE_IO_ERROR;
+    } else if (!softpc_platform_write_physical(SOFTPC_RESET_VECTOR_ADDRESS,
+            floppy_reset_vector, sizeof(floppy_reset_vector))) {
+        return SOFTPC_MACHINE_IO_ERROR;
+    }
+    return SOFTPC_MACHINE_OK;
 }
 
 softpc_machine_result softpc_machine_create(const softpc_machine_options *options,
@@ -110,9 +131,11 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     if (!softpc_platform_hdd_attach(machine->options.hard_disk_path))
         return SOFTPC_MACHINE_IO_ERROR;
     {
-        softpc_machine_result result = softpc_machine_load_boot_sector(machine);
+        softpc_machine_result result = SOFTPC_MACHINE_OK;
+        if (machine->options.floppy_path != NULL)
+            result = softpc_machine_load_boot_sector(machine);
         if (result != SOFTPC_MACHINE_OK) return result;
-        result = softpc_machine_install_reset_rom();
+        result = softpc_machine_install_reset_rom(machine);
         if (result != SOFTPC_MACHINE_OK) return result;
     }
     machine->reset = 1;
