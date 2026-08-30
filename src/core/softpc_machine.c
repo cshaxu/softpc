@@ -128,6 +128,7 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
     if (machine_out != NULL) *machine_out = NULL;
     if (options == NULL || machine_out == NULL ||
         (options->floppy_path == NULL && options->hard_disk_path == NULL) ||
+        (options->floppy_path != NULL && options->hard_disk_path != NULL) ||
         !softpc_machine_media_exists(options->floppy_path) ||
         !softpc_machine_media_exists(options->hard_disk_path))
         return SOFTPC_MACHINE_INVALID_ARGUMENT;

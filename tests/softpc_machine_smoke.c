@@ -148,6 +148,9 @@ int main(void)
     const char *hdd_int13 = "softpc-machine-hdd-int13-smoke.img";
     const char *floppy_int13 = "softpc-machine-floppy-int13-smoke.img";
     const char *hdd_int13_head = "softpc-machine-hdd-int13-head-smoke.img";
+    softpc_machine_options conflicting_media = { floppy, hdd,
+        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *conflicting_machine = NULL;
     write_boot_image(floppy, 0x42u);
     write_boot_image(hdd, 0x77u);
     write_keyboard_boot_image(keyboard);
@@ -155,6 +158,9 @@ int main(void)
     write_int13_boot_image(hdd_int13, 0x80u, 0u, 2u, 0x6bu);
     write_int13_boot_image(floppy_int13, 0x00u, 0u, 2u, 0x6cu);
     write_int13_boot_image(hdd_int13_head, 0x80u, 1u, 1u, 0x6du);
+    assert(softpc_machine_create(&conflicting_media, &conflicting_machine) ==
+        SOFTPC_MACHINE_INVALID_ARGUMENT);
+    assert(conflicting_machine == NULL);
     run_boot_image(floppy, 1, 0x42u, 4u);
     run_boot_image(hdd, 0, 0x77u, 1000u);
     run_keyboard_boot_image(keyboard);
