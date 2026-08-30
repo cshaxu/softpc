@@ -5,6 +5,7 @@ set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/softpc_gdp_slots.h"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/sascdef.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/support/ios.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/disks/fdisk.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_standalone_platform.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_machine.c")
@@ -44,3 +45,10 @@ foreach(source IN LISTS standalone_sources)
         message(FATAL_ERROR "Standalone CCPU contains product-shell semantics: ${source}")
     endif()
 endforeach()
+
+file(READ "${SOFTPC_SOURCE_DIR}/src/core/softpc_standalone_platform.c"
+    standalone_platform)
+string(TOLOWER "${standalone_platform}" normalized_platform)
+if(normalized_platform MATCHES "softpc_ata")
+    message(FATAL_ERROR "Standalone platform retains a handwritten ATA controller")
+endif()
