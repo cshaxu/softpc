@@ -1,0 +1,69 @@
+#include "softpc_machine.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct softpc_machine {
+    softpc_machine_options options;
+    int reset;
+};
+
+static int softpc_machine_media_exists(const char *path)
+{
+    FILE *file;
+    if (path == NULL) return 1;
+    file = fopen(path, "rb");
+    if (file == NULL) return 0;
+    fclose(file);
+    return 1;
+}
+
+softpc_machine_result softpc_machine_create(const softpc_machine_options *options,
+    softpc_machine **machine_out)
+{
+    softpc_machine *machine;
+    if (machine_out != NULL) *machine_out = NULL;
+    if (options == NULL || machine_out == NULL ||
+        (options->floppy_path == NULL && options->hard_disk_path == NULL) ||
+        !softpc_machine_media_exists(options->floppy_path) ||
+        !softpc_machine_media_exists(options->hard_disk_path))
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    machine = calloc(1u, sizeof(*machine));
+    if (machine == NULL) return SOFTPC_MACHINE_IO_ERROR;
+    machine->options = *options;
+    *machine_out = machine;
+    return SOFTPC_MACHINE_OK;
+}
+
+softpc_machine_result softpc_machine_reset(softpc_machine *machine)
+{
+    if (machine == NULL) return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    machine->reset = 1;
+    return SOFTPC_MACHINE_OK;
+}
+
+softpc_machine_result softpc_machine_run(softpc_machine *machine,
+    uint64_t instruction_budget)
+{
+    if (machine == NULL || !machine->reset || instruction_budget == 0u)
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    /* The next cut wires this call to the detached CCPU executor.  It is
+       deliberately not a BOP/DOS fallback. */
+    return SOFTPC_MACHINE_BACKEND_UNAVAILABLE;
+}
+
+void softpc_machine_destroy(softpc_machine *machine)
+{
+    free(machine);
+}
+
+const char *softpc_machine_result_name(softpc_machine_result result)
+{
+    switch (result) {
+    case SOFTPC_MACHINE_OK: return "ok";
+    case SOFTPC_MACHINE_INVALID_ARGUMENT: return "invalid argument or media";
+    case SOFTPC_MACHINE_IO_ERROR: return "host I/O error";
+    case SOFTPC_MACHINE_BACKEND_UNAVAILABLE: return "SoftPC executor not wired";
+    }
+    return "unknown result";
+}
