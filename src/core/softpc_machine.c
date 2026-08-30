@@ -20,6 +20,8 @@ extern void ica0_init(void);
 extern void ica1_init(void);
 extern void dma_init(void);
 extern void dma_post(void);
+extern void gfi_init(void);
+extern void fla_init(void);
 extern void cmos_init(void);
 extern void rom_init(void);
 extern void ppi_init(void);
@@ -424,6 +426,8 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         softpc_platform_keyboard_init();
         softpc_device_bop_register_machine_services();
         softpc_platform_hdd_init();
+        gfi_init();
+        fla_init();
         machine->hardware_initialized = 1;
     }
     /* CCPU owns the optional fault trace; the standalone machine owns its

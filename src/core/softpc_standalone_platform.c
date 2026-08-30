@@ -7,8 +7,11 @@
 
 #include "cpu4.h"
 #include "cpu_vid.h"
+#include "xt.h"
 #include "error.h"
 #include "fdisk.h"
+#include "gfi.h"
+#include "config.h"
 #include "ios.h"
 #include "ica.h"
 #include "timestmp.h"
@@ -141,11 +144,61 @@ UTINY what;
     return 0;
 }
 
-SHORT gfi_drive_type(drive)
-UTINY drive;
+/* GFI's old product configuration callbacks are retained as inert fixed-VM
+   ports.  Actual image attachment installs the standalone GFI server directly
+   and does not use a runtime configuration graph. */
+void host_runtime_set(what, value)
+UTINY what;
+SHORT value;
 {
-    UNUSED(drive);
-    return 0;
+    UNUSED(what);
+    UNUSED(value);
+}
+
+void config_activate(host_id, req_state)
+UTINY host_id;
+BOOL req_state;
+{
+    UNUSED(host_id);
+    UNUSED(req_state);
+}
+
+SHORT host_gfi_rdiskette_valid(host_id, values, error)
+UTINY host_id;
+ConfigValues *values;
+CHAR *error;
+{
+    UNUSED(host_id);
+    UNUSED(values);
+    UNUSED(error);
+    return C_CONFIG_OP_OK;
+}
+
+SHORT host_gfi_rdiskette_active(host_id, active, error)
+UTINY host_id;
+BOOL active;
+CHAR *error;
+{
+    UNUSED(host_id);
+    UNUSED(active);
+    UNUSED(error);
+    return C_CONFIG_OP_OK;
+}
+
+void host_gfi_rdiskette_change(host_id, apply)
+UTINY host_id;
+BOOL apply;
+{
+    UNUSED(host_id);
+    UNUSED(apply);
+}
+
+half_word cmos_read(cmos_byte)
+int cmos_byte;
+{
+    half_word value = 0;
+    (void)cmos_read_byte(cmos_byte, &value);
+    return value;
 }
 
 void set_tod(void)

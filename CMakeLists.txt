@@ -37,6 +37,11 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/keymouse/ppi.c
     src/core/softpc/base/keymouse/keyba.c
     src/core/softpc/base/keymouse/keybd_io.c
+    src/core/softpc/base/disks/fla.c
+    src/core/softpc/base/disks/gfi.c
+    src/core/softpc/base/disks/gfi_mpty.c
+    src/core/softpc/base/disks/floppy.c
+    src/core/softpc/base/disks/floppy_i.c
     src/core/softpc/base/disks/fdisk.c
     src/core/softpc_device_bop.c
     src/core/softpc_standalone_platform.c
