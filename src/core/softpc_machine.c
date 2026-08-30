@@ -171,6 +171,13 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0xb0u, 0x20u, 0xe6u, 0x20u, 0xcfu
     };
     static const unsigned char irq0_vector[] = { 0x00u, 0x04u, 0x00u, 0xf0u };
+    static const unsigned char bootstrap_vector[] = { 0x10u, 0x04u, 0x00u, 0xf0u };
+    static const unsigned char hdd_bootstrap_rom[] = {
+        0xeau, 0x00u, 0x00u, 0x00u, 0xf0u
+    };
+    static const unsigned char floppy_bootstrap_rom[] = {
+        0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
+    };
     static const unsigned char floppy_reset_vector[] = {
         0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
     };
@@ -197,14 +204,22 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         !softpc_platform_write_physical(0xf0400u, irq0_rom,
             sizeof(irq0_rom)) ||
         !softpc_platform_write_physical(0x20u, irq0_vector,
-            sizeof(irq0_vector))) return SOFTPC_MACHINE_IO_ERROR;
+            sizeof(irq0_vector)) ||
+        !softpc_platform_write_physical(0x60u, bootstrap_vector,
+            sizeof(bootstrap_vector)) ||
+        !softpc_platform_write_physical(0x64u, bootstrap_vector,
+            sizeof(bootstrap_vector))) return SOFTPC_MACHINE_IO_ERROR;
     if (machine->options.floppy_path == NULL) {
         if (!softpc_platform_write_physical(0xf0000u, hdd_boot_rom,
                 sizeof(hdd_boot_rom)) ||
+            !softpc_platform_write_physical(0xf0410u, hdd_bootstrap_rom,
+                sizeof(hdd_bootstrap_rom)) ||
             !softpc_platform_write_physical(SOFTPC_RESET_VECTOR_ADDRESS,
                 hdd_reset_vector, sizeof(hdd_reset_vector)))
             return SOFTPC_MACHINE_IO_ERROR;
-    } else if (!softpc_platform_write_physical(SOFTPC_RESET_VECTOR_ADDRESS,
+    } else if (!softpc_platform_write_physical(0xf0410u, floppy_bootstrap_rom,
+            sizeof(floppy_bootstrap_rom)) ||
+        !softpc_platform_write_physical(SOFTPC_RESET_VECTOR_ADDRESS,
             floppy_reset_vector, sizeof(floppy_reset_vector))) {
         return SOFTPC_MACHINE_IO_ERROR;
     }
