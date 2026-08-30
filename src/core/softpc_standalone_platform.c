@@ -23,6 +23,7 @@
 #include "egaports.h"
 #include "gvi.h"
 #include "video.h"
+#include "host_com.h"
 
 /*
  * Minimal host ports for the detached CCPU.  These are deliberately machine
@@ -371,6 +372,78 @@ void host_print_auto_feed(int adapter, BOOL auto_feed)
 {
     UNUSED(adapter);
     UNUSED(auto_feed);
+}
+
+/* Original UART controller host port.  Controller registers, IRQ selection,
+   FIFO handling and BIOS semantics all remain in com.c/rs232_io.c.  The
+   standalone VM supplies a connected, idle endpoint until a console serial
+   backend is attached. */
+void host_com_reset(adapter)
+int adapter;
+{
+    UNUSED(adapter);
+}
+
+void host_com_close(adapter)
+int adapter;
+{
+    UNUSED(adapter);
+}
+
+void host_com_read(adapter, value, error_mask)
+int adapter;
+UTINY *value;
+int *error_mask;
+{
+    UNUSED(adapter);
+    if (value != NULL) *value = 0;
+    if (error_mask != NULL) *error_mask = HOST_COM_NO_DATA;
+}
+
+void host_com_write(adapter, value)
+int adapter;
+char value;
+{
+    UNUSED(adapter);
+    UNUSED(value);
+}
+
+void host_com_ioctl(adapter, request, argument)
+int adapter;
+int request;
+intptr_t argument;
+{
+    UNUSED(adapter);
+    if (request == HOST_COM_INPUT_READY && argument != 0) {
+        *(int *)argument = FALSE;
+    } else if (request == HOST_COM_MODEM && argument != 0) {
+        *(int *)argument = HOST_COM_MODEM_CTS | HOST_COM_MODEM_DSR |
+            HOST_COM_MODEM_RLSD;
+    }
+}
+
+void host_com_xon_change(host_id, apply)
+IU8 host_id;
+IBOOL apply;
+{
+    UNUSED(host_id);
+    UNUSED(apply);
+}
+
+void host_com_send_delay_done(adapter, delay)
+long adapter;
+int delay;
+{
+    UNUSED(adapter);
+    UNUSED(delay);
+}
+
+void host_com_msr_callback(adapter, status)
+int adapter;
+half_word status;
+{
+    UNUSED(adapter);
+    UNUSED(status);
 }
 
 quick_event_delays host_delays = { 0, 0, 0, 0, 0, 0, 25000 };

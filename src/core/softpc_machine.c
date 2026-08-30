@@ -47,6 +47,8 @@ extern void time_of_day_init(void);
 extern void time_strobe(void);
 extern void printer_init(int adapter);
 extern void printer_post(int adapter);
+extern void com_init(int adapter);
+extern void com_post(int adapter);
 extern void softpc_platform_hdd_init(void);
 extern int softpc_platform_hdd_attach(const char *floppy_path,
     const char *hard_disk_path);
@@ -245,16 +247,10 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0xf8u, 0xcfu, 0xb4u, 0x86u, 0xf9u, 0xcfu
     };
     static const unsigned char int15_vector[] = { 0x00u, 0x08u, 0x00u, 0xf0u };
-    /* INT 14h models a fixed, non-blocking serial endpoint.  It is a BIOS
-       device contract only: initialization, transmit, and status report
-       ready; receive reports timeout when no input backend is attached. */
+    /* The fixed firmware reaches the original serial BIOS C implementation
+       through its normal BIOS Operation entry. */
     static const unsigned char int14_serial_rom[] = {
-        0x80u, 0xfcu, 0x02u, 0x74u, 0x13u,
-        0x80u, 0xfcu, 0x00u, 0x74u, 0x0au,
-        0x80u, 0xfcu, 0x01u, 0x74u, 0x05u,
-        0x80u, 0xfcu, 0x03u, 0x75u, 0x04u,
-        0xb4u, 0x60u, 0xf8u, 0xcfu,
-        0xb4u, 0x80u, 0xf9u, 0xcfu
+        0xc4u, 0xc4u, 0x14u, 0xcfu
     };
     static const unsigned char int14_vector[] = { 0x00u, 0x09u, 0x00u, 0xf0u };
     /* INT 17h exposes a fixed non-blocking printer sink.  The endpoint is
@@ -467,6 +463,10 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     timer_post();
     printer_init(0);
     printer_post(0);
+    com_init(0);
+    com_post(0);
+    com_init(1);
+    com_post(1);
     /* The original product's BIOS POST programmed the two 8259 PICs after
        their port glue was registered.  A standalone reset owns that hardware
        action directly; it is not a guest-service operation. */
