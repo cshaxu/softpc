@@ -50,6 +50,22 @@ static void write_int16_boot_image(const char *path)
     assert(fclose(file) == 0);
 }
 
+static void write_int1d_boot_image(const char *path)
+{
+    unsigned char sector[512] = { 0 };
+    FILE *file;
+    /* The original BIOS idle-poll vector reaches BOP 1Dh, then returns. */
+    unsigned char program[] = {
+        0xcdu, 0x1du, 0xc6u, 0x06u, 0x00u, 0x05u, 0x1du, 0xebu, 0xfeu
+    };
+    memcpy(sector, program, sizeof(program));
+    sector[510] = 0x55u; sector[511] = 0xaau;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
+    assert(fclose(file) == 0);
+}
+
 static void write_int15_memory_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
@@ -569,6 +585,20 @@ static void run_int16_boot_image(const char *path)
     softpc_machine_destroy(machine);
 }
 
+static void run_int1d_boot_image(const char *path)
+{
+    unsigned char marker = 0u;
+    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    boot_machine(machine);
+    assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) ==
+        SOFTPC_MACHINE_OK);
+    assert(marker == 0x1du);
+    softpc_machine_destroy(machine);
+}
+
 static void run_int15_memory_boot_image(const char *path)
 {
     unsigned char memory_kib[2] = { 0, 0 };
@@ -910,6 +940,7 @@ int main(void)
     const char *hdd = "softpc-machine-hdd-smoke.img";
     const char *keyboard = "softpc-machine-keyboard-smoke.img";
     const char *int16 = "softpc-machine-int16-smoke.img";
+    const char *int1d = "softpc-machine-int1d-smoke.img";
     const char *int15_memory = "softpc-machine-int15-memory-smoke.img";
     const char *int16_ascii = "softpc-machine-int16-ascii-smoke.img";
     const char *irq1_int16 = "softpc-machine-irq1-int16-smoke.img";
@@ -942,6 +973,7 @@ int main(void)
     write_boot_image(hdd, 0x77u);
     write_keyboard_boot_image(keyboard);
     write_int16_boot_image(int16);
+    write_int1d_boot_image(int1d);
     write_int15_memory_boot_image(int15_memory);
     write_int16_ascii_boot_image(int16_ascii);
     write_irq1_int16_boot_image(irq1_int16);
@@ -978,6 +1010,7 @@ int main(void)
     run_boot_image(hdd, 0, 0x77u, 6000u);
     run_keyboard_boot_image(keyboard);
     run_int16_boot_image(int16);
+    run_int1d_boot_image(int1d);
     run_int15_memory_boot_image(int15_memory);
     run_int16_ascii_boot_image(int16_ascii);
     run_irq1_int16_boot_image(irq1_int16);
@@ -1000,6 +1033,7 @@ int main(void)
     assert(remove(hdd) == 0);
     assert(remove(keyboard) == 0);
     assert(remove(int16) == 0);
+    assert(remove(int1d) == 0);
     assert(remove(int15_memory) == 0);
     assert(remove(int16_ascii) == 0);
     assert(remove(irq1_int16) == 0);
