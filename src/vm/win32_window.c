@@ -35,6 +35,17 @@ static void softpc_window_paint(HDC dc)
     }
 }
 
+static void softpc_window_key(WPARAM key, int released)
+{
+    UINT scan = MapVirtualKeyA((UINT)key, MAPVK_VK_TO_VSC_EX);
+    if (scan == 0u) return;
+    if ((scan & 0xff00u) != 0u)
+        (void)softpc_machine_key_scancode(softpc_window_machine, 0xe0u);
+    scan &= 0xffu;
+    if (released) scan |= 0x80u;
+    (void)softpc_machine_key_scancode(softpc_window_machine, (uint8_t)scan);
+}
+
 static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
     WPARAM wparam, LPARAM lparam)
 {
@@ -52,6 +63,14 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
             softpc_window_paint(dc);
             EndPaint(window, &paint);
         }
+        return 0;
+    case WM_KEYDOWN:
+    case WM_SYSKEYDOWN:
+        softpc_window_key(wparam, 0);
+        return 0;
+    case WM_KEYUP:
+    case WM_SYSKEYUP:
+        softpc_window_key(wparam, 1);
         return 0;
     case WM_DESTROY:
         KillTimer(window, SOFTPC_TIMER_ID);

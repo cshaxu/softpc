@@ -8,6 +8,8 @@
 #include "cpu4.h"
 #include "cpu_vid.h"
 #include "error.h"
+#include "ios.h"
+#include "ica.h"
 #include "timestmp.h"
 
 /*
@@ -22,6 +24,54 @@ extern void c_cpu_simulate();
 static UTINY *softpc_ram;
 static sys_addr softpc_ram_size;
 IU32 softpc_ccpu_instruction_budget = 0;
+
+#define SOFTPC_KEYBOARD_QUEUE_SIZE 32u
+static IU8 softpc_keyboard_queue[SOFTPC_KEYBOARD_QUEUE_SIZE];
+static IU32 softpc_keyboard_head;
+static IU32 softpc_keyboard_tail;
+
+static void softpc_keyboard_inb(port, value)
+io_addr port;
+IU8 *value;
+{
+    if (port == 0x60u) {
+        if (softpc_keyboard_head == softpc_keyboard_tail) *value = 0;
+        else {
+            *value = softpc_keyboard_queue[softpc_keyboard_tail];
+            softpc_keyboard_tail = (softpc_keyboard_tail + 1u) % SOFTPC_KEYBOARD_QUEUE_SIZE;
+        }
+    } else {
+        *value = softpc_keyboard_head == softpc_keyboard_tail ? 0u : 1u;
+    }
+}
+
+static void softpc_keyboard_outb(port, value)
+io_addr port;
+IU8 value;
+{
+    UNUSED(port);
+    UNUSED(value);
+}
+
+void softpc_platform_keyboard_init(void)
+{
+    softpc_keyboard_head = 0;
+    softpc_keyboard_tail = 0;
+    io_define_inb(AT_KEYB_ADAPTOR, softpc_keyboard_inb);
+    io_define_outb(AT_KEYB_ADAPTOR, softpc_keyboard_outb);
+    io_connect_port(0x60u, AT_KEYB_ADAPTOR, IO_READ | IO_WRITE);
+    io_connect_port(0x64u, AT_KEYB_ADAPTOR, IO_READ | IO_WRITE);
+}
+
+int softpc_platform_keyboard_scancode(IU8 scan_code)
+{
+    IU32 next = (softpc_keyboard_head + 1u) % SOFTPC_KEYBOARD_QUEUE_SIZE;
+    if (next == softpc_keyboard_tail) return 0;
+    softpc_keyboard_queue[softpc_keyboard_head] = scan_code;
+    softpc_keyboard_head = next;
+    ica_hw_interrupt(ICA_MASTER, CPU_KB_INT, 1);
+    return 1;
+}
 
 UTINY *host_sas_init(sys_addr size)
 {

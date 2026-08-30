@@ -12,6 +12,7 @@ extern void c_cpu_simulate(void);
 extern void sas_init(unsigned long size);
 extern void sas_term(void);
 extern void io_init(void);
+extern void SWPIC_init_funcptrs(void);
 extern void ica0_init(void);
 extern void ica1_init(void);
 extern unsigned long softpc_ccpu_instruction_budget;
@@ -19,6 +20,8 @@ extern int softpc_platform_write_physical(unsigned long address,
     const unsigned char *bytes, unsigned long length);
 extern int softpc_platform_read_physical(unsigned long address,
     unsigned char *bytes, unsigned long length);
+extern void softpc_platform_keyboard_init(void);
+extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
 #define SOFTPC_BOOT_SECTOR_BYTES 512u
@@ -92,8 +95,10 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     if (!machine->hardware_initialized) {
         sas_init(SOFTPC_FIXED_RAM_BYTES);
         io_init();
+        SWPIC_init_funcptrs();
         ica0_init();
         ica1_init();
+        softpc_platform_keyboard_init();
         machine->hardware_initialized = 1;
     }
     c_cpu_init();
@@ -106,6 +111,15 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     }
     machine->reset = 1;
     return SOFTPC_MACHINE_OK;
+}
+
+softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,
+    uint8_t scan_code)
+{
+    if (machine == NULL || !machine->reset)
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    return softpc_platform_keyboard_scancode((unsigned char)scan_code) ?
+        SOFTPC_MACHINE_OK : SOFTPC_MACHINE_IO_ERROR;
 }
 
 softpc_machine_result softpc_machine_read_physical(const softpc_machine *machine,
