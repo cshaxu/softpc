@@ -250,6 +250,40 @@ static void write_int13_bpb_hdd_boot_image(const char *path)
     assert(fclose(file) == 0);
 }
 
+static void write_int13_reset_boot_image(const char *path)
+{
+    unsigned char sector[512] = { 0 };
+    FILE *file;
+    /* xor ah,ah; int 13h; mov byte ptr [0500],76h; jmp $ */
+    unsigned char program[] = {
+        0x30u, 0xe4u, 0xcdu, 0x13u, 0xc6u, 0x06u, 0x00u,
+        0x05u, 0x76u, 0xebu, 0xfeu
+    };
+    memcpy(sector, program, sizeof(program));
+    sector[510] = 0x55u; sector[511] = 0xaau;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
+    assert(fclose(file) == 0);
+}
+
+static void write_int13_parameters_boot_image(const char *path)
+{
+    unsigned char sector[512] = { 0 };
+    FILE *file;
+    /* AH=08h; store CL(sectors/track) and DH(max head). */
+    unsigned char program[] = {
+        0xb4u, 0x08u, 0xcdu, 0x13u, 0x88u, 0xc8u, 0xa2u, 0x00u,
+        0x05u, 0x88u, 0xf0u, 0xa2u, 0x01u, 0x05u, 0xebu, 0xfeu
+    };
+    memcpy(sector, program, sizeof(program));
+    sector[510] = 0x55u; sector[511] = 0xaau;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
+    assert(fclose(file) == 0);
+}
+
 static void run_boot_image(const char *path, int floppy, unsigned char expected,
     uint64_t instruction_budget)
 {
@@ -322,6 +356,19 @@ static void run_int16_check_boot_image(const char *path)
     assert(softpc_machine_run(machine, 64u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
     assert(marker == 0x1eu);
+    softpc_machine_destroy(machine);
+}
+
+static void run_int13_parameters_boot_image(const char *path)
+{
+    unsigned char values[2] = { 0, 0 };
+    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 64u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x500u, values, sizeof(values)) == SOFTPC_MACHINE_OK);
+    assert(values[0] == 18u && values[1] == 1u);
     softpc_machine_destroy(machine);
 }
 
@@ -433,6 +480,8 @@ int main(void)
     const char *hdd_int13_multi = "softpc-machine-hdd-int13-multi-smoke.img";
     const char *floppy_int13_360k = "softpc-machine-floppy-int13-360k-smoke.img";
     const char *hdd_int13_bpb = "softpc-machine-hdd-int13-bpb-smoke.img";
+    const char *int13_reset = "softpc-machine-int13-reset-smoke.img";
+    const char *int13_parameters = "softpc-machine-int13-parameters-smoke.img";
     softpc_machine_options conflicting_media = { floppy, hdd,
         SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *conflicting_machine = NULL;
@@ -453,6 +502,8 @@ int main(void)
     write_int13_multi_boot_image(hdd_int13_multi, 0x80u, 0x73u, 0x74u);
     write_int13_360k_boot_image(floppy_int13_360k);
     write_int13_bpb_hdd_boot_image(hdd_int13_bpb);
+    write_int13_reset_boot_image(int13_reset);
+    write_int13_parameters_boot_image(int13_parameters);
     assert(softpc_machine_create(&conflicting_media, &conflicting_machine) ==
         SOFTPC_MACHINE_INVALID_ARGUMENT);
     assert(conflicting_machine == NULL);
@@ -473,6 +524,8 @@ int main(void)
     run_int13_multi_boot_image(hdd_int13_multi, 0, 0x73u, 0x74u);
     run_int13_boot_image(floppy_int13_360k, 1, 0x74u);
     run_int13_boot_image(hdd_int13_bpb, 0, 0x75u);
+    run_boot_image(int13_reset, 1, 0x76u, 64u);
+    run_int13_parameters_boot_image(int13_parameters);
     assert(remove(floppy) == 0);
     assert(remove(hdd) == 0);
     assert(remove(keyboard) == 0);
@@ -490,5 +543,7 @@ int main(void)
     assert(remove(hdd_int13_multi) == 0);
     assert(remove(floppy_int13_360k) == 0);
     assert(remove(hdd_int13_bpb) == 0);
+    assert(remove(int13_reset) == 0);
+    assert(remove(int13_parameters) == 0);
     return 0;
 }

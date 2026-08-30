@@ -13,6 +13,10 @@ int13_read:
     push di
     push bp
     push ax                       ; retain AH=function and AL=count
+    cmp ah, 0x00                  ; controller reset
+    je reset
+    cmp ah, 0x08                  ; drive parameters
+    je parameters
     mov di, bx                    ; ES:DI destination for REP INSW
     cmp ah, 0x02                  ; read sectors
     jne fail
@@ -78,6 +82,33 @@ read_word:
     pop cx
     pop bx
     pop ax
+    xor ah, ah
+    clc
+    iret
+reset:
+    pop ax
+    pop bp
+    pop di
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    xor ah, ah
+    clc
+    iret
+parameters:
+    pop ax
+    pop bp
+    pop di
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    mov ch, 0xff
+    mov cl, [cs:sectors_per_track]
+    mov dh, [cs:heads]
+    dec dh
+    mov dl, 1
     xor ah, ah
     clc
     iret

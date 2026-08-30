@@ -41,6 +41,11 @@ This is intentionally a compact fixed PC, not a complete BIOS or controller
 emulation: writes, CMOS/RTC, VGA graphics, floppy-controller commands, sound,
 and simultaneous floppy-plus-hard-disk attachment are not implemented yet.
 
+For a real-media, non-interactive boot probe (not part of the default test
+suite), run `build/softpc-real-boot-smoke --floppy disk.img` or replace
+`--floppy` with `--hdd`. It succeeds when the guest reaches printable text
+output in text video memory.
+
 ## Source layout
 
 - `src/core/softpc/` — recovered SoftPC CPU baseline.
