@@ -75,3 +75,4 @@ set_tests_properties(softpc-machine-smoke PROPERTIES
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tests/standalone_source_boundary.cmake")
+add_test(NAME softpcvm-help COMMAND softpcvm --help)

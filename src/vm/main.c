@@ -20,7 +20,10 @@ int main(int argc, char **argv)
 
     options.presentation = SOFTPC_PRESENTATION_CONSOLE;
     for (index = 1; index < argc; ++index) {
-        if (!strcmp(argv[index], "--floppy") && index + 1 < argc)
+        if (!strcmp(argv[index], "--help") || !strcmp(argv[index], "-h")) {
+            usage(argv[0]);
+            return 0;
+        } else if (!strcmp(argv[index], "--floppy") && index + 1 < argc)
             options.floppy_path = argv[++index];
         else if (!strcmp(argv[index], "--hdd") && index + 1 < argc)
             options.hard_disk_path = argv[++index];
