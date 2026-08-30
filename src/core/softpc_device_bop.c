@@ -19,3 +19,12 @@ IBOOL softpc_device_bop_dispatch IFN2(IU8, number, IU32, argument)
     (*handler)();
     return TRUE;
 }
+
+void softpc_device_bop_register_machine_services IFN0()
+{
+    extern void keyboard_int IPT0();
+    extern void keyboard_io IPT0();
+
+    BIOS[BIOS_KB_INT] = keyboard_int;
+    BIOS[BIOS_KEYBOARD_IO] = keyboard_io;
+}

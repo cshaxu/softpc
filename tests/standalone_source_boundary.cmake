@@ -6,6 +6,8 @@ set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/sascdef.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/support/ios.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/disks/fdisk.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/keymouse/keybd_io.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/system/idetect.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_device_bop.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_standalone_platform.c"

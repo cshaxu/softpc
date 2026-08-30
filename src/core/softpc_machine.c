@@ -30,6 +30,7 @@ extern int softpc_platform_write_physical(unsigned long address,
 extern int softpc_platform_read_physical(unsigned long address,
     unsigned char *bytes, unsigned long length);
 extern void softpc_platform_keyboard_init(void);
+extern void softpc_device_bop_register_machine_services(void);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
 extern void softpc_platform_timer_init(void);
 extern void softpc_platform_timer_advance(unsigned long instructions);
@@ -420,6 +421,7 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         ppi_init();
         softpc_platform_timer_init();
         softpc_platform_keyboard_init();
+        softpc_device_bop_register_machine_services();
         softpc_platform_hdd_init();
         machine->hardware_initialized = 1;
     }

@@ -47,6 +47,21 @@ void host_disable_timer2_sound(void)
 {
 }
 
+/* The original keyboard BIOS uses this as a bounded audible indication.
+   The standalone console has no mandatory sound backend yet, so the machine
+   preserves the timing contract without inventing a host product service. */
+void host_alarm(long duration)
+{
+    UNUSED(duration);
+}
+
+/* The console owns its event pump and invokes the machine in bounded slices.
+   Returning here therefore yields to that slice boundary without borrowing a
+   historical host scheduler. */
+void host_release_timeslice(void)
+{
+}
+
 /* The original CMOS controller expects the product configuration service.
  * A standalone fixed machine exposes no mutable product configuration: its
  * concrete media and memory are already supplied by softpc_machine_options. */
@@ -239,7 +254,10 @@ IU32 softpc_platform_timer_ticks(void)
 
 void softpc_platform_keyboard_init(void)
 {
+    extern void keyboard_init(void);
+
     AT_kbd_init();
+    keyboard_init();
 }
 
 int softpc_platform_keyboard_scancode(IU8 scan_code)
@@ -503,6 +521,13 @@ IUH host_get_q_calib_val(void)
 }
 
 int soft_reset = 1;
+
+/* Ctrl-Alt-Del reaches this original keyboard BIOS hook.  The next machine
+   reset remains owned by the public machine lifecycle. */
+void reboot(void)
+{
+    soft_reset = 1;
+}
 
 void (*BIOS[256])() = { 0 };
 /* The detached executor has no product logger.  Keep its optional diagnostic
