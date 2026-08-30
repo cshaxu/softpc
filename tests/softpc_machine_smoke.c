@@ -53,22 +53,30 @@ static void write_hdd_pio_boot_image(const char *path)
 }
 
 static void write_int13_boot_image(const char *path, unsigned char drive,
-    unsigned char marker)
+    unsigned char head, unsigned char sector, unsigned char marker)
 {
-    unsigned char image[1024] = { 0 };
+    unsigned char image[64u * 512u] = { 0 };
     FILE *file;
+    unsigned int lba;
+    unsigned int bytes;
     unsigned char program[] = {
         0xb4u, 0x02u, 0xb0u, 0x01u, 0xb5u, 0x00u, 0xb1u, 0x02u,
         0xb6u, 0x00u, 0xb2u, 0x00u, 0xbbu, 0x00u, 0x06u, 0xcdu,
         0x13u, 0xa0u, 0x00u, 0x06u, 0xa2u, 0x00u, 0x05u, 0xebu, 0xfeu
     };
+    program[7] = sector;
+    program[9] = head;
     program[11] = drive;
+    lba = (unsigned int)head * (drive < 0x80u ? 18u : 63u) +
+        (unsigned int)sector - 1u;
     memcpy(image, program, sizeof(program));
     image[510] = 0x55u; image[511] = 0xaau;
-    image[512] = marker;
+    image[lba * 512u] = marker;
+    bytes = (lba + 1u) * 512u;
+    if (bytes < 1024u) bytes = 1024u;
     file = fopen(path, "wb");
     assert(file != NULL);
-    assert(fwrite(image, 1u, sizeof(image), file) == sizeof(image));
+    assert(fwrite(image, 1u, bytes, file) == bytes);
     assert(fclose(file) == 0);
 }
 
@@ -125,7 +133,7 @@ static void run_int13_boot_image(const char *path, int floppy, unsigned char exp
     else options.hard_disk_path = path;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    assert(softpc_machine_run(machine, 1800u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 3000u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
     assert(marker == expected);
     softpc_machine_destroy(machine);
@@ -139,23 +147,27 @@ int main(void)
     const char *hdd_pio = "softpc-machine-hdd-pio-smoke.img";
     const char *hdd_int13 = "softpc-machine-hdd-int13-smoke.img";
     const char *floppy_int13 = "softpc-machine-floppy-int13-smoke.img";
+    const char *hdd_int13_head = "softpc-machine-hdd-int13-head-smoke.img";
     write_boot_image(floppy, 0x42u);
     write_boot_image(hdd, 0x77u);
     write_keyboard_boot_image(keyboard);
     write_hdd_pio_boot_image(hdd_pio);
-    write_int13_boot_image(hdd_int13, 0x80u, 0x6bu);
-    write_int13_boot_image(floppy_int13, 0x00u, 0x6cu);
+    write_int13_boot_image(hdd_int13, 0x80u, 0u, 2u, 0x6bu);
+    write_int13_boot_image(floppy_int13, 0x00u, 0u, 2u, 0x6cu);
+    write_int13_boot_image(hdd_int13_head, 0x80u, 1u, 1u, 0x6du);
     run_boot_image(floppy, 1, 0x42u, 4u);
     run_boot_image(hdd, 0, 0x77u, 1000u);
     run_keyboard_boot_image(keyboard);
     run_hdd_pio_boot_image(hdd_pio);
     run_int13_boot_image(hdd_int13, 0, 0x6bu);
     run_int13_boot_image(floppy_int13, 1, 0x6cu);
+    run_int13_boot_image(hdd_int13_head, 0, 0x6du);
     assert(remove(floppy) == 0);
     assert(remove(hdd) == 0);
     assert(remove(keyboard) == 0);
     assert(remove(hdd_pio) == 0);
     assert(remove(hdd_int13) == 0);
     assert(remove(floppy_int13) == 0);
+    assert(remove(hdd_int13_head) == 0);
     return 0;
 }
