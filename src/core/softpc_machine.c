@@ -93,13 +93,13 @@ static softpc_machine_result softpc_machine_install_reset_rom(
     static const unsigned char floppy_reset_vector[] = {
         0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
     };
+    if (!softpc_platform_write_physical(0xf0100u, hdd_int13_rom,
+            sizeof(hdd_int13_rom)) ||
+        !softpc_platform_write_physical(0x4cu, hdd_int13_vector,
+            sizeof(hdd_int13_vector))) return SOFTPC_MACHINE_IO_ERROR;
     if (machine->options.floppy_path == NULL) {
         if (!softpc_platform_write_physical(0xf0000u, hdd_boot_rom,
                 sizeof(hdd_boot_rom)) ||
-            !softpc_platform_write_physical(0xf0100u, hdd_int13_rom,
-                sizeof(hdd_int13_rom)) ||
-            !softpc_platform_write_physical(0x4cu, hdd_int13_vector,
-                sizeof(hdd_int13_vector)) ||
             !softpc_platform_write_physical(SOFTPC_RESET_VECTOR_ADDRESS,
                 hdd_reset_vector, sizeof(hdd_reset_vector)))
             return SOFTPC_MACHINE_IO_ERROR;
@@ -142,7 +142,8 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     }
     c_cpu_init();
     c_cpu_reset();
-    if (!softpc_platform_hdd_attach(machine->options.hard_disk_path))
+    if (!softpc_platform_hdd_attach(machine->options.hard_disk_path != NULL ?
+            machine->options.hard_disk_path : machine->options.floppy_path))
         return SOFTPC_MACHINE_IO_ERROR;
     {
         softpc_machine_result result = SOFTPC_MACHINE_OK;
