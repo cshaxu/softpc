@@ -134,6 +134,23 @@ static void write_timer_boot_image(const char *path)
     assert(fclose(file) == 0);
 }
 
+static void write_cmos_boot_image(const char *path)
+{
+    unsigned char sector[512] = { 0 };
+    FILE *file;
+    /* Select RTC register A, read it through port 71h, and retain it. */
+    unsigned char program[] = {
+        0xb0u, 0x0au, 0xe6u, 0x70u, 0xe4u, 0x71u, 0xa2u,
+        0x00u, 0x05u, 0xebu, 0xfeu
+    };
+    memcpy(sector, program, sizeof(program));
+    sector[510] = 0x55u; sector[511] = 0xaau;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
+    assert(fclose(file) == 0);
+}
+
 static void write_text_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
@@ -624,6 +641,19 @@ static void run_timer_boot_image(const char *path)
     softpc_machine_destroy(machine);
 }
 
+static void run_cmos_boot_image(const char *path)
+{
+    unsigned char marker = 0u;
+    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 16u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
+    assert(marker == 0u);
+    softpc_machine_destroy(machine);
+}
+
 static void run_text_boot_image(const char *path)
 {
     unsigned char cell[2] = { 0, 0 };
@@ -895,6 +925,7 @@ int main(void)
     write_irq1_int16_boot_image(irq1_int16);
     write_int16_check_boot_image(int16_check);
     write_timer_boot_image(timer);
+    write_cmos_boot_image("softpc-smoke-cmos.img");
     write_text_boot_image(text);
     write_int10_boot_image(int10);
     write_int10_mode_cursor_boot_image(int10_mode_cursor);
@@ -938,6 +969,7 @@ int main(void)
     run_irq1_int16_boot_image(irq1_int16);
     run_int16_check_boot_image(int16_check);
     run_timer_boot_image(timer);
+    run_cmos_boot_image("softpc-smoke-cmos.img");
     run_text_boot_image(text);
     run_int10_boot_image(int10);
     run_int10_mode_cursor_boot_image(int10_mode_cursor);
@@ -971,6 +1003,7 @@ int main(void)
     assert(remove(irq1_int16) == 0);
     assert(remove(int16_check) == 0);
     assert(remove(timer) == 0);
+    assert(remove("softpc-smoke-cmos.img") == 0);
     assert(remove(text) == 0);
     assert(remove(int10) == 0);
     assert(remove(int10_mode_cursor) == 0);

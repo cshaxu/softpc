@@ -11,6 +11,7 @@
 #include "ios.h"
 #include "ica.h"
 #include "timestmp.h"
+#include "timeval.h"
 
 /*
  * Minimal host ports for the detached CCPU.  These are deliberately machine
@@ -23,6 +24,80 @@ extern void c_cpu_simulate();
 static UTINY *softpc_ram;
 static sys_addr softpc_ram_size;
 IU32 softpc_ccpu_instruction_budget = 0;
+
+/* The original CMOS controller expects the product configuration service.
+ * A standalone fixed machine exposes no mutable product configuration: its
+ * concrete media and memory are already supplied by softpc_machine_options. */
+static CHAR softpc_empty_config_value[] = "";
+void *config_inquire(host_id, values)
+UTINY host_id;
+void *values;
+{
+    UNUSED(host_id);
+    UNUSED(values);
+    return softpc_empty_config_value;
+}
+
+void config_get(host_id, values)
+UTINY host_id;
+void **values;
+{
+    UNUSED(host_id);
+    if (values != NULL) *values = NULL;
+}
+
+SHORT config_put(host_id, error_data)
+UTINY host_id;
+void *error_data;
+{
+    UNUSED(host_id);
+    UNUSED(error_data);
+    return 0;
+}
+
+SHORT host_runtime_inquire(what)
+UTINY what;
+{
+    UNUSED(what);
+    return 0;
+}
+
+SHORT gfi_drive_type(drive)
+UTINY drive;
+{
+    UNUSED(drive);
+    return 0;
+}
+
+void set_tod(void)
+{
+}
+
+long host_time(long *location)
+{
+    long value = (long)time(NULL);
+    if (location != NULL) *location = value;
+    return value;
+}
+
+struct host_tm *host_localtime(time_t *clock_value)
+{
+    static struct host_tm result;
+    struct tm *native_time;
+    if (clock_value == NULL) return NULL;
+    native_time = localtime(clock_value);
+    if (native_time == NULL) return NULL;
+    result.tm_sec = native_time->tm_sec;
+    result.tm_min = native_time->tm_min;
+    result.tm_hour = native_time->tm_hour;
+    result.tm_mday = native_time->tm_mday;
+    result.tm_mon = native_time->tm_mon;
+    result.tm_year = native_time->tm_year;
+    result.tm_wday = native_time->tm_wday;
+    result.tm_yday = native_time->tm_yday;
+    result.tm_isdst = native_time->tm_isdst;
+    return &result;
+}
 
 #define SOFTPC_KEYBOARD_QUEUE_SIZE 32u
 static IU8 softpc_keyboard_queue[SOFTPC_KEYBOARD_QUEUE_SIZE];
