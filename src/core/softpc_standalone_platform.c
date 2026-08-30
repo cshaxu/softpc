@@ -199,8 +199,10 @@ void host_release_timeslice(void)
  * concrete media and memory are already supplied by softpc_machine_options. */
 static CHAR softpc_empty_config_value[] = "";
 static const CHAR *softpc_hdd_config_paths[2];
+extern char *softpc_platform_floppy_config_value(void);
 #define SOFTPC_CONFIG_HARD_DISK1_NAME 25u
 #define SOFTPC_CONFIG_HARD_DISK2_NAME 26u
+#define SOFTPC_CONFIG_FLOPPY_A_DEVICE 51u
 void *config_inquire(host_id, values)
 UTINY host_id;
 void *values;
@@ -214,6 +216,8 @@ void *values;
     if (host_id == SOFTPC_CONFIG_HARD_DISK2_NAME)
         return (void *)(softpc_hdd_config_paths[1] != NULL ?
             softpc_hdd_config_paths[1] : softpc_empty_config_value);
+    if (host_id == SOFTPC_CONFIG_FLOPPY_A_DEVICE)
+        return softpc_platform_floppy_config_value();
     return softpc_empty_config_value;
 }
 

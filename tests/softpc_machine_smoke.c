@@ -170,10 +170,11 @@ static void write_cmos_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
     FILE *file;
-    /* Select CMOS_DISKETTE (10h), read it through port 71h, and retain it. */
+    /* Read original CMOS_DISKETTE (10h) and CMOS_EQUIP (14h). */
     unsigned char program[] = {
         0xb0u, 0x10u, 0xe6u, 0x70u, 0xe4u, 0x71u, 0xa2u,
-        0x00u, 0x05u, 0xebu, 0xfeu
+        0x00u, 0x05u, 0xb0u, 0x14u, 0xe6u, 0x70u, 0xe4u,
+        0x71u, 0xa2u, 0x01u, 0x05u, 0xebu, 0xfeu
     };
     memcpy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
@@ -718,16 +719,20 @@ static void run_timer_boot_image(const char *path)
 
 static void run_cmos_boot_image(const char *path)
 {
-    unsigned char marker = 0u;
+    unsigned char markers[2] = { 0u, 0u };
     softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     boot_machine(machine);
-    assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x500u, markers,
+        sizeof(markers)) == SOFTPC_MACHINE_OK);
     /* The original CMOS POST derives drive A's type from the GFI image
        backend.  The small fixture is intentionally presented as 1.44 MiB. */
-    assert(marker == 0x40u);
+    assert(markers[0] == 0x40u);
+    /* The original POST also sees the attached drive through the fixed
+       machine's configuration port and publishes DISKETTE_PRESENT. */
+    assert(markers[1] == 0x01u);
     softpc_machine_destroy(machine);
 }
 

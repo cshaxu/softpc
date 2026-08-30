@@ -30,6 +30,8 @@ typedef struct {
 } softpc_gfi_image_drive;
 
 static softpc_gfi_image_drive softpc_gfi_drives[MAX_DISKETTES];
+static char softpc_gfi_attached_config_value[] = "floppy";
+static char softpc_gfi_empty_config_value[] = "";
 
 static int softpc_gfi_geometry(long bytes, softpc_gfi_image_drive *drive)
 {
@@ -242,4 +244,13 @@ void softpc_platform_floppy_detach(void)
     softpc_gfi_image_drive *drive = &softpc_gfi_drives[0];
     if (drive->file != NULL) fclose(drive->file);
     memset(drive, 0, sizeof(*drive));
+}
+
+/* The original CMOS POST asks the product configuration layer whether drive
+ * A exists.  Expose only that fixed-machine fact; image paths remain private
+ * to this host media backend. */
+char *softpc_platform_floppy_config_value(void)
+{
+    return softpc_gfi_drives[0].file != NULL ?
+        softpc_gfi_attached_config_value : softpc_gfi_empty_config_value;
 }
