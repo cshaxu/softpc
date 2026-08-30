@@ -5,7 +5,6 @@ set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/softpc_gdp_slots.h"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/sascdef.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/support/ios.c"
-    "${SOFTPC_SOURCE_DIR}/src/core/softpc_pic8259.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_quick_events.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_standalone_platform.c"
@@ -19,6 +18,15 @@ foreach(name IN LISTS ccpu_source_names)
             "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/ccpu386/${name}")
     endif()
 endforeach()
+
+# Original controller sources retain inactive historic host branches so their
+# provenance and machine implementation remain intact.  The standalone target
+# must never activate those branches.
+file(READ "${SOFTPC_SOURCE_DIR}/CMakeLists.txt" build_definition)
+string(TOLOWER "${build_definition}" normalized_build_definition)
+if(normalized_build_definition MATCHES "target_compile_definitions\\([^\\)]*ntvdm")
+    message(FATAL_ERROR "Standalone SoftPC enables an NTVDM compile definition")
+endif()
 
 # Firmware is part of the standalone machine's executable guest contract.
 # Discover every checked-in ROM source so future BIOS additions cannot evade
