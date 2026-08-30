@@ -9,6 +9,11 @@
 #define SOFTPC_TRACE_INSTRUCTIONS 100u
 #define SOFTPC_TRACE_1K_INSTRUCTIONS 1000u
 #define SOFTPC_LONG_TRACE_SLICES 800u
+#define SOFTPC_TRANSITION_WARMUP_SLICES 620u
+#define SOFTPC_TRANSITION_TRACE_SLICES 600u
+
+extern unsigned short c_getSS(void);
+extern unsigned short c_getSP(void);
 
 static int text_has_printable_character(const unsigned char *text)
 {
@@ -44,6 +49,7 @@ int main(int argc, char **argv)
     uint32_t eip = 0u;
     unsigned int index;
     unsigned int slices = SOFTPC_BOOT_SLICES;
+    unsigned int warmup_slices = 0u;
     int trace = 0;
     uint64_t slice_instructions = SOFTPC_SLICE_INSTRUCTIONS;
     softpc_machine_result result;
@@ -53,8 +59,9 @@ int main(int argc, char **argv)
         (argc == 4 && strcmp(argv[3], "--trace") != 0 &&
             strcmp(argv[3], "--trace-1k") != 0 &&
             strcmp(argv[3], "--trace-long") != 0 &&
-            strcmp(argv[3], "--trace-slices") != 0)) {
-        fprintf(stderr, "Usage: %s (--floppy|--hdd) image.img [--trace|--trace-1k|--trace-long|--trace-slices]\n",
+            strcmp(argv[3], "--trace-slices") != 0 &&
+            strcmp(argv[3], "--trace-transition") != 0)) {
+        fprintf(stderr, "Usage: %s (--floppy|--hdd) image.img [--trace|--trace-1k|--trace-long|--trace-slices|--trace-transition]\n",
             argv[0]);
         return 2;
     }
@@ -66,6 +73,10 @@ int main(int argc, char **argv)
     else if (trace && strcmp(argv[3], "--trace-long") == 0) {
         slice_instructions = SOFTPC_TRACE_INSTRUCTIONS;
         slices = SOFTPC_LONG_TRACE_SLICES;
+    } else if (trace && strcmp(argv[3], "--trace-transition") == 0) {
+        slice_instructions = 1u;
+        slices = SOFTPC_TRANSITION_TRACE_SLICES;
+        warmup_slices = SOFTPC_TRANSITION_WARMUP_SLICES;
     }
     if (strcmp(argv[1], "--floppy") == 0) options.floppy_path = argv[2];
     else options.hard_disk_path = argv[2];
@@ -73,13 +84,19 @@ int main(int argc, char **argv)
     if (result != SOFTPC_MACHINE_OK) goto failed;
     result = softpc_machine_reset(machine);
     if (result != SOFTPC_MACHINE_OK) goto failed;
+    for (index = 0u; index < warmup_slices; ++index) {
+        result = softpc_machine_run(machine, SOFTPC_TRACE_INSTRUCTIONS);
+        if (result != SOFTPC_MACHINE_OK) goto failed;
+    }
     for (index = 0u; index < slices; ++index) {
         result = softpc_machine_run(machine, slice_instructions);
         if (result != SOFTPC_MACHINE_OK) goto failed;
         if (trace) {
             (void)softpc_machine_instruction_pointer(machine, &cs, &eip);
-            fprintf(stderr, "%03u %04x:%08x\n", index,
-                (unsigned int)cs, (unsigned int)eip);
+            fprintf(stderr, "%03u %04x:%08x ss:sp=%04x:%04x\n",
+                index + warmup_slices,
+                (unsigned int)cs, (unsigned int)eip,
+                (unsigned int)c_getSS(), (unsigned int)c_getSP());
             print_instruction(machine, cs, eip);
         }
         if (softpc_machine_read_physical(machine, 0xb8000u, text,

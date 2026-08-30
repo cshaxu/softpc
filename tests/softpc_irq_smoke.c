@@ -10,8 +10,14 @@ int main(void)
     unsigned char sector[512] = { 0 };
     unsigned char marker = 0;
     unsigned char program[] = {
+        /* Re-enter the same boot sector through a nonzero CS. */
+        0xeau, 0x10u, 0x00u, 0xc0u, 0x07u,
+        0x90u, 0x90u, 0x90u, 0x90u, 0x90u, 0x90u, 0x90u, 0x90u,
+        0x90u, 0x90u, 0x90u,
         /* Program the PIT with one instruction per tick while IF is clear. */
         0xfau, 0x31u, 0xc0u, 0x8eu, 0xd8u,
+        /* Exercise the nonzero, odd stack shape used by the real loader. */
+        0xb8u, 0x84u, 0x9fu, 0x8eu, 0xd0u, 0xbcu, 0xe3u, 0x00u,
         0xb0u, 0x34u, 0xe6u, 0x43u, 0xb0u, 0x01u, 0xe6u, 0x40u,
         0xb0u, 0x00u, 0xe6u, 0x40u,
         /* The queued IRQ0 must be delivered after STI and return through the
@@ -31,7 +37,7 @@ int main(void)
 
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    assert(softpc_machine_run(machine, 9u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 13u) == SOFTPC_MACHINE_OK);
     /* The second slice loads the PIT's final byte and queues IRQ0. */
     assert(softpc_machine_run(machine, 2u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_run(machine, 12u) == SOFTPC_MACHINE_OK);

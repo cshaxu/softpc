@@ -415,6 +415,31 @@ static void write_int13_bpb_hdd_boot_image(const char *path)
     assert(fclose(file) == 0);
 }
 
+static void write_int13_high_segment_hdd_boot_image(const char *path)
+{
+    enum { target_lba = 308, target_offset = 0x1f9 };
+    unsigned char *image = calloc(1u, (target_lba + 1u) * 512u);
+    FILE *file;
+    /* Read a high LBA to 0070:125a and expose the byte at +01f9h. */
+    unsigned char program[] = {
+        0xfau, 0x31u, 0xc0u, 0x8eu, 0xd8u, 0xb8u, 0x70u, 0x00u,
+        0x8eu, 0xc0u, 0xb4u, 0x02u, 0xb0u, 0x01u, 0xb5u, 0x00u,
+        0xb1u, 0x39u, 0xb6u, 0x04u, 0xb2u, 0x80u, 0xbbu, 0x5au,
+        0x12u, 0xcdu, 0x13u, 0x26u, 0xa0u, 0x53u, 0x14u, 0xa2u,
+        0x00u, 0x05u, 0xebu, 0xfeu
+    };
+    assert(image != NULL);
+    memcpy(image, program, sizeof(program));
+    image[510u] = 0x55u; image[511u] = 0xaau;
+    image[target_lba * 512u + target_offset] = 0x5au;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(image, 1u, (target_lba + 1u) * 512u, file) ==
+        (target_lba + 1u) * 512u);
+    assert(fclose(file) == 0);
+    free(image);
+}
+
 static void write_int13_reset_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
@@ -854,6 +879,7 @@ int main(void)
     const char *hdd_int13_multi = "softpc-machine-hdd-int13-multi-smoke.img";
     const char *floppy_int13_360k = "softpc-machine-floppy-int13-360k-smoke.img";
     const char *hdd_int13_bpb = "softpc-machine-hdd-int13-bpb-smoke.img";
+    const char *hdd_int13_high = "softpc-machine-hdd-int13-high-smoke.img";
     const char *int13_reset = "softpc-machine-int13-reset-smoke.img";
     const char *int13_write = "softpc-machine-int13-write-smoke.img";
     const char *int13_parameters = "softpc-machine-int13-parameters-smoke.img";
@@ -886,6 +912,7 @@ int main(void)
     write_int13_multi_boot_image(hdd_int13_multi, 0x80u, 0x73u, 0x74u);
     write_int13_360k_boot_image(floppy_int13_360k);
     write_int13_bpb_hdd_boot_image(hdd_int13_bpb);
+    write_int13_high_segment_hdd_boot_image(hdd_int13_high);
     write_int13_reset_boot_image(int13_reset);
     write_int13_write_boot_image(int13_write);
     write_int13_parameters_boot_image(int13_parameters);
@@ -921,6 +948,7 @@ int main(void)
     run_int13_multi_boot_image(hdd_int13_multi, 0, 0x73u, 0x74u);
     run_int13_boot_image(floppy_int13_360k, 1, 0x74u);
     run_int13_boot_image(hdd_int13_bpb, 0, 0x75u);
+    run_boot_image(hdd_int13_high, 0, 0x5au, 4000u);
     run_boot_image(int13_reset, 1, 0x76u, 64u);
     run_int13_write_boot_image(int13_write);
     run_int13_parameters_boot_image(int13_parameters);
@@ -950,6 +978,7 @@ int main(void)
     assert(remove(hdd_int13_multi) == 0);
     assert(remove(floppy_int13_360k) == 0);
     assert(remove(hdd_int13_bpb) == 0);
+    assert(remove(hdd_int13_high) == 0);
     assert(remove(int13_reset) == 0);
     assert(remove(int13_write) == 0);
     assert(remove(int13_parameters) == 0);
