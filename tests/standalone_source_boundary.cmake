@@ -3,13 +3,11 @@ set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/softpc_gdp_state.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/softpc_gdp_state.h"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/softpc_gdp_slots.h"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/sascdef.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_io.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_pic8259.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_quick_events.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.c"
-    "${SOFTPC_SOURCE_DIR}/src/core/firmware/int10_teletype.asm"
-    "${SOFTPC_SOURCE_DIR}/src/core/firmware/int13_chs.asm"
-    "${SOFTPC_SOURCE_DIR}/src/core/firmware/int16_keyboard.asm"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_standalone_platform.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_machine.c")
 
@@ -21,6 +19,13 @@ foreach(name IN LISTS ccpu_source_names)
             "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/ccpu386/${name}")
     endif()
 endforeach()
+
+# Firmware is part of the standalone machine's executable guest contract.
+# Discover every checked-in ROM source so future BIOS additions cannot evade
+# the same product-semantic guard through a stale manual list.
+file(GLOB firmware_sources
+    "${SOFTPC_SOURCE_DIR}/src/core/firmware/*.asm")
+list(APPEND standalone_sources ${firmware_sources})
 
 foreach(source IN LISTS standalone_sources)
     file(READ "${source}" contents)
