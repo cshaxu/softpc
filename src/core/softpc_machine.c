@@ -3,6 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* CCPU's standalone executor entry points.  The wrapper intentionally calls
+ * the core directly instead of the historical host_simulate/BOP facade. */
+extern void c_cpu_init(void);
+extern void c_cpu_reset(void);
+
 struct softpc_machine {
     softpc_machine_options options;
     int reset;
@@ -38,6 +43,8 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
 softpc_machine_result softpc_machine_reset(softpc_machine *machine)
 {
     if (machine == NULL) return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    c_cpu_init();
+    c_cpu_reset();
     machine->reset = 1;
     return SOFTPC_MACHINE_OK;
 }

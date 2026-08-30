@@ -1,16 +1,12 @@
 #include "insignia.h"
 #include "host_def.h"
-/* DIVERGENCE(MVDM-HOST-DIV-076): preserve the native C varargs ABI. */
 #include <stdio.h>
 #include "evidgen.h"
 
 #include "cpu4.h"
 
-/* DIVERGENCE(MVDM-HOST-DIV-080): this selected host-facing CCPU facade is
- * compiled without the CCPU private-interface macro, so cpu4gen.h does not
- * publish these two existing private CCPU providers. Keep the original direct
- * call sequence and declare the exact c_main.c / ccpusas4.c contracts rather
- * than infer an int result on either host width. */
+/* The CCPU facade is compiled without the private-interface macro, so retain
+ * the original direct call contracts for these private CCPU providers. */
 IMPORT IU32 c_cpu_calc_q_ev_inst_for_time IPT1(IU32, val);
 IMPORT void c_sas_overwrite_memory IPT2(PHY_ADDR, addr, PHY_ADDR, length);
 
@@ -23,9 +19,7 @@ struct CpuVector Cpu;
 //struct SasVector Sas;
 struct VideoVector Video;
 
-/* DIVERGENCE(MVDM-HOST-DIV-129): this original dispatcher has no result
- * path.  State its existing void ABI so modern x86/x64 callers do not infer
- * an int result; switch order and interrupt delivery remain unchanged. */
+/* This dispatcher has no result path; keep its original void ABI. */
 VOID a3_cpu_interrupt (int errupt, IU16 numint)
 {
     switch(errupt)
@@ -103,14 +97,6 @@ void cpu_simulate()
 #endif
 
 void copyROM()
-{
-}
-
-void initialise_npx()
-{
-}
-
-void npx_reset()
 {
 }
 

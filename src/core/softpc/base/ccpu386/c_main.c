@@ -68,7 +68,9 @@ extern void TakeNpxExceptionInt(void);
  * this source-missing extended BOP fallback. Preserve its exact void/ULONG
  * call contract; the registered NTVDMx64 patch keeps the original debug-break
  * disposition until an owner-approved runtime implementation exists. */
+#if !defined(SOFTPC_STANDALONE)
 extern void EDL_fast_bop(ULONG immed);
+#endif
 
 #include  <aaa.h>	/* The workers */
 #include  <aad.h>	/*     ...     */
@@ -3349,6 +3351,12 @@ TYPEC4:
 	  PIG_SYNCH(CHECK_NO_EXEC);	/* Everything checkable up to this point */
 #else	/* PIG */
 	  UPDATE_INTEL_IP(p);
+#if defined(SOFTPC_STANDALONE)
+          /* C4/C4 BOP is an NTVDM product escape, not an x86 instruction.
+             A standalone machine has no service dispatcher; leave the CCPU
+             executor instead of interpreting a selector as host semantics. */
+          c_cpu_unsimulate();
+#else
           if ((immed & 0xff) == 0xfe)
           {
 		  switch(immed)
@@ -3378,6 +3386,7 @@ TYPEC4:
 	      bop(ops[0].sng);
 	      in_C = 0;
 	  }
+#endif /* SOFTPC_STANDALONE */
           CANCEL_HOST_IP();
 	  SYNCH_TICK();
 #endif	/* PIG */

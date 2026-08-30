@@ -10,11 +10,26 @@ add_library(softpc-machine
 target_include_directories(softpc-machine PUBLIC include)
 target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 
-# First detached SoftPC core slice.  It deliberately links no NTVDM host,
-# BOP service dispatcher, DOS/WOW component or Win32 presentation provider.
+# The original CCPU manifest is the executable x86 core.  It deliberately
+# links no NTVDM host, BOP service dispatcher, DOS/WOW component or Win32
+# presentation provider.
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/c-files"
+    SOFTPC_CCPU_SOURCE_NAMES)
+list(FILTER SOFTPC_CCPU_SOURCE_NAMES EXCLUDE REGEX "^p\\.")
+set(SOFTPC_CCPU_SOURCES)
+foreach(SOFTPC_CCPU_SOURCE_NAME IN LISTS SOFTPC_CCPU_SOURCE_NAMES)
+    list(APPEND SOFTPC_CCPU_SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/${SOFTPC_CCPU_SOURCE_NAME}")
+endforeach()
 add_library(softpc-ccpu-core OBJECT
-    src/core/softpc/base/ccpu386/c_main.c
-    src/core/softpc/base/ccpu386/ccpusas4.c
+    ${SOFTPC_CCPU_SOURCES}
+    src/core/softpc/base/ccpu386/softpc_ccpu_facade.c
+    src/core/softpc/base/cvidc/mvdm_gdp_state.c
+    src/core/softpc/base/cvidc/sascdef.c
+    src/core/softpc/base/support/ios.c
+    src/core/softpc/base/system/ica.c
+    src/core/softpc/base/system/quick_ev.c
+    src/core/softpc_standalone_platform.c
     src/core/softpc_physical_mapping.c)
 set_target_properties(softpc-ccpu-core PROPERTIES
     C_STANDARD 90
@@ -28,6 +43,19 @@ target_include_directories(softpc-ccpu-core PRIVATE
     src/core/softpc/base/ccpu386
     src/core/softpc/base/cvidc
     src/core)
+
+# Keep the executor in the machine library so that every unresolved host edge
+# is visible to the standalone build, rather than being hidden in an unused
+# object target.
+target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-ccpu-core>)
+target_include_directories(softpc-machine PRIVATE
+    src/core/softpc/host/inc
+    src/core/softpc/host/inc/x86/prod
+    src/core/softpc/base/inc
+    src/core/softpc/base/ccpu386
+    src/core/softpc/base/cvidc
+    src/core)
+target_compile_definitions(softpc-machine PRIVATE SOFTPC_STANDALONE=1)
 
 add_executable(softpcvm src/vm/main.c)
 target_link_libraries(softpcvm PRIVATE softpc-machine)

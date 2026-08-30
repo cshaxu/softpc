@@ -13,10 +13,10 @@ softpcvm --hdd disk.img
 softpcvm --floppy disk.img --window
 ```
 
-`--window` reserves the Win32 presentation route.  Console presentation is
-the default.  The initial source cut is deliberately staged: it creates the
-machine boundary and validates media ownership before the CCPU/SAS/device
-packages are linked.
+`--window` reserves the Win32 presentation route. Console presentation is the
+default. The current core links the detached CCPU, SAS, I/O, PIC and event
+packages through standalone host ports; firmware, storage controllers and
+presentation are the next machine-owned packages to complete.
 
 ## Source layout
 

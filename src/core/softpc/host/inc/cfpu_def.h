@@ -122,7 +122,29 @@ FP80SE	sign_exp;
 #endif /* LITTLEND */
 
 
-#ifdef NTVDM
+#if defined(SOFTPC_STANDALONE)
+
+/*
+ * The original non-NT host port expected an obsolete fpgetsticky/fpsetround
+ * interface.  The standalone VM has no host product layer, so use the ISO C
+ * floating-point environment directly instead.  These macros deliberately
+ * expose only the mechanical state the CCPU FPU needs; they do not inherit
+ * any NTVDM process or thread policy.
+ */
+#include <fenv.h>
+
+#define HostGetOverflowException()      (fetestexcept(FE_OVERFLOW))
+#define HostGetUnderflowException()     (fetestexcept(FE_UNDERFLOW))
+#define HostGetPrecisionException()     (fetestexcept(FE_INEXACT))
+
+#define HostClearExceptions()           ((VOID)feclearexcept(FE_ALL_EXCEPT))
+
+#define HostSetRoundToNearest()         ((VOID)fesetround(FE_TONEAREST))
+#define HostSetRoundDown()              ((VOID)fesetround(FE_DOWNWARD))
+#define HostSetRoundUp()                ((VOID)fesetround(FE_UPWARD))
+#define HostSetRoundToZero()            ((VOID)fesetround(FE_TOWARDZERO))
+
+#elif defined(NTVDM)
 #include <float.h>
 
 #define HostGetOverflowException()	(_controlfp(0, 0) & _EM_OVERFLOW)
