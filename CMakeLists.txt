@@ -59,6 +59,7 @@ target_compile_definitions(softpc-machine PRIVATE SOFTPC_STANDALONE=1)
 
 add_executable(softpcvm
     src/vm/main.c
+    src/vm/console.c
     src/vm/win32_window.c)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
 if(WIN32)
