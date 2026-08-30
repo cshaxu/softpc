@@ -26,6 +26,7 @@ extern void dma_post(void);
 extern void gfi_init(void);
 extern void fla_init(void);
 extern void cmos_init(void);
+extern void cmos_post(void);
 extern void rom_init(void);
 extern void softpc_bios_setup_ivt(void);
 extern void ppi_init(void);
@@ -234,14 +235,17 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         return SOFTPC_MACHINE_IO_ERROR;
     if (!softpc_platform_floppy_attach(machine->options.floppy_path))
         return SOFTPC_MACHINE_IO_ERROR;
-    /* Original reset POST initialises the FDC BIOS state before replacing
-       INT 13h with the fixed-disk dispatcher (which retains it as INT 40h). */
-    diskette_post();
-    disk_post();
+    /* The original POST derives CMOS drive types from the now-attached GFI
+       backend, then publishes BDA equipment before the FDC examines it. */
+    cmos_post();
     {
         softpc_machine_result result = softpc_machine_install_reset_rom(machine);
         if (result != SOFTPC_MACHINE_OK) return result;
     }
+    /* Original reset POST initialises the FDC BIOS state before replacing
+       INT 13h with the fixed-disk dispatcher (which retains it as INT 40h). */
+    diskette_post();
+    disk_post();
     machine->reset = 1;
     return SOFTPC_MACHINE_OK;
 }

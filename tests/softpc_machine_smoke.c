@@ -170,9 +170,9 @@ static void write_cmos_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
     FILE *file;
-    /* Select RTC register A, read it through port 71h, and retain it. */
+    /* Select CMOS_DISKETTE (10h), read it through port 71h, and retain it. */
     unsigned char program[] = {
-        0xb0u, 0x0au, 0xe6u, 0x70u, 0xe4u, 0x71u, 0xa2u,
+        0xb0u, 0x10u, 0xe6u, 0x70u, 0xe4u, 0x71u, 0xa2u,
         0x00u, 0x05u, 0xebu, 0xfeu
     };
     memcpy(sector, program, sizeof(program));
@@ -725,10 +725,9 @@ static void run_cmos_boot_image(const char *path)
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     boot_machine(machine);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
-    /* The standalone host has not yet supplied the original product's CMOS
-       configuration provider, so the restored controller exposes its raw
-       post-init value rather than a fabricated RTC response. */
-    assert(marker == 0u);
+    /* The original CMOS POST derives drive A's type from the GFI image
+       backend.  The small fixture is intentionally presented as 1.44 MiB. */
+    assert(marker == 0x40u);
     softpc_machine_destroy(machine);
 }
 
