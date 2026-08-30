@@ -55,6 +55,8 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/keymouse/ppi.c
     src/core/softpc/base/keymouse/keyba.c
     src/core/softpc/base/keymouse/keybd_io.c
+    src/core/softpc/base/keymouse/mouse.c
+    src/core/softpc/base/keymouse/mouse_io.c
     src/core/softpc/base/disks/fla.c
     src/core/softpc/base/disks/gfi.c
     src/core/softpc/base/disks/gfi_mpty.c
@@ -157,6 +159,15 @@ target_include_directories(softpc-serial-smoke PRIVATE
     src/core/softpc/base/inc)
 add_test(NAME softpc-serial-smoke COMMAND softpc-serial-smoke)
 set_tests_properties(softpc-serial-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-mouse-smoke tests/softpc_mouse_smoke.c)
+target_link_libraries(softpc-mouse-smoke PRIVATE softpc-machine)
+target_include_directories(softpc-mouse-smoke PRIVATE
+    src/core/softpc/host/inc
+    src/core/softpc/host/inc/x86/prod
+    src/core/softpc/base/inc)
+add_test(NAME softpc-mouse-smoke COMMAND softpc-mouse-smoke)
+set_tests_properties(softpc-mouse-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-real-boot-smoke tests/softpc_real_boot_smoke.c)
 target_link_libraries(softpc-real-boot-smoke PRIVATE softpc-machine)

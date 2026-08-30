@@ -24,6 +24,7 @@
 #include "gvi.h"
 #include "video.h"
 #include "host_com.h"
+#include "virtual.h"
 
 /*
  * Minimal host ports for the detached CCPU.  These are deliberately machine
@@ -98,6 +99,52 @@ int softpc_platform_video_buffers_init(void)
 
 void host_ring_bell(long duration) { UNUSED(duration); }
 void stream_io_update(void) {}
+
+/* V7's original controller owns the hardware-pointer registers.  The
+   detached presentation layer has no separate hardware-pointer surface, so
+   its two paint hooks are intentionally inert. */
+static void softpc_v7_pointer_void()
+{
+}
+void (*paint_v7ptr)() = softpc_v7_pointer_void;
+void (*clear_v7ptr)() = softpc_v7_pointer_void;
+
+CHAR *SPC_Product_Name = "SoftPC VM";
+
+/* This VM intentionally has one machine instance.  The original mouse driver
+   asks the Windows-era NIDDB service for a per-instance data handle; the
+   standalone equivalent is a single owned allocation, not a VDM service. */
+static IHP softpc_instance_data;
+
+IHP *NIDDB_Allocate_Instance_Data(size, create_callback, terminate_callback)
+int size;
+NIDDB_CR_CALLBACK create_callback;
+NIDDB_TM_CALLBACK terminate_callback;
+{
+    UNUSED(terminate_callback);
+    if (size <= 0) return NULL;
+    free(softpc_instance_data);
+    softpc_instance_data = calloc(1u, (size_t)size);
+    if (softpc_instance_data != NULL && create_callback != NULL)
+        (*create_callback)(&softpc_instance_data);
+    return &softpc_instance_data;
+}
+
+void NIDDB_Deallocate_Instance_Data(handle)
+IHP *handle;
+{
+    if (handle == NULL) return;
+    free(*handle);
+    *handle = NULL;
+}
+
+void host_memset(address, value, size)
+char *address;
+char value;
+unsigned int size;
+{
+    if (address != NULL) memset(address, (unsigned char)value, size);
+}
 
 void memfill(unsigned char data, unsigned char *first, unsigned char *last)
 {

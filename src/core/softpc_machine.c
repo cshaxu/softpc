@@ -50,6 +50,9 @@ extern void printer_post(int adapter);
 extern void com_init(int adapter);
 extern void com_post(int adapter);
 extern void disk_post(void);
+extern void mouse_init(void);
+extern void mouse_driver_initialisation(void);
+extern void mouse_driver_termination(void);
 extern void softpc_platform_hdd_init(void);
 extern int softpc_platform_hdd_attach(const char *floppy_path,
     const char *hard_disk_path);
@@ -79,6 +82,7 @@ struct softpc_machine {
     unsigned long memory_bytes;
     int reset;
     int hardware_initialized;
+    int mouse_driver_initialized;
 };
 
 
@@ -446,6 +450,11 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     com_post(0);
     com_init(1);
     com_post(1);
+    mouse_init();
+    if (!machine->mouse_driver_initialized) {
+        mouse_driver_initialisation();
+        machine->mouse_driver_initialized = 1;
+    }
     /* The original product's BIOS POST programmed the two 8259 PICs after
        their port glue was registered.  A standalone reset owns that hardware
        action directly; it is not a guest-service operation. */
@@ -586,8 +595,10 @@ static int softpc_machine_hdd_geometry(const char *path,
 void softpc_machine_destroy(softpc_machine *machine)
 {
     if (machine != NULL && machine->hardware_initialized) {
-    softpc_platform_hdd_detach();
-    softpc_platform_floppy_detach();
+        softpc_platform_hdd_detach();
+        softpc_platform_floppy_detach();
+        if (machine->mouse_driver_initialized)
+            mouse_driver_termination();
         sas_term();
     }
     free(machine);
