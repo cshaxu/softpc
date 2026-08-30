@@ -289,7 +289,10 @@ int softpc_platform_read_physical(IU32 address, IU8 *bytes, IU32 length)
 
 void host_set_hw_int(void)
 {
-    c_cpu_interrupt(CPU_HW_INT, 0);
+    /* ica.h's historical CPU_HW_INT macro is the PIC bitmap bit (zero),
+       whereas CCPU's CPU_INT_TYPE hardware-interrupt enum is value two.
+       Keep the machine port on the executor ABI rather than the PIC macro. */
+    c_cpu_interrupt((CPU_INT_TYPE)2, 0);
 }
 
 void host_clear_hw_int(void)

@@ -72,6 +72,11 @@ target_link_libraries(softpc-machine-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-machine-smoke COMMAND softpc-machine-smoke)
 set_tests_properties(softpc-machine-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-irq-smoke tests/softpc_irq_smoke.c)
+target_link_libraries(softpc-irq-smoke PRIVATE softpc-machine)
+add_test(NAME softpc-irq-smoke COMMAND softpc-irq-smoke)
+set_tests_properties(softpc-irq-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tests/standalone_source_boundary.cmake")
