@@ -20,6 +20,7 @@
 extern void c_cpu_simulate();
 
 static UTINY *softpc_ram;
+IU32 softpc_ccpu_instruction_budget = 0;
 
 UTINY *host_sas_init(sys_addr size)
 {

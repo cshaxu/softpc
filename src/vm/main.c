@@ -40,5 +40,5 @@ int main(int argc, char **argv)
     if (result != SOFTPC_MACHINE_OK)
         fprintf(stderr, "softpcvm: %s\n", softpc_machine_result_name(result));
     softpc_machine_destroy(machine);
-    return result == SOFTPC_MACHINE_BACKEND_UNAVAILABLE ? 0 : result != SOFTPC_MACHINE_OK;
+    return result != SOFTPC_MACHINE_OK;
 }

@@ -817,6 +817,17 @@ IFN1(
 
 DO_INST:
 
+#ifdef SOFTPC_STANDALONE
+   /* A standalone run slice returns by instruction budget, never through a
+      BOP FE product escape. */
+   {
+   extern IU32 softpc_ccpu_instruction_budget;
+   if (softpc_ccpu_instruction_budget == 0)
+      c_cpu_unsimulate();
+   --softpc_ccpu_instruction_budget;
+   }
+#endif
+
 
    /* INSIGNIA debugging */
 #ifdef	PIG
@@ -3671,7 +3682,10 @@ TYPED4:
 
       PIG_SYNCH(CHECK_NO_EXEC);
 
-#ifndef	PIG
+#if defined(SOFTPC_STANDALONE)
+      /* D6 is SoftPC's pseudo instruction, not guest x86. */
+      c_cpu_unsimulate();
+#elif !defined(PIG)
       if (ops[0].sng == 0xfe)
       {
 	      c_cpu_unsimulate();
