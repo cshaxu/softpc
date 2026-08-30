@@ -10,6 +10,7 @@
 #include "ios.h"
 #include "fla.h"
 #include "gfi.h"
+#include "cmos.h"
 
 static void write_floppy(const char *path)
 {
@@ -60,12 +61,18 @@ int main(void)
     softpc_machine *machine = NULL;
     unsigned char byte = 0u;
     unsigned char result;
+    unsigned short cmos_diskette = 0u;
     unsigned int attempts;
 
     write_floppy(path);
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     assert(gfi_drive_type(0) == GFI_DRIVE_TYPE_144);
+    /* The original CMOS POST must receive the drive capability supplied by
+       the standalone image GFI port: A: is a 1.44M drive (high nibble 4). */
+    cmos_post();
+    assert(cmos_read_byte(CMOS_DISKETTE, &cmos_diskette) == SUCCESS);
+    assert(cmos_diskette == 0x40u);
     program_dma_read();
     outb(DISKETTE_DOR_REG, 0x1cu);
     fdc_write(FDC_READ_DATA);
