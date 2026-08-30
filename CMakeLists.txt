@@ -36,19 +36,28 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/cvidc/accessfn.c
     src/core/softpc/base/cvidc/vglfunc.c
     src/core/softpc/base/cvidc/softpc_gdp_state.c
-    src/core/softpc/base/cvidc/sascdef.c
+    src/core/softpc/base/cvidc/sascdef.c)
+
+# Controllers, firmware and the standalone host boundary evolve independently
+# of the CCPU/C-VIDC executor.  Keep them in a separate object target so a
+# recovered original device does not force recompilation of the full executor.
+add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/support/ios.c
     src/core/softpc/base/system/ica.c
     src/core/softpc/base/system/quick_ev.c
     src/core/softpc/base/system/at_dma.c
     src/core/softpc/base/system/cmos.c
     src/core/softpc/base/system/idetect.c
+    src/core/softpc/base/system/illegalp.c
     src/core/softpc/base/system/rom.c
     src/core/softpc/base/system/timer.c
     src/core/softpc/base/system/timestrb.c
+    src/core/softpc/base/system/unexp_nt.c
     src/core/softpc/base/support/time_day.c
     src/core/softpc/base/bios/cmos_bis.c
     src/core/softpc/base/bios/bootstra.c
+    src/core/softpc/base/bios/ivt.c
+    src/core/softpc/base/bios/tape_io.c
     src/core/softpc/base/bios/equipmnt.c
     src/core/softpc/base/bios/mem_size.c
     src/core/softpc/base/comms/printer.c
@@ -93,9 +102,21 @@ add_library(softpc-ccpu-core OBJECT
 set_target_properties(softpc-ccpu-core PROPERTIES
     C_STANDARD 90
     C_EXTENSIONS ON)
+set_target_properties(softpc-machine-devices PROPERTIES
+    C_STANDARD 90
+    C_EXTENSIONS ON)
 target_compile_definitions(softpc-ccpu-core PRIVATE
     CPU_40_STYLE CCPU C_VID CPU_486 PROD SOFTPC_STANDALONE=1)
+target_compile_definitions(softpc-machine-devices PRIVATE
+    CPU_40_STYLE CCPU C_VID CPU_486 PROD SOFTPC_STANDALONE=1)
 target_include_directories(softpc-ccpu-core PRIVATE
+    src/core/softpc/host/inc
+    src/core/softpc/host/inc/x86/prod
+    src/core/softpc/base/inc
+    src/core/softpc/base/ccpu386
+    src/core/softpc/base/cvidc
+    src/core)
+target_include_directories(softpc-machine-devices PRIVATE
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
     src/core/softpc/base/inc
@@ -107,6 +128,7 @@ target_include_directories(softpc-ccpu-core PRIVATE
 # is visible to the standalone build, rather than being hidden in an unused
 # object target.
 target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-ccpu-core>)
+target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-machine-devices>)
 target_include_directories(softpc-machine PRIVATE
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod

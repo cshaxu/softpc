@@ -3332,10 +3332,23 @@ TYPEC4:
               ++bop_argument_index)
             bop_argument |= (IU32)GET_INST_BYTE(p) <<
                 (8 * bop_argument_index);
+         /* A BIOS Operation may recursively enter host_simulate().  As in
+            the original BOP decoder, publish the post-BOP guest IP before
+            invoking its C service so nested execution returns after it. */
+         UPDATE_INTEL_IP(p);
+         /* BIOS4 uses BOP FE as the original return trampoline for nested
+            host_simulate() ROM calls.  It is executor mechanics, not a
+            product BOP, and must unwind the current CCPU simulation level. */
+         if (bop_number == 0xfe) {
+            c_cpu_unsimulate();
+            break;
+         }
          if (!softpc_device_bop_dispatch(bop_number, bop_argument)) {
             Int6();
             break;
          }
+         CANCEL_HOST_IP();
+         SYNCH_TICK();
          break;
       }
       /* LES requires a memory operand.  The historical product used this

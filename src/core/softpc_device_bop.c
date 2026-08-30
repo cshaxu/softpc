@@ -14,8 +14,9 @@ IBOOL softpc_device_bop_dispatch IFN2(IU8, number, IU32, argument)
 
     UNUSED(argument);
     handler = BIOS[number];
-    if (handler == 0)
+    if (handler == 0) {
         return FALSE;
+    }
     (*handler)();
     return TRUE;
 }
@@ -23,6 +24,7 @@ IBOOL softpc_device_bop_dispatch IFN2(IU8, number, IU32, argument)
 void softpc_device_bop_register_machine_services IFN0()
 {
     extern void keyboard_int IPT0();
+    extern void illegal_op_int IPT0();
     extern void keyboard_io IPT0();
     extern void diskette_int IPT0();
     extern void diskette_io IPT0();
@@ -30,6 +32,7 @@ void softpc_device_bop_register_machine_services IFN0()
     extern void printer_io IPT0();
     extern void rs232_io IPT0();
     extern void disk_io IPT0();
+    extern void cassette_io IPT0();
     extern void equipment IPT0();
     extern void memory_size IPT0();
     extern void bootstrap IPT0();
@@ -44,6 +47,7 @@ void softpc_device_bop_register_machine_services IFN0()
     extern void mouse_io_interrupt IPT0();
     extern void mouse_video_io IPT0();
 
+    BIOS[0x06] = illegal_op_int;
     BIOS[BIOS_KB_INT] = keyboard_int;
     BIOS[BIOS_KEYBOARD_IO] = keyboard_io;
     BIOS[BIOS_DISKETTE_INT] = diskette_int;
@@ -52,6 +56,7 @@ void softpc_device_bop_register_machine_services IFN0()
     BIOS[BIOS_PRINTER_IO] = printer_io;
     BIOS[BIOS_RS232_IO] = rs232_io;
     BIOS[BIOS_DISK_IO] = disk_io;
+    BIOS[BIOS_CASSETTE_IO] = cassette_io;
     BIOS[BIOS_EQUIPMENT] = equipment;
     BIOS[BIOS_MEMORY_SIZE] = memory_size;
     BIOS[BIOS_BOOT_STRAP] = bootstrap;

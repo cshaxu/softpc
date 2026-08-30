@@ -14,6 +14,8 @@ extern unsigned long c_getCS_BASE(void);
 extern unsigned long c_getEIP(void);
 extern void sas_init(unsigned long size);
 extern void sas_term(void);
+extern void sas_fills(unsigned long address, unsigned char value,
+    unsigned long length);
 extern void io_init(void);
 extern void SWPIC_init_funcptrs(void);
 extern void ica0_init(void);
@@ -24,6 +26,7 @@ extern void gfi_init(void);
 extern void fla_init(void);
 extern void cmos_init(void);
 extern void rom_init(void);
+extern void softpc_bios_setup_ivt(void);
 extern void ppi_init(void);
 extern void ica0_post(void);
 extern void ica1_post(void);
@@ -45,11 +48,14 @@ extern void timer_init(void);
 extern void timer_post(void);
 extern void time_of_day_init(void);
 extern void time_strobe(void);
+extern void q_event_init(void);
+extern void tic_event_init(void);
 extern void printer_init(int adapter);
 extern void printer_post(int adapter);
 extern void com_init(int adapter);
 extern void com_post(int adapter);
 extern void disk_post(void);
+extern void diskette_post(void);
 extern void mouse_init(void);
 extern void mouse_driver_initialisation(void);
 extern void mouse_driver_termination(void);
@@ -65,8 +71,6 @@ extern FILE *trace_file;
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
 #define SOFTPC_MINIMUM_RAM_BYTES (1024ul * 1024ul)
 #define SOFTPC_BOOT_SECTOR_BYTES 512u
-#define SOFTPC_BOOT_SECTOR_ADDRESS 0x7c00u
-#define SOFTPC_RESET_VECTOR_ADDRESS 0xffff0u
 
 static int softpc_machine_floppy_geometry(const char *path,
     unsigned short *sectors_per_track, unsigned short *heads);
@@ -96,43 +100,11 @@ static int softpc_machine_media_exists(const char *path)
     return 1;
 }
 
-static softpc_machine_result softpc_machine_load_boot_sector(
-    const softpc_machine *machine)
-{
-    const char *path = machine->options.floppy_path != NULL ?
-        machine->options.floppy_path : machine->options.hard_disk_path;
-    unsigned char sector[SOFTPC_BOOT_SECTOR_BYTES];
-    FILE *file = fopen(path, "rb");
-    if (file == NULL) return SOFTPC_MACHINE_IO_ERROR;
-    if (fread(sector, 1u, sizeof(sector), file) != sizeof(sector)) {
-        fclose(file);
-        return SOFTPC_MACHINE_IO_ERROR;
-    }
-    fclose(file);
-    if (sector[510] != 0x55u || sector[511] != 0xaau)
-        return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    if (!softpc_platform_write_physical(SOFTPC_BOOT_SECTOR_ADDRESS, sector,
-            sizeof(sector))) return SOFTPC_MACHINE_IO_ERROR;
-    return SOFTPC_MACHINE_OK;
-}
-
 static softpc_machine_result softpc_machine_install_reset_rom(
     const softpc_machine *machine)
 {
     unsigned char bda_configuration[6];
     unsigned char bda_fixed_disk_count;
-    /* Architectural reset enters at f000:fff0. HDD boot uses ATA PIO to
-       fetch LBA 0; floppy remains on the temporary sector-load path. */
-    static const unsigned char hdd_reset_vector[] = { 0xeau, 0x00u, 0x00u, 0x00u, 0xf0u };
-    static const unsigned char hdd_boot_rom[] = {
-        0xbau, 0xf2u, 0x01u, 0xb0u, 0x01u, 0xeeu,
-        /* fdisk is CHS rather than ATA-LBA: sector IDs begin at one. */
-        0x42u, 0xb0u, 0x01u, 0xeeu, 0x42u, 0x30u, 0xc0u, 0xeeu,
-        0x42u, 0xeeu,
-        0x42u, 0xb0u, 0xe0u, 0xeeu, 0x42u, 0xb0u, 0x20u, 0xeeu,
-        0xbau, 0xf0u, 0x01u, 0xbfu, 0x00u, 0x7cu, 0xb9u, 0x00u, 0x01u,
-        0xfcu, 0xedu, 0xabu, 0xe2u, 0xfcu, 0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
-    };
 #if 0
     static unsigned char retired_int13_rom[] = {
         0x50u, 0x53u, 0x51u, 0x52u, 0x56u, 0x57u, 0x55u, 0x1eu,
@@ -263,16 +235,7 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0x50u, 0xb0u, 0x20u, 0xe6u, 0x20u, 0x58u, 0xcfu
     };
     static const unsigned char irq1_vector[] = { 0x20u, 0x04u, 0x00u, 0xf0u };
-    static const unsigned char bootstrap_vector[] = { 0x10u, 0x04u, 0x00u, 0xf0u };
-    static const unsigned char hdd_bootstrap_rom[] = {
-        0xeau, 0x00u, 0x00u, 0x00u, 0xf0u
-    };
-    static const unsigned char floppy_bootstrap_rom[] = {
-        0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
-    };
-    static const unsigned char floppy_reset_vector[] = {
-        0xb2u, 0x00u, 0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
-    };
+    static const unsigned char bootstrap_vector[] = { 0x00u, 0xe7u, 0x00u, 0xf0u };
     {
         unsigned long extended_kib = (machine->memory_bytes -
             SOFTPC_MINIMUM_RAM_BYTES) / 1024ul;
@@ -332,19 +295,7 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         !softpc_platform_write_physical(0x60u, bootstrap_vector,
             sizeof(bootstrap_vector)) ||
         !softpc_platform_write_physical(0x64u, bootstrap_vector,
-            sizeof(bootstrap_vector))) return SOFTPC_MACHINE_IO_ERROR;
-    if (machine->options.floppy_path == NULL) {
-        if (!softpc_platform_write_physical(0xf0000u, hdd_boot_rom,
-                sizeof(hdd_boot_rom)) ||
-            !softpc_platform_write_physical(0xf0410u, hdd_bootstrap_rom,
-                sizeof(hdd_bootstrap_rom)) ||
-            !softpc_platform_write_physical(SOFTPC_RESET_VECTOR_ADDRESS,
-                hdd_reset_vector, sizeof(hdd_reset_vector)))
-            return SOFTPC_MACHINE_IO_ERROR;
-    } else if (!softpc_platform_write_physical(0xf0410u, floppy_bootstrap_rom,
-            sizeof(floppy_bootstrap_rom)) ||
-        !softpc_platform_write_physical(SOFTPC_RESET_VECTOR_ADDRESS,
-            floppy_reset_vector, sizeof(floppy_reset_vector))) {
+            sizeof(bootstrap_vector))) {
         return SOFTPC_MACHINE_IO_ERROR;
     }
     return SOFTPC_MACHINE_OK;
@@ -419,10 +370,20 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     trace_file = stderr;
     c_cpu_init();
     c_cpu_reset();
+    /* Original reset POST clears conventional memory before rebuilding the
+       IVT and BIOS data area.  Keep reset semantics independent of allocator
+       state and prior guest execution. */
+    sas_fills(0u, 0u, 640ul * 1024ul);
     /* Restore the original BIOS and V7 video ROM images first.  The current
        temporary reset overlay remains only until every original ROM BOP
        service is registered. */
     rom_init();
+    softpc_bios_setup_ivt();
+    /* Original reset POST establishes both event queues before device POST.
+       FLA completes commands through this queue; the standalone host only
+       drives the original dispatcher from the CCPU execution loop. */
+    q_event_init();
+    tic_event_init();
     /* Preserve the original controller lifecycle: its GVI layer installs the
        V7 VGA ports and memory mappings, then the BIOS video state is made
        from the restored firmware.  The host layer only presents its output. */
@@ -452,15 +413,14 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     if (!softpc_platform_hdd_attach(machine->options.floppy_path,
             machine->options.hard_disk_path))
         return SOFTPC_MACHINE_IO_ERROR;
-    disk_post();
     if (!softpc_platform_floppy_attach(machine->options.floppy_path))
         return SOFTPC_MACHINE_IO_ERROR;
+    /* Original reset POST initialises the FDC BIOS state before replacing
+       INT 13h with the fixed-disk dispatcher (which retains it as INT 40h). */
+    diskette_post();
+    disk_post();
     {
-        softpc_machine_result result = SOFTPC_MACHINE_OK;
-        if (machine->options.floppy_path != NULL)
-            result = softpc_machine_load_boot_sector(machine);
-        if (result != SOFTPC_MACHINE_OK) return result;
-        result = softpc_machine_install_reset_rom(machine);
+        softpc_machine_result result = softpc_machine_install_reset_rom(machine);
         if (result != SOFTPC_MACHINE_OK) return result;
     }
     machine->reset = 1;
