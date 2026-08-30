@@ -98,7 +98,9 @@ typedef unsigned int         IUH;	    /* Host register sized unsigned quantity *
 #define TRUE            (!FALSE)        /* Boolean truth value */
 #endif
 
+#ifndef STRINGIFY
 #define STRINGIFY(x)	#x
+#endif
 
 #if !defined(_WINDOWS_) && !defined(NT_INCLUDED)   /* Types already defined by windows */
 //typedef int INT;
