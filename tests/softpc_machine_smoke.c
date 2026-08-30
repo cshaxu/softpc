@@ -150,6 +150,25 @@ static void write_int10_boot_image(const char *path)
     assert(fclose(file) == 0);
 }
 
+static void write_int10_mode_cursor_boot_image(const char *path)
+{
+    unsigned char sector[512] = { 0 };
+    FILE *file;
+    /* Query mode, set cursor to 2:3, query it, and expose all results. */
+    unsigned char program[] = {
+        0xb4u, 0x0fu, 0xcdu, 0x10u, 0xa3u, 0x00u, 0x05u,
+        0xb4u, 0x02u, 0xb6u, 0x02u, 0xb2u, 0x03u, 0xcdu, 0x10u,
+        0xb4u, 0x03u, 0xcdu, 0x10u, 0x88u, 0xf0u, 0xa2u, 0x02u,
+        0x05u, 0x88u, 0xd0u, 0xa2u, 0x03u, 0x05u, 0xebu, 0xfeu
+    };
+    memcpy(sector, program, sizeof(program));
+    sector[510] = 0x55u; sector[511] = 0xaau;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
+    assert(fclose(file) == 0);
+}
+
 static void write_int12_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
@@ -578,6 +597,21 @@ static void run_int10_boot_image(const char *path)
     softpc_machine_destroy(machine);
 }
 
+static void run_int10_mode_cursor_boot_image(const char *path)
+{
+    unsigned char values[4] = { 0, 0, 0, 0 };
+    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 128u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x500u, values,
+        sizeof(values)) == SOFTPC_MACHINE_OK);
+    assert(values[0] == 0x03u && values[1] == 0x50u);
+    assert(values[2] == 2u && values[3] == 3u);
+    softpc_machine_destroy(machine);
+}
+
 static void run_int12_boot_image(const char *path)
 {
     unsigned char memory_kib[2] = { 0, 0 };
@@ -749,6 +783,7 @@ int main(void)
     const char *timer = "softpc-machine-timer-smoke.img";
     const char *text = "softpc-machine-text-smoke.img";
     const char *int10 = "softpc-machine-int10-smoke.img";
+    const char *int10_mode_cursor = "softpc-machine-int10-mode-cursor-smoke.img";
     const char *int12 = "softpc-machine-int12-smoke.img";
     const char *int11 = "softpc-machine-int11-smoke.img";
     const char *int1a = "softpc-machine-int1a-smoke.img";
@@ -779,6 +814,7 @@ int main(void)
     write_timer_boot_image(timer);
     write_text_boot_image(text);
     write_int10_boot_image(int10);
+    write_int10_mode_cursor_boot_image(int10_mode_cursor);
     write_int12_boot_image(int12);
     write_int11_boot_image(int11);
     write_int1a_boot_image(int1a);
@@ -809,6 +845,7 @@ int main(void)
     run_timer_boot_image(timer);
     run_text_boot_image(text);
     run_int10_boot_image(int10);
+    run_int10_mode_cursor_boot_image(int10_mode_cursor);
     run_int12_boot_image(int12);
     run_int11_boot_image(int11, 1, 0x23u);
     run_int11_boot_image(int11, 0, 0x22u);
@@ -837,6 +874,7 @@ int main(void)
     assert(remove(timer) == 0);
     assert(remove(text) == 0);
     assert(remove(int10) == 0);
+    assert(remove(int10_mode_cursor) == 0);
     assert(remove(int12) == 0);
     assert(remove(int11) == 0);
     assert(remove(int1a) == 0);

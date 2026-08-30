@@ -28,7 +28,8 @@ support. Its ROM boots a floppy
 sector directly or reads hard-disk LBA 0 through ATA PIO. It provides these
 guest-firmware services:
 
-- `INT 10h/AH=0Eh` — 80×25 text teletype output.
+- `INT 10h/AH=0Eh`, `AH=0Fh`, `AH=02h`, and `AH=03h` — 80×25 text
+  teletype, mode query, and cursor control.
 - `INT 11h` — fixed equipment list (color text, FPU, and attached floppy).
 - `INT 12h` — fixed 640 KiB conventional-memory report.
 - `INT 13h/AH=02h` and `AH=03h` — contiguous CHS reads and writes of up to
