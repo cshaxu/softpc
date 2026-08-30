@@ -18,8 +18,9 @@ softpcvm --floppy disk.img --window
 Console presentation is the default and runs continuously; press `Esc` to
 leave it. `--window` selects the equivalent Win32 text window. The current
 core links the detached CCPU, SAS, I/O, PIC and event packages through
-standalone host ports; firmware, storage controllers and presentation are the
-next machine-owned packages to complete.
+standalone host ports. The fixed firmware, raw-media storage path, and
+console/Win32 text presentation are machine-owned rather than supplied by a
+product host.
 
 Exactly one boot medium is accepted. The fixed machine has 16 MiB RAM, master
 and slave 8259 PICs, PIT channel 0, an 8042-style keyboard queue, text video
@@ -38,6 +39,9 @@ guest-firmware services:
 - `INT 16h/AH=00h` and `AH=01h` — ASCII/scan-code read and non-consuming
   availability check for basic US keyboard input.
 - `INT 1Ah/AH=00h` — BIOS tick counter maintained by the fixed PIT.
+- `INT 14h/AH=00h`, `AH=01h`, and `AH=03h` — a fixed serial sink with
+  initialization, transmit, and ready status.
+- `INT 17h/AH=01h` — a fixed ready printer sink.
 
 The standard BIOS Data Area also exposes the matching equipment word at
 `0040:0010`, the 640 KiB conventional-memory word at `0040:0013`, and the
