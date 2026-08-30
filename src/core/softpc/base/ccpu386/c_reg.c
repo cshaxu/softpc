@@ -36,7 +36,7 @@ Provide External Interface to CPU Registers.
 
 #include <Fpu_c.h>
 #include <Pigger_c.h>
-/* DIVERGENCE(MVDM-HOST-DIV-082): the original diagnostic keeps its `printf`
+/* DIVERGENCE(SOFTPC-PORT-082): the original diagnostic keeps its `printf`
  * call and argument order; publish the standard variadic declaration so both
  * modern host ABIs check it instead of assuming an `int` call contract. */
 #include <stdio.h>

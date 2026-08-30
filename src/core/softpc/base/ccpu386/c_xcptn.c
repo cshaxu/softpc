@@ -29,7 +29,7 @@ Exception Handling Support.
 #include <c_xtrn.h>
 #include <ccpupig.h>
 #include <fault.h>
-/* DIVERGENCE(MVDM-HOST-DIV-080): use the original Yoda diagnostic interface
+/* DIVERGENCE(SOFTPC-PORT-080): use the original Yoda diagnostic interface
  * so this CCPU exception path retains force_yoda's void/no-argument call
  * contract on both x86 and x64. The exception-environment macro likewise
  * uses the one host_def.h-provided CRT getenv declaration rather than redeclare

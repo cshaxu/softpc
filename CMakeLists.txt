@@ -24,7 +24,7 @@ endforeach()
 add_library(softpc-ccpu-core OBJECT
     ${SOFTPC_CCPU_SOURCES}
     src/core/softpc/base/ccpu386/softpc_ccpu_facade.c
-    src/core/softpc/base/cvidc/mvdm_gdp_state.c
+    src/core/softpc/base/cvidc/softpc_gdp_state.c
     src/core/softpc/base/cvidc/sascdef.c
     src/core/softpc_io.c
     src/core/softpc_pic8259.c

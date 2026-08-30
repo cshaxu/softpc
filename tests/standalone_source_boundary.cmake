@@ -1,5 +1,8 @@
 set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/ccpu386/softpc_ccpu_facade.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/softpc_gdp_state.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/softpc_gdp_state.h"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/softpc_gdp_slots.h"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_io.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_pic8259.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_quick_events.c"
@@ -22,7 +25,7 @@ foreach(source IN LISTS standalone_sources)
     if(normalized_contents MATCHES "(^|[^[:alnum:]_])bop[[:space:]]*\\(")
         message(FATAL_ERROR "Standalone CCPU contains a BOP dispatcher: ${source}")
     endif()
-    if(normalized_contents MATCHES "(^|[^[:alnum:]_])(ntvdm|wow|vdd|basesrv|csr|dos)([^[:alnum:]_]|$)")
+    if(normalized_contents MATCHES "(^|[^[:alnum:]_])(mvdm|ntvdm|vdm|wow|vdd|basesrv|csr|dos)([^[:alnum:]_]|$)")
         message(FATAL_ERROR "Standalone CCPU contains product-shell semantics: ${source}")
     endif()
 endforeach()

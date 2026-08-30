@@ -71,7 +71,7 @@ struct VGAGLOBALSETTINGS
 	IU32 plane_enable;
 	IU32 plane_enable_mask;
 	IUH *sr_lookup;
-	/* DIVERGENCE(MVDM-HOST-DIV-051): these selected CCPU rule entries carry
+	/* DIVERGENCE(SOFTPC-PORT-051): these selected CCPU rule entries carry
 	 * native code addresses.  NT4 represented them as IU32* only because its
 	 * host pointer width was 32 bits; retain the original accessor ABI while
 	 * storing the private SoftPC addresses at native width on x86 and x64. */

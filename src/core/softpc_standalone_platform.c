@@ -15,8 +15,7 @@
 /*
  * Minimal host ports for the detached CCPU.  These are deliberately machine
  * mechanics only: RAM allocation, a monotonic event clock, and interrupt
- * notification.  There is no VDM session, BOP dispatcher, DOS service or
- * Windows NT process integration here.
+ * notification.  There is no product-session or service-dispatch layer here.
  */
 
 extern void c_cpu_simulate();

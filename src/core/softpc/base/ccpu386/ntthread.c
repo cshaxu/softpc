@@ -71,7 +71,7 @@ void ccpu386foundnewthread()
 
     if (simstack == (ThreadSimBufPtr)0)
     {
-        /* DIVERGENCE(MVDM-HOST-DIV-116): sizeof is native-width on both
+        /* DIVERGENCE(SOFTPC-PORT-116): sizeof is native-width on both
          * supported hosts; retain the original diagnostic while using its
          * matching C varargs conversion instead of the NT4 x86-only %d. */
         fprintf(stderr, "ccpu386foundnewthread id:%#x cant malloc %zu bytes. Err:%#x\n", GetCurrentThreadId(), sizeof(ThreadSimBuf), GetLastError());
@@ -223,7 +223,7 @@ jmp_buf *ccpu386ThrdExptnPtr()
     if (ccpuSimId == BADID)
     {
         fprintf(stderr, "ccpu386ThrdExptnPtr id:%#x called with Bad Id\n", GetCurrentThreadId());
-        /* DIVERGENCE(MVDM-HOST-DIV-128): this pointer-returning helper used
+        /* DIVERGENCE(SOFTPC-PORT-128): this pointer-returning helper used
          * a bare return on its two original failure paths.  Match the
          * same-package ccpu386SimulatePtr failure contract: retain the
          * diagnostic and failure branch, but return a typed null jmp frame. */
@@ -233,7 +233,7 @@ jmp_buf *ccpu386ThrdExptnPtr()
     if (simstack == (ThreadSimBufPtr)0)
     {
         fprintf(stderr, "ccpu386ThrdExptnPtr id:%#x TlsGetValue failed (err:%#x)\n", GetCurrentThreadId(), GetLastError());
-        /* DIVERGENCE(MVDM-HOST-DIV-128): see the BADID failure branch above. */
+        /* DIVERGENCE(SOFTPC-PORT-128): see the BADID failure branch above. */
         return ((jmp_buf *)0);
     }
     

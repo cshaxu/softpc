@@ -40,7 +40,7 @@ IU8 npxbuff[108];   /* Make it the maximum required size */
 } OPERAND;
 
 IMPORT IU8 *Start_of_M_area;
-/* DIVERGENCE(MVDM-HOST-DIV-055): this is the CCPU SAS physical extent, not
+/* DIVERGENCE(SOFTPC-PORT-055): this is the CCPU SAS physical extent, not
  * the native backing pointer.  Keep it identical to sas.h/ccpusas4.c. */
 IMPORT PHY_ADDR Length_of_M_area;
 IMPORT ISM32 in_C;
@@ -86,7 +86,7 @@ IMPORT IU32 CCPU_IP;
 
 LOCAL BOOL DoNpxPrologue IPT0();
 
-/* DIVERGENCE(MVDM-HOST-DIV-082): the selected original FPU body exports
+/* DIVERGENCE(SOFTPC-PORT-082): the selected original FPU body exports
  * FLDENV but no selected CCPU header publishes its declaration.  Preserve the
  * original call shape so modern x86/x64 builds validate its pointer argument
  * rather than assuming an `int` result. */
@@ -4814,7 +4814,7 @@ npx_funimp,
 npx_funimp
 };
 
-/* DIVERGENCE(MVDM-HOST-DIV-131): preserve the original IU32 instruction
+/* DIVERGENCE(SOFTPC-PORT-131): preserve the original IU32 instruction
  * input and body, while replacing its K&R declarator with the same explicit
  * callable ABI for modern x86/x64 C compilation. */
 VOID ZFRSRVD(IU32 npx_instr)

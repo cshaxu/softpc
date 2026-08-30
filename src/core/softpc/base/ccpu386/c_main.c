@@ -30,7 +30,7 @@ Actual worker routines are spun off elsewhere.
 #include  <debug.h>
 #include  <config.h>
 #include <c_main.h>	/* C CPU definitions-interfaces */
-/* DIVERGENCE(MVDM-HOST-DIV-072): publish the existing owner headers whose
+/* DIVERGENCE(SOFTPC-PORT-072): publish the existing owner headers whose
  * declarations the historical executor previously inferred implicitly. */
 #include <c_addr.h>	/* C CPU address calculation contract */
 #include <c_page.h>	/* Paging Interface */
@@ -52,7 +52,7 @@ Actual worker routines are spun off elsewhere.
 #include <timer.h>
 
 /*
- * DIVERGENCE(MVDM-HOST-DIV-072): these are existing CCPU package bodies
+ * DIVERGENCE(SOFTPC-PORT-072): these are existing CCPU package bodies
  * selected by this source profile. The historical source relied on
  * implicit-int declarations; publish their exact void/no-argument contracts
  * so x64 cannot infer a host int result.
@@ -576,7 +576,7 @@ GLOBAL	PHY_ADDR	SasWrapMask = 0xfffff;
  * pigger scripts that result in very large EIP values pig correctly.
  */
 #define CCPU_INSTRUCTION_DELTA(x) ((IU32)DIFF_INST_BYTE((x), p_start))
-/* DIVERGENCE(MVDM-HOST-DIV-125): `p_start` and the decode cursor are
+/* DIVERGENCE(SOFTPC-PORT-125): `p_start` and the decode cursor are
  * same-page private host pointers.  Their difference is an instruction byte
  * count, not a guest or host identity; retain that bounded count as IU32
  * before it joins the original 32-bit EIP arithmetic on x86 and x64. */

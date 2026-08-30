@@ -142,7 +142,7 @@ LOCAL void bios_write_word   IPT2(LIN_ADDR, linAddr, IU16, value);
 LOCAL void bios_write_double IPT2(LIN_ADDR, linAddr, IU32, value);
 
 GLOBAL IU8 *Start_of_M_area = NULL;
-GLOBAL PHY_ADDR Length_of_M_area = 0; /* DIVERGENCE(MVDM-HOST-DIV-055):
+GLOBAL PHY_ADDR Length_of_M_area = 0; /* DIVERGENCE(SOFTPC-PORT-055):
                                         guest physical byte count; see sas.h. */
 #ifdef BACK_M
 GLOBAL IU8 *end_of_M = NULL;

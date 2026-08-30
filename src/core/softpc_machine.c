@@ -5,7 +5,7 @@
 #include <string.h>
 
 /* CCPU's standalone executor entry points.  The wrapper intentionally calls
- * the core directly instead of the historical host_simulate/BOP facade. */
+ * the core directly instead of the historical host shim. */
 extern void c_cpu_init(void);
 extern void c_cpu_reset(void);
 extern void c_cpu_simulate(void);
@@ -184,7 +184,7 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     c_cpu_reset();
     /* The original product's BIOS POST programmed the two 8259 PICs after
        their port glue was registered.  A standalone reset owns that hardware
-       action directly; it is not a DOS or VDM service. */
+       action directly; it is not a guest-service operation. */
     ica0_post();
     ica1_post();
     if (!softpc_platform_hdd_attach(machine->options.hard_disk_path != NULL ?

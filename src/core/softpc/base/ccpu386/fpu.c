@@ -17,7 +17,7 @@
 ]*/
 #include "insignia.h"
 #include "host_def.h"
-/* DIVERGENCE(MVDM-HOST-DIV-076): preserve the native C varargs ABI. */
+/* DIVERGENCE(SOFTPC-PORT-076): preserve the native C varargs ABI. */
 #include <stdio.h>
 #include <math.h>
 #include "cfpu_def.h"
@@ -5858,7 +5858,7 @@ GLOBAL	void NpxStackRegAsString IFN3(FPSTACKENTRY *, fpStPtr, char *, buf, IU32,
 /* this one is only ever used in trace.c and only if pure CCPU */
 GLOBAL char * getNpxStackReg IFN2(IU32, reg_num, char *, buffer)
 {
-	/* DIVERGENCE(MVDM-HOST-DIV-130): TOSPtr and FPUStackBase delimit the
+	/* DIVERGENCE(SOFTPC-PORT-130): TOSPtr and FPUStackBase delimit the
 	 * original eight-entry private FPU stack, so their pointer difference is
 	 * a bounded stack index, not a host identity.  Make the retained IU32
 	 * register arithmetic explicit on both host widths. */
