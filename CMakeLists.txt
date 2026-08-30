@@ -5,6 +5,17 @@ set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
+# SoftPC's selected CPU_40_STYLE machine is supported as either an x86 or
+# x64 host build.  Keep the host word size explicit: historical code must use
+# ULONG_PTR/IUH at host-pointer boundaries, never assume that ULONG is a
+# pointer.  A 32-bit CMake toolchain selects x86; a native 64-bit toolchain
+# selects x64 without changing the guest machine profile.
+if(NOT CMAKE_SIZEOF_VOID_P EQUAL 4 AND NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+    message(FATAL_ERROR "SoftPC requires a 32-bit or 64-bit host pointer model")
+endif()
+math(EXPR SOFTPC_HOST_POINTER_BITS "${CMAKE_SIZEOF_VOID_P} * 8")
+message(STATUS "SoftPC host pointer width: ${SOFTPC_HOST_POINTER_BITS}-bit")
+
 add_library(softpc-machine
     src/core/softpc_machine.c)
 target_include_directories(softpc-machine PUBLIC include)
@@ -55,8 +66,8 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/system/unexp_nt.c
     src/core/softpc/base/support/time_day.c
     src/core/softpc/base/bios/cmos_bis.c
+    src/core/softpc/base/bios/reset.c
     src/core/softpc/base/bios/bootstra.c
-    src/core/softpc/base/bios/ivt.c
     src/core/softpc/base/bios/slave_bs.c
     src/core/softpc/base/bios/tape_io.c
     src/core/softpc/base/bios/equipmnt.c
@@ -107,9 +118,11 @@ set_target_properties(softpc-machine-devices PROPERTIES
     C_STANDARD 90
     C_EXTENSIONS ON)
 target_compile_definitions(softpc-ccpu-core PRIVATE
-    CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1)
+    CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1
+    SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 target_compile_definitions(softpc-machine-devices PRIVATE
-    CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1)
+    CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1
+    SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 target_include_directories(softpc-ccpu-core PRIVATE
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
@@ -137,7 +150,8 @@ target_include_directories(softpc-machine PRIVATE
     src/core/softpc/base/ccpu386
     src/core/softpc/base/cvidc
     src/core)
-target_compile_definitions(softpc-machine PRIVATE SOFTPC_STANDALONE=1)
+target_compile_definitions(softpc-machine PRIVATE
+    SOFTPC_STANDALONE=1 SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 
 add_executable(softpcvm
     src/vm/main.c

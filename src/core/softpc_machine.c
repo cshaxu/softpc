@@ -14,52 +14,22 @@ extern unsigned long c_getCS_BASE(void);
 extern unsigned long c_getEIP(void);
 extern void sas_init(unsigned long size);
 extern void sas_term(void);
-extern void sas_fills(unsigned long address, unsigned char value,
-    unsigned long length);
-extern void sas_storew(unsigned long address, unsigned short value);
-extern void io_init(void);
-extern void SWPIC_init_funcptrs(void);
-extern void ica0_init(void);
-extern void ica1_init(void);
-extern void dma_init(void);
-extern void dma_post(void);
 extern void gfi_init(void);
-extern void fla_init(void);
-extern void cmos_init(void);
-extern void cmos_post(void);
-extern void rom_init(void);
-extern void softpc_bios_setup_ivt(void);
-extern void ppi_init(void);
-extern void ica0_post(void);
-extern void ica1_post(void);
-extern void gvi_init(unsigned char adapter);
-extern void video_init(void);
 extern void *setup_global_data_ptr(void);
 extern void setup_vga_globals(void);
+extern void reset(void);
 extern int soft_reset;
 extern unsigned long softpc_ccpu_instruction_budget;
 extern int softpc_platform_write_physical(unsigned long address,
     const unsigned char *bytes, unsigned long length);
 extern int softpc_platform_read_physical(unsigned long address,
     unsigned char *bytes, unsigned long length);
-extern void softpc_platform_keyboard_reset(void);
 extern void softpc_device_bop_register_machine_services(void);
 extern void softpc_device_bop_set_memory_size(unsigned long memory_bytes);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
-extern void SWTMR_init_funcptrs(void);
-extern void timer_init(void);
-extern void timer_post(void);
-extern void time_of_day_init(void);
 extern void time_strobe(void);
 extern void q_event_init(void);
 extern void tic_event_init(void);
-extern void printer_init(int adapter);
-extern void printer_post(int adapter);
-extern void com_init(int adapter);
-extern void com_post(int adapter);
-extern void disk_post(void);
-extern void diskette_post(void);
-extern void mouse_init(void);
 extern void mouse_driver_initialisation(void);
 extern void mouse_driver_termination(void);
 extern void softpc_platform_hdd_init(void);
@@ -74,9 +44,6 @@ extern FILE *trace_file;
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
 #define SOFTPC_MINIMUM_RAM_BYTES (1024ul * 1024ul)
 #define SOFTPC_BOOT_SECTOR_BYTES 512u
-#define SOFTPC_BDA_EQUIP_FLAG 0x410ul
-#define SOFTPC_BDA_MEMORY_VAR 0x413ul
-#define SOFTPC_CONVENTIONAL_MEMORY_KIB 640u
 
 static int softpc_machine_floppy_geometry(const char *path,
     unsigned short *sectors_per_track, unsigned short *heads);
@@ -104,17 +71,6 @@ static int softpc_machine_media_exists(const char *path)
     if (file == NULL) return 0;
     fclose(file);
     return 1;
-}
-
-static softpc_machine_result softpc_machine_install_reset_rom(
-    const softpc_machine *machine)
-{
-    /* Original reset.c owns these BIOS variables through the SAS interface.
-       disk_post() has already established HF_NUM from the attached controller. */
-    sas_storew(SOFTPC_BDA_EQUIP_FLAG,
-        (unsigned short)(machine->options.floppy_path != NULL ? 0x23u : 0x22u));
-    sas_storew(SOFTPC_BDA_MEMORY_VAR, SOFTPC_CONVENTIONAL_MEMORY_KIB);
-    return SOFTPC_MACHINE_OK;
 }
 
 softpc_machine_result softpc_machine_create(const softpc_machine_options *options,
@@ -161,19 +117,10 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     if (machine == NULL) return SOFTPC_MACHINE_INVALID_ARGUMENT;
     if (!machine->hardware_initialized) {
         sas_init(machine->memory_bytes);
-        io_init();
-        SWPIC_init_funcptrs();
-        ica0_init();
-        ica1_init();
-        dma_init();
-        cmos_init();
-        ppi_init();
-        SWTMR_init_funcptrs();
-    softpc_device_bop_register_machine_services();
-    softpc_device_bop_set_memory_size(machine->memory_bytes);
+        softpc_device_bop_register_machine_services();
+        softpc_device_bop_set_memory_size(machine->memory_bytes);
         softpc_platform_hdd_init();
         gfi_init();
-        fla_init();
         if (!softpc_platform_video_buffers_init())
             return SOFTPC_MACHINE_IO_ERROR;
         if (setup_global_data_ptr() == NULL)
@@ -186,66 +133,23 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     trace_file = stderr;
     c_cpu_init();
     c_cpu_reset();
-    /* Original reset POST clears conventional memory before rebuilding the
-       IVT and BIOS data area.  Keep reset semantics independent of allocator
-       state and prior guest execution. */
-    sas_fills(0u, 0u, 640ul * 1024ul);
-    /* Retain reset.c's complete keyboard lifecycle after conventional memory
-       is cleared: BIOS ring POST followed by the original AT controller
-       POST.  This is controller reset work, not a one-time host setup. */
-    softpc_platform_keyboard_reset();
-    /* Restore the original BIOS and V7 video ROM images first.  The current
-       temporary reset overlay remains only until every original ROM BOP
-       service is registered. */
-    rom_init();
-    softpc_bios_setup_ivt();
-    /* Original reset POST establishes both event queues before device POST.
-       FLA completes commands through this queue; the standalone host only
-       drives the original dispatcher from the CCPU execution loop. */
+    /* The original non-NT reset path creates queues only on a soft reset.
+       A standalone first boot needs them before its original FDC POST. */
     q_event_init();
     tic_event_init();
-    /* Preserve the original controller lifecycle: its GVI layer installs the
-       V7 VGA ports and memory mappings, then the BIOS video state is made
-       from the restored firmware.  The host layer only presents its output. */
-    soft_reset = machine->reset ? 1 : 0;
-    gvi_init(5u);
-    video_init();
-    time_of_day_init();
-    timer_init();
-    timer_post();
-    printer_init(0);
-    printer_post(0);
-    com_init(0);
-    com_post(0);
-    com_init(1);
-    com_post(1);
-    mouse_init();
-    if (!machine->mouse_driver_initialized) {
-        mouse_driver_initialisation();
-        machine->mouse_driver_initialized = 1;
-    }
-    /* The original product's BIOS POST programmed the two 8259 PICs after
-       their port glue was registered.  A standalone reset owns that hardware
-       action directly; it is not a guest-service operation. */
-    ica0_post();
-    ica1_post();
-    dma_post();
+    /* The media has to exist before original CMOS, FDC and fixed-disk POST
+       query their respective configuration and host controller hooks. */
     if (!softpc_platform_hdd_attach(machine->options.floppy_path,
             machine->options.hard_disk_path))
         return SOFTPC_MACHINE_IO_ERROR;
     if (!softpc_platform_floppy_attach(machine->options.floppy_path))
         return SOFTPC_MACHINE_IO_ERROR;
-    /* The original POST derives CMOS drive types from the now-attached GFI
-       backend, then publishes BDA equipment before the FDC examines it. */
-    cmos_post();
-    {
-        softpc_machine_result result = softpc_machine_install_reset_rom(machine);
-        if (result != SOFTPC_MACHINE_OK) return result;
+    soft_reset = machine->reset ? 1 : 0;
+    reset();
+    if (!machine->mouse_driver_initialized) {
+        mouse_driver_initialisation();
+        machine->mouse_driver_initialized = 1;
     }
-    /* Original reset POST initialises the FDC BIOS state before replacing
-       INT 13h with the fixed-disk dispatcher (which retains it as INT 40h). */
-    diskette_post();
-    disk_post();
     machine->reset = 1;
     return SOFTPC_MACHINE_OK;
 }

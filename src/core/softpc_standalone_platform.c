@@ -621,7 +621,6 @@ int softpc_platform_hdd_attach(const char *floppy_path, const char *hard_disk_pa
         softpc_hdd_config_paths[1] = NULL;
         return 0;
     }
-    hda_init();
     return 1;
 }
 
@@ -794,7 +793,7 @@ IUH host_get_q_calib_val(void)
     return 1;
 }
 
-int soft_reset = 1;
+extern int soft_reset;
 
 /* Ctrl-Alt-Del reaches this original keyboard BIOS hook.  The next machine
    reset remains owned by the public machine lifecycle. */
@@ -804,6 +803,16 @@ void reboot(void)
 }
 
 void (*BIOS[256])() = { 0 };
+
+/* Original reset.c asks the host only for presentation metadata and lifecycle
+ * notifications.  A standalone machine has no product shell to notify. */
+CHAR *host_get_version(void) { return ""; }
+CHAR *host_get_unpublished_version(void) { return ""; }
+CHAR *host_get_years(void) { return ""; }
+CHAR *host_get_copyright(void) { return ""; }
+void NIDDB_System_Reboot(void) { }
+void host_timer_shutdown(void) { }
+void host_reset(void) { }
 /* The detached executor has no product logger.  Keep its optional diagnostic
  * stream valid so CCPU fault reports remain usable during standalone testing. */
 FILE *trace_file = NULL;
