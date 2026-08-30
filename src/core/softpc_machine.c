@@ -86,6 +86,7 @@ static softpc_machine_result softpc_machine_install_reset_rom(
     const softpc_machine *machine)
 {
     unsigned char bda_configuration[5];
+    unsigned char bda_fixed_disk_count;
     /* Architectural reset enters at f000:fff0. HDD boot uses ATA PIO to
        fetch LBA 0; floppy remains on the temporary sector-load path. */
     static const unsigned char hdd_reset_vector[] = { 0xeau, 0x00u, 0x00u, 0x00u, 0xf0u };
@@ -247,6 +248,7 @@ static softpc_machine_result softpc_machine_install_reset_rom(
     bda_configuration[2] = 0x80u;
     bda_configuration[3] = 0x02u;
     bda_configuration[4] = 0u;
+    bda_fixed_disk_count = machine->options.hard_disk_path != NULL ? 1u : 0u;
     if (!softpc_platform_write_physical(0xf0100u, hdd_int13_rom,
             sizeof(hdd_int13_rom)) ||
         !softpc_platform_write_physical(0x4cu, hdd_int13_vector,
@@ -270,6 +272,9 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         /* BDA equipment at 0040:0010, conventional memory at 0040:0013. */
         !softpc_platform_write_physical(0x410u, bda_configuration,
             sizeof(bda_configuration)) ||
+        /* BDA fixed-disk count at 0040:0075. */
+        !softpc_platform_write_physical(0x475u, &bda_fixed_disk_count,
+            sizeof(bda_fixed_disk_count)) ||
         !softpc_platform_write_physical(0xf0600u, int1a_clock_rom,
             sizeof(int1a_clock_rom)) ||
         !softpc_platform_write_physical(0x68u, int1a_vector,

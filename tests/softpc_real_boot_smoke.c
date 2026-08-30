@@ -16,6 +16,19 @@ static int text_has_printable_character(const unsigned char *text)
     return 0;
 }
 
+static void print_instruction(softpc_machine *machine, uint16_t cs,
+    uint32_t eip)
+{
+    unsigned char instruction[8];
+    uint32_t address = ((uint32_t)cs << 4u) + eip;
+    if (softpc_machine_read_physical(machine, address, instruction,
+            sizeof(instruction)) == SOFTPC_MACHINE_OK)
+        fprintf(stderr, "    %05x: %02x %02x %02x %02x %02x %02x %02x %02x\n",
+            (unsigned int)address, instruction[0], instruction[1],
+            instruction[2], instruction[3], instruction[4], instruction[5],
+            instruction[6], instruction[7]);
+}
+
 int main(int argc, char **argv)
 {
     softpc_machine_options options = { NULL, NULL,
@@ -46,16 +59,10 @@ int main(int argc, char **argv)
             SOFTPC_SLICE_INSTRUCTIONS);
         if (result != SOFTPC_MACHINE_OK) goto failed;
         if (trace) {
-            unsigned char instruction[8];
             (void)softpc_machine_instruction_pointer(machine, &cs, &eip);
             fprintf(stderr, "%03u %04x:%08x\n", index,
                 (unsigned int)cs, (unsigned int)eip);
-            if (cs == 0u && eip < 0x1000u &&
-                softpc_machine_read_physical(machine, eip, instruction,
-                    sizeof(instruction)) == SOFTPC_MACHINE_OK)
-                fprintf(stderr, "    %02x %02x %02x %02x %02x %02x %02x %02x\n",
-                    instruction[0], instruction[1], instruction[2], instruction[3],
-                    instruction[4], instruction[5], instruction[6], instruction[7]);
+            print_instruction(machine, cs, eip);
         }
         if (softpc_machine_read_physical(machine, 0xb8000u, text,
                 sizeof(text)) == SOFTPC_MACHINE_OK &&
@@ -67,6 +74,7 @@ int main(int argc, char **argv)
     (void)softpc_machine_instruction_pointer(machine, &cs, &eip);
     fprintf(stderr, "softpc-real-boot-smoke: guest produced no text output at %04x:%08x\n",
         (unsigned int)cs, (unsigned int)eip);
+    print_instruction(machine, cs, eip);
 failed:
     if (result != SOFTPC_MACHINE_OK)
         fprintf(stderr, "softpc-real-boot-smoke: %s\n",

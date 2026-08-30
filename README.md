@@ -40,7 +40,8 @@ guest-firmware services:
 - `INT 1Ah/AH=00h` — BIOS tick counter maintained by the fixed PIT.
 
 The standard BIOS Data Area also exposes the matching equipment word at
-`0040:0010` and the 640 KiB conventional-memory word at `0040:0013`.
+`0040:0010`, the 640 KiB conventional-memory word at `0040:0013`, and the
+single fixed-disk count at `0040:0075` when booting from a hard-disk image.
 
 Floppy geometry is inferred from standard raw-image capacities (360 KiB,
 720 KiB, 1.2 MiB, 1.44 MiB, and 2.88 MiB). For partitioned hard disks, the

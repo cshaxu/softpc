@@ -679,6 +679,7 @@ static void run_bda_configuration_image(const char *path, int floppy,
     unsigned char expected_equipment)
 {
     unsigned char configuration[5] = { 0, 0, 0, 0, 0 };
+    unsigned char fixed_disk_count = 0xffu;
     softpc_machine_options options = { NULL, NULL,
         SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *machine = NULL;
@@ -691,6 +692,9 @@ static void run_bda_configuration_image(const char *path, int floppy,
     assert(configuration[0] == expected_equipment && configuration[1] == 0u);
     assert(configuration[2] == 0x80u && configuration[3] == 0x02u);
     assert(configuration[4] == 0u);
+    assert(softpc_machine_read_physical(machine, 0x475u, &fixed_disk_count,
+        sizeof(fixed_disk_count)) == SOFTPC_MACHINE_OK);
+    assert(fixed_disk_count == (floppy ? 0u : 1u));
     softpc_machine_destroy(machine);
 }
 
