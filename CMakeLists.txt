@@ -22,9 +22,19 @@ foreach(SOFTPC_CCPU_SOURCE_NAME IN LISTS SOFTPC_CCPU_SOURCE_NAMES)
     list(APPEND SOFTPC_CCPU_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/${SOFTPC_CCPU_SOURCE_NAME}")
 endforeach()
+file(GLOB SOFTPC_CVIDC_GENERATED_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/cvidc/sinit*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/cvidc/sevid*.c")
 add_library(softpc-ccpu-core OBJECT
     ${SOFTPC_CCPU_SOURCES}
     src/core/softpc/base/ccpu386/softpc_ccpu_facade.c
+    src/core/softpc/base/ccpu386/vglob.c
+    ${SOFTPC_CVIDC_GENERATED_SOURCES}
+    src/core/softpc/base/cvidc/ev_glue.c
+    src/core/softpc/base/cvidc/evidfunc.c
+    src/core/softpc/base/cvidc/j_c_lang.c
+    src/core/softpc/base/cvidc/accessfn.c
+    src/core/softpc/base/cvidc/vglfunc.c
     src/core/softpc/base/cvidc/softpc_gdp_state.c
     src/core/softpc/base/cvidc/sascdef.c
     src/core/softpc/base/support/ios.c
@@ -43,6 +53,25 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/disks/floppy.c
     src/core/softpc/base/disks/floppy_i.c
     src/core/softpc/base/disks/fdisk.c
+    src/core/softpc/base/video/ega_mode.c
+    src/core/softpc/base/video/ega_prts.c
+    src/core/softpc/base/video/ega_vide.c
+    src/core/softpc/base/video/gfx_updt.c
+    src/core/softpc/base/video/video.c
+    src/core/softpc/base/video/gvi.c
+    src/core/softpc/base/video/video_io.c
+    src/core/softpc/base/video/v7_ports.c
+    src/core/softpc/base/video/v7_video.c
+    src/core/softpc/base/video/vga_mode.c
+    src/core/softpc/base/video/vga_prts.c
+    src/core/softpc/base/video/vga_vide.c
+    src/core/softpc/base/video/ega_read.c
+    src/core/softpc/base/video/ega_writ.c
+    src/core/softpc/base/video/ega_dmmy.c
+    src/core/softpc/base/video/ega_trcr.c
+    src/core/softpc/base/video/egawrtm0.c
+    src/core/softpc/base/video/egwrtm12.c
+    src/core/softpc/base/video/cga.c
     src/core/softpc_device_bop.c
     src/core/softpc_gfi_image.c
     src/core/softpc_standalone_platform.c
@@ -51,7 +80,7 @@ set_target_properties(softpc-ccpu-core PROPERTIES
     C_STANDARD 90
     C_EXTENSIONS ON)
 target_compile_definitions(softpc-ccpu-core PRIVATE
-    CPU_40_STYLE CCPU CPU_486 PROD SOFTPC_STANDALONE=1)
+    CPU_40_STYLE CCPU C_VID CPU_486 PROD SOFTPC_STANDALONE=1)
 target_include_directories(softpc-ccpu-core PRIVATE
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod

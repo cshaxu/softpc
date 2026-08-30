@@ -276,3 +276,13 @@ IMPORT sys_addr stream_io_bios_busy_sysaddr;
 #endif /* MONITOR */
 
 #endif /* NTVDM */
+
+/* The detached machine keeps this optional presentation path disabled, but
+   the original video controller references its state independently of the
+   product-specific enable/disable services above. */
+#ifndef NTVDM
+IMPORT half_word * stream_io_buffer;
+IMPORT word * stream_io_dirty_count_ptr;
+IMPORT word stream_io_buffer_size;
+IMPORT boolean stream_io_enabled;
+#endif

@@ -18,6 +18,11 @@
 #include "timeval.h"
 #include "timer.h"
 #include "keyboard.h"
+#include "gmi.h"
+#include "gfx_upd.h"
+#include "egaports.h"
+#include "gvi.h"
+#include "video.h"
 
 /*
  * Minimal host ports for the detached CCPU.  These are deliberately machine
@@ -30,6 +35,92 @@ extern void c_cpu_simulate();
 static UTINY *softpc_ram;
 static sys_addr softpc_ram_size;
 IU32 softpc_ccpu_instruction_budget = 0;
+
+/* These are controller buffers, not a second video implementation.  The
+   original platform allocated them while bringing up its UI; the detached
+   platform owns the same allocation at its presentation boundary instead. */
+extern byte *EGA_planes;
+extern byte *video_copy;
+extern PC_palette *DAC;
+
+/* The original video core's optional stream-I/O path is a product console
+   optimization.  The detached VM presents through its own console/window,
+   so it remains disabled while retaining the original controller behavior. */
+half_word *stream_io_buffer = NULL;
+boolean stream_io_enabled = FALSE;
+word stream_io_buffer_size = 0;
+word *stream_io_dirty_count_ptr = NULL;
+
+/* Original EGA/VGA controller host ports.  Presentation remains owned by the
+   standalone console/window; these callbacks preserve the controller's
+   lifecycle without importing the historical host product. */
+boolean timer_video_enabled = FALSE;
+
+static void softpc_video_void(void) {}
+static void softpc_video_init_screen(void)
+{
+    if (video_copy == NULL) video_copy = (byte *)calloc(1u, 0x20000u);
+    if (EGA_planes == NULL)
+        EGA_planes = (byte *)calloc(4u, (size_t)EGA_PLANE_SIZE);
+    if (DAC == NULL) DAC = (PC_palette *)calloc(VGA_DAC_SIZE, sizeof(*DAC));
+}
+static void softpc_video_init_adaptor(int adapter, int height)
+{ UNUSED(adapter); UNUSED(height); }
+static void softpc_video_int(int value) { UNUSED(value); }
+static void softpc_video_palette(PC_palette *palette, int count)
+{ UNUSED(palette); UNUSED(count); }
+static boolean softpc_video_scroll(int start, int width, int height,
+    int attribute, int lines, int ignored)
+{ UNUSED(start); UNUSED(width); UNUSED(height); UNUSED(attribute); UNUSED(lines); UNUSED(ignored); return TRUE; }
+static void softpc_video_cursor(int x, int y, half_word attribute)
+{ UNUSED(x); UNUSED(y); UNUSED(attribute); }
+static void softpc_video_two_ints(int first, int second)
+{ UNUSED(first); UNUSED(second); }
+
+static VIDEOFUNCS softpc_video_functions = {
+    softpc_video_init_screen, softpc_video_init_adaptor, softpc_video_void,
+    softpc_video_int, softpc_video_palette, softpc_video_int,
+    softpc_video_void, softpc_video_void, softpc_video_void,
+    softpc_video_void, softpc_video_void, softpc_video_void,
+    softpc_video_scroll, softpc_video_scroll, (void (*)())softpc_video_cursor,
+    (void (*)())softpc_video_two_ints, softpc_video_int, softpc_video_void,
+    softpc_video_two_ints, softpc_video_int, softpc_video_int,
+    softpc_video_int, softpc_video_two_ints, softpc_video_two_ints,
+    softpc_video_void
+};
+VIDEOFUNCS *working_video_funcs = &softpc_video_functions;
+void (*paint_screen)() = softpc_video_void;
+
+int softpc_platform_video_buffers_init(void)
+{
+    host_init_screen();
+    return video_copy != NULL && EGA_planes != NULL && DAC != NULL;
+}
+
+void host_ring_bell(long duration) { UNUSED(duration); }
+void stream_io_update(void) {}
+
+void memfill(unsigned char data, unsigned char *first, unsigned char *last)
+{
+    if (first != NULL && last >= first) memset(first, data,
+        (size_t)(last - first) + 1u);
+}
+
+void fwd_word_fill(unsigned short data, unsigned char *destination, int count)
+{
+    int index;
+    for (index = 0; destination != NULL && index < count; ++index) {
+        destination[index * 2] = (unsigned char)data;
+        destination[index * 2 + 1] = (unsigned char)(data >> 8u);
+    }
+}
+
+void memset4(unsigned int data, unsigned int *destination, unsigned int count)
+{
+    unsigned int index;
+    for (index = 0u; destination != NULL && index < count; ++index)
+        destination[index] = data;
+}
 
 #define SOFTPC_CONFIG_GFX_ADAPTER 54u
 #define SOFTPC_VGA_ADAPTER 5u
@@ -613,7 +704,6 @@ void (*BIOS[256])() = { 0 };
 /* The detached executor has no product logger.  Keep its optional diagnostic
  * stream valid so CCPU fault reports remain usable during standalone testing. */
 FILE *trace_file = NULL;
-READ_POINTERS read_pointers = { 0 };
 
 static SHORT softpc_error_ignore()
 {

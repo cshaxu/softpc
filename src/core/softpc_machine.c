@@ -27,6 +27,11 @@ extern void rom_init(void);
 extern void ppi_init(void);
 extern void ica0_post(void);
 extern void ica1_post(void);
+extern void gvi_init(unsigned char adapter);
+extern void video_init(void);
+extern void *setup_global_data_ptr(void);
+extern void setup_vga_globals(void);
+extern int soft_reset;
 extern unsigned long softpc_ccpu_instruction_budget;
 extern int softpc_platform_write_physical(unsigned long address,
     const unsigned char *bytes, unsigned long length);
@@ -44,6 +49,7 @@ extern int softpc_platform_hdd_attach(const char *floppy_path,
 extern void softpc_platform_hdd_detach(void);
 extern int softpc_platform_floppy_attach(const char *path);
 extern void softpc_platform_floppy_detach(void);
+extern int softpc_platform_video_buffers_init(void);
 extern FILE *trace_file;
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
@@ -430,6 +436,11 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         softpc_platform_hdd_init();
         gfi_init();
         fla_init();
+        if (!softpc_platform_video_buffers_init())
+            return SOFTPC_MACHINE_IO_ERROR;
+        if (setup_global_data_ptr() == NULL)
+            return SOFTPC_MACHINE_IO_ERROR;
+        setup_vga_globals();
         machine->hardware_initialized = 1;
     }
     /* CCPU owns the optional fault trace; the standalone machine owns its
@@ -441,6 +452,12 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
        temporary reset overlay remains only until every original ROM BOP
        service is registered. */
     rom_init();
+    /* Preserve the original controller lifecycle: its GVI layer installs the
+       V7 VGA ports and memory mappings, then the BIOS video state is made
+       from the restored firmware.  The host layer only presents its output. */
+    soft_reset = machine->reset ? 1 : 0;
+    gvi_init(5u);
+    video_init();
     /* The original product's BIOS POST programmed the two 8259 PICs after
        their port glue was registered.  A standalone reset owns that hardware
        action directly; it is not a guest-service operation. */

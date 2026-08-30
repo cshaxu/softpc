@@ -3,6 +3,11 @@
 
 #include "evidgen.h"
 
+/* This generated vector unit contains declarations only.  Its original
+ * K&R-style IFN1 expansion is not a valid modern C prototype, unlike the
+ * function-definition uses in the generated rule units. */
+#undef IFN1
+#define IFN1(t1,n1) (t1 n1)
 
 extern IHPE  S_0363_CiGetVideolatches_00000000 IFN0();
 extern IHPE  S_0364_CiGetVideorplane_00000001 IFN0();

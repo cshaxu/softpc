@@ -14,7 +14,7 @@ IMPORT void c_sas_overwrite_memory IPT2(PHY_ADDR, addr, PHY_ADDR, length);
 
 extern struct VideoVector C_Video;
 
-IHP Gdp;
+extern IHP Gdp;
 struct CpuVector Cpu;
 //struct SasVector Sas;
 struct VideoVector Video;
