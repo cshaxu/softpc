@@ -111,7 +111,6 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0xf8u, 0xcfu, 0xb4u, 0x86u, 0xf9u, 0xcfu
     };
     static const unsigned char int15_vector[] = { 0x00u, 0x08u, 0x00u, 0xf0u };
-    static const unsigned char bootstrap_vector[] = { 0x00u, 0xe7u, 0x00u, 0xf0u };
     {
         unsigned long extended_kib = (machine->memory_bytes -
             SOFTPC_MINIMUM_RAM_BYTES) / 1024ul;
@@ -135,11 +134,7 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         !softpc_platform_write_physical(0xf0800u, int15_memory_rom,
             sizeof(int15_memory_rom)) ||
         !softpc_platform_write_physical(0x54u, int15_vector,
-            sizeof(int15_vector)) ||
-        !softpc_platform_write_physical(0x60u, bootstrap_vector,
-            sizeof(bootstrap_vector)) ||
-        !softpc_platform_write_physical(0x64u, bootstrap_vector,
-            sizeof(bootstrap_vector))) {
+            sizeof(int15_vector))) {
         return SOFTPC_MACHINE_IO_ERROR;
     }
     return SOFTPC_MACHINE_OK;
