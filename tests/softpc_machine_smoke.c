@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 static void write_boot_image(const char *path, unsigned char marker)
 {
@@ -28,6 +29,26 @@ static void write_keyboard_boot_image(const char *path)
     file = fopen(path, "wb");
     assert(file != NULL);
     assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
+    assert(fclose(file) == 0);
+}
+
+static void write_hdd_pio_boot_image(const char *path)
+{
+    unsigned char image[1024] = { 0 };
+    FILE *file;
+    const unsigned char program[] = {
+        0xbau, 0xf2u, 0x01u, 0xb0u, 0x01u, 0xeeu,
+        0x42u, 0xb0u, 0x01u, 0xeeu, 0x42u, 0x30u, 0xc0u, 0xeeu,
+        0x42u, 0xeeu, 0x42u, 0xb0u, 0xe0u, 0xeeu,
+        0x42u, 0xb0u, 0x20u, 0xeeu, 0xbau, 0xf0u, 0x01u,
+        0xedu, 0xa3u, 0x00u, 0x05u, 0xebu, 0xfeu
+    };
+    memcpy(image, program, sizeof(program));
+    image[510] = 0x55u; image[511] = 0xaau;
+    image[512] = 0x5au;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(image, 1u, sizeof(image), file) == sizeof(image));
     assert(fclose(file) == 0);
 }
 
@@ -61,19 +82,36 @@ static void run_keyboard_boot_image(const char *path)
     softpc_machine_destroy(machine);
 }
 
+static void run_hdd_pio_boot_image(const char *path)
+{
+    unsigned char marker = 0;
+    softpc_machine_options options = { NULL, path, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 40u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
+    assert(marker == 0x5au);
+    softpc_machine_destroy(machine);
+}
+
 int main(void)
 {
     const char *floppy = "softpc-machine-floppy-smoke.img";
     const char *hdd = "softpc-machine-hdd-smoke.img";
     const char *keyboard = "softpc-machine-keyboard-smoke.img";
+    const char *hdd_pio = "softpc-machine-hdd-pio-smoke.img";
     write_boot_image(floppy, 0x42u);
     write_boot_image(hdd, 0x77u);
     write_keyboard_boot_image(keyboard);
+    write_hdd_pio_boot_image(hdd_pio);
     run_boot_image(floppy, 1, 0x42u);
     run_boot_image(hdd, 0, 0x77u);
     run_keyboard_boot_image(keyboard);
+    run_hdd_pio_boot_image(hdd_pio);
     assert(remove(floppy) == 0);
     assert(remove(hdd) == 0);
     assert(remove(keyboard) == 0);
+    assert(remove(hdd_pio) == 0);
     return 0;
 }

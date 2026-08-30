@@ -73,6 +73,104 @@ int softpc_platform_keyboard_scancode(IU8 scan_code)
     return 1;
 }
 
+static FILE *softpc_hdd_file;
+static IU8 softpc_hdd_sector_count;
+static IU8 softpc_hdd_lba_low;
+static IU8 softpc_hdd_lba_mid;
+static IU8 softpc_hdd_lba_high;
+static IU8 softpc_hdd_drive_head;
+static IU8 softpc_hdd_status;
+static IU8 softpc_hdd_buffer[512];
+static IU32 softpc_hdd_buffer_offset;
+
+static void softpc_hdd_inb(port, value)
+io_addr port;
+IU8 *value;
+{
+    if (port == 0x1f0u && softpc_hdd_status == 0x48u &&
+        softpc_hdd_buffer_offset < sizeof(softpc_hdd_buffer)) {
+        *value = softpc_hdd_buffer[softpc_hdd_buffer_offset++];
+        if (softpc_hdd_buffer_offset == sizeof(softpc_hdd_buffer))
+            softpc_hdd_status = 0x40u;
+    } else if (port == 0x1f7u || port == 0x3f6u) {
+        *value = softpc_hdd_status;
+    } else {
+        *value = 0u;
+    }
+}
+
+static void softpc_hdd_read_sector(void)
+{
+    unsigned long lba;
+    if (softpc_hdd_file == NULL || softpc_hdd_sector_count != 1u) {
+        softpc_hdd_status = 0x41u;
+        return;
+    }
+    lba = (unsigned long)softpc_hdd_lba_low |
+        ((unsigned long)softpc_hdd_lba_mid << 8u) |
+        ((unsigned long)softpc_hdd_lba_high << 16u) |
+        ((unsigned long)(softpc_hdd_drive_head & 0x0fu) << 24u);
+    if (fseek(softpc_hdd_file, (long)(lba * sizeof(softpc_hdd_buffer)), SEEK_SET) != 0 ||
+        fread(softpc_hdd_buffer, 1u, sizeof(softpc_hdd_buffer), softpc_hdd_file) !=
+            sizeof(softpc_hdd_buffer)) {
+        clearerr(softpc_hdd_file);
+        softpc_hdd_status = 0x41u;
+        return;
+    }
+    softpc_hdd_buffer_offset = 0;
+    softpc_hdd_status = 0x48u;
+}
+
+static void softpc_hdd_outb(port, value)
+io_addr port;
+IU8 value;
+{
+    switch (port) {
+    case 0x1f2u: softpc_hdd_sector_count = value; break;
+    case 0x1f3u: softpc_hdd_lba_low = value; break;
+    case 0x1f4u: softpc_hdd_lba_mid = value; break;
+    case 0x1f5u: softpc_hdd_lba_high = value; break;
+    case 0x1f6u: softpc_hdd_drive_head = value; break;
+    case 0x1f7u:
+        if (value == 0x20u) softpc_hdd_read_sector();
+        else if (value == 0xecu) softpc_hdd_status = 0x41u;
+        break;
+    case 0x3f6u:
+        if (value & 0x04u) softpc_hdd_status = 0x40u;
+        break;
+    }
+}
+
+int softpc_platform_hdd_attach(const char *path)
+{
+    if (softpc_hdd_file != NULL) fclose(softpc_hdd_file);
+    softpc_hdd_file = NULL;
+    softpc_hdd_status = 0x40u;
+    softpc_hdd_buffer_offset = 0;
+    if (path == NULL) return 1;
+    softpc_hdd_file = fopen(path, "rb+");
+    if (softpc_hdd_file == NULL) softpc_hdd_file = fopen(path, "rb");
+    return softpc_hdd_file != NULL;
+}
+
+void softpc_platform_hdd_detach(void)
+{
+    if (softpc_hdd_file != NULL) fclose(softpc_hdd_file);
+    softpc_hdd_file = NULL;
+    softpc_hdd_status = 0x40u;
+    softpc_hdd_buffer_offset = 0;
+}
+
+void softpc_platform_hdd_init(void)
+{
+    io_addr port;
+    io_define_inb(HDA_ADAPTOR, softpc_hdd_inb);
+    io_define_outb(HDA_ADAPTOR, softpc_hdd_outb);
+    for (port = 0x1f0u; port <= 0x1f7u; ++port)
+        io_connect_port(port, HDA_ADAPTOR, IO_READ | IO_WRITE);
+    io_connect_port(0x3f6u, HDA_ADAPTOR, IO_READ | IO_WRITE);
+}
+
 UTINY *host_sas_init(sys_addr size)
 {
     softpc_ram = (UTINY *)calloc((size_t)size + 0x2000u, 1u);

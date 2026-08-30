@@ -22,6 +22,9 @@ extern int softpc_platform_read_physical(unsigned long address,
     unsigned char *bytes, unsigned long length);
 extern void softpc_platform_keyboard_init(void);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
+extern void softpc_platform_hdd_init(void);
+extern int softpc_platform_hdd_attach(const char *path);
+extern void softpc_platform_hdd_detach(void);
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
 #define SOFTPC_BOOT_SECTOR_BYTES 512u
@@ -99,10 +102,13 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         ica0_init();
         ica1_init();
         softpc_platform_keyboard_init();
+        softpc_platform_hdd_init();
         machine->hardware_initialized = 1;
     }
     c_cpu_init();
     c_cpu_reset();
+    if (!softpc_platform_hdd_attach(machine->options.hard_disk_path))
+        return SOFTPC_MACHINE_IO_ERROR;
     {
         softpc_machine_result result = softpc_machine_load_boot_sector(machine);
         if (result != SOFTPC_MACHINE_OK) return result;
@@ -144,7 +150,10 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
 
 void softpc_machine_destroy(softpc_machine *machine)
 {
-    if (machine != NULL && machine->hardware_initialized) sas_term();
+    if (machine != NULL && machine->hardware_initialized) {
+        softpc_platform_hdd_detach();
+        sas_term();
+    }
     free(machine);
 }
 
