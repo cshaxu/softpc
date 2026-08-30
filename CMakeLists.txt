@@ -26,9 +26,9 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/ccpu386/softpc_ccpu_facade.c
     src/core/softpc/base/cvidc/mvdm_gdp_state.c
     src/core/softpc/base/cvidc/sascdef.c
-    src/core/softpc/base/support/ios.c
+    src/core/softpc_io.c
     src/core/softpc_pic8259.c
-    src/core/softpc/base/system/quick_ev.c
+    src/core/softpc_quick_events.c
     src/core/softpc_standalone_platform.c
     src/core/softpc_physical_mapping.c)
 set_target_properties(softpc-ccpu-core PROPERTIES

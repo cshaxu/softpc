@@ -20,7 +20,7 @@
 
 /* Size of i/o memory array in half-words */
 
-#if defined( NTVDM ) || defined ( GISP_SVGA ) || defined ( SFELLOW )
+#if defined(SOFTPC_STANDALONE) || defined( NTVDM ) || defined ( GISP_SVGA ) || defined ( SFELLOW )
 #define PC_IO_MEM_SIZE 	0x10000	/* Must be a power of two! */
 #else
 #define PC_IO_MEM_SIZE 	0x400	/* Must be a power of two! */

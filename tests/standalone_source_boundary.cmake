@@ -1,5 +1,9 @@
 set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/ccpu386/softpc_ccpu_facade.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc_io.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc_pic8259.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc_quick_events.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_standalone_platform.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_machine.c")
 
