@@ -198,7 +198,8 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     softpc_ccpu_instruction_budget = (unsigned long)instruction_budget;
     c_cpu_simulate();
-    softpc_platform_timer_advance((unsigned long)instruction_budget);
+    softpc_platform_timer_advance((unsigned long)instruction_budget -
+        softpc_ccpu_instruction_budget);
     return SOFTPC_MACHINE_OK;
 }
 
