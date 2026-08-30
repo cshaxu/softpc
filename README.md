@@ -23,7 +23,7 @@ next machine-owned packages to complete.
 
 Exactly one boot medium is accepted. The fixed machine has 16 MiB RAM, master
 and slave 8259 PICs, PIT channel 0, an 8042-style keyboard queue, text video
-at `B800:0000`, and one read-only ATA PIO backend. Its ROM boots a floppy
+at `B800:0000`, and one ATA PIO backend with sector read/write support. Its ROM boots a floppy
 sector directly or reads hard-disk LBA 0 through ATA PIO. It provides these
 guest-firmware services:
 
@@ -42,8 +42,8 @@ firmware uses sectors-per-track and heads from the first partition's BPB;
 unrecognised hard disks retain the fixed 16×63 compatibility geometry.
 
 This is intentionally a compact fixed PC, not a complete BIOS or controller
-emulation: writes, CMOS/RTC, VGA graphics, floppy-controller commands, sound,
-and simultaneous floppy-plus-hard-disk attachment are not implemented yet.
+emulation: CMOS/RTC, VGA graphics, floppy-controller commands, sound, and
+simultaneous floppy-plus-hard-disk attachment are not implemented yet.
 
 For a real-media, non-interactive boot probe (not part of the default test
 suite), run `build/softpc-real-boot-smoke --floppy disk.img` or replace

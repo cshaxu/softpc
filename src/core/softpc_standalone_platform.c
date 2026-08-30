@@ -157,6 +157,8 @@ static IU8 softpc_hdd_status;
 static IU8 softpc_hdd_buffer[SOFTPC_ATA_SECTOR_BYTES * SOFTPC_ATA_MAX_SECTORS];
 static IU32 softpc_hdd_buffer_offset;
 static IU32 softpc_hdd_transfer_bytes;
+static int softpc_hdd_write_active;
+static int softpc_hdd_writable;
 
 static void softpc_hdd_inb(port, value)
 io_addr port;
@@ -211,11 +213,53 @@ static void softpc_hdd_read_sectors(void)
     softpc_hdd_status = 0x48u;
 }
 
+static unsigned long softpc_hdd_lba(void)
+{
+    return (unsigned long)softpc_hdd_lba_low |
+        ((unsigned long)softpc_hdd_lba_mid << 8u) |
+        ((unsigned long)softpc_hdd_lba_high << 16u) |
+        ((unsigned long)(softpc_hdd_drive_head & 0x0fu) << 24u);
+}
+
+static void softpc_hdd_begin_write(void)
+{
+    IU32 sectors = softpc_hdd_sector_count;
+    if (sectors == 0u) sectors = 256u;
+    if (softpc_hdd_file == NULL || !softpc_hdd_writable ||
+        sectors > SOFTPC_ATA_MAX_SECTORS) {
+        softpc_hdd_status = 0x41u;
+        return;
+    }
+    softpc_hdd_transfer_bytes = sectors * SOFTPC_ATA_SECTOR_BYTES;
+    softpc_hdd_buffer_offset = 0u;
+    softpc_hdd_write_active = 1;
+    softpc_hdd_status = 0x48u;
+}
+
+static void softpc_hdd_data_write(IU8 value)
+{
+    unsigned long lba;
+    if (!softpc_hdd_write_active || softpc_hdd_status != 0x48u ||
+        softpc_hdd_buffer_offset >= softpc_hdd_transfer_bytes) return;
+    softpc_hdd_buffer[softpc_hdd_buffer_offset++] = value;
+    if (softpc_hdd_buffer_offset != softpc_hdd_transfer_bytes) return;
+    lba = softpc_hdd_lba();
+    if (fseek(softpc_hdd_file, (long)(lba * SOFTPC_ATA_SECTOR_BYTES), SEEK_SET) != 0 ||
+        fwrite(softpc_hdd_buffer, 1u, softpc_hdd_transfer_bytes,
+            softpc_hdd_file) != softpc_hdd_transfer_bytes ||
+        fflush(softpc_hdd_file) != 0) {
+        clearerr(softpc_hdd_file);
+        softpc_hdd_status = 0x41u;
+    } else softpc_hdd_status = 0x40u;
+    softpc_hdd_write_active = 0;
+}
+
 static void softpc_hdd_outb(port, value)
 io_addr port;
 IU8 value;
 {
     switch (port) {
+    case 0x1f0u: softpc_hdd_data_write(value); break;
     case 0x1f2u: softpc_hdd_sector_count = value; break;
     case 0x1f3u: softpc_hdd_lba_low = value; break;
     case 0x1f4u: softpc_hdd_lba_mid = value; break;
@@ -223,12 +267,23 @@ IU8 value;
     case 0x1f6u: softpc_hdd_drive_head = value; break;
     case 0x1f7u:
         if (value == 0x20u) softpc_hdd_read_sectors();
+        else if (value == 0x30u) softpc_hdd_begin_write();
         else if (value == 0xecu) softpc_hdd_status = 0x41u;
         break;
     case 0x3f6u:
         if (value & 0x04u) softpc_hdd_status = 0x40u;
         break;
     }
+}
+
+static void softpc_hdd_outw(port, value)
+io_addr port;
+word value;
+{
+    if (port == 0x1f0u) {
+        softpc_hdd_data_write((IU8)value);
+        softpc_hdd_data_write((IU8)(value >> 8u));
+    } else softpc_hdd_outb(port, (IU8)value);
 }
 
 int softpc_platform_hdd_attach(const char *path)
@@ -238,9 +293,12 @@ int softpc_platform_hdd_attach(const char *path)
     softpc_hdd_status = 0x40u;
     softpc_hdd_buffer_offset = 0;
     softpc_hdd_transfer_bytes = 0;
+    softpc_hdd_write_active = 0;
+    softpc_hdd_writable = 0;
     if (path == NULL) return 1;
     softpc_hdd_file = fopen(path, "rb+");
-    if (softpc_hdd_file == NULL) softpc_hdd_file = fopen(path, "rb");
+    if (softpc_hdd_file != NULL) softpc_hdd_writable = 1;
+    else softpc_hdd_file = fopen(path, "rb");
     return softpc_hdd_file != NULL;
 }
 
@@ -251,13 +309,16 @@ void softpc_platform_hdd_detach(void)
     softpc_hdd_status = 0x40u;
     softpc_hdd_buffer_offset = 0;
     softpc_hdd_transfer_bytes = 0;
+    softpc_hdd_write_active = 0;
+    softpc_hdd_writable = 0;
 }
 
 void softpc_platform_hdd_init(void)
 {
     io_addr port;
     io_define_in_routines(HDA_ADAPTOR, softpc_hdd_inb, softpc_hdd_inw, 0, 0);
-    io_define_outb(HDA_ADAPTOR, softpc_hdd_outb);
+    io_define_out_routines(HDA_ADAPTOR, softpc_hdd_outb, softpc_hdd_outw,
+        0, 0);
     for (port = 0x1f0u; port <= 0x1f7u; ++port)
         io_connect_port(port, HDA_ADAPTOR, IO_READ | IO_WRITE);
     io_connect_port(0x3f6u, HDA_ADAPTOR, IO_READ | IO_WRITE);
