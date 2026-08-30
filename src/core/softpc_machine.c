@@ -211,18 +211,6 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0xf8u, 0xcfu, 0xb4u, 0x86u, 0xf9u, 0xcfu
     };
     static const unsigned char int15_vector[] = { 0x00u, 0x08u, 0x00u, 0xf0u };
-    /* The fixed firmware reaches the original serial BIOS C implementation
-       through its normal BIOS Operation entry. */
-    static const unsigned char int14_serial_rom[] = {
-        0xc4u, 0xc4u, 0x14u, 0xcfu
-    };
-    static const unsigned char int14_vector[] = { 0x00u, 0x09u, 0x00u, 0xf0u };
-    /* INT 17h exposes a fixed non-blocking printer sink.  The endpoint is
-       selected and ready, while transmitted bytes are intentionally ignored. */
-    static const unsigned char int17_printer_rom[] = {
-        0xb4u, 0x90u, 0xf8u, 0xcfu
-    };
-    static const unsigned char int17_vector[] = { 0x00u, 0x0au, 0x00u, 0xf0u };
     /* IRQ0 acknowledges the fixed master PIC while preserving the guest's
        scratch register state before returning. */
     static const unsigned char irq0_rom[] = {
@@ -276,14 +264,6 @@ static softpc_machine_result softpc_machine_install_reset_rom(
             sizeof(int15_memory_rom)) ||
         !softpc_platform_write_physical(0x54u, int15_vector,
             sizeof(int15_vector)) ||
-        !softpc_platform_write_physical(0xf0900u, int14_serial_rom,
-            sizeof(int14_serial_rom)) ||
-        !softpc_platform_write_physical(0x50u, int14_vector,
-            sizeof(int14_vector)) ||
-        !softpc_platform_write_physical(0xf0a00u, int17_printer_rom,
-            sizeof(int17_printer_rom)) ||
-        !softpc_platform_write_physical(0x5cu, int17_vector,
-            sizeof(int17_vector)) ||
         !softpc_platform_write_physical(0xf0400u, irq0_rom,
             sizeof(irq0_rom)) ||
         !softpc_platform_write_physical(0x20u, irq0_vector,
