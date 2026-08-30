@@ -32,6 +32,23 @@ static void write_keyboard_boot_image(const char *path)
     assert(fclose(file) == 0);
 }
 
+static void write_int16_boot_image(const char *path)
+{
+    unsigned char sector[512] = { 0 };
+    FILE *file;
+    /* xor ah,ah; int 16h; mov al,ah; mov [0500],al; jmp $ */
+    unsigned char program[] = {
+        0x30u, 0xe4u, 0xcdu, 0x16u, 0x88u, 0xe0u, 0xa2u,
+        0x00u, 0x05u, 0xebu, 0xfeu
+    };
+    memcpy(sector, program, sizeof(program));
+    sector[510] = 0x55u; sector[511] = 0xaau;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
+    assert(fclose(file) == 0);
+}
+
 static void write_timer_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
@@ -185,6 +202,20 @@ static void run_keyboard_boot_image(const char *path)
     softpc_machine_destroy(machine);
 }
 
+static void run_int16_boot_image(const char *path)
+{
+    unsigned char marker = 0;
+    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_key_scancode(machine, 0x1eu) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 64u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
+    assert(marker == 0x1eu);
+    softpc_machine_destroy(machine);
+}
+
 static void run_timer_boot_image(const char *path)
 {
     unsigned char marker = 0;
@@ -279,6 +310,7 @@ int main(void)
     const char *floppy = "softpc-machine-floppy-smoke.img";
     const char *hdd = "softpc-machine-hdd-smoke.img";
     const char *keyboard = "softpc-machine-keyboard-smoke.img";
+    const char *int16 = "softpc-machine-int16-smoke.img";
     const char *timer = "softpc-machine-timer-smoke.img";
     const char *text = "softpc-machine-text-smoke.img";
     const char *int10 = "softpc-machine-int10-smoke.img";
@@ -294,6 +326,7 @@ int main(void)
     write_boot_image(floppy, 0x42u);
     write_boot_image(hdd, 0x77u);
     write_keyboard_boot_image(keyboard);
+    write_int16_boot_image(int16);
     write_timer_boot_image(timer);
     write_text_boot_image(text);
     write_int10_boot_image(int10);
@@ -309,6 +342,7 @@ int main(void)
     run_boot_image(floppy, 1, 0x42u, 4u);
     run_boot_image(hdd, 0, 0x77u, 1000u);
     run_keyboard_boot_image(keyboard);
+    run_int16_boot_image(int16);
     run_timer_boot_image(timer);
     run_text_boot_image(text);
     run_int10_boot_image(int10);
@@ -321,6 +355,7 @@ int main(void)
     assert(remove(floppy) == 0);
     assert(remove(hdd) == 0);
     assert(remove(keyboard) == 0);
+    assert(remove(int16) == 0);
     assert(remove(timer) == 0);
     assert(remove(text) == 0);
     assert(remove(int10) == 0);

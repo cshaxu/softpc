@@ -124,6 +124,17 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0x5bu, 0x58u, 0xcfu, 0x00u, 0x00u
     };
     static const unsigned char int10_vector[] = { 0x00u, 0x02u, 0x00u, 0xf0u };
+    /* Assembled from firmware/int16_keyboard.asm. */
+    static const unsigned char int16_keyboard_rom[] = {
+        0x53u, 0x52u, 0x55u, 0x89u, 0xe5u, 0x80u, 0xfcu, 0x00u,
+        0x74u, 0x1du, 0x80u, 0xfcu, 0x01u, 0x75u, 0x24u, 0xe4u,
+        0x64u, 0xa8u, 0x01u, 0x74u, 0x0cu, 0xe4u, 0x60u, 0x88u,
+        0xc4u, 0x30u, 0xc0u, 0x83u, 0x66u, 0x0au, 0xbfu, 0xebu,
+        0x12u, 0x83u, 0x4eu, 0x0au, 0x40u, 0xebu, 0x0cu, 0xe4u,
+        0x64u, 0xa8u, 0x01u, 0x74u, 0xfau, 0xe4u, 0x60u, 0x88u,
+        0xc4u, 0x30u, 0xc0u, 0x5du, 0x5au, 0x5bu, 0xcfu
+    };
+    static const unsigned char int16_vector[] = { 0x00u, 0x03u, 0x00u, 0xf0u };
     static const unsigned char floppy_reset_vector[] = {
         0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
     };
@@ -134,7 +145,11 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         !softpc_platform_write_physical(0xf0200u, int10_teletype_rom,
             sizeof(int10_teletype_rom)) ||
         !softpc_platform_write_physical(0x40u, int10_vector,
-            sizeof(int10_vector))) return SOFTPC_MACHINE_IO_ERROR;
+            sizeof(int10_vector)) ||
+        !softpc_platform_write_physical(0xf0300u, int16_keyboard_rom,
+            sizeof(int16_keyboard_rom)) ||
+        !softpc_platform_write_physical(0x58u, int16_vector,
+            sizeof(int16_vector))) return SOFTPC_MACHINE_IO_ERROR;
     if (machine->options.floppy_path == NULL) {
         if (!softpc_platform_write_physical(0xf0000u, hdd_boot_rom,
                 sizeof(hdd_boot_rom)) ||
