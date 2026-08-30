@@ -48,6 +48,8 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/system/timestrb.c
     src/core/softpc/base/support/time_day.c
     src/core/softpc/base/bios/cmos_bis.c
+    src/core/softpc/base/comms/printer.c
+    src/core/softpc/base/comms/printer_.c
     src/core/softpc/base/keymouse/ppi.c
     src/core/softpc/base/keymouse/keyba.c
     src/core/softpc/base/keymouse/keybd_io.c
@@ -134,6 +136,15 @@ target_include_directories(softpc-fdc-smoke PRIVATE
     src/core/softpc/base/inc)
 add_test(NAME softpc-fdc-smoke COMMAND softpc-fdc-smoke)
 set_tests_properties(softpc-fdc-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-printer-smoke tests/softpc_printer_smoke.c)
+target_link_libraries(softpc-printer-smoke PRIVATE softpc-machine)
+target_include_directories(softpc-printer-smoke PRIVATE
+    src/core/softpc/host/inc
+    src/core/softpc/host/inc/x86/prod
+    src/core/softpc/base/inc)
+add_test(NAME softpc-printer-smoke COMMAND softpc-printer-smoke)
+set_tests_properties(softpc-printer-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-real-boot-smoke tests/softpc_real_boot_smoke.c)
 target_link_libraries(softpc-real-boot-smoke PRIVATE softpc-machine)

@@ -45,6 +45,8 @@ extern void timer_init(void);
 extern void timer_post(void);
 extern void time_of_day_init(void);
 extern void time_strobe(void);
+extern void printer_init(int adapter);
+extern void printer_post(int adapter);
 extern void softpc_platform_hdd_init(void);
 extern int softpc_platform_hdd_attach(const char *floppy_path,
     const char *hard_disk_path);
@@ -463,6 +465,8 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     time_of_day_init();
     timer_init();
     timer_post();
+    printer_init(0);
+    printer_post(0);
     /* The original product's BIOS POST programmed the two 8259 PICs after
        their port glue was registered.  A standalone reset owns that hardware
        action directly; it is not a guest-service operation. */

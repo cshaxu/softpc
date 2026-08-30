@@ -340,6 +340,39 @@ void host_timer_init(void)
     /* The VM loop calls the original time_strobe() once per bounded slice. */
 }
 
+/* Standalone LPT port: the original printer controller owns all guest
+   registers, ACK transitions and IRQ behavior.  This host edge simply
+   accepts output and reports an always-ready virtual endpoint. */
+unsigned long host_lpt_status(int adapter)
+{
+    UNUSED(adapter);
+    return 0u;
+}
+
+BOOL host_print_byte(int adapter, byte value)
+{
+    UNUSED(adapter);
+    UNUSED(value);
+    return TRUE;
+}
+
+BOOL host_print_doc(int adapter)
+{
+    UNUSED(adapter);
+    return TRUE;
+}
+
+void host_reset_print(int adapter)
+{
+    UNUSED(adapter);
+}
+
+void host_print_auto_feed(int adapter, BOOL auto_feed)
+{
+    UNUSED(adapter);
+    UNUSED(auto_feed);
+}
+
 quick_event_delays host_delays = { 0, 0, 0, 0, 0, 0, 25000 };
 extern void AT_kbd_init(void);
 extern void host_key_down(int key);
