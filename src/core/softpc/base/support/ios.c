@@ -42,11 +42,6 @@
 #define VIRTUALISATION
 #endif
 
-#ifdef NTVDM
-#define getIOInAdapter(ioaddr) (Ios_in_adapter_table[ioaddr & (PC_IO_MEM_SIZE-1)])
-#define getIOOutAdapter(ioaddr) (Ios_out_adapter_table[ioaddr & (PC_IO_MEM_SIZE-1)])
-#endif
-
 /*
  * 
  * ============================================================================
@@ -864,19 +859,6 @@ GLOBAL VOID	io_define_ind_routine IFN3(half_word, adapter,
     OUTPUT:
 ==============================================================================
 )*/
-#ifdef NTVDM
-GLOBAL BOOL	io_connect_port IFN3(io_addr, io_address, half_word, adapter,
-	half_word, mode)
-{
-	if (mode & IO_READ){
-		Ios_in_adapter_table[io_address & (PC_IO_MEM_SIZE-1)] = adapter;
-	}
-	if (mode & IO_WRITE){
-		Ios_out_adapter_table[io_address & (PC_IO_MEM_SIZE-1)] = adapter;
-	}
-	return TRUE;
-}
-#else
 GLOBAL void	io_connect_port IFN3(io_addr, io_address, half_word, adapter,
 	half_word, mode)
 {
@@ -887,7 +869,6 @@ GLOBAL void	io_connect_port IFN3(io_addr, io_address, half_word, adapter,
 		Ios_out_adapter_table[io_address & (PC_IO_MEM_SIZE-1)] = adapter;
 	}
 }
-#endif
 
 
 /*(
@@ -898,26 +879,12 @@ GLOBAL void	io_connect_port IFN3(io_addr, io_address, half_word, adapter,
     OUTPUT:
 ==============================================================================
 )*/
-#ifdef NTVDM
-GLOBAL void     io_disconnect_port IFN2(io_addr, io_address, half_word, adapter)
-{
-        if (adapter != Ios_in_adapter_table[io_address & (PC_IO_MEM_SIZE-1)] &&
-            adapter != Ios_out_adapter_table[io_address & (PC_IO_MEM_SIZE-1)])
-           {
-            return;
-           }
-
-        Ios_in_adapter_table[io_address & (PC_IO_MEM_SIZE-1)] = EMPTY_ADAPTOR;
-        Ios_out_adapter_table[io_address & (PC_IO_MEM_SIZE-1)] = EMPTY_ADAPTOR;
-}
-#else
 GLOBAL void	io_disconnect_port IFN2(io_addr, io_address, half_word, adapter)
 {
 	UNUSED(adapter);
 	Ios_in_adapter_table[io_address] = EMPTY_ADAPTOR;
 	Ios_out_adapter_table[io_address] = EMPTY_ADAPTOR;
 }
-#endif	/* NTVDM */
 
 
 /*(
@@ -1002,20 +969,3 @@ GLOBAL void	io_init IFN0()
 }
 
 
-#ifdef NTVDM
-GLOBAL char GetExtIoInAdapter (io_addr ioaddr)
-{
-#ifndef PROD
-    printf("GetExtIoInAdapter(%x) called\n",ioaddr);
-#endif
-    return EMPTY_ADAPTOR;
-}
-
-GLOBAL char GetExtIoOutAdapter (io_addr ioaddr)
-{
-#ifndef PROD
-    printf("GetExtIoOutAdapter(%x) called\n",ioaddr);
-#endif
-    return EMPTY_ADAPTOR;
-}
-#endif /* NTVDM */

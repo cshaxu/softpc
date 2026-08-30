@@ -4,7 +4,7 @@ set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/softpc_gdp_state.h"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/softpc_gdp_slots.h"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/sascdef.c"
-    "${SOFTPC_SOURCE_DIR}/src/core/softpc_io.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/support/ios.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_pic8259.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_quick_events.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.c"
