@@ -10,6 +10,7 @@ extern void c_cpu_init(void);
 extern void c_cpu_reset(void);
 extern void c_cpu_simulate(void);
 extern unsigned short c_getCS(void);
+extern unsigned long c_getCS_BASE(void);
 extern unsigned long c_getEIP(void);
 extern void sas_init(unsigned long size);
 extern void sas_term(void);
@@ -212,15 +213,16 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0xf8u, 0xcfu, 0xb4u, 0x86u, 0xf9u, 0xcfu
     };
     static const unsigned char int15_vector[] = { 0x00u, 0x08u, 0x00u, 0xf0u };
-    /* IRQ0 acknowledges the fixed master PIC and returns to guest code. */
+    /* IRQ0 acknowledges the fixed master PIC while preserving the guest's
+       scratch register state before returning. */
     static const unsigned char irq0_rom[] = {
-        0xb0u, 0x20u, 0xe6u, 0x20u, 0xcfu
+        0x50u, 0xb0u, 0x20u, 0xe6u, 0x20u, 0x58u, 0xcfu
     };
     static const unsigned char irq0_vector[] = { 0x00u, 0x04u, 0x00u, 0xf0u };
     /* IRQ1 leaves the controller's queued scan code for INT 16h, acknowledges
-       the master PIC, and returns to the interrupted guest. */
+       the master PIC, preserves AX, and returns to the interrupted guest. */
     static const unsigned char irq1_rom[] = {
-        0xb0u, 0x20u, 0xe6u, 0x20u, 0xcfu
+        0x50u, 0xb0u, 0x20u, 0xe6u, 0x20u, 0x58u, 0xcfu
     };
     static const unsigned char irq1_vector[] = { 0x20u, 0x04u, 0x00u, 0xf0u };
     static const unsigned char bootstrap_vector[] = { 0x10u, 0x04u, 0x00u, 0xf0u };
@@ -428,6 +430,15 @@ softpc_machine_result softpc_machine_instruction_pointer(
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     *cs = (uint16_t)c_getCS();
     *eip = (uint32_t)c_getEIP();
+    return SOFTPC_MACHINE_OK;
+}
+
+softpc_machine_result softpc_machine_instruction_address(
+    const softpc_machine *machine, uint32_t *address)
+{
+    if (machine == NULL || address == NULL || !machine->reset)
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    *address = (uint32_t)(c_getCS_BASE() + c_getEIP());
     return SOFTPC_MACHINE_OK;
 }
 
