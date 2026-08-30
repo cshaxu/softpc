@@ -44,6 +44,7 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/disks/floppy_i.c
     src/core/softpc/base/disks/fdisk.c
     src/core/softpc_device_bop.c
+    src/core/softpc_gfi_image.c
     src/core/softpc_standalone_platform.c
     src/core/softpc_physical_mapping.c)
 set_target_properties(softpc-ccpu-core PROPERTIES
@@ -91,6 +92,15 @@ add_executable(softpc-irq-smoke tests/softpc_irq_smoke.c)
 target_link_libraries(softpc-irq-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-irq-smoke COMMAND softpc-irq-smoke)
 set_tests_properties(softpc-irq-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-fdc-smoke tests/softpc_fdc_smoke.c)
+target_link_libraries(softpc-fdc-smoke PRIVATE softpc-machine)
+target_include_directories(softpc-fdc-smoke PRIVATE
+    src/core/softpc/host/inc
+    src/core/softpc/host/inc/x86/prod
+    src/core/softpc/base/inc)
+add_test(NAME softpc-fdc-smoke COMMAND softpc-fdc-smoke)
+set_tests_properties(softpc-fdc-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-real-boot-smoke tests/softpc_real_boot_smoke.c)
 target_link_libraries(softpc-real-boot-smoke PRIVATE softpc-machine)

@@ -42,6 +42,8 @@ extern void softpc_platform_hdd_init(void);
 extern int softpc_platform_hdd_attach(const char *floppy_path,
     const char *hard_disk_path);
 extern void softpc_platform_hdd_detach(void);
+extern int softpc_platform_floppy_attach(const char *path);
+extern void softpc_platform_floppy_detach(void);
 extern FILE *trace_file;
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
@@ -448,6 +450,8 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     if (!softpc_platform_hdd_attach(machine->options.floppy_path,
             machine->options.hard_disk_path))
         return SOFTPC_MACHINE_IO_ERROR;
+    if (!softpc_platform_floppy_attach(machine->options.floppy_path))
+        return SOFTPC_MACHINE_IO_ERROR;
     {
         softpc_machine_result result = SOFTPC_MACHINE_OK;
         if (machine->options.floppy_path != NULL)
@@ -587,7 +591,8 @@ static int softpc_machine_hdd_geometry(const char *path,
 void softpc_machine_destroy(softpc_machine *machine)
 {
     if (machine != NULL && machine->hardware_initialized) {
-        softpc_platform_hdd_detach();
+    softpc_platform_hdd_detach();
+    softpc_platform_floppy_detach();
         sas_term();
     }
     free(machine);
