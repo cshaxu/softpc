@@ -150,6 +150,44 @@ static void write_int12_boot_image(const char *path)
     assert(fclose(file) == 0);
 }
 
+static void write_int1a_boot_image(const char *path)
+{
+    unsigned char sector[512] = { 0 };
+    FILE *file;
+    /* Set BDA ticks to 1234h; AH=00h; INT 1Ah; store DX:CX at 0500h. */
+    unsigned char program[] = {
+        0xc7u, 0x06u, 0x6cu, 0x04u, 0x34u, 0x12u, 0xb4u, 0x00u,
+        0xcdu, 0x1au, 0x89u, 0x16u, 0x00u, 0x05u, 0x89u, 0x0eu,
+        0x02u, 0x05u, 0xebu, 0xfeu
+    };
+    memcpy(sector, program, sizeof(program));
+    sector[510] = 0x55u; sector[511] = 0xaau;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
+    assert(fclose(file) == 0);
+}
+
+static void write_int1a_tick_boot_image(const char *path)
+{
+    unsigned char sector[512] = { 0 };
+    FILE *file;
+    /* Program PIT for every instruction, then repeatedly read its BDA tick
+       through INT 1Ah into 0500h. */
+    unsigned char program[] = {
+        0xfau, 0x31u, 0xc0u, 0x8eu, 0xd8u, 0xb0u, 0x34u, 0xe6u,
+        0x43u, 0xb0u, 0x01u, 0xe6u, 0x40u, 0xb0u, 0x00u, 0xe6u,
+        0x40u, 0xfbu, 0xb4u, 0x00u, 0xcdu, 0x1au, 0x89u, 0x16u,
+        0x00u, 0x05u, 0xebu, 0xf6u
+    };
+    memcpy(sector, program, sizeof(program));
+    sector[510] = 0x55u; sector[511] = 0xaau;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
+    assert(fclose(file) == 0);
+}
+
 static void write_hdd_pio_boot_image(const char *path)
 {
     unsigned char image[1024] = { 0 };
@@ -445,6 +483,37 @@ static void run_int12_boot_image(const char *path)
     softpc_machine_destroy(machine);
 }
 
+static void run_int1a_boot_image(const char *path)
+{
+    unsigned char ticks[4] = { 0xffu, 0xffu, 0xffu, 0xffu };
+    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 64u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x500u, ticks,
+        sizeof(ticks)) == SOFTPC_MACHINE_OK);
+    assert(ticks[0] == 0x34u && ticks[1] == 0x12u && ticks[2] == 0u &&
+        ticks[3] == 0u);
+    softpc_machine_destroy(machine);
+}
+
+static void run_int1a_tick_boot_image(const char *path)
+{
+    unsigned char bda_tick_low = 0u;
+    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 100u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 1000u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 100u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x46cu, &bda_tick_low,
+        1u) == SOFTPC_MACHINE_OK);
+    assert(bda_tick_low != 0u);
+    softpc_machine_destroy(machine);
+}
+
 static void run_hdd_pio_boot_image(const char *path)
 {
     unsigned char marker = 0;
@@ -503,6 +572,8 @@ int main(void)
     const char *text = "softpc-machine-text-smoke.img";
     const char *int10 = "softpc-machine-int10-smoke.img";
     const char *int12 = "softpc-machine-int12-smoke.img";
+    const char *int1a = "softpc-machine-int1a-smoke.img";
+    const char *int1a_tick = "softpc-machine-int1a-tick-smoke.img";
     const char *hdd_pio = "softpc-machine-hdd-pio-smoke.img";
     const char *hdd_int13 = "softpc-machine-hdd-int13-smoke.img";
     const char *floppy_int13 = "softpc-machine-floppy-int13-smoke.img";
@@ -526,6 +597,8 @@ int main(void)
     write_text_boot_image(text);
     write_int10_boot_image(int10);
     write_int12_boot_image(int12);
+    write_int1a_boot_image(int1a);
+    write_int1a_tick_boot_image(int1a_tick);
     write_hdd_pio_boot_image(hdd_pio);
     write_int13_boot_image(hdd_int13, 0x80u, 0u, 2u, 0x6bu);
     write_int13_boot_image(floppy_int13, 0x00u, 0u, 2u, 0x6cu);
@@ -549,6 +622,8 @@ int main(void)
     run_text_boot_image(text);
     run_int10_boot_image(int10);
     run_int12_boot_image(int12);
+    run_int1a_boot_image(int1a);
+    run_int1a_tick_boot_image(int1a_tick);
     run_hdd_pio_boot_image(hdd_pio);
     run_int13_boot_image(hdd_int13, 0, 0x6bu);
     run_int13_boot_image(floppy_int13, 1, 0x6cu);
@@ -569,6 +644,8 @@ int main(void)
     assert(remove(text) == 0);
     assert(remove(int10) == 0);
     assert(remove(int12) == 0);
+    assert(remove(int1a) == 0);
+    assert(remove(int1a_tick) == 0);
     assert(remove(hdd_pio) == 0);
     assert(remove(hdd_int13) == 0);
     assert(remove(floppy_int13) == 0);

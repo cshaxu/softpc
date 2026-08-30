@@ -28,6 +28,7 @@ extern void softpc_platform_keyboard_init(void);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
 extern void softpc_platform_timer_init(void);
 extern void softpc_platform_timer_advance(unsigned long instructions);
+extern unsigned long softpc_platform_timer_ticks(void);
 extern void softpc_platform_hdd_init(void);
 extern int softpc_platform_hdd_attach(const char *path);
 extern void softpc_platform_hdd_detach(void);
@@ -172,6 +173,14 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0xb8u, 0x80u, 0x02u, 0xcfu
     };
     static const unsigned char int12_vector[] = { 0x00u, 0x05u, 0x00u, 0xf0u };
+    /* INT 1Ah/AH=00h reads the BIOS data area's IRQ0-maintained tick count. */
+    static const unsigned char int1a_clock_rom[] = {
+        0x1eu, 0x80u, 0xfcu, 0x00u, 0x75u, 0x11u, 0x31u, 0xc0u,
+        0x8eu, 0xd8u, 0x8bu, 0x16u, 0x6cu, 0x04u, 0x8bu, 0x0eu,
+        0x6eu, 0x04u, 0x30u, 0xc0u, 0xf8u, 0x1fu, 0xcfu, 0xb4u,
+        0x86u, 0xf9u, 0x1fu, 0xcfu
+    };
+    static const unsigned char int1a_vector[] = { 0x00u, 0x06u, 0x00u, 0xf0u };
     /* IRQ0 acknowledges the fixed master PIC and returns to guest code. */
     static const unsigned char irq0_rom[] = {
         0xb0u, 0x20u, 0xe6u, 0x20u, 0xcfu
@@ -211,6 +220,10 @@ static softpc_machine_result softpc_machine_install_reset_rom(
             sizeof(int12_memory_rom)) ||
         !softpc_platform_write_physical(0x48u, int12_vector,
             sizeof(int12_vector)) ||
+        !softpc_platform_write_physical(0xf0600u, int1a_clock_rom,
+            sizeof(int1a_clock_rom)) ||
+        !softpc_platform_write_physical(0x68u, int1a_vector,
+            sizeof(int1a_vector)) ||
         !softpc_platform_write_physical(0xf0400u, irq0_rom,
             sizeof(irq0_rom)) ||
         !softpc_platform_write_physical(0x20u, irq0_vector,
@@ -332,6 +345,16 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
     c_cpu_simulate();
     softpc_platform_timer_advance((unsigned long)instruction_budget -
         softpc_ccpu_instruction_budget);
+    {
+        unsigned long ticks = softpc_platform_timer_ticks();
+        unsigned char bda_ticks[4];
+        bda_ticks[0] = (unsigned char)ticks;
+        bda_ticks[1] = (unsigned char)(ticks >> 8u);
+        bda_ticks[2] = (unsigned char)(ticks >> 16u);
+        bda_ticks[3] = (unsigned char)(ticks >> 24u);
+        if (!softpc_platform_write_physical(0x46cu, bda_ticks,
+                sizeof(bda_ticks))) return SOFTPC_MACHINE_IO_ERROR;
+    }
     return SOFTPC_MACHINE_OK;
 }
 

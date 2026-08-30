@@ -33,6 +33,7 @@ static IU32 softpc_keyboard_tail;
  * instruction time and routes expiry through the machine PIC. */
 static IU32 softpc_pit_reload = 65536u;
 static IU32 softpc_pit_elapsed;
+static IU32 softpc_pit_ticks;
 static IU8 softpc_pit_write_low;
 static IU8 softpc_pit_read_low;
 
@@ -77,6 +78,7 @@ void softpc_platform_timer_init(void)
 {
     softpc_pit_reload = 65536u;
     softpc_pit_elapsed = 0u;
+    softpc_pit_ticks = 0u;
     softpc_pit_write_low = 0u;
     softpc_pit_read_low = 0u;
     io_define_inb(TIMER_ADAPTOR, softpc_pit_inb);
@@ -90,8 +92,14 @@ void softpc_platform_timer_advance(IU32 instructions)
     softpc_pit_elapsed += instructions;
     while (softpc_pit_elapsed >= softpc_pit_reload) {
         softpc_pit_elapsed -= softpc_pit_reload;
+        ++softpc_pit_ticks;
         ica_hw_interrupt(ICA_MASTER, CPU_TIMER_INT, 1);
     }
+}
+
+IU32 softpc_platform_timer_ticks(void)
+{
+    return softpc_pit_ticks;
 }
 
 static void softpc_keyboard_inb(port, value)

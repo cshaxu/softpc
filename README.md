@@ -32,6 +32,7 @@ guest-firmware services:
 - `INT 13h/AH=02h` — contiguous CHS reads of up to 128 sectors.
 - `INT 16h/AH=00h` and `AH=01h` — ASCII/scan-code read and non-consuming
   availability check for basic US keyboard input.
+- `INT 1Ah/AH=00h` — BIOS tick counter maintained by the fixed PIT.
 
 Floppy geometry is inferred from standard raw-image capacities (360 KiB,
 720 KiB, 1.2 MiB, 1.44 MiB, and 2.88 MiB). For partitioned hard disks, the
