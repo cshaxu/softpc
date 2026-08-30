@@ -536,7 +536,7 @@ static void run_keyboard_boot_image(const char *path)
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_key_scancode(machine, 0x1eu) == SOFTPC_MACHINE_OK);
-    assert(softpc_machine_run(machine, 4u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 64u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
     assert(marker == 0x1eu);
     softpc_machine_destroy(machine);

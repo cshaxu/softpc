@@ -1434,6 +1434,18 @@ else
 	}
 }
 
+/* Standalone machine API adapter: callers expose PC/AT Set-1 scan codes,
+ * whereas this original controller consumes host keyboard key indices. */
+GLOBAL int keyba_set1_scan_to_key IFN1(half_word, scan)
+{
+    int key;
+
+    for (key = 1; key < 127; key++)
+        if (most_set_1_make_codes[key] == scan)
+            return key;
+    return -1;
+}
+
 #ifdef NTVDM
 GLOBAL VOID RaiseAllDownKeys(VOID)
 {

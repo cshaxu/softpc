@@ -13,6 +13,7 @@
 #include "timestmp.h"
 #include "timeval.h"
 #include "timer.h"
+#include "keyboard.h"
 
 /*
  * Minimal host ports for the detached CCPU.  These are deliberately machine
@@ -119,10 +120,40 @@ struct host_tm *host_localtime(time_t *clock_value)
     return &result;
 }
 
-#define SOFTPC_KEYBOARD_QUEUE_SIZE 32u
-static IU8 softpc_keyboard_queue[SOFTPC_KEYBOARD_QUEUE_SIZE];
-static IU32 softpc_keyboard_head;
-static IU32 softpc_keyboard_tail;
+quick_event_delays host_delays = { 0, 0, 0, 0, 0, 0, 25000 };
+extern void AT_kbd_init(void);
+extern void host_key_down(int key);
+extern void host_key_up(int key);
+extern int keyba_set1_scan_to_key(half_word scan);
+
+static void softpc_keyboard_host_void(void)
+{
+}
+
+static void softpc_keyboard_host_lights()
+{
+}
+
+static KEYBDFUNCS softpc_keyboard_host_functions = {
+    softpc_keyboard_host_void,
+    softpc_keyboard_host_void,
+    softpc_keyboard_host_void,
+    softpc_keyboard_host_void,
+    softpc_keyboard_host_lights,
+    softpc_keyboard_host_lights
+};
+KEYBDFUNCS *working_keybd_funcs = &softpc_keyboard_host_functions;
+
+SHORT host_error(error_number, options, extra_text)
+int error_number;
+int options;
+char *extra_text;
+{
+    UNUSED(error_number);
+    UNUSED(options);
+    UNUSED(extra_text);
+    return 0;
+}
 
 /* Fixed-machine 8253 channel 0.  The run-loop advances it in guest
  * instruction time and routes expiry through the machine PIC. */
@@ -197,46 +228,17 @@ IU32 softpc_platform_timer_ticks(void)
     return softpc_pit_ticks;
 }
 
-static void softpc_keyboard_inb(port, value)
-io_addr port;
-IU8 *value;
-{
-    if (port == 0x60u) {
-        if (softpc_keyboard_head == softpc_keyboard_tail) *value = 0;
-        else {
-            *value = softpc_keyboard_queue[softpc_keyboard_tail];
-            softpc_keyboard_tail = (softpc_keyboard_tail + 1u) % SOFTPC_KEYBOARD_QUEUE_SIZE;
-        }
-    } else {
-        *value = softpc_keyboard_head == softpc_keyboard_tail ? 0u : 1u;
-    }
-}
-
-static void softpc_keyboard_outb(port, value)
-io_addr port;
-IU8 value;
-{
-    UNUSED(port);
-    UNUSED(value);
-}
-
 void softpc_platform_keyboard_init(void)
 {
-    softpc_keyboard_head = 0;
-    softpc_keyboard_tail = 0;
-    io_define_inb(AT_KEYB_ADAPTOR, softpc_keyboard_inb);
-    io_define_outb(AT_KEYB_ADAPTOR, softpc_keyboard_outb);
-    io_connect_port(0x60u, AT_KEYB_ADAPTOR, IO_READ | IO_WRITE);
-    io_connect_port(0x64u, AT_KEYB_ADAPTOR, IO_READ | IO_WRITE);
+    AT_kbd_init();
 }
 
 int softpc_platform_keyboard_scancode(IU8 scan_code)
 {
-    IU32 next = (softpc_keyboard_head + 1u) % SOFTPC_KEYBOARD_QUEUE_SIZE;
-    if (next == softpc_keyboard_tail) return 0;
-    softpc_keyboard_queue[softpc_keyboard_head] = scan_code;
-    softpc_keyboard_head = next;
-    ica_hw_interrupt(ICA_MASTER, CPU_KB_INT, 1);
+    int key = keyba_set1_scan_to_key((half_word)(scan_code & 0x7fu));
+    if (key < 0) return 0;
+    if ((scan_code & 0x80u) != 0u) host_key_up(key);
+    else host_key_down(key);
     return 1;
 }
 
