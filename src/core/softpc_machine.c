@@ -206,10 +206,6 @@ static softpc_machine_result softpc_machine_install_reset_rom(
             sizeof(int15_memory_rom)) ||
         !softpc_platform_write_physical(0x54u, int15_vector,
             sizeof(int15_vector)) ||
-        !softpc_platform_write_physical(0xf0420u, irq1_rom,
-            sizeof(irq1_rom)) ||
-        !softpc_platform_write_physical(0x24u, irq1_vector,
-            sizeof(irq1_vector)) ||
         !softpc_platform_write_physical(0x60u, bootstrap_vector,
             sizeof(bootstrap_vector)) ||
         !softpc_platform_write_physical(0x64u, bootstrap_vector,
