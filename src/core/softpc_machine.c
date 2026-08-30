@@ -40,7 +40,7 @@ extern int softpc_platform_write_physical(unsigned long address,
     const unsigned char *bytes, unsigned long length);
 extern int softpc_platform_read_physical(unsigned long address,
     unsigned char *bytes, unsigned long length);
-extern void softpc_platform_keyboard_init(void);
+extern void softpc_platform_keyboard_reset(void);
 extern void softpc_device_bop_register_machine_services(void);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
 extern void SWTMR_init_funcptrs(void);
@@ -353,7 +353,6 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         cmos_init();
         ppi_init();
         SWTMR_init_funcptrs();
-        softpc_platform_keyboard_init();
         softpc_device_bop_register_machine_services();
         softpc_platform_hdd_init();
         gfi_init();
@@ -374,6 +373,10 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
        IVT and BIOS data area.  Keep reset semantics independent of allocator
        state and prior guest execution. */
     sas_fills(0u, 0u, 640ul * 1024ul);
+    /* Retain reset.c's complete keyboard lifecycle after conventional memory
+       is cleared: BIOS ring POST followed by the original AT controller
+       POST.  This is controller reset work, not a one-time host setup. */
+    softpc_platform_keyboard_reset();
     /* Restore the original BIOS and V7 video ROM images first.  The current
        temporary reset overlay remains only until every original ROM BOP
        service is registered. */

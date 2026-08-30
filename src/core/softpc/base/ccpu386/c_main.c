@@ -3325,6 +3325,7 @@ TYPEC4:
          IU8 bop_number = GET_INST_BYTE(p);
          IU8 bop_argument_bytes = (IU8)(modRM - 0xc4);
          IU8 bop_argument_index;
+         extern ISM32 in_C;
          extern IBOOL softpc_device_bop_dispatch IPT2(IU8, number,
              IU32, argument);
 
@@ -3343,10 +3344,16 @@ TYPEC4:
             c_cpu_unsimulate();
             break;
          }
+         /* Preserve the original executor's C-service boundary.  A device
+            BOP may recursively invoke host_simulate(); its return path
+            depends on in_C denoting that execution has re-entered C. */
+         in_C = 1;
          if (!softpc_device_bop_dispatch(bop_number, bop_argument)) {
+            in_C = 0;
             Int6();
             break;
          }
+         in_C = 0;
          CANCEL_HOST_IP();
          SYNCH_TICK();
          break;

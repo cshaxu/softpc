@@ -505,6 +505,7 @@ half_word status;
 
 quick_event_delays host_delays = { 0, 0, 0, 0, 0, 0, 25000 };
 extern void AT_kbd_init(void);
+extern void AT_kbd_post(void);
 extern void host_key_down(int key);
 extern void host_key_up(int key);
 extern int keyba_set1_scan_to_key(half_word scan);
@@ -538,12 +539,15 @@ char *extra_text;
     return 0;
 }
 
-void softpc_platform_keyboard_init(void)
+void softpc_platform_keyboard_reset(void)
 {
     extern void keyboard_init(void);
+    extern void keyboard_post(void);
 
-    AT_kbd_init();
     keyboard_init();
+    keyboard_post();
+    AT_kbd_init();
+    AT_kbd_post();
 }
 
 int softpc_platform_keyboard_scancode(IU8 scan_code)
