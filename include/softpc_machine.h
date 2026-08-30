@@ -30,6 +30,8 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
     uint64_t instruction_budget);
 softpc_machine_result softpc_machine_read_physical(const softpc_machine *machine,
     uint32_t address, void *buffer, uint32_t bytes);
+softpc_machine_result softpc_machine_instruction_pointer(
+    const softpc_machine *machine, uint16_t *cs, uint32_t *eip);
 softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,
     uint8_t scan_code);
 void softpc_machine_destroy(softpc_machine *machine);

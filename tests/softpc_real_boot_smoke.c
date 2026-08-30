@@ -22,6 +22,8 @@ int main(int argc, char **argv)
         SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *machine = NULL;
     unsigned char text[SOFTPC_TEXT_BYTES];
+    uint16_t cs = 0u;
+    uint32_t eip = 0u;
     unsigned int index;
     softpc_machine_result result;
 
@@ -46,7 +48,9 @@ int main(int argc, char **argv)
             return 0;
         }
     }
-    fprintf(stderr, "softpc-real-boot-smoke: guest produced no text output\n");
+    (void)softpc_machine_instruction_pointer(machine, &cs, &eip);
+    fprintf(stderr, "softpc-real-boot-smoke: guest produced no text output at %04x:%08x\n",
+        (unsigned int)cs, (unsigned int)eip);
 failed:
     if (result != SOFTPC_MACHINE_OK)
         fprintf(stderr, "softpc-real-boot-smoke: %s\n",

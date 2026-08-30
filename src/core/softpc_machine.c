@@ -9,6 +9,8 @@
 extern void c_cpu_init(void);
 extern void c_cpu_reset(void);
 extern void c_cpu_simulate(void);
+extern unsigned short c_getCS(void);
+extern unsigned long c_getEIP(void);
 extern void sas_init(unsigned long size);
 extern void sas_term(void);
 extern void io_init(void);
@@ -293,6 +295,16 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
     c_cpu_simulate();
     softpc_platform_timer_advance((unsigned long)instruction_budget -
         softpc_ccpu_instruction_budget);
+    return SOFTPC_MACHINE_OK;
+}
+
+softpc_machine_result softpc_machine_instruction_pointer(
+    const softpc_machine *machine, uint16_t *cs, uint32_t *eip)
+{
+    if (machine == NULL || cs == NULL || eip == NULL || !machine->reset)
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    *cs = (uint16_t)c_getCS();
+    *eip = (uint32_t)c_getEIP();
     return SOFTPC_MACHINE_OK;
 }
 
