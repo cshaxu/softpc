@@ -125,7 +125,10 @@ struct SasVector cSasPtrs = {
 	c_sas_PRS,
 	c_sas_PRS_no_check,
 	c_sas_PigCmpPage,
-	c_IOVirtualised
+	(TYPE_sas_touch *)0,
+	c_IOVirtualised,
+	(TYPE_VirtualiseInstruction *)0,
+	(TYPE_IsPageInstanceData *)0
 };
 
 /*======================================== END ========================================*/
