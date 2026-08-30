@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static void write_boot_image(const char *path, unsigned char marker)
@@ -171,6 +172,51 @@ static void write_int13_multi_boot_image(const char *path, unsigned char drive,
     assert(fclose(file) == 0);
 }
 
+static void write_int13_360k_boot_image(const char *path)
+{
+    unsigned char *image = calloc(1u, 368640u);
+    FILE *file;
+    /* Read CHS 0/1/1.  On 360 KiB media this is LBA 9, not LBA 18. */
+    unsigned char program[] = {
+        0xb4u, 0x02u, 0xb0u, 0x01u, 0xb5u, 0x00u, 0xb1u, 0x01u,
+        0xb6u, 0x01u, 0xb2u, 0x00u, 0xbbu, 0x00u, 0x06u, 0xcdu,
+        0x13u, 0xa0u, 0x00u, 0x06u, 0xa2u, 0x00u, 0x05u, 0xebu, 0xfeu
+    };
+    assert(image != NULL);
+    memcpy(image, program, sizeof(program));
+    image[510] = 0x55u; image[511] = 0xaau;
+    image[9u * 512u] = 0x74u;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(image, 1u, 368640u, file) == 368640u);
+    assert(fclose(file) == 0);
+    free(image);
+}
+
+static void write_int13_bpb_hdd_boot_image(const char *path)
+{
+    unsigned char image[64u * 512u] = { 0 };
+    FILE *file;
+    /* Read CHS 0/1/1.  The partition BPB declares 17 sectors/track. */
+    unsigned char program[] = {
+        0xb4u, 0x02u, 0xb0u, 0x01u, 0xb5u, 0x00u, 0xb1u, 0x01u,
+        0xb6u, 0x01u, 0xb2u, 0x80u, 0xbbu, 0x00u, 0x06u, 0xcdu,
+        0x13u, 0xa0u, 0x00u, 0x06u, 0xa2u, 0x00u, 0x05u, 0xebu, 0xfeu
+    };
+    memcpy(image, program, sizeof(program));
+    image[446u + 4u] = 0x06u;
+    image[446u + 8u] = 1u;
+    image[446u + 12u] = 63u;
+    image[510] = 0x55u; image[511] = 0xaau;
+    image[512u + 24u] = 17u;
+    image[512u + 26u] = 4u;
+    image[17u * 512u] = 0x75u;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(image, 1u, sizeof(image), file) == sizeof(image));
+    assert(fclose(file) == 0);
+}
+
 static void run_boot_image(const char *path, int floppy, unsigned char expected,
     uint64_t instruction_budget)
 {
@@ -320,6 +366,8 @@ int main(void)
     const char *hdd_int13_head = "softpc-machine-hdd-int13-head-smoke.img";
     const char *floppy_int13_multi = "softpc-machine-floppy-int13-multi-smoke.img";
     const char *hdd_int13_multi = "softpc-machine-hdd-int13-multi-smoke.img";
+    const char *floppy_int13_360k = "softpc-machine-floppy-int13-360k-smoke.img";
+    const char *hdd_int13_bpb = "softpc-machine-hdd-int13-bpb-smoke.img";
     softpc_machine_options conflicting_media = { floppy, hdd,
         SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *conflicting_machine = NULL;
@@ -336,6 +384,8 @@ int main(void)
     write_int13_boot_image(hdd_int13_head, 0x80u, 1u, 1u, 0x6du);
     write_int13_multi_boot_image(floppy_int13_multi, 0x00u, 0x71u, 0x72u);
     write_int13_multi_boot_image(hdd_int13_multi, 0x80u, 0x73u, 0x74u);
+    write_int13_360k_boot_image(floppy_int13_360k);
+    write_int13_bpb_hdd_boot_image(hdd_int13_bpb);
     assert(softpc_machine_create(&conflicting_media, &conflicting_machine) ==
         SOFTPC_MACHINE_INVALID_ARGUMENT);
     assert(conflicting_machine == NULL);
@@ -352,6 +402,8 @@ int main(void)
     run_int13_boot_image(hdd_int13_head, 0, 0x6du);
     run_int13_multi_boot_image(floppy_int13_multi, 1, 0x71u, 0x72u);
     run_int13_multi_boot_image(hdd_int13_multi, 0, 0x73u, 0x74u);
+    run_int13_boot_image(floppy_int13_360k, 1, 0x74u);
+    run_int13_boot_image(hdd_int13_bpb, 0, 0x75u);
     assert(remove(floppy) == 0);
     assert(remove(hdd) == 0);
     assert(remove(keyboard) == 0);
@@ -365,5 +417,7 @@ int main(void)
     assert(remove(hdd_int13_head) == 0);
     assert(remove(floppy_int13_multi) == 0);
     assert(remove(hdd_int13_multi) == 0);
+    assert(remove(floppy_int13_360k) == 0);
+    assert(remove(hdd_int13_bpb) == 0);
     return 0;
 }

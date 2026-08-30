@@ -37,9 +37,16 @@ extern void softpc_platform_hdd_detach(void);
 
 struct softpc_machine {
     softpc_machine_options options;
+    unsigned short sectors_per_track;
+    unsigned short heads;
     int reset;
     int hardware_initialized;
 };
+
+static int softpc_machine_floppy_geometry(const char *path,
+    unsigned short *sectors_per_track, unsigned short *heads);
+static int softpc_machine_hdd_geometry(const char *path,
+    unsigned short *sectors_per_track, unsigned short *heads);
 
 static int softpc_machine_media_exists(const char *path)
 {
@@ -87,28 +94,24 @@ static softpc_machine_result softpc_machine_install_reset_rom(
     /* Assembled from firmware/int13_chs.asm.  Keep the checked-in assembly
        source and this freestanding C initializer in lockstep so the normal C
        build has no assembler-toolchain dependency. */
-    static const unsigned char hdd_int13_rom[] = {
+    static unsigned char hdd_int13_rom[] = {
         0x50u, 0x53u, 0x51u, 0x52u, 0x57u, 0x55u, 0x50u, 0x89u,
-        0xdfu, 0x80u, 0xfcu, 0x02u, 0x0fu, 0x85u, 0x80u, 0x00u,
-        0x08u, 0xc0u, 0x74u,
-        0x7cu, 0x3cu, 0x80u, 0x77u, 0x78u, 0x89u, 0xc8u, 0x86u,
-        0xc4u, 0x80u, 0xe4u, 0xc0u, 0xc0u, 0xecu, 0x06u, 0x89u,
-        0xd3u, 0x88u, 0xfbu, 0x30u, 0xffu, 0x89u, 0xd5u, 0x81u,
-        0xe5u, 0xffu, 0x00u, 0x81u, 0xfdu, 0x80u, 0x00u, 0x72u,
-        0x05u, 0xbeu, 0x10u, 0x00u, 0xebu, 0x03u, 0xbeu,
-        0x02u, 0x00u, 0xf7u, 0xe6u, 0x01u, 0xd8u, 0x81u, 0xfdu,
-        0x80u, 0x00u, 0x72u, 0x05u, 0xbeu, 0x3fu, 0x00u, 0xebu, 0x03u,
-        0xbeu, 0x12u, 0x00u, 0xf7u, 0xe6u, 0x89u, 0xcbu,
+        0xdfu, 0x80u, 0xfcu, 0x02u, 0x75u, 0x68u, 0x08u, 0xc0u,
+        0x74u, 0x64u, 0x3cu, 0x80u, 0x77u, 0x60u, 0x89u, 0xc8u,
+        0x86u, 0xc4u, 0x80u, 0xe4u, 0xc0u, 0xc0u, 0xecu, 0x06u,
+        0x89u, 0xd3u, 0x88u, 0xfbu, 0x30u, 0xffu, 0x2eu, 0x8bu,
+        0x36u, 0x81u, 0x01u, 0x2eu, 0x8bu, 0x2eu, 0x83u, 0x01u,
+        0xf7u, 0xe6u, 0x01u, 0xd8u, 0xf7u, 0xe5u, 0x89u, 0xcbu,
         0x80u, 0xe3u, 0x3fu, 0x4bu, 0x01u, 0xd8u, 0x89u, 0xc3u,
-        0xbau, 0xf2u, 0x01u, 0x59u, 0x89u, 0xc8u, 0xeeu, 0x42u, 0x89u,
-        0xd8u, 0xeeu, 0x42u, 0x88u, 0xe0u, 0xeeu, 0x42u, 0x30u,
-        0xc0u, 0xeeu, 0x42u, 0xb0u, 0xe0u, 0xeeu, 0x42u, 0xb0u,
-        0x20u, 0xeeu, 0xbau, 0xf0u, 0x01u, 0x30u,
-        0xedu, 0x51u, 0xb9u, 0x00u, 0x01u, 0xfcu, 0xedu, 0xabu,
-        0xe2u, 0xfcu, 0x59u, 0xe2u, 0xf4u, 0x5du, 0x5fu, 0x5au,
-        0x59u, 0x5bu, 0x58u, 0x30u, 0xe4u,
-        0xf8u, 0xcfu, 0x59u, 0x5du, 0x5fu, 0x5au, 0x59u, 0x5bu, 0x58u,
-        0xb4u, 0x01u, 0xf9u, 0xcfu
+        0xbau, 0xf2u, 0x01u, 0x59u, 0x89u, 0xc8u, 0xeeu, 0x42u,
+        0x89u, 0xd8u, 0xeeu, 0x42u, 0x88u, 0xe0u, 0xeeu, 0x42u,
+        0x30u, 0xc0u, 0xeeu, 0x42u, 0xb0u, 0xe0u, 0xeeu, 0x42u,
+        0xb0u, 0x20u, 0xeeu, 0xbau, 0xf0u, 0x01u, 0x30u, 0xedu,
+        0x51u, 0xb9u, 0x00u, 0x01u, 0xfcu, 0xedu, 0xabu, 0xe2u,
+        0xfcu, 0x59u, 0xe2u, 0xf4u, 0x5du, 0x5fu, 0x5au, 0x59u,
+        0x5bu, 0x58u, 0x30u, 0xe4u, 0xf8u, 0xcfu, 0x59u, 0x5du,
+        0x5fu, 0x5au, 0x59u, 0x5bu, 0x58u, 0xb4u, 0x01u, 0xf9u,
+        0xcfu, 0x10u, 0x00u, 0x3fu, 0x00u
     };
     static const unsigned char hdd_int13_vector[] = { 0x00u, 0x01u, 0x00u, 0xf0u };
     /* Assembled from firmware/int10_teletype.asm; embedding keeps the normal
@@ -138,6 +141,14 @@ static softpc_machine_result softpc_machine_install_reset_rom(
     static const unsigned char floppy_reset_vector[] = {
         0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
     };
+    hdd_int13_rom[sizeof(hdd_int13_rom) - 4u] =
+        (unsigned char)(machine->heads & 0xffu);
+    hdd_int13_rom[sizeof(hdd_int13_rom) - 3u] =
+        (unsigned char)(machine->heads >> 8u);
+    hdd_int13_rom[sizeof(hdd_int13_rom) - 2u] =
+        (unsigned char)(machine->sectors_per_track & 0xffu);
+    hdd_int13_rom[sizeof(hdd_int13_rom) - 1u] =
+        (unsigned char)(machine->sectors_per_track >> 8u);
     if (!softpc_platform_write_physical(0xf0100u, hdd_int13_rom,
             sizeof(hdd_int13_rom)) ||
         !softpc_platform_write_physical(0x4cu, hdd_int13_vector,
@@ -177,6 +188,17 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
     machine = calloc(1u, sizeof(*machine));
     if (machine == NULL) return SOFTPC_MACHINE_IO_ERROR;
     machine->options = *options;
+    if (options->floppy_path != NULL) {
+        if (!softpc_machine_floppy_geometry(options->floppy_path,
+                &machine->sectors_per_track, &machine->heads)) {
+            free(machine);
+            return SOFTPC_MACHINE_IO_ERROR;
+        }
+    } else if (!softpc_machine_hdd_geometry(options->hard_disk_path,
+            &machine->sectors_per_track, &machine->heads)) {
+        free(machine);
+        return SOFTPC_MACHINE_IO_ERROR;
+    }
     *machine_out = machine;
     return SOFTPC_MACHINE_OK;
 }
@@ -246,6 +268,70 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
     softpc_platform_timer_advance((unsigned long)instruction_budget -
         softpc_ccpu_instruction_budget);
     return SOFTPC_MACHINE_OK;
+}
+
+static unsigned short softpc_machine_u16le(const unsigned char *bytes)
+{
+    return (unsigned short)(bytes[0] | ((unsigned short)bytes[1] << 8u));
+}
+
+static int softpc_machine_floppy_geometry(const char *path,
+    unsigned short *sectors_per_track, unsigned short *heads)
+{
+    FILE *file = fopen(path, "rb");
+    long bytes;
+    if (file == NULL) return 0;
+    if (fseek(file, 0, SEEK_END) != 0) { fclose(file); return 0; }
+    bytes = ftell(file);
+    fclose(file);
+    *heads = 2u;
+    switch (bytes) {
+    case 368640L: *sectors_per_track = 9u; return 1;
+    case 737280L: *sectors_per_track = 9u; return 1;
+    case 1228800L: *sectors_per_track = 15u; return 1;
+    case 1474560L: *sectors_per_track = 18u; return 1;
+    case 2949120L: *sectors_per_track = 36u; return 1;
+    default: *sectors_per_track = 18u; return 1;
+    }
+}
+
+static int softpc_machine_hdd_geometry(const char *path,
+    unsigned short *sectors_per_track, unsigned short *heads)
+{
+    unsigned char sector[SOFTPC_BOOT_SECTOR_BYTES];
+    FILE *file = fopen(path, "rb");
+    unsigned long partition_lba = 0u;
+    unsigned int index;
+    if (file == NULL) return 0;
+    if (fread(sector, 1u, sizeof(sector), file) == sizeof(sector) &&
+        sector[510] == 0x55u && sector[511] == 0xaau) {
+        for (index = 0u; index < 4u; ++index) {
+            const unsigned char *entry = sector + 446u + index * 16u;
+            if (entry[4] != 0u) {
+                partition_lba = (unsigned long)entry[8] |
+                    ((unsigned long)entry[9] << 8u) |
+                    ((unsigned long)entry[10] << 16u) |
+                    ((unsigned long)entry[11] << 24u);
+                break;
+            }
+        }
+        if (partition_lba != 0u && fseek(file,
+                (long)(partition_lba * SOFTPC_BOOT_SECTOR_BYTES), SEEK_SET) == 0 &&
+            fread(sector, 1u, sizeof(sector), file) == sizeof(sector)) {
+            unsigned short sectors = softpc_machine_u16le(sector + 24u);
+            unsigned short disk_heads = softpc_machine_u16le(sector + 26u);
+            if (sectors != 0u && sectors <= 63u && disk_heads != 0u) {
+                *sectors_per_track = sectors;
+                *heads = disk_heads;
+                fclose(file);
+                return 1;
+            }
+        }
+    }
+    fclose(file);
+    *sectors_per_track = 63u;
+    *heads = 16u;
+    return 1;
 }
 
 void softpc_machine_destroy(softpc_machine *machine)

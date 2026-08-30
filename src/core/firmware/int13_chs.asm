@@ -28,25 +28,11 @@ int13_read:
     mov bx, dx
     mov bl, bh                    ; head
     xor bh, bh
-    mov bp, dx
-    and bp, 0x00ff
-    cmp bp, 0x80
-    jb floppy_geometry
-    mov si, 16
-    jmp short head_geometry_ready
-floppy_geometry:
-    mov si, 2
-head_geometry_ready:
+    mov si, [cs:heads]
+    mov bp, [cs:sectors_per_track]
     mul si                        ; cylinder * heads
     add ax, bx
-    cmp bp, 0x80
-    jb floppy_sectors
-    mov si, 63
-    jmp short geometry_ready
-floppy_sectors:
-    mov si, 18
-geometry_ready:
-    mul si                        ; (cylinder * heads + head) * sectors
+    mul bp                        ; (cylinder * heads + head) * sectors
     mov bx, cx
     and bl, 0x3f
     dec bx
@@ -106,3 +92,8 @@ fail:
     mov ah, 0x01
     stc
     iret
+
+heads:
+    dw 16
+sectors_per_track:
+    dw 63
