@@ -31,6 +31,7 @@ guest-firmware services:
 - `INT 11h` — fixed equipment list (color text, FPU, and attached floppy).
 - `INT 12h` — fixed 640 KiB conventional-memory report.
 - `INT 13h/AH=02h` — contiguous CHS reads of up to 128 sectors.
+- `INT 15h/AH=88h` — fixed 15 MiB extended-memory report.
 - `INT 16h/AH=00h` and `AH=01h` — ASCII/scan-code read and non-consuming
   availability check for basic US keyboard input.
 - `INT 1Ah/AH=00h` — BIOS tick counter maintained by the fixed PIT.

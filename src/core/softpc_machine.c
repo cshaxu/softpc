@@ -187,6 +187,12 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0x86u, 0xf9u, 0x1fu, 0xcfu
     };
     static const unsigned char int1a_vector[] = { 0x00u, 0x06u, 0x00u, 0xf0u };
+    /* INT 15h/AH=88h reports the fixed RAM above the first MiB. */
+    static const unsigned char int15_memory_rom[] = {
+        0x80u, 0xfcu, 0x88u, 0x75u, 0x05u, 0xb8u, 0x00u, 0x3cu,
+        0xf8u, 0xcfu, 0xb4u, 0x86u, 0xf9u, 0xcfu
+    };
+    static const unsigned char int15_vector[] = { 0x00u, 0x08u, 0x00u, 0xf0u };
     /* IRQ0 acknowledges the fixed master PIC and returns to guest code. */
     static const unsigned char irq0_rom[] = {
         0xb0u, 0x20u, 0xe6u, 0x20u, 0xcfu
@@ -236,6 +242,10 @@ static softpc_machine_result softpc_machine_install_reset_rom(
             sizeof(int1a_clock_rom)) ||
         !softpc_platform_write_physical(0x68u, int1a_vector,
             sizeof(int1a_vector)) ||
+        !softpc_platform_write_physical(0xf0800u, int15_memory_rom,
+            sizeof(int15_memory_rom)) ||
+        !softpc_platform_write_physical(0x54u, int15_vector,
+            sizeof(int15_vector)) ||
         !softpc_platform_write_physical(0xf0400u, irq0_rom,
             sizeof(irq0_rom)) ||
         !softpc_platform_write_physical(0x20u, irq0_vector,

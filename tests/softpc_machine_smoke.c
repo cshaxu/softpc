@@ -50,6 +50,22 @@ static void write_int16_boot_image(const char *path)
     assert(fclose(file) == 0);
 }
 
+static void write_int15_memory_boot_image(const char *path)
+{
+    unsigned char sector[512] = { 0 };
+    FILE *file;
+    /* AH=88h; INT 15h; store AX at 0500h; jmp $. */
+    unsigned char program[] = {
+        0xb4u, 0x88u, 0xcdu, 0x15u, 0xa3u, 0x00u, 0x05u, 0xebu, 0xfeu
+    };
+    memcpy(sector, program, sizeof(program));
+    sector[510] = 0x55u; sector[511] = 0xaau;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
+    assert(fclose(file) == 0);
+}
+
 static void write_int16_ascii_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
@@ -399,6 +415,20 @@ static void run_int16_boot_image(const char *path)
     softpc_machine_destroy(machine);
 }
 
+static void run_int15_memory_boot_image(const char *path)
+{
+    unsigned char memory_kib[2] = { 0, 0 };
+    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 64u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x500u, memory_kib,
+        sizeof(memory_kib)) == SOFTPC_MACHINE_OK);
+    assert(memory_kib[0] == 0u && memory_kib[1] == 0x3cu);
+    softpc_machine_destroy(machine);
+}
+
 static void run_int16_ascii_boot_image(const char *path)
 {
     unsigned char marker = 0;
@@ -599,6 +629,7 @@ int main(void)
     const char *hdd = "softpc-machine-hdd-smoke.img";
     const char *keyboard = "softpc-machine-keyboard-smoke.img";
     const char *int16 = "softpc-machine-int16-smoke.img";
+    const char *int15_memory = "softpc-machine-int15-memory-smoke.img";
     const char *int16_ascii = "softpc-machine-int16-ascii-smoke.img";
     const char *int16_check = "softpc-machine-int16-check-smoke.img";
     const char *timer = "softpc-machine-timer-smoke.img";
@@ -625,6 +656,7 @@ int main(void)
     write_boot_image(hdd, 0x77u);
     write_keyboard_boot_image(keyboard);
     write_int16_boot_image(int16);
+    write_int15_memory_boot_image(int15_memory);
     write_int16_ascii_boot_image(int16_ascii);
     write_int16_check_boot_image(int16_check);
     write_timer_boot_image(timer);
@@ -651,6 +683,7 @@ int main(void)
     run_boot_image(hdd, 0, 0x77u, 1000u);
     run_keyboard_boot_image(keyboard);
     run_int16_boot_image(int16);
+    run_int15_memory_boot_image(int15_memory);
     run_int16_ascii_boot_image(int16_ascii);
     run_int16_check_boot_image(int16_check);
     run_timer_boot_image(timer);
@@ -675,6 +708,7 @@ int main(void)
     assert(remove(hdd) == 0);
     assert(remove(keyboard) == 0);
     assert(remove(int16) == 0);
+    assert(remove(int15_memory) == 0);
     assert(remove(int16_ascii) == 0);
     assert(remove(int16_check) == 0);
     assert(remove(timer) == 0);
