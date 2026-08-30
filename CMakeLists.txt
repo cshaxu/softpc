@@ -106,9 +106,9 @@ set_target_properties(softpc-machine-devices PROPERTIES
     C_STANDARD 90
     C_EXTENSIONS ON)
 target_compile_definitions(softpc-ccpu-core PRIVATE
-    CPU_40_STYLE CCPU C_VID CPU_486 PROD SOFTPC_STANDALONE=1)
+    CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1)
 target_compile_definitions(softpc-machine-devices PRIVATE
-    CPU_40_STYLE CCPU C_VID CPU_486 PROD SOFTPC_STANDALONE=1)
+    CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1)
 target_include_directories(softpc-ccpu-core PRIVATE
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
