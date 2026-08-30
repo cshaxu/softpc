@@ -22,6 +22,8 @@ extern int softpc_platform_read_physical(unsigned long address,
     unsigned char *bytes, unsigned long length);
 extern void softpc_platform_keyboard_init(void);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
+extern void softpc_platform_timer_init(void);
+extern void softpc_platform_timer_advance(unsigned long instructions);
 extern void softpc_platform_hdd_init(void);
 extern int softpc_platform_hdd_attach(const char *path);
 extern void softpc_platform_hdd_detach(void);
@@ -148,6 +150,7 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         SWPIC_init_funcptrs();
         ica0_init();
         ica1_init();
+        softpc_platform_timer_init();
         softpc_platform_keyboard_init();
         softpc_platform_hdd_init();
         machine->hardware_initialized = 1;
@@ -195,6 +198,7 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     softpc_ccpu_instruction_budget = (unsigned long)instruction_budget;
     c_cpu_simulate();
+    softpc_platform_timer_advance((unsigned long)instruction_budget);
     return SOFTPC_MACHINE_OK;
 }
 

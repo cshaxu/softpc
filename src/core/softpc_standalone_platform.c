@@ -30,6 +30,71 @@ static IU8 softpc_keyboard_queue[SOFTPC_KEYBOARD_QUEUE_SIZE];
 static IU32 softpc_keyboard_head;
 static IU32 softpc_keyboard_tail;
 
+/* Fixed-machine 8253 channel 0.  The run-loop advances it in guest
+ * instruction time and routes expiry through the machine PIC. */
+static IU32 softpc_pit_reload = 65536u;
+static IU32 softpc_pit_elapsed;
+static IU8 softpc_pit_write_low;
+static IU8 softpc_pit_read_low;
+
+static void softpc_pit_inb(port, value)
+io_addr port;
+IU8 *value;
+{
+    if (port != 0x40u) {
+        *value = 0u;
+        return;
+    }
+    if (!softpc_pit_read_low) {
+        *value = (IU8)(softpc_pit_reload & 0xffu);
+        softpc_pit_read_low = 1u;
+    } else {
+        *value = (IU8)((softpc_pit_reload >> 8u) & 0xffu);
+        softpc_pit_read_low = 0u;
+    }
+}
+
+static void softpc_pit_outb(port, value)
+io_addr port;
+IU8 value;
+{
+    if (port == 0x43u) {
+        if ((value & 0xc0u) == 0u) softpc_pit_write_low = 0u;
+        return;
+    }
+    if (port != 0x40u) return;
+    if (!softpc_pit_write_low) {
+        softpc_pit_reload = (softpc_pit_reload & 0xff00u) | value;
+        softpc_pit_write_low = 1u;
+    } else {
+        softpc_pit_reload = (softpc_pit_reload & 0x00ffu) | ((IU32)value << 8u);
+        if (softpc_pit_reload == 0u) softpc_pit_reload = 65536u;
+        softpc_pit_elapsed = 0u;
+        softpc_pit_write_low = 0u;
+    }
+}
+
+void softpc_platform_timer_init(void)
+{
+    softpc_pit_reload = 65536u;
+    softpc_pit_elapsed = 0u;
+    softpc_pit_write_low = 0u;
+    softpc_pit_read_low = 0u;
+    io_define_inb(TIMER_ADAPTOR, softpc_pit_inb);
+    io_define_outb(TIMER_ADAPTOR, softpc_pit_outb);
+    io_connect_port(0x40u, TIMER_ADAPTOR, IO_READ | IO_WRITE);
+    io_connect_port(0x43u, TIMER_ADAPTOR, IO_WRITE);
+}
+
+void softpc_platform_timer_advance(IU32 instructions)
+{
+    softpc_pit_elapsed += instructions;
+    while (softpc_pit_elapsed >= softpc_pit_reload) {
+        softpc_pit_elapsed -= softpc_pit_reload;
+        ica_hw_interrupt(ICA_MASTER, CPU_TIMER_INT, 1);
+    }
+}
+
 static void softpc_keyboard_inb(port, value)
 io_addr port;
 IU8 *value;
