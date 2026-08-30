@@ -28,6 +28,7 @@ void softpc_device_bop_register_machine_services IFN0()
     extern void keyboard_io IPT0();
     extern void diskette_int IPT0();
     extern void diskette_io IPT0();
+    extern void video_io IPT0();
     extern void ega_video_io IPT0();
     extern void printer_io IPT0();
     extern void rs232_io IPT0();
@@ -54,7 +55,11 @@ void softpc_device_bop_register_machine_services IFN0()
     BIOS[BIOS_KEYBOARD_IO] = keyboard_io;
     BIOS[BIOS_DISKETTE_INT] = diskette_int;
     BIOS[BIOS_DISKETTE_IO] = diskette_io;
-    BIOS[BIOS_VIDEO_IO] = ega_video_io;
+    /* Keep the original BIOS BOP layout: the base video service occupies
+       10h, while the V7 VGA ROM transfers INT 10h to the EGA extension at
+       42h.  The latter is visible in v7vga.rom at C000:0898. */
+    BIOS[BIOS_VIDEO_IO] = video_io;
+    BIOS[0x42] = ega_video_io;
     BIOS[BIOS_PRINTER_IO] = printer_io;
     BIOS[BIOS_RS232_IO] = rs232_io;
     BIOS[BIOS_DISK_IO] = disk_io;
