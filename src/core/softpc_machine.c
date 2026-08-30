@@ -196,12 +196,8 @@ static softpc_machine_result softpc_machine_install_reset_rom(
     bda_configuration[4] = 0x02u;
     bda_configuration[5] = 0u;
     bda_fixed_disk_count = machine->options.hard_disk_path != NULL ? 1u : 0u;
-    if (!softpc_platform_write_physical(0xf0300u, int16_keyboard_rom,
-            sizeof(int16_keyboard_rom)) ||
-        !softpc_platform_write_physical(0x58u, int16_vector,
-            sizeof(int16_vector)) ||
-        /* BDA equipment at 0040:0010, conventional memory at 0040:0013. */
-        !softpc_platform_write_physical(0x410u, bda_configuration,
+    /* BDA equipment at 0040:0010, conventional memory at 0040:0013. */
+    if (!softpc_platform_write_physical(0x410u, bda_configuration,
             sizeof(bda_configuration)) ||
         /* BDA fixed-disk count at 0040:0075. */
         !softpc_platform_write_physical(0x475u, &bda_fixed_disk_count,
