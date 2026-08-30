@@ -35,6 +35,8 @@ void softpc_device_bop_register_machine_services IFN0()
     extern void cassette_io IPT0();
     extern void equipment IPT0();
     extern void memory_size IPT0();
+    extern void time_int IPT0();
+    extern void time_of_day IPT0();
     extern void bootstrap IPT0();
     extern void bootstrap1 IPT0();
     extern void bootstrap2 IPT0();
@@ -59,6 +61,8 @@ void softpc_device_bop_register_machine_services IFN0()
     BIOS[BIOS_CASSETTE_IO] = cassette_io;
     BIOS[BIOS_EQUIPMENT] = equipment;
     BIOS[BIOS_MEMORY_SIZE] = memory_size;
+    BIOS[BIOS_TIMER_INT] = time_int;
+    BIOS[BIOS_TIME_OF_DAY] = time_of_day;
     BIOS[BIOS_BOOT_STRAP] = bootstrap;
     BIOS[0x90] = bootstrap1;
     BIOS[0x91] = bootstrap2;

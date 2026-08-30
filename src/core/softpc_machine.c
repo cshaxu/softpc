@@ -193,26 +193,12 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u
     };
     static const unsigned char int16_vector[] = { 0x00u, 0x03u, 0x00u, 0xf0u };
-    /* INT 1Ah/AH=00h reads the BIOS data area's IRQ0-maintained tick count. */
-    static const unsigned char int1a_clock_rom[] = {
-        0x1eu, 0x80u, 0xfcu, 0x00u, 0x75u, 0x11u, 0x31u, 0xc0u,
-        0x8eu, 0xd8u, 0x8bu, 0x16u, 0x6cu, 0x04u, 0x8bu, 0x0eu,
-        0x6eu, 0x04u, 0x30u, 0xc0u, 0xf8u, 0x1fu, 0xcfu, 0xb4u,
-        0x86u, 0xf9u, 0x1fu, 0xcfu
-    };
-    static const unsigned char int1a_vector[] = { 0x00u, 0x06u, 0x00u, 0xf0u };
     /* INT 15h/AH=88h reports the fixed RAM above the first MiB. */
     static unsigned char int15_memory_rom[] = {
         0x80u, 0xfcu, 0x88u, 0x75u, 0x05u, 0xb8u, 0x00u, 0x3cu,
         0xf8u, 0xcfu, 0xb4u, 0x86u, 0xf9u, 0xcfu
     };
     static const unsigned char int15_vector[] = { 0x00u, 0x08u, 0x00u, 0xf0u };
-    /* IRQ0 acknowledges the fixed master PIC while preserving the guest's
-       scratch register state before returning. */
-    static const unsigned char irq0_rom[] = {
-        0x50u, 0xb0u, 0x20u, 0xe6u, 0x20u, 0x58u, 0xcfu
-    };
-    static const unsigned char irq0_vector[] = { 0x00u, 0x04u, 0x00u, 0xf0u };
     /* IRQ1 leaves the controller's queued scan code for INT 16h, acknowledges
        the master PIC, preserves AX, and returns to the interrupted guest. */
     static const unsigned char irq1_rom[] = {
@@ -248,18 +234,10 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         /* BDA fixed-disk count at 0040:0075. */
         !softpc_platform_write_physical(0x475u, &bda_fixed_disk_count,
             sizeof(bda_fixed_disk_count)) ||
-        !softpc_platform_write_physical(0xf0600u, int1a_clock_rom,
-            sizeof(int1a_clock_rom)) ||
-        !softpc_platform_write_physical(0x68u, int1a_vector,
-            sizeof(int1a_vector)) ||
         !softpc_platform_write_physical(0xf0800u, int15_memory_rom,
             sizeof(int15_memory_rom)) ||
         !softpc_platform_write_physical(0x54u, int15_vector,
             sizeof(int15_vector)) ||
-        !softpc_platform_write_physical(0xf0400u, irq0_rom,
-            sizeof(irq0_rom)) ||
-        !softpc_platform_write_physical(0x20u, irq0_vector,
-            sizeof(irq0_vector)) ||
         !softpc_platform_write_physical(0xf0420u, irq1_rom,
             sizeof(irq1_rom)) ||
         !softpc_platform_write_physical(0x24u, irq1_vector,

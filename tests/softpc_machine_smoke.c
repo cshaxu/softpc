@@ -775,6 +775,7 @@ static void run_bda_configuration_image(const char *path, int floppy,
 static void run_int1a_boot_image(const char *path)
 {
     unsigned char ticks[4] = { 0xffu, 0xffu, 0xffu, 0xffu };
+    unsigned char bda_ticks[4] = { 0xffu, 0xffu, 0xffu, 0xffu };
     softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
@@ -782,8 +783,11 @@ static void run_int1a_boot_image(const char *path)
     boot_machine(machine);
     assert(softpc_machine_read_physical(machine, 0x500u, ticks,
         sizeof(ticks)) == SOFTPC_MACHINE_OK);
-    assert(ticks[0] == 0x34u && ticks[1] == 0x12u && ticks[2] == 0u &&
-        ticks[3] == 0u);
+    assert(softpc_machine_read_physical(machine, 0x46cu, bda_ticks,
+        sizeof(bda_ticks)) == SOFTPC_MACHINE_OK);
+    /* The original time_of_day BOP derives the response from the host clock
+       and refreshes the BDA; it does not return the test's earlier 1234h. */
+    assert(memcmp(ticks, bda_ticks, sizeof(ticks)) == 0);
     softpc_machine_destroy(machine);
 }
 
