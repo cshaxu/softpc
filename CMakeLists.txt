@@ -10,6 +10,25 @@ add_library(softpc-machine
 target_include_directories(softpc-machine PUBLIC include)
 target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 
+# First detached SoftPC core slice.  It deliberately links no NTVDM host,
+# BOP service dispatcher, DOS/WOW component or Win32 presentation provider.
+add_library(softpc-ccpu-core OBJECT
+    src/core/softpc/base/ccpu386/c_main.c
+    src/core/softpc/base/ccpu386/ccpusas4.c
+    src/core/softpc_physical_mapping.c)
+set_target_properties(softpc-ccpu-core PROPERTIES
+    C_STANDARD 90
+    C_EXTENSIONS ON)
+target_compile_definitions(softpc-ccpu-core PRIVATE
+    CPU_40_STYLE CCPU CPU_486 PROD SOFTPC_STANDALONE=1)
+target_include_directories(softpc-ccpu-core PRIVATE
+    src/core/softpc/host/inc
+    src/core/softpc/host/inc/x86/prod
+    src/core/softpc/base/inc
+    src/core/softpc/base/ccpu386
+    src/core/softpc/base/cvidc
+    src/core)
+
 add_executable(softpcvm src/vm/main.c)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
 

@@ -152,7 +152,10 @@ extern void host_simulate(void);
 
 #define LIM
 
-#define NTVDM	// To enable NT specific base code.
+/* Standalone SoftPC VM: do not select the historical NTVDM host path.
+ * CPU, SAS and device sources must use their original non-NTVDM branches
+ * until each host interaction is reintroduced through the standalone core. */
+#define SOFTPC_STANDALONE 1
 
 #define CPU_30_STYLE
 #define PM
