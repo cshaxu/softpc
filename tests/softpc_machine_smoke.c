@@ -52,6 +52,24 @@ static void write_hdd_pio_boot_image(const char *path)
     assert(fclose(file) == 0);
 }
 
+static void write_hdd_int13_boot_image(const char *path)
+{
+    unsigned char image[1024] = { 0 };
+    FILE *file;
+    const unsigned char program[] = {
+        0xb4u, 0x02u, 0xb0u, 0x01u, 0xb5u, 0x00u, 0xb1u, 0x02u,
+        0xb6u, 0x00u, 0xb2u, 0x80u, 0xbbu, 0x00u, 0x06u, 0xcdu,
+        0x13u, 0xa0u, 0x00u, 0x06u, 0xa2u, 0x00u, 0x05u, 0xebu, 0xfeu
+    };
+    memcpy(image, program, sizeof(program));
+    image[510] = 0x55u; image[511] = 0xaau;
+    image[512] = 0x6bu;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(image, 1u, sizeof(image), file) == sizeof(image));
+    assert(fclose(file) == 0);
+}
+
 static void run_boot_image(const char *path, int floppy, unsigned char expected,
     uint64_t instruction_budget)
 {
@@ -96,23 +114,40 @@ static void run_hdd_pio_boot_image(const char *path)
     softpc_machine_destroy(machine);
 }
 
+static void run_hdd_int13_boot_image(const char *path)
+{
+    unsigned char marker = 0;
+    softpc_machine_options options = { NULL, path, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 1800u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
+    assert(marker == 0x6bu);
+    softpc_machine_destroy(machine);
+}
+
 int main(void)
 {
     const char *floppy = "softpc-machine-floppy-smoke.img";
     const char *hdd = "softpc-machine-hdd-smoke.img";
     const char *keyboard = "softpc-machine-keyboard-smoke.img";
     const char *hdd_pio = "softpc-machine-hdd-pio-smoke.img";
+    const char *hdd_int13 = "softpc-machine-hdd-int13-smoke.img";
     write_boot_image(floppy, 0x42u);
     write_boot_image(hdd, 0x77u);
     write_keyboard_boot_image(keyboard);
     write_hdd_pio_boot_image(hdd_pio);
+    write_hdd_int13_boot_image(hdd_int13);
     run_boot_image(floppy, 1, 0x42u, 4u);
     run_boot_image(hdd, 0, 0x77u, 1000u);
     run_keyboard_boot_image(keyboard);
     run_hdd_pio_boot_image(hdd_pio);
+    run_hdd_int13_boot_image(hdd_int13);
     assert(remove(floppy) == 0);
     assert(remove(hdd) == 0);
     assert(remove(keyboard) == 0);
     assert(remove(hdd_pio) == 0);
+    assert(remove(hdd_int13) == 0);
     return 0;
 }
