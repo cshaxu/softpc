@@ -98,6 +98,29 @@ static void write_int13_boot_image(const char *path, unsigned char drive,
     assert(fclose(file) == 0);
 }
 
+static void write_int13_multi_boot_image(const char *path, unsigned char drive,
+    unsigned char first_marker, unsigned char second_marker)
+{
+    unsigned char image[64u * 512u] = { 0 };
+    FILE *file;
+    /* Read CHS 0/0/sectors 2-3 into 0000:0600, then expose both bytes. */
+    unsigned char program[] = {
+        0xb4u, 0x02u, 0xb0u, 0x02u, 0xb5u, 0x00u, 0xb1u, 0x02u,
+        0xb6u, 0x00u, 0xb2u, 0x00u, 0xbbu, 0x00u, 0x06u, 0xcdu,
+        0x13u, 0xa0u, 0x00u, 0x06u, 0xa2u, 0x00u, 0x05u, 0xa0u,
+        0x00u, 0x08u, 0xa2u, 0x01u, 0x05u, 0xebu, 0xfeu
+    };
+    program[11] = drive;
+    memcpy(image, program, sizeof(program));
+    image[510] = 0x55u; image[511] = 0xaau;
+    image[1u * 512u] = first_marker;
+    image[2u * 512u] = second_marker;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(image, 1u, sizeof(image), file) == sizeof(image));
+    assert(fclose(file) == 0);
+}
+
 static void run_boot_image(const char *path, int floppy, unsigned char expected,
     uint64_t instruction_budget)
 {
@@ -170,6 +193,24 @@ static void run_int13_boot_image(const char *path, int floppy, unsigned char exp
     softpc_machine_destroy(machine);
 }
 
+static void run_int13_multi_boot_image(const char *path, int floppy,
+    unsigned char first_expected, unsigned char second_expected)
+{
+    unsigned char markers[2] = { 0, 0 };
+    softpc_machine_options options = { NULL, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    if (floppy) options.floppy_path = path;
+    else options.hard_disk_path = path;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 6000u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x500u, markers,
+        sizeof(markers)) == SOFTPC_MACHINE_OK);
+    assert(markers[0] == first_expected);
+    assert(markers[1] == second_expected);
+    softpc_machine_destroy(machine);
+}
+
 int main(void)
 {
     const char *floppy = "softpc-machine-floppy-smoke.img";
@@ -180,6 +221,8 @@ int main(void)
     const char *hdd_int13 = "softpc-machine-hdd-int13-smoke.img";
     const char *floppy_int13 = "softpc-machine-floppy-int13-smoke.img";
     const char *hdd_int13_head = "softpc-machine-hdd-int13-head-smoke.img";
+    const char *floppy_int13_multi = "softpc-machine-floppy-int13-multi-smoke.img";
+    const char *hdd_int13_multi = "softpc-machine-hdd-int13-multi-smoke.img";
     softpc_machine_options conflicting_media = { floppy, hdd,
         SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *conflicting_machine = NULL;
@@ -191,6 +234,8 @@ int main(void)
     write_int13_boot_image(hdd_int13, 0x80u, 0u, 2u, 0x6bu);
     write_int13_boot_image(floppy_int13, 0x00u, 0u, 2u, 0x6cu);
     write_int13_boot_image(hdd_int13_head, 0x80u, 1u, 1u, 0x6du);
+    write_int13_multi_boot_image(floppy_int13_multi, 0x00u, 0x71u, 0x72u);
+    write_int13_multi_boot_image(hdd_int13_multi, 0x80u, 0x73u, 0x74u);
     assert(softpc_machine_create(&conflicting_media, &conflicting_machine) ==
         SOFTPC_MACHINE_INVALID_ARGUMENT);
     assert(conflicting_machine == NULL);
@@ -202,6 +247,8 @@ int main(void)
     run_int13_boot_image(hdd_int13, 0, 0x6bu);
     run_int13_boot_image(floppy_int13, 1, 0x6cu);
     run_int13_boot_image(hdd_int13_head, 0, 0x6du);
+    run_int13_multi_boot_image(floppy_int13_multi, 1, 0x71u, 0x72u);
+    run_int13_multi_boot_image(hdd_int13_multi, 0, 0x73u, 0x74u);
     assert(remove(floppy) == 0);
     assert(remove(hdd) == 0);
     assert(remove(keyboard) == 0);
@@ -210,5 +257,7 @@ int main(void)
     assert(remove(hdd_int13) == 0);
     assert(remove(floppy_int13) == 0);
     assert(remove(hdd_int13_head) == 0);
+    assert(remove(floppy_int13_multi) == 0);
+    assert(remove(hdd_int13_multi) == 0);
     return 0;
 }

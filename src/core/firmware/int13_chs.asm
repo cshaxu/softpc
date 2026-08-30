@@ -1,0 +1,108 @@
+; Fixed-machine INT 13h read service.
+; The ROM is assembled to a byte array embedded by softpc_machine.c.  It is
+; deliberately firmware code, not a host callback or a BOP escape.
+
+BITS 16
+ORG 0x0100
+
+int13_read:
+    push ax
+    push bx
+    push cx
+    push dx
+    push di
+    push bp
+    push ax                       ; retain AH=function and AL=count
+    mov di, bx                    ; ES:DI destination for REP INSW
+    cmp ah, 0x02                  ; read sectors
+    jne fail
+    or al, al
+    jz fail
+    cmp al, 128                   ; standalone ATA PIO transfer limit
+    ja fail
+
+    mov ax, cx                    ; CH + CL[7:6] form the cylinder
+    xchg al, ah
+    and ah, 0xc0
+    shr ah, 6
+    mov bx, dx
+    mov bl, bh                    ; head
+    xor bh, bh
+    mov bp, dx
+    and bp, 0x00ff
+    cmp bp, 0x80
+    jb floppy_geometry
+    mov si, 16
+    jmp short head_geometry_ready
+floppy_geometry:
+    mov si, 2
+head_geometry_ready:
+    mul si                        ; cylinder * heads
+    add ax, bx
+    cmp bp, 0x80
+    jb floppy_sectors
+    mov si, 63
+    jmp short geometry_ready
+floppy_sectors:
+    mov si, 18
+geometry_ready:
+    mul si                        ; (cylinder * heads + head) * sectors
+    mov bx, cx
+    and bl, 0x3f
+    dec bx
+    add ax, bx                    ; LBA in AX (fixed profile stays < 64K)
+    mov bx, ax
+
+    mov dx, 0x1f2
+    pop cx
+    mov ax, cx
+    out dx, al                    ; ATA sector count
+    inc dx
+    mov ax, bx
+    out dx, al                    ; LBA[7:0]
+    inc dx
+    mov al, ah
+    out dx, al                    ; LBA[15:8]
+    inc dx
+    xor al, al
+    out dx, al                    ; LBA[23:16]
+    inc dx
+    mov al, 0xe0
+    out dx, al                    ; master, LBA mode
+    inc dx
+    mov al, 0x20
+    out dx, al                    ; read sectors
+
+    mov dx, 0x1f0
+    xor ch, ch
+read_sector:
+    push cx
+    mov cx, 0x100
+    cld
+read_word:
+    in ax, dx
+    stosw
+    loop read_word
+    pop cx
+    loop read_sector
+
+    pop bp
+    pop di
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    xor ah, ah
+    clc
+    iret
+fail:
+    pop cx
+    pop bp
+    pop di
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    mov ah, 0x01
+    stc
+    iret

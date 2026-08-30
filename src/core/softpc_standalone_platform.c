@@ -145,17 +145,20 @@ static IU8 softpc_hdd_lba_mid;
 static IU8 softpc_hdd_lba_high;
 static IU8 softpc_hdd_drive_head;
 static IU8 softpc_hdd_status;
-static IU8 softpc_hdd_buffer[512];
+#define SOFTPC_ATA_SECTOR_BYTES 512u
+#define SOFTPC_ATA_MAX_SECTORS 128u
+static IU8 softpc_hdd_buffer[SOFTPC_ATA_SECTOR_BYTES * SOFTPC_ATA_MAX_SECTORS];
 static IU32 softpc_hdd_buffer_offset;
+static IU32 softpc_hdd_transfer_bytes;
 
 static void softpc_hdd_inb(port, value)
 io_addr port;
 IU8 *value;
 {
     if (port == 0x1f0u && softpc_hdd_status == 0x48u &&
-        softpc_hdd_buffer_offset < sizeof(softpc_hdd_buffer)) {
+        softpc_hdd_buffer_offset < softpc_hdd_transfer_bytes) {
         *value = softpc_hdd_buffer[softpc_hdd_buffer_offset++];
-        if (softpc_hdd_buffer_offset == sizeof(softpc_hdd_buffer))
+        if (softpc_hdd_buffer_offset == softpc_hdd_transfer_bytes)
             softpc_hdd_status = 0x40u;
     } else if (port == 0x1f7u || port == 0x3f6u) {
         *value = softpc_hdd_status;
@@ -175,25 +178,29 @@ word *value;
     *value = (word)((IU16)low | ((IU16)high << 8u));
 }
 
-static void softpc_hdd_read_sector(void)
+static void softpc_hdd_read_sectors(void)
 {
     unsigned long lba;
-    if (softpc_hdd_file == NULL || softpc_hdd_sector_count != 1u) {
+    IU32 sectors = softpc_hdd_sector_count;
+    IU32 transfer_bytes;
+    if (sectors == 0u) sectors = 256u;
+    if (softpc_hdd_file == NULL || sectors > SOFTPC_ATA_MAX_SECTORS) {
         softpc_hdd_status = 0x41u;
         return;
     }
+    transfer_bytes = sectors * SOFTPC_ATA_SECTOR_BYTES;
     lba = (unsigned long)softpc_hdd_lba_low |
         ((unsigned long)softpc_hdd_lba_mid << 8u) |
         ((unsigned long)softpc_hdd_lba_high << 16u) |
         ((unsigned long)(softpc_hdd_drive_head & 0x0fu) << 24u);
-    if (fseek(softpc_hdd_file, (long)(lba * sizeof(softpc_hdd_buffer)), SEEK_SET) != 0 ||
-        fread(softpc_hdd_buffer, 1u, sizeof(softpc_hdd_buffer), softpc_hdd_file) !=
-            sizeof(softpc_hdd_buffer)) {
+    if (fseek(softpc_hdd_file, (long)(lba * SOFTPC_ATA_SECTOR_BYTES), SEEK_SET) != 0 ||
+        fread(softpc_hdd_buffer, 1u, transfer_bytes, softpc_hdd_file) != transfer_bytes) {
         clearerr(softpc_hdd_file);
         softpc_hdd_status = 0x41u;
         return;
     }
     softpc_hdd_buffer_offset = 0;
+    softpc_hdd_transfer_bytes = transfer_bytes;
     softpc_hdd_status = 0x48u;
 }
 
@@ -208,7 +215,7 @@ IU8 value;
     case 0x1f5u: softpc_hdd_lba_high = value; break;
     case 0x1f6u: softpc_hdd_drive_head = value; break;
     case 0x1f7u:
-        if (value == 0x20u) softpc_hdd_read_sector();
+        if (value == 0x20u) softpc_hdd_read_sectors();
         else if (value == 0xecu) softpc_hdd_status = 0x41u;
         break;
     case 0x3f6u:
@@ -223,6 +230,7 @@ int softpc_platform_hdd_attach(const char *path)
     softpc_hdd_file = NULL;
     softpc_hdd_status = 0x40u;
     softpc_hdd_buffer_offset = 0;
+    softpc_hdd_transfer_bytes = 0;
     if (path == NULL) return 1;
     softpc_hdd_file = fopen(path, "rb+");
     if (softpc_hdd_file == NULL) softpc_hdd_file = fopen(path, "rb");
@@ -235,6 +243,7 @@ void softpc_platform_hdd_detach(void)
     softpc_hdd_file = NULL;
     softpc_hdd_status = 0x40u;
     softpc_hdd_buffer_offset = 0;
+    softpc_hdd_transfer_bytes = 0;
 }
 
 void softpc_platform_hdd_init(void)
