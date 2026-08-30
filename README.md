@@ -30,7 +30,8 @@ guest-firmware services:
 - `INT 10h/AH=0Eh` — 80×25 text teletype output.
 - `INT 11h` — fixed equipment list (color text, FPU, and attached floppy).
 - `INT 12h` — fixed 640 KiB conventional-memory report.
-- `INT 13h/AH=02h` — contiguous CHS reads of up to 128 sectors.
+- `INT 13h/AH=02h` and `AH=03h` — contiguous CHS reads and writes of up to
+  128 sectors.
 - `INT 15h/AH=88h` — fixed 15 MiB extended-memory report.
 - `INT 16h/AH=00h` and `AH=01h` — ASCII/scan-code read and non-consuming
   availability check for basic US keyboard input.

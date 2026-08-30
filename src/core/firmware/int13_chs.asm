@@ -1,4 +1,4 @@
-; Fixed-machine INT 13h read service.
+; Fixed-machine INT 13h CHS read/write service.
 ; The ROM is assembled to a byte array embedded by softpc_machine.c.  It is
 ; deliberately firmware code, not a host callback or service escape.
 
@@ -10,16 +10,21 @@ int13_read:
     push bx
     push cx
     push dx
+    push si
     push di
     push bp
+    push ds
     push ax                       ; retain AH=function and AL=count
     cmp ah, 0x00                  ; controller reset
     je reset
     cmp ah, 0x08                  ; drive parameters
     je parameters
-    mov di, bx                    ; ES:DI destination for REP INSW
+    mov di, bx                    ; ES:DI destination / source offset
     cmp ah, 0x02                  ; read sectors
+    je transfer
+    cmp ah, 0x03                  ; write sectors
     jne fail
+transfer:
     or al, al
     jz fail
     cmp al, 128                   ; standalone ATA PIO transfer limit
@@ -60,6 +65,8 @@ int13_read:
     mov al, 0xe0
     out dx, al                    ; master, LBA mode
     inc dx
+    cmp ch, 0x03
+    je write_command
     mov al, 0x20
     out dx, al                    ; read sectors
 
@@ -75,9 +82,30 @@ read_word:
     loop read_word
     pop cx
     loop read_sector
+    jmp success
 
+write_command:
+    mov al, 0x30
+    out dx, al                    ; write sectors
+
+    mov dx, 0x1f0
+    xor ch, ch
+    push es
+    pop ds
+    mov si, di
+write_sector:
+    push cx
+    mov cx, 0x100
+    cld
+    rep outsw
+    pop cx
+    loop write_sector
+
+success:
+    pop ds
     pop bp
     pop di
+    pop si
     pop dx
     pop cx
     pop bx
@@ -87,8 +115,10 @@ read_word:
     iret
 reset:
     pop ax
+    pop ds
     pop bp
     pop di
+    pop si
     pop dx
     pop cx
     pop bx
@@ -98,8 +128,10 @@ reset:
     iret
 parameters:
     pop ax
+    pop ds
     pop bp
     pop di
+    pop si
     pop dx
     pop cx
     pop bx
@@ -114,8 +146,10 @@ parameters:
     iret
 fail:
     pop cx
+    pop ds
     pop bp
     pop di
+    pop si
     pop dx
     pop cx
     pop bx
