@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* CCPU's standalone executor entry points.  The wrapper intentionally calls
  * the core directly instead of the historical host_simulate/BOP facade. */
@@ -9,12 +10,20 @@ extern void c_cpu_init(void);
 extern void c_cpu_reset(void);
 extern void c_cpu_simulate(void);
 extern void sas_init(unsigned long size);
+extern void sas_term(void);
 extern void io_init(void);
 extern void ica0_init(void);
 extern void ica1_init(void);
 extern unsigned long softpc_ccpu_instruction_budget;
+extern int softpc_platform_write_physical(unsigned long address,
+    const unsigned char *bytes, unsigned long length);
+extern int softpc_platform_read_physical(unsigned long address,
+    unsigned char *bytes, unsigned long length);
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
+#define SOFTPC_BOOT_SECTOR_BYTES 512u
+#define SOFTPC_BOOT_SECTOR_ADDRESS 0x7c00u
+#define SOFTPC_RESET_VECTOR_ADDRESS 0xffff0u
 
 struct softpc_machine {
     softpc_machine_options options;
@@ -30,6 +39,34 @@ static int softpc_machine_media_exists(const char *path)
     if (file == NULL) return 0;
     fclose(file);
     return 1;
+}
+
+static softpc_machine_result softpc_machine_load_boot_sector(
+    const softpc_machine *machine)
+{
+    const char *path = machine->options.floppy_path != NULL ?
+        machine->options.floppy_path : machine->options.hard_disk_path;
+    unsigned char sector[SOFTPC_BOOT_SECTOR_BYTES];
+    FILE *file = fopen(path, "rb");
+    if (file == NULL) return SOFTPC_MACHINE_IO_ERROR;
+    if (fread(sector, 1u, sizeof(sector), file) != sizeof(sector)) {
+        fclose(file);
+        return SOFTPC_MACHINE_IO_ERROR;
+    }
+    fclose(file);
+    if (sector[510] != 0x55u || sector[511] != 0xaau)
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    if (!softpc_platform_write_physical(SOFTPC_BOOT_SECTOR_ADDRESS, sector,
+            sizeof(sector))) return SOFTPC_MACHINE_IO_ERROR;
+    return SOFTPC_MACHINE_OK;
+}
+
+static softpc_machine_result softpc_machine_install_reset_rom(void)
+{
+    /* far jmp 0000:7c00 -- architectural reset enters here at f000:fff0 */
+    static const unsigned char reset_vector[] = { 0xeau, 0x00u, 0x7cu, 0x00u, 0x00u };
+    return softpc_platform_write_physical(SOFTPC_RESET_VECTOR_ADDRESS,
+        reset_vector, sizeof(reset_vector)) ? SOFTPC_MACHINE_OK : SOFTPC_MACHINE_IO_ERROR;
 }
 
 softpc_machine_result softpc_machine_create(const softpc_machine_options *options,
@@ -61,8 +98,24 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     }
     c_cpu_init();
     c_cpu_reset();
+    {
+        softpc_machine_result result = softpc_machine_load_boot_sector(machine);
+        if (result != SOFTPC_MACHINE_OK) return result;
+        result = softpc_machine_install_reset_rom();
+        if (result != SOFTPC_MACHINE_OK) return result;
+    }
     machine->reset = 1;
     return SOFTPC_MACHINE_OK;
+}
+
+softpc_machine_result softpc_machine_read_physical(const softpc_machine *machine,
+    uint32_t address, void *buffer, uint32_t bytes)
+{
+    if (machine == NULL || buffer == NULL || !machine->reset || bytes == 0u)
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    return softpc_platform_read_physical((unsigned long)address,
+        (unsigned char *)buffer, (unsigned long)bytes) ?
+        SOFTPC_MACHINE_OK : SOFTPC_MACHINE_INVALID_ARGUMENT;
 }
 
 softpc_machine_result softpc_machine_run(softpc_machine *machine,
@@ -77,6 +130,7 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
 
 void softpc_machine_destroy(softpc_machine *machine)
 {
+    if (machine != NULL && machine->hardware_initialized) sas_term();
     free(machine);
 }
 

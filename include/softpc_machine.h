@@ -28,6 +28,8 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
 softpc_machine_result softpc_machine_reset(softpc_machine *machine);
 softpc_machine_result softpc_machine_run(softpc_machine *machine,
     uint64_t instruction_budget);
+softpc_machine_result softpc_machine_read_physical(const softpc_machine *machine,
+    uint32_t address, void *buffer, uint32_t bytes);
 void softpc_machine_destroy(softpc_machine *machine);
 
 const char *softpc_machine_result_name(softpc_machine_result result);

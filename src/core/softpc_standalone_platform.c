@@ -20,11 +20,13 @@
 extern void c_cpu_simulate();
 
 static UTINY *softpc_ram;
+static sys_addr softpc_ram_size;
 IU32 softpc_ccpu_instruction_budget = 0;
 
 UTINY *host_sas_init(sys_addr size)
 {
     softpc_ram = (UTINY *)calloc((size_t)size + 0x2000u, 1u);
+    softpc_ram_size = softpc_ram == NULL ? 0 : size;
     return softpc_ram;
 }
 
@@ -32,7 +34,24 @@ UTINY *host_sas_term(void)
 {
     free(softpc_ram);
     softpc_ram = NULL;
+    softpc_ram_size = 0;
     return NULL;
+}
+
+int softpc_platform_write_physical(IU32 address, const IU8 *bytes, IU32 length)
+{
+    if (bytes == NULL || address > softpc_ram_size ||
+        length > softpc_ram_size - address) return 0;
+    memcpy(softpc_ram + address, bytes, length);
+    return 1;
+}
+
+int softpc_platform_read_physical(IU32 address, IU8 *bytes, IU32 length)
+{
+    if (bytes == NULL || address > softpc_ram_size ||
+        length > softpc_ram_size - address) return 0;
+    memcpy(bytes, softpc_ram + address, length);
+    return 1;
 }
 
 void host_set_hw_int(void)
