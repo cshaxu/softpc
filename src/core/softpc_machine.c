@@ -15,6 +15,8 @@ extern void io_init(void);
 extern void SWPIC_init_funcptrs(void);
 extern void ica0_init(void);
 extern void ica1_init(void);
+extern void ica0_post(void);
+extern void ica1_post(void);
 extern unsigned long softpc_ccpu_instruction_budget;
 extern int softpc_platform_write_physical(unsigned long address,
     const unsigned char *bytes, unsigned long length);
@@ -157,6 +159,11 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     }
     c_cpu_init();
     c_cpu_reset();
+    /* The original product's BIOS POST programmed the two 8259 PICs after
+       their port glue was registered.  A standalone reset owns that hardware
+       action directly; it is not a DOS or VDM service. */
+    ica0_post();
+    ica1_post();
     if (!softpc_platform_hdd_attach(machine->options.hard_disk_path != NULL ?
             machine->options.hard_disk_path : machine->options.floppy_path))
         return SOFTPC_MACHINE_IO_ERROR;
