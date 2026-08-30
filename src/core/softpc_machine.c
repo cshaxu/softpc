@@ -166,6 +166,11 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u
     };
     static const unsigned char int16_vector[] = { 0x00u, 0x03u, 0x00u, 0xf0u };
+    /* IRQ0 acknowledges the fixed master PIC and returns to guest code. */
+    static const unsigned char irq0_rom[] = {
+        0xb0u, 0x20u, 0xe6u, 0x20u, 0xcfu
+    };
+    static const unsigned char irq0_vector[] = { 0x00u, 0x04u, 0x00u, 0xf0u };
     static const unsigned char floppy_reset_vector[] = {
         0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
     };
@@ -188,7 +193,11 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         !softpc_platform_write_physical(0xf0300u, int16_keyboard_rom,
             sizeof(int16_keyboard_rom)) ||
         !softpc_platform_write_physical(0x58u, int16_vector,
-            sizeof(int16_vector))) return SOFTPC_MACHINE_IO_ERROR;
+            sizeof(int16_vector)) ||
+        !softpc_platform_write_physical(0xf0400u, irq0_rom,
+            sizeof(irq0_rom)) ||
+        !softpc_platform_write_physical(0x20u, irq0_vector,
+            sizeof(irq0_vector))) return SOFTPC_MACHINE_IO_ERROR;
     if (machine->options.floppy_path == NULL) {
         if (!softpc_platform_write_physical(0xf0000u, hdd_boot_rom,
                 sizeof(hdd_boot_rom)) ||
