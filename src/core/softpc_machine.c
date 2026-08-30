@@ -193,10 +193,6 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u
     };
     static const unsigned char int16_vector[] = { 0x00u, 0x03u, 0x00u, 0xf0u };
-    /* The original ROM's INT 11h/12h entry points issue BOPs to the
-       restored equipment and memory-size services. */
-    static const unsigned char int12_vector[] = { 0x41u, 0xf8u, 0x00u, 0xf0u };
-    static const unsigned char int11_vector[] = { 0x4du, 0xf8u, 0x00u, 0xf0u };
     /* INT 1Ah/AH=00h reads the BIOS data area's IRQ0-maintained tick count. */
     static const unsigned char int1a_clock_rom[] = {
         0x1eu, 0x80u, 0xfcu, 0x00u, 0x75u, 0x11u, 0x31u, 0xc0u,
@@ -246,10 +242,6 @@ static softpc_machine_result softpc_machine_install_reset_rom(
             sizeof(int16_keyboard_rom)) ||
         !softpc_platform_write_physical(0x58u, int16_vector,
             sizeof(int16_vector)) ||
-        !softpc_platform_write_physical(0x48u, int12_vector,
-            sizeof(int12_vector)) ||
-        !softpc_platform_write_physical(0x44u, int11_vector,
-            sizeof(int11_vector)) ||
         /* BDA equipment at 0040:0010, conventional memory at 0040:0013. */
         !softpc_platform_write_physical(0x410u, bda_configuration,
             sizeof(bda_configuration)) ||
