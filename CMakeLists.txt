@@ -57,8 +57,13 @@ target_include_directories(softpc-machine PRIVATE
     src/core)
 target_compile_definitions(softpc-machine PRIVATE SOFTPC_STANDALONE=1)
 
-add_executable(softpcvm src/vm/main.c)
+add_executable(softpcvm
+    src/vm/main.c
+    src/vm/win32_window.c)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
+if(WIN32)
+    target_link_libraries(softpcvm PRIVATE user32 gdi32)
+endif()
 
 enable_testing()
 add_executable(softpc-machine-smoke tests/softpc_machine_smoke.c)

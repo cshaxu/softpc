@@ -1,4 +1,5 @@
 #include "softpc_machine.h"
+#include "win32_window.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -36,7 +37,12 @@ int main(int argc, char **argv)
         return 1;
     }
     result = softpc_machine_reset(machine);
-    if (result == SOFTPC_MACHINE_OK) result = softpc_machine_run(machine, 100000u);
+    if (result == SOFTPC_MACHINE_OK &&
+        options.presentation == SOFTPC_PRESENTATION_WINDOW) {
+        if (softpc_vm_run_window(machine) != 0) result = SOFTPC_MACHINE_IO_ERROR;
+    } else if (result == SOFTPC_MACHINE_OK) {
+        result = softpc_machine_run(machine, 100000u);
+    }
     if (result != SOFTPC_MACHINE_OK)
         fprintf(stderr, "softpcvm: %s\n", softpc_machine_result_name(result));
     softpc_machine_destroy(machine);
