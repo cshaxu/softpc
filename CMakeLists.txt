@@ -44,6 +44,10 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/system/cmos.c
     src/core/softpc/base/system/idetect.c
     src/core/softpc/base/system/rom.c
+    src/core/softpc/base/system/timer.c
+    src/core/softpc/base/system/timestrb.c
+    src/core/softpc/base/support/time_day.c
+    src/core/softpc/base/bios/cmos_bis.c
     src/core/softpc/base/keymouse/ppi.c
     src/core/softpc/base/keymouse/keyba.c
     src/core/softpc/base/keymouse/keybd_io.c

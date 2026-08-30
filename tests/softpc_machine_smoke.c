@@ -239,9 +239,10 @@ static void write_int1a_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
     FILE *file;
-    /* Set BDA ticks to 1234h; AH=00h; INT 1Ah; store DX:CX at 0500h. */
+    /* Set BDA ticks to 00001234h; AH=00h; INT 1Ah; store DX:CX at 0500h. */
     unsigned char program[] = {
-        0xc7u, 0x06u, 0x6cu, 0x04u, 0x34u, 0x12u, 0xb4u, 0x00u,
+        0xc7u, 0x06u, 0x6cu, 0x04u, 0x34u, 0x12u,
+        0xc7u, 0x06u, 0x6eu, 0x04u, 0x00u, 0x00u, 0xb4u, 0x00u,
         0xcdu, 0x1au, 0x89u, 0x16u, 0x00u, 0x05u, 0x89u, 0x0eu,
         0x02u, 0x05u, 0xebu, 0xfeu
     };
@@ -257,11 +258,11 @@ static void write_int1a_tick_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
     FILE *file;
-    /* Program PIT for every instruction, then repeatedly read its BDA tick
+    /* Program PIT at a high, but finite rate, then repeatedly read its BDA tick
        through INT 1Ah into 0500h. */
     unsigned char program[] = {
         0xfau, 0x31u, 0xc0u, 0x8eu, 0xd8u, 0xb0u, 0x34u, 0xe6u,
-        0x43u, 0xb0u, 0x01u, 0xe6u, 0x40u, 0xb0u, 0x00u, 0xe6u,
+        0x43u, 0xb0u, 0x00u, 0xe6u, 0x40u, 0xb0u, 0x10u, 0xe6u,
         0x40u, 0xfbu, 0xb4u, 0x00u, 0xcdu, 0x1au, 0x89u, 0x16u,
         0x00u, 0x05u, 0xebu, 0xf6u
     };
@@ -635,9 +636,11 @@ static void run_timer_boot_image(const char *path)
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    assert(softpc_machine_run(machine, 16u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 64u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
-    assert(marker == 0x34u);
+    /* The original 8253 advances between the guest's load and read I/O
+       instructions; the old standalone PIT incorrectly returned 34h. */
+    assert(marker == 0x71u);
     softpc_machine_destroy(machine);
 }
 
@@ -650,7 +653,9 @@ static void run_cmos_boot_image(const char *path)
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_run(machine, 16u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
-    assert(marker == 0u);
+    /* The original CMOS RTC begins its reset/update phase with UIP asserted;
+       the removed handwritten stub returned an inert zero register. */
+    assert(marker == 0x80u);
     softpc_machine_destroy(machine);
 }
 

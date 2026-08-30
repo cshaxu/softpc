@@ -54,8 +54,6 @@ word *stream_io_dirty_count_ptr = NULL;
 /* Original EGA/VGA controller host ports.  Presentation remains owned by the
    standalone console/window; these callbacks preserve the controller's
    lifecycle without importing the historical host product. */
-boolean timer_video_enabled = FALSE;
-
 static void softpc_video_void(void) {}
 static void softpc_video_init_screen(void)
 {
@@ -124,17 +122,6 @@ void memset4(unsigned int data, unsigned int *destination, unsigned int count)
 
 #define SOFTPC_CONFIG_GFX_ADAPTER 54u
 #define SOFTPC_VGA_ADAPTER 5u
-
-static void softpc_timer2_gate(port, value)
-io_addr port;
-half_word value;
-{
-    UNUSED(port);
-    UNUSED(value);
-}
-
-void (*timer_gate_func) IPT2(io_addr, port, half_word, value) =
-    softpc_timer2_gate;
 
 void host_enable_timer2_sound(void)
 {
@@ -284,18 +271,6 @@ BOOL apply;
     UNUSED(apply);
 }
 
-half_word cmos_read(cmos_byte)
-int cmos_byte;
-{
-    half_word value = 0;
-    (void)cmos_read_byte(cmos_byte, &value);
-    return value;
-}
-
-void set_tod(void)
-{
-}
-
 long host_time(long *location)
 {
     long value = (long)time(NULL);
@@ -320,6 +295,49 @@ struct host_tm *host_localtime(time_t *clock_value)
     result.tm_yday = native_time->tm_yday;
     result.tm_isdst = native_time->tm_isdst;
     return &result;
+}
+
+/* The original 8253 remains responsible for guest time.  These functions
+   are only its standalone host ports: wall-clock sampling, bounded slice
+   scheduling, host-speed calibration, and optional speaker presentation. */
+void host_gettimeofday(struct host_timeval *value, struct host_timezone *zone)
+{
+    FILETIME file_time;
+    ULARGE_INTEGER ticks;
+    const ULONGLONG unix_epoch_in_filetime = 116444736000000000ULL;
+    ULONGLONG microseconds;
+
+    if (value == NULL) return;
+    GetSystemTimeAsFileTime(&file_time);
+    ticks.LowPart = file_time.dwLowDateTime;
+    ticks.HighPart = file_time.dwHighDateTime;
+    microseconds = (ticks.QuadPart - unix_epoch_in_filetime) / 10ULL;
+    value->tv_sec = (IS32)(microseconds / 1000000ULL);
+    value->tv_usec = (IS32)(microseconds % 1000000ULL);
+    if (zone != NULL) {
+        zone->tz_minuteswest = 0;
+        zone->tz_dsttime = 0;
+    }
+}
+
+IU32 host_speed(IU32 nominal_instructions)
+{
+    return nominal_instructions == 0u ? 1u : nominal_instructions;
+}
+
+void host_timer2_waveform(unsigned int delay, unsigned long low_clocks,
+    unsigned long high_clocks, int starts_low, int repeats)
+{
+    UNUSED(delay);
+    UNUSED(low_clocks);
+    UNUSED(high_clocks);
+    UNUSED(starts_low);
+    UNUSED(repeats);
+}
+
+void host_timer_init(void)
+{
+    /* The VM loop calls the original time_strobe() once per bounded slice. */
 }
 
 quick_event_delays host_delays = { 0, 0, 0, 0, 0, 0, 25000 };
@@ -355,79 +373,6 @@ char *extra_text;
     UNUSED(options);
     UNUSED(extra_text);
     return 0;
-}
-
-/* Fixed-machine 8253 channel 0.  The run-loop advances it in guest
- * instruction time and routes expiry through the machine PIC. */
-static IU32 softpc_pit_reload = 65536u;
-static IU32 softpc_pit_elapsed;
-static IU32 softpc_pit_ticks;
-static IU8 softpc_pit_write_low;
-static IU8 softpc_pit_read_low;
-
-static void softpc_pit_inb(port, value)
-io_addr port;
-IU8 *value;
-{
-    if (port != 0x40u) {
-        *value = 0u;
-        return;
-    }
-    if (!softpc_pit_read_low) {
-        *value = (IU8)(softpc_pit_reload & 0xffu);
-        softpc_pit_read_low = 1u;
-    } else {
-        *value = (IU8)((softpc_pit_reload >> 8u) & 0xffu);
-        softpc_pit_read_low = 0u;
-    }
-}
-
-static void softpc_pit_outb(port, value)
-io_addr port;
-IU8 value;
-{
-    if (port == 0x43u) {
-        if ((value & 0xc0u) == 0u) softpc_pit_write_low = 0u;
-        return;
-    }
-    if (port != 0x40u) return;
-    if (!softpc_pit_write_low) {
-        softpc_pit_reload = (softpc_pit_reload & 0xff00u) | value;
-        softpc_pit_write_low = 1u;
-    } else {
-        softpc_pit_reload = (softpc_pit_reload & 0x00ffu) | ((IU32)value << 8u);
-        if (softpc_pit_reload == 0u) softpc_pit_reload = 65536u;
-        softpc_pit_elapsed = 0u;
-        softpc_pit_write_low = 0u;
-    }
-}
-
-void softpc_platform_timer_init(void)
-{
-    softpc_pit_reload = 65536u;
-    softpc_pit_elapsed = 0u;
-    softpc_pit_ticks = 0u;
-    softpc_pit_write_low = 0u;
-    softpc_pit_read_low = 0u;
-    io_define_inb(TIMER_ADAPTOR, softpc_pit_inb);
-    io_define_outb(TIMER_ADAPTOR, softpc_pit_outb);
-    io_connect_port(0x40u, TIMER_ADAPTOR, IO_READ | IO_WRITE);
-    io_connect_port(0x43u, TIMER_ADAPTOR, IO_WRITE);
-}
-
-void softpc_platform_timer_advance(IU32 instructions)
-{
-    softpc_pit_elapsed += instructions;
-    while (softpc_pit_elapsed >= softpc_pit_reload) {
-        softpc_pit_elapsed -= softpc_pit_reload;
-        ++softpc_pit_ticks;
-        ica_hw_interrupt(ICA_MASTER, CPU_TIMER_INT, 1);
-    }
-}
-
-IU32 softpc_platform_timer_ticks(void)
-{
-    return softpc_pit_ticks;
 }
 
 void softpc_platform_keyboard_init(void)

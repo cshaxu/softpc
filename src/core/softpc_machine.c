@@ -40,9 +40,11 @@ extern int softpc_platform_read_physical(unsigned long address,
 extern void softpc_platform_keyboard_init(void);
 extern void softpc_device_bop_register_machine_services(void);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
-extern void softpc_platform_timer_init(void);
-extern void softpc_platform_timer_advance(unsigned long instructions);
-extern unsigned long softpc_platform_timer_ticks(void);
+extern void SWTMR_init_funcptrs(void);
+extern void timer_init(void);
+extern void timer_post(void);
+extern void time_of_day_init(void);
+extern void time_strobe(void);
 extern void softpc_platform_hdd_init(void);
 extern int softpc_platform_hdd_attach(const char *floppy_path,
     const char *hard_disk_path);
@@ -430,7 +432,7 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         dma_init();
         cmos_init();
         ppi_init();
-        softpc_platform_timer_init();
+        SWTMR_init_funcptrs();
         softpc_platform_keyboard_init();
         softpc_device_bop_register_machine_services();
         softpc_platform_hdd_init();
@@ -458,6 +460,9 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     soft_reset = machine->reset ? 1 : 0;
     gvi_init(5u);
     video_init();
+    time_of_day_init();
+    timer_init();
+    timer_post();
     /* The original product's BIOS POST programmed the two 8259 PICs after
        their port glue was registered.  A standalone reset owns that hardware
        action directly; it is not a guest-service operation. */
@@ -507,18 +512,7 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     softpc_ccpu_instruction_budget = (unsigned long)instruction_budget;
     c_cpu_simulate();
-    softpc_platform_timer_advance((unsigned long)instruction_budget -
-        softpc_ccpu_instruction_budget);
-    {
-        unsigned long ticks = softpc_platform_timer_ticks();
-        unsigned char bda_ticks[4];
-        bda_ticks[0] = (unsigned char)ticks;
-        bda_ticks[1] = (unsigned char)(ticks >> 8u);
-        bda_ticks[2] = (unsigned char)(ticks >> 16u);
-        bda_ticks[3] = (unsigned char)(ticks >> 24u);
-        if (!softpc_platform_write_physical(0x46cu, bda_ticks,
-                sizeof(bda_ticks))) return SOFTPC_MACHINE_IO_ERROR;
-    }
+    time_strobe();
     return SOFTPC_MACHINE_OK;
 }
 
