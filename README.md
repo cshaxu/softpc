@@ -19,6 +19,13 @@ core links the detached CCPU, SAS, I/O, PIC and event packages through
 standalone host ports; firmware, storage controllers and presentation are the
 next machine-owned packages to complete.
 
+Exactly one boot medium is accepted at present. The fixed firmware boots its
+first sector and provides single-sector CHS reads for the selected medium;
+this is sufficient for the checked boot and follow-on-read paths, not a claim
+of complete BIOS or controller compatibility. A simultaneous floppy and hard
+disk configuration will be enabled only with separate machine-owned device
+backends.
+
 ## Source layout
 
 - `src/core/softpc/` — imported SoftPC baseline.  This is the primary source
