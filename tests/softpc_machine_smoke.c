@@ -67,6 +67,22 @@ static void write_text_boot_image(const char *path)
     assert(fclose(file) == 0);
 }
 
+static void write_int10_boot_image(const char *path)
+{
+    unsigned char sector[512] = { 0 };
+    FILE *file;
+    /* mov ah,0e; mov al,'V'; int 10; jmp $ */
+    unsigned char program[] = {
+        0xb4u, 0x0eu, 0xb0u, 0x56u, 0xcdu, 0x10u, 0xebu, 0xfeu
+    };
+    memcpy(sector, program, sizeof(program));
+    sector[510] = 0x55u; sector[511] = 0xaau;
+    file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
+    assert(fclose(file) == 0);
+}
+
 static void write_hdd_pio_boot_image(const char *path)
 {
     unsigned char image[1024] = { 0 };
@@ -197,6 +213,21 @@ static void run_text_boot_image(const char *path)
     softpc_machine_destroy(machine);
 }
 
+static void run_int10_boot_image(const char *path)
+{
+    unsigned char cell[2] = { 0, 0 };
+    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 64u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0xb8000u, cell,
+        sizeof(cell)) == SOFTPC_MACHINE_OK);
+    assert(cell[0] == 'V');
+    assert(cell[1] == 0x07u);
+    softpc_machine_destroy(machine);
+}
+
 static void run_hdd_pio_boot_image(const char *path)
 {
     unsigned char marker = 0;
@@ -250,6 +281,7 @@ int main(void)
     const char *keyboard = "softpc-machine-keyboard-smoke.img";
     const char *timer = "softpc-machine-timer-smoke.img";
     const char *text = "softpc-machine-text-smoke.img";
+    const char *int10 = "softpc-machine-int10-smoke.img";
     const char *hdd_pio = "softpc-machine-hdd-pio-smoke.img";
     const char *hdd_int13 = "softpc-machine-hdd-int13-smoke.img";
     const char *floppy_int13 = "softpc-machine-floppy-int13-smoke.img";
@@ -264,6 +296,7 @@ int main(void)
     write_keyboard_boot_image(keyboard);
     write_timer_boot_image(timer);
     write_text_boot_image(text);
+    write_int10_boot_image(int10);
     write_hdd_pio_boot_image(hdd_pio);
     write_int13_boot_image(hdd_int13, 0x80u, 0u, 2u, 0x6bu);
     write_int13_boot_image(floppy_int13, 0x00u, 0u, 2u, 0x6cu);
@@ -278,6 +311,7 @@ int main(void)
     run_keyboard_boot_image(keyboard);
     run_timer_boot_image(timer);
     run_text_boot_image(text);
+    run_int10_boot_image(int10);
     run_hdd_pio_boot_image(hdd_pio);
     run_int13_boot_image(hdd_int13, 0, 0x6bu);
     run_int13_boot_image(floppy_int13, 1, 0x6cu);
@@ -289,6 +323,7 @@ int main(void)
     assert(remove(keyboard) == 0);
     assert(remove(timer) == 0);
     assert(remove(text) == 0);
+    assert(remove(int10) == 0);
     assert(remove(hdd_pio) == 0);
     assert(remove(hdd_int13) == 0);
     assert(remove(floppy_int13) == 0);

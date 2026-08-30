@@ -111,13 +111,30 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0xb4u, 0x01u, 0xf9u, 0xcfu
     };
     static const unsigned char hdd_int13_vector[] = { 0x00u, 0x01u, 0x00u, 0xf0u };
+    /* Assembled from firmware/int10_teletype.asm; embedding keeps the normal
+       C build independent of an assembler installation. */
+    static const unsigned char int10_teletype_rom[] = {
+        0x50u, 0x53u, 0x52u, 0x57u, 0x06u, 0x80u, 0xfcu, 0x0eu,
+        0x75u, 0x2bu, 0xbbu, 0x00u, 0xb8u, 0x8eu, 0xc3u, 0x2eu,
+        0x8bu, 0x3eu, 0x3bu, 0x02u, 0x3cu, 0x0du, 0x74u, 0x1du,
+        0x3cu, 0x0au, 0x74u, 0x19u, 0xb4u, 0x07u, 0xabu, 0x2eu,
+        0x83u, 0x06u, 0x3bu, 0x02u, 0x02u, 0x2eu, 0x81u, 0x3eu,
+        0x3bu, 0x02u, 0xa0u, 0x0fu, 0x72u, 0x07u, 0x2eu, 0xc7u,
+        0x06u, 0x3bu, 0x02u, 0x00u, 0x00u, 0x07u, 0x5fu, 0x5au,
+        0x5bu, 0x58u, 0xcfu, 0x00u, 0x00u
+    };
+    static const unsigned char int10_vector[] = { 0x00u, 0x02u, 0x00u, 0xf0u };
     static const unsigned char floppy_reset_vector[] = {
         0xeau, 0x00u, 0x7cu, 0x00u, 0x00u
     };
     if (!softpc_platform_write_physical(0xf0100u, hdd_int13_rom,
             sizeof(hdd_int13_rom)) ||
         !softpc_platform_write_physical(0x4cu, hdd_int13_vector,
-            sizeof(hdd_int13_vector))) return SOFTPC_MACHINE_IO_ERROR;
+            sizeof(hdd_int13_vector)) ||
+        !softpc_platform_write_physical(0xf0200u, int10_teletype_rom,
+            sizeof(int10_teletype_rom)) ||
+        !softpc_platform_write_physical(0x40u, int10_vector,
+            sizeof(int10_vector))) return SOFTPC_MACHINE_IO_ERROR;
     if (machine->options.floppy_path == NULL) {
         if (!softpc_platform_write_physical(0xf0000u, hdd_boot_rom,
                 sizeof(hdd_boot_rom)) ||
