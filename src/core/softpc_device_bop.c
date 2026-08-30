@@ -39,6 +39,10 @@ void softpc_device_bop_register_machine_services IFN0()
     extern void time_int IPT0();
     extern void time_of_day IPT0();
     extern void kb_idle_poll IPT0();
+    extern void re_direct IPT0();
+    extern void D11_int IPT0();
+    extern void int_287 IPT0();
+    extern void unexpected_int IPT0();
     extern void bootstrap IPT0();
     extern void bootstrap1 IPT0();
     extern void bootstrap2 IPT0();
@@ -52,6 +56,7 @@ void softpc_device_bop_register_machine_services IFN0()
     extern void mouse_video_io IPT0();
 
     BIOS[0x06] = illegal_op_int;
+    BIOS[BIOS_UNEXP_INT] = unexpected_int;
     BIOS[BIOS_KB_INT] = keyboard_int;
     BIOS[BIOS_KEYBOARD_IO] = keyboard_io;
     BIOS[BIOS_DISKETTE_INT] = diskette_int;
@@ -70,6 +75,13 @@ void softpc_device_bop_register_machine_services IFN0()
     BIOS[BIOS_TIMER_INT] = time_int;
     BIOS[BIOS_TIME_OF_DAY] = time_of_day;
     BIOS[BIOS_KEYBOARD_BREAK + 2] = kb_idle_poll;
+    BIOS[0x71] = re_direct;
+    BIOS[0x72] = D11_int;
+    BIOS[0x73] = D11_int;
+    BIOS[0x74] = D11_int;
+    BIOS[0x75] = int_287;
+    BIOS[0x76] = D11_int;
+    BIOS[0x77] = D11_int;
     BIOS[BIOS_BOOT_STRAP] = bootstrap;
     BIOS[0x90] = bootstrap1;
     BIOS[0x91] = bootstrap2;

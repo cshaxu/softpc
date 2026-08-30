@@ -57,6 +57,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/bios/cmos_bis.c
     src/core/softpc/base/bios/bootstra.c
     src/core/softpc/base/bios/ivt.c
+    src/core/softpc/base/bios/slave_bs.c
     src/core/softpc/base/bios/tape_io.c
     src/core/softpc/base/bios/equipmnt.c
     src/core/softpc/base/bios/mem_size.c
