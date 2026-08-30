@@ -119,7 +119,7 @@ static softpc_machine_result softpc_machine_load_boot_sector(
 static softpc_machine_result softpc_machine_install_reset_rom(
     const softpc_machine *machine)
 {
-    unsigned char bda_configuration[5];
+    unsigned char bda_configuration[6];
     unsigned char bda_fixed_disk_count;
     /* Architectural reset enters at f000:fff0. HDD boot uses ATA PIO to
        fetch LBA 0; floppy remains on the temporary sector-load path. */
@@ -221,17 +221,10 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u
     };
     static const unsigned char int16_vector[] = { 0x00u, 0x03u, 0x00u, 0xf0u };
-    /* INT 12h reports the fixed machine's conventional-memory extent. */
-    static const unsigned char int12_memory_rom[] = {
-        0xb8u, 0x80u, 0x02u, 0xcfu
-    };
-    static const unsigned char int12_vector[] = { 0x00u, 0x05u, 0x00u, 0xf0u };
-    /* INT 11h exposes the fixed display/FPU equipment plus the attached
-       removable drive, if this boot has one. */
-    static unsigned char int11_equipment_rom[] = {
-        0xb8u, 0x22u, 0x00u, 0xcfu
-    };
-    static const unsigned char int11_vector[] = { 0x00u, 0x07u, 0x00u, 0xf0u };
+    /* The original ROM's INT 11h/12h entry points issue BOPs to the
+       restored equipment and memory-size services. */
+    static const unsigned char int12_vector[] = { 0x41u, 0xf8u, 0x00u, 0xf0u };
+    static const unsigned char int11_vector[] = { 0x4du, 0xf8u, 0x00u, 0xf0u };
     /* INT 1Ah/AH=00h reads the BIOS data area's IRQ0-maintained tick count. */
     static const unsigned char int1a_clock_rom[] = {
         0x1eu, 0x80u, 0xfcu, 0x00u, 0x75u, 0x11u, 0x31u, 0xc0u,
@@ -287,13 +280,12 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         int15_memory_rom[6] = (unsigned char)extended_kib;
         int15_memory_rom[7] = (unsigned char)(extended_kib >> 8u);
     }
-    int11_equipment_rom[1] = machine->options.floppy_path != NULL ?
-        0x23u : 0x22u;
-    bda_configuration[0] = int11_equipment_rom[1];
+    bda_configuration[0] = machine->options.floppy_path != NULL ? 0x23u : 0x22u;
     bda_configuration[1] = 0u;
-    bda_configuration[2] = 0x80u;
-    bda_configuration[3] = 0x02u;
-    bda_configuration[4] = 0u;
+    bda_configuration[2] = 0u;
+    bda_configuration[3] = 0x80u;
+    bda_configuration[4] = 0x02u;
+    bda_configuration[5] = 0u;
     bda_fixed_disk_count = machine->options.hard_disk_path != NULL ? 1u : 0u;
     if (!softpc_platform_write_physical(0xf0200u, int10_teletype_rom,
             sizeof(int10_teletype_rom)) ||
@@ -303,12 +295,8 @@ static softpc_machine_result softpc_machine_install_reset_rom(
             sizeof(int16_keyboard_rom)) ||
         !softpc_platform_write_physical(0x58u, int16_vector,
             sizeof(int16_vector)) ||
-        !softpc_platform_write_physical(0xf0500u, int12_memory_rom,
-            sizeof(int12_memory_rom)) ||
         !softpc_platform_write_physical(0x48u, int12_vector,
             sizeof(int12_vector)) ||
-        !softpc_platform_write_physical(0xf0700u, int11_equipment_rom,
-            sizeof(int11_equipment_rom)) ||
         !softpc_platform_write_physical(0x44u, int11_vector,
             sizeof(int11_vector)) ||
         /* BDA equipment at 0040:0010, conventional memory at 0040:0013. */

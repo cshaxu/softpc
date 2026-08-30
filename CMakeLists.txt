@@ -48,6 +48,8 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/system/timestrb.c
     src/core/softpc/base/support/time_day.c
     src/core/softpc/base/bios/cmos_bis.c
+    src/core/softpc/base/bios/equipmnt.c
+    src/core/softpc/base/bios/mem_size.c
     src/core/softpc/base/comms/printer.c
     src/core/softpc/base/comms/printer_.c
     src/core/softpc/base/comms/com.c

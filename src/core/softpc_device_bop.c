@@ -30,6 +30,8 @@ void softpc_device_bop_register_machine_services IFN0()
     extern void printer_io IPT0();
     extern void rs232_io IPT0();
     extern void disk_io IPT0();
+    extern void equipment IPT0();
+    extern void memory_size IPT0();
     extern void mouse_install1 IPT0();
     extern void mouse_install2 IPT0();
     extern void mouse_int1 IPT0();
@@ -46,6 +48,8 @@ void softpc_device_bop_register_machine_services IFN0()
     BIOS[BIOS_PRINTER_IO] = printer_io;
     BIOS[BIOS_RS232_IO] = rs232_io;
     BIOS[BIOS_DISK_IO] = disk_io;
+    BIOS[BIOS_EQUIPMENT] = equipment;
+    BIOS[BIOS_MEMORY_SIZE] = memory_size;
     BIOS[BIOS_MOUSE_INSTALL1] = mouse_install1;
     BIOS[BIOS_MOUSE_INSTALL2] = mouse_install2;
     BIOS[BIOS_MOUSE_INT1] = mouse_int1;

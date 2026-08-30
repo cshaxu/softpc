@@ -711,7 +711,7 @@ static void run_int12_boot_image(const char *path)
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    assert(softpc_machine_run(machine, 64u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine, 256u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, memory_kib,
         sizeof(memory_kib)) == SOFTPC_MACHINE_OK);
     assert(memory_kib[0] == 0x80u && memory_kib[1] == 0x02u);
@@ -738,7 +738,7 @@ static void run_int11_boot_image(const char *path, int floppy,
 static void run_bda_configuration_image(const char *path, int floppy,
     unsigned char expected_equipment)
 {
-    unsigned char configuration[5] = { 0, 0, 0, 0, 0 };
+    unsigned char configuration[6] = { 0, 0, 0, 0, 0, 0 };
     unsigned char fixed_disk_count = 0xffu;
     softpc_machine_options options = { NULL, NULL,
         SOFTPC_PRESENTATION_CONSOLE };
@@ -750,8 +750,9 @@ static void run_bda_configuration_image(const char *path, int floppy,
     assert(softpc_machine_read_physical(machine, 0x410u, configuration,
         sizeof(configuration)) == SOFTPC_MACHINE_OK);
     assert(configuration[0] == expected_equipment && configuration[1] == 0u);
-    assert(configuration[2] == 0x80u && configuration[3] == 0x02u);
-    assert(configuration[4] == 0u);
+    assert(configuration[2] == 0u);
+    assert(configuration[3] == 0x80u && configuration[4] == 0x02u);
+    assert(configuration[5] == 0u);
     assert(softpc_machine_read_physical(machine, 0x475u, &fixed_disk_count,
         sizeof(fixed_disk_count)) == SOFTPC_MACHINE_OK);
     assert(fixed_disk_count == (floppy ? 0u : 1u));
