@@ -6,6 +6,7 @@ set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/sascdef.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/support/ios.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/disks/fdisk.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc_device_bop.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_standalone_platform.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_machine.c")
@@ -38,9 +39,6 @@ list(APPEND standalone_sources ${firmware_sources})
 foreach(source IN LISTS standalone_sources)
     file(READ "${source}" contents)
     string(TOLOWER "${contents}" normalized_contents)
-    if(normalized_contents MATCHES "(^|[^[:alnum:]_])bop[[:space:]]*\\(")
-        message(FATAL_ERROR "Standalone CCPU contains a BOP dispatcher: ${source}")
-    endif()
     if(normalized_contents MATCHES "(^|[^[:alnum:]_])(mvdm|ntvdm|vdm|wow|vdd|basesrv|csr|dos)([^[:alnum:]_]|$)")
         message(FATAL_ERROR "Standalone CCPU contains product-shell semantics: ${source}")
     endif()

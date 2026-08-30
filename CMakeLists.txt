@@ -11,8 +11,9 @@ target_include_directories(softpc-machine PUBLIC include)
 target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 
 # The original CCPU manifest is the executable x86 core.  It deliberately
-# links no NTVDM host, BOP service dispatcher, DOS/WOW component or Win32
-# presentation provider.
+# links no NTVDM host, DOS/WOW component or Win32 presentation provider.
+# A narrow original-ROM BIOS Operation table is machine-resident and only
+# registers restored hardware services.
 file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/c-files"
     SOFTPC_CCPU_SOURCE_NAMES)
 list(FILTER SOFTPC_CCPU_SOURCE_NAMES EXCLUDE REGEX "^p\\.")
@@ -34,6 +35,7 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/keymouse/ppi.c
     src/core/softpc/base/keymouse/keyba.c
     src/core/softpc/base/disks/fdisk.c
+    src/core/softpc_device_bop.c
     src/core/softpc_standalone_platform.c
     src/core/softpc_physical_mapping.c)
 set_target_properties(softpc-ccpu-core PROPERTIES

@@ -3316,9 +3316,31 @@ TYPEC3:
 TYPEC4:
 
       modRM = GET_INST_BYTE(p);
+      /* SoftPC reserves the otherwise-invalid LES register encodings
+         C4 C4..C7 for BIOS Operation calls.  The byte after that prefix is
+         the service number; C5..C7 additionally carry a little-endian
+         argument.  Keep ordinary LES/LDS behaviour unchanged. */
+      if (instp32p32 == LES && modRM >= 0xc4 && modRM <= 0xc7) {
+         IU32 bop_argument = 0;
+         IU8 bop_number = GET_INST_BYTE(p);
+         IU8 bop_argument_bytes = (IU8)(modRM - 0xc4);
+         IU8 bop_argument_index;
+         extern IBOOL softpc_device_bop_dispatch IPT2(IU8, number,
+             IU32, argument);
+
+         for (bop_argument_index = 0; bop_argument_index < bop_argument_bytes;
+              ++bop_argument_index)
+            bop_argument |= (IU32)GET_INST_BYTE(p) <<
+                (8 * bop_argument_index);
+         if (!softpc_device_bop_dispatch(bop_number, bop_argument)) {
+            Int6();
+            break;
+         }
+         break;
+      }
       /* LES requires a memory operand.  The historical product used this
-         invalid register encoding as a host escape; standalone hardware
-         exposes the architectural invalid-opcode fault instead. */
+         invalid register encoding for a BIOS Operation.  Other invalid
+         register encodings retain the architectural invalid-opcode fault. */
       if (((modRM & 0xc0) == 0xc0) && (instp32p32 == LES)) {
          Int6();
          break;
