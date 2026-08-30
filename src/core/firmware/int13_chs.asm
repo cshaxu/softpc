@@ -1,6 +1,6 @@
 ; Fixed-machine INT 13h read service.
 ; The ROM is assembled to a byte array embedded by softpc_machine.c.  It is
-; deliberately firmware code, not a host callback or a BOP escape.
+; deliberately firmware code, not a host callback or service escape.
 
 BITS 16
 ORG 0x0100

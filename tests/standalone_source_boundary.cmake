@@ -7,6 +7,9 @@ set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_pic8259.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_quick_events.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/firmware/int10_teletype.asm"
+    "${SOFTPC_SOURCE_DIR}/src/core/firmware/int13_chs.asm"
+    "${SOFTPC_SOURCE_DIR}/src/core/firmware/int16_keyboard.asm"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_standalone_platform.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_machine.c")
 
