@@ -16,6 +16,7 @@ extern void sas_init(unsigned long size);
 extern void sas_term(void);
 extern void sas_fills(unsigned long address, unsigned char value,
     unsigned long length);
+extern void sas_storew(unsigned long address, unsigned short value);
 extern void io_init(void);
 extern void SWPIC_init_funcptrs(void);
 extern void ica0_init(void);
@@ -71,6 +72,9 @@ extern FILE *trace_file;
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
 #define SOFTPC_MINIMUM_RAM_BYTES (1024ul * 1024ul)
 #define SOFTPC_BOOT_SECTOR_BYTES 512u
+#define SOFTPC_BDA_EQUIP_FLAG 0x410ul
+#define SOFTPC_BDA_MEMORY_VAR 0x413ul
+#define SOFTPC_CONVENTIONAL_MEMORY_KIB 640u
 
 static int softpc_machine_floppy_geometry(const char *path,
     unsigned short *sectors_per_track, unsigned short *heads);
@@ -103,8 +107,6 @@ static int softpc_machine_media_exists(const char *path)
 static softpc_machine_result softpc_machine_install_reset_rom(
     const softpc_machine *machine)
 {
-    unsigned char bda_configuration[6];
-    unsigned char bda_fixed_disk_count;
     /* INT 15h/AH=88h reports the fixed RAM above the first MiB. */
     static unsigned char int15_memory_rom[] = {
         0x80u, 0xfcu, 0x88u, 0x75u, 0x05u, 0xb8u, 0x00u, 0x3cu,
@@ -118,20 +120,12 @@ static softpc_machine_result softpc_machine_install_reset_rom(
         int15_memory_rom[6] = (unsigned char)extended_kib;
         int15_memory_rom[7] = (unsigned char)(extended_kib >> 8u);
     }
-    bda_configuration[0] = machine->options.floppy_path != NULL ? 0x23u : 0x22u;
-    bda_configuration[1] = 0u;
-    bda_configuration[2] = 0u;
-    bda_configuration[3] = 0x80u;
-    bda_configuration[4] = 0x02u;
-    bda_configuration[5] = 0u;
-    bda_fixed_disk_count = machine->options.hard_disk_path != NULL ? 1u : 0u;
-    /* BDA equipment at 0040:0010, conventional memory at 0040:0013. */
-    if (!softpc_platform_write_physical(0x410u, bda_configuration,
-            sizeof(bda_configuration)) ||
-        /* BDA fixed-disk count at 0040:0075. */
-        !softpc_platform_write_physical(0x475u, &bda_fixed_disk_count,
-            sizeof(bda_fixed_disk_count)) ||
-        !softpc_platform_write_physical(0xf0800u, int15_memory_rom,
+    /* Original reset.c owns these BIOS variables through the SAS interface.
+       disk_post() has already established HF_NUM from the attached controller. */
+    sas_storew(SOFTPC_BDA_EQUIP_FLAG,
+        (unsigned short)(machine->options.floppy_path != NULL ? 0x23u : 0x22u));
+    sas_storew(SOFTPC_BDA_MEMORY_VAR, SOFTPC_CONVENTIONAL_MEMORY_KIB);
+    if (!softpc_platform_write_physical(0xf0800u, int15_memory_rom,
             sizeof(int15_memory_rom)) ||
         !softpc_platform_write_physical(0x54u, int15_vector,
             sizeof(int15_vector))) {
