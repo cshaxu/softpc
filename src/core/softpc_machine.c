@@ -43,6 +43,7 @@ extern int softpc_platform_read_physical(unsigned long address,
     unsigned char *bytes, unsigned long length);
 extern void softpc_platform_keyboard_reset(void);
 extern void softpc_device_bop_register_machine_services(void);
+extern void softpc_device_bop_set_memory_size(unsigned long memory_bytes);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
 extern void SWTMR_init_funcptrs(void);
 extern void timer_init(void);
@@ -107,30 +108,11 @@ static int softpc_machine_media_exists(const char *path)
 static softpc_machine_result softpc_machine_install_reset_rom(
     const softpc_machine *machine)
 {
-    /* INT 15h/AH=88h reports the fixed RAM above the first MiB. */
-    static unsigned char int15_memory_rom[] = {
-        0x80u, 0xfcu, 0x88u, 0x75u, 0x05u, 0xb8u, 0x00u, 0x3cu,
-        0xf8u, 0xcfu, 0xb4u, 0x86u, 0xf9u, 0xcfu
-    };
-    static const unsigned char int15_vector[] = { 0x00u, 0x08u, 0x00u, 0xf0u };
-    {
-        unsigned long extended_kib = (machine->memory_bytes -
-            SOFTPC_MINIMUM_RAM_BYTES) / 1024ul;
-        if (extended_kib > 0xfffful) extended_kib = 0xfffful;
-        int15_memory_rom[6] = (unsigned char)extended_kib;
-        int15_memory_rom[7] = (unsigned char)(extended_kib >> 8u);
-    }
     /* Original reset.c owns these BIOS variables through the SAS interface.
        disk_post() has already established HF_NUM from the attached controller. */
     sas_storew(SOFTPC_BDA_EQUIP_FLAG,
         (unsigned short)(machine->options.floppy_path != NULL ? 0x23u : 0x22u));
     sas_storew(SOFTPC_BDA_MEMORY_VAR, SOFTPC_CONVENTIONAL_MEMORY_KIB);
-    if (!softpc_platform_write_physical(0xf0800u, int15_memory_rom,
-            sizeof(int15_memory_rom)) ||
-        !softpc_platform_write_physical(0x54u, int15_vector,
-            sizeof(int15_vector))) {
-        return SOFTPC_MACHINE_IO_ERROR;
-    }
     return SOFTPC_MACHINE_OK;
 }
 
@@ -186,7 +168,8 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         cmos_init();
         ppi_init();
         SWTMR_init_funcptrs();
-        softpc_device_bop_register_machine_services();
+    softpc_device_bop_register_machine_services();
+    softpc_device_bop_set_memory_size(machine->memory_bytes);
         softpc_platform_hdd_init();
         gfi_init();
         fla_init();
