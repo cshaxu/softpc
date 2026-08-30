@@ -23,7 +23,8 @@ next machine-owned packages to complete.
 
 Exactly one boot medium is accepted. The fixed machine has 16 MiB RAM, master
 and slave 8259 PICs, PIT channel 0, an 8042-style keyboard queue, text video
-at `B800:0000`, and one ATA PIO backend with sector read/write support. Its ROM boots a floppy
+at `B800:0000`, and one ATA PIO backend with sector read/write and identify
+support. Its ROM boots a floppy
 sector directly or reads hard-disk LBA 0 through ATA PIO. It provides these
 guest-firmware services:
 
