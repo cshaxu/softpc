@@ -1,8 +1,8 @@
 set(standalone_sources
-    "${CMAKE_SOURCE_DIR}/src/core/softpc/base/ccpu386/c_main.c"
-    "${CMAKE_SOURCE_DIR}/src/core/softpc/base/ccpu386/softpc_ccpu_facade.c"
-    "${CMAKE_SOURCE_DIR}/src/core/softpc_standalone_platform.c"
-    "${CMAKE_SOURCE_DIR}/src/core/softpc_machine.c")
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/ccpu386/c_main.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/ccpu386/softpc_ccpu_facade.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc_standalone_platform.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc_machine.c")
 
 foreach(source IN LISTS standalone_sources)
     file(READ "${source}" contents)
