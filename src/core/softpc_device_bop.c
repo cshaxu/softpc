@@ -32,6 +32,10 @@ void softpc_device_bop_register_machine_services IFN0()
     extern void disk_io IPT0();
     extern void equipment IPT0();
     extern void memory_size IPT0();
+    extern void bootstrap IPT0();
+    extern void bootstrap1 IPT0();
+    extern void bootstrap2 IPT0();
+    extern void bootstrap3 IPT0();
     extern void mouse_install1 IPT0();
     extern void mouse_install2 IPT0();
     extern void mouse_int1 IPT0();
@@ -50,6 +54,10 @@ void softpc_device_bop_register_machine_services IFN0()
     BIOS[BIOS_DISK_IO] = disk_io;
     BIOS[BIOS_EQUIPMENT] = equipment;
     BIOS[BIOS_MEMORY_SIZE] = memory_size;
+    BIOS[BIOS_BOOT_STRAP] = bootstrap;
+    BIOS[0x90] = bootstrap1;
+    BIOS[0x91] = bootstrap2;
+    BIOS[0x92] = bootstrap3;
     BIOS[BIOS_MOUSE_INSTALL1] = mouse_install1;
     BIOS[BIOS_MOUSE_INSTALL2] = mouse_install2;
     BIOS[BIOS_MOUSE_INT1] = mouse_int1;
