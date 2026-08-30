@@ -31,6 +31,7 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/system/quick_ev.c
     src/core/softpc/base/system/at_dma.c
     src/core/softpc/base/system/cmos.c
+    src/core/softpc/base/keymouse/ppi.c
     src/core/softpc_standalone_platform.c
     src/core/softpc_physical_mapping.c)
 set_target_properties(softpc-ccpu-core PROPERTIES

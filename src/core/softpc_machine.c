@@ -21,6 +21,7 @@ extern void ica1_init(void);
 extern void dma_init(void);
 extern void dma_post(void);
 extern void cmos_init(void);
+extern void ppi_init(void);
 extern void ica0_post(void);
 extern void ica1_post(void);
 extern unsigned long softpc_ccpu_instruction_budget;
@@ -414,6 +415,7 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         ica1_init();
         dma_init();
         cmos_init();
+        ppi_init();
         softpc_platform_timer_init();
         softpc_platform_keyboard_init();
         softpc_platform_hdd_init();

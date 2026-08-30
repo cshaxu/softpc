@@ -12,6 +12,7 @@
 #include "ica.h"
 #include "timestmp.h"
 #include "timeval.h"
+#include "timer.h"
 
 /*
  * Minimal host ports for the detached CCPU.  These are deliberately machine
@@ -24,6 +25,25 @@ extern void c_cpu_simulate();
 static UTINY *softpc_ram;
 static sys_addr softpc_ram_size;
 IU32 softpc_ccpu_instruction_budget = 0;
+
+static void softpc_timer2_gate(port, value)
+io_addr port;
+half_word value;
+{
+    UNUSED(port);
+    UNUSED(value);
+}
+
+void (*timer_gate_func) IPT2(io_addr, port, half_word, value) =
+    softpc_timer2_gate;
+
+void host_enable_timer2_sound(void)
+{
+}
+
+void host_disable_timer2_sound(void)
+{
+}
 
 /* The original CMOS controller expects the product configuration service.
  * A standalone fixed machine exposes no mutable product configuration: its
