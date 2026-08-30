@@ -675,6 +675,25 @@ static void run_int11_boot_image(const char *path, int floppy,
     softpc_machine_destroy(machine);
 }
 
+static void run_bda_configuration_image(const char *path, int floppy,
+    unsigned char expected_equipment)
+{
+    unsigned char configuration[5] = { 0, 0, 0, 0, 0 };
+    softpc_machine_options options = { NULL, NULL,
+        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    if (floppy) options.floppy_path = path;
+    else options.hard_disk_path = path;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x410u, configuration,
+        sizeof(configuration)) == SOFTPC_MACHINE_OK);
+    assert(configuration[0] == expected_equipment && configuration[1] == 0u);
+    assert(configuration[2] == 0x80u && configuration[3] == 0x02u);
+    assert(configuration[4] == 0u);
+    softpc_machine_destroy(machine);
+}
+
 static void run_int1a_boot_image(const char *path)
 {
     unsigned char ticks[4] = { 0xffu, 0xffu, 0xffu, 0xffu };
@@ -884,6 +903,8 @@ int main(void)
     run_int12_boot_image(int12);
     run_int11_boot_image(int11, 1, 0x23u);
     run_int11_boot_image(int11, 0, 0x22u);
+    run_bda_configuration_image(floppy, 1, 0x23u);
+    run_bda_configuration_image(hdd, 0, 0x22u);
     run_int1a_boot_image(int1a);
     run_int1a_tick_boot_image(int1a_tick);
     run_hdd_pio_boot_image(hdd_pio);
