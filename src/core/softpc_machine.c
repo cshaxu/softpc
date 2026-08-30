@@ -18,6 +18,8 @@ extern void io_init(void);
 extern void SWPIC_init_funcptrs(void);
 extern void ica0_init(void);
 extern void ica1_init(void);
+extern void dma_init(void);
+extern void dma_post(void);
 extern void ica0_post(void);
 extern void ica1_post(void);
 extern unsigned long softpc_ccpu_instruction_budget;
@@ -409,6 +411,7 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         SWPIC_init_funcptrs();
         ica0_init();
         ica1_init();
+        dma_init();
         softpc_platform_timer_init();
         softpc_platform_keyboard_init();
         softpc_platform_hdd_init();
@@ -424,6 +427,7 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
        action directly; it is not a guest-service operation. */
     ica0_post();
     ica1_post();
+    dma_post();
     if (!softpc_platform_hdd_attach(machine->options.floppy_path,
             machine->options.hard_disk_path))
         return SOFTPC_MACHINE_IO_ERROR;
