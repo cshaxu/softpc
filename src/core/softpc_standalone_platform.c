@@ -488,39 +488,6 @@ void host_timer_init(void)
     /* The VM loop calls the original time_strobe() once per bounded slice. */
 }
 
-/* Standalone LPT port: the original printer controller owns all guest
-   registers, ACK transitions and IRQ behavior.  This host edge simply
-   accepts output and reports an always-ready virtual endpoint. */
-unsigned long host_lpt_status(int adapter)
-{
-    UNUSED(adapter);
-    return 0u;
-}
-
-BOOL host_print_byte(int adapter, byte value)
-{
-    UNUSED(adapter);
-    UNUSED(value);
-    return TRUE;
-}
-
-BOOL host_print_doc(int adapter)
-{
-    UNUSED(adapter);
-    return TRUE;
-}
-
-void host_reset_print(int adapter)
-{
-    UNUSED(adapter);
-}
-
-void host_print_auto_feed(int adapter, BOOL auto_feed)
-{
-    UNUSED(adapter);
-    UNUSED(auto_feed);
-}
-
 /* Original UART controller host port.  Controller registers, IRQ selection,
    FIFO handling and BIOS semantics all remain in com.c/rs232_io.c.  The
    standalone VM supplies a connected, idle endpoint until a console serial

@@ -35,6 +35,7 @@ extern void q_event_init(void);
 extern void tic_event_init(void);
 extern void mouse_driver_initialisation(void);
 extern void mouse_driver_termination(void);
+extern void host_lpt_close_all(void);
 extern int softpc_platform_hdd_attach(const char *hard_disk_path);
 extern void softpc_platform_hdd_detach(void);
 extern int softpc_platform_floppy_attach(const char *path);
@@ -251,6 +252,7 @@ void softpc_machine_destroy(softpc_machine *machine)
 {
     if (machine != NULL && machine->hardware_initialized) {
         host_timer_shutdown();
+        host_lpt_close_all();
         softpc_platform_hdd_detach();
         softpc_platform_floppy_detach();
         if (machine->mouse_driver_initialized)

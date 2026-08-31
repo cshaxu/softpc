@@ -144,6 +144,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/host/src/nt_ega.c
     src/core/softpc/host/src/nt_graph.c
     src/core/softpc/host/src/nt_keycd.c
+    src/core/softpc/host/src/nt_lpt.c
     src/core/softpc/host/src/nt_sound.c
     src/core/softpc/host/src/nt_munge.c
     src/core/softpc/host/src/nt_cga.c
