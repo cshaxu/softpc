@@ -2,6 +2,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <string.h>
 
 extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 
@@ -10,7 +11,7 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 #define SOFTPC_TIMER_ID 1u
 /* Keep each GUI tick bounded for responsive input, but large enough that
  * POST is not delayed by the host timer granularity. */
-#define SOFTPC_RUN_SLICE 50000u
+#define SOFTPC_RUN_SLICE 10000u
 #define SOFTPC_VGA_MODE13_WIDTH 320
 #define SOFTPC_VGA_MODE13_HEIGHT 200
 #define SOFTPC_VGA_PLANAR_MAX_WIDTH 1024
@@ -27,6 +28,43 @@ static int softpc_window_left_button;
 static int softpc_window_right_button;
 static int softpc_window_result;
 static int softpc_window_keydown_delivered;
+static unsigned char softpc_window_previous_text[SOFTPC_TEXT_COLUMNS *
+    SOFTPC_TEXT_ROWS];
+static int softpc_window_previous_text_valid;
+
+static int softpc_window_text_changed(void)
+{
+    const void *surface;
+    const unsigned char *cells;
+    uint32_t columns;
+    uint32_t rows;
+    uint32_t stride;
+    uint32_t cell_bytes;
+    unsigned char current[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
+    uint32_t row;
+
+    if (!softpc_machine_presentation_text(softpc_window_machine, &surface,
+            &columns, &rows, &stride, &cell_bytes) || cell_bytes < 1u ||
+        stride < columns)
+        return 0;
+    memset(current, ' ', sizeof(current));
+    cells = (const unsigned char *)surface;
+    if (columns > SOFTPC_TEXT_COLUMNS) columns = SOFTPC_TEXT_COLUMNS;
+    if (rows > SOFTPC_TEXT_ROWS) rows = SOFTPC_TEXT_ROWS;
+    for (row = 0u; row < rows; ++row) {
+        uint32_t column;
+        for (column = 0u; column < columns; ++column)
+            current[row * SOFTPC_TEXT_COLUMNS + column] =
+                cells[(row * stride + column) * cell_bytes];
+    }
+    if (!softpc_window_previous_text_valid || memcmp(current,
+            softpc_window_previous_text, sizeof(current)) != 0) {
+        memcpy(softpc_window_previous_text, current, sizeof(current));
+        softpc_window_previous_text_valid = 1;
+        return 1;
+    }
+    return 0;
+}
 
 static int softpc_window_paint_original_dib(HDC dc)
 {
@@ -175,7 +213,8 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
             int32_t right;
             int32_t bottom;
             (void)softpc_machine_run(softpc_window_machine, SOFTPC_RUN_SLICE);
-            if (!softpc_machine_presentation_is_graphics(softpc_window_machine)) {
+            if (!softpc_machine_presentation_is_graphics(softpc_window_machine) &&
+                    softpc_window_text_changed()) {
                 InvalidateRect(window, NULL, FALSE);
             } else if (softpc_machine_presentation_take_dirty(
                     softpc_window_machine, &left, &top, &right, &bottom)) {
@@ -273,6 +312,7 @@ int softpc_vm_run_window(softpc_machine *machine)
         return 1;
     softpc_window_machine = machine;
     softpc_window_mouse_position_valid = 0;
+    softpc_window_previous_text_valid = 0;
     softpc_window_left_button = 0;
     softpc_window_right_button = 0;
     softpc_window_result = SOFTPC_VM_FRONTEND_STOPPED;
