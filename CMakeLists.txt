@@ -240,6 +240,15 @@ target_include_directories(softpc-mouse-smoke PRIVATE
 add_test(NAME softpc-mouse-smoke COMMAND softpc-mouse-smoke)
 set_tests_properties(softpc-mouse-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-vga-frame-smoke tests/softpc_vga_frame_smoke.c)
+target_link_libraries(softpc-vga-frame-smoke PRIVATE softpc-machine)
+target_include_directories(softpc-vga-frame-smoke PRIVATE
+    src/core/softpc/host/inc
+    src/core/softpc/host/inc/x86/prod
+    src/core/softpc/base/inc)
+add_test(NAME softpc-vga-frame-smoke COMMAND softpc-vga-frame-smoke)
+set_tests_properties(softpc-vga-frame-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-bop-smoke tests/softpc_bop_smoke.c)
 target_link_libraries(softpc-bop-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-bop-smoke PRIVATE

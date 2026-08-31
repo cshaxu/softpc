@@ -8,6 +8,8 @@
 #define SOFTPC_TEXT_ADDRESS 0xb8000u
 #define SOFTPC_TIMER_ID 1u
 #define SOFTPC_RUN_SLICE 50000u
+#define SOFTPC_VGA_MODE13_WIDTH 320
+#define SOFTPC_VGA_MODE13_HEIGHT 200
 
 static softpc_machine *softpc_window_machine;
 static HFONT softpc_window_font;
@@ -16,6 +18,25 @@ static int softpc_window_mouse_y;
 static int softpc_window_mouse_position_valid;
 static int softpc_window_left_button;
 static int softpc_window_right_button;
+
+static void softpc_window_paint_vga_mode13(HDC dc)
+{
+    static uint32_t pixels[SOFTPC_VGA_MODE13_WIDTH * SOFTPC_VGA_MODE13_HEIGHT];
+    BITMAPINFO bitmap;
+    if (softpc_machine_vga_mode13_frame(softpc_window_machine, pixels,
+            (uint32_t)(sizeof(pixels) / sizeof(pixels[0]))) != SOFTPC_MACHINE_OK)
+        return;
+    ZeroMemory(&bitmap, sizeof(bitmap));
+    bitmap.bmiHeader.biSize = sizeof(bitmap.bmiHeader);
+    bitmap.bmiHeader.biWidth = SOFTPC_VGA_MODE13_WIDTH;
+    bitmap.bmiHeader.biHeight = -SOFTPC_VGA_MODE13_HEIGHT;
+    bitmap.bmiHeader.biPlanes = 1;
+    bitmap.bmiHeader.biBitCount = 32;
+    bitmap.bmiHeader.biCompression = BI_RGB;
+    StretchDIBits(dc, 8, 8, SOFTPC_VGA_MODE13_WIDTH * 2,
+        SOFTPC_VGA_MODE13_HEIGHT * 2, 0, 0, SOFTPC_VGA_MODE13_WIDTH,
+        SOFTPC_VGA_MODE13_HEIGHT, pixels, &bitmap, DIB_RGB_COLORS, SRCCOPY);
+}
 
 static int softpc_window_mouse_x_from_lparam(LPARAM position)
 {
@@ -31,6 +52,10 @@ static void softpc_window_paint(HDC dc)
 {
     unsigned char text[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS * 2u];
     int row;
+    if (softpc_machine_vga_mode13_active(softpc_window_machine)) {
+        softpc_window_paint_vga_mode13(dc);
+        return;
+    }
     if (softpc_machine_read_physical(softpc_window_machine,
             SOFTPC_TEXT_ADDRESS, text, sizeof(text)) != SOFTPC_MACHINE_OK) return;
     SelectObject(dc, softpc_window_font);

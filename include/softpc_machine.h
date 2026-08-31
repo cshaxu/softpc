@@ -41,6 +41,13 @@ softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,
  * Mouse adapter. Button values are zero (up) or nonzero (down). */
 softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,
     int32_t delta_x, int32_t delta_y, uint8_t left_down, uint8_t right_down);
+/* Copy the original VGA controller's mode 13h (320x200, 256-colour) output
+ * into a caller-owned RGB32 surface. Pixels are 0x00RRGGBB. This does not
+ * emulate VGA; it is a presentation readout of the original controller's
+ * planes and DAC. */
+int softpc_machine_vga_mode13_active(const softpc_machine *machine);
+softpc_machine_result softpc_machine_vga_mode13_frame(
+    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count);
 void softpc_machine_destroy(softpc_machine *machine);
 
 const char *softpc_machine_result_name(softpc_machine_result result);

@@ -44,6 +44,42 @@ IU32 softpc_ccpu_instruction_budget = 0;
 extern byte *EGA_planes;
 extern byte *video_copy;
 extern PC_palette *DAC;
+extern IU8 Video_mode;
+
+#define SOFTPC_VGA_MODE13_WIDTH 320u
+#define SOFTPC_VGA_MODE13_HEIGHT 200u
+#define SOFTPC_VGA_MODE13_PIXELS \
+    (SOFTPC_VGA_MODE13_WIDTH * SOFTPC_VGA_MODE13_HEIGHT)
+
+static unsigned long softpc_vga_dac_component(half_word component)
+{
+    /* VGA DAC values are six-bit components. The original controller owns
+       their storage; this merely expands them for a 32-bit host surface. */
+    return ((unsigned long)(component & 0x3fu) * 255ul + 31ul) / 63ul;
+}
+
+int softpc_platform_vga_mode13_active(void)
+{
+    return Video_mode == 0x13u && EGA_planes != NULL && DAC != NULL;
+}
+
+int softpc_platform_vga_mode13_frame(unsigned long *pixels,
+    unsigned long pixel_count)
+{
+    unsigned long index;
+    if (pixels == NULL || pixel_count < SOFTPC_VGA_MODE13_PIXELS ||
+        !softpc_platform_vga_mode13_active())
+        return 0;
+    /* Chain-4 mode stores plane 0/1/2/3 as four consecutive bytes. This is
+       the same byte ordering consumed by the original nt_vga.c presenter. */
+    for (index = 0ul; index < SOFTPC_VGA_MODE13_PIXELS; ++index) {
+        PC_palette *colour = &DAC[EGA_planes[index]];
+        pixels[index] = (softpc_vga_dac_component(colour->red) << 16u) |
+            (softpc_vga_dac_component(colour->green) << 8u) |
+            softpc_vga_dac_component(colour->blue);
+    }
+    return 1;
+}
 
 /* The original video core's optional stream-I/O path is a product console
    optimization.  The detached VM presents through its own console/window,

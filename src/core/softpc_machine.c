@@ -40,6 +40,9 @@ extern void softpc_platform_hdd_detach(void);
 extern int softpc_platform_floppy_attach(const char *path);
 extern void softpc_platform_floppy_detach(void);
 extern int softpc_platform_video_buffers_init(void);
+extern int softpc_platform_vga_mode13_frame(unsigned long *pixels,
+    unsigned long pixel_count);
+extern int softpc_platform_vga_mode13_active(void);
 extern FILE *trace_file;
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
@@ -184,6 +187,22 @@ softpc_machine_result softpc_machine_instruction_address(
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     *address = (uint32_t)(c_getCS_BASE() + c_getEIP());
     return SOFTPC_MACHINE_OK;
+}
+
+int softpc_machine_vga_mode13_active(const softpc_machine *machine)
+{
+    return machine != NULL && machine->reset &&
+        softpc_platform_vga_mode13_active();
+}
+
+softpc_machine_result softpc_machine_vga_mode13_frame(
+    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count)
+{
+    if (machine == NULL || pixels == NULL || !machine->reset)
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    return softpc_platform_vga_mode13_frame((unsigned long *)pixels,
+        (unsigned long)pixel_count) ? SOFTPC_MACHINE_OK :
+        SOFTPC_MACHINE_BACKEND_UNAVAILABLE;
 }
 
 void softpc_machine_destroy(softpc_machine *machine)

@@ -38,11 +38,13 @@ presentation are supplied by the standalone VM, not a product host.
 The fixed machine has 16 MiB RAM by default (configurable through
 `memory_mb`), master and slave 8259 PICs, PIT channel 0, the original
 keyboard/mouse controller path, original FLA/GFI/FDC floppy path, original
-fixed-disk BIOS path, and original V7 VGA controller.  The console and Win32
-window currently present text memory at `B800:0000`; they are presentation
-front ends, not replacement video controllers. The Win32 window forwards
-relative pointer movement and its two buttons to the original Microsoft Bus
-Mouse adapter; it does not implement a second mouse device.
+fixed-disk BIOS path, and original V7 VGA controller. The console presents
+text memory at `B800:0000`; the Win32 window presents that text path and the
+original VGA mode 13h (320×200, 256-colour) planes/DAC through an RGB32 host
+surface. They are presentation front ends, not replacement video controllers.
+The Win32 window forwards relative pointer movement and its two buttons to
+the original Microsoft Bus Mouse adapter; it does not implement a second
+mouse device.
 
 The ROM and restored controllers provide their original BIOS/interrupt and
 I/O behavior.  The standalone host provides raw floppy and hard-disk image
