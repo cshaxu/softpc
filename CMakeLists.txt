@@ -102,6 +102,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/bios/tape_io.c
     src/core/softpc/base/bios/equipmnt.c
     src/core/softpc/base/bios/mem_size.c
+    src/core/softpc/base/bios/rom_basc.c
     src/core/softpc/base/comms/printer.c
     src/core/softpc/base/comms/printer_.c
     src/core/softpc/base/comms/com.c
@@ -237,6 +238,15 @@ target_include_directories(softpc-mouse-smoke PRIVATE
     src/core/softpc/base/inc)
 add_test(NAME softpc-mouse-smoke COMMAND softpc-mouse-smoke)
 set_tests_properties(softpc-mouse-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-bop-smoke tests/softpc_bop_smoke.c)
+target_link_libraries(softpc-bop-smoke PRIVATE softpc-machine)
+target_include_directories(softpc-bop-smoke PRIVATE
+    src/core/softpc/host/inc
+    src/core/softpc/host/inc/x86/prod
+    src/core/softpc/base/inc)
+add_test(NAME softpc-bop-smoke COMMAND softpc-bop-smoke)
+set_tests_properties(softpc-bop-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-real-boot-smoke tests/softpc_real_boot_smoke.c)
 target_link_libraries(softpc-real-boot-smoke PRIVATE softpc-machine)
