@@ -50,6 +50,7 @@ IBOOL softpc_ccpu_instruction_budget_active = FALSE;
    on the machine/executor thread where the original device state lives. */
 static HANDLE softpc_clock_timer;
 static volatile LONG softpc_clock_pending_ticks;
+static volatile LONG softpc_boot_clock_active;
 
 static VOID CALLBACK softpc_clock_tick(PVOID context, BOOLEAN fired)
 {
@@ -65,9 +66,25 @@ static VOID CALLBACK softpc_clock_tick(PVOID context, BOOLEAN fired)
 IBOOL softpc_platform_consume_clock_tick(void)
 {
 #ifdef _WIN32
+    /* The original FDC POST runs a nested CCPU loop before the standalone
+       launcher has returned to a public run slice.  Give that finite machine
+       phase a synchronous heartbeat; normal guest execution remains paced by
+       the original 20 Hz host timer below. */
+    if (InterlockedCompareExchange(&softpc_boot_clock_active, 0, 0) != 0)
+        return TRUE;
     return InterlockedExchange(&softpc_clock_pending_ticks, 0) != 0;
 #else
     return FALSE;
+#endif
+}
+
+void softpc_platform_set_boot_clock(int active)
+{
+#ifdef _WIN32
+    (void)InterlockedExchange(&softpc_boot_clock_active, active ? 1 : 0);
+    if (!active) (void)InterlockedExchange(&softpc_clock_pending_ticks, 0);
+#else
+    UNUSED(active);
 #endif
 }
 

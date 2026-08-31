@@ -35,6 +35,7 @@ extern int softpc_platform_keyboard_key(int key, int released);
 extern void mouse_send(int delta_x, int delta_y, int left, int right);
 extern void time_strobe(void);
 extern void host_timer_shutdown(void);
+extern void softpc_platform_set_boot_clock(int active);
 extern void q_event_init(void);
 extern void tic_event_init(void);
 extern void mouse_driver_initialisation(void);
@@ -130,7 +131,9 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         machine->options.media_mode))
         return SOFTPC_MACHINE_IO_ERROR;
     soft_reset = machine->reset ? 1 : 0;
+    softpc_platform_set_boot_clock(1);
     reset();
+    softpc_platform_set_boot_clock(0);
     if (!machine->mouse_driver_initialized) {
         mouse_driver_initialisation();
         machine->mouse_driver_initialized = 1;
