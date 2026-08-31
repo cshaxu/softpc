@@ -8,6 +8,7 @@
 #include "dma.h"
 #include "fla.h"
 #include "gfi.h"
+#include "config.h"
 
 /*
  * This is a host media port, not an FDC implementation.  The original FLA,
@@ -31,6 +32,14 @@ typedef struct {
 static softpc_gfi_image_drive softpc_gfi_drives[MAX_DISKETTES];
 static char softpc_gfi_attached_config_value[] = "floppy";
 static char softpc_gfi_empty_config_value[] = "";
+
+/* Keep the original GFI lifecycle: a detached host medium yields control
+ * back to the original empty-drive server rather than leaving this adapter's
+ * vectors installed against a closed image handle. */
+static void softpc_gfi_activate_empty(void)
+{
+    (void)gfi_empty_active(C_FLOPPY_A_DEVICE, TRUE, NULL);
+}
 
 static int softpc_gfi_geometry(long bytes, softpc_gfi_image_drive *drive)
 {
@@ -287,6 +296,7 @@ int softpc_platform_floppy_attach(const char *path)
         !softpc_gfi_geometry(bytes, drive)) {
         if (drive->file != NULL) fclose(drive->file);
         memset(drive, 0, sizeof(*drive));
+        softpc_gfi_activate_empty();
         return 0;
     }
     softpc_gfi_install(0);
@@ -298,6 +308,7 @@ void softpc_platform_floppy_detach(void)
     softpc_gfi_image_drive *drive = &softpc_gfi_drives[0];
     if (drive->file != NULL) fclose(drive->file);
     memset(drive, 0, sizeof(*drive));
+    softpc_gfi_activate_empty();
 }
 
 /* The original CMOS POST asks the product configuration layer whether drive

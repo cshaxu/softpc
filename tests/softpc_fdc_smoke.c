@@ -168,6 +168,9 @@ int main(void)
         SOFTPC_MACHINE_OK);
     assert(byte == 0xe5u);
     softpc_machine_destroy(machine);
+    /* Detaching the raw-image port must restore the original gfi_mpty
+       empty-drive server, just as the original real-floppy backend does. */
+    assert(gfi_drive_type(0) == GFI_DRIVE_TYPE_NULL);
     assert(remove(path) == 0);
     return 0;
 }
