@@ -75,7 +75,7 @@
 #define CPU_AT_DISK_INT		6
 
  
-#ifndef CPU_30_STYLE
+#if !defined(CPU_30_STYLE) && !defined(CPU_40_STYLE)
 
 /* def of bits in the CPU_INTERRUPT_MAP ?? */
 #define CPU_HW_INT		0
@@ -87,7 +87,7 @@
  
 #define CPU_SW_INT              8
 #define CPU_SW_INT_MASK         (1 << CPU_SW_INT)
-#endif /* 3.0 CPU */
+#endif /* 3.0 CPU / CCPU40 supplies its own CPU_INT_TYPE */
 
 #define DIVIDE_OVERFLOW_INT     0
 

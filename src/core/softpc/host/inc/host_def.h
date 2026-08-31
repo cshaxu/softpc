@@ -157,7 +157,6 @@ extern void host_simulate(void);
  * until each host interaction is reintroduced through the standalone core. */
 #define SOFTPC_STANDALONE 1
 
-#define CPU_30_STYLE
 #define PM
 
 #if !defined(MONITOR) && !defined(PROD)
