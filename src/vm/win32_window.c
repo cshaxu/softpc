@@ -8,7 +8,9 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 #define SOFTPC_TEXT_COLUMNS 80
 #define SOFTPC_TEXT_ROWS 25
 #define SOFTPC_TIMER_ID 1u
-#define SOFTPC_RUN_SLICE 512u
+/* Keep each GUI tick bounded for responsive input, but large enough that
+ * POST is not delayed by the host timer granularity. */
+#define SOFTPC_RUN_SLICE 50000u
 #define SOFTPC_VGA_MODE13_WIDTH 320
 #define SOFTPC_VGA_MODE13_HEIGHT 200
 #define SOFTPC_VGA_PLANAR_MAX_WIDTH 1024
@@ -219,7 +221,7 @@ int softpc_vm_run_window(softpc_machine *machine)
     if (window == NULL) return 1;
     ShowWindow(window, SW_SHOW);
     UpdateWindow(window);
-    SetTimer(window, SOFTPC_TIMER_ID, 10u, NULL);
+    SetTimer(window, SOFTPC_TIMER_ID, 1u, NULL);
     while (GetMessageA(&message, NULL, 0, 0) > 0) {
         TranslateMessage(&message);
         DispatchMessageA(&message);

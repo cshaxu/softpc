@@ -8,7 +8,10 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 
 #define SOFTPC_TEXT_COLUMNS 80u
 #define SOFTPC_TEXT_ROWS 25u
-#define SOFTPC_RUN_SLICE 512u
+/* A 512-instruction slice together with Sleep(1) throttles POST to a crawl
+ * on normal Windows timer resolution.  This is still a bounded slice for
+ * keyboard polling, while matching the proven standalone boot probe. */
+#define SOFTPC_RUN_SLICE 50000u
 
 /* A console selected in softpc.ini is a presentation choice, not a
  * requirement that the launcher inherited a usable stdin/stdout console.
@@ -160,7 +163,7 @@ int softpc_vm_run_console(softpc_machine *machine)
         if (softpc_machine_run(machine, SOFTPC_RUN_SLICE) != SOFTPC_MACHINE_OK)
             running = 0;
         softpc_console_paint(output, machine, previous);
-        Sleep(1u);
+        Sleep(0u);
     }
     (void)SetConsoleMode(input, original_mode);
     softpc_console_close(input, output, private_console);
