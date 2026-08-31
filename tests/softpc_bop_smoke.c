@@ -15,7 +15,8 @@ enum {
     SOFTPC_COM1_PORT = 0x3f8,
     SOFTPC_RS232_LSR = 5,
     SOFTPC_RS232_MSR = 6,
-    SOFTPC_LPT1_PORT = 0x378
+    SOFTPC_LPT1_PORT = 0x378,
+    SOFTPC_EQUIPMENT_BDA = 0x410
 };
 
 extern IBOOL softpc_device_bop_dispatch(IU8 number, IU32 argument);
@@ -91,6 +92,22 @@ int main(void)
        session/product shell.  The raw-image GFI attachment survives it. */
     assert(softpc_device_bop_dispatch(BIOS_RESET, 0u) == TRUE);
     assert(gfi_drive_type(0) == GFI_DRIVE_TYPE_144);
+
+    /* INT 11h and INT 12h are the original BIOS-data-area handlers.  The
+       values must remain guest-owned and writable through the machine RAM
+       boundary, rather than being rebuilt from standalone host options. */
+    {
+        const unsigned char equipment_word[2] = { 0x5au, 0xa5u };
+        const unsigned char memory_word[2] = { 0x80u, 0x02u };
+        assert(softpc_machine_write_physical(machine, SOFTPC_EQUIPMENT_BDA,
+            equipment_word, sizeof(equipment_word)) == SOFTPC_MACHINE_OK);
+        assert(softpc_machine_write_physical(machine, MEMORY_VAR,
+            memory_word, sizeof(memory_word)) == SOFTPC_MACHINE_OK);
+    }
+    assert(softpc_device_bop_dispatch(BIOS_EQUIPMENT, 0u) == TRUE);
+    assert(c_getAX() == 0xa55au);
+    assert(softpc_device_bop_dispatch(BIOS_MEMORY_SIZE, 0u) == TRUE);
+    assert(c_getAX() == 0x0280u);
 
     /* BOP 18 is original ROM BASIC fallback firmware, unlike product
        selectors intentionally absent from the standalone machine table. */
