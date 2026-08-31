@@ -171,20 +171,108 @@ void memset4(unsigned int data, unsigned int *destination, unsigned int count)
 #define SOFTPC_CONFIG_GFX_ADAPTER 54u
 #define SOFTPC_VGA_ADAPTER 5u
 
+/* The original PPI and 8253 own speaker gating and waveform generation.
+   This is only their standalone host sink.  NTVDM used the private Beep
+   device asynchronously; use a small Win32 worker so a guest tone never
+   blocks the executor or its presentation event loop. */
+#ifdef _WIN32
+#define SOFTPC_SPEAKER_CLOCK_HZ 1193180ul
+#define SOFTPC_SPEAKER_MIN_HZ 37ul
+#define SOFTPC_SPEAKER_MAX_HZ 20000ul
+#define SOFTPC_SPEAKER_SLICE_MS 40u
+static HANDLE softpc_speaker_wake;
+static HANDLE softpc_speaker_stop;
+static HANDLE softpc_speaker_thread;
+static volatile LONG softpc_speaker_enabled;
+static volatile LONG softpc_speaker_frequency;
+
+static DWORD WINAPI softpc_speaker_worker(void *unused)
+{
+    HANDLE waits[2];
+    UNUSED(unused);
+    waits[0] = softpc_speaker_stop;
+    waits[1] = softpc_speaker_wake;
+    for (;;) {
+        DWORD result = WaitForMultipleObjects(2u, waits, FALSE, INFINITE);
+        if (result == WAIT_OBJECT_0) break;
+        if (result != WAIT_OBJECT_0 + 1u) continue;
+        ResetEvent(softpc_speaker_wake);
+        while (InterlockedCompareExchange(&softpc_speaker_enabled, 0, 0) != 0 &&
+               InterlockedCompareExchange(&softpc_speaker_frequency, 0, 0) != 0) {
+            DWORD frequency = (DWORD)InterlockedCompareExchange(
+                &softpc_speaker_frequency, 0, 0);
+            (void)Beep(frequency, SOFTPC_SPEAKER_SLICE_MS);
+            if (WaitForSingleObject(softpc_speaker_stop, 0u) == WAIT_OBJECT_0)
+                return 0u;
+            if (WaitForSingleObject(softpc_speaker_wake, 0u) == WAIT_OBJECT_0)
+                ResetEvent(softpc_speaker_wake);
+        }
+    }
+    return 0u;
+}
+
+static void softpc_speaker_wake_worker(void)
+{
+    if (softpc_speaker_wake == NULL) {
+        softpc_speaker_wake = CreateEventA(NULL, TRUE, FALSE, NULL);
+        softpc_speaker_stop = CreateEventA(NULL, TRUE, FALSE, NULL);
+        if (softpc_speaker_wake == NULL || softpc_speaker_stop == NULL) {
+            if (softpc_speaker_wake != NULL) CloseHandle(softpc_speaker_wake);
+            if (softpc_speaker_stop != NULL) CloseHandle(softpc_speaker_stop);
+            softpc_speaker_wake = NULL;
+            softpc_speaker_stop = NULL;
+            return;
+        }
+    }
+    if (softpc_speaker_thread == NULL) {
+        softpc_speaker_thread = CreateThread(NULL, 0u, softpc_speaker_worker,
+            NULL, 0u, NULL);
+        if (softpc_speaker_thread == NULL) return;
+    }
+    SetEvent(softpc_speaker_wake);
+}
+
+static void softpc_speaker_shutdown(void)
+{
+    if (softpc_speaker_thread != NULL) {
+        SetEvent(softpc_speaker_stop);
+        SetEvent(softpc_speaker_wake);
+        (void)WaitForSingleObject(softpc_speaker_thread, INFINITE);
+        CloseHandle(softpc_speaker_thread);
+        softpc_speaker_thread = NULL;
+    }
+    if (softpc_speaker_wake != NULL) CloseHandle(softpc_speaker_wake);
+    if (softpc_speaker_stop != NULL) CloseHandle(softpc_speaker_stop);
+    softpc_speaker_wake = NULL;
+    softpc_speaker_stop = NULL;
+    InterlockedExchange(&softpc_speaker_enabled, 0);
+    InterlockedExchange(&softpc_speaker_frequency, 0);
+}
+#endif
+
 void host_enable_timer2_sound(void)
 {
+#ifdef _WIN32
+    InterlockedExchange(&softpc_speaker_enabled, 1);
+    if (InterlockedCompareExchange(&softpc_speaker_frequency, 0, 0) != 0)
+        softpc_speaker_wake_worker();
+#endif
 }
 
 void host_disable_timer2_sound(void)
 {
+#ifdef _WIN32
+    InterlockedExchange(&softpc_speaker_enabled, 0);
+    if (softpc_speaker_wake != NULL) SetEvent(softpc_speaker_wake);
+#endif
 }
 
-/* The original keyboard BIOS uses this as a bounded audible indication.
-   The standalone console has no mandatory sound backend yet, so the machine
-   preserves the timing contract without inventing a host product service. */
 void host_alarm(long duration)
 {
     UNUSED(duration);
+#ifdef _WIN32
+    (void)MessageBeep(MB_OK);
+#endif
 }
 
 /* The console owns its event pump and invokes the machine in bounded slices.
@@ -391,10 +479,25 @@ void host_timer2_waveform(unsigned int delay, unsigned long low_clocks,
     unsigned long high_clocks, int starts_low, int repeats)
 {
     UNUSED(delay);
-    UNUSED(low_clocks);
-    UNUSED(high_clocks);
     UNUSED(starts_low);
     UNUSED(repeats);
+#ifdef _WIN32
+    unsigned long period = low_clocks + high_clocks;
+    unsigned long frequency = period == 0ul ? 0ul :
+        SOFTPC_SPEAKER_CLOCK_HZ / period;
+    if (frequency < SOFTPC_SPEAKER_MIN_HZ ||
+        frequency > SOFTPC_SPEAKER_MAX_HZ)
+        frequency = 0ul;
+    InterlockedExchange(&softpc_speaker_frequency, (LONG)frequency);
+    if (frequency != 0ul &&
+        InterlockedCompareExchange(&softpc_speaker_enabled, 0, 0) != 0)
+        softpc_speaker_wake_worker();
+    else if (softpc_speaker_wake != NULL)
+        SetEvent(softpc_speaker_wake);
+#else
+    UNUSED(low_clocks);
+    UNUSED(high_clocks);
+#endif
 }
 
 void host_timer_init(void)
@@ -808,7 +911,12 @@ CHAR *host_get_unpublished_version(void) { return ""; }
 CHAR *host_get_years(void) { return ""; }
 CHAR *host_get_copyright(void) { return ""; }
 void NIDDB_System_Reboot(void) { }
-void host_timer_shutdown(void) { }
+void host_timer_shutdown(void)
+{
+#ifdef _WIN32
+    softpc_speaker_shutdown();
+#endif
+}
 void host_reset(void) { }
 /* The detached executor has no product logger.  Keep its optional diagnostic
  * stream valid so CCPU fault reports remain usable during standalone testing. */

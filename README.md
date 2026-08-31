@@ -50,8 +50,10 @@ files plus a fixed 16-head/63-sector hard-disk compatibility geometry; it
 does not reinterpret partition BPBs as a second disk controller.
 
 Serial and printer controllers are original SoftPC code connected to idle
-standalone host endpoints.  Sound and graphical presentation are the next
-host-front-end work, not reasons to substitute their controllers.
+standalone host endpoints. The original PPI and PIT channel 2 speaker path
+now drives a bounded asynchronous Win32 beep sink; it is stopped with the
+machine on reset or teardown. Graphical presentation remains host-front-end
+work, not a reason to substitute the original VGA controller.
 
 For a real-media, non-interactive boot probe (not part of the default test
 suite), run `build/softpc-real-boot-smoke --floppy disk.img` or replace

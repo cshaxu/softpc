@@ -30,6 +30,7 @@ extern void softpc_device_bop_set_memory_size(unsigned long memory_bytes);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
 extern void mouse_send(int delta_x, int delta_y, int left, int right);
 extern void time_strobe(void);
+extern void host_timer_shutdown(void);
 extern void q_event_init(void);
 extern void tic_event_init(void);
 extern void mouse_driver_initialisation(void);
@@ -188,6 +189,7 @@ softpc_machine_result softpc_machine_instruction_address(
 void softpc_machine_destroy(softpc_machine *machine)
 {
     if (machine != NULL && machine->hardware_initialized) {
+        host_timer_shutdown();
         softpc_platform_hdd_detach();
         softpc_platform_floppy_detach();
         if (machine->mouse_driver_initialized)
