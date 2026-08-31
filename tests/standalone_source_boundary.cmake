@@ -36,6 +36,12 @@ if(normalized_build_definition MATCHES "target_compile_definitions\\([^\\)]*ntvd
     message(FATAL_ERROR "Standalone SoftPC enables an NTVDM compile definition")
 endif()
 
+# cmosnt.c is the Windows NT RTC host variant.  The standalone machine uses
+# the original cross-host controller in cmos.c and must not link that variant.
+if(normalized_build_definition MATCHES "cmosnt\\.c")
+    message(FATAL_ERROR "Standalone SoftPC activates the NT-specific CMOS controller")
+endif()
+
 # The fixed VM must retain the original machine controllers.  Standalone
 # sources are permitted only at their host/media/presentation boundaries;
 # dropping one of these source files is a regression toward a replacement
