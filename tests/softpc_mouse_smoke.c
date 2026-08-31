@@ -43,9 +43,23 @@ int main(void)
     outb(MOUSE_PORT_0, 0x87u);
     inb(MOUSE_PORT_1, &value);
     assert(value == 0u);
+    assert(softpc_machine_mouse_input(machine, 5, -3, 1u, 0u) ==
+        SOFTPC_MACHINE_OK);
     outb(MOUSE_PORT_1, 0x20u);
     inb(MOUSE_PORT_1, &value);
     assert(value == 0x20u);
+
+    /* The public port reaches the original adapter; its hold transition
+       latches relative movement and button state in the original registers. */
+    outb(MOUSE_PORT_0, INTERNAL_MOUSE_STAT_REG);
+    inb(MOUSE_PORT_1, &value);
+    assert(value == (LEFT_BUTTON_DOWN | LEFT_BUTTON_CHANGE | MOVEMENT));
+    outb(MOUSE_PORT_0, INTERNAL_DATA1_REG);
+    inb(MOUSE_PORT_1, &value);
+    assert(value == 5u);
+    outb(MOUSE_PORT_0, INTERNAL_DATA2_REG);
+    inb(MOUSE_PORT_1, &value);
+    assert(value == 0xfdu);
 
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);

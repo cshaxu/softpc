@@ -37,6 +37,10 @@ softpc_machine_result softpc_machine_instruction_address(
     const softpc_machine *machine, uint32_t *address);
 softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,
     uint8_t scan_code);
+/* Inject relative host-pointer movement into the original Microsoft Bus
+ * Mouse adapter. Button values are zero (up) or nonzero (down). */
+softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,
+    int32_t delta_x, int32_t delta_y, uint8_t left_down, uint8_t right_down);
 void softpc_machine_destroy(softpc_machine *machine);
 
 const char *softpc_machine_result_name(softpc_machine_result result);

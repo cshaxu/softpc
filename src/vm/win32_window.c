@@ -11,6 +11,21 @@
 
 static softpc_machine *softpc_window_machine;
 static HFONT softpc_window_font;
+static int softpc_window_mouse_x;
+static int softpc_window_mouse_y;
+static int softpc_window_mouse_position_valid;
+static int softpc_window_left_button;
+static int softpc_window_right_button;
+
+static int softpc_window_mouse_x_from_lparam(LPARAM position)
+{
+    return (int)(short)LOWORD(position);
+}
+
+static int softpc_window_mouse_y_from_lparam(LPARAM position)
+{
+    return (int)(short)HIWORD(position);
+}
 
 static void softpc_window_paint(HDC dc)
 {
@@ -46,6 +61,22 @@ static void softpc_window_key(WPARAM key, int released)
     (void)softpc_machine_key_scancode(softpc_window_machine, (uint8_t)scan);
 }
 
+static void softpc_window_mouse(int x, int y)
+{
+    int delta_x = 0;
+    int delta_y = 0;
+    if (softpc_window_mouse_position_valid) {
+        delta_x = x - softpc_window_mouse_x;
+        delta_y = y - softpc_window_mouse_y;
+    }
+    softpc_window_mouse_x = x;
+    softpc_window_mouse_y = y;
+    softpc_window_mouse_position_valid = 1;
+    (void)softpc_machine_mouse_input(softpc_window_machine, delta_x, delta_y,
+        (uint8_t)softpc_window_left_button,
+        (uint8_t)softpc_window_right_button);
+}
+
 static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
     WPARAM wparam, LPARAM lparam)
 {
@@ -72,6 +103,34 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
     case WM_SYSKEYUP:
         softpc_window_key(wparam, 1);
         return 0;
+    case WM_MOUSEMOVE:
+        softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
+            softpc_window_mouse_y_from_lparam(lparam));
+        return 0;
+    case WM_LBUTTONDOWN:
+        softpc_window_left_button = 1;
+        SetCapture(window);
+        softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
+            softpc_window_mouse_y_from_lparam(lparam));
+        return 0;
+    case WM_LBUTTONUP:
+        softpc_window_left_button = 0;
+        softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
+            softpc_window_mouse_y_from_lparam(lparam));
+        if (!softpc_window_right_button) ReleaseCapture();
+        return 0;
+    case WM_RBUTTONDOWN:
+        softpc_window_right_button = 1;
+        SetCapture(window);
+        softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
+            softpc_window_mouse_y_from_lparam(lparam));
+        return 0;
+    case WM_RBUTTONUP:
+        softpc_window_right_button = 0;
+        softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
+            softpc_window_mouse_y_from_lparam(lparam));
+        if (!softpc_window_left_button) ReleaseCapture();
+        return 0;
     case WM_DESTROY:
         KillTimer(window, SOFTPC_TIMER_ID);
         PostQuitMessage(0);
@@ -96,6 +155,9 @@ int softpc_vm_run_window(softpc_machine *machine)
     if (RegisterClassA(&window_class) == 0 && GetLastError() != ERROR_CLASS_ALREADY_EXISTS)
         return 1;
     softpc_window_machine = machine;
+    softpc_window_mouse_position_valid = 0;
+    softpc_window_left_button = 0;
+    softpc_window_right_button = 0;
     softpc_window_font = CreateFontA(16, 8, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
         OEM_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
         FIXED_PITCH | FF_MODERN, "Consolas");
