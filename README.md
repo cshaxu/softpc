@@ -8,9 +8,18 @@ configuration; users supply boot media rather than select a machine profile.
 Build the VM, then set the fixed machine defaults in `softpc.yaml`:
 
 ```text
-cmake -S . -B build
-cmake --build build
-softpcvm
+cmake -S . -B build -G Ninja
+cmake --build build --parallel 8
+build/softpcvm
+```
+
+The CMake build supports both 32-bit and 64-bit Windows hosts.  A 32-bit
+build requires a real i686 MinGW toolchain (including its Windows import and
+CRT libraries), for example:
+
+```text
+cmake -S . -B build-x86 -G Ninja -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc
+cmake --build build-x86 --parallel 8
 ```
 
 `softpc.yaml` has exactly four top-level keys: `memory_mb`, `floppy`,
@@ -19,49 +28,28 @@ set together, creating fixed `A:` and `C:` slots; the machine boots `A:`
 first, then `C:`. Use `--config path.yaml` only to point at another fixed
 machine-default file. Console presentation runs continuously; press `Esc` to
 leave it. The current
-core links the detached CCPU, SAS, I/O, PIC and event packages through
-standalone host ports. The fixed firmware, raw-media storage path, and
-console/Win32 text presentation are machine-owned rather than supplied by a
-product host.
+core links the detached CCPU, SAS, I/O, PIC, event, original FDC/FLA/GFI,
+fixed-disk BIOS and V7 VGA packages through standalone host ports.  The
+original ROM reaches only machine-resident C services through its historical
+BOP instruction table; it has no NTVDM, DOS/WOW, VDD or product-service
+dispatcher.  Fixed firmware, raw-media storage and console/Win32
+presentation are supplied by the standalone VM, not a product host.
 
 The fixed machine has 16 MiB RAM by default (configurable through
-`memory_mb`), master
-and slave 8259 PICs, PIT channel 0, an 8042-style keyboard queue, text video
-at `B800:0000`, and one ATA PIO backend with sector read/write and identify
-support. Its ROM boots a floppy
-sector directly or reads hard-disk LBA 0 through ATA PIO. It provides these
-guest-firmware services:
+`memory_mb`), master and slave 8259 PICs, PIT channel 0, the original
+keyboard/mouse controller path, original FLA/GFI/FDC floppy path, original
+fixed-disk BIOS path, and original V7 VGA controller.  The console and Win32
+window currently present text memory at `B800:0000`; they are presentation
+front ends, not replacement video controllers.
 
-- `INT 10h/AH=0Eh`, `AH=0Fh`, `AH=02h`, and `AH=03h` — 80×25 text
-  teletype, mode query, and cursor control.
-- `INT 11h` — fixed equipment list (color text, FPU, and attached floppy).
-- `INT 12h` — fixed 640 KiB conventional-memory report.
-- `INT 13h/AH=02h` and `AH=03h` — contiguous CHS reads and writes of up to
-  128 sectors.
-- `INT 15h/AH=88h` — fixed 15 MiB extended-memory report.
-- `INT 16h/AH=00h` and `AH=01h` — ASCII/scan-code read and non-consuming
-  availability check for basic US keyboard input.
-- `INT 1Ah/AH=00h` — BIOS tick counter maintained by the fixed PIT.
-- `INT 14h/AH=00h`, `AH=01h`, and `AH=03h` — a fixed serial sink with
-  initialization, transmit, and ready status.
-- `INT 17h/AH=01h` — a fixed ready printer sink.
+The ROM and restored controllers provide their original BIOS/interrupt and
+I/O behavior.  The standalone host provides raw floppy and hard-disk image
+files plus a fixed 16-head/63-sector hard-disk compatibility geometry; it
+does not reinterpret partition BPBs as a second disk controller.
 
-The standard BIOS Data Area also exposes the matching equipment word at
-`0040:0010`, the 640 KiB conventional-memory word at `0040:0013`, and the
-single fixed-disk count at `0040:0075` when booting from a hard-disk image.
-
-Floppy geometry is inferred from standard raw-image capacities (360 KiB,
-720 KiB, 1.2 MiB, 1.44 MiB, and 2.88 MiB). For partitioned hard disks, the
-firmware uses sectors-per-track and heads from the first partition's BPB;
-unrecognised hard disks retain the fixed 16×63 compatibility geometry.
-
-This is intentionally a compact fixed PC, not a complete BIOS or controller
-emulation: CMOS/RTC, VGA graphics, floppy-controller commands, and sound are
-not implemented yet.
-
-Keyboard input is delivered through the fixed 8042-style queue and IRQ1, then
-consumed through `INT 16h`; enabling guest interrupts therefore does not turn
-ordinary console or window keystrokes into an unhandled interrupt.
+Serial and printer controllers are original SoftPC code connected to idle
+standalone host endpoints.  Sound and graphical presentation are the next
+host-front-end work, not reasons to substitute their controllers.
 
 For a real-media, non-interactive boot probe (not part of the default test
 suite), run `build/softpc-real-boot-smoke --floppy disk.img` or replace
