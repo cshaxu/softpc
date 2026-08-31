@@ -60,7 +60,9 @@ int main(void)
     assert(BIOS[BIOS_CASSETTE_IO] == cassette_io);
     assert(BIOS[BIOS_EQUIPMENT] != NULL);
     assert(BIOS[BIOS_MEMORY_SIZE] != NULL);
-    assert(BIOS[BIOS_TIMER_INT] != NULL);
+    /* CPU40's original BOP 08 is illegal; timer IRQ handling stays in the
+       original controller path rather than acquiring a new BIOS bridge. */
+    assert(BIOS[BIOS_TIMER_INT] == NULL);
     assert(BIOS[BIOS_TIME_OF_DAY] != NULL);
     assert(BIOS[BIOS_BOOT_STRAP] != NULL);
     assert(BIOS[BIOS_MOUSE_INSTALL1] != NULL);
@@ -68,6 +70,7 @@ int main(void)
 
     /* BOP 01 is the original BIOS dummy interrupt, not a product service. */
     assert(softpc_device_bop_dispatch(BIOS_DUMMY_INT, 0u) == TRUE);
+    assert(softpc_device_bop_dispatch(BIOS_TIMER_INT, 0u) == FALSE);
 
     /* INT 15h stays an original SoftPC BIOS handler: under the selected PM
        profile it returns the original CMOS-backed extended-memory value. */
