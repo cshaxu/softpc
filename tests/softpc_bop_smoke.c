@@ -43,6 +43,7 @@ int main(void)
        direct entries into restored SoftPC controller/firmware code, rather
        than silently falling back to a new VM service layer. */
     assert(BIOS[BIOS_KB_INT] != NULL);
+    assert(BIOS[BIOS_DUMMY_INT] != NULL);
     assert(BIOS[BIOS_KEYBOARD_IO] != NULL);
     assert(BIOS[BIOS_DISKETTE_INT] != NULL);
     assert(BIOS[BIOS_DISKETTE_IO] != NULL);
@@ -59,6 +60,9 @@ int main(void)
     assert(BIOS[BIOS_BOOT_STRAP] != NULL);
     assert(BIOS[BIOS_MOUSE_INSTALL1] != NULL);
     assert(BIOS[BIOS_MOUSE_VIDEO_IO] != NULL);
+
+    /* BOP 01 is the original BIOS dummy interrupt, not a product service. */
+    assert(softpc_device_bop_dispatch(BIOS_DUMMY_INT, 0u) == TRUE);
 
     /* BOP 18 is original ROM BASIC fallback firmware, unlike product
        selectors intentionally absent from the standalone machine table. */

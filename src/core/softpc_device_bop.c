@@ -51,6 +51,7 @@ IBOOL softpc_device_bop_dispatch IFN2(IU8, number, IU32, argument)
 void softpc_device_bop_register_machine_services IFN0()
 {
     extern void keyboard_int IPT0();
+    extern void dummy_int IPT0();
     extern void illegal_op_int IPT0();
     extern void keyboard_io IPT0();
     extern void diskette_int IPT0();
@@ -84,6 +85,7 @@ void softpc_device_bop_register_machine_services IFN0()
     extern void mouse_io_interrupt IPT0();
     extern void mouse_video_io IPT0();
 
+    BIOS[BIOS_DUMMY_INT] = dummy_int;
     BIOS[0x06] = illegal_op_int;
     BIOS[BIOS_UNEXP_INT] = unexpected_int;
     BIOS[BIOS_KB_INT] = keyboard_int;

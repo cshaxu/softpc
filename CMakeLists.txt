@@ -88,6 +88,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/system/quick_ev.c
     src/core/softpc/base/system/at_dma.c
     src/core/softpc/base/system/cmos.c
+    src/core/softpc/base/system/dummy_nt.c
     src/core/softpc/base/system/idetect.c
     src/core/softpc/base/system/illegalp.c
     src/core/softpc/base/system/rom.c
