@@ -6,8 +6,14 @@
 #include "insignia.h"
 #include "host_def.h"
 #include "bios.h"
+#include "build_id.h"
 
 extern IBOOL softpc_device_bop_dispatch(IU8 number, IU32 argument);
+extern void c_setAL(IU8 value);
+extern void c_setCX(IU16 value);
+extern ISM32 c_setDS(IU16 value);
+extern IU16 c_getAX(void);
+extern IU16 c_getBX(void);
 
 static void make_boot_disk(const char *path)
 {
@@ -36,6 +42,20 @@ int main(void)
     /* BOP 18 is original ROM BASIC fallback firmware, unlike product
        selectors intentionally absent from the standalone machine table. */
     assert(softpc_device_bop_dispatch(BIOS_BASIC, 0u) == TRUE);
+
+    c_setAL(1u);
+    c_setDS(0u);
+    c_setCX(0x600u);
+    assert(softpc_device_bop_dispatch(0x21u, 0u) == TRUE);
+    {
+        unsigned char name[5];
+        assert(softpc_machine_read_physical(machine, 0x600u, name,
+            sizeof(name)) == SOFTPC_MACHINE_OK);
+        assert(name[0] == 'B' && name[1] == 'a' && name[2] == 's' &&
+            name[3] == 'e' && name[4] == '$');
+    }
+    assert(c_getAX() == 0u);
+    assert(c_getBX() == BUILD_ID_CODE);
 
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);

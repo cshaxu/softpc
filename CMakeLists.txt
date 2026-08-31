@@ -96,6 +96,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/system/unexp_nt.c
     src/core/softpc/base/support/time_day.c
     src/core/softpc/base/bios/cmos_bis.c
+    src/core/softpc/base/bios/build_id.c
     src/core/softpc/base/bios/reset.c
     src/core/softpc/base/bios/bootstra.c
     src/core/softpc/base/bios/slave_bs.c

@@ -67,6 +67,7 @@ void softpc_device_bop_register_machine_services IFN0()
     extern void time_of_day IPT0();
     extern void kb_idle_poll IPT0();
     extern void rom_basic IPT0();
+    extern void Get_build_id IPT0();
     extern void re_direct IPT0();
     extern void D11_int IPT0();
     extern void int_287 IPT0();
@@ -103,6 +104,7 @@ void softpc_device_bop_register_machine_services IFN0()
     BIOS[BIOS_TIMER_INT] = time_int;
     BIOS[BIOS_TIME_OF_DAY] = time_of_day;
     BIOS[BIOS_BASIC] = rom_basic;
+    BIOS[0x21] = Get_build_id;
     BIOS[BIOS_KEYBOARD_BREAK + 2] = kb_idle_poll;
     BIOS[0x71] = re_direct;
     BIOS[0x72] = D11_int;
