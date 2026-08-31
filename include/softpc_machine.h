@@ -53,6 +53,13 @@ softpc_machine_result softpc_machine_vga_mode13_frame(
 int softpc_machine_vga_mode12_active(const softpc_machine *machine);
 softpc_machine_result softpc_machine_vga_mode12_frame(
     const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count);
+/* Query and copy an original 4-plane EGA/VGA BIOS graphics mode (0Dh, 0Eh,
+ * 0Fh, 10h, or 12h).  The caller supplies an RGB32 surface large enough for
+ * the returned dimensions; this is a controller-state readout only. */
+int softpc_machine_vga_planar_dimensions(const softpc_machine *machine,
+    uint32_t *width, uint32_t *height);
+softpc_machine_result softpc_machine_vga_planar_frame(
+    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count);
 void softpc_machine_destroy(softpc_machine *machine);
 
 const char *softpc_machine_result_name(softpc_machine_result result);

@@ -83,6 +83,54 @@ int main(void)
         SOFTPC_MACHINE_OK);
     assert(mode12_pixels[0] == 0x00a05000u);
 
+    /* The same original EGA plane layout also carries the lower BIOS modes.
+       The detached presentation must not replace it with mode-specific VM
+       memory. */
+    Video_mode = 0x0du;
+    EGA_planes[0] = 0x80u;
+    EGA_planes[1] = 0x80u;
+    EGA_planes[2] = 0u;
+    EGA_planes[3] = 0u;
+    {
+        uint32_t width = 0u;
+        uint32_t height = 0u;
+        assert(softpc_machine_vga_planar_dimensions(machine, &width,
+            &height));
+        assert(width == 320u && height == 200u);
+        assert(softpc_machine_vga_planar_frame(machine, mode12_pixels,
+            (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
+            SOFTPC_MACHINE_OK);
+        assert(mode12_pixels[0] == 0x00a05000u);
+    }
+    Video_mode = 0x0eu;
+    {
+        uint32_t width = 0u;
+        uint32_t height = 0u;
+        assert(softpc_machine_vga_planar_dimensions(machine, &width,
+            &height));
+        assert(width == 640u && height == 200u);
+        assert(softpc_machine_vga_planar_frame(machine, mode12_pixels,
+            (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
+            SOFTPC_MACHINE_OK);
+        assert(mode12_pixels[0] == 0x00a05000u);
+    }
+    Video_mode = 0x0fu;
+    {
+        uint32_t width = 0u;
+        uint32_t height = 0u;
+        assert(softpc_machine_vga_planar_dimensions(machine, &width,
+            &height));
+        assert(width == 640u && height == 350u);
+    }
+    Video_mode = 0x10u;
+    {
+        uint32_t width = 0u;
+        uint32_t height = 0u;
+        assert(softpc_machine_vga_planar_dimensions(machine, &width,
+            &height));
+        assert(width == 640u && height == 350u);
+    }
+
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);
     return 0;

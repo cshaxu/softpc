@@ -46,6 +46,10 @@ extern int softpc_platform_vga_mode13_active(void);
 extern int softpc_platform_vga_mode12_frame(unsigned long *pixels,
     unsigned long pixel_count);
 extern int softpc_platform_vga_mode12_active(void);
+extern int softpc_platform_vga_planar_dimensions(unsigned long *width,
+    unsigned long *height);
+extern int softpc_platform_vga_planar_frame(unsigned long *pixels,
+    unsigned long pixel_count);
 extern FILE *trace_file;
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
@@ -220,6 +224,31 @@ softpc_machine_result softpc_machine_vga_mode12_frame(
     if (machine == NULL || pixels == NULL || !machine->reset)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     return softpc_platform_vga_mode12_frame((unsigned long *)pixels,
+        (unsigned long)pixel_count) ? SOFTPC_MACHINE_OK :
+        SOFTPC_MACHINE_BACKEND_UNAVAILABLE;
+}
+
+int softpc_machine_vga_planar_dimensions(const softpc_machine *machine,
+    uint32_t *width, uint32_t *height)
+{
+    unsigned long platform_width;
+    unsigned long platform_height;
+    if (machine == NULL || width == NULL || height == NULL || !machine->reset)
+        return 0;
+    if (!softpc_platform_vga_planar_dimensions(&platform_width,
+            &platform_height))
+        return 0;
+    *width = (uint32_t)platform_width;
+    *height = (uint32_t)platform_height;
+    return 1;
+}
+
+softpc_machine_result softpc_machine_vga_planar_frame(
+    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count)
+{
+    if (machine == NULL || pixels == NULL || !machine->reset)
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    return softpc_platform_vga_planar_frame((unsigned long *)pixels,
         (unsigned long)pixel_count) ? SOFTPC_MACHINE_OK :
         SOFTPC_MACHINE_BACKEND_UNAVAILABLE;
 }

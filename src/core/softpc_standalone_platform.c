@@ -92,18 +92,36 @@ int softpc_platform_vga_mode12_active(void)
     return Video_mode == 0x12u && EGA_planes != NULL;
 }
 
-int softpc_platform_vga_mode12_frame(unsigned long *pixels,
+int softpc_platform_vga_planar_dimensions(unsigned long *width,
+    unsigned long *height)
+{
+    if (width == NULL || height == NULL || EGA_planes == NULL) return 0;
+    switch (Video_mode) {
+    case 0x0du: *width = 320ul; *height = 200ul; return 1;
+    case 0x0eu: *width = 640ul; *height = 200ul; return 1;
+    case 0x0fu: *width = 640ul; *height = 350ul; return 1;
+    case 0x10u: *width = 640ul; *height = 350ul; return 1;
+    case 0x12u: *width = SOFTPC_VGA_MODE12_WIDTH;
+        *height = SOFTPC_VGA_MODE12_HEIGHT; return 1;
+    default: return 0;
+    }
+}
+
+int softpc_platform_vga_planar_frame(unsigned long *pixels,
     unsigned long pixel_count)
 {
+    unsigned long width;
+    unsigned long height;
+    unsigned long bytes_per_line;
     unsigned long x;
     unsigned long y;
-    if (pixels == NULL || pixel_count < SOFTPC_VGA_MODE12_PIXELS ||
-        !softpc_platform_vga_mode12_active())
+    if (pixels == NULL || !softpc_platform_vga_planar_dimensions(&width,
+            &height) || pixel_count < width * height)
         return 0;
-    for (y = 0ul; y < SOFTPC_VGA_MODE12_HEIGHT; ++y) {
-        for (x = 0ul; x < SOFTPC_VGA_MODE12_WIDTH; ++x) {
-            unsigned long byte_offset = (y * SOFTPC_VGA_MODE12_BYTES_PER_LINE +
-                (x >> 3u)) << 2u;
+    bytes_per_line = width >> 3u;
+    for (y = 0ul; y < height; ++y) {
+        for (x = 0ul; x < width; ++x) {
+            unsigned long byte_offset = (y * bytes_per_line + (x >> 3u)) << 2u;
             byte bit = (byte)(0x80u >> (x & 7u));
             unsigned int colour_index =
                 ((EGA_planes[byte_offset] & bit) != 0u ? 1u : 0u) |
@@ -111,13 +129,20 @@ int softpc_platform_vga_mode12_frame(unsigned long *pixels,
                 ((EGA_planes[byte_offset + 2u] & bit) != 0u ? 4u : 0u) |
                 ((EGA_planes[byte_offset + 3u] & bit) != 0u ? 8u : 0u);
             PC_palette *colour = &EGA_GRAPH.palette[colour_index];
-            pixels[y * SOFTPC_VGA_MODE12_WIDTH + x] =
+            pixels[y * width + x] =
                 ((unsigned long)colour->red << 16u) |
                 ((unsigned long)colour->green << 8u) |
                 (unsigned long)colour->blue;
         }
     }
     return 1;
+}
+
+int softpc_platform_vga_mode12_frame(unsigned long *pixels,
+    unsigned long pixel_count)
+{
+    return softpc_platform_vga_mode12_active() &&
+        softpc_platform_vga_planar_frame(pixels, pixel_count);
 }
 
 /* The original video core's optional stream-I/O path is a product console
