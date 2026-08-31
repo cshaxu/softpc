@@ -7,6 +7,7 @@
 #include "egamode.h"
 #include "gvi.h"
 #include "egagraph.h"
+#include "egaports.h"
 
 /* Original SoftPC headers erase const for pre-ANSI compilers.  Restore it
    for this C17 test's public-machine API calls. */
@@ -35,6 +36,8 @@ extern void nt_vga_hi_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
 extern void nt_v7vga_hi_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
+extern void nt_text(int ScreenOffset, int ScreenX, int ScreenY, int len,
+    int height);
 extern int softpc_device_bop_dispatch(unsigned char number,
     unsigned int argument);
 extern void c_setAL(unsigned char value);
@@ -79,6 +82,11 @@ int main(void)
     assert(bits != NULL && info != NULL);
     assert(width == 1056u && height == 768u);
 
+    /* The C-VID mode-transition path can emit an empty text repaint.  The
+       original nt_text bulk-copy calculation must discard it rather than
+       treating (height - 1) as an enormous byte count. */
+    nt_text(0, 0, 0, 160, 0);
+
     /* The V7 ROM hands INT 10h extension 6Fh to the original EGA BOP 42h.
        Subfunction 5 selects an extended 640x400 256-colour mode (60h). */
     c_setAH(0x6fu);
@@ -96,6 +104,11 @@ int main(void)
        nt_vga_hi_graph_std renderer must reject that empty region before its
        historical do/while loop consumes the VGA-plane buffer. */
     nt_vga_hi_graph_std(0, 0, 0, 1, 0);
+
+    /* A V7 wrap-edge dirty record can name the final source byte but an
+       overlarge height.  The original painter must clip the source rows to
+       the allocated four-plane buffer before dereferencing the next row. */
+    nt_vga_hi_graph_std(EGA_PLANE_SIZE - 1, 0, 0, 1, 768);
 
     /* V7 VGA's 640-pixel 256-colour path is an original nt_vga.c painter,
        not a standalone pixel converter.  Give it two source pixels and

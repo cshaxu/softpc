@@ -11,6 +11,7 @@
 #define SOFTPC_LONG_TRACE_SLICES 800u
 #define SOFTPC_TRANSITION_WARMUP_SLICES 620u
 #define SOFTPC_TRANSITION_TRACE_SLICES 600u
+#define SOFTPC_PROMPT_SLICES 4000u
 
 extern unsigned short c_getSS(void);
 extern unsigned short c_getSP(void);
@@ -22,6 +23,39 @@ static int text_has_printable_character(const unsigned char *text)
         if (text[index] >= 0x20u && text[index] < 0x7fu) return 1;
     }
     return 0;
+}
+
+static int text_has_dos_prompt(const unsigned char *text)
+{
+    unsigned int row;
+    for (row = 0u; row < 25u; ++row) {
+        char line[81];
+        unsigned int column;
+        for (column = 0u; column < 80u; ++column) {
+            unsigned char character = text[(row * 80u + column) * 2u];
+            line[column] = character >= 0x20u && character < 0x7fu ?
+                (char)character : ' ';
+        }
+        line[80] = '\0';
+        if (strstr(line, ":\\>") != NULL) return 1;
+    }
+    return 0;
+}
+
+static void print_text_screen(const unsigned char *text)
+{
+    unsigned int row;
+    for (row = 0u; row < 25u; ++row) {
+        char line[81];
+        unsigned int column;
+        for (column = 0u; column < 80u; ++column) {
+            unsigned char character = text[(row * 80u + column) * 2u];
+            line[column] = character >= 0x20u && character < 0x7fu ?
+                (char)character : ' ';
+        }
+        line[80] = '\0';
+        fprintf(stderr, "%s\n", line);
+    }
 }
 
 static void print_instruction(softpc_machine *machine, uint16_t cs,
@@ -60,6 +94,7 @@ int main(int argc, char **argv)
     unsigned int slices = SOFTPC_BOOT_SLICES;
     unsigned int warmup_slices = 0u;
     int trace = 0;
+    int require_prompt = 0;
     uint64_t slice_instructions = SOFTPC_SLICE_INSTRUCTIONS;
     softpc_machine_result result;
 
@@ -88,13 +123,17 @@ int main(int argc, char **argv)
                 slices = SOFTPC_TRANSITION_TRACE_SLICES;
                 warmup_slices = SOFTPC_TRANSITION_WARMUP_SLICES;
             }
+        } else if (strcmp(argv[index], "--until-prompt") == 0 &&
+            !require_prompt) {
+            require_prompt = 1;
+            slices = SOFTPC_PROMPT_SLICES;
         } else if (strcmp(argv[index], "--overlay") == 0) {
             options.media_mode = SOFTPC_MEDIA_OVERLAY;
         } else goto usage;
     }
     if (options.floppy_path == NULL && options.hard_disk_path == NULL) {
 usage:
-        fprintf(stderr, "Usage: %s [--floppy floppy.img] [--hdd hard-disk.img] [--overlay] [--trace|--trace-1k|--trace-long|--trace-slices|--trace-transition]\n",
+        fprintf(stderr, "Usage: %s [--floppy floppy.img] [--hdd hard-disk.img] [--overlay] [--until-prompt] [--trace|--trace-1k|--trace-long|--trace-slices|--trace-transition]\n",
             argv[0]);
         return 2;
     }
@@ -118,15 +157,22 @@ usage:
             print_instruction(machine, cs, eip);
         }
         if (softpc_machine_read_physical(machine, 0xb8000u, text,
-                sizeof(text)) == SOFTPC_MACHINE_OK &&
-            text_has_printable_character(text)) {
-            softpc_machine_destroy(machine);
-            return 0;
+                sizeof(text)) == SOFTPC_MACHINE_OK) {
+            if (require_prompt && text_has_dos_prompt(text)) {
+                print_text_screen(text);
+                softpc_machine_destroy(machine);
+                return 0;
+            }
+            if (!require_prompt && text_has_printable_character(text)) {
+                softpc_machine_destroy(machine);
+                return 0;
+            }
         }
     }
     (void)softpc_machine_instruction_pointer(machine, &cs, &eip);
     fprintf(stderr, "softpc-real-boot-smoke: guest produced no text output at %04x:%08x\n",
         (unsigned int)cs, (unsigned int)eip);
+    if (require_prompt) print_text_screen(text);
     print_instruction(machine, cs, eip);
 failed:
     if (result != SOFTPC_MACHINE_OK)

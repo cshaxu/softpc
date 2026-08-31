@@ -282,6 +282,13 @@ void nt_text(int ScreenOffset, int ScreenX, int ScreenY,
     ScreenY = ScreenY / get_host_char_height();
 #endif
 
+    /* A mode transition may emit an empty text dirty rectangle.  The NTVDM
+       console path implicitly filtered these, but the original bulk-copy
+       calculation below uses (height - 1), turning height == 0 into a huge
+       unsigned copy length in the standalone DIB host. */
+    if (pScreenText == NULL || len <= 0 || height <= 0)
+        return;
+
     /*:: Clip requested re-paint region to currently selected console buffer */
 
     //Clip width

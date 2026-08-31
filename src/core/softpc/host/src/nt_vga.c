@@ -824,6 +824,10 @@ void nt_vga_hi_graph_std(int offset, int screen_x, int screen_y,
          i,
          bpl,
          max_width = sc.PC_W_Width >> 3;
+    long source_offset;
+    long source_stride;
+    long source_height;
+    long source_capacity = 4L * EGA_PLANE_SIZE;
     SMALL_RECT   rect;
 
     sub_note_trace5(EGA_HOST_VERBOSE,
@@ -863,6 +867,23 @@ void nt_vga_hi_graph_std(int offset, int screen_x, int screen_y,
        mode transition is in flight; the original do/while below would then
        underflow local_height and walk past the VGA planes. */
     if (screen_x < 0 || screen_y < 0 || width <= 0 || height <= 0)
+        return;
+
+    /* The original NTVDM renderer relied on its shared VGA mapping to make
+       a wrap-edge dirty record harmless.  In the standalone DIB host the
+       planes are a finite linear allocation, so retain the original painter
+       but restrict it to rows whose four interleaved source bytes exist. */
+    if (offset < 0 || get_offset_per_line() <= 0)
+        return;
+    source_offset = (long)offset << 2;
+    source_stride = 4L * get_offset_per_line();
+    if (source_offset < 0 || source_offset > source_capacity - 4L * width)
+        return;
+    source_height = 1L + (source_capacity - source_offset -
+        4L * width) / source_stride;
+    if ((long)height > source_height)
+        height = (int)source_height;
+    if (height <= 0)
         return;
 
     /* local_height is number of lines in video memory. */
