@@ -11,7 +11,8 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 #define SOFTPC_TIMER_ID 1u
 /* Keep each GUI tick bounded for responsive input, but large enough that
  * POST is not delayed by the host timer granularity. */
-#define SOFTPC_RUN_SLICE 10000u
+#define SOFTPC_RUN_SLICE 5000u
+#define SOFTPC_PAINT_INTERVAL_MS 16u
 #define SOFTPC_VGA_MODE13_WIDTH 320
 #define SOFTPC_VGA_MODE13_HEIGHT 200
 #define SOFTPC_VGA_PLANAR_MAX_WIDTH 1024
@@ -28,6 +29,11 @@ static int softpc_window_left_button;
 static int softpc_window_right_button;
 static int softpc_window_result;
 static int softpc_window_keydown_delivered;
+static HWND softpc_window_handle;
+static HANDLE softpc_window_runner;
+static CRITICAL_SECTION softpc_window_machine_lock;
+static volatile LONG softpc_window_runner_active;
+static volatile LONG softpc_window_runner_failed;
 static unsigned char softpc_window_previous_text[SOFTPC_TEXT_COLUMNS *
     SOFTPC_TEXT_ROWS];
 static int softpc_window_previous_text_valid;
@@ -64,6 +70,28 @@ static int softpc_window_text_changed(void)
         return 1;
     }
     return 0;
+}
+
+static DWORD WINAPI softpc_window_run_machine(void *opaque)
+{
+    softpc_machine *machine = (softpc_machine *)opaque;
+
+    while (InterlockedCompareExchange(&softpc_window_runner_active, 0, 0) != 0) {
+        softpc_machine_result result;
+
+        EnterCriticalSection(&softpc_window_machine_lock);
+        result = softpc_machine_run(machine, SOFTPC_RUN_SLICE);
+        LeaveCriticalSection(&softpc_window_machine_lock);
+        if (result != SOFTPC_MACHINE_OK) {
+            InterlockedExchange(&softpc_window_runner_failed, 1);
+            InterlockedExchange(&softpc_window_runner_active, 0);
+            if (softpc_window_handle != NULL)
+                PostMessageA(softpc_window_handle, WM_CLOSE, 0, 0);
+            break;
+        }
+        Sleep(0u);
+    }
+    return 0u;
 }
 
 static int softpc_window_paint_original_dib(HDC dc)
@@ -135,13 +163,18 @@ static void softpc_window_paint(HDC dc)
     uint32_t stride;
     uint32_t cell_bytes;
     int row;
+    EnterCriticalSection(&softpc_window_machine_lock);
     if (softpc_machine_presentation_is_graphics(softpc_window_machine)) {
         (void)softpc_window_paint_original_dib(dc);
+        LeaveCriticalSection(&softpc_window_machine_lock);
         return;
     }
     if (!softpc_machine_presentation_text(softpc_window_machine, &surface,
             &columns, &rows, &stride, &cell_bytes) ||
-        cell_bytes < 1u || stride < columns) return;
+        cell_bytes < 1u || stride < columns) {
+        LeaveCriticalSection(&softpc_window_machine_lock);
+        return;
+    }
     cells = (const unsigned char *)surface;
     SelectObject(dc, softpc_window_font);
     SetBkMode(dc, OPAQUE);
@@ -161,6 +194,7 @@ static void softpc_window_paint(HDC dc)
         line[SOFTPC_TEXT_COLUMNS] = '\0';
         TextOutA(dc, 8, 8 + row * 16, line, SOFTPC_TEXT_COLUMNS);
     }
+    LeaveCriticalSection(&softpc_window_machine_lock);
 }
 
 static void softpc_window_key(WPARAM key, LPARAM lparam, int released)
@@ -212,12 +246,19 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
             int32_t top;
             int32_t right;
             int32_t bottom;
-            (void)softpc_machine_run(softpc_window_machine, SOFTPC_RUN_SLICE);
-            if (!softpc_machine_presentation_is_graphics(softpc_window_machine) &&
-                    softpc_window_text_changed()) {
+            int graphics;
+            int changed = 0;
+
+            EnterCriticalSection(&softpc_window_machine_lock);
+            graphics = softpc_machine_presentation_is_graphics(
+                softpc_window_machine);
+            if (!graphics) changed = softpc_window_text_changed();
+            else changed = softpc_machine_presentation_take_dirty(
+                softpc_window_machine, &left, &top, &right, &bottom);
+            LeaveCriticalSection(&softpc_window_machine_lock);
+            if (!graphics && changed) {
                 InvalidateRect(window, NULL, FALSE);
-            } else if (softpc_machine_presentation_take_dirty(
-                    softpc_window_machine, &left, &top, &right, &bottom)) {
+            } else if (graphics && changed) {
                 RECT dirty;
                 dirty.left = left + 8;
                 dirty.top = top + 8;
@@ -240,55 +281,74 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
         if (wparam == 'P' && (GetKeyState(VK_CONTROL) < 0) &&
             (GetKeyState(VK_MENU) < 0)) {
             softpc_window_result = SOFTPC_VM_FRONTEND_PAUSED;
+            InterlockedExchange(&softpc_window_runner_active, 0);
             DestroyWindow(window);
             return 0;
         }
         if (wparam == VK_ESCAPE) {
             softpc_window_result = SOFTPC_VM_FRONTEND_STOPPED;
+            InterlockedExchange(&softpc_window_runner_active, 0);
             DestroyWindow(window);
             return 0;
         }
+        EnterCriticalSection(&softpc_window_machine_lock);
         softpc_window_key(wparam, lparam, 0);
+        LeaveCriticalSection(&softpc_window_machine_lock);
         return 0;
     case WM_KEYUP:
     case WM_SYSKEYUP:
+        EnterCriticalSection(&softpc_window_machine_lock);
         softpc_window_key(wparam, lparam, 1);
+        LeaveCriticalSection(&softpc_window_machine_lock);
         return 0;
     case WM_CHAR:
+        EnterCriticalSection(&softpc_window_machine_lock);
         if (!softpc_window_keydown_delivered && wparam >= 0x20u && wparam != 0x7fu)
             softpc_window_deliver_unicode((WCHAR)wparam);
         softpc_window_keydown_delivered = 0;
+        LeaveCriticalSection(&softpc_window_machine_lock);
         return 0;
     case WM_MOUSEMOVE:
+        EnterCriticalSection(&softpc_window_machine_lock);
         softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
             softpc_window_mouse_y_from_lparam(lparam));
+        LeaveCriticalSection(&softpc_window_machine_lock);
         return 0;
     case WM_LBUTTONDOWN:
         softpc_window_left_button = 1;
         SetCapture(window);
+        EnterCriticalSection(&softpc_window_machine_lock);
         softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
             softpc_window_mouse_y_from_lparam(lparam));
+        LeaveCriticalSection(&softpc_window_machine_lock);
         return 0;
     case WM_LBUTTONUP:
         softpc_window_left_button = 0;
+        EnterCriticalSection(&softpc_window_machine_lock);
         softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
             softpc_window_mouse_y_from_lparam(lparam));
+        LeaveCriticalSection(&softpc_window_machine_lock);
         if (!softpc_window_right_button) ReleaseCapture();
         return 0;
     case WM_RBUTTONDOWN:
         softpc_window_right_button = 1;
         SetCapture(window);
+        EnterCriticalSection(&softpc_window_machine_lock);
         softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
             softpc_window_mouse_y_from_lparam(lparam));
+        LeaveCriticalSection(&softpc_window_machine_lock);
         return 0;
     case WM_RBUTTONUP:
         softpc_window_right_button = 0;
+        EnterCriticalSection(&softpc_window_machine_lock);
         softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
             softpc_window_mouse_y_from_lparam(lparam));
+        LeaveCriticalSection(&softpc_window_machine_lock);
         if (!softpc_window_left_button) ReleaseCapture();
         return 0;
     case WM_DESTROY:
         KillTimer(window, SOFTPC_TIMER_ID);
+        InterlockedExchange(&softpc_window_runner_active, 0);
         PostQuitMessage(0);
         return 0;
     }
@@ -307,6 +367,7 @@ int softpc_vm_run_window(softpc_machine *machine)
     window_class.lpfnWndProc = softpc_window_proc;
     window_class.hInstance = instance;
     window_class.hCursor = LoadCursorA(NULL, IDC_ARROW);
+    window_class.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
     window_class.lpszClassName = "SoftPCStandaloneWindow";
     if (RegisterClassA(&window_class) == 0 && GetLastError() != ERROR_CLASS_ALREADY_EXISTS)
         return 1;
@@ -316,20 +377,46 @@ int softpc_vm_run_window(softpc_machine *machine)
     softpc_window_left_button = 0;
     softpc_window_right_button = 0;
     softpc_window_result = SOFTPC_VM_FRONTEND_STOPPED;
+    softpc_window_handle = NULL;
+    softpc_window_runner = NULL;
+    InterlockedExchange(&softpc_window_runner_active, 0);
+    InterlockedExchange(&softpc_window_runner_failed, 0);
+    InitializeCriticalSection(&softpc_window_machine_lock);
     softpc_window_font = CreateFontA(16, 8, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
         OEM_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
         FIXED_PITCH | FF_MODERN, "Consolas");
     window = CreateWindowExA(0, window_class.lpszClassName, "SoftPC VM",
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 680, 560,
         NULL, NULL, instance, NULL);
-    if (window == NULL) return 1;
+    if (window == NULL) {
+        DeleteCriticalSection(&softpc_window_machine_lock);
+        return 1;
+    }
+    softpc_window_handle = window;
     ShowWindow(window, SW_SHOW);
     UpdateWindow(window);
-    SetTimer(window, SOFTPC_TIMER_ID, 1u, NULL);
+    SetTimer(window, SOFTPC_TIMER_ID, SOFTPC_PAINT_INTERVAL_MS, NULL);
+    InterlockedExchange(&softpc_window_runner_active, 1);
+    softpc_window_runner = CreateThread(NULL, 0u, softpc_window_run_machine,
+        machine, 0u, NULL);
+    if (softpc_window_runner == NULL) {
+        InterlockedExchange(&softpc_window_runner_active, 0);
+        DestroyWindow(window);
+    }
     while (GetMessageA(&message, NULL, 0, 0) > 0) {
         TranslateMessage(&message);
         DispatchMessageA(&message);
     }
+    if (softpc_window_runner != NULL) {
+        InterlockedExchange(&softpc_window_runner_active, 0);
+        WaitForSingleObject(softpc_window_runner, INFINITE);
+        CloseHandle(softpc_window_runner);
+        softpc_window_runner = NULL;
+    }
+    if (InterlockedCompareExchange(&softpc_window_runner_failed, 0, 0) != 0)
+        softpc_window_result = SOFTPC_VM_FRONTEND_ERROR;
+    softpc_window_handle = NULL;
+    DeleteCriticalSection(&softpc_window_machine_lock);
     DeleteObject(softpc_window_font);
     softpc_window_font = NULL;
     softpc_window_machine = NULL;
