@@ -41,9 +41,9 @@ keyboard/mouse controller path, original FLA/GFI/FDC floppy path, original
 fixed-disk BIOS path, and original V7 VGA controller. The console presents
 text memory at `B800:0000`; the Win32 window presents that text path and the
 original CGA-compatible BIOS modes 04h/05h/06h, VGA mode 13h (320×200,
-256-colour) planes/DAC, and the EGA/VGA 4-plane BIOS modes 0Dh, 0Eh, 0Fh,
-10h and 12h through RGB32 host surfaces. They are presentation front ends,
-not replacement video controllers.
+256-colour) planes/DAC, and the EGA/VGA 4-plane BIOS modes 0Dh through 12h
+through RGB32 host surfaces. They are presentation front ends, not
+replacement video controllers.
 The Win32 window forwards relative pointer movement and its two buttons to
 the original Microsoft Bus Mouse adapter; it does not implement a second
 mouse device.

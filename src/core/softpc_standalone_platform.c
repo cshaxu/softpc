@@ -103,6 +103,7 @@ int softpc_platform_vga_planar_dimensions(unsigned long *width,
     case 0x0eu: *width = 640ul; *height = 200ul; return 1;
     case 0x0fu: *width = 640ul; *height = 350ul; return 1;
     case 0x10u: *width = 640ul; *height = 350ul; return 1;
+    case 0x11u: *width = 640ul; *height = 480ul; return 1;
     case 0x12u: *width = SOFTPC_VGA_MODE12_WIDTH;
         *height = SOFTPC_VGA_MODE12_HEIGHT; return 1;
     default: return 0;
