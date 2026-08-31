@@ -110,6 +110,20 @@ int main(void)
     assert(c_getAX() == 0u);
     assert(c_getBX() == BUILD_ID_CODE);
 
+    /* INT 16h remains the original non-NTVDM keyboard BIOS service.  Its
+       XT-SFD insertion function feeds the same BIOS ring that the standard
+       status and read functions consume. */
+    c_setAH(0x05u);
+    c_setCX(0x1e61u); /* scan code 1Eh, ASCII 'a' */
+    assert(softpc_device_bop_dispatch(BIOS_KEYBOARD_IO, 0u) == TRUE);
+    assert(c_getAX() == 0u);
+    c_setAH(0x01u);
+    assert(softpc_device_bop_dispatch(BIOS_KEYBOARD_IO, 0u) == TRUE);
+    assert(c_getAX() == 0x1e61u);
+    c_setAH(0x00u);
+    assert(softpc_device_bop_dispatch(BIOS_KEYBOARD_IO, 0u) == TRUE);
+    assert(c_getAX() == 0x1e61u);
+
     /* INT 14h remains the original ROM BOP service over the original UART
        controller. Its status result must agree with the direct UART ports. */
     c_setDX(0u);
