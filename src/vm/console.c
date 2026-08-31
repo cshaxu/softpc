@@ -119,7 +119,7 @@ static int softpc_console_has_text(softpc_machine *machine)
         uint32_t column;
         for (column = 0u; column < columns; ++column) {
             unsigned char character = cells[(row * stride + column) * cell_bytes];
-            if (character >= 0x20u && character < 0x7fu) return 1;
+            if (character > 0x20u && character < 0x7fu) return 1;
         }
     }
     return 0;
