@@ -4018,7 +4018,17 @@ TYPEE8:
 
 #ifdef SOFTPC_STANDALONE
 	 if (softpc_platform_consume_clock_tick())
+	    {
 	    host_timer_event();
+	    /* The original wait loop owns device pacing.  Yield only after one
+	       real 20Hz host tick, so FDC/PIT/controller semantics remain intact
+	       while the standalone console/window can poll input between ticks. */
+	    {
+	    extern IBOOL softpc_ccpu_instruction_budget_active;
+	    if (softpc_ccpu_instruction_budget_active && simulate_level == 1)
+	       c_cpu_unsimulate();
+	    }
+	    }
 #endif
 
 #ifndef	PROD
