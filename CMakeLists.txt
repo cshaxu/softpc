@@ -299,3 +299,26 @@ add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tests/standalone_source_boundary.cmake")
 add_test(NAME softpcvm-help COMMAND softpcvm --help)
+
+# Smoke tests intentionally use assert() for both the operation and its
+# postcondition.  Keep those checks live even when validating an optimized
+# machine library; production targets retain their normal Release NDEBUG.
+set(SOFTPC_TEST_TARGETS
+    softpc-machine-smoke
+    softpc-dual-media-smoke
+    softpc-irq-smoke
+    softpc-fdc-smoke
+    softpc-printer-smoke
+    softpc-sound-smoke
+    softpc-serial-smoke
+    softpc-mouse-smoke
+    softpc-vga-frame-smoke
+    softpc-bop-smoke
+    softpc-real-boot-smoke)
+foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
+    if(MSVC)
+        target_compile_options(${softpc_test_target} PRIVATE /UNDEBUG)
+    else()
+        target_compile_options(${softpc_test_target} PRIVATE -UNDEBUG)
+    endif()
+endforeach()
