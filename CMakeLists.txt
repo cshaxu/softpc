@@ -200,6 +200,11 @@ target_link_libraries(softpc-machine-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-machine-smoke COMMAND softpc-machine-smoke)
 set_tests_properties(softpc-machine-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-dual-media-smoke tests/softpc_dual_media_smoke.c)
+target_link_libraries(softpc-dual-media-smoke PRIVATE softpc-machine)
+add_test(NAME softpc-dual-media-smoke COMMAND softpc-dual-media-smoke)
+set_tests_properties(softpc-dual-media-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-irq-smoke tests/softpc_irq_smoke.c)
 target_link_libraries(softpc-irq-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-irq-smoke COMMAND softpc-irq-smoke)
