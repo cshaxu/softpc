@@ -174,6 +174,7 @@ target_include_directories(softpc-ccpu-core PRIVATE
     src/core/softpc/base/cvidc
     src/core)
 target_include_directories(softpc-machine-devices PRIVATE
+    include
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
     src/core/softpc/base/inc

@@ -10,6 +10,13 @@ typedef enum softpc_presentation {
     SOFTPC_PRESENTATION_WINDOW
 } softpc_presentation;
 
+/* Source image policy selected by the fixed launcher configuration. */
+typedef enum softpc_media_mode {
+    SOFTPC_MEDIA_DIRECT = 0,
+    SOFTPC_MEDIA_READONLY,
+    SOFTPC_MEDIA_OVERLAY
+} softpc_media_mode;
+
 typedef enum softpc_machine_result {
     SOFTPC_MACHINE_OK,
     SOFTPC_MACHINE_INVALID_ARGUMENT,
@@ -22,6 +29,7 @@ typedef struct softpc_machine_options {
     const char *hard_disk_path;
     softpc_presentation presentation;
     uint32_t memory_bytes;
+    softpc_media_mode media_mode;
 } softpc_machine_options;
 
 softpc_machine_result softpc_machine_create(const softpc_machine_options *options,

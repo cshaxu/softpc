@@ -27,8 +27,8 @@ The x86 configure writes `build/output/softpc32.exe`; the native x64
 configure writes `build/output/softpc64.exe`. Both use the same adjacent
 `softpc.ini`.
 
-`softpc.ini` has exactly four `key=value` keys: `memory_mb`, `floppy`,
-`hard_disk`, and `display` (`console` or `window`). Both media keys may be
+`softpc.ini` has five `key=value` keys: `memory_mb`, `floppy`, `hard_disk`,
+`display` (`console` or `window`), and `media_mode`. Both media keys may be
 set together, creating fixed `A:` and `C:` slots; the machine boots `A:`
 first, then `C:`. The launchers accept no command-line parameters and always
 load the `softpc.ini` beside themselves; relative image paths are relative to
@@ -40,6 +40,12 @@ original ROM reaches only machine-resident C services through its historical
 BOP instruction table; it has no NTVDM, DOS/WOW, VDD or product-service
 dispatcher.  Fixed firmware, raw-media storage and console/Win32
 presentation are supplied by the standalone VM, not a product host.
+
+Set `media_mode` to choose how both configured images are attached:
+`readonly` passes writes back to the original controller as write-protected,
+`direct` writes the source image files directly, and `overlay` loads both
+images into RAM at startup and directs all guest writes to those volatile
+copies. The distributed configuration uses `overlay` for safe experimentation.
 
 The fixed machine has 16 MiB RAM by default (configurable through
 `memory_mb`), master and slave 8259 PICs, PIT channel 0, the original

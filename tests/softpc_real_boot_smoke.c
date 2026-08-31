@@ -88,11 +88,13 @@ int main(int argc, char **argv)
                 slices = SOFTPC_TRANSITION_TRACE_SLICES;
                 warmup_slices = SOFTPC_TRANSITION_WARMUP_SLICES;
             }
+        } else if (strcmp(argv[index], "--overlay") == 0) {
+            options.media_mode = SOFTPC_MEDIA_OVERLAY;
         } else goto usage;
     }
     if (options.floppy_path == NULL && options.hard_disk_path == NULL) {
 usage:
-        fprintf(stderr, "Usage: %s [--floppy floppy.img] [--hdd hard-disk.img] [--trace|--trace-1k|--trace-long|--trace-slices|--trace-transition]\n",
+        fprintf(stderr, "Usage: %s [--floppy floppy.img] [--hdd hard-disk.img] [--overlay] [--trace|--trace-1k|--trace-long|--trace-slices|--trace-transition]\n",
             argv[0]);
         return 2;
     }

@@ -16,6 +16,7 @@ typedef struct softpc_startup_config {
     char hard_disk_path[SOFTPC_CONFIG_PATH_MAX];
     uint32_t memory_bytes;
     softpc_presentation presentation;
+    softpc_media_mode media_mode;
 } softpc_startup_config;
 
 static char *softpc_trim(char *text)
@@ -125,6 +126,14 @@ static int softpc_load_startup_config(const char *path,
             else if (strcmp(value, "window") == 0)
                 config->presentation = SOFTPC_PRESENTATION_WINDOW;
             else goto invalid;
+        } else if (strcmp(key, "media_mode") == 0) {
+            if (strcmp(value, "readonly") == 0)
+                config->media_mode = SOFTPC_MEDIA_READONLY;
+            else if (strcmp(value, "direct") == 0)
+                config->media_mode = SOFTPC_MEDIA_DIRECT;
+            else if (strcmp(value, "overlay") == 0)
+                config->media_mode = SOFTPC_MEDIA_OVERLAY;
+            else goto invalid;
         } else goto invalid;
     }
     fclose(file);
@@ -138,7 +147,7 @@ int main(int argc, char **argv)
 {
     char config_path[SOFTPC_CONFIG_PATH_MAX];
     softpc_startup_config config = { { 0 }, { 0 }, 16u * 1024u * 1024u,
-        SOFTPC_PRESENTATION_CONSOLE };
+        SOFTPC_PRESENTATION_CONSOLE, SOFTPC_MEDIA_OVERLAY };
     softpc_machine_options options = { 0 };
     softpc_machine *machine = NULL;
     softpc_machine_result result;
@@ -166,6 +175,7 @@ int main(int argc, char **argv)
     options.hard_disk_path = config.hard_disk_path[0] == '\0' ? NULL : config.hard_disk_path;
     options.memory_bytes = config.memory_bytes;
     options.presentation = config.presentation;
+    options.media_mode = config.media_mode;
     result = softpc_machine_create(&options, &machine);
     if (result != SOFTPC_MACHINE_OK) goto done;
     result = softpc_machine_reset(machine);
