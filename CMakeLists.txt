@@ -68,6 +68,7 @@ set_source_files_properties(
     PROPERTIES COMPILE_DEFINITIONS CVIDC_RULE_WORD=1)
 add_library(softpc-ccpu-core OBJECT
     ${SOFTPC_CCPU_SOURCES}
+    src/core/softpc/base/ccpu386/ntstubs.c
     src/core/softpc/base/ccpu386/softpc_ccpu_facade.c
     src/core/softpc/base/ccpu386/vglob.c
     ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
