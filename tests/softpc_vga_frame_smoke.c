@@ -3,6 +3,13 @@
 #include <assert.h>
 #include <stdio.h>
 
+/* Keep this regression on the standalone DIB contract; nt_graph.h carries
+   the historical console-server structure and is intentionally not needed by
+   this direct original-renderer call. */
+extern unsigned char *EGA_planes;
+extern void nt_v7vga_hi_graph_std(int offset, int screen_x, int screen_y,
+    int width, int height);
+
 static void make_boot_disk(const char *path)
 {
     unsigned char sector[512] = { 0 };
@@ -35,6 +42,29 @@ int main(void)
         &height));
     assert(bits != NULL && info != NULL);
     assert(width == 1056u && height == 768u);
+
+    /* V7 VGA's 640-pixel 256-colour path is an original nt_vga.c painter,
+       not a standalone pixel converter.  Give it two source pixels and
+       verify both the shared DIB and the original dirty-rectangle exit. */
+    {
+        int32_t left;
+        int32_t top;
+        int32_t right;
+        int32_t bottom;
+        unsigned char *surface = (unsigned char *)bits;
+
+        while (softpc_machine_presentation_take_dirty(machine, &left, &top,
+            &right, &bottom)) {
+        }
+        EGA_planes[0] = 0x2au;
+        EGA_planes[1] = 0x7eu;
+        nt_v7vga_hi_graph_std(0, 0, 0, 2, 1);
+        assert(surface[0] == 0x2au);
+        assert(surface[1] == 0x7eu);
+        assert(softpc_machine_presentation_take_dirty(machine, &left, &top,
+            &right, &bottom));
+        assert(left == 0 && top == 0 && right == 1 && bottom == 0);
+    }
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);
     return 0;
