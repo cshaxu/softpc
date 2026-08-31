@@ -245,7 +245,12 @@ int softpc_platform_video_buffers_init(void)
     return video_copy != NULL && EGA_planes != NULL && DAC != NULL;
 }
 
-void host_ring_bell(long duration) { UNUSED(duration); }
+/* The fixed standalone machine has no product sound preference; retain the
+   original default-enabled bell path for video BEL output. */
+void host_ring_bell(long duration)
+{
+    if (host_runtime_inquire(C_SOUND_ON)) host_alarm(duration);
+}
 void stream_io_update(void) {}
 
 /* V7's original controller owns the hardware-pointer registers.  The
@@ -506,7 +511,7 @@ void *error_data;
 SHORT host_runtime_inquire(what)
 UTINY what;
 {
-    UNUSED(what);
+    if (what == C_SOUND_ON) return TRUE;
     return 0;
 }
 
