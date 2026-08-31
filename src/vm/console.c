@@ -66,6 +66,54 @@ static void softpc_console_close(HANDLE input, HANDLE output,
     if (private_console) FreeConsole();
 }
 
+static int softpc_console_deliver_virtual_key(softpc_machine *machine,
+    WORD virtual_key, DWORD control_state, int released)
+{
+    KEY_EVENT_RECORD event;
+    BYTE key_number;
+    UINT scan_code;
+    ZeroMemory(&event, sizeof(event));
+    scan_code = MapVirtualKeyW(virtual_key, MAPVK_VK_TO_VSC);
+    if (scan_code == 0u) return -1;
+    event.wVirtualKeyCode = virtual_key;
+    event.wVirtualScanCode = (WORD)(scan_code & 0xffu);
+    event.dwControlKeyState = control_state;
+    key_number = KeyMsgToKeyCode(&event);
+    if (key_number == 0u) return -1;
+    return softpc_machine_key_number(machine, key_number, (uint8_t)released)
+        == SOFTPC_MACHINE_OK ? -1 : SOFTPC_VM_FRONTEND_ERROR;
+}
+
+static int softpc_console_deliver_unicode(softpc_machine *machine,
+    WCHAR character)
+{
+    SHORT translated = VkKeyScanW(character);
+    BYTE modifiers;
+    int action;
+    if (translated == -1) return -2;
+    modifiers = HIBYTE(translated);
+    /* Mobile RDP keyboards commonly supply character packets instead of a
+       key-down/key-up pair. Synthesize one complete physical sequence so
+       modifiers cannot remain stuck when the matching packet has no key-up. */
+    if ((modifiers & 1u) != 0u && (action = softpc_console_deliver_virtual_key(
+            machine, VK_SHIFT, 0u, 0)) >= 0) return action;
+    if ((modifiers & 2u) != 0u && (action = softpc_console_deliver_virtual_key(
+            machine, VK_CONTROL, 0u, 0)) >= 0) return action;
+    if ((modifiers & 4u) != 0u && (action = softpc_console_deliver_virtual_key(
+            machine, VK_MENU, 0u, 0)) >= 0) return action;
+    if ((action = softpc_console_deliver_virtual_key(machine,
+            LOBYTE(translated), 0u, 0)) >= 0) return action;
+    if ((action = softpc_console_deliver_virtual_key(machine,
+            LOBYTE(translated), 0u, 1)) >= 0) return action;
+    if ((modifiers & 4u) != 0u && (action = softpc_console_deliver_virtual_key(
+            machine, VK_MENU, 0u, 1)) >= 0) return action;
+    if ((modifiers & 2u) != 0u && (action = softpc_console_deliver_virtual_key(
+            machine, VK_CONTROL, 0u, 1)) >= 0) return action;
+    if ((modifiers & 1u) != 0u) return softpc_console_deliver_virtual_key(
+        machine, VK_SHIFT, 0u, 1);
+    return -1;
+}
+
 static int softpc_console_key(softpc_machine *machine, const KEY_EVENT_RECORD *key)
 {
     KEY_EVENT_RECORD event;
@@ -82,6 +130,12 @@ static int softpc_console_key(softpc_machine *machine, const KEY_EVENT_RECORD *k
        physical scan code required by the original nt_keycd tables. Recover
        that host detail through the Win32 keyboard layout, then retain the
        original SoftPC key-number translation and 8042 path. */
+    if (key_number == 0u && key->bKeyDown && event.uChar.UnicodeChar != 0u) {
+        int action = softpc_console_deliver_unicode(machine,
+            event.uChar.UnicodeChar);
+        if (action >= 0) return action;
+        if (action == -1) return -1;
+    }
     if (key_number == 0u && event.wVirtualKeyCode != 0u) {
         UINT scan_code = MapVirtualKeyW(event.wVirtualKeyCode,
             MAPVK_VK_TO_VSC);
