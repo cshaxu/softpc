@@ -67,6 +67,64 @@ static unsigned long softpc_vga_dac_component(half_word component)
     return ((unsigned long)(component & 0x3fu) * 255ul + 31ul) / 63ul;
 }
 
+/* nt_ega pre-expanded every plane byte and ORed its contributions to form
+   eight EGA colour indices.  Retain that renderer-only LUT technique while
+   the original controller and palette continue to own all video state. */
+static unsigned char softpc_planar_lut[4][256][8];
+static int softpc_planar_lut_ready;
+
+static void softpc_planar_lut_init(void)
+{
+    unsigned long plane;
+    unsigned long value;
+    unsigned long bit;
+    if (softpc_planar_lut_ready) return;
+    for (plane = 0ul; plane < 4ul; ++plane) {
+        for (value = 0ul; value < 256ul; ++value) {
+            for (bit = 0ul; bit < 8ul; ++bit) {
+                softpc_planar_lut[plane][value][bit] =
+                    (unsigned char)(((value >> (7ul - bit)) & 1ul) << plane);
+            }
+        }
+    }
+    softpc_planar_lut_ready = 1;
+}
+
+static int softpc_planar_frame(unsigned long *pixels, unsigned long width,
+    unsigned long height, unsigned long pixel_count)
+{
+    unsigned long bytes_per_line;
+    unsigned long y;
+    unsigned long byte_index;
+    unsigned long bit;
+    if (pixels == NULL || EGA_planes == NULL || pixel_count < width * height)
+        return 0;
+    softpc_planar_lut_init();
+    bytes_per_line = width >> 3u;
+    for (y = 0ul; y < height; ++y) {
+        for (byte_index = 0ul; byte_index < bytes_per_line; ++byte_index) {
+            unsigned long byte_offset = (y * bytes_per_line + byte_index) << 2u;
+            byte plane0 = EGA_planes[byte_offset];
+            byte plane1 = EGA_planes[byte_offset + 1u];
+            byte plane2 = EGA_planes[byte_offset + 2u];
+            byte plane3 = EGA_planes[byte_offset + 3u];
+            for (bit = 0ul; bit < 8ul; ++bit) {
+                unsigned int colour_index =
+                    softpc_planar_lut[0][plane0][bit] |
+                    softpc_planar_lut[1][plane1][bit] |
+                    softpc_planar_lut[2][plane2][bit] |
+                    softpc_planar_lut[3][plane3][bit];
+                PC_palette *colour = &EGA_GRAPH.palette[colour_index];
+                pixels[y * width + (byte_index << 3u) + bit] =
+                    ((unsigned long)colour->red << 16u) |
+                    ((unsigned long)colour->green << 8u) |
+                    (unsigned long)colour->blue;
+            }
+        }
+    }
+    return 1;
+}
+
 int softpc_platform_vga_mode13_active(void)
 {
     return Video_mode == 0x13u && EGA_planes != NULL && DAC != NULL;
@@ -116,30 +174,10 @@ int softpc_platform_vga_planar_frame(unsigned long *pixels,
 {
     unsigned long width;
     unsigned long height;
-    unsigned long bytes_per_line;
-    unsigned long x;
-    unsigned long y;
     if (pixels == NULL || !softpc_platform_vga_planar_dimensions(&width,
             &height) || pixel_count < width * height)
         return 0;
-    bytes_per_line = width >> 3u;
-    for (y = 0ul; y < height; ++y) {
-        for (x = 0ul; x < width; ++x) {
-            unsigned long byte_offset = (y * bytes_per_line + (x >> 3u)) << 2u;
-            byte bit = (byte)(0x80u >> (x & 7u));
-            unsigned int colour_index =
-                ((EGA_planes[byte_offset] & bit) != 0u ? 1u : 0u) |
-                ((EGA_planes[byte_offset + 1u] & bit) != 0u ? 2u : 0u) |
-                ((EGA_planes[byte_offset + 2u] & bit) != 0u ? 4u : 0u) |
-                ((EGA_planes[byte_offset + 3u] & bit) != 0u ? 8u : 0u);
-            PC_palette *colour = &EGA_GRAPH.palette[colour_index];
-            pixels[y * width + x] =
-                ((unsigned long)colour->red << 16u) |
-                ((unsigned long)colour->green << 8u) |
-                (unsigned long)colour->blue;
-        }
-    }
-    return 1;
+    return softpc_planar_frame(pixels, width, height, pixel_count);
 }
 
 int softpc_platform_vga_mode12_frame(unsigned long *pixels,
@@ -207,22 +245,7 @@ int softpc_platform_v7_graphics_frame(unsigned long *pixels,
         }
         return 1;
     }
-    for (y = 0ul; y < height; ++y) {
-        for (x = 0ul; x < width; ++x) {
-            unsigned long byte_offset = (y * (width >> 3u) + (x >> 3u)) << 2u;
-            byte bit = (byte)(0x80u >> (x & 7u));
-            unsigned int colour_index =
-                ((EGA_planes[byte_offset] & bit) != 0u ? 1u : 0u) |
-                ((EGA_planes[byte_offset + 1u] & bit) != 0u ? 2u : 0u) |
-                ((EGA_planes[byte_offset + 2u] & bit) != 0u ? 4u : 0u) |
-                ((EGA_planes[byte_offset + 3u] & bit) != 0u ? 8u : 0u);
-            PC_palette *colour = &EGA_GRAPH.palette[colour_index];
-            pixels[y * width + x] = ((unsigned long)colour->red << 16u) |
-                ((unsigned long)colour->green << 8u) |
-                (unsigned long)colour->blue;
-        }
-    }
-    return 1;
+    return softpc_planar_frame(pixels, width, height, pixel_count);
 }
 
 int softpc_platform_cga_graphics_dimensions(unsigned long *width,
