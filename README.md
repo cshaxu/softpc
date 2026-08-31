@@ -5,12 +5,13 @@ source, without NTVDM, DOS/WOW, VDD, BOP service dispatch, or an NTVDM host
 process.  The machine shape is fixed to the currently selected SoftPC
 configuration; users supply boot media rather than select a machine profile.
 
-Build the VM, then set the fixed machine defaults in `softpc.yaml`:
+Build the VM, then set the fixed machine defaults in
+`build/output/softpc.ini`:
 
 ```text
 cmake -S . -B build -G Ninja
 cmake --build build --parallel 8
-build/softpcvm
+build/output/softpc64.exe
 ```
 
 The CMake build supports both 32-bit and 64-bit Windows hosts.  A 32-bit
@@ -22,12 +23,17 @@ cmake -S . -B build-x86 -G Ninja -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc
 cmake --build build-x86 --parallel 8
 ```
 
-`softpc.yaml` has exactly four top-level keys: `memory_mb`, `floppy`,
+The x86 configure writes `build/output/softpc32.exe`; the native x64
+configure writes `build/output/softpc64.exe`. Both use the same adjacent
+`softpc.ini`.
+
+`softpc.ini` has exactly four `key=value` keys: `memory_mb`, `floppy`,
 `hard_disk`, and `display` (`console` or `window`). Both media keys may be
 set together, creating fixed `A:` and `C:` slots; the machine boots `A:`
-first, then `C:`. Use `--config path.yaml` only to point at another fixed
-machine-default file. Console presentation runs continuously; press `Esc` to
-leave it. The current
+first, then `C:`. The launchers accept no command-line parameters and always
+load the `softpc.ini` beside themselves; relative image paths are relative to
+that file. Console presentation runs continuously; press `Esc` to leave it.
+The current
 core links the detached CCPU, SAS, I/O, PIC, event, original FDC/FLA/GFI,
 fixed-disk BIOS and V7 VGA packages through standalone host ports.  The
 original ROM reaches only machine-resident C services through its historical

@@ -205,6 +205,22 @@ if(WIN32)
     target_link_libraries(softpcvm PRIVATE user32 gdi32)
 endif()
 
+# The standalone distribution has one fixed configuration alongside the two
+# host-width launchers.  A 32-bit and a 64-bit configure can therefore share
+# one stable delivery directory without overwriting each other's executable.
+set(SOFTPC_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/output")
+if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set(SOFTPC_LAUNCHER_NAME softpc32)
+else()
+    set(SOFTPC_LAUNCHER_NAME softpc64)
+endif()
+file(MAKE_DIRECTORY "${SOFTPC_OUTPUT_DIRECTORY}")
+set_target_properties(softpcvm PROPERTIES
+    OUTPUT_NAME "${SOFTPC_LAUNCHER_NAME}"
+    RUNTIME_OUTPUT_DIRECTORY "${SOFTPC_OUTPUT_DIRECTORY}")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/softpc.ini"
+    "${SOFTPC_OUTPUT_DIRECTORY}/softpc.ini" COPYONLY)
+
 enable_testing()
 add_executable(softpc-machine-smoke tests/softpc_machine_smoke.c)
 target_link_libraries(softpc-machine-smoke PRIVATE softpc-machine)
@@ -318,7 +334,8 @@ target_link_libraries(softpc-real-boot-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tests/standalone_source_boundary.cmake")
-add_test(NAME softpcvm-help COMMAND softpcvm --help)
+add_test(NAME softpcvm-reject-arguments COMMAND softpcvm --help)
+set_tests_properties(softpcvm-reject-arguments PROPERTIES WILL_FAIL TRUE)
 
 # Smoke tests intentionally use assert() for both the operation and its
 # postcondition.  Keep those checks live even when validating an optimized

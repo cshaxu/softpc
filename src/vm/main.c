@@ -2,6 +2,8 @@
 #include "softpc_machine.h"
 #include "win32_window.h"
 
+#include <windows.h>
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,6 +40,56 @@ static int softpc_copy_value(char *target, const char *value)
     return 1;
 }
 
+static int softpc_get_config_path(char *path)
+{
+    DWORD length = GetModuleFileNameA(NULL, path, SOFTPC_CONFIG_PATH_MAX);
+    char *separator;
+    char *forward_separator;
+
+    if (length == 0u || length >= SOFTPC_CONFIG_PATH_MAX) return 0;
+    separator = strrchr(path, '\\');
+    forward_separator = strrchr(path, '/');
+    if (forward_separator != NULL &&
+        (separator == NULL || forward_separator > separator))
+        separator = forward_separator;
+    if (separator == NULL) return 0;
+    if ((size_t)(separator - path) + sizeof("softpc.ini") >=
+        SOFTPC_CONFIG_PATH_MAX)
+        return 0;
+    memcpy(separator + 1, "softpc.ini", sizeof("softpc.ini"));
+    return 1;
+}
+
+static int softpc_path_is_absolute(const char *path)
+{
+    return path[0] == '/' || path[0] == '\\' ||
+        (isalpha((unsigned char)path[0]) && path[1] == ':' &&
+            (path[2] == '/' || path[2] == '\\'));
+}
+
+static int softpc_resolve_image_path(char *path, const char *config_path)
+{
+    const char *separator;
+    const char *forward_separator;
+    char resolved[SOFTPC_CONFIG_PATH_MAX];
+    size_t directory_length;
+    size_t image_length;
+
+    if (path[0] == '\0' || softpc_path_is_absolute(path)) return 1;
+    separator = strrchr(config_path, '\\');
+    forward_separator = strrchr(config_path, '/');
+    if (forward_separator != NULL &&
+        (separator == NULL || forward_separator > separator))
+        separator = forward_separator;
+    if (separator == NULL) return 0;
+    directory_length = (size_t)(separator - config_path) + 1u;
+    image_length = strlen(path);
+    if (directory_length + image_length >= sizeof(resolved)) return 0;
+    memcpy(resolved, config_path, directory_length);
+    memcpy(resolved + directory_length, path, image_length + 1u);
+    return softpc_copy_value(path, resolved);
+}
+
 static int softpc_load_startup_config(const char *path,
     softpc_startup_config *config)
 {
@@ -47,14 +99,17 @@ static int softpc_load_startup_config(const char *path,
     while (fgets(line, sizeof(line), file) != NULL) {
         char *key;
         char *value;
-        char *colon = strchr(line, ':');
+        char *equals = strchr(line, '=');
         char *comment = strchr(line, '#');
+        char *semicolon = strchr(line, ';');
+        if (semicolon != NULL && (comment == NULL || semicolon < comment))
+            comment = semicolon;
         if (comment != NULL) *comment = '\0';
-        if (colon == NULL) continue;
-        *colon = '\0';
+        if (equals == NULL) continue;
+        *equals = '\0';
         key = softpc_trim(line);
-        value = softpc_trim(colon + 1);
-        if (*key == '\0' || *value == '\0') continue;
+        value = softpc_trim(equals + 1);
+        if (*key == '\0') continue;
         if (strcmp(key, "memory_mb") == 0) {
             char *end;
             unsigned long mib = strtoul(value, &end, 10);
@@ -79,36 +134,32 @@ invalid:
     return 0;
 }
 
-static void softpc_usage(const char *program)
-{
-    fprintf(stderr, "Usage: %s [--config softpc.yaml]\n", program);
-}
-
 int main(int argc, char **argv)
 {
-    const char *config_path = "softpc.yaml";
+    char config_path[SOFTPC_CONFIG_PATH_MAX];
     softpc_startup_config config = { { 0 }, { 0 }, 16u * 1024u * 1024u,
         SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine_options options = { 0 };
     softpc_machine *machine = NULL;
     softpc_machine_result result;
-    int index;
+    (void)argv;
 
-    for (index = 1; index < argc; ++index) {
-        if (!strcmp(argv[index], "--help") || !strcmp(argv[index], "-h")) {
-            softpc_usage(argv[0]);
-            return 0;
-        }
-        if (!strcmp(argv[index], "--config") && index + 1 < argc) {
-            config_path = argv[++index];
-            continue;
-        }
-        softpc_usage(argv[0]);
+    if (argc != 1) {
+        fprintf(stderr, "softpcvm: command-line arguments are not supported\n");
         return 2;
+    }
+    if (!softpc_get_config_path(config_path)) {
+        fprintf(stderr, "softpcvm: cannot determine adjacent softpc.ini path\n");
+        return 1;
     }
     if (!softpc_load_startup_config(config_path, &config)) {
         fprintf(stderr, "softpcvm: cannot read fixed-machine config '%s'\n",
             config_path);
+        return 1;
+    }
+    if (!softpc_resolve_image_path(config.floppy_path, config_path) ||
+        !softpc_resolve_image_path(config.hard_disk_path, config_path)) {
+        fprintf(stderr, "softpcvm: image path in '%s' is too long\n", config_path);
         return 1;
     }
     options.floppy_path = config.floppy_path[0] == '\0' ? NULL : config.floppy_path;

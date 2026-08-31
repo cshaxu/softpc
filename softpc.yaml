@@ -1,5 +1,0 @@
-# Fixed single-machine defaults. Paths are resolved from the working directory.
-memory_mb: 16
-floppy: ""
-hard_disk: ""
-display: console
