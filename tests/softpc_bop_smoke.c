@@ -29,6 +29,20 @@ extern void c_setDX(IU16 value);
 extern ISM32 c_setDS(IU16 value);
 extern IU16 c_getAX(void);
 extern IU16 c_getBX(void);
+extern void reset(void);
+extern void keyboard_int(void);
+extern void keyboard_io(void);
+extern void diskette_int(void);
+extern void diskette_io(void);
+extern void video_io(void);
+extern void ega_video_io(void);
+extern void printer_io(void);
+extern void rs232_io(void);
+extern void disk_io(void);
+extern void equipment(void);
+extern void memory_size(void);
+extern void time_of_day(void);
+extern void bootstrap(void);
 
 static void make_boot_disk(const char *path)
 {
@@ -79,6 +93,25 @@ int main(void)
     assert(BIOS[BIOS_BOOT_STRAP] != NULL);
     assert(BIOS[BIOS_MOUSE_INSTALL1] != NULL);
     assert(BIOS[BIOS_MOUSE_VIDEO_IO] != NULL);
+
+    /* The fixed-profile BOP table must remain a direct routing table to the
+       original machine code.  A wrapper at any of these slots would be a
+       replacement controller/firmware layer, rather than the permitted
+       ROM-to-C bridge. */
+    assert(BIOS[BIOS_RESET] == reset);
+    assert(BIOS[BIOS_KB_INT] == keyboard_int);
+    assert(BIOS[BIOS_KEYBOARD_IO] == keyboard_io);
+    assert(BIOS[BIOS_DISKETTE_INT] == diskette_int);
+    assert(BIOS[BIOS_DISKETTE_IO] == diskette_io);
+    assert(BIOS[BIOS_VIDEO_IO] == video_io);
+    assert(BIOS[0x42] == ega_video_io);
+    assert(BIOS[BIOS_PRINTER_IO] == printer_io);
+    assert(BIOS[BIOS_RS232_IO] == rs232_io);
+    assert(BIOS[BIOS_DISK_IO] == disk_io);
+    assert(BIOS[BIOS_EQUIPMENT] == equipment);
+    assert(BIOS[BIOS_MEMORY_SIZE] == memory_size);
+    assert(BIOS[BIOS_TIME_OF_DAY] == time_of_day);
+    assert(BIOS[BIOS_BOOT_STRAP] == bootstrap);
 
     /* BOP 01 is the original BIOS dummy interrupt, not a product service. */
     assert(softpc_device_bop_dispatch(BIOS_DUMMY_INT, 0u) == TRUE);
