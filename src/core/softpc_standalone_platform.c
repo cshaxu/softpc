@@ -842,6 +842,12 @@ void LIM_w_write(sys_addr intel_addr)
     UNUSED(intel_addr);
 }
 
+#ifdef host_simulate
+#undef host_simulate
+#endif
+/* CPU_40's original host contract dispatches through this slot.  The
+ * standalone machine has one executor, so bind it directly at load time. */
+void (*host_simulate_func)() = c_cpu_simulate;
 void host_simulate(void)
 {
     c_cpu_simulate();
