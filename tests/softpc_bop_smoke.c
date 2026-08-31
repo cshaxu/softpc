@@ -69,11 +69,11 @@ int main(void)
     /* BOP 01 is the original BIOS dummy interrupt, not a product service. */
     assert(softpc_device_bop_dispatch(BIOS_DUMMY_INT, 0u) == TRUE);
 
-    /* INT 15h stays an original SoftPC BIOS handler: the detached BOP table
-       does not substitute a VM-specific extended-memory service. */
+    /* INT 15h stays an original SoftPC BIOS handler: under the selected PM
+       profile it returns the original CMOS-backed extended-memory value. */
     c_setAH(INT15_EMS_DETERMINE);
     assert(softpc_device_bop_dispatch(BIOS_CASSETTE_IO, 0u) == TRUE);
-    assert(c_getAX() == 0u);
+    assert(c_getAX() == 0x3c00u); /* 16 MiB fixed RAM less the first MiB */
 
     /* The original reset BOP reinitialises machine controllers, not a
        session/product shell.  The raw-image GFI attachment survives it. */
