@@ -144,6 +144,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/host/src/nt_ega.c
     src/core/softpc/host/src/nt_graph.c
     src/core/softpc/host/src/nt_keycd.c
+    src/core/softpc/host/src/nt_sound.c
     src/core/softpc/host/src/nt_munge.c
     src/core/softpc/host/src/nt_cga.c
     src/core/softpc/host/src/nt_vga.c
@@ -243,6 +244,15 @@ target_include_directories(softpc-printer-smoke PRIVATE
     src/core/softpc/base/inc)
 add_test(NAME softpc-printer-smoke COMMAND softpc-printer-smoke)
 set_tests_properties(softpc-printer-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-sound-smoke tests/softpc_sound_smoke.c)
+target_link_libraries(softpc-sound-smoke PRIVATE softpc-machine)
+target_include_directories(softpc-sound-smoke PRIVATE
+    src/core/softpc/host/inc
+    src/core/softpc/host/inc/x86/prod
+    src/core/softpc/base/inc)
+add_test(NAME softpc-sound-smoke COMMAND softpc-sound-smoke)
+set_tests_properties(softpc-sound-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-serial-smoke tests/softpc_serial_smoke.c)
 target_link_libraries(softpc-serial-smoke PRIVATE softpc-machine)

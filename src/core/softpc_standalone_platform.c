@@ -127,12 +127,6 @@ int softpc_platform_video_buffers_init(void)
     return video_copy != NULL && EGA_planes != NULL && DAC != NULL;
 }
 
-/* The fixed standalone machine has no product sound preference; retain the
-   original default-enabled bell path for video BEL output. */
-void host_ring_bell(long duration)
-{
-    if (host_runtime_inquire(C_SOUND_ON)) host_alarm(duration);
-}
 void stream_io_update(void) {}
 
 /* V7's original controller owns the hardware-pointer registers.  The
@@ -206,19 +200,15 @@ void memset4(unsigned int data, unsigned int *destination, unsigned int count)
 #define SOFTPC_CONFIG_GFX_ADAPTER 54u
 #define SOFTPC_VGA_ADAPTER 5u
 
-/* The original PPI and 8253 own speaker gating and waveform generation.
-   This is only their standalone host sink.  NTVDM used the private Beep
-   device asynchronously; use a small Win32 worker so a guest tone never
-   blocks the executor or its presentation event loop. */
+/* Standalone audio is only a presentation sink.  nt_sound.c owns the
+ * original PPI/Timer2 state transitions and requests a frequency here. */
 #ifdef _WIN32
-#define SOFTPC_SPEAKER_CLOCK_HZ 1193180ul
-#define SOFTPC_SPEAKER_MIN_HZ 37ul
+#define SOFTPC_SPEAKER_MIN_HZ 10ul
 #define SOFTPC_SPEAKER_MAX_HZ 20000ul
 #define SOFTPC_SPEAKER_SLICE_MS 40u
 static HANDLE softpc_speaker_wake;
 static HANDLE softpc_speaker_stop;
 static HANDLE softpc_speaker_thread;
-static volatile LONG softpc_speaker_enabled;
 static volatile LONG softpc_speaker_frequency;
 
 static DWORD WINAPI softpc_speaker_worker(void *unused)
@@ -232,8 +222,7 @@ static DWORD WINAPI softpc_speaker_worker(void *unused)
         if (result == WAIT_OBJECT_0) break;
         if (result != WAIT_OBJECT_0 + 1u) continue;
         ResetEvent(softpc_speaker_wake);
-        while (InterlockedCompareExchange(&softpc_speaker_enabled, 0, 0) != 0 &&
-               InterlockedCompareExchange(&softpc_speaker_frequency, 0, 0) != 0) {
+        while (InterlockedCompareExchange(&softpc_speaker_frequency, 0, 0) != 0) {
             DWORD frequency = (DWORD)InterlockedCompareExchange(
                 &softpc_speaker_frequency, 0, 0);
             (void)Beep(frequency, SOFTPC_SPEAKER_SLICE_MS);
@@ -267,6 +256,16 @@ static void softpc_speaker_wake_worker(void)
     SetEvent(softpc_speaker_wake);
 }
 
+void softpc_standalone_audio_set_tone(ULONG frequency, ULONG duration)
+{
+    if (duration < 10u || frequency < SOFTPC_SPEAKER_MIN_HZ ||
+        frequency > SOFTPC_SPEAKER_MAX_HZ)
+        frequency = 0u;
+    InterlockedExchange(&softpc_speaker_frequency, (LONG)frequency);
+    if (frequency != 0u) softpc_speaker_wake_worker();
+    else if (softpc_speaker_wake != NULL) SetEvent(softpc_speaker_wake);
+}
+
 static void softpc_speaker_shutdown(void)
 {
     if (softpc_speaker_thread != NULL) {
@@ -280,35 +279,9 @@ static void softpc_speaker_shutdown(void)
     if (softpc_speaker_stop != NULL) CloseHandle(softpc_speaker_stop);
     softpc_speaker_wake = NULL;
     softpc_speaker_stop = NULL;
-    InterlockedExchange(&softpc_speaker_enabled, 0);
     InterlockedExchange(&softpc_speaker_frequency, 0);
 }
 #endif
-
-void host_enable_timer2_sound(void)
-{
-#ifdef _WIN32
-    InterlockedExchange(&softpc_speaker_enabled, 1);
-    if (InterlockedCompareExchange(&softpc_speaker_frequency, 0, 0) != 0)
-        softpc_speaker_wake_worker();
-#endif
-}
-
-void host_disable_timer2_sound(void)
-{
-#ifdef _WIN32
-    InterlockedExchange(&softpc_speaker_enabled, 0);
-    if (softpc_speaker_wake != NULL) SetEvent(softpc_speaker_wake);
-#endif
-}
-
-void host_alarm(long duration)
-{
-    UNUSED(duration);
-#ifdef _WIN32
-    (void)MessageBeep(MB_OK);
-#endif
-}
 
 /* The console owns its event pump and invokes the machine in bounded slices.
    Returning here therefore yields to that slice boundary without borrowing a
@@ -508,31 +481,6 @@ void host_gettimeofday(struct host_timeval *value, struct host_timezone *zone)
 IU32 host_speed(IU32 nominal_instructions)
 {
     return nominal_instructions == 0u ? 1u : nominal_instructions;
-}
-
-void host_timer2_waveform(unsigned int delay, unsigned long low_clocks,
-    unsigned long high_clocks, int starts_low, int repeats)
-{
-    UNUSED(delay);
-    UNUSED(starts_low);
-    UNUSED(repeats);
-#ifdef _WIN32
-    unsigned long period = low_clocks + high_clocks;
-    unsigned long frequency = period == 0ul ? 0ul :
-        SOFTPC_SPEAKER_CLOCK_HZ / period;
-    if (frequency < SOFTPC_SPEAKER_MIN_HZ ||
-        frequency > SOFTPC_SPEAKER_MAX_HZ)
-        frequency = 0ul;
-    InterlockedExchange(&softpc_speaker_frequency, (LONG)frequency);
-    if (frequency != 0ul &&
-        InterlockedCompareExchange(&softpc_speaker_enabled, 0, 0) != 0)
-        softpc_speaker_wake_worker();
-    else if (softpc_speaker_wake != NULL)
-        SetEvent(softpc_speaker_wake);
-#else
-    UNUSED(low_clocks);
-    UNUSED(high_clocks);
-#endif
 }
 
 void host_timer_init(void)
