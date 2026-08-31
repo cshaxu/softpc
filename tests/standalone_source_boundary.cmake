@@ -104,6 +104,8 @@ set(required_original_controller_sources
     "src/core/softpc/host/src/nt_munge.c"
     "src/core/softpc/host/src/nt_graph.c"
     "src/core/softpc/host/src/nt_keycd.c"
+    "src/core/softpc/host/src/nt_com.c"
+    "src/core/softpc/host/src/nt_lpt.c"
     "src/core/softpc/host/src/nt_sound.c")
 foreach(source IN LISTS required_original_controller_sources)
     string(FIND "${build_definition}" "${source}" source_location)
