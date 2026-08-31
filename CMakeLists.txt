@@ -274,6 +274,15 @@ target_include_directories(softpc-mouse-smoke PRIVATE
 add_test(NAME softpc-mouse-smoke COMMAND softpc-mouse-smoke)
 set_tests_properties(softpc-mouse-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-keycode-smoke tests/softpc_keycode_smoke.c)
+target_link_libraries(softpc-keycode-smoke PRIVATE softpc-machine)
+target_include_directories(softpc-keycode-smoke PRIVATE
+    src/core/softpc/host/inc
+    src/core/softpc/host/inc/x86/prod
+    src/core/softpc/base/inc)
+add_test(NAME softpc-keycode-smoke COMMAND softpc-keycode-smoke)
+set_tests_properties(softpc-keycode-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-vga-frame-smoke tests/softpc_vga_frame_smoke.c)
 target_link_libraries(softpc-vga-frame-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-vga-frame-smoke PRIVATE
@@ -323,6 +332,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-sound-smoke
     softpc-serial-smoke
     softpc-mouse-smoke
+    softpc-keycode-smoke
     softpc-vga-frame-smoke
     softpc-bop-smoke
     softpc-quick-time-smoke
