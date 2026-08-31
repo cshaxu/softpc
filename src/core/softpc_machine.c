@@ -44,19 +44,9 @@ extern FILE *trace_file;
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
 #define SOFTPC_MINIMUM_RAM_BYTES (1024ul * 1024ul)
-#define SOFTPC_BOOT_SECTOR_BYTES 512u
-
-static int softpc_machine_floppy_geometry(const char *path,
-    unsigned short *sectors_per_track, unsigned short *heads);
-static int softpc_machine_hdd_geometry(const char *path,
-    unsigned short *sectors_per_track, unsigned short *heads);
 
 struct softpc_machine {
     softpc_machine_options options;
-    unsigned short floppy_sectors_per_track;
-    unsigned short floppy_heads;
-    unsigned short hard_disk_sectors_per_track;
-    unsigned short hard_disk_heads;
     unsigned long memory_bytes;
     int reset;
     int hardware_initialized;
@@ -92,22 +82,6 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
     if (machine->memory_bytes < SOFTPC_MINIMUM_RAM_BYTES) {
         free(machine);
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    }
-    machine->floppy_sectors_per_track = 18u;
-    machine->floppy_heads = 2u;
-    machine->hard_disk_sectors_per_track = 63u;
-    machine->hard_disk_heads = 16u;
-    if (options->floppy_path != NULL && !softpc_machine_floppy_geometry(
-            options->floppy_path, &machine->floppy_sectors_per_track,
-            &machine->floppy_heads)) {
-        free(machine);
-        return SOFTPC_MACHINE_IO_ERROR;
-    }
-    if (options->hard_disk_path != NULL && !softpc_machine_hdd_geometry(
-            options->hard_disk_path, &machine->hard_disk_sectors_per_track,
-            &machine->hard_disk_heads)) {
-        free(machine);
-        return SOFTPC_MACHINE_IO_ERROR;
     }
     *machine_out = machine;
     return SOFTPC_MACHINE_OK;
@@ -203,70 +177,6 @@ softpc_machine_result softpc_machine_instruction_address(
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     *address = (uint32_t)(c_getCS_BASE() + c_getEIP());
     return SOFTPC_MACHINE_OK;
-}
-
-static unsigned short softpc_machine_u16le(const unsigned char *bytes)
-{
-    return (unsigned short)(bytes[0] | ((unsigned short)bytes[1] << 8u));
-}
-
-static int softpc_machine_floppy_geometry(const char *path,
-    unsigned short *sectors_per_track, unsigned short *heads)
-{
-    FILE *file = fopen(path, "rb");
-    long bytes;
-    if (file == NULL) return 0;
-    if (fseek(file, 0, SEEK_END) != 0) { fclose(file); return 0; }
-    bytes = ftell(file);
-    fclose(file);
-    *heads = 2u;
-    switch (bytes) {
-    case 368640L: *sectors_per_track = 9u; return 1;
-    case 737280L: *sectors_per_track = 9u; return 1;
-    case 1228800L: *sectors_per_track = 15u; return 1;
-    case 1474560L: *sectors_per_track = 18u; return 1;
-    case 2949120L: *sectors_per_track = 36u; return 1;
-    default: *sectors_per_track = 18u; return 1;
-    }
-}
-
-static int softpc_machine_hdd_geometry(const char *path,
-    unsigned short *sectors_per_track, unsigned short *heads)
-{
-    unsigned char sector[SOFTPC_BOOT_SECTOR_BYTES];
-    FILE *file = fopen(path, "rb");
-    unsigned long partition_lba = 0u;
-    unsigned int index;
-    if (file == NULL) return 0;
-    if (fread(sector, 1u, sizeof(sector), file) == sizeof(sector) &&
-        sector[510] == 0x55u && sector[511] == 0xaau) {
-        for (index = 0u; index < 4u; ++index) {
-            const unsigned char *entry = sector + 446u + index * 16u;
-            if (entry[4] != 0u) {
-                partition_lba = (unsigned long)entry[8] |
-                    ((unsigned long)entry[9] << 8u) |
-                    ((unsigned long)entry[10] << 16u) |
-                    ((unsigned long)entry[11] << 24u);
-                break;
-            }
-        }
-        if (partition_lba != 0u && fseek(file,
-                (long)(partition_lba * SOFTPC_BOOT_SECTOR_BYTES), SEEK_SET) == 0 &&
-            fread(sector, 1u, sizeof(sector), file) == sizeof(sector)) {
-            unsigned short sectors = softpc_machine_u16le(sector + 24u);
-            unsigned short disk_heads = softpc_machine_u16le(sector + 26u);
-            if (sectors != 0u && sectors <= 63u && disk_heads != 0u) {
-                *sectors_per_track = sectors;
-                *heads = disk_heads;
-                fclose(file);
-                return 1;
-            }
-        }
-    }
-    fclose(file);
-    *sectors_per_track = 63u;
-    *heads = 16u;
-    return 1;
 }
 
 void softpc_machine_destroy(softpc_machine *machine)
