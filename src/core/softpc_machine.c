@@ -27,6 +27,7 @@ extern int softpc_platform_read_physical(unsigned long address,
     unsigned char *bytes, unsigned long length);
 extern void softpc_device_bop_register_machine_services(void);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
+extern int softpc_platform_keyboard_key(int key, int released);
 extern void mouse_send(int delta_x, int delta_y, int left, int right);
 extern void time_strobe(void);
 extern void host_timer_shutdown(void);
@@ -134,6 +135,15 @@ softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,
     if (machine == NULL || !machine->reset)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     return softpc_platform_keyboard_scancode((unsigned char)scan_code) ?
+        SOFTPC_MACHINE_OK : SOFTPC_MACHINE_IO_ERROR;
+}
+
+softpc_machine_result softpc_machine_key_number(softpc_machine *machine,
+    uint8_t key_number, uint8_t released)
+{
+    if (machine == NULL || !machine->reset || key_number == 0u)
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    return softpc_platform_keyboard_key((int)key_number, released != 0u) ?
         SOFTPC_MACHINE_OK : SOFTPC_MACHINE_IO_ERROR;
 }
 

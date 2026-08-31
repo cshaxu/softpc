@@ -143,6 +143,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/video/cga.c
     src/core/softpc/host/src/nt_ega.c
     src/core/softpc/host/src/nt_graph.c
+    src/core/softpc/host/src/nt_keycd.c
     src/core/softpc/host/src/nt_munge.c
     src/core/softpc/host/src/nt_cga.c
     src/core/softpc/host/src/nt_vga.c

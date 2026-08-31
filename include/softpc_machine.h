@@ -42,6 +42,9 @@ softpc_machine_result softpc_machine_instruction_address(
     const softpc_machine *machine, uint32_t *address);
 softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,
     uint8_t scan_code);
+/* Deliver an original SoftPC keyboard key number after host mapping. */
+softpc_machine_result softpc_machine_key_number(softpc_machine *machine,
+    uint8_t key_number, uint8_t released);
 /* Inject relative host-pointer movement into the original Microsoft Bus
  * Mouse adapter. Button values are zero (up) or nonzero (down). */
 softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,

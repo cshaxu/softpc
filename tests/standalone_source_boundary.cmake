@@ -102,7 +102,8 @@ set(required_original_controller_sources
     "src/core/softpc/host/src/nt_ega.c"
     "src/core/softpc/host/src/nt_vga.c"
     "src/core/softpc/host/src/nt_munge.c"
-    "src/core/softpc/host/src/nt_graph.c")
+    "src/core/softpc/host/src/nt_graph.c"
+    "src/core/softpc/host/src/nt_keycd.c")
 foreach(source IN LISTS required_original_controller_sources)
     string(FIND "${build_definition}" "${source}" source_location)
     if(source_location EQUAL -1)

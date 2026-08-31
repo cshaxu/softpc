@@ -3,6 +3,8 @@
 #ifdef _WIN32
 #include <windows.h>
 
+extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
+
 #define SOFTPC_TEXT_COLUMNS 80
 #define SOFTPC_TEXT_ROWS 25
 #define SOFTPC_TEXT_ADDRESS 0xb8000u
@@ -74,17 +76,20 @@ static void softpc_window_paint(HDC dc)
     }
 }
 
-static void softpc_window_key(WPARAM key, int released)
+static void softpc_window_key(WPARAM key, LPARAM lparam, int released)
 {
-    UINT scan = MapVirtualKeyA((UINT)key, MAPVK_VK_TO_VSC_EX);
-    if (scan == 0u) return;
-    if ((scan & 0xff00u) != 0u)
-        (void)softpc_machine_key_scancode(softpc_window_machine, 0xe0u);
-    scan &= 0xffu;
-    if (released) scan |= 0x80u;
-    (void)softpc_machine_key_scancode(softpc_window_machine, (uint8_t)scan);
+    KEY_EVENT_RECORD event;
+    BYTE key_number;
+    ZeroMemory(&event, sizeof(event));
+    event.wVirtualKeyCode = (WORD)key;
+    event.wVirtualScanCode = (WORD)((lparam >> 16) & 0xffu);
+    if ((lparam & 0x01000000L) != 0)
+        event.dwControlKeyState |= ENHANCED_KEY;
+    key_number = KeyMsgToKeyCode(&event);
+    if (key_number != 0u)
+        (void)softpc_machine_key_number(softpc_window_machine, key_number,
+            (uint8_t)released);
 }
-
 static void softpc_window_mouse(int x, int y)
 {
     int delta_x = 0;
@@ -135,11 +140,11 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
         return 0;
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
-        softpc_window_key(wparam, 0);
+        softpc_window_key(wparam, lparam, 0);
         return 0;
     case WM_KEYUP:
     case WM_SYSKEYUP:
-        softpc_window_key(wparam, 1);
+        softpc_window_key(wparam, lparam, 1);
         return 0;
     case WM_MOUSEMOVE:
         softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),

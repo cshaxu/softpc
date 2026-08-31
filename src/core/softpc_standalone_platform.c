@@ -692,6 +692,13 @@ void softpc_platform_keyboard_reset(void)
     AT_kbd_post();
 }
 
+int softpc_platform_keyboard_key(int key, int released)
+{
+    if (key <= 0) return 0;
+    if (released) host_key_up(key); else host_key_down(key);
+    return 1;
+}
+
 int softpc_platform_keyboard_scancode(IU8 scan_code)
 {
     int key = keyba_set1_scan_to_key((half_word)(scan_code & 0x7fu));
