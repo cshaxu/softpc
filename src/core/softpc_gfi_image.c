@@ -125,7 +125,10 @@ static int softpc_gfi_transfer(softpc_gfi_image_drive *drive,
     unsigned int index;
     char buffer[8192];
 
-    if (size_code > 6u) return 0;
+    /* A raw .img medium is an IBM 512-byte sector stream.  Unlike a
+       controller image, it has no per-sector size metadata, so accepting a
+       different N here would misaddress the file. */
+    if (size_code != 2u) return 0;
     sector_bytes = 128u << size_code;
     if (sector_bytes > sizeof(buffer) || drive->file == NULL ||
         cylinder >= drive->cylinders || head >= drive->heads ||

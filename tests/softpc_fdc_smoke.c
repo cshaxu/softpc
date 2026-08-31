@@ -166,6 +166,13 @@ int main(void)
         assert(get_r0_head(command_result) == 0u);
         assert(get_r0_sector(command_result) == 3u);
         assert(get_r0_N(command_result) == 2u);
+
+        /* Raw IBM images have fixed 512-byte sectors.  A mismatched N must
+           take the original FDC no-data path, rather than reinterpreting
+           the image with a new standalone geometry. */
+        put_c0_N(command, 1u);
+        assert(gfi_fdc_command(command, command_result) == SUCCESS);
+        assert(get_r1_ST1_no_data(command_result) != 0u);
     }
 
     /* The raw-image port consumes the original FDC format DMA CHRN list;
