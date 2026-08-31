@@ -4,6 +4,8 @@
 
 #include "insignia.h"
 #include "host_def.h"
+#include "gmi.h"
+#include "gfx_upd.h"
 #include "softpc_standalone_dib.h"
 #include "nt_graph.h"
 
@@ -36,20 +38,6 @@ int now_width = 80;
 void closeGraphicsBuffer(void)
 {
     /* The DIB is VM-owned and remains valid across text/graphics changes. */
-}
-
-/* Original CGA big/huge entry points retain these expansion hooks.  The
-   fixed standalone profile uses scale 2, so they are not selected today. */
-void high_stretch3(unsigned char *buffer, int length)
-{
-    UNUSED(buffer);
-    UNUSED(length);
-}
-
-void high_stretch4(unsigned char *buffer, int length)
-{
-    UNUSED(buffer);
-    UNUSED(length);
 }
 
 int softpc_standalone_dib_init(void)
@@ -122,4 +110,19 @@ int softpc_standalone_dib_surface(const void **bits_out, const void **info_out,
     *width_out = SOFTPC_DIB_MAX_WIDTH;
     *height_out = SOFTPC_DIB_MAX_HEIGHT;
     return 1;
+}
+void softpc_standalone_dib_set_palette(PC_palette *palette, int count)
+{
+    int index;
+    if (softpc_dib_info == NULL || palette == NULL || count <= 0) return;
+    if (count > (int)SOFTPC_DIB_COLOURS) count = (int)SOFTPC_DIB_COLOURS;
+    for (index = 0; index < count; ++index) {
+        softpc_dib_info->bmiColors[index].rgbRed =
+            (BYTE)(palette[index].red << 2);
+        softpc_dib_info->bmiColors[index].rgbGreen =
+            (BYTE)(palette[index].green << 2);
+        softpc_dib_info->bmiColors[index].rgbBlue =
+            (BYTE)(palette[index].blue << 2);
+        softpc_dib_info->bmiColors[index].rgbReserved = 0;
+    }
 }

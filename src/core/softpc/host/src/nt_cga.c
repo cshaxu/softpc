@@ -19,6 +19,12 @@
 
 #include "insignia.h"
 #include "host_def.h"
+#ifdef SOFTPC_STANDALONE
+/* The fixed standalone profile has no user-selectable scale.  Compile the
+   original standard-size CGA paint path only; this is not a replacement
+   renderer. */
+#undef BIGWIN
+#endif
 
 #include "xt.h"
 #include "gvi.h"

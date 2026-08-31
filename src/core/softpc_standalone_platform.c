@@ -86,7 +86,9 @@ static void softpc_video_init_adaptor(int adapter, int height)
 { UNUSED(adapter); UNUSED(height); }
 static void softpc_video_int(int value) { UNUSED(value); }
 static void softpc_video_palette(PC_palette *palette, int count)
-{ UNUSED(palette); UNUSED(count); }
+{
+    softpc_standalone_dib_set_palette(palette, count);
+}
 static boolean softpc_video_scroll(int start, int width, int height,
     int attribute, int lines, int ignored)
 { UNUSED(start); UNUSED(width); UNUSED(height); UNUSED(attribute); UNUSED(lines); UNUSED(ignored); return TRUE; }
