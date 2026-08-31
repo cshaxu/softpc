@@ -2,7 +2,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <stdlib.h>
 #include <string.h>
 
 extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
@@ -14,9 +13,6 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
  * POST is not delayed by the host timer granularity. */
 #define SOFTPC_RUN_SLICE 1000u
 #define SOFTPC_DISPLAY_CADENCE_MS 50u
-#define SOFTPC_DIB_MAX_WIDTH 1056u
-#define SOFTPC_DIB_MAX_HEIGHT 768u
-#define SOFTPC_DIB_INFO_BYTES (sizeof(BITMAPINFOHEADER) + 256u * sizeof(RGBQUAD))
 #define SOFTPC_INPUT_QUEUE_CAPACITY 128u
 #define SOFTPC_VGA_MODE13_WIDTH 320
 #define SOFTPC_VGA_MODE13_HEIGHT 200
@@ -45,10 +41,6 @@ static unsigned char softpc_window_snapshot_text[SOFTPC_TEXT_COLUMNS *
     SOFTPC_TEXT_ROWS];
 static unsigned short softpc_window_snapshot_attributes[SOFTPC_TEXT_COLUMNS *
     SOFTPC_TEXT_ROWS];
-static unsigned char *softpc_window_snapshot_dib;
-static BITMAPINFO *softpc_window_snapshot_dib_info;
-static uint32_t softpc_window_snapshot_width;
-static uint32_t softpc_window_snapshot_height;
 static int softpc_window_snapshot_graphics;
 static int softpc_window_snapshot_valid;
 static unsigned char softpc_window_input_keys[SOFTPC_INPUT_QUEUE_CAPACITY];
@@ -124,28 +116,17 @@ static void softpc_window_publish_snapshot(softpc_machine *machine)
 
     EnterCriticalSection(&softpc_window_snapshot_lock);
     if (softpc_machine_presentation_is_graphics(machine)) {
-        const void *bits;
-        const void *info;
-        uint32_t width;
-        uint32_t height;
-        if (softpc_machine_presentation_dib(machine, &bits, &info, &width,
-                &height) && bits != NULL && info != NULL && width != 0u &&
-            height != 0u && width <= SOFTPC_DIB_MAX_WIDTH &&
-            height <= SOFTPC_DIB_MAX_HEIGHT && softpc_window_snapshot_dib != NULL &&
-            softpc_window_snapshot_dib_info != NULL) {
-            size_t bytes = (((size_t)width + 3u) & ~(size_t)3u) * height;
-            memcpy(softpc_window_snapshot_dib, bits, bytes);
-            memcpy(softpc_window_snapshot_dib_info, info, SOFTPC_DIB_INFO_BYTES);
-            softpc_window_snapshot_width = width;
-            softpc_window_snapshot_height = height;
-            softpc_window_snapshot_graphics = 1;
-            softpc_window_snapshot_valid = 1;
-        }
+        softpc_window_snapshot_graphics = 1;
+        softpc_window_snapshot_valid = 1;
     } else if (softpc_machine_presentation_text(machine, &surface, &columns,
             &rows, &stride, &cell_bytes) && cell_bytes >= 1u && stride >= columns) {
         memset(softpc_window_snapshot_text, ' ', sizeof(softpc_window_snapshot_text));
-        memset(softpc_window_snapshot_attributes, 0x07,
-            sizeof(softpc_window_snapshot_attributes));
+        {
+            size_t cell;
+            for (cell = 0u; cell < SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS;
+                    ++cell)
+                softpc_window_snapshot_attributes[cell] = 0x07u;
+        }
         cells = (const unsigned char *)surface;
         if (columns > SOFTPC_TEXT_COLUMNS) columns = SOFTPC_TEXT_COLUMNS;
         if (rows > SOFTPC_TEXT_ROWS) rows = SOFTPC_TEXT_ROWS;
@@ -155,10 +136,13 @@ static void softpc_window_publish_snapshot(softpc_machine *machine)
                 size_t source = ((size_t)row * stride + column) * cell_bytes;
                 size_t destination = (size_t)row * SOFTPC_TEXT_COLUMNS + column;
                 softpc_window_snapshot_text[destination] = cells[source];
-                if (cell_bytes >= 4u)
+                /* The imported nt_cga renderer retains the original x86
+                   layout: character, attribute, then two padding bytes.
+                   (The four-byte cell is an ABI alignment detail, not a
+                   16-bit attribute.) */
+                if (cell_bytes >= 2u)
                     softpc_window_snapshot_attributes[destination] =
-                        (unsigned short)(cells[source + 2u] |
-                        ((unsigned short)cells[source + 3u] << 8));
+                        (unsigned short)cells[source + 1u];
             }
         }
         softpc_window_snapshot_graphics = 0;
@@ -199,16 +183,19 @@ static DWORD WINAPI softpc_window_run_machine(void *opaque)
     return 0u;
 }
 
-static int softpc_window_paint_original_dib(HDC dc)
+/* Keep the original DIB presentation path intact.  The UI uses a try-lock,
+ * so an in-flight C-VID update merely drops this repaint rather than blocking
+ * input or the Windows message queue. */
+static int softpc_window_paint_original_dib(HDC dc, softpc_machine *machine)
 {
-    if (!softpc_window_snapshot_valid || !softpc_window_snapshot_graphics ||
-        softpc_window_snapshot_dib == NULL ||
-        softpc_window_snapshot_dib_info == NULL) return 0;
-    StretchDIBits(dc, 8, 8, (int)softpc_window_snapshot_width,
-        (int)softpc_window_snapshot_height, 0, 0,
-        (int)softpc_window_snapshot_width,
-        (int)softpc_window_snapshot_height, softpc_window_snapshot_dib,
-        softpc_window_snapshot_dib_info, DIB_RGB_COLORS, SRCCOPY);
+    const void *bits;
+    const void *info;
+    uint32_t width;
+    uint32_t height;
+    if (!softpc_machine_presentation_dib(machine, &bits, &info, &width,
+            &height)) return 0;
+    StretchDIBits(dc, 8, 8, (int)width, (int)height, 0, 0, (int)width,
+        (int)height, bits, (const BITMAPINFO *)info, DIB_RGB_COLORS, SRCCOPY);
     return 1;
 }
 
@@ -273,8 +260,11 @@ static void softpc_window_paint(HDC dc)
     int row;
     EnterCriticalSection(&softpc_window_snapshot_lock);
     if (softpc_window_snapshot_graphics) {
-        (void)softpc_window_paint_original_dib(dc);
         LeaveCriticalSection(&softpc_window_snapshot_lock);
+        if (TryEnterCriticalSection(&softpc_window_machine_lock)) {
+            (void)softpc_window_paint_original_dib(dc, softpc_window_machine);
+            LeaveCriticalSection(&softpc_window_machine_lock);
+        }
         return;
     }
     SelectObject(dc, softpc_window_font);
@@ -460,23 +450,8 @@ int softpc_vm_run_window(softpc_machine *machine)
     InitializeCriticalSection(&softpc_window_machine_lock);
     InitializeCriticalSection(&softpc_window_input_lock);
     InitializeCriticalSection(&softpc_window_snapshot_lock);
-    softpc_window_snapshot_dib = (unsigned char *)calloc(
-        SOFTPC_DIB_MAX_WIDTH * SOFTPC_DIB_MAX_HEIGHT, 1u);
-    softpc_window_snapshot_dib_info = (BITMAPINFO *)calloc(1u,
-        SOFTPC_DIB_INFO_BYTES);
     softpc_window_snapshot_valid = 0;
     softpc_window_snapshot_graphics = 0;
-    if (softpc_window_snapshot_dib == NULL ||
-        softpc_window_snapshot_dib_info == NULL) {
-        free(softpc_window_snapshot_dib);
-        free(softpc_window_snapshot_dib_info);
-        softpc_window_snapshot_dib = NULL;
-        softpc_window_snapshot_dib_info = NULL;
-        DeleteCriticalSection(&softpc_window_snapshot_lock);
-        DeleteCriticalSection(&softpc_window_input_lock);
-        DeleteCriticalSection(&softpc_window_machine_lock);
-        return 1;
-    }
     softpc_window_font = CreateFontA(16, 8, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
         OEM_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
         FIXED_PITCH | FF_MODERN, "Consolas");
@@ -484,10 +459,6 @@ int softpc_vm_run_window(softpc_machine *machine)
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 680, 560,
         NULL, NULL, instance, NULL);
     if (window == NULL) {
-        free(softpc_window_snapshot_dib);
-        free(softpc_window_snapshot_dib_info);
-        softpc_window_snapshot_dib = NULL;
-        softpc_window_snapshot_dib_info = NULL;
         DeleteCriticalSection(&softpc_window_snapshot_lock);
         DeleteCriticalSection(&softpc_window_input_lock);
         DeleteCriticalSection(&softpc_window_machine_lock);
@@ -520,10 +491,6 @@ int softpc_vm_run_window(softpc_machine *machine)
     DeleteCriticalSection(&softpc_window_machine_lock);
     DeleteCriticalSection(&softpc_window_input_lock);
     DeleteCriticalSection(&softpc_window_snapshot_lock);
-    free(softpc_window_snapshot_dib);
-    free(softpc_window_snapshot_dib_info);
-    softpc_window_snapshot_dib = NULL;
-    softpc_window_snapshot_dib_info = NULL;
     DeleteObject(softpc_window_font);
     softpc_window_font = NULL;
     softpc_window_machine = NULL;
