@@ -33,9 +33,7 @@ extern void q_event_init(void);
 extern void tic_event_init(void);
 extern void mouse_driver_initialisation(void);
 extern void mouse_driver_termination(void);
-extern void softpc_platform_hdd_init(void);
-extern int softpc_platform_hdd_attach(const char *floppy_path,
-    const char *hard_disk_path);
+extern int softpc_platform_hdd_attach(const char *hard_disk_path);
 extern void softpc_platform_hdd_detach(void);
 extern int softpc_platform_floppy_attach(const char *path);
 extern void softpc_platform_floppy_detach(void);
@@ -94,7 +92,6 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         sas_init(machine->memory_bytes);
         softpc_device_bop_register_machine_services();
         softpc_device_bop_set_memory_size(machine->memory_bytes);
-        softpc_platform_hdd_init();
         gfi_init();
         if (!softpc_platform_video_buffers_init())
             return SOFTPC_MACHINE_IO_ERROR;
@@ -115,8 +112,7 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     tic_event_init();
     /* The media has to exist before original CMOS, FDC and fixed-disk POST
        query their respective configuration and host controller hooks. */
-    if (!softpc_platform_hdd_attach(machine->options.floppy_path,
-            machine->options.hard_disk_path))
+    if (!softpc_platform_hdd_attach(machine->options.hard_disk_path))
         return SOFTPC_MACHINE_IO_ERROR;
     if (!softpc_platform_floppy_attach(machine->options.floppy_path))
         return SOFTPC_MACHINE_IO_ERROR;

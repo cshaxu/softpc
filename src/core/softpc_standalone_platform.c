@@ -598,7 +598,7 @@ attach_failed:
     return 0;
 }
 
-int softpc_platform_hdd_attach(const char *floppy_path, const char *hard_disk_path)
+int softpc_platform_hdd_attach(const char *hard_disk_path)
 {
     unsigned int index;
     for (index = 0u; index < 2u; ++index) {
@@ -610,7 +610,6 @@ int softpc_platform_hdd_attach(const char *floppy_path, const char *hard_disk_pa
     }
     /* Fixed disks belong solely to the original fixed-disk controller.
        Removable media is attached separately through original FLA/GFI/FDC. */
-    UNUSED(floppy_path);
     softpc_hdd_config_paths[0] = hard_disk_path;
     softpc_hdd_config_paths[1] = NULL;
     if (!softpc_hdd_attach_media(&softpc_hdd_media[0], softpc_hdd_config_paths[0])) return 0;
@@ -637,11 +636,6 @@ void softpc_platform_hdd_detach(void)
     }
     softpc_hdd_config_paths[0] = NULL;
     softpc_hdd_config_paths[1] = NULL;
-}
-
-void softpc_platform_hdd_init(void)
-{
-    /* hda_init runs after the concrete image paths are attached. */
 }
 
 void host_fdisk_get_params(driveid, cylinders, heads, sectors)
