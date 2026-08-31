@@ -2,6 +2,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <stdlib.h>
 #include <string.h>
 
 extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
@@ -12,7 +13,10 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 /* Keep each GUI tick bounded for responsive input, but large enough that
  * POST is not delayed by the host timer granularity. */
 #define SOFTPC_RUN_SLICE 1000u
-#define SOFTPC_PAINT_INTERVAL_MS 16u
+#define SOFTPC_DISPLAY_CADENCE_MS 50u
+#define SOFTPC_DIB_MAX_WIDTH 1056u
+#define SOFTPC_DIB_MAX_HEIGHT 768u
+#define SOFTPC_DIB_INFO_BYTES (sizeof(BITMAPINFOHEADER) + 256u * sizeof(RGBQUAD))
 #define SOFTPC_INPUT_QUEUE_CAPACITY 128u
 #define SOFTPC_VGA_MODE13_WIDTH 320
 #define SOFTPC_VGA_MODE13_HEIGHT 200
@@ -34,15 +38,28 @@ static HWND softpc_window_handle;
 static HANDLE softpc_window_runner;
 static CRITICAL_SECTION softpc_window_machine_lock;
 static CRITICAL_SECTION softpc_window_input_lock;
+static CRITICAL_SECTION softpc_window_snapshot_lock;
 static volatile LONG softpc_window_runner_active;
 static volatile LONG softpc_window_runner_failed;
-static unsigned char softpc_window_previous_text[SOFTPC_TEXT_COLUMNS *
+static unsigned char softpc_window_snapshot_text[SOFTPC_TEXT_COLUMNS *
     SOFTPC_TEXT_ROWS];
-static int softpc_window_previous_text_valid;
+static unsigned short softpc_window_snapshot_attributes[SOFTPC_TEXT_COLUMNS *
+    SOFTPC_TEXT_ROWS];
+static unsigned char *softpc_window_snapshot_dib;
+static BITMAPINFO *softpc_window_snapshot_dib_info;
+static uint32_t softpc_window_snapshot_width;
+static uint32_t softpc_window_snapshot_height;
+static int softpc_window_snapshot_graphics;
+static int softpc_window_snapshot_valid;
 static unsigned char softpc_window_input_keys[SOFTPC_INPUT_QUEUE_CAPACITY];
 static unsigned char softpc_window_input_releases[SOFTPC_INPUT_QUEUE_CAPACITY];
 static unsigned int softpc_window_input_head;
 static unsigned int softpc_window_input_tail;
+static int softpc_window_pending_mouse_dx;
+static int softpc_window_pending_mouse_dy;
+static uint8_t softpc_window_pending_mouse_left;
+static uint8_t softpc_window_pending_mouse_right;
+static int softpc_window_mouse_pending;
 
 static void softpc_window_queue_key(BYTE key_number, int released)
 {
@@ -59,7 +76,7 @@ static void softpc_window_queue_key(BYTE key_number, int released)
     LeaveCriticalSection(&softpc_window_input_lock);
 }
 
-static void softpc_window_apply_queued_keys(softpc_machine *machine)
+static void softpc_window_apply_queued_input(softpc_machine *machine)
 {
     for (;;) {
         BYTE key_number;
@@ -76,9 +93,26 @@ static void softpc_window_apply_queued_keys(softpc_machine *machine)
         LeaveCriticalSection(&softpc_window_input_lock);
         (void)softpc_machine_key_number(machine, key_number, released);
     }
+
+    EnterCriticalSection(&softpc_window_input_lock);
+    if (softpc_window_mouse_pending) {
+        int delta_x = softpc_window_pending_mouse_dx;
+        int delta_y = softpc_window_pending_mouse_dy;
+        uint8_t left = softpc_window_pending_mouse_left;
+        uint8_t right = softpc_window_pending_mouse_right;
+        softpc_window_pending_mouse_dx = 0;
+        softpc_window_pending_mouse_dy = 0;
+        softpc_window_mouse_pending = 0;
+        LeaveCriticalSection(&softpc_window_input_lock);
+        (void)softpc_machine_mouse_input(machine, delta_x, delta_y, left, right);
+    } else {
+        LeaveCriticalSection(&softpc_window_input_lock);
+    }
 }
 
-static int softpc_window_text_changed(void)
+/* NXVM-style publication boundary: the worker alone reads SoftPC state;
+ * the UI sees only this copied frame and never contends for machine state. */
+static void softpc_window_publish_snapshot(softpc_machine *machine)
 {
     const void *surface;
     const unsigned char *cells;
@@ -86,41 +120,63 @@ static int softpc_window_text_changed(void)
     uint32_t rows;
     uint32_t stride;
     uint32_t cell_bytes;
-    unsigned char current[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
     uint32_t row;
 
-    if (!softpc_machine_presentation_text(softpc_window_machine, &surface,
-            &columns, &rows, &stride, &cell_bytes) || cell_bytes < 1u ||
-        stride < columns)
-        return 0;
-    memset(current, ' ', sizeof(current));
-    cells = (const unsigned char *)surface;
-    if (columns > SOFTPC_TEXT_COLUMNS) columns = SOFTPC_TEXT_COLUMNS;
-    if (rows > SOFTPC_TEXT_ROWS) rows = SOFTPC_TEXT_ROWS;
-    for (row = 0u; row < rows; ++row) {
-        uint32_t column;
-        for (column = 0u; column < columns; ++column)
-            current[row * SOFTPC_TEXT_COLUMNS + column] =
-                cells[(row * stride + column) * cell_bytes];
+    EnterCriticalSection(&softpc_window_snapshot_lock);
+    if (softpc_machine_presentation_is_graphics(machine)) {
+        const void *bits;
+        const void *info;
+        uint32_t width;
+        uint32_t height;
+        if (softpc_machine_presentation_dib(machine, &bits, &info, &width,
+                &height) && bits != NULL && info != NULL && width != 0u &&
+            height != 0u && width <= SOFTPC_DIB_MAX_WIDTH &&
+            height <= SOFTPC_DIB_MAX_HEIGHT && softpc_window_snapshot_dib != NULL &&
+            softpc_window_snapshot_dib_info != NULL) {
+            size_t bytes = (((size_t)width + 3u) & ~(size_t)3u) * height;
+            memcpy(softpc_window_snapshot_dib, bits, bytes);
+            memcpy(softpc_window_snapshot_dib_info, info, SOFTPC_DIB_INFO_BYTES);
+            softpc_window_snapshot_width = width;
+            softpc_window_snapshot_height = height;
+            softpc_window_snapshot_graphics = 1;
+            softpc_window_snapshot_valid = 1;
+        }
+    } else if (softpc_machine_presentation_text(machine, &surface, &columns,
+            &rows, &stride, &cell_bytes) && cell_bytes >= 1u && stride >= columns) {
+        memset(softpc_window_snapshot_text, ' ', sizeof(softpc_window_snapshot_text));
+        memset(softpc_window_snapshot_attributes, 0x07,
+            sizeof(softpc_window_snapshot_attributes));
+        cells = (const unsigned char *)surface;
+        if (columns > SOFTPC_TEXT_COLUMNS) columns = SOFTPC_TEXT_COLUMNS;
+        if (rows > SOFTPC_TEXT_ROWS) rows = SOFTPC_TEXT_ROWS;
+        for (row = 0u; row < rows; ++row) {
+            uint32_t column;
+            for (column = 0u; column < columns; ++column) {
+                size_t source = ((size_t)row * stride + column) * cell_bytes;
+                size_t destination = (size_t)row * SOFTPC_TEXT_COLUMNS + column;
+                softpc_window_snapshot_text[destination] = cells[source];
+                if (cell_bytes >= 4u)
+                    softpc_window_snapshot_attributes[destination] =
+                        (unsigned short)(cells[source + 2u] |
+                        ((unsigned short)cells[source + 3u] << 8));
+            }
+        }
+        softpc_window_snapshot_graphics = 0;
+        softpc_window_snapshot_valid = 1;
     }
-    if (!softpc_window_previous_text_valid || memcmp(current,
-            softpc_window_previous_text, sizeof(current)) != 0) {
-        memcpy(softpc_window_previous_text, current, sizeof(current));
-        softpc_window_previous_text_valid = 1;
-        return 1;
-    }
-    return 0;
+    LeaveCriticalSection(&softpc_window_snapshot_lock);
 }
 
 static DWORD WINAPI softpc_window_run_machine(void *opaque)
 {
     softpc_machine *machine = (softpc_machine *)opaque;
+    DWORD next_snapshot = 0u;
 
     while (InterlockedCompareExchange(&softpc_window_runner_active, 0, 0) != 0) {
         softpc_machine_result result;
 
         EnterCriticalSection(&softpc_window_machine_lock);
-        softpc_window_apply_queued_keys(machine);
+        softpc_window_apply_queued_input(machine);
         result = softpc_machine_run(machine, SOFTPC_RUN_SLICE);
         LeaveCriticalSection(&softpc_window_machine_lock);
         if (result != SOFTPC_MACHINE_OK) {
@@ -129,6 +185,12 @@ static DWORD WINAPI softpc_window_run_machine(void *opaque)
             if (softpc_window_handle != NULL)
                 PostMessageA(softpc_window_handle, WM_CLOSE, 0, 0);
             break;
+        }
+        if ((LONG)(GetTickCount() - next_snapshot) >= 0) {
+            EnterCriticalSection(&softpc_window_machine_lock);
+            softpc_window_publish_snapshot(machine);
+            LeaveCriticalSection(&softpc_window_machine_lock);
+            next_snapshot = GetTickCount() + SOFTPC_DISPLAY_CADENCE_MS;
         }
         /* A real sleep prevents this detached VM from monopolising one host
            core, and gives RDP/Win32 message delivery a reliable timeslice. */
@@ -139,16 +201,26 @@ static DWORD WINAPI softpc_window_run_machine(void *opaque)
 
 static int softpc_window_paint_original_dib(HDC dc)
 {
-    const void *bits;
-    const void *info;
-    uint32_t width;
-    uint32_t height;
-    if (!softpc_machine_presentation_dib(softpc_window_machine, &bits, &info,
-            &width, &height))
-        return 0;
-    StretchDIBits(dc, 8, 8, (int)width, (int)height, 0, 0, (int)width,
-        (int)height, bits, (const BITMAPINFO *)info, DIB_RGB_COLORS, SRCCOPY);
+    if (!softpc_window_snapshot_valid || !softpc_window_snapshot_graphics ||
+        softpc_window_snapshot_dib == NULL ||
+        softpc_window_snapshot_dib_info == NULL) return 0;
+    StretchDIBits(dc, 8, 8, (int)softpc_window_snapshot_width,
+        (int)softpc_window_snapshot_height, 0, 0,
+        (int)softpc_window_snapshot_width,
+        (int)softpc_window_snapshot_height, softpc_window_snapshot_dib,
+        softpc_window_snapshot_dib_info, DIB_RGB_COLORS, SRCCOPY);
     return 1;
+}
+
+static COLORREF softpc_window_text_colour(unsigned int colour)
+{
+    static const COLORREF palette[16] = {
+        RGB(0, 0, 0), RGB(0, 0, 170), RGB(0, 170, 0), RGB(0, 170, 170),
+        RGB(170, 0, 0), RGB(170, 0, 170), RGB(170, 85, 0), RGB(170, 170, 170),
+        RGB(85, 85, 85), RGB(85, 85, 255), RGB(85, 255, 85), RGB(85, 255, 255),
+        RGB(255, 85, 85), RGB(255, 85, 255), RGB(255, 255, 85), RGB(255, 255, 255)
+    };
+    return palette[colour & 0x0fu];
 }
 
 static void softpc_window_deliver_virtual_key(WORD virtual_key,
@@ -198,48 +270,37 @@ static int softpc_window_mouse_y_from_lparam(LPARAM position)
 
 static void softpc_window_paint(HDC dc)
 {
-    const void *surface;
-    const unsigned char *cells;
-    uint32_t columns;
-    uint32_t rows;
-    uint32_t stride;
-    uint32_t cell_bytes;
     int row;
-    /* The executor may be in a long original C-VID update.  Painting must
-       never wait behind it: a later timer tick will invalidate the current
-       surface once the worker releases the machine lock. */
-    if (!TryEnterCriticalSection(&softpc_window_machine_lock)) return;
-    if (softpc_machine_presentation_is_graphics(softpc_window_machine)) {
+    EnterCriticalSection(&softpc_window_snapshot_lock);
+    if (softpc_window_snapshot_graphics) {
         (void)softpc_window_paint_original_dib(dc);
-        LeaveCriticalSection(&softpc_window_machine_lock);
+        LeaveCriticalSection(&softpc_window_snapshot_lock);
         return;
     }
-    if (!softpc_machine_presentation_text(softpc_window_machine, &surface,
-            &columns, &rows, &stride, &cell_bytes) ||
-        cell_bytes < 1u || stride < columns) {
-        LeaveCriticalSection(&softpc_window_machine_lock);
-        return;
-    }
-    cells = (const unsigned char *)surface;
     SelectObject(dc, softpc_window_font);
     SetBkMode(dc, OPAQUE);
-    SetBkColor(dc, RGB(0, 0, 0));
-    SetTextColor(dc, RGB(192, 192, 192));
     for (row = 0; row < SOFTPC_TEXT_ROWS; ++row) {
-        char line[SOFTPC_TEXT_COLUMNS + 1];
-        int column;
-        for (column = 0; column < SOFTPC_TEXT_COLUMNS; ++column) {
-            unsigned char character = ' ';
-            if ((uint32_t)row < rows && (uint32_t)column < columns)
-                character = cells[((uint32_t)row * stride + (uint32_t)column) *
-                    cell_bytes];
-            line[column] = character >= 0x20u && character < 0x7fu ?
-                (char)character : ' ';
+        int column = 0;
+        while (column < SOFTPC_TEXT_COLUMNS) {
+            unsigned short attribute = softpc_window_snapshot_attributes[
+                row * SOFTPC_TEXT_COLUMNS + column];
+            char line[SOFTPC_TEXT_COLUMNS + 1];
+            int length = 0;
+            while (column + length < SOFTPC_TEXT_COLUMNS &&
+                softpc_window_snapshot_attributes[row * SOFTPC_TEXT_COLUMNS +
+                column + length] == attribute) {
+                unsigned char character = softpc_window_snapshot_text[
+                    row * SOFTPC_TEXT_COLUMNS + column + length];
+                line[length++] = character >= 0x20u && character < 0x7fu ?
+                    (char)character : ' ';
+            }
+            SetTextColor(dc, softpc_window_text_colour(attribute));
+            SetBkColor(dc, softpc_window_text_colour(attribute >> 4));
+            TextOutA(dc, 8 + column * 8, 8 + row * 16, line, length);
+            column += length;
         }
-        line[SOFTPC_TEXT_COLUMNS] = '\0';
-        TextOutA(dc, 8, 8 + row * 16, line, SOFTPC_TEXT_COLUMNS);
     }
-    LeaveCriticalSection(&softpc_window_machine_lock);
+    LeaveCriticalSection(&softpc_window_snapshot_lock);
 }
 
 static void softpc_window_key(WPARAM key, LPARAM lparam, int released)
@@ -275,9 +336,13 @@ static void softpc_window_mouse(int x, int y)
     softpc_window_mouse_x = x;
     softpc_window_mouse_y = y;
     softpc_window_mouse_position_valid = 1;
-    (void)softpc_machine_mouse_input(softpc_window_machine, delta_x, delta_y,
-        (uint8_t)softpc_window_left_button,
-        (uint8_t)softpc_window_right_button);
+    EnterCriticalSection(&softpc_window_input_lock);
+    softpc_window_pending_mouse_dx += delta_x;
+    softpc_window_pending_mouse_dy += delta_y;
+    softpc_window_pending_mouse_left = (uint8_t)softpc_window_left_button;
+    softpc_window_pending_mouse_right = (uint8_t)softpc_window_right_button;
+    softpc_window_mouse_pending = 1;
+    LeaveCriticalSection(&softpc_window_input_lock);
 }
 
 static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
@@ -286,31 +351,7 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
     switch (message) {
     case WM_TIMER:
         if (wparam == SOFTPC_TIMER_ID) {
-            int32_t left;
-            int32_t top;
-            int32_t right;
-            int32_t bottom;
-            int graphics;
-            int changed = 0;
-
-            if (!TryEnterCriticalSection(&softpc_window_machine_lock))
-                return 0;
-            graphics = softpc_machine_presentation_is_graphics(
-                softpc_window_machine);
-            if (!graphics) changed = softpc_window_text_changed();
-            else changed = softpc_machine_presentation_take_dirty(
-                softpc_window_machine, &left, &top, &right, &bottom);
-            LeaveCriticalSection(&softpc_window_machine_lock);
-            if (!graphics && changed) {
-                InvalidateRect(window, NULL, FALSE);
-            } else if (graphics && changed) {
-                RECT dirty;
-                dirty.left = left + 8;
-                dirty.top = top + 8;
-                dirty.right = right + 9;
-                dirty.bottom = bottom + 9;
-                InvalidateRect(window, &dirty, FALSE);
-            }
+            InvalidateRect(window, NULL, FALSE);
         }
         return 0;
     case WM_PAINT:
@@ -348,41 +389,31 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
         softpc_window_keydown_delivered = 0;
         return 0;
     case WM_MOUSEMOVE:
-        EnterCriticalSection(&softpc_window_machine_lock);
         softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
             softpc_window_mouse_y_from_lparam(lparam));
-        LeaveCriticalSection(&softpc_window_machine_lock);
         return 0;
     case WM_LBUTTONDOWN:
         softpc_window_left_button = 1;
         SetCapture(window);
-        EnterCriticalSection(&softpc_window_machine_lock);
         softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
             softpc_window_mouse_y_from_lparam(lparam));
-        LeaveCriticalSection(&softpc_window_machine_lock);
         return 0;
     case WM_LBUTTONUP:
         softpc_window_left_button = 0;
-        EnterCriticalSection(&softpc_window_machine_lock);
         softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
             softpc_window_mouse_y_from_lparam(lparam));
-        LeaveCriticalSection(&softpc_window_machine_lock);
         if (!softpc_window_right_button) ReleaseCapture();
         return 0;
     case WM_RBUTTONDOWN:
         softpc_window_right_button = 1;
         SetCapture(window);
-        EnterCriticalSection(&softpc_window_machine_lock);
         softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
             softpc_window_mouse_y_from_lparam(lparam));
-        LeaveCriticalSection(&softpc_window_machine_lock);
         return 0;
     case WM_RBUTTONUP:
         softpc_window_right_button = 0;
-        EnterCriticalSection(&softpc_window_machine_lock);
         softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),
             softpc_window_mouse_y_from_lparam(lparam));
-        LeaveCriticalSection(&softpc_window_machine_lock);
         if (!softpc_window_left_button) ReleaseCapture();
         return 0;
     case WM_DESTROY:
@@ -412,7 +443,6 @@ int softpc_vm_run_window(softpc_machine *machine)
         return 1;
     softpc_window_machine = machine;
     softpc_window_mouse_position_valid = 0;
-    softpc_window_previous_text_valid = 0;
     softpc_window_left_button = 0;
     softpc_window_right_button = 0;
     softpc_window_result = SOFTPC_VM_FRONTEND_STOPPED;
@@ -420,10 +450,33 @@ int softpc_vm_run_window(softpc_machine *machine)
     softpc_window_runner = NULL;
     softpc_window_input_head = 0u;
     softpc_window_input_tail = 0u;
+    softpc_window_pending_mouse_dx = 0;
+    softpc_window_pending_mouse_dy = 0;
+    softpc_window_pending_mouse_left = 0u;
+    softpc_window_pending_mouse_right = 0u;
+    softpc_window_mouse_pending = 0;
     InterlockedExchange(&softpc_window_runner_active, 0);
     InterlockedExchange(&softpc_window_runner_failed, 0);
     InitializeCriticalSection(&softpc_window_machine_lock);
     InitializeCriticalSection(&softpc_window_input_lock);
+    InitializeCriticalSection(&softpc_window_snapshot_lock);
+    softpc_window_snapshot_dib = (unsigned char *)calloc(
+        SOFTPC_DIB_MAX_WIDTH * SOFTPC_DIB_MAX_HEIGHT, 1u);
+    softpc_window_snapshot_dib_info = (BITMAPINFO *)calloc(1u,
+        SOFTPC_DIB_INFO_BYTES);
+    softpc_window_snapshot_valid = 0;
+    softpc_window_snapshot_graphics = 0;
+    if (softpc_window_snapshot_dib == NULL ||
+        softpc_window_snapshot_dib_info == NULL) {
+        free(softpc_window_snapshot_dib);
+        free(softpc_window_snapshot_dib_info);
+        softpc_window_snapshot_dib = NULL;
+        softpc_window_snapshot_dib_info = NULL;
+        DeleteCriticalSection(&softpc_window_snapshot_lock);
+        DeleteCriticalSection(&softpc_window_input_lock);
+        DeleteCriticalSection(&softpc_window_machine_lock);
+        return 1;
+    }
     softpc_window_font = CreateFontA(16, 8, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
         OEM_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
         FIXED_PITCH | FF_MODERN, "Consolas");
@@ -431,6 +484,11 @@ int softpc_vm_run_window(softpc_machine *machine)
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 680, 560,
         NULL, NULL, instance, NULL);
     if (window == NULL) {
+        free(softpc_window_snapshot_dib);
+        free(softpc_window_snapshot_dib_info);
+        softpc_window_snapshot_dib = NULL;
+        softpc_window_snapshot_dib_info = NULL;
+        DeleteCriticalSection(&softpc_window_snapshot_lock);
         DeleteCriticalSection(&softpc_window_input_lock);
         DeleteCriticalSection(&softpc_window_machine_lock);
         return 1;
@@ -438,7 +496,7 @@ int softpc_vm_run_window(softpc_machine *machine)
     softpc_window_handle = window;
     ShowWindow(window, SW_SHOW);
     UpdateWindow(window);
-    SetTimer(window, SOFTPC_TIMER_ID, SOFTPC_PAINT_INTERVAL_MS, NULL);
+    SetTimer(window, SOFTPC_TIMER_ID, SOFTPC_DISPLAY_CADENCE_MS, NULL);
     InterlockedExchange(&softpc_window_runner_active, 1);
     softpc_window_runner = CreateThread(NULL, 0u, softpc_window_run_machine,
         machine, 0u, NULL);
@@ -461,6 +519,11 @@ int softpc_vm_run_window(softpc_machine *machine)
     softpc_window_handle = NULL;
     DeleteCriticalSection(&softpc_window_machine_lock);
     DeleteCriticalSection(&softpc_window_input_lock);
+    DeleteCriticalSection(&softpc_window_snapshot_lock);
+    free(softpc_window_snapshot_dib);
+    free(softpc_window_snapshot_dib_info);
+    softpc_window_snapshot_dib = NULL;
+    softpc_window_snapshot_dib_info = NULL;
     DeleteObject(softpc_window_font);
     softpc_window_font = NULL;
     softpc_window_machine = NULL;
