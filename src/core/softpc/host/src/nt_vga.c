@@ -858,6 +858,13 @@ void nt_vga_hi_graph_std(int offset, int screen_x, int screen_y,
     if (screen_y + height > sc.PC_W_Height)
         height = sc.PC_W_Height - screen_y;
 
+    /* The NT console path relied on its dirty-region producer never issuing
+       an empty clipped update.  The standalone DIB can receive one while a
+       mode transition is in flight; the original do/while below would then
+       underflow local_height and walk past the VGA planes. */
+    if (screen_x < 0 || screen_y < 0 || width <= 0 || height <= 0)
+        return;
+
     /* local_height is number of lines in video memory. */
     local_height = height;
 
@@ -2190,4 +2197,3 @@ void nt_vga_hi_frozen_std(int offset, int screen_x, int screen_y,
       }
 }
 #endif /* MONITOR */
-

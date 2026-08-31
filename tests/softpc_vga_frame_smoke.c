@@ -31,6 +31,8 @@ typedef struct {
    the historical console-server structure and is intentionally not needed by
    this direct original-renderer call. */
 extern unsigned char *EGA_planes;
+extern void nt_vga_hi_graph_std(int offset, int screen_x, int screen_y,
+    int width, int height);
 extern void nt_v7vga_hi_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
 extern int softpc_device_bop_dispatch(unsigned char number,
@@ -89,6 +91,11 @@ int main(void)
     host_timer_event();
     host_timer_event();
     assert(softpc_machine_presentation_is_graphics(machine));
+
+    /* A dirty-region transition may be clipped to zero height.  The original
+       nt_vga_hi_graph_std renderer must reject that empty region before its
+       historical do/while loop consumes the VGA-plane buffer. */
+    nt_vga_hi_graph_std(0, 0, 0, 1, 0);
 
     /* V7 VGA's 640-pixel 256-colour path is an original nt_vga.c painter,
        not a standalone pixel converter.  Give it two source pixels and
