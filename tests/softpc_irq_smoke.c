@@ -4,12 +4,19 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "insignia.h"
+#include "host_def.h"
+#include "ios.h"
+
 int main(void)
 {
     const char *path = "softpc-machine-irq-smoke.img";
     unsigned char sector[512] = { 0 };
     unsigned char marker = 0;
     unsigned char ticks[4] = { 0, 0, 0, 0 };
+    half_word reset_command = 0xfeu;
+    uint16_t cs = 0u;
+    uint32_t eip = 0u;
     unsigned char program[] = {
         /* Re-enter the same boot sector through a nonzero CS. */
         0xeau, 0x10u, 0x00u, 0xc0u, 0x07u,
@@ -47,6 +54,16 @@ int main(void)
     assert(softpc_machine_read_physical(machine, 0x46cu, ticks,
         sizeof(ticks)) == SOFTPC_MACHINE_OK);
     assert(ticks[0] != 0u || ticks[1] != 0u || ticks[2] != 0u || ticks[3] != 0u);
+
+    /* The original 8042 output-port pulse requests a CPU reset through the
+       original keyboard controller; it is not a standalone reset shortcut. */
+    outb(0x64u, reset_command);
+    assert(softpc_machine_run(machine, 1u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_instruction_pointer(machine, &cs, &eip) ==
+        SOFTPC_MACHINE_OK);
+    assert(cs == 0xf000u);
+    assert(eip == 0xfff0u);
+
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);
     return 0;
