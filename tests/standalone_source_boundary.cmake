@@ -141,3 +141,11 @@ string(TOLOWER "${standalone_platform}" normalized_platform)
 if(normalized_platform MATCHES "softpc_ata")
     message(FATAL_ERROR "Standalone platform retains a handwritten ATA controller")
 endif()
+
+# Presentation is deliberately a DIB consumer.  Controller planes and DAC
+# interpretation stay in the original nt_cga/nt_ega/nt_vga renderer path.
+file(READ "${SOFTPC_SOURCE_DIR}/src/vm/win32_window.c" window_frontend)
+string(TOLOWER "${window_frontend}" normalized_window_frontend)
+if(normalized_window_frontend MATCHES "ega_planes|\\bdac\\b")
+    message(FATAL_ERROR "Standalone window bypasses the original SoftPC renderer")
+endif()
