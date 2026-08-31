@@ -126,3 +126,15 @@ void softpc_standalone_dib_set_palette(PC_palette *palette, int count)
         softpc_dib_info->bmiColors[index].rgbReserved = 0;
     }
 }
+int softpc_standalone_dib_take_dirty(long *left, long *top, long *right,
+    long *bottom)
+{
+    if (left == NULL || top == NULL || right == NULL || bottom == NULL ||
+        !softpc_dib_dirty_valid) return 0;
+    *left = softpc_dib_dirty.Left;
+    *top = softpc_dib_dirty.Top;
+    *right = softpc_dib_dirty.Right;
+    *bottom = softpc_dib_dirty.Bottom;
+    softpc_dib_dirty_valid = 0;
+    return 1;
+}

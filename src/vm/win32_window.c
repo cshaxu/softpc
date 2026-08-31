@@ -107,8 +107,22 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
     switch (message) {
     case WM_TIMER:
         if (wparam == SOFTPC_TIMER_ID) {
+            int32_t left;
+            int32_t top;
+            int32_t right;
+            int32_t bottom;
             (void)softpc_machine_run(softpc_window_machine, SOFTPC_RUN_SLICE);
-            InvalidateRect(window, NULL, FALSE);
+            if (!softpc_machine_presentation_is_graphics(softpc_window_machine)) {
+                InvalidateRect(window, NULL, FALSE);
+            } else if (softpc_machine_presentation_take_dirty(
+                    softpc_window_machine, &left, &top, &right, &bottom)) {
+                RECT dirty;
+                dirty.left = left + 8;
+                dirty.top = top + 8;
+                dirty.right = right + 9;
+                dirty.bottom = bottom + 9;
+                InvalidateRect(window, &dirty, FALSE);
+            }
         }
         return 0;
     case WM_PAINT:

@@ -12,6 +12,12 @@ typedef struct _CONSOLE_GRAPHICS_BUFFER_INFO {
 BOOL softpc_standalone_invalidate_dibits(HANDLE ignored,
     const SMALL_RECT *rect);
 
+int softpc_standalone_dib_surface(const void **bits_out, const void **info_out,
+    unsigned long *width_out, unsigned long *height_out);
+void softpc_standalone_dib_set_palette(PC_palette *palette, int count);
+int softpc_standalone_dib_take_dirty(long *left, long *top, long *right,
+    long *bottom);
+
 #define InvalidateConsoleDIBits(handle, rect) \
     softpc_standalone_invalidate_dibits((handle), (rect))
 

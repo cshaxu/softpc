@@ -48,6 +48,10 @@ softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,
     int32_t delta_x, int32_t delta_y, uint8_t left_down, uint8_t right_down);
 int softpc_machine_presentation_is_graphics(const softpc_machine *machine);
 
+/* Consume the original host renderer's pending dirty rectangle. */
+int softpc_machine_presentation_take_dirty(const softpc_machine *machine,
+    int32_t *left, int32_t *top, int32_t *right, int32_t *bottom);
+
 /* Borrow the original host renderer's indexed DIB.  The caller must not
  * retain the pointers after machine destruction or mutate either surface. */
 int softpc_machine_presentation_dib(const softpc_machine *machine,

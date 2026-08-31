@@ -39,6 +39,8 @@ extern void softpc_platform_hdd_detach(void);
 extern int softpc_platform_floppy_attach(const char *path);
 extern void softpc_platform_floppy_detach(void);
 extern int softpc_platform_video_buffers_init(void);
+extern int softpc_standalone_dib_take_dirty(long *left, long *top,
+    long *right, long *bottom);
 extern FILE *trace_file;
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
@@ -199,6 +201,23 @@ int softpc_machine_presentation_is_graphics(const softpc_machine *machine)
     extern int softpc_platform_presentation_is_graphics(void);
     return machine != NULL && machine->reset &&
         softpc_platform_presentation_is_graphics();
+}
+
+int softpc_machine_presentation_take_dirty(const softpc_machine *machine,
+    int32_t *left, int32_t *top, int32_t *right, int32_t *bottom)
+{
+    long native_left;
+    long native_top;
+    long native_right;
+    long native_bottom;
+    if (machine == NULL || !machine->reset || left == NULL || top == NULL ||
+        right == NULL || bottom == NULL || !softpc_standalone_dib_take_dirty(
+            &native_left, &native_top, &native_right, &native_bottom)) return 0;
+    *left = (int32_t)native_left;
+    *top = (int32_t)native_top;
+    *right = (int32_t)native_right;
+    *bottom = (int32_t)native_bottom;
+    return 1;
 }
 
 int softpc_machine_presentation_dib(const softpc_machine *machine,
