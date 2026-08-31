@@ -43,6 +43,9 @@ extern void equipment(void);
 extern void memory_size(void);
 extern void time_of_day(void);
 extern void bootstrap(void);
+extern void bootstrap1(void);
+extern void bootstrap2(void);
+extern void bootstrap3(void);
 
 static void make_boot_disk(const char *path)
 {
@@ -112,6 +115,9 @@ int main(void)
     assert(BIOS[BIOS_MEMORY_SIZE] == memory_size);
     assert(BIOS[BIOS_TIME_OF_DAY] == time_of_day);
     assert(BIOS[BIOS_BOOT_STRAP] == bootstrap);
+    assert(BIOS[0x90] == bootstrap1);
+    assert(BIOS[0x91] == bootstrap2);
+    assert(BIOS[0x92] == bootstrap3);
 
     /* BOP 01 is the original BIOS dummy interrupt, not a product service. */
     assert(softpc_device_bop_dispatch(BIOS_DUMMY_INT, 0u) == TRUE);
@@ -236,6 +242,9 @@ int main(void)
     assert(softpc_device_bop_dispatch(0x25u, 0u) == FALSE); /* VDD */
     assert(softpc_device_bop_dispatch(0x2bu, 0u) == FALSE); /* DOS command */
     assert(softpc_device_bop_dispatch(0x30u, 0u) == FALSE); /* DPMI */
+    assert(softpc_device_bop_dispatch(0x50u, 0u) == FALSE); /* NTVDM reserved */
+    assert(softpc_device_bop_dispatch(0x78u, 0u) == FALSE); /* WORM service */
+    assert(softpc_device_bop_dispatch(0x79u, 0u) == FALSE); /* WORM service */
 
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);
