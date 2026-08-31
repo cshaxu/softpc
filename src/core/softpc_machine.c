@@ -287,6 +287,20 @@ int softpc_machine_presentation_text(const softpc_machine *machine,
     return 1;
 }
 
+int softpc_machine_presentation_cursor(const softpc_machine *machine,
+    int32_t *column_out, int32_t *row_out)
+{
+    long column;
+    long row;
+    extern int softpc_platform_presentation_cursor(long *, long *);
+    if (machine == NULL || !machine->reset || column_out == NULL ||
+        row_out == NULL || !softpc_platform_presentation_cursor(&column,
+            &row)) return 0;
+    *column_out = (int32_t)column;
+    *row_out = (int32_t)row;
+    return 1;
+}
+
 void softpc_machine_destroy(softpc_machine *machine)
 {
     if (machine != NULL && machine->hardware_initialized) {

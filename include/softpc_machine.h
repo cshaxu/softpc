@@ -77,6 +77,12 @@ int softpc_machine_presentation_text(const softpc_machine *machine,
     const void **cells_out, uint32_t *columns_out, uint32_t *rows_out,
     uint32_t *stride_out, uint32_t *cell_bytes_out);
 
+/* Read the most recent text-cursor position emitted by the original video
+ * controller. The standalone host records this callback; frontends own the
+ * actual cursor drawing. */
+int softpc_machine_presentation_cursor(const softpc_machine *machine,
+    int32_t *column_out, int32_t *row_out);
+
 void softpc_machine_destroy(softpc_machine *machine);
 
 const char *softpc_machine_result_name(softpc_machine_result result);

@@ -144,8 +144,16 @@ static void softpc_video_palette(PC_palette *palette, int count)
 static boolean softpc_video_scroll(int start, int width, int height,
     int attribute, int lines, int ignored)
 { UNUSED(start); UNUSED(width); UNUSED(height); UNUSED(attribute); UNUSED(lines); UNUSED(ignored); return TRUE; }
+static int softpc_video_cursor_valid;
+static long softpc_video_cursor_x;
+static long softpc_video_cursor_y;
 static void softpc_video_cursor(int x, int y, half_word attribute)
-{ UNUSED(x); UNUSED(y); UNUSED(attribute); }
+{
+    softpc_video_cursor_x = x;
+    softpc_video_cursor_y = y;
+    softpc_video_cursor_valid = 1;
+    UNUSED(attribute);
+}
 static void softpc_video_two_ints(int first, int second)
 { UNUSED(first); UNUSED(second); }
 
@@ -197,8 +205,18 @@ int softpc_platform_presentation_is_graphics(void)
     return sc.ModeType == GRAPHICS;
 }
 
+int softpc_platform_presentation_cursor(long *column_out, long *row_out)
+{
+    if (!softpc_video_cursor_valid || column_out == NULL || row_out == NULL)
+        return 0;
+    *column_out = softpc_video_cursor_x;
+    *row_out = softpc_video_cursor_y;
+    return 1;
+}
+
 int softpc_platform_video_buffers_init(void)
 {
+    softpc_video_cursor_valid = 0;
     host_init_screen();
     return video_copy != NULL && EGA_planes != NULL && DAC != NULL;
 }
