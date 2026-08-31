@@ -550,6 +550,13 @@ extern IBOOL checkForQEvent IPT0();
 #endif
 #endif	/* SFELLOW */
 
+#ifdef SOFTPC_STANDALONE
+/* The detached host timer only records elapsed time from its worker thread.
+   Keep all original device clock work on this executor thread, including
+   nested host_simulate() calls made by ROM BOP services. */
+extern IBOOL softpc_platform_consume_clock_tick(void);
+#endif
+
 #ifdef SFELLOW
 extern int ica_intack IPT0();
 extern int VectorBase8259Slave IPT0();
@@ -805,12 +812,19 @@ IFN1(
 DO_INST:
 
 #ifdef SOFTPC_STANDALONE
-   /* A standalone run slice returns when its instruction budget is spent. */
+   /* A standalone public run slice returns when its instruction budget is
+      spent.  Original device BOPs may recursively enter host_simulate() to
+      execute a short ROM sequence ending in BOP FE; that nested execution
+      must not consume or prematurely exhaust the caller's public budget. */
    {
    extern IU32 softpc_ccpu_instruction_budget;
-   if (softpc_ccpu_instruction_budget == 0)
-      c_cpu_unsimulate();
-   --softpc_ccpu_instruction_budget;
+   extern IBOOL softpc_ccpu_instruction_budget_active;
+   if (softpc_ccpu_instruction_budget_active && simulate_level == 1)
+      {
+      if (softpc_ccpu_instruction_budget == 0)
+         c_cpu_unsimulate();
+      --softpc_ccpu_instruction_budget;
+      }
    }
 #endif
 
@@ -4002,6 +4016,11 @@ TYPEE8:
 	    host_timer_event();
 	    }
 
+#ifdef SOFTPC_STANDALONE
+	 if (softpc_platform_consume_clock_tick())
+	    host_timer_event();
+#endif
+
 #ifndef	PROD
 	 if (cpu_interrupt_map & CPU_SAD_EXCEPTION_MASK)
 	    {
@@ -4363,6 +4382,11 @@ TYPEFF_3:
       host_timer_event();
       }
 
+#ifdef SOFTPC_STANDALONE
+   if (softpc_platform_consume_clock_tick())
+      host_timer_event();
+#endif
+
    if (cpu_interrupt_map & CPU_SAD_EXCEPTION_MASK)
       {
       cpu_interrupt_map &= ~CPU_SAD_EXCEPTION_MASK;
@@ -4416,10 +4440,17 @@ TYPEFF_3:
 
 	 cpu_hw_interrupt_number = ica_intack(&hook_address);
 	 cpu_interrupt_map &= ~CPU_HW_INT_MASK;
-	 EXT = EXTERNAL;
-	 SYNCH_TICK();
-	 do_intrupt(cpu_hw_interrupt_number, FALSE, FALSE, (IU16)0);
-	 CCPU_save_EIP = GET_EIP();   /* to reflect IP change */
+	 /* CPU_40-style ICA may reject a stale notification after a controller
+	    callback has consumed it.  The historical CCPU local is unsigned, so
+	    forwarding -1 to do_intrupt() incorrectly indexes vector FFFFh and
+	    sends a standalone guest into zero/unmapped memory. */
+	 if (cpu_hw_interrupt_number != (IU16)-1)
+	    {
+	    EXT = EXTERNAL;
+	    SYNCH_TICK();
+	    do_intrupt(cpu_hw_interrupt_number, FALSE, FALSE, (IU16)0);
+	    CCPU_save_EIP = GET_EIP();   /* to reflect IP change */
+	    }
       }
 #else	/* SFELLOW */
    if (GET_IF() && (cpu_interrupt_map & (CPU_HW_INT_MASK | CPU_HW_NPX_INT_MASK)))

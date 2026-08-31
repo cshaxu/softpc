@@ -24,6 +24,7 @@ extern void softpc_ccpu_install_video_vector(void);
 extern void reset(void);
 extern int soft_reset;
 extern unsigned long softpc_ccpu_instruction_budget;
+extern int softpc_ccpu_instruction_budget_active;
 extern int softpc_platform_write_physical(unsigned long address,
     const unsigned char *bytes, unsigned long length);
 extern int softpc_platform_read_physical(unsigned long address,
@@ -193,9 +194,12 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
     softpc_ccpu_instruction_budget = (unsigned long)instruction_budget;
     /* The original CCPU consumes CPU_TIMER_TICK at an instruction boundary.
        A standalone machine owns that heartbeat at the public slice boundary,
-       rather than using the historical NTVDM timer thread. */
+       rather than using the historical NTVDM timer thread.  Nested original
+       host_simulate() calls retain their own BOP-FE return path in CCPU. */
     a3_cpu_interrupt(1, 0u);
+    softpc_ccpu_instruction_budget_active = 1;
     c_cpu_simulate();
+    softpc_ccpu_instruction_budget_active = 0;
     return SOFTPC_MACHINE_OK;
 }
 

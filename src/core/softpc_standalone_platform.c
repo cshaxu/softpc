@@ -39,10 +39,37 @@
  */
 
 extern void c_cpu_simulate();
-
 static UTINY *softpc_ram;
 static sys_addr softpc_ram_size;
 IU32 softpc_ccpu_instruction_budget = 0;
+IBOOL softpc_ccpu_instruction_budget_active = FALSE;
+
+#ifdef _WIN32
+/* Original timestrb.c documents a host alarm of roughly 20 Hz.  The timer
+   queue callback only marks the CCPU event pending; host_timer_event() stays
+   on the machine/executor thread where the original device state lives. */
+static HANDLE softpc_clock_timer;
+static volatile LONG softpc_clock_pending_ticks;
+
+static VOID CALLBACK softpc_clock_tick(PVOID context, BOOLEAN fired)
+{
+    UNUSED(context);
+    UNUSED(fired);
+    /* CCPU and the restored controller state are single-threaded.  The
+       Windows timer worker must therefore only publish elapsed host time;
+       the executor consumes it at an instruction boundary. */
+    (void)InterlockedIncrement(&softpc_clock_pending_ticks);
+}
+#endif
+
+IBOOL softpc_platform_consume_clock_tick(void)
+{
+#ifdef _WIN32
+    return InterlockedExchange(&softpc_clock_pending_ticks, 0) != 0;
+#else
+    return FALSE;
+#endif
+}
 
 /* These are controller buffers, not a second video implementation.  The
    original platform allocated them while bringing up its UI; the detached
@@ -517,7 +544,12 @@ IU32 host_speed(IU32 nominal_instructions)
 
 void host_timer_init(void)
 {
-    /* The VM loop calls the original time_strobe() once per bounded slice. */
+#ifdef _WIN32
+    if (softpc_clock_timer == NULL) {
+        (void)CreateTimerQueueTimer(&softpc_clock_timer, NULL,
+            softpc_clock_tick, NULL, 50u, 50u, WT_EXECUTEDEFAULT);
+    }
+#endif
 }
 
 quick_event_delays host_delays = { 0, 0, 0, 0, 0, 0, 25000 };
@@ -894,6 +926,11 @@ void NIDDB_System_Reboot(void) { }
 void host_timer_shutdown(void)
 {
 #ifdef _WIN32
+    if (softpc_clock_timer != NULL) {
+        (void)DeleteTimerQueueTimer(NULL, softpc_clock_timer,
+            INVALID_HANDLE_VALUE);
+        softpc_clock_timer = NULL;
+    }
     softpc_speaker_shutdown();
 #endif
 }
