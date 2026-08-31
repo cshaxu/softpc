@@ -13,6 +13,7 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
  * keyboard polling, while matching the proven standalone boot probe. */
 #define SOFTPC_RUN_SLICE 50000u
 #define SOFTPC_BOOT_SLICE_LIMIT 4000u
+#define SOFTPC_TEXT_ADDRESS 0xb8000u
 
 /* A console selected in softpc.ini is a presentation choice, not a
  * requirement that the launcher inherited a usable stdin/stdout console.
@@ -146,11 +147,13 @@ static void softpc_console_paint(HANDLE output, softpc_machine *machine,
     uint32_t stride;
     uint32_t cell_bytes;
     CHAR_INFO output_cells[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
+    unsigned char fallback[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS * 2u];
     unsigned char text[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
     COORD output_size;
     COORD output_origin;
     SMALL_RECT output_region;
     unsigned int row;
+    int has_nonblank = 0;
     if (!softpc_machine_presentation_text(machine, &surface,
             &columns, &rows, &stride, &cell_bytes) || cell_bytes < 1u ||
         stride < columns) return;
@@ -163,6 +166,26 @@ static void softpc_console_paint(HANDLE output, softpc_machine *machine,
         for (column = 0; column < columns; ++column)
             text[row * SOFTPC_TEXT_COLUMNS + column] =
                 cells[(row * stride + column) * cell_bytes];
+    }
+    for (row = 0; row < SOFTPC_TEXT_ROWS; ++row) {
+        unsigned int column;
+        for (column = 0; column < SOFTPC_TEXT_COLUMNS; ++column) {
+            if (text[row * SOFTPC_TEXT_COLUMNS + column] > 0x20u) {
+                has_nonblank = 1;
+                break;
+            }
+        }
+        if (has_nonblank) break;
+    }
+    if (!has_nonblank && softpc_machine_read_physical(machine,
+            SOFTPC_TEXT_ADDRESS, fallback, sizeof(fallback)) ==
+            SOFTPC_MACHINE_OK) {
+        for (row = 0; row < SOFTPC_TEXT_ROWS; ++row) {
+            unsigned int column;
+            for (column = 0; column < SOFTPC_TEXT_COLUMNS; ++column)
+                text[row * SOFTPC_TEXT_COLUMNS + column] =
+                    fallback[(row * SOFTPC_TEXT_COLUMNS + column) * 2u];
+        }
     }
     if (memcmp(text, previous, sizeof(text)) == 0) return;
     for (row = 0; row < SOFTPC_TEXT_ROWS; ++row) {
