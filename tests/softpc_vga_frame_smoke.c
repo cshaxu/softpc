@@ -9,6 +9,15 @@
 extern unsigned char *EGA_planes;
 extern void nt_v7vga_hi_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
+extern int softpc_device_bop_dispatch(unsigned char number,
+    unsigned int argument);
+extern void c_setAL(unsigned char value);
+extern void c_setAH(unsigned char value);
+extern void c_setBX(unsigned short value);
+extern unsigned short c_getAX(void);
+extern unsigned short c_getBX(void);
+extern unsigned char Currently_emulated_video_mode;
+extern void host_timer_event(void);
 
 static void make_boot_disk(const char *path)
 {
@@ -42,6 +51,19 @@ int main(void)
         &height));
     assert(bits != NULL && info != NULL);
     assert(width == 1056u && height == 768u);
+
+    /* The V7 ROM hands INT 10h extension 6Fh to the original EGA BOP 42h.
+       Subfunction 5 selects an extended 640x400 256-colour mode (60h). */
+    c_setAH(0x6fu);
+    c_setAL(5u);
+    c_setBX(0x0060u);
+    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    assert(c_getAX() == 0x6f05u);
+    assert(c_getBX() == 0x0060u);
+    assert(Currently_emulated_video_mode == 0x60u);
+    host_timer_event();
+    host_timer_event();
+    assert(softpc_machine_presentation_is_graphics(machine));
 
     /* V7 VGA's 640-pixel 256-colour path is an original nt_vga.c painter,
        not a standalone pixel converter.  Give it two source pixels and

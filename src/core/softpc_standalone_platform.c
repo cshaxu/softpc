@@ -21,6 +21,7 @@
 #include "gmi.h"
 #include "gfx_upd.h"
 #include "egaports.h"
+#include "egamode.h"
 #include "gvi.h"
 #include "egagraph.h"
 #include "video.h"
@@ -28,6 +29,7 @@
 #include "virtual.h"
 #include "softpc_standalone_dib.h"
 #include "nt_graph.h"
+#include "nt_ega.h"
 
 /*
  * Minimal host ports for the detached CCPU.  These are deliberately machine
@@ -99,6 +101,25 @@ static void softpc_video_cursor(int x, int y, half_word attribute)
 static void softpc_video_two_ints(int first, int second)
 { UNUSED(first); UNUSED(second); }
 
+/* This is the machine-only half of original nt_graph.c's nt_graphics_tick:
+   VGA register writes deliberately settle for EGA_TICK_DELAY heartbeats
+   before choose_display_mode selects the original paint routine.  The
+   standalone frontend has no console-server flush, mouse-delay, or cursor
+   resize work, so none of those NTVDM product branches belong here. */
+static int softpc_video_mode_change_ticks;
+static void softpc_video_graphics_tick(void)
+{
+    if (video_adapter != EGA && video_adapter != VGA) return;
+    if (softpc_video_mode_change_ticks != 0) {
+        if (--softpc_video_mode_change_ticks == 0) {
+            (void)(*choose_display_mode)();
+            set_mode_change_required(FALSE);
+        }
+    } else if (get_mode_change_required()) {
+        softpc_video_mode_change_ticks = EGA_TICK_DELAY - 1;
+    }
+}
+
 /* Original nt_graph.c owns the paint vectors and the complete controller-mode
  * selection state machine.  This remains only the standalone host vtable. */
 extern void nt_set_paint_routine(DISPLAY_MODE mode, int height);
@@ -107,7 +128,7 @@ static VIDEOFUNCS softpc_video_functions = {
     softpc_video_init_screen, softpc_video_init_adaptor, softpc_video_void,
     softpc_video_int, softpc_video_palette, softpc_video_int,
     softpc_video_void, softpc_video_void, softpc_video_void,
-    softpc_video_void, softpc_video_void, softpc_video_void,
+    softpc_video_graphics_tick, softpc_video_void, softpc_video_void,
     softpc_video_scroll, softpc_video_scroll, (void (*)())softpc_video_cursor,
     (void (*)())nt_set_paint_routine, softpc_video_int, softpc_video_void,
     softpc_video_two_ints, softpc_video_int, softpc_video_int,
