@@ -11,6 +11,54 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 #define SOFTPC_TEXT_ADDRESS 0xb8000u
 #define SOFTPC_RUN_SLICE 50000u
 
+/* A console selected in softpc.ini is a presentation choice, not a
+ * requirement that the launcher inherited a usable stdin/stdout console.
+ * Explorer, GUI launchers, and redirected shells can all start us without
+ * CONIN$/CONOUT$ handles.  Create a private console in that case so the VM
+ * remains interactive instead of reporting a machine host-I/O failure. */
+static int softpc_console_open(HANDLE *input_out, HANDLE *output_out,
+    DWORD *original_mode_out, int *private_console_out)
+{
+    HANDLE input;
+    HANDLE output;
+    DWORD original_mode;
+    int private_console = 0;
+
+    input = GetStdHandle(STD_INPUT_HANDLE);
+    output = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (input == INVALID_HANDLE_VALUE || output == INVALID_HANDLE_VALUE ||
+        !GetConsoleMode(input, &original_mode)) {
+        if (GetConsoleCP() != 0u || !AllocConsole()) return 0;
+        private_console = 1;
+        input = CreateFileA("CONIN$", GENERIC_READ | GENERIC_WRITE,
+            FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+        output = CreateFileA("CONOUT$", GENERIC_READ | GENERIC_WRITE,
+            FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+        if (input == INVALID_HANDLE_VALUE || output == INVALID_HANDLE_VALUE ||
+            !GetConsoleMode(input, &original_mode)) {
+            if (input != INVALID_HANDLE_VALUE) CloseHandle(input);
+            if (output != INVALID_HANDLE_VALUE) CloseHandle(output);
+            FreeConsole();
+            return 0;
+        }
+        SetConsoleTitleA("SoftPC VM");
+    }
+    *input_out = input;
+    *output_out = output;
+    *original_mode_out = original_mode;
+    *private_console_out = private_console;
+    return 1;
+}
+
+static void softpc_console_close(HANDLE input, HANDLE output,
+    int private_console)
+{
+    if (!private_console) return;
+    CloseHandle(input);
+    CloseHandle(output);
+    FreeConsole();
+}
+
 static int softpc_console_key(softpc_machine *machine, const KEY_EVENT_RECORD *key)
 {
     KEY_EVENT_RECORD event;
@@ -56,13 +104,15 @@ int softpc_vm_run_console(softpc_machine *machine)
     DWORD original_mode;
     unsigned char previous[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS * 2u];
     int running = 1;
+    int private_console;
     if (machine == NULL) return 1;
-    input = GetStdHandle(STD_INPUT_HANDLE);
-    output = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (input == INVALID_HANDLE_VALUE || output == INVALID_HANDLE_VALUE ||
-        !GetConsoleMode(input, &original_mode)) return 1;
+    if (!softpc_console_open(&input, &output, &original_mode,
+            &private_console)) return 1;
     if (!SetConsoleMode(input, original_mode & ~(ENABLE_ECHO_INPUT |
-            ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT))) return 1;
+            ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT))) {
+        softpc_console_close(input, output, private_console);
+        return 1;
+    }
     memset(previous, 0xff, sizeof(previous));
     while (running) {
         INPUT_RECORD record;
@@ -85,6 +135,7 @@ int softpc_vm_run_console(softpc_machine *machine)
         Sleep(1u);
     }
     (void)SetConsoleMode(input, original_mode);
+    softpc_console_close(input, output, private_console);
     return 0;
 }
 
