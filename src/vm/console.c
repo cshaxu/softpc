@@ -8,9 +8,8 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 
 #define SOFTPC_TEXT_COLUMNS 80u
 #define SOFTPC_TEXT_ROWS 25u
-/* A 512-instruction slice together with Sleep(1) throttles POST to a crawl
- * on normal Windows timer resolution.  This is still a bounded slice for
- * keyboard polling, while matching the proven standalone boot probe. */
+/* This remains a bounded CPU slice for keyboard polling, while matching the
+ * real-media boot probe closely enough to keep the original POST responsive. */
 #define SOFTPC_TEXT_ADDRESS 0xb8000u
 #define SOFTPC_RUN_SLICE 50000u
 
@@ -88,7 +87,6 @@ static void softpc_console_paint(HANDLE output, softpc_machine *machine,
     if (softpc_machine_read_physical(machine, SOFTPC_TEXT_ADDRESS,
             text, sizeof(text)) != SOFTPC_MACHINE_OK ||
         memcmp(text, previous, sizeof(text)) == 0) return;
-    if (memcmp(text, previous, sizeof(text)) == 0) return;
     for (row = 0; row < SOFTPC_TEXT_ROWS; ++row) {
         CHAR line[SOFTPC_TEXT_COLUMNS];
         unsigned int column;

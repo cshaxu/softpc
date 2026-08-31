@@ -222,6 +222,30 @@ file(MAKE_DIRECTORY "${SOFTPC_OUTPUT_DIRECTORY}")
 set_target_properties(softpcvm PROPERTIES
     OUTPUT_NAME "${SOFTPC_LAUNCHER_NAME}"
     RUNTIME_OUTPUT_DIRECTORY "${SOFTPC_OUTPUT_DIRECTORY}")
+# The original ROM loader deliberately asks the host resource port for
+# firmware/roms/<name>.  A double-clicked launcher therefore has to carry the
+# original fixed firmware beside the executable; relying on the build
+# directory happens to work for tests but leaves a blank, non-booting VM for
+# the actual delivered program.
+set(SOFTPC_FIRMWARE_OUTPUT_DIRECTORY
+    "${SOFTPC_OUTPUT_DIRECTORY}/firmware/roms")
+set(SOFTPC_FIRMWARE_FILES
+    bios1.rom
+    bios4.rom
+    v7vga.rom)
+add_custom_command(TARGET softpcvm POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E make_directory
+        "${SOFTPC_FIRMWARE_OUTPUT_DIRECTORY}"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/firmware/roms/bios1.rom"
+        "${SOFTPC_FIRMWARE_OUTPUT_DIRECTORY}/bios1.rom"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/firmware/roms/bios4.rom"
+        "${SOFTPC_FIRMWARE_OUTPUT_DIRECTORY}/bios4.rom"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/firmware/roms/v7vga.rom"
+        "${SOFTPC_FIRMWARE_OUTPUT_DIRECTORY}/v7vga.rom"
+    VERBATIM)
 if(NOT EXISTS "${SOFTPC_OUTPUT_DIRECTORY}/softpc.ini")
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/softpc.ini"
         "${SOFTPC_OUTPUT_DIRECTORY}/softpc.ini" COPYONLY)
