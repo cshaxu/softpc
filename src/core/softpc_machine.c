@@ -26,7 +26,6 @@ extern int softpc_platform_write_physical(unsigned long address,
 extern int softpc_platform_read_physical(unsigned long address,
     unsigned char *bytes, unsigned long length);
 extern void softpc_device_bop_register_machine_services(void);
-extern void softpc_device_bop_set_memory_size(unsigned long memory_bytes);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
 extern void mouse_send(int delta_x, int delta_y, int left, int right);
 extern void time_strobe(void);
@@ -107,7 +106,6 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     if (!machine->hardware_initialized) {
         sas_init(machine->memory_bytes);
         softpc_device_bop_register_machine_services();
-        softpc_device_bop_set_memory_size(machine->memory_bytes);
         gfi_init();
         if (!softpc_platform_video_buffers_init())
             return SOFTPC_MACHINE_IO_ERROR;

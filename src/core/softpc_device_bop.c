@@ -5,29 +5,6 @@
 #include TypesH
 #include CpuH
 
-static word softpc_extended_memory_kib;
-
-void softpc_device_bop_set_memory_size IFN1(unsigned long, memory_bytes)
-{
-    unsigned long kib = (memory_bytes - (1024ul * 1024ul)) / 1024ul;
-
-    if (kib > 0xfffful) kib = 0xfffful;
-    softpc_extended_memory_kib = (word)kib;
-}
-
-static void softpc_standalone_cassette_io IFN0()
-{
-    /* The original non-PM cassette service reports no extended RAM.  The
-       fixed standalone machine owns real RAM above 1 MiB, so expose that
-       mechanical fact at the existing ROM BOP boundary. */
-    if (getAH() == INT15_EMS_DETERMINE) {
-        setAX(softpc_extended_memory_kib);
-        setCF(0);
-        return;
-    }
-    cassette_io();
-}
-
 /*
  * The original ROM communicates with machine-resident C services through
  * C4 C4..C7 BIOS Operations.  This is deliberately only a machine device
@@ -102,7 +79,7 @@ void softpc_device_bop_register_machine_services IFN0()
     BIOS[BIOS_PRINTER_IO] = printer_io;
     BIOS[BIOS_RS232_IO] = rs232_io;
     BIOS[BIOS_DISK_IO] = disk_io;
-    BIOS[BIOS_CASSETTE_IO] = softpc_standalone_cassette_io;
+    BIOS[BIOS_CASSETTE_IO] = cassette_io;
     BIOS[BIOS_EQUIPMENT] = equipment;
     BIOS[BIOS_MEMORY_SIZE] = memory_size;
     BIOS[BIOS_TIMER_INT] = time_int;

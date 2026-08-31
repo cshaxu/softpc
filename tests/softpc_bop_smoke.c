@@ -8,9 +8,11 @@
 #include "bios.h"
 #include "build_id.h"
 #include "gfi.h"
+#include "tape_io.h"
 
 extern IBOOL softpc_device_bop_dispatch(IU8 number, IU32 argument);
 extern void c_setAL(IU8 value);
+extern void c_setAH(IU8 value);
 extern void c_setCX(IU16 value);
 extern ISM32 c_setDS(IU16 value);
 extern IU16 c_getAX(void);
@@ -55,6 +57,7 @@ int main(void)
     assert(BIOS[BIOS_RS232_IO] != NULL);
     assert(BIOS[BIOS_DISK_IO] != NULL);
     assert(BIOS[BIOS_CASSETTE_IO] != NULL);
+    assert(BIOS[BIOS_CASSETTE_IO] == cassette_io);
     assert(BIOS[BIOS_EQUIPMENT] != NULL);
     assert(BIOS[BIOS_MEMORY_SIZE] != NULL);
     assert(BIOS[BIOS_TIMER_INT] != NULL);
@@ -65,6 +68,12 @@ int main(void)
 
     /* BOP 01 is the original BIOS dummy interrupt, not a product service. */
     assert(softpc_device_bop_dispatch(BIOS_DUMMY_INT, 0u) == TRUE);
+
+    /* INT 15h stays an original SoftPC BIOS handler: the detached BOP table
+       does not substitute a VM-specific extended-memory service. */
+    c_setAH(INT15_EMS_DETERMINE);
+    assert(softpc_device_bop_dispatch(BIOS_CASSETTE_IO, 0u) == TRUE);
+    assert(c_getAX() == 0u);
 
     /* The original reset BOP reinitialises machine controllers, not a
        session/product shell.  The raw-image GFI attachment survives it. */
