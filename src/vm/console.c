@@ -233,12 +233,6 @@ int softpc_vm_run_console(softpc_machine *machine)
         return 1;
     }
     memset(previous, 0xff, sizeof(previous));
-    if (!softpc_console_bootstrap(machine)) {
-        (void)SetConsoleMode(input, original_mode);
-        softpc_console_close(input, output, private_console);
-        return 1;
-    }
-    softpc_console_paint(output, machine, previous);
     while (running) {
         INPUT_RECORD record;
         DWORD available;
