@@ -16,7 +16,9 @@ enum {
     SOFTPC_RS232_LSR = 5,
     SOFTPC_RS232_MSR = 6,
     SOFTPC_LPT1_PORT = 0x378,
-    SOFTPC_EQUIPMENT_BDA = 0x410
+    SOFTPC_EQUIPMENT_BDA = 0x410,
+    SOFTPC_TIMER_LOW_BDA = 0x46c,
+    SOFTPC_TIMER_HIGH_BDA = 0x46e
 };
 
 extern IBOOL softpc_device_bop_dispatch(IU8 number, IU32 argument);
@@ -108,6 +110,25 @@ int main(void)
     assert(c_getAX() == 0xa55au);
     assert(softpc_device_bop_dispatch(BIOS_MEMORY_SIZE, 0u) == TRUE);
     assert(c_getAX() == 0x0280u);
+
+    /* INT 1Ah's original set-time service owns the BIOS timer fields and
+       updates its host-clock port; it must not be a product/session clock. */
+    c_setAH(0x01u);
+    c_setCX(0x1234u);
+    c_setDX(0x5678u);
+    assert(softpc_device_bop_dispatch(BIOS_TIME_OF_DAY, 0u) == TRUE);
+    {
+        const unsigned char expected_low[2] = { 0x78u, 0x56u };
+        const unsigned char expected_high[2] = { 0x34u, 0x12u };
+        unsigned char timer_low[2];
+        unsigned char timer_high[2];
+        assert(softpc_machine_read_physical(machine, SOFTPC_TIMER_LOW_BDA,
+            timer_low, sizeof(timer_low)) == SOFTPC_MACHINE_OK);
+        assert(softpc_machine_read_physical(machine, SOFTPC_TIMER_HIGH_BDA,
+            timer_high, sizeof(timer_high)) == SOFTPC_MACHINE_OK);
+        assert(memcmp(timer_low, expected_low, sizeof(timer_low)) == 0);
+        assert(memcmp(timer_high, expected_high, sizeof(timer_high)) == 0);
+    }
 
     /* BOP 18 is original ROM BASIC fallback firmware, unlike product
        selectors intentionally absent from the standalone machine table. */
