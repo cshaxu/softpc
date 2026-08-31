@@ -254,12 +254,8 @@ static SHORT softpc_gfi_command(FDC_CMD_BLOCK *command,
             1u, 2u, drive->file == NULL, 0);
         return SUCCESS;
     case FDC_READ_DATA:
-    case FDC_READ_DELETED_DATA:
-    case FDC_READ_TRACK:
     case FDC_WRITE_DATA:
-    case FDC_WRITE_DELETED_DATA:
-        writing = get_type_cmd(command) == FDC_WRITE_DATA ||
-            get_type_cmd(command) == FDC_WRITE_DELETED_DATA;
+        writing = get_type_cmd(command) == FDC_WRITE_DATA;
         okay = softpc_gfi_transfer(drive, command, writing, &cylinder, &head,
             &sector);
         softpc_gfi_result(result, unit, cylinder, head, sector, size, !okay,

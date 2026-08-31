@@ -173,6 +173,14 @@ int main(void)
         put_c0_N(command, 1u);
         assert(gfi_fdc_command(command, command_result) == SUCCESS);
         assert(get_r1_ST1_no_data(command_result) != 0u);
+
+        /* A raw sector stream has no deleted-data marks or track records.
+           Do not manufacture those controller formats in the host port. */
+        put_c0_N(command, 2u);
+        put_c0_cmd(command, FDC_READ_DELETED_DATA);
+        assert(gfi_fdc_command(command, command_result) == FAILURE);
+        put_c0_cmd(command, FDC_READ_TRACK);
+        assert(gfi_fdc_command(command, command_result) == FAILURE);
     }
 
     /* The raw-image port consumes the original FDC format DMA CHRN list;
