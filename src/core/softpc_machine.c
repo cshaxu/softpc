@@ -9,6 +9,7 @@
 extern void c_cpu_init(void);
 extern void c_cpu_reset(void);
 extern void c_cpu_simulate(void);
+extern void c_cpu_terminate(void);
 extern void a3_cpu_interrupt(int errupt, unsigned short number);
 extern unsigned short c_getCS(void);
 extern unsigned long c_getCS_BASE(void);
@@ -17,6 +18,7 @@ extern void sas_init(unsigned long size);
 extern void sas_term(void);
 extern void gfi_init(void);
 extern void *setup_global_data_ptr(void);
+extern void softpc_gdp_destroy_global(void);
 extern void setup_vga_globals(void);
 extern void softpc_ccpu_install_video_vector(void);
 extern void reset(void);
@@ -263,6 +265,8 @@ void softpc_machine_destroy(softpc_machine *machine)
         softpc_platform_floppy_detach();
         if (machine->mouse_driver_initialized)
             mouse_driver_termination();
+        c_cpu_terminate();
+        softpc_gdp_destroy_global();
         sas_term();
     }
     free(machine);

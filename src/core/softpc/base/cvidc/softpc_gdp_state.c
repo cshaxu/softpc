@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+extern IHP Gdp;
+
 /* The selected generated header currently has 692 direct GDP forms.  Keep a
  * small amount of spare capacity so a source-version correction can be
  * audited without silently reallocating an active slot table. */
@@ -90,6 +92,12 @@ void softpc_gdp_destroy(void *value)
     for (index = 0u; index < state->count; ++index) free(state->slots[index].storage);
     state->magic = 0u;
     free(state);
+}
+
+void softpc_gdp_destroy_global(void)
+{
+    softpc_gdp_destroy(Gdp);
+    Gdp = (IHP)0;
 }
 
 void *softpc_gdp_slot(const void *value, unsigned int original_offset,

@@ -9,6 +9,8 @@
  */
 void *softpc_gdp_create(void);
 void softpc_gdp_destroy(void *state);
+/* Release the C-VID global-data carrier owned by setup_global_data_ptr(). */
+void softpc_gdp_destroy_global(void);
 void *softpc_gdp_slot(const void *state, unsigned int original_offset,
     size_t native_width);
 
