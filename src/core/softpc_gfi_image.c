@@ -26,7 +26,6 @@ typedef struct {
     unsigned int sectors;
     unsigned int drive_type;
     unsigned int cylinder;
-    int changed;
 } softpc_gfi_image_drive;
 
 static softpc_gfi_image_drive softpc_gfi_drives[MAX_DISKETTES];
@@ -124,7 +123,6 @@ static int softpc_gfi_transfer(softpc_gfi_image_drive *drive,
         }
     }
     drive->cylinder = cylinder;
-    drive->changed = 0;
     return 1;
 }
 
@@ -242,7 +240,6 @@ int softpc_platform_floppy_attach(const char *path)
         memset(drive, 0, sizeof(*drive));
         return 0;
     }
-    drive->changed = 0;
     softpc_gfi_install(0);
     return 1;
 }
