@@ -9,6 +9,7 @@
 extern void c_cpu_init(void);
 extern void c_cpu_reset(void);
 extern void c_cpu_simulate(void);
+extern void a3_cpu_interrupt(int errupt, unsigned short number);
 extern unsigned short c_getCS(void);
 extern unsigned long c_getCS_BASE(void);
 extern unsigned long c_getEIP(void);
@@ -184,8 +185,11 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
     if (machine == NULL || !machine->reset || instruction_budget == 0u)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     softpc_ccpu_instruction_budget = (unsigned long)instruction_budget;
+    /* The original CCPU consumes CPU_TIMER_TICK at an instruction boundary.
+       A standalone machine owns that heartbeat at the public slice boundary,
+       rather than using the historical NTVDM timer thread. */
+    a3_cpu_interrupt(1, 0u);
     c_cpu_simulate();
-    time_strobe();
     return SOFTPC_MACHINE_OK;
 }
 

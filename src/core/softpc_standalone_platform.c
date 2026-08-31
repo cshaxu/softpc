@@ -744,6 +744,15 @@ IU32 depth;
 
 void host_timer_event(void)
 {
+    /* Preserve the machine-facing portion of the original nt_timer heartbeat.
+       Product scheduling (WOW, DEM, console switching and NT worker threads)
+       is deliberately absent; these calls advance only restored devices and
+       the standalone DIB renderer. */
+    host_graphics_tick();
+    host_com_heart_beat();
+    host_lpt_heart_beat();
+    time_strobe();
+    PlayContinuousTone();
 }
 
 void host_note_queue_added(IU32 value)

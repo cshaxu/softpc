@@ -537,11 +537,17 @@ extern IBOOL checkForQEvent IPT0();
 		}					\
 	}
 
+/* The historical non-SFELLOW CCPU build discarded SIGALRM because its
+ * platform owned no usable host event route.  A standalone machine does:
+ * its run-slice boundary injects CPU_TIMER_TICK and the host port advances
+ * the original controller/renderer state machines. */
+#ifndef SOFTPC_STANDALONE
 #ifdef host_timer_event
 #undef host_timer_event
 #endif
 
 #define host_timer_event()
+#endif
 #endif	/* SFELLOW */
 
 #ifdef SFELLOW

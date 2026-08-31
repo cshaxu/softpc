@@ -107,6 +107,14 @@ void host_com_close_all(void)
         host_com_close(adapter);
 }
 
+/* The original NT adapter used the heartbeat to harvest asynchronous serial
+ * driver I/O.  This standalone backend has no host serial handle or worker;
+ * its RX/TX state is synchronous, but retains the original event port so the
+ * machine heartbeat has the same controller-facing shape. */
+void host_com_heart_beat(void)
+{
+}
+
 void host_com_read(adapter, value, error_mask)
 int adapter;
 UTINY *value;
