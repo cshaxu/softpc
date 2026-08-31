@@ -1,0 +1,125 @@
+#include <windows.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "insignia.h"
+#include "host_def.h"
+#include "softpc_standalone_dib.h"
+#include "nt_graph.h"
+
+#define SOFTPC_DIB_MAX_WIDTH 1056u
+#define SOFTPC_DIB_MAX_HEIGHT 768u
+#define SOFTPC_DIB_COLOURS 256u
+
+SCREEN_DESCRIPTION sc;
+int host_screen_scale = 2;
+extern half_word bg_col_mask;
+char *DIBData;
+PBITMAPINFO MonoDIB;
+PBITMAPINFO CGADIB;
+PBITMAPINFO EGADIB;
+PBITMAPINFO VGADIB;
+BOOL FunnyPaintMode;
+
+static BITMAPINFO *softpc_dib_info;
+static unsigned char *softpc_dib_bits;
+static SMALL_RECT softpc_dib_dirty;
+static int softpc_dib_dirty_valid;
+
+/* nt_cga.c owns the original text update algorithm.  Its Windows console
+   sharing buffer becomes standalone-owned storage; the frontend consumes it
+   through the DIB/text presenter instead of a console server. */
+PBYTE textBuffer;
+int now_height = 50;
+int now_width = 80;
+
+void closeGraphicsBuffer(void)
+{
+    /* The DIB is VM-owned and remains valid across text/graphics changes. */
+}
+
+/* Original CGA big/huge entry points retain these expansion hooks.  The
+   fixed standalone profile uses scale 2, so they are not selected today. */
+void high_stretch3(unsigned char *buffer, int length)
+{
+    UNUSED(buffer);
+    UNUSED(length);
+}
+
+void high_stretch4(unsigned char *buffer, int length)
+{
+    UNUSED(buffer);
+    UNUSED(length);
+}
+
+int softpc_standalone_dib_init(void)
+{
+    size_t info_bytes;
+    size_t bitmap_bytes;
+
+    if (softpc_dib_bits != NULL) return 1;
+    info_bytes = sizeof(BITMAPINFOHEADER) +
+        SOFTPC_DIB_COLOURS * sizeof(RGBQUAD);
+    bitmap_bytes = SOFTPC_DIB_MAX_WIDTH * SOFTPC_DIB_MAX_HEIGHT;
+    softpc_dib_info = (BITMAPINFO *)calloc(1u, info_bytes);
+    softpc_dib_bits = (unsigned char *)calloc(1u, bitmap_bytes);
+    if (softpc_dib_info == NULL || softpc_dib_bits == NULL) {
+        free(softpc_dib_info);
+        free(softpc_dib_bits);
+        softpc_dib_info = NULL;
+        softpc_dib_bits = NULL;
+        return 0;
+    }
+    softpc_dib_info->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    softpc_dib_info->bmiHeader.biWidth = SOFTPC_DIB_MAX_WIDTH;
+    softpc_dib_info->bmiHeader.biHeight = -(LONG)SOFTPC_DIB_MAX_HEIGHT;
+    softpc_dib_info->bmiHeader.biPlanes = 1;
+    softpc_dib_info->bmiHeader.biBitCount = 8;
+    softpc_dib_info->bmiHeader.biCompression = BI_RGB;
+    softpc_dib_info->bmiHeader.biClrUsed = SOFTPC_DIB_COLOURS;
+    sc.ScreenBufHandle = (HANDLE)softpc_dib_bits;
+    sc.ConsoleBufInfo.lpBitMap = softpc_dib_bits;
+    sc.ConsoleBufInfo.lpBitMapInfo = softpc_dib_info;
+    sc.ConsoleBufInfo.hMutex = NULL;
+    sc.PC_W_Width = SOFTPC_DIB_MAX_WIDTH;
+    sc.PC_W_Height = SOFTPC_DIB_MAX_HEIGHT;
+    if (textBuffer == NULL)
+        textBuffer = (PBYTE)calloc(80u * 50u, 4u);
+    if (textBuffer == NULL) return 0;
+    DIBData = (char *)softpc_dib_bits;
+    MonoDIB = softpc_dib_info;
+    CGADIB = softpc_dib_info;
+    EGADIB = softpc_dib_info;
+    VGADIB = softpc_dib_info;
+    return 1;
+}
+
+BOOL softpc_standalone_invalidate_dibits(HANDLE ignored,
+    const SMALL_RECT *rect)
+{
+    UNUSED(ignored);
+    if (rect == NULL) return FALSE;
+    if (!softpc_dib_dirty_valid) {
+        softpc_dib_dirty = *rect;
+        softpc_dib_dirty_valid = 1;
+    } else {
+        if (rect->Left < softpc_dib_dirty.Left) softpc_dib_dirty.Left = rect->Left;
+        if (rect->Top < softpc_dib_dirty.Top) softpc_dib_dirty.Top = rect->Top;
+        if (rect->Right > softpc_dib_dirty.Right) softpc_dib_dirty.Right = rect->Right;
+        if (rect->Bottom > softpc_dib_dirty.Bottom) softpc_dib_dirty.Bottom = rect->Bottom;
+    }
+    return TRUE;
+}
+
+int softpc_standalone_dib_surface(const void **bits_out, const void **info_out,
+    unsigned long *width_out, unsigned long *height_out)
+{
+    if (bits_out == NULL || info_out == NULL || width_out == NULL ||
+        height_out == NULL || softpc_dib_bits == NULL || softpc_dib_info == NULL)
+        return 0;
+    *bits_out = softpc_dib_bits;
+    *info_out = softpc_dib_info;
+    *width_out = SOFTPC_DIB_MAX_WIDTH;
+    *height_out = SOFTPC_DIB_MAX_HEIGHT;
+    return 1;
+}

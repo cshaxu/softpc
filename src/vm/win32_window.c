@@ -23,92 +23,18 @@ static int softpc_window_mouse_position_valid;
 static int softpc_window_left_button;
 static int softpc_window_right_button;
 
-static void softpc_window_paint_vga_mode13(HDC dc)
+static int softpc_window_paint_original_dib(HDC dc)
 {
-    static uint32_t pixels[SOFTPC_VGA_MODE13_WIDTH * SOFTPC_VGA_MODE13_HEIGHT];
-    BITMAPINFO bitmap;
-    if (softpc_machine_vga_mode13_frame(softpc_window_machine, pixels,
-            (uint32_t)(sizeof(pixels) / sizeof(pixels[0]))) != SOFTPC_MACHINE_OK)
-        return;
-    ZeroMemory(&bitmap, sizeof(bitmap));
-    bitmap.bmiHeader.biSize = sizeof(bitmap.bmiHeader);
-    bitmap.bmiHeader.biWidth = SOFTPC_VGA_MODE13_WIDTH;
-    bitmap.bmiHeader.biHeight = -SOFTPC_VGA_MODE13_HEIGHT;
-    bitmap.bmiHeader.biPlanes = 1;
-    bitmap.bmiHeader.biBitCount = 32;
-    bitmap.bmiHeader.biCompression = BI_RGB;
-    StretchDIBits(dc, 8, 8, SOFTPC_VGA_MODE13_WIDTH * 2,
-        SOFTPC_VGA_MODE13_HEIGHT * 2, 0, 0, SOFTPC_VGA_MODE13_WIDTH,
-        SOFTPC_VGA_MODE13_HEIGHT, pixels, &bitmap, DIB_RGB_COLORS, SRCCOPY);
-}
-
-static void softpc_window_paint_vga_planar(HDC dc)
-{
-    static uint32_t pixels[SOFTPC_VGA_PLANAR_MAX_WIDTH *
-        SOFTPC_VGA_PLANAR_MAX_HEIGHT];
-    BITMAPINFO bitmap;
+    const void *bits;
+    const void *info;
     uint32_t width;
     uint32_t height;
-    if (!softpc_machine_vga_planar_dimensions(softpc_window_machine, &width,
-            &height) ||
-        softpc_machine_vga_planar_frame(softpc_window_machine, pixels,
-            (uint32_t)(sizeof(pixels) / sizeof(pixels[0]))) != SOFTPC_MACHINE_OK)
-        return;
-    ZeroMemory(&bitmap, sizeof(bitmap));
-    bitmap.bmiHeader.biSize = sizeof(bitmap.bmiHeader);
-    bitmap.bmiHeader.biWidth = (LONG)width;
-    bitmap.bmiHeader.biHeight = -(LONG)height;
-    bitmap.bmiHeader.biPlanes = 1;
-    bitmap.bmiHeader.biBitCount = 32;
-    bitmap.bmiHeader.biCompression = BI_RGB;
+    if (!softpc_machine_presentation_dib(softpc_window_machine, &bits, &info,
+            &width, &height))
+        return 0;
     StretchDIBits(dc, 8, 8, (int)width, (int)height, 0, 0, (int)width,
-        (int)height, pixels, &bitmap, DIB_RGB_COLORS, SRCCOPY);
-}
-
-static void softpc_window_paint_v7_graphics(HDC dc)
-{
-    static uint32_t pixels[SOFTPC_VGA_PLANAR_MAX_WIDTH *
-        SOFTPC_VGA_PLANAR_MAX_HEIGHT];
-    BITMAPINFO bitmap;
-    uint32_t width;
-    uint32_t height;
-    if (!softpc_machine_v7_graphics_dimensions(softpc_window_machine, &width,
-            &height) || softpc_machine_v7_graphics_frame(
-            softpc_window_machine, pixels,
-            (uint32_t)(sizeof(pixels) / sizeof(pixels[0]))) != SOFTPC_MACHINE_OK)
-        return;
-    ZeroMemory(&bitmap, sizeof(bitmap));
-    bitmap.bmiHeader.biSize = sizeof(bitmap.bmiHeader);
-    bitmap.bmiHeader.biWidth = (LONG)width;
-    bitmap.bmiHeader.biHeight = -(LONG)height;
-    bitmap.bmiHeader.biPlanes = 1;
-    bitmap.bmiHeader.biBitCount = 32;
-    bitmap.bmiHeader.biCompression = BI_RGB;
-    StretchDIBits(dc, 8, 8, (int)width, (int)height, 0, 0, (int)width,
-        (int)height, pixels, &bitmap, DIB_RGB_COLORS, SRCCOPY);
-}
-
-static void softpc_window_paint_cga_graphics(HDC dc)
-{
-    static uint32_t pixels[SOFTPC_CGA_GRAPHICS_MAX_WIDTH *
-        SOFTPC_CGA_GRAPHICS_MAX_HEIGHT];
-    BITMAPINFO bitmap;
-    uint32_t width;
-    uint32_t height;
-    if (!softpc_machine_cga_graphics_dimensions(softpc_window_machine, &width,
-            &height) || softpc_machine_cga_graphics_frame(
-            softpc_window_machine, pixels,
-            (uint32_t)(sizeof(pixels) / sizeof(pixels[0]))) != SOFTPC_MACHINE_OK)
-        return;
-    ZeroMemory(&bitmap, sizeof(bitmap));
-    bitmap.bmiHeader.biSize = sizeof(bitmap.bmiHeader);
-    bitmap.bmiHeader.biWidth = (LONG)width;
-    bitmap.bmiHeader.biHeight = -(LONG)height;
-    bitmap.bmiHeader.biPlanes = 1;
-    bitmap.bmiHeader.biBitCount = 32;
-    bitmap.bmiHeader.biCompression = BI_RGB;
-    StretchDIBits(dc, 8, 8, (int)width * 2, (int)height * 2, 0, 0,
-        (int)width, (int)height, pixels, &bitmap, DIB_RGB_COLORS, SRCCOPY);
+        (int)height, bits, (const BITMAPINFO *)info, DIB_RGB_COLORS, SRCCOPY);
+    return 1;
 }
 
 static int softpc_window_mouse_x_from_lparam(LPARAM position)
@@ -125,35 +51,8 @@ static void softpc_window_paint(HDC dc)
 {
     unsigned char text[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS * 2u];
     int row;
-    {
-        uint32_t width;
-        uint32_t height;
-        if (softpc_machine_cga_graphics_dimensions(softpc_window_machine,
-                &width, &height)) {
-            softpc_window_paint_cga_graphics(dc);
-            return;
-        }
-    }
-    {
-        uint32_t width;
-        uint32_t height;
-        if (softpc_machine_v7_graphics_dimensions(softpc_window_machine,
-                &width, &height)) {
-            softpc_window_paint_v7_graphics(dc);
-            return;
-        }
-    }
-    {
-        uint32_t width;
-        uint32_t height;
-        if (softpc_machine_vga_planar_dimensions(softpc_window_machine,
-                &width, &height)) {
-            softpc_window_paint_vga_planar(dc);
-            return;
-        }
-    }
-    if (softpc_machine_vga_mode13_active(softpc_window_machine)) {
-        softpc_window_paint_vga_mode13(dc);
+    if (softpc_machine_presentation_is_graphics(softpc_window_machine)) {
+        (void)softpc_window_paint_original_dib(dc);
         return;
     }
     if (softpc_machine_read_physical(softpc_window_machine,

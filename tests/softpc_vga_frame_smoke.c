@@ -3,23 +3,6 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "insignia.h"
-#include "host_def.h"
-#include "gmi.h"
-#include "gfx_upd.h"
-#include "gvi.h"
-#include "egagraph.h"
-#include "egaports.h"
-#include "video.h"
-
-extern byte *EGA_planes;
-extern PC_palette *DAC;
-extern IBOOL softpc_device_bop_dispatch(IU8 number, IU32 argument);
-extern void c_setAL(IU8 value);
-extern void c_setAH(IU8 value);
-
-static uint32_t mode12_pixels[1024u * 768u];
-
 static void make_boot_disk(const char *path)
 {
     unsigned char sector[512] = { 0 };
@@ -35,220 +18,23 @@ static void make_boot_disk(const char *path)
 
 int main(void)
 {
-    const char *path = "softpc-vga-frame-smoke.img";
+    const char *path = "softpc-original-dib-smoke.img";
     softpc_machine_options options = { path, NULL,
         SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *machine = NULL;
-    uint32_t pixels[320u * 200u];
+    const void *bits = NULL;
+    const void *info = NULL;
+    uint32_t width = 0;
+    uint32_t height = 0;
 
     make_boot_disk(path);
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    assert(!softpc_machine_vga_mode13_active(machine));
-    assert(EGA_planes != NULL && DAC != NULL);
-
-    /* Mode 13h's original chain-4 storage is plane 0/1/2/3 interleaved. */
-    Video_mode = 0x13u;
-    EGA_planes[0] = 1u;
-    EGA_planes[1] = 2u;
-    EGA_planes[2] = 3u;
-    EGA_planes[3] = 4u;
-    DAC[1].red = 63u;
-    DAC[1].green = DAC[1].blue = 0u;
-    DAC[2].red = DAC[2].blue = 0u;
-    DAC[2].green = 63u;
-    DAC[3].red = DAC[3].green = 0u;
-    DAC[3].blue = 63u;
-    DAC[4].red = DAC[4].green = DAC[4].blue = 63u;
-
-    assert(softpc_machine_vga_mode13_active(machine));
-    assert(softpc_machine_vga_mode13_frame(machine, pixels,
-        (uint32_t)(sizeof(pixels) / sizeof(pixels[0]))) == SOFTPC_MACHINE_OK);
-    assert(pixels[0] == 0x00ff0000u);
-    assert(pixels[1] == 0x0000ff00u);
-    assert(pixels[2] == 0x000000ffu);
-    assert(pixels[3] == 0x00ffffffu);
-
-    /* V7 extension modes are still rendered from the original controller
-       state, not from a second standalone video buffer. */
-    /* The V7 ROM reaches its extended controller service through the
-       original EGA BOP. AL 19h maps to Video Seven mode 65h. */
-    c_setAH(0u);
-    c_setAL(0x19u);
-    assert(softpc_device_bop_dispatch(0x42u, 0u) == TRUE);
-    /* Mode 65h is the original V7 1024-pixel planar layout: one plane byte
-       represents eight pixels, and the controller supplies its 128-byte
-       physical-plane stride. CRTC offset_per_line is separately derived
-       from its addressing mode and is not a host plane-buffer stride. */
-    assert(get_actual_offset_per_line() == 128);
-    EGA_planes[0] = 0x80u;
-    EGA_planes[1] = 0x80u;
-    EGA_planes[2] = EGA_planes[3] = 0u;
-    EGA_GRAPH.palette[3].red = 0xa0u;
-    EGA_GRAPH.palette[3].green = 0x50u;
-    EGA_GRAPH.palette[3].blue = 0u;
-    EGA_planes[128u << 2u] = 0x80u;
-    EGA_planes[(128u << 2u) + 1u] = 0u;
-    EGA_planes[(128u << 2u) + 2u] = 0x80u;
-    EGA_planes[(128u << 2u) + 3u] = 0u;
-    EGA_GRAPH.palette[5].red = 0u;
-    EGA_GRAPH.palette[5].green = 0xa0u;
-    EGA_GRAPH.palette[5].blue = 0x50u;
-    {
-        uint32_t width = 0u;
-        uint32_t height = 0u;
-        assert(softpc_machine_v7_graphics_dimensions(machine, &width,
-            &height));
-        assert(width == 1024u && height == 768u);
-        assert(softpc_machine_v7_graphics_frame(machine, mode12_pixels,
-            (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
-            SOFTPC_MACHINE_OK);
-        assert(mode12_pixels[0] == 0x00a05000u);
-        assert(mode12_pixels[1024] == 0x0000a050u);
-    }
-    /* Likewise AL 1Dh is V7 packed 256-colour mode 69h. */
-    c_setAH(0u);
-    c_setAL(0x1du);
-    assert(softpc_device_bop_dispatch(0x42u, 0u) == TRUE);
-    /* Mode 69h is V7 packed 256-colour. The original controller exposes
-       200 bytes per plane; its interleaved plane buffer therefore advances
-       by 800 index bytes per scanline. */
-    assert(get_actual_offset_per_line() == 200);
-    assert(get_bytes_per_line() == 200);
-    EGA_planes[0] = 4u;
-    EGA_planes[200u << 2u] = 5u;
-    DAC[4].red = DAC[4].green = DAC[4].blue = 63u;
-    DAC[5].red = 0u;
-    DAC[5].green = 63u;
-    DAC[5].blue = 32u;
-    {
-        uint32_t width = 0u;
-        uint32_t height = 0u;
-        assert(softpc_machine_v7_graphics_dimensions(machine, &width,
-            &height));
-        assert(width == 800u && height == 600u);
-        assert(softpc_machine_v7_graphics_frame(machine, mode12_pixels,
-            (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
-            SOFTPC_MACHINE_OK);
-        assert(mode12_pixels[0] == 0x00ffffffu);
-        assert(mode12_pixels[800] == 0x0000ff82u);
-    }
-    /* The original planar mode uses one bit from each plane as the palette
-       index. Plane zero is the low bit, exactly as the controller exposes
-       it to the old SoftPC host renderer. */
-    Video_mode = 0x12u;
-    EGA_planes[0] = 0x80u;
-    EGA_planes[1] = 0x80u;
-    EGA_planes[2] = 0u;
-    EGA_planes[3] = 0u;
-    EGA_GRAPH.palette[3].red = 0xa0u;
-    EGA_GRAPH.palette[3].green = 0x50u;
-    EGA_GRAPH.palette[3].blue = 0u;
-    assert(softpc_machine_vga_mode12_active(machine));
-    assert(softpc_machine_vga_mode12_frame(machine, mode12_pixels,
-        (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
-        SOFTPC_MACHINE_OK);
-    assert(mode12_pixels[0] == 0x00a05000u);
-
-    /* The same original EGA plane layout also carries the lower BIOS modes.
-       The detached presentation must not replace it with mode-specific VM
-       memory. */
-    Video_mode = 0x0du;
-    EGA_planes[0] = 0x80u;
-    EGA_planes[1] = 0x80u;
-    EGA_planes[2] = 0u;
-    EGA_planes[3] = 0u;
-    {
-        uint32_t width = 0u;
-        uint32_t height = 0u;
-        assert(softpc_machine_vga_planar_dimensions(machine, &width,
-            &height));
-        assert(width == 320u && height == 200u);
-        assert(softpc_machine_vga_planar_frame(machine, mode12_pixels,
-            (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
-            SOFTPC_MACHINE_OK);
-        assert(mode12_pixels[0] == 0x00a05000u);
-    }
-    Video_mode = 0x0eu;
-    {
-        uint32_t width = 0u;
-        uint32_t height = 0u;
-        assert(softpc_machine_vga_planar_dimensions(machine, &width,
-            &height));
-        assert(width == 640u && height == 200u);
-        assert(softpc_machine_vga_planar_frame(machine, mode12_pixels,
-            (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
-            SOFTPC_MACHINE_OK);
-        assert(mode12_pixels[0] == 0x00a05000u);
-    }
-    Video_mode = 0x0fu;
-    {
-        uint32_t width = 0u;
-        uint32_t height = 0u;
-        assert(softpc_machine_vga_planar_dimensions(machine, &width,
-            &height));
-        assert(width == 640u && height == 350u);
-    }
-    Video_mode = 0x10u;
-    {
-        uint32_t width = 0u;
-        uint32_t height = 0u;
-        assert(softpc_machine_vga_planar_dimensions(machine, &width,
-            &height));
-        assert(width == 640u && height == 350u);
-    }
-    Video_mode = 0x11u;
-    {
-        uint32_t width = 0u;
-        uint32_t height = 0u;
-        assert(softpc_machine_vga_planar_dimensions(machine, &width,
-            &height));
-        assert(width == 640u && height == 480u);
-        assert(softpc_machine_vga_planar_frame(machine, mode12_pixels,
-            (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
-            SOFTPC_MACHINE_OK);
-        assert(mode12_pixels[0] == 0x00a05000u);
-    }
-
-    /* In this V7 VGA profile the original CGA-compatible graphics paths
-       retain their historical odd/even CGA banking inside EGA_planes. */
-    Video_mode = 0x04u;
-    DAC[1].red = 63u;
-    DAC[1].green = DAC[1].blue = 0u;
-    DAC[2].red = DAC[2].blue = 0u;
-    DAC[2].green = 63u;
-    DAC[3].red = DAC[3].green = 0u;
-    DAC[3].blue = 63u;
-    EGA_planes[0] = 0x1bu; /* 00, 01, 10, 11 */
-    {
-        uint32_t width = 0u;
-        uint32_t height = 0u;
-        assert(softpc_machine_cga_graphics_dimensions(machine, &width,
-            &height));
-        assert(width == 320u && height == 200u);
-        assert(softpc_machine_cga_graphics_frame(machine, mode12_pixels,
-            (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
-            SOFTPC_MACHINE_OK);
-        assert(mode12_pixels[0] == 0u);
-        assert(mode12_pixels[1] == 0x00ff0000u);
-        assert(mode12_pixels[2] == 0x0000ff00u);
-        assert(mode12_pixels[3] == 0x000000ffu);
-    }
-    Video_mode = 0x06u;
-    EGA_planes[0] = 0x80u;
-    {
-        uint32_t width = 0u;
-        uint32_t height = 0u;
-        assert(softpc_machine_cga_graphics_dimensions(machine, &width,
-            &height));
-        assert(width == 640u && height == 200u);
-        assert(softpc_machine_cga_graphics_frame(machine, mode12_pixels,
-            (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
-            SOFTPC_MACHINE_OK);
-        assert(mode12_pixels[0] == 0x00ff0000u);
-        assert(mode12_pixels[1] == 0u);
-    }
-
+    assert(!softpc_machine_presentation_is_graphics(machine));
+    assert(softpc_machine_presentation_dib(machine, &bits, &info, &width,
+        &height));
+    assert(bits != NULL && info != NULL);
+    assert(width == 1056u && height == 768u);
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);
     return 0;

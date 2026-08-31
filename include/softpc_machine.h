@@ -46,39 +46,14 @@ softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,
  * Mouse adapter. Button values are zero (up) or nonzero (down). */
 softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,
     int32_t delta_x, int32_t delta_y, uint8_t left_down, uint8_t right_down);
-/* Copy the original VGA controller's mode 13h (320x200, 256-colour) output
- * into a caller-owned RGB32 surface. Pixels are 0x00RRGGBB. This does not
- * emulate VGA; it is a presentation readout of the original controller's
- * planes and DAC. */
-int softpc_machine_vga_mode13_active(const softpc_machine *machine);
-softpc_machine_result softpc_machine_vga_mode13_frame(
-    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count);
-/* Copy the original VGA controller's BIOS mode 12h (640x480, 16-colour)
- * output into a caller-owned RGB32 surface. */
-int softpc_machine_vga_mode12_active(const softpc_machine *machine);
-softpc_machine_result softpc_machine_vga_mode12_frame(
-    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count);
-/* Query and copy an original 4-plane EGA/VGA BIOS graphics mode (0Dh, 0Eh,
- * 0Fh, 10h, or 12h).  The caller supplies an RGB32 surface large enough for
- * the returned dimensions; this is a controller-state readout only. */
-int softpc_machine_vga_planar_dimensions(const softpc_machine *machine,
-    uint32_t *width, uint32_t *height);
-softpc_machine_result softpc_machine_vga_planar_frame(
-    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count);
-/* Copy an original Video Seven extended graphics mode (60h–69h) into RGB32.
- * The mode, planes and DAC remain owned by the restored V7 controller; this
- * is only a presentation readout. */
-int softpc_machine_v7_graphics_dimensions(const softpc_machine *machine,
-    uint32_t *width, uint32_t *height);
-softpc_machine_result softpc_machine_v7_graphics_frame(
-    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count);
-/* Copy the original V7 VGA controller's CGA-compatible BIOS graphics modes
- * 04h/05h (320x200, four-colour) and 06h (640x200, two-colour) into RGB32.
- * This reads the controller's existing CHAIN2/CHAIN4 storage. */
-int softpc_machine_cga_graphics_dimensions(const softpc_machine *machine,
-    uint32_t *width, uint32_t *height);
-softpc_machine_result softpc_machine_cga_graphics_frame(
-    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count);
+int softpc_machine_presentation_is_graphics(const softpc_machine *machine);
+
+/* Borrow the original host renderer's indexed DIB.  The caller must not
+ * retain the pointers after machine destruction or mutate either surface. */
+int softpc_machine_presentation_dib(const softpc_machine *machine,
+    const void **bits_out, const void **info_out, uint32_t *width_out,
+    uint32_t *height_out);
+
 void softpc_machine_destroy(softpc_machine *machine);
 
 const char *softpc_machine_result_name(softpc_machine_result result);

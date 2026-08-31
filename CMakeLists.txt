@@ -141,6 +141,11 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/video/egawrtm0.c
     src/core/softpc/base/video/egwrtm12.c
     src/core/softpc/base/video/cga.c
+    src/core/softpc/host/src/nt_ega.c
+    src/core/softpc/host/src/nt_munge.c
+    src/core/softpc/host/src/nt_cga.c
+    src/core/softpc/host/src/nt_vga.c
+    src/core/softpc_standalone_dib.c
     src/core/softpc_device_bop.c
     src/core/softpc_gfi_image.c
     src/core/softpc_standalone_platform.c)

@@ -26,6 +26,8 @@
 #include "video.h"
 #include "host_com.h"
 #include "virtual.h"
+#include "softpc_standalone_dib.h"
+#include "nt_graph.h"
 
 /*
  * Minimal host ports for the detached CCPU.  These are deliberately machine
@@ -60,247 +62,6 @@ extern IU8 Currently_emulated_video_mode;
 #define SOFTPC_CGA_BYTES_PER_LINE 80u
 #define SOFTPC_CGA_ODD_BANK_OFFSET 0x2000u
 
-static unsigned long softpc_vga_dac_component(half_word component)
-{
-    /* VGA DAC values are six-bit components. The original controller owns
-       their storage; this merely expands them for a 32-bit host surface. */
-    return ((unsigned long)(component & 0x3fu) * 255ul + 31ul) / 63ul;
-}
-
-/* nt_ega pre-expanded every plane byte and ORed its contributions to form
-   eight EGA colour indices.  Retain that renderer-only LUT technique while
-   the original controller and palette continue to own all video state. */
-static unsigned char softpc_planar_lut[4][256][8];
-static int softpc_planar_lut_ready;
-
-static void softpc_planar_lut_init(void)
-{
-    unsigned long plane;
-    unsigned long value;
-    unsigned long bit;
-    if (softpc_planar_lut_ready) return;
-    for (plane = 0ul; plane < 4ul; ++plane) {
-        for (value = 0ul; value < 256ul; ++value) {
-            for (bit = 0ul; bit < 8ul; ++bit) {
-                softpc_planar_lut[plane][value][bit] =
-                    (unsigned char)(((value >> (7ul - bit)) & 1ul) << plane);
-            }
-        }
-    }
-    softpc_planar_lut_ready = 1;
-}
-
-static int softpc_planar_frame(unsigned long *pixels, unsigned long width,
-    unsigned long height, unsigned long pixel_count,
-    unsigned long plane_stride)
-{
-    unsigned long bytes_per_line;
-    unsigned long y;
-    unsigned long byte_index;
-    unsigned long bit;
-    if (pixels == NULL || EGA_planes == NULL || pixel_count < width * height)
-        return 0;
-    softpc_planar_lut_init();
-    bytes_per_line = width >> 3u;
-    if (plane_stride < bytes_per_line) return 0;
-    for (y = 0ul; y < height; ++y) {
-        for (byte_index = 0ul; byte_index < bytes_per_line; ++byte_index) {
-            unsigned long byte_offset = (y * plane_stride + byte_index) << 2u;
-            byte plane0 = EGA_planes[byte_offset];
-            byte plane1 = EGA_planes[byte_offset + 1u];
-            byte plane2 = EGA_planes[byte_offset + 2u];
-            byte plane3 = EGA_planes[byte_offset + 3u];
-            for (bit = 0ul; bit < 8ul; ++bit) {
-                unsigned int colour_index =
-                    softpc_planar_lut[0][plane0][bit] |
-                    softpc_planar_lut[1][plane1][bit] |
-                    softpc_planar_lut[2][plane2][bit] |
-                    softpc_planar_lut[3][plane3][bit];
-                PC_palette *colour = &EGA_GRAPH.palette[colour_index];
-                pixels[y * width + (byte_index << 3u) + bit] =
-                    ((unsigned long)colour->red << 16u) |
-                    ((unsigned long)colour->green << 8u) |
-                    (unsigned long)colour->blue;
-            }
-        }
-    }
-    return 1;
-}
-
-int softpc_platform_vga_mode13_active(void)
-{
-    return Video_mode == 0x13u && EGA_planes != NULL && DAC != NULL;
-}
-
-int softpc_platform_vga_mode13_frame(unsigned long *pixels,
-    unsigned long pixel_count)
-{
-    unsigned long index;
-    if (pixels == NULL || pixel_count < SOFTPC_VGA_MODE13_PIXELS ||
-        !softpc_platform_vga_mode13_active())
-        return 0;
-    /* Chain-4 mode stores plane 0/1/2/3 as four consecutive bytes. This is
-       the same byte ordering consumed by the original nt_vga.c presenter. */
-    for (index = 0ul; index < SOFTPC_VGA_MODE13_PIXELS; ++index) {
-        PC_palette *colour = &DAC[EGA_planes[index]];
-        pixels[index] = (softpc_vga_dac_component(colour->red) << 16u) |
-            (softpc_vga_dac_component(colour->green) << 8u) |
-            softpc_vga_dac_component(colour->blue);
-    }
-    return 1;
-}
-
-int softpc_platform_vga_mode12_active(void)
-{
-    return Video_mode == 0x12u && EGA_planes != NULL;
-}
-
-int softpc_platform_vga_planar_dimensions(unsigned long *width,
-    unsigned long *height)
-{
-    if (width == NULL || height == NULL || EGA_planes == NULL) return 0;
-    switch (Video_mode) {
-    case 0x0du: *width = 320ul; *height = 200ul; return 1;
-    case 0x0eu: *width = 640ul; *height = 200ul; return 1;
-    case 0x0fu: *width = 640ul; *height = 350ul; return 1;
-    case 0x10u: *width = 640ul; *height = 350ul; return 1;
-    case 0x11u: *width = 640ul; *height = 480ul; return 1;
-    case 0x12u: *width = SOFTPC_VGA_MODE12_WIDTH;
-        *height = SOFTPC_VGA_MODE12_HEIGHT; return 1;
-    default: return 0;
-    }
-}
-
-int softpc_platform_vga_planar_frame(unsigned long *pixels,
-    unsigned long pixel_count)
-{
-    unsigned long width;
-    unsigned long height;
-    if (pixels == NULL || !softpc_platform_vga_planar_dimensions(&width,
-            &height) || pixel_count < width * height)
-        return 0;
-    return softpc_planar_frame(pixels, width, height, pixel_count,
-        width >> 3u);
-}
-
-int softpc_platform_vga_mode12_frame(unsigned long *pixels,
-    unsigned long pixel_count)
-{
-    return softpc_platform_vga_mode12_active() &&
-        softpc_platform_vga_planar_frame(pixels, pixel_count);
-}
-
-/* The V7 ROM records an extended mode in Currently_emulated_video_mode;
- * unlike the BIOS data-area byte, this value is not folded for the 60h–69h
- * modes.  Keep the original V7 table's geometry here at the presentation
- * boundary, never in a new video controller. */
-static int softpc_v7_graphics_dimensions(unsigned long *width,
-    unsigned long *height, int *packed)
-{
-    if (width == NULL || height == NULL || packed == NULL || EGA_planes == NULL)
-        return 0;
-    switch (Currently_emulated_video_mode) {
-    case 0x60u: *width = 752ul; *height = 410ul; *packed = 0; break;
-    case 0x61u: *width = 720ul; *height = 540ul; *packed = 0; break;
-    case 0x62u: *width = 800ul; *height = 600ul; *packed = 0; break;
-    case 0x63u: *width = 1024ul; *height = 768ul; *packed = 0; break;
-    case 0x64u: *width = 1024ul; *height = 768ul; *packed = 0; break;
-    case 0x65u: *width = 1024ul; *height = 768ul; *packed = 0; break;
-    case 0x66u: *width = 640ul; *height = 400ul; *packed = 1; break;
-    case 0x67u: *width = 640ul; *height = 480ul; *packed = 1; break;
-    case 0x68u: *width = 720ul; *height = 540ul; *packed = 1; break;
-    case 0x69u: *width = 800ul; *height = 600ul; *packed = 1; break;
-    default: return 0;
-    }
-    return 1;
-}
-
-int softpc_platform_v7_graphics_dimensions(unsigned long *width,
-    unsigned long *height)
-{
-    int packed;
-    return softpc_v7_graphics_dimensions(width, height, &packed);
-}
-
-int softpc_platform_v7_graphics_frame(unsigned long *pixels,
-    unsigned long pixel_count)
-{
-    unsigned long width;
-    unsigned long height;
-    unsigned long plane_stride;
-    unsigned long x;
-    unsigned long y;
-    int packed;
-    if (pixels == NULL || !softpc_v7_graphics_dimensions(&width, &height,
-            &packed) || pixel_count < width * height)
-        return 0;
-    if (packed) {
-        if (DAC == NULL) return 0;
-        /* nt_vga.c's nt_v7vga_hi_graph_* readers consume this same packed
-           EGA_plane0123 byte stream. */
-        plane_stride = (unsigned long)get_actual_offset_per_line();
-        if (plane_stride == 0ul || plane_stride > (~0ul >> 2u)) return 0;
-        plane_stride <<= 2u;
-        for (y = 0ul; y < height; ++y) {
-            for (x = 0ul; x < width; ++x) {
-                PC_palette *colour = &DAC[EGA_planes[y * plane_stride + x]];
-                pixels[y * width + x] =
-                    (softpc_vga_dac_component(colour->red) << 16u) |
-                    (softpc_vga_dac_component(colour->green) << 8u) |
-                    softpc_vga_dac_component(colour->blue);
-            }
-        }
-        return 1;
-    }
-    return softpc_planar_frame(pixels, width, height, pixel_count,
-        (unsigned long)get_actual_offset_per_line());
-}
-
-int softpc_platform_cga_graphics_dimensions(unsigned long *width,
-    unsigned long *height)
-{
-    if (width == NULL || height == NULL || EGA_planes == NULL || DAC == NULL)
-        return 0;
-    switch (Video_mode) {
-    case 0x04u:
-    case 0x05u: *width = 320ul; *height = 200ul; return 1;
-    case 0x06u: *width = 640ul; *height = 200ul; return 1;
-    default: return 0;
-    }
-}
-
-int softpc_platform_cga_graphics_frame(unsigned long *pixels,
-    unsigned long pixel_count)
-{
-    unsigned long width;
-    unsigned long height;
-    unsigned long x;
-    unsigned long y;
-    int two_bit;
-    if (pixels == NULL || !softpc_platform_cga_graphics_dimensions(&width,
-            &height) || pixel_count < width * height)
-        return 0;
-    two_bit = Video_mode == 0x04u || Video_mode == 0x05u;
-    for (y = 0ul; y < height; ++y) {
-        unsigned long row_offset = ((y >> 1u) * SOFTPC_CGA_BYTES_PER_LINE) +
-            ((y & 1u) != 0u ? SOFTPC_CGA_ODD_BANK_OFFSET : 0u);
-        for (x = 0ul; x < width; ++x) {
-            unsigned long byte_offset = row_offset +
-                (two_bit ? x >> 2u : x >> 3u);
-            byte value = EGA_planes[byte_offset << 2u];
-            unsigned int colour_index = two_bit ?
-                (unsigned int)((value >> (6u - ((x & 3u) << 1u))) & 3u) :
-                (unsigned int)((value >> (7u - (x & 7u))) & 1u);
-            PC_palette *colour = &DAC[colour_index];
-            pixels[y * width + x] =
-                (softpc_vga_dac_component(colour->red) << 16u) |
-                (softpc_vga_dac_component(colour->green) << 8u) |
-                softpc_vga_dac_component(colour->blue);
-        }
-    }
-    return 1;
-}
-
 /* The original video core's optional stream-I/O path is a product console
    optimization.  The detached VM presents through its own console/window,
    so it remains disabled while retaining the original controller behavior. */
@@ -319,6 +80,7 @@ static void softpc_video_init_screen(void)
     if (EGA_planes == NULL)
         EGA_planes = (byte *)calloc(4u, (size_t)EGA_PLANE_SIZE);
     if (DAC == NULL) DAC = (PC_palette *)calloc(VGA_DAC_SIZE, sizeof(*DAC));
+    (void)softpc_standalone_dib_init();
 }
 static void softpc_video_init_adaptor(int adapter, int height)
 { UNUSED(adapter); UNUSED(height); }
@@ -333,19 +95,114 @@ static void softpc_video_cursor(int x, int y, half_word attribute)
 static void softpc_video_two_ints(int first, int second)
 { UNUSED(first); UNUSED(second); }
 
+/* This is the original nt_graph.c standard colour dispatch table, retained
+   here as the standalone host's narrow routing layer.  The paint routines
+   themselves remain the original nt_cga.c, nt_ega.c and nt_vga.c sources. */
+static PAINTFUNCS softpc_standard_colour_paint_funcs = {
+    nt_text,
+    nt_cga_colour_med_graph_std, nt_cga_colour_hi_graph_std,
+    nt_text,
+    nt_ega_lo_graph_std, nt_ega_med_graph_std, nt_ega_hi_graph_std,
+    nt_vga_graph_std, nt_vga_med_graph_std, nt_vga_hi_graph_std,
+#ifdef V7VGA
+    nt_v7vga_hi_graph_std
+#endif
+};
+
+static INITFUNCS softpc_colour_init_funcs = {
+    nt_init_text,
+    nt_init_cga_colour_med_graph, nt_init_cga_colour_hi_graph,
+    nt_init_text,
+    nt_init_ega_lo_graph, nt_init_ega_med_graph, nt_init_ega_hi_graph,
+    nt_init_vga_hi_graph
+};
+
+static void softpc_standalone_set_paint(DISPLAY_MODE mode, int height)
+{
+    UNUSED(height);
+    FunnyPaintMode = FALSE;
+    switch ((int)mode) {
+    case TEXT_40_FUN: case CGA_TEXT_40_SP: case CGA_TEXT_40_SP_WR:
+    case CGA_TEXT_40: case CGA_TEXT_40_WR: case TEXT_80_FUN:
+    case CGA_TEXT_80_SP: case CGA_TEXT_80_SP_WR: case CGA_TEXT_80:
+    case CGA_TEXT_80_WR:
+        sc.ModeType = TEXT;
+        paint_screen = softpc_standard_colour_paint_funcs.cga_text;
+        softpc_colour_init_funcs.cga_text();
+        break;
+    case CGA_MED_FUN: case CGA_MED:
+        sc.ModeType = GRAPHICS;
+        paint_screen = softpc_standard_colour_paint_funcs.cga_med_graph;
+        softpc_colour_init_funcs.cga_med_graph();
+        break;
+    case CGA_HI_FUN: case CGA_HI:
+        sc.ModeType = GRAPHICS;
+        paint_screen = softpc_standard_colour_paint_funcs.cga_hi_graph;
+        softpc_colour_init_funcs.cga_hi_graph();
+        break;
+    case EGA_TEXT_40_SP: case EGA_TEXT_40_SP_WR: case EGA_TEXT_40:
+    case EGA_TEXT_40_WR: case EGA_TEXT_80_SP: case EGA_TEXT_80_SP_WR:
+    case EGA_TEXT_80: case EGA_TEXT_80_WR:
+        sc.ModeType = TEXT;
+        paint_screen = softpc_standard_colour_paint_funcs.ega_text;
+        softpc_colour_init_funcs.ega_text();
+        break;
+    case EGA_HI_FUN: case EGA_HI: case EGA_HI_WR: case EGA_HI_SP:
+    case EGA_HI_SP_WR:
+        sc.ModeType = GRAPHICS;
+        if (get_256_colour_mode()) {
+#ifdef V7VGA
+            if (get_seq_chain4_mode() && get_chain4_mode())
+                paint_screen = softpc_standard_colour_paint_funcs.v7vga_hi_graph;
+            else
+#endif
+            if (get_chain4_mode())
+                paint_screen = softpc_standard_colour_paint_funcs.vga_graph;
+            else if (get_char_height() == 2)
+                paint_screen = softpc_standard_colour_paint_funcs.vga_med_graph;
+            else
+                paint_screen = softpc_standard_colour_paint_funcs.vga_hi_graph;
+            softpc_colour_init_funcs.vga_hi_graph();
+        } else {
+            paint_screen = softpc_standard_colour_paint_funcs.ega_hi_graph;
+            softpc_colour_init_funcs.ega_hi_graph();
+        }
+        break;
+    case EGA_MED_FUN: case EGA_MED: case EGA_MED_WR: case EGA_MED_SP:
+    case EGA_MED_SP_WR:
+        sc.ModeType = GRAPHICS;
+        paint_screen = softpc_standard_colour_paint_funcs.ega_med_graph;
+        softpc_colour_init_funcs.ega_med_graph();
+        break;
+    case EGA_LO_FUN: case EGA_LO: case EGA_LO_WR: case EGA_LO_SP:
+    case EGA_LO_SP_WR:
+        sc.ModeType = GRAPHICS;
+        paint_screen = softpc_standard_colour_paint_funcs.ega_lo_graph;
+        softpc_colour_init_funcs.ega_lo_graph();
+        break;
+    default:
+        paint_screen = softpc_video_void;
+        break;
+    }
+}
 static VIDEOFUNCS softpc_video_functions = {
     softpc_video_init_screen, softpc_video_init_adaptor, softpc_video_void,
     softpc_video_int, softpc_video_palette, softpc_video_int,
     softpc_video_void, softpc_video_void, softpc_video_void,
     softpc_video_void, softpc_video_void, softpc_video_void,
     softpc_video_scroll, softpc_video_scroll, (void (*)())softpc_video_cursor,
-    (void (*)())softpc_video_two_ints, softpc_video_int, softpc_video_void,
+    (void (*)())softpc_standalone_set_paint, softpc_video_int, softpc_video_void,
     softpc_video_two_ints, softpc_video_int, softpc_video_int,
     softpc_video_int, softpc_video_two_ints, softpc_video_two_ints,
     softpc_video_void
 };
 VIDEOFUNCS *working_video_funcs = &softpc_video_functions;
 void (*paint_screen)() = softpc_video_void;
+
+int softpc_platform_presentation_is_graphics(void)
+{
+    return sc.ModeType == GRAPHICS;
+}
 
 int softpc_platform_video_buffers_init(void)
 {

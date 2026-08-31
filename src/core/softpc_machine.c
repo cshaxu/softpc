@@ -39,24 +39,6 @@ extern void softpc_platform_hdd_detach(void);
 extern int softpc_platform_floppy_attach(const char *path);
 extern void softpc_platform_floppy_detach(void);
 extern int softpc_platform_video_buffers_init(void);
-extern int softpc_platform_vga_mode13_frame(unsigned long *pixels,
-    unsigned long pixel_count);
-extern int softpc_platform_vga_mode13_active(void);
-extern int softpc_platform_vga_mode12_frame(unsigned long *pixels,
-    unsigned long pixel_count);
-extern int softpc_platform_vga_mode12_active(void);
-extern int softpc_platform_vga_planar_dimensions(unsigned long *width,
-    unsigned long *height);
-extern int softpc_platform_vga_planar_frame(unsigned long *pixels,
-    unsigned long pixel_count);
-extern int softpc_platform_v7_graphics_dimensions(unsigned long *width,
-    unsigned long *height);
-extern int softpc_platform_v7_graphics_frame(unsigned long *pixels,
-    unsigned long pixel_count);
-extern int softpc_platform_cga_graphics_dimensions(unsigned long *width,
-    unsigned long *height);
-extern int softpc_platform_cga_graphics_frame(unsigned long *pixels,
-    unsigned long pixel_count);
 extern FILE *trace_file;
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
@@ -212,111 +194,28 @@ softpc_machine_result softpc_machine_instruction_address(
     return SOFTPC_MACHINE_OK;
 }
 
-int softpc_machine_vga_mode13_active(const softpc_machine *machine)
+int softpc_machine_presentation_is_graphics(const softpc_machine *machine)
 {
+    extern int softpc_platform_presentation_is_graphics(void);
     return machine != NULL && machine->reset &&
-        softpc_platform_vga_mode13_active();
+        softpc_platform_presentation_is_graphics();
 }
 
-softpc_machine_result softpc_machine_vga_mode13_frame(
-    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count)
+int softpc_machine_presentation_dib(const softpc_machine *machine,
+    const void **bits_out, const void **info_out, uint32_t *width_out,
+    uint32_t *height_out)
 {
-    if (machine == NULL || pixels == NULL || !machine->reset)
-        return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    return softpc_platform_vga_mode13_frame((unsigned long *)pixels,
-        (unsigned long)pixel_count) ? SOFTPC_MACHINE_OK :
-        SOFTPC_MACHINE_BACKEND_UNAVAILABLE;
-}
-
-int softpc_machine_vga_mode12_active(const softpc_machine *machine)
-{
-    return machine != NULL && machine->reset &&
-        softpc_platform_vga_mode12_active();
-}
-
-softpc_machine_result softpc_machine_vga_mode12_frame(
-    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count)
-{
-    if (machine == NULL || pixels == NULL || !machine->reset)
-        return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    return softpc_platform_vga_mode12_frame((unsigned long *)pixels,
-        (unsigned long)pixel_count) ? SOFTPC_MACHINE_OK :
-        SOFTPC_MACHINE_BACKEND_UNAVAILABLE;
-}
-
-int softpc_machine_vga_planar_dimensions(const softpc_machine *machine,
-    uint32_t *width, uint32_t *height)
-{
-    unsigned long platform_width;
-    unsigned long platform_height;
-    if (machine == NULL || width == NULL || height == NULL || !machine->reset)
+    unsigned long width;
+    unsigned long height;
+    extern int softpc_standalone_dib_surface(const void **, const void **,
+        unsigned long *, unsigned long *);
+    if (machine == NULL || bits_out == NULL || info_out == NULL ||
+        width_out == NULL || height_out == NULL ||
+        !softpc_standalone_dib_surface(bits_out, info_out, &width, &height))
         return 0;
-    if (!softpc_platform_vga_planar_dimensions(&platform_width,
-            &platform_height))
-        return 0;
-    *width = (uint32_t)platform_width;
-    *height = (uint32_t)platform_height;
+    *width_out = (uint32_t)width;
+    *height_out = (uint32_t)height;
     return 1;
-}
-
-softpc_machine_result softpc_machine_vga_planar_frame(
-    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count)
-{
-    if (machine == NULL || pixels == NULL || !machine->reset)
-        return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    return softpc_platform_vga_planar_frame((unsigned long *)pixels,
-        (unsigned long)pixel_count) ? SOFTPC_MACHINE_OK :
-        SOFTPC_MACHINE_BACKEND_UNAVAILABLE;
-}
-
-int softpc_machine_v7_graphics_dimensions(const softpc_machine *machine,
-    uint32_t *width, uint32_t *height)
-{
-    unsigned long platform_width;
-    unsigned long platform_height;
-    if (machine == NULL || width == NULL || height == NULL || !machine->reset)
-        return 0;
-    if (!softpc_platform_v7_graphics_dimensions(&platform_width,
-            &platform_height))
-        return 0;
-    *width = (uint32_t)platform_width;
-    *height = (uint32_t)platform_height;
-    return 1;
-}
-
-softpc_machine_result softpc_machine_v7_graphics_frame(
-    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count)
-{
-    if (machine == NULL || pixels == NULL || !machine->reset)
-        return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    return softpc_platform_v7_graphics_frame((unsigned long *)pixels,
-        (unsigned long)pixel_count) ? SOFTPC_MACHINE_OK :
-        SOFTPC_MACHINE_BACKEND_UNAVAILABLE;
-}
-
-int softpc_machine_cga_graphics_dimensions(const softpc_machine *machine,
-    uint32_t *width, uint32_t *height)
-{
-    unsigned long platform_width;
-    unsigned long platform_height;
-    if (machine == NULL || width == NULL || height == NULL || !machine->reset)
-        return 0;
-    if (!softpc_platform_cga_graphics_dimensions(&platform_width,
-            &platform_height))
-        return 0;
-    *width = (uint32_t)platform_width;
-    *height = (uint32_t)platform_height;
-    return 1;
-}
-
-softpc_machine_result softpc_machine_cga_graphics_frame(
-    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count)
-{
-    if (machine == NULL || pixels == NULL || !machine->reset)
-        return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    return softpc_platform_cga_graphics_frame((unsigned long *)pixels,
-        (unsigned long)pixel_count) ? SOFTPC_MACHINE_OK :
-        SOFTPC_MACHINE_BACKEND_UNAVAILABLE;
 }
 
 void softpc_machine_destroy(softpc_machine *machine)
