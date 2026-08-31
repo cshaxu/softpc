@@ -46,6 +46,7 @@ extern byte *EGA_planes;
 extern byte *video_copy;
 extern PC_palette *DAC;
 extern IU8 Video_mode;
+extern IU8 Currently_emulated_video_mode;
 
 #define SOFTPC_VGA_MODE13_WIDTH 320u
 #define SOFTPC_VGA_MODE13_HEIGHT 200u
@@ -146,6 +147,82 @@ int softpc_platform_vga_mode12_frame(unsigned long *pixels,
 {
     return softpc_platform_vga_mode12_active() &&
         softpc_platform_vga_planar_frame(pixels, pixel_count);
+}
+
+/* The V7 ROM records an extended mode in Currently_emulated_video_mode;
+ * unlike the BIOS data-area byte, this value is not folded for the 60h–69h
+ * modes.  Keep the original V7 table's geometry here at the presentation
+ * boundary, never in a new video controller. */
+static int softpc_v7_graphics_dimensions(unsigned long *width,
+    unsigned long *height, int *packed)
+{
+    if (width == NULL || height == NULL || packed == NULL || EGA_planes == NULL)
+        return 0;
+    switch (Currently_emulated_video_mode) {
+    case 0x60u: *width = 752ul; *height = 410ul; *packed = 0; break;
+    case 0x61u: *width = 720ul; *height = 540ul; *packed = 0; break;
+    case 0x62u: *width = 800ul; *height = 600ul; *packed = 0; break;
+    case 0x63u: *width = 1024ul; *height = 768ul; *packed = 0; break;
+    case 0x64u: *width = 1024ul; *height = 768ul; *packed = 0; break;
+    case 0x65u: *width = 1024ul; *height = 768ul; *packed = 0; break;
+    case 0x66u: *width = 640ul; *height = 400ul; *packed = 1; break;
+    case 0x67u: *width = 640ul; *height = 480ul; *packed = 1; break;
+    case 0x68u: *width = 720ul; *height = 540ul; *packed = 1; break;
+    case 0x69u: *width = 800ul; *height = 600ul; *packed = 1; break;
+    default: return 0;
+    }
+    return 1;
+}
+
+int softpc_platform_v7_graphics_dimensions(unsigned long *width,
+    unsigned long *height)
+{
+    int packed;
+    return softpc_v7_graphics_dimensions(width, height, &packed);
+}
+
+int softpc_platform_v7_graphics_frame(unsigned long *pixels,
+    unsigned long pixel_count)
+{
+    unsigned long width;
+    unsigned long height;
+    unsigned long x;
+    unsigned long y;
+    int packed;
+    if (pixels == NULL || !softpc_v7_graphics_dimensions(&width, &height,
+            &packed) || pixel_count < width * height)
+        return 0;
+    if (packed) {
+        if (DAC == NULL) return 0;
+        /* nt_vga.c's nt_v7vga_hi_graph_* readers consume this same packed
+           EGA_plane0123 byte stream. */
+        for (y = 0ul; y < height; ++y) {
+            for (x = 0ul; x < width; ++x) {
+                PC_palette *colour = &DAC[EGA_planes[y * width + x]];
+                pixels[y * width + x] =
+                    (softpc_vga_dac_component(colour->red) << 16u) |
+                    (softpc_vga_dac_component(colour->green) << 8u) |
+                    softpc_vga_dac_component(colour->blue);
+            }
+        }
+        return 1;
+    }
+    for (y = 0ul; y < height; ++y) {
+        for (x = 0ul; x < width; ++x) {
+            unsigned long byte_offset = (y * (width >> 3u) + (x >> 3u)) << 2u;
+            byte bit = (byte)(0x80u >> (x & 7u));
+            unsigned int colour_index =
+                ((EGA_planes[byte_offset] & bit) != 0u ? 1u : 0u) |
+                ((EGA_planes[byte_offset + 1u] & bit) != 0u ? 2u : 0u) |
+                ((EGA_planes[byte_offset + 2u] & bit) != 0u ? 4u : 0u) |
+                ((EGA_planes[byte_offset + 3u] & bit) != 0u ? 8u : 0u);
+            PC_palette *colour = &EGA_GRAPH.palette[colour_index];
+            pixels[y * width + x] = ((unsigned long)colour->red << 16u) |
+                ((unsigned long)colour->green << 8u) |
+                (unsigned long)colour->blue;
+        }
+    }
+    return 1;
 }
 
 int softpc_platform_cga_graphics_dimensions(unsigned long *width,

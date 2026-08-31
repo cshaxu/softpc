@@ -14,8 +14,9 @@
 
 extern byte *EGA_planes;
 extern PC_palette *DAC;
+extern IU8 Currently_emulated_video_mode;
 
-static uint32_t mode12_pixels[640u * 480u];
+static uint32_t mode12_pixels[1024u * 768u];
 
 static void make_boot_disk(const char *path)
 {
@@ -65,6 +66,41 @@ int main(void)
     assert(pixels[1] == 0x0000ff00u);
     assert(pixels[2] == 0x000000ffu);
     assert(pixels[3] == 0x00ffffffu);
+
+    /* V7 extension modes are still rendered from the original controller
+       state, not from a second standalone video buffer. */
+    Currently_emulated_video_mode = 0x65u;
+    EGA_planes[0] = 0x80u;
+    EGA_planes[1] = 0x80u;
+    EGA_planes[2] = EGA_planes[3] = 0u;
+    EGA_GRAPH.palette[3].red = 0xa0u;
+    EGA_GRAPH.palette[3].green = 0x50u;
+    EGA_GRAPH.palette[3].blue = 0u;
+    {
+        uint32_t width = 0u;
+        uint32_t height = 0u;
+        assert(softpc_machine_v7_graphics_dimensions(machine, &width,
+            &height));
+        assert(width == 1024u && height == 768u);
+        assert(softpc_machine_v7_graphics_frame(machine, mode12_pixels,
+            (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
+            SOFTPC_MACHINE_OK);
+        assert(mode12_pixels[0] == 0x00a05000u);
+    }
+    Currently_emulated_video_mode = 0x69u;
+    EGA_planes[0] = 4u;
+    {
+        uint32_t width = 0u;
+        uint32_t height = 0u;
+        assert(softpc_machine_v7_graphics_dimensions(machine, &width,
+            &height));
+        assert(width == 800u && height == 600u);
+        assert(softpc_machine_v7_graphics_frame(machine, mode12_pixels,
+            (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
+            SOFTPC_MACHINE_OK);
+        assert(mode12_pixels[0] == 0x00ffffffu);
+    }
+    Currently_emulated_video_mode = 0u;
 
     /* The original planar mode uses one bit from each plane as the palette
        index. Plane zero is the low bit, exactly as the controller exposes

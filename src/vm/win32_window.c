@@ -10,8 +10,8 @@
 #define SOFTPC_RUN_SLICE 50000u
 #define SOFTPC_VGA_MODE13_WIDTH 320
 #define SOFTPC_VGA_MODE13_HEIGHT 200
-#define SOFTPC_VGA_PLANAR_MAX_WIDTH 640
-#define SOFTPC_VGA_PLANAR_MAX_HEIGHT 480
+#define SOFTPC_VGA_PLANAR_MAX_WIDTH 1024
+#define SOFTPC_VGA_PLANAR_MAX_HEIGHT 768
 #define SOFTPC_CGA_GRAPHICS_MAX_WIDTH 640
 #define SOFTPC_CGA_GRAPHICS_MAX_HEIGHT 200
 
@@ -52,6 +52,29 @@ static void softpc_window_paint_vga_planar(HDC dc)
     if (!softpc_machine_vga_planar_dimensions(softpc_window_machine, &width,
             &height) ||
         softpc_machine_vga_planar_frame(softpc_window_machine, pixels,
+            (uint32_t)(sizeof(pixels) / sizeof(pixels[0]))) != SOFTPC_MACHINE_OK)
+        return;
+    ZeroMemory(&bitmap, sizeof(bitmap));
+    bitmap.bmiHeader.biSize = sizeof(bitmap.bmiHeader);
+    bitmap.bmiHeader.biWidth = (LONG)width;
+    bitmap.bmiHeader.biHeight = -(LONG)height;
+    bitmap.bmiHeader.biPlanes = 1;
+    bitmap.bmiHeader.biBitCount = 32;
+    bitmap.bmiHeader.biCompression = BI_RGB;
+    StretchDIBits(dc, 8, 8, (int)width, (int)height, 0, 0, (int)width,
+        (int)height, pixels, &bitmap, DIB_RGB_COLORS, SRCCOPY);
+}
+
+static void softpc_window_paint_v7_graphics(HDC dc)
+{
+    static uint32_t pixels[SOFTPC_VGA_PLANAR_MAX_WIDTH *
+        SOFTPC_VGA_PLANAR_MAX_HEIGHT];
+    BITMAPINFO bitmap;
+    uint32_t width;
+    uint32_t height;
+    if (!softpc_machine_v7_graphics_dimensions(softpc_window_machine, &width,
+            &height) || softpc_machine_v7_graphics_frame(
+            softpc_window_machine, pixels,
             (uint32_t)(sizeof(pixels) / sizeof(pixels[0]))) != SOFTPC_MACHINE_OK)
         return;
     ZeroMemory(&bitmap, sizeof(bitmap));
@@ -108,6 +131,15 @@ static void softpc_window_paint(HDC dc)
         if (softpc_machine_cga_graphics_dimensions(softpc_window_machine,
                 &width, &height)) {
             softpc_window_paint_cga_graphics(dc);
+            return;
+        }
+    }
+    {
+        uint32_t width;
+        uint32_t height;
+        if (softpc_machine_v7_graphics_dimensions(softpc_window_machine,
+                &width, &height)) {
+            softpc_window_paint_v7_graphics(dc);
             return;
         }
     }

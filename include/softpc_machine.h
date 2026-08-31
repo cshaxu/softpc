@@ -65,6 +65,13 @@ int softpc_machine_vga_planar_dimensions(const softpc_machine *machine,
     uint32_t *width, uint32_t *height);
 softpc_machine_result softpc_machine_vga_planar_frame(
     const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count);
+/* Copy an original Video Seven extended graphics mode (60h–69h) into RGB32.
+ * The mode, planes and DAC remain owned by the restored V7 controller; this
+ * is only a presentation readout. */
+int softpc_machine_v7_graphics_dimensions(const softpc_machine *machine,
+    uint32_t *width, uint32_t *height);
+softpc_machine_result softpc_machine_v7_graphics_frame(
+    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count);
 /* Copy the original V7 VGA controller's CGA-compatible BIOS graphics modes
  * 04h/05h (320x200, four-colour) and 06h (640x200, two-colour) into RGB32.
  * This reads the controller's existing CHAIN2/CHAIN4 storage. */
