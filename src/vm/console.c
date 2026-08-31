@@ -78,7 +78,9 @@ static int softpc_console_key(softpc_machine *machine, const KEY_EVENT_RECORD *k
         return SOFTPC_VM_FRONTEND_STOPPED;
     event = *key;
     key_number = KeyMsgToKeyCode(&event);
-    if (key_number == 0u) return 0;
+    /* A console can report layout/dead-key and focus records that have no
+       original SoftPC key number. They are not a monitor stop request. */
+    if (key_number == 0u) return -1;
     return softpc_machine_key_number(machine, key_number,
         (uint8_t)!key->bKeyDown) == SOFTPC_MACHINE_OK ? -1 :
         SOFTPC_VM_FRONTEND_ERROR;
