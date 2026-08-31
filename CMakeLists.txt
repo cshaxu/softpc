@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.23)
-project(softpcvm LANGUAGES C)
+project(softpcvm LANGUAGES C RC)
 
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -15,6 +15,12 @@ if(NOT CMAKE_SIZEOF_VOID_P EQUAL 4 AND NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif()
 math(EXPR SOFTPC_HOST_POINTER_BITS "${CMAKE_SIZEOF_VOID_P} * 8")
 message(STATUS "SoftPC host pointer width: ${SOFTPC_HOST_POINTER_BITS}-bit")
+# MSYS2's windres can otherwise infer the host architecture rather than the
+# selected C toolchain.  Resources are linked into every x86 executable, so
+# make the COFF target explicit.
+if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} --target=pe-i386")
+endif()
 
 add_library(softpc-machine
     src/core/softpc_machine.c)
@@ -203,7 +209,8 @@ target_compile_definitions(softpc-machine PRIVATE
 add_executable(softpcvm
     src/vm/main.c
     src/vm/console.c
-    src/vm/win32_window.c)
+    src/vm/win32_window.c
+    src/vm/softpc_firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
 if(WIN32)
     target_link_libraries(softpcvm PRIVATE user32 gdi32)
@@ -222,30 +229,6 @@ file(MAKE_DIRECTORY "${SOFTPC_OUTPUT_DIRECTORY}")
 set_target_properties(softpcvm PROPERTIES
     OUTPUT_NAME "${SOFTPC_LAUNCHER_NAME}"
     RUNTIME_OUTPUT_DIRECTORY "${SOFTPC_OUTPUT_DIRECTORY}")
-# The original ROM loader deliberately asks the host resource port for
-# firmware/roms/<name>.  A double-clicked launcher therefore has to carry the
-# original fixed firmware beside the executable; relying on the build
-# directory happens to work for tests but leaves a blank, non-booting VM for
-# the actual delivered program.
-set(SOFTPC_FIRMWARE_OUTPUT_DIRECTORY
-    "${SOFTPC_OUTPUT_DIRECTORY}/firmware/roms")
-set(SOFTPC_FIRMWARE_FILES
-    bios1.rom
-    bios4.rom
-    v7vga.rom)
-add_custom_command(TARGET softpcvm POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E make_directory
-        "${SOFTPC_FIRMWARE_OUTPUT_DIRECTORY}"
-    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-        "${CMAKE_CURRENT_SOURCE_DIR}/firmware/roms/bios1.rom"
-        "${SOFTPC_FIRMWARE_OUTPUT_DIRECTORY}/bios1.rom"
-    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-        "${CMAKE_CURRENT_SOURCE_DIR}/firmware/roms/bios4.rom"
-        "${SOFTPC_FIRMWARE_OUTPUT_DIRECTORY}/bios4.rom"
-    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-        "${CMAKE_CURRENT_SOURCE_DIR}/firmware/roms/v7vga.rom"
-        "${SOFTPC_FIRMWARE_OUTPUT_DIRECTORY}/v7vga.rom"
-    VERBATIM)
 if(NOT EXISTS "${SOFTPC_OUTPUT_DIRECTORY}/softpc.ini")
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/softpc.ini"
         "${SOFTPC_OUTPUT_DIRECTORY}/softpc.ini" COPYONLY)
@@ -385,6 +368,9 @@ set(SOFTPC_TEST_TARGETS
     softpc-quick-time-smoke
     softpc-real-boot-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
+    # The machine resource port reads fixed firmware from the hosting module.
+    # Keep every executable test self-contained, just like the launcher.
+    target_sources(${softpc_test_target} PRIVATE src/vm/softpc_firmware.rc)
     if(MSVC)
         target_compile_options(${softpc_test_target} PRIVATE /UNDEBUG)
     else()

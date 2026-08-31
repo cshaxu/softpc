@@ -393,8 +393,9 @@ void *values;
     return softpc_empty_config_value;
 }
 
-/* Original ROM loading is a machine resource lookup.  The standalone VM has
-   a fixed firmware directory rather than an NT resource provider. */
+/* Original ROM loading is a machine resource lookup.  The standalone VM
+   embeds its fixed firmware as RCDATA, so launching it never depends on the
+   process working directory or an adjacent ROM directory. */
 long host_read_resource(resource_id, name, destination, maximum, binary)
 int resource_id;
 char *name;
@@ -402,24 +403,37 @@ host_addr destination;
 int maximum;
 int binary;
 {
-    char path[260];
-    FILE *file;
-    size_t bytes;
-
     UNUSED(resource_id);
     UNUSED(binary);
-    if (name == NULL || destination == 0 || maximum <= 0 ||
-        (strcmp(name, "bios1.rom") != 0 &&
-         strcmp(name, "bios4.rom") != 0 &&
-         strcmp(name, "v7vga.rom") != 0))
+#ifdef _WIN32
+    HRSRC resource;
+    HGLOBAL loaded;
+    DWORD bytes;
+    int identifier;
+
+    if (name == NULL || destination == 0 || maximum <= 0) return 0L;
+    if (strcmp(name, "bios1.rom") == 0)
+        identifier = 101;
+    else if (strcmp(name, "bios4.rom") == 0)
+        identifier = 102;
+    else if (strcmp(name, "v7vga.rom") == 0)
+        identifier = 103;
+    else
         return 0L;
-    sprintf(path, "firmware/roms/%s", name);
-    file = fopen(path, "rb");
-    if (file == NULL)
+    resource = FindResourceA(NULL, MAKEINTRESOURCEA(identifier), RT_RCDATA);
+    if (resource == NULL || (bytes = SizeofResource(NULL, resource)) == 0u)
         return 0L;
-    bytes = fread((void *)destination, 1u, (size_t)maximum, file);
-    fclose(file);
+    loaded = LoadResource(NULL, resource);
+    if (loaded == NULL) return 0L;
+    if (bytes > (DWORD)maximum) bytes = (DWORD)maximum;
+    memcpy((void *)destination, LockResource(loaded), (size_t)bytes);
     return (long)bytes;
+#else
+    UNUSED(name);
+    UNUSED(destination);
+    UNUSED(maximum);
+    return 0L;
+#endif
 }
 
 void config_get(host_id, values)
