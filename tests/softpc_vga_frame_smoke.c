@@ -87,6 +87,13 @@ int main(void)
     EGA_GRAPH.palette[3].red = 0xa0u;
     EGA_GRAPH.palette[3].green = 0x50u;
     EGA_GRAPH.palette[3].blue = 0u;
+    EGA_planes[128u << 2u] = 0x80u;
+    EGA_planes[(128u << 2u) + 1u] = 0u;
+    EGA_planes[(128u << 2u) + 2u] = 0x80u;
+    EGA_planes[(128u << 2u) + 3u] = 0u;
+    EGA_GRAPH.palette[5].red = 0u;
+    EGA_GRAPH.palette[5].green = 0xa0u;
+    EGA_GRAPH.palette[5].blue = 0x50u;
     {
         uint32_t width = 0u;
         uint32_t height = 0u;
@@ -97,6 +104,7 @@ int main(void)
             (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
             SOFTPC_MACHINE_OK);
         assert(mode12_pixels[0] == 0x00a05000u);
+        assert(mode12_pixels[1024] == 0x0000a050u);
     }
     /* Likewise AL 1Dh is V7 packed 256-colour mode 69h. */
     c_setAH(0u);
@@ -108,7 +116,11 @@ int main(void)
     assert(get_actual_offset_per_line() == 200);
     assert(get_bytes_per_line() == 200);
     EGA_planes[0] = 4u;
+    EGA_planes[200u << 2u] = 5u;
     DAC[4].red = DAC[4].green = DAC[4].blue = 63u;
+    DAC[5].red = 0u;
+    DAC[5].green = 63u;
+    DAC[5].blue = 32u;
     {
         uint32_t width = 0u;
         uint32_t height = 0u;
@@ -119,6 +131,7 @@ int main(void)
             (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
             SOFTPC_MACHINE_OK);
         assert(mode12_pixels[0] == 0x00ffffffu);
+        assert(mode12_pixels[800] == 0x0000ff82u);
     }
     /* The original planar mode uses one bit from each plane as the palette
        index. Plane zero is the low bit, exactly as the controller exposes
