@@ -175,9 +175,10 @@ int softpc_vm_run_console(softpc_machine *machine)
                 break;
             }
         }
-        if (softpc_machine_run(machine, SOFTPC_RUN_SLICE) != SOFTPC_MACHINE_OK)
+        if (softpc_machine_run(machine, SOFTPC_RUN_SLICE) != SOFTPC_MACHINE_OK) {
             result = SOFTPC_VM_FRONTEND_ERROR;
             running = 0;
+        }
         softpc_console_paint(output, machine, previous);
         Sleep(0u);
     }
