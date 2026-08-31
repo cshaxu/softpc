@@ -622,7 +622,7 @@ LOCAL MOUSE_VECTOR cursor_grids[MOUSE_VIDEO_MODE_MAXIMUM] =
 	{  2, 1 },	/* mode 13 */
 #endif
 };
-#ifdef V7VGA
+#if !defined(NTVDM) || (defined(NTVDM) && defined(V7VGA))
 LOCAL MOUSE_VECTOR v7text_cursor_grids[6] =
 {
 	{  8, 8 },	/* mode 40 */
