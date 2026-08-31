@@ -222,8 +222,10 @@ file(MAKE_DIRECTORY "${SOFTPC_OUTPUT_DIRECTORY}")
 set_target_properties(softpcvm PROPERTIES
     OUTPUT_NAME "${SOFTPC_LAUNCHER_NAME}"
     RUNTIME_OUTPUT_DIRECTORY "${SOFTPC_OUTPUT_DIRECTORY}")
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/softpc.ini"
-    "${SOFTPC_OUTPUT_DIRECTORY}/softpc.ini" COPYONLY)
+if(NOT EXISTS "${SOFTPC_OUTPUT_DIRECTORY}/softpc.ini")
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/softpc.ini"
+        "${SOFTPC_OUTPUT_DIRECTORY}/softpc.ini" COPYONLY)
+endif()
 
 enable_testing()
 add_executable(softpc-machine-smoke tests/softpc_machine_smoke.c)

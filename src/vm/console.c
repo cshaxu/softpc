@@ -9,7 +9,7 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 #define SOFTPC_TEXT_COLUMNS 80u
 #define SOFTPC_TEXT_ROWS 25u
 #define SOFTPC_TEXT_ADDRESS 0xb8000u
-#define SOFTPC_RUN_SLICE 50000u
+#define SOFTPC_RUN_SLICE 512u
 
 /* A console selected in softpc.ini is a presentation choice, not a
  * requirement that the launcher inherited a usable stdin/stdout console.
@@ -28,8 +28,9 @@ static int softpc_console_open(HANDLE *input_out, HANDLE *output_out,
     output = GetStdHandle(STD_OUTPUT_HANDLE);
     if (input == INVALID_HANDLE_VALUE || output == INVALID_HANDLE_VALUE ||
         !GetConsoleMode(input, &original_mode)) {
-        if (GetConsoleCP() != 0u || !AllocConsole()) return 0;
-        private_console = 1;
+        /* A launcher can leave this process attached to a console while
+           redirecting its standard handles.  Reopen the console devices
+           before deciding that we need a private console. */
         input = CreateFileA("CONIN$", GENERIC_READ | GENERIC_WRITE,
             FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
         output = CreateFileA("CONOUT$", GENERIC_READ | GENERIC_WRITE,
@@ -38,10 +39,21 @@ static int softpc_console_open(HANDLE *input_out, HANDLE *output_out,
             !GetConsoleMode(input, &original_mode)) {
             if (input != INVALID_HANDLE_VALUE) CloseHandle(input);
             if (output != INVALID_HANDLE_VALUE) CloseHandle(output);
-            FreeConsole();
-            return 0;
+            if (GetConsoleCP() != 0u || !AllocConsole()) return 0;
+            private_console = 1;
+            input = CreateFileA("CONIN$", GENERIC_READ | GENERIC_WRITE,
+                FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+            output = CreateFileA("CONOUT$", GENERIC_READ | GENERIC_WRITE,
+                FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+            if (input == INVALID_HANDLE_VALUE || output == INVALID_HANDLE_VALUE ||
+                !GetConsoleMode(input, &original_mode)) {
+                if (input != INVALID_HANDLE_VALUE) CloseHandle(input);
+                if (output != INVALID_HANDLE_VALUE) CloseHandle(output);
+                FreeConsole();
+                return 0;
+            }
+            SetConsoleTitleA("SoftPC VM");
         }
-        SetConsoleTitleA("SoftPC VM");
     }
     *input_out = input;
     *output_out = output;
