@@ -143,6 +143,15 @@ void nt_change_plane_mask(int plane_mask)
     update_vlt = TRUE;
 }
 
+/* Original machine-side refresh notification.  The standalone tick owns the
+ * eventual DIB paint, but C-VID and mode changes must retain this immediate
+ * dirty/VLT signal rather than silently discarding it at the host vtable. */
+void nt_mark_screen_refresh(void)
+{
+    screen_refresh_required();
+    update_vlt = TRUE;
+}
+
 /* Original nt_graph.c mode-to-renderer selection.  The tail deliberately
  * stops before the historic console resize path. */
 void nt_set_paint_routine(DISPLAY_MODE mode, int height)

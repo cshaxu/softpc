@@ -54,6 +54,7 @@ extern IU8 Currently_emulated_video_mode;
 extern void softpc_nt_graph_standalone_init(void);
 extern void softpc_nt_graph_standalone_tick(void);
 extern void nt_change_plane_mask(int plane_mask);
+extern void nt_mark_screen_refresh(void);
 
 #define SOFTPC_VGA_MODE13_WIDTH 320u
 #define SOFTPC_VGA_MODE13_HEIGHT 200u
@@ -136,7 +137,7 @@ extern void nt_set_paint_routine(DISPLAY_MODE mode, int height);
 static VIDEOFUNCS softpc_video_functions = {
     softpc_video_init_screen, softpc_video_init_adaptor, softpc_video_void,
     softpc_video_int, softpc_video_palette, softpc_video_int,
-    softpc_video_void, softpc_video_void, softpc_video_void,
+    softpc_video_void, softpc_video_void, nt_mark_screen_refresh,
     softpc_video_graphics_tick, softpc_video_void, softpc_video_void,
     softpc_video_scroll, softpc_video_scroll, (void (*)())softpc_video_cursor,
     (void (*)())nt_set_paint_routine, nt_change_plane_mask, softpc_video_void,

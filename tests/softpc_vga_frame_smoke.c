@@ -125,7 +125,8 @@ int main(void)
         DAC[1].red = 1u;
         DAC[1].green = 2u;
         DAC[1].blue = 3u;
-        set_palette_change_required(TRUE);
+        /* Route through the original VIDEOFUNCS mark-refresh callback. */
+        host_mark_screen_refresh();
         host_timer_event();
         host_timer_event();
         assert(dib->colours[0].red == 4u);
