@@ -600,11 +600,13 @@ static int softpc_hdd_attach_media(softpc_disk_media *media, const char *path)
     media->file = fopen(path, "rb+");
     if (media->file != NULL) media->writable = 1;
     else media->file = fopen(path, "rb");
-    if (media->file != NULL) {
+    if (media->file == NULL) return 0;
+    {
         long bytes;
         if (fseek(media->file, 0L, SEEK_END) != 0) goto attach_failed;
         bytes = ftell(media->file);
-        if (bytes < 0 || fseek(media->file, 0L, SEEK_SET) != 0)
+        if (bytes < (long)SOFTPC_DISK_SECTOR_BYTES ||
+            fseek(media->file, 0L, SEEK_SET) != 0)
             goto attach_failed;
         media->total_sectors = (IU32)((unsigned long)bytes /
             SOFTPC_DISK_SECTOR_BYTES);

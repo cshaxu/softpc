@@ -33,6 +33,7 @@ int main(void)
 {
     const char *floppy = "softpc-dual-media-floppy.img";
     const char *hard_disk = "softpc-dual-media-hdd.img";
+    const char *empty_disk = "softpc-dual-media-empty-hdd.img";
     softpc_machine_options options = { floppy, hard_disk,
         SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *machine = NULL;
@@ -62,5 +63,23 @@ int main(void)
     softpc_machine_destroy(machine);
     assert(remove(floppy) == 0);
     assert(remove(hard_disk) == 0);
+
+    /* Original nt_fdisk activation fails when the selected fixed medium
+       cannot be opened as a disk.  A zero-byte raw file is equally not an
+       attachable disk; do not let the standalone configuration port claim
+       that C: exists and leave the original controller with phantom media. */
+    {
+        FILE *file = fopen(empty_disk, "wb");
+        softpc_machine_options empty_options = { NULL, empty_disk,
+            SOFTPC_PRESENTATION_CONSOLE };
+        assert(file != NULL);
+        assert(fclose(file) == 0);
+        machine = NULL;
+        assert(softpc_machine_create(&empty_options, &machine) ==
+            SOFTPC_MACHINE_OK);
+        assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_IO_ERROR);
+        softpc_machine_destroy(machine);
+        assert(remove(empty_disk) == 0);
+    }
     return 0;
 }
