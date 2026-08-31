@@ -7,6 +7,7 @@
 #include "host_def.h"
 #include "bios.h"
 #include "build_id.h"
+#include "gfi.h"
 
 extern IBOOL softpc_device_bop_dispatch(IU8 number, IU32 argument);
 extern void c_setAL(IU8 value);
@@ -43,6 +44,7 @@ int main(void)
        direct entries into restored SoftPC controller/firmware code, rather
        than silently falling back to a new VM service layer. */
     assert(BIOS[BIOS_KB_INT] != NULL);
+    assert(BIOS[BIOS_RESET] != NULL);
     assert(BIOS[BIOS_DUMMY_INT] != NULL);
     assert(BIOS[BIOS_KEYBOARD_IO] != NULL);
     assert(BIOS[BIOS_DISKETTE_INT] != NULL);
@@ -63,6 +65,11 @@ int main(void)
 
     /* BOP 01 is the original BIOS dummy interrupt, not a product service. */
     assert(softpc_device_bop_dispatch(BIOS_DUMMY_INT, 0u) == TRUE);
+
+    /* The original reset BOP reinitialises machine controllers, not a
+       session/product shell.  The raw-image GFI attachment survives it. */
+    assert(softpc_device_bop_dispatch(BIOS_RESET, 0u) == TRUE);
+    assert(gfi_drive_type(0) == GFI_DRIVE_TYPE_144);
 
     /* BOP 18 is original ROM BASIC fallback firmware, unlike product
        selectors intentionally absent from the standalone machine table. */
