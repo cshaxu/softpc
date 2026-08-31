@@ -3,6 +3,11 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include "insignia.h"
+#include "host_def.h"
+#include "xt.h"
+#include "cmos.h"
+
 static void write_boot_image(const char *path, unsigned char marker)
 {
     unsigned char sector[512] = { 0 };
@@ -33,6 +38,7 @@ int main(void)
     softpc_machine *machine = NULL;
     unsigned char marker = 0u;
     unsigned char fixed_disk_count = 0u;
+    unsigned short cmos_disk = 0u;
     unsigned int slice;
 
     write_boot_image(floppy, 0x42u);
@@ -47,6 +53,12 @@ int main(void)
         1u) == SOFTPC_MACHINE_OK);
     assert(marker == 0x42u);
     assert(fixed_disk_count == 1u);
+    /* The original CMOS controller obtains fixed-media presence from the
+       standalone host configuration port, then retains the original C: type
+       3 encoding.  This is not a second disk-profile implementation. */
+    cmos_post();
+    assert(cmos_read_byte(CMOS_DISK, &cmos_disk) == SUCCESS);
+    assert(cmos_disk == 0x30u);
     softpc_machine_destroy(machine);
     assert(remove(floppy) == 0);
     assert(remove(hard_disk) == 0);

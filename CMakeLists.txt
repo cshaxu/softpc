@@ -203,6 +203,10 @@ set_tests_properties(softpc-machine-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-dual-media-smoke tests/softpc_dual_media_smoke.c)
 target_link_libraries(softpc-dual-media-smoke PRIVATE softpc-machine)
+target_include_directories(softpc-dual-media-smoke PRIVATE
+    src/core/softpc/host/inc
+    src/core/softpc/host/inc/x86/prod
+    src/core/softpc/base/inc)
 add_test(NAME softpc-dual-media-smoke COMMAND softpc-dual-media-smoke)
 set_tests_properties(softpc-dual-media-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
