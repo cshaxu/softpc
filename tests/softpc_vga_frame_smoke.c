@@ -76,6 +76,11 @@ int main(void)
     c_setAH(0u);
     c_setAL(0x19u);
     assert(softpc_device_bop_dispatch(0x42u, 0u) == TRUE);
+    /* Mode 65h is the original V7 1024-pixel planar layout: one plane byte
+       represents eight pixels, and the controller supplies its 128-byte
+       physical-plane stride. CRTC offset_per_line is separately derived
+       from its addressing mode and is not a host plane-buffer stride. */
+    assert(get_actual_offset_per_line() == 128);
     EGA_planes[0] = 0x80u;
     EGA_planes[1] = 0x80u;
     EGA_planes[2] = EGA_planes[3] = 0u;
@@ -97,6 +102,11 @@ int main(void)
     c_setAH(0u);
     c_setAL(0x1du);
     assert(softpc_device_bop_dispatch(0x42u, 0u) == TRUE);
+    /* Mode 69h is V7 packed 256-colour. The original controller exposes
+       200 bytes per plane; its interleaved plane buffer therefore advances
+       by 800 index bytes per scanline. */
+    assert(get_actual_offset_per_line() == 200);
+    assert(get_bytes_per_line() == 200);
     EGA_planes[0] = 4u;
     DAC[4].red = DAC[4].green = DAC[4].blue = 63u;
     {

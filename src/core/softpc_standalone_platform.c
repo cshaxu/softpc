@@ -91,7 +91,8 @@ static void softpc_planar_lut_init(void)
 }
 
 static int softpc_planar_frame(unsigned long *pixels, unsigned long width,
-    unsigned long height, unsigned long pixel_count)
+    unsigned long height, unsigned long pixel_count,
+    unsigned long plane_stride)
 {
     unsigned long bytes_per_line;
     unsigned long y;
@@ -101,9 +102,10 @@ static int softpc_planar_frame(unsigned long *pixels, unsigned long width,
         return 0;
     softpc_planar_lut_init();
     bytes_per_line = width >> 3u;
+    if (plane_stride < bytes_per_line) return 0;
     for (y = 0ul; y < height; ++y) {
         for (byte_index = 0ul; byte_index < bytes_per_line; ++byte_index) {
-            unsigned long byte_offset = (y * bytes_per_line + byte_index) << 2u;
+            unsigned long byte_offset = (y * plane_stride + byte_index) << 2u;
             byte plane0 = EGA_planes[byte_offset];
             byte plane1 = EGA_planes[byte_offset + 1u];
             byte plane2 = EGA_planes[byte_offset + 2u];
@@ -177,7 +179,8 @@ int softpc_platform_vga_planar_frame(unsigned long *pixels,
     if (pixels == NULL || !softpc_platform_vga_planar_dimensions(&width,
             &height) || pixel_count < width * height)
         return 0;
-    return softpc_planar_frame(pixels, width, height, pixel_count);
+    return softpc_planar_frame(pixels, width, height, pixel_count,
+        width >> 3u);
 }
 
 int softpc_platform_vga_mode12_frame(unsigned long *pixels,
@@ -224,6 +227,7 @@ int softpc_platform_v7_graphics_frame(unsigned long *pixels,
 {
     unsigned long width;
     unsigned long height;
+    unsigned long plane_stride;
     unsigned long x;
     unsigned long y;
     int packed;
@@ -234,9 +238,12 @@ int softpc_platform_v7_graphics_frame(unsigned long *pixels,
         if (DAC == NULL) return 0;
         /* nt_vga.c's nt_v7vga_hi_graph_* readers consume this same packed
            EGA_plane0123 byte stream. */
+        plane_stride = (unsigned long)get_actual_offset_per_line();
+        if (plane_stride == 0ul || plane_stride > (~0ul >> 2u)) return 0;
+        plane_stride <<= 2u;
         for (y = 0ul; y < height; ++y) {
             for (x = 0ul; x < width; ++x) {
-                PC_palette *colour = &DAC[EGA_planes[y * width + x]];
+                PC_palette *colour = &DAC[EGA_planes[y * plane_stride + x]];
                 pixels[y * width + x] =
                     (softpc_vga_dac_component(colour->red) << 16u) |
                     (softpc_vga_dac_component(colour->green) << 8u) |
@@ -245,7 +252,8 @@ int softpc_platform_v7_graphics_frame(unsigned long *pixels,
         }
         return 1;
     }
-    return softpc_planar_frame(pixels, width, height, pixel_count);
+    return softpc_planar_frame(pixels, width, height, pixel_count,
+        (unsigned long)get_actual_offset_per_line());
 }
 
 int softpc_platform_cga_graphics_dimensions(unsigned long *width,
