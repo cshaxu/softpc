@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#define SOFTPC_TEXT_BYTES (80u * 25u * 2u)
+#define SOFTPC_TEXT_COLUMNS 80u
+#define SOFTPC_TEXT_ROWS 25u
+#define SOFTPC_TEXT_BYTES (SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS)
 #define SOFTPC_BOOT_SLICES 200u
 #define SOFTPC_SLICE_INSTRUCTIONS 50000u
 #define SOFTPC_TRACE_INSTRUCTIONS 100u
@@ -16,10 +18,35 @@
 extern unsigned short c_getSS(void);
 extern unsigned short c_getSP(void);
 
+static int read_text_surface(softpc_machine *machine, unsigned char *text)
+{
+    const void *surface;
+    const unsigned char *cells;
+    uint32_t columns;
+    uint32_t rows;
+    uint32_t stride;
+    uint32_t cell_bytes;
+    unsigned int row;
+    if (!softpc_machine_presentation_text(machine, &surface, &columns, &rows,
+            &stride, &cell_bytes) || cell_bytes < 1u || stride < columns)
+        return 0;
+    cells = (const unsigned char *)surface;
+    memset(text, ' ', SOFTPC_TEXT_BYTES);
+    if (columns > SOFTPC_TEXT_COLUMNS) columns = SOFTPC_TEXT_COLUMNS;
+    if (rows > SOFTPC_TEXT_ROWS) rows = SOFTPC_TEXT_ROWS;
+    for (row = 0u; row < rows; ++row) {
+        unsigned int column;
+        for (column = 0u; column < columns; ++column)
+            text[row * SOFTPC_TEXT_COLUMNS + column] =
+                cells[(row * stride + column) * cell_bytes];
+    }
+    return 1;
+}
+
 static int text_has_printable_character(const unsigned char *text)
 {
     unsigned int index;
-    for (index = 0u; index < SOFTPC_TEXT_BYTES; index += 2u) {
+    for (index = 0u; index < SOFTPC_TEXT_BYTES; ++index) {
         if (text[index] >= 0x20u && text[index] < 0x7fu) return 1;
     }
     return 0;
@@ -28,15 +55,15 @@ static int text_has_printable_character(const unsigned char *text)
 static int text_has_dos_prompt(const unsigned char *text)
 {
     unsigned int row;
-    for (row = 0u; row < 25u; ++row) {
+    for (row = 0u; row < SOFTPC_TEXT_ROWS; ++row) {
         char line[81];
         unsigned int column;
-        for (column = 0u; column < 80u; ++column) {
-            unsigned char character = text[(row * 80u + column) * 2u];
+        for (column = 0u; column < SOFTPC_TEXT_COLUMNS; ++column) {
+            unsigned char character = text[row * SOFTPC_TEXT_COLUMNS + column];
             line[column] = character >= 0x20u && character < 0x7fu ?
                 (char)character : ' ';
         }
-        line[80] = '\0';
+        line[SOFTPC_TEXT_COLUMNS] = '\0';
         if (strstr(line, ":\\>") != NULL) return 1;
     }
     return 0;
@@ -45,15 +72,15 @@ static int text_has_dos_prompt(const unsigned char *text)
 static void print_text_screen(const unsigned char *text)
 {
     unsigned int row;
-    for (row = 0u; row < 25u; ++row) {
+    for (row = 0u; row < SOFTPC_TEXT_ROWS; ++row) {
         char line[81];
         unsigned int column;
-        for (column = 0u; column < 80u; ++column) {
-            unsigned char character = text[(row * 80u + column) * 2u];
+        for (column = 0u; column < SOFTPC_TEXT_COLUMNS; ++column) {
+            unsigned char character = text[row * SOFTPC_TEXT_COLUMNS + column];
             line[column] = character >= 0x20u && character < 0x7fu ?
                 (char)character : ' ';
         }
-        line[80] = '\0';
+        line[SOFTPC_TEXT_COLUMNS] = '\0';
         fprintf(stderr, "%s\n", line);
     }
 }
@@ -156,8 +183,7 @@ usage:
                 (unsigned int)c_getSS(), (unsigned int)c_getSP());
             print_instruction(machine, cs, eip);
         }
-        if (softpc_machine_read_physical(machine, 0xb8000u, text,
-                sizeof(text)) == SOFTPC_MACHINE_OK) {
+        if (read_text_surface(machine, text)) {
             if (require_prompt && text_has_dos_prompt(text)) {
                 print_text_screen(text);
                 softpc_machine_destroy(machine);

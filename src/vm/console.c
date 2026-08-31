@@ -8,7 +8,6 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 
 #define SOFTPC_TEXT_COLUMNS 80u
 #define SOFTPC_TEXT_ROWS 25u
-#define SOFTPC_TEXT_ADDRESS 0xb8000u
 #define SOFTPC_RUN_SLICE 512u
 
 /* A console selected in softpc.ini is a presentation choice, not a
@@ -86,18 +85,35 @@ static int softpc_console_key(softpc_machine *machine, const KEY_EVENT_RECORD *k
 static void softpc_console_paint(HANDLE output, softpc_machine *machine,
     unsigned char *previous)
 {
-    unsigned char text[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS * 2u];
+    const void *surface;
+    const unsigned char *cells;
+    uint32_t columns;
+    uint32_t rows;
+    uint32_t stride;
+    uint32_t cell_bytes;
+    unsigned char text[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
     unsigned int row;
-    if (softpc_machine_read_physical(machine, SOFTPC_TEXT_ADDRESS,
-            text, sizeof(text)) != SOFTPC_MACHINE_OK ||
-        memcmp(text, previous, sizeof(text)) == 0) return;
+    if (!softpc_machine_presentation_text(machine, &surface,
+            &columns, &rows, &stride, &cell_bytes) || cell_bytes < 1u ||
+        stride < columns) return;
+    cells = (const unsigned char *)surface;
+    memset(text, ' ', sizeof(text));
+    if (columns > SOFTPC_TEXT_COLUMNS) columns = SOFTPC_TEXT_COLUMNS;
+    if (rows > SOFTPC_TEXT_ROWS) rows = SOFTPC_TEXT_ROWS;
+    for (row = 0; row < rows; ++row) {
+        unsigned int column;
+        for (column = 0; column < columns; ++column)
+            text[row * SOFTPC_TEXT_COLUMNS + column] =
+                cells[(row * stride + column) * cell_bytes];
+    }
+    if (memcmp(text, previous, sizeof(text)) == 0) return;
     for (row = 0; row < SOFTPC_TEXT_ROWS; ++row) {
         CHAR line[SOFTPC_TEXT_COLUMNS];
         COORD position;
         DWORD written;
         unsigned int column;
         for (column = 0; column < SOFTPC_TEXT_COLUMNS; ++column) {
-            unsigned char character = text[(row * SOFTPC_TEXT_COLUMNS + column) * 2u];
+            unsigned char character = text[row * SOFTPC_TEXT_COLUMNS + column];
             line[column] = character >= 0x20u && character < 0x7fu ?
                 (CHAR)character : ' ';
         }
@@ -114,7 +130,7 @@ int softpc_vm_run_console(softpc_machine *machine)
     HANDLE input;
     HANDLE output;
     DWORD original_mode;
-    unsigned char previous[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS * 2u];
+    unsigned char previous[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
     int running = 1;
     int private_console;
     if (machine == NULL) return 1;

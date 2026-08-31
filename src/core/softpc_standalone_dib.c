@@ -12,6 +12,9 @@
 #define SOFTPC_DIB_MAX_WIDTH 1056u
 #define SOFTPC_DIB_MAX_HEIGHT 768u
 #define SOFTPC_DIB_COLOURS 256u
+#define SOFTPC_TEXT_COLUMNS 80u
+#define SOFTPC_TEXT_ROWS 50u
+#define SOFTPC_TEXT_CELL_BYTES 4u
 
 SCREEN_DESCRIPTION sc;
 int host_screen_scale = 2;
@@ -72,7 +75,8 @@ int softpc_standalone_dib_init(void)
     sc.PC_W_Width = SOFTPC_DIB_MAX_WIDTH;
     sc.PC_W_Height = SOFTPC_DIB_MAX_HEIGHT;
     if (textBuffer == NULL)
-        textBuffer = (PBYTE)calloc(80u * 50u, 4u);
+        textBuffer = (PBYTE)calloc(SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS,
+            SOFTPC_TEXT_CELL_BYTES);
     if (textBuffer == NULL) return 0;
     DIBData = (char *)softpc_dib_bits;
     MonoDIB = softpc_dib_info;
@@ -109,6 +113,21 @@ int softpc_standalone_dib_surface(const void **bits_out, const void **info_out,
     *info_out = softpc_dib_info;
     *width_out = SOFTPC_DIB_MAX_WIDTH;
     *height_out = SOFTPC_DIB_MAX_HEIGHT;
+    return 1;
+}
+
+int softpc_standalone_text_surface(const void **cells_out,
+    unsigned long *columns_out, unsigned long *rows_out,
+    unsigned long *stride_out, unsigned long *cell_bytes_out)
+{
+    if (cells_out == NULL || columns_out == NULL || rows_out == NULL ||
+        stride_out == NULL || cell_bytes_out == NULL || textBuffer == NULL)
+        return 0;
+    *cells_out = textBuffer;
+    *columns_out = SOFTPC_TEXT_COLUMNS;
+    *rows_out = SOFTPC_TEXT_ROWS;
+    *stride_out = SOFTPC_TEXT_COLUMNS;
+    *cell_bytes_out = SOFTPC_TEXT_CELL_BYTES;
     return 1;
 }
 void softpc_standalone_dib_set_palette(PC_palette *palette, int count)

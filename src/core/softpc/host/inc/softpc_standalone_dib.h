@@ -14,6 +14,9 @@ BOOL softpc_standalone_invalidate_dibits(HANDLE ignored,
 
 int softpc_standalone_dib_surface(const void **bits_out, const void **info_out,
     unsigned long *width_out, unsigned long *height_out);
+int softpc_standalone_text_surface(const void **cells_out,
+    unsigned long *columns_out, unsigned long *rows_out,
+    unsigned long *stride_out, unsigned long *cell_bytes_out);
 void softpc_standalone_dib_set_palette(PC_palette *palette, int count);
 int softpc_standalone_dib_take_dirty(long *left, long *top, long *right,
     long *bottom);

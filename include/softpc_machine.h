@@ -69,6 +69,14 @@ int softpc_machine_presentation_dib(const softpc_machine *machine,
     const void **bits_out, const void **info_out, uint32_t *width_out,
     uint32_t *height_out);
 
+/* Borrow the original nt_cga text-presenter surface.  Cells are four bytes
+ * wide in this standalone build: the character and attribute occupy the
+ * first two bytes, followed by the original renderer's padding.  The caller
+ * must not mutate the surface or retain it after machine destruction. */
+int softpc_machine_presentation_text(const softpc_machine *machine,
+    const void **cells_out, uint32_t *columns_out, uint32_t *rows_out,
+    uint32_t *stride_out, uint32_t *cell_bytes_out);
+
 void softpc_machine_destroy(softpc_machine *machine);
 
 const char *softpc_machine_result_name(softpc_machine_result result);

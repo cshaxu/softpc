@@ -7,7 +7,6 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 
 #define SOFTPC_TEXT_COLUMNS 80
 #define SOFTPC_TEXT_ROWS 25
-#define SOFTPC_TEXT_ADDRESS 0xb8000u
 #define SOFTPC_TIMER_ID 1u
 #define SOFTPC_RUN_SLICE 512u
 #define SOFTPC_VGA_MODE13_WIDTH 320
@@ -51,14 +50,21 @@ static int softpc_window_mouse_y_from_lparam(LPARAM position)
 
 static void softpc_window_paint(HDC dc)
 {
-    unsigned char text[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS * 2u];
+    const void *surface;
+    const unsigned char *cells;
+    uint32_t columns;
+    uint32_t rows;
+    uint32_t stride;
+    uint32_t cell_bytes;
     int row;
     if (softpc_machine_presentation_is_graphics(softpc_window_machine)) {
         (void)softpc_window_paint_original_dib(dc);
         return;
     }
-    if (softpc_machine_read_physical(softpc_window_machine,
-            SOFTPC_TEXT_ADDRESS, text, sizeof(text)) != SOFTPC_MACHINE_OK) return;
+    if (!softpc_machine_presentation_text(softpc_window_machine, &surface,
+            &columns, &rows, &stride, &cell_bytes) ||
+        cell_bytes < 1u || stride < columns) return;
+    cells = (const unsigned char *)surface;
     SelectObject(dc, softpc_window_font);
     SetBkMode(dc, OPAQUE);
     SetBkColor(dc, RGB(0, 0, 0));
@@ -67,7 +73,10 @@ static void softpc_window_paint(HDC dc)
         char line[SOFTPC_TEXT_COLUMNS + 1];
         int column;
         for (column = 0; column < SOFTPC_TEXT_COLUMNS; ++column) {
-            unsigned char character = text[(row * SOFTPC_TEXT_COLUMNS + column) * 2u];
+            unsigned char character = ' ';
+            if ((uint32_t)row < rows && (uint32_t)column < columns)
+                character = cells[((uint32_t)row * stride + (uint32_t)column) *
+                    cell_bytes];
             line[column] = character >= 0x20u && character < 0x7fu ?
                 (char)character : ' ';
         }
