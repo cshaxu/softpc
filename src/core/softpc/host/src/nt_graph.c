@@ -58,6 +58,15 @@ static INITFUNCS colour_init_funcs =
 
 static PAINTFUNCS *nt_paint_funcs;
 static INITFUNCS *nt_init_funcs;
+/* Keep the original nt_graph resize cache.  It is not a console detail: the
+ * EGA/VGA painters write through sc.ConsoleBufInfo and need graphicsResize()
+ * whenever a guest mode changes the DIB geometry. */
+static int standalone_current_char_height;
+static int standalone_current_height;
+static int standalone_current_width;
+static int standalone_current_bits_per_pixel;
+static int standalone_current_mode_type = TEXT;
+static int standalone_current_scale;
 /* These are the original nt_graph VLT inputs.  The detached build retains
  * their controller-side mapping and substitutes only the palette sink. */
 extern PC_palette *DAC;
@@ -74,11 +83,87 @@ static void dummy_paint_screen(int offset, int host_x, int host_y,
     UNUSED(height);
 }
 
+/* Original nt_graph.c::check_win_size, with only textResize removed.  The
+ * standalone text presenter has its own backing store, while graphicsResize
+ * remains essential: it creates the indexed DIB consumed directly by the
+ * unmodified nt_ega/nt_vga paint routines. */
+static void standalone_check_win_size(int height)
+{
+    int width;
+    extern int soft_reset;
+
+    if (!soft_reset)
+        return;
+
+    if (sas_hw_at(vd_video_mode) > 0x10)
+    {
+        if (alpha_num_mode())
+            width = get_chars_per_line() * get_pix_char_width();
+        else
+            width = get_chars_per_line() * get_char_width() *
+                (get_256_colour_mode() ? 2 : 1);
+        if (width == 0)
+            width = CGA_WIN_WIDTH;
+    }
+    else
+        width = CGA_WIN_WIDTH;
+
+    if (sc.ModeType == TEXT)
+    {
+        if ((standalone_current_mode_type != TEXT) ||
+            (get_char_height() != standalone_current_char_height) ||
+            (standalone_current_height != height) ||
+            (standalone_current_width != width))
+        {
+            sc.PC_W_Width = width;
+            sc.PC_W_Height = height * get_host_pix_height();
+            standalone_current_height = height;
+            standalone_current_width = width;
+            standalone_current_mode_type = TEXT;
+            standalone_current_char_height = get_char_height();
+        }
+    }
+    else if ((standalone_current_mode_type != GRAPHICS) ||
+             (standalone_current_height != height) ||
+             (standalone_current_width != width) ||
+             (standalone_current_bits_per_pixel != sc.BitsPerPixel) ||
+             (standalone_current_scale != host_screen_scale))
+    {
+        sc.PC_W_Width = SCALE(width);
+        sc.PC_W_Height = SCALE(height * get_host_pix_height());
+        graphicsResize();
+        standalone_current_height = height;
+        standalone_current_width = width;
+        standalone_current_mode_type = GRAPHICS;
+        standalone_current_bits_per_pixel = sc.BitsPerPixel;
+        standalone_current_scale = host_screen_scale;
+    }
+
+    sc.CharHeight = standalone_current_char_height;
+}
+
+/* Original nt_graph::graphicsResize keeps all renderer state in sc.  In the
+ * detached host the one product-specific operation, creating/activating an
+ * NT console graphics buffer, is replaced by the VM-owned indexed DIB. */
+void graphicsResize(void)
+{
+    if (!softpc_standalone_dib_resize(sc.PC_W_Width, sc.PC_W_Height,
+            sc.BitsPerPixel))
+        assert3(NO, "SoftPC: standalone graphics surface %dx%dx%d failed",
+            sc.PC_W_Width, sc.PC_W_Height, sc.BitsPerPixel);
+}
+
 void softpc_nt_graph_standalone_init(void)
 {
     nt_paint_funcs = &std_colour_paint_funcs;
     nt_init_funcs = &colour_init_funcs;
     paint_screen = dummy_paint_screen;
+    standalone_current_char_height = 0;
+    standalone_current_height = 0;
+    standalone_current_width = 0;
+    standalone_current_bits_per_pixel = 0;
+    standalone_current_mode_type = TEXT;
+    standalone_current_scale = 0;
 }
 
 /* Original nt_graph.c::set_the_vlt controller mapping.  The historical
@@ -152,15 +237,15 @@ void nt_mark_screen_refresh(void)
     update_vlt = TRUE;
 }
 
-/* Original nt_graph.c mode-to-renderer selection.  The tail deliberately
- * stops before the historic console resize path. */
+/* Original nt_graph.c mode-to-renderer selection.  The historic console
+ * resize is replaced by standalone_check_win_size(), which preserves the
+ * geometry/DIB side of that path without changing any console state. */
 void nt_set_paint_routine(DISPLAY_MODE mode, int height)
 {
     int oldModeType;
 
     oldModeType = sc.ModeType;
     UNUSED(oldModeType);
-    UNUSED(height);
     FunnyPaintMode = FALSE;
 
     switch((int) mode)
@@ -272,6 +357,8 @@ void nt_set_paint_routine(DISPLAY_MODE mode, int height)
             paint_screen = dummy_paint_screen;
             break;
     }
+
+    standalone_check_win_size(height);
 }
 #else
 #include <windows.h>

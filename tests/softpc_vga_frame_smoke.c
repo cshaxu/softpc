@@ -99,6 +99,13 @@ int main(void)
     host_timer_event();
     host_timer_event();
     assert(softpc_machine_presentation_is_graphics(machine));
+    /* nt_graph must carry its original mode-change tail into the standalone
+       host: selecting V7 640x400 recreates the DIB at the controller's
+       original 752x410 host geometry (including its border), rather than
+       leaving painters on the initial 1056x768 allocation. */
+    assert(softpc_machine_presentation_dib(machine, &bits, &info, &width,
+        &height));
+    assert(width == 752u && height == 410u);
 
     /* A dirty-region transition may be clipped to zero height.  The original
        nt_vga_hi_graph_std renderer must reject that empty region before its

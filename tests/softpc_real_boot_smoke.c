@@ -124,6 +124,34 @@ static int text_has_line_fragment(const unsigned char *text,
     return 0;
 }
 
+/* A mode transition is not a display result.  Windows Setup exposes the
+ * old standalone-host bug precisely by entering EGA/VGA mode while its DIB
+ * remains black, so acceptance requires a renderer-produced non-background
+ * pixel in the published original DIB. */
+static int graphics_frame_has_visible_pixel(softpc_machine *machine)
+{
+    const void *bits;
+    const void *info;
+    const unsigned char *pixels;
+    uint32_t width;
+    uint32_t height;
+    uint32_t stride;
+    uint32_t row;
+
+    if (!softpc_machine_presentation_dib(machine, &bits, &info, &width,
+            &height) || bits == NULL || info == NULL || width == 0u ||
+            height == 0u)
+        return 0;
+    pixels = (const unsigned char *)bits;
+    stride = (width + 3u) & ~3u;
+    for (row = 0u; row < height; ++row) {
+        uint32_t column;
+        for (column = 0u; column < width; ++column)
+            if (pixels[row * stride + column] != 0u) return 1;
+    }
+    return 0;
+}
+
 static void print_text_screen(const unsigned char *text)
 {
     unsigned int row;
@@ -333,6 +361,7 @@ usage:
                     HANDLE runner;
                     DWORD elapsed;
                     int observed_setup = 0;
+                    int observed_graphics = 0;
                     /* Mirror NXVM's proven integration probe: the machine
                        runs continuously while the host supplies real make /
                        break transitions for c:\\ewin31\\setup.exe. */
@@ -350,13 +379,13 @@ usage:
                         }
                         goto failed;
                     }
-                    for (elapsed = 0u; elapsed < 30000u; elapsed += 10u) {
-                        if (softpc_machine_presentation_is_graphics(machine) ||
-                            (read_text_surface(machine, text) &&
-                             (text_has_line_fragment(text, "Reading SETUP.INF") ||
-                              text_has_line_fragment(text, "Welcome to Setup.")))) {
-                            observed_setup = 1;
-                            break;
+                    for (elapsed = 0u; elapsed < 60000u; elapsed += 10u) {
+                        if (softpc_machine_presentation_is_graphics(machine)) {
+                            observed_graphics = 1;
+                            if (graphics_frame_has_visible_pixel(machine)) {
+                                observed_setup = 1;
+                                break;
+                            }
                         }
                         if (InterlockedCompareExchange(&setup_runner_failed,
                                 0, 0) != 0) break;
@@ -367,7 +396,8 @@ usage:
                     CloseHandle(runner);
                     if (!observed_setup) {
                         if (read_text_surface(machine, text)) print_text_screen(text);
-                        fprintf(stderr, "softpc-real-boot-smoke: Windows Setup did not reach its installer checkpoint\n");
+                        fprintf(stderr, "softpc-real-boot-smoke: Windows Setup %s reach a visible installer frame\n",
+                            observed_graphics ? "did not" : "did not enter graphics to");
                         goto failed;
                     }
 #else
