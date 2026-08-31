@@ -36,6 +36,41 @@ if(normalized_build_definition MATCHES "target_compile_definitions\\([^\\)]*ntvd
     message(FATAL_ERROR "Standalone SoftPC enables an NTVDM compile definition")
 endif()
 
+# The fixed VM must retain the original machine controllers.  Standalone
+# sources are permitted only at their host/media/presentation boundaries;
+# dropping one of these source files is a regression toward a replacement
+# controller even if the new implementation happens to build.
+set(required_original_controller_sources
+    "src/core/softpc/base/system/ica.c"
+    "src/core/softpc/base/system/quick_ev.c"
+    "src/core/softpc/base/system/at_dma.c"
+    "src/core/softpc/base/system/cmos.c"
+    "src/core/softpc/base/system/timer.c"
+    "src/core/softpc/base/keymouse/ppi.c"
+    "src/core/softpc/base/keymouse/keyba.c"
+    "src/core/softpc/base/keymouse/keybd_io.c"
+    "src/core/softpc/base/keymouse/mouse.c"
+    "src/core/softpc/base/keymouse/mouse_io.c"
+    "src/core/softpc/base/disks/fla.c"
+    "src/core/softpc/base/disks/gfi.c"
+    "src/core/softpc/base/disks/gfi_mpty.c"
+    "src/core/softpc/base/disks/floppy.c"
+    "src/core/softpc/base/disks/floppy_i.c"
+    "src/core/softpc/base/disks/fdisk.c"
+    "src/core/softpc/base/disks/diskbios.c"
+    "src/core/softpc/base/comms/com.c"
+    "src/core/softpc/base/comms/printer.c"
+    "src/core/softpc/base/video/ega_vide.c"
+    "src/core/softpc/base/video/vga_vide.c"
+    "src/core/softpc/base/video/v7_ports.c"
+    "src/core/softpc/base/video/v7_video.c")
+foreach(source IN LISTS required_original_controller_sources)
+    string(FIND "${build_definition}" "${source}" source_location)
+    if(source_location EQUAL -1)
+        message(FATAL_ERROR "Standalone SoftPC omits original controller: ${source}")
+    endif()
+endforeach()
+
 # Firmware is part of the standalone machine's executable guest contract.
 # Discover every checked-in ROM source so future BIOS additions cannot evade
 # the same product-semantic guard through a stale manual list.
