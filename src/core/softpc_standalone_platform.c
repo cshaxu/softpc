@@ -760,9 +760,26 @@ void host_note_queue_added(IU32 value)
     UNUSED(value);
 }
 
+/* nt_timer.c used the NT performance counter for CCPU's quick-event
+ * recalibration.  Do the same at the standalone host boundary: clock() is
+ * process CPU time, so it stops advancing while the window/event loop waits
+ * and makes a real machine's elapsed-time accounting depend on host load. */
 static IUH softpc_clock_ticks(void)
 {
-    return (IUH)((clock() * 1000000u) / CLOCKS_PER_SEC);
+    static LARGE_INTEGER frequency;
+    LARGE_INTEGER counter;
+    ULONGLONG seconds;
+    ULONGLONG remainder;
+    ULONGLONG microseconds;
+
+    if (frequency.QuadPart == 0 && !QueryPerformanceFrequency(&frequency))
+        return 0;
+    if (!QueryPerformanceCounter(&counter)) return 0;
+    seconds = (ULONGLONG)counter.QuadPart / (ULONGLONG)frequency.QuadPart;
+    remainder = (ULONGLONG)counter.QuadPart % (ULONGLONG)frequency.QuadPart;
+    microseconds = seconds * 1000000ULL +
+        (remainder * 1000000ULL) / (ULONGLONG)frequency.QuadPart;
+    return (IUH)microseconds;
 }
 
 void host_q_write_timestamp(QTIMESTAMP_PTR stamp)

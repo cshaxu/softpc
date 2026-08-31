@@ -295,6 +295,15 @@ target_include_directories(softpc-bop-smoke PRIVATE
 add_test(NAME softpc-bop-smoke COMMAND softpc-bop-smoke)
 set_tests_properties(softpc-bop-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-quick-time-smoke tests/softpc_quick_time_smoke.c)
+target_link_libraries(softpc-quick-time-smoke PRIVATE softpc-machine)
+target_include_directories(softpc-quick-time-smoke PRIVATE
+    src/core/softpc/host/inc
+    src/core/softpc/host/inc/x86/prod
+    src/core/softpc/base/inc)
+add_test(NAME softpc-quick-time-smoke COMMAND softpc-quick-time-smoke)
+set_tests_properties(softpc-quick-time-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-real-boot-smoke tests/softpc_real_boot_smoke.c)
 target_link_libraries(softpc-real-boot-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-standalone-source-boundary
@@ -316,6 +325,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-mouse-smoke
     softpc-vga-frame-smoke
     softpc-bop-smoke
+    softpc-quick-time-smoke
     softpc-real-boot-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     if(MSVC)
