@@ -622,7 +622,7 @@ LOCAL MOUSE_VECTOR cursor_grids[MOUSE_VIDEO_MODE_MAXIMUM] =
 	{  2, 1 },	/* mode 13 */
 #endif
 };
-#if !defined(NTVDM) || (defined(NTVDM) && defined(V7VGA))
+#ifdef V7VGA
 LOCAL MOUSE_VECTOR v7text_cursor_grids[6] =
 {
 	{  8, 8 },	/* mode 40 */
@@ -2816,7 +2816,7 @@ LOCAL void mouse_reset IFN4(word *,installed_ptr,word *,nbuttons_ptr,word *,junk
 	 *	dependent on it
 	 */
 	sas_load(MOUSE_VIDEO_CRT_MODE, &crt_mode);
-#ifdef V7VGA
+#if !defined(NTVDM) || (defined(NTVDM) && defined(V7VGA))
         if ((crt_mode == 1) && extensions_controller.foreground_latch_1)
             crt_mode = extensions_controller.foreground_latch_1;
         else if (crt_mode > 0x13)
