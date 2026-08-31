@@ -14,7 +14,9 @@
 
 extern byte *EGA_planes;
 extern PC_palette *DAC;
-extern IU8 Currently_emulated_video_mode;
+extern IBOOL softpc_device_bop_dispatch(IU8 number, IU32 argument);
+extern void c_setAL(IU8 value);
+extern void c_setAH(IU8 value);
 
 static uint32_t mode12_pixels[1024u * 768u];
 
@@ -69,7 +71,11 @@ int main(void)
 
     /* V7 extension modes are still rendered from the original controller
        state, not from a second standalone video buffer. */
-    Currently_emulated_video_mode = 0x65u;
+    /* The V7 ROM reaches its extended controller service through the
+       original EGA BOP. AL 19h maps to Video Seven mode 65h. */
+    c_setAH(0u);
+    c_setAL(0x19u);
+    assert(softpc_device_bop_dispatch(0x42u, 0u) == TRUE);
     EGA_planes[0] = 0x80u;
     EGA_planes[1] = 0x80u;
     EGA_planes[2] = EGA_planes[3] = 0u;
@@ -87,8 +93,12 @@ int main(void)
             SOFTPC_MACHINE_OK);
         assert(mode12_pixels[0] == 0x00a05000u);
     }
-    Currently_emulated_video_mode = 0x69u;
+    /* Likewise AL 1Dh is V7 packed 256-colour mode 69h. */
+    c_setAH(0u);
+    c_setAL(0x1du);
+    assert(softpc_device_bop_dispatch(0x42u, 0u) == TRUE);
     EGA_planes[0] = 4u;
+    DAC[4].red = DAC[4].green = DAC[4].blue = 63u;
     {
         uint32_t width = 0u;
         uint32_t height = 0u;
@@ -100,8 +110,6 @@ int main(void)
             SOFTPC_MACHINE_OK);
         assert(mode12_pixels[0] == 0x00ffffffu);
     }
-    Currently_emulated_video_mode = 0u;
-
     /* The original planar mode uses one bit from each plane as the palette
        index. Plane zero is the low bit, exactly as the controller exposes
        it to the old SoftPC host renderer. */
@@ -182,6 +190,12 @@ int main(void)
     /* In this V7 VGA profile the original CGA-compatible graphics paths
        retain their historical odd/even CGA banking inside EGA_planes. */
     Video_mode = 0x04u;
+    DAC[1].red = 63u;
+    DAC[1].green = DAC[1].blue = 0u;
+    DAC[2].red = DAC[2].blue = 0u;
+    DAC[2].green = 63u;
+    DAC[3].red = DAC[3].green = 0u;
+    DAC[3].blue = 63u;
     EGA_planes[0] = 0x1bu; /* 00, 01, 10, 11 */
     {
         uint32_t width = 0u;
