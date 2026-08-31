@@ -48,6 +48,11 @@ softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,
 int softpc_machine_vga_mode13_active(const softpc_machine *machine);
 softpc_machine_result softpc_machine_vga_mode13_frame(
     const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count);
+/* Copy the original VGA controller's BIOS mode 12h (640x480, 16-colour)
+ * output into a caller-owned RGB32 surface. */
+int softpc_machine_vga_mode12_active(const softpc_machine *machine);
+softpc_machine_result softpc_machine_vga_mode12_frame(
+    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count);
 void softpc_machine_destroy(softpc_machine *machine);
 
 const char *softpc_machine_result_name(softpc_machine_result result);

@@ -43,6 +43,9 @@ extern int softpc_platform_video_buffers_init(void);
 extern int softpc_platform_vga_mode13_frame(unsigned long *pixels,
     unsigned long pixel_count);
 extern int softpc_platform_vga_mode13_active(void);
+extern int softpc_platform_vga_mode12_frame(unsigned long *pixels,
+    unsigned long pixel_count);
+extern int softpc_platform_vga_mode12_active(void);
 extern FILE *trace_file;
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
@@ -201,6 +204,22 @@ softpc_machine_result softpc_machine_vga_mode13_frame(
     if (machine == NULL || pixels == NULL || !machine->reset)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     return softpc_platform_vga_mode13_frame((unsigned long *)pixels,
+        (unsigned long)pixel_count) ? SOFTPC_MACHINE_OK :
+        SOFTPC_MACHINE_BACKEND_UNAVAILABLE;
+}
+
+int softpc_machine_vga_mode12_active(const softpc_machine *machine)
+{
+    return machine != NULL && machine->reset &&
+        softpc_platform_vga_mode12_active();
+}
+
+softpc_machine_result softpc_machine_vga_mode12_frame(
+    const softpc_machine *machine, uint32_t *pixels, uint32_t pixel_count)
+{
+    if (machine == NULL || pixels == NULL || !machine->reset)
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    return softpc_platform_vga_mode12_frame((unsigned long *)pixels,
         (unsigned long)pixel_count) ? SOFTPC_MACHINE_OK :
         SOFTPC_MACHINE_BACKEND_UNAVAILABLE;
 }

@@ -246,6 +246,9 @@ target_include_directories(softpc-vga-frame-smoke PRIVATE
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
     src/core/softpc/base/inc)
+target_compile_definitions(softpc-vga-frame-smoke PRIVATE
+    CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1
+    SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 add_test(NAME softpc-vga-frame-smoke COMMAND softpc-vga-frame-smoke)
 set_tests_properties(softpc-vga-frame-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")

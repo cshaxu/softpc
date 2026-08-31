@@ -4,13 +4,18 @@
 #include <stdio.h>
 
 #include "insignia.h"
+#include "host_def.h"
 #include "gmi.h"
 #include "gfx_upd.h"
+#include "gvi.h"
+#include "egagraph.h"
 #include "egaports.h"
 #include "video.h"
 
 extern byte *EGA_planes;
 extern PC_palette *DAC;
+
+static uint32_t mode12_pixels[640u * 480u];
 
 static void make_boot_disk(const char *path)
 {
@@ -46,7 +51,10 @@ int main(void)
     EGA_planes[2] = 3u;
     EGA_planes[3] = 4u;
     DAC[1].red = 63u;
+    DAC[1].green = DAC[1].blue = 0u;
+    DAC[2].red = DAC[2].blue = 0u;
     DAC[2].green = 63u;
+    DAC[3].red = DAC[3].green = 0u;
     DAC[3].blue = 63u;
     DAC[4].red = DAC[4].green = DAC[4].blue = 63u;
 
@@ -57,6 +65,23 @@ int main(void)
     assert(pixels[1] == 0x0000ff00u);
     assert(pixels[2] == 0x000000ffu);
     assert(pixels[3] == 0x00ffffffu);
+
+    /* The original planar mode uses one bit from each plane as the palette
+       index. Plane zero is the low bit, exactly as the controller exposes
+       it to the old SoftPC host renderer. */
+    Video_mode = 0x12u;
+    EGA_planes[0] = 0x80u;
+    EGA_planes[1] = 0x80u;
+    EGA_planes[2] = 0u;
+    EGA_planes[3] = 0u;
+    EGA_GRAPH.palette[3].red = 0xa0u;
+    EGA_GRAPH.palette[3].green = 0x50u;
+    EGA_GRAPH.palette[3].blue = 0u;
+    assert(softpc_machine_vga_mode12_active(machine));
+    assert(softpc_machine_vga_mode12_frame(machine, mode12_pixels,
+        (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
+        SOFTPC_MACHINE_OK);
+    assert(mode12_pixels[0] == 0x00a05000u);
 
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);

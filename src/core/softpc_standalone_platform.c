@@ -22,6 +22,7 @@
 #include "gfx_upd.h"
 #include "egaports.h"
 #include "gvi.h"
+#include "egagraph.h"
 #include "video.h"
 #include "host_com.h"
 #include "virtual.h"
@@ -50,6 +51,11 @@ extern IU8 Video_mode;
 #define SOFTPC_VGA_MODE13_HEIGHT 200u
 #define SOFTPC_VGA_MODE13_PIXELS \
     (SOFTPC_VGA_MODE13_WIDTH * SOFTPC_VGA_MODE13_HEIGHT)
+#define SOFTPC_VGA_MODE12_WIDTH 640u
+#define SOFTPC_VGA_MODE12_HEIGHT 480u
+#define SOFTPC_VGA_MODE12_PIXELS \
+    (SOFTPC_VGA_MODE12_WIDTH * SOFTPC_VGA_MODE12_HEIGHT)
+#define SOFTPC_VGA_MODE12_BYTES_PER_LINE 80u
 
 static unsigned long softpc_vga_dac_component(half_word component)
 {
@@ -77,6 +83,39 @@ int softpc_platform_vga_mode13_frame(unsigned long *pixels,
         pixels[index] = (softpc_vga_dac_component(colour->red) << 16u) |
             (softpc_vga_dac_component(colour->green) << 8u) |
             softpc_vga_dac_component(colour->blue);
+    }
+    return 1;
+}
+
+int softpc_platform_vga_mode12_active(void)
+{
+    return Video_mode == 0x12u && EGA_planes != NULL;
+}
+
+int softpc_platform_vga_mode12_frame(unsigned long *pixels,
+    unsigned long pixel_count)
+{
+    unsigned long x;
+    unsigned long y;
+    if (pixels == NULL || pixel_count < SOFTPC_VGA_MODE12_PIXELS ||
+        !softpc_platform_vga_mode12_active())
+        return 0;
+    for (y = 0ul; y < SOFTPC_VGA_MODE12_HEIGHT; ++y) {
+        for (x = 0ul; x < SOFTPC_VGA_MODE12_WIDTH; ++x) {
+            unsigned long byte_offset = (y * SOFTPC_VGA_MODE12_BYTES_PER_LINE +
+                (x >> 3u)) << 2u;
+            byte bit = (byte)(0x80u >> (x & 7u));
+            unsigned int colour_index =
+                ((EGA_planes[byte_offset] & bit) != 0u ? 1u : 0u) |
+                ((EGA_planes[byte_offset + 1u] & bit) != 0u ? 2u : 0u) |
+                ((EGA_planes[byte_offset + 2u] & bit) != 0u ? 4u : 0u) |
+                ((EGA_planes[byte_offset + 3u] & bit) != 0u ? 8u : 0u);
+            PC_palette *colour = &EGA_GRAPH.palette[colour_index];
+            pixels[y * SOFTPC_VGA_MODE12_WIDTH + x] =
+                ((unsigned long)colour->red << 16u) |
+                ((unsigned long)colour->green << 8u) |
+                (unsigned long)colour->blue;
+        }
     }
     return 1;
 }

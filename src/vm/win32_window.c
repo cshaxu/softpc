@@ -10,6 +10,8 @@
 #define SOFTPC_RUN_SLICE 50000u
 #define SOFTPC_VGA_MODE13_WIDTH 320
 #define SOFTPC_VGA_MODE13_HEIGHT 200
+#define SOFTPC_VGA_MODE12_WIDTH 640
+#define SOFTPC_VGA_MODE12_HEIGHT 480
 
 static softpc_machine *softpc_window_machine;
 static HFONT softpc_window_font;
@@ -38,6 +40,25 @@ static void softpc_window_paint_vga_mode13(HDC dc)
         SOFTPC_VGA_MODE13_HEIGHT, pixels, &bitmap, DIB_RGB_COLORS, SRCCOPY);
 }
 
+static void softpc_window_paint_vga_mode12(HDC dc)
+{
+    static uint32_t pixels[SOFTPC_VGA_MODE12_WIDTH * SOFTPC_VGA_MODE12_HEIGHT];
+    BITMAPINFO bitmap;
+    if (softpc_machine_vga_mode12_frame(softpc_window_machine, pixels,
+            (uint32_t)(sizeof(pixels) / sizeof(pixels[0]))) != SOFTPC_MACHINE_OK)
+        return;
+    ZeroMemory(&bitmap, sizeof(bitmap));
+    bitmap.bmiHeader.biSize = sizeof(bitmap.bmiHeader);
+    bitmap.bmiHeader.biWidth = SOFTPC_VGA_MODE12_WIDTH;
+    bitmap.bmiHeader.biHeight = -SOFTPC_VGA_MODE12_HEIGHT;
+    bitmap.bmiHeader.biPlanes = 1;
+    bitmap.bmiHeader.biBitCount = 32;
+    bitmap.bmiHeader.biCompression = BI_RGB;
+    StretchDIBits(dc, 8, 8, SOFTPC_VGA_MODE12_WIDTH,
+        SOFTPC_VGA_MODE12_HEIGHT, 0, 0, SOFTPC_VGA_MODE12_WIDTH,
+        SOFTPC_VGA_MODE12_HEIGHT, pixels, &bitmap, DIB_RGB_COLORS, SRCCOPY);
+}
+
 static int softpc_window_mouse_x_from_lparam(LPARAM position)
 {
     return (int)(short)LOWORD(position);
@@ -52,6 +73,10 @@ static void softpc_window_paint(HDC dc)
 {
     unsigned char text[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS * 2u];
     int row;
+    if (softpc_machine_vga_mode12_active(softpc_window_machine)) {
+        softpc_window_paint_vga_mode12(dc);
+        return;
+    }
     if (softpc_machine_vga_mode13_active(softpc_window_machine)) {
         softpc_window_paint_vga_mode13(dc);
         return;
@@ -187,7 +212,7 @@ int softpc_vm_run_window(softpc_machine *machine)
         OEM_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
         FIXED_PITCH | FF_MODERN, "Consolas");
     window = CreateWindowExA(0, window_class.lpszClassName, "SoftPC VM",
-        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 680, 460,
+        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 680, 560,
         NULL, NULL, instance, NULL);
     if (window == NULL) return 1;
     ShowWindow(window, SW_SHOW);
