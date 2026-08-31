@@ -57,6 +57,13 @@ int main(void)
     assert(c_getAX() == 0u);
     assert(c_getBX() == BUILD_ID_CODE);
 
+    /* Product-shell selectors must remain unreachable in the standalone
+       machine even though the historical BOP instruction remains its ROM-to-C
+       firmware bridge. */
+    assert(softpc_device_bop_dispatch(0x25u, 0u) == FALSE); /* VDD */
+    assert(softpc_device_bop_dispatch(0x2bu, 0u) == FALSE); /* DOS command */
+    assert(softpc_device_bop_dispatch(0x30u, 0u) == FALSE); /* DPMI */
+
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);
     return 0;
