@@ -107,6 +107,7 @@ static void softpc_video_two_ints(int first, int second)
    standalone frontend has no console-server flush, mouse-delay, or cursor
    resize work, so none of those NTVDM product branches belong here. */
 static int softpc_video_mode_change_ticks;
+static int softpc_video_flush_ticks;
 static void softpc_video_graphics_tick(void)
 {
     if (video_adapter != EGA && video_adapter != VGA) return;
@@ -117,6 +118,11 @@ static void softpc_video_graphics_tick(void)
         }
     } else if (get_mode_change_required()) {
         softpc_video_mode_change_ticks = EGA_TICK_DELAY - 1;
+    } else if (++softpc_video_flush_ticks == 2) {
+        /* The original nt_graphics_tick coalesces C-VID dirty marks for two
+           machine ticks before its host painter consumes them. */
+        (void)(*update_alg.calc_update)();
+        softpc_video_flush_ticks = 0;
     }
 }
 
@@ -728,7 +734,10 @@ int softpc_platform_write_physical(IU32 address, const IU8 *bytes, IU32 length)
 {
     if (bytes == NULL || address > softpc_ram_size ||
         length > softpc_ram_size - address) return 0;
-    memcpy(softpc_ram + address, bytes, length);
+    /* A physical bus write must take the same original SAS route as reads.
+       Direct host-RAM copying bypasses SAS_VIDEO, so it fails to update
+       C-VID's EGA planes and its original dirty-marking algorithm. */
+    c_sas_stores(address, (IU8 *)bytes, length);
     return 1;
 }
 
