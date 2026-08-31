@@ -49,6 +49,7 @@ extern byte *video_copy;
 extern PC_palette *DAC;
 extern IU8 Video_mode;
 extern IU8 Currently_emulated_video_mode;
+extern void softpc_nt_graph_standalone_init(void);
 
 #define SOFTPC_VGA_MODE13_WIDTH 320u
 #define SOFTPC_VGA_MODE13_HEIGHT 200u
@@ -81,6 +82,7 @@ static void softpc_video_init_screen(void)
         EGA_planes = (byte *)calloc(4u, (size_t)EGA_PLANE_SIZE);
     if (DAC == NULL) DAC = (PC_palette *)calloc(VGA_DAC_SIZE, sizeof(*DAC));
     (void)softpc_standalone_dib_init();
+    softpc_nt_graph_standalone_init();
 }
 static void softpc_video_init_adaptor(int adapter, int height)
 { UNUSED(adapter); UNUSED(height); }
@@ -97,109 +99,22 @@ static void softpc_video_cursor(int x, int y, half_word attribute)
 static void softpc_video_two_ints(int first, int second)
 { UNUSED(first); UNUSED(second); }
 
-/* This is the original nt_graph.c standard colour dispatch table, retained
-   here as the standalone host's narrow routing layer.  The paint routines
-   themselves remain the original nt_cga.c, nt_ega.c and nt_vga.c sources. */
-static PAINTFUNCS softpc_standard_colour_paint_funcs = {
-    nt_text,
-    nt_cga_colour_med_graph_std, nt_cga_colour_hi_graph_std,
-    nt_text,
-    nt_ega_lo_graph_std, nt_ega_med_graph_std, nt_ega_hi_graph_std,
-    nt_vga_graph_std, nt_vga_med_graph_std, nt_vga_hi_graph_std,
-#ifdef V7VGA
-    nt_v7vga_hi_graph_std
-#endif
-};
+/* Original nt_graph.c owns the paint vectors and the complete controller-mode
+ * selection state machine.  This remains only the standalone host vtable. */
+extern void nt_set_paint_routine(DISPLAY_MODE mode, int height);
 
-static INITFUNCS softpc_colour_init_funcs = {
-    nt_init_text,
-    nt_init_cga_colour_med_graph, nt_init_cga_colour_hi_graph,
-    nt_init_text,
-    nt_init_ega_lo_graph, nt_init_ega_med_graph, nt_init_ega_hi_graph,
-    nt_init_vga_hi_graph
-};
-
-static void softpc_standalone_set_paint(DISPLAY_MODE mode, int height)
-{
-    UNUSED(height);
-    FunnyPaintMode = FALSE;
-    switch ((int)mode) {
-    case TEXT_40_FUN: case CGA_TEXT_40_SP: case CGA_TEXT_40_SP_WR:
-    case CGA_TEXT_40: case CGA_TEXT_40_WR: case TEXT_80_FUN:
-    case CGA_TEXT_80_SP: case CGA_TEXT_80_SP_WR: case CGA_TEXT_80:
-    case CGA_TEXT_80_WR:
-        sc.ModeType = TEXT;
-        paint_screen = softpc_standard_colour_paint_funcs.cga_text;
-        softpc_colour_init_funcs.cga_text();
-        break;
-    case CGA_MED_FUN: case CGA_MED:
-        sc.ModeType = GRAPHICS;
-        paint_screen = softpc_standard_colour_paint_funcs.cga_med_graph;
-        softpc_colour_init_funcs.cga_med_graph();
-        break;
-    case CGA_HI_FUN: case CGA_HI:
-        sc.ModeType = GRAPHICS;
-        paint_screen = softpc_standard_colour_paint_funcs.cga_hi_graph;
-        softpc_colour_init_funcs.cga_hi_graph();
-        break;
-    case EGA_TEXT_40_SP: case EGA_TEXT_40_SP_WR: case EGA_TEXT_40:
-    case EGA_TEXT_40_WR: case EGA_TEXT_80_SP: case EGA_TEXT_80_SP_WR:
-    case EGA_TEXT_80: case EGA_TEXT_80_WR:
-        sc.ModeType = TEXT;
-        paint_screen = softpc_standard_colour_paint_funcs.ega_text;
-        softpc_colour_init_funcs.ega_text();
-        break;
-    case EGA_HI_FUN: case EGA_HI: case EGA_HI_WR: case EGA_HI_SP:
-    case EGA_HI_SP_WR:
-        sc.ModeType = GRAPHICS;
-        if (get_256_colour_mode()) {
-#ifdef V7VGA
-            if (get_seq_chain4_mode() && get_chain4_mode())
-                paint_screen = softpc_standard_colour_paint_funcs.v7vga_hi_graph;
-            else
-#endif
-            if (get_chain4_mode())
-                paint_screen = softpc_standard_colour_paint_funcs.vga_graph;
-            else if (get_char_height() == 2)
-                paint_screen = softpc_standard_colour_paint_funcs.vga_med_graph;
-            else
-                paint_screen = softpc_standard_colour_paint_funcs.vga_hi_graph;
-            softpc_colour_init_funcs.vga_hi_graph();
-        } else {
-            paint_screen = softpc_standard_colour_paint_funcs.ega_hi_graph;
-            softpc_colour_init_funcs.ega_hi_graph();
-        }
-        break;
-    case EGA_MED_FUN: case EGA_MED: case EGA_MED_WR: case EGA_MED_SP:
-    case EGA_MED_SP_WR:
-        sc.ModeType = GRAPHICS;
-        paint_screen = softpc_standard_colour_paint_funcs.ega_med_graph;
-        softpc_colour_init_funcs.ega_med_graph();
-        break;
-    case EGA_LO_FUN: case EGA_LO: case EGA_LO_WR: case EGA_LO_SP:
-    case EGA_LO_SP_WR:
-        sc.ModeType = GRAPHICS;
-        paint_screen = softpc_standard_colour_paint_funcs.ega_lo_graph;
-        softpc_colour_init_funcs.ega_lo_graph();
-        break;
-    default:
-        paint_screen = softpc_video_void;
-        break;
-    }
-}
 static VIDEOFUNCS softpc_video_functions = {
     softpc_video_init_screen, softpc_video_init_adaptor, softpc_video_void,
     softpc_video_int, softpc_video_palette, softpc_video_int,
     softpc_video_void, softpc_video_void, softpc_video_void,
     softpc_video_void, softpc_video_void, softpc_video_void,
     softpc_video_scroll, softpc_video_scroll, (void (*)())softpc_video_cursor,
-    (void (*)())softpc_standalone_set_paint, softpc_video_int, softpc_video_void,
+    (void (*)())nt_set_paint_routine, softpc_video_int, softpc_video_void,
     softpc_video_two_ints, softpc_video_int, softpc_video_int,
     softpc_video_int, softpc_video_two_ints, softpc_video_two_ints,
     softpc_video_void
 };
 VIDEOFUNCS *working_video_funcs = &softpc_video_functions;
-void (*paint_screen)() = softpc_video_void;
 
 int softpc_platform_presentation_is_graphics(void)
 {
