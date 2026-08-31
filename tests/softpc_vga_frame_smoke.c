@@ -113,6 +113,40 @@ int main(void)
         assert(left == 0 && top == 0 && right == 1 && bottom == 0);
     }
 
+    /* The same original V7 extension selects its 800x600 256-colour mode
+       through the mode table in v7_video.c.  Exercise a second proprietary
+       layout: it must keep nt_v7vga_hi_graph_std as the painter and the
+       standalone DIB only as its output surface. */
+    c_setAH(0x6fu);
+    c_setAL(5u);
+    c_setBX(0x0063u);
+    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    assert(c_getAX() == 0x6f05u);
+    assert(c_getBX() == 0x0063u);
+    assert(Currently_emulated_video_mode == 0x63u);
+    host_timer_event();
+    host_timer_event();
+    assert(softpc_machine_presentation_is_graphics(machine));
+    {
+        int32_t left;
+        int32_t top;
+        int32_t right;
+        int32_t bottom;
+        unsigned char *surface = (unsigned char *)bits;
+
+        while (softpc_machine_presentation_take_dirty(machine, &left, &top,
+            &right, &bottom)) {
+        }
+        EGA_planes[0] = 0x11u;
+        EGA_planes[1] = 0x22u;
+        nt_v7vga_hi_graph_std(0, 0, 0, 2, 1);
+        assert(surface[0] == 0x11u);
+        assert(surface[1] == 0x22u);
+        assert(softpc_machine_presentation_take_dirty(machine, &left, &top,
+            &right, &bottom));
+        assert(left == 0 && top == 0 && right == 1 && bottom == 0);
+    }
+
     /* The original nt_graph VLT maps the attribute-controller palette to
        DIB entries; simply copying DAC[] would leave index zero black here. */
     {
