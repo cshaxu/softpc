@@ -10,9 +10,13 @@ set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/keymouse/keybd_io.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/system/idetect.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_device_bop.c"
-    "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_standalone_platform.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc_machine.c")
+
+if(EXISTS "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.c" OR
+   EXISTS "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.h")
+    message(FATAL_ERROR "Standalone SoftPC retains the obsolete physical-mapping shim")
+endif()
 
 file(STRINGS "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/ccpu386/c-files"
     ccpu_source_names)

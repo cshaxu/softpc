@@ -63,8 +63,6 @@
 #include <yoda.h>
 #include <emm.h>
 #include <host.h>
-#include "softpc_physical_mapping.h"
-
 /* DIVERGENCE: the original x86 build relied on an implicit-int declaration
  * for host_sas_init.  Its actual SoftPC implementation returns UTINY *;
  * declare that existing same-shaped interface so an x64 build cannot truncate
@@ -1320,15 +1318,6 @@ GLOBAL IU8 *
 c_GetPhyAdd IFN1(PHY_ADDR, addr)
 {
 	IU8 *retVal;
-	uint32_t translated_address;
-
-	/* Standalone machine hook for future ROM/MMIO or explicitly attached
-* physical regions.  It intentionally has no product-shell mapping
-	 * semantics; normal SoftPC RAM retains the original direct fast path. */
-	if (softpc_physical_mapping_translate(addr, &translated_address))
-		addr = (PHY_ADDR)translated_address;
-	if (softpc_physical_mapping_resolve(addr, &retVal))
-		return(retVal);
 
 #ifdef BACK_M
 	retVal = (IU8 *)((IHPE)end_of_M - (IHPE)addr);

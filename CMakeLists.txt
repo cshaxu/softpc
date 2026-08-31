@@ -139,8 +139,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/video/cga.c
     src/core/softpc_device_bop.c
     src/core/softpc_gfi_image.c
-    src/core/softpc_standalone_platform.c
-    src/core/softpc_physical_mapping.c)
+    src/core/softpc_standalone_platform.c)
 set_target_properties(softpc-ccpu-core PROPERTIES
     C_STANDARD 90
     C_EXTENSIONS ON)
