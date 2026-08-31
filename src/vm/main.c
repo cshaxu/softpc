@@ -143,6 +143,114 @@ invalid:
     return 0;
 }
 
+typedef enum softpc_monitor_state {
+    SOFTPC_MONITOR_STOPPED,
+    SOFTPC_MONITOR_PAUSED
+} softpc_monitor_state;
+
+static void softpc_monitor_help(void)
+{
+    puts("SoftPC VM monitor");
+    puts("  start                 cold-reset and run the machine");
+    puts("  resume                continue a paused machine");
+    puts("  pause                 report the current paused state");
+    puts("  stop                  stop execution");
+    puts("  reset                 cold-reset and pause at firmware entry");
+    puts("  floppy insert <image> insert drive A media while stopped/paused");
+    puts("  floppy eject          eject drive A media while stopped/paused");
+    puts("  help                  show this help");
+    puts("  exit                  quit");
+    puts("While the guest is running, press Ctrl+Alt+P to return here.");
+}
+
+static int softpc_monitor_run_frontend(softpc_machine *machine,
+    softpc_presentation presentation, softpc_monitor_state *state)
+{
+    int frontend_result = presentation == SOFTPC_PRESENTATION_WINDOW ?
+        softpc_vm_run_window(machine) : softpc_vm_run_console(machine);
+    if (frontend_result == SOFTPC_VM_FRONTEND_ERROR) return 0;
+    *state = frontend_result == SOFTPC_VM_FRONTEND_PAUSED ?
+        SOFTPC_MONITOR_PAUSED : SOFTPC_MONITOR_STOPPED;
+    puts(*state == SOFTPC_MONITOR_PAUSED ? "Machine paused." :
+        "Machine stopped.");
+    return 1;
+}
+
+static int softpc_monitor_start(softpc_machine *machine,
+    softpc_presentation presentation, softpc_monitor_state *state, int reset)
+{
+    softpc_machine_result result;
+    if (reset || *state == SOFTPC_MONITOR_STOPPED) {
+        result = softpc_machine_reset(machine);
+        if (result != SOFTPC_MACHINE_OK) {
+            fprintf(stderr, "softpcvm: reset: %s\n",
+                softpc_machine_result_name(result));
+            return 0;
+        }
+    }
+    return softpc_monitor_run_frontend(machine, presentation, state);
+}
+
+static int softpc_monitor(softpc_machine *machine,
+    softpc_presentation presentation)
+{
+    char line[SOFTPC_CONFIG_PATH_MAX + 64u];
+    softpc_monitor_state state = SOFTPC_MONITOR_STOPPED;
+
+    softpc_monitor_help();
+    for (;;) {
+        char *command;
+        char *argument;
+        printf("SoftPC> ");
+        fflush(stdout);
+        if (fgets(line, sizeof(line), stdin) == NULL) return 1;
+        command = softpc_trim(line);
+        argument = command;
+        while (*argument != '\0' && !isspace((unsigned char)*argument))
+            ++argument;
+        if (*argument != '\0') *argument++ = '\0';
+        argument = softpc_trim(argument);
+        for (char *letter = command; *letter != '\0'; ++letter)
+            *letter = (char)tolower((unsigned char)*letter);
+        if (*command == '\0') continue;
+        if (strcmp(command, "help") == 0) softpc_monitor_help();
+        else if (strcmp(command, "exit") == 0) return 0;
+        else if (strcmp(command, "start") == 0) {
+            if (!softpc_monitor_start(machine, presentation, &state, 0)) return 1;
+        } else if (strcmp(command, "resume") == 0) {
+            if (state != SOFTPC_MONITOR_PAUSED) puts("Machine is not paused.");
+            else if (!softpc_monitor_start(machine, presentation, &state, 0)) return 1;
+        } else if (strcmp(command, "pause") == 0) {
+            puts(state == SOFTPC_MONITOR_PAUSED ? "Machine is paused." :
+                "Use Ctrl+Alt+P while the guest is running.");
+        } else if (strcmp(command, "stop") == 0) {
+            state = SOFTPC_MONITOR_STOPPED;
+            puts("Machine stopped.");
+        } else if (strcmp(command, "reset") == 0) {
+            if (softpc_machine_reset(machine) != SOFTPC_MACHINE_OK) return 1;
+            state = SOFTPC_MONITOR_PAUSED;
+            puts("Machine reset and paused.");
+        } else if (strcmp(command, "floppy") == 0) {
+            char *verb = argument;
+            char *path = verb;
+            while (*path != '\0' && !isspace((unsigned char)*path)) ++path;
+            if (*path != '\0') *path++ = '\0';
+            path = softpc_trim(path);
+            for (char *letter = verb; *letter != '\0'; ++letter)
+                *letter = (char)tolower((unsigned char)*letter);
+            if (strcmp(verb, "eject") == 0 && *path == '\0') {
+                if (softpc_machine_set_floppy(machine, NULL) != SOFTPC_MACHINE_OK)
+                    puts("Cannot eject floppy.");
+                else puts("Floppy ejected.");
+            } else if (strcmp(verb, "insert") == 0 && *path != '\0') {
+                if (softpc_machine_set_floppy(machine, path) != SOFTPC_MACHINE_OK)
+                    puts("Cannot insert floppy.");
+                else puts("Floppy inserted.");
+            } else puts("Usage: floppy insert <image> | eject");
+        } else printf("Unknown command: %s\n", command);
+    }
+}
+
 int main(int argc, char **argv)
 {
     char config_path[SOFTPC_CONFIG_PATH_MAX];
@@ -178,12 +286,8 @@ int main(int argc, char **argv)
     options.media_mode = config.media_mode;
     result = softpc_machine_create(&options, &machine);
     if (result != SOFTPC_MACHINE_OK) goto done;
-    result = softpc_machine_reset(machine);
-    if (result == SOFTPC_MACHINE_OK &&
-        options.presentation == SOFTPC_PRESENTATION_WINDOW) {
-        if (softpc_vm_run_window(machine) != 0) result = SOFTPC_MACHINE_IO_ERROR;
-    } else if (result == SOFTPC_MACHINE_OK &&
-        softpc_vm_run_console(machine) != 0) result = SOFTPC_MACHINE_IO_ERROR;
+    if (softpc_monitor(machine, options.presentation) != 0)
+        result = SOFTPC_MACHINE_IO_ERROR;
 done:
     if (result != SOFTPC_MACHINE_OK)
         fprintf(stderr, "softpcvm: %s\n", softpc_machine_result_name(result));

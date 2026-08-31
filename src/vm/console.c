@@ -70,12 +70,18 @@ static int softpc_console_key(softpc_machine *machine, const KEY_EVENT_RECORD *k
 {
     KEY_EVENT_RECORD event;
     BYTE key_number;
-    if (key->bKeyDown && key->wVirtualKeyCode == VK_ESCAPE) return 1;
+    if (key->bKeyDown && key->wVirtualKeyCode == 'P' &&
+        (key->dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
+        (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)))
+        return SOFTPC_VM_FRONTEND_PAUSED;
+    if (key->bKeyDown && key->wVirtualKeyCode == VK_ESCAPE)
+        return SOFTPC_VM_FRONTEND_STOPPED;
     event = *key;
     key_number = KeyMsgToKeyCode(&event);
     if (key_number == 0u) return 0;
     return softpc_machine_key_number(machine, key_number,
-        (uint8_t)!key->bKeyDown) == SOFTPC_MACHINE_OK ? 0 : 1;
+        (uint8_t)!key->bKeyDown) == SOFTPC_MACHINE_OK ? -1 :
+        SOFTPC_VM_FRONTEND_ERROR;
 }
 
 static void softpc_console_paint(HANDLE output, softpc_machine *machine,
@@ -139,6 +145,7 @@ int softpc_vm_run_console(softpc_machine *machine)
     DWORD original_mode;
     unsigned char previous[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
     int running = 1;
+    int result = SOFTPC_VM_FRONTEND_STOPPED;
     int private_console;
     if (machine == NULL) return 1;
     if (!softpc_console_open(&input, &output, &original_mode,
@@ -158,26 +165,29 @@ int softpc_vm_run_console(softpc_machine *machine)
                 running = 0;
                 break;
             }
-            if (record.EventType == KEY_EVENT &&
-                softpc_console_key(machine, &record.Event.KeyEvent)) {
+            int action = record.EventType == KEY_EVENT ? softpc_console_key(
+                machine, &record.Event.KeyEvent) : -1;
+            if (action >= 0) {
+                result = action;
                 running = 0;
                 break;
             }
         }
         if (softpc_machine_run(machine, SOFTPC_RUN_SLICE) != SOFTPC_MACHINE_OK)
+            result = SOFTPC_VM_FRONTEND_ERROR;
             running = 0;
         softpc_console_paint(output, machine, previous);
         Sleep(0u);
     }
     (void)SetConsoleMode(input, original_mode);
     softpc_console_close(input, output, private_console);
-    return 0;
+    return result;
 }
 
 #else
 int softpc_vm_run_console(softpc_machine *machine)
 {
     (void)machine;
-    return 1;
+    return SOFTPC_VM_FRONTEND_ERROR;
 }
 #endif

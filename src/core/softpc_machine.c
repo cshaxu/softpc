@@ -54,6 +54,7 @@ extern FILE *trace_file;
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
 #define SOFTPC_MINIMUM_RAM_BYTES (1024ul * 1024ul)
+#define SOFTPC_MEDIA_PATH_MAX 1024u
 
 struct softpc_machine {
     softpc_machine_options options;
@@ -61,6 +62,7 @@ struct softpc_machine {
     int reset;
     int hardware_initialized;
     int mouse_driver_initialized;
+    char floppy_path[SOFTPC_MEDIA_PATH_MAX];
 };
 
 
@@ -88,6 +90,15 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
     machine = calloc(1u, sizeof(*machine));
     if (machine == NULL) return SOFTPC_MACHINE_IO_ERROR;
     machine->options = *options;
+    if (options->floppy_path != NULL) {
+        size_t length = strlen(options->floppy_path);
+        if (length >= sizeof(machine->floppy_path)) {
+            free(machine);
+            return SOFTPC_MACHINE_INVALID_ARGUMENT;
+        }
+        memcpy(machine->floppy_path, options->floppy_path, length + 1u);
+        machine->options.floppy_path = machine->floppy_path;
+    }
     machine->memory_bytes = options->memory_bytes == 0u ?
         SOFTPC_FIXED_RAM_BYTES : (unsigned long)options->memory_bytes;
     if (machine->memory_bytes < SOFTPC_MINIMUM_RAM_BYTES) {
@@ -166,6 +177,37 @@ softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,
     if (machine == NULL || !machine->reset)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     mouse_send((int)delta_x, (int)delta_y, left_down != 0u, right_down != 0u);
+    return SOFTPC_MACHINE_OK;
+}
+
+softpc_machine_result softpc_machine_set_floppy(softpc_machine *machine,
+    const char *path)
+{
+    size_t length;
+    if (machine == NULL) return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    if (path != NULL) {
+        length = strlen(path);
+        if (length >= sizeof(machine->floppy_path) ||
+            !softpc_machine_media_exists(path))
+            return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    }
+    if (!machine->hardware_initialized) {
+        if (path == NULL) machine->floppy_path[0] = '\0';
+        else {
+            memcpy(machine->floppy_path, path, length + 1u);
+        }
+        machine->options.floppy_path = machine->floppy_path[0] == '\0' ?
+            NULL : machine->floppy_path;
+        return SOFTPC_MACHINE_OK;
+    }
+    if (!softpc_platform_floppy_attach(path, machine->options.media_mode))
+        return SOFTPC_MACHINE_IO_ERROR;
+    if (path == NULL) machine->floppy_path[0] = '\0';
+    else {
+        memcpy(machine->floppy_path, path, length + 1u);
+    }
+    machine->options.floppy_path = machine->floppy_path[0] == '\0' ?
+        NULL : machine->floppy_path;
     return SOFTPC_MACHINE_OK;
 }
 

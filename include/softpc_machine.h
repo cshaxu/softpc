@@ -57,6 +57,12 @@ softpc_machine_result softpc_machine_key_number(softpc_machine *machine,
  * Mouse adapter. Button values are zero (up) or nonzero (down). */
 softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,
     int32_t delta_x, int32_t delta_y, uint8_t left_down, uint8_t right_down);
+
+/* Replace drive A's removable medium through the original GFI/FDC host-media
+ * boundary. Passing NULL ejects it. Callers must stop or pause execution
+ * before changing media. */
+softpc_machine_result softpc_machine_set_floppy(softpc_machine *machine,
+    const char *path);
 int softpc_machine_presentation_is_graphics(const softpc_machine *machine);
 
 /* Consume the original host renderer's pending dirty rectangle. */

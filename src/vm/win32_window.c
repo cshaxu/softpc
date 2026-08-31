@@ -25,6 +25,7 @@ static int softpc_window_mouse_y;
 static int softpc_window_mouse_position_valid;
 static int softpc_window_left_button;
 static int softpc_window_right_button;
+static int softpc_window_result;
 
 static int softpc_window_paint_original_dib(HDC dc)
 {
@@ -151,6 +152,17 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
         return 0;
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
+        if (wparam == 'P' && (GetKeyState(VK_CONTROL) < 0) &&
+            (GetKeyState(VK_MENU) < 0)) {
+            softpc_window_result = SOFTPC_VM_FRONTEND_PAUSED;
+            DestroyWindow(window);
+            return 0;
+        }
+        if (wparam == VK_ESCAPE) {
+            softpc_window_result = SOFTPC_VM_FRONTEND_STOPPED;
+            DestroyWindow(window);
+            return 0;
+        }
         softpc_window_key(wparam, lparam, 0);
         return 0;
     case WM_KEYUP:
@@ -212,6 +224,7 @@ int softpc_vm_run_window(softpc_machine *machine)
     softpc_window_mouse_position_valid = 0;
     softpc_window_left_button = 0;
     softpc_window_right_button = 0;
+    softpc_window_result = SOFTPC_VM_FRONTEND_STOPPED;
     softpc_window_font = CreateFontA(16, 8, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
         OEM_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
         FIXED_PITCH | FF_MODERN, "Consolas");
@@ -229,13 +242,13 @@ int softpc_vm_run_window(softpc_machine *machine)
     DeleteObject(softpc_window_font);
     softpc_window_font = NULL;
     softpc_window_machine = NULL;
-    return 0;
+    return softpc_window_result;
 }
 
 #else
 int softpc_vm_run_window(softpc_machine *machine)
 {
     (void)machine;
-    return 1;
+    return SOFTPC_VM_FRONTEND_ERROR;
 }
 #endif
