@@ -52,6 +52,8 @@ extern PC_palette *DAC;
 extern IU8 Video_mode;
 extern IU8 Currently_emulated_video_mode;
 extern void softpc_nt_graph_standalone_init(void);
+extern void softpc_nt_graph_standalone_tick(void);
+extern void nt_change_plane_mask(int plane_mask);
 
 #define SOFTPC_VGA_MODE13_WIDTH 320u
 #define SOFTPC_VGA_MODE13_HEIGHT 200u
@@ -121,6 +123,7 @@ static void softpc_video_graphics_tick(void)
     } else if (++softpc_video_flush_ticks == 2) {
         /* The original nt_graphics_tick coalesces C-VID dirty marks for two
            machine ticks before its host painter consumes them. */
+        softpc_nt_graph_standalone_tick();
         (void)(*update_alg.calc_update)();
         softpc_video_flush_ticks = 0;
     }
@@ -136,7 +139,7 @@ static VIDEOFUNCS softpc_video_functions = {
     softpc_video_void, softpc_video_void, softpc_video_void,
     softpc_video_graphics_tick, softpc_video_void, softpc_video_void,
     softpc_video_scroll, softpc_video_scroll, (void (*)())softpc_video_cursor,
-    (void (*)())nt_set_paint_routine, softpc_video_int, softpc_video_void,
+    (void (*)())nt_set_paint_routine, nt_change_plane_mask, softpc_video_void,
     softpc_video_two_ints, softpc_video_int, softpc_video_int,
     softpc_video_int, softpc_video_two_ints, softpc_video_two_ints,
     softpc_video_void

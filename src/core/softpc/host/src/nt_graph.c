@@ -14,6 +14,7 @@
 #include "gvi.h"
 #include "cga.h"
 #include "gmi.h"
+#include "config.h"
 #include "gfx_upd.h"
 #include "egagraph.h"
 #include "egaports.h"
@@ -57,6 +58,11 @@ static INITFUNCS colour_init_funcs =
 
 static PAINTFUNCS *nt_paint_funcs;
 static INITFUNCS *nt_init_funcs;
+/* These are the original nt_graph VLT inputs.  The detached build retains
+ * their controller-side mapping and substitutes only the palette sink. */
+extern PC_palette *DAC;
+static int update_vlt = FALSE;
+static int host_plane_mask = 0xf;
 
 static void dummy_paint_screen(int offset, int host_x, int host_y,
     int width, int height)
@@ -73,6 +79,68 @@ void softpc_nt_graph_standalone_init(void)
     nt_paint_funcs = &std_colour_paint_funcs;
     nt_init_funcs = &colour_init_funcs;
     paint_screen = dummy_paint_screen;
+}
+
+/* Original nt_graph.c::set_the_vlt controller mapping.  The historical
+ * SetPaletteEntries call is the product-specific edge; the standalone DIB
+ * carries the same 256 RGB entries to the VM window instead. */
+void set_the_vlt(void)
+{
+    PC_palette vga_color[VGA_DAC_SIZE];
+    int i, ind;
+    byte mask, top_bit;
+
+    if (video_adapter == VGA && DAC != NULL)
+    {
+        if (get_256_colour_mode())
+        {
+            for (i = 0; i < VGA_DAC_SIZE; i++)
+            {
+                ind = i & get_DAC_mask();
+                vga_color[i] = DAC[ind];
+            }
+        }
+        else
+        {
+            if (get_colour_select())
+            {
+                mask = 0xf;
+                top_bit = (byte)((get_top_pixel_pad() << 6)
+                    | (get_mid_pixel_pad() << 4));
+            }
+            else
+            {
+                mask = 0x3f;
+                top_bit = (byte)(get_top_pixel_pad() << 6);
+            }
+
+            for (i = 0; i < VGA_DAC_SIZE; i++)
+            {
+                ind = i & host_plane_mask;
+                if ((sc.ModeType == GRAPHICS) && (bg_col_mask == 0x70))
+                    ind |= 8;
+                ind = get_palette_val(ind);
+                ind = top_bit | (ind & mask);
+                ind &= get_DAC_mask();
+                vga_color[i] = DAC[ind];
+            }
+        }
+
+        softpc_standalone_dib_set_palette(vga_color, VGA_DAC_SIZE);
+        set_palette_change_required(FALSE);
+    }
+    update_vlt = FALSE;
+}
+
+void softpc_nt_graph_standalone_tick(void)
+{
+    if (update_vlt || get_palette_change_required()) set_the_vlt();
+}
+
+void nt_change_plane_mask(int plane_mask)
+{
+    if (host_plane_mask != plane_mask) host_plane_mask = 0xf;
+    update_vlt = TRUE;
 }
 
 /* Original nt_graph.c mode-to-renderer selection.  The tail deliberately

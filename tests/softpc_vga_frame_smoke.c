@@ -1,7 +1,31 @@
 #include "softpc_machine.h"
+#include "insignia.h"
+#include "host_def.h"
+#include "xt.h"
+#include "gmi.h"
+#include "gfx_upd.h"
+#include "egamode.h"
+#include "gvi.h"
+#include "egagraph.h"
+
+/* Original SoftPC headers erase const for pre-ANSI compilers.  Restore it
+   for this C17 test's public-machine API calls. */
+#undef const
 
 #include <assert.h>
 #include <stdio.h>
+
+typedef struct {
+    unsigned char blue;
+    unsigned char green;
+    unsigned char red;
+    unsigned char reserved;
+} softpc_test_rgbquad;
+
+typedef struct {
+    unsigned char header[40];
+    softpc_test_rgbquad colours[256];
+} softpc_test_dib_info;
 
 /* Keep this regression on the standalone DIB contract; nt_graph.h carries
    the historical console-server structure and is intentionally not needed by
@@ -18,6 +42,7 @@ extern unsigned short c_getAX(void);
 extern unsigned short c_getBX(void);
 extern unsigned char Currently_emulated_video_mode;
 extern void host_timer_event(void);
+extern PC_palette *DAC;
 
 static void make_boot_disk(const char *path)
 {
@@ -86,6 +111,26 @@ int main(void)
         assert(softpc_machine_presentation_take_dirty(machine, &left, &top,
             &right, &bottom));
         assert(left == 0 && top == 0 && right == 1 && bottom == 0);
+    }
+
+    /* The original nt_graph VLT maps the attribute-controller palette to
+       DIB entries; simply copying DAC[] would leave index zero black here. */
+    {
+        const softpc_test_dib_info *dib = (const softpc_test_dib_info *)info;
+        set_256_colour_mode(FALSE);
+        set_colour_select(FALSE);
+        set_top_pixel_pad(0);
+        set_DAC_mask(0xffu);
+        set_palette_val(0, 1u);
+        DAC[1].red = 1u;
+        DAC[1].green = 2u;
+        DAC[1].blue = 3u;
+        set_palette_change_required(TRUE);
+        host_timer_event();
+        host_timer_event();
+        assert(dib->colours[0].red == 4u);
+        assert(dib->colours[0].green == 8u);
+        assert(dib->colours[0].blue == 12u);
     }
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);
