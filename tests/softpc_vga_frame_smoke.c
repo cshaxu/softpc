@@ -131,6 +131,39 @@ int main(void)
         assert(width == 640u && height == 350u);
     }
 
+    /* In this V7 VGA profile the original CGA-compatible graphics paths
+       retain their historical odd/even CGA banking inside EGA_planes. */
+    Video_mode = 0x04u;
+    EGA_planes[0] = 0x1bu; /* 00, 01, 10, 11 */
+    {
+        uint32_t width = 0u;
+        uint32_t height = 0u;
+        assert(softpc_machine_cga_graphics_dimensions(machine, &width,
+            &height));
+        assert(width == 320u && height == 200u);
+        assert(softpc_machine_cga_graphics_frame(machine, mode12_pixels,
+            (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
+            SOFTPC_MACHINE_OK);
+        assert(mode12_pixels[0] == 0u);
+        assert(mode12_pixels[1] == 0x00ff0000u);
+        assert(mode12_pixels[2] == 0x0000ff00u);
+        assert(mode12_pixels[3] == 0x000000ffu);
+    }
+    Video_mode = 0x06u;
+    EGA_planes[0] = 0x80u;
+    {
+        uint32_t width = 0u;
+        uint32_t height = 0u;
+        assert(softpc_machine_cga_graphics_dimensions(machine, &width,
+            &height));
+        assert(width == 640u && height == 200u);
+        assert(softpc_machine_cga_graphics_frame(machine, mode12_pixels,
+            (uint32_t)(sizeof(mode12_pixels) / sizeof(mode12_pixels[0]))) ==
+            SOFTPC_MACHINE_OK);
+        assert(mode12_pixels[0] == 0x00ff0000u);
+        assert(mode12_pixels[1] == 0u);
+    }
+
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);
     return 0;

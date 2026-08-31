@@ -12,6 +12,8 @@
 #define SOFTPC_VGA_MODE13_HEIGHT 200
 #define SOFTPC_VGA_PLANAR_MAX_WIDTH 640
 #define SOFTPC_VGA_PLANAR_MAX_HEIGHT 480
+#define SOFTPC_CGA_GRAPHICS_MAX_WIDTH 640
+#define SOFTPC_CGA_GRAPHICS_MAX_HEIGHT 200
 
 static softpc_machine *softpc_window_machine;
 static HFONT softpc_window_font;
@@ -63,6 +65,29 @@ static void softpc_window_paint_vga_planar(HDC dc)
         (int)height, pixels, &bitmap, DIB_RGB_COLORS, SRCCOPY);
 }
 
+static void softpc_window_paint_cga_graphics(HDC dc)
+{
+    static uint32_t pixels[SOFTPC_CGA_GRAPHICS_MAX_WIDTH *
+        SOFTPC_CGA_GRAPHICS_MAX_HEIGHT];
+    BITMAPINFO bitmap;
+    uint32_t width;
+    uint32_t height;
+    if (!softpc_machine_cga_graphics_dimensions(softpc_window_machine, &width,
+            &height) || softpc_machine_cga_graphics_frame(
+            softpc_window_machine, pixels,
+            (uint32_t)(sizeof(pixels) / sizeof(pixels[0]))) != SOFTPC_MACHINE_OK)
+        return;
+    ZeroMemory(&bitmap, sizeof(bitmap));
+    bitmap.bmiHeader.biSize = sizeof(bitmap.bmiHeader);
+    bitmap.bmiHeader.biWidth = (LONG)width;
+    bitmap.bmiHeader.biHeight = -(LONG)height;
+    bitmap.bmiHeader.biPlanes = 1;
+    bitmap.bmiHeader.biBitCount = 32;
+    bitmap.bmiHeader.biCompression = BI_RGB;
+    StretchDIBits(dc, 8, 8, (int)width * 2, (int)height * 2, 0, 0,
+        (int)width, (int)height, pixels, &bitmap, DIB_RGB_COLORS, SRCCOPY);
+}
+
 static int softpc_window_mouse_x_from_lparam(LPARAM position)
 {
     return (int)(short)LOWORD(position);
@@ -77,6 +102,15 @@ static void softpc_window_paint(HDC dc)
 {
     unsigned char text[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS * 2u];
     int row;
+    {
+        uint32_t width;
+        uint32_t height;
+        if (softpc_machine_cga_graphics_dimensions(softpc_window_machine,
+                &width, &height)) {
+            softpc_window_paint_cga_graphics(dc);
+            return;
+        }
+    }
     {
         uint32_t width;
         uint32_t height;

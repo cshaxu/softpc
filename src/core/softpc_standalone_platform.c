@@ -56,6 +56,8 @@ extern IU8 Video_mode;
 #define SOFTPC_VGA_MODE12_PIXELS \
     (SOFTPC_VGA_MODE12_WIDTH * SOFTPC_VGA_MODE12_HEIGHT)
 #define SOFTPC_VGA_MODE12_BYTES_PER_LINE 80u
+#define SOFTPC_CGA_BYTES_PER_LINE 80u
+#define SOFTPC_CGA_ODD_BANK_OFFSET 0x2000u
 
 static unsigned long softpc_vga_dac_component(half_word component)
 {
@@ -143,6 +145,51 @@ int softpc_platform_vga_mode12_frame(unsigned long *pixels,
 {
     return softpc_platform_vga_mode12_active() &&
         softpc_platform_vga_planar_frame(pixels, pixel_count);
+}
+
+int softpc_platform_cga_graphics_dimensions(unsigned long *width,
+    unsigned long *height)
+{
+    if (width == NULL || height == NULL || EGA_planes == NULL || DAC == NULL)
+        return 0;
+    switch (Video_mode) {
+    case 0x04u:
+    case 0x05u: *width = 320ul; *height = 200ul; return 1;
+    case 0x06u: *width = 640ul; *height = 200ul; return 1;
+    default: return 0;
+    }
+}
+
+int softpc_platform_cga_graphics_frame(unsigned long *pixels,
+    unsigned long pixel_count)
+{
+    unsigned long width;
+    unsigned long height;
+    unsigned long x;
+    unsigned long y;
+    int two_bit;
+    if (pixels == NULL || !softpc_platform_cga_graphics_dimensions(&width,
+            &height) || pixel_count < width * height)
+        return 0;
+    two_bit = Video_mode == 0x04u || Video_mode == 0x05u;
+    for (y = 0ul; y < height; ++y) {
+        unsigned long row_offset = ((y >> 1u) * SOFTPC_CGA_BYTES_PER_LINE) +
+            ((y & 1u) != 0u ? SOFTPC_CGA_ODD_BANK_OFFSET : 0u);
+        for (x = 0ul; x < width; ++x) {
+            unsigned long byte_offset = row_offset +
+                (two_bit ? x >> 2u : x >> 3u);
+            byte value = EGA_planes[byte_offset << 2u];
+            unsigned int colour_index = two_bit ?
+                (unsigned int)((value >> (6u - ((x & 3u) << 1u))) & 3u) :
+                (unsigned int)((value >> (7u - (x & 7u))) & 1u);
+            PC_palette *colour = &DAC[colour_index];
+            pixels[y * width + x] =
+                (softpc_vga_dac_component(colour->red) << 16u) |
+                (softpc_vga_dac_component(colour->green) << 8u) |
+                softpc_vga_dac_component(colour->blue);
+        }
+    }
+    return 1;
 }
 
 /* The original video core's optional stream-I/O path is a product console
