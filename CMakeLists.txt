@@ -57,15 +57,18 @@ foreach(SOFTPC_CVIDC_GENERATED_INPUT IN LISTS SOFTPC_CVIDC_GENERATED_INPUTS)
         "${SOFTPC_CVIDC_TRANSFORMED_SOURCE}")
 endforeach()
 # ``j_c_lang`` is the generated-rule register file.  It carries private host
-# pointers (not guest registers), so only the generated rule ABI and its glue
-# use a pointer-width IUH.  Keeping this source property narrow preserves the
-# original 32-bit guest word semantics in the ordinary CCPU sources.
-set_source_files_properties(
-    ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
-    src/core/softpc/base/cvidc/j_c_lang.c
-    src/core/softpc/base/cvidc/ev_glue.c
-    src/core/softpc/base/cvidc/vglfunc.c
-    PROPERTIES COMPILE_DEFINITIONS CVIDC_RULE_WORD=1)
+# pointers (not guest registers), so x64 needs a pointer-width IUH only at
+# this generated-rule ABI boundary.  On an x86 host, the original generated
+# signatures already have the correct native widths; forcing the x64 rule
+# word there corrupts their pointer and void function-table declarations.
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set_source_files_properties(
+        ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
+        src/core/softpc/base/cvidc/j_c_lang.c
+        src/core/softpc/base/cvidc/ev_glue.c
+        src/core/softpc/base/cvidc/vglfunc.c
+        PROPERTIES COMPILE_DEFINITIONS CVIDC_RULE_WORD=1)
+endif()
 add_library(softpc-ccpu-core OBJECT
     ${SOFTPC_CCPU_SOURCES}
     src/core/softpc/base/ccpu386/ntstubs.c
