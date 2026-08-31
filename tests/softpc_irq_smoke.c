@@ -9,6 +9,7 @@ int main(void)
     const char *path = "softpc-machine-irq-smoke.img";
     unsigned char sector[512] = { 0 };
     unsigned char marker = 0;
+    unsigned char ticks[4] = { 0, 0, 0, 0 };
     unsigned char program[] = {
         /* Re-enter the same boot sector through a nonzero CS. */
         0xeau, 0x10u, 0x00u, 0xc0u, 0x07u,
@@ -37,12 +38,15 @@ int main(void)
 
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    assert(softpc_machine_run(machine, 13u) == SOFTPC_MACHINE_OK);
-    /* The second slice loads the PIT's final byte and queues IRQ0. */
-    assert(softpc_machine_run(machine, 2u) == SOFTPC_MACHINE_OK);
-    assert(softpc_machine_run(machine, 12u) == SOFTPC_MACHINE_OK);
+    /* The original ROM POST is part of the machine path.  A slice measured
+       in the old replacement core's bootstrap instructions cannot reach a
+       boot sector after that POST, so use a bounded machine slice instead. */
+    assert(softpc_machine_run(machine, 6000u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
     assert(marker == 0x5au);
+    assert(softpc_machine_read_physical(machine, 0x46cu, ticks,
+        sizeof(ticks)) == SOFTPC_MACHINE_OK);
+    assert(ticks[0] != 0u || ticks[1] != 0u || ticks[2] != 0u || ticks[3] != 0u);
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);
     return 0;

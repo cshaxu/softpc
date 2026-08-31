@@ -1,7 +1,10 @@
 #include "insignia.h"
 #include "host_def.h"
 #include <stdio.h>
-#include "evidgen.h"
+/* CPU_40_STYLE uses the complete generated C-VID vector.  The nearby
+ * ccpu386/evidgen.h is an older five-entry bootstrap vector and has an
+ * incompatible layout on both x86 and x64. */
+#include "../cvidc/evidgen.h"
 
 #include "cpu4.h"
 
@@ -18,6 +21,14 @@ extern IHP Gdp;
 struct CpuVector Cpu;
 //struct SasVector Sas;
 struct VideoVector Video;
+
+/* The original CPU_40 product bootstrap installs the generated C-VID vector
+ * into the generic Video dispatch table before EGA/VGA port initialisation.
+ * The standalone machine owns that bootstrap explicitly. */
+void softpc_ccpu_install_video_vector(void)
+{
+    Video = C_Video;
+}
 
 /* This dispatcher has no result path; keep its original void ABI. */
 VOID a3_cpu_interrupt (int errupt, IU16 numint)

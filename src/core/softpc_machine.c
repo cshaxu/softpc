@@ -17,6 +17,7 @@ extern void sas_term(void);
 extern void gfi_init(void);
 extern void *setup_global_data_ptr(void);
 extern void setup_vga_globals(void);
+extern void softpc_ccpu_install_video_vector(void);
 extern void reset(void);
 extern int soft_reset;
 extern unsigned long softpc_ccpu_instruction_budget;
@@ -126,6 +127,7 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         if (setup_global_data_ptr() == NULL)
             return SOFTPC_MACHINE_IO_ERROR;
         setup_vga_globals();
+        softpc_ccpu_install_video_vector();
         machine->hardware_initialized = 1;
     }
     /* CCPU owns the optional fault trace; the standalone machine owns its

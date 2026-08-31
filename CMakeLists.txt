@@ -33,14 +33,44 @@ foreach(SOFTPC_CCPU_SOURCE_NAME IN LISTS SOFTPC_CCPU_SOURCE_NAMES)
     list(APPEND SOFTPC_CCPU_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/${SOFTPC_CCPU_SOURCE_NAME}")
 endforeach()
-file(GLOB SOFTPC_CVIDC_GENERATED_SOURCES CONFIGURE_DEPENDS
+file(GLOB SOFTPC_CVIDC_GENERATED_INPUTS CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/cvidc/sinit*.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/cvidc/sevid*.c")
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+set(SOFTPC_CVIDC_TRANSFORMED_SOURCES)
+foreach(SOFTPC_CVIDC_GENERATED_INPUT IN LISTS SOFTPC_CVIDC_GENERATED_INPUTS)
+    get_filename_component(SOFTPC_CVIDC_GENERATED_NAME
+        "${SOFTPC_CVIDC_GENERATED_INPUT}" NAME)
+    set(SOFTPC_CVIDC_TRANSFORMED_SOURCE
+        "${CMAKE_CURRENT_BINARY_DIR}/generated-cvid/${SOFTPC_CVIDC_GENERATED_NAME}")
+    add_custom_command(
+        OUTPUT "${SOFTPC_CVIDC_TRANSFORMED_SOURCE}"
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
+            "${SOFTPC_CVIDC_GENERATED_INPUT}"
+            "${SOFTPC_CVIDC_TRANSFORMED_SOURCE}"
+        DEPENDS "${SOFTPC_CVIDC_GENERATED_INPUT}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
+        COMMENT "Transforming C-VID GDP layout ${SOFTPC_CVIDC_GENERATED_NAME}"
+        VERBATIM)
+    list(APPEND SOFTPC_CVIDC_TRANSFORMED_SOURCES
+        "${SOFTPC_CVIDC_TRANSFORMED_SOURCE}")
+endforeach()
+# ``j_c_lang`` is the generated-rule register file.  It carries private host
+# pointers (not guest registers), so only the generated rule ABI and its glue
+# use a pointer-width IUH.  Keeping this source property narrow preserves the
+# original 32-bit guest word semantics in the ordinary CCPU sources.
+set_source_files_properties(
+    ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
+    src/core/softpc/base/cvidc/j_c_lang.c
+    src/core/softpc/base/cvidc/ev_glue.c
+    src/core/softpc/base/cvidc/vglfunc.c
+    PROPERTIES COMPILE_DEFINITIONS CVIDC_RULE_WORD=1)
 add_library(softpc-ccpu-core OBJECT
     ${SOFTPC_CCPU_SOURCES}
     src/core/softpc/base/ccpu386/softpc_ccpu_facade.c
     src/core/softpc/base/ccpu386/vglob.c
-    ${SOFTPC_CVIDC_GENERATED_SOURCES}
+    ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
     src/core/softpc/base/cvidc/ev_glue.c
     src/core/softpc/base/cvidc/evidfunc.c
     src/core/softpc/base/cvidc/j_c_lang.c

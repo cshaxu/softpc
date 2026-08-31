@@ -54,7 +54,9 @@ static void write_int1d_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
     FILE *file;
-    /* The original BIOS idle-poll vector reaches BOP 1Dh, then returns. */
+    /* A conventional boot sector is only the reset carrier for the IVT
+       assertion below.  INT 1Dh itself is a Video Parameter Table pointer,
+       not an executable service. */
     unsigned char program[] = {
         0xcdu, 0x1du, 0xc6u, 0x06u, 0x00u, 0x05u, 0x1du, 0xebu, 0xfeu
     };
@@ -205,8 +207,13 @@ static void write_int10_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
     FILE *file;
-    /* mov ah,0e; mov al,'V'; int 10; jmp $ */
+    /* Use the original EGA/VGA INT 10h path to set the active-page cursor
+       to 0:0, then emit 'V' through its teletype service.  POST legitimately
+       leaves the cursor elsewhere, so the fixture must not assume that reset
+       alone leaves B800:0000 as the current text cell. */
     unsigned char program[] = {
+        0xb4u, 0x02u, 0xb7u, 0x00u, 0xb6u, 0x00u, 0xb2u, 0x00u,
+        0xcdu, 0x10u,
         0xb4u, 0x0eu, 0xb0u, 0x56u, 0xcdu, 0x10u, 0xebu, 0xfeu
     };
     memcpy(sector, program, sizeof(program));
@@ -604,15 +611,18 @@ static void run_int16_boot_image(const char *path)
 
 static void run_int1d_boot_image(const char *path)
 {
-    unsigned char marker = 0u;
+    unsigned char vector[4] = { 0u };
     softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    boot_machine(machine);
-    assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) ==
+    /* Original reset.c exposes the Video Parameter Table through INT 1Dh.
+       It intentionally does not install an IRET/BOP handler at that vector. */
+    assert(softpc_machine_read_physical(machine, 0x1du * 4u, vector,
+        sizeof(vector)) ==
         SOFTPC_MACHINE_OK);
-    assert(marker == 0x1du);
+    assert(vector[0] == 0xa4u && vector[1] == 0xf0u &&
+        vector[2] == 0x00u && vector[3] == 0xf0u);
     softpc_machine_destroy(machine);
 }
 
@@ -796,7 +806,7 @@ static void run_int12_boot_image(const char *path)
 }
 
 static void run_int11_boot_image(const char *path, int floppy,
-    unsigned char expected)
+    unsigned short expected)
 {
     unsigned char equipment[2] = { 0, 0 };
     softpc_machine_options options = { NULL, NULL, SOFTPC_PRESENTATION_CONSOLE };
@@ -808,12 +818,13 @@ static void run_int11_boot_image(const char *path, int floppy,
     boot_machine(machine);
     assert(softpc_machine_read_physical(machine, 0x500u, equipment,
         sizeof(equipment)) == SOFTPC_MACHINE_OK);
-    assert(equipment[0] == expected && equipment[1] == 0u);
+    assert(((unsigned short)equipment[0] |
+        ((unsigned short)equipment[1] << 8)) == expected);
     softpc_machine_destroy(machine);
 }
 
 static void run_bda_configuration_image(const char *path, int floppy,
-    unsigned char expected_equipment)
+    unsigned short expected_equipment)
 {
     unsigned char configuration[6] = { 0, 0, 0, 0, 0, 0 };
     unsigned char fixed_disk_count = 0xffu;
@@ -826,7 +837,8 @@ static void run_bda_configuration_image(const char *path, int floppy,
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x410u, configuration,
         sizeof(configuration)) == SOFTPC_MACHINE_OK);
-    assert(configuration[0] == expected_equipment && configuration[1] == 0u);
+    assert(((unsigned short)configuration[0] |
+        ((unsigned short)configuration[1] << 8)) == expected_equipment);
     assert(configuration[2] == 0u);
     assert(configuration[3] == 0x80u && configuration[4] == 0x02u);
     assert(configuration[5] == 0u);
@@ -1058,10 +1070,10 @@ int main(void)
     run_int10_boot_image(int10);
     run_int10_mode_cursor_boot_image(int10_mode_cursor);
     run_int12_boot_image(int12);
-    run_int11_boot_image(int11, 1, 0x23u);
-    run_int11_boot_image(int11, 0, 0x22u);
-    run_bda_configuration_image(floppy, 1, 0x23u);
-    run_bda_configuration_image(hdd, 0, 0x22u);
+    run_int11_boot_image(int11, 1, 0xc821u);
+    run_int11_boot_image(int11, 0, 0xc820u);
+    run_bda_configuration_image(floppy, 1, 0xc821u);
+    run_bda_configuration_image(hdd, 0, 0xc820u);
     run_int1a_boot_image(int1a);
     run_int1a_tick_boot_image(int1a_tick);
     run_hdd_pio_boot_image(hdd_pio);

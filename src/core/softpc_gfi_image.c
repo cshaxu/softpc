@@ -196,7 +196,15 @@ static SHORT softpc_gfi_high IFN2(UTINY, drive, half_word, rate)
 static SHORT softpc_gfi_drive_type IFN1(UTINY, drive)
 { return drive < MAX_DISKETTES ? (SHORT)softpc_gfi_drives[drive].drive_type : GFI_DRIVE_TYPE_NULL; }
 static SHORT softpc_gfi_change IFN1(UTINY, drive)
-{ return drive < MAX_DISKETTES ? (SHORT)softpc_gfi_drives[drive].changed : TRUE; }
+{
+    /* GFI returns SUCCESS while the disk-change line is clear.  A mounted
+     * image is immediately stable from the fixed VM's point of view; return
+     * FAILURE only for an absent drive, otherwise the original rd_wr_vf()
+     * treats every boot read as an open-drive condition and never issues its
+     * FDC READ DATA command. */
+    return drive < MAX_DISKETTES && softpc_gfi_drives[drive].file != NULL ?
+        SUCCESS : FAILURE;
+}
 static SHORT softpc_gfi_reset IFN2(FDC_RESULT_BLOCK *, result, UTINY, drive)
 {
     if (drive >= MAX_DISKETTES) return FAILURE;
@@ -234,7 +242,7 @@ int softpc_platform_floppy_attach(const char *path)
         memset(drive, 0, sizeof(*drive));
         return 0;
     }
-    drive->changed = 1;
+    drive->changed = 0;
     softpc_gfi_install(0);
     return 1;
 }

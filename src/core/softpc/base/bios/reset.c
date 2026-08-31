@@ -533,7 +533,7 @@ void reset()
 	half_word cmos_shutdown;
 	sys_addr user_stack;
 	word temp_word;
-#ifdef NTVDM
+#if defined(NTVDM) || defined(SOFTPC_STANDALONE)
         half_word cmos_diskette;
 #endif
 
@@ -838,7 +838,7 @@ void reset()
 	equip_flag.bits.rs232_count = NUM_SERIAL_PORTS;
 	equip_flag.bits.ram_size = 0;
 
-#ifdef NTVDM
+#if defined(NTVDM) || defined(SOFTPC_STANDALONE)
 	equip_flag.bits.diskette_present = FALSE;
 	equip_flag.bits.max_diskette = 0;
 	if (cmos_read_byte(CMOS_DISKETTE, &cmos_diskette) == SUCCESS &&

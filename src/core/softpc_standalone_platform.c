@@ -733,7 +733,10 @@ int softpc_platform_read_physical(IU32 address, IU8 *bytes, IU32 length)
 {
     if (bytes == NULL || address > softpc_ram_size ||
         length > softpc_ram_size - address) return 0;
-    memcpy(bytes, softpc_ram + address, length);
+    /* A physical bus read must honour SAS_VIDEO and other original mapping
+       types.  Reading host_sas memory directly bypasses C-VID's EGA planes,
+       making B8000h appear empty even after a guest has written text. */
+    c_sas_loads(address, bytes, length);
     return 1;
 }
 
