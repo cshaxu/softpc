@@ -1961,7 +1961,7 @@ GLOBAL IU8* c_get_byte_addr IFN1(PHY_ADDR, addr)
 	return (c_GetPhyAdd(addr));
 }
 
-/* stub needed for standalone Ccpu */
+/* Original CPU_40 SAS compatibility hook. */
 GLOBAL IBOOL c_sas_PigCmpPage IFN3(IU32, src, IU8 *, dest, IU32, len)
 {
 	return(FALSE);
