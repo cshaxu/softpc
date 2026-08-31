@@ -39,6 +39,27 @@ int main(void)
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
 
+    /* These are the original ROM's machine-service slots.  They must remain
+       direct entries into restored SoftPC controller/firmware code, rather
+       than silently falling back to a new VM service layer. */
+    assert(BIOS[BIOS_KB_INT] != NULL);
+    assert(BIOS[BIOS_KEYBOARD_IO] != NULL);
+    assert(BIOS[BIOS_DISKETTE_INT] != NULL);
+    assert(BIOS[BIOS_DISKETTE_IO] != NULL);
+    assert(BIOS[BIOS_VIDEO_IO] != NULL);
+    assert(BIOS[0x42] != NULL); /* V7 VGA ROM EGA extension */
+    assert(BIOS[BIOS_PRINTER_IO] != NULL);
+    assert(BIOS[BIOS_RS232_IO] != NULL);
+    assert(BIOS[BIOS_DISK_IO] != NULL);
+    assert(BIOS[BIOS_CASSETTE_IO] != NULL);
+    assert(BIOS[BIOS_EQUIPMENT] != NULL);
+    assert(BIOS[BIOS_MEMORY_SIZE] != NULL);
+    assert(BIOS[BIOS_TIMER_INT] != NULL);
+    assert(BIOS[BIOS_TIME_OF_DAY] != NULL);
+    assert(BIOS[BIOS_BOOT_STRAP] != NULL);
+    assert(BIOS[BIOS_MOUSE_INSTALL1] != NULL);
+    assert(BIOS[BIOS_MOUSE_VIDEO_IO] != NULL);
+
     /* BOP 18 is original ROM BASIC fallback firmware, unlike product
        selectors intentionally absent from the standalone machine table. */
     assert(softpc_device_bop_dispatch(BIOS_BASIC, 0u) == TRUE);
