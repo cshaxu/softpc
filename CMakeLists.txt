@@ -148,6 +148,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/host/src/nt_sound.c
     src/core/softpc/host/src/nt_munge.c
     src/core/softpc/host/src/nt_cga.c
+    src/core/softpc/host/src/nt_com.c
     src/core/softpc/host/src/nt_vga.c
     src/core/softpc_standalone_dib.c
     src/core/softpc_device_bop.c
