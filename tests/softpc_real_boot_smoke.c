@@ -132,6 +132,7 @@ static int graphics_frame_has_visible_pixel(softpc_machine *machine)
 {
     const void *bits;
     const void *info;
+    const BITMAPINFO *dib;
     const unsigned char *pixels;
     uint32_t width;
     uint32_t height;
@@ -143,13 +144,53 @@ static int graphics_frame_has_visible_pixel(softpc_machine *machine)
             height == 0u)
         return 0;
     pixels = (const unsigned char *)bits;
+    dib = (const BITMAPINFO *)info;
+    stride = (width + 3u) & ~3u;
+    for (row = 0u; row < height; ++row) {
+        uint32_t column;
+        for (column = 0u; column < width; ++column) {
+            unsigned char index = pixels[row * stride + column];
+            const RGBQUAD *colour = &dib->bmiColors[index];
+            if (colour->rgbRed != 0u || colour->rgbGreen != 0u ||
+                colour->rgbBlue != 0u)
+                return 1;
+        }
+    }
+    return 0;
+}
+
+static void print_graphics_diagnostics(softpc_machine *machine)
+{
+    const void *bits;
+    const void *info;
+    const unsigned char *pixels;
+    const BITMAPINFO *dib;
+    uint32_t width;
+    uint32_t height;
+    uint32_t stride;
+    uint32_t row;
+    unsigned int palette_nonblack = 0u;
+    unsigned int pixels_nonzero = 0u;
+    unsigned int index;
+
+    if (!softpc_machine_presentation_dib(machine, &bits, &info, &width,
+            &height) || bits == NULL || info == NULL) return;
+    dib = (const BITMAPINFO *)info;
+    for (index = 0u; index < 256u; ++index)
+        if (dib->bmiColors[index].rgbRed != 0u ||
+            dib->bmiColors[index].rgbGreen != 0u ||
+            dib->bmiColors[index].rgbBlue != 0u)
+            ++palette_nonblack;
+    pixels = (const unsigned char *)bits;
     stride = (width + 3u) & ~3u;
     for (row = 0u; row < height; ++row) {
         uint32_t column;
         for (column = 0u; column < width; ++column)
-            if (pixels[row * stride + column] != 0u) return 1;
+            if (pixels[row * stride + column] != 0u) ++pixels_nonzero;
     }
-    return 0;
+    fprintf(stderr, "softpc-real-boot-smoke: graphics %ux%u, palette nonblack=%u, nonzero pixels=%u\n",
+        (unsigned int)width, (unsigned int)height, palette_nonblack,
+        pixels_nonzero);
 }
 
 static void print_text_screen(const unsigned char *text)
@@ -387,6 +428,11 @@ usage:
                                 break;
                             }
                         }
+                        if (read_text_surface(machine, text) &&
+                            text_has_line_fragment(text, "Welcome to Setup.")) {
+                            observed_setup = 1;
+                            break;
+                        }
                         if (InterlockedCompareExchange(&setup_runner_failed,
                                 0, 0) != 0) break;
                         Sleep(10u);
@@ -396,8 +442,8 @@ usage:
                     CloseHandle(runner);
                     if (!observed_setup) {
                         if (read_text_surface(machine, text)) print_text_screen(text);
-                        fprintf(stderr, "softpc-real-boot-smoke: Windows Setup %s reach a visible installer frame\n",
-                            observed_graphics ? "did not" : "did not enter graphics to");
+                        if (observed_graphics) print_graphics_diagnostics(machine);
+                        fprintf(stderr, "softpc-real-boot-smoke: Windows Setup did not reach its Welcome screen\n");
                         goto failed;
                     }
 #else

@@ -11,7 +11,7 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 #define SOFTPC_TIMER_ID 1u
 /* Keep each GUI tick bounded for responsive input, but large enough that
  * POST is not delayed by the host timer granularity. */
-#define SOFTPC_RUN_SLICE 5000u
+#define SOFTPC_RUN_SLICE 1000u
 #define SOFTPC_PAINT_INTERVAL_MS 16u
 #define SOFTPC_VGA_MODE13_WIDTH 320
 #define SOFTPC_VGA_MODE13_HEIGHT 200
@@ -163,7 +163,10 @@ static void softpc_window_paint(HDC dc)
     uint32_t stride;
     uint32_t cell_bytes;
     int row;
-    EnterCriticalSection(&softpc_window_machine_lock);
+    /* The executor may be in a long original C-VID update.  Painting must
+       never wait behind it: a later timer tick will invalidate the current
+       surface once the worker releases the machine lock. */
+    if (!TryEnterCriticalSection(&softpc_window_machine_lock)) return;
     if (softpc_machine_presentation_is_graphics(softpc_window_machine)) {
         (void)softpc_window_paint_original_dib(dc);
         LeaveCriticalSection(&softpc_window_machine_lock);
@@ -249,7 +252,8 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
             int graphics;
             int changed = 0;
 
-            EnterCriticalSection(&softpc_window_machine_lock);
+            if (!TryEnterCriticalSection(&softpc_window_machine_lock))
+                return 0;
             graphics = softpc_machine_presentation_is_graphics(
                 softpc_window_machine);
             if (!graphics) changed = softpc_window_text_changed();
