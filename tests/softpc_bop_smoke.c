@@ -8,12 +8,21 @@
 #include "bios.h"
 #include "build_id.h"
 #include "gfi.h"
+#include "ios.h"
 #include "tape_io.h"
+
+enum {
+    SOFTPC_COM1_PORT = 0x3f8,
+    SOFTPC_RS232_LSR = 5,
+    SOFTPC_RS232_MSR = 6,
+    SOFTPC_LPT1_PORT = 0x378
+};
 
 extern IBOOL softpc_device_bop_dispatch(IU8 number, IU32 argument);
 extern void c_setAL(IU8 value);
 extern void c_setAH(IU8 value);
 extern void c_setCX(IU16 value);
+extern void c_setDX(IU16 value);
 extern ISM32 c_setDS(IU16 value);
 extern IU16 c_getAX(void);
 extern IU16 c_getBX(void);
@@ -100,6 +109,41 @@ int main(void)
     }
     assert(c_getAX() == 0u);
     assert(c_getBX() == BUILD_ID_CODE);
+
+    /* INT 14h remains the original ROM BOP service over the original UART
+       controller. Its status result must agree with the direct UART ports. */
+    c_setDX(0u);
+    c_setAH(3u);
+    assert(softpc_device_bop_dispatch(BIOS_RS232_IO, 0u) == TRUE);
+    {
+        half_word line_status;
+        half_word modem_status;
+        inb(SOFTPC_COM1_PORT + SOFTPC_RS232_LSR, &line_status);
+        inb(SOFTPC_COM1_PORT + SOFTPC_RS232_MSR, &modem_status);
+        /* Reading the original MSR clears its delta bits, so only compare
+           the non-destructive LSR return and the stable CTS state. */
+        assert((c_getAX() >> 8u) == line_status);
+        assert((c_getAX() & 0x10u) != 0u);
+        assert((modem_status & 0x10u) != 0u);
+    }
+    c_setAH(1u);
+    c_setAL(0x41u);
+    assert(softpc_device_bop_dispatch(BIOS_RS232_IO, 0u) == TRUE);
+    assert((c_getAX() & 0x6000u) == 0x6000u);
+
+    /* INT 17h likewise remains a ROM BOP over the original parallel
+       controller. BIOS formatting of the status byte must match the port. */
+    c_setDX(0u);
+    c_setAH(2u);
+    assert(softpc_device_bop_dispatch(BIOS_PRINTER_IO, 0u) == TRUE);
+    {
+        half_word raw_status;
+        inb(SOFTPC_LPT1_PORT + 1u, &raw_status);
+        assert((c_getAX() >> 8u) == ((raw_status & 0xf8u) ^ 0x48u));
+    }
+    c_setAH(0u);
+    c_setAL(0x41u);
+    assert(softpc_device_bop_dispatch(BIOS_PRINTER_IO, 0u) == TRUE);
 
     /* Product-shell selectors must remain unreachable in the standalone
        machine even though the historical BOP instruction remains its ROM-to-C
