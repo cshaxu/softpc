@@ -13,6 +13,7 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
  * POST is not delayed by the host timer granularity. */
 #define SOFTPC_RUN_SLICE 1000u
 #define SOFTPC_PAINT_INTERVAL_MS 16u
+#define SOFTPC_INPUT_QUEUE_CAPACITY 128u
 #define SOFTPC_VGA_MODE13_WIDTH 320
 #define SOFTPC_VGA_MODE13_HEIGHT 200
 #define SOFTPC_VGA_PLANAR_MAX_WIDTH 1024
@@ -32,11 +33,50 @@ static int softpc_window_keydown_delivered;
 static HWND softpc_window_handle;
 static HANDLE softpc_window_runner;
 static CRITICAL_SECTION softpc_window_machine_lock;
+static CRITICAL_SECTION softpc_window_input_lock;
 static volatile LONG softpc_window_runner_active;
 static volatile LONG softpc_window_runner_failed;
 static unsigned char softpc_window_previous_text[SOFTPC_TEXT_COLUMNS *
     SOFTPC_TEXT_ROWS];
 static int softpc_window_previous_text_valid;
+static unsigned char softpc_window_input_keys[SOFTPC_INPUT_QUEUE_CAPACITY];
+static unsigned char softpc_window_input_releases[SOFTPC_INPUT_QUEUE_CAPACITY];
+static unsigned int softpc_window_input_head;
+static unsigned int softpc_window_input_tail;
+
+static void softpc_window_queue_key(BYTE key_number, int released)
+{
+    unsigned int next;
+    if (key_number == 0u) return;
+    EnterCriticalSection(&softpc_window_input_lock);
+    next = (softpc_window_input_head + 1u) % SOFTPC_INPUT_QUEUE_CAPACITY;
+    if (next != softpc_window_input_tail) {
+        softpc_window_input_keys[softpc_window_input_head] = key_number;
+        softpc_window_input_releases[softpc_window_input_head] =
+            (unsigned char)(released != 0);
+        softpc_window_input_head = next;
+    }
+    LeaveCriticalSection(&softpc_window_input_lock);
+}
+
+static void softpc_window_apply_queued_keys(softpc_machine *machine)
+{
+    for (;;) {
+        BYTE key_number;
+        unsigned char released;
+        EnterCriticalSection(&softpc_window_input_lock);
+        if (softpc_window_input_tail == softpc_window_input_head) {
+            LeaveCriticalSection(&softpc_window_input_lock);
+            break;
+        }
+        key_number = softpc_window_input_keys[softpc_window_input_tail];
+        released = softpc_window_input_releases[softpc_window_input_tail];
+        softpc_window_input_tail = (softpc_window_input_tail + 1u) %
+            SOFTPC_INPUT_QUEUE_CAPACITY;
+        LeaveCriticalSection(&softpc_window_input_lock);
+        (void)softpc_machine_key_number(machine, key_number, released);
+    }
+}
 
 static int softpc_window_text_changed(void)
 {
@@ -80,6 +120,7 @@ static DWORD WINAPI softpc_window_run_machine(void *opaque)
         softpc_machine_result result;
 
         EnterCriticalSection(&softpc_window_machine_lock);
+        softpc_window_apply_queued_keys(machine);
         result = softpc_machine_run(machine, SOFTPC_RUN_SLICE);
         LeaveCriticalSection(&softpc_window_machine_lock);
         if (result != SOFTPC_MACHINE_OK) {
@@ -89,7 +130,9 @@ static DWORD WINAPI softpc_window_run_machine(void *opaque)
                 PostMessageA(softpc_window_handle, WM_CLOSE, 0, 0);
             break;
         }
-        Sleep(0u);
+        /* A real sleep prevents this detached VM from monopolising one host
+           core, and gives RDP/Win32 message delivery a reliable timeslice. */
+        Sleep(1u);
     }
     return 0u;
 }
@@ -120,8 +163,7 @@ static void softpc_window_deliver_virtual_key(WORD virtual_key,
     event.wVirtualScanCode = (WORD)(scan_code & 0xffu);
     key_number = KeyMsgToKeyCode(&event);
     if (key_number != 0u)
-        (void)softpc_machine_key_number(softpc_window_machine, key_number,
-            (uint8_t)released);
+        softpc_window_queue_key(key_number, released);
 }
 
 static void softpc_window_deliver_unicode(WCHAR character)
@@ -219,8 +261,7 @@ static void softpc_window_key(WPARAM key, LPARAM lparam, int released)
         }
     }
     if (key_number != 0u)
-        (void)softpc_machine_key_number(softpc_window_machine, key_number,
-            (uint8_t)released);
+        softpc_window_queue_key(key_number, released);
     if (!released && key_number != 0u) softpc_window_keydown_delivered = 1;
 }
 static void softpc_window_mouse(int x, int y)
@@ -295,22 +336,16 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
             DestroyWindow(window);
             return 0;
         }
-        EnterCriticalSection(&softpc_window_machine_lock);
         softpc_window_key(wparam, lparam, 0);
-        LeaveCriticalSection(&softpc_window_machine_lock);
         return 0;
     case WM_KEYUP:
     case WM_SYSKEYUP:
-        EnterCriticalSection(&softpc_window_machine_lock);
         softpc_window_key(wparam, lparam, 1);
-        LeaveCriticalSection(&softpc_window_machine_lock);
         return 0;
     case WM_CHAR:
-        EnterCriticalSection(&softpc_window_machine_lock);
         if (!softpc_window_keydown_delivered && wparam >= 0x20u && wparam != 0x7fu)
             softpc_window_deliver_unicode((WCHAR)wparam);
         softpc_window_keydown_delivered = 0;
-        LeaveCriticalSection(&softpc_window_machine_lock);
         return 0;
     case WM_MOUSEMOVE:
         EnterCriticalSection(&softpc_window_machine_lock);
@@ -383,9 +418,12 @@ int softpc_vm_run_window(softpc_machine *machine)
     softpc_window_result = SOFTPC_VM_FRONTEND_STOPPED;
     softpc_window_handle = NULL;
     softpc_window_runner = NULL;
+    softpc_window_input_head = 0u;
+    softpc_window_input_tail = 0u;
     InterlockedExchange(&softpc_window_runner_active, 0);
     InterlockedExchange(&softpc_window_runner_failed, 0);
     InitializeCriticalSection(&softpc_window_machine_lock);
+    InitializeCriticalSection(&softpc_window_input_lock);
     softpc_window_font = CreateFontA(16, 8, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
         OEM_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
         FIXED_PITCH | FF_MODERN, "Consolas");
@@ -393,6 +431,7 @@ int softpc_vm_run_window(softpc_machine *machine)
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 680, 560,
         NULL, NULL, instance, NULL);
     if (window == NULL) {
+        DeleteCriticalSection(&softpc_window_input_lock);
         DeleteCriticalSection(&softpc_window_machine_lock);
         return 1;
     }
@@ -421,6 +460,7 @@ int softpc_vm_run_window(softpc_machine *machine)
         softpc_window_result = SOFTPC_VM_FRONTEND_ERROR;
     softpc_window_handle = NULL;
     DeleteCriticalSection(&softpc_window_machine_lock);
+    DeleteCriticalSection(&softpc_window_input_lock);
     DeleteObject(softpc_window_font);
     softpc_window_font = NULL;
     softpc_window_machine = NULL;
