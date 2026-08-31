@@ -3321,7 +3321,7 @@ LOCAL void mouse_set_graphics IFN4(word *,junk1,MOUSE_SCALAR *,hot_spot_x_ptr,MO
 	}
 	else
 	{
-		MOUSE_SCREEN_DATA *mask_address;
+		sys_addr mask_address;
 		int line;
 		UTINY temp;
 		IU32 temp2;
@@ -3334,16 +3334,17 @@ LOCAL void mouse_set_graphics IFN4(word *,junk1,MOUSE_SCALAR *,hot_spot_x_ptr,MO
 		/*
 		 *	Set graphics cursor screen and cursor masks
 		 */
-		mask_address = (MOUSE_SCREEN_DATA *)effective_addr(getES(), *bitmap_address);
+		mask_address = effective_addr(getES(), *bitmap_address);
 
-		for (line = 0; line < MOUSE_GRAPHICS_CURSOR_DEPTH; line++, mask_address++)
+		for (line = 0; line < MOUSE_GRAPHICS_CURSOR_DEPTH;
+		     line++, mask_address += sizeof(MOUSE_SCREEN_DATA))
 		{
-			sas_load((sys_addr)mask_address + 1, &temp );
+			sas_load(mask_address + 1, &temp );
 
 			temp2 = ( (IU32) temp << 8 ) | (IU32) temp;
 			graphics_cursor.screen_lo[line] = ( temp2 << 16 ) | temp2;
 
-			sas_load((sys_addr)mask_address , &temp );
+			sas_load(mask_address , &temp );
 
 			temp2 = ( (IU32) temp << 8 ) | (IU32) temp;
 			graphics_cursor.screen_hi[line] = ( temp2 << 16 ) | temp2;
@@ -3352,14 +3353,15 @@ LOCAL void mouse_set_graphics IFN4(word *,junk1,MOUSE_SCALAR *,hot_spot_x_ptr,MO
 									| ( graphics_cursor.screen_lo[line] << 8 );
 		}
 
-		for (line = 0; line < MOUSE_GRAPHICS_CURSOR_DEPTH; line++, mask_address++)
+		for (line = 0; line < MOUSE_GRAPHICS_CURSOR_DEPTH;
+		     line++, mask_address += sizeof(MOUSE_SCREEN_DATA))
 		{
-			sas_load((sys_addr)mask_address + 1, &temp );
+			sas_load(mask_address + 1, &temp );
 
 			temp2 = ( (IU32) temp << 8 ) | (IU32) temp;
 			graphics_cursor.cursor_lo[line] = ( temp2 << 16 ) | temp2;
 
-			sas_load((sys_addr)mask_address , &temp );
+			sas_load(mask_address , &temp );
 
 			temp2 = ( (IU32) temp << 8 ) | (IU32) temp;
 			graphics_cursor.cursor_hi[line] = ( temp2 << 16 ) | temp2;
