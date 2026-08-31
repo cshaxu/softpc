@@ -28,6 +28,8 @@ BOOL FunnyPaintMode;
 
 static BITMAPINFO *softpc_dib_info;
 static unsigned char *softpc_dib_bits;
+static unsigned long softpc_dib_width;
+static unsigned long softpc_dib_height;
 static SMALL_RECT softpc_dib_dirty;
 static int softpc_dib_dirty_valid;
 
@@ -83,6 +85,41 @@ int softpc_standalone_dib_init(void)
     CGADIB = softpc_dib_info;
     EGADIB = softpc_dib_info;
     VGADIB = softpc_dib_info;
+    softpc_dib_width = SOFTPC_DIB_MAX_WIDTH;
+    softpc_dib_height = SOFTPC_DIB_MAX_HEIGHT;
+    return 1;
+}
+
+int softpc_standalone_dib_resize(int width, int height, int bits_per_pixel)
+{
+    size_t stride;
+    if (width <= 0 || height <= 0 || width > (int)SOFTPC_DIB_MAX_WIDTH ||
+        height > (int)SOFTPC_DIB_MAX_HEIGHT || bits_per_pixel != 8 ||
+        !softpc_standalone_dib_init()) return 0;
+
+    /* The imported EGA/VGA painters calculate their addresses from the
+       current DIB header.  Keep the backing allocation large, but publish
+       the actual mode geometry exactly as nt_graph::graphicsResize did. */
+    softpc_dib_info->bmiHeader.biWidth = width;
+    softpc_dib_info->bmiHeader.biHeight = -height;
+    softpc_dib_info->bmiHeader.biBitCount = (WORD)bits_per_pixel;
+    softpc_dib_info->bmiHeader.biSizeImage =
+        (DWORD)(((unsigned long)width + 3u) & ~3u) * (DWORD)height;
+    softpc_dib_width = (unsigned long)width;
+    softpc_dib_height = (unsigned long)height;
+    stride = ((size_t)width + 3u) & ~(size_t)3u;
+    memset(softpc_dib_bits, 0, stride * (size_t)height);
+    sc.ScreenBufHandle = (HANDLE)softpc_dib_bits;
+    sc.ConsoleBufInfo.lpBitMap = softpc_dib_bits;
+    sc.ConsoleBufInfo.lpBitMapInfo = softpc_dib_info;
+    sc.ActiveOutputBufferHandle = sc.ScreenBufHandle;
+    sc.BitmapLastLine = (char *)softpc_dib_bits +
+        ((size_t)height - 1u) * stride;
+    DIBData = (char *)softpc_dib_bits;
+    MonoDIB = softpc_dib_info;
+    CGADIB = softpc_dib_info;
+    EGADIB = softpc_dib_info;
+    VGADIB = softpc_dib_info;
     return 1;
 }
 
@@ -111,8 +148,8 @@ int softpc_standalone_dib_surface(const void **bits_out, const void **info_out,
         return 0;
     *bits_out = softpc_dib_bits;
     *info_out = softpc_dib_info;
-    *width_out = SOFTPC_DIB_MAX_WIDTH;
-    *height_out = SOFTPC_DIB_MAX_HEIGHT;
+    *width_out = softpc_dib_width;
+    *height_out = softpc_dib_height;
     return 1;
 }
 

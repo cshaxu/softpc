@@ -14,6 +14,11 @@ BOOL softpc_standalone_invalidate_dibits(HANDLE ignored,
 
 int softpc_standalone_dib_surface(const void **bits_out, const void **info_out,
     unsigned long *width_out, unsigned long *height_out);
+/* Rebind the original nt_graph output contract to standalone-owned storage
+ * after a controller mode change.  Unlike graphicsResize's historical
+ * console-buffer branch, this never transfers ownership to a Windows
+ * console server. */
+int softpc_standalone_dib_resize(int width, int height, int bits_per_pixel);
 int softpc_standalone_text_surface(const void **cells_out,
     unsigned long *columns_out, unsigned long *rows_out,
     unsigned long *stride_out, unsigned long *cell_bytes_out);

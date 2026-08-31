@@ -26,6 +26,7 @@ static int softpc_window_mouse_position_valid;
 static int softpc_window_left_button;
 static int softpc_window_right_button;
 static int softpc_window_result;
+static int softpc_window_keydown_delivered;
 
 static int softpc_window_paint_original_dib(HDC dc)
 {
@@ -39,6 +40,42 @@ static int softpc_window_paint_original_dib(HDC dc)
     StretchDIBits(dc, 8, 8, (int)width, (int)height, 0, 0, (int)width,
         (int)height, bits, (const BITMAPINFO *)info, DIB_RGB_COLORS, SRCCOPY);
     return 1;
+}
+
+static void softpc_window_deliver_virtual_key(WORD virtual_key,
+    int released)
+{
+    KEY_EVENT_RECORD event;
+    BYTE key_number;
+    UINT scan_code = MapVirtualKeyW(virtual_key, MAPVK_VK_TO_VSC);
+    if (scan_code == 0u) return;
+    ZeroMemory(&event, sizeof(event));
+    event.wVirtualKeyCode = virtual_key;
+    event.wVirtualScanCode = (WORD)(scan_code & 0xffu);
+    key_number = KeyMsgToKeyCode(&event);
+    if (key_number != 0u)
+        (void)softpc_machine_key_number(softpc_window_machine, key_number,
+            (uint8_t)released);
+}
+
+static void softpc_window_deliver_unicode(WCHAR character)
+{
+    SHORT translated = VkKeyScanW(character);
+    BYTE modifiers;
+    if (translated == -1) return;
+    modifiers = HIBYTE(translated);
+    /* The same mobile-RDP packet form handled by the console frontend can
+       arrive as WM_CHAR when the standalone DIB window has focus.  Retain
+       the original SoftPC key-number mapper; synthesize only the missing
+       host key transition. */
+    if ((modifiers & 1u) != 0u) softpc_window_deliver_virtual_key(VK_SHIFT, 0);
+    if ((modifiers & 2u) != 0u) softpc_window_deliver_virtual_key(VK_CONTROL, 0);
+    if ((modifiers & 4u) != 0u) softpc_window_deliver_virtual_key(VK_MENU, 0);
+    softpc_window_deliver_virtual_key(LOBYTE(translated), 0);
+    softpc_window_deliver_virtual_key(LOBYTE(translated), 1);
+    if ((modifiers & 4u) != 0u) softpc_window_deliver_virtual_key(VK_MENU, 1);
+    if ((modifiers & 2u) != 0u) softpc_window_deliver_virtual_key(VK_CONTROL, 1);
+    if ((modifiers & 1u) != 0u) softpc_window_deliver_virtual_key(VK_SHIFT, 1);
 }
 
 static int softpc_window_mouse_x_from_lparam(LPARAM position)
@@ -93,14 +130,23 @@ static void softpc_window_key(WPARAM key, LPARAM lparam, int released)
     KEY_EVENT_RECORD event;
     BYTE key_number;
     ZeroMemory(&event, sizeof(event));
+    if (!released) softpc_window_keydown_delivered = 0;
     event.wVirtualKeyCode = (WORD)key;
     event.wVirtualScanCode = (WORD)((lparam >> 16) & 0xffu);
     if ((lparam & 0x01000000L) != 0)
         event.dwControlKeyState |= ENHANCED_KEY;
     key_number = KeyMsgToKeyCode(&event);
+    if (key_number == 0u && event.wVirtualKeyCode != 0u) {
+        UINT scan_code = MapVirtualKeyW(event.wVirtualKeyCode, MAPVK_VK_TO_VSC);
+        if (scan_code != 0u) {
+            event.wVirtualScanCode = (WORD)(scan_code & 0xffu);
+            key_number = KeyMsgToKeyCode(&event);
+        }
+    }
     if (key_number != 0u)
         (void)softpc_machine_key_number(softpc_window_machine, key_number,
             (uint8_t)released);
+    if (!released && key_number != 0u) softpc_window_keydown_delivered = 1;
 }
 static void softpc_window_mouse(int x, int y)
 {
@@ -168,6 +214,11 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
     case WM_KEYUP:
     case WM_SYSKEYUP:
         softpc_window_key(wparam, lparam, 1);
+        return 0;
+    case WM_CHAR:
+        if (!softpc_window_keydown_delivered && wparam >= 0x20u && wparam != 0x7fu)
+            softpc_window_deliver_unicode((WCHAR)wparam);
+        softpc_window_keydown_delivered = 0;
         return 0;
     case WM_MOUSEMOVE:
         softpc_window_mouse(softpc_window_mouse_x_from_lparam(lparam),

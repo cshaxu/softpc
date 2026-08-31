@@ -2338,6 +2338,16 @@ void textResize(void)
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 void graphicsResize(void)
 {
+#ifdef SOFTPC_STANDALONE
+        /* Preserve all of nt_graph's mode selection and all nt_ega/nt_vga
+           drawing.  Only replace its final NT console-graphics buffer
+           allocation with the detached VM's owned indexed DIB. */
+        if (!softpc_standalone_dib_resize(sc.PC_W_Width, sc.PC_W_Height,
+                sc.BitsPerPixel))
+            assert1(NO, "SoftPC: standalone graphics surface %dx%dx%d failed",
+                sc.PC_W_Width, sc.PC_W_Height, sc.BitsPerPixel);
+        return;
+#else
         DWORD    headerSize;
         LPBITMAPINFO     infoStructPtr;
 
@@ -2407,6 +2417,7 @@ void graphicsResize(void)
         sc.BitmapLastLine = (char *) sc.ConsoleBufInfo.lpBitMap +
             (sc.PC_W_Height - 1) *
             BYTES_PER_SCANLINE(sc.ConsoleBufInfo.lpBitMapInfo);
+#endif /* SOFTPC_STANDALONE */
 }
 
 

@@ -113,7 +113,13 @@ def main() -> int:
     original = args.source.read_text(encoding="latin-1")
     generated, static_count, dynamic_count = transform(original)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(generated, encoding="latin-1", newline="")
+    # Ninja uses the output timestamp to decide whether every generated rule
+    # must be compiled again.  A CMake reconfigure may re-invoke this command
+    # even when its input is unchanged; do not turn that harmless invocation
+    # into a full CCPU rebuild by rewriting identical output.
+    if (not args.output.exists() or
+            args.output.read_text(encoding="latin-1") != generated):
+        args.output.write_text(generated, encoding="latin-1", newline="")
     if args.report is not None:
         args.report.write_text(
             "%s static=%d dynamic=%d\n"
