@@ -4,6 +4,8 @@
 #include <windows.h>
 #include <string.h>
 
+extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
+
 #define SOFTPC_TEXT_COLUMNS 80u
 #define SOFTPC_TEXT_ROWS 25u
 #define SOFTPC_TEXT_ADDRESS 0xb8000u
@@ -11,19 +13,14 @@
 
 static int softpc_console_key(softpc_machine *machine, const KEY_EVENT_RECORD *key)
 {
-    uint8_t scan_code;
-    if (!key->bKeyDown) return 0;
-    if (key->wVirtualKeyCode == VK_ESCAPE) return 1;
-    scan_code = (uint8_t)(key->wVirtualScanCode & 0xffu);
-    if (scan_code == 0u) return 0;
-    if ((key->dwControlKeyState & ENHANCED_KEY) != 0u &&
-        softpc_machine_key_scancode(machine, 0xe0u) != SOFTPC_MACHINE_OK)
-        return 1;
-    if (softpc_machine_key_scancode(machine, scan_code) != SOFTPC_MACHINE_OK ||
-        softpc_machine_key_scancode(machine, (uint8_t)(scan_code | 0x80u)) !=
-            SOFTPC_MACHINE_OK)
-        return 1;
-    return 0;
+    KEY_EVENT_RECORD event;
+    BYTE key_number;
+    if (key->bKeyDown && key->wVirtualKeyCode == VK_ESCAPE) return 1;
+    event = *key;
+    key_number = KeyMsgToKeyCode(&event);
+    if (key_number == 0u) return 0;
+    return softpc_machine_key_number(machine, key_number,
+        (uint8_t)!key->bKeyDown) == SOFTPC_MACHINE_OK ? 0 : 1;
 }
 
 static void softpc_console_paint(HANDLE output, softpc_machine *machine,
