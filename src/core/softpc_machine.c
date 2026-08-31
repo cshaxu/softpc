@@ -170,6 +170,16 @@ softpc_machine_result softpc_machine_read_physical(const softpc_machine *machine
         SOFTPC_MACHINE_OK : SOFTPC_MACHINE_INVALID_ARGUMENT;
 }
 
+softpc_machine_result softpc_machine_write_physical(softpc_machine *machine,
+    uint32_t address, const void *buffer, uint32_t bytes)
+{
+    if (machine == NULL || buffer == NULL || !machine->reset || bytes == 0u)
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    return softpc_platform_write_physical((unsigned long)address,
+        (const unsigned char *)buffer, (unsigned long)bytes) ?
+        SOFTPC_MACHINE_OK : SOFTPC_MACHINE_INVALID_ARGUMENT;
+}
+
 softpc_machine_result softpc_machine_run(softpc_machine *machine,
     uint64_t instruction_budget)
 {

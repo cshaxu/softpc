@@ -31,6 +31,11 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
     uint64_t instruction_budget);
 softpc_machine_result softpc_machine_read_physical(const softpc_machine *machine,
     uint32_t address, void *buffer, uint32_t bytes);
+/* Copy bytes into guest physical RAM through the machine boundary.  This is
+ * intended for firmware/media integration and test fixtures, not a host RAM
+ * alias; ROM and out-of-range writes are rejected by the machine. */
+softpc_machine_result softpc_machine_write_physical(softpc_machine *machine,
+    uint32_t address, const void *buffer, uint32_t bytes);
 softpc_machine_result softpc_machine_instruction_pointer(
     const softpc_machine *machine, uint16_t *cs, uint32_t *eip);
 softpc_machine_result softpc_machine_instruction_address(

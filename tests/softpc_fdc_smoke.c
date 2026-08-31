@@ -41,6 +41,20 @@ static void program_dma_read(void)
     outb(0x0au, 0x02u);
 }
 
+static void program_dma_write(unsigned short address, unsigned short count)
+{
+    outb(0x0au, 0x06u);
+    outb(0x0cu, 0u);
+    outb(0x04u, (unsigned char)(address & 0xffu));
+    outb(0x04u, (unsigned char)(address >> 8));
+    outb(0x81u, 0x00u);
+    outb(0x0cu, 0u);
+    outb(0x05u, (unsigned char)(count & 0xffu));
+    outb(0x05u, (unsigned char)(count >> 8));
+    outb(0x0bu, 0x4au);
+    outb(0x0au, 0x02u);
+}
+
 static void fdc_write(unsigned char value)
 {
     unsigned char status = 0u;
@@ -53,6 +67,24 @@ static void fdc_write(unsigned char value)
     outb(DISKETTE_DATA_REG, value);
 }
 
+static void fdc_drain_data_result(void)
+{
+    unsigned char status = 0u;
+    unsigned char ignored;
+    unsigned int index;
+    unsigned int attempts;
+    /* READ/WRITE/FORMAT complete with a seven-byte result phase.  The
+       original FLA cannot accept the next command until every byte is read. */
+    for (index = 0u; index < 6u; ++index) {
+        for (attempts = 0u; attempts < 4u; ++attempts) {
+            inb(DISKETTE_STATUS_REG, &status);
+            if ((status & (FDC_RQM | FDC_DIO)) == (FDC_RQM | FDC_DIO)) break;
+        }
+        assert((status & (FDC_RQM | FDC_DIO)) == (FDC_RQM | FDC_DIO));
+        inb(DISKETTE_DATA_REG, &ignored);
+    }
+}
+
 int main(void)
 {
     const char *path = "softpc-fdc-smoke.img";
@@ -63,6 +95,9 @@ int main(void)
     unsigned char result;
     unsigned short cmos_diskette = 0u;
     unsigned int attempts;
+    FDC_CMD_BLOCK format_command[MAX_COMMAND_LEN] = { 0 };
+    FDC_RESULT_BLOCK format_result[MAX_RESULT_LEN] = { 0 };
+    unsigned char format_ids[4] = { 0u, 0u, 1u, 2u };
 
     write_floppy(path);
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
@@ -91,9 +126,47 @@ int main(void)
     assert((result & (FDC_RQM | FDC_DIO)) == (FDC_RQM | FDC_DIO));
     inb(DISKETTE_DATA_REG, &result);
     assert(result == 0u);
+    fdc_drain_data_result();
     assert(softpc_machine_read_physical(machine, 0x600u, &byte, 1u) ==
         SOFTPC_MACHINE_OK);
     assert(byte == 0x5au);
+
+    /* The raw-image port consumes the original FDC format DMA CHRN list;
+       no replacement floppy controller participates. */
+    assert(softpc_machine_write_physical(machine, 0x700u, format_ids,
+        sizeof(format_ids)) == SOFTPC_MACHINE_OK);
+    program_dma_write(0x700u, (unsigned short)(sizeof(format_ids) - 1u));
+    put_c3_cmd(format_command, FDC_FORMAT_TRACK);
+    put_c3_drive(format_command, 0u);
+    put_c3_head(format_command, 0u);
+    put_c3_N(format_command, 2u);
+    put_c3_SC(format_command, 1u);
+    put_c3_filler(format_command, 0xe5u);
+    assert(gfi_fdc_command(format_command, format_result) == SUCCESS);
+    assert(get_r0_ST0(format_result) == 0u);
+    assert(get_r0_ST1(format_result) == 0u);
+    assert(get_r0_ST2(format_result) == 0u);
+    program_dma_read();
+    fdc_write(FDC_READ_DATA);
+    fdc_write(0x00u);
+    fdc_write(0x00u);
+    fdc_write(0x00u);
+    fdc_write(0x01u);
+    fdc_write(0x02u);
+    fdc_write(0x01u);
+    fdc_write(0x1bu);
+    fdc_write(0xffu);
+    for (attempts = 0u; attempts < 4u; ++attempts) {
+        inb(DISKETTE_STATUS_REG, &result);
+        if ((result & (FDC_RQM | FDC_DIO)) == (FDC_RQM | FDC_DIO)) break;
+    }
+    assert((result & (FDC_RQM | FDC_DIO)) == (FDC_RQM | FDC_DIO));
+    inb(DISKETTE_DATA_REG, &result);
+    assert(result == 0u);
+    fdc_drain_data_result();
+    assert(softpc_machine_read_physical(machine, 0x600u, &byte, 1u) ==
+        SOFTPC_MACHINE_OK);
+    assert(byte == 0xe5u);
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);
     return 0;

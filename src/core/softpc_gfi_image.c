@@ -126,6 +126,49 @@ static int softpc_gfi_transfer(softpc_gfi_image_drive *drive,
     return 1;
 }
 
+/* A raw image has the ordinary IBM sequential sector map.  Formatting is
+   therefore still a host-media operation: the original FLA owns command
+   timing, DMA setup and FDC result delivery; this port consumes the CHRN
+   list already placed in the original DMA channel and writes its filler. */
+static int softpc_gfi_format(softpc_gfi_image_drive *drive,
+    FDC_CMD_BLOCK *command)
+{
+    unsigned int cylinder = drive->cylinder;
+    unsigned int head = get_c3_head(command);
+    unsigned int sector_bytes;
+    unsigned int count = get_c3_SC(command);
+    unsigned int index;
+    char id[4];
+    char filler[8192];
+
+    if (drive->file == NULL || !drive->writable || get_c3_N(command) > 6u)
+        return 0;
+    sector_bytes = 128u << get_c3_N(command);
+    if (sector_bytes != SOFTPC_GFI_SECTOR_BYTES || count == 0u ||
+        count > drive->sectors || cylinder >= drive->cylinders ||
+        head >= drive->heads)
+        return 0;
+    memset(filler, get_c3_filler(command), sector_bytes);
+    for (index = 0u; index < count; ++index) {
+        unsigned int sector;
+        unsigned long offset;
+        /* dma_request returns FALSE when this request reaches terminal
+           count, which is the normal final transfer for a format CHRN list. */
+        (void)dma_request(DMA_DISKETTE_CHANNEL, id, (word)sizeof(id));
+        sector = (unsigned char)id[2];
+        if ((unsigned char)id[0] != cylinder || (unsigned char)id[1] != head ||
+            (unsigned char)id[3] != get_c3_N(command) || sector == 0u ||
+            sector > drive->sectors)
+            return 0;
+        offset = (((unsigned long)cylinder * drive->heads + head) *
+            drive->sectors + (sector - 1u)) * sector_bytes;
+        if (fseek(drive->file, (long)offset, SEEK_SET) != 0 ||
+            fwrite(filler, 1u, sector_bytes, drive->file) != sector_bytes)
+            return 0;
+    }
+    return fflush(drive->file) == 0;
+}
+
 static SHORT softpc_gfi_command(FDC_CMD_BLOCK *command,
     FDC_RESULT_BLOCK *result)
 {
@@ -172,6 +215,7 @@ static SHORT softpc_gfi_command(FDC_CMD_BLOCK *command,
         return SUCCESS;
     case FDC_READ_DATA:
     case FDC_READ_DELETED_DATA:
+    case FDC_READ_TRACK:
     case FDC_WRITE_DATA:
     case FDC_WRITE_DELETED_DATA:
         writing = get_type_cmd(command) == FDC_WRITE_DATA ||
@@ -179,6 +223,11 @@ static SHORT softpc_gfi_command(FDC_CMD_BLOCK *command,
         okay = softpc_gfi_transfer(drive, command, writing);
         softpc_gfi_result(result, unit, cylinder, head, sector, size, !okay,
             writing && !drive->writable);
+        return SUCCESS;
+    case FDC_FORMAT_TRACK:
+        okay = softpc_gfi_format(drive, command);
+        softpc_gfi_result(result, unit, drive->cylinder, get_c3_head(command),
+            get_c3_SC(command), get_c3_N(command), !okay, !drive->writable);
         return SUCCESS;
     default:
         return FAILURE;
