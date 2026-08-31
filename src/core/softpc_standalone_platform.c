@@ -683,10 +683,13 @@ char *buffer;
 {
     softpc_disk_media *media;
     size_t bytes;
-    if (driveid < 0 || driveid >= 2 || sectors < 0) return 0;
+    if (driveid < 0 || driveid >= 2 || offset < 0 || sectors < 0) return 0;
     media = &softpc_hdd_media[driveid];
     bytes = (size_t)sectors * SOFTPC_DISK_SECTOR_BYTES;
-    if (media->file == NULL || fseek(media->file, (long)offset, SEEK_SET) != 0 ||
+    if (media->file == NULL || (IU32)offset > media->total_sectors *
+        SOFTPC_DISK_SECTOR_BYTES || bytes > (size_t)(media->total_sectors *
+        SOFTPC_DISK_SECTOR_BYTES - (IU32)offset) ||
+        fseek(media->file, (long)offset, SEEK_SET) != 0 ||
         fread(buffer, 1u, bytes, media->file) != bytes) {
         if (media->file != NULL) clearerr(media->file);
         return 0;
@@ -702,10 +705,12 @@ char *buffer;
 {
     softpc_disk_media *media;
     size_t bytes;
-    if (driveid < 0 || driveid >= 2 || sectors < 0) return 0;
+    if (driveid < 0 || driveid >= 2 || offset < 0 || sectors < 0) return 0;
     media = &softpc_hdd_media[driveid];
     bytes = (size_t)sectors * SOFTPC_DISK_SECTOR_BYTES;
-    if (media->file == NULL || !media->writable ||
+    if (media->file == NULL || !media->writable || (IU32)offset >
+        media->total_sectors * SOFTPC_DISK_SECTOR_BYTES || bytes >
+        (size_t)(media->total_sectors * SOFTPC_DISK_SECTOR_BYTES - (IU32)offset) ||
         fseek(media->file, (long)offset, SEEK_SET) != 0 ||
         fwrite(buffer, 1u, bytes, media->file) != bytes || fflush(media->file) != 0) {
         if (media->file != NULL) clearerr(media->file);
