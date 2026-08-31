@@ -39,6 +39,15 @@ static void print_instruction(softpc_machine *machine, uint16_t cs,
             instruction[6], instruction[7]);
 }
 
+static int is_trace_option(const char *argument)
+{
+    return strcmp(argument, "--trace") == 0 ||
+        strcmp(argument, "--trace-1k") == 0 ||
+        strcmp(argument, "--trace-long") == 0 ||
+        strcmp(argument, "--trace-slices") == 0 ||
+        strcmp(argument, "--trace-transition") == 0;
+}
+
 int main(int argc, char **argv)
 {
     softpc_machine_options options = { NULL, NULL,
@@ -54,32 +63,39 @@ int main(int argc, char **argv)
     uint64_t slice_instructions = SOFTPC_SLICE_INSTRUCTIONS;
     softpc_machine_result result;
 
-    if ((argc != 3 && argc != 4) || (strcmp(argv[1], "--floppy") != 0 &&
-        strcmp(argv[1], "--hdd") != 0) ||
-        (argc == 4 && strcmp(argv[3], "--trace") != 0 &&
-            strcmp(argv[3], "--trace-1k") != 0 &&
-            strcmp(argv[3], "--trace-long") != 0 &&
-            strcmp(argv[3], "--trace-slices") != 0 &&
-            strcmp(argv[3], "--trace-transition") != 0)) {
-        fprintf(stderr, "Usage: %s (--floppy|--hdd) image.img [--trace|--trace-1k|--trace-long|--trace-slices|--trace-transition]\n",
+    for (index = 1u; index < (unsigned int)argc; ++index) {
+        if ((strcmp(argv[index], "--floppy") == 0 ||
+            strcmp(argv[index], "--hdd") == 0) && index + 1u < (unsigned int)argc) {
+            const char *path = argv[++index];
+            if (strcmp(argv[index - 1u], "--floppy") == 0) {
+                if (options.floppy_path != NULL) goto usage;
+                options.floppy_path = path;
+            } else {
+                if (options.hard_disk_path != NULL) goto usage;
+                options.hard_disk_path = path;
+            }
+        } else if (is_trace_option(argv[index]) && !trace) {
+            trace = 1;
+            if (strcmp(argv[index], "--trace") == 0)
+                slice_instructions = SOFTPC_TRACE_INSTRUCTIONS;
+            else if (strcmp(argv[index], "--trace-1k") == 0)
+                slice_instructions = SOFTPC_TRACE_1K_INSTRUCTIONS;
+            else if (strcmp(argv[index], "--trace-long") == 0) {
+                slice_instructions = SOFTPC_TRACE_INSTRUCTIONS;
+                slices = SOFTPC_LONG_TRACE_SLICES;
+            } else if (strcmp(argv[index], "--trace-transition") == 0) {
+                slice_instructions = 1u;
+                slices = SOFTPC_TRANSITION_TRACE_SLICES;
+                warmup_slices = SOFTPC_TRANSITION_WARMUP_SLICES;
+            }
+        } else goto usage;
+    }
+    if (options.floppy_path == NULL && options.hard_disk_path == NULL) {
+usage:
+        fprintf(stderr, "Usage: %s [--floppy floppy.img] [--hdd hard-disk.img] [--trace|--trace-1k|--trace-long|--trace-slices|--trace-transition]\n",
             argv[0]);
         return 2;
     }
-    trace = argc == 4;
-    if (trace && strcmp(argv[3], "--trace") == 0)
-        slice_instructions = SOFTPC_TRACE_INSTRUCTIONS;
-    else if (trace && strcmp(argv[3], "--trace-1k") == 0)
-        slice_instructions = SOFTPC_TRACE_1K_INSTRUCTIONS;
-    else if (trace && strcmp(argv[3], "--trace-long") == 0) {
-        slice_instructions = SOFTPC_TRACE_INSTRUCTIONS;
-        slices = SOFTPC_LONG_TRACE_SLICES;
-    } else if (trace && strcmp(argv[3], "--trace-transition") == 0) {
-        slice_instructions = 1u;
-        slices = SOFTPC_TRANSITION_TRACE_SLICES;
-        warmup_slices = SOFTPC_TRANSITION_WARMUP_SLICES;
-    }
-    if (strcmp(argv[1], "--floppy") == 0) options.floppy_path = argv[2];
-    else options.hard_disk_path = argv[2];
     result = softpc_machine_create(&options, &machine);
     if (result != SOFTPC_MACHINE_OK) goto failed;
     result = softpc_machine_reset(machine);
