@@ -78,6 +78,18 @@ static int softpc_console_key(softpc_machine *machine, const KEY_EVENT_RECORD *k
         return SOFTPC_VM_FRONTEND_STOPPED;
     event = *key;
     key_number = KeyMsgToKeyCode(&event);
+    /* Some RDP console transports preserve wVirtualKeyCode but omit the
+       physical scan code required by the original nt_keycd tables. Recover
+       that host detail through the Win32 keyboard layout, then retain the
+       original SoftPC key-number translation and 8042 path. */
+    if (key_number == 0u && event.wVirtualKeyCode != 0u) {
+        UINT scan_code = MapVirtualKeyW(event.wVirtualKeyCode,
+            MAPVK_VK_TO_VSC);
+        if (scan_code != 0u) {
+            event.wVirtualScanCode = (WORD)(scan_code & 0xffu);
+            key_number = KeyMsgToKeyCode(&event);
+        }
+    }
     /* A console can report layout/dead-key and focus records that have no
        original SoftPC key number. They are not a monitor stop request. */
     if (key_number == 0u) return -1;
