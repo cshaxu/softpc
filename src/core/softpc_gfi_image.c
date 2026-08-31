@@ -88,8 +88,31 @@ static void softpc_gfi_result(FDC_RESULT_BLOCK *result, UTINY drive,
     put_r0_N(result, (half_word)size);
 }
 
+/* Directly preserve nt_rflop.c::update_chrn() at the raw-image boundary.
+   FLA owns the command/result phases, but the GFI server owns the CHRN which
+   it returns after a multi-sector DMA transfer. */
+static void softpc_gfi_update_chrn(unsigned int *cylinder, unsigned int *head,
+    unsigned int *sector, unsigned int multi_track, unsigned int eot,
+    unsigned int sector_count)
+{
+    unsigned int new_sector = *sector + sector_count - 1u;
+
+    if (new_sector > eot && multi_track != 0u) {
+        *head = 1u;
+        new_sector >>= 1u;
+    }
+    *sector = new_sector == eot ? 1u : new_sector + 1u;
+    if (multi_track != 0u && new_sector == eot) {
+        if (*head == 1u) ++*cylinder;
+        *head ^= 1u;
+    } else if (new_sector == eot) {
+        ++*cylinder;
+    }
+}
+
 static int softpc_gfi_transfer(softpc_gfi_image_drive *drive,
-    FDC_CMD_BLOCK *command, int writing)
+    FDC_CMD_BLOCK *command, int writing, unsigned int *result_cylinder,
+    unsigned int *result_head, unsigned int *result_sector)
 {
     sys_addr ignored_address;
     word dma_count;
@@ -132,6 +155,11 @@ static int softpc_gfi_transfer(softpc_gfi_image_drive *drive,
         }
     }
     drive->cylinder = cylinder;
+    *result_cylinder = cylinder;
+    *result_head = head;
+    *result_sector = sector;
+    softpc_gfi_update_chrn(result_cylinder, result_head, result_sector,
+        get_c0_MT(command), get_c0_EOT(command), count);
     return 1;
 }
 
@@ -229,7 +257,8 @@ static SHORT softpc_gfi_command(FDC_CMD_BLOCK *command,
     case FDC_WRITE_DELETED_DATA:
         writing = get_type_cmd(command) == FDC_WRITE_DATA ||
             get_type_cmd(command) == FDC_WRITE_DELETED_DATA;
-        okay = softpc_gfi_transfer(drive, command, writing);
+        okay = softpc_gfi_transfer(drive, command, writing, &cylinder, &head,
+            &sector);
         softpc_gfi_result(result, unit, cylinder, head, sector, size, !okay,
             writing && !drive->writable);
         return SUCCESS;

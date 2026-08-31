@@ -41,6 +41,21 @@ static void program_dma_read(void)
     outb(0x0au, 0x02u);
 }
 
+static void program_dma_read_multi(void)
+{
+    /* Channel 2, 0600h, 1024 bytes, device-to-memory single transfer. */
+    outb(0x0au, 0x06u);
+    outb(0x0cu, 0u);
+    outb(0x04u, 0x00u);
+    outb(0x04u, 0x06u);
+    outb(0x81u, 0x00u);
+    outb(0x0cu, 0u);
+    outb(0x05u, 0xffu);
+    outb(0x05u, 0x03u);
+    outb(0x0bu, 0x46u);
+    outb(0x0au, 0x02u);
+}
+
 static void program_dma_write(unsigned short address, unsigned short count)
 {
     outb(0x0au, 0x06u);
@@ -130,6 +145,28 @@ int main(void)
     assert(softpc_machine_read_physical(machine, 0x600u, &byte, 1u) ==
         SOFTPC_MACHINE_OK);
     assert(byte == 0x5au);
+
+    /* Original nt_rflop advances the result CHRN after a multi-sector DMA
+       command.  The raw-image port must preserve that GFI-server contract
+       rather than reporting the input CHRN after every successful read. */
+    {
+        FDC_CMD_BLOCK command[MAX_COMMAND_LEN] = { 0 };
+        FDC_RESULT_BLOCK command_result[MAX_RESULT_LEN] = { 0 };
+        program_dma_read_multi();
+        put_c0_cmd(command, FDC_READ_DATA);
+        put_c0_drive(command, 0u);
+        put_c0_cyl(command, 0u);
+        put_c0_hd(command, 0u);
+        put_c0_sector(command, 1u);
+        put_c0_N(command, 2u);
+        put_c0_EOT(command, 18u);
+        assert(gfi_fdc_command(command, command_result) == SUCCESS);
+        assert(get_r0_ST0(command_result) == 0u);
+        assert(get_r0_cyl(command_result) == 0u);
+        assert(get_r0_head(command_result) == 0u);
+        assert(get_r0_sector(command_result) == 3u);
+        assert(get_r0_N(command_result) == 2u);
+    }
 
     /* The raw-image port consumes the original FDC format DMA CHRN list;
        no replacement floppy controller participates. */
