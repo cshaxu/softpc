@@ -15,6 +15,13 @@
 #define SOFTPC_TEXT_COLUMNS 80u
 #define SOFTPC_TEXT_ROWS 50u
 #define SOFTPC_TEXT_CELL_BYTES 4u
+/* nt_text's original 80-column fast path indexes the shared text surface
+   with the controller's physical character stride, rather than its visible
+   width.  Setup temporarily programs 132-column / tall text geometries while
+   probing video hardware, so the standalone backing store must accommodate
+   that original contract even though the console presenter exposes 80x50. */
+#define SOFTPC_TEXT_STORAGE_COLUMNS 160u
+#define SOFTPC_TEXT_STORAGE_ROWS 200u
 
 SCREEN_DESCRIPTION sc;
 int host_screen_scale = 2;
@@ -77,8 +84,8 @@ int softpc_standalone_dib_init(void)
     sc.PC_W_Width = SOFTPC_DIB_MAX_WIDTH;
     sc.PC_W_Height = SOFTPC_DIB_MAX_HEIGHT;
     if (textBuffer == NULL)
-        textBuffer = (PBYTE)calloc(SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS,
-            SOFTPC_TEXT_CELL_BYTES);
+        textBuffer = (PBYTE)calloc(SOFTPC_TEXT_STORAGE_COLUMNS *
+            SOFTPC_TEXT_STORAGE_ROWS, SOFTPC_TEXT_CELL_BYTES);
     if (textBuffer == NULL) return 0;
     DIBData = (char *)softpc_dib_bits;
     MonoDIB = softpc_dib_info;

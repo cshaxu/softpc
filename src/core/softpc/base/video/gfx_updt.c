@@ -619,7 +619,7 @@ VOID remove_old_cursor IFN0()
 				"remove_old_cursor x=%d, y=%d", dirty_curs_x, dirty_curs_y );
 
 		(*paint_screen)( dirty_curs_offs, dirty_curs_x * get_pix_char_width(),
-								dirty_curs_y * get_host_char_height(), 2 );
+								dirty_curs_y * get_host_char_height(), 2, 1 );
 
 		dirty_curs_offs = -1;
 	}
@@ -1112,9 +1112,33 @@ void ega_text_update IFN0()
 	int	lines_per_screen;
 	int	offset;
 	int	screen_start;
+	int	offset_per_line;
+	int	screen_length;
+	int	chars_per_line;
+	int	char_height;
 
 	if (getVideodirty_total() == 0 || get_display_disabled() )
 		return;
+
+	/* A real mode change writes the CRTC fields one at a time.  The NT host
+	   happened not to call this painter until those writes had settled; the
+	   detached host ticks independently and can observe the transient.  Do
+	   not interpret incomplete geometry as text memory: that would overrun
+	   video_copy/dirty records before the next controller tick selects the
+	   final original paint routine. */
+	offset_per_line = get_offset_per_line();
+	screen_length = get_screen_length();
+	chars_per_line = get_chars_per_line();
+	char_height = get_host_char_height();
+	if (offset_per_line <= 0 || screen_length <= 0 ||
+		chars_per_line <= 0 || chars_per_line > 160 || char_height <= 0 ||
+		char_height > 32 || screen_length > 2 * EGA_PLANE_DISP_SIZE ||
+		(screen_length % offset_per_line) != 0 ||
+		(screen_length / offset_per_line) > 200 ||
+		get_screen_start() > EGA_PLANE_DISP_SIZE) {
+		setVideodirty_total(0);
+		return;
+	}
 
 	host_start_update();
 
@@ -1122,7 +1146,7 @@ void ega_text_update IFN0()
 
 	ALIGN_SCREEN_START(screen_start);
 
-	lines_per_screen = get_screen_length()/get_offset_per_line();
+	lines_per_screen = screen_length/offset_per_line;
 
 	if(getVideodirty_total()>1500)	/* paint the whole lot */
 	{
@@ -4843,4 +4867,3 @@ void stream_io_update(void)
 
 }
 #endif
-
