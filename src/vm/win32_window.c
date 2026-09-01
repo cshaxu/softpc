@@ -9,9 +9,11 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 #define SOFTPC_TEXT_COLUMNS 80
 #define SOFTPC_TEXT_ROWS 25
 #define SOFTPC_TIMER_ID 1u
-/* Keep each GUI tick bounded for responsive input, but large enough that
- * POST is not delayed by the host timer granularity. */
-#define SOFTPC_RUN_SLICE 1000u
+/* Match the standalone console's executor quantum.  The window has its own
+ * UI thread and queued input, so it must not turn every 1,000 instructions
+ * into a Windows timer sleep: on normal timer resolution that throttles the
+ * guest to tens of thousands of instructions per second. */
+#define SOFTPC_RUN_SLICE 50000u
 #define SOFTPC_DISPLAY_CADENCE_MS 50u
 #define SOFTPC_INPUT_QUEUE_CAPACITY 128u
 #define SOFTPC_VGA_MODE13_WIDTH 320
@@ -176,9 +178,10 @@ static DWORD WINAPI softpc_window_run_machine(void *opaque)
             LeaveCriticalSection(&softpc_window_machine_lock);
             next_snapshot = GetTickCount() + SOFTPC_DISPLAY_CADENCE_MS;
         }
-        /* A real sleep prevents this detached VM from monopolising one host
-           core, and gives RDP/Win32 message delivery a reliable timeslice. */
-        Sleep(1u);
+        /* Yield without imposing a timer-granularity delay on every CCPU
+           slice.  The separate UI thread remains responsive and the host
+           scheduler can run an equal-priority RDP/UI worker immediately. */
+        Sleep(0u);
     }
     return 0u;
 }
