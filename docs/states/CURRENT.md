@@ -2,23 +2,22 @@
 
 ## Current Work
 
-### M1 T2 S9 P1: Externalize the SAS vector null-slot carrier
+### M1 T2 S10 P1: Externalize ZFRSRVD CCPU declarations
 
 - **Owner:** repository owner (single-person dual-role execution)
-- **Input boundary:** selected original `sascdef.c` and its `cSasPtrs`
-  function-vector initializer.
-- **Output boundary:** a generated source with the selected unavailable
-  `Sas_overwrite_memory` slot expressed in its actual function-pointer type.
-- **Scope:** externalize only the null carrier's type; preserve vector order,
-  slot value, SAS calls, and all memory behavior.
-- **Non-goals:** do not add SAS services, alter allocation, change guest
-  addresses, or modify CCPU execution, BOP, devices, or runtime pacing.
+- **Input boundary:** selected original `zfrsrvd.c` and its existing CCPU/FPU
+  declaration providers.
+- **Output boundary:** generated source declarations that compile the original
+  ZFRSRVD callable interface on both widths.
+- **Scope:** externalize only published original headers, the `FLDENV`
+  prototype, and the historic K&R parameter form.
+- **Non-goals:** do not change FPU operations, exceptions, instruction
+  decoding, BOP, SAS behavior, device state, or runtime pacing.
 - **Focused verification:** source hash, generated-output idempotence,
   dual-width rebuild, and bounded BOP smoke.
-- **Stop condition:** stop if vector ordering or the selected null value must
-  change.
-- **Exit criteria:** `sascdef.c` is pristine in the tree and both widths
-  compile its vector through a reproducible generated carrier overlay.
+- **Stop condition:** stop if an overlay reaches any ZFRSRVD operation body.
+- **Exit criteria:** `zfrsrvd.c` is pristine and compiles through a bounded
+  generated declaration overlay.
 
 ## Current Technical Baseline
 
