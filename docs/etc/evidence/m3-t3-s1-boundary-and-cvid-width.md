@@ -91,3 +91,30 @@ WOW, console-server, or product service code. Only after that package has a
 bounded dual-media proof can M3 attach a mailbox callback to the original
 `host_timer_event()` consumption point. A separate owner-approved lifecycle
 boundary is still required for pause, reset, stop, and live media swap.
+
+### M2 Timer/ICA Recovery Closure
+
+The required original-source closure is deliberately smaller than either the
+whole `nt_eoi.c` or the whole NTVDM host product:
+
+- `host/src/nt_eoi.c` supplies the three ICA lock operations
+  `InitializeIcaLock`, `host_ica_lock`, and `host_ica_unlock`. Its delayed IRQ,
+  monitor-TEB, WOW-idle, VDM virtual-ICA and IRET-hook product paths are not
+  required by the selected standalone CCPU40 machine.
+- `host/src/nt_timer.c` supplies the heartbeat order: initialise the lock and
+  timer source; under the ICA lock run `time_tick()` and the original
+  `cmosnt.c` `RtcTick`; then publish `CPU_TIMER_TICK`. Its console switching,
+  DEM/WOW heartbeat, PIF priority, thread alert and CSR exception paths are
+  unavailable product behavior, not compatibility requirements.
+- `base/system/timestrb.c` already carries the original `REAL_TIMER` contract.
+  When the external heartbeat owns timer/RTC progression, compiling this one
+  translation unit with `REAL_TIMER` suppresses its otherwise non-NTVDM
+  duplicate `time_tick()` and `rtc_tick()` calls while retaining the original
+  tic-event and display-strobe flow. Defining `NTVDM` to obtain this effect is
+  forbidden because it would change unrelated product branches.
+
+M2 must make this selection reproducible through the port-ABI build graph,
+place the new Win32 timer/lock implementation in `host/softpc-compat`, and
+prove no duplicate tick with a bounded IRQ/BDA-time fixture on both x86 and
+x64. The current `softpc-quick-time-smoke` only verifies wall-clock timestamp
+measurement; it does not prove heartbeat delivery or tick cardinality.
