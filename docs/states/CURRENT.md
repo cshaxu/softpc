@@ -2,23 +2,40 @@
 
 ## Current Work
 
-### M1 T2 S11 P1: Reconcile the remaining CCPU divergence ledger
+### M3 T3 S2 P1: Establish a safe single-executor rendezvous
 
-- **Owner:** repository owner (single-person dual-role execution)
-- **Input boundary:** current semantic-diff ledger after all admitted CCPU
-  source recoveries.
-- **Output boundary:** an updated classification proving each remaining row is
-  either pristine, a port-ABI overlay, a host compatibility boundary, or M3
-  executor work.
-- **Scope:** rerun the ledger and trace remaining source edits; remove only
-  representation-only edits whose selected provider and consumer are known.
-- **Non-goals:** do not change CCPU rule logic, event scheduling, BOP, BIOS,
-  controllers, runtime pacing, or user-facing frontends.
-- **Focused verification:** semantic ledger delta, source hashes, and bounded
-  dual-width BOP smoke for any admitted final recovery.
-- **Stop condition:** stop if a row needs a run-slice or timer/event choice.
-- **Exit criteria:** no unclassified direct CCPU source edits remain before M2
-  and M3 begin their respective host-contract work.
+- **Owner and mode:** repository owner; single-person dual-role execution.
+- **Admission and approval:** the owner approved the NXVM-style standalone
+  architecture and instructed continued execution: one executor owns SoftPC,
+  frontends communicate by mailbox, and original core/device/BIOS/BOP behavior
+  remains intact. S1 proved that an instruction budget is not a return
+  boundary.
+- **Input boundary:** the transitional console and window both call
+  `softpc_machine_run()`, apply input directly, and lock/read machine state.
+  This creates frontend pacing, cross-thread device mutation, and RDP latency.
+- **Objective and output boundary:** identify a generated CCPU rendezvous
+  that can drain copied records on the executor thread without repurposing
+  `c_cpu_unsimulate()`, BOP FE, instruction accounting, or timer delivery.
+  A runtime implementation is not admitted until that rendezvous has a
+  bounded real-media proof.
+- **Finding so far:** a trial that combined mailbox draining with CCPU timer
+  delivery was rejected. It changed original POST timing and left the
+  dual-media reset probe CPU-bound. The trial was removed rather than retained
+  as an unverified runtime layer.
+- **Non-goals:** no controller/device rewrite, ROM/BOP change, guest-media
+  mutation, selectable profile/session, frontend styling, or Windows Setup
+  completion claim in this S.
+- **Verification:** source-generation audit; a bounded dual-media POST probe;
+  x64/x86 existing BOP, timer and VGA checks. Only then admit a runtime
+  command/input/snapshot fixture.
+- **Asset needs:** synthetic fixture only; no guest media is required.
+- **Similar-issue sweep:** console, window, real-boot probe, HLT wake, timer
+  callback, nested `host_simulate`, and both width rows.
+- **Stop condition:** stop if the hook needs to mutate controller state from a
+  host thread, reinterpret BOP FE, inject a device tick, or retain raw machine
+  surface pointers outside the executor callback.
+- **Exit criteria:** a supported rendezvous contract with no timing or BOP
+  semantic change, then one executor and copied mailbox proof on both widths.
 
 ## Current Technical Baseline
 

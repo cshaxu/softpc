@@ -22,7 +22,7 @@ STATIC_GDP = re.compile(
 # Generated EDL emits this form when the original source selected a GDP field
 # through a temporary rule register: *((TYPE *)((*((IHPE *)&r1)) + rNN)).
 DYNAMIC_GDP = re.compile(
-    r"\*\s*\(\s*\(\s*(?P<type>IUH|IU32|IU16|IU8|IHPE)\s*\*\s*\)\s*"
+    r"\*\s*\(\s*\(\s*(?P<type>IUH|IU32|IU16|IU8|IS32|IS16|IS8|IHPE)\s*\*\s*\)\s*"
     r"\(\s*\(\s*\*\s*\(\s*\(\s*IHPE\s*\*\s*\)\s*"
     r"&\s*\(\s*r1\s*\)\s*\)\s*\)\s*\+\s*"
     r"\*\s*\(\s*\(\s*IHPE\s*\*\s*\)\s*"
@@ -33,7 +33,7 @@ DYNAMIC_GDP = re.compile(
 # register, then dereferences that register directly.  At runtime the helper
 # distinguishes these small legacy offsets from native pointers.
 INDIRECT_GDP = re.compile(
-    r"\*\s*\(\s*\(\s*(?P<type>IUH|IU32|IU16|IU8|IHPE)\s*\*\s*\)\s*"
+    r"\*\s*\(\s*\(\s*(?P<type>IUH|IU32|IU16|IU8|IS32|IS16|IS8|IHPE)\s*\*\s*\)\s*"
     r"\(\s*\*\s*\(\s*\(\s*IHPE\s*\*\s*\)\s*"
     r"&\s*\(\s*(?P<address_reg>r\d+)\s*\)\s*\)\s*\)\s*\)"
 )
