@@ -203,6 +203,37 @@ def transform_ccpu_sas_source(source: str) -> str:
     return source
 
 
+def transform_ccpu_main(source: str) -> str:
+    if '#include <c_addr.h>' not in source:
+        source = source.replace('#include <c_main.h>\t/* C CPU definitions-interfaces */\n',
+                                '#include <c_main.h>\t/* C CPU definitions-interfaces */\n'
+                                '#include <c_addr.h>\t/* C CPU address calculation contract */\n', 1)
+    if '#include <c_seg.h>' not in source:
+        source = source.replace('#include <c_mem.h>\t/* CPU - Memory Interface */\n',
+                                '#include <c_mem.h>\t/* CPU - Memory Interface */\n'
+                                '#include <c_seg.h>\t/* Segment-cache and pseudo-descriptor contract */\n', 1)
+    if '#include <ica.h>' not in source:
+        source = source.replace('#include <fault.h>\n',
+                                '#include <fault.h>\n#include <ica.h>\n#include <timer.h>\n', 1)
+    workers = '#include  <aaa.h>\t/* The workers */\n'
+    declarations = ('extern void force_yoda(void);\n'
+                    'extern void TakeNpxExceptionInt(void);\n')
+    if declarations not in source:
+        source = source.replace(workers, declarations + workers, 1)
+    marker = '#define CCPU_INSTRUCTION_DELTA(x) ((IU32)DIFF_INST_BYTE((x), p_start))\n'
+    if marker not in source:
+        source = source.replace('#define UPDATE_INTEL_IP(x)', marker + '#define UPDATE_INTEL_IP(x)', 1)
+    source = source.replace('   {  int len = DIFF_INST_BYTE(x, p_start);',
+                            '   {  IU32 len = CCPU_INSTRUCTION_DELTA(x);', 1)
+    source = source.replace('SET_EIP(GET_EIP() + DIFF_INST_BYTE(x, p_start) & WORD_MASK);',
+                            'SET_EIP(GET_EIP() + (CCPU_INSTRUCTION_DELTA(x) & WORD_MASK));')
+    source = source.replace('SET_EIP(GET_EIP() + DIFF_INST_BYTE(x, p_start));',
+                            'SET_EIP(GET_EIP() + CCPU_INSTRUCTION_DELTA(x));')
+    source = source.replace('SET_EIP(GET_EIP() + DIFF_INST_BYTE(*q, p_start));',
+                            'SET_EIP(GET_EIP() + CCPU_INSTRUCTION_DELTA(*q));')
+    return source
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=pathlib.Path)
@@ -214,6 +245,7 @@ def main() -> int:
     parser.add_argument("--ccpu-sas-header", action="store_true")
     parser.add_argument("--ccpu-bsic-header", action="store_true")
     parser.add_argument("--ccpu-sas-source", action="store_true")
+    parser.add_argument("--ccpu-main", action="store_true")
     args = parser.parse_args()
 
     original = args.source.read_text(encoding="latin-1")
@@ -234,6 +266,9 @@ def main() -> int:
         static_count = dynamic_count = 1
     elif args.ccpu_sas_source:
         generated = transform_ccpu_sas_source(original)
+        static_count = dynamic_count = 1
+    elif args.ccpu_main:
+        generated = transform_ccpu_main(original)
         static_count = dynamic_count = 1
     else:
         generated, static_count, dynamic_count = transform_rules(original)

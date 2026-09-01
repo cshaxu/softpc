@@ -2,25 +2,23 @@
 
 ## Current Work
 
-### M1 T2 S5 P1: Externalize remaining generated CCPU declaration overlays
+### M1 T2 S6 P1: Externalize CCPU compatibility-stub ownership
 
 - **Owner:** repository owner (single-person dual-role execution)
-- **Input boundary:** the selected original CCPU generated-source inputs
-  identified in the declaration roster, beginning with `c_main.c` and
-  `ntstubs.c`.
-- **Output boundary:** generated compilation inputs plus narrowly scoped
-  port-ABI declarations for pre-existing standalone providers.
-- **Scope:** externalize only missing prototypes, native pointer carriers, and
-  historic C grammar incompatibilities necessary to compile the selected
-  CCPU executor on both widths.
-- **Non-goals:** do not alter executor control flow, BOP dispatch, guest
-  register values, controller behavior, or runtime pacing.
-- **Focused verification:** source hashes, generated-output idempotence,
-  dual-width rebuild, and bounded BOP smoke.
-- **Stop condition:** stop if an overlay needs a change to emitted CCPU rule
-  logic or guest-visible state.
-- **Exit criteria:** each admitted generated-source input is pristine in the
-  tree and has one traceable, repeatable compilation overlay.
+- **Input boundary:** selected original `ntstubs.c`, C-VID GDP ownership, and
+  the original ROM/FPU providers selected by the standalone link.
+- **Output boundary:** a generated compatibility source that declares the
+  selected owners without duplicating them.
+- **Scope:** externalize only C-VID global ownership, source-header routing,
+  and duplicate empty ROM/FPU stubs from the pristine compatibility input.
+- **Non-goals:** do not change CCPU vector behavior, SAS wrappers, ROM/FPU
+  machine behavior, BOP dispatch, or runtime pacing.
+- **Focused verification:** source hash, definition-owner trace, dual-width
+  rebuild, and bounded BOP smoke.
+- **Stop condition:** stop if a selected provider is absent or an ownership
+  change affects a guest-visible initialization order.
+- **Exit criteria:** `ntstubs.c` is pristine in the tree and each formerly
+  duplicate definition has one selected standalone owner.
 
 ## Current Technical Baseline
 

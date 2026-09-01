@@ -116,13 +116,20 @@ set(SOFTPC_CCPU_SAS_INPUT
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/ccpusas4.c")
 set(SOFTPC_CCPU_SAS_SOURCE
     "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/ccpusas4.c")
-foreach(SOFTPC_CCPU_ABI_NAME IN ITEMS sas-header bsic-header sas-source)
+set(SOFTPC_CCPU_MAIN_INPUT
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/c_main.c")
+set(SOFTPC_CCPU_MAIN_SOURCE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/c_main.c")
+foreach(SOFTPC_CCPU_ABI_NAME IN ITEMS sas-header bsic-header sas-source main)
     if(SOFTPC_CCPU_ABI_NAME STREQUAL "sas-header")
         set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_SAS_HEADER_INPUT}")
         set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_SAS_HEADER_SOURCE}")
     elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "bsic-header")
         set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_BSIC_HEADER_INPUT}")
         set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_BSIC_HEADER_SOURCE}")
+    elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "main")
+        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_MAIN_INPUT}")
+        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_MAIN_SOURCE}")
     else()
         set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_SAS_INPUT}")
         set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_SAS_SOURCE}")
@@ -143,10 +150,13 @@ add_custom_target(softpc-ccpu-port-abi-inputs
             "${SOFTPC_CCPU_VGLOB_SOURCE}"
             "${SOFTPC_CCPU_SAS_HEADER_SOURCE}"
             "${SOFTPC_CCPU_BSIC_HEADER_SOURCE}"
-            "${SOFTPC_CCPU_SAS_SOURCE}")
-set_source_files_properties("${SOFTPC_CCPU_SAS_SOURCE}" PROPERTIES GENERATED TRUE)
+            "${SOFTPC_CCPU_SAS_SOURCE}"
+            "${SOFTPC_CCPU_MAIN_SOURCE}")
+set_source_files_properties("${SOFTPC_CCPU_SAS_SOURCE}" "${SOFTPC_CCPU_MAIN_SOURCE}" PROPERTIES GENERATED TRUE)
 list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_SAS_INPUT}")
 list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_SAS_SOURCE}")
+list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_MAIN_INPUT}")
+list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_MAIN_SOURCE}")
 # ``j_c_lang`` is the generated-rule register file.  It carries private host
 # pointers (not guest registers), so x64 needs a pointer-width IUH only at
 # this generated-rule ABI boundary.  On an x86 host, the original generated

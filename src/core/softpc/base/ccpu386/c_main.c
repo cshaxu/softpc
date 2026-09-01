@@ -19,7 +19,7 @@ Actual worker routines are spun off elsewhere.
 #include <stdlib.h>
 #include <setjmp.h>
 
-#include  <xt.h>
+#include  <xt.h>		/* needed by bios.h */
 #include  <sas.h>	/* need memory(M)     */
 #include  <ccpusas4.h>	/* the cpu internal sas bits */
 #ifdef	PIG
@@ -30,14 +30,14 @@ Actual worker routines are spun off elsewhere.
 #include  <bios.h>	/* need access to bop */
 #include  <debug.h>
 #include  <config.h>
+#ifdef NTVDM
+#include <ntthread.h>
+#endif
+
 #include <c_main.h>	/* C CPU definitions-interfaces */
-/* DIVERGENCE(SOFTPC-PORT-072): publish the existing owner headers whose
- * declarations the historical executor previously inferred implicitly. */
-#include <c_addr.h>	/* C CPU address calculation contract */
 #include <c_page.h>	/* Paging Interface */
 #include <c_mem.h>	/* CPU - Memory Interface */
 #include <c_intr.h>	/* Interrupt Interface */
-#include <c_seg.h>	/* Segment-cache and pseudo-descriptor contract */
 #include <c_debug.h>	/* Debug Regs and Breakpoint Interface */
 #include <c_oprnd.h>	/* Operand decoding functions(macros) */
 #include <c_xcptn.h>
@@ -49,17 +49,7 @@ Actual worker routines are spun off elsewhere.
 #include <c_bsic.h>
 #include <ccpupig.h>
 #include <fault.h>
-#include <ica.h>
-#include <timer.h>
 
-/*
- * DIVERGENCE(SOFTPC-PORT-072): these are existing CCPU package bodies
- * selected by this source profile. The historical source relied on
- * implicit-int declarations; publish their exact void/no-argument contracts
- * so x64 cannot infer a host int result.
- */
-extern void force_yoda(void);
-extern void TakeNpxExceptionInt(void);
 #include  <aaa.h>	/* The workers */
 #include  <aad.h>	/*     ...     */
 #include  <aam.h>	/*     ...     */
@@ -576,13 +566,8 @@ GLOBAL	PHY_ADDR	SasWrapMask = 0xfffff;
  * Note we only mask to 16 bits if the original EIP was 16bits so that
  * pigger scripts that result in very large EIP values pig correctly.
  */
-#define CCPU_INSTRUCTION_DELTA(x) ((IU32)DIFF_INST_BYTE((x), p_start))
-/* DIVERGENCE(SOFTPC-PORT-125): `p_start` and the decode cursor are
- * same-page private host pointers.  Their difference is an instruction byte
- * count, not a guest or host identity; retain that bounded count as IU32
- * before it joins the original 32-bit EIP arithmetic on x86 and x64. */
 #define UPDATE_INTEL_IP(x)						\
-   {  IU32 len = CCPU_INSTRUCTION_DELTA(x);				\
+   {  int len = DIFF_INST_BYTE(x, p_start);				\
       IU32 mask = 0xFFFFFFFF;						\
       IU32 oldEIP = GET_EIP();						\
       if ((oldEIP < 0x10000) && (GET_CS_AR_X() == USE16))		\
@@ -593,9 +578,9 @@ GLOBAL	PHY_ADDR	SasWrapMask = 0xfffff;
 /* update Intel format EIP from host format IP (mask if 16 operand) */
 #define UPDATE_INTEL_IP_USE_OP_SIZE(x)					\
    if ( GET_OPERAND_SIZE() == USE16 )					\
-      SET_EIP(GET_EIP() + (CCPU_INSTRUCTION_DELTA(x) & WORD_MASK));\
+      SET_EIP(GET_EIP() + DIFF_INST_BYTE(x, p_start) & WORD_MASK);\
    else								\
-      SET_EIP(GET_EIP() + CCPU_INSTRUCTION_DELTA(x));
+      SET_EIP(GET_EIP() + DIFF_INST_BYTE(x, p_start));
 
 /* mark host format IP as inoperative */
 #define CANCEL_HOST_IP()					\
@@ -781,7 +766,11 @@ IFN1(
 #endif	/* PIG */
 
    /* somewhere for exceptions to return to */
+#ifdef NTVDM
+   setjmp(ccpu386ThrdExptnPtr());
+#else
    setjmp(next_inst[simulate_level-1]);
+#endif
 
 #ifdef SYNCH_TIMERS
    /* If we have taken a fault the EDL Cpu will have checked on
@@ -798,6 +787,7 @@ IFN1(
    goto NEXT_INST;
 
 DO_INST:
+
 
    /* INSIGNIA debugging */
 #ifdef	PIG
@@ -3309,62 +3299,62 @@ TYPEC4:
       if (((modRM & 0xfc) == 0xc4) && (instp32p32 == LES)) {
          /*
           * It's a c4c? BOP.
-          * The bop routine itself will read the argument, but
-          * we read it here so that we get the next EIP correct.
+	  * The bop routine itself will read the argument, but
+	  * we read it here so that we get the next EIP correct.
           */
-         int nField, i;
+	  int nField, i;
 
-         D_Ib(0);
-         nField = modRM & 3;
-         immed = 0;
-         for (i = 0; i < nField; i++)
-         {
-            immed |= (ULONG)GET_INST_BYTE(p);
-            immed <<= 8;
-         }
-         immed |= ops[0].sng;
+          D_Ib(0);
+	  nField = modRM & 3;
+	  immed = 0;
+	  for (i = 0; i < nField; i++)
+	  {
+		  immed |= (ULONG)GET_INST_BYTE(p);
+		  immed <<= 8;
+	  }
+          immed |= ops[0].sng;
 #ifdef	PIG
-         if (immed == 0xfe)
-            SET_EIP(CCPU_save_EIP);
-         else
-            UPDATE_INTEL_IP(p);
-         CANCEL_HOST_IP();
-         PIG_SYNCH(CHECK_NO_EXEC);	/* Everything checkable up to this point */
+          if (immed == 0xfe)
+	     SET_EIP(CCPU_save_EIP);
+	  else
+	     UPDATE_INTEL_IP(p);
+	  CANCEL_HOST_IP();
+	  PIG_SYNCH(CHECK_NO_EXEC);	/* Everything checkable up to this point */
 #else	/* PIG */
-         UPDATE_INTEL_IP(p);
-         if ((immed & 0xff) == 0xfe)
-         {
-            switch(immed)
-            {
+	  UPDATE_INTEL_IP(p);
+          if ((immed & 0xff) == 0xfe)
+          {
+		  switch(immed)
+		  {
 #if defined(SFELLOW)
-            case 0x03fe:
-               SfdelayUSecs();
-               break;
-            case 0x05fe:
-               SfsasTouchBop();
-               break;
-            case 0x06fe:
-               SfscatterGatherSasTouch();
-               break;
+		  case 0x03fe:
+			    SfdelayUSecs();
+			    break;
+		  case 0x05fe:
+			    SfsasTouchBop();
+			    break;
+		  case 0x06fe:
+			    SfscatterGatherSasTouch();
+			    break;
 #endif /* SFELLOW */
-            case 0xfe:
-               c_cpu_unsimulate();
-               /* Never returns (?) */
-            default:
-               EDL_fast_bop(immed);
-               break;
-            }
-         }
-         else
-         {
-            in_C = 1;
-            bop(ops[0].sng);
-            in_C = 0;
-         }
-         CANCEL_HOST_IP();
-         SYNCH_TICK();
+		  case 0xfe:
+			  c_cpu_unsimulate();
+			  /* Never returns (?) */
+		  default:
+			  EDL_fast_bop(immed);
+			  break;
+		  }
+	  }
+	  else
+	  {
+	      in_C = 1;
+	      bop(ops[0].sng);
+	      in_C = 0;
+	  }
+          CANCEL_HOST_IP();
+	  SYNCH_TICK();
 #endif	/* PIG */
-         break;
+          break;
       }
       if ( GET_OPERAND_SIZE() == USE16 )
 	 {
@@ -3648,7 +3638,7 @@ TYPED4:
 #ifndef	PIG
       if (ops[0].sng == 0xfe)
       {
-         c_cpu_unsimulate();
+	      c_cpu_unsimulate();
       }
       in_C = 1;
       bop(ops[0].sng);
@@ -4639,7 +4629,7 @@ LOCAL VOID
       IU32 ip_phy_addr;	/* Used when setting up IP (cf SETUP_HOST_IP) */
 
       /* update Intel IP up to end of the old page */
-      SET_EIP(GET_EIP() + CCPU_INSTRUCTION_DELTA(*q));
+      SET_EIP(GET_EIP() + DIFF_INST_BYTE(*q, p_start));
 
       /* move onto new page in host format */
       SETUP_HOST_IP(*q)
@@ -4690,6 +4680,10 @@ LOCAL VOID
 	first = FALSE;
       }
 #endif	/* PIG */
+
+#ifdef NTVDM
+      ccpu386InitThreadStuff();
+#endif
 
       c_cpu_reset();
       SET_POP_DISP(0);
@@ -4841,7 +4835,11 @@ LOCAL VOID
 	 fprintf(stderr, "Stack overflow in host_simulate()!\n");
 
       /* Save current context and invoke a new CPU level */
+#ifdef NTVDM
+      if ( setjmp(ccpu386SimulatePtr()) == 0)
+#else
       if ( setjmp(longjmp_env_stack[simulate_level++]) == 0 )
+#endif
 	 {
 	 in_C = 0;
 	 ccpu(FALSE);
@@ -4854,16 +4852,24 @@ LOCAL VOID
    GLOBAL VOID
    c_cpu_continue IFN0()
       {
+#ifdef NTVDM
+      ccpu386GotoThrdExptnPt();
+#else
       longjmp(next_inst[simulate_level-1], 1);
+#endif
       }
 
    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
    /* Exit point from CPU.                                               */
-   /* Return from a bounded standalone CPU invocation. */
+   /* Called from CPU via 'BOP FE' to exit the current CPU invocation    */
+   /* Or from CPU via '0F 0F' for the PIG_TESTER.                        */
    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
    GLOBAL VOID
    c_cpu_unsimulate IFN0()
       {
+#ifdef NTVDM
+      ccpu386Unsimulate();
+#else
       if (simulate_level == 0)
          {
 	 fprintf(stderr, "host_unsimulate() - already at base of stack!\n");
@@ -4877,6 +4883,7 @@ LOCAL VOID
 	 in_C = 1;
 	 longjmp(longjmp_env_stack[--simulate_level], 1);
 	 }
+#endif
       }
 
 #ifdef	PIG
@@ -4895,7 +4902,11 @@ LOCAL VOID
 	 fprintf(stderr, "Stack overflow in c_do_interrupt()!\n");
 
       /* Save current context and invoke a new CPU level */
+#ifdef NTVDM
+      if ( setjmp(ccpu386SimulatePtr()) == 0)
+#else
       if ( setjmp(longjmp_env_stack[simulate_level++]) == 0 )
+#endif
 	 {
 	 in_C = 0;
 	 EXT = EXTERNAL;
