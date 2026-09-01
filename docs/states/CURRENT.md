@@ -2,29 +2,29 @@
 
 ## Current Work
 
-### M1 T1 S1 P1: Freeze the pristine recovery baseline
+### M1 T1 S2 P1: Recover original execution-source boundaries
 
 - **Owner:** repository owner (single-person dual-role execution)
 - **Input boundary:** the selected OpenNT source tree at
   `nt/private/mvdm/softpc.new`, and the current `src/core/softpc` tree.
-- **Output boundary:** a tracked divergence ledger and source manifest only;
-  no machine-source transformation is admitted in S1.
-- **Scope:** enumerate every same-name C/H source divergence, identify the
-  source families that contain standalone policy, and assign the next
-  recovery cut to pristine restoration, port-ABI overlay, or compatibility
-  host work.  Record files with no original peer separately.
-- **Non-goals:** do not modify guest media, change controller behavior, add a
-  scheduler, or infer a source contract that cannot be evidenced.
-- **Focused verification:** reproducible hash comparison against the selected
-  source tree; static sweep for standalone policy markers; local-link check.
-- **Full regression:** not applicable: S1 does not modify the runnable path.
-- **Similar-issue sweep:** include CCPU, C-VID, BIOS, controllers, BOP/ROM,
-  and every imported `nt_*` host source; do not limit the audit to the prior
-  pacing changes.
-- **Stop condition:** stop and report if a changed current file lacks a
-  recognizable original peer or a supported disposition.
-- **Exit criteria:** the ledger accounts for all 106 divergent original-peer
-  files and 9 no-peer files, and defines the first source-changing S2 cut.
+- **Output boundary:** restored original CCPU/C-VID execution-source inputs,
+  plus only the narrowly evidenced port-ABI declarations needed to compile
+  them. Runtime scheduling, BOP providers, and host callbacks remain outside.
+- **Scope:** recover the original `c_main.c` BOP and execute flow and C-VID
+  event glue; remove standalone scheduler policy from those machine files;
+  move no helper implementation into pristine source.
+- **Non-goals:** do not implement a new CPU executor, guest clock, device,
+  BIOS behavior, media path, or a synthetic BOP selector service.
+- **Focused verification:** source diff against original for the recovered
+  flows; static absence of standalone scheduler markers in those sources;
+  x64 and x86 configure/build/test after each buildable cut.
+- **Full regression:** all configured CTest cases on both host widths.
+- **Similar-issue sweep:** examine every CCPU/C-VID policy marker and direct
+  host call, not only the previously edited HLT branch.
+- **Stop condition:** stop before a portability repair changes guest-visible
+  execution semantics; record it for the port-ABI overlay instead.
+- **Exit criteria:** original execute/BOP/event semantics are restored or
+  every remaining exception has a bounded port-ABI rationale and proof.
 
 ## Current Technical Baseline
 
