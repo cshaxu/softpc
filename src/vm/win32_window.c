@@ -1,4 +1,5 @@
 #include "win32_window.h"
+#include "runner_pacer.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -17,7 +18,7 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
  * UI thread and queued input, so it must not turn every 1,000 instructions
  * into a Windows timer sleep: on normal timer resolution that throttles the
  * guest to tens of thousands of instructions per second. */
-#define SOFTPC_RUN_SLICE 50000u
+#define SOFTPC_RUN_SLICE 5000u
 #define SOFTPC_DISPLAY_CADENCE_MS 50u
 #define SOFTPC_INPUT_QUEUE_CAPACITY 128u
 #define SOFTPC_VGA_MODE13_WIDTH 320
@@ -174,6 +175,9 @@ static DWORD WINAPI softpc_window_run_machine(void *opaque)
 {
     softpc_machine *machine = (softpc_machine *)opaque;
     DWORD next_snapshot = 0u;
+    softpc_vm_runner_pacer pacer;
+
+    softpc_vm_runner_pacer_init(&pacer);
 
     while (InterlockedCompareExchange(&softpc_window_runner_active, 0, 0) != 0) {
         softpc_machine_result result;
@@ -190,6 +194,7 @@ static DWORD WINAPI softpc_window_run_machine(void *opaque)
                 PostMessageA(softpc_window_handle, WM_CLOSE, 0, 0);
             break;
         }
+        softpc_vm_runner_pacer_wait(&pacer);
         if (input_applied || (LONG)(GetTickCount() - next_snapshot) >= 0) {
             EnterCriticalSection(&softpc_window_machine_lock);
             softpc_window_publish_snapshot(machine);
