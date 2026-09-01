@@ -104,9 +104,49 @@ add_custom_command(
         "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
     COMMENT "Transforming CCPU VGA global port ABI"
     VERBATIM)
+set(SOFTPC_CCPU_SAS_HEADER_INPUT
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/inc/sas.h")
+set(SOFTPC_CCPU_SAS_HEADER_SOURCE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/sas.h")
+set(SOFTPC_CCPU_BSIC_HEADER_INPUT
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/c_bsic.h")
+set(SOFTPC_CCPU_BSIC_HEADER_SOURCE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/c_bsic.h")
+set(SOFTPC_CCPU_SAS_INPUT
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/ccpusas4.c")
+set(SOFTPC_CCPU_SAS_SOURCE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/ccpusas4.c")
+foreach(SOFTPC_CCPU_ABI_NAME IN ITEMS sas-header bsic-header sas-source)
+    if(SOFTPC_CCPU_ABI_NAME STREQUAL "sas-header")
+        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_SAS_HEADER_INPUT}")
+        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_SAS_HEADER_SOURCE}")
+    elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "bsic-header")
+        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_BSIC_HEADER_INPUT}")
+        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_BSIC_HEADER_SOURCE}")
+    else()
+        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_SAS_INPUT}")
+        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_SAS_SOURCE}")
+    endif()
+    add_custom_command(
+        OUTPUT "${SOFTPC_CCPU_ABI_OUTPUT}"
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
+            "--ccpu-${SOFTPC_CCPU_ABI_NAME}" "${SOFTPC_CCPU_ABI_INPUT}"
+            "${SOFTPC_CCPU_ABI_OUTPUT}"
+        DEPENDS "${SOFTPC_CCPU_ABI_INPUT}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
+        COMMENT "Transforming CCPU ${SOFTPC_CCPU_ABI_NAME} port ABI"
+        VERBATIM)
+endforeach()
 add_custom_target(softpc-ccpu-port-abi-inputs
     DEPENDS "${SOFTPC_CCPU_CPU4GEN_SOURCE}"
-            "${SOFTPC_CCPU_VGLOB_SOURCE}")
+            "${SOFTPC_CCPU_VGLOB_SOURCE}"
+            "${SOFTPC_CCPU_SAS_HEADER_SOURCE}"
+            "${SOFTPC_CCPU_BSIC_HEADER_SOURCE}"
+            "${SOFTPC_CCPU_SAS_SOURCE}")
+set_source_files_properties("${SOFTPC_CCPU_SAS_SOURCE}" PROPERTIES GENERATED TRUE)
+list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_SAS_INPUT}")
+list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_SAS_SOURCE}")
 # ``j_c_lang`` is the generated-rule register file.  It carries private host
 # pointers (not guest registers), so x64 needs a pointer-width IUH only at
 # this generated-rule ABI boundary.  On an x86 host, the original generated
@@ -211,6 +251,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc_device_bop.c
     src/core/softpc_gfi_image.c
     src/core/softpc_standalone_platform.c)
+add_dependencies(softpc-machine-devices softpc-ccpu-port-abi-inputs)
 set_target_properties(softpc-ccpu-core PROPERTIES
     C_STANDARD 90
     C_EXTENSIONS ON)
@@ -239,6 +280,7 @@ target_include_directories(softpc-ccpu-core PRIVATE
     src/core/softpc/base/cvidc
     src/core)
 target_include_directories(softpc-machine-devices PRIVATE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu"
     include
     src/core/softpc-port-abi/cvidc
     src/core/softpc/host/inc

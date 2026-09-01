@@ -172,6 +172,37 @@ def transform_ccpu_vglob(source: str) -> str:
     return source
 
 
+def transform_ccpu_sas_header(source: str) -> str:
+    marker = ('extern void sas_overwrite_memory IPT2(PHY_ADDR, addr, '
+              'PHY_ADDR, len);\n')
+    if marker not in source:
+        source = source.replace('#include\t<sas4gen.h>\n',
+                                '#include\t<sas4gen.h>\n\n' + marker, 1)
+    source = re.sub(r'extern\s+(?:IHPE|sys_addr)\s+Length_of_M_area;[^\n]*',
+                    'extern PHY_ADDR Length_of_M_area;\t/* guest physical byte count */',
+                    source)
+    return source
+
+
+def transform_ccpu_bsic_header(source: str) -> str:
+    marker = 'IMPORT IU32 c_getEFLAGS IPT0();\n'
+    if marker not in source:
+        source = source.replace('IMPORT IU32 getFLAGS IPT0();\n',
+                                marker + '\nIMPORT IU32 getFLAGS IPT0();\n', 1)
+    return source
+
+
+def transform_ccpu_sas_source(source: str) -> str:
+    includes = '#include <emm.h>\n#include <host.h>\n'
+    if includes not in source:
+        source = source.replace('#include <yoda.h>\n', '#include <yoda.h>\n' + includes, 1)
+    declarations = ('extern UTINY *host_sas_init IPT1(sys_addr, size);\n'
+                    'extern UTINY *host_sas_term IPT0();\n')
+    if declarations not in source:
+        source = source.replace('#include <host.h>\n', '#include <host.h>\n' + declarations, 1)
+    return source
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=pathlib.Path)
@@ -180,6 +211,9 @@ def main() -> int:
     parser.add_argument("--event-glue", action="store_true")
     parser.add_argument("--ccpu-cpu4gen", action="store_true")
     parser.add_argument("--ccpu-vglob", action="store_true")
+    parser.add_argument("--ccpu-sas-header", action="store_true")
+    parser.add_argument("--ccpu-bsic-header", action="store_true")
+    parser.add_argument("--ccpu-sas-source", action="store_true")
     args = parser.parse_args()
 
     original = args.source.read_text(encoding="latin-1")
@@ -191,6 +225,15 @@ def main() -> int:
         static_count = dynamic_count = 1
     elif args.ccpu_vglob:
         generated = transform_ccpu_vglob(original)
+        static_count = dynamic_count = 1
+    elif args.ccpu_sas_header:
+        generated = transform_ccpu_sas_header(original)
+        static_count = dynamic_count = 1
+    elif args.ccpu_bsic_header:
+        generated = transform_ccpu_bsic_header(original)
+        static_count = dynamic_count = 1
+    elif args.ccpu_sas_source:
+        generated = transform_ccpu_sas_source(original)
         static_count = dynamic_count = 1
     else:
         generated, static_count, dynamic_count = transform_rules(original)

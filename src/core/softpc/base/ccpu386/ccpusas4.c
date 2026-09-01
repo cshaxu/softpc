@@ -61,14 +61,6 @@
 #include <c_reg.h>
 #include <timer.h>
 #include <yoda.h>
-#include <emm.h>
-#include <host.h>
-/* DIVERGENCE: the original x86 build relied on an implicit-int declaration
- * for host_sas_init.  Its actual SoftPC implementation returns UTINY *;
- * declare that existing same-shaped interface so an x64 build cannot truncate
- * the allocated SAS backing address before CCPU stores it. */
-extern UTINY *host_sas_init IPT1(sys_addr, size);
-extern UTINY *host_sas_term IPT0();
 
 /********************************************************/
 #define SIXTY_FOUR_K 1024*64
@@ -140,8 +132,7 @@ LOCAL void bios_write_word   IPT2(LIN_ADDR, linAddr, IU16, value);
 LOCAL void bios_write_double IPT2(LIN_ADDR, linAddr, IU32, value);
 
 GLOBAL IU8 *Start_of_M_area = NULL;
-GLOBAL PHY_ADDR Length_of_M_area = 0; /* DIVERGENCE(SOFTPC-PORT-055):
-                                        guest physical byte count; see sas.h. */
+GLOBAL PHY_ADDR  Length_of_M_area = 0;
 #ifdef BACK_M
 GLOBAL IU8 *end_of_M = NULL;
 #endif
@@ -1961,7 +1952,7 @@ GLOBAL IU8* c_get_byte_addr IFN1(PHY_ADDR, addr)
 	return (c_GetPhyAdd(addr));
 }
 
-/* Original CPU_40 SAS compatibility hook. */
+/* stub needed for standalone Ccpu */
 GLOBAL IBOOL c_sas_PigCmpPage IFN3(IU32, src, IU8 *, dest, IU32, len)
 {
 	return(FALSE);

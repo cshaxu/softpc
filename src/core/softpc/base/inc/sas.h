@@ -92,13 +92,6 @@ extern void sas_term IPT0();
 
 #include	<sas4gen.h>
 
-/* DIVERGENCE(MVDM-HOST-DIV-092): the selected CPU_40 CCPU provider keeps
- * sas_overwrite_memory as a direct physical-range invalidation function;
- * it is not a SAS vector member declared by sas4gen.h.  Publish its exact
- * fixed-width address/length contract so both native host targets compile
- * the original callers without an implicit-int call ABI. */
-extern void sas_overwrite_memory IPT2(PHY_ADDR, addr, PHY_ADDR, len);
-
 #ifdef NTVDM
 #ifdef CCPU
 extern IU8 *c_GetLinAdd IPT1(IU32, lin_addr);
@@ -113,11 +106,7 @@ extern IU8 *NtGetPtrToLinAddrByte IPT1(IU32, lin_addr);
  */
 
 extern host_addr Start_of_M_area;       /* host addr (char *) of start of M */
-/* DIVERGENCE(MVDM-HOST-DIV-055): this is a guest physical byte count, not
- * an address in the host process.  Keep it at the original CCPU physical
- * address width so c_sas_memory_size and every physical range check retain
- * one x86/x64-independent contract. */
-extern  PHY_ADDR Length_of_M_area;       /* offset of end of M */
+extern  IHPE    Length_of_M_area;       /* offset of end of M */
 #else /* CPU_40_STYLE */
 #define sas_set_buf(buf,addr)	buf=get_byte_addr(addr)
 

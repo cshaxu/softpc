@@ -2,22 +2,25 @@
 
 ## Current Work
 
-### M1 T2 S3 P1: Classify remaining declaration and carrier overlays
+### M1 T2 S5 P1: Externalize remaining generated CCPU declaration overlays
 
 - **Owner:** repository owner (single-person dual-role execution)
-- **Input boundary:** the remaining CCPU and `base/inc` semantic-diff rows
-  classified `port-abi-overlay`.
-- **Output boundary:** a declaration/carrier roster distinguishing generated
-  source overlays from compiler declarations that can live in port ABI headers.
-- **Scope:** inspect only type widths, return carriers, and missing prototypes.
-  Preserve machine execution and all guest-visible values.
-- **Non-goals:** do not implement host contracts, runtime policy, devices, or
-  BOP/BIOS behavior.
-- **Focused verification:** each proposed overlay is traced to an actual
-  source definition and selected compile consumer on both widths.
-- **Stop condition:** stop if a candidate changes a guest-visible value.
-- **Exit criteria:** every remaining CCPU/declaration row has one minimal,
-  testable extraction method and no duplicate declaration strategy.
+- **Input boundary:** the selected original CCPU generated-source inputs
+  identified in the declaration roster, beginning with `c_main.c` and
+  `ntstubs.c`.
+- **Output boundary:** generated compilation inputs plus narrowly scoped
+  port-ABI declarations for pre-existing standalone providers.
+- **Scope:** externalize only missing prototypes, native pointer carriers, and
+  historic C grammar incompatibilities necessary to compile the selected
+  CCPU executor on both widths.
+- **Non-goals:** do not alter executor control flow, BOP dispatch, guest
+  register values, controller behavior, or runtime pacing.
+- **Focused verification:** source hashes, generated-output idempotence,
+  dual-width rebuild, and bounded BOP smoke.
+- **Stop condition:** stop if an overlay needs a change to emitted CCPU rule
+  logic or guest-visible state.
+- **Exit criteria:** each admitted generated-source input is pristine in the
+  tree and has one traceable, repeatable compilation overlay.
 
 ## Current Technical Baseline
 
