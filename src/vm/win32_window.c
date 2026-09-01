@@ -15,6 +15,7 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
  * guest to tens of thousands of instructions per second. */
 #define SOFTPC_RUN_SLICE 50000u
 #define SOFTPC_DISPLAY_CADENCE_MS 50u
+#define SOFTPC_STANDARD_TICKS_PER_SECOND 8000000u
 #define SOFTPC_INPUT_QUEUE_CAPACITY 128u
 #define SOFTPC_VGA_MODE13_WIDTH 320
 #define SOFTPC_VGA_MODE13_HEIGHT 200
@@ -54,6 +55,54 @@ static int softpc_window_pending_mouse_dy;
 static uint8_t softpc_window_pending_mouse_left;
 static uint8_t softpc_window_pending_mouse_right;
 static int softpc_window_mouse_pending;
+
+typedef struct softpc_window_pacing {
+    LARGE_INTEGER frequency;
+    LARGE_INTEGER host_origin;
+    uint64_t machine_origin;
+    int valid;
+} softpc_window_pacing;
+
+static softpc_window_pacing softpc_window_pacing_state;
+
+/* This mirrors NXVM's standard-speed policy: execution progress has a stable
+ * virtual rate (8 MHz) and the host waits only when it gets ahead.  Unlike a
+ * fixed sleep after every slice, an oversleep is naturally repaid by later
+ * slices running without delay. */
+static void softpc_window_pace(const softpc_machine *machine)
+{
+    LARGE_INTEGER now;
+    uint64_t elapsed_instructions;
+    uint64_t target_ticks;
+
+    if (machine == NULL || !QueryPerformanceFrequency(
+            &softpc_window_pacing_state.frequency) ||
+        !QueryPerformanceCounter(&now)) return;
+    if (!softpc_window_pacing_state.valid) {
+        softpc_window_pacing_state.host_origin = now;
+        softpc_window_pacing_state.machine_origin =
+            softpc_machine_executed_instructions(machine);
+        softpc_window_pacing_state.valid = 1;
+        return;
+    }
+    elapsed_instructions = softpc_machine_executed_instructions(machine) -
+        softpc_window_pacing_state.machine_origin;
+    target_ticks = (elapsed_instructions / SOFTPC_STANDARD_TICKS_PER_SECOND) *
+        (uint64_t)softpc_window_pacing_state.frequency.QuadPart +
+        ((elapsed_instructions % SOFTPC_STANDARD_TICKS_PER_SECOND) *
+        (uint64_t)softpc_window_pacing_state.frequency.QuadPart) /
+        SOFTPC_STANDARD_TICKS_PER_SECOND;
+    while ((uint64_t)(now.QuadPart -
+            softpc_window_pacing_state.host_origin.QuadPart) < target_ticks) {
+        uint64_t remaining = target_ticks - (uint64_t)(now.QuadPart -
+            softpc_window_pacing_state.host_origin.QuadPart);
+        DWORD milliseconds = (DWORD)((remaining * 1000u) /
+            (uint64_t)softpc_window_pacing_state.frequency.QuadPart);
+        if (milliseconds > 1u) Sleep(milliseconds - 1u);
+        else SwitchToThread();
+        if (!QueryPerformanceCounter(&now)) break;
+    }
+}
 
 static void softpc_window_queue_key(BYTE key_number, int released)
 {
@@ -178,10 +227,7 @@ static DWORD WINAPI softpc_window_run_machine(void *opaque)
             LeaveCriticalSection(&softpc_window_machine_lock);
             next_snapshot = GetTickCount() + SOFTPC_DISPLAY_CADENCE_MS;
         }
-        /* Yield without imposing a timer-granularity delay on every CCPU
-           slice.  The separate UI thread remains responsive and the host
-           scheduler can run an equal-priority RDP/UI worker immediately. */
-        Sleep(0u);
+        softpc_window_pace(machine);
     }
     return 0u;
 }
@@ -448,6 +494,7 @@ int softpc_vm_run_window(softpc_machine *machine)
     softpc_window_pending_mouse_left = 0u;
     softpc_window_pending_mouse_right = 0u;
     softpc_window_mouse_pending = 0;
+    softpc_window_pacing_state.valid = 0;
     InterlockedExchange(&softpc_window_runner_active, 0);
     InterlockedExchange(&softpc_window_runner_failed, 0);
     InitializeCriticalSection(&softpc_window_machine_lock);
