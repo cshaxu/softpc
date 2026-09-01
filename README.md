@@ -1,5 +1,10 @@
 # SoftPC VM
 
+Project governance, target architecture, and the ordered recovery plan are in
+[docs/README.md](docs/README.md). The current executable remains a
+transitional baseline; do not treat its temporary standalone branches as the
+approved final architecture.
+
 Standalone PC virtual machine built around the recovered SoftPC machine
 source, without NTVDM, DOS/WOW, VDD, BOP service dispatch, or an NTVDM host
 process.  The machine shape is fixed to the currently selected SoftPC
