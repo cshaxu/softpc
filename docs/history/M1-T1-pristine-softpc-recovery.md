@@ -30,3 +30,9 @@ It enumerates 115 non-identical current C/H files: 106 original peers assigned
 the compatibility host or runtime is redesigned. Any host-width declaration
 needed to compile belongs to a mechanically explainable port-ABI boundary, not
 to scheduler or product behavior in machine source.
+
+**Progress evidence:** [S2 execution-boundary evidence](../etc/evidence/m1-t1-s2-execution-boundary.md)
+records the recovered source flow, external `EDL_fast_bop` contract, successful
+x64 CCPU compile/link, and BOP smoke. It also records why the old full CTest
+cannot close this task: its transitional run-slice contract is unbounded once
+the CCPU instruction-budget workaround is correctly removed.

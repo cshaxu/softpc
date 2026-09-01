@@ -27,6 +27,7 @@ Actual worker routines are spun off elsewhere.
 #endif	/* PIG */
 #include CpuH
 /* #include "event.h" */	/* Event Manager         */
+#include  <bios.h>	/* need access to bop */
 #include  <debug.h>
 #include  <config.h>
 #include <c_main.h>	/* C CPU definitions-interfaces */
@@ -537,26 +538,12 @@ extern IBOOL checkForQEvent IPT0();
 		}					\
 	}
 
-/* The historical non-SFELLOW CCPU build discarded SIGALRM because its
- * platform owned no usable host event route.  A standalone machine receives
- * its real host timer and frontend wake requests through the ports below. */
-#ifndef SOFTPC_STANDALONE
 #ifdef host_timer_event
 #undef host_timer_event
 #endif
 
 #define host_timer_event()
-#endif
 #endif	/* SFELLOW */
-
-#ifdef SOFTPC_STANDALONE
-/* The detached host timer only records elapsed time from its worker thread.
-   Keep all original device clock work on this executor thread, including
-   nested host_simulate() calls made by ROM BOP services. */
-extern IBOOL softpc_platform_consume_clock_tick(void);
-extern IBOOL softpc_platform_consume_executor_wake(void);
-extern void softpc_platform_wait_for_executor_event(void);
-#endif
 
 #ifdef SFELLOW
 extern int ica_intack IPT0();
@@ -811,24 +798,6 @@ IFN1(
    goto NEXT_INST;
 
 DO_INST:
-
-#ifdef SOFTPC_STANDALONE
-   /* A standalone public run slice returns when its instruction budget is
-      spent.  Original device BOPs may recursively enter host_simulate() to
-      execute a short ROM sequence ending in BOP FE; that nested execution
-      must not consume or prematurely exhaust the caller's public budget. */
-   {
-   extern IU32 softpc_ccpu_instruction_budget;
-   extern IBOOL softpc_ccpu_instruction_budget_active;
-   if (softpc_ccpu_instruction_budget_active && simulate_level == 1)
-      {
-      if (softpc_ccpu_instruction_budget == 0)
-         c_cpu_unsimulate();
-      --softpc_ccpu_instruction_budget;
-      }
-   }
-#endif
-
 
    /* INSIGNIA debugging */
 #ifdef	PIG
@@ -3337,53 +3306,64 @@ TYPEC3:
 TYPEC4:
 
       modRM = GET_INST_BYTE(p);
-      /* SoftPC reserves the otherwise-invalid LES register encodings
-         C4 C4..C7 for BIOS Operation calls.  The byte after that prefix is
-         the service number; C5..C7 additionally carry a little-endian
-         argument.  Keep ordinary LES/LDS behaviour unchanged. */
-      if (instp32p32 == LES && modRM >= 0xc4 && modRM <= 0xc7) {
-         IU32 bop_argument = 0;
-         IU8 bop_number = GET_INST_BYTE(p);
-         IU8 bop_argument_bytes = (IU8)(modRM - 0xc4);
-         IU8 bop_argument_index;
-         extern ISM32 in_C;
-         extern IBOOL softpc_device_bop_dispatch IPT2(IU8, number,
-             IU32, argument);
+      if (((modRM & 0xfc) == 0xc4) && (instp32p32 == LES)) {
+         /*
+          * It's a c4c? BOP.
+          * The bop routine itself will read the argument, but
+          * we read it here so that we get the next EIP correct.
+          */
+         int nField, i;
 
-         for (bop_argument_index = 0; bop_argument_index < bop_argument_bytes;
-              ++bop_argument_index)
-            bop_argument |= (IU32)GET_INST_BYTE(p) <<
-                (8 * bop_argument_index);
-         /* A BIOS Operation may recursively enter host_simulate().  As in
-            the original BOP decoder, publish the post-BOP guest IP before
-            invoking its C service so nested execution returns after it. */
+         D_Ib(0);
+         nField = modRM & 3;
+         immed = 0;
+         for (i = 0; i < nField; i++)
+         {
+            immed |= (ULONG)GET_INST_BYTE(p);
+            immed <<= 8;
+         }
+         immed |= ops[0].sng;
+#ifdef	PIG
+         if (immed == 0xfe)
+            SET_EIP(CCPU_save_EIP);
+         else
+            UPDATE_INTEL_IP(p);
+         CANCEL_HOST_IP();
+         PIG_SYNCH(CHECK_NO_EXEC);	/* Everything checkable up to this point */
+#else	/* PIG */
          UPDATE_INTEL_IP(p);
-         /* BIOS4 uses BOP FE as the original return trampoline for nested
-            host_simulate() ROM calls.  It is executor mechanics, not a
-            product BOP, and must unwind the current CCPU simulation level. */
-         if (bop_number == 0xfe) {
-            c_cpu_unsimulate();
-            break;
+         if ((immed & 0xff) == 0xfe)
+         {
+            switch(immed)
+            {
+#if defined(SFELLOW)
+            case 0x03fe:
+               SfdelayUSecs();
+               break;
+            case 0x05fe:
+               SfsasTouchBop();
+               break;
+            case 0x06fe:
+               SfscatterGatherSasTouch();
+               break;
+#endif /* SFELLOW */
+            case 0xfe:
+               c_cpu_unsimulate();
+               /* Never returns (?) */
+            default:
+               EDL_fast_bop(immed);
+               break;
+            }
          }
-         /* Preserve the original executor's C-service boundary.  A device
-            BOP may recursively invoke host_simulate(); its return path
-            depends on in_C denoting that execution has re-entered C. */
-         in_C = 1;
-         if (!softpc_device_bop_dispatch(bop_number, bop_argument)) {
+         else
+         {
+            in_C = 1;
+            bop(ops[0].sng);
             in_C = 0;
-            Int6();
-            break;
          }
-         in_C = 0;
          CANCEL_HOST_IP();
          SYNCH_TICK();
-         break;
-      }
-      /* LES requires a memory operand.  The historical product used this
-         invalid register encoding for a BIOS Operation.  Other invalid
-         register encodings retain the architectural invalid-opcode fault. */
-      if (((modRM & 0xc0) == 0xc0) && (instp32p32 == LES)) {
-         Int6();
+#endif	/* PIG */
          break;
       }
       if ( GET_OPERAND_SIZE() == USE16 )
@@ -3502,10 +3482,6 @@ TYPEC4:
       D_Ib(0);
       UPDATE_INTEL_IP(p);
       start_trap = 0;   /* clear any pending TF exception */
-      if (getenv("SOFTPC_TRACE_INTERRUPTS") != NULL)
-         fprintf(stderr, "(%04x:%08lx)Software interrupt:- %02x.\n",
-            GET_CS_SELECTOR(), (unsigned long)GET_EIP(),
-            (unsigned int)ops[0].sng);
       INTx(ops[0].sng);
       CANCEL_HOST_IP();
       PIG_SYNCH(CHECK_ALL);
@@ -3663,8 +3639,23 @@ TYPED4:
 
    case 0xd5:   /* T2 AAD Ib */   inst32 = AAD;   goto TYPED4;
 
-   case 0xd6:   /* SALC is not part of the fixed 386 instruction subset. */
-      Int6();
+   case 0xd6:   /* T2 BOP Ib */
+      D_Ib(0);
+      UPDATE_INTEL_IP(p);
+
+      PIG_SYNCH(CHECK_NO_EXEC);
+
+#ifndef	PIG
+      if (ops[0].sng == 0xfe)
+      {
+         c_cpu_unsimulate();
+      }
+      in_C = 1;
+      bop(ops[0].sng);
+      in_C = 0;
+      CANCEL_HOST_IP();
+#endif	/* PIG */
+      SYNCH_TICK();
       break;
 
    case 0xd7:   /* T2 XLAT Z */
@@ -4016,29 +4007,6 @@ TYPEE8:
 	    cpu_interrupt_map &= ~CPU_SIGALRM_EXCEPTION_MASK;
 	    host_timer_event();
 	    }
-
-#ifdef SOFTPC_STANDALONE
-	 if (softpc_platform_consume_clock_tick())
-	    {
-	    host_timer_event();
-	    /* The original wait loop owns device pacing.  Yield only after one
-	       real 20Hz host tick, so FDC/PIT/controller semantics remain intact
-	       while the standalone console/window can poll input between ticks. */
-	    {
-	    extern IBOOL softpc_ccpu_instruction_budget_active;
-	    if (softpc_ccpu_instruction_budget_active && simulate_level == 1)
-	       c_cpu_unsimulate();
-	    }
-	    }
-	 if (softpc_platform_consume_executor_wake())
-	    {
-	    extern IBOOL softpc_ccpu_instruction_budget_active;
-	    if (softpc_ccpu_instruction_budget_active && simulate_level == 1)
-	       c_cpu_unsimulate();
-	    }
-	 else
-	    softpc_platform_wait_for_executor_event();
-#endif
 
 #ifndef	PROD
 	 if (cpu_interrupt_map & CPU_SAD_EXCEPTION_MASK)
@@ -4401,17 +4369,6 @@ TYPEFF_3:
       host_timer_event();
       }
 
-#ifdef SOFTPC_STANDALONE
-   if (softpc_platform_consume_clock_tick())
-      host_timer_event();
-   if (softpc_platform_consume_executor_wake())
-      {
-      extern IBOOL softpc_ccpu_instruction_budget_active;
-      if (softpc_ccpu_instruction_budget_active && simulate_level == 1)
-         c_cpu_unsimulate();
-      }
-#endif
-
    if (cpu_interrupt_map & CPU_SAD_EXCEPTION_MASK)
       {
       cpu_interrupt_map &= ~CPU_SAD_EXCEPTION_MASK;
@@ -4465,17 +4422,10 @@ TYPEFF_3:
 
 	 cpu_hw_interrupt_number = ica_intack(&hook_address);
 	 cpu_interrupt_map &= ~CPU_HW_INT_MASK;
-	 /* CPU_40-style ICA may reject a stale notification after a controller
-	    callback has consumed it.  The historical CCPU local is unsigned, so
-	    forwarding -1 to do_intrupt() incorrectly indexes vector FFFFh and
-	    sends a standalone guest into zero/unmapped memory. */
-	 if (cpu_hw_interrupt_number != (IU16)-1)
-	    {
-	    EXT = EXTERNAL;
-	    SYNCH_TICK();
-	    do_intrupt(cpu_hw_interrupt_number, FALSE, FALSE, (IU16)0);
-	    CCPU_save_EIP = GET_EIP();   /* to reflect IP change */
-	    }
+	 EXT = EXTERNAL;
+	 SYNCH_TICK();
+	 do_intrupt(cpu_hw_interrupt_number, FALSE, FALSE, (IU16)0);
+	 CCPU_save_EIP = GET_EIP();   /* to reflect IP change */
       }
 #else	/* SFELLOW */
    if (GET_IF() && (cpu_interrupt_map & (CPU_HW_INT_MASK | CPU_HW_NPX_INT_MASK)))

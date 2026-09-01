@@ -159,6 +159,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/host/src/nt_cga.c
     src/core/softpc/host/src/nt_com.c
     src/core/softpc/host/src/nt_vga.c
+    src/host/softpc_compat/edl_fast_bop.c
     src/core/softpc_standalone_dib.c
     src/core/softpc_device_bop.c
     src/core/softpc_gfi_image.c
