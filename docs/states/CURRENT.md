@@ -22,6 +22,14 @@
   delivery was rejected. It changed original POST timing and left the
   dual-media reset probe CPU-bound. The trial was removed rather than retained
   as an unverified runtime layer.
+- **S2 P1 result:** original `nt_timer.c` proves that `host_timer_event()` is
+  a CCPU-thread event-consumption point, not a general CCPU return boundary.
+  Its required producer is the original heartbeat sequence
+  `ICA lock -> time_tick/RTC -> CPU_TIMER_TICK`; the detached platform has
+  only an unconsumed timer-queue counter and a no-lock `ica.c` branch. M3 may
+  not recreate that producer because the resulting host-thread controller
+  mutation is this packet's stop condition. The M2 timer/ICA compatibility
+  package is therefore a hard predecessor; see the updated S1 evidence.
 - **Non-goals:** no controller/device rewrite, ROM/BOP change, guest-media
   mutation, selectable profile/session, frontend styling, or Windows Setup
   completion claim in this S.

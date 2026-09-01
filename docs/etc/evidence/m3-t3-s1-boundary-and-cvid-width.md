@@ -57,3 +57,37 @@ original reset/FDC POST behavior. The runtime remained in POST and the
 existing dual-media reset probe became CPU-bound. The implementation and its
 generated-hook rule were removed. A future M3 task must restore the original
 host-event delivery contract independently of mailbox lifecycle work.
+
+## S2 P1 Source-Backed Rendezvous Result
+
+The original `host/src/nt_timer.c` establishes the actual Windows SoftPC
+ordering. Its heartbeat thread enters the original ICA critical section,
+advances `time_tick()` and RTC work, then calls
+`cpu_interrupt(CPU_TIMER_TICK, 0)`. In the selected CCPU40 build this is
+`c_cpu_interrupt(CPU_TIMER_TICK, 0)`. At the next CCPU interrupt check,
+including the HLT loop, the original executor clears
+`CPU_SIGALRM_EXCEPTION_MASK` and invokes `host_timer_event()` on the CCPU
+thread.
+
+That makes `host_timer_event()` a valid original **input/event consumption
+point**: a future copied input mailbox may be drained there by the executor.
+It is not a CCPU return, pause, reset, stop, or media-swap boundary. The only
+ordinary CCPU outward transfer remains the nested `host_simulate()`/BOP-FE
+path already rejected in S1.
+
+The detached platform currently has a 50 ms timer-queue callback that only
+increments `softpc_clock_pending_ticks`; no compiled source consumes that
+pending value. Its `ica.c` build is the non-NTVDM source branch, where
+`host_ica_lock()` and `host_ica_unlock()` are empty. Consequently making that
+callback call `time_tick()` would introduce unsynchronised controller mutation
+from a host worker and violate both M3's stop condition and the runtime
+proposal. It must not be repaired by a generated instruction hook, UI slice,
+or a new guest clock.
+
+The required predecessor is the queued M2 timer/ICA host-compatibility
+package: recover the finite original heartbeat order and its locking boundary
+through the port-ABI/host-compat layers, without importing NTVDM lifecycle,
+WOW, console-server, or product service code. Only after that package has a
+bounded dual-media proof can M3 attach a mailbox callback to the original
+`host_timer_event()` consumption point. A separate owner-approved lifecycle
+boundary is still required for pause, reset, stop, and live media swap.
