@@ -231,6 +231,19 @@ def transform_ccpu_main(source: str) -> str:
                             'SET_EIP(GET_EIP() + CCPU_INSTRUCTION_DELTA(x));')
     source = source.replace('SET_EIP(GET_EIP() + DIFF_INST_BYTE(*q, p_start));',
                             'SET_EIP(GET_EIP() + CCPU_INSTRUCTION_DELTA(*q));')
+    # ntthread.c is the original CCPU TLS simulation-stack implementation.
+    # Select only that host-thread storage mechanism for the standalone
+    # runtime; defining NTVDM would incorrectly import unrelated product
+    # branches across the rest of the machine.
+    source = source.replace(
+        '#ifdef NTVDM\n#include <ntthread.h>\n#endif',
+        '#if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)\n'
+        '#include <ntthread.h>\n#endif',
+    )
+    source = source.replace(
+        '#ifdef NTVDM\n',
+        '#if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)\n',
+    )
     return source
 
 

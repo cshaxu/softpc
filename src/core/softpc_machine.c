@@ -36,6 +36,9 @@ extern void mouse_send(int delta_x, int delta_y, int left, int right);
 extern void time_strobe(void);
 extern void host_timer_shutdown(void);
 extern void softpc_platform_set_boot_clock(int active);
+extern void softpc_platform_set_runtime_heartbeat(int enabled);
+extern void softpc_platform_set_executor_callback(void (*callback)(void *),
+    void *context);
 extern void q_event_init(void);
 extern void tic_event_init(void);
 extern void mouse_driver_initialisation(void);
@@ -251,6 +254,19 @@ void softpc_machine_request_wake(softpc_machine *machine)
         softpc_platform_request_executor_wake();
 }
 
+void softpc_machine_set_heartbeat(softpc_machine *machine, int enabled)
+{
+    if (machine == NULL || !machine->reset) return;
+    softpc_platform_set_runtime_heartbeat(enabled);
+}
+
+void softpc_machine_set_executor_callback(softpc_machine *machine,
+    softpc_machine_executor_callback callback, void *context)
+{
+    if (machine == NULL) return;
+    softpc_platform_set_executor_callback((void (*)(void *))callback, context);
+}
+
 softpc_machine_result softpc_machine_instruction_pointer(
     const softpc_machine *machine, uint16_t *cs, uint32_t *eip)
 {
@@ -349,6 +365,8 @@ int softpc_machine_presentation_cursor(const softpc_machine *machine,
 void softpc_machine_destroy(softpc_machine *machine)
 {
     if (machine != NULL && machine->hardware_initialized) {
+        softpc_platform_set_runtime_heartbeat(0);
+        softpc_platform_set_executor_callback(NULL, NULL);
         host_timer_shutdown();
         host_lpt_close_all();
         host_com_close_all();

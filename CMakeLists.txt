@@ -233,6 +233,7 @@ endif()
 add_library(softpc-ccpu-core OBJECT
     ${SOFTPC_CCPU_SOURCES}
     "${SOFTPC_CCPU_NTSTUBS_SOURCE}"
+    src/core/softpc/base/ccpu386/ntthread.c
     src/core/softpc/base/ccpu386/softpc_ccpu_facade.c
     "${SOFTPC_CCPU_VGLOB_SOURCE}"
     ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
@@ -333,6 +334,7 @@ set_target_properties(softpc-port-abi PROPERTIES
     C_EXTENSIONS ON)
 target_compile_definitions(softpc-ccpu-core PRIVATE
     CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1
+    SOFTPC_CCPU_TLS_SIMSTACK=1
     SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 target_compile_definitions(softpc-machine-devices PRIVATE
     CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1

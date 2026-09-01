@@ -53,15 +53,21 @@ static HANDLE softpc_executor_event;
 static volatile LONG softpc_clock_pending_ticks;
 static volatile LONG softpc_executor_wake_pending;
 static volatile LONG softpc_boot_clock_active;
+static volatile LONG softpc_runtime_heartbeat_enabled;
+static void (*softpc_executor_callback)(void *);
+static void *softpc_executor_callback_context;
 
 static VOID CALLBACK softpc_clock_tick(PVOID context, BOOLEAN fired)
 {
     UNUSED(context);
     UNUSED(fired);
-    /* CCPU and the restored controller state are single-threaded.  The
-       Windows timer worker must therefore only publish elapsed host time;
-       the executor consumes it at an instruction boundary. */
-    (void)InterlockedIncrement(&softpc_clock_pending_ticks);
+    /* Before a runtime owns CCPU, retain the legacy test producer.  A live
+       runtime uses the original CPU_TIMER_TICK publication; controller work
+       is still consumed only on CCPU's own thread. */
+    if (InterlockedCompareExchange(&softpc_runtime_heartbeat_enabled, 0, 0) != 0)
+        c_cpu_interrupt(CPU_TIMER_TICK, 0);
+    else
+        (void)InterlockedIncrement(&softpc_clock_pending_ticks);
     if (softpc_executor_event != NULL) SetEvent(softpc_executor_event);
 }
 #endif
@@ -123,6 +129,23 @@ void softpc_platform_set_boot_clock(int active)
 #else
     UNUSED(active);
 #endif
+}
+
+void softpc_platform_set_runtime_heartbeat(int enabled)
+{
+#ifdef _WIN32
+    (void)InterlockedExchange(&softpc_runtime_heartbeat_enabled,
+        enabled ? 1 : 0);
+#else
+    UNUSED(enabled);
+#endif
+}
+
+void softpc_platform_set_executor_callback(void (*callback)(void *),
+    void *context)
+{
+    softpc_executor_callback_context = context;
+    softpc_executor_callback = callback;
 }
 
 /* These are controller buffers, not a second video implementation.  The
@@ -942,6 +965,8 @@ void host_timer_event(void)
     host_lpt_heart_beat();
     time_strobe();
     PlayContinuousTone();
+    if (softpc_executor_callback != NULL)
+        (*softpc_executor_callback)(softpc_executor_callback_context);
 }
 
 void host_note_queue_added(IU32 value)

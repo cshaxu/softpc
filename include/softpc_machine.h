@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 typedef struct softpc_machine softpc_machine;
+typedef void (*softpc_machine_executor_callback)(void *context);
 
 typedef enum softpc_presentation {
     SOFTPC_PRESENTATION_CONSOLE,
@@ -56,6 +57,15 @@ softpc_machine_result softpc_machine_key_number(softpc_machine *machine,
 /* Wake an executor that is halted in guest idle without manufacturing a
  * timer/device tick. This is safe to call from a frontend input thread. */
 void softpc_machine_request_wake(softpc_machine *machine);
+/* The standalone runtime owns the original host heartbeat.  Legacy bounded
+ * test calls keep it disabled; a continuous executor enables it only after
+ * reset has returned to the public machine boundary. */
+void softpc_machine_set_heartbeat(softpc_machine *machine, int enabled);
+/* Called by the original CCPU host-timer event on the executor thread.  The
+ * callback must copy/consume host records only; it must not retain machine
+ * surfaces or invoke nested execution. */
+void softpc_machine_set_executor_callback(softpc_machine *machine,
+    softpc_machine_executor_callback callback, void *context);
 /* Inject relative host-pointer movement into the original Microsoft Bus
  * Mouse adapter. Button values are zero (up) or nonzero (down). */
 softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,
