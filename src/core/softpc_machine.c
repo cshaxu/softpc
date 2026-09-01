@@ -62,7 +62,6 @@ struct softpc_machine {
     int reset;
     int hardware_initialized;
     int mouse_driver_initialized;
-    uint64_t executed_instructions;
     char floppy_path[SOFTPC_MEDIA_PATH_MAX];
 };
 
@@ -113,7 +112,6 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
 softpc_machine_result softpc_machine_reset(softpc_machine *machine)
 {
     if (machine == NULL) return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    machine->executed_instructions = 0u;
     if (!machine->hardware_initialized) {
         sas_init(machine->memory_bytes);
         softpc_device_bop_register_machine_services();
@@ -236,13 +234,9 @@ softpc_machine_result softpc_machine_write_physical(softpc_machine *machine,
 softpc_machine_result softpc_machine_run(softpc_machine *machine,
     uint64_t instruction_budget)
 {
-    unsigned long requested_budget;
     if (machine == NULL || !machine->reset || instruction_budget == 0u)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    requested_budget = (unsigned long)instruction_budget;
-    if ((uint64_t)requested_budget != instruction_budget)
-        return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    softpc_ccpu_instruction_budget = requested_budget;
+    softpc_ccpu_instruction_budget = (unsigned long)instruction_budget;
     /* The original CCPU consumes CPU_TIMER_TICK at an instruction boundary.
        A standalone machine owns that heartbeat at the public slice boundary,
        rather than using the historical NTVDM timer thread.  Nested original
@@ -251,14 +245,7 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
     softpc_ccpu_instruction_budget_active = 1;
     c_cpu_simulate();
     softpc_ccpu_instruction_budget_active = 0;
-    machine->executed_instructions += (uint64_t)(requested_budget -
-        softpc_ccpu_instruction_budget);
     return SOFTPC_MACHINE_OK;
-}
-
-uint64_t softpc_machine_executed_instructions(const softpc_machine *machine)
-{
-    return machine == NULL ? 0u : machine->executed_instructions;
 }
 
 softpc_machine_result softpc_machine_instruction_pointer(

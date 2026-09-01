@@ -37,9 +37,6 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
 softpc_machine_result softpc_machine_reset(softpc_machine *machine);
 softpc_machine_result softpc_machine_run(softpc_machine *machine,
     uint64_t instruction_budget);
-/* Read-only execution progress for a host scheduler.  This is a machine
- * facade observation; it neither advances guest time nor exposes CCPU state. */
-uint64_t softpc_machine_executed_instructions(const softpc_machine *machine);
 softpc_machine_result softpc_machine_read_physical(const softpc_machine *machine,
     uint32_t address, void *buffer, uint32_t bytes);
 /* Copy bytes into guest physical RAM through the machine boundary.  This is

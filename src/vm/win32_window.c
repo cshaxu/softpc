@@ -8,6 +8,10 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 
 #define SOFTPC_TEXT_COLUMNS 80
 #define SOFTPC_TEXT_ROWS 25
+#define SOFTPC_TEXT_CELL_WIDTH 8
+#define SOFTPC_TEXT_CELL_HEIGHT 16
+#define SOFTPC_TEXT_SURFACE_WIDTH (SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_CELL_WIDTH)
+#define SOFTPC_TEXT_SURFACE_HEIGHT (SOFTPC_TEXT_ROWS * SOFTPC_TEXT_CELL_HEIGHT)
 #define SOFTPC_TIMER_ID 1u
 /* Match the standalone console's executor quantum.  The window has its own
  * UI thread and queued input, so it must not turn every 1,000 instructions
@@ -15,7 +19,6 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
  * guest to tens of thousands of instructions per second. */
 #define SOFTPC_RUN_SLICE 50000u
 #define SOFTPC_DISPLAY_CADENCE_MS 50u
-#define SOFTPC_STANDARD_TICKS_PER_SECOND 8000000u
 #define SOFTPC_INPUT_QUEUE_CAPACITY 128u
 #define SOFTPC_VGA_MODE13_WIDTH 320
 #define SOFTPC_VGA_MODE13_HEIGHT 200
@@ -26,6 +29,9 @@ extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 
 static softpc_machine *softpc_window_machine;
 static HFONT softpc_window_font;
+static HDC softpc_window_text_dc;
+static HBITMAP softpc_window_text_bitmap;
+static HGDIOBJ softpc_window_text_previous_bitmap;
 static int softpc_window_mouse_x;
 static int softpc_window_mouse_y;
 static int softpc_window_mouse_position_valid;
@@ -46,6 +52,11 @@ static unsigned short softpc_window_snapshot_attributes[SOFTPC_TEXT_COLUMNS *
     SOFTPC_TEXT_ROWS];
 static int softpc_window_snapshot_graphics;
 static int softpc_window_snapshot_valid;
+static unsigned char softpc_window_presented_text[SOFTPC_TEXT_COLUMNS *
+    SOFTPC_TEXT_ROWS];
+static unsigned short softpc_window_presented_attributes[SOFTPC_TEXT_COLUMNS *
+    SOFTPC_TEXT_ROWS];
+static int softpc_window_presented_text_valid;
 static unsigned char softpc_window_input_keys[SOFTPC_INPUT_QUEUE_CAPACITY];
 static unsigned char softpc_window_input_releases[SOFTPC_INPUT_QUEUE_CAPACITY];
 static unsigned int softpc_window_input_head;
@@ -55,54 +66,6 @@ static int softpc_window_pending_mouse_dy;
 static uint8_t softpc_window_pending_mouse_left;
 static uint8_t softpc_window_pending_mouse_right;
 static int softpc_window_mouse_pending;
-
-typedef struct softpc_window_pacing {
-    LARGE_INTEGER frequency;
-    LARGE_INTEGER host_origin;
-    uint64_t machine_origin;
-    int valid;
-} softpc_window_pacing;
-
-static softpc_window_pacing softpc_window_pacing_state;
-
-/* This mirrors NXVM's standard-speed policy: execution progress has a stable
- * virtual rate (8 MHz) and the host waits only when it gets ahead.  Unlike a
- * fixed sleep after every slice, an oversleep is naturally repaid by later
- * slices running without delay. */
-static void softpc_window_pace(const softpc_machine *machine)
-{
-    LARGE_INTEGER now;
-    uint64_t elapsed_instructions;
-    uint64_t target_ticks;
-
-    if (machine == NULL || !QueryPerformanceFrequency(
-            &softpc_window_pacing_state.frequency) ||
-        !QueryPerformanceCounter(&now)) return;
-    if (!softpc_window_pacing_state.valid) {
-        softpc_window_pacing_state.host_origin = now;
-        softpc_window_pacing_state.machine_origin =
-            softpc_machine_executed_instructions(machine);
-        softpc_window_pacing_state.valid = 1;
-        return;
-    }
-    elapsed_instructions = softpc_machine_executed_instructions(machine) -
-        softpc_window_pacing_state.machine_origin;
-    target_ticks = (elapsed_instructions / SOFTPC_STANDARD_TICKS_PER_SECOND) *
-        (uint64_t)softpc_window_pacing_state.frequency.QuadPart +
-        ((elapsed_instructions % SOFTPC_STANDARD_TICKS_PER_SECOND) *
-        (uint64_t)softpc_window_pacing_state.frequency.QuadPart) /
-        SOFTPC_STANDARD_TICKS_PER_SECOND;
-    while ((uint64_t)(now.QuadPart -
-            softpc_window_pacing_state.host_origin.QuadPart) < target_ticks) {
-        uint64_t remaining = target_ticks - (uint64_t)(now.QuadPart -
-            softpc_window_pacing_state.host_origin.QuadPart);
-        DWORD milliseconds = (DWORD)((remaining * 1000u) /
-            (uint64_t)softpc_window_pacing_state.frequency.QuadPart);
-        if (milliseconds > 1u) Sleep(milliseconds - 1u);
-        else SwitchToThread();
-        if (!QueryPerformanceCounter(&now)) break;
-    }
-}
 
 static void softpc_window_queue_key(BYTE key_number, int released)
 {
@@ -234,7 +197,6 @@ static DWORD WINAPI softpc_window_run_machine(void *opaque)
             if (input_applied && softpc_window_handle != NULL)
                 PostMessageA(softpc_window_handle, WM_APP + 1u, 0, 0);
         }
-        softpc_window_pace(machine);
     }
     return 0u;
 }
@@ -264,6 +226,55 @@ static COLORREF softpc_window_text_colour(unsigned int colour)
         RGB(255, 85, 85), RGB(255, 85, 255), RGB(255, 255, 85), RGB(255, 255, 255)
     };
     return palette[colour & 0x0fu];
+}
+
+/* Match NXVM's display ownership: GDI builds a local backing surface only
+ * when the published text frame changes; each paint then sends one BitBlt to
+ * the window/RDP transport rather than a sequence of remote TextOut calls. */
+static void softpc_window_update_text_surface(void)
+{
+    int row;
+
+    if (softpc_window_text_dc == NULL || softpc_window_font == NULL ||
+        (softpc_window_presented_text_valid && memcmp(
+            softpc_window_presented_text, softpc_window_snapshot_text,
+            sizeof(softpc_window_presented_text)) == 0 && memcmp(
+            softpc_window_presented_attributes,
+            softpc_window_snapshot_attributes,
+            sizeof(softpc_window_presented_attributes)) == 0)) return;
+    SelectObject(softpc_window_text_dc, softpc_window_font);
+    SetBkMode(softpc_window_text_dc, OPAQUE);
+    for (row = 0; row < SOFTPC_TEXT_ROWS; ++row) {
+        int column = 0;
+        while (column < SOFTPC_TEXT_COLUMNS) {
+            unsigned short attribute = softpc_window_snapshot_attributes[
+                row * SOFTPC_TEXT_COLUMNS + column];
+            char line[SOFTPC_TEXT_COLUMNS + 1];
+            int length = 0;
+            while (column + length < SOFTPC_TEXT_COLUMNS &&
+                softpc_window_snapshot_attributes[row * SOFTPC_TEXT_COLUMNS +
+                column + length] == attribute) {
+                unsigned char character = softpc_window_snapshot_text[
+                    row * SOFTPC_TEXT_COLUMNS + column + length];
+                line[length++] = character >= 0x20u && character < 0x7fu ?
+                    (char)character : ' ';
+            }
+            SetTextColor(softpc_window_text_dc,
+                softpc_window_text_colour(attribute));
+            SetBkColor(softpc_window_text_dc,
+                softpc_window_text_colour(attribute >> 4));
+            TextOutA(softpc_window_text_dc,
+                column * SOFTPC_TEXT_CELL_WIDTH,
+                row * SOFTPC_TEXT_CELL_HEIGHT, line, length);
+            column += length;
+        }
+    }
+    memcpy(softpc_window_presented_text, softpc_window_snapshot_text,
+        sizeof(softpc_window_presented_text));
+    memcpy(softpc_window_presented_attributes,
+        softpc_window_snapshot_attributes,
+        sizeof(softpc_window_presented_attributes));
+    softpc_window_presented_text_valid = 1;
 }
 
 static void softpc_window_deliver_virtual_key(WORD virtual_key,
@@ -313,7 +324,6 @@ static int softpc_window_mouse_y_from_lparam(LPARAM position)
 
 static void softpc_window_paint(HDC dc)
 {
-    int row;
     EnterCriticalSection(&softpc_window_snapshot_lock);
     if (softpc_window_snapshot_graphics) {
         LeaveCriticalSection(&softpc_window_snapshot_lock);
@@ -323,30 +333,11 @@ static void softpc_window_paint(HDC dc)
         }
         return;
     }
-    SelectObject(dc, softpc_window_font);
-    SetBkMode(dc, OPAQUE);
-    for (row = 0; row < SOFTPC_TEXT_ROWS; ++row) {
-        int column = 0;
-        while (column < SOFTPC_TEXT_COLUMNS) {
-            unsigned short attribute = softpc_window_snapshot_attributes[
-                row * SOFTPC_TEXT_COLUMNS + column];
-            char line[SOFTPC_TEXT_COLUMNS + 1];
-            int length = 0;
-            while (column + length < SOFTPC_TEXT_COLUMNS &&
-                softpc_window_snapshot_attributes[row * SOFTPC_TEXT_COLUMNS +
-                column + length] == attribute) {
-                unsigned char character = softpc_window_snapshot_text[
-                    row * SOFTPC_TEXT_COLUMNS + column + length];
-                line[length++] = character >= 0x20u && character < 0x7fu ?
-                    (char)character : ' ';
-            }
-            SetTextColor(dc, softpc_window_text_colour(attribute));
-            SetBkColor(dc, softpc_window_text_colour(attribute >> 4));
-            TextOutA(dc, 8 + column * 8, 8 + row * 16, line, length);
-            column += length;
-        }
-    }
+    softpc_window_update_text_surface();
     LeaveCriticalSection(&softpc_window_snapshot_lock);
+    if (softpc_window_text_dc != NULL)
+        BitBlt(dc, 8, 8, SOFTPC_TEXT_SURFACE_WIDTH, SOFTPC_TEXT_SURFACE_HEIGHT,
+            softpc_window_text_dc, 0, 0, SRCCOPY);
 }
 
 static void softpc_window_key(WPARAM key, LPARAM lparam, int released)
@@ -504,7 +495,6 @@ int softpc_vm_run_window(softpc_machine *machine)
     softpc_window_pending_mouse_left = 0u;
     softpc_window_pending_mouse_right = 0u;
     softpc_window_mouse_pending = 0;
-    softpc_window_pacing_state.valid = 0;
     InterlockedExchange(&softpc_window_runner_active, 0);
     InterlockedExchange(&softpc_window_runner_failed, 0);
     InitializeCriticalSection(&softpc_window_machine_lock);
@@ -512,6 +502,7 @@ int softpc_vm_run_window(softpc_machine *machine)
     InitializeCriticalSection(&softpc_window_snapshot_lock);
     softpc_window_snapshot_valid = 0;
     softpc_window_snapshot_graphics = 0;
+    softpc_window_presented_text_valid = 0;
     softpc_window_font = CreateFontA(16, 8, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
         OEM_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
         FIXED_PITCH | FF_MODERN, "Consolas");
@@ -523,6 +514,28 @@ int softpc_vm_run_window(softpc_machine *machine)
         DeleteCriticalSection(&softpc_window_input_lock);
         DeleteCriticalSection(&softpc_window_machine_lock);
         return 1;
+    }
+    {
+        HDC window_dc = GetDC(window);
+        if (window_dc != NULL) {
+            softpc_window_text_dc = CreateCompatibleDC(window_dc);
+            softpc_window_text_bitmap = CreateCompatibleBitmap(window_dc,
+                SOFTPC_TEXT_SURFACE_WIDTH, SOFTPC_TEXT_SURFACE_HEIGHT);
+            ReleaseDC(window, window_dc);
+        }
+        if (softpc_window_text_dc == NULL || softpc_window_text_bitmap == NULL) {
+            if (softpc_window_text_dc != NULL) DeleteDC(softpc_window_text_dc);
+            if (softpc_window_text_bitmap != NULL) DeleteObject(softpc_window_text_bitmap);
+            softpc_window_text_dc = NULL;
+            softpc_window_text_bitmap = NULL;
+            DestroyWindow(window);
+            DeleteCriticalSection(&softpc_window_snapshot_lock);
+            DeleteCriticalSection(&softpc_window_input_lock);
+            DeleteCriticalSection(&softpc_window_machine_lock);
+            return 1;
+        }
+        softpc_window_text_previous_bitmap = SelectObject(softpc_window_text_dc,
+            softpc_window_text_bitmap);
     }
     softpc_window_handle = window;
     ShowWindow(window, SW_SHOW);
@@ -551,6 +564,14 @@ int softpc_vm_run_window(softpc_machine *machine)
     DeleteCriticalSection(&softpc_window_machine_lock);
     DeleteCriticalSection(&softpc_window_input_lock);
     DeleteCriticalSection(&softpc_window_snapshot_lock);
+    if (softpc_window_text_dc != NULL) {
+        SelectObject(softpc_window_text_dc, softpc_window_text_previous_bitmap);
+        DeleteDC(softpc_window_text_dc);
+    }
+    DeleteObject(softpc_window_text_bitmap);
+    softpc_window_text_dc = NULL;
+    softpc_window_text_bitmap = NULL;
+    softpc_window_text_previous_bitmap = NULL;
     DeleteObject(softpc_window_font);
     softpc_window_font = NULL;
     softpc_window_machine = NULL;
