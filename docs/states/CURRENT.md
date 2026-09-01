@@ -2,24 +2,22 @@
 
 ## Current Work
 
-### M1 T2 S2 P1: Externalize the remaining CCPU GDP bridge
+### M1 T2 S3 P1: Classify remaining declaration and carrier overlays
 
 - **Owner:** repository owner (single-person dual-role execution)
-- **Input boundary:** the selected original CCPU `cpu4gen.h` and `vglob.c`,
-  plus the existing C-VID GDP side table and transformation script.
-- **Output boundary:** pristine CCPU inputs compiled through deterministic
-  transformed copies that add the private GDP slot declaration externally.
-- **Scope:** remove only direct `softpc_gdp_slots.h` inclusion from the two
-  CCPU sources. Preserve their generated spelling, execution flow, and VGA
-  global layout.
-- **Non-goals:** do not change C-VID rule behavior, BIOS/ROM/BOP, devices,
-  host services, or runtime scheduling.
-- **Focused verification:** transform idempotence; x64/x86 compile graphs use
-  the generated copies; focused BOP smoke passes on both widths.
-- **Stop condition:** stop if the transformed copies require a non-ABI change
-  to CCPU behavior or a product host service.
-- **Exit criteria:** neither pristine CCPU source includes the private GDP
-  slot header directly, and both builds consume the generated replacements.
+- **Input boundary:** the remaining CCPU and `base/inc` semantic-diff rows
+  classified `port-abi-overlay`.
+- **Output boundary:** a declaration/carrier roster distinguishing generated
+  source overlays from compiler declarations that can live in port ABI headers.
+- **Scope:** inspect only type widths, return carriers, and missing prototypes.
+  Preserve machine execution and all guest-visible values.
+- **Non-goals:** do not implement host contracts, runtime policy, devices, or
+  BOP/BIOS behavior.
+- **Focused verification:** each proposed overlay is traced to an actual
+  source definition and selected compile consumer on both widths.
+- **Stop condition:** stop if a candidate changes a guest-visible value.
+- **Exit criteria:** every remaining CCPU/declaration row has one minimal,
+  testable extraction method and no duplicate declaration strategy.
 
 ## Current Technical Baseline
 

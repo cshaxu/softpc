@@ -138,17 +138,59 @@ def transform_event_glue(source: str) -> str:
     return source
 
 
+def transform_ccpu_cpu4gen(source: str) -> str:
+    """Overlay the selected CCPU generated header without changing its input."""
+    marker = '#include <softpc_gdp_slots.h>\n'
+    if marker not in source:
+        source = source.replace(
+            '#include <gdpvar.h>\t/* For direct access getAX() etc. */\n',
+            '#include <gdpvar.h>\t/* For direct access getAX() etc. */\n' + marker,
+            1,
+        )
+    for name in ('c_setCS', 'c_setSS', 'c_setDS', 'c_setES'):
+        source = source.replace(
+            'IMPORT\tIUH\t%s\tIPT1(IU16, val);' % name,
+            'IMPORT\tISM32\t%s\tIPT1(IU16, val);' % name,
+        )
+    for name in ('c_getCF', 'c_getPF', 'c_getAF', 'c_getZF', 'c_getSF',
+                 'c_getTF', 'c_getIF', 'c_getDF', 'c_getOF'):
+        source = source.replace(
+            'IMPORT\tIBOOL\t%s\tIPT0();' % name,
+            'IMPORT\tISM32\t%s\tIPT0();' % name,
+        )
+    return source
+
+
+def transform_ccpu_vglob(source: str) -> str:
+    """Select the C-VID aggregate view and GDP slots outside pristine CCPU."""
+    source = source.replace('#include "Evid_c.h"\n',
+                            '#include "../cvidc/Evid_c.h"\n', 1)
+    marker = '#include <softpc_gdp_slots.h>\n'
+    if marker not in source:
+        source = source.replace('#include "gdpvar.h"\n',
+                                '#include "gdpvar.h"\n' + marker, 1)
+    return source
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=pathlib.Path)
     parser.add_argument("output", type=pathlib.Path)
     parser.add_argument("--report", type=pathlib.Path)
     parser.add_argument("--event-glue", action="store_true")
+    parser.add_argument("--ccpu-cpu4gen", action="store_true")
+    parser.add_argument("--ccpu-vglob", action="store_true")
     args = parser.parse_args()
 
     original = args.source.read_text(encoding="latin-1")
     if args.event_glue:
         generated = transform_event_glue(original)
+        static_count = dynamic_count = 1
+    elif args.ccpu_cpu4gen:
+        generated = transform_ccpu_cpu4gen(original)
+        static_count = dynamic_count = 1
+    elif args.ccpu_vglob:
+        generated = transform_ccpu_vglob(original)
         static_count = dynamic_count = 1
     else:
         generated, static_count, dynamic_count = transform_rules(original)

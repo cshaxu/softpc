@@ -17,11 +17,8 @@
 
 #include "insignia.h"
 #include "host_def.h"
-#include "../cvidc/Evid_c.h"
+#include "Evid_c.h"
 #include "gdpvar.h"
-/* DIVERGENCE(SOFTPC-PORT-048): see cpu4gen.h; this direct generated-header
- * consumer needs the same native-width private GDP slots. */
-#include <softpc_gdp_slots.h>
 
 /*
  * Note: no interfaces produced for the following 3.0 VGlob entries as

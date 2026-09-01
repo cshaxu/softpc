@@ -7,9 +7,6 @@
 #define _CPU4GEN_H_
 
 #include <gdpvar.h>	/* For direct access getAX() etc. */
-/* DIVERGENCE(SOFTPC-PORT-048): retain generated GDP spellings while the
- * matching private overlay supplies native-width slots on both host widths. */
-#include <softpc_gdp_slots.h>
 
 struct	CpuVector	{
 #ifdef	CPU_PRIVATE
@@ -778,10 +775,7 @@ IMPORT	void	setEIP	IPT1(IU32, val);
 #endif	/* CCPU */
 
 #ifdef	CCPU
-/* DIVERGENCE: c_reg.c defines the selected CCPU segment loaders as
- * ISM32(IU16).  Preserve the generated function shape with its actual
- * source return carrier so callers and the host selection table agree. */
-IMPORT	ISM32	c_setCS	IPT1(IU16, val);
+IMPORT	IUH	c_setCS	IPT1(IU16, val);
 #define	setCS(val)	c_setCS(val)
 #else	/* CCPU */
 
@@ -794,7 +788,7 @@ IMPORT	IUH	setCS	IPT1(IU16, val);
 #endif	/* CCPU */
 
 #ifdef	CCPU
-IMPORT	ISM32	c_setSS	IPT1(IU16, val);
+IMPORT	IUH	c_setSS	IPT1(IU16, val);
 #define	setSS(val)	c_setSS(val)
 #else	/* CCPU */
 
@@ -807,7 +801,7 @@ IMPORT	IUH	setSS	IPT1(IU16, val);
 #endif	/* CCPU */
 
 #ifdef	CCPU
-IMPORT	ISM32	c_setDS	IPT1(IU16, val);
+IMPORT	IUH	c_setDS	IPT1(IU16, val);
 #define	setDS(val)	c_setDS(val)
 #else	/* CCPU */
 
@@ -820,7 +814,7 @@ IMPORT	IUH	setDS	IPT1(IU16, val);
 #endif	/* CCPU */
 
 #ifdef	CCPU
-IMPORT	ISM32	c_setES	IPT1(IU16, val);
+IMPORT	IUH	c_setES	IPT1(IU16, val);
 #define	setES(val)	c_setES(val)
 #else	/* CCPU */
 
@@ -1717,10 +1711,7 @@ IMPORT	IU32	getCR3	IPT0();
 #endif	/* CCPU */
 
 #ifdef	CCPU
-/* DIVERGENCE: c_reg.c defines all CCPU flag getters as ISM32.  Use that
- * original implementation carrier rather than the incompatible generated
- * IBOOL declarations. */
-IMPORT	ISM32	c_getCF	IPT0();
+IMPORT	IBOOL	c_getCF	IPT0();
 #define	getCF()	c_getCF()
 #else	/* CCPU */
 
@@ -1733,7 +1724,7 @@ IMPORT	IBOOL	getCF	IPT0();
 #endif	/* CCPU */
 
 #ifdef	CCPU
-IMPORT	ISM32	c_getPF	IPT0();
+IMPORT	IBOOL	c_getPF	IPT0();
 #define	getPF()	c_getPF()
 #else	/* CCPU */
 
@@ -1746,7 +1737,7 @@ IMPORT	IBOOL	getPF	IPT0();
 #endif	/* CCPU */
 
 #ifdef	CCPU
-IMPORT	ISM32	c_getAF	IPT0();
+IMPORT	IBOOL	c_getAF	IPT0();
 #define	getAF()	c_getAF()
 #else	/* CCPU */
 
@@ -1759,7 +1750,7 @@ IMPORT	IBOOL	getAF	IPT0();
 #endif	/* CCPU */
 
 #ifdef	CCPU
-IMPORT	ISM32	c_getZF	IPT0();
+IMPORT	IBOOL	c_getZF	IPT0();
 #define	getZF()	c_getZF()
 #else	/* CCPU */
 
@@ -1772,7 +1763,7 @@ IMPORT	IBOOL	getZF	IPT0();
 #endif	/* CCPU */
 
 #ifdef	CCPU
-IMPORT	ISM32	c_getSF	IPT0();
+IMPORT	IBOOL	c_getSF	IPT0();
 #define	getSF()	c_getSF()
 #else	/* CCPU */
 
@@ -1785,7 +1776,7 @@ IMPORT	IBOOL	getSF	IPT0();
 #endif	/* CCPU */
 
 #ifdef	CCPU
-IMPORT	ISM32	c_getTF	IPT0();
+IMPORT	IBOOL	c_getTF	IPT0();
 #define	getTF()	c_getTF()
 #else	/* CCPU */
 
@@ -1798,7 +1789,7 @@ IMPORT	IBOOL	getTF	IPT0();
 #endif	/* CCPU */
 
 #ifdef	CCPU
-IMPORT	ISM32	c_getIF	IPT0();
+IMPORT	IBOOL	c_getIF	IPT0();
 #define	getIF()	c_getIF()
 #else	/* CCPU */
 
@@ -1811,7 +1802,7 @@ IMPORT	IBOOL	getIF	IPT0();
 #endif	/* CCPU */
 
 #ifdef	CCPU
-IMPORT	ISM32	c_getDF	IPT0();
+IMPORT	IBOOL	c_getDF	IPT0();
 #define	getDF()	c_getDF()
 #else	/* CCPU */
 
@@ -1824,7 +1815,7 @@ IMPORT	IBOOL	getDF	IPT0();
 #endif	/* CCPU */
 
 #ifdef	CCPU
-IMPORT	ISM32	c_getOF	IPT0();
+IMPORT	IBOOL	c_getOF	IPT0();
 #define	getOF()	c_getOF()
 #else	/* CCPU */
 

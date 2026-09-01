@@ -76,6 +76,37 @@ add_custom_command(
         "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
     COMMENT "Transforming C-VID event glue port ABI"
     VERBATIM)
+set(SOFTPC_CCPU_CPU4GEN_INPUT
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/cpu4gen.h")
+set(SOFTPC_CCPU_CPU4GEN_SOURCE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/cpu4gen.h")
+add_custom_command(
+    OUTPUT "${SOFTPC_CCPU_CPU4GEN_SOURCE}"
+    COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
+        --ccpu-cpu4gen "${SOFTPC_CCPU_CPU4GEN_INPUT}"
+        "${SOFTPC_CCPU_CPU4GEN_SOURCE}"
+    DEPENDS "${SOFTPC_CCPU_CPU4GEN_INPUT}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
+    COMMENT "Transforming CCPU GDP header port ABI"
+    VERBATIM)
+set(SOFTPC_CCPU_VGLOB_INPUT
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/vglob.c")
+set(SOFTPC_CCPU_VGLOB_SOURCE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/vglob.c")
+add_custom_command(
+    OUTPUT "${SOFTPC_CCPU_VGLOB_SOURCE}"
+    COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
+        --ccpu-vglob "${SOFTPC_CCPU_VGLOB_INPUT}"
+        "${SOFTPC_CCPU_VGLOB_SOURCE}"
+    DEPENDS "${SOFTPC_CCPU_VGLOB_INPUT}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
+    COMMENT "Transforming CCPU VGA global port ABI"
+    VERBATIM)
+add_custom_target(softpc-ccpu-port-abi-inputs
+    DEPENDS "${SOFTPC_CCPU_CPU4GEN_SOURCE}"
+            "${SOFTPC_CCPU_VGLOB_SOURCE}")
 # ``j_c_lang`` is the generated-rule register file.  It carries private host
 # pointers (not guest registers), so x64 needs a pointer-width IUH only at
 # this generated-rule ABI boundary.  On an x86 host, the original generated
@@ -93,7 +124,7 @@ add_library(softpc-ccpu-core OBJECT
     ${SOFTPC_CCPU_SOURCES}
     src/core/softpc/base/ccpu386/ntstubs.c
     src/core/softpc/base/ccpu386/softpc_ccpu_facade.c
-    src/core/softpc/base/ccpu386/vglob.c
+    "${SOFTPC_CCPU_VGLOB_SOURCE}"
     ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
     "${SOFTPC_CVIDC_EVENT_GLUE_SOURCE}"
     src/core/softpc/base/cvidc/evidfunc.c
@@ -103,6 +134,7 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/cvidc/sascdef.c)
 add_library(softpc-port-abi OBJECT
     src/core/softpc-port-abi/cvidc/softpc_gdp_state.c)
+add_dependencies(softpc-ccpu-core softpc-ccpu-port-abi-inputs)
 
 # Controllers, firmware and the standalone host boundary evolve independently
 # of the CCPU/C-VIDC executor.  Keep them in a separate object target so a
@@ -198,6 +230,7 @@ target_compile_definitions(softpc-port-abi PRIVATE
     CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1
     SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 target_include_directories(softpc-ccpu-core PRIVATE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu"
     src/core/softpc-port-abi/cvidc
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
