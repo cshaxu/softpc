@@ -2,53 +2,43 @@
 
 ## Current Work
 
-### M3 T3 S2 P1: Establish a safe single-executor rendezvous
+### M2 T4 S1: Recover original timer/ICA host compatibility
 
 - **Owner and mode:** repository owner; single-person dual-role execution.
-- **Admission and approval:** the owner approved the NXVM-style standalone
-  architecture and instructed continued execution: one executor owns SoftPC,
-  frontends communicate by mailbox, and original core/device/BIOS/BOP behavior
-  remains intact. S1 proved that an instruction budget is not a return
-  boundary.
-- **Input boundary:** the transitional console and window both call
-  `softpc_machine_run()`, apply input directly, and lock/read machine state.
-  This creates frontend pacing, cross-thread device mutation, and RDP latency.
-- **Objective and output boundary:** identify a generated CCPU rendezvous
-  that can drain copied records on the executor thread without repurposing
-  `c_cpu_unsimulate()`, BOP FE, instruction accounting, or timer delivery.
-  A runtime implementation is not admitted until that rendezvous has a
-  bounded real-media proof.
-- **Finding so far:** a trial that combined mailbox draining with CCPU timer
-  delivery was rejected. It changed original POST timing and left the
-  dual-media reset probe CPU-bound. The trial was removed rather than retained
-  as an unverified runtime layer.
-- **S2 P1 result:** original `nt_timer.c` proves that `host_timer_event()` is
-  a CCPU-thread event-consumption point, not a general CCPU return boundary.
-  Its required producer is the original heartbeat sequence
-  `ICA lock -> time_tick/RTC -> CPU_TIMER_TICK`; the detached platform has
-  only an unconsumed timer-queue counter and a no-lock `ica.c` branch. M3 may
-  not recreate that producer because the resulting host-thread controller
-  mutation is this packet's stop condition. The M2 timer/ICA compatibility
-  package is therefore a hard predecessor; see the updated S1 evidence.
-- **Non-goals:** no controller/device rewrite, ROM/BOP change, guest-media
-  mutation, selectable profile/session, frontend styling, or Windows Setup
-  completion claim in this S.
-- **Verification:** source-generation audit; a bounded dual-media POST probe;
-  x64/x86 existing BOP, timer and VGA checks. Only then admit a runtime
-  command/input/snapshot fixture.
-- **Asset needs:** synthetic fixture only; no guest media is required.
-- **Similar-issue sweep:** console, window, real-boot probe, HLT wake, timer
-  callback, nested `host_simulate`, and both width rows.
-- **Stop condition:** stop if the hook needs to mutate controller state from a
-  host thread, reinterpret BOP FE, inject a device tick, or retain raw machine
-  surface pointers outside the executor callback.
-- **Exit criteria:** a supported rendezvous contract with no timing or BOP
-  semantic change, then one executor and copied mailbox proof on both widths.
+- **Admission and approval:** the owner directed execution of the ordered
+  standalone SoftPC queue. M3/T3 established that the original timer/ICA
+  contract is the immediate prerequisite for the requested single-executor
+  NXVM-style runtime.
+- **Objective:** recover the finite original SoftPC host heartbeat contract:
+  an ICA synchronization boundary, worker-owned `time_tick()`/RTC progression,
+  and CCPU `CPU_TIMER_TICK` publication. Preserve original CCPU40, PIT/PIC,
+  CMOS/RTC, devices, BIOS, ROM/VGA ROM and BOP behavior.
+- **Input and output boundary:** input is the selected original
+  `host/src/nt_eoi.c`, `host/src/nt_timer.c`, `base/system/timestrb.c`, and
+  current standalone host port. Output is a reproducible port-ABI build
+  selection plus a `host/softpc-compat` Win32 capability implementation; no
+  standalone-only branch is added to pristine SoftPC source.
+- **Non-goals:** no NTVDM/WOW/DEM/CSR/VDD/product-service import; no controller
+  rewrite; no BOP selector change; no guest-media mutation; no runtime
+  mailbox/frontend conversion; no pause/reset/stop policy; no profile or
+  multi-session feature.
+- **Verification:** focused heartbeat/tick-cardinality fixture and bounded
+  dual-media POST probe, then x64 and x86 build plus the existing BOP, timer,
+  IRQ and VGA checks. User media and `build/output/softpc.ini` remain untouched.
+- **Similar-issue sweep:** `time_strobe`, RTC, PIT/IRQ0, HLT wake, FDC POST,
+  keyboard wake, timer start/stop/reset, ICA locking, x86/x64 CCPU40 builds.
+- **Stop condition:** a required dependency is NTVDM product behavior rather
+  than a finite machine/host capability; a change would require CCPU/BOP
+  semantics, a guest clock derived from instruction count, or unsynchronised
+  controller mutation.
+- **Exit criteria:** one original-source-shaped heartbeat path advances timer
+  and RTC work exactly once per host pulse under the recovered lock, publishes
+  `CPU_TIMER_TICK`, survives bounded dual-media POST, and passes focused x86
+  and x64 verification. Only then may M3 runtime be re-admitted.
 
 ## Current Technical Baseline
 
-The current runnable baseline is the direct-launch SoftPC VM on `main`. It is
-transitional: standalone-specific behavior still appears in original CCPU and
-original host-renderer paths. The target architecture is defined in
-[System Architecture](../design/ARCHITECTURE.md).  Local real-boot traces are
-uncommitted evidence and are not task inputs unless a later packet names them.
+The machine remains direct-launch transitional behavior on `main`. M3/T3
+closed its executor-boundary audit and transferred the timer/ICA prerequisite
+to this packet. The target architecture remains in
+[System Architecture](../design/ARCHITECTURE.md).
