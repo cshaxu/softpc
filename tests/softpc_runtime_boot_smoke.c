@@ -32,7 +32,8 @@ static int frame_has_prompt(const softpc_runtime_frame *frame)
             const uint8_t *text = &frame->text[row * SOFTPC_RUNTIME_TEXT_COLUMNS + column];
             if (((text[0] >= 'A' && text[0] <= 'Z') ||
                  (text[0] >= 'a' && text[0] <= 'z')) && text[1] == ':' &&
-                text[2] == '>') return 1;
+                (text[2] == '>' || (column + 3u < SOFTPC_RUNTIME_TEXT_COLUMNS &&
+                text[2] == '\\' && text[3] == '>'))) return 1;
         }
     }
     return 0;
@@ -44,14 +45,31 @@ static void send_enter(softpc_runtime *runtime)
     (void)softpc_runtime_enqueue_key(runtime, 0x1cu, 1u);
 }
 
+static void dump_frame(const softpc_runtime_frame *frame)
+{
+    unsigned int row;
+    if (frame == NULL || frame->valid == 0u) return;
+    for (row = 0u; row < SOFTPC_RUNTIME_TEXT_ROWS; ++row) {
+        char line[SOFTPC_RUNTIME_TEXT_COLUMNS + 1u];
+        unsigned int column;
+        for (column = 0u; column < SOFTPC_RUNTIME_TEXT_COLUMNS; ++column) {
+            unsigned char c = frame->text[row * SOFTPC_RUNTIME_TEXT_COLUMNS + column];
+            line[column] = c >= 0x20u && c < 0x7fu ? (char)c : ' ';
+        }
+        line[SOFTPC_RUNTIME_TEXT_COLUMNS] = '\0';
+        fprintf(stderr, "%s\n", line);
+    }
+}
+
 int main(int argc, char **argv)
 {
     softpc_machine_options options = { NULL, NULL, SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *machine = NULL;
     softpc_runtime *runtime = NULL;
-    softpc_runtime_frame *frame;
+    softpc_runtime_frame *frame = NULL;
     DWORD deadline;
     int date_sent = 0, time_sent = 0, success = 0;
+    int final_state = SOFTPC_RUNTIME_ERROR;
     if (argc != 5 || strcmp(argv[1], "--floppy") != 0 ||
         strcmp(argv[3], "--hdd") != 0) return 2;
     options.floppy_path = argv[2];
@@ -76,12 +94,15 @@ int main(int argc, char **argv)
         if (softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_ERROR) break;
         Sleep(10u);
     } while ((LONG)(GetTickCount() - deadline) < 0);
-    free(frame);
 done:
+    if (runtime != NULL) final_state = (int)softpc_runtime_get_state(runtime);
+    if (!success) dump_frame(frame);
+    free(frame);
     if (runtime != NULL) { (void)softpc_runtime_stop(runtime); softpc_runtime_destroy(runtime); }
     softpc_machine_destroy(machine);
     if (!success)
-        fprintf(stderr, "softpc-runtime-boot-smoke: prompt not reached\n");
+        fprintf(stderr, "softpc-runtime-boot-smoke: prompt not reached (state=%d)\n",
+            final_state);
     return success ? 0 : 1;
 }
 #else

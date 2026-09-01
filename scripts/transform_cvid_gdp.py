@@ -222,7 +222,8 @@ def transform_ccpu_main(source: str) -> str:
                                 '#include <fault.h>\n#include <ica.h>\n#include <timer.h>\n', 1)
     workers = '#include  <aaa.h>\t/* The workers */\n'
     declarations = ('extern void force_yoda(void);\n'
-                    'extern void TakeNpxExceptionInt(void);\n')
+                    'extern void TakeNpxExceptionInt(void);\n'
+                    'extern void softpc_platform_executor_event(void);\n')
     if declarations not in source:
         source = source.replace(workers, declarations + workers, 1)
     marker = '#define CCPU_INSTRUCTION_DELTA(x) ((IU32)DIFF_INST_BYTE((x), p_start))\n'
@@ -266,6 +267,30 @@ def transform_ccpu_main(source: str) -> str:
                       '      softpc_ccpu_lifecycle_leave();\n' +
                       simulation[closing:])
     source = source[:simulation_start] + simulation + source[restart_start:]
+    timer_event = re.compile(
+        r'(?P<indent>[ \t]*)if \(cpu_interrupt_map & '
+        r'CPU_SIGALRM_EXCEPTION_MASK\)\n'
+        r'(?P=indent)[ \t]*\{\n'
+        r'(?P=indent)[ \t]*cpu_interrupt_map &= '
+        r'~CPU_SIGALRM_EXCEPTION_MASK;\n'
+        r'(?P=indent)[ \t]*host_timer_event\(\);\n'
+        r'(?P=indent)[ \t]*\}\n'
+    )
+
+    def add_executor_event(match: re.Match[str]) -> str:
+        indent = match.group('indent')
+        return match.group(0) + (
+            '\n%sif (cpu_interrupt_map & CPU_SIGIO_EXCEPTION_MASK)\n'
+            '%s   {\n'
+            '%s   cpu_interrupt_map &= ~CPU_SIGIO_EXCEPTION_MASK;\n'
+            '%s   softpc_platform_executor_event();\n'
+            '%s   }\n' % (indent, indent, indent, indent, indent)
+        )
+
+    if 'softpc_platform_executor_event();' not in source:
+        source, count = timer_event.subn(add_executor_event, source)
+        if count != 2:
+            raise ValueError('cannot locate both CCPU timer-event sites')
     return source
 
 

@@ -43,5 +43,8 @@ by the source-boundary test. The active M4 work is runtime acceptance with
 real fixed media and RDP-friendly interaction. See [lifecycle
 evidence](../etc/evidence/m3-t4-s1-lifecycle-boundary.md), [runtime mailbox
 evidence](../etc/evidence/m3-t4-s2-runtime-mailbox.md), and [frontend client
-evidence](../etc/evidence/m3-t4-s3-frontend-clients.md).
+evidence](../etc/evidence/m3-t4-s3-frontend-clients.md). Fixed A:+C: boot and
+the independent input rendezvous are recorded in [M4 runtime-media/input
+evidence](../etc/evidence/m4-runtime-media-input.md); Windows Setup remains
+the active acceptance gap.
 The target architecture remains in [System Architecture](../design/ARCHITECTURE.md).

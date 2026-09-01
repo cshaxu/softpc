@@ -58,6 +58,7 @@ static volatile LONG softpc_boot_clock_active;
 static volatile LONG softpc_runtime_heartbeat_enabled;
 static void (*softpc_executor_callback)(void *);
 static void *softpc_executor_callback_context;
+void softpc_platform_executor_event(void);
 
 static VOID CALLBACK softpc_clock_tick(PVOID context, BOOLEAN fired)
 {
@@ -96,6 +97,14 @@ IBOOL softpc_platform_consume_clock_tick(void)
 void softpc_platform_request_executor_wake(void)
 {
 #ifdef _WIN32
+    if (InterlockedCompareExchange(&softpc_runtime_heartbeat_enabled, 0, 0) != 0) {
+        /* CPU_SIGIO_EVENT is an original CCPU event bit, distinct from the
+           20 Hz timer.  The generated port ABI consumes it at an instruction
+           boundary and invokes only the standalone executor callback, so UI
+           input never accelerates PIT/video/controller time. */
+        c_cpu_interrupt(CPU_SIGIO_EVENT, 0);
+        return;
+    }
     (void)InterlockedExchange(&softpc_executor_wake_pending, 1);
     if (softpc_executor_event != NULL) SetEvent(softpc_executor_event);
 #endif
@@ -967,6 +976,11 @@ void host_timer_event(void)
     host_lpt_heart_beat();
     time_strobe();
     PlayContinuousTone();
+    softpc_platform_executor_event();
+}
+
+void softpc_platform_executor_event(void)
+{
     if (softpc_executor_callback != NULL)
         (*softpc_executor_callback)(softpc_executor_callback_context);
     /* The outer-frame predicate is maintained by the generated CCPU port-ABI
