@@ -11,3 +11,7 @@ BOP, ROM, media, and guest time are unchanged.
 
 Verification: x64 rebuilt and `softpc-bop-smoke` passed; x86 rebuilt and
 direct `softpc-bop-smoke.exe` returned zero.
+
+The rebuilt `build/output/softpc64.exe` and `softpc32.exe` each loaded their
+adjacent fixed `softpc.ini`, entered the monitor, and exited zero after the
+`exit` command.
