@@ -2,24 +2,23 @@
 
 ## Current Work
 
-### M1 T2 S8 P1: Externalize the FPU private-index carrier
+### M1 T2 S9 P1: Externalize the SAS vector null-slot carrier
 
 - **Owner:** repository owner (single-person dual-role execution)
-- **Input boundary:** selected original `fpu.c` and its eight-entry private
-  FPU stack representation.
-- **Output boundary:** a generated FPU compilation input with one fixed guest
-  register-index carrier.
-- **Scope:** externalize only the native diagnostic include and the bounded
-  `TOSPtr - FPUStackBase` conversion before it joins original `IU32` index
-  arithmetic.
-- **Non-goals:** do not change FPU arithmetic, exception behavior, stack
-  contents, initialization, BOP dispatch, or runtime pacing.
-- **Focused verification:** source hash, transform idempotence, dual-width
-  rebuild, and bounded BOP smoke.
-- **Stop condition:** stop if any edit reaches an FPU operation or changes a
-  guest-visible register result.
-- **Exit criteria:** `fpu.c` is pristine in the tree and its sole host-width
-  carrier is supplied by a reproducible generated overlay.
+- **Input boundary:** selected original `sascdef.c` and its `cSasPtrs`
+  function-vector initializer.
+- **Output boundary:** a generated source with the selected unavailable
+  `Sas_overwrite_memory` slot expressed in its actual function-pointer type.
+- **Scope:** externalize only the null carrier's type; preserve vector order,
+  slot value, SAS calls, and all memory behavior.
+- **Non-goals:** do not add SAS services, alter allocation, change guest
+  addresses, or modify CCPU execution, BOP, devices, or runtime pacing.
+- **Focused verification:** source hash, generated-output idempotence,
+  dual-width rebuild, and bounded BOP smoke.
+- **Stop condition:** stop if vector ordering or the selected null value must
+  change.
+- **Exit criteria:** `sascdef.c` is pristine in the tree and both widths
+  compile its vector through a reproducible generated carrier overlay.
 
 ## Current Technical Baseline
 

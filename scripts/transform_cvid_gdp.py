@@ -248,6 +248,15 @@ def transform_ccpu_ntstubs(source: str) -> str:
     return source
 
 
+def transform_ccpu_fpu(source: str) -> str:
+    if '#include <stdio.h>' not in source:
+        source = source.replace('#include "host_def.h"\n',
+                                '#include "host_def.h"\n#include <stdio.h>\n', 1)
+    source = source.replace('reg_num += TOSPtr - FPUStackBase;',
+                            'reg_num += (IU32)(TOSPtr - FPUStackBase);', 1)
+    return source
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=pathlib.Path)
@@ -261,6 +270,7 @@ def main() -> int:
     parser.add_argument("--ccpu-sas-source", action="store_true")
     parser.add_argument("--ccpu-main", action="store_true")
     parser.add_argument("--ccpu-ntstubs", action="store_true")
+    parser.add_argument("--ccpu-fpu", action="store_true")
     args = parser.parse_args()
 
     original = args.source.read_text(encoding="latin-1")
@@ -287,6 +297,9 @@ def main() -> int:
         static_count = dynamic_count = 1
     elif args.ccpu_ntstubs:
         generated = transform_ccpu_ntstubs(original)
+        static_count = dynamic_count = 1
+    elif args.ccpu_fpu:
+        generated = transform_ccpu_fpu(original)
         static_count = dynamic_count = 1
     else:
         generated, static_count, dynamic_count = transform_rules(original)

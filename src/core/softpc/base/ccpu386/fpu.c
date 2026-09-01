@@ -17,8 +17,6 @@
 ]*/
 #include "insignia.h"
 #include "host_def.h"
-/* DIVERGENCE(SOFTPC-PORT-076): preserve the native C varargs ABI. */
-#include <stdio.h>
 #include <math.h>
 #include "cfpu_def.h"
 #include "ckmalloc.h"
@@ -5858,11 +5856,7 @@ GLOBAL	void NpxStackRegAsString IFN3(FPSTACKENTRY *, fpStPtr, char *, buf, IU32,
 /* this one is only ever used in trace.c and only if pure CCPU */
 GLOBAL char * getNpxStackReg IFN2(IU32, reg_num, char *, buffer)
 {
-	/* DIVERGENCE(SOFTPC-PORT-130): TOSPtr and FPUStackBase delimit the
-	 * original eight-entry private FPU stack, so their pointer difference is
-	 * a bounded stack index, not a host identity.  Make the retained IU32
-	 * register arithmetic explicit on both host widths. */
-	reg_num += (IU32)(TOSPtr - FPUStackBase);
+	reg_num += TOSPtr - FPUStackBase;
 	NpxStackRegAsString (&FPUStackBase[reg_num&7], buffer, 12);
 	return buffer;
 }
@@ -5928,7 +5922,7 @@ GLOBAL IU32 getNpxTagwordReg IFN0()
 
 GLOBAL VOID setNpxTagwordReg IFN1(IU32, newTag)
 {
-	/* Don't do it!! */
+	/* Don't do it!! It fucks you up!! */
 	/* SetIntelTagword(newTag); */
 }
 
