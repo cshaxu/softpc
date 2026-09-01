@@ -13,8 +13,6 @@ POPF CPU Functions.
 #include <insignia.h>
 
 #include <host_def.h>
-/* DIVERGENCE(SOFTPC-PORT-076): preserve the native C varargs ABI. */
-#include <stdio.h>
 #include <xt.h>
 #include CpuH
 #include <c_main.h>
@@ -28,11 +26,6 @@ POPF CPU Functions.
 #include <popf.h>
 #include <debug.h>
 #include <config.h>
-
-/* DIVERGENCE(SOFTPC-PORT-126): the selected CCPU body defines this
- * same-package diagnostic hook in c_main.c.  Publish its original void/char
- * call contract so modern C does not infer an int result on either host width. */
-extern void note_486_instruction(char *text);
 
 
 /*

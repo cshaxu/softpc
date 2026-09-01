@@ -42,6 +42,13 @@ INTO()
 
   if ( GET_OF() )
       {
+#ifdef NTVDM
+      extern BOOL host_swint_hook IPT1(IS32, int_no);
+
+      if(GET_PE() && host_swint_hook((IS32) 4))
+	  return; /* Interrupt processed by user defined handler */
+#endif
+
       EXT = INTERNAL;
       do_intrupt((IU16)4, TRUE, FALSE, (IU16)0);
       }
