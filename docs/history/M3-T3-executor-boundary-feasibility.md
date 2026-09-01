@@ -28,12 +28,31 @@ boundary. The detached build lacks the original timer/ICA locking contract;
 recovering it requires the queued M2 host-compatibility work. M3 did not add
 an instruction hook, synthetic clock, BOP reinterpretation, or frontend lock.
 
+## S2 P2: Reject A Timer Retrofit Beneath The Legacy Slice API
+
+**Status:** complete; no source change retained.
+
+The standalone timer queue was temporarily changed from a pending counter to
+the original `CPU_TIMER_TICK` publication.  The existing
+`softpc-machine-smoke` immediately became CPU-bound: its `softpc_machine_run`
+"slice" enters an unbounded CCPU call and has no lifecycle return after the
+timer event begins servicing original `time_strobe()` work.  Delaying the
+producer until after reset does not repair that contract; it merely moves the
+failure into the first legacy run call.  The experiment and its generated
+CMOS image were removed.
+
+This proves that timer/ICA recovery is not an independent predecessor.  Its
+producer must be owned by the new runtime, started only after that runtime
+owns execution, and retired before it destroys the machine.  It must not be
+enabled under the legacy direct-run API.
+
 ## Transfer
 
-M2 T4 S1 owns restoration of the finite original timer/ICA compatibility
-contract: the original heartbeat order, ICA lock boundary, and `REAL_TIMER`
-translation-unit selection. It must first prove tick cardinality and bounded
-dual-media POST on x86 and x64. M3 runtime work resumes only after that proof.
+M3 T4 owns the single-executor runtime foundation.  It must establish the
+runtime lifecycle and copied command/input mailbox first; that runtime then
+becomes the only permitted owner of original heartbeat activation.  M2 timer
+and ICA capability recovery remains a nested implementation item of that
+runtime package, not a pre-runtime device retrofit.
 
 ## Evidence
 

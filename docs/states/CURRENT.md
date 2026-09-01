@@ -2,43 +2,46 @@
 
 ## Current Work
 
-### M2 T4 S1: Recover original timer/ICA host compatibility
+### M3 T4 S1: Establish the single-executor runtime foundation
 
 - **Owner and mode:** repository owner; single-person dual-role execution.
 - **Admission and approval:** the owner directed execution of the ordered
-  standalone SoftPC queue. M3/T3 established that the original timer/ICA
-  contract is the immediate prerequisite for the requested single-executor
-  NXVM-style runtime.
-- **Objective:** recover the finite original SoftPC host heartbeat contract:
-  an ICA synchronization boundary, worker-owned `time_tick()`/RTC progression,
-  and CCPU `CPU_TIMER_TICK` publication. Preserve original CCPU40, PIT/PIC,
-  CMOS/RTC, devices, BIOS, ROM/VGA ROM and BOP behavior.
-- **Input and output boundary:** input is the selected original
-  `host/src/nt_eoi.c`, `host/src/nt_timer.c`, `base/system/timestrb.c`, and
-  current standalone host port. Output is a reproducible port-ABI build
-  selection plus a `host/softpc-compat` Win32 capability implementation; no
-  standalone-only branch is added to pristine SoftPC source.
+  standalone SoftPC queue and approved the NXVM-style outer architecture.
+  M3/T3 proved that legacy direct `softpc_machine_run(slice)` has no safe
+  scheduling boundary. Its follow-up timer experiment proved that a real
+  heartbeat cannot be enabled beneath that API.
+- **Objective:** introduce a VM-owned executor lifecycle and copied host
+  command/input mailbox outside pristine SoftPC. The runtime, not a frontend,
+  owns reset, run, heartbeat activation and teardown; console/window become
+  producers and snapshot consumers only.
+- **Input and output boundary:** input is the current `src/vm` direct-run
+  shell, `softpc_machine` public mechanics, original CCPU event handling, and
+  standalone timer port. Output is `vm/runtime` with explicit state ownership,
+  command records and copied presentation snapshots. Pristine SoftPC source,
+  controllers, BIOS/ROM/VGA ROM and BOP tables remain unchanged.
 - **Non-goals:** no NTVDM/WOW/DEM/CSR/VDD/product-service import; no controller
-  rewrite; no BOP selector change; no guest-media mutation; no runtime
-  mailbox/frontend conversion; no pause/reset/stop policy; no profile or
-  multi-session feature.
-- **Verification:** focused heartbeat/tick-cardinality fixture and bounded
-  dual-media POST probe, then x64 and x86 build plus the existing BOP, timer,
-  IRQ and VGA checks. User media and `build/output/softpc.ini` remain untouched.
-- **Similar-issue sweep:** `time_strobe`, RTC, PIT/IRQ0, HLT wake, FDC POST,
-  keyboard wake, timer start/stop/reset, ICA locking, x86/x64 CCPU40 builds.
-- **Stop condition:** a required dependency is NTVDM product behavior rather
-  than a finite machine/host capability; a change would require CCPU/BOP
-  semantics, a guest clock derived from instruction count, or unsynchronised
-  controller mutation.
-- **Exit criteria:** one original-source-shaped heartbeat path advances timer
-  and RTC work exactly once per host pulse under the recovered lock, publishes
-  `CPU_TIMER_TICK`, survives bounded dual-media POST, and passes focused x86
-  and x64 verification. Only then may M3 runtime be re-admitted.
+  rewrite; no BOP selector change; no guest-media mutation; no profile or
+  multi-session feature; no instruction-budget, BOP-FE or `c_cpu_unsimulate()`
+  scheduling shortcut.
+- **Verification:** a bounded runtime lifecycle probe, copied keyboard input
+  during continuous execution, start/pause/stop/reset behavior, and a
+  presentation snapshot freshness check; then x64/x86 BOP, timer, IRQ, VGA
+  and dual-media checks. User media and `build/output/softpc.ini` remain
+  untouched.
+- **Similar-issue sweep:** nested `host_simulate`, FDC POST, HLT wake, timer
+  start/stop/reset, pause/stop semantics, ICA ownership, RDP input and both
+  host widths.
+- **Stop condition:** a requested runtime lifecycle action has no finite
+  CCPU-level boundary without reinterpreting BOP, changing controller timing
+  or terminating a live CCPU thread unsafely.
+- **Exit criteria:** one executor owns all machine mutation, frontends do not
+  call `softpc_machine_run()` or mutate input/device state, and a real host
+  heartbeat is active only while that executor runs. The full lifecycle and
+  copied-input proof must pass on x64 and x86.
 
 ## Current Technical Baseline
 
 The machine remains direct-launch transitional behavior on `main`. M3/T3
-closed its executor-boundary audit and transferred the timer/ICA prerequisite
-to this packet. The target architecture remains in
+closed its executor-boundary audit and rejected an unsafe timer retrofit under
+the legacy slice API. The target architecture remains in
 [System Architecture](../design/ARCHITECTURE.md).
