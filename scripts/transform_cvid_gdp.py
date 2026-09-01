@@ -234,6 +234,20 @@ def transform_ccpu_main(source: str) -> str:
     return source
 
 
+def transform_ccpu_ntstubs(source: str) -> str:
+    source = source.replace('#include "evidgen.h"',
+                            '#include "../cvidc/evidgen.h"', 1)
+    if '#include <stdio.h>' not in source:
+        source = source.replace('#include "cpu4.h"\n', '#include "cpu4.h"\n\n#include <stdio.h>\n', 1)
+    source = source.replace('\nIHP Gdp;\nstruct CpuVector Cpu;',
+                            '\nextern IHP Gdp;\nstruct CpuVector Cpu;', 1)
+    for stub in ('void copyROM()\n{\n}\n',
+                 'void initialise_npx()\n{\n}\n',
+                 'void npx_reset()\n{\n}\n'):
+        source = source.replace(stub, '', 1)
+    return source
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=pathlib.Path)
@@ -246,6 +260,7 @@ def main() -> int:
     parser.add_argument("--ccpu-bsic-header", action="store_true")
     parser.add_argument("--ccpu-sas-source", action="store_true")
     parser.add_argument("--ccpu-main", action="store_true")
+    parser.add_argument("--ccpu-ntstubs", action="store_true")
     args = parser.parse_args()
 
     original = args.source.read_text(encoding="latin-1")
@@ -269,6 +284,9 @@ def main() -> int:
         static_count = dynamic_count = 1
     elif args.ccpu_main:
         generated = transform_ccpu_main(original)
+        static_count = dynamic_count = 1
+    elif args.ccpu_ntstubs:
+        generated = transform_ccpu_ntstubs(original)
         static_count = dynamic_count = 1
     else:
         generated, static_count, dynamic_count = transform_rules(original)
