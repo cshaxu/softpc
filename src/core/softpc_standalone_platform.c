@@ -49,6 +49,7 @@ IBOOL softpc_ccpu_instruction_budget_active = FALSE;
    queue callback only marks the CCPU event pending; host_timer_event() stays
    on the machine/executor thread where the original device state lives. */
 static HANDLE softpc_clock_timer;
+static HANDLE softpc_executor_event;
 static volatile LONG softpc_clock_pending_ticks;
 static volatile LONG softpc_executor_wake_pending;
 static volatile LONG softpc_boot_clock_active;
@@ -61,6 +62,7 @@ static VOID CALLBACK softpc_clock_tick(PVOID context, BOOLEAN fired)
        Windows timer worker must therefore only publish elapsed host time;
        the executor consumes it at an instruction boundary. */
     (void)InterlockedIncrement(&softpc_clock_pending_ticks);
+    if (softpc_executor_event != NULL) SetEvent(softpc_executor_event);
 }
 #endif
 
@@ -87,6 +89,7 @@ void softpc_platform_request_executor_wake(void)
 {
 #ifdef _WIN32
     (void)InterlockedExchange(&softpc_executor_wake_pending, 1);
+    if (softpc_executor_event != NULL) SetEvent(softpc_executor_event);
 #endif
 }
 
@@ -96,6 +99,19 @@ IBOOL softpc_platform_consume_executor_wake(void)
     return InterlockedExchange(&softpc_executor_wake_pending, 0) != 0;
 #else
     return FALSE;
+#endif
+}
+
+/* Called only from the standalone CCPU HLT path after both pending sources
+ * have been checked.  The auto-reset event avoids a polling spin: either the
+ * original host timer or frontend input wakes this executor immediately. */
+void softpc_platform_wait_for_executor_event(void)
+{
+#ifdef _WIN32
+    if (softpc_executor_event != NULL)
+        (void)WaitForSingleObject(softpc_executor_event, INFINITE);
+    else
+        Sleep(1u);
 #endif
 }
 
@@ -615,6 +631,8 @@ IU32 host_speed(IU32 nominal_instructions)
 void host_timer_init(void)
 {
 #ifdef _WIN32
+    if (softpc_executor_event == NULL)
+        softpc_executor_event = CreateEventA(NULL, FALSE, FALSE, NULL);
     if (softpc_clock_timer == NULL) {
         (void)CreateTimerQueueTimer(&softpc_clock_timer, NULL,
             softpc_clock_tick, NULL, 50u, 50u, WT_EXECUTEDEFAULT);
@@ -1001,6 +1019,8 @@ void host_timer_shutdown(void)
             INVALID_HANDLE_VALUE);
         softpc_clock_timer = NULL;
     }
+    if (softpc_executor_event != NULL) CloseHandle(softpc_executor_event);
+    softpc_executor_event = NULL;
     softpc_speaker_shutdown();
 #endif
 }

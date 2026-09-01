@@ -555,6 +555,7 @@ extern IBOOL checkForQEvent IPT0();
    nested host_simulate() calls made by ROM BOP services. */
 extern IBOOL softpc_platform_consume_clock_tick(void);
 extern IBOOL softpc_platform_consume_executor_wake(void);
+extern void softpc_platform_wait_for_executor_event(void);
 #endif
 
 #ifdef SFELLOW
@@ -4035,6 +4036,8 @@ TYPEE8:
 	    if (softpc_ccpu_instruction_budget_active && simulate_level == 1)
 	       c_cpu_unsimulate();
 	    }
+	 else
+	    softpc_platform_wait_for_executor_event();
 #endif
 
 #ifndef	PROD
