@@ -29,15 +29,34 @@ but it had no safe join/teardown path.  Its destructor would either leave a
 live executor or risk freeing the callback context under CCPU.  The trial was
 removed before frontend integration; no runtime or build-graph change remains.
 
-## Required Approval Before Implementation Continues
+## S1 Closure: Generated Outer-Frame Adapter
 
-The smallest possible next experiment is a reproducible CCPU port-ABI overlay,
-not a device, BIOS, BOP, or renderer change.  It must expose the current CCPU
-simulation depth and add a dedicated runtime-exit transfer that is accepted
-only at outer depth one.  Requests observed at a nested frame are deferred
-until an outer original heartbeat rendezvous.  The adapter must have separate
-x64/x86 proofs showing that BOP `FE` retains its original one-frame semantics.
+Under the owner-approved standalone/NXVM architecture, the selected adapter
+was implemented solely through the reproducible CCPU port-ABI path:
 
-Without explicit approval for that narrow generated port-ABI adapter, M3 T4
-cannot truthfully claim the required lifecycle contract and frontends cannot
-be migrated to it.
+- generated `c_main.c` brackets each original `c_cpu_simulate()` invocation
+  with a thread-local depth record;
+- a standalone request is honoured by `c_cpu_unsimulate()` only when that
+  depth is one, from the original CCPU-thread `host_timer_event()` rendezvous;
+- original nested `host_simulate`, BOP `FE`, device timing, BIOS and renderer
+  paths retain their existing transfer behavior;
+- the VM executor explicitly registers with the original `ntthread.c` TLS
+  simulation stack before it enters CCPU, and unregisters after return.
+
+The lifecycle smoke executes a real guest `jmp $` loop in a worker, enables
+the original host heartbeat, requests stop from outside that worker, waits for
+the outer CCPU call to return, then destroys the machine.  It uses an overlay
+fixture and leaves no guest-media mutation.
+
+## Verification
+
+- x64 CMake/Ninja build completed; `softpc-lifecycle-smoke`,
+  `softpc-bop-smoke`, `softpc-vga-frame-smoke`, and
+  `softpc-quick-time-smoke` passed.
+- x86 CMake/Ninja build completed with `C:\\msys64\\mingw32\\bin` on `PATH`
+  (required for the MinGW32 compiler backend runtime); the same four tests
+  passed.
+
+This closes the lifecycle-boundary predecessor.  M3 T4 now proceeds to its
+runtime-owned command/input/frame mailbox; it does not yet claim frontend or
+Windows Setup acceptance.

@@ -10,6 +10,8 @@ extern void c_cpu_init(void);
 extern void c_cpu_reset(void);
 extern void c_cpu_simulate(void);
 extern void c_cpu_terminate(void);
+extern void ccpu386newthread(void);
+extern void ccpu386exitthread(void);
 extern unsigned short c_getCS(void);
 extern unsigned long c_getCS_BASE(void);
 extern unsigned long c_getEIP(void);
@@ -32,6 +34,8 @@ extern void softpc_device_bop_register_machine_services(void);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
 extern int softpc_platform_keyboard_key(int key, int released);
 extern void softpc_platform_request_executor_wake(void);
+extern void softpc_ccpu_lifecycle_request_exit(void);
+extern void softpc_ccpu_lifecycle_clear_exit(void);
 extern void mouse_send(int delta_x, int delta_y, int left, int right);
 extern void time_strobe(void);
 extern void host_timer_shutdown(void);
@@ -115,6 +119,7 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
 softpc_machine_result softpc_machine_reset(softpc_machine *machine)
 {
     if (machine == NULL) return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    softpc_ccpu_lifecycle_clear_exit();
     if (!machine->hardware_initialized) {
         sas_init(machine->memory_bytes);
         softpc_device_bop_register_machine_services();
@@ -252,6 +257,26 @@ void softpc_machine_request_wake(softpc_machine *machine)
 {
     if (machine != NULL && machine->reset)
         softpc_platform_request_executor_wake();
+}
+
+void softpc_machine_request_stop(softpc_machine *machine)
+{
+    if (machine != NULL && machine->reset) {
+        softpc_ccpu_lifecycle_request_exit();
+        softpc_platform_request_executor_wake();
+    }
+}
+
+void softpc_machine_executor_thread_enter(softpc_machine *machine)
+{
+    if (machine != NULL && machine->reset)
+        ccpu386newthread();
+}
+
+void softpc_machine_executor_thread_leave(softpc_machine *machine)
+{
+    if (machine != NULL && machine->reset)
+        ccpu386exitthread();
 }
 
 void softpc_machine_set_heartbeat(softpc_machine *machine, int enabled)

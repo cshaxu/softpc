@@ -57,6 +57,15 @@ softpc_machine_result softpc_machine_key_number(softpc_machine *machine,
 /* Wake an executor that is halted in guest idle without manufacturing a
  * timer/device tick. This is safe to call from a frontend input thread. */
 void softpc_machine_request_wake(softpc_machine *machine);
+/* Request an orderly return from the outer original CCPU invocation.  The
+ * request is observed only at the original timer rendezvous, never by an
+ * asynchronous host thread or a nested host_simulate frame. */
+void softpc_machine_request_stop(softpc_machine *machine);
+/* Register the single VM executor with the original CCPU TLS simulation
+ * stack. These calls belong to that executor's lifetime, never to a UI
+ * thread. */
+void softpc_machine_executor_thread_enter(softpc_machine *machine);
+void softpc_machine_executor_thread_leave(softpc_machine *machine);
 /* The standalone runtime owns the original host heartbeat.  Legacy bounded
  * test calls keep it disabled; a continuous executor enables it only after
  * reset has returned to the public machine boundary. */

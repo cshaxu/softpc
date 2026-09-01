@@ -204,6 +204,11 @@ def transform_ccpu_sas_source(source: str) -> str:
 
 
 def transform_ccpu_main(source: str) -> str:
+    if '#include <softpc_ccpu_lifecycle.h>' not in source:
+        source = source.replace(
+            '#include <c_main.h>\t/* C CPU definitions-interfaces */\n',
+            '#include <c_main.h>\t/* C CPU definitions-interfaces */\n'
+            '#include <softpc_ccpu_lifecycle.h>\n', 1)
     if '#include <c_addr.h>' not in source:
         source = source.replace('#include <c_main.h>\t/* C CPU definitions-interfaces */\n',
                                 '#include <c_main.h>\t/* C CPU definitions-interfaces */\n'
@@ -244,6 +249,23 @@ def transform_ccpu_main(source: str) -> str:
         '#ifdef NTVDM\n',
         '#if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)\n',
     )
+    simulation_start = source.find('   c_cpu_simulate IFN0()')
+    restart_start = source.find('   /* Restart (Continue) point for CPU.',
+                                simulation_start)
+    if simulation_start < 0 or restart_start < 0:
+        raise ValueError('cannot locate c_cpu_simulate lifecycle frame')
+    simulation = source[simulation_start:restart_start]
+    if 'softpc_ccpu_lifecycle_enter();' not in simulation:
+        simulation = simulation.replace(
+            '      {\n      SYNCH_TICK();',
+            '      {\n      softpc_ccpu_lifecycle_enter();\n      SYNCH_TICK();', 1)
+        closing = simulation.rfind('      }')
+        if closing < 0:
+            raise ValueError('cannot locate c_cpu_simulate lifecycle close')
+        simulation = (simulation[:closing] +
+                      '      softpc_ccpu_lifecycle_leave();\n' +
+                      simulation[closing:])
+    source = source[:simulation_start] + simulation + source[restart_start:]
     return source
 
 

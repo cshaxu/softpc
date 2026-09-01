@@ -244,7 +244,8 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/cvidc/vglfunc.c
     src/core/softpc/base/cvidc/sascdef.c)
 add_library(softpc-port-abi OBJECT
-    src/core/softpc-port-abi/cvidc/softpc_gdp_state.c)
+    src/core/softpc-port-abi/cvidc/softpc_gdp_state.c
+    src/core/softpc-port-abi/ccpu/softpc_ccpu_lifecycle.c)
 add_dependencies(softpc-ccpu-core softpc-ccpu-port-abi-inputs)
 
 # Controllers, firmware and the standalone host boundary evolve independently
@@ -344,6 +345,7 @@ target_compile_definitions(softpc-port-abi PRIVATE
     SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 target_include_directories(softpc-ccpu-core PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu"
+    src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
@@ -354,6 +356,7 @@ target_include_directories(softpc-ccpu-core PRIVATE
 target_include_directories(softpc-machine-devices PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu"
     include
+    src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
@@ -362,6 +365,7 @@ target_include_directories(softpc-machine-devices PRIVATE
     src/core/softpc/base/cvidc
     src/core)
 target_include_directories(softpc-port-abi PRIVATE
+    src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
@@ -377,6 +381,7 @@ target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-ccpu-core>)
 target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-machine-devices>)
 target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-port-abi>)
 target_include_directories(softpc-machine PRIVATE
+    src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
@@ -525,6 +530,11 @@ set_tests_properties(softpc-quick-time-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-real-boot-smoke tests/softpc_real_boot_smoke.c)
 target_link_libraries(softpc-real-boot-smoke PRIVATE softpc-machine)
+add_executable(softpc-lifecycle-smoke tests/softpc_lifecycle_smoke.c)
+target_link_libraries(softpc-lifecycle-smoke PRIVATE softpc-machine)
+add_test(NAME softpc-lifecycle-smoke COMMAND softpc-lifecycle-smoke)
+set_tests_properties(softpc-lifecycle-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tests/standalone_source_boundary.cmake")
@@ -547,7 +557,8 @@ set(SOFTPC_TEST_TARGETS
     softpc-vga-frame-smoke
     softpc-bop-smoke
     softpc-quick-time-smoke
-    softpc-real-boot-smoke)
+    softpc-real-boot-smoke
+    softpc-lifecycle-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
     # Keep every executable test self-contained, just like the launcher.

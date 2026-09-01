@@ -31,6 +31,7 @@
 #include "nt_graph.h"
 #include "nt_ega.h"
 #include "softpc_machine.h"
+#include "softpc_ccpu_lifecycle.h"
 
 /*
  * Minimal host ports for the detached CCPU.  These are deliberately machine
@@ -39,6 +40,7 @@
  */
 
 extern void c_cpu_simulate();
+extern void c_cpu_unsimulate();
 static UTINY *softpc_ram;
 static sys_addr softpc_ram_size;
 IU32 softpc_ccpu_instruction_budget = 0;
@@ -967,6 +969,14 @@ void host_timer_event(void)
     PlayContinuousTone();
     if (softpc_executor_callback != NULL)
         (*softpc_executor_callback)(softpc_executor_callback_context);
+    /* The outer-frame predicate is maintained by the generated CCPU port-ABI
+       overlay. BOP FE and nested host_simulate returns retain their original
+       c_cpu_unsimulate behavior; this dedicated request is never honoured
+       while a controller owns an inner CCPU frame. */
+    if (softpc_ccpu_lifecycle_outer_exit_requested()) {
+        softpc_ccpu_lifecycle_clear_exit();
+        c_cpu_unsimulate();
+    }
 }
 
 void host_note_queue_added(IU32 value)
