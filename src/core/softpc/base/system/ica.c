@@ -1846,12 +1846,20 @@ GLOBAL IU32 ica_iret_hook_needed IFN1(IU32, line)
 GLOBAL void
 ica_iret_hook_control IFN3(IU32, adapter, IU32, line, IBOOL, enable)
 {
+	/* The CCPU interrupt path receives but does not consume IRET hooks.
+	 * Keep hook bookkeeping disabled for that executor, as in ica.old. */
+#ifndef CCPU
 	int mask = 1 << (line + (adapter << 3));
 
 	if (enable)
 		iretHookMask |= mask;
 	else
 		iretHookMask &= ~mask;
+#else
+	UNUSED(adapter);
+	UNUSED(line);
+	UNUSED(enable);
+#endif	/* CCPU */
 }
 
 

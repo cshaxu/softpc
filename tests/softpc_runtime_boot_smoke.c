@@ -45,6 +45,12 @@ static void send_enter(softpc_runtime *runtime)
     (void)softpc_runtime_enqueue_key(runtime, 0x1cu, 1u);
 }
 
+static int send_key(softpc_runtime *runtime, uint8_t key_number)
+{
+    return softpc_runtime_enqueue_key(runtime, key_number, 0u) &&
+        softpc_runtime_enqueue_key(runtime, key_number, 1u);
+}
+
 static void dump_frame(const softpc_runtime_frame *frame)
 {
     unsigned int row;
@@ -68,7 +74,7 @@ int main(int argc, char **argv)
     softpc_runtime *runtime = NULL;
     softpc_runtime_frame *frame = NULL;
     DWORD deadline;
-    int date_sent = 0, time_sent = 0, success = 0;
+    int date_sent = 0, time_sent = 0, input_stage = 0, success = 0;
     int final_state = SOFTPC_RUNTIME_ERROR;
     if (argc != 5 || strcmp(argv[1], "--floppy") != 0 ||
         strcmp(argv[3], "--hdd") != 0) return 2;
@@ -80,7 +86,10 @@ int main(int argc, char **argv)
         goto done;
     frame = (softpc_runtime_frame *)calloc(1u, sizeof(*frame));
     if (frame == NULL) goto done;
-    deadline = GetTickCount() + 60000u;
+    /* This is an integration probe, not an unattended boot soak.  Leave
+       enough room for firmware POST but emit its captured frame before any
+       shutdown work if the guest does not reach the prompt. */
+    deadline = GetTickCount() + 20000u;
     do {
         if (softpc_runtime_copy_frame(runtime, frame) && frame->graphics == 0u) {
             if (!date_sent && frame_contains(frame, "Enter new date")) {
@@ -89,14 +98,41 @@ int main(int argc, char **argv)
             if (!time_sent && frame_contains(frame, "Enter new time")) {
                 send_enter(runtime); time_sent = 1;
             }
-            if (frame_has_prompt(frame)) { success = 1; break; }
+            if (input_stage == 0 && frame_has_prompt(frame)) {
+                /* The frontend receives distinct Windows key messages.  Feed
+                   the original controller the same way: one complete key at
+                   a time, then observe its guest-visible result. */
+                if (!send_key(runtime, 31u))
+                    fprintf(stderr, "softpc-runtime-boot-smoke: input enqueue failed (state=%d)\n",
+                        (int)softpc_runtime_get_state(runtime));
+                input_stage = 1;
+            }
+            if (input_stage == 1 && frame_contains(frame, ">a")) {
+                if (!send_key(runtime, 50u))
+                    fprintf(stderr, "softpc-runtime-boot-smoke: input enqueue failed (state=%d)\n",
+                        (int)softpc_runtime_get_state(runtime));
+                input_stage = 2;
+            }
+            if (input_stage == 2 && frame_contains(frame, ">ab")) {
+                if (!send_key(runtime, 48u))
+                    fprintf(stderr, "softpc-runtime-boot-smoke: input enqueue failed (state=%d)\n",
+                        (int)softpc_runtime_get_state(runtime));
+                input_stage = 3;
+            }
+            if (input_stage == 3 && frame_contains(frame, ">abc")) {
+                success = 1;
+                break;
+            }
         }
         if (softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_ERROR) break;
         Sleep(10u);
     } while ((LONG)(GetTickCount() - deadline) < 0);
 done:
     if (runtime != NULL) final_state = (int)softpc_runtime_get_state(runtime);
-    if (!success) dump_frame(frame);
+    if (!success) {
+        dump_frame(frame);
+        fflush(stderr);
+    }
     free(frame);
     if (runtime != NULL) { (void)softpc_runtime_stop(runtime); softpc_runtime_destroy(runtime); }
     softpc_machine_destroy(machine);

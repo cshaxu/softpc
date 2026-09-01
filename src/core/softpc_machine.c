@@ -68,6 +68,7 @@ struct softpc_machine {
     unsigned long memory_bytes;
     int reset;
     int hardware_initialized;
+    int cpu_initialized;
     int mouse_driver_initialized;
     char floppy_path[SOFTPC_MEDIA_PATH_MAX];
 };
@@ -132,10 +133,19 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         softpc_ccpu_install_video_vector();
         machine->hardware_initialized = 1;
     }
-    /* CCPU owns the optional fault trace; the standalone machine owns its
-       concrete stream rather than relying on a historical host logger. */
-    trace_file = stderr;
-    c_cpu_init();
+    /* c_cpu_init creates the CCPU's per-thread simulation-stack facility.
+       It is an original machine-lifetime initialization, not a reset action:
+       repeating it leaks/replaces the TLS slot on every standalone start.
+       The executor that performs this first reset therefore owns the original
+       CPU context for the complete machine lifetime; later starts use the
+       original c_cpu_reset path only. */
+    if (!machine->cpu_initialized) {
+        /* CCPU owns the optional fault trace; the standalone machine owns its
+           concrete stream rather than relying on a historical host logger. */
+        trace_file = stderr;
+        c_cpu_init();
+        machine->cpu_initialized = 1;
+    }
     c_cpu_reset();
     /* The original non-NT reset path creates queues only on a soft reset.
        A standalone first boot needs them before its original FDC POST. */
@@ -399,7 +409,8 @@ void softpc_machine_destroy(softpc_machine *machine)
         softpc_platform_floppy_detach();
         if (machine->mouse_driver_initialized)
             mouse_driver_termination();
-        c_cpu_terminate();
+        if (machine->cpu_initialized)
+            c_cpu_terminate();
         softpc_gdp_destroy_global();
         sas_term();
     }

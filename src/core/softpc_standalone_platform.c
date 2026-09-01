@@ -54,23 +54,30 @@ static HANDLE softpc_clock_timer;
 static HANDLE softpc_executor_event;
 static volatile LONG softpc_clock_pending_ticks;
 static volatile LONG softpc_executor_wake_pending;
-static volatile LONG softpc_boot_clock_active;
-static volatile LONG softpc_runtime_heartbeat_enabled;
 static void (*softpc_executor_callback)(void *);
 static void *softpc_executor_callback_context;
 void softpc_platform_executor_event(void);
+
+static IBOOL softpc_platform_take_pending(volatile LONG *pending)
+{
+    LONG observed;
+
+    do {
+        observed = InterlockedCompareExchange(pending, 0, 0);
+        if (observed <= 0) return FALSE;
+    } while (InterlockedCompareExchange(pending, observed - 1, observed) !=
+        observed);
+    return TRUE;
+}
 
 static VOID CALLBACK softpc_clock_tick(PVOID context, BOOLEAN fired)
 {
     UNUSED(context);
     UNUSED(fired);
-    /* Before a runtime owns CCPU, retain the legacy test producer.  A live
-       runtime uses the original CPU_TIMER_TICK publication; controller work
-       is still consumed only on CCPU's own thread. */
-    if (InterlockedCompareExchange(&softpc_runtime_heartbeat_enabled, 0, 0) != 0)
-        c_cpu_interrupt(CPU_TIMER_TICK, 0);
-    else
-        (void)InterlockedIncrement(&softpc_clock_pending_ticks);
+    /* This host callback never writes CCPU state.  The generated port ABI
+       consumes each pending heartbeat on the executor's original
+       instruction/HLT safe point. */
+    (void)InterlockedIncrement(&softpc_clock_pending_ticks);
     if (softpc_executor_event != NULL) SetEvent(softpc_executor_event);
 }
 #endif
@@ -78,13 +85,7 @@ static VOID CALLBACK softpc_clock_tick(PVOID context, BOOLEAN fired)
 IBOOL softpc_platform_consume_clock_tick(void)
 {
 #ifdef _WIN32
-    /* The original FDC POST runs a nested CCPU loop before the standalone
-       launcher has returned to a public run slice.  Give that finite machine
-       phase a synchronous heartbeat; normal guest execution remains paced by
-       the original 20 Hz host timer below. */
-    if (InterlockedCompareExchange(&softpc_boot_clock_active, 0, 0) != 0)
-        return TRUE;
-    return InterlockedExchange(&softpc_clock_pending_ticks, 0) != 0;
+    return softpc_platform_take_pending(&softpc_clock_pending_ticks);
 #else
     return FALSE;
 #endif
@@ -97,14 +98,6 @@ IBOOL softpc_platform_consume_clock_tick(void)
 void softpc_platform_request_executor_wake(void)
 {
 #ifdef _WIN32
-    if (InterlockedCompareExchange(&softpc_runtime_heartbeat_enabled, 0, 0) != 0) {
-        /* CPU_SIGIO_EVENT is an original CCPU event bit, distinct from the
-           20 Hz timer.  The generated port ABI consumes it at an instruction
-           boundary and invokes only the standalone executor callback, so UI
-           input never accelerates PIT/video/controller time. */
-        c_cpu_interrupt(CPU_SIGIO_EVENT, 0);
-        return;
-    }
     (void)InterlockedExchange(&softpc_executor_wake_pending, 1);
     if (softpc_executor_event != NULL) SetEvent(softpc_executor_event);
 #endif
@@ -113,7 +106,7 @@ void softpc_platform_request_executor_wake(void)
 IBOOL softpc_platform_consume_executor_wake(void)
 {
 #ifdef _WIN32
-    return InterlockedExchange(&softpc_executor_wake_pending, 0) != 0;
+    return softpc_platform_take_pending(&softpc_executor_wake_pending);
 #else
     return FALSE;
 #endif
@@ -135,7 +128,8 @@ void softpc_platform_wait_for_executor_event(void)
 void softpc_platform_set_boot_clock(int active)
 {
 #ifdef _WIN32
-    (void)InterlockedExchange(&softpc_boot_clock_active, active ? 1 : 0);
+    /* Timer availability is owned by original timer.c.  Reset may call this
+       legacy lifecycle hook, but it must not manufacture guest heartbeats. */
     if (!active) (void)InterlockedExchange(&softpc_clock_pending_ticks, 0);
 #else
     UNUSED(active);
@@ -144,12 +138,7 @@ void softpc_platform_set_boot_clock(int active)
 
 void softpc_platform_set_runtime_heartbeat(int enabled)
 {
-#ifdef _WIN32
-    (void)InterlockedExchange(&softpc_runtime_heartbeat_enabled,
-        enabled ? 1 : 0);
-#else
     UNUSED(enabled);
-#endif
 }
 
 void softpc_platform_set_executor_callback(void (*callback)(void *),

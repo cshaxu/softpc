@@ -223,7 +223,10 @@ def transform_ccpu_main(source: str) -> str:
     workers = '#include  <aaa.h>\t/* The workers */\n'
     declarations = ('extern void force_yoda(void);\n'
                     'extern void TakeNpxExceptionInt(void);\n'
-                    'extern void softpc_platform_executor_event(void);\n')
+                    'extern void softpc_platform_executor_event(void);\n'
+                    'extern IBOOL softpc_platform_consume_clock_tick(void);\n'
+                    'extern IBOOL softpc_platform_consume_executor_wake(void);\n'
+                    'extern void softpc_platform_wait_for_executor_event(void);\n')
     if declarations not in source:
         source = source.replace(workers, declarations + workers, 1)
     marker = '#define CCPU_INSTRUCTION_DELTA(x) ((IU32)DIFF_INST_BYTE((x), p_start))\n'
@@ -277,20 +280,41 @@ def transform_ccpu_main(source: str) -> str:
         r'(?P=indent)[ \t]*\}\n'
     )
 
-    def add_executor_event(match: re.Match[str]) -> str:
+    def add_safe_point_mailbox(match: re.Match[str]) -> str:
         indent = match.group('indent')
         return match.group(0) + (
             '\n%sif (cpu_interrupt_map & CPU_SIGIO_EXCEPTION_MASK)\n'
             '%s   {\n'
             '%s   cpu_interrupt_map &= ~CPU_SIGIO_EXCEPTION_MASK;\n'
-            '%s   softpc_platform_executor_event();\n'
-            '%s   }\n' % (indent, indent, indent, indent, indent)
+            '%s   ica_sigio_event();\n'
+            '%s   }\n'
+            '\n%sif (softpc_platform_consume_clock_tick())\n'
+            '%s   host_timer_event();\n'
+            '\n%sif (softpc_platform_consume_executor_wake())\n'
+            '%s   softpc_platform_executor_event();\n' %
+            (indent, indent, indent, indent, indent, indent, indent,
+             indent, indent)
         )
 
-    if 'softpc_platform_executor_event();' not in source:
-        source, count = timer_event.subn(add_executor_event, source)
+    if 'softpc_platform_consume_clock_tick();' not in source:
+        source, count = timer_event.subn(add_safe_point_mailbox, source)
         if count != 2:
             raise ValueError('cannot locate both CCPU timer-event sites')
+    hlt_start = source.find('case 0xf4:')
+    hlt_end = source.find('quick_mode = FALSE;', hlt_start)
+    if hlt_start < 0 or hlt_end < 0:
+        raise ValueError('cannot locate CCPU HLT loop')
+    hlt = source[hlt_start:hlt_end]
+    hlt_tick = '         SYNCH_TICK();\n         QUICK_EVENT_TICK();\n'
+    hlt_wait = (hlt_tick +
+                '         if (cpu_interrupt_map == 0 &&\n'
+                '             c_cpu_q_ev_get_count() == 0)\n'
+                '            softpc_platform_wait_for_executor_event();\n')
+    if 'softpc_platform_wait_for_executor_event();' not in hlt:
+        if hlt_tick not in hlt:
+            raise ValueError('cannot locate CCPU HLT quick-event tick')
+        hlt = hlt.replace(hlt_tick, hlt_wait, 1)
+        source = source[:hlt_start] + hlt + source[hlt_end:]
     return source
 
 

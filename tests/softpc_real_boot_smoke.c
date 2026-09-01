@@ -265,6 +265,11 @@ static volatile LONG setup_runner_failed;
 static DWORD WINAPI run_setup_machine(void *opaque)
 {
     softpc_machine *machine = (softpc_machine *)opaque;
+
+    /* The probe intentionally transfers an already-reset machine onto its
+       continuous executor.  Register that executor with the original CCPU
+       TLS simulation stack before it enters c_cpu_simulate. */
+    softpc_machine_executor_thread_enter(machine);
     while (InterlockedCompareExchange(&setup_runner_active, 0, 0) != 0) {
         if (softpc_machine_run(machine, SOFTPC_SLICE_INSTRUCTIONS) !=
                 SOFTPC_MACHINE_OK) {
@@ -272,6 +277,7 @@ static DWORD WINAPI run_setup_machine(void *opaque)
             break;
         }
     }
+    softpc_machine_executor_thread_leave(machine);
     return 0u;
 }
 
