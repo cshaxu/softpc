@@ -4,17 +4,24 @@ This is the sole documentation entry point.
 
 ## Task Reading Set
 
-Before starting or resuming work, read:
+Before starting or resuming an implementation subtask, every participant reads:
 
 1. this guide;
-2. [Current](states/CURRENT.md);
+2. the active [Current](states/CURRENT.md) packet and its subtask brief;
 3. [Execution Rules](rules/EXECUTION.md); and
 4. [Contributing](../CONTRIBUTING.md).
 
-For code or build changes, also read [System Architecture](design/ARCHITECTURE.md),
-[Source Layout](design/CODING.md), [Architecture Rules](rules/ARCHITECTURE.md),
-and [Coding Rules](rules/CODING.md). For documentation/governance changes, read
-[Documentation Rules](rules/DOCUMENT.md) and every authority changed.
+Then apply these triggers:
+
+- Planning, admitting, or closing a subtask also reads [Queue](states/QUEUE.md)
+  and [Roadmap](design/ROADMAP.md). Closing also reads
+  [Documentation Rules](rules/DOCUMENT.md).
+- Code or build work reads [System Architecture](design/ARCHITECTURE.md),
+  [Source Layout](design/CODING.md), [Architecture Rules](rules/ARCHITECTURE.md),
+  and [Coding Rules](rules/CODING.md).
+- A UX change also reads [Product UX](design/UI.md). Documentation or governance
+  work reads [Documentation Rules](rules/DOCUMENT.md) and every authority it
+  directly changes.
 
 ## Authority Map
 
@@ -27,3 +34,10 @@ and [Coding Rules](rules/CODING.md). For documentation/governance changes, read
 - `proposals/` contains the detail for queued candidates.
 - `history/` will retain closed numbered implementation-task records.
 - `etc/` contains indexed supporting evidence only.
+
+## Daily Operation
+
+[Current](states/CURRENT.md) is the only active-task and technical-baseline
+authority. [Queue](states/QUEUE.md) holds ordered, unnumbered candidates. A
+candidate receives a numeric task only when the owner admits it. Deferred debt
+that is not a planned task belongs in [TODO](states/TODO.md).

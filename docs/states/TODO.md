@@ -1,9 +1,4 @@
 # Deferred Debt
 
-- [ ] **Full original-host callback inventory (`TODO(High)`).** Admit through
-  M2 host compatibility after M1's pristine ledger identifies every unresolved
-  callback and its machine/host disposition.
-- [ ] **Safe CCPU executor yield proof (`TODO(High)`).** M3 must prove an
-  existing safe return boundary or stop for owner approval of a narrowly
-  generated port-ABI adaptation; do not use thread suspension or a second
-  timer as a workaround.
+No deferred work is recorded. Add an item only after an admitted task has
+identified work that is real but intentionally not queued.

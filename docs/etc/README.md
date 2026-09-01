@@ -1,5 +1,6 @@
 # Supporting Material Index
 
-This directory will hold immutable evidence ledgers, source comparison reports,
-and task-local supporting records. It cannot define active architecture, queue,
-or task state.
+`etc/` contains task evidence and supporting design detail. It does not define
+active work, architecture, or queue order.
+
+- `evidence/` contains reproducible command results and audit records.
