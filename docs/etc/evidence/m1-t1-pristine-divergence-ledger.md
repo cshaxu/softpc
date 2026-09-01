@@ -18,6 +18,20 @@
 The initial count is an inventory checkpoint, not evidence that every
 divergence is semantically necessary.
 
+## Reproduction
+
+Run the repository-owned read-only audit with the selected original root:
+
+```powershell
+.\scripts\audit_pristine_divergence.ps1 `
+  -OriginalRoot O:\repos.external\opennt-src-2\nt\private\mvdm\softpc.new
+```
+
+It emits the complete path-level manifest, including the source family,
+standalone-marker count, and a unique disposition. The tracked ledger records
+the boundary rationale; the script prevents its file universe from silently
+drifting.
+
 ## Required Dispositions
 
 Every divergent or no-peer item will receive exactly one of these
@@ -25,7 +39,7 @@ dispositions before T1 closes:
 
 | Disposition | Meaning |
 | --- | --- |
-| `restore-pristine` | Restore the original source verbatim; move any required standalone behavior outside it. |
+| `restore-pristine` | Restore the original source verbatim; move any required standalone behavior outside it. All 106 divergent original-peer files have this disposition. |
 | `port-abi-overlay` | Preserve behavior through a reproducible x86/x64 source/ABI adaptation outside the pristine layer. |
 | `compat-host` | Implement an original host contract outside the machine source. |
 | `remove-transitional` | Delete a standalone-only workaround after its replacement exists. |
@@ -49,9 +63,17 @@ machine capability; M3 must remove it once a proven executor boundary exists.
 
 ## S1 Completion Table
 
-The following complete per-file table is deliberately filled by the audit
-itself. No file is treated as restored merely because its family is known.
+The reproducible manifest is the complete per-file table. Its classification
+is deliberately mechanical:
 
-| Path | Original peer | Current difference | Disposition | Evidence / next task |
-| --- | --- | --- | --- | --- |
-| _pending hash-manifest audit_ |  |  |  |  |
+- Every same-relative-path original peer is `restore-pristine`. A buildable
+  port may later need a generated transform, but that belongs beside—not
+  inside—the restored source.
+- `softpc_ccpu_facade.c` and `softpc_standalone_dib.h` are `compat-host`.
+  They cannot be pristine-machine files because neither has an original peer.
+- GDP state/rule helpers and generated `host/inc/x86/prod` headers are
+  `port-abi-overlay`; they represent host/compiler compatibility inputs.
+
+Run the command above to enumerate every row. A row's `Next task` field gives
+the first admitted cut allowed to act on it; no source-changing task may
+silently reclassify a row.
