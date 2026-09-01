@@ -1,5 +1,4 @@
 #include "win32_window.h"
-#include "runner_pacer.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -175,10 +174,6 @@ static DWORD WINAPI softpc_window_run_machine(void *opaque)
 {
     softpc_machine *machine = (softpc_machine *)opaque;
     DWORD next_snapshot = 0u;
-    softpc_vm_runner_pacer pacer;
-
-    softpc_vm_runner_pacer_init(&pacer);
-
     while (InterlockedCompareExchange(&softpc_window_runner_active, 0, 0) != 0) {
         softpc_machine_result result;
         int input_applied;
@@ -194,7 +189,6 @@ static DWORD WINAPI softpc_window_run_machine(void *opaque)
                 PostMessageA(softpc_window_handle, WM_CLOSE, 0, 0);
             break;
         }
-        softpc_vm_runner_pacer_wait(&pacer);
         if (input_applied || (LONG)(GetTickCount() - next_snapshot) >= 0) {
             EnterCriticalSection(&softpc_window_machine_lock);
             softpc_window_publish_snapshot(machine);

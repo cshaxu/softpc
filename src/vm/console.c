@@ -1,5 +1,4 @@
 #include "console.h"
-#include "runner_pacer.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -214,7 +213,6 @@ int softpc_vm_run_console(softpc_machine *machine)
     DWORD original_mode;
     unsigned char previous[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
     int running = 1;
-    softpc_vm_runner_pacer pacer;
     int result = SOFTPC_VM_FRONTEND_STOPPED;
     int private_console;
     if (machine == NULL) return 1;
@@ -226,7 +224,6 @@ int softpc_vm_run_console(softpc_machine *machine)
         return 1;
     }
     memset(previous, 0xff, sizeof(previous));
-    softpc_vm_runner_pacer_init(&pacer);
     while (running) {
         INPUT_RECORD record;
         DWORD available;
@@ -249,7 +246,6 @@ int softpc_vm_run_console(softpc_machine *machine)
             running = 0;
         }
         softpc_console_paint(output, machine, previous);
-        softpc_vm_runner_pacer_wait(&pacer);
     }
     (void)SetConsoleMode(input, original_mode);
     softpc_console_close(input, output, private_console);

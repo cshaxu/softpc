@@ -388,7 +388,6 @@ target_compile_definitions(softpc-machine PRIVATE
 add_executable(softpcvm
     src/vm/main.c
     src/vm/console.c
-    src/vm/runner_pacer.c
     src/vm/win32_window.c
     src/vm/softpc_firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
