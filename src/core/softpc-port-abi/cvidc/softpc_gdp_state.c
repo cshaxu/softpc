@@ -8,10 +8,11 @@
 
 extern IHP Gdp;
 
-/* The selected generated header currently has 692 direct GDP forms.  Keep a
- * small amount of spare capacity so a source-version correction can be
- * audited without silently reallocating an active slot table. */
-#define SOFTPC_GDP_SLOT_CAPACITY 704u
+/* Generated C-VID reaches more distinct historical offsets during controller
+ * initialization than occur in the static header.  Slot storage itself is
+ * separately allocated, so growing this index never invalidates a returned
+ * field address. */
+#define SOFTPC_GDP_INITIAL_SLOT_CAPACITY 128u
 #define SOFTPC_GDP_MAGIC 0x47504453u
 
 typedef struct softpc_gdp_slot_record {
@@ -23,7 +24,8 @@ typedef struct softpc_gdp_slot_record {
 typedef struct softpc_gdp_state {
     uint32_t magic;
     unsigned int count;
-    softpc_gdp_slot_record slots[SOFTPC_GDP_SLOT_CAPACITY];
+    unsigned int capacity;
+    softpc_gdp_slot_record *slots;
 } softpc_gdp_state;
 
 static size_t softpc_gdp_vga_native_offset(unsigned int original_offset)
@@ -56,7 +58,10 @@ static size_t softpc_gdp_vga_native_offset(unsigned int original_offset)
     case 1376u: return offsetof(struct VGAGLOBALSETTINGS, colour_comp);
     case 1380u: return offsetof(struct VGAGLOBALSETTINGS, dont_care);
     case 1384u: return offsetof(struct VGAGLOBALSETTINGS, v7_bank_vid_copy_off);
-    case 1388u: return offsetof(struct VGAGLOBALSETTINGS, video_base_lin_addr);
+    /* The original 32-bit C-VID name at this offset is
+     * video_base_lin_addr.  The selected CCPU owns the shared aggregate and
+     * represents the same slot as video_base_ls0 at native pointer width. */
+    case 1388u: return offsetof(struct VGAGLOBALSETTINGS, video_base_ls0);
     case 1392u: return offsetof(struct VGAGLOBALSETTINGS, route_reg1);
     case 1396u: return offsetof(struct VGAGLOBALSETTINGS, route_reg2);
     case 1400u: return offsetof(struct VGAGLOBALSETTINGS, screen_ptr);
@@ -90,6 +95,7 @@ void softpc_gdp_destroy(void *value)
 
     if (state == NULL || state->magic != SOFTPC_GDP_MAGIC) return;
     for (index = 0u; index < state->count; ++index) free(state->slots[index].storage);
+    free(state->slots);
     state->magic = 0u;
     free(state);
 }
@@ -114,7 +120,16 @@ void *softpc_gdp_slot(const void *value, unsigned int original_offset,
         if (slot->original_offset != original_offset) continue;
         return slot->native_width == native_width ? slot->storage : NULL;
     }
-    if (state->count == SOFTPC_GDP_SLOT_CAPACITY) return NULL;
+    if (state->count == state->capacity) {
+        unsigned int new_capacity = state->capacity == 0u
+            ? SOFTPC_GDP_INITIAL_SLOT_CAPACITY : state->capacity * 2u;
+        softpc_gdp_slot_record *new_slots = (softpc_gdp_slot_record *)realloc(
+            state->slots, new_capacity * sizeof(*new_slots));
+
+        if (new_slots == NULL) return NULL;
+        state->slots = new_slots;
+        state->capacity = new_capacity;
+    }
     slot = &state->slots[state->count];
     slot->storage = calloc(1u, native_width);
     if (slot->storage == NULL) return NULL;

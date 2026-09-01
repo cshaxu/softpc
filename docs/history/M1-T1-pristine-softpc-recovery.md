@@ -24,7 +24,7 @@ It enumerates 115 non-identical current C/H files: 106 original peers assigned
 
 ## S2: Recover Original Execution-Source Boundaries
 
-**Status:** in progress.
+**Status:** complete.
 
 **Intent:** restore original CCPU execute/BOP flow and C-VID event glue before
 the compatibility host or runtime is redesigned. Any host-width declaration
@@ -36,3 +36,15 @@ records the recovered source flow, external `EDL_fast_bop` contract, successful
 x64 CCPU compile/link, and BOP smoke. It also records why the old full CTest
 cannot close this task: its transitional run-slice contract is unbounded once
 the CCPU instruction-budget workaround is correctly removed.
+
+## S3: Extract C-VID Port-ABI Inputs
+
+**Status:** complete.
+
+**Intent:** restore original `ev_glue.c` as a machine input while relocating
+GDP storage and generated-rule adaptations to `softpc-port-abi`. The build
+will consume a deterministic transformed copy for the x64 representation; the
+checked-in machine source must not carry that host policy.
+
+The resulting transform is idempotent and both x64 and x86 focused BOP smoke
+executables pass. See [S3 C-VID port-ABI evidence](../etc/evidence/m1-t1-s3-cvid-port-abi.md).

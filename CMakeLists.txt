@@ -62,6 +62,20 @@ foreach(SOFTPC_CVIDC_GENERATED_INPUT IN LISTS SOFTPC_CVIDC_GENERATED_INPUTS)
     list(APPEND SOFTPC_CVIDC_TRANSFORMED_SOURCES
         "${SOFTPC_CVIDC_TRANSFORMED_SOURCE}")
 endforeach()
+set(SOFTPC_CVIDC_EVENT_GLUE_INPUT
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/cvidc/ev_glue.c")
+set(SOFTPC_CVIDC_EVENT_GLUE_SOURCE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated-cvid/ev_glue.c")
+add_custom_command(
+    OUTPUT "${SOFTPC_CVIDC_EVENT_GLUE_SOURCE}"
+    COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
+        --event-glue "${SOFTPC_CVIDC_EVENT_GLUE_INPUT}"
+        "${SOFTPC_CVIDC_EVENT_GLUE_SOURCE}"
+    DEPENDS "${SOFTPC_CVIDC_EVENT_GLUE_INPUT}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
+    COMMENT "Transforming C-VID event glue port ABI"
+    VERBATIM)
 # ``j_c_lang`` is the generated-rule register file.  It carries private host
 # pointers (not guest registers), so x64 needs a pointer-width IUH only at
 # this generated-rule ABI boundary.  On an x86 host, the original generated
@@ -71,7 +85,7 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set_source_files_properties(
         ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
         src/core/softpc/base/cvidc/j_c_lang.c
-        src/core/softpc/base/cvidc/ev_glue.c
+        "${SOFTPC_CVIDC_EVENT_GLUE_SOURCE}"
         src/core/softpc/base/cvidc/vglfunc.c
         PROPERTIES COMPILE_DEFINITIONS CVIDC_RULE_WORD=1)
 endif()
@@ -81,13 +95,14 @@ add_library(softpc-ccpu-core OBJECT
     src/core/softpc/base/ccpu386/softpc_ccpu_facade.c
     src/core/softpc/base/ccpu386/vglob.c
     ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
-    src/core/softpc/base/cvidc/ev_glue.c
+    "${SOFTPC_CVIDC_EVENT_GLUE_SOURCE}"
     src/core/softpc/base/cvidc/evidfunc.c
     src/core/softpc/base/cvidc/j_c_lang.c
     src/core/softpc/base/cvidc/accessfn.c
     src/core/softpc/base/cvidc/vglfunc.c
-    src/core/softpc/base/cvidc/softpc_gdp_state.c
     src/core/softpc/base/cvidc/sascdef.c)
+add_library(softpc-port-abi OBJECT
+    src/core/softpc-port-abi/cvidc/softpc_gdp_state.c)
 
 # Controllers, firmware and the standalone host boundary evolve independently
 # of the CCPU/C-VIDC executor.  Keep them in a separate object target so a
@@ -170,13 +185,20 @@ set_target_properties(softpc-ccpu-core PROPERTIES
 set_target_properties(softpc-machine-devices PROPERTIES
     C_STANDARD 90
     C_EXTENSIONS ON)
+set_target_properties(softpc-port-abi PROPERTIES
+    C_STANDARD 90
+    C_EXTENSIONS ON)
 target_compile_definitions(softpc-ccpu-core PRIVATE
     CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1
     SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 target_compile_definitions(softpc-machine-devices PRIVATE
     CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1
     SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
+target_compile_definitions(softpc-port-abi PRIVATE
+    CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1
+    SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 target_include_directories(softpc-ccpu-core PRIVATE
+    src/core/softpc-port-abi/cvidc
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
     src/core/softpc/base/inc
@@ -185,6 +207,15 @@ target_include_directories(softpc-ccpu-core PRIVATE
     src/core)
 target_include_directories(softpc-machine-devices PRIVATE
     include
+    src/core/softpc-port-abi/cvidc
+    src/core/softpc/host/inc
+    src/core/softpc/host/inc/x86/prod
+    src/core/softpc/base/inc
+    src/core/softpc/base/ccpu386
+    src/core/softpc/base/cvidc
+    src/core)
+target_include_directories(softpc-port-abi PRIVATE
+    src/core/softpc-port-abi/cvidc
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
     src/core/softpc/base/inc
@@ -197,7 +228,9 @@ target_include_directories(softpc-machine-devices PRIVATE
 # object target.
 target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-ccpu-core>)
 target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-machine-devices>)
+target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-port-abi>)
 target_include_directories(softpc-machine PRIVATE
+    src/core/softpc-port-abi/cvidc
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
     src/core/softpc/base/inc

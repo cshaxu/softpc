@@ -2,29 +2,32 @@
 
 ## Current Work
 
-### M1 T1 S2 P1: Recover original execution-source boundaries
+### M1 T1 S4 P1: Reconcile remaining pristine-source divergences
 
 - **Owner:** repository owner (single-person dual-role execution)
 - **Input boundary:** the selected OpenNT source tree at
   `nt/private/mvdm/softpc.new`, and the current `src/core/softpc` tree.
-- **Output boundary:** restored original CCPU/C-VID execution-source inputs,
-  plus only the narrowly evidenced port-ABI declarations needed to compile
-  them. Runtime scheduling, BOP providers, and host callbacks remain outside.
-- **Scope:** recover the original `c_main.c` BOP and execute flow and C-VID
-  event glue; remove standalone scheduler policy from those machine files;
-  move no helper implementation into pristine source.
-- **Non-goals:** do not implement a new CPU executor, guest clock, device,
-  BIOS behavior, media path, or a synthetic BOP selector service.
-- **Focused verification:** source diff against original for the recovered
-  flows; static absence of standalone scheduler markers in those sources;
-  x64 and x86 configure/build/test after each buildable cut.
-- **Full regression:** all configured CTest cases on both host widths.
-- **Similar-issue sweep:** examine every CCPU/C-VID policy marker and direct
-  host call, not only the previously edited HLT branch.
-- **Stop condition:** stop before a portability repair changes guest-visible
-  execution semantics; record it for the port-ABI overlay instead.
-- **Exit criteria:** original execute/BOP/event semantics are restored or
-  every remaining exception has a bounded port-ABI rationale and proof.
+- **Output boundary:** updated complete divergence ledger and restored original
+  machine inputs, or a bounded external port-ABI/host-compat disposition for
+  every remaining selected source difference.
+- **Scope:** audit the current original-peer differences after S2/S3; recover
+  machine behavior where the selected original source is available; identify
+  any port-width declaration or host-boundary exception without implementing
+  M2 host services or M3 runtime policy.
+- **Non-goals:** do not add scheduling, product semantics, a replacement
+  renderer/controller, or a new user-facing feature.
+- **Focused verification:** reproduce the divergence manifest; source diff for
+  each restored input; x64 and x86 compile of every changed production target.
+- **Full regression:** retain the M3 safe-execution prerequisite before using
+  the legacy machine-run smoke as a closure gate.
+- **Similar-issue sweep:** inspect sibling variants and all CMake source lists
+  for direct compilation of a divergence already classified as overlay or host
+  compatibility.
+- **Stop condition:** stop for owner direction if restoring an original input
+  would require a DOS/WOW/NTVDM product service rather than a finite host
+  contract.
+- **Exit criteria:** no selected original-peer difference remains unclassified,
+  and every change admitted to pristine or port ABI has dual-width evidence.
 
 ## Current Technical Baseline
 
