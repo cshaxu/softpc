@@ -1173,4 +1173,3 @@ void fla_init IFN0()
     fla_ndma = FALSE;
     fla_busy = FALSE;
 }
-
