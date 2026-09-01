@@ -257,6 +257,23 @@ def transform_ccpu_fpu(source: str) -> str:
     return source
 
 
+def transform_ccpu_zfrsrvd(source: str) -> str:
+    if '#include <c_addr.h>' not in source:
+        source = source.replace('#include <c_mem.h>      /* CPU - Memory Interface */\n',
+                                '#include <c_mem.h>      /* CPU - Memory Interface */\n'
+                                '#include <c_addr.h>     /* Original d_mem/limit_check contracts */\n', 1)
+    if '#include <c_intr.h>' not in source:
+        source = source.replace('#include <c_reg.h>\n',
+                                '#include <c_reg.h>\n#include <c_intr.h>     /* Original do_intrupt contract */\n'
+                                '#include <intx.h>       /* Original INTx contract */\n', 1)
+    declaration = 'GLOBAL VOID FLDENV IPT1(VOID *, memPtr);\n'
+    if declaration not in source:
+        source = source.replace('LOCAL VOID npx_fabs() {', declaration + '\nLOCAL VOID npx_fabs() {', 1)
+    source = source.replace('VOID ZFRSRVD(npx_instr)\nIU32 npx_instr;\n{',
+                            'VOID ZFRSRVD(IU32 npx_instr)\n{', 1)
+    return source
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=pathlib.Path)
@@ -271,6 +288,7 @@ def main() -> int:
     parser.add_argument("--ccpu-main", action="store_true")
     parser.add_argument("--ccpu-ntstubs", action="store_true")
     parser.add_argument("--ccpu-fpu", action="store_true")
+    parser.add_argument("--ccpu-zfrsrvd", action="store_true")
     args = parser.parse_args()
 
     original = args.source.read_text(encoding="latin-1")
@@ -300,6 +318,9 @@ def main() -> int:
         static_count = dynamic_count = 1
     elif args.ccpu_fpu:
         generated = transform_ccpu_fpu(original)
+        static_count = dynamic_count = 1
+    elif args.ccpu_zfrsrvd:
+        generated = transform_ccpu_zfrsrvd(original)
         static_count = dynamic_count = 1
     else:
         generated, static_count, dynamic_count = transform_rules(original)

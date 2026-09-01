@@ -2,22 +2,23 @@
 
 ## Current Work
 
-### M1 T2 S10 P1: Externalize ZFRSRVD CCPU declarations
+### M1 T2 S11 P1: Reconcile the remaining CCPU divergence ledger
 
 - **Owner:** repository owner (single-person dual-role execution)
-- **Input boundary:** selected original `zfrsrvd.c` and its existing CCPU/FPU
-  declaration providers.
-- **Output boundary:** generated source declarations that compile the original
-  ZFRSRVD callable interface on both widths.
-- **Scope:** externalize only published original headers, the `FLDENV`
-  prototype, and the historic K&R parameter form.
-- **Non-goals:** do not change FPU operations, exceptions, instruction
-  decoding, BOP, SAS behavior, device state, or runtime pacing.
-- **Focused verification:** source hash, generated-output idempotence,
-  dual-width rebuild, and bounded BOP smoke.
-- **Stop condition:** stop if an overlay reaches any ZFRSRVD operation body.
-- **Exit criteria:** `zfrsrvd.c` is pristine and compiles through a bounded
-  generated declaration overlay.
+- **Input boundary:** current semantic-diff ledger after all admitted CCPU
+  source recoveries.
+- **Output boundary:** an updated classification proving each remaining row is
+  either pristine, a port-ABI overlay, a host compatibility boundary, or M3
+  executor work.
+- **Scope:** rerun the ledger and trace remaining source edits; remove only
+  representation-only edits whose selected provider and consumer are known.
+- **Non-goals:** do not change CCPU rule logic, event scheduling, BOP, BIOS,
+  controllers, runtime pacing, or user-facing frontends.
+- **Focused verification:** semantic ledger delta, source hashes, and bounded
+  dual-width BOP smoke for any admitted final recovery.
+- **Stop condition:** stop if a row needs a run-slice or timer/event choice.
+- **Exit criteria:** no unclassified direct CCPU source edits remain before M2
+  and M3 begin their respective host-contract work.
 
 ## Current Technical Baseline
 

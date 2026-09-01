@@ -128,7 +128,11 @@ set(SOFTPC_CCPU_FPU_INPUT
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/fpu.c")
 set(SOFTPC_CCPU_FPU_SOURCE
     "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/fpu.c")
-foreach(SOFTPC_CCPU_ABI_NAME IN ITEMS sas-header bsic-header sas-source main ntstubs fpu)
+set(SOFTPC_CCPU_ZFRSRVD_INPUT
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/zfrsrvd.c")
+set(SOFTPC_CCPU_ZFRSRVD_SOURCE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/zfrsrvd.c")
+foreach(SOFTPC_CCPU_ABI_NAME IN ITEMS sas-header bsic-header sas-source main ntstubs fpu zfrsrvd)
     if(SOFTPC_CCPU_ABI_NAME STREQUAL "sas-header")
         set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_SAS_HEADER_INPUT}")
         set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_SAS_HEADER_SOURCE}")
@@ -144,6 +148,9 @@ foreach(SOFTPC_CCPU_ABI_NAME IN ITEMS sas-header bsic-header sas-source main nts
     elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "fpu")
         set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_FPU_INPUT}")
         set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_FPU_SOURCE}")
+    elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "zfrsrvd")
+        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_ZFRSRVD_INPUT}")
+        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_ZFRSRVD_SOURCE}")
     else()
         set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_SAS_INPUT}")
         set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_SAS_SOURCE}")
@@ -167,8 +174,9 @@ add_custom_target(softpc-ccpu-port-abi-inputs
             "${SOFTPC_CCPU_SAS_SOURCE}"
             "${SOFTPC_CCPU_MAIN_SOURCE}"
             "${SOFTPC_CCPU_NTSTUBS_SOURCE}"
-            "${SOFTPC_CCPU_FPU_SOURCE}")
-set_source_files_properties("${SOFTPC_CCPU_SAS_SOURCE}" "${SOFTPC_CCPU_MAIN_SOURCE}" "${SOFTPC_CCPU_NTSTUBS_SOURCE}" "${SOFTPC_CCPU_FPU_SOURCE}" PROPERTIES GENERATED TRUE)
+            "${SOFTPC_CCPU_FPU_SOURCE}"
+            "${SOFTPC_CCPU_ZFRSRVD_SOURCE}")
+set_source_files_properties("${SOFTPC_CCPU_SAS_SOURCE}" "${SOFTPC_CCPU_MAIN_SOURCE}" "${SOFTPC_CCPU_NTSTUBS_SOURCE}" "${SOFTPC_CCPU_FPU_SOURCE}" "${SOFTPC_CCPU_ZFRSRVD_SOURCE}" PROPERTIES GENERATED TRUE)
 list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_SAS_INPUT}")
 list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_SAS_SOURCE}")
 list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_MAIN_INPUT}")
@@ -177,6 +185,8 @@ list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_NTSTUBS_INPUT}")
 list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_NTSTUBS_SOURCE}")
 list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_FPU_INPUT}")
 list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_FPU_SOURCE}")
+list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_ZFRSRVD_INPUT}")
+list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_ZFRSRVD_SOURCE}")
 # ``j_c_lang`` is the generated-rule register file.  It carries private host
 # pointers (not guest registers), so x64 needs a pointer-width IUH only at
 # this generated-rule ABI boundary.  On an x86 host, the original generated
