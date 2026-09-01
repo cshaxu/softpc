@@ -43,5 +43,10 @@
 
 The machine remains direct-launch transitional behavior on `main`. M3/T3
 closed its executor-boundary audit and rejected an unsafe timer retrofit under
-the legacy slice API. The target architecture remains in
-[System Architecture](../design/ARCHITECTURE.md).
+the legacy slice API. M3/T4 further established that the original
+`c_cpu_unsimulate()` transfer targets the current nested `host_simulate` frame,
+not a VM lifecycle frame; its unintegrated runtime trial was removed. The
+active packet is at its stop condition pending explicit approval of the narrow
+outer-frame port-ABI adapter recorded in
+[M3 T4 lifecycle-boundary evidence](../etc/evidence/m3-t4-s1-lifecycle-boundary.md).
+The target architecture remains in [System Architecture](../design/ARCHITECTURE.md).
