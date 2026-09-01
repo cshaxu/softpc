@@ -972,6 +972,10 @@ void host_timer_event(void)
        is deliberately absent; these calls advance only restored devices and
        the standalone DIB renderer. */
     host_graphics_tick();
+    /* quick_ev.c calibrates the original CCPU time-to-jump conversion from
+       this host heartbeat.  It is machine timing support, not a frontend
+       cadence or an invented guest tick. */
+    quick_tick_recalibrate();
     host_com_heart_beat();
     host_lpt_heart_beat();
     time_strobe();
