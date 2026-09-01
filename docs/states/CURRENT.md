@@ -2,32 +2,26 @@
 
 ## Current Work
 
-### M1 T1 S4 P1: Reconcile remaining pristine-source divergences
+### M1 T2 S1 P1: Define port-ABI transformation inventory
 
 - **Owner:** repository owner (single-person dual-role execution)
-- **Input boundary:** the selected OpenNT source tree at
-  `nt/private/mvdm/softpc.new`, and the current `src/core/softpc` tree.
-- **Output boundary:** updated complete divergence ledger and restored original
-  machine inputs, or a bounded external port-ABI/host-compat disposition for
-  every remaining selected source difference.
-- **Scope:** audit the current original-peer differences after S2/S3; recover
-  machine behavior where the selected original source is available; identify
-  any port-width declaration or host-boundary exception without implementing
-  M2 host services or M3 runtime policy.
-- **Non-goals:** do not add scheduling, product semantics, a replacement
-  renderer/controller, or a new user-facing feature.
-- **Focused verification:** reproduce the divergence manifest; source diff for
-  each restored input; x64 and x86 compile of every changed production target.
-- **Full regression:** retain the M3 safe-execution prerequisite before using
-  the legacy machine-run smoke as a closure gate.
-- **Similar-issue sweep:** inspect sibling variants and all CMake source lists
-  for direct compilation of a divergence already classified as overlay or host
-  compatibility.
-- **Stop condition:** stop for owner direction if restoring an original input
-  would require a DOS/WOW/NTVDM product service rather than a finite host
-  contract.
-- **Exit criteria:** no selected original-peer difference remains unclassified,
-  and every change admitted to pristine or port ABI has dual-width evidence.
+- **Input boundary:** the `port-abi-overlay` rows in the semantic divergence
+  ledger, the selected OpenNT source tree, and the existing C-VID transform.
+- **Output boundary:** one explicit transformation inventory showing which
+  original CCPU/C-VID/declaration inputs compile directly, which are generated
+  overlays, and their native-width rationale.
+- **Scope:** plan and prove only pointer-width, generated-rule, and declaration
+  adaptation. Preserve original execution, controller, BIOS, BOP, renderer,
+  and frontend behavior.
+- **Non-goals:** do not add host services, runtime scheduling, or a new
+  controller implementation.
+- **Focused verification:** deterministic transform output and dual-width
+  compilation of each admitted target.
+- **Stop condition:** stop for owner direction if an apparent ABI overlay
+  changes a guest-visible value or needs a product service.
+- **Exit criteria:** each `port-abi-overlay` row has an owner, transformation
+  location, and dual-width proof plan; no core source change is made merely to
+  hide a host contract.
 
 ## Current Technical Baseline
 

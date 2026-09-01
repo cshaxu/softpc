@@ -48,3 +48,19 @@ checked-in machine source must not carry that host policy.
 
 The resulting transform is idempotent and both x64 and x86 focused BOP smoke
 executables pass. See [S3 C-VID port-ABI evidence](../etc/evidence/m1-t1-s3-cvid-port-abi.md).
+
+## S4: Reconcile Remaining Pristine-Source Divergences
+
+**Status:** complete.
+
+The audit now compares canonical source text rather than historical line
+endings. It has 75 actionable rows, each assigned to `restore-pristine`,
+`port-abi-overlay`, or `compat-host`; there is no unclassified state.
+
+The clear original-machine recoveries landed as commits `8b72547`, `b304479`,
+and `958b48f`: the BIOS BOP service group, the original 8272A floppy
+controller input, and the build-ID BIOS service. Both x64 and x86 rebuilt
+after each recovery; BOP smoke passed after the BIOS group and FDC smoke
+passed after the controller recovery. The updated
+[semantic ledger](../etc/evidence/m1-t1-pristine-divergence-ledger.md) is the
+full per-file evidence.

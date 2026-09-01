@@ -39,7 +39,16 @@ function Get-NextTask([string]$Family, [bool]$HasOriginalPeer) {
 }
 
 function Get-Disposition([string]$RelativePath, [bool]$HasOriginalPeer) {
-    if ($HasOriginalPeer) { return 'restore-pristine' }
+    if ($HasOriginalPeer) {
+        if ($RelativePath.StartsWith('host\')) { return 'compat-host' }
+        if ($RelativePath.StartsWith('base\ccpu386\') -or
+            $RelativePath.StartsWith('base\cvidc\') -or
+            $RelativePath.StartsWith('base\inc\')) {
+            return 'port-abi-overlay'
+        }
+        if ($RelativePath -eq 'base\support\ios.c') { return 'compat-host' }
+        return 'restore-pristine'
+    }
     if ($RelativePath -eq 'base\ccpu386\softpc_ccpu_facade.c') {
         return 'compat-host'
     }
@@ -47,6 +56,16 @@ function Get-Disposition([string]$RelativePath, [bool]$HasOriginalPeer) {
         return 'compat-host'
     }
     return 'port-abi-overlay'
+}
+
+function Get-CanonicalSource([string]$Path) {
+    # The selected historical tree is CRLF while the working tree may be LF.
+    # Source ownership is a text question, so do not report line-ending or
+    # terminal-blank normalization as a machine divergence.
+    $text = [System.Text.Encoding]::Latin1.GetString(
+        [System.IO.File]::ReadAllBytes($Path)
+    )
+    return $text.Replace("`r", '').TrimEnd("`n")
 }
 
 Get-ChildItem -LiteralPath $current -Recurse -File |
@@ -59,9 +78,8 @@ Get-ChildItem -LiteralPath $current -Recurse -File |
         $state = 'no-original-peer'
 
         if ($hasPeer) {
-            $currentHash = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
-            $originalHash = (Get-FileHash -LiteralPath $originalPath -Algorithm SHA256).Hash
-            if ($currentHash -eq $originalHash) {
+            if ((Get-CanonicalSource $_.FullName) -ceq
+                (Get-CanonicalSource $originalPath)) {
                 return
             }
             $state = 'divergent-original-peer'
