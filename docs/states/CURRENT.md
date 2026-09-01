@@ -2,24 +2,24 @@
 
 ## Current Work
 
-### M1 T2 S7 P1: Classify remaining CCPU generated-source overlays
+### M1 T2 S8 P1: Externalize the FPU private-index carrier
 
 - **Owner:** repository owner (single-person dual-role execution)
-- **Input boundary:** remaining semantic-diff rows in original CCPU generated
-  sources, including `fpu.c`, `sascdef.c`, and `zfrsrvd.c`.
-- **Output boundary:** a ranked, evidence-backed roster separating pure
-  declaration/carrier overlays from candidates that must wait for M3.
-- **Scope:** trace each remaining direct edit to its provider, consumer, and
-  width requirement; admit one bounded source only if its overlay cannot
-  change CCPU rule logic.
-- **Non-goals:** do not modify FPU arithmetic, exception behavior, generated
-  instruction rules, BOP dispatch, controller state, or runtime pacing.
-- **Focused verification:** source diffs, owner traces, and generated-output
-  idempotence for any admitted source.
-- **Stop condition:** stop at any candidate whose recovery needs an executor
-  run-slice decision.
-- **Exit criteria:** each remaining row is either an admitted minimal overlay
-  or explicitly deferred to M3 with concrete blocking evidence.
+- **Input boundary:** selected original `fpu.c` and its eight-entry private
+  FPU stack representation.
+- **Output boundary:** a generated FPU compilation input with one fixed guest
+  register-index carrier.
+- **Scope:** externalize only the native diagnostic include and the bounded
+  `TOSPtr - FPUStackBase` conversion before it joins original `IU32` index
+  arithmetic.
+- **Non-goals:** do not change FPU arithmetic, exception behavior, stack
+  contents, initialization, BOP dispatch, or runtime pacing.
+- **Focused verification:** source hash, transform idempotence, dual-width
+  rebuild, and bounded BOP smoke.
+- **Stop condition:** stop if any edit reaches an FPU operation or changes a
+  guest-visible register result.
+- **Exit criteria:** `fpu.c` is pristine in the tree and its sole host-width
+  carrier is supplied by a reproducible generated overlay.
 
 ## Current Technical Baseline
 
