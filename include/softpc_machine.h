@@ -53,6 +53,9 @@ softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,
 /* Deliver an original SoftPC keyboard key number after host mapping. */
 softpc_machine_result softpc_machine_key_number(softpc_machine *machine,
     uint8_t key_number, uint8_t released);
+/* Wake an executor that is halted in guest idle without manufacturing a
+ * timer/device tick. This is safe to call from a frontend input thread. */
+void softpc_machine_request_wake(softpc_machine *machine);
 /* Inject relative host-pointer movement into the original Microsoft Bus
  * Mouse adapter. Button values are zero (up) or nonzero (down). */
 softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,

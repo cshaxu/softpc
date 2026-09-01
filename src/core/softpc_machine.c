@@ -10,7 +10,6 @@ extern void c_cpu_init(void);
 extern void c_cpu_reset(void);
 extern void c_cpu_simulate(void);
 extern void c_cpu_terminate(void);
-extern void a3_cpu_interrupt(int errupt, unsigned short number);
 extern unsigned short c_getCS(void);
 extern unsigned long c_getCS_BASE(void);
 extern unsigned long c_getEIP(void);
@@ -32,6 +31,7 @@ extern int softpc_platform_read_physical(unsigned long address,
 extern void softpc_device_bop_register_machine_services(void);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
 extern int softpc_platform_keyboard_key(int key, int released);
+extern void softpc_platform_request_executor_wake(void);
 extern void mouse_send(int delta_x, int delta_y, int left, int right);
 extern void time_strobe(void);
 extern void host_timer_shutdown(void);
@@ -237,15 +237,18 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
     if (machine == NULL || !machine->reset || instruction_budget == 0u)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     softpc_ccpu_instruction_budget = (unsigned long)instruction_budget;
-    /* The original CCPU consumes CPU_TIMER_TICK at an instruction boundary.
-       A standalone machine owns that heartbeat at the public slice boundary,
-       rather than using the historical NTVDM timer thread.  Nested original
-       host_simulate() calls retain their own BOP-FE return path in CCPU. */
-    a3_cpu_interrupt(1, 0u);
+    /* The original timer subsystem starts the standalone host timer during
+       reset.  Do not manufacture a second timer tick at every UI slice. */
     softpc_ccpu_instruction_budget_active = 1;
     c_cpu_simulate();
     softpc_ccpu_instruction_budget_active = 0;
     return SOFTPC_MACHINE_OK;
+}
+
+void softpc_machine_request_wake(softpc_machine *machine)
+{
+    if (machine != NULL && machine->reset)
+        softpc_platform_request_executor_wake();
 }
 
 softpc_machine_result softpc_machine_instruction_pointer(

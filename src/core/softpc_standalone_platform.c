@@ -50,6 +50,7 @@ IBOOL softpc_ccpu_instruction_budget_active = FALSE;
    on the machine/executor thread where the original device state lives. */
 static HANDLE softpc_clock_timer;
 static volatile LONG softpc_clock_pending_ticks;
+static volatile LONG softpc_executor_wake_pending;
 static volatile LONG softpc_boot_clock_active;
 
 static VOID CALLBACK softpc_clock_tick(PVOID context, BOOLEAN fired)
@@ -73,6 +74,26 @@ IBOOL softpc_platform_consume_clock_tick(void)
     if (InterlockedCompareExchange(&softpc_boot_clock_active, 0, 0) != 0)
         return TRUE;
     return InterlockedExchange(&softpc_clock_pending_ticks, 0) != 0;
+#else
+    return FALSE;
+#endif
+}
+
+/* A frontend may request that an HLT loop return to its owning executor so
+ * queued keyboard/mouse input can be applied.  This is deliberately separate
+ * from the 20Hz device clock: waking must not advance the PIT, video, or
+ * controller state. */
+void softpc_platform_request_executor_wake(void)
+{
+#ifdef _WIN32
+    (void)InterlockedExchange(&softpc_executor_wake_pending, 1);
+#endif
+}
+
+IBOOL softpc_platform_consume_executor_wake(void)
+{
+#ifdef _WIN32
+    return InterlockedExchange(&softpc_executor_wake_pending, 0) != 0;
 #else
     return FALSE;
 #endif

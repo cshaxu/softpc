@@ -538,9 +538,8 @@ extern IBOOL checkForQEvent IPT0();
 	}
 
 /* The historical non-SFELLOW CCPU build discarded SIGALRM because its
- * platform owned no usable host event route.  A standalone machine does:
- * its run-slice boundary injects CPU_TIMER_TICK and the host port advances
- * the original controller/renderer state machines. */
+ * platform owned no usable host event route.  A standalone machine receives
+ * its real host timer and frontend wake requests through the ports below. */
 #ifndef SOFTPC_STANDALONE
 #ifdef host_timer_event
 #undef host_timer_event
@@ -555,6 +554,7 @@ extern IBOOL checkForQEvent IPT0();
    Keep all original device clock work on this executor thread, including
    nested host_simulate() calls made by ROM BOP services. */
 extern IBOOL softpc_platform_consume_clock_tick(void);
+extern IBOOL softpc_platform_consume_executor_wake(void);
 #endif
 
 #ifdef SFELLOW
@@ -4029,6 +4029,12 @@ TYPEE8:
 	       c_cpu_unsimulate();
 	    }
 	    }
+	 if (softpc_platform_consume_executor_wake())
+	    {
+	    extern IBOOL softpc_ccpu_instruction_budget_active;
+	    if (softpc_ccpu_instruction_budget_active && simulate_level == 1)
+	       c_cpu_unsimulate();
+	    }
 #endif
 
 #ifndef	PROD
@@ -4395,6 +4401,12 @@ TYPEFF_3:
 #ifdef SOFTPC_STANDALONE
    if (softpc_platform_consume_clock_tick())
       host_timer_event();
+   if (softpc_platform_consume_executor_wake())
+      {
+      extern IBOOL softpc_ccpu_instruction_budget_active;
+      if (softpc_ccpu_instruction_budget_active && simulate_level == 1)
+         c_cpu_unsimulate();
+      }
 #endif
 
    if (cpu_interrupt_map & CPU_SAD_EXCEPTION_MASK)

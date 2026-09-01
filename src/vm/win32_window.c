@@ -78,6 +78,7 @@ static void softpc_window_queue_key(BYTE key_number, int released)
         softpc_window_input_releases[softpc_window_input_head] =
             (unsigned char)(released != 0);
         softpc_window_input_head = next;
+        softpc_machine_request_wake(softpc_window_machine);
     }
     LeaveCriticalSection(&softpc_window_input_lock);
 }
@@ -379,6 +380,7 @@ static void softpc_window_mouse(int x, int y)
     softpc_window_pending_mouse_left = (uint8_t)softpc_window_left_button;
     softpc_window_pending_mouse_right = (uint8_t)softpc_window_right_button;
     softpc_window_mouse_pending = 1;
+    softpc_machine_request_wake(softpc_window_machine);
     LeaveCriticalSection(&softpc_window_input_lock);
 }
 
