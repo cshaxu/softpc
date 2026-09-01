@@ -1,8 +1,8 @@
 set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/ccpu386/softpc_ccpu_facade.c"
-    "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/softpc_gdp_state.c"
-    "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/softpc_gdp_state.h"
-    "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/softpc_gdp_slots.h"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc-port-abi/cvidc/softpc_gdp_state.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc-port-abi/cvidc/softpc_gdp_state.h"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc-port-abi/cvidc/softpc_gdp_slots.h"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/cvidc/sascdef.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/support/ios.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc/base/disks/fdisk.c"
@@ -154,4 +154,10 @@ file(READ "${SOFTPC_SOURCE_DIR}/src/vm/console.c" console_frontend)
 string(TOLOWER "${window_frontend}${console_frontend}" normalized_frontends)
 if(normalized_frontends MATCHES "host_key_(down|up)|mouse_send")
     message(FATAL_ERROR "Standalone frontend bypasses original SoftPC input controllers")
+endif()
+
+# Runtime owns every machine pointer.  Both display frontends are mailbox
+# clients: they may enqueue host records and copy published frames only.
+if(normalized_frontends MATCHES "softpc_machine_")
+    message(FATAL_ERROR "Standalone frontend directly accesses the machine")
 endif()

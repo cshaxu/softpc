@@ -12,6 +12,7 @@
 #define SOFTPC_RUNTIME_DIB_MAX_BYTES \
     (SOFTPC_RUNTIME_DIB_MAX_WIDTH * SOFTPC_RUNTIME_DIB_MAX_HEIGHT)
 #define SOFTPC_RUNTIME_DIB_INFO_BYTES 1064u
+#define SOFTPC_RUNTIME_PATH_MAX 1024u
 
 typedef struct softpc_runtime softpc_runtime;
 
@@ -42,6 +43,7 @@ int softpc_runtime_start(softpc_runtime *runtime);
 int softpc_runtime_pause(softpc_runtime *runtime);
 int softpc_runtime_resume(softpc_runtime *runtime);
 int softpc_runtime_stop(softpc_runtime *runtime);
+int softpc_runtime_set_floppy(softpc_runtime *runtime, const char *path);
 softpc_runtime_state softpc_runtime_get_state(const softpc_runtime *runtime);
 softpc_machine_result softpc_runtime_get_result(const softpc_runtime *runtime);
 int softpc_runtime_enqueue_key(softpc_runtime *runtime, uint8_t key_number,

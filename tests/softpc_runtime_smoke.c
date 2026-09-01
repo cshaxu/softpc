@@ -54,6 +54,7 @@ int main(void)
     assert(softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_STOPPED);
     assert(softpc_runtime_start(runtime));
     assert(softpc_runtime_stop(runtime));
+    assert(softpc_runtime_set_floppy(runtime, NULL));
     free(frame);
     softpc_runtime_destroy(runtime);
     softpc_machine_destroy(machine);

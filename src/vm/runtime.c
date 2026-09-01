@@ -26,6 +26,7 @@ struct softpc_runtime {
     HANDLE command_event;
     HANDLE ready_event;
     HANDLE resume_event;
+    HANDLE media_event;
     HANDLE worker;
     volatile LONG state;
     volatile LONG result;
@@ -33,6 +34,9 @@ struct softpc_runtime {
     volatile LONG stop_requested;
     volatile LONG start_requested;
     volatile LONG terminate_requested;
+    volatile LONG media_requested;
+    softpc_machine_result media_result;
+    char media_floppy_path[SOFTPC_RUNTIME_PATH_MAX];
 };
 
 static void softpc_runtime_publish(softpc_runtime *runtime)
@@ -173,6 +177,13 @@ static DWORD WINAPI softpc_runtime_worker(void *opaque)
         (void)WaitForSingleObject(runtime->command_event, INFINITE);
         if (InterlockedCompareExchange(&runtime->terminate_requested, 0, 0) != 0)
             break;
+        if (InterlockedExchange(&runtime->media_requested, 0) != 0) {
+            runtime->media_result = softpc_machine_set_floppy(runtime->machine,
+                runtime->media_floppy_path[0] == '\0' ? NULL :
+                runtime->media_floppy_path);
+            SetEvent(runtime->media_event);
+            continue;
+        }
         if (InterlockedExchange(&runtime->start_requested, 0) == 0)
             continue;
 
@@ -216,11 +227,13 @@ int softpc_runtime_create(softpc_machine *machine, softpc_runtime **out)
     runtime->command_event = CreateEventA(NULL, FALSE, FALSE, NULL);
     runtime->ready_event = CreateEventA(NULL, TRUE, FALSE, NULL);
     runtime->resume_event = CreateEventA(NULL, FALSE, FALSE, NULL);
+    runtime->media_event = CreateEventA(NULL, TRUE, FALSE, NULL);
     if (runtime->command_event == NULL || runtime->ready_event == NULL ||
-        runtime->resume_event == NULL) {
+        runtime->resume_event == NULL || runtime->media_event == NULL) {
         if (runtime->command_event != NULL) CloseHandle(runtime->command_event);
         if (runtime->ready_event != NULL) CloseHandle(runtime->ready_event);
         if (runtime->resume_event != NULL) CloseHandle(runtime->resume_event);
+        if (runtime->media_event != NULL) CloseHandle(runtime->media_event);
         free(runtime);
         return 0;
     }
@@ -233,6 +246,7 @@ int softpc_runtime_create(softpc_machine *machine, softpc_runtime **out)
     if (runtime->worker == NULL) {
         CloseHandle(runtime->resume_event);
         CloseHandle(runtime->ready_event);
+        CloseHandle(runtime->media_event);
         CloseHandle(runtime->command_event);
         DeleteCriticalSection(&runtime->frame_lock);
         DeleteCriticalSection(&runtime->input_lock);
@@ -262,10 +276,20 @@ int softpc_runtime_start(softpc_runtime *runtime)
 
 int softpc_runtime_pause(softpc_runtime *runtime)
 {
+    DWORD deadline;
     if (runtime == NULL || InterlockedCompareExchange(&runtime->state, 0, 0) !=
         SOFTPC_RUNTIME_RUNNING) return 0;
     InterlockedExchange(&runtime->pause_requested, 1);
-    return 1;
+    deadline = GetTickCount() + 5000u;
+    do {
+        if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
+            SOFTPC_RUNTIME_PAUSED) return 1;
+        if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
+            SOFTPC_RUNTIME_RUNNING) return 0;
+        Sleep(1u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    InterlockedExchange(&runtime->pause_requested, 0);
+    return 0;
 }
 
 int softpc_runtime_resume(softpc_runtime *runtime)
@@ -294,6 +318,26 @@ int softpc_runtime_stop(softpc_runtime *runtime)
         return 0;
     return InterlockedCompareExchange(&runtime->state, 0, 0) ==
         SOFTPC_RUNTIME_STOPPED;
+}
+
+int softpc_runtime_set_floppy(softpc_runtime *runtime, const char *path)
+{
+    size_t length;
+    if (runtime == NULL || InterlockedCompareExchange(&runtime->state, 0, 0) !=
+        SOFTPC_RUNTIME_STOPPED) return 0;
+    if (path == NULL) {
+        runtime->media_floppy_path[0] = '\0';
+    } else {
+        length = strlen(path);
+        if (length >= sizeof(runtime->media_floppy_path)) return 0;
+        memcpy(runtime->media_floppy_path, path, length + 1u);
+    }
+    ResetEvent(runtime->media_event);
+    InterlockedExchange(&runtime->media_requested, 1);
+    SetEvent(runtime->command_event);
+    if (WaitForSingleObject(runtime->media_event, INFINITE) != WAIT_OBJECT_0)
+        return 0;
+    return runtime->media_result == SOFTPC_MACHINE_OK;
 }
 
 softpc_runtime_state softpc_runtime_get_state(const softpc_runtime *runtime)
@@ -369,6 +413,7 @@ void softpc_runtime_destroy(softpc_runtime *runtime)
     CloseHandle(runtime->worker);
     CloseHandle(runtime->ready_event);
     CloseHandle(runtime->resume_event);
+    CloseHandle(runtime->media_event);
     CloseHandle(runtime->command_event);
     DeleteCriticalSection(&runtime->frame_lock);
     DeleteCriticalSection(&runtime->input_lock);

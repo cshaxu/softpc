@@ -66,7 +66,7 @@ static void softpc_console_close(HANDLE input, HANDLE output,
     if (private_console) FreeConsole();
 }
 
-static int softpc_console_deliver_virtual_key(softpc_machine *machine,
+static int softpc_console_deliver_virtual_key(softpc_runtime *runtime,
     WORD virtual_key, DWORD control_state, int released)
 {
     KEY_EVENT_RECORD event;
@@ -80,11 +80,11 @@ static int softpc_console_deliver_virtual_key(softpc_machine *machine,
     event.dwControlKeyState = control_state;
     key_number = KeyMsgToKeyCode(&event);
     if (key_number == 0u) return -1;
-    return softpc_machine_key_number(machine, key_number, (uint8_t)released)
-        == SOFTPC_MACHINE_OK ? -1 : SOFTPC_VM_FRONTEND_ERROR;
+    return softpc_runtime_enqueue_key(runtime, key_number, (uint8_t)released) ?
+        -1 : SOFTPC_VM_FRONTEND_ERROR;
 }
 
-static int softpc_console_deliver_unicode(softpc_machine *machine,
+static int softpc_console_deliver_unicode(softpc_runtime *runtime,
     WCHAR character)
 {
     SHORT translated = VkKeyScanW(character);
@@ -96,25 +96,25 @@ static int softpc_console_deliver_unicode(softpc_machine *machine,
        key-down/key-up pair. Synthesize one complete physical sequence so
        modifiers cannot remain stuck when the matching packet has no key-up. */
     if ((modifiers & 1u) != 0u && (action = softpc_console_deliver_virtual_key(
-            machine, VK_SHIFT, 0u, 0)) >= 0) return action;
+            runtime, VK_SHIFT, 0u, 0)) >= 0) return action;
     if ((modifiers & 2u) != 0u && (action = softpc_console_deliver_virtual_key(
-            machine, VK_CONTROL, 0u, 0)) >= 0) return action;
+            runtime, VK_CONTROL, 0u, 0)) >= 0) return action;
     if ((modifiers & 4u) != 0u && (action = softpc_console_deliver_virtual_key(
-            machine, VK_MENU, 0u, 0)) >= 0) return action;
-    if ((action = softpc_console_deliver_virtual_key(machine,
+            runtime, VK_MENU, 0u, 0)) >= 0) return action;
+    if ((action = softpc_console_deliver_virtual_key(runtime,
             LOBYTE(translated), 0u, 0)) >= 0) return action;
-    if ((action = softpc_console_deliver_virtual_key(machine,
+    if ((action = softpc_console_deliver_virtual_key(runtime,
             LOBYTE(translated), 0u, 1)) >= 0) return action;
     if ((modifiers & 4u) != 0u && (action = softpc_console_deliver_virtual_key(
-            machine, VK_MENU, 0u, 1)) >= 0) return action;
+            runtime, VK_MENU, 0u, 1)) >= 0) return action;
     if ((modifiers & 2u) != 0u && (action = softpc_console_deliver_virtual_key(
-            machine, VK_CONTROL, 0u, 1)) >= 0) return action;
+            runtime, VK_CONTROL, 0u, 1)) >= 0) return action;
     if ((modifiers & 1u) != 0u) return softpc_console_deliver_virtual_key(
-        machine, VK_SHIFT, 0u, 1);
+        runtime, VK_SHIFT, 0u, 1);
     return -1;
 }
 
-static int softpc_console_key(softpc_machine *machine, const KEY_EVENT_RECORD *key)
+static int softpc_console_key(softpc_runtime *runtime, const KEY_EVENT_RECORD *key)
 {
     KEY_EVENT_RECORD event;
     BYTE key_number;
@@ -131,7 +131,7 @@ static int softpc_console_key(softpc_machine *machine, const KEY_EVENT_RECORD *k
        that host detail through the Win32 keyboard layout, then retain the
        original SoftPC key-number translation and 8042 path. */
     if (key_number == 0u && key->bKeyDown && event.uChar.UnicodeChar != 0u) {
-        int action = softpc_console_deliver_unicode(machine,
+        int action = softpc_console_deliver_unicode(runtime,
             event.uChar.UnicodeChar);
         if (action >= 0) return action;
         if (action == -1) return -1;
@@ -147,75 +147,50 @@ static int softpc_console_key(softpc_machine *machine, const KEY_EVENT_RECORD *k
     /* A console can report layout/dead-key and focus records that have no
        original SoftPC key number. They are not a monitor stop request. */
     if (key_number == 0u) return -1;
-    return softpc_machine_key_number(machine, key_number,
-        (uint8_t)!key->bKeyDown) == SOFTPC_MACHINE_OK ? -1 :
+    return softpc_runtime_enqueue_key(runtime, key_number,
+        (uint8_t)!key->bKeyDown) ? -1 :
         SOFTPC_VM_FRONTEND_ERROR;
 }
 
-static void softpc_console_paint(HANDLE output, softpc_machine *machine,
-    unsigned char *previous)
+static void softpc_console_paint(HANDLE output,
+    const softpc_runtime_frame *frame, unsigned char *previous)
 {
-    const void *surface;
-    const unsigned char *cells;
-    uint32_t columns;
-    uint32_t rows;
-    uint32_t stride;
-    uint32_t cell_bytes;
-    int32_t cursor_column;
-    int32_t cursor_row;
-    unsigned char text[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
     unsigned int row;
-    /* nt_text() is the original controller-aware presenter.  It already
-       applies CRTC page origin, row stride and mode geometry, which raw
-       B8000 reads cannot reconstruct. */
-    if (!softpc_machine_presentation_text(machine, &surface,
-            &columns, &rows, &stride, &cell_bytes) || cell_bytes < 1u ||
-        stride < columns) return;
-    cells = (const unsigned char *)surface;
-    memset(text, ' ', sizeof(text));
-    if (columns > SOFTPC_TEXT_COLUMNS) columns = SOFTPC_TEXT_COLUMNS;
-    if (rows > SOFTPC_TEXT_ROWS) rows = SOFTPC_TEXT_ROWS;
-    for (row = 0u; row < rows; ++row) {
-        unsigned int column;
-        for (column = 0u; column < columns; ++column)
-            text[row * SOFTPC_TEXT_COLUMNS + column] =
-                cells[(row * stride + column) * cell_bytes];
-    }
-    if (memcmp(text, previous, sizeof(text)) != 0) {
+    if (frame->valid == 0u || frame->graphics != 0u ||
+        memcmp(frame->text, previous, sizeof(frame->text)) == 0) return;
     for (row = 0; row < SOFTPC_TEXT_ROWS; ++row) {
         CHAR line[SOFTPC_TEXT_COLUMNS];
         unsigned int column;
         for (column = 0; column < SOFTPC_TEXT_COLUMNS; ++column) {
-            unsigned char character = text[row * SOFTPC_TEXT_COLUMNS + column];
+            unsigned char character = frame->text[row * SOFTPC_TEXT_COLUMNS + column];
             line[column] = character >= 0x20u && character < 0x7fu ?
                 (CHAR)character : ' ';
         }
         { COORD position = { 0, (SHORT)row }; DWORD written;
           (void)WriteConsoleOutputCharacterA(output, line, SOFTPC_TEXT_COLUMNS, position, &written); }
     }
-    memcpy(previous, text, sizeof(text));
-    }
-    if (softpc_machine_presentation_cursor(machine, &cursor_column,
-            &cursor_row) && cursor_column >= 0 && cursor_row >= 0 &&
-        cursor_column < (int32_t)SOFTPC_TEXT_COLUMNS &&
-        cursor_row < (int32_t)SOFTPC_TEXT_ROWS) {
+    memcpy(previous, frame->text, sizeof(frame->text));
+    if (frame->cursor_column >= 0 && frame->cursor_row >= 0 &&
+        frame->cursor_column < (int32_t)SOFTPC_TEXT_COLUMNS &&
+        frame->cursor_row < (int32_t)SOFTPC_TEXT_ROWS) {
         COORD position;
-        position.X = (SHORT)cursor_column;
-        position.Y = (SHORT)cursor_row;
+        position.X = (SHORT)frame->cursor_column;
+        position.Y = (SHORT)frame->cursor_row;
         (void)SetConsoleCursorPosition(output, position);
     }
 }
 
-int softpc_vm_run_console(softpc_machine *machine)
+int softpc_vm_run_console(softpc_runtime *runtime)
 {
     HANDLE input;
     HANDLE output;
     DWORD original_mode;
     unsigned char previous[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
+    softpc_runtime_frame *frame;
     int running = 1;
     int result = SOFTPC_VM_FRONTEND_STOPPED;
     int private_console;
-    if (machine == NULL) return 1;
+    if (runtime == NULL) return 1;
     if (!softpc_console_open(&input, &output, &original_mode,
             &private_console)) return 1;
     if (!SetConsoleMode(input, original_mode & ~(ENABLE_ECHO_INPUT |
@@ -223,8 +198,13 @@ int softpc_vm_run_console(softpc_machine *machine)
         softpc_console_close(input, output, private_console);
         return 1;
     }
+    frame = (softpc_runtime_frame *)calloc(1u, sizeof(*frame));
+    if (frame == NULL) {
+        softpc_console_close(input, output, private_console);
+        return 1;
+    }
     memset(previous, 0xff, sizeof(previous));
-    while (running) {
+    while (running && softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_RUNNING) {
         INPUT_RECORD record;
         DWORD available;
         DWORD read;
@@ -234,28 +214,36 @@ int softpc_vm_run_console(softpc_machine *machine)
                 break;
             }
             int action = record.EventType == KEY_EVENT ? softpc_console_key(
-                machine, &record.Event.KeyEvent) : -1;
+                runtime, &record.Event.KeyEvent) : -1;
             if (action >= 0) {
                 result = action;
                 running = 0;
                 break;
             }
         }
-        if (softpc_machine_run(machine, SOFTPC_RUN_SLICE) != SOFTPC_MACHINE_OK) {
-            result = SOFTPC_VM_FRONTEND_ERROR;
-            running = 0;
-        }
-        softpc_console_paint(output, machine, previous);
+        if (softpc_runtime_copy_frame(runtime, frame))
+            softpc_console_paint(output, frame, previous);
+        Sleep(10u);
     }
+    if (result == SOFTPC_VM_FRONTEND_STOPPED &&
+        softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED)
+        result = SOFTPC_VM_FRONTEND_PAUSED;
+    if (result == SOFTPC_VM_FRONTEND_PAUSED)
+        (void)softpc_runtime_pause(runtime);
+    else if (result == SOFTPC_VM_FRONTEND_STOPPED)
+        (void)softpc_runtime_stop(runtime);
+    if (softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_ERROR)
+        result = SOFTPC_VM_FRONTEND_ERROR;
+    free(frame);
     (void)SetConsoleMode(input, original_mode);
     softpc_console_close(input, output, private_console);
     return result;
 }
 
 #else
-int softpc_vm_run_console(softpc_machine *machine)
+int softpc_vm_run_console(softpc_runtime *runtime)
 {
-    (void)machine;
+    (void)runtime;
     return SOFTPC_VM_FRONTEND_ERROR;
 }
 #endif
