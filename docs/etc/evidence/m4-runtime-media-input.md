@@ -29,3 +29,19 @@ passed on both x64 and x86 after the change.  The real fixed-media runtime
 probe also passed on both widths.
 
 Windows Setup graphics and interactive RDP acceptance remain active M4 work.
+
+## Snapshot responsiveness and test-boundary result
+
+The executor may be copying an original renderer DIB while a console or window
+asks for its next published frame.  `softpc_runtime_copy_frame` now uses a
+non-blocking critical-section acquisition: a client retains its existing frame
+when publication is in progress and retries on its next UI turn.  This changes
+only the copied-frame boundary; it does not lock, inspect or alter SoftPC,
+CCPU, device, BIOS, ROM, BOP or renderer state.
+
+Focused x64 and x86 runtime, lifecycle, keycode, source-boundary and fixed-INI
+tests passed, as did the overlay-mode real-media runtime boot/input probe on
+both widths.  The legacy `softpc-machine-smoke` and
+`softpc-dual-media-smoke` direct-run forms remain unsuitable for M4 because
+they enter unbounded `softpc_machine_run`; they must be replaced by
+runtime-owned equivalents under M5 rather than used as a full-suite gate.

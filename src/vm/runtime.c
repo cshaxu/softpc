@@ -395,7 +395,11 @@ int softpc_runtime_copy_frame(softpc_runtime *runtime,
     softpc_runtime_frame *destination)
 {
     if (runtime == NULL || destination == NULL) return 0;
-    EnterCriticalSection(&runtime->frame_lock);
+    /* A presentation client must never wait behind the executor while it is
+       copying an original renderer surface.  It can retain its prior frame
+       and try again on the next UI turn; only the executor owns machine
+       state, and no command/input path depends on this snapshot succeeding. */
+    if (!TryEnterCriticalSection(&runtime->frame_lock)) return 0;
     memcpy(destination, &runtime->frames[runtime->published_frame],
         sizeof(*destination));
     LeaveCriticalSection(&runtime->frame_lock);
