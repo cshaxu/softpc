@@ -544,6 +544,11 @@ target_include_directories(softpc-runtime-smoke PRIVATE src/vm)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
 set_tests_properties(softpc-runtime-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-runtime-boot-smoke
+    tests/softpc_runtime_boot_smoke.c
+    src/vm/runtime.c)
+target_link_libraries(softpc-runtime-boot-smoke PRIVATE softpc-machine)
+target_include_directories(softpc-runtime-boot-smoke PRIVATE src/vm)
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tests/standalone_source_boundary.cmake")
@@ -568,7 +573,8 @@ set(SOFTPC_TEST_TARGETS
     softpc-quick-time-smoke
     softpc-real-boot-smoke
     softpc-lifecycle-smoke
-    softpc-runtime-smoke)
+    softpc-runtime-smoke
+    softpc-runtime-boot-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
     # Keep every executable test self-contained, just like the launcher.
