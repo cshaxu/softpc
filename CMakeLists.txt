@@ -395,6 +395,7 @@ target_compile_definitions(softpc-machine PRIVATE
 add_executable(softpcvm
     src/vm/main.c
     src/vm/console.c
+    src/vm/runtime.c
     src/vm/win32_window.c
     src/vm/softpc_firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
@@ -535,6 +536,14 @@ target_link_libraries(softpc-lifecycle-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-lifecycle-smoke COMMAND softpc-lifecycle-smoke)
 set_tests_properties(softpc-lifecycle-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-runtime-smoke
+    tests/softpc_runtime_smoke.c
+    src/vm/runtime.c)
+target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine)
+target_include_directories(softpc-runtime-smoke PRIVATE src/vm)
+add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
+set_tests_properties(softpc-runtime-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tests/standalone_source_boundary.cmake")
@@ -558,7 +567,8 @@ set(SOFTPC_TEST_TARGETS
     softpc-bop-smoke
     softpc-quick-time-smoke
     softpc-real-boot-smoke
-    softpc-lifecycle-smoke)
+    softpc-lifecycle-smoke
+    softpc-runtime-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
     # Keep every executable test self-contained, just like the launcher.
