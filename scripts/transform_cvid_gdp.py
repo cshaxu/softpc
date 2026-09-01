@@ -288,6 +288,13 @@ def transform_ccpu_reg(source: str) -> str:
     return source
 
 
+def transform_ccpu_xcptn(source: str) -> str:
+    if '#include <yoda.h>' not in source:
+        source = source.replace('#include <fault.h>\n', '#include <fault.h>\n#include <yoda.h>\n', 1)
+    source = source.replace('\tIMPORT char *host_getenv IPT1 (char *, name);\t\t\t\\\n', '', 1)
+    return source
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=pathlib.Path)
@@ -305,6 +312,7 @@ def main() -> int:
     parser.add_argument("--ccpu-zfrsrvd", action="store_true")
     parser.add_argument("--ccpu-page", action="store_true")
     parser.add_argument("--ccpu-reg", action="store_true")
+    parser.add_argument("--ccpu-xcptn", action="store_true")
     args = parser.parse_args()
 
     original = args.source.read_text(encoding="latin-1")
@@ -343,6 +351,9 @@ def main() -> int:
         static_count = dynamic_count = 1
     elif args.ccpu_reg:
         generated = transform_ccpu_reg(original)
+        static_count = dynamic_count = 1
+    elif args.ccpu_xcptn:
+        generated = transform_ccpu_xcptn(original)
         static_count = dynamic_count = 1
     else:
         generated, static_count, dynamic_count = transform_rules(original)
