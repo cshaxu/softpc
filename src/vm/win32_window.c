@@ -119,8 +119,9 @@ static void softpc_window_queue_key(BYTE key_number, int released)
     LeaveCriticalSection(&softpc_window_input_lock);
 }
 
-static void softpc_window_apply_queued_input(softpc_machine *machine)
+static int softpc_window_apply_queued_input(softpc_machine *machine)
 {
+    int applied = 0;
     for (;;) {
         BYTE key_number;
         unsigned char released;
@@ -135,6 +136,7 @@ static void softpc_window_apply_queued_input(softpc_machine *machine)
             SOFTPC_INPUT_QUEUE_CAPACITY;
         LeaveCriticalSection(&softpc_window_input_lock);
         (void)softpc_machine_key_number(machine, key_number, released);
+        applied = 1;
     }
 
     EnterCriticalSection(&softpc_window_input_lock);
@@ -148,9 +150,11 @@ static void softpc_window_apply_queued_input(softpc_machine *machine)
         softpc_window_mouse_pending = 0;
         LeaveCriticalSection(&softpc_window_input_lock);
         (void)softpc_machine_mouse_input(machine, delta_x, delta_y, left, right);
+        applied = 1;
     } else {
         LeaveCriticalSection(&softpc_window_input_lock);
     }
+    return applied;
 }
 
 /* NXVM-style publication boundary: the worker alone reads SoftPC state;
@@ -209,9 +213,10 @@ static DWORD WINAPI softpc_window_run_machine(void *opaque)
 
     while (InterlockedCompareExchange(&softpc_window_runner_active, 0, 0) != 0) {
         softpc_machine_result result;
+        int input_applied;
 
         EnterCriticalSection(&softpc_window_machine_lock);
-        softpc_window_apply_queued_input(machine);
+        input_applied = softpc_window_apply_queued_input(machine);
         result = softpc_machine_run(machine, SOFTPC_RUN_SLICE);
         LeaveCriticalSection(&softpc_window_machine_lock);
         if (result != SOFTPC_MACHINE_OK) {
@@ -221,11 +226,13 @@ static DWORD WINAPI softpc_window_run_machine(void *opaque)
                 PostMessageA(softpc_window_handle, WM_CLOSE, 0, 0);
             break;
         }
-        if ((LONG)(GetTickCount() - next_snapshot) >= 0) {
+        if (input_applied || (LONG)(GetTickCount() - next_snapshot) >= 0) {
             EnterCriticalSection(&softpc_window_machine_lock);
             softpc_window_publish_snapshot(machine);
             LeaveCriticalSection(&softpc_window_machine_lock);
             next_snapshot = GetTickCount() + SOFTPC_DISPLAY_CADENCE_MS;
+            if (input_applied && softpc_window_handle != NULL)
+                PostMessageA(softpc_window_handle, WM_APP + 1u, 0, 0);
         }
         softpc_window_pace(machine);
     }
@@ -392,6 +399,9 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
         if (wparam == SOFTPC_TIMER_ID) {
             InvalidateRect(window, NULL, FALSE);
         }
+        return 0;
+    case WM_APP + 1u:
+        InvalidateRect(window, NULL, FALSE);
         return 0;
     case WM_PAINT:
         {
