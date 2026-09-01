@@ -24,3 +24,10 @@ launcher lifecycle over the recovered machine.
 
 Replace transitional console/window loops, prove RDP interaction and original
 renderer operation, then close with real A:/C: and Windows Setup evidence.
+
+## M5: Pristine Restoration And Outer Runtime
+
+Close the pristine-source ledger, recover original timer/quick-event and
+controller host contracts, and replace transitional execution integration with
+an evidenced safe-boundary outer runtime.  Finish with original renderer and
+dual-width Windows Setup acceptance.

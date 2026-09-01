@@ -14,3 +14,4 @@ allocates a numeric task identifier.
 9. [M4 monitor console mailbox conversion](../proposals/m4-monitor-console.md)
 10. [M4 window frame consumer and RDP input proof](../proposals/m4-window-rdp.md)
 11. [M4 dual-width real-media and Windows Setup closure](../proposals/m4-frontends-and-proof.md)
+12. [M5 outer runtime and pristine restoration](../proposals/m5-outer-runtime-and-pristine-restoration.md)
