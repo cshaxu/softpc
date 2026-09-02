@@ -19,3 +19,6 @@ state; it only ends its presentation loop and requests runtime stop.
   requires `SOFTPC_RUNTIME_STOPPED`.
 - The smoke passed on x64 MinGW and x86 Clang.
 - Full serial CTest passed `18/18` on each width.
+- The delivered `build/output/softpc64.exe` and `softpc32.exe` were each
+  started through their fixed INI in overlay mode, created `SoftPC VM`, and
+  exited after a real `WM_CLOSE` message.
