@@ -33,6 +33,10 @@ BOOL softpc_compat_scroll_console_buffer(HANDLE output,
 BOOL softpc_compat_set_console_cursor_position(HANDLE output, COORD position);
 BOOL softpc_compat_set_console_cursor_info(HANDLE output,
     const CONSOLE_CURSOR_INFO *cursor);
+/* The original nt_graph renderer reaches the standalone presenter through
+ * the two Console cursor calls above.  This copied value is presentation
+ * metadata only; frontends never inspect the video controller directly. */
+int softpc_compat_presentation_cursor(long *column_out, long *row_out);
 BOOL softpc_compat_get_current_console_font(HANDLE output, BOOL maximum,
     PCONSOLE_FONT_INFO font);
 COORD softpc_compat_get_console_font_size(HANDLE output, DWORD font);

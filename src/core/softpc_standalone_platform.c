@@ -300,9 +300,7 @@ int softpc_platform_presentation_is_graphics(void)
 
 int softpc_platform_presentation_cursor(long *column_out, long *row_out)
 {
-    UNUSED(column_out);
-    UNUSED(row_out);
-    return 0;
+    return softpc_compat_presentation_cursor(column_out, row_out);
 }
 
 int softpc_platform_presentation_fonts(uint8_t *primary, uint8_t *secondary,

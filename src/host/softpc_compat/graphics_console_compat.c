@@ -15,6 +15,10 @@ BYTE Blue[] = { 0, 128, 0, 128, 0, 128, 0, 192, 128, 255, 0, 255,
     0, 255, 0, 255 };
 BOOL ConsoleInitialised = TRUE;
 BOOL ConsoleNoUpdates = FALSE;
+static LONG softpc_compat_cursor_column;
+static LONG softpc_compat_cursor_row;
+static int softpc_compat_cursor_position_valid;
+static int softpc_compat_cursor_visible = 1;
 
 BOOL CreateDisplayPalette(void)
 {
@@ -132,15 +136,29 @@ BOOL softpc_compat_scroll_console_buffer(HANDLE output,
 
 BOOL softpc_compat_set_console_cursor_position(HANDLE output, COORD position)
 {
-    UNUSED(output); UNUSED(position);
+    UNUSED(output);
+    softpc_compat_cursor_column = position.X;
+    softpc_compat_cursor_row = position.Y;
+    softpc_compat_cursor_position_valid = 1;
     return TRUE;
 }
 
 BOOL softpc_compat_set_console_cursor_info(HANDLE output,
     const CONSOLE_CURSOR_INFO *cursor)
 {
-    UNUSED(output); UNUSED(cursor);
+    UNUSED(output);
+    if (cursor != NULL) softpc_compat_cursor_visible = cursor->bVisible != FALSE;
     return TRUE;
+}
+
+int softpc_compat_presentation_cursor(long *column_out, long *row_out)
+{
+    if (column_out == NULL || row_out == NULL ||
+        !softpc_compat_cursor_position_valid || !softpc_compat_cursor_visible)
+        return 0;
+    *column_out = softpc_compat_cursor_column;
+    *row_out = softpc_compat_cursor_row;
+    return 1;
 }
 
 BOOL softpc_compat_get_current_console_font(HANDLE output, BOOL maximum,

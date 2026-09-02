@@ -171,6 +171,24 @@ static void softpc_window_paint(HWND window, HDC dc)
     softpc_window_update_text_surface();
     StretchBlt(dc, 0, 0, width, height, softpc_window_text_dc, 0, 0,
         SOFTPC_TEXT_SURFACE_WIDTH, SOFTPC_TEXT_SURFACE_HEIGHT, SRCCOPY);
+    if (softpc_window_frame->cursor_column >= 0 &&
+        softpc_window_frame->cursor_row >= 0 &&
+        softpc_window_frame->cursor_column < SOFTPC_TEXT_COLUMNS &&
+        softpc_window_frame->cursor_row < SOFTPC_TEXT_ROWS) {
+        /* nt_graph publishes the original controller-selected text cursor
+           through the compatibility Console endpoint.  Draw it only after
+           the copied text DIB reaches the window, so this remains a pure
+           frontend overlay and never changes guest video memory. */
+        int left = softpc_window_frame->cursor_column * width /
+            SOFTPC_TEXT_COLUMNS;
+        int right = (softpc_window_frame->cursor_column + 1) * width /
+            SOFTPC_TEXT_COLUMNS;
+        int top = (softpc_window_frame->cursor_row + 1) * height /
+            SOFTPC_TEXT_ROWS - (height / SOFTPC_TEXT_ROWS + 7) / 8;
+        RECT cursor = { left, top, right, (softpc_window_frame->cursor_row + 1) *
+            height / SOFTPC_TEXT_ROWS };
+        InvertRect(dc, &cursor);
+    }
 }
 
 static int softpc_window_keyboard_sink(void *context, uint8_t key_number,

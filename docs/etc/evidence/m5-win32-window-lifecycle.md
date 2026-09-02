@@ -29,6 +29,15 @@ thick sizing frame. This prevents a Windows-theme resize border from reading
 as an extra guest-display margin and prevents a user resize from making the
 client rectangle cease to represent the copied guest surface.
 
+## Original Text Cursor
+
+The original `nt_graph` text path retains ownership of cursor choice and
+placement. Its existing console-cursor endpoint is recorded by the
+standalone compatibility boundary, copied into the runtime presentation frame,
+and drawn as an underline over the already-copied DIB. The window therefore
+does not inspect guest text memory or controller registers, and it introduces
+no independent cursor semantics.
+
 ## Verification
 
 - `softpc-win32-window-smoke` starts a runtime, creates the actual
@@ -39,6 +48,9 @@ client rectangle cease to represent the copied guest surface.
   640x400, proving the normal window frame is outside the display surface.
 - It asserts that `WS_THICKFRAME` is absent, so the displayed frame cannot
   acquire a resizable white sizing border.
+- `softpc-runtime-smoke` waits for a valid copied text frame and verifies that
+  the original renderer's cursor endpoint reaches the runtime frame on both
+  host widths.
 - Full serial CTest passed `18/18` on each width.
 - The delivered `build/output/softpc64.exe` and `softpc32.exe` were each
   started through their fixed INI in overlay mode, created `SoftPC VM`, and

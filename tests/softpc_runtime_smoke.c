@@ -45,7 +45,29 @@ int main(void)
     Sleep(150u);
     frame = (softpc_runtime_frame *)calloc(1u, sizeof(*frame));
     assert(frame != NULL);
-    assert(softpc_runtime_copy_frame(runtime, frame));
+    {
+        DWORD deadline = GetTickCount() + 5000u;
+        int cursor_seen = 0;
+        do {
+            /* A copied presentation frame is deliberately non-blocking.
+               The executor may own its frame lock while publishing the first
+               original renderer update, so retry rather than turning that
+               defined snapshot miss into a timing-dependent test failure. */
+            if (softpc_runtime_copy_frame(runtime, frame) &&
+                frame->graphics == 0u && frame->cursor_column >= 0 &&
+                frame->cursor_column < SOFTPC_RUNTIME_TEXT_COLUMNS &&
+                frame->cursor_row >= 0 &&
+                frame->cursor_row < SOFTPC_RUNTIME_TEXT_ROWS) {
+                cursor_seen = 1;
+                break;
+            }
+            Sleep(10u);
+        } while ((LONG)(GetTickCount() - deadline) < 0);
+        /* Original nt_graph's Console cursor endpoint must reach the copied
+           frame.  Both outer frontends consume this value without reading a
+           controller register or a guest-memory pointer. */
+        assert(cursor_seen);
+    }
     assert(softpc_runtime_published_frame_sequence(runtime) == frame->sequence);
     assert(frame->sequence != 0u);
     assert(softpc_runtime_pause(runtime));
