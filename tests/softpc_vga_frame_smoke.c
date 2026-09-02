@@ -236,6 +236,10 @@ int main(void)
        DIB entries; simply copying DAC[] would leave index zero black here. */
     {
         const softpc_test_dib_info *dib = (const softpc_test_dib_info *)info;
+        int32_t left;
+        int32_t top;
+        int32_t right;
+        int32_t bottom;
         set_256_colour_mode(FALSE);
         set_colour_select(FALSE);
         set_top_pixel_pad(0);
@@ -244,6 +248,9 @@ int main(void)
         DAC[1].red = 1u;
         DAC[1].green = 2u;
         DAC[1].blue = 3u;
+        while (softpc_machine_presentation_take_dirty(machine, &left, &top,
+            &right, &bottom)) {
+        }
         /* Route through the original VIDEOFUNCS mark-refresh callback. */
         host_mark_screen_refresh();
         host_timer_event();
@@ -251,6 +258,14 @@ int main(void)
         assert(dib->colours[0].red == 4u);
         assert(dib->colours[0].green == 8u);
         assert(dib->colours[0].blue == 12u);
+        /* Palette-only writes change no EGA plane.  The original console
+           redraws after SetConsolePalette; the standalone RGB snapshot must
+           publish the same change so a guest such as Windows Setup cannot
+           retain stale red/white entries after programming blue/yellow. */
+        assert(softpc_machine_presentation_take_dirty(machine, &left, &top,
+            &right, &bottom));
+        assert(left == 0 && top == 0 && right == (int32_t)width - 1 &&
+            bottom == (int32_t)height - 1);
     }
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));

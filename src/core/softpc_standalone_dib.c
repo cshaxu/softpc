@@ -30,6 +30,21 @@ static unsigned long softpc_dib_height;
 static SMALL_RECT softpc_dib_dirty;
 static int softpc_dib_dirty_valid;
 
+/* In the original Win32 host, SetPaletteEntries followed by
+   SetConsolePalette repaints an indexed console DIB even when its pixel
+   bytes have not changed.  The standalone frontend instead publishes a
+   self-contained RGB DIB snapshot, so a palette-only update must explicitly
+   make that snapshot observable. */
+static void softpc_standalone_dib_palette_changed(void)
+{
+    if (softpc_dib_width == 0u || softpc_dib_height == 0u) return;
+    softpc_dib_dirty.Left = 0;
+    softpc_dib_dirty.Top = 0;
+    softpc_dib_dirty.Right = (SHORT)(softpc_dib_width - 1u);
+    softpc_dib_dirty.Bottom = (SHORT)(softpc_dib_height - 1u);
+    softpc_dib_dirty_valid = 1;
+}
+
 /* nt_cga.c owns the original text update algorithm.  Its Windows console
    sharing buffer becomes standalone-owned storage; the frontend consumes it
    through the DIB/text presenter instead of a console server. */
@@ -218,6 +233,7 @@ void softpc_standalone_dib_set_palette(const void *palette_data, int count)
             (BYTE)(palette[index].blue << 2);
         softpc_dib_info->bmiColors[index].rgbReserved = 0;
     }
+    softpc_standalone_dib_palette_changed();
 }
 
 void softpc_standalone_dib_set_palette_entries(const PALETTEENTRY *entries,
@@ -232,6 +248,7 @@ void softpc_standalone_dib_set_palette_entries(const PALETTEENTRY *entries,
         softpc_dib_info->bmiColors[index].rgbBlue = entries[index].peBlue;
         softpc_dib_info->bmiColors[index].rgbReserved = 0;
     }
+    softpc_standalone_dib_palette_changed();
 }
 int softpc_standalone_dib_take_dirty(long *left, long *top, long *right,
     long *bottom)
