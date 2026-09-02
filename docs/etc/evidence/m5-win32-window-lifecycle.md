@@ -22,6 +22,13 @@ frontend padding inside the guest display. A renderer mode change can resize
 this endpoint, but neither the window nor its sizing path reads machine state
 directly.
 
+The standalone window is deliberately not resizable. Unlike NXVM's general
+purpose host canvas, this product has one fixed SoftPC machine. Its outer
+style retains the title bar, system menu and minimise command but omits the
+thick sizing frame. This prevents a Windows-theme resize border from reading
+as an extra guest-display margin and prevents a user resize from making the
+client rectangle cease to represent the copied guest surface.
+
 ## Verification
 
 - `softpc-win32-window-smoke` starts a runtime, creates the actual
@@ -30,6 +37,8 @@ directly.
 - The smoke passed on x64 MinGW and x86 Clang.
 - The smoke also asserts that the initial actual client rectangle is exactly
   640x400, proving the normal window frame is outside the display surface.
+- It asserts that `WS_THICKFRAME` is absent, so the displayed frame cannot
+  acquire a resizable white sizing border.
 - Full serial CTest passed `18/18` on each width.
 - The delivered `build/output/softpc64.exe` and `softpc32.exe` were each
   started through their fixed INI in overlay mode, created `SoftPC VM`, and
