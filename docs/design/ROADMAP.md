@@ -36,3 +36,12 @@ dual-width Windows Setup acceptance.
 
 Make bounded standalone-frontend usability repairs without changing the
 recovered SoftPC machine, compatibility-host device contracts, or guest timing.
+
+## M7: Original-Host Capability Completion
+
+Complete the remaining useful original SoftPC host algorithms in a fixed,
+single-machine VM. The five tasks are strictly serial: raw-media host recovery,
+single-image partition proof, display compatibility proof, audio endpoint
+completion, then optional serial/parallel endpoints. They must retain the
+original controller and renderer owners and must not reintroduce MVDM product
+services.
