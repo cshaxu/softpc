@@ -7,10 +7,9 @@ The pre-restoration run of `scripts/audit_pristine_divergence.ps1` against
 canonical-text C/H divergences.  Thirty-five were named port-ABI overlays,
 nineteen were original host algorithms with independent endpoints, and six
 were `restore-pristine` controller/firmware sources. PPI, the original
-illegal-driver BOP path, CPU_40 keyboard reset path and CMOS controller are
-now restored, leaving these two routes:
+illegal-driver BOP path, CPU_40 keyboard reset path, CMOS controller and BIOS
+reset firmware are now restored, leaving this one route:
 
-- `base/bios/reset.c`
 - `base/system/timer.c`
 
 ## PPI restoration result
@@ -53,5 +52,17 @@ the controller source. `softpc-fdc-smoke` proves a floppy-only machine reports
 no fixed disk in CMOS, while `softpc-dual-media-smoke` proves the configured
 A:+C: route reports the original C: type. Both focused tests pass on x86 and
 x64; detailed proof is in `m5-cmos-media-port-restoration.md`.
+
+## BIOS reset restoration result
+
+`base/bios/reset.c` now compares equal to the original source after
+line-ending normalization. The standalone build disables the unselected LIM
+product feature only for this source compilation. The original firmware owns
+its GWI table storage; before first firmware reset, the outer host binds its
+already-existing original renderer, keyboard and error endpoints to those
+tables. No reset flow, BOP, ROM or controller logic is replaced.
+
+The original reset, dual-media boot and runtime smoke tests pass on x86 and
+x64. Detailed proof is in `m5-bios-reset-restoration.md`.
 
 No additional machine source was retained or changed by these probes.

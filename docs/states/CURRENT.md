@@ -67,7 +67,7 @@ Its client rectangle follows the NXVM sizing rule and contains no frontend
 display margin.
 Window text now uses the currently loaded original EGA/VGA font plane rather
 than a host font; see [M5 original font presentation evidence](../etc/evidence/m5-original-font-presentation.md).
-Two controller/firmware extraction routes remain after restoring the original
-PPI controller, incompatible-driver BOP path, CPU_40 keyboard reset path and
-CMOS controller through their standalone host contracts. The restoration
-ledger is in [M5 remaining pristine-controller boundaries](../etc/evidence/m5-remaining-pristine-controller-boundaries.md).
+One controller/firmware extraction route remains after restoring the original
+PPI controller, incompatible-driver BOP path, CPU_40 keyboard reset path,
+CMOS controller and BIOS reset firmware through their standalone host
+contracts. The restoration ledger is in [M5 remaining pristine-controller boundaries](../etc/evidence/m5-remaining-pristine-controller-boundaries.md).
