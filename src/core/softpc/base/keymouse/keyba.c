@@ -105,10 +105,6 @@ static char SccsID[]="@(#)keyba.c	1.57 06/22/95 Copyright Insignia Solutions Ltd
 #ifdef NTVDM
 #include "idetect.h"
 #include "nt_eoi.h"
-/* DIVERGENCE(MVDM-HOST-DIV-085): the selected keyboard path invokes the
- * original XMS A20 providers. Use their original xms.h declaration carrier;
- * the historical conditional sas.h declaration is not effective here. */
-#include "xms.h"
 
 /* exported for NT host event code */
 GLOBAL VOID KbdResume(VOID);
@@ -1432,18 +1428,6 @@ else
 #endif
 	do_host_key_up(key);
 	}
-}
-
-/* Standalone machine API adapter: callers expose PC/AT Set-1 scan codes,
- * whereas this original controller consumes host keyboard key indices. */
-GLOBAL int keyba_set1_scan_to_key IFN1(half_word, scan)
-{
-    int key;
-
-    for (key = 1; key < 127; key++)
-        if (most_set_1_make_codes[key] == scan)
-            return key;
-    return -1;
 }
 
 #ifdef NTVDM
@@ -3143,8 +3127,7 @@ GLOBAL VOID AT_kbd_init IFN0()
 	}
 #endif	/* macintosh */
 
-	/* DIVERGENCE MVDM-HOST-DIV-075: config scalar is pointer-sized on x86/x64. */
-	videoAdapt = (ULONG)(ULONG_PTR) config_inquire(C_GFX_ADAPTER, NULL);
+	videoAdapt = (ULONG) config_inquire(C_GFX_ADAPTER, NULL);
 
 	buff_6805_out_ptr=0;
 	clear_buff_6805 ();

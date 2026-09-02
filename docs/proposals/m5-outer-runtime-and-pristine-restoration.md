@@ -14,7 +14,7 @@ BOP routing.  The host supplies only platform capabilities.
 
 ## Audit Baseline
 
-The current read-only divergence command reports 59 actionable C/C-header
+The current read-only divergence command reports 60 actionable C/C-header
 rows against the selected OpenNT `softpc.new` tree.  The local generated
 manifest is evidence only; its machine-side rows include BIOS reset, keyboard,
 PPI, CMOS, timer, ROM, video, C-VID and CCPU declarations.  Every such row

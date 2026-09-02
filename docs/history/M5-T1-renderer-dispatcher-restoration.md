@@ -28,3 +28,19 @@ assigns exactly 35 to reproducible port-ABI overlays, 19 to compatibility-host
 endpoints, and 6 to later pristine source restoration.  The exact coverage and
 bounded next cut are in the [M5 route ledger](../etc/evidence/m5-pristine-host-contract-routes.md).
 No machine behavior changed in this audit subtask.
+
+## S3: Machine/Host Contract Declaration Extraction
+
+**Status:** complete.
+
+The six remaining machine-source restoration rows now have named, existing
+host capability owners. In particular, standalone Set-1 keyboard ingress uses
+the original `nt_keycd` table through a narrow host endpoint, leaving
+`keyba.c` without its locally reconstructed scan-code lookup. The only
+keyboard controller difference retained is the CPU_40 port-ABI reset request:
+the selected CCPU keeps its interrupt map private, so the device uses its
+declared `cpu_interrupt(CPU_HW_RESET, 0)` entry rather than exposing state to
+the host.
+
+The source map and focused x64 smoke proof are in the
+[M5 machine/host contract evidence](../etc/evidence/m5-machine-host-contracts.md).

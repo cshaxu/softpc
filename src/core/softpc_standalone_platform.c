@@ -32,6 +32,7 @@
 #include "nt_ega.h"
 #include "softpc_machine.h"
 #include "softpc_ccpu_lifecycle.h"
+#include "softpc_host_input.h"
 
 /*
  * Minimal host ports for the detached CCPU.  These are deliberately machine
@@ -688,7 +689,6 @@ extern void AT_kbd_init(void);
 extern void AT_kbd_post(void);
 extern void host_key_down(int key);
 extern void host_key_up(int key);
-extern int keyba_set1_scan_to_key(half_word scan);
 
 static void softpc_keyboard_host_void(void)
 {
@@ -739,8 +739,8 @@ int softpc_platform_keyboard_key(int key, int released)
 
 int softpc_platform_keyboard_scancode(IU8 scan_code)
 {
-    int key = keyba_set1_scan_to_key((half_word)(scan_code & 0x7fu));
-    if (key < 0) return 0;
+    int key = softpc_host_scan1_to_key((unsigned int)(scan_code & 0x7fu));
+    if (key == 0) return 0;
     if ((scan_code & 0x80u) != 0u) host_key_up(key);
     else host_key_down(key);
     return 1;

@@ -414,6 +414,15 @@ BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
     }
 }
 
+/* The standalone monitor receives a PC/AT Scan-1 byte rather than a Win32
+ * KEY_EVENT_RECORD.  Keep the original table and its ownership in this host
+ * source; this is only its narrow independent-host entrypoint. */
+int softpc_host_scan1_to_key(unsigned int scan_code)
+{
+    return scan_code < sizeof(Scan1ToKeynum) ?
+        Scan1ToKeynum[scan_code] : 0;
+}
+
 
 
 
