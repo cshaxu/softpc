@@ -55,14 +55,15 @@ x64; detailed proof is in `m5-cmos-media-port-restoration.md`.
 ## BIOS reset restoration result
 
 `base/bios/reset.c` now compares equal to the original source after
-line-ending normalization. The standalone build disables the unselected LIM
-product feature only for this source compilation. The original firmware owns
-its GWI table storage; before first firmware reset, the outer host binds its
-already-existing original renderer, keyboard and error endpoints to those
-tables. No reset flow, BOP, ROM or controller logic is replaced.
+line-ending normalization. A reproducible reset port-ABI copy supplies the
+unselected LIM product exclusion, pointer-width-safe graphics scalar reads and
+the actual attached floppy topology. The original firmware owns its GWI table
+storage; before first firmware reset, the outer host binds its already-existing
+original renderer, keyboard and error endpoints to those tables. No reset
+flow, BOP, ROM or controller logic is replaced.
 
-The original reset, dual-media boot and runtime smoke tests pass on x86 and
-x64. Detailed proof is in `m5-bios-reset-restoration.md`.
+Freshly relinked original-reset, dual-media boot and runtime smoke tests pass
+on x86 and x64. Detailed proof is in `m5-bios-reset-restoration.md`.
 
 ## Timer restoration result
 
