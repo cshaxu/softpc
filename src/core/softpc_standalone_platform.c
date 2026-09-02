@@ -1164,6 +1164,7 @@ static ERRORFUNCS softpc_error_functions = {
     softpc_error_ignore,
     softpc_error_ignore
 };
+extern ERRORFUNCS *working_error_funcs;
 
 /* `reset.c` remains the original owner of its GWI table storage.  Bind the
    standalone endpoints once before the original firmware reset runs. */

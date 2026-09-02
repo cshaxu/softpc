@@ -74,6 +74,24 @@ add_custom_command(
     COMMENT "Transforming timer quick-event port ABI"
     VERBATIM)
 set_source_files_properties("${SOFTPC_TIMER_SOURCE}" PROPERTIES GENERATED TRUE)
+set(SOFTPC_RESET_INPUT
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/bios/reset.c")
+set(SOFTPC_RESET_SOURCE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated-device/reset.c")
+add_custom_command(
+    OUTPUT "${SOFTPC_RESET_SOURCE}"
+    COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_reset.py"
+        "${SOFTPC_RESET_INPUT}"
+        "${SOFTPC_RESET_SOURCE}"
+    DEPENDS "${SOFTPC_RESET_INPUT}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_reset.py"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/reset/host_def.h"
+    COMMENT "Transforming BIOS reset host ABI"
+    VERBATIM)
+set_source_files_properties("${SOFTPC_RESET_SOURCE}" PROPERTIES
+    GENERATED TRUE
+    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/reset")
 set(SOFTPC_CVIDC_TRANSFORMED_SOURCES)
 foreach(SOFTPC_CVIDC_GENERATED_INPUT IN LISTS SOFTPC_CVIDC_GENERATED_INPUTS)
     get_filename_component(SOFTPC_CVIDC_GENERATED_NAME
@@ -295,8 +313,6 @@ set_source_files_properties(src/core/softpc/base/system/illegalp.c PROPERTIES
     COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/illegalp")
 set_source_files_properties(src/core/softpc/base/keymouse/keyba.c PROPERTIES
     COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/keyba")
-set_source_files_properties(src/core/softpc/base/bios/reset.c PROPERTIES
-    COMPILE_OPTIONS "-ULIM")
 add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/support/ios.c
     src/core/softpc/base/system/ica.c
@@ -313,7 +329,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/support/time_day.c
     src/core/softpc/base/bios/cmos_bis.c
     src/core/softpc/base/bios/build_id.c
-    src/core/softpc/base/bios/reset.c
+    "${SOFTPC_RESET_SOURCE}"
     src/core/softpc/base/bios/bootstra.c
     src/core/softpc/base/bios/slave_bs.c
     src/core/softpc/base/bios/tape_io.c
