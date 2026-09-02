@@ -76,7 +76,9 @@ int main(void)
     make_boot_disk(path);
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    assert(!softpc_machine_presentation_is_graphics(machine));
+    /* ModeType becomes authoritative only after the original controller has
+       selected its first display mode.  Do not impose the retired standalone
+       dispatcher's reset-time TEXT default here. */
     assert(softpc_machine_presentation_dib(machine, &bits, &info, &width,
         &height));
     assert(bits != NULL && info != NULL);

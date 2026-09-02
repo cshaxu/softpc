@@ -226,6 +226,7 @@ def transform_ccpu_main(source: str) -> str:
                     'extern void softpc_platform_executor_event(void);\n'
                     'extern IBOOL softpc_platform_consume_clock_tick(void);\n'
                     'extern IBOOL softpc_platform_consume_executor_wake(void);\n'
+                    'extern IBOOL softpc_platform_consume_instruction_budget(void);\n'
                     'extern void softpc_platform_wait_for_executor_event(void);\n')
     if declarations not in source:
         source = source.replace(workers, declarations + workers, 1)
@@ -300,6 +301,24 @@ def transform_ccpu_main(source: str) -> str:
         source, count = timer_event.subn(add_safe_point_mailbox, source)
         if count != 2:
             raise ValueError('cannot locate both CCPU timer-event sites')
+    next_instruction = 'NEXT_INST:\n\n'
+    next_instruction_mailbox = (next_instruction +
+        '   /* Standalone executor mailbox: this is the original CCPU\n'
+        '      instruction boundary, including quick-mode iterations. */\n'
+        '   if (softpc_platform_consume_clock_tick())\n'
+        '      host_timer_event();\n\n'
+        '   if (softpc_platform_consume_executor_wake())\n'
+        '      softpc_platform_executor_event();\n\n'
+        '   if (!(cpu_interrupt_map & CPU_RESET_EXCEPTION_MASK) &&\n'
+        '       softpc_platform_consume_instruction_budget())\n'
+        '      {\n'
+        '      softpc_ccpu_lifecycle_request_exit();\n'
+        '      softpc_platform_executor_event();\n'
+        '      }\n\n')
+    if 'Standalone executor mailbox: this is the original CCPU' not in source:
+        if next_instruction not in source:
+            raise ValueError('cannot locate CCPU next-instruction boundary')
+        source = source.replace(next_instruction, next_instruction_mailbox, 1)
     hlt_start = source.find('case 0xf4:')
     hlt_end = source.find('quick_mode = FALSE;', hlt_start)
     if hlt_start < 0 or hlt_end < 0:
@@ -330,6 +349,46 @@ def transform_ccpu_ntstubs(source: str) -> str:
                  'void npx_reset()\n{\n}\n'):
         source = source.replace(stub, '', 1)
     return source
+
+
+def transform_ccpu_ntthread(source: str) -> str:
+    """Add the standalone executor return at the original CCPU jump boundary."""
+    if "void ccpu386UnsimulateOuter()" in source:
+        return source
+    marker = "\n   /* somewhere for exceptions to return to */\n"
+    adapter = """
+/* Standalone runtime control reaches this only from a CCPU host event on the
+ * executor thread.  Normal SoftPC BOP/device unwinds retain ccpu386Unsimulate
+ * above; a shutdown must bypass nested host_simulate frames (for example the
+ * original keyboard polling loop) and return to the outer executor frame. */
+void ccpu386UnsimulateOuter()
+{
+    ThreadSimBufPtr simstack;
+    extern ISM32 in_C;
+
+    if (ccpuSimId == BADID)
+    {
+        fprintf(stderr, "ccpu386UnsimulateOuter id:%#x called with Bad Id\\n", GetCurrentThreadId());
+        return;
+    }
+    simstack = (ThreadSimBufPtr)TlsGetValue(ccpuSimId);
+    if (simstack == (ThreadSimBufPtr)0 || simstack->level == 0)
+    {
+        fprintf(stderr, "ccpu386UnsimulateOuter has no executor frame\\n");
+        return;
+    }
+
+    in_C = 1;
+    /* ccpu386SimulatePtr increments the level before setjmp.  The ordinary
+       c_cpu_unsimulate path decrements it before jumping back; mirror that
+       invariant when returning across nested host_simulate frames. */
+    simstack->level = 0;
+    longjmp(simstack->sims[0], 1);
+}
+"""
+    if marker not in source:
+        raise ValueError("ntthread source has no exception-boundary marker")
+    return source.replace(marker, "\n" + adapter + marker, 1)
 
 
 def transform_ccpu_fpu(source: str) -> str:
@@ -401,6 +460,7 @@ def main() -> int:
     parser.add_argument("--ccpu-sas-source", action="store_true")
     parser.add_argument("--ccpu-main", action="store_true")
     parser.add_argument("--ccpu-ntstubs", action="store_true")
+    parser.add_argument("--ccpu-ntthread", action="store_true")
     parser.add_argument("--ccpu-fpu", action="store_true")
     parser.add_argument("--ccpu-zfrsrvd", action="store_true")
     parser.add_argument("--ccpu-page", action="store_true")
@@ -433,6 +493,9 @@ def main() -> int:
         static_count = dynamic_count = 1
     elif args.ccpu_ntstubs:
         generated = transform_ccpu_ntstubs(original)
+        static_count = dynamic_count = 1
+    elif args.ccpu_ntthread:
+        generated = transform_ccpu_ntthread(original)
         static_count = dynamic_count = 1
     elif args.ccpu_fpu:
         generated = transform_ccpu_fpu(original)

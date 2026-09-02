@@ -461,7 +461,7 @@ extern word int10_seg;
 extern word int10_caller;
 extern word useHostInt10;
 extern word changing_mode_flag;
-extern boolean host_stream_io_enabled;
+extern BOOL host_stream_io_enabled;
 
 
 // from nt_ega.c

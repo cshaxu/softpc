@@ -40,7 +40,6 @@
  */
 
 extern void c_cpu_simulate();
-extern void c_cpu_unsimulate();
 static UTINY *softpc_ram;
 static sys_addr softpc_ram_size;
 IU32 softpc_ccpu_instruction_budget = 0;
@@ -62,6 +61,7 @@ static IBOOL softpc_platform_take_pending(volatile LONG *pending)
 {
     LONG observed;
 
+    if (*pending <= 0) return FALSE;
     do {
         observed = InterlockedCompareExchange(pending, 0, 0);
         if (observed <= 0) return FALSE;
@@ -74,9 +74,10 @@ static VOID CALLBACK softpc_clock_tick(PVOID context, BOOLEAN fired)
 {
     UNUSED(context);
     UNUSED(fired);
-    /* This host callback never writes CCPU state.  The generated port ABI
-       consumes each pending heartbeat on the executor's original
-       instruction/HLT safe point. */
+    /* The timer thread only records the original host heartbeat.  CCPU's
+       generated inter-instruction/HLT mailbox consumes it on the executor
+       thread and then calls host_timer_event, avoiding cross-thread CPU state
+       mutation. */
     (void)InterlockedIncrement(&softpc_clock_pending_ticks);
     if (softpc_executor_event != NULL) SetEvent(softpc_executor_event);
 }
@@ -111,6 +112,19 @@ IBOOL softpc_platform_consume_executor_wake(void)
     return FALSE;
 #endif
 }
+
+/* A bounded public machine run is measured only at the generated CCPU
+ * inter-instruction safe point.  The continuous VM executor supplies the
+ * maximum native budget and is stopped through its separate lifecycle port. */
+IBOOL softpc_platform_consume_instruction_budget(void)
+{
+    if (!softpc_ccpu_instruction_budget_active ||
+        softpc_ccpu_instruction_budget == 0u)
+        return FALSE;
+    --softpc_ccpu_instruction_budget;
+    return softpc_ccpu_instruction_budget == 0u;
+}
+
 
 /* Called only from the standalone CCPU HLT path after both pending sources
  * have been checked.  The auto-reset event avoids a polling spin: either the
@@ -156,8 +170,8 @@ extern byte *video_copy;
 extern PC_palette *DAC;
 extern IU8 Video_mode;
 extern IU8 Currently_emulated_video_mode;
-extern void softpc_nt_graph_standalone_init(void);
-extern void softpc_nt_graph_standalone_tick(void);
+extern void nt_init_screen(void);
+extern void nt_graphics_tick(void);
 extern void nt_change_plane_mask(int plane_mask);
 extern void nt_mark_screen_refresh(void);
 
@@ -181,9 +195,9 @@ boolean stream_io_enabled = FALSE;
 word stream_io_buffer_size = 0;
 word *stream_io_dirty_count_ptr = NULL;
 
-/* Original EGA/VGA controller host ports.  Presentation remains owned by the
-   standalone console/window; these callbacks preserve the controller's
-   lifecycle without importing the historical host product. */
+/* Transitional duplicate video vtable retained for audit only.  Original
+   nt_graph owns the sole compiled VIDEOFUNCS state below. */
+#if 0
 static void softpc_video_void(void) {}
 static void softpc_video_init_screen(void)
 {
@@ -192,7 +206,7 @@ static void softpc_video_init_screen(void)
         EGA_planes = (byte *)calloc(4u, (size_t)EGA_PLANE_SIZE);
     if (DAC == NULL) DAC = (PC_palette *)calloc(VGA_DAC_SIZE, sizeof(*DAC));
     (void)softpc_standalone_dib_init();
-    softpc_nt_graph_standalone_init();
+    nt_init_screen();
 }
 static void softpc_video_init_adaptor(int adapter, int height)
 { UNUSED(adapter); UNUSED(height); }
@@ -237,7 +251,7 @@ static void softpc_video_graphics_tick(void)
     } else if (++softpc_video_flush_ticks == 2) {
         /* The original nt_graphics_tick coalesces C-VID dirty marks for two
            machine ticks before its host painter consumes them. */
-        softpc_nt_graph_standalone_tick();
+        nt_graphics_tick();
         (void)(*update_alg.calc_update)();
         softpc_video_flush_ticks = 0;
     }
@@ -258,7 +272,10 @@ static VIDEOFUNCS softpc_video_functions = {
     softpc_video_int, softpc_video_two_ints, softpc_video_two_ints,
     softpc_video_void
 };
-VIDEOFUNCS *working_video_funcs = &softpc_video_functions;
+#endif
+
+extern VIDEOFUNCS nt_video_funcs;
+VIDEOFUNCS *working_video_funcs = &nt_video_funcs;
 
 int softpc_platform_presentation_is_graphics(void)
 {
@@ -267,16 +284,14 @@ int softpc_platform_presentation_is_graphics(void)
 
 int softpc_platform_presentation_cursor(long *column_out, long *row_out)
 {
-    if (!softpc_video_cursor_valid || column_out == NULL || row_out == NULL)
-        return 0;
-    *column_out = softpc_video_cursor_x;
-    *row_out = softpc_video_cursor_y;
-    return 1;
+    UNUSED(column_out);
+    UNUSED(row_out);
+    return 0;
 }
 
 int softpc_platform_video_buffers_init(void)
 {
-    softpc_video_cursor_valid = 0;
+    (void)softpc_standalone_dib_init();
     host_init_screen();
     return video_copy != NULL && EGA_planes != NULL && DAC != NULL;
 }
@@ -453,6 +468,7 @@ extern char *softpc_platform_floppy_config_value(void);
 #define SOFTPC_CONFIG_HARD_DISK1_NAME 25u
 #define SOFTPC_CONFIG_HARD_DISK2_NAME 26u
 #define SOFTPC_CONFIG_FLOPPY_A_DEVICE 51u
+#define SOFTPC_CONFIG_WIN_SIZE 55u
 void *config_inquire(host_id, values)
 UTINY host_id;
 void *values;
@@ -460,6 +476,10 @@ void *values;
     UNUSED(values);
     if (host_id == SOFTPC_CONFIG_GFX_ADAPTER)
         return (void *)(ULONG_PTR)SOFTPC_VGA_ADAPTER;
+    /* nt_graph obtains this historical scalar through config_inquire(),
+       encoded as a pointer.  The original NT host uses scale 2 by default. */
+    if (host_id == SOFTPC_CONFIG_WIN_SIZE)
+        return (void *)(ULONG_PTR)2u;
     if (host_id == SOFTPC_CONFIG_HARD_DISK1_NAME)
         return (void *)(softpc_hdd_config_paths[0] != NULL ?
             softpc_hdd_config_paths[0] : softpc_empty_config_value);
@@ -976,14 +996,11 @@ void softpc_platform_executor_event(void)
 {
     if (softpc_executor_callback != NULL)
         (*softpc_executor_callback)(softpc_executor_callback_context);
-    /* The outer-frame predicate is maintained by the generated CCPU port-ABI
-       overlay. BOP FE and nested host_simulate returns retain their original
-       c_cpu_unsimulate behavior; this dedicated request is never honoured
-       while a controller owns an inner CCPU frame. */
-    if (softpc_ccpu_lifecycle_outer_exit_requested()) {
-        softpc_ccpu_lifecycle_clear_exit();
-        c_cpu_unsimulate();
-    }
+    /* The original keyboard polling service may have entered nested
+       host_simulate frames.  A standalone stop returns to the outer executor
+       frame; it does not alter normal device/BOP unwinds. */
+    if (softpc_ccpu_lifecycle_exit_requested())
+        softpc_ccpu_lifecycle_return_outer();
 }
 
 void host_note_queue_added(IU32 value)

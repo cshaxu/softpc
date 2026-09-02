@@ -8,3 +8,5 @@ active work, architecture, or queue order.
   result and the associated generated C-VID field-width audit.
 - `evidence/m3-t4-s1-lifecycle-boundary.md` records why the original CCPU
   unsimulate path cannot be repurposed for standalone lifecycle control.
+- `evidence/m5-renderer-executor-acceptance.md` records original-renderer,
+  generated-CCPU return, dual-width regression and Windows Setup acceptance.

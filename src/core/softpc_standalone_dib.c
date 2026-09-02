@@ -23,16 +23,6 @@
 #define SOFTPC_TEXT_STORAGE_COLUMNS 160u
 #define SOFTPC_TEXT_STORAGE_ROWS 200u
 
-SCREEN_DESCRIPTION sc;
-int host_screen_scale = 2;
-extern half_word bg_col_mask;
-char *DIBData;
-PBITMAPINFO MonoDIB;
-PBITMAPINFO CGADIB;
-PBITMAPINFO EGADIB;
-PBITMAPINFO VGADIB;
-BOOL FunnyPaintMode;
-
 static BITMAPINFO *softpc_dib_info;
 static unsigned char *softpc_dib_bits;
 static unsigned long softpc_dib_width;
@@ -44,13 +34,6 @@ static int softpc_dib_dirty_valid;
    sharing buffer becomes standalone-owned storage; the frontend consumes it
    through the DIB/text presenter instead of a console server. */
 PBYTE textBuffer;
-int now_height = 50;
-int now_width = 80;
-
-void closeGraphicsBuffer(void)
-{
-    /* The DIB is VM-owned and remains valid across text/graphics changes. */
-}
 
 int softpc_standalone_dib_init(void)
 {
@@ -77,9 +60,14 @@ int softpc_standalone_dib_init(void)
     softpc_dib_info->bmiHeader.biBitCount = 8;
     softpc_dib_info->bmiHeader.biCompression = BI_RGB;
     softpc_dib_info->bmiHeader.biClrUsed = SOFTPC_DIB_COLOURS;
-    sc.ScreenBufHandle = (HANDLE)softpc_dib_bits;
-    sc.ConsoleBufInfo.lpBitMap = softpc_dib_bits;
-    sc.ConsoleBufInfo.lpBitMapInfo = softpc_dib_info;
+    /* The frontend owns softpc_dib_info for its whole lifetime.  Do not
+       publish it through the historical console buffer: nt_graph owns and
+       frees that slot whenever it rebuilds an indexed painter DIB. */
+    sc.ScreenBufHandle = NULL;
+    sc.ConsoleBufInfo.lpBitMap = NULL;
+    sc.ConsoleBufInfo.lpBitMapInfo = NULL;
+    sc.ConsoleBufInfo.dwBitMapInfoLength = 0;
+    sc.ConsoleBufInfo.dwUsage = 0;
     sc.ConsoleBufInfo.hMutex = NULL;
     sc.PC_W_Width = SOFTPC_DIB_MAX_WIDTH;
     sc.PC_W_Height = SOFTPC_DIB_MAX_HEIGHT;
@@ -119,6 +107,9 @@ int softpc_standalone_dib_resize(int width, int height, int bits_per_pixel)
     sc.ScreenBufHandle = (HANDLE)softpc_dib_bits;
     sc.ConsoleBufInfo.lpBitMap = softpc_dib_bits;
     sc.ConsoleBufInfo.lpBitMapInfo = softpc_dib_info;
+    sc.ConsoleBufInfo.dwBitMapInfoLength = sizeof(BITMAPINFOHEADER) +
+        SOFTPC_DIB_COLOURS * sizeof(RGBQUAD);
+    sc.ConsoleBufInfo.dwUsage = DIB_RGB_COLORS;
     sc.ActiveOutputBufferHandle = sc.ScreenBufHandle;
     sc.BitmapLastLine = (char *)softpc_dib_bits +
         ((size_t)height - 1u) * stride;
@@ -127,6 +118,44 @@ int softpc_standalone_dib_resize(int width, int height, int bits_per_pixel)
     CGADIB = softpc_dib_info;
     EGADIB = softpc_dib_info;
     VGADIB = softpc_dib_info;
+    return 1;
+}
+
+int softpc_standalone_dib_bind(PBITMAPINFO painter_info)
+{
+    int width;
+    int height;
+    int bits_per_pixel;
+
+    if (painter_info == NULL || !softpc_standalone_dib_init()) return 0;
+    width = (int)painter_info->bmiHeader.biWidth;
+    height = (int)painter_info->bmiHeader.biHeight;
+    if (height < 0) height = -height;
+    bits_per_pixel = (int)painter_info->bmiHeader.biBitCount;
+    if (width <= 0 || height <= 0 || width > (int)SOFTPC_DIB_MAX_WIDTH ||
+        height > (int)SOFTPC_DIB_MAX_HEIGHT || bits_per_pixel != 8) return 0;
+
+    softpc_dib_info->bmiHeader.biWidth = width;
+    softpc_dib_info->bmiHeader.biHeight = -height;
+    softpc_dib_info->bmiHeader.biBitCount = (WORD)bits_per_pixel;
+    softpc_dib_info->bmiHeader.biSizeImage =
+        (DWORD)(((unsigned long)width + 3u) & ~3u) * (DWORD)height;
+    softpc_dib_width = (unsigned long)width;
+    softpc_dib_height = (unsigned long)height;
+    memset(softpc_dib_bits, 0, (size_t)softpc_dib_info->bmiHeader.biSizeImage);
+
+    sc.ConsoleBufInfo.lpBitMap = softpc_dib_bits;
+    sc.ConsoleBufInfo.lpBitMapInfo = painter_info;
+    sc.ConsoleBufInfo.dwUsage = DIB_PAL_COLORS;
+    sc.ScreenBufHandle = NULL;
+    sc.ActiveOutputBufferHandle = NULL;
+    sc.BitmapLastLine = (char *)softpc_dib_bits +
+        ((size_t)height - 1u) * (((size_t)width + 3u) & ~(size_t)3u);
+    DIBData = (char *)softpc_dib_bits;
+    MonoDIB = painter_info;
+    CGADIB = painter_info;
+    EGADIB = painter_info;
+    VGADIB = painter_info;
     return 1;
 }
 
@@ -174,8 +203,9 @@ int softpc_standalone_text_surface(const void **cells_out,
     *cell_bytes_out = SOFTPC_TEXT_CELL_BYTES;
     return 1;
 }
-void softpc_standalone_dib_set_palette(PC_palette *palette, int count)
+void softpc_standalone_dib_set_palette(const void *palette_data, int count)
 {
+    const PC_palette *palette = (const PC_palette *)palette_data;
     int index;
     if (softpc_dib_info == NULL || palette == NULL || count <= 0) return;
     if (count > (int)SOFTPC_DIB_COLOURS) count = (int)SOFTPC_DIB_COLOURS;
@@ -186,6 +216,20 @@ void softpc_standalone_dib_set_palette(PC_palette *palette, int count)
             (BYTE)(palette[index].green << 2);
         softpc_dib_info->bmiColors[index].rgbBlue =
             (BYTE)(palette[index].blue << 2);
+        softpc_dib_info->bmiColors[index].rgbReserved = 0;
+    }
+}
+
+void softpc_standalone_dib_set_palette_entries(const PALETTEENTRY *entries,
+    int count)
+{
+    int index;
+    if (softpc_dib_info == NULL || entries == NULL || count <= 0) return;
+    if (count > (int)SOFTPC_DIB_COLOURS) count = (int)SOFTPC_DIB_COLOURS;
+    for (index = 0; index < count; ++index) {
+        softpc_dib_info->bmiColors[index].rgbRed = entries[index].peRed;
+        softpc_dib_info->bmiColors[index].rgbGreen = entries[index].peGreen;
+        softpc_dib_info->bmiColors[index].rgbBlue = entries[index].peBlue;
         softpc_dib_info->bmiColors[index].rgbReserved = 0;
     }
 }

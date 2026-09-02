@@ -125,12 +125,15 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
         sas_init(machine->memory_bytes);
         softpc_device_bop_register_machine_services();
         gfi_init();
-        if (!softpc_platform_video_buffers_init())
-            return SOFTPC_MACHINE_IO_ERROR;
         if (setup_global_data_ptr() == NULL)
             return SOFTPC_MACHINE_IO_ERROR;
         setup_vga_globals();
         softpc_ccpu_install_video_vector();
+        /* nt_init_screen() immediately issues the original C-VID dirty
+           notification.  Its generated vector and data carrier therefore
+           have to exist before the renderer host is initialized. */
+        if (!softpc_platform_video_buffers_init())
+            return SOFTPC_MACHINE_IO_ERROR;
         machine->hardware_initialized = 1;
     }
     /* c_cpu_init creates the CCPU's per-thread simulation-stack facility.
@@ -260,6 +263,7 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
     softpc_ccpu_instruction_budget_active = 1;
     c_cpu_simulate();
     softpc_ccpu_instruction_budget_active = 0;
+    softpc_ccpu_lifecycle_clear_exit();
     return SOFTPC_MACHINE_OK;
 }
 

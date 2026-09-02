@@ -205,7 +205,9 @@ static DWORD WINAPI softpc_runtime_worker(void *opaque)
         softpc_machine_set_heartbeat(runtime->machine, 1);
         InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_RUNNING);
         SetEvent(runtime->ready_event);
-        result = softpc_machine_run(runtime->machine, 1u);
+        /* The runtime owns one continuous CCPU executor.  Finite budgets are
+           reserved for the public machine API and deterministic smoke slices. */
+        result = softpc_machine_run(runtime->machine, (uint64_t)-1);
         softpc_machine_set_heartbeat(runtime->machine, 0);
         softpc_machine_set_executor_callback(runtime->machine, NULL, NULL);
         InterlockedExchange(&runtime->result, (LONG)result);

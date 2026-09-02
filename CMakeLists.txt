@@ -124,6 +124,10 @@ set(SOFTPC_CCPU_NTSTUBS_INPUT
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/ntstubs.c")
 set(SOFTPC_CCPU_NTSTUBS_SOURCE
     "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/ntstubs.c")
+set(SOFTPC_CCPU_NTTHREAD_INPUT
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/ntthread.c")
+set(SOFTPC_CCPU_NTTHREAD_SOURCE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/ntthread.c")
 set(SOFTPC_CCPU_FPU_INPUT
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/fpu.c")
 set(SOFTPC_CCPU_FPU_SOURCE
@@ -140,7 +144,7 @@ set(SOFTPC_CCPU_XCPTN_INPUT "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/cc
 set(SOFTPC_CCPU_XCPTN_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/c_xcptn.c")
 set(SOFTPC_CCPU_POPF_INPUT "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/ccpu386/popf.c")
 set(SOFTPC_CCPU_POPF_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/popf.c")
-foreach(SOFTPC_CCPU_ABI_NAME IN ITEMS sas-header bsic-header sas-source main ntstubs fpu zfrsrvd page reg xcptn popf)
+foreach(SOFTPC_CCPU_ABI_NAME IN ITEMS sas-header bsic-header sas-source main ntstubs ntthread fpu zfrsrvd page reg xcptn popf)
     if(SOFTPC_CCPU_ABI_NAME STREQUAL "sas-header")
         set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_SAS_HEADER_INPUT}")
         set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_SAS_HEADER_SOURCE}")
@@ -153,6 +157,9 @@ foreach(SOFTPC_CCPU_ABI_NAME IN ITEMS sas-header bsic-header sas-source main nts
     elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "ntstubs")
         set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_NTSTUBS_INPUT}")
         set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_NTSTUBS_SOURCE}")
+    elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "ntthread")
+        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_NTTHREAD_INPUT}")
+        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_NTTHREAD_SOURCE}")
     elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "fpu")
         set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_FPU_INPUT}")
         set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_FPU_SOURCE}")
@@ -194,19 +201,22 @@ add_custom_target(softpc-ccpu-port-abi-inputs
             "${SOFTPC_CCPU_SAS_SOURCE}"
             "${SOFTPC_CCPU_MAIN_SOURCE}"
             "${SOFTPC_CCPU_NTSTUBS_SOURCE}"
+            "${SOFTPC_CCPU_NTTHREAD_SOURCE}"
             "${SOFTPC_CCPU_FPU_SOURCE}"
             "${SOFTPC_CCPU_ZFRSRVD_SOURCE}"
             "${SOFTPC_CCPU_PAGE_SOURCE}"
             "${SOFTPC_CCPU_REG_SOURCE}"
             "${SOFTPC_CCPU_XCPTN_SOURCE}"
             "${SOFTPC_CCPU_POPF_SOURCE}")
-set_source_files_properties("${SOFTPC_CCPU_SAS_SOURCE}" "${SOFTPC_CCPU_MAIN_SOURCE}" "${SOFTPC_CCPU_NTSTUBS_SOURCE}" "${SOFTPC_CCPU_FPU_SOURCE}" "${SOFTPC_CCPU_ZFRSRVD_SOURCE}" "${SOFTPC_CCPU_PAGE_SOURCE}" "${SOFTPC_CCPU_REG_SOURCE}" "${SOFTPC_CCPU_XCPTN_SOURCE}" "${SOFTPC_CCPU_POPF_SOURCE}" PROPERTIES GENERATED TRUE)
+set_source_files_properties("${SOFTPC_CCPU_SAS_SOURCE}" "${SOFTPC_CCPU_MAIN_SOURCE}" "${SOFTPC_CCPU_NTSTUBS_SOURCE}" "${SOFTPC_CCPU_NTTHREAD_SOURCE}" "${SOFTPC_CCPU_FPU_SOURCE}" "${SOFTPC_CCPU_ZFRSRVD_SOURCE}" "${SOFTPC_CCPU_PAGE_SOURCE}" "${SOFTPC_CCPU_REG_SOURCE}" "${SOFTPC_CCPU_XCPTN_SOURCE}" "${SOFTPC_CCPU_POPF_SOURCE}" PROPERTIES GENERATED TRUE)
 list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_SAS_INPUT}")
 list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_SAS_SOURCE}")
 list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_MAIN_INPUT}")
 list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_MAIN_SOURCE}")
 list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_NTSTUBS_INPUT}")
 list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_NTSTUBS_SOURCE}")
+list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_NTTHREAD_INPUT}")
+list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_NTTHREAD_SOURCE}")
 list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_FPU_INPUT}")
 list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_FPU_SOURCE}")
 list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_ZFRSRVD_INPUT}")
@@ -233,7 +243,6 @@ endif()
 add_library(softpc-ccpu-core OBJECT
     ${SOFTPC_CCPU_SOURCES}
     "${SOFTPC_CCPU_NTSTUBS_SOURCE}"
-    src/core/softpc/base/ccpu386/ntthread.c
     src/core/softpc/base/ccpu386/softpc_ccpu_facade.c
     "${SOFTPC_CCPU_VGLOB_SOURCE}"
     ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
@@ -319,6 +328,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/host/src/nt_com.c
     src/core/softpc/host/src/nt_vga.c
     src/host/softpc_compat/edl_fast_bop.c
+    src/host/softpc_compat/graphics_console_compat.c
     src/core/softpc_standalone_dib.c
     src/core/softpc_device_bop.c
     src/core/softpc_gfi_image.c
@@ -347,6 +357,7 @@ target_include_directories(softpc-ccpu-core PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu"
     src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
+    src/host/softpc_compat
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
     src/core/softpc/base/inc
@@ -358,6 +369,7 @@ target_include_directories(softpc-machine-devices PRIVATE
     include
     src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
+    src/host/softpc_compat
     src/core/softpc/host/inc
     src/core/softpc/host/inc/x86/prod
     src/core/softpc/base/inc

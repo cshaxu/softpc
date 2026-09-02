@@ -11,6 +11,8 @@
 static SOFTPC_CCPU_THREAD_LOCAL unsigned long softpc_ccpu_frame_depth;
 static volatile LONG softpc_ccpu_exit_requested;
 
+extern void ccpu386UnsimulateOuter(void);
+
 void softpc_ccpu_lifecycle_enter(void)
 {
     ++softpc_ccpu_frame_depth;
@@ -32,8 +34,16 @@ void softpc_ccpu_lifecycle_clear_exit(void)
     InterlockedExchange(&softpc_ccpu_exit_requested, 0);
 }
 
-int softpc_ccpu_lifecycle_outer_exit_requested(void)
+int softpc_ccpu_lifecycle_exit_requested(void)
 {
-    return softpc_ccpu_frame_depth == 1ul &&
+    return softpc_ccpu_frame_depth != 0ul &&
         InterlockedCompareExchange(&softpc_ccpu_exit_requested, 0, 0) != 0;
+}
+
+void softpc_ccpu_lifecycle_return_outer(void)
+{
+    /* The generated adapter returns to the first c_cpu_simulate frame.  The
+       matching generated c_main leave hook then restores this depth to zero. */
+    softpc_ccpu_frame_depth = 1ul;
+    ccpu386UnsimulateOuter();
 }

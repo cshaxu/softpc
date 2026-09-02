@@ -7,6 +7,7 @@ void softpc_ccpu_lifecycle_enter(void);
 void softpc_ccpu_lifecycle_leave(void);
 void softpc_ccpu_lifecycle_request_exit(void);
 void softpc_ccpu_lifecycle_clear_exit(void);
-int softpc_ccpu_lifecycle_outer_exit_requested(void);
+int softpc_ccpu_lifecycle_exit_requested(void);
+void softpc_ccpu_lifecycle_return_outer(void);
 
 #endif
