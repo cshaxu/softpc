@@ -50,6 +50,7 @@ int main(void)
     assert(frame->sequence != 0u);
     assert(softpc_runtime_pause(runtime));
     assert(softpc_runtime_wait(runtime, SOFTPC_RUNTIME_PAUSED));
+    assert(softpc_runtime_set_floppy(runtime, NULL));
     assert(softpc_runtime_resume(runtime));
     assert(softpc_runtime_wait(runtime, SOFTPC_RUNTIME_RUNNING));
     assert(softpc_runtime_stop(runtime));

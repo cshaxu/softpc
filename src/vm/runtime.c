@@ -158,6 +158,20 @@ static void softpc_runtime_drain_input(softpc_runtime *runtime)
     }
 }
 
+/* Media replacement is a host command, but the original FDC remains owned
+ * by the executor.  A paused executor is deliberately waiting at an
+ * evidenced CCPU callback; service the request there instead of letting a
+ * monitor thread touch the controller or claiming that paused insertion is
+ * supported when it cannot complete. */
+static void softpc_runtime_service_media(softpc_runtime *runtime)
+{
+    if (InterlockedExchange(&runtime->media_requested, 0) == 0) return;
+    runtime->media_result = softpc_machine_set_floppy(runtime->machine,
+        runtime->media_floppy_path[0] == '\0' ? NULL :
+        runtime->media_floppy_path);
+    SetEvent(runtime->media_event);
+}
+
 static void softpc_runtime_executor_event(void *opaque)
 {
     softpc_runtime *runtime = (softpc_runtime *)opaque;
@@ -167,8 +181,12 @@ static void softpc_runtime_executor_event(void *opaque)
         InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0) {
         InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_PAUSED);
         while (InterlockedCompareExchange(&runtime->pause_requested, 0, 0) != 0 &&
-            InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0)
-            (void)WaitForSingleObject(runtime->resume_event, INFINITE);
+            InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0) {
+            HANDLE events[2] = { runtime->resume_event, runtime->command_event };
+            DWORD wait = WaitForMultipleObjects(2u, events, FALSE, INFINITE);
+            if (wait == WAIT_OBJECT_0 + 1u)
+                softpc_runtime_service_media(runtime);
+        }
         if (InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0)
             InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_RUNNING);
     }
@@ -183,11 +201,8 @@ static DWORD WINAPI softpc_runtime_worker(void *opaque)
         (void)WaitForSingleObject(runtime->command_event, INFINITE);
         if (InterlockedCompareExchange(&runtime->terminate_requested, 0, 0) != 0)
             break;
-        if (InterlockedExchange(&runtime->media_requested, 0) != 0) {
-            runtime->media_result = softpc_machine_set_floppy(runtime->machine,
-                runtime->media_floppy_path[0] == '\0' ? NULL :
-                runtime->media_floppy_path);
-            SetEvent(runtime->media_event);
+        if (InterlockedCompareExchange(&runtime->media_requested, 0, 0) != 0) {
+            softpc_runtime_service_media(runtime);
             continue;
         }
         if (InterlockedExchange(&runtime->start_requested, 0) == 0)
@@ -331,8 +346,11 @@ int softpc_runtime_stop(softpc_runtime *runtime)
 int softpc_runtime_set_floppy(softpc_runtime *runtime, const char *path)
 {
     size_t length;
-    if (runtime == NULL || InterlockedCompareExchange(&runtime->state, 0, 0) !=
-        SOFTPC_RUNTIME_STOPPED) return 0;
+    LONG state;
+    if (runtime == NULL) return 0;
+    state = InterlockedCompareExchange(&runtime->state, 0, 0);
+    if (state != SOFTPC_RUNTIME_STOPPED && state != SOFTPC_RUNTIME_PAUSED)
+        return 0;
     if (path == NULL) {
         runtime->media_floppy_path[0] = '\0';
     } else {

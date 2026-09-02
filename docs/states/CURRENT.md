@@ -52,3 +52,6 @@ retaining original SoftPC key translation and controller ownership; see
 The console now presents original text attributes rather than flattening them
 to the host default palette; see
 [M5 console text-attribute evidence](../etc/evidence/m5-console-text-attributes.md).
+Paused floppy insertion/ejection now follows the documented monitor contract
+without giving the monitor controller access; see
+[M5 paused-media evidence](../etc/evidence/m5-paused-media-contract.md).
