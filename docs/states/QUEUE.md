@@ -18,5 +18,5 @@ allocates a numeric task identifier.
 13. [M7 T1 original raw-media host recovery](../proposals/m7-t1-original-media-host.md)
 14. [M7 T2 single-image partition compatibility proof](../proposals/m7-t2-single-image-partitions.md)
 15. [M7 T3 original V7 display compatibility proof](../proposals/m7-t3-v7-display-compatibility.md)
-16. [M7 T4 original speaker host endpoint completion](../proposals/m7-t4-audio-endpoint.md)
-17. [M7 T5 original serial and parallel host endpoints](../proposals/m7-t5-com-lpt-endpoints.md)
+16. [M7 T4 original serial and parallel host endpoints](../proposals/m7-t5-com-lpt-endpoints.md)
+17. [M7 T5 original speaker host endpoint completion](../proposals/m7-t4-audio-endpoint.md)

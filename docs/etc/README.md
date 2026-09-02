@@ -22,3 +22,5 @@ active work, architecture, or queue order.
   disposition of the original OpenNT raw-media host candidates.
 - `evidence/m7-t2-single-image-partitions.md` records the guest INT 13h proof
   that one raw fixed-disk image carries guest-owned partition metadata.
+- `evidence/m7-t3-v7-display-compatibility.md` records the original V7 BIOS,
+  controller, and `nt_*` painter proof for standalone DIB presentation.

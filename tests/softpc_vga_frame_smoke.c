@@ -33,6 +33,8 @@ typedef struct {
    the historical console-server structure and is intentionally not needed by
    this direct original-renderer call. */
 extern unsigned char *EGA_planes;
+extern void nt_ega_hi_graph_std(int offset, int screen_x, int screen_y,
+    int width, int height);
 extern void nt_vga_hi_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
 extern void nt_v7vga_hi_graph_std(int offset, int screen_x, int screen_y,
@@ -194,6 +196,40 @@ int main(void)
         assert(softpc_machine_presentation_take_dirty(machine, &left, &top,
             &right, &bottom));
         assert(left == 0 && top == 0 && right == 1 && bottom == 0);
+    }
+
+    /* Modes 60h-65h are not all packed 256-colour layouts.  The original
+       V7 BIOS selects 65h as its 1024x768 16-colour mode; nt_graph therefore
+       selects nt_ega_hi_graph_std and its original four-plane LUT path.  The
+       standalone host owns only the destination DIB and dirty callback. */
+    c_setAH(0x6fu);
+    c_setAL(5u);
+    c_setBX(0x0065u);
+    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    assert(Currently_emulated_video_mode == 0x65u);
+    host_timer_event();
+    host_timer_event();
+    assert(softpc_machine_presentation_is_graphics(machine));
+    assert(softpc_machine_presentation_dib(machine, &bits, &info, &width,
+        &height));
+    assert(width == 1024u && height == 768u);
+    {
+        int32_t left;
+        int32_t top;
+        int32_t right;
+        int32_t bottom;
+
+        while (softpc_machine_presentation_take_dirty(machine, &left, &top,
+            &right, &bottom)) {
+        }
+        EGA_planes[0] = 0x80u;
+        EGA_planes[1] = 0x00u;
+        EGA_planes[2] = 0x00u;
+        EGA_planes[3] = 0x00u;
+        nt_ega_hi_graph_std(0, 0, 0, 1, 1);
+        assert(softpc_machine_presentation_take_dirty(machine, &left, &top,
+            &right, &bottom));
+        assert(left == 0 && top == 0 && right == 7 && bottom == 0);
     }
 
     /* The original nt_graph VLT maps the attribute-controller palette to
