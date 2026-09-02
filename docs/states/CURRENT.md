@@ -63,6 +63,8 @@ copying a full DIB, keeping static graphics from consuming executor time; see
 [M5 original dirty-frame publication evidence](../etc/evidence/m5-original-dirty-frame-publication.md).
 The actual Win32 window now has a proved close-to-runtime-stop lifecycle;
 see [M5 Win32 window lifecycle evidence](../etc/evidence/m5-win32-window-lifecycle.md).
+Its client rectangle follows the NXVM sizing rule and contains no frontend
+display margin.
 Window text now uses the currently loaded original EGA/VGA font plane rather
 than a host font; see [M5 original font presentation evidence](../etc/evidence/m5-original-font-presentation.md).
 Five controller/firmware extraction routes remain after restoring the original
