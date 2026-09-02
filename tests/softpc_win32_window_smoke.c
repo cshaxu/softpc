@@ -67,6 +67,14 @@ int main(void)
         Sleep(10u);
     } while ((LONG)(GetTickCount() - deadline) < 0);
     assert(window != NULL);
+    {
+        RECT client;
+        /* The endpoint begins with a literal 80x25 CP437 8x16 surface: no
+           frontend border is permitted inside the guest client rectangle. */
+        GetClientRect(window, &client);
+        assert(client.right - client.left == 640);
+        assert(client.bottom - client.top == 400);
+    }
     assert(PostMessageA(window, WM_CLOSE, 0u, 0));
     assert(WaitForSingleObject(thread, 5000u) == WAIT_OBJECT_0);
     assert(context.result == SOFTPC_VM_FRONTEND_STOPPED);

@@ -35,6 +35,8 @@ static int softpc_window_mouse_y;
 static int softpc_window_mouse_valid;
 static int softpc_window_left_button;
 static int softpc_window_right_button;
+static uint32_t softpc_window_surface_width;
+static uint32_t softpc_window_surface_height;
 
 static COLORREF softpc_window_colour(unsigned int colour)
 {
@@ -45,6 +47,42 @@ static COLORREF softpc_window_colour(unsigned int colour)
         RGB(255, 85, 85), RGB(255, 85, 255), RGB(255, 255, 85), RGB(255, 255, 255)
     };
     return palette[colour & 0x0fu];
+}
+
+/* Match NXVM's display contract: the client rectangle is the current guest
+ * surface, while the normal Win32 frame is outside it.  The frontend owns
+ * this geometry only; the dimensions still come from a copied frame. */
+static void softpc_window_resize_surface(HWND window, uint32_t width,
+    uint32_t height)
+{
+    RECT client;
+    RECT outer;
+    LONG width_offset;
+    LONG height_offset;
+
+    if (window == NULL || width == 0u || height == 0u ||
+        (softpc_window_surface_width == width &&
+         softpc_window_surface_height == height)) return;
+    GetClientRect(window, &client);
+    GetWindowRect(window, &outer);
+    width_offset = (outer.right - outer.left) - (client.right - client.left);
+    height_offset = (outer.bottom - outer.top) - (client.bottom - client.top);
+    MoveWindow(window, outer.left, outer.top, (int)width + width_offset,
+        (int)height + height_offset, TRUE);
+    softpc_window_surface_width = width;
+    softpc_window_surface_height = height;
+}
+
+static void softpc_window_resize_frame(HWND window)
+{
+    if (softpc_window_frame == NULL || softpc_window_frame->valid == 0u)
+        return;
+    if (softpc_window_frame->graphics != 0u)
+        softpc_window_resize_surface(window, softpc_window_frame->dib_width,
+            softpc_window_frame->dib_height);
+    else
+        softpc_window_resize_surface(window, SOFTPC_TEXT_SURFACE_WIDTH,
+            SOFTPC_TEXT_SURFACE_HEIGHT);
 }
 
 static void softpc_window_update_text_surface(void)
@@ -95,7 +133,7 @@ static void softpc_window_paint(HDC dc)
 {
     if (softpc_window_frame == NULL || softpc_window_frame->valid == 0u) return;
     if (softpc_window_frame->graphics != 0u) {
-        StretchDIBits(dc, 8, 8, (int)softpc_window_frame->dib_width,
+        StretchDIBits(dc, 0, 0, (int)softpc_window_frame->dib_width,
             (int)softpc_window_frame->dib_height, 0, 0,
             (int)softpc_window_frame->dib_width,
             (int)softpc_window_frame->dib_height,
@@ -105,7 +143,7 @@ static void softpc_window_paint(HDC dc)
         return;
     }
     softpc_window_update_text_surface();
-    BitBlt(dc, 8, 8, SOFTPC_TEXT_SURFACE_WIDTH, SOFTPC_TEXT_SURFACE_HEIGHT,
+    BitBlt(dc, 0, 0, SOFTPC_TEXT_SURFACE_WIDTH, SOFTPC_TEXT_SURFACE_HEIGHT,
         softpc_window_text_dc, 0, 0, SRCCOPY);
 }
 
@@ -160,6 +198,7 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
                 softpc_runtime_copy_frame(softpc_window_runtime,
                     softpc_window_frame)) {
                 softpc_window_displayed_sequence = softpc_window_frame->sequence;
+                softpc_window_resize_frame(window);
                 InvalidateRect(window, NULL, FALSE);
             }
             if (softpc_runtime_get_state(softpc_window_runtime) !=
@@ -170,6 +209,8 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
         { PAINTSTRUCT paint; HDC dc = BeginPaint(window, &paint);
           softpc_window_paint(dc); EndPaint(window, &paint); }
         return 0;
+    case WM_ERASEBKGND:
+        return 1;
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
         if (wparam == 'P' && GetKeyState(VK_CONTROL) < 0 && GetKeyState(VK_MENU) < 0) {
@@ -230,9 +271,13 @@ int softpc_vm_run_window(softpc_runtime *runtime)
         sizeof(softpc_window_keyboard_normalizer));
     softpc_window_mouse_valid = 0;
     softpc_window_left_button = softpc_window_right_button = 0;
+    softpc_window_surface_width = 0u;
+    softpc_window_surface_height = 0u;
     window = CreateWindowExA(0, klass.lpszClassName, "SoftPC VM", WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, 680, 560, NULL, NULL, klass.hInstance, NULL);
     if (window == NULL) { free(softpc_window_frame); return SOFTPC_VM_FRONTEND_ERROR; }
+    softpc_window_resize_surface(window, SOFTPC_TEXT_SURFACE_WIDTH,
+        SOFTPC_TEXT_SURFACE_HEIGHT);
     dc = GetDC(window);
     softpc_window_text_dc = CreateCompatibleDC(dc);
     {
