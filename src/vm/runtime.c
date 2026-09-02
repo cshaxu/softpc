@@ -44,6 +44,7 @@ static void softpc_runtime_publish(softpc_runtime *runtime)
 {
     softpc_runtime_frame *frame;
     unsigned int next = runtime->published_frame == 0u ? 1u : 0u;
+    int published = 0;
     const void *surface;
     uint32_t columns;
     uint32_t rows;
@@ -61,6 +62,25 @@ static void softpc_runtime_publish(softpc_runtime *runtime)
         uint32_t height;
         uint32_t bytes;
         uint32_t row_stride;
+        int32_t ignored_left;
+        int32_t ignored_top;
+        int32_t ignored_right;
+        int32_t ignored_bottom;
+        const softpc_runtime_frame *current =
+            &runtime->frames[runtime->published_frame];
+        int mode_changed = current->valid == 0u || current->graphics == 0u;
+        int dirty = softpc_machine_presentation_take_dirty(runtime->machine,
+            &ignored_left, &ignored_top, &ignored_right, &ignored_bottom);
+
+        /* nt_graph/nt_ega/nt_vga already report their changed DIB rectangle.
+           Consume that original presentation signal here, before copying the
+           complete host snapshot.  Recopying an unchanged 800 KiB DIB at
+           every executor callback is outer-shell work and can starve the
+           guest without making its display more current. */
+        if (!mode_changed && !dirty) {
+            LeaveCriticalSection(&runtime->frame_lock);
+            return;
+        }
         if (softpc_machine_presentation_dib(runtime->machine, &bits, &info,
                 &width, &height) && bits != NULL && info != NULL &&
             width <= SOFTPC_RUNTIME_DIB_MAX_WIDTH &&
@@ -74,6 +94,7 @@ static void softpc_runtime_publish(softpc_runtime *runtime)
                 frame->dib_height = height;
                 frame->graphics = 1u;
                 frame->valid = 1u;
+                published = 1;
             }
         }
     } else if (softpc_machine_presentation_text(runtime->machine, &surface,
@@ -111,8 +132,9 @@ static void softpc_runtime_publish(softpc_runtime *runtime)
         frame->cursor_row = cursor_row;
         frame->graphics = 0u;
         frame->valid = 1u;
+        published = 1;
     }
-    if (frame->valid != 0u) {
+    if (published) {
         frame->sequence = ++runtime->frame_sequence;
         runtime->published_frame = next;
         /* Publish only after the copied frame and its selected slot are

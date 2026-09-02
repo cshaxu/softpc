@@ -58,3 +58,6 @@ without giving the monitor controller access; see
 The delivered fixed INI now names the verified A:+C: media pair and both
 width-specific launchers reach the monitor without arguments; see
 [M5 delivered-launcher configuration evidence](../etc/evidence/m5-delivered-launcher-configuration.md).
+Graphics snapshots now consume the original renderer dirty signal before
+copying a full DIB, keeping static graphics from consuming executor time; see
+[M5 original dirty-frame publication evidence](../etc/evidence/m5-original-dirty-frame-publication.md).
