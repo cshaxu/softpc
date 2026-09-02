@@ -24,6 +24,7 @@
 #include "egamode.h"
 #include "gvi.h"
 #include "egagraph.h"
+#include "egavideo.h"
 #include "video.h"
 #include "host_com.h"
 #include "virtual.h"
@@ -305,6 +306,32 @@ int softpc_platform_presentation_cursor(long *column_out, long *row_out)
     return 0;
 }
 
+int softpc_platform_presentation_font(uint8_t *glyphs,
+    unsigned long *height_out)
+{
+    static const unsigned long font_offsets[8] = {
+        0u, 0x4000u, 0x8000u, 0xc000u, 0x2000u, 0x6000u, 0xa000u, 0xe000u
+    };
+    unsigned long height;
+    unsigned long font;
+    unsigned long character;
+
+    if (glyphs == NULL || height_out == NULL || EGA_planes == NULL) return 0;
+    height = sas_hw_at_no_check(ega_char_height);
+    if (height == 0u || height > 16u) height = 16u;
+    font = (unsigned long)get_prim_font_index() & 7u;
+    memset(glyphs, 0, 256u * 16u);
+    for (character = 0u; character < 256u; ++character) {
+        unsigned long row;
+        byte *source = EGA_planes + FONT_BASE_ADDR + (font_offsets[font] << 2) +
+            ((unsigned long)FONT_MAX_HEIGHT * character << 2);
+        for (row = 0u; row < height; ++row)
+            glyphs[character * 16u + row] = source[row << 2];
+    }
+    *height_out = height;
+    return 1;
+}
+
 int softpc_platform_video_buffers_init(void)
 {
     (void)softpc_standalone_dib_init();
@@ -468,11 +495,15 @@ static void softpc_speaker_shutdown(void)
 }
 #endif
 
-/* The console owns its event pump and invokes the machine in bounded slices.
-   Returning here therefore yields to that slice boundary without borrowing a
-   historical host scheduler. */
+/* Original idetect.c calls this only after it has classified repeated failed
+   keyboard polls as guest idle.  Yield the host quantum without sleeping or
+   advancing machine time; this is the same outer scheduling primitive NXVM
+   uses for a core that has no productive work. */
 void host_release_timeslice(void)
 {
+#ifdef _WIN32
+    Sleep(0u);
+#endif
 }
 
 /* The original CMOS controller expects the product configuration service.

@@ -84,6 +84,20 @@ int main(void)
     assert(bits != NULL && info != NULL);
     assert(width == 1056u && height == 768u);
 
+    /* The standalone front end gets its glyphs from the original loaded
+       EGA/VGA font plane, never a host-installed TrueType font. */
+    {
+        unsigned char font[256u * 16u];
+        uint32_t font_height = 0;
+        unsigned int row;
+        unsigned int populated = 0;
+        assert(softpc_machine_presentation_font(machine, font, &font_height));
+        assert(font_height == 16u);
+        for (row = 0u; row < font_height; ++row)
+            populated |= font[(unsigned int)'A' * 16u + row];
+        assert(populated != 0u);
+    }
+
     /* The C-VID mode-transition path can emit an empty text repaint.  The
        original nt_text bulk-copy calculation must discard it rather than
        treating (height - 1) as an enormous byte count. */

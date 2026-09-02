@@ -18,12 +18,14 @@
 
 static softpc_runtime *softpc_window_runtime;
 static softpc_runtime_frame *softpc_window_frame;
-static HFONT softpc_window_font;
 static HDC softpc_window_text_dc;
 static HBITMAP softpc_window_text_bitmap;
 static HGDIOBJ softpc_window_text_previous_bitmap;
+static uint32_t *softpc_window_text_pixels;
 static unsigned char softpc_window_presented_text[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
 static unsigned short softpc_window_presented_attributes[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
+static unsigned char softpc_window_presented_font[256u * 16u];
+static uint32_t softpc_window_presented_font_height;
 static int softpc_window_presented_text_valid;
 static uint32_t softpc_window_displayed_sequence;
 static int softpc_window_result;
@@ -53,35 +55,39 @@ static void softpc_window_update_text_surface(void)
             softpc_window_frame->text, sizeof(softpc_window_presented_text)) == 0 &&
          memcmp(softpc_window_presented_attributes,
             softpc_window_frame->attributes,
-            sizeof(softpc_window_presented_attributes)) == 0)) return;
-    SelectObject(softpc_window_text_dc, softpc_window_font);
-    SetBkMode(softpc_window_text_dc, OPAQUE);
+            sizeof(softpc_window_presented_attributes)) == 0 &&
+         memcmp(softpc_window_presented_font, softpc_window_frame->font,
+            sizeof(softpc_window_presented_font)) == 0 &&
+         softpc_window_presented_font_height ==
+            softpc_window_frame->font_height)) return;
     for (row = 0; row < SOFTPC_TEXT_ROWS; ++row) {
-        int column = 0;
-        while (column < SOFTPC_TEXT_COLUMNS) {
-            unsigned short attribute = softpc_window_frame->attributes[
-                row * SOFTPC_TEXT_COLUMNS + column];
-            char line[SOFTPC_TEXT_COLUMNS];
-            int length = 0;
-            while (column + length < SOFTPC_TEXT_COLUMNS &&
-                softpc_window_frame->attributes[row * SOFTPC_TEXT_COLUMNS +
-                    column + length] == attribute) {
-                unsigned char character = softpc_window_frame->text[
-                    row * SOFTPC_TEXT_COLUMNS + column + length];
-                line[length++] = character >= 0x20u && character < 0x7fu ?
-                    (char)character : ' ';
+        int column;
+        for (column = 0; column < SOFTPC_TEXT_COLUMNS; ++column) {
+            unsigned int scan;
+            size_t index = (size_t)row * SOFTPC_TEXT_COLUMNS + column;
+            unsigned char character = softpc_window_frame->text[index];
+            unsigned short attribute = softpc_window_frame->attributes[index];
+            for (scan = 0u; scan < SOFTPC_TEXT_CELL_HEIGHT; ++scan) {
+                unsigned char bits = softpc_window_frame->font[
+                    (size_t)character * 16u + scan];
+                unsigned int bit;
+                uint32_t *pixels = softpc_window_text_pixels +
+                    ((size_t)row * SOFTPC_TEXT_CELL_HEIGHT + scan) *
+                    SOFTPC_TEXT_SURFACE_WIDTH + column * SOFTPC_TEXT_CELL_WIDTH;
+                for (bit = 0u; bit < SOFTPC_TEXT_CELL_WIDTH; ++bit)
+                    pixels[bit] = (bits & (0x80u >> bit)) ?
+                        softpc_window_colour(attribute) :
+                        softpc_window_colour(attribute >> 4);
             }
-            SetTextColor(softpc_window_text_dc, softpc_window_colour(attribute));
-            SetBkColor(softpc_window_text_dc, softpc_window_colour(attribute >> 4));
-            TextOutA(softpc_window_text_dc, column * SOFTPC_TEXT_CELL_WIDTH,
-                row * SOFTPC_TEXT_CELL_HEIGHT, line, length);
-            column += length;
         }
     }
     memcpy(softpc_window_presented_text, softpc_window_frame->text,
         sizeof(softpc_window_presented_text));
     memcpy(softpc_window_presented_attributes, softpc_window_frame->attributes,
         sizeof(softpc_window_presented_attributes));
+    memcpy(softpc_window_presented_font, softpc_window_frame->font,
+        sizeof(softpc_window_presented_font));
+    softpc_window_presented_font_height = softpc_window_frame->font_height;
     softpc_window_presented_text_valid = 1;
 }
 
@@ -224,16 +230,23 @@ int softpc_vm_run_window(softpc_runtime *runtime)
         sizeof(softpc_window_keyboard_normalizer));
     softpc_window_mouse_valid = 0;
     softpc_window_left_button = softpc_window_right_button = 0;
-    softpc_window_font = CreateFontA(16, 8, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
-        OEM_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-        FIXED_PITCH | FF_MODERN, "Consolas");
     window = CreateWindowExA(0, klass.lpszClassName, "SoftPC VM", WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, 680, 560, NULL, NULL, klass.hInstance, NULL);
     if (window == NULL) { free(softpc_window_frame); return SOFTPC_VM_FRONTEND_ERROR; }
     dc = GetDC(window);
     softpc_window_text_dc = CreateCompatibleDC(dc);
-    softpc_window_text_bitmap = CreateCompatibleBitmap(dc, SOFTPC_TEXT_SURFACE_WIDTH,
-        SOFTPC_TEXT_SURFACE_HEIGHT);
+    {
+        BITMAPINFO info;
+        ZeroMemory(&info, sizeof(info));
+        info.bmiHeader.biSize = sizeof(info.bmiHeader);
+        info.bmiHeader.biWidth = SOFTPC_TEXT_SURFACE_WIDTH;
+        info.bmiHeader.biHeight = -SOFTPC_TEXT_SURFACE_HEIGHT;
+        info.bmiHeader.biPlanes = 1;
+        info.bmiHeader.biBitCount = 32;
+        info.bmiHeader.biCompression = BI_RGB;
+        softpc_window_text_bitmap = CreateDIBSection(dc, &info, DIB_RGB_COLORS,
+            (void **)&softpc_window_text_pixels, NULL, 0u);
+    }
     ReleaseDC(window, dc);
     if (softpc_window_text_dc == NULL || softpc_window_text_bitmap == NULL) {
         DestroyWindow(window); free(softpc_window_frame); return SOFTPC_VM_FRONTEND_ERROR;
@@ -246,9 +259,14 @@ int softpc_vm_run_window(softpc_runtime *runtime)
         TranslateMessage(&message); DispatchMessageA(&message);
     }
     SelectObject(softpc_window_text_dc, softpc_window_text_previous_bitmap);
-    DeleteDC(softpc_window_text_dc); DeleteObject(softpc_window_text_bitmap);
-    DeleteObject(softpc_window_font); free(softpc_window_frame);
-    softpc_window_frame = NULL; softpc_window_runtime = NULL;
+    DeleteDC(softpc_window_text_dc);
+    softpc_window_text_dc = NULL;
+    DeleteObject(softpc_window_text_bitmap);
+    softpc_window_text_bitmap = NULL;
+    softpc_window_text_pixels = NULL;
+    free(softpc_window_frame);
+    softpc_window_frame = NULL;
+    softpc_window_runtime = NULL;
     if (softpc_window_result == SOFTPC_VM_FRONTEND_STOPPED)
         (void)softpc_runtime_stop(runtime);
     return softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_ERROR ?

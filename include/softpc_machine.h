@@ -111,6 +111,12 @@ int softpc_machine_presentation_text(const softpc_machine *machine,
 int softpc_machine_presentation_cursor(const softpc_machine *machine,
     int32_t *column_out, int32_t *row_out);
 
+/* Copy the active original EGA/VGA primary font as CP437 glyph rows.  Every
+ * glyph has a fixed 16-row slot; rows below the current original font height
+ * are zero. */
+int softpc_machine_presentation_font(const softpc_machine *machine,
+    uint8_t glyphs[256u * 16u], uint32_t *height_out);
+
 void softpc_machine_destroy(softpc_machine *machine);
 
 const char *softpc_machine_result_name(softpc_machine_result result);
