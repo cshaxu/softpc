@@ -46,6 +46,8 @@ int main(void)
     frame = (softpc_runtime_frame *)calloc(1u, sizeof(*frame));
     assert(frame != NULL);
     assert(softpc_runtime_copy_frame(runtime, frame));
+    assert(softpc_runtime_published_frame_sequence(runtime) == frame->sequence);
+    assert(frame->sequence != 0u);
     assert(softpc_runtime_pause(runtime));
     assert(softpc_runtime_wait(runtime, SOFTPC_RUNTIME_PAUSED));
     assert(softpc_runtime_resume(runtime));

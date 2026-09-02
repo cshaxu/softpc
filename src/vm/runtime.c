@@ -23,6 +23,7 @@ struct softpc_runtime {
     softpc_runtime_frame frames[2];
     unsigned int published_frame;
     uint32_t frame_sequence;
+    volatile LONG published_frame_sequence;
     HANDLE command_event;
     HANDLE ready_event;
     HANDLE resume_event;
@@ -114,6 +115,11 @@ static void softpc_runtime_publish(softpc_runtime *runtime)
     if (frame->valid != 0u) {
         frame->sequence = ++runtime->frame_sequence;
         runtime->published_frame = next;
+        /* Publish only after the copied frame and its selected slot are
+           complete.  Frontends use this as a cheap cadence gate before they
+           acquire the frame lock and copy a full graphics surface. */
+        (void)InterlockedExchange(&runtime->published_frame_sequence,
+            (LONG)frame->sequence);
     }
     LeaveCriticalSection(&runtime->frame_lock);
 }
@@ -406,6 +412,13 @@ int softpc_runtime_copy_frame(softpc_runtime *runtime,
         sizeof(*destination));
     LeaveCriticalSection(&runtime->frame_lock);
     return destination->valid != 0u;
+}
+
+uint32_t softpc_runtime_published_frame_sequence(const softpc_runtime *runtime)
+{
+    if (runtime == NULL) return 0u;
+    return (uint32_t)InterlockedCompareExchange(
+        (volatile LONG *)&runtime->published_frame_sequence, 0, 0);
 }
 
 void softpc_runtime_destroy(softpc_runtime *runtime)

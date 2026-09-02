@@ -187,6 +187,7 @@ int softpc_vm_run_console(softpc_runtime *runtime)
     DWORD original_mode;
     unsigned char previous[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
     softpc_runtime_frame *frame;
+    uint32_t displayed_sequence = 0u;
     int running = 1;
     int result = SOFTPC_VM_FRONTEND_STOPPED;
     int private_console;
@@ -221,8 +222,11 @@ int softpc_vm_run_console(softpc_runtime *runtime)
                 break;
             }
         }
-        if (softpc_runtime_copy_frame(runtime, frame))
+        if (softpc_runtime_published_frame_sequence(runtime) !=
+            displayed_sequence && softpc_runtime_copy_frame(runtime, frame)) {
             softpc_console_paint(output, frame, previous);
+            displayed_sequence = frame->sequence;
+        }
         Sleep(10u);
     }
     if (result == SOFTPC_VM_FRONTEND_STOPPED &&

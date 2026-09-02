@@ -52,6 +52,9 @@ int softpc_runtime_enqueue_mouse(softpc_runtime *runtime, int32_t delta_x,
     int32_t delta_y, uint8_t left_down, uint8_t right_down);
 int softpc_runtime_copy_frame(softpc_runtime *runtime,
     softpc_runtime_frame *destination);
+/* A presentation client may cheaply test whether the runtime's copied frame
+   changed before requesting the potentially large DIB snapshot. */
+uint32_t softpc_runtime_published_frame_sequence(const softpc_runtime *runtime);
 void softpc_runtime_destroy(softpc_runtime *runtime);
 
 #endif

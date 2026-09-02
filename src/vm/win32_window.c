@@ -26,6 +26,7 @@ static HGDIOBJ softpc_window_text_previous_bitmap;
 static unsigned char softpc_window_presented_text[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
 static unsigned short softpc_window_presented_attributes[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
 static int softpc_window_presented_text_valid;
+static uint32_t softpc_window_displayed_sequence;
 static int softpc_window_result;
 static int softpc_window_keydown_delivered;
 static int softpc_window_mouse_x;
@@ -162,9 +163,13 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
     switch (message) {
     case WM_TIMER:
         if (wparam == SOFTPC_TIMER_ID) {
-            (void)softpc_runtime_copy_frame(softpc_window_runtime,
-                softpc_window_frame);
-            InvalidateRect(window, NULL, FALSE);
+            if (softpc_runtime_published_frame_sequence(
+                    softpc_window_runtime) != softpc_window_displayed_sequence &&
+                softpc_runtime_copy_frame(softpc_window_runtime,
+                    softpc_window_frame)) {
+                softpc_window_displayed_sequence = softpc_window_frame->sequence;
+                InvalidateRect(window, NULL, FALSE);
+            }
             if (softpc_runtime_get_state(softpc_window_runtime) !=
                 SOFTPC_RUNTIME_RUNNING) DestroyWindow(window);
         }
@@ -222,6 +227,7 @@ int softpc_vm_run_window(softpc_runtime *runtime)
     softpc_window_runtime = runtime;
     softpc_window_result = SOFTPC_VM_FRONTEND_STOPPED;
     softpc_window_presented_text_valid = 0;
+    softpc_window_displayed_sequence = 0u;
     softpc_window_mouse_valid = 0;
     softpc_window_left_button = softpc_window_right_button = 0;
     softpc_window_font = CreateFontA(16, 8, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,

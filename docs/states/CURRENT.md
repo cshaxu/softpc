@@ -42,3 +42,7 @@ the completed [M5 machine/host contract evidence](../etc/evidence/m5-machine-hos
 and [M5 outer runtime and pristine restoration](../proposals/m5-outer-runtime-and-pristine-restoration.md).
 The completed timer/8042 callback proof is in
 [M5 event/8042 contract evidence](../etc/evidence/m5-event-8042-contract.md).
+The first S5 outer-shell repair removes redundant full-frame copies and
+repaints while retaining the original renderer path; its scope and remaining
+interactive acceptance work are in
+[M5 outer frame-cadence evidence](../etc/evidence/m5-outer-frame-cadence.md).
