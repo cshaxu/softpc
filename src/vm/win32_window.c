@@ -129,12 +129,22 @@ static void softpc_window_update_text_surface(void)
     softpc_window_presented_text_valid = 1;
 }
 
-static void softpc_window_paint(HDC dc)
+static void softpc_window_paint(HWND window, HDC dc)
 {
+    RECT client;
+    int width;
+    int height;
+
     if (softpc_window_frame == NULL || softpc_window_frame->valid == 0u) return;
+    GetClientRect(window, &client);
+    width = client.right - client.left;
+    height = client.bottom - client.top;
+    if (width <= 0 || height <= 0) return;
     if (softpc_window_frame->graphics != 0u) {
-        StretchDIBits(dc, 0, 0, (int)softpc_window_frame->dib_width,
-            (int)softpc_window_frame->dib_height, 0, 0,
+        /* NXVM's Win32 shell owns resizing: the client rectangle is always
+           covered by the current guest surface.  Keep this at the final GDI
+           boundary so controller mode geometry remains untouched. */
+        StretchDIBits(dc, 0, 0, width, height, 0, 0,
             (int)softpc_window_frame->dib_width,
             (int)softpc_window_frame->dib_height,
             softpc_window_frame->dib_bits,
@@ -143,8 +153,8 @@ static void softpc_window_paint(HDC dc)
         return;
     }
     softpc_window_update_text_surface();
-    BitBlt(dc, 0, 0, SOFTPC_TEXT_SURFACE_WIDTH, SOFTPC_TEXT_SURFACE_HEIGHT,
-        softpc_window_text_dc, 0, 0, SRCCOPY);
+    StretchBlt(dc, 0, 0, width, height, softpc_window_text_dc, 0, 0,
+        SOFTPC_TEXT_SURFACE_WIDTH, SOFTPC_TEXT_SURFACE_HEIGHT, SRCCOPY);
 }
 
 static int softpc_window_keyboard_sink(void *context, uint8_t key_number,
@@ -207,7 +217,7 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
         return 0;
     case WM_PAINT:
         { PAINTSTRUCT paint; HDC dc = BeginPaint(window, &paint);
-          softpc_window_paint(dc); EndPaint(window, &paint); }
+          softpc_window_paint(window, dc); EndPaint(window, &paint); }
         return 0;
     case WM_ERASEBKGND:
         return 1;
@@ -299,6 +309,9 @@ int softpc_vm_run_window(softpc_runtime *runtime)
     softpc_window_text_previous_bitmap = SelectObject(softpc_window_text_dc,
         softpc_window_text_bitmap);
     ShowWindow(window, SW_SHOW);
+    UpdateWindow(window);
+    SetForegroundWindow(window);
+    SetFocus(window);
     SetTimer(window, SOFTPC_TIMER_ID, 16u, NULL);
     while (GetMessageA(&message, NULL, 0, 0) > 0) {
         TranslateMessage(&message); DispatchMessageA(&message);
