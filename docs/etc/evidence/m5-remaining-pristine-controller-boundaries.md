@@ -2,14 +2,18 @@
 
 ## Fresh audit
 
-The pre-restoration run of `scripts/audit_pristine_divergence.ps1` against
-`O:\repos.external\opennt-src-2\nt\private\mvdm\softpc.new` reported 60
-canonical-text C/H divergences.  Thirty-five were named port-ABI overlays,
-nineteen were original host algorithms with independent endpoints, and six
-were `restore-pristine` controller/firmware sources. PPI, the original
+The fresh run of `scripts/audit_pristine_divergence.ps1` against
+`O:\repos.external\opennt-src-2\nt\private\mvdm\softpc.new` reports 58
+canonical-text C/H divergences: thirty-nine named port-ABI overlays and
+nineteen original host algorithms with independent endpoints. No direct
+`restore-pristine` controller or firmware route remains. PPI, the original
 illegal-driver BOP path, CPU_40 keyboard reset path, CMOS controller, BIOS
-reset firmware and PIT timer are now restored. No direct
-`restore-pristine` controller or firmware route remains.
+reset firmware and PIT timer are restored.
+
+The audit maps the original sibling MVDM `xms.486` and `suballoc` components,
+which were historically outside `softpc.new`, before it decides that a file
+has no peer. Their source remains original; the four reported differences are
+the documented standalone address/header port-ABI overlays.
 
 ## PPI restoration result
 

@@ -3,19 +3,19 @@
 ## Audit Result
 
 The canonical-text audit against the selected OpenNT `softpc.new` baseline
-reports 60 C/H rows.  The count includes line-ending-normalized source text
+reports 58 C/H rows.  The count includes line-ending-normalized source text
 only.  It is a routing inventory, not permission to retain a standalone
 branch in machine code.
 
 | Rows | Extraction route | Next owner |
 | ---: | --- | --- |
-| 35 | Reproducible port-ABI overlay | `core/softpc-port-abi` generator |
+| 39 | Reproducible port-ABI overlay | `core/softpc-port-abi` generator |
 | 19 | Original host algorithm with independent endpoint | `host/softpc-compat` |
-| 6 | Restore original machine source after endpoint extraction | next M5 machine/host-contract cut |
+| 0 | Restore original machine source after endpoint extraction | none remain |
 
 ## Exact Route Coverage
 
-### Port-ABI overlay — 35 rows
+### Port-ABI overlay — 39 rows
 
 - CCPU: `base/ccpu386/evid_c.h`, `base/ccpu386/ntthread.c`, and current-only
   `base/ccpu386/softpc_ccpu_facade.c`.  The source peer is restored; generated
@@ -33,6 +33,10 @@ branch in machine code.
   `base/video/gfx_updt.c`.
 - Current-only generated declarations: `host/inc/x86/prod/gdpvar.h`,
   `PigReg_c.h`, and `sas4gen.h`.
+- Original sibling MVDM XMS/suballocation components: `suballoc/suballcp.h`,
+  `xms.486/xms.h`, `xmsa20.c`, and `xmsblock.c`. The audit maps these to the
+  selected OpenNT MVDM tree rather than treating their original source as
+  current-only; their four rows are narrow standalone header/address ports.
 
 None of these rows owns a controller policy.  A later implementation moves
 each transformation beside the pristine input and proves the x86/x64 generated
@@ -53,34 +57,20 @@ dispatcher/painters remain and only their finite surface endpoint is supplied
 by the independent host.  The remaining rows are host capability contracts,
 not device replacements.
 
-### Restore original machine source — 6 rows
+### Completed original-source restorations
 
-- `base/bios/reset.c`: optional LIM, product globals, and attached-media
-  configuration must move to named host contracts while original POST is
-  restored.
-- `base/keymouse/keyba.c`: scan-code ingress and reset notification become
-  host/runtime input contracts; original keyboard controller logic remains.
-- `base/keymouse/ppi.c`: Timer-2 sound notification is a host audio endpoint.
-- `base/system/cmos.c`: fixed-disk presence is read through the media host
-  contract rather than a standalone conditional in CMOS logic.
-- `base/system/timer.c`: the zero-delay quick-event guard requires an
-  evidenced original timer/quick-event contract before it can be removed.
-- `base/system/illegalp.c`: unavailable product-driver handling is an
-  explicit host-unavailable result, not a standalone conditional in the
-  machine.
-
-The next smallest source-changing cut is this last group only after its host
-contract declarations are written.  It is bounded to reset, keyboard/PPI,
-CMOS, timer and illegal-driver endpoints; it does not alter a BOP selector,
-firmware byte, controller protocol, or guest media.
+`base/bios/reset.c`, `base/keymouse/keyba.c`, `base/keymouse/ppi.c`,
+`base/system/cmos.c`, `base/system/timer.c`, and `base/system/illegalp.c`
+now compare equal to the selected original source after canonical
+line-ending normalization. Their endpoint evidence is recorded in the M5
+controller-boundary ledger; none remains as a live extraction route.
 
 ## Reproduction
 
 Run the repository-owned read-only command from the project root with the
-selected OpenNT tree.  It reports the same 60 current rows and does not modify
+selected OpenNT tree.  It reports the same 58 current rows and does not modify
 either source tree:
 
 ```powershell
 .\scripts\audit_pristine_divergence.ps1 -OriginalRoot <selected-opennt-softpc-root>
 ```
-

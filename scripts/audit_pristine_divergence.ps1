@@ -11,6 +11,10 @@ $ErrorActionPreference = 'Stop'
 
 $original = (Resolve-Path -LiteralPath $OriginalRoot).Path
 $current = (Resolve-Path -LiteralPath $CurrentRoot).Path
+# XMS and the allocator were historical MVDM components beside softpc.new,
+# rather than children of it.  They are still original source inputs: map
+# their exact upstream locations so a no-peer row cannot conceal them.
+$mvdm = (Resolve-Path -LiteralPath (Join-Path $original '..')).Path
 $extensions = @('.c', '.h')
 $records = [System.Collections.Generic.List[object]]::new()
 
@@ -76,12 +80,31 @@ function Get-NextTask([string]$Family, [bool]$HasOriginalPeer) {
 }
 
 function Get-Disposition([string]$RelativePath, [bool]$HasOriginalPeer) {
+    if ($RelativePath.StartsWith('xms.486\') -or
+        $RelativePath.StartsWith('suballoc\')) { return 'port-abi-overlay' }
     if ($portAbiPaths -contains $RelativePath) { return 'port-abi-overlay' }
     if ($compatHostPaths -contains $RelativePath) { return 'compat-host' }
     if ($restorePristinePaths -contains $RelativePath) {
         return 'restore-pristine'
     }
     throw "M5 ledger has no extraction route for $RelativePath"
+}
+
+function Get-OriginalPeer([string]$RelativePath) {
+    if ($RelativePath.StartsWith('xms.486\')) {
+        $name = $RelativePath.Substring('xms.486\'.Length)
+        if ($name -eq 'memapi.h' -or $name -eq 'xmssvc.h') {
+            return Join-Path $mvdm (Join-Path 'inc' $name)
+        }
+        return Join-Path $mvdm (Join-Path 'xms.486' $name)
+    }
+    if ($RelativePath -eq 'suballoc\suballoc.h') {
+        return Join-Path $mvdm 'inc\suballoc.h'
+    }
+    if ($RelativePath.StartsWith('suballoc\')) {
+        return Join-Path $mvdm $RelativePath
+    }
+    return Join-Path $original $RelativePath
 }
 
 function Get-CanonicalSource([string]$Path) {
@@ -99,7 +122,7 @@ Get-ChildItem -LiteralPath $current -Recurse -File |
     Sort-Object FullName |
     ForEach-Object {
         $relative = $_.FullName.Substring($current.Length).TrimStart('\\')
-        $originalPath = Join-Path $original $relative
+        $originalPath = Get-OriginalPeer $relative
         $hasPeer = Test-Path -LiteralPath $originalPath
         $state = 'no-original-peer'
 

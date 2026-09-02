@@ -14,15 +14,16 @@ BOP routing.  The host supplies only platform capabilities.
 
 ## Audit Baseline
 
-The current read-only divergence command reports 60 actionable C/C-header
-rows against the selected OpenNT `softpc.new` tree.  The local generated
-manifest is evidence only; its machine-side rows include BIOS reset, keyboard,
-PPI, CMOS, timer, ROM, video, C-VID and CCPU declarations.  Every such row
-must receive a disposition before a runtime repair depends on it:
+The current read-only divergence command reports 58 actionable C/C-header
+rows against the selected OpenNT `softpc.new` tree, including mapped original
+sibling MVDM XMS/suballocation inputs. The local generated manifest is
+evidence only. Its remaining rows are thirty-nine port-ABI overlays and
+nineteen original-host compatibility endpoints; controller, BIOS, firmware
+and BOP restorations have no remaining `restore-pristine` row.
 
 | Class | Required disposition |
 | --- | --- |
-| Original controller, firmware, BIOS, ROM, CCPU or C-VID logic | restore pristine, then use a generated port-ABI overlay only when width/toolchain proof requires it |
+| Original controller, firmware, BIOS, ROM, CCPU or C-VID logic | restored pristine; use a generated port-ABI overlay only when width/toolchain proof requires it |
 | Original `nt_*` renderer/input/audio algorithm | retain through `host/softpc-compat`, replacing only NTVDM service endpoints |
 | Host media, clock, window, monitor or input collection | standalone compatibility host or VM runtime |
 | Duplicate controller, renderer or scheduler behavior | remove after the original path is usable |
@@ -58,11 +59,10 @@ recovered original host callback order.
 
 ## Ordered Implementation Candidates
 
-1. **M5 pristine-source and host-contract ledger closure.** Re-run the
-   divergence manifest; move or replace each machine-side standalone branch
-   with a pristine source plus a named overlay/compatibility owner.  Exit only
-   when no controller, BIOS, ROM, BOP or renderer duplicate remains hidden in
-   `src/core/softpc`.
+1. **M5 pristine-source and host-contract ledger closure — complete.** The
+   rerunnable manifest assigns every remaining row to a named overlay or
+   compatibility endpoint; no controller, BIOS, ROM, BOP or renderer
+   duplicate remains hidden in `src/core/softpc`.
 2. **M5 original timer, quick-event and 8042 contract recovery.** Recover the
    exact non-product host callback order required by `quick_ev`, PIT/PIC,
    keyboard refill, FDC and original host clocks.  Add an executor-owned
