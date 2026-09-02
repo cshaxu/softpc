@@ -452,6 +452,8 @@ usage:
                         fprintf(stderr, "softpc-real-boot-smoke: Windows Setup did not reach its Welcome screen\n");
                         goto failed;
                     }
+                    fprintf(stderr,
+                        "softpc-real-boot-smoke: Windows Setup reached its Welcome screen\n");
 #else
                     fprintf(stderr, "softpc-real-boot-smoke: Windows Setup probe requires Win32\n");
                     goto failed;
