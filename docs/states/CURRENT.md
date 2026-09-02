@@ -55,3 +55,6 @@ to the host default palette; see
 Paused floppy insertion/ejection now follows the documented monitor contract
 without giving the monitor controller access; see
 [M5 paused-media evidence](../etc/evidence/m5-paused-media-contract.md).
+The delivered fixed INI now names the verified A:+C: media pair and both
+width-specific launchers reach the monitor without arguments; see
+[M5 delivered-launcher configuration evidence](../etc/evidence/m5-delivered-launcher-configuration.md).
