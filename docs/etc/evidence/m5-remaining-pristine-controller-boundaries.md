@@ -6,11 +6,11 @@ The pre-restoration run of `scripts/audit_pristine_divergence.ps1` against
 `O:\repos.external\opennt-src-2\nt\private\mvdm\softpc.new` reported 60
 canonical-text C/H divergences.  Thirty-five were named port-ABI overlays,
 nineteen were original host algorithms with independent endpoints, and six
-were `restore-pristine` controller/firmware sources. PPI and the original
-illegal-driver BOP path are now restored, leaving these four routes:
+were `restore-pristine` controller/firmware sources. PPI, the original
+illegal-driver BOP path and CPU_40 keyboard reset path are now restored,
+leaving these three routes:
 
 - `base/bios/reset.c`
-- `base/keymouse/keyba.c`
 - `base/system/cmos.c`
 - `base/system/timer.c`
 
@@ -31,12 +31,13 @@ has a pre-existing empty-source-file handling defect, so this extraction uses
 the direct source comparison plus dual-width regression as its evidence;
 repairing that independent audit utility remains separate work.
 
-## Keyboard extraction result
+## Keyboard restoration result
 
-The original `CPU_40_STYLE` keyboard-reset path calls
-`host_cpu_interrupt()`.  The historical NT implementation is an empty host
-stub, and the standalone host does not yet expose a named CPU-interrupt
-contract.  Restoring its call before that contract exists would add an
-unproved CPU path; it remains pending extraction.
+`base/keymouse/keyba.c` now compares equal to the original source after
+line-end normalization. Its CPU_40 reset bit is exposed only to that original
+compilation unit by a generated CCPU port-ABI accessor, and the corresponding
+historical host notification is the original no-op endpoint. The original
+8042 reset smoke passes on both widths; detailed proof is in
+`m5-keyboard-reset-restoration.md`.
 
 No additional machine source was retained or changed by these probes.
