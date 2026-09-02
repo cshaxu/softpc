@@ -31,3 +31,8 @@ Close the pristine-source ledger, recover original timer/quick-event and
 controller host contracts, and replace transitional execution integration with
 an evidenced safe-boundary outer runtime.  Finish with original renderer and
 dual-width Windows Setup acceptance.
+
+## M6: Frontend Polish
+
+Make bounded standalone-frontend usability repairs without changing the
+recovered SoftPC machine, compatibility-host device contracts, or guest timing.

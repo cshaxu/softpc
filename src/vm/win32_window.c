@@ -15,6 +15,7 @@
 #define SOFTPC_TEXT_SURFACE_WIDTH (SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_CELL_WIDTH)
 #define SOFTPC_TEXT_SURFACE_HEIGHT (SOFTPC_TEXT_ROWS * SOFTPC_TEXT_CELL_HEIGHT)
 #define SOFTPC_TIMER_ID 1u
+#define SOFTPC_CURSOR_BLINK_INTERVAL_MS 250u
 
 static softpc_runtime *softpc_window_runtime;
 static softpc_runtime_frame *softpc_window_frame;
@@ -39,6 +40,8 @@ static int softpc_window_left_button;
 static int softpc_window_right_button;
 static uint32_t softpc_window_surface_width;
 static uint32_t softpc_window_surface_height;
+static int softpc_window_cursor_blink_visible;
+static DWORD softpc_window_cursor_blink_due;
 
 static COLORREF softpc_window_colour(unsigned int colour)
 {
@@ -145,6 +148,58 @@ static void softpc_window_update_text_surface(void)
     softpc_window_presented_text_valid = 1;
 }
 
+/* The original nt_graph endpoint gave Windows Console a real cursor.  Its
+ * blink was therefore owned by the host, not by a guest timer or by C-VID.
+ * Keep that boundary: this merely describes the copied-frame overlay that the
+ * standalone window may invalidate between otherwise unchanged frames. */
+static int softpc_window_cursor_rect(HWND window, RECT *cursor)
+{
+    RECT client;
+    int width;
+    int height;
+    int cell_height;
+    int cursor_height;
+    uint32_t cursor_size;
+
+    if (window == NULL || cursor == NULL || softpc_window_frame == NULL ||
+        softpc_window_frame->valid == 0u ||
+        softpc_window_frame->graphics != 0u ||
+        softpc_window_frame->cursor_column < 0 ||
+        softpc_window_frame->cursor_row < 0 ||
+        softpc_window_frame->cursor_column >= SOFTPC_TEXT_COLUMNS ||
+        softpc_window_frame->cursor_row >= SOFTPC_TEXT_ROWS) return 0;
+    GetClientRect(window, &client);
+    width = client.right - client.left;
+    height = client.bottom - client.top;
+    cell_height = height / SOFTPC_TEXT_ROWS;
+    if (width <= 0 || cell_height <= 0) return 0;
+    cursor_size = softpc_window_frame->cursor_size;
+    if (cursor_size == 0u || cursor_size > 100u) cursor_size = 100u;
+    cursor_height = (int)((cell_height * cursor_size + 99u) / 100u);
+    if (cursor_height > cell_height) cursor_height = cell_height;
+    cursor->left = softpc_window_frame->cursor_column * width /
+        SOFTPC_TEXT_COLUMNS;
+    cursor->right = (softpc_window_frame->cursor_column + 1) * width /
+        SOFTPC_TEXT_COLUMNS;
+    cursor->top = (softpc_window_frame->cursor_row + 1) * cell_height -
+        cursor_height;
+    cursor->bottom = (softpc_window_frame->cursor_row + 1) * height /
+        SOFTPC_TEXT_ROWS;
+    return cursor->right > cursor->left && cursor->bottom > cursor->top;
+}
+
+static void softpc_window_advance_cursor_blink(HWND window)
+{
+    RECT cursor;
+    DWORD now = GetTickCount();
+
+    if ((LONG)(now - softpc_window_cursor_blink_due) < 0) return;
+    softpc_window_cursor_blink_visible = !softpc_window_cursor_blink_visible;
+    softpc_window_cursor_blink_due = now + SOFTPC_CURSOR_BLINK_INTERVAL_MS;
+    if (softpc_window_cursor_rect(window, &cursor))
+        InvalidateRect(window, &cursor, FALSE);
+}
+
 static void softpc_window_paint(HWND window, HDC dc)
 {
     RECT client;
@@ -171,29 +226,14 @@ static void softpc_window_paint(HWND window, HDC dc)
     softpc_window_update_text_surface();
     StretchBlt(dc, 0, 0, width, height, softpc_window_text_dc, 0, 0,
         SOFTPC_TEXT_SURFACE_WIDTH, SOFTPC_TEXT_SURFACE_HEIGHT, SRCCOPY);
-    if (softpc_window_frame->cursor_column >= 0 &&
-        softpc_window_frame->cursor_row >= 0 &&
-        softpc_window_frame->cursor_column < SOFTPC_TEXT_COLUMNS &&
-        softpc_window_frame->cursor_row < SOFTPC_TEXT_ROWS) {
+    if (softpc_window_cursor_blink_visible) {
+        RECT cursor;
         /* nt_graph publishes the original controller-selected text cursor
            through the compatibility Console endpoint.  Draw it only after
            the copied text DIB reaches the window, so this remains a pure
            frontend overlay and never changes guest video memory. */
-        int left = softpc_window_frame->cursor_column * width /
-            SOFTPC_TEXT_COLUMNS;
-        int right = (softpc_window_frame->cursor_column + 1) * width /
-            SOFTPC_TEXT_COLUMNS;
-        uint32_t cursor_size = softpc_window_frame->cursor_size;
-        int cell_height = height / SOFTPC_TEXT_ROWS;
-        int cursor_height;
-        if (cursor_size == 0u || cursor_size > 100u) cursor_size = 100u;
-        cursor_height = (int)((cell_height * cursor_size + 99u) / 100u);
-        if (cursor_height > cell_height) cursor_height = cell_height;
-        int top = (softpc_window_frame->cursor_row + 1) * cell_height -
-            cursor_height;
-        RECT cursor = { left, top, right, (softpc_window_frame->cursor_row + 1) *
-            height / SOFTPC_TEXT_ROWS };
-        InvertRect(dc, &cursor);
+        if (softpc_window_cursor_rect(window, &cursor))
+            InvertRect(dc, &cursor);
     }
 }
 
@@ -251,6 +291,7 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
                 softpc_window_resize_frame(window);
                 InvalidateRect(window, NULL, FALSE);
             }
+            softpc_window_advance_cursor_blink(window);
             if (softpc_runtime_get_state(softpc_window_runtime) !=
                 SOFTPC_RUNTIME_RUNNING) DestroyWindow(window);
         }
@@ -323,6 +364,9 @@ int softpc_vm_run_window(softpc_runtime *runtime)
     softpc_window_left_button = softpc_window_right_button = 0;
     softpc_window_surface_width = 0u;
     softpc_window_surface_height = 0u;
+    softpc_window_cursor_blink_visible = 1;
+    softpc_window_cursor_blink_due = GetTickCount() +
+        SOFTPC_CURSOR_BLINK_INTERVAL_MS;
     /* This is a fixed single-machine display, not a host canvas.  Do not use
        WS_OVERLAPPEDWINDOW here: its resize frame is visually larger than the
        guest edge on current Windows themes and lets a user create a client
