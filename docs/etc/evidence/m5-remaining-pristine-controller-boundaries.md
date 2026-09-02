@@ -7,10 +7,9 @@ The pre-restoration run of `scripts/audit_pristine_divergence.ps1` against
 canonical-text C/H divergences.  Thirty-five were named port-ABI overlays,
 nineteen were original host algorithms with independent endpoints, and six
 were `restore-pristine` controller/firmware sources. PPI, the original
-illegal-driver BOP path, CPU_40 keyboard reset path, CMOS controller and BIOS
-reset firmware are now restored, leaving this one route:
-
-- `base/system/timer.c`
+illegal-driver BOP path, CPU_40 keyboard reset path, CMOS controller, BIOS
+reset firmware and PIT timer are now restored. No direct
+`restore-pristine` controller or firmware route remains.
 
 ## PPI restoration result
 
@@ -64,5 +63,18 @@ tables. No reset flow, BOP, ROM or controller logic is replaced.
 
 The original reset, dual-media boot and runtime smoke tests pass on x86 and
 x64. Detailed proof is in `m5-bios-reset-restoration.md`.
+
+## Timer restoration result
+
+`base/system/timer.c` now compares equal to the original source after
+line-ending normalization. The standalone build uses a reproducible timer
+port-ABI copy that preserves the original PIT/IRQ queue algorithm and alters
+only a zero microsecond delay passed to the historical quick-event endpoint:
+it becomes one microsecond so a valid one-clock guest counter cannot recurse
+through an immediate-event host queue. The original queue, controller state
+and interrupt generation remain its sole owners.
+
+Quick-time, machine-start and runtime smoke tests pass on x86 and x64; the
+full proof is in `m5-timer-quick-event-restoration.md`.
 
 No additional machine source was retained or changed by these probes.
