@@ -324,8 +324,31 @@ def transform_ccpu_main(source: str) -> str:
     if hlt_start < 0 or hlt_end < 0:
         raise ValueError('cannot locate CCPU HLT loop')
     hlt = source[hlt_start:hlt_end]
+    # The generic timer safe-point overlay also matches the original SIGALRM
+    # block inside HLT.  HLT needs the same mailbox, but at its *own* original
+    # quick-event boundary below; remove only that duplicate pair while
+    # retaining the adjacent original SIGIO handling.
+    hlt, mailbox_count = re.subn(
+        r'\n[ \t]*if \(softpc_platform_consume_clock_tick\(\)\)\n'
+        r'[ \t]*host_timer_event\(\);\n'
+        r'\n[ \t]*if \(softpc_platform_consume_executor_wake\(\)\)\n'
+        r'[ \t]*softpc_platform_executor_event\(\);\n',
+        '\n', hlt, count=1)
+    if mailbox_count != 1:
+        raise ValueError('cannot locate CCPU HLT duplicate mailbox')
     hlt_tick = '         SYNCH_TICK();\n         QUICK_EVENT_TICK();\n'
-    hlt_wait = (hlt_tick +
+    hlt_mailbox_tick = (
+                '         /* HLT is still an original CCPU instruction-safe\n'
+                '            rendezvous.  Consume host mailbox records here\n'
+                '            before the original quick-event dispatch; an\n'
+                '            event wake alone must not return directly to\n'
+                '            WaitForSingleObject and starve 8042 input. */\n'
+                '         if (softpc_platform_consume_clock_tick())\n'
+                '            host_timer_event();\n'
+                '         if (softpc_platform_consume_executor_wake())\n'
+                '            softpc_platform_executor_event();\n'
+                + hlt_tick)
+    hlt_wait = (hlt_mailbox_tick +
                 '         if (cpu_interrupt_map == 0 &&\n'
                 '             c_cpu_q_ev_get_count() == 0)\n'
                 '            softpc_platform_wait_for_executor_event();\n')

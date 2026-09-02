@@ -44,3 +44,19 @@ the host.
 
 The source map and focused x64 smoke proof are in the
 [M5 machine/host contract evidence](../etc/evidence/m5-machine-host-contracts.md).
+
+## S4: Original Timer, Quick-Event And 8042 Contract Recovery
+
+**Status:** complete.
+
+The detached runtime now consumes frontend wakes only at the original CCPU
+instruction and HLT safe points.  Original `keyba.c`, `quick_ev.c`, the 8042,
+PIC and guest IRQ flow retain ownership of keyboard delivery; the host timer
+records a heartbeat and the executor performs the original callback order.
+
+The generated CCPU overlay contains a single HLT mailbox bridge before the
+original quick-event dispatch.  A guest-owned IRQ1 regression proves that a
+runtime key wakes HLT through original 8042/PIC delivery rather than through a
+frontend shortcut.  Both x64 and x86 full suites passed 16/16, and both widths
+passed the overlay-media Windows Setup probe.  Details are in the
+[M5 event/8042 contract evidence](../etc/evidence/m5-event-8042-contract.md).

@@ -123,6 +123,105 @@ static void dump_frame(const softpc_runtime_frame *frame)
     }
 }
 
+/* Regression for the executor's original HLT rendezvous.  The guest reaches
+ * HLT with IF enabled; only a host key queued through runtime may release it.
+ * This proves that an event wake is consumed on the CCPU HLT path rather than
+ * merely waking and immediately re-waiting. */
+static int run_halted_keyboard_probe(void)
+{
+    static const char image_path[] = "softpc-runtime-hlt-keyboard.img";
+    unsigned char sector[512] = { 0 };
+    softpc_machine_options options = { image_path, NULL,
+        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine *machine = NULL;
+    softpc_runtime *runtime = NULL;
+    FILE *image;
+    DWORD deadline;
+    uint8_t marker = 0u;
+    uint8_t ready = 0u;
+    softpc_runtime_frame frame;
+    uint32_t sequence_before = 0u;
+    uint32_t sequence_after = 0u;
+    int success = 0;
+
+    /* The probe owns IRQ1 rather than relying on whatever the boot ROM put
+       in the BIOS keyboard vector.  That keeps this specifically about the
+       original 8042 -> PIC -> CCPU HLT chain: the handler marks 0500h,
+       acknowledges the master PIC, and returns. */
+    static const unsigned char program[] = {
+        0xfau, 0x31u, 0xc0u, 0x8eu, 0xd8u,
+        0xc6u, 0x06u, 0x01u, 0x05u, 0x55u,
+        /* IVT[9] = CS:7c21, where the local IRQ1 handler starts. */
+        0xb8u, 0x21u, 0x7cu, 0xa3u, 0x24u, 0x00u,
+        0x0eu, 0x58u, 0xa3u, 0x26u, 0x00u,
+        /* STI's one-instruction inhibition is deliberately followed by
+           NOP, so HLT sees an already-enabled INTR exactly as CCPU does. */
+        0xfbu, 0x90u, 0xf4u,
+        0xc6u, 0x06u, 0x00u, 0x05u, 0xa5u, 0xfau, 0xf4u,
+        0xebu, 0xfdu,
+        /* 7c21: mov byte [0500],a5; mov al,20; out 20,al; iret */
+        0xc6u, 0x06u, 0x00u, 0x05u, 0xa5u,
+        0xb0u, 0x20u, 0xe6u, 0x20u, 0xcfu
+    };
+    memcpy(sector, program, sizeof(program));
+    sector[510] = 0x55u;
+    sector[511] = 0xaau;
+    image = fopen(image_path, "wb");
+    if (image == NULL) goto done;
+    if (fwrite(sector, 1u, sizeof(sector), image) != sizeof(sector) ||
+        fclose(image) != 0) {
+        image = NULL;
+        goto done;
+    }
+    image = NULL;
+    options.media_mode = SOFTPC_MEDIA_OVERLAY;
+    if (softpc_machine_create(&options, &machine) != SOFTPC_MACHINE_OK ||
+        !softpc_runtime_create(machine, &runtime) ||
+        !softpc_runtime_start(runtime)) goto done;
+    deadline = GetTickCount() + 5000u;
+    do {
+        if (softpc_machine_read_physical(machine, 0x501u, &ready,
+                sizeof(ready)) == SOFTPC_MACHINE_OK && ready == 0x55u)
+            break;
+        Sleep(10u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    if (ready != 0x55u) {
+        fprintf(stderr, "halted keyboard probe: boot marker=%02x state=%d\n",
+            ready, (int)softpc_runtime_get_state(runtime));
+        goto done;
+    }
+    memset(&frame, 0, sizeof(frame));
+    if (softpc_runtime_copy_frame(runtime, &frame))
+        sequence_before = frame.sequence;
+    if (!softpc_runtime_enqueue_key(runtime, 31u, 0u)) goto done;
+    deadline = GetTickCount() + 3000u;
+    do {
+        if (softpc_machine_read_physical(machine, 0x500u, &marker,
+                sizeof(marker)) == SOFTPC_MACHINE_OK && marker == 0xa5u) {
+            (void)softpc_runtime_enqueue_key(runtime, 31u, 1u);
+            success = 1;
+            break;
+        }
+        Sleep(10u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    memset(&frame, 0, sizeof(frame));
+    if (softpc_runtime_copy_frame(runtime, &frame))
+        sequence_after = frame.sequence;
+    if (!success)
+        fprintf(stderr, "halted keyboard probe: resume marker=%02x state=%d frame=%lu->%lu\n",
+            marker, (int)softpc_runtime_get_state(runtime),
+            (unsigned long)sequence_before, (unsigned long)sequence_after);
+done:
+    if (image != NULL) fclose(image);
+    if (runtime != NULL) {
+        (void)softpc_runtime_stop(runtime);
+        softpc_runtime_destroy(runtime);
+    }
+    if (machine != NULL) softpc_machine_destroy(machine);
+    (void)remove(image_path);
+    return success;
+}
+
 int main(int argc, char **argv)
 {
     softpc_machine_options options = { NULL, NULL, SOFTPC_PRESENTATION_CONSOLE };
@@ -134,6 +233,10 @@ int main(int argc, char **argv)
     int windows_setup = 0, setup_command_sent = 0;
     int final_state = SOFTPC_RUNTIME_ERROR;
     int argument;
+    if (!run_halted_keyboard_probe()) {
+        fprintf(stderr, "softpc-runtime-boot-smoke: halted keyboard probe failed\n");
+        return 1;
+    }
     if (argc < 5 || strcmp(argv[1], "--floppy") != 0 ||
         strcmp(argv[3], "--hdd") != 0) return 2;
     for (argument = 5; argument < argc; ++argument) {
