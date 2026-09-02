@@ -63,3 +63,6 @@ copying a full DIB, keeping static graphics from consuming executor time; see
 [M5 original dirty-frame publication evidence](../etc/evidence/m5-original-dirty-frame-publication.md).
 The actual Win32 window now has a proved close-to-runtime-stop lifecycle;
 see [M5 Win32 window lifecycle evidence](../etc/evidence/m5-win32-window-lifecycle.md).
+The fresh pristine audit still has six controller/firmware extraction routes;
+the first PPI and keyboard results are recorded in
+[M5 remaining pristine-controller boundaries](../etc/evidence/m5-remaining-pristine-controller-boundaries.md).
