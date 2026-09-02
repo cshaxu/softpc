@@ -17,6 +17,9 @@ to an invalid earlier invocation.
 ## Verification
 
 - Clean x64 and Clang x86 builds completed.
+- Fresh independent Ninja directories were configured again for x64 MinGW GCC
+  and x86 Clang. The x86 configuration uses the recorded MSYS2 32-bit
+  include/lib and GCC-runtime search paths; it is not a reused object tree.
 - The isolated `softpc-machine-smoke` completed with exit status zero on both
   widths after the generated CCPU adapter correction.
 - Each complete CTest suite passed 18 of 18 tests on x64 and x86, including
@@ -37,3 +40,15 @@ With a clean worktree, the serial CTest suites again passed 18 of 18 on both
 the x64 MinGW build and x86 Clang build.  `softpc-real-boot-smoke` then used
 `O:\assets\fdd.img` and `O:\assets\hdd1.img` in overlay mode on both widths;
 each run reached the original Windows Setup Welcome screen.
+
+## Clean Build Reliability
+
+Every smoke image is removed only after its machine/runtime has been
+destroyed. The test-only cleanup helper retries a failed Windows deletion for
+at most one second, covering short-lived external file-filter sharing without
+changing machine, media, controller or runtime behavior. A handle that remains
+open still fails the test.
+
+Fresh x64 and x86 Ninja builds each regenerated the CCPU/C-VID port-ABI
+outputs, compiled the complete machine, produced the requested width-specific
+launcher, and passed serial CTest 18/18.

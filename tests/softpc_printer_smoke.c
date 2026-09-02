@@ -1,4 +1,5 @@
 #include "softpc_machine.h"
+#include "softpc_test_cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -39,6 +40,6 @@ int main(void)
     inb(LPT1_PORT_START + 1u, &status);
     assert((status & 0x80u) != 0u);
     softpc_machine_destroy(machine);
-    assert(remove(path) == 0);
+    assert(softpc_test_remove_image(path));
     return 0;
 }

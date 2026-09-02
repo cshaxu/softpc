@@ -1,4 +1,5 @@
 #include "softpc_machine.h"
+#include "softpc_test_cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -226,6 +227,6 @@ int main(void)
     /* Detaching the raw-image port must restore the original gfi_mpty
        empty-drive server, just as the original real-floppy backend does. */
     assert(gfi_drive_type(0) == GFI_DRIVE_TYPE_NULL);
-    assert(remove(path) == 0);
+    assert(softpc_test_remove_image(path));
     return 0;
 }

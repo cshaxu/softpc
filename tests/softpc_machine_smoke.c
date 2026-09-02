@@ -1,4 +1,5 @@
 #include "softpc_machine.h"
+#include "softpc_test_cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -1144,26 +1145,26 @@ int main(void)
     run_int1a_tick_boot_image(int1a_tick);
     run_hdd_pio_boot_image(hdd_pio);
     run_hdd_pio_write_boot_image(hdd_pio_write);
-    assert(remove(floppy) == 0);
-    assert(remove(hdd) == 0);
-    assert(remove(keyboard) == 0);
-    assert(remove(int16) == 0);
-    assert(remove(int1d) == 0);
-    assert(remove(int75) == 0);
-    assert(remove(int15_memory) == 0);
-    assert(remove(int16_ascii) == 0);
-    assert(remove(irq1_int16) == 0);
-    assert(remove(int16_check) == 0);
-    assert(remove(timer) == 0);
-    assert(remove("softpc-smoke-cmos.img") == 0);
-    assert(remove(text) == 0);
-    assert(remove(int10) == 0);
-    assert(remove(int10_mode_cursor) == 0);
-    assert(remove(int12) == 0);
-    assert(remove(int11) == 0);
-    assert(remove(int1a) == 0);
-    assert(remove(int1a_tick) == 0);
-    assert(remove(hdd_pio) == 0);
-    assert(remove(hdd_pio_write) == 0);
+    assert(softpc_test_remove_image(floppy));
+    assert(softpc_test_remove_image(hdd));
+    assert(softpc_test_remove_image(keyboard));
+    assert(softpc_test_remove_image(int16));
+    assert(softpc_test_remove_image(int1d));
+    assert(softpc_test_remove_image(int75));
+    assert(softpc_test_remove_image(int15_memory));
+    assert(softpc_test_remove_image(int16_ascii));
+    assert(softpc_test_remove_image(irq1_int16));
+    assert(softpc_test_remove_image(int16_check));
+    assert(softpc_test_remove_image(timer));
+    assert(softpc_test_remove_image("softpc-smoke-cmos.img"));
+    assert(softpc_test_remove_image(text));
+    assert(softpc_test_remove_image(int10));
+    assert(softpc_test_remove_image(int10_mode_cursor));
+    assert(softpc_test_remove_image(int12));
+    assert(softpc_test_remove_image(int11));
+    assert(softpc_test_remove_image(int1a));
+    assert(softpc_test_remove_image(int1a_tick));
+    assert(softpc_test_remove_image(hdd_pio));
+    assert(softpc_test_remove_image(hdd_pio_write));
     return 0;
 }

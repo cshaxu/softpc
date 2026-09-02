@@ -1,4 +1,5 @@
 #include "softpc_machine.h"
+#include "softpc_test_cleanup.h"
 #include "insignia.h"
 #include "host_def.h"
 #include "xt.h"
@@ -216,6 +217,6 @@ int main(void)
         assert(dib->colours[0].blue == 12u);
     }
     softpc_machine_destroy(machine);
-    assert(remove(path) == 0);
+    assert(softpc_test_remove_image(path));
     return 0;
 }

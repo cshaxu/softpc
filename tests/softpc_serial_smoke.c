@@ -1,4 +1,5 @@
 #include "softpc_machine.h"
+#include "softpc_test_cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -66,6 +67,6 @@ int main(void)
     assert((status & 0x60u) == 0x60u);
 
     softpc_machine_destroy(machine);
-    assert(remove(path) == 0);
+    assert(softpc_test_remove_image(path));
     return 0;
 }

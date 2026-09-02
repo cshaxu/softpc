@@ -1,4 +1,5 @@
 #include "softpc_machine.h"
+#include "softpc_test_cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -61,8 +62,8 @@ int main(void)
     assert(cmos_read_byte(CMOS_DISK, &cmos_disk) == SUCCESS);
     assert(cmos_disk == 0x30u);
     softpc_machine_destroy(machine);
-    assert(remove(floppy) == 0);
-    assert(remove(hard_disk) == 0);
+    assert(softpc_test_remove_image(floppy));
+    assert(softpc_test_remove_image(hard_disk));
 
     /* Original nt_fdisk activation fails when the selected fixed medium
        cannot be opened as a disk.  A zero-byte raw file is equally not an
@@ -79,7 +80,7 @@ int main(void)
             SOFTPC_MACHINE_OK);
         assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_IO_ERROR);
         softpc_machine_destroy(machine);
-        assert(remove(empty_disk) == 0);
+        assert(softpc_test_remove_image(empty_disk));
     }
     return 0;
 }
