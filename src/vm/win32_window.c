@@ -299,7 +299,12 @@ int softpc_vm_run_window(softpc_runtime *runtime)
     softpc_window_left_button = softpc_window_right_button = 0;
     softpc_window_surface_width = 0u;
     softpc_window_surface_height = 0u;
-    window = CreateWindowExA(0, klass.lpszClassName, "SoftPC VM", WS_OVERLAPPEDWINDOW,
+    /* This is a fixed single-machine display, not a host canvas.  Do not use
+       WS_OVERLAPPEDWINDOW here: its resize frame is visually larger than the
+       guest edge on current Windows themes and lets a user create a client
+       rectangle that no longer represents the published SoftPC surface. */
+    window = CreateWindowExA(0, klass.lpszClassName, "SoftPC VM",
+        WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
         CW_USEDEFAULT, CW_USEDEFAULT, 680, 560, NULL, NULL, klass.hInstance, NULL);
     if (window == NULL) { free(softpc_window_frame); return SOFTPC_VM_FRONTEND_ERROR; }
     softpc_window_resize_surface(window, SOFTPC_TEXT_SURFACE_WIDTH,

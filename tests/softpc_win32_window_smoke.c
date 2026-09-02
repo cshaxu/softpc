@@ -82,11 +82,14 @@ int main(void)
     assert(window != NULL);
     {
         RECT client;
+        LONG style = GetWindowLongA(window, GWL_STYLE);
         /* The endpoint begins with a literal 80x25 CP437 8x16 surface: no
            frontend border is permitted inside the guest client rectangle. */
         GetClientRect(window, &client);
         assert(client.right - client.left == 640);
         assert(client.bottom - client.top == 400);
+        /* A standalone fixed machine has no resizable white sizing frame. */
+        assert((style & WS_THICKFRAME) == 0);
     }
     /* Do not merely assert that PostMessage succeeds.  This guest stops at
        HLT until the exact Win32-keyboard-normalizer -> runtime queue ->
