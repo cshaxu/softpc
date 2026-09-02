@@ -2,36 +2,34 @@
 
 ## Current Work
 
-### M5 T1 S1: Original renderer dispatcher restoration
+### M5 T1 S3: Machine-host contract declaration extraction
 
 - **Owner and mode:** repository owner; single-person dual-role execution.
-- **Admission and approval:** M4 acceptance exposed a source conflict: the
-  compiled standalone `nt_graph.c` branch is a 377-line local duplicate of
-  original graphics coordination, so Windows Setup cannot prove the required
-  original renderer path. The owner directed execution of the ordered queue
-  and approved the NXVM-style outer architecture.
-- **Objective:** restore the original SoftPC `nt_graph` dispatcher, mode
-  change, VLT, graphics-tick and paint-selection data flow. Move only its
-  finite console-DIB outlet to the standalone compatibility host, while
-  `vm/runtime` remains a frame client.
-- **Input and output boundary:** input is pristine OpenNT `nt_graph.c`,
-  original `nt_cga`/`nt_ega`/`nt_vga` painters, and the standalone DIB surface.
-  Output is pristine renderer source plus a named host compatibility layer for
-  DIB allocation, palette publication, text geometry and product-window
-  endpoints. Controllers, firmware, ROMs, CCPU, BOP tables and guest media
-  are not outputs.
-- **Verification:** a source-divergence check proves the local renderer no
-  longer contains a standalone dispatcher; VGA/text-surface checks exercise
-  original mode selection, VLT and dirty rectangles; clean x64/x86 builds and
-  runtime/lifecycle/keycode/source-boundary tests precede real A:+C: Setup.
-- **Similar-issue sweep:** text/graphics transitions, palette changes, V7
-  modes, DIB resize lifetime, text stride, cursor/product-window calls, frame
-  contention and both host widths.
-- **Stop condition:** restoration requires a DOS/WOW/NTVDM/CSR/VDD service, a
-  BOP or ROM change, a second graphics-state owner, or a renderer rewrite
-  instead of a finite host endpoint.
-- **Exit criteria:** original dispatcher is compiled; host supplies only the
-  DIB/window endpoint; Setup graphics and welcome screen work on x64 and x86.
+- **Admission and approval:** S2's fail-closed audit identified six machine
+  files whose standalone branches can be removed only after host declarations
+  exist: reset, keyboard/PPI, CMOS, timer and illegal-driver handling. The
+  owner directed queue-ordered standalone recovery under single-person
+  dual-role execution.
+- **Objective:** define the smallest independent host-contract surface needed
+  to restore those six original machine inputs. Contracts cover media presence,
+  Timer-2 audio notification, keyboard ingress/reset notification, timer and
+  explicit unavailable-product reporting. They do not implement a controller.
+- **Input and output boundary:** input is the S2 route ledger and existing
+  standalone host providers. Output is host-facing declarations and a source
+  replacement map. Original controller/BIOS behavior, ROMs, BOP selectors,
+  guest media, CCPU and C-VID are not changed in this subtask.
+- **Verification:** every proposed contract has one existing or deliberately
+  unavailable host owner; source-boundary checks prevent frontend access to
+  guest state; clean x64/x86 builds and focused contract tests precede any
+  source restoration.
+- **Similar-issue sweep:** fixed-disk presence, floppy CMOS reporting,
+  keyboard reset and Set-1 ingress, timer quick events, PPI Timer-2 sound,
+  product-driver BOP failure, and both host widths.
+- **Stop condition:** an endpoint requires DOS/WOW/NTVDM/CSR/VDD behavior,
+  reinterprets a device protocol, mutates BOP/ROM data, or owns guest state.
+- **Exit criteria:** named contracts and their existing providers cover all
+  six restoration rows; the next source-restoration patch can remove only
+  machine-side standalone branches and passes x64/x86 focused proof.
 
 ## Current Technical Baseline
 
@@ -40,5 +38,6 @@ the outer-shell baseline. Fixed A:+C: boot and independent input rendezvous
 are recorded in [M4 runtime-media/input evidence](../etc/evidence/m4-runtime-media-input.md).
 The original dispatcher and finite DIB endpoint now provide the Setup welcome
 path on both widths; the generated CCPU outer return also preserves repeated
-bounded-run state. See the [M5 renderer/executor acceptance evidence](../etc/evidence/m5-renderer-executor-acceptance.md)
+bounded-run state. See the completed [M5 S1 history](../history/M5-T1-renderer-dispatcher-restoration.md),
+[M5 renderer/executor acceptance evidence](../etc/evidence/m5-renderer-executor-acceptance.md)
 and [M5 outer runtime and pristine restoration](../proposals/m5-outer-runtime-and-pristine-restoration.md).

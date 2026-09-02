@@ -14,6 +14,43 @@ $current = (Resolve-Path -LiteralPath $CurrentRoot).Path
 $extensions = @('.c', '.h')
 $records = [System.Collections.Generic.List[object]]::new()
 
+# M5 owns these routes explicitly.  Keep the audit fail-closed: a newly
+# divergent input must be given an owner rather than inheriting a broad family
+# default that could hide a controller or product-policy branch.
+$portAbiPaths = @(
+    'base\ccpu386\evid_c.h', 'base\ccpu386\ntthread.c',
+    'base\ccpu386\softpc_ccpu_facade.c',
+    'base\cvidc\evidfunc.h', 'base\cvidc\evidgen.h',
+    'base\cvidc\j_c_lang.c', 'base\cvidc\j_c_lang.h',
+    'base\cvidc\sascdef.c', 'base\cvidc\sevid019.c',
+    'base\cvidc\sevid020.c', 'base\cvidc\vglfunc.c',
+    'base\inc\ckmalloc.h', 'base\inc\cpu_vid.h',
+    'base\inc\egacpu.h', 'base\inc\emm.h', 'base\inc\gmi.h',
+    'base\inc\host_com.h', 'base\inc\host.h', 'base\inc\ica.h',
+    'base\inc\ios.h', 'base\inc\timeval.h', 'base\inc\video.h',
+    'base\comms\com.c', 'base\keymouse\keybd_io.c',
+    'base\keymouse\mouse_io.c', 'base\support\time_day.c',
+    'base\system\cmosnt.c', 'base\system\idetect.c',
+    'base\system\ica.c', 'base\system\rom.c', 'base\support\main.c',
+    'base\video\gfx_updt.c', 'host\inc\x86\prod\gdpvar.h',
+    'host\inc\x86\prod\PigReg_c.h', 'host\inc\x86\prod\sas4gen.h'
+)
+$compatHostPaths = @(
+    'base\support\ios.c', 'host\inc\cfpu_def.h',
+    'host\inc\host_cpu.h', 'host\inc\host_def.h',
+    'host\inc\host_emm.h', 'host\inc\insignia.h',
+    'host\inc\nt_event.h', 'host\inc\nt_graph.h',
+    'host\inc\nt_inthk.h', 'host\inc\softpc_standalone_dib.h',
+    'host\src\nt_cga.c', 'host\src\nt_com.c', 'host\src\nt_ega.c',
+    'host\src\nt_graph.c', 'host\src\nt_keycd.c', 'host\src\nt_lpt.c',
+    'host\src\nt_munge.c', 'host\src\nt_sound.c', 'host\src\nt_vga.c'
+)
+$restorePristinePaths = @(
+    'base\bios\reset.c', 'base\keymouse\keyba.c',
+    'base\keymouse\ppi.c', 'base\system\cmos.c',
+    'base\system\timer.c', 'base\system\illegalp.c'
+)
+
 function Get-Family([string]$RelativePath) {
     if ($RelativePath.StartsWith('base\ccpu386\')) { return 'CCPU' }
     if ($RelativePath.StartsWith('base\cvidc\')) { return 'C-VID' }
@@ -39,23 +76,12 @@ function Get-NextTask([string]$Family, [bool]$HasOriginalPeer) {
 }
 
 function Get-Disposition([string]$RelativePath, [bool]$HasOriginalPeer) {
-    if ($HasOriginalPeer) {
-        if ($RelativePath.StartsWith('host\')) { return 'compat-host' }
-        if ($RelativePath.StartsWith('base\ccpu386\') -or
-            $RelativePath.StartsWith('base\cvidc\') -or
-            $RelativePath.StartsWith('base\inc\')) {
-            return 'port-abi-overlay'
-        }
-        if ($RelativePath -eq 'base\support\ios.c') { return 'compat-host' }
+    if ($portAbiPaths -contains $RelativePath) { return 'port-abi-overlay' }
+    if ($compatHostPaths -contains $RelativePath) { return 'compat-host' }
+    if ($restorePristinePaths -contains $RelativePath) {
         return 'restore-pristine'
     }
-    if ($RelativePath -eq 'base\ccpu386\softpc_ccpu_facade.c') {
-        return 'compat-host'
-    }
-    if ($RelativePath -eq 'host\inc\softpc_standalone_dib.h') {
-        return 'compat-host'
-    }
-    return 'port-abi-overlay'
+    throw "M5 ledger has no extraction route for $RelativePath"
 }
 
 function Get-CanonicalSource([string]$Path) {

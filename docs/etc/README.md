@@ -10,3 +10,5 @@ active work, architecture, or queue order.
   unsimulate path cannot be repurposed for standalone lifecycle control.
 - `evidence/m5-renderer-executor-acceptance.md` records original-renderer,
   generated-CCPU return, dual-width regression and Windows Setup acceptance.
+- `evidence/m5-pristine-host-contract-routes.md` maps every current
+  pristine-source audit row to an extraction route and next owner.
