@@ -1,4 +1,4 @@
-# M7 T4: Original Speaker Host Endpoint Completion
+# M7 T5: Original Speaker Host Endpoint Completion
 
 ## Goal
 
@@ -7,7 +7,7 @@ and PIT/PPI Timer-2 state transitions.
 
 ## Dependency
 
-M7 T3 must close first.
+M7 T4 must close first.
 
 ## Scope
 

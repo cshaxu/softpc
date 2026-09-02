@@ -11,6 +11,8 @@
 #include "host_def.h"
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "xt.h"
 #include "host_lpt.h"
@@ -18,6 +20,7 @@
 #define KBUFFER_SIZE 1024
 #define HIGH_WATER 1020
 #define DIRECT_ACCESS_HIGH_WATER 1020
+#define SOFTPC_LPT_OUTPUT_PATH_MAX 1024
 
 typedef struct {
     unsigned long port_status;
@@ -29,9 +32,27 @@ typedef struct {
     boolean direct_access;
     boolean no_device_attached;
     byte *buffer;
+    FILE *output;
+    char output_path[SOFTPC_LPT_OUTPUT_PATH_MAX];
 } HOST_LPT;
 
 static HOST_LPT host_lpt[NUM_PARALLEL_PORTS];
+
+int softpc_host_lpt_set_output_path(int adapter, const char *path)
+{
+    HOST_LPT *lpt;
+    size_t length;
+    if (adapter < 0 || adapter >= NUM_PARALLEL_PORTS) return FALSE;
+    lpt = &host_lpt[adapter];
+    if (path == 0) {
+        lpt->output_path[0] = '\0';
+        return TRUE;
+    }
+    length = strlen(path);
+    if (length >= sizeof(lpt->output_path)) return FALSE;
+    memcpy(lpt->output_path, path, length + 1u);
+    return TRUE;
+}
 
 /* The fixed standalone profile deliberately has no physical printer
  * selection.  This is the sole replacement for nt_lpt's CreateFile,
@@ -41,6 +62,10 @@ static boolean flush_buffer(int adapter)
 {
     HOST_LPT *lpt = &host_lpt[adapter];
     if (!lpt->active) return FALSE;
+    if (lpt->output != 0 && lpt->bytes_in_buffer != 0 &&
+        (fwrite(lpt->buffer, 1u, (size_t)lpt->bytes_in_buffer,
+            lpt->output) != (size_t)lpt->bytes_in_buffer ||
+        fflush(lpt->output) != 0)) return FALSE;
     lpt->bytes_in_buffer = 0;
     return TRUE;
 }
@@ -54,6 +79,14 @@ static SHORT host_lpt_open(int adapter, boolean direct_access)
     if (lpt->active) return TRUE;
     lpt->buffer = (byte *)malloc(KBUFFER_SIZE);
     if (lpt->buffer == NULL) return FALSE;
+    if (lpt->output_path[0] != '\0') {
+        lpt->output = fopen(lpt->output_path, "ab");
+        if (lpt->output == NULL) {
+            free(lpt->buffer);
+            lpt->buffer = NULL;
+            return FALSE;
+        }
+    }
     lpt->bytes_in_buffer = 0;
     lpt->flush_threshold = direct_access ? DIRECT_ACCESS_HIGH_WATER :
         HIGH_WATER;
@@ -72,6 +105,10 @@ void host_lpt_close(int adapter)
     lpt = &host_lpt[adapter];
     if (!lpt->active) return;
     (void)flush_buffer(adapter);
+    if (lpt->output != NULL) {
+        fclose(lpt->output);
+        lpt->output = NULL;
+    }
     free(lpt->buffer);
     lpt->buffer = NULL;
     lpt->bytes_in_buffer = 0;

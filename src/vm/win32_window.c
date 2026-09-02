@@ -60,20 +60,23 @@ static COLORREF softpc_window_colour(unsigned int colour)
 static void softpc_window_resize_surface(HWND window, uint32_t width,
     uint32_t height)
 {
-    RECT client;
     RECT outer;
-    LONG width_offset;
-    LONG height_offset;
+    DWORD style;
+    DWORD extended_style;
 
     if (window == NULL || width == 0u || height == 0u ||
         (softpc_window_surface_width == width &&
          softpc_window_surface_height == height)) return;
-    GetClientRect(window, &client);
-    GetWindowRect(window, &outer);
-    width_offset = (outer.right - outer.left) - (client.right - client.left);
-    height_offset = (outer.bottom - outer.top) - (client.bottom - client.top);
-    MoveWindow(window, outer.left, outer.top, (int)width + width_offset,
-        (int)height + height_offset, TRUE);
+    /* Before a newly created window is shown, its actual client rectangle can
+       still be zero or reflect a DPI transition.  Derive the outer size from
+       the requested fixed guest client surface instead of measuring that
+       transient rectangle. */
+    SetRect(&outer, 0, 0, (int)width, (int)height);
+    style = (DWORD)GetWindowLongPtrA(window, GWL_STYLE);
+    extended_style = (DWORD)GetWindowLongPtrA(window, GWL_EXSTYLE);
+    if (!AdjustWindowRectEx(&outer, style, FALSE, extended_style)) return;
+    MoveWindow(window, 0, 0, outer.right - outer.left,
+        outer.bottom - outer.top, TRUE);
     softpc_window_surface_width = width;
     softpc_window_surface_height = height;
 }

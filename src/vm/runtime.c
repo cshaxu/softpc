@@ -66,9 +66,6 @@ static void softpc_runtime_publish(softpc_runtime *runtime)
         int32_t ignored_top;
         int32_t ignored_right;
         int32_t ignored_bottom;
-        const softpc_runtime_frame *current =
-            &runtime->frames[runtime->published_frame];
-        int mode_changed = current->valid == 0u || current->graphics == 0u;
         int dirty = softpc_machine_presentation_take_dirty(runtime->machine,
             &ignored_left, &ignored_top, &ignored_right, &ignored_bottom);
 
@@ -77,7 +74,12 @@ static void softpc_runtime_publish(softpc_runtime *runtime)
            complete host snapshot.  Recopying an unchanged 800 KiB DIB at
            every executor callback is outer-shell work and can starve the
            guest without making its display more current. */
-        if (!mode_changed && !dirty) {
+        /* A reset-time DIB allocation is only a host backing store; C-VID has
+           not necessarily selected a guest display mode yet. Publish a
+           graphics frame only after the original renderer reports a dirty
+           rectangle, otherwise a frontend can resize to that maximum scratch
+           allocation before the BIOS reaches its real text mode. */
+        if (!dirty) {
             LeaveCriticalSection(&runtime->frame_lock);
             return;
         }

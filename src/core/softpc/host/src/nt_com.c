@@ -14,8 +14,12 @@
 #include "xt.h"
 #include "host_com.h"
 
+#include <stdio.h>
+#include <string.h>
+
 #define SOFTPC_COM_PORTS 4
 #define SOFTPC_COM_QUEUE_SIZE 256
+#define SOFTPC_COM_OUTPUT_PATH_MAX 1024
 
 typedef struct {
     UTINY rx[SOFTPC_COM_QUEUE_SIZE];
@@ -34,6 +38,8 @@ typedef struct {
     int xon_enabled;
     int modem;
     half_word last_msr;
+    FILE *output;
+    char output_path[SOFTPC_COM_OUTPUT_PATH_MAX];
 } HOST_COM;
 
 static HOST_COM host_com[SOFTPC_COM_PORTS];
@@ -42,6 +48,21 @@ static HOST_COM *host_com_port(int adapter)
 {
     if (adapter < 0 || adapter >= SOFTPC_COM_PORTS) return 0;
     return &host_com[adapter];
+}
+
+int softpc_host_com_set_output_path(int adapter, const char *path)
+{
+    HOST_COM *port = host_com_port(adapter);
+    size_t length;
+    if (port == 0) return FALSE;
+    if (path == 0) {
+        port->output_path[0] = '\0';
+        return TRUE;
+    }
+    length = strlen(path);
+    if (length >= sizeof(port->output_path)) return FALSE;
+    memcpy(port->output_path, path, length + 1u);
+    return TRUE;
 }
 
 void host_com_init(adapter)
@@ -62,6 +83,10 @@ int adapter;
 {
     HOST_COM *port = host_com_port(adapter);
     if (port == 0) return FALSE;
+    if (port->output_path[0] != '\0' && port->output == 0) {
+        port->output = fopen(port->output_path, "ab");
+        if (port->output == 0) return FALSE;
+    }
     port->opened = TRUE;
     return TRUE;
 }
@@ -94,6 +119,10 @@ int adapter;
     HOST_COM *port = host_com_port(adapter);
     if (port == 0) return;
     port->opened = FALSE;
+    if (port->output != 0) {
+        fclose(port->output);
+        port->output = 0;
+    }
     port->rx_head = 0;
     port->rx_tail = 0;
     port->rx_count = 0;
@@ -135,8 +164,17 @@ int adapter;
 char value;
 {
     HOST_COM *port = host_com_port(adapter);
-    UNUSED(value);
-    if (port == 0 || !port->opened) return;
+    /* The original controller opens the NT endpoint only under NTVDM when
+       applications touch the UART line-control registers. In the detached
+       build that product conditional is absent, so a configured synchronous
+       output endpoint opens at its first original transmit callback. */
+    if (port == 0) return;
+    if ((!port->opened || (port->output_path[0] != '\0' &&
+        port->output == 0)) && !host_com_open(adapter)) return;
+    if (port->output != 0) {
+        if (fputc((unsigned char)value, port->output) == EOF ||
+            fflush(port->output) != 0) return;
+    }
     /* nt_com.c's WriteFile exit is a successful virtual sink here.  Keep a
        bounded accounting value so FLUSH and close retain original meaning. */
     if (port->tx_count != SOFTPC_COM_QUEUE_SIZE) ++port->tx_count;

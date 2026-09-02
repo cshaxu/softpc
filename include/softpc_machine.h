@@ -31,6 +31,10 @@ typedef struct softpc_machine_options {
     softpc_presentation presentation;
     uint32_t memory_bytes;
     softpc_media_mode media_mode;
+    /* Optional standalone host endpoints for the original COM1/LPT1 host
+       contracts. NULL retains their bounded virtual sinks. */
+    const char *serial_output_path;
+    const char *printer_output_path;
 } softpc_machine_options;
 
 softpc_machine_result softpc_machine_create(const softpc_machine_options *options,

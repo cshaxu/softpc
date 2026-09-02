@@ -15,6 +15,8 @@
 typedef struct softpc_startup_config {
     char floppy_path[SOFTPC_CONFIG_PATH_MAX];
     char hard_disk_path[SOFTPC_CONFIG_PATH_MAX];
+    char serial_output_path[SOFTPC_CONFIG_PATH_MAX];
+    char printer_output_path[SOFTPC_CONFIG_PATH_MAX];
     uint32_t memory_bytes;
     softpc_presentation presentation;
     softpc_media_mode media_mode;
@@ -121,6 +123,10 @@ static int softpc_load_startup_config(const char *path,
             if (!softpc_copy_value(config->floppy_path, value)) goto invalid;
         } else if (strcmp(key, "hard_disk") == 0) {
             if (!softpc_copy_value(config->hard_disk_path, value)) goto invalid;
+        } else if (strcmp(key, "serial_output") == 0) {
+            if (!softpc_copy_value(config->serial_output_path, value)) goto invalid;
+        } else if (strcmp(key, "printer_output") == 0) {
+            if (!softpc_copy_value(config->printer_output_path, value)) goto invalid;
         } else if (strcmp(key, "display") == 0) {
             if (strcmp(value, "console") == 0)
                 config->presentation = SOFTPC_PRESENTATION_CONSOLE;
@@ -253,7 +259,7 @@ static int softpc_monitor(softpc_runtime *runtime,
 int main(int argc, char **argv)
 {
     char config_path[SOFTPC_CONFIG_PATH_MAX];
-    softpc_startup_config config = { { 0 }, { 0 }, 16u * 1024u * 1024u,
+    softpc_startup_config config = { { 0 }, { 0 }, { 0 }, { 0 }, 16u * 1024u * 1024u,
         SOFTPC_PRESENTATION_CONSOLE, SOFTPC_MEDIA_OVERLAY };
     softpc_machine_options options = { 0 };
     softpc_machine *machine = NULL;
@@ -275,8 +281,10 @@ int main(int argc, char **argv)
         return 1;
     }
     if (!softpc_resolve_image_path(config.floppy_path, config_path) ||
-        !softpc_resolve_image_path(config.hard_disk_path, config_path)) {
-        fprintf(stderr, "softpcvm: image path in '%s' is too long\n", config_path);
+        !softpc_resolve_image_path(config.hard_disk_path, config_path) ||
+        !softpc_resolve_image_path(config.serial_output_path, config_path) ||
+        !softpc_resolve_image_path(config.printer_output_path, config_path)) {
+        fprintf(stderr, "softpcvm: path in '%s' is too long\n", config_path);
         return 1;
     }
     options.floppy_path = config.floppy_path[0] == '\0' ? NULL : config.floppy_path;
@@ -284,6 +292,10 @@ int main(int argc, char **argv)
     options.memory_bytes = config.memory_bytes;
     options.presentation = config.presentation;
     options.media_mode = config.media_mode;
+    options.serial_output_path = config.serial_output_path[0] == '\0' ? NULL :
+        config.serial_output_path;
+    options.printer_output_path = config.printer_output_path[0] == '\0' ? NULL :
+        config.printer_output_path;
     result = softpc_machine_create(&options, &machine);
     if (result != SOFTPC_MACHINE_OK) goto done;
     if (!softpc_runtime_create(machine, &runtime)) {

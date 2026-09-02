@@ -51,6 +51,8 @@ extern void mouse_driver_initialisation(void);
 extern void mouse_driver_termination(void);
 extern void host_lpt_close_all(void);
 extern void host_com_close_all(void);
+extern int softpc_host_com_set_output_path(int adapter, const char *path);
+extern int softpc_host_lpt_set_output_path(int adapter, const char *path);
 extern int softpc_platform_hdd_attach(const char *hard_disk_path,
     softpc_media_mode mode);
 extern void softpc_platform_hdd_detach(void);
@@ -76,6 +78,8 @@ struct softpc_machine {
     int cpu_initialized;
     int mouse_driver_initialized;
     char floppy_path[SOFTPC_MEDIA_PATH_MAX];
+    char serial_output_path[SOFTPC_MEDIA_PATH_MAX];
+    char printer_output_path[SOFTPC_MEDIA_PATH_MAX];
 };
 
 
@@ -111,6 +115,33 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
         }
         memcpy(machine->floppy_path, options->floppy_path, length + 1u);
         machine->options.floppy_path = machine->floppy_path;
+    }
+    if (options->serial_output_path != NULL) {
+        size_t length = strlen(options->serial_output_path);
+        if (length >= sizeof(machine->serial_output_path)) {
+            free(machine);
+            return SOFTPC_MACHINE_INVALID_ARGUMENT;
+        }
+        memcpy(machine->serial_output_path, options->serial_output_path,
+            length + 1u);
+        machine->options.serial_output_path = machine->serial_output_path;
+    }
+    if (options->printer_output_path != NULL) {
+        size_t length = strlen(options->printer_output_path);
+        if (length >= sizeof(machine->printer_output_path)) {
+            free(machine);
+            return SOFTPC_MACHINE_INVALID_ARGUMENT;
+        }
+        memcpy(machine->printer_output_path, options->printer_output_path,
+            length + 1u);
+        machine->options.printer_output_path = machine->printer_output_path;
+    }
+    if (!softpc_host_com_set_output_path(0,
+        machine->options.serial_output_path) ||
+        !softpc_host_lpt_set_output_path(0,
+            machine->options.printer_output_path)) {
+        free(machine);
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
     }
     machine->memory_bytes = options->memory_bytes == 0u ?
         SOFTPC_FIXED_RAM_BYTES : (unsigned long)options->memory_bytes;

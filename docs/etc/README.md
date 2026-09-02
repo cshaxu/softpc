@@ -24,3 +24,5 @@ active work, architecture, or queue order.
   that one raw fixed-disk image carries guest-owned partition metadata.
 - `evidence/m7-t3-v7-display-compatibility.md` records the original V7 BIOS,
   controller, and `nt_*` painter proof for standalone DIB presentation.
+- `evidence/m7-t4-com-lpt-endpoints.md` records optional standalone COM1 and
+  LPT1 output endpoints while preserving the original controller paths.

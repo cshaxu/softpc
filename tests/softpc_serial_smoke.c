@@ -2,6 +2,7 @@
 #include "softpc_test_cleanup.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 
 #include "insignia.h"
@@ -31,6 +32,7 @@ static void make_boot_disk(const char *path)
 int main(void)
 {
     const char *path = "softpc-serial-smoke.img";
+    const char *output_path = "softpc-serial-output.bin";
     softpc_machine_options options = { path, NULL,
         SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *machine = NULL;
@@ -41,6 +43,8 @@ int main(void)
     int modem = 0;
 
     make_boot_disk(path);
+    assert(remove(output_path) == 0 || errno == ENOENT);
+    options.serial_output_path = output_path;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
 
@@ -55,7 +59,7 @@ int main(void)
     assert(!input_ready);
     host_com_read(0, &received, &error_mask);
     assert(error_mask == HOST_COM_NO_DATA);
-    host_com_write(0, 'A');
+    host_com_write(0, 'S');
     host_com_ioctl(0, HOST_COM_FLUSH, 0);
 
     inb(RS232_COM1_PORT_START + SOFTPC_RS232_LSR, &status);
@@ -66,7 +70,24 @@ int main(void)
     inb(RS232_COM1_PORT_START + SOFTPC_RS232_LSR, &status);
     assert((status & 0x60u) == 0x60u);
 
+    /* Reset must retain the configured host endpoint without retaining UART
+       state or leaking an extra endpoint handle. */
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    host_com_write(0, 'R');
+
     softpc_machine_destroy(machine);
+    {
+        unsigned char output[3];
+        FILE *file = fopen(output_path, "rb");
+        assert(file != NULL);
+        assert(fread(output, 1u, sizeof(output), file) == sizeof(output));
+        assert(output[0] == 'S');
+        assert(output[1] == 'A');
+        assert(output[2] == 'R');
+        assert(fgetc(file) == EOF);
+        assert(fclose(file) == 0);
+    }
+    assert(remove(output_path) == 0);
     assert(softpc_test_remove_image(path));
     return 0;
 }

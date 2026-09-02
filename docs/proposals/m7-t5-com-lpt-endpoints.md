@@ -1,4 +1,4 @@
-# M7 T5: Original Serial And Parallel Host Endpoints
+# M7 T4: Original Serial And Parallel Host Endpoints
 
 ## Goal
 
@@ -7,7 +7,7 @@ standalone host endpoints rather than their current virtual sinks.
 
 ## Dependency
 
-M7 T4 must close first.
+M7 T3 must close first.
 
 ## Scope
 

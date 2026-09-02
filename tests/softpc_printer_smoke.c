@@ -2,6 +2,7 @@
 #include "softpc_test_cleanup.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 
 #include "insignia.h"
@@ -24,12 +25,15 @@ static void make_boot_disk(const char *path)
 int main(void)
 {
     const char *path = "softpc-printer-smoke.img";
+    const char *output_path = "softpc-printer-output.bin";
     softpc_machine_options options = { path, NULL,
         SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *machine = NULL;
     half_word status = 0u;
 
     make_boot_disk(path);
+    assert(remove(output_path) == 0 || errno == ENOENT);
+    options.printer_output_path = output_path;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     outb(LPT1_PORT_START, 0x41u);
@@ -40,6 +44,14 @@ int main(void)
     inb(LPT1_PORT_START + 1u, &status);
     assert((status & 0x80u) != 0u);
     softpc_machine_destroy(machine);
+    {
+        FILE *file = fopen(output_path, "rb");
+        assert(file != NULL);
+        assert(fgetc(file) == 0x41);
+        assert(fgetc(file) == EOF);
+        assert(fclose(file) == 0);
+    }
+    assert(remove(output_path) == 0);
     assert(softpc_test_remove_image(path));
     return 0;
 }
