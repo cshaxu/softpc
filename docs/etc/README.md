@@ -18,3 +18,5 @@ active work, architecture, or queue order.
   original CPU_40 keyboard reset path through a generated CCPU ABI overlay.
 - `evidence/m5-pristine-host-contract-routes.md` maps every current
   pristine-source audit row to an extraction route and next owner.
+- `evidence/m7-t1-original-media-host-audit.md` records the symbol-level
+  disposition of the original OpenNT raw-media host candidates.

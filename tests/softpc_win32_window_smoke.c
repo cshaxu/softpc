@@ -86,8 +86,16 @@ int main(void)
         RECT client;
         LONG style = GetWindowLongA(window, GWL_STYLE);
         /* The endpoint begins with a literal 80x25 CP437 8x16 surface: no
-           frontend border is permitted inside the guest client rectangle. */
-        GetClientRect(window, &client);
+           frontend border is permitted inside the guest client rectangle.
+           CreateWindow returns before its initial MoveWindow has necessarily
+           reached the UI thread, so wait for that published fixed geometry. */
+        deadline = GetTickCount() + 5000u;
+        do {
+            GetClientRect(window, &client);
+            if (client.right - client.left == 640 &&
+                client.bottom - client.top == 400) break;
+            Sleep(10u);
+        } while ((LONG)(GetTickCount() - deadline) < 0);
         assert(client.right - client.left == 640);
         assert(client.bottom - client.top == 400);
         /* A standalone fixed machine has no resizable white sizing frame. */
