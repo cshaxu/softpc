@@ -116,6 +116,12 @@ int softpc_machine_presentation_cursor(const softpc_machine *machine,
  * are zero. */
 int softpc_machine_presentation_font(const softpc_machine *machine,
     uint8_t glyphs[256u * 16u], uint32_t *height_out);
+/* The original VGA attribute controller may select a second character map
+   through attribute bit 3.  Presentation consumers need both loaded maps;
+   they must not substitute a host font for either one. */
+int softpc_machine_presentation_fonts(const softpc_machine *machine,
+    uint8_t primary[256u * 16u], uint8_t secondary[256u * 16u],
+    uint32_t *height_out, uint32_t *attribute_select_out);
 
 void softpc_machine_destroy(softpc_machine *machine);
 

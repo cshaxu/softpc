@@ -25,7 +25,9 @@ static uint32_t *softpc_window_text_pixels;
 static unsigned char softpc_window_presented_text[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
 static unsigned short softpc_window_presented_attributes[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
 static unsigned char softpc_window_presented_font[256u * 16u];
+static unsigned char softpc_window_presented_secondary_font[256u * 16u];
 static uint32_t softpc_window_presented_font_height;
+static uint32_t softpc_window_presented_attribute_font_select;
 static int softpc_window_presented_text_valid;
 static uint32_t softpc_window_displayed_sequence;
 static int softpc_window_result;
@@ -96,8 +98,13 @@ static void softpc_window_update_text_surface(void)
             sizeof(softpc_window_presented_attributes)) == 0 &&
          memcmp(softpc_window_presented_font, softpc_window_frame->font,
             sizeof(softpc_window_presented_font)) == 0 &&
+         memcmp(softpc_window_presented_secondary_font,
+            softpc_window_frame->secondary_font,
+            sizeof(softpc_window_presented_secondary_font)) == 0 &&
          softpc_window_presented_font_height ==
-            softpc_window_frame->font_height)) return;
+            softpc_window_frame->font_height &&
+         softpc_window_presented_attribute_font_select ==
+            softpc_window_frame->attribute_font_select)) return;
     for (row = 0; row < SOFTPC_TEXT_ROWS; ++row) {
         int column;
         for (column = 0; column < SOFTPC_TEXT_COLUMNS; ++column) {
@@ -106,7 +113,11 @@ static void softpc_window_update_text_surface(void)
             unsigned char character = softpc_window_frame->text[index];
             unsigned short attribute = softpc_window_frame->attributes[index];
             for (scan = 0u; scan < SOFTPC_TEXT_CELL_HEIGHT; ++scan) {
-                unsigned char bits = softpc_window_frame->font[
+                const unsigned char *font =
+                    softpc_window_frame->attribute_font_select != 0u &&
+                    (attribute & 0x08u) != 0u ?
+                    softpc_window_frame->secondary_font : softpc_window_frame->font;
+                unsigned char bits = font[
                     (size_t)character * 16u + scan];
                 unsigned int bit;
                 uint32_t *pixels = softpc_window_text_pixels +
@@ -125,7 +136,12 @@ static void softpc_window_update_text_surface(void)
         sizeof(softpc_window_presented_attributes));
     memcpy(softpc_window_presented_font, softpc_window_frame->font,
         sizeof(softpc_window_presented_font));
+    memcpy(softpc_window_presented_secondary_font,
+        softpc_window_frame->secondary_font,
+        sizeof(softpc_window_presented_secondary_font));
     softpc_window_presented_font_height = softpc_window_frame->font_height;
+    softpc_window_presented_attribute_font_select =
+        softpc_window_frame->attribute_font_select;
     softpc_window_presented_text_valid = 1;
 }
 

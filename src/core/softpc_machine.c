@@ -417,6 +417,24 @@ int softpc_machine_presentation_font(const softpc_machine *machine,
     return 1;
 }
 
+int softpc_machine_presentation_fonts(const softpc_machine *machine,
+    uint8_t primary[256u * 16u], uint8_t secondary[256u * 16u],
+    uint32_t *height_out, uint32_t *attribute_select_out)
+{
+    extern int softpc_platform_presentation_fonts(uint8_t *, uint8_t *,
+        unsigned long *, unsigned long *);
+    unsigned long height;
+    unsigned long attribute_select;
+
+    if (machine == NULL || !machine->reset || primary == NULL ||
+        secondary == NULL || height_out == NULL || attribute_select_out == NULL ||
+        !softpc_platform_presentation_fonts(primary, secondary, &height,
+            &attribute_select)) return 0;
+    *height_out = (uint32_t)height;
+    *attribute_select_out = (uint32_t)attribute_select;
+    return 1;
+}
+
 void softpc_machine_destroy(softpc_machine *machine)
 {
     if (machine != NULL && machine->hardware_initialized) {

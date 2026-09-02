@@ -88,7 +88,9 @@ int main(void)
        EGA/VGA font plane, never a host-installed TrueType font. */
     {
         unsigned char font[256u * 16u];
+        unsigned char secondary_font[256u * 16u];
         uint32_t font_height = 0;
+        uint32_t attribute_font_select = 0;
         unsigned int row;
         unsigned int populated = 0;
         assert(softpc_machine_presentation_font(machine, font, &font_height));
@@ -96,6 +98,9 @@ int main(void)
         for (row = 0u; row < font_height; ++row)
             populated |= font[(unsigned int)'A' * 16u + row];
         assert(populated != 0u);
+        assert(softpc_machine_presentation_fonts(machine, font,
+            secondary_font, &font_height, &attribute_font_select));
+        assert(font_height == 16u);
     }
 
     /* The C-VID mode-transition path can emit an empty text repaint.  The

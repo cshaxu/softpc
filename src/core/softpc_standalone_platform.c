@@ -305,8 +305,8 @@ int softpc_platform_presentation_cursor(long *column_out, long *row_out)
     return 0;
 }
 
-int softpc_platform_presentation_font(uint8_t *glyphs,
-    unsigned long *height_out)
+int softpc_platform_presentation_fonts(uint8_t *primary, uint8_t *secondary,
+    unsigned long *height_out, unsigned long *attribute_select_out)
 {
     static const unsigned long font_offsets[8] = {
         0u, 0x4000u, 0x8000u, 0xc000u, 0x2000u, 0x6000u, 0xa000u, 0xe000u
@@ -315,20 +315,42 @@ int softpc_platform_presentation_font(uint8_t *glyphs,
     unsigned long font;
     unsigned long character;
 
-    if (glyphs == NULL || height_out == NULL || EGA_planes == NULL) return 0;
+    unsigned long secondary_font;
+
+    if (primary == NULL || secondary == NULL || height_out == NULL ||
+        attribute_select_out == NULL || EGA_planes == NULL) return 0;
     height = sas_hw_at_no_check(ega_char_height);
     if (height == 0u || height > 16u) height = 16u;
     font = (unsigned long)get_prim_font_index() & 7u;
-    memset(glyphs, 0, 256u * 16u);
+    secondary_font = (unsigned long)get_sec_font_index() & 7u;
+    memset(primary, 0, 256u * 16u);
+    memset(secondary, 0, 256u * 16u);
     for (character = 0u; character < 256u; ++character) {
         unsigned long row;
         byte *source = EGA_planes + FONT_BASE_ADDR + (font_offsets[font] << 2) +
             ((unsigned long)FONT_MAX_HEIGHT * character << 2);
+        byte *secondary_source = EGA_planes + FONT_BASE_ADDR +
+            (font_offsets[secondary_font] << 2) +
+            ((unsigned long)FONT_MAX_HEIGHT * character << 2);
         for (row = 0u; row < height; ++row)
-            glyphs[character * 16u + row] = source[row << 2];
+        {
+            primary[character * 16u + row] = source[row << 2];
+            secondary[character * 16u + row] = secondary_source[row << 2];
+        }
     }
     *height_out = height;
+    *attribute_select_out = get_attrib_font_select() ? 1u : 0u;
     return 1;
+}
+
+int softpc_platform_presentation_font(uint8_t *glyphs,
+    unsigned long *height_out)
+{
+    unsigned char secondary[256u * 16u];
+    unsigned long attribute_select;
+
+    return softpc_platform_presentation_fonts(glyphs, secondary, height_out,
+        &attribute_select);
 }
 
 int softpc_platform_video_buffers_init(void)
