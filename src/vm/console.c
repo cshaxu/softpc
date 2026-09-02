@@ -98,23 +98,37 @@ static int softpc_console_key(softpc_runtime *runtime,
 }
 
 static void softpc_console_paint(HANDLE output,
-    const softpc_runtime_frame *frame, unsigned char *previous)
+    const softpc_runtime_frame *frame, unsigned char *previous,
+    unsigned short *previous_attributes)
 {
     unsigned int row;
     if (frame->valid == 0u || frame->graphics != 0u ||
-        memcmp(frame->text, previous, sizeof(frame->text)) == 0) return;
+        (memcmp(frame->text, previous, sizeof(frame->text)) == 0 &&
+         memcmp(frame->attributes, previous_attributes,
+             sizeof(frame->attributes)) == 0)) return;
     for (row = 0; row < SOFTPC_TEXT_ROWS; ++row) {
-        CHAR line[SOFTPC_TEXT_COLUMNS];
+        CHAR_INFO line[SOFTPC_TEXT_COLUMNS];
         unsigned int column;
         for (column = 0; column < SOFTPC_TEXT_COLUMNS; ++column) {
             unsigned char character = frame->text[row * SOFTPC_TEXT_COLUMNS + column];
-            line[column] = character >= 0x20u && character < 0x7fu ?
+            line[column].Char.AsciiChar = character >= 0x20u && character < 0x7fu ?
                 (CHAR)character : ' ';
+            /* nt_cga's original surface provides the IBM-PC foreground and
+               background nibble unchanged; CONSOLE output uses the same
+               16-colour ordering.  Do not flatten Setup's palette to the
+               host console's default black background. */
+            line[column].Attributes = (WORD)frame->attributes[
+                row * SOFTPC_TEXT_COLUMNS + column];
         }
-        { COORD position = { 0, (SHORT)row }; DWORD written;
-          (void)WriteConsoleOutputCharacterA(output, line, SOFTPC_TEXT_COLUMNS, position, &written); }
+        { COORD position = { 0, (SHORT)row };
+          COORD size = { SOFTPC_TEXT_COLUMNS, 1 };
+          SMALL_RECT region = { 0, (SHORT)row, SOFTPC_TEXT_COLUMNS - 1,
+              (SHORT)row };
+          (void)WriteConsoleOutputA(output, line, size, position, &region); }
     }
     memcpy(previous, frame->text, sizeof(frame->text));
+    memcpy(previous_attributes, frame->attributes,
+        sizeof(frame->attributes));
     if (frame->cursor_column >= 0 && frame->cursor_row >= 0 &&
         frame->cursor_column < (int32_t)SOFTPC_TEXT_COLUMNS &&
         frame->cursor_row < (int32_t)SOFTPC_TEXT_ROWS) {
@@ -131,6 +145,7 @@ int softpc_vm_run_console(softpc_runtime *runtime)
     HANDLE output;
     DWORD original_mode;
     unsigned char previous[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
+    unsigned short previous_attributes[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
     softpc_runtime_frame *frame;
     uint32_t displayed_sequence = 0u;
     softpc_win32_keyboard_normalizer keyboard_normalizer = { 0 };
@@ -151,6 +166,7 @@ int softpc_vm_run_console(softpc_runtime *runtime)
         return 1;
     }
     memset(previous, 0xff, sizeof(previous));
+    memset(previous_attributes, 0xff, sizeof(previous_attributes));
     while (running && softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_RUNNING) {
         INPUT_RECORD record;
         DWORD available;
@@ -170,7 +186,7 @@ int softpc_vm_run_console(softpc_runtime *runtime)
         }
         if (softpc_runtime_published_frame_sequence(runtime) !=
             displayed_sequence && softpc_runtime_copy_frame(runtime, frame)) {
-            softpc_console_paint(output, frame, previous);
+            softpc_console_paint(output, frame, previous, previous_attributes);
             displayed_sequence = frame->sequence;
         }
         Sleep(10u);

@@ -49,3 +49,6 @@ interactive acceptance work are in
 Console and window now share one thin Win32/RDP packet normalizer while
 retaining original SoftPC key translation and controller ownership; see
 [M5 shared input-normalizer evidence](../etc/evidence/m5-win32-input-normalizer.md).
+The console now presents original text attributes rather than flattening them
+to the host default palette; see
+[M5 console text-attribute evidence](../etc/evidence/m5-console-text-attributes.md).
