@@ -183,8 +183,14 @@ static void softpc_window_paint(HWND window, HDC dc)
             SOFTPC_TEXT_COLUMNS;
         int right = (softpc_window_frame->cursor_column + 1) * width /
             SOFTPC_TEXT_COLUMNS;
-        int top = (softpc_window_frame->cursor_row + 1) * height /
-            SOFTPC_TEXT_ROWS - (height / SOFTPC_TEXT_ROWS + 7) / 8;
+        uint32_t cursor_size = softpc_window_frame->cursor_size;
+        int cell_height = height / SOFTPC_TEXT_ROWS;
+        int cursor_height;
+        if (cursor_size == 0u || cursor_size > 100u) cursor_size = 100u;
+        cursor_height = (int)((cell_height * cursor_size + 99u) / 100u);
+        if (cursor_height > cell_height) cursor_height = cell_height;
+        int top = (softpc_window_frame->cursor_row + 1) * cell_height -
+            cursor_height;
         RECT cursor = { left, top, right, (softpc_window_frame->cursor_row + 1) *
             height / SOFTPC_TEXT_ROWS };
         InvertRect(dc, &cursor);

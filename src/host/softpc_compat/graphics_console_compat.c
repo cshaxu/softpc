@@ -17,6 +17,7 @@ BOOL ConsoleInitialised = TRUE;
 BOOL ConsoleNoUpdates = FALSE;
 static LONG softpc_compat_cursor_column;
 static LONG softpc_compat_cursor_row;
+static DWORD softpc_compat_cursor_size = 20u;
 static int softpc_compat_cursor_position_valid;
 static int softpc_compat_cursor_visible = 1;
 
@@ -147,17 +148,22 @@ BOOL softpc_compat_set_console_cursor_info(HANDLE output,
     const CONSOLE_CURSOR_INFO *cursor)
 {
     UNUSED(output);
-    if (cursor != NULL) softpc_compat_cursor_visible = cursor->bVisible != FALSE;
+    if (cursor != NULL) {
+        softpc_compat_cursor_size = cursor->dwSize;
+        softpc_compat_cursor_visible = cursor->bVisible != FALSE;
+    }
     return TRUE;
 }
 
-int softpc_compat_presentation_cursor(long *column_out, long *row_out)
+int softpc_compat_presentation_cursor(long *column_out, long *row_out,
+    unsigned long *size_out)
 {
-    if (column_out == NULL || row_out == NULL ||
+    if (column_out == NULL || row_out == NULL || size_out == NULL ||
         !softpc_compat_cursor_position_valid || !softpc_compat_cursor_visible)
         return 0;
     *column_out = softpc_compat_cursor_column;
     *row_out = softpc_compat_cursor_row;
+    *size_out = softpc_compat_cursor_size;
     return 1;
 }
 

@@ -109,7 +109,7 @@ int softpc_machine_presentation_text(const softpc_machine *machine,
  * controller. The standalone host records this callback; frontends own the
  * actual cursor drawing. */
 int softpc_machine_presentation_cursor(const softpc_machine *machine,
-    int32_t *column_out, int32_t *row_out);
+    int32_t *column_out, int32_t *row_out, uint32_t *size_out);
 
 /* Copy the active original EGA/VGA primary font as CP437 glyph rows.  Every
  * glyph has a fixed 16-row slot; rows below the current original font height

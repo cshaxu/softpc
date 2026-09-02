@@ -404,16 +404,19 @@ int softpc_machine_presentation_text(const softpc_machine *machine,
 }
 
 int softpc_machine_presentation_cursor(const softpc_machine *machine,
-    int32_t *column_out, int32_t *row_out)
+    int32_t *column_out, int32_t *row_out, uint32_t *size_out)
 {
     long column;
     long row;
-    extern int softpc_platform_presentation_cursor(long *, long *);
+    unsigned long size;
+    extern int softpc_platform_presentation_cursor(long *, long *,
+        unsigned long *);
     if (machine == NULL || !machine->reset || column_out == NULL ||
-        row_out == NULL || !softpc_platform_presentation_cursor(&column,
-            &row)) return 0;
+        row_out == NULL || size_out == NULL ||
+        !softpc_platform_presentation_cursor(&column, &row, &size)) return 0;
     *column_out = (int32_t)column;
     *row_out = (int32_t)row;
+    *size_out = (uint32_t)size;
     return 1;
 }
 

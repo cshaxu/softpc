@@ -298,9 +298,10 @@ int softpc_platform_presentation_is_graphics(void)
     return sc.ModeType == GRAPHICS;
 }
 
-int softpc_platform_presentation_cursor(long *column_out, long *row_out)
+int softpc_platform_presentation_cursor(long *column_out, long *row_out,
+    unsigned long *size_out)
 {
-    return softpc_compat_presentation_cursor(column_out, row_out);
+    return softpc_compat_presentation_cursor(column_out, row_out, size_out);
 }
 
 int softpc_platform_presentation_fonts(uint8_t *primary, uint8_t *secondary,

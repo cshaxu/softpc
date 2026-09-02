@@ -57,7 +57,8 @@ int main(void)
                 frame->graphics == 0u && frame->cursor_column >= 0 &&
                 frame->cursor_column < SOFTPC_RUNTIME_TEXT_COLUMNS &&
                 frame->cursor_row >= 0 &&
-                frame->cursor_row < SOFTPC_RUNTIME_TEXT_ROWS) {
+                frame->cursor_row < SOFTPC_RUNTIME_TEXT_ROWS &&
+                frame->cursor_size > 0u && frame->cursor_size <= 100u) {
                 cursor_seen = 1;
                 break;
             }

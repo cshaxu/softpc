@@ -34,7 +34,8 @@ client rectangle cease to represent the copied guest surface.
 The original `nt_graph` text path retains ownership of cursor choice and
 placement. Its existing console-cursor endpoint is recorded by the
 standalone compatibility boundary, copied into the runtime presentation frame,
-and drawn as an underline over the already-copied DIB. The window therefore
+and drawn at its original published percentage height over the already-copied
+DIB. The window therefore
 does not inspect guest text memory or controller registers, and it introduces
 no independent cursor semantics.
 

@@ -127,7 +127,7 @@ static void softpc_runtime_publish(softpc_runtime *runtime)
         cursor_column = -1;
         cursor_row = -1;
         (void)softpc_machine_presentation_cursor(runtime->machine,
-            &cursor_column, &cursor_row);
+            &cursor_column, &cursor_row, &frame->cursor_size);
         frame->cursor_column = cursor_column;
         frame->cursor_row = cursor_row;
         (void)softpc_machine_presentation_fonts(runtime->machine, frame->font,

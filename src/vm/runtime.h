@@ -30,6 +30,7 @@ typedef struct softpc_runtime_frame {
     uint32_t valid;
     int32_t cursor_column;
     int32_t cursor_row;
+    uint32_t cursor_size;
     uint8_t text[SOFTPC_RUNTIME_TEXT_COLUMNS * SOFTPC_RUNTIME_TEXT_ROWS];
     uint16_t attributes[SOFTPC_RUNTIME_TEXT_COLUMNS * SOFTPC_RUNTIME_TEXT_ROWS];
     uint8_t font[256u * 16u];
