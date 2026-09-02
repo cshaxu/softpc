@@ -27,9 +27,11 @@ normalizer. It requires the same original guest IRQ1 marker within 250 ms.
 ## Current evidence
 
 - x64 MinGW: runtime probe plus A:+C: Windows Setup Welcome path passed;
-  the Win32 window end-to-end input probe passed.
+  the Win32 window end-to-end input probe passed; complete serial CTest
+  passed 18/18.
 - x86 Clang: runtime probe plus A:+C: Windows Setup Welcome path passed;
-  the Win32 window end-to-end input probe passed.
+  the Win32 window end-to-end input probe passed; complete serial CTest
+  passed 18/18.
 
 ## Boundary
 
