@@ -67,7 +67,7 @@ Its client rectangle follows the NXVM sizing rule and contains no frontend
 display margin.
 Window text now uses the currently loaded original EGA/VGA font plane rather
 than a host font; see [M5 original font presentation evidence](../etc/evidence/m5-original-font-presentation.md).
-Five controller/firmware extraction routes remain after restoring the original
-PPI controller through its standalone host contract; the PPI and keyboard
-results are recorded in
+Four controller/firmware extraction routes remain after restoring the original
+PPI controller and incompatible-driver BOP path through their standalone host
+contracts; the PPI and keyboard results are recorded in
 [M5 remaining pristine-controller boundaries](../etc/evidence/m5-remaining-pristine-controller-boundaries.md).

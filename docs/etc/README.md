@@ -12,5 +12,7 @@ active work, architecture, or queue order.
   generated-CCPU return, dual-width regression and Windows Setup acceptance.
 - `evidence/m5-original-font-presentation.md` records the original EGA/VGA
   font-plane export used by the Win32 text presentation endpoint.
+- `evidence/m5-illegal-driver-bop-restoration.md` records restoration of the
+  original incompatible-driver BOP path through a declaration-only port ABI.
 - `evidence/m5-pristine-host-contract-routes.md` maps every current
   pristine-source audit row to an extraction route and next owner.

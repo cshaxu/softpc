@@ -6,14 +6,13 @@ The pre-restoration run of `scripts/audit_pristine_divergence.ps1` against
 `O:\repos.external\opennt-src-2\nt\private\mvdm\softpc.new` reported 60
 canonical-text C/H divergences.  Thirty-five were named port-ABI overlays,
 nineteen were original host algorithms with independent endpoints, and six
-were `restore-pristine` controller/firmware sources.  PPI is now restored,
-leaving these five controller/firmware routes:
+were `restore-pristine` controller/firmware sources. PPI and the original
+illegal-driver BOP path are now restored, leaving these four routes:
 
 - `base/bios/reset.c`
 - `base/keymouse/keyba.c`
 - `base/system/cmos.c`
 - `base/system/timer.c`
-- `base/system/illegalp.c`
 
 ## PPI restoration result
 
