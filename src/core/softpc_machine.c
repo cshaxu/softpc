@@ -55,6 +55,7 @@ extern void softpc_platform_hdd_detach(void);
 extern int softpc_platform_floppy_attach(const char *path, softpc_media_mode mode);
 extern void softpc_platform_floppy_detach(void);
 extern int softpc_platform_video_buffers_init(void);
+extern void softpc_platform_install_timer2_sound_gate(void);
 extern int softpc_standalone_dib_take_dirty(long *left, long *top,
     long *right, long *bottom);
 extern FILE *trace_file;
@@ -166,6 +167,7 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     softpc_platform_set_boot_clock(1);
     reset();
     softpc_platform_set_boot_clock(0);
+    softpc_platform_install_timer2_sound_gate();
     if (!machine->mouse_driver_initialized) {
         mouse_driver_initialisation();
         machine->mouse_driver_initialized = 1;

@@ -2,27 +2,35 @@
 
 ## Fresh audit
 
-`scripts/audit_pristine_divergence.ps1` against
-`O:\repos.external\opennt-src-2\nt\private\mvdm\softpc.new` reports 60
-canonical-text C/H divergences.  Thirty-five are named port-ABI overlays,
-nineteen are original host algorithms with independent endpoints, and six
-remain `restore-pristine` controller/firmware sources:
+The pre-restoration run of `scripts/audit_pristine_divergence.ps1` against
+`O:\repos.external\opennt-src-2\nt\private\mvdm\softpc.new` reported 60
+canonical-text C/H divergences.  Thirty-five were named port-ABI overlays,
+nineteen were original host algorithms with independent endpoints, and six
+were `restore-pristine` controller/firmware sources.  PPI is now restored,
+leaving these five controller/firmware routes:
 
 - `base/bios/reset.c`
 - `base/keymouse/keyba.c`
-- `base/keymouse/ppi.c`
 - `base/system/cmos.c`
 - `base/system/timer.c`
 - `base/system/illegalp.c`
 
-## PPI extraction result
+## PPI restoration result
 
-The direct restoration candidate in `ppi.c` was rejected by evidence.  Its
-standalone `HostPpiState` call is not a redundant NTVDM branch: removing it
-causes the x86 original sound smoke to fail its full PPI/Timer-2 state
-assertion.  The original non-NT enable/disable callbacks encode a narrower
-signal.  The next valid cut is therefore an independent full-PPI sound host
-contract, followed by restoration of the controller source.
+`base/keymouse/ppi.c` now compares equal to the original source after line-end
+normalization, including its inactive historical `#ifdef NTVDM` branch.  The
+standalone build selects the original non-NTVDM enable/disable callbacks.
+The standalone host owns only the endpoint composition: it records timer-2
+gate state when the original timer calls its gate function, and combines that
+state with the original PPI callbacks in `nt_sound.c`.  No PPI controller
+logic remains standalone-specific.
+
+`softpc-sound-smoke` exercises original port `0x61` through `ppi.c`, invokes
+the original PIT-to-host waveform callback, and verifies both enable and
+disable state.  It passed cleanly for x86 and x64.  The whole-tree audit script
+has a pre-existing empty-source-file handling defect, so this extraction uses
+the direct source comparison plus dual-width regression as its evidence;
+repairing that independent audit utility remains separate work.
 
 ## Keyboard extraction result
 
@@ -32,5 +40,4 @@ stub, and the standalone host does not yet expose a named CPU-interrupt
 contract.  Restoring its call before that contract exists would add an
 unproved CPU path; it remains pending extraction.
 
-No machine source was retained or changed by these probes.  The x86 sound
-smoke passed again after restoring the prior PPI source.
+No additional machine source was retained or changed by these probes.

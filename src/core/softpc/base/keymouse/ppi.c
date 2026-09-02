@@ -164,7 +164,7 @@ void ppi_outb IFN2(io_addr, port, half_word, value)
 		    timer_gate(TIMER2_REG, GATE_SIGNAL_LOW); 
 		    gate_2_was_low = TRUE;
 		}
-#if defined(NTVDM) || defined(SOFTPC_STANDALONE)
+#ifdef NTVDM
                 /*
                  *  Tell the host the full PpiState because this effects
                  *  whether we are playing Timer 2 Freq, Ppi Freq or both.

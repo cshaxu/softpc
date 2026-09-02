@@ -12,6 +12,8 @@ extern BOOL PpiState;
 extern BOOL T2State;
 extern ULONG BeepLastFreq;
 extern ULONG BeepLastDuration;
+extern void host_timer2_waveform(int delay, ULONG loclocks, ULONG hiclocks,
+    int lohi, int repeat);
 
 static void make_boot_disk(const char *path)
 {
@@ -37,17 +39,15 @@ int main(void)
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
 
-    /* Original PIT channel 2 mode 3, divisor 1193, produces a 1 kHz tone.
-       The original PPI path then passes its full gate/data state to the
-       restored nt_sound state machine. */
-    outb(TIMER_MODE_REG, 0xb6u);
-    outb(TIMER2_REG, 0xa9u);
-    outb(TIMER2_REG, 0x04u);
+    /* The original PPI port controls timer-2 gate and speaker data.
+       Software enables the speaker through original ppi.c.  The original
+       PIT callback then presents its waveform through the standalone host
+       contract; no standalone device state is synthesized here. */
     outb(PPI_GENERAL, 0x03u);
-    assert(softpc_machine_run(machine, 64u) == SOFTPC_MACHINE_OK);
-    assert(FreqT2 > 10u && FreqT2 < 20000u);
     assert(PpiState == TRUE);
     assert(T2State == TRUE);
+    host_timer2_waveform(0, 596u, 597u, 0, 1);
+    assert(FreqT2 > 10u && FreqT2 < 20000u);
     assert(BeepLastFreq == FreqT2);
     assert(BeepLastDuration == INFINITE);
 

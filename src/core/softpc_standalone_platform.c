@@ -46,6 +46,21 @@ static sys_addr softpc_ram_size;
 IU32 softpc_ccpu_instruction_budget = 0;
 IBOOL softpc_ccpu_instruction_budget_active = FALSE;
 
+extern void softpc_standalone_sound_timer2_gate(half_word value);
+
+static void softpc_standalone_timer_gate(io_addr port, half_word value)
+{
+    SWTMR_gate(port, value);
+    if (port == TIMER2_REG)
+        softpc_standalone_sound_timer2_gate(value);
+}
+
+void softpc_platform_install_timer2_sound_gate(void)
+{
+    timer_gate_func = softpc_standalone_timer_gate;
+    softpc_standalone_sound_timer2_gate(GATE_SIGNAL_RISE);
+}
+
 #ifdef _WIN32
 /* Original timestrb.c documents a host alarm of roughly 20 Hz.  The timer
    queue callback only marks the CCPU event pending; host_timer_event() stays

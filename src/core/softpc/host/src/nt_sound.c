@@ -6,6 +6,7 @@
 #include "xt.h"
 #include "config.h"
 #include "ica.h"
+#include "timer.h"
 
 /* The standalone VM executes one machine slice at a time; the original
  * sound calls retain their ordering but require no NT host critical section. */
@@ -191,12 +192,29 @@ void PlayContinuousTone(void)
 
 void host_enable_timer2_sound(void)
 {
-    PlaySound(FALSE);
+    host_ica_lock();
+    if (!PpiState) {
+        PpiState = TRUE;
+        PulsePpi();
+    }
+    PlaySound(PpiState);
+    host_ica_unlock();
 }
 
 void host_disable_timer2_sound(void)
 {
-    LazyBeep(0, 0);
+    host_ica_lock();
+    PpiState = FALSE;
+    PlaySound(FALSE);
+    host_ica_unlock();
+}
+
+void softpc_standalone_sound_timer2_gate(half_word value)
+{
+    host_ica_lock();
+    T2State = value != GATE_SIGNAL_LOW;
+    PlaySound(FALSE);
+    host_ica_unlock();
 }
 
 #else
