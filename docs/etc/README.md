@@ -26,3 +26,5 @@ active work, architecture, or queue order.
   controller, and `nt_*` painter proof for standalone DIB presentation.
 - `evidence/m7-t4-com-lpt-endpoints.md` records optional standalone COM1 and
   LPT1 output endpoints while preserving the original controller paths.
+- `evidence/m7-t5-speaker-endpoint.md` records the bounded standalone playback
+  endpoint for the original PPI/Timer-2 speaker state machine.

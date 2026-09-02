@@ -52,10 +52,25 @@ int main(void)
     assert(BeepLastFreq == FreqT2);
     assert(BeepLastDuration == INFINITE);
 
+    /* A second original PIT waveform changes only the requested playback
+       tone; the host worker remains a presentation sink and never feeds a
+       synthesized timing event back into the guest. */
+    host_timer2_waveform(0, 298u, 299u, 0, 1);
+    assert(FreqT2 > 10u && FreqT2 < 20000u);
+    assert(BeepLastFreq == FreqT2);
+    assert(BeepLastDuration == INFINITE);
+
     /* Clearing both original PPI bits stops the same state machine. */
     outb(PPI_GENERAL, 0x00u);
     assert(PpiState == FALSE);
     assert(T2State == FALSE);
+    assert(BeepLastFreq == 0u);
+    assert(BeepLastDuration == 0u);
+
+    /* Original reset.c clears the same Timer-2/PPI path. A standalone audio
+       worker must therefore have no tone or guest state to retain across a
+       cold reset. */
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     assert(BeepLastFreq == 0u);
     assert(BeepLastDuration == 0u);
 
