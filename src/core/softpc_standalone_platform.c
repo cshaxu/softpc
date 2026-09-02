@@ -292,7 +292,6 @@ static VIDEOFUNCS softpc_video_functions = {
 #endif
 
 extern VIDEOFUNCS nt_video_funcs;
-VIDEOFUNCS *working_video_funcs = &nt_video_funcs;
 
 int softpc_platform_presentation_is_graphics(void)
 {
@@ -766,7 +765,6 @@ static KEYBDFUNCS softpc_keyboard_host_functions = {
     softpc_keyboard_host_lights,
     softpc_keyboard_host_lights
 };
-KEYBDFUNCS *working_keybd_funcs = &softpc_keyboard_host_functions;
 
 SHORT host_error(error_number, options, extra_text)
 int error_number;
@@ -1166,7 +1164,15 @@ static ERRORFUNCS softpc_error_functions = {
     softpc_error_ignore,
     softpc_error_ignore
 };
-ERRORFUNCS *working_error_funcs = &softpc_error_functions;
+
+/* `reset.c` remains the original owner of its GWI table storage.  Bind the
+   standalone endpoints once before the original firmware reset runs. */
+void softpc_platform_bind_reset_host_functions(void)
+{
+    working_video_funcs = &nt_video_funcs;
+    working_keybd_funcs = &softpc_keyboard_host_functions;
+    working_error_funcs = &softpc_error_functions;
+}
 
 void LIM_b_write(sys_addr intel_addr)
 {

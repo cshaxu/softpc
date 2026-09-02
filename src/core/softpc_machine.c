@@ -55,6 +55,7 @@ extern void softpc_platform_hdd_detach(void);
 extern int softpc_platform_floppy_attach(const char *path, softpc_media_mode mode);
 extern void softpc_platform_floppy_detach(void);
 extern int softpc_platform_video_buffers_init(void);
+extern void softpc_platform_bind_reset_host_functions(void);
 extern void softpc_platform_install_timer2_sound_gate(void);
 extern int softpc_standalone_dib_take_dirty(long *left, long *top,
     long *right, long *bottom);
@@ -130,6 +131,7 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
             return SOFTPC_MACHINE_IO_ERROR;
         setup_vga_globals();
         softpc_ccpu_install_video_vector();
+        softpc_platform_bind_reset_host_functions();
         /* nt_init_screen() immediately issues the original C-VID dirty
            notification.  Its generated vector and data carrier therefore
            have to exist before the renderer host is initialized. */

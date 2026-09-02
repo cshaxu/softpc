@@ -280,6 +280,8 @@ set_source_files_properties(src/core/softpc/base/system/illegalp.c PROPERTIES
     COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/illegalp")
 set_source_files_properties(src/core/softpc/base/keymouse/keyba.c PROPERTIES
     COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/keyba")
+set_source_files_properties(src/core/softpc/base/bios/reset.c PROPERTIES
+    COMPILE_OPTIONS "-ULIM")
 add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/support/ios.c
     src/core/softpc/base/system/ica.c
