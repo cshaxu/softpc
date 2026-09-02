@@ -220,6 +220,21 @@ def transform_ccpu_main(source: str) -> str:
     if '#include <ica.h>' not in source:
         source = source.replace('#include <fault.h>\n',
                                 '#include <fault.h>\n#include <ica.h>\n#include <timer.h>\n', 1)
+    interrupt_map_accessor = (
+        'GLOBAL IU32 *softpc_ccpu_interrupt_map_address(void)\n'
+        '{\n'
+        '   return &cpu_interrupt_map;\n'
+        '}\n\n'
+    )
+    if 'softpc_ccpu_interrupt_map_address(void)' not in source:
+        interrupt_map = re.compile(
+            r'LOCAL IUM32\s+cpu_interrupt_map = 0;\n#endif[^\n]*\n'
+        )
+        source, count = interrupt_map.subn(
+            lambda match: match.group(0) + '\n' + interrupt_map_accessor,
+            source, count=1)
+        if count != 1:
+            raise ValueError('cannot locate CCPU interrupt-map storage')
     workers = '#include  <aaa.h>\t/* The workers */\n'
     declarations = ('extern void force_yoda(void);\n'
                     'extern void TakeNpxExceptionInt(void);\n'

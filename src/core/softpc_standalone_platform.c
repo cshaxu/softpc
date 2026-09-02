@@ -1012,6 +1012,14 @@ void host_clear_hw_int(void)
 {
 }
 
+/* CPU_40's original keyboard controller sets the CCPU reset bit and then
+ * calls this historical host notification. CCPU's original NT endpoint is
+ * empty; the sole executor is already executing the 8042 command, so no
+ * second scheduler or CPU-state owner is needed here. */
+void host_cpu_interrupt(void)
+{
+}
+
 void PurgeLostIretHookLine(line_num, depth)
 IU16 line_num;
 IU32 depth;
