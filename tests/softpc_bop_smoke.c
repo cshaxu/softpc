@@ -26,9 +26,11 @@ extern void c_setAL(IU8 value);
 extern void c_setAH(IU8 value);
 extern void c_setCX(IU16 value);
 extern void c_setDX(IU16 value);
+extern void c_setCF(IU8 value);
 extern ISM32 c_setDS(IU16 value);
 extern IU16 c_getAX(void);
 extern IU16 c_getBX(void);
+extern IU16 c_getSTATUS(void);
 extern void reset(void);
 extern void keyboard_int(void);
 extern void keyboard_io(void);
@@ -46,6 +48,7 @@ extern void bootstrap(void);
 extern void bootstrap1(void);
 extern void bootstrap2(void);
 extern void bootstrap3(void);
+extern void illegal_dvr_bop(void);
 
 static void make_boot_disk(const char *path)
 {
@@ -245,6 +248,13 @@ int main(void)
     assert(softpc_device_bop_dispatch(0x50u, 0u) == FALSE); /* NTVDM reserved */
     assert(softpc_device_bop_dispatch(0x78u, 0u) == FALSE); /* WORM service */
     assert(softpc_device_bop_dispatch(0x79u, 0u) == FALSE); /* WORM service */
+
+    /* The original incompatible-driver BOP is not a standalone product
+       service.  It reports through the finite host-error endpoint and
+       returns its documented carry-clear result. */
+    c_setCF(1u);
+    illegal_dvr_bop();
+    assert((c_getSTATUS() & 1u) == 0u);
 
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);

@@ -137,7 +137,7 @@ void illegal_op_int()
 
 void illegal_dvr_bop IFN0()
 {
-#if !defined(NTVDM) && !defined(SOFTPC_STANDALONE)
+#ifndef NTVDM
 	sys_addr bop_addr;
 	CHAR buf[256];
 

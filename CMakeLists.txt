@@ -260,6 +260,8 @@ add_dependencies(softpc-ccpu-core softpc-ccpu-port-abi-inputs)
 # Controllers, firmware and the standalone host boundary evolve independently
 # of the CCPU/C-VIDC executor.  Keep them in a separate object target so a
 # recovered original device does not force recompilation of the full executor.
+set_source_files_properties(src/core/softpc/base/system/illegalp.c PROPERTIES
+    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/illegalp")
 add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/support/ios.c
     src/core/softpc/base/system/ica.c
