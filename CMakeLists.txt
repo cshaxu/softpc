@@ -558,6 +558,19 @@ target_include_directories(softpc-runtime-smoke PRIVATE src/vm)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
 set_tests_properties(softpc-runtime-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-win32-window-smoke
+    tests/softpc_win32_window_smoke.c
+    src/vm/runtime.c
+    src/vm/win32_keyboard.c
+    src/vm/win32_window.c)
+target_link_libraries(softpc-win32-window-smoke PRIVATE softpc-machine)
+if(WIN32)
+    target_link_libraries(softpc-win32-window-smoke PRIVATE user32 gdi32)
+endif()
+target_include_directories(softpc-win32-window-smoke PRIVATE src/vm)
+add_test(NAME softpc-win32-window-smoke COMMAND softpc-win32-window-smoke)
+set_tests_properties(softpc-win32-window-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-runtime-boot-smoke
     tests/softpc_runtime_boot_smoke.c
     src/vm/runtime.c
@@ -597,6 +610,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-real-boot-smoke
     softpc-lifecycle-smoke
     softpc-runtime-smoke
+    softpc-win32-window-smoke
     softpc-runtime-boot-smoke
     softpc-win32-keyboard-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)

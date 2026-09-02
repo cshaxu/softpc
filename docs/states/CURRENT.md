@@ -61,3 +61,5 @@ width-specific launchers reach the monitor without arguments; see
 Graphics snapshots now consume the original renderer dirty signal before
 copying a full DIB, keeping static graphics from consuming executor time; see
 [M5 original dirty-frame publication evidence](../etc/evidence/m5-original-dirty-frame-publication.md).
+The actual Win32 window now has a proved close-to-runtime-stop lifecycle;
+see [M5 Win32 window lifecycle evidence](../etc/evidence/m5-win32-window-lifecycle.md).

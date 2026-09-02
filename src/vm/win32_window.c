@@ -249,6 +249,8 @@ int softpc_vm_run_window(softpc_runtime *runtime)
     DeleteDC(softpc_window_text_dc); DeleteObject(softpc_window_text_bitmap);
     DeleteObject(softpc_window_font); free(softpc_window_frame);
     softpc_window_frame = NULL; softpc_window_runtime = NULL;
+    if (softpc_window_result == SOFTPC_VM_FRONTEND_STOPPED)
+        (void)softpc_runtime_stop(runtime);
     return softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_ERROR ?
         SOFTPC_VM_FRONTEND_ERROR : softpc_window_result;
 }
