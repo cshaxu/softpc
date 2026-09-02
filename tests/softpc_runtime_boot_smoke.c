@@ -142,6 +142,8 @@ static int run_halted_keyboard_probe(void)
     softpc_runtime_frame frame;
     uint32_t sequence_before = 0u;
     uint32_t sequence_after = 0u;
+    DWORD key_queued_at = 0u;
+    DWORD key_delivered_at = 0u;
     int success = 0;
 
     /* The probe owns IRQ1 rather than relying on whatever the boot ROM put
@@ -193,13 +195,21 @@ static int run_halted_keyboard_probe(void)
     memset(&frame, 0, sizeof(frame));
     if (softpc_runtime_copy_frame(runtime, &frame))
         sequence_before = frame.sequence;
+    key_queued_at = GetTickCount();
     if (!softpc_runtime_enqueue_key(runtime, 31u, 0u)) goto done;
     deadline = GetTickCount() + 3000u;
     do {
         if (softpc_machine_read_physical(machine, 0x500u, &marker,
                 sizeof(marker)) == SOFTPC_MACHINE_OK && marker == 0xa5u) {
+            key_delivered_at = GetTickCount();
             (void)softpc_runtime_enqueue_key(runtime, 31u, 1u);
-            success = 1;
+            /* This is the whole outer input path: queue, wake, original
+               8042/PIC delivery and the CCPU HLT return.  It must not be
+               deferred to the 50 ms timer heartbeat or a frontend repaint. */
+            success = (DWORD)(key_delivered_at - key_queued_at) <= 250u;
+            if (!success)
+                fprintf(stderr, "halted keyboard probe: delivery took %lu ms\n",
+                    (unsigned long)(key_delivered_at - key_queued_at));
             break;
         }
         Sleep(10u);

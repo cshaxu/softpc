@@ -42,10 +42,23 @@ int main(void)
     HANDLE thread;
     HWND window = NULL;
     DWORD deadline;
+    DWORD key_queued_at;
+    uint8_t ready = 0u;
+    uint8_t marker = 0u;
+    static const unsigned char program[] = {
+        0xfau, 0x31u, 0xc0u, 0x8eu, 0xd8u,
+        0xc6u, 0x06u, 0x01u, 0x05u, 0x55u,
+        /* IVT[9] = CS:7c21; IRQ1 records delivery and acknowledges PIC. */
+        0xb8u, 0x21u, 0x7cu, 0xa3u, 0x24u, 0x00u,
+        0x0eu, 0x58u, 0xa3u, 0x26u, 0x00u,
+        0xfbu, 0x90u, 0xf4u,
+        0xebu, 0xfdu,
+        0xc6u, 0x06u, 0x00u, 0x05u, 0xa5u,
+        0xb0u, 0x20u, 0xe6u, 0x20u, 0xcfu
+    };
 
     options.media_mode = SOFTPC_MEDIA_OVERLAY;
-    sector[0] = 0xebu;
-    sector[1] = 0xfeu;
+    memcpy(sector, program, sizeof(program));
     sector[510] = 0x55u;
     sector[511] = 0xaau;
     file = fopen(path, "wb");
@@ -75,6 +88,29 @@ int main(void)
         assert(client.right - client.left == 640);
         assert(client.bottom - client.top == 400);
     }
+    /* Do not merely assert that PostMessage succeeds.  This guest stops at
+       HLT until the exact Win32-keyboard-normalizer -> runtime queue ->
+       original 8042/PIC/CCPU path delivers IRQ1. */
+    deadline = GetTickCount() + 5000u;
+    do {
+        assert(softpc_machine_read_physical(machine, 0x501u, &ready,
+            sizeof(ready)) == SOFTPC_MACHINE_OK);
+        if (ready == 0x55u) break;
+        Sleep(1u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    assert(ready == 0x55u);
+    key_queued_at = GetTickCount();
+    assert(PostMessageA(window, WM_KEYDOWN, 'S', 0x001f0001L));
+    deadline = key_queued_at + 250u;
+    do {
+        assert(softpc_machine_read_physical(machine, 0x500u, &marker,
+            sizeof(marker)) == SOFTPC_MACHINE_OK);
+        if (marker == 0xa5u) break;
+        Sleep(1u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    assert(marker == 0xa5u);
+    assert((DWORD)(GetTickCount() - key_queued_at) <= 250u);
+    assert(PostMessageA(window, WM_KEYUP, 'S', 0xc01f0001L));
     assert(PostMessageA(window, WM_CLOSE, 0u, 0));
     assert(WaitForSingleObject(thread, 5000u) == WAIT_OBJECT_0);
     assert(context.result == SOFTPC_VM_FRONTEND_STOPPED);

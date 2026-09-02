@@ -67,6 +67,9 @@ Its client rectangle follows the NXVM sizing rule and contains no frontend
 display margin.
 Window text now uses the currently loaded original EGA/VGA font plane rather
 than a host font; see [M5 original font presentation evidence](../etc/evidence/m5-original-font-presentation.md).
+The independent runtime and actual Win32 window input routes now each have a
+bounded original IRQ1 delivery probe, including the real configured A:+C:
+Setup route on both widths; see [M5 outer input latency evidence](../etc/evidence/m5-outer-input-latency.md).
 All audited controller and firmware sources are now restored to the selected
 original code. The independent build may supply narrowly scoped generated
 port-ABI copies for host-width and host-queue boundaries; the restoration
