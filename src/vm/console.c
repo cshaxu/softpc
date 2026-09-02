@@ -1,10 +1,9 @@
 #include "console.h"
+#include "win32_keyboard.h"
 
 #ifdef _WIN32
 #include <windows.h>
 #include <string.h>
-
-extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 
 #define SOFTPC_TEXT_COLUMNS 80u
 #define SOFTPC_TEXT_ROWS 25u
@@ -66,90 +65,36 @@ static void softpc_console_close(HANDLE input, HANDLE output,
     if (private_console) FreeConsole();
 }
 
-static int softpc_console_deliver_virtual_key(softpc_runtime *runtime,
-    WORD virtual_key, DWORD control_state, int released)
+static int softpc_console_keyboard_sink(void *context, uint8_t key_number,
+    uint8_t released)
 {
-    KEY_EVENT_RECORD event;
-    BYTE key_number;
-    UINT scan_code;
-    ZeroMemory(&event, sizeof(event));
-    scan_code = MapVirtualKeyW(virtual_key, MAPVK_VK_TO_VSC);
-    if (scan_code == 0u) return -1;
-    event.wVirtualKeyCode = virtual_key;
-    event.wVirtualScanCode = (WORD)(scan_code & 0xffu);
-    event.dwControlKeyState = control_state;
-    key_number = KeyMsgToKeyCode(&event);
-    if (key_number == 0u) return -1;
-    return softpc_runtime_enqueue_key(runtime, key_number, (uint8_t)released) ?
-        -1 : SOFTPC_VM_FRONTEND_ERROR;
+    return softpc_runtime_enqueue_key((softpc_runtime *)context, key_number,
+        released);
 }
 
-static int softpc_console_deliver_unicode(softpc_runtime *runtime,
-    WCHAR character)
+static int softpc_console_key(softpc_runtime *runtime,
+    softpc_win32_keyboard_normalizer *normalizer,
+    const KEY_EVENT_RECORD *key)
 {
-    SHORT translated = VkKeyScanW(character);
-    BYTE modifiers;
-    int action;
-    if (translated == -1) return -2;
-    modifiers = HIBYTE(translated);
-    /* Mobile RDP keyboards commonly supply character packets instead of a
-       key-down/key-up pair. Synthesize one complete physical sequence so
-       modifiers cannot remain stuck when the matching packet has no key-up. */
-    if ((modifiers & 1u) != 0u && (action = softpc_console_deliver_virtual_key(
-            runtime, VK_SHIFT, 0u, 0)) >= 0) return action;
-    if ((modifiers & 2u) != 0u && (action = softpc_console_deliver_virtual_key(
-            runtime, VK_CONTROL, 0u, 0)) >= 0) return action;
-    if ((modifiers & 4u) != 0u && (action = softpc_console_deliver_virtual_key(
-            runtime, VK_MENU, 0u, 0)) >= 0) return action;
-    if ((action = softpc_console_deliver_virtual_key(runtime,
-            LOBYTE(translated), 0u, 0)) >= 0) return action;
-    if ((action = softpc_console_deliver_virtual_key(runtime,
-            LOBYTE(translated), 0u, 1)) >= 0) return action;
-    if ((modifiers & 4u) != 0u && (action = softpc_console_deliver_virtual_key(
-            runtime, VK_MENU, 0u, 1)) >= 0) return action;
-    if ((modifiers & 2u) != 0u && (action = softpc_console_deliver_virtual_key(
-            runtime, VK_CONTROL, 0u, 1)) >= 0) return action;
-    if ((modifiers & 1u) != 0u) return softpc_console_deliver_virtual_key(
-        runtime, VK_SHIFT, 0u, 1);
-    return -1;
-}
-
-static int softpc_console_key(softpc_runtime *runtime, const KEY_EVENT_RECORD *key)
-{
-    KEY_EVENT_RECORD event;
-    BYTE key_number;
     if (key->bKeyDown && key->wVirtualKeyCode == 'P' &&
         (key->dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
         (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)))
         return SOFTPC_VM_FRONTEND_PAUSED;
     if (key->bKeyDown && key->wVirtualKeyCode == VK_ESCAPE)
         return SOFTPC_VM_FRONTEND_STOPPED;
-    event = *key;
-    key_number = KeyMsgToKeyCode(&event);
-    /* Some RDP console transports preserve wVirtualKeyCode but omit the
-       physical scan code required by the original nt_keycd tables. Recover
-       that host detail through the Win32 keyboard layout, then retain the
-       original SoftPC key-number translation and 8042 path. */
-    if (key_number == 0u && key->bKeyDown && event.uChar.UnicodeChar != 0u) {
-        int action = softpc_console_deliver_unicode(runtime,
-            event.uChar.UnicodeChar);
-        if (action >= 0) return action;
-        if (action == -1) return -1;
+    /* RDP soft keyboards may report UTF-16 text without a physical scan.
+       The shared normalizer produces a complete host-layout sequence, then
+       the original nt_keycd table and 8042 ingress handle it normally. */
+    if (key->wVirtualScanCode == 0u && key->bKeyDown &&
+        key->uChar.UnicodeChar != 0u) {
+        (void)softpc_win32_keyboard_submit_utf16(normalizer, runtime,
+            softpc_console_keyboard_sink, key->uChar.UnicodeChar);
+    } else {
+        (void)softpc_win32_keyboard_submit_transition(runtime,
+            softpc_console_keyboard_sink, key->wVirtualScanCode,
+            key->wVirtualKeyCode, key->dwControlKeyState, key->bKeyDown != 0);
     }
-    if (key_number == 0u && event.wVirtualKeyCode != 0u) {
-        UINT scan_code = MapVirtualKeyW(event.wVirtualKeyCode,
-            MAPVK_VK_TO_VSC);
-        if (scan_code != 0u) {
-            event.wVirtualScanCode = (WORD)(scan_code & 0xffu);
-            key_number = KeyMsgToKeyCode(&event);
-        }
-    }
-    /* A console can report layout/dead-key and focus records that have no
-       original SoftPC key number. They are not a monitor stop request. */
-    if (key_number == 0u) return -1;
-    return softpc_runtime_enqueue_key(runtime, key_number,
-        (uint8_t)!key->bKeyDown) ? -1 :
-        SOFTPC_VM_FRONTEND_ERROR;
+    return -1;
 }
 
 static void softpc_console_paint(HANDLE output,
@@ -188,6 +133,7 @@ int softpc_vm_run_console(softpc_runtime *runtime)
     unsigned char previous[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
     softpc_runtime_frame *frame;
     uint32_t displayed_sequence = 0u;
+    softpc_win32_keyboard_normalizer keyboard_normalizer = { 0 };
     int running = 1;
     int result = SOFTPC_VM_FRONTEND_STOPPED;
     int private_console;
@@ -215,7 +161,7 @@ int softpc_vm_run_console(softpc_runtime *runtime)
                 break;
             }
             int action = record.EventType == KEY_EVENT ? softpc_console_key(
-                runtime, &record.Event.KeyEvent) : -1;
+                runtime, &keyboard_normalizer, &record.Event.KeyEvent) : -1;
             if (action >= 0) {
                 result = action;
                 running = 0;

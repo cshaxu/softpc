@@ -46,3 +46,6 @@ The first S5 outer-shell repair removes redundant full-frame copies and
 repaints while retaining the original renderer path; its scope and remaining
 interactive acceptance work are in
 [M5 outer frame-cadence evidence](../etc/evidence/m5-outer-frame-cadence.md).
+Console and window now share one thin Win32/RDP packet normalizer while
+retaining original SoftPC key translation and controller ownership; see
+[M5 shared input-normalizer evidence](../etc/evidence/m5-win32-input-normalizer.md).

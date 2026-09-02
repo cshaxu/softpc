@@ -408,6 +408,7 @@ add_executable(softpcvm
     src/vm/main.c
     src/vm/console.c
     src/vm/runtime.c
+    src/vm/win32_keyboard.c
     src/vm/win32_window.c
     src/vm/softpc_firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
@@ -550,7 +551,8 @@ set_tests_properties(softpc-lifecycle-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-runtime-smoke
     tests/softpc_runtime_smoke.c
-    src/vm/runtime.c)
+    src/vm/runtime.c
+    src/vm/win32_keyboard.c)
 target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-runtime-smoke PRIVATE src/vm)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
@@ -558,9 +560,18 @@ set_tests_properties(softpc-runtime-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-runtime-boot-smoke
     tests/softpc_runtime_boot_smoke.c
-    src/vm/runtime.c)
+    src/vm/runtime.c
+    src/vm/win32_keyboard.c)
 target_link_libraries(softpc-runtime-boot-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-runtime-boot-smoke PRIVATE src/vm)
+add_executable(softpc-win32-keyboard-smoke
+    tests/softpc_win32_keyboard_smoke.c
+    src/vm/win32_keyboard.c)
+target_link_libraries(softpc-win32-keyboard-smoke PRIVATE softpc-machine)
+target_include_directories(softpc-win32-keyboard-smoke PRIVATE src/vm)
+add_test(NAME softpc-win32-keyboard-smoke COMMAND softpc-win32-keyboard-smoke)
+set_tests_properties(softpc-win32-keyboard-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tests/standalone_source_boundary.cmake")
@@ -586,7 +597,8 @@ set(SOFTPC_TEST_TARGETS
     softpc-real-boot-smoke
     softpc-lifecycle-smoke
     softpc-runtime-smoke
-    softpc-runtime-boot-smoke)
+    softpc-runtime-boot-smoke
+    softpc-win32-keyboard-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
     # Keep every executable test self-contained, just like the launcher.

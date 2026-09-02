@@ -2,12 +2,11 @@
 
 #ifdef _WIN32
 #include "runtime.h"
+#include "win32_keyboard.h"
 
 #include <windows.h>
 #include <stdlib.h>
 #include <string.h>
-
-extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 
 #define SOFTPC_TEXT_COLUMNS 80
 #define SOFTPC_TEXT_ROWS 25
@@ -28,7 +27,7 @@ static unsigned short softpc_window_presented_attributes[SOFTPC_TEXT_COLUMNS * S
 static int softpc_window_presented_text_valid;
 static uint32_t softpc_window_displayed_sequence;
 static int softpc_window_result;
-static int softpc_window_keydown_delivered;
+static softpc_win32_keyboard_normalizer softpc_window_keyboard_normalizer;
 static int softpc_window_mouse_x;
 static int softpc_window_mouse_y;
 static int softpc_window_mouse_valid;
@@ -104,40 +103,27 @@ static void softpc_window_paint(HDC dc)
         softpc_window_text_dc, 0, 0, SRCCOPY);
 }
 
-static void softpc_window_enqueue_key(WPARAM key, LPARAM lparam, int released)
+static int softpc_window_keyboard_sink(void *context, uint8_t key_number,
+    uint8_t released)
 {
-    KEY_EVENT_RECORD event;
-    BYTE key_number;
-    ZeroMemory(&event, sizeof(event));
-    event.wVirtualKeyCode = (WORD)key;
-    event.wVirtualScanCode = (WORD)((lparam >> 16) & 0xffu);
-    if ((lparam & 0x01000000L) != 0) event.dwControlKeyState = ENHANCED_KEY;
-    key_number = KeyMsgToKeyCode(&event);
-    if (key_number == 0u && event.wVirtualKeyCode != 0u) {
-        UINT scan = MapVirtualKeyW(event.wVirtualKeyCode, MAPVK_VK_TO_VSC);
-        event.wVirtualScanCode = (WORD)(scan & 0xffu);
-        key_number = KeyMsgToKeyCode(&event);
-    }
-    if (key_number != 0u)
-        (void)softpc_runtime_enqueue_key(softpc_window_runtime, key_number,
-            (uint8_t)released);
+    (void)context;
+    return softpc_runtime_enqueue_key(softpc_window_runtime, key_number,
+        released);
 }
 
-static void softpc_window_char(WCHAR character)
+static void softpc_window_transition(WPARAM key, LPARAM lparam, int released)
 {
-    SHORT translated = VkKeyScanW(character);
-    KEY_EVENT_RECORD event;
-    BYTE key_number;
-    if (translated == -1) return;
-    ZeroMemory(&event, sizeof(event));
-    event.wVirtualKeyCode = LOBYTE(translated);
-    event.wVirtualScanCode = (WORD)MapVirtualKeyW(event.wVirtualKeyCode,
-        MAPVK_VK_TO_VSC);
-    key_number = KeyMsgToKeyCode(&event);
-    if (key_number != 0u) {
-        (void)softpc_runtime_enqueue_key(softpc_window_runtime, key_number, 0u);
-        (void)softpc_runtime_enqueue_key(softpc_window_runtime, key_number, 1u);
-    }
+    WORD scan = (WORD)((lparam >> 16) & 0xffu);
+    DWORD control_state = (lparam & 0x01000000L) != 0 ? ENHANCED_KEY : 0u;
+    if (scan == 0u && !released)
+        softpc_win32_keyboard_note_recovered_key(
+            &softpc_window_keyboard_normalizer, (WORD)key);
+    if (scan == 0u && released)
+        softpc_win32_keyboard_release_recovered_key(
+            &softpc_window_keyboard_normalizer, (WORD)key);
+    (void)softpc_win32_keyboard_submit_transition(NULL,
+        softpc_window_keyboard_sink, scan, (WORD)key, control_state,
+        !released);
 }
 
 static void softpc_window_mouse(LPARAM position)
@@ -188,14 +174,20 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
             softpc_window_result = SOFTPC_VM_FRONTEND_STOPPED;
             (void)softpc_runtime_stop(softpc_window_runtime);
             DestroyWindow(window);
-        } else { softpc_window_keydown_delivered = 1; softpc_window_enqueue_key(wparam, lparam, 0); }
+        } else softpc_window_transition(wparam, lparam, 0);
         return 0;
     case WM_KEYUP:
-    case WM_SYSKEYUP: softpc_window_enqueue_key(wparam, lparam, 1); return 0;
+    case WM_SYSKEYUP: softpc_window_transition(wparam, lparam, 1); return 0;
     case WM_CHAR:
-        if (!softpc_window_keydown_delivered && wparam >= 0x20u && wparam != 0x7fu)
-            softpc_window_char((WCHAR)wparam);
-        softpc_window_keydown_delivered = 0;
+        /* A physical WM_KEYDOWN has already been delivered.  A scan-less
+           RDP text packet is normalized only when it is not that recovered
+           physical key's duplicate character. */
+        if (((uint32_t)lparam >> 16u & 0xffu) == 0u &&
+            !softpc_win32_keyboard_consume_duplicate_character(
+                &softpc_window_keyboard_normalizer, (WORD)wparam))
+            (void)softpc_win32_keyboard_submit_utf16(
+                &softpc_window_keyboard_normalizer, NULL,
+                softpc_window_keyboard_sink, (WORD)wparam);
         return 0;
     case WM_MOUSEMOVE: softpc_window_mouse(lparam); return 0;
     case WM_LBUTTONDOWN: softpc_window_left_button = 1; SetCapture(window); softpc_window_mouse(lparam); return 0;
@@ -228,6 +220,8 @@ int softpc_vm_run_window(softpc_runtime *runtime)
     softpc_window_result = SOFTPC_VM_FRONTEND_STOPPED;
     softpc_window_presented_text_valid = 0;
     softpc_window_displayed_sequence = 0u;
+    ZeroMemory(&softpc_window_keyboard_normalizer,
+        sizeof(softpc_window_keyboard_normalizer));
     softpc_window_mouse_valid = 0;
     softpc_window_left_button = softpc_window_right_button = 0;
     softpc_window_font = CreateFontA(16, 8, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
