@@ -536,6 +536,11 @@ target_include_directories(softpc-dual-media-smoke PRIVATE
 add_test(NAME softpc-dual-media-smoke COMMAND softpc-dual-media-smoke)
 set_tests_properties(softpc-dual-media-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-partition-image-smoke tests/softpc_partition_image_smoke.c)
+target_link_libraries(softpc-partition-image-smoke PRIVATE softpc-machine)
+add_test(NAME softpc-partition-image-smoke COMMAND softpc-partition-image-smoke)
+set_tests_properties(softpc-partition-image-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-irq-smoke tests/softpc_irq_smoke.c)
 target_link_libraries(softpc-irq-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-irq-smoke PRIVATE
@@ -684,6 +689,7 @@ set_tests_properties(softpcvm-reject-arguments PROPERTIES WILL_FAIL TRUE)
 set(SOFTPC_TEST_TARGETS
     softpc-machine-smoke
     softpc-dual-media-smoke
+    softpc-partition-image-smoke
     softpc-irq-smoke
     softpc-fdc-smoke
     softpc-printer-smoke

@@ -20,3 +20,5 @@ active work, architecture, or queue order.
   pristine-source audit row to an extraction route and next owner.
 - `evidence/m7-t1-original-media-host-audit.md` records the symbol-level
   disposition of the original OpenNT raw-media host candidates.
+- `evidence/m7-t2-single-image-partitions.md` records the guest INT 13h proof
+  that one raw fixed-disk image carries guest-owned partition metadata.
