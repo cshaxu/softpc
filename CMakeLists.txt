@@ -326,6 +326,14 @@ add_library(softpc-machine-devices OBJECT
     "${SOFTPC_TIMER_SOURCE}"
     src/core/softpc/base/system/timestrb.c
     src/core/softpc/base/system/unexp_nt.c
+    src/core/softpc/xms.486/xms.c
+    src/core/softpc/xms.486/xmsa20.c
+    src/core/softpc/xms.486/xmsblock.c
+    src/core/softpc/xms.486/xmsdisp.c
+    src/core/softpc/xms.486/xmsmisc.c
+    src/core/softpc/xms.486/xmsumb.c
+    src/core/softpc/suballoc/suballoc.c
+    src/core/softpc_xms_host.c
     src/core/softpc/base/support/time_day.c
     src/core/softpc/base/bios/cmos_bis.c
     src/core/softpc/base/bios/build_id.c
@@ -387,6 +395,31 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc_gfi_image.c
     src/core/softpc_standalone_platform.c)
 add_dependencies(softpc-machine-devices softpc-ccpu-port-abi-inputs)
+target_include_directories(softpc-machine-devices PRIVATE
+    src/core/softpc/xms.486
+    src/core/softpc/suballoc
+    src/core/softpc-port-abi/xms)
+set_source_files_properties(src/core/softpc/xms.486/xms.h
+    src/core/softpc/xms.486/xms.c
+    src/core/softpc/xms.486/xmsa20.c
+    src/core/softpc/xms.486/xmsblock.c
+    src/core/softpc/xms.486/xmsdisp.c
+    src/core/softpc/xms.486/xmsmisc.c
+    src/core/softpc/xms.486/xmsumb.c
+    src/core/softpc/suballoc/suballoc.c
+    src/core/softpc_xms_host.c PROPERTIES
+    COMPILE_DEFINITIONS "SOFTPC_STANDALONE=1")
+set_source_files_properties(src/core/softpc/xms.486/xms.c PROPERTIES
+    COMPILE_DEFINITIONS "SOFTPC_STANDALONE=1;i386=1")
+set_source_files_properties(src/core/softpc/xms.486/xms.c
+    src/core/softpc/xms.486/xmsa20.c
+    src/core/softpc/xms.486/xmsblock.c
+    src/core/softpc/xms.486/xmsdisp.c
+    src/core/softpc/xms.486/xmsmisc.c
+    src/core/softpc/xms.486/xmsumb.c
+    src/core/softpc/suballoc/suballoc.c
+    src/core/softpc_xms_host.c PROPERTIES
+    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/xms")
 set_target_properties(softpc-ccpu-core PROPERTIES
     C_STANDARD 90
     C_EXTENSIONS ON)

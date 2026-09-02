@@ -31,6 +31,8 @@ extern int softpc_platform_write_physical(unsigned long address,
 extern int softpc_platform_read_physical(unsigned long address,
     unsigned char *bytes, unsigned long length);
 extern void softpc_device_bop_register_machine_services(void);
+extern unsigned long xmsMemorySize;
+extern int XMSInit(int argc, char *argv[]);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
 extern int softpc_platform_keyboard_key(int key, int released);
 extern void softpc_platform_request_executor_wake(void);
@@ -70,6 +72,7 @@ struct softpc_machine {
     unsigned long memory_bytes;
     int reset;
     int hardware_initialized;
+    int xms_initialized;
     int cpu_initialized;
     int mouse_driver_initialized;
     char floppy_path[SOFTPC_MEDIA_PATH_MAX];
@@ -125,6 +128,15 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     softpc_ccpu_lifecycle_clear_exit();
     if (!machine->hardware_initialized) {
         sas_init(machine->memory_bytes);
+        /* xms.486 owns allocation bookkeeping and A20 state.  The standalone
+           host merely gives it the already allocated guest RAM range; there
+           is no VDM virtual-memory mapping or DOS service here. */
+        if (machine->memory_bytes > SOFTPC_MINIMUM_RAM_BYTES) {
+            xmsMemorySize = (machine->memory_bytes -
+                SOFTPC_MINIMUM_RAM_BYTES) / 1024u;
+            if (!XMSInit(0, NULL)) return SOFTPC_MACHINE_IO_ERROR;
+            machine->xms_initialized = 1;
+        }
         softpc_device_bop_register_machine_services();
         gfi_init();
         if (setup_global_data_ptr() == NULL)

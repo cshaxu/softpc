@@ -39,6 +39,32 @@ static int frame_has_prompt(const softpc_runtime_frame *frame)
     return 0;
 }
 
+/* Runtime frames are host-owned copies.  Reading this snapshot therefore
+   exercises the standalone presentation boundary without racing the original
+   renderer or its CCPU executor. */
+static int graphics_frame_has_visible_pixel(const softpc_runtime_frame *frame)
+{
+    const BITMAPINFO *dib;
+    uint32_t stride;
+    uint32_t row;
+
+    if (frame == NULL || frame->graphics == 0u || frame->dib_width == 0u ||
+        frame->dib_height == 0u || frame->dib_width > SOFTPC_RUNTIME_DIB_MAX_WIDTH ||
+        frame->dib_height > SOFTPC_RUNTIME_DIB_MAX_HEIGHT) return 0;
+    dib = (const BITMAPINFO *)frame->dib_info;
+    stride = (frame->dib_width + 3u) & ~3u;
+    for (row = 0u; row < frame->dib_height; ++row) {
+        uint32_t column;
+        for (column = 0u; column < frame->dib_width; ++column) {
+            unsigned char index = frame->dib_bits[row * stride + column];
+            const RGBQUAD *colour = &dib->bmiColors[index];
+            if (colour->rgbRed != 0u || colour->rgbGreen != 0u ||
+                colour->rgbBlue != 0u) return 1;
+        }
+    }
+    return 0;
+}
+
 static void send_enter(softpc_runtime *runtime)
 {
     (void)softpc_runtime_enqueue_key(runtime, 0x1cu, 0u);
@@ -240,7 +266,10 @@ int main(int argc, char **argv)
     softpc_runtime_frame *frame = NULL;
     DWORD deadline;
     int date_sent = 0, time_sent = 0, input_stage = 0, success = 0;
-    int windows_setup = 0, setup_command_sent = 0;
+    int overlay = 0, windows_setup = 0, setup_command_sent = 0;
+    int setup_enter_stage = 0;
+    int setup_enter_release_sent = 0;
+    DWORD setup_enter_make_at = 0u;
     int final_state = SOFTPC_RUNTIME_ERROR;
     int argument;
     if (!run_halted_keyboard_probe()) {
@@ -250,10 +279,15 @@ int main(int argc, char **argv)
     if (argc < 5 || strcmp(argv[1], "--floppy") != 0 ||
         strcmp(argv[3], "--hdd") != 0) return 2;
     for (argument = 5; argument < argc; ++argument) {
-        if (strcmp(argv[argument], "--windows-setup") == 0 && !windows_setup) {
+        if (strcmp(argv[argument], "--overlay") == 0 && !overlay) {
+            overlay = 1;
+        } else if (strcmp(argv[argument], "--windows-setup") == 0 && !windows_setup) {
             windows_setup = 1;
         } else return 2;
     }
+    /* This probe is intentionally media-safe: unlike the launcher it has no
+       direct-media option, and its real image runs require explicit overlay. */
+    if (!overlay) return 2;
     options.floppy_path = argv[2];
     options.hard_disk_path = argv[4];
     options.media_mode = SOFTPC_MEDIA_OVERLAY;
@@ -267,11 +301,62 @@ int main(int argc, char **argv)
        shutdown work if the guest does not reach the prompt. */
     deadline = GetTickCount() + (windows_setup ? 60000u : 20000u);
     do {
+        if (windows_setup && setup_enter_stage != 0 &&
+            !setup_enter_release_sent &&
+            (DWORD)(GetTickCount() - setup_enter_make_at) >= 100u) {
+            if (!enqueue_virtual_key(runtime, VK_RETURN, 0u, 1u)) break;
+            setup_enter_release_sent = 1;
+        }
         if (softpc_runtime_copy_frame(runtime, frame)) {
-            if (windows_setup && setup_command_sent && frame->graphics == 0u &&
-                frame_contains(frame, "Welcome to Setup.")) {
-                success = 1;
-                break;
+            if (windows_setup && setup_command_sent) {
+                if (frame->graphics != 0u) {
+                    if (setup_enter_stage >= 4 &&
+                        graphics_frame_has_visible_pixel(frame)) {
+                        success = 1;
+                        break;
+                    }
+                    goto next_frame;
+                }
+                if (frame_contains(frame, "Welcome to Setup.")) {
+                    if (setup_enter_stage == 0) {
+                        /* Model the separate make/break messages received by
+                           the console/window. Feeding both into one 8042
+                           service turn can collapse this real Setup key. */
+                        if (!enqueue_virtual_key(runtime, VK_RETURN, 0u, 0u))
+                            break;
+                        setup_enter_make_at = GetTickCount();
+                        setup_enter_stage = 1;
+                        setup_enter_release_sent = 0;
+                    }
+                    goto next_frame;
+                }
+                if (setup_enter_stage == 1 && setup_enter_release_sent &&
+                    frame_contains(frame, "To use Express Setup, press ENTER.")) {
+                    if (!enqueue_virtual_key(runtime, VK_RETURN, 0u, 0u))
+                        break;
+                    setup_enter_make_at = GetTickCount();
+                    setup_enter_stage = 2;
+                    setup_enter_release_sent = 0;
+                    goto next_frame;
+                }
+                if (setup_enter_stage == 2 && setup_enter_release_sent &&
+                    frame_contains(frame, "To upgrade, press ENTER.")) {
+                    if (!enqueue_virtual_key(runtime, VK_RETURN, 0u, 0u))
+                        break;
+                    setup_enter_make_at = GetTickCount();
+                    setup_enter_stage = 3;
+                    setup_enter_release_sent = 0;
+                    goto next_frame;
+                }
+                if (setup_enter_stage == 3 && setup_enter_release_sent &&
+                    frame_contains(frame, "To have Setup perform an upgrade")) {
+                    if (!enqueue_virtual_key(runtime, VK_RETURN, 0u, 0u))
+                        break;
+                    setup_enter_make_at = GetTickCount();
+                    setup_enter_stage = 4;
+                    setup_enter_release_sent = 0;
+                    goto next_frame;
+                }
             }
             if (frame->graphics != 0u) goto next_frame;
             if (!date_sent && frame_contains(frame, "Enter new date")) {
@@ -329,7 +414,8 @@ done:
     softpc_machine_destroy(machine);
     if (!success)
         fprintf(stderr, "softpc-runtime-boot-smoke: %s not reached (state=%d)\n",
-            windows_setup ? "Windows Setup" : "prompt", final_state);
+            windows_setup ? "Windows Setup graphics after Welcome" : "prompt",
+            final_state);
     return success ? 0 : 1;
 }
 #else

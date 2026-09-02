@@ -24,12 +24,16 @@ enum {
 extern IBOOL softpc_device_bop_dispatch(IU8 number, IU32 argument);
 extern void c_setAL(IU8 value);
 extern void c_setAH(IU8 value);
+extern void c_setAX(IU16 value);
 extern void c_setCX(IU16 value);
 extern void c_setDX(IU16 value);
 extern void c_setCF(IU8 value);
+extern void c_setCS(IU16 value);
+extern void c_setIP(IU16 value);
 extern ISM32 c_setDS(IU16 value);
 extern IU16 c_getAX(void);
 extern IU16 c_getBX(void);
+extern IU16 c_getIP(void);
 extern IU16 c_getSTATUS(void);
 extern void reset(void);
 extern void keyboard_int(void);
@@ -49,6 +53,16 @@ extern void bootstrap1(void);
 extern void bootstrap2(void);
 extern void bootstrap3(void);
 extern void illegal_dvr_bop(void);
+
+static void invoke_xms_bop(softpc_machine *machine, unsigned char service)
+{
+    assert(softpc_machine_write_physical(machine, 0x0600u, &service,
+        sizeof(service)) == SOFTPC_MACHINE_OK);
+    c_setCS(0u);
+    c_setIP(0x0600u);
+    assert(softpc_device_bop_dispatch(0x52u, 0u) == TRUE);
+    assert(c_getIP() == 0x0601u);
+}
 
 static void make_boot_disk(const char *path)
 {
@@ -99,6 +113,7 @@ int main(void)
     assert(BIOS[BIOS_BOOT_STRAP] != NULL);
     assert(BIOS[BIOS_MOUSE_INSTALL1] != NULL);
     assert(BIOS[BIOS_MOUSE_VIDEO_IO] != NULL);
+    assert(BIOS[0x52] != NULL); /* original XMS BOP */
 
     /* The fixed-profile BOP table must remain a direct routing table to the
        original machine code.  A wrapper at any of these slots would be a
@@ -121,6 +136,22 @@ int main(void)
     assert(BIOS[0x90] == bootstrap1);
     assert(BIOS[0x91] == bootstrap2);
     assert(BIOS[0x92] == bootstrap3);
+
+    /* XMS is a machine resident service, reached through the original
+       BOP 52h byte-selector contract.  It must report the guest's 15 MiB of
+       extended RAM and allocate from that physical range without NTVDM. */
+    invoke_xms_bop(machine, 0x05u);
+    assert(c_getAX() == 15360u);
+    c_setDX(1024u);
+    invoke_xms_bop(machine, 0x02u);
+    assert(c_getAX() != 0u);
+    {
+        IU16 xms_base = c_getAX();
+        c_setAX(xms_base);
+        c_setDX(1024u);
+        invoke_xms_bop(machine, 0x03u);
+        assert(c_getAX() == 1u);
+    }
 
     /* BOP 01 is the original BIOS dummy interrupt, not a product service. */
     assert(softpc_device_bop_dispatch(BIOS_DUMMY_INT, 0u) == TRUE);
@@ -246,6 +277,8 @@ int main(void)
     assert(softpc_device_bop_dispatch(0x2bu, 0u) == FALSE); /* DOS command */
     assert(softpc_device_bop_dispatch(0x30u, 0u) == FALSE); /* DPMI */
     assert(softpc_device_bop_dispatch(0x50u, 0u) == FALSE); /* NTVDM reserved */
+    invoke_xms_bop(machine, 0x05u); /* XMS only */
+    assert(c_getAX() == 15360u);
     assert(softpc_device_bop_dispatch(0x78u, 0u) == FALSE); /* WORM service */
     assert(softpc_device_bop_dispatch(0x79u, 0u) == FALSE); /* WORM service */
 

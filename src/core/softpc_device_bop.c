@@ -2,8 +2,19 @@
 #include "host_def.h"
 #include "bios.h"
 #include "tape_io.h"
+#include "sas.h"
+#include "xmsexp.h"
 #include TypesH
 #include CpuH
+
+/* Original nt_bop.c's MS_bop_2 is the XMS entry.  The standalone port keeps
+   its byte-at-CS:IP contract but reads through SoftPC SAS instead of the
+   NTVDM pointer mapper. */
+void softpc_xms_bop IFN0()
+{
+    XMSDispatch((ULONG)sas_hw_at_no_check(effective_addr(getCS(), getIP())));
+    setIP((IU16)(getIP() + 1u));
+}
 
 /*
  * The original ROM communicates with machine-resident C services through
@@ -75,6 +86,7 @@ void softpc_device_bop_register_machine_services IFN0()
        42h.  The latter is visible in v7vga.rom at C000:0898. */
     BIOS[BIOS_VIDEO_IO] = video_io;
     BIOS[0x42] = ega_video_io;
+    BIOS[0x52] = softpc_xms_bop;
     BIOS[BIOS_PRINTER_IO] = printer_io;
     BIOS[BIOS_RS232_IO] = rs232_io;
     BIOS[BIOS_DISK_IO] = disk_io;
