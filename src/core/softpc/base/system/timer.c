@@ -2225,13 +2225,6 @@ extern	IBOOL ccpu_pig_enabled;
 					/* spread interrupts through system tick */
 					timer_generate_int(1);
 					timer_multiple_delay = SYSTEM_TICK_INTV / n;
-					/* A guest may validly program counter 0 with one clock.
-					 * Keep the original queued-IRQ algorithm, but never hand
-					 * quick_ev a zero delay: its historic immediate-event rule
-					 * would recursively drain the entire backlog on a modern
-					 * standalone host. */
-					if (timer_multiple_delay == 0)
-						timer_multiple_delay = 1;
 					active_int_event = TRUE;
 					add_q_event_t(timer_multiple_ints, timer_multiple_delay, n-1);
 				}

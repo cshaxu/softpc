@@ -59,6 +59,21 @@ add_custom_command(
     COMMENT "Transforming CMOS media port ABI"
     VERBATIM)
 set_source_files_properties("${SOFTPC_CMOS_SOURCE}" PROPERTIES GENERATED TRUE)
+set(SOFTPC_TIMER_INPUT
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/system/timer.c")
+set(SOFTPC_TIMER_SOURCE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated-device/timer.c")
+add_custom_command(
+    OUTPUT "${SOFTPC_TIMER_SOURCE}"
+    COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_timer.py"
+        "${SOFTPC_TIMER_INPUT}"
+        "${SOFTPC_TIMER_SOURCE}"
+    DEPENDS "${SOFTPC_TIMER_INPUT}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_timer.py"
+    COMMENT "Transforming timer quick-event port ABI"
+    VERBATIM)
+set_source_files_properties("${SOFTPC_TIMER_SOURCE}" PROPERTIES GENERATED TRUE)
 set(SOFTPC_CVIDC_TRANSFORMED_SOURCES)
 foreach(SOFTPC_CVIDC_GENERATED_INPUT IN LISTS SOFTPC_CVIDC_GENERATED_INPUTS)
     get_filename_component(SOFTPC_CVIDC_GENERATED_NAME
@@ -292,7 +307,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/system/idetect.c
     src/core/softpc/base/system/illegalp.c
     src/core/softpc/base/system/rom.c
-    src/core/softpc/base/system/timer.c
+    "${SOFTPC_TIMER_SOURCE}"
     src/core/softpc/base/system/timestrb.c
     src/core/softpc/base/system/unexp_nt.c
     src/core/softpc/base/support/time_day.c
