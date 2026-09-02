@@ -516,6 +516,20 @@ extern char *softpc_platform_floppy_config_value(void);
 #define SOFTPC_CONFIG_HARD_DISK2_NAME 26u
 #define SOFTPC_CONFIG_FLOPPY_A_DEVICE 51u
 #define SOFTPC_CONFIG_WIN_SIZE 55u
+
+/* The original CMOS controller owns its register values.  This host port
+   reports only which concrete fixed-media backends have been attached. */
+half_word softpc_host_cmos_fixed_disk_type(void)
+{
+    half_word disk = 0u;
+    if (softpc_hdd_config_paths[0] != NULL &&
+        softpc_hdd_config_paths[0][0] != '\0')
+        disk = 0x30u;
+    if (softpc_hdd_config_paths[1] != NULL &&
+        softpc_hdd_config_paths[1][0] != '\0')
+        disk |= 0x04u;
+    return disk;
+}
 void *config_inquire(host_id, values)
 UTINY host_id;
 void *values;

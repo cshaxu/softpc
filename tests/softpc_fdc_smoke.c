@@ -108,6 +108,7 @@ int main(void)
     softpc_machine *machine = NULL;
     unsigned char byte = 0u;
     unsigned char result;
+    unsigned short cmos_disk = 0u;
     unsigned short cmos_diskette = 0u;
     unsigned int attempts;
     FDC_CMD_BLOCK format_command[MAX_COMMAND_LEN] = { 0 };
@@ -121,6 +122,8 @@ int main(void)
     /* The original CMOS POST must receive the drive capability supplied by
        the standalone image GFI port: A: is a 1.44M drive (high nibble 4). */
     cmos_post();
+    assert(cmos_read_byte(CMOS_DISK, &cmos_disk) == SUCCESS);
+    assert(cmos_disk == 0u);
     assert(cmos_read_byte(CMOS_DISKETTE, &cmos_diskette) == SUCCESS);
     assert(cmos_diskette == 0x40u);
     program_dma_read();

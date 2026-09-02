@@ -43,6 +43,22 @@ file(GLOB SOFTPC_CVIDC_GENERATED_INPUTS CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/cvidc/sinit*.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/cvidc/sevid*.c")
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
+set(SOFTPC_CMOS_INPUT
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc/base/system/cmos.c")
+set(SOFTPC_CMOS_SOURCE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated-device/cmos.c")
+add_custom_command(
+    OUTPUT "${SOFTPC_CMOS_SOURCE}"
+    COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cmos.py"
+        "${SOFTPC_CMOS_INPUT}"
+        "${SOFTPC_CMOS_SOURCE}"
+    DEPENDS "${SOFTPC_CMOS_INPUT}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cmos.py"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/cmos/softpc_cmos_host.h"
+    COMMENT "Transforming CMOS media port ABI"
+    VERBATIM)
+set_source_files_properties("${SOFTPC_CMOS_SOURCE}" PROPERTIES GENERATED TRUE)
 set(SOFTPC_CVIDC_TRANSFORMED_SOURCES)
 foreach(SOFTPC_CVIDC_GENERATED_INPUT IN LISTS SOFTPC_CVIDC_GENERATED_INPUTS)
     get_filename_component(SOFTPC_CVIDC_GENERATED_NAME
@@ -269,7 +285,7 @@ add_library(softpc-machine-devices OBJECT
     src/core/softpc/base/system/ica.c
     src/core/softpc/base/system/quick_ev.c
     src/core/softpc/base/system/at_dma.c
-    src/core/softpc/base/system/cmos.c
+    "${SOFTPC_CMOS_SOURCE}"
     src/core/softpc/base/system/dummy_nt.c
     src/core/softpc/base/system/idetect.c
     src/core/softpc/base/system/illegalp.c
@@ -371,6 +387,7 @@ target_include_directories(softpc-ccpu-core PRIVATE
 target_include_directories(softpc-machine-devices PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu"
     include
+    src/core/softpc-port-abi
     src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
     src/host/softpc_compat

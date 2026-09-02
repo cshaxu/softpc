@@ -340,8 +340,7 @@ LOCAL int verify_equip_byte IFN1(half_word *, equip)
 
 	/* Check the Equipment Byte */
 	*equip = 0;
-	/* DIVERGENCE MVDM-HOST-DIV-075: config scalar is pointer-sized on x86/x64. */
-	adapter = (ULONG)(ULONG_PTR) config_inquire(C_GFX_ADAPTER, NULL);
+	adapter = (ULONG) config_inquire(C_GFX_ADAPTER, NULL);
 	if(adapter != -1)
 		*equip |= display_mask[adapter];
 
@@ -1038,22 +1037,11 @@ GLOBAL void cmos_post IFN0()
 	if (floppy != cmos[CMOS_DISKETTE])
 		cmos_err |= BAD_FLOPPY;
 
-	/* Check the Fixed Disk Type.  The original product configuration always
-	 * supplied drive C, while the standalone machine's only authority is its
-	 * concrete attached image backend.  Keep the original CMOS type values,
-	 * but derive their presence from the existing configuration port. */
-#ifdef SOFTPC_STANDALONE
-	 disk = NO_HARD_C | NO_HARD_D;
-	 if (*((CHAR *) config_inquire(C_HARD_DISK1_NAME, NULL)))
-		 disk = 0x30;         /* Drive C type 3 */
-	 if (*((CHAR *) config_inquire(C_HARD_DISK2_NAME, NULL)))
-		 disk |= 0x04;        /* Drive D type 4 */
-#else
+	/* Check the Fixed Disk Type */
 	 disk = 0x30;         /* Drive C type always 3 - then <<4 */
 	 /* check whether D drive exists */
 	 if ( *((CHAR *) config_inquire(C_HARD_DISK2_NAME, NULL)))
 		 disk = 0x34;         /* 3 << 4 | 4 */
-#endif
 	if (disk != cmos[CMOS_DISK])
 		cmos_err |= BAD_DISK;
 
