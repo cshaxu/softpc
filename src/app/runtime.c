@@ -258,6 +258,7 @@ static void app_runtime_drain_input(app_runtime *runtime)
 {
     uint8_t key;
     uint8_t released;
+    int key_pending;
 
     /* keyboard_io can enter a nested host_simulate frame for the original
        BIOS INT 15 keyboard hook.  A Windows make/break pair may already be
@@ -276,6 +277,16 @@ static void app_runtime_drain_input(app_runtime *runtime)
             fprintf(stderr, "softpc input drain key=%u released=%u\n",
                 (unsigned int)key, (unsigned int)released);
         (void)softpc_machine_key_number(runtime->machine, key, released);
+        /* The original keyboard path can re-enter the CCPU while servicing
+           one transition.  It remains deliberately one transition per
+           executor callback.  If the standalone queue already has another
+           transition, arrange a new CCPU-safe callback rather than waiting
+           for the unrelated 20 Hz device clock. */
+        EnterCriticalSection(&runtime->input_lock);
+        key_pending = runtime->input_tail != runtime->input_head;
+        LeaveCriticalSection(&runtime->input_lock);
+        if (key_pending)
+            softpc_machine_request_wake(runtime->machine);
     } else {
         LeaveCriticalSection(&runtime->input_lock);
     }

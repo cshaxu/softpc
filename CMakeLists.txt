@@ -619,6 +619,19 @@ target_include_directories(softpc-runtime-smoke PRIVATE src/app)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
 set_tests_properties(softpc-runtime-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-runtime-input-continuation-smoke
+    test/unit/runtime_input_continuation_smoke.c
+    src/app/runtime.c
+    src/app/keyboard.c
+    src/app/prompt_trace.c)
+target_link_libraries(softpc-runtime-input-continuation-smoke PRIVATE
+    softpc-machine)
+target_include_directories(softpc-runtime-input-continuation-smoke PRIVATE
+    src/app test/support)
+add_test(NAME softpc-runtime-input-continuation-smoke
+    COMMAND softpc-runtime-input-continuation-smoke)
+set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-win32-window-smoke
     test/unit/win32_window_smoke.c
     src/app/runtime.c
@@ -669,6 +682,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-quick-time-smoke
     softpc-lifecycle-smoke
     softpc-runtime-smoke
+    softpc-runtime-input-continuation-smoke
     softpc-win32-window-smoke
     softpc-win32-keyboard-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
@@ -698,6 +712,7 @@ set(SOFTPC_UNIT_TESTS
     softpc-quick-time-smoke
     softpc-lifecycle-smoke
     softpc-runtime-smoke
+    softpc-runtime-input-continuation-smoke
     softpc-win32-window-smoke
     softpc-win32-keyboard-smoke
     softpc-standalone-source-boundary
