@@ -4,20 +4,20 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 Td S3 closed |
-| Admission And Approval | Owner renamed the package root from `artifacts/` to `assets/`, then clarified its sole child contracts are `binary/`, `media/`, and `readme/`; ROMs remain in the source mirror. |
-| Objective | Make the package, build, integration, and current-documentation contracts consistently use `assets/`. |
-| Non-goals | No ROM relocation or external-ROM contract; no `softpc.ini` content change; no guest, machine, host, frontend, or executable behavior change beyond the package-output path. |
-| Baseline | M9 T26 closed at `89ce6b0`; user has physically moved tracked package files from `artifacts/` to `assets/`. |
+| Identifier Mode | M9 T27 closed |
+| Admission And Approval | Owner approved flattening the two-file standalone communications endpoint directory, then requested the architecture decision for `compat/`. |
+| Objective | Remove the needless `src/host/comms/` nesting while retaining `src/host/compat/` as the original-host ABI compatibility boundary. |
+| Non-goals | No original SoftPC mirror movement or edits; no serial/parallel behavior, host contract, configuration, ROM, guest-media, ABI, or frontend change; do not move `compat/` to `src/compat/`. |
+| Baseline | M9 Td S3 closed at `6f7294a`; `src/host/comms/` contains only `serial.c` and `parallel.c`, which have no private header or shared implementation boundary. |
 | Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT is read-only comparison material. |
-| Affected Boundary | Package output CMake variables, package integration contract, current package documentation, and tracked package-directory rename. |
-| Subtask Plan | S1 replace active package paths and preserve the ROM source contract; S2 verify CMake and documentation governance; S3 stage the owner-moved package files as renames, then close and publish. |
-| Requirement Ledger | R1: packages build to `assets/binary/`. R2: integration reads only `assets/binary/softpc.ini` and `assets/media/`. R3: `assets/readme/` remains documentation-only. R4: ROMs remain embedded from `src/mvdm/softpc.new/roms/`; no `assets/roms/` exists. R5: the agent does not modify INI contents. |
-| Focused Verification | Path-reference sweep, CMake configure/build and package smoke, documentation-governance check, and tracked rename review. |
-| Stop Conditions | Stop before altering user-owned INI contents, ROM inputs, media bytes, or machine behavior. |
-| Exit Criteria | No active runtime/package reference uses `artifacts/`; both package widths and integration contract use `assets/`; documentation governance passes. |
-| Closure | Closed. The package root is `assets/` with only `binary/`, `media/`, and `readme/` child contracts. CMake and the integration runner now use `assets/binary/` and `assets/media/`; x64 and x86 GCC package smoke passed. ROMs remain embedded from the original source mirror, and the user-owned INI contents were not modified. |
-| Original Owner Request | “softpc/artifacts，整体目录改名成了 softpc/assets。请你治理文档，以后都在assets里面放binary，media，rom这些”； corrected: “binary, media, readme；rom还是在src mvdm里面的。” |
+| Affected Boundary | The two standalone endpoint source paths, their CMake source-list entries, source-layout documentation, and package executables only. |
+| Subtask Plan | S1 use `git mv` to flatten `serial.c` and `parallel.c`; S2 repair direct build/documentation references; S3 run dual-width source-boundary, unit, integration, and package evidence; S4 close and publish. |
+| Requirement Ledger | R1: `src/host/comms/` no longer exists. R2: serial and parallel endpoint source is directly below `src/host/`. R3: `src/host/compat/` remains in place and retains its ABI-only ownership. R4: package INI and media remain untouched. |
+| Focused Verification | Direct-reference sweep, source-boundary test, both GCC configurations' unit and integration tests, and package smoke. |
+| Stop Conditions | Stop before changing any endpoint logic, machine source, configuration contents, or compatibility-ABI location/meaning. |
+| Exit Criteria | The tree is structurally flatter, CMake builds x86/x64, the existing test tiers pass, and the diff is only relocations plus direct path/documentation repairs. |
+| Closure | Closed. `serial.c` and `parallel.c` now live directly below `src/host/`; the empty `comms/` directory is gone. `src/host/compat/` remains the original-host ABI compatibility boundary. Fresh GCC x64/x86 builds and full 20/20 CTest passed for both widths; user-owned INI and media contents were untouched. |
+| Original Owner Request | “src/host是否可以继续扁平化？comms目录有必要存在吗？”; “批准。那么，src/host/compat这个该放host里面还是src/compat里面？” |
 
 ## Current Technical Baseline
 
@@ -52,6 +52,9 @@
 - M9 Td S3 renamed the package root to `assets/`, with `binary/`, `media/`,
   and `readme/` as its only contracts. ROMs remain embedded source-mirror
   inputs, not package assets.
+- M9 T27 flattens the two standalone communications endpoint sources into
+  `src/host/` while retaining `src/host/compat/` as the original-host ABI
+  compatibility boundary; dual-width full CTest passed.
 - M8 Td S1 established the NXVM-style authority topology, linked the four
   applicable shared governance skills, and added the documentation gate.
 - M8 Td S2 established the public product identity as Insignia SoftPC and

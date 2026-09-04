@@ -10,7 +10,6 @@ src/
     mvdm/softpc.new/
   host/
     ordinary host C/H files
-    comms/{serial,parallel}.c
     compat/{ccpu,cvidc,...}/
   app/
     main.c, runtime.c, console.c, keyboard.c, window.c, firmware.rc

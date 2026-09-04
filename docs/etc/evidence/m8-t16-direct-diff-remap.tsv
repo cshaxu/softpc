@@ -71,11 +71,11 @@ src/core/softpc/host/inc/x86/prod/gdpvar.h	src/host/compat/ccpu/legacy/gdpvar.h	
 src/core/softpc/host/inc/x86/prod/PigReg_c.h	src/host/compat/ccpu/legacy/PigReg_c.h	host/inc/x86/prod/PigReg_c.h	local-standalone	host	host-pending-T17	not-directly-selected	true
 src/core/softpc/host/inc/x86/prod/sas4gen.h	src/host/compat/ccpu/legacy/sas4gen.h	host/inc/x86/prod/sas4gen.h	local-standalone	host	host-pending-T17	not-directly-selected	true
 src/core/softpc/host/src/nt_cga.c	src/mvdm/softpc.new/host/src/nt_cga.c	host/src/nt_cga.c	direct-original-diff	host	recovered-machine-review	literal-reference	true
-src/core/softpc/host/src/nt_com.c	src/host/comms/serial.c	host/src/nt_com.c	direct-original-diff	host	host-pending-T17	literal-reference	true
+src/core/softpc/host/src/nt_com.c	src/host/serial.c	host/src/nt_com.c	direct-original-diff	host	host-pending-T17	literal-reference	true
 src/core/softpc/host/src/nt_ega.c	src/mvdm/softpc.new/host/src/nt_ega.c	host/src/nt_ega.c	direct-original-diff	host	recovered-machine-review	literal-reference	true
 src/core/softpc/host/src/nt_graph.c	src/mvdm/softpc.new/host/src/nt_graph.c	host/src/nt_graph.c	direct-original-diff	host	recovered-machine-review	literal-reference	true
 src/core/softpc/host/src/nt_keycd.c	src/mvdm/softpc.new/host/src/nt_keycd.c	host/src/nt_keycd.c	direct-original-diff	host	recovered-machine-review	literal-reference	true
-src/core/softpc/host/src/nt_lpt.c	src/host/comms/parallel.c	host/src/nt_lpt.c	direct-original-diff	host	host-pending-T17	literal-reference	true
+src/core/softpc/host/src/nt_lpt.c	src/host/parallel.c	host/src/nt_lpt.c	direct-original-diff	host	host-pending-T17	literal-reference	true
 src/core/softpc/host/src/nt_munge.c	src/mvdm/softpc.new/host/src/nt_munge.c	host/src/nt_munge.c	direct-original-diff	host	recovered-machine-review	literal-reference	true
 src/core/softpc/host/src/nt_sound.c	src/mvdm/softpc.new/host/src/nt_sound.c	host/src/nt_sound.c	direct-original-diff	host	recovered-machine-review	literal-reference	true
 src/core/softpc/host/src/nt_vga.c	src/mvdm/softpc.new/host/src/nt_vga.c	host/src/nt_vga.c	direct-original-diff	host	recovered-machine-review	literal-reference	true

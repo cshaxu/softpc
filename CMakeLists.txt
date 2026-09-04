@@ -398,8 +398,8 @@ add_library(softpc-machine-devices OBJECT
     src/host/memory.c
     src/host/gfi_image.c
     src/host/hdd_media.c
-    src/host/comms/serial.c
-    src/host/comms/parallel.c
+    src/host/serial.c
+    src/host/parallel.c
     src/host/keyboard.c
     src/host/mouse_instance.c
     src/host/audio.c
