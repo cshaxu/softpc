@@ -2,7 +2,12 @@
 
 ## Status
 
-Active.
+Closed on 2026-09-04. The completed implementation was pushed to
+`origin/main` at `afba203` after GCC MinGW x64 and x86 each passed all 20
+CTest cases. `src/host/` is now constrained to the approved taxonomy
+(`compat`, `input`, `machine`, `media`, `platform`, and `video`); the recovered
+source and its BIOS/VGA/CMOS ROMs remain together under
+`src/mvdm/softpc.new/`.
 
 ## Task Brief
 

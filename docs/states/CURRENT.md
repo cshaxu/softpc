@@ -4,18 +4,18 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M8 T17 S2 |
-| Admission And Approval | Owner authorized sequential SoftPC queue execution through the active code-layout objective on 2026-09-03. |
-| Objective | Decompose standalone host implementation into `src/host/{platform,media,video,input,compat,machine}` without changing the recovered SoftPC machine, its firmware, controllers, BOP behavior, or public user experience. |
-| Non-goals | No import or copy from `opennt-src-2`; no controller/BIOS/ROM/BOP/CCPU/C-VID semantic change; no generated source or compiler intermediate checked into `src/`; no application-shell move (T18 owns `src/app`). |
-| Baseline | T16 completed direct-difference evacuation: all 98 ledger rows have current paths, `src/mvdm/softpc.new/` has zero local-standalone rows, and GCC x64/x86 both passed 20/20 CTest. |
-| Affected Boundary | Standalone host code is progressively separating from the platform aggregate beneath `src/host/`; recovered source and firmware stay together under `src/mvdm/softpc.new/`, including `roms/`. |
-| Subtask Plan | S1 inventory direct owners and route a minimal host taxonomy; S2 move platform/machine/media/video/input/compat files without content edits; S3 update CMake/tests and establish one implementation owner per host callback; S4 verify x64/x86 media, renderer, input, timer, BOP, and package behavior. |
-| Requirement Ledger | R1: every standalone host source has one taxonomy owner. R2: host owns no guest RAM, controller state, or original renderer algorithm. R3: the recovered SoftPC tree remains reference-shaped. R4: no object/library/intermediate output is retained. |
-| Focused Verification | CMake selected-input audit; static ownership sweep; x64/x86 builds and focused controller/FDC/HDD/dual-media/BOP/serial/printer/audio/timer/V7/mouse tests. |
-| Stop Conditions | Stop for owner direction if a move needs machine semantic change, guest policy, a new runtime facility, or unproved ABI representation. |
-| Exit Criteria | No mixed standalone-platform aggregate remains; all new host code is beneath the host taxonomy; host code has no direct ownership of guest machine state; x64/x86 regressions match the T16 baseline. |
-| Original Owner Request | Persistent objective: “单人双角色模式执行SoftPC 的队列任务：代码布局优化。” T17 is the active ordered queue task. |
+| Identifier Mode | M8 T18 S1 |
+| Admission And Approval | Owner authorized sequential SoftPC queue execution through the active code-layout objective on 2026-09-03 and explicitly approved the completed T17 push on 2026-09-04. |
+| Objective | Move the user-visible standalone application shell from `src/vm/` to `src/app/`, grouping monitor, runtime, input queue, and console/Win32 frontends while preserving the one-executor and copied-frame contracts. |
+| Non-goals | No import or copy from `opennt-src-2`; no controller/BIOS/ROM/BOP/CCPU/C-VID semantic change; no generated source or compiler intermediate checked into `src/`; no public SDK, profile selection, or multi-session surface. |
+| Baseline | T17 is closed and pushed at `afba203`: the host taxonomy is enforced, the recovered tree (including `src/mvdm/softpc.new/roms/`) remains reference-shaped, and GCC x64/x86 each passed 20/20 CTest. |
+| Affected Boundary | Only repository-owned application-shell paths move from `src/vm/` to `src/app/`; `src/mvdm/softpc.new/` and its embedded BIOS/VGA/CMOS firmware remain unchanged. |
+| Subtask Plan | S1 move the application shell with `git mv` and repair CMake/private includes; S2 prove executor and copied-frame ownership remains singular; S3 update source-boundary and direct-diff ledger evidence; S4 verify x64/x86 runtime, monitor, frontend, input, pause/resume, mouse-capture, and packaged launch behavior. |
+| Requirement Ledger | R1: all user-visible shell code lives beneath `src/app/`. R2: exactly one executor mutates the machine and frontends consume copied snapshots. R3: app code has no direct CPU/RAM/controller/renderer state access. R4: CMake, tests, and the 98-row direct-diff ledger name the new paths. |
+| Focused Verification | Static application ownership sweep; x64/x86 build and runtime/keyboard/window/monitor/pause-resume/mouse-capture/direct-launch tests; both packages launch from `artifacts/binary/` using only adjacent `softpc.ini`. |
+| Stop Conditions | Stop for owner direction if the relocation needs machine semantics, a new host/device policy, a new runtime facility, a public SDK surface, or an unproved ABI representation. |
+| Exit Criteria | `src/app/` contains every user-visible shell source, `src/vm/` is absent, application code has no direct machine-state access, and x64/x86 regression evidence matches the T17 baseline. |
+| Original Owner Request | Persistent objective: “单人双角色模式执行SoftPC 的队列任务：代码布局优化。” T18 is the active ordered queue task. |
 
 ## Current Technical Baseline
 
