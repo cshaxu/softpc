@@ -59,6 +59,7 @@ struct app_runtime {
     HANDLE ready_event;
     HANDLE resume_event;
     HANDLE media_event;
+    HANDLE frame_event;
     HANDLE worker;
     volatile LONG state;
     volatile LONG result;
@@ -328,6 +329,7 @@ static void app_runtime_publish(app_runtime *runtime)
             trace_right, trace_bottom);
     }
     LeaveCriticalSection(&runtime->frame_lock);
+    if (published) SetEvent(runtime->frame_event);
 }
 
 static void app_runtime_drain_input(app_runtime *runtime)
@@ -486,12 +488,15 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
     runtime->ready_event = CreateEventA(NULL, TRUE, FALSE, NULL);
     runtime->resume_event = CreateEventA(NULL, FALSE, FALSE, NULL);
     runtime->media_event = CreateEventA(NULL, TRUE, FALSE, NULL);
+    runtime->frame_event = CreateEventA(NULL, FALSE, FALSE, NULL);
     if (runtime->command_event == NULL || runtime->ready_event == NULL ||
-        runtime->resume_event == NULL || runtime->media_event == NULL) {
+        runtime->resume_event == NULL || runtime->media_event == NULL ||
+        runtime->frame_event == NULL) {
         if (runtime->command_event != NULL) CloseHandle(runtime->command_event);
         if (runtime->ready_event != NULL) CloseHandle(runtime->ready_event);
         if (runtime->resume_event != NULL) CloseHandle(runtime->resume_event);
         if (runtime->media_event != NULL) CloseHandle(runtime->media_event);
+        if (runtime->frame_event != NULL) CloseHandle(runtime->frame_event);
         free(runtime);
         return 0;
     }
@@ -506,6 +511,7 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
         CloseHandle(runtime->resume_event);
         CloseHandle(runtime->ready_event);
         CloseHandle(runtime->media_event);
+        CloseHandle(runtime->frame_event);
         CloseHandle(runtime->command_event);
         DeleteCriticalSection(&runtime->frame_lock);
         DeleteCriticalSection(&runtime->input_lock);
@@ -522,6 +528,7 @@ int app_runtime_start(app_runtime *runtime)
     if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
         SOFTPC_RUNTIME_STOPPED) return 0;
     ResetEvent(runtime->ready_event);
+    ResetEvent(runtime->frame_event);
     InterlockedExchange(&runtime->pause_requested, 0);
     InterlockedExchange(&runtime->stop_requested, 0);
     InterlockedExchange(&runtime->result, SOFTPC_MACHINE_IO_ERROR);
@@ -690,6 +697,11 @@ uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime)
         (volatile LONG *)&runtime->published_frame_sequence, 0, 0);
 }
 
+void *app_runtime_frame_event(const app_runtime *runtime)
+{
+    return runtime == NULL ? NULL : (void *)runtime->frame_event;
+}
+
 void app_runtime_destroy(app_runtime *runtime)
 {
     if (runtime == NULL) return;
@@ -702,6 +714,7 @@ void app_runtime_destroy(app_runtime *runtime)
     CloseHandle(runtime->ready_event);
     CloseHandle(runtime->resume_event);
     CloseHandle(runtime->media_event);
+    CloseHandle(runtime->frame_event);
     CloseHandle(runtime->command_event);
     DeleteCriticalSection(&runtime->frame_lock);
     DeleteCriticalSection(&runtime->input_lock);

@@ -883,10 +883,28 @@ static int app_vm_run_window_mode(app_runtime *runtime,
     UpdateWindow(window);
     SetForegroundWindow(window);
     SetFocus(window);
-    SetTimer(window, SOFTPC_TIMER_ID, 16u, NULL);
-    while (GetMessageA(&message, NULL, 0, 0) > 0) {
-        TranslateMessage(&message); DispatchMessageA(&message);
+    for (;;) {
+        HANDLE frame_event = (HANDLE)app_runtime_frame_event(runtime);
+        DWORD count = frame_event == NULL ? 0u : 1u;
+        DWORD wait = MsgWaitForMultipleObjects(count, &frame_event, FALSE,
+            SOFTPC_CURSOR_BLINK_INTERVAL_MS, QS_ALLINPUT);
+
+        /* The presentation event replaces the former 16 ms polling timer.
+           The bounded deadline is solely for cursor/title/state maintenance;
+           normal window and input messages still wake immediately. */
+        if (wait == WAIT_TIMEOUT || (count != 0u && wait == WAIT_OBJECT_0))
+            SendMessageA(window, WM_TIMER, SOFTPC_TIMER_ID, 0);
+        else if (wait == WAIT_FAILED) {
+            app_window_result = SOFTPC_VM_FRONTEND_ERROR;
+            DestroyWindow(window);
+        }
+        while (PeekMessageA(&message, NULL, 0, 0, PM_REMOVE)) {
+            if (message.message == WM_QUIT) goto window_loop_done;
+            TranslateMessage(&message);
+            DispatchMessageA(&message);
+        }
     }
+window_loop_done:
     SelectObject(app_window_text_dc, app_window_text_previous_bitmap);
     DeleteDC(app_window_text_dc);
     app_window_text_dc = NULL;

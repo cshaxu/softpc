@@ -4,19 +4,19 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T33 S6 active |
-| Admission And Approval | Owner approved S6 from the queued frontend-performance proposal. |
-| Objective | Measure executor pacing, graphics publication, and process CPU use during the Prompt path before deciding whether the 1 MIPS standalone governor is a limiting factor. |
-| Non-goals | No CCPU, V7/VGA controller, original renderer, BIOS, ROM, BOP, timer, input, INI, media, or guest/Win3.1 driver change; no console/window lifecycle restructuring. |
-| Baseline | T32 S5 is implemented at `396318c`; unchanged dirty frames no longer publish. |
+| Identifier Mode | No active implementation task |
+| Admission And Approval | M9 T34 S7 was owner-approved from the frontend-performance proposal and is closed. |
+| Objective | Await owner admission of the next queued task. |
+| Non-goals | Do not begin S8 or any other queued work without owner admission. |
+| Baseline | T34 S7 is closed with event-driven window idle scheduling; see [closure record](../history/M9-T34-S7-window-idle-scheduling.md). |
 | Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT is read-only comparison material. |
-| Affected Boundary | Standalone runtime/process measurement and trace output; package executables. |
-| Subtask Plan | Add once-per-second read-only counters for published frames, graphics dirty reports, and process CPU time; rebuild dual-width packages; retain an owner Prompt capture. Decide separately whether any pace change is warranted. |
-| Requirement Ledger | R1: no pace value changes in this task. R2: original timer/quick-event semantics unchanged. R3: trace is bounded to one summary per second. R4: no INI/media changes. |
-| Focused Verification | x64/x86 build and CTest; package smoke; owner Prompt capture with the new summary lines. |
-| Stop Conditions | Stop after measurement packages are published; do not tune the governor without owner evidence. |
-| Exit Criteria | Trace provides frame/dirty rate and process CPU per second for a reproducible Prompt run; both package widths and full suites pass. |
-| Original Owner Request | “S6” |
+| Affected Boundary | None until a task is admitted. |
+| Subtask Plan | None. |
+| Requirement Ledger | T34: all requirements closed. |
+| Focused Verification | T34: GCC x64 CTest 21/21 and GCC x86 CTest 21/21 passed. |
+| Stop Conditions | Await owner direction. |
+| Exit Criteria | A future owner-admitted task supplies its own criteria. |
+| Original Owner Request | “可以，准入S7” |
 
 ## Current Technical Baseline
 
@@ -62,6 +62,9 @@
 - M9 T30 S3 closed with no code: recorded Prompt text geometry is already
   stable at 80 by 25, so its reported graphical character loss is not a text
   surface sizing issue.
+- M9 T34 S7 replaces the standalone window's fixed 16 ms polling timer with
+  frame-publication, UI-message, and cursor/title-deadline waits; GCC x64 and
+  x86 full CTest each passed 21/21.
 - M8 Td S1 established the NXVM-style authority topology, linked the four
   applicable shared governance skills, and added the documentation gate.
 - M8 Td S2 established the public product identity as Insignia SoftPC and

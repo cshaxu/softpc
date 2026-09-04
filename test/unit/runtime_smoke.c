@@ -42,7 +42,10 @@ int main(void)
 
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(app_runtime_create(machine, &runtime));
+    assert(app_runtime_frame_event(runtime) != NULL);
     assert(app_runtime_start(runtime));
+    assert(WaitForSingleObject((HANDLE)app_runtime_frame_event(runtime),
+        5000u) == WAIT_OBJECT_0);
     Sleep(150u);
     frame = (app_runtime_frame *)calloc(1u, sizeof(*frame));
     assert(frame != NULL);

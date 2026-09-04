@@ -68,6 +68,10 @@ int app_runtime_copy_frame(app_runtime *runtime,
 /* A presentation client may cheaply test whether the runtime's copied frame
    changed before requesting the potentially large DIB snapshot. */
 uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime);
+/* Auto-reset Win32 publication event for the sole presentation client.  The
+   copied frame remains the ownership boundary; this only avoids waking that
+   client when no new snapshot exists. */
+void *app_runtime_frame_event(const app_runtime *runtime);
 void app_runtime_destroy(app_runtime *runtime);
 
 #endif
