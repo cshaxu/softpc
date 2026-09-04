@@ -27,17 +27,17 @@ Windows 3.1 Program Manager desktop.
 All generated build state belongs under the repository's single `build/`
 directory.  This includes CMake/Ninja metadata, generated sources, test
 executables, diagnostics, and temporary test media. The user-facing package is
-only `artifacts/binary/`; reusable boot media is in `artifacts/media/`. The
+only `assets/binary/`; reusable boot media is in `assets/media/`. The
 selected original ROMs are embedded from
-`src/mvdm/softpc.new/roms/`; `artifacts/firmware/` does not exist. Do not
+`src/mvdm/softpc.new/roms/`; `assets/roms/` does not exist. Do not
 create sibling `build-*` directories or place generated executables at the
 repository root. Build the VM, then set the fixed machine defaults in the
-adjacent `artifacts/binary/softpc.ini`:
+adjacent `assets/binary/softpc.ini`:
 
 ```text
 cmake -S . -B build -G Ninja
 cmake --build build --parallel 8
-artifacts/binary/softpc64.exe
+assets/binary/softpc64.exe
 ```
 
 The CMake build supports both 32-bit and 64-bit Windows hosts.  A 32-bit
@@ -49,8 +49,8 @@ cmake -S . -B build/x86 -G Ninja -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc
 cmake --build build/x86 --parallel 8
 ```
 
-The x86 configure writes `artifacts/binary/softpc32.exe`; the native x64
-configure writes `artifacts/binary/softpc64.exe`. Both use the same adjacent
+The x86 configure writes `assets/binary/softpc32.exe`; the native x64
+configure writes `assets/binary/softpc64.exe`. Both use the same adjacent
 `softpc.ini`.
 
 `softpc.ini` has five `key=value` keys: `memory_mb`, `floppy`, `hard_disk`,

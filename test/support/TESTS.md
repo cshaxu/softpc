@@ -15,13 +15,13 @@ integration test, so CMake no longer builds or registers them.
 ## Integration
 
 `softpc-package-smoke` is the sole `integration` test. It launches the
-architecture-matching `artifacts/binary/softpc{32,64}.exe` without a command
+architecture-matching `assets/binary/softpc{32,64}.exe` without a command
 line, reads only its adjacent `softpc.ini`, verifies that the configured floppy
-and fixed disk resolve below `artifacts/media/`, and observes that the monitor
+and fixed disk resolve below `assets/media/`, and observes that the monitor
 stays alive. It never writes supplied media; the configuration must use
 `overlay` or `readonly` mode.
 
 The selected BIOS and V7 ROMs are compiled into the executable from their
 original source-mirror path `src/mvdm/softpc.new/roms/`. Therefore this package
-has no runtime external-ROM lookup, and `artifacts/roms/` is intentionally
-absent.
+has no runtime external-ROM lookup. The selected ROMs remain embedded from
+`src/mvdm/softpc.new/roms/`; no `assets/roms/` directory exists.

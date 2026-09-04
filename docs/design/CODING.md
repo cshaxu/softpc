@@ -36,12 +36,12 @@ The complete `build/` tree is ignored. It holds CMake build trees, generated
 sources, test binaries, compiler intermediates, logs, captures, diagnostic
 scripts, and disposable test media. Additional host-width configurations use
 children of it (for example `build/x86/`). The only user-facing package is
-`artifacts/binary/`: `softpc32.exe`, `softpc64.exe`, and their adjacent fixed
+`assets/binary/`: `softpc32.exe`, `softpc64.exe`, and their adjacent fixed
 `softpc.ini`. That INI may use absolute paths or paths relative to
-`artifacts/binary/`; the supplied default uses `../media/`. Reusable guest
-media belongs in `artifacts/media/`. The fixed original ROM set is embedded
-from its source-mirror location `src/mvdm/softpc.new/roms/`; a future package
-that genuinely needs runtime-external ROM input must use `artifacts/roms/`.
+`assets/binary/`; the supplied default uses `../media/`. Reusable guest media
+belongs in `assets/media/`. The fixed original ROM set remains embedded from
+its source-mirror location `src/mvdm/softpc.new/roms/`; no external-ROM asset
+contract exists.
 Repository-root executables and sibling `build-*` directories are forbidden.
 
 The preserved SoftPC baseline contains source, headers, scripts, and runtime

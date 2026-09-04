@@ -490,7 +490,7 @@ endif()
 # The standalone distribution keeps its two host-width launchers together.
 # The adjacent softpc.ini is deliberately user-owned configuration, never a
 # CMake template or package-generation output.
-set(SOFTPC_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/artifacts/binary")
+set(SOFTPC_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets/binary")
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
     set(SOFTPC_LAUNCHER_NAME softpc32)
 else()
@@ -714,7 +714,7 @@ add_dependencies(softpc-package-smoke softpcvm)
 target_compile_definitions(softpc-package-smoke PRIVATE
     SOFTPC_PACKAGE_DIRECTORY="${SOFTPC_OUTPUT_DIRECTORY}"
     SOFTPC_PACKAGE_EXECUTABLE="${SOFTPC_OUTPUT_DIRECTORY}/${SOFTPC_LAUNCHER_NAME}.exe"
-    SOFTPC_PACKAGE_MEDIA_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/artifacts/media")
+    SOFTPC_PACKAGE_MEDIA_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/assets/media")
 if(WIN32)
     target_link_libraries(softpc-package-smoke PRIVATE user32)
 endif()

@@ -12,13 +12,12 @@ execution rules. A local executable is developer evidence, not a release.
 The complete `build/` tree is ignored and reserved for native configurations,
 generated sources, tests, logs, captures, and disposable media. Use `build/`
 and subdirectories such as `build/x86/` for additional toolchains. The only
-user-facing deliverables are `artifacts/binary/softpc32.exe`,
-`artifacts/binary/softpc64.exe`, and their adjacent `softpc.ini`. Reusable
-guest media belongs in `artifacts/media/`. The fixed original ROMs are embedded
-from `src/mvdm/softpc.new/roms/`; any future external-ROM contract belongs in
-`artifacts/roms/`.
+user-facing deliverables are `assets/binary/softpc32.exe`,
+`assets/binary/softpc64.exe`, and their adjacent `softpc.ini`. Reusable guest
+media belongs in `assets/media/`. The fixed original ROMs remain embedded from
+`src/mvdm/softpc.new/roms/`; the package has no external-ROM directory.
 
-`artifacts/binary/softpc.ini` is user-owned configuration and is never an
+`assets/binary/softpc.ini` is user-owned configuration and is never an
 agent build or packaging output. Owner changes to it ship with the current
 completed task; see the binding rule in
 [Execution Rules](docs/rules/EXECUTION.md#user-package-configuration).
