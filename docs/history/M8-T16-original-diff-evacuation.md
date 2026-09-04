@@ -2,8 +2,8 @@
 
 ## Status
 
-Active. This record retains the task brief, evidence, closure review, and any
-approved deferral.
+Complete. This record retains the task brief, evidence, closure review, and
+any approved deferral.
 
 ## Original Request Ledger
 
@@ -88,3 +88,30 @@ x86 after the move.
 an explicit repository-local map. Regenerating the 98-row TSV therefore keeps
 the ledger's `current_path`, owner, and existence fields true after every
 future path audit rather than preserving the obsolete S1 snapshot paths.
+
+## S3 DIB Host-Contract Evacuation
+
+`softpc_standalone_dib.h` is the standalone-owned DIB surface and dirty-
+rectangle callback contract consumed by the retained original `nt_cga.c`,
+`nt_ega.c`, `nt_vga.c`, `nt_graph.c`, and `nt_munge.c` renderers. It contains
+no controller or renderer algorithm. The header has therefore moved unchanged
+from the recovered `host/inc/` tree to
+`src/host/softpc_compat/softpc_standalone_dib.h`, beside its independent
+console-DIB compatibility implementation. This makes the original renderer's
+output port explicit without altering the renderer's functions or data flow.
+
+## Closure Review
+
+- **R1 — current disposition:** the regenerated 98-row ledger has an existing
+  current path for every direct/local row. It explicitly records the four
+  CCPU moves and the DIB-host-contract move.
+- **R2 — external material:** T16 only moved or restored repository-owned
+  files; no external OpenNT content, patch payload, generated source, object,
+  or library was added.
+- **R3 — ownership:** the ledger query for `local-standalone` paths under
+  `src/mvdm/softpc.new/` returns zero. Remaining original-source differences
+  remain visible as recovered-machine review items for their later owners;
+  T16 did not rewrite their machine algorithms.
+- **R4 — behavior:** GCC x64 and GCC x86 each rebuilt and passed all 20 CTest
+  cases, including the original renderer, media, input, BOP, runtime, package,
+  and source-boundary checks.

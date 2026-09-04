@@ -4,18 +4,18 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M8 T16 S2 |
+| Identifier Mode | M8 T17 S1 |
 | Admission And Approval | Owner authorized sequential SoftPC queue execution through the active code-layout objective on 2026-09-03. |
-| Objective | Classify and evacuate the remaining direct standalone adaptations from the recovered SoftPC tree without copying source from the external OpenNT reference or changing machine behavior. |
-| Non-goals | No import or copy from `opennt-src-2`; no controller/BIOS/ROM/BOP/CCPU/C-VID semantic change; no generated source or compiler intermediate checked into `src/`; no standalone-host/application decomposition (T17/T18 own those). |
-| Baseline | T15 relocated the repository-owned recovered SoftPC base/host tree to `src/mvdm/softpc.new/`. T16 S2 has restored three trivial source differences and evacuated the local CCPU facade plus generated CCPU ABI headers to `src/core/softpc-port-abi/ccpu/`; GCC x64/x86 both pass 20/20 CTest. T14 (`a072bb8`) retains the 60 direct-difference dispositions. |
-| Affected Boundary | Repository-owned direct-difference ledger, source-local compatibility adaptation, and CMake routing. The external OpenNT tree remains read-only comparison material only. |
-| Subtask Plan | S1 remap the T14 ledger from the former source paths to the T15 layout and identify every active direct adaptation; S2 remove adaptations whose original code now builds; S3 relocate remaining standalone-only adaptation to its rightful existing compatibility boundary without copying reference content; S4 rebuild and prove x64/x86 regression parity. |
-| Requirement Ledger | R1: each direct-difference row has a current path and disposition. R2: no external reference file or generated patch enters the repository. R3: machine algorithms remain in the recovered source tree; standalone adaptations are explicitly owned outside it or by a small repository-owned compatibility patch. R4: no object/library/intermediate output is retained. |
-| Focused Verification | Ledger/path audit; static source-ownership sweep; CMake selected-input audit; then x64/x86 build and focused machine/renderer/input/timer/media/BOP tests. |
-| Stop Conditions | Stop for owner direction if a proposed evacuation changes machine semantics, needs an unproved ABI representation change, or would require copying content from the external reference. |
-| Exit Criteria | Every active direct adaptation has a current owner and visible disposition; no standalone-only behavior remains hidden in recovered-machine code; x64/x86 regression matches the T15 baseline. |
-| Original Owner Request | Persistent objective: “单人双角色模式执行SoftPC 的队列任务：代码布局优化。” T16 is the active ordered queue task. |
+| Objective | Decompose standalone host implementation into `src/host/{platform,media,video,input,compat,machine}` without changing the recovered SoftPC machine, its firmware, controllers, BOP behavior, or public user experience. |
+| Non-goals | No import or copy from `opennt-src-2`; no controller/BIOS/ROM/BOP/CCPU/C-VID semantic change; no generated source or compiler intermediate checked into `src/`; no application-shell move (T18 owns `src/app`). |
+| Baseline | T16 completed direct-difference evacuation: all 98 ledger rows have current paths, `src/mvdm/softpc.new/` has zero local-standalone rows, and GCC x64/x86 both passed 20/20 CTest. |
+| Affected Boundary | New standalone host code now split between `src/core/softpc_*` and `src/host/softpc_compat/`; recovered machine source stays under `src/mvdm/softpc.new/`. |
+| Subtask Plan | S1 inventory direct owners and route a minimal host taxonomy; S2 move platform/machine/media/video/input/compat files without content edits; S3 update CMake/tests and establish one implementation owner per host callback; S4 verify x64/x86 media, renderer, input, timer, BOP, and package behavior. |
+| Requirement Ledger | R1: every standalone host source has one taxonomy owner. R2: host owns no guest RAM, controller state, or original renderer algorithm. R3: the recovered SoftPC tree remains reference-shaped. R4: no object/library/intermediate output is retained. |
+| Focused Verification | CMake selected-input audit; static ownership sweep; x64/x86 builds and focused controller/FDC/HDD/dual-media/BOP/serial/printer/audio/timer/V7/mouse tests. |
+| Stop Conditions | Stop for owner direction if a move needs machine semantic change, guest policy, a new runtime facility, or unproved ABI representation. |
+| Exit Criteria | No mixed standalone-platform aggregate remains; all new host code is beneath the host taxonomy; host code has no direct ownership of guest machine state; x64/x86 regressions match the T16 baseline. |
+| Original Owner Request | Persistent objective: “单人双角色模式执行SoftPC 的队列任务：代码布局优化。” T17 is the active ordered queue task. |
 
 ## Current Technical Baseline
 

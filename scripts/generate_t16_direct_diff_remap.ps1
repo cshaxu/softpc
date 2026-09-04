@@ -16,6 +16,7 @@ if (-not $OutputPath) {
 
 $RelocatedPaths = @{
     'src/core/softpc/base/ccpu386/softpc_ccpu_facade.c' = 'src/core/softpc-port-abi/ccpu/softpc_ccpu_facade.c'
+    'src/core/softpc/host/inc/softpc_standalone_dib.h' = 'src/host/softpc_compat/softpc_standalone_dib.h'
     'src/core/softpc/host/inc/x86/prod/gdpvar.h' = 'src/core/softpc-port-abi/ccpu/gdpvar.h'
     'src/core/softpc/host/inc/x86/prod/PigReg_c.h' = 'src/core/softpc-port-abi/ccpu/PigReg_c.h'
     'src/core/softpc/host/inc/x86/prod/sas4gen.h' = 'src/core/softpc-port-abi/ccpu/sas4gen.h'

@@ -66,7 +66,7 @@ src/core/softpc/host/inc/insignia.h	src/mvdm/softpc.new/host/inc/insignia.h	host
 src/core/softpc/host/inc/nt_event.h	src/mvdm/softpc.new/host/inc/nt_event.h	host/inc/nt_event.h	direct-original-diff	host	recovered-machine-review	not-directly-selected	true
 src/core/softpc/host/inc/nt_graph.h	src/mvdm/softpc.new/host/inc/nt_graph.h	host/inc/nt_graph.h	direct-original-diff	host	recovered-machine-review	not-directly-selected	true
 src/core/softpc/host/inc/nt_inthk.h	src/mvdm/softpc.new/host/inc/nt_inthk.h	host/inc/nt_inthk.h	direct-original-diff	host	recovered-machine-review	not-directly-selected	true
-src/core/softpc/host/inc/softpc_standalone_dib.h	src/mvdm/softpc.new/host/inc/softpc_standalone_dib.h	host/inc/softpc_standalone_dib.h	local-standalone	host	recovered-machine-review	not-directly-selected	true
+src/core/softpc/host/inc/softpc_standalone_dib.h	src/host/softpc_compat/softpc_standalone_dib.h	host/inc/softpc_standalone_dib.h	local-standalone	host	host-pending-T17	not-directly-selected	true
 src/core/softpc/host/inc/x86/prod/gdpvar.h	src/core/softpc-port-abi/ccpu/gdpvar.h	host/inc/x86/prod/gdpvar.h	local-standalone	host	compat-review	not-directly-selected	true
 src/core/softpc/host/inc/x86/prod/PigReg_c.h	src/core/softpc-port-abi/ccpu/PigReg_c.h	host/inc/x86/prod/PigReg_c.h	local-standalone	host	compat-review	not-directly-selected	true
 src/core/softpc/host/inc/x86/prod/sas4gen.h	src/core/softpc-port-abi/ccpu/sas4gen.h	host/inc/x86/prod/sas4gen.h	local-standalone	host	compat-review	not-directly-selected	true
