@@ -423,7 +423,6 @@ target_include_directories(softpc-ccpu-core PRIVATE
     src/core/softpc-port-abi/cvidc
     src/host/softpc_compat
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
     src/mvdm/softpc.new/base/cvidc
@@ -436,7 +435,6 @@ target_include_directories(softpc-machine-devices PRIVATE
     src/core/softpc-port-abi/cvidc
     src/host/softpc_compat
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
     src/mvdm/softpc.new/base/cvidc
@@ -445,7 +443,6 @@ target_include_directories(softpc-port-abi PRIVATE
     src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
     src/mvdm/softpc.new/base/cvidc
@@ -461,7 +458,6 @@ target_include_directories(softpc-machine PRIVATE
     src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
     src/mvdm/softpc.new/base/cvidc
@@ -507,7 +503,6 @@ add_executable(softpc-dual-media-smoke test/unit/softpc_dual_media_smoke.c)
 target_link_libraries(softpc-dual-media-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-dual-media-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc)
 add_test(NAME softpc-dual-media-smoke COMMAND softpc-dual-media-smoke)
 set_tests_properties(softpc-dual-media-smoke PROPERTIES
@@ -521,7 +516,6 @@ add_executable(softpc-irq-smoke test/unit/softpc_irq_smoke.c)
 target_link_libraries(softpc-irq-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-irq-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc)
 add_test(NAME softpc-irq-smoke COMMAND softpc-irq-smoke)
 set_tests_properties(softpc-irq-smoke PROPERTIES
@@ -530,7 +524,6 @@ add_executable(softpc-fdc-smoke test/unit/softpc_fdc_smoke.c)
 target_link_libraries(softpc-fdc-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-fdc-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc)
 add_test(NAME softpc-fdc-smoke COMMAND softpc-fdc-smoke)
 set_tests_properties(softpc-fdc-smoke PROPERTIES
@@ -539,7 +532,6 @@ add_executable(softpc-printer-smoke test/unit/softpc_printer_smoke.c)
 target_link_libraries(softpc-printer-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-printer-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc)
 add_test(NAME softpc-printer-smoke COMMAND softpc-printer-smoke)
 set_tests_properties(softpc-printer-smoke PROPERTIES
@@ -548,7 +540,6 @@ add_executable(softpc-sound-smoke test/unit/softpc_sound_smoke.c)
 target_link_libraries(softpc-sound-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-sound-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc)
 add_test(NAME softpc-sound-smoke COMMAND softpc-sound-smoke)
 set_tests_properties(softpc-sound-smoke PROPERTIES
@@ -557,7 +548,6 @@ add_executable(softpc-serial-smoke test/unit/softpc_serial_smoke.c)
 target_link_libraries(softpc-serial-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-serial-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc)
 add_test(NAME softpc-serial-smoke COMMAND softpc-serial-smoke)
 set_tests_properties(softpc-serial-smoke PROPERTIES
@@ -566,7 +556,6 @@ add_executable(softpc-mouse-smoke test/unit/softpc_mouse_smoke.c)
 target_link_libraries(softpc-mouse-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-mouse-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc)
 add_test(NAME softpc-mouse-smoke COMMAND softpc-mouse-smoke)
 set_tests_properties(softpc-mouse-smoke PROPERTIES
@@ -575,7 +564,6 @@ add_executable(softpc-keycode-smoke test/unit/softpc_keycode_smoke.c)
 target_link_libraries(softpc-keycode-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-keycode-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc)
 add_test(NAME softpc-keycode-smoke COMMAND softpc-keycode-smoke)
 set_tests_properties(softpc-keycode-smoke PROPERTIES
@@ -584,7 +572,6 @@ add_executable(softpc-vga-frame-smoke test/unit/softpc_vga_frame_smoke.c)
 target_link_libraries(softpc-vga-frame-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-vga-frame-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc)
 target_compile_definitions(softpc-vga-frame-smoke PRIVATE
     CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1
@@ -596,7 +583,6 @@ add_executable(softpc-bop-smoke test/unit/softpc_bop_smoke.c)
 target_link_libraries(softpc-bop-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-bop-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc)
 add_test(NAME softpc-bop-smoke COMMAND softpc-bop-smoke)
 set_tests_properties(softpc-bop-smoke PROPERTIES
@@ -605,7 +591,6 @@ add_executable(softpc-quick-time-smoke test/unit/softpc_quick_time_smoke.c)
 target_link_libraries(softpc-quick-time-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-quick-time-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
-    src/mvdm/softpc.new/host/inc/x86/prod
     src/mvdm/softpc.new/base/inc)
 add_test(NAME softpc-quick-time-smoke COMMAND softpc-quick-time-smoke)
 set_tests_properties(softpc-quick-time-smoke PROPERTIES

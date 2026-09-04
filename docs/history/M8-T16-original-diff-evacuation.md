@@ -63,3 +63,23 @@ descriptor-translation entry points are now unchanged at
 object target still compiles it with the CCPU/C-VID executor because it owns
 those symbols, but the source boundary and CMake paths now make the standalone
 compatibility ownership explicit. GCC x64/x86 full CTest both passed 20/20.
+
+## S2 Generated CCPU ABI Evacuation
+
+The three local generated-executor ABI headers previously retained below the
+recovered host tree were moved byte-for-byte from
+`src/mvdm/softpc.new/host/inc/x86/prod/` to the existing standalone CCPU
+compatibility boundary:
+
+- `src/core/softpc-port-abi/ccpu/gdpvar.h`;
+- `src/core/softpc-port-abi/ccpu/PigReg_c.h`;
+- `src/core/softpc-port-abi/ccpu/sas4gen.h`.
+
+They define the generated CCPU GDP register layout and SAS entry ABI. They are
+included only by CCPU/C-VID executor paths; they are neither controller,
+firmware, nor original host-renderer logic. The move does not alter their
+contents or any machine behavior. CMake no longer names the obsolete
+`host/inc/x86/prod` directory; all CCPU-capable targets already include the
+explicit `src/core/softpc-port-abi/ccpu` boundary. The static standalone-source
+boundary check and complete GCC CTest suites passed 20/20 for both x64 and
+x86 after the move.
