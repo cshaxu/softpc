@@ -89,3 +89,8 @@ mouse driver now lives in `src/host/input/softpc_mouse_instance.c`.  It owns
 only its host allocation; the original mouse controller retains all guest
 device state.  GCC x64 and x86 compile the isolated endpoint, and the x86
 mouse/source-boundary checks pass.
+
+The standalone speaker sink is now an isolated platform source,
+`src/host/platform/softpc_platform_audio.c`; it retains the original host
+frequency request contract and teardown ordering.  GCC x64/x86 compile it and
+the focused sound/source-boundary test passes on x86.

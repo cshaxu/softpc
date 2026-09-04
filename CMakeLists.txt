@@ -400,6 +400,7 @@ add_library(softpc-machine-devices OBJECT
     src/host/media/softpc_hdd_media.c
     src/host/input/softpc_platform_keyboard.c
     src/host/input/softpc_mouse_instance.c
+    src/host/platform/softpc_platform_audio.c
     src/host/platform/softpc_standalone_platform.c)
 add_dependencies(softpc-machine-devices softpc-ccpu-port-abi-inputs)
 set_target_properties(softpc-ccpu-core PROPERTIES
