@@ -21,6 +21,13 @@ A build or one smoke does not close a task. Runnable-path work needs x64 and
 x86 build/test evidence proportional to the change. Artifact media remains
 non-mutating unless its active packet explicitly admits disposable output.
 
+## User Package Configuration
+
+`artifacts/binary/softpc.ini` is user-owned package configuration. An agent
+must not create, rewrite, copy over, normalize, stage, commit, or otherwise
+modify it. Builds and packaging may refresh only `softpc32.exe` and
+`softpc64.exe` in that directory. Only the owner may modify the INI.
+
 ## Identifier And Build-Version Policy
 
 `T<n>` is one repository-wide, strictly increasing implementation-task number;

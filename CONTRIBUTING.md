@@ -17,3 +17,7 @@ user-facing deliverables are `artifacts/binary/softpc32.exe`,
 guest media belongs in `artifacts/media/`. The fixed original ROMs are embedded
 from `src/mvdm/softpc.new/roms/`; any future external-ROM contract belongs in
 `artifacts/roms/`.
+
+`artifacts/binary/softpc.ini` is user-owned configuration and is never an
+agent build or packaging output; see the binding rule in
+[Execution Rules](docs/rules/EXECUTION.md#user-package-configuration).

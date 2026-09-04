@@ -4,19 +4,19 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T21 closed |
-| Admission And Approval | Owner directed implementation of queued `Ctrl+Alt+F` guest Alt+Enter in both console and window, with console help listing every Ctrl+Alt command on its own line. |
-| Objective | Translate `Ctrl+Alt+F` into the guest's physical Alt+Enter make/break sequence through the existing runtime keyboard path. |
-| Non-goals | No host fullscreen action; no change below `src/app`; no change to SoftPC, BIOS, BOP, controller, timing, capture policy, or existing Ctrl+Alt commands. |
-| Baseline | T20 is closed and dual-width verified. Console/window already reserve Ctrl+Alt+P/D/M and use the shared keyboard normalizer. |
-| Affected Boundary | `src/app/{keyboard,console,window,main}` and focused keyboard/frontend tests. |
-| Subtask Plan | S1 add shared Alt+Enter injection; S2 reserve it in both frontends and rewrite monitor help; S3 dual-width proof and package refresh. |
-| Requirement Ledger | R1: guest receives Alt make, Enter make, Enter break, Alt break. R2: host Ctrl+Alt+F and its release do not leak to the guest. R3: P/D/M behavior stays unchanged. R4: console help is one Ctrl+Alt command per line. |
-| Focused Verification | Keyboard sequence smoke, frontend hotkey handling, help-text assertion, full GCC x64/x86 CTest and package smoke. |
-| Stop Conditions | Stop if frontend routing requires direct machine or controller access, or if Alt+Enter conflicts with a documented existing host action. |
-| Exit Criteria | Both frontends inject guest Alt+Enter without host window changes; help is complete and multiline; both package builds and regressions pass. |
-| Closure | Completed: Ctrl+Alt+F is consumed in console and window, injects Alt+Enter through the shared original-keyboard route, and console help lists P/D/F/M one per line. Fresh GCC x64/x86 builds and CTest 20/20 each passed. |
-| Original Owner Request | “ctrl+alt+f可以都在console和window模式里给客户机发送alt+enter” and “修改console，列出所有ctrl+alt命令，分行显示”. |
+| Identifier Mode | M9 Td S1 closed |
+| Admission And Approval | Owner directed that the standing prohibition on agent modification of `softpc.ini` be written into repository governance. |
+| Objective | Make the package-configuration ownership rule enforceable and reachable from the mandatory task reading set. |
+| Non-goals | No executable, build-system, source, artifact, guest-media, or configuration-file change. |
+| Baseline | `artifacts/binary/softpc.ini` is user-maintained adjacent package configuration; the executable pair is the only agent-refreshable package output. |
+| Affected Boundary | `docs/rules/EXECUTION.md`, its contributor pointer, and this current packet. |
+| Subtask Plan | S1 record the binding rule once; link it from contributor guidance; run the documentation-governance gate. |
+| Requirement Ledger | R1: forbid every form of agent mutation of the package INI. R2: reserve INI modification to the owner. R3: preserve agent packaging authority for the two executables only. |
+| Focused Verification | Documentation governance check and `git diff --check`; confirm the user-owned INI is not staged. |
+| Stop Conditions | Stop if the rule would contradict a higher authority or require a change to the INI itself. |
+| Exit Criteria | A single binding execution rule is reachable from mandatory reading, contributor guidance does not duplicate it, validation passes, and no configuration file is staged. |
+| Closure | Completed: the execution rule now protects `artifacts/binary/softpc.ini` from all agent mutation and permits package refresh only for the two executables. The contributor guide points to that single rule. |
+| Original Owner Request | “禁止你再去修改softpc.ini!!” and “写入治理规范！” |
 
 ## Current Technical Baseline
 
@@ -31,6 +31,9 @@
 
 ## Recent Governance
 
+- M9 Td S1 makes `artifacts/binary/softpc.ini` permanently user-owned package
+  configuration: agents may refresh the executable pair but cannot modify,
+  stage, or commit that INI.
 - M8 Td S1 established the NXVM-style authority topology, linked the four
   applicable shared governance skills, and added the documentation gate.
 - M8 Td S2 established the public product identity as Insignia SoftPC and
