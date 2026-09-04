@@ -2,7 +2,20 @@
 
 ## Current Work
 
-No active task.
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | M8 T15 S1 |
+| Admission And Approval | Owner authorized sequential SoftPC queue execution through the active code-layout objective on 2026-09-03. |
+| Objective | Establish the selected OpenNT source mirror, mirrored overlay-patch layout, manifest enforcement, and build-tree source composition so the compiler no longer reads a directly edited original file from the mirror. |
+| Non-goals | No controller/BIOS/ROM/BOP/CCPU/C-VID semantic change; no new machine capability; no generated source checked into `src/`; no relocation of standalone host/app implementation (T17/T18 own those). |
+| Baseline | T14 (`a072bb8`) establishes the selected OpenNT revision and the 60 direct-difference ledger. The current tree is `src/core/softpc/`; 39 direct rows propose overlay, 17 host, and four unselected XMS/allocator removals. |
+| Affected Boundary | Source provenance, CMake build routing, and ignored build-tree composed copies. The original external tree is comparison/import input for this admitted mirror task only; it is never a runtime dependency. |
+| Subtask Plan | S1 create a byte-accounted pristine mirror and mirrored patch ledger; S2 compose selected sources into `build/`; S3 route CMake to composed inputs and fail closed on stale/missing patch mapping; S4 prove unpatched hashes and x64/x86 regression parity. |
+| Requirement Ledger | R1: mirror path matches OpenNT relative layout. R2: each patch path mirrors its original and has manifest owner/reason/defines/x86/x64 evidence fields. R3: composition fails when an applied patch is stale or unregistered. R4: compiler selects composed rather than directly edited mirror sources. R5: unpatched composed hashes equal pristine source hashes. |
+| Focused Verification | Hash check for mirror and unpatched composed paths; deliberately invalid patch/manifest fixture; static CMake selected-input audit; then x64/x86 build and focused machine/renderer/input/timer/media/BOP tests. |
+| Stop Conditions | Stop for owner direction if a required direct diff cannot be represented as a reversible patch, if current behavior requires an unproved representation change, or if the target source layout would require a machine-semantic decision. |
+| Exit Criteria | A byte-accounted original mirror and checked patch composition produce the existing build on x64/x86; no compiled original comes from a directly edited mirror file; every selected patch is manifest-visible; focused regression matches the T14 baseline. |
+| Original Owner Request | Persistent objective: “单人双角色模式执行SoftPC 的队列任务：代码布局优化。” T15 is the next ordered queue task. |
 
 ## Current Technical Baseline
 
