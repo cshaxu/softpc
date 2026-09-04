@@ -75,7 +75,37 @@ struct app_runtime {
     uint32_t graphics_source_width;
     uint32_t graphics_source_height;
     uint32_t graphics_visible_width;
+    uint32_t measurement_published_frames;
+    uint32_t measurement_dirty_frames;
+    DWORD measurement_due;
 };
+
+static void app_runtime_measure(app_runtime *runtime)
+{
+    FILETIME created, exited, kernel, user;
+    ULARGE_INTEGER cpu;
+    DWORD now = GetTickCount();
+
+    if ((LONG)(now - runtime->measurement_due) < 0) return;
+    runtime->measurement_due = now + 1000u;
+    cpu.QuadPart = 0u;
+    if (GetProcessTimes(GetCurrentProcess(), &created, &exited, &kernel,
+            &user)) {
+        ULARGE_INTEGER kernel_time;
+        ULARGE_INTEGER user_time;
+        kernel_time.LowPart = kernel.dwLowDateTime;
+        kernel_time.HighPart = kernel.dwHighDateTime;
+        user_time.LowPart = user.dwLowDateTime;
+        user_time.HighPart = user.dwHighDateTime;
+        cpu.QuadPart = kernel_time.QuadPart + user_time.QuadPart;
+    }
+    app_prompt_trace("softpc measure frames=%lu dirty=%lu cpu100ns=%llu",
+        (unsigned long)runtime->measurement_published_frames,
+        (unsigned long)runtime->measurement_dirty_frames,
+        (unsigned long long)cpu.QuadPart);
+    runtime->measurement_published_frames = 0u;
+    runtime->measurement_dirty_frames = 0u;
+}
 
 static void app_runtime_publish(app_runtime *runtime)
 {
@@ -109,6 +139,7 @@ static void app_runtime_publish(app_runtime *runtime)
         int dirty = softpc_machine_presentation_take_dirty(runtime->machine,
             &ignored_left, &ignored_top, &ignored_right, &ignored_bottom);
         trace_dirty = dirty;
+        if (dirty) ++runtime->measurement_dirty_frames;
         trace_left = ignored_left; trace_top = ignored_top;
         trace_right = ignored_right; trace_bottom = ignored_bottom;
 
@@ -282,6 +313,7 @@ static void app_runtime_publish(app_runtime *runtime)
     }
     if (published) {
         frame->sequence = ++runtime->frame_sequence;
+        ++runtime->measurement_published_frames;
         runtime->published_frame = next;
         /* Publish only after the copied frame and its selected slot are
            complete.  Frontends use this as a cheap cadence gate before they
@@ -370,6 +402,7 @@ static void app_runtime_executor_event(void *opaque)
     app_runtime *runtime = (app_runtime *)opaque;
     app_runtime_drain_input(runtime);
     app_runtime_publish(runtime);
+    app_runtime_measure(runtime);
     if (InterlockedCompareExchange(&runtime->pause_requested, 0, 0) != 0 &&
         InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0) {
         InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_PAUSED);
@@ -466,6 +499,7 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
     InitializeCriticalSection(&runtime->frame_lock);
     runtime->result = SOFTPC_MACHINE_OK;
     runtime->state = SOFTPC_RUNTIME_STOPPED;
+    runtime->measurement_due = GetTickCount() + 1000u;
     runtime->worker = CreateThread(NULL, 0u, app_runtime_worker, runtime,
         0u, NULL);
     if (runtime->worker == NULL) {

@@ -4,19 +4,19 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T32 S5 active |
-| Admission And Approval | Owner accepted T31 S4 behavior and approved S5 from the queued frontend-performance proposal. |
-| Objective | Avoid copying and publishing a graphics frame when its original dirty region and palette are unchanged from the currently published self-contained frame. |
+| Identifier Mode | M9 T33 S6 active |
+| Admission And Approval | Owner approved S6 from the queued frontend-performance proposal. |
+| Objective | Measure executor pacing, graphics publication, and process CPU use during the Prompt path before deciding whether the 1 MIPS standalone governor is a limiting factor. |
 | Non-goals | No CCPU, V7/VGA controller, original renderer, BIOS, ROM, BOP, timer, input, INI, media, or guest/Win3.1 driver change; no console/window lifecycle restructuring. |
-| Baseline | T31 S4 is implemented at `f118fb5`; original dirty rectangles now reach the standalone RGB presenter. |
+| Baseline | T32 S5 is implemented at `396318c`; unchanged dirty frames no longer publish. |
 | Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT is read-only comparison material. |
-| Affected Boundary | Standalone runtime graphics snapshot publication and its unit coverage; package executables. |
-| Subtask Plan | Compare each original dirty region and palette with the current copied frame before copying the next slot; preserve publication for actual changes and every full-refresh condition. |
-| Requirement Ledger | R1: original renderer unchanged. R2: no-content-change dirty reports do not publish a frame. R3: palette/geometry changes publish complete frames. R4: snapshots remain self-contained. R5: no INI/media changes. |
-| Focused Verification | Runtime/frame unit proof; existing renderer/window tests; full x64/x86 CTest and package smoke. |
-| Stop Conditions | Stop after rebuilt dual-width packages. Do not start S6. |
-| Exit Criteria | Unchanged dirty graphics skips publication; changed dirty pixels and palette changes publish; both package widths and full suites pass. |
-| Original Owner Request | “好，批准” |
+| Affected Boundary | Standalone runtime/process measurement and trace output; package executables. |
+| Subtask Plan | Add once-per-second read-only counters for published frames, graphics dirty reports, and process CPU time; rebuild dual-width packages; retain an owner Prompt capture. Decide separately whether any pace change is warranted. |
+| Requirement Ledger | R1: no pace value changes in this task. R2: original timer/quick-event semantics unchanged. R3: trace is bounded to one summary per second. R4: no INI/media changes. |
+| Focused Verification | x64/x86 build and CTest; package smoke; owner Prompt capture with the new summary lines. |
+| Stop Conditions | Stop after measurement packages are published; do not tune the governor without owner evidence. |
+| Exit Criteria | Trace provides frame/dirty rate and process CPU per second for a reproducible Prompt run; both package widths and full suites pass. |
+| Original Owner Request | “S6” |
 
 ## Current Technical Baseline
 
