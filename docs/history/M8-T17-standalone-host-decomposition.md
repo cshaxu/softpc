@@ -22,8 +22,8 @@ will assign every standalone host source one taxonomy owner before it moves.
 ## S1 Ownership Inventory And First Path Migration
 
 The repository-owned standalone implementation was inventoried as the former
-`src/core/softpc_*` aggregation plus the existing `src/host/softpc_compat/`
-adapters. Its first path migration is content-preserving:
+`src/core/softpc_*` aggregation plus the existing host compatibility adapters.
+Its first path migration is content-preserving:
 
 - `host/machine`: `softpc_machine.[ch]` and the standalone machine-BOP
   dispatcher;
@@ -33,9 +33,9 @@ adapters. Its first path migration is content-preserving:
 - `host/platform`: the still-to-be-split platform callback aggregate;
 - `host/compat`: the unselected XMS compatibility endpoints.
 
-The pre-existing `host/softpc_compat/` directory continues to contain its
-console compatibility and fast-BOP adapters. CMake's selected inputs and
-public machine header routing now use the taxonomy paths; no selected
+The compatibility endpoints now live in `host/compat/`: conapi/DIB surface,
+console compatibility, and fast-BOP adapters. CMake's selected inputs and
+private machine header routing now use the taxonomy paths; no selected
 `src/core/softpc_*` path remains. GCC x64 and GCC x86 both rebuilt and passed
 all 20 CTest cases.
 
@@ -93,6 +93,13 @@ The standalone speaker sink is now an isolated platform source,
 `src/host/platform/softpc_platform_audio.c`; it retains the original host
 frequency request contract and teardown ordering.  GCC x64/x86 compile it and
 the focused sound/source-boundary test passes on x86.
+
+The former `src/host/softpc_compat/` directory has also been retired. Its
+conapi/DIB compatibility declarations and console/fast-BOP implementation
+sources now live in the approved `src/host/compat/` taxonomy, alongside the
+existing XMS host endpoint. The current 98-row direct-difference ledger is
+generated from this path map and rejects a missing current path. GCC x64 and
+x86 both rebuilt the package and passed all 20 CTest cases after the move.
 
 ## S2 V7 Hardware-Pointer Presentation Separation
 

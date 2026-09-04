@@ -391,8 +391,8 @@ add_library(softpc-machine-devices OBJECT
     src/mvdm/softpc.new/host/src/nt_cga.c
     src/mvdm/softpc.new/host/src/nt_com.c
     src/mvdm/softpc.new/host/src/nt_vga.c
-    src/host/softpc_compat/edl_fast_bop.c
-    src/host/softpc_compat/graphics_console_compat.c
+    src/host/compat/edl_fast_bop.c
+    src/host/compat/graphics_console_compat.c
     src/host/video/softpc_standalone_dib.c
     src/host/video/softpc_platform_video.c
     src/host/video/softpc_v7_pointer.c
@@ -427,7 +427,7 @@ target_include_directories(softpc-ccpu-core PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu"
     src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
-    src/host/softpc_compat
+    src/host/compat
     src/host/input
     src/host/machine
     src/host/media
@@ -443,7 +443,7 @@ target_include_directories(softpc-machine-devices PRIVATE
     src/core/softpc-port-abi
     src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
-    src/host/softpc_compat
+    src/host/compat
     src/host/input
     src/host/machine
     src/host/media

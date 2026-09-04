@@ -16,6 +16,10 @@ set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/host/platform/softpc_standalone_platform.c"
     "${SOFTPC_SOURCE_DIR}/src/host/machine/softpc_machine.c")
 
+if(EXISTS "${SOFTPC_SOURCE_DIR}/src/host/softpc_compat")
+    message(FATAL_ERROR "Standalone host retains the obsolete softpc_compat taxonomy")
+endif()
+
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.c" OR
    EXISTS "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.h")
     message(FATAL_ERROR "Standalone SoftPC retains the obsolete physical-mapping shim")

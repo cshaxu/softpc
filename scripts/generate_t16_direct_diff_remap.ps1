@@ -16,10 +16,22 @@ if (-not $OutputPath) {
 
 $RelocatedPaths = @{
     'src/core/softpc/base/ccpu386/softpc_ccpu_facade.c' = 'src/core/softpc-port-abi/ccpu/softpc_ccpu_facade.c'
-    'src/core/softpc/host/inc/softpc_standalone_dib.h' = 'src/host/softpc_compat/softpc_standalone_dib.h'
+    'src/core/softpc/host/inc/softpc_standalone_dib.h' = 'src/host/compat/softpc_standalone_dib.h'
     'src/core/softpc/host/inc/x86/prod/gdpvar.h' = 'src/core/softpc-port-abi/ccpu/gdpvar.h'
     'src/core/softpc/host/inc/x86/prod/PigReg_c.h' = 'src/core/softpc-port-abi/ccpu/PigReg_c.h'
     'src/core/softpc/host/inc/x86/prod/sas4gen.h' = 'src/core/softpc-port-abi/ccpu/sas4gen.h'
+    'src/core/softpc_device_bop.c' = 'src/host/machine/softpc_device_bop.c'
+    'src/core/softpc_gfi_image.c' = 'src/host/media/softpc_gfi_image.c'
+    'src/core/softpc_machine.c' = 'src/host/machine/softpc_machine.c'
+    'src/core/softpc_machine.h' = 'src/host/machine/softpc_machine.h'
+    'src/core/softpc_standalone_dib.c' = 'src/host/video/softpc_standalone_dib.c'
+    'src/core/softpc_standalone_platform.c' = 'src/host/platform/softpc_standalone_platform.c'
+    'src/core/softpc_xms_host.c' = 'src/host/compat/softpc_xms_host.c'
+    'src/host/softpc_compat/conapi.h' = 'src/host/compat/conapi.h'
+    'src/host/softpc_compat/edl_fast_bop.c' = 'src/host/compat/edl_fast_bop.c'
+    'src/host/softpc_compat/graphics_console_compat.c' = 'src/host/compat/graphics_console_compat.c'
+    'src/host/softpc_compat/softpc_standalone_dib.h' = 'src/host/compat/softpc_standalone_dib.h'
+    'src/host/softpc_compat/softpc_host_input.h' = 'src/host/input/softpc_host_input.h'
 }
 
 function Get-CurrentPath([string]$OldPath) {
@@ -71,8 +83,9 @@ foreach ($row in $rows) {
     ) -join "`t"))
 }
 
-if (@($content | Select-Object -Skip 1 | Where-Object { $_.EndsWith("`tfalse") }).Count -ne 0) {
-    throw 'A T14 direct/local row has no current repository path.'
+$missingRows = @($content | Select-Object -Skip 1 | Where-Object { $_.EndsWith("`tfalse") })
+if ($missingRows.Count -ne 0) {
+    throw "A T14 direct/local row has no current repository path: $($missingRows -join '; ')"
 }
 
 $outputDirectory = Split-Path -Parent $OutputPath
