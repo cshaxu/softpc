@@ -112,6 +112,12 @@ without creating a second RAM, C-VID, or controller implementation. GCC
 x64/x86 rebuilt `artifacts/binary/softpc64.exe` and `softpc32.exe` and each
 passed all 20 CTest cases.
 
+The source-boundary test now enumerates `src/host/` and permits only
+`compat`, `input`, `machine`, `media`, `platform`, and `video`. It also rejects
+V7 presentation callbacks and SAS backing from the platform aggregate. This
+makes the T17 ownership layout a regression invariant rather than a manual
+review result.
+
 ## S2 V7 Hardware-Pointer Presentation Separation
 
 The standalone V7 hardware-pointer DIB composite now lives in

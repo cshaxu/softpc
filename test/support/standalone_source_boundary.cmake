@@ -1,3 +1,17 @@
+# New host code has one concrete ownership taxonomy.  No compatibility or
+# convenience aggregate may appear beside these six owners.
+set(allowed_host_taxonomies compat input machine media platform video)
+file(GLOB host_entries RELATIVE "${SOFTPC_SOURCE_DIR}/src/host"
+    "${SOFTPC_SOURCE_DIR}/src/host/*")
+foreach(host_entry IN LISTS host_entries)
+    if(IS_DIRECTORY "${SOFTPC_SOURCE_DIR}/src/host/${host_entry}")
+        list(FIND allowed_host_taxonomies "${host_entry}" host_taxonomy_index)
+        if(host_taxonomy_index EQUAL -1)
+            message(FATAL_ERROR "Standalone host has no taxonomy owner: ${host_entry}")
+        endif()
+    endif()
+endforeach()
+
 set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/core/softpc-port-abi/ccpu/softpc_ccpu_facade.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc-port-abi/cvidc/softpc_gdp_state.c"
