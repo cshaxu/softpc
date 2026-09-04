@@ -158,7 +158,41 @@ static void app_runtime_publish(app_runtime *runtime)
             bytes = destination_stride * height;
             if (bytes <= SOFTPC_RUNTIME_DIB_MAX_BYTES) {
                 const uint8_t *source = (const uint8_t *)bits;
+                const app_runtime_frame *current =
+                    &runtime->frames[runtime->published_frame];
                 uint32_t row;
+
+                /* A renderer dirty indication can be conservative.  Do not
+                   copy/publish a maximum-sized standalone snapshot unless
+                   its reported region or palette actually differs. */
+                if (current->valid && current->graphics &&
+                    current->dib_width == visible_width &&
+                    current->dib_height == height &&
+                    memcmp(current->dib_info, info,
+                        sizeof(current->dib_info)) == 0) {
+                    int changed = 0;
+                    int32_t left = ignored_left < 0 ? 0 : ignored_left;
+                    int32_t top = ignored_top < 0 ? 0 : ignored_top;
+                    int32_t right = ignored_right >= (int32_t)visible_width ?
+                        (int32_t)visible_width - 1 : ignored_right;
+                    int32_t bottom = ignored_bottom >= (int32_t)height ?
+                        (int32_t)height - 1 : ignored_bottom;
+                    if (right >= left && bottom >= top) {
+                        for (row = (uint32_t)top; row <= (uint32_t)bottom;
+                                ++row) {
+                            if (memcmp(source + row * row_stride + left,
+                                    current->dib_bits + row * destination_stride +
+                                    left, (size_t)(right - left + 1)) != 0) {
+                                changed = 1;
+                                break;
+                            }
+                        }
+                    }
+                    if (!changed) {
+                        LeaveCriticalSection(&runtime->frame_lock);
+                        return;
+                    }
+                }
 
                 for (row = 0u; row < height; ++row)
                     memcpy(frame->dib_bits + row * destination_stride,

@@ -4,19 +4,19 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T31 S4 active |
-| Admission And Approval | Owner requested T30 S3 closure from evidence and admitted S4 to optimize graphics presentation while investigating Win3.1 windowed MS-DOS Prompt characters. |
-| Objective | Carry the original renderer's dirty rectangle through the standalone indexed-DIB-to-RGB window path, convert and invalidate only changed graphics regions, and retain diagnostic evidence that distinguishes original DIB updates from outer RGB/window loss. |
+| Identifier Mode | M9 T32 S5 active |
+| Admission And Approval | Owner accepted T31 S4 behavior and approved S5 from the queued frontend-performance proposal. |
+| Objective | Avoid copying and publishing a graphics frame when its original dirty region and palette are unchanged from the currently published self-contained frame. |
 | Non-goals | No CCPU, V7/VGA controller, original renderer, BIOS, ROM, BOP, timer, input, INI, media, or guest/Win3.1 driver change; no console/window lifecycle restructuring. |
-| Baseline | T29 S2 is closed at `bb3c67e`; T30 S3 closes without code in `history/M9-T30-S3-evidence-led-text-geometry.md`. |
+| Baseline | T31 S4 is implemented at `f118fb5`; original dirty rectangles now reach the standalone RGB presenter. |
 | Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT is read-only comparison material. |
-| Affected Boundary | Standalone copied graphics-frame metadata, RGB surface conversion, Win32 dirty invalidation/paint; graphics unit coverage; package executables. |
-| Subtask Plan | Preserve the original dirty rectangle with each copied graphics frame; force a full conversion only for first frame, surface geometry, or palette change; otherwise convert and repaint the mapped dirty rectangle. Emit compact input/frame/RGB diagnostic evidence for the owner Prompt reproduction. |
-| Requirement Ledger | R1: the original indexed DIB and `nt_ega`/`nt_vga` painter remain unmodified. R2: a first frame, dimension change, or palette change forces a full RGB conversion/repaint. R3: ordinary dirty frames convert/invalidate only their clipped region. R4: diagnostic records identify input delivery, indexed frame, RGB conversion, and invalidation without mutating guest state. R5: no INI/media changes. |
-| Focused Verification | Unit proof for dirty-rectangle clipping, palette/full-refresh selection, and mapped invalidation; existing renderer/window tests; full x64/x86 CTest and package smoke; owner Win3.1 windowed Prompt text reproduction. |
-| Stop Conditions | Stop after dual-width packages and the compact diagnostic capture are ready. Do not alter V7/Win3.1 driver semantics or start S5. |
-| Exit Criteria | An original dirty rectangle yields a corresponding partial RGB conversion and paint invalidation; full-refresh conditions remain correct; diagnostics can assign an absent Prompt glyph to the original DIB or the outer presentation path; both packages and full suites pass. |
-| Original Owner Request | “哦对，做好S3收口，准入S4，优化显示” |
+| Affected Boundary | Standalone runtime graphics snapshot publication and its unit coverage; package executables. |
+| Subtask Plan | Compare each original dirty region and palette with the current copied frame before copying the next slot; preserve publication for actual changes and every full-refresh condition. |
+| Requirement Ledger | R1: original renderer unchanged. R2: no-content-change dirty reports do not publish a frame. R3: palette/geometry changes publish complete frames. R4: snapshots remain self-contained. R5: no INI/media changes. |
+| Focused Verification | Runtime/frame unit proof; existing renderer/window tests; full x64/x86 CTest and package smoke. |
+| Stop Conditions | Stop after rebuilt dual-width packages. Do not start S6. |
+| Exit Criteria | Unchanged dirty graphics skips publication; changed dirty pixels and palette changes publish; both package widths and full suites pass. |
+| Original Owner Request | “好，批准” |
 
 ## Current Technical Baseline
 
