@@ -168,6 +168,7 @@ static void app_monitor_help(void)
     puts("  floppy eject          eject drive A media while stopped/paused");
     puts("  help                  show this help");
     puts("  exit                  quit");
+    puts("");
     puts("While the guest is running:");
     puts("  Ctrl+Alt+P  pause or resume");
     puts("  Ctrl+Alt+D  send Ctrl+Alt+Del");
