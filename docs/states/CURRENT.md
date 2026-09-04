@@ -4,20 +4,20 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T24 closed |
-| Admission And Approval | Owner admitted the next queued task: contextual standalone symbol ownership. |
-| Objective | Make modern application globals explicitly `app_*`, without changing the recovered SoftPC machine ABI or behavior. |
-| Non-goals | No rename below `src/mvdm/softpc.new`; no change to original host-ABI callbacks, CCPU/C-VID/V7/BIOS/BOP/controller code, guest behavior, UI behavior, media, ROMs, executable names, or `softpc.ini`. The compatibility host remains under its established historical spellings where generated or original machine code imports them. |
-| Baseline | The proposal's initial broad scan found 320 unique modern `softpc_*` candidates. The admission audit proved that the host/compat candidates include direct original imports and generated CCPU/C-VID ABI: their spellings are not standalone naming debt. The executable scope is therefore app-owned globals and their direct consumers only. |
+| Identifier Mode | M9 T25 closed |
+| Admission And Approval | Owner reported the next priority bug: guest Ctrl+Alt+Del works, but its warm restart hangs at `Starting MS-DOS ...`. |
+| Objective | Restore a guest Ctrl+Alt+Del warm restart that continues through DOS startup by repairing only the standalone lifecycle boundary that violates the original machine's reset contract. |
+| Non-goals | No DOS, DPMI, NTVDM, WOW, VDD, or frontend-only reboot implementation; no change to selected BIOS/ROM/BOP/controller behavior, guest media, executable names, or user-owned `softpc.ini`. No source change below `src/mvdm/softpc.new/` absent a demonstrated port-ABI need. |
+| Baseline | Cold boot is functional and Ctrl+Alt+D demonstrably reaches the guest. The resulting warm boot reaches `Starting MS-DOS ...` then stops progressing. M9 T24 closed at `34975cd` with GCC x64/x86 20/20 CTest proof. |
 | Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT is read-only comparison material. |
-| Affected Boundary | Application-owned symbols and matching declarations/callers/tests/source-boundary checks below `src/app/` and `test/`; original and generated machine imports remain unchanged. |
-| Subtask Plan | S1 classify candidate definitions and generated/import consumers; S2 rename the app owner families and repair direct consumers; S3 add a regression gate, build both GCC widths, run full CTest and package smoke, then close. |
-| Requirement Ledger | R1: every renamed application global identifies its `app` owner. R2: original and generated SoftPC-required imports retain their spelling. R3: all declarations, callers, tests and static checks use the selected name. R4: x64/x86 package behavior remains unchanged. |
-| Focused Verification | Definition/declaration/import audit; static app-ownership gate; GCC x64/x86 builds; full CTest; package smoke for both launchers. |
-| Stop Conditions | Stop before renaming an original mirror import, a generated ABI entry point, an externally required Windows entry point, or an ambiguous symbol lacking a provable owner; record such cases rather than guessing. |
-| Exit Criteria | Application-owned standalone globals use `app_*`; original and generated SoftPC ABI spelling is intact; static ownership gate and dual-width full regression pass. |
-| Closure | Closed: application-owned globals now use `app_*`; all host/compat `softpc_*` spellings were classified as required original/generated machine ABI and retained. GCC x64 and x86 rebuilt and each passed full CTest, 20/20, including package smoke. |
-| Original Owner Request | “准入执行” for the approved M9 contextual standalone symbol ownership proposal. |
+| Affected Boundary | The app keyboard hotkey route, input queue, executor/reset lifecycle, and required host reset callbacks below `src/{app,host}` and `test/`; original machine imports remain intact. |
+| Subtask Plan | S1 trace cold and guest-warm lifecycle state including modifiers, timer/event and media controller boundaries; S2 add a bounded regression and implement the narrow boundary repair; S3 run dual-width GCC build, full CTest and package smoke, then close. |
+| Requirement Ledger | R1: Ctrl+Alt+D sends guest Ctrl+Alt+Del with no stranded host or guest modifiers. R2: warm reset keeps the original keyboard/reset hardware as the owner. R3: the post-reset execution path continues beyond the DOS startup banner. R4: no product-service semantics or user configuration/media mutation is introduced. |
+| Focused Verification | Cold-versus-warm lifecycle trace; bounded non-artifact regression; GCC x64/x86 builds; full CTest; package smoke for both launchers. |
+| Stop Conditions | Stop before substituting an app-only reboot for guest hardware reset, changing guest media, or modifying original mirrored source without an evidenced port-ABI requirement. |
+| Exit Criteria | Guest Ctrl+Alt+D warm restart progresses beyond `Starting MS-DOS ...` under the fixed machine profile, with dual-width regression proof and no new guest-semantic implementation. |
+| Closure | Closed. `reboot()` had set only the SoftPC reset classification flag, leaving CCPU executing the pre-reset stream. It now asserts the original CCPU hardware reset line (`CPU_HW_RESET`), which restarts at the ROM reset vector and leaves BIOS/controller initialization to the original machine. GCC x64/x86 rebuilt and passed full CTest, 20/20 each; package smoke passed at both widths. |
+| Original Owner Request | “下一个bug：按了ctrl alt d以后确实起作用，但是热重启的机器，死机在 Starting MS-DOS ...” |
 
 ## Current Technical Baseline
 
@@ -35,12 +35,12 @@
 - M9 T23 retired 294 demonstrably unselected historical paths (15 C files and
   279 headers) from the original mirror without changing its selected machine
   behavior; fresh GCC x64/x86 CTest each passed 20/20.
-- M9 T24 is admitted to make modern application symbol ownership explicit. Its
-  admission audit establishes that host/compat `softpc_*` spellings form an
-  original/generated machine ABI and must remain intact.
 - M9 T24 closed with dual-width 20/20 CTest proof and package smoke. The next
   reported issue is a guest Ctrl+Alt+Del warm-reset hang after `Starting
   MS-DOS ...`; it requires a dedicated lifecycle investigation.
+- M9 T25 closed by reconnecting the original keyboard `reboot()` callback to
+  the CCPU hardware reset line. This is a machine reset, not a DOS/DPMI or
+  frontend restart; dual-width GCC CTest passed 20/20 at closure.
 - M9 T22 normalizes frontend host hotkeys without changing SoftPC: Ctrl+Alt+P
   no longer strands guest modifiers across console pause/resume, and
   Ctrl+Alt+F now supplies guest Alt+Enter rather than Ctrl+Alt+Enter.

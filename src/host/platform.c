@@ -715,11 +715,14 @@ IUH host_get_q_calib_val(void)
 
 extern int soft_reset;
 
-/* Ctrl-Alt-Del reaches this original keyboard BIOS hook.  The next machine
-   reset remains owned by the public machine lifecycle. */
+/* Ctrl-Alt-Del reaches this original keyboard BIOS hook. The host side of
+   the original contract asserts the processor reset line; the original CCPU
+   then restarts at the ROM reset vector and its normal BIOS reset path owns
+   every controller initialization. */
 void reboot(void)
 {
     soft_reset = 1;
+    c_cpu_interrupt(CPU_HW_RESET, 0);
 }
 
 void (*BIOS[256])() = {0};

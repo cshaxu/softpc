@@ -9,6 +9,8 @@
 #include "host_def.h"
 #include "ios.h"
 
+extern void reboot(void);
+
 int main(void)
 {
     const char *path = "softpc-machine-irq-smoke.img";
@@ -59,6 +61,17 @@ int main(void)
     /* The original 8042 output-port pulse requests a CPU reset through the
        original keyboard controller; it is not a standalone reset shortcut. */
     outb(0x64u, reset_command);
+    assert(softpc_machine_run(machine, 1u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_instruction_pointer(machine, &cs, &eip) ==
+        SOFTPC_MACHINE_OK);
+    assert(cs == 0xf000u);
+    assert(eip == 0xfff0u);
+
+    /* Ctrl+Alt+Del is decoded by the original BIOS keyboard service, which
+       calls the historical reboot host callback. The standalone callback
+       must assert that same CCPU reset line; it must not merely set the
+       soft-reset classification flag and leave execution in DOS. */
+    reboot();
     assert(softpc_machine_run(machine, 1u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_instruction_pointer(machine, &cs, &eip) ==
         SOFTPC_MACHINE_OK);
