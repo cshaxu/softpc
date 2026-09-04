@@ -18,6 +18,8 @@ No active task.
 
 - M8 Td S1 established the NXVM-style authority topology, linked the four
   applicable shared governance skills, and added the documentation gate.
+- M8 Td S2 established the public product identity as Insignia SoftPC and
+  added current, owner-provided SoftPC product captures to the root README.
 - Implementation task identifiers are repository-wide build versions: the
   12 historical tasks end at T12, the completed test-boundary work is M8 T13,
   and the queued work begins with M8 T14. Td governance work does not consume

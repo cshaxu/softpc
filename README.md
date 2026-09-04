@@ -1,14 +1,28 @@
-# SoftPC VM
+# Insignia SoftPC (revived from NTVDM)
 
-Project governance, target architecture, and the ordered recovery plan are in
-[docs/README.md](docs/README.md). The current executable remains a
-transitional baseline; do not treat its temporary standalone branches as the
-approved final architecture.
+Insignia SoftPC is a standalone PC virtual machine revived from the original
+SoftPC machine source. It runs its fixed recovered machine configuration
+without an NTVDM, DOS/WOW, VDD, or Windows NT host process. The machine keeps
+its original ROM-level hardware behavior, including its narrow machine BOP
+table, but has no NTVDM product-service dispatcher.
 
-Standalone PC virtual machine built around the recovered SoftPC machine
-source, without NTVDM, DOS/WOW, VDD, BOP service dispatch, or an NTVDM host
-process.  The machine shape is fixed to the currently selected SoftPC
-configuration; users supply boot media rather than select a machine profile.
+The machine shape is fixed: users provide boot media instead of choosing a
+machine profile. Project governance, target architecture, and the ordered
+recovery plan are in [docs/README.md](docs/README.md).
+
+## In use
+
+These are current captures of SoftPC running the bundled test media. They
+show the standalone window presentation, the Windows 3.1 load screen, and a
+Windows 3.1 Program Manager desktop.
+
+![SoftPC booted to MS-DOS](assets/readme/dos-boot.png)
+
+![Windows 3.1 loading in SoftPC](assets/readme/windows31-loading.png)
+
+![Windows 3.1 Program Manager in SoftPC](assets/readme/windows31-desktop.png)
+
+## Build and run
 
 All generated build state belongs under the repository's single `build/`
 directory.  This includes CMake/Ninja metadata, generated sources, test
@@ -90,6 +104,8 @@ launcher and validates its adjacent configuration and declared media roots.
 
 ## Source layout
 
+- `assets/readme/` — owner-provided current product screenshots used by this
+  README; they are documentation assets, not guest media or runtime inputs.
 - `src/mvdm/softpc.new/roms/` — byte-identical selected original ROM inputs.
 - `src/core/softpc/` — transitional recovered SoftPC CPU baseline, to be
   migrated by M8 under the source-mirror plan.
