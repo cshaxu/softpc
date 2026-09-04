@@ -17,7 +17,7 @@ def transform(source: str) -> str:
     source = replace_once(
         source,
         '#include "config.h"\n',
-        '#include "config.h"\n#include <cmos/softpc_cmos_host.h>\n',
+        '#include "config.h"\n#include <cmos/port.h>\n',
         "host-port include",
     )
     # The original host encoded its graphics scalar in a pointer.  Preserve

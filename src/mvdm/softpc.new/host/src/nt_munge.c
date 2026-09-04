@@ -23,7 +23,7 @@
 #include "gfx_upd.h"
 #include "egagraph.h"
 #ifdef SOFTPC_STANDALONE
-#include "softpc_standalone_dib.h"
+#include "dib_surface.h"
 #else
 #include <conapi.h>
 #endif

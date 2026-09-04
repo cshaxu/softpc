@@ -94,7 +94,7 @@ def transform_rules(source: str) -> tuple[str, int, int]:
     source, static_count = STATIC_GDP.subn(static_replacement, source)
     source, _ = INDIRECT_GDP.subn(indirect_replacement, source)
     source, _ = LOCAL_IUH_MALLOC.subn(local_iuh_malloc_replacement, source)
-    marker = '#include "softpc_gdp_rule_access.h"\n'
+    marker = '#include "gdp_rule_access.h"\n'
     if marker not in source:
         first_include_end = source.find("\n", source.find("#include")) + 1
         if first_include_end <= 0:
@@ -106,7 +106,7 @@ def transform_rules(source: str) -> tuple[str, int, int]:
 def transform_event_glue(source: str) -> str:
     """Apply the narrow host-width ABI overlay to pristine event glue."""
     host_marker = '#include <stdio.h>\n#include <inttypes.h>\n'
-    gdp_marker = '#include <softpc_gdp_slots.h>\n'
+    gdp_marker = '#include <gdp_slots.h>\n'
     if host_marker not in source:
         source = source.replace(
             '#include "host_def.h"\n',
@@ -140,7 +140,7 @@ def transform_event_glue(source: str) -> str:
 
 def transform_ccpu_cpu4gen(source: str) -> str:
     """Overlay the selected CCPU generated header without changing its input."""
-    marker = '#include <softpc_gdp_slots.h>\n'
+    marker = '#include <gdp_slots.h>\n'
     if marker not in source:
         source = source.replace(
             '#include <gdpvar.h>\t/* For direct access getAX() etc. */\n',
@@ -165,7 +165,7 @@ def transform_ccpu_vglob(source: str) -> str:
     """Select the C-VID aggregate view and GDP slots outside pristine CCPU."""
     source = source.replace('#include "Evid_c.h"\n',
                             '#include "../cvidc/Evid_c.h"\n', 1)
-    marker = '#include <softpc_gdp_slots.h>\n'
+    marker = '#include <gdp_slots.h>\n'
     if marker not in source:
         source = source.replace('#include "gdpvar.h"\n',
                                 '#include "gdpvar.h"\n' + marker, 1)
@@ -204,11 +204,11 @@ def transform_ccpu_sas_source(source: str) -> str:
 
 
 def transform_ccpu_main(source: str) -> str:
-    if '#include <softpc_ccpu_lifecycle.h>' not in source:
+    if '#include <lifecycle.h>' not in source:
         source = source.replace(
             '#include <c_main.h>\t/* C CPU definitions-interfaces */\n',
             '#include <c_main.h>\t/* C CPU definitions-interfaces */\n'
-            '#include <softpc_ccpu_lifecycle.h>\n', 1)
+            '#include <lifecycle.h>\n', 1)
     if '#include <c_addr.h>' not in source:
         source = source.replace('#include <c_main.h>\t/* C CPU definitions-interfaces */\n',
                                 '#include <c_main.h>\t/* C CPU definitions-interfaces */\n'

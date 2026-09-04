@@ -5,7 +5,7 @@
 #include "host_def.h"
 #include "conapi.h"
 #include "nt_graph.h"
-#include "softpc_standalone_dib.h"
+#include "dib_surface.h"
 
 BYTE Red[] = { 0, 0, 0, 0, 128, 128, 128, 192, 128, 0, 0, 0,
     255, 255, 255, 255 };

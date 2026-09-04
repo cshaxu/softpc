@@ -5,7 +5,7 @@
  * original SoftPC renderers.  It deliberately exposes a DIB endpoint, not a
  * console-server or VDM service. */
 #include <windows.h>
-#include "softpc_standalone_dib.h"
+#include "dib_surface.h"
 
 #define CONSOLE_GRAPHICS_BUFFER 2
 #define SYSPAL_STATIC 1

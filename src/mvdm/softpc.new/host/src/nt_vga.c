@@ -30,7 +30,7 @@
 #include "egaports.h"
 #include "host_rrr.h"
 #ifdef SOFTPC_STANDALONE
-#include "softpc_standalone_dib.h"
+#include "dib_surface.h"
 #else
 #include "conapi.h"
 #endif

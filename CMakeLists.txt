@@ -32,8 +32,8 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 4)
 endif()
 
 add_library(softpc-machine
-    src/host/machine/softpc_machine.c)
-target_include_directories(softpc-machine PUBLIC src/host/machine)
+    src/host/machine.c)
+target_include_directories(softpc-machine PUBLIC src/host)
 target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 
 # The original CCPU manifest is the executable x86 core.  It deliberately
@@ -64,7 +64,7 @@ add_custom_command(
         "${SOFTPC_CMOS_SOURCE}"
     DEPENDS "${SOFTPC_CMOS_INPUT}"
         "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cmos.py"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/cmos/softpc_cmos_host.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/host/compat/cmos/port.h"
     COMMENT "Transforming CMOS media port ABI"
     VERBATIM)
 set_source_files_properties("${SOFTPC_CMOS_SOURCE}" PROPERTIES GENERATED TRUE)
@@ -95,12 +95,12 @@ add_custom_command(
         "${SOFTPC_RESET_SOURCE}"
     DEPENDS "${SOFTPC_RESET_INPUT}"
         "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_reset.py"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/bios/host_def.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/host/compat/bios/host_def.h"
     COMMENT "Transforming BIOS reset host ABI"
     VERBATIM)
 set_source_files_properties("${SOFTPC_RESET_SOURCE}" PROPERTIES
     GENERATED TRUE
-    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/bios")
+    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/host/compat/bios")
 set(SOFTPC_CVIDC_TRANSFORMED_SOURCES)
 foreach(SOFTPC_CVIDC_GENERATED_INPUT IN LISTS SOFTPC_CVIDC_GENERATED_INPUTS)
     get_filename_component(SOFTPC_CVIDC_GENERATED_NAME
@@ -301,7 +301,7 @@ endif()
 add_library(softpc-ccpu-core OBJECT
     ${SOFTPC_CCPU_SOURCES}
     "${SOFTPC_CCPU_NTSTUBS_SOURCE}"
-    src/overlay/mvdm/softpc.new/base/ccpu386/softpc_ccpu_facade.c
+    src/host/compat/ccpu/facade.c
     "${SOFTPC_CCPU_VGLOB_SOURCE}"
     ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
     "${SOFTPC_CVIDC_EVENT_GLUE_SOURCE}"
@@ -310,18 +310,18 @@ add_library(softpc-ccpu-core OBJECT
     src/mvdm/softpc.new/base/cvidc/accessfn.c
     src/mvdm/softpc.new/base/cvidc/vglfunc.c
     src/mvdm/softpc.new/base/cvidc/sascdef.c)
-add_library(softpc-machine-overlay OBJECT
-    src/overlay/mvdm/softpc.new/base/cvidc/softpc_gdp_state.c
-    src/overlay/mvdm/softpc.new/base/ccpu386/softpc_ccpu_lifecycle.c)
+add_library(softpc-machine-compat OBJECT
+    src/host/compat/cvidc/gdp_state.c
+    src/host/compat/ccpu/lifecycle.c)
 add_dependencies(softpc-ccpu-core softpc-ccpu-port-abi-inputs)
 
 # Controllers, firmware and the standalone host boundary evolve independently
 # of the CCPU/C-VIDC executor.  Keep them in a separate object target so a
 # recovered original device does not force recompilation of the full executor.
 set_source_files_properties(src/mvdm/softpc.new/base/system/illegalp.c PROPERTIES
-    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/system")
+    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/host/compat/system")
 set_source_files_properties(src/mvdm/softpc.new/base/keymouse/keyba.c PROPERTIES
-    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/keymouse")
+    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/host/compat/keymouse")
 set_source_files_properties(src/mvdm/softpc.new/base/support/time_day.c PROPERTIES
     COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/inc")
 add_library(softpc-machine-devices OBJECT
@@ -385,25 +385,25 @@ add_library(softpc-machine-devices OBJECT
     src/mvdm/softpc.new/host/src/nt_ega.c
     src/mvdm/softpc.new/host/src/nt_graph.c
     src/mvdm/softpc.new/host/src/nt_keycd.c
-    src/mvdm/softpc.new/host/src/nt_lpt.c
     src/mvdm/softpc.new/host/src/nt_sound.c
     src/mvdm/softpc.new/host/src/nt_munge.c
     src/mvdm/softpc.new/host/src/nt_cga.c
-    src/mvdm/softpc.new/host/src/nt_com.c
     src/mvdm/softpc.new/host/src/nt_vga.c
     src/host/compat/edl_fast_bop.c
     src/host/compat/graphics_console_compat.c
-    src/host/video/softpc_standalone_dib.c
-    src/host/video/softpc_platform_video.c
-    src/host/video/softpc_v7_pointer.c
-    src/host/machine/softpc_device_bop.c
-    src/host/machine/softpc_memory.c
-    src/host/media/softpc_gfi_image.c
-    src/host/media/softpc_hdd_media.c
-    src/host/input/softpc_platform_keyboard.c
-    src/host/input/softpc_mouse_instance.c
-    src/host/platform/softpc_platform_audio.c
-    src/host/platform/softpc_standalone_platform.c)
+    src/host/dib_surface.c
+    src/host/video.c
+    src/host/v7_pointer.c
+    src/host/device_bop.c
+    src/host/memory.c
+    src/host/gfi_image.c
+    src/host/hdd_media.c
+    src/host/comms/serial.c
+    src/host/comms/parallel.c
+    src/host/keyboard.c
+    src/host/mouse_instance.c
+    src/host/audio.c
+    src/host/platform.c)
 add_dependencies(softpc-machine-devices softpc-ccpu-port-abi-inputs)
 set_target_properties(softpc-ccpu-core PROPERTIES
     C_STANDARD 90
@@ -411,7 +411,7 @@ set_target_properties(softpc-ccpu-core PROPERTIES
 set_target_properties(softpc-machine-devices PROPERTIES
     C_STANDARD 90
     C_EXTENSIONS ON)
-set_target_properties(softpc-machine-overlay PROPERTIES
+set_target_properties(softpc-machine-compat PROPERTIES
     C_STANDARD 90
     C_EXTENSIONS ON)
 target_compile_definitions(softpc-ccpu-core PRIVATE
@@ -421,46 +421,37 @@ target_compile_definitions(softpc-ccpu-core PRIVATE
 target_compile_definitions(softpc-machine-devices PRIVATE
     CPU_40_STYLE CCPU C_VID CPU_486 SPC386 V7VGA WDCTRL_BOP PROD SOFTPC_STANDALONE=1
     SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
-target_compile_definitions(softpc-machine-overlay PRIVATE
+target_compile_definitions(softpc-machine-compat PRIVATE
     CPU_40_STYLE CCPU C_VID CPU_486 SPC386 V7VGA WDCTRL_BOP PROD SOFTPC_STANDALONE=1
     SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 target_include_directories(softpc-ccpu-core PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu"
-    src/overlay/mvdm/softpc.new/base/ccpu386
-    src/overlay/mvdm/softpc.new/base/cvidc
-    src/overlay/mvdm/softpc.new/host/inc/x86/prod
+    src/host/compat/ccpu
+    src/host/compat/cvidc
+    src/host/compat/ccpu/legacy
     src/host/compat
-    src/host/input
-    src/host/machine
-    src/host/media
-    src/host/platform
-    src/host/video
+    src/host
     src/mvdm/softpc.new/host/inc
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
     src/mvdm/softpc.new/base/cvidc)
 target_include_directories(softpc-machine-devices PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu"
-    src/overlay/mvdm/softpc.new/base
-    src/overlay/mvdm/softpc.new/base/ccpu386
-    src/overlay/mvdm/softpc.new/base/cvidc
-    src/overlay/mvdm/softpc.new/host/inc/x86/prod
     src/host/compat
-    src/host/input
-    src/host/machine
-    src/host/media
-    src/host/platform
-    src/host/video
+    src/host/compat/ccpu
+    src/host/compat/cvidc
+    src/host/compat/ccpu/legacy
+    src/host/compat
+    src/host
     src/mvdm/softpc.new/host/inc
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
     src/mvdm/softpc.new/base/cvidc)
-target_include_directories(softpc-machine-overlay PRIVATE
-    src/overlay/mvdm/softpc.new/base/ccpu386
-    src/overlay/mvdm/softpc.new/base/cvidc
-    src/overlay/mvdm/softpc.new/host/inc/x86/prod
-    src/host/input
-    src/host/machine
+target_include_directories(softpc-machine-compat PRIVATE
+    src/host/compat/ccpu
+    src/host/compat/cvidc
+    src/host/compat/ccpu/legacy
+    src/host
     src/mvdm/softpc.new/host/inc
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
@@ -471,16 +462,12 @@ target_include_directories(softpc-machine-overlay PRIVATE
 # object target.
 target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-ccpu-core>)
 target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-machine-devices>)
-target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-machine-overlay>)
+target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-machine-compat>)
 target_include_directories(softpc-machine PRIVATE
-    src/overlay/mvdm/softpc.new/base/ccpu386
-    src/overlay/mvdm/softpc.new/base/cvidc
-    src/overlay/mvdm/softpc.new/host/inc/x86/prod
-    src/host/input
-    src/host/machine
-    src/host/media
-    src/host/platform
-    src/host/video
+    src/host/compat/ccpu
+    src/host/compat/cvidc
+    src/host/compat/ccpu/legacy
+    src/host
     src/mvdm/softpc.new/host/inc
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
@@ -490,11 +477,11 @@ target_compile_definitions(softpc-machine PRIVATE
 
 add_executable(softpcvm
     src/app/main.c
-    src/app/frontends/console/console.c
-    src/app/runtime/runtime.c
-    src/app/frontends/win32/win32_keyboard.c
-    src/app/frontends/win32/win32_window.c
-    src/app/softpc_firmware.rc)
+    src/app/console.c
+    src/app/runtime.c
+    src/app/keyboard.c
+    src/app/window.c
+    src/app/firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
 if(WIN32)
     target_link_libraries(softpcvm PRIVATE user32 gdi32)
@@ -517,12 +504,12 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/softpc.ini"
     "${SOFTPC_OUTPUT_DIRECTORY}/softpc.ini" COPYONLY)
 
 enable_testing()
-add_executable(softpc-machine-smoke test/unit/softpc_machine_smoke.c)
+add_executable(softpc-machine-smoke test/unit/machine_smoke.c)
 target_link_libraries(softpc-machine-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-machine-smoke COMMAND softpc-machine-smoke)
 set_tests_properties(softpc-machine-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-dual-media-smoke test/unit/softpc_dual_media_smoke.c)
+add_executable(softpc-dual-media-smoke test/unit/dual_media_smoke.c)
 target_link_libraries(softpc-dual-media-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-dual-media-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
@@ -530,12 +517,12 @@ target_include_directories(softpc-dual-media-smoke PRIVATE
 add_test(NAME softpc-dual-media-smoke COMMAND softpc-dual-media-smoke)
 set_tests_properties(softpc-dual-media-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-partition-image-smoke test/unit/softpc_partition_image_smoke.c)
+add_executable(softpc-partition-image-smoke test/unit/partition_image_smoke.c)
 target_link_libraries(softpc-partition-image-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-partition-image-smoke COMMAND softpc-partition-image-smoke)
 set_tests_properties(softpc-partition-image-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-irq-smoke test/unit/softpc_irq_smoke.c)
+add_executable(softpc-irq-smoke test/unit/irq_smoke.c)
 target_link_libraries(softpc-irq-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-irq-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
@@ -543,7 +530,7 @@ target_include_directories(softpc-irq-smoke PRIVATE
 add_test(NAME softpc-irq-smoke COMMAND softpc-irq-smoke)
 set_tests_properties(softpc-irq-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-fdc-smoke test/unit/softpc_fdc_smoke.c)
+add_executable(softpc-fdc-smoke test/unit/fdc_smoke.c)
 target_link_libraries(softpc-fdc-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-fdc-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
@@ -551,7 +538,7 @@ target_include_directories(softpc-fdc-smoke PRIVATE
 add_test(NAME softpc-fdc-smoke COMMAND softpc-fdc-smoke)
 set_tests_properties(softpc-fdc-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-printer-smoke test/unit/softpc_printer_smoke.c)
+add_executable(softpc-printer-smoke test/unit/printer_smoke.c)
 target_link_libraries(softpc-printer-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-printer-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
@@ -559,7 +546,7 @@ target_include_directories(softpc-printer-smoke PRIVATE
 add_test(NAME softpc-printer-smoke COMMAND softpc-printer-smoke)
 set_tests_properties(softpc-printer-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-sound-smoke test/unit/softpc_sound_smoke.c)
+add_executable(softpc-sound-smoke test/unit/sound_smoke.c)
 target_link_libraries(softpc-sound-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-sound-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
@@ -567,7 +554,7 @@ target_include_directories(softpc-sound-smoke PRIVATE
 add_test(NAME softpc-sound-smoke COMMAND softpc-sound-smoke)
 set_tests_properties(softpc-sound-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-serial-smoke test/unit/softpc_serial_smoke.c)
+add_executable(softpc-serial-smoke test/unit/serial_smoke.c)
 target_link_libraries(softpc-serial-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-serial-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
@@ -575,7 +562,7 @@ target_include_directories(softpc-serial-smoke PRIVATE
 add_test(NAME softpc-serial-smoke COMMAND softpc-serial-smoke)
 set_tests_properties(softpc-serial-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-mouse-smoke test/unit/softpc_mouse_smoke.c)
+add_executable(softpc-mouse-smoke test/unit/mouse_smoke.c)
 target_link_libraries(softpc-mouse-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-mouse-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
@@ -583,7 +570,7 @@ target_include_directories(softpc-mouse-smoke PRIVATE
 add_test(NAME softpc-mouse-smoke COMMAND softpc-mouse-smoke)
 set_tests_properties(softpc-mouse-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-keycode-smoke test/unit/softpc_keycode_smoke.c)
+add_executable(softpc-keycode-smoke test/unit/keycode_smoke.c)
 target_link_libraries(softpc-keycode-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-keycode-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
@@ -591,7 +578,7 @@ target_include_directories(softpc-keycode-smoke PRIVATE
 add_test(NAME softpc-keycode-smoke COMMAND softpc-keycode-smoke)
 set_tests_properties(softpc-keycode-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-vga-frame-smoke test/unit/softpc_vga_frame_smoke.c)
+add_executable(softpc-vga-frame-smoke test/unit/vga_frame_smoke.c)
 target_link_libraries(softpc-vga-frame-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-vga-frame-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
@@ -602,7 +589,7 @@ target_compile_definitions(softpc-vga-frame-smoke PRIVATE
 add_test(NAME softpc-vga-frame-smoke COMMAND softpc-vga-frame-smoke)
 set_tests_properties(softpc-vga-frame-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-bop-smoke test/unit/softpc_bop_smoke.c)
+add_executable(softpc-bop-smoke test/unit/bop_smoke.c)
 target_link_libraries(softpc-bop-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-bop-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
@@ -610,7 +597,7 @@ target_include_directories(softpc-bop-smoke PRIVATE
 add_test(NAME softpc-bop-smoke COMMAND softpc-bop-smoke)
 set_tests_properties(softpc-bop-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-quick-time-smoke test/unit/softpc_quick_time_smoke.c)
+add_executable(softpc-quick-time-smoke test/unit/quick_time_smoke.c)
 target_link_libraries(softpc-quick-time-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-quick-time-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
@@ -618,40 +605,40 @@ target_include_directories(softpc-quick-time-smoke PRIVATE
 add_test(NAME softpc-quick-time-smoke COMMAND softpc-quick-time-smoke)
 set_tests_properties(softpc-quick-time-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-lifecycle-smoke test/unit/softpc_lifecycle_smoke.c)
+add_executable(softpc-lifecycle-smoke test/unit/lifecycle_smoke.c)
 target_link_libraries(softpc-lifecycle-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-lifecycle-smoke COMMAND softpc-lifecycle-smoke)
 set_tests_properties(softpc-lifecycle-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-runtime-smoke
-    test/unit/softpc_runtime_smoke.c
-    src/app/runtime/runtime.c
-    src/app/frontends/win32/win32_keyboard.c)
+    test/unit/runtime_smoke.c
+    src/app/runtime.c
+    src/app/keyboard.c)
 target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine)
-target_include_directories(softpc-runtime-smoke PRIVATE src/app/runtime src/app/frontends/win32)
+target_include_directories(softpc-runtime-smoke PRIVATE src/app)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
 set_tests_properties(softpc-runtime-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-win32-window-smoke
-    test/unit/softpc_win32_window_smoke.c
-    src/app/runtime/runtime.c
-    src/app/frontends/win32/win32_keyboard.c
-    src/app/frontends/win32/win32_window.c)
+    test/unit/win32_window_smoke.c
+    src/app/runtime.c
+    src/app/keyboard.c
+    src/app/window.c)
 target_link_libraries(softpc-win32-window-smoke PRIVATE softpc-machine)
 target_compile_definitions(softpc-win32-window-smoke PRIVATE
     SOFTPC_WINDOW_TESTING=1)
 if(WIN32)
     target_link_libraries(softpc-win32-window-smoke PRIVATE user32 gdi32)
 endif()
-target_include_directories(softpc-win32-window-smoke PRIVATE src/app/runtime src/app/frontends/console src/app/frontends/win32)
+target_include_directories(softpc-win32-window-smoke PRIVATE src/app)
 add_test(NAME softpc-win32-window-smoke COMMAND softpc-win32-window-smoke)
 set_tests_properties(softpc-win32-window-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-win32-keyboard-smoke
-    test/unit/softpc_win32_keyboard_smoke.c
-    src/app/frontends/win32/win32_keyboard.c)
+    test/unit/win32_keyboard_smoke.c
+    src/app/keyboard.c)
 target_link_libraries(softpc-win32-keyboard-smoke PRIVATE softpc-machine)
-target_include_directories(softpc-win32-keyboard-smoke PRIVATE src/app/frontends/win32)
+target_include_directories(softpc-win32-keyboard-smoke PRIVATE src/app)
 add_test(NAME softpc-win32-keyboard-smoke COMMAND softpc-win32-keyboard-smoke)
 set_tests_properties(softpc-win32-keyboard-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
@@ -686,7 +673,7 @@ set(SOFTPC_TEST_TARGETS
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
     # Keep every executable test self-contained, just like the launcher.
-    target_sources(${softpc_test_target} PRIVATE src/app/softpc_firmware.rc)
+    target_sources(${softpc_test_target} PRIVATE src/app/firmware.rc)
     if(MSVC)
         target_compile_options(${softpc_test_target} PRIVATE /UNDEBUG)
     else()
@@ -724,7 +711,7 @@ foreach(softpc_unit_test IN LISTS SOFTPC_UNIT_TESTS)
 endforeach()
 set_tests_properties(softpc-documentation-governance PROPERTIES LABELS "governance")
 
-add_executable(softpc-package-smoke test/integration/softpc_package_smoke.c)
+add_executable(softpc-package-smoke test/integration/package_smoke.c)
 add_dependencies(softpc-package-smoke softpcvm)
 target_compile_definitions(softpc-package-smoke PRIVATE
     SOFTPC_PACKAGE_DIRECTORY="${SOFTPC_OUTPUT_DIRECTORY}"

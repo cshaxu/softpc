@@ -4,28 +4,28 @@
 
 ```text
 mvdm/softpc.new
-  original CCPU, C-VID, controllers, BIOS, firmware, BOP and nt_* renderers
+  selected original CCPU, C-VID, controllers, BIOS, firmware, BOP and renderers
         ↑
 overlay/mvdm/softpc.new
   reproducible x86/x64 source/ABI adaptation only; no machine policy
         ↑
 host/
-  original host callback implementations: timer, media, BOP services,
-  conapi-compatible surfaces, input sink and audio sink
+  standalone host callback implementations: timer, media, BOP services,
+  conapi-compatible surfaces, input, audio, serial and parallel endpoints
         ↑
-app/runtime
-  one executor, command/input queues, lifecycle and frame mailbox
-        ↑
-app/frontends
-  monitor console and Win32 window; no machine-state access
+app/
+  one executor, command/input queues, lifecycle, frame mailbox, monitor
+  console, and Win32 window; no machine-state access
 ```
 
-`mvdm/softpc.new` is the repository-owned recovered-machine layout. It retains
-the original relative paths and names so T14 can compare it with the read-only
-OpenNT reference; no source is copied from that reference. Its corresponding
-overlay path, if needed, holds only repository-owned reproducible patches for
-host-width or toolchain representation; it never owns machine policy. `host/`
-supplies original host-facing symbols but does not own guest-visible state.
+`mvdm/softpc.new` is the repository-owned selected recovered-machine layout.
+It retains original relative paths and names for every included file so T14 can
+compare them with the read-only OpenNT reference. It is a selected source
+subset: wholly host-specific NT endpoint files may be absent when a standalone
+host endpoint replaces that contract. Its corresponding overlay path, if
+needed, holds only repository-owned reproducible patches for host-width or
+toolchain representation; it never owns machine policy. `host/` supplies
+standalone host-facing symbols but does not own guest-visible state.
 `app/` owns the single executor and presentation shell.
 
 The runtime executor is the sole caller of the machine and compatibility host.

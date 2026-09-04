@@ -36,7 +36,7 @@
 #include "host_rrr.h"
 
 #ifdef SOFTPC_STANDALONE
-#include "softpc_standalone_dib.h"
+#include "dib_surface.h"
 #else
 #include "conapi.h"
 #endif
@@ -2146,4 +2146,3 @@ void nt_ega_hi_frozen_std(int offset, int screen_x, int screen_y,
       }
 }
 #endif /* MONITOR */
-

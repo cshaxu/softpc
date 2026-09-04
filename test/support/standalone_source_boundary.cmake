@@ -1,6 +1,6 @@
 # New host code has one concrete ownership taxonomy.  No compatibility or
 # convenience aggregate may appear beside these six owners.
-set(allowed_host_taxonomies compat input machine media platform video)
+set(allowed_host_taxonomies comms compat input machine media platform video)
 file(GLOB host_entries RELATIVE "${SOFTPC_SOURCE_DIR}/src/host"
     "${SOFTPC_SOURCE_DIR}/src/host/*")
 foreach(host_entry IN LISTS host_entries)
@@ -13,23 +13,35 @@ foreach(host_entry IN LISTS host_entries)
 endforeach()
 
 set(standalone_sources
-    "${SOFTPC_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/ccpu386/softpc_ccpu_facade.c"
-    "${SOFTPC_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/cvidc/softpc_gdp_state.c"
-    "${SOFTPC_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/cvidc/softpc_gdp_state.h"
-    "${SOFTPC_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/cvidc/softpc_gdp_slots.h"
+    "${SOFTPC_SOURCE_DIR}/src/host/compat/ccpu/facade.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/compat/cvidc/gdp_state.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/compat/cvidc/gdp_state.h"
+    "${SOFTPC_SOURCE_DIR}/src/host/compat/cvidc/gdp_slots.h"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/cvidc/sascdef.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/support/ios.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/disks/fdisk.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/media/softpc_gfi_image.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/media/softpc_hdd_media.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/video/softpc_platform_video.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/video/softpc_v7_pointer.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/machine/softpc_memory.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/gfi_image.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/hdd_media.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/video.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/v7_pointer.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/memory.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/keymouse/keybd_io.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/system/idetect.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/machine/softpc_device_bop.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/platform/softpc_standalone_platform.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/machine/softpc_machine.c")
+    "${SOFTPC_SOURCE_DIR}/src/host/device_bop.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/platform.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/machine.c")
+
+# Overlay is reserved for a future direct source composition only.  Its path
+# is meaningful only when every file maps one-to-one to a recovered peer.
+set(overlay_root "${SOFTPC_SOURCE_DIR}/src/overlay/mvdm/softpc.new")
+if(EXISTS "${overlay_root}")
+    file(GLOB_RECURSE overlay_files RELATIVE "${overlay_root}" "${overlay_root}/*")
+    foreach(overlay_file IN LISTS overlay_files)
+        if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/${overlay_file}")
+            message(FATAL_ERROR "Overlay has no same-name recovered peer: ${overlay_file}")
+        endif()
+    endforeach()
+endif()
 
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/host/softpc_compat")
     message(FATAL_ERROR "Standalone host retains the obsolete softpc_compat taxonomy")
@@ -44,10 +56,10 @@ if(EXISTS "${SOFTPC_SOURCE_DIR}/src/core")
 endif()
 foreach(app_source IN ITEMS
     "src/app/main.c"
-    "src/app/runtime/runtime.c"
-    "src/app/frontends/console/console.c"
-    "src/app/frontends/win32/win32_keyboard.c"
-    "src/app/frontends/win32/win32_window.c")
+    "src/app/runtime.c"
+    "src/app/console.c"
+    "src/app/keyboard.c"
+    "src/app/window.c")
     if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/${app_source}")
         message(FATAL_ERROR "Standalone application source is missing: ${app_source}")
     endif()
@@ -145,8 +157,6 @@ set(required_original_controller_sources
     "src/mvdm/softpc.new/host/src/nt_munge.c"
     "src/mvdm/softpc.new/host/src/nt_graph.c"
     "src/mvdm/softpc.new/host/src/nt_keycd.c"
-    "src/mvdm/softpc.new/host/src/nt_com.c"
-    "src/mvdm/softpc.new/host/src/nt_lpt.c"
     "src/mvdm/softpc.new/host/src/nt_sound.c")
 foreach(source IN LISTS required_original_controller_sources)
     string(FIND "${build_definition}" "${source}" source_location)
@@ -163,7 +173,7 @@ foreach(source IN LISTS standalone_sources)
     endif()
 endforeach()
 
-file(READ "${SOFTPC_SOURCE_DIR}/src/host/platform/softpc_standalone_platform.c"
+file(READ "${SOFTPC_SOURCE_DIR}/src/host/platform.c"
     standalone_platform)
 string(TOLOWER "${standalone_platform}" normalized_platform)
 if(normalized_platform MATCHES "softpc_ata")
@@ -178,13 +188,13 @@ endif()
 
 # Presentation is deliberately a DIB consumer.  Controller planes and DAC
 # interpretation stay in the original nt_cga/nt_ega/nt_vga renderer path.
-file(READ "${SOFTPC_SOURCE_DIR}/src/app/frontends/win32/win32_window.c" window_frontend)
+file(READ "${SOFTPC_SOURCE_DIR}/src/app/window.c" window_frontend)
 string(TOLOWER "${window_frontend}" normalized_window_frontend)
 if(normalized_window_frontend MATCHES "ega_planes|\\bdac\\b")
     message(FATAL_ERROR "Standalone window bypasses the original SoftPC renderer")
 endif()
 
-file(READ "${SOFTPC_SOURCE_DIR}/src/app/frontends/console/console.c" console_frontend)
+file(READ "${SOFTPC_SOURCE_DIR}/src/app/console.c" console_frontend)
 string(TOLOWER "${window_frontend}${console_frontend}" normalized_frontends)
 if(normalized_frontends MATCHES "host_key_(down|up)|mouse_send")
     message(FATAL_ERROR "Standalone frontend bypasses original SoftPC input controllers")
@@ -217,7 +227,7 @@ foreach(source IN LISTS unit_test_sources)
     endif()
 endforeach()
 
-if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/test/integration/softpc_package_smoke.c")
+if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/test/integration/package_smoke.c")
     message(FATAL_ERROR "Missing fixed-package integration runner")
 endif()
 if(build_definition MATCHES "tests/")
