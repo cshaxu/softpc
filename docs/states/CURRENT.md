@@ -5,18 +5,18 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | No active implementation task |
-| Admission And Approval | M9 T34 S7 was owner-approved from the frontend-performance proposal and is closed. |
+| Admission And Approval | M9 T35 S8 was owner-admitted from the frontend-performance proposal and is closed. |
 | Objective | Await owner admission of the next queued task. |
-| Non-goals | Do not begin S8 or any other queued work without owner admission. |
-| Baseline | T34 S7 is closed with event-driven window idle scheduling; see [closure record](../history/M9-T34-S7-window-idle-scheduling.md). |
+| Non-goals | Do not begin further queued work without owner admission. |
+| Baseline | T35 S8 is closed with event-driven console idle scheduling; see [closure record](../history/M9-T35-S8-console-idle-scheduling.md). |
 | Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT is read-only comparison material. |
 | Affected Boundary | None until a task is admitted. |
 | Subtask Plan | None. |
-| Requirement Ledger | T34: all requirements closed. |
-| Focused Verification | T34: GCC x64 CTest 21/21 and GCC x86 CTest 21/21 passed. |
+| Requirement Ledger | T35: all requirements closed. |
+| Focused Verification | T35: GCC x64 CTest 21/21 and GCC x86 CTest 21/21 passed. |
 | Stop Conditions | Await owner direction. |
 | Exit Criteria | A future owner-admitted task supplies its own criteria. |
-| Original Owner Request | “可以，准入S7” |
+| Original Owner Request | “准入” |
 
 ## Current Technical Baseline
 
@@ -65,6 +65,9 @@
 - M9 T34 S7 replaces the standalone window's fixed 16 ms polling timer with
   frame-publication, UI-message, and cursor/title-deadline waits; GCC x64 and
   x86 full CTest each passed 21/21.
+- M9 T35 S8 replaces the console's fixed 10 ms sleep loop with input/frame
+  waits plus a bounded state deadline; GCC x64 and x86 full CTest each passed
+  21/21.
 - M8 Td S1 established the NXVM-style authority topology, linked the four
   applicable shared governance skills, and added the documentation gate.
 - M8 Td S2 established the public product identity as Insignia SoftPC and

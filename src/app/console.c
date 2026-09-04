@@ -284,6 +284,7 @@ int app_vm_run_console(app_runtime *runtime)
     int running = 1;
     int result = SOFTPC_VM_FRONTEND_STOPPED;
     int private_console;
+    HANDLE wait_handles[2];
     if (runtime == NULL) return 1;
     if (!app_console_open(&input, &output, &original_mode,
             &private_console)) return 1;
@@ -303,6 +304,8 @@ int app_vm_run_console(app_runtime *runtime)
     memset(previous, 0xff, sizeof(previous));
     memset(previous_attributes, 0xff, sizeof(previous_attributes));
     memset(previous_palette, 0xff, sizeof(previous_palette));
+    wait_handles[0] = input;
+    wait_handles[1] = (HANDLE)app_runtime_frame_event(runtime);
     while (running && app_runtime_get_state(runtime) == SOFTPC_RUNTIME_RUNNING) {
         INPUT_RECORD record;
         DWORD available;
@@ -342,7 +345,15 @@ int app_vm_run_console(app_runtime *runtime)
                     previous_attributes, previous_palette))
                 displayed_sequence = frame->sequence;
         }
-        Sleep(10u);
+        /* Console input is level-signalled until its records are drained;
+           the runtime event is signalled once for a complete copied frame.
+           The deadline is only a bounded state check for a stop/pause which
+           does not itself publish a frame.  It is not a guest clock. */
+        if (WaitForMultipleObjects(wait_handles[1] == NULL ? 1u : 2u,
+                wait_handles, FALSE, 250u) == WAIT_FAILED) {
+            result = SOFTPC_VM_FRONTEND_ERROR;
+            running = 0;
+        }
     }
     if (result == SOFTPC_VM_FRONTEND_STOPPED &&
         app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED)
