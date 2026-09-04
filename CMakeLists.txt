@@ -396,6 +396,7 @@ add_library(softpc-machine-devices OBJECT
     src/host/video/softpc_standalone_dib.c
     src/host/machine/softpc_device_bop.c
     src/host/media/softpc_gfi_image.c
+    src/host/media/softpc_hdd_media.c
     src/host/input/softpc_platform_keyboard.c
     src/host/platform/softpc_standalone_platform.c)
 add_dependencies(softpc-machine-devices softpc-ccpu-port-abi-inputs)

@@ -7,6 +7,7 @@ set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/support/ios.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/disks/fdisk.c"
     "${SOFTPC_SOURCE_DIR}/src/host/media/softpc_gfi_image.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/media/softpc_hdd_media.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/keymouse/keybd_io.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/system/idetect.c"
     "${SOFTPC_SOURCE_DIR}/src/host/machine/softpc_device_bop.c"

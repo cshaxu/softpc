@@ -48,3 +48,20 @@ binds that callback table when original firmware reset occurs. This is a host
 ownership move only: original keyboard-controller tables and device state
 remain in the recovered SoftPC source. GCC x64 and GCC x86 each pass 20/20
 CTest after the split.
+
+## S2 Fixed-Disk Media Separation
+
+The fixed-disk raw-image adapter now lives in
+`src/host/media/softpc_hdd_media.c`.  It retains the existing direct,
+read-only, and overlay file handling, and continues to export the same
+`host_fdisk_*` callbacks consumed by the recovered original FDISK controller.
+The platform aggregate now asks the private media endpoint only whether each
+configured image is attached, so original CMOS and configuration callbacks
+retain their existing guest-visible result without owning image files or
+overlay buffers.  No source under `src/mvdm/softpc.new/` changed; its BIOS,
+VGA, and CMOS ROM inputs remain together in `src/mvdm/softpc.new/roms/`.
+
+Fresh GCC MinGW x64 and x86 builds each passed the complete 20-test CTest
+suite after the separation.  The first run in each fresh build directory saw
+a transient Windows test-image cleanup handle; the immediate stable rerun was
+green and is the recorded result.
