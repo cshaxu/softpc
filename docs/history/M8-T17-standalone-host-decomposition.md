@@ -79,3 +79,7 @@ composition pending its own focused extraction.
 
 GCC MinGW x64 and x86 each rebuilt and passed the complete 20-test CTest
 suite, including VGA-frame, Win32-window, source-boundary, and package tests.
+
+The obsolete disabled duplicate video vtable was removed from the remaining
+platform aggregate.  It was not compiled or selected by any reset path;
+`nt_graph` remains the only active original `VIDEOFUNCS` owner.
