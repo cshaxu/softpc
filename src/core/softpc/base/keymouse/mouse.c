@@ -96,9 +96,21 @@ static int
 
 static int mouse_inb_toggle = 0;
 
+/* Windows 3.1's Microsoft MOUSE.DRV probes an InPort before it enables
+ * IRQ9: OUT 23Fh,91h; OUT 23Dh,A5h; OUT 23Eh,10h; IN 23Dh.  The test
+ * register affects that one diagnostic transfer only; it must not turn the
+ * normal data/mode port into a permanent loopback device. */
+static int mouse_test_state = 0;
+static half_word mouse_test_data = 0;
+
 void mouse_inb IFN2(io_addr, port, half_word *, value)
 {
     if (port == MOUSE_PORT_1) {		/* data register */
+	if (mouse_test_state == 3) {
+	    *value = mouse_test_data;
+	    mouse_test_state = 0;
+	    return;
+	}
 
 	/*
 	 * Internal registers
@@ -148,6 +160,7 @@ void mouse_inb IFN2(io_addr, port, half_word *, value)
 	trace(buff,DUMP_NONE);
     }
 #endif
+
 }
 
 
@@ -170,6 +183,11 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 	 */
 
 	if (port == MOUSE_PORT_1) {	/* data register */
+		if (mouse_test_state == 1) {
+			mouse_test_data = value;
+			mouse_test_state = 2;
+			return;
+		}
 
 		/*
 		 * Out to Mode register
@@ -322,11 +340,24 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 		}
 
 	}
+	else if (port == MOUSE_PORT_3)	/* InPort test register */
+	{
+		mouse_test_state = (value == 0x91) ? 1 : 0;
+	}
+	else if (port == MOUSE_PORT_2)	/* completes the diagnostic transfer */
+	{
+		if (mouse_test_state == 2 && value == 0x10)
+			mouse_test_state = 3;
+		else
+			mouse_test_state = 0;
+	}
 	else if(port == MOUSE_PORT_0)	/* address pointer register */
 	{
+	    mouse_test_state = 0;
 	    if (value & 0x80)  /* is it  a reset */
 	    {
 		mouse_mode_reg = 0;
+		mouse_test_data = 0;
 		loadsainterrupts = 5;	/* lets Windows initialise its mouse happily */
 		address_reg = value & 0x7F;	/* clear reset bit*/
 		ica_clear_int( AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT );
@@ -393,7 +424,9 @@ void mouse_init IFN0()
     }
 #endif
 
-    mouse_inb_toggle = 0;
+	mouse_inb_toggle = 0;
+	mouse_test_state = 0;
+	mouse_test_data = 0;
 
     io_define_inb(MOUSE_ADAPTOR, mouse_inb);
     io_define_outb(MOUSE_ADAPTOR, mouse_outb);
@@ -417,5 +450,3 @@ void mouse_init IFN0()
     }
     host_deinstall_host_mouse();
 }
-
-

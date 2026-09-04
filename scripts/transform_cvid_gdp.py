@@ -239,9 +239,12 @@ def transform_ccpu_main(source: str) -> str:
     declarations = ('extern void force_yoda(void);\n'
                     'extern void TakeNpxExceptionInt(void);\n'
                     'extern void softpc_platform_executor_event(void);\n'
+                    'extern void softpc_platform_timer_event(void);\n'
+                    'extern IBOOL softpc_platform_has_pending_executor_event(void);\n'
                     'extern IBOOL softpc_platform_consume_clock_tick(void);\n'
                     'extern IBOOL softpc_platform_consume_executor_wake(void);\n'
                     'extern IBOOL softpc_platform_consume_instruction_budget(void);\n'
+                    'extern void softpc_platform_pace_instruction(void);\n'
                     'extern void softpc_platform_wait_for_executor_event(void);\n')
     if declarations not in source:
         source = source.replace(workers, declarations + workers, 1)
@@ -305,7 +308,7 @@ def transform_ccpu_main(source: str) -> str:
             '%s   ica_sigio_event();\n'
             '%s   }\n'
             '\n%sif (softpc_platform_consume_clock_tick())\n'
-            '%s   host_timer_event();\n'
+            '%s   softpc_platform_timer_event();\n'
             '\n%sif (softpc_platform_consume_executor_wake())\n'
             '%s   softpc_platform_executor_event();\n' %
             (indent, indent, indent, indent, indent, indent, indent,
@@ -316,14 +319,33 @@ def transform_ccpu_main(source: str) -> str:
         source, count = timer_event.subn(add_safe_point_mailbox, source)
         if count != 2:
             raise ValueError('cannot locate both CCPU timer-event sites')
+    quick_mode_boundary = (
+        '   if ( quick_mode && GET_DR(DR_DSR) == 0 )\n'
+        '      goto DO_INST;\n')
+    quick_mode_mailbox_boundary = (
+        '   /* The original quick path skips NEXT_INST.  A standalone host\n'
+        '      timer or control wake must therefore first leave quick mode,\n'
+        '      then be consumed at the normal CCPU safe point below. */\n'
+        '   if (quick_mode && softpc_platform_has_pending_executor_event())\n'
+        '      quick_mode = FALSE;\n\n'
+        + quick_mode_boundary)
+    if 'softpc_platform_has_pending_executor_event()' not in source:
+        if quick_mode_boundary not in source:
+            raise ValueError('cannot locate CCPU quick-mode boundary')
+        source = source.replace(quick_mode_boundary,
+                                quick_mode_mailbox_boundary, 1)
     next_instruction = 'NEXT_INST:\n\n'
     next_instruction_mailbox = (next_instruction +
         '   /* Standalone executor mailbox: this is the original CCPU\n'
         '      instruction boundary, including quick-mode iterations. */\n'
         '   if (softpc_platform_consume_clock_tick())\n'
-        '      host_timer_event();\n\n'
+        '      softpc_platform_timer_event();\n\n'
         '   if (softpc_platform_consume_executor_wake())\n'
         '      softpc_platform_executor_event();\n\n'
+        '   /* The original CCPU quick-event contract maps one decoded\n'
+        '      instruction to one microsecond.  Pace only the standalone\n'
+        '      continuous executor here, outside all machine controllers. */\n'
+        '   softpc_platform_pace_instruction();\n\n'
         '   if (!(cpu_interrupt_map & CPU_RESET_EXCEPTION_MASK) &&\n'
         '       softpc_platform_consume_instruction_budget())\n'
         '      {\n'
@@ -345,7 +367,7 @@ def transform_ccpu_main(source: str) -> str:
     # retaining the adjacent original SIGIO handling.
     hlt, mailbox_count = re.subn(
         r'\n[ \t]*if \(softpc_platform_consume_clock_tick\(\)\)\n'
-        r'[ \t]*host_timer_event\(\);\n'
+        r'[ \t]*softpc_platform_timer_event\(\);\n'
         r'\n[ \t]*if \(softpc_platform_consume_executor_wake\(\)\)\n'
         r'[ \t]*softpc_platform_executor_event\(\);\n',
         '\n', hlt, count=1)
@@ -359,7 +381,7 @@ def transform_ccpu_main(source: str) -> str:
                 '            event wake alone must not return directly to\n'
                 '            WaitForSingleObject and starve 8042 input. */\n'
                 '         if (softpc_platform_consume_clock_tick())\n'
-                '            host_timer_event();\n'
+                '            softpc_platform_timer_event();\n'
                 '         if (softpc_platform_consume_executor_wake())\n'
                 '            softpc_platform_executor_event();\n'
                 + hlt_tick)

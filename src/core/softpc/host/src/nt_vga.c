@@ -1379,7 +1379,10 @@ void nt_v7vga_hi_graph_std(int offset, int screen_x, int screen_y,
     ** Tim Septemver 92, sanity check parameters, if they're too big
     ** it can cause a crash.
     */
-    if( height>400 || width>640 ){
+    /* The painter's original V7 mode list includes 640x400, 640x480,
+       720x540 and 800x600.  Its old 640x400 guard was a console-surface
+       limitation, not V7 controller semantics. */
+    if( height>600 || width>800 ){
         assert2( NO, "VDM: nt_v7vga_hi_graph_std() w=%d h=%d", width, height );
         return;
     }

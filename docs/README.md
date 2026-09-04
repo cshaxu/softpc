@@ -4,40 +4,40 @@ This is the sole documentation entry point.
 
 ## Task Reading Set
 
-Before starting or resuming an implementation subtask, every participant reads:
+Before changing work for a subtask, read:
 
 1. this guide;
-2. the active [Current](states/CURRENT.md) packet and its subtask brief;
+2. the active [Current](states/CURRENT.md) packet and its brief;
 3. [Execution Rules](rules/EXECUTION.md); and
 4. [Contributing](../CONTRIBUTING.md).
 
-Then apply these triggers:
+Then apply the change triggers:
 
-- Planning, admitting, or closing a subtask also reads [Queue](states/QUEUE.md)
-  and [Roadmap](design/ROADMAP.md). Closing also reads
-  [Documentation Rules](rules/DOCUMENT.md).
+- Planning, admission, or closure also reads [Queue](states/QUEUE.md),
+  [TODO](states/TODO.md), and [Roadmap](design/ROADMAP.md).
 - Code or build work reads [System Architecture](design/ARCHITECTURE.md),
   [Source Layout](design/CODING.md), [Architecture Rules](rules/ARCHITECTURE.md),
   and [Coding Rules](rules/CODING.md).
-- A UX change also reads [Product UX](design/UI.md). Documentation or governance
-  work reads [Documentation Rules](rules/DOCUMENT.md) and every authority it
-  directly changes.
+- Documentation or governance work reads [Documentation Rules](rules/DOCUMENT.md)
+  and every authority it changes. UX work reads [Product UX](design/UI.md).
+
+Read the fixed set on first entry to a subtask and first resume; re-read an
+authority when its requirements or the affected surface changes.
 
 ## Authority Map
 
-- `design/` defines the product, architecture, source layout, UX, and roadmap.
-- `rules/` defines enforceable process, architecture, coding, and documentation
-  constraints.
-- `states/CURRENT.md` is the only active work packet and current baseline.
-- `states/QUEUE.md` holds ordered, unnumbered candidate links.
-- `states/TODO.md` holds deferred debt only.
-- `proposals/` contains the detail for queued candidates.
-- `history/` will retain closed numbered implementation-task records.
-- `etc/` contains indexed supporting evidence only.
+- `design/` owns current product design, source layout, UI, and milestones.
+- `rules/` owns enforceable repository process, architecture, coding, and
+  documentation constraints.
+- `states/CURRENT.md` is the sole active-work and technical-baseline authority.
+- `states/QUEUE.md` holds ordered unnumbered candidate links; `states/TODO.md`
+  holds deferred debt only.
+- `proposals/` holds unnumbered candidate detail; `history/` holds closed
+  implementation-task records and retained proposals.
+- `etc/` holds only indexed supporting material; see [its index](etc/README.md).
 
 ## Daily Operation
 
-[Current](states/CURRENT.md) is the only active-task and technical-baseline
-authority. [Queue](states/QUEUE.md) holds ordered, unnumbered candidates. A
-candidate receives a numeric task only when the owner admits it. Deferred debt
-that is not a planned task belongs in [TODO](states/TODO.md).
+One topic has one current authority. Link across boundaries instead of copying
+rules, design, status, or plans. Queue is not an active plan and history never
+overrides current design or rules.

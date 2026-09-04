@@ -5,5 +5,9 @@
 #include "console.h"
 
 int softpc_vm_run_window(softpc_runtime *runtime);
+/* Console routing variant: return to the console if the original guest changes
+ * from graphics back to text. Fixed `display=window' never performs this
+ * transfer. */
+int softpc_vm_run_console_window(softpc_runtime *runtime);
 
 #endif

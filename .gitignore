@@ -1,6 +1,3 @@
 /build/
-/build-*/
 /softpc-*-smoke.img
 /artifacts/real-boot/*.img
-/artifacts/real-boot/*/stdout.txt
-/artifacts/real-boot/*/stderr.txt

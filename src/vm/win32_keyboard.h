@@ -22,6 +22,10 @@ int softpc_win32_keyboard_submit_transition(void *context,
     DWORD control_state, int pressed);
 int softpc_win32_keyboard_submit_utf16(softpc_win32_keyboard_normalizer *state,
     void *context, softpc_win32_keyboard_sink sink, WORD code_unit);
+/* Inject the standard physical Ctrl+Alt+Del make/break sequence through the
+   same nt_keycd/8042 path as ordinary host keyboard packets. */
+int softpc_win32_keyboard_submit_ctrl_alt_del(void *context,
+    softpc_win32_keyboard_sink sink);
 void softpc_win32_keyboard_note_recovered_key(
     softpc_win32_keyboard_normalizer *state, WORD virtual_key);
 void softpc_win32_keyboard_release_recovered_key(

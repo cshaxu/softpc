@@ -157,7 +157,8 @@ typedef enum softpc_monitor_state {
 
 static void softpc_monitor_help(void)
 {
-    puts("SoftPC VM monitor");
+    puts("Insignia SoftPC");
+    puts("===============");
     puts("  start                 cold-reset and run the machine");
     puts("  resume                continue a paused machine");
     puts("  pause                 report the current paused state");
@@ -167,14 +168,31 @@ static void softpc_monitor_help(void)
     puts("  floppy eject          eject drive A media while stopped/paused");
     puts("  help                  show this help");
     puts("  exit                  quit");
-    puts("While the guest is running, press Ctrl+Alt+P to return here.");
+    puts("While the guest is running: Ctrl+Alt+P pauses; Ctrl+Alt+D sends Ctrl+Alt+Del; Ctrl+Alt+M releases mouse.");
 }
 
 static int softpc_monitor_run_frontend(softpc_runtime *runtime,
     softpc_presentation presentation, softpc_monitor_state *state)
 {
-    int frontend_result = presentation == SOFTPC_PRESENTATION_WINDOW ?
-        softpc_vm_run_window(runtime) : softpc_vm_run_console(runtime);
+    int frontend_result;
+    int use_window = presentation == SOFTPC_PRESENTATION_WINDOW;
+
+    for (;;) {
+        frontend_result = use_window ?
+            (presentation == SOFTPC_PRESENTATION_CONSOLE ?
+                softpc_vm_run_console_window(runtime) : softpc_vm_run_window(runtime)) :
+            softpc_vm_run_console(runtime);
+        if (presentation != SOFTPC_PRESENTATION_CONSOLE) break;
+        if (frontend_result == SOFTPC_VM_FRONTEND_SWITCH_WINDOW) {
+            use_window = 1;
+            continue;
+        }
+        if (frontend_result == SOFTPC_VM_FRONTEND_SWITCH_CONSOLE) {
+            use_window = 0;
+            continue;
+        }
+        break;
+    }
     if (frontend_result == SOFTPC_VM_FRONTEND_ERROR) return 0;
     *state = frontend_result == SOFTPC_VM_FRONTEND_PAUSED ?
         SOFTPC_MONITOR_PAUSED : SOFTPC_MONITOR_STOPPED;
@@ -201,6 +219,7 @@ static int softpc_monitor(softpc_runtime *runtime,
     softpc_monitor_state state = SOFTPC_MONITOR_STOPPED;
 
     softpc_monitor_help();
+    puts("");
     for (;;) {
         char *command;
         char *argument;
@@ -253,6 +272,7 @@ static int softpc_monitor(softpc_runtime *runtime,
                 else puts("Floppy inserted.");
             } else puts("Usage: floppy insert <image> | eject");
         } else printf("Unknown command: %s\n", command);
+        puts("");
     }
 }
 

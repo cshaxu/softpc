@@ -276,7 +276,10 @@ half_word target_AR;
 		setES( conf_15_seg );
 		setBX( conf_15_off );
 #else
-		setES( getCS() );
+		/* The C handler executes in the caller's CPU context; getCS() is
+		 * therefore the guest caller's segment, not the ROM segment.  C0
+		 * must point at the original BIOS configuration table at F000:E6F5. */
+		setES( CONF_TABLE_SEGMENT );
 		setBX( CONF_TABLE_OFFSET );
 #endif
 		setAH( 0 );

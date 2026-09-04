@@ -4725,6 +4725,16 @@ LOCAL VOID
       quick_mode = FALSE;
       }
 
+   /* The CPU vector declares this physical-INTR deassertion operation, but
+      the original standalone CCPU object never supplied its endpoint.  A
+      PIC line that is masked before the CPU accepts it must lower the CCPU
+      pending bit; otherwise a later reassertion is lost. */
+   GLOBAL VOID
+   c_cpu_clearHwInt IFN0()
+      {
+      cpu_interrupt_map &= ~CPU_HW_INT_MASK;
+      }
+
    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
    /* Act like CPU 'reset' line activated. (Well nearly)                 */
    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

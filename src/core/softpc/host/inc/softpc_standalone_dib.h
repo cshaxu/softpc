@@ -31,6 +31,7 @@ int softpc_standalone_text_surface(const void **cells_out,
 void softpc_standalone_dib_set_palette(const void *palette, int count);
 void softpc_standalone_dib_set_palette_entries(const PALETTEENTRY *entries,
     int count);
+unsigned long softpc_standalone_dib_palette_history(const RGBQUAD **entries);
 int softpc_standalone_dib_take_dirty(long *left, long *top, long *right,
     long *bottom);
 

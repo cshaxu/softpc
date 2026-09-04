@@ -8,12 +8,20 @@ not a frontend mode emulator. It proves the following original controller and
 renderer combinations write the standalone-owned DIB surface:
 
 - initial text mode and the original loaded EGA/VGA glyph planes;
-- V7 mode `60h` (640x400 256-colour): original `nt_v7vga_hi_graph_std`, with
-  the controller-selected 752x410 DIB geometry;
-- V7 mode `63h` (800x600 256-colour): the same original packed V7 painter;
+- the V7 memory query (`INT 10h/6Fh/07h`) returns its original `AX=826Fh`
+  identity: two 256 KiB VRAM blocks, i.e. 512 KiB total;
+- V7 mode `60h` (752x410 16-colour) and mode `63h` (1024x768 2-colour)
+  select their original controller geometry; neither is misrepresented as a
+  packed 256-colour mode;
 - V7 mode `65h` (1024x768 16-colour): original `nt_graph` selects
   `nt_ega_hi_graph_std`, including its original four-plane LUT expansion, and
   the controller selects a 1024x768 DIB; and
+- V7 modes `66h` (640x400 256-colour) and `67h` (640x480 256-colour): the
+  original `nt_v7vga_hi_graph_std` copies guest pixels and publishes its
+  original dirty rectangle to DIB output;
+- V7 modes `68h` (720x540 256-colour) and `69h` (800x600 256-colour): the
+  same original painter and dirty-output route operate at their original V7
+  geometries; and
 - original VLT/DAC palette propagation, dirty rectangles, text-to-graphics
   transition, and empty/wrap-edge dirty input handling.
 
@@ -23,11 +31,14 @@ replacement renderer.
 
 ## Intentional Scope
 
-The fixed V7 profile makes modes `60h`, `63h`, and `65h` representative of the
-three distinct original routes used here: proprietary packed 256-colour,
-proprietary geometry, and planar 16-colour. Other V7 table entries remain
-owned by the same original controller/paint dispatch and are not advertised as
-separately guest-tested modes.
+The standalone DIB adapter uses the original `vd_ext_graph_table` only to size
+the V7 proprietary 256-colour output surface. This replaces the old NT console
+formula that incorrectly allocated a 1280-pixel surface for modes `66h` and
+`67h`; it does not alter V7 registers, VRAM, BIOS, or the original painters.
+
+The full-frame paths for the high-resolution planar modes remain unaccepted
+until their original dirty update/painter limits have direct regression
+coverage.
 
 ## Verification
 

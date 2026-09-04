@@ -5,6 +5,9 @@
  *    O/S include files.
  */
 #include <stdio.h>
+#ifdef SOFTPC_STANDALONE
+#include <stdlib.h>
+#endif
 #include TypesH
 
 /*
@@ -1325,7 +1328,9 @@ void SWPIC_hw_interrupt IFN3(IU32, adapter, IU32, line_no, IS32, call_count)
      */
 
     if ((line = ica_scan_irr(adapter)) & 0x80)
-	ica_interrupt_cpu(adapter, line & 0x07);
+	{
+	    ica_interrupt_cpu(adapter, line & 0x07);
+	}
 
     ica_lock_set(0);
     host_ica_unlock();
@@ -1358,6 +1363,17 @@ void SWPIC_clear_int IFN2(IU32, adapter, IU32, line_no)
 		asp->ica_cpu_int=FALSE;
 		ica_clear_int(ICA_MASTER,asp->ica_ssr);
 		}
+#ifdef SOFTPC_STANDALONE
+	/* A source can withdraw the only pending master request after the CCPU
+	 * has seen INTR but before it accepts it. Mirror the physical INTR line
+	 * here so a later unmask/reassertion is observable by the executor. */
+	else if (asp->ica_master && asp->ica_cpu_int &&
+	         ica_scan_irr(adapter) == 7)
+		{
+		asp->ica_cpu_int = FALSE;
+		host_clear_hw_int();
+		}
+#endif
 #ifdef EOI_HOOKS
 	/*
 	// If the line has a pending interrupt, call the eoi hook
@@ -1436,7 +1452,6 @@ ica_intack IFN0()
     {
         line = ica_accept(ICA_SLAVE);
 	int_no = line + adapter_state[ICA_SLAVE].ica_base;
-
 #if defined (CPU_40_STYLE) || defined (NTVDM)
 	if (line == -1)	/* skip any spurious ints */
         {

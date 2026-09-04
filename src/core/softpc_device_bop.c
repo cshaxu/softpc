@@ -3,18 +3,9 @@
 #include "bios.h"
 #include "tape_io.h"
 #include "sas.h"
-#include "xmsexp.h"
 #include TypesH
 #include CpuH
 
-/* Original nt_bop.c's MS_bop_2 is the XMS entry.  The standalone port keeps
-   its byte-at-CS:IP contract but reads through SoftPC SAS instead of the
-   NTVDM pointer mapper. */
-void softpc_xms_bop IFN0()
-{
-    XMSDispatch((ULONG)sas_hw_at_no_check(effective_addr(getCS(), getIP())));
-    setIP((IU16)(getIP() + 1u));
-}
 
 /*
  * The original ROM communicates with machine-resident C services through
@@ -65,16 +56,17 @@ void softpc_device_bop_register_machine_services IFN0()
     extern void bootstrap1 IPT0();
     extern void bootstrap2 IPT0();
     extern void bootstrap3 IPT0();
-    extern void mouse_install1 IPT0();
-    extern void mouse_install2 IPT0();
-    extern void mouse_int1 IPT0();
-    extern void mouse_int2 IPT0();
-    extern void mouse_io_language IPT0();
-    extern void mouse_io_interrupt IPT0();
-    extern void mouse_video_io IPT0();
+#ifdef WDCTRL_BOP
+    /* Original diskbios.c 32-bit controller path.  Windows probes this at
+       ROM BOP 04h; it is a machine disk I/O acceleration, not a DOS, DPMI,
+       XMS, VDD, or NTVDM service. */
+#endif
 
     BIOS[BIOS_RESET] = reset;
     BIOS[BIOS_DUMMY_INT] = dummy_int;
+#ifdef WDCTRL_BOP
+    BIOS[0x04] = wdctrl_bop;
+#endif
     BIOS[0x06] = illegal_op_int;
     BIOS[BIOS_UNEXP_INT] = unexpected_int;
     BIOS[BIOS_KB_INT] = keyboard_int;
@@ -86,7 +78,6 @@ void softpc_device_bop_register_machine_services IFN0()
        42h.  The latter is visible in v7vga.rom at C000:0898. */
     BIOS[BIOS_VIDEO_IO] = video_io;
     BIOS[0x42] = ega_video_io;
-    BIOS[0x52] = softpc_xms_bop;
     BIOS[BIOS_PRINTER_IO] = printer_io;
     BIOS[BIOS_RS232_IO] = rs232_io;
     BIOS[BIOS_DISK_IO] = disk_io;
@@ -108,11 +99,4 @@ void softpc_device_bop_register_machine_services IFN0()
     BIOS[0x90] = bootstrap1;
     BIOS[0x91] = bootstrap2;
     BIOS[0x92] = bootstrap3;
-    BIOS[BIOS_MOUSE_INSTALL1] = mouse_install1;
-    BIOS[BIOS_MOUSE_INSTALL2] = mouse_install2;
-    BIOS[BIOS_MOUSE_INT1] = mouse_int1;
-    BIOS[BIOS_MOUSE_INT2] = mouse_int2;
-    BIOS[BIOS_MOUSE_IO_LANGUAGE] = mouse_io_language;
-    BIOS[BIOS_MOUSE_IO_INTERRUPT] = mouse_io_interrupt;
-    BIOS[BIOS_MOUSE_VIDEO_IO] = mouse_video_io;
 }

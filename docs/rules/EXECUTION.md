@@ -1,18 +1,51 @@
 # Execution Rules
 
-Only the owner admits, reorders, or closes implementation tasks. Queue entries
-are ordered but unnumbered. Admission creates one numeric `T` and one active
-subtask `S` in `states/CURRENT.md`; completed task evidence moves to `history/`.
+Apply the shared [execution-governance skill](https://github.com/cshaxu/skills/blob/main/execution-governance/SKILL.md).
+This document is the SoftPC execution authority.
 
-Use `M<milestone> T<task> S<subtask> P<part>: summary` for admitted
-implementation commits. Standalone documentation/governance work uses
-`M<milestone> Td S<subtask> P<part>: summary` and never allocates a numeric T.
+## Lifecycle And Authority
 
-Every implementation subtask states its owner, input/output boundary, focused
-verification, full regression requirement, similar-issue sweep, stop
-condition, and exit criteria. A runnable-path change requires x64 and x86
-build/test evidence. Real media remains local evidence and must never be
-mutated unless the active packet explicitly permits its configured mode.
+Only the owner admits, reorders, suspends, or closes implementation work.
+Admission creates one active subtask in `states/CURRENT.md` with the original
+request, objective, non-goals, baseline, affected boundaries, applicable rules,
+focused verification, full regression, similar-issue sweep, stop conditions,
+and exit criteria. There is one active subtask at a time.
 
-An executor reports a discovered scope conflict rather than silently expanding
-an admitted task. Passing one smoke test never closes a task.
+```text
+accepted -> planned -> active -> implemented -> verified -> closed
+                                  |              |
+                                  +-> blocked    +-> deferred
+```
+
+A build or one smoke does not close a task. Runnable-path work needs x64 and
+x86 build/test evidence proportional to the change. Artifact media remains
+non-mutating unless its active packet explicitly admits disposable output.
+
+## Identifier And Build-Version Policy
+
+`T<n>` is one repository-wide, strictly increasing implementation-task number;
+it never resets with `M<n>`. `T<n>` is that task's program build version.
+Milestones scope roadmap work only.
+
+`Td` is a standalone documentation/governance identifier and never consumes a
+`T` number. Use `M<milestone> Td S<subtask> P<part>: summary` for governance
+commits and `M<milestone> T<task> S<subtask> P<part>: summary` for
+implementation commits.
+
+Historical milestone-local task labels remain immutable facts. The auditable
+historical count is M1=2, M2=1, M3=2, M5=1, M6=1, M7=5: twelve tasks total.
+The completed staged test-boundary task is M8 T13; future queued M8 tasks use
+T14 and above. No future task may reuse an earlier T number.
+
+Only an admitted Td may edit `docs/rules/`. Before any closure, run:
+
+```powershell
+cmake -DSOFTPC_SOURCE_DIR=. -P tools/Verify-DocumentationGovernance.cmake
+```
+
+## Change Discipline
+
+Use `git mv` for structural relocation, repair every direct reference, then
+run the applicable verification. Discoveries outside the active boundary become
+a Queue proposal or TODO debt; do not silently fold them into the task. A
+completed change is committed and pushed before it is reported closed.

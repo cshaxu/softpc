@@ -11,10 +11,10 @@ not automatically run the guest.
 The monitor owns human-facing commands, not machine state. It presents a
 small fixed command set:
 
-- `start`, `pause`, `reset`, and `stop` request lifecycle changes;
-- `floppy` reports or swaps the configured floppy according to `softpc.ini`;
-- `status` reports the published lifecycle state; and
-- `help` and `quit` are local monitor commands.
+- `start`, `resume`, `pause`, `reset`, and `stop` request lifecycle changes;
+- `floppy insert <image>` and `floppy eject` swap configured drive-A media
+  while stopped or paused; and
+- `help` and `exit` are local monitor commands.
 
 Commands enqueue requests and receive a published result. They never directly
 call a CPU, controller, BOP, or renderer function.

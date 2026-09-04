@@ -31,14 +31,13 @@ extern int softpc_platform_write_physical(unsigned long address,
 extern int softpc_platform_read_physical(unsigned long address,
     unsigned char *bytes, unsigned long length);
 extern void softpc_device_bop_register_machine_services(void);
-extern unsigned long xmsMemorySize;
-extern int XMSInit(int argc, char *argv[]);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
 extern int softpc_platform_keyboard_key(int key, int released);
 extern void softpc_platform_request_executor_wake(void);
 extern void softpc_ccpu_lifecycle_request_exit(void);
 extern void softpc_ccpu_lifecycle_clear_exit(void);
 extern void mouse_send(int delta_x, int delta_y, int left, int right);
+extern void softpc_platform_presentation_request_refresh(void);
 extern void time_strobe(void);
 extern void host_timer_shutdown(void);
 extern void softpc_platform_set_boot_clock(int active);
@@ -47,8 +46,6 @@ extern void softpc_platform_set_executor_callback(void (*callback)(void *),
     void *context);
 extern void q_event_init(void);
 extern void tic_event_init(void);
-extern void mouse_driver_initialisation(void);
-extern void mouse_driver_termination(void);
 extern void host_lpt_close_all(void);
 extern void host_com_close_all(void);
 extern int softpc_host_com_set_output_path(int adapter, const char *path);
@@ -74,9 +71,7 @@ struct softpc_machine {
     unsigned long memory_bytes;
     int reset;
     int hardware_initialized;
-    int xms_initialized;
     int cpu_initialized;
-    int mouse_driver_initialized;
     char floppy_path[SOFTPC_MEDIA_PATH_MAX];
     char serial_output_path[SOFTPC_MEDIA_PATH_MAX];
     char printer_output_path[SOFTPC_MEDIA_PATH_MAX];
@@ -159,15 +154,6 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     softpc_ccpu_lifecycle_clear_exit();
     if (!machine->hardware_initialized) {
         sas_init(machine->memory_bytes);
-        /* xms.486 owns allocation bookkeeping and A20 state.  The standalone
-           host merely gives it the already allocated guest RAM range; there
-           is no VDM virtual-memory mapping or DOS service here. */
-        if (machine->memory_bytes > SOFTPC_MINIMUM_RAM_BYTES) {
-            xmsMemorySize = (machine->memory_bytes -
-                SOFTPC_MINIMUM_RAM_BYTES) / 1024u;
-            if (!XMSInit(0, NULL)) return SOFTPC_MACHINE_IO_ERROR;
-            machine->xms_initialized = 1;
-        }
         softpc_device_bop_register_machine_services();
         gfi_init();
         if (setup_global_data_ptr() == NULL)
@@ -213,10 +199,6 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     reset();
     softpc_platform_set_boot_clock(0);
     softpc_platform_install_timer2_sound_gate();
-    if (!machine->mouse_driver_initialized) {
-        mouse_driver_initialisation();
-        machine->mouse_driver_initialized = 1;
-    }
     machine->reset = 1;
     return SOFTPC_MACHINE_OK;
 }
@@ -245,6 +227,10 @@ softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,
     if (machine == NULL || !machine->reset)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     mouse_send((int)delta_x, (int)delta_y, left_down != 0u, right_down != 0u);
+    /* Windows' V7 driver can update its software cursor through its virtual
+       display path without an ordinary mapped VGA write.  Ask the imported
+       renderer for its own complete refresh after a real InPort event. */
+    softpc_platform_presentation_request_refresh();
     return SOFTPC_MACHINE_OK;
 }
 
@@ -304,10 +290,20 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
 {
     if (machine == NULL || !machine->reset || instruction_budget == 0u)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    softpc_ccpu_instruction_budget = (unsigned long)instruction_budget;
-    /* The original timer subsystem starts the standalone host timer during
-       reset.  Do not manufacture a second timer tick at every UI slice. */
-    softpc_ccpu_instruction_budget_active = 1;
+    /* CCPU's restored inter-instruction counter is 32-bit.  UINT64_MAX is
+       the public API's continuous-execution sentinel: do not truncate it to
+       0xffffffff and accidentally turn a VM run into a roughly-20-second
+       slice.  Finite callers (smokes and the public slicing API) retain the
+       original generated safe-point budget. */
+    if (instruction_budget == UINT64_MAX) {
+        softpc_ccpu_instruction_budget = 0u;
+        softpc_ccpu_instruction_budget_active = 0;
+    } else {
+        softpc_ccpu_instruction_budget = (unsigned long)instruction_budget;
+        /* The original timer subsystem starts the standalone host timer during
+           reset.  Do not manufacture a second timer tick at every UI slice. */
+        softpc_ccpu_instruction_budget_active = 1;
+    }
     c_cpu_simulate();
     softpc_ccpu_instruction_budget_active = 0;
     softpc_ccpu_lifecycle_clear_exit();
@@ -491,8 +487,6 @@ void softpc_machine_destroy(softpc_machine *machine)
         host_com_close_all();
         softpc_platform_hdd_detach();
         softpc_platform_floppy_detach();
-        if (machine->mouse_driver_initialized)
-            mouse_driver_termination();
         if (machine->cpu_initialized)
             c_cpu_terminate();
         softpc_gdp_destroy_global();

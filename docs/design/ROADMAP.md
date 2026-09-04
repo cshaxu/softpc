@@ -45,3 +45,12 @@ single-image partition proof, display compatibility proof, optional
 serial/parallel endpoints, then audio endpoint completion. They must retain the
 original controller and renderer owners and must not reintroduce MVDM product
 services.
+
+## M8: Auditable Source-Mirror Migration
+
+Rebuild the source layout around a byte-accounted OpenNT `softpc.new` mirror,
+mirrored source overlays, a standalone host, and an application shell. This
+milestone starts with T13, separating self-contained unit tests from fixed-package
+integration tests. Every subsequent structural step preserves the selected
+machine and proves the existing x86/x64 behavior before removing a
+transitional path.

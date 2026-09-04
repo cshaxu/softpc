@@ -3313,4 +3313,3 @@ VOID vga_set_line_compare  IFN1(LONG,lcomp_val)
 #endif /* HUNTER */
 #endif /* VGG */
 #endif /* REAL_VGA */
-

@@ -1,4 +1,4 @@
-#include "insignia.h" 
+#include "insignia.h"
 #include "host_def.h"
 /*
  * SoftPC Version 2.0
@@ -2418,8 +2418,8 @@ if (waiting_for_next_8042_code)
 				if ( (cmd_code & 2) == 2)
 					{
 #ifdef PM
-				   if ( !gate_a20_status )
-				      {
+					   if ( !gate_a20_status )
+					      {
 #ifdef NTVDM
 				      /* call xms function to deal with A20 */
 				      xmsDisableA20Wrapping();
@@ -2431,8 +2431,8 @@ if (waiting_for_next_8042_code)
 				   }
 				else
 				   {
-				   if ( gate_a20_status )
-				      {
+					   if ( gate_a20_status )
+					      {
 #ifdef NTVDM
 				      xmsEnableA20Wrapping();
 #else

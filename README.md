@@ -10,13 +10,20 @@ source, without NTVDM, DOS/WOW, VDD, BOP service dispatch, or an NTVDM host
 process.  The machine shape is fixed to the currently selected SoftPC
 configuration; users supply boot media rather than select a machine profile.
 
-Build the VM, then set the fixed machine defaults in
-`build/output/softpc.ini`:
+All generated build state belongs under the repository's single `build/`
+directory.  This includes CMake/Ninja metadata, generated sources, test
+executables, diagnostics, and temporary test media. The user-facing package is
+only `artifacts/binary/`; reusable boot media is in `artifacts/media/`. The
+selected original ROMs are embedded from
+`src/mvdm/softpc.new/roms/`; `artifacts/firmware/` does not exist. Do not
+create sibling `build-*` directories or place generated executables at the
+repository root. Build the VM, then set the fixed machine defaults in the
+adjacent `artifacts/binary/softpc.ini`:
 
 ```text
 cmake -S . -B build -G Ninja
 cmake --build build --parallel 8
-build/output/softpc64.exe
+artifacts/binary/softpc64.exe
 ```
 
 The CMake build supports both 32-bit and 64-bit Windows hosts.  A 32-bit
@@ -24,12 +31,12 @@ build requires a real i686 MinGW toolchain (including its Windows import and
 CRT libraries), for example:
 
 ```text
-cmake -S . -B build-x86 -G Ninja -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc
-cmake --build build-x86 --parallel 8
+cmake -S . -B build/x86 -G Ninja -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc
+cmake --build build/x86 --parallel 8
 ```
 
-The x86 configure writes `build/output/softpc32.exe`; the native x64
-configure writes `build/output/softpc64.exe`. Both use the same adjacent
+The x86 configure writes `artifacts/binary/softpc32.exe`; the native x64
+configure writes `artifacts/binary/softpc64.exe`. Both use the same adjacent
 `softpc.ini`.
 
 `softpc.ini` has five `key=value` keys: `memory_mb`, `floppy`, `hard_disk`,
@@ -37,7 +44,8 @@ configure writes `build/output/softpc64.exe`. Both use the same adjacent
 set together, creating fixed `A:` and `C:` slots; the machine boots `A:`
 first, then `C:`. The launchers accept no command-line parameters and always
 load the `softpc.ini` beside themselves; relative image paths are relative to
-that file. Console presentation runs continuously; press `Esc` to leave it.
+that file. The monitor accepts `start`, `pause`, `resume`, `stop`, `reset`,
+and floppy commands; `Esc` is not a monitor hotkey.
 The current
 core links the detached CCPU, SAS, I/O, PIC, event, original FDC/FLA/GFI,
 fixed-disk BIOS and V7 VGA packages through standalone host ports.  The
@@ -76,19 +84,22 @@ now drives a bounded asynchronous Win32 beep sink; it is stopped with the
 machine on reset or teardown. Graphical presentation remains host-front-end
 work, not a reason to substitute the original VGA controller.
 
-For a real-media, non-interactive boot probe (not part of the default test
-suite), run `build/softpc-real-boot-smoke --floppy disk.img` or replace
-`--floppy` with `--hdd`. It succeeds when the guest reaches printable text
-output in text video memory.
+CTest is tiered under `test/`: `ctest -L unit` uses only source and test
+fixtures, while `ctest -L integration` launches the packaged no-argument
+launcher and validates its adjacent configuration and declared media roots.
 
 ## Source layout
 
-- `src/core/softpc/` — recovered SoftPC CPU baseline.
-- `src/core/` — standalone lifecycle, physical-memory ownership, CPU/device
-  composition and host-port contracts around that source tree.
-- `src/vm/` — executable entry point, console, Win32 presentation and media
-  attachment.  It never owns CPU, guest RAM or device state.
-- `tests/` — boundary and lifecycle tests.
+- `src/mvdm/softpc.new/roms/` — byte-identical selected original ROM inputs.
+- `src/core/softpc/` — transitional recovered SoftPC CPU baseline, to be
+  migrated by M8 under the source-mirror plan.
+- `src/core/` — transitional standalone lifecycle, physical-memory ownership,
+  CPU/device composition and host-port contracts around that source tree.
+- `src/vm/` — transitional executable entry point, console, Win32
+  presentation and media attachment. It never owns CPU, guest RAM or device
+  state.
+- `test/unit/`, `test/integration/`, `test/support/` — self-contained unit,
+  fixed-package integration, and shared/diagnostic test support respectively.
 
 The standalone core never accepts a product-shell callback or selector
 service. Hardware and firmware behavior is machine-owned state and typed

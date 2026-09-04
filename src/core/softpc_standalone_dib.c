@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -9,7 +10,7 @@
 #include "softpc_standalone_dib.h"
 #include "nt_graph.h"
 
-#define SOFTPC_DIB_MAX_WIDTH 1056u
+#define SOFTPC_DIB_MAX_WIDTH 1280u
 #define SOFTPC_DIB_MAX_HEIGHT 768u
 #define SOFTPC_DIB_COLOURS 256u
 #define SOFTPC_TEXT_COLUMNS 80u
@@ -29,6 +30,32 @@ static unsigned long softpc_dib_width;
 static unsigned long softpc_dib_height;
 static SMALL_RECT softpc_dib_dirty;
 static int softpc_dib_dirty_valid;
+#define SOFTPC_DIB_PALETTE_HISTORY 8u
+static RGBQUAD softpc_dib_palette_history[SOFTPC_DIB_PALETTE_HISTORY][16];
+static unsigned long softpc_dib_palette_history_count;
+
+static void softpc_standalone_dib_record_palette(void)
+{
+    unsigned long slot = softpc_dib_palette_history_count %
+        SOFTPC_DIB_PALETTE_HISTORY;
+
+    if (softpc_dib_info == NULL) return;
+    memcpy(softpc_dib_palette_history[slot], softpc_dib_info->bmiColors,
+        sizeof(softpc_dib_palette_history[slot]));
+    softpc_dib_palette_history_count++;
+    if (getenv("SOFTPC_PALETTE_TRACE") != NULL) {
+        const RGBQUAD *palette = softpc_dib_palette_history[slot];
+        fprintf(stderr, "softpc palette[%lu] 1=%02x%02x%02x 4=%02x%02x%02x\n",
+            softpc_dib_palette_history_count - 1u,
+            (unsigned int)palette[1].rgbRed,
+            (unsigned int)palette[1].rgbGreen,
+            (unsigned int)palette[1].rgbBlue,
+            (unsigned int)palette[4].rgbRed,
+            (unsigned int)palette[4].rgbGreen,
+            (unsigned int)palette[4].rgbBlue);
+        fflush(stderr);
+    }
+}
 
 /* In the original Win32 host, SetPaletteEntries followed by
    SetConsolePalette repaints an indexed console DIB even when its pixel
@@ -162,8 +189,12 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info)
     sc.ConsoleBufInfo.lpBitMap = softpc_dib_bits;
     sc.ConsoleBufInfo.lpBitMapInfo = painter_info;
     sc.ConsoleBufInfo.dwUsage = DIB_PAL_COLORS;
-    sc.ScreenBufHandle = NULL;
-    sc.ActiveOutputBufferHandle = NULL;
+    /* nt_ega.c/nt_vga.c retain the original console-buffer guard before
+       writing a dirty rectangle.  In the detached host the DIB allocation is
+       the buffer; preserve a non-NULL identity for that guard instead of
+       accidentally making every original paint request a no-op. */
+    sc.ScreenBufHandle = (HANDLE)softpc_dib_bits;
+    sc.ActiveOutputBufferHandle = sc.ScreenBufHandle;
     sc.BitmapLastLine = (char *)softpc_dib_bits +
         ((size_t)height - 1u) * (((size_t)width + 3u) & ~(size_t)3u);
     DIBData = (char *)softpc_dib_bits;
@@ -171,6 +202,20 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info)
     CGADIB = painter_info;
     EGADIB = painter_info;
     VGADIB = painter_info;
+    /* The original renderer creates a new Console graphics buffer on a
+       text-to-graphics transition.  A standalone frontend must receive one
+       frame for that new buffer even before the first guest dirty rectangle;
+       otherwise it continues presenting the stale text surface forever. */
+    softpc_dib_dirty.Left = 0;
+    softpc_dib_dirty.Top = 0;
+    softpc_dib_dirty.Right = (SHORT)(width - 1);
+    softpc_dib_dirty.Bottom = (SHORT)(height - 1);
+    softpc_dib_dirty_valid = 1;
+    if (getenv("SOFTPC_DIB_TRACE") != NULL) {
+        fprintf(stderr, "softpc dib bind %dx%dx%d\n", width, height,
+            bits_per_pixel);
+        fflush(stderr);
+    }
     return 1;
 }
 
@@ -187,6 +232,11 @@ BOOL softpc_standalone_invalidate_dibits(HANDLE ignored,
         if (rect->Top < softpc_dib_dirty.Top) softpc_dib_dirty.Top = rect->Top;
         if (rect->Right > softpc_dib_dirty.Right) softpc_dib_dirty.Right = rect->Right;
         if (rect->Bottom > softpc_dib_dirty.Bottom) softpc_dib_dirty.Bottom = rect->Bottom;
+    }
+    if (getenv("SOFTPC_DIB_TRACE") != NULL) {
+        fprintf(stderr, "softpc dib dirty %d,%d-%d,%d\n", (int)rect->Left,
+            (int)rect->Top, (int)rect->Right, (int)rect->Bottom);
+        fflush(stderr);
     }
     return TRUE;
 }
@@ -233,6 +283,7 @@ void softpc_standalone_dib_set_palette(const void *palette_data, int count)
             (BYTE)(palette[index].blue << 2);
         softpc_dib_info->bmiColors[index].rgbReserved = 0;
     }
+    softpc_standalone_dib_record_palette();
     softpc_standalone_dib_palette_changed();
 }
 
@@ -248,7 +299,15 @@ void softpc_standalone_dib_set_palette_entries(const PALETTEENTRY *entries,
         softpc_dib_info->bmiColors[index].rgbBlue = entries[index].peBlue;
         softpc_dib_info->bmiColors[index].rgbReserved = 0;
     }
+    softpc_standalone_dib_record_palette();
     softpc_standalone_dib_palette_changed();
+}
+
+unsigned long softpc_standalone_dib_palette_history(const RGBQUAD **entries)
+{
+    if (entries == NULL) return 0u;
+    *entries = &softpc_dib_palette_history[0][0];
+    return softpc_dib_palette_history_count;
 }
 int softpc_standalone_dib_take_dirty(long *left, long *top, long *right,
     long *bottom)

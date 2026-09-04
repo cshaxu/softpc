@@ -339,5 +339,10 @@ GLOBAL void init_virtual_drivers IFN0()
 #ifdef HFX
 	hfx_driver_initialisation();
 #endif
+#ifndef SOFTPC_STANDALONE
+	/* mouse_io.c is the historical DOS INT 33h/BOP driver.  The standalone
+	 * machine retains the original Bus Mouse controller, but must not install
+	 * the NTVDM/DOS product driver into the ROM-to-C BOP table. */
 	mouse_driver_initialisation();
+#endif
 }

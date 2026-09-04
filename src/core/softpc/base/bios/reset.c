@@ -743,8 +743,15 @@ void reset()
 		hfx_driver_termination();	/* ..then each driver */
 		hfx_driver_initialisation();
 #endif
+		/* mouse_io.c installs the historical DOS INT 33/BOP driver.  It is
+		 * not the recovered Bus Mouse controller (which is initialised below
+		 * by mouse_init()), and advertising it after a warm reset makes guest
+		 * setup software select a host-era mouse profile.  A standalone VM
+		 * keeps only physical-device semantics. */
+#ifndef SOFTPC_STANDALONE
 		mouse_driver_termination();	/* ..then each driver */
 		mouse_driver_initialisation();
+#endif
 
 		q_event_init();
 		tic_event_init();
@@ -828,7 +835,6 @@ void reset()
 	equip_flag.bits.game_io_present = FALSE;
 	equip_flag.bits.rs232_count = NUM_SERIAL_PORTS;
 	equip_flag.bits.ram_size = 0;
-
 #ifdef NTVDM
 	equip_flag.bits.diskette_present = FALSE;
 	equip_flag.bits.max_diskette = 0;

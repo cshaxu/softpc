@@ -44,6 +44,20 @@ int softpc_win32_keyboard_submit_transition(void *context,
         control_state, pressed);
 }
 
+int softpc_win32_keyboard_submit_ctrl_alt_del(void *context,
+    softpc_win32_keyboard_sink sink)
+{
+    /* Del is an extended Set-1 key.  Do not treat this as a monitor command:
+       the guest BIOS/OS observes the same six transitions as physical PC
+       hardware. */
+    return softpc_win32_keyboard_emit(context, sink, 0x1du, VK_CONTROL, 0u, 1) &&
+        softpc_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u, 1) &&
+        softpc_win32_keyboard_emit(context, sink, 0x0153u, VK_DELETE, 0u, 1) &&
+        softpc_win32_keyboard_emit(context, sink, 0x0153u, VK_DELETE, 0u, 0) &&
+        softpc_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u, 0) &&
+        softpc_win32_keyboard_emit(context, sink, 0x1du, VK_CONTROL, 0u, 0);
+}
+
 void softpc_win32_keyboard_note_recovered_key(
     softpc_win32_keyboard_normalizer *state, WORD virtual_key)
 {

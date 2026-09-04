@@ -7,7 +7,7 @@
 
 #define SOFTPC_RUNTIME_TEXT_COLUMNS 80u
 #define SOFTPC_RUNTIME_TEXT_ROWS 25u
-#define SOFTPC_RUNTIME_DIB_MAX_WIDTH 1024u
+#define SOFTPC_RUNTIME_DIB_MAX_WIDTH 1280u
 #define SOFTPC_RUNTIME_DIB_MAX_HEIGHT 768u
 #define SOFTPC_RUNTIME_DIB_MAX_BYTES \
     (SOFTPC_RUNTIME_DIB_MAX_WIDTH * SOFTPC_RUNTIME_DIB_MAX_HEIGHT)
@@ -33,6 +33,9 @@ typedef struct softpc_runtime_frame {
     uint32_t cursor_size;
     uint8_t text[SOFTPC_RUNTIME_TEXT_COLUMNS * SOFTPC_RUNTIME_TEXT_ROWS];
     uint16_t attributes[SOFTPC_RUNTIME_TEXT_COLUMNS * SOFTPC_RUNTIME_TEXT_ROWS];
+    /* Copied RGB values for the original renderer's active VGA text palette.
+       Text attributes are palette indices, not fixed host colours. */
+    uint32_t text_palette[16u];
     uint8_t font[256u * 16u];
     uint8_t secondary_font[256u * 16u];
     uint32_t font_height;

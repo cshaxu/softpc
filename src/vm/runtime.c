@@ -2,6 +2,8 @@
 
 #include <windows.h>
 
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -38,6 +40,12 @@ struct softpc_runtime {
     volatile LONG media_requested;
     softpc_machine_result media_result;
     char media_floppy_path[SOFTPC_RUNTIME_PATH_MAX];
+    /* The original V7 standard painter may use the left half of a doubled
+       host DIB as a backing surface.  This is presentation metadata only;
+       it never changes C-VID's DIB or controller geometry. */
+    uint32_t graphics_source_width;
+    uint32_t graphics_source_height;
+    uint32_t graphics_visible_width;
 };
 
 static void softpc_runtime_publish(softpc_runtime *runtime)
@@ -87,12 +95,45 @@ static void softpc_runtime_publish(softpc_runtime *runtime)
                 &width, &height) && bits != NULL && info != NULL &&
             width <= SOFTPC_RUNTIME_DIB_MAX_WIDTH &&
             height <= SOFTPC_RUNTIME_DIB_MAX_HEIGHT) {
+            uint32_t visible_width;
+            uint32_t destination_stride;
+
             row_stride = (width + 3u) & ~3u;
-            bytes = row_stride * height;
+            if (runtime->graphics_source_width != width ||
+                runtime->graphics_source_height != height) {
+                runtime->graphics_source_width = width;
+                runtime->graphics_source_height = height;
+                runtime->graphics_visible_width = width;
+            }
+            /* nt_v7vga_hi_graph_std reports a physical 640-pixel update
+               while nt_graph's historical doubled host DIB is 1280 pixels
+               wide.  Keep the original painter and its DIB untouched, but
+               publish the painted physical image rather than its unused
+               black backing half. */
+            if (ignored_left == 0 && ignored_top == 0 &&
+                ignored_bottom >= (int32_t)height - 1 &&
+                ignored_right >= 0 &&
+                (uint32_t)(ignored_right + 1) * 2u == width)
+                runtime->graphics_visible_width =
+                    (uint32_t)(ignored_right + 1);
+            visible_width = runtime->graphics_visible_width;
+            if (visible_width == 0u || visible_width > width)
+                visible_width = width;
+            destination_stride = (visible_width + 3u) & ~3u;
+            bytes = destination_stride * height;
             if (bytes <= SOFTPC_RUNTIME_DIB_MAX_BYTES) {
-                memcpy(frame->dib_bits, bits, bytes);
+                const uint8_t *source = (const uint8_t *)bits;
+                uint32_t row;
+
+                for (row = 0u; row < height; ++row)
+                    memcpy(frame->dib_bits + row * destination_stride,
+                        source + row * row_stride, visible_width);
                 memcpy(frame->dib_info, info, sizeof(frame->dib_info));
-                frame->dib_width = width;
+                ((BITMAPINFO *)frame->dib_info)->bmiHeader.biWidth =
+                    (LONG)visible_width;
+                ((BITMAPINFO *)frame->dib_info)->bmiHeader.biSizeImage =
+                    bytes;
+                frame->dib_width = visible_width;
                 frame->dib_height = height;
                 frame->graphics = 1u;
                 frame->valid = 1u;
@@ -103,6 +144,10 @@ static void softpc_runtime_publish(softpc_runtime *runtime)
             &columns, &rows, &stride, &cell_bytes) && surface != NULL &&
         cell_bytes >= 1u && stride >= columns) {
         const uint8_t *cells = (const uint8_t *)surface;
+        const void *dib_bits;
+        const void *dib_info;
+        uint32_t dib_width;
+        uint32_t dib_height;
         uint32_t row;
         memset(frame->text, ' ', sizeof(frame->text));
         {
@@ -110,6 +155,23 @@ static void softpc_runtime_publish(softpc_runtime *runtime)
             for (index = 0u; index < sizeof(frame->attributes) /
                     sizeof(frame->attributes[0]); ++index)
                 frame->attributes[index] = 0x07u;
+        }
+        /* nt_graph owns the guest DAC/VLT translation.  Copy its current
+           text palette with the text cells so frontends do not substitute a
+           fixed EGA table for a guest-programmed VGA palette. */
+        if (softpc_machine_presentation_dib(runtime->machine, &dib_bits,
+                &dib_info, &dib_width, &dib_height) && dib_info != NULL) {
+            const BITMAPINFO *dib = (const BITMAPINFO *)dib_info;
+            size_t palette_index;
+
+            (void)dib_bits;
+            (void)dib_width;
+            (void)dib_height;
+            for (palette_index = 0u; palette_index < 16u; ++palette_index) {
+                const RGBQUAD *colour = &dib->bmiColors[palette_index];
+                frame->text_palette[palette_index] = (uint32_t)RGB(
+                    colour->rgbRed, colour->rgbGreen, colour->rgbBlue);
+            }
         }
         if (columns > SOFTPC_RUNTIME_TEXT_COLUMNS)
             columns = SOFTPC_RUNTIME_TEXT_COLUMNS;
@@ -153,20 +215,28 @@ static void softpc_runtime_publish(softpc_runtime *runtime)
 
 static void softpc_runtime_drain_input(softpc_runtime *runtime)
 {
-    for (;;) {
-        uint8_t key;
-        uint8_t released;
-        EnterCriticalSection(&runtime->input_lock);
-        if (runtime->input_tail == runtime->input_head) {
-            LeaveCriticalSection(&runtime->input_lock);
-            break;
-        }
+    uint8_t key;
+    uint8_t released;
+
+    /* keyboard_io can enter a nested host_simulate frame for the original
+       BIOS INT 15 keyboard hook.  A Windows make/break pair may already be
+       queued by the time that callback runs, but injecting both recursively
+       into that frame corrupts the original controller's service ordering.
+       Deliver precisely one hardware scan event per executor callback; the
+       restored 20 Hz host timer naturally schedules the next one. */
+    EnterCriticalSection(&runtime->input_lock);
+    if (runtime->input_tail != runtime->input_head) {
         key = runtime->keys[runtime->input_tail];
         released = runtime->releases[runtime->input_tail];
         runtime->input_tail = (runtime->input_tail + 1u) %
             SOFTPC_RUNTIME_INPUT_CAPACITY;
         LeaveCriticalSection(&runtime->input_lock);
+        if (getenv("SOFTPC_INPUT_TRACE") != NULL)
+            fprintf(stderr, "softpc input drain key=%u released=%u\n",
+                (unsigned int)key, (unsigned int)released);
         (void)softpc_machine_key_number(runtime->machine, key, released);
+    } else {
+        LeaveCriticalSection(&runtime->input_lock);
     }
     EnterCriticalSection(&runtime->input_lock);
     if (runtime->mouse_pending) {
@@ -253,9 +323,18 @@ static DWORD WINAPI softpc_runtime_worker(void *opaque)
         softpc_machine_set_heartbeat(runtime->machine, 1);
         InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_RUNNING);
         SetEvent(runtime->ready_event);
-        /* The runtime owns one continuous CCPU executor.  Finite budgets are
-           reserved for the public machine API and deterministic smoke slices. */
-        result = softpc_machine_run(runtime->machine, (uint64_t)-1);
+        /* The original CPU uses BOP FE to unwind the *current* host_simulate
+           frame after a firmware/device turn.  That is not a guest stop: an
+           NTVDM host immediately entered the next frame.  The standalone
+           runtime is now that outer host, so keep entering CCPU until an
+           explicit stop or an actual machine error.  Do not reset between
+           entries; the CCPU/device state remains entirely original SoftPC
+           state. */
+        do {
+            result = softpc_machine_run(runtime->machine, (uint64_t)-1);
+        } while (result == SOFTPC_MACHINE_OK &&
+            InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0 &&
+            InterlockedCompareExchange(&runtime->terminate_requested, 0, 0) == 0);
         softpc_machine_set_heartbeat(runtime->machine, 0);
         softpc_machine_set_executor_callback(runtime->machine, NULL, NULL);
         InterlockedExchange(&runtime->result, (LONG)result);
@@ -344,12 +423,24 @@ int softpc_runtime_pause(softpc_runtime *runtime)
 
 int softpc_runtime_resume(softpc_runtime *runtime)
 {
+    DWORD deadline;
     if (runtime == NULL) return 0;
     if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
         SOFTPC_RUNTIME_PAUSED) return 0;
     InterlockedExchange(&runtime->pause_requested, 0);
     SetEvent(runtime->resume_event);
-    return 1;
+    /* A frontend is recreated immediately after resume.  Do not let it see
+       the old PAUSED state and terminate itself before the executor has
+       acknowledged the resume event. */
+    deadline = GetTickCount() + 5000u;
+    do {
+        if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
+            SOFTPC_RUNTIME_RUNNING) return 1;
+        if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
+            SOFTPC_RUNTIME_PAUSED) return 0;
+        Sleep(1u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    return 0;
 }
 
 int softpc_runtime_stop(softpc_runtime *runtime)
@@ -424,6 +515,9 @@ int softpc_runtime_enqueue_key(softpc_runtime *runtime, uint8_t key_number,
     runtime->releases[runtime->input_head] = released != 0u;
     runtime->input_head = next;
     LeaveCriticalSection(&runtime->input_lock);
+    if (getenv("SOFTPC_INPUT_TRACE") != NULL)
+        fprintf(stderr, "softpc input enqueue key=%u released=%u\n",
+            (unsigned int)key_number, (unsigned int)(released != 0u));
     softpc_machine_request_wake(runtime->machine);
     return 1;
 }

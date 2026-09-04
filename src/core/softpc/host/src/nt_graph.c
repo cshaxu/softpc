@@ -80,6 +80,12 @@
 extern int  ega_int_enable;
 #endif
 
+#ifdef V7VGA
+/* vgaports.h declares this for controller code; nt_graph deliberately keeps
+   its historic narrower include set, so declare the V7 DAC width here. */
+extern int DAC_data_bits;
+#endif
+
 extern byte  *video_copy;
 
 static int flush_count = 0;	 /*count of graphic ticks since last flush*/
@@ -623,6 +629,9 @@ void nt_init_screen(void)
 
     /*::::::::::::::::::::::::::::::::: Allocate DAC and EGA planes buffers */
 
+    /* The original V7 BIOS reports AX=826Fh: two 256 KiB VRAM blocks.
+       EGA_PLANE_SIZE is 128 KiB in the V7 build, therefore the original
+       four-plane allocation is the fixed card's 512 KiB capacity. */
     if(!EGA_planes) EGA_planes = (byte *) host_malloc(4*EGA_PLANE_SIZE);
     if(!DAC) DAC = (PC_palette *) host_malloc(sizeof(PC_palette) * VGA_DAC_SIZE);
 
@@ -1555,9 +1564,20 @@ static void check_win_size(register int height)
 {
     register int width;
     extern int soft_reset;
+#ifdef SOFTPC_STANDALONE
+#ifdef V7VGA
+    extern IU8 Currently_emulated_video_mode;
+#endif
+#endif
 
+#ifndef SOFTPC_STANDALONE
     if (! soft_reset)	// we want top get the chance to integrate with
 	return;		// console before changing size
+#endif
+    /* A detached VM binds its DIB outlet before the firmware executes; it
+       has no NTVDM console-integration phase to wait for.  Retain the
+       original geometry, mode selection and painting below, but do not let
+       the historical console-lifecycle guard suppress surface creation. */
 
     /*:::::::::::::::::::::::::::::::::::::::::::::: Calculate screen width */
 
@@ -1573,6 +1593,19 @@ static void check_win_size(register int height)
     }
     else
        width = CGA_WIN_WIDTH;
+
+#ifdef SOFTPC_STANDALONE
+#ifdef V7VGA
+    /* V7's proprietary 256-colour byte-mode is described by the original
+       controller table.  The generic NT console formula above mistakes its
+       CRTC width for character cells, producing a 1280-pixel DIB for modes
+       66h/67h although the original painter emits 640 guest pixels.  Adapt
+       only the detached host surface geometry from that original table. */
+    if (!alpha_num_mode() && Currently_emulated_video_mode >= 0x60 &&
+        Currently_emulated_video_mode <= 0x69)
+        width = vd_ext_graph_table[Currently_emulated_video_mode - 0x60].mode_screen_cols << 3;
+#endif
+#endif
 
     /*::::::::::::::::::::::::::::::::::::::::::::::::::::::: Resize window */
 
@@ -1649,15 +1682,20 @@ void set_the_vlt(void)
 
                 vga_color[i].peFlags = 0;
 
-                vga_color[i].peRed = (BYTE) (DAC[ind].red * 4);
-                vga_color[i].peGreen = (BYTE) (DAC[ind].green * 4);
-                vga_color[i].peBlue = (BYTE) (DAC[ind].blue * 4);
+                /* The VGA DAC is normally six bits, whereas the original
+                   V7 extension can select an eight-bit DAC.  The NT palette
+                   sink wants an eight-bit component in both cases. */
+                vga_color[i].peRed = (BYTE)(DAC_data_bits == 8 ?
+                    DAC[ind].red : DAC[ind].red * 4);
+                vga_color[i].peGreen = (BYTE)(DAC_data_bits == 8 ?
+                    DAC[ind].green : DAC[ind].green * 4);
+                vga_color[i].peBlue = (BYTE)(DAC_data_bits == 8 ?
+                    DAC[ind].blue : DAC[ind].blue * 4);
             }
 
             /*..................... Apply new colours to output palette */
 
             SetPaletteEntries(sc.ColPalette, 0, VGA_DAC_SIZE, &vga_color[0]);
-
             /* Progs that cycle the DACs get hit by idle detect unless..*/
 
             IDLE_video();
@@ -1709,9 +1747,12 @@ void set_the_vlt(void)
                 /*........................ Construct next palette entry */
 
                 vga_color[i].peFlags = 0;
-                vga_color[i].peRed = (BYTE) (DAC[ind].red * 4);
-                vga_color[i].peGreen = (BYTE) (DAC[ind].green * 4);
-                vga_color[i].peBlue = (BYTE) (DAC[ind].blue * 4);
+                vga_color[i].peRed = (BYTE)(DAC_data_bits == 8 ?
+                    DAC[ind].red : DAC[ind].red * 4);
+                vga_color[i].peGreen = (BYTE)(DAC_data_bits == 8 ?
+                    DAC[ind].green : DAC[ind].green * 4);
+                vga_color[i].peBlue = (BYTE)(DAC_data_bits == 8 ?
+                    DAC[ind].blue : DAC[ind].blue * 4);
             }
 
             SetPaletteEntries(sc.ColPalette, 0, VGA_DAC_SIZE, &vga_color[0]);
