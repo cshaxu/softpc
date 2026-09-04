@@ -2,8 +2,7 @@
 
 ## Status
 
-Active. This record was created on owner admission; it will retain the task
-brief, evidence, closure review, and any approved deferral.
+Closed on 2026-09-03.
 
 ## Original Request Ledger
 
@@ -52,6 +51,21 @@ need to copy/import external source or modify a recovered file.
 
 ## Planned Evidence
 
-The completed manifest and the manual-review record will be owner-indexed
-under `docs/etc/evidence/` and linked here at closure. No audit results have
-been claimed at admission.
+The completed [path/hash manifest](../etc/evidence/m8-t14-pristine-map.tsv)
+and [review summary](../etc/evidence/m8-t14-pristine-map.md) are indexed
+evidence. The generator is `scripts/generate_pristine_map.ps1`.
+
+## Closure Review
+
+The manifest has 1,222 path rows and a fixed selected OpenNT revision. All
+1,029 source/header rows have a classification. It identifies 60 direct
+original differences: 39 proposed overlays, 17 proposed host moves, and four
+unselected XMS/allocator removals. The remaining output rows explicitly record
+identical/original-omitted/local/binary status; no differing path is called
+pristine.
+
+The direct-difference inventory was reviewed per file with `git diff --no-index
+--numstat`, including BIOS, CCPU, C-VID, controller, and `nt_*` families. The
+task made no machine, firmware, CMake, generated-source, or product behavior
+change. T15 is the next queued task and owns source-mirror composition; T16
+owns moving applied modifications out of the recovered tree.

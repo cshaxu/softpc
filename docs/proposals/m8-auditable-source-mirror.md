@@ -55,24 +55,7 @@ Each overlay has a manifest record containing the original path, patch path,
 reason, owner, selected defines, and x86/x64 evidence. New standalone source
 never belongs in the mirror or overlay tree.
 
-## Ordered Candidate Tasks
-
-### M8 T14: Pristine-map and divergence manifest
-
-**Boundary:** read-only comparison of the current recovered tree with the
-selected OpenNT `mvdm/softpc.new` tree.
-
-**Work:** produce a rerunnable path/hash manifest that classifies every source
-and header as identical original, original with direct diff, original omitted,
-local standalone source, generated input, or generated output. Assign every
-direct diff a proposed overlay or host/app disposition. Establish the selected
-original revision and excluded binary/object inventory.
-
-**Verification:** rerun the manifest on x64 and x86 source inputs; manually
-inspect every non-identical controller, BIOS, CCPU, C-VID, and `nt_*` row.
-
-**Exit:** no source path is ambiguously described as original when it differs
-from OpenNT.
+## Remaining Candidate Tasks
 
 ### M8 T15: Pristine mirror and patch-composition harness
 
