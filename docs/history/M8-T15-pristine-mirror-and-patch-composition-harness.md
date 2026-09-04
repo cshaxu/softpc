@@ -1,16 +1,16 @@
-# M8 T15: Pristine Mirror And Patch-composition Harness
+# M8 T15: Repository-owned Source-layout Migration
 
 ## Status
 
-Active. This record retains the task brief, evidence, closure review, and any
+Complete. This record retains the task brief, evidence, closure review, and
 approved deferral.
 
 ## Original Request Ledger
 
 | ID | Owner request | Planned result | Status |
 | --- | --- | --- | --- |
-| R1 | “单人双角色模式执行SoftPC 的队列任务：代码布局优化。” | Execute the next admitted source-layout task in order. | Active |
-| R2 | M8 source-layout proposal | Move the repository-owned recovered source to a reference-shaped path layout. | Active |
+| R1 | “单人双角色模式执行SoftPC 的队列任务：代码布局优化。” | Execute the next admitted source-layout task in order. | Complete |
+| R2 | M8 source-layout proposal | Move the repository-owned recovered source to a reference-shaped path layout. | Complete |
 
 ## Task Brief
 
@@ -44,3 +44,18 @@ prohibited. The experiment, its import scripts, and generated patches were
 removed. The four firmware files already tracked at
 `src/mvdm/softpc.new/roms/` were preserved. This task now moves only files
 already owned by this repository.
+
+## Closure Evidence
+
+- Deleted the 18 owner-approved, unreferenced legacy NMAKE/generated-build
+  files enumerated in `docs/etc/evidence/m8-t15-retained-file-audit.md`.
+- Git-moved 252 C files, 575 headers, and the one current CMake input list
+  into `src/mvdm/softpc.new/base/` and `host/`, preserving their relative
+  paths. The pre-existing selected ROMs remain under that same machine root.
+- Updated CMake, the source-boundary test, and three standalone compatibility
+  include redirects; the machine sources themselves were not edited.
+- `docs/etc/evidence/m8-t15-build-verification.md` records a clean GCC x64
+  rebuild plus 20/20 CTest and a clean GCC x86 rebuild plus 20/20 CTest.
+- The only remaining `src/core/softpc/` files are 12 unselected
+  `suballoc/`/`xms.486/` C/H files whose reference paths lie outside the
+  original SoftPC root; T19 owns their removal.

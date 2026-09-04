@@ -10,13 +10,18 @@ OpenNT comparison tree.
 
 | Class | Count | Disposition |
 | --- | ---: | --- |
-| C source (`.c`) | 259 | Move from `src/core/softpc/` to the matching `src/mvdm/softpc.new/` path. |
-| C header (`.h`) | 580 | Move from `src/core/softpc/` to the matching `src/mvdm/softpc.new/` path. |
+| C source (`.c`) selected by the standalone build | 252 | Move from `src/core/softpc/` to the matching `src/mvdm/softpc.new/` path. |
+| C header (`.h`) in the selected SoftPC tree | 575 | Move from `src/core/softpc/` to the matching `src/mvdm/softpc.new/` path. |
 | CCPU CMake input list (`base/ccpu386/c-files`) | 1 | Retain as required modern build configuration. |
 | Existing selected firmware (`bios1.rom`, `bios4.rom`, `v7vga.rom`, `cmos.ram`) | 4 | Already tracked at `src/mvdm/softpc.new/roms/`; preserve byte-for-byte. |
 
 No assembly source currently exists in the transitional `src/core/softpc/`
 tree. Compiler outputs are not present in the retained set.
+
+Twelve C/H files under `suballoc/` and `xms.486/` remain outside the move.
+They are not selected by CMake, map outside the original `softpc.new` root in
+the T14 ledger, and are already assigned to the later unselected-source
+removal work. Moving them would make the reference-shaped tree less accurate.
 
 ## Excluded Historical Files
 

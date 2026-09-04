@@ -4,7 +4,7 @@
  * its address only to this original source file through a generated ABI
  * accessor. No host, frontend or controller receives CCPU state access.
  */
-#include "../../softpc/base/inc/cpu4.h"
+#include "../../mvdm/softpc.new/base/inc/cpu4.h"
 
 extern IU32 *softpc_ccpu_interrupt_map_address(void);
 #define cpu_interrupt_map (*softpc_ccpu_interrupt_map_address())
