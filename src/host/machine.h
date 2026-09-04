@@ -92,6 +92,9 @@ softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,
 softpc_machine_result softpc_machine_set_floppy(softpc_machine *machine,
     const char *path);
 int softpc_machine_presentation_is_graphics(const softpc_machine *machine);
+/* Read-only original renderer state for opt-in standalone diagnostics. */
+int softpc_machine_presentation_state(const softpc_machine *machine,
+    uint32_t *mode_type_out, uint32_t *screen_state_out);
 
 /* Consume the original host renderer's pending dirty rectangle. */
 int softpc_machine_presentation_take_dirty(const softpc_machine *machine,

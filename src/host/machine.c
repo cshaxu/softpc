@@ -375,6 +375,15 @@ int softpc_machine_presentation_is_graphics(const softpc_machine *machine)
         softpc_platform_presentation_is_graphics();
 }
 
+int softpc_machine_presentation_state(const softpc_machine *machine,
+    uint32_t *mode_type_out, uint32_t *screen_state_out)
+{
+    extern int softpc_platform_presentation_state(uint32_t *, uint32_t *);
+    if (machine == NULL || !machine->reset || mode_type_out == NULL ||
+        screen_state_out == NULL) return 0;
+    return softpc_platform_presentation_state(mode_type_out, screen_state_out);
+}
+
 int softpc_machine_presentation_take_dirty(const softpc_machine *machine,
     int32_t *left, int32_t *top, int32_t *right, int32_t *bottom)
 {

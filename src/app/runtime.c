@@ -9,6 +9,35 @@
 
 #define SOFTPC_RUNTIME_INPUT_CAPACITY 256u
 
+static void app_runtime_prompt_trace(uint32_t sequence, uint32_t mode_type,
+    uint32_t screen_state, uint32_t graphics, uint32_t columns,
+    uint32_t rows, uint32_t stride, uint32_t width, uint32_t height,
+    int dirty, int32_t left, int32_t top, int32_t right, int32_t bottom)
+{
+    static uint32_t prior_mode = UINT32_MAX;
+    static uint32_t prior_screen = UINT32_MAX;
+    static uint32_t prior_graphics = UINT32_MAX;
+    static uint32_t prior_columns = UINT32_MAX;
+    static uint32_t prior_rows = UINT32_MAX;
+    static uint32_t prior_width = UINT32_MAX;
+    static uint32_t prior_height = UINT32_MAX;
+    if (getenv("SOFTPC_PROMPT_TRACE") == NULL) return;
+    if (prior_mode == mode_type && prior_screen == screen_state &&
+        prior_graphics == graphics && prior_columns == columns &&
+        prior_rows == rows && prior_width == width && prior_height == height)
+        return;
+    fprintf(stderr, "softpc prompt frame=%lu mode=%lu state=%lu graphics=%lu text=%lux%lu stride=%lu dib=%lux%lu dirty=%d,%ld,%ld,%ld,%ld\n",
+        (unsigned long)sequence, (unsigned long)mode_type,
+        (unsigned long)screen_state, (unsigned long)graphics,
+        (unsigned long)columns, (unsigned long)rows, (unsigned long)stride,
+        (unsigned long)width, (unsigned long)height, dirty, (long)left,
+        (long)top, (long)right, (long)bottom);
+    fflush(stderr);
+    prior_mode = mode_type; prior_screen = screen_state;
+    prior_graphics = graphics; prior_columns = columns; prior_rows = rows;
+    prior_width = width; prior_height = height;
+}
+
 struct app_runtime {
     softpc_machine *machine;
     CRITICAL_SECTION input_lock;
@@ -54,12 +83,15 @@ static void app_runtime_publish(app_runtime *runtime)
     unsigned int next = runtime->published_frame == 0u ? 1u : 0u;
     int published = 0;
     const void *surface;
-    uint32_t columns;
-    uint32_t rows;
-    uint32_t stride;
+    uint32_t columns = 0u;
+    uint32_t rows = 0u;
+    uint32_t stride = 0u;
     uint32_t cell_bytes;
     int32_t cursor_column;
     int32_t cursor_row;
+    uint32_t mode_type = 0u, screen_state = 0u;
+    int32_t trace_left = -1, trace_top = -1, trace_right = -1, trace_bottom = -1;
+    int trace_dirty = 0;
 
     EnterCriticalSection(&runtime->frame_lock);
     frame = &runtime->frames[next];
@@ -76,6 +108,9 @@ static void app_runtime_publish(app_runtime *runtime)
         int32_t ignored_bottom;
         int dirty = softpc_machine_presentation_take_dirty(runtime->machine,
             &ignored_left, &ignored_top, &ignored_right, &ignored_bottom);
+        trace_dirty = dirty;
+        trace_left = ignored_left; trace_top = ignored_top;
+        trace_right = ignored_right; trace_bottom = ignored_bottom;
 
         /* nt_graph/nt_ega/nt_vga already report their changed DIB rectangle.
            Consume that original presentation signal here, before copying the
@@ -209,6 +244,12 @@ static void app_runtime_publish(app_runtime *runtime)
            acquire the frame lock and copy a full graphics surface. */
         (void)InterlockedExchange(&runtime->published_frame_sequence,
             (LONG)frame->sequence);
+        (void)softpc_machine_presentation_state(runtime->machine, &mode_type,
+            &screen_state);
+        app_runtime_prompt_trace(frame->sequence, mode_type, screen_state,
+            frame->graphics, columns, rows, stride, frame->dib_width,
+            frame->dib_height, trace_dirty, trace_left, trace_top,
+            trace_right, trace_bottom);
     }
     LeaveCriticalSection(&runtime->frame_lock);
 }

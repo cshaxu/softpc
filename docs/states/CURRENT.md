@@ -4,20 +4,19 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T27 closed |
-| Admission And Approval | Owner approved flattening the two-file standalone communications endpoint directory, then requested the architecture decision for `compat/`. |
-| Objective | Remove the needless `src/host/comms/` nesting while retaining `src/host/compat/` as the original-host ABI compatibility boundary. |
-| Non-goals | No original SoftPC mirror movement or edits; no serial/parallel behavior, host contract, configuration, ROM, guest-media, ABI, or frontend change; do not move `compat/` to `src/compat/`. |
-| Baseline | M9 Td S3 closed at `6f7294a`; `src/host/comms/` contains only `serial.c` and `parallel.c`, which have no private header or shared implementation boundary. |
+| Identifier Mode | M9 T28 S1 active |
+| Admission And Approval | Owner admitted and requested execution of only S1 from the queued Windows 3.1 MS-DOS Prompt frontend-performance proposal, with a stop for manual testing before S2. |
+| Objective | Add an opt-in, read-only transition trace that records guest presentation state and console/window routing during Windows 3.1 MS-DOS Prompt mode changes. |
+| Non-goals | No behavior optimization; no change to the required exit-one-presenter/create-the-other structure; no CCPU, device, BIOS, ROM, BOP, timer, input, INI, media, or guest behavior change. |
+| Baseline | M9 Td S4 queued the serial S1–S8 proposal at `ffca285`; T27 is closed at `635b228`. |
 | Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT is read-only comparison material. |
-| Affected Boundary | The two standalone endpoint source paths, their CMake source-list entries, source-layout documentation, and package executables only. |
-| Subtask Plan | S1 use `git mv` to flatten `serial.c` and `parallel.c`; S2 repair direct build/documentation references; S3 run dual-width source-boundary, unit, integration, and package evidence; S4 close and publish. |
-| Requirement Ledger | R1: `src/host/comms/` no longer exists. R2: serial and parallel endpoint source is directly below `src/host/`. R3: `src/host/compat/` remains in place and retains its ABI-only ownership. R4: package INI and media remain untouched. |
-| Focused Verification | Direct-reference sweep, source-boundary test, both GCC configurations' unit and integration tests, and package smoke. |
-| Stop Conditions | Stop before changing any endpoint logic, machine source, configuration contents, or compatibility-ABI location/meaning. |
-| Exit Criteria | The tree is structurally flatter, CMake builds x86/x64, the existing test tiers pass, and the diff is only relocations plus direct path/documentation repairs. |
-| Closure | Closed. `serial.c` and `parallel.c` now live directly below `src/host/`; the empty `comms/` directory is gone. `src/host/compat/` remains the original-host ABI compatibility boundary. Fresh GCC x64/x86 builds and full 20/20 CTest passed for both widths; user-owned INI and media contents were untouched. |
-| Original Owner Request | “src/host是否可以继续扁平化？comms目录有必要存在吗？”; “批准。那么，src/host/compat这个该放host里面还是src/compat里面？” |
+| Affected Boundary | Read-only diagnostic accessors in the standalone host; runtime trace emission; console/window route trace emission; package executables. |
+| Subtask Plan | S1 expose copied presentation diagnostics; S2 emit only changed state under `SOFTPC_PROMPT_TRACE`; S3 rebuild both GCC packages and prove trace-off behavior; S4 stop for owner test. |
+| Requirement Ledger | R1: trace is off unless `SOFTPC_PROMPT_TRACE` is set. R2: records mode type, screen state, text geometry, DIB geometry, dirty rectangle, frame sequence, and routing. R3: trace neither mutates machine state nor alters presenter routing. R4: no INI/media changes. |
+| Focused Verification | x64/x86 build, unit/integration smoke, trace-off package behavior, and a trace-enabled manual test command. |
+| Stop Conditions | Stop immediately after S1 package evidence; do not begin S2 or any performance/geometry behavior change before owner testing. |
+| Exit Criteria | Both packages are rebuilt; trace is opt-in and records compact changed-state lines; all existing package behavior is unchanged while it is disabled. |
+| Original Owner Request | “好的准入t任务，并执行S1.S1完成后停下来让我测试。” |
 
 ## Current Technical Baseline
 

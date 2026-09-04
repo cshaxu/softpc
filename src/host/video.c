@@ -34,6 +34,15 @@ int softpc_platform_presentation_is_graphics(void)
     return sc.ModeType == GRAPHICS;
 }
 
+int softpc_platform_presentation_state(uint32_t *mode_type_out,
+    uint32_t *screen_state_out)
+{
+    if (mode_type_out == NULL || screen_state_out == NULL) return 0;
+    *mode_type_out = (uint32_t)sc.ModeType;
+    *screen_state_out = (uint32_t)sc.ScreenState;
+    return 1;
+}
+
 void softpc_platform_presentation_request_refresh(void)
 {
     if (softpc_platform_presentation_is_graphics())

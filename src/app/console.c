@@ -3,6 +3,8 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define SOFTPC_TEXT_COLUMNS 80u
@@ -329,6 +331,9 @@ int app_vm_run_console(app_runtime *runtime)
                on later dirty turns, so a frontend cannot infer this from
                palette contents. */
             if (frame->graphics != 0u) {
+                if (getenv("SOFTPC_PROMPT_TRACE") != NULL)
+                    fprintf(stderr, "softpc prompt route console->window frame=%lu\n",
+                        (unsigned long)frame->sequence);
                 result = SOFTPC_VM_FRONTEND_SWITCH_WINDOW;
                 running = 0;
                 break;
