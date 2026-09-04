@@ -24,9 +24,11 @@ non-mutating unless its active packet explicitly admits disposable output.
 ## User Package Configuration
 
 `artifacts/binary/softpc.ini` is user-owned package configuration. An agent
-must not create, rewrite, copy over, normalize, stage, commit, or otherwise
-modify it. Builds and packaging may refresh only `softpc32.exe` and
-`softpc64.exe` in that directory. Only the owner may modify the INI.
+must not create, rewrite, copy over, normalize, or otherwise modify it. Builds
+and packaging may refresh only `softpc32.exe` and `softpc64.exe` in that
+directory. When the owner has changed the INI, an agent must stage, commit,
+and push that change with the current completed task; only the owner may edit
+its contents.
 
 ## Identifier And Build-Version Policy
 

@@ -4,19 +4,19 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 Td S1 closed |
-| Admission And Approval | Owner directed that the standing prohibition on agent modification of `softpc.ini` be written into repository governance. |
-| Objective | Make the package-configuration ownership rule enforceable and reachable from the mandatory task reading set. |
-| Non-goals | No executable, build-system, source, artifact, guest-media, or configuration-file change. |
-| Baseline | `artifacts/binary/softpc.ini` is user-maintained adjacent package configuration; the executable pair is the only agent-refreshable package output. |
-| Affected Boundary | `docs/rules/EXECUTION.md`, its contributor pointer, and this current packet. |
-| Subtask Plan | S1 record the binding rule once; link it from contributor guidance; run the documentation-governance gate. |
-| Requirement Ledger | R1: forbid every form of agent mutation of the package INI. R2: reserve INI modification to the owner. R3: preserve agent packaging authority for the two executables only. |
-| Focused Verification | Documentation governance check and `git diff --check`; confirm the user-owned INI is not staged. |
-| Stop Conditions | Stop if the rule would contradict a higher authority or require a change to the INI itself. |
-| Exit Criteria | A single binding execution rule is reachable from mandatory reading, contributor guidance does not duplicate it, validation passes, and no configuration file is staged. |
-| Closure | Completed: the execution rule now protects `artifacts/binary/softpc.ini` from all agent mutation and permits package refresh only for the two executables. The contributor guide points to that single rule. |
-| Original Owner Request | “禁止你再去修改softpc.ini!!” and “写入治理规范！” |
+| Identifier Mode | M9 T22 closed |
+| Admission And Approval | Owner reported that console pause/resume leaves the guest keyboard unresponsive and that Ctrl+Alt+F fails to toggle the Win3.1 MS-DOS Prompt back to its graphics window. |
+| Objective | Make host hotkeys leave no guest modifier held, and make Ctrl+Alt+F deliver guest Alt+Enter rather than guest Ctrl+Alt+Enter. |
+| Non-goals | No SoftPC/CCPU/controller/BIOS/BOP change; no host fullscreen action; no synthetic frontend switch; no agent edit to `softpc.ini`, media, or guest. Owner-provided INI changes ship with this task. |
+| Baseline | Console and window both submit ordinary Ctrl and Alt transitions before receiving a reserved chord. Console exits its input loop on pause, so the later host modifier key-up records are not delivered. |
+| Affected Boundary | `src/app/{keyboard,console,window}`, CMake package-output ownership, and focused app-input tests only. |
+| Subtask Plan | S1 normalize reserved-chord modifier release; S2 apply it before console/window pause and Alt+Enter delivery; S3 dual-width test and package refresh. |
+| Requirement Ledger | R1: after Ctrl+Alt+P then resume, ordinary console keys reach the same runtime queue. R2: Ctrl+Alt+F produces guest Alt+Enter with Ctrl released before Enter. R3: no host window action or machine-state shortcut replaces the guest transition. R4: P/D/F/M all clear their already-forwarded host Ctrl/Alt modifiers before their respective action. |
+| Focused Verification | Keyboard transition-order unit checks; runtime queue pause/resume proof; full GCC x64/x86 CTest and package smoke. |
+| Stop Conditions | Stop if remediation requires a machine/controller change or if the original input contract cannot accept ordinary modifier releases. |
+| Exit Criteria | Console pause/resume remains keyboard-live, Ctrl+Alt+F reaches the guest as Alt+Enter, regressions pass on both widths, executables are refreshed, and any owner-provided INI change ships alongside them. |
+| Closure | Completed: P/D/F/M now neutralize the already-forwarded host Ctrl/Alt modifiers in both frontends. P can no longer strand modifiers across a console pause/resume, and F clears the host chord before injecting a fresh guest Alt+Enter. CMake no longer copies a template over the user-owned package INI. Fresh GCC x64 and x86 builds each passed full CTest, 20/20. |
+| Original Owner Request | “pause机器以后resume进去，机器无法接受键盘输入” and “Ctrl+Alt+F … 应该让win3.x的msdos prompt变成窗口模式”. |
 
 ## Current Technical Baseline
 
@@ -31,6 +31,9 @@
 
 ## Recent Governance
 
+- M9 T22 normalizes frontend host hotkeys without changing SoftPC: Ctrl+Alt+P
+  no longer strands guest modifiers across console pause/resume, and
+  Ctrl+Alt+F now supplies guest Alt+Enter rather than Ctrl+Alt+Enter.
 - M9 Td S1 makes `artifacts/binary/softpc.ini` permanently user-owned package
   configuration: agents may refresh the executable pair but cannot modify,
   stage, or commit that INI.

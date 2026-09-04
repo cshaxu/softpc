@@ -19,5 +19,6 @@ from `src/mvdm/softpc.new/roms/`; any future external-ROM contract belongs in
 `artifacts/roms/`.
 
 `artifacts/binary/softpc.ini` is user-owned configuration and is never an
-agent build or packaging output; see the binding rule in
+agent build or packaging output. Owner changes to it ship with the current
+completed task; see the binding rule in
 [Execution Rules](docs/rules/EXECUTION.md#user-package-configuration).

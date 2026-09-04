@@ -43,10 +43,23 @@ int main(void)
         capture.releases[4] == 1u && capture.releases[5] == 1u);
 
     capture.count = 0u;
+    assert(softpc_win32_keyboard_release_ctrl_alt(&capture, capture_key));
+    assert(capture.count == 2u);
+    assert(capture.keys[0] == 58u && capture.releases[0] == 1u);
+    assert(capture.keys[1] == 60u && capture.releases[1] == 1u);
+
+    capture.count = 0u;
     assert(softpc_win32_keyboard_submit_alt_enter(&capture, capture_key));
-    assert(capture.count == 4u);
-    assert(capture.releases[0] == 0u && capture.releases[1] == 0u &&
-        capture.releases[2] == 1u && capture.releases[3] == 1u);
+    /* Ctrl+Alt+F has already produced host Ctrl/Alt makes.  The replacement
+       must clear them before creating a distinct guest Alt+Enter, never send
+       guest Ctrl+Alt+Enter. */
+    assert(capture.count == 6u);
+    assert(capture.keys[0] == 58u && capture.releases[0] == 1u);
+    assert(capture.keys[1] == 60u && capture.releases[1] == 1u);
+    assert(capture.keys[2] == 60u && capture.releases[2] == 0u);
+    assert(capture.keys[3] == 43u && capture.releases[3] == 0u);
+    assert(capture.keys[4] == 43u && capture.releases[4] == 1u);
+    assert(capture.keys[5] == 60u && capture.releases[5] == 1u);
 
     /* Esc is an ordinary original key-table entry (key 110), not a host
        stop command. */

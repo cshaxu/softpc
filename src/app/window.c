@@ -612,8 +612,11 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
             if (softpc_runtime_get_state(softpc_window_runtime) ==
                 SOFTPC_RUNTIME_RUNNING) {
                 /* A paused guest cannot consume further pointer traffic.
-                   Keep the final frame visible, but release the host mouse. */
+                   Keep the final frame visible, release the host mouse, and
+                   release the Ctrl/Alt makes which led to this host chord. */
                 softpc_window_release_mouse_capture();
+                (void)softpc_win32_keyboard_release_ctrl_alt(NULL,
+                    softpc_window_keyboard_sink);
                 (void)softpc_runtime_pause(softpc_window_runtime);
             } else if (softpc_runtime_get_state(softpc_window_runtime) ==
                 SOFTPC_RUNTIME_PAUSED) {
@@ -623,6 +626,8 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
             softpc_window_suppressed_hotkey = wparam;
         } else if (wparam == 'D' && GetKeyState(VK_CONTROL) < 0 &&
             GetKeyState(VK_MENU) < 0) {
+            (void)softpc_win32_keyboard_release_ctrl_alt(NULL,
+                softpc_window_keyboard_sink);
             (void)softpc_win32_keyboard_submit_ctrl_alt_del(NULL,
                 softpc_window_keyboard_sink);
             softpc_window_suppressed_hotkey = wparam;
@@ -633,6 +638,8 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
             softpc_window_suppressed_hotkey = wparam;
         } else if (wparam == 'M' && GetKeyState(VK_CONTROL) < 0 &&
             GetKeyState(VK_MENU) < 0) {
+            (void)softpc_win32_keyboard_release_ctrl_alt(NULL,
+                softpc_window_keyboard_sink);
             softpc_window_release_mouse_capture();
             softpc_window_suppressed_hotkey = wparam;
         } else if (softpc_window_guest_running())

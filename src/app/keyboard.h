@@ -27,8 +27,16 @@ int softpc_win32_keyboard_submit_utf16(softpc_win32_keyboard_normalizer *state,
    same nt_keycd/8042 path as ordinary host keyboard packets. */
 int softpc_win32_keyboard_submit_ctrl_alt_del(void *context,
     softpc_win32_keyboard_sink sink);
+/* Reserved host Ctrl+Alt chords have already delivered their modifier makes
+   by the time the chord key is seen.  Release those guest modifiers before
+   pausing or substituting another guest chord; otherwise a frontend that
+   stops reading input loses the host key-up records and leaves the guest
+   keyboard logically wedged. */
+int softpc_win32_keyboard_release_ctrl_alt(void *context,
+    softpc_win32_keyboard_sink sink);
 /* Inject Alt+Enter as four ordinary physical transitions through the same
-   nt_keycd/8042 path. This is guest input, never a host window command. */
+   nt_keycd/8042 path, after neutralizing the host Ctrl+Alt chord that invoked
+   it. This is guest input, never a host window command. */
 int softpc_win32_keyboard_submit_alt_enter(void *context,
     softpc_win32_keyboard_sink sink);
 void softpc_win32_keyboard_note_recovered_key(

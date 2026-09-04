@@ -108,11 +108,19 @@ static int softpc_console_key(softpc_runtime *runtime,
     }
     if (key->bKeyDown && key->wVirtualKeyCode == 'P' &&
         (key->dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
-        (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)))
+        (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))) {
+        /* The loop now returns to the monitor, so the physical Ctrl/Alt
+           key-up records will not necessarily reach this frontend. Release
+           the already-forwarded guest modifiers before requesting pause. */
+        (void)softpc_win32_keyboard_release_ctrl_alt(runtime,
+            softpc_console_keyboard_sink);
         return SOFTPC_VM_FRONTEND_PAUSED;
+    }
     if (key->bKeyDown && key->wVirtualKeyCode == 'D' &&
         (key->dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
         (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))) {
+        (void)softpc_win32_keyboard_release_ctrl_alt(runtime,
+            softpc_console_keyboard_sink);
         (void)softpc_win32_keyboard_submit_ctrl_alt_del(runtime,
             softpc_console_keyboard_sink);
         normalizer->suppressed_virtual_key = key->wVirtualKeyCode;
@@ -133,6 +141,8 @@ static int softpc_console_key(softpc_runtime *runtime,
         (key->dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
         (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)))
     {
+        (void)softpc_win32_keyboard_release_ctrl_alt(runtime,
+            softpc_console_keyboard_sink);
         normalizer->suppressed_virtual_key = key->wVirtualKeyCode;
         return -1;
     }

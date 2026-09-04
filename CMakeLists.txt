@@ -487,9 +487,9 @@ if(WIN32)
     target_link_libraries(softpcvm PRIVATE user32 gdi32)
 endif()
 
-# The standalone distribution has one fixed configuration alongside the two
-# host-width launchers.  A 32-bit and a 64-bit configure can therefore share
-# one stable delivery directory without overwriting each other's executable.
+# The standalone distribution keeps its two host-width launchers together.
+# The adjacent softpc.ini is deliberately user-owned configuration, never a
+# CMake template or package-generation output.
 set(SOFTPC_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/artifacts/binary")
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
     set(SOFTPC_LAUNCHER_NAME softpc32)
@@ -500,8 +500,6 @@ file(MAKE_DIRECTORY "${SOFTPC_OUTPUT_DIRECTORY}")
 set_target_properties(softpcvm PROPERTIES
     OUTPUT_NAME "${SOFTPC_LAUNCHER_NAME}"
     RUNTIME_OUTPUT_DIRECTORY "${SOFTPC_OUTPUT_DIRECTORY}")
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/softpc.ini"
-    "${SOFTPC_OUTPUT_DIRECTORY}/softpc.ini" COPYONLY)
 
 enable_testing()
 add_executable(softpc-machine-smoke test/unit/machine_smoke.c)
