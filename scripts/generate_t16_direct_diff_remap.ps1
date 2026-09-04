@@ -14,7 +14,17 @@ if (-not $OutputPath) {
     $OutputPath = Join-Path $repository 'docs\etc\evidence\m8-t16-direct-diff-remap.tsv'
 }
 
+$RelocatedPaths = @{
+    'src/core/softpc/base/ccpu386/softpc_ccpu_facade.c' = 'src/core/softpc-port-abi/ccpu/softpc_ccpu_facade.c'
+    'src/core/softpc/host/inc/x86/prod/gdpvar.h' = 'src/core/softpc-port-abi/ccpu/gdpvar.h'
+    'src/core/softpc/host/inc/x86/prod/PigReg_c.h' = 'src/core/softpc-port-abi/ccpu/PigReg_c.h'
+    'src/core/softpc/host/inc/x86/prod/sas4gen.h' = 'src/core/softpc-port-abi/ccpu/sas4gen.h'
+}
+
 function Get-CurrentPath([string]$OldPath) {
+    if ($RelocatedPaths.ContainsKey($OldPath)) {
+        return $RelocatedPaths[$OldPath]
+    }
     if ($OldPath.StartsWith('src/core/softpc/base/')) {
         return 'src/mvdm/softpc.new/base/' + $OldPath.Substring('src/core/softpc/base/'.Length)
     }

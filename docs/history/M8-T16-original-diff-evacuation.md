@@ -83,3 +83,8 @@ contents or any machine behavior. CMake no longer names the obsolete
 explicit `src/core/softpc-port-abi/ccpu` boundary. The static standalone-source
 boundary check and complete GCC CTest suites passed 20/20 for both x64 and
 x86 after the move.
+
+`generate_t16_direct_diff_remap.ps1` now owns these completed relocations as
+an explicit repository-local map. Regenerating the 98-row TSV therefore keeps
+the ledger's `current_path`, owner, and existence fields true after every
+future path audit rather than preserving the obsolete S1 snapshot paths.
