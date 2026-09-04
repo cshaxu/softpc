@@ -74,8 +74,7 @@ text-font export, palette-frame observation, and the disabled stream-I/O
 endpoint moved out of the platform aggregate.  This is explicitly not a new
 renderer.  The original `nt_cga.c`, `nt_ega.c`, `nt_vga.c`, and V7 controller
 sources remain the sole renderer/controller owners beneath
-`src/mvdm/softpc.new/`; the platform retains only V7 hardware-pointer
-composition pending its own focused extraction.
+`src/mvdm/softpc.new/`.
 
 GCC MinGW x64 and x86 each rebuilt and passed the complete 20-test CTest
 suite, including VGA-frame, Win32-window, source-boundary, and package tests.
@@ -94,3 +93,19 @@ The standalone speaker sink is now an isolated platform source,
 `src/host/platform/softpc_platform_audio.c`; it retains the original host
 frequency request contract and teardown ordering.  GCC x64/x86 compile it and
 the focused sound/source-boundary test passes on x86.
+
+## S2 V7 Hardware-Pointer Presentation Separation
+
+The standalone V7 hardware-pointer DIB composite now lives in
+`src/host/video/softpc_v7_pointer.c`.  It retains the same `paint_v7ptr` and
+`clear_v7ptr` callbacks: the original recovered V7 controller still supplies
+the hardware pattern address and coordinates, while this host-only endpoint
+saves, composites, restores, and invalidates the already-rendered DIB region.
+No controller register, ROM, palette, plane-rendering, or pointer algorithm
+changed; the move merely removes the last video presentation implementation
+from the platform aggregate.
+
+The standalone source-boundary and documentation governance checks pass. GCC
+MinGW x64 and x86 each rebuilt and passed all 20 CTest cases. The checked-in
+`artifacts/binary/softpc64.exe` and `softpc32.exe` were then relinked from
+those respective build trees.

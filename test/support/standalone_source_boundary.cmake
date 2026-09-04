@@ -9,6 +9,7 @@ set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/host/media/softpc_gfi_image.c"
     "${SOFTPC_SOURCE_DIR}/src/host/media/softpc_hdd_media.c"
     "${SOFTPC_SOURCE_DIR}/src/host/video/softpc_platform_video.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/video/softpc_v7_pointer.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/keymouse/keybd_io.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/system/idetect.c"
     "${SOFTPC_SOURCE_DIR}/src/host/machine/softpc_device_bop.c"
@@ -142,6 +143,9 @@ file(READ "${SOFTPC_SOURCE_DIR}/src/host/platform/softpc_standalone_platform.c"
 string(TOLOWER "${standalone_platform}" normalized_platform)
 if(normalized_platform MATCHES "softpc_ata")
     message(FATAL_ERROR "Standalone platform retains a handwritten ATA controller")
+endif()
+if(normalized_platform MATCHES "paint_v7ptr|clear_v7ptr")
+    message(FATAL_ERROR "Standalone platform retains V7 presentation callbacks")
 endif()
 
 # Presentation is deliberately a DIB consumer.  Controller planes and DAC
