@@ -101,6 +101,17 @@ existing XMS host endpoint. The current 98-row direct-difference ledger is
 generated from this path map and rejects a missing current path. GCC x64 and
 x86 both rebuilt the package and passed all 20 CTest cases after the move.
 
+## S3 Machine-Memory Host Separation
+
+The sole standalone SAS backing allocation and its original callback symbols
+now live in `src/host/machine/softpc_memory.c`. It retains `host_sas_init`,
+`host_sas_term`, and the existing XMS physical-pointer surface, while physical
+read/write calls still go through the original `c_sas_loads`/`c_sas_stores`
+mapping route. This moves host allocation ownership to the machine endpoint
+without creating a second RAM, C-VID, or controller implementation. GCC
+x64/x86 rebuilt `artifacts/binary/softpc64.exe` and `softpc32.exe` and each
+passed all 20 CTest cases.
+
 ## S2 V7 Hardware-Pointer Presentation Separation
 
 The standalone V7 hardware-pointer DIB composite now lives in

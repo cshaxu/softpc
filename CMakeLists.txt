@@ -397,6 +397,7 @@ add_library(softpc-machine-devices OBJECT
     src/host/video/softpc_platform_video.c
     src/host/video/softpc_v7_pointer.c
     src/host/machine/softpc_device_bop.c
+    src/host/machine/softpc_memory.c
     src/host/media/softpc_gfi_image.c
     src/host/media/softpc_hdd_media.c
     src/host/input/softpc_platform_keyboard.c
