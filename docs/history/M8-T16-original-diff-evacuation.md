@@ -29,3 +29,12 @@ standalone host or app; T17 and T18 own those moves.
 - CMake selected-input proof and x64/x86 focused regression evidence;
 - a similar-issue sweep across original headers, generated inputs, CCPU,
   C-VID, BIOS, controllers, and original `nt_*` renderers.
+
+## S1 Current-path Remap
+
+`scripts/generate_t16_direct_diff_remap.ps1` reads only the committed T14 TSV
+and verifies that all 98 direct-original-diff/local-standalone rows have a
+current repository path after T15. The generated remap reports zero missing
+paths: 56 rows are direct original differences and 38 are local standalone
+files. Its owner labels are intentionally preliminary; they preserve the T14
+disposition while T16 audits actual implementation responsibility.
