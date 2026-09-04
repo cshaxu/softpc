@@ -4,18 +4,18 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M8 T18 S1 |
-| Admission And Approval | Owner authorized sequential SoftPC queue execution through the active code-layout objective on 2026-09-03 and explicitly approved the completed T17 push on 2026-09-04. |
-| Objective | Move the user-visible standalone application shell from `src/vm/` to `src/app/`, grouping monitor, runtime, input queue, and console/Win32 frontends while preserving the one-executor and copied-frame contracts. |
-| Non-goals | No import or copy from `opennt-src-2`; no controller/BIOS/ROM/BOP/CCPU/C-VID semantic change; no generated source or compiler intermediate checked into `src/`; no public SDK, profile selection, or multi-session surface. |
-| Baseline | T17 is closed and pushed at `afba203`: the host taxonomy is enforced, the recovered tree (including `src/mvdm/softpc.new/roms/`) remains reference-shaped, and GCC x64/x86 each passed 20/20 CTest. |
-| Affected Boundary | Only repository-owned application-shell paths move from `src/vm/` to `src/app/`; `src/mvdm/softpc.new/` and its embedded BIOS/VGA/CMOS firmware remain unchanged. |
-| Subtask Plan | S1 move the application shell with `git mv` and repair CMake/private includes; S2 prove executor and copied-frame ownership remains singular; S3 update source-boundary and direct-diff ledger evidence; S4 verify x64/x86 runtime, monitor, frontend, input, pause/resume, mouse-capture, and packaged launch behavior. |
-| Requirement Ledger | R1: all user-visible shell code lives beneath `src/app/`. R2: exactly one executor mutates the machine and frontends consume copied snapshots. R3: app code has no direct CPU/RAM/controller/renderer state access. R4: CMake, tests, and the 98-row direct-diff ledger name the new paths. |
-| Focused Verification | Static application ownership sweep; x64/x86 build and runtime/keyboard/window/monitor/pause-resume/mouse-capture/direct-launch tests; both packages launch from `artifacts/binary/` using only adjacent `softpc.ini`. |
-| Stop Conditions | Stop for owner direction if the relocation needs machine semantics, a new host/device policy, a new runtime facility, a public SDK surface, or an unproved ABI representation. |
-| Exit Criteria | `src/app/` contains every user-visible shell source, `src/vm/` is absent, application code has no direct machine-state access, and x64/x86 regression evidence matches the T17 baseline. |
-| Original Owner Request | Persistent objective: “单人双角色模式执行SoftPC 的队列任务：代码布局优化。” T18 is the active ordered queue task. |
+| Identifier Mode | M8 T19 S1 |
+| Admission And Approval | Owner authorized sequential SoftPC queue execution through the active code-layout objective on 2026-09-03; T17 was explicitly approved for push on 2026-09-04. T19 is the next ordered implementation task. |
+| Objective | Remove the remaining transitional source-layout routes only after proving every retained source, overlay, host, app, test, firmware, and artifact path has a durable owner. Publish the final source/diff ledger and source-layout documentation. |
+| Non-goals | No import or copy from `opennt-src-2`; no controller/BIOS/ROM/BOP/CCPU/C-VID semantic change; no generated source or compiler intermediate checked into `src/`; no deletion based solely on difficult classification. |
+| Baseline | T18 moved all ten app-shell files to `src/app/`, removed `src/vm/`, updated all 98 direct-difference ledger rows, and passed full GCC x64/x86 CTest 20/20. The original BIOS/VGA/CMOS ROMs remain embedded from `src/mvdm/softpc.new/roms/`. |
+| Affected Boundary | Transitional `src/core/softpc` routing, obsolete CMake references, source-layout documentation, and the final direct-difference ledger only. Recovered machine/firmware and the approved `src/{mvdm,overlay,host,app}` owners remain unchanged unless an auditable structural move is necessary. |
+| Subtask Plan | S1 inventory residual transitional paths and classify each against the ledger; S2 remove only obsolete routing or relocate retained sources with `git mv`; S3 make final source-boundary/ledger invariants executable; S4 run clean x64/x86 builds, full CTest, package, media, text-to-graphics, V7 cursor/mouse, and presentation proof. |
+| Requirement Ledger | R1: no source file remains beneath transitional `src/core/softpc` or `src/vm`. R2: every original-source difference is patch-visible in the final ledger. R3: all repository-owned code belongs to recovered machine, overlay, host, app, or test. R4: no compiler output is tracked under source paths. |
+| Focused Verification | Source-tree and CMake audit; ledger regeneration; clean GCC x64/x86 builds and complete CTest; A:, C:, and dual-media startup; Windows 3.1 text-to-graphics handoff; V7 cursor/mouse; console/window presentation; artifact-package launch proof. |
+| Stop Conditions | Stop for owner direction if a residual path needs a machine semantic change, guest policy, a new runtime facility, an unproved ABI representation, or deletion without a proven replacement/owner. |
+| Exit Criteria | No source remains under transitional `src/core/softpc` or `src/vm`; all original-source differences are patch-visible; all new code has a host or app owner; x64/x86 builds/tests and package behavior satisfy the recorded verification. |
+| Original Owner Request | Persistent objective: “单人双角色模式执行SoftPC 的队列任务：代码布局优化。” T19 is the active ordered queue task. |
 
 ## Current Technical Baseline
 

@@ -1,7 +1,7 @@
 #ifndef SOFTPC_VM_CONSOLE_H
 #define SOFTPC_VM_CONSOLE_H
 
-#include "runtime.h"
+#include "../../runtime/runtime.h"
 
 #define SOFTPC_VM_FRONTEND_STOPPED 0
 #define SOFTPC_VM_FRONTEND_ERROR 1

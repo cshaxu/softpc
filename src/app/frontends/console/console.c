@@ -1,5 +1,5 @@
 #include "console.h"
-#include "win32_keyboard.h"
+#include "../win32/win32_keyboard.h"
 
 #ifdef _WIN32
 #include <windows.h>

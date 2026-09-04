@@ -486,12 +486,12 @@ target_compile_definitions(softpc-machine PRIVATE
     SOFTPC_STANDALONE=1 SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 
 add_executable(softpcvm
-    src/vm/main.c
-    src/vm/console.c
-    src/vm/runtime.c
-    src/vm/win32_keyboard.c
-    src/vm/win32_window.c
-    src/vm/softpc_firmware.rc)
+    src/app/main.c
+    src/app/frontends/console/console.c
+    src/app/runtime/runtime.c
+    src/app/frontends/win32/win32_keyboard.c
+    src/app/frontends/win32/win32_window.c
+    src/app/softpc_firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
 if(WIN32)
     target_link_libraries(softpcvm PRIVATE user32 gdi32)
@@ -622,33 +622,33 @@ set_tests_properties(softpc-lifecycle-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-runtime-smoke
     test/unit/softpc_runtime_smoke.c
-    src/vm/runtime.c
-    src/vm/win32_keyboard.c)
+    src/app/runtime/runtime.c
+    src/app/frontends/win32/win32_keyboard.c)
 target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine)
-target_include_directories(softpc-runtime-smoke PRIVATE src/vm)
+target_include_directories(softpc-runtime-smoke PRIVATE src/app/runtime src/app/frontends/win32)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
 set_tests_properties(softpc-runtime-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-win32-window-smoke
     test/unit/softpc_win32_window_smoke.c
-    src/vm/runtime.c
-    src/vm/win32_keyboard.c
-    src/vm/win32_window.c)
+    src/app/runtime/runtime.c
+    src/app/frontends/win32/win32_keyboard.c
+    src/app/frontends/win32/win32_window.c)
 target_link_libraries(softpc-win32-window-smoke PRIVATE softpc-machine)
 target_compile_definitions(softpc-win32-window-smoke PRIVATE
     SOFTPC_WINDOW_TESTING=1)
 if(WIN32)
     target_link_libraries(softpc-win32-window-smoke PRIVATE user32 gdi32)
 endif()
-target_include_directories(softpc-win32-window-smoke PRIVATE src/vm)
+target_include_directories(softpc-win32-window-smoke PRIVATE src/app/runtime src/app/frontends/console src/app/frontends/win32)
 add_test(NAME softpc-win32-window-smoke COMMAND softpc-win32-window-smoke)
 set_tests_properties(softpc-win32-window-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-win32-keyboard-smoke
     test/unit/softpc_win32_keyboard_smoke.c
-    src/vm/win32_keyboard.c)
+    src/app/frontends/win32/win32_keyboard.c)
 target_link_libraries(softpc-win32-keyboard-smoke PRIVATE softpc-machine)
-target_include_directories(softpc-win32-keyboard-smoke PRIVATE src/vm)
+target_include_directories(softpc-win32-keyboard-smoke PRIVATE src/app/frontends/win32)
 add_test(NAME softpc-win32-keyboard-smoke COMMAND softpc-win32-keyboard-smoke)
 set_tests_properties(softpc-win32-keyboard-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
@@ -683,7 +683,7 @@ set(SOFTPC_TEST_TARGETS
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
     # Keep every executable test self-contained, just like the launcher.
-    target_sources(${softpc_test_target} PRIVATE src/vm/softpc_firmware.rc)
+    target_sources(${softpc_test_target} PRIVATE src/app/softpc_firmware.rc)
     if(MSVC)
         target_compile_options(${softpc_test_target} PRIVATE /UNDEBUG)
     else()

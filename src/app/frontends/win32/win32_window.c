@@ -1,7 +1,7 @@
 #include "win32_window.h"
 
 #ifdef _WIN32
-#include "runtime.h"
+#include "../../runtime/runtime.h"
 #include "win32_keyboard.h"
 
 #include <windows.h>

@@ -1,7 +1,7 @@
-#include "console.h"
-#include "runtime.h"
+#include "frontends/console/console.h"
+#include "runtime/runtime.h"
 #include "softpc_machine.h"
-#include "win32_window.h"
+#include "frontends/win32/win32_window.h"
 
 #include <windows.h>
 

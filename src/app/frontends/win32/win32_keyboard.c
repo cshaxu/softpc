@@ -1,7 +1,7 @@
 #include "win32_keyboard.h"
 
 #ifdef _WIN32
-#include "runtime.h"
+#include "../../runtime/runtime.h"
 
 extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD key_event);
 

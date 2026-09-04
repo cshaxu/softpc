@@ -35,6 +35,22 @@ if(EXISTS "${SOFTPC_SOURCE_DIR}/src/host/softpc_compat")
     message(FATAL_ERROR "Standalone host retains the obsolete softpc_compat taxonomy")
 endif()
 
+# The standalone application shell has one layout.  Its former vm aggregate
+# must not return as a compatibility path after T18.
+if(EXISTS "${SOFTPC_SOURCE_DIR}/src/vm")
+    message(FATAL_ERROR "Standalone application retains the obsolete src/vm layout")
+endif()
+foreach(app_source IN ITEMS
+    "src/app/main.c"
+    "src/app/runtime/runtime.c"
+    "src/app/frontends/console/console.c"
+    "src/app/frontends/win32/win32_keyboard.c"
+    "src/app/frontends/win32/win32_window.c")
+    if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/${app_source}")
+        message(FATAL_ERROR "Standalone application source is missing: ${app_source}")
+    endif()
+endforeach()
+
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.c" OR
    EXISTS "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.h")
     message(FATAL_ERROR "Standalone SoftPC retains the obsolete physical-mapping shim")
@@ -172,13 +188,13 @@ endif()
 
 # Presentation is deliberately a DIB consumer.  Controller planes and DAC
 # interpretation stay in the original nt_cga/nt_ega/nt_vga renderer path.
-file(READ "${SOFTPC_SOURCE_DIR}/src/vm/win32_window.c" window_frontend)
+file(READ "${SOFTPC_SOURCE_DIR}/src/app/frontends/win32/win32_window.c" window_frontend)
 string(TOLOWER "${window_frontend}" normalized_window_frontend)
 if(normalized_window_frontend MATCHES "ega_planes|\\bdac\\b")
     message(FATAL_ERROR "Standalone window bypasses the original SoftPC renderer")
 endif()
 
-file(READ "${SOFTPC_SOURCE_DIR}/src/vm/console.c" console_frontend)
+file(READ "${SOFTPC_SOURCE_DIR}/src/app/frontends/console/console.c" console_frontend)
 string(TOLOWER "${window_frontend}${console_frontend}" normalized_frontends)
 if(normalized_frontends MATCHES "host_key_(down|up)|mouse_send")
     message(FATAL_ERROR "Standalone frontend bypasses original SoftPC input controllers")

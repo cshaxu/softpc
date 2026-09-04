@@ -111,7 +111,7 @@ launcher and validates its adjacent configuration and declared media roots.
   migrated by M8 under the source-mirror plan.
 - `src/core/` — transitional standalone lifecycle, physical-memory ownership,
   CPU/device composition and host-port contracts around that source tree.
-- `src/vm/` — transitional executable entry point, console, Win32
+- `src/app/` — executable entry point, single runtime executor, console, and Win32
   presentation and media attachment. It never owns CPU, guest RAM or device
   state.
 - `test/unit/`, `test/integration/`, `test/support/` — self-contained unit,

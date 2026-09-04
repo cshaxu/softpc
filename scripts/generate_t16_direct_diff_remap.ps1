@@ -32,6 +32,16 @@ $RelocatedPaths = @{
     'src/host/softpc_compat/graphics_console_compat.c' = 'src/host/compat/graphics_console_compat.c'
     'src/host/softpc_compat/softpc_standalone_dib.h' = 'src/host/compat/softpc_standalone_dib.h'
     'src/host/softpc_compat/softpc_host_input.h' = 'src/host/input/softpc_host_input.h'
+    'src/vm/main.c' = 'src/app/main.c'
+    'src/vm/softpc_firmware.rc' = 'src/app/softpc_firmware.rc'
+    'src/vm/runtime.c' = 'src/app/runtime/runtime.c'
+    'src/vm/runtime.h' = 'src/app/runtime/runtime.h'
+    'src/vm/console.c' = 'src/app/frontends/console/console.c'
+    'src/vm/console.h' = 'src/app/frontends/console/console.h'
+    'src/vm/win32_keyboard.c' = 'src/app/frontends/win32/win32_keyboard.c'
+    'src/vm/win32_keyboard.h' = 'src/app/frontends/win32/win32_keyboard.h'
+    'src/vm/win32_window.c' = 'src/app/frontends/win32/win32_window.c'
+    'src/vm/win32_window.h' = 'src/app/frontends/win32/win32_window.h'
 }
 
 function Get-CurrentPath([string]$OldPath) {
@@ -50,7 +60,7 @@ function Get-CurrentPath([string]$OldPath) {
 function Get-InitialOwner([string]$CurrentPath) {
     if ($CurrentPath.StartsWith('src/mvdm/softpc.new/')) { return 'recovered-machine-review' }
     if ($CurrentPath.StartsWith('src/core/softpc-port-abi/')) { return 'compat-review' }
-    if ($CurrentPath.StartsWith('src/vm/')) { return 'app-pending-T18' }
+    if ($CurrentPath.StartsWith('src/app/')) { return 'app' }
     if ($CurrentPath.StartsWith('src/host/')) { return 'host-pending-T17' }
     if ($CurrentPath -match '^src/core/softpc_') { return 'host-pending-T17' }
     return 'unselected-or-review'

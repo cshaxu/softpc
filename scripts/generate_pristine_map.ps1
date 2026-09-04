@@ -99,7 +99,7 @@ function Get-Disposition([string]$CurrentRelative, [string]$BaselineState, [stri
     }
     if ($BaselineState -eq 'original-omitted') { return 'classify-before-T15' }
     if ($CurrentRelative.StartsWith('src/core/softpc-port-abi/')) { return 'overlay' }
-    if ($CurrentRelative.StartsWith('src/vm/')) { return 'app' }
+    if ($CurrentRelative.StartsWith('src/app/')) { return 'app' }
     if ($CurrentRelative.StartsWith('src/host/')) { return 'host' }
     if ($CurrentRelative -match '^src/core/softpc_xms_host\.c$') { return 'remove-unselected' }
     if ($CurrentRelative.StartsWith('src/core/softpc/host/')) { return 'host' }
