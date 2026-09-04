@@ -12,7 +12,7 @@
 
 #define SOFTPC_CONFIG_PATH_MAX 1024u
 
-typedef struct softpc_startup_config {
+typedef struct app_startup_config {
     char floppy_path[SOFTPC_CONFIG_PATH_MAX];
     char hard_disk_path[SOFTPC_CONFIG_PATH_MAX];
     char serial_output_path[SOFTPC_CONFIG_PATH_MAX];
@@ -20,9 +20,9 @@ typedef struct softpc_startup_config {
     uint32_t memory_bytes;
     softpc_presentation presentation;
     softpc_media_mode media_mode;
-} softpc_startup_config;
+} app_startup_config;
 
-static char *softpc_trim(char *text)
+static char *app_trim(char *text)
 {
     char *end;
     while (*text != '\0' && isspace((unsigned char)*text)) ++text;
@@ -36,7 +36,7 @@ static char *softpc_trim(char *text)
     return text;
 }
 
-static int softpc_copy_value(char *target, const char *value)
+static int app_copy_value(char *target, const char *value)
 {
     size_t length = strlen(value);
     if (length >= SOFTPC_CONFIG_PATH_MAX) return 0;
@@ -44,7 +44,7 @@ static int softpc_copy_value(char *target, const char *value)
     return 1;
 }
 
-static int softpc_get_config_path(char *path)
+static int app_get_config_path(char *path)
 {
     DWORD length = GetModuleFileNameA(NULL, path, SOFTPC_CONFIG_PATH_MAX);
     char *separator;
@@ -64,14 +64,14 @@ static int softpc_get_config_path(char *path)
     return 1;
 }
 
-static int softpc_path_is_absolute(const char *path)
+static int app_path_is_absolute(const char *path)
 {
     return path[0] == '/' || path[0] == '\\' ||
         (isalpha((unsigned char)path[0]) && path[1] == ':' &&
             (path[2] == '/' || path[2] == '\\'));
 }
 
-static int softpc_resolve_image_path(char *path, const char *config_path)
+static int app_resolve_image_path(char *path, const char *config_path)
 {
     const char *separator;
     const char *forward_separator;
@@ -79,7 +79,7 @@ static int softpc_resolve_image_path(char *path, const char *config_path)
     size_t directory_length;
     size_t image_length;
 
-    if (path[0] == '\0' || softpc_path_is_absolute(path)) return 1;
+    if (path[0] == '\0' || app_path_is_absolute(path)) return 1;
     separator = strrchr(config_path, '\\');
     forward_separator = strrchr(config_path, '/');
     if (forward_separator != NULL &&
@@ -91,11 +91,11 @@ static int softpc_resolve_image_path(char *path, const char *config_path)
     if (directory_length + image_length >= sizeof(resolved)) return 0;
     memcpy(resolved, config_path, directory_length);
     memcpy(resolved + directory_length, path, image_length + 1u);
-    return softpc_copy_value(path, resolved);
+    return app_copy_value(path, resolved);
 }
 
-static int softpc_load_startup_config(const char *path,
-    softpc_startup_config *config)
+static int app_load_startup_config(const char *path,
+    app_startup_config *config)
 {
     FILE *file = fopen(path, "r");
     char line[1200];
@@ -111,8 +111,8 @@ static int softpc_load_startup_config(const char *path,
         if (comment != NULL) *comment = '\0';
         if (equals == NULL) continue;
         *equals = '\0';
-        key = softpc_trim(line);
-        value = softpc_trim(equals + 1);
+        key = app_trim(line);
+        value = app_trim(equals + 1);
         if (*key == '\0') continue;
         if (strcmp(key, "memory_mb") == 0) {
             char *end;
@@ -120,13 +120,13 @@ static int softpc_load_startup_config(const char *path,
             if (*end != '\0' || mib == 0u || mib > 4095u) goto invalid;
             config->memory_bytes = (uint32_t)(mib * 1024u * 1024u);
         } else if (strcmp(key, "floppy") == 0) {
-            if (!softpc_copy_value(config->floppy_path, value)) goto invalid;
+            if (!app_copy_value(config->floppy_path, value)) goto invalid;
         } else if (strcmp(key, "hard_disk") == 0) {
-            if (!softpc_copy_value(config->hard_disk_path, value)) goto invalid;
+            if (!app_copy_value(config->hard_disk_path, value)) goto invalid;
         } else if (strcmp(key, "serial_output") == 0) {
-            if (!softpc_copy_value(config->serial_output_path, value)) goto invalid;
+            if (!app_copy_value(config->serial_output_path, value)) goto invalid;
         } else if (strcmp(key, "printer_output") == 0) {
-            if (!softpc_copy_value(config->printer_output_path, value)) goto invalid;
+            if (!app_copy_value(config->printer_output_path, value)) goto invalid;
         } else if (strcmp(key, "display") == 0) {
             if (strcmp(value, "console") == 0)
                 config->presentation = SOFTPC_PRESENTATION_CONSOLE;
@@ -150,12 +150,12 @@ invalid:
     return 0;
 }
 
-typedef enum softpc_monitor_state {
+typedef enum app_monitor_state {
     SOFTPC_MONITOR_STOPPED,
     SOFTPC_MONITOR_PAUSED
-} softpc_monitor_state;
+} app_monitor_state;
 
-static void softpc_monitor_help(void)
+static void app_monitor_help(void)
 {
     puts("Insignia SoftPC");
     puts("===============");
@@ -175,8 +175,8 @@ static void softpc_monitor_help(void)
     puts("  Ctrl+Alt+M  release mouse");
 }
 
-static int softpc_monitor_run_frontend(softpc_runtime *runtime,
-    softpc_presentation presentation, softpc_monitor_state *state)
+static int app_monitor_run_frontend(app_runtime *runtime,
+    softpc_presentation presentation, app_monitor_state *state)
 {
     int frontend_result;
     int use_window = presentation == SOFTPC_PRESENTATION_WINDOW;
@@ -184,8 +184,8 @@ static int softpc_monitor_run_frontend(softpc_runtime *runtime,
     for (;;) {
         frontend_result = use_window ?
             (presentation == SOFTPC_PRESENTATION_CONSOLE ?
-                softpc_vm_run_console_window(runtime) : softpc_vm_run_window(runtime)) :
-            softpc_vm_run_console(runtime);
+                app_vm_run_console_window(runtime) : app_vm_run_window(runtime)) :
+            app_vm_run_console(runtime);
         if (presentation != SOFTPC_PRESENTATION_CONSOLE) break;
         if (frontend_result == SOFTPC_VM_FRONTEND_SWITCH_WINDOW) {
             use_window = 1;
@@ -205,24 +205,24 @@ static int softpc_monitor_run_frontend(softpc_runtime *runtime,
     return 1;
 }
 
-static int softpc_monitor_start(softpc_runtime *runtime,
-    softpc_presentation presentation, softpc_monitor_state *state, int reset)
+static int app_monitor_start(app_runtime *runtime,
+    softpc_presentation presentation, app_monitor_state *state, int reset)
 {
     if (reset || *state == SOFTPC_MONITOR_STOPPED) {
-        if (!softpc_runtime_start(runtime)) return 0;
-    } else if (!softpc_runtime_resume(runtime)) {
+        if (!app_runtime_start(runtime)) return 0;
+    } else if (!app_runtime_resume(runtime)) {
         return 0;
     }
-    return softpc_monitor_run_frontend(runtime, presentation, state);
+    return app_monitor_run_frontend(runtime, presentation, state);
 }
 
-static int softpc_monitor(softpc_runtime *runtime,
+static int app_monitor(app_runtime *runtime,
     softpc_presentation presentation)
 {
     char line[SOFTPC_CONFIG_PATH_MAX + 64u];
-    softpc_monitor_state state = SOFTPC_MONITOR_STOPPED;
+    app_monitor_state state = SOFTPC_MONITOR_STOPPED;
 
-    softpc_monitor_help();
+    app_monitor_help();
     puts("");
     for (;;) {
         char *command;
@@ -230,32 +230,32 @@ static int softpc_monitor(softpc_runtime *runtime,
         printf("SoftPC> ");
         fflush(stdout);
         if (fgets(line, sizeof(line), stdin) == NULL) return 1;
-        command = softpc_trim(line);
+        command = app_trim(line);
         argument = command;
         while (*argument != '\0' && !isspace((unsigned char)*argument))
             ++argument;
         if (*argument != '\0') *argument++ = '\0';
-        argument = softpc_trim(argument);
+        argument = app_trim(argument);
         for (char *letter = command; *letter != '\0'; ++letter)
             *letter = (char)tolower((unsigned char)*letter);
         if (*command == '\0') continue;
-        if (strcmp(command, "help") == 0) softpc_monitor_help();
+        if (strcmp(command, "help") == 0) app_monitor_help();
         else if (strcmp(command, "exit") == 0) return 0;
         else if (strcmp(command, "start") == 0) {
-            if (!softpc_monitor_start(runtime, presentation, &state, 0)) return 1;
+            if (!app_monitor_start(runtime, presentation, &state, 0)) return 1;
         } else if (strcmp(command, "resume") == 0) {
             if (state != SOFTPC_MONITOR_PAUSED) puts("Machine is not paused.");
-            else if (!softpc_monitor_start(runtime, presentation, &state, 0)) return 1;
+            else if (!app_monitor_start(runtime, presentation, &state, 0)) return 1;
         } else if (strcmp(command, "pause") == 0) {
             puts(state == SOFTPC_MONITOR_PAUSED ? "Machine is paused." :
                 "Use Ctrl+Alt+P while the guest is running.");
         } else if (strcmp(command, "stop") == 0) {
-            if (!softpc_runtime_stop(runtime)) return 1;
+            if (!app_runtime_stop(runtime)) return 1;
             state = SOFTPC_MONITOR_STOPPED;
             puts("Machine stopped.");
         } else if (strcmp(command, "reset") == 0) {
-            if (!softpc_runtime_stop(runtime) || !softpc_runtime_start(runtime) ||
-                !softpc_runtime_pause(runtime)) return 1;
+            if (!app_runtime_stop(runtime) || !app_runtime_start(runtime) ||
+                !app_runtime_pause(runtime)) return 1;
             state = SOFTPC_MONITOR_PAUSED;
             puts("Machine reset and pause requested.");
         } else if (strcmp(command, "floppy") == 0) {
@@ -263,15 +263,15 @@ static int softpc_monitor(softpc_runtime *runtime,
             char *path = verb;
             while (*path != '\0' && !isspace((unsigned char)*path)) ++path;
             if (*path != '\0') *path++ = '\0';
-            path = softpc_trim(path);
+            path = app_trim(path);
             for (char *letter = verb; *letter != '\0'; ++letter)
                 *letter = (char)tolower((unsigned char)*letter);
             if (strcmp(verb, "eject") == 0 && *path == '\0') {
-                if (!softpc_runtime_set_floppy(runtime, NULL))
+                if (!app_runtime_set_floppy(runtime, NULL))
                     puts("Cannot eject floppy.");
                 else puts("Floppy ejected.");
             } else if (strcmp(verb, "insert") == 0 && *path != '\0') {
-                if (!softpc_runtime_set_floppy(runtime, path))
+                if (!app_runtime_set_floppy(runtime, path))
                     puts("Cannot insert floppy.");
                 else puts("Floppy inserted.");
             } else puts("Usage: floppy insert <image> | eject");
@@ -283,11 +283,11 @@ static int softpc_monitor(softpc_runtime *runtime,
 int main(int argc, char **argv)
 {
     char config_path[SOFTPC_CONFIG_PATH_MAX];
-    softpc_startup_config config = { { 0 }, { 0 }, { 0 }, { 0 }, 16u * 1024u * 1024u,
+    app_startup_config config = { { 0 }, { 0 }, { 0 }, { 0 }, 16u * 1024u * 1024u,
         SOFTPC_PRESENTATION_CONSOLE, SOFTPC_MEDIA_OVERLAY };
     softpc_machine_options options = { 0 };
     softpc_machine *machine = NULL;
-    softpc_runtime *runtime = NULL;
+    app_runtime *runtime = NULL;
     softpc_machine_result result;
     (void)argv;
 
@@ -295,19 +295,19 @@ int main(int argc, char **argv)
         fprintf(stderr, "softpcvm: command-line arguments are not supported\n");
         return 2;
     }
-    if (!softpc_get_config_path(config_path)) {
+    if (!app_get_config_path(config_path)) {
         fprintf(stderr, "softpcvm: cannot determine adjacent softpc.ini path\n");
         return 1;
     }
-    if (!softpc_load_startup_config(config_path, &config)) {
+    if (!app_load_startup_config(config_path, &config)) {
         fprintf(stderr, "softpcvm: cannot read fixed-machine config '%s'\n",
             config_path);
         return 1;
     }
-    if (!softpc_resolve_image_path(config.floppy_path, config_path) ||
-        !softpc_resolve_image_path(config.hard_disk_path, config_path) ||
-        !softpc_resolve_image_path(config.serial_output_path, config_path) ||
-        !softpc_resolve_image_path(config.printer_output_path, config_path)) {
+    if (!app_resolve_image_path(config.floppy_path, config_path) ||
+        !app_resolve_image_path(config.hard_disk_path, config_path) ||
+        !app_resolve_image_path(config.serial_output_path, config_path) ||
+        !app_resolve_image_path(config.printer_output_path, config_path)) {
         fprintf(stderr, "softpcvm: path in '%s' is too long\n", config_path);
         return 1;
     }
@@ -322,16 +322,16 @@ int main(int argc, char **argv)
         config.printer_output_path;
     result = softpc_machine_create(&options, &machine);
     if (result != SOFTPC_MACHINE_OK) goto done;
-    if (!softpc_runtime_create(machine, &runtime)) {
+    if (!app_runtime_create(machine, &runtime)) {
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
     }
-    if (softpc_monitor(runtime, options.presentation) != 0)
+    if (app_monitor(runtime, options.presentation) != 0)
         result = SOFTPC_MACHINE_IO_ERROR;
 done:
     if (result != SOFTPC_MACHINE_OK)
         fprintf(stderr, "softpcvm: %s\n", softpc_machine_result_name(result));
-    softpc_runtime_destroy(runtime);
+    app_runtime_destroy(runtime);
     softpc_machine_destroy(machine);
     return result != SOFTPC_MACHINE_OK;
 }

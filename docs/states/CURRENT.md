@@ -4,20 +4,20 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T23 closed |
-| Admission And Approval | Owner admitted the next queued task: retire demonstrably unused source from the selected original MVDM mirror. |
-| Objective | Reduce `src/mvdm/softpc.new` to the original source subset actually selected by the fixed standalone machine, without changing machine behavior. |
-| Non-goals | No rewrite, semantic edit, or removal of active CCPU/C-VID/V7/BIOS/BOP/controller code; no host-ABI, media, ROM, guest, UI, or `softpc.ini` change. |
-| Baseline | The approved proposal identifies 15 unselected C files (4,921 lines) and 279 header candidates. Only the C list is pre-confirmed; every header requires exact x64/x86 compiler dependency proof. |
-| Applicable Rules | Documentation guide and execution rules; source-layout, architecture, and coding rules; original mirror remains a selected baseline and OpenNT stays read-only comparison material. |
-| Affected Boundary | Selected inactive paths below `src/mvdm/softpc.new`, CMake/transform reference audits, source-boundary evidence, and test documentation only. |
-| Subtask Plan | S1 regenerate exact selection/dependency evidence for both widths; S2 remove only proven inactive C/header paths and repair stale references; S3 fresh dual-width build, full CTest, package smoke, and source-map closure. |
-| Requirement Ledger | R1: each removed C path is absent from CMake and transformation inputs. R2: each removed header is absent from exact compiler dependency output for both widths. R3: active original source spelling/behavior remains unchanged. R4: dual-width behavior and package launch remain unchanged. |
-| Focused Verification | Exact path audits, x64/x86 dependency manifests, CMake stale-reference scan, fresh GCC x64/x86 builds, full CTest, and package smoke. |
-| Stop Conditions | Stop before deleting a path referenced by CMake, a transform, a compiler dependency manifest, or any active source. Defer ambiguous headers rather than guessing. |
-| Exit Criteria | Every pre-confirmed inactive C file is gone; only headers with exact dual-width proof are gone; no stale build/reference path remains; and dual-width regression preserves current packages. |
-| Closure | Closed 2026-09-04. Removed all 15 pre-confirmed inactive C files and all 279 manifest headers after exact fresh x64/x86 dependency proof found zero consumers. Fresh GCC x64/x86 builds and full CTest each passed 20/20, including package smoke, source-boundary, and documentation-governance gates. |
-| Original Owner Request | “好 准入” following the approved M9 unused-MVDM-source-retirement proposal. |
+| Identifier Mode | M9 T24 closed |
+| Admission And Approval | Owner admitted the next queued task: contextual standalone symbol ownership. |
+| Objective | Make modern application globals explicitly `app_*`, without changing the recovered SoftPC machine ABI or behavior. |
+| Non-goals | No rename below `src/mvdm/softpc.new`; no change to original host-ABI callbacks, CCPU/C-VID/V7/BIOS/BOP/controller code, guest behavior, UI behavior, media, ROMs, executable names, or `softpc.ini`. The compatibility host remains under its established historical spellings where generated or original machine code imports them. |
+| Baseline | The proposal's initial broad scan found 320 unique modern `softpc_*` candidates. The admission audit proved that the host/compat candidates include direct original imports and generated CCPU/C-VID ABI: their spellings are not standalone naming debt. The executable scope is therefore app-owned globals and their direct consumers only. |
+| Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT is read-only comparison material. |
+| Affected Boundary | Application-owned symbols and matching declarations/callers/tests/source-boundary checks below `src/app/` and `test/`; original and generated machine imports remain unchanged. |
+| Subtask Plan | S1 classify candidate definitions and generated/import consumers; S2 rename the app owner families and repair direct consumers; S3 add a regression gate, build both GCC widths, run full CTest and package smoke, then close. |
+| Requirement Ledger | R1: every renamed application global identifies its `app` owner. R2: original and generated SoftPC-required imports retain their spelling. R3: all declarations, callers, tests and static checks use the selected name. R4: x64/x86 package behavior remains unchanged. |
+| Focused Verification | Definition/declaration/import audit; static app-ownership gate; GCC x64/x86 builds; full CTest; package smoke for both launchers. |
+| Stop Conditions | Stop before renaming an original mirror import, a generated ABI entry point, an externally required Windows entry point, or an ambiguous symbol lacking a provable owner; record such cases rather than guessing. |
+| Exit Criteria | Application-owned standalone globals use `app_*`; original and generated SoftPC ABI spelling is intact; static ownership gate and dual-width full regression pass. |
+| Closure | Closed: application-owned globals now use `app_*`; all host/compat `softpc_*` spellings were classified as required original/generated machine ABI and retained. GCC x64 and x86 rebuilt and each passed full CTest, 20/20, including package smoke. |
+| Original Owner Request | “准入执行” for the approved M9 contextual standalone symbol ownership proposal. |
 
 ## Current Technical Baseline
 
@@ -35,6 +35,12 @@
 - M9 T23 retired 294 demonstrably unselected historical paths (15 C files and
   279 headers) from the original mirror without changing its selected machine
   behavior; fresh GCC x64/x86 CTest each passed 20/20.
+- M9 T24 is admitted to make modern application symbol ownership explicit. Its
+  admission audit establishes that host/compat `softpc_*` spellings form an
+  original/generated machine ABI and must remain intact.
+- M9 T24 closed with dual-width 20/20 CTest proof and package smoke. The next
+  reported issue is a guest Ctrl+Alt+Del warm-reset hang after `Starting
+  MS-DOS ...`; it requires a dedicated lifecycle investigation.
 - M9 T22 normalizes frontend host hotkeys without changing SoftPC: Ctrl+Alt+P
   no longer strands guest modifiers across console pause/resume, and
   Ctrl+Alt+F now supplies guest Alt+Enter rather than Ctrl+Alt+Enter.

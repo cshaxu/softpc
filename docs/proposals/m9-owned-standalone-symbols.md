@@ -7,16 +7,27 @@ the owning source-layer namespace. File names already identify their owner;
 the remaining global symbols should do the same without changing the recovered
 SoftPC machine ABI.
 
+## Admission Scope Correction
+
+The initial inventory was intentionally broad.  Admission examination of both
+the direct original-source imports and the linked generated CCPU/C-VID objects
+proved that host and compatibility spellings such as `softpc_platform_*`,
+`softpc_ccpu_lifecycle_*`, and `softpc_gdp_*` are a machine-facing ABI.  A
+host-only rename breaks that ABI even though the calling generated source is
+not itself under the source mirror.  They are therefore preserved, rather than
+being renamed for cosmetic consistency.
+
+The admitted implementation scope is application-owned globals and their
+direct test consumers.  The original candidate intent remains useful as a
+classification record, not as permission to alter a required ABI.
+
 ## Candidate Work
 
 - Rename modern application-owned globals below `src/app/` to `app_*`:
   runtime, window, console, keyboard, monitor and startup symbols.
-- Rename modern standalone host-owned globals below `src/host/` to `host_*`:
-  machine façade, platform, media, GFI, V7 pointer, DIB/video, audio and
-  standalone presentation helpers.
-- Name independent compatibility helpers below `src/host/compat/` as
-  `compat_*`, with a subsystem component where needed (`compat_ccpu_*`,
-  `compat_cvidc_*`).
+- Preserve host-owned and compatibility spellings that are imported by the
+  recovered machine or its generated CCPU/C-VID forms; their ABI classification
+  is explicit in the closed task record.
 - Remove a prefix from a function or object with internal linkage only when
   its enclosing file already makes ownership unambiguous.
 - Repair every direct caller, test, declaration, CMake transform and static
@@ -47,15 +58,15 @@ families are `softpc_window_*` (62), `softpc_platform_*` (32),
 
 ## Verification
 
-1. Assert that no modern standalone definition or declaration retains a
-   `softpc_*` name, except an explicitly documented compatibility alias if
-   unavoidable.
+1. Assert that no application-owned definition or declaration retains a
+   `softpc_*` name, except the documented machine-façade types and functions
+   that the application consumes.
 2. Assert every original machine import keeps its original symbol spelling.
 3. Configure, build and run full CTest with GCC for x64 and x86.
 4. Run package smoke for both launchers.
 
 ## Exit
 
-Modern standalone symbols express their `app`, `host` or `compat` owner;
-original SoftPC ABI names are untouched; and dual-width behavior remains
+Application-owned standalone symbols express their `app` owner; original and
+generated SoftPC ABI names are untouched; and dual-width behavior remains
 unchanged.

@@ -21,12 +21,12 @@ static int capture_key(void *context, uint8_t key_number, uint8_t released)
 int main(void)
 {
     softpc_keyboard_capture capture = { { 0 }, { 0 }, 0u };
-    softpc_win32_keyboard_normalizer normalizer = { 0 };
+    app_win32_keyboard_normalizer normalizer = { 0 };
 
     /* The original nt_keycd table, not this outer adapter, assigns 31 to A. */
-    assert(softpc_win32_keyboard_submit_transition(&capture, capture_key,
+    assert(app_win32_keyboard_submit_transition(&capture, capture_key,
         0x1eu, 'A', 0u, 1));
-    assert(softpc_win32_keyboard_submit_transition(&capture, capture_key,
+    assert(app_win32_keyboard_submit_transition(&capture, capture_key,
         0x1eu, 'A', 0u, 0));
     assert(capture.count == 2u);
     assert(capture.keys[0] == 31u && capture.releases[0] == 0u);
@@ -36,20 +36,20 @@ int main(void)
        transitions through the original key table rather than a VM reset
        side channel. */
     capture.count = 0u;
-    assert(softpc_win32_keyboard_submit_ctrl_alt_del(&capture, capture_key));
+    assert(app_win32_keyboard_submit_ctrl_alt_del(&capture, capture_key));
     assert(capture.count == 6u);
     assert(capture.releases[0] == 0u && capture.releases[1] == 0u &&
         capture.releases[2] == 0u && capture.releases[3] == 1u &&
         capture.releases[4] == 1u && capture.releases[5] == 1u);
 
     capture.count = 0u;
-    assert(softpc_win32_keyboard_release_ctrl_alt(&capture, capture_key));
+    assert(app_win32_keyboard_release_ctrl_alt(&capture, capture_key));
     assert(capture.count == 2u);
     assert(capture.keys[0] == 58u && capture.releases[0] == 1u);
     assert(capture.keys[1] == 60u && capture.releases[1] == 1u);
 
     capture.count = 0u;
-    assert(softpc_win32_keyboard_submit_alt_enter(&capture, capture_key));
+    assert(app_win32_keyboard_submit_alt_enter(&capture, capture_key));
     /* Ctrl+Alt+F has already produced host Ctrl/Alt makes.  The replacement
        must clear them before creating a distinct guest Alt+Enter, never send
        guest Ctrl+Alt+Enter. */
@@ -64,25 +64,25 @@ int main(void)
     /* Esc is an ordinary original key-table entry (key 110), not a host
        stop command. */
     capture.count = 0u;
-    assert(softpc_win32_keyboard_submit_transition(&capture, capture_key,
+    assert(app_win32_keyboard_submit_transition(&capture, capture_key,
         0x01u, VK_ESCAPE, 0u, 1));
-    assert(softpc_win32_keyboard_submit_transition(&capture, capture_key,
+    assert(app_win32_keyboard_submit_transition(&capture, capture_key,
         0x01u, VK_ESCAPE, 0u, 0));
     assert(capture.count == 2u);
     assert(capture.keys[0] == 110u && capture.releases[0] == 0u);
     assert(capture.keys[1] == 110u && capture.releases[1] == 1u);
 
     /* A scan-less RDP key followed by its WM_CHAR must not inject twice. */
-    softpc_win32_keyboard_note_recovered_key(&normalizer, 'A');
-    assert(softpc_win32_keyboard_consume_duplicate_character(&normalizer,
+    app_win32_keyboard_note_recovered_key(&normalizer, 'A');
+    assert(app_win32_keyboard_consume_duplicate_character(&normalizer,
         L'a'));
-    assert(!softpc_win32_keyboard_consume_duplicate_character(&normalizer,
+    assert(!app_win32_keyboard_consume_duplicate_character(&normalizer,
         L'a'));
 
     /* UTF-16 input uses the active host layout to synthesize make/break;
        it never places text directly in guest memory. */
     capture.count = 0u;
-    assert(softpc_win32_keyboard_submit_utf16(&normalizer, &capture,
+    assert(app_win32_keyboard_submit_utf16(&normalizer, &capture,
         capture_key, L'a'));
     assert(capture.count == 2u);
     assert(capture.keys[0] == 31u && capture.releases[0] == 0u);

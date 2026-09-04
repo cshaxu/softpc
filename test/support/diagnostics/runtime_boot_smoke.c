@@ -14,7 +14,7 @@ extern unsigned long softpc_standalone_dib_palette_history(
 extern int gate_a20_status;
 extern int sas_twenty_bit_wrapping_enabled(void);
 
-static int frame_contains(const softpc_runtime_frame *frame, const char *needle)
+static int frame_contains(const app_runtime_frame *frame, const char *needle)
 {
     unsigned int row;
     for (row = 0u; row < SOFTPC_RUNTIME_TEXT_ROWS; ++row) {
@@ -30,7 +30,7 @@ static int frame_contains(const softpc_runtime_frame *frame, const char *needle)
     return 0;
 }
 
-static int frame_has_exact_line(const softpc_runtime_frame *frame,
+static int frame_has_exact_line(const app_runtime_frame *frame,
     const char *needle)
 {
     unsigned int row;
@@ -48,7 +48,7 @@ static int frame_has_exact_line(const softpc_runtime_frame *frame,
     return 0;
 }
 
-static int frame_has_prompt(const softpc_runtime_frame *frame)
+static int frame_has_prompt(const app_runtime_frame *frame)
 {
     unsigned int row;
     for (row = 0u; row < SOFTPC_RUNTIME_TEXT_ROWS; ++row) {
@@ -72,7 +72,7 @@ static int frame_has_prompt(const softpc_runtime_frame *frame)
 /* Runtime frames are host-owned copies.  Reading this snapshot therefore
    exercises the standalone presentation boundary without racing the original
    renderer or its CCPU executor. */
-static int graphics_frame_has_visible_pixel(const softpc_runtime_frame *frame)
+static int graphics_frame_has_visible_pixel(const app_runtime_frame *frame)
 {
     const BITMAPINFO *dib;
     uint32_t stride;
@@ -116,7 +116,7 @@ static int graphics_frame_has_visible_pixel(const softpc_runtime_frame *frame)
 /* Opt-in evidence capture for a real rendered guest frame.  The runtime
    frame is already an owned BI_RGB snapshot, so writing it here neither
    reads controller state nor changes the original SoftPC renderer. */
-static int write_graphics_frame_bmp(const softpc_runtime_frame *frame,
+static int write_graphics_frame_bmp(const app_runtime_frame *frame,
     const char *path)
 {
     const BITMAPINFO *dib;
@@ -158,7 +158,7 @@ static int write_graphics_frame_bmp(const softpc_runtime_frame *frame,
     return 1;
 }
 
-static void dump_setup_text_attributes(const softpc_runtime_frame *frame)
+static void dump_setup_text_attributes(const app_runtime_frame *frame)
 {
     unsigned long foreground[16] = { 0u };
     unsigned long background[16] = { 0u };
@@ -181,7 +181,7 @@ static void dump_setup_text_attributes(const softpc_runtime_frame *frame)
     fflush(stderr);
 }
 
-static void dump_setup_text_palette(const softpc_runtime_frame *frame)
+static void dump_setup_text_palette(const app_runtime_frame *frame)
 {
     unsigned int index;
 
@@ -200,7 +200,7 @@ static void dump_setup_text_palette(const softpc_runtime_frame *frame)
 /* Keep palette diagnosis at the copied runtime boundary.  This records the
    exact RGB table sent to the standalone window, rather than inferring a
    colour from a screenshot or from guest controller state. */
-static void dump_graphics_palette(const softpc_runtime_frame *frame)
+static void dump_graphics_palette(const app_runtime_frame *frame)
 {
     const BITMAPINFO *dib;
     unsigned int index;
@@ -325,10 +325,10 @@ static void dump_palette_history(void)
     fflush(stderr);
 }
 
-static int send_key(softpc_runtime *runtime, uint8_t key_number)
+static int send_key(app_runtime *runtime, uint8_t key_number)
 {
-    return softpc_runtime_enqueue_key(runtime, key_number, 0u) &&
-        softpc_runtime_enqueue_key(runtime, key_number, 1u);
+    return app_runtime_enqueue_key(runtime, key_number, 0u) &&
+        app_runtime_enqueue_key(runtime, key_number, 1u);
 }
 
 /* The runtime queue takes SoftPC key numbers, rather than PC scan codes.
@@ -336,7 +336,7 @@ static int send_key(softpc_runtime *runtime, uint8_t key_number)
    interactive console and window frontends. */
 extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 
-static int enqueue_virtual_key(softpc_runtime *runtime, WORD virtual_key,
+static int enqueue_virtual_key(app_runtime *runtime, WORD virtual_key,
     DWORD control_state, uint8_t released)
 {
     KEY_EVENT_RECORD event;
@@ -361,7 +361,7 @@ static int enqueue_virtual_key(softpc_runtime *runtime, WORD virtual_key,
     if ((scan & 0xff00u) == 0xe000u)
         event.dwControlKeyState |= ENHANCED_KEY;
     key_number = KeyMsgToKeyCode(&event);
-    return key_number != 0u && softpc_runtime_enqueue_key(runtime, key_number,
+    return key_number != 0u && app_runtime_enqueue_key(runtime, key_number,
         released);
 }
 
@@ -370,23 +370,23 @@ static int enqueue_virtual_key(softpc_runtime *runtime, WORD virtual_key,
    Deliberately holding a dialog key for 100 ms enters the original keyboard
    INT 15 nesting frame first and can strand the synthetic break outside it;
    that is not how the actual console/window frontend presents a tap. */
-static int enqueue_virtual_key_pair(softpc_runtime *runtime, WORD virtual_key)
+static int enqueue_virtual_key_pair(app_runtime *runtime, WORD virtual_key)
 {
     return enqueue_virtual_key(runtime, virtual_key, 0u, 0u) &&
         enqueue_virtual_key(runtime, virtual_key, 0u, 1u);
 }
 
-static void send_enter(softpc_runtime *runtime)
+static void send_enter(app_runtime *runtime)
 {
     (void)enqueue_virtual_key_pair(runtime, VK_RETURN);
 }
 
-static int send_setup_navigation_key(softpc_runtime *runtime, WORD virtual_key)
+static int send_setup_navigation_key(app_runtime *runtime, WORD virtual_key)
 {
     return enqueue_virtual_key_pair(runtime, virtual_key);
 }
 
-static int send_character_slow(softpc_runtime *runtime, WCHAR character)
+static int send_character_slow(app_runtime *runtime, WCHAR character)
 {
     SHORT translation = VkKeyScanW(character);
     BYTE modifiers;
@@ -410,7 +410,7 @@ static int send_character_slow(softpc_runtime *runtime, WCHAR character)
     return 1;
 }
 
-static int send_windows_setup_command(softpc_runtime *runtime)
+static int send_windows_setup_command(app_runtime *runtime)
 {
     static const WCHAR command[] = L"c:\\ewin31\\setup.exe";
     WCHAR overridden_command[260];
@@ -434,7 +434,7 @@ static int send_windows_setup_command(softpc_runtime *runtime)
  * transitions as a human window frontend.  It deliberately omits Enter: the
  * acceptance condition is that typed input neither terminates the executor
  * nor returns Setup to DOS. */
-static int send_setup_username_probe(softpc_runtime *runtime)
+static int send_setup_username_probe(app_runtime *runtime)
 {
     static const WCHAR username[] = L"SoftPC User";
     unsigned int index;
@@ -448,7 +448,7 @@ static int send_setup_username_probe(softpc_runtime *runtime)
  * handoff has remained text-only.  A returned COMMAND.COM prompt will echo
  * it; an active loader will not, distinguishing stale text paint from a
  * genuine DOS return without mutating the supplied image. */
-static int send_dos_prompt_probe(softpc_runtime *runtime)
+static int send_dos_prompt_probe(app_runtime *runtime)
 {
     static const WCHAR command[] = L"echo SOFTPC_SETUP_RETURNED";
     unsigned int index;
@@ -458,7 +458,7 @@ static int send_dos_prompt_probe(softpc_runtime *runtime)
     return enqueue_virtual_key_pair(runtime, VK_RETURN);
 }
 
-static int send_dos_errorlevel_probe(softpc_runtime *runtime)
+static int send_dos_errorlevel_probe(app_runtime *runtime)
 {
     static const WCHAR command[] = L"if errorlevel 1 echo SOFTPC_SETUP_ERROR";
     unsigned int index;
@@ -468,7 +468,7 @@ static int send_dos_errorlevel_probe(softpc_runtime *runtime)
     return enqueue_virtual_key_pair(runtime, VK_RETURN);
 }
 
-static void dump_frame(const softpc_runtime_frame *frame)
+static void dump_frame(const app_runtime_frame *frame)
 {
     unsigned int row;
     if (frame == NULL || frame->valid == 0u) return;
@@ -488,7 +488,7 @@ static void dump_frame(const softpc_runtime_frame *frame)
    opt-in because it records the host-owned presentation snapshot, not guest
    memory; this makes an unattended stock SETUP /i run diagnosable without
    changing a controller, BIOS service, or renderer. */
-static uint32_t trace_setup_frame(const softpc_runtime_frame *frame)
+static uint32_t trace_setup_frame(const app_runtime_frame *frame)
 {
     uint32_t hash = 2166136261u;
     unsigned int index;
@@ -517,7 +517,7 @@ static uint32_t trace_setup_frame(const softpc_runtime_frame *frame)
    into the original SoftPC VGA surface.  Hash that owned presentation copy,
    not a frontend cursor or host pointer, so a motion regression proves the
    physical InPort -> IRQ9 -> guest-driver -> original-renderer path. */
-static uint32_t graphics_frame_hash(const softpc_runtime_frame *frame)
+static uint32_t graphics_frame_hash(const app_runtime_frame *frame)
 {
     uint32_t hash = 2166136261u;
     uint32_t stride;
@@ -549,12 +549,12 @@ static int run_halted_keyboard_probe(void)
     softpc_machine_options options = { image_path, NULL,
         SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *machine = NULL;
-    softpc_runtime *runtime = NULL;
+    app_runtime *runtime = NULL;
     FILE *image;
     DWORD deadline;
     uint8_t marker = 0u;
     uint8_t ready = 0u;
-    softpc_runtime_frame frame;
+    app_runtime_frame frame;
     uint32_t sequence_before = 0u;
     uint32_t sequence_after = 0u;
     DWORD key_queued_at = 0u;
@@ -593,8 +593,8 @@ static int run_halted_keyboard_probe(void)
     image = NULL;
     options.media_mode = SOFTPC_MEDIA_OVERLAY;
     if (softpc_machine_create(&options, &machine) != SOFTPC_MACHINE_OK ||
-        !softpc_runtime_create(machine, &runtime) ||
-        !softpc_runtime_start(runtime)) goto done;
+        !app_runtime_create(machine, &runtime) ||
+        !app_runtime_start(runtime)) goto done;
     deadline = GetTickCount() + 5000u;
     do {
         if (softpc_machine_read_physical(machine, 0x501u, &ready,
@@ -604,20 +604,20 @@ static int run_halted_keyboard_probe(void)
     } while ((LONG)(GetTickCount() - deadline) < 0);
     if (ready != 0x55u) {
         fprintf(stderr, "halted keyboard probe: boot marker=%02x state=%d\n",
-            ready, (int)softpc_runtime_get_state(runtime));
+            ready, (int)app_runtime_get_state(runtime));
         goto done;
     }
     memset(&frame, 0, sizeof(frame));
-    if (softpc_runtime_copy_frame(runtime, &frame))
+    if (app_runtime_copy_frame(runtime, &frame))
         sequence_before = frame.sequence;
     key_queued_at = GetTickCount();
-    if (!softpc_runtime_enqueue_key(runtime, 31u, 0u)) goto done;
+    if (!app_runtime_enqueue_key(runtime, 31u, 0u)) goto done;
     deadline = GetTickCount() + 3000u;
     do {
         if (softpc_machine_read_physical(machine, 0x500u, &marker,
                 sizeof(marker)) == SOFTPC_MACHINE_OK && marker == 0xa5u) {
             key_delivered_at = GetTickCount();
-            (void)softpc_runtime_enqueue_key(runtime, 31u, 1u);
+            (void)app_runtime_enqueue_key(runtime, 31u, 1u);
             /* This is the whole outer input path: queue, wake, original
                8042/PIC delivery and the CCPU HLT return.  It must not be
                deferred to the 50 ms timer heartbeat or a frontend repaint. */
@@ -630,17 +630,17 @@ static int run_halted_keyboard_probe(void)
         Sleep(10u);
     } while ((LONG)(GetTickCount() - deadline) < 0);
     memset(&frame, 0, sizeof(frame));
-    if (softpc_runtime_copy_frame(runtime, &frame))
+    if (app_runtime_copy_frame(runtime, &frame))
         sequence_after = frame.sequence;
     if (!success)
         fprintf(stderr, "halted keyboard probe: resume marker=%02x state=%d frame=%lu->%lu\n",
-            marker, (int)softpc_runtime_get_state(runtime),
+            marker, (int)app_runtime_get_state(runtime),
             (unsigned long)sequence_before, (unsigned long)sequence_after);
 done:
     if (image != NULL) fclose(image);
     if (runtime != NULL) {
-        (void)softpc_runtime_stop(runtime);
-        softpc_runtime_destroy(runtime);
+        (void)app_runtime_stop(runtime);
+        app_runtime_destroy(runtime);
     }
     if (machine != NULL) softpc_machine_destroy(machine);
     (void)remove(image_path);
@@ -651,8 +651,8 @@ int main(int argc, char **argv)
 {
     softpc_machine_options options = { NULL, NULL, SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *machine = NULL;
-    softpc_runtime *runtime = NULL;
-    softpc_runtime_frame *frame = NULL;
+    app_runtime *runtime = NULL;
+    app_runtime_frame *frame = NULL;
     DWORD deadline;
     int date_sent = 0, time_sent = 0, input_stage = 0, success = 0;
     int overlay = 0, direct = 0, windows_setup = 0, windows_setup_complete = 0;
@@ -771,9 +771,9 @@ int main(int argc, char **argv)
     if (overlay && direct) return 2;
     options.media_mode = direct ? SOFTPC_MEDIA_DIRECT : SOFTPC_MEDIA_OVERLAY;
     if (softpc_machine_create(&options, &machine) != SOFTPC_MACHINE_OK ||
-        !softpc_runtime_create(machine, &runtime) || !softpc_runtime_start(runtime))
+        !app_runtime_create(machine, &runtime) || !app_runtime_start(runtime))
         goto done;
-    frame = (softpc_runtime_frame *)calloc(1u, sizeof(*frame));
+    frame = (app_runtime_frame *)calloc(1u, sizeof(*frame));
     if (frame == NULL) goto done;
     /* This is an integration probe, not an unattended boot soak.  Leave
        enough room for firmware POST but emit its captured frame before any
@@ -804,7 +804,7 @@ int main(int argc, char **argv)
             if (!enqueue_virtual_key(runtime, setup_enter_virtual_key, 0u, 1u)) break;
             setup_enter_release_sent = 1;
         }
-        if (softpc_runtime_copy_frame(runtime, frame)) {
+        if (app_runtime_copy_frame(runtime, frame)) {
             if (windows_setup && setup_frame_trace) {
                 uint32_t frame_hash = trace_setup_frame(frame);
                 if (frame_hash != setup_last_frame_hash) {
@@ -888,7 +888,7 @@ int main(int argc, char **argv)
                             setup_mouse_surface_before_hash =
                                 graphics_frame_hash(frame);
                             if (setup_mouse_surface_before_hash == 0u) break;
-                            if (!softpc_runtime_enqueue_mouse(runtime, 96, 96,
+                            if (!app_runtime_enqueue_mouse(runtime, 96, 96,
                                     0u, 0u)) break;
                             setup_mouse_motion_sent = 1;
                             fprintf(stderr, "setup stage: physical mouse motion sent\n");
@@ -1244,7 +1244,7 @@ int main(int argc, char **argv)
                     >= 1500u) {
                     if (!send_windows_setup_command(runtime))
                         fprintf(stderr, "softpc-runtime-boot-smoke: Setup command enqueue failed (state=%d)\n",
-                            (int)softpc_runtime_get_state(runtime));
+                            (int)app_runtime_get_state(runtime));
                     else setup_command_sent = 1;
                 }
                 if (setup_command_sent) {
@@ -1265,19 +1265,19 @@ int main(int argc, char **argv)
                    a time, then observe its guest-visible result. */
                 if (!send_key(runtime, 31u))
                     fprintf(stderr, "softpc-runtime-boot-smoke: input enqueue failed (state=%d)\n",
-                        (int)softpc_runtime_get_state(runtime));
+                        (int)app_runtime_get_state(runtime));
                 input_stage = 1;
             }
             if (!windows_setup && input_stage == 1 && frame_contains(frame, ">a")) {
                 if (!send_key(runtime, 50u))
                     fprintf(stderr, "softpc-runtime-boot-smoke: input enqueue failed (state=%d)\n",
-                        (int)softpc_runtime_get_state(runtime));
+                        (int)app_runtime_get_state(runtime));
                 input_stage = 2;
             }
             if (!windows_setup && input_stage == 2 && frame_contains(frame, ">ab")) {
                 if (!send_key(runtime, 48u))
                     fprintf(stderr, "softpc-runtime-boot-smoke: input enqueue failed (state=%d)\n",
-                        (int)softpc_runtime_get_state(runtime));
+                        (int)app_runtime_get_state(runtime));
                 input_stage = 3;
             }
             if (!windows_setup && input_stage == 3 && frame_contains(frame, ">abc")) {
@@ -1286,25 +1286,25 @@ int main(int argc, char **argv)
             }
         }
 next_frame:
-        if (softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_ERROR) break;
-        if (softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_STOPPED &&
+        if (app_runtime_get_state(runtime) == SOFTPC_RUNTIME_ERROR) break;
+        if (app_runtime_get_state(runtime) == SOFTPC_RUNTIME_STOPPED &&
             setup_command_sent) {
             fprintf(stderr,
                 "softpc-runtime-boot-smoke: executor stopped during Windows Setup (result=%d)\n",
-                (int)softpc_runtime_get_result(runtime));
+                (int)app_runtime_get_result(runtime));
             break;
         }
         Sleep(10u);
     } while ((LONG)(GetTickCount() - deadline) < 0);
 done:
     if (runtime != NULL) {
-        final_state = (int)softpc_runtime_get_state(runtime);
-        final_machine_result = (int)softpc_runtime_get_result(runtime);
+        final_state = (int)app_runtime_get_state(runtime);
+        final_machine_result = (int)app_runtime_get_result(runtime);
         /* Freeze the one executor before reading CCPU registers or guest
            physical bytes.  The public address getter is deliberately lock
            free, so taking this snapshot while the loader is executing can
            pair a later EIP with an earlier instruction byte sequence. */
-        (void)softpc_runtime_stop(runtime);
+        (void)app_runtime_stop(runtime);
     }
     if (machine != NULL) {
         (void)softpc_machine_instruction_pointer(machine, &final_cs, &final_eip);
@@ -1325,7 +1325,7 @@ done:
     }
     free(frame);
     if (runtime != NULL) {
-        softpc_runtime_destroy(runtime);
+        app_runtime_destroy(runtime);
     }
     softpc_machine_destroy(machine);
     if (!success) {

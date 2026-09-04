@@ -5,20 +5,20 @@
 
 extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD key_event);
 
-static WORD softpc_win32_keyboard_decode_scan(WORD raw_scan)
+static WORD app_win32_keyboard_decode_scan(WORD raw_scan)
 {
     return (raw_scan & 0xff00u) == 0xe000u ?
         (WORD)(0x0100u | (raw_scan & 0x00ffu)) : (WORD)(raw_scan & 0x00ffu);
 }
 
-static WORD softpc_win32_keyboard_resolve_scan(WORD virtual_key)
+static WORD app_win32_keyboard_resolve_scan(WORD virtual_key)
 {
-    return softpc_win32_keyboard_decode_scan((WORD)MapVirtualKeyExW(
+    return app_win32_keyboard_decode_scan((WORD)MapVirtualKeyExW(
         virtual_key, MAPVK_VK_TO_VSC_EX, GetKeyboardLayout(0u)));
 }
 
-static int softpc_win32_keyboard_emit(void *context,
-    softpc_win32_keyboard_sink sink, WORD scan, WORD virtual_key,
+static int app_win32_keyboard_emit(void *context,
+    app_win32_keyboard_sink sink, WORD scan, WORD virtual_key,
     DWORD control_state, int pressed)
 {
     KEY_EVENT_RECORD event;
@@ -35,70 +35,70 @@ static int softpc_win32_keyboard_emit(void *context,
     return key_number != 0u && sink(context, key_number, (uint8_t)!pressed);
 }
 
-int softpc_win32_keyboard_submit_transition(void *context,
-    softpc_win32_keyboard_sink sink, WORD scan, WORD virtual_key,
+int app_win32_keyboard_submit_transition(void *context,
+    app_win32_keyboard_sink sink, WORD scan, WORD virtual_key,
     DWORD control_state, int pressed)
 {
-    if (scan == 0u) scan = softpc_win32_keyboard_resolve_scan(virtual_key);
-    return softpc_win32_keyboard_emit(context, sink, scan, virtual_key,
+    if (scan == 0u) scan = app_win32_keyboard_resolve_scan(virtual_key);
+    return app_win32_keyboard_emit(context, sink, scan, virtual_key,
         control_state, pressed);
 }
 
-int softpc_win32_keyboard_submit_ctrl_alt_del(void *context,
-    softpc_win32_keyboard_sink sink)
+int app_win32_keyboard_submit_ctrl_alt_del(void *context,
+    app_win32_keyboard_sink sink)
 {
     /* Del is an extended Set-1 key.  Do not treat this as a monitor command:
        the guest BIOS/OS observes the same six transitions as physical PC
        hardware. */
-    return softpc_win32_keyboard_emit(context, sink, 0x1du, VK_CONTROL, 0u, 1) &&
-        softpc_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u, 1) &&
-        softpc_win32_keyboard_emit(context, sink, 0x0153u, VK_DELETE, 0u, 1) &&
-        softpc_win32_keyboard_emit(context, sink, 0x0153u, VK_DELETE, 0u, 0) &&
-        softpc_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u, 0) &&
-        softpc_win32_keyboard_emit(context, sink, 0x1du, VK_CONTROL, 0u, 0);
+    return app_win32_keyboard_emit(context, sink, 0x1du, VK_CONTROL, 0u, 1) &&
+        app_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u, 1) &&
+        app_win32_keyboard_emit(context, sink, 0x0153u, VK_DELETE, 0u, 1) &&
+        app_win32_keyboard_emit(context, sink, 0x0153u, VK_DELETE, 0u, 0) &&
+        app_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u, 0) &&
+        app_win32_keyboard_emit(context, sink, 0x1du, VK_CONTROL, 0u, 0);
 }
 
-int softpc_win32_keyboard_release_ctrl_alt(void *context,
-    softpc_win32_keyboard_sink sink)
+int app_win32_keyboard_release_ctrl_alt(void *context,
+    app_win32_keyboard_sink sink)
 {
     /* The host shortcut's Ctrl/Alt makes have already travelled through the
        ordinary path.  `host_key_up` deliberately ignores a later duplicate
        release, so it is safe to normalize both traditional consoles and RDP
        packets that coalesce modifier state into the chord record. */
-    return softpc_win32_keyboard_emit(context, sink, 0x1du, VK_CONTROL, 0u, 0) &&
-        softpc_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u, 0);
+    return app_win32_keyboard_emit(context, sink, 0x1du, VK_CONTROL, 0u, 0) &&
+        app_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u, 0);
 }
 
-int softpc_win32_keyboard_submit_alt_enter(void *context,
-    softpc_win32_keyboard_sink sink)
+int app_win32_keyboard_submit_alt_enter(void *context,
+    app_win32_keyboard_sink sink)
 {
     /* Ctrl+Alt+F is a host chord, not guest Ctrl+Alt+Enter.  First clear the
        already-forwarded host modifiers, then generate a fresh physical guest
        Alt+Enter.  The host's eventual Ctrl/Alt key-ups are harmless duplicate
        releases in the original keyba implementation. */
-    return softpc_win32_keyboard_release_ctrl_alt(context, sink) &&
-        softpc_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u, 1) &&
-        softpc_win32_keyboard_emit(context, sink, 0x1cu, VK_RETURN, 0u, 1) &&
-        softpc_win32_keyboard_emit(context, sink, 0x1cu, VK_RETURN, 0u, 0) &&
-        softpc_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u, 0);
+    return app_win32_keyboard_release_ctrl_alt(context, sink) &&
+        app_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u, 1) &&
+        app_win32_keyboard_emit(context, sink, 0x1cu, VK_RETURN, 0u, 1) &&
+        app_win32_keyboard_emit(context, sink, 0x1cu, VK_RETURN, 0u, 0) &&
+        app_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u, 0);
 }
 
-void softpc_win32_keyboard_note_recovered_key(
-    softpc_win32_keyboard_normalizer *state, WORD virtual_key)
+void app_win32_keyboard_note_recovered_key(
+    app_win32_keyboard_normalizer *state, WORD virtual_key)
 {
     if (state != NULL) state->recovered_virtual_key =
-        softpc_win32_keyboard_resolve_scan(virtual_key) == 0u ? 0u : virtual_key;
+        app_win32_keyboard_resolve_scan(virtual_key) == 0u ? 0u : virtual_key;
 }
 
-void softpc_win32_keyboard_release_recovered_key(
-    softpc_win32_keyboard_normalizer *state, WORD virtual_key)
+void app_win32_keyboard_release_recovered_key(
+    app_win32_keyboard_normalizer *state, WORD virtual_key)
 {
     if (state != NULL && state->recovered_virtual_key == virtual_key)
         state->recovered_virtual_key = 0u;
 }
 
-int softpc_win32_keyboard_consume_duplicate_character(
-    softpc_win32_keyboard_normalizer *state, WORD code_unit)
+int app_win32_keyboard_consume_duplicate_character(
+    app_win32_keyboard_normalizer *state, WORD code_unit)
 {
     SHORT mapped;
     int duplicate;
@@ -112,8 +112,8 @@ int softpc_win32_keyboard_consume_duplicate_character(
     return duplicate;
 }
 
-static int softpc_win32_keyboard_submit_character(void *context,
-    softpc_win32_keyboard_sink sink, uint32_t scalar)
+static int app_win32_keyboard_submit_character(void *context,
+    app_win32_keyboard_sink sink, uint32_t scalar)
 {
     SHORT mapped;
     WORD virtual_key;
@@ -125,29 +125,29 @@ static int softpc_win32_keyboard_submit_character(void *context,
     mapped = VkKeyScanExW((WCHAR)scalar, GetKeyboardLayout(0u));
     if (mapped == -1) return 0;
     virtual_key = (WORD)(mapped & 0xffu);
-    scan = softpc_win32_keyboard_resolve_scan(virtual_key);
+    scan = app_win32_keyboard_resolve_scan(virtual_key);
     if (scan == 0u) return 0;
     modifiers = (uint8_t)((mapped >> 8u) & 0xffu);
-    if ((modifiers & 2u) != 0u && !softpc_win32_keyboard_emit(context, sink,
+    if ((modifiers & 2u) != 0u && !app_win32_keyboard_emit(context, sink,
             0x1du, VK_CONTROL, 0u, 1)) return 0;
-    if ((modifiers & 4u) != 0u && !softpc_win32_keyboard_emit(context, sink,
+    if ((modifiers & 4u) != 0u && !app_win32_keyboard_emit(context, sink,
             0x38u, VK_MENU, 0u, 1)) return 0;
-    if ((modifiers & 1u) != 0u && !softpc_win32_keyboard_emit(context, sink,
+    if ((modifiers & 1u) != 0u && !app_win32_keyboard_emit(context, sink,
             0x2au, VK_SHIFT, 0u, 1)) return 0;
-    if (!softpc_win32_keyboard_emit(context, sink, scan, virtual_key, 0u, 1) ||
-        !softpc_win32_keyboard_emit(context, sink, scan, virtual_key, 0u, 0))
+    if (!app_win32_keyboard_emit(context, sink, scan, virtual_key, 0u, 1) ||
+        !app_win32_keyboard_emit(context, sink, scan, virtual_key, 0u, 0))
         return 0;
-    if ((modifiers & 1u) != 0u && !softpc_win32_keyboard_emit(context, sink,
+    if ((modifiers & 1u) != 0u && !app_win32_keyboard_emit(context, sink,
             0x2au, VK_SHIFT, 0u, 0)) return 0;
-    if ((modifiers & 4u) != 0u && !softpc_win32_keyboard_emit(context, sink,
+    if ((modifiers & 4u) != 0u && !app_win32_keyboard_emit(context, sink,
             0x38u, VK_MENU, 0u, 0)) return 0;
-    if ((modifiers & 2u) != 0u && !softpc_win32_keyboard_emit(context, sink,
+    if ((modifiers & 2u) != 0u && !app_win32_keyboard_emit(context, sink,
             0x1du, VK_CONTROL, 0u, 0)) return 0;
     return 1;
 }
 
-int softpc_win32_keyboard_submit_utf16(softpc_win32_keyboard_normalizer *state,
-    void *context, softpc_win32_keyboard_sink sink, WORD code_unit)
+int app_win32_keyboard_submit_utf16(app_win32_keyboard_normalizer *state,
+    void *context, app_win32_keyboard_sink sink, WORD code_unit)
 {
     uint32_t scalar;
 
@@ -162,12 +162,12 @@ int softpc_win32_keyboard_submit_utf16(softpc_win32_keyboard_normalizer *state,
         scalar = 0x10000u + (((uint32_t)state->pending_high_surrogate -
             0xd800u) << 10u) + ((uint32_t)code_unit - 0xdc00u);
         state->pending_high_surrogate = 0u;
-        return softpc_win32_keyboard_submit_character(context, sink, scalar);
+        return app_win32_keyboard_submit_character(context, sink, scalar);
     }
     if (state->pending_high_surrogate != 0u) {
         state->pending_high_surrogate = 0u;
         return 0;
     }
-    return softpc_win32_keyboard_submit_character(context, sink, code_unit);
+    return app_win32_keyboard_submit_character(context, sink, code_unit);
 }
 #endif

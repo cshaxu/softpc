@@ -11,6 +11,6 @@
 #define SOFTPC_VM_FRONTEND_SWITCH_WINDOW 3
 #define SOFTPC_VM_FRONTEND_SWITCH_CONSOLE 4
 
-int softpc_vm_run_console(softpc_runtime *runtime);
+int app_vm_run_console(app_runtime *runtime);
 
 #endif

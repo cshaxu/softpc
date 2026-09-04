@@ -176,13 +176,13 @@ endforeach()
 file(READ "${SOFTPC_SOURCE_DIR}/src/host/platform.c"
     standalone_platform)
 string(TOLOWER "${standalone_platform}" normalized_platform)
-if(normalized_platform MATCHES "softpc_ata")
+if(normalized_platform MATCHES "host_ata")
     message(FATAL_ERROR "Standalone platform retains a handwritten ATA controller")
 endif()
 if(normalized_platform MATCHES "paint_v7ptr|clear_v7ptr")
     message(FATAL_ERROR "Standalone platform retains V7 presentation callbacks")
 endif()
-if(normalized_platform MATCHES "softpc_ram")
+if(normalized_platform MATCHES "host_ram")
     message(FATAL_ERROR "Standalone platform retains SAS machine-memory backing")
 endif()
 
@@ -202,9 +202,24 @@ endif()
 
 # Runtime owns every machine pointer.  Both display frontends are mailbox
 # clients: they may enqueue host records and copy published frames only.
-if(normalized_frontends MATCHES "softpc_machine_")
+if(normalized_frontends MATCHES "host_machine_")
     message(FATAL_ERROR "Standalone frontend directly accesses the machine")
 endif()
+
+# Application globals make their owner visible. The compatibility host remains
+# part of the original machine's generated and direct host ABI, and therefore
+# retains the historical spellings imported by that machine.
+file(GLOB_RECURSE standalone_owner_sources
+    "${SOFTPC_SOURCE_DIR}/src/app/*.[ch]")
+foreach(source IN LISTS standalone_owner_sources)
+    file(READ "${source}" owner_source)
+    string(REPLACE "softpc_machine" "" owner_source "${owner_source}")
+    string(REPLACE "softpc_presentation" "" owner_source "${owner_source}")
+    string(REPLACE "softpc_media_mode" "" owner_source "${owner_source}")
+    if(owner_source MATCHES "(^|[^[:alnum:]_])softpc_[A-Za-z0-9_]+")
+        message(FATAL_ERROR "Standalone application retains an unowned softpc_ symbol: ${source}")
+    endif()
+endforeach()
 
 # M8 T1: test tiers are an input boundary, not merely a CTest convention.
 # Unit fixtures may write their tiny disk bytes under build/, but neither their

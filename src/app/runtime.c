@@ -9,7 +9,7 @@
 
 #define SOFTPC_RUNTIME_INPUT_CAPACITY 256u
 
-struct softpc_runtime {
+struct app_runtime {
     softpc_machine *machine;
     CRITICAL_SECTION input_lock;
     CRITICAL_SECTION frame_lock;
@@ -22,7 +22,7 @@ struct softpc_runtime {
     uint8_t mouse_left;
     uint8_t mouse_right;
     int mouse_pending;
-    softpc_runtime_frame frames[2];
+    app_runtime_frame frames[2];
     unsigned int published_frame;
     uint32_t frame_sequence;
     volatile LONG published_frame_sequence;
@@ -48,9 +48,9 @@ struct softpc_runtime {
     uint32_t graphics_visible_width;
 };
 
-static void softpc_runtime_publish(softpc_runtime *runtime)
+static void app_runtime_publish(app_runtime *runtime)
 {
-    softpc_runtime_frame *frame;
+    app_runtime_frame *frame;
     unsigned int next = runtime->published_frame == 0u ? 1u : 0u;
     int published = 0;
     const void *surface;
@@ -213,7 +213,7 @@ static void softpc_runtime_publish(softpc_runtime *runtime)
     LeaveCriticalSection(&runtime->frame_lock);
 }
 
-static void softpc_runtime_drain_input(softpc_runtime *runtime)
+static void app_runtime_drain_input(app_runtime *runtime)
 {
     uint8_t key;
     uint8_t released;
@@ -260,7 +260,7 @@ static void softpc_runtime_drain_input(softpc_runtime *runtime)
  * evidenced CCPU callback; service the request there instead of letting a
  * monitor thread touch the controller or claiming that paused insertion is
  * supported when it cannot complete. */
-static void softpc_runtime_service_media(softpc_runtime *runtime)
+static void app_runtime_service_media(app_runtime *runtime)
 {
     if (InterlockedExchange(&runtime->media_requested, 0) == 0) return;
     runtime->media_result = softpc_machine_set_floppy(runtime->machine,
@@ -269,11 +269,11 @@ static void softpc_runtime_service_media(softpc_runtime *runtime)
     SetEvent(runtime->media_event);
 }
 
-static void softpc_runtime_executor_event(void *opaque)
+static void app_runtime_executor_event(void *opaque)
 {
-    softpc_runtime *runtime = (softpc_runtime *)opaque;
-    softpc_runtime_drain_input(runtime);
-    softpc_runtime_publish(runtime);
+    app_runtime *runtime = (app_runtime *)opaque;
+    app_runtime_drain_input(runtime);
+    app_runtime_publish(runtime);
     if (InterlockedCompareExchange(&runtime->pause_requested, 0, 0) != 0 &&
         InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0) {
         InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_PAUSED);
@@ -282,16 +282,16 @@ static void softpc_runtime_executor_event(void *opaque)
             HANDLE events[2] = { runtime->resume_event, runtime->command_event };
             DWORD wait = WaitForMultipleObjects(2u, events, FALSE, INFINITE);
             if (wait == WAIT_OBJECT_0 + 1u)
-                softpc_runtime_service_media(runtime);
+                app_runtime_service_media(runtime);
         }
         if (InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0)
             InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_RUNNING);
     }
 }
 
-static DWORD WINAPI softpc_runtime_worker(void *opaque)
+static DWORD WINAPI app_runtime_worker(void *opaque)
 {
-    softpc_runtime *runtime = (softpc_runtime *)opaque;
+    app_runtime *runtime = (app_runtime *)opaque;
     for (;;) {
         softpc_machine_result result;
 
@@ -299,7 +299,7 @@ static DWORD WINAPI softpc_runtime_worker(void *opaque)
         if (InterlockedCompareExchange(&runtime->terminate_requested, 0, 0) != 0)
             break;
         if (InterlockedCompareExchange(&runtime->media_requested, 0, 0) != 0) {
-            softpc_runtime_service_media(runtime);
+            app_runtime_service_media(runtime);
             continue;
         }
         if (InterlockedExchange(&runtime->start_requested, 0) == 0)
@@ -319,7 +319,7 @@ static DWORD WINAPI softpc_runtime_worker(void *opaque)
         }
 
         softpc_machine_set_executor_callback(runtime->machine,
-            softpc_runtime_executor_event, runtime);
+            app_runtime_executor_event, runtime);
         softpc_machine_set_heartbeat(runtime->machine, 1);
         InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_RUNNING);
         SetEvent(runtime->ready_event);
@@ -345,12 +345,12 @@ static DWORD WINAPI softpc_runtime_worker(void *opaque)
     return 0u;
 }
 
-int softpc_runtime_create(softpc_machine *machine, softpc_runtime **out)
+int app_runtime_create(softpc_machine *machine, app_runtime **out)
 {
-    softpc_runtime *runtime;
+    app_runtime *runtime;
     if (machine == NULL || out == NULL) return 0;
     *out = NULL;
-    runtime = (softpc_runtime *)calloc(1u, sizeof(*runtime));
+    runtime = (app_runtime *)calloc(1u, sizeof(*runtime));
     if (runtime == NULL) return 0;
     runtime->machine = machine;
     runtime->command_event = CreateEventA(NULL, FALSE, FALSE, NULL);
@@ -370,7 +370,7 @@ int softpc_runtime_create(softpc_machine *machine, softpc_runtime **out)
     InitializeCriticalSection(&runtime->frame_lock);
     runtime->result = SOFTPC_MACHINE_OK;
     runtime->state = SOFTPC_RUNTIME_STOPPED;
-    runtime->worker = CreateThread(NULL, 0u, softpc_runtime_worker, runtime,
+    runtime->worker = CreateThread(NULL, 0u, app_runtime_worker, runtime,
         0u, NULL);
     if (runtime->worker == NULL) {
         CloseHandle(runtime->resume_event);
@@ -386,7 +386,7 @@ int softpc_runtime_create(softpc_machine *machine, softpc_runtime **out)
     return 1;
 }
 
-int softpc_runtime_start(softpc_runtime *runtime)
+int app_runtime_start(app_runtime *runtime)
 {
     if (runtime == NULL) return 0;
     if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
@@ -403,7 +403,7 @@ int softpc_runtime_start(softpc_runtime *runtime)
         SOFTPC_RUNTIME_RUNNING;
 }
 
-int softpc_runtime_pause(softpc_runtime *runtime)
+int app_runtime_pause(app_runtime *runtime)
 {
     DWORD deadline;
     if (runtime == NULL || InterlockedCompareExchange(&runtime->state, 0, 0) !=
@@ -421,7 +421,7 @@ int softpc_runtime_pause(softpc_runtime *runtime)
     return 0;
 }
 
-int softpc_runtime_resume(softpc_runtime *runtime)
+int app_runtime_resume(app_runtime *runtime)
 {
     DWORD deadline;
     if (runtime == NULL) return 0;
@@ -443,7 +443,7 @@ int softpc_runtime_resume(softpc_runtime *runtime)
     return 0;
 }
 
-int softpc_runtime_stop(softpc_runtime *runtime)
+int app_runtime_stop(app_runtime *runtime)
 {
     if (runtime == NULL) return 0;
     if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
@@ -461,7 +461,7 @@ int softpc_runtime_stop(softpc_runtime *runtime)
         SOFTPC_RUNTIME_STOPPED;
 }
 
-int softpc_runtime_set_floppy(softpc_runtime *runtime, const char *path)
+int app_runtime_set_floppy(app_runtime *runtime, const char *path)
 {
     size_t length;
     LONG state;
@@ -484,21 +484,21 @@ int softpc_runtime_set_floppy(softpc_runtime *runtime, const char *path)
     return runtime->media_result == SOFTPC_MACHINE_OK;
 }
 
-softpc_runtime_state softpc_runtime_get_state(const softpc_runtime *runtime)
+app_runtime_state app_runtime_get_state(const app_runtime *runtime)
 {
     if (runtime == NULL) return SOFTPC_RUNTIME_ERROR;
-    return (softpc_runtime_state)InterlockedCompareExchange(
+    return (app_runtime_state)InterlockedCompareExchange(
         (volatile LONG *)&runtime->state, 0, 0);
 }
 
-softpc_machine_result softpc_runtime_get_result(const softpc_runtime *runtime)
+softpc_machine_result app_runtime_get_result(const app_runtime *runtime)
 {
     if (runtime == NULL) return SOFTPC_MACHINE_INVALID_ARGUMENT;
     return (softpc_machine_result)InterlockedCompareExchange(
         (volatile LONG *)&runtime->result, 0, 0);
 }
 
-int softpc_runtime_enqueue_key(softpc_runtime *runtime, uint8_t key_number,
+int app_runtime_enqueue_key(app_runtime *runtime, uint8_t key_number,
     uint8_t released)
 {
     unsigned int next;
@@ -522,7 +522,7 @@ int softpc_runtime_enqueue_key(softpc_runtime *runtime, uint8_t key_number,
     return 1;
 }
 
-int softpc_runtime_enqueue_mouse(softpc_runtime *runtime, int32_t delta_x,
+int app_runtime_enqueue_mouse(app_runtime *runtime, int32_t delta_x,
     int32_t delta_y, uint8_t left_down, uint8_t right_down)
 {
     if (runtime == NULL || InterlockedCompareExchange(&runtime->state, 0, 0) !=
@@ -538,8 +538,8 @@ int softpc_runtime_enqueue_mouse(softpc_runtime *runtime, int32_t delta_x,
     return 1;
 }
 
-int softpc_runtime_copy_frame(softpc_runtime *runtime,
-    softpc_runtime_frame *destination)
+int app_runtime_copy_frame(app_runtime *runtime,
+    app_runtime_frame *destination)
 {
     if (runtime == NULL || destination == NULL) return 0;
     /* A presentation client must never wait behind the executor while it is
@@ -553,17 +553,17 @@ int softpc_runtime_copy_frame(softpc_runtime *runtime,
     return destination->valid != 0u;
 }
 
-uint32_t softpc_runtime_published_frame_sequence(const softpc_runtime *runtime)
+uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime)
 {
     if (runtime == NULL) return 0u;
     return (uint32_t)InterlockedCompareExchange(
         (volatile LONG *)&runtime->published_frame_sequence, 0, 0);
 }
 
-void softpc_runtime_destroy(softpc_runtime *runtime)
+void app_runtime_destroy(app_runtime *runtime)
 {
     if (runtime == NULL) return;
-    (void)softpc_runtime_stop(runtime);
+    (void)app_runtime_stop(runtime);
     InterlockedExchange(&runtime->terminate_requested, 1);
     SetEvent(runtime->resume_event);
     SetEvent(runtime->command_event);

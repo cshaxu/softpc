@@ -8,33 +8,33 @@
 #ifdef _WIN32
 #include <windows.h>
 
-extern uint32_t softpc_window_test_dib_pixel(COLORREF colour);
+extern uint32_t app_window_test_dib_pixel(COLORREF colour);
 
-typedef struct softpc_window_smoke_context {
-    softpc_runtime *runtime;
+typedef struct app_window_smoke_context {
+    app_runtime *runtime;
     int result;
-} softpc_window_smoke_context;
+} app_window_smoke_context;
 
-static DWORD WINAPI softpc_window_smoke_run(void *opaque)
+static DWORD WINAPI app_window_smoke_run(void *opaque)
 {
-    softpc_window_smoke_context *context =
-        (softpc_window_smoke_context *)opaque;
-    context->result = softpc_vm_run_window(context->runtime);
+    app_window_smoke_context *context =
+        (app_window_smoke_context *)opaque;
+    context->result = app_vm_run_window(context->runtime);
     return 0u;
 }
 
-static int softpc_window_wait_for_runtime(softpc_runtime *runtime,
-    softpc_runtime_state expected)
+static int app_window_wait_for_runtime(app_runtime *runtime,
+    app_runtime_state expected)
 {
     DWORD deadline = GetTickCount() + 5000u;
     do {
-        if (softpc_runtime_get_state(runtime) == expected) return 1;
+        if (app_runtime_get_state(runtime) == expected) return 1;
         Sleep(10u);
     } while ((LONG)(GetTickCount() - deadline) < 0);
     return 0;
 }
 
-static HWND softpc_window_smoke_find(void)
+static HWND app_window_smoke_find(void)
 {
     HWND window = FindWindowA("SoftPCStandaloneWindow", NULL);
     DWORD process_id = 0u;
@@ -51,14 +51,14 @@ int main(void)
     softpc_machine_options options = { path, NULL,
         SOFTPC_PRESENTATION_WINDOW };
     softpc_machine *machine = NULL;
-    softpc_runtime *runtime = NULL;
-    softpc_window_smoke_context context = { NULL, SOFTPC_VM_FRONTEND_ERROR };
+    app_runtime *runtime = NULL;
+    app_window_smoke_context context = { NULL, SOFTPC_VM_FRONTEND_ERROR };
     HANDLE thread;
     HWND window = NULL;
     DWORD deadline;
     DWORD window_thread;
     DWORD key_queued_at;
-    softpc_runtime_frame frame = { 0 };
+    app_runtime_frame frame = { 0 };
     uint8_t ready = 0u;
     uint8_t marker = 0u;
     static const unsigned char program[] = {
@@ -76,8 +76,8 @@ int main(void)
     /* COLORREF is 0x00bbggrr while a 32-bit BI_RGB DIB stores a DWORD as
        0x00rrggbb.  Blue Setup text backgrounds previously reached this DIB
        with the COLORREF packing unchanged and therefore painted red. */
-    assert(softpc_window_test_dib_pixel(RGB(0, 0, 168)) == 0x000000a8u);
-    assert(softpc_window_test_dib_pixel(RGB(168, 0, 0)) == 0x00a80000u);
+    assert(app_window_test_dib_pixel(RGB(0, 0, 168)) == 0x000000a8u);
+    assert(app_window_test_dib_pixel(RGB(168, 0, 0)) == 0x00a80000u);
 
     options.media_mode = SOFTPC_MEDIA_OVERLAY;
     memcpy(sector, program, sizeof(program));
@@ -89,15 +89,15 @@ int main(void)
     assert(fclose(file) == 0);
 
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
-    assert(softpc_runtime_create(machine, &runtime));
-    assert(softpc_runtime_start(runtime));
+    assert(app_runtime_create(machine, &runtime));
+    assert(app_runtime_start(runtime));
     context.runtime = runtime;
-    thread = CreateThread(NULL, 0u, softpc_window_smoke_run, &context, 0u,
+    thread = CreateThread(NULL, 0u, app_window_smoke_run, &context, 0u,
         NULL);
     assert(thread != NULL);
     deadline = GetTickCount() + 5000u;
     do {
-        window = softpc_window_smoke_find();
+        window = app_window_smoke_find();
         if (window != NULL) break;
         Sleep(10u);
     } while ((LONG)(GetTickCount() - deadline) < 0);
@@ -172,7 +172,7 @@ int main(void)
         /* The mailbox is deliberately non-blocking: the frontend thread may
            own its short copy window, so wait for a complete snapshot instead
            of turning that expected contention into a test failure. */
-        if (softpc_runtime_copy_frame(runtime, &frame) &&
+        if (app_runtime_copy_frame(runtime, &frame) &&
             frame.valid != 0u && frame.graphics == 0u &&
             frame.cursor_column >= 0 && frame.cursor_row >= 0 &&
             frame.cursor_column < 80 && frame.cursor_row < 25) break;
@@ -247,7 +247,7 @@ int main(void)
     } while ((LONG)(GetTickCount() - deadline) < 0);
     assert(marker == 0xa5u);
     assert((DWORD)(GetTickCount() - key_queued_at) <= 250u);
-    assert(softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_RUNNING);
+    assert(app_runtime_get_state(runtime) == SOFTPC_RUNTIME_RUNNING);
     /* Esc belongs to the guest.  The standalone shell reserves exactly
        Ctrl+Alt+P (pause) and Ctrl+Alt+M (release pointer); it must not turn
        an ordinary guest key into a host machine-stop command. */
@@ -259,13 +259,13 @@ int main(void)
        keyboard-normalizer smoke. This window-level check owns only the
        frontend policy: Esc must not request a host stop. */
     Sleep(50u);
-    assert(softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_RUNNING);
+    assert(app_runtime_get_state(runtime) == SOFTPC_RUNTIME_RUNNING);
     assert(PostMessageA(window, WM_KEYUP, VK_ESCAPE, 0xc0010001L));
     /* Pausing must leave the window visible but make its client surface a
        host-only view: it cannot recapture the pointer or queue a key for a
        later resume. */
-    assert(softpc_runtime_pause(runtime));
-    assert(softpc_window_wait_for_runtime(runtime, SOFTPC_RUNTIME_PAUSED));
+    assert(app_runtime_pause(runtime));
+    assert(app_window_wait_for_runtime(runtime, SOFTPC_RUNTIME_PAUSED));
     deadline = GetTickCount() + 1000u;
     do {
         char title[64];
@@ -292,8 +292,8 @@ int main(void)
     assert(softpc_machine_read_physical(machine, 0x500u, &marker,
         sizeof(marker)) == SOFTPC_MACHINE_OK);
     assert(marker == 0u);
-    assert(softpc_runtime_resume(runtime));
-    assert(softpc_window_wait_for_runtime(runtime, SOFTPC_RUNTIME_RUNNING));
+    assert(app_runtime_resume(runtime));
+    assert(app_window_wait_for_runtime(runtime, SOFTPC_RUNTIME_RUNNING));
     deadline = GetTickCount() + 1000u;
     do {
         char title[64];
@@ -309,12 +309,12 @@ int main(void)
     assert(PostMessageA(window, WM_CLOSE, 0u, 0));
     assert(WaitForSingleObject(thread, 5000u) == WAIT_OBJECT_0);
     assert(context.result == SOFTPC_VM_FRONTEND_PAUSED);
-    assert(softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED);
-    assert(softpc_runtime_resume(runtime));
-    assert(softpc_window_wait_for_runtime(runtime, SOFTPC_RUNTIME_RUNNING));
-    assert(softpc_runtime_stop(runtime));
+    assert(app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED);
+    assert(app_runtime_resume(runtime));
+    assert(app_window_wait_for_runtime(runtime, SOFTPC_RUNTIME_RUNNING));
+    assert(app_runtime_stop(runtime));
     CloseHandle(thread);
-    softpc_runtime_destroy(runtime);
+    app_runtime_destroy(runtime);
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     return 0;

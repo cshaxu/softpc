@@ -8,12 +8,12 @@
 #ifdef _WIN32
 #include <windows.h>
 
-static int softpc_runtime_wait(softpc_runtime *runtime,
-    softpc_runtime_state expected)
+static int app_runtime_wait(app_runtime *runtime,
+    app_runtime_state expected)
 {
     DWORD deadline = GetTickCount() + 5000u;
     do {
-        if (softpc_runtime_get_state(runtime) == expected) return 1;
+        if (app_runtime_get_state(runtime) == expected) return 1;
         Sleep(10u);
     } while ((LONG)(GetTickCount() - deadline) < 0);
     return 0;
@@ -27,8 +27,8 @@ int main(void)
     softpc_machine_options options = { path, NULL,
         SOFTPC_PRESENTATION_CONSOLE };
     softpc_machine *machine = NULL;
-    softpc_runtime *runtime = NULL;
-    softpc_runtime_frame *frame;
+    app_runtime *runtime = NULL;
+    app_runtime_frame *frame;
 
     options.media_mode = SOFTPC_MEDIA_OVERLAY;
     sector[0] = 0xebu;
@@ -41,10 +41,10 @@ int main(void)
     assert(fclose(file) == 0);
 
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
-    assert(softpc_runtime_create(machine, &runtime));
-    assert(softpc_runtime_start(runtime));
+    assert(app_runtime_create(machine, &runtime));
+    assert(app_runtime_start(runtime));
     Sleep(150u);
-    frame = (softpc_runtime_frame *)calloc(1u, sizeof(*frame));
+    frame = (app_runtime_frame *)calloc(1u, sizeof(*frame));
     assert(frame != NULL);
     {
         DWORD deadline = GetTickCount() + 5000u;
@@ -54,7 +54,7 @@ int main(void)
                The executor may own its frame lock while publishing the first
                original renderer update, so retry rather than turning that
                defined snapshot miss into a timing-dependent test failure. */
-            if (softpc_runtime_copy_frame(runtime, frame) &&
+            if (app_runtime_copy_frame(runtime, frame) &&
                 frame->graphics == 0u && frame->cursor_column >= 0 &&
                 frame->cursor_column < SOFTPC_RUNTIME_TEXT_COLUMNS &&
                 frame->cursor_row >= 0 &&
@@ -70,20 +70,20 @@ int main(void)
            controller register or a guest-memory pointer. */
         assert(cursor_seen);
     }
-    assert(softpc_runtime_published_frame_sequence(runtime) == frame->sequence);
+    assert(app_runtime_published_frame_sequence(runtime) == frame->sequence);
     assert(frame->sequence != 0u);
-    assert(softpc_runtime_pause(runtime));
-    assert(softpc_runtime_wait(runtime, SOFTPC_RUNTIME_PAUSED));
-    assert(softpc_runtime_set_floppy(runtime, NULL));
-    assert(softpc_runtime_resume(runtime));
-    assert(softpc_runtime_wait(runtime, SOFTPC_RUNTIME_RUNNING));
-    assert(softpc_runtime_stop(runtime));
-    assert(softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_STOPPED);
-    assert(softpc_runtime_start(runtime));
-    assert(softpc_runtime_stop(runtime));
-    assert(softpc_runtime_set_floppy(runtime, NULL));
+    assert(app_runtime_pause(runtime));
+    assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_PAUSED));
+    assert(app_runtime_set_floppy(runtime, NULL));
+    assert(app_runtime_resume(runtime));
+    assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_RUNNING));
+    assert(app_runtime_stop(runtime));
+    assert(app_runtime_get_state(runtime) == SOFTPC_RUNTIME_STOPPED);
+    assert(app_runtime_start(runtime));
+    assert(app_runtime_stop(runtime));
+    assert(app_runtime_set_floppy(runtime, NULL));
     free(frame);
-    softpc_runtime_destroy(runtime);
+    app_runtime_destroy(runtime);
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     return 0;

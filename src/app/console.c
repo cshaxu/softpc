@@ -16,7 +16,7 @@
  * Explorer, GUI launchers, and redirected shells can all start us without
  * CONIN$/CONOUT$ handles.  Create a private console in that case so the VM
  * remains interactive instead of reporting a machine host-I/O failure. */
-static int softpc_console_open(HANDLE *input_out, HANDLE *output_out,
+static int app_console_open(HANDLE *input_out, HANDLE *output_out,
     DWORD *original_mode_out, int *private_console_out)
 {
     HANDLE input;
@@ -61,7 +61,7 @@ static int softpc_console_open(HANDLE *input_out, HANDLE *output_out,
  * console inherited from a launcher/RDP shell may expose only one buffer row
  * even though it visibly hosts a larger terminal. Ensure the presenter's
  * fixed 80x25 text surface is representable before its first frame arrives. */
-static void softpc_console_ensure_text_surface(HANDLE output)
+static void app_console_ensure_text_surface(HANDLE output)
 {
     CONSOLE_SCREEN_BUFFER_INFO info;
     COORD required;
@@ -76,7 +76,7 @@ static void softpc_console_ensure_text_surface(HANDLE output)
         (void)SetConsoleScreenBufferSize(output, required);
 }
 
-static void softpc_console_close(HANDLE input, HANDLE output,
+static void app_console_close(HANDLE input, HANDLE output,
     int private_console)
 {
     /* GetStdHandle returns handles owned by the launching shell.  A
@@ -90,15 +90,15 @@ static void softpc_console_close(HANDLE input, HANDLE output,
     }
 }
 
-static int softpc_console_keyboard_sink(void *context, uint8_t key_number,
+static int app_console_keyboard_sink(void *context, uint8_t key_number,
     uint8_t released)
 {
-    return softpc_runtime_enqueue_key((softpc_runtime *)context, key_number,
+    return app_runtime_enqueue_key((app_runtime *)context, key_number,
         released);
 }
 
-static int softpc_console_key(softpc_runtime *runtime,
-    softpc_win32_keyboard_normalizer *normalizer,
+static int app_console_key(app_runtime *runtime,
+    app_win32_keyboard_normalizer *normalizer,
     const KEY_EVENT_RECORD *key)
 {
     if (!key->bKeyDown && normalizer->suppressed_virtual_key ==
@@ -112,25 +112,25 @@ static int softpc_console_key(softpc_runtime *runtime,
         /* The loop now returns to the monitor, so the physical Ctrl/Alt
            key-up records will not necessarily reach this frontend. Release
            the already-forwarded guest modifiers before requesting pause. */
-        (void)softpc_win32_keyboard_release_ctrl_alt(runtime,
-            softpc_console_keyboard_sink);
+        (void)app_win32_keyboard_release_ctrl_alt(runtime,
+            app_console_keyboard_sink);
         return SOFTPC_VM_FRONTEND_PAUSED;
     }
     if (key->bKeyDown && key->wVirtualKeyCode == 'D' &&
         (key->dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
         (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))) {
-        (void)softpc_win32_keyboard_release_ctrl_alt(runtime,
-            softpc_console_keyboard_sink);
-        (void)softpc_win32_keyboard_submit_ctrl_alt_del(runtime,
-            softpc_console_keyboard_sink);
+        (void)app_win32_keyboard_release_ctrl_alt(runtime,
+            app_console_keyboard_sink);
+        (void)app_win32_keyboard_submit_ctrl_alt_del(runtime,
+            app_console_keyboard_sink);
         normalizer->suppressed_virtual_key = key->wVirtualKeyCode;
         return -1;
     }
     if (key->bKeyDown && key->wVirtualKeyCode == 'F' &&
         (key->dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
         (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))) {
-        (void)softpc_win32_keyboard_submit_alt_enter(runtime,
-            softpc_console_keyboard_sink);
+        (void)app_win32_keyboard_submit_alt_enter(runtime,
+            app_console_keyboard_sink);
         normalizer->suppressed_virtual_key = key->wVirtualKeyCode;
         return -1;
     }
@@ -141,8 +141,8 @@ static int softpc_console_key(softpc_runtime *runtime,
         (key->dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
         (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)))
     {
-        (void)softpc_win32_keyboard_release_ctrl_alt(runtime,
-            softpc_console_keyboard_sink);
+        (void)app_win32_keyboard_release_ctrl_alt(runtime,
+            app_console_keyboard_sink);
         normalizer->suppressed_virtual_key = key->wVirtualKeyCode;
         return -1;
     }
@@ -151,11 +151,11 @@ static int softpc_console_key(softpc_runtime *runtime,
        the original nt_keycd table and 8042 ingress handle it normally. */
     if (key->wVirtualScanCode == 0u && key->bKeyDown &&
         key->uChar.UnicodeChar != 0u) {
-        (void)softpc_win32_keyboard_submit_utf16(normalizer, runtime,
-            softpc_console_keyboard_sink, key->uChar.UnicodeChar);
+        (void)app_win32_keyboard_submit_utf16(normalizer, runtime,
+            app_console_keyboard_sink, key->uChar.UnicodeChar);
     } else {
-        (void)softpc_win32_keyboard_submit_transition(runtime,
-            softpc_console_keyboard_sink, key->wVirtualScanCode,
+        (void)app_win32_keyboard_submit_transition(runtime,
+            app_console_keyboard_sink, key->wVirtualScanCode,
             key->wVirtualKeyCode, key->dwControlKeyState, key->bKeyDown != 0);
     }
     return -1;
@@ -166,7 +166,7 @@ static int softpc_console_key(softpc_runtime *runtime,
  * translate every ordinary console mouse record to the existing relative
  * Bus Mouse ingress so guest programs with a mouse driver (for example DOS
  * EDIT) can use their menus without a frontend capture state. */
-static void softpc_console_mouse(softpc_runtime *runtime,
+static void app_console_mouse(app_runtime *runtime,
     COORD *previous, int *previous_valid, const MOUSE_EVENT_RECORD *mouse)
 {
     int32_t delta_x = 0;
@@ -186,11 +186,11 @@ static void softpc_console_mouse(softpc_runtime *runtime,
     *previous_valid = 1;
     left = (mouse->dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) != 0u;
     right = (mouse->dwButtonState & RIGHTMOST_BUTTON_PRESSED) != 0u;
-    (void)softpc_runtime_enqueue_mouse(runtime, delta_x, delta_y, left, right);
+    (void)app_runtime_enqueue_mouse(runtime, delta_x, delta_y, left, right);
 }
 
-static int softpc_console_paint(HANDLE output,
-    const softpc_runtime_frame *frame, unsigned char *previous,
+static int app_console_paint(HANDLE output,
+    const app_runtime_frame *frame, unsigned char *previous,
     unsigned short *previous_attributes, uint32_t *previous_palette)
 {
     CHAR_INFO cells[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
@@ -265,7 +265,7 @@ static int softpc_console_paint(HANDLE output,
     return 1;
 }
 
-int softpc_vm_run_console(softpc_runtime *runtime)
+int app_vm_run_console(app_runtime *runtime)
 {
     HANDLE input;
     HANDLE output;
@@ -273,34 +273,34 @@ int softpc_vm_run_console(softpc_runtime *runtime)
     unsigned char previous[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
     unsigned short previous_attributes[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
     uint32_t previous_palette[16u];
-    softpc_runtime_frame *frame;
+    app_runtime_frame *frame;
     uint32_t displayed_sequence = 0u;
-    softpc_win32_keyboard_normalizer keyboard_normalizer = { 0 };
+    app_win32_keyboard_normalizer keyboard_normalizer = { 0 };
     COORD mouse_previous = { 0, 0 };
     int mouse_previous_valid = 0;
     int running = 1;
     int result = SOFTPC_VM_FRONTEND_STOPPED;
     int private_console;
     if (runtime == NULL) return 1;
-    if (!softpc_console_open(&input, &output, &original_mode,
+    if (!app_console_open(&input, &output, &original_mode,
             &private_console)) return 1;
     if (!SetConsoleMode(input, (original_mode & ~(ENABLE_ECHO_INPUT |
             ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT |
             ENABLE_QUICK_EDIT_MODE)) | ENABLE_MOUSE_INPUT |
             ENABLE_EXTENDED_FLAGS)) {
-        softpc_console_close(input, output, private_console);
+        app_console_close(input, output, private_console);
         return 1;
     }
-    softpc_console_ensure_text_surface(output);
-    frame = (softpc_runtime_frame *)calloc(1u, sizeof(*frame));
+    app_console_ensure_text_surface(output);
+    frame = (app_runtime_frame *)calloc(1u, sizeof(*frame));
     if (frame == NULL) {
-        softpc_console_close(input, output, private_console);
+        app_console_close(input, output, private_console);
         return 1;
     }
     memset(previous, 0xff, sizeof(previous));
     memset(previous_attributes, 0xff, sizeof(previous_attributes));
     memset(previous_palette, 0xff, sizeof(previous_palette));
-    while (running && softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_RUNNING) {
+    while (running && app_runtime_get_state(runtime) == SOFTPC_RUNTIME_RUNNING) {
         INPUT_RECORD record;
         DWORD available;
         DWORD read;
@@ -311,10 +311,10 @@ int softpc_vm_run_console(softpc_runtime *runtime)
             }
             int action = -1;
             if (record.EventType == KEY_EVENT)
-                action = softpc_console_key(runtime, &keyboard_normalizer,
+                action = app_console_key(runtime, &keyboard_normalizer,
                     &record.Event.KeyEvent);
             else if (record.EventType == MOUSE_EVENT)
-                softpc_console_mouse(runtime, &mouse_previous,
+                app_console_mouse(runtime, &mouse_previous,
                     &mouse_previous_valid, &record.Event.MouseEvent);
             if (action >= 0) {
                 result = action;
@@ -322,8 +322,8 @@ int softpc_vm_run_console(softpc_runtime *runtime)
                 break;
             }
         }
-        if (softpc_runtime_published_frame_sequence(runtime) !=
-            displayed_sequence && softpc_runtime_copy_frame(runtime, frame)) {
+        if (app_runtime_published_frame_sequence(runtime) !=
+            displayed_sequence && app_runtime_copy_frame(runtime, frame)) {
             /* The original renderer's mode bit is the routing authority.
                Setup may validly enter graphics on a black DIB and paint it
                on later dirty turns, so a frontend cannot infer this from
@@ -333,29 +333,29 @@ int softpc_vm_run_console(softpc_runtime *runtime)
                 running = 0;
                 break;
             }
-            if (softpc_console_paint(output, frame, previous,
+            if (app_console_paint(output, frame, previous,
                     previous_attributes, previous_palette))
                 displayed_sequence = frame->sequence;
         }
         Sleep(10u);
     }
     if (result == SOFTPC_VM_FRONTEND_STOPPED &&
-        softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED)
+        app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED)
         result = SOFTPC_VM_FRONTEND_PAUSED;
     if (result == SOFTPC_VM_FRONTEND_PAUSED)
-        (void)softpc_runtime_pause(runtime);
+        (void)app_runtime_pause(runtime);
     else if (result == SOFTPC_VM_FRONTEND_STOPPED)
-        (void)softpc_runtime_stop(runtime);
-    if (softpc_runtime_get_state(runtime) == SOFTPC_RUNTIME_ERROR)
+        (void)app_runtime_stop(runtime);
+    if (app_runtime_get_state(runtime) == SOFTPC_RUNTIME_ERROR)
         result = SOFTPC_VM_FRONTEND_ERROR;
     free(frame);
     (void)SetConsoleMode(input, original_mode);
-    softpc_console_close(input, output, private_console);
+    app_console_close(input, output, private_console);
     return result;
 }
 
 #else
-int softpc_vm_run_console(softpc_runtime *runtime)
+int app_vm_run_console(app_runtime *runtime)
 {
     (void)runtime;
     return SOFTPC_VM_FRONTEND_ERROR;

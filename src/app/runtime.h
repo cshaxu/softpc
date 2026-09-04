@@ -14,17 +14,17 @@
 #define SOFTPC_RUNTIME_DIB_INFO_BYTES 1064u
 #define SOFTPC_RUNTIME_PATH_MAX 1024u
 
-typedef struct softpc_runtime softpc_runtime;
+typedef struct app_runtime app_runtime;
 
-typedef enum softpc_runtime_state {
+typedef enum app_runtime_state {
     SOFTPC_RUNTIME_STOPPED,
     SOFTPC_RUNTIME_STARTING,
     SOFTPC_RUNTIME_RUNNING,
     SOFTPC_RUNTIME_PAUSED,
     SOFTPC_RUNTIME_ERROR
-} softpc_runtime_state;
+} app_runtime_state;
 
-typedef struct softpc_runtime_frame {
+typedef struct app_runtime_frame {
     uint32_t sequence;
     uint32_t graphics;
     uint32_t valid;
@@ -44,25 +44,25 @@ typedef struct softpc_runtime_frame {
     uint32_t dib_height;
     uint8_t dib_info[SOFTPC_RUNTIME_DIB_INFO_BYTES];
     uint8_t dib_bits[SOFTPC_RUNTIME_DIB_MAX_BYTES];
-} softpc_runtime_frame;
+} app_runtime_frame;
 
-int softpc_runtime_create(softpc_machine *machine, softpc_runtime **out);
-int softpc_runtime_start(softpc_runtime *runtime);
-int softpc_runtime_pause(softpc_runtime *runtime);
-int softpc_runtime_resume(softpc_runtime *runtime);
-int softpc_runtime_stop(softpc_runtime *runtime);
-int softpc_runtime_set_floppy(softpc_runtime *runtime, const char *path);
-softpc_runtime_state softpc_runtime_get_state(const softpc_runtime *runtime);
-softpc_machine_result softpc_runtime_get_result(const softpc_runtime *runtime);
-int softpc_runtime_enqueue_key(softpc_runtime *runtime, uint8_t key_number,
+int app_runtime_create(softpc_machine *machine, app_runtime **out);
+int app_runtime_start(app_runtime *runtime);
+int app_runtime_pause(app_runtime *runtime);
+int app_runtime_resume(app_runtime *runtime);
+int app_runtime_stop(app_runtime *runtime);
+int app_runtime_set_floppy(app_runtime *runtime, const char *path);
+app_runtime_state app_runtime_get_state(const app_runtime *runtime);
+softpc_machine_result app_runtime_get_result(const app_runtime *runtime);
+int app_runtime_enqueue_key(app_runtime *runtime, uint8_t key_number,
     uint8_t released);
-int softpc_runtime_enqueue_mouse(softpc_runtime *runtime, int32_t delta_x,
+int app_runtime_enqueue_mouse(app_runtime *runtime, int32_t delta_x,
     int32_t delta_y, uint8_t left_down, uint8_t right_down);
-int softpc_runtime_copy_frame(softpc_runtime *runtime,
-    softpc_runtime_frame *destination);
+int app_runtime_copy_frame(app_runtime *runtime,
+    app_runtime_frame *destination);
 /* A presentation client may cheaply test whether the runtime's copied frame
    changed before requesting the potentially large DIB snapshot. */
-uint32_t softpc_runtime_published_frame_sequence(const softpc_runtime *runtime);
-void softpc_runtime_destroy(softpc_runtime *runtime);
+uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime);
+void app_runtime_destroy(app_runtime *runtime);
 
 #endif
