@@ -32,8 +32,8 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 4)
 endif()
 
 add_library(softpc-machine
-    src/core/softpc_machine.c)
-target_include_directories(softpc-machine PUBLIC src/core)
+    src/host/machine/softpc_machine.c)
+target_include_directories(softpc-machine PUBLIC src/host/machine)
 target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 
 # The original CCPU manifest is the executable x86 core.  It deliberately
@@ -393,10 +393,10 @@ add_library(softpc-machine-devices OBJECT
     src/mvdm/softpc.new/host/src/nt_vga.c
     src/host/softpc_compat/edl_fast_bop.c
     src/host/softpc_compat/graphics_console_compat.c
-    src/core/softpc_standalone_dib.c
-    src/core/softpc_device_bop.c
-    src/core/softpc_gfi_image.c
-    src/core/softpc_standalone_platform.c)
+    src/host/video/softpc_standalone_dib.c
+    src/host/machine/softpc_device_bop.c
+    src/host/media/softpc_gfi_image.c
+    src/host/platform/softpc_standalone_platform.c)
 add_dependencies(softpc-machine-devices softpc-ccpu-port-abi-inputs)
 set_target_properties(softpc-ccpu-core PROPERTIES
     C_STANDARD 90
@@ -422,11 +422,15 @@ target_include_directories(softpc-ccpu-core PRIVATE
     src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
     src/host/softpc_compat
+    src/host/input
+    src/host/machine
+    src/host/media
+    src/host/platform
+    src/host/video
     src/mvdm/softpc.new/host/inc
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
-    src/mvdm/softpc.new/base/cvidc
-    src/core)
+    src/mvdm/softpc.new/base/cvidc)
 target_include_directories(softpc-machine-devices PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu"
     include
@@ -434,19 +438,24 @@ target_include_directories(softpc-machine-devices PRIVATE
     src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
     src/host/softpc_compat
+    src/host/input
+    src/host/machine
+    src/host/media
+    src/host/platform
+    src/host/video
     src/mvdm/softpc.new/host/inc
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
-    src/mvdm/softpc.new/base/cvidc
-    src/core)
+    src/mvdm/softpc.new/base/cvidc)
 target_include_directories(softpc-port-abi PRIVATE
     src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
+    src/host/input
+    src/host/machine
     src/mvdm/softpc.new/host/inc
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
-    src/mvdm/softpc.new/base/cvidc
-    src/core)
+    src/mvdm/softpc.new/base/cvidc)
 
 # Keep the executor in the machine library so that every unresolved host edge
 # is visible to the standalone build, rather than being hidden in an unused
@@ -457,11 +466,15 @@ target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-port-abi>)
 target_include_directories(softpc-machine PRIVATE
     src/core/softpc-port-abi/ccpu
     src/core/softpc-port-abi/cvidc
+    src/host/input
+    src/host/machine
+    src/host/media
+    src/host/platform
+    src/host/video
     src/mvdm/softpc.new/host/inc
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
-    src/mvdm/softpc.new/base/cvidc
-    src/core)
+    src/mvdm/softpc.new/base/cvidc)
 target_compile_definitions(softpc-machine PRIVATE
     SOFTPC_STANDALONE=1 SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 

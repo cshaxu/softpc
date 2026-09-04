@@ -6,12 +6,12 @@ set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/cvidc/sascdef.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/support/ios.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/disks/fdisk.c"
-    "${SOFTPC_SOURCE_DIR}/src/core/softpc_gfi_image.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/media/softpc_gfi_image.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/keymouse/keybd_io.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/system/idetect.c"
-    "${SOFTPC_SOURCE_DIR}/src/core/softpc_device_bop.c"
-    "${SOFTPC_SOURCE_DIR}/src/core/softpc_standalone_platform.c"
-    "${SOFTPC_SOURCE_DIR}/src/core/softpc_machine.c")
+    "${SOFTPC_SOURCE_DIR}/src/host/machine/softpc_device_bop.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/platform/softpc_standalone_platform.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/machine/softpc_machine.c")
 
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.c" OR
    EXISTS "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.h")
@@ -135,7 +135,7 @@ foreach(source IN LISTS standalone_sources)
     endif()
 endforeach()
 
-file(READ "${SOFTPC_SOURCE_DIR}/src/core/softpc_standalone_platform.c"
+file(READ "${SOFTPC_SOURCE_DIR}/src/host/platform/softpc_standalone_platform.c"
     standalone_platform)
 string(TOLOWER "${standalone_platform}" normalized_platform)
 if(normalized_platform MATCHES "softpc_ata")

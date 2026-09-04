@@ -18,3 +18,23 @@ firmware, ROM, BOP, CCPU/C-VID, guest-media, or presentation semantics.
 T16 completed with a 98-row current-path ledger, zero `local-standalone` rows
 under the recovered machine root, and GCC x64/x86 CTest 20/20. The next audit
 will assign every standalone host source one taxonomy owner before it moves.
+
+## S1 Ownership Inventory And First Path Migration
+
+The repository-owned standalone implementation was inventoried as the former
+`src/core/softpc_*` aggregation plus the existing `src/host/softpc_compat/`
+adapters. Its first path migration is content-preserving:
+
+- `host/machine`: `softpc_machine.[ch]` and the standalone machine-BOP
+  dispatcher;
+- `host/media`: the GFI raw-image backend;
+- `host/video`: the standalone DIB surface;
+- `host/input`: the Scan-1 to original-key mapping contract;
+- `host/platform`: the still-to-be-split platform callback aggregate;
+- `host/compat`: the unselected XMS compatibility endpoints.
+
+The pre-existing `host/softpc_compat/` directory continues to contain its
+console compatibility and fast-BOP adapters. CMake's selected inputs and
+public machine header routing now use the taxonomy paths; no selected
+`src/core/softpc_*` path remains. GCC x64 and GCC x86 both rebuilt and passed
+all 20 CTest cases.
