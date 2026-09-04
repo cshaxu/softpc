@@ -322,6 +322,8 @@ set_source_files_properties(src/mvdm/softpc.new/base/system/illegalp.c PROPERTIE
     COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/illegalp")
 set_source_files_properties(src/mvdm/softpc.new/base/keymouse/keyba.c PROPERTIES
     COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/keyba")
+set_source_files_properties(src/mvdm/softpc.new/base/support/time_day.c PROPERTIES
+    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/inc")
 add_library(softpc-machine-devices OBJECT
     src/mvdm/softpc.new/base/support/ios.c
     src/mvdm/softpc.new/base/system/ica.c

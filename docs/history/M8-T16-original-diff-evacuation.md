@@ -38,3 +38,18 @@ current repository path after T15. The generated remap reports zero missing
 paths: 56 rows are direct original differences and 38 are local standalone
 files. Its owner labels are intentionally preliminary; they preserve the T14
 disposition while T16 audits actual implementation responsibility.
+
+## S2 First Reference-restoration Batch
+
+Three direct differences were solely formatting or include-search adaptation
+and are now absent from the recovered source tree:
+
+- `base/bios/equipmnt.c`: removed an added blank line;
+- `base/video/v7_ports.c`: restored the original comment indentation;
+- `base/support/time_day.c`: restored `#include "error.h"`.
+
+For `time_day.c`, CMake now supplies `base/inc` through a source-local
+`-iquote` option, so the original header spelling resolves to the same base
+error declaration without relying on host include-order accident. Read-only
+reference comparison reports zero differences for all three paths. GCC x64
+and GCC x86 both rebuilt; each full CTest suite passed 20/20.

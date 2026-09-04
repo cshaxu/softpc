@@ -50,6 +50,5 @@ void equipment()
     EQUIPMENT_WORD equip_flag;
 
     sas_loadw(EQUIP_FLAG, &equip_flag.all);
-
     setAX(equip_flag.all);
 }

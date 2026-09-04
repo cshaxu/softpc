@@ -684,7 +684,7 @@ draw_v7ptr()
 		 * this is a guess as to their meaning.
 		 */
 
-		/*
+	/* 
 	   1.4.92 MG
 	   Sadly, this guess isn't correct - the pointer_bank_select bits are
 	   used to select which 256k bank the pointer data is read from. Now

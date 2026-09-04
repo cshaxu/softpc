@@ -72,7 +72,7 @@ static char SccsID[]="@(#)time_day.c	1.27 4/20/94 Copyright Insignia Solutions L
 #include "host.h"
 #include "timeval.h"
 #include "timer.h"
-#include "../inc/error.h"
+#include "error.h"
 
 #include "cmos.h"
 #include "cmosbios.h"
