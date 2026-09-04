@@ -38,3 +38,13 @@ console compatibility and fast-BOP adapters. CMake's selected inputs and
 public machine header routing now use the taxonomy paths; no selected
 `src/core/softpc_*` path remains. GCC x64 and GCC x86 both rebuilt and passed
 all 20 CTest cases.
+
+## S2 Input Callback Separation
+
+The host Scan-1 mapping, keyboard reset/key delivery functions, keyboard
+callback table, and non-interactive `host_error` endpoint now live together in
+`src/host/input/softpc_platform_keyboard.c`. The remaining platform code only
+binds that callback table when original firmware reset occurs. This is a host
+ownership move only: original keyboard-controller tables and device state
+remain in the recovered SoftPC source. GCC x64 and GCC x86 each pass 20/20
+CTest after the split.
