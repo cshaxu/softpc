@@ -626,6 +626,11 @@ static LRESULT CALLBACK softpc_window_proc(HWND window, UINT message,
             (void)softpc_win32_keyboard_submit_ctrl_alt_del(NULL,
                 softpc_window_keyboard_sink);
             softpc_window_suppressed_hotkey = wparam;
+        } else if (wparam == 'F' && GetKeyState(VK_CONTROL) < 0 &&
+            GetKeyState(VK_MENU) < 0) {
+            (void)softpc_win32_keyboard_submit_alt_enter(NULL,
+                softpc_window_keyboard_sink);
+            softpc_window_suppressed_hotkey = wparam;
         } else if (wparam == 'M' && GetKeyState(VK_CONTROL) < 0 &&
             GetKeyState(VK_MENU) < 0) {
             softpc_window_release_mouse_capture();

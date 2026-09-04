@@ -58,6 +58,15 @@ int softpc_win32_keyboard_submit_ctrl_alt_del(void *context,
         softpc_win32_keyboard_emit(context, sink, 0x1du, VK_CONTROL, 0u, 0);
 }
 
+int softpc_win32_keyboard_submit_alt_enter(void *context,
+    softpc_win32_keyboard_sink sink)
+{
+    return softpc_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u, 1) &&
+        softpc_win32_keyboard_emit(context, sink, 0x1cu, VK_RETURN, 0u, 1) &&
+        softpc_win32_keyboard_emit(context, sink, 0x1cu, VK_RETURN, 0u, 0) &&
+        softpc_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u, 0);
+}
+
 void softpc_win32_keyboard_note_recovered_key(
     softpc_win32_keyboard_normalizer *state, WORD virtual_key)
 {

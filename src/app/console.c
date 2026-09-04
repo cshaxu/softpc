@@ -101,6 +101,11 @@ static int softpc_console_key(softpc_runtime *runtime,
     softpc_win32_keyboard_normalizer *normalizer,
     const KEY_EVENT_RECORD *key)
 {
+    if (!key->bKeyDown && normalizer->suppressed_virtual_key ==
+        key->wVirtualKeyCode) {
+        normalizer->suppressed_virtual_key = 0u;
+        return -1;
+    }
     if (key->bKeyDown && key->wVirtualKeyCode == 'P' &&
         (key->dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
         (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)))
@@ -110,6 +115,15 @@ static int softpc_console_key(softpc_runtime *runtime,
         (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))) {
         (void)softpc_win32_keyboard_submit_ctrl_alt_del(runtime,
             softpc_console_keyboard_sink);
+        normalizer->suppressed_virtual_key = key->wVirtualKeyCode;
+        return -1;
+    }
+    if (key->bKeyDown && key->wVirtualKeyCode == 'F' &&
+        (key->dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
+        (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))) {
+        (void)softpc_win32_keyboard_submit_alt_enter(runtime,
+            softpc_console_keyboard_sink);
+        normalizer->suppressed_virtual_key = key->wVirtualKeyCode;
         return -1;
     }
     /* Ctrl+Alt+M is reserved consistently with the window frontend.  The
@@ -118,7 +132,10 @@ static int softpc_console_key(softpc_runtime *runtime,
     if (key->wVirtualKeyCode == 'M' &&
         (key->dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
         (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)))
+    {
+        normalizer->suppressed_virtual_key = key->wVirtualKeyCode;
         return -1;
+    }
     /* RDP soft keyboards may report UTF-16 text without a physical scan.
        The shared normalizer produces a complete host-layout sequence, then
        the original nt_keycd table and 8042 ingress handle it normally. */

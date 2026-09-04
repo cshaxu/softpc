@@ -12,6 +12,7 @@ typedef int (*softpc_win32_keyboard_sink)(void *context, uint8_t key_number,
 typedef struct softpc_win32_keyboard_normalizer {
     WORD pending_high_surrogate;
     WORD recovered_virtual_key;
+    WORD suppressed_virtual_key;
 } softpc_win32_keyboard_normalizer;
 
 /* These functions only normalize host packets.  The original nt_keycd table
@@ -25,6 +26,10 @@ int softpc_win32_keyboard_submit_utf16(softpc_win32_keyboard_normalizer *state,
 /* Inject the standard physical Ctrl+Alt+Del make/break sequence through the
    same nt_keycd/8042 path as ordinary host keyboard packets. */
 int softpc_win32_keyboard_submit_ctrl_alt_del(void *context,
+    softpc_win32_keyboard_sink sink);
+/* Inject Alt+Enter as four ordinary physical transitions through the same
+   nt_keycd/8042 path. This is guest input, never a host window command. */
+int softpc_win32_keyboard_submit_alt_enter(void *context,
     softpc_win32_keyboard_sink sink);
 void softpc_win32_keyboard_note_recovered_key(
     softpc_win32_keyboard_normalizer *state, WORD virtual_key);

@@ -42,6 +42,12 @@ int main(void)
         capture.releases[2] == 0u && capture.releases[3] == 1u &&
         capture.releases[4] == 1u && capture.releases[5] == 1u);
 
+    capture.count = 0u;
+    assert(softpc_win32_keyboard_submit_alt_enter(&capture, capture_key));
+    assert(capture.count == 4u);
+    assert(capture.releases[0] == 0u && capture.releases[1] == 0u &&
+        capture.releases[2] == 1u && capture.releases[3] == 1u);
+
     /* Esc is an ordinary original key-table entry (key 110), not a host
        stop command. */
     capture.count = 0u;

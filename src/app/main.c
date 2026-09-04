@@ -168,7 +168,11 @@ static void softpc_monitor_help(void)
     puts("  floppy eject          eject drive A media while stopped/paused");
     puts("  help                  show this help");
     puts("  exit                  quit");
-    puts("While the guest is running: Ctrl+Alt+P pauses; Ctrl+Alt+D sends Ctrl+Alt+Del; Ctrl+Alt+M releases mouse.");
+    puts("While the guest is running:");
+    puts("  Ctrl+Alt+P  pause or resume");
+    puts("  Ctrl+Alt+D  send Ctrl+Alt+Del");
+    puts("  Ctrl+Alt+F  send Alt+Enter to the guest");
+    puts("  Ctrl+Alt+M  release mouse");
 }
 
 static int softpc_monitor_run_frontend(softpc_runtime *runtime,
