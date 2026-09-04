@@ -2,6 +2,7 @@
 #include "runtime.h"
 #include "machine.h"
 #include "window.h"
+#include "prompt_trace.h"
 
 #include <windows.h>
 
@@ -291,6 +292,8 @@ int main(int argc, char **argv)
     app_runtime *runtime = NULL;
     softpc_machine_result result;
     (void)argv;
+
+    app_prompt_trace_reset();
 
     if (argc != 1) {
         fprintf(stderr, "softpcvm: command-line arguments are not supported\n");

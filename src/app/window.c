@@ -3,6 +3,7 @@
 #ifdef _WIN32
 #include "runtime.h"
 #include "keyboard.h"
+#include "prompt_trace.h"
 
 #include <windows.h>
 #include <stdio.h>
@@ -567,9 +568,8 @@ static LRESULT CALLBACK app_window_proc(HWND window, UINT message,
                        window until the original renderer has demonstrated a
                        stable return to text mode. */
                     if (++app_window_auto_text_frames >= 3u) {
-                        if (getenv("SOFTPC_PROMPT_TRACE") != NULL)
-                            fprintf(stderr, "softpc prompt route window->console frame=%lu\n",
-                                (unsigned long)app_window_frame->sequence);
+                        app_prompt_trace("softpc prompt route window->console frame=%lu",
+                            (unsigned long)app_window_frame->sequence);
                         app_window_result = SOFTPC_VM_FRONTEND_SWITCH_CONSOLE;
                         DestroyWindow(window);
                         return 0;

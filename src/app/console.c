@@ -1,5 +1,6 @@
 #include "console.h"
 #include "keyboard.h"
+#include "prompt_trace.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -331,9 +332,8 @@ int app_vm_run_console(app_runtime *runtime)
                on later dirty turns, so a frontend cannot infer this from
                palette contents. */
             if (frame->graphics != 0u) {
-                if (getenv("SOFTPC_PROMPT_TRACE") != NULL)
-                    fprintf(stderr, "softpc prompt route console->window frame=%lu\n",
-                        (unsigned long)frame->sequence);
+                app_prompt_trace("softpc prompt route console->window frame=%lu",
+                    (unsigned long)frame->sequence);
                 result = SOFTPC_VM_FRONTEND_SWITCH_WINDOW;
                 running = 0;
                 break;

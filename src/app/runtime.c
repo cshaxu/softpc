@@ -1,4 +1,5 @@
 #include "runtime.h"
+#include "prompt_trace.h"
 
 #include <windows.h>
 
@@ -21,18 +22,17 @@ static void app_runtime_prompt_trace(uint32_t sequence, uint32_t mode_type,
     static uint32_t prior_rows = UINT32_MAX;
     static uint32_t prior_width = UINT32_MAX;
     static uint32_t prior_height = UINT32_MAX;
-    if (getenv("SOFTPC_PROMPT_TRACE") == NULL) return;
+    if (!app_prompt_trace_enabled()) return;
     if (prior_mode == mode_type && prior_screen == screen_state &&
         prior_graphics == graphics && prior_columns == columns &&
         prior_rows == rows && prior_width == width && prior_height == height)
         return;
-    fprintf(stderr, "softpc prompt frame=%lu mode=%lu state=%lu graphics=%lu text=%lux%lu stride=%lu dib=%lux%lu dirty=%d,%ld,%ld,%ld,%ld\n",
+    app_prompt_trace("softpc prompt frame=%lu mode=%lu state=%lu graphics=%lu text=%lux%lu stride=%lu dib=%lux%lu dirty=%d,%ld,%ld,%ld,%ld",
         (unsigned long)sequence, (unsigned long)mode_type,
         (unsigned long)screen_state, (unsigned long)graphics,
         (unsigned long)columns, (unsigned long)rows, (unsigned long)stride,
         (unsigned long)width, (unsigned long)height, dirty, (long)left,
         (long)top, (long)right, (long)bottom);
-    fflush(stderr);
     prior_mode = mode_type; prior_screen = screen_state;
     prior_graphics = graphics; prior_columns = columns; prior_rows = rows;
     prior_width = width; prior_height = height;

@@ -480,6 +480,7 @@ add_executable(softpcvm
     src/app/console.c
     src/app/runtime.c
     src/app/keyboard.c
+    src/app/prompt_trace.c
     src/app/window.c
     src/app/firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
@@ -611,7 +612,8 @@ set_tests_properties(softpc-lifecycle-smoke PROPERTIES
 add_executable(softpc-runtime-smoke
     test/unit/runtime_smoke.c
     src/app/runtime.c
-    src/app/keyboard.c)
+    src/app/keyboard.c
+    src/app/prompt_trace.c)
 target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-runtime-smoke PRIVATE src/app)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
@@ -621,6 +623,7 @@ add_executable(softpc-win32-window-smoke
     test/unit/win32_window_smoke.c
     src/app/runtime.c
     src/app/keyboard.c
+    src/app/prompt_trace.c
     src/app/window.c)
 target_link_libraries(softpc-win32-window-smoke PRIVATE softpc-machine)
 target_compile_definitions(softpc-win32-window-smoke PRIVATE

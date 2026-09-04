@@ -6,16 +6,16 @@
 | --- | --- |
 | Identifier Mode | M9 T28 S1 active |
 | Admission And Approval | Owner admitted and requested execution of only S1 from the queued Windows 3.1 MS-DOS Prompt frontend-performance proposal, with a stop for manual testing before S2. |
-| Objective | Add an opt-in, read-only transition trace that records guest presentation state and console/window routing during Windows 3.1 MS-DOS Prompt mode changes. |
+| Objective | Add a read-only transition trace written automatically to `build/` that records guest presentation state and console/window routing during Windows 3.1 MS-DOS Prompt mode changes. |
 | Non-goals | No behavior optimization; no change to the required exit-one-presenter/create-the-other structure; no CCPU, device, BIOS, ROM, BOP, timer, input, INI, media, or guest behavior change. |
 | Baseline | M9 Td S4 queued the serial S1–S8 proposal at `ffca285`; T27 is closed at `635b228`. |
 | Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT is read-only comparison material. |
 | Affected Boundary | Read-only diagnostic accessors in the standalone host; runtime trace emission; console/window route trace emission; package executables. |
-| Subtask Plan | S1 expose copied presentation diagnostics; S2 emit only changed state under `SOFTPC_PROMPT_TRACE`; S3 rebuild both GCC packages and prove trace-off behavior; S4 stop for owner test. |
-| Requirement Ledger | R1: trace is off unless `SOFTPC_PROMPT_TRACE` is set. R2: records mode type, screen state, text geometry, DIB geometry, dirty rectangle, frame sequence, and routing. R3: trace neither mutates machine state nor alters presenter routing. R4: no INI/media changes. |
-| Focused Verification | x64/x86 build, unit/integration smoke, trace-off package behavior, and a trace-enabled manual test command. |
+| Subtask Plan | S1 exposes copied presentation diagnostics, emits only changed state to `build/softpc-prompt-trace.log`, rebuilds both GCC packages, proves package startup creates the trace without an environment switch, then stops for owner testing. |
+| Requirement Ledger | R1: each package run resets and writes `build/softpc-prompt-trace.log` automatically. R2: it records mode type, screen state, text geometry, DIB geometry, dirty rectangle, frame sequence, and routing. R3: trace neither mutates machine state nor alters presenter routing. R4: no INI/media changes. |
+| Focused Verification | x64/x86 build, unit/integration smoke, automatic trace-file package behavior, and an owner Prompt transition run. |
 | Stop Conditions | Stop immediately after S1 package evidence; do not begin S2 or any performance/geometry behavior change before owner testing. |
-| Exit Criteria | Both packages are rebuilt; trace is opt-in and records compact changed-state lines; all existing package behavior is unchanged while it is disabled. |
+| Exit Criteria | Both packages are rebuilt; trace records compact changed-state lines automatically in `build/`; all existing presentation behavior is unchanged. |
 | Original Owner Request | “好的准入t任务，并执行S1.S1完成后停下来让我测试。” |
 
 ## Current Technical Baseline
