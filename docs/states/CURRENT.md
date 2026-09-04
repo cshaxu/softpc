@@ -4,19 +4,20 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T22 closed |
-| Admission And Approval | Owner reported that console pause/resume leaves the guest keyboard unresponsive and that Ctrl+Alt+F fails to toggle the Win3.1 MS-DOS Prompt back to its graphics window. |
-| Objective | Make host hotkeys leave no guest modifier held, and make Ctrl+Alt+F deliver guest Alt+Enter rather than guest Ctrl+Alt+Enter. |
-| Non-goals | No SoftPC/CCPU/controller/BIOS/BOP change; no host fullscreen action; no synthetic frontend switch; no agent edit to `softpc.ini`, media, or guest. Owner-provided INI changes ship with this task. |
-| Baseline | Console and window both submit ordinary Ctrl and Alt transitions before receiving a reserved chord. Console exits its input loop on pause, so the later host modifier key-up records are not delivered. |
-| Affected Boundary | `src/app/{keyboard,console,window}`, CMake package-output ownership, and focused app-input tests only. |
-| Subtask Plan | S1 normalize reserved-chord modifier release; S2 apply it before console/window pause and Alt+Enter delivery; S3 dual-width test and package refresh. |
-| Requirement Ledger | R1: after Ctrl+Alt+P then resume, ordinary console keys reach the same runtime queue. R2: Ctrl+Alt+F produces guest Alt+Enter with Ctrl released before Enter. R3: no host window action or machine-state shortcut replaces the guest transition. R4: P/D/F/M all clear their already-forwarded host Ctrl/Alt modifiers before their respective action. |
-| Focused Verification | Keyboard transition-order unit checks; runtime queue pause/resume proof; full GCC x64/x86 CTest and package smoke. |
-| Stop Conditions | Stop if remediation requires a machine/controller change or if the original input contract cannot accept ordinary modifier releases. |
-| Exit Criteria | Console pause/resume remains keyboard-live, Ctrl+Alt+F reaches the guest as Alt+Enter, regressions pass on both widths, executables are refreshed, and any owner-provided INI change ships alongside them. |
-| Closure | Completed: P/D/F/M now neutralize the already-forwarded host Ctrl/Alt modifiers in both frontends. P can no longer strand modifiers across a console pause/resume, and F clears the host chord before injecting a fresh guest Alt+Enter. CMake no longer copies a template over the user-owned package INI. Fresh GCC x64 and x86 builds each passed full CTest, 20/20. |
-| Original Owner Request | “pause机器以后resume进去，机器无法接受键盘输入” and “Ctrl+Alt+F … 应该让win3.x的msdos prompt变成窗口模式”. |
+| Identifier Mode | M9 T23 closed |
+| Admission And Approval | Owner admitted the next queued task: retire demonstrably unused source from the selected original MVDM mirror. |
+| Objective | Reduce `src/mvdm/softpc.new` to the original source subset actually selected by the fixed standalone machine, without changing machine behavior. |
+| Non-goals | No rewrite, semantic edit, or removal of active CCPU/C-VID/V7/BIOS/BOP/controller code; no host-ABI, media, ROM, guest, UI, or `softpc.ini` change. |
+| Baseline | The approved proposal identifies 15 unselected C files (4,921 lines) and 279 header candidates. Only the C list is pre-confirmed; every header requires exact x64/x86 compiler dependency proof. |
+| Applicable Rules | Documentation guide and execution rules; source-layout, architecture, and coding rules; original mirror remains a selected baseline and OpenNT stays read-only comparison material. |
+| Affected Boundary | Selected inactive paths below `src/mvdm/softpc.new`, CMake/transform reference audits, source-boundary evidence, and test documentation only. |
+| Subtask Plan | S1 regenerate exact selection/dependency evidence for both widths; S2 remove only proven inactive C/header paths and repair stale references; S3 fresh dual-width build, full CTest, package smoke, and source-map closure. |
+| Requirement Ledger | R1: each removed C path is absent from CMake and transformation inputs. R2: each removed header is absent from exact compiler dependency output for both widths. R3: active original source spelling/behavior remains unchanged. R4: dual-width behavior and package launch remain unchanged. |
+| Focused Verification | Exact path audits, x64/x86 dependency manifests, CMake stale-reference scan, fresh GCC x64/x86 builds, full CTest, and package smoke. |
+| Stop Conditions | Stop before deleting a path referenced by CMake, a transform, a compiler dependency manifest, or any active source. Defer ambiguous headers rather than guessing. |
+| Exit Criteria | Every pre-confirmed inactive C file is gone; only headers with exact dual-width proof are gone; no stale build/reference path remains; and dual-width regression preserves current packages. |
+| Closure | Closed 2026-09-04. Removed all 15 pre-confirmed inactive C files and all 279 manifest headers after exact fresh x64/x86 dependency proof found zero consumers. Fresh GCC x64/x86 builds and full CTest each passed 20/20, including package smoke, source-boundary, and documentation-governance gates. |
+| Original Owner Request | “好 准入” following the approved M9 unused-MVDM-source-retirement proposal. |
 
 ## Current Technical Baseline
 
@@ -31,6 +32,9 @@
 
 ## Recent Governance
 
+- M9 T23 retired 294 demonstrably unselected historical paths (15 C files and
+  279 headers) from the original mirror without changing its selected machine
+  behavior; fresh GCC x64/x86 CTest each passed 20/20.
 - M9 T22 normalizes frontend host hotkeys without changing SoftPC: Ctrl+Alt+P
   no longer strands guest modifiers across console pause/resume, and
   Ctrl+Alt+F now supplies guest Alt+Enter rather than Ctrl+Alt+Enter.
