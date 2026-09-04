@@ -53,3 +53,13 @@ For `time_day.c`, CMake now supplies `base/inc` through a source-local
 error declaration without relying on host include-order accident. Read-only
 reference comparison reports zero differences for all three paths. GCC x64
 and GCC x86 both rebuilt; each full CTest suite passed 20/20.
+
+## S2 CCPU Bridge Evacuation
+
+`softpc_ccpu_facade.c` was a local standalone bridge incorrectly placed under
+the recovered `base/ccpu386` tree. Its CCPU bootstrap, real-mode address, and
+descriptor-translation entry points are now unchanged at
+`src/core/softpc-port-abi/ccpu/softpc_ccpu_facade.c`. The `softpc-ccpu-core`
+object target still compiles it with the CCPU/C-VID executor because it owns
+those symbols, but the source boundary and CMake paths now make the standalone
+compatibility ownership explicit. GCC x64/x86 full CTest both passed 20/20.

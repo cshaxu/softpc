@@ -301,7 +301,7 @@ endif()
 add_library(softpc-ccpu-core OBJECT
     ${SOFTPC_CCPU_SOURCES}
     "${SOFTPC_CCPU_NTSTUBS_SOURCE}"
-    src/mvdm/softpc.new/base/ccpu386/softpc_ccpu_facade.c
+    src/core/softpc-port-abi/ccpu/softpc_ccpu_facade.c
     "${SOFTPC_CCPU_VGLOB_SOURCE}"
     ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
     "${SOFTPC_CVIDC_EVENT_GLUE_SOURCE}"

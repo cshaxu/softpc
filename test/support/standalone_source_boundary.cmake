@@ -1,5 +1,5 @@
 set(standalone_sources
-    "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/softpc_ccpu_facade.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc-port-abi/ccpu/softpc_ccpu_facade.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc-port-abi/cvidc/softpc_gdp_state.c"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc-port-abi/cvidc/softpc_gdp_state.h"
     "${SOFTPC_SOURCE_DIR}/src/core/softpc-port-abi/cvidc/softpc_gdp_slots.h"
