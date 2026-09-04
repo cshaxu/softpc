@@ -83,3 +83,9 @@ suite, including VGA-frame, Win32-window, source-boundary, and package tests.
 The obsolete disabled duplicate video vtable was removed from the remaining
 platform aggregate.  It was not compiled or selected by any reset path;
 `nt_graph` remains the only active original `VIDEOFUNCS` owner.
+
+The single-machine NIDDB allocation endpoint used solely by the recovered
+mouse driver now lives in `src/host/input/softpc_mouse_instance.c`.  It owns
+only its host allocation; the original mouse controller retains all guest
+device state.  GCC x64 and x86 compile the isolated endpoint, and the x86
+mouse/source-boundary checks pass.

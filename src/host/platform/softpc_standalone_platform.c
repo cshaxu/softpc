@@ -438,35 +438,6 @@ void (*clear_v7ptr)() = softpc_v7_pointer_clear;
 
 CHAR *SPC_Product_Name = "SoftPC";
 
-/* This VM intentionally has one machine instance.  The original mouse driver
-   asks the Windows-era NIDDB service for a per-instance data handle; the
-   standalone equivalent is a single owned allocation, not a VDM service. */
-static IHP softpc_instance_data;
-
-IHP *NIDDB_Allocate_Instance_Data(size, create_callback, terminate_callback)
-int size;
-NIDDB_CR_CALLBACK create_callback;
-NIDDB_TM_CALLBACK terminate_callback;
-{
-    UNUSED(terminate_callback);
-    if (size <= 0)
-        return NULL;
-    free(softpc_instance_data);
-    softpc_instance_data = calloc(1u, (size_t)size);
-    if (softpc_instance_data != NULL && create_callback != NULL)
-        (*create_callback)(&softpc_instance_data);
-    return &softpc_instance_data;
-}
-
-void NIDDB_Deallocate_Instance_Data(handle)
-    IHP *handle;
-{
-    if (handle == NULL)
-        return;
-    free(*handle);
-    *handle = NULL;
-}
-
 void host_memset(address, value, size) char *address;
 char value;
 unsigned int size;
