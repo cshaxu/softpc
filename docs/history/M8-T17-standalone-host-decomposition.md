@@ -65,3 +65,17 @@ Fresh GCC MinGW x64 and x86 builds each passed the complete 20-test CTest
 suite after the separation.  The first run in each fresh build directory saw
 a transient Windows test-image cleanup handle; the immediate stable rerun was
 green and is the recorded result.
+
+## S2 Video Presentation Host Separation
+
+The standalone video presentation bridge now lives in
+`src/host/video/softpc_platform_video.c`: DIB startup, presentation refresh,
+text-font export, palette-frame observation, and the disabled stream-I/O
+endpoint moved out of the platform aggregate.  This is explicitly not a new
+renderer.  The original `nt_cga.c`, `nt_ega.c`, `nt_vga.c`, and V7 controller
+sources remain the sole renderer/controller owners beneath
+`src/mvdm/softpc.new/`; the platform retains only V7 hardware-pointer
+composition pending its own focused extraction.
+
+GCC MinGW x64 and x86 each rebuilt and passed the complete 20-test CTest
+suite, including VGA-frame, Win32-window, source-boundary, and package tests.
