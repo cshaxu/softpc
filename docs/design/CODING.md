@@ -16,12 +16,17 @@ src/
     main.c
 ```
 
-Directories appear only in their admitted migration task. `mvdm/softpc.new`
-is directly comparable to the selected OpenNT source and contains no
-standalone behavior branches. `overlay/mvdm/softpc.new` contains only mirrored
-patches necessary to compile that baseline on x86/x64; generated forms remain
-in ignored `build/`. `host` owns platform capability implementations; `app`
-owns orchestration, mailboxes, and user interaction/presentation.
+Directories appear only in their admitted migration task.
+`mvdm/softpc.new` contains only repository-owned recovered source moved from
+the former baseline tree; its paths and names permit a direct T14-ledger
+comparison with the selected read-only OpenNT reference, but no reference file
+may be copied into it. Retained files are C/H/ASM, required modern build
+configuration, and selected BIOS/VGA/CMOS firmware only. Historical object,
+library, and other compiler intermediate files are forbidden. If used,
+`overlay/mvdm/softpc.new` contains only repository-owned mirrored patches
+necessary to compile the baseline on x86/x64; generated forms remain in
+ignored `build/`. `host` owns platform capability implementations; `app` owns
+orchestration, mailboxes, and user interaction/presentation.
 
 ## Build Output Layout
 

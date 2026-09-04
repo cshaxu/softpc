@@ -11,7 +11,7 @@ The resulting source shape is:
 
 ```text
 src/
-  mvdm/softpc.new/       # byte-accounted OpenNT source mirror
+  mvdm/softpc.new/       # repository-owned recovered source, reference-shaped
   overlay/mvdm/softpc.new/
                           # patch files with the same relative paths
   host/                  # independent platform and compatibility adapters
@@ -30,7 +30,10 @@ not standalone source code.
 - Do not introduce DOS, DPMI, WOW, NTVDM, CSR, VDD, session, or product
   services.
 - Do not create a persistent disk COW/overlay format. This proposal's
-  "overlay" means a source patch relative to the OpenNT mirror.
+  "overlay" means a source patch relative to the repository-owned recovered
+  source, if a later task proves that one is necessary.
+- Do not copy, import, generate, or retain source files from `opennt-src-2`.
+  That tree is a read-only path-and-content comparison reference only.
 - Do not rewrite an original algorithm merely to make the directory move
   easier.
 
@@ -45,11 +48,14 @@ compatibility implementation details rather than a product-facing subsystem.
 
 ## Composition Rule
 
-`src/mvdm/softpc.new/` must remain directly comparable to the selected OpenNT
-tree. An overlay is a small patch file under `src/overlay/mvdm/softpc.new/`
-whose relative path identifies the original it changes. CMake composes the
-mirror and selected patches into the ignored `build/` tree before compiling.
-No edited copy of an original source file is compiled directly from the mirror.
+`src/mvdm/softpc.new/` must retain the relative paths and names needed for a
+path-by-path comparison with the selected OpenNT tree, but contains only
+repository-owned recovered files moved from the former source location. An
+overlay, if later needed, is a small repository-owned patch under
+`src/overlay/mvdm/softpc.new/` whose relative path identifies the affected
+source. No material is copied from the external reference. CMake may compile
+the moved repository-owned source directly; generated forms remain in ignored
+`build/`.
 
 Each overlay has a manifest record containing the original path, patch path,
 reason, owner, selected defines, and x86/x64 evidence. New standalone source
@@ -61,33 +67,35 @@ never belongs in the mirror or overlay tree.
 
 **Boundary:** build assembly only; no semantic source migration yet.
 
-**Work:** create `src/mvdm/softpc.new/` as the selected original mirror;
-introduce the mirrored overlay-patch and manifest layout; compose into
-`build/`; make CMake fail if a patch no longer applies or a source is selected
-outside the manifest.
+**Work:** move the existing recovered SoftPC source from `src/core/softpc/`
+into `src/mvdm/softpc.new/` with its reference-shaped relative paths;
+introduce a provenance/retained-file manifest; route CMake to the moved
+repository-owned files. Do not copy any external source or retain historical
+build intermediates.
 
-**Verification:** prove composed source hashes equal pristine hashes for
-unpatched files; build current x64/x86 targets and compare focused machine,
-renderer, input, timer, media, and BOP test results to the pre-task baseline.
+**Verification:** prove moved paths existed in the repository before the move;
+audit retained file classes; build current x64/x86 targets and compare focused
+machine, renderer, input, timer, media, and BOP test results to the pre-task
+baseline.
 
-**Exit:** the compiler no longer reads a directly edited original source file
-from the source mirror.
+**Exit:** the compiler reads only the moved repository-owned source paths; no
+external source or compiler intermediate has entered the repository.
 
 ### M8 T16: Original-diff evacuation
 
 **Boundary:** original source changes only.
 
-**Work:** move every current direct modification under the old recovered tree
-to a named mirrored overlay patch or remove it when the original code already
-works. Keep generated CCPU/C-VID transformations reproducible from pristine
-inputs in `build/`; do not check generated sources into `src/`.
+**Work:** classify and, where justified, move standalone adaptation out of the
+recovered-source tree into repository-owned host/app code or a small mirrored
+overlay. Keep generated CCPU/C-VID transformations reproducible from current
+repository inputs in `build/`; do not check generated sources into `src/`.
 
 **Verification:** x64/x86 build; all applicable CTest; path/hash manifest;
 similar-issue sweep over headers, generated inputs, CCPU, C-VID, BIOS,
 controllers, and original `nt_*` sources.
 
-**Exit:** `src/mvdm/softpc.new/` is pristine and every applied diff is visible
-in the mirrored overlay tree with a manifest disposition.
+**Exit:** every direct-difference row has a manifest disposition, and no
+external reference content has been added to the repository.
 
 ### M8 T17: Standalone-host decomposition
 

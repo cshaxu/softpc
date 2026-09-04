@@ -20,11 +20,13 @@ app/frontends
   monitor console and Win32 window; no machine-state access
 ```
 
-`mvdm/softpc.new` is the pristine machine mirror. Its corresponding overlay
-path holds only reproducible source patches required by host-width or toolchain
-representation; it never owns machine policy. `host/` supplies original
-host-facing symbols but does not own guest-visible state. `app/` owns the
-single executor and presentation shell.
+`mvdm/softpc.new` is the repository-owned recovered-machine layout. It retains
+the original relative paths and names so T14 can compare it with the read-only
+OpenNT reference; no source is copied from that reference. Its corresponding
+overlay path, if needed, holds only repository-owned reproducible patches for
+host-width or toolchain representation; it never owns machine policy. `host/`
+supplies original host-facing symbols but does not own guest-visible state.
+`app/` owns the single executor and presentation shell.
 
 The runtime executor is the sole caller of the machine and compatibility host.
 Input producers enqueue records and signal it. The executor publishes complete
