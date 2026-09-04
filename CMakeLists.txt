@@ -64,7 +64,7 @@ add_custom_command(
         "${SOFTPC_CMOS_SOURCE}"
     DEPENDS "${SOFTPC_CMOS_INPUT}"
         "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cmos.py"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/cmos/softpc_cmos_host.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/cmos/softpc_cmos_host.h"
     COMMENT "Transforming CMOS media port ABI"
     VERBATIM)
 set_source_files_properties("${SOFTPC_CMOS_SOURCE}" PROPERTIES GENERATED TRUE)
@@ -95,12 +95,12 @@ add_custom_command(
         "${SOFTPC_RESET_SOURCE}"
     DEPENDS "${SOFTPC_RESET_INPUT}"
         "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_reset.py"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/reset/host_def.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/bios/host_def.h"
     COMMENT "Transforming BIOS reset host ABI"
     VERBATIM)
 set_source_files_properties("${SOFTPC_RESET_SOURCE}" PROPERTIES
     GENERATED TRUE
-    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/reset")
+    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/bios")
 set(SOFTPC_CVIDC_TRANSFORMED_SOURCES)
 foreach(SOFTPC_CVIDC_GENERATED_INPUT IN LISTS SOFTPC_CVIDC_GENERATED_INPUTS)
     get_filename_component(SOFTPC_CVIDC_GENERATED_NAME
@@ -301,7 +301,7 @@ endif()
 add_library(softpc-ccpu-core OBJECT
     ${SOFTPC_CCPU_SOURCES}
     "${SOFTPC_CCPU_NTSTUBS_SOURCE}"
-    src/core/softpc-port-abi/ccpu/softpc_ccpu_facade.c
+    src/overlay/mvdm/softpc.new/base/ccpu386/softpc_ccpu_facade.c
     "${SOFTPC_CCPU_VGLOB_SOURCE}"
     ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
     "${SOFTPC_CVIDC_EVENT_GLUE_SOURCE}"
@@ -310,18 +310,18 @@ add_library(softpc-ccpu-core OBJECT
     src/mvdm/softpc.new/base/cvidc/accessfn.c
     src/mvdm/softpc.new/base/cvidc/vglfunc.c
     src/mvdm/softpc.new/base/cvidc/sascdef.c)
-add_library(softpc-port-abi OBJECT
-    src/core/softpc-port-abi/cvidc/softpc_gdp_state.c
-    src/core/softpc-port-abi/ccpu/softpc_ccpu_lifecycle.c)
+add_library(softpc-machine-overlay OBJECT
+    src/overlay/mvdm/softpc.new/base/cvidc/softpc_gdp_state.c
+    src/overlay/mvdm/softpc.new/base/ccpu386/softpc_ccpu_lifecycle.c)
 add_dependencies(softpc-ccpu-core softpc-ccpu-port-abi-inputs)
 
 # Controllers, firmware and the standalone host boundary evolve independently
 # of the CCPU/C-VIDC executor.  Keep them in a separate object target so a
 # recovered original device does not force recompilation of the full executor.
 set_source_files_properties(src/mvdm/softpc.new/base/system/illegalp.c PROPERTIES
-    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/illegalp")
+    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/system")
 set_source_files_properties(src/mvdm/softpc.new/base/keymouse/keyba.c PROPERTIES
-    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/core/softpc-port-abi/keyba")
+    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/keymouse")
 set_source_files_properties(src/mvdm/softpc.new/base/support/time_day.c PROPERTIES
     COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/inc")
 add_library(softpc-machine-devices OBJECT
@@ -411,7 +411,7 @@ set_target_properties(softpc-ccpu-core PROPERTIES
 set_target_properties(softpc-machine-devices PROPERTIES
     C_STANDARD 90
     C_EXTENSIONS ON)
-set_target_properties(softpc-port-abi PROPERTIES
+set_target_properties(softpc-machine-overlay PROPERTIES
     C_STANDARD 90
     C_EXTENSIONS ON)
 target_compile_definitions(softpc-ccpu-core PRIVATE
@@ -421,13 +421,14 @@ target_compile_definitions(softpc-ccpu-core PRIVATE
 target_compile_definitions(softpc-machine-devices PRIVATE
     CPU_40_STYLE CCPU C_VID CPU_486 SPC386 V7VGA WDCTRL_BOP PROD SOFTPC_STANDALONE=1
     SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
-target_compile_definitions(softpc-port-abi PRIVATE
+target_compile_definitions(softpc-machine-overlay PRIVATE
     CPU_40_STYLE CCPU C_VID CPU_486 SPC386 V7VGA WDCTRL_BOP PROD SOFTPC_STANDALONE=1
     SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 target_include_directories(softpc-ccpu-core PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu"
-    src/core/softpc-port-abi/ccpu
-    src/core/softpc-port-abi/cvidc
+    src/overlay/mvdm/softpc.new/base/ccpu386
+    src/overlay/mvdm/softpc.new/base/cvidc
+    src/overlay/mvdm/softpc.new/host/inc/x86/prod
     src/host/compat
     src/host/input
     src/host/machine
@@ -440,10 +441,10 @@ target_include_directories(softpc-ccpu-core PRIVATE
     src/mvdm/softpc.new/base/cvidc)
 target_include_directories(softpc-machine-devices PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu"
-    include
-    src/core/softpc-port-abi
-    src/core/softpc-port-abi/ccpu
-    src/core/softpc-port-abi/cvidc
+    src/overlay/mvdm/softpc.new/base
+    src/overlay/mvdm/softpc.new/base/ccpu386
+    src/overlay/mvdm/softpc.new/base/cvidc
+    src/overlay/mvdm/softpc.new/host/inc/x86/prod
     src/host/compat
     src/host/input
     src/host/machine
@@ -454,9 +455,10 @@ target_include_directories(softpc-machine-devices PRIVATE
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
     src/mvdm/softpc.new/base/cvidc)
-target_include_directories(softpc-port-abi PRIVATE
-    src/core/softpc-port-abi/ccpu
-    src/core/softpc-port-abi/cvidc
+target_include_directories(softpc-machine-overlay PRIVATE
+    src/overlay/mvdm/softpc.new/base/ccpu386
+    src/overlay/mvdm/softpc.new/base/cvidc
+    src/overlay/mvdm/softpc.new/host/inc/x86/prod
     src/host/input
     src/host/machine
     src/mvdm/softpc.new/host/inc
@@ -469,10 +471,11 @@ target_include_directories(softpc-port-abi PRIVATE
 # object target.
 target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-ccpu-core>)
 target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-machine-devices>)
-target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-port-abi>)
+target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-machine-overlay>)
 target_include_directories(softpc-machine PRIVATE
-    src/core/softpc-port-abi/ccpu
-    src/core/softpc-port-abi/cvidc
+    src/overlay/mvdm/softpc.new/base/ccpu386
+    src/overlay/mvdm/softpc.new/base/cvidc
+    src/overlay/mvdm/softpc.new/host/inc/x86/prod
     src/host/input
     src/host/machine
     src/host/media

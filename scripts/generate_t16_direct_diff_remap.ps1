@@ -15,18 +15,27 @@ if (-not $OutputPath) {
 }
 
 $RelocatedPaths = @{
-    'src/core/softpc/base/ccpu386/softpc_ccpu_facade.c' = 'src/core/softpc-port-abi/ccpu/softpc_ccpu_facade.c'
+    'src/core/softpc/base/ccpu386/softpc_ccpu_facade.c' = 'src/overlay/mvdm/softpc.new/base/ccpu386/softpc_ccpu_facade.c'
+    'src/core/softpc-port-abi/ccpu/softpc_ccpu_lifecycle.c' = 'src/overlay/mvdm/softpc.new/base/ccpu386/softpc_ccpu_lifecycle.c'
+    'src/core/softpc-port-abi/ccpu/softpc_ccpu_lifecycle.h' = 'src/overlay/mvdm/softpc.new/base/ccpu386/softpc_ccpu_lifecycle.h'
+    'src/core/softpc-port-abi/cmos/softpc_cmos_host.h' = 'src/overlay/mvdm/softpc.new/base/cmos/softpc_cmos_host.h'
+    'src/core/softpc-port-abi/cvidc/softpc_gdp_rule_access.h' = 'src/overlay/mvdm/softpc.new/base/cvidc/softpc_gdp_rule_access.h'
+    'src/core/softpc-port-abi/cvidc/softpc_gdp_slots.h' = 'src/overlay/mvdm/softpc.new/base/cvidc/softpc_gdp_slots.h'
+    'src/core/softpc-port-abi/cvidc/softpc_gdp_state.c' = 'src/overlay/mvdm/softpc.new/base/cvidc/softpc_gdp_state.c'
+    'src/core/softpc-port-abi/cvidc/softpc_gdp_state.h' = 'src/overlay/mvdm/softpc.new/base/cvidc/softpc_gdp_state.h'
+    'src/core/softpc-port-abi/illegalp/error.h' = 'src/overlay/mvdm/softpc.new/base/system/error.h'
+    'src/core/softpc-port-abi/keyba/cpu4.h' = 'src/overlay/mvdm/softpc.new/base/keymouse/cpu4.h'
+    'src/core/softpc-port-abi/reset/host_def.h' = 'src/overlay/mvdm/softpc.new/base/bios/host_def.h'
     'src/core/softpc/host/inc/softpc_standalone_dib.h' = 'src/host/compat/softpc_standalone_dib.h'
-    'src/core/softpc/host/inc/x86/prod/gdpvar.h' = 'src/core/softpc-port-abi/ccpu/gdpvar.h'
-    'src/core/softpc/host/inc/x86/prod/PigReg_c.h' = 'src/core/softpc-port-abi/ccpu/PigReg_c.h'
-    'src/core/softpc/host/inc/x86/prod/sas4gen.h' = 'src/core/softpc-port-abi/ccpu/sas4gen.h'
+    'src/core/softpc/host/inc/x86/prod/gdpvar.h' = 'src/overlay/mvdm/softpc.new/host/inc/x86/prod/gdpvar.h'
+    'src/core/softpc/host/inc/x86/prod/PigReg_c.h' = 'src/overlay/mvdm/softpc.new/host/inc/x86/prod/PigReg_c.h'
+    'src/core/softpc/host/inc/x86/prod/sas4gen.h' = 'src/overlay/mvdm/softpc.new/host/inc/x86/prod/sas4gen.h'
     'src/core/softpc_device_bop.c' = 'src/host/machine/softpc_device_bop.c'
     'src/core/softpc_gfi_image.c' = 'src/host/media/softpc_gfi_image.c'
     'src/core/softpc_machine.c' = 'src/host/machine/softpc_machine.c'
     'src/core/softpc_machine.h' = 'src/host/machine/softpc_machine.h'
     'src/core/softpc_standalone_dib.c' = 'src/host/video/softpc_standalone_dib.c'
     'src/core/softpc_standalone_platform.c' = 'src/host/platform/softpc_standalone_platform.c'
-    'src/core/softpc_xms_host.c' = 'src/host/compat/softpc_xms_host.c'
     'src/host/softpc_compat/conapi.h' = 'src/host/compat/conapi.h'
     'src/host/softpc_compat/edl_fast_bop.c' = 'src/host/compat/edl_fast_bop.c'
     'src/host/softpc_compat/graphics_console_compat.c' = 'src/host/compat/graphics_console_compat.c'
@@ -44,7 +53,20 @@ $RelocatedPaths = @{
     'src/vm/win32_window.h' = 'src/app/frontends/win32/win32_window.h'
 }
 
+# T19 removes these explicitly unselected NTVDM XMS/suballocation remnants.
+# Keep their historical ledger rows, but make their deliberate absence visible.
+$RemovedPaths = @{
+    'src/core/softpc_xms_host.c' = $true
+    'src/core/softpc/suballoc/suballcp.h' = $true
+    'src/core/softpc/xms.486/xms.h' = $true
+    'src/core/softpc/xms.486/xmsa20.c' = $true
+    'src/core/softpc/xms.486/xmsblock.c' = $true
+    'src/core/softpc-port-abi/xms/mvdm.h' = $true
+    'src/core/softpc-port-abi/xms/softpc.h' = $true
+}
+
 function Get-CurrentPath([string]$OldPath) {
+    if ($RemovedPaths.ContainsKey($OldPath)) { return '-' }
     if ($RelocatedPaths.ContainsKey($OldPath)) {
         return $RelocatedPaths[$OldPath]
     }
@@ -58,8 +80,9 @@ function Get-CurrentPath([string]$OldPath) {
 }
 
 function Get-InitialOwner([string]$CurrentPath) {
+    if ($CurrentPath -eq '-') { return 'removed-unselected' }
     if ($CurrentPath.StartsWith('src/mvdm/softpc.new/')) { return 'recovered-machine-review' }
-    if ($CurrentPath.StartsWith('src/core/softpc-port-abi/')) { return 'compat-review' }
+    if ($CurrentPath.StartsWith('src/overlay/mvdm/softpc.new/')) { return 'overlay' }
     if ($CurrentPath.StartsWith('src/app/')) { return 'app' }
     if ($CurrentPath.StartsWith('src/host/')) { return 'host-pending-T17' }
     if ($CurrentPath -match '^src/core/softpc_') { return 'host-pending-T17' }
@@ -80,7 +103,8 @@ $content.Add(('old_path', 'current_path', 'baseline_path', 'classification',
     't14_disposition', 'initial_t16_owner', 'cmake_selection', 'current_exists') -join "`t")
 foreach ($row in $rows) {
     $current = Get-CurrentPath $row.path
-    $exists = Test-Path -LiteralPath (Join-Path $repository $current) -PathType Leaf
+    $exists = $current -ne '-' -and
+        (Test-Path -LiteralPath (Join-Path $repository $current) -PathType Leaf)
     $content.Add((@(
         $row.path,
         $current,
@@ -93,7 +117,9 @@ foreach ($row in $rows) {
     ) -join "`t"))
 }
 
-$missingRows = @($content | Select-Object -Skip 1 | Where-Object { $_.EndsWith("`tfalse") })
+$missingRows = @($content | Select-Object -Skip 1 | Where-Object {
+    $_.EndsWith("`tfalse") -and $_ -notmatch "`tremoved-unselected`t"
+})
 if ($missingRows.Count -ne 0) {
     throw "A T14 direct/local row has no current repository path: $($missingRows -join '; ')"
 }

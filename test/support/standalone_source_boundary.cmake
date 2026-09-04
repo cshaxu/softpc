@@ -13,10 +13,10 @@ foreach(host_entry IN LISTS host_entries)
 endforeach()
 
 set(standalone_sources
-    "${SOFTPC_SOURCE_DIR}/src/core/softpc-port-abi/ccpu/softpc_ccpu_facade.c"
-    "${SOFTPC_SOURCE_DIR}/src/core/softpc-port-abi/cvidc/softpc_gdp_state.c"
-    "${SOFTPC_SOURCE_DIR}/src/core/softpc-port-abi/cvidc/softpc_gdp_state.h"
-    "${SOFTPC_SOURCE_DIR}/src/core/softpc-port-abi/cvidc/softpc_gdp_slots.h"
+    "${SOFTPC_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/ccpu386/softpc_ccpu_facade.c"
+    "${SOFTPC_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/cvidc/softpc_gdp_state.c"
+    "${SOFTPC_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/cvidc/softpc_gdp_state.h"
+    "${SOFTPC_SOURCE_DIR}/src/overlay/mvdm/softpc.new/base/cvidc/softpc_gdp_slots.h"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/cvidc/sascdef.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/support/ios.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/disks/fdisk.c"
@@ -35,10 +35,12 @@ if(EXISTS "${SOFTPC_SOURCE_DIR}/src/host/softpc_compat")
     message(FATAL_ERROR "Standalone host retains the obsolete softpc_compat taxonomy")
 endif()
 
-# The standalone application shell has one layout.  Its former vm aggregate
-# must not return as a compatibility path after T18.
+# The transitional aggregates must not return after the source-layout move.
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/vm")
     message(FATAL_ERROR "Standalone application retains the obsolete src/vm layout")
+endif()
+if(EXISTS "${SOFTPC_SOURCE_DIR}/src/core")
+    message(FATAL_ERROR "Standalone source retains the obsolete src/core layout")
 endif()
 foreach(app_source IN ITEMS
     "src/app/main.c"
@@ -50,11 +52,6 @@ foreach(app_source IN ITEMS
         message(FATAL_ERROR "Standalone application source is missing: ${app_source}")
     endif()
 endforeach()
-
-if(EXISTS "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.c" OR
-   EXISTS "${SOFTPC_SOURCE_DIR}/src/core/softpc_physical_mapping.h")
-    message(FATAL_ERROR "Standalone SoftPC retains the obsolete physical-mapping shim")
-endif()
 
 file(STRINGS "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/c-files"
     ccpu_source_names)
@@ -157,13 +154,6 @@ foreach(source IN LISTS required_original_controller_sources)
         message(FATAL_ERROR "Standalone SoftPC omits original controller: ${source}")
     endif()
 endforeach()
-
-# Firmware is part of the standalone machine's executable guest contract.
-# Discover every checked-in ROM source so future BIOS additions cannot evade
-# the same product-semantic guard through a stale manual list.
-file(GLOB firmware_sources
-    "${SOFTPC_SOURCE_DIR}/src/core/firmware/*.asm")
-list(APPEND standalone_sources ${firmware_sources})
 
 foreach(source IN LISTS standalone_sources)
     file(READ "${source}" contents)

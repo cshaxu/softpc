@@ -7,7 +7,7 @@ Reading Set, including every authority named by the active packet.
 
 - The authorities selected by that reading set govern the work. This file is
   only an execution pointer, not a second design, rule, or status source.
-- `src/core/softpc/` is the preserved SoftPC source baseline. Do not add a
+- `src/mvdm/softpc.new/` is the preserved SoftPC source baseline. Do not add a
   standalone-only behavior branch there without an admitted port-ABI task.
 - `O:\repos.external\opennt-src-2` and `O:\repos.hobby\nxvm` are read-only
   comparison material, never runtime, build, or acceptance dependencies.

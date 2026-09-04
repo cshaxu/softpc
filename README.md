@@ -106,11 +106,13 @@ launcher and validates its adjacent configuration and declared media roots.
 
 - `assets/readme/` — owner-provided current product screenshots used by this
   README; they are documentation assets, not guest media or runtime inputs.
-- `src/mvdm/softpc.new/roms/` — byte-identical selected original ROM inputs.
-- `src/core/softpc/` — transitional recovered SoftPC CPU baseline, to be
-  migrated by M8 under the source-mirror plan.
-- `src/core/` — transitional standalone lifecycle, physical-memory ownership,
-  CPU/device composition and host-port contracts around that source tree.
+- `src/mvdm/softpc.new/` — recovered original SoftPC machine, including the
+  embedded selected BIOS/VGA/CMOS ROM inputs, retained in its historical tree.
+- `src/overlay/mvdm/softpc.new/` — the narrow, reproducible compiler/host-ABI
+  overlay that mirrors the affected original paths; it contains no machine
+  policy.
+- `src/host/` — standalone platform, media, input, video, compatibility, and
+  machine-boundary implementations.
 - `src/app/` — executable entry point, single runtime executor, console, and Win32
   presentation and media attachment. It never owns CPU, guest RAM or device
   state.

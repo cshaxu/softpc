@@ -1,6 +1,6 @@
 # Source Layout
 
-The current tree is transitional. The approved target is:
+The current source tree is:
 
 ```text
 src/
