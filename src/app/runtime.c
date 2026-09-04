@@ -170,6 +170,12 @@ static void app_runtime_publish(app_runtime *runtime)
                     bytes;
                 frame->dib_width = visible_width;
                 frame->dib_height = height;
+                frame->dirty_left = ignored_left < 0 ? 0 : ignored_left;
+                frame->dirty_top = ignored_top < 0 ? 0 : ignored_top;
+                frame->dirty_right = ignored_right >= (int32_t)visible_width ?
+                    (int32_t)visible_width - 1 : ignored_right;
+                frame->dirty_bottom = ignored_bottom >= (int32_t)height ?
+                    (int32_t)height - 1 : ignored_bottom;
                 frame->graphics = 1u;
                 frame->valid = 1u;
                 published = 1;
@@ -233,6 +239,10 @@ static void app_runtime_publish(app_runtime *runtime)
             frame->secondary_font, &frame->font_height,
             &frame->attribute_font_select);
         frame->graphics = 0u;
+        frame->dirty_left = 0;
+        frame->dirty_top = 0;
+        frame->dirty_right = -1;
+        frame->dirty_bottom = -1;
         frame->valid = 1u;
         published = 1;
     }

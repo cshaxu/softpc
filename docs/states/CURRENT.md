@@ -4,19 +4,19 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T29 S2 active |
-| Admission And Approval | Owner accepted S1 evidence and admitted S2 from the queued Windows 3.1 MS-DOS Prompt frontend-performance proposal. |
-| Objective | When a key remains in the standalone runtime queue after one original keyboard delivery, request another CCPU-safe executor wake without waiting for the next 50 ms host device tick. |
-| Non-goals | No batch keyboard delivery; no change to the original keyboard service invocation count; no CCPU, device, BIOS, ROM, BOP, timer, INI, media, or guest behavior change; no change to the required exit-one-presenter/create-the-other structure. |
-| Baseline | M9 T28 S1 is closed at `50df6b0` with owner transition evidence in `history/M9-T28-S1-prompt-transition-trace.md`. |
+| Identifier Mode | M9 T31 S4 active |
+| Admission And Approval | Owner requested T30 S3 closure from evidence and admitted S4 to optimize graphics presentation while investigating Win3.1 windowed MS-DOS Prompt characters. |
+| Objective | Carry the original renderer's dirty rectangle through the standalone indexed-DIB-to-RGB window path, convert and invalidate only changed graphics regions, and retain diagnostic evidence that distinguishes original DIB updates from outer RGB/window loss. |
+| Non-goals | No CCPU, V7/VGA controller, original renderer, BIOS, ROM, BOP, timer, input, INI, media, or guest/Win3.1 driver change; no console/window lifecycle restructuring. |
+| Baseline | T29 S2 is closed at `bb3c67e`; T30 S3 closes without code in `history/M9-T30-S3-evidence-led-text-geometry.md`. |
 | Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT is read-only comparison material. |
-| Affected Boundary | Standalone runtime input queue and its existing CCPU-safe wake request; runtime unit coverage; package executables. |
-| Subtask Plan | After one queued make or break is delivered through the existing original keyboard path, detect whether another key remains; request the existing executor wake only in that case; prove ordering and bounded delivery without changing the timer/device clock. |
-| Requirement Ledger | R1: exactly one `softpc_machine_key_number` invocation per executor callback. R2: remaining queued keyboard work requests one subsequent CCPU-safe wake. R3: empty queue does not request a continuation wake. R4: frontend hotkeys, pause/resume, and mouse path retain their existing behavior. R5: no INI/media changes. |
-| Focused Verification | New runtime queue-continuation unit proof; keyboard and lifecycle smokes; full x64/x86 CTest; package smoke; owner RDP/console/window typing, hotkey, and pause/resume check. |
-| Stop Conditions | Stop after publishing rebuilt dual-width packages and verification. Do not start S3 or alter text geometry, presentation, timer, or CCPU generation. |
-| Exit Criteria | A queued make/break sequence is delivered in order without one 50 ms device-tick wait per record; one keyboard service call remains the maximum per callback; both packages and full test suites pass. |
-| Original Owner Request | “好的，那你做一下S2” |
+| Affected Boundary | Standalone copied graphics-frame metadata, RGB surface conversion, Win32 dirty invalidation/paint; graphics unit coverage; package executables. |
+| Subtask Plan | Preserve the original dirty rectangle with each copied graphics frame; force a full conversion only for first frame, surface geometry, or palette change; otherwise convert and repaint the mapped dirty rectangle. Emit compact input/frame/RGB diagnostic evidence for the owner Prompt reproduction. |
+| Requirement Ledger | R1: the original indexed DIB and `nt_ega`/`nt_vga` painter remain unmodified. R2: a first frame, dimension change, or palette change forces a full RGB conversion/repaint. R3: ordinary dirty frames convert/invalidate only their clipped region. R4: diagnostic records identify input delivery, indexed frame, RGB conversion, and invalidation without mutating guest state. R5: no INI/media changes. |
+| Focused Verification | Unit proof for dirty-rectangle clipping, palette/full-refresh selection, and mapped invalidation; existing renderer/window tests; full x64/x86 CTest and package smoke; owner Win3.1 windowed Prompt text reproduction. |
+| Stop Conditions | Stop after dual-width packages and the compact diagnostic capture are ready. Do not alter V7/Win3.1 driver semantics or start S5. |
+| Exit Criteria | An original dirty rectangle yields a corresponding partial RGB conversion and paint invalidation; full-refresh conditions remain correct; diagnostics can assign an absent Prompt glyph to the original DIB or the outer presentation path; both packages and full suites pass. |
+| Original Owner Request | “哦对，做好S3收口，准入S4，优化显示” |
 
 ## Current Technical Baseline
 
@@ -57,6 +57,11 @@
 - M9 T28 S1 closed with owner-proven Win3.1 MS-DOS Prompt transition evidence:
   original text is 80 by 25, while graphics legitimately transitions through
   640 by 350 before stabilizing at 640 by 480.
+- M9 T29 S2 closed with a standalone queued-input continuation wake; owner
+  confirmed normal operation after the dual-width 21/21 regression package.
+- M9 T30 S3 closed with no code: recorded Prompt text geometry is already
+  stable at 80 by 25, so its reported graphical character loss is not a text
+  surface sizing issue.
 - M8 Td S1 established the NXVM-style authority topology, linked the four
   applicable shared governance skills, and added the documentation gate.
 - M8 Td S2 established the public product identity as Insignia SoftPC and

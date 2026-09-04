@@ -42,6 +42,11 @@ typedef struct app_runtime_frame {
     uint32_t attribute_font_select;
     uint32_t dib_width;
     uint32_t dib_height;
+    /* Original nt_graph dirty rectangle, clipped to the copied DIB. */
+    int32_t dirty_left;
+    int32_t dirty_top;
+    int32_t dirty_right;
+    int32_t dirty_bottom;
     uint8_t dib_info[SOFTPC_RUNTIME_DIB_INFO_BYTES];
     uint8_t dib_bits[SOFTPC_RUNTIME_DIB_MAX_BYTES];
 } app_runtime_frame;

@@ -33,6 +33,8 @@ static HGDIOBJ app_window_graphics_previous_bitmap;
 static uint32_t *app_window_graphics_pixels;
 static uint32_t app_window_graphics_width;
 static uint32_t app_window_graphics_height;
+static uint8_t app_window_graphics_palette[SOFTPC_RUNTIME_DIB_INFO_BYTES];
+static int app_window_graphics_valid;
 static unsigned char app_window_presented_text[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
 static unsigned short app_window_presented_attributes[SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS];
 static uint32_t app_window_presented_text_palette[16u];
@@ -314,28 +316,52 @@ static void app_window_update_text_surface(void)
  * a window even though its bytes are valid (the exact same frame writes a
  * correct BMP). Convert only at the final frontend outlet to an RGB32 DIB;
  * this is the same isolated presentation boundary as the text surface. */
-static void app_window_update_graphics_surface(void)
+static int app_window_update_graphics_surface(RECT *changed)
 {
     const BITMAPINFO *dib;
     uint32_t source_stride;
     uint32_t row;
+    int full_refresh;
+    int32_t left;
+    int32_t top;
+    int32_t right;
+    int32_t bottom;
 
     if (app_window_frame == NULL || app_window_graphics_pixels == NULL ||
         app_window_frame->graphics == 0u ||
         app_window_frame->dib_width == 0u ||
         app_window_frame->dib_height == 0u ||
         app_window_frame->dib_width > SOFTPC_GRAPHICS_SURFACE_MAX_WIDTH ||
-        app_window_frame->dib_height > SOFTPC_GRAPHICS_SURFACE_MAX_HEIGHT)
-        return;
+        app_window_frame->dib_height > SOFTPC_GRAPHICS_SURFACE_MAX_HEIGHT ||
+        changed == NULL)
+        return 0;
     dib = (const BITMAPINFO *)app_window_frame->dib_info;
+    full_refresh = !app_window_graphics_valid ||
+        app_window_graphics_width != app_window_frame->dib_width ||
+        app_window_graphics_height != app_window_frame->dib_height ||
+        memcmp(app_window_graphics_palette, app_window_frame->dib_info,
+            sizeof(app_window_graphics_palette)) != 0;
+    left = full_refresh ? 0 : app_window_frame->dirty_left;
+    top = full_refresh ? 0 : app_window_frame->dirty_top;
+    right = full_refresh ? (int32_t)app_window_frame->dib_width - 1 :
+        app_window_frame->dirty_right;
+    bottom = full_refresh ? (int32_t)app_window_frame->dib_height - 1 :
+        app_window_frame->dirty_bottom;
+    if (left < 0) left = 0;
+    if (top < 0) top = 0;
+    if (right >= (int32_t)app_window_frame->dib_width)
+        right = (int32_t)app_window_frame->dib_width - 1;
+    if (bottom >= (int32_t)app_window_frame->dib_height)
+        bottom = (int32_t)app_window_frame->dib_height - 1;
+    if (right < left || bottom < top) return 0;
     source_stride = (app_window_frame->dib_width + 3u) & ~3u;
-    for (row = 0u; row < app_window_frame->dib_height; ++row) {
+    for (row = (uint32_t)top; row <= (uint32_t)bottom; ++row) {
         const uint8_t *source = app_window_frame->dib_bits +
             row * source_stride;
         uint32_t *destination = app_window_graphics_pixels +
             row * SOFTPC_GRAPHICS_SURFACE_MAX_WIDTH;
         uint32_t column;
-        for (column = 0u; column < app_window_frame->dib_width; ++column) {
+        for (column = (uint32_t)left; column <= (uint32_t)right; ++column) {
             const RGBQUAD *colour = &dib->bmiColors[source[column]];
             destination[column] = ((uint32_t)colour->rgbRed << 16) |
                 ((uint32_t)colour->rgbGreen << 8) |
@@ -344,6 +370,43 @@ static void app_window_update_graphics_surface(void)
     }
     app_window_graphics_width = app_window_frame->dib_width;
     app_window_graphics_height = app_window_frame->dib_height;
+    memcpy(app_window_graphics_palette, app_window_frame->dib_info,
+        sizeof(app_window_graphics_palette));
+    app_window_graphics_valid = 1;
+    changed->left = left;
+    changed->top = top;
+    changed->right = right + 1;
+    changed->bottom = bottom + 1;
+    app_prompt_trace("softpc prompt rgb frame=%lu full=%d rect=%ld,%ld,%ld,%ld",
+        (unsigned long)app_window_frame->sequence, full_refresh,
+        (long)changed->left, (long)changed->top, (long)changed->right,
+        (long)changed->bottom);
+    return 1;
+}
+
+static void app_window_invalidate_graphics(HWND window, const RECT *source)
+{
+    RECT display;
+    RECT target;
+    uint32_t width;
+    uint32_t height;
+
+    if (window == NULL || source == NULL || app_window_frame == NULL ||
+        !app_window_display_rect(window, app_window_frame->dib_width,
+            app_window_frame->dib_height, &display)) return;
+    width = app_window_frame->dib_width;
+    height = app_window_frame->dib_height;
+    target.left = display.left + source->left * (display.right - display.left) /
+        (int)width;
+    target.top = display.top + source->top * (display.bottom - display.top) /
+        (int)height;
+    target.right = display.left + (source->right *
+        (display.right - display.left) + (int)width - 1) / (int)width;
+    target.bottom = display.top + (source->bottom *
+        (display.bottom - display.top) + (int)height - 1) / (int)height;
+    if (target.right <= target.left) target.right = target.left + 1;
+    if (target.bottom <= target.top) target.bottom = target.top + 1;
+    InvalidateRect(window, &target, FALSE);
 }
 
 /* The original nt_graph endpoint gave Windows Console a real cursor.  Its
@@ -558,9 +621,14 @@ static LRESULT CALLBACK app_window_proc(HWND window, UINT message,
                     app_window_frame)) {
                 app_window_displayed_sequence = app_window_frame->sequence;
                 if (app_window_frame->graphics != 0u) {
-                    app_window_update_graphics_surface();
+                    RECT changed;
+                    int graphics_changed = app_window_update_graphics_surface(
+                        &changed);
                     app_window_auto_graphics_presented = 1;
                     app_window_auto_text_frames = 0u;
+                    app_window_resize_frame(window);
+                    if (graphics_changed)
+                        app_window_invalidate_graphics(window, &changed);
                 } else if (app_window_auto_switch &&
                     app_window_auto_graphics_presented) {
                     /* C-VID can publish a transient text snapshot around a
@@ -575,8 +643,10 @@ static LRESULT CALLBACK app_window_proc(HWND window, UINT message,
                         return 0;
                     }
                 }
-                app_window_resize_frame(window);
-                InvalidateRect(window, NULL, FALSE);
+                if (app_window_frame->graphics == 0u) {
+                    app_window_resize_frame(window);
+                    InvalidateRect(window, NULL, FALSE);
+                }
             }
             app_window_advance_cursor_blink(window);
             app_window_update_title(window);
@@ -747,6 +817,9 @@ static int app_vm_run_window_mode(app_runtime *runtime,
     app_window_auto_text_frames = 0u;
     app_window_result = SOFTPC_VM_FRONTEND_STOPPED;
     app_window_presented_text_valid = 0;
+    app_window_graphics_valid = 0;
+    ZeroMemory(app_window_graphics_palette,
+        sizeof(app_window_graphics_palette));
     app_window_displayed_sequence = 0u;
     ZeroMemory(&app_window_keyboard_normalizer,
         sizeof(app_window_keyboard_normalizer));
