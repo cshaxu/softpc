@@ -588,6 +588,18 @@ target_compile_definitions(softpc-vga-frame-smoke PRIVATE
 add_test(NAME softpc-vga-frame-smoke COMMAND softpc-vga-frame-smoke)
 set_tests_properties(softpc-vga-frame-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-vga-ccpu-update-smoke test/unit/vga_ccpu_update_smoke.c)
+target_link_libraries(softpc-vga-ccpu-update-smoke PRIVATE softpc-machine)
+target_include_directories(softpc-vga-ccpu-update-smoke PRIVATE
+    src/host
+    src/mvdm/softpc.new/host/inc
+    src/mvdm/softpc.new/base/inc)
+target_compile_definitions(softpc-vga-ccpu-update-smoke PRIVATE
+    CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1
+    SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
+add_test(NAME softpc-vga-ccpu-update-smoke COMMAND softpc-vga-ccpu-update-smoke)
+set_tests_properties(softpc-vga-ccpu-update-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-bop-smoke test/unit/bop_smoke.c)
 target_link_libraries(softpc-bop-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-bop-smoke PRIVATE
@@ -678,6 +690,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-mouse-smoke
     softpc-keycode-smoke
     softpc-vga-frame-smoke
+    softpc-vga-ccpu-update-smoke
     softpc-bop-smoke
     softpc-quick-time-smoke
     softpc-lifecycle-smoke
@@ -708,6 +721,7 @@ set(SOFTPC_UNIT_TESTS
     softpc-mouse-smoke
     softpc-keycode-smoke
     softpc-vga-frame-smoke
+    softpc-vga-ccpu-update-smoke
     softpc-bop-smoke
     softpc-quick-time-smoke
     softpc-lifecycle-smoke

@@ -4,19 +4,19 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | No active implementation task |
-| Admission And Approval | M9 T35 S8 was owner-admitted from the frontend-performance proposal and is closed. |
-| Objective | Await owner admission of the next queued task. |
-| Non-goals | Do not begin further queued work without owner admission. |
-| Baseline | T35 S8 is closed with event-driven console idle scheduling; see [closure record](../history/M9-T35-S8-console-idle-scheduling.md). |
-| Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT is read-only comparison material. |
-| Affected Boundary | None until a task is admitted. |
-| Subtask Plan | None. |
-| Requirement Ledger | T35: all requirements closed. |
-| Focused Verification | T35: GCC x64 CTest 21/21 and GCC x86 CTest 21/21 passed. |
-| Stop Conditions | Await owner direction. |
-| Exit Criteria | A future owner-admitted task supplies its own criteria. |
-| Original Owner Request | “准入” |
+| Identifier Mode | M9 T36 — active implementation/build version |
+| Admission And Approval | Owner explicitly authorized investigation and repair of the Windows 3.1 graphical MS-DOS Prompt rendering defect. |
+| Objective | Verify the recovered visible character-update path while commands continue to execute. |
+| Non-goals | No DOS/DPMI/Windows-driver/NTVDM semantics, frontend VRAM decoder, INI/media/ROM change, or presenter-lifecycle redesign. |
+| Baseline | T35 is closed. The defect predates T28–T35 outer-runtime dirty-frame and scheduling work. |
+| Applicable Rules | Documentation, execution, architecture, coding and source-layout authorities; OpenNT is read-only comparison material. |
+| Affected Boundary | Standalone machine keyboard-make → original-renderer refresh port; original C-VID/VGA remains unchanged. |
+| Subtask Plan | Owner-validate graphical Prompt typing using the refreshed packages; then record acceptance and close T36. |
+| Requirement Ledger | [M9 T36 task record](../history/M9-T36-windows31-msdos-prompt-rendering.md). |
+| Focused Verification | GCC x64/x86 CTest each passed 22/22. Pending owner proof: graphical Prompt visible text plus command execution, normal graphics repaint, text route and Prompt transition. |
+| Stop Conditions | Stop and queue a design task if evidence requires a new VGA controller, Windows driver/DOS semantics, or broad unclassified mirror rewrite. |
+| Exit Criteria | The task record's evidence and dual-width package/regression requirements are complete. |
+| Original Owner Request | “对啊，你来帮我研究和修复一下看看怎么回事” |
 
 ## Current Technical Baseline
 
