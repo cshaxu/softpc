@@ -16,6 +16,10 @@ host/
 app/
   one executor, command/input queues, lifecycle, frame mailbox, monitor
   console, and Win32 window; no machine-state access
+        ↑
+lib/platform/win32/
+  copied-frame ABI and reusable Win32 input, geometry, sizing, and mouse
+  capture mechanics; no guest input protocol or lifecycle policy
 ```
 
 `mvdm/softpc.new` is the repository-owned selected recovered-machine layout.
@@ -27,6 +31,10 @@ needed, holds only repository-owned reproducible patches for host-width or
 toolchain representation; it never owns machine policy. `host/` supplies
 standalone host-facing symbols but does not own guest-visible state.
 `app/` owns the single executor and presentation shell.
+`lib/platform/win32/` is a local synchronized-source component, not a runtime
+or build dependency on NXVM or NTVDM64.  It consumes and produces copied host
+values only; the app binding alone converts those values to the guest's input
+protocol and makes all product lifecycle and hotkey decisions.
 
 The runtime executor is the sole caller of the machine and compatibility host.
 Input producers enqueue records and signal it. The executor publishes complete

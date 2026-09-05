@@ -4,19 +4,19 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | No active implementation task |
-| Admission And Approval | M9 T35 S8 was owner-admitted from the frontend-performance proposal and is closed. |
-| Objective | Await owner admission of the next queued task. |
-| Non-goals | Do not begin further queued work without owner admission. |
-| Baseline | T35 S8 is closed with event-driven console idle scheduling; see [closure record](../history/M9-T35-S8-console-idle-scheduling.md). |
-| Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT is read-only comparison material. |
-| Affected Boundary | None until a task is admitted. |
-| Subtask Plan | None. |
-| Requirement Ledger | T35: all requirements closed. |
-| Focused Verification | T35: GCC x64 CTest 21/21 and GCC x86 CTest 21/21 passed. |
-| Stop Conditions | Await owner direction. |
-| Exit Criteria | A future owner-admitted task supplies its own criteria. |
-| Original Owner Request | “准入” |
+| Identifier Mode | M9 T36 closed |
+| Admission And Approval | Owner admitted and approved the shared Win32 presentation-library proposal. |
+| Objective | Extract SoftPC's reusable copied-frame, Win32 input, geometry, and presentation mechanics into `src/lib/platform/win32/`, with `src/app` retaining a thin project binding. |
+| Non-goals | No change to `src/mvdm/softpc.new`, machine/device/BOP/ROM/media behavior, user-owned `softpc.ini`, product lifecycle, fixed hotkeys, or the one-presenter-at-a-time console/window transition. |
+| Baseline | T36 is closed; see [closure record](../history/M9-T36-shared-win32-presentation-library.md). |
+| Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT/NXVM/NTVDM64 are read-only comparison material. |
+| Affected Boundary | `src/app` to local `src/lib/platform/win32` only; copied values and opaque runtime ownership remain mandatory. |
+| Subtask Plan | Complete: established copied frame ABI and generic Win32 helpers; retained app bindings; added a source-hash manifest check; rebuilt/tested both widths. |
+| Requirement Ledger | Met: shared component has no machine/runtime pointers; app owns input mapping, hotkeys, lifecycle and route decisions; source contents can be hash-compared by sibling projects. |
+| Focused Verification | Generic input/geometry/mouse unit coverage; runtime/window/keyboard/package tests; full GCC x64 and x86 CTest. |
+| Stop Conditions | Not reached: the extraction required no recovered-machine modification and changed no lifecycle policy. |
+| Exit Criteria | Met: local component/thin binding built; manifest check passes; no original-machine file changed; dual-width tests and package builds pass. |
+| Original Owner Request | “很好 准入 请你执行” |
 
 ## Current Technical Baseline
 
@@ -68,6 +68,10 @@
 - M9 T35 S8 replaces the console's fixed 10 ms sleep loop with input/frame
   waits plus a bounded state deadline; GCC x64 and x86 full CTest each passed
   21/21.
+- M9 T36 extracts copied-frame ABI, normalized keyboard input, DIB geometry,
+  sizing, and explicit mouse capture to `src/lib/platform/win32/`. The app
+  binding retains guest input encoding, hotkeys, routing, and lifecycle;
+  GCC x64/x86 full CTest each passed 23/23.
 - M8 Td S1 established the NXVM-style authority topology, linked the four
   applicable shared governance skills, and added the documentation gate.
 - M8 Td S2 established the public product identity as Insignia SoftPC and

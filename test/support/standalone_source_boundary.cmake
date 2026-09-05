@@ -65,6 +65,19 @@ foreach(app_source IN ITEMS
     endif()
 endforeach()
 
+# The synchronised Win32 presentation component consumes copied values only.
+# It cannot acquire SoftPC's runtime, machine, renderer, or original key-map
+# ownership; those remain in the project binding under src/app.
+file(GLOB_RECURSE shared_win32_sources
+    "${SOFTPC_SOURCE_DIR}/src/lib/platform/win32/*.[ch]")
+foreach(source IN LISTS shared_win32_sources)
+    file(READ "${source}" shared_win32_contents)
+    if(shared_win32_contents MATCHES
+        "(softpc_machine|app_runtime|KeyMsgToKeyCode|EGA_planes|host_machine_)")
+        message(FATAL_ERROR "Shared Win32 presentation leaks project ownership: ${source}")
+    endif()
+endforeach()
+
 file(STRINGS "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/c-files"
     ccpu_source_names)
 foreach(name IN LISTS ccpu_source_names)

@@ -93,15 +93,8 @@ static void app_console_close(HANDLE input, HANDLE output,
     }
 }
 
-static int app_console_keyboard_sink(void *context, uint8_t key_number,
-    uint8_t released)
-{
-    return app_runtime_enqueue_key((app_runtime *)context, key_number,
-        released);
-}
-
 static int app_console_key(app_runtime *runtime,
-    app_win32_keyboard_normalizer *normalizer,
+    win32_presentation_keyboard_normalizer *normalizer,
     const KEY_EVENT_RECORD *key)
 {
     if (!key->bKeyDown && normalizer->suppressed_virtual_key ==
@@ -115,25 +108,25 @@ static int app_console_key(app_runtime *runtime,
         /* The loop now returns to the monitor, so the physical Ctrl/Alt
            key-up records will not necessarily reach this frontend. Release
            the already-forwarded guest modifiers before requesting pause. */
-        (void)app_win32_keyboard_release_ctrl_alt(runtime,
-            app_console_keyboard_sink);
+        (void)win32_presentation_keyboard_release_ctrl_alt(runtime,
+            app_keyboard_enqueue_win32_event);
         return SOFTPC_VM_FRONTEND_PAUSED;
     }
     if (key->bKeyDown && key->wVirtualKeyCode == 'D' &&
         (key->dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
         (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))) {
-        (void)app_win32_keyboard_release_ctrl_alt(runtime,
-            app_console_keyboard_sink);
-        (void)app_win32_keyboard_submit_ctrl_alt_del(runtime,
-            app_console_keyboard_sink);
+        (void)win32_presentation_keyboard_release_ctrl_alt(runtime,
+            app_keyboard_enqueue_win32_event);
+        (void)win32_presentation_keyboard_submit_ctrl_alt_del(runtime,
+            app_keyboard_enqueue_win32_event);
         normalizer->suppressed_virtual_key = key->wVirtualKeyCode;
         return -1;
     }
     if (key->bKeyDown && key->wVirtualKeyCode == 'F' &&
         (key->dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
         (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))) {
-        (void)app_win32_keyboard_submit_alt_enter(runtime,
-            app_console_keyboard_sink);
+        (void)win32_presentation_keyboard_submit_alt_enter(runtime,
+            app_keyboard_enqueue_win32_event);
         normalizer->suppressed_virtual_key = key->wVirtualKeyCode;
         return -1;
     }
@@ -144,8 +137,8 @@ static int app_console_key(app_runtime *runtime,
         (key->dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
         (key->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)))
     {
-        (void)app_win32_keyboard_release_ctrl_alt(runtime,
-            app_console_keyboard_sink);
+        (void)win32_presentation_keyboard_release_ctrl_alt(runtime,
+            app_keyboard_enqueue_win32_event);
         normalizer->suppressed_virtual_key = key->wVirtualKeyCode;
         return -1;
     }
@@ -154,11 +147,11 @@ static int app_console_key(app_runtime *runtime,
        the original nt_keycd table and 8042 ingress handle it normally. */
     if (key->wVirtualScanCode == 0u && key->bKeyDown &&
         key->uChar.UnicodeChar != 0u) {
-        (void)app_win32_keyboard_submit_utf16(normalizer, runtime,
-            app_console_keyboard_sink, key->uChar.UnicodeChar);
+        (void)win32_presentation_keyboard_submit_utf16(normalizer, runtime,
+            app_keyboard_enqueue_win32_event, key->uChar.UnicodeChar);
     } else {
-        (void)app_win32_keyboard_submit_transition(runtime,
-            app_console_keyboard_sink, key->wVirtualScanCode,
+        (void)win32_presentation_keyboard_submit_transition(runtime,
+            app_keyboard_enqueue_win32_event, key->wVirtualScanCode,
             key->wVirtualKeyCode, key->dwControlKeyState, key->bKeyDown != 0);
     }
     return -1;
@@ -278,7 +271,7 @@ int app_vm_run_console(app_runtime *runtime)
     uint32_t previous_palette[16u];
     app_runtime_frame *frame;
     uint32_t displayed_sequence = 0u;
-    app_win32_keyboard_normalizer keyboard_normalizer = { 0 };
+    win32_presentation_keyboard_normalizer keyboard_normalizer = { 0 };
     COORD mouse_previous = { 0, 0 };
     int mouse_previous_valid = 0;
     int running = 1;

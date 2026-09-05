@@ -2,16 +2,16 @@
 #define SOFTPC_VM_RUNTIME_H
 
 #include "machine.h"
+#include "../lib/platform/win32/frame.h"
 
 #include <stdint.h>
 
-#define SOFTPC_RUNTIME_TEXT_COLUMNS 80u
-#define SOFTPC_RUNTIME_TEXT_ROWS 25u
-#define SOFTPC_RUNTIME_DIB_MAX_WIDTH 1280u
-#define SOFTPC_RUNTIME_DIB_MAX_HEIGHT 768u
-#define SOFTPC_RUNTIME_DIB_MAX_BYTES \
-    (SOFTPC_RUNTIME_DIB_MAX_WIDTH * SOFTPC_RUNTIME_DIB_MAX_HEIGHT)
-#define SOFTPC_RUNTIME_DIB_INFO_BYTES 1064u
+#define SOFTPC_RUNTIME_TEXT_COLUMNS WIN32_PRESENTATION_TEXT_COLUMNS
+#define SOFTPC_RUNTIME_TEXT_ROWS WIN32_PRESENTATION_TEXT_ROWS
+#define SOFTPC_RUNTIME_DIB_MAX_WIDTH WIN32_PRESENTATION_DIB_MAX_WIDTH
+#define SOFTPC_RUNTIME_DIB_MAX_HEIGHT WIN32_PRESENTATION_DIB_MAX_HEIGHT
+#define SOFTPC_RUNTIME_DIB_MAX_BYTES WIN32_PRESENTATION_DIB_MAX_BYTES
+#define SOFTPC_RUNTIME_DIB_INFO_BYTES WIN32_PRESENTATION_DIB_INFO_BYTES
 #define SOFTPC_RUNTIME_PATH_MAX 1024u
 
 typedef struct app_runtime app_runtime;
@@ -24,32 +24,7 @@ typedef enum app_runtime_state {
     SOFTPC_RUNTIME_ERROR
 } app_runtime_state;
 
-typedef struct app_runtime_frame {
-    uint32_t sequence;
-    uint32_t graphics;
-    uint32_t valid;
-    int32_t cursor_column;
-    int32_t cursor_row;
-    uint32_t cursor_size;
-    uint8_t text[SOFTPC_RUNTIME_TEXT_COLUMNS * SOFTPC_RUNTIME_TEXT_ROWS];
-    uint16_t attributes[SOFTPC_RUNTIME_TEXT_COLUMNS * SOFTPC_RUNTIME_TEXT_ROWS];
-    /* Copied RGB values for the original renderer's active VGA text palette.
-       Text attributes are palette indices, not fixed host colours. */
-    uint32_t text_palette[16u];
-    uint8_t font[256u * 16u];
-    uint8_t secondary_font[256u * 16u];
-    uint32_t font_height;
-    uint32_t attribute_font_select;
-    uint32_t dib_width;
-    uint32_t dib_height;
-    /* Original nt_graph dirty rectangle, clipped to the copied DIB. */
-    int32_t dirty_left;
-    int32_t dirty_top;
-    int32_t dirty_right;
-    int32_t dirty_bottom;
-    uint8_t dib_info[SOFTPC_RUNTIME_DIB_INFO_BYTES];
-    uint8_t dib_bits[SOFTPC_RUNTIME_DIB_MAX_BYTES];
-} app_runtime_frame;
+typedef win32_presentation_frame app_runtime_frame;
 
 int app_runtime_create(softpc_machine *machine, app_runtime **out);
 int app_runtime_start(app_runtime *runtime);

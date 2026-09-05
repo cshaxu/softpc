@@ -4,6 +4,8 @@
 #include "runtime.h"
 #include "keyboard.h"
 #include "prompt_trace.h"
+#include "../lib/platform/win32/geometry.h"
+#include "../lib/platform/win32/mouse.h"
 
 #include <windows.h>
 #include <stdio.h>
@@ -48,14 +50,10 @@ static int app_window_result;
 static int app_window_auto_switch;
 static int app_window_auto_graphics_presented;
 static unsigned int app_window_auto_text_frames;
-static app_win32_keyboard_normalizer app_window_keyboard_normalizer;
-static int app_window_mouse_x;
-static int app_window_mouse_y;
-static int app_window_mouse_valid;
+static win32_presentation_keyboard_normalizer app_window_keyboard_normalizer;
 static int app_window_left_button;
 static int app_window_right_button;
-static int app_window_mouse_captured;
-static int app_window_host_cursor_hidden;
+static win32_presentation_mouse app_window_mouse_state;
 static WPARAM app_window_suppressed_hotkey;
 static uint32_t app_window_surface_width;
 static uint32_t app_window_surface_height;
@@ -105,9 +103,7 @@ static COLORREF app_window_colour(unsigned int colour)
  * final GDI storage boundary. */
 static uint32_t app_window_dib_pixel(COLORREF colour)
 {
-    return ((uint32_t)GetRValue(colour) << 16) |
-        ((uint32_t)GetGValue(colour) << 8) |
-        (uint32_t)GetBValue(colour);
+    return win32_presentation_dib_pixel(colour);
 }
 
 /* Keep the byte-order conversion observable to the Win32 presenter smoke
@@ -126,13 +122,9 @@ uint32_t app_window_test_dib_pixel(COLORREF colour)
 static int app_window_display_rect(HWND window, uint32_t source_width,
     uint32_t source_height, RECT *display)
 {
-    if (window == NULL || display == NULL || source_width == 0u ||
-        source_height == 0u) return 0;
-    display->left = 0;
-    display->top = 0;
-    display->right = app_window_client_width;
-    display->bottom = app_window_client_height;
-    return display->right > 0 && display->bottom > 0;
+    if (window == NULL) return 0;
+    return win32_presentation_display_rect(app_window_client_width,
+        app_window_client_height, source_width, source_height, display);
 }
 
 static void app_window_capture_client_size(HWND window)
@@ -148,20 +140,11 @@ static void app_window_capture_client_size(HWND window)
 static void app_window_resize_surface(HWND window, uint32_t width,
     uint32_t height)
 {
-    RECT outer;
-    DWORD style;
-    DWORD extended_style;
-
     if (window == NULL || width == 0u || height == 0u ||
         (app_window_surface_width == width &&
          app_window_surface_height == height)) return;
-    SetRect(&outer, 0, 0, (int)width, (int)height);
-    style = (DWORD)GetWindowLongPtrA(window, GWL_STYLE);
-    extended_style = (DWORD)GetWindowLongPtrA(window, GWL_EXSTYLE);
-    if (!AdjustWindowRectEx(&outer, style, FALSE, extended_style)) return;
     /* Preserve the user's desktop position across guest mode changes. */
-    SetWindowPos(window, NULL, 0, 0, outer.right - outer.left,
-        outer.bottom - outer.top, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+    if (!win32_presentation_resize_client(window, width, height)) return;
     app_window_surface_width = width;
     app_window_surface_height = height;
 }
@@ -195,55 +178,13 @@ static void app_window_current_surface_size(uint32_t *width,
 static void app_window_constrain_sizing(HWND window, WPARAM edge,
     RECT *outer)
 {
-    RECT current_window;
-    RECT current_client;
     uint32_t source_width;
     uint32_t source_height;
-    int frame_width;
-    int frame_height;
-    int client_width;
-    int client_height;
-    int target_width;
-    int target_height;
 
     if (window == NULL || outer == NULL) return;
     app_window_current_surface_size(&source_width, &source_height);
-    if (source_width == 0u || source_height == 0u) return;
-    GetWindowRect(window, &current_window);
-    GetClientRect(window, &current_client);
-    frame_width = (current_window.right - current_window.left) -
-        (current_client.right - current_client.left);
-    frame_height = (current_window.bottom - current_window.top) -
-        (current_client.bottom - current_client.top);
-    target_width = outer->right - outer->left;
-    target_height = outer->bottom - outer->top;
-    client_width = target_width - frame_width;
-    client_height = target_height - frame_height;
-    if (client_width <= 0 || client_height <= 0) return;
-    if (edge == WMSZ_LEFT || edge == WMSZ_RIGHT) {
-        client_height = (int)((uint64_t)client_width * source_height /
-            source_width);
-    } else if (edge == WMSZ_TOP || edge == WMSZ_BOTTOM) {
-        client_width = (int)((uint64_t)client_height * source_width /
-            source_height);
-    } else if ((uint64_t)client_width * source_height >=
-        (uint64_t)client_height * source_width) {
-        client_height = (int)((uint64_t)client_width * source_height /
-            source_width);
-    } else {
-        client_width = (int)((uint64_t)client_height * source_width /
-            source_height);
-    }
-    target_width = client_width + frame_width;
-    target_height = client_height + frame_height;
-    if (edge == WMSZ_LEFT || edge == WMSZ_TOPLEFT || edge == WMSZ_BOTTOMLEFT)
-        outer->left = outer->right - target_width;
-    else
-        outer->right = outer->left + target_width;
-    if (edge == WMSZ_TOP || edge == WMSZ_TOPLEFT || edge == WMSZ_TOPRIGHT)
-        outer->top = outer->bottom - target_height;
-    else
-        outer->bottom = outer->top + target_height;
+    win32_presentation_constrain_sizing(window, edge, outer, source_width,
+        source_height);
 }
 
 static void app_window_update_text_surface(void)
@@ -396,16 +337,8 @@ static void app_window_invalidate_graphics(HWND window, const RECT *source)
             app_window_frame->dib_height, &display)) return;
     width = app_window_frame->dib_width;
     height = app_window_frame->dib_height;
-    target.left = display.left + source->left * (display.right - display.left) /
-        (int)width;
-    target.top = display.top + source->top * (display.bottom - display.top) /
-        (int)height;
-    target.right = display.left + (source->right *
-        (display.right - display.left) + (int)width - 1) / (int)width;
-    target.bottom = display.top + (source->bottom *
-        (display.bottom - display.top) + (int)height - 1) / (int)height;
-    if (target.right <= target.left) target.right = target.left + 1;
-    if (target.bottom <= target.top) target.bottom = target.top + 1;
+    win32_presentation_map_dirty_rect(source, &display, width, height,
+        &target);
     InvalidateRect(window, &target, FALSE);
 }
 
@@ -503,57 +436,36 @@ static void app_window_paint(HWND window, HDC dc)
     }
 }
 
-static int app_window_keyboard_sink(void *context, uint8_t key_number,
-    uint8_t released)
-{
-    (void)context;
-    if (!app_window_guest_running()) return 0;
-    return app_runtime_enqueue_key(app_window_runtime, key_number,
-        released);
-}
-
 static void app_window_transition(WPARAM key, LPARAM lparam, int released)
 {
     WORD scan = (WORD)((lparam >> 16) & 0xffu);
     DWORD control_state = (lparam & 0x01000000L) != 0 ? ENHANCED_KEY : 0u;
     if (scan == 0u && !released)
-        app_win32_keyboard_note_recovered_key(
+        win32_presentation_keyboard_note_recovered_key(
             &app_window_keyboard_normalizer, (WORD)key);
     if (scan == 0u && released)
-        app_win32_keyboard_release_recovered_key(
+        win32_presentation_keyboard_release_recovered_key(
             &app_window_keyboard_normalizer, (WORD)key);
-    (void)app_win32_keyboard_submit_transition(NULL,
-        app_window_keyboard_sink, scan, (WORD)key, control_state,
+    (void)win32_presentation_keyboard_submit_transition(app_window_runtime,
+        app_keyboard_enqueue_win32_event, scan, (WORD)key, control_state,
         !released);
 }
 
 static void app_window_mouse(LPARAM position)
 {
-    int x = (int)(short)LOWORD(position);
-    int y = (int)(short)HIWORD(position);
     int dx = 0, dy = 0;
-    if (!app_window_guest_running()) return;
-    if (app_window_mouse_valid) {
-        dx = x - app_window_mouse_x;
-        dy = y - app_window_mouse_y;
-    }
-    app_window_mouse_x = x;
-    app_window_mouse_y = y;
-    app_window_mouse_valid = 1;
+    uint32_t guest_width;
+    uint32_t guest_height;
 
+    if (!app_window_guest_running()) return;
     /* Mouse counters belong to the native guest surface, whereas WM_MOUSE
        reports pixels in the current (possibly user-scaled) client area.
        Preserve the same physical InPort controller while making an enlarged
        or reduced window describe the same guest movement. */
-    if (app_window_client_width > 0 && app_window_client_height > 0) {
-        uint32_t guest_width;
-        uint32_t guest_height;
-        app_window_current_surface_size(&guest_width, &guest_height);
-        dx = (int)((int64_t)dx * (int64_t)guest_width /
-            app_window_client_width);
-        dy = (int)((int64_t)dy * (int64_t)guest_height /
-            app_window_client_height);
-    }
+    app_window_current_surface_size(&guest_width, &guest_height);
+    if (!win32_presentation_mouse_move(&app_window_mouse_state, position,
+            app_window_client_width, app_window_client_height, guest_width,
+            guest_height, &dx, &dy)) return;
     (void)app_runtime_enqueue_mouse(app_window_runtime, dx, dy,
         (uint8_t)app_window_left_button,
         (uint8_t)app_window_right_button);
@@ -566,46 +478,17 @@ static void app_window_mouse(LPARAM position)
  * releases this purely frontend capture; no guest controller state changes. */
 static void app_window_release_mouse_capture(void)
 {
-    if (!app_window_mouse_captured) return;
-    ClipCursor(NULL);
-    ReleaseCapture();
-    app_window_host_cursor_hidden = 0;
-    SetCursor(LoadCursorA(NULL, IDC_ARROW));
-    app_window_mouse_captured = 0;
-    app_window_mouse_valid = 0;
+    win32_presentation_mouse_release(&app_window_mouse_state);
 }
 
 static void app_window_capture_mouse(HWND window, LPARAM position)
 {
-    RECT client;
-    POINT upper_left;
-    POINT lower_right;
-
     if (window == NULL || !app_window_guest_running()) return;
-    SetFocus(window);
-    SetCapture(window);
-    GetClientRect(window, &client);
-    upper_left.x = client.left;
-    upper_left.y = client.top;
-    lower_right.x = client.right;
-    lower_right.y = client.bottom;
-    if (ClientToScreen(window, &upper_left) &&
-        ClientToScreen(window, &lower_right)) {
-        RECT bounds;
-        bounds.left = upper_left.x;
-        bounds.top = upper_left.y;
-        bounds.right = lower_right.x;
-        bounds.bottom = lower_right.y;
-        (void)ClipCursor(&bounds);
-    }
-    app_window_mouse_x = (int)(short)LOWORD(position);
-    app_window_mouse_y = (int)(short)HIWORD(position);
-    app_window_mouse_valid = 1;
-    app_window_mouse_captured = 1;
+    (void)win32_presentation_mouse_capture(&app_window_mouse_state, window,
+        position);
     /* The guest owns the visible pointer after an explicit click.  Returning
        NULL from WM_SETCURSOR keeps the desktop arrow out of the guest DIB
        without changing any SoftPC device or guest cursor state. */
-    app_window_host_cursor_hidden = 1;
     SetCursor(NULL);
 }
 
@@ -689,8 +572,8 @@ static LRESULT CALLBACK app_window_proc(HWND window, UINT message,
                    Keep the final frame visible, release the host mouse, and
                    release the Ctrl/Alt makes which led to this host chord. */
                 app_window_release_mouse_capture();
-                (void)app_win32_keyboard_release_ctrl_alt(NULL,
-                    app_window_keyboard_sink);
+                (void)win32_presentation_keyboard_release_ctrl_alt(app_window_runtime,
+                    app_keyboard_enqueue_win32_event);
                 (void)app_runtime_pause(app_window_runtime);
             } else if (app_runtime_get_state(app_window_runtime) ==
                 SOFTPC_RUNTIME_PAUSED) {
@@ -700,20 +583,20 @@ static LRESULT CALLBACK app_window_proc(HWND window, UINT message,
             app_window_suppressed_hotkey = wparam;
         } else if (wparam == 'D' && GetKeyState(VK_CONTROL) < 0 &&
             GetKeyState(VK_MENU) < 0) {
-            (void)app_win32_keyboard_release_ctrl_alt(NULL,
-                app_window_keyboard_sink);
-            (void)app_win32_keyboard_submit_ctrl_alt_del(NULL,
-                app_window_keyboard_sink);
+            (void)win32_presentation_keyboard_release_ctrl_alt(app_window_runtime,
+                app_keyboard_enqueue_win32_event);
+            (void)win32_presentation_keyboard_submit_ctrl_alt_del(app_window_runtime,
+                app_keyboard_enqueue_win32_event);
             app_window_suppressed_hotkey = wparam;
         } else if (wparam == 'F' && GetKeyState(VK_CONTROL) < 0 &&
             GetKeyState(VK_MENU) < 0) {
-            (void)app_win32_keyboard_submit_alt_enter(NULL,
-                app_window_keyboard_sink);
+            (void)win32_presentation_keyboard_submit_alt_enter(app_window_runtime,
+                app_keyboard_enqueue_win32_event);
             app_window_suppressed_hotkey = wparam;
         } else if (wparam == 'M' && GetKeyState(VK_CONTROL) < 0 &&
             GetKeyState(VK_MENU) < 0) {
-            (void)app_win32_keyboard_release_ctrl_alt(NULL,
-                app_window_keyboard_sink);
+            (void)win32_presentation_keyboard_release_ctrl_alt(app_window_runtime,
+                app_keyboard_enqueue_win32_event);
             app_window_release_mouse_capture();
             app_window_suppressed_hotkey = wparam;
         } else if (app_window_guest_running())
@@ -734,18 +617,20 @@ static LRESULT CALLBACK app_window_proc(HWND window, UINT message,
            physical key's duplicate character. */
         if (app_window_guest_running() &&
             ((uint32_t)lparam >> 16u & 0xffu) == 0u &&
-            !app_win32_keyboard_consume_duplicate_character(
+            !win32_presentation_keyboard_consume_duplicate_character(
                 &app_window_keyboard_normalizer, (WORD)wparam))
-            (void)app_win32_keyboard_submit_utf16(
-                &app_window_keyboard_normalizer, NULL,
-                app_window_keyboard_sink, (WORD)wparam);
+            (void)win32_presentation_keyboard_submit_utf16(
+                &app_window_keyboard_normalizer, app_window_runtime,
+                app_keyboard_enqueue_win32_event, (WORD)wparam);
         return 0;
     case WM_MOUSEMOVE:
-        if (app_window_guest_running() && app_window_mouse_captured)
+        if (app_window_guest_running() &&
+            win32_presentation_mouse_captured(&app_window_mouse_state))
             app_window_mouse(lparam);
         return 0;
     case WM_SETCURSOR:
-        if (app_window_host_cursor_hidden && LOWORD(lparam) == HTCLIENT) {
+        if (win32_presentation_mouse_hides_host_cursor(
+                &app_window_mouse_state) && LOWORD(lparam) == HTCLIENT) {
             SetCursor(NULL);
             return TRUE;
         }
@@ -759,7 +644,8 @@ static LRESULT CALLBACK app_window_proc(HWND window, UINT message,
     case WM_LBUTTONUP:
         if (!app_window_guest_running()) return 0;
         app_window_left_button = 0;
-        if (app_window_mouse_captured) app_window_mouse(lparam);
+        if (win32_presentation_mouse_captured(&app_window_mouse_state))
+            app_window_mouse(lparam);
         return 0;
     case WM_RBUTTONDOWN:
         if (!app_window_guest_running()) return 0;
@@ -770,7 +656,8 @@ static LRESULT CALLBACK app_window_proc(HWND window, UINT message,
     case WM_RBUTTONUP:
         if (!app_window_guest_running()) return 0;
         app_window_right_button = 0;
-        if (app_window_mouse_captured) app_window_mouse(lparam);
+        if (win32_presentation_mouse_captured(&app_window_mouse_state))
+            app_window_mouse(lparam);
         return 0;
     case WM_KILLFOCUS:
         app_window_release_mouse_capture();
@@ -823,10 +710,8 @@ static int app_vm_run_window_mode(app_runtime *runtime,
     app_window_displayed_sequence = 0u;
     ZeroMemory(&app_window_keyboard_normalizer,
         sizeof(app_window_keyboard_normalizer));
-    app_window_mouse_valid = 0;
     app_window_left_button = app_window_right_button = 0;
-    app_window_mouse_captured = 0;
-    app_window_host_cursor_hidden = 0;
+    win32_presentation_mouse_reset(&app_window_mouse_state);
     app_window_surface_width = 0u;
     app_window_surface_height = 0u;
     app_window_client_width = 0;

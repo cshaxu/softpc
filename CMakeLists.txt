@@ -36,6 +36,19 @@ add_library(softpc-machine
 target_include_directories(softpc-machine PUBLIC src/host)
 target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 
+# This is a source-synchronised local component, not a cross-repository
+# dependency.  Project bindings retain all machine, lifecycle and hotkey
+# decisions; the library handles copied-value Win32 presentation mechanics.
+add_library(win32-presentation STATIC
+    src/lib/platform/win32/input.c
+    src/lib/platform/win32/geometry.c
+    src/lib/platform/win32/mouse.c)
+target_include_directories(win32-presentation PUBLIC
+    src/lib/platform/win32)
+if(WIN32)
+    target_link_libraries(win32-presentation PUBLIC user32)
+endif()
+
 # The original CCPU manifest is the executable x86 core.  It deliberately
 # links no NTVDM host, DOS/WOW component or Win32 presentation provider.
 # A narrow original-ROM BIOS Operation table is machine-resident and only
@@ -484,6 +497,7 @@ add_executable(softpcvm
     src/app/window.c
     src/app/firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
+target_link_libraries(softpcvm PRIVATE win32-presentation)
 if(WIN32)
     target_link_libraries(softpcvm PRIVATE user32 gdi32)
 endif()
@@ -615,7 +629,8 @@ add_executable(softpc-runtime-smoke
     src/app/keyboard.c
     src/app/prompt_trace.c)
 target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine)
-target_include_directories(softpc-runtime-smoke PRIVATE src/app)
+target_include_directories(softpc-runtime-smoke PRIVATE
+    src/app src/lib/platform/win32)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
 set_tests_properties(softpc-runtime-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
@@ -627,7 +642,7 @@ add_executable(softpc-runtime-input-continuation-smoke
 target_link_libraries(softpc-runtime-input-continuation-smoke PRIVATE
     softpc-machine)
 target_include_directories(softpc-runtime-input-continuation-smoke PRIVATE
-    src/app test/support)
+    src/app src/lib/platform/win32 test/support)
 add_test(NAME softpc-runtime-input-continuation-smoke
     COMMAND softpc-runtime-input-continuation-smoke)
 set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
@@ -639,6 +654,7 @@ add_executable(softpc-win32-window-smoke
     src/app/prompt_trace.c
     src/app/window.c)
 target_link_libraries(softpc-win32-window-smoke PRIVATE softpc-machine)
+target_link_libraries(softpc-win32-window-smoke PRIVATE win32-presentation)
 target_compile_definitions(softpc-win32-window-smoke PRIVATE
     SOFTPC_WINDOW_TESTING=1)
 if(WIN32)
@@ -649,12 +665,19 @@ add_test(NAME softpc-win32-window-smoke COMMAND softpc-win32-window-smoke)
 set_tests_properties(softpc-win32-window-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-win32-keyboard-smoke
-    test/unit/win32_keyboard_smoke.c
-    src/app/keyboard.c)
-target_link_libraries(softpc-win32-keyboard-smoke PRIVATE softpc-machine)
-target_include_directories(softpc-win32-keyboard-smoke PRIVATE src/app)
+    test/unit/win32_keyboard_smoke.c)
+target_link_libraries(softpc-win32-keyboard-smoke PRIVATE
+    softpc-machine win32-presentation)
 add_test(NAME softpc-win32-keyboard-smoke COMMAND softpc-win32-keyboard-smoke)
 set_tests_properties(softpc-win32-keyboard-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-win32-presentation-smoke
+    test/unit/win32_presentation_smoke.c)
+target_link_libraries(softpc-win32-presentation-smoke PRIVATE
+    win32-presentation)
+add_test(NAME softpc-win32-presentation-smoke
+    COMMAND softpc-win32-presentation-smoke)
+set_tests_properties(softpc-win32-presentation-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
@@ -662,6 +685,9 @@ add_test(NAME softpc-standalone-source-boundary
 add_test(NAME softpc-documentation-governance
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tools/Verify-DocumentationGovernance.cmake")
+add_test(NAME softpc-win32-presentation-manifest
+    COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
+        "${CMAKE_SOURCE_DIR}/test/support/win32_presentation_manifest.cmake")
 
 # Smoke tests intentionally use assert() for both the operation and its
 # postcondition.  Keep those checks live even when validating an optimized
@@ -684,7 +710,8 @@ set(SOFTPC_TEST_TARGETS
     softpc-runtime-smoke
     softpc-runtime-input-continuation-smoke
     softpc-win32-window-smoke
-    softpc-win32-keyboard-smoke)
+    softpc-win32-keyboard-smoke
+    softpc-win32-presentation-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
     # Keep every executable test self-contained, just like the launcher.

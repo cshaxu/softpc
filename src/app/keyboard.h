@@ -1,50 +1,14 @@
-#ifndef SOFTPC_VM_WIN32_KEYBOARD_H
-#define SOFTPC_VM_WIN32_KEYBOARD_H
+#ifndef APP_KEYBOARD_H
+#define APP_KEYBOARD_H
 
-#include <stdint.h>
+#include "../lib/platform/win32/input.h"
 
 #ifdef _WIN32
-#include <windows.h>
-
-typedef int (*app_win32_keyboard_sink)(void *context, uint8_t key_number,
-    uint8_t released);
-
-typedef struct app_win32_keyboard_normalizer {
-    WORD pending_high_surrogate;
-    WORD recovered_virtual_key;
-    WORD suppressed_virtual_key;
-} app_win32_keyboard_normalizer;
-
-/* These functions only normalize host packets.  The original nt_keycd table
-   still assigns SoftPC key numbers; the runtime remains the sole input queue
-   owner and the original 8042 remains the guest controller owner. */
-int app_win32_keyboard_submit_transition(void *context,
-    app_win32_keyboard_sink sink, WORD scan, WORD virtual_key,
-    DWORD control_state, int pressed);
-int app_win32_keyboard_submit_utf16(app_win32_keyboard_normalizer *state,
-    void *context, app_win32_keyboard_sink sink, WORD code_unit);
-/* Inject the standard physical Ctrl+Alt+Del make/break sequence through the
-   same nt_keycd/8042 path as ordinary host keyboard packets. */
-int app_win32_keyboard_submit_ctrl_alt_del(void *context,
-    app_win32_keyboard_sink sink);
-/* Reserved host Ctrl+Alt chords have already delivered their modifier makes
-   by the time the chord key is seen.  Release those guest modifiers before
-   pausing or substituting another guest chord; otherwise a frontend that
-   stops reading input loses the host key-up records and leaves the guest
-   keyboard logically wedged. */
-int app_win32_keyboard_release_ctrl_alt(void *context,
-    app_win32_keyboard_sink sink);
-/* Inject Alt+Enter as four ordinary physical transitions through the same
-   nt_keycd/8042 path, after neutralizing the host Ctrl+Alt chord that invoked
-   it. This is guest input, never a host window command. */
-int app_win32_keyboard_submit_alt_enter(void *context,
-    app_win32_keyboard_sink sink);
-void app_win32_keyboard_note_recovered_key(
-    app_win32_keyboard_normalizer *state, WORD virtual_key);
-void app_win32_keyboard_release_recovered_key(
-    app_win32_keyboard_normalizer *state, WORD virtual_key);
-int app_win32_keyboard_consume_duplicate_character(
-    app_win32_keyboard_normalizer *state, WORD code_unit);
+/* SoftPC's thin binding of normalized Win32 input.  The shared component
+ * owns host packet recovery; this adapter alone invokes the original nt_keycd
+ * table and queues its resulting SoftPC key number. */
+int app_keyboard_enqueue_win32_event(void *context,
+    const KEY_EVENT_RECORD *event);
 #endif
 
 #endif
