@@ -497,12 +497,10 @@ target_compile_definitions(softpc-machine PRIVATE
 
 add_executable(softpcvm
     src/app/main.c
-    src/app/console.c
     src/app/runtime.c
     src/app/keyboard.c
     src/app/presentation.c
     src/app/prompt_trace.c
-    src/app/window.c
     src/app/firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
 target_link_libraries(softpcvm PRIVATE win32-presentation)
@@ -661,8 +659,7 @@ add_executable(softpc-win32-window-smoke
     src/app/runtime.c
     src/app/keyboard.c
     src/app/prompt_trace.c
-    src/app/presentation.c
-    src/app/window.c)
+    src/app/presentation.c)
 target_link_libraries(softpc-win32-window-smoke PRIVATE softpc-machine)
 target_link_libraries(softpc-win32-window-smoke PRIVATE win32-presentation)
 target_compile_definitions(softpc-win32-window-smoke PRIVATE

@@ -49,6 +49,10 @@ int win32_presentation_binding_valid(
     const win32_presentation_binding *binding);
 
 #ifdef _WIN32
+/* Dispatch is intentionally generic: only the router selects a presenter.
+ * A binding never contains an app-owned console/window selection loop. */
+win32_presentation_run_result win32_presentation_run(
+    const win32_presentation_binding *binding);
 win32_presentation_run_result win32_presentation_run_console(
     const win32_presentation_binding *binding);
 win32_presentation_run_result win32_presentation_run_window(

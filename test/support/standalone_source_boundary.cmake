@@ -58,9 +58,7 @@ foreach(app_source IN ITEMS
     "src/app/main.c"
     "src/app/runtime.c"
     "src/app/presentation.c"
-    "src/app/console.c"
-    "src/app/keyboard.c"
-    "src/app/window.c")
+    "src/app/keyboard.c")
     if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/${app_source}")
         message(FATAL_ERROR "Standalone application source is missing: ${app_source}")
     endif()
@@ -78,6 +76,27 @@ foreach(source IN LISTS shared_win32_sources)
         message(FATAL_ERROR "Shared Win32 presentation leaks project ownership: ${source}")
     endif()
 endforeach()
+
+# A product binding may select the generic policy from its configuration, but
+# may not re-create a target-to-presenter switch.  That common dispatcher is
+# part of the synchronized Win32 component.
+file(READ "${SOFTPC_SOURCE_DIR}/src/app/main.c" app_main_source)
+file(READ "${SOFTPC_SOURCE_DIR}/src/app/presentation.c" app_presentation_source)
+if(app_main_source MATCHES "WIN32_PRESENTATION_TARGET|run_(window|console)")
+    message(FATAL_ERROR "Application retains presentation-target dispatch")
+endif()
+if(app_presentation_source MATCHES "WIN32_PRESENTATION_TARGET|run_(window|console)")
+    message(FATAL_ERROR "Product binding retains presentation-target dispatch")
+endif()
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/platform/win32/presenter.c"
+    shared_presenter_source)
+string(FIND "${shared_presenter_source}" "win32_presentation_run_window"
+    shared_window_dispatch)
+string(FIND "${shared_presenter_source}" "win32_presentation_run_console"
+    shared_console_dispatch)
+if(shared_window_dispatch EQUAL -1 OR shared_console_dispatch EQUAL -1)
+    message(FATAL_ERROR "Shared Win32 component lacks generic presentation dispatcher")
+endif()
 
 file(STRINGS "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/c-files"
     ccpu_source_names)
@@ -202,13 +221,13 @@ endif()
 
 # Presentation is deliberately a DIB consumer.  Controller planes and DAC
 # interpretation stay in the original nt_cga/nt_ega/nt_vga renderer path.
-file(READ "${SOFTPC_SOURCE_DIR}/src/app/window.c" window_frontend)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/platform/win32/window.c" window_frontend)
 string(TOLOWER "${window_frontend}" normalized_window_frontend)
 if(normalized_window_frontend MATCHES "ega_planes|\\bdac\\b")
     message(FATAL_ERROR "Standalone window bypasses the original SoftPC renderer")
 endif()
 
-file(READ "${SOFTPC_SOURCE_DIR}/src/app/console.c" console_frontend)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/platform/win32/console.c" console_frontend)
 string(TOLOWER "${window_frontend}${console_frontend}" normalized_frontends)
 if(normalized_frontends MATCHES "host_key_(down|up)|mouse_send")
     message(FATAL_ERROR "Standalone frontend bypasses original SoftPC input controllers")

@@ -49,6 +49,7 @@ The names may evolve, but the ownership and behavior are mandatory.
 | `window` | Window class, message pump, copied-frame painting, cursor overlay/blink, DIB conversion/dirty invalidation, geometry, input, and action dispatch. | Title, initial configuration, generic event/action callbacks, and a non-machine running query for host cursor blinking. |
 | `console` | Private-console lifetime, copied-frame text painting, generic keyboard/RDP/mouse input, registered actions, and event/message waits. | Product title/help strings, generic event/action callbacks, and frame publication. |
 | `router` | `WINDOW` always presents in a window; `CONSOLE` presents text in console, graphics in window, then returns after the defined stable-text threshold. | Maps product configuration syntax to `WINDOW` or `CONSOLE`. |
+| `presenter` dispatcher | Invokes the selected reusable console/window presenter and repeats only for the generic router's switch results. | Supplies one binding and a selected generic policy; it never branches on presentation target. |
 
 The public binding boundary emits generic events, not `KEY_EVENT_RECORD`.
 `KEY_EVENT_RECORD` is permitted only inside the Win32 collection layer. RDP
@@ -80,8 +81,9 @@ Win32 event loop.
 4. Move the text/DIB rendering, Win32 window lifecycle/message pump, console
    lifecycle/message pump, and their common wait behavior into library
    presenters driven only by the mailbox and binding callbacks.
-5. Move the existing text/graphics/text transition into the generic router;
-   delete SoftPC-specific `auto_switch` and presentation-choice branches.
+5. Move the existing text/graphics/text transition into the generic router and
+   its generic dispatcher; delete SoftPC-specific `auto_switch`,
+   presentation-choice, and presenter-selection branches.
 6. Prove, on x64 and x86, generic ABI tests plus the current SoftPC boot,
    text, graphics, resize, RDP typing, mouse capture/release, hotkey,
    pause/resume, and console/window transition tests. The source-boundary

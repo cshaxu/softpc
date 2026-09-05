@@ -1,5 +1,5 @@
 #include "runtime.h"
-#include "window.h"
+#include "presentation.h"
 #include "geometry.h"
 #include "test_cleanup.h"
 
@@ -11,7 +11,6 @@
 
 typedef struct app_window_smoke_context {
     app_runtime *runtime;
-    win32_presentation_router router;
     int result;
 } app_window_smoke_context;
 
@@ -19,7 +18,8 @@ static DWORD WINAPI app_window_smoke_run(void *opaque)
 {
     app_window_smoke_context *context =
         (app_window_smoke_context *)opaque;
-    context->result = app_vm_run_window(context->runtime, &context->router);
+    context->result = app_presentation_run(context->runtime,
+        SOFTPC_PRESENTATION_WINDOW);
     return 0u;
 }
 
@@ -52,7 +52,7 @@ int main(void)
         SOFTPC_PRESENTATION_WINDOW };
     softpc_machine *machine = NULL;
     app_runtime *runtime = NULL;
-    app_window_smoke_context context = { NULL, { 0 },
+    app_window_smoke_context context = { NULL,
         SOFTPC_VM_FRONTEND_ERROR };
     HANDLE thread;
     HWND window = NULL;
@@ -89,8 +89,6 @@ int main(void)
     assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
     assert(fclose(file) == 0);
 
-    win32_presentation_router_init(&context.router,
-        WIN32_PRESENTATION_DISPLAY_WINDOW);
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(app_runtime_create(machine, &runtime));
     assert(app_runtime_start(runtime));

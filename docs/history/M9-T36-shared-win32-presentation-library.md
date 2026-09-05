@@ -10,6 +10,11 @@ machine frame, maps generic events to the original key/InPort entry points,
 registers Ctrl+Alt P/D/F/M, supplies product titles, and decides pause/close
 lifecycle effects.
 
+The reopened completion audit also moved the final router-to-presenter
+dispatcher into `win32_presentation_run()`. SoftPC now supplies only a generic
+display policy and binding; it has no target-selection loop and no app-local
+console/window presenter source.
+
 `WINDOW` remains window-only. `CONSOLE` uses the common router to present text
 in the console, graphics in a window, and stable text return in a fresh
 console. The reusable library names no `app_runtime`, `softpc_machine`,
@@ -19,6 +24,8 @@ console. The reusable library names no `app_runtime`, `softpc_machine`,
 
 - Moved the former window loop with `git mv` into the shared component and
   extracted the console loop there.
+- Moved the final target-to-presenter dispatch into the shared presenter and
+  removed the obsolete app console/window wrappers.
 - Added opaque mailbox/event queue, generic host events, action registry,
   binding ABI, and complete console/window presenter loops.
 - Made package smoke accept the user-supported fixed hard-disk-only layout;

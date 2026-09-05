@@ -1,7 +1,6 @@
-#include "console.h"
+#include "presentation.h"
 #include "runtime.h"
 #include "machine.h"
-#include "window.h"
 #include "prompt_trace.h"
 
 #include <windows.h>
@@ -180,25 +179,9 @@ static void app_monitor_help(void)
 static int app_monitor_run_frontend(app_runtime *runtime,
     softpc_presentation presentation, app_monitor_state *state)
 {
-    win32_presentation_router router;
     int frontend_result;
 
-    win32_presentation_router_init(&router,
-        presentation == SOFTPC_PRESENTATION_WINDOW ?
-        WIN32_PRESENTATION_DISPLAY_WINDOW : WIN32_PRESENTATION_DISPLAY_CONSOLE);
-
-    for (;;) {
-        frontend_result = win32_presentation_router_target(&router) ==
-            WIN32_PRESENTATION_TARGET_WINDOW ? app_vm_run_window(runtime,
-                &router) : app_vm_run_console(runtime, &router);
-        if (frontend_result == SOFTPC_VM_FRONTEND_SWITCH_WINDOW) {
-            continue;
-        }
-        if (frontend_result == SOFTPC_VM_FRONTEND_SWITCH_CONSOLE) {
-            continue;
-        }
-        break;
-    }
+    frontend_result = app_presentation_run(runtime, presentation);
     if (frontend_result == SOFTPC_VM_FRONTEND_ERROR) return 0;
     *state = frontend_result == SOFTPC_VM_FRONTEND_PAUSED ?
         SOFTPC_MONITOR_PAUSED : SOFTPC_MONITOR_STOPPED;

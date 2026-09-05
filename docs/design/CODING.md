@@ -15,7 +15,7 @@ src/
     synchronized copied-frame mailbox, input/action queues, and Win32
     console/window presentation mechanics
   app/
-    main.c, runtime.c, console.c, keyboard.c, window.c, firmware.rc
+    main.c, runtime.c, presentation.c, keyboard.c, firmware.rc
 ```
 
 Directories appear only in their admitted migration task.

@@ -2,7 +2,6 @@
 
 #ifdef _WIN32
 #include "keyboard.h"
-#include "window.h"
 
 #include <string.h>
 
@@ -100,14 +99,25 @@ int app_presentation_result(win32_presentation_run_result result)
     switch (result) {
     case WIN32_PRESENTATION_RUN_PAUSED_RESULT:
         return SOFTPC_VM_FRONTEND_PAUSED;
-    case WIN32_PRESENTATION_RUN_SWITCH_WINDOW:
-        return SOFTPC_VM_FRONTEND_SWITCH_WINDOW;
-    case WIN32_PRESENTATION_RUN_SWITCH_CONSOLE:
-        return SOFTPC_VM_FRONTEND_SWITCH_CONSOLE;
     case WIN32_PRESENTATION_RUN_STOPPED_RESULT:
         return SOFTPC_VM_FRONTEND_STOPPED;
     default:
         return SOFTPC_VM_FRONTEND_ERROR;
     }
+}
+
+int app_presentation_run(app_runtime *runtime,
+    softpc_presentation presentation)
+{
+    win32_presentation_router router;
+    win32_presentation_action_registry actions;
+    win32_presentation_binding binding;
+
+    win32_presentation_router_init(&router,
+        presentation == SOFTPC_PRESENTATION_WINDOW ?
+        WIN32_PRESENTATION_DISPLAY_WINDOW : WIN32_PRESENTATION_DISPLAY_CONSOLE);
+    if (!app_presentation_binding(runtime, &router, &actions, &binding))
+        return SOFTPC_VM_FRONTEND_ERROR;
+    return app_presentation_result(win32_presentation_run(&binding));
 }
 #endif

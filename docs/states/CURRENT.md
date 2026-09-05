@@ -5,8 +5,8 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | M9 T36 closed |
-| Admission And Approval | Owner reopened T36 because its first-stage extraction did not meet the proposal's UI exit conditions; the complete migration is now closed. |
-| Objective | Completed reusable Win32 presentation component in `src/lib/platform/win32/`: host-action registration, copied-frame mailbox/event, reusable window and console presentation mechanics, and its common `WINDOW`/`CONSOLE` display-routing policy; `src/app` is a product binding. |
+| Admission And Approval | Owner reopened T36 because its first-stage extraction did not meet the proposal's UI exit conditions. Completion audit then found and removed the remaining app-local router-to-presenter dispatcher. |
+| Objective | Completed reusable Win32 presentation component in `src/lib/platform/win32/`: host-action registration, copied-frame mailbox/event, window and console presentation mechanics, and its common `WINDOW`/`CONSOLE` router plus dispatcher; `src/app` is a product binding. |
 | Non-goals | No change to `src/mvdm/softpc.new`, machine/device/BOP/ROM/media behavior, user-owned `softpc.ini`, or a product's lifecycle and hotkey policy. |
 | Baseline | T36 first-stage source is committed at `6d907e7`; it supplies frame ABI, input normalization, geometry, and capture only. |
 | Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT/NXVM/NTVDM64 are read-only comparison material. |
@@ -15,7 +15,7 @@
 | Requirement Ledger | Lib must contain no machine/runtime pointer or guest protocol. Bindings supply copied frames and map normalized actions/input to their product queues. Lib owns the common `WINDOW` fixed-window policy and `CONSOLE` text-to-console/graphics-to-window/stable-text-to-console policy. |
 | Focused Verification | New library-level action/mailbox/window/console tests; existing runtime/window/keyboard/package tests; full GCC x64 and x86 CTest. |
 | Stop Conditions | Stop if an extraction needs recovered-machine modification or causes the library to decide a product lifecycle policy. |
-| Exit Criteria | Met: both window and console run through lib-owned presentation loops; a product registers its own shortcut table and action sink; lib owns a generic latest-frame mailbox/wake event and common display router; `WINDOW` remains window-only while `CONSOLE` automatically switches text/graphics/text presenters; original-machine files remain unchanged; dual-width tests and packages pass. |
+| Exit Criteria | Met: both window and console run through lib-owned presentation loops and a lib-owned generic dispatcher; a product registers its own shortcut table and action sink; lib owns a generic latest-frame mailbox/wake event and common display router; `WINDOW` remains window-only while `CONSOLE` automatically switches text/graphics/text presenters; original-machine files remain unchanged; dual-width tests and packages pass. |
 | Original Owner Request | “很好 准入 请你执行” |
 
 ## Current Technical Baseline
@@ -73,10 +73,10 @@
   `src/lib/platform/win32/`; it is reopened because mailbox/event ownership,
   reusable window/console loops, and registered product actions remain in
   `src/app`.
-- M9 T36 closed after completing that extraction: lib now owns the mailbox,
-  generic queue/actions, complete console/window loops, and shared display
-  router; GCC x64/x86 full CTest each passed 23/23 and no recovered-machine
-  file changed. See [T36 history](../history/M9-T36-shared-win32-presentation-library.md).
+- M9 T36 closed after its completion audit moved the final router-to-presenter
+  dispatcher from app to lib and removed app-local console/window wrappers.
+  GCC x64/x86 full CTest each passed 23/23; the new source boundary check
+  forbids the app from recovering target dispatch. See [T36 history](../history/M9-T36-shared-win32-presentation-library.md).
 - M8 Td S1 established the NXVM-style authority topology, linked the four
   applicable shared governance skills, and added the documentation gate.
 - M8 Td S2 established the public product identity as Insignia SoftPC and
