@@ -1,5 +1,6 @@
 #include "runtime.h"
 #include "window.h"
+#include "geometry.h"
 #include "test_cleanup.h"
 
 #include <assert.h>
@@ -8,10 +9,9 @@
 #ifdef _WIN32
 #include <windows.h>
 
-extern uint32_t app_window_test_dib_pixel(COLORREF colour);
-
 typedef struct app_window_smoke_context {
     app_runtime *runtime;
+    win32_presentation_router router;
     int result;
 } app_window_smoke_context;
 
@@ -19,7 +19,7 @@ static DWORD WINAPI app_window_smoke_run(void *opaque)
 {
     app_window_smoke_context *context =
         (app_window_smoke_context *)opaque;
-    context->result = app_vm_run_window(context->runtime);
+    context->result = app_vm_run_window(context->runtime, &context->router);
     return 0u;
 }
 
@@ -36,7 +36,7 @@ static int app_window_wait_for_runtime(app_runtime *runtime,
 
 static HWND app_window_smoke_find(void)
 {
-    HWND window = FindWindowA("SoftPCStandaloneWindow", NULL);
+    HWND window = FindWindowA("Win32PresentationWindow", NULL);
     DWORD process_id = 0u;
     if (window == NULL) return NULL;
     (void)GetWindowThreadProcessId(window, &process_id);
@@ -52,7 +52,8 @@ int main(void)
         SOFTPC_PRESENTATION_WINDOW };
     softpc_machine *machine = NULL;
     app_runtime *runtime = NULL;
-    app_window_smoke_context context = { NULL, SOFTPC_VM_FRONTEND_ERROR };
+    app_window_smoke_context context = { NULL, { 0 },
+        SOFTPC_VM_FRONTEND_ERROR };
     HANDLE thread;
     HWND window = NULL;
     DWORD deadline;
@@ -76,8 +77,8 @@ int main(void)
     /* COLORREF is 0x00bbggrr while a 32-bit BI_RGB DIB stores a DWORD as
        0x00rrggbb.  Blue Setup text backgrounds previously reached this DIB
        with the COLORREF packing unchanged and therefore painted red. */
-    assert(app_window_test_dib_pixel(RGB(0, 0, 168)) == 0x000000a8u);
-    assert(app_window_test_dib_pixel(RGB(168, 0, 0)) == 0x00a80000u);
+    assert(win32_presentation_dib_pixel(RGB(0, 0, 168)) == 0x000000a8u);
+    assert(win32_presentation_dib_pixel(RGB(168, 0, 0)) == 0x00a80000u);
 
     options.media_mode = SOFTPC_MEDIA_OVERLAY;
     memcpy(sector, program, sizeof(program));
@@ -88,6 +89,8 @@ int main(void)
     assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
     assert(fclose(file) == 0);
 
+    win32_presentation_router_init(&context.router,
+        WIN32_PRESENTATION_DISPLAY_WINDOW);
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(app_runtime_create(machine, &runtime));
     assert(app_runtime_start(runtime));

@@ -12,7 +12,8 @@ src/
     ordinary host C/H files
     compat/{ccpu,cvidc,...}/
   lib/platform/win32/
-    synchronized copied-frame and Win32 presentation mechanics
+    synchronized copied-frame mailbox, input/action queues, and Win32
+    console/window presentation mechanics
   app/
     main.c, runtime.c, console.c, keyboard.c, window.c, firmware.rc
 ```
@@ -29,10 +30,12 @@ library, and other compiler intermediate files are forbidden. If used,
 `overlay/mvdm/softpc.new` contains only repository-owned mirrored patches
 necessary to compile the baseline on x86/x64; generated forms remain in
 ignored `build/`. `host` owns platform capability implementations; `app` owns
-orchestration, mailboxes, and user interaction/presentation.
-`lib/platform/win32` owns copied-value Win32 mechanics only: it never owns a
-project runtime, machine, renderer, guest-input mapping, lifecycle, or hotkey
-policy.
+orchestration, machine snapshot production, guest-input conversion, monitor
+UI, and product lifecycle policy. `lib/platform/win32` owns copied-value
+Win32 presentation: mailbox/event queues, input normalization, action
+registration, console/window loops, routing, geometry, and capture. It never
+owns a project runtime, machine, renderer, guest-input mapping, lifecycle, or
+hotkey meaning.
 
 ## Build Output Layout
 

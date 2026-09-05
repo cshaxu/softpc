@@ -14,22 +14,22 @@ static WORD win32_presentation_keyboard_resolve_scan(WORD virtual_key)
 }
 
 static int win32_presentation_keyboard_emit(void *context,
-    win32_presentation_key_sink sink, WORD scan, WORD virtual_key,
+    win32_presentation_event_sink sink, WORD scan, WORD virtual_key,
     DWORD control_state, int pressed)
 {
-    KEY_EVENT_RECORD event;
+    win32_presentation_event event;
     if (sink == NULL || virtual_key == 0u || scan == 0u) return 0;
     ZeroMemory(&event, sizeof(event));
-    event.bKeyDown = pressed != 0;
-    event.wVirtualKeyCode = virtual_key;
-    event.wVirtualScanCode = (WORD)(scan & 0xffu);
-    event.dwControlKeyState = control_state;
-    if ((scan & 0x0100u) != 0u) event.dwControlKeyState |= ENHANCED_KEY;
+    event.type = WIN32_PRESENTATION_EVENT_KEY;
+    event.data.key.pressed = pressed != 0;
+    event.data.key.virtual_key = virtual_key;
+    event.data.key.scan_code = scan;
+    event.data.key.modifiers = control_state;
     return sink(context, &event);
 }
 
 int win32_presentation_keyboard_submit_transition(void *context,
-    win32_presentation_key_sink sink, WORD scan, WORD virtual_key,
+    win32_presentation_event_sink sink, WORD scan, WORD virtual_key,
     DWORD control_state, int pressed)
 {
     if (scan == 0u) scan = win32_presentation_keyboard_resolve_scan(virtual_key);
@@ -38,7 +38,7 @@ int win32_presentation_keyboard_submit_transition(void *context,
 }
 
 int win32_presentation_keyboard_submit_ctrl_alt_del(void *context,
-    win32_presentation_key_sink sink)
+    win32_presentation_event_sink sink)
 {
     /* Del is an extended Set-1 key.  Do not treat this as a monitor command:
        the guest BIOS/OS observes the same six transitions as physical PC
@@ -52,7 +52,7 @@ int win32_presentation_keyboard_submit_ctrl_alt_del(void *context,
 }
 
 int win32_presentation_keyboard_release_ctrl_alt(void *context,
-    win32_presentation_key_sink sink)
+    win32_presentation_event_sink sink)
 {
     /* The host shortcut's Ctrl/Alt makes have already travelled through the
        ordinary path.  `host_key_up` deliberately ignores a later duplicate
@@ -63,7 +63,7 @@ int win32_presentation_keyboard_release_ctrl_alt(void *context,
 }
 
 int win32_presentation_keyboard_submit_alt_enter(void *context,
-    win32_presentation_key_sink sink)
+    win32_presentation_event_sink sink)
 {
     /* Ctrl+Alt+F is a host chord, not guest Ctrl+Alt+Enter.  First clear the
        already-forwarded host modifiers, then generate a fresh physical guest
@@ -106,7 +106,7 @@ int win32_presentation_keyboard_consume_duplicate_character(
 }
 
 static int win32_presentation_keyboard_submit_character(void *context,
-    win32_presentation_key_sink sink, uint32_t scalar)
+    win32_presentation_event_sink sink, uint32_t scalar)
 {
     SHORT mapped;
     WORD virtual_key;
@@ -116,7 +116,13 @@ static int win32_presentation_keyboard_submit_character(void *context,
     if (scalar == 0u || scalar > 0xffffu ||
         (scalar >= 0xd800u && scalar <= 0xdfffu)) return 0;
     mapped = VkKeyScanExW((WCHAR)scalar, GetKeyboardLayout(0u));
-    if (mapped == -1) return 0;
+    if (mapped == -1) {
+        win32_presentation_event event;
+        ZeroMemory(&event, sizeof(event));
+        event.type = WIN32_PRESENTATION_EVENT_TEXT;
+        event.data.text.scalar = scalar;
+        return sink != NULL && sink(context, &event);
+    }
     virtual_key = (WORD)(mapped & 0xffu);
     scan = win32_presentation_keyboard_resolve_scan(virtual_key);
     if (scan == 0u) return 0;
@@ -140,7 +146,7 @@ static int win32_presentation_keyboard_submit_character(void *context,
 }
 
 int win32_presentation_keyboard_submit_utf16(win32_presentation_keyboard_normalizer *state,
-    void *context, win32_presentation_key_sink sink, WORD code_unit)
+    void *context, win32_presentation_event_sink sink, WORD code_unit)
 {
     uint32_t scalar;
 

@@ -1,5 +1,8 @@
 #include "runtime.h"
+#include "keyboard.h"
 #include "prompt_trace.h"
+#include "../lib/platform/win32/event_queue.h"
+#include "../lib/platform/win32/mailbox.h"
 
 #include <windows.h>
 
@@ -7,8 +10,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define SOFTPC_RUNTIME_INPUT_CAPACITY 256u
 
 static void app_runtime_prompt_trace(uint32_t sequence, uint32_t mode_type,
     uint32_t screen_state, uint32_t graphics, uint32_t columns,
@@ -40,26 +41,12 @@ static void app_runtime_prompt_trace(uint32_t sequence, uint32_t mode_type,
 
 struct app_runtime {
     softpc_machine *machine;
-    CRITICAL_SECTION input_lock;
-    CRITICAL_SECTION frame_lock;
-    uint8_t keys[SOFTPC_RUNTIME_INPUT_CAPACITY];
-    uint8_t releases[SOFTPC_RUNTIME_INPUT_CAPACITY];
-    unsigned int input_head;
-    unsigned int input_tail;
-    int32_t mouse_dx;
-    int32_t mouse_dy;
-    uint8_t mouse_left;
-    uint8_t mouse_right;
-    int mouse_pending;
-    app_runtime_frame frames[2];
-    unsigned int published_frame;
-    uint32_t frame_sequence;
-    volatile LONG published_frame_sequence;
+    win32_presentation_event_queue *input_queue;
+    win32_presentation_mailbox *frame_mailbox;
     HANDLE command_event;
     HANDLE ready_event;
     HANDLE resume_event;
     HANDLE media_event;
-    HANDLE frame_event;
     HANDLE worker;
     volatile LONG state;
     volatile LONG result;
@@ -111,7 +98,7 @@ static void app_runtime_measure(app_runtime *runtime)
 static void app_runtime_publish(app_runtime *runtime)
 {
     app_runtime_frame *frame;
-    unsigned int next = runtime->published_frame == 0u ? 1u : 0u;
+    const app_runtime_frame *current;
     int published = 0;
     const void *surface;
     uint32_t columns = 0u;
@@ -124,8 +111,8 @@ static void app_runtime_publish(app_runtime *runtime)
     int32_t trace_left = -1, trace_top = -1, trace_right = -1, trace_bottom = -1;
     int trace_dirty = 0;
 
-    EnterCriticalSection(&runtime->frame_lock);
-    frame = &runtime->frames[next];
+    if (!win32_presentation_mailbox_begin_update(runtime->frame_mailbox,
+            &frame, &current)) return;
     if (softpc_machine_presentation_is_graphics(runtime->machine)) {
         const void *bits;
         const void *info;
@@ -155,7 +142,8 @@ static void app_runtime_publish(app_runtime *runtime)
            rectangle, otherwise a frontend can resize to that maximum scratch
            allocation before the BIOS reaches its real text mode. */
         if (!dirty) {
-            LeaveCriticalSection(&runtime->frame_lock);
+            (void)win32_presentation_mailbox_finish_update(
+                runtime->frame_mailbox, 0);
             return;
         }
         if (softpc_machine_presentation_dib(runtime->machine, &bits, &info,
@@ -190,8 +178,6 @@ static void app_runtime_publish(app_runtime *runtime)
             bytes = destination_stride * height;
             if (bytes <= SOFTPC_RUNTIME_DIB_MAX_BYTES) {
                 const uint8_t *source = (const uint8_t *)bits;
-                const app_runtime_frame *current =
-                    &runtime->frames[runtime->published_frame];
                 uint32_t row;
 
                 /* A renderer dirty indication can be conservative.  Do not
@@ -221,7 +207,8 @@ static void app_runtime_publish(app_runtime *runtime)
                         }
                     }
                     if (!changed) {
-                        LeaveCriticalSection(&runtime->frame_lock);
+                        (void)win32_presentation_mailbox_finish_update(
+                            runtime->frame_mailbox, 0);
                         return;
                     }
                 }
@@ -313,14 +300,9 @@ static void app_runtime_publish(app_runtime *runtime)
         published = 1;
     }
     if (published) {
-        frame->sequence = ++runtime->frame_sequence;
+        frame->sequence = win32_presentation_mailbox_finish_update(
+            runtime->frame_mailbox, 1);
         ++runtime->measurement_published_frames;
-        runtime->published_frame = next;
-        /* Publish only after the copied frame and its selected slot are
-           complete.  Frontends use this as a cheap cadence gate before they
-           acquire the frame lock and copy a full graphics surface. */
-        (void)InterlockedExchange(&runtime->published_frame_sequence,
-            (LONG)frame->sequence);
         (void)softpc_machine_presentation_state(runtime->machine, &mode_type,
             &screen_state);
         app_runtime_prompt_trace(frame->sequence, mode_type, screen_state,
@@ -328,15 +310,14 @@ static void app_runtime_publish(app_runtime *runtime)
             frame->dib_height, trace_dirty, trace_left, trace_top,
             trace_right, trace_bottom);
     }
-    LeaveCriticalSection(&runtime->frame_lock);
-    if (published) SetEvent(runtime->frame_event);
+    else
+        (void)win32_presentation_mailbox_finish_update(runtime->frame_mailbox,
+            0);
 }
 
 static void app_runtime_drain_input(app_runtime *runtime)
 {
-    uint8_t key;
-    uint8_t released;
-    int key_pending;
+    win32_presentation_event event;
 
     /* keyboard_io can enter a nested host_simulate frame for the original
        BIOS INT 15 keyboard hook.  A Windows make/break pair may already be
@@ -344,44 +325,25 @@ static void app_runtime_drain_input(app_runtime *runtime)
        into that frame corrupts the original controller's service ordering.
        Deliver precisely one hardware scan event per executor callback; the
        restored 20 Hz host timer naturally schedules the next one. */
-    EnterCriticalSection(&runtime->input_lock);
-    if (runtime->input_tail != runtime->input_head) {
-        key = runtime->keys[runtime->input_tail];
-        released = runtime->releases[runtime->input_tail];
-        runtime->input_tail = (runtime->input_tail + 1u) %
-            SOFTPC_RUNTIME_INPUT_CAPACITY;
-        LeaveCriticalSection(&runtime->input_lock);
-        if (getenv("SOFTPC_INPUT_TRACE") != NULL)
-            fprintf(stderr, "softpc input drain key=%u released=%u\n",
-                (unsigned int)key, (unsigned int)released);
-        (void)softpc_machine_key_number(runtime->machine, key, released);
+    if (win32_presentation_event_queue_pop(runtime->input_queue, &event)) {
+        if (event.type == WIN32_PRESENTATION_EVENT_KEY) {
+            if (getenv("SOFTPC_INPUT_TRACE") != NULL)
+                fprintf(stderr, "softpc input drain scan=%u released=%u\n",
+                    (unsigned int)event.data.key.scan_code,
+                    (unsigned int)!event.data.key.pressed);
+            (void)app_keyboard_inject_machine_event(runtime->machine, &event);
+        } else if (event.type == WIN32_PRESENTATION_EVENT_MOUSE) {
+            (void)softpc_machine_mouse_input(runtime->machine,
+                event.data.mouse.delta_x, event.data.mouse.delta_y,
+                event.data.mouse.left_down, event.data.mouse.right_down);
+        }
         /* The original keyboard path can re-enter the CCPU while servicing
            one transition.  It remains deliberately one transition per
            executor callback.  If the standalone queue already has another
            transition, arrange a new CCPU-safe callback rather than waiting
            for the unrelated 20 Hz device clock. */
-        EnterCriticalSection(&runtime->input_lock);
-        key_pending = runtime->input_tail != runtime->input_head;
-        LeaveCriticalSection(&runtime->input_lock);
-        if (key_pending)
+        if (win32_presentation_event_queue_pending(runtime->input_queue))
             softpc_machine_request_wake(runtime->machine);
-    } else {
-        LeaveCriticalSection(&runtime->input_lock);
-    }
-    EnterCriticalSection(&runtime->input_lock);
-    if (runtime->mouse_pending) {
-        int32_t delta_x = runtime->mouse_dx;
-        int32_t delta_y = runtime->mouse_dy;
-        uint8_t left = runtime->mouse_left;
-        uint8_t right = runtime->mouse_right;
-        runtime->mouse_dx = 0;
-        runtime->mouse_dy = 0;
-        runtime->mouse_pending = 0;
-        LeaveCriticalSection(&runtime->input_lock);
-        (void)softpc_machine_mouse_input(runtime->machine, delta_x, delta_y,
-            left, right);
-    } else {
-        LeaveCriticalSection(&runtime->input_lock);
     }
 }
 
@@ -488,20 +450,19 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
     runtime->ready_event = CreateEventA(NULL, TRUE, FALSE, NULL);
     runtime->resume_event = CreateEventA(NULL, FALSE, FALSE, NULL);
     runtime->media_event = CreateEventA(NULL, TRUE, FALSE, NULL);
-    runtime->frame_event = CreateEventA(NULL, FALSE, FALSE, NULL);
     if (runtime->command_event == NULL || runtime->ready_event == NULL ||
         runtime->resume_event == NULL || runtime->media_event == NULL ||
-        runtime->frame_event == NULL) {
+        !win32_presentation_mailbox_create(&runtime->frame_mailbox) ||
+        !win32_presentation_event_queue_create(&runtime->input_queue)) {
         if (runtime->command_event != NULL) CloseHandle(runtime->command_event);
         if (runtime->ready_event != NULL) CloseHandle(runtime->ready_event);
         if (runtime->resume_event != NULL) CloseHandle(runtime->resume_event);
         if (runtime->media_event != NULL) CloseHandle(runtime->media_event);
-        if (runtime->frame_event != NULL) CloseHandle(runtime->frame_event);
+        win32_presentation_mailbox_destroy(runtime->frame_mailbox);
+        win32_presentation_event_queue_destroy(runtime->input_queue);
         free(runtime);
         return 0;
     }
-    InitializeCriticalSection(&runtime->input_lock);
-    InitializeCriticalSection(&runtime->frame_lock);
     runtime->result = SOFTPC_MACHINE_OK;
     runtime->state = SOFTPC_RUNTIME_STOPPED;
     runtime->measurement_due = GetTickCount() + 1000u;
@@ -511,10 +472,9 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
         CloseHandle(runtime->resume_event);
         CloseHandle(runtime->ready_event);
         CloseHandle(runtime->media_event);
-        CloseHandle(runtime->frame_event);
+        win32_presentation_mailbox_destroy(runtime->frame_mailbox);
+        win32_presentation_event_queue_destroy(runtime->input_queue);
         CloseHandle(runtime->command_event);
-        DeleteCriticalSection(&runtime->frame_lock);
-        DeleteCriticalSection(&runtime->input_lock);
         free(runtime);
         return 0;
     }
@@ -528,7 +488,7 @@ int app_runtime_start(app_runtime *runtime)
     if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
         SOFTPC_RUNTIME_STOPPED) return 0;
     ResetEvent(runtime->ready_event);
-    ResetEvent(runtime->frame_event);
+    win32_presentation_mailbox_reset_event(runtime->frame_mailbox);
     InterlockedExchange(&runtime->pause_requested, 0);
     InterlockedExchange(&runtime->stop_requested, 0);
     InterlockedExchange(&runtime->result, SOFTPC_MACHINE_IO_ERROR);
@@ -635,42 +595,14 @@ softpc_machine_result app_runtime_get_result(const app_runtime *runtime)
         (volatile LONG *)&runtime->result, 0, 0);
 }
 
-int app_runtime_enqueue_key(app_runtime *runtime, uint8_t key_number,
-    uint8_t released)
+int app_runtime_enqueue_input_event(app_runtime *runtime,
+    const win32_presentation_event *event)
 {
-    unsigned int next;
-    if (runtime == NULL || key_number == 0u ||
+    if (runtime == NULL || event == NULL ||
         InterlockedCompareExchange(&runtime->state, 0, 0) !=
             SOFTPC_RUNTIME_RUNNING) return 0;
-    EnterCriticalSection(&runtime->input_lock);
-    next = (runtime->input_head + 1u) % SOFTPC_RUNTIME_INPUT_CAPACITY;
-    if (next == runtime->input_tail) {
-        LeaveCriticalSection(&runtime->input_lock);
+    if (!win32_presentation_event_queue_push(runtime->input_queue, event))
         return 0;
-    }
-    runtime->keys[runtime->input_head] = key_number;
-    runtime->releases[runtime->input_head] = released != 0u;
-    runtime->input_head = next;
-    LeaveCriticalSection(&runtime->input_lock);
-    if (getenv("SOFTPC_INPUT_TRACE") != NULL)
-        fprintf(stderr, "softpc input enqueue key=%u released=%u\n",
-            (unsigned int)key_number, (unsigned int)(released != 0u));
-    softpc_machine_request_wake(runtime->machine);
-    return 1;
-}
-
-int app_runtime_enqueue_mouse(app_runtime *runtime, int32_t delta_x,
-    int32_t delta_y, uint8_t left_down, uint8_t right_down)
-{
-    if (runtime == NULL || InterlockedCompareExchange(&runtime->state, 0, 0) !=
-        SOFTPC_RUNTIME_RUNNING) return 0;
-    EnterCriticalSection(&runtime->input_lock);
-    runtime->mouse_dx += delta_x;
-    runtime->mouse_dy += delta_y;
-    runtime->mouse_left = left_down != 0u;
-    runtime->mouse_right = right_down != 0u;
-    runtime->mouse_pending = 1;
-    LeaveCriticalSection(&runtime->input_lock);
     softpc_machine_request_wake(runtime->machine);
     return 1;
 }
@@ -678,28 +610,26 @@ int app_runtime_enqueue_mouse(app_runtime *runtime, int32_t delta_x,
 int app_runtime_copy_frame(app_runtime *runtime,
     app_runtime_frame *destination)
 {
-    if (runtime == NULL || destination == NULL) return 0;
-    /* A presentation client must never wait behind the executor while it is
-       copying an original renderer surface.  It can retain its prior frame
-       and try again on the next UI turn; only the executor owns machine
-       state, and no command/input path depends on this snapshot succeeding. */
-    if (!TryEnterCriticalSection(&runtime->frame_lock)) return 0;
-    memcpy(destination, &runtime->frames[runtime->published_frame],
-        sizeof(*destination));
-    LeaveCriticalSection(&runtime->frame_lock);
-    return destination->valid != 0u;
+    return runtime != NULL && win32_presentation_mailbox_copy(
+        runtime->frame_mailbox, destination);
 }
 
 uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime)
 {
-    if (runtime == NULL) return 0u;
-    return (uint32_t)InterlockedCompareExchange(
-        (volatile LONG *)&runtime->published_frame_sequence, 0, 0);
+    return runtime == NULL ? 0u : win32_presentation_mailbox_sequence(
+        runtime->frame_mailbox);
 }
 
 void *app_runtime_frame_event(const app_runtime *runtime)
 {
-    return runtime == NULL ? NULL : (void *)runtime->frame_event;
+    return runtime == NULL ? NULL : win32_presentation_mailbox_event(
+        runtime->frame_mailbox);
+}
+
+win32_presentation_mailbox *app_runtime_presentation_mailbox(
+    app_runtime *runtime)
+{
+    return runtime == NULL ? NULL : runtime->frame_mailbox;
 }
 
 void app_runtime_destroy(app_runtime *runtime)
@@ -714,9 +644,8 @@ void app_runtime_destroy(app_runtime *runtime)
     CloseHandle(runtime->ready_event);
     CloseHandle(runtime->resume_event);
     CloseHandle(runtime->media_event);
-    CloseHandle(runtime->frame_event);
+    win32_presentation_mailbox_destroy(runtime->frame_mailbox);
+    win32_presentation_event_queue_destroy(runtime->input_queue);
     CloseHandle(runtime->command_event);
-    DeleteCriticalSection(&runtime->frame_lock);
-    DeleteCriticalSection(&runtime->input_lock);
     free(runtime);
 }

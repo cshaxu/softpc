@@ -94,11 +94,16 @@ static int verify_fixed_ini(void)
         }
     }
     fclose(file);
-    return valid && floppy[0] != '\0' && hard_disk[0] != '\0' &&
-        is_below(floppy, SOFTPC_PACKAGE_MEDIA_DIRECTORY) &&
+    /* A fixed SoftPC may boot either an installed hard disk alone or a
+       floppy plus hard disk.  The user-owned adjacent INI therefore makes
+       floppy optional; when supplied it must still resolve inside package
+       media and exist. */
+    return valid && hard_disk[0] != '\0' &&
         is_below(hard_disk, SOFTPC_PACKAGE_MEDIA_DIRECTORY) &&
-        GetFileAttributesA(floppy) != INVALID_FILE_ATTRIBUTES &&
-        GetFileAttributesA(hard_disk) != INVALID_FILE_ATTRIBUTES;
+        GetFileAttributesA(hard_disk) != INVALID_FILE_ATTRIBUTES &&
+        (floppy[0] == '\0' ||
+            (is_below(floppy, SOFTPC_PACKAGE_MEDIA_DIRECTORY) &&
+             GetFileAttributesA(floppy) != INVALID_FILE_ATTRIBUTES));
 }
 
 int main(void)

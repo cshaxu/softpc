@@ -23,6 +23,18 @@ static int runtime_input_wait_for_byte(softpc_machine *machine,
     return 0;
 }
 
+static int runtime_input_enqueue_key(app_runtime *runtime, uint16_t scan,
+    uint16_t virtual_key, uint8_t pressed)
+{
+    win32_presentation_event event = { 0 };
+
+    event.type = WIN32_PRESENTATION_EVENT_KEY;
+    event.data.key.scan_code = scan;
+    event.data.key.virtual_key = virtual_key;
+    event.data.key.pressed = pressed;
+    return app_runtime_enqueue_input_event(runtime, &event);
+}
+
 int main(void)
 {
     static const char image_path[] = "softpc-runtime-input-smoke.img";
@@ -66,10 +78,10 @@ int main(void)
         GetTickCount() + 5000u, NULL));
 
     started_at = GetTickCount();
-    assert(app_runtime_enqueue_key(runtime, 31u, 0u));
-    assert(app_runtime_enqueue_key(runtime, 31u, 1u));
-    assert(app_runtime_enqueue_key(runtime, 32u, 0u));
-    assert(app_runtime_enqueue_key(runtime, 32u, 1u));
+    assert(runtime_input_enqueue_key(runtime, 0x1fu, 'S', 1u));
+    assert(runtime_input_enqueue_key(runtime, 0x1fu, 'S', 0u));
+    assert(runtime_input_enqueue_key(runtime, 0x20u, 'D', 1u));
+    assert(runtime_input_enqueue_key(runtime, 0x20u, 'D', 0u));
     deadline = started_at + 1000u;
     assert(runtime_input_wait_for_byte(machine, 0x500u, 4u, deadline,
         &delivered));

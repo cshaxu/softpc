@@ -9,12 +9,13 @@ typedef struct softpc_keyboard_capture {
     unsigned int count;
 } softpc_keyboard_capture;
 
-static int capture_key(void *context, const KEY_EVENT_RECORD *event)
+static int capture_key(void *context, const win32_presentation_event *event)
 {
     softpc_keyboard_capture *capture = (softpc_keyboard_capture *)context;
-    if (event == NULL || capture->count == sizeof(capture->keys)) return 0;
-    capture->keys[capture->count] = (uint8_t)event->wVirtualScanCode;
-    capture->releases[capture->count++] = (uint8_t)!event->bKeyDown;
+    if (event == NULL || event->type != WIN32_PRESENTATION_EVENT_KEY ||
+        capture->count == sizeof(capture->keys)) return 0;
+    capture->keys[capture->count] = (uint8_t)event->data.key.scan_code;
+    capture->releases[capture->count++] = (uint8_t)!event->data.key.pressed;
     return 1;
 }
 

@@ -57,6 +57,7 @@ endif()
 foreach(app_source IN ITEMS
     "src/app/main.c"
     "src/app/runtime.c"
+    "src/app/presentation.c"
     "src/app/console.c"
     "src/app/keyboard.c"
     "src/app/window.c")

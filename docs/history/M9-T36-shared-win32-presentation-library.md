@@ -2,33 +2,40 @@
 
 ## Outcome
 
-SoftPC now has a local, synchronized-source Win32 presentation component at
-`src/lib/platform/win32/`.  It owns a copied-value frame ABI, normalized
-keyboard transitions and RDP-safe text input, DIB dirty-rectangle geometry,
-native/aspect-preserving window sizing, and explicit relative-mouse capture.
-`src/app/keyboard.c` is the thin SoftPC binding that alone maps normalized
-Win32 records through the original selected key encoder and queues guest keys.
-The window binding alone continues to choose monitor hotkeys, console/window
-routing, pause semantics, and the original InPort mouse request.
+Closed. `src/lib/platform/win32/` now owns the reusable copied-frame mailbox,
+generic input queue, RDP-safe input normalizer, registered action map, mouse
+capture, display router, private-console presenter, and window presenter.
+`src/app` is only the SoftPC product binding: it publishes a safe copied
+machine frame, maps generic events to the original key/InPort entry points,
+registers Ctrl+Alt P/D/F/M, supplies product titles, and decides pause/close
+lifecycle effects.
 
-`MANIFEST.sha256` plus its CMake test provides an LF-normalized source hash
-contract for a later byte-identical copy into NXVM and NTVDM64.  This is a
-source synchronization mechanism only: neither project is a SoftPC build,
-runtime, or acceptance dependency.
+`WINDOW` remains window-only. `CONSOLE` uses the common router to present text
+in the console, graphics in a window, and stable text return in a fresh
+console. The reusable library names no `app_runtime`, `softpc_machine`,
+`KeyMsgToKeyCode`, renderer plane, BOP, or guest controller state.
 
-## Boundaries Preserved
+## Scope
 
-- No file under `src/mvdm/softpc.new/` changed.
-- No CPU, C-VID, controller, BIOS, ROM, BOP, timer, guest-media, or INI
-  behavior changed.
-- The single-presenter console/window handoff and all product hotkeys remain
-  app policy, outside the reusable component.
+- Moved the former window loop with `git mv` into the shared component and
+  extracted the console loop there.
+- Added opaque mailbox/event queue, generic host events, action registry,
+  binding ABI, and complete console/window presenter loops.
+- Made package smoke accept the user-supported fixed hard-disk-only layout;
+  an optional floppy remains validated when configured.
+- Preserved the owner change that comments out the default floppy in the
+  adjacent user-owned INI. No agent rewrote its configuration.
 
 ## Verification
 
-- WinLibs GCC x64: full CTest, 23/23 passed.
-- MSYS2 MinGW32 GCC x86: full CTest, 23/23 passed.  Its task-local PATH puts
-  `D:\programs\msys64\mingw32\bin` before the inherited x64 toolchain so the
-  relocated `cc1.exe` resolves the matching x86 DLLs; no global PATH changed.
-- Refreshed `assets/binary/softpc64.exe` and `softpc32.exe`; the adjacent
-  user-owned `softpc.ini` was not modified.
+- GCC x64: full CTest, 23/23 passed.
+- GCC x86: full CTest, 23/23 passed.
+- Documentation governance, source boundary, synchronized manifest, package
+  launch, Win32 window/RDP/keyboard/mouse smoke all pass in both runs.
+- `src/mvdm/softpc.new` has no task diff.
+
+## Non-goals Kept
+
+No original machine, C-VID, VGA, ROM, BOP, media, or guest timing behavior was
+changed. The shared component does not own guest protocol encoding, product
+hotkey meanings, or lifecycle policy.

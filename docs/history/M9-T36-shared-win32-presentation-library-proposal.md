@@ -21,10 +21,10 @@ presentation boundary:
 
 ```text
 project runtime/session
-  -> project binding copies a frame and publishes a generation
-  -> library waits for frame/event or Win32 messages
+  -> product adapter copies a frame and publishes it to the library mailbox
+  -> library routes console/window and waits for mailbox/event or Win32 messages
   -> library paints the newest copied frame and emits normalized input/actions
-  -> project binding enqueues input and decides lifecycle semantics
+  -> product adapter enqueues input and decides lifecycle semantics
 ```
 
 The common frame contract supports text cells, fonts, cursor metadata,
@@ -32,6 +32,61 @@ indexed pixels, palette data, a dirty rectangle, a `full_refresh` marker, and
 a monotonically changing generation. It contains copied values only; it never
 exposes VRAM, a SoftPC DIB pointer, a renderer lock, a CPU/machine pointer, or
 a session mapping.
+
+## Required Library ABI
+
+T36 is complete only when this directory supplies the following generic ABI.
+The names may evolve, but the ownership and behavior are mandatory.
+
+| Component | Library owns | Binding supplies |
+| --- | --- | --- |
+| `frame` | Value-only text/graphics/font/palette/cursor frame format. | A safe machine/session snapshot copied into a frame; never a live VRAM/DIB pointer. |
+| `mailbox` | Two-slot latest-frame storage, synchronization, publication sequence, and auto-reset Win32 wake event. | Calls `publish`; no app runtime owns a parallel frame mailbox/event. |
+| `input` | Host physical-key and RDP packet normalization: scan recovery, extended keys, duplicate `WM_CHAR` suppression, UTF-16/Unicode scalar handling, and generic key/text events. | Converts generic events to the product guest-key/device queue. |
+| `event_queue` | Bounded synchronized generic input/action queue plus its wake event, so no presenter writes a product runtime's key/mouse arrays directly. | Drains generic events and translates them to its guest keyboard/mouse/controller ingress. |
+| `actions` | Per-presenter registered shortcut table matching host chords to typed actions, with consumed modifiers safely released before dispatch. | Registers product-selected chord/action entries and decides action meaning. |
+| `mouse` | Relative coordinate calculation, button transitions, click capture, cursor hiding, `ClipCursor`, focus-loss release, and generic mouse events. | Converts generic relative/button events into its mouse-controller protocol. |
+| `window` | Window class, message pump, copied-frame painting, cursor overlay/blink, DIB conversion/dirty invalidation, geometry, input, and action dispatch. | Title, initial configuration, generic event/action callbacks, and a non-machine running query for host cursor blinking. |
+| `console` | Private-console lifetime, copied-frame text painting, generic keyboard/RDP/mouse input, registered actions, and event/message waits. | Product title/help strings, generic event/action callbacks, and frame publication. |
+| `router` | `WINDOW` always presents in a window; `CONSOLE` presents text in console, graphics in window, then returns after the defined stable-text threshold. | Maps product configuration syntax to `WINDOW` or `CONSOLE`. |
+
+The public binding boundary emits generic events, not `KEY_EVENT_RECORD`.
+`KEY_EVENT_RECORD` is permitted only inside the Win32 collection layer. RDP
+Unicode handling therefore belongs entirely to the library; SoftPC only turns
+the resulting generic event into its existing original key encoder and guest
+input queue.
+
+The only machine-adjacent SoftPC adapter is deliberately narrow:
+
+```text
+SoftPC machine snapshot APIs -> copied generic frame -> mailbox.publish()
+generic input event           -> original SoftPC key/InPort adapter
+```
+
+That adapter is not a presenter, mailbox, hotkey table, display router, or
+Win32 event loop.
+
+## Migration Order And Completion Proof
+
+1. Move the copied-frame mailbox, publication event, and generic input event
+   queue into the library; remove duplicate runtime-owned presentation and
+   input transport storage.
+2. Replace the public `KEY_EVENT_RECORD` callback with generic key, Unicode
+   text, and mouse events. Keep the original SoftPC key table solely in the
+   SoftPC delivery adapter.
+3. Install the generic action registry in both presenters. SoftPC registers
+   its current Ctrl+Alt P/D/F/M entries; another product may register a
+   different table without editing lib source.
+4. Move the text/DIB rendering, Win32 window lifecycle/message pump, console
+   lifecycle/message pump, and their common wait behavior into library
+   presenters driven only by the mailbox and binding callbacks.
+5. Move the existing text/graphics/text transition into the generic router;
+   delete SoftPC-specific `auto_switch` and presentation-choice branches.
+6. Prove, on x64 and x86, generic ABI tests plus the current SoftPC boot,
+   text, graphics, resize, RDP typing, mouse capture/release, hotkey,
+   pause/resume, and console/window transition tests. The source-boundary
+   test must prove the library has no `app_runtime`, `softpc_machine`, C-VID,
+   BOP, or guest-controller reference.
 
 ## Partial-Update Contract
 
@@ -62,10 +117,10 @@ authority to import SoftPC machine state or lifecycle policy.
 | Text | SoftPC presenter | Render text cells, attributes, primary/secondary fonts, font-select state, palette and a host-only cursor overlay. | Supply copied text/font/cursor data and decide whether text is eligible for a window. |
 | Cursor timing | SoftPC presenter | Maintain a bounded host cursor-blink deadline without polling frame presentation; freeze the displayed frame while a project declares execution paused. | Publish running/paused presentation state. |
 | Window geometry | SoftPC presenter | Native guest-size initialization, aspect-ratio-preserving sizing, guest-coordinate scaling, and explicit restore to native geometry. | Choose title, initial placement and project-specific display policy. |
-| Keyboard | SoftPC presenter | Normalize scan/extended transitions, suppress duplicate `WM_CHAR` after physical keys, support scan-less RDP UTF-16 input, and release host modifier state before a consumed host action. | Convert normalized input into the project's queued guest input protocol and define product hotkeys. |
+| Keyboard | SoftPC presenter | Normalize scan/extended transitions, suppress duplicate `WM_CHAR` after physical keys, support scan-less RDP UTF-16/Unicode input, and release host modifier state before a consumed host action. | Convert generic input events into the project's queued guest input protocol and register product hotkeys. |
 | Mouse | SoftPC presenter | Click-to-capture, relative movement scaled from client to guest coordinates, button state, host cursor hiding, `ClipCursor`, and release on focus loss or a binding action. | Convert relative events into the project's mouse/device request and choose whether capture is supported. |
 | Wait loop | SoftPC presenter | Wait jointly for frame wakeups, Win32 messages and bounded cursor/title deadlines; never drive guest timing or busy-poll. | Own executor wakeup, guest clock, and all machine scheduling. |
-| Display arbitration | NTVDM64 | Expose typed open/close/display-transfer requests only. | Decide Console/window/auto policy; admit a graphics window only at a project-owned graphics-ready boundary or an explicitly consumed host gesture. |
+| Display arbitration | NTVDM64 | Own the common display policy: `WINDOW` always presents in a window; `CONSOLE` presents text in the console, opens a window for graphics, and returns to the console after a stable text return. | Parse product configuration into the common policy and supply copied frames. |
 
 The current NXVM mailbox establishes the correct copied-value ownership
 direction but not the final wake strategy: its spin-lock capture/publish
@@ -77,14 +132,14 @@ machine-independent frame boundary.
 
 The library must not decide or embed any of the following:
 
-- product shortcut assignments, including the meaning of Ctrl+Alt chords;
+- product shortcut assignments or typed-action meaning; the library owns
+  registration and matching but never a product's shortcut table;
 - guest key encoding, mouse-controller protocol, BOP, DOS, WOW, debugger or
   Console semantics;
 - whether closing the window pauses a machine, cancels a session, returns to
   a debugger, or stops a process;
-- when a project changes between Console and window presentation, including
-  SoftPC's stable-text return threshold and NTVDM64's original graphics/host
-  gesture admission boundary;
+- a product's configuration syntax or persistence for choosing the common
+  `WINDOW` or `CONSOLE` display policy;
 - fullscreen-controller, Console Server, VDD, VRAM, DIB, renderer-lock,
   guest-memory, CPU, timer, machine or session ownership.
 
@@ -95,14 +150,14 @@ safe snapshot and for all lifetime/locking rules.
 
 ## Project Bindings
 
-- SoftPC binds its existing runtime frame event, copied double-buffer frame,
-  queued keyboard/mouse input, and monitor-owned lifecycle requests.
+- SoftPC supplies a machine-snapshot producer and generic keyboard/mouse
+  delivery adapter, then registers its title/help strings and action table.
 - NXVM binds its machine/composition presentation mailbox and value-copy
   display frame.
 - NTVDM64 binds its session-owned graphics/text snapshot and Console
   arbitration path; it retains its original SoftPC/COMMAND/BOP boundaries.
 
-The common library does not define product hotkeys. A binding supplies its
+The common library does not define product hotkeys. A binding registers its
 own mapping and receives typed host actions such as pause, close, display
 toggle, or mouse-release. SoftPC's current mouse capture, focus-loss release,
 relative-coordinate scaling, and RDP-safe keyboard normalization are the
@@ -116,7 +171,8 @@ An admitted implementation task must:
 
 1. move or extract the reusable Win32 implementation with `git mv` where
    applicable, without changing recovered `mvdm/softpc.new` source;
-2. leave one SoftPC-specific thin binding outside `src/lib/platform/win32`;
+2. leave only a SoftPC-specific frame-producer and generic input-delivery
+   binding outside `src/lib/platform/win32`;
 3. prove SoftPC's existing text, graphics, resize, keyboard, mouse-capture,
    focus-loss, RDP, pause and Console/window-transition behavior on x64 and
    x86; and
@@ -131,7 +187,8 @@ An admitted implementation task must:
 - No new fullscreen controller, Console Server, NTVDM, DOS, WOW, or VDD
   semantics.
 - No common product lifecycle, fixed hotkey table, machine callback, or guest
-  input protocol.
+  input protocol. The generic shortcut registry and generic display router
+  are required, but action meaning and configuration syntax remain bindings.
 - No change to user-owned `assets/binary/softpc.ini`.
 
 ## Admission Questions
@@ -140,4 +197,3 @@ Before implementation, choose the initial common frame ABI and the exact
 three-repository synchronisation/hash gate. The first task should port only
 SoftPC to the new local library and prove no UX regression; NXVM and NTVDM64
 adoption are separate admitted tasks.
-

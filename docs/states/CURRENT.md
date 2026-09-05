@@ -5,17 +5,17 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | M9 T36 closed |
-| Admission And Approval | Owner admitted and approved the shared Win32 presentation-library proposal. |
-| Objective | Extract SoftPC's reusable copied-frame, Win32 input, geometry, and presentation mechanics into `src/lib/platform/win32/`, with `src/app` retaining a thin project binding. |
-| Non-goals | No change to `src/mvdm/softpc.new`, machine/device/BOP/ROM/media behavior, user-owned `softpc.ini`, product lifecycle, fixed hotkeys, or the one-presenter-at-a-time console/window transition. |
-| Baseline | T36 is closed; see [closure record](../history/M9-T36-shared-win32-presentation-library.md). |
+| Admission And Approval | Owner reopened T36 because its first-stage extraction did not meet the proposal's UI exit conditions; the complete migration is now closed. |
+| Objective | Completed reusable Win32 presentation component in `src/lib/platform/win32/`: host-action registration, copied-frame mailbox/event, reusable window and console presentation mechanics, and its common `WINDOW`/`CONSOLE` display-routing policy; `src/app` is a product binding. |
+| Non-goals | No change to `src/mvdm/softpc.new`, machine/device/BOP/ROM/media behavior, user-owned `softpc.ini`, or a product's lifecycle and hotkey policy. |
+| Baseline | T36 first-stage source is committed at `6d907e7`; it supplies frame ABI, input normalization, geometry, and capture only. |
 | Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT/NXVM/NTVDM64 are read-only comparison material. |
 | Affected Boundary | `src/app` to local `src/lib/platform/win32` only; copied values and opaque runtime ownership remain mandatory. |
-| Subtask Plan | Complete: established copied frame ABI and generic Win32 helpers; retained app bindings; added a source-hash manifest check; rebuilt/tested both widths. |
-| Requirement Ledger | Met: shared component has no machine/runtime pointers; app owns input mapping, hotkeys, lifecycle and route decisions; source contents can be hash-compared by sibling projects. |
-| Focused Verification | Generic input/geometry/mouse unit coverage; runtime/window/keyboard/package tests; full GCC x64 and x86 CTest. |
-| Stop Conditions | Not reached: the extraction required no recovered-machine modification and changed no lifecycle policy. |
-| Exit Criteria | Met: local component/thin binding built; manifest check passes; no original-machine file changed; dual-width tests and package builds pass. |
+| Subtask Plan | Retain the first-stage value ABI/helpers; add a typed host-action registry, shared latest-frame mailbox/wake contract, reusable window presenter, reusable console presenter, and a common display router; reduce SoftPC to a binding. |
+| Requirement Ledger | Lib must contain no machine/runtime pointer or guest protocol. Bindings supply copied frames and map normalized actions/input to their product queues. Lib owns the common `WINDOW` fixed-window policy and `CONSOLE` text-to-console/graphics-to-window/stable-text-to-console policy. |
+| Focused Verification | New library-level action/mailbox/window/console tests; existing runtime/window/keyboard/package tests; full GCC x64 and x86 CTest. |
+| Stop Conditions | Stop if an extraction needs recovered-machine modification or causes the library to decide a product lifecycle policy. |
+| Exit Criteria | Met: both window and console run through lib-owned presentation loops; a product registers its own shortcut table and action sink; lib owns a generic latest-frame mailbox/wake event and common display router; `WINDOW` remains window-only while `CONSOLE` automatically switches text/graphics/text presenters; original-machine files remain unchanged; dual-width tests and packages pass. |
 | Original Owner Request | “很好 准入 请你执行” |
 
 ## Current Technical Baseline
@@ -68,10 +68,15 @@
 - M9 T35 S8 replaces the console's fixed 10 ms sleep loop with input/frame
   waits plus a bounded state deadline; GCC x64 and x86 full CTest each passed
   21/21.
-- M9 T36 extracts copied-frame ABI, normalized keyboard input, DIB geometry,
-  sizing, and explicit mouse capture to `src/lib/platform/win32/`. The app
-  binding retains guest input encoding, hotkeys, routing, and lifecycle;
-  GCC x64/x86 full CTest each passed 23/23.
+- M9 T36 first-stage source extracts copied-frame ABI, normalized keyboard
+  input, DIB geometry, sizing, and explicit mouse capture to
+  `src/lib/platform/win32/`; it is reopened because mailbox/event ownership,
+  reusable window/console loops, and registered product actions remain in
+  `src/app`.
+- M9 T36 closed after completing that extraction: lib now owns the mailbox,
+  generic queue/actions, complete console/window loops, and shared display
+  router; GCC x64/x86 full CTest each passed 23/23 and no recovered-machine
+  file changed. See [T36 history](../history/M9-T36-shared-win32-presentation-library.md).
 - M8 Td S1 established the NXVM-style authority topology, linked the four
   applicable shared governance skills, and added the documentation gate.
 - M8 Td S2 established the public product identity as Insignia SoftPC and

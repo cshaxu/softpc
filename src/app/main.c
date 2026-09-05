@@ -180,21 +180,21 @@ static void app_monitor_help(void)
 static int app_monitor_run_frontend(app_runtime *runtime,
     softpc_presentation presentation, app_monitor_state *state)
 {
+    win32_presentation_router router;
     int frontend_result;
-    int use_window = presentation == SOFTPC_PRESENTATION_WINDOW;
+
+    win32_presentation_router_init(&router,
+        presentation == SOFTPC_PRESENTATION_WINDOW ?
+        WIN32_PRESENTATION_DISPLAY_WINDOW : WIN32_PRESENTATION_DISPLAY_CONSOLE);
 
     for (;;) {
-        frontend_result = use_window ?
-            (presentation == SOFTPC_PRESENTATION_CONSOLE ?
-                app_vm_run_console_window(runtime) : app_vm_run_window(runtime)) :
-            app_vm_run_console(runtime);
-        if (presentation != SOFTPC_PRESENTATION_CONSOLE) break;
+        frontend_result = win32_presentation_router_target(&router) ==
+            WIN32_PRESENTATION_TARGET_WINDOW ? app_vm_run_window(runtime,
+                &router) : app_vm_run_console(runtime, &router);
         if (frontend_result == SOFTPC_VM_FRONTEND_SWITCH_WINDOW) {
-            use_window = 1;
             continue;
         }
         if (frontend_result == SOFTPC_VM_FRONTEND_SWITCH_CONSOLE) {
-            use_window = 0;
             continue;
         }
         break;

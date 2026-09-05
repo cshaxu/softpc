@@ -40,9 +40,16 @@ target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 # dependency.  Project bindings retain all machine, lifecycle and hotkey
 # decisions; the library handles copied-value Win32 presentation mechanics.
 add_library(win32-presentation STATIC
+    src/lib/platform/win32/actions.c
+    src/lib/platform/win32/console.c
+    src/lib/platform/win32/event_queue.c
     src/lib/platform/win32/input.c
     src/lib/platform/win32/geometry.c
-    src/lib/platform/win32/mouse.c)
+    src/lib/platform/win32/mailbox.c
+    src/lib/platform/win32/mouse.c
+    src/lib/platform/win32/presenter.c
+    src/lib/platform/win32/window.c
+    src/lib/platform/win32/router.c)
 target_include_directories(win32-presentation PUBLIC
     src/lib/platform/win32)
 if(WIN32)
@@ -493,6 +500,7 @@ add_executable(softpcvm
     src/app/console.c
     src/app/runtime.c
     src/app/keyboard.c
+    src/app/presentation.c
     src/app/prompt_trace.c
     src/app/window.c
     src/app/firmware.rc)
@@ -628,7 +636,8 @@ add_executable(softpc-runtime-smoke
     src/app/runtime.c
     src/app/keyboard.c
     src/app/prompt_trace.c)
-target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine)
+target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine
+    win32-presentation)
 target_include_directories(softpc-runtime-smoke PRIVATE
     src/app src/lib/platform/win32)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
@@ -640,7 +649,7 @@ add_executable(softpc-runtime-input-continuation-smoke
     src/app/keyboard.c
     src/app/prompt_trace.c)
 target_link_libraries(softpc-runtime-input-continuation-smoke PRIVATE
-    softpc-machine)
+    softpc-machine win32-presentation)
 target_include_directories(softpc-runtime-input-continuation-smoke PRIVATE
     src/app src/lib/platform/win32 test/support)
 add_test(NAME softpc-runtime-input-continuation-smoke
@@ -652,6 +661,7 @@ add_executable(softpc-win32-window-smoke
     src/app/runtime.c
     src/app/keyboard.c
     src/app/prompt_trace.c
+    src/app/presentation.c
     src/app/window.c)
 target_link_libraries(softpc-win32-window-smoke PRIVATE softpc-machine)
 target_link_libraries(softpc-win32-window-smoke PRIVATE win32-presentation)

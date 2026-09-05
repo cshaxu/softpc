@@ -3,6 +3,8 @@
 
 #include "machine.h"
 #include "../lib/platform/win32/frame.h"
+#include "../lib/platform/win32/event.h"
+#include "../lib/platform/win32/mailbox.h"
 
 #include <stdint.h>
 
@@ -34,10 +36,8 @@ int app_runtime_stop(app_runtime *runtime);
 int app_runtime_set_floppy(app_runtime *runtime, const char *path);
 app_runtime_state app_runtime_get_state(const app_runtime *runtime);
 softpc_machine_result app_runtime_get_result(const app_runtime *runtime);
-int app_runtime_enqueue_key(app_runtime *runtime, uint8_t key_number,
-    uint8_t released);
-int app_runtime_enqueue_mouse(app_runtime *runtime, int32_t delta_x,
-    int32_t delta_y, uint8_t left_down, uint8_t right_down);
+int app_runtime_enqueue_input_event(app_runtime *runtime,
+    const win32_presentation_event *event);
 int app_runtime_copy_frame(app_runtime *runtime,
     app_runtime_frame *destination);
 /* A presentation client may cheaply test whether the runtime's copied frame
@@ -47,6 +47,10 @@ uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime);
    copied frame remains the ownership boundary; this only avoids waking that
    client when no new snapshot exists. */
 void *app_runtime_frame_event(const app_runtime *runtime);
+/* Opaque shared-presentation mailbox.  The app binding may pass this handle
+   to a Win32 presenter; it never exposes machine-owned video state. */
+win32_presentation_mailbox *app_runtime_presentation_mailbox(
+    app_runtime *runtime);
 void app_runtime_destroy(app_runtime *runtime);
 
 #endif
