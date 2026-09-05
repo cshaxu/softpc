@@ -88,6 +88,107 @@ CrulesRuntimeError IFN1( char * , message )
 	printf("cevid runtime error: %s\r\n", message);
 }
 
+#ifdef V7VGA
+IMPORT IBOOL v7_solid_fg_bg_active IPT0();
+IMPORT IBOOL v7_solid_fg_bg_chain4_active IPT0();
+IMPORT VOID v7_solid_fg_bg_prepare IPT1(UTINY, source);
+IMPORT UTINY v7_solid_fg_bg_colour IPT2(UTINY, source, UTINY, bit);
+IMPORT IBOOL v7_masked_write_active IPT0();
+IMPORT UTINY v7_masked_write_mask IPT1(UTINY, source);
+GLOBAL void setWritePointers IPT0();
+
+LOCAL IU32
+v7_expand_mask IFN1(UTINY, mask)
+{
+	IU32 expanded;
+
+	expanded = mask | ((IU32)mask << 8);
+	return expanded | (expanded << 16);
+}
+
+/* Preserve the foreground-latch state that belongs to dither mode while a
+ * revision-3 solid foreground/background write temporarily uses the same
+ * C-VID dither write tables as its per-plane ALU input.  ERF3's masked
+ * write does not require a preceding guest read, but its C-VID equivalent
+ * must load the destination latches before applying the temporary bit mask. */
+LOCAL void
+v7_special_byte_write IFN2(IU32, eaOff, IU8, eaVal)
+{
+	IU32 saved_latches, saved_protection, saved_data_xor, saved_latch_xor;
+	IBOOL masked;
+
+	/* The generated dither table is an unchained planar table.  The V7
+	 * sequential chain-4 hardware instead expands a source byte into eight
+	 * adjacent 256-colour pixels.  Reuse the original chain-4 C-VID writers
+	 * for each resulting pixel so its map-mask, ALU and banking behaviour stay
+	 * in force; only V7's missing source-byte expansion is supplied here. */
+	if (v7_solid_fg_bg_chain4_active())
+	{
+		IU32 bit;
+
+		setVideodither(0);
+		setWritePointers();
+		for (bit = 0; bit != 8; ++bit)
+		{
+			jccc_parm1 = (IUH)(eaOff + bit) - gvi_pc_low_regen;
+			jccc_parm2 = (IUH)v7_solid_fg_bg_colour(eaVal, (UTINY)bit);
+			jccc_gdp = (IUH)Gdp;
+			(*c_ev_write_ptr.b_write)(eaOff + bit,
+				v7_solid_fg_bg_colour(eaVal, (UTINY)bit));
+		}
+		setVideodither(1);
+		setWritePointers();
+		return;
+	}
+
+	masked = v7_masked_write_active();
+	saved_latches = getVideov7_fg_latches();
+	if (masked)
+	{
+		IU32 protection;
+
+		jccc_parm2 = (IUH)eaOff - gvi_pc_low_regen;
+		jccc_gdp = (IUH)Gdp;
+		(*c_ev_read_ptr.b_read)(eaOff);
+		protection = getVideobit_prot_mask() &
+			v7_expand_mask(v7_masked_write_mask(eaVal));
+		saved_protection = getVideobit_prot_mask();
+		saved_data_xor = getVideodata_xor_mask();
+		saved_latch_xor = getVideolatch_xor_mask();
+		setVideobit_prot_mask(protection);
+		setVideodata_xor_mask(~(getVideocalc_data_xor() & protection));
+		setVideolatch_xor_mask(getVideocalc_latch_xor() & protection);
+	}
+	if (v7_solid_fg_bg_active())
+		v7_solid_fg_bg_prepare(eaVal);
+	jccc_parm1 = (IUH)eaOff - gvi_pc_low_regen;
+	jccc_parm2 = (IUH)eaVal;
+	jccc_gdp = (IUH)Gdp;
+	(*c_ev_write_ptr.b_write)(eaOff, eaVal);
+	/* The generated dither table updates the selected planar bytes but, unlike
+	 * the ordinary CCPU write table, does not call the installed C-VID mark
+	 * vector.  Re-enter that original vector with its required VRAM-relative
+	 * offset so the existing nt_ega/v7 painter consumes the changed byte. */
+	(*getVideomark_byte())(eaOff - gvi_pc_low_regen);
+	if (masked)
+	{
+		setVideobit_prot_mask(saved_protection);
+		setVideodata_xor_mask(saved_data_xor);
+		setVideolatch_xor_mask(saved_latch_xor);
+	}
+	setVideov7_fg_latches(saved_latches);
+}
+
+LOCAL void
+v7_special_byte_fill IFN3(IU32, eaOff, IU8, eaVal, IU32, count)
+{
+	IU32 index;
+
+	for (index = 0; index != count; ++index)
+		v7_special_byte_write(eaOff + index, eaVal);
+}
+#endif
+
 /*(
 =========================== write_byte_ev_glue =======================
 
@@ -102,6 +203,13 @@ OUTPUT: None.
 GLOBAL void
 write_byte_ev_glue IFN2(IU32, eaOff, IU8, eaVal)
 {
+#ifdef V7VGA
+	if (v7_solid_fg_bg_active() || v7_masked_write_active())
+	{
+		v7_special_byte_write(eaOff, eaVal);
+		return;
+	}
+#endif
 	jccc_parm1 = (IUH)eaOff - gvi_pc_low_regen;
 	jccc_parm2 = (IUH)eaVal;
 	jccc_gdp = (IUH)Gdp;
@@ -123,6 +231,14 @@ OUTPUT: None.
 GLOBAL void
 write_word_ev_glue IFN2(IU32, eaOff, IU16, eaVal)
 {
+#ifdef V7VGA
+	if (v7_solid_fg_bg_active() || v7_masked_write_active())
+	{
+		v7_special_byte_write(eaOff, (IU8)eaVal);
+		v7_special_byte_write(eaOff + 1, (IU8)(eaVal >> 8));
+		return;
+	}
+#endif
 	jccc_parm1 = (IUH)eaOff - gvi_pc_low_regen;
 	jccc_parm2 = (IUH)eaVal;
 	jccc_gdp = (IUH)Gdp;
@@ -144,6 +260,16 @@ OUTPUT: None.
 GLOBAL void
 write_dword_ev_glue IFN2(IU32, eaOff, IU32, eaVal)
 {
+#ifdef V7VGA
+	if (v7_solid_fg_bg_active() || v7_masked_write_active())
+	{
+		v7_special_byte_write(eaOff, (IU8)eaVal);
+		v7_special_byte_write(eaOff + 1, (IU8)(eaVal >> 8));
+		v7_special_byte_write(eaOff + 2, (IU8)(eaVal >> 16));
+		v7_special_byte_write(eaOff + 3, (IU8)(eaVal >> 24));
+		return;
+	}
+#endif
 	jccc_parm1 = (IUH)eaOff - gvi_pc_low_regen;
 	jccc_parm2 = (IUH)eaVal;
 	jccc_gdp = (IUH)Gdp;
@@ -165,6 +291,13 @@ OUTPUT: None.
 GLOBAL void
 fill_byte_ev_glue IFN3(IU32, eaOff, IU8, eaVal, IU32, count)
 {
+#ifdef V7VGA
+	if (v7_solid_fg_bg_active() || v7_masked_write_active())
+	{
+		v7_special_byte_fill(eaOff, eaVal, count);
+		return;
+	}
+#endif
 	jccc_parm1 = (IUH)eaOff - gvi_pc_low_regen;
 	jccc_parm2 = (IUH)eaVal;
 	jccc_parm3 = (IUH)count;
@@ -187,6 +320,18 @@ OUTPUT: None.
 GLOBAL void
 fill_word_ev_glue IFN3(IU32, eaOff, IU16, eaVal, IU32, count)
 {
+#ifdef V7VGA
+	if (v7_solid_fg_bg_active() || v7_masked_write_active())
+	{
+		IU32 index;
+		for (index = 0; index != count; ++index)
+		{
+			v7_special_byte_write(eaOff + (index << 1), (IU8)eaVal);
+			v7_special_byte_write(eaOff + (index << 1) + 1, (IU8)(eaVal >> 8));
+		}
+		return;
+	}
+#endif
 	jccc_parm1 = (IUH)eaOff - gvi_pc_low_regen;
 	jccc_parm2 = (IUH)eaVal;
 	jccc_parm3 = (IUH)count;
@@ -209,6 +354,20 @@ OUTPUT: None.
 GLOBAL void
 fill_dword_ev_glue IFN3(IU32, eaOff, IU32, eaVal, IU32, count)
 {
+#ifdef V7VGA
+	if (v7_solid_fg_bg_active() || v7_masked_write_active())
+	{
+		IU32 index;
+		for (index = 0; index != count; ++index)
+		{
+			v7_special_byte_write(eaOff + (index << 2), (IU8)eaVal);
+			v7_special_byte_write(eaOff + (index << 2) + 1, (IU8)(eaVal >> 8));
+			v7_special_byte_write(eaOff + (index << 2) + 2, (IU8)(eaVal >> 16));
+			v7_special_byte_write(eaOff + (index << 2) + 3, (IU8)(eaVal >> 24));
+		}
+		return;
+	}
+#endif
 	jccc_parm1 = (IUH)eaOff - gvi_pc_low_regen;
 	jccc_parm2 = (IUH)eaVal;
 	jccc_parm3 = (IUH)count;

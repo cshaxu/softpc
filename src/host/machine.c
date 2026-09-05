@@ -215,20 +215,10 @@ softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,
 softpc_machine_result softpc_machine_key_number(softpc_machine *machine,
     uint8_t key_number, uint8_t released)
 {
-    softpc_machine_result result;
     if (machine == NULL || !machine->reset || key_number == 0u)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    result = softpc_platform_keyboard_key((int)key_number, released != 0u) ?
+    return softpc_platform_keyboard_key((int)key_number, released != 0u) ?
         SOFTPC_MACHINE_OK : SOFTPC_MACHINE_IO_ERROR;
-    /* Windows 3.1's V7VDD can update the virtual DOS presentation while
-       handling a make event, without an ordinary mapped VGA write.  This is
-       the keyboard counterpart to the original-renderer refresh already
-       requested after a real InPort mouse event.  It crosses only the
-       standalone host presentation port; CCPU, VGA, BIOS and V7 controller
-       state remain untouched. */
-    if (result == SOFTPC_MACHINE_OK && !released)
-        softpc_platform_presentation_request_refresh();
-    return result;
 }
 
 softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,

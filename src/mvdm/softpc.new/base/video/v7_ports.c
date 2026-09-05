@@ -64,6 +64,115 @@ GLOBAL	void	remove_v7ptr IPT0();
 SAVED	word	curr_v7ptr_x;
 SAVED	word	curr_v7ptr_y;
 
+LOCAL void
+update_v7ptr()
+{
+	if (extensions_controller.cursor_attrs.as_bfld.pointer_enable)
+	{
+		host_start_update ();
+		(*clear_v7ptr)(curr_v7ptr_x, curr_v7ptr_y);
+		draw_v7ptr();
+		host_end_update ();
+	}
+}
+
+GLOBAL IBOOL
+v7_solid_fg_bg_active()
+{
+	return (extensions_controller.fg_bg_control.as.abyte & 0x0c) == 0x04;
+}
+
+/* In the V7 sequential chain-4 256-colour modes, one CPU byte expands to
+ * eight adjacent byte-addressed pixels.  Keep this predicate here with the
+ * V7 register state rather than teaching the generic C-VID glue about a
+ * standalone display model. */
+GLOBAL IBOOL
+v7_solid_fg_bg_chain4_active()
+{
+	return v7_solid_fg_bg_active() && get_chain4_mode();
+}
+
+GLOBAL UTINY
+v7_solid_fg_bg_colour IFN2(UTINY, source, UTINY, bit)
+{
+	UTINY pattern;
+
+	if (extensions_controller.fg_bg_control.as_bfld.fg_bg_source)
+	{
+		pattern = source;
+		if (getVideorotate() != 0)
+			pattern = (pattern >> getVideorotate()) |
+				(pattern << (8 - getVideorotate()));
+	}
+	else
+		pattern = extensions_controller.fg_bg_pattern;
+	return (pattern & (0x80 >> bit)) ?
+		extensions_controller.foreground_color.as.abyte :
+		extensions_controller.background_color.as.abyte;
+}
+
+GLOBAL IBOOL
+v7_masked_write_active()
+{
+	return extensions_controller.masked_write_control.as_bfld.masked_write_enable;
+}
+
+/* ERF3 either selects ERF4 or the normal rotated CPU datum as the extra
+ * write-per-bit mask.  C-VID expands this byte to its four planar lanes. */
+GLOBAL UTINY
+v7_masked_write_mask IFN1(UTINY, source)
+{
+	UTINY mask;
+
+	if (!v7_masked_write_active())
+		return 0xff;
+	if (extensions_controller.masked_write_control.as_bfld.masked_write_source)
+	{
+		mask = source;
+		if (getVideorotate() != 0)
+			mask = (mask >> getVideorotate()) |
+				(mask << (8 - getVideorotate()));
+		return mask;
+	}
+	return extensions_controller.masked_write_mask;
+}
+
+/*
+ * ERFE's solid foreground/background mode takes a one-bit pattern and
+ * expands it to the four CPU-side ALU inputs.  This is invoked immediately
+ * around a C-VID write, so the dither-latch state used by a later dithered
+ * write is not overwritten.
+ */
+GLOBAL void
+v7_solid_fg_bg_prepare IFN1(UTINY, source)
+{
+	UTINY pattern;
+	UTINY foreground;
+	UTINY background;
+	int plane;
+
+	if (!v7_solid_fg_bg_active())
+		return;
+
+	if (extensions_controller.fg_bg_control.as_bfld.fg_bg_source)
+	{
+		pattern = source;
+		if (getVideorotate() != 0)
+			pattern = (pattern >> getVideorotate()) |
+				(pattern << (8 - getVideorotate()));
+	}
+	else
+		pattern = extensions_controller.fg_bg_pattern;
+	foreground = extensions_controller.foreground_color.as.abyte;
+	background = extensions_controller.background_color.as.abyte;
+	for (plane = 0; plane != 4; ++plane)
+	{
+		SET_FG_LATCH(plane,
+			((foreground & (1 << plane)) ? pattern : 0) |
+			((background & (1 << plane)) ? ~pattern : 0));
+	}
+}
+
 /*(
 ----------------------------------------------------------------------
 
@@ -167,30 +276,27 @@ half_word       value;
 		case 0x94:
 			note_entrance0("pointer pattern");
 			extensions_controller.pointer_pattern = value;
-			host_start_update ();
-			(*clear_v7ptr)(curr_v7ptr_x, curr_v7ptr_y);
-			draw_v7ptr();
-			host_end_update ();
+			update_v7ptr();
 			break;
 		case 0x9c:
 			note_entrance0("pointer horiz position hi");
 			extensions_controller.ptr_horiz_posn_hi.as.abyte = value;
+			update_v7ptr();
 			break;
 		case 0x9d:
 			note_entrance0("pointer horiz position lo");
 			extensions_controller.ptr_horiz_posn_lo = value;
+			update_v7ptr();
 			break;
 		case 0x9e:
 			note_entrance0("pointer vert position hi");
 			extensions_controller.ptr_vert_posn_hi.as.abyte = value;
+			update_v7ptr();
 			break;
 		case 0x9f:
 			note_entrance0("pointer vert position lo");
 			extensions_controller.ptr_vert_posn_lo = value;
-			host_start_update ();
-			(*clear_v7ptr)(curr_v7ptr_x, curr_v7ptr_y);
-			draw_v7ptr();
-			host_end_update ();
+			update_v7ptr();
 			break;
 		case 0xa0:
 			note_entrance0("graphics controller mem latch 0");
@@ -220,7 +326,7 @@ half_word       value;
 		case 0xa5:
 			note_entrance0("cursor attributes");
 			old_value=extensions_controller.cursor_attrs.as.abyte;
-			extensions_controller.cursor_attrs.as.abyte = value;
+			extensions_controller.cursor_attrs.as.abyte = value & 0x89;
 
 			/*
 			   8.6.92 MG
@@ -232,7 +338,7 @@ half_word       value;
 
 			/* Not doing cursor mode stuff (whatever that means) */
 
-			if (value&0x80!=old_value&0x80) {
+			if ((value & 0x80) != (old_value & 0x80)) {
 				host_start_update ();
 				if (value & 0x80) {
 					/* Enable hardware graphics pointer */ 
@@ -253,7 +359,7 @@ half_word       value;
 		*/
 
 		case 0xc1:
-			extensions_controller.dac_control.as.abyte=value;
+			extensions_controller.dac_control.as.abyte=value & 1;
 			if (extensions_controller.dac_control.as_bfld.dac_8_bits) {
 				DAC_data_bits=8;
 				DAC_data_mask=0xff;
@@ -333,7 +439,9 @@ half_word       value;
 			break;
 		case 0xf1:
 			note_entrance0("fast latch load state");
-			extensions_controller.fast_latch_load_state.as.abyte = value;
+			/* ERF1 exposes foreground state in bits 5:4 and background
+			 * state in bits 1:0; the remaining bits read as zero. */
+			extensions_controller.fast_latch_load_state.as.abyte = value & 0x33;
 			break;
 		case 0xf2:
 			note_entrance0("fast background latch load");
@@ -359,7 +467,7 @@ half_word       value;
 			break;
 		case 0xf3:
 			note_entrance0("masked write control");
-			extensions_controller.masked_write_control.as.abyte = value;
+			extensions_controller.masked_write_control.as.abyte = value & 3;
 			break;
 		case 0xf4:
 			note_entrance0("masked write mask");
@@ -385,16 +493,16 @@ half_word       value;
 			break;
 		case 0xf9:
 			note_entrance0("page select");
-			extensions_controller.page_select.as.abyte = value;
+			extensions_controller.page_select.as.abyte = value & 1;
 			update_banking();
 			break;
 		case 0xfa:
 			note_entrance0("foreground color");
-			extensions_controller.foreground_color.as.abyte = value;
+			extensions_controller.foreground_color.as.abyte = value & 0x0f;
 			break;
 		case 0xfb:
 			note_entrance0("background color");
-			extensions_controller.background_color.as.abyte = value;
+			extensions_controller.background_color.as.abyte = value & 0x0f;
 			break;
 		case 0xfc:
 			note_entrance0("compatibility control");
@@ -423,8 +531,8 @@ half_word       value;
 			break;
 		case 0xfe:
 			note_entrance0("foreground/background control");
-			extensions_controller.fg_bg_control.as.abyte = value;
-			fg_bg_control = value;
+			extensions_controller.fg_bg_control.as.abyte = value & 0x0e;
+			fg_bg_control = value & 0x0e;
 			ega_read_routines_update();
 			ega_write_routines_update( WRITE_MODE );
 
@@ -434,7 +542,10 @@ half_word       value;
 			break;
 		case 0xff:
 			note_entrance0("16-bit interface control");
-			extensions_controller.interface_control.as.abyte = value;
+			/* ERFF[7] reports the installed bus width.  It is not a
+			 * writable control bit; this fixed AT profile presents the
+			 * original V7VGA as a 16-bit adapter. */
+			extensions_controller.interface_control.as.abyte = value & 0x7f;
 
 			/***
 			sort_out_memory_stuff();
@@ -621,7 +732,7 @@ half_word       *value;
 			*value = extensions_controller.fg_bg_control.as.abyte & 0xe;
 			break;
 		case 0xff:
-			*value = extensions_controller.interface_control.as.abyte;
+			*value = extensions_controller.interface_control.as.abyte | 0x80;
 			break;
 		default:
 			NON_PROD(if(io_verbose & EGA_PORTS_VERBOSE)

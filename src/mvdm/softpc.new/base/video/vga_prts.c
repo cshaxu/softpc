@@ -444,6 +444,8 @@ VOID vga_seq_mem_mode IPT2(io_addr,port,half_word,value);
 IMPORT VOID vga_seq_extn_control IPT2(io_addr,port,half_word,value);
 IMPORT VOID vga_extn_outb IPT2(io_addr,port,half_word,value);
 IMPORT VOID vga_extn_inb IPT2(io_addr,port,half_word *,value);
+IMPORT ULONG fg_latches;
+IMPORT UTINY fg_bg_control, Last_v7_fg_bg;
 #endif /* V7VGA */
 VOID vga_seq_inb IPT2(io_addr,port,half_word *,value);
 /* Same as EGA */
@@ -813,18 +815,35 @@ GLOBAL VOID	vga_init IFN0()
 #ifdef V7VGA
 	/* Initialise V7VGA Extensions Registers */
 	extensions_controller.pointer_pattern = 0xff;
+	extensions_controller.ptr_horiz_posn_hi.as.abyte = 0;
+	extensions_controller.ptr_horiz_posn_lo = 0;
+	extensions_controller.ptr_vert_posn_hi.as.abyte = 0;
+	extensions_controller.ptr_vert_posn_lo = 0;
 	extensions_controller.clock_select.as.abyte = 0;
 	extensions_controller.cursor_attrs.as.abyte = 0;
+	extensions_controller.dac_control.as.abyte = 0;
 	extensions_controller.emulation_control.as.abyte = 0;
-	extensions_controller.masked_write_control.as_bfld.masked_write_enable = 0;
-	extensions_controller.ram_bank_select.as.abyte = 0;
-	extensions_controller.clock_control.as.abyte &= 0xe4;
-	extensions_controller.page_select.as.abyte = 0;
-	extensions_controller.compatibility_control.as.abyte &= 0x2;
-	extensions_controller.timing_select.as.abyte = 0;
-	extensions_controller.fg_bg_control.as.abyte &= 0xf3;
-	extensions_controller.interface_control.as.abyte &= 0xe0;
+	extensions_controller.foreground_latch_0 = 0;
 	extensions_controller.foreground_latch_1 = 0;
+	extensions_controller.foreground_latch_2 = 0;
+	extensions_controller.foreground_latch_3 = 0;
+	extensions_controller.fast_latch_load_state.as.abyte = 0;
+	extensions_controller.masked_write_control.as.abyte = 0;
+	extensions_controller.masked_write_mask = 0;
+	extensions_controller.fg_bg_pattern = 0;
+	extensions_controller.ram_bank_select.as.abyte = 0;
+	extensions_controller.switch_readback = 0;
+	extensions_controller.clock_control.as.abyte = 0;
+	extensions_controller.page_select.as.abyte = 0;
+	extensions_controller.foreground_color.as.abyte = 0;
+	extensions_controller.background_color.as.abyte = 0;
+	extensions_controller.compatibility_control.as.abyte = 0;
+	extensions_controller.timing_select.as.abyte = 0;
+	extensions_controller.fg_bg_control.as.abyte = 0;
+	extensions_controller.interface_control.as.abyte = 0;
+	fg_latches = 0;
+	fg_bg_control = 0;
+	Last_v7_fg_bg = 0;
 
 	/* 31.3.92 MG Default to six-bit palette */
 

@@ -6,14 +6,14 @@
 | --- | --- |
 | Identifier Mode | M9 T36 — active implementation/build version |
 | Admission And Approval | Owner explicitly authorized investigation and repair of the Windows 3.1 graphical MS-DOS Prompt rendering defect. |
-| Objective | Verify the recovered visible character-update path while commands continue to execute. |
+| Objective | Identify and recover the missing V7VDD virtual-display character-update path while commands continue to execute. |
 | Non-goals | No DOS/DPMI/Windows-driver/NTVDM semantics, frontend VRAM decoder, INI/media/ROM change, or presenter-lifecycle redesign. |
 | Baseline | T35 is closed. The defect predates T28–T35 outer-runtime dirty-frame and scheduling work. |
 | Applicable Rules | Documentation, execution, architecture, coding and source-layout authorities; OpenNT is read-only comparison material. |
-| Affected Boundary | Standalone machine keyboard-make → original-renderer refresh port; original C-VID/VGA remains unchanged. |
-| Subtask Plan | Owner-validate graphical Prompt typing using the refreshed packages; then record acceptance and close T36. |
+| Affected Boundary | Selected original V7 revision-3 extension registers and the original C-VID CPU-side VGA write dispatch that consumes their per-plane ALU input. |
+| Subtask Plan | Trace V7VDD's selected proprietary hardware transactions and correlate each with original bank/plane state, C-VID ALU input, painter output and dirty publication; repair only the failed V7 stage. |
 | Requirement Ledger | [M9 T36 task record](../history/M9-T36-windows31-msdos-prompt-rendering.md). |
-| Focused Verification | GCC x64/x86 CTest each passed 22/22. Pending owner proof: graphical Prompt visible text plus command execution, normal graphics repaint, text route and Prompt transition. |
+| Focused Verification | The baseline V7 CCPU/DIB regression passes; the keyboard-refresh hypothesis failed owner acceptance and was removed. Pending: graphical Prompt visible text plus command execution after a V7-specific repair. |
 | Stop Conditions | Stop and queue a design task if evidence requires a new VGA controller, Windows driver/DOS semantics, or broad unclassified mirror rewrite. |
 | Exit Criteria | The task record's evidence and dual-width package/regression requirements are complete. |
 | Original Owner Request | “对啊，你来帮我研究和修复一下看看怎么回事” |

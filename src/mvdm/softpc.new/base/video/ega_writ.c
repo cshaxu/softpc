@@ -777,10 +777,11 @@ ega_write_routines_update IFN1(CHANGE_TYPE, reason )
 		{
 #ifdef	V7VGA
 			/*
-			 *	Is it the V7VGA foreground dithering extension ?
+			 *	Is it a V7VGA foreground/background ALU extension?
 			 */
 
-			if( fg_bg_control & 0x8 )
+			if ((fg_bg_control & 0x0c) == 0x08 ||
+			    (fg_bg_control & 0x0c) == 0x04)
 			{
 				setVideodither(1);	/* enable Evid dither fns */
 				switch( EGA_CPU.write_mode )
@@ -859,4 +860,3 @@ ega_write_routines_update IFN1(CHANGE_TYPE, reason )
 #endif /* EGG */
 
 #endif	/* !(NTVDM && MONITOR) */
-

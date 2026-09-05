@@ -23,8 +23,9 @@ and scheduling changes.
 
 ### Affected Boundary
 
-The standalone machine input-to-presentation port.  The selected original
-C-VID/VGA controller and painters remain unchanged.
+Selected original V7 revision-3 extension registers and the original C-VID
+CPU-side VGA-write dispatch which consumes their per-plane ALU input.  No
+standalone input-to-presentation refresh policy is admitted.
 
 ### Non-goals
 
@@ -40,23 +41,33 @@ console/window lifecycle change.  No frontend guest-VRAM renderer.
   Therefore neither generic CCPU writes, C-VID marking, V7 mode selection,
   nor the copied-frame filter is the root cause.
 - The installed Windows 3.1 profile contains `V7VGA.DRV` and `V7VDD.386`.
-  `V7VDD.386` is the guest's Video Seven virtual-display component for a
-  windowed DOS Prompt; it can alter its presentable virtual screen while
-  handling guest input without an ordinary mapped VGA store.
-- The existing standalone mouse input path already requests the original
-  `nt_mark_screen_refresh()` after an InPort event for that same virtual
-  display route.  Keyboard make events had no corresponding request.
-- The new regression proves that a keyboard make event did not create an
-  original DIB dirty rectangle before the repair.  It passes after the host
-  bridge requests the original refresh on a successfully delivered make
-  event.  Release events do not refresh.
+  The latter is guest-side VDD code. Its static image contains support for
+  several Video Seven generations, so its mere possession of a proprietary
+  register sequence does not prove that the selected revision-3 machine
+  executes that sequence.
+- The selected original controller reports V7 revision 3 (`SR8E/SR8F = 70h`)
+  and implements the revision-3 extension set, including `F6` banking and
+  `FE` foreground/background control. It does not implement `CD`, `CE`, `E8`,
+  or `E9`; those registers must not be imported from a later chipset unless
+  the runtime trace proves that the selected configuration reaches them.
+- The existing standalone mouse input path requests the original
+  `nt_mark_screen_refresh()` after an InPort event. A matching keyboard
+  refresh was tested and rejected: it did not restore Prompt text, is not a
+  V7 hardware operation, and would force an expensive speculative repaint on
+  every keypress.
+- The revision-3 V7 manual's color-text-expansion example programs `FE=06h`
+  and emits font scan lines through `LODSB`/`STOSB`.  The selected controller
+  had V7 dither write tables but did not prepare their temporary four-plane
+  ALU input for the solid foreground/background variant.  That is a direct
+  machine-side candidate for the invisible graphical Prompt character path;
+  it is neither a DOS service nor a frontend repaint.
 
-### Repair
+### Rejected Hypothesis
 
-`src/host/machine.c` now calls the existing standalone presentation-refresh
-port after a successful keyboard make.  This invokes the imported original
-renderer's `nt_mark_screen_refresh()` and does not alter CCPU, V7 registers,
-VRAM, BIOS, ROM, BOP policy, or Windows/DOS semantics.
+No keyboard refresh bridge is retained. The V7 CCPU/DIB regression remains as
+the baseline: ordinary V7 640 by 480 mode selection and mapped string writes
+work, so the remaining investigation must target the guest V7VDD hardware
+protocol rather than a generic input repaint.
 
 ### Focused Verification
 
@@ -82,7 +93,7 @@ mirror.
 
 | Requirement | Owner | Status | Evidence |
 | --- | --- | --- | --- |
-| Determine why typed Prompt characters execute but are invisible | T36 diagnostic path | Implemented | Guest V7 CCPU/DIB proof and keyboard-refresh regression |
-| Repair only the implicated original-machine/original-host route | T36 implementation | Implemented, owner verification pending | Keyboard make → existing original renderer refresh port |
+| Determine why typed Prompt characters execute but are invisible | T36 diagnostic path | Active | Guest V7 CCPU/DIB proof excludes generic mapped-write and repaint paths |
+| Repair only the implicated original-machine/original-host route | T36 implementation | Pending | Must trace the selected V7VDD runtime register/bank protocol before extending the original controller |
 | Preserve independent-VM boundaries and configuration/media | T36 scope | Active | No change admitted to excluded surfaces |
 | Produce x64/x86 runnable packages and regression evidence | T36 verification | Complete | GCC x64 22/22; GCC x86 22/22; both package EXEs refreshed |
