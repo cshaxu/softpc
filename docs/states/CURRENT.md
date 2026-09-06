@@ -4,26 +4,23 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T36 closed |
-| Admission And Approval | Owner reopened T36 because its first-stage extraction did not meet the proposal's UI exit conditions. Completion audit then found and removed the remaining app-local router-to-presenter dispatcher. |
-| Objective | Completed reusable Win32 presentation component in `src/lib/platform/win32/`: host-action registration, copied-frame mailbox/event, window and console presentation mechanics, and its common `WINDOW`/`CONSOLE` router plus dispatcher; `src/app` is a product binding. |
-| Non-goals | No change to `src/mvdm/softpc.new`, machine/device/BOP/ROM/media behavior, user-owned `softpc.ini`, or a product's lifecycle and hotkey policy. |
-| Baseline | T36 first-stage source is committed at `6d907e7`; it supplies frame ABI, input normalization, geometry, and capture only. |
-| Applicable Rules | Documentation, execution, architecture, and coding rules; source layout; the original mirror remains a preserved baseline and OpenNT/NXVM/NTVDM64 are read-only comparison material. |
-| Affected Boundary | `src/app` to local `src/lib/platform/win32` only; copied values and opaque runtime ownership remain mandatory. |
-| Subtask Plan | Retain the first-stage value ABI/helpers; add a typed host-action registry, shared latest-frame mailbox/wake contract, reusable window presenter, reusable console presenter, and a common display router; reduce SoftPC to a binding. |
-| Requirement Ledger | Lib must contain no machine/runtime pointer or guest protocol. Bindings supply copied frames and map normalized actions/input to their product queues. Lib owns the common `WINDOW` fixed-window policy and `CONSOLE` text-to-console/graphics-to-window/stable-text-to-console policy. |
-| Focused Verification | New library-level action/mailbox/window/console tests; existing runtime/window/keyboard/package tests; full GCC x64 and x86 CTest. |
-| Stop Conditions | Stop if an extraction needs recovered-machine modification or causes the library to decide a product lifecycle policy. |
-| Exit Criteria | Met: both window and console run through lib-owned presentation loops and a lib-owned generic dispatcher; a product registers its own shortcut table and action sink; lib owns a generic latest-frame mailbox/wake event and common display router; `WINDOW` remains window-only while `CONSOLE` automatically switches text/graphics/text presenters; original-machine files remain unchanged; dual-width tests and packages pass. |
-| Original Owner Request | “很好 准入 请你执行” |
+| Identifier Mode | M9 T39 closed |
+| Admission And Approval | Owner requested a full NXVM `src/lib/` shared-library admission audit after T38 closure. |
+| Objective | Determine whether NXVM `src/lib/` can be imported verbatim as SoftPC's complete shared library without any MVDM boundary change. |
+| Non-goals | No NXVM import, build change, SoftPC source deletion, or MVDM modification. |
+| Baseline | NXVM revision `9ef5e899a8e540cf9def51c9e70ae3397586477c`; the review covers its complete `src/lib/` tree. |
+| Applicable Rules | Execution, architecture, source layout, NXVM adoption proposal, and T39 audit. |
+| Affected Boundary | Read-only NXVM `src/lib/`, SoftPC `src/{lib,host,app}`, and the immutable `src/mvdm/softpc.new/` boundary. |
+| Outcome | Not admitted: the NXVM manifest is incomplete and the shared public contracts require the documented generic-boundary work before an unchanged import can be approved. |
+| Exit Criteria | Report records the complete scope, immutable MVDM boundary, each component disposition, and actionable NXVM re-review conditions. |
+| Original Owner Request | “审计一下 nxvm 的 lib 当前代码，看下它是否符合无需改动直接引入。” |
 
 ## Current Technical Baseline
 
 - The fixed standalone package is `assets/binary/softpc32.exe` and
   `softpc64.exe`, with adjacent user-owned `softpc.ini`; reusable guest media
   is below `assets/media/`, and README captures are below `assets/readme/`.
-- M8 T19 completes the source layout as `src/{mvdm,overlay,host,app}` and
+- M8 T19 completes the source layout as `src/{mvdm,host,app}` and
   removes transitional `src/core` and `src/vm` routes. Fresh GCC x64/x86
   builds each passed full CTest, 20/20.
 - The selected original ROM inputs are byte-identical to OpenNT and embedded
@@ -81,9 +78,21 @@
   applicable shared governance skills, and added the documentation gate.
 - M8 Td S2 established the public product identity as Insignia SoftPC and
   added current, owner-provided SoftPC product captures to the root README.
+- M9 Td S4 admitted direct source-visible mechanical portability diffs and
+  external host compatibility ownership; it removed the former generated-source
+  portability rule without changing machine source or build selection. See
+  [Td S4 history](../history/M9-Td-S4-direct-source-portability-governance.md).
+- M9 T38 retired every mechanical C/Python source transform. Its 52 direct
+  source-visible portability corrections build from checked-in source for both
+  widths; GCC x64 and i686 full CTest each passed 23/23. See [T38
+  history](../history/M9-T38-direct-source-transform-retirement.md).
+- M9 T39 audited the complete NXVM `src/lib/` as a prospective verbatim shared
+  import. It is not admitted until its complete manifest and product-neutral
+  capability contracts are closed; MVDM is immutable. See [T39
+  history](../history/M9-T39-nxvm-shared-lib-admission-audit.md).
 - M8 T14 established a deterministic, 1,222-row source-map against the
   selected OpenNT revision. It found 60 direct differences and assigned every
-  one a future overlay, host, or removal disposition without altering code.
+  one a future direct-source, host, or removal disposition without altering code.
 - Implementation task identifiers are repository-wide build versions: the
   12 historical tasks end at T12 and M8 completes at T19. Td governance work
   does not consume a build-version number.

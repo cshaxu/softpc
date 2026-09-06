@@ -108,9 +108,8 @@ launcher and validates its adjacent configuration and declared media roots.
   README; they are documentation assets, not guest media or runtime inputs.
 - `src/mvdm/softpc.new/` — recovered original SoftPC machine, including the
   embedded selected BIOS/VGA/CMOS ROM inputs, retained in its historical tree.
-- `src/overlay/mvdm/softpc.new/` — the narrow, reproducible compiler/host-ABI
-  overlay that mirrors the affected original paths; it contains no machine
-  policy.
+- `src/mvdm/softpc.new/` may contain narrow, reviewable compiler/host-ABI
+  source diffs at the affected point; it contains no new machine policy.
 - `src/host/` — standalone platform, media, input, video, compatibility, and
   machine-boundary implementations.
 - `src/app/` — executable entry point, single runtime executor, console, and Win32

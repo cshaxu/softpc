@@ -17,6 +17,7 @@
 ]*/
 #include "insignia.h"
 #include "host_def.h"
+#include <stdio.h>
 #include <math.h>
 #include "cfpu_def.h"
 #include "ckmalloc.h"
@@ -5856,7 +5857,7 @@ GLOBAL	void NpxStackRegAsString IFN3(FPSTACKENTRY *, fpStPtr, char *, buf, IU32,
 /* this one is only ever used in trace.c and only if pure CCPU */
 GLOBAL char * getNpxStackReg IFN2(IU32, reg_num, char *, buffer)
 {
-	reg_num += TOSPtr - FPUStackBase;
+	reg_num += (IU32)(TOSPtr - FPUStackBase);
 	NpxStackRegAsString (&FPUStackBase[reg_num&7], buffer, 12);
 	return buffer;
 }

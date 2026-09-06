@@ -1,14 +1,16 @@
 #include "insignia.h"
 #include "host_def.h"
-#include "evidgen.h"
+#include "../cvidc/evidgen.h"
 
 #include "cpu4.h"
+
+#include <stdio.h>
 
 #ifndef PIG
 
 extern struct VideoVector C_Video;
 
-IHP Gdp;
+extern IHP Gdp;
 struct CpuVector Cpu;
 //struct SasVector Sas;
 struct VideoVector Video;
@@ -89,17 +91,8 @@ void cpu_simulate()
 }
 #endif
 
-void copyROM()
-{
-}
 
-void initialise_npx()
-{
-}
 
-void npx_reset()
-{
-}
 
 IHPE Cpu_outb_function;
 IHPE GDP;

@@ -6,8 +6,6 @@ The current source tree is:
 src/
   mvdm/
     softpc.new/
-  overlay/
-    mvdm/softpc.new/
   host/
     ordinary host C/H files
     compat/{ccpu,cvidc,...}/
@@ -26,10 +24,11 @@ reference. Wholly host-specific original endpoint files may be intentionally
 absent when the standalone host owns their replacement. Retained files are
 C/H/ASM, required modern build configuration, and selected BIOS/VGA/CMOS
 firmware only. Historical object,
-library, and other compiler intermediate files are forbidden. If used,
-`overlay/mvdm/softpc.new` contains only repository-owned mirrored patches
-necessary to compile the baseline on x86/x64; generated forms remain in
-ignored `build/`. `host` owns platform capability implementations; `app` owns
+library, and other compiler intermediate files are forbidden. Narrow,
+mechanical compiler, declaration, calling-ABI, and pointer-representation
+corrections live as reviewable source diffs at their affected points. Generated
+transformed C/H files are not build inputs. `host` owns platform capability
+implementations and larger functional adaptations; `app` owns
 orchestration, machine snapshot production, guest-input conversion, monitor
 UI, and product lifecycle policy. `lib/platform/win32` owns copied-value
 Win32 presentation: mailbox/event queues, input normalization, action

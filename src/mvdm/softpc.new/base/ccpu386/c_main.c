@@ -30,13 +30,16 @@ Actual worker routines are spun off elsewhere.
 #include  <bios.h>	/* need access to bop */
 #include  <debug.h>
 #include  <config.h>
-#ifdef NTVDM
+#if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
 #include <ntthread.h>
 #endif
 
 #include <c_main.h>	/* C CPU definitions-interfaces */
+#include <c_addr.h>	/* C CPU address calculation contract */
+#include <lifecycle.h>
 #include <c_page.h>	/* Paging Interface */
 #include <c_mem.h>	/* CPU - Memory Interface */
+#include <c_seg.h>	/* Segment-cache and pseudo-descriptor contract */
 #include <c_intr.h>	/* Interrupt Interface */
 #include <c_debug.h>	/* Debug Regs and Breakpoint Interface */
 #include <c_oprnd.h>	/* Operand decoding functions(macros) */
@@ -49,7 +52,19 @@ Actual worker routines are spun off elsewhere.
 #include <c_bsic.h>
 #include <ccpupig.h>
 #include <fault.h>
+#include <ica.h>
+#include <timer.h>
 
+extern void force_yoda(void);
+extern void TakeNpxExceptionInt(void);
+extern void softpc_platform_executor_event(void);
+extern void softpc_platform_timer_event(void);
+extern IBOOL softpc_platform_has_pending_executor_event(void);
+extern IBOOL softpc_platform_consume_clock_tick(void);
+extern IBOOL softpc_platform_consume_executor_wake(void);
+extern IBOOL softpc_platform_consume_instruction_budget(void);
+extern void softpc_platform_pace_instruction(void);
+extern void softpc_platform_wait_for_executor_event(void);
 #include  <aaa.h>	/* The workers */
 #include  <aad.h>	/*     ...     */
 #include  <aam.h>	/*     ...     */
@@ -228,6 +243,12 @@ extern IU32	cpu_interrupt_map ;
 #else
 LOCAL IUM32	cpu_interrupt_map = 0;
 #endif	/* SFELLOW */
+
+GLOBAL IU32 *softpc_ccpu_interrupt_map_address(void)
+{
+   return &cpu_interrupt_map;
+}
+
 
 
 GLOBAL IBOOL took_relative_jump;
@@ -566,8 +587,9 @@ GLOBAL	PHY_ADDR	SasWrapMask = 0xfffff;
  * Note we only mask to 16 bits if the original EIP was 16bits so that
  * pigger scripts that result in very large EIP values pig correctly.
  */
+#define CCPU_INSTRUCTION_DELTA(x) ((IU32)DIFF_INST_BYTE((x), p_start))
 #define UPDATE_INTEL_IP(x)						\
-   {  int len = DIFF_INST_BYTE(x, p_start);				\
+   {  IU32 len = CCPU_INSTRUCTION_DELTA(x);				\
       IU32 mask = 0xFFFFFFFF;						\
       IU32 oldEIP = GET_EIP();						\
       if ((oldEIP < 0x10000) && (GET_CS_AR_X() == USE16))		\
@@ -578,9 +600,9 @@ GLOBAL	PHY_ADDR	SasWrapMask = 0xfffff;
 /* update Intel format EIP from host format IP (mask if 16 operand) */
 #define UPDATE_INTEL_IP_USE_OP_SIZE(x)					\
    if ( GET_OPERAND_SIZE() == USE16 )					\
-      SET_EIP(GET_EIP() + DIFF_INST_BYTE(x, p_start) & WORD_MASK);\
+      SET_EIP(GET_EIP() + (CCPU_INSTRUCTION_DELTA(x) & WORD_MASK));\
    else								\
-      SET_EIP(GET_EIP() + DIFF_INST_BYTE(x, p_start));
+      SET_EIP(GET_EIP() + CCPU_INSTRUCTION_DELTA(x));
 
 /* mark host format IP as inoperative */
 #define CANCEL_HOST_IP()					\
@@ -766,7 +788,7 @@ IFN1(
 #endif	/* PIG */
 
    /* somewhere for exceptions to return to */
-#ifdef NTVDM
+#if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
    setjmp(ccpu386ThrdExptnPtr());
 #else
    setjmp(next_inst[simulate_level-1]);
@@ -3998,6 +4020,13 @@ TYPEE8:
 	    host_timer_event();
 	    }
 
+	 if (cpu_interrupt_map & CPU_SIGIO_EXCEPTION_MASK)
+	    {
+	    cpu_interrupt_map &= ~CPU_SIGIO_EXCEPTION_MASK;
+	    ica_sigio_event();
+	    }
+
+
 #ifndef	PROD
 	 if (cpu_interrupt_map & CPU_SAD_EXCEPTION_MASK)
 	    {
@@ -4006,8 +4035,20 @@ TYPEE8:
 	    }
 #endif	/* PROD */
 
+         /* HLT is still an original CCPU instruction-safe
+            rendezvous.  Consume host mailbox records here
+            before the original quick-event dispatch; an
+            event wake alone must not return directly to
+            WaitForSingleObject and starve 8042 input. */
+         if (softpc_platform_consume_clock_tick())
+            softpc_platform_timer_event();
+         if (softpc_platform_consume_executor_wake())
+            softpc_platform_executor_event();
          SYNCH_TICK();
          QUICK_EVENT_TICK();
+         if (cpu_interrupt_map == 0 &&
+             c_cpu_q_ev_get_count() == 0)
+            softpc_platform_wait_for_executor_event();
 	 }
 	quick_mode = FALSE;
 
@@ -4323,6 +4364,12 @@ TYPEFF_3:
       Now check for interrupts/external events/breakpoints...
     */
 
+   /* The original quick path skips NEXT_INST.  A standalone host
+      timer or control wake must therefore first leave quick mode,
+      then be consumed at the normal CCPU safe point below. */
+   if (quick_mode && softpc_platform_has_pending_executor_event())
+      quick_mode = FALSE;
+
    if ( quick_mode && GET_DR(DR_DSR) == 0 )
       goto DO_INST;
 
@@ -4358,6 +4405,18 @@ TYPEFF_3:
       cpu_interrupt_map &= ~CPU_SIGALRM_EXCEPTION_MASK;
       host_timer_event();
       }
+
+   if (cpu_interrupt_map & CPU_SIGIO_EXCEPTION_MASK)
+      {
+      cpu_interrupt_map &= ~CPU_SIGIO_EXCEPTION_MASK;
+      ica_sigio_event();
+      }
+
+   if (softpc_platform_consume_clock_tick())
+      softpc_platform_timer_event();
+
+   if (softpc_platform_consume_executor_wake())
+      softpc_platform_executor_event();
 
    if (cpu_interrupt_map & CPU_SAD_EXCEPTION_MASK)
       {
@@ -4486,6 +4545,26 @@ TYPEFF_3:
 #endif /* PIG */
 
 NEXT_INST:
+
+   /* Standalone executor mailbox: this is the original CCPU
+      instruction boundary, including quick-mode iterations. */
+   if (softpc_platform_consume_clock_tick())
+      softpc_platform_timer_event();
+
+   if (softpc_platform_consume_executor_wake())
+      softpc_platform_executor_event();
+
+   /* The original CCPU quick-event contract maps one decoded
+      instruction to one microsecond.  Pace only the standalone
+      continuous executor here, outside all machine controllers. */
+   softpc_platform_pace_instruction();
+
+   if (!(cpu_interrupt_map & CPU_RESET_EXCEPTION_MASK) &&
+       softpc_platform_consume_instruction_budget())
+      {
+      softpc_ccpu_lifecycle_request_exit();
+      softpc_platform_executor_event();
+      }
 
    CCPU_save_EIP = GET_EIP();   /* to reflect IP change */
 
@@ -4629,7 +4708,7 @@ LOCAL VOID
       IU32 ip_phy_addr;	/* Used when setting up IP (cf SETUP_HOST_IP) */
 
       /* update Intel IP up to end of the old page */
-      SET_EIP(GET_EIP() + DIFF_INST_BYTE(*q, p_start));
+      SET_EIP(GET_EIP() + CCPU_INSTRUCTION_DELTA(*q));
 
       /* move onto new page in host format */
       SETUP_HOST_IP(*q)
@@ -4681,7 +4760,7 @@ LOCAL VOID
       }
 #endif	/* PIG */
 
-#ifdef NTVDM
+#if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
       ccpu386InitThreadStuff();
 #endif
 
@@ -4840,12 +4919,13 @@ LOCAL VOID
    GLOBAL VOID
    c_cpu_simulate IFN0()
       {
+      softpc_ccpu_lifecycle_enter();
       SYNCH_TICK();
       if (simulate_level >= FRAMES)
 	 fprintf(stderr, "Stack overflow in host_simulate()!\n");
 
       /* Save current context and invoke a new CPU level */
-#ifdef NTVDM
+#if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
       if ( setjmp(ccpu386SimulatePtr()) == 0)
 #else
       if ( setjmp(longjmp_env_stack[simulate_level++]) == 0 )
@@ -4854,6 +4934,7 @@ LOCAL VOID
 	 in_C = 0;
 	 ccpu(FALSE);
 	 }
+      softpc_ccpu_lifecycle_leave();
       }
 
    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -4862,7 +4943,7 @@ LOCAL VOID
    GLOBAL VOID
    c_cpu_continue IFN0()
       {
-#ifdef NTVDM
+#if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
       ccpu386GotoThrdExptnPt();
 #else
       longjmp(next_inst[simulate_level-1], 1);
@@ -4877,7 +4958,7 @@ LOCAL VOID
    GLOBAL VOID
    c_cpu_unsimulate IFN0()
       {
-#ifdef NTVDM
+#if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
       ccpu386Unsimulate();
 #else
       if (simulate_level == 0)
@@ -4912,7 +4993,7 @@ LOCAL VOID
 	 fprintf(stderr, "Stack overflow in c_do_interrupt()!\n");
 
       /* Save current context and invoke a new CPU level */
-#ifdef NTVDM
+#if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
       if ( setjmp(ccpu386SimulatePtr()) == 0)
 #else
       if ( setjmp(longjmp_env_stack[simulate_level++]) == 0 )

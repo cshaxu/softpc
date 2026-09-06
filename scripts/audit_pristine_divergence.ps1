@@ -4,7 +4,7 @@ param(
     [ValidateNotNullOrEmpty()]
     [string]$OriginalRoot,
 
-    [string]$CurrentRoot = (Join-Path $PSScriptRoot '..\src\core\softpc')
+    [string]$CurrentRoot = (Join-Path $PSScriptRoot '..\src\mvdm\softpc.new')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -39,6 +39,36 @@ $portAbiPaths = @(
     'base\video\gfx_updt.c', 'host\inc\x86\prod\gdpvar.h',
     'host\inc\x86\prod\PigReg_c.h', 'host\inc\x86\prod\sas4gen.h'
 )
+$directPortPaths = @(
+    'base\bios\reset.c',
+    'base\system\cmos.c', 'base\system\timer.c',
+    'base\ccpu386\c_bsic.h', 'base\ccpu386\c_main.c',
+    'base\ccpu386\c_page.c', 'base\ccpu386\c_reg.c',
+    'base\ccpu386\c_xcptn.c', 'base\ccpu386\ccpusas4.c',
+    'base\ccpu386\cpu4gen.h', 'base\ccpu386\fpu.c',
+    'base\ccpu386\ntstubs.c', 'base\ccpu386\ntthread.c',
+    'base\ccpu386\popf.c', 'base\ccpu386\vglob.c',
+    'base\ccpu386\zfrsrvd.c', 'base\inc\sas.h',
+    'base\cvidc\ev_glue.c',
+    'base\cvidc\sevid000.c', 'base\cvidc\sevid001.c',
+    'base\cvidc\sevid002.c', 'base\cvidc\sevid003.c',
+    'base\cvidc\sevid004.c', 'base\cvidc\sevid005.c',
+    'base\cvidc\sevid006.c', 'base\cvidc\sevid007.c',
+    'base\cvidc\sevid008.c', 'base\cvidc\sevid009.c',
+    'base\cvidc\sevid010.c', 'base\cvidc\sevid011.c',
+    'base\cvidc\sevid012.c', 'base\cvidc\sevid013.c',
+    'base\cvidc\sevid014.c', 'base\cvidc\sevid015.c',
+    'base\cvidc\sevid016.c', 'base\cvidc\sevid017.c',
+    'base\cvidc\sevid018.c', 'base\cvidc\sevid019.c',
+    'base\cvidc\sevid020.c', 'base\cvidc\sevid021.c',
+    'base\cvidc\sevid022.c', 'base\cvidc\sevid023.c',
+    'base\cvidc\sevid024.c', 'base\cvidc\sevid025.c',
+    'base\cvidc\sevid026.c', 'base\cvidc\sevid027.c',
+    'base\cvidc\sevid028.c', 'base\cvidc\sevid029.c',
+    'base\cvidc\sevid030.c',
+    'base\cvidc\sinit011.c', 'base\cvidc\sinit012.c',
+    'base\cvidc\sinit013.c'
+)
 $compatHostPaths = @(
     'base\support\ios.c', 'host\inc\cfpu_def.h',
     'host\inc\host_cpu.h', 'host\inc\host_def.h',
@@ -53,6 +83,10 @@ $restorePristinePaths = @(
     'base\bios\reset.c', 'base\keymouse\keyba.c',
     'base\keymouse\ppi.c', 'base\system\cmos.c',
     'base\system\timer.c', 'base\system\illegalp.c'
+)
+$blockedBehaviorPaths = @(
+    'base\bios\tape_io.c', 'base\ccpu386\c_main.c',
+    'base\keymouse\mouse.c'
 )
 
 function Get-Family([string]$RelativePath) {
@@ -80,6 +114,7 @@ function Get-NextTask([string]$Family, [bool]$HasOriginalPeer) {
 }
 
 function Get-Disposition([string]$RelativePath, [bool]$HasOriginalPeer) {
+    if ($directPortPaths -contains $RelativePath) { return 'port-abi-direct' }
     if ($RelativePath.StartsWith('xms.486\') -or
         $RelativePath.StartsWith('suballoc\')) { return 'port-abi-overlay' }
     if ($portAbiPaths -contains $RelativePath) { return 'port-abi-overlay' }
@@ -87,7 +122,10 @@ function Get-Disposition([string]$RelativePath, [bool]$HasOriginalPeer) {
     if ($restorePristinePaths -contains $RelativePath) {
         return 'restore-pristine'
     }
-    throw "M5 ledger has no extraction route for $RelativePath"
+    if ($blockedBehaviorPaths -contains $RelativePath) {
+        return 'blocked-behavior'
+    }
+    return 'unclassified'
 }
 
 function Get-OriginalPeer([string]$RelativePath) {
@@ -161,3 +199,10 @@ foreach ($record in $records) {
 }
 ''
 "Total: $($records.Count)"
+
+$unclassified = @($records | Where-Object {
+    $_.Disposition -eq 'unclassified'
+})
+if ($unclassified.Count -ne 0) {
+    throw "Current divergence audit has $($unclassified.Count) unclassified path(s); classify every path before using this ledger as an admission record"
+}

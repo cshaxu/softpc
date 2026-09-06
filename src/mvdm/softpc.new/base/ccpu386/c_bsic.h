@@ -97,6 +97,8 @@ IPT1(
    );
 
 
+IMPORT IU32 c_getEFLAGS IPT0();
+
 IMPORT IU32 getFLAGS IPT0();
 
 IMPORT VOID read_descriptor_linear

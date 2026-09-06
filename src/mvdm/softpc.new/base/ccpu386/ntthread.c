@@ -215,6 +215,36 @@ void ccpu386Unsimulate()
     longjmp(simstack->sims[simstack->level], 1);
 }
 
+
+/* Standalone runtime control reaches this only from a CCPU host event on the
+ * executor thread.  Normal SoftPC BOP/device unwinds retain ccpu386Unsimulate
+ * above; a shutdown must bypass nested host_simulate frames (for example the
+ * original keyboard polling loop) and return to the outer executor frame. */
+void ccpu386UnsimulateOuter()
+{
+    ThreadSimBufPtr simstack;
+    extern ISM32 in_C;
+
+    if (ccpuSimId == BADID)
+    {
+        fprintf(stderr, "ccpu386UnsimulateOuter id:%#x called with Bad Id\n", GetCurrentThreadId());
+        return;
+    }
+    simstack = (ThreadSimBufPtr)TlsGetValue(ccpuSimId);
+    if (simstack == (ThreadSimBufPtr)0 || simstack->level == 0)
+    {
+        fprintf(stderr, "ccpu386UnsimulateOuter has no executor frame\n");
+        return;
+    }
+
+    in_C = 1;
+    /* ccpu386SimulatePtr increments the level before setjmp.  The ordinary
+       c_cpu_unsimulate path decrements it before jumping back; mirror that
+       invariant when returning across nested host_simulate frames. */
+    simstack->level = 0;
+    longjmp(simstack->sims[0], 1);
+}
+
    /* somewhere for exceptions to return to */
 jmp_buf *ccpu386ThrdExptnPtr()
 {

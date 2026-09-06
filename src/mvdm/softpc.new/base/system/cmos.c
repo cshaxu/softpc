@@ -41,6 +41,7 @@
 #include "spcfile.h"
 #include "error.h"
 #include "config.h"
+#include <cmos/port.h>
 #include "timeval.h"
 #include "ica.h"
 #include "timer.h"
@@ -340,7 +341,7 @@ LOCAL int verify_equip_byte IFN1(half_word *, equip)
 
 	/* Check the Equipment Byte */
 	*equip = 0;
-	adapter = (ULONG) config_inquire(C_GFX_ADAPTER, NULL);
+	adapter = (ULONG)(ULONG_PTR) config_inquire(C_GFX_ADAPTER, NULL);
 	if(adapter != -1)
 		*equip |= display_mask[adapter];
 
@@ -1037,11 +1038,8 @@ GLOBAL void cmos_post IFN0()
 	if (floppy != cmos[CMOS_DISKETTE])
 		cmos_err |= BAD_FLOPPY;
 
-	/* Check the Fixed Disk Type */
-	 disk = 0x30;         /* Drive C type always 3 - then <<4 */
-	 /* check whether D drive exists */
-	 if ( *((CHAR *) config_inquire(C_HARD_DISK2_NAME, NULL)))
-		 disk = 0x34;         /* 3 << 4 | 4 */
+	/* Check the Fixed Disk Type through the standalone media port. */
+	 disk = softpc_host_cmos_fixed_disk_type();
 	if (disk != cmos[CMOS_DISK])
 		cmos_err |= BAD_DISK;
 

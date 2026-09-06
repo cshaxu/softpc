@@ -92,6 +92,8 @@ extern void sas_term IPT0();
 
 #include	<sas4gen.h>
 
+extern void sas_overwrite_memory IPT2(PHY_ADDR, addr, PHY_ADDR, len);
+
 #ifdef NTVDM
 #ifdef CCPU
 extern IU8 *c_GetLinAdd IPT1(IU32, lin_addr);
@@ -106,15 +108,15 @@ extern IU8 *NtGetPtrToLinAddrByte IPT1(IU32, lin_addr);
  */
 
 extern host_addr Start_of_M_area;       /* host addr (char *) of start of M */
-extern  IHPE    Length_of_M_area;       /* offset of end of M */
+extern PHY_ADDR Length_of_M_area;	/* guest physical byte count */
 #else /* CPU_40_STYLE */
 #define sas_set_buf(buf,addr)	buf=get_byte_addr(addr)
 
 extern host_addr Start_of_M_area;	/* host addr (char *) of start of M */
 #ifdef	GISP_CPU
-extern	IHPE	Length_of_M_area;	/* offset of end of M */
+extern PHY_ADDR Length_of_M_area;	/* guest physical byte count */
 #else
-extern sys_addr Length_of_M_area;	/* sys addr (long) offset of end of M */
+extern PHY_ADDR Length_of_M_area;	/* guest physical byte count */
 #endif	/* GISP_CPU */
 
 /* the following is for integration only */

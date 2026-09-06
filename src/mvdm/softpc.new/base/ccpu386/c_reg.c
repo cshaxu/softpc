@@ -36,6 +36,7 @@ Provide External Interface to CPU Registers.
 
 #include <Fpu_c.h>
 #include <Pigger_c.h>
+#include <stdio.h>
 #ifdef PIG
 #include <gdpvar.h>
 #define AR_FIXUP				\

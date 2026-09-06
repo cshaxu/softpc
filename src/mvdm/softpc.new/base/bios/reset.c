@@ -197,7 +197,7 @@ static void setup_ivt()
 	sas_storew(int_addr(0xE), DISKETTE_INT_OFFSET);
 	sas_storew(int_addr(0xE) + 2, DISKETTE_INT_SEGMENT);
 #ifdef	GISP_SVGA
-	if((ULONG) config_inquire(C_GFX_ADAPTER, NULL) == CGA )
+	if((ULONG_PTR) config_inquire(C_GFX_ADAPTER, NULL) == CGA )
 	{
 		sas_storew(int_addr(0x10), CGA_VIDEO_IO_OFFSET);
 		sas_storew( int_addr(0x10) + 2 , VIDEO_IO_SEGMENT );
@@ -333,7 +333,7 @@ half_word *low, *high;
 
     /* set the value of the high switches from the config settings */
 
-    switch((ULONG)config_inquire(C_GFX_ADAPTER, NULL))
+    switch((ULONG_PTR)config_inquire(C_GFX_ADAPTER, NULL))
     {
     case CGA:
 #ifdef CGAMONO
@@ -524,7 +524,7 @@ void reset()
 	half_word cmos_shutdown;
 	sys_addr user_stack;
 	word temp_word;
-#ifdef NTVDM
+#if defined(NTVDM) || defined(SOFTPC_STANDALONE)
         half_word cmos_diskette;
 #endif
 
@@ -835,7 +835,9 @@ void reset()
 	equip_flag.bits.game_io_present = FALSE;
 	equip_flag.bits.rs232_count = NUM_SERIAL_PORTS;
 	equip_flag.bits.ram_size = 0;
-#ifdef NTVDM
+#if defined(NTVDM) || defined(SOFTPC_STANDALONE)
+	/* Standalone equipment is the attached FDC topology, not the
+	   original product default that always exposed a floppy. */
 	equip_flag.bits.diskette_present = FALSE;
 	equip_flag.bits.max_diskette = 0;
 	if (cmos_read_byte(CMOS_DISKETTE, &cmos_diskette) == SUCCESS &&
@@ -860,7 +862,7 @@ void reset()
 	/* Load up the amount of memory into the BIOS. */
 	sas_storew(MEMORY_VAR, host_get_memory_size());
 
-	gfxAdapt = (ULONG)config_inquire(C_GFX_ADAPTER, NULL);
+	gfxAdapt = (SHORT)(ULONG_PTR)config_inquire(C_GFX_ADAPTER, NULL);
 
 #ifdef GISP_SVGA
 

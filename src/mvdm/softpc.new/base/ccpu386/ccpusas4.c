@@ -61,6 +61,10 @@
 #include <c_reg.h>
 #include <timer.h>
 #include <yoda.h>
+#include <emm.h>
+#include <host.h>
+extern UTINY *host_sas_init IPT1(sys_addr, size);
+extern UTINY *host_sas_term IPT0();
 
 /********************************************************/
 #define SIXTY_FOUR_K 1024*64

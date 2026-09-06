@@ -6,9 +6,6 @@
 mvdm/softpc.new
   selected original CCPU, C-VID, controllers, BIOS, firmware, BOP and renderers
         ↑
-overlay/mvdm/softpc.new
-  reproducible x86/x64 source/ABI adaptation only; no machine policy
-        ↑
 host/
   standalone host callback implementations: timer, media, BOP services,
   conapi-compatible surfaces, input, audio, serial and parallel endpoints
@@ -27,10 +24,11 @@ lib/platform/win32/
 It retains original relative paths and names for every included file so T14 can
 compare them with the read-only OpenNT reference. It is a selected source
 subset: wholly host-specific NT endpoint files may be absent when a standalone
-host endpoint replaces that contract. Its corresponding overlay path, if
-needed, holds only repository-owned reproducible patches for host-width or
-toolchain representation; it never owns machine policy. `host/` supplies
-standalone host-facing symbols but does not own guest-visible state.
+host endpoint replaces that contract. Narrow compiler, declaration, calling-ABI
+and pointer-representation corrections may be direct, source-visible diffs at
+the affected point when they remain mechanical and introduce no machine policy.
+`host/` owns larger host adaptations, including new state, lifecycle,
+capability, ownership, and policy, but does not own guest-visible state.
 `app/` owns the single executor, machine snapshot producer, guest-input
 adapter, monitor, and product binding.
 `lib/platform/win32/` is a local synchronized-source component, not a runtime

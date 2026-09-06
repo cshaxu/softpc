@@ -31,18 +31,6 @@ set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/host/platform.c"
     "${SOFTPC_SOURCE_DIR}/src/host/machine.c")
 
-# Overlay is reserved for a future direct source composition only.  Its path
-# is meaningful only when every file maps one-to-one to a recovered peer.
-set(overlay_root "${SOFTPC_SOURCE_DIR}/src/overlay/mvdm/softpc.new")
-if(EXISTS "${overlay_root}")
-    file(GLOB_RECURSE overlay_files RELATIVE "${overlay_root}" "${overlay_root}/*")
-    foreach(overlay_file IN LISTS overlay_files)
-        if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/${overlay_file}")
-            message(FATAL_ERROR "Overlay has no same-name recovered peer: ${overlay_file}")
-        endif()
-    endforeach()
-endif()
-
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/host/softpc_compat")
     message(FATAL_ERROR "Standalone host retains the obsolete softpc_compat taxonomy")
 endif()
@@ -112,6 +100,15 @@ endforeach()
 # must never activate those branches.
 file(READ "${SOFTPC_SOURCE_DIR}/CMakeLists.txt" build_definition)
 string(TOLOWER "${build_definition}" normalized_build_definition)
+file(GLOB retired_source_transform_scripts
+    "${SOFTPC_SOURCE_DIR}/scripts/transform_*.py")
+if(retired_source_transform_scripts)
+    message(FATAL_ERROR "Standalone build retains source-transform scripts: ${retired_source_transform_scripts}")
+endif()
+if(normalized_build_definition MATCHES
+    "(add_custom_command|python3|generated-(ccpu|cvid|device))")
+    message(FATAL_ERROR "Standalone build retains generated-source machinery")
+endif()
 if(normalized_build_definition MATCHES "target_compile_definitions\\([^\\)]*ntvdm")
     message(FATAL_ERROR "Standalone SoftPC enables an NTVDM compile definition")
 endif()

@@ -49,7 +49,8 @@ services.
 ## M8: Auditable Source-Mirror Migration
 
 Rebuild the source layout around a byte-accounted OpenNT `softpc.new` mirror,
-mirrored source overlays, a standalone host, and an application shell. This
+source-visible, reviewable portability diffs, a standalone host, and an
+application shell. This
 milestone starts with T13, separating self-contained unit tests from fixed-package
 integration tests. Every subsequent structural step preserves the selected
 machine and proves the existing x86/x64 behavior before removing a

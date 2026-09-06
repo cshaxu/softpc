@@ -17,8 +17,9 @@
 
 #include "insignia.h"
 #include "host_def.h"
-#include "Evid_c.h"
+#include "../cvidc/Evid_c.h"
 #include "gdpvar.h"
+#include <gdp_slots.h>
 
 /*
  * Note: no interfaces produced for the following 3.0 VGlob entries as

@@ -27,6 +27,7 @@ Paging Support.
 #include <c_tlb.h>	/* Translation Lookaside Buffer interface */
 #include <ccpusas4.h>	/* CPU <-> sas interface */
 #include <c_debug.h>	/* Debugging Regs and Breakpoint interface */
+#include <yoda.h>
 
 
 /*[

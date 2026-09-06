@@ -68,263 +68,50 @@ foreach(SOFTPC_CCPU_SOURCE_NAME IN LISTS SOFTPC_CCPU_SOURCE_NAMES)
     list(APPEND SOFTPC_CCPU_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/${SOFTPC_CCPU_SOURCE_NAME}")
 endforeach()
-file(GLOB SOFTPC_CVIDC_GENERATED_INPUTS CONFIGURE_DEPENDS
+
+# Keep the historical object/archive ordering while compiling the checked-in
+# sources directly.  The old generated-source path happened to append these
+# translation units after c-files; static archive resolution depends on that
+# order.  This is source selection only, not a source transformation.
+set(SOFTPC_CCPU_DIRECT_PORT_HEAD
+    src/mvdm/softpc.new/base/ccpu386/ccpusas4.c
+    src/mvdm/softpc.new/base/ccpu386/c_main.c)
+set(SOFTPC_CCPU_DIRECT_PORT_TAIL
+    src/mvdm/softpc.new/base/ccpu386/ntthread.c
+    src/mvdm/softpc.new/base/ccpu386/fpu.c
+    src/mvdm/softpc.new/base/ccpu386/zfrsrvd.c
+    src/mvdm/softpc.new/base/ccpu386/c_page.c
+    src/mvdm/softpc.new/base/ccpu386/c_reg.c
+    src/mvdm/softpc.new/base/ccpu386/c_xcptn.c
+    src/mvdm/softpc.new/base/ccpu386/popf.c)
+list(REMOVE_ITEM SOFTPC_CCPU_SOURCES
+    ${SOFTPC_CCPU_DIRECT_PORT_HEAD}
+    ${SOFTPC_CCPU_DIRECT_PORT_TAIL})
+file(GLOB SOFTPC_CVIDC_RULE_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/cvidc/sinit*.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/cvidc/sevid*.c")
-find_package(Python3 REQUIRED COMPONENTS Interpreter)
-set(SOFTPC_CMOS_INPUT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/system/cmos.c")
-set(SOFTPC_CMOS_SOURCE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-device/cmos.c")
-add_custom_command(
-    OUTPUT "${SOFTPC_CMOS_SOURCE}"
-    COMMAND "${Python3_EXECUTABLE}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cmos.py"
-        "${SOFTPC_CMOS_INPUT}"
-        "${SOFTPC_CMOS_SOURCE}"
-    DEPENDS "${SOFTPC_CMOS_INPUT}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cmos.py"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/host/compat/cmos/port.h"
-    COMMENT "Transforming CMOS media port ABI"
-    VERBATIM)
-set_source_files_properties("${SOFTPC_CMOS_SOURCE}" PROPERTIES GENERATED TRUE)
-set(SOFTPC_TIMER_INPUT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/system/timer.c")
-set(SOFTPC_TIMER_SOURCE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-device/timer.c")
-add_custom_command(
-    OUTPUT "${SOFTPC_TIMER_SOURCE}"
-    COMMAND "${Python3_EXECUTABLE}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_timer.py"
-        "${SOFTPC_TIMER_INPUT}"
-        "${SOFTPC_TIMER_SOURCE}"
-    DEPENDS "${SOFTPC_TIMER_INPUT}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_timer.py"
-    COMMENT "Transforming timer quick-event port ABI"
-    VERBATIM)
-set_source_files_properties("${SOFTPC_TIMER_SOURCE}" PROPERTIES GENERATED TRUE)
-set(SOFTPC_RESET_INPUT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/bios/reset.c")
-set(SOFTPC_RESET_SOURCE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-device/reset.c")
-add_custom_command(
-    OUTPUT "${SOFTPC_RESET_SOURCE}"
-    COMMAND "${Python3_EXECUTABLE}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_reset.py"
-        "${SOFTPC_RESET_INPUT}"
-        "${SOFTPC_RESET_SOURCE}"
-    DEPENDS "${SOFTPC_RESET_INPUT}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_reset.py"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/host/compat/bios/host_def.h"
-    COMMENT "Transforming BIOS reset host ABI"
-    VERBATIM)
-set_source_files_properties("${SOFTPC_RESET_SOURCE}" PROPERTIES
-    GENERATED TRUE
-    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/host/compat/bios")
-set(SOFTPC_CVIDC_TRANSFORMED_SOURCES)
-foreach(SOFTPC_CVIDC_GENERATED_INPUT IN LISTS SOFTPC_CVIDC_GENERATED_INPUTS)
-    get_filename_component(SOFTPC_CVIDC_GENERATED_NAME
-        "${SOFTPC_CVIDC_GENERATED_INPUT}" NAME)
-    set(SOFTPC_CVIDC_TRANSFORMED_SOURCE
-        "${CMAKE_CURRENT_BINARY_DIR}/generated-cvid/${SOFTPC_CVIDC_GENERATED_NAME}")
-    add_custom_command(
-        OUTPUT "${SOFTPC_CVIDC_TRANSFORMED_SOURCE}"
-        COMMAND "${Python3_EXECUTABLE}"
-            "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
-            "${SOFTPC_CVIDC_GENERATED_INPUT}"
-            "${SOFTPC_CVIDC_TRANSFORMED_SOURCE}"
-        DEPENDS "${SOFTPC_CVIDC_GENERATED_INPUT}"
-            "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
-        COMMENT "Transforming C-VID GDP layout ${SOFTPC_CVIDC_GENERATED_NAME}"
-        VERBATIM)
-    list(APPEND SOFTPC_CVIDC_TRANSFORMED_SOURCES
-        "${SOFTPC_CVIDC_TRANSFORMED_SOURCE}")
-endforeach()
-set(SOFTPC_CVIDC_EVENT_GLUE_INPUT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/cvidc/ev_glue.c")
-set(SOFTPC_CVIDC_EVENT_GLUE_SOURCE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-cvid/ev_glue.c")
-add_custom_command(
-    OUTPUT "${SOFTPC_CVIDC_EVENT_GLUE_SOURCE}"
-    COMMAND "${Python3_EXECUTABLE}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
-        --event-glue "${SOFTPC_CVIDC_EVENT_GLUE_INPUT}"
-        "${SOFTPC_CVIDC_EVENT_GLUE_SOURCE}"
-    DEPENDS "${SOFTPC_CVIDC_EVENT_GLUE_INPUT}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
-    COMMENT "Transforming C-VID event glue port ABI"
-    VERBATIM)
-set(SOFTPC_CCPU_CPU4GEN_INPUT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/cpu4gen.h")
-set(SOFTPC_CCPU_CPU4GEN_SOURCE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/cpu4gen.h")
-add_custom_command(
-    OUTPUT "${SOFTPC_CCPU_CPU4GEN_SOURCE}"
-    COMMAND "${Python3_EXECUTABLE}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
-        --ccpu-cpu4gen "${SOFTPC_CCPU_CPU4GEN_INPUT}"
-        "${SOFTPC_CCPU_CPU4GEN_SOURCE}"
-    DEPENDS "${SOFTPC_CCPU_CPU4GEN_INPUT}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
-    COMMENT "Transforming CCPU GDP header port ABI"
-    VERBATIM)
-set(SOFTPC_CCPU_VGLOB_INPUT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/vglob.c")
-set(SOFTPC_CCPU_VGLOB_SOURCE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/vglob.c")
-add_custom_command(
-    OUTPUT "${SOFTPC_CCPU_VGLOB_SOURCE}"
-    COMMAND "${Python3_EXECUTABLE}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
-        --ccpu-vglob "${SOFTPC_CCPU_VGLOB_INPUT}"
-        "${SOFTPC_CCPU_VGLOB_SOURCE}"
-    DEPENDS "${SOFTPC_CCPU_VGLOB_INPUT}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
-    COMMENT "Transforming CCPU VGA global port ABI"
-    VERBATIM)
-set(SOFTPC_CCPU_SAS_HEADER_INPUT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/inc/sas.h")
-set(SOFTPC_CCPU_SAS_HEADER_SOURCE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/sas.h")
-set(SOFTPC_CCPU_BSIC_HEADER_INPUT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/c_bsic.h")
-set(SOFTPC_CCPU_BSIC_HEADER_SOURCE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/c_bsic.h")
-set(SOFTPC_CCPU_SAS_INPUT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/ccpusas4.c")
-set(SOFTPC_CCPU_SAS_SOURCE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/ccpusas4.c")
-set(SOFTPC_CCPU_MAIN_INPUT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/c_main.c")
-set(SOFTPC_CCPU_MAIN_SOURCE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/c_main.c")
-set(SOFTPC_CCPU_NTSTUBS_INPUT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/ntstubs.c")
-set(SOFTPC_CCPU_NTSTUBS_SOURCE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/ntstubs.c")
-set(SOFTPC_CCPU_NTTHREAD_INPUT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/ntthread.c")
-set(SOFTPC_CCPU_NTTHREAD_SOURCE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/ntthread.c")
-set(SOFTPC_CCPU_FPU_INPUT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/fpu.c")
-set(SOFTPC_CCPU_FPU_SOURCE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/fpu.c")
-set(SOFTPC_CCPU_ZFRSRVD_INPUT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/zfrsrvd.c")
-set(SOFTPC_CCPU_ZFRSRVD_SOURCE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/zfrsrvd.c")
-set(SOFTPC_CCPU_PAGE_INPUT "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/c_page.c")
-set(SOFTPC_CCPU_PAGE_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/c_page.c")
-set(SOFTPC_CCPU_REG_INPUT "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/c_reg.c")
-set(SOFTPC_CCPU_REG_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/c_reg.c")
-set(SOFTPC_CCPU_XCPTN_INPUT "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/c_xcptn.c")
-set(SOFTPC_CCPU_XCPTN_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/c_xcptn.c")
-set(SOFTPC_CCPU_POPF_INPUT "${CMAKE_CURRENT_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/popf.c")
-set(SOFTPC_CCPU_POPF_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu/popf.c")
-foreach(SOFTPC_CCPU_ABI_NAME IN ITEMS sas-header bsic-header sas-source main ntstubs ntthread fpu zfrsrvd page reg xcptn popf)
-    if(SOFTPC_CCPU_ABI_NAME STREQUAL "sas-header")
-        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_SAS_HEADER_INPUT}")
-        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_SAS_HEADER_SOURCE}")
-    elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "bsic-header")
-        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_BSIC_HEADER_INPUT}")
-        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_BSIC_HEADER_SOURCE}")
-    elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "main")
-        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_MAIN_INPUT}")
-        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_MAIN_SOURCE}")
-    elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "ntstubs")
-        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_NTSTUBS_INPUT}")
-        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_NTSTUBS_SOURCE}")
-    elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "ntthread")
-        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_NTTHREAD_INPUT}")
-        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_NTTHREAD_SOURCE}")
-    elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "fpu")
-        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_FPU_INPUT}")
-        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_FPU_SOURCE}")
-    elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "zfrsrvd")
-        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_ZFRSRVD_INPUT}")
-        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_ZFRSRVD_SOURCE}")
-    elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "page")
-        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_PAGE_INPUT}")
-        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_PAGE_SOURCE}")
-    elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "reg")
-        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_REG_INPUT}")
-        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_REG_SOURCE}")
-    elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "xcptn")
-        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_XCPTN_INPUT}")
-        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_XCPTN_SOURCE}")
-    elseif(SOFTPC_CCPU_ABI_NAME STREQUAL "popf")
-        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_POPF_INPUT}")
-        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_POPF_SOURCE}")
-    else()
-        set(SOFTPC_CCPU_ABI_INPUT "${SOFTPC_CCPU_SAS_INPUT}")
-        set(SOFTPC_CCPU_ABI_OUTPUT "${SOFTPC_CCPU_SAS_SOURCE}")
-    endif()
-    add_custom_command(
-        OUTPUT "${SOFTPC_CCPU_ABI_OUTPUT}"
-        COMMAND "${Python3_EXECUTABLE}"
-            "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
-            "--ccpu-${SOFTPC_CCPU_ABI_NAME}" "${SOFTPC_CCPU_ABI_INPUT}"
-            "${SOFTPC_CCPU_ABI_OUTPUT}"
-        DEPENDS "${SOFTPC_CCPU_ABI_INPUT}"
-            "${CMAKE_CURRENT_SOURCE_DIR}/scripts/transform_cvid_gdp.py"
-        COMMENT "Transforming CCPU ${SOFTPC_CCPU_ABI_NAME} port ABI"
-        VERBATIM)
-endforeach()
-add_custom_target(softpc-ccpu-port-abi-inputs
-    DEPENDS "${SOFTPC_CCPU_CPU4GEN_SOURCE}"
-            "${SOFTPC_CCPU_VGLOB_SOURCE}"
-            "${SOFTPC_CCPU_SAS_HEADER_SOURCE}"
-            "${SOFTPC_CCPU_BSIC_HEADER_SOURCE}"
-            "${SOFTPC_CCPU_SAS_SOURCE}"
-            "${SOFTPC_CCPU_MAIN_SOURCE}"
-            "${SOFTPC_CCPU_NTSTUBS_SOURCE}"
-            "${SOFTPC_CCPU_NTTHREAD_SOURCE}"
-            "${SOFTPC_CCPU_FPU_SOURCE}"
-            "${SOFTPC_CCPU_ZFRSRVD_SOURCE}"
-            "${SOFTPC_CCPU_PAGE_SOURCE}"
-            "${SOFTPC_CCPU_REG_SOURCE}"
-            "${SOFTPC_CCPU_XCPTN_SOURCE}"
-            "${SOFTPC_CCPU_POPF_SOURCE}")
-set_source_files_properties("${SOFTPC_CCPU_SAS_SOURCE}" "${SOFTPC_CCPU_MAIN_SOURCE}" "${SOFTPC_CCPU_NTSTUBS_SOURCE}" "${SOFTPC_CCPU_NTTHREAD_SOURCE}" "${SOFTPC_CCPU_FPU_SOURCE}" "${SOFTPC_CCPU_ZFRSRVD_SOURCE}" "${SOFTPC_CCPU_PAGE_SOURCE}" "${SOFTPC_CCPU_REG_SOURCE}" "${SOFTPC_CCPU_XCPTN_SOURCE}" "${SOFTPC_CCPU_POPF_SOURCE}" PROPERTIES GENERATED TRUE)
-list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_SAS_INPUT}")
-list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_SAS_SOURCE}")
-list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_MAIN_INPUT}")
-list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_MAIN_SOURCE}")
-list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_NTSTUBS_INPUT}")
-list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_NTSTUBS_SOURCE}")
-list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_NTTHREAD_INPUT}")
-list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_NTTHREAD_SOURCE}")
-list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_FPU_INPUT}")
-list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_FPU_SOURCE}")
-list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_ZFRSRVD_INPUT}")
-list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_ZFRSRVD_SOURCE}")
-list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_PAGE_INPUT}" "${SOFTPC_CCPU_REG_INPUT}")
-list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_PAGE_SOURCE}" "${SOFTPC_CCPU_REG_SOURCE}")
-list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_XCPTN_INPUT}")
-list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_XCPTN_SOURCE}")
-list(REMOVE_ITEM SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_POPF_INPUT}")
-list(APPEND SOFTPC_CCPU_SOURCES "${SOFTPC_CCPU_POPF_SOURCE}")
-# ``j_c_lang`` is the generated-rule register file.  It carries private host
-# pointers (not guest registers), so x64 needs a pointer-width IUH only at
-# this generated-rule ABI boundary.  On an x86 host, the original generated
-# signatures already have the correct native widths; forcing the x64 rule
-# word there corrupts their pointer and void function-table declarations.
+
+# C-VID generated rules keep their original 32-bit rule-register layout, but
+# their checked-in source now names the native-width GDP access boundary.
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set_source_files_properties(
-        ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
+        ${SOFTPC_CVIDC_RULE_SOURCES}
         src/mvdm/softpc.new/base/cvidc/j_c_lang.c
-        "${SOFTPC_CVIDC_EVENT_GLUE_SOURCE}"
+        src/mvdm/softpc.new/base/cvidc/ev_glue.c
         src/mvdm/softpc.new/base/cvidc/vglfunc.c
         PROPERTIES COMPILE_DEFINITIONS CVIDC_RULE_WORD=1)
 endif()
+set_source_files_properties(src/mvdm/softpc.new/base/bios/reset.c PROPERTIES
+    COMPILE_OPTIONS "-iquote${CMAKE_CURRENT_SOURCE_DIR}/src/host/compat/bios")
 add_library(softpc-ccpu-core OBJECT
     ${SOFTPC_CCPU_SOURCES}
-    "${SOFTPC_CCPU_NTSTUBS_SOURCE}"
+    ${SOFTPC_CCPU_DIRECT_PORT_HEAD}
+    src/mvdm/softpc.new/base/ccpu386/ntstubs.c
+    ${SOFTPC_CCPU_DIRECT_PORT_TAIL}
     src/host/compat/ccpu/facade.c
-    "${SOFTPC_CCPU_VGLOB_SOURCE}"
-    ${SOFTPC_CVIDC_TRANSFORMED_SOURCES}
-    "${SOFTPC_CVIDC_EVENT_GLUE_SOURCE}"
+    src/mvdm/softpc.new/base/ccpu386/vglob.c
+    ${SOFTPC_CVIDC_RULE_SOURCES}
+    src/mvdm/softpc.new/base/cvidc/ev_glue.c
     src/mvdm/softpc.new/base/cvidc/evidfunc.c
     src/mvdm/softpc.new/base/cvidc/j_c_lang.c
     src/mvdm/softpc.new/base/cvidc/accessfn.c
@@ -333,7 +120,6 @@ add_library(softpc-ccpu-core OBJECT
 add_library(softpc-machine-compat OBJECT
     src/host/compat/cvidc/gdp_state.c
     src/host/compat/ccpu/lifecycle.c)
-add_dependencies(softpc-ccpu-core softpc-ccpu-port-abi-inputs)
 
 # Controllers, firmware and the standalone host boundary evolve independently
 # of the CCPU/C-VIDC executor.  Keep them in a separate object target so a
@@ -349,18 +135,18 @@ add_library(softpc-machine-devices OBJECT
     src/mvdm/softpc.new/base/system/ica.c
     src/mvdm/softpc.new/base/system/quick_ev.c
     src/mvdm/softpc.new/base/system/at_dma.c
-    "${SOFTPC_CMOS_SOURCE}"
+    src/mvdm/softpc.new/base/system/cmos.c
     src/mvdm/softpc.new/base/system/dummy_nt.c
     src/mvdm/softpc.new/base/system/idetect.c
     src/mvdm/softpc.new/base/system/illegalp.c
     src/mvdm/softpc.new/base/system/rom.c
-    "${SOFTPC_TIMER_SOURCE}"
+    src/mvdm/softpc.new/base/system/timer.c
     src/mvdm/softpc.new/base/system/timestrb.c
     src/mvdm/softpc.new/base/system/unexp_nt.c
     src/mvdm/softpc.new/base/support/time_day.c
     src/mvdm/softpc.new/base/bios/cmos_bis.c
     src/mvdm/softpc.new/base/bios/build_id.c
-    "${SOFTPC_RESET_SOURCE}"
+    src/mvdm/softpc.new/base/bios/reset.c
     src/mvdm/softpc.new/base/bios/bootstra.c
     src/mvdm/softpc.new/base/bios/slave_bs.c
     src/mvdm/softpc.new/base/bios/tape_io.c
@@ -424,7 +210,6 @@ add_library(softpc-machine-devices OBJECT
     src/host/mouse_instance.c
     src/host/audio.c
     src/host/platform.c)
-add_dependencies(softpc-machine-devices softpc-ccpu-port-abi-inputs)
 set_target_properties(softpc-ccpu-core PROPERTIES
     C_STANDARD 90
     C_EXTENSIONS ON)
@@ -445,7 +230,6 @@ target_compile_definitions(softpc-machine-compat PRIVATE
     CPU_40_STYLE CCPU C_VID CPU_486 SPC386 V7VGA WDCTRL_BOP PROD SOFTPC_STANDALONE=1
     SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 target_include_directories(softpc-ccpu-core PRIVATE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu"
     src/host/compat/ccpu
     src/host/compat/cvidc
     src/host/compat/ccpu/legacy
@@ -456,7 +240,6 @@ target_include_directories(softpc-ccpu-core PRIVATE
     src/mvdm/softpc.new/base/ccpu386
     src/mvdm/softpc.new/base/cvidc)
 target_include_directories(softpc-machine-devices PRIVATE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated-ccpu"
     src/host/compat
     src/host/compat/ccpu
     src/host/compat/cvidc

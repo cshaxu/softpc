@@ -2225,6 +2225,11 @@ extern	IBOOL ccpu_pig_enabled;
 					/* spread interrupts through system tick */
 					timer_generate_int(1);
 					timer_multiple_delay = SYSTEM_TICK_INTV / n;
+					/* The standalone host must defer a zero-delay queue entry by
+					   one microsecond: the original queue's immediate-event path
+					   otherwise recursively drains a valid one-clock PIT backlog. */
+					if (timer_multiple_delay == 0)
+						timer_multiple_delay = 1;
 					active_int_event = TRUE;
 					add_q_event_t(timer_multiple_ints, timer_multiple_delay, n-1);
 				}
