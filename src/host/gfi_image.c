@@ -1,8 +1,6 @@
 #include "insignia.h"
 #include "host_def.h"
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "xt.h"
@@ -12,6 +10,7 @@
 #include "gfi.h"
 #include "config.h"
 #include "machine.h"
+#include "lib/storage/medium.h"
 
 /*
  * This is a host media port, not an FDC implementation.  The original FLA,
@@ -23,9 +22,7 @@
 #define SOFTPC_GFI_SECTOR_BYTES 512u
 
 typedef struct {
-    FILE *file;
-    unsigned char *data;
-    size_t data_bytes;
+    lib_storage_medium *medium;
     softpc_media_mode mode;
     unsigned int cylinders;
     unsigned int heads;
@@ -136,7 +133,7 @@ static int softpc_gfi_transfer(softpc_gfi_image_drive *drive,
     if (size_code != 2u) return 0;
     sector_bytes = 128u << size_code;
     if (sector_bytes > sizeof(buffer) ||
-        (drive->data == NULL && drive->file == NULL) ||
+        drive->medium == NULL ||
         cylinder >= drive->cylinders || head >= drive->heads ||
         sector == 0u || sector > drive->sectors) return 0;
     dma_enquire(DMA_DISKETTE_CHANNEL, &ignored_address, &dma_count);
@@ -148,24 +145,15 @@ static int softpc_gfi_transfer(softpc_gfi_image_drive *drive,
         if (current_sector > drive->sectors) return 0;
         offset = (((unsigned long)cylinder * drive->heads + head) *
             drive->sectors + (current_sector - 1u)) * sector_bytes;
-        if (drive->mode == SOFTPC_MEDIA_OVERLAY &&
-            (offset > drive->data_bytes || sector_bytes >
-                drive->data_bytes - offset)) return 0;
         if (writing) {
             if (drive->mode == SOFTPC_MEDIA_READONLY) return 0;
             (void)dma_request(DMA_DISKETTE_CHANNEL, buffer,
                 (word)sector_bytes);
-            if (drive->mode == SOFTPC_MEDIA_OVERLAY)
-                memcpy(drive->data + offset, buffer, sector_bytes);
-            else if (fseek(drive->file, (long)offset, SEEK_SET) != 0 ||
-                fwrite(buffer, 1u, sector_bytes, drive->file) != sector_bytes ||
-                fflush(drive->file) != 0) return 0;
+            if (lib_storage_medium_write_at(drive->medium, offset, buffer,
+                    sector_bytes) != LIB_STATUS_OK) return 0;
         } else {
-            if (drive->mode == SOFTPC_MEDIA_OVERLAY)
-                memcpy(buffer, drive->data + offset, sector_bytes);
-            else if (fseek(drive->file, (long)offset, SEEK_SET) != 0 ||
-                fread(buffer, 1u, sector_bytes, drive->file) != sector_bytes)
-                return 0;
+            if (lib_storage_medium_read_at(drive->medium, offset, buffer,
+                    sector_bytes) != LIB_STATUS_OK) return 0;
             (void)dma_request(DMA_DISKETTE_CHANNEL, buffer,
                 (word)sector_bytes);
         }
@@ -194,7 +182,7 @@ static int softpc_gfi_format(softpc_gfi_image_drive *drive,
     char id[4];
     char filler[8192];
 
-    if ((drive->data == NULL && drive->file == NULL) ||
+    if (drive->medium == NULL ||
         drive->mode == SOFTPC_MEDIA_READONLY || get_c3_N(command) > 6u)
         return 0;
     sector_bytes = 128u << get_c3_N(command);
@@ -216,17 +204,11 @@ static int softpc_gfi_format(softpc_gfi_image_drive *drive,
             return 0;
         offset = (((unsigned long)cylinder * drive->heads + head) *
             drive->sectors + (sector - 1u)) * sector_bytes;
-        if (drive->mode == SOFTPC_MEDIA_OVERLAY &&
-            (offset > drive->data_bytes || sector_bytes >
-                drive->data_bytes - offset))
-            return 0;
-        if (drive->mode == SOFTPC_MEDIA_OVERLAY)
-            memcpy(drive->data + offset, filler, sector_bytes);
-        else if (fseek(drive->file, (long)offset, SEEK_SET) != 0 ||
-            fwrite(filler, 1u, sector_bytes, drive->file) != sector_bytes)
+        if (lib_storage_medium_write_at(drive->medium, offset, filler,
+                sector_bytes) != LIB_STATUS_OK)
             return 0;
     }
-    return drive->mode == SOFTPC_MEDIA_OVERLAY || fflush(drive->file) == 0;
+    return 1;
 }
 
 static SHORT softpc_gfi_command(FDC_CMD_BLOCK *command,
@@ -263,7 +245,7 @@ static SHORT softpc_gfi_command(FDC_CMD_BLOCK *command,
     case FDC_SENSE_DRIVE_STATUS:
         put_r2_ST3_fault(result, 0);
         put_r2_ST3_write_protected(result, drive->mode == SOFTPC_MEDIA_READONLY);
-        put_r2_ST3_ready(result, (drive->data != NULL || drive->file != NULL));
+        put_r2_ST3_ready(result, (drive->medium != NULL));
         put_r2_ST3_track_0(result, (drive->cylinder == 0u));
         put_r2_ST3_two_sided(result, (drive->heads > 1u));
         put_r2_ST3_head_address(result, get_c7_head(command));
@@ -271,7 +253,7 @@ static SHORT softpc_gfi_command(FDC_CMD_BLOCK *command,
         return SUCCESS;
     case FDC_READ_ID:
         softpc_gfi_result(result, unit, drive->cylinder, get_c4_head(command),
-            1u, 2u, drive->data == NULL && drive->file == NULL, 0);
+            1u, 2u, drive->medium == NULL, 0);
         return SUCCESS;
     case FDC_READ_DATA:
     case FDC_WRITE_DATA:
@@ -308,8 +290,7 @@ static SHORT softpc_gfi_change IFN1(UTINY, drive)
      * treats every boot read as an open-drive condition and never issues its
      * FDC READ DATA command. */
     return drive < MAX_DISKETTES &&
-        (softpc_gfi_drives[drive].data != NULL ||
-            softpc_gfi_drives[drive].file != NULL) ?
+        softpc_gfi_drives[drive].medium != NULL ?
         SUCCESS : FAILURE;
 }
 static SHORT softpc_gfi_reset IFN2(FDC_RESULT_BLOCK *, result, UTINY, drive)
@@ -335,35 +316,22 @@ static void softpc_gfi_install(UTINY drive)
 int softpc_platform_floppy_attach(const char *path, softpc_media_mode mode)
 {
     softpc_gfi_image_drive *drive = &softpc_gfi_drives[0];
-    FILE *file;
-    long bytes;
-    if (drive->file != NULL) fclose(drive->file);
-    free(drive->data);
+    lib_storage_medium_mode storage_mode;
+    size_t bytes;
+    lib_storage_medium_destroy(&drive->medium);
     memset(drive, 0, sizeof(*drive));
     if (path == NULL) return 1;
-    file = fopen(path, mode == SOFTPC_MEDIA_DIRECT ? "rb+" : "rb");
-    if (file == NULL || fseek(file, 0L, SEEK_END) != 0 ||
-        (bytes = ftell(file)) < 0 || fseek(file, 0L, SEEK_SET) != 0 ||
-        !softpc_gfi_geometry(bytes, drive)) {
-        if (file != NULL) fclose(file);
+    storage_mode = mode == SOFTPC_MEDIA_DIRECT ? LIB_STORAGE_MEDIUM_DIRECT :
+        mode == SOFTPC_MEDIA_READONLY ? LIB_STORAGE_MEDIUM_READONLY :
+        LIB_STORAGE_MEDIUM_OVERLAY;
+    if (lib_storage_medium_open(path, storage_mode, &drive->medium) !=
+            LIB_STATUS_OK ||
+        (bytes = lib_storage_medium_byte_count(drive->medium)) > LONG_MAX ||
+        !softpc_gfi_geometry((long)bytes, drive)) {
+        lib_storage_medium_destroy(&drive->medium);
         memset(drive, 0, sizeof(*drive));
         softpc_gfi_activate_empty();
         return 0;
-    }
-    if (mode == SOFTPC_MEDIA_OVERLAY) {
-        drive->data = malloc((size_t)bytes);
-        if (drive->data == NULL || fread(drive->data, 1u, (size_t)bytes, file) !=
-            (size_t)bytes) {
-            free(drive->data);
-            memset(drive, 0, sizeof(*drive));
-            fclose(file);
-            softpc_gfi_activate_empty();
-            return 0;
-        }
-        fclose(file);
-        drive->data_bytes = (size_t)bytes;
-    } else {
-        drive->file = file;
     }
     drive->mode = mode;
     softpc_gfi_install(0);
@@ -373,8 +341,7 @@ int softpc_platform_floppy_attach(const char *path, softpc_media_mode mode)
 void softpc_platform_floppy_detach(void)
 {
     softpc_gfi_image_drive *drive = &softpc_gfi_drives[0];
-    if (drive->file != NULL) fclose(drive->file);
-    free(drive->data);
+    lib_storage_medium_destroy(&drive->medium);
     memset(drive, 0, sizeof(*drive));
     softpc_gfi_activate_empty();
 }
@@ -384,6 +351,6 @@ void softpc_platform_floppy_detach(void)
  * to this host media backend. */
 char *softpc_platform_floppy_config_value(void)
 {
-    return softpc_gfi_drives[0].data != NULL || softpc_gfi_drives[0].file != NULL ?
+    return softpc_gfi_drives[0].medium != NULL ?
         softpc_gfi_attached_config_value : softpc_gfi_empty_config_value;
 }
