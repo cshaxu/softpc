@@ -74,7 +74,6 @@ static int frame_has_prompt(const app_runtime_frame *frame)
    renderer or its CCPU executor. */
 static int graphics_frame_has_visible_pixel(const app_runtime_frame *frame)
 {
-    const BITMAPINFO *dib;
     uint32_t stride;
     uint32_t row;
     uint32_t non_black_pixels = 0u;
@@ -82,19 +81,18 @@ static int graphics_frame_has_visible_pixel(const app_runtime_frame *frame)
     int have_first_colour = 0;
     int have_second_colour = 0;
 
-    if (frame == NULL || frame->graphics == 0u || frame->dib_width == 0u ||
-        frame->dib_height == 0u || frame->dib_width > SOFTPC_RUNTIME_DIB_MAX_WIDTH ||
-        frame->dib_height > SOFTPC_RUNTIME_DIB_MAX_HEIGHT) return 0;
-    dib = (const BITMAPINFO *)frame->dib_info;
-    stride = (frame->dib_width + 3u) & ~3u;
-    for (row = 0u; row < frame->dib_height; ++row) {
+    if (frame == NULL || frame->graphics == 0u || frame->graphics_width == 0u ||
+        frame->graphics_height == 0u || frame->graphics_width > SOFTPC_RUNTIME_DIB_MAX_WIDTH ||
+        frame->graphics_height > SOFTPC_RUNTIME_DIB_MAX_HEIGHT) return 0;
+    stride = frame->graphics_stride;
+    for (row = 0u; row < frame->graphics_height; ++row) {
         uint32_t column;
-        for (column = 0u; column < frame->dib_width; ++column) {
-            unsigned char index = frame->dib_bits[row * stride + column];
-            const RGBQUAD *colour = &dib->bmiColors[index];
-            uint32_t packed = (uint32_t)colour->rgbRed |
-                ((uint32_t)colour->rgbGreen << 8) |
-                ((uint32_t)colour->rgbBlue << 16);
+        for (column = 0u; column < frame->graphics_width; ++column) {
+            COLORREF colour = (COLORREF)frame->graphics_palette[
+                frame->graphics_pixels[row * stride + column]];
+            uint32_t packed = (uint32_t)GetRValue(colour) |
+                ((uint32_t)GetGValue(colour) << 8) |
+                ((uint32_t)GetBValue(colour) << 16);
             if (packed != 0u) {
                 ++non_black_pixels;
                 if (!have_first_colour) {
@@ -110,7 +108,7 @@ static int graphics_frame_has_visible_pixel(const app_runtime_frame *frame)
        non-black colour.  Windows Setup's graphical handoff must instead
        produce both detail and a meaningful painted area. */
     return have_second_colour && non_black_pixels >=
-        (frame->dib_width * frame->dib_height) / 1000u;
+        (frame->graphics_width * frame->graphics_height) / 1000u;
 }
 
 /* Opt-in evidence capture for a real rendered guest frame.  The runtime
@@ -119,38 +117,51 @@ static int graphics_frame_has_visible_pixel(const app_runtime_frame *frame)
 static int write_graphics_frame_bmp(const app_runtime_frame *frame,
     const char *path)
 {
-    const BITMAPINFO *dib;
     BITMAPFILEHEADER file_header;
     BITMAPINFOHEADER info_header;
+    RGBQUAD palette[256];
     uint32_t stride;
     size_t bits_bytes;
     FILE *file;
 
     if (frame == NULL || path == NULL || path[0] == '\0' ||
-        frame->graphics == 0u || frame->dib_width == 0u ||
-        frame->dib_height == 0u || frame->dib_width >
-        SOFTPC_RUNTIME_DIB_MAX_WIDTH || frame->dib_height >
+        frame->graphics == 0u || frame->graphics_width == 0u ||
+        frame->graphics_height == 0u || frame->graphics_width >
+        SOFTPC_RUNTIME_DIB_MAX_WIDTH || frame->graphics_height >
         SOFTPC_RUNTIME_DIB_MAX_HEIGHT) return 0;
-    dib = (const BITMAPINFO *)frame->dib_info;
-    stride = (frame->dib_width + 3u) & ~3u;
-    bits_bytes = (size_t)stride * frame->dib_height;
+    stride = frame->graphics_stride;
+    bits_bytes = (size_t)stride * frame->graphics_height;
     if (bits_bytes > SOFTPC_RUNTIME_DIB_MAX_BYTES) return 0;
     memset(&file_header, 0, sizeof(file_header));
     file_header.bfType = 0x4d42u;
     file_header.bfOffBits = sizeof(file_header) + sizeof(info_header) +
         256u * sizeof(RGBQUAD);
     file_header.bfSize = file_header.bfOffBits + (DWORD)bits_bytes;
-    info_header = dib->bmiHeader;
+    memset(&info_header, 0, sizeof(info_header));
+    info_header.biSize = sizeof(info_header);
+    info_header.biWidth = (LONG)frame->graphics_width;
+    info_header.biHeight = -(LONG)frame->graphics_height;
+    info_header.biPlanes = 1u;
+    info_header.biBitCount = 8u;
+    info_header.biCompression = BI_RGB;
+    info_header.biSizeImage = (DWORD)bits_bytes;
     info_header.biClrUsed = 256u;
     info_header.biClrImportant = 0u;
     file = fopen(path, "wb");
     if (file == NULL) return 0;
+    for (unsigned int index = 0u; index < 256u; ++index) {
+        COLORREF colour = (COLORREF)frame->graphics_palette[index];
+        palette[index].rgbRed = GetRValue(colour);
+        palette[index].rgbGreen = GetGValue(colour);
+        palette[index].rgbBlue = GetBValue(colour);
+        palette[index].rgbReserved = 0u;
+    }
     if (fwrite(&file_header, 1u, sizeof(file_header), file) !=
             sizeof(file_header) ||
         fwrite(&info_header, 1u, sizeof(info_header), file) !=
             sizeof(info_header) ||
-        fwrite(dib->bmiColors, sizeof(RGBQUAD), 256u, file) != 256u ||
-        fwrite(frame->dib_bits, 1u, bits_bytes, file) != bits_bytes ||
+        fwrite(palette, sizeof(RGBQUAD), 256u, file) != 256u ||
+        fwrite(frame->graphics_pixels, 1u, bits_bytes, file) != bits_bytes ||
         fclose(file) != 0) {
         fclose(file);
         return 0;
@@ -202,16 +213,14 @@ static void dump_setup_text_palette(const app_runtime_frame *frame)
    colour from a screenshot or from guest controller state. */
 static void dump_graphics_palette(const app_runtime_frame *frame)
 {
-    const BITMAPINFO *dib;
     unsigned int index;
     if (frame == NULL || frame->graphics == 0u) return;
-    dib = (const BITMAPINFO *)frame->dib_info;
     fprintf(stderr, "softpc-runtime-boot-smoke: graphics palette");
     for (index = 0u; index < 16u; ++index) {
-        const RGBQUAD *colour = &dib->bmiColors[index];
+        COLORREF colour = (COLORREF)frame->graphics_palette[index];
         fprintf(stderr, " %u=%02x%02x%02x", index,
-            (unsigned int)colour->rgbRed, (unsigned int)colour->rgbGreen,
-            (unsigned int)colour->rgbBlue);
+            (unsigned int)GetRValue(colour), (unsigned int)GetGValue(colour),
+            (unsigned int)GetBValue(colour));
     }
     fputc('\n', stderr);
     fflush(stderr);
@@ -325,27 +334,21 @@ static void dump_palette_history(void)
     fflush(stderr);
 }
 
+static int enqueue_virtual_key_pair(app_runtime *runtime, WORD virtual_key);
+
 static int send_key(app_runtime *runtime, uint8_t key_number)
 {
-    return app_runtime_enqueue_key(runtime, key_number, 0u) &&
-        app_runtime_enqueue_key(runtime, key_number, 1u);
+    WORD virtual_key = key_number == 31u ? 'S' :
+        key_number == 50u ? 'M' : key_number == 48u ? 'B' : 0u;
+    return virtual_key != 0u && enqueue_virtual_key_pair(runtime, virtual_key);
 }
-
-/* The runtime queue takes SoftPC key numbers, rather than PC scan codes.
-   Keep this probe on exactly the same Win32 -> original key-code path as the
-   interactive console and window frontends. */
-extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
 
 static int enqueue_virtual_key(app_runtime *runtime, WORD virtual_key,
     DWORD control_state, uint8_t released)
 {
-    KEY_EVENT_RECORD event;
-    BYTE key_number;
     WORD scan;
+    ux_event event = { 0 };
 
-    ZeroMemory(&event, sizeof(event));
-    event.bKeyDown = released == 0u;
-    event.wVirtualKeyCode = virtual_key;
     /* Match win32_keyboard.c exactly: the Setup menu distinguishes the
        extended cursor Up key from keypad 8. */
     scan = (WORD)MapVirtualKeyExW(virtual_key, MAPVK_VK_TO_VSC_EX,
@@ -356,13 +359,14 @@ static int enqueue_virtual_key(app_runtime *runtime, WORD virtual_key,
        so the smoke tests the original arrow, rather than keypad 8. */
     if (virtual_key == VK_UP) scan = 0xe048u;
     if (virtual_key == VK_DOWN) scan = 0xe050u;
-    event.wVirtualScanCode = (WORD)(scan & 0xffu);
-    event.dwControlKeyState = control_state;
-    if ((scan & 0xff00u) == 0xe000u)
-        event.dwControlKeyState |= ENHANCED_KEY;
-    key_number = KeyMsgToKeyCode(&event);
-    return key_number != 0u && app_runtime_enqueue_key(runtime, key_number,
-        released);
+    event.type = UX_EVENT_KEY;
+    event.data.key.scan_code = (scan & 0xff00u) == 0xe000u ?
+        (lib_u16)(0x0100u | (scan & 0xffu)) : (lib_u16)(scan & 0xffu);
+    event.data.key.virtual_key = virtual_key;
+    event.data.key.modifiers = control_state;
+    event.data.key.pressed = released == 0u;
+    return event.data.key.scan_code != 0u &&
+        app_runtime_enqueue_input_event(runtime, &event);
 }
 
 /* Match the Win32 frontend's ordinary key transition contract: the host
@@ -503,9 +507,9 @@ static uint32_t trace_setup_frame(const app_runtime_frame *frame)
     }
     hash ^= frame->graphics;
     hash *= 16777619u;
-    hash ^= frame->dib_width;
+    hash ^= frame->graphics_width;
     hash *= 16777619u;
-    hash ^= frame->dib_height;
+    hash ^= frame->graphics_height;
     hash *= 16777619u;
     hash ^= (uint32_t)frame->cursor_column;
     hash *= 16777619u;
@@ -524,15 +528,15 @@ static uint32_t graphics_frame_hash(const app_runtime_frame *frame)
     size_t bytes;
     size_t index;
 
-    if (frame == NULL || frame->graphics == 0u || frame->dib_width == 0u ||
-        frame->dib_height == 0u || frame->dib_width >
-        SOFTPC_RUNTIME_DIB_MAX_WIDTH || frame->dib_height >
+    if (frame == NULL || frame->graphics == 0u || frame->graphics_width == 0u ||
+        frame->graphics_height == 0u || frame->graphics_width >
+        SOFTPC_RUNTIME_DIB_MAX_WIDTH || frame->graphics_height >
         SOFTPC_RUNTIME_DIB_MAX_HEIGHT) return 0u;
-    stride = (frame->dib_width + 3u) & ~3u;
-    bytes = (size_t)stride * frame->dib_height;
+    stride = frame->graphics_stride;
+    bytes = (size_t)stride * frame->graphics_height;
     if (bytes > SOFTPC_RUNTIME_DIB_MAX_BYTES) return 0u;
     for (index = 0u; index < bytes; ++index) {
-        hash ^= frame->dib_bits[index];
+        hash ^= frame->graphics_pixels[index];
         hash *= 16777619u;
     }
     return hash;
@@ -611,13 +615,13 @@ static int run_halted_keyboard_probe(void)
     if (app_runtime_copy_frame(runtime, &frame))
         sequence_before = frame.sequence;
     key_queued_at = GetTickCount();
-    if (!app_runtime_enqueue_key(runtime, 31u, 0u)) goto done;
+    if (!enqueue_virtual_key(runtime, 'S', 0u, 0u)) goto done;
     deadline = GetTickCount() + 3000u;
     do {
         if (softpc_machine_read_physical(machine, 0x500u, &marker,
                 sizeof(marker)) == SOFTPC_MACHINE_OK && marker == 0xa5u) {
             key_delivered_at = GetTickCount();
-            (void)app_runtime_enqueue_key(runtime, 31u, 1u);
+            (void)enqueue_virtual_key(runtime, 'S', 0u, 1u);
             /* This is the whole outer input path: queue, wake, original
                8042/PIC delivery and the CCPU HLT return.  It must not be
                deferred to the 50 ms timer heartbeat or a frontend repaint. */
@@ -810,8 +814,8 @@ int main(int argc, char **argv)
                 if (frame_hash != setup_last_frame_hash) {
                     fprintf(stderr, "setup frame: graphics=%u dib=%lux%lu cursor=%ld,%ld hash=%08lx\n",
                         (unsigned int)frame->graphics,
-                        (unsigned long)frame->dib_width,
-                        (unsigned long)frame->dib_height,
+                        (unsigned long)frame->graphics_width,
+                        (unsigned long)frame->graphics_height,
                         (long)frame->cursor_column,
                         (long)frame->cursor_row,
                         (unsigned long)frame_hash);
@@ -888,8 +892,13 @@ int main(int argc, char **argv)
                             setup_mouse_surface_before_hash =
                                 graphics_frame_hash(frame);
                             if (setup_mouse_surface_before_hash == 0u) break;
-                            if (!app_runtime_enqueue_mouse(runtime, 96, 96,
-                                    0u, 0u)) break;
+                            { ux_event mouse = { 0 };
+                              mouse.type = UX_EVENT_MOUSE;
+                              mouse.data.mouse.delta_x = 96;
+                              mouse.data.mouse.delta_y = 96;
+                              mouse.data.mouse.relative = 1u;
+                              if (!app_runtime_enqueue_input_event(runtime,
+                                      &mouse)) break; }
                             setup_mouse_motion_sent = 1;
                             fprintf(stderr, "setup stage: physical mouse motion sent\n");
                             fflush(stderr);
