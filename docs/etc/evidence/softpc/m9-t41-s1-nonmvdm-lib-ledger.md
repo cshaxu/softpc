@@ -70,6 +70,10 @@ and only the SoftPC executor consumed input. NXVM UX intentionally exposes an
 event sink rather than imposing a product queue. Therefore this queue is
 SoftPC runtime coordination, not a missing shared-lib facility: it must be
 rehomed under `src/app/` while preserving the sole-executor boundary.
+Its `CRITICAL_SECTION` is the queue's own data protection; the imported host
+API deliberately supplies events and tasks but no general mutex abstraction.
+Likewise, the runtime's interlocked fields are SoftPC lifecycle state, not a
+second shared session implementation.
 
 `serial.c` and `parallel.c` write arbitrary guest bytes to configured COM/LPT
 device endpoints. The shared storage writer is deliberately a sequential text
@@ -84,6 +88,15 @@ are not duplicate generic mechanisms: together they form the original CCPU
 a periodic timer nor an auto-reset event (its event contract is manual-reset),
 so replacing that pair would change the machine-host contract rather than
 complete a shared-platform migration.
+
+The remaining direct Win32 calls outside those paths are package or
+machine-resource bindings: module-path discovery selects the user-owned
+`softpc.ini` and trace location; RCDATA loading supplies the fixed embedded
+ROMs; and wall-clock sampling implements the original host callback. They do
+not duplicate a present imported UX, host synchronization/clock, or storage
+operation. The non-MVDM direct-platform sweep also found no local window,
+console loop, generic file-reader, generic file-writer, or performance-counter
+implementation left outside the dispositions above.
 
 ## Build/Test Follow-up
 
