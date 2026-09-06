@@ -4,16 +4,13 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T39 closed |
-| Admission And Approval | Owner requested a full NXVM `src/lib/` shared-library admission audit after T38 closure. |
-| Objective | Determine whether NXVM `src/lib/` can be imported verbatim as SoftPC's complete shared library without any MVDM boundary change. |
-| Non-goals | No NXVM import, build change, SoftPC source deletion, or MVDM modification. |
-| Baseline | NXVM revision `9ef5e899a8e540cf9def51c9e70ae3397586477c`; the review covers its complete `src/lib/` tree. |
-| Applicable Rules | Execution, architecture, source layout, NXVM adoption proposal, and T39 audit. |
-| Affected Boundary | Read-only NXVM `src/lib/`, SoftPC `src/{lib,host,app}`, and the immutable `src/mvdm/softpc.new/` boundary. |
-| Outcome | Not admitted: the NXVM manifest is incomplete and the shared public contracts require the documented generic-boundary work before an unchanged import can be approved. |
-| Exit Criteria | Report records the complete scope, immutable MVDM boundary, each component disposition, and actionable NXVM re-review conditions. |
-| Original Owner Request | “审计一下 nxvm 的 lib 当前代码，看下它是否符合无需改动直接引入。” |
+| Identifier Mode | M9 T40 closed |
+| Admission And Approval | Owner admitted the first queued XP-obsolete non-x86 mirror-header retirement as an ordinary implementation task and directed it to closure. |
+| Objective | Remove unselected XP-obsolete and legacy MVDM headers without changing the selected standalone machine. |
+| Outcome | Removed 33 headers: 30 OpenNT-only MIPS/PPC paths absent from XP SP1, plus unselected `get_env.h`, `gfisflop.h`, and `monsim32.h`; no selected x86/AT/V7 source changed. |
+| Verification | Fresh GCC x64 and MSYS2 i686 x86 full CTest each passed 23/23, including each package smoke; source-selection/dependency searches were clean; `softpc.ini` hash was unchanged; documentation governance and diff checks passed. |
+| Exit Criteria | Met.  See [T40 history](../history/M9-T40-xp-obsolete-header-retirement.md). |
+| Original Owner Request | “准入第一条，作为普通T任务执行到收口。” |
 
 ## Current Technical Baseline
 
