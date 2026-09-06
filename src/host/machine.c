@@ -1,4 +1,5 @@
 #include "machine.h"
+#include "lib/storage/medium.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -80,11 +81,11 @@ struct softpc_machine {
 
 static int softpc_machine_media_exists(const char *path)
 {
-    FILE *file;
+    lib_storage_medium *medium = NULL;
     if (path == NULL) return 1;
-    file = fopen(path, "rb");
-    if (file == NULL) return 0;
-    fclose(file);
+    if (lib_storage_medium_open(path, LIB_STORAGE_MEDIUM_READONLY, &medium) !=
+        LIB_STATUS_OK) return 0;
+    lib_storage_medium_destroy(&medium);
     return 1;
 }
 
