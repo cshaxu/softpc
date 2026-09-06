@@ -65,38 +65,7 @@ struct app_runtime {
     uint32_t graphics_source_width;
     uint32_t graphics_source_height;
     uint32_t graphics_visible_width;
-    uint32_t measurement_published_frames;
-    uint32_t measurement_dirty_frames;
-    lib_u64 measurement_due;
 };
-
-static void app_runtime_measure(app_runtime *runtime)
-{
-    FILETIME created, exited, kernel, user;
-    ULARGE_INTEGER cpu;
-    lib_u64 now = 0u;
-
-    if (host_clock_milliseconds(&now) != LIB_STATUS_OK ||
-        now < runtime->measurement_due) return;
-    runtime->measurement_due = now + 1000u;
-    cpu.QuadPart = 0u;
-    if (GetProcessTimes(GetCurrentProcess(), &created, &exited, &kernel,
-            &user)) {
-        ULARGE_INTEGER kernel_time;
-        ULARGE_INTEGER user_time;
-        kernel_time.LowPart = kernel.dwLowDateTime;
-        kernel_time.HighPart = kernel.dwHighDateTime;
-        user_time.LowPart = user.dwLowDateTime;
-        user_time.HighPart = user.dwHighDateTime;
-        cpu.QuadPart = kernel_time.QuadPart + user_time.QuadPart;
-    }
-    app_prompt_trace("softpc measure frames=%lu dirty=%lu cpu100ns=%llu",
-        (unsigned long)runtime->measurement_published_frames,
-        (unsigned long)runtime->measurement_dirty_frames,
-        (unsigned long long)cpu.QuadPart);
-    runtime->measurement_published_frames = 0u;
-    runtime->measurement_dirty_frames = 0u;
-}
 
 static void app_runtime_publish(app_runtime *runtime)
 {
@@ -129,7 +98,6 @@ static void app_runtime_publish(app_runtime *runtime)
         int dirty = softpc_machine_presentation_take_dirty(runtime->machine,
             &ignored_left, &ignored_top, &ignored_right, &ignored_bottom);
         trace_dirty = dirty;
-        if (dirty) ++runtime->measurement_dirty_frames;
         trace_left = ignored_left; trace_top = ignored_top;
         trace_right = ignored_right; trace_bottom = ignored_bottom;
 
@@ -276,7 +244,6 @@ static void app_runtime_publish(app_runtime *runtime)
         if (ux_mailbox_publish(runtime->frame_mailbox, frame) != LIB_STATUS_OK)
             return;
         frame->sequence = ux_mailbox_generation(runtime->frame_mailbox);
-        ++runtime->measurement_published_frames;
         (void)softpc_machine_presentation_state(runtime->machine, &mode_type,
             &screen_state);
         app_runtime_prompt_trace(frame->sequence, mode_type, screen_state,
@@ -338,7 +305,6 @@ static void app_runtime_executor_event(void *opaque)
     app_runtime *runtime = (app_runtime *)opaque;
     app_runtime_drain_input(runtime);
     app_runtime_publish(runtime);
-    app_runtime_measure(runtime);
     if (InterlockedCompareExchange(&runtime->pause_requested, 0, 0) != 0 &&
         InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0) {
         InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_PAUSED);
@@ -446,8 +412,7 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
     }
     runtime->result = SOFTPC_MACHINE_OK;
     runtime->state = SOFTPC_RUNTIME_STOPPED;
-    if (host_clock_milliseconds(&runtime->measurement_due) != LIB_STATUS_OK ||
-        host_sync_task_create(app_runtime_worker, runtime, &runtime->worker) !=
+    if (host_sync_task_create(app_runtime_worker, runtime, &runtime->worker) !=
             LIB_STATUS_OK) {
         host_sync_event_destroy(runtime->resume_event);
         host_sync_event_destroy(runtime->ready_event);
@@ -459,7 +424,6 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
         free(runtime);
         return 0;
     }
-    runtime->measurement_due += 1000u;
     *out = runtime;
     return 1;
 }
