@@ -72,6 +72,12 @@ new SoftPC-local platform module. The current generic input-queue gap is
 therefore an upstream prerequisite: do not move the former
 `event_queue.c/.h` implementation into `src/app/`.
 
+This boundary starts strictly outside `src/mvdm/softpc.new/`. Any direct Win32
+API use or WinNT-derived implementation retained within that preserved MVDM
+tree remains there unchanged. T41 neither audits it as a migration candidate
+nor modifies it; a separate admitted port-ABI task would be required for any
+such change.
+
 SoftPC binding code may adapt copied values and opaque handles, but must not
 fork or locally reimplement an imported-library capability. A proposed removal
 is valid only when the replacement ownership, input/output contract, and
@@ -81,6 +87,8 @@ x86/x64 evidence are explicit.
 
 - Do not modify `src/mvdm/softpc.new` except through separately admitted,
   narrow portability-diff work.
+- Do not migrate, wrap, replace, or otherwise alter any MVDM-local Win32 API
+  use or WinNT-derived implementation as part of T41.
 - Do not modify the imported NXVM library source after import.
 - Do not introduce an NXVM runtime dependency, session catalog, profile
   system, debugger, asset loader, product console, or multi-machine policy
