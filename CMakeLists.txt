@@ -37,24 +37,9 @@ target_include_directories(softpc-machine PUBLIC src/host)
 target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 
 # This is a source-synchronised local component, not a cross-repository
-# dependency.  Project bindings retain all machine, lifecycle and hotkey
-# decisions; the library handles copied-value Win32 presentation mechanics.
-add_library(win32-presentation STATIC
-    src/lib/platform/win32/actions.c
-    src/lib/platform/win32/console.c
-    src/lib/platform/win32/event_queue.c
-    src/lib/platform/win32/input.c
-    src/lib/platform/win32/geometry.c
-    src/lib/platform/win32/mailbox.c
-    src/lib/platform/win32/mouse.c
-    src/lib/platform/win32/presenter.c
-    src/lib/platform/win32/window.c
-    src/lib/platform/win32/router.c)
-target_include_directories(win32-presentation PUBLIC
-    src/lib/platform/win32)
-if(WIN32)
-    target_link_libraries(win32-presentation PUBLIC user32)
-endif()
+# dependency. Project bindings retain all machine and lifecycle decisions;
+# the imported library owns generic host, storage, and UX mechanics.
+add_subdirectory(src/lib)
 
 # The original CCPU manifest is the executable x86 core.  It deliberately
 # links no NTVDM host, DOS/WOW component or Win32 presentation provider.
@@ -286,7 +271,7 @@ add_executable(softpcvm
     src/app/prompt_trace.c
     src/app/firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
-target_link_libraries(softpcvm PRIVATE win32-presentation)
+target_link_libraries(softpcvm PRIVATE ux host-sync storage-medium)
 if(WIN32)
     target_link_libraries(softpcvm PRIVATE user32 gdi32)
 endif()
@@ -417,10 +402,9 @@ add_executable(softpc-runtime-smoke
     src/app/runtime.c
     src/app/keyboard.c
     src/app/prompt_trace.c)
-target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine
-    win32-presentation)
-target_include_directories(softpc-runtime-smoke PRIVATE
-    src/app src/lib/platform/win32)
+target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine ux host-sync
+    storage-medium)
+target_include_directories(softpc-runtime-smoke PRIVATE src/app)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
 set_tests_properties(softpc-runtime-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
@@ -430,9 +414,9 @@ add_executable(softpc-runtime-input-continuation-smoke
     src/app/keyboard.c
     src/app/prompt_trace.c)
 target_link_libraries(softpc-runtime-input-continuation-smoke PRIVATE
-    softpc-machine win32-presentation)
+    softpc-machine ux host-sync storage-medium)
 target_include_directories(softpc-runtime-input-continuation-smoke PRIVATE
-    src/app src/lib/platform/win32 test/support)
+    src/app test/support)
 add_test(NAME softpc-runtime-input-continuation-smoke
     COMMAND softpc-runtime-input-continuation-smoke)
 set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
@@ -444,7 +428,8 @@ add_executable(softpc-win32-window-smoke
     src/app/prompt_trace.c
     src/app/presentation.c)
 target_link_libraries(softpc-win32-window-smoke PRIVATE softpc-machine)
-target_link_libraries(softpc-win32-window-smoke PRIVATE win32-presentation)
+target_link_libraries(softpc-win32-window-smoke PRIVATE ux host-sync
+    storage-medium)
 target_compile_definitions(softpc-win32-window-smoke PRIVATE
     SOFTPC_WINDOW_TESTING=1)
 if(WIN32)
@@ -457,14 +442,14 @@ set_tests_properties(softpc-win32-window-smoke PROPERTIES
 add_executable(softpc-win32-keyboard-smoke
     test/unit/win32_keyboard_smoke.c)
 target_link_libraries(softpc-win32-keyboard-smoke PRIVATE
-    softpc-machine win32-presentation)
+    softpc-machine ux)
 add_test(NAME softpc-win32-keyboard-smoke COMMAND softpc-win32-keyboard-smoke)
 set_tests_properties(softpc-win32-keyboard-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-win32-presentation-smoke
     test/unit/win32_presentation_smoke.c)
 target_link_libraries(softpc-win32-presentation-smoke PRIVATE
-    win32-presentation)
+    ux)
 add_test(NAME softpc-win32-presentation-smoke
     COMMAND softpc-win32-presentation-smoke)
 set_tests_properties(softpc-win32-presentation-smoke PROPERTIES

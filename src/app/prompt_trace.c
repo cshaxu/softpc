@@ -1,4 +1,6 @@
 #include "prompt_trace.h"
+#include "lib/storage/file.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,30 +34,46 @@ int app_prompt_trace_enabled(void)
 
 void app_prompt_trace_reset(void)
 {
-    FILE *file;
+    lib_storage_file_writer *writer;
     const char *trace_path = app_prompt_trace_get_path();
 
     if (trace_path == NULL) return;
-    file = fopen(trace_path, "w");
-    if (file == NULL) return;
-    fputs("Insignia SoftPC Prompt transition trace\n", file);
-    fclose(file);
+    if (lib_storage_file_writer_open(trace_path,
+            LIB_STORAGE_FILE_WRITER_TRUNCATE, &writer) != LIB_STATUS_OK)
+        return;
+    (void)lib_storage_file_writer_write(writer,
+        "Insignia SoftPC Prompt transition trace\n");
+    (void)lib_storage_file_writer_close(writer);
 }
 
 void app_prompt_trace(const char *format, ...)
 {
-    FILE *file;
     va_list arguments;
+    va_list copied_arguments;
+    char *text;
+    int length;
+    lib_storage_file_writer *writer;
     const char *trace_path;
 
     if (!app_prompt_trace_enabled()) return;
     trace_path = app_prompt_trace_get_path();
     if (trace_path == NULL) return;
-    file = fopen(trace_path, "a");
-    if (file == NULL) return;
     va_start(arguments, format);
-    vfprintf(file, format, arguments);
+    va_copy(copied_arguments, arguments);
+    length = vsnprintf(NULL, 0u, format, copied_arguments);
+    va_end(copied_arguments);
+    if (length < 0 || (text = malloc((size_t)length + 2u)) == NULL) {
+        va_end(arguments);
+        return;
+    }
+    (void)vsnprintf(text, (size_t)length + 1u, format, arguments);
     va_end(arguments);
-    fputc('\n', file);
-    fclose(file);
+    text[length] = '\n';
+    text[length + 1] = '\0';
+    if (lib_storage_file_writer_open(trace_path,
+            LIB_STORAGE_FILE_WRITER_APPEND, &writer) == LIB_STATUS_OK) {
+        (void)lib_storage_file_writer_write(writer, text);
+        (void)lib_storage_file_writer_close(writer);
+    }
+    free(text);
 }
