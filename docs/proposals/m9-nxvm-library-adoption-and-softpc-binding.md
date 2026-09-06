@@ -40,15 +40,13 @@ be resolved before its duplicate is removed.
 
 M9 T41 S1 is admitted against the reviewed complete corpus
 `O:/repos.hobby/nxvm/src/lib` at
-`cb3ce7b6b46795e000ad25983b7977387331ed9e`. Its `MANIFEST.sha256` file hash
-is `F6970E6A5D300B7D797D59F18028EB3074EBE4FD0729ED983E74BB9CAD47E625`.
+`71e59ec09d669050ba98faca410ed8b9e9259d7c`. Its `MANIFEST.sha256` file hash
+is `2578C3B60B35FBD33D98A950F01F43846894C7AA3FAD22DED412DCC7CD2597DF`.
 The review records the public headers, Windows-first platform boundary,
 ownership model, and the required unchanged-import rule in the active T41
 packet. Linux sources remain in the corpus; Linux runnable acceptance is
 deferred, not removed. The corpus now deliberately contains only `base`,
-`host`, `storage`, and `ux`; the upstream README must be reconciled before the
-import because it still describes the retired `session` and `observability`
-roots.
+`host`, `storage`, and `ux`; its README and manifest agree with that scope.
 
 No SoftPC task may guess that selection, selectively copy a library subset,
 retain part of the current SoftPC `src/lib/` beside it, or modify imported
