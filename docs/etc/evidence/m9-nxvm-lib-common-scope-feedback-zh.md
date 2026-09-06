@@ -3,10 +3,19 @@
 ## 结论
 
 本反馈审计 NXVM revision `ecc88d35435c5c46773c132040669c14f3e8ade7`
-的完整 `src/lib`。共同库的准则收紧为：能力必须是两个项目现在都实际
-需要的，或是 owner 已明确要求 SoftPC 近期采用的共同能力。后者只包括
-Linux UX/host 能力、零初始化可写媒体和 overlay 的单文件落盘；不能借此
-保留 NXVM debugger、FDD sidecar 或单步控制。
+的完整 `src/lib`。共同库有两层，不能混为一谈：
+
+1. **中立平台底座**：文件、窗口、console、线程、同步、时钟、复制值和
+   内存 byte lease。NXVM 与 SoftPC 的产品层都不得直接使用宿主 SDK；即使某个
+   平台 primitive 暂时只被一方调用，它仍可留在 lib，只要它是最小、无产品
+   语义的跨宿主能力。
+2. **产品/机器语义**：debugger recorder、FDD sidecar 格式、单步、执行预算、
+   media topology、CHS/FDC/BIOS 和错误呈现。这些必须各留在产品层，不能因它们
+   最终会读写文件或等待事件而进入 lib。
+
+“两个项目现在都实际需要”适用于第二层的候选抽象；它不要求两个产品重复
+实现同一个 `fopen`、Win32 窗口或同步原语。owner 已明确要求 SoftPC 近期采用
+Linux UX/host、零初始化可写媒体和 overlay 的单文件落盘。
 
 因此当前 corpus **尚不可作为最终的原样导入 revision**。NXVM 先按本报告
 收紧接口和本地化产品功能；随后 SoftPC 才导入新的完整 corpus，且导入后
@@ -26,6 +35,13 @@ Linux configure/build/run 证明另立后续任务，不阻塞本次 Windows 导
   NXVM 来规避共同能力。
 - `lib_storage_file_read_owned()` 保留。NXVM 已用于镜像、catalog、BYOB 和
   session 输入；SoftPC 现有 overlay 也手写了“文件读入拥有内存”的同类机制。
+- 文件存在、替换、删除和受控输出流也属于 lib 的**平台文件层**。产品层只能
+  提供路径、内容和自身的失败呈现，不能直接调用 C/Win32/POSIX 文件 API。
+  它们宜从 `storage` 中分出明确的 `host/file`（或同等中立根），避免误称为
+  镜像/媒体策略。
+- 顺序 writer 保留为中立文件输出 primitive，但应改为可明确选择 truncate 或
+  append 的通用 stream API。NXVM debugger 只拥有记录内容、何时开始/停止和
+  如何报错；SoftPC prompt trace 可选择 append。二者都不得各自 `fopen`。
 - `lib_storage_image_create_overlay()`、字节 lease replacement、只读字节访问和
   可写 overlay 字节访问保留。SoftPC 当前 `SOFTPC_MEDIA_OVERLAY` 与 NXVM 的
   非只读镜像都需要私有可写副本。
@@ -51,8 +67,8 @@ Linux configure/build/run 证明另立后续任务，不阻塞本次 Windows 导
 | pause reason | `request_pause(state, reason)` 与 `pause_reason()` 只服务 NXVM 的 `vm_session_pause_reason`；SoftPC 当前没有相同的数值 reason 合同。 | 共同状态改为无 reason 的 pause request；reason 由 NXVM control 本地保存。 |
 | `lib_storage_image_take_direct_writable()` | 无 NXVM 生产调用，只有 lib 测试/neutral consumer。它接管一块 malloc 内存，绝不是文件直写。 | 删除。 |
 | `lib_storage_file_reader_{open,next,close}()` | 无 NXVM 生产调用，SoftPC 也无对应需求。 | 删除，不以测试维持公共 API。 |
-| `lib_storage_file_writer_{open,write,close}()` | 仅 NXVM `vm/machine/debug.c` 使用。它服务 `record start/stop` 命令，在每条指令时写寄存器、反汇编和内存访问记录。 | 移入 NXVM debugger/debug 层。 |
-| `lib_storage_commit_pair_atomically()` | 仅 NXVM FDD remove 使用；它同时保存 raw image 与 `.json` address-mark sidecar。 | 从 lib 删除，作为 NXVM FDD 持久化策略的一部分本地实现。 |
+| `lib_storage_file_writer_{open,write,close}()` 的现有形态 | 当前仅 NXVM `vm/machine/debug.c` 使用，且固定 `"w"` 覆盖创建；但它实现的是中立的宿主文件输出，不是 debugger 语义。SoftPC trace 当前则需要 append。 | 保留在 lib 的平台文件层，改为带明确 create/truncate/append mode 的中立 stream；debugger 格式、start/stop 和报错留在 NXVM。 |
+| `lib_storage_commit_pair_atomically()` | 仅 NXVM FDD remove 使用；它同时保存 raw image 与 `.json` address-mark sidecar。 | 从 lib 的高层 API 删除，作为 NXVM FDD 持久化策略本地编排；其底层 file stage/replace/remove 仍调用 lib 的中立文件 primitive。 |
 | `lib_storage_image_mode_of()`、`lib_storage_image_discard()` | 仅测试使用；前者暴露实现模式，后者只是 destroy 后置空。 | 从公共 API 删除；测试改验可观察行为，调用方使用 `destroy()`。 |
 
 ## 文件镜像模型：必须先澄清的差异
@@ -75,13 +91,14 @@ SoftPC 当前 `SOFTPC_MEDIA_DIRECT` 则是 `fopen(path, "rb+")` 后按 I/O 直�
 结论如下：
 
 1. 不得把 `take_direct_writable()` 错当成 SoftPC 文件 direct 模式；删除它。
-2. `take_direct_readonly()` 也不应继续以含混的 `direct` 命名保留。若 NXVM
-   必须保留其已加载只读 byte lease，应改名为 `take_owned_readonly_bytes()`；
-   但在“两个项目现在都调用同一 API”的严格标准下，它仍是 NXVM 本地能力，
-   应移到 NXVM，直到 SoftPC 确实采用不可变内存镜像为止。
-3. SoftPC 当前 direct/readonly 文件路径留在 SoftPC host；NXVM 当前也没有
-   同类 file-backed lease，因此不得为了统一名称向 lib 新增文件句柄镜像 API。
-   将来双方都实际需要时，再以独立任务抽取。
+2. `take_direct_readonly()` 应改名为 `take_owned_readonly_bytes()`，避免把
+   “不复制的内存所有权转移”误称为文件 direct。它可作为 lib 的通用 byte-lease
+   backend 保留；它没有产品语义。
+3. SoftPC 当前 direct/readonly 的随机文件 I/O 也必须离开 SoftPC host，进入
+   lib 的平台文件层。NXVM 应提供最小 opaque file contract：以只读或读写模式
+   打开、查询长度、按 offset 读/写、flush、close。它不得包含磁盘 geometry、
+   FDD/HDD、CHS、媒体选择或机器状态。NXVM 即使暂不调用，也应使其成为未来
+   SoftPC 绑定所用的共同平台实现，而不是让 SoftPC 继续直接接触 `FILE *`。
 
 ## 关于 FDD 成对提交
 
@@ -91,36 +108,39 @@ address marks、raw size、checksum 和 geometry，且 checksum 对应 raw image
 这解释了它为什么存在，也证明它是 NXVM FDD 私有持久化合同，而非共享存储
 机制。
 
-公共库应删除该 API。但 NXVM 不应无意中把它替换为“先写一个、另一个失败只
-打印错误”的静默不一致状态；NXVM FDD 自己决定并记录下列之一：保留本地
-rollback helper，或采用明确的顺序提交、错误报告及下次打开时的恢复/拒绝策略。
-这项选择不应进入 lib。
+公共库应删除该**成对提交策略 API**。但 NXVM 不应无意中把它替换为“先写一个、
+另一个失败只打印错误”的静默不一致状态；NXVM FDD 自己决定并记录下列之一：
+本地 rollback helper，或明确的顺序提交、错误报告及下次打开时恢复/拒绝策略。
+本地策略通过 lib 的中立文件 primitives 完成，但策略本身不进入 lib。
 
 ## 关于顺序文本 writer
 
 NXVM writer 是长寿命、覆盖创建的 recorder：`record start <path>` 打开文件，
-每个指令观测写入寄存器/反汇编/内存访问，`record stop` 再关闭。它属于 NXVM
-debugger 的诊断产品功能。
+每个指令观测写入寄存器/反汇编/内存访问，`record stop` 再关闭。记录格式、
+开始/停止命令和错误信息属于 NXVM debugger；打开、写入、flush/close 则是 lib
+的中立平台文件能力。
 
 SoftPC 的 `app/prompt_trace.c` 则每次 trace 调用都以 append 打开、写一行并
-关闭，且路径和启用策略是 SoftPC 自己的诊断合同。二者不能因都写文本就被当作
-同一共同能力；NXVM writer 应本地化，SoftPC trace 不应为复用它而改语义。
+关闭，且路径和启用策略是 SoftPC 自己的诊断合同。二者不能因都写文本就合并
+产品语义；但它们应共用 lib 的 append/truncate stream primitive，SoftPC trace
+不应继续直接 `fopen`。
 
 ## 额外收紧：公共文件 API
 
-`file_write_exclusive`、`file_replace`、`file_remove` 只被 storage commit
-实现使用；`file_exists` 除 commit 外只被 NXVM FDD sidecar 使用。pair helper
-本地化后，这些不是跨产品的公共能力。应将单文件 commit 所需的 primitives
-变为 `storage/internal`，FDD sidecar 所需的 exists/replace/remove 则随 FDD
-本地化，避免以低层文件操作扩大共同 ABI。
+`file_write_exclusive`、`file_replace`、`file_remove` 以及 `file_exists` 是中立
+平台 primitives，不应迁回任何产品，也不应让产品自己接触 SDK。它们可公开给
+产品本地的**策略编排**（例如 NXVM FDD sidecar），或以更小的 lib transaction
+接口暴露；选择应以最小 ABI 为准。无论采用何种形态，FDD JSON/schema/checksum
+和 pair rollback 仍是 NXVM 本地语义。
 
 ## NXVM 完成条件
 
 1. 完成上表的迁移/删除，并更新 `MANIFEST.sha256`、standalone CMake、tests
    与 Windows lib-only CI。
 2. 保留 Linux UX/host；不要求本轮提供 SoftPC Linux build proof。
-3. 把共同 storage 公共面收敛为：owned file bytes、copy/zeroed overlay、lease
-   replacement、只读/可写 bytes、单文件 image commit，以及实现这些所必需但
-   不公开的内部 primitives。
+3. 把共同 lib 分清为中立平台文件层（owned read、random file I/O、output
+   stream、replace/remove/commit）和 storage byte-lease 层（copy/zeroed
+   overlay、lease replacement、只读/可写 bytes、单文件 image commit）；不把
+   产品 media 策略塞进任何一层。
 4. 记录新的 fixed revision。SoftPC 将对该 revision 做最后一次 unchanged-import
    审计，之后才开始完整替换本项目 `src/lib/`。
