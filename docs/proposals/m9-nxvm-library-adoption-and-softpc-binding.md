@@ -22,13 +22,19 @@ src/host/             SoftPC-specific host and original-host compatibility
 src/app/              minimal SoftPC binding, monitor, and product policy
 ```
 
-The objective is not merely to add a library dependency. It is to make
-`src/app/` and the non-library portion of `src/host/` as small as the fixed
-SoftPC machine boundary permits, deleting or moving duplicated mechanisms
-only after the imported library supplies their required behavior. Any current
-SoftPC `src/lib/` code is either deleted when the NXVM replacement covers it,
-or moved out of `src/lib/` only when the ownership audit proves it is an
-irreducibly SoftPC-specific host or product binding.
+The objective is not merely to add a library dependency. Every MVDM-external,
+product-neutral host capability covered by the imported `host`, `storage`, or
+`ux` contract must use that contract: clocks, task/event/wait mechanics,
+native presentation mechanics, file I/O, and byte-medium leases. `src/app/`
+and the non-library portion of `src/host/` retain only SoftPC policy and
+original-host adaptation around those calls. They must not retain, move, or
+recreate a local platform implementation that lib already owns.
+
+Any current SoftPC `src/lib/` code is deleted when the NXVM replacement covers
+it. A current local mechanism that has no product-neutral lib equivalent is
+not silently moved: S1 must classify it either as an irreducibly
+SoftPC-specific machine/original-host boundary or as an upstream lib gap to
+be resolved before its duplicate is removed.
 
 ## Admission Record
 
@@ -50,11 +56,21 @@ NXVM source to satisfy a SoftPC boundary.
 
 ## Required Boundary
 
-The imported library owns only the capabilities it already exposes. SoftPC
-retains ownership of its selected original machine, original-host ABI, fixed
-machine assembly, package configuration, media contract, monitor syntax, and
-product-visible policy unless the approved NXVM library explicitly owns an
-equivalent generic mechanism.
+The imported library owns every product-neutral capability it exposes. SoftPC
+must route all non-MVDM use of those capabilities through lib, rather than
+through a direct SDK call or an old local wrapper: `host` owns clock and
+task/event/wait mechanics, `storage` owns ordinary owned-file access, writers,
+and byte-medium leases, and `ux` owns copied frames, host input
+normalization, mailboxes, presenters, routing, and capture.
+
+SoftPC retains its selected original machine, original-host ABI, fixed-machine
+assembly, package configuration, media topology/geometry, monitor syntax, and
+product-visible policy. Those owners choose when to call lib and translate
+their own copied values, but do not recreate lib's generic mechanism. If both
+products need a missing generic mechanism, it is an NXVM lib change, not a
+new SoftPC-local platform module. The current generic input-queue gap is
+therefore an upstream prerequisite: do not move the former
+`event_queue.c/.h` implementation into `src/app/`.
 
 SoftPC binding code may adapt copied values and opaque handles, but must not
 fork or locally reimplement an imported-library capability. A proposed removal
@@ -87,29 +103,39 @@ file: retained SoftPC binding/host responsibility outside `src/lib/`,
 imported-library equivalent, candidate deletion, or blocked semantic mismatch.
 
 The audit must identify build-system and public-header adaptation needed to
-compile the imported library locally without altering its source. It must also
-record whether each candidate is shared mechanical lifecycle/presentation/
-queue functionality or an irreducibly SoftPC-specific machine/host boundary.
+compile the imported library locally without altering its source. It must
+inventory every non-MVDM direct platform/file/media operation and classify it
+as a required `host`/`storage`/`ux` migration, an irreducibly
+SoftPC-specific machine/original-host boundary, or an upstream lib gap. A
+generic input queue is specifically such a gap until it is supplied by lib.
 
 **Exit:** `src/lib/` is exactly the approved NXVM library import and is
 hash-verifiable; every displaced current SoftPC library file and every other
-active SoftPC non-library owner has a disposition; no deletion or functional
-routing change has occurred without a proved replacement.
+active SoftPC non-library platform owner has a disposition; every generic
+duplicate has either a named lib replacement or an explicit upstream blocker;
+no deletion or functional routing change has occurred without a proved
+replacement.
 
 ### S2 — Bind SoftPC to imported library capabilities
 
-Replace approved duplicate mechanisms with the imported library through small,
-explicit SoftPC binding adapters. Preserve one fixed SoftPC machine and its
-proven executor-safe boundaries. Move product policy, original-host ABI, and
-machine-specific translation out of the imported library rather than teaching
-the library about SoftPC.
+Migrate every S1-approved generic operation to the imported library: direct
+clock/event/task/wait use to `host`; direct ordinary file and media lease use
+to `storage`; and copied-frame, input-normalization, mailbox, router,
+capture, and native presenter use to `ux`. Bindings may retain SoftPC product
+policy, original-host ABI, media geometry, and machine-specific input/media
+translation, but may not retain a second generic implementation. Preserve one
+fixed SoftPC machine and its executor-safe boundaries; teach neither lib nor
+MVDM about SoftPC product policy.
 
 ### S3 — Remove superseded SoftPC implementations
 
-Delete only code whose ownership is demonstrably supplied by the imported
-library and whose binding has dual-width focused and full-regression proof.
-Keep a compact deletion/retention ledger so the remaining non-library code is
-explained by a real SoftPC responsibility rather than historical placement.
+Delete every superseded old platform implementation, including the complete
+former `src/lib/platform/win32/` corpus and any direct local wrapper that S2
+has replaced. Delete only after dual-width focused and full-regression proof.
+Keep a compact deletion/retention ledger: every remaining non-library file
+must be explained by a real SoftPC machine/original-host/product responsibility,
+not historical platform placement. A missing shared generic facility blocks
+this step; it is not permission to retain or relocate a local clone.
 
 ### S4 — Freeze synchronization and source boundaries
 
