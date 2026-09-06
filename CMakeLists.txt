@@ -40,6 +40,7 @@ target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 # dependency. Project bindings retain all machine and lifecycle decisions;
 # the imported library owns generic host, storage, and UX mechanics.
 add_subdirectory(src/lib)
+target_link_libraries(softpc-machine PRIVATE storage-medium host-sync)
 
 # The original CCPU manifest is the executable x86 core.  It deliberately
 # links no NTVDM host, DOS/WOW component or Win32 presentation provider.
