@@ -2,6 +2,7 @@
 #include "runtime.h"
 #include "machine.h"
 #include "prompt_trace.h"
+#include "lib/storage/file.h"
 
 #include <windows.h>
 
@@ -97,23 +98,46 @@ static int app_resolve_image_path(char *path, const char *config_path)
 static int app_load_startup_config(const char *path,
     app_startup_config *config)
 {
-    FILE *file = fopen(path, "r");
-    char line[1200];
-    if (file == NULL) return 0;
-    while (fgets(line, sizeof(line), file) != NULL) {
+    void *owned = NULL;
+    size_t byte_count;
+    char *contents;
+    char *line;
+    if (lib_storage_file_read_owned(path, 64u * 1024u, &owned, &byte_count) !=
+        LIB_STATUS_OK) return 0;
+    contents = malloc(byte_count + 1u);
+    if (contents == NULL) {
+        free(owned);
+        return 0;
+    }
+    memcpy(contents, owned, byte_count);
+    contents[byte_count] = '\0';
+    free(owned);
+    line = contents;
+    while (line != NULL && *line != '\0') {
+        char *next = strpbrk(line, "\r\n");
         char *key;
         char *value;
         char *equals = strchr(line, '=');
         char *comment = strchr(line, '#');
         char *semicolon = strchr(line, ';');
+        if (next != NULL) {
+            *next++ = '\0';
+            while (*next == '\r' || *next == '\n') ++next;
+        }
         if (semicolon != NULL && (comment == NULL || semicolon < comment))
             comment = semicolon;
         if (comment != NULL) *comment = '\0';
-        if (equals == NULL) continue;
+        if (equals == NULL) {
+            line = next;
+            continue;
+        }
         *equals = '\0';
         key = app_trim(line);
         value = app_trim(equals + 1);
-        if (*key == '\0') continue;
+        if (*key == '\0') {
+            line = next;
+            continue;
+        }
         if (strcmp(key, "memory_mb") == 0) {
             char *end;
             unsigned long mib = strtoul(value, &end, 10);
@@ -142,11 +166,12 @@ static int app_load_startup_config(const char *path,
                 config->media_mode = SOFTPC_MEDIA_OVERLAY;
             else goto invalid;
         } else goto invalid;
+        line = next;
     }
-    fclose(file);
+    free(contents);
     return 1;
 invalid:
-    fclose(file);
+    free(contents);
     return 0;
 }
 
