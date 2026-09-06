@@ -16,7 +16,7 @@ of scope and has no entries below.
 
 | Disposition | C/H/RC files | Meaning |
 | --- | ---: | --- |
-| Delete and replace | 21 | Complete former `src/lib/platform/win32/` C/H corpus. |
+| Delete from old lib location | 21 | Complete former `src/lib/platform/win32/` C/H corpus; shared portions use the imported corpus, while the runtime queue is rehomed as app coordination. |
 | Modify for lib binding | 15 | Retain SoftPC policy/ABI but remove its generic platform operation. |
 | Retain unchanged | 30 | No generic capability duplicated by the present shared library. |
 
@@ -63,26 +63,19 @@ capability:
   Console compatibility, CMOS/keymouse/system declarations, and the CCPU
   lifecycle adapter.
 
-## Upstream Prerequisite
+## Product-Local Retentions
 
-The former `event_queue.c/.h` is a generic producer-to-sole-executor input
-queue. Its only product caller is `app/runtime.c`, but it is not a SoftPC
-machine semantic: it enforces the shared boundary that UI producers do not
-enter MVDM and only the executor consumes input.
+The former `event_queue.c/.h` enforced that UI producers did not enter MVDM
+and only the SoftPC executor consumed input. NXVM UX intentionally exposes an
+event sink rather than imposing a product queue. Therefore this queue is
+SoftPC runtime coordination, not a missing shared-lib facility: it must be
+rehomed under `src/app/` while preserving the sole-executor boundary.
 
-Current NXVM UX has no queue API and explicitly says product code owns its
-input queue. Under T41's adopted rule, SoftPC may not move or recreate this
-generic mechanism in `src/app`. NXVM must add a product-neutral `ux` queue
-before S2: creation/destruction, copied `ux_event` push/pop, pending state,
-and a wake/wait contract compatible with `host_sync` are sufficient. A reviewed
-new manifest revision is then required before the binding work proceeds.
-
-`storage` has a second generic gap. Its writer accepts only a NUL-terminated
-text string. SoftPC's configured COM/LPT sinks emit arbitrary guest bytes, so
-they may contain NUL and cannot use that text API without corrupting output.
-NXVM must add an appendable byte-writer operation with `(bytes, byte_count)`
-semantics (or an equivalent create-if-missing direct byte stream). S2 may then
-migrate `serial.c` and `parallel.c` without preserving direct `FILE *` I/O.
+`serial.c` and `parallel.c` write arbitrary guest bytes to configured COM/LPT
+device endpoints. The shared storage writer is deliberately a sequential text
+writer and is correctly used by prompt tracing, but it does not describe those
+endpoint protocols. Retain their byte-stream implementation in the SoftPC host
+layer; do not widen lib unless NXVM obtains the same concrete endpoint need.
 
 ## Build/Test Follow-up
 

@@ -23,10 +23,11 @@ src/app/              minimal SoftPC binding, monitor, and product policy
 ```
 
 The objective is not merely to add a library dependency. Every MVDM-external,
-product-neutral host capability covered by the imported `host`, `storage`, or
-`ux` contract must use that contract: clocks, task/event/wait mechanics,
-native presentation mechanics, file I/O, and byte-medium leases. `src/app/`
-and the non-library portion of `src/host/` retain only SoftPC policy and
+product-neutral host capability actually covered by the imported `host`,
+`storage`, or `ux` contract must use that contract: clocks, task/event/wait
+mechanics, native presentation mechanics, ordinary owned-file access, and
+byte-medium leases. `src/app/` and the non-library portion of `src/host/`
+retain SoftPC policy, runtime coordination, device protocols, and
 original-host adaptation around those calls. They must not retain, move, or
 recreate a local platform implementation that lib already owns.
 
@@ -62,13 +63,14 @@ and byte-medium leases, and `ux` owns copied frames, host input
 normalization, mailboxes, presenters, routing, and capture.
 
 SoftPC retains its selected original machine, original-host ABI, fixed-machine
-assembly, package configuration, media topology/geometry, monitor syntax, and
-product-visible policy. Those owners choose when to call lib and translate
-their own copied values, but do not recreate lib's generic mechanism. If both
-products need a missing generic mechanism, it is an NXVM lib change, not a
-new SoftPC-local platform module. The current generic input-queue gap is
-therefore an upstream prerequisite: do not move the former
-`event_queue.c/.h` implementation into `src/app/`.
+assembly, package configuration, media topology/geometry, monitor syntax,
+product-visible policy, runtime input/command queue, and device endpoint
+protocols. Those owners choose when to call lib and translate their own copied
+values, but do not recreate lib's generic mechanism. If both products actually
+need a missing generic mechanism, it is an NXVM lib change rather than a new
+SoftPC-local platform module. NXVM UX deliberately leaves product input-queue
+ownership outside lib, so the former `event_queue.c/.h` behavior may be
+rehomed under `src/app/` as SoftPC executor coordination.
 
 This boundary starts strictly outside `src/mvdm/softpc.new/`. Any direct Win32
 API use or WinNT-derived implementation retained within that preserved MVDM
@@ -111,9 +113,9 @@ imported-library equivalent, candidate deletion, or blocked semantic mismatch.
 The audit must identify build-system and public-header adaptation needed to
 compile the imported library locally without altering its source. It must
 inventory every non-MVDM direct platform/file/media operation and classify it
-as a required `host`/`storage`/`ux` migration, an irreducibly
-SoftPC-specific machine/original-host boundary, or an upstream lib gap. A
-generic input queue is specifically such a gap until it is supplied by lib.
+as a required `host`/`storage`/`ux` migration, a SoftPC-specific runtime,
+machine/original-host, or device-endpoint boundary, or an upstream lib gap
+that both products actually need.
 
 **Exit:** `src/lib/` is exactly the approved NXVM library import and is
 hash-verifiable; every displaced current SoftPC library file and every other
@@ -128,10 +130,11 @@ Migrate every S1-approved generic operation to the imported library: direct
 clock/event/task/wait use to `host`; direct ordinary file and media lease use
 to `storage`; and copied-frame, input-normalization, mailbox, router,
 capture, and native presenter use to `ux`. Bindings may retain SoftPC product
-policy, original-host ABI, media geometry, and machine-specific input/media
-translation, but may not retain a second generic implementation. Preserve one
-fixed SoftPC machine and its executor-safe boundaries; teach neither lib nor
-MVDM about SoftPC product policy.
+policy, runtime queueing, original-host ABI, media geometry, device endpoint
+protocols, and machine-specific input/media translation, but may not retain a
+second generic implementation. Preserve one fixed SoftPC machine and its
+executor-safe boundaries; teach neither lib nor MVDM about SoftPC product
+policy.
 
 ### S3 — Remove superseded SoftPC implementations
 
@@ -139,9 +142,11 @@ Delete every superseded old platform implementation, including the complete
 former `src/lib/platform/win32/` corpus and any direct local wrapper that S2
 has replaced. Delete only after dual-width focused and full-regression proof.
 Keep a compact deletion/retention ledger: every remaining non-library file
-must be explained by a real SoftPC machine/original-host/product responsibility,
-not historical platform placement. A missing shared generic facility blocks
-this step; it is not permission to retain or relocate a local clone.
+must be explained by a real SoftPC runtime, machine/original-host, product, or
+device-endpoint responsibility, not historical platform placement. A missing
+shared generic facility that both products need blocks this step; a
+product-specific queue or endpoint remains locally owned rather than forcing
+an over-broad lib API.
 
 ### S4 — Freeze synchronization and source boundaries
 
