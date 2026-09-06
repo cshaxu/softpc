@@ -117,13 +117,19 @@ static int app_load_startup_config(const char *path,
         char *next = strpbrk(line, "\r\n");
         char *key;
         char *value;
-        char *equals = strchr(line, '=');
-        char *comment = strchr(line, '#');
-        char *semicolon = strchr(line, ';');
+        char *equals;
+        char *comment;
+        char *semicolon;
         if (next != NULL) {
             *next++ = '\0';
             while (*next == '\r' || *next == '\n') ++next;
         }
+        /* Delimit the current record before scanning it.  Scanning the
+           unsplit buffer lets a leading comment consume an '=' from a later
+           setting and silently discard that setting. */
+        equals = strchr(line, '=');
+        comment = strchr(line, '#');
+        semicolon = strchr(line, ';');
         if (semicolon != NULL && (comment == NULL || semicolon < comment))
             comment = semicolon;
         if (comment != NULL) *comment = '\0';
