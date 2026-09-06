@@ -34,6 +34,8 @@
 #include "lifecycle.h"
 #include "input.h"
 #include "hdd_media.h"
+#include "lib/host/clock.h"
+#include "lib/host/sync.h"
 
 /*
  * Minimal host ports for the detached CCPU.  These are deliberately machine
@@ -55,8 +57,8 @@ IBOOL softpc_ccpu_instruction_budget_active = FALSE;
 #ifdef _WIN32
 static volatile LONG softpc_executor_pacing_enabled;
 static ULONGLONG softpc_executor_pacing_instructions;
-static LARGE_INTEGER softpc_executor_pacing_origin;
-static LARGE_INTEGER softpc_executor_pacing_frequency;
+static lib_u64 softpc_executor_pacing_origin;
+static lib_u64 softpc_executor_pacing_frequency;
 #endif
 
 extern void softpc_standalone_sound_timer2_gate(half_word value);
@@ -173,7 +175,8 @@ IBOOL softpc_platform_consume_instruction_budget(void)
 void softpc_platform_pace_instruction(void)
 {
 #ifdef _WIN32
-    LARGE_INTEGER now;
+    lib_u64 now;
+    lib_u64 units_per_second;
     ULONGLONG target_units;
     ULONGLONG elapsed_units;
     ULONGLONG milliseconds;
@@ -185,28 +188,26 @@ void softpc_platform_pace_instruction(void)
          SOFTPC_EXECUTOR_PACE_CHECK_INTERVAL) != 0u ||
         softpc_platform_has_pending_executor_event())
         return;
-    if (softpc_executor_pacing_frequency.QuadPart == 0 ||
-        !QueryPerformanceCounter(&now))
+    if (softpc_executor_pacing_frequency == 0u ||
+        host_clock_monotonic_counter(&now, &units_per_second) != LIB_STATUS_OK)
         return;
     target_units = (softpc_executor_pacing_instructions *
-                    (ULONGLONG)softpc_executor_pacing_frequency.QuadPart) /
+                    (ULONGLONG)softpc_executor_pacing_frequency) /
                    SOFTPC_EXECUTOR_PACE_INSTRUCTIONS_PER_SECOND;
-    elapsed_units = (ULONGLONG)(now.QuadPart -
-                                softpc_executor_pacing_origin.QuadPart);
+    elapsed_units = (ULONGLONG)(now - softpc_executor_pacing_origin);
     while (target_units > elapsed_units &&
            InterlockedCompareExchange(&softpc_executor_pacing_enabled, 0, 0) != 0 &&
            !softpc_platform_has_pending_executor_event())
     {
         milliseconds = ((target_units - elapsed_units) * 1000ULL) /
-                       (ULONGLONG)softpc_executor_pacing_frequency.QuadPart;
+                       (ULONGLONG)softpc_executor_pacing_frequency;
         if (milliseconds != 0u)
-            Sleep((DWORD)(milliseconds > 1u ? 1u : milliseconds));
+            host_sync_sleep_milliseconds(1u);
         else
-            SwitchToThread();
-        if (!QueryPerformanceCounter(&now))
+            host_sync_yield();
+        if (host_clock_monotonic_counter(&now, &units_per_second) != LIB_STATUS_OK)
             break;
-        elapsed_units = (ULONGLONG)(now.QuadPart -
-                                    softpc_executor_pacing_origin.QuadPart);
+        elapsed_units = (ULONGLONG)(now - softpc_executor_pacing_origin);
     }
 #endif
 }
@@ -220,7 +221,7 @@ void softpc_platform_wait_for_executor_event(void)
     if (softpc_executor_event != NULL)
         (void)WaitForSingleObject(softpc_executor_event, INFINITE);
     else
-        Sleep(1u);
+        host_sync_sleep_milliseconds(1u);
 #endif
 }
 
@@ -239,11 +240,15 @@ void softpc_platform_set_boot_clock(int active)
 void softpc_platform_set_runtime_heartbeat(int enabled)
 {
 #ifdef _WIN32
-    LARGE_INTEGER now;
+    lib_u64 now;
+    lib_u64 units_per_second;
 
-    if (enabled && QueryPerformanceFrequency(&softpc_executor_pacing_frequency) && QueryPerformanceCounter(&now))
+    if (enabled &&
+        host_clock_monotonic_counter(&now, &units_per_second) == LIB_STATUS_OK &&
+        units_per_second != 0u)
     {
         softpc_executor_pacing_origin = now;
+        softpc_executor_pacing_frequency = units_per_second;
         softpc_executor_pacing_instructions = 0u;
         InterlockedExchange(&softpc_executor_pacing_enabled, 1);
     }
@@ -309,7 +314,7 @@ void memset4(unsigned int data, unsigned int *destination, unsigned int count)
 void host_release_timeslice(void)
 {
 #ifdef _WIN32
-    Sleep(0u);
+    host_sync_yield();
 #endif
 }
 
@@ -674,20 +679,19 @@ void host_note_queue_added(IU32 value)
  * and makes a real machine's elapsed-time accounting depend on host load. */
 static IUH softpc_clock_ticks(void)
 {
-    static LARGE_INTEGER frequency;
-    LARGE_INTEGER counter;
+    lib_u64 frequency;
+    lib_u64 counter;
     ULONGLONG seconds;
     ULONGLONG remainder;
     ULONGLONG microseconds;
 
-    if (frequency.QuadPart == 0 && !QueryPerformanceFrequency(&frequency))
+    if (host_clock_monotonic_counter(&counter, &frequency) != LIB_STATUS_OK ||
+        frequency == 0u)
         return 0;
-    if (!QueryPerformanceCounter(&counter))
-        return 0;
-    seconds = (ULONGLONG)counter.QuadPart / (ULONGLONG)frequency.QuadPart;
-    remainder = (ULONGLONG)counter.QuadPart % (ULONGLONG)frequency.QuadPart;
+    seconds = (ULONGLONG)counter / (ULONGLONG)frequency;
+    remainder = (ULONGLONG)counter % (ULONGLONG)frequency;
     microseconds = seconds * 1000000ULL +
-                   (remainder * 1000000ULL) / (ULONGLONG)frequency.QuadPart;
+                   (remainder * 1000000ULL) / (ULONGLONG)frequency;
     return (IUH)microseconds;
 }
 

@@ -46,7 +46,7 @@ or moved to another local platform directory.
 | `src/host/hdd_media.c` | `lib_storage_medium_*` | HDD geometry and original-host attachment. |
 | `src/host/machine.c` | `lib_storage_file_read_owned` | Fixed machine assembly and resource policy. |
 | `src/host/parallel.c`, `serial.c` | `lib_storage_file_writer_*` | Original LPT/COM endpoint protocol. |
-| `src/host/platform.c` | `host_clock_*`, `host_sync_*` where covered | Original timer callback, CCPU safe point, resources, and machine timing. |
+| `src/host/platform.c` | `host_clock_monotonic_counter`, `host_sync_sleep_milliseconds`, `host_sync_yield` | Original timer callback, CCPU safe point, resources, and machine timing. |
 
 ## Retain Unchanged
 
@@ -76,6 +76,14 @@ device endpoints. The shared storage writer is deliberately a sequential text
 writer and is correctly used by prompt tracing, but it does not describe those
 endpoint protocols. Retain their byte-stream implementation in the SoftPC host
 layer; do not widen lib unless NXVM obtains the same concrete endpoint need.
+
+`platform.c` now obtains its monotonic counter and scheduler yield/sleep from
+the shared host APIs. Its remaining TimerQueue and auto-reset executor event
+are not duplicate generic mechanisms: together they form the original CCPU
+20 Hz machine-timer delivery boundary. The imported host API provides neither
+a periodic timer nor an auto-reset event (its event contract is manual-reset),
+so replacing that pair would change the machine-host contract rather than
+complete a shared-platform migration.
 
 ## Build/Test Follow-up
 
