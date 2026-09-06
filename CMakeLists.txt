@@ -267,6 +267,7 @@ target_compile_definitions(softpc-machine PRIVATE
 add_executable(softpcvm
     src/app/main.c
     src/app/runtime.c
+    src/app/input_queue.c
     src/app/keyboard.c
     src/app/presentation.c
     src/app/prompt_trace.c
@@ -401,6 +402,7 @@ set_tests_properties(softpc-lifecycle-smoke PROPERTIES
 add_executable(softpc-runtime-smoke
     test/unit/runtime_smoke.c
     src/app/runtime.c
+    src/app/input_queue.c
     src/app/keyboard.c
     src/app/prompt_trace.c)
 target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine ux host-sync
@@ -412,6 +414,7 @@ set_tests_properties(softpc-runtime-smoke PROPERTIES
 add_executable(softpc-runtime-input-continuation-smoke
     test/unit/runtime_input_continuation_smoke.c
     src/app/runtime.c
+    src/app/input_queue.c
     src/app/keyboard.c
     src/app/prompt_trace.c)
 target_link_libraries(softpc-runtime-input-continuation-smoke PRIVATE
@@ -425,6 +428,7 @@ set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
 add_executable(softpc-win32-window-smoke
     test/unit/win32_window_smoke.c
     src/app/runtime.c
+    src/app/input_queue.c
     src/app/keyboard.c
     src/app/prompt_trace.c
     src/app/presentation.c)

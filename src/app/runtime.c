@@ -1,8 +1,7 @@
 #include "runtime.h"
 #include "keyboard.h"
+#include "input_queue.h"
 #include "prompt_trace.h"
-#include "../lib/platform/win32/event_queue.h"
-#include "../lib/platform/win32/mailbox.h"
 
 #include <windows.h>
 
@@ -41,8 +40,9 @@ static void app_runtime_prompt_trace(uint32_t sequence, uint32_t mode_type,
 
 struct app_runtime {
     softpc_machine *machine;
-    win32_presentation_event_queue *input_queue;
-    win32_presentation_mailbox *frame_mailbox;
+    app_input_queue *input_queue;
+    ux_mailbox *frame_mailbox;
+    ux_frame *frame_buffer;
     HANDLE command_event;
     HANDLE ready_event;
     HANDLE resume_event;
@@ -97,28 +97,27 @@ static void app_runtime_measure(app_runtime *runtime)
 
 static void app_runtime_publish(app_runtime *runtime)
 {
-    app_runtime_frame *frame;
-    const app_runtime_frame *current;
+    app_runtime_frame *frame = runtime->frame_buffer;
     int published = 0;
     const void *surface;
     uint32_t columns = 0u;
     uint32_t rows = 0u;
     uint32_t stride = 0u;
     uint32_t cell_bytes;
+    uint32_t cursor_size = 0u;
     int32_t cursor_column;
     int32_t cursor_row;
     uint32_t mode_type = 0u, screen_state = 0u;
     int32_t trace_left = -1, trace_top = -1, trace_right = -1, trace_bottom = -1;
     int trace_dirty = 0;
 
-    if (!win32_presentation_mailbox_begin_update(runtime->frame_mailbox,
-            &frame, &current)) return;
+    if (frame == NULL) return;
+    memset(frame, 0, sizeof(*frame));
     if (softpc_machine_presentation_is_graphics(runtime->machine)) {
         const void *bits;
         const void *info;
         uint32_t width;
         uint32_t height;
-        uint32_t bytes;
         uint32_t row_stride;
         int32_t ignored_left;
         int32_t ignored_top;
@@ -141,17 +140,13 @@ static void app_runtime_publish(app_runtime *runtime)
            graphics frame only after the original renderer reports a dirty
            rectangle, otherwise a frontend can resize to that maximum scratch
            allocation before the BIOS reaches its real text mode. */
-        if (!dirty) {
-            (void)win32_presentation_mailbox_finish_update(
-                runtime->frame_mailbox, 0);
-            return;
-        }
+        if (!dirty) return;
         if (softpc_machine_presentation_dib(runtime->machine, &bits, &info,
                 &width, &height) && bits != NULL && info != NULL &&
             width <= SOFTPC_RUNTIME_DIB_MAX_WIDTH &&
             height <= SOFTPC_RUNTIME_DIB_MAX_HEIGHT) {
             uint32_t visible_width;
-            uint32_t destination_stride;
+            const BITMAPINFO *dib = (const BITMAPINFO *)info;
 
             row_stride = (width + 3u) & ~3u;
             if (runtime->graphics_source_width != width ||
@@ -174,55 +169,23 @@ static void app_runtime_publish(app_runtime *runtime)
             visible_width = runtime->graphics_visible_width;
             if (visible_width == 0u || visible_width > width)
                 visible_width = width;
-            destination_stride = (visible_width + 3u) & ~3u;
-            bytes = destination_stride * height;
-            if (bytes <= SOFTPC_RUNTIME_DIB_MAX_BYTES) {
+            if (visible_width * height <= SOFTPC_RUNTIME_DIB_MAX_BYTES) {
                 const uint8_t *source = (const uint8_t *)bits;
                 uint32_t row;
-
-                /* A renderer dirty indication can be conservative.  Do not
-                   copy/publish a maximum-sized standalone snapshot unless
-                   its reported region or palette actually differs. */
-                if (current->valid && current->graphics &&
-                    current->dib_width == visible_width &&
-                    current->dib_height == height &&
-                    memcmp(current->dib_info, info,
-                        sizeof(current->dib_info)) == 0) {
-                    int changed = 0;
-                    int32_t left = ignored_left < 0 ? 0 : ignored_left;
-                    int32_t top = ignored_top < 0 ? 0 : ignored_top;
-                    int32_t right = ignored_right >= (int32_t)visible_width ?
-                        (int32_t)visible_width - 1 : ignored_right;
-                    int32_t bottom = ignored_bottom >= (int32_t)height ?
-                        (int32_t)height - 1 : ignored_bottom;
-                    if (right >= left && bottom >= top) {
-                        for (row = (uint32_t)top; row <= (uint32_t)bottom;
-                                ++row) {
-                            if (memcmp(source + row * row_stride + left,
-                                    current->dib_bits + row * destination_stride +
-                                    left, (size_t)(right - left + 1)) != 0) {
-                                changed = 1;
-                                break;
-                            }
-                        }
-                    }
-                    if (!changed) {
-                        (void)win32_presentation_mailbox_finish_update(
-                            runtime->frame_mailbox, 0);
-                        return;
-                    }
-                }
-
+                uint32_t palette_index;
                 for (row = 0u; row < height; ++row)
-                    memcpy(frame->dib_bits + row * destination_stride,
+                    memcpy(frame->graphics_pixels + row * visible_width,
                         source + row * row_stride, visible_width);
-                memcpy(frame->dib_info, info, sizeof(frame->dib_info));
-                ((BITMAPINFO *)frame->dib_info)->bmiHeader.biWidth =
-                    (LONG)visible_width;
-                ((BITMAPINFO *)frame->dib_info)->bmiHeader.biSizeImage =
-                    bytes;
-                frame->dib_width = visible_width;
-                frame->dib_height = height;
+                for (palette_index = 0u;
+                        palette_index < UX_GRAPHICS_PALETTE_ENTRIES;
+                        ++palette_index) {
+                    const RGBQUAD *colour = &dib->bmiColors[palette_index];
+                    frame->graphics_palette[palette_index] = (uint32_t)RGB(
+                        colour->rgbRed, colour->rgbGreen, colour->rgbBlue);
+                }
+                frame->graphics_width = visible_width;
+                frame->graphics_height = height;
+                frame->graphics_stride = visible_width;
                 frame->dirty_left = ignored_left < 0 ? 0 : ignored_left;
                 frame->dirty_top = ignored_top < 0 ? 0 : ignored_top;
                 frame->dirty_right = ignored_right >= (int32_t)visible_width ?
@@ -285,13 +248,20 @@ static void app_runtime_publish(app_runtime *runtime)
         cursor_column = -1;
         cursor_row = -1;
         (void)softpc_machine_presentation_cursor(runtime->machine,
-            &cursor_column, &cursor_row, &frame->cursor_size);
+            &cursor_column, &cursor_row, &cursor_size);
         frame->cursor_column = cursor_column;
         frame->cursor_row = cursor_row;
         (void)softpc_machine_presentation_fonts(runtime->machine, frame->font,
             frame->secondary_font, &frame->font_height,
             &frame->attribute_font_select);
         frame->graphics = 0u;
+        frame->text_columns = (uint16_t)columns;
+        frame->text_rows = (uint16_t)rows;
+        frame->cursor_top = 0u;
+        frame->cursor_bottom = cursor_size == 0u ? 15u :
+            (uint8_t)((cursor_size * 16u + 99u) / 100u - 1u);
+        frame->cursor_visible = cursor_column >= 0 && cursor_row >= 0;
+        frame->cursor_phase = 1u;
         frame->dirty_left = 0;
         frame->dirty_top = 0;
         frame->dirty_right = -1;
@@ -300,24 +270,22 @@ static void app_runtime_publish(app_runtime *runtime)
         published = 1;
     }
     if (published) {
-        frame->sequence = win32_presentation_mailbox_finish_update(
-            runtime->frame_mailbox, 1);
+        if (ux_mailbox_publish(runtime->frame_mailbox, frame) != LIB_STATUS_OK)
+            return;
+        frame->sequence = ux_mailbox_generation(runtime->frame_mailbox);
         ++runtime->measurement_published_frames;
         (void)softpc_machine_presentation_state(runtime->machine, &mode_type,
             &screen_state);
         app_runtime_prompt_trace(frame->sequence, mode_type, screen_state,
-            frame->graphics, columns, rows, stride, frame->dib_width,
-            frame->dib_height, trace_dirty, trace_left, trace_top,
+            frame->graphics, columns, rows, stride, frame->graphics_width,
+            frame->graphics_height, trace_dirty, trace_left, trace_top,
             trace_right, trace_bottom);
     }
-    else
-        (void)win32_presentation_mailbox_finish_update(runtime->frame_mailbox,
-            0);
 }
 
 static void app_runtime_drain_input(app_runtime *runtime)
 {
-    win32_presentation_event event;
+    ux_event event;
 
     /* keyboard_io can enter a nested host_simulate frame for the original
        BIOS INT 15 keyboard hook.  A Windows make/break pair may already be
@@ -325,24 +293,25 @@ static void app_runtime_drain_input(app_runtime *runtime)
        into that frame corrupts the original controller's service ordering.
        Deliver precisely one hardware scan event per executor callback; the
        restored 20 Hz host timer naturally schedules the next one. */
-    if (win32_presentation_event_queue_pop(runtime->input_queue, &event)) {
-        if (event.type == WIN32_PRESENTATION_EVENT_KEY) {
+    if (app_input_queue_pop(runtime->input_queue, &event)) {
+        if (event.type == UX_EVENT_KEY) {
             if (getenv("SOFTPC_INPUT_TRACE") != NULL)
                 fprintf(stderr, "softpc input drain scan=%u released=%u\n",
                     (unsigned int)event.data.key.scan_code,
                     (unsigned int)!event.data.key.pressed);
             (void)app_keyboard_inject_machine_event(runtime->machine, &event);
-        } else if (event.type == WIN32_PRESENTATION_EVENT_MOUSE) {
+        } else if (event.type == UX_EVENT_MOUSE) {
             (void)softpc_machine_mouse_input(runtime->machine,
                 event.data.mouse.delta_x, event.data.mouse.delta_y,
-                event.data.mouse.left_down, event.data.mouse.right_down);
+                (event.data.mouse.buttons & UX_MOUSE_BUTTON_LEFT) != 0u,
+                (event.data.mouse.buttons & UX_MOUSE_BUTTON_RIGHT) != 0u);
         }
         /* The original keyboard path can re-enter the CCPU while servicing
            one transition.  It remains deliberately one transition per
            executor callback.  If the standalone queue already has another
            transition, arrange a new CCPU-safe callback rather than waiting
            for the unrelated 20 Hz device clock. */
-        if (win32_presentation_event_queue_pending(runtime->input_queue))
+        if (app_input_queue_pending(runtime->input_queue))
             softpc_machine_request_wake(runtime->machine);
     }
 }
@@ -452,14 +421,16 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
     runtime->media_event = CreateEventA(NULL, TRUE, FALSE, NULL);
     if (runtime->command_event == NULL || runtime->ready_event == NULL ||
         runtime->resume_event == NULL || runtime->media_event == NULL ||
-        !win32_presentation_mailbox_create(&runtime->frame_mailbox) ||
-        !win32_presentation_event_queue_create(&runtime->input_queue)) {
+        ux_mailbox_create(&runtime->frame_mailbox) != LIB_STATUS_OK ||
+        !app_input_queue_create(&runtime->input_queue) ||
+        (runtime->frame_buffer = calloc(1u, sizeof(*runtime->frame_buffer))) == NULL) {
         if (runtime->command_event != NULL) CloseHandle(runtime->command_event);
         if (runtime->ready_event != NULL) CloseHandle(runtime->ready_event);
         if (runtime->resume_event != NULL) CloseHandle(runtime->resume_event);
         if (runtime->media_event != NULL) CloseHandle(runtime->media_event);
-        win32_presentation_mailbox_destroy(runtime->frame_mailbox);
-        win32_presentation_event_queue_destroy(runtime->input_queue);
+        ux_mailbox_destroy(runtime->frame_mailbox);
+        app_input_queue_destroy(runtime->input_queue);
+        free(runtime->frame_buffer);
         free(runtime);
         return 0;
     }
@@ -472,8 +443,9 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
         CloseHandle(runtime->resume_event);
         CloseHandle(runtime->ready_event);
         CloseHandle(runtime->media_event);
-        win32_presentation_mailbox_destroy(runtime->frame_mailbox);
-        win32_presentation_event_queue_destroy(runtime->input_queue);
+        ux_mailbox_destroy(runtime->frame_mailbox);
+        app_input_queue_destroy(runtime->input_queue);
+        free(runtime->frame_buffer);
         CloseHandle(runtime->command_event);
         free(runtime);
         return 0;
@@ -488,7 +460,7 @@ int app_runtime_start(app_runtime *runtime)
     if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
         SOFTPC_RUNTIME_STOPPED) return 0;
     ResetEvent(runtime->ready_event);
-    win32_presentation_mailbox_reset_event(runtime->frame_mailbox);
+    ux_mailbox_wake(runtime->frame_mailbox);
     InterlockedExchange(&runtime->pause_requested, 0);
     InterlockedExchange(&runtime->stop_requested, 0);
     InterlockedExchange(&runtime->result, SOFTPC_MACHINE_IO_ERROR);
@@ -596,12 +568,12 @@ softpc_machine_result app_runtime_get_result(const app_runtime *runtime)
 }
 
 int app_runtime_enqueue_input_event(app_runtime *runtime,
-    const win32_presentation_event *event)
+    const ux_event *event)
 {
     if (runtime == NULL || event == NULL ||
         InterlockedCompareExchange(&runtime->state, 0, 0) !=
             SOFTPC_RUNTIME_RUNNING) return 0;
-    if (!win32_presentation_event_queue_push(runtime->input_queue, event))
+    if (!app_input_queue_push(runtime->input_queue, event))
         return 0;
     softpc_machine_request_wake(runtime->machine);
     return 1;
@@ -610,23 +582,16 @@ int app_runtime_enqueue_input_event(app_runtime *runtime,
 int app_runtime_copy_frame(app_runtime *runtime,
     app_runtime_frame *destination)
 {
-    return runtime != NULL && win32_presentation_mailbox_copy(
-        runtime->frame_mailbox, destination);
+    return runtime != NULL && ux_mailbox_capture(runtime->frame_mailbox,
+        destination) == LIB_STATUS_OK;
 }
 
 uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime)
 {
-    return runtime == NULL ? 0u : win32_presentation_mailbox_sequence(
-        runtime->frame_mailbox);
+    return runtime == NULL ? 0u : ux_mailbox_generation(runtime->frame_mailbox);
 }
 
-void *app_runtime_frame_event(const app_runtime *runtime)
-{
-    return runtime == NULL ? NULL : win32_presentation_mailbox_event(
-        runtime->frame_mailbox);
-}
-
-win32_presentation_mailbox *app_runtime_presentation_mailbox(
+ux_mailbox *app_runtime_presentation_mailbox(
     app_runtime *runtime)
 {
     return runtime == NULL ? NULL : runtime->frame_mailbox;
@@ -644,8 +609,9 @@ void app_runtime_destroy(app_runtime *runtime)
     CloseHandle(runtime->ready_event);
     CloseHandle(runtime->resume_event);
     CloseHandle(runtime->media_event);
-    win32_presentation_mailbox_destroy(runtime->frame_mailbox);
-    win32_presentation_event_queue_destroy(runtime->input_queue);
+    ux_mailbox_destroy(runtime->frame_mailbox);
+    app_input_queue_destroy(runtime->input_queue);
+    free(runtime->frame_buffer);
     CloseHandle(runtime->command_event);
     free(runtime);
 }

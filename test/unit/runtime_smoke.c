@@ -42,10 +42,7 @@ int main(void)
 
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(app_runtime_create(machine, &runtime));
-    assert(app_runtime_frame_event(runtime) != NULL);
     assert(app_runtime_start(runtime));
-    assert(WaitForSingleObject((HANDLE)app_runtime_frame_event(runtime),
-        5000u) == WAIT_OBJECT_0);
     Sleep(150u);
     frame = (app_runtime_frame *)calloc(1u, sizeof(*frame));
     assert(frame != NULL);
@@ -62,7 +59,7 @@ int main(void)
                 frame->cursor_column < SOFTPC_RUNTIME_TEXT_COLUMNS &&
                 frame->cursor_row >= 0 &&
                 frame->cursor_row < SOFTPC_RUNTIME_TEXT_ROWS &&
-                frame->cursor_size > 0u && frame->cursor_size <= 100u) {
+                frame->cursor_visible != 0u && frame->cursor_phase != 0u) {
                 cursor_seen = 1;
                 break;
             }

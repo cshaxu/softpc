@@ -9,9 +9,8 @@ src/
   host/
     ordinary host C/H files
     compat/{ccpu,cvidc,...}/
-  lib/platform/win32/
-    synchronized copied-frame mailbox, input/action queues, and Win32
-    console/window presentation mechanics
+  lib/{base,host,storage,ux}/
+    byte-identical NXVM shared platform implementation
   app/
     main.c, runtime.c, presentation.c, keyboard.c, firmware.rc
 ```
@@ -30,11 +29,11 @@ corrections live as reviewable source diffs at their affected points. Generated
 transformed C/H files are not build inputs. `host` owns platform capability
 implementations and larger functional adaptations; `app` owns
 orchestration, machine snapshot production, guest-input conversion, monitor
-UI, and product lifecycle policy. `lib/platform/win32` owns copied-value
-Win32 presentation: mailbox/event queues, input normalization, action
-registration, console/window loops, routing, geometry, and capture. It never
-owns a project runtime, machine, renderer, guest-input mapping, lifecycle, or
-hotkey meaning.
+UI, and product lifecycle policy. `lib` owns copied-value platform mechanics:
+mailbox, host input normalization, action registration, console/window loops,
+routing, geometry, capture, clock, synchronization, and storage. It never
+owns a project runtime, machine, renderer, product input queue, guest-input
+mapping, lifecycle, or hotkey meaning.
 
 ## Build Output Layout
 

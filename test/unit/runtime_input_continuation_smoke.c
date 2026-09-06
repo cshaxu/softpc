@@ -26,9 +26,9 @@ static int runtime_input_wait_for_byte(softpc_machine *machine,
 static int runtime_input_enqueue_key(app_runtime *runtime, uint16_t scan,
     uint16_t virtual_key, uint8_t pressed)
 {
-    win32_presentation_event event = { 0 };
+    ux_event event = { 0 };
 
-    event.type = WIN32_PRESENTATION_EVENT_KEY;
+    event.type = UX_EVENT_KEY;
     event.data.key.scan_code = scan;
     event.data.key.virtual_key = virtual_key;
     event.data.key.pressed = pressed;

@@ -1,6 +1,5 @@
 #include "runtime.h"
 #include "presentation.h"
-#include "geometry.h"
 #include "test_cleanup.h"
 
 #include <assert.h>
@@ -73,12 +72,6 @@ int main(void)
         0xc6u, 0x06u, 0x00u, 0x05u, 0xa5u,
         0xb0u, 0x20u, 0xe6u, 0x20u, 0xcfu
     };
-
-    /* COLORREF is 0x00bbggrr while a 32-bit BI_RGB DIB stores a DWORD as
-       0x00rrggbb.  Blue Setup text backgrounds previously reached this DIB
-       with the COLORREF packing unchanged and therefore painted red. */
-    assert(win32_presentation_dib_pixel(RGB(0, 0, 168)) == 0x000000a8u);
-    assert(win32_presentation_dib_pixel(RGB(168, 0, 0)) == 0x00a80000u);
 
     options.media_mode = SOFTPC_MEDIA_OVERLAY;
     memcpy(sector, program, sizeof(program));
@@ -182,7 +175,9 @@ int main(void)
     assert(frame.valid != 0u && frame.graphics == 0u);
     {
         RECT client;
-        uint32_t cursor_size = frame.cursor_size;
+        uint32_t cursor_size = frame.cursor_bottom >= frame.cursor_top &&
+            frame.font_height != 0u ? (frame.cursor_bottom - frame.cursor_top + 1u) *
+            100u / frame.font_height : 100u;
         int cell_height;
         int cursor_height;
         int cursor_x;

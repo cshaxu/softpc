@@ -14,10 +14,10 @@ app/
   one executor, machine snapshot producer, guest-input adapter, lifecycle,
   monitor, and product binding; no machine-state access from frontends
         ↑
-lib/platform/win32/
-  copied-frame mailbox/event, generic input/action queues, reusable Win32
-  console/window presenters, geometry, sizing, mouse capture, and display
-  router; no guest input protocol or lifecycle policy
+lib/{base,host,storage,ux}/
+  byte-identical NXVM shared platform library: copied-frame mailbox, host
+  input normalization, action matching, reusable presenters, clock,
+  synchronization, and storage; no product queue or guest protocol
 ```
 
 `mvdm/softpc.new` is the repository-owned selected recovered-machine layout.
@@ -31,12 +31,13 @@ the affected point when they remain mechanical and introduce no machine policy.
 capability, ownership, and policy, but does not own guest-visible state.
 `app/` owns the single executor, machine snapshot producer, guest-input
 adapter, monitor, and product binding.
-`lib/platform/win32/` is a local synchronized-source component, not a runtime
-or build dependency on NXVM or NTVDM64. It consumes and produces copied host
-values only. It owns the generic mailbox, console/window message loops,
-host-input normalization, action registration/matching, mouse capture, and
-`WINDOW`/`CONSOLE` routing. The app binding alone converts events to the
-guest's input protocol and makes all product lifecycle and action decisions.
+`lib/` is an exact checked-in NXVM import, not a runtime or build dependency
+on NXVM or NTVDM64. It consumes and produces copied host values only. It owns
+the generic mailbox, console/window message loops, host-input normalization,
+action registration/matching, mouse capture, routing, clock, synchronization,
+and storage primitives. The app binding owns its executor queue, converts
+events to the guest's input protocol, and makes all product lifecycle and
+action decisions.
 
 The runtime executor is the sole caller of the machine and compatibility host.
 Input producers enqueue records and signal it. The executor publishes complete

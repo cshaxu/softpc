@@ -52,11 +52,11 @@ foreach(app_source IN ITEMS
     endif()
 endforeach()
 
-# The synchronised Win32 presentation component consumes copied values only.
+# The imported UX component consumes copied values only.
 # It cannot acquire SoftPC's runtime, machine, renderer, or original key-map
 # ownership; those remain in the project binding under src/app.
 file(GLOB_RECURSE shared_win32_sources
-    "${SOFTPC_SOURCE_DIR}/src/lib/platform/win32/*.[ch]")
+    "${SOFTPC_SOURCE_DIR}/src/lib/ux/*.[ch]")
 foreach(source IN LISTS shared_win32_sources)
     file(READ "${source}" shared_win32_contents)
     if(shared_win32_contents MATCHES
@@ -67,7 +67,7 @@ endforeach()
 
 # A product binding may select the generic policy from its configuration, but
 # may not re-create a target-to-presenter switch.  That common dispatcher is
-# part of the synchronized Win32 component.
+# part of the imported UX component.
 file(READ "${SOFTPC_SOURCE_DIR}/src/app/main.c" app_main_source)
 file(READ "${SOFTPC_SOURCE_DIR}/src/app/presentation.c" app_presentation_source)
 if(app_main_source MATCHES "WIN32_PRESENTATION_TARGET|run_(window|console)")
@@ -76,11 +76,11 @@ endif()
 if(app_presentation_source MATCHES "WIN32_PRESENTATION_TARGET|run_(window|console)")
     message(FATAL_ERROR "Product binding retains presentation-target dispatch")
 endif()
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/platform/win32/presenter.c"
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux/win32/runner.c"
     shared_presenter_source)
-string(FIND "${shared_presenter_source}" "win32_presentation_run_window"
+string(FIND "${shared_presenter_source}" "ux_win32_run_window"
     shared_window_dispatch)
-string(FIND "${shared_presenter_source}" "win32_presentation_run_console"
+string(FIND "${shared_presenter_source}" "ux_win32_run_console"
     shared_console_dispatch)
 if(shared_window_dispatch EQUAL -1 OR shared_console_dispatch EQUAL -1)
     message(FATAL_ERROR "Shared Win32 component lacks generic presentation dispatcher")
@@ -218,13 +218,13 @@ endif()
 
 # Presentation is deliberately a DIB consumer.  Controller planes and DAC
 # interpretation stay in the original nt_cga/nt_ega/nt_vga renderer path.
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/platform/win32/window.c" window_frontend)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux/win32/window.c" window_frontend)
 string(TOLOWER "${window_frontend}" normalized_window_frontend)
 if(normalized_window_frontend MATCHES "ega_planes|\\bdac\\b")
     message(FATAL_ERROR "Standalone window bypasses the original SoftPC renderer")
 endif()
 
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/platform/win32/console.c" console_frontend)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux/win32/console.c" console_frontend)
 string(TOLOWER "${window_frontend}${console_frontend}" normalized_frontends)
 if(normalized_frontends MATCHES "host_key_(down|up)|mouse_send")
     message(FATAL_ERROR "Standalone frontend bypasses original SoftPC input controllers")
