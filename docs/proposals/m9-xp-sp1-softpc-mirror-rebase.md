@@ -23,12 +23,20 @@ XP SP1: O:/repos.external/winxpscodes/Source/XPSP1/NT/base/mvdm/softpc.new @ a2f
 Local:  src/mvdm/softpc.new
 ```
 
-The comparison normalizes CRLF/LF and terminal blank lines for C/H ownership
-only.  It found 898 OpenNT C/H files, 793 XP C/H files and 526 local C/H
-files.  OpenNT to XP has 145 changed same-path files, 126 OpenNT-only files
-(principally retired non-x86 routes), and 21 XP-only files (principally PC-98
-and SoundBlaster routes).  Neither one-sided inventory is permission to add a
-source to the selected standalone build.
+The frozen pre-T40 comparison normalizes CRLF/LF and terminal blank lines for
+C/H ownership only.  It found 898 OpenNT C/H files, 793 XP C/H files and 526
+local C/H files.  OpenNT to XP has 145 changed same-path files, 126
+OpenNT-only files (principally retired non-x86 routes), and 21 XP-only files
+(principally PC-98 and SoundBlaster routes).  Neither one-sided inventory is
+permission to add a source to the selected standalone build.
+
+M9 T40 subsequently removed 33 unselected local headers.  The current local
+inventory is therefore 493 C/H files.  Local now lacks all 126 OpenNT-only
+paths: 96 had already been absent and T40 retired the final 30 MIPS/PPC
+headers.  Its other three header removals (`get_env.h`, `gfisflop.h`, and
+`monsim32.h`) are present in both reference trees, so they do not alter the
+OpenNT-only or XP-only counts.  None of the 33 was an A/B content-difference
+path; the 58 A and 28 B semantic ledger remains intact.
 
 For the 526 local paths with peers in both references: 344 are identical in
 all three trees; 66 are existing standalone/port-ABI differences while the

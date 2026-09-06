@@ -4,13 +4,14 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T40 closed |
-| Admission And Approval | Owner admitted the first queued XP-obsolete non-x86 mirror-header retirement as an ordinary implementation task and directed it to closure. |
-| Objective | Remove unselected XP-obsolete and legacy MVDM headers without changing the selected standalone machine. |
-| Outcome | Removed 33 headers: 30 OpenNT-only MIPS/PPC paths absent from XP SP1, plus unselected `get_env.h`, `gfisflop.h`, and `monsim32.h`; no selected x86/AT/V7 source changed. |
-| Verification | Fresh GCC x64 and MSYS2 i686 x86 full CTest each passed 23/23, including each package smoke; source-selection/dependency searches were clean; `softpc.ini` hash was unchanged; documentation governance and diff checks passed. |
-| Exit Criteria | Met.  See [T40 history](../history/M9-T40-xp-obsolete-header-retirement.md). |
-| Original Owner Request | “准入第一条，作为普通T任务执行到收口。” |
+| Identifier Mode | M9 Td S5 closed |
+| Admission And Approval | Owner directed a Td governance reconciliation of the XP audit after T40 removed 33 headers. |
+| Objective | Keep the XP SP1 proposal and Chinese A/B audit accurate about the current local source inventory without changing their hunk conclusions. |
+| Non-goals | No source, build, package, queue-order, A/B hunk disposition, or machine-profile change. |
+| Outcome | Recorded that local now lacks all 126 OpenNT-only paths, that the local C/H inventory is 493 after T40, and that the 86 A/B rows and 21 XP-only inventory are unchanged. |
+| Verification | Cross-checked the T40 closure manifest and history against the frozen comparison counts; documentation governance and diff checks passed. |
+| Exit Criteria | Met; this closure records the completed documentation reconciliation. |
+| Original Owner Request | “XP审计：现在我们又删除了33个文件，你更新一下xp审计文档们” / “Td治理” |
 
 ## Current Technical Baseline
 
@@ -25,6 +26,9 @@
 
 ## Recent Governance
 
+- M9 Td S5 reconciled the XP SP1 proposal and Chinese A/B audit after T40:
+  the local C/H inventory is 493, all 126 OpenNT-only paths are now absent,
+  while the 86 A/B conclusions and 21 XP-only inventory remain unchanged.
 - M9 T23 retired 294 demonstrably unselected historical paths (15 C files and
   279 headers) from the original mirror without changing its selected machine
   behavior; fresh GCC x64/x86 CTest each passed 20/20.

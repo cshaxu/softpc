@@ -24,6 +24,20 @@ V7VGA WDCTRL_BOP PROD SOFTPC_STANDALONE`；不定义 `NTVDM`、`NEC_98` 或
 XP hunk 即使位于普通文件中，只要被 `NEC_98`、`JAPAN` 或 `NTVDM` 排除，
 也不算本项目机器 profile 的升级。
 
+## T40 后的路径库存校正
+
+本报告的 86 个 A/B 条目来自 T40 前的三方内容比较；T40 没有删除其中任何
+一项，因此 A=58、B=28 及以下逐文件结论均不变。变化的是“OpenNT 有、XP
+没有”的单边库存：初始 126 条中，本项目原已缺少 96 条，T40 删除最后 30
+条 MIPS/PPC 头文件后，本项目现已缺少全部 126 条。
+
+T40 还删除 `base/inc/get_env.h`、`base/inc/gfisflop.h` 与
+`host/inc/monsim32.h`。三者在 OpenNT 与 XP 中都存在，故不属于这 126 条，
+也不改变 XP-only 21 条的分类；它们只是当前 standalone 未选择的历史声明。
+因此本地 C/H 库存从初始审计的 526 降至 493。T40 的双宽 23/23 CTest 与
+package smoke 已通过，详情见
+[T40 收口记录](../../../history/M9-T40-xp-obsolete-header-retirement.md)。
+
 ## 结论摘要
 
 这 86 个 A/B 文件中，尚未发现 XP 为当前 normal AT/V7 profile 新增一个

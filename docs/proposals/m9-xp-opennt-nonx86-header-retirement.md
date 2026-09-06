@@ -9,9 +9,9 @@ in the OpenNT reference but absent from XP SP1.  Rebuild the fixed package
 executables `assets/binary/softpc32.exe` and `assets/binary/softpc64.exe` from
 the resulting checked-in source.
 
-This is a mechanical, non-machine-behaviour implementation candidate and a
-prerequisite cleanup for the XP SP1 mirror rebase.  Its `T` build version is
-allocated only if and when the owner admits it.
+This was admitted and closed as M9 T40: a mechanical, non-machine-behaviour
+prerequisite cleanup for the XP SP1 mirror rebase.  The closure evidence is
+in [T40 history](../history/M9-T40-xp-obsolete-header-retirement.md).
 
 ## Frozen Comparison Basis
 
@@ -21,10 +21,11 @@ XP SP1: O:/repos.external/winxpscodes/Source/XPSP1/NT/base/mvdm/softpc.new @ a2f
 Local:  src/mvdm/softpc.new
 ```
 
-The OpenNT-only inventory has 126 C/H paths.  Local already lacks 96.  The
-remaining 30 are all headers, all below `host/inc/mips/` or `host/inc/ppc/`,
-and are absent from the XP SP1 tree.  They have no exact-path selection in
-CMake, sources, scripts, or tests, and no active MIPS/PPC host build exists.
+At admission, the OpenNT-only inventory had 126 C/H paths.  Local already
+lacked 96.  The remaining 30 were all headers, all below `host/inc/mips/` or
+`host/inc/ppc/`, and were absent from the XP SP1 tree.  They had no exact-path
+selection in CMake, sources, scripts, or tests, and no active MIPS/PPC host
+build existed.  After T40, all 126 OpenNT-only paths are absent locally.
 The owner also added three independent candidates to the admitted audit:
 `get_env.h` only declared the already-retired `get_env.c` wrappers;
 `gfisflop.h` only supported the previously retired GFI slave-PC/serial-RPC
