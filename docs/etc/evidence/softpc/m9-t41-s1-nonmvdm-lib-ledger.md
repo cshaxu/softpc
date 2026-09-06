@@ -77,6 +77,13 @@ before S2: creation/destruction, copied `ux_event` push/pop, pending state,
 and a wake/wait contract compatible with `host_sync` are sufficient. A reviewed
 new manifest revision is then required before the binding work proceeds.
 
+`storage` has a second generic gap. Its writer accepts only a NUL-terminated
+text string. SoftPC's configured COM/LPT sinks emit arbitrary guest bytes, so
+they may contain NUL and cannot use that text API without corrupting output.
+NXVM must add an appendable byte-writer operation with `(bytes, byte_count)`
+semantics (or an equivalent create-if-missing direct byte stream). S2 may then
+migrate `serial.c` and `parallel.c` without preserving direct `FILE *` I/O.
+
 ## Build/Test Follow-up
 
 `CMakeLists.txt` must replace the former `win32-presentation` target with the
