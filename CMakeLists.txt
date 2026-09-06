@@ -33,7 +33,7 @@ endif()
 
 add_library(softpc-machine
     src/host/machine.c)
-target_include_directories(softpc-machine PUBLIC src/host)
+target_include_directories(softpc-machine PUBLIC src/host PRIVATE src)
 target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 
 # This is a source-synchronised local component, not a cross-repository
@@ -226,6 +226,7 @@ target_include_directories(softpc-ccpu-core PRIVATE
     src/mvdm/softpc.new/base/ccpu386
     src/mvdm/softpc.new/base/cvidc)
 target_include_directories(softpc-machine-devices PRIVATE
+    src
     src/host/compat
     src/host/compat/ccpu
     src/host/compat/cvidc
