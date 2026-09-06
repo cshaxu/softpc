@@ -4,14 +4,18 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 Td S5 closed |
-| Admission And Approval | Owner directed a Td governance reconciliation of the XP audit after T40 removed 33 headers. |
-| Objective | Keep the XP SP1 proposal and Chinese A/B audit accurate about the current local source inventory without changing their hunk conclusions. |
-| Non-goals | No source, build, package, queue-order, A/B hunk disposition, or machine-profile change. |
-| Outcome | Recorded that local now lacks all 126 OpenNT-only paths, that the local C/H inventory is 493 after T40, and that the 86 A/B rows and 21 XP-only inventory are unchanged. |
-| Verification | Cross-checked the T40 closure manifest and history against the frozen comparison counts; documentation governance and diff checks passed. |
-| Exit Criteria | Met; this closure records the completed documentation reconciliation. |
-| Original Owner Request | “XP审计：现在我们又删除了33个文件，你更新一下xp审计文档们” / “Td治理” |
+| Identifier Mode | M9 T41 S1 active |
+| Admission And Approval | Owner reordered the queue to place NXVM library adoption first and directed its admission. The reviewed source is `O:/repos.hobby/nxvm/src/lib` at `7038e0ef9e43b3564b5d9d1a0acf598247941757`, with `MANIFEST.sha256` file hash `9F2AE704775785B5A751269CA90A3CDB5A2C4CDAD68EC256C9A439F97A0FE391`. |
+| Objective | Atomically replace SoftPC `src/lib/` with that complete, byte-identical NXVM corpus, then produce the S1 ownership/build audit required before any SoftPC capability binding or duplicate deletion. |
+| Non-goals | No modification of imported library files; no NXVM build/runtime dependency; no `mvdm` change; no product-policy, original-host ABI, media, executor, or presentation routing change; no package or user-configuration change. |
+| Affected Boundaries | `src/lib/`, local CMake/source-selection and public-header wiring, and the S1 ownership ledger. `src/mvdm/softpc.new/` remains immutable; `src/host/` and `src/app/` are audit subjects only in S1. |
+| Applicable Rules | Execution, architecture, coding, and documentation authorities; the approved adoption proposal; library files remain verbatim and their manifest is authoritative. |
+| Focused Verification | Verify the upstream manifest before import and the local corpus after import; prove no former SoftPC library file remains in `src/lib/`; configure/build the imported library locally without modifying it; complete the non-`mvdm` ownership ledger. |
+| Full Regression | Before S1 closure, run proportionate local GCC x64 and i686 x86 configuration/build/CTest evidence, preserve `assets/binary/softpc.ini` and guest media, and run documentation governance and diff checks. |
+| Similar-Issue Sweep | Search source selection, includes, and callers for every displaced `src/lib/` route; classify each as imported equivalent, retained SoftPC binding/host owner, candidate deletion, or explicit blocker. |
+| Stop Conditions | Stop for owner direction if the corpus or manifest is not exact, local compilation requires an imported-source edit, an intended removal reaches a machine/original-host contract, or an x86/x64 difference lacks an explicit outer binding boundary. |
+| Exit Criteria | `src/lib/` exactly matches the approved NXVM corpus and verifies by manifest; every displaced current library file and active non-`mvdm` owner has a recorded disposition; local build integration is explicit; no unproved deletion or routing change has occurred. |
+| Original Owner Request | “队列里把lib adoption作为队首任务，准入” |
 
 ## Current Technical Baseline
 
@@ -88,8 +92,8 @@
   widths; GCC x64 and i686 full CTest each passed 23/23. See [T38
   history](../history/M9-T38-direct-source-transform-retirement.md).
 - M9 T39 audited the complete NXVM `src/lib/` as a prospective verbatim shared
-  import. It is not admitted until its complete manifest and product-neutral
-  capability contracts are closed; MVDM is immutable. See [T39
+  import. Its subsequent reviewed `7038e0ef` corpus now supplies the admitted
+  T41 S1 baseline; MVDM remains immutable. See [T39
   history](../history/M9-T39-nxvm-shared-lib-admission-audit.md).
 - M8 T14 established a deterministic, 1,222-row source-map against the
   selected OpenNT revision. It found 60 direct differences and assigned every

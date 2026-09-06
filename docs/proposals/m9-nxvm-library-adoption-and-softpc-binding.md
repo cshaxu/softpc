@@ -30,13 +30,16 @@ SoftPC `src/lib/` code is either deleted when the NXVM replacement covers it,
 or moved out of `src/lib/` only when the ownership audit proves it is an
 irreducibly SoftPC-specific host or product binding.
 
-## Admission Prerequisite
+## Admission Record
 
-This proposal is not ready for implementation until the separate NXVM library
-review declares a specific library scope and revision ready for reuse. That
-review must identify the exact NXVM source root, commit/hash, public headers,
-supported host/platform assumptions, ownership model, and any library content
-that cannot be adopted unchanged by SoftPC.
+M9 T41 S1 is admitted against the reviewed complete corpus
+`O:/repos.hobby/nxvm/src/lib` at
+`7038e0ef9e43b3564b5d9d1a0acf598247941757`. Its `MANIFEST.sha256` file hash
+is `9F2AE704775785B5A751269CA90A3CDB5A2C4CDAD68EC256C9A439F97A0FE391`.
+The review records the public headers, Windows-first platform boundary,
+ownership model, and the required unchanged-import rule in the active T41
+packet. Linux sources remain in the corpus; Linux runnable acceptance is
+deferred, not removed.
 
 No SoftPC task may guess that selection, selectively copy a library subset,
 retain part of the current SoftPC `src/lib/` beside it, or modify imported
