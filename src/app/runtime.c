@@ -2,6 +2,8 @@
 #include "keyboard.h"
 #include "input_queue.h"
 #include "prompt_trace.h"
+#include "lib/host/clock.h"
+#include "lib/host/sync.h"
 
 #include <windows.h>
 
@@ -43,11 +45,11 @@ struct app_runtime {
     app_input_queue *input_queue;
     ux_mailbox *frame_mailbox;
     ux_frame *frame_buffer;
-    HANDLE command_event;
-    HANDLE ready_event;
-    HANDLE resume_event;
-    HANDLE media_event;
-    HANDLE worker;
+    host_sync_event *command_event;
+    host_sync_event *ready_event;
+    host_sync_event *resume_event;
+    host_sync_event *media_event;
+    host_sync_task *worker;
     volatile LONG state;
     volatile LONG result;
     volatile LONG pause_requested;
@@ -65,16 +67,17 @@ struct app_runtime {
     uint32_t graphics_visible_width;
     uint32_t measurement_published_frames;
     uint32_t measurement_dirty_frames;
-    DWORD measurement_due;
+    lib_u64 measurement_due;
 };
 
 static void app_runtime_measure(app_runtime *runtime)
 {
     FILETIME created, exited, kernel, user;
     ULARGE_INTEGER cpu;
-    DWORD now = GetTickCount();
+    lib_u64 now = 0u;
 
-    if ((LONG)(now - runtime->measurement_due) < 0) return;
+    if (host_clock_milliseconds(&now) != LIB_STATUS_OK ||
+        now < runtime->measurement_due) return;
     runtime->measurement_due = now + 1000u;
     cpu.QuadPart = 0u;
     if (GetProcessTimes(GetCurrentProcess(), &created, &exited, &kernel,
@@ -327,7 +330,7 @@ static void app_runtime_service_media(app_runtime *runtime)
     runtime->media_result = softpc_machine_set_floppy(runtime->machine,
         runtime->media_floppy_path[0] == '\0' ? NULL :
         runtime->media_floppy_path);
-    SetEvent(runtime->media_event);
+    host_sync_event_signal(runtime->media_event);
 }
 
 static void app_runtime_executor_event(void *opaque)
@@ -341,23 +344,33 @@ static void app_runtime_executor_event(void *opaque)
         InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_PAUSED);
         while (InterlockedCompareExchange(&runtime->pause_requested, 0, 0) != 0 &&
             InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0) {
-            HANDLE events[2] = { runtime->resume_event, runtime->command_event };
-            DWORD wait = WaitForMultipleObjects(2u, events, FALSE, INFINITE);
-            if (wait == WAIT_OBJECT_0 + 1u)
+            host_sync_event *events[2] = { runtime->resume_event,
+                runtime->command_event };
+            lib_u32 event_index = UINT32_MAX;
+            if (host_sync_wait_any(events, 2u, runtime->worker, UINT32_MAX,
+                    &event_index) != HOST_SYNC_WAIT_SIGNALED)
+                continue;
+            if (event_index == 0u)
+                host_sync_event_reset(runtime->resume_event);
+            else if (event_index == 1u) {
+                host_sync_event_reset(runtime->command_event);
                 app_runtime_service_media(runtime);
+            }
         }
         if (InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0)
             InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_RUNNING);
     }
 }
 
-static DWORD WINAPI app_runtime_worker(void *opaque)
+static void app_runtime_worker(void *opaque, const host_sync_task *task)
 {
     app_runtime *runtime = (app_runtime *)opaque;
     for (;;) {
         softpc_machine_result result;
 
-        (void)WaitForSingleObject(runtime->command_event, INFINITE);
+        if (host_sync_event_wait(runtime->command_event, UINT32_MAX) !=
+            HOST_SYNC_WAIT_SIGNALED || host_sync_task_cancelled(task)) break;
+        host_sync_event_reset(runtime->command_event);
         if (InterlockedCompareExchange(&runtime->terminate_requested, 0, 0) != 0)
             break;
         if (InterlockedCompareExchange(&runtime->media_requested, 0, 0) != 0) {
@@ -371,12 +384,12 @@ static DWORD WINAPI app_runtime_worker(void *opaque)
         InterlockedExchange(&runtime->result, (LONG)result);
         if (result != SOFTPC_MACHINE_OK) {
             InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_ERROR);
-            SetEvent(runtime->ready_event);
+            host_sync_event_signal(runtime->ready_event);
             continue;
         }
         if (InterlockedCompareExchange(&runtime->stop_requested, 0, 0) != 0) {
             InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_STOPPED);
-            SetEvent(runtime->ready_event);
+            host_sync_event_signal(runtime->ready_event);
             continue;
         }
 
@@ -384,7 +397,7 @@ static DWORD WINAPI app_runtime_worker(void *opaque)
             app_runtime_executor_event, runtime);
         softpc_machine_set_heartbeat(runtime->machine, 1);
         InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_RUNNING);
-        SetEvent(runtime->ready_event);
+        host_sync_event_signal(runtime->ready_event);
         /* The original CPU uses BOP FE to unwind the *current* host_simulate
            frame after a firmware/device turn.  That is not a guest stop: an
            NTVDM host immediately entered the next frame.  The standalone
@@ -402,9 +415,8 @@ static DWORD WINAPI app_runtime_worker(void *opaque)
         InterlockedExchange(&runtime->result, (LONG)result);
         InterlockedExchange(&runtime->state, result == SOFTPC_MACHINE_OK ?
             SOFTPC_RUNTIME_STOPPED : SOFTPC_RUNTIME_ERROR);
-        SetEvent(runtime->ready_event);
+        host_sync_event_signal(runtime->ready_event);
     }
-    return 0u;
 }
 
 int app_runtime_create(softpc_machine *machine, app_runtime **out)
@@ -415,19 +427,17 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
     runtime = (app_runtime *)calloc(1u, sizeof(*runtime));
     if (runtime == NULL) return 0;
     runtime->machine = machine;
-    runtime->command_event = CreateEventA(NULL, FALSE, FALSE, NULL);
-    runtime->ready_event = CreateEventA(NULL, TRUE, FALSE, NULL);
-    runtime->resume_event = CreateEventA(NULL, FALSE, FALSE, NULL);
-    runtime->media_event = CreateEventA(NULL, TRUE, FALSE, NULL);
-    if (runtime->command_event == NULL || runtime->ready_event == NULL ||
-        runtime->resume_event == NULL || runtime->media_event == NULL ||
+    if (host_sync_event_create(&runtime->command_event) != LIB_STATUS_OK ||
+        host_sync_event_create(&runtime->ready_event) != LIB_STATUS_OK ||
+        host_sync_event_create(&runtime->resume_event) != LIB_STATUS_OK ||
+        host_sync_event_create(&runtime->media_event) != LIB_STATUS_OK ||
         ux_mailbox_create(&runtime->frame_mailbox) != LIB_STATUS_OK ||
         !app_input_queue_create(&runtime->input_queue) ||
         (runtime->frame_buffer = calloc(1u, sizeof(*runtime->frame_buffer))) == NULL) {
-        if (runtime->command_event != NULL) CloseHandle(runtime->command_event);
-        if (runtime->ready_event != NULL) CloseHandle(runtime->ready_event);
-        if (runtime->resume_event != NULL) CloseHandle(runtime->resume_event);
-        if (runtime->media_event != NULL) CloseHandle(runtime->media_event);
+        host_sync_event_destroy(runtime->command_event);
+        host_sync_event_destroy(runtime->ready_event);
+        host_sync_event_destroy(runtime->resume_event);
+        host_sync_event_destroy(runtime->media_event);
         ux_mailbox_destroy(runtime->frame_mailbox);
         app_input_queue_destroy(runtime->input_queue);
         free(runtime->frame_buffer);
@@ -436,20 +446,20 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
     }
     runtime->result = SOFTPC_MACHINE_OK;
     runtime->state = SOFTPC_RUNTIME_STOPPED;
-    runtime->measurement_due = GetTickCount() + 1000u;
-    runtime->worker = CreateThread(NULL, 0u, app_runtime_worker, runtime,
-        0u, NULL);
-    if (runtime->worker == NULL) {
-        CloseHandle(runtime->resume_event);
-        CloseHandle(runtime->ready_event);
-        CloseHandle(runtime->media_event);
+    if (host_clock_milliseconds(&runtime->measurement_due) != LIB_STATUS_OK ||
+        host_sync_task_create(app_runtime_worker, runtime, &runtime->worker) !=
+            LIB_STATUS_OK) {
+        host_sync_event_destroy(runtime->resume_event);
+        host_sync_event_destroy(runtime->ready_event);
+        host_sync_event_destroy(runtime->media_event);
         ux_mailbox_destroy(runtime->frame_mailbox);
         app_input_queue_destroy(runtime->input_queue);
         free(runtime->frame_buffer);
-        CloseHandle(runtime->command_event);
+        host_sync_event_destroy(runtime->command_event);
         free(runtime);
         return 0;
     }
+    runtime->measurement_due += 1000u;
     *out = runtime;
     return 1;
 }
@@ -459,56 +469,62 @@ int app_runtime_start(app_runtime *runtime)
     if (runtime == NULL) return 0;
     if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
         SOFTPC_RUNTIME_STOPPED) return 0;
-    ResetEvent(runtime->ready_event);
+    host_sync_event_reset(runtime->ready_event);
     ux_mailbox_wake(runtime->frame_mailbox);
     InterlockedExchange(&runtime->pause_requested, 0);
     InterlockedExchange(&runtime->stop_requested, 0);
     InterlockedExchange(&runtime->result, SOFTPC_MACHINE_IO_ERROR);
     InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_STARTING);
     InterlockedExchange(&runtime->start_requested, 1);
-    SetEvent(runtime->command_event);
-    (void)WaitForSingleObject(runtime->ready_event, INFINITE);
+    host_sync_event_signal(runtime->command_event);
+    (void)host_sync_event_wait(runtime->ready_event, UINT32_MAX);
     return InterlockedCompareExchange(&runtime->state, 0, 0) ==
         SOFTPC_RUNTIME_RUNNING;
 }
 
 int app_runtime_pause(app_runtime *runtime)
 {
-    DWORD deadline;
+    lib_u64 deadline;
+    lib_u64 now;
     if (runtime == NULL || InterlockedCompareExchange(&runtime->state, 0, 0) !=
         SOFTPC_RUNTIME_RUNNING) return 0;
     InterlockedExchange(&runtime->pause_requested, 1);
-    deadline = GetTickCount() + 5000u;
+    if (host_clock_milliseconds(&now) != LIB_STATUS_OK) return 0;
+    deadline = now + 5000u;
     do {
         if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
             SOFTPC_RUNTIME_PAUSED) return 1;
         if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
             SOFTPC_RUNTIME_RUNNING) return 0;
-        Sleep(1u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        host_sync_sleep_milliseconds(1u);
+        if (host_clock_milliseconds(&now) != LIB_STATUS_OK) break;
+    } while (now < deadline);
     InterlockedExchange(&runtime->pause_requested, 0);
     return 0;
 }
 
 int app_runtime_resume(app_runtime *runtime)
 {
-    DWORD deadline;
+    lib_u64 deadline;
+    lib_u64 now;
     if (runtime == NULL) return 0;
     if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
         SOFTPC_RUNTIME_PAUSED) return 0;
     InterlockedExchange(&runtime->pause_requested, 0);
-    SetEvent(runtime->resume_event);
+    host_sync_event_signal(runtime->resume_event);
     /* A frontend is recreated immediately after resume.  Do not let it see
        the old PAUSED state and terminate itself before the executor has
        acknowledged the resume event. */
-    deadline = GetTickCount() + 5000u;
+    if (host_clock_milliseconds(&now) != LIB_STATUS_OK) return 0;
+    deadline = now + 5000u;
     do {
         if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
             SOFTPC_RUNTIME_RUNNING) return 1;
         if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
             SOFTPC_RUNTIME_PAUSED) return 0;
-        Sleep(1u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        host_sync_sleep_milliseconds(1u);
+        if (host_clock_milliseconds(&now) != LIB_STATUS_OK) break;
+    } while (now < deadline);
     return 0;
 }
 
@@ -519,12 +535,13 @@ int app_runtime_stop(app_runtime *runtime)
         SOFTPC_RUNTIME_STOPPED) return 1;
     if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
         SOFTPC_RUNTIME_ERROR) return 0;
-    ResetEvent(runtime->ready_event);
+    host_sync_event_reset(runtime->ready_event);
     InterlockedExchange(&runtime->stop_requested, 1);
     InterlockedExchange(&runtime->pause_requested, 0);
-    SetEvent(runtime->resume_event);
+    host_sync_event_signal(runtime->resume_event);
     softpc_machine_request_stop(runtime->machine);
-    if (WaitForSingleObject(runtime->ready_event, INFINITE) != WAIT_OBJECT_0)
+    if (host_sync_event_wait(runtime->ready_event, UINT32_MAX) !=
+        HOST_SYNC_WAIT_SIGNALED)
         return 0;
     return InterlockedCompareExchange(&runtime->state, 0, 0) ==
         SOFTPC_RUNTIME_STOPPED;
@@ -545,10 +562,11 @@ int app_runtime_set_floppy(app_runtime *runtime, const char *path)
         if (length >= sizeof(runtime->media_floppy_path)) return 0;
         memcpy(runtime->media_floppy_path, path, length + 1u);
     }
-    ResetEvent(runtime->media_event);
+    host_sync_event_reset(runtime->media_event);
     InterlockedExchange(&runtime->media_requested, 1);
-    SetEvent(runtime->command_event);
-    if (WaitForSingleObject(runtime->media_event, INFINITE) != WAIT_OBJECT_0)
+    host_sync_event_signal(runtime->command_event);
+    if (host_sync_event_wait(runtime->media_event, UINT32_MAX) !=
+        HOST_SYNC_WAIT_SIGNALED)
         return 0;
     return runtime->media_result == SOFTPC_MACHINE_OK;
 }
@@ -602,16 +620,15 @@ void app_runtime_destroy(app_runtime *runtime)
     if (runtime == NULL) return;
     (void)app_runtime_stop(runtime);
     InterlockedExchange(&runtime->terminate_requested, 1);
-    SetEvent(runtime->resume_event);
-    SetEvent(runtime->command_event);
-    (void)WaitForSingleObject(runtime->worker, INFINITE);
-    CloseHandle(runtime->worker);
-    CloseHandle(runtime->ready_event);
-    CloseHandle(runtime->resume_event);
-    CloseHandle(runtime->media_event);
+    host_sync_event_signal(runtime->resume_event);
+    host_sync_event_signal(runtime->command_event);
+    host_sync_task_destroy(runtime->worker);
+    host_sync_event_destroy(runtime->ready_event);
+    host_sync_event_destroy(runtime->resume_event);
+    host_sync_event_destroy(runtime->media_event);
     ux_mailbox_destroy(runtime->frame_mailbox);
     app_input_queue_destroy(runtime->input_queue);
     free(runtime->frame_buffer);
-    CloseHandle(runtime->command_event);
+    host_sync_event_destroy(runtime->command_event);
     free(runtime);
 }
