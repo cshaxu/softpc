@@ -88,17 +88,19 @@ component instance, preserving guest-input order on mismatch. A Window and a
 VM Console each process only their own raw key sequence, so no cross-component
 key combination is possible.
 
-Every `ux-window` instance owns one frame mailbox and four separate control
-mailboxes: stop, title, mouse-enabled, and one-shot mouse-release. Every
-`ux-console` owns only frame and stop mailboxes. `frame`, title, and
-mouse-enabled are latest-value state; mouse-release and stop are sticky
-one-shot requests whose respective native workers are the sole consumers.
-The native wake is only a wake primitive, never a data/control mailbox.
-Window paint reads only its copied frame and never consumes control. Their
-common typed mailbox mechanics live in `ux-base`; instances remain private to
-their owning component, never public handles or shared UX infrastructure.
-SoftPC invokes the specific component API it has chosen; components
-communicate back only through the copied input-queue entry supplied at creation.
+Every `ux-window` and `ux-console` instance owns exactly two private
+mailboxes: a latest-wins copied frame mailbox and an ordered FIFO control
+mailbox. Window controls are `set_title`, `set_mouse_enabled`,
+`release_mouse`, and `stop`; Console normally receives only `stop` and
+defensively discards Window-only control messages. Either mailbox signals the
+component's private native wake, which is never itself a data mailbox. On
+wake, a worker drains controls in FIFO order; once it takes `stop`, it ignores
+later control and frame work, closes itself, and exits. Window paint reads only
+its copied frame and never consumes control. Common two-mailbox mechanics live
+in `ux-base`; instances remain private to their owning component, never public
+handles or shared UX infrastructure. SoftPC invokes the specific component API
+it has chosen; components communicate back only through the copied input-queue
+entry supplied at creation.
 
 ## BOP And Firmware Boundary
 
