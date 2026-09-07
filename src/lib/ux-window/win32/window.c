@@ -53,11 +53,21 @@ static LRESULT CALLBACK ux_window_proc(HWND hwnd, UINT message, WPARAM wparam,
             frame.graphics == 0u) {
             lib_u32 row;
             (void)generation; (void)title; (void)mouse_enabled; (void)release_mouse;
+            SetBkMode(dc, OPAQUE);
             for (row = 0u; row < frame.text_rows; ++row) {
-                char line[UX_TEXT_COLUMNS + 1u];
-                memcpy(line, &frame.text[row * UX_TEXT_COLUMNS], frame.text_columns);
-                line[frame.text_columns] = '\0';
-                TextOutA(dc, 0, (int)row * 16, line, frame.text_columns);
+                lib_u32 column;
+                for (column = 0u; column < frame.text_columns; ++column) {
+                    lib_size index = (lib_size)row * UX_TEXT_COLUMNS + column;
+                    lib_u16 attribute = frame.attributes[index];
+                    char character = (char)frame.text[index];
+                    lib_u32 foreground = frame.text_palette[attribute & 0x0fu];
+                    lib_u32 background = frame.text_palette[(attribute >> 4u) & 0x0fu];
+                    SetTextColor(dc, RGB((foreground >> 16u) & 0xffu,
+                        (foreground >> 8u) & 0xffu, foreground & 0xffu));
+                    SetBkColor(dc, RGB((background >> 16u) & 0xffu,
+                        (background >> 8u) & 0xffu, background & 0xffu));
+                    TextOutA(dc, (int)column * 8, (int)row * 16, &character, 1);
+                }
             }
         } else if (ux_frame_is_valid(&frame) && frame.graphics != 0u) {
             ux_window_native *native = window->native;
