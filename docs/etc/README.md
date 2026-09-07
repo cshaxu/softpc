@@ -9,6 +9,7 @@ active work, current architecture, rules, or queue order.
 | `evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md` | Owner-requested Chinese, per-file semantic audit of the XP SP1/OpenNT/local SoftPC A/B differences. | Retain while the XP SP1 mirror-rebase proposal is queued or active; replace only through its admitted hunk-level re-audit. |
 | `evidence/m9-nxvm-lib-common-scope-feedback-zh.md` | Owner-requested Chinese feedback to NXVM narrowing the prospective common-library surface to present common capabilities and explicitly owner-directed near-term Linux/media capabilities. | Retain while NXVM library adoption is queued; replace after NXVM implements the requested scope and a new unchanged-import audit fixes the approved revision. |
 | `evidence/softpc/m9-t41-s1-nonmvdm-lib-ledger.md` | M9 T41 S1 file-level disposition of every current non-MVDM production source during the NXVM lib import. | Retain through T41 closure; revise only through the admitted ownership audit when the reviewed NXVM manifest changes. |
+| `evidence/softpc/m9-t41-palette-contract-issue.md` | M9 T41 evidence brief for the Win3.1 splash palette-channel regression, its SoftPC adapter cause, and the separate NXVM text-palette contract correction. | Retain through resolution and full-lib re-import; supersede with the verification record of that admitted repair. |
 
 New supporting files require an owner-approved task and an indexed subtree or
 exact-file row. `etc/` is not a shortcut for a new principal authority.

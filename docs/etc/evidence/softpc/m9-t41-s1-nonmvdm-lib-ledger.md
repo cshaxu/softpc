@@ -104,3 +104,20 @@ implementation left outside the dispositions above.
 imported library targets. The presentation/runtime source-boundary and unit
 tests must migrate from `win32_presentation_*` to the shared UX contract;
 they must not preserve a compatibility copy of the old API.
+
+## Runtime Acceptance Blocker
+
+The imported UX runner deliberately does not choose a presentation target. Its
+console loop changes runner when the product requests a new `ux_router` target.
+SoftPC restores its product policy at the frame-publication boundary: console
+presentation requests a native window immediately for a graphics frame, then
+requests console after three stable text frames. Requests are suppressed when
+the router already names the desired target. NXVM implements the same product
+policy in its `vm_platform_run_context_publish_ux_frame`.
+
+The shared `get_title` callback intentionally applies the app-provided title to
+both console and window presenters. Target selection is the SoftPC product
+decision. SoftPC must add it at its own frame-publication boundary using
+`ux_router_request`, not by restoring a local console/window wrapper or
+editing the imported corpus. T41 remains active pending owner dual-width
+routing acceptance coverage.

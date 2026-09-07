@@ -80,14 +80,14 @@ static void app_presentation_title(void *context, char *buffer,
 }
 
 int app_presentation_binding(app_runtime *runtime,
-    ux_router *router, ux_action_registry *actions, ux_binding *binding)
+    ux_action_registry *actions, ux_binding *binding)
 {
-    if (runtime == NULL || router == NULL || actions == NULL || binding == NULL ||
+    if (runtime == NULL || actions == NULL || binding == NULL ||
         !app_keyboard_register_actions(actions)) return 0;
     memset(binding, 0, sizeof(*binding));
     binding->context = runtime;
     binding->mailbox = app_runtime_presentation_mailbox(runtime);
-    binding->router = router;
+    binding->router = app_runtime_presentation_router(runtime);
     binding->actions = actions;
     binding->input_sink = app_keyboard_deliver_input;
     binding->release_inputs = app_presentation_release_inputs;
@@ -113,14 +113,11 @@ int app_presentation_result(ux_run_result result)
 int app_presentation_run(app_runtime *runtime,
     softpc_presentation presentation)
 {
-    ux_router router;
     ux_action_registry actions;
     ux_binding binding;
 
-    ux_router_initialize(&router,
-        presentation == SOFTPC_PRESENTATION_WINDOW ?
-        UX_TARGET_WINDOW : UX_TARGET_CONSOLE);
-    if (!app_presentation_binding(runtime, &router, &actions, &binding))
+    app_runtime_set_presentation_mode(runtime, presentation);
+    if (!app_presentation_binding(runtime, &actions, &binding))
         return SOFTPC_VM_FRONTEND_ERROR;
     return app_presentation_result(ux_win32_run(&binding));
 }

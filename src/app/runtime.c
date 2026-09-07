@@ -45,6 +45,9 @@ struct app_runtime {
     app_input_queue *input_queue;
     ux_mailbox *frame_mailbox;
     ux_frame *frame_buffer;
+    ux_router presentation_router;
+    volatile LONG presentation_mode;
+    volatile LONG console_text_frames;
     host_sync_event *command_event;
     host_sync_event *ready_event;
     host_sync_event *resume_event;
@@ -66,6 +69,36 @@ struct app_runtime {
     uint32_t graphics_source_height;
     uint32_t graphics_visible_width;
 };
+
+static void app_runtime_request_presentation_target(app_runtime *runtime,
+    ux_target target)
+{
+    if (runtime != NULL &&
+        ux_router_target(&runtime->presentation_router) != target)
+        ux_router_request(&runtime->presentation_router, target);
+}
+
+/* This is SoftPC product policy.  The reusable UX runner only follows the
+   requested target; it deliberately does not infer a product's preferred
+   console/window transition from a frame. */
+static void app_runtime_route_presentation_frame(app_runtime *runtime,
+    const ux_frame *frame)
+{
+    if (runtime == NULL || frame == NULL || frame->valid == 0u) return;
+    if (InterlockedCompareExchange(&runtime->presentation_mode, 0, 0) ==
+        SOFTPC_PRESENTATION_WINDOW) {
+        InterlockedExchange(&runtime->console_text_frames, 0);
+        app_runtime_request_presentation_target(runtime, UX_TARGET_WINDOW);
+    } else if (frame->graphics != 0u) {
+        InterlockedExchange(&runtime->console_text_frames, 0);
+        app_runtime_request_presentation_target(runtime, UX_TARGET_WINDOW);
+    } else if (ux_router_target(&runtime->presentation_router) ==
+            UX_TARGET_WINDOW &&
+        InterlockedIncrement(&runtime->console_text_frames) >= 3) {
+        InterlockedExchange(&runtime->console_text_frames, 0);
+        app_runtime_request_presentation_target(runtime, UX_TARGET_CONSOLE);
+    }
+}
 
 static void app_runtime_publish(app_runtime *runtime)
 {
@@ -241,6 +274,7 @@ static void app_runtime_publish(app_runtime *runtime)
         published = 1;
     }
     if (published) {
+        app_runtime_route_presentation_frame(runtime, frame);
         if (ux_mailbox_publish(runtime->frame_mailbox, frame) != LIB_STATUS_OK)
             return;
         frame->sequence = ux_mailbox_generation(runtime->frame_mailbox);
@@ -412,6 +446,8 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
     }
     runtime->result = SOFTPC_MACHINE_OK;
     runtime->state = SOFTPC_RUNTIME_STOPPED;
+    runtime->presentation_mode = SOFTPC_PRESENTATION_CONSOLE;
+    ux_router_initialize(&runtime->presentation_router, UX_TARGET_CONSOLE);
     if (host_sync_task_create(app_runtime_worker, runtime, &runtime->worker) !=
             LIB_STATUS_OK) {
         host_sync_event_destroy(runtime->resume_event);
@@ -577,6 +613,31 @@ ux_mailbox *app_runtime_presentation_mailbox(
     app_runtime *runtime)
 {
     return runtime == NULL ? NULL : runtime->frame_mailbox;
+}
+
+void app_runtime_set_presentation_mode(app_runtime *runtime,
+    softpc_presentation presentation)
+{
+    ux_frame frame;
+
+    if (runtime == NULL || (presentation != SOFTPC_PRESENTATION_CONSOLE &&
+        presentation != SOFTPC_PRESENTATION_WINDOW)) return;
+    InterlockedExchange(&runtime->presentation_mode, (LONG)presentation);
+    InterlockedExchange(&runtime->console_text_frames, 0);
+    if (presentation == SOFTPC_PRESENTATION_WINDOW) {
+        app_runtime_request_presentation_target(runtime, UX_TARGET_WINDOW);
+    } else if (ux_mailbox_capture(runtime->frame_mailbox, &frame) == LIB_STATUS_OK &&
+        frame.valid != 0u) {
+        app_runtime_route_presentation_frame(runtime, &frame);
+    } else {
+        app_runtime_request_presentation_target(runtime, UX_TARGET_CONSOLE);
+    }
+    ux_mailbox_wake(runtime->frame_mailbox);
+}
+
+ux_router *app_runtime_presentation_router(app_runtime *runtime)
+{
+    return runtime == NULL ? NULL : &runtime->presentation_router;
 }
 
 void app_runtime_destroy(app_runtime *runtime)

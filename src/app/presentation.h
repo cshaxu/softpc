@@ -10,7 +10,6 @@
 #define SOFTPC_VM_FRONTEND_PAUSED 2
 
 int app_presentation_binding(app_runtime *runtime,
-    ux_router *router,
     ux_action_registry *actions,
     ux_binding *binding);
 int app_presentation_result(ux_run_result result);

@@ -72,6 +72,21 @@ int main(void)
     }
     assert(app_runtime_published_frame_sequence(runtime) == frame->sequence);
     assert(frame->sequence != 0u);
+    /* Console presentation returns from a transient native window only after
+       three valid text frames. The router is runtime-owned so the executor
+       can make this product decision while the UX runner is consuming frames. */
+    app_runtime_set_presentation_mode(runtime, SOFTPC_PRESENTATION_CONSOLE);
+    ux_router_request(app_runtime_presentation_router(runtime), UX_TARGET_WINDOW);
+    {
+        DWORD deadline = GetTickCount() + 5000u;
+        do {
+            if (ux_router_target(app_runtime_presentation_router(runtime)) ==
+                UX_TARGET_CONSOLE) break;
+            Sleep(10u);
+        } while ((LONG)(GetTickCount() - deadline) < 0);
+        assert(ux_router_target(app_runtime_presentation_router(runtime)) ==
+            UX_TARGET_CONSOLE);
+    }
     assert(app_runtime_pause(runtime));
     assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_PAUSED));
     assert(app_runtime_set_floppy(runtime, NULL));
