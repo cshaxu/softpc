@@ -46,13 +46,11 @@ static LRESULT CALLBACK ux_window_proc(HWND hwnd, UINT message, WPARAM wparam,
         HDC dc = BeginPaint(hwnd, &paint);
         ux_frame frame;
         lib_u32 generation;
-        char title[UX_WINDOW_TITLE_CAPACITY];
-        lib_bool mouse_enabled, release_mouse;
-        if (ux_window_capture_state(window, &frame, &generation, title,
-                &mouse_enabled, &release_mouse) == LIB_STATUS_OK && ux_frame_is_valid(&frame) &&
+        if (ux_window_capture_paint_state(window, &frame, &generation) ==
+                LIB_STATUS_OK && ux_frame_is_valid(&frame) &&
             frame.graphics == 0u) {
             lib_u32 row;
-            (void)generation; (void)title; (void)mouse_enabled; (void)release_mouse;
+            (void)generation;
             SetBkMode(dc, OPAQUE);
             for (row = 0u; row < frame.text_rows; ++row) {
                 lib_u32 column;
@@ -130,11 +128,10 @@ static DWORD WINAPI ux_window_worker(void *context)
         DWORD wait = MsgWaitForMultipleObjects(2u, waits, FALSE, INFINITE, QS_ALLINPUT);
         if (wait == WAIT_OBJECT_0) break;
         if (wait == WAIT_OBJECT_0 + 1u) {
-            ux_frame frame; lib_u32 generation; char title[UX_WINDOW_TITLE_CAPACITY];
+            char title[UX_WINDOW_TITLE_CAPACITY];
             lib_bool mouse_enabled, release_mouse;
-            if (ux_window_capture_state(window, &frame, &generation, title,
+            if (ux_window_take_control_state(window, title,
                     &mouse_enabled, &release_mouse) == LIB_STATUS_OK) {
-                (void)frame; (void)generation; (void)mouse_enabled; (void)release_mouse;
                 SetWindowTextA(native->hwnd, title);
                 native->mouse_enabled = mouse_enabled;
                 if (mouse_enabled == LIB_FALSE || release_mouse != LIB_FALSE) ReleaseCapture();
