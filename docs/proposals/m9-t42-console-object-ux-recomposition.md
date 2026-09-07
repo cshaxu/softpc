@@ -20,13 +20,14 @@ are background, not competing authority.
 1. Add the generic logical `lib_console` object to `base` and the one-current-
    object native Console broker to `host`, including raw/cooked modes,
    transactional replacement, output ownership, and stale-event suppression.
-2. Recompose `ux` as independently enableable Window and Console presenters,
-   with separate frame mailboxes, completed presenter-set facts, an optional
-   UX-owned Console object, Window-close request delivery, and no host or
-   SoftPC dependency.
+2. Replace the old unified `ux` controller with independent `ux-base`,
+   `ux-window`, and `ux-console` components. Each Window/VM-Console component
+   has a private mailbox and lifecycle; `ux-console` has an optional logical
+   Console object; Window close is only a copied event; no UX component depends
+   on `host` or SoftPC.
 3. Rework only non-MVDM SoftPC code into the sole policy/reconciler owner:
-   derive presenter set, current Console object, and VM lifecycle from
-   configuration, completed facts, frame route, and FIFO intent; own monitor
+   derive component existence, current Console object, and VM lifecycle from
+   configuration, completed component facts, frame route, and FIFO intent; own monitor
    parsing, `console_control`, DISPLAY policy, CAP semantics, and X policy.
 4. Prove the state and ordering matrix with deterministic completion-gated
    fakes before real-thread boundary tests. Build/test both package widths and
@@ -39,7 +40,7 @@ are background, not competing authority.
 ### S1 — Decomposition and implementation-boundary audit
 
 Inspect the actual T41 baseline and produce this S plan before any code change.
-For every existing Console reader/writer, presenter owner, input sink,
+For every existing Console reader/writer, unified-UX owner, input sink,
 lifecycle callback, and relevant test, assign one destination S or explicitly
 record it as unaffected. Cross-check against the current UI/architecture
 authorities and prove that MVDM is excluded. **Exit:** owner-readable source
@@ -50,7 +51,7 @@ pass.
 
 Add only the platform-neutral copied-event/output object in `lib/base`, with
 its event-sink, output, lifetime, rejected-line, and current-object result
-contracts. No native handles, reader thread, UX presenter, SoftPC monitor, or
+contracts. No native handles, reader thread, UX component, SoftPC monitor, or
 policy may appear here. **Exit:** base-only unit tests prove copied ownership
 and API failure behavior; public-header/CMake boundaries are explicit.
 
@@ -65,7 +66,8 @@ remain unchanged.
 
 ### S4 — Split UX components and generic registered-hotkey input
 
-Replace the unified `ux` presenter with three flat shared components:
+Delete the unified `ux` controller and replace it with three flat shared
+components:
 `ux-base` for copied frame/input values, unified UX-event construction,
 reusable private-mailbox mechanics, and source-local generic hotkey matching;
 `ux-window` for one Window lifecycle; and `ux-console` for one VM
@@ -92,7 +94,7 @@ Window-close delivery, and permanent-retirement input reset.
 Replace the old non-MVDM Console handoff with SoftPC's sole FIFO control
 thread/reconciler. It owns `display`, `console_control`, monitor parsing,
 CAP/X intent, VM run generation, current frame route, host replacement calls,
-and presenter lifecycle ordering. **Exit:** pure derivation and
+and component lifecycle ordering. **Exit:** pure derivation and
 completion-gated fake tests prove the complete approved state/transition matrix
 without running a native Console.
 
@@ -128,9 +130,8 @@ contract but may not rewrite its owner.
 | --- | --- | --- |
 | `src/lib/base/base.h` | shared scalar/status vocabulary only; lacks a logical Console object | S2 adds the generic copied object contract and its tests |
 | `src/lib/host/{clock,sync}.*`, platform subdirectories, `src/lib/CMakeLists.txt` | host has no Console broker; existing clock/sync remain valid | S3 adds broker/platform implementations and target wiring; S2 owns the base-public-header portion |
-| `src/lib/ux/presenter.{h,c}` and `ux/internal/presenter_internal.h` | one scalar Console-or-Window target and requested, rather than completed, state | S4 replaces this surface with completed presenter-set facts and separate frame mailboxes |
-| `src/lib/ux/win32/{runner,console,window,mailbox,actions,input,mouse}.*` | one sequential runner opens `CONIN$` itself and changes native modes; Window X currently directly controls runner result | S4 makes UX own only presenters/optional logical UX object and emit copied events; S3 alone owns native Console I/O |
-| `src/lib/ux/linux/**` | parallel public UX implementation must retain the same API shape, although Linux runnable parity is deferred | S4 supplies compile-time placeholder/API parity only; no Linux runtime acceptance in T42 |
+| `src/lib/ux/**` | old unified controller/runner combines target choice, native Console access, and Window lifecycle | S4 deletes it and creates `src/lib/{ux-base,ux-window,ux-console}/`; S3 alone owns native Console I/O |
+| old `ux` Win32/Linux code | sequential runner opens `CONIN$`, changes native modes, and lets Window X control runner result | S4 replaces it with independent Window/VM-Console API-parity components; Linux runtime acceptance remains deferred |
 | `src/app/main.c` | synchronous `fgets` monitor owns lifecycle loop and shares process Console implicitly | S5 creates SoftPC monitor object/sink and moves command parsing into the sole control queue; cooked terminal behavior becomes host S3 |
 | `src/app/{runtime,presentation}.{c,h}` | product frame router, direct `ux_run`, action callbacks, lifecycle calls, title/capture changes interleave synchronously | S5 creates the sole derived-state reconciler and run-generation envelopes; it becomes the only host/UX/VM composer |
 | `src/app/{input_queue,keyboard}.{c,h}` | UX-only queue and policy callbacks; mouse coalescing is currently app-owned | S5 changes it to the one tagged SoftPC input queue; S4 moves only Window mouse-move coalescing into UX |
@@ -145,7 +146,7 @@ Dependencies are strictly linear where an ownership handoff occurs:
 S1 scope proof
   -> S2 base object
   -> S3 host broker
-  -> S4 UX dual presenters
+  -> S4 split UX components
   -> S5 SoftPC reconciler
   -> S6 threaded integration
   -> S7 owner acceptance

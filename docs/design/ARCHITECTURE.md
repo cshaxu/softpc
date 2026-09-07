@@ -14,9 +14,10 @@ app/
   one executor, machine snapshot producer, guest-input adapter, lifecycle,
   monitor, and product binding; no machine-state access from frontends
         ↑
-lib/{base,host,storage,ux}/
+lib/{base,host,storage,ux-base,ux-window,ux-console}/
   byte-identical NXVM shared platform library: copied-frame mailbox, host
-  input normalization, action matching, reusable presenters, clock,
+  input normalization, generic registered-chord matching, independent Window/
+  VM-Console components, clock,
   synchronization, and storage; no product queue or guest protocol
 ```
 
@@ -33,8 +34,9 @@ capability, ownership, and policy, but does not own guest-visible state.
 adapter, monitor, and product binding.
 `lib/` is an exact checked-in NXVM import, not a runtime or build dependency
 on NXVM or NTVDM64. It consumes and produces copied host values only. It owns
-the generic mailbox, console/window message loops, host-input normalization,
-action registration/matching, mouse capture, routing, clock, synchronization,
+the generic mailbox mechanics, independent console/window message loops,
+host-input normalization, registered-chord matching, mouse capture, clock,
+synchronization,
 and storage primitives. The app binding owns its executor queue, converts
 events to the guest's input protocol, and makes all product lifecycle and
 action decisions. An owner-admitted generic shared-library candidate may
@@ -65,9 +67,10 @@ current object.
 
 SoftPC control is the sole product-state writer. VM, host, and UX workers only
 enqueue copied events/completions to its app-owned queue. The control thread
-derives a target from config, frame route, FIFO intent, and completed actual
-state, then advances one reconciler. VM `run_generation` is SoftPC-only; UX
-`configuration_generation` confirms presenter configuration only.
+derives the required component instances from config, frame route, FIFO intent,
+and completed actual state, then advances one reconciler. VM `run_generation`
+is SoftPC-only. Component readiness is returned by each component's own
+creation/start contract; shared UX carries no global configuration generation.
 
 SoftPC passes copied `{chord, identifier}` registrations to each UX component.
 The components may generically recognize and suppress a registered chord, but
