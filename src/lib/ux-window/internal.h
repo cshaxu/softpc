@@ -14,6 +14,7 @@ struct ux_window {
     atomic_flag lock;
     ux_window_native *native;
     lib_bool started;
+    lib_bool starting;
     lib_bool mouse_enabled;
     lib_bool mouse_release_requested;
     char title[UX_WINDOW_TITLE_CAPACITY];

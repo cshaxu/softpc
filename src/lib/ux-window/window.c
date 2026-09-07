@@ -42,15 +42,21 @@ lib_status ux_window_create(ux_window **out_window,
 
 lib_status ux_window_start(ux_window *window)
 {
+    lib_status status;
     if (window == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     ux_window_lock(window);
-    if (window->started != LIB_FALSE) {
+    if (window->started != LIB_FALSE || window->starting != LIB_FALSE) {
         ux_window_unlock(window);
         return LIB_STATUS_INVALID_STATE;
     }
-    if (ux_window_native_start(window) != LIB_STATUS_OK) {
+    window->starting = LIB_TRUE;
+    ux_window_unlock(window);
+    status = ux_window_native_start(window);
+    ux_window_lock(window);
+    window->starting = LIB_FALSE;
+    if (status != LIB_STATUS_OK) {
         ux_window_unlock(window);
-        return LIB_STATUS_IO_ERROR;
+        return status;
     }
     window->started = LIB_TRUE;
     ux_window_unlock(window);
