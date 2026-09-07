@@ -71,8 +71,9 @@ lib_status ux_window_start(ux_window *window)
 void ux_window_destroy(ux_window *window)
 {
     if (window == LIB_NULL) return;
-    (void)ux_hotkey_matcher_retire(window->hotkeys, window, window->input_sink,
-        window->input_context);
+    if (window->started != LIB_FALSE)
+        (void)ux_hotkey_matcher_retire(window->hotkeys, window,
+            window->input_sink, window->input_context);
     ux_hotkey_matcher_destroy(window->hotkeys);
     free(window);
 }
