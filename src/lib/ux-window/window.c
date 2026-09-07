@@ -1,17 +1,4 @@
-#include "lib/ux-window/window.h"
-#include "lib/ux-base/internal.h"
-
-struct ux_window {
-    ux_frame_mailbox frames;
-    ux_hotkey_matcher *hotkeys;
-    ux_input_sink input_sink;
-    void *input_context;
-    atomic_flag lock;
-    lib_bool started;
-    lib_bool mouse_enabled;
-    lib_bool mouse_release_requested;
-    char title[UX_WINDOW_TITLE_CAPACITY];
-};
+#include "lib/ux-window/internal.h"
 
 static void ux_window_lock(ux_window *window)
 {
@@ -61,8 +48,10 @@ lib_status ux_window_start(ux_window *window)
         ux_window_unlock(window);
         return LIB_STATUS_INVALID_STATE;
     }
-    /* The platform worker is added by the Win32/Linux implementation.  This
-     * core transition deliberately makes no product or host decision. */
+    if (ux_window_native_start(window) != LIB_STATUS_OK) {
+        ux_window_unlock(window);
+        return LIB_STATUS_IO_ERROR;
+    }
     window->started = LIB_TRUE;
     ux_window_unlock(window);
     return LIB_STATUS_OK;
@@ -71,6 +60,7 @@ lib_status ux_window_start(ux_window *window)
 void ux_window_destroy(ux_window *window)
 {
     if (window == LIB_NULL) return;
+    ux_window_native_stop(window);
     if (window->started != LIB_FALSE)
         (void)ux_hotkey_matcher_retire(window->hotkeys, window,
             window->input_sink, window->input_context);
@@ -80,8 +70,11 @@ void ux_window_destroy(ux_window *window)
 
 lib_status ux_window_publish_frame(ux_window *window, const ux_frame *frame)
 {
-    return window == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
-        ux_frame_mailbox_publish(&window->frames, frame);
+    lib_status status;
+    if (window == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    status = ux_frame_mailbox_publish(&window->frames, frame);
+    if (status == LIB_STATUS_OK) ux_window_native_signal(window);
+    return status;
 }
 
 lib_status ux_window_set_title(ux_window *window, const char *title)
@@ -94,6 +87,7 @@ lib_status ux_window_set_title(ux_window *window, const char *title)
     ux_window_lock(window);
     memcpy(window->title, title, (lib_size)(end - title) + 1u);
     ux_window_unlock(window);
+    ux_window_native_signal(window);
     return LIB_STATUS_OK;
 }
 
@@ -103,6 +97,7 @@ lib_status ux_window_set_mouse_enabled(ux_window *window, lib_bool enabled)
     ux_window_lock(window);
     window->mouse_enabled = enabled != LIB_FALSE;
     ux_window_unlock(window);
+    ux_window_native_signal(window);
     return LIB_STATUS_OK;
 }
 
@@ -112,10 +107,45 @@ lib_status ux_window_release_mouse(ux_window *window)
     ux_window_lock(window);
     window->mouse_release_requested = LIB_TRUE;
     ux_window_unlock(window);
+    ux_window_native_signal(window);
     return LIB_STATUS_OK;
 }
 
 const void *ux_window_input_source(const ux_window *window)
 {
     return window;
+}
+
+lib_status ux_window_submit_input(ux_window *window, const ux_input_event *event)
+{
+    if (window == LIB_NULL || event == LIB_NULL || event->source_handle != window)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    return ux_hotkey_matcher_submit(window->hotkeys, event, window->input_sink,
+        window->input_context);
+}
+
+lib_status ux_window_request_close(ux_window *window)
+{
+    ux_input_event event;
+    lib_status status = ux_input_make_window_close(&event, window);
+    return status == LIB_STATUS_OK ? window->input_sink(window->input_context, &event) : status;
+}
+
+lib_status ux_window_capture_state(const ux_window *window, ux_frame *out_frame,
+    lib_u32 *out_generation, char out_title[UX_WINDOW_TITLE_CAPACITY],
+    lib_bool *out_mouse_enabled, lib_bool *out_release_mouse)
+{
+    ux_window *mutable_window = (ux_window *)window;
+    if (window == LIB_NULL || out_frame == LIB_NULL || out_generation == LIB_NULL ||
+        out_title == LIB_NULL || out_mouse_enabled == LIB_NULL || out_release_mouse == LIB_NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    if (ux_frame_mailbox_take(&window->frames, out_frame, out_generation) != LIB_STATUS_OK)
+        return LIB_STATUS_INVALID_STATE;
+    ux_window_lock(mutable_window);
+    memcpy(out_title, window->title, UX_WINDOW_TITLE_CAPACITY);
+    *out_mouse_enabled = window->mouse_enabled;
+    *out_release_mouse = window->mouse_release_requested;
+    mutable_window->mouse_release_requested = LIB_FALSE;
+    ux_window_unlock(mutable_window);
+    return LIB_STATUS_OK;
 }
