@@ -4,19 +4,19 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T42 S1 active |
-| Admission And Approval | Owner explicitly closed T41 and admitted T42 for the complete approved Console-object/host/UX/SoftPC design. T42 begins from T41's imported NXVM-library baseline and its governing Td S6 design closure. |
-| Objective | Implement the generic `base` Console object, `host` one-current-object broker, independently composable `ux` Window/Console presenters, and the non-MVDM SoftPC reconciler; then obtain NXVM's byte-identical adoption and re-import that corpus into SoftPC. |
-| Outcome | T42 is newly active. T41's imported 52-file `base`/`host`/`storage`/`ux` corpus and its non-MVDM ownership ledger are the baseline. The prior Window/Console behavior is not accepted product behavior and is replaced, not incrementally patched, by the approved derived-state design. |
+| Identifier Mode | M9 T42 S1 complete — awaiting admission of S2 |
+| Admission And Approval | Owner explicitly closed T41 and admitted T42 for the complete approved Console-object/host/UX/SoftPC design, then directed that its S-task decomposition be completed before any implementation subtask is admitted. T42 S1 used the T41 imported-library baseline and Td S6 design closure. |
+| Objective | S1 produced the complete serial T42 S-task decomposition, source-boundary inventory, dependency order, and per-S verification/exit contract. No implementation source change was authorized or made. |
+| Outcome | S1 is complete. The owner-readable S2–S8 plan and one-owner source assignment are in the T42 proposal. T41's imported 52-file `base`/`host`/`storage`/`ux` corpus and its non-MVDM ownership ledger remain the baseline. The prior Window/Console behavior is not accepted product behavior and is replaced, not incrementally patched, by the approved derived-state design. |
 | Non-goals | No modification to `src/mvdm/softpc.new/`, its MVDM-local Win32 calls, or WinNT-derived implementation; no SoftPC lifecycle, DISPLAY policy, `console_control`, monitor syntax, or guest-hotkey in lib; no permanent SoftPC-only lib fork or NXVM runtime/build dependency; no package configuration or guest-media change. |
-| Affected Boundaries | `src/lib/{base,host,ux}`, their CMake/public-header wiring, and non-MVDM `src/app/`/`src/host/` binding and tests. `storage` is not redesigned. `src/mvdm/softpc.new/` remains excluded and immutable. |
+| Affected Boundaries | T42 S1 may inspect `src/lib/{base,host,ux}`, non-MVDM `src/app/`/`src/host/`, CMake wiring, and tests, and may update the T42 proposal/current packet. It does not modify implementation source. `storage` is not redesigned; `src/mvdm/softpc.new/` remains excluded and immutable. |
 | Applicable Rules | Execution, architecture, coding, and documentation authorities; [T42 proposal](../proposals/m9-t42-console-object-ux-recomposition.md); [Product UX](../design/UI.md); [System Architecture](../design/ARCHITECTURE.md). |
-| Focused Verification | First prove pure SoftPC state derivation and completion-gated reconciler traces. Then prove host one-current-object transactional replacement, stale-event/lifetime behavior, and UX presenter completion/retirement with controllable fakes. Exercise real threads only using barriers/events and bounded deadlock guards, never sleeps. |
-| Full Regression | Before closure, run local x64 and x86 configure/build/CTest evidence proportional to the runnable change, preserve `assets/binary/softpc.ini` and guest media, run the Console/Window owner acceptance matrix, and pass documentation governance and diff checks. |
-| Similar-Issue Sweep | Audit every non-MVDM direct Console reader/writer, `stdin`/`fgets` handoff, native Console mode/handle use, presenter-type switch, mouse/input route, and lifecycle callback. Each must become a single approved host/UX/SoftPC path or be removed; MVDM remains out of scope. |
+| Focused Verification | Cross-check every planned subtask against the approved UI/architecture authorities and the retained decision record. Prove each source owner has exactly one destination S and that no S crosses into MVDM or duplicates another S's lifecycle ownership. |
+| Full Regression | Before S1 closure, pass documentation governance and diff checks. Later implementation S tasks each define their proportionate build/CTest proof; T42 closure additionally requires the full Console/Window owner matrix and owner runtime acceptance. |
+| Similar-Issue Sweep | Inventory existing generic base/host Console abstractions, platform input/open/close paths, UX presenter ownership, SoftPC `stdin`/`fgets`/monitor/lifecycle routing, and their tests. Assign each to one named S or record it as intentionally unaffected. |
 | Stop Conditions | Stop for owner direction if an API encodes SoftPC policy, changes MVDM, leaves two native readers/output owners, permits a zero-current-object state outside broker teardown, or cannot be adopted by NXVM unchanged. |
-| Exit Criteria | Deterministic tests prove the approved state/transition matrix and thread boundaries; x64/x86 evidence and owner runtime acceptance pass; NXVM adopts the generic candidate byte-identically; SoftPC re-imports and manifest-verifies that adopted corpus. |
-| Original Owner Request | “请你直接收口T41吧，我们开T42来做刚才的全套设计” |
+| Exit Criteria | The proposal contains an owner-readable, dependency-ordered S decomposition with exact scope, non-goals, source owners, verification, and exit gate for every implementation step. T42 as a whole later requires the full state matrix, dual-width evidence, owner runtime acceptance, NXVM exact adoption, and SoftPC re-import/manifest verification. |
+| Original Owner Request | “请你直接收口T41吧，我们开T42来做刚才的全套设计”；“准入下一任务” |
 
 ## Current Technical Baseline
 
