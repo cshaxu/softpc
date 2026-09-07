@@ -72,10 +72,19 @@ SoftPC passes copied `{chord, identifier}` registrations to each UX component.
 The components may generically recognize and suppress a registered chord, but
 only enqueue `UX_HOTKEY(identifier)`; they never execute a product callback or
 interpret pause, reset, guest CAD, or another identifier. Their ordinary input
-and matched-hotkey events share SoftPC's one FIFO. The generic matcher keeps
-pending only possible chord prefixes per component instance, preserving guest
-input order on mismatch and preventing keys from different input components
-from forming a host hotkey.
+and matched-hotkey events are `ux_input_event` variants. The cooked monitor
+instead produces `monitor_input_event` values. Both families enter SoftPC's one
+input FIFO as distinct payloads; the control thread is their sole consumer.
+The generic matcher keeps pending only possible chord prefixes inside its own
+component instance, preserving guest-input order on mismatch. A Window and a
+VM Console each process only their own raw key sequence, so no cross-component
+key combination is possible.
+
+Every `ux-window` and `ux-console` instance owns private control/frame/input
+mailboxes and its own native worker(s). Those mailboxes are implementation
+details, never public handles or shared UX infrastructure. SoftPC invokes the
+specific component API it has chosen; components communicate back only through
+the copied input-queue entry supplied at creation.
 
 ## BOP And Firmware Boundary
 

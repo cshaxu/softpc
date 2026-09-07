@@ -80,6 +80,13 @@ alone maps identifiers to pause/resume, stop/reset/start, mouse release, or
 synthetic guest input such as Ctrl+Alt+Del and Alt+Enter. The cooked monitor
 does not use a UX component or hotkey registry and accepts only monitor lines.
 
+Every user input produced by either UX component is a copied `ux_input_event`:
+ordinary key/text/mouse input and registered-hotkey input are variants of that
+one UX event family. A cooked monitor line is instead a `monitor_input_event`.
+SoftPC's one input queue accepts both event families as distinct payloads; its
+control thread is their sole consumer. No monitor line is mislabeled as a UX
+event, and no UX component parses monitor commands.
+
 ## Responsiveness
 
 The frontend remains responsive while the guest runs. Frame presentation is
