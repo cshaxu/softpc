@@ -80,6 +80,9 @@ when not registered flushes Ctrl, Alt, and X as normal input in order. SoftPC
 alone maps identifiers to pause/resume, stop/reset/start, mouse release, or
 synthetic guest input such as Ctrl+Alt+Del and Alt+Enter. The cooked monitor
 does not use a UX component or hotkey registry and accepts only monitor lines.
+Each matcher derives its modifier state solely from its own raw sequence; it
+does not trust process-global modifier state, so keys from two UX components
+cannot compose a chord.
 
 Every user input produced by either UX component is a copied `ux_input_event`:
 ordinary key/text/mouse input and registered-hotkey input are variants of that

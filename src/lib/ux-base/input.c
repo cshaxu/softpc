@@ -5,6 +5,7 @@ struct ux_hotkey_matcher {
     lib_u32 registration_count;
     ux_input_event pending[3u];
     lib_u32 pending_count;
+    lib_u32 active_modifiers;
     lib_u32 suppressed_modifiers;
     lib_u32 suppressed_key;
 };
@@ -195,27 +196,30 @@ lib_status ux_hotkey_matcher_submit(ux_hotkey_matcher *matcher,
             matcher->suppressed_key = 0u;
             return LIB_STATUS_OK;
         }
-        if (ux_hotkey_is_modifier(event->value.key.virtual_key, &modifier) &&
-            (matcher->suppressed_modifiers & modifier) != 0u) {
-            matcher->suppressed_modifiers &= ~modifier;
-            return LIB_STATUS_OK;
+        if (ux_hotkey_is_modifier(event->value.key.virtual_key, &modifier)) {
+            matcher->active_modifiers &= ~modifier;
+            if ((matcher->suppressed_modifiers & modifier) != 0u) {
+                matcher->suppressed_modifiers &= ~modifier;
+                return LIB_STATUS_OK;
+            }
         }
         status = ux_hotkey_flush(matcher, sink, sink_context);
         return status != LIB_STATUS_OK ? status : ux_hotkey_emit(sink, sink_context, event);
     }
     if (ux_hotkey_is_modifier(event->value.key.virtual_key, &modifier) &&
         ux_hotkey_modifier_is_prefix(matcher, modifier)) {
+        matcher->active_modifiers |= modifier;
         if (matcher->pending_count == (lib_u32)(sizeof(matcher->pending) /
                 sizeof(matcher->pending[0]))) return LIB_STATUS_LIMIT_EXCEEDED;
         matcher->pending[matcher->pending_count++] = *event;
         return LIB_STATUS_OK;
     }
     match = ux_hotkey_find(matcher, event->value.key.virtual_key,
-        event->value.key.modifiers);
+        matcher->active_modifiers);
     if (match != LIB_NULL) {
         ux_input_event hotkey;
         matcher->pending_count = 0u;
-        matcher->suppressed_modifiers = event->value.key.modifiers;
+        matcher->suppressed_modifiers = matcher->active_modifiers;
         matcher->suppressed_key = event->value.key.virtual_key;
         status = ux_input_make_hotkey(&hotkey, event->source_handle,
             match->identifier);
@@ -235,6 +239,7 @@ lib_status ux_hotkey_matcher_retire(ux_hotkey_matcher *matcher,
     status = ux_hotkey_flush(matcher, sink, sink_context);
     if (status != LIB_STATUS_OK) return status;
     matcher->suppressed_modifiers = 0u;
+    matcher->active_modifiers = 0u;
     matcher->suppressed_key = 0u;
     status = ux_input_make_reset(&reset, source_handle);
     return status != LIB_STATUS_OK ? status : ux_hotkey_emit(sink, sink_context, &reset);
