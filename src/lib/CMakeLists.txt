@@ -14,6 +14,9 @@ function(library_root target)
     target_include_directories(${target} PUBLIC "${LIBRARY_SOURCE_ROOT}")
 endfunction()
 
+add_library(base-console STATIC base/console.c)
+library_root(base-console)
+
 set(LIBRARY_UX_SOURCES
     ux/actions.c
     ux/linux/input.c
@@ -33,6 +36,7 @@ else()
 endif()
 add_library(ux STATIC ${LIBRARY_UX_SOURCES})
 library_root(ux)
+target_link_libraries(ux PUBLIC base-console)
 add_library(ux-contract ALIAS ux)
 add_library(ux-native ALIAS ux)
 
@@ -43,6 +47,7 @@ else()
 endif()
 add_library(host-sync STATIC ${LIBRARY_HOST_SOURCES})
 library_root(host-sync)
+target_link_libraries(host-sync PUBLIC base-console)
 
 set(LIBRARY_STORAGE_SOURCES storage/file.c storage/medium.c)
 if(WIN32)
@@ -67,7 +72,7 @@ endif()
 # This build-only aggregate does not create a library-root dependency. Each
 # peer root remains independently compilable and depends only on `base`.
 add_library(lib-neutral-corpus INTERFACE)
-target_link_libraries(lib-neutral-corpus INTERFACE ux host-sync storage-medium)
+target_link_libraries(lib-neutral-corpus INTERFACE base-console ux host-sync storage-medium)
 
 add_custom_target(lib-verify-manifest
     COMMAND "${CMAKE_COMMAND}" -DLIBRARY_ROOT:PATH=${CMAKE_CURRENT_LIST_DIR}

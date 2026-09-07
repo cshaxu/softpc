@@ -299,6 +299,11 @@ target_link_libraries(softpc-machine-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-machine-smoke COMMAND softpc-machine-smoke)
 set_tests_properties(softpc-machine-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-lib-console-smoke test/unit/lib_console_smoke.c)
+target_link_libraries(softpc-lib-console-smoke PRIVATE base-console)
+add_test(NAME softpc-lib-console-smoke COMMAND softpc-lib-console-smoke)
+set_tests_properties(softpc-lib-console-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-dual-media-smoke test/unit/dual_media_smoke.c)
 target_link_libraries(softpc-dual-media-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-dual-media-smoke PRIVATE
@@ -475,6 +480,7 @@ add_test(NAME softpc-win32-presentation-manifest
 # machine library; production targets retain their normal Release NDEBUG.
 set(SOFTPC_TEST_TARGETS
     softpc-machine-smoke
+    softpc-lib-console-smoke
     softpc-dual-media-smoke
     softpc-partition-image-smoke
     softpc-irq-smoke
@@ -506,6 +512,7 @@ endforeach()
 
 set(SOFTPC_UNIT_TESTS
     softpc-machine-smoke
+    softpc-lib-console-smoke
     softpc-dual-media-smoke
     softpc-partition-image-smoke
     softpc-irq-smoke
