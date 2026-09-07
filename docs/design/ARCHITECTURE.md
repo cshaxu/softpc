@@ -37,11 +37,33 @@ the generic mailbox, console/window message loops, host-input normalization,
 action registration/matching, mouse capture, routing, clock, synchronization,
 and storage primitives. The app binding owns its executor queue, converts
 events to the guest's input protocol, and makes all product lifecycle and
-action decisions.
+action decisions. An owner-admitted generic shared-library candidate may
+temporarily originate in SoftPC only when its active packet requires NXVM to
+adopt the exact code and requires SoftPC to re-import it before task closure;
+this is a delivery order, not a permanent project fork.
 
 The runtime executor is the sole caller of the machine and compatibility host.
 Input producers enqueue records and signal it. The executor publishes complete
 text or graphic frame snapshots; frontends consume only those snapshots.
+
+## Shared Console And UX Composition
+
+An admitted shared-library candidate may originate in SoftPC only when NXVM
+adopts the exact code and SoftPC re-imports it before closure; this is delivery
+order, not a permanent library fork.
+
+`base` defines copied logical Console objects. `host` owns native Console
+handles/modes, one I/O worker, and exactly one Current Console Object from
+broker creation to destruction; replacement is transactional. `ux` owns its
+optional raw Console object and zero to two presenter runners, but never opens
+or registers the process Console. SoftPC owns its monitor object and alone asks
+host to replace the current object.
+
+SoftPC control is the sole product-state writer. VM, host, and UX workers only
+enqueue copied events/completions to its app-owned queue. The control thread
+derives a target from config, frame route, FIFO intent, and completed actual
+state, then advances one reconciler. VM `run_generation` is SoftPC-only; UX
+`configuration_generation` confirms presenter configuration only.
 
 ## BOP And Firmware Boundary
 

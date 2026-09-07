@@ -30,6 +30,32 @@ The console and window are equivalent input producers. RDP is supported by
 the same normalized key path; no frontend may depend on raw local-only key
 state as its sole input source.
 
+## Presenter And Console Product Policy
+
+SoftPC distinguishes static `display=console|window`, the active presenter set
+`{window_enabled, console_enabled}`, and the one Current Console Object bound
+by host. That object is either the SoftPC cooked monitor or the UX raw VM
+object. A monitor never implements SoftPC hotkeys; it accepts normal line
+commands only.
+
+| Running condition | Presenter set | Current Console Object |
+| --- | --- | --- |
+| `display=console`, text frame | `{false,true}` | UX raw VM object |
+| `display=console`, graphic frame, `console_control=0` | `{true,true}` | UX raw VM object |
+| `display=console`, graphic frame, `console_control=1` | `{true,false}` | SoftPC cooked monitor |
+| `display=window`, text or graphic frame | `{true,false}` | SoftPC cooked monitor |
+
+`console_control` is read only for `display=console`; it is `0|1` and defaults
+to `1`. Window display ignores it. Paused uses the monitor object with
+`console_enabled=false`; an existing Window remains only when product intent
+retains it. Stopped has no UX presenter. Resume first restores the derived
+running presenter set and Current Console Object, then resumes the VM.
+
+Window X is a SoftPC close request: running first reaches paused, host switches
+to monitor, then SoftPC destroys the presenter. Until native Window destruction,
+normal Window input remains valid. Window CAP is a UX action; Console CAP exists
+only while the UX raw object is current.
+
 ## Responsiveness
 
 The frontend remains responsive while the guest runs. Frame presentation is
