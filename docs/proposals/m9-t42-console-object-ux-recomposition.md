@@ -76,8 +76,9 @@ Console lifecycle. `ux-console` converts a copied UX text frame into the base
 text-frame value; it never renders a native Console directly. Window and
 Console have independent Win32/Linux code and
 independent mailboxes/workers. `ux-console` creates its logical Console object
-but never opens or registers native Console I/O; both components include only
-shared base contracts, never `host` or SoftPC.
+but never opens or registers native Console I/O. The component DAG permits
+`ux-window` and `ux-console` to depend directly on both `base` and `ux-base`;
+neither may depend on `host`, SoftPC, or the other UX leaf.
 
 SoftPC supplies each component a copied registration table of `{chord,
 identifier}` records. Matching consumes a registered chord and enqueues only
@@ -90,7 +91,11 @@ handle-free `monitor_input_event` payloads in the same SoftPC FIFO. Window X
 likewise becomes only an event. **Exit:** controllable-runner tests
 prove independent creation/destruction, logical Console availability, separate
 frame mailboxes, registered-chord suppression/mismatch flush, source isolation,
-Window-close delivery, and permanent-retirement input reset.
+Window-close delivery, and permanent-retirement input reset. To remove the
+second production route, S4 also mechanically replaces the old app-facing
+`ux_presenter`/`ux_run` calls with the new component calls. That replacement
+does not choose product state, monitor behavior, lifecycle policy, or a frame
+route; S5 remains the sole owner of those decisions.
 
 ### S5 — SoftPC monitor and derived-state reconciler
 
@@ -136,7 +141,7 @@ contract but may not rewrite its owner.
 | `src/lib/ux/**` | old unified controller/runner combines target choice, native Console access, and Window lifecycle | S4 deletes it and creates `src/lib/{ux-base,ux-window,ux-console}/`; S3 alone owns native Console I/O |
 | old `ux` Win32/Linux code | sequential runner opens `CONIN$`, changes native modes, and lets Window X control runner result | S4 replaces it with independent Window/VM-Console API-parity components; Linux runtime acceptance remains deferred |
 | `src/app/main.c` | synchronous `fgets` monitor owns lifecycle loop and shares process Console implicitly | S5 creates SoftPC monitor object/sink and moves command parsing into the sole control queue; cooked terminal behavior becomes host S3 |
-| `src/app/{runtime,presentation}.{c,h}` | product frame router, direct `ux_run`, action callbacks, lifecycle calls, title/capture changes interleave synchronously | S5 creates the sole derived-state reconciler and run-generation envelopes; it becomes the only host/UX/VM composer |
+| `src/app/{runtime,presentation}.{c,h}` | product frame router, direct `ux_run`, action callbacks, lifecycle calls, title/capture changes interleave synchronously | S4 mechanically removes direct old-`ux` calls; S5 creates the sole derived-state reconciler and run-generation envelopes, becoming the only host/UX/VM composer |
 | `src/app/{input_queue,keyboard}.{c,h}` | UX-only queue and policy callbacks; mouse coalescing is currently app-owned | S5 changes it to the one tagged SoftPC input queue; S4 moves only Window mouse-move coalescing into UX |
 | `test/unit/{runtime_smoke,runtime_input_continuation_smoke,win32_presentation_smoke,win32_window_smoke,win32_keyboard_smoke}.c` | current tests encode direct-runner and synchronous callback behavior | S5 rewrites/adds pure derivation and completion-gated reconciler coverage; S6 adds boundary integration proof |
 | top-level/test CMake and package smoke | target/test registration and final package evidence | S2–S6 add only their own focused targets; S7 runs package/owner acceptance and S8 records exact corpus evidence |
