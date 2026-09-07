@@ -1,4 +1,5 @@
 #include "lib/ux-base/input.h"
+#include "lib/ux-base/internal.h"
 
 #include <assert.h>
 
@@ -25,6 +26,36 @@ int main(void)
     captured_events captured = { 0 };
     int source;
     int other_source;
+    ux_control_mailbox controls;
+    ux_control_message control = { UX_CONTROL_SET_TITLE, { { 0 } } };
+    ux_control_message taken;
+    lib_bool has_control;
+    lib_u32 index;
+
+    /* Controls are FIFO.  The final slot is terminal-only, which ensures
+     * destruction can append STOP even when ordinary controls are saturated. */
+    ux_control_mailbox_initialize(&controls);
+    for (index = 0u; index + 1u < UX_CONTROL_MAILBOX_CAPACITY; ++index) {
+        control.kind = (index & 1u) == 0u ? UX_CONTROL_SET_TITLE :
+            UX_CONTROL_SET_MOUSE_ENABLED;
+        control.value.mouse_enabled = (index & 1u) != 0u;
+        assert(ux_control_mailbox_push(&controls, &control) == LIB_STATUS_OK);
+    }
+    assert(ux_control_mailbox_push(&controls, &control) ==
+        LIB_STATUS_LIMIT_EXCEEDED);
+    control.kind = UX_CONTROL_STOP;
+    assert(ux_control_mailbox_push(&controls, &control) == LIB_STATUS_OK);
+    for (index = 0u; index + 1u < UX_CONTROL_MAILBOX_CAPACITY; ++index) {
+        assert(ux_control_mailbox_take(&controls, &taken, &has_control) ==
+            LIB_STATUS_OK && has_control != LIB_FALSE);
+        assert(taken.kind == ((index & 1u) == 0u ? UX_CONTROL_SET_TITLE :
+            UX_CONTROL_SET_MOUSE_ENABLED));
+    }
+    assert(ux_control_mailbox_take(&controls, &taken, &has_control) ==
+        LIB_STATUS_OK && has_control != LIB_FALSE &&
+        taken.kind == UX_CONTROL_STOP);
+    assert(ux_control_mailbox_take(&controls, &taken, &has_control) ==
+        LIB_STATUS_OK && has_control == LIB_FALSE);
 
     assert(ux_hotkey_matcher_create(&matcher, &registration, 1u) == LIB_STATUS_OK);
     assert(ux_input_make_key(&event, &source, 0u, UX_KEY_CONTROL,

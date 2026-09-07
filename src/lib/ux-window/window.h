@@ -4,8 +4,6 @@
 #include "lib/ux-base/frame.h"
 #include "lib/ux-base/input.h"
 
-#define UX_WINDOW_TITLE_CAPACITY 128u
-
 typedef struct ux_window ux_window;
 
 typedef struct ux_window_options {
