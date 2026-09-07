@@ -58,7 +58,8 @@ destruction, normal Window input remains valid.
 ## UX Components And Registered Hotkeys
 
 Shared UX is three independent components, not one presenter that switches a
-target: `lib/ux-base/` contains only copied values and stateless helpers;
+target: `lib/ux-base/` contains copied values, generic event construction,
+and reusable private-mailbox helpers;
 `lib/ux-window/` owns one Window lifecycle; and `lib/ux-console/` owns one VM
 Console lifecycle. Each of Window and VM Console has its own Win32 and Linux
 implementation. Neither component owns the SoftPC monitor Console, native
@@ -82,10 +83,13 @@ does not use a UX component or hotkey registry and accepts only monitor lines.
 
 Every user input produced by either UX component is a copied `ux_input_event`:
 ordinary key/text/mouse input and registered-hotkey input are variants of that
-one UX event family. A cooked monitor line is instead a `monitor_input_event`.
-SoftPC's one input queue accepts both event families as distinct payloads; its
-control thread is their sole consumer. No monitor line is mislabeled as a UX
-event, and no UX component parses monitor commands.
+one UX event family. `ux-base` provides its single construction path and each
+such value carries its originating Window or VM-Console component handle for
+lifetime tracing; SoftPC does not assign product semantics by source. A cooked
+monitor line is instead a `monitor_input_event` and carries no UX handle.
+SoftPC's one input queue accepts both event families as distinct payloads in
+arrival order; its control thread is their sole consumer. No monitor line is
+mislabeled as a UX event, and no UX component parses monitor commands.
 
 ## Responsiveness
 

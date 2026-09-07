@@ -66,8 +66,9 @@ remain unchanged.
 ### S4 — Split UX components and generic registered-hotkey input
 
 Replace the unified `ux` presenter with three flat shared components:
-`ux-base` for copied frame/input values and source-local generic hotkey
-matching; `ux-window` for one Window lifecycle; and `ux-console` for one VM
+`ux-base` for copied frame/input values, unified UX-event construction,
+reusable private-mailbox mechanics, and source-local generic hotkey matching;
+`ux-window` for one Window lifecycle; and `ux-console` for one VM
 Console lifecycle. Window and Console have independent Win32/Linux code and
 independent mailboxes/workers. `ux-console` creates its logical Console object
 but never opens or registers native Console I/O; both components include only
@@ -78,7 +79,10 @@ identifier}` records. Matching consumes a registered chord and enqueues only
 `UX_HOTKEY(identifier)` at SoftPC's queue entry; lib executes no product action.
 The generic matcher buffers only possible chord prefixes per component instance,
 flushes unmatched input in order, and cannot combine Window/Console keys.
-Window X likewise becomes only an event. **Exit:** controllable-runner tests
+Every `ux_input_event` carries its source component handle solely for tracing
+and safe lifetime handling, never product dispatch; monitor lines are separate,
+handle-free `monitor_input_event` payloads in the same SoftPC FIFO. Window X
+likewise becomes only an event. **Exit:** controllable-runner tests
 prove independent creation/destruction, logical Console availability, separate
 frame mailboxes, registered-chord suppression/mismatch flush, source isolation,
 Window-close delivery, and permanent-retirement input reset.
