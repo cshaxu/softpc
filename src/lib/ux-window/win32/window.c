@@ -3,7 +3,7 @@
 #ifdef _WIN32
 #include <windows.h>
 
-struct ux_window_native { HANDLE wake, stop, ready, thread; HWND hwnd; lib_u32 *pixels; lib_size pixel_capacity; };
+struct ux_window_native { HANDLE wake, stop, ready, thread; HWND hwnd; lib_u32 *pixels; lib_size pixel_capacity; int mouse_x, mouse_y; lib_bool mouse_valid, mouse_enabled; };
 
 static lib_u32 ux_window_modifiers(void)
 {
@@ -24,6 +24,23 @@ static LRESULT CALLBACK ux_window_proc(HWND hwnd, UINT message, WPARAM wparam,
     window = (ux_window *)GetWindowLongPtrA(hwnd, GWLP_USERDATA);
     if (window == LIB_NULL) return DefWindowProcA(hwnd, message, wparam, lparam);
     if (message == WM_CLOSE) { (void)ux_window_request_close(window); return 0; }
+    if (message == WM_KILLFOCUS) { ReleaseCapture(); return 0; }
+    if (message == WM_LBUTTONDOWN) {
+        if (window->native->mouse_enabled != LIB_FALSE) { SetCapture(hwnd); window->native->mouse_valid = LIB_FALSE; }
+        return 0;
+    }
+    if (message == WM_MOUSEMOVE && GetCapture() == hwnd) {
+        int x = (int)(short)LOWORD(lparam), y = (int)(short)HIWORD(lparam);
+        if (window->native->mouse_valid != LIB_FALSE) {
+            ux_input_event event;
+            if (ux_input_make_mouse(&event, window, x - window->native->mouse_x,
+                    y - window->native->mouse_y, 0, 0, 0, 0, 0u, LIB_TRUE) == LIB_STATUS_OK)
+                (void)ux_window_submit_input(window, &event);
+        }
+        window->native->mouse_x = x; window->native->mouse_y = y; window->native->mouse_valid = LIB_TRUE;
+        return 0;
+    }
+    if (message == WM_LBUTTONUP) { if (GetCapture() == hwnd) ReleaseCapture(); return 0; }
     if (message == WM_PAINT) {
         PAINTSTRUCT paint;
         HDC dc = BeginPaint(hwnd, &paint);
@@ -109,6 +126,8 @@ static DWORD WINAPI ux_window_worker(void *context)
                     &mouse_enabled, &release_mouse) == LIB_STATUS_OK) {
                 (void)frame; (void)generation; (void)mouse_enabled; (void)release_mouse;
                 SetWindowTextA(native->hwnd, title);
+                native->mouse_enabled = mouse_enabled;
+                if (mouse_enabled == LIB_FALSE || release_mouse != LIB_FALSE) ReleaseCapture();
                 InvalidateRect(native->hwnd, NULL, FALSE);
             }
         }
