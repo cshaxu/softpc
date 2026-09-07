@@ -3,7 +3,7 @@
 #ifdef _WIN32
 #include <windows.h>
 
-struct ux_window_native { HANDLE wake, stop, ready, thread; HWND hwnd; };
+struct ux_window_native { HANDLE wake, stop, ready, thread; HWND hwnd; lib_u32 *pixels; lib_size pixel_capacity; };
 
 static lib_u32 ux_window_modifiers(void)
 {
@@ -32,8 +32,8 @@ static LRESULT CALLBACK ux_window_proc(HWND hwnd, UINT message, WPARAM wparam,
         char title[UX_WINDOW_TITLE_CAPACITY];
         lib_bool mouse_enabled, release_mouse;
         if (ux_window_capture_state(window, &frame, &generation, title,
-                &mouse_enabled, &release_mouse) == LIB_STATUS_OK &&
-            frame.graphics == 0u && ux_frame_is_valid(&frame)) {
+                &mouse_enabled, &release_mouse) == LIB_STATUS_OK && ux_frame_is_valid(&frame) &&
+            frame.graphics == 0u) {
             lib_u32 row;
             (void)generation; (void)title; (void)mouse_enabled; (void)release_mouse;
             for (row = 0u; row < frame.text_rows; ++row) {
@@ -41,6 +41,29 @@ static LRESULT CALLBACK ux_window_proc(HWND hwnd, UINT message, WPARAM wparam,
                 memcpy(line, &frame.text[row * UX_TEXT_COLUMNS], frame.text_columns);
                 line[frame.text_columns] = '\0';
                 TextOutA(dc, 0, (int)row * 16, line, frame.text_columns);
+            }
+        } else if (ux_frame_is_valid(&frame) && frame.graphics != 0u) {
+            ux_window_native *native = window->native;
+            lib_size count = (lib_size)frame.graphics_width * frame.graphics_height;
+            if (native != LIB_NULL && count <= UX_GRAPHICS_MAX_PIXELS &&
+                native->pixel_capacity < count) {
+                lib_u32 *pixels = realloc(native->pixels, count * sizeof(*pixels));
+                if (pixels != LIB_NULL) { native->pixels = pixels; native->pixel_capacity = count; }
+            }
+            if (native != LIB_NULL && native->pixels != LIB_NULL && native->pixel_capacity >= count) {
+                BITMAPINFO info = { 0 }; lib_u32 y, x;
+                info.bmiHeader.biSize = sizeof(info.bmiHeader);
+                info.bmiHeader.biWidth = frame.graphics_width;
+                info.bmiHeader.biHeight = -(LONG)frame.graphics_height;
+                info.bmiHeader.biPlanes = 1; info.bmiHeader.biBitCount = 32;
+                info.bmiHeader.biCompression = BI_RGB;
+                for (y = 0u; y < frame.graphics_height; ++y)
+                    for (x = 0u; x < frame.graphics_width; ++x)
+                        native->pixels[(lib_size)y * frame.graphics_width + x] =
+                            frame.graphics_palette[frame.graphics_pixels[(lib_size)y * frame.graphics_stride + x]];
+                StretchDIBits(dc, 0, 0, paint.rcPaint.right - paint.rcPaint.left,
+                    paint.rcPaint.bottom - paint.rcPaint.top, 0, 0, frame.graphics_width,
+                    frame.graphics_height, native->pixels, &info, DIB_RGB_COLORS, SRCCOPY);
             }
         }
         EndPaint(hwnd, &paint);
@@ -116,7 +139,7 @@ void ux_window_native_stop(ux_window *window)
     ux_window_native *native = window == LIB_NULL ? LIB_NULL : window->native;
     if (native == LIB_NULL) return; SetEvent(native->stop);
     if (native->thread != NULL) { WaitForSingleObject(native->thread, INFINITE); CloseHandle(native->thread); }
-    CloseHandle(native->ready); CloseHandle(native->stop); CloseHandle(native->wake); window->native = LIB_NULL; free(native);
+    CloseHandle(native->ready); CloseHandle(native->stop); CloseHandle(native->wake); free(native->pixels); window->native = LIB_NULL; free(native);
 }
 void ux_window_native_signal(ux_window *window)
 { if (window != LIB_NULL && window->native != LIB_NULL) SetEvent(window->native->wake); }
