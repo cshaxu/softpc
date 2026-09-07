@@ -31,7 +31,11 @@ static lib_status host_console_start(host_console_broker *broker,
     if (status == LIB_STATUS_OK)
         status = lib_console_set_text_frame_sink(console,
             host_console_native_present_text_frame, broker->native_console);
-    if (status != LIB_STATUS_OK) host_console_native_deactivate(broker->native_console);
+    if (status != LIB_STATUS_OK) {
+        host_console_native_deactivate(broker->native_console);
+        (void)lib_console_set_output_sink(console, LIB_NULL, LIB_NULL);
+        (void)lib_console_set_text_frame_sink(console, LIB_NULL, LIB_NULL);
+    }
     return status;
 }
 

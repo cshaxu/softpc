@@ -147,6 +147,7 @@ lib_status lib_console_present_text_frame(lib_console *console,
 {
     lib_console_text_frame_sink sink;
     void *context;
+    lib_console_text_frame copied;
 
     if (console == LIB_NULL || frame == LIB_NULL || frame->columns == 0u ||
         frame->columns > LIB_CONSOLE_TEXT_COLUMNS || frame->rows == 0u ||
@@ -154,9 +155,10 @@ lib_status lib_console_present_text_frame(lib_console *console,
     lib_console_lock(console);
     console->latest_text_frame = *frame;
     console->latest_text_frame_valid = LIB_TRUE;
+    copied = console->latest_text_frame;
     sink = console->text_frame_sink;
     context = console->text_frame_context;
     lib_console_unlock(console);
     if (sink == LIB_NULL) return LIB_STATUS_NOT_CURRENT;
-    return sink(context, frame);
+    return sink(context, &copied);
 }
