@@ -160,7 +160,13 @@ Focused S4 proof must include: each control API affects only its corresponding
 FIFO message; Paint cannot consume control; a `stop` cuts off subsequent
 control/frame processing; stale source input after permanent retirement
 produces the one required input reset; and no Window/Console source pair can
-compose a hotkey.
+compose a hotkey. Before S4 is reported implemented, compare the split corpus
+function-by-function with NXVM's admitted unified-UX corpus. The comparison
+must account for Window and Console input, frame rendering, palette/color,
+cursor, mouse capture and conversion, native Console allocation/sizing, and
+lifecycle boundaries; every difference is classified as preserved, an
+explicitly approved ownership migration, or a missing capability to restore.
+Architecture splitting is not authorization to alter product semantics.
 
 ### S5 — SoftPC monitor and derived-state reconciler
 

@@ -7,7 +7,8 @@ static void ux_console_event(void *context, const lib_console_event *event)
 
     if (console == LIB_NULL || event == LIB_NULL) return;
     if (event->kind == LIB_CONSOLE_EVENT_RAW_KEY) {
-        if (ux_input_make_key(&input, console, 0u, event->value.raw_key.key,
+        if (ux_input_make_key(&input, console, event->value.raw_key.scan_code,
+                event->value.raw_key.key,
                 event->value.raw_key.modifiers, event->value.raw_key.pressed) ==
             LIB_STATUS_OK) {
             (void)ux_hotkey_matcher_submit(console->hotkeys, &input,
@@ -90,7 +91,6 @@ lib_status ux_console_publish_frame(ux_console *console, const ux_frame *frame)
 lib_status ux_console_present_frame(ux_console *console, const ux_frame *frame)
 {
     lib_console_text_frame text = { 0 };
-    lib_size cells;
 
     if (console == LIB_NULL || !ux_frame_is_valid(frame)) return LIB_STATUS_INVALID_ARGUMENT;
     if (frame->graphics != 0u) return LIB_STATUS_OK; /* preserve last text frame */
@@ -98,10 +98,15 @@ lib_status ux_console_present_frame(ux_console *console, const ux_frame *frame)
     text.rows = frame->text_rows;
     text.cursor_column = frame->cursor_column;
     text.cursor_row = frame->cursor_row;
+    text.cursor_top = frame->cursor_top;
+    text.cursor_bottom = frame->cursor_bottom;
+    text.font_height = frame->font_height;
     text.cursor_visible = frame->cursor_visible != 0u && frame->cursor_phase != 0u;
-    cells = (lib_size)text.columns * text.rows;
-    memcpy(text.text, frame->text, cells);
-    memcpy(text.attributes, frame->attributes, cells * sizeof(text.attributes[0]));
+    /* Both frame formats are fixed 80-column surfaces.  Copying only
+     * columns*rows would compact a narrow text mode and make every row after
+     * the first render from the wrong source offset. */
+    memcpy(text.text, frame->text, sizeof(text.text));
+    memcpy(text.attributes, frame->attributes, sizeof(text.attributes));
     memcpy(text.palette, frame->text_palette, sizeof(text.palette));
     return lib_console_present_text_frame(console->logical_console, &text);
 }
