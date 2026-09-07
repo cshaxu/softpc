@@ -97,6 +97,64 @@ second production route, S4 also mechanically replaces the old app-facing
 does not choose product state, monitor behavior, lifecycle policy, or a frame
 route; S5 remains the sole owner of those decisions.
 
+#### S4 component mailbox and API contract
+
+This replaces the old unified-presenter storage mechanically rather than
+inventing a coarser shared control state.  The old presenter's independent
+`frame`, `title`, `mouse_capturable`, and `mouse_release` mailboxes remain
+independent after the split.  Its `target` mailbox is intentionally retired:
+SoftPC expresses that product decision by creating or destroying the relevant
+component.  Its runner termination becomes the component's private `stop`
+mailbox.
+
+`ux-window` owns one copied frame mailbox plus four independent control
+mailboxes:
+
+| Mailbox | Writer | Sole consumer | Semantics |
+| --- | --- | --- | --- |
+| `frame` | `ux_window_publish_frame` | paint path snapshots it; worker requests repaint | latest complete copied frame |
+| `stop` | `ux_window_destroy` | Window worker | sticky terminal request; worker exits before destruction frees state |
+| `title` | `ux_window_set_title` | Window worker | latest copied NUL-terminated title |
+| `mouse_enabled` | `ux_window_set_mouse_enabled` | Window worker | latest boolean; controls whether a click may capture |
+| `mouse_release` | `ux_window_release_mouse` | Window worker | sticky one-shot request; only its consumer clears it after native release |
+
+The Window public API is therefore exactly `create`, `start`,
+`publish_frame`, `set_title`, `set_mouse_enabled`, `release_mouse`,
+`input_source`, and `destroy`.  Each mutating API writes only the named
+mailbox and signals one private native wake primitive.  That wake carries no
+data and is not a mailbox.  The worker checks `stop`, then consumes `title`,
+`mouse_enabled`, and `mouse_release`, then invalidates as required.  `WM_PAINT`
+may snapshot only `frame`; it must never inspect or consume a control mailbox.
+Window-close, key, text, and mouse callbacks only construct copied
+`ux_input_event` values and submit them through the supplied sink; no callback
+may stop the worker, change SoftPC lifecycle, or mutate another mailbox.
+
+`ux-console` owns only two component mailboxes:
+
+| Mailbox | Writer | Sole consumer | Semantics |
+| --- | --- | --- | --- |
+| `frame` | `ux_console_publish_frame` | Console renderer worker | latest complete copied text/graphics frame; graphics preserves the last Console text display |
+| `stop` | `ux_console_destroy` | Console renderer worker | sticky terminal request; worker exits before the logical Console is released |
+
+Its public API is exactly `create`, `start`, `publish_frame`, `get_console`,
+`input_source`, and `destroy`.  Creation also creates its logical VM Console
+and binds its event sink to the source-local hotkey matcher.  Host may later
+bind that logical object as Current Console in raw mode, but `ux-console`
+neither opens, registers, reads, nor renders a native Console.  Raw host
+events become copied `ux_input_event` values through the matcher; host cooked
+monitor lines never pass through this component.
+
+`ux-base` supplies the value types, one input-event construction path,
+source-local matcher, and private typed mailbox helpers.  It exposes none of
+those mailbox handles publicly.  Each component owns its own instances and
+native wake/worker state; Window and Console never share one.
+
+Focused S4 proof must include: each control API affects only its corresponding
+mailbox; Paint cannot consume `mouse_release`; repeated release coalesces to
+one native release; stop wins over every nonterminal update; stale source input
+after permanent retirement produces the one required input reset; and no
+Window/Console source pair can compose a hotkey.
+
 ### S5 — SoftPC monitor and derived-state reconciler
 
 Replace the old non-MVDM Console handoff with SoftPC's sole FIFO control
