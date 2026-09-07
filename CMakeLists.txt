@@ -304,6 +304,14 @@ target_link_libraries(softpc-lib-console-smoke PRIVATE base-console)
 add_test(NAME softpc-lib-console-smoke COMMAND softpc-lib-console-smoke)
 set_tests_properties(softpc-lib-console-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-host-console-broker-smoke
+    test/unit/host_console_broker_smoke.c
+    src/lib/host/console.c)
+target_link_libraries(softpc-host-console-broker-smoke PRIVATE base-console)
+add_test(NAME softpc-host-console-broker-smoke
+    COMMAND softpc-host-console-broker-smoke)
+set_tests_properties(softpc-host-console-broker-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-dual-media-smoke test/unit/dual_media_smoke.c)
 target_link_libraries(softpc-dual-media-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-dual-media-smoke PRIVATE
@@ -481,6 +489,7 @@ add_test(NAME softpc-win32-presentation-manifest
 set(SOFTPC_TEST_TARGETS
     softpc-machine-smoke
     softpc-lib-console-smoke
+    softpc-host-console-broker-smoke
     softpc-dual-media-smoke
     softpc-partition-image-smoke
     softpc-irq-smoke
@@ -513,6 +522,7 @@ endforeach()
 set(SOFTPC_UNIT_TESTS
     softpc-machine-smoke
     softpc-lib-console-smoke
+    softpc-host-console-broker-smoke
     softpc-dual-media-smoke
     softpc-partition-image-smoke
     softpc-irq-smoke

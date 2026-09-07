@@ -4,12 +4,12 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T42 S2 active — base logical Console object |
-| Admission And Approval | T42 S1 completed the source-boundary audit and serial S2–S8 plan. The owner-directed T42 objective now admits S2 only: a platform-neutral `base` Console object. |
-| Objective | Implement and unit-test the opaque copied-event/output `lib_console` contract. It is a logical object only: no native handle, reader, UX presenter, SoftPC policy, monitor parsing, or lifecycle behavior. |
-| Outcome | S2 is active. T41's imported 52-file `base`/`host`/`storage`/`ux` corpus and its non-MVDM ownership ledger remain the baseline. The prior Window/Console behavior is not accepted product behavior and is replaced, not incrementally patched, by the approved derived-state design. |
+| Identifier Mode | M9 T42 S3 active — host Current Console Object broker |
+| Admission And Approval | T42 S2 completed the platform-neutral logical Console object and focused proof. The owner-directed T42 objective now admits S3 only: host-native binding of exactly one such object. |
+| Objective | Implement and test the generic host broker: initial registration, raw/cooked native modes, transactional replacement/rollback, serialized output, strong current-object lifetime, stale-event generation, and teardown. UX and SoftPC remain unchanged. |
+| Outcome | S3 is active. The S2 `lib_console` object is the only broker payload. T41's imported 52-file baseline remains in force; the prior Window/Console behavior is not accepted product behavior and is replaced, not incrementally patched, by the approved derived-state design. |
 | Non-goals | No modification to `src/mvdm/softpc.new/`, its MVDM-local Win32 calls, or WinNT-derived implementation; no SoftPC lifecycle, DISPLAY policy, `console_control`, monitor syntax, or guest-hotkey in lib; no permanent SoftPC-only lib fork or NXVM runtime/build dependency; no package configuration or guest-media change. |
-| Affected Boundaries | `src/lib/base/`, `src/lib/CMakeLists.txt`, and a focused base unit test only. `host`, `ux`, `src/app/`, and non-library `src/host/` are not changed. `storage` is not redesigned; `src/mvdm/softpc.new/` remains excluded and immutable. |
+| Affected Boundaries | `src/lib/host/`, its CMake/public-header wiring, and focused broker tests. The S2 base object may receive only an adapter-required generic correction. `ux`, `src/app/`, and non-library `src/host/` are not changed. `storage` is not redesigned; `src/mvdm/softpc.new/` remains excluded and immutable. |
 | Applicable Rules | Execution, architecture, coding, and documentation authorities; [T42 proposal](../proposals/m9-t42-console-object-ux-recomposition.md); [Product UX](../design/UI.md); [System Architecture](../design/ARCHITECTURE.md). |
 | Focused Verification | Unit-test copied event delivery, sink replacement/removal, backend absence as `NOT_CURRENT`, output forwarding, and invalid payload rejection. Verify the base API exports no Win32, UX, SoftPC, monitor, or VM type. |
 | Full Regression | Before S2 closure, run the focused base test plus proportionate local x64/x86 configure/build/CTest evidence where toolchains exist, preserve `assets/binary/softpc.ini` and guest media, and pass documentation governance and diff checks. |
