@@ -9,7 +9,7 @@ src/
   host/
     ordinary host C/H files
     compat/{ccpu,cvidc,...}/
-  lib/{base,host,storage,ux}/
+  lib/{base,host,storage,ux-base,ux-window,ux-console}/
     byte-identical NXVM shared platform implementation
   app/
     main.c, runtime.c, presentation.c, keyboard.c, firmware.rc
@@ -30,8 +30,9 @@ transformed C/H files are not build inputs. `host` owns platform capability
 implementations and larger functional adaptations; `app` owns
 orchestration, machine snapshot production, guest-input conversion, monitor
 UI, and product lifecycle policy. `lib` owns copied-value platform mechanics:
-mailbox, host input normalization, action registration, console/window loops,
-routing, geometry, capture, clock, synchronization, and storage. It never
+`ux-base` event construction, registered-chord matching and private-mailbox
+helpers; independent `ux-window`/`ux-console` lifecycles; host input
+normalization, geometry, capture, clock, synchronization, and storage. It never
 owns a project runtime, machine, renderer, product input queue, guest-input
 mapping, lifecycle, or hotkey meaning.
 
