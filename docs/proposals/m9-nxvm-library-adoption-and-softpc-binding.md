@@ -1,4 +1,8 @@
-# M9: NXVM Library Adoption And SoftPC Binding
+# M9 T41: NXVM Library Adoption And SoftPC Binding (closed record)
+
+> **Status:** Closed by owner direction. This retained proposal records the
+> completed T41 import/binding work. Its former S5 Console-object material is
+> implementation background for [M9 T42 Console-object and UX recomposition](m9-t42-console-object-ux-recomposition.md), not an unfinished T41 condition.
 
 ## Purpose
 
@@ -13,12 +17,9 @@ This is a local source import, not a cross-repository build, runtime, or
 acceptance dependency. NXVM remains read-only comparison material; after an
 approved import, SoftPC builds solely from its own checked-in sources.
 
-The active S5 delivery order narrowly supersedes this retained plan's earlier
-unchanged-import wording: SoftPC may implement only the generic S5 candidate
-locally; NXVM must adopt it exactly; SoftPC must re-import it before T41 closes.
-Current product and architecture authority is in [Product UX](../design/UI.md)
-and [System Architecture](../design/ARCHITECTURE.md). This proposal is retained
-implementation background and detailed acceptance planning.
+The former S5 delivery-order text is retained below solely as technical
+background for T42. Current product and architecture authority is in
+[Product UX](../design/UI.md) and [System Architecture](../design/ARCHITECTURE.md).
 
 The desired source responsibility is:
 
@@ -238,16 +239,17 @@ current package behavior.
 
 The archived S5 text above is superseded in full. It incorrectly coupled VM
 running state to UX Console ownership and assigned SoftPC Console ownership
-to lib UX. The following is the sole S5 design authority.
+to lib UX. The following is retained T42 implementation background; current
+design authority is the linked UI and architecture documentation.
 
-**Scope.** The owner changed S5 delivery order: SoftPC implements this generic
-shared-library candidate in local `src/lib/`, then NXVM adopts that exact code
-and SoftPC re-imports it before T41 closes. This authorizes only the APIs and
-generic implementations specified here; it does not authorize an `softpc.ini`
+**Scope.** The owner moved this delivery order into T42: SoftPC implements this
+generic shared-library candidate in local `src/lib/`, then NXVM adopts that
+exact code and SoftPC re-imports it before T42 closes. This authorizes only the
+APIs and generic implementations specified here; it does not authorize an `softpc.ini`
 edit, an MVDM edit, or SoftPC product policy in lib. The withdrawn SoftPC
 monitor/frontend coordinator and global-`stdin` handoff remain absent.
 The retained [owner decision record and cross-audit](../etc/evidence/softpc/m9-t41-s5-console-design-review-record-zh.md)
-is supporting evidence only. Current S5 product and architecture authority is
+is supporting evidence only. Current T42 product and architecture authority is
 in [Product UX](../design/UI.md) and
 [System Architecture](../design/ARCHITECTURE.md); this section is retained
 implementation elaboration and acceptance planning.

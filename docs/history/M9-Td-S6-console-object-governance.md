@@ -12,9 +12,9 @@ Promoted the owner-approved S5 Console-object/UX design to current authority:
 - [S5 review record](../etc/evidence/softpc/m9-t41-s5-console-design-review-record-zh.md)
   retains decision excerpts/cross-audit only.
 
-The owner changed delivery order: SoftPC implements the generic candidate in
-`src/lib`, NXVM adopts it exactly, then SoftPC re-imports it before T41 closure.
-This is not a permanent SoftPC library fork.
+The owner chose a new T42 delivery order: SoftPC implements the generic
+candidate in `src/lib`, NXVM adopts it exactly, then SoftPC re-imports it
+before T42 closure. This is not a permanent SoftPC library fork.
 
 ## Frozen invariants
 
@@ -30,4 +30,5 @@ This is not a permanent SoftPC library fork.
 ## Verification
 
 Documentation governance and diff checks passed. No code/package artifact is
-changed by this Td; T41 remains active for implementation.
+changed by this Td. T41 was subsequently closed by owner direction and the
+implementation is now T42.

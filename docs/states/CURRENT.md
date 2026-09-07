@@ -4,19 +4,19 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T41 S1 active; M9 Td S6 governance closed before S5 implementation |
-| Admission And Approval | Owner reordered the queue to place NXVM library adoption first and directed its admission. The current reviewed source is `O:/repos.hobby/nxvm/src/lib` at `c7b5e668b7d9fc8e8710c3dd77c863ce07801553`, with `MANIFEST.sha256` file hash `C22012E985A30E130369AAC8A5E0C0E93DA9F56C842843A4C5B3685769E3E9A6`. The owner additionally admitted S5 and explicitly changed its delivery order: SoftPC implements the reviewed generic host/UX candidate in local `src/lib/`; NXVM then adopts that exact implementation; SoftPC re-syncs the adopted corpus before T41 closure. |
-| Objective | Preserve the admitted corpus as baseline, complete the S1 ownership ledger, and implement the owner-approved S5 generic Console-object/UX candidate in SoftPC `src/lib/` plus its non-MVDM SoftPC binding. NXVM must adopt the candidate byte-identically and SoftPC must re-import that adopted corpus before closure; product runtime policy remains in SoftPC. |
-| Outcome | Imported the complete 52-file corpus byte-identically and verified its manifest. Local CMake now selects the imported targets; prompt tracing uses the shared storage writer; HDD and GFI media use shared byte-medium leases; and the runtime/presenter plus audio worker use shared UX and host synchronization. The file-level ledger is [T41 S1 evidence](../etc/evidence/softpc/m9-t41-s1-nonmvdm-lib-ledger.md). The UX input queue is SoftPC runtime coordination, and binary COM/LPT file sinks are SoftPC device endpoints; neither is an NXVM-lib prerequisite. SoftPC owns frame routing policy in `app_runtime`: console graphics requests window, and three stable text frames request console, with requests suppressed when the target is unchanged. The binding sends `0x00RRGGBB` frame pixels to lib, updates Window-only titles as runtime state changes, and enables mouse capture only for a running Window target. **Owner runtime acceptance remains pending.** The later experimental monitor/frontend coordinator and global-`stdin` handoff is withdrawn from the working tree and may not be revived; S5 replaces it with a generic host Console-endpoint contract and completed UX surface facts. |
-| Non-goals | No NXVM build/runtime dependency; no `mvdm` change; no migration, wrapping, replacement, or other alteration of any MVDM-local Win32 API use or WinNT-derived implementation; no movement of SoftPC product policy, original-host ABI, media geometry, executor ownership, or presentation decisions into lib; no package or user-configuration change. Local `src/lib/` edits are limited to the approved generic S5 candidate and cannot become a permanent SoftPC fork. |
-| Affected Boundaries | `src/lib/`, local CMake/source-selection and public-header wiring, and every existing direct non-MVDM clock/task/event/wait, file/media, and UX/presentation route in `src/app/` and `src/host/`. `src/mvdm/softpc.new/` is excluded and immutable, including its MVDM-local Win32/WinNT implementation. |
-| Applicable Rules | Execution, architecture, coding, and documentation authorities; the approved adoption proposal; S5 candidate edits remain generic and must be adopted by NXVM byte-identically, then re-imported into SoftPC before closure. |
-| Focused Verification | Verify the upstream manifest before import and the local corpus after import; prove no former SoftPC library file remains in `src/lib/`; configure/build the imported library locally without modifying it; complete the non-`mvdm` ownership ledger. The upstream `src/lib` path is clean at the selected revision; its manifest verifies and its README now matches the three-component corpus. The current GCC x64 build produces `assets/binary/softpc64.exe`; its manifest and source diff checks pass. The current local Clang i686 MinGW-target configuration cannot link because its required i686 import libraries are absent on this host, so no x86 acceptance is claimed for this checkpoint. The runtime smoke covers three-text-frame return; owner must manually verify console-to-graphics window creation on both package widths. |
-| Full Regression | Before S1 closure, run proportionate local GCC x64 and i686 x86 configuration/build/CTest evidence, preserve `assets/binary/softpc.ini` and guest media, and run documentation governance and diff checks. |
-| Similar-Issue Sweep | Search source selection, includes, and callers for every displaced `src/lib/` route and every direct non-MVDM platform/file/media use; classify each as a shared `host`/`storage`/`ux` migration, retained SoftPC-specific runtime/device owner, candidate deletion, or explicit upstream blocker where both projects actually require the missing generic capability. |
-| Stop Conditions | Stop for owner direction if a candidate edit is not generic, would encode SoftPC lifecycle/monitor semantics, reaches a machine/original-host contract, leaves two independent Console readers, or cannot be adopted by NXVM unchanged. Do not manufacture an upstream prerequisite from a product-specific runtime queue or device-endpoint protocol. |
-| Exit Criteria | The S5 candidate is fully built/tested in SoftPC, adopted byte-identically by NXVM, and re-imported/verifiable in SoftPC; every displaced current library file and active non-`mvdm` owner has a recorded disposition; local build integration is explicit; no unproved deletion or routing change has occurred. |
-| Original Owner Request | “队列里把lib adoption作为队首任务，准入” |
+| Identifier Mode | M9 T42 S1 active |
+| Admission And Approval | Owner explicitly closed T41 and admitted T42 for the complete approved Console-object/host/UX/SoftPC design. T42 begins from T41's imported NXVM-library baseline and its governing Td S6 design closure. |
+| Objective | Implement the generic `base` Console object, `host` one-current-object broker, independently composable `ux` Window/Console presenters, and the non-MVDM SoftPC reconciler; then obtain NXVM's byte-identical adoption and re-import that corpus into SoftPC. |
+| Outcome | T42 is newly active. T41's imported 52-file `base`/`host`/`storage`/`ux` corpus and its non-MVDM ownership ledger are the baseline. The prior Window/Console behavior is not accepted product behavior and is replaced, not incrementally patched, by the approved derived-state design. |
+| Non-goals | No modification to `src/mvdm/softpc.new/`, its MVDM-local Win32 calls, or WinNT-derived implementation; no SoftPC lifecycle, DISPLAY policy, `console_control`, monitor syntax, or guest-hotkey in lib; no permanent SoftPC-only lib fork or NXVM runtime/build dependency; no package configuration or guest-media change. |
+| Affected Boundaries | `src/lib/{base,host,ux}`, their CMake/public-header wiring, and non-MVDM `src/app/`/`src/host/` binding and tests. `storage` is not redesigned. `src/mvdm/softpc.new/` remains excluded and immutable. |
+| Applicable Rules | Execution, architecture, coding, and documentation authorities; [T42 proposal](../proposals/m9-t42-console-object-ux-recomposition.md); [Product UX](../design/UI.md); [System Architecture](../design/ARCHITECTURE.md). |
+| Focused Verification | First prove pure SoftPC state derivation and completion-gated reconciler traces. Then prove host one-current-object transactional replacement, stale-event/lifetime behavior, and UX presenter completion/retirement with controllable fakes. Exercise real threads only using barriers/events and bounded deadlock guards, never sleeps. |
+| Full Regression | Before closure, run local x64 and x86 configure/build/CTest evidence proportional to the runnable change, preserve `assets/binary/softpc.ini` and guest media, run the Console/Window owner acceptance matrix, and pass documentation governance and diff checks. |
+| Similar-Issue Sweep | Audit every non-MVDM direct Console reader/writer, `stdin`/`fgets` handoff, native Console mode/handle use, presenter-type switch, mouse/input route, and lifecycle callback. Each must become a single approved host/UX/SoftPC path or be removed; MVDM remains out of scope. |
+| Stop Conditions | Stop for owner direction if an API encodes SoftPC policy, changes MVDM, leaves two native readers/output owners, permits a zero-current-object state outside broker teardown, or cannot be adopted by NXVM unchanged. |
+| Exit Criteria | Deterministic tests prove the approved state/transition matrix and thread boundaries; x64/x86 evidence and owner runtime acceptance pass; NXVM adopts the generic candidate byte-identically; SoftPC re-imports and manifest-verifies that adopted corpus. |
+| Original Owner Request | “请你直接收口T41吧，我们开T42来做刚才的全套设计” |
 
 ## Current Technical Baseline
 
@@ -31,10 +31,14 @@
 
 ## Recent Governance
 
-- M9 Td S6 promoted the S5 Console-object design to `design/UI.md` and
+- M9 T41 closed by owner direction after completing the imported-lib baseline
+  and non-MVDM ownership ledger. Its incomplete Console/Window runtime work is
+  transferred to active T42; see [T41 history](../history/M9-T41-nxvm-library-adoption-and-binding.md).
+
+- M9 Td S6 promoted the Console-object design to `design/UI.md` and
   `design/ARCHITECTURE.md`, retained the reviewed decision record as evidence,
   and fixed SoftPC-first candidate delivery: NXVM must adopt it exactly and
-  SoftPC must re-import it before T41 closure. See
+  SoftPC must re-import it before T42 closure. See
   [Td S6 history](../history/M9-Td-S6-console-object-governance.md).
 
 - M9 Td S5 reconciled the XP SP1 proposal and Chinese A/B audit after T40:
