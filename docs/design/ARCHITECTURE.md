@@ -54,16 +54,28 @@ order, not a permanent library fork.
 
 `base` defines copied logical Console objects. `host` owns native Console
 handles/modes, one I/O worker, and exactly one Current Console Object from
-broker creation to destruction; replacement is transactional. `ux` owns its
-optional raw Console object and zero to two presenter runners, but never opens
-or registers the process Console. SoftPC owns its monitor object and alone asks
-host to replace the current object.
+broker creation to destruction; replacement is transactional. Shared UX is
+split into `ux-base` (copied UX values and source-local generic hotkey matcher),
+`ux-window` (one Window lifecycle), and `ux-console` (one VM Console lifecycle).
+The latter creates an optional logical VM Console object but neither UX
+component opens or registers the process Console. SoftPC owns its monitor
+object and alone decides which UX components exist and asks host to replace the
+current object.
 
 SoftPC control is the sole product-state writer. VM, host, and UX workers only
 enqueue copied events/completions to its app-owned queue. The control thread
 derives a target from config, frame route, FIFO intent, and completed actual
 state, then advances one reconciler. VM `run_generation` is SoftPC-only; UX
 `configuration_generation` confirms presenter configuration only.
+
+SoftPC passes copied `{chord, identifier}` registrations to each UX component.
+The components may generically recognize and suppress a registered chord, but
+only enqueue `UX_HOTKEY(identifier)`; they never execute a product callback or
+interpret pause, reset, guest CAD, or another identifier. Their ordinary input
+and matched-hotkey events share SoftPC's one FIFO. The generic matcher keeps
+pending only possible chord prefixes per component instance, preserving guest
+input order on mismatch and preventing keys from different input components
+from forming a host hotkey.
 
 ## BOP And Firmware Boundary
 

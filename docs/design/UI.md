@@ -52,9 +52,33 @@ retains it. Stopped has no UX presenter. Resume first restores the derived
 running presenter set and Current Console Object, then resumes the VM.
 
 Window X is a SoftPC close request: running first reaches paused, host switches
-to monitor, then SoftPC destroys the presenter. Until native Window destruction,
-normal Window input remains valid. Window CAP is a UX action; Console CAP exists
-only while the UX raw object is current.
+to monitor, then SoftPC destroys the Window component. Until native Window
+destruction, normal Window input remains valid.
+
+## UX Components And Registered Hotkeys
+
+Shared UX is three independent components, not one presenter that switches a
+target: `lib/ux-base/` contains only copied values and stateless helpers;
+`lib/ux-window/` owns one Window lifecycle; and `lib/ux-console/` owns one VM
+Console lifecycle. Each of Window and VM Console has its own Win32 and Linux
+implementation. Neither component owns the SoftPC monitor Console, native
+Console handles/modes, or the product decision to exist.
+
+SoftPC creates either component with a copied table of registered host-hotkey
+chords and identifier strings. `ux-base` provides only generic source-local
+matching. A matched chord is discarded as normal input and produces one copied
+`UX_HOTKEY(identifier)` event at SoftPC's queue entry; lib does not interpret
+the identifier. Unmatched input is emitted as ordinary copied key/text/mouse
+events in its original order. Matcher state is per component instance: keys
+from Window and VM Console never combine into one chord.
+
+The matcher withholds only a possible registered-chord prefix until it can
+decide match versus mismatch. Thus Ctrl+Alt+P registered as `pause-toggle`
+emits only that identifier, never partial Ctrl/Alt/P guest input. Ctrl+Alt+X
+when not registered flushes Ctrl, Alt, and X as normal input in order. SoftPC
+alone maps identifiers to pause/resume, stop/reset/start, mouse release, or
+synthetic guest input such as Ctrl+Alt+Del and Alt+Enter. The cooked monitor
+does not use a UX component or hotkey registry and accepts only monitor lines.
 
 ## Responsiveness
 

@@ -63,14 +63,25 @@ suppression, and broker teardown. **Exit:** controllable blocked-reader/
 callback tests prove every ordering/failure case without sleeps. UX and SoftPC
 remain unchanged.
 
-### S4 — UX dual-presenter composition
+### S4 — Split UX components and generic registered-hotkey input
 
-Refactor only shared UX to independently enable Window and Console presenters,
-separate Window/Console frame mailboxes, optional UX-owned Console object,
-completed presenter-set/configuration facts, Window-close-request delivery,
-and local mouse/input rules. UX includes `base` only, never `host` or SoftPC.
-**Exit:** controllable-runner tests prove creation, destruction, stale-source
-rejection, no live empty set, and permanent-retirement input reset.
+Replace the unified `ux` presenter with three flat shared components:
+`ux-base` for copied frame/input values and source-local generic hotkey
+matching; `ux-window` for one Window lifecycle; and `ux-console` for one VM
+Console lifecycle. Window and Console have independent Win32/Linux code and
+independent mailboxes/workers. `ux-console` creates its logical Console object
+but never opens or registers native Console I/O; both components include only
+shared base contracts, never `host` or SoftPC.
+
+SoftPC supplies each component a copied registration table of `{chord,
+identifier}` records. Matching consumes a registered chord and enqueues only
+`UX_HOTKEY(identifier)` at SoftPC's queue entry; lib executes no product action.
+The generic matcher buffers only possible chord prefixes per component instance,
+flushes unmatched input in order, and cannot combine Window/Console keys.
+Window X likewise becomes only an event. **Exit:** controllable-runner tests
+prove independent creation/destruction, logical Console availability, separate
+frame mailboxes, registered-chord suppression/mismatch flush, source isolation,
+Window-close delivery, and permanent-retirement input reset.
 
 ### S5 — SoftPC monitor and derived-state reconciler
 
