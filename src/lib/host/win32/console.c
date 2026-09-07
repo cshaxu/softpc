@@ -5,6 +5,7 @@
 #include <windows.h>
 
 struct host_console_native {
+    atomic_flag output_lock;
     HANDLE input;
     HANDLE output;
     HANDLE stop_event;
@@ -14,6 +15,17 @@ struct host_console_native {
     host_console_mode mode;
     lib_u32 generation;
 };
+
+static void host_console_output_lock(host_console_native *native_console)
+{
+    while (atomic_flag_test_and_set_explicit(&native_console->output_lock,
+        memory_order_acquire)) { }
+}
+
+static void host_console_output_unlock(host_console_native *native_console)
+{
+    atomic_flag_clear_explicit(&native_console->output_lock, memory_order_release);
+}
 
 static lib_u8 host_console_modifiers(DWORD state)
 {
@@ -93,6 +105,8 @@ lib_status host_console_native_create(host_console_native **out_native)
     *out_native = LIB_NULL;
     native_console = calloc(1u, sizeof(*native_console));
     if (native_console == LIB_NULL) return LIB_STATUS_NO_MEMORY;
+    native_console->output_lock = (atomic_flag)ATOMIC_FLAG_INIT;
+    atomic_flag_clear_explicit(&native_console->output_lock, memory_order_release);
     native_console->input = CreateFileA("CONIN$", GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     native_console->output = CreateFileA("CONOUT$", GENERIC_READ | GENERIC_WRITE,
@@ -166,9 +180,60 @@ lib_status host_console_native_write(void *context, const char *text,
 {
     host_console_native *native_console = (host_console_native *)context;
     DWORD written = 0u;
+    lib_status status;
     if (native_console == LIB_NULL || (text == LIB_NULL && length != 0u) ||
         length > (lib_size)UINT32_MAX) return LIB_STATUS_INVALID_ARGUMENT;
-    return WriteConsoleA(native_console->output, text, (DWORD)length, &written, NULL) &&
+    host_console_output_lock(native_console);
+    status = WriteConsoleA(native_console->output, text, (DWORD)length, &written, NULL) &&
         written == (DWORD)length ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+    host_console_output_unlock(native_console);
+    return status;
+}
+
+lib_status host_console_native_present_text_frame(void *context,
+    const lib_console_text_frame *frame)
+{
+    host_console_native *native_console = (host_console_native *)context;
+    CONSOLE_SCREEN_BUFFER_INFOEX info = { 0 };
+    COORD position = { 0, 0 };
+    DWORD written;
+    lib_u32 row;
+    lib_status status = LIB_STATUS_OK;
+
+    if (native_console == LIB_NULL || frame == LIB_NULL || frame->columns == 0u ||
+        frame->columns > LIB_CONSOLE_TEXT_COLUMNS || frame->rows == 0u ||
+        frame->rows > LIB_CONSOLE_TEXT_ROWS) return LIB_STATUS_INVALID_ARGUMENT;
+    host_console_output_lock(native_console);
+    info.cbSize = sizeof(info);
+    if (GetConsoleScreenBufferInfoEx(native_console->output, &info)) {
+        for (row = 0u; row < 16u; ++row) {
+            lib_u32 color = frame->palette[row];
+            info.ColorTable[row] = RGB((color >> 16u) & 0xffu,
+                (color >> 8u) & 0xffu, color & 0xffu);
+        }
+        (void)SetConsoleScreenBufferInfoEx(native_console->output, &info);
+    }
+    for (row = 0u; row < frame->rows; ++row) {
+        lib_size offset = (lib_size)row * LIB_CONSOLE_TEXT_COLUMNS;
+        position.Y = (SHORT)row;
+        if (!WriteConsoleOutputCharacterA(native_console->output,
+                (const char *)&frame->text[offset], frame->columns, position, &written) ||
+            written != frame->columns || !WriteConsoleOutputAttribute(native_console->output,
+                (const WORD *)&frame->attributes[offset], frame->columns, position,
+                &written) || written != frame->columns) {
+            status = LIB_STATUS_IO_ERROR;
+            break;
+        }
+    }
+    if (status == LIB_STATUS_OK && frame->cursor_visible != LIB_FALSE &&
+        frame->cursor_column >= 0 && frame->cursor_column < frame->columns &&
+        frame->cursor_row >= 0 && frame->cursor_row < frame->rows) {
+        position.X = (SHORT)frame->cursor_column;
+        position.Y = (SHORT)frame->cursor_row;
+        if (!SetConsoleCursorPosition(native_console->output, position))
+            status = LIB_STATUS_IO_ERROR;
+    }
+    host_console_output_unlock(native_console);
+    return status;
 }
 #endif

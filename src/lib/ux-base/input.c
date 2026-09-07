@@ -90,6 +90,36 @@ lib_status ux_input_make_key(ux_input_event *out_event,
     return LIB_STATUS_OK;
 }
 
+lib_status ux_input_make_text(ux_input_event *out_event,
+    const void *source_handle, lib_u32 scalar)
+{
+    lib_status status = ux_input_set(out_event, source_handle, UX_INPUT_TEXT);
+
+    if (status != LIB_STATUS_OK || scalar == 0u || scalar > 0x10ffffu ||
+        (scalar >= 0xd800u && scalar <= 0xdfffu)) return LIB_STATUS_INVALID_ARGUMENT;
+    out_event->value.text.scalar = scalar;
+    return LIB_STATUS_OK;
+}
+
+lib_status ux_input_make_mouse(ux_input_event *out_event,
+    const void *source_handle, lib_i32 delta_x, lib_i32 delta_y,
+    lib_i32 absolute_x, lib_i32 absolute_y, lib_i32 wheel_x, lib_i32 wheel_y,
+    lib_u32 buttons, lib_bool relative)
+{
+    lib_status status = ux_input_set(out_event, source_handle, UX_INPUT_MOUSE);
+
+    if (status != LIB_STATUS_OK) return status;
+    out_event->value.mouse.delta_x = delta_x;
+    out_event->value.mouse.delta_y = delta_y;
+    out_event->value.mouse.absolute_x = absolute_x;
+    out_event->value.mouse.absolute_y = absolute_y;
+    out_event->value.mouse.wheel_x = wheel_x;
+    out_event->value.mouse.wheel_y = wheel_y;
+    out_event->value.mouse.buttons = buttons;
+    out_event->value.mouse.relative = relative != LIB_FALSE;
+    return LIB_STATUS_OK;
+}
+
 lib_status ux_input_make_hotkey(ux_input_event *out_event,
     const void *source_handle, const char *identifier)
 {
