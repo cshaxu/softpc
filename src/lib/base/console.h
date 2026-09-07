@@ -50,6 +50,8 @@ typedef void (*lib_console_event_sink)(void *context,
     const lib_console_event *event);
 
 lib_status lib_console_create(lib_console **out_console);
+lib_console *lib_console_retain(lib_console *console);
+void lib_console_release(lib_console *console);
 void lib_console_destroy(lib_console *console);
 lib_status lib_console_set_event_sink(lib_console *console,
     lib_console_event_sink sink, void *context);

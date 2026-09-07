@@ -37,6 +37,8 @@ int main(void)
 
     assert(lib_console_create(&console) == LIB_STATUS_OK);
     assert(console != LIB_NULL);
+    assert(lib_console_retain(console) == console);
+    lib_console_release(console);
     assert(lib_console_write_text(console, "x", 1u) == LIB_STATUS_NOT_CURRENT);
     assert(lib_console_set_event_sink(console, console_probe_event, &probe) ==
         LIB_STATUS_OK);

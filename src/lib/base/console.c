@@ -2,6 +2,7 @@
 
 struct lib_console {
     atomic_flag lock;
+    atomic_uint references;
     lib_console_event_sink event_sink;
     void *event_context;
     lib_console_output_sink output_sink;
@@ -37,14 +38,30 @@ lib_status lib_console_create(lib_console **out_console)
     console = calloc(1u, sizeof(*console));
     if (console == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     atomic_flag_clear(&console->lock);
+    atomic_init(&console->references, 1u);
     *out_console = console;
     return LIB_STATUS_OK;
 }
 
-void lib_console_destroy(lib_console *console)
+lib_console *lib_console_retain(lib_console *console)
+{
+    if (console == LIB_NULL) return LIB_NULL;
+    (void)atomic_fetch_add_explicit(&console->references, 1u,
+        memory_order_relaxed);
+    return console;
+}
+
+void lib_console_release(lib_console *console)
 {
     if (console == LIB_NULL) return;
-    free(console);
+    if (atomic_fetch_sub_explicit(&console->references, 1u,
+            memory_order_acq_rel) == 1u)
+        free(console);
+}
+
+void lib_console_destroy(lib_console *console)
+{
+    lib_console_release(console);
 }
 
 lib_status lib_console_set_event_sink(lib_console *console,
