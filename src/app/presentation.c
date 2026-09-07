@@ -2,12 +2,19 @@
 
 #ifdef _WIN32
 #include "keyboard.h"
-#include "lib/ux/win32/runner.h"
 
 #include <string.h>
 
 enum { APP_ACTION_PAUSE_TOGGLE = 1u, APP_ACTION_SEND_CTRL_ALT_DEL = 2u,
     APP_ACTION_SEND_ALT_ENTER = 3u, APP_ACTION_RELEASE_MOUSE = 4u };
+
+static void app_presentation_publish_title(app_runtime *runtime)
+{
+    (void)ux_presenter_set_window_title(
+        app_runtime_presentation_presenter(runtime),
+        app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED ?
+            "Insignia SoftPC (Paused)" : "Insignia SoftPC (Running)");
+}
 
 static ux_run_state app_presentation_state(void *context)
 {
@@ -35,9 +42,15 @@ static ux_run_result app_presentation_action(void *context,
     switch (action) {
     case APP_ACTION_PAUSE_TOGGLE:
         (void)app_keyboard_release_ctrl_alt(runtime, sink);
-        if (app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED)
-            return app_runtime_resume(runtime) ? UX_RUN_CONTINUE : UX_RUN_ERROR_RESULT;
-        return app_runtime_pause(runtime) ? UX_RUN_PAUSED_RESULT : UX_RUN_ERROR_RESULT;
+        if (app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED) {
+            if (!app_runtime_resume(runtime)) return UX_RUN_ERROR_RESULT;
+            app_presentation_publish_title(runtime);
+            return UX_RUN_CONTINUE;
+        }
+        if (!app_runtime_pause(runtime)) return UX_RUN_ERROR_RESULT;
+        app_presentation_publish_title(runtime);
+        return app_runtime_presentation_target(runtime) == UX_TARGET_WINDOW ?
+            UX_RUN_CONTINUE : UX_RUN_PAUSED_RESULT;
     case APP_ACTION_SEND_CTRL_ALT_DEL:
         (void)app_keyboard_release_ctrl_alt(runtime, sink);
         return app_keyboard_submit_ctrl_alt_del(runtime, sink) ?
@@ -66,19 +79,6 @@ static ux_run_result app_presentation_close(void *context, ux_event_sink sink)
     return app_runtime_pause(runtime) ? UX_RUN_PAUSED_RESULT : UX_RUN_ERROR_RESULT;
 }
 
-static void app_presentation_title(void *context, char *buffer,
-    unsigned int buffer_size)
-{
-    app_runtime_state state;
-
-    if (buffer == NULL || buffer_size == 0u) return;
-    state = app_runtime_get_state((app_runtime *)context);
-    (void)strncpy(buffer, state == SOFTPC_RUNTIME_PAUSED ?
-        "Insignia SoftPC (Paused)" : "Insignia SoftPC (Running)",
-        buffer_size - 1u);
-    buffer[buffer_size - 1u] = '\0';
-}
-
 int app_presentation_binding(app_runtime *runtime,
     ux_action_registry *actions, ux_binding *binding)
 {
@@ -86,15 +86,14 @@ int app_presentation_binding(app_runtime *runtime,
         !app_keyboard_register_actions(actions)) return 0;
     memset(binding, 0, sizeof(*binding));
     binding->context = runtime;
-    binding->mailbox = app_runtime_presentation_mailbox(runtime);
-    binding->router = app_runtime_presentation_router(runtime);
+    binding->presenter = app_runtime_presentation_presenter(runtime);
     binding->actions = actions;
     binding->input_sink = app_keyboard_deliver_input;
-    binding->release_inputs = app_presentation_release_inputs;
+    binding->release_pressed_keys = app_presentation_release_inputs;
     binding->get_state = app_presentation_state;
     binding->handle_action = app_presentation_action;
     binding->handle_close = app_presentation_close;
-    binding->get_title = app_presentation_title;
+    strcpy(binding->window_initial_title, "Insignia SoftPC (Running)");
     return ux_binding_validate(binding) == LIB_STATUS_OK;
 }
 
@@ -119,6 +118,7 @@ int app_presentation_run(app_runtime *runtime,
     app_runtime_set_presentation_mode(runtime, presentation);
     if (!app_presentation_binding(runtime, &actions, &binding))
         return SOFTPC_VM_FRONTEND_ERROR;
-    return app_presentation_result(ux_win32_run(&binding));
+    app_presentation_publish_title(runtime);
+    return app_presentation_result(ux_run(&binding));
 }
 #endif

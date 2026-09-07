@@ -41,8 +41,8 @@ be resolved before its duplicate is removed.
 
 M9 T41 S1 is admitted against the reviewed complete corpus
 `O:/repos.hobby/nxvm/src/lib` at
-`71e59ec09d669050ba98faca410ed8b9e9259d7c`. Its `MANIFEST.sha256` file hash
-is `2578C3B60B35FBD33D98A950F01F43846894C7AA3FAD22DED412DCC7CD2597DF`.
+`c7b5e668b7d9fc8e8710c3dd77c863ce07801553`. Its `MANIFEST.sha256` file hash
+is `C22012E985A30E130369AAC8A5E0C0E93DA9F56C842843A4C5B3685769E3E9A6`.
 The review records the public headers, Windows-first platform boundary,
 ownership model, and the required unchanged-import rule in the active T41
 packet. Linux sources remain in the corpus; Linux runnable acceptance is
@@ -154,6 +154,78 @@ Add a source-hash manifest and boundary checks proving the imported `src/lib/`
 content remains byte-identical to its approved NXVM review revision. Document
 the local update procedure: a future NXVM library update is a new reviewed,
 atomic import, never an in-place SoftPC edit to library files.
+
+### S5 — Console ownership contract and upstream UX redesign
+
+**Admission.** The owner added this subtask after runtime acceptance found
+that an experimental SoftPC-side monitor/frontend handoff was unreliable. Its
+uncommitted source is withdrawn from the working tree; it remains only in a
+recoverable Git stash for forensic comparison and is not a candidate
+implementation. S5 is a design and upstream-alignment subtask. It does not
+authorize a local `src/lib/` edit or an MVDM edit.
+
+**Problem.** A Windows process Console is one input resource. The existing
+NXVM Win32 runner's private atomic flag is acquired only while its Console
+runner exists, and `ux_run()` unconditionally starts that runner before it
+considers the presenter target. Neither behavior expresses whether a Window
+target keeps the Console for the presenter session or releases it to a
+product's cooked command UI. A product must not infer that fact from a target
+request, a frame, or a timing delay.
+
+**Required public model.** The next reviewed NXVM UX contract needs one
+immutable Boolean in `ux_binding`, fixed at `ux_run()` startup:
+
+```text
+retain_console_while_window = true
+    the presenter owns the process Console from ux_run entry until ux_run
+    returns, including while its active surface is Window.
+
+retain_console_while_window = false
+    the presenter owns the process Console only while its active surface is
+    Console; a Window surface releases it.
+```
+
+The native Console runner's raw input mode and event reader exist only while
+the active surface is Console. A `SESSION` lease held during Window is a
+logical reservation, not a hidden raw reader. On a transition to Console the
+native owner must first acquire the presenter lease, configure raw input, and
+then report Console active. On a transition away it must stop its reader,
+restore the saved mode, release the lease when the selected scope requires it,
+and only then report the resulting active state. `ux_run()` must capture the
+initial target before it creates a Console runner.
+
+The public binding must report completed facts, not requested intent: active
+surface (`NONE`, `WINDOW`, `CONSOLE`) and whether the presenter currently owns
+the Console. It must not expose Win32 handles or encode SoftPC lifecycle,
+commands, or guest hotkeys. A callback or copied-state/event interface is
+acceptable, but it must be non-reentrant and documented as an observation of
+completed native ownership transfer.
+
+**Product boundary.** SoftPC sets this Boolean; lib does not name or infer a
+product mode. When it is true, the original simple monitor model applies: the
+monitor has no reader between `ux_run()` entry and return. When it is false,
+SoftPC may run its monitor while Window is active, but it may request a Console
+target only after its cooked reader has stopped, joined, and released its
+Console lease. It may start that reader only after lib reports that Window is
+active and the presenter lease is released. The generic lib must supply the
+lease and cooked/raw platform transition required to make this exclusive; it
+must not leave independent `stdin` and `CONIN$` readers to race over the same
+process Console. Parsing `start`, `pause`, `resume`, `reset`, and `stop`
+remains SoftPC product code.
+
+**NXVM alignment and gate.** S5 records a clean NXVM revision and manifest,
+then reviews that exact corpus against this contract. If NXVM adopts the
+generic lease capability, SoftPC imports the resulting whole `src/lib/`
+corpus atomically and byte-identically; it does not carry a local UX fork.
+The same Boolean contract must have a Linux-compatible public shape, though
+Linux runnable parity remains deferred.
+
+**Exit:** an approved, minimal ownership/state table; an exact public API and
+native transition order; a clean upstream revision/manifest implementing it;
+and a SoftPC audit proving that the withdrawn coordinator/global-`stdin`
+approach is absent. Follow-on implementation requires focused ownership tests,
+dual-width builds, and owner runtime acceptance before it can replace the
+current package behavior.
 
 ## Verification
 

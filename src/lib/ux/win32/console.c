@@ -1,10 +1,12 @@
 #include "lib/base/base.h"
-#include "console.h"
+#include "lib/ux/internal/win32_console.h"
 
 #ifdef _WIN32
-#include "actions.h"
-#include "input.h"
-#include "mailbox.h"
+#include "lib/ux/internal/win32_actions.h"
+#include "lib/ux/internal/win32_geometry.h"
+#include "lib/ux/internal/win32_input.h"
+#include "lib/ux/internal/presenter_internal.h"
+#include "lib/ux/internal/win32_presenter_wake.h"
 
 #include <windows.h>
 #include <stdlib.h>
@@ -73,11 +75,6 @@ static int win32_console_open(const ux_binding *binding,
             return 0;
         }
     }
-    if (binding->get_title != NULL) {
-        char title[128] = "Presentation";
-        binding->get_title(binding->context, title, sizeof(title));
-        SetConsoleTitleA(title);
-    }
     console->input = input;
     console->output = output;
     console->original_mode = original_mode;
@@ -96,10 +93,27 @@ static void win32_console_close(ux_win32_console *console)
     console->output = NULL;
 }
 
+/* A Window-to-Console switch has already destroyed the Window surface before
+ * this Console runner is created.  The native runner, rather than its product
+ * binding, therefore restores the one process Console as the foreground input
+ * surface before this runner begins consuming guest input. */
+static void win32_console_activate(ux_win32_console *console)
+{
+    HWND window;
+
+    if (console == NULL || console->input == NULL ||
+        console->input == INVALID_HANDLE_VALUE) return;
+    window = GetConsoleWindow();
+    if (window == NULL) return;
+    if (IsIconic(window)) ShowWindow(window, SW_RESTORE);
+    (void)SetForegroundWindow(window);
+    (void)SetActiveWindow(window);
+    (void)SetFocus(window);
+}
+
 static int win32_console_ensure_text_surface(HANDLE output)
 {
     CONSOLE_SCREEN_BUFFER_INFO info;
-    COORD largest;
     COORD required;
     SMALL_RECT viewport = { 0, 0, UX_TEXT_COLUMNS - 1, UX_TEXT_ROWS - 1 };
 
@@ -111,10 +125,12 @@ static int win32_console_ensure_text_surface(HANDLE output)
         (SHORT)UX_TEXT_ROWS : info.dwSize.Y;
     if ((required.X != info.dwSize.X || required.Y != info.dwSize.Y) &&
         !SetConsoleScreenBufferSize(output, required)) return 0;
-    largest = GetLargestConsoleWindowSize(output);
-    if (largest.X < (SHORT)UX_TEXT_COLUMNS || largest.Y < (SHORT)UX_TEXT_ROWS)
-        return 0;
-    return SetConsoleWindowInfo(output, TRUE, &viewport) != 0;
+    /* The host may report a stale or constrained largest viewport (notably
+       through a pseudoconsole).  The requested viewport itself is the only
+       authoritative resize attempt; output remains valid against the full
+       buffer if that host declines to resize its visible viewport. */
+    (void)SetConsoleWindowInfo(output, TRUE, &viewport);
+    return 1;
 }
 
 static ux_run_result win32_console_key(ux_win32_console *console,
@@ -201,7 +217,8 @@ static int win32_console_paint(ux_win32_console *console)
         info.cbSize = sizeof(info);
         if (GetConsoleScreenBufferInfoEx(console->output, &info)) {
             for (index = 0u; index < 16u; ++index)
-                info.ColorTable[index] = (COLORREF)frame->text_palette[index];
+                info.ColorTable[index] = ux_win32_colorref_from_rgb(
+                    frame->text_palette[index]);
             (void)SetConsoleScreenBufferInfoEx(console->output, &info);
         }
         memcpy(console->previous_palette, frame->text_palette,
@@ -280,6 +297,7 @@ static lib_status ux_win32_console_create(const ux_binding *binding,
         ux_win32_console_release();
         return LIB_STATUS_INVALID_STATE;
     }
+    win32_console_activate(console);
     console->frame = calloc(1u, sizeof(*console->frame));
     if (console->frame == NULL) {
         (void)SetConsoleMode(console->input, console->original_mode);
@@ -300,50 +318,58 @@ static ux_run_result ux_win32_console_run(ux_win32_console *console)
     HANDLE wait_handles[2];
     ux_run_result result = UX_RUN_STOPPED_RESULT;
     int running = 1;
+    lib_u32 target_generation = 0u;
 
     if (console == NULL) return UX_RUN_ERROR_RESULT;
-    wait_handles[0] = console->input;
-    wait_handles[1] = ux_win32_mailbox_wait_handle(console->binding->mailbox);
+    wait_handles[0] = ux_win32_presenter_wait_handle(console->binding->presenter);
+    wait_handles[1] = console->input;
     while (running) {
         INPUT_RECORD record;
         DWORD available;
         DWORD read;
+        ux_target target;
+        lib_u32 generation = ux_presenter_capture_target(
+            console->binding->presenter, &target);
 
-        while (PeekConsoleInputA(console->input, &record, 1u, &available) &&
-            available != 0u) {
-            if (!ReadConsoleInputA(console->input, &record, 1u, &read)) {
+        if (generation != target_generation) {
+            target_generation = generation;
+            if (target == UX_TARGET_NONE) {
                 running = 0;
-                break;
-            }
-            if (record.EventType == KEY_EVENT) {
-                result = win32_console_key(console, &record.Event.KeyEvent);
-                if (result != UX_RUN_CONTINUE) {
-                    running = 0;
-                    break;
-                }
-            } else if (record.EventType == MOUSE_EVENT) {
-                win32_console_mouse(console, &record.Event.MouseEvent);
+                result = UX_RUN_STOPPED_RESULT;
+            } else if (target == UX_TARGET_WINDOW) {
+                result = UX_RUN_SWITCH_WINDOW;
+                running = 0;
             }
         }
-        if (ux_router_target(console->binding->router) == UX_TARGET_NONE) {
-            result = UX_RUN_STOPPED_RESULT;
-            break;
-        }
-        if (ux_router_target(console->binding->router) == UX_TARGET_WINDOW) {
-            result = UX_RUN_SWITCH_WINDOW;
-            break;
-        }
-        if (ux_mailbox_generation(console->binding->mailbox) !=
+        if (!running) break;
+        if (ux_presenter_frame_generation(console->binding->presenter) !=
                 console->displayed_sequence &&
-            ux_mailbox_capture(console->binding->mailbox, console->frame) ==
+            ux_presenter_capture_frame(console->binding->presenter, console->frame) ==
                 LIB_STATUS_OK) {
             if (win32_console_paint(console))
                 console->displayed_sequence = console->frame->sequence;
         }
-        if (WaitForMultipleObjects(2u, wait_handles, FALSE, INFINITE) ==
-            WAIT_FAILED) {
-            result = UX_RUN_ERROR_RESULT;
-            running = 0;
+        {
+            DWORD wait = WaitForMultipleObjects(2u, wait_handles, FALSE, INFINITE);
+
+            if (wait == WAIT_FAILED) {
+                result = UX_RUN_ERROR_RESULT;
+                running = 0;
+            } else if (wait == WAIT_OBJECT_0 + 1u) {
+                while (PeekConsoleInputA(console->input, &record, 1u, &available) &&
+                    available != 0u) {
+                    if (!ReadConsoleInputA(console->input, &record, 1u, &read)) {
+                        running = 0;
+                        break;
+                    }
+                    if (record.EventType == KEY_EVENT) {
+                        result = win32_console_key(console, &record.Event.KeyEvent);
+                        if (result != UX_RUN_CONTINUE) { running = 0; break; }
+                    } else if (record.EventType == MOUSE_EVENT) {
+                        win32_console_mouse(console, &record.Event.MouseEvent);
+                    }
+                }
+            }
         }
     }
     return result;

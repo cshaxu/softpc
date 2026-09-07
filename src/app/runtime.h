@@ -4,8 +4,7 @@
 #include "machine.h"
 #include "lib/ux/event.h"
 #include "lib/ux/frame.h"
-#include "lib/ux/mailbox.h"
-#include "lib/ux/router.h"
+#include "lib/ux/presenter.h"
 
 #include <stdint.h>
 
@@ -45,13 +44,12 @@ int app_runtime_copy_frame(app_runtime *runtime,
 uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime);
 /* Opaque shared-presentation mailbox.  The app binding may pass this handle
    to a UX presenter; it never exposes machine-owned video state. */
-ux_mailbox *app_runtime_presentation_mailbox(
-    app_runtime *runtime);
+ux_presenter *app_runtime_presentation_presenter(app_runtime *runtime);
+ux_target app_runtime_presentation_target(const app_runtime *runtime);
 /* Product presentation policy owns the target selection; lib/ux only
    dispatches the target requested by this runtime-owned router. */
 void app_runtime_set_presentation_mode(app_runtime *runtime,
     softpc_presentation presentation);
-ux_router *app_runtime_presentation_router(app_runtime *runtime);
 void app_runtime_destroy(app_runtime *runtime);
 
 #endif
