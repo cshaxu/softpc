@@ -7,11 +7,14 @@
 #include "lib/ux-console/console.h"
 #include "lib/ux-window/window.h"
 
+#include <stdlib.h>
 #include <string.h>
 #include <windows.h>
 
-typedef struct app_presentation_context {
+struct app_presentation {
     app_runtime *runtime;
+    softpc_presentation display;
+    int console_control;
     ux_window *window;
     ux_console *console;
     app_monitor_console *monitor;
@@ -19,7 +22,10 @@ typedef struct app_presentation_context {
     ux_hotkey_registry hotkeys;
     unsigned int text_frames_since_graphics;
     app_runtime_state displayed_state;
-} app_presentation_context;
+    int close_requested;
+};
+
+typedef struct app_presentation app_presentation_context;
 
 static void app_presentation_publish_title(app_presentation_context *context)
 {
@@ -135,59 +141,111 @@ static int app_presentation_publish(app_presentation_context *context,
     return 1;
 }
 
+int app_presentation_create(app_presentation **out_presentation,
+    app_runtime *runtime, softpc_presentation presentation, int console_control,
+    app_monitor_console *monitor, app_control_queue *control_queue)
+{
+    app_presentation_context *context;
+
+    if (out_presentation == NULL || runtime == NULL || monitor == NULL ||
+        control_queue == NULL) return 0;
+    *out_presentation = NULL;
+    context = calloc(1u, sizeof(*context));
+    if (context == NULL) return 0;
+    if (!app_keyboard_register_hotkeys(&context->hotkeys)) {
+        free(context);
+        return 0;
+    }
+    context->runtime = runtime;
+    context->display = presentation;
+    context->console_control = console_control;
+    context->monitor = monitor;
+    context->control_queue = control_queue;
+    context->displayed_state = app_runtime_get_state(runtime);
+    *out_presentation = context;
+    return 1;
+}
+
+void app_presentation_destroy(app_presentation *presentation)
+{
+    if (presentation == NULL) return;
+    app_presentation_destroy_components(presentation);
+    free(presentation);
+}
+
+int app_presentation_prepare_resume(app_presentation *presentation)
+{
+    app_runtime_frame frame = { 0 };
+    app_presentation_plan plan;
+    int graphics = 0;
+
+    if (presentation == NULL) return 0;
+    if (app_runtime_copy_frame(presentation->runtime, &frame))
+        graphics = frame.graphics != 0u;
+    plan = app_presentation_derive(presentation->display,
+        presentation->console_control, SOFTPC_RUNTIME_RUNNING, graphics);
+    if (!app_presentation_apply_plan(presentation, &plan)) return 0;
+    presentation->close_requested = 0;
+    return 1;
+}
+
+int app_presentation_reconcile(app_presentation *context)
+{
+    app_runtime_frame frame = { 0 };
+    app_runtime_state state;
+    app_presentation_plan plan;
+    uint32_t sequence;
+
+    if (context == NULL) return 0;
+    state = app_runtime_get_state(context->runtime);
+    if (state != context->displayed_state) {
+        context->displayed_state = state;
+        app_presentation_publish_title(context);
+        if (context->window != NULL) {
+                if (state == SOFTPC_RUNTIME_RUNNING)
+                    (void)ux_window_enable_mouse(context->window);
+                else if (state == SOFTPC_RUNTIME_PAUSED)
+                    (void)ux_window_disable_mouse(context->window);
+        }
+    }
+    if (app_runtime_take_window_mouse_release(context->runtime) &&
+        context->window != NULL)
+        (void)ux_window_release_mouse(context->window);
+    if (app_runtime_take_window_close(context->runtime)) context->close_requested = 1;
+    sequence = app_runtime_published_frame_sequence(context->runtime);
+    if (sequence != 0u) (void)app_runtime_copy_frame(context->runtime, &frame);
+    plan = app_presentation_derive(context->display, context->console_control,
+        state, frame.valid != 0u && frame.graphics != 0u);
+    if (context->close_requested && state == SOFTPC_RUNTIME_PAUSED)
+        plan.window_enabled = 0;
+    if (!app_presentation_apply_plan(context, &plan)) return 0;
+    if (frame.valid != 0u && !app_presentation_publish(context, &frame)) return 0;
+    return 1;
+}
+
+#ifdef SOFTPC_WINDOW_TESTING
 int app_presentation_run(app_runtime *runtime,
     softpc_presentation presentation, int console_control,
     app_monitor_console *monitor, app_control_queue *control_queue)
 {
-    app_presentation_context context = { 0 };
-    app_runtime_frame frame = { 0 };
-    uint32_t prior_sequence = 0u;
+    app_presentation *component = NULL;
     int result = SOFTPC_VM_FRONTEND_ERROR;
-
-    if (runtime == NULL || monitor == NULL || control_queue == NULL ||
-        !app_keyboard_register_hotkeys(&context.hotkeys))
-        return SOFTPC_VM_FRONTEND_ERROR;
-    context.runtime = runtime;
-    context.monitor = monitor;
-    context.control_queue = control_queue;
-    context.displayed_state = app_runtime_get_state(runtime);
+    if (!app_presentation_create(&component, runtime, presentation,
+            console_control, monitor, control_queue)) return result;
     for (;;) {
-        app_runtime_state state = app_runtime_get_state(runtime);
-        app_presentation_plan plan;
-        uint32_t sequence = app_runtime_published_frame_sequence(runtime);
-        if (state != context.displayed_state) {
-            context.displayed_state = state;
-            app_presentation_publish_title(&context);
-            if (context.window != NULL) {
-                if (state == SOFTPC_RUNTIME_RUNNING)
-                    (void)ux_window_enable_mouse(context.window);
-                else if (state == SOFTPC_RUNTIME_PAUSED)
-                    (void)ux_window_disable_mouse(context.window);
-            }
-        }
-        if (app_runtime_take_window_mouse_release(runtime) && context.window != NULL)
-            (void)ux_window_release_mouse(context.window);
-        if (app_runtime_take_window_close(runtime) && state == SOFTPC_RUNTIME_PAUSED)
+        if (!app_presentation_reconcile(component)) break;
+        if (app_runtime_get_state(runtime) == SOFTPC_RUNTIME_ERROR ||
+            app_runtime_get_state(runtime) == SOFTPC_RUNTIME_STOPPED ||
+            (component->close_requested &&
+             app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED)) {
+            result = app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED ?
+                SOFTPC_VM_FRONTEND_PAUSED : SOFTPC_VM_FRONTEND_STOPPED;
             break;
-        if (state == SOFTPC_RUNTIME_ERROR || state == SOFTPC_RUNTIME_STOPPED)
-            break;
-        if (sequence != prior_sequence && app_runtime_copy_frame(runtime, &frame)) {
-            prior_sequence = sequence;
-        }
-        plan = app_presentation_derive(presentation, console_control, state,
-            frame.valid != 0u && frame.graphics != 0u);
-        if (!app_presentation_apply_plan(&context, &plan)) goto done;
-        if (frame.valid != 0u && !app_presentation_publish(&context, &frame)) goto done;
-        if (state == SOFTPC_RUNTIME_PAUSED) {
-            Sleep(5u);
-            continue;
         }
         Sleep(5u);
     }
-    result = app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED ?
-        SOFTPC_VM_FRONTEND_PAUSED : SOFTPC_VM_FRONTEND_STOPPED;
-done:
-    app_presentation_destroy_components(&context);
+    app_presentation_destroy(component);
     return result;
 }
+#endif
 #endif

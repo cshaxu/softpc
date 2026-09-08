@@ -20,6 +20,32 @@ typedef enum ux_event_type {
 #define UX_HOTKEY_IDENTIFIER_CAPACITY 64u
 
 enum {
+    /* Neutral terminal key identities.  These describe input only; registered
+     * hotkey interpretation remains an application concern. */
+    UX_KEY_F1 = 0x00010001u,
+    UX_KEY_F2 = 0x00010002u,
+    UX_KEY_F3 = 0x00010003u,
+    UX_KEY_F4 = 0x00010004u,
+    UX_KEY_F5 = 0x00010005u,
+    UX_KEY_F6 = 0x00010006u,
+    UX_KEY_F7 = 0x00010007u,
+    UX_KEY_F8 = 0x00010008u,
+    UX_KEY_F9 = 0x00010009u,
+    UX_KEY_F10 = 0x0001000au,
+    UX_KEY_F11 = 0x0001000bu,
+    UX_KEY_F12 = 0x0001000cu,
+    UX_KEY_ENTER = 0x00020001u,
+    UX_KEY_BACKSPACE = 0x00020002u,
+    UX_KEY_UP = 0x00020003u,
+    UX_KEY_DOWN = 0x00020004u,
+    UX_KEY_LEFT = 0x00020005u,
+    UX_KEY_RIGHT = 0x00020006u,
+    UX_KEY_HOME = 0x00020007u,
+    UX_KEY_END = 0x00020008u,
+    UX_KEY_PAGE_UP = 0x00020009u,
+    UX_KEY_PAGE_DOWN = 0x0002000au,
+    UX_KEY_INSERT = 0x0002000bu,
+    UX_KEY_DELETE = 0x0002000cu,
     UX_MOUSE_BUTTON_LEFT = 0x01u,
     UX_MOUSE_BUTTON_RIGHT = 0x02u,
     UX_MOUSE_BUTTON_MIDDLE = 0x04u

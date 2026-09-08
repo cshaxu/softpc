@@ -26,6 +26,7 @@ if(WIN32)
     list(APPEND LIBRARY_UX_BASE_SOURCES
         ux-base/win32/mailbox.c
         ux-base/win32/color.c
+        ux-base/win32/actions.c
         ux-base/win32/input.c)
 else()
     list(APPEND LIBRARY_UX_BASE_SOURCES ux-base/linux/mailbox.c)

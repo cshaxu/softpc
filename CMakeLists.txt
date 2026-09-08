@@ -452,7 +452,8 @@ add_executable(softpc-win32-window-smoke
     src/app/control.c
     src/app/monitor.c
     src/app/prompt_trace.c
-    src/app/presentation.c)
+    src/app/presentation.c
+    src/app/presentation_plan.c)
 target_link_libraries(softpc-win32-window-smoke PRIVATE softpc-machine)
 target_link_libraries(softpc-win32-window-smoke PRIVATE ux host-sync
     storage-medium)
@@ -484,6 +485,7 @@ add_executable(softpc-presentation-plan-smoke
     test/unit/presentation_plan_smoke.c
     src/app/presentation_plan.c)
 target_include_directories(softpc-presentation-plan-smoke PRIVATE src/app src/host)
+target_include_directories(softpc-presentation-plan-smoke PRIVATE src)
 add_test(NAME softpc-presentation-plan-smoke
     COMMAND softpc-presentation-plan-smoke)
 set_tests_properties(softpc-presentation-plan-smoke PROPERTIES

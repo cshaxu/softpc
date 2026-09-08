@@ -1,7 +1,6 @@
 #ifndef UX_LINUX_INPUT_H
 #define UX_LINUX_INPUT_H
 
-#include "lib/ux-base/actions.h"
 #include "lib/ux-base/event.h"
 
 typedef enum ux_linux_key {

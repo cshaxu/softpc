@@ -75,8 +75,8 @@ int main(void)
     assert(app_runtime_published_frame_sequence(runtime) == frame->sequence);
     assert(frame->sequence != 0u);
     /* Runtime owns copied frame production only.  Component existence and
-       Console/Window selection now belong to app_presentation_run(), not a
-       shared UX target router. */
+       Console/Window selection belong to the app presentation reconciler,
+       not a shared UX target router. */
     {
         ux_input_event hotkey = { 0 };
         hotkey.type = UX_EVENT_HOTKEY;

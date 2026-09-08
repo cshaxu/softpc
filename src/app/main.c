@@ -209,61 +209,37 @@ static void app_monitor_help(app_monitor_console *monitor)
         "Raw VM Console hotkeys: Ctrl+Alt+P/D/F/M\r\n");
 }
 
-typedef struct app_frontend {
-    app_runtime *runtime;
-    softpc_presentation presentation;
-    int console_control;
-    app_monitor_console *monitor;
-    app_control_queue *control_queue;
-    HANDLE thread;
-    int result;
-} app_frontend;
-
-static DWORD WINAPI app_frontend_run(void *opaque)
-{
-    app_frontend *frontend = (app_frontend *)opaque;
-    frontend->result = app_presentation_run(frontend->runtime,
-        frontend->presentation, frontend->console_control, frontend->monitor,
-        frontend->control_queue);
-    return 0u;
-}
-
-static int app_frontend_start(app_frontend *frontend)
-{
-    if (frontend->thread != NULL) return 1;
-    frontend->result = SOFTPC_VM_FRONTEND_ERROR;
-    frontend->thread = CreateThread(NULL, 0u, app_frontend_run, frontend, 0u,
-        NULL);
-    return frontend->thread != NULL;
-}
-
-static int app_frontend_reap(app_frontend *frontend, app_monitor_state *state,
-    app_monitor_console *monitor)
-{
-    if (frontend->thread == NULL ||
-        WaitForSingleObject(frontend->thread, 0u) != WAIT_OBJECT_0) return 1;
-    CloseHandle(frontend->thread);
-    frontend->thread = NULL;
-    if (frontend->result == SOFTPC_VM_FRONTEND_ERROR) return 0;
-    *state = app_runtime_get_state(frontend->runtime) == SOFTPC_RUNTIME_PAUSED ?
-        SOFTPC_MONITOR_PAUSED : SOFTPC_MONITOR_STOPPED;
-    app_monitor_console_write(monitor, *state == SOFTPC_MONITOR_PAUSED ?
-        "Machine paused.\r\n" : "Machine stopped.\r\n");
-    return 1;
-}
-
-static int app_monitor_start(app_runtime *runtime, app_frontend *frontend,
-    app_monitor_state *state, int reset)
+static int app_monitor_start(app_runtime *runtime,
+    app_presentation *presentation, app_monitor_state *state, int reset)
 {
     if (reset || *state == SOFTPC_MONITOR_STOPPED) {
         if (!app_runtime_start(runtime)) return 0;
-    } else if (!app_runtime_resume(runtime)) return 0;
-    if (!app_frontend_start(frontend)) {
-        (void)app_runtime_stop(runtime);
-        return 0;
+    } else {
+        /* The reconciler must establish the resumed component set and raw
+         * Current Console before the VM resumes. */
+        if (!app_presentation_prepare_resume(presentation) ||
+            !app_runtime_resume(runtime)) return 0;
     }
+    if (!app_presentation_reconcile(presentation)) return 0;
     *state = SOFTPC_MONITOR_RUNNING;
     return 1;
+}
+
+/* Product hotkey interpretation lives with the control/reconciler.  The UX
+ * leaf has already converted a matching chord into a copied identifier; the
+ * control path alone decides its lifecycle effect and preserves the resume
+ * ordering required by the Console-object contract. */
+static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
+    app_presentation *presentation, const ux_input_event *event)
+{
+    if (event != NULL && event->type == UX_EVENT_HOTKEY &&
+        strcmp(event->data.hotkey.identifier, "pause-toggle") == 0) {
+        if (app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED)
+            return app_presentation_prepare_resume(presentation) &&
+                app_runtime_resume(runtime);
+        return app_runtime_pause(runtime);
+    }
+    return app_control_handle_ux(queue, runtime, event);
 }
 
 static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
@@ -272,10 +248,11 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
 {
     char line[SOFTPC_CONFIG_PATH_MAX + 64u];
     app_monitor_state state = SOFTPC_MONITOR_STOPPED;
-    app_frontend frontend = { runtime, presentation, console_control, monitor,
-        control_queue, NULL, SOFTPC_VM_FRONTEND_ERROR };
+    app_presentation *presenter = NULL;
 
     int prompt_pending = 0;
+    if (!app_presentation_create(&presenter, runtime, presentation,
+            console_control, monitor, control_queue)) return 1;
     app_monitor_help(monitor);
     prompt_pending = 1;
     for (;;) {
@@ -287,9 +264,10 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
             app_control_event control_event;
             if (app_control_queue_take(control_queue, &control_event, 100u)) {
                 if (control_event.kind == APP_CONTROL_UX_INPUT) {
-                    if (!app_control_handle_ux(control_queue, runtime,
+                    if (!app_monitor_handle_ux(control_queue, runtime, presenter,
                             &control_event.value.ux))
-                        return 1;
+                        goto failed;
+                    if (!app_presentation_reconcile(presenter)) goto failed;
                     continue;
                 }
                 if (control_event.kind == APP_CONTROL_MONITOR_LINE) {
@@ -313,9 +291,9 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
             }
             if (prompt_pending && app_monitor_console_write(monitor, "SoftPC> "))
                 prompt_pending = 0;
-            if (!app_frontend_reap(&frontend, &state, monitor)) return 1;
+            if (!app_presentation_reconcile(presenter)) goto failed;
         }
-        if (!app_frontend_reap(&frontend, &state, monitor)) return 1;
+        if (!app_presentation_reconcile(presenter)) goto failed;
         command = app_trim(line);
         argument = command;
         while (*argument != '\0' && !isspace((unsigned char)*argument))
@@ -329,29 +307,30 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
         if (strcmp(command, "help") == 0) app_monitor_help(monitor);
         else if (strcmp(command, "exit") == 0) {
             (void)app_runtime_stop(runtime);
-            if (frontend.thread != NULL) {
-                (void)WaitForSingleObject(frontend.thread, INFINITE);
-                CloseHandle(frontend.thread);
-            }
+            (void)app_presentation_reconcile(presenter);
+            app_presentation_destroy(presenter);
             return 0;
         }
         else if (strcmp(command, "start") == 0) {
-            if (!app_monitor_start(runtime, &frontend, &state, 0)) return 1;
+            if (!app_monitor_start(runtime, presenter, &state, 0)) goto failed;
         } else if (strcmp(command, "resume") == 0) {
             if (state != SOFTPC_MONITOR_PAUSED)
                 app_monitor_console_write(monitor, "Machine is not paused.\r\n");
-            else if (!app_monitor_start(runtime, &frontend, &state, 0)) return 1;
+            else if (!app_monitor_start(runtime, presenter, &state, 0)) goto failed;
         } else if (strcmp(command, "pause") == 0) {
             if (state == SOFTPC_MONITOR_PAUSED)
                 app_monitor_console_write(monitor, "Machine is paused.\r\n");
-            else if (!app_runtime_pause(runtime)) return 1;
+            else if (!app_runtime_pause(runtime) ||
+                !app_presentation_reconcile(presenter)) goto failed;
         } else if (strcmp(command, "stop") == 0) {
-            if (!app_runtime_stop(runtime)) return 1;
+            if (!app_runtime_stop(runtime) ||
+                !app_presentation_reconcile(presenter)) goto failed;
             state = SOFTPC_MONITOR_STOPPED;
             app_monitor_console_write(monitor, "Machine stopped.\r\n");
         } else if (strcmp(command, "reset") == 0) {
             if (!app_runtime_stop(runtime) || !app_runtime_start(runtime) ||
-                !app_runtime_pause(runtime)) return 1;
+                !app_runtime_pause(runtime) ||
+                !app_presentation_reconcile(presenter)) goto failed;
             state = SOFTPC_MONITOR_PAUSED;
             app_monitor_console_write(monitor, "Machine reset and pause requested.\r\n");
         } else if (strcmp(command, "floppy") == 0) {
@@ -375,6 +354,9 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
         } else app_monitor_console_write(monitor, "Unknown command.\r\n");
         app_monitor_console_write(monitor, "\r\n");
     }
+failed:
+    app_presentation_destroy(presenter);
+    return 1;
 }
 
 int main(int argc, char **argv)
