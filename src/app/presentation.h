@@ -29,7 +29,7 @@ app_reconciler_action app_presentation_take_runtime_action(
 void app_presentation_note_runtime_completed(app_presentation *presentation,
     app_runtime_state state);
 void app_presentation_note_frame_completed(app_presentation *presentation,
-    int graphics);
+    uint32_t sequence, int graphics);
 void app_presentation_note_component_completed(app_presentation *presentation,
     app_control_component_kind component, int exists);
 void app_presentation_note_broker_completed(app_presentation *presentation,

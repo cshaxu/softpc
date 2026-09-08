@@ -323,6 +323,7 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                 }
                 else if (control_event.kind == APP_CONTROL_FRAME_COMPLETED)
                     app_presentation_note_frame_completed(presenter,
+                        control_event.value.frame.sequence,
                         control_event.value.frame.graphics);
                 else if (control_event.kind == APP_CONTROL_COMPONENT_COMPLETED)
                     app_presentation_note_component_completed(presenter,

@@ -27,6 +27,7 @@ struct app_presentation {
     int close_requested;
     uint32_t displayed_run_generation;
     uint32_t observed_frame_sequence;
+    uint32_t delivered_frame_sequence;
     app_runtime_frame observed_frame;
     app_reconciler reducer;
     app_reconciler_action pending_runtime_action;
@@ -38,7 +39,7 @@ static void app_presentation_publish_title(app_presentation_context *context)
 {
     if (context == NULL || context->window == NULL) return;
     (void)ux_window_set_title(context->window,
-        app_runtime_get_state(context->runtime) == SOFTPC_RUNTIME_PAUSED ?
+        context->displayed_state == SOFTPC_RUNTIME_PAUSED ?
             "Insignia SoftPC (Paused)" : "Insignia SoftPC (Running)");
 }
 
@@ -71,7 +72,7 @@ static int app_presentation_create_window(app_presentation_context *context)
     if (ux_window_create(&context->window, &options) != LIB_STATUS_OK)
         return 0;
     app_presentation_publish_title(context);
-    if (app_runtime_get_state(context->runtime) == SOFTPC_RUNTIME_RUNNING)
+    if (context->displayed_state == SOFTPC_RUNTIME_RUNNING)
         (void)ux_window_enable_mouse(context->window);
     return 1;
 }
@@ -219,11 +220,32 @@ void app_presentation_destroy(app_presentation *presentation)
 
 void app_presentation_note_runtime_completed(app_presentation *presentation,
     app_runtime_state state)
-{ if (presentation != NULL) app_reconciler_note_runtime(&presentation->reducer, state); }
+{
+    if (presentation == NULL) return;
+    presentation->displayed_state = state;
+    app_presentation_publish_title(presentation);
+    if (presentation->window != NULL) {
+        if (state == SOFTPC_RUNTIME_RUNNING)
+            (void)ux_window_enable_mouse(presentation->window);
+        else if (state == SOFTPC_RUNTIME_PAUSED)
+            (void)ux_window_disable_mouse(presentation->window);
+    }
+    app_reconciler_note_runtime(&presentation->reducer, state);
+}
 
 void app_presentation_note_frame_completed(app_presentation *presentation,
-    int graphics)
-{ if (presentation != NULL) app_reconciler_note_frame(&presentation->reducer, graphics); }
+    uint32_t sequence, int graphics)
+{
+    uint32_t run_generation;
+    if (presentation == NULL || sequence == 0u ||
+        sequence <= presentation->observed_frame_sequence) return;
+    if (!app_runtime_copy_published_frame(presentation->runtime,
+            &presentation->observed_frame, &run_generation) ||
+        presentation->observed_frame.sequence != sequence) return;
+    (void)run_generation;
+    presentation->observed_frame_sequence = sequence;
+    app_reconciler_note_frame(&presentation->reducer, graphics);
+}
 
 void app_presentation_note_component_completed(app_presentation *presentation,
     app_control_component_kind component, int exists)
@@ -261,29 +283,7 @@ app_reconciler_action app_presentation_take_runtime_action(
 
 int app_presentation_reconcile(app_presentation *context)
 {
-    app_runtime_state state;
-    uint32_t sequence;
-    int frame_changed = 0;
-
     if (context == NULL) return 0;
-    state = app_runtime_get_state(context->runtime);
-    if (context->displayed_run_generation !=
-        app_runtime_run_generation(context->runtime)) {
-        context->displayed_run_generation = app_runtime_run_generation(context->runtime);
-        context->close_requested = 0;
-        context->observed_frame_sequence = 0u;
-        memset(&context->observed_frame, 0, sizeof(context->observed_frame));
-    }
-    if (state != context->displayed_state) {
-        context->displayed_state = state;
-        app_presentation_publish_title(context);
-        if (context->window != NULL) {
-                if (state == SOFTPC_RUNTIME_RUNNING)
-                    (void)ux_window_enable_mouse(context->window);
-                else if (state == SOFTPC_RUNTIME_PAUSED)
-                    (void)ux_window_disable_mouse(context->window);
-        }
-    }
     if (app_runtime_take_window_mouse_release(context->runtime) &&
         context->window != NULL)
         (void)ux_window_release_mouse(context->window);
@@ -292,20 +292,15 @@ int app_presentation_reconcile(app_presentation *context)
         app_reconciler_note_intent(&context->reducer,
             APP_RECONCILER_INTENT_WINDOW_CLOSE);
     }
-    sequence = app_runtime_published_frame_sequence(context->runtime);
-    if (sequence != 0u && sequence != context->observed_frame_sequence &&
-        app_runtime_copy_published_frame(context->runtime,
-            &context->observed_frame, &sequence) &&
-        sequence == context->displayed_run_generation) {
-        context->observed_frame_sequence = context->observed_frame.sequence;
-        frame_changed = 1;
-    }
     /* Component and broker actual state only arrives through their completion
      * records.  A non-NULL local handle means merely that a request was
      * issued; treating it as actual here reintroduces a second control path. */
     if (!app_presentation_apply_next_action(context)) return 0;
-    if (frame_changed && !app_presentation_publish(context,
-            &context->observed_frame)) return 0;
+    if ((context->window != NULL || context->console != NULL) &&
+        context->observed_frame_sequence != 0u &&
+        context->observed_frame_sequence != context->delivered_frame_sequence &&
+        !app_presentation_publish(context, &context->observed_frame)) return 0;
+    context->delivered_frame_sequence = context->observed_frame_sequence;
     return 1;
 }
 
