@@ -23,7 +23,11 @@ struct app_presentation {
     ux_hotkey_registry hotkeys;
     app_runtime_state displayed_state;
     uint32_t observed_frame_sequence;
-    uint32_t delivered_frame_sequence;
+    /* Delivery is a property of an individual output object.  A recreated
+     * Window/Console must receive the last completed frame even when the VM
+     * has not published a newer sequence. */
+    uint32_t window_delivered_frame_sequence;
+    uint32_t console_delivered_frame_sequence;
     app_runtime_frame observed_frame;
     app_reconciler reducer;
     app_reconciler_action pending_runtime_action;
@@ -78,6 +82,7 @@ static int app_presentation_create_window(app_presentation_context *context)
     options.hotkeys = context->hotkeys;
     if (ux_window_create(&context->window, &options) != LIB_STATUS_OK)
         return 0;
+    context->window_delivered_frame_sequence = 0u;
     app_presentation_publish_title(context);
     if (context->displayed_state == SOFTPC_RUNTIME_RUNNING)
         (void)ux_window_enable_mouse(context->window);
@@ -94,7 +99,10 @@ static int app_presentation_create_console(app_presentation_context *context)
     options.failure_context = context;
     options.failure_sink = app_presentation_delivery_failed;
     options.hotkeys = context->hotkeys;
-    return ux_console_create(&context->console, &options) == LIB_STATUS_OK;
+    if (ux_console_create(&context->console, &options) != LIB_STATUS_OK)
+        return 0;
+    context->console_delivered_frame_sequence = 0u;
+    return 1;
 }
 
 static void app_presentation_destroy_components(app_presentation_context *context)
@@ -112,6 +120,8 @@ static void app_presentation_destroy_components(app_presentation_context *contex
         ux_console_destroy(context->console);
     context->window = NULL;
     context->console = NULL;
+    context->window_delivered_frame_sequence = 0u;
+    context->console_delivered_frame_sequence = 0u;
 }
 
 static int app_presentation_apply_next_action(app_presentation_context *context)
@@ -159,6 +169,7 @@ static int app_presentation_apply_next_action(app_presentation_context *context)
     case APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE:
         ux_console_destroy(context->console);
         context->console = NULL;
+        context->console_delivered_frame_sequence = 0u;
         context->vm_console_current = 0;
         return app_control_queue_push_component_completed(context->control_queue,
             APP_CONTROL_COMPONENT_VM_CONSOLE, 0,
@@ -166,6 +177,7 @@ static int app_presentation_apply_next_action(app_presentation_context *context)
     case APP_RECONCILER_ACTION_DESTROY_WINDOW:
         ux_window_destroy(context->window);
         context->window = NULL;
+        context->window_delivered_frame_sequence = 0u;
         return app_control_queue_push_component_completed(context->control_queue,
             APP_CONTROL_COMPONENT_WINDOW, 0,
             app_runtime_run_generation(context->runtime));
@@ -213,11 +225,17 @@ static int app_presentation_publish(app_presentation_context *context,
     if (context->reducer.vm_console_actual &&
         context->reducer.current_console_actual == APP_RECONCILER_CONSOLE_VM &&
         context->console != NULL &&
-        ux_console_publish_frame(context->console, console_frame) !=
+        context->console_delivered_frame_sequence != frame->sequence) {
+        if (ux_console_publish_frame(context->console, console_frame) !=
             LIB_STATUS_OK) return 0;
+        context->console_delivered_frame_sequence = frame->sequence;
+    }
     if (context->reducer.window_actual && context->window != NULL &&
-        ux_window_publish_frame(context->window, frame) !=
-            LIB_STATUS_OK) return 0;
+        context->window_delivered_frame_sequence != frame->sequence) {
+        if (ux_window_publish_frame(context->window, frame) != LIB_STATUS_OK)
+            return 0;
+        context->window_delivered_frame_sequence = frame->sequence;
+    }
     return 1;
 }
 
@@ -347,11 +365,8 @@ int app_presentation_reconcile(app_presentation *context)
      * issued; treating it as actual here reintroduces a second control path. */
     if (!app_presentation_apply_next_action(context)) return 0;
     if (context->observed_frame_sequence != 0u &&
-        context->observed_frame_sequence != context->delivered_frame_sequence &&
-        app_presentation_frame_targets_ready(context)) {
-        if (!app_presentation_publish(context, &context->observed_frame)) return 0;
-        context->delivered_frame_sequence = context->observed_frame_sequence;
-    }
+        app_presentation_frame_targets_ready(context) &&
+        !app_presentation_publish(context, &context->observed_frame)) return 0;
     return 1;
 }
 
