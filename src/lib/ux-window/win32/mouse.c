@@ -7,7 +7,6 @@ void ux_win32_mouse_reset(ux_win32_mouse *mouse)
     mouse->x = 0;
     mouse->y = 0;
     mouse->valid = 0;
-    mouse->cursor_hide_count = 0u;
     ux_capture_initialize(&mouse->capture);
 }
 
@@ -16,10 +15,6 @@ void ux_win32_mouse_release(ux_win32_mouse *mouse)
     if (mouse == NULL || !ux_capture_is_active(&mouse->capture)) return;
     ClipCursor(NULL);
     ReleaseCapture();
-    while (mouse->cursor_hide_count != 0u) {
-        (void)ShowCursor(TRUE);
-        --mouse->cursor_hide_count;
-    }
     SetCursor(LoadCursorA(NULL, IDC_ARROW));
     ux_capture_release(&mouse->capture);
     mouse->valid = 0;
@@ -56,14 +51,6 @@ int ux_win32_mouse_capture(ux_win32_mouse *mouse,
         ReleaseCapture();
         return 0;
     }
-    /* SetCursor(NULL) alone is only a one-shot shape choice: later native
-       cursor resolution may replace it with the class cursor.  Hide the host
-       cursor for the entire capture lifetime and retain the exact balancing
-       count needed to restore the thread's prior visibility on release. */
-    do {
-        ++mouse->cursor_hide_count;
-    } while (ShowCursor(FALSE) >= 0);
-    SetCursor(NULL);
     mouse->x = (int)(short)LOWORD(position);
     mouse->y = (int)(short)HIWORD(position);
     mouse->valid = 1;
