@@ -12,6 +12,7 @@ struct ux_component {
     void *input_context;
     ux_input_sink input_sink;
     ux_hotkey_matcher hotkey_matcher;
+    lib_u64 source_identity;
     atomic_int stopping;
     ux_component_native_stop_fn native_stop;
     ux_component_dispose_fn dispose;

@@ -99,6 +99,14 @@ lib_status host_console_replace_active(host_console_broker *broker,
     old = broker->current;
     next_generation = broker->generation + 1u;
     next = lib_console_retain(next_console);
+    /* A failed next binding must leave the old native reader wholly active.
+     * This is the non-disruptive phase of the replacement transaction. */
+    status = host_console_native_prepare(broker->native_console, next, next_mode);
+    if (status != LIB_STATUS_OK) {
+        lib_console_release(next);
+        host_console_unlock(broker);
+        return status;
+    }
     host_console_native_deactivate(broker->native_console);
     (void)lib_console_bind_generation(old, 0u);
     (void)lib_console_set_output_sink(old, LIB_NULL, LIB_NULL);

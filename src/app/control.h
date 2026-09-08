@@ -14,6 +14,9 @@ typedef enum app_control_event_kind {
 
 typedef struct app_control_event {
     app_control_event_kind kind;
+    /* Zero is monitor/local input.  UX producers stamp the currently active
+     * machine run so a queued old input cannot affect a later start. */
+    uint32_t run_generation;
     union {
         ux_input_event ux;
         lib_console_line line;
@@ -24,6 +27,8 @@ int app_control_queue_create(app_control_queue **out_queue);
 void app_control_queue_destroy(app_control_queue *queue);
 int app_control_queue_push_ux(app_control_queue *queue,
     const ux_input_event *event);
+int app_control_queue_push_ux_for_run(app_control_queue *queue,
+    const ux_input_event *event, uint32_t run_generation);
 int app_control_queue_push_monitor_line(app_control_queue *queue,
     const lib_console_line *line);
 int app_control_queue_take(app_control_queue *queue,

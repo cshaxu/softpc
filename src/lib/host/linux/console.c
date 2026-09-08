@@ -9,6 +9,9 @@ lib_status host_console_native_create(host_console_native **out_native)
 }
 void host_console_native_destroy(host_console_native *native_console)
 { (void)native_console; }
+lib_status host_console_native_prepare(host_console_native *native_console,
+    lib_console *console, host_console_mode mode)
+{ (void)native_console; (void)console; (void)mode; return LIB_STATUS_UNSUPPORTED; }
 lib_status host_console_native_activate(host_console_native *native_console,
     lib_console *console, host_console_mode mode, lib_u32 generation)
 { (void)native_console; (void)console; (void)mode; (void)generation; return LIB_STATUS_UNSUPPORTED; }

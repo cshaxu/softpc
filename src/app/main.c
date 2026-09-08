@@ -264,6 +264,13 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
             app_control_event control_event;
             if (app_control_queue_take(control_queue, &control_event, 100u)) {
                 if (control_event.kind == APP_CONTROL_UX_INPUT) {
+                    /* A component can have queued an event just before an
+                     * old VM run stopped.  It belongs to that run, never to
+                     * a later start which happens to reuse the same UI. */
+                    if (control_event.run_generation != 0u &&
+                        control_event.run_generation !=
+                            app_runtime_run_generation(runtime))
+                        continue;
                     if (!app_monitor_handle_ux(control_queue, runtime, presenter,
                             &control_event.value.ux))
                         goto failed;

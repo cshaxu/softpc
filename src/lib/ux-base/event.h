@@ -55,6 +55,10 @@ typedef struct ux_input_event {
     /* Borrowed opaque component handle. It is for lifetime tracing only;
      * product action policy never branches on input source. */
     const void *source;
+    /* Monotonic instance identity.  Unlike the borrowed address above this
+     * value remains unambiguous after the component has been retired and its
+     * storage can be reused.  Consumers use it only for lifetime hygiene. */
+    lib_u64 source_identity;
     ux_event_type type;
     union {
         struct {
@@ -94,9 +98,12 @@ typedef int (*ux_input_sink)(void *context, const ux_input_event *event);
 typedef ux_input_sink ux_event_sink;
 
 static inline void ux_input_event_set_source(ux_input_event *event,
-    const void *source)
+    const void *source, lib_u64 source_identity)
 {
-    if (event != LIB_NULL) event->source = source;
+    if (event != LIB_NULL) {
+        event->source = source;
+        event->source_identity = source_identity;
+    }
 }
 
 #endif

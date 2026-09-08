@@ -38,8 +38,9 @@ static void app_presentation_publish_title(app_presentation_context *context)
 static int app_presentation_guest_input(void *opaque, const ux_event *event)
 {
     app_presentation_context *context = (app_presentation_context *)opaque;
-    return context != NULL && app_control_queue_push_ux(context->control_queue,
-        event);
+    return context != NULL && app_control_queue_push_ux_for_run(
+        context->control_queue, event,
+        app_runtime_run_generation(context->runtime));
 }
 
 /* One app-owned queue sink for Window and VM-Console events.  The source

@@ -151,6 +151,19 @@ void host_console_native_destroy(host_console_native *native_console)
     free(native_console);
 }
 
+lib_status host_console_native_prepare(host_console_native *native_console,
+    lib_console *console, host_console_mode mode)
+{
+    DWORD ignored;
+    if (native_console == LIB_NULL || console == LIB_NULL ||
+        (mode != HOST_CONSOLE_RAW_EVENTS && mode != HOST_CONSOLE_COOKED_LINES))
+        return LIB_STATUS_INVALID_ARGUMENT;
+    return native_console->input == INVALID_HANDLE_VALUE ||
+        native_console->output == INVALID_HANDLE_VALUE ||
+        !GetConsoleMode(native_console->input, &ignored) ? LIB_STATUS_IO_ERROR :
+        LIB_STATUS_OK;
+}
+
 lib_status host_console_native_activate(host_console_native *native_console,
     lib_console *console, host_console_mode mode, lib_u32 generation)
 {

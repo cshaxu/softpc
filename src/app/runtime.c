@@ -52,6 +52,7 @@ struct app_runtime {
     host_sync_event *media_event;
     host_sync_task *worker;
     volatile LONG state;
+    volatile LONG run_generation;
     volatile LONG result;
     volatile LONG pause_requested;
     volatile LONG stop_requested;
@@ -444,6 +445,7 @@ int app_runtime_start(app_runtime *runtime)
     InterlockedExchange(&runtime->stop_requested, 0);
     InterlockedExchange(&runtime->result, SOFTPC_MACHINE_IO_ERROR);
     InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_STARTING);
+    (void)InterlockedIncrement(&runtime->run_generation);
     InterlockedExchange(&runtime->start_requested, 1);
     host_sync_event_signal(runtime->command_event);
     (void)host_sync_event_wait(runtime->ready_event, UINT32_MAX);
@@ -587,6 +589,12 @@ int app_runtime_copy_frame(app_runtime *runtime,
 uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime)
 {
     return runtime == NULL ? 0u : runtime->published_frame_sequence;
+}
+
+uint32_t app_runtime_run_generation(const app_runtime *runtime)
+{
+    return runtime == NULL ? 0u : (uint32_t)InterlockedCompareExchange(
+        (volatile LONG *)&runtime->run_generation, 0, 0);
 }
 
 int app_runtime_take_window_close(app_runtime *runtime)

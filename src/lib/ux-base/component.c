@@ -1,5 +1,7 @@
 #include "lib/ux-base/internal/component.h"
 
+static atomic_uint_fast64_t ux_component_next_source_identity = 1u;
+
 lib_status ux_component_initialize(ux_component *component,
     const ux_component_options *options, ux_component_native_stop_fn native_stop,
     ux_component_dispose_fn dispose)
@@ -10,6 +12,8 @@ lib_status ux_component_initialize(ux_component *component,
     component->input_sink = options->input_sink;
     component->native_stop = native_stop;
     component->dispose = dispose;
+    component->source_identity = atomic_fetch_add_explicit(
+        &ux_component_next_source_identity, 1u, memory_order_relaxed);
     ux_hotkey_matcher_initialize(&component->hotkey_matcher, &options->hotkeys);
     atomic_init(&component->stopping, 0);
     return ux_component_mailboxes_create(&component->mailboxes);
@@ -21,7 +25,7 @@ int ux_component_emit(ux_component *component, const ux_input_event *event)
     if (component == LIB_NULL || event == LIB_NULL || component->input_sink == LIB_NULL ||
         atomic_load_explicit(&component->stopping, memory_order_acquire) != 0) return 0;
     copied = *event;
-    ux_input_event_set_source(&copied, component);
+    ux_input_event_set_source(&copied, component, component->source_identity);
     return ux_hotkey_matcher_submit(&component->hotkey_matcher, &copied,
         component->input_sink, component->input_context);
 }
@@ -31,7 +35,7 @@ void ux_component_emit_source_retired(ux_component *component)
     ux_input_event event = { 0 };
     if (component == LIB_NULL || component->input_sink == LIB_NULL) return;
     event.type = UX_EVENT_SOURCE_RETIRED;
-    ux_input_event_set_source(&event, component);
+    ux_input_event_set_source(&event, component, component->source_identity);
     (void)component->input_sink(component->input_context, &event);
 }
 

@@ -31,6 +31,7 @@ int main(void)
     softpc_machine *machine = NULL;
     app_runtime *runtime = NULL;
     app_runtime_frame *frame;
+    uint32_t first_run;
 
     options.media_mode = SOFTPC_MEDIA_OVERLAY;
     sector[0] = 0xebu;
@@ -45,6 +46,8 @@ int main(void)
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(app_runtime_create(machine, &runtime));
     assert(app_runtime_start(runtime));
+    first_run = app_runtime_run_generation(runtime);
+    assert(first_run != 0u);
     Sleep(150u);
     frame = (app_runtime_frame *)calloc(1u, sizeof(*frame));
     assert(frame != NULL);
@@ -101,6 +104,7 @@ int main(void)
     assert(app_runtime_stop(runtime));
     assert(app_runtime_get_state(runtime) == SOFTPC_RUNTIME_STOPPED);
     assert(app_runtime_start(runtime));
+    assert(app_runtime_run_generation(runtime) != first_run);
     assert(app_runtime_stop(runtime));
     assert(app_runtime_set_floppy(runtime, NULL));
     free(frame);
