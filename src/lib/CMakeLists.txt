@@ -17,18 +17,6 @@ endfunction()
 add_library(base-console STATIC base/console.c)
 library_root(base-console)
 
-add_library(ux-base STATIC ux-base/input.c ux-base/mailbox.c)
-library_root(ux-base)
-target_link_libraries(ux-base PUBLIC base-console)
-
-add_library(ux-window STATIC ux-window/window.c)
-library_root(ux-window)
-target_link_libraries(ux-window PUBLIC ux-base)
-
-add_library(ux-console STATIC ux-console/console.c)
-library_root(ux-console)
-target_link_libraries(ux-console PUBLIC ux-base base-console)
-
 set(LIBRARY_UX_SOURCES
     ux/actions.c
     ux/linux/input.c
@@ -84,8 +72,7 @@ endif()
 # This build-only aggregate does not create a library-root dependency. Each
 # peer root remains independently compilable and depends only on `base`.
 add_library(lib-neutral-corpus INTERFACE)
-target_link_libraries(lib-neutral-corpus INTERFACE
-    base-console ux-base ux-window ux-console ux host-sync storage-medium)
+target_link_libraries(lib-neutral-corpus INTERFACE base-console ux host-sync storage-medium)
 
 add_custom_target(lib-verify-manifest
     COMMAND "${CMAKE_COMMAND}" -DLIBRARY_ROOT:PATH=${CMAKE_CURRENT_LIST_DIR}
