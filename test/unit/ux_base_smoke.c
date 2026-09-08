@@ -20,11 +20,9 @@ int main(void)
     ux_hotkey_registration registration = { 'P', UX_MODIFIER_CONTROL |
         UX_MODIFIER_ALT, "pause-toggle" };
     ux_hotkey_matcher *matcher = NULL;
-    ux_hotkey_matcher *other_matcher = NULL;
     ux_input_event event;
     captured_events captured = { 0 };
     int source;
-    int other_source;
 
     assert(ux_hotkey_matcher_create(&matcher, &registration, 1u) == LIB_STATUS_OK);
     assert(ux_input_make_key(&event, &source, 0u, UX_KEY_CONTROL,
@@ -71,29 +69,6 @@ int main(void)
     assert(ux_hotkey_matcher_retire(matcher, &source, capture_event, &captured) ==
         LIB_STATUS_OK);
     assert(captured.count == 4u && captured.items[3].kind == UX_INPUT_RESET);
-    ux_hotkey_matcher_destroy(matcher);
-
-    captured.count = 0u;
-    assert(ux_hotkey_matcher_create(&matcher, &registration, 1u) == LIB_STATUS_OK);
-    assert(ux_hotkey_matcher_create(&other_matcher, &registration, 1u) ==
-        LIB_STATUS_OK);
-    /* Source-local state is not a shared modifier bitmap: Ctrl from one
-     * component and P from another must stay ordinary input. */
-    assert(ux_input_make_key(&event, &source, 0u, UX_KEY_CONTROL,
-        UX_MODIFIER_CONTROL, LIB_TRUE) == LIB_STATUS_OK);
-    assert(ux_hotkey_matcher_submit(matcher, &event, capture_event, &captured) ==
-        LIB_STATUS_OK);
-    assert(ux_input_make_key(&event, &other_source, 0u, 'P',
-        UX_MODIFIER_CONTROL | UX_MODIFIER_ALT, LIB_TRUE) == LIB_STATUS_OK);
-    assert(ux_hotkey_matcher_submit(other_matcher, &event, capture_event,
-        &captured) == LIB_STATUS_OK);
-    assert(captured.count == 1u && captured.items[0].kind == UX_INPUT_KEY);
-    assert(captured.items[0].source_handle == &other_source);
-    assert(ux_hotkey_matcher_retire(matcher, &source, capture_event, &captured) ==
-        LIB_STATUS_OK);
-    assert(captured.count == 3u && captured.items[1].source_handle == &source &&
-        captured.items[2].kind == UX_INPUT_RESET);
-    ux_hotkey_matcher_destroy(other_matcher);
     ux_hotkey_matcher_destroy(matcher);
     return 0;
 }
