@@ -19,6 +19,7 @@ library_root(base-console)
 
 set(LIBRARY_UX_SOURCES
     ux-base/actions.c
+    ux-base/hotkey.c
     ux-base/mailbox.c
     ux-base/linux/input.c
     ux/presenter.c)
