@@ -16,7 +16,6 @@
 #define WIN32_WINDOW_TEXT_CELL_HEIGHT 16u
 #define WIN32_WINDOW_MAILBOX_READY (WM_APP + 1u)
 #define WIN32_WINDOW_MOUSE_READY (WM_APP + 2u)
-#define WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS 250u
 
 typedef struct ux_win32_window_context {
     ux_window *component;
@@ -42,8 +41,6 @@ typedef struct ux_win32_window_context {
     uint32_t client_surface_height;
     int client_width;
     int client_height;
-    int cursor_blink_visible;
-    DWORD cursor_blink_due;
     lib_bool mouse_capturable;
 } ux_win32_window_context;
 
@@ -295,38 +292,9 @@ static void win32_window_paint(HWND window, ux_win32_window_context *context,
     StretchBlt(dc, display.left, display.top, display.right - display.left,
         display.bottom - display.top, context->surface_dc, 0, 0,
         (int)context->surface_width, (int)context->surface_height, SRCCOPY);
-    if (context->cursor_blink_visible) {
-        RECT cursor;
-        if (win32_window_cursor_rect(window, context, &cursor)) InvertRect(dc, &cursor);
-    }
-}
-
-static void win32_window_advance_cursor_blink(HWND window,
-    ux_win32_window_context *context)
-{
     RECT cursor;
-    DWORD now = GetTickCount();
-
-    if (!win32_window_accepting_input(context) ||
-        (LONG)(now - context->cursor_blink_due) < 0) return;
-    context->cursor_blink_visible = !context->cursor_blink_visible;
-    context->cursor_blink_due = now + WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS;
     if (win32_window_cursor_rect(window, context, &cursor))
-        InvalidateRect(window, &cursor, FALSE);
-}
-
-static DWORD win32_window_cursor_blink_timeout(
-    const ux_win32_window_context *context)
-{
-    DWORD now;
-
-    if (context == NULL || context->frame == NULL ||
-        !ux_frame_is_valid(context->frame) || context->frame->graphics != 0u ||
-        context->frame->cursor_visible == 0u || context->frame->cursor_phase == 0u)
-        return INFINITE;
-    now = GetTickCount();
-    return (LONG)(now - context->cursor_blink_due) >= 0 ? 0u :
-        context->cursor_blink_due - now;
+        InvertRect(dc, &cursor);
 }
 
 static void win32_window_transition(ux_win32_window_context *context,
@@ -501,7 +469,6 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
     case WIN32_WINDOW_MAILBOX_READY:
         if (win32_window_consume_mailboxes(window, context)) {
             win32_window_consume_frame(window, context);
-            win32_window_advance_cursor_blink(window, context);
         }
         return 0;
     case WIN32_WINDOW_MOUSE_READY:
@@ -651,8 +618,6 @@ static DWORD WINAPI ux_window_worker(void *opaque)
         return 0u;
     }
     state->startup_status = LIB_STATUS_OK;
-    context->cursor_blink_visible = 1;
-    context->cursor_blink_due = GetTickCount() + WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS;
     ux_win32_mouse_reset(&context->mouse);
     SendMessageA(window, WIN32_WINDOW_MAILBOX_READY, 0, 0);
     ShowWindow(window, SW_SHOW);
@@ -663,8 +628,7 @@ static DWORD WINAPI ux_window_worker(void *opaque)
     while (IsWindow(window)) {
         HANDLE wake = ux_win32_mailbox_wait_handle(
             ux_component_mailboxes_wake(&component->base.mailboxes));
-        DWORD wait = MsgWaitForMultipleObjects(1u, &wake, FALSE,
-            win32_window_cursor_blink_timeout(context),
+        DWORD wait = MsgWaitForMultipleObjects(1u, &wake, FALSE, INFINITE,
             QS_ALLINPUT);
         if (wait == WAIT_OBJECT_0) {
             if (atomic_load_explicit(&component->base.stopping, memory_order_acquire) != 0)
@@ -676,8 +640,6 @@ static DWORD WINAPI ux_window_worker(void *opaque)
             atomic_store_explicit(&component->base.stopping, 1, memory_order_release);
             DestroyWindow(window);
         }
-        else if (wait == WAIT_TIMEOUT)
-            win32_window_advance_cursor_blink(window, context);
         while (PeekMessageA(&message, NULL, 0, 0, PM_REMOVE)) {
             if (message.message == WM_QUIT) {
                 atomic_store_explicit(&component->base.stopping, 1, memory_order_release);
