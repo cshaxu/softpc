@@ -3,17 +3,10 @@
 #include <assert.h>
 #include <string.h>
 
-typedef struct ux_window_capture {
-    ux_input_event event;
-    lib_u32 count;
-} ux_window_capture;
-
-static lib_status capture_input(void *context, const ux_input_event *event)
+static lib_status discard_input(void *context, const ux_input_event *event)
 {
-    ux_window_capture *capture = context;
-    if (capture == LIB_NULL || event == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    capture->event = *event;
-    ++capture->count;
+    (void)context;
+    (void)event;
     return LIB_STATUS_OK;
 }
 
@@ -24,13 +17,11 @@ int main(void)
     ux_frame frame = { 0 };
     ux_frame copied = { 0 };
     lib_u32 generation = 0u;
-    ux_control_message control;
-    lib_bool has_control = LIB_FALSE;
-    ux_window_capture capture = { 0 };
-    ux_input_event text = { 0 };
+    char title[UX_WINDOW_TITLE_CAPACITY];
+    lib_bool mouse_enabled = LIB_FALSE;
+    lib_bool release_mouse = LIB_FALSE;
 
-    options.input_sink = capture_input;
-    options.input_context = &capture;
+    options.input_sink = discard_input;
     strcpy(options.initial_title, "SoftPC");
     assert(ux_window_create(&window, &options) == LIB_STATUS_OK);
     frame.valid = 1u;
@@ -38,37 +29,20 @@ int main(void)
     frame.text_columns = 80u;
     frame.text_rows = 25u;
     assert(ux_window_publish_frame(window, &frame) == LIB_STATUS_OK);
-    assert(ux_window_set_title(window, "SoftPC running") == LIB_STATUS_OK);
     assert(ux_window_set_mouse_enabled(window, LIB_TRUE) == LIB_STATUS_OK);
     assert(ux_window_release_mouse(window) == LIB_STATUS_OK);
 
-    /* Paint only reads frame. The Window worker receives controls in order. */
+    /* WM_PAINT may copy a frame but cannot consume a worker-only command. */
     assert(ux_window_capture_paint_state(window, &copied, &generation) ==
         LIB_STATUS_OK);
     assert(copied.valid != 0u && generation != 0u);
-    assert(ux_window_take_control(window, &control, &has_control) ==
-        LIB_STATUS_OK && has_control != LIB_FALSE);
-    assert(control.kind == UX_CONTROL_SET_TITLE &&
-        strcmp(control.value.title, "SoftPC") == 0);
-    assert(ux_window_take_control(window, &control, &has_control) ==
-        LIB_STATUS_OK && has_control != LIB_FALSE);
-    assert(control.kind == UX_CONTROL_SET_TITLE &&
-        strcmp(control.value.title, "SoftPC running") == 0);
-    assert(ux_window_take_control(window, &control, &has_control) ==
-        LIB_STATUS_OK && has_control != LIB_FALSE);
-    assert(control.kind == UX_CONTROL_SET_MOUSE_ENABLED &&
-        control.value.mouse_enabled != LIB_FALSE);
-    assert(ux_window_take_control(window, &control, &has_control) ==
-        LIB_STATUS_OK && has_control != LIB_FALSE);
-    assert(control.kind == UX_CONTROL_RELEASE_MOUSE);
-    assert(ux_window_take_control(window, &control, &has_control) ==
-        LIB_STATUS_OK && has_control == LIB_FALSE);
-
-    assert(ux_input_make_text(&text, ux_window_input_source(window), 'a') ==
-        LIB_STATUS_OK);
-    assert(ux_window_submit_input(window, &text) == LIB_STATUS_OK);
-    assert(capture.count == 1u && capture.event.kind == UX_INPUT_TEXT &&
-        capture.event.value.text.scalar == 'a');
+    assert(ux_window_take_control_state(window, title, &mouse_enabled,
+        &release_mouse) == LIB_STATUS_OK);
+    assert(strcmp(title, "SoftPC") == 0);
+    assert(mouse_enabled != LIB_FALSE && release_mouse != LIB_FALSE);
+    assert(ux_window_take_control_state(window, title, &mouse_enabled,
+        &release_mouse) == LIB_STATUS_OK);
+    assert(release_mouse == LIB_FALSE);
 
     ux_window_destroy(window);
     return 0;

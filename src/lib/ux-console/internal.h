@@ -8,7 +8,6 @@ typedef struct ux_console_native ux_console_native;
 
 struct ux_console {
     ux_frame_mailbox frames;
-    ux_control_mailbox controls;
     ux_hotkey_matcher *hotkeys;
     ux_input_sink input_sink;
     void *input_context;
@@ -21,9 +20,5 @@ lib_status ux_console_native_start(ux_console *console);
 void ux_console_native_stop(ux_console *console);
 void ux_console_native_signal(ux_console *console);
 lib_status ux_console_present_frame(ux_console *console, const ux_frame *frame);
-lib_status ux_console_take_control(ux_console *console,
-    ux_control_message *out_message, lib_bool *out_has_message);
-lib_status ux_console_push_control(ux_console *console,
-    const ux_control_message *message);
 
 #endif

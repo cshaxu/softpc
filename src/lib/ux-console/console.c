@@ -34,7 +34,6 @@ lib_status ux_console_create(ux_console **out_console,
     console = calloc(1u, sizeof(*console));
     if (console == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     ux_frame_mailbox_initialize(&console->frames);
-    ux_control_mailbox_initialize(&console->controls);
     status = ux_hotkey_matcher_create(&console->hotkeys, options->hotkeys,
         options->hotkey_count);
     if (status == LIB_STATUS_OK)
@@ -114,23 +113,4 @@ lib_console *ux_console_get_console(ux_console *console)
 const void *ux_console_input_source(const ux_console *console)
 {
     return console;
-}
-
-lib_status ux_console_take_control(ux_console *console,
-    ux_control_message *out_message, lib_bool *out_has_message)
-{
-    if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    return ux_control_mailbox_take(&console->controls, out_message,
-        out_has_message);
-}
-
-lib_status ux_console_push_control(ux_console *console,
-    const ux_control_message *message)
-{
-    lib_status status;
-    if (console == LIB_NULL || message == LIB_NULL)
-        return LIB_STATUS_INVALID_ARGUMENT;
-    status = ux_control_mailbox_push(&console->controls, message);
-    if (status == LIB_STATUS_OK) ux_console_native_signal(console);
-    return status;
 }

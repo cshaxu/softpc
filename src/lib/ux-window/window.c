@@ -26,7 +26,6 @@ lib_status ux_window_create(ux_window **out_window,
     window->lock = (atomic_flag)ATOMIC_FLAG_INIT;
     atomic_flag_clear_explicit(&window->lock, memory_order_release);
     ux_frame_mailbox_initialize(&window->frames);
-    ux_control_mailbox_initialize(&window->controls);
     status = ux_hotkey_matcher_create(&window->hotkeys, options->hotkeys,
         options->hotkey_count);
     if (status != LIB_STATUS_OK) {
@@ -35,17 +34,8 @@ lib_status ux_window_create(ux_window **out_window,
     }
     window->input_sink = options->input_sink;
     window->input_context = options->input_context;
-    {
-        ux_control_message initial_title = { UX_CONTROL_SET_TITLE, { { 0 } } };
-        memcpy(initial_title.value.title, options->initial_title,
-            (lib_size)(title_end - options->initial_title) + 1u);
-        status = ux_control_mailbox_push(&window->controls, &initial_title);
-        if (status != LIB_STATUS_OK) {
-            ux_hotkey_matcher_destroy(window->hotkeys);
-            free(window);
-            return status;
-        }
-    }
+    memcpy(window->title, options->initial_title,
+        (lib_size)(title_end - options->initial_title) + 1u);
     *out_window = window;
     return LIB_STATUS_OK;
 }
@@ -96,27 +86,35 @@ lib_status ux_window_publish_frame(ux_window *window, const ux_frame *frame)
 lib_status ux_window_set_title(ux_window *window, const char *title)
 {
     const char *end;
-    ux_control_message message = { UX_CONTROL_SET_TITLE, { { 0 } } };
 
     if (window == LIB_NULL || title == LIB_NULL ||
         (end = memchr(title, '\0', UX_WINDOW_TITLE_CAPACITY)) == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
-    memcpy(message.value.title, title, (lib_size)(end - title) + 1u);
-    return ux_window_push_control(window, &message);
+    ux_window_lock(window);
+    memcpy(window->title, title, (lib_size)(end - title) + 1u);
+    ux_window_unlock(window);
+    ux_window_native_signal(window);
+    return LIB_STATUS_OK;
 }
 
 lib_status ux_window_set_mouse_enabled(ux_window *window, lib_bool enabled)
 {
-    ux_control_message message = { UX_CONTROL_SET_MOUSE_ENABLED,
-        { { 0 } } };
-    message.value.mouse_enabled = enabled != LIB_FALSE;
-    return ux_window_push_control(window, &message);
+    if (window == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    ux_window_lock(window);
+    window->mouse_enabled = enabled != LIB_FALSE;
+    ux_window_unlock(window);
+    ux_window_native_signal(window);
+    return LIB_STATUS_OK;
 }
 
 lib_status ux_window_release_mouse(ux_window *window)
 {
-    const ux_control_message message = { UX_CONTROL_RELEASE_MOUSE, { { 0 } } };
-    return ux_window_push_control(window, &message);
+    if (window == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    ux_window_lock(window);
+    window->mouse_release_requested = LIB_TRUE;
+    ux_window_unlock(window);
+    ux_window_native_signal(window);
+    return LIB_STATUS_OK;
 }
 
 const void *ux_window_input_source(const ux_window *window)
@@ -147,21 +145,18 @@ lib_status ux_window_capture_paint_state(const ux_window *window,
     return ux_frame_mailbox_take(&window->frames, out_frame, out_generation);
 }
 
-lib_status ux_window_take_control(ux_window *window,
-    ux_control_message *out_message, lib_bool *out_has_message)
+lib_status ux_window_take_control_state(ux_window *window,
+    char out_title[UX_WINDOW_TITLE_CAPACITY], lib_bool *out_mouse_enabled,
+    lib_bool *out_release_mouse)
 {
-    if (window == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    return ux_control_mailbox_take(&window->controls, out_message,
-        out_has_message);
-}
-
-lib_status ux_window_push_control(ux_window *window,
-    const ux_control_message *message)
-{
-    lib_status status;
-    if (window == LIB_NULL || message == LIB_NULL)
+    if (window == LIB_NULL || out_title == LIB_NULL ||
+        out_mouse_enabled == LIB_NULL || out_release_mouse == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
-    status = ux_control_mailbox_push(&window->controls, message);
-    if (status == LIB_STATUS_OK) ux_window_native_signal(window);
-    return status;
+    ux_window_lock(window);
+    memcpy(out_title, window->title, UX_WINDOW_TITLE_CAPACITY);
+    *out_mouse_enabled = window->mouse_enabled;
+    *out_release_mouse = window->mouse_release_requested;
+    window->mouse_release_requested = LIB_FALSE;
+    ux_window_unlock(window);
+    return LIB_STATUS_OK;
 }
