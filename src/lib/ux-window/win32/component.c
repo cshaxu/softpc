@@ -15,6 +15,7 @@
 #define WIN32_WINDOW_TEXT_CELL_WIDTH 8u
 #define WIN32_WINDOW_TEXT_CELL_HEIGHT 16u
 #define WIN32_WINDOW_MAILBOX_READY (WM_APP + 1u)
+#define WIN32_WINDOW_MOUSE_READY (WM_APP + 2u)
 #define WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS 250u
 
 typedef struct ux_win32_window_context {
@@ -32,6 +33,10 @@ typedef struct ux_win32_window_context {
     ux_win32_keyboard_normalizer keyboard_normalizer;
     int left_button;
     int right_button;
+    lib_i64 pending_mouse_dx;
+    lib_i64 pending_mouse_dy;
+    lib_u32 pending_mouse_buttons;
+    int mouse_delivery_posted;
     ux_win32_mouse mouse;
     uint32_t client_surface_width;
     uint32_t client_surface_height;
@@ -325,29 +330,75 @@ static void win32_window_transition(ux_win32_window_context *context,
         win32_window_emit_normalized, scan, (WORD)key, control_state, !released);
 }
 
-static void win32_window_mouse(ux_win32_window_context *context,
-    LPARAM position)
+static lib_i32 win32_window_mouse_clamp(lib_i64 value)
+{
+    return value > INT32_MAX ? INT32_MAX :
+        value < INT32_MIN ? INT32_MIN : (lib_i32)value;
+}
+
+static void win32_window_emit_mouse(ux_win32_window_context *context,
+    lib_i32 dx, lib_i32 dy, lib_u32 buttons)
+{
+    ux_event event = { 0 };
+
+    if (!win32_window_accepting_input(context)) return;
+    event.type = UX_EVENT_MOUSE;
+    event.data.mouse.delta_x = dx;
+    event.data.mouse.delta_y = dy;
+    event.data.mouse.relative = 1u;
+    event.data.mouse.buttons = buttons;
+    (void)win32_window_emit(context, &event);
+}
+
+static void win32_window_flush_mouse(ux_win32_window_context *context)
+{
+    if (context == NULL || !context->mouse_delivery_posted) return;
+    context->mouse_delivery_posted = 0;
+    win32_window_emit_mouse(context,
+        win32_window_mouse_clamp(context->pending_mouse_dx),
+        win32_window_mouse_clamp(context->pending_mouse_dy),
+        context->pending_mouse_buttons);
+    context->pending_mouse_dx = 0;
+    context->pending_mouse_dy = 0;
+}
+
+static void win32_window_queue_mouse(HWND window,
+    ux_win32_window_context *context, int dx, int dy)
+{
+    if (window == NULL || context == NULL) return;
+    context->pending_mouse_dx += dx;
+    context->pending_mouse_dy += dy;
+    context->pending_mouse_buttons =
+        (context->left_button ? UX_MOUSE_BUTTON_LEFT : 0u) |
+        (context->right_button ? UX_MOUSE_BUTTON_RIGHT : 0u);
+    if (context->mouse_delivery_posted) return;
+    context->mouse_delivery_posted = 1;
+    if (!PostMessageA(window, WIN32_WINDOW_MOUSE_READY, 0u, 0))
+        win32_window_flush_mouse(context);
+}
+
+static void win32_window_mouse(HWND window, ux_win32_window_context *context,
+    LPARAM position, int immediate)
 {
     int dx = 0;
     int dy = 0;
-    ux_event event = { 0 };
 
     if (!win32_window_accepting_input(context) ||
         !ux_win32_mouse_move(&context->mouse, position, context->client_width,
             context->client_height, context->surface_width, context->surface_height,
             &dx, &dy)) return;
-    event.type = UX_EVENT_MOUSE;
-    event.data.mouse.delta_x = dx;
-    event.data.mouse.delta_y = dy;
-    event.data.mouse.relative = 1u;
-    event.data.mouse.buttons = (context->left_button ? UX_MOUSE_BUTTON_LEFT : 0u) |
-        (context->right_button ? UX_MOUSE_BUTTON_RIGHT : 0u);
-    (void)win32_window_emit(context, &event);
+    if (immediate) {
+        win32_window_emit_mouse(context, dx, dy,
+            (context->left_button ? UX_MOUSE_BUTTON_LEFT : 0u) |
+            (context->right_button ? UX_MOUSE_BUTTON_RIGHT : 0u));
+    } else if (dx != 0 || dy != 0)
+        win32_window_queue_mouse(window, context, dx, dy);
 }
 
 static void win32_window_release_mouse(ux_win32_window_context *context)
 {
     if (context == NULL) return;
+    win32_window_flush_mouse(context);
     ux_win32_mouse_release(&context->mouse);
 }
 
@@ -439,6 +490,9 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
             win32_window_advance_cursor_blink(window, context);
         }
         return 0;
+    case WIN32_WINDOW_MOUSE_READY:
+        win32_window_flush_mouse(context);
+        return 0;
     case WM_PAINT:
         { PAINTSTRUCT paint; HDC dc = BeginPaint(window, &paint);
           win32_window_paint(window, context, dc); EndPaint(window, &paint); }
@@ -483,7 +537,7 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         return 0;
     case WM_MOUSEMOVE:
         if (ux_win32_mouse_captured(&context->mouse))
-            win32_window_mouse(context, lparam);
+            win32_window_mouse(window, context, lparam, 0);
         return 0;
     case WM_SETCURSOR:
         if (ux_win32_mouse_captured(&context->mouse) && LOWORD(lparam) == HTCLIENT) {
@@ -493,25 +547,31 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         break;
     case WM_LBUTTONDOWN:
         if (!win32_window_accepting_input(context)) return 0;
+        win32_window_flush_mouse(context);
         context->left_button = 1;
         win32_window_capture_mouse(window, context, lparam);
-        win32_window_mouse(context, lparam);
+        win32_window_mouse(window, context, lparam, 1);
         return 0;
     case WM_LBUTTONUP:
         if (!win32_window_accepting_input(context)) return 0;
+        win32_window_flush_mouse(context);
         context->left_button = 0;
-        if (ux_win32_mouse_captured(&context->mouse)) win32_window_mouse(context, lparam);
+        if (ux_win32_mouse_captured(&context->mouse))
+            win32_window_mouse(window, context, lparam, 1);
         return 0;
     case WM_RBUTTONDOWN:
         if (!win32_window_accepting_input(context)) return 0;
+        win32_window_flush_mouse(context);
         context->right_button = 1;
         win32_window_capture_mouse(window, context, lparam);
-        win32_window_mouse(context, lparam);
+        win32_window_mouse(window, context, lparam, 1);
         return 0;
     case WM_RBUTTONUP:
         if (!win32_window_accepting_input(context)) return 0;
+        win32_window_flush_mouse(context);
         context->right_button = 0;
-        if (ux_win32_mouse_captured(&context->mouse)) win32_window_mouse(context, lparam);
+        if (ux_win32_mouse_captured(&context->mouse))
+            win32_window_mouse(window, context, lparam, 1);
         return 0;
     case WM_KILLFOCUS:
         win32_window_release_mouse(context);

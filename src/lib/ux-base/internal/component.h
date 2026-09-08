@@ -23,6 +23,10 @@ struct ux_component {
 lib_status ux_component_initialize(ux_component *component,
     const ux_component_options *options, ux_component_native_stop_fn native_stop,
     ux_component_dispose_fn dispose);
+/* A source identity is never recycled.  Zero is the permanent exhausted
+ * sentinel, rather than the beginning of a second allocation epoch. */
+lib_status ux_component_allocate_source_identity(atomic_uint_fast64_t *next,
+    lib_u64 *out_identity);
 int ux_component_emit(ux_component *component, const ux_input_event *event);
 void ux_component_emit_source_retired(ux_component *component);
 

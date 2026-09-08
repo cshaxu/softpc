@@ -45,6 +45,8 @@ int main(void)
     ux_component_control control = { UX_COMPONENT_CONTROL_SET_WINDOW_MOUSE_ENABLED,
         { 0 } };
     ux_component_control taken;
+    atomic_uint_fast64_t identity_next;
+    lib_u64 identity;
     unsigned int index;
 
     probe.accept_input = 1;
@@ -59,6 +61,17 @@ int main(void)
     assert(first.source_identity != 0u);
     assert(second.source_identity != 0u);
     assert(first.source_identity != second.source_identity);
+
+    /* Source identity is a single non-repeating epoch: issuing the final
+       representable value permanently exhausts it instead of wrapping. */
+    atomic_init(&identity_next, UINT64_MAX - 1u);
+    assert(ux_component_allocate_source_identity(&identity_next, &identity) ==
+        LIB_STATUS_OK && identity == UINT64_MAX - 1u);
+    assert(ux_component_allocate_source_identity(&identity_next, &identity) ==
+        LIB_STATUS_OK && identity == UINT64_MAX);
+    assert(ux_component_allocate_source_identity(&identity_next, &identity) ==
+        LIB_STATUS_LIMIT_EXCEEDED);
+    assert(atomic_load_explicit(&identity_next, memory_order_relaxed) == 0u);
 
     event.type = UX_EVENT_KEY;
     event.data.key.virtual_key = 'A';

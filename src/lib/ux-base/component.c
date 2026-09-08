@@ -2,6 +2,29 @@
 
 static atomic_uint_fast64_t ux_component_next_source_identity = 1u;
 
+lib_status ux_component_allocate_source_identity(atomic_uint_fast64_t *next,
+    lib_u64 *out_identity)
+{
+    uint_fast64_t identity;
+    uint_fast64_t following;
+
+    if (next == LIB_NULL || out_identity == LIB_NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    identity = atomic_load_explicit(next, memory_order_relaxed);
+    for (;;) {
+        /* Zero is written only after UINT64_MAX has been issued.  Do not use
+         * fetch-add here: its next failed call would wrap zero to one and
+         * eventually reuse a source identity. */
+        if (identity == 0u) return LIB_STATUS_LIMIT_EXCEEDED;
+        following = identity == UINT64_MAX ? 0u : identity + 1u;
+        if (atomic_compare_exchange_weak_explicit(next, &identity, following,
+                memory_order_relaxed, memory_order_relaxed)) {
+            *out_identity = (lib_u64)identity;
+            return LIB_STATUS_OK;
+        }
+    }
+}
+
 static void ux_component_report_failure(ux_component *component, lib_status status)
 {
     if (component != LIB_NULL && component->failure_sink != LIB_NULL &&
@@ -24,9 +47,9 @@ lib_status ux_component_initialize(ux_component *component,
     component->failure_sink = options->failure_sink;
     component->native_stop = native_stop;
     component->dispose = dispose;
-    identity = atomic_fetch_add_explicit(
-        &ux_component_next_source_identity, 1u, memory_order_relaxed);
-    if (identity == 0u) return LIB_STATUS_LIMIT_EXCEEDED;
+    if (ux_component_allocate_source_identity(&ux_component_next_source_identity,
+            &identity) != LIB_STATUS_OK)
+        return LIB_STATUS_LIMIT_EXCEEDED;
     component->source_identity = identity;
     ux_hotkey_matcher_initialize(&component->hotkey_matcher, &options->hotkeys);
     atomic_init(&component->stopping, 0);
