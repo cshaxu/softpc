@@ -4,18 +4,18 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T42 S7 active — real-thread integration boundaries |
-| Admission And Approval | Owner admitted S7 after S6 closure. |
-| Objective | Prove the actual host/UX thread boundaries with deterministic barriers, without changing SoftPC lifecycle or display policy. |
-| Outcome | In progress: event-sink detach and ux-console destroy barriers are being proven with real workers and no timing sleeps. |
+| Identifier Mode | M9 T42 S7 closed — S8–S9 await separate owner admission |
+| Admission And Approval | Owner admitted and closed S7 after S6 closure. |
+| Objective | S7 proved the actual host/UX thread boundaries with deterministic barriers, without changing SoftPC lifecycle or display policy. |
+| Outcome | Closed: event-sink detach, ux-console destroy, and broker replacement all have completion-gated real-thread proof. See [S7 history](../history/M9-T42-S7-real-thread-barriers.md). |
 | Non-goals | No modification to `src/mvdm/softpc.new/`, its MVDM-local Win32 calls, or WinNT-derived implementation; no SoftPC lifecycle, DISPLAY policy, `console_control`, monitor syntax, or guest-hotkey semantics in lib; no permanent SoftPC-only lib fork or NXVM runtime/build dependency; no package configuration or guest-media change. |
 | Affected Boundaries | `src/app/` owns the reconciler, monitor bridge, lifecycle/event queue, and component/broker ordering. `src/lib` is consumed unchanged through its public APIs. Non-library `src/host/`, `storage`, and `src/mvdm/softpc.new/` remain unchanged. |
 | Applicable Rules | Execution, architecture, coding, and documentation authorities; [T42 proposal](../proposals/m9-t42-console-object-ux-recomposition.md); [Product UX](../design/UI.md); [System Architecture](../design/ARCHITECTURE.md). |
 | Focused Verification | Deterministic app tests cover running/paused/stopped transitions, Window X, CAP from either raw component, monitor lines, Current Console replacement order, and per-display component derivation. Verify UX callbacks only enqueue copied events. |
-| Full Regression | Pending S7 focused barriers and dual-width verification; preserve `assets/binary/softpc.ini` and guest media. |
+| Full Regression | x64 full CTest passed 29/29. x86 Console/broker barrier targets passed 3/3; preserve `assets/binary/softpc.ini` and guest media. |
 | Similar-Issue Sweep | Search `src/app` for direct UX callback lifecycle/window calls, raw Console readers outside host, `fgets` monitor ownership, old presenter/router paths, and a second active Console object. |
 | Stop Conditions | Stop for owner direction if an API encodes SoftPC policy, changes MVDM, lets a UX component open/register native Console I/O, permits cross-component hotkey matching, leaves an old unified UX path, or cannot be adopted by NXVM unchanged. |
-| Exit Criteria | S7 proves real-thread barrier boundaries, then T42 requires S8 owner runtime acceptance and S9 NXVM exact adoption/re-import/manifest verification. |
+| Exit Criteria | S7 is closed. T42 requires separately admitted S8 owner runtime acceptance and S9 NXVM exact adoption/re-import/manifest verification. |
 | Original Owner Request | “请你直接收口T41吧，我们开T42来做刚才的全套设计”；“准入下一任务” |
 
 ## Current Technical Baseline
@@ -40,6 +40,10 @@
 - M9 T42 S6 closed the generic Current Console and UX lifecycle contracts;
   x64 full CTest passed 27/27 and x86 library probes passed. See [S6
   history](../history/M9-T42-S6-console-ux-lifecycle-contracts.md).
+
+- M9 T42 S7 closed real-thread Console/UX barrier verification: x64 full
+  CTest passed 29/29 and x86 Console/broker barriers passed 3/3. See [S7
+  history](../history/M9-T42-S7-real-thread-barriers.md).
 
 - M9 T41 closed by owner direction after completing the imported-lib baseline
   and non-MVDM ownership ledger. Its incomplete Console/Window runtime work is
