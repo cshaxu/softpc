@@ -18,7 +18,7 @@ static DWORD WINAPI app_window_smoke_run(void *opaque)
     app_window_smoke_context *context =
         (app_window_smoke_context *)opaque;
     context->result = app_presentation_run(context->runtime,
-        SOFTPC_PRESENTATION_WINDOW, 1);
+        SOFTPC_PRESENTATION_WINDOW);
     return 0u;
 }
 

@@ -20,7 +20,6 @@ typedef struct app_startup_config {
     char printer_output_path[SOFTPC_CONFIG_PATH_MAX];
     uint32_t memory_bytes;
     softpc_presentation presentation;
-    int console_control;
     softpc_media_mode media_mode;
 } app_startup_config;
 
@@ -164,10 +163,6 @@ static int app_load_startup_config(const char *path,
             else if (strcmp(value, "window") == 0)
                 config->presentation = SOFTPC_PRESENTATION_WINDOW;
             else goto invalid;
-        } else if (strcmp(key, "console_control") == 0) {
-            if (strcmp(value, "0") == 0) config->console_control = 0;
-            else if (strcmp(value, "1") == 0) config->console_control = 1;
-            else goto invalid;
         } else if (strcmp(key, "media_mode") == 0) {
             if (strcmp(value, "readonly") == 0)
                 config->media_mode = SOFTPC_MEDIA_READONLY;
@@ -213,11 +208,11 @@ static void app_monitor_help(void)
 }
 
 static int app_monitor_run_frontend(app_runtime *runtime,
-    softpc_presentation presentation, int console_control, app_monitor_state *state)
+    softpc_presentation presentation, app_monitor_state *state)
 {
     int frontend_result;
 
-    frontend_result = app_presentation_run(runtime, presentation, console_control);
+    frontend_result = app_presentation_run(runtime, presentation);
     if (frontend_result == SOFTPC_VM_FRONTEND_ERROR) return 0;
     *state = frontend_result == SOFTPC_VM_FRONTEND_PAUSED ?
         SOFTPC_MONITOR_PAUSED : SOFTPC_MONITOR_STOPPED;
@@ -227,18 +222,18 @@ static int app_monitor_run_frontend(app_runtime *runtime,
 }
 
 static int app_monitor_start(app_runtime *runtime,
-    softpc_presentation presentation, int console_control, app_monitor_state *state, int reset)
+    softpc_presentation presentation, app_monitor_state *state, int reset)
 {
     if (reset || *state == SOFTPC_MONITOR_STOPPED) {
         if (!app_runtime_start(runtime)) return 0;
     } else if (!app_runtime_resume(runtime)) {
         return 0;
     }
-    return app_monitor_run_frontend(runtime, presentation, console_control, state);
+    return app_monitor_run_frontend(runtime, presentation, state);
 }
 
 static int app_monitor(app_runtime *runtime,
-    softpc_presentation presentation, int console_control)
+    softpc_presentation presentation)
 {
     char line[SOFTPC_CONFIG_PATH_MAX + 64u];
     app_monitor_state state = SOFTPC_MONITOR_STOPPED;
@@ -263,10 +258,10 @@ static int app_monitor(app_runtime *runtime,
         if (strcmp(command, "help") == 0) app_monitor_help();
         else if (strcmp(command, "exit") == 0) return 0;
         else if (strcmp(command, "start") == 0) {
-            if (!app_monitor_start(runtime, presentation, console_control, &state, 0)) return 1;
+            if (!app_monitor_start(runtime, presentation, &state, 0)) return 1;
         } else if (strcmp(command, "resume") == 0) {
             if (state != SOFTPC_MONITOR_PAUSED) puts("Machine is not paused.");
-            else if (!app_monitor_start(runtime, presentation, console_control, &state, 0)) return 1;
+            else if (!app_monitor_start(runtime, presentation, &state, 0)) return 1;
         } else if (strcmp(command, "pause") == 0) {
             puts(state == SOFTPC_MONITOR_PAUSED ? "Machine is paused." :
                 "Use Ctrl+Alt+P while the guest is running.");
@@ -305,7 +300,7 @@ int main(int argc, char **argv)
 {
     char config_path[SOFTPC_CONFIG_PATH_MAX];
     app_startup_config config = { { 0 }, { 0 }, { 0 }, { 0 }, 16u * 1024u * 1024u,
-        SOFTPC_PRESENTATION_CONSOLE, 1, SOFTPC_MEDIA_OVERLAY };
+        SOFTPC_PRESENTATION_CONSOLE, SOFTPC_MEDIA_OVERLAY };
     softpc_machine_options options = { 0 };
     softpc_machine *machine = NULL;
     app_runtime *runtime = NULL;
@@ -349,7 +344,7 @@ int main(int argc, char **argv)
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
     }
-    if (app_monitor(runtime, options.presentation, config.console_control) != 0)
+    if (app_monitor(runtime, options.presentation) != 0)
         result = SOFTPC_MACHINE_IO_ERROR;
 done:
     if (result != SOFTPC_MACHINE_OK)
