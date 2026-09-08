@@ -218,6 +218,14 @@ void host_console_native_deactivate(host_console_native *native_console)
     if (native_console == LIB_NULL) return;
     if (native_console->reader != NULL) {
         (void)SetEvent(native_console->stop_event);
+        /* Cooked ReadConsoleA is line-buffered.  CancelSynchronousIo alone
+         * is not reliable for that Console operation under all terminal
+         * hosts: it can otherwise remain blocked until the user presses
+         * Enter, consuming and then discarding that whole line while a raw
+         * VM Console is waiting to take ownership.  Cancel the input-handle
+         * I/O process-wide first; the reader-thread cancellation remains a
+         * compatible fallback for a pending raw ReadConsoleInput call. */
+        (void)CancelIoEx(native_console->input, NULL);
         (void)CancelSynchronousIo(native_console->reader);
         (void)WaitForSingleObject(native_console->reader, INFINITE);
         CloseHandle(native_console->reader);
