@@ -120,6 +120,40 @@ int app_control_queue_push_monitor_line(app_control_queue *queue,
     return app_control_queue_push(queue, &copied);
 }
 
+int app_control_queue_push_runtime_completed(app_control_queue *queue,
+    app_runtime_state state, uint32_t run_generation)
+{
+    app_control_event event = { APP_CONTROL_RUNTIME_COMPLETED, run_generation };
+    event.value.runtime_state = state;
+    return app_control_queue_push(queue, &event);
+}
+
+int app_control_queue_push_frame_completed(app_control_queue *queue,
+    uint32_t sequence, int graphics, uint32_t run_generation)
+{
+    app_control_event event = { APP_CONTROL_FRAME_COMPLETED, run_generation };
+    event.value.frame.sequence = sequence;
+    event.value.frame.graphics = graphics != 0;
+    return app_control_queue_push(queue, &event);
+}
+
+int app_control_queue_push_component_completed(app_control_queue *queue,
+    app_control_component_kind component, int exists, uint32_t run_generation)
+{
+    app_control_event event = { APP_CONTROL_COMPONENT_COMPLETED, run_generation };
+    event.value.component.component = component;
+    event.value.component.exists = exists != 0;
+    return app_control_queue_push(queue, &event);
+}
+
+int app_control_queue_push_broker_completed(app_control_queue *queue,
+    int vm_console_current, uint32_t run_generation)
+{
+    app_control_event event = { APP_CONTROL_BROKER_COMPLETED, run_generation };
+    event.value.broker_vm_console_current = vm_console_current != 0;
+    return app_control_queue_push(queue, &event);
+}
+
 int app_control_queue_take(app_control_queue *queue,
     app_control_event *out_event, unsigned long timeout_ms)
 {

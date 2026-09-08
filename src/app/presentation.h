@@ -22,6 +22,14 @@ int app_presentation_reconcile(app_presentation *presentation);
 /* Before a paused VM resumes, install the derived running components and
  * Current Console Object.  The control thread then calls app_runtime_resume. */
 int app_presentation_prepare_resume(app_presentation *presentation);
+void app_presentation_note_runtime_completed(app_presentation *presentation,
+    app_runtime_state state);
+void app_presentation_note_frame_completed(app_presentation *presentation,
+    int graphics);
+void app_presentation_note_component_completed(app_presentation *presentation,
+    app_control_component_kind component, int exists);
+void app_presentation_note_broker_completed(app_presentation *presentation,
+    int vm_console_current);
 
 #ifdef SOFTPC_WINDOW_TESTING
 /* Test-only blocking adapter.  Production must use the functions above from

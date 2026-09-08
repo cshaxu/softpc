@@ -117,9 +117,15 @@ static int app_presentation_apply_next_action(app_presentation_context *context)
     case APP_RECONCILER_ACTION_RUNTIME_STOP:
         return 1;
     case APP_RECONCILER_ACTION_CREATE_WINDOW:
-        return app_presentation_create_window(context);
+        if (!app_presentation_create_window(context)) return 0;
+        return app_control_queue_push_component_completed(context->control_queue,
+            APP_CONTROL_COMPONENT_WINDOW, 1,
+            app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_CREATE_VM_CONSOLE:
-        return app_presentation_create_console(context);
+        if (!app_presentation_create_console(context)) return 0;
+        return app_control_queue_push_component_completed(context->control_queue,
+            APP_CONTROL_COMPONENT_VM_CONSOLE, 1,
+            app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_BIND_VM_CONSOLE:
         if (context->console == NULL) return 0;
         if (host_console_replace_active(
@@ -128,7 +134,8 @@ static int app_presentation_apply_next_action(app_presentation_context *context)
             ux_console_get_console(context->console), HOST_CONSOLE_RAW_EVENTS) ==
             LIB_STATUS_OK) return 0;
         context->vm_console_current = 1;
-        return 1;
+        return app_control_queue_push_broker_completed(context->control_queue, 1,
+            app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_BIND_MONITOR:
         if (context->console == NULL) return 0;
         if (host_console_replace_active(
@@ -137,16 +144,21 @@ static int app_presentation_apply_next_action(app_presentation_context *context)
             app_monitor_console_object(context->monitor), HOST_CONSOLE_COOKED_LINES) ==
             LIB_STATUS_OK) return 0;
         context->vm_console_current = 0;
-        return 1;
+        return app_control_queue_push_broker_completed(context->control_queue, 0,
+            app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE:
         ux_component_destroy(ux_console_component(context->console));
         context->console = NULL;
         context->vm_console_current = 0;
-        return 1;
+        return app_control_queue_push_component_completed(context->control_queue,
+            APP_CONTROL_COMPONENT_VM_CONSOLE, 0,
+            app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_DESTROY_WINDOW:
         ux_component_destroy(ux_window_component(context->window));
         context->window = NULL;
-        return 1;
+        return app_control_queue_push_component_completed(context->control_queue,
+            APP_CONTROL_COMPONENT_WINDOW, 0,
+            app_runtime_run_generation(context->runtime));
     }
     return 0;
 }
@@ -196,6 +208,31 @@ void app_presentation_destroy(app_presentation *presentation)
     if (presentation == NULL) return;
     app_presentation_destroy_components(presentation);
     free(presentation);
+}
+
+void app_presentation_note_runtime_completed(app_presentation *presentation,
+    app_runtime_state state)
+{ if (presentation != NULL) app_reconciler_note_runtime(&presentation->reducer, state); }
+
+void app_presentation_note_frame_completed(app_presentation *presentation,
+    int graphics)
+{ if (presentation != NULL) app_reconciler_note_frame(&presentation->reducer, graphics); }
+
+void app_presentation_note_component_completed(app_presentation *presentation,
+    app_control_component_kind component, int exists)
+{
+    if (presentation == NULL) return;
+    if (component == APP_CONTROL_COMPONENT_WINDOW)
+        app_reconciler_note_window(&presentation->reducer, exists);
+    else app_reconciler_note_vm_console(&presentation->reducer, exists);
+}
+
+void app_presentation_note_broker_completed(app_presentation *presentation,
+    int vm_console_current)
+{
+    if (presentation != NULL) app_reconciler_note_current_console(
+        &presentation->reducer, vm_console_current ? APP_RECONCILER_CONSOLE_VM :
+        APP_RECONCILER_CONSOLE_MONITOR);
 }
 
 int app_presentation_prepare_resume(app_presentation *presentation)

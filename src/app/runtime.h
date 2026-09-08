@@ -24,9 +24,15 @@ typedef enum app_runtime_state {
     SOFTPC_RUNTIME_ERROR
 } app_runtime_state;
 
+typedef void (*app_runtime_completion_sink)(void *context,
+    app_runtime_state state, uint32_t frame_sequence, int frame_graphics,
+    uint32_t run_generation);
+
 typedef ux_frame app_runtime_frame;
 
 int app_runtime_create(softpc_machine *machine, app_runtime **out);
+void app_runtime_set_completion_sink(app_runtime *runtime,
+    app_runtime_completion_sink sink, void *context);
 int app_runtime_start(app_runtime *runtime);
 int app_runtime_pause(app_runtime *runtime);
 int app_runtime_resume(app_runtime *runtime);

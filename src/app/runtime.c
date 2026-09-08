@@ -64,6 +64,8 @@ struct app_runtime {
     volatile LONG media_requested;
     volatile LONG window_close_requested;
     volatile LONG window_mouse_release_requested;
+    app_runtime_completion_sink completion_sink;
+    void *completion_context;
     softpc_machine_result media_result;
     char media_floppy_path[SOFTPC_RUNTIME_PATH_MAX];
     /* The original V7 standard painter may use the left half of a doubled
@@ -73,6 +75,14 @@ struct app_runtime {
     uint32_t graphics_source_height;
     uint32_t graphics_visible_width;
 };
+
+static void app_runtime_notify_state(app_runtime *runtime)
+{
+    if (runtime != NULL && runtime->completion_sink != NULL)
+        runtime->completion_sink(runtime->completion_context,
+            app_runtime_get_state(runtime), 0u, 0,
+            app_runtime_run_generation(runtime));
+}
 
 static void app_runtime_publish(app_runtime *runtime)
 {
@@ -90,6 +100,11 @@ static void app_runtime_publish(app_runtime *runtime)
     uint32_t mode_type = 0u, screen_state = 0u;
     int32_t trace_left = -1, trace_top = -1, trace_right = -1, trace_bottom = -1;
     int trace_dirty = 0;
+    app_runtime_completion_sink completion_sink = NULL;
+    void *completion_context = NULL;
+    uint32_t completion_sequence = 0u;
+    int completion_graphics = 0;
+    uint32_t completion_run = 0u;
 
     if (runtime == NULL) return;
     EnterCriticalSection(&runtime->frame_lock);
@@ -270,9 +285,18 @@ static void app_runtime_publish(app_runtime *runtime)
             frame->graphics_height, trace_dirty, trace_left, trace_top,
             trace_right, trace_bottom);
         runtime->published_frame_index = staging_index;
+        completion_sink = runtime->completion_sink;
+        completion_context = runtime->completion_context;
+        completion_sequence = frame->sequence;
+        completion_graphics = frame->graphics != 0u;
+        completion_run = (uint32_t)InterlockedCompareExchange(
+            &runtime->run_generation, 0, 0);
     }
 done:
     LeaveCriticalSection(&runtime->frame_lock);
+    if (completion_sink != NULL)
+        completion_sink(completion_context, app_runtime_get_state(runtime),
+            completion_sequence, completion_graphics, completion_run);
 }
 
 static void app_runtime_drain_input(app_runtime *runtime)
@@ -472,8 +496,10 @@ int app_runtime_start(app_runtime *runtime)
     InterlockedExchange(&runtime->start_requested, 1);
     host_sync_event_signal(runtime->command_event);
     (void)host_sync_event_wait(runtime->ready_event, UINT32_MAX);
-    return InterlockedCompareExchange(&runtime->state, 0, 0) ==
-        SOFTPC_RUNTIME_RUNNING;
+    if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
+        SOFTPC_RUNTIME_RUNNING) return 0;
+    app_runtime_notify_state(runtime);
+    return 1;
 }
 
 int app_runtime_pause(app_runtime *runtime)
@@ -488,6 +514,7 @@ int app_runtime_pause(app_runtime *runtime)
     do {
         if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
             SOFTPC_RUNTIME_PAUSED) {
+            app_runtime_notify_state(runtime);
             return 1;
         }
         if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
@@ -516,6 +543,7 @@ int app_runtime_resume(app_runtime *runtime)
     do {
         if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
             SOFTPC_RUNTIME_RUNNING) {
+            app_runtime_notify_state(runtime);
             return 1;
         }
         if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
@@ -541,8 +569,10 @@ int app_runtime_stop(app_runtime *runtime)
     if (host_sync_event_wait(runtime->ready_event, UINT32_MAX) !=
         HOST_SYNC_WAIT_SIGNALED)
         return 0;
-    return InterlockedCompareExchange(&runtime->state, 0, 0) ==
-        SOFTPC_RUNTIME_STOPPED;
+    if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
+        SOFTPC_RUNTIME_STOPPED) return 0;
+    app_runtime_notify_state(runtime);
+    return 1;
 }
 
 int app_runtime_set_floppy(app_runtime *runtime, const char *path)
@@ -605,6 +635,14 @@ int app_runtime_copy_frame(app_runtime *runtime,
     app_runtime_frame *destination)
 {
     return app_runtime_copy_published_frame(runtime, destination, NULL);
+}
+
+void app_runtime_set_completion_sink(app_runtime *runtime,
+    app_runtime_completion_sink sink, void *context)
+{
+    if (runtime == NULL) return;
+    runtime->completion_sink = sink;
+    runtime->completion_context = context;
 }
 
 int app_runtime_copy_published_frame(app_runtime *runtime,

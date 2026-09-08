@@ -225,6 +225,17 @@ static int app_monitor_start(app_runtime *runtime,
     return 1;
 }
 
+static void app_runtime_completed(void *opaque, app_runtime_state state,
+    uint32_t sequence, int graphics, uint32_t run_generation)
+{
+    app_control_queue *queue = (app_control_queue *)opaque;
+    if (queue == NULL) return;
+    (void)app_control_queue_push_runtime_completed(queue, state, run_generation);
+    if (sequence != 0u)
+        (void)app_control_queue_push_frame_completed(queue, sequence, graphics,
+            run_generation);
+}
+
 /* Product hotkey interpretation lives with the control/reconciler.  The UX
  * leaf has already converted a matching chord into a copied identifier; the
  * control path alone decides its lifecycle effect and preserves the resume
@@ -284,6 +295,24 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                     line[control_event.value.line.length] = '\0';
                     break;
                 }
+                if (control_event.run_generation != 0u &&
+                    control_event.run_generation != app_runtime_run_generation(runtime))
+                    continue;
+                if (control_event.kind == APP_CONTROL_RUNTIME_COMPLETED)
+                    app_presentation_note_runtime_completed(presenter,
+                        control_event.value.runtime_state);
+                else if (control_event.kind == APP_CONTROL_FRAME_COMPLETED)
+                    app_presentation_note_frame_completed(presenter,
+                        control_event.value.frame.graphics);
+                else if (control_event.kind == APP_CONTROL_COMPONENT_COMPLETED)
+                    app_presentation_note_component_completed(presenter,
+                        control_event.value.component.component,
+                        control_event.value.component.exists);
+                else if (control_event.kind == APP_CONTROL_BROKER_COMPLETED)
+                    app_presentation_note_broker_completed(presenter,
+                        control_event.value.broker_vm_console_current);
+                if (!app_presentation_reconcile(presenter)) goto failed;
+                continue;
             }
             app_runtime_state actual = app_runtime_get_state(runtime);
             if (actual == SOFTPC_RUNTIME_PAUSED && state != SOFTPC_MONITOR_PAUSED) {
@@ -421,6 +450,7 @@ int main(int argc, char **argv)
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
     }
+    app_runtime_set_completion_sink(runtime, app_runtime_completed, control_queue);
     if (app_monitor(runtime, options.presentation, config.console_control,
             monitor, control_queue) != 0)
         result = SOFTPC_MACHINE_IO_ERROR;
