@@ -354,6 +354,7 @@ static void app_runtime_executor_event(void *opaque)
     if (InterlockedCompareExchange(&runtime->pause_requested, 0, 0) != 0 &&
         InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0) {
         InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_PAUSED);
+        app_runtime_notify_state(runtime);
         while (InterlockedCompareExchange(&runtime->pause_requested, 0, 0) != 0 &&
             InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0) {
             host_sync_event *events[3] = { runtime->resume_event,
@@ -372,6 +373,8 @@ static void app_runtime_executor_event(void *opaque)
         }
         if (InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0)
             InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_RUNNING);
+        if (InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0)
+            app_runtime_notify_state(runtime);
     }
 }
 
@@ -397,11 +400,13 @@ static void app_runtime_worker(void *opaque, const host_sync_task *task)
         InterlockedExchange(&runtime->result, (LONG)result);
         if (result != SOFTPC_MACHINE_OK) {
             InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_ERROR);
+            app_runtime_notify_state(runtime);
             host_sync_event_signal(runtime->ready_event);
             continue;
         }
         if (InterlockedCompareExchange(&runtime->stop_requested, 0, 0) != 0) {
             InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_STOPPED);
+            app_runtime_notify_state(runtime);
             host_sync_event_signal(runtime->ready_event);
             continue;
         }
@@ -410,6 +415,7 @@ static void app_runtime_worker(void *opaque, const host_sync_task *task)
             app_runtime_executor_event, runtime);
         softpc_machine_set_heartbeat(runtime->machine, 1);
         InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_RUNNING);
+        app_runtime_notify_state(runtime);
         host_sync_event_signal(runtime->ready_event);
         /* The original CPU uses BOP FE to unwind the *current* host_simulate
            frame after a firmware/device turn.  That is not a guest stop: an
@@ -428,6 +434,7 @@ static void app_runtime_worker(void *opaque, const host_sync_task *task)
         InterlockedExchange(&runtime->result, (LONG)result);
         InterlockedExchange(&runtime->state, result == SOFTPC_MACHINE_OK ?
             SOFTPC_RUNTIME_STOPPED : SOFTPC_RUNTIME_ERROR);
+        app_runtime_notify_state(runtime);
         host_sync_event_signal(runtime->ready_event);
     }
 }
@@ -495,63 +502,25 @@ int app_runtime_start(app_runtime *runtime)
     (void)InterlockedIncrement(&runtime->run_generation);
     InterlockedExchange(&runtime->start_requested, 1);
     host_sync_event_signal(runtime->command_event);
-    (void)host_sync_event_wait(runtime->ready_event, UINT32_MAX);
-    if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
-        SOFTPC_RUNTIME_RUNNING) return 0;
-    app_runtime_notify_state(runtime);
     return 1;
 }
 
 int app_runtime_pause(app_runtime *runtime)
 {
-    lib_u64 deadline;
-    lib_u64 now;
     if (runtime == NULL || InterlockedCompareExchange(&runtime->state, 0, 0) !=
         SOFTPC_RUNTIME_RUNNING) return 0;
     InterlockedExchange(&runtime->pause_requested, 1);
-    if (host_clock_milliseconds(&now) != LIB_STATUS_OK) return 0;
-    deadline = now + 5000u;
-    do {
-        if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
-            SOFTPC_RUNTIME_PAUSED) {
-            app_runtime_notify_state(runtime);
-            return 1;
-        }
-        if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
-            SOFTPC_RUNTIME_RUNNING) return 0;
-        host_sync_sleep_milliseconds(1u);
-        if (host_clock_milliseconds(&now) != LIB_STATUS_OK) break;
-    } while (now < deadline);
-    InterlockedExchange(&runtime->pause_requested, 0);
-    return 0;
+    return 1;
 }
 
 int app_runtime_resume(app_runtime *runtime)
 {
-    lib_u64 deadline;
-    lib_u64 now;
     if (runtime == NULL) return 0;
     if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
         SOFTPC_RUNTIME_PAUSED) return 0;
     InterlockedExchange(&runtime->pause_requested, 0);
     host_sync_event_signal(runtime->resume_event);
-    /* A frontend is recreated immediately after resume.  Do not let it see
-       the old PAUSED state and terminate itself before the executor has
-       acknowledged the resume event. */
-    if (host_clock_milliseconds(&now) != LIB_STATUS_OK) return 0;
-    deadline = now + 5000u;
-    do {
-        if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
-            SOFTPC_RUNTIME_RUNNING) {
-            app_runtime_notify_state(runtime);
-            return 1;
-        }
-        if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
-            SOFTPC_RUNTIME_PAUSED) return 0;
-        host_sync_sleep_milliseconds(1u);
-        if (host_clock_milliseconds(&now) != LIB_STATUS_OK) break;
-    } while (now < deadline);
-    return 0;
+    return 1;
 }
 
 int app_runtime_stop(app_runtime *runtime)
@@ -566,12 +535,6 @@ int app_runtime_stop(app_runtime *runtime)
     InterlockedExchange(&runtime->pause_requested, 0);
     host_sync_event_signal(runtime->resume_event);
     softpc_machine_request_stop(runtime->machine);
-    if (host_sync_event_wait(runtime->ready_event, UINT32_MAX) !=
-        HOST_SYNC_WAIT_SIGNALED)
-        return 0;
-    if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
-        SOFTPC_RUNTIME_STOPPED) return 0;
-    app_runtime_notify_state(runtime);
     return 1;
 }
 
