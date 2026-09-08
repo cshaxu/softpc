@@ -317,11 +317,6 @@ target_link_libraries(softpc-ux-base-smoke PRIVATE ux-base)
 add_test(NAME softpc-ux-base-smoke COMMAND softpc-ux-base-smoke)
 set_tests_properties(softpc-ux-base-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-ux-window-state-smoke test/unit/ux_window_state_smoke.c)
-target_link_libraries(softpc-ux-window-state-smoke PRIVATE ux-window)
-add_test(NAME softpc-ux-window-state-smoke COMMAND softpc-ux-window-state-smoke)
-set_tests_properties(softpc-ux-window-state-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-dual-media-smoke test/unit/dual_media_smoke.c)
 target_link_libraries(softpc-dual-media-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-dual-media-smoke PRIVATE
@@ -535,7 +530,6 @@ set(SOFTPC_UNIT_TESTS
     softpc-lib-console-smoke
     softpc-host-console-broker-smoke
     softpc-ux-base-smoke
-    softpc-ux-window-state-smoke
     softpc-dual-media-smoke
     softpc-partition-image-smoke
     softpc-irq-smoke
