@@ -9,6 +9,11 @@ struct host_console_native {
     HANDLE output;
     HANDLE stop_event;
     HANDLE reader;
+    HANDLE prepared_stop_event;
+    HANDLE prepared_start_event;
+    HANDLE prepared_ready_event;
+    HANDLE prepared_reader;
+    volatile LONG prepared_reader_waiting;
     DWORD original_mode;
     lib_console *console;
     host_console_mode mode;
@@ -84,6 +89,13 @@ static void host_console_emit_mouse(host_console_native *native_console,
 static DWORD WINAPI host_console_reader(void *context)
 {
     host_console_native *native_console = (host_console_native *)context;
+    if (InterlockedCompareExchange(&native_console->prepared_reader_waiting, 0, 0) != 0) {
+        HANDLE gates[2] = { native_console->prepared_stop_event,
+            native_console->prepared_start_event };
+        (void)SetEvent(native_console->prepared_ready_event);
+        if (WaitForMultipleObjects(2u, gates, FALSE, INFINITE) != WAIT_OBJECT_0 + 1u)
+            return 0u;
+    }
     if (native_console->mode == HOST_CONSOLE_COOKED_LINES) {
         for (;;) {
             char text[LIB_CONSOLE_LINE_MAX];
@@ -145,6 +157,7 @@ lib_status host_console_native_create(host_console_native **out_native)
 void host_console_native_destroy(host_console_native *native_console)
 {
     if (native_console == LIB_NULL) return;
+    host_console_native_discard_prepare(native_console);
     host_console_native_deactivate(native_console);
     if (native_console->input != INVALID_HANDLE_VALUE) CloseHandle(native_console->input);
     if (native_console->output != INVALID_HANDLE_VALUE) CloseHandle(native_console->output);
@@ -158,10 +171,53 @@ lib_status host_console_native_prepare(host_console_native *native_console,
     if (native_console == LIB_NULL || console == LIB_NULL ||
         (mode != HOST_CONSOLE_RAW_EVENTS && mode != HOST_CONSOLE_COOKED_LINES))
         return LIB_STATUS_INVALID_ARGUMENT;
-    return native_console->input == INVALID_HANDLE_VALUE ||
+    if (native_console->input == INVALID_HANDLE_VALUE ||
         native_console->output == INVALID_HANDLE_VALUE ||
-        !GetConsoleMode(native_console->input, &ignored) ? LIB_STATUS_IO_ERROR :
-        LIB_STATUS_OK;
+        !GetConsoleMode(native_console->input, &ignored)) return LIB_STATUS_IO_ERROR;
+    if (native_console->prepared_reader != NULL) return LIB_STATUS_INVALID_STATE;
+    native_console->prepared_stop_event = CreateEventA(NULL, TRUE, FALSE, NULL);
+    native_console->prepared_start_event = CreateEventA(NULL, TRUE, FALSE, NULL);
+    native_console->prepared_ready_event = CreateEventA(NULL, TRUE, FALSE, NULL);
+    if (native_console->prepared_stop_event == NULL ||
+        native_console->prepared_start_event == NULL ||
+        native_console->prepared_ready_event == NULL) {
+        host_console_native_discard_prepare(native_console);
+        return LIB_STATUS_NO_MEMORY;
+    }
+    InterlockedExchange(&native_console->prepared_reader_waiting, 1);
+    native_console->prepared_reader = CreateThread(NULL, 0u, host_console_reader,
+        native_console, 0u, NULL);
+    if (native_console->prepared_reader == NULL) {
+        host_console_native_discard_prepare(native_console);
+        return LIB_STATUS_NO_MEMORY;
+    }
+    if (WaitForSingleObject(native_console->prepared_ready_event, INFINITE) !=
+        WAIT_OBJECT_0) {
+        host_console_native_discard_prepare(native_console);
+        return LIB_STATUS_IO_ERROR;
+    }
+    return LIB_STATUS_OK;
+}
+
+void host_console_native_discard_prepare(host_console_native *native_console)
+{
+    if (native_console == LIB_NULL) return;
+    if (native_console->prepared_reader != NULL) {
+        (void)SetEvent(native_console->prepared_stop_event);
+        (void)WaitForSingleObject(native_console->prepared_reader, INFINITE);
+        CloseHandle(native_console->prepared_reader);
+    }
+    if (native_console->prepared_start_event != NULL)
+        CloseHandle(native_console->prepared_start_event);
+    if (native_console->prepared_ready_event != NULL)
+        CloseHandle(native_console->prepared_ready_event);
+    if (native_console->prepared_stop_event != NULL)
+        CloseHandle(native_console->prepared_stop_event);
+    native_console->prepared_reader = NULL;
+    native_console->prepared_start_event = NULL;
+    native_console->prepared_ready_event = NULL;
+    native_console->prepared_stop_event = NULL;
+    InterlockedExchange(&native_console->prepared_reader_waiting, 0);
 }
 
 lib_status host_console_native_activate(host_console_native *native_console,
@@ -176,7 +232,9 @@ lib_status host_console_native_activate(host_console_native *native_console,
             ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS;
     else configured |= ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT;
     if (!SetConsoleMode(native_console->input, configured)) return LIB_STATUS_IO_ERROR;
-    native_console->stop_event = CreateEventA(NULL, TRUE, FALSE, NULL);
+    native_console->stop_event = native_console->prepared_stop_event;
+    if (native_console->stop_event == NULL)
+        native_console->stop_event = CreateEventA(NULL, TRUE, FALSE, NULL);
     if (native_console->stop_event == NULL) return LIB_STATUS_NO_MEMORY;
     native_console->console = console;
     native_console->mode = mode;
@@ -188,13 +246,31 @@ lib_status host_console_native_activate(host_console_native *native_console,
         sizeof(native_console->previous_palette));
     native_console->previous_columns = 0u;
     native_console->previous_rows = 0u;
-    native_console->reader = CreateThread(NULL, 0u, host_console_reader,
-        native_console, 0u, NULL);
+    native_console->reader = native_console->prepared_reader;
+    if (native_console->reader == NULL)
+        native_console->reader = CreateThread(NULL, 0u, host_console_reader,
+            native_console, 0u, NULL);
     if (native_console->reader == NULL) {
         CloseHandle(native_console->stop_event);
         native_console->stop_event = NULL;
         native_console->console = LIB_NULL;
         return LIB_STATUS_NO_MEMORY;
+    }
+    if (native_console->prepared_reader != NULL) {
+        HANDLE start = native_console->prepared_start_event;
+        HANDLE ready = native_console->prepared_ready_event;
+        native_console->prepared_reader = NULL;
+        native_console->prepared_start_event = NULL;
+        native_console->prepared_stop_event = NULL;
+        native_console->prepared_ready_event = NULL;
+        if (!SetEvent(start)) {
+            CloseHandle(start);
+            host_console_native_deactivate(native_console);
+            return LIB_STATUS_IO_ERROR;
+        }
+        CloseHandle(start);
+        CloseHandle(ready);
+        InterlockedExchange(&native_console->prepared_reader_waiting, 0);
     }
     return LIB_STATUS_OK;
 }

@@ -117,6 +117,7 @@ lib_status host_console_replace_active(host_console_broker *broker,
          * before returning, preserving the one-current-object invariant. */
         status = host_console_start(broker, old, broker->current_mode,
             broker->generation);
+        host_console_native_discard_prepare(broker->native_console);
         lib_console_release(next);
         host_console_unlock(broker);
         return status == LIB_STATUS_OK ? LIB_STATUS_IO_ERROR : status;
