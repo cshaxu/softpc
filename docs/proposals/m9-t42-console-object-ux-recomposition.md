@@ -44,7 +44,7 @@ For every existing Console reader/writer, unified-UX owner, input sink,
 lifecycle callback, and relevant test, assign one destination S or explicitly
 record it as unaffected. Cross-check against the current UI/architecture
 authorities and prove that MVDM is excluded. **Exit:** owner-readable source
-inventory, dependencies, and acceptance gates for S2–S8; documentation checks
+   inventory, dependencies, and acceptance gates for S2–S10; documentation checks
 pass.
 
 ### S2 — Base logical Console object
@@ -179,14 +179,27 @@ queued input, and raw/cooked switching; no timing sleeps. **Exit:** no second
 reader/output path remains, source audit is clean, and both widths build/test
 to the extent available on the host.
 
-### S8 — Owner runtime acceptance
+### S8 — Work-area-aware Window default bounds
+
+Keep the generic Win32 Window entirely inside its selected monitor work area
+without involving SoftPC policy. Retain the desired default outer size when it
+fits; otherwise proportionally fit both dimensions before Window creation.
+When the first copied frame requests its natural client size, apply the same
+work-area limit so the first frame cannot restore an oversized Window. Preserve
+the copied frame's aspect ratio and leave manual resizing unchanged.
+
+**Exit:** pure geometry tests cover fit, width-limited, and height-limited
+work areas; both package widths build/test; owner accepts normal and narrow
+desktop/RDP behavior.
+
+### S9 — Owner runtime acceptance
 
 Produce the two package widths without touching `softpc.ini` or media, then
 run the approved Console/Window acceptance matrix with the owner. **Exit:**
 owner accepts runtime behavior or records bounded defects; no design change is
 silently folded in.
 
-### S9 — NXVM adoption and re-import closure
+### S10 — NXVM adoption and re-import closure
 
 Submit only the generic `src/lib` corpus, obtain NXVM's byte-identical
 adoption, atomically re-import it into SoftPC, and verify the returned manifest
@@ -209,7 +222,7 @@ contract but may not rewrite its owner.
 | `src/app/{runtime,presentation}.{c,h}` | product frame router, direct `ux_run`, action callbacks, lifecycle calls, title/capture changes interleave synchronously | S4 mechanically removes direct old-`ux` calls; S5 creates the sole derived-state reconciler and run-generation envelopes, becoming the only host/UX/VM composer |
 | `src/app/{input_queue,keyboard}.{c,h}` | UX-only queue and policy callbacks; mouse coalescing is currently app-owned | S5 changes it to the one tagged SoftPC input queue; S4 moves only Window mouse-move coalescing into UX |
 | `test/unit/{runtime_smoke,runtime_input_continuation_smoke,win32_presentation_smoke,win32_window_smoke,win32_keyboard_smoke}.c` | current tests encode direct-runner and synchronous callback behavior | S5 rewrites/adds pure derivation and completion-gated reconciler coverage; S6 adds boundary integration proof |
-| top-level/test CMake and package smoke | target/test registration and final package evidence | S2–S6 add only their own focused targets; S7 runs package/owner acceptance and S8 records exact corpus evidence |
+| top-level/test CMake and package smoke | target/test registration and final package evidence | S2–S8 add only their own focused targets; S9 runs package/owner acceptance and S10 records exact corpus evidence |
 | `src/host/compat/**`, `src/host/{machine,platform,video,dib_surface,audio,device_bop,keyboard,mouse_instance,serial,parallel,*.h}` | original-host ABI, fixed-machine endpoints, and MVDM-facing compatibility | intentionally unaffected. They are neither a Console broker nor a T42 migration surface |
 | `src/mvdm/softpc.new/**` | preserved selected machine and MVDM-local Win32/WinNT implementation | permanently excluded |
 
@@ -222,8 +235,10 @@ S1 scope proof
   -> S4 split UX components
   -> S5 SoftPC reconciler
   -> S6 threaded integration
-  -> S7 owner acceptance
-  -> S8 NXVM adoption, re-import, T42 closure
+  -> S7 real-thread proof
+  -> S8 work-area-aware Window bounds
+  -> S9 owner acceptance
+  -> S10 NXVM adoption, re-import, T42 closure
 ```
 
 `storage`, clock, and existing sync implementations are not rewritten by T42.

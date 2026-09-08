@@ -467,6 +467,13 @@ add_test(NAME softpc-win32-presentation-smoke
     COMMAND softpc-win32-presentation-smoke)
 set_tests_properties(softpc-win32-presentation-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-win32-window-bounds-smoke
+    test/unit/win32_window_bounds_smoke.c)
+target_link_libraries(softpc-win32-window-bounds-smoke PRIVATE ux-window)
+add_test(NAME softpc-win32-window-bounds-smoke
+    COMMAND softpc-win32-window-bounds-smoke)
+set_tests_properties(softpc-win32-window-bounds-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-ux-component-contract-smoke
     test/unit/ux_component_contract_smoke.c)
 target_link_libraries(softpc-ux-component-contract-smoke PRIVATE ux-base)
@@ -530,7 +537,8 @@ set(SOFTPC_TEST_TARGETS
     softpc-runtime-smoke
     softpc-runtime-input-continuation-smoke
     softpc-win32-keyboard-smoke
-    softpc-win32-presentation-smoke)
+    softpc-win32-presentation-smoke
+    softpc-win32-window-bounds-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-ux-component-contract-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-ux-console-retirement-barrier-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-plan-smoke)
@@ -567,6 +575,7 @@ set(SOFTPC_UNIT_TESTS
     softpc-runtime-smoke
     softpc-runtime-input-continuation-smoke
     softpc-win32-keyboard-smoke
+    softpc-win32-window-bounds-smoke
     softpc-ux-component-contract-smoke
     softpc-ux-console-retirement-barrier-smoke
     softpc-presentation-plan-smoke

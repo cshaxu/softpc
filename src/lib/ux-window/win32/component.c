@@ -16,6 +16,8 @@
 #define WIN32_WINDOW_TEXT_CELL_HEIGHT 16u
 #define WIN32_WINDOW_MAILBOX_READY (WM_APP + 1u)
 #define WIN32_WINDOW_MOUSE_READY (WM_APP + 2u)
+#define WIN32_WINDOW_DEFAULT_WIDTH 680
+#define WIN32_WINDOW_DEFAULT_HEIGHT 560
 
 typedef struct ux_win32_window_context {
     ux_window *component;
@@ -90,6 +92,33 @@ static void win32_window_set_client_cursor(
         SetCursor(context->transparent_cursor);
     else
         SetCursor(LoadCursorA(NULL, IDC_ARROW));
+}
+
+static void win32_window_initial_bounds(int *left, int *top, int *width,
+    int *height)
+{
+    POINT point = { 0, 0 };
+    MONITORINFO monitor_info;
+    HMONITOR monitor;
+    RECT fitted;
+
+    if (left == NULL || top == NULL || width == NULL || height == NULL) return;
+    *left = CW_USEDEFAULT;
+    *top = 0;
+    *width = WIN32_WINDOW_DEFAULT_WIDTH;
+    *height = WIN32_WINDOW_DEFAULT_HEIGHT;
+    (void)GetCursorPos(&point);
+    monitor = MonitorFromPoint(point, MONITOR_DEFAULTTOPRIMARY);
+    ZeroMemory(&monitor_info, sizeof(monitor_info));
+    monitor_info.cbSize = sizeof(monitor_info);
+    if (monitor == NULL || !GetMonitorInfoA(monitor, &monitor_info) ||
+        !ux_win32_fit_outer_rect(&monitor_info.rcWork,
+            WIN32_WINDOW_DEFAULT_WIDTH, WIN32_WINDOW_DEFAULT_HEIGHT, &fitted))
+        return;
+    *left = fitted.left;
+    *top = fitted.top;
+    *width = fitted.right - fitted.left;
+    *height = fitted.bottom - fitted.top;
 }
 
 static void win32_window_destroy_surface(ux_win32_window_context *context)
@@ -646,6 +675,10 @@ static DWORD WINAPI ux_window_worker(void *opaque)
     WNDCLASSA klass;
     MSG message;
     HWND window;
+    int initial_left;
+    int initial_top;
+    int initial_width;
+    int initial_height;
 
     if (state == LIB_NULL || (context = state->context) == LIB_NULL) return 0u;
     ZeroMemory(&klass, sizeof(klass));
@@ -662,9 +695,12 @@ static DWORD WINAPI ux_window_worker(void *opaque)
         SetEvent(state->ready);
         return 0u;
     }
+    win32_window_initial_bounds(&initial_left, &initial_top, &initial_width,
+        &initial_height);
     window = CreateWindowExA(0, klass.lpszClassName, "Insignia SoftPC",
         WS_THICKFRAME | WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
-        WS_MINIMIZEBOX | WS_MAXIMIZEBOX, CW_USEDEFAULT, 0, 680, 560,
+        WS_MINIMIZEBOX | WS_MAXIMIZEBOX, initial_left, initial_top,
+        initial_width, initial_height,
         NULL, NULL, klass.hInstance, context);
     if (window == NULL) {
         state->startup_status = LIB_STATUS_INVALID_STATE;

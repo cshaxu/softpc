@@ -4,19 +4,18 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T42 S7 closed — T42 awaits separate owner admission of S8 |
-| Admission And Approval | Owner reopened S7 for the implementation-audit repairs and accepted the resulting runtime package. |
-| Objective | Retain S7's deterministic host/UX thread proof while repairing: frame-vs-lifecycle completion separation, completed-fact monitor status, non-droppable control records, terminal broker rollback failure, and the discovered Window frame/mouse lifecycle edges. |
-| Outcome | Closed: the original barrier proof and reopened repairs are recorded in [S7 history](../history/M9-T42-S7-real-thread-barriers.md). |
-| Non-goals | No modification to `src/mvdm/softpc.new/`, its MVDM-local Win32 calls, or WinNT-derived implementation; no SoftPC lifecycle, DISPLAY policy, `console_control`, monitor syntax, or guest-hotkey semantics in lib; no permanent SoftPC-only lib fork or NXVM runtime/build dependency; no package configuration or guest-media change. |
-| Affected Boundaries | `src/app/` owns the reconciler, monitor bridge, lifecycle/event queue, and component/broker ordering. `src/lib` is consumed unchanged through its public APIs. Non-library `src/host/`, `storage`, and `src/mvdm/softpc.new/` remain unchanged. |
+| Identifier Mode | M9 T42 S8 active |
+| Admission And Approval | Owner admitted this new S8 and explicitly postponed the former owner-runtime-acceptance S8 to S9. |
+| Objective | Make the generic Win32 `ux-window` default bounds fit the active monitor work area: retain its desired size when it fits; otherwise proportionally scale down before first display. |
+| Non-goals | No modification to `src/mvdm/softpc.new/`, SoftPC app policy, lifecycle, guest frame data, frame rendering semantics, user resize behavior, `softpc.ini`, or guest media. |
+| Affected Boundaries | Only `src/lib/ux-window/win32/{component,geometry}.{c,h}`, its focused geometry test, and build/test registration. `src/app`, `src/host`, storage, and MVDM remain unchanged. |
 | Applicable Rules | Execution, architecture, coding, and documentation authorities; [T42 proposal](../proposals/m9-t42-console-object-ux-recomposition.md); [Product UX](../design/UI.md); [System Architecture](../design/ARCHITECTURE.md). |
-| Focused Verification | Prove that a paint callback produces only a new-frame record, monitor status follows runtime completion only, every failed required control record becomes a terminal control failure, and failed next/old Console activation leaves the broker explicitly terminal rather than falsely current. |
-| Full Regression | Fresh x64 and x86 package builds each passed full CTest 29/29. Owner manually accepted the repaired Window/Console behavior; preserve `assets/binary/softpc.ini` and guest media. |
-| Similar-Issue Sweep | Search `src/app` for direct UX callback lifecycle/window calls, raw Console readers outside host, `fgets` monitor ownership, old presenter/router paths, and a second active Console object. |
-| Stop Conditions | Stop for owner direction if an API encodes SoftPC policy, changes MVDM, lets a UX component open/register native Console I/O, permits cross-component hotkey matching, leaves an old unified UX path, or cannot be adopted by NXVM unchanged. |
-| Exit Criteria | Met. T42 still requires separately admitted S8 owner runtime acceptance and S9 NXVM exact adoption/re-import/manifest verification. |
-| Original Owner Request | “请你直接收口T41吧，我们开T42来做刚才的全套设计”；“准入下一任务” |
+| Focused Verification | Pure geometry cases prove: desired bounds are retained when the work area fits; width-limited and height-limited work areas proportionally fit; resulting outer bounds remain inside the selected work area. |
+| Full Regression | Fresh x64 and x86 package builds and full CTest; owner checks a narrow RDP/desktop screen and a normal screen. Preserve `assets/binary/softpc.ini` and guest media. |
+| Similar-Issue Sweep | Inspect every automatic `SetWindowPos`/initial `CreateWindowEx` path to ensure a frame publication cannot restore an oversized default after it was fitted. |
+| Stop Conditions | Stop for owner direction if the change needs SoftPC product policy, affects guest frame dimensions or MVDM, changes manual resize semantics, or requires an NXVM-specific branch. |
+| Exit Criteria | Default Window bounds preserve desired size on adequate displays, proportionally fit a smaller monitor work area, and stay fitted after the first copied frame; dual-width tests pass and the owner accepts runtime behavior. |
+| Original Owner Request | “when screen width and height are enough … keep the original size … when … smaller … keep the H:V ratio, and scale down the window size by default.” |
 
 ## Current Technical Baseline
 

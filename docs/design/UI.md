@@ -30,6 +30,16 @@ The console and window are equivalent input producers. RDP is supported by
 the same normalized key path; no frontend may depend on raw local-only key
 state as its sole input source.
 
+### Default Window Bounds
+
+`ux-window` selects the initial Win32 outer bounds from the monitor work area.
+It retains the desired default bounds when they fit. If either dimension would
+exceed the work area, it proportionally scales both dimensions down and centers
+the resulting Window in that work area. The same work-area limit applies when
+the first copied frame requests its natural client size. This is host-window
+geometry only: it does not alter copied frame dimensions, guest rendering, or
+the user's later manual resize choice.
+
 ## UX Component And Console Product Policy
 
 SoftPC distinguishes static `display=console|window`, the active component set
