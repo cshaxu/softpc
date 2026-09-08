@@ -15,8 +15,6 @@ typedef struct ux_console_win32_state {
 
 static int ux_console_emit(ux_console *console, const ux_input_event *event)
 {
-    ux_input_event copied;
-
     return console == LIB_NULL ? 0 : ux_component_emit(&console->base, event);
 }
 

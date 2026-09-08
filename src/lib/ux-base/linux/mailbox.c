@@ -51,21 +51,6 @@ void ux_mailbox_native_signal(ux_mailbox_native *native_mailbox)
         (void)write(native_mailbox->write_fd, &wake, sizeof(wake));
 }
 
-int ux_linux_presenter_wait_fd(const ux_presenter *presenter)
-{
-    ux_mailbox_native *native_mailbox = ux_mailbox_native_for_presenter(presenter);
-
-    return ux_linux_mailbox_wait_fd(native_mailbox);
-}
-
-void ux_linux_presenter_consume(const ux_presenter *presenter)
-{
-    char bytes[64];
-    int fd = ux_linux_presenter_wait_fd(presenter);
-
-    while (fd >= 0 && read(fd, bytes, sizeof(bytes)) > 0) {}
-}
-
 int ux_linux_mailbox_wait_fd(const ux_mailbox_native *native_mailbox)
 {
     return native_mailbox == NULL ? -1 : native_mailbox->read_fd;

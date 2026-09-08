@@ -57,8 +57,6 @@ static int win32_window_accepting_input(const ux_win32_window_context *context)
 static int win32_window_emit(ux_win32_window_context *context,
     const ux_input_event *event)
 {
-    ux_input_event copied;
-
     return !win32_window_accepting_input(context) ? 0 :
         ux_component_emit(&context->component->base, event);
 }
