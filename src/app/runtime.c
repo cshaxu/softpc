@@ -587,7 +587,8 @@ int app_runtime_enqueue_input_event(app_runtime *runtime,
     if (runtime == NULL || event == NULL) return 0;
     state = InterlockedCompareExchange(&runtime->state, 0, 0);
     if (state != SOFTPC_RUNTIME_RUNNING &&
-        !(state == SOFTPC_RUNTIME_PAUSED && event->type == UX_EVENT_HOTKEY))
+        !(state == SOFTPC_RUNTIME_PAUSED &&
+          (event->type == UX_EVENT_HOTKEY || event->type == UX_EVENT_WINDOW_CLOSE)))
         return 0;
     if (!app_input_queue_push(runtime->input_queue, event))
         return 0;
