@@ -55,14 +55,13 @@ static const ux_hotkey_registration *ux_hotkey_find(
     return LIB_NULL;
 }
 
-static lib_bool ux_hotkey_modifiers_are_prefix(const ux_hotkey_matcher *matcher,
-    lib_u32 active_modifiers)
+static lib_bool ux_hotkey_modifier_is_prefix(const ux_hotkey_matcher *matcher,
+    lib_u32 modifier)
 {
     lib_u32 index;
 
     for (index = 0u; index < matcher->registration_count; ++index) {
-        if ((matcher->registrations[index].modifiers & active_modifiers) ==
-            active_modifiers)
+        if ((matcher->registrations[index].modifiers & modifier) != 0u)
             return LIB_TRUE;
     }
     return LIB_FALSE;
@@ -162,18 +161,10 @@ lib_status ux_hotkey_matcher_create(ux_hotkey_matcher **out_matcher,
     if (matcher == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     for (index = 0u; index < registration_count; ++index) {
         const ux_hotkey_registration *entry = &registrations[index];
-        lib_u32 prior;
         if (entry->virtual_key == 0u || memchr(entry->identifier, '\0',
             sizeof(entry->identifier)) == LIB_NULL) {
             free(matcher);
             return LIB_STATUS_INVALID_ARGUMENT;
-        }
-        for (prior = 0u; prior < index; ++prior) {
-            if (matcher->registrations[prior].virtual_key == entry->virtual_key &&
-                matcher->registrations[prior].modifiers == entry->modifiers) {
-                free(matcher);
-                return LIB_STATUS_INVALID_ARGUMENT;
-            }
         }
         matcher->registrations[index] = *entry;
     }
@@ -215,17 +206,13 @@ lib_status ux_hotkey_matcher_submit(ux_hotkey_matcher *matcher,
         status = ux_hotkey_flush(matcher, sink, sink_context);
         return status != LIB_STATUS_OK ? status : ux_hotkey_emit(sink, sink_context, event);
     }
-    if (ux_hotkey_is_modifier(event->value.key.virtual_key, &modifier)) {
+    if (ux_hotkey_is_modifier(event->value.key.virtual_key, &modifier) &&
+        ux_hotkey_modifier_is_prefix(matcher, modifier)) {
         matcher->active_modifiers |= modifier;
-        if (ux_hotkey_modifiers_are_prefix(matcher, matcher->active_modifiers)) {
-            if (matcher->pending_count == (lib_u32)(sizeof(matcher->pending) /
-                    sizeof(matcher->pending[0]))) return LIB_STATUS_LIMIT_EXCEEDED;
-            matcher->pending[matcher->pending_count++] = *event;
-            return LIB_STATUS_OK;
-        }
-        status = ux_hotkey_flush(matcher, sink, sink_context);
-        return status != LIB_STATUS_OK ? status : ux_hotkey_emit(sink, sink_context,
-            event);
+        if (matcher->pending_count == (lib_u32)(sizeof(matcher->pending) /
+                sizeof(matcher->pending[0]))) return LIB_STATUS_LIMIT_EXCEEDED;
+        matcher->pending[matcher->pending_count++] = *event;
+        return LIB_STATUS_OK;
     }
     match = ux_hotkey_find(matcher, event->value.key.virtual_key,
         matcher->active_modifiers);

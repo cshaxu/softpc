@@ -9,8 +9,6 @@ struct lib_console {
     void *output_context;
     lib_console_text_frame_sink text_frame_sink;
     void *text_frame_context;
-    lib_console_text_frame latest_text_frame;
-    lib_bool latest_text_frame_valid;
 };
 
 static void lib_console_lock(lib_console *console)
@@ -93,18 +91,11 @@ lib_status lib_console_set_output_sink(lib_console *console,
 lib_status lib_console_set_text_frame_sink(lib_console *console,
     lib_console_text_frame_sink sink, void *context)
 {
-    lib_console_text_frame latest;
-    lib_bool has_latest;
-
     if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     lib_console_lock(console);
     console->text_frame_sink = sink;
     console->text_frame_context = context;
-    latest = console->latest_text_frame;
-    has_latest = console->latest_text_frame_valid;
     lib_console_unlock(console);
-    if (sink != LIB_NULL && has_latest != LIB_FALSE)
-        return sink(context, &latest);
     return LIB_STATUS_OK;
 }
 
@@ -152,8 +143,6 @@ lib_status lib_console_present_text_frame(lib_console *console,
         frame->columns > LIB_CONSOLE_TEXT_COLUMNS || frame->rows == 0u ||
         frame->rows > LIB_CONSOLE_TEXT_ROWS) return LIB_STATUS_INVALID_ARGUMENT;
     lib_console_lock(console);
-    console->latest_text_frame = *frame;
-    console->latest_text_frame_valid = LIB_TRUE;
     sink = console->text_frame_sink;
     context = console->text_frame_context;
     lib_console_unlock(console);

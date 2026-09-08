@@ -21,9 +21,6 @@ typedef enum lib_console_event_kind {
 } lib_console_event_kind;
 
 typedef struct lib_console_raw_key {
-    /* Physical host scan code.  Bit 8 denotes the Win32 extended-key flag;
-     * the value is copied at the host boundary and has no native handle. */
-    lib_u16 scan_code;
     lib_u32 key;
     lib_u32 unicode;
     lib_u8 modifiers;
@@ -48,9 +45,6 @@ typedef struct lib_console_text_frame {
     lib_u16 rows;
     lib_i32 cursor_column;
     lib_i32 cursor_row;
-    lib_u8 cursor_top;
-    lib_u8 cursor_bottom;
-    lib_u32 font_height;
     lib_bool cursor_visible;
     lib_u8 text[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
     lib_u16 attributes[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];

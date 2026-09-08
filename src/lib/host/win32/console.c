@@ -11,12 +11,9 @@ struct host_console_native {
     HANDLE stop_event;
     HANDLE reader;
     DWORD original_mode;
-    lib_bool private_console;
     lib_console *console;
     host_console_mode mode;
     lib_u32 generation;
-    COORD prior_mouse_position;
-    lib_bool prior_mouse_position_valid;
 };
 
 static void host_console_output_lock(host_console_native *native_console)
@@ -45,9 +42,6 @@ static void host_console_emit_key(host_console_native *native_console,
     lib_console_event event = { 0 };
     event.kind = LIB_CONSOLE_EVENT_RAW_KEY;
     event.binding_generation = native_console->generation;
-    event.value.raw_key.scan_code = key->wVirtualScanCode;
-    if ((key->dwControlKeyState & ENHANCED_KEY) != 0u)
-        event.value.raw_key.scan_code |= 0x0100u;
     event.value.raw_key.key = key->wVirtualKeyCode;
     event.value.raw_key.unicode = key->uChar.UnicodeChar;
     event.value.raw_key.modifiers = host_console_modifiers(key->dwControlKeyState);
@@ -61,20 +55,9 @@ static void host_console_emit_mouse(host_console_native *native_console,
     lib_console_event event = { 0 };
     event.kind = LIB_CONSOLE_EVENT_RAW_MOUSE;
     event.binding_generation = native_console->generation;
-    if (native_console->prior_mouse_position_valid != LIB_FALSE) {
-        /* Win32 Console reports character-cell positions.  Raw Console and
-         * Window input must retain the old common guest-pixel contract. */
-        event.value.raw_mouse.delta_x = ((lib_i32)mouse->dwMousePosition.X -
-            native_console->prior_mouse_position.X) * 8;
-        event.value.raw_mouse.delta_y = ((lib_i32)mouse->dwMousePosition.Y -
-            native_console->prior_mouse_position.Y) * 16;
-    }
-    native_console->prior_mouse_position = mouse->dwMousePosition;
-    native_console->prior_mouse_position_valid = LIB_TRUE;
-    event.value.raw_mouse.buttons =
-        (mouse->dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) != 0u ? 0x01u : 0u;
-    if ((mouse->dwButtonState & RIGHTMOST_BUTTON_PRESSED) != 0u)
-        event.value.raw_mouse.buttons |= 0x02u;
+    event.value.raw_mouse.delta_x = mouse->dwMousePosition.X;
+    event.value.raw_mouse.delta_y = mouse->dwMousePosition.Y;
+    event.value.raw_mouse.buttons = mouse->dwButtonState;
     (void)lib_console_deliver_event(native_console->console, &event);
 }
 
@@ -133,24 +116,8 @@ lib_status host_console_native_create(host_console_native **out_native)
         !GetConsoleMode(native_console->input, &mode)) {
         if (native_console->input != INVALID_HANDLE_VALUE) CloseHandle(native_console->input);
         if (native_console->output != INVALID_HANDLE_VALUE) CloseHandle(native_console->output);
-        if (GetConsoleCP() != 0u || !AllocConsole()) {
-            free(native_console);
-            return LIB_STATUS_UNSUPPORTED;
-        }
-        native_console->private_console = LIB_TRUE;
-        native_console->input = CreateFileA("CONIN$", GENERIC_READ | GENERIC_WRITE,
-            FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-        native_console->output = CreateFileA("CONOUT$", GENERIC_READ | GENERIC_WRITE,
-            FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-        if (native_console->input == INVALID_HANDLE_VALUE ||
-            native_console->output == INVALID_HANDLE_VALUE ||
-            !GetConsoleMode(native_console->input, &mode)) {
-            if (native_console->input != INVALID_HANDLE_VALUE) CloseHandle(native_console->input);
-            if (native_console->output != INVALID_HANDLE_VALUE) CloseHandle(native_console->output);
-            FreeConsole();
-            free(native_console);
-            return LIB_STATUS_UNSUPPORTED;
-        }
+        free(native_console);
+        return LIB_STATUS_UNSUPPORTED;
     }
     native_console->original_mode = mode;
     *out_native = native_console;
@@ -163,7 +130,6 @@ void host_console_native_destroy(host_console_native *native_console)
     host_console_native_deactivate(native_console);
     if (native_console->input != INVALID_HANDLE_VALUE) CloseHandle(native_console->input);
     if (native_console->output != INVALID_HANDLE_VALUE) CloseHandle(native_console->output);
-    if (native_console->private_console != LIB_FALSE) FreeConsole();
     free(native_console);
 }
 
@@ -184,24 +150,12 @@ lib_status host_console_native_activate(host_console_native *native_console,
     native_console->console = console;
     native_console->mode = mode;
     native_console->generation = generation;
-    native_console->prior_mouse_position_valid = LIB_FALSE;
-    {
-        HWND window = GetConsoleWindow();
-        if (window != NULL) {
-            if (IsIconic(window)) ShowWindow(window, SW_RESTORE);
-            (void)SetForegroundWindow(window);
-            (void)SetActiveWindow(window);
-            (void)SetFocus(window);
-        }
-    }
     native_console->reader = CreateThread(NULL, 0u, host_console_reader,
         native_console, 0u, NULL);
     if (native_console->reader == NULL) {
         CloseHandle(native_console->stop_event);
         native_console->stop_event = NULL;
         native_console->console = LIB_NULL;
-        (void)SetConsoleMode(native_console->input,
-            native_console->original_mode);
         return LIB_STATUS_NO_MEMORY;
     }
     return LIB_STATUS_OK;
@@ -209,22 +163,16 @@ lib_status host_console_native_activate(host_console_native *native_console,
 
 void host_console_native_deactivate(host_console_native *native_console)
 {
-    if (native_console == LIB_NULL) return;
-    if (native_console->reader != NULL) {
-        (void)SetEvent(native_console->stop_event);
-        (void)CancelSynchronousIo(native_console->reader);
-        (void)WaitForSingleObject(native_console->reader, INFINITE);
-        CloseHandle(native_console->reader);
-        native_console->reader = NULL;
-    }
-    if (native_console->stop_event != NULL) {
-        CloseHandle(native_console->stop_event);
-        native_console->stop_event = NULL;
-    }
+    if (native_console == LIB_NULL || native_console->reader == NULL) return;
+    (void)SetEvent(native_console->stop_event);
+    (void)CancelSynchronousIo(native_console->reader);
+    (void)WaitForSingleObject(native_console->reader, INFINITE);
+    CloseHandle(native_console->reader);
+    CloseHandle(native_console->stop_event);
+    native_console->reader = NULL;
+    native_console->stop_event = NULL;
     native_console->console = LIB_NULL;
-    native_console->prior_mouse_position_valid = LIB_FALSE;
-    if (native_console->input != INVALID_HANDLE_VALUE)
-        (void)SetConsoleMode(native_console->input, native_console->original_mode);
+    (void)SetConsoleMode(native_console->input, native_console->original_mode);
 }
 
 lib_status host_console_native_write(void *context, const char *text,
@@ -246,13 +194,9 @@ lib_status host_console_native_present_text_frame(void *context,
     const lib_console_text_frame *frame)
 {
     host_console_native *native_console = (host_console_native *)context;
-    CHAR_INFO cells[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
     CONSOLE_SCREEN_BUFFER_INFOEX info = { 0 };
-    CONSOLE_CURSOR_INFO cursor;
-    COORD size = { LIB_CONSOLE_TEXT_COLUMNS, LIB_CONSOLE_TEXT_ROWS };
     COORD position = { 0, 0 };
-    SMALL_RECT region = { 0, 0, LIB_CONSOLE_TEXT_COLUMNS - 1,
-        LIB_CONSOLE_TEXT_ROWS - 1 };
+    DWORD written;
     lib_u32 row;
     lib_status status = LIB_STATUS_OK;
 
@@ -260,26 +204,6 @@ lib_status host_console_native_present_text_frame(void *context,
         frame->columns > LIB_CONSOLE_TEXT_COLUMNS || frame->rows == 0u ||
         frame->rows > LIB_CONSOLE_TEXT_ROWS) return LIB_STATUS_INVALID_ARGUMENT;
     host_console_output_lock(native_console);
-    {
-        CONSOLE_SCREEN_BUFFER_INFO surface;
-        COORD required;
-        SMALL_RECT viewport = { 0, 0, LIB_CONSOLE_TEXT_COLUMNS - 1,
-            LIB_CONSOLE_TEXT_ROWS - 1 };
-        if (!GetConsoleScreenBufferInfo(native_console->output, &surface)) {
-            host_console_output_unlock(native_console);
-            return LIB_STATUS_IO_ERROR;
-        }
-        required.X = surface.dwSize.X < (SHORT)LIB_CONSOLE_TEXT_COLUMNS ?
-            (SHORT)LIB_CONSOLE_TEXT_COLUMNS : surface.dwSize.X;
-        required.Y = surface.dwSize.Y < (SHORT)LIB_CONSOLE_TEXT_ROWS ?
-            (SHORT)LIB_CONSOLE_TEXT_ROWS : surface.dwSize.Y;
-        if ((required.X != surface.dwSize.X || required.Y != surface.dwSize.Y) &&
-            !SetConsoleScreenBufferSize(native_console->output, required)) {
-            host_console_output_unlock(native_console);
-            return LIB_STATUS_IO_ERROR;
-        }
-        (void)SetConsoleWindowInfo(native_console->output, TRUE, &viewport);
-    }
     info.cbSize = sizeof(info);
     if (GetConsoleScreenBufferInfoEx(native_console->output, &info)) {
         for (row = 0u; row < 16u; ++row) {
@@ -289,34 +213,26 @@ lib_status host_console_native_present_text_frame(void *context,
         }
         (void)SetConsoleScreenBufferInfoEx(native_console->output, &info);
     }
-    for (row = 0u; row < LIB_CONSOLE_TEXT_ROWS; ++row) {
-        lib_u32 column;
-        for (column = 0u; column < LIB_CONSOLE_TEXT_COLUMNS; ++column) {
-            lib_size offset = (lib_size)row * LIB_CONSOLE_TEXT_COLUMNS + column;
-            cells[offset].Char.AsciiChar = row < frame->rows && column < frame->columns &&
-                frame->text[offset] >= 0x20u && frame->text[offset] < 0x7fu ?
-                    (CHAR)frame->text[offset] : ' ';
-            cells[offset].Attributes = (WORD)(row < frame->rows &&
-                column < frame->columns ? frame->attributes[offset] : 0u);
+    for (row = 0u; row < frame->rows; ++row) {
+        lib_size offset = (lib_size)row * LIB_CONSOLE_TEXT_COLUMNS;
+        position.Y = (SHORT)row;
+        if (!WriteConsoleOutputCharacterA(native_console->output,
+                (const char *)&frame->text[offset], frame->columns, position, &written) ||
+            written != frame->columns || !WriteConsoleOutputAttribute(native_console->output,
+                (const WORD *)&frame->attributes[offset], frame->columns, position,
+                &written) || written != frame->columns) {
+            status = LIB_STATUS_IO_ERROR;
+            break;
         }
     }
-    if (!WriteConsoleOutputA(native_console->output, cells, size, position, &region))
-        status = LIB_STATUS_IO_ERROR;
-    cursor.dwSize = frame->font_height != 0u &&
-        frame->cursor_bottom >= frame->cursor_top ?
-            (DWORD)((frame->cursor_bottom - frame->cursor_top + 1u) *
-                100u / frame->font_height) : 100u;
-    if (cursor.dwSize == 0u || cursor.dwSize > 100u) cursor.dwSize = 100u;
-    cursor.bVisible = status == LIB_STATUS_OK && frame->cursor_visible != LIB_FALSE &&
+    if (status == LIB_STATUS_OK && frame->cursor_visible != LIB_FALSE &&
         frame->cursor_column >= 0 && frame->cursor_column < frame->columns &&
-        frame->cursor_row >= 0 && frame->cursor_row < frame->rows;
-    if (cursor.bVisible) {
+        frame->cursor_row >= 0 && frame->cursor_row < frame->rows) {
         position.X = (SHORT)frame->cursor_column;
         position.Y = (SHORT)frame->cursor_row;
         if (!SetConsoleCursorPosition(native_console->output, position))
             status = LIB_STATUS_IO_ERROR;
     }
-    (void)SetConsoleCursorInfo(native_console->output, &cursor);
     host_console_output_unlock(native_console);
     return status;
 }
