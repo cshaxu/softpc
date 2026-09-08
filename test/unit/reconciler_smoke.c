@@ -16,6 +16,9 @@ int main(void)
        makes it actual.  It must not be emitted twice. */
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
     app_reconciler_note_runtime(&state, SOFTPC_RUNTIME_RUNNING);
+    /* Runtime RUNNING alone must not steal the cooked monitor: raw Console
+       ownership begins only when a completed VM frame is observed. */
+    assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
     app_reconciler_note_frame(&state, 1);
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_CREATE_WINDOW);
     app_reconciler_note_window(&state, 1);

@@ -13,6 +13,7 @@ typedef struct app_presentation_plan {
 /* Pure product-policy derivation.  It neither creates components nor touches
  * host Console registration; the reconciler applies the returned facts. */
 app_presentation_plan app_presentation_derive(softpc_presentation display,
-    int console_control, app_runtime_state state, int graphics);
+    int console_control, app_runtime_state state, int frame_available,
+    int graphics);
 
 #endif

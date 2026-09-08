@@ -1,7 +1,8 @@
 #include "presentation_plan.h"
 
 app_presentation_plan app_presentation_derive(softpc_presentation display,
-    int console_control, app_runtime_state state, int graphics)
+    int console_control, app_runtime_state state, int frame_available,
+    int graphics)
 {
     app_presentation_plan plan = { 0, 0, 1 };
 
@@ -19,6 +20,11 @@ app_presentation_plan app_presentation_derive(softpc_presentation display,
         plan.window_enabled = 1;
         return plan;
     }
+    /* A running Console-display machine remains on the cooked monitor until
+     * it has actually committed its first guest frame.  In particular, do
+     * not cancel a ReadConsole line merely because the VM announced RUNNING. */
+    if (!frame_available)
+        return plan;
     if (!graphics) {
         plan.vm_console_enabled = 1;
         plan.monitor_console_enabled = 0;

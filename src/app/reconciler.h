@@ -40,6 +40,7 @@ typedef struct app_reconciler {
     softpc_presentation display;
     int console_control;
     app_runtime_state runtime_actual;
+    int frame_actual;
     int graphics_actual;
     int window_actual;
     int vm_console_actual;

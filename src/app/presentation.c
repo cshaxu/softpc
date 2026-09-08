@@ -218,12 +218,30 @@ static int app_presentation_publish(app_presentation_context *context,
         }
         console_frame = &console_status;
     }
-    if (context->console != NULL &&
+    if (context->reducer.vm_console_actual &&
+        context->reducer.current_console_actual == APP_RECONCILER_CONSOLE_VM &&
+        context->console != NULL &&
         ux_component_publish_frame(ux_console_component(context->console), console_frame) !=
             LIB_STATUS_OK) return 0;
-    if (context->window != NULL &&
+    if (context->reducer.window_actual && context->window != NULL &&
         ux_component_publish_frame(ux_window_component(context->window), frame) !=
             LIB_STATUS_OK) return 0;
+    return 1;
+}
+
+static int app_presentation_frame_targets_ready(
+    const app_presentation_context *context)
+{
+    app_presentation_plan desired;
+
+    if (context == NULL) return 0;
+    desired = app_reconciler_desired(&context->reducer);
+    if (!desired.window_enabled && !desired.vm_console_enabled) return 0;
+    if (desired.window_enabled && !context->reducer.window_actual) return 0;
+    if (desired.vm_console_enabled &&
+        (!context->reducer.vm_console_actual ||
+         context->reducer.current_console_actual != APP_RECONCILER_CONSOLE_VM))
+        return 0;
     return 1;
 }
 
@@ -336,11 +354,12 @@ int app_presentation_reconcile(app_presentation *context)
      * records.  A non-NULL local handle means merely that a request was
      * issued; treating it as actual here reintroduces a second control path. */
     if (!app_presentation_apply_next_action(context)) return 0;
-    if ((context->window != NULL || context->console != NULL) &&
-        context->observed_frame_sequence != 0u &&
+    if (context->observed_frame_sequence != 0u &&
         context->observed_frame_sequence != context->delivered_frame_sequence &&
-        !app_presentation_publish(context, &context->observed_frame)) return 0;
-    context->delivered_frame_sequence = context->observed_frame_sequence;
+        app_presentation_frame_targets_ready(context)) {
+        if (!app_presentation_publish(context, &context->observed_frame)) return 0;
+        context->delivered_frame_sequence = context->observed_frame_sequence;
+    }
     return 1;
 }
 

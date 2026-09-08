@@ -27,6 +27,12 @@ void app_reconciler_note_runtime(app_reconciler *reconciler,
 {
     if (reconciler == NULL) return;
     reconciler->runtime_actual = state;
+    if (state == SOFTPC_RUNTIME_STOPPED || state == SOFTPC_RUNTIME_ERROR) {
+        /* A subsequent run must not inherit the previous run's display
+         * route before it has committed a frame of its own. */
+        reconciler->frame_actual = 0;
+        reconciler->graphics_actual = 0;
+    }
     if ((reconciler->in_flight == APP_RECONCILER_ACTION_RUNTIME_START ||
          reconciler->in_flight == APP_RECONCILER_ACTION_RUNTIME_RESUME) &&
         state == SOFTPC_RUNTIME_RUNNING)
@@ -43,7 +49,12 @@ void app_reconciler_note_runtime(app_reconciler *reconciler,
 }
 
 void app_reconciler_note_frame(app_reconciler *reconciler, int graphics)
-{ if (reconciler != NULL) reconciler->graphics_actual = graphics != 0; }
+{
+    if (reconciler != NULL) {
+        reconciler->frame_actual = 1;
+        reconciler->graphics_actual = graphics != 0;
+    }
+}
 
 void app_reconciler_note_window(app_reconciler *reconciler, int exists)
 {
@@ -81,6 +92,7 @@ app_presentation_plan app_reconciler_desired(const app_reconciler *reconciler)
     if (reconciler == NULL) return plan;
     plan = app_presentation_derive(reconciler->display,
         reconciler->console_control, reconciler->runtime_actual,
+        reconciler->frame_actual,
         reconciler->graphics_actual);
     if (reconciler->close_requested &&
         reconciler->runtime_actual == SOFTPC_RUNTIME_PAUSED)

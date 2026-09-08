@@ -10,6 +10,32 @@
 #ifdef _WIN32
 #include <windows.h>
 
+typedef struct runtime_completion_probe {
+    volatile LONG state_facts;
+    volatile LONG frame_facts;
+} runtime_completion_probe;
+
+static void runtime_state_probe_receive(void *opaque, app_runtime_state state,
+    uint32_t run_generation)
+{
+    runtime_completion_probe *probe = (runtime_completion_probe *)opaque;
+    (void)state;
+    (void)run_generation;
+    if (probe == NULL) return;
+    (void)InterlockedIncrement(&probe->state_facts);
+}
+
+static void runtime_frame_probe_receive(void *opaque, uint32_t sequence,
+    int graphics, uint32_t run_generation)
+{
+    runtime_completion_probe *probe = (runtime_completion_probe *)opaque;
+    (void)sequence;
+    (void)graphics;
+    (void)run_generation;
+    if (probe == NULL) return;
+    (void)InterlockedIncrement(&probe->frame_facts);
+}
+
 static int app_runtime_wait(app_runtime *runtime,
     app_runtime_state expected)
 {
@@ -32,6 +58,7 @@ int main(void)
     app_runtime *runtime = NULL;
     app_runtime_frame *frame;
     uint32_t first_run;
+    runtime_completion_probe completion_probe = { 0 };
 
     options.media_mode = SOFTPC_MEDIA_OVERLAY;
     sector[0] = 0xebu;
@@ -45,6 +72,10 @@ int main(void)
 
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(app_runtime_create(machine, &runtime));
+    app_runtime_set_state_sink(runtime, runtime_state_probe_receive,
+        &completion_probe);
+    app_runtime_set_frame_sink(runtime, runtime_frame_probe_receive,
+        &completion_probe);
     /* The product control FIFO must not turn a short input burst into a
        silently dropped make/break sequence at its old fixed-64 boundary. */
     {
@@ -100,12 +131,20 @@ int main(void)
     assert(frame->sequence != 0u);
     {
         uint32_t stable_sequence = frame->sequence;
+        LONG stable_state_facts;
         /* An unchanged text screen is not an executor heartbeat.  Repeated
            publication would flood the app control FIFO and starve Console
            raw input behind redundant frame completions. */
         Sleep(150u);
         assert(app_runtime_copy_frame(runtime, frame));
         assert(frame->sequence == stable_sequence);
+        /* Executor paint callbacks are frame facts only. They must not create
+           additional lifecycle completions while the machine stays running. */
+        stable_state_facts = InterlockedCompareExchange(
+            &completion_probe.state_facts, 0, 0);
+        Sleep(150u);
+        assert(InterlockedCompareExchange(&completion_probe.state_facts, 0, 0) ==
+            stable_state_facts);
     }
     /* Runtime owns copied frame production only.  Component existence and
        Console/Window selection belong to the app presentation reconciler,

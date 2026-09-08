@@ -24,15 +24,22 @@ typedef enum app_runtime_state {
     SOFTPC_RUNTIME_ERROR
 } app_runtime_state;
 
-typedef void (*app_runtime_completion_sink)(void *context,
-    app_runtime_state state, uint32_t frame_sequence, int frame_graphics,
-    uint32_t run_generation);
+/* State transitions and completed frame publication are independent facts.
+ * Keeping their callbacks separate prevents an executor paint callback from
+ * being mistaken for a lifecycle completion by the product control queue. */
+typedef void (*app_runtime_state_sink)(void *context,
+    app_runtime_state state, uint32_t run_generation);
+
+typedef void (*app_runtime_frame_sink)(void *context,
+    uint32_t frame_sequence, int frame_graphics, uint32_t run_generation);
 
 typedef ux_frame app_runtime_frame;
 
 int app_runtime_create(softpc_machine *machine, app_runtime **out);
-void app_runtime_set_completion_sink(app_runtime *runtime,
-    app_runtime_completion_sink sink, void *context);
+void app_runtime_set_state_sink(app_runtime *runtime,
+    app_runtime_state_sink sink, void *context);
+void app_runtime_set_frame_sink(app_runtime *runtime,
+    app_runtime_frame_sink sink, void *context);
 int app_runtime_start(app_runtime *runtime);
 int app_runtime_pause(app_runtime *runtime);
 int app_runtime_resume(app_runtime *runtime);

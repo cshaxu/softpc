@@ -30,7 +30,13 @@ struct app_control_queue {
     uint64_t fatal_delivery_source;
     uint32_t fatal_delivery_generation;
     lib_status fatal_delivery_status;
+    int fatal_queue_delivery_pending;
+    uint32_t fatal_queue_delivery_generation;
+    lib_status fatal_queue_delivery_status;
 };
+
+static int app_control_queue_push(app_control_queue *queue,
+    const app_control_event *event);
 
 /* Allocation failure must not turn a key transition into a silent drop.  This
  * fixed metadata slot is the queue's final, allocation-free fault record. */
@@ -47,6 +53,32 @@ static void app_control_queue_latch_delivery_failure(app_control_queue *queue,
     }
     (void)SetEvent(queue->available);
     LeaveCriticalSection(&queue->lock);
+}
+
+/* All control records are facts required by the sole reconciler.  If the
+ * dynamically growing FIFO cannot retain one, expose a terminal failure from
+ * fixed storage rather than pretending the fact never happened. */
+static void app_control_queue_latch_queue_delivery_failure(
+    app_control_queue *queue, lib_status status, uint32_t run_generation)
+{
+    if (queue == NULL) return;
+    EnterCriticalSection(&queue->lock);
+    if (!queue->fatal_queue_delivery_pending) {
+        queue->fatal_queue_delivery_pending = 1;
+        queue->fatal_queue_delivery_generation = run_generation;
+        queue->fatal_queue_delivery_status = status;
+    }
+    (void)SetEvent(queue->available);
+    LeaveCriticalSection(&queue->lock);
+}
+
+static int app_control_queue_push_required(app_control_queue *queue,
+    const app_control_event *event)
+{
+    if (app_control_queue_push(queue, event)) return 1;
+    app_control_queue_latch_queue_delivery_failure(queue, LIB_STATUS_NO_MEMORY,
+        event == NULL ? 0u : event->run_generation);
+    return 0;
 }
 
 static int app_control_queue_push(app_control_queue *queue,
@@ -141,7 +173,7 @@ int app_control_queue_push_monitor_line(app_control_queue *queue,
     if (line == NULL) return 0;
     copied.kind = APP_CONTROL_MONITOR_LINE;
     copied.value.line = *line;
-    return app_control_queue_push(queue, &copied);
+    return app_control_queue_push_required(queue, &copied);
 }
 
 int app_control_queue_push_runtime_completed(app_control_queue *queue,
@@ -149,7 +181,7 @@ int app_control_queue_push_runtime_completed(app_control_queue *queue,
 {
     app_control_event event = { APP_CONTROL_RUNTIME_COMPLETED, run_generation };
     event.value.runtime_state = state;
-    return app_control_queue_push(queue, &event);
+    return app_control_queue_push_required(queue, &event);
 }
 
 int app_control_queue_push_frame_completed(app_control_queue *queue,
@@ -158,7 +190,7 @@ int app_control_queue_push_frame_completed(app_control_queue *queue,
     app_control_event event = { APP_CONTROL_FRAME_COMPLETED, run_generation };
     event.value.frame.sequence = sequence;
     event.value.frame.graphics = graphics != 0;
-    return app_control_queue_push(queue, &event);
+    return app_control_queue_push_required(queue, &event);
 }
 
 int app_control_queue_push_component_completed(app_control_queue *queue,
@@ -167,7 +199,7 @@ int app_control_queue_push_component_completed(app_control_queue *queue,
     app_control_event event = { APP_CONTROL_COMPONENT_COMPLETED, run_generation };
     event.value.component.component = component;
     event.value.component.exists = exists != 0;
-    return app_control_queue_push(queue, &event);
+    return app_control_queue_push_required(queue, &event);
 }
 
 int app_control_queue_push_broker_completed(app_control_queue *queue,
@@ -175,7 +207,7 @@ int app_control_queue_push_broker_completed(app_control_queue *queue,
 {
     app_control_event event = { APP_CONTROL_BROKER_COMPLETED, run_generation };
     event.value.broker_vm_console_current = vm_console_current != 0;
-    return app_control_queue_push(queue, &event);
+    return app_control_queue_push_required(queue, &event);
 }
 
 int app_control_queue_push_ux_delivery_failed(app_control_queue *queue,
@@ -184,7 +216,7 @@ int app_control_queue_push_ux_delivery_failed(app_control_queue *queue,
     app_control_event event = { APP_CONTROL_UX_DELIVERY_FAILED, run_generation };
     event.value.delivery_failure.source_identity = source_identity;
     event.value.delivery_failure.status = status;
-    return app_control_queue_push(queue, &event);
+    return app_control_queue_push_required(queue, &event);
 }
 
 int app_control_queue_take(app_control_queue *queue,
@@ -201,6 +233,17 @@ int app_control_queue_take(app_control_queue *queue,
         out_event->value.delivery_failure.source_identity = queue->fatal_delivery_source;
         out_event->value.delivery_failure.status = queue->fatal_delivery_status;
         queue->fatal_delivery_pending = 0;
+        if (!queue->fatal_queue_delivery_pending)
+            (void)ResetEvent(queue->available);
+        LeaveCriticalSection(&queue->lock);
+        return 1;
+    }
+    if (queue->count == 0u && queue->fatal_queue_delivery_pending) {
+        memset(out_event, 0, sizeof(*out_event));
+        out_event->kind = APP_CONTROL_QUEUE_DELIVERY_FAILED;
+        out_event->run_generation = queue->fatal_queue_delivery_generation;
+        out_event->value.queue_delivery_status = queue->fatal_queue_delivery_status;
+        queue->fatal_queue_delivery_pending = 0;
         (void)ResetEvent(queue->available);
         LeaveCriticalSection(&queue->lock);
         return 1;
@@ -213,7 +256,8 @@ int app_control_queue_take(app_control_queue *queue,
     *out_event = queue->events[queue->first];
     queue->first = (queue->first + 1u) % queue->capacity;
     --queue->count;
-    if (queue->count == 0u && !queue->fatal_delivery_pending)
+    if (queue->count == 0u && !queue->fatal_delivery_pending &&
+        !queue->fatal_queue_delivery_pending)
         (void)ResetEvent(queue->available);
     LeaveCriticalSection(&queue->lock);
     return 1;

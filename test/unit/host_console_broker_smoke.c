@@ -54,8 +54,8 @@ void host_console_native_discard_prepare(host_console_native *native_console)
 lib_status host_console_native_activate(host_console_native *native_console,
     lib_console *console, host_console_mode mode, lib_u32 generation)
 {
-    if (host_console_fail_next_activation) {
-        host_console_fail_next_activation = 0;
+    if (host_console_fail_next_activation > 0) {
+        --host_console_fail_next_activation;
         return LIB_STATUS_IO_ERROR;
     }
     native_console->active = console;
@@ -170,6 +170,16 @@ int main(void)
     assert(host_console_replace_active(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_OK);
+    /* If the next reader and the mandatory old-reader restoration both fail,
+       the broker is terminally broken rather than falsely advertising old as
+       Current. The application must stop; a later replacement cannot revive
+       an indeterminate native Console transaction. */
+    host_console_fail_next_activation = 2;
+    assert(host_console_replace_active(broker, second, first,
+        HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);
+    assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_NOT_CURRENT);
+    assert(host_console_replace_active(broker, second, first,
+        HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_INVALID_STATE);
     host_console_broker_destroy(broker);
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_NOT_CURRENT);
     assert(host_console_broker_create(&second_broker, first,

@@ -8,6 +8,10 @@ struct host_console_broker {
     host_console_mode current_mode;
     lib_u32 generation;
     struct host_console_output_binding *current_output;
+    /* A next-reader failure followed by a failed old-reader restore leaves
+       native Console I/O unusable.  Do not masquerade that as a current
+       logical Console; all later replacements fail and the app terminates. */
+    lib_bool broken;
 };
 
 typedef struct host_console_output_binding {
@@ -161,7 +165,7 @@ lib_status host_console_replace_active(host_console_broker *broker,
         (next_mode != HOST_CONSOLE_RAW_EVENTS &&
          next_mode != HOST_CONSOLE_COOKED_LINES)) return LIB_STATUS_INVALID_ARGUMENT;
     host_console_lock(broker);
-    if (broker->current != old_console) {
+    if (broker->broken || broker->current != old_console) {
         host_console_unlock(broker);
         return LIB_STATUS_INVALID_STATE;
     }
@@ -202,16 +206,27 @@ lib_status host_console_replace_active(host_console_broker *broker,
     lib_console_invalidate_binding(old);
     status = host_console_activate_bound(broker, next, next_mode, next_generation);
     if (status != LIB_STATUS_OK) {
+        lib_status restore_status;
         /* A failed next object never becomes visible.  Restore the old reader
-         * before returning, preserving the one-current-object invariant. */
-        status = host_console_activate_bound(broker, old, broker->current_mode,
+         * before returning. If restoration itself fails, native Console I/O is
+         * terminally broken and callers must not keep operating on a fiction
+         * that old remains active. */
+        restore_status = host_console_activate_bound(broker, old, broker->current_mode,
             broker->generation);
         host_console_native_discard_prepare(broker->native_console);
         host_console_native_unlock_output(broker->native_console);
         host_console_remove_output_binding(next, next_output);
         lib_console_release(next);
+        if (restore_status != LIB_STATUS_OK) {
+            broker->broken = LIB_TRUE;
+            old_output = broker->current_output;
+            broker->current_output = LIB_NULL;
+            host_console_unlock(broker);
+            host_console_remove_output_binding(old, old_output);
+            return restore_status;
+        }
         host_console_unlock(broker);
-        return status == LIB_STATUS_OK ? LIB_STATUS_IO_ERROR : status;
+        return LIB_STATUS_IO_ERROR;
     }
     broker->current = next;
     broker->current_mode = next_mode;

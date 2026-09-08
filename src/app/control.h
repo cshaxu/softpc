@@ -16,7 +16,10 @@ typedef enum app_control_event_kind {
     APP_CONTROL_FRAME_COMPLETED,
     APP_CONTROL_COMPONENT_COMPLETED,
     APP_CONTROL_BROKER_COMPLETED,
-    APP_CONTROL_UX_DELIVERY_FAILED
+    APP_CONTROL_UX_DELIVERY_FAILED,
+    /* The queue could not retain a control fact.  Continuing would leave the
+       reducer waiting for an event which was silently lost. */
+    APP_CONTROL_QUEUE_DELIVERY_FAILED
 } app_control_event_kind;
 
 typedef enum app_control_component_kind {
@@ -37,6 +40,7 @@ typedef struct app_control_event {
         struct { app_control_component_kind component; int exists; } component;
         int broker_vm_console_current;
         struct { uint64_t source_identity; lib_status status; } delivery_failure;
+        lib_status queue_delivery_status;
     } value;
 } app_control_event;
 
