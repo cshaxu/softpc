@@ -48,6 +48,7 @@ typedef struct app_reconciler {
     /* A requested effect is not an actual fact.  Until its completion is
      * returned on the control FIFO, no second transition may be emitted. */
     app_reconciler_action in_flight;
+    int reset_started;
     int close_requested;
 } app_reconciler;
 

@@ -63,5 +63,20 @@ int main(void)
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
     app_reconciler_note_window(&state, 1);
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
+
+    /* Reset is a single intent: stop an existing run, cold start, then
+       pause only after the new run reports running. */
+    app_reconciler_initialize(&state, SOFTPC_PRESENTATION_WINDOW, 1);
+    app_reconciler_note_runtime(&state, SOFTPC_RUNTIME_RUNNING);
+    app_reconciler_note_intent(&state, APP_RECONCILER_INTENT_RESET);
+    assert(app_reconciler_take_action(&state) == APP_RECONCILER_ACTION_RUNTIME_STOP);
+    app_reconciler_note_runtime(&state, SOFTPC_RUNTIME_STOPPED);
+    assert(app_reconciler_take_action(&state) == APP_RECONCILER_ACTION_RUNTIME_START);
+    app_reconciler_note_runtime(&state, SOFTPC_RUNTIME_RUNNING);
+    assert(app_reconciler_take_action(&state) == APP_RECONCILER_ACTION_RUNTIME_PAUSE);
+    app_reconciler_note_runtime(&state, SOFTPC_RUNTIME_PAUSED);
+    assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_CREATE_WINDOW);
+    app_reconciler_note_window(&state, 1);
+    assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
     return 0;
 }

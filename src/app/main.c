@@ -373,9 +373,8 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
             state = SOFTPC_MONITOR_STOPPED;
             app_monitor_console_write(monitor, "Machine stopped.\r\n");
         } else if (strcmp(command, "reset") == 0) {
-            if (!app_runtime_stop(runtime) || !app_runtime_start(runtime) ||
-                !app_runtime_pause(runtime) ||
-                !app_presentation_reconcile(presenter)) goto failed;
+            app_presentation_request_intent(presenter, APP_RECONCILER_INTENT_RESET);
+            if (!app_monitor_drive(runtime, presenter)) goto failed;
             state = SOFTPC_MONITOR_PAUSED;
             app_monitor_console_write(monitor, "Machine reset and pause requested.\r\n");
         } else if (strcmp(command, "floppy") == 0) {
