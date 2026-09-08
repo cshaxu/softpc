@@ -1,4 +1,7 @@
 #include "control.h"
+#include "keyboard.h"
+
+#include <string.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -96,5 +99,27 @@ int app_control_queue_take(app_control_queue *queue,
     if (queue->count == 0u) (void)ResetEvent(queue->available);
     LeaveCriticalSection(&queue->lock);
     return 1;
+}
+
+int app_control_handle_ux(app_runtime *runtime, const ux_input_event *event)
+{
+    if (runtime == NULL || event == NULL) return 0;
+    if (event->type == UX_EVENT_KEY || event->type == UX_EVENT_MOUSE)
+        return app_keyboard_deliver_input(runtime, event);
+    if (event->type == UX_EVENT_WINDOW_CLOSE)
+        return app_runtime_request_window_close(runtime);
+    if (event->type != UX_EVENT_HOTKEY) return 1;
+    if (strcmp(event->data.hotkey.identifier, "pause-toggle") == 0)
+        return app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED ?
+            app_runtime_resume(runtime) : app_runtime_pause(runtime);
+    if (strcmp(event->data.hotkey.identifier, "send-ctrl-alt-del") == 0)
+        return app_keyboard_submit_ctrl_alt_del(runtime, app_keyboard_deliver_input);
+    if (strcmp(event->data.hotkey.identifier, "send-alt-enter") == 0)
+        return app_keyboard_submit_alt_enter(runtime, app_keyboard_deliver_input);
+    if (strcmp(event->data.hotkey.identifier, "release-window-mouse") == 0) {
+        app_runtime_request_window_mouse_release(runtime);
+        return 1;
+    }
+    return 0;
 }
 #endif

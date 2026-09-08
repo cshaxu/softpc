@@ -418,6 +418,7 @@ set_tests_properties(softpc-lifecycle-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-runtime-smoke
     test/unit/runtime_smoke.c
+    src/app/control.c
     src/app/runtime.c
     src/app/input_queue.c
     src/app/keyboard.c
@@ -430,6 +431,7 @@ set_tests_properties(softpc-runtime-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-runtime-input-continuation-smoke
     test/unit/runtime_input_continuation_smoke.c
+    src/app/control.c
     src/app/runtime.c
     src/app/input_queue.c
     src/app/keyboard.c

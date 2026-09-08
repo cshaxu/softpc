@@ -3,6 +3,7 @@
 
 #include "lib/base/console.h"
 #include "lib/ux-base/event.h"
+#include "runtime.h"
 
 typedef struct app_control_queue app_control_queue;
 
@@ -27,5 +28,6 @@ int app_control_queue_push_monitor_line(app_control_queue *queue,
     const lib_console_line *line);
 int app_control_queue_take(app_control_queue *queue,
     app_control_event *out_event, unsigned long timeout_ms);
+int app_control_handle_ux(app_runtime *runtime, const ux_input_event *event);
 
 #endif

@@ -1,6 +1,5 @@
 #include "presentation.h"
 #include "monitor.h"
-#include "keyboard.h"
 #include "runtime.h"
 #include "machine.h"
 #include "prompt_trace.h"
@@ -267,29 +266,6 @@ static int app_monitor_start(app_runtime *runtime, app_frontend *frontend,
     return 1;
 }
 
-static int app_monitor_handle_ux(app_runtime *runtime,
-    const ux_input_event *event)
-{
-    if (runtime == NULL || event == NULL) return 0;
-    if (event->type == UX_EVENT_KEY || event->type == UX_EVENT_MOUSE)
-        return app_keyboard_deliver_input(runtime, event);
-    if (event->type == UX_EVENT_WINDOW_CLOSE)
-        return app_runtime_request_window_close(runtime);
-    if (event->type != UX_EVENT_HOTKEY) return 1;
-    if (strcmp(event->data.hotkey.identifier, "pause-toggle") == 0)
-        return app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED ?
-            app_runtime_resume(runtime) : app_runtime_pause(runtime);
-    if (strcmp(event->data.hotkey.identifier, "send-ctrl-alt-del") == 0)
-        return app_keyboard_submit_ctrl_alt_del(runtime, app_keyboard_deliver_input);
-    if (strcmp(event->data.hotkey.identifier, "send-alt-enter") == 0)
-        return app_keyboard_submit_alt_enter(runtime, app_keyboard_deliver_input);
-    if (strcmp(event->data.hotkey.identifier, "release-window-mouse") == 0) {
-        app_runtime_request_window_mouse_release(runtime);
-        return 1;
-    }
-    return 0;
-}
-
 static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
     int console_control, app_monitor_console *monitor,
     app_control_queue *control_queue)
@@ -311,7 +287,7 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
             app_control_event control_event;
             if (app_control_queue_take(control_queue, &control_event, 100u)) {
                 if (control_event.kind == APP_CONTROL_UX_INPUT) {
-                    if (!app_monitor_handle_ux(runtime, &control_event.value.ux))
+                    if (!app_control_handle_ux(runtime, &control_event.value.ux))
                         return 1;
                     continue;
                 }

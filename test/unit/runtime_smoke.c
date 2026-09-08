@@ -1,4 +1,5 @@
 #include "runtime.h"
+#include "control.h"
 #include "test_cleanup.h"
 
 #include <assert.h>
@@ -81,7 +82,7 @@ int main(void)
         hotkey.type = UX_EVENT_HOTKEY;
         memcpy(hotkey.data.hotkey.identifier, "pause-toggle",
             sizeof("pause-toggle"));
-        assert(app_runtime_enqueue_input_event(runtime, &hotkey));
+        assert(app_control_handle_ux(runtime, &hotkey));
     }
     assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_PAUSED));
     assert(app_runtime_set_floppy(runtime, NULL));
@@ -90,7 +91,7 @@ int main(void)
         hotkey.type = UX_EVENT_HOTKEY;
         memcpy(hotkey.data.hotkey.identifier, "pause-toggle",
             sizeof("pause-toggle"));
-        assert(app_runtime_enqueue_input_event(runtime, &hotkey));
+        assert(app_control_handle_ux(runtime, &hotkey));
     }
     assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_RUNNING));
     assert(app_runtime_stop(runtime));
