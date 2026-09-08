@@ -309,29 +309,4 @@ int app_presentation_reconcile(app_presentation *context)
     return 1;
 }
 
-#ifdef SOFTPC_WINDOW_TESTING
-int app_presentation_run(app_runtime *runtime,
-    softpc_presentation presentation, int console_control,
-    app_monitor_console *monitor, app_control_queue *control_queue)
-{
-    app_presentation *component = NULL;
-    int result = SOFTPC_VM_FRONTEND_ERROR;
-    if (!app_presentation_create(&component, runtime, presentation,
-            console_control, monitor, control_queue)) return result;
-    for (;;) {
-        if (!app_presentation_reconcile(component)) break;
-        if (app_runtime_get_state(runtime) == SOFTPC_RUNTIME_ERROR ||
-            app_runtime_get_state(runtime) == SOFTPC_RUNTIME_STOPPED ||
-            (component->close_requested &&
-             app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED)) {
-            result = app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED ?
-                SOFTPC_VM_FRONTEND_PAUSED : SOFTPC_VM_FRONTEND_STOPPED;
-            break;
-        }
-        Sleep(5u);
-    }
-    app_presentation_destroy(component);
-    return result;
-}
-#endif
 #endif

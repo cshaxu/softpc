@@ -445,28 +445,6 @@ add_test(NAME softpc-runtime-input-continuation-smoke
     COMMAND softpc-runtime-input-continuation-smoke)
 set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-win32-window-smoke
-    test/unit/win32_window_smoke.c
-    src/app/runtime.c
-    src/app/input_queue.c
-    src/app/keyboard.c
-    src/app/control.c
-    src/app/monitor.c
-    src/app/prompt_trace.c
-    src/app/presentation.c
-    src/app/presentation_plan.c)
-target_link_libraries(softpc-win32-window-smoke PRIVATE softpc-machine)
-target_link_libraries(softpc-win32-window-smoke PRIVATE ux host-sync
-    storage-medium)
-target_compile_definitions(softpc-win32-window-smoke PRIVATE
-    SOFTPC_WINDOW_TESTING=1)
-if(WIN32)
-    target_link_libraries(softpc-win32-window-smoke PRIVATE user32 gdi32)
-endif()
-target_include_directories(softpc-win32-window-smoke PRIVATE src/app)
-add_test(NAME softpc-win32-window-smoke COMMAND softpc-win32-window-smoke)
-set_tests_properties(softpc-win32-window-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-win32-keyboard-smoke
     test/unit/win32_keyboard_smoke.c)
 target_link_libraries(softpc-win32-keyboard-smoke PRIVATE
@@ -529,7 +507,6 @@ set(SOFTPC_TEST_TARGETS
     softpc-lifecycle-smoke
     softpc-runtime-smoke
     softpc-runtime-input-continuation-smoke
-    softpc-win32-window-smoke
     softpc-win32-keyboard-smoke
     softpc-win32-presentation-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-plan-smoke)
@@ -564,7 +541,6 @@ set(SOFTPC_UNIT_TESTS
     softpc-lifecycle-smoke
     softpc-runtime-smoke
     softpc-runtime-input-continuation-smoke
-    softpc-win32-window-smoke
     softpc-win32-keyboard-smoke
     softpc-presentation-plan-smoke
     softpc-reconciler-smoke

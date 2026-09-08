@@ -35,13 +35,6 @@ void app_presentation_note_component_completed(app_presentation *presentation,
 void app_presentation_note_broker_completed(app_presentation *presentation,
     int vm_console_current);
 
-#ifdef SOFTPC_WINDOW_TESTING
-/* Test-only blocking adapter.  Production must use the functions above from
- * its sole control loop. */
-int app_presentation_run(app_runtime *runtime,
-    softpc_presentation presentation, int console_control,
-    app_monitor_console *monitor, app_control_queue *control_queue);
-#endif
 #endif
 
 #endif
