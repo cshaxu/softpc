@@ -234,7 +234,7 @@ int app_presentation_create(app_presentation **out_presentation,
     context->console_control = console_control;
     context->monitor = monitor;
     context->control_queue = control_queue;
-    context->displayed_state = app_runtime_get_state(runtime);
+    context->displayed_state = SOFTPC_RUNTIME_STOPPED;
     app_reconciler_initialize(&context->reducer, presentation, console_control);
     *out_presentation = context;
     return 1;
