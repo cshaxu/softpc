@@ -2,7 +2,7 @@
 #include "lib/ux/presenter.h"
 
 #ifdef _WIN32
-#include "lib/ux/internal/win32_console.h"
+#include "lib/ux-console/win32/console.h"
 #include "lib/ux-window/win32/window.h"
 
 ux_run_result ux_run(const ux_binding *binding)
