@@ -9,8 +9,11 @@
 typedef enum ux_event_type {
     UX_EVENT_KEY,
     UX_EVENT_TEXT,
-    UX_EVENT_MOUSE
+    UX_EVENT_MOUSE,
+    UX_EVENT_HOTKEY
 } ux_event_type;
+
+#define UX_HOTKEY_IDENTIFIER_CAPACITY 64u
 
 enum {
     UX_MOUSE_BUTTON_LEFT = 0x01u,
@@ -18,7 +21,10 @@ enum {
     UX_MOUSE_BUTTON_MIDDLE = 0x04u
 };
 
-typedef struct ux_event {
+typedef struct ux_input_event {
+    /* Borrowed opaque component handle. It is for lifetime tracing only;
+     * product action policy never branches on input source. */
+    const void *source;
     ux_event_type type;
     union {
         struct {
@@ -41,9 +47,23 @@ typedef struct ux_event {
             lib_u32 buttons;
             lib_u8 relative;
         } mouse;
+        struct {
+            char identifier[UX_HOTKEY_IDENTIFIER_CAPACITY];
+        } hotkey;
     } data;
-} ux_event;
+} ux_input_event;
 
-typedef int (*ux_event_sink)(void *context, const ux_event *event);
+/* Legacy spellings preserve the existing input producer ABI while the split
+ * components and SoftPC FIFO migrate to the explicit input-event name. */
+typedef ux_input_event ux_event;
+
+typedef int (*ux_input_sink)(void *context, const ux_input_event *event);
+typedef ux_input_sink ux_event_sink;
+
+static inline void ux_input_event_set_source(ux_input_event *event,
+    const void *source)
+{
+    if (event != LIB_NULL) event->source = source;
+}
 
 #endif
