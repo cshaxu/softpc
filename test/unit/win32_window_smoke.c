@@ -49,7 +49,8 @@ static void app_window_drain_control(app_window_smoke_context *context)
         if (event.kind == APP_CONTROL_UX_INPUT &&
             (event.value.ux.type == UX_EVENT_KEY ||
              event.value.ux.type == UX_EVENT_MOUSE))
-            assert(app_control_handle_ux(context->runtime, &event.value.ux));
+            assert(app_control_handle_ux(context->control_queue, context->runtime,
+                &event.value.ux));
     }
 }
 

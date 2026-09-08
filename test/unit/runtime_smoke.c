@@ -82,7 +82,9 @@ int main(void)
         hotkey.type = UX_EVENT_HOTKEY;
         memcpy(hotkey.data.hotkey.identifier, "pause-toggle",
             sizeof("pause-toggle"));
-        assert(app_control_handle_ux(runtime, &hotkey));
+        { app_control_queue *queue = NULL; assert(app_control_queue_create(&queue));
+          assert(app_control_handle_ux(queue, runtime, &hotkey));
+          app_control_queue_destroy(queue); }
     }
     assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_PAUSED));
     assert(app_runtime_set_floppy(runtime, NULL));
@@ -91,7 +93,9 @@ int main(void)
         hotkey.type = UX_EVENT_HOTKEY;
         memcpy(hotkey.data.hotkey.identifier, "pause-toggle",
             sizeof("pause-toggle"));
-        assert(app_control_handle_ux(runtime, &hotkey));
+        { app_control_queue *queue = NULL; assert(app_control_queue_create(&queue));
+          assert(app_control_handle_ux(queue, runtime, &hotkey));
+          app_control_queue_destroy(queue); }
     }
     assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_RUNNING));
     assert(app_runtime_stop(runtime));

@@ -287,7 +287,8 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
             app_control_event control_event;
             if (app_control_queue_take(control_queue, &control_event, 100u)) {
                 if (control_event.kind == APP_CONTROL_UX_INPUT) {
-                    if (!app_control_handle_ux(runtime, &control_event.value.ux))
+                    if (!app_control_handle_ux(control_queue, runtime,
+                            &control_event.value.ux))
                         return 1;
                     continue;
                 }

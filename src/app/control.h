@@ -28,6 +28,7 @@ int app_control_queue_push_monitor_line(app_control_queue *queue,
     const lib_console_line *line);
 int app_control_queue_take(app_control_queue *queue,
     app_control_event *out_event, unsigned long timeout_ms);
-int app_control_handle_ux(app_runtime *runtime, const ux_input_event *event);
+int app_control_handle_ux(app_control_queue *queue, app_runtime *runtime,
+    const ux_input_event *event);
 
 #endif
