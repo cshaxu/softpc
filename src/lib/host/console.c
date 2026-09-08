@@ -28,7 +28,13 @@ static lib_status host_console_start(host_console_broker *broker,
     if (status != LIB_STATUS_OK) return status;
     status = lib_console_set_output_sink(console, host_console_native_write,
         broker->native_console);
-    if (status != LIB_STATUS_OK) host_console_native_deactivate(broker->native_console);
+    if (status == LIB_STATUS_OK)
+        status = lib_console_set_text_frame_sink(console,
+            host_console_native_write_text_frame, broker->native_console);
+    if (status != LIB_STATUS_OK) {
+        (void)lib_console_set_output_sink(console, LIB_NULL, LIB_NULL);
+        host_console_native_deactivate(broker->native_console);
+    }
     return status;
 }
 
@@ -83,6 +89,7 @@ lib_status host_console_replace_active(host_console_broker *broker,
     next = lib_console_retain(next_console);
     host_console_native_deactivate(broker->native_console);
     (void)lib_console_set_output_sink(old, LIB_NULL, LIB_NULL);
+    (void)lib_console_set_text_frame_sink(old, LIB_NULL, LIB_NULL);
     status = host_console_start(broker, next, next_mode, next_generation);
     if (status != LIB_STATUS_OK) {
         /* A failed next object never becomes visible.  Restore the old reader
@@ -111,6 +118,8 @@ void host_console_broker_destroy(host_console_broker *broker)
     host_console_native_deactivate(broker->native_console);
     if (current != LIB_NULL)
         (void)lib_console_set_output_sink(current, LIB_NULL, LIB_NULL);
+    if (current != LIB_NULL)
+        (void)lib_console_set_text_frame_sink(current, LIB_NULL, LIB_NULL);
     host_console_unlock(broker);
     if (current != LIB_NULL) lib_console_release(current);
     host_console_native_destroy(broker->native_console);

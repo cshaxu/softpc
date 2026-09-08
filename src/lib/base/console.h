@@ -8,6 +8,8 @@
  * the only component that binds one logical object to native Console I/O. */
 
 #define LIB_CONSOLE_LINE_MAX 1024u
+#define LIB_CONSOLE_TEXT_COLUMNS 80u
+#define LIB_CONSOLE_TEXT_ROWS 25u
 
 typedef struct lib_console lib_console;
 
@@ -36,6 +38,25 @@ typedef struct lib_console_line {
     char text[LIB_CONSOLE_LINE_MAX];
 } lib_console_line;
 
+/* Copied guest-text output for a logical Console. It is deliberately a
+ * Console value rather than a UX/window frame: native host renderers consume
+ * it without learning a machine or Window protocol. Palette values use
+ * 0x00RRGGBB. */
+typedef struct lib_console_text_frame {
+    lib_u16 columns;
+    lib_u16 rows;
+    lib_u8 text[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
+    lib_u16 attributes[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
+    lib_u32 palette[16u];
+    lib_i32 cursor_column;
+    lib_i32 cursor_row;
+    lib_u8 cursor_top;
+    lib_u8 cursor_bottom;
+    lib_u8 cursor_visible;
+    lib_u8 cursor_phase;
+    lib_u32 font_height;
+} lib_console_text_frame;
+
 typedef struct lib_console_event {
     lib_console_event_kind kind;
     lib_u32 binding_generation;
@@ -57,5 +78,7 @@ lib_status lib_console_set_event_sink(lib_console *console,
     lib_console_event_sink sink, void *context);
 lib_status lib_console_write_text(lib_console *console,
     const char *text, lib_size length);
+lib_status lib_console_write_text_frame(lib_console *console,
+    const lib_console_text_frame *frame);
 
 #endif

@@ -13,7 +13,36 @@ struct host_console_native {
     lib_console *console;
     host_console_mode mode;
     lib_u32 generation;
+    lib_u8 previous[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
+    lib_u16 previous_attributes[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
+    lib_u32 previous_palette[16u];
+    lib_u16 previous_columns;
+    lib_u16 previous_rows;
 };
+
+static COLORREF host_console_colorref_from_rgb(lib_u32 rgb)
+{
+    return RGB((rgb >> 16u) & 0xffu, (rgb >> 8u) & 0xffu, rgb & 0xffu);
+}
+
+static int host_console_ensure_text_surface(HANDLE output)
+{
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    COORD required;
+    SMALL_RECT viewport = { 0, 0, LIB_CONSOLE_TEXT_COLUMNS - 1,
+        LIB_CONSOLE_TEXT_ROWS - 1 };
+
+    if (output == NULL || output == INVALID_HANDLE_VALUE ||
+        !GetConsoleScreenBufferInfo(output, &info)) return 0;
+    required.X = info.dwSize.X < (SHORT)LIB_CONSOLE_TEXT_COLUMNS ?
+        (SHORT)LIB_CONSOLE_TEXT_COLUMNS : info.dwSize.X;
+    required.Y = info.dwSize.Y < (SHORT)LIB_CONSOLE_TEXT_ROWS ?
+        (SHORT)LIB_CONSOLE_TEXT_ROWS : info.dwSize.Y;
+    if ((required.X != info.dwSize.X || required.Y != info.dwSize.Y) &&
+        !SetConsoleScreenBufferSize(output, required)) return 0;
+    (void)SetConsoleWindowInfo(output, TRUE, &viewport);
+    return 1;
+}
 
 static lib_u8 host_console_modifiers(DWORD state)
 {
@@ -136,6 +165,13 @@ lib_status host_console_native_activate(host_console_native *native_console,
     native_console->console = console;
     native_console->mode = mode;
     native_console->generation = generation;
+    memset(native_console->previous, 0xff, sizeof(native_console->previous));
+    memset(native_console->previous_attributes, 0xff,
+        sizeof(native_console->previous_attributes));
+    memset(native_console->previous_palette, 0xff,
+        sizeof(native_console->previous_palette));
+    native_console->previous_columns = 0u;
+    native_console->previous_rows = 0u;
     native_console->reader = CreateThread(NULL, 0u, host_console_reader,
         native_console, 0u, NULL);
     if (native_console->reader == NULL) {
@@ -170,5 +206,81 @@ lib_status host_console_native_write(void *context, const char *text,
         length > (lib_size)UINT32_MAX) return LIB_STATUS_INVALID_ARGUMENT;
     return WriteConsoleA(native_console->output, text, (DWORD)length, &written, NULL) &&
         written == (DWORD)length ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+}
+
+lib_status host_console_native_write_text_frame(void *context,
+    const lib_console_text_frame *frame)
+{
+    host_console_native *native_console = (host_console_native *)context;
+    CHAR_INFO cells[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
+    COORD size = { LIB_CONSOLE_TEXT_COLUMNS, LIB_CONSOLE_TEXT_ROWS };
+    COORD position = { 0, 0 };
+    SMALL_RECT region = { 0, 0, LIB_CONSOLE_TEXT_COLUMNS - 1,
+        LIB_CONSOLE_TEXT_ROWS - 1 };
+    lib_u32 row;
+
+    if (native_console == LIB_NULL || frame == LIB_NULL ||
+        native_console->console == LIB_NULL ||
+        !host_console_ensure_text_surface(native_console->output))
+        return LIB_STATUS_INVALID_ARGUMENT;
+    if (memcmp(frame->palette, native_console->previous_palette,
+            sizeof(frame->palette)) != 0) {
+        CONSOLE_SCREEN_BUFFER_INFOEX info;
+        lib_u32 index;
+
+        memset(&info, 0, sizeof(info));
+        info.cbSize = sizeof(info);
+        if (GetConsoleScreenBufferInfoEx(native_console->output, &info)) {
+            for (index = 0u; index < 16u; ++index)
+                info.ColorTable[index] = host_console_colorref_from_rgb(
+                    frame->palette[index]);
+            (void)SetConsoleScreenBufferInfoEx(native_console->output, &info);
+        }
+        memcpy(native_console->previous_palette, frame->palette,
+            sizeof(frame->palette));
+    }
+    if (native_console->previous_columns != frame->columns ||
+        native_console->previous_rows != frame->rows ||
+        memcmp(frame->text, native_console->previous,
+            sizeof(frame->text)) != 0 ||
+        memcmp(frame->attributes, native_console->previous_attributes,
+            sizeof(frame->attributes)) != 0) {
+        for (row = 0u; row < LIB_CONSOLE_TEXT_ROWS; ++row) {
+            lib_u32 column;
+            for (column = 0u; column < LIB_CONSOLE_TEXT_COLUMNS; ++column) {
+                lib_size offset = (lib_size)row * LIB_CONSOLE_TEXT_COLUMNS + column;
+                cells[offset].Char.AsciiChar = row < frame->rows &&
+                    column < frame->columns && frame->text[offset] >= 0x20u &&
+                    frame->text[offset] < 0x7fu ? (CHAR)frame->text[offset] : ' ';
+                cells[offset].Attributes = (WORD)(row < frame->rows &&
+                    column < frame->columns ? frame->attributes[offset] : 0u);
+            }
+        }
+        if (!WriteConsoleOutputA(native_console->output, cells, size, position,
+                &region)) return LIB_STATUS_IO_ERROR;
+        memcpy(native_console->previous, frame->text, sizeof(frame->text));
+        memcpy(native_console->previous_attributes, frame->attributes,
+            sizeof(frame->attributes));
+        native_console->previous_columns = frame->columns;
+        native_console->previous_rows = frame->rows;
+    }
+    {
+        CONSOLE_CURSOR_INFO cursor;
+        cursor.dwSize = frame->cursor_bottom >= frame->cursor_top &&
+            frame->font_height != 0u ? (DWORD)((frame->cursor_bottom -
+                frame->cursor_top + 1u) * 100u / frame->font_height) : 100u;
+        if (cursor.dwSize == 0u || cursor.dwSize > 100u) cursor.dwSize = 100u;
+        cursor.bVisible = frame->cursor_visible != 0u && frame->cursor_phase != 0u &&
+            frame->cursor_column >= 0 && frame->cursor_row >= 0 &&
+            frame->cursor_column < (lib_i32)frame->columns &&
+            frame->cursor_row < (lib_i32)frame->rows;
+        if (cursor.bVisible) {
+            position.X = (SHORT)frame->cursor_column;
+            position.Y = (SHORT)frame->cursor_row;
+            (void)SetConsoleCursorPosition(native_console->output, position);
+        }
+        (void)SetConsoleCursorInfo(native_console->output, &cursor);
+    }
+    return LIB_STATUS_OK;
 }
 #endif
