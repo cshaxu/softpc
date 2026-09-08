@@ -51,7 +51,7 @@ static ux_win32_window_context *win32_window_context(HWND window)
 static int win32_window_accepting_input(const ux_win32_window_context *context)
 {
     return context != NULL && context->component != LIB_NULL &&
-        atomic_load_explicit(&context->component->stopping, memory_order_acquire) == 0;
+        atomic_load_explicit(&context->component->base.stopping, memory_order_acquire) == 0;
 }
 
 static int win32_window_emit(ux_win32_window_context *context,
@@ -59,12 +59,8 @@ static int win32_window_emit(ux_win32_window_context *context,
 {
     ux_input_event copied;
 
-    if (!win32_window_accepting_input(context) || event == LIB_NULL ||
-        context->component->input_sink == LIB_NULL) return 0;
-    copied = *event;
-    ux_input_event_set_source(&copied, context->component);
-    return ux_hotkey_matcher_submit(&context->component->hotkey_matcher, &copied,
-        context->component->input_sink, context->component->input_context);
+    return !win32_window_accepting_input(context) ? 0 :
+        ux_component_emit(&context->component->base, event);
 }
 
 static int win32_window_emit_normalized(void *opaque, const ux_event *event)
@@ -373,12 +369,12 @@ static void win32_window_consume_frame(HWND window,
     uint32_t height;
 
     if (context == NULL || context->component == LIB_NULL ||
-        !ux_component_mailboxes_capture_frame(&context->component->mailboxes,
+        !ux_component_mailboxes_capture_frame(&context->component->base.mailboxes,
             &context->displayed_sequence, context->frame))
         return;
     if (!win32_window_frame_size(context->frame, &width, &height) ||
         !win32_window_ensure_surface(window, context, width, height)) {
-        atomic_store_explicit(&context->component->stopping, 1,
+        atomic_store_explicit(&context->component->base.stopping, 1,
             memory_order_release);
         DestroyWindow(window);
         return;
@@ -405,10 +401,10 @@ static int win32_window_consume_mailboxes(HWND window,
     ux_component_control control;
 
     if (context == LIB_NULL || context->component == LIB_NULL) return 0;
-    while (ux_component_mailboxes_take_control(&context->component->mailboxes,
+    while (ux_component_mailboxes_take_control(&context->component->base.mailboxes,
             &control)) {
         if (control.kind == UX_COMPONENT_CONTROL_STOP) {
-            atomic_store_explicit(&context->component->stopping, 1,
+            atomic_store_explicit(&context->component->base.stopping, 1,
                 memory_order_release);
             win32_window_release_mouse(context);
             DestroyWindow(window);
@@ -572,7 +568,7 @@ static DWORD WINAPI ux_window_worker(void *opaque)
         SetEvent(state->ready);
         return 0u;
     }
-    window = CreateWindowExA(0, klass.lpszClassName, component->initial_title,
+    window = CreateWindowExA(0, klass.lpszClassName, "Insignia SoftPC",
         WS_THICKFRAME | WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
         WS_MINIMIZEBOX | WS_MAXIMIZEBOX, CW_USEDEFAULT, 0, 680, 560,
         NULL, NULL, klass.hInstance, context);
@@ -593,22 +589,22 @@ static DWORD WINAPI ux_window_worker(void *opaque)
     SetEvent(state->ready);
     while (IsWindow(window)) {
         HANDLE wake = ux_win32_mailbox_wait_handle(
-            ux_component_mailboxes_wake(&component->mailboxes));
+            ux_component_mailboxes_wake(&component->base.mailboxes));
         DWORD wait = MsgWaitForMultipleObjects(1u, &wake, FALSE, INFINITE,
             QS_ALLINPUT);
         if (wait == WAIT_OBJECT_0) {
-            if (atomic_load_explicit(&component->stopping, memory_order_acquire) != 0)
+            if (atomic_load_explicit(&component->base.stopping, memory_order_acquire) != 0)
                 DestroyWindow(window);
             else
                 SendMessageA(window, WIN32_WINDOW_MAILBOX_READY, 0, 0);
         }
         else if (wait == WAIT_FAILED) {
-            atomic_store_explicit(&component->stopping, 1, memory_order_release);
+            atomic_store_explicit(&component->base.stopping, 1, memory_order_release);
             DestroyWindow(window);
         }
         while (PeekMessageA(&message, NULL, 0, 0, PM_REMOVE)) {
             if (message.message == WM_QUIT) {
-                atomic_store_explicit(&component->stopping, 1, memory_order_release);
+                atomic_store_explicit(&component->base.stopping, 1, memory_order_release);
                 if (IsWindow(window)) DestroyWindow(window);
                 break;
             }
@@ -662,8 +658,8 @@ void ux_window_native_stop(ux_window *component)
     ux_window_win32_state *state;
     if (component == LIB_NULL || (state = (ux_window_win32_state *)
             component->native_state) == LIB_NULL) return;
-    atomic_store_explicit(&component->stopping, 1, memory_order_release);
-    ux_mailbox_native_signal(ux_component_mailboxes_wake(&component->mailboxes));
+    atomic_store_explicit(&component->base.stopping, 1, memory_order_release);
+    ux_mailbox_native_signal(ux_component_mailboxes_wake(&component->base.mailboxes));
     (void)WaitForSingleObject(state->worker, INFINITE);
     CloseHandle(state->worker);
     CloseHandle(state->ready);

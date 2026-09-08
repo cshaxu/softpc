@@ -1,0 +1,23 @@
+#ifndef UX_BASE_COMPONENT_H
+#define UX_BASE_COMPONENT_H
+
+#include "lib/ux-base/hotkey.h"
+#include "lib/ux-base/frame.h"
+
+typedef struct ux_component ux_component;
+
+/* Identical creation contract for every UX leaf. Leaf-specific capability is
+ * deliberately absent here: Window title/mouse and Console logical-handle
+ * access remain explicit leaf APIs. */
+typedef struct ux_component_options {
+    void *input_context;
+    ux_input_sink input_sink;
+    ux_hotkey_registry hotkeys;
+} ux_component_options;
+
+lib_status ux_component_publish_frame(ux_component *component,
+    const ux_frame *frame);
+lib_status ux_component_request_stop(ux_component *component);
+void ux_component_destroy(ux_component *component);
+
+#endif

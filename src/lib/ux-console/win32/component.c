@@ -17,13 +17,7 @@ static int ux_console_emit(ux_console *console, const ux_input_event *event)
 {
     ux_input_event copied;
 
-    if (console == LIB_NULL || event == LIB_NULL || console->input_sink == LIB_NULL ||
-        atomic_load_explicit(&console->stopping, memory_order_acquire) != 0)
-        return 0;
-    copied = *event;
-    ux_input_event_set_source(&copied, console);
-    return ux_hotkey_matcher_submit(&console->hotkey_matcher, &copied,
-        console->input_sink, console->input_context);
+    return console == LIB_NULL ? 0 : ux_component_emit(&console->base, event);
 }
 
 static int ux_console_emit_normalized(void *context, const ux_event *event)
@@ -39,7 +33,7 @@ static void ux_console_receive_event(void *context,
     ux_input_event input = { 0 };
 
     if (console == LIB_NULL || event == LIB_NULL ||
-        atomic_load_explicit(&console->stopping, memory_order_acquire) != 0 ||
+        atomic_load_explicit(&console->base.stopping, memory_order_acquire) != 0 ||
         (state = (ux_console_win32_state *)console->native_state) == LIB_NULL)
         return;
     if (event->kind == LIB_CONSOLE_EVENT_RAW_KEY) {
@@ -105,23 +99,23 @@ static DWORD WINAPI ux_console_worker(void *opaque)
     ux_console *console = (ux_console *)opaque;
     lib_u32 generation = 0u;
 
-    while (atomic_load_explicit(&console->stopping, memory_order_acquire) == 0) {
+    while (atomic_load_explicit(&console->base.stopping, memory_order_acquire) == 0) {
         ux_component_control control;
         ux_frame frame;
         HANDLE wake = ux_win32_mailbox_wait_handle(
-            ux_component_mailboxes_wake(&console->mailboxes));
+            ux_component_mailboxes_wake(&console->base.mailboxes));
 
         if (wake == NULL || WaitForSingleObject(wake, INFINITE) != WAIT_OBJECT_0)
             break;
-        while (ux_component_mailboxes_take_control(&console->mailboxes, &control)) {
+        while (ux_component_mailboxes_take_control(&console->base.mailboxes, &control)) {
             if (control.kind == UX_COMPONENT_CONTROL_STOP) {
-                atomic_store_explicit(&console->stopping, 1, memory_order_release);
+                atomic_store_explicit(&console->base.stopping, 1, memory_order_release);
                 return 0u;
             }
             /* ux-console has no title or mouse surface. Unsupported Window
              * control entries are intentionally consumed as no-ops. */
         }
-        if (ux_component_mailboxes_capture_frame(&console->mailboxes,
+        if (ux_component_mailboxes_capture_frame(&console->base.mailboxes,
                 &generation, &frame)) ux_console_publish_text_frame(console, &frame);
     }
     return 0u;
@@ -144,8 +138,8 @@ lib_status ux_console_native_start(ux_console *console)
     }
     if (lib_console_set_event_sink(console->logical_console,
             ux_console_receive_event, console) != LIB_STATUS_OK) {
-        atomic_store_explicit(&console->stopping, 1, memory_order_release);
-        ux_mailbox_native_signal(ux_component_mailboxes_wake(&console->mailboxes));
+        atomic_store_explicit(&console->base.stopping, 1, memory_order_release);
+        ux_mailbox_native_signal(ux_component_mailboxes_wake(&console->base.mailboxes));
         (void)WaitForSingleObject(state->worker, INFINITE);
         CloseHandle(state->worker);
         console->native_state = LIB_NULL;
@@ -161,9 +155,9 @@ void ux_console_native_stop(ux_console *console)
 
     if (console == LIB_NULL || (state = (ux_console_win32_state *)
             console->native_state) == LIB_NULL) return;
-    atomic_store_explicit(&console->stopping, 1, memory_order_release);
+    atomic_store_explicit(&console->base.stopping, 1, memory_order_release);
     (void)lib_console_set_event_sink(console->logical_console, LIB_NULL, LIB_NULL);
-    ux_mailbox_native_signal(ux_component_mailboxes_wake(&console->mailboxes));
+    ux_mailbox_native_signal(ux_component_mailboxes_wake(&console->base.mailboxes));
     (void)WaitForSingleObject(state->worker, INFINITE);
     CloseHandle(state->worker);
     console->native_state = LIB_NULL;
