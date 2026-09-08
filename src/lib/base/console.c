@@ -2,6 +2,7 @@
 
 struct lib_console {
     atomic_flag lock;
+    atomic_flag output_lock;
     atomic_uint references;
     lib_console_event_sink event_sink;
     void *event_context;
@@ -9,6 +10,8 @@ struct lib_console {
     void *output_context;
     lib_console_text_frame_sink text_frame_sink;
     void *text_frame_context;
+    lib_u32 binding_generation;
+    lib_bool binding_known;
 };
 
 static void lib_console_lock(lib_console *console)
@@ -40,6 +43,7 @@ lib_status lib_console_create(lib_console **out_console)
     console = calloc(1u, sizeof(*console));
     if (console == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     atomic_flag_clear(&console->lock);
+    atomic_flag_clear(&console->output_lock);
     atomic_init(&console->references, 1u);
     *out_console = console;
     return LIB_STATUS_OK;
@@ -81,10 +85,13 @@ lib_status lib_console_set_output_sink(lib_console *console,
     lib_console_output_sink sink, void *context)
 {
     if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    while (atomic_flag_test_and_set_explicit(&console->output_lock,
+        memory_order_acquire)) { }
     lib_console_lock(console);
     console->output_sink = sink;
     console->output_context = context;
     lib_console_unlock(console);
+    atomic_flag_clear_explicit(&console->output_lock, memory_order_release);
     return LIB_STATUS_OK;
 }
 
@@ -92,10 +99,13 @@ lib_status lib_console_set_text_frame_sink(lib_console *console,
     lib_console_text_frame_sink sink, void *context)
 {
     if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    while (atomic_flag_test_and_set_explicit(&console->output_lock,
+        memory_order_acquire)) { }
     lib_console_lock(console);
     console->text_frame_sink = sink;
     console->text_frame_context = context;
     lib_console_unlock(console);
+    atomic_flag_clear_explicit(&console->output_lock, memory_order_release);
     return LIB_STATUS_OK;
 }
 
@@ -110,6 +120,11 @@ lib_status lib_console_deliver_event(lib_console *console,
         return LIB_STATUS_INVALID_ARGUMENT;
     copied = *event;
     lib_console_lock(console);
+    if (console->binding_known != LIB_FALSE &&
+        copied.binding_generation != console->binding_generation) {
+        lib_console_unlock(console);
+        return LIB_STATUS_NOT_CURRENT;
+    }
     sink = console->event_sink;
     context = console->event_context;
     lib_console_unlock(console);
@@ -118,19 +133,34 @@ lib_status lib_console_deliver_event(lib_console *console,
     return LIB_STATUS_OK;
 }
 
+lib_status lib_console_bind_generation(lib_console *console,
+    lib_u32 generation)
+{
+    if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    lib_console_lock(console);
+    console->binding_generation = generation;
+    console->binding_known = LIB_TRUE;
+    lib_console_unlock(console);
+    return LIB_STATUS_OK;
+}
+
 lib_status lib_console_write_text(lib_console *console,
     const char *text, lib_size length)
 {
     lib_console_output_sink sink;
     void *context;
+    lib_status status;
     if (console == LIB_NULL || (text == LIB_NULL && length != 0u))
         return LIB_STATUS_INVALID_ARGUMENT;
+    while (atomic_flag_test_and_set_explicit(&console->output_lock,
+        memory_order_acquire)) { }
     lib_console_lock(console);
     sink = console->output_sink;
     context = console->output_context;
     lib_console_unlock(console);
-    if (sink == LIB_NULL) return LIB_STATUS_NOT_CURRENT;
-    return sink(context, text, length);
+    status = sink == LIB_NULL ? LIB_STATUS_NOT_CURRENT : sink(context, text, length);
+    atomic_flag_clear_explicit(&console->output_lock, memory_order_release);
+    return status;
 }
 
 lib_status lib_console_write_text_frame(lib_console *console,
@@ -138,14 +168,18 @@ lib_status lib_console_write_text_frame(lib_console *console,
 {
     lib_console_text_frame_sink sink;
     void *context;
+    lib_status status;
 
     if (console == LIB_NULL || frame == LIB_NULL || frame->columns == 0u ||
         frame->columns > LIB_CONSOLE_TEXT_COLUMNS || frame->rows == 0u ||
         frame->rows > LIB_CONSOLE_TEXT_ROWS) return LIB_STATUS_INVALID_ARGUMENT;
+    while (atomic_flag_test_and_set_explicit(&console->output_lock,
+        memory_order_acquire)) { }
     lib_console_lock(console);
     sink = console->text_frame_sink;
     context = console->text_frame_context;
     lib_console_unlock(console);
-    if (sink == LIB_NULL) return LIB_STATUS_NOT_CURRENT;
-    return sink(context, frame);
+    status = sink == LIB_NULL ? LIB_STATUS_NOT_CURRENT : sink(context, frame);
+    atomic_flag_clear_explicit(&console->output_lock, memory_order_release);
+    return status;
 }

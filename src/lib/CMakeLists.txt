@@ -17,30 +17,45 @@ endfunction()
 add_library(base-console STATIC base/console.c)
 library_root(base-console)
 
-set(LIBRARY_UX_SOURCES
+set(LIBRARY_UX_BASE_SOURCES
     ux-base/component.c
     ux-base/hotkey.c
     ux-base/mailbox.c
-    ux-console/console.c
-    ux-window/window.c
     ux-base/linux/input.c)
 if(WIN32)
-    list(APPEND LIBRARY_UX_SOURCES
+    list(APPEND LIBRARY_UX_BASE_SOURCES
         ux-base/win32/mailbox.c
         ux-base/win32/color.c
-        ux-console/win32/component.c
-        ux-window/win32/geometry.c
-        ux-base/win32/input.c
-        ux-window/win32/mouse.c
-        ux-window/win32/component.c)
+        ux-base/win32/input.c)
 else()
-    list(APPEND LIBRARY_UX_SOURCES ux-base/linux/mailbox.c
-        ux-console/linux/component.c ux-window/linux/component.c)
+    list(APPEND LIBRARY_UX_BASE_SOURCES ux-base/linux/mailbox.c)
 endif()
-add_library(ux STATIC ${LIBRARY_UX_SOURCES})
-library_root(ux)
-target_link_libraries(ux PUBLIC base-console)
-add_library(ux-contract ALIAS ux)
+add_library(ux-base STATIC ${LIBRARY_UX_BASE_SOURCES})
+library_root(ux-base)
+target_link_libraries(ux-base PUBLIC base-console)
+
+add_library(ux-window STATIC ux-window/window.c)
+if(WIN32)
+    target_sources(ux-window PRIVATE ux-window/win32/geometry.c
+        ux-window/win32/mouse.c ux-window/win32/component.c)
+else()
+    target_sources(ux-window PRIVATE ux-window/linux/component.c)
+endif()
+library_root(ux-window)
+target_link_libraries(ux-window PUBLIC base-console ux-base)
+
+add_library(ux-console STATIC ux-console/console.c)
+if(WIN32)
+    target_sources(ux-console PRIVATE ux-console/win32/component.c)
+else()
+    target_sources(ux-console PRIVATE ux-console/linux/component.c)
+endif()
+library_root(ux-console)
+target_link_libraries(ux-console PUBLIC base-console ux-base)
+
+add_library(ux INTERFACE)
+target_link_libraries(ux INTERFACE ux-base ux-window ux-console)
+add_library(ux-contract ALIAS ux-base)
 add_library(ux-native ALIAS ux)
 
 if(WIN32)
@@ -63,13 +78,14 @@ library_root(storage-medium)
 
 if(WIN32)
     add_library(ux-win32-native ALIAS ux)
-    target_link_libraries(ux PRIVATE user32 gdi32)
+    target_link_libraries(ux-window PRIVATE user32 gdi32)
 else()
     add_library(ux-linux-native ALIAS ux)
     find_package(Curses REQUIRED)
     find_package(Threads REQUIRED)
-    target_include_directories(ux PUBLIC ${CURSES_INCLUDE_DIRS})
-    target_link_libraries(ux PUBLIC ${CURSES_LIBRARIES} Threads::Threads)
+    target_include_directories(ux-window PUBLIC ${CURSES_INCLUDE_DIRS})
+    target_link_libraries(ux-window PUBLIC ${CURSES_LIBRARIES} Threads::Threads)
+    target_link_libraries(ux-console PUBLIC ${CURSES_LIBRARIES} Threads::Threads)
 endif()
 
 # This build-only aggregate does not create a library-root dependency. Each

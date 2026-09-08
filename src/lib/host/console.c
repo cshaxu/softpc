@@ -9,6 +9,8 @@ struct host_console_broker {
     lib_u32 generation;
 };
 
+static atomic_flag host_console_process_claimed = ATOMIC_FLAG_INIT;
+
 static void host_console_lock(host_console_broker *broker)
 {
     while (atomic_flag_test_and_set_explicit(&broker->lock,
@@ -23,8 +25,10 @@ static void host_console_unlock(host_console_broker *broker)
 static lib_status host_console_start(host_console_broker *broker,
     lib_console *console, host_console_mode mode, lib_u32 generation)
 {
-    lib_status status = host_console_native_activate(broker->native_console,
-        console, mode, generation);
+    lib_status status = lib_console_bind_generation(console, generation);
+    if (status != LIB_STATUS_OK) return status;
+    status = host_console_native_activate(broker->native_console, console, mode,
+        generation);
     if (status != LIB_STATUS_OK) return status;
     status = lib_console_set_output_sink(console, host_console_native_write,
         broker->native_console);
@@ -47,8 +51,14 @@ lib_status host_console_broker_create(host_console_broker **out_broker,
         (initial_mode != HOST_CONSOLE_RAW_EVENTS &&
          initial_mode != HOST_CONSOLE_COOKED_LINES)) return LIB_STATUS_INVALID_ARGUMENT;
     *out_broker = LIB_NULL;
+    if (atomic_flag_test_and_set_explicit(&host_console_process_claimed,
+            memory_order_acq_rel)) return LIB_STATUS_INVALID_STATE;
     broker = calloc(1u, sizeof(*broker));
-    if (broker == LIB_NULL) return LIB_STATUS_NO_MEMORY;
+    if (broker == LIB_NULL) {
+        atomic_flag_clear_explicit(&host_console_process_claimed,
+            memory_order_release);
+        return LIB_STATUS_NO_MEMORY;
+    }
     atomic_flag_clear(&broker->lock);
     status = host_console_native_create(&broker->native_console);
     if (status == LIB_STATUS_OK) {
@@ -62,6 +72,8 @@ lib_status host_console_broker_create(host_console_broker **out_broker,
         if (broker->current != LIB_NULL) lib_console_release(broker->current);
         host_console_native_destroy(broker->native_console);
         free(broker);
+        atomic_flag_clear_explicit(&host_console_process_claimed,
+            memory_order_release);
         return status;
     }
     *out_broker = broker;
@@ -88,6 +100,7 @@ lib_status host_console_replace_active(host_console_broker *broker,
     next_generation = broker->generation + 1u;
     next = lib_console_retain(next_console);
     host_console_native_deactivate(broker->native_console);
+    (void)lib_console_bind_generation(old, 0u);
     (void)lib_console_set_output_sink(old, LIB_NULL, LIB_NULL);
     (void)lib_console_set_text_frame_sink(old, LIB_NULL, LIB_NULL);
     status = host_console_start(broker, next, next_mode, next_generation);
@@ -116,6 +129,7 @@ void host_console_broker_destroy(host_console_broker *broker)
     current = broker->current;
     broker->current = LIB_NULL;
     host_console_native_deactivate(broker->native_console);
+    if (current != LIB_NULL) (void)lib_console_bind_generation(current, 0u);
     if (current != LIB_NULL)
         (void)lib_console_set_output_sink(current, LIB_NULL, LIB_NULL);
     if (current != LIB_NULL)
@@ -124,4 +138,5 @@ void host_console_broker_destroy(host_console_broker *broker)
     if (current != LIB_NULL) lib_console_release(current);
     host_console_native_destroy(broker->native_console);
     free(broker);
+    atomic_flag_clear_explicit(&host_console_process_claimed, memory_order_release);
 }

@@ -4,7 +4,7 @@
 #include "lib/ux-base/event.h"
 
 #define UX_HOTKEY_CAPACITY 16u
-#define UX_HOTKEY_PENDING_CAPACITY 3u
+#define UX_HOTKEY_PENDING_CAPACITY 4u
 
 enum {
     UX_HOTKEY_MODIFIER_CONTROL = 0x01u,
@@ -30,7 +30,11 @@ typedef struct ux_hotkey_matcher {
     ux_hotkey_registry registry;
     ux_input_event pending[UX_HOTKEY_PENDING_CAPACITY];
     lib_u32 pending_count;
-    lib_u32 suppressed_key;
+    /* A matched chord suppresses every make and every later break belonging
+     * to that chord.  Tracking only the trigger leaks Ctrl/Alt breaks to the
+     * guest after their makes were withheld. */
+    lib_u32 suppressed_keys[UX_HOTKEY_PENDING_CAPACITY];
+    lib_u32 suppressed_count;
 } ux_hotkey_matcher;
 
 void ux_hotkey_registry_initialize(ux_hotkey_registry *registry);

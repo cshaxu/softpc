@@ -40,6 +40,17 @@ int main(void)
         "pause-toggle") == LIB_STATUS_OK);
     ux_hotkey_matcher_initialize(&matcher, &registry);
     event.type = UX_EVENT_KEY;
+    event.data.key.virtual_key = UX_HOTKEY_KEY_CONTROL;
+    event.data.key.pressed = 1u;
+    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
+        &capture));
+    event.data.key.virtual_key = UX_HOTKEY_KEY_ALT;
+    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL |
+        UX_HOTKEY_MODIFIER_ALT;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
+        &capture));
+    event.type = UX_EVENT_KEY;
     event.data.key.virtual_key = 'P';
     event.data.key.pressed = 1u;
     event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL |
@@ -49,6 +60,17 @@ int main(void)
     assert(capture.count == 1u && capture.events[0].type == UX_EVENT_HOTKEY);
     assert(strcmp(capture.events[0].data.hotkey.identifier,
         "pause-toggle") == 0);
+    event.data.key.pressed = 0u;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
+        &capture));
+    event.data.key.virtual_key = UX_HOTKEY_KEY_ALT;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
+        &capture));
+    event.data.key.virtual_key = UX_HOTKEY_KEY_CONTROL;
+    event.data.key.hotkey_modifiers = 0u;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
+        &capture));
+    assert(capture.count == 1u);
     free(frame);
     return 0;
 }

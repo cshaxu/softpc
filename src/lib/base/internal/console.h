@@ -17,5 +17,7 @@ lib_status lib_console_set_text_frame_sink(lib_console *console,
     lib_console_text_frame_sink sink, void *context);
 lib_status lib_console_deliver_event(lib_console *console,
     const lib_console_event *event);
+lib_status lib_console_bind_generation(lib_console *console,
+    lib_u32 generation);
 
 #endif

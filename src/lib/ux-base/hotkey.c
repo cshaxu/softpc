@@ -43,6 +43,32 @@ static int ux_hotkey_flush_pending(ux_hotkey_matcher *matcher,
     return 1;
 }
 
+static lib_bool ux_hotkey_is_suppressed(const ux_hotkey_matcher *matcher,
+    lib_u32 key)
+{
+    lib_u32 index;
+    for (index = 0u; index < matcher->suppressed_count; ++index) {
+        if (matcher->suppressed_keys[index] == key) return LIB_TRUE;
+    }
+    return LIB_FALSE;
+}
+
+static void ux_hotkey_suppress_chord(ux_hotkey_matcher *matcher,
+    const ux_input_event *trigger)
+{
+    lib_u32 index;
+    matcher->suppressed_count = 0u;
+    for (index = 0u; index < matcher->pending_count; ++index) {
+        lib_u32 key = matcher->pending[index].data.key.virtual_key;
+        if (!ux_hotkey_is_suppressed(matcher, key))
+            matcher->suppressed_keys[matcher->suppressed_count++] = key;
+    }
+    if (!ux_hotkey_is_suppressed(matcher, trigger->data.key.virtual_key))
+        matcher->suppressed_keys[matcher->suppressed_count++] =
+            trigger->data.key.virtual_key;
+    matcher->pending_count = 0u;
+}
+
 void ux_hotkey_registry_initialize(ux_hotkey_registry *registry)
 {
     if (registry != LIB_NULL) memset(registry, 0, sizeof(*registry));
@@ -89,17 +115,24 @@ int ux_hotkey_matcher_submit(ux_hotkey_matcher *matcher,
     if (event->type != UX_EVENT_KEY) {
         return ux_hotkey_flush_pending(matcher, sink, context) && sink(context, event);
     }
-    if (event->data.key.pressed == 0u &&
-        event->data.key.virtual_key == matcher->suppressed_key) {
-        matcher->suppressed_key = 0u;
+    if (event->data.key.pressed == 0u && ux_hotkey_is_suppressed(matcher,
+            event->data.key.virtual_key)) {
+        lib_u32 index;
+        for (index = 0u; index < matcher->suppressed_count; ++index) {
+            if (matcher->suppressed_keys[index] == event->data.key.virtual_key) {
+                matcher->suppressed_keys[index] = matcher->suppressed_keys[
+                    matcher->suppressed_count - 1u];
+                --matcher->suppressed_count;
+                break;
+            }
+        }
         return 1;
     }
     if (event->data.key.pressed != 0u && (matched = ux_hotkey_registry_match(
             &matcher->registry, event->data.key.virtual_key,
             event->data.key.hotkey_modifiers)) != LIB_NULL) {
         ux_input_event hotkey = *event;
-        matcher->pending_count = 0u;
-        matcher->suppressed_key = event->data.key.virtual_key;
+        ux_hotkey_suppress_chord(matcher, event);
         hotkey.type = UX_EVENT_HOTKEY;
         memcpy(hotkey.data.hotkey.identifier, matched->identifier,
             sizeof(hotkey.data.hotkey.identifier));
@@ -120,5 +153,5 @@ void ux_hotkey_matcher_discard(ux_hotkey_matcher *matcher)
 {
     if (matcher == LIB_NULL) return;
     matcher->pending_count = 0u;
-    matcher->suppressed_key = 0u;
+    matcher->suppressed_count = 0u;
 }
