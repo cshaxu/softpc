@@ -460,6 +460,13 @@ add_test(NAME softpc-win32-presentation-smoke
     COMMAND softpc-win32-presentation-smoke)
 set_tests_properties(softpc-win32-presentation-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-ux-component-contract-smoke
+    test/unit/ux_component_contract_smoke.c)
+target_link_libraries(softpc-ux-component-contract-smoke PRIVATE ux-base)
+add_test(NAME softpc-ux-component-contract-smoke
+    COMMAND softpc-ux-component-contract-smoke)
+set_tests_properties(softpc-ux-component-contract-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-presentation-plan-smoke
     test/unit/presentation_plan_smoke.c
     src/app/presentation_plan.c)
@@ -509,6 +516,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-runtime-input-continuation-smoke
     softpc-win32-keyboard-smoke
     softpc-win32-presentation-smoke)
+list(APPEND SOFTPC_TEST_TARGETS softpc-ux-component-contract-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-plan-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-reconciler-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
@@ -542,6 +550,7 @@ set(SOFTPC_UNIT_TESTS
     softpc-runtime-smoke
     softpc-runtime-input-continuation-smoke
     softpc-win32-keyboard-smoke
+    softpc-ux-component-contract-smoke
     softpc-presentation-plan-smoke
     softpc-reconciler-smoke
     softpc-standalone-source-boundary
