@@ -13,7 +13,6 @@ typedef enum host_sync_wait_result {
 
 typedef struct host_sync_event host_sync_event;
 typedef struct host_sync_task host_sync_task;
-typedef struct host_sync_mutex host_sync_mutex;
 
 /* Events are manual-reset: signal remains observable until reset. A task owns
  * one cancellation source. Task lifecycle calls are made by one owner; destroy
@@ -23,12 +22,6 @@ typedef void (*host_sync_task_entry)(void *context,
 
 void host_sync_sleep_milliseconds(lib_u32 milliseconds);
 void host_sync_yield(void);
-/* A host-owned mutual-exclusion primitive for product queues.  Callers may
- * not retain it across a host callback, UI dispatch, or blocking wait. */
-lib_status host_sync_mutex_create(host_sync_mutex **out_mutex);
-void host_sync_mutex_destroy(host_sync_mutex *mutex);
-void host_sync_mutex_lock(host_sync_mutex *mutex);
-void host_sync_mutex_unlock(host_sync_mutex *mutex);
 lib_status host_sync_event_create(host_sync_event **out_event);
 void host_sync_event_destroy(host_sync_event *event);
 void host_sync_event_signal(host_sync_event *event);

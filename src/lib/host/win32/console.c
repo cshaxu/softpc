@@ -180,10 +180,7 @@ lib_status host_console_native_activate(host_console_native *native_console,
     else configured |= ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT;
     if (!SetConsoleMode(native_console->input, configured)) return LIB_STATUS_IO_ERROR;
     native_console->stop_event = CreateEventA(NULL, TRUE, FALSE, NULL);
-    if (native_console->stop_event == NULL) {
-        (void)SetConsoleMode(native_console->input, native_console->original_mode);
-        return LIB_STATUS_NO_MEMORY;
-    }
+    if (native_console->stop_event == NULL) return LIB_STATUS_NO_MEMORY;
     native_console->console = console;
     native_console->mode = mode;
     native_console->generation = generation;

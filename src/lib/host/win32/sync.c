@@ -7,10 +7,6 @@ struct host_sync_event {
     HANDLE handle;
 };
 
-struct host_sync_mutex {
-    CRITICAL_SECTION native;
-};
-
 struct host_sync_task {
     HANDLE thread;
     HANDLE cancellation;
@@ -71,35 +67,6 @@ void host_sync_sleep_milliseconds(lib_u32 milliseconds)
 void host_sync_yield(void)
 {
     Sleep(0u);
-}
-
-lib_status host_sync_mutex_create(host_sync_mutex **out_mutex)
-{
-    host_sync_mutex *mutex;
-    if (out_mutex == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    *out_mutex = LIB_NULL;
-    mutex = calloc(1u, sizeof(*mutex));
-    if (mutex == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    InitializeCriticalSection(&mutex->native);
-    *out_mutex = mutex;
-    return LIB_STATUS_OK;
-}
-
-void host_sync_mutex_destroy(host_sync_mutex *mutex)
-{
-    if (mutex == LIB_NULL) return;
-    DeleteCriticalSection(&mutex->native);
-    free(mutex);
-}
-
-void host_sync_mutex_lock(host_sync_mutex *mutex)
-{
-    if (mutex != LIB_NULL) EnterCriticalSection(&mutex->native);
-}
-
-void host_sync_mutex_unlock(host_sync_mutex *mutex)
-{
-    if (mutex != LIB_NULL) LeaveCriticalSection(&mutex->native);
 }
 
 lib_status host_sync_event_create(host_sync_event **out_event)
