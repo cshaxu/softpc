@@ -8,13 +8,9 @@
  * logical Console to native I/O themselves. */
 typedef lib_status (*lib_console_output_sink)(void *context,
     const char *text, lib_size length);
-typedef lib_status (*lib_console_text_frame_sink)(void *context,
-    const lib_console_text_frame *frame);
 
 lib_status lib_console_set_output_sink(lib_console *console,
     lib_console_output_sink sink, void *context);
-lib_status lib_console_set_text_frame_sink(lib_console *console,
-    lib_console_text_frame_sink sink, void *context);
 lib_status lib_console_deliver_event(lib_console *console,
     const lib_console_event *event);
 

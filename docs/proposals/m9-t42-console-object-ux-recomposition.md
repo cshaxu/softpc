@@ -50,8 +50,7 @@ pass.
 ### S2 — Base logical Console object
 
 Add only the platform-neutral copied-event/output object in `lib/base`, with
-its event-sink, text-stream and copied text-frame output, lifetime,
-rejected-line, and current-object result
+its event-sink, output, lifetime, rejected-line, and current-object result
 contracts. No native handles, reader thread, UX component, SoftPC monitor, or
 policy may appear here. **Exit:** base-only unit tests prove copied ownership
 and API failure behavior; public-header/CMake boundaries are explicit.
@@ -72,9 +71,7 @@ components:
 `ux-base` for copied frame/input values, unified UX-event construction,
 reusable private-mailbox mechanics, and source-local generic hotkey matching;
 `ux-window` for one Window lifecycle; and `ux-console` for one VM
-Console lifecycle. `ux-console` converts a copied UX text frame into the base
-text-frame value; it never renders a native Console directly. Window and
-Console have independent Win32/Linux code and
+Console lifecycle. Window and Console have independent Win32/Linux code and
 independent mailboxes/workers. `ux-console` creates its logical Console object
 but never opens or registers native Console I/O. The component DAG permits
 `ux-window` and `ux-console` to depend directly on both `base` and `ux-base`;

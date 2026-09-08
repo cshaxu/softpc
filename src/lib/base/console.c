@@ -7,8 +7,6 @@ struct lib_console {
     void *event_context;
     lib_console_output_sink output_sink;
     void *output_context;
-    lib_console_text_frame_sink text_frame_sink;
-    void *text_frame_context;
 };
 
 static void lib_console_lock(lib_console *console)
@@ -88,17 +86,6 @@ lib_status lib_console_set_output_sink(lib_console *console,
     return LIB_STATUS_OK;
 }
 
-lib_status lib_console_set_text_frame_sink(lib_console *console,
-    lib_console_text_frame_sink sink, void *context)
-{
-    if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    lib_console_lock(console);
-    console->text_frame_sink = sink;
-    console->text_frame_context = context;
-    lib_console_unlock(console);
-    return LIB_STATUS_OK;
-}
-
 lib_status lib_console_deliver_event(lib_console *console,
     const lib_console_event *event)
 {
@@ -131,21 +118,4 @@ lib_status lib_console_write_text(lib_console *console,
     lib_console_unlock(console);
     if (sink == LIB_NULL) return LIB_STATUS_NOT_CURRENT;
     return sink(context, text, length);
-}
-
-lib_status lib_console_present_text_frame(lib_console *console,
-    const lib_console_text_frame *frame)
-{
-    lib_console_text_frame_sink sink;
-    void *context;
-
-    if (console == LIB_NULL || frame == LIB_NULL || frame->columns == 0u ||
-        frame->columns > LIB_CONSOLE_TEXT_COLUMNS || frame->rows == 0u ||
-        frame->rows > LIB_CONSOLE_TEXT_ROWS) return LIB_STATUS_INVALID_ARGUMENT;
-    lib_console_lock(console);
-    sink = console->text_frame_sink;
-    context = console->text_frame_context;
-    lib_console_unlock(console);
-    if (sink == LIB_NULL) return LIB_STATUS_NOT_CURRENT;
-    return sink(context, frame);
 }

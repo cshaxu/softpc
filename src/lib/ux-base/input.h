@@ -65,12 +65,6 @@ typedef struct ux_hotkey_matcher ux_hotkey_matcher;
 lib_status ux_input_make_key(ux_input_event *out_event,
     const void *source_handle, lib_u16 scan_code, lib_u32 virtual_key,
     lib_u32 modifiers, lib_bool pressed);
-lib_status ux_input_make_text(ux_input_event *out_event,
-    const void *source_handle, lib_u32 scalar);
-lib_status ux_input_make_mouse(ux_input_event *out_event,
-    const void *source_handle, lib_i32 delta_x, lib_i32 delta_y,
-    lib_i32 absolute_x, lib_i32 absolute_y, lib_i32 wheel_x, lib_i32 wheel_y,
-    lib_u32 buttons, lib_bool relative);
 lib_status ux_input_make_hotkey(ux_input_event *out_event,
     const void *source_handle, const char *identifier);
 lib_status ux_input_make_window_close(ux_input_event *out_event,

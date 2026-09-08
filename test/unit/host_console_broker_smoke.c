@@ -47,14 +47,6 @@ lib_status host_console_native_write(void *context, const char *text,
         LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
 
-lib_status host_console_native_present_text_frame(void *context,
-    const lib_console_text_frame *frame)
-{
-    host_console_native *native_console = (host_console_native *)context;
-    return native_console->active == LIB_NULL || frame == LIB_NULL ?
-        LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
-}
-
 int main(void)
 {
     lib_console *first = LIB_NULL;
@@ -70,9 +62,6 @@ int main(void)
         HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK);
     assert(lib_console_write_text(first, "a", 1u) == LIB_STATUS_NOT_CURRENT);
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_OK);
-    assert(lib_console_present_text_frame(second, &(lib_console_text_frame) {
-        .columns = 80u, .rows = 25u
-    }) == LIB_STATUS_OK);
     host_console_fail_next_activation = 1;
     assert(host_console_replace_active(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);

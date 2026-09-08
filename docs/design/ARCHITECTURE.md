@@ -54,16 +54,14 @@ An admitted shared-library candidate may originate in SoftPC only when NXVM
 adopts the exact code and SoftPC re-imports it before closure; this is delivery
 order, not a permanent library fork.
 
-`base` defines copied logical Console objects and text-frame values. `host` owns native Console
+`base` defines copied logical Console objects. `host` owns native Console
 handles/modes, one I/O worker, and exactly one Current Console Object from
 broker creation to destruction; replacement is transactional. Shared UX is
 split into `ux-base` (copied UX values, one event-construction path,
 private-mailbox helpers, and source-local generic hotkey matcher),
 `ux-window` (one Window lifecycle), and `ux-console` (one VM Console lifecycle).
 The latter creates an optional logical VM Console object but neither UX
-component opens or registers the process Console. `ux-console` converts its
-copied text frame to the generic base text-frame value; host alone renders that
-value at the native boundary. SoftPC owns its monitor
+component opens or registers the process Console. SoftPC owns its monitor
 object and alone decides which UX components exist and asks host to replace the
 current object.
 

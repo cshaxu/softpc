@@ -24,11 +24,15 @@ static void ux_console_event(void *context, const lib_console_event *event)
                 console->input_sink, console->input_context);
         }
     } else if (event->kind == LIB_CONSOLE_EVENT_RAW_MOUSE) {
-        if (ux_input_make_mouse(&input, console,
-                event->value.raw_mouse.delta_x, event->value.raw_mouse.delta_y,
-                0, 0, 0, 0, event->value.raw_mouse.buttons, LIB_TRUE) == LIB_STATUS_OK)
-            (void)ux_hotkey_matcher_submit(console->hotkeys, &input,
-                console->input_sink, console->input_context);
+        memset(&input, 0, sizeof(input));
+        input.source_handle = console;
+        input.kind = UX_INPUT_MOUSE;
+        input.value.mouse.delta_x = event->value.raw_mouse.delta_x;
+        input.value.mouse.delta_y = event->value.raw_mouse.delta_y;
+        input.value.mouse.buttons = event->value.raw_mouse.buttons;
+        input.value.mouse.relative = LIB_TRUE;
+        (void)ux_hotkey_matcher_submit(console->hotkeys, &input,
+            console->input_sink, console->input_context);
     }
 }
 

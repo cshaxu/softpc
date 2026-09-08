@@ -12,7 +12,5 @@ lib_status host_console_native_activate(host_console_native *native_console,
 void host_console_native_deactivate(host_console_native *native_console);
 lib_status host_console_native_write(void *context, const char *text,
     lib_size length);
-lib_status host_console_native_present_text_frame(void *context,
-    const lib_console_text_frame *frame);
 
 #endif
