@@ -29,7 +29,10 @@ static lib_status host_console_start(host_console_broker *broker,
     if (status != LIB_STATUS_OK) return status;
     status = host_console_native_activate(broker->native_console, console, mode,
         generation);
-    if (status != LIB_STATUS_OK) return status;
+    if (status != LIB_STATUS_OK) {
+        (void)lib_console_bind_generation(console, 0u);
+        return status;
+    }
     status = lib_console_set_output_sink(console, host_console_native_write,
         broker->native_console);
     if (status == LIB_STATUS_OK)
@@ -37,6 +40,7 @@ static lib_status host_console_start(host_console_broker *broker,
             host_console_native_write_text_frame, broker->native_console);
     if (status != LIB_STATUS_OK) {
         (void)lib_console_set_output_sink(console, LIB_NULL, LIB_NULL);
+        (void)lib_console_bind_generation(console, 0u);
         host_console_native_deactivate(broker->native_console);
     }
     return status;
