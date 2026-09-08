@@ -68,9 +68,8 @@ void ux_console_destroy(ux_console *console)
 {
     if (console == LIB_NULL) return;
     ux_console_native_stop(console);
-    if (console->started != LIB_FALSE)
-        (void)ux_hotkey_matcher_retire(console->hotkeys, console,
-            console->input_sink, console->input_context);
+    (void)ux_hotkey_matcher_retire(console->hotkeys, console,
+        console->input_sink, console->input_context);
     (void)lib_console_set_event_sink(console->logical_console, LIB_NULL, LIB_NULL);
     lib_console_destroy(console->logical_console);
     ux_hotkey_matcher_destroy(console->hotkeys);
