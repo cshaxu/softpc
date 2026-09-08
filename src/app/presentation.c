@@ -29,6 +29,7 @@ struct app_presentation {
     uint32_t observed_frame_sequence;
     app_runtime_frame observed_frame;
     app_reconciler reducer;
+    app_reconciler_action pending_runtime_action;
 };
 
 typedef struct app_presentation app_presentation_context;
@@ -111,10 +112,12 @@ static int app_presentation_apply_next_action(app_presentation_context *context)
     action = app_reconciler_take_action(&context->reducer);
     switch (action) {
     case APP_RECONCILER_ACTION_NONE:
+        return 1;
     case APP_RECONCILER_ACTION_RUNTIME_START:
     case APP_RECONCILER_ACTION_RUNTIME_PAUSE:
     case APP_RECONCILER_ACTION_RUNTIME_RESUME:
     case APP_RECONCILER_ACTION_RUNTIME_STOP:
+        context->pending_runtime_action = action;
         return 1;
     case APP_RECONCILER_ACTION_CREATE_WINDOW:
         if (!app_presentation_create_window(context)) return 0;
@@ -239,36 +242,21 @@ void app_presentation_note_broker_completed(app_presentation *presentation,
         APP_RECONCILER_CONSOLE_MONITOR);
 }
 
-int app_presentation_prepare_resume(app_presentation *presentation)
+void app_presentation_request_intent(app_presentation *presentation,
+    app_reconciler_intent intent)
 {
-    app_runtime_frame frame = { 0 };
-    int graphics = 0;
+    if (presentation != NULL)
+        app_reconciler_note_intent(&presentation->reducer, intent);
+}
 
-    if (presentation == NULL) return 0;
-    if (app_runtime_copy_frame(presentation->runtime, &frame))
-        graphics = frame.graphics != 0u;
-    app_reconciler_note_frame(&presentation->reducer, graphics);
-    app_reconciler_note_runtime(&presentation->reducer, SOFTPC_RUNTIME_RUNNING);
-    app_reconciler_note_intent(&presentation->reducer,
-        APP_RECONCILER_INTENT_RESUME);
-    /* Resume is the one product transition that must establish its required
-     * presenter set and Current Console before the VM is allowed to run. */
-    for (;;) {
-        app_reconciler_action action;
-        app_reconciler_note_window(&presentation->reducer,
-            presentation->window != NULL);
-        app_reconciler_note_vm_console(&presentation->reducer,
-            presentation->console != NULL);
-        app_reconciler_note_current_console(&presentation->reducer,
-            presentation->vm_console_current ? APP_RECONCILER_CONSOLE_VM :
-            APP_RECONCILER_CONSOLE_MONITOR);
-        action = app_reconciler_next_action(&presentation->reducer);
-        if (action == APP_RECONCILER_ACTION_RUNTIME_RESUME ||
-            action == APP_RECONCILER_ACTION_NONE) break;
-        if (!app_presentation_apply_next_action(presentation)) return 0;
-    }
-    presentation->close_requested = 0;
-    return 1;
+app_reconciler_action app_presentation_take_runtime_action(
+    app_presentation *presentation)
+{
+    app_reconciler_action action;
+    if (presentation == NULL) return APP_RECONCILER_ACTION_NONE;
+    action = presentation->pending_runtime_action;
+    presentation->pending_runtime_action = APP_RECONCILER_ACTION_NONE;
+    return action;
 }
 
 int app_presentation_reconcile(app_presentation *context)

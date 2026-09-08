@@ -209,20 +209,19 @@ static void app_monitor_help(app_monitor_console *monitor)
         "Raw VM Console hotkeys: Ctrl+Alt+P/D/F/M\r\n");
 }
 
-static int app_monitor_start(app_runtime *runtime,
-    app_presentation *presentation, app_monitor_state *state, int reset)
+static int app_monitor_drive(app_runtime *runtime, app_presentation *presentation)
 {
-    if (reset || *state == SOFTPC_MONITOR_STOPPED) {
-        if (!app_runtime_start(runtime)) return 0;
-    } else {
-        /* The reconciler must establish the resumed component set and raw
-         * Current Console before the VM resumes. */
-        if (!app_presentation_prepare_resume(presentation) ||
-            !app_runtime_resume(runtime)) return 0;
-    }
+    app_reconciler_action action;
     if (!app_presentation_reconcile(presentation)) return 0;
-    *state = SOFTPC_MONITOR_RUNNING;
-    return 1;
+    action = app_presentation_take_runtime_action(presentation);
+    switch (action) {
+    case APP_RECONCILER_ACTION_NONE: return 1;
+    case APP_RECONCILER_ACTION_RUNTIME_START: return app_runtime_start(runtime);
+    case APP_RECONCILER_ACTION_RUNTIME_PAUSE: return app_runtime_pause(runtime);
+    case APP_RECONCILER_ACTION_RUNTIME_RESUME: return app_runtime_resume(runtime);
+    case APP_RECONCILER_ACTION_RUNTIME_STOP: return app_runtime_stop(runtime);
+    default: return 0;
+    }
 }
 
 static void app_runtime_completed(void *opaque, app_runtime_state state,
@@ -243,14 +242,17 @@ static void app_runtime_completed(void *opaque, app_runtime_state state,
 static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
     app_presentation *presentation, const ux_input_event *event)
 {
-    if (event != NULL && event->type == UX_EVENT_WINDOW_CLOSE)
-        return app_runtime_request_window_close(runtime);
+    if (event != NULL && event->type == UX_EVENT_WINDOW_CLOSE) {
+        app_presentation_request_intent(presentation,
+            APP_RECONCILER_INTENT_WINDOW_CLOSE);
+        return 1;
+    }
     if (event != NULL && event->type == UX_EVENT_HOTKEY &&
         strcmp(event->data.hotkey.identifier, "pause-toggle") == 0) {
-        if (app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED)
-            return app_presentation_prepare_resume(presentation) &&
-                app_runtime_resume(runtime);
-        return app_runtime_pause(runtime);
+        app_presentation_request_intent(presentation,
+            app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED ?
+                APP_RECONCILER_INTENT_RESUME : APP_RECONCILER_INTENT_PAUSE);
+        return 1;
     }
     return app_control_handle_ux(queue, runtime, event);
 }
@@ -287,7 +289,7 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                     if (!app_monitor_handle_ux(control_queue, runtime, presenter,
                             &control_event.value.ux))
                         goto failed;
-                    if (!app_presentation_reconcile(presenter)) goto failed;
+                    if (!app_monitor_drive(runtime, presenter)) goto failed;
                     continue;
                 }
                 if (control_event.kind == APP_CONTROL_MONITOR_LINE) {
@@ -313,7 +315,7 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                 else if (control_event.kind == APP_CONTROL_BROKER_COMPLETED)
                     app_presentation_note_broker_completed(presenter,
                         control_event.value.broker_vm_console_current);
-                if (!app_presentation_reconcile(presenter)) goto failed;
+                if (!app_monitor_drive(runtime, presenter)) goto failed;
                 continue;
             }
             app_runtime_state actual = app_runtime_get_state(runtime);
@@ -329,9 +331,9 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
             }
             if (prompt_pending && app_monitor_console_write(monitor, "SoftPC> "))
                 prompt_pending = 0;
-            if (!app_presentation_reconcile(presenter)) goto failed;
+            if (!app_monitor_drive(runtime, presenter)) goto failed;
         }
-        if (!app_presentation_reconcile(presenter)) goto failed;
+        if (!app_monitor_drive(runtime, presenter)) goto failed;
         command = app_trim(line);
         argument = command;
         while (*argument != '\0' && !isspace((unsigned char)*argument))
@@ -350,19 +352,24 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
             return 0;
         }
         else if (strcmp(command, "start") == 0) {
-            if (!app_monitor_start(runtime, presenter, &state, 0)) goto failed;
+            app_presentation_request_intent(presenter, APP_RECONCILER_INTENT_START);
+            if (!app_monitor_drive(runtime, presenter)) goto failed;
         } else if (strcmp(command, "resume") == 0) {
             if (state != SOFTPC_MONITOR_PAUSED)
                 app_monitor_console_write(monitor, "Machine is not paused.\r\n");
-            else if (!app_monitor_start(runtime, presenter, &state, 0)) goto failed;
+            else { app_presentation_request_intent(presenter, APP_RECONCILER_INTENT_RESUME);
+                if (!app_monitor_drive(runtime, presenter)) goto failed; }
         } else if (strcmp(command, "pause") == 0) {
             if (state == SOFTPC_MONITOR_PAUSED)
                 app_monitor_console_write(monitor, "Machine is paused.\r\n");
-            else if (!app_runtime_pause(runtime) ||
-                !app_presentation_reconcile(presenter)) goto failed;
+            else {
+                app_presentation_request_intent(presenter,
+                    APP_RECONCILER_INTENT_PAUSE);
+                if (!app_monitor_drive(runtime, presenter)) goto failed;
+            }
         } else if (strcmp(command, "stop") == 0) {
-            if (!app_runtime_stop(runtime) ||
-                !app_presentation_reconcile(presenter)) goto failed;
+            app_presentation_request_intent(presenter, APP_RECONCILER_INTENT_STOP);
+            if (!app_monitor_drive(runtime, presenter)) goto failed;
             state = SOFTPC_MONITOR_STOPPED;
             app_monitor_console_write(monitor, "Machine stopped.\r\n");
         } else if (strcmp(command, "reset") == 0) {

@@ -3,6 +3,7 @@
 
 #include "runtime.h"
 #include "monitor.h"
+#include "reconciler.h"
 
 #ifdef _WIN32
 typedef struct app_presentation app_presentation;
@@ -19,9 +20,12 @@ int app_presentation_create(app_presentation **out_presentation,
     app_monitor_console *monitor, app_control_queue *control_queue);
 void app_presentation_destroy(app_presentation *presentation);
 int app_presentation_reconcile(app_presentation *presentation);
-/* Before a paused VM resumes, install the derived running components and
- * Current Console Object.  The control thread then calls app_runtime_resume. */
-int app_presentation_prepare_resume(app_presentation *presentation);
+/* Product callers submit intent; the single control loop takes a runtime
+ * action only after the reducer has completed all prerequisite UX actions. */
+void app_presentation_request_intent(app_presentation *presentation,
+    app_reconciler_intent intent);
+app_reconciler_action app_presentation_take_runtime_action(
+    app_presentation *presentation);
 void app_presentation_note_runtime_completed(app_presentation *presentation,
     app_runtime_state state);
 void app_presentation_note_frame_completed(app_presentation *presentation,
