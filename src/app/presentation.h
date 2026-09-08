@@ -12,7 +12,7 @@
  * and maps generic UX events to SoftPC actions; neither shared UX leaf has
  * product lifecycle knowledge. */
 int app_presentation_run(app_runtime *runtime,
-    softpc_presentation presentation);
+    softpc_presentation presentation, int console_control);
 #endif
 
 #endif
