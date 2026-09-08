@@ -21,7 +21,7 @@ guest-media, or manual-resize change.
 - Fresh x64 and x86 builds both passed full CTest, 30/30.
 - The owner tested and accepted normal and narrow-screen behavior.
 
-## Next
+## Closure
 
-S9 records the remaining owner Console/Window runtime acceptance and closes
-T42.  It is an acceptance-only task; any new repair is separately admitted.
+S9 recorded owner acceptance and closed T42. Any later repair requires a
+separate admission.

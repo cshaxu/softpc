@@ -2,20 +2,8 @@
 
 ## Current Work
 
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | M9 T42 S9 active |
-| Admission And Approval | Owner accepted S8 runtime behavior and admitted S9 as the final T42 runtime-acceptance record. |
-| Objective | Record owner runtime acceptance of the completed T42 Console/Window integration without changing source, package configuration, media, or product design. |
-| Non-goals | No repair work, redesign, NXVM adoption/re-import, source modification, build refresh, `softpc.ini`, or guest-media change. New defects become separately admitted work. |
-| Affected Boundaries | Acceptance evidence only: `docs/states/`, `docs/history/`, and the T42 proposal. |
-| Applicable Rules | Execution and documentation authorities; [T42 proposal](../proposals/m9-t42-console-object-ux-recomposition.md). |
-| Focused Verification | Owner has accepted the S8 normal/narrow desktop behavior; this S records the remaining approved Console/Window runtime acceptance as reported by the owner. |
-| Full Regression | Reuse completed S8 x64/x86 build and CTest evidence unless the owner requests a fresh package. Preserve `assets/binary/softpc.ini` and guest media. |
-| Similar-Issue Sweep | None: this is evidence collection, not an implementation sweep. |
-| Stop Conditions | Stop and close T42 if accepted. If the owner reports a defect requiring code or design change, record it as a separate candidate; do not repair it here. |
-| Exit Criteria | Owner accepts the runtime matrix and T42 closes, or a bounded follow-up candidate is recorded without modifying T42. |
-| Original Owner Request | “收口s8进入s9 我验证后告诉你继续修复 去掉”; S9 must not contain repair work. |
+No implementation task is active. M9 T42 closed after S9 owner acceptance.
+The ordered candidate queue remains the only source for a future admission.
 
 ## Current Technical Baseline
 
@@ -43,6 +31,12 @@
 - M9 T42 S7 closed real-thread Console/UX barrier verification: x64 full
   CTest passed 29/29 and x86 Console/broker barriers passed 3/3. See [S7
   history](../history/M9-T42-S7-real-thread-barriers.md).
+
+- M9 T42 closed at S9 after owner acceptance of the completed Console/Window
+  integration. S8 also completed generic work-area-aware initial Window
+  bounds; any later issue must be separately admitted. See [S8 history]
+  (../history/M9-T42-S8-work-area-window-bounds.md) and [S9 history]
+  (../history/M9-T42-S9-owner-runtime-acceptance.md).
 
 - M9 T41 closed by owner direction after completing the imported-lib baseline
   and non-MVDM ownership ledger. Its incomplete Console/Window runtime work is
