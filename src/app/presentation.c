@@ -108,7 +108,7 @@ static int app_presentation_apply_next_action(app_presentation_context *context)
 {
     app_reconciler_action action;
     if (context == NULL) return 0;
-    action = app_reconciler_next_action(&context->reducer);
+    action = app_reconciler_take_action(&context->reducer);
     switch (action) {
     case APP_RECONCILER_ACTION_NONE:
     case APP_RECONCILER_ACTION_RUNTIME_START:
@@ -131,8 +131,10 @@ static int app_presentation_apply_next_action(app_presentation_context *context)
         if (host_console_replace_active(
             app_monitor_console_broker(context->monitor),
             app_monitor_console_object(context->monitor),
-            ux_console_get_console(context->console), HOST_CONSOLE_RAW_EVENTS) ==
-            LIB_STATUS_OK) return 0;
+            ux_console_get_console(context->console), HOST_CONSOLE_RAW_EVENTS) !=
+            LIB_STATUS_OK) {
+            return 0;
+        }
         context->vm_console_current = 1;
         return app_control_queue_push_broker_completed(context->control_queue, 1,
             app_runtime_run_generation(context->runtime));
@@ -141,8 +143,10 @@ static int app_presentation_apply_next_action(app_presentation_context *context)
         if (host_console_replace_active(
             app_monitor_console_broker(context->monitor),
             ux_console_get_console(context->console),
-            app_monitor_console_object(context->monitor), HOST_CONSOLE_COOKED_LINES) ==
-            LIB_STATUS_OK) return 0;
+            app_monitor_console_object(context->monitor), HOST_CONSOLE_COOKED_LINES) !=
+            LIB_STATUS_OK) {
+            return 0;
+        }
         context->vm_console_current = 0;
         return app_control_queue_push_broker_completed(context->control_queue, 0,
             app_runtime_run_generation(context->runtime));
@@ -308,14 +312,9 @@ int app_presentation_reconcile(app_presentation *context)
         context->observed_frame_sequence = context->observed_frame.sequence;
         frame_changed = 1;
     }
-    app_reconciler_note_runtime(&context->reducer, state);
-    app_reconciler_note_frame(&context->reducer, context->observed_frame.valid != 0u &&
-        context->observed_frame.graphics != 0u);
-    app_reconciler_note_window(&context->reducer, context->window != NULL);
-    app_reconciler_note_vm_console(&context->reducer, context->console != NULL);
-    app_reconciler_note_current_console(&context->reducer,
-        context->vm_console_current ? APP_RECONCILER_CONSOLE_VM :
-        APP_RECONCILER_CONSOLE_MONITOR);
+    /* Component and broker actual state only arrives through their completion
+     * records.  A non-NULL local handle means merely that a request was
+     * issued; treating it as actual here reintroduces a second control path. */
     if (!app_presentation_apply_next_action(context)) return 0;
     if (frame_changed && !app_presentation_publish(context,
             &context->observed_frame)) return 0;

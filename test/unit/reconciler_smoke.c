@@ -11,6 +11,10 @@ int main(void)
 
     app_reconciler_note_intent(&state, APP_RECONCILER_INTENT_START);
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_RUNTIME_START);
+    assert(app_reconciler_take_action(&state) == APP_RECONCILER_ACTION_RUNTIME_START);
+    /* A dispatched effect remains only desired until its matching completion
+       makes it actual.  It must not be emitted twice. */
+    assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
     app_reconciler_note_runtime(&state, SOFTPC_RUNTIME_RUNNING);
     app_reconciler_note_frame(&state, 1);
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_CREATE_WINDOW);
@@ -49,6 +53,15 @@ int main(void)
     app_reconciler_note_vm_console(&state, 1);
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_BIND_VM_CONSOLE);
     app_reconciler_note_current_console(&state, APP_RECONCILER_CONSOLE_VM);
+    assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
+
+    /* Component facts also clear only their own pending action. */
+    app_reconciler_initialize(&state, SOFTPC_PRESENTATION_WINDOW, 1);
+    app_reconciler_note_intent(&state, APP_RECONCILER_INTENT_START);
+    app_reconciler_note_runtime(&state, SOFTPC_RUNTIME_RUNNING);
+    assert(app_reconciler_take_action(&state) == APP_RECONCILER_ACTION_CREATE_WINDOW);
+    assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
+    app_reconciler_note_window(&state, 1);
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
     return 0;
 }

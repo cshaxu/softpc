@@ -22,20 +22,53 @@ void app_reconciler_note_intent(app_reconciler *reconciler,
 
 void app_reconciler_note_runtime(app_reconciler *reconciler,
     app_runtime_state state)
-{ if (reconciler != NULL) reconciler->runtime_actual = state; }
+{
+    if (reconciler == NULL) return;
+    reconciler->runtime_actual = state;
+    if ((reconciler->in_flight == APP_RECONCILER_ACTION_RUNTIME_START ||
+         reconciler->in_flight == APP_RECONCILER_ACTION_RUNTIME_RESUME) &&
+        state == SOFTPC_RUNTIME_RUNNING)
+        reconciler->in_flight = APP_RECONCILER_ACTION_NONE;
+    else if (reconciler->in_flight == APP_RECONCILER_ACTION_RUNTIME_PAUSE &&
+        state == SOFTPC_RUNTIME_PAUSED)
+        reconciler->in_flight = APP_RECONCILER_ACTION_NONE;
+    else if (reconciler->in_flight == APP_RECONCILER_ACTION_RUNTIME_STOP &&
+        (state == SOFTPC_RUNTIME_STOPPED || state == SOFTPC_RUNTIME_ERROR))
+        reconciler->in_flight = APP_RECONCILER_ACTION_NONE;
+}
 
 void app_reconciler_note_frame(app_reconciler *reconciler, int graphics)
 { if (reconciler != NULL) reconciler->graphics_actual = graphics != 0; }
 
 void app_reconciler_note_window(app_reconciler *reconciler, int exists)
-{ if (reconciler != NULL) reconciler->window_actual = exists != 0; }
+{
+    if (reconciler == NULL) return;
+    reconciler->window_actual = exists != 0;
+    if ((exists && reconciler->in_flight == APP_RECONCILER_ACTION_CREATE_WINDOW) ||
+        (!exists && reconciler->in_flight == APP_RECONCILER_ACTION_DESTROY_WINDOW))
+        reconciler->in_flight = APP_RECONCILER_ACTION_NONE;
+}
 
 void app_reconciler_note_vm_console(app_reconciler *reconciler, int exists)
-{ if (reconciler != NULL) reconciler->vm_console_actual = exists != 0; }
+{
+    if (reconciler == NULL) return;
+    reconciler->vm_console_actual = exists != 0;
+    if ((exists && reconciler->in_flight == APP_RECONCILER_ACTION_CREATE_VM_CONSOLE) ||
+        (!exists && reconciler->in_flight == APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE))
+        reconciler->in_flight = APP_RECONCILER_ACTION_NONE;
+}
 
 void app_reconciler_note_current_console(app_reconciler *reconciler,
     app_reconciler_console_actual current)
-{ if (reconciler != NULL) reconciler->current_console_actual = current; }
+{
+    if (reconciler == NULL) return;
+    reconciler->current_console_actual = current;
+    if ((current == APP_RECONCILER_CONSOLE_VM &&
+         reconciler->in_flight == APP_RECONCILER_ACTION_BIND_VM_CONSOLE) ||
+        (current == APP_RECONCILER_CONSOLE_MONITOR &&
+         reconciler->in_flight == APP_RECONCILER_ACTION_BIND_MONITOR))
+        reconciler->in_flight = APP_RECONCILER_ACTION_NONE;
+}
 
 app_presentation_plan app_reconciler_desired(const app_reconciler *reconciler)
 {
@@ -54,6 +87,8 @@ app_reconciler_action app_reconciler_next_action(const app_reconciler *reconcile
 {
     app_presentation_plan desired;
     if (reconciler == NULL) return APP_RECONCILER_ACTION_NONE;
+    if (reconciler->in_flight != APP_RECONCILER_ACTION_NONE)
+        return APP_RECONCILER_ACTION_NONE;
 
     if (reconciler->intent == APP_RECONCILER_INTENT_STOP ||
         reconciler->intent == APP_RECONCILER_INTENT_RESET) {
@@ -90,4 +125,14 @@ app_reconciler_action app_reconciler_next_action(const app_reconciler *reconcile
         reconciler->runtime_actual == SOFTPC_RUNTIME_PAUSED)
         return APP_RECONCILER_ACTION_RUNTIME_RESUME;
     return APP_RECONCILER_ACTION_NONE;
+}
+
+app_reconciler_action app_reconciler_take_action(app_reconciler *reconciler)
+{
+    app_reconciler_action action;
+    if (reconciler == NULL) return APP_RECONCILER_ACTION_NONE;
+    action = app_reconciler_next_action(reconciler);
+    if (action != APP_RECONCILER_ACTION_NONE)
+        reconciler->in_flight = action;
+    return action;
 }

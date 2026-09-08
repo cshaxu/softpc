@@ -45,6 +45,9 @@ typedef struct app_reconciler {
     int vm_console_actual;
     app_reconciler_console_actual current_console_actual;
     app_reconciler_intent intent;
+    /* A requested effect is not an actual fact.  Until its completion is
+     * returned on the control FIFO, no second transition may be emitted. */
+    app_reconciler_action in_flight;
     int close_requested;
 } app_reconciler;
 
@@ -61,5 +64,6 @@ void app_reconciler_note_current_console(app_reconciler *reconciler,
     app_reconciler_console_actual current);
 app_presentation_plan app_reconciler_desired(const app_reconciler *reconciler);
 app_reconciler_action app_reconciler_next_action(const app_reconciler *reconciler);
+app_reconciler_action app_reconciler_take_action(app_reconciler *reconciler);
 
 #endif
