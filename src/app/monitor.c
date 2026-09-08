@@ -61,6 +61,12 @@ int app_monitor_console_activate_self(app_monitor_console *monitor,
             ux_console_get_console(console)) == LIB_STATUS_OK;
 }
 
+int app_monitor_console_request_line(app_monitor_console *monitor)
+{
+    return monitor != NULL && host_console_cooked_request_line(monitor->cooked) ==
+        LIB_STATUS_OK;
+}
+
 int app_monitor_console_write(app_monitor_console *monitor, const char *text)
 {
     if (monitor == NULL || text == NULL) return 0;

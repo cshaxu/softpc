@@ -74,6 +74,10 @@ void host_console_native_deactivate(host_console_native *native_console)
     native_console->active = LIB_NULL;
 }
 
+lib_status host_console_native_request_cooked_line(
+    host_console_native *native_console)
+{ return native_console == NULL ? LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_OK; }
+
 void host_console_native_lock_output(host_console_native *native_console)
 { (void)native_console; }
 void host_console_native_unlock_output(host_console_native *native_console)

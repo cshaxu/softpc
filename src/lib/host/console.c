@@ -336,6 +336,23 @@ lib_status host_console_cooked_activate_self(host_console_cooked *cooked,
             HOST_CONSOLE_COOKED_LINES);
 }
 
+lib_status host_console_cooked_request_line(host_console_cooked *cooked)
+{
+    lib_status status;
+
+    if (cooked == LIB_NULL || cooked->broker == LIB_NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    host_console_lock(cooked->broker);
+    if (cooked->broker->broken || cooked->broker->current != cooked->console ||
+        cooked->broker->current_mode != HOST_CONSOLE_COOKED_LINES) {
+        host_console_unlock(cooked->broker);
+        return LIB_STATUS_NOT_CURRENT;
+    }
+    status = host_console_native_request_cooked_line(cooked->broker->native_console);
+    host_console_unlock(cooked->broker);
+    return status;
+}
+
 lib_status host_console_cooked_write(host_console_cooked *cooked,
     const char *text, lib_size length)
 {

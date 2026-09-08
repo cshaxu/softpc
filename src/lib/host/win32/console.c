@@ -9,6 +9,11 @@ struct host_console_native {
     HANDLE output;
     HANDLE stop_event;
     HANDLE reader;
+    /* A cooked reader owns exactly one native line.  It clears this before
+     * delivering that line, so host can safely rearm after the app consumes
+     * it without confusing an in-flight line with a thread that is merely
+     * returning from its callback. */
+    volatile LONG cooked_line_pending;
     CRITICAL_SECTION output_lock;
     DWORD original_mode;
     lib_console *console;
@@ -86,23 +91,25 @@ static DWORD WINAPI host_console_reader(void *context)
 {
     host_console_native *native_console = (host_console_native *)context;
     if (native_console->mode == HOST_CONSOLE_COOKED_LINES) {
-        for (;;) {
-            char text[LIB_CONSOLE_LINE_MAX];
-            DWORD read = 0u;
-            lib_console_event event = { 0 };
-            if (!ReadConsoleA(native_console->input, text,
-                    LIB_CONSOLE_LINE_MAX - 1u, &read, NULL)) break;
-            if (WaitForSingleObject(native_console->stop_event, 0u) == WAIT_OBJECT_0)
-                break;
-            while (read != 0u && (text[read - 1u] == '\r' || text[read - 1u] == '\n'))
-                --read;
-            event.kind = LIB_CONSOLE_EVENT_COOKED_LINE;
-            event.binding_generation = native_console->generation;
-            event.value.line.length = read;
-            memcpy(event.value.line.text, text, read);
-            event.value.line.text[read] = '\0';
-            (void)lib_console_deliver_event(native_console->console, &event);
+        char text[LIB_CONSOLE_LINE_MAX];
+        DWORD read = 0u;
+        lib_console_event event = { 0 };
+        if (!ReadConsoleA(native_console->input, text,
+                LIB_CONSOLE_LINE_MAX - 1u, &read, NULL)) {
+            InterlockedExchange(&native_console->cooked_line_pending, 0);
+            return 0u;
         }
+        InterlockedExchange(&native_console->cooked_line_pending, 0);
+        if (WaitForSingleObject(native_console->stop_event, 0u) == WAIT_OBJECT_0)
+            return 0u;
+        while (read != 0u && (text[read - 1u] == '\r' || text[read - 1u] == '\n'))
+            --read;
+        event.kind = LIB_CONSOLE_EVENT_COOKED_LINE;
+        event.binding_generation = native_console->generation;
+        event.value.line.length = read;
+        memcpy(event.value.line.text, text, read);
+        event.value.line.text[read] = '\0';
+        (void)lib_console_deliver_event(native_console->console, &event);
     } else {
         HANDLE waits[2] = { native_console->stop_event, native_console->input };
         while (WaitForMultipleObjects(2u, waits, FALSE, INFINITE) == WAIT_OBJECT_0 + 1u) {
@@ -154,6 +161,19 @@ void host_console_native_destroy(host_console_native *native_console)
     free(native_console);
 }
 
+static lib_status host_console_start_reader(host_console_native *native_console)
+{
+    if (native_console->mode == HOST_CONSOLE_COOKED_LINES)
+        InterlockedExchange(&native_console->cooked_line_pending, 1);
+    native_console->reader = CreateThread(NULL, 0u, host_console_reader,
+        native_console, 0u, NULL);
+    if (native_console->reader == NULL) {
+        InterlockedExchange(&native_console->cooked_line_pending, 0);
+        return LIB_STATUS_NO_MEMORY;
+    }
+    return LIB_STATUS_OK;
+}
+
 lib_status host_console_native_prepare(host_console_native *native_console,
     lib_console *console, host_console_mode mode)
 {
@@ -202,15 +222,37 @@ lib_status host_console_native_activate(host_console_native *native_console,
         sizeof(native_console->previous_palette));
     native_console->previous_columns = 0u;
     native_console->previous_rows = 0u;
-    native_console->reader = CreateThread(NULL, 0u, host_console_reader,
-        native_console, 0u, NULL);
-    if (native_console->reader == NULL) {
+    if (host_console_start_reader(native_console) != LIB_STATUS_OK) {
         CloseHandle(native_console->stop_event);
         native_console->stop_event = NULL;
         native_console->console = LIB_NULL;
         return LIB_STATUS_NO_MEMORY;
     }
     return LIB_STATUS_OK;
+}
+
+lib_status host_console_native_request_cooked_line(
+    host_console_native *native_console)
+{
+    DWORD completed;
+
+    if (native_console == LIB_NULL ||
+        native_console->mode != HOST_CONSOLE_COOKED_LINES ||
+        native_console->console == LIB_NULL || native_console->stop_event == NULL)
+        return LIB_STATUS_INVALID_STATE;
+    if (native_console->reader != NULL) {
+        if (InterlockedCompareExchange(&native_console->cooked_line_pending,
+                0, 0) != 0)
+            return LIB_STATUS_OK;
+        completed = WaitForSingleObject(native_console->reader, 0u);
+        if (completed == WAIT_TIMEOUT) {
+            completed = WaitForSingleObject(native_console->reader, INFINITE);
+        }
+        if (completed != WAIT_OBJECT_0) return LIB_STATUS_IO_ERROR;
+        CloseHandle(native_console->reader);
+        native_console->reader = NULL;
+    }
+    return host_console_start_reader(native_console);
 }
 
 void host_console_native_deactivate(host_console_native *native_console)
@@ -233,6 +275,7 @@ void host_console_native_deactivate(host_console_native *native_console)
     if (native_console->stop_event != NULL) CloseHandle(native_console->stop_event);
     native_console->reader = NULL;
     native_console->stop_event = NULL;
+    InterlockedExchange(&native_console->cooked_line_pending, 0);
     native_console->console = LIB_NULL;
     native_console->generation = 0u;
     (void)SetConsoleMode(native_console->input, native_console->original_mode);

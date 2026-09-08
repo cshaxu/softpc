@@ -18,6 +18,7 @@ int app_monitor_console_activate_vm(app_monitor_console *monitor,
     struct ux_console *console);
 int app_monitor_console_activate_self(app_monitor_console *monitor,
     struct ux_console *console);
+int app_monitor_console_request_line(app_monitor_console *monitor);
 int app_monitor_console_write(app_monitor_console *monitor, const char *text);
 
 #endif

@@ -15,6 +15,11 @@ lib_status host_console_native_prepare(host_console_native *native_console,
 void host_console_native_discard_prepare(host_console_native *native_console);
 lib_status host_console_native_activate(host_console_native *native_console,
     lib_console *console, host_console_mode mode, lib_u32 generation);
+/* Cooked input is deliberately one line per reader.  The product asks for
+ * the next native line only when its monitor is actually ready for it; this
+ * keeps a completed `start` line from racing a later raw-Console takeover. */
+lib_status host_console_native_request_cooked_line(
+    host_console_native *native_console);
 void host_console_native_deactivate(host_console_native *native_console);
 /* The broker holds this gate across an indivisible native takeover.  Bound
  * writers take the same gate and validate their logical Console/generation

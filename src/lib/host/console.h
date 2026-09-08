@@ -33,6 +33,9 @@ lib_status host_console_cooked_activate_raw(host_console_cooked *cooked,
     lib_console *raw_console);
 lib_status host_console_cooked_activate_self(host_console_cooked *cooked,
     lib_console *raw_console);
+/* Idempotently arms one native cooked line while this is Current Console.
+ * It does nothing when a line is already pending. */
+lib_status host_console_cooked_request_line(host_console_cooked *cooked);
 lib_status host_console_cooked_write(host_console_cooked *cooked,
     const char *text, lib_size length);
 

@@ -287,8 +287,10 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
     for (;;) {
         char *command;
         char *argument;
-        if (prompt_pending && app_monitor_console_write(monitor, "SoftPC> "))
+        if (prompt_pending && app_monitor_console_write(monitor, "SoftPC> ")) {
+            (void)app_monitor_console_request_line(monitor);
             prompt_pending = 0;
+        }
         for (;;) {
             app_control_event control_event;
             if (app_control_queue_take(control_queue, &control_event, 100u)) {
@@ -362,8 +364,10 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                 if (!app_monitor_drive(runtime, presenter)) goto failed;
                 continue;
             }
-            if (prompt_pending && app_monitor_console_write(monitor, "SoftPC> "))
+            if (prompt_pending && app_monitor_console_write(monitor, "SoftPC> ")) {
+                (void)app_monitor_console_request_line(monitor);
                 prompt_pending = 0;
+            }
         }
         if (!app_monitor_drive(runtime, presenter)) goto failed;
         command = app_trim(line);
@@ -374,9 +378,11 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
         argument = app_trim(argument);
         for (char *letter = command; *letter != '\0'; ++letter)
             *letter = (char)tolower((unsigned char)*letter);
-        if (*command == '\0') continue;
-        prompt_pending = 1;
-        if (strcmp(command, "help") == 0) app_monitor_help(monitor);
+        if (*command == '\0') { prompt_pending = 1; continue; }
+        if (strcmp(command, "help") == 0) {
+            app_monitor_help(monitor);
+            prompt_pending = 1;
+        }
         else if (strcmp(command, "exit") == 0) {
             (void)app_runtime_stop(runtime);
             (void)app_presentation_reconcile(presenter);
@@ -388,12 +394,18 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
             if (!app_monitor_drive(runtime, presenter)) goto failed;
         } else if (strcmp(command, "resume") == 0) {
             if (state != SOFTPC_MONITOR_PAUSED)
+            {
                 app_monitor_console_write(monitor, "Machine is not paused.\r\n");
+                prompt_pending = 1;
+            }
             else { app_presentation_request_intent(presenter, APP_RECONCILER_INTENT_RESUME);
                 if (!app_monitor_drive(runtime, presenter)) goto failed; }
         } else if (strcmp(command, "pause") == 0) {
             if (state == SOFTPC_MONITOR_PAUSED)
+            {
                 app_monitor_console_write(monitor, "Machine is paused.\r\n");
+                prompt_pending = 1;
+            }
             else {
                 app_presentation_request_intent(presenter,
                     APP_RECONCILER_INTENT_PAUSE);
@@ -425,7 +437,11 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                 else app_monitor_console_write(monitor, "Floppy inserted.\r\n");
             } else app_monitor_console_write(monitor,
                 "Usage: floppy insert <image> | eject\r\n");
-        } else app_monitor_console_write(monitor, "Unknown command.\r\n");
+            prompt_pending = 1;
+        } else {
+            app_monitor_console_write(monitor, "Unknown command.\r\n");
+            prompt_pending = 1;
+        }
         app_monitor_console_write(monitor, "\r\n");
     }
 failed:
