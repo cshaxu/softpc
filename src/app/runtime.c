@@ -43,7 +43,9 @@ static void app_runtime_prompt_trace(uint32_t sequence, uint32_t mode_type,
 struct app_runtime {
     softpc_machine *machine;
     app_input_queue *input_queue;
-    ux_frame *frame_buffer;
+    ux_frame *frame_buffers[2];
+    CRITICAL_SECTION frame_lock;
+    int published_frame_index;
     uint32_t published_frame_sequence;
     volatile LONG published_frame_run_generation;
     host_sync_event *command_event;
@@ -74,7 +76,8 @@ struct app_runtime {
 
 static void app_runtime_publish(app_runtime *runtime)
 {
-    app_runtime_frame *frame = runtime->frame_buffer;
+    app_runtime_frame *frame;
+    int staging_index;
     int published = 0;
     const void *surface;
     uint32_t columns = 0u;
@@ -88,7 +91,14 @@ static void app_runtime_publish(app_runtime *runtime)
     int32_t trace_left = -1, trace_top = -1, trace_right = -1, trace_bottom = -1;
     int trace_dirty = 0;
 
-    if (frame == NULL) return;
+    if (runtime == NULL) return;
+    EnterCriticalSection(&runtime->frame_lock);
+    staging_index = runtime->published_frame_index == 0 ? 1 : 0;
+    frame = runtime->frame_buffers[staging_index];
+    if (frame == NULL) {
+        LeaveCriticalSection(&runtime->frame_lock);
+        return;
+    }
     memset(frame, 0, sizeof(*frame));
     if (softpc_machine_presentation_is_graphics(runtime->machine)) {
         const void *bits;
@@ -116,7 +126,7 @@ static void app_runtime_publish(app_runtime *runtime)
            graphics frame only after the original renderer reports a dirty
            rectangle, otherwise a frontend can resize to that maximum scratch
            allocation before the BIOS reaches its real text mode. */
-        if (!dirty) return;
+        if (!dirty) goto done;
         if (softpc_machine_presentation_dib(runtime->machine, &bits, &info,
                 &width, &height) && bits != NULL && info != NULL &&
             width <= SOFTPC_RUNTIME_DIB_MAX_WIDTH &&
@@ -259,7 +269,10 @@ static void app_runtime_publish(app_runtime *runtime)
             frame->graphics, columns, rows, stride, frame->graphics_width,
             frame->graphics_height, trace_dirty, trace_left, trace_top,
             trace_right, trace_bottom);
+        runtime->published_frame_index = staging_index;
     }
+done:
+    LeaveCriticalSection(&runtime->frame_lock);
 }
 
 static void app_runtime_drain_input(app_runtime *runtime)
@@ -409,19 +422,24 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
         host_sync_event_create(&runtime->input_event) != LIB_STATUS_OK ||
         host_sync_event_create(&runtime->media_event) != LIB_STATUS_OK ||
         !app_input_queue_create(&runtime->input_queue) ||
-        (runtime->frame_buffer = calloc(1u, sizeof(*runtime->frame_buffer))) == NULL) {
+        (runtime->frame_buffers[0] = calloc(1u,
+            sizeof(*runtime->frame_buffers[0]))) == NULL ||
+        (runtime->frame_buffers[1] = calloc(1u,
+            sizeof(*runtime->frame_buffers[1]))) == NULL) {
         host_sync_event_destroy(runtime->command_event);
         host_sync_event_destroy(runtime->ready_event);
         host_sync_event_destroy(runtime->resume_event);
         host_sync_event_destroy(runtime->input_event);
         host_sync_event_destroy(runtime->media_event);
         app_input_queue_destroy(runtime->input_queue);
-        free(runtime->frame_buffer);
+        free(runtime->frame_buffers[0]);
+        free(runtime->frame_buffers[1]);
         free(runtime);
         return 0;
     }
     runtime->result = SOFTPC_MACHINE_OK;
     runtime->state = SOFTPC_RUNTIME_STOPPED;
+    InitializeCriticalSection(&runtime->frame_lock);
     if (host_sync_task_create(app_runtime_worker, runtime, &runtime->worker) !=
             LIB_STATUS_OK) {
         host_sync_event_destroy(runtime->resume_event);
@@ -429,7 +447,9 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
         host_sync_event_destroy(runtime->ready_event);
         host_sync_event_destroy(runtime->media_event);
         app_input_queue_destroy(runtime->input_queue);
-        free(runtime->frame_buffer);
+        DeleteCriticalSection(&runtime->frame_lock);
+        free(runtime->frame_buffers[0]);
+        free(runtime->frame_buffers[1]);
         host_sync_event_destroy(runtime->command_event);
         free(runtime);
         return 0;
@@ -584,20 +604,44 @@ int app_runtime_enqueue_input_event(app_runtime *runtime,
 int app_runtime_copy_frame(app_runtime *runtime,
     app_runtime_frame *destination)
 {
-    return runtime != NULL && destination != NULL && runtime->frame_buffer != NULL &&
-        (memcpy(destination, runtime->frame_buffer, sizeof(*destination)),
-        destination->valid != 0u);
+    return app_runtime_copy_published_frame(runtime, destination, NULL);
+}
+
+int app_runtime_copy_published_frame(app_runtime *runtime,
+    app_runtime_frame *destination, uint32_t *out_run_generation)
+{
+    int copied;
+    if (runtime == NULL || destination == NULL) return 0;
+    EnterCriticalSection(&runtime->frame_lock);
+    memcpy(destination, runtime->frame_buffers[runtime->published_frame_index],
+        sizeof(*destination));
+    if (out_run_generation != NULL)
+        *out_run_generation = (uint32_t)InterlockedCompareExchange(
+            &runtime->published_frame_run_generation, 0, 0);
+    copied = destination->valid != 0u;
+    LeaveCriticalSection(&runtime->frame_lock);
+    return copied;
 }
 
 uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime)
 {
-    return runtime == NULL ? 0u : runtime->published_frame_sequence;
+    uint32_t sequence;
+    if (runtime == NULL) return 0u;
+    EnterCriticalSection((CRITICAL_SECTION *)&runtime->frame_lock);
+    sequence = runtime->published_frame_sequence;
+    LeaveCriticalSection((CRITICAL_SECTION *)&runtime->frame_lock);
+    return sequence;
 }
 
 uint32_t app_runtime_published_frame_run_generation(const app_runtime *runtime)
 {
-    return runtime == NULL ? 0u : (uint32_t)InterlockedCompareExchange(
+    uint32_t generation;
+    if (runtime == NULL) return 0u;
+    EnterCriticalSection((CRITICAL_SECTION *)&runtime->frame_lock);
+    generation = (uint32_t)InterlockedCompareExchange(
         (volatile LONG *)&runtime->published_frame_run_generation, 0, 0);
+    LeaveCriticalSection((CRITICAL_SECTION *)&runtime->frame_lock);
+    return generation;
 }
 
 uint32_t app_runtime_run_generation(const app_runtime *runtime)
@@ -625,7 +669,9 @@ void app_runtime_destroy(app_runtime *runtime)
     host_sync_event_destroy(runtime->input_event);
     host_sync_event_destroy(runtime->media_event);
     app_input_queue_destroy(runtime->input_queue);
-    free(runtime->frame_buffer);
+    DeleteCriticalSection(&runtime->frame_lock);
+    free(runtime->frame_buffers[0]);
+    free(runtime->frame_buffers[1]);
     host_sync_event_destroy(runtime->command_event);
     free(runtime);
 }

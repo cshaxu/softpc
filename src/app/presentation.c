@@ -4,6 +4,7 @@
 #include "keyboard.h"
 #include "lib/host/console.h"
 #include "presentation_plan.h"
+#include "reconciler.h"
 #include "lib/ux-console/console.h"
 #include "lib/ux-window/window.h"
 
@@ -17,6 +18,7 @@ struct app_presentation {
     int console_control;
     ux_window *window;
     ux_console *console;
+    int vm_console_current;
     app_monitor_console *monitor;
     app_control_queue *control_queue;
     ux_hotkey_registry hotkeys;
@@ -24,6 +26,9 @@ struct app_presentation {
     app_runtime_state displayed_state;
     int close_requested;
     uint32_t displayed_run_generation;
+    uint32_t observed_frame_sequence;
+    app_runtime_frame observed_frame;
+    app_reconciler reducer;
 };
 
 typedef struct app_presentation app_presentation_context;
@@ -78,17 +83,7 @@ static int app_presentation_create_console(app_presentation_context *context)
     options.input_context = context;
     options.input_sink = app_presentation_input;
     options.hotkeys = context->hotkeys;
-    if (ux_console_create(&context->console, &options) != LIB_STATUS_OK)
-        return 0;
-    if (host_console_replace_active(app_monitor_console_broker(context->monitor),
-            app_monitor_console_object(context->monitor),
-            ux_console_get_console(context->console), HOST_CONSOLE_RAW_EVENTS) !=
-            LIB_STATUS_OK) {
-        ux_component_destroy(ux_console_component(context->console));
-        context->console = NULL;
-        return 0;
-    }
-    return 1;
+    return ux_console_create(&context->console, &options) == LIB_STATUS_OK;
 }
 
 static void app_presentation_destroy_components(app_presentation_context *context)
@@ -100,6 +95,7 @@ static void app_presentation_destroy_components(app_presentation_context *contex
         (void)host_console_replace_active(app_monitor_console_broker(context->monitor),
             ux_console_get_console(context->console),
             app_monitor_console_object(context->monitor), HOST_CONSOLE_COOKED_LINES);
+    context->vm_console_current = 0;
     if (context->window != NULL)
         ux_component_destroy(ux_window_component(context->window));
     if (context->console != NULL)
@@ -108,26 +104,51 @@ static void app_presentation_destroy_components(app_presentation_context *contex
     context->console = NULL;
 }
 
-static int app_presentation_apply_plan(app_presentation_context *context,
-    const app_presentation_plan *plan)
+static int app_presentation_apply_next_action(app_presentation_context *context)
 {
-    if (context == NULL || plan == NULL) return 0;
-    if (plan->window_enabled && !app_presentation_create_window(context)) return 0;
-    if (plan->vm_console_enabled && context->console == NULL &&
-        !app_presentation_create_console(context)) return 0;
-    if (!plan->vm_console_enabled && context->console != NULL) {
-        if (host_console_replace_active(app_monitor_console_broker(context->monitor),
-                ux_console_get_console(context->console),
-                app_monitor_console_object(context->monitor),
-                HOST_CONSOLE_COOKED_LINES) != LIB_STATUS_OK) return 0;
+    app_reconciler_action action;
+    if (context == NULL) return 0;
+    action = app_reconciler_next_action(&context->reducer);
+    switch (action) {
+    case APP_RECONCILER_ACTION_NONE:
+    case APP_RECONCILER_ACTION_RUNTIME_START:
+    case APP_RECONCILER_ACTION_RUNTIME_PAUSE:
+    case APP_RECONCILER_ACTION_RUNTIME_RESUME:
+    case APP_RECONCILER_ACTION_RUNTIME_STOP:
+        return 1;
+    case APP_RECONCILER_ACTION_CREATE_WINDOW:
+        return app_presentation_create_window(context);
+    case APP_RECONCILER_ACTION_CREATE_VM_CONSOLE:
+        return app_presentation_create_console(context);
+    case APP_RECONCILER_ACTION_BIND_VM_CONSOLE:
+        if (context->console == NULL) return 0;
+        if (host_console_replace_active(
+            app_monitor_console_broker(context->monitor),
+            app_monitor_console_object(context->monitor),
+            ux_console_get_console(context->console), HOST_CONSOLE_RAW_EVENTS) ==
+            LIB_STATUS_OK) return 0;
+        context->vm_console_current = 1;
+        return 1;
+    case APP_RECONCILER_ACTION_BIND_MONITOR:
+        if (context->console == NULL) return 0;
+        if (host_console_replace_active(
+            app_monitor_console_broker(context->monitor),
+            ux_console_get_console(context->console),
+            app_monitor_console_object(context->monitor), HOST_CONSOLE_COOKED_LINES) ==
+            LIB_STATUS_OK) return 0;
+        context->vm_console_current = 0;
+        return 1;
+    case APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE:
         ux_component_destroy(ux_console_component(context->console));
         context->console = NULL;
-    }
-    if (!plan->window_enabled && context->window != NULL) {
+        context->vm_console_current = 0;
+        return 1;
+    case APP_RECONCILER_ACTION_DESTROY_WINDOW:
         ux_component_destroy(ux_window_component(context->window));
         context->window = NULL;
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 static int app_presentation_publish(app_presentation_context *context,
@@ -165,6 +186,7 @@ int app_presentation_create(app_presentation **out_presentation,
     context->control_queue = control_queue;
     context->displayed_state = app_runtime_get_state(runtime);
     context->displayed_run_generation = app_runtime_run_generation(runtime);
+    app_reconciler_initialize(&context->reducer, presentation, console_control);
     *out_presentation = context;
     return 1;
 }
@@ -179,25 +201,40 @@ void app_presentation_destroy(app_presentation *presentation)
 int app_presentation_prepare_resume(app_presentation *presentation)
 {
     app_runtime_frame frame = { 0 };
-    app_presentation_plan plan;
     int graphics = 0;
 
     if (presentation == NULL) return 0;
     if (app_runtime_copy_frame(presentation->runtime, &frame))
         graphics = frame.graphics != 0u;
-    plan = app_presentation_derive(presentation->display,
-        presentation->console_control, SOFTPC_RUNTIME_RUNNING, graphics);
-    if (!app_presentation_apply_plan(presentation, &plan)) return 0;
+    app_reconciler_note_frame(&presentation->reducer, graphics);
+    app_reconciler_note_runtime(&presentation->reducer, SOFTPC_RUNTIME_RUNNING);
+    app_reconciler_note_intent(&presentation->reducer,
+        APP_RECONCILER_INTENT_RESUME);
+    /* Resume is the one product transition that must establish its required
+     * presenter set and Current Console before the VM is allowed to run. */
+    for (;;) {
+        app_reconciler_action action;
+        app_reconciler_note_window(&presentation->reducer,
+            presentation->window != NULL);
+        app_reconciler_note_vm_console(&presentation->reducer,
+            presentation->console != NULL);
+        app_reconciler_note_current_console(&presentation->reducer,
+            presentation->vm_console_current ? APP_RECONCILER_CONSOLE_VM :
+            APP_RECONCILER_CONSOLE_MONITOR);
+        action = app_reconciler_next_action(&presentation->reducer);
+        if (action == APP_RECONCILER_ACTION_RUNTIME_RESUME ||
+            action == APP_RECONCILER_ACTION_NONE) break;
+        if (!app_presentation_apply_next_action(presentation)) return 0;
+    }
     presentation->close_requested = 0;
     return 1;
 }
 
 int app_presentation_reconcile(app_presentation *context)
 {
-    app_runtime_frame frame = { 0 };
     app_runtime_state state;
-    app_presentation_plan plan;
     uint32_t sequence;
+    int frame_changed = 0;
 
     if (context == NULL) return 0;
     state = app_runtime_get_state(context->runtime);
@@ -205,6 +242,8 @@ int app_presentation_reconcile(app_presentation *context)
         app_runtime_run_generation(context->runtime)) {
         context->displayed_run_generation = app_runtime_run_generation(context->runtime);
         context->close_requested = 0;
+        context->observed_frame_sequence = 0u;
+        memset(&context->observed_frame, 0, sizeof(context->observed_frame));
     }
     if (state != context->displayed_state) {
         context->displayed_state = state;
@@ -219,17 +258,30 @@ int app_presentation_reconcile(app_presentation *context)
     if (app_runtime_take_window_mouse_release(context->runtime) &&
         context->window != NULL)
         (void)ux_window_release_mouse(context->window);
-    if (app_runtime_take_window_close(context->runtime)) context->close_requested = 1;
+    if (app_runtime_take_window_close(context->runtime)) {
+        context->close_requested = 1;
+        app_reconciler_note_intent(&context->reducer,
+            APP_RECONCILER_INTENT_WINDOW_CLOSE);
+    }
     sequence = app_runtime_published_frame_sequence(context->runtime);
-    if (sequence != 0u && app_runtime_published_frame_run_generation(
-            context->runtime) == context->displayed_run_generation)
-        (void)app_runtime_copy_frame(context->runtime, &frame);
-    plan = app_presentation_derive(context->display, context->console_control,
-        state, frame.valid != 0u && frame.graphics != 0u);
-    if (context->close_requested && state == SOFTPC_RUNTIME_PAUSED)
-        plan.window_enabled = 0;
-    if (!app_presentation_apply_plan(context, &plan)) return 0;
-    if (frame.valid != 0u && !app_presentation_publish(context, &frame)) return 0;
+    if (sequence != 0u && sequence != context->observed_frame_sequence &&
+        app_runtime_copy_published_frame(context->runtime,
+            &context->observed_frame, &sequence) &&
+        sequence == context->displayed_run_generation) {
+        context->observed_frame_sequence = context->observed_frame.sequence;
+        frame_changed = 1;
+    }
+    app_reconciler_note_runtime(&context->reducer, state);
+    app_reconciler_note_frame(&context->reducer, context->observed_frame.valid != 0u &&
+        context->observed_frame.graphics != 0u);
+    app_reconciler_note_window(&context->reducer, context->window != NULL);
+    app_reconciler_note_vm_console(&context->reducer, context->console != NULL);
+    app_reconciler_note_current_console(&context->reducer,
+        context->vm_console_current ? APP_RECONCILER_CONSOLE_VM :
+        APP_RECONCILER_CONSOLE_MONITOR);
+    if (!app_presentation_apply_next_action(context)) return 0;
+    if (frame_changed && !app_presentation_publish(context,
+            &context->observed_frame)) return 0;
     return 1;
 }
 

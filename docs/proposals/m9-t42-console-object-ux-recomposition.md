@@ -103,6 +103,50 @@ and component lifecycle ordering. **Exit:** pure derivation and
 completion-gated fake tests prove the complete approved state/transition matrix
 without running a native Console.
 
+#### S5 closure constraints
+
+S5 is not complete merely because its public calls compile.  The following
+properties are one inseparable acceptance set:
+
+1. **Immutable published frame.** The runtime's published snapshot is always
+   its last complete frame.  A graphics callback with no dirty region must not
+   clear, mutate, or reclassify it.  The executor builds a staging snapshot,
+   commits it with its sequence and SoftPC run generation only after success,
+   and readers copy only the committed snapshot.  The reconciler consumes a
+   frame, derives its text/graphics route, and publishes it to UX only when it
+   observes a new committed sequence; otherwise it retains the previous
+   completed route.
+2. **One product control path.** Monitor lines, copied UX events, runtime
+   state completion, frame publication, component completion, and broker
+   replacement completion are tagged records in the sole SoftPC control FIFO.
+   No presentation worker, native callback, monitor reader, or runtime worker
+   may directly decide product lifecycle or component existence.
+3. **Explicit desired and actual facts.** A pure reducer owns pending user
+   intent, desired component set/current Console/VM target, actual completed
+   facts, and one in-flight action.  It emits at most one next action.  The
+   action's completion must be queued back before another action is derived;
+   no caller may infer completion from a convenient synchronous side effect.
+4. **SoftPC-only run envelope.** Each run has a monotonically increasing
+   SoftPC generation.  Frame snapshots and every asynchronous UX/runtime/
+   component/broker completion carry or are enveloped by it.  The control
+   thread rejects a result from an old run.  Shared UX remains unaware of this
+   generation and supplies only its own stable source identity.
+5. **Transactional Current Console replacement.** Host first prepares and
+   confirms the next native mode/reader without disrupting the old active
+   object, then commits Current Console Object, then retires the old reader.
+   Pre-commit failure leaves the old object active; post-commit failure has
+   one defined rollback completion.  There is never a product-visible
+   zero-Console interval.
+6. **Retirement and backpressure are explicit.** Permanent raw-source
+   retirement yields one ordered completion after no further raw events can be
+   emitted; SoftPC releases only that source's guest keys.  The control FIFO
+   must not silently discard make/break, hotkey, close, or retirement records.
+7. **Proof before native runtime.** Pure tests use controllable fakes for all
+   reducer transitions.  Barrier tests prove reader replacement during a
+   callback, component retirement with queued input, broker failure/rollback,
+   stale-generation rejection, and the complete display/console-control/X/
+   lifecycle matrix.  These tests use completion barriers, not `Sleep()`.
+
 ### S6 — Integration and concurrency boundaries
 
 Connect S3–S5 in the actual non-MVDM runtime. Add only narrow real-thread

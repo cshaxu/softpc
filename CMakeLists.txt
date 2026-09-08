@@ -274,6 +274,7 @@ add_executable(softpcvm
     src/app/monitor.c
     src/app/presentation.c
     src/app/presentation_plan.c
+    src/app/reconciler.c
     src/app/prompt_trace.c
     src/app/firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
@@ -490,6 +491,12 @@ add_test(NAME softpc-presentation-plan-smoke
     COMMAND softpc-presentation-plan-smoke)
 set_tests_properties(softpc-presentation-plan-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-reconciler-smoke test/unit/reconciler_smoke.c
+    src/app/reconciler.c src/app/presentation_plan.c)
+target_include_directories(softpc-reconciler-smoke PRIVATE src/app src/host src)
+add_test(NAME softpc-reconciler-smoke COMMAND softpc-reconciler-smoke)
+set_tests_properties(softpc-reconciler-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/test/support/standalone_source_boundary.cmake")
@@ -526,6 +533,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-win32-keyboard-smoke
     softpc-win32-presentation-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-plan-smoke)
+list(APPEND SOFTPC_TEST_TARGETS softpc-reconciler-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
     # Keep every executable test self-contained, just like the launcher.
@@ -559,6 +567,7 @@ set(SOFTPC_UNIT_TESTS
     softpc-win32-window-smoke
     softpc-win32-keyboard-smoke
     softpc-presentation-plan-smoke
+    softpc-reconciler-smoke
     softpc-standalone-source-boundary
     softpc-documentation-governance)
 

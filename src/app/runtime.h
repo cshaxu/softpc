@@ -38,6 +38,8 @@ int app_runtime_enqueue_input_event(app_runtime *runtime,
     const ux_event *event);
 int app_runtime_copy_frame(app_runtime *runtime,
     app_runtime_frame *destination);
+int app_runtime_copy_published_frame(app_runtime *runtime,
+    app_runtime_frame *destination, uint32_t *out_run_generation);
 /* A presentation client may cheaply test whether the runtime's copied frame
    changed before requesting the potentially large DIB snapshot. */
 uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime);
