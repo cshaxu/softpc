@@ -14,7 +14,7 @@
  * product lifecycle knowledge. */
 int app_presentation_run(app_runtime *runtime,
     softpc_presentation presentation, int console_control,
-    app_monitor_console *monitor);
+    app_monitor_console *monitor, app_control_queue *control_queue);
 #endif
 
 #endif

@@ -1,5 +1,6 @@
 #include "presentation.h"
 #include "monitor.h"
+#include "keyboard.h"
 #include "runtime.h"
 #include "machine.h"
 #include "prompt_trace.h"
@@ -214,6 +215,7 @@ typedef struct app_frontend {
     softpc_presentation presentation;
     int console_control;
     app_monitor_console *monitor;
+    app_control_queue *control_queue;
     HANDLE thread;
     int result;
 } app_frontend;
@@ -222,7 +224,8 @@ static DWORD WINAPI app_frontend_run(void *opaque)
 {
     app_frontend *frontend = (app_frontend *)opaque;
     frontend->result = app_presentation_run(frontend->runtime,
-        frontend->presentation, frontend->console_control, frontend->monitor);
+        frontend->presentation, frontend->console_control, frontend->monitor,
+        frontend->control_queue);
     return 0u;
 }
 
@@ -264,13 +267,37 @@ static int app_monitor_start(app_runtime *runtime, app_frontend *frontend,
     return 1;
 }
 
+static int app_monitor_handle_ux(app_runtime *runtime,
+    const ux_input_event *event)
+{
+    if (runtime == NULL || event == NULL) return 0;
+    if (event->type == UX_EVENT_KEY || event->type == UX_EVENT_MOUSE)
+        return app_keyboard_deliver_input(runtime, event);
+    if (event->type == UX_EVENT_WINDOW_CLOSE)
+        return app_runtime_request_window_close(runtime);
+    if (event->type != UX_EVENT_HOTKEY) return 1;
+    if (strcmp(event->data.hotkey.identifier, "pause-toggle") == 0)
+        return app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED ?
+            app_runtime_resume(runtime) : app_runtime_pause(runtime);
+    if (strcmp(event->data.hotkey.identifier, "send-ctrl-alt-del") == 0)
+        return app_keyboard_submit_ctrl_alt_del(runtime, app_keyboard_deliver_input);
+    if (strcmp(event->data.hotkey.identifier, "send-alt-enter") == 0)
+        return app_keyboard_submit_alt_enter(runtime, app_keyboard_deliver_input);
+    if (strcmp(event->data.hotkey.identifier, "release-window-mouse") == 0) {
+        app_runtime_request_window_mouse_release(runtime);
+        return 1;
+    }
+    return 0;
+}
+
 static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
-    int console_control, app_monitor_console *monitor)
+    int console_control, app_monitor_console *monitor,
+    app_control_queue *control_queue)
 {
     char line[SOFTPC_CONFIG_PATH_MAX + 64u];
     app_monitor_state state = SOFTPC_MONITOR_STOPPED;
     app_frontend frontend = { runtime, presentation, console_control, monitor,
-        NULL, SOFTPC_VM_FRONTEND_ERROR };
+        control_queue, NULL, SOFTPC_VM_FRONTEND_ERROR };
 
     int prompt_pending = 0;
     app_monitor_help(monitor);
@@ -280,7 +307,22 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
         char *argument;
         if (prompt_pending && app_monitor_console_write(monitor, "SoftPC> "))
             prompt_pending = 0;
-        while (!app_monitor_console_take_line(monitor, line, sizeof(line), 100u)) {
+        for (;;) {
+            app_control_event control_event;
+            if (app_control_queue_take(control_queue, &control_event, 100u)) {
+                if (control_event.kind == APP_CONTROL_UX_INPUT) {
+                    if (!app_monitor_handle_ux(runtime, &control_event.value.ux))
+                        return 1;
+                    continue;
+                }
+                if (control_event.kind == APP_CONTROL_MONITOR_LINE) {
+                    if (control_event.value.line.length >= sizeof(line)) return 1;
+                    memcpy(line, control_event.value.line.text,
+                        control_event.value.line.length);
+                    line[control_event.value.line.length] = '\0';
+                    break;
+                }
+            }
             app_runtime_state actual = app_runtime_get_state(runtime);
             if (actual == SOFTPC_RUNTIME_PAUSED && state != SOFTPC_MONITOR_PAUSED) {
                 state = SOFTPC_MONITOR_PAUSED;
@@ -367,6 +409,7 @@ int main(int argc, char **argv)
     softpc_machine *machine = NULL;
     app_runtime *runtime = NULL;
     app_monitor_console *monitor = NULL;
+    app_control_queue *control_queue = NULL;
     softpc_machine_result result;
     (void)argv;
 
@@ -407,17 +450,19 @@ int main(int argc, char **argv)
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
     }
-    if (!app_monitor_console_create(&monitor)) {
+    if (!app_control_queue_create(&control_queue) ||
+        !app_monitor_console_create(&monitor, control_queue)) {
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
     }
     if (app_monitor(runtime, options.presentation, config.console_control,
-            monitor) != 0)
+            monitor, control_queue) != 0)
         result = SOFTPC_MACHINE_IO_ERROR;
 done:
     if (result != SOFTPC_MACHINE_OK)
         fprintf(stderr, "softpcvm: %s\n", softpc_machine_result_name(result));
     app_monitor_console_destroy(monitor);
+    app_control_queue_destroy(control_queue);
     app_runtime_destroy(runtime);
     softpc_machine_destroy(machine);
     return result != SOFTPC_MACHINE_OK;

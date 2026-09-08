@@ -1,6 +1,7 @@
 #include "runtime.h"
 #include "presentation.h"
 #include "monitor.h"
+#include "control.h"
 #include "test_cleanup.h"
 
 #include <assert.h>
@@ -12,6 +13,7 @@
 typedef struct app_window_smoke_context {
     app_runtime *runtime;
     app_monitor_console *monitor;
+    app_control_queue *control_queue;
     int result;
 } app_window_smoke_context;
 
@@ -20,7 +22,8 @@ static DWORD WINAPI app_window_smoke_run(void *opaque)
     app_window_smoke_context *context =
         (app_window_smoke_context *)opaque;
     context->result = app_presentation_run(context->runtime,
-        SOFTPC_PRESENTATION_WINDOW, 1, context->monitor);
+        SOFTPC_PRESENTATION_WINDOW, 1, context->monitor,
+        context->control_queue);
     return 0u;
 }
 
@@ -54,7 +57,8 @@ int main(void)
     softpc_machine *machine = NULL;
     app_runtime *runtime = NULL;
     app_monitor_console *monitor = NULL;
-    app_window_smoke_context context = { NULL, NULL,
+    app_control_queue *control_queue = NULL;
+    app_window_smoke_context context = { NULL, NULL, NULL,
         SOFTPC_VM_FRONTEND_ERROR };
     HANDLE thread;
     HWND window = NULL;
@@ -87,10 +91,12 @@ int main(void)
 
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(app_runtime_create(machine, &runtime));
-    assert(app_monitor_console_create(&monitor));
+    assert(app_control_queue_create(&control_queue));
+    assert(app_monitor_console_create(&monitor, control_queue));
     assert(app_runtime_start(runtime));
     context.runtime = runtime;
     context.monitor = monitor;
+    context.control_queue = control_queue;
     thread = CreateThread(NULL, 0u, app_window_smoke_run, &context, 0u,
         NULL);
     assert(thread != NULL);
@@ -316,6 +322,7 @@ int main(void)
     assert(app_runtime_stop(runtime));
     CloseHandle(thread);
     app_monitor_console_destroy(monitor);
+    app_control_queue_destroy(control_queue);
     app_runtime_destroy(runtime);
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));

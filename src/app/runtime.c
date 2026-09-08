@@ -269,29 +269,7 @@ static void app_runtime_drain_input(app_runtime *runtime)
        Deliver precisely one hardware scan event per executor callback; the
        restored 20 Hz host timer naturally schedules the next one. */
     if (app_input_queue_pop(runtime->input_queue, &event)) {
-        if (event.type == UX_EVENT_HOTKEY) {
-            if (strcmp(event.data.hotkey.identifier, "pause-toggle") == 0) {
-                if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
-                    SOFTPC_RUNTIME_PAUSED) {
-                    InterlockedExchange(&runtime->pause_requested, 0);
-                    host_sync_event_signal(runtime->resume_event);
-                } else InterlockedExchange(&runtime->pause_requested, 1);
-            } else if (strcmp(event.data.hotkey.identifier,
-                    "send-ctrl-alt-del") == 0) {
-                (void)app_keyboard_submit_ctrl_alt_del(runtime,
-                    app_keyboard_deliver_input);
-            } else if (strcmp(event.data.hotkey.identifier,
-                    "send-alt-enter") == 0) {
-                (void)app_keyboard_submit_alt_enter(runtime,
-                    app_keyboard_deliver_input);
-            } else if (strcmp(event.data.hotkey.identifier,
-                    "release-window-mouse") == 0) {
-                InterlockedExchange(&runtime->window_mouse_release_requested, 1);
-            }
-        } else if (event.type == UX_EVENT_WINDOW_CLOSE) {
-            InterlockedExchange(&runtime->window_close_requested, 1);
-            InterlockedExchange(&runtime->pause_requested, 1);
-        } else if (event.type == UX_EVENT_KEY) {
+        if (event.type == UX_EVENT_KEY) {
             if (getenv("SOFTPC_INPUT_TRACE") != NULL)
                 fprintf(stderr, "softpc input drain scan=%u released=%u\n",
                     (unsigned int)event.data.key.scan_code,
@@ -632,4 +610,18 @@ void app_runtime_destroy(app_runtime *runtime)
     free(runtime->frame_buffer);
     host_sync_event_destroy(runtime->command_event);
     free(runtime);
+}
+
+int app_runtime_request_window_close(app_runtime *runtime)
+{
+    if (runtime == NULL || InterlockedCompareExchange(&runtime->state, 0, 0) !=
+        SOFTPC_RUNTIME_RUNNING) return 0;
+    InterlockedExchange(&runtime->window_close_requested, 1);
+    return app_runtime_pause(runtime);
+}
+
+void app_runtime_request_window_mouse_release(app_runtime *runtime)
+{
+    if (runtime != NULL)
+        InterlockedExchange(&runtime->window_mouse_release_requested, 1);
 }

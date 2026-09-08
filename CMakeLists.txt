@@ -270,6 +270,7 @@ add_executable(softpcvm
     src/app/runtime.c
     src/app/input_queue.c
     src/app/keyboard.c
+    src/app/control.c
     src/app/monitor.c
     src/app/presentation.c
     src/app/presentation_plan.c
@@ -446,6 +447,7 @@ add_executable(softpc-win32-window-smoke
     src/app/runtime.c
     src/app/input_queue.c
     src/app/keyboard.c
+    src/app/control.c
     src/app/monitor.c
     src/app/prompt_trace.c
     src/app/presentation.c)

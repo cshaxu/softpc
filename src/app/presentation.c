@@ -15,6 +15,7 @@ typedef struct app_presentation_context {
     ux_window *window;
     ux_console *console;
     app_monitor_console *monitor;
+    app_control_queue *control_queue;
     ux_hotkey_registry hotkeys;
     unsigned int text_frames_since_graphics;
     app_runtime_state displayed_state;
@@ -31,7 +32,8 @@ static void app_presentation_publish_title(app_presentation_context *context)
 static int app_presentation_guest_input(void *opaque, const ux_event *event)
 {
     app_presentation_context *context = (app_presentation_context *)opaque;
-    return context != NULL && app_keyboard_deliver_input(context->runtime, event);
+    return context != NULL && app_control_queue_push_ux(context->control_queue,
+        event);
 }
 
 /* One app-owned queue sink for Window and VM-Console events.  The source
@@ -135,18 +137,19 @@ static int app_presentation_publish(app_presentation_context *context,
 
 int app_presentation_run(app_runtime *runtime,
     softpc_presentation presentation, int console_control,
-    app_monitor_console *monitor)
+    app_monitor_console *monitor, app_control_queue *control_queue)
 {
     app_presentation_context context = { 0 };
     app_runtime_frame frame = { 0 };
     uint32_t prior_sequence = 0u;
     int result = SOFTPC_VM_FRONTEND_ERROR;
 
-    if (runtime == NULL || monitor == NULL ||
+    if (runtime == NULL || monitor == NULL || control_queue == NULL ||
         !app_keyboard_register_hotkeys(&context.hotkeys))
         return SOFTPC_VM_FRONTEND_ERROR;
     context.runtime = runtime;
     context.monitor = monitor;
+    context.control_queue = control_queue;
     context.displayed_state = app_runtime_get_state(runtime);
     for (;;) {
         app_runtime_state state = app_runtime_get_state(runtime);
