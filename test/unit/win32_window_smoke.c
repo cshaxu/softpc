@@ -2,6 +2,7 @@
 #include "presentation.h"
 #include "monitor.h"
 #include "control.h"
+#include "keyboard.h"
 #include "test_cleanup.h"
 
 #include <assert.h>
@@ -36,6 +37,20 @@ static int app_window_wait_for_runtime(app_runtime *runtime,
         Sleep(10u);
     } while ((LONG)(GetTickCount() - deadline) < 0);
     return 0;
+}
+
+/* The production control thread is deliberately outside this component
+ * smoke. Feed only ordinary copied UX input through the same runtime entry
+ * while the test owns its deterministic fixture. */
+static void app_window_drain_control(app_window_smoke_context *context)
+{
+    app_control_event event;
+    while (app_control_queue_take(context->control_queue, &event, 0u)) {
+        if (event.kind == APP_CONTROL_UX_INPUT &&
+            (event.value.ux.type == UX_EVENT_KEY ||
+             event.value.ux.type == UX_EVENT_MOUSE))
+            assert(app_keyboard_deliver_input(context->runtime, &event.value.ux));
+    }
 }
 
 static HWND app_window_smoke_find(void)
@@ -228,6 +243,7 @@ int main(void)
     assert(PostMessageA(window, WM_KEYDOWN, 'S', 0x001f0001L));
     deadline = key_queued_at + 250u;
     do {
+        app_window_drain_control(&context);
         assert(softpc_machine_read_physical(machine, 0x500u, &marker,
             sizeof(marker)) == SOFTPC_MACHINE_OK);
         if (marker == 0xa5u) break;
@@ -247,6 +263,7 @@ int main(void)
     assert(PostMessageA(window, WM_CHAR, 's', 0));
     deadline = key_queued_at + 250u;
     do {
+        app_window_drain_control(&context);
         assert(softpc_machine_read_physical(machine, 0x500u, &marker,
             sizeof(marker)) == SOFTPC_MACHINE_OK);
         if (marker == 0xa5u) break;
