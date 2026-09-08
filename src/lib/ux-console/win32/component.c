@@ -153,10 +153,10 @@ void ux_console_native_stop(ux_console *console)
 
     if (console == LIB_NULL || (state = (ux_console_win32_state *)
             console->native_state) == LIB_NULL) return;
-    atomic_store_explicit(&console->base.stopping, 1, memory_order_release);
-    (void)lib_console_set_event_sink(console->logical_console, LIB_NULL, LIB_NULL);
-    ux_mailbox_native_signal(ux_component_mailboxes_wake(&console->base.mailboxes));
+    /* ux_component_destroy has queued STOP; wait for the Console worker to
+     * consume it before detaching the event sink or releasing state. */
     (void)WaitForSingleObject(state->worker, INFINITE);
+    (void)lib_console_set_event_sink(console->logical_console, LIB_NULL, LIB_NULL);
     CloseHandle(state->worker);
     console->native_state = LIB_NULL;
     free(state);

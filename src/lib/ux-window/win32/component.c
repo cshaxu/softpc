@@ -656,8 +656,8 @@ void ux_window_native_stop(ux_window *component)
     ux_window_win32_state *state;
     if (component == LIB_NULL || (state = (ux_window_win32_state *)
             component->native_state) == LIB_NULL) return;
-    atomic_store_explicit(&component->base.stopping, 1, memory_order_release);
-    ux_mailbox_native_signal(ux_component_mailboxes_wake(&component->base.mailboxes));
+    /* STOP is already in the control FIFO.  The worker consumes it, closes
+     * its Window, and thereby establishes completion before this join. */
     (void)WaitForSingleObject(state->worker, INFINITE);
     CloseHandle(state->worker);
     CloseHandle(state->ready);
