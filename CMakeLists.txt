@@ -308,6 +308,13 @@ target_link_libraries(softpc-lib-console-smoke PRIVATE base-console)
 add_test(NAME softpc-lib-console-smoke COMMAND softpc-lib-console-smoke)
 set_tests_properties(softpc-lib-console-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-lib-console-event-gate-smoke
+    test/unit/lib_console_event_gate_smoke.c)
+target_link_libraries(softpc-lib-console-event-gate-smoke PRIVATE base-console)
+add_test(NAME softpc-lib-console-event-gate-smoke
+    COMMAND softpc-lib-console-event-gate-smoke)
+set_tests_properties(softpc-lib-console-event-gate-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-host-console-broker-smoke
     test/unit/host_console_broker_smoke.c
     src/lib/host/console.c)
@@ -467,6 +474,13 @@ add_test(NAME softpc-ux-component-contract-smoke
     COMMAND softpc-ux-component-contract-smoke)
 set_tests_properties(softpc-ux-component-contract-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-ux-console-retirement-barrier-smoke
+    test/unit/ux_console_retirement_barrier_smoke.c)
+target_link_libraries(softpc-ux-console-retirement-barrier-smoke PRIVATE ux-console)
+add_test(NAME softpc-ux-console-retirement-barrier-smoke
+    COMMAND softpc-ux-console-retirement-barrier-smoke)
+set_tests_properties(softpc-ux-console-retirement-barrier-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-presentation-plan-smoke
     test/unit/presentation_plan_smoke.c
     src/app/presentation_plan.c)
@@ -498,6 +512,7 @@ add_test(NAME softpc-win32-presentation-manifest
 set(SOFTPC_TEST_TARGETS
     softpc-machine-smoke
     softpc-lib-console-smoke
+    softpc-lib-console-event-gate-smoke
     softpc-host-console-broker-smoke
     softpc-dual-media-smoke
     softpc-partition-image-smoke
@@ -517,6 +532,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-win32-keyboard-smoke
     softpc-win32-presentation-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-ux-component-contract-smoke)
+list(APPEND SOFTPC_TEST_TARGETS softpc-ux-console-retirement-barrier-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-plan-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-reconciler-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
@@ -533,6 +549,7 @@ endforeach()
 set(SOFTPC_UNIT_TESTS
     softpc-machine-smoke
     softpc-lib-console-smoke
+    softpc-lib-console-event-gate-smoke
     softpc-host-console-broker-smoke
     softpc-dual-media-smoke
     softpc-partition-image-smoke
@@ -551,6 +568,7 @@ set(SOFTPC_UNIT_TESTS
     softpc-runtime-input-continuation-smoke
     softpc-win32-keyboard-smoke
     softpc-ux-component-contract-smoke
+    softpc-ux-console-retirement-barrier-smoke
     softpc-presentation-plan-smoke
     softpc-reconciler-smoke
     softpc-standalone-source-boundary
