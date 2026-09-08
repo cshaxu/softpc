@@ -11,6 +11,7 @@ typedef struct ux_win32_mouse {
     int x;
     int y;
     int valid;
+    unsigned int cursor_hide_count;
     ux_capture capture;
 } ux_win32_mouse;
 

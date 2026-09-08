@@ -402,7 +402,6 @@ static void win32_window_capture_mouse(HWND window,
     if (!win32_window_accepting_input(context) || context->mouse_capturable ==
         LIB_FALSE) return;
     if (!ux_win32_mouse_capture(&context->mouse, window, position)) return;
-    SetCursor(NULL);
 }
 
 static void win32_window_consume_frame(HWND window,
