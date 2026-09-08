@@ -1,4 +1,5 @@
 #include "lib/base/internal/console.h"
+#include "lib/host/internal/console.h"
 #include "lib/host/internal/console_native.h"
 
 struct host_console_broker {

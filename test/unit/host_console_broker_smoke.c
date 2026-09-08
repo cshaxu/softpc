@@ -1,5 +1,6 @@
 #include "lib/base/console.h"
 #include "lib/base/internal/console.h"
+#include "lib/host/internal/console.h"
 #include "lib/host/internal/console_native.h"
 
 #include <assert.h>
