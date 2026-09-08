@@ -31,3 +31,18 @@ that compiler, separately from the shared library work.
 
 S8 is owner runtime acceptance.  It must use the refreshed package without
 changing user-owned `assets/binary/softpc.ini` or media.
+
+## Reopened repair closure
+
+The owner reopened S7 for the implementation-audit control-fact/Console
+repairs and then reported real Window lifecycle edges.  The repaired runtime
+now keeps a completed frame per concrete Window/Console output object, so a
+Window recreated after pause/resume replays the last complete frame rather
+than opening blank.  Window mouse permission is established as a creation
+fact without automatically capturing; native capture is transactional, and a
+failed Win32 capture cannot leak guest mouse input.  The first client click
+that acquires capture remains host-only.
+
+Fresh x64 and x86 package builds each passed full CTest, 29/29.  The owner
+manually accepted the resulting runtime behavior.  S7 is therefore closed;
+S8 and S9 remain separate, unadmitted T42 work.
