@@ -45,6 +45,7 @@ struct app_runtime {
     app_input_queue *input_queue;
     ux_frame *frame_buffer;
     uint32_t published_frame_sequence;
+    volatile LONG published_frame_run_generation;
     host_sync_event *command_event;
     host_sync_event *ready_event;
     host_sync_event *resume_event;
@@ -250,6 +251,8 @@ static void app_runtime_publish(app_runtime *runtime)
     }
     if (published) {
         frame->sequence = ++runtime->published_frame_sequence;
+        InterlockedExchange(&runtime->published_frame_run_generation,
+            InterlockedCompareExchange(&runtime->run_generation, 0, 0));
         (void)softpc_machine_presentation_state(runtime->machine, &mode_type,
             &screen_state);
         app_runtime_prompt_trace(frame->sequence, mode_type, screen_state,
@@ -589,6 +592,12 @@ int app_runtime_copy_frame(app_runtime *runtime,
 uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime)
 {
     return runtime == NULL ? 0u : runtime->published_frame_sequence;
+}
+
+uint32_t app_runtime_published_frame_run_generation(const app_runtime *runtime)
+{
+    return runtime == NULL ? 0u : (uint32_t)InterlockedCompareExchange(
+        (volatile LONG *)&runtime->published_frame_run_generation, 0, 0);
 }
 
 uint32_t app_runtime_run_generation(const app_runtime *runtime)

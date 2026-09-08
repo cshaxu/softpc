@@ -45,6 +45,26 @@ int main(void)
 
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(app_runtime_create(machine, &runtime));
+    /* The product control FIFO must not turn a short input burst into a
+       silently dropped make/break sequence at its old fixed-64 boundary. */
+    {
+        app_control_queue *queue = NULL;
+        ux_input_event event = { 0 };
+        app_control_event copied;
+        unsigned int index;
+        assert(app_control_queue_create(&queue));
+        event.type = UX_EVENT_TEXT;
+        for (index = 0u; index < 96u; ++index) {
+            event.data.text.scalar = index;
+            assert(app_control_queue_push_ux(queue, &event));
+        }
+        for (index = 0u; index < 96u; ++index) {
+            assert(app_control_queue_take(queue, &copied, 0u));
+            assert(copied.kind == APP_CONTROL_UX_INPUT);
+            assert(copied.value.ux.data.text.scalar == index);
+        }
+        app_control_queue_destroy(queue);
+    }
     assert(app_runtime_start(runtime));
     first_run = app_runtime_run_generation(runtime);
     assert(first_run != 0u);
@@ -76,6 +96,7 @@ int main(void)
         assert(cursor_seen);
     }
     assert(app_runtime_published_frame_sequence(runtime) == frame->sequence);
+    assert(app_runtime_published_frame_run_generation(runtime) == first_run);
     assert(frame->sequence != 0u);
     /* Runtime owns copied frame production only.  Component existence and
        Console/Window selection belong to the app presentation reconciler,

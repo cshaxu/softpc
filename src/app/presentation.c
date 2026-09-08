@@ -23,6 +23,7 @@ struct app_presentation {
     unsigned int text_frames_since_graphics;
     app_runtime_state displayed_state;
     int close_requested;
+    uint32_t displayed_run_generation;
 };
 
 typedef struct app_presentation app_presentation_context;
@@ -163,6 +164,7 @@ int app_presentation_create(app_presentation **out_presentation,
     context->monitor = monitor;
     context->control_queue = control_queue;
     context->displayed_state = app_runtime_get_state(runtime);
+    context->displayed_run_generation = app_runtime_run_generation(runtime);
     *out_presentation = context;
     return 1;
 }
@@ -199,6 +201,11 @@ int app_presentation_reconcile(app_presentation *context)
 
     if (context == NULL) return 0;
     state = app_runtime_get_state(context->runtime);
+    if (context->displayed_run_generation !=
+        app_runtime_run_generation(context->runtime)) {
+        context->displayed_run_generation = app_runtime_run_generation(context->runtime);
+        context->close_requested = 0;
+    }
     if (state != context->displayed_state) {
         context->displayed_state = state;
         app_presentation_publish_title(context);
@@ -214,7 +221,9 @@ int app_presentation_reconcile(app_presentation *context)
         (void)ux_window_release_mouse(context->window);
     if (app_runtime_take_window_close(context->runtime)) context->close_requested = 1;
     sequence = app_runtime_published_frame_sequence(context->runtime);
-    if (sequence != 0u) (void)app_runtime_copy_frame(context->runtime, &frame);
+    if (sequence != 0u && app_runtime_published_frame_run_generation(
+            context->runtime) == context->displayed_run_generation)
+        (void)app_runtime_copy_frame(context->runtime, &frame);
     plan = app_presentation_derive(context->display, context->console_control,
         state, frame.valid != 0u && frame.graphics != 0u);
     if (context->close_requested && state == SOFTPC_RUNTIME_PAUSED)
