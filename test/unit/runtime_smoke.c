@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -75,10 +76,22 @@ int main(void)
     /* Runtime owns copied frame production only.  Component existence and
        Console/Window selection now belong to app_presentation_run(), not a
        shared UX target router. */
-    assert(app_runtime_pause(runtime));
+    {
+        ux_input_event hotkey = { 0 };
+        hotkey.type = UX_EVENT_HOTKEY;
+        memcpy(hotkey.data.hotkey.identifier, "pause-toggle",
+            sizeof("pause-toggle"));
+        assert(app_runtime_enqueue_input_event(runtime, &hotkey));
+    }
     assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_PAUSED));
     assert(app_runtime_set_floppy(runtime, NULL));
-    assert(app_runtime_resume(runtime));
+    {
+        ux_input_event hotkey = { 0 };
+        hotkey.type = UX_EVENT_HOTKEY;
+        memcpy(hotkey.data.hotkey.identifier, "pause-toggle",
+            sizeof("pause-toggle"));
+        assert(app_runtime_enqueue_input_event(runtime, &hotkey));
+    }
     assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_RUNNING));
     assert(app_runtime_stop(runtime));
     assert(app_runtime_get_state(runtime) == SOFTPC_RUNTIME_STOPPED);
