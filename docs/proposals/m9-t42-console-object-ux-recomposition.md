@@ -44,7 +44,7 @@ For every existing Console reader/writer, unified-UX owner, input sink,
 lifecycle callback, and relevant test, assign one destination S or explicitly
 record it as unaffected. Cross-check against the current UI/architecture
 authorities and prove that MVDM is excluded. **Exit:** owner-readable source
-   inventory, dependencies, and acceptance gates for S2–S10; documentation checks
+   inventory, dependencies, and acceptance gates for S2–S9; documentation checks
 pass.
 
 ### S2 — Base logical Console object
@@ -192,19 +192,13 @@ the copied frame's aspect ratio and leave manual resizing unchanged.
 work areas; both package widths build/test; owner accepts normal and narrow
 desktop/RDP behavior.
 
-### S9 — Owner runtime acceptance
+### S9 — Owner runtime acceptance and T42 closure
 
 Produce the two package widths without touching `softpc.ini` or media, then
 run the approved Console/Window acceptance matrix with the owner. **Exit:**
-owner accepts runtime behavior or records bounded defects; no design change is
-silently folded in.
-
-### S10 — NXVM adoption and re-import closure
-
-Submit only the generic `src/lib` corpus, obtain NXVM's byte-identical
-adoption, atomically re-import it into SoftPC, and verify the returned manifest
-before final dual-width regression and closure. **Exit:** no permanent SoftPC
-library fork and exact corpus evidence on both sides.
+owner accepts runtime behavior and T42 closes. A defect is a separately
+admitted follow-up; no repair or design change is folded into this acceptance
+task.
 
 ## S1 Source-Boundary Inventory And Dependency Proof
 
@@ -222,7 +216,7 @@ contract but may not rewrite its owner.
 | `src/app/{runtime,presentation}.{c,h}` | product frame router, direct `ux_run`, action callbacks, lifecycle calls, title/capture changes interleave synchronously | S4 mechanically removes direct old-`ux` calls; S5 creates the sole derived-state reconciler and run-generation envelopes, becoming the only host/UX/VM composer |
 | `src/app/{input_queue,keyboard}.{c,h}` | UX-only queue and policy callbacks; mouse coalescing is currently app-owned | S5 changes it to the one tagged SoftPC input queue; S4 moves only Window mouse-move coalescing into UX |
 | `test/unit/{runtime_smoke,runtime_input_continuation_smoke,win32_presentation_smoke,win32_window_smoke,win32_keyboard_smoke}.c` | current tests encode direct-runner and synchronous callback behavior | S5 rewrites/adds pure derivation and completion-gated reconciler coverage; S6 adds boundary integration proof |
-| top-level/test CMake and package smoke | target/test registration and final package evidence | S2–S8 add only their own focused targets; S9 runs package/owner acceptance and S10 records exact corpus evidence |
+| top-level/test CMake and package smoke | target/test registration and final package evidence | S2–S8 add only their own focused targets; S9 records package/owner acceptance and closes T42 |
 | `src/host/compat/**`, `src/host/{machine,platform,video,dib_surface,audio,device_bop,keyboard,mouse_instance,serial,parallel,*.h}` | original-host ABI, fixed-machine endpoints, and MVDM-facing compatibility | intentionally unaffected. They are neither a Console broker nor a T42 migration surface |
 | `src/mvdm/softpc.new/**` | preserved selected machine and MVDM-local Win32/WinNT implementation | permanently excluded |
 
@@ -237,8 +231,7 @@ S1 scope proof
   -> S6 threaded integration
   -> S7 real-thread proof
   -> S8 work-area-aware Window bounds
-  -> S9 owner acceptance
-  -> S10 NXVM adoption, re-import, T42 closure
+  -> S9 owner acceptance and T42 closure
 ```
 
 `storage`, clock, and existing sync implementations are not rewritten by T42.
@@ -258,5 +251,4 @@ They may be used by the implementation but are not a covert second workstream.
 The derived-state and transition tests cover every approved Console/Window/
 monitor lifecycle combination; host proves exactly one active Console object;
 UX and host concurrency boundaries are deterministic; x64 and x86 builds/tests
-pass; the owner accepts runtime behavior; NXVM has adopted the generic corpus
-unchanged and SoftPC has re-imported and verified it.
+pass; the owner accepts runtime behavior.

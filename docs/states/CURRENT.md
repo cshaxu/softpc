@@ -4,18 +4,18 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T42 S8 active |
-| Admission And Approval | Owner admitted this new S8 and explicitly postponed the former owner-runtime-acceptance S8 to S9. |
-| Objective | Make the generic Win32 `ux-window` default bounds fit the active monitor work area: retain its desired size when it fits; otherwise proportionally scale down before first display. |
-| Non-goals | No modification to `src/mvdm/softpc.new/`, SoftPC app policy, lifecycle, guest frame data, frame rendering semantics, user resize behavior, `softpc.ini`, or guest media. |
-| Affected Boundaries | Only `src/lib/ux-window/win32/{component,geometry}.{c,h}`, its focused geometry test, and build/test registration. `src/app`, `src/host`, storage, and MVDM remain unchanged. |
-| Applicable Rules | Execution, architecture, coding, and documentation authorities; [T42 proposal](../proposals/m9-t42-console-object-ux-recomposition.md); [Product UX](../design/UI.md); [System Architecture](../design/ARCHITECTURE.md). |
-| Focused Verification | Pure geometry cases prove: desired bounds are retained when the work area fits; width-limited and height-limited work areas proportionally fit; resulting outer bounds remain inside the selected work area. |
-| Full Regression | Fresh x64 and x86 package builds and full CTest; owner checks a narrow RDP/desktop screen and a normal screen. Preserve `assets/binary/softpc.ini` and guest media. |
-| Similar-Issue Sweep | Inspect every automatic `SetWindowPos`/initial `CreateWindowEx` path to ensure a frame publication cannot restore an oversized default after it was fitted. |
-| Stop Conditions | Stop for owner direction if the change needs SoftPC product policy, affects guest frame dimensions or MVDM, changes manual resize semantics, or requires an NXVM-specific branch. |
-| Exit Criteria | Default Window bounds preserve desired size on adequate displays, proportionally fit a smaller monitor work area, and stay fitted after the first copied frame; dual-width tests pass and the owner accepts runtime behavior. |
-| Original Owner Request | “when screen width and height are enough … keep the original size … when … smaller … keep the H:V ratio, and scale down the window size by default.” |
+| Identifier Mode | M9 T42 S9 active |
+| Admission And Approval | Owner accepted S8 runtime behavior and admitted S9 as the final T42 runtime-acceptance record. |
+| Objective | Record owner runtime acceptance of the completed T42 Console/Window integration without changing source, package configuration, media, or product design. |
+| Non-goals | No repair work, redesign, NXVM adoption/re-import, source modification, build refresh, `softpc.ini`, or guest-media change. New defects become separately admitted work. |
+| Affected Boundaries | Acceptance evidence only: `docs/states/`, `docs/history/`, and the T42 proposal. |
+| Applicable Rules | Execution and documentation authorities; [T42 proposal](../proposals/m9-t42-console-object-ux-recomposition.md). |
+| Focused Verification | Owner has accepted the S8 normal/narrow desktop behavior; this S records the remaining approved Console/Window runtime acceptance as reported by the owner. |
+| Full Regression | Reuse completed S8 x64/x86 build and CTest evidence unless the owner requests a fresh package. Preserve `assets/binary/softpc.ini` and guest media. |
+| Similar-Issue Sweep | None: this is evidence collection, not an implementation sweep. |
+| Stop Conditions | Stop and close T42 if accepted. If the owner reports a defect requiring code or design change, record it as a separate candidate; do not repair it here. |
+| Exit Criteria | Owner accepts the runtime matrix and T42 closes, or a bounded follow-up candidate is recorded without modifying T42. |
+| Original Owner Request | “收口s8进入s9 我验证后告诉你继续修复 去掉”; S9 must not contain repair work. |
 
 ## Current Technical Baseline
 
@@ -49,10 +49,8 @@
   transferred to active T42; see [T41 history](../history/M9-T41-nxvm-library-adoption-and-binding.md).
 
 - M9 Td S6 promoted the Console-object design to `design/UI.md` and
-  `design/ARCHITECTURE.md`, retained the reviewed decision record as evidence,
-  and fixed SoftPC-first candidate delivery: NXVM must adopt it exactly and
-  SoftPC must re-import it before T42 closure. See
-  [Td S6 history](../history/M9-Td-S6-console-object-governance.md).
+  `design/ARCHITECTURE.md` and retained the reviewed decision record as
+  evidence. See [Td S6 history](../history/M9-Td-S6-console-object-governance.md).
 
 - M9 Td S5 reconciled the XP SP1 proposal and Chinese A/B audit after T40:
   the local C/H inventory is 493, all 126 OpenNT-only paths are now absent,
