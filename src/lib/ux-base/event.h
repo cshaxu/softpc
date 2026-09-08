@@ -10,7 +10,8 @@ typedef enum ux_event_type {
     UX_EVENT_KEY,
     UX_EVENT_TEXT,
     UX_EVENT_MOUSE,
-    UX_EVENT_HOTKEY
+    UX_EVENT_HOTKEY,
+    UX_EVENT_WINDOW_CLOSE
 } ux_event_type;
 
 #define UX_HOTKEY_IDENTIFIER_CAPACITY 64u

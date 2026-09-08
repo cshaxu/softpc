@@ -3,6 +3,7 @@
 
 #include "lib/base/console.h"
 #include "lib/ux-base/hotkey.h"
+#include "lib/ux-base/frame.h"
 
 typedef struct ux_console ux_console;
 

@@ -1,4 +1,5 @@
 #include "lib/ux-base/win32/input.h"
+#include "lib/ux-base/win32/actions.h"
 
 #ifdef _WIN32
 static WORD ux_win32_keyboard_decode_scan(WORD raw_scan)
@@ -25,6 +26,7 @@ static int ux_win32_keyboard_emit(void *context,
     event.data.key.virtual_key = virtual_key;
     event.data.key.scan_code = scan;
     event.data.key.modifiers = control_state;
+    event.data.key.hotkey_modifiers = ux_win32_modifiers_from_key_state();
     return sink(context, &event);
 }
 

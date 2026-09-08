@@ -1,11 +1,10 @@
 #include "lib/base/base.h"
-#include "lib/ux-window/win32/window.h"
+#include "lib/ux-window/win32/component.h"
 
 #ifdef _WIN32
-#include "lib/ux-base/win32/actions.h"
 #include "lib/ux-window/win32/geometry.h"
 #include "lib/ux-base/win32/input.h"
-#include "lib/ux/internal/presenter_internal.h"
+#include "lib/ux-base/internal/mailbox.h"
 #include "lib/ux-base/win32/mailbox_wake.h"
 #include "lib/ux-window/win32/mouse.h"
 
@@ -15,11 +14,11 @@
 
 #define WIN32_WINDOW_TEXT_CELL_WIDTH 8u
 #define WIN32_WINDOW_TEXT_CELL_HEIGHT 16u
-#define WIN32_WINDOW_FRAME_READY (WM_APP + 1u)
+#define WIN32_WINDOW_MAILBOX_READY (WM_APP + 1u)
 #define WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS 250u
 
 typedef struct ux_win32_window_context {
-    const ux_binding *binding;
+    ux_window *component;
     ux_frame *frame;
     HDC surface_dc;
     HBITMAP surface_bitmap;
@@ -30,20 +29,16 @@ typedef struct ux_win32_window_context {
     uint32_t graphics_palette[UX_GRAPHICS_PALETTE_ENTRIES];
     int graphics_valid;
     uint32_t displayed_sequence;
-    ux_run_result result;
     ux_win32_keyboard_normalizer keyboard_normalizer;
     int left_button;
     int right_button;
     ux_win32_mouse mouse;
-    WPARAM suppressed_hotkey;
     uint32_t client_surface_width;
     uint32_t client_surface_height;
     int client_width;
     int client_height;
     int cursor_blink_visible;
     DWORD cursor_blink_due;
-    lib_u32 target_generation;
-    lib_u32 title_generation;
     lib_bool mouse_capturable;
 } ux_win32_window_context;
 
@@ -53,10 +48,28 @@ static ux_win32_window_context *win32_window_context(HWND window)
         GetWindowLongPtrA(window, GWLP_USERDATA);
 }
 
-static int win32_window_content_running(const ux_win32_window_context *context)
+static int win32_window_accepting_input(const ux_win32_window_context *context)
 {
-    return context != NULL && context->binding != NULL &&
-        context->binding->get_state(context->binding->context) == UX_RUN_RUNNING;
+    return context != NULL && context->component != LIB_NULL &&
+        atomic_load_explicit(&context->component->stopping, memory_order_acquire) == 0;
+}
+
+static int win32_window_emit(ux_win32_window_context *context,
+    const ux_input_event *event)
+{
+    ux_input_event copied;
+
+    if (!win32_window_accepting_input(context) || event == LIB_NULL ||
+        context->component->input_sink == LIB_NULL) return 0;
+    copied = *event;
+    ux_input_event_set_source(&copied, context->component);
+    return ux_hotkey_matcher_submit(&context->component->hotkey_matcher, &copied,
+        context->component->input_sink, context->component->input_context);
+}
+
+static int win32_window_emit_normalized(void *opaque, const ux_event *event)
+{
+    return win32_window_emit((ux_win32_window_context *)opaque, event);
 }
 
 static void win32_window_destroy_surface(ux_win32_window_context *context)
@@ -295,7 +308,7 @@ static void win32_window_advance_cursor_blink(HWND window,
     RECT cursor;
     DWORD now = GetTickCount();
 
-    if (!win32_window_content_running(context) ||
+    if (!win32_window_accepting_input(context) ||
         (LONG)(now - context->cursor_blink_due) < 0) return;
     context->cursor_blink_visible = !context->cursor_blink_visible;
     context->cursor_blink_due = now + WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS;
@@ -314,8 +327,8 @@ static void win32_window_transition(ux_win32_window_context *context,
     if (scan == 0u && released)
         ux_win32_keyboard_release_recovered_key(&context->keyboard_normalizer,
             (WORD)key);
-    (void)ux_win32_keyboard_submit_transition(context->binding->context,
-        context->binding->input_sink, scan, (WORD)key, control_state, !released);
+    (void)ux_win32_keyboard_submit_transition(context,
+        win32_window_emit_normalized, scan, (WORD)key, control_state, !released);
 }
 
 static void win32_window_mouse(ux_win32_window_context *context,
@@ -325,7 +338,7 @@ static void win32_window_mouse(ux_win32_window_context *context,
     int dy = 0;
     ux_event event = { 0 };
 
-    if (!win32_window_content_running(context) ||
+    if (!win32_window_accepting_input(context) ||
         !ux_win32_mouse_move(&context->mouse, position, context->client_width,
             context->client_height, context->surface_width, context->surface_height,
             &dx, &dy)) return;
@@ -335,45 +348,22 @@ static void win32_window_mouse(ux_win32_window_context *context,
     event.data.mouse.relative = 1u;
     event.data.mouse.buttons = (context->left_button ? UX_MOUSE_BUTTON_LEFT : 0u) |
         (context->right_button ? UX_MOUSE_BUTTON_RIGHT : 0u);
-    (void)context->binding->input_sink(context->binding->context, &event);
+    (void)win32_window_emit(context, &event);
 }
 
 static void win32_window_release_mouse(ux_win32_window_context *context)
 {
     if (context == NULL) return;
     ux_win32_mouse_release(&context->mouse);
-    ux_presenter_set_mouse_capture_state(context->binding->presenter,
-        UX_MOUSE_CAPTURE_RELEASED);
 }
 
 static void win32_window_capture_mouse(HWND window,
     ux_win32_window_context *context, LPARAM position)
 {
-    if (!win32_window_content_running(context) || context->mouse_capturable ==
+    if (!win32_window_accepting_input(context) || context->mouse_capturable ==
         LIB_FALSE) return;
     if (!ux_win32_mouse_capture(&context->mouse, window, position)) return;
-    ux_presenter_set_mouse_capture_state(context->binding->presenter,
-        UX_MOUSE_CAPTURE_CAPTURED);
     SetCursor(NULL);
-}
-
-static void win32_window_consume_mouse_control(
-    ux_win32_window_context *context)
-{
-    lib_bool capturable;
-    lib_u32 generation;
-    lib_bool release_requested;
-
-    if (context == NULL) return;
-    generation = ux_presenter_capture_mouse_capturable(
-        context->binding->presenter, &capturable);
-    if (generation == 0u) return;
-    context->mouse_capturable = capturable;
-    release_requested = ux_presenter_take_mouse_release(
-        context->binding->presenter);
-    if (capturable == LIB_FALSE || release_requested != LIB_FALSE) {
-        win32_window_release_mouse(context);
-    }
 }
 
 static void win32_window_consume_frame(HWND window,
@@ -382,16 +372,14 @@ static void win32_window_consume_frame(HWND window,
     uint32_t width;
     uint32_t height;
 
-    if (context == NULL) return;
-    if (ux_presenter_frame_generation(context->binding->presenter) ==
-            context->displayed_sequence ||
-        ux_presenter_capture_frame(context->binding->presenter, context->frame) !=
-            LIB_STATUS_OK)
+    if (context == NULL || context->component == LIB_NULL ||
+        !ux_component_mailboxes_capture_frame(&context->component->mailboxes,
+            &context->displayed_sequence, context->frame))
         return;
-    context->displayed_sequence = context->frame->sequence;
     if (!win32_window_frame_size(context->frame, &width, &height) ||
         !win32_window_ensure_surface(window, context, width, height)) {
-        context->result = UX_RUN_ERROR_RESULT;
+        atomic_store_explicit(&context->component->stopping, 1,
+            memory_order_release);
         DestroyWindow(window);
         return;
     }
@@ -414,31 +402,27 @@ static void win32_window_consume_frame(HWND window,
 static int win32_window_consume_mailboxes(HWND window,
     ux_win32_window_context *context)
 {
-    char title[UX_WINDOW_TITLE_CAPACITY];
-    ux_target target;
-    lib_u32 generation = ux_presenter_capture_target(
-        context->binding->presenter, &target);
+    ux_component_control control;
 
-    if (generation != context->target_generation) {
-        context->target_generation = generation;
-        if (target == UX_TARGET_NONE) {
-            context->result = UX_RUN_STOPPED_RESULT;
+    if (context == LIB_NULL || context->component == LIB_NULL) return 0;
+    while (ux_component_mailboxes_take_control(&context->component->mailboxes,
+            &control)) {
+        if (control.kind == UX_COMPONENT_CONTROL_STOP) {
+            atomic_store_explicit(&context->component->stopping, 1,
+                memory_order_release);
+            win32_window_release_mouse(context);
             DestroyWindow(window);
             return 0;
         }
-        if (target == UX_TARGET_CONSOLE) {
-            context->result = UX_RUN_SWITCH_CONSOLE;
-            DestroyWindow(window);
-            return 0;
-        }
+        if (control.kind == UX_COMPONENT_CONTROL_SET_WINDOW_TITLE)
+            SetWindowTextA(window, control.value.title);
+        else if (control.kind == UX_COMPONENT_CONTROL_SET_WINDOW_MOUSE_ENABLED) {
+            context->mouse_capturable = control.value.window_mouse_enabled;
+            if (context->mouse_capturable == LIB_FALSE)
+                win32_window_release_mouse(context);
+        } else if (control.kind == UX_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE)
+            win32_window_release_mouse(context);
     }
-    generation = ux_presenter_capture_window_title(context->binding->presenter,
-        title);
-    if (generation != context->title_generation) {
-        context->title_generation = generation;
-        SetWindowTextA(window, title);
-    }
-    win32_window_consume_mouse_control(context);
     return 1;
 }
 
@@ -454,7 +438,7 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
     context = win32_window_context(window);
     if (context == NULL) return DefWindowProcA(window, message, wparam, lparam);
     switch (message) {
-    case WIN32_WINDOW_FRAME_READY:
+    case WIN32_WINDOW_MAILBOX_READY:
         if (win32_window_consume_mailboxes(window, context)) {
             win32_window_consume_frame(window, context);
             win32_window_advance_cursor_blink(window, context);
@@ -485,36 +469,22 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
             context->surface_width, context->surface_height);
         return TRUE;
     case WM_KEYDOWN:
-    case WM_SYSKEYDOWN: {
-        lib_u8 modifiers = ux_win32_modifiers_from_key_state();
-        ux_action action = ux_actions_match(context->binding->actions,
-            (WORD)wparam, modifiers);
-        if (action != UX_ACTION_NONE) {
-            ux_run_result result;
-            result = ux_binding_invoke_action(context->binding, action);
-            if (result != UX_RUN_CONTINUE) context->result = result;
-            context->suppressed_hotkey = wparam;
-        } else if (win32_window_content_running(context)) {
+    case WM_SYSKEYDOWN:
+        if (win32_window_accepting_input(context))
             win32_window_transition(context, wparam, lparam, 0);
-        }
         return 0;
-    }
     case WM_KEYUP:
     case WM_SYSKEYUP:
-        if (wparam == context->suppressed_hotkey) {
-            context->suppressed_hotkey = 0u;
-            return 0;
-        }
-        if (win32_window_content_running(context))
+        if (win32_window_accepting_input(context))
             win32_window_transition(context, wparam, lparam, 1);
         return 0;
     case WM_CHAR:
-        if (win32_window_content_running(context) &&
+        if (win32_window_accepting_input(context) &&
             ((uint32_t)lparam >> 16u & 0xffu) == 0u &&
             !ux_win32_keyboard_consume_duplicate_character(&context->keyboard_normalizer,
                 (WORD)wparam))
             (void)ux_win32_keyboard_submit_utf16(&context->keyboard_normalizer,
-                context->binding->context, context->binding->input_sink, (WORD)wparam);
+                context, win32_window_emit_normalized, (WORD)wparam);
         return 0;
     case WM_MOUSEMOVE:
         if (ux_win32_mouse_captured(&context->mouse))
@@ -527,26 +497,24 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         }
         break;
     case WM_LBUTTONDOWN:
-        win32_window_consume_mouse_control(context);
-        if (!win32_window_content_running(context)) return 0;
+        if (!win32_window_accepting_input(context)) return 0;
         context->left_button = 1;
         win32_window_capture_mouse(window, context, lparam);
         win32_window_mouse(context, lparam);
         return 0;
     case WM_LBUTTONUP:
-        if (!win32_window_content_running(context)) return 0;
+        if (!win32_window_accepting_input(context)) return 0;
         context->left_button = 0;
         if (ux_win32_mouse_captured(&context->mouse)) win32_window_mouse(context, lparam);
         return 0;
     case WM_RBUTTONDOWN:
-        win32_window_consume_mouse_control(context);
-        if (!win32_window_content_running(context)) return 0;
+        if (!win32_window_accepting_input(context)) return 0;
         context->right_button = 1;
         win32_window_capture_mouse(window, context, lparam);
         win32_window_mouse(context, lparam);
         return 0;
     case WM_RBUTTONUP:
-        if (!win32_window_content_running(context)) return 0;
+        if (!win32_window_accepting_input(context)) return 0;
         context->right_button = 0;
         if (ux_win32_mouse_captured(&context->mouse)) win32_window_mouse(context, lparam);
         return 0;
@@ -554,10 +522,10 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         win32_window_release_mouse(context);
         return 0;
     case WM_CLOSE:
+        { ux_input_event close_event = { 0 };
         win32_window_release_mouse(context);
-        context->result = context->binding->handle_close(context->binding->context,
-            context->binding->input_sink);
-        if (context->result != UX_RUN_CONTINUE) DestroyWindow(window);
+        close_event.type = UX_EVENT_WINDOW_CLOSE;
+        (void)win32_window_emit(context, &close_event); }
         return 0;
     case WM_DESTROY:
         win32_window_release_mouse(context);
@@ -575,71 +543,72 @@ static void win32_window_destroy(ux_win32_window_context *context, HWND window)
     free(context);
 }
 
-ux_run_result ux_win32_run_window(const ux_binding *binding)
+typedef struct ux_window_win32_state {
+    HANDLE worker;
+    HANDLE ready;
+    lib_status startup_status;
+    ux_win32_window_context *context;
+} ux_window_win32_state;
+
+static DWORD WINAPI ux_window_worker(void *opaque)
 {
+    ux_window *component = (ux_window *)opaque;
+    ux_window_win32_state *state = component == LIB_NULL ? LIB_NULL :
+        (ux_window_win32_state *)component->native_state;
+    ux_win32_window_context *context;
     WNDCLASSA klass;
     MSG message;
     HWND window;
-    ux_win32_window_context *context;
-    ux_run_result result;
 
-    if (ux_binding_validate(binding) != LIB_STATUS_OK) return UX_RUN_ERROR_RESULT;
+    if (state == LIB_NULL || (context = state->context) == LIB_NULL) return 0u;
     ZeroMemory(&klass, sizeof(klass));
     klass.lpfnWndProc = win32_window_proc;
     klass.hInstance = GetModuleHandleA(NULL);
     klass.hCursor = LoadCursorA(NULL, IDC_ARROW);
     klass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-    klass.lpszClassName = "Win32PresentationWindow";
-    if (RegisterClassA(&klass) == 0 && GetLastError() != ERROR_CLASS_ALREADY_EXISTS)
-        return UX_RUN_ERROR_RESULT;
-    context = calloc(1u, sizeof(*context));
-    if (context == NULL) return UX_RUN_ERROR_RESULT;
-    context->frame = calloc(1u, sizeof(*context->frame));
-    if (context->frame == NULL) {
-        free(context);
-        return UX_RUN_ERROR_RESULT;
+    klass.lpszClassName = "SoftPCUxWindow";
+    if (RegisterClassA(&klass) == 0 && GetLastError() != ERROR_CLASS_ALREADY_EXISTS) {
+        state->startup_status = LIB_STATUS_INVALID_STATE;
+        SetEvent(state->ready);
+        return 0u;
     }
-    context->binding = binding;
-    context->result = UX_RUN_STOPPED_RESULT;
+    window = CreateWindowExA(0, klass.lpszClassName, component->initial_title,
+        WS_THICKFRAME | WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
+        WS_MINIMIZEBOX | WS_MAXIMIZEBOX, CW_USEDEFAULT, 0, 680, 560,
+        NULL, NULL, klass.hInstance, context);
+    if (window == NULL) {
+        state->startup_status = LIB_STATUS_INVALID_STATE;
+        SetEvent(state->ready);
+        return 0u;
+    }
+    state->startup_status = LIB_STATUS_OK;
     context->cursor_blink_visible = 1;
     context->cursor_blink_due = GetTickCount() + WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS;
     ux_win32_mouse_reset(&context->mouse);
-    {
-        window = CreateWindowExA(0, klass.lpszClassName,
-            binding->window_initial_title,
-            WS_THICKFRAME | WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
-            WS_MINIMIZEBOX | WS_MAXIMIZEBOX, CW_USEDEFAULT, 0, 680, 560,
-            NULL, NULL, klass.hInstance, context);
-    }
-    if (window == NULL) {
-        win32_window_destroy(context, NULL);
-        return UX_RUN_ERROR_RESULT;
-    }
-    /* A switch consumes the shared wake in the prior runner. Capture the
-     * persistent target/title/frame state before waiting for another wake. */
-    SendMessageA(window, WIN32_WINDOW_FRAME_READY, 0, 0);
-    if (!IsWindow(window)) {
-        result = context->result;
-        win32_window_destroy(context, NULL);
-        return result;
-    }
+    SendMessageA(window, WIN32_WINDOW_MAILBOX_READY, 0, 0);
     ShowWindow(window, SW_SHOW);
     UpdateWindow(window);
     SetForegroundWindow(window);
     SetFocus(window);
+    SetEvent(state->ready);
     while (IsWindow(window)) {
-        HANDLE wait_handle = ux_win32_presenter_wait_handle(binding->presenter);
-        DWORD wait = MsgWaitForMultipleObjects(1u, &wait_handle, FALSE,
-            INFINITE, QS_ALLINPUT);
-
-        if (wait == WAIT_OBJECT_0) SendMessageA(window, WIN32_WINDOW_FRAME_READY, 0, 0);
+        HANDLE wake = ux_win32_mailbox_wait_handle(
+            ux_component_mailboxes_wake(&component->mailboxes));
+        DWORD wait = MsgWaitForMultipleObjects(1u, &wake, FALSE, INFINITE,
+            QS_ALLINPUT);
+        if (wait == WAIT_OBJECT_0) {
+            if (atomic_load_explicit(&component->stopping, memory_order_acquire) != 0)
+                DestroyWindow(window);
+            else
+                SendMessageA(window, WIN32_WINDOW_MAILBOX_READY, 0, 0);
+        }
         else if (wait == WAIT_FAILED) {
-            context->result = UX_RUN_ERROR_RESULT;
+            atomic_store_explicit(&component->stopping, 1, memory_order_release);
             DestroyWindow(window);
         }
         while (PeekMessageA(&message, NULL, 0, 0, PM_REMOVE)) {
             if (message.message == WM_QUIT) {
-                context->result = UX_RUN_ERROR_RESULT;
+                atomic_store_explicit(&component->stopping, 1, memory_order_release);
                 if (IsWindow(window)) DestroyWindow(window);
                 break;
             }
@@ -647,8 +616,59 @@ ux_run_result ux_win32_run_window(const ux_binding *binding)
             DispatchMessageA(&message);
         }
     }
-    result = context->result;
     win32_window_destroy(context, NULL);
-    return result;
+    state->context = LIB_NULL;
+    return 0u;
+}
+
+lib_status ux_window_native_start(ux_window *component)
+{
+    ux_window_win32_state *state;
+
+    if (component == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    state = calloc(1u, sizeof(*state));
+    if (state == LIB_NULL) return LIB_STATUS_NO_MEMORY;
+    state->context = calloc(1u, sizeof(*state->context));
+    if (state->context == LIB_NULL) { free(state); return LIB_STATUS_NO_MEMORY; }
+    state->context->frame = calloc(1u, sizeof(*state->context->frame));
+    if (state->context->frame == LIB_NULL) {
+        free(state->context); free(state); return LIB_STATUS_NO_MEMORY;
+    }
+    state->context->component = component;
+    state->ready = CreateEventA(NULL, TRUE, FALSE, NULL);
+    if (state->ready == NULL) {
+        win32_window_destroy(state->context, NULL); free(state); return LIB_STATUS_NO_MEMORY;
+    }
+    component->native_state = state;
+    state->worker = CreateThread(NULL, 0u, ux_window_worker, component, 0u, NULL);
+    if (state->worker == NULL) {
+        component->native_state = LIB_NULL;
+        CloseHandle(state->ready); win32_window_destroy(state->context, NULL);
+        free(state); return LIB_STATUS_NO_MEMORY;
+    }
+    (void)WaitForSingleObject(state->ready, INFINITE);
+    if (state->startup_status != LIB_STATUS_OK) {
+        (void)WaitForSingleObject(state->worker, INFINITE);
+        CloseHandle(state->worker); CloseHandle(state->ready);
+        if (state->context != LIB_NULL) win32_window_destroy(state->context, NULL);
+        component->native_state = LIB_NULL; free(state);
+        return state->startup_status;
+    }
+    return LIB_STATUS_OK;
+}
+
+void ux_window_native_stop(ux_window *component)
+{
+    ux_window_win32_state *state;
+    if (component == LIB_NULL || (state = (ux_window_win32_state *)
+            component->native_state) == LIB_NULL) return;
+    atomic_store_explicit(&component->stopping, 1, memory_order_release);
+    ux_mailbox_native_signal(ux_component_mailboxes_wake(&component->mailboxes));
+    (void)WaitForSingleObject(state->worker, INFINITE);
+    CloseHandle(state->worker);
+    CloseHandle(state->ready);
+    if (state->context != LIB_NULL) win32_window_destroy(state->context, NULL);
+    component->native_state = LIB_NULL;
+    free(state);
 }
 #endif
