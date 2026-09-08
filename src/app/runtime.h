@@ -4,7 +4,6 @@
 #include "machine.h"
 #include "lib/ux-base/event.h"
 #include "lib/ux-base/frame.h"
-#include "lib/ux/presenter.h"
 
 #include <stdint.h>
 
@@ -42,14 +41,6 @@ int app_runtime_copy_frame(app_runtime *runtime,
 /* A presentation client may cheaply test whether the runtime's copied frame
    changed before requesting the potentially large DIB snapshot. */
 uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime);
-/* Opaque shared-presentation mailbox.  The app binding may pass this handle
-   to a UX presenter; it never exposes machine-owned video state. */
-ux_presenter *app_runtime_presentation_presenter(app_runtime *runtime);
-ux_target app_runtime_presentation_target(const app_runtime *runtime);
-/* Product presentation policy owns the target selection; lib/ux only
-   dispatches the target requested by this runtime-owned router. */
-void app_runtime_set_presentation_mode(app_runtime *runtime,
-    softpc_presentation presentation);
 void app_runtime_destroy(app_runtime *runtime);
 
 #endif

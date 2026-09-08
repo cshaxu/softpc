@@ -1,20 +1,32 @@
-#include "lib/ux-base/actions.h"
 #include "lib/ux-base/frame.h"
-#include "lib/ux/mailbox.h"
-#include "lib/ux/router.h"
+#include "lib/ux-base/hotkey.h"
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
+
+typedef struct ux_capture {
+    ux_input_event events[4];
+    unsigned int count;
+} ux_capture;
+
+static int ux_capture_event(void *opaque, const ux_input_event *event)
+{
+    ux_capture *capture = (ux_capture *)opaque;
+    if (capture == NULL || event == NULL || capture->count == 4u) return 0;
+    capture->events[capture->count++] = *event;
+    return 1;
+}
 
 int main(void)
 {
     ux_frame *frame = calloc(1u, sizeof(*frame));
-    ux_frame *copied = calloc(1u, sizeof(*copied));
-    ux_mailbox *mailbox = NULL;
-    ux_action_registry actions;
-    ux_router router;
+    ux_hotkey_registry registry;
+    ux_hotkey_matcher matcher;
+    ux_capture capture = { 0 };
+    ux_input_event event = { 0 };
 
-    assert(frame != NULL && copied != NULL);
+    assert(frame != NULL);
     frame->valid = 1u;
     frame->graphics = 0u;
     frame->text_columns = 80u;
@@ -22,25 +34,21 @@ int main(void)
     frame->text[0] = 'X';
     assert(ux_frame_is_valid(frame));
 
-    ux_actions_initialize(&actions);
-    assert(ux_actions_register(&actions, 'P', UX_MODIFIER_CONTROL |
-        UX_MODIFIER_ALT, 7u) == LIB_STATUS_OK);
-    assert(ux_actions_match(&actions, 'P', UX_MODIFIER_CONTROL |
-        UX_MODIFIER_ALT) == 7u);
-    assert(ux_actions_match(&actions, 'P', 0u) == UX_ACTION_NONE);
-
-    ux_router_initialize(&router, UX_TARGET_CONSOLE);
-    assert(ux_router_target(&router) == UX_TARGET_CONSOLE);
-    ux_router_request(&router, UX_TARGET_WINDOW);
-    assert(ux_router_target(&router) == UX_TARGET_WINDOW);
-
-    assert(ux_mailbox_create(&mailbox) == LIB_STATUS_OK);
-    assert(ux_mailbox_publish(mailbox, frame) == LIB_STATUS_OK);
-    assert(ux_mailbox_generation(mailbox) == 1u);
-    assert(ux_mailbox_capture(mailbox, copied) == LIB_STATUS_OK);
-    assert(copied->sequence == 1u && copied->text[0] == 'X');
-    ux_mailbox_destroy(mailbox);
-    free(copied);
+    ux_hotkey_registry_initialize(&registry);
+    assert(ux_hotkey_registry_register(&registry, 'P',
+        UX_HOTKEY_MODIFIER_CONTROL | UX_HOTKEY_MODIFIER_ALT,
+        "pause-toggle") == LIB_STATUS_OK);
+    ux_hotkey_matcher_initialize(&matcher, &registry);
+    event.type = UX_EVENT_KEY;
+    event.data.key.virtual_key = 'P';
+    event.data.key.pressed = 1u;
+    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL |
+        UX_HOTKEY_MODIFIER_ALT;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
+        &capture));
+    assert(capture.count == 1u && capture.events[0].type == UX_EVENT_HOTKEY);
+    assert(strcmp(capture.events[0].data.hotkey.identifier,
+        "pause-toggle") == 0);
     free(frame);
     return 0;
 }

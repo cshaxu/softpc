@@ -43,12 +43,8 @@ static void app_runtime_prompt_trace(uint32_t sequence, uint32_t mode_type,
 struct app_runtime {
     softpc_machine *machine;
     app_input_queue *input_queue;
-    ux_presenter *presenter;
     ux_frame *frame_buffer;
     uint32_t published_frame_sequence;
-    volatile LONG presentation_target;
-    volatile LONG presentation_mode;
-    volatile LONG console_text_frames;
     host_sync_event *command_event;
     host_sync_event *ready_event;
     host_sync_event *resume_event;
@@ -70,42 +66,6 @@ struct app_runtime {
     uint32_t graphics_source_height;
     uint32_t graphics_visible_width;
 };
-
-static void app_runtime_request_presentation_target(app_runtime *runtime,
-    ux_target target)
-{
-    if (runtime != NULL && InterlockedCompareExchange(
-            &runtime->presentation_target, 0, 0) != (LONG)target) {
-        InterlockedExchange(&runtime->presentation_target, (LONG)target);
-        (void)ux_presenter_set_target(runtime->presenter, target);
-        (void)ux_presenter_set_mouse_capturable(runtime->presenter,
-            InterlockedCompareExchange(&runtime->state, 0, 0) ==
-                SOFTPC_RUNTIME_RUNNING && target == UX_TARGET_WINDOW ?
-                LIB_TRUE : LIB_FALSE);
-    }
-}
-
-/* This is SoftPC product policy.  The reusable UX runner only follows the
-   requested target; it deliberately does not infer a product's preferred
-   console/window transition from a frame. */
-static void app_runtime_route_presentation_frame(app_runtime *runtime,
-    const ux_frame *frame)
-{
-    if (runtime == NULL || frame == NULL || frame->valid == 0u) return;
-    if (InterlockedCompareExchange(&runtime->presentation_mode, 0, 0) ==
-        SOFTPC_PRESENTATION_WINDOW) {
-        InterlockedExchange(&runtime->console_text_frames, 0);
-        app_runtime_request_presentation_target(runtime, UX_TARGET_WINDOW);
-    } else if (frame->graphics != 0u) {
-        InterlockedExchange(&runtime->console_text_frames, 0);
-        app_runtime_request_presentation_target(runtime, UX_TARGET_WINDOW);
-    } else if (InterlockedCompareExchange(&runtime->presentation_target, 0, 0) ==
-            UX_TARGET_WINDOW &&
-        InterlockedIncrement(&runtime->console_text_frames) >= 3) {
-        InterlockedExchange(&runtime->console_text_frames, 0);
-        app_runtime_request_presentation_target(runtime, UX_TARGET_CONSOLE);
-    }
-}
 
 static void app_runtime_publish(app_runtime *runtime)
 {
@@ -285,9 +245,6 @@ static void app_runtime_publish(app_runtime *runtime)
         published = 1;
     }
     if (published) {
-        app_runtime_route_presentation_frame(runtime, frame);
-        if (ux_presenter_publish_frame(runtime->presenter, frame) != LIB_STATUS_OK)
-            return;
         frame->sequence = ++runtime->published_frame_sequence;
         (void)softpc_machine_presentation_state(runtime->machine, &mode_type,
             &screen_state);
@@ -442,14 +399,12 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
         host_sync_event_create(&runtime->ready_event) != LIB_STATUS_OK ||
         host_sync_event_create(&runtime->resume_event) != LIB_STATUS_OK ||
         host_sync_event_create(&runtime->media_event) != LIB_STATUS_OK ||
-        ux_presenter_create(&runtime->presenter) != LIB_STATUS_OK ||
         !app_input_queue_create(&runtime->input_queue) ||
         (runtime->frame_buffer = calloc(1u, sizeof(*runtime->frame_buffer))) == NULL) {
         host_sync_event_destroy(runtime->command_event);
         host_sync_event_destroy(runtime->ready_event);
         host_sync_event_destroy(runtime->resume_event);
         host_sync_event_destroy(runtime->media_event);
-        ux_presenter_destroy(runtime->presenter);
         app_input_queue_destroy(runtime->input_queue);
         free(runtime->frame_buffer);
         free(runtime);
@@ -457,14 +412,11 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
     }
     runtime->result = SOFTPC_MACHINE_OK;
     runtime->state = SOFTPC_RUNTIME_STOPPED;
-    runtime->presentation_mode = SOFTPC_PRESENTATION_CONSOLE;
-    runtime->presentation_target = UX_TARGET_NONE;
     if (host_sync_task_create(app_runtime_worker, runtime, &runtime->worker) !=
             LIB_STATUS_OK) {
         host_sync_event_destroy(runtime->resume_event);
         host_sync_event_destroy(runtime->ready_event);
         host_sync_event_destroy(runtime->media_event);
-        ux_presenter_destroy(runtime->presenter);
         app_input_queue_destroy(runtime->input_queue);
         free(runtime->frame_buffer);
         host_sync_event_destroy(runtime->command_event);
@@ -504,8 +456,6 @@ int app_runtime_pause(app_runtime *runtime)
     do {
         if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
             SOFTPC_RUNTIME_PAUSED) {
-            (void)ux_presenter_set_mouse_capturable(runtime->presenter,
-                LIB_FALSE);
             return 1;
         }
         if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
@@ -534,9 +484,6 @@ int app_runtime_resume(app_runtime *runtime)
     do {
         if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
             SOFTPC_RUNTIME_RUNNING) {
-            (void)ux_presenter_set_mouse_capturable(runtime->presenter,
-                InterlockedCompareExchange(&runtime->presentation_target, 0, 0) ==
-                    UX_TARGET_WINDOW ? LIB_TRUE : LIB_FALSE);
             return 1;
         }
         if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
@@ -550,7 +497,6 @@ int app_runtime_resume(app_runtime *runtime)
 int app_runtime_stop(app_runtime *runtime)
 {
     if (runtime == NULL) return 0;
-    (void)ux_presenter_set_mouse_capturable(runtime->presenter, LIB_FALSE);
     if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
         SOFTPC_RUNTIME_STOPPED) return 1;
     if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
@@ -630,37 +576,6 @@ uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime)
     return runtime == NULL ? 0u : runtime->published_frame_sequence;
 }
 
-ux_presenter *app_runtime_presentation_presenter(app_runtime *runtime)
-{
-    return runtime == NULL ? NULL : runtime->presenter;
-}
-
-ux_target app_runtime_presentation_target(const app_runtime *runtime)
-{
-    return runtime == NULL ? UX_TARGET_NONE : (ux_target)
-        InterlockedCompareExchange((volatile LONG *)&runtime->presentation_target,
-            0, 0);
-}
-
-void app_runtime_set_presentation_mode(app_runtime *runtime,
-    softpc_presentation presentation)
-{
-    ux_frame frame;
-
-    if (runtime == NULL || (presentation != SOFTPC_PRESENTATION_CONSOLE &&
-        presentation != SOFTPC_PRESENTATION_WINDOW)) return;
-    InterlockedExchange(&runtime->presentation_mode, (LONG)presentation);
-    InterlockedExchange(&runtime->console_text_frames, 0);
-    if (presentation == SOFTPC_PRESENTATION_WINDOW) {
-        app_runtime_request_presentation_target(runtime, UX_TARGET_WINDOW);
-    } else if (runtime->frame_buffer != NULL && runtime->frame_buffer->valid != 0u) {
-        frame = *runtime->frame_buffer;
-        app_runtime_route_presentation_frame(runtime, &frame);
-    } else {
-        app_runtime_request_presentation_target(runtime, UX_TARGET_CONSOLE);
-    }
-}
-
 void app_runtime_destroy(app_runtime *runtime)
 {
     if (runtime == NULL) return;
@@ -672,7 +587,6 @@ void app_runtime_destroy(app_runtime *runtime)
     host_sync_event_destroy(runtime->ready_event);
     host_sync_event_destroy(runtime->resume_event);
     host_sync_event_destroy(runtime->media_event);
-    ux_presenter_destroy(runtime->presenter);
     app_input_queue_destroy(runtime->input_queue);
     free(runtime->frame_buffer);
     host_sync_event_destroy(runtime->command_event);

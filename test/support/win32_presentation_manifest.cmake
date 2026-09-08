@@ -10,7 +10,7 @@ endif()
 file(SHA256 "${manifest}" manifest_hash)
 string(TOUPPER "${manifest_hash}" manifest_hash)
 if(NOT manifest_hash STREQUAL
-    "2578C3B60B35FBD33D98A950F01F43846894C7AA3FAD22DED412DCC7CD2597DF")
+    "4E7659203D25723549A47AA6E10BC42C5F8456A2390DEF174B48384D49AD10AD")
     message(FATAL_ERROR "Imported NXVM library manifest differs from T41 admission")
 endif()
 message(STATUS "Imported NXVM library manifest is valid")

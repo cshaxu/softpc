@@ -35,7 +35,7 @@ static int app_window_wait_for_runtime(app_runtime *runtime,
 
 static HWND app_window_smoke_find(void)
 {
-    HWND window = FindWindowA("Win32PresentationWindow", NULL);
+    HWND window = FindWindowA("SoftPCUxWindow", NULL);
     DWORD process_id = 0u;
     if (window == NULL) return NULL;
     (void)GetWindowThreadProcessId(window, &process_id);
