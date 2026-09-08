@@ -107,6 +107,7 @@ static DWORD WINAPI ux_console_worker(void *opaque)
             break;
         while (ux_component_mailboxes_take_control(&console->base.mailboxes, &control)) {
             if (control.kind == UX_COMPONENT_CONTROL_STOP) {
+                ux_component_emit_source_retired(&console->base);
                 atomic_store_explicit(&console->base.stopping, 1, memory_order_release);
                 return 0u;
             }

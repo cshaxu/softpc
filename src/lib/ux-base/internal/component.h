@@ -21,5 +21,6 @@ lib_status ux_component_initialize(ux_component *component,
     const ux_component_options *options, ux_component_native_stop_fn native_stop,
     ux_component_dispose_fn dispose);
 int ux_component_emit(ux_component *component, const ux_input_event *event);
+void ux_component_emit_source_retired(ux_component *component);
 
 #endif

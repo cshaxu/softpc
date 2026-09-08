@@ -402,6 +402,7 @@ static int win32_window_consume_mailboxes(HWND window,
     while (ux_component_mailboxes_take_control(&context->component->base.mailboxes,
             &control)) {
         if (control.kind == UX_COMPONENT_CONTROL_STOP) {
+            ux_component_emit_source_retired(&context->component->base);
             atomic_store_explicit(&context->component->base.stopping, 1,
                 memory_order_release);
             win32_window_release_mouse(context);

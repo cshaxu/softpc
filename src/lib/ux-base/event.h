@@ -11,7 +11,10 @@ typedef enum ux_event_type {
     UX_EVENT_TEXT,
     UX_EVENT_MOUSE,
     UX_EVENT_HOTKEY,
-    UX_EVENT_WINDOW_CLOSE
+    UX_EVENT_WINDOW_CLOSE,
+    /* A raw component is permanently retiring. The application must clear
+     * any guest pressed-state associated with this source before forgetting it. */
+    UX_EVENT_SOURCE_RETIRED
 } ux_event_type;
 
 #define UX_HOTKEY_IDENTIFIER_CAPACITY 64u

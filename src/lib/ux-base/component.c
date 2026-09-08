@@ -26,6 +26,15 @@ int ux_component_emit(ux_component *component, const ux_input_event *event)
         component->input_sink, component->input_context);
 }
 
+void ux_component_emit_source_retired(ux_component *component)
+{
+    ux_input_event event = { 0 };
+    if (component == LIB_NULL || component->input_sink == LIB_NULL) return;
+    event.type = UX_EVENT_SOURCE_RETIRED;
+    ux_input_event_set_source(&event, component);
+    (void)component->input_sink(component->input_context, &event);
+}
+
 lib_status ux_component_publish_frame(ux_component *component, const ux_frame *frame)
 {
     return component == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
