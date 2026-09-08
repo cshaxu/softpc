@@ -1,4 +1,5 @@
 #include "presentation.h"
+#include "monitor.h"
 #include "runtime.h"
 #include "machine.h"
 #include "prompt_trace.h"
@@ -20,6 +21,7 @@ typedef struct app_startup_config {
     char printer_output_path[SOFTPC_CONFIG_PATH_MAX];
     uint32_t memory_bytes;
     softpc_presentation presentation;
+    int console_control;
     softpc_media_mode media_mode;
 } app_startup_config;
 
@@ -163,6 +165,10 @@ static int app_load_startup_config(const char *path,
             else if (strcmp(value, "window") == 0)
                 config->presentation = SOFTPC_PRESENTATION_WINDOW;
             else goto invalid;
+        } else if (strcmp(key, "console_control") == 0) {
+            if (strcmp(value, "0") == 0) config->console_control = 0;
+            else if (strcmp(value, "1") == 0) config->console_control = 1;
+            else goto invalid;
         } else if (strcmp(key, "media_mode") == 0) {
             if (strcmp(value, "readonly") == 0)
                 config->media_mode = SOFTPC_MEDIA_READONLY;
@@ -183,69 +189,114 @@ invalid:
 
 typedef enum app_monitor_state {
     SOFTPC_MONITOR_STOPPED,
+    SOFTPC_MONITOR_RUNNING,
     SOFTPC_MONITOR_PAUSED
 } app_monitor_state;
 
-static void app_monitor_help(void)
+static void app_monitor_help(app_monitor_console *monitor)
 {
-    puts("Insignia SoftPC");
-    puts("===============");
-    puts("  start                 cold-reset and run the machine");
-    puts("  resume                continue a paused machine");
-    puts("  pause                 report the current paused state");
-    puts("  stop                  stop execution");
-    puts("  reset                 cold-reset and pause at firmware entry");
-    puts("  floppy insert <image> insert drive A media while stopped/paused");
-    puts("  floppy eject          eject drive A media while stopped/paused");
-    puts("  help                  show this help");
-    puts("  exit                  quit");
-    puts("");
-    puts("While the guest is running:");
-    puts("  Ctrl+Alt+P  pause or resume");
-    puts("  Ctrl+Alt+D  send Ctrl+Alt+Del");
-    puts("  Ctrl+Alt+F  send Alt+Enter to the guest");
-    puts("  Ctrl+Alt+M  release mouse");
+    app_monitor_console_write(monitor,
+        "Insignia SoftPC\r\n===============\r\n"
+        "  start                 cold-reset and run the machine\r\n"
+        "  resume                continue a paused machine\r\n"
+        "  pause                 request machine pause\r\n"
+        "  stop                  stop execution\r\n"
+        "  reset                 cold-reset and pause at firmware entry\r\n"
+        "  floppy insert <image> insert drive A media while stopped/paused\r\n"
+        "  floppy eject          eject drive A media while stopped/paused\r\n"
+        "  help                  show this help\r\n"
+        "  exit                  quit\r\n\r\n"
+        "Raw VM Console hotkeys: Ctrl+Alt+P/D/F/M\r\n");
 }
 
-static int app_monitor_run_frontend(app_runtime *runtime,
-    softpc_presentation presentation, app_monitor_state *state)
-{
-    int frontend_result;
+typedef struct app_frontend {
+    app_runtime *runtime;
+    softpc_presentation presentation;
+    int console_control;
+    app_monitor_console *monitor;
+    HANDLE thread;
+    int result;
+} app_frontend;
 
-    frontend_result = app_presentation_run(runtime, presentation);
-    if (frontend_result == SOFTPC_VM_FRONTEND_ERROR) return 0;
-    *state = frontend_result == SOFTPC_VM_FRONTEND_PAUSED ?
+static DWORD WINAPI app_frontend_run(void *opaque)
+{
+    app_frontend *frontend = (app_frontend *)opaque;
+    frontend->result = app_presentation_run(frontend->runtime,
+        frontend->presentation, frontend->console_control, frontend->monitor);
+    return 0u;
+}
+
+static int app_frontend_start(app_frontend *frontend)
+{
+    if (frontend->thread != NULL) return 1;
+    frontend->result = SOFTPC_VM_FRONTEND_ERROR;
+    frontend->thread = CreateThread(NULL, 0u, app_frontend_run, frontend, 0u,
+        NULL);
+    return frontend->thread != NULL;
+}
+
+static int app_frontend_reap(app_frontend *frontend, app_monitor_state *state,
+    app_monitor_console *monitor)
+{
+    if (frontend->thread == NULL ||
+        WaitForSingleObject(frontend->thread, 0u) != WAIT_OBJECT_0) return 1;
+    CloseHandle(frontend->thread);
+    frontend->thread = NULL;
+    if (frontend->result == SOFTPC_VM_FRONTEND_ERROR) return 0;
+    *state = app_runtime_get_state(frontend->runtime) == SOFTPC_RUNTIME_PAUSED ?
         SOFTPC_MONITOR_PAUSED : SOFTPC_MONITOR_STOPPED;
-    puts(*state == SOFTPC_MONITOR_PAUSED ? "Machine paused." :
-        "Machine stopped.");
+    app_monitor_console_write(monitor, *state == SOFTPC_MONITOR_PAUSED ?
+        "Machine paused.\r\n" : "Machine stopped.\r\n");
     return 1;
 }
 
-static int app_monitor_start(app_runtime *runtime,
-    softpc_presentation presentation, app_monitor_state *state, int reset)
+static int app_monitor_start(app_runtime *runtime, app_frontend *frontend,
+    app_monitor_state *state, int reset)
 {
     if (reset || *state == SOFTPC_MONITOR_STOPPED) {
         if (!app_runtime_start(runtime)) return 0;
-    } else if (!app_runtime_resume(runtime)) {
+    } else if (!app_runtime_resume(runtime)) return 0;
+    if (!app_frontend_start(frontend)) {
+        (void)app_runtime_stop(runtime);
         return 0;
     }
-    return app_monitor_run_frontend(runtime, presentation, state);
+    *state = SOFTPC_MONITOR_RUNNING;
+    return 1;
 }
 
-static int app_monitor(app_runtime *runtime,
-    softpc_presentation presentation)
+static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
+    int console_control, app_monitor_console *monitor)
 {
     char line[SOFTPC_CONFIG_PATH_MAX + 64u];
     app_monitor_state state = SOFTPC_MONITOR_STOPPED;
+    app_frontend frontend = { runtime, presentation, console_control, monitor,
+        NULL, SOFTPC_VM_FRONTEND_ERROR };
 
-    app_monitor_help();
-    puts("");
+    int prompt_pending = 0;
+    app_monitor_help(monitor);
+    prompt_pending = 1;
     for (;;) {
         char *command;
         char *argument;
-        printf("SoftPC> ");
-        fflush(stdout);
-        if (fgets(line, sizeof(line), stdin) == NULL) return 1;
+        if (prompt_pending && app_monitor_console_write(monitor, "SoftPC> "))
+            prompt_pending = 0;
+        while (!app_monitor_console_take_line(monitor, line, sizeof(line), 100u)) {
+            app_runtime_state actual = app_runtime_get_state(runtime);
+            if (actual == SOFTPC_RUNTIME_PAUSED && state != SOFTPC_MONITOR_PAUSED) {
+                state = SOFTPC_MONITOR_PAUSED;
+                app_monitor_console_write(monitor, "Machine paused.\r\n");
+                prompt_pending = 1;
+            } else if (actual == SOFTPC_RUNTIME_STOPPED &&
+                state == SOFTPC_MONITOR_RUNNING) {
+                state = SOFTPC_MONITOR_STOPPED;
+                app_monitor_console_write(monitor, "Machine stopped.\r\n");
+                prompt_pending = 1;
+            }
+            if (prompt_pending && app_monitor_console_write(monitor, "SoftPC> "))
+                prompt_pending = 0;
+            if (!app_frontend_reap(&frontend, &state, monitor)) return 1;
+        }
+        if (!app_frontend_reap(&frontend, &state, monitor)) return 1;
         command = app_trim(line);
         argument = command;
         while (*argument != '\0' && !isspace((unsigned char)*argument))
@@ -255,25 +306,35 @@ static int app_monitor(app_runtime *runtime,
         for (char *letter = command; *letter != '\0'; ++letter)
             *letter = (char)tolower((unsigned char)*letter);
         if (*command == '\0') continue;
-        if (strcmp(command, "help") == 0) app_monitor_help();
-        else if (strcmp(command, "exit") == 0) return 0;
+        prompt_pending = 1;
+        if (strcmp(command, "help") == 0) app_monitor_help(monitor);
+        else if (strcmp(command, "exit") == 0) {
+            (void)app_runtime_stop(runtime);
+            if (frontend.thread != NULL) {
+                (void)WaitForSingleObject(frontend.thread, INFINITE);
+                CloseHandle(frontend.thread);
+            }
+            return 0;
+        }
         else if (strcmp(command, "start") == 0) {
-            if (!app_monitor_start(runtime, presentation, &state, 0)) return 1;
+            if (!app_monitor_start(runtime, &frontend, &state, 0)) return 1;
         } else if (strcmp(command, "resume") == 0) {
-            if (state != SOFTPC_MONITOR_PAUSED) puts("Machine is not paused.");
-            else if (!app_monitor_start(runtime, presentation, &state, 0)) return 1;
+            if (state != SOFTPC_MONITOR_PAUSED)
+                app_monitor_console_write(monitor, "Machine is not paused.\r\n");
+            else if (!app_monitor_start(runtime, &frontend, &state, 0)) return 1;
         } else if (strcmp(command, "pause") == 0) {
-            puts(state == SOFTPC_MONITOR_PAUSED ? "Machine is paused." :
-                "Use Ctrl+Alt+P while the guest is running.");
+            if (state == SOFTPC_MONITOR_PAUSED)
+                app_monitor_console_write(monitor, "Machine is paused.\r\n");
+            else if (!app_runtime_pause(runtime)) return 1;
         } else if (strcmp(command, "stop") == 0) {
             if (!app_runtime_stop(runtime)) return 1;
             state = SOFTPC_MONITOR_STOPPED;
-            puts("Machine stopped.");
+            app_monitor_console_write(monitor, "Machine stopped.\r\n");
         } else if (strcmp(command, "reset") == 0) {
             if (!app_runtime_stop(runtime) || !app_runtime_start(runtime) ||
                 !app_runtime_pause(runtime)) return 1;
             state = SOFTPC_MONITOR_PAUSED;
-            puts("Machine reset and pause requested.");
+            app_monitor_console_write(monitor, "Machine reset and pause requested.\r\n");
         } else if (strcmp(command, "floppy") == 0) {
             char *verb = argument;
             char *path = verb;
@@ -284,15 +345,16 @@ static int app_monitor(app_runtime *runtime,
                 *letter = (char)tolower((unsigned char)*letter);
             if (strcmp(verb, "eject") == 0 && *path == '\0') {
                 if (!app_runtime_set_floppy(runtime, NULL))
-                    puts("Cannot eject floppy.");
-                else puts("Floppy ejected.");
+                    app_monitor_console_write(monitor, "Cannot eject floppy.\r\n");
+                else app_monitor_console_write(monitor, "Floppy ejected.\r\n");
             } else if (strcmp(verb, "insert") == 0 && *path != '\0') {
                 if (!app_runtime_set_floppy(runtime, path))
-                    puts("Cannot insert floppy.");
-                else puts("Floppy inserted.");
-            } else puts("Usage: floppy insert <image> | eject");
-        } else printf("Unknown command: %s\n", command);
-        puts("");
+                    app_monitor_console_write(monitor, "Cannot insert floppy.\r\n");
+                else app_monitor_console_write(monitor, "Floppy inserted.\r\n");
+            } else app_monitor_console_write(monitor,
+                "Usage: floppy insert <image> | eject\r\n");
+        } else app_monitor_console_write(monitor, "Unknown command.\r\n");
+        app_monitor_console_write(monitor, "\r\n");
     }
 }
 
@@ -300,10 +362,11 @@ int main(int argc, char **argv)
 {
     char config_path[SOFTPC_CONFIG_PATH_MAX];
     app_startup_config config = { { 0 }, { 0 }, { 0 }, { 0 }, 16u * 1024u * 1024u,
-        SOFTPC_PRESENTATION_CONSOLE, SOFTPC_MEDIA_OVERLAY };
+        SOFTPC_PRESENTATION_CONSOLE, 1, SOFTPC_MEDIA_OVERLAY };
     softpc_machine_options options = { 0 };
     softpc_machine *machine = NULL;
     app_runtime *runtime = NULL;
+    app_monitor_console *monitor = NULL;
     softpc_machine_result result;
     (void)argv;
 
@@ -344,11 +407,17 @@ int main(int argc, char **argv)
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
     }
-    if (app_monitor(runtime, options.presentation) != 0)
+    if (!app_monitor_console_create(&monitor)) {
+        result = SOFTPC_MACHINE_IO_ERROR;
+        goto done;
+    }
+    if (app_monitor(runtime, options.presentation, config.console_control,
+            monitor) != 0)
         result = SOFTPC_MACHINE_IO_ERROR;
 done:
     if (result != SOFTPC_MACHINE_OK)
         fprintf(stderr, "softpcvm: %s\n", softpc_machine_result_name(result));
+    app_monitor_console_destroy(monitor);
     app_runtime_destroy(runtime);
     softpc_machine_destroy(machine);
     return result != SOFTPC_MACHINE_OK;

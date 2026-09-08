@@ -24,7 +24,7 @@ int main(void)
         plan.monitor_console_enabled);
     plan = app_presentation_derive(SOFTPC_PRESENTATION_WINDOW, 1,
         SOFTPC_RUNTIME_PAUSED, 1);
-    assert(!plan.window_enabled && !plan.vm_console_enabled &&
+    assert(plan.window_enabled && !plan.vm_console_enabled &&
         plan.monitor_console_enabled);
     return 0;
 }

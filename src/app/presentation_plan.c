@@ -5,7 +5,16 @@ app_presentation_plan app_presentation_derive(softpc_presentation display,
 {
     app_presentation_plan plan = { 0, 0, 1 };
 
-    if (state != SOFTPC_RUNTIME_RUNNING) return plan;
+    if (state == SOFTPC_RUNTIME_STOPPED || state == SOFTPC_RUNTIME_ERROR)
+        return plan;
+    /* Pause releases the raw VM Console before its component is retired, but
+     * an already meaningful Window remains a paused view.  Static Window
+     * display always retains it; Console display retains it only when the
+     * last completed guest frame was graphical. */
+    if (state == SOFTPC_RUNTIME_PAUSED) {
+        plan.window_enabled = display == SOFTPC_PRESENTATION_WINDOW || graphics;
+        return plan;
+    }
     if (display == SOFTPC_PRESENTATION_WINDOW) {
         plan.window_enabled = 1;
         return plan;

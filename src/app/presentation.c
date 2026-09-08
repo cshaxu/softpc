@@ -3,6 +3,7 @@
 #ifdef _WIN32
 #include "keyboard.h"
 #include "lib/host/console.h"
+#include "presentation_plan.h"
 #include "lib/ux-console/console.h"
 #include "lib/ux-window/window.h"
 
@@ -13,7 +14,7 @@ typedef struct app_presentation_context {
     app_runtime *runtime;
     ux_window *window;
     ux_console *console;
-    host_console_broker *console_broker;
+    app_monitor_console *monitor;
     ux_hotkey_registry hotkeys;
     unsigned int text_frames_since_graphics;
     app_runtime_state displayed_state;
@@ -69,9 +70,10 @@ static int app_presentation_create_console(app_presentation_context *context)
     options.hotkeys = context->hotkeys;
     if (ux_console_create(&context->console, &options) != LIB_STATUS_OK)
         return 0;
-    if (host_console_broker_create(&context->console_broker,
-            ux_console_get_console(context->console),
-            HOST_CONSOLE_RAW_EVENTS) != LIB_STATUS_OK) {
+    if (host_console_replace_active(app_monitor_console_broker(context->monitor),
+            app_monitor_console_object(context->monitor),
+            ux_console_get_console(context->console), HOST_CONSOLE_RAW_EVENTS) !=
+            LIB_STATUS_OK) {
         ux_component_destroy(ux_console_component(context->console));
         context->console = NULL;
         return 0;
@@ -82,16 +84,40 @@ static int app_presentation_create_console(app_presentation_context *context)
 static void app_presentation_destroy_components(app_presentation_context *context)
 {
     if (context == NULL) return;
-    /* The broker owns the process Console activation.  Retire it before its
-     * borrowed VM Console object is destroyed. */
-    host_console_broker_destroy(context->console_broker);
-    context->console_broker = NULL;
+    /* Replace the VM object before destroying it. Host retains one Current
+     * Console for its entire life; presentation merely changes the object. */
+    if (context->console != NULL)
+        (void)host_console_replace_active(app_monitor_console_broker(context->monitor),
+            ux_console_get_console(context->console),
+            app_monitor_console_object(context->monitor), HOST_CONSOLE_COOKED_LINES);
     if (context->window != NULL)
         ux_component_destroy(ux_window_component(context->window));
     if (context->console != NULL)
         ux_component_destroy(ux_console_component(context->console));
     context->window = NULL;
     context->console = NULL;
+}
+
+static int app_presentation_apply_plan(app_presentation_context *context,
+    const app_presentation_plan *plan)
+{
+    if (context == NULL || plan == NULL) return 0;
+    if (plan->window_enabled && !app_presentation_create_window(context)) return 0;
+    if (plan->vm_console_enabled && context->console == NULL &&
+        !app_presentation_create_console(context)) return 0;
+    if (!plan->vm_console_enabled && context->console != NULL) {
+        if (host_console_replace_active(app_monitor_console_broker(context->monitor),
+                ux_console_get_console(context->console),
+                app_monitor_console_object(context->monitor),
+                HOST_CONSOLE_COOKED_LINES) != LIB_STATUS_OK) return 0;
+        ux_component_destroy(ux_console_component(context->console));
+        context->console = NULL;
+    }
+    if (!plan->window_enabled && context->window != NULL) {
+        ux_component_destroy(ux_window_component(context->window));
+        context->window = NULL;
+    }
+    return 1;
 }
 
 static int app_presentation_publish(app_presentation_context *context,
@@ -108,24 +134,23 @@ static int app_presentation_publish(app_presentation_context *context,
 }
 
 int app_presentation_run(app_runtime *runtime,
-    softpc_presentation presentation)
+    softpc_presentation presentation, int console_control,
+    app_monitor_console *monitor)
 {
     app_presentation_context context = { 0 };
     app_runtime_frame frame = { 0 };
     uint32_t prior_sequence = 0u;
     int result = SOFTPC_VM_FRONTEND_ERROR;
 
-    if (runtime == NULL || !app_keyboard_register_hotkeys(&context.hotkeys))
+    if (runtime == NULL || monitor == NULL ||
+        !app_keyboard_register_hotkeys(&context.hotkeys))
         return SOFTPC_VM_FRONTEND_ERROR;
     context.runtime = runtime;
+    context.monitor = monitor;
     context.displayed_state = app_runtime_get_state(runtime);
-    if (presentation == SOFTPC_PRESENTATION_WINDOW) {
-        if (!app_presentation_create_window(&context)) goto done;
-    } else if (!app_presentation_create_console(&context)) {
-        goto done;
-    }
     for (;;) {
         app_runtime_state state = app_runtime_get_state(runtime);
+        app_presentation_plan plan;
         uint32_t sequence = app_runtime_published_frame_sequence(runtime);
         if (state != context.displayed_state) {
             context.displayed_state = state;
@@ -141,28 +166,18 @@ int app_presentation_run(app_runtime *runtime,
             (void)ux_window_release_mouse(context.window);
         if (app_runtime_take_window_close(runtime) && state == SOFTPC_RUNTIME_PAUSED)
             break;
-        if (state == SOFTPC_RUNTIME_ERROR || state == SOFTPC_RUNTIME_STOPPED ||
-            (state == SOFTPC_RUNTIME_PAUSED &&
-             presentation == SOFTPC_PRESENTATION_CONSOLE))
+        if (state == SOFTPC_RUNTIME_ERROR || state == SOFTPC_RUNTIME_STOPPED)
             break;
+        if (sequence != prior_sequence && app_runtime_copy_frame(runtime, &frame)) {
+            prior_sequence = sequence;
+        }
+        plan = app_presentation_derive(presentation, console_control, state,
+            frame.valid != 0u && frame.graphics != 0u);
+        if (!app_presentation_apply_plan(&context, &plan)) goto done;
+        if (frame.valid != 0u && !app_presentation_publish(&context, &frame)) goto done;
         if (state == SOFTPC_RUNTIME_PAUSED) {
             Sleep(5u);
             continue;
-        }
-        if (sequence != prior_sequence && app_runtime_copy_frame(runtime, &frame)) {
-            prior_sequence = sequence;
-            if (presentation == SOFTPC_PRESENTATION_CONSOLE) {
-                if (frame.graphics != 0u) {
-                    context.text_frames_since_graphics = 0u;
-                    if (!app_presentation_create_window(&context)) goto done;
-                } else if (context.window != NULL &&
-                    ++context.text_frames_since_graphics >= 3u) {
-                    ux_component_destroy(ux_window_component(context.window));
-                    context.window = NULL;
-                    context.text_frames_since_graphics = 0u;
-                }
-            }
-            if (!app_presentation_publish(&context, &frame)) goto done;
         }
         Sleep(5u);
     }

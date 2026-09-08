@@ -2,6 +2,7 @@
 #define APP_PRESENTATION_H
 
 #include "runtime.h"
+#include "monitor.h"
 
 #ifdef _WIN32
 #define SOFTPC_VM_FRONTEND_STOPPED 0
@@ -12,7 +13,8 @@
  * and maps generic UX events to SoftPC actions; neither shared UX leaf has
  * product lifecycle knowledge. */
 int app_presentation_run(app_runtime *runtime,
-    softpc_presentation presentation);
+    softpc_presentation presentation, int console_control,
+    app_monitor_console *monitor);
 #endif
 
 #endif
