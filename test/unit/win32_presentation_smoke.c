@@ -1,5 +1,5 @@
-#include "lib/ux/actions.h"
-#include "lib/ux/frame.h"
+#include "lib/ux-base/actions.h"
+#include "lib/ux-base/frame.h"
 #include "lib/ux/mailbox.h"
 #include "lib/ux/router.h"
 

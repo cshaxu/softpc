@@ -1,7 +1,7 @@
 #ifndef UX_WIN32_ACTIONS_H
 #define UX_WIN32_ACTIONS_H
 
-#include "lib/ux/actions.h"
+#include "lib/ux-base/actions.h"
 
 #ifdef _WIN32
 #include <windows.h>

@@ -2,7 +2,7 @@
 #define UX_WIN32_MOUSE_H
 
 #ifdef _WIN32
-#include "lib/ux/capture.h"
+#include "lib/ux-base/capture.h"
 #include <windows.h>
 
 /* Host-only relative-pointer state. The caller owns input-device buttons and

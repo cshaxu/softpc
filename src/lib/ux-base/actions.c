@@ -1,5 +1,5 @@
 #include "lib/base/base.h"
-#include "lib/ux/actions.h"
+#include "lib/ux-base/actions.h"
 
 void ux_actions_initialize(ux_action_registry *registry)
 {

@@ -1,9 +1,9 @@
 #ifndef UX_PRESENTER_H
 #define UX_PRESENTER_H
 
-#include "lib/ux/actions.h"
-#include "lib/ux/event.h"
-#include "lib/ux/frame.h"
+#include "lib/ux-base/actions.h"
+#include "lib/ux-base/event.h"
+#include "lib/ux-base/frame.h"
 
 #define UX_WINDOW_TITLE_CAPACITY 128u
 

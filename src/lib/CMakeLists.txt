@@ -18,16 +18,16 @@ add_library(base-console STATIC base/console.c)
 library_root(base-console)
 
 set(LIBRARY_UX_SOURCES
-    ux/actions.c
-    ux/linux/input.c
+    ux-base/actions.c
+    ux-base/linux/input.c
     ux/presenter.c)
 if(WIN32)
     list(APPEND LIBRARY_UX_SOURCES
         ux/win32/mailbox.c
-        ux/win32/actions.c
+        ux-base/win32/actions.c
         ux/win32/console.c
         ux/win32/geometry.c
-        ux/win32/input.c
+        ux-base/win32/input.c
         ux/win32/mouse.c
         ux/win32/runner.c
         ux/win32/window.c)
