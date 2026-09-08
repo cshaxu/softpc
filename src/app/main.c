@@ -240,7 +240,8 @@ static void app_runtime_completed(void *opaque, app_runtime_state state,
  * control path alone decides its lifecycle effect and preserves the resume
  * ordering required by the Console-object contract. */
 static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
-    app_presentation *presentation, const ux_input_event *event)
+    app_presentation *presentation, app_monitor_state monitor_state,
+    const ux_input_event *event)
 {
     if (event != NULL && event->type == UX_EVENT_WINDOW_CLOSE) {
         app_presentation_request_intent(presentation,
@@ -250,7 +251,7 @@ static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
     if (event != NULL && event->type == UX_EVENT_HOTKEY &&
         strcmp(event->data.hotkey.identifier, "pause-toggle") == 0) {
         app_presentation_request_intent(presentation,
-            app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED ?
+            monitor_state == SOFTPC_MONITOR_PAUSED ?
                 APP_RECONCILER_INTENT_RESUME : APP_RECONCILER_INTENT_PAUSE);
         return 1;
     }
@@ -287,7 +288,7 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                             app_runtime_run_generation(runtime))
                         continue;
                     if (!app_monitor_handle_ux(control_queue, runtime, presenter,
-                            &control_event.value.ux))
+                            state, &control_event.value.ux))
                         goto failed;
                     if (!app_monitor_drive(runtime, presenter)) goto failed;
                     continue;
