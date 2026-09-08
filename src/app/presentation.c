@@ -174,9 +174,42 @@ static int app_presentation_apply_next_action(app_presentation_context *context)
 static int app_presentation_publish(app_presentation_context *context,
     const ux_frame *frame)
 {
+    ux_frame console_status;
+    const ux_frame *console_frame = frame;
     if (context == NULL || frame == NULL) return 0;
+    /* A graphics frame has no console rendering contract.  In the one mode
+     * where the VM raw Console remains active beside Window, SoftPC provides
+     * the product status surface rather than leaving stale guest text. */
+    if (context->console != NULL && frame->graphics != 0u &&
+        context->display == SOFTPC_PRESENTATION_CONSOLE &&
+        !context->console_control) {
+        static const char message[] =
+            "Insignia SoftPC is running in the Window.\r\n"
+            "Raw VM Console hotkeys: Ctrl+Alt+P/D/F/M\r\n";
+        size_t index, row = 0u, column = 0u;
+        memset(&console_status, 0, sizeof(console_status));
+        console_status.valid = 1u;
+        console_status.sequence = frame->sequence;
+        console_status.text_columns = UX_TEXT_COLUMNS;
+        console_status.text_rows = UX_TEXT_ROWS;
+        console_status.cursor_column = -1;
+        console_status.cursor_row = -1;
+        for (index = 0u; index < sizeof(console_status.text); ++index) {
+            console_status.text[index] = ' ';
+            console_status.attributes[index] = 0x07u;
+        }
+        for (index = 0u; index < sizeof(message) - 1u; ++index) {
+            if (message[index] == '\r') continue;
+            if (message[index] == '\n') { ++row; column = 0u; continue; }
+            if (row < UX_TEXT_ROWS && column < UX_TEXT_COLUMNS)
+                console_status.text[row * UX_TEXT_COLUMNS + column] =
+                    (lib_u8)message[index];
+            ++column;
+        }
+        console_frame = &console_status;
+    }
     if (context->console != NULL &&
-        ux_component_publish_frame(ux_console_component(context->console), frame) !=
+        ux_component_publish_frame(ux_console_component(context->console), console_frame) !=
             LIB_STATUS_OK) return 0;
     if (context->window != NULL &&
         ux_component_publish_frame(ux_window_component(context->window), frame) !=
