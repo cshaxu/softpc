@@ -48,6 +48,7 @@ struct app_runtime {
     host_sync_event *command_event;
     host_sync_event *ready_event;
     host_sync_event *resume_event;
+    host_sync_event *input_event;
     host_sync_event *media_event;
     host_sync_task *worker;
     volatile LONG state;
@@ -57,6 +58,8 @@ struct app_runtime {
     volatile LONG start_requested;
     volatile LONG terminate_requested;
     volatile LONG media_requested;
+    volatile LONG window_close_requested;
+    volatile LONG window_mouse_release_requested;
     softpc_machine_result media_result;
     char media_floppy_path[SOFTPC_RUNTIME_PATH_MAX];
     /* The original V7 standard painter may use the left half of a doubled
@@ -266,7 +269,29 @@ static void app_runtime_drain_input(app_runtime *runtime)
        Deliver precisely one hardware scan event per executor callback; the
        restored 20 Hz host timer naturally schedules the next one. */
     if (app_input_queue_pop(runtime->input_queue, &event)) {
-        if (event.type == UX_EVENT_KEY) {
+        if (event.type == UX_EVENT_HOTKEY) {
+            if (strcmp(event.data.hotkey.identifier, "pause-toggle") == 0) {
+                if (InterlockedCompareExchange(&runtime->state, 0, 0) ==
+                    SOFTPC_RUNTIME_PAUSED) {
+                    InterlockedExchange(&runtime->pause_requested, 0);
+                    host_sync_event_signal(runtime->resume_event);
+                } else InterlockedExchange(&runtime->pause_requested, 1);
+            } else if (strcmp(event.data.hotkey.identifier,
+                    "send-ctrl-alt-del") == 0) {
+                (void)app_keyboard_submit_ctrl_alt_del(runtime,
+                    app_keyboard_deliver_input);
+            } else if (strcmp(event.data.hotkey.identifier,
+                    "send-alt-enter") == 0) {
+                (void)app_keyboard_submit_alt_enter(runtime,
+                    app_keyboard_deliver_input);
+            } else if (strcmp(event.data.hotkey.identifier,
+                    "release-window-mouse") == 0) {
+                InterlockedExchange(&runtime->window_mouse_release_requested, 1);
+            }
+        } else if (event.type == UX_EVENT_WINDOW_CLOSE) {
+            InterlockedExchange(&runtime->window_close_requested, 1);
+            InterlockedExchange(&runtime->pause_requested, 1);
+        } else if (event.type == UX_EVENT_KEY) {
             if (getenv("SOFTPC_INPUT_TRACE") != NULL)
                 fprintf(stderr, "softpc input drain scan=%u released=%u\n",
                     (unsigned int)event.data.key.scan_code,
@@ -312,10 +337,10 @@ static void app_runtime_executor_event(void *opaque)
         InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_PAUSED);
         while (InterlockedCompareExchange(&runtime->pause_requested, 0, 0) != 0 &&
             InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0) {
-            host_sync_event *events[2] = { runtime->resume_event,
-                runtime->command_event };
+            host_sync_event *events[3] = { runtime->resume_event,
+                runtime->command_event, runtime->input_event };
             lib_u32 event_index = UINT32_MAX;
-            if (host_sync_wait_any(events, 2u, runtime->worker, UINT32_MAX,
+            if (host_sync_wait_any(events, 3u, runtime->worker, UINT32_MAX,
                     &event_index) != HOST_SYNC_WAIT_SIGNALED)
                 continue;
             if (event_index == 0u)
@@ -323,7 +348,8 @@ static void app_runtime_executor_event(void *opaque)
             else if (event_index == 1u) {
                 host_sync_event_reset(runtime->command_event);
                 app_runtime_service_media(runtime);
-            }
+            } else { host_sync_event_reset(runtime->input_event);
+                app_runtime_drain_input(runtime); }
         }
         if (InterlockedCompareExchange(&runtime->stop_requested, 0, 0) == 0)
             InterlockedExchange(&runtime->state, SOFTPC_RUNTIME_RUNNING);
@@ -398,12 +424,14 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
     if (host_sync_event_create(&runtime->command_event) != LIB_STATUS_OK ||
         host_sync_event_create(&runtime->ready_event) != LIB_STATUS_OK ||
         host_sync_event_create(&runtime->resume_event) != LIB_STATUS_OK ||
+        host_sync_event_create(&runtime->input_event) != LIB_STATUS_OK ||
         host_sync_event_create(&runtime->media_event) != LIB_STATUS_OK ||
         !app_input_queue_create(&runtime->input_queue) ||
         (runtime->frame_buffer = calloc(1u, sizeof(*runtime->frame_buffer))) == NULL) {
         host_sync_event_destroy(runtime->command_event);
         host_sync_event_destroy(runtime->ready_event);
         host_sync_event_destroy(runtime->resume_event);
+        host_sync_event_destroy(runtime->input_event);
         host_sync_event_destroy(runtime->media_event);
         app_input_queue_destroy(runtime->input_queue);
         free(runtime->frame_buffer);
@@ -415,6 +443,7 @@ int app_runtime_create(softpc_machine *machine, app_runtime **out)
     if (host_sync_task_create(app_runtime_worker, runtime, &runtime->worker) !=
             LIB_STATUS_OK) {
         host_sync_event_destroy(runtime->resume_event);
+        host_sync_event_destroy(runtime->input_event);
         host_sync_event_destroy(runtime->ready_event);
         host_sync_event_destroy(runtime->media_event);
         app_input_queue_destroy(runtime->input_queue);
@@ -554,12 +583,16 @@ softpc_machine_result app_runtime_get_result(const app_runtime *runtime)
 int app_runtime_enqueue_input_event(app_runtime *runtime,
     const ux_event *event)
 {
-    if (runtime == NULL || event == NULL ||
-        InterlockedCompareExchange(&runtime->state, 0, 0) !=
-            SOFTPC_RUNTIME_RUNNING) return 0;
+    LONG state;
+    if (runtime == NULL || event == NULL) return 0;
+    state = InterlockedCompareExchange(&runtime->state, 0, 0);
+    if (state != SOFTPC_RUNTIME_RUNNING &&
+        !(state == SOFTPC_RUNTIME_PAUSED && event->type == UX_EVENT_HOTKEY))
+        return 0;
     if (!app_input_queue_push(runtime->input_queue, event))
         return 0;
     softpc_machine_request_wake(runtime->machine);
+    host_sync_event_signal(runtime->input_event);
     return 1;
 }
 
@@ -576,6 +609,12 @@ uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime)
     return runtime == NULL ? 0u : runtime->published_frame_sequence;
 }
 
+int app_runtime_take_window_close(app_runtime *runtime)
+{ return runtime != NULL && InterlockedExchange(&runtime->window_close_requested, 0); }
+
+int app_runtime_take_window_mouse_release(app_runtime *runtime)
+{ return runtime != NULL && InterlockedExchange(&runtime->window_mouse_release_requested, 0); }
+
 void app_runtime_destroy(app_runtime *runtime)
 {
     if (runtime == NULL) return;
@@ -586,6 +625,7 @@ void app_runtime_destroy(app_runtime *runtime)
     host_sync_task_destroy(runtime->worker);
     host_sync_event_destroy(runtime->ready_event);
     host_sync_event_destroy(runtime->resume_event);
+    host_sync_event_destroy(runtime->input_event);
     host_sync_event_destroy(runtime->media_event);
     app_input_queue_destroy(runtime->input_queue);
     free(runtime->frame_buffer);

@@ -41,6 +41,8 @@ int app_runtime_copy_frame(app_runtime *runtime,
 /* A presentation client may cheaply test whether the runtime's copied frame
    changed before requesting the potentially large DIB snapshot. */
 uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime);
+int app_runtime_take_window_close(app_runtime *runtime);
+int app_runtime_take_window_mouse_release(app_runtime *runtime);
 void app_runtime_destroy(app_runtime *runtime);
 
 #endif
