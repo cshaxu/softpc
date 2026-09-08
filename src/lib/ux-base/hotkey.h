@@ -5,6 +5,7 @@
 
 #define UX_HOTKEY_CAPACITY 16u
 #define UX_HOTKEY_PENDING_CAPACITY 4u
+#define UX_HOTKEY_SUPPRESSED_CAPACITY (UX_HOTKEY_PENDING_CAPACITY + 1u)
 
 enum {
     UX_HOTKEY_MODIFIER_CONTROL = 0x01u,
@@ -26,14 +27,19 @@ typedef struct ux_hotkey_registry {
     lib_u32 count;
 } ux_hotkey_registry;
 
+typedef struct ux_hotkey_suppressed_key {
+    lib_u32 virtual_key;
+    lib_u16 scan_code;
+} ux_hotkey_suppressed_key;
+
 typedef struct ux_hotkey_matcher {
     ux_hotkey_registry registry;
     ux_input_event pending[UX_HOTKEY_PENDING_CAPACITY];
     lib_u32 pending_count;
     /* A matched chord suppresses every make and every later break belonging
-     * to that chord.  Tracking only the trigger leaks Ctrl/Alt breaks to the
-     * guest after their makes were withheld. */
-    lib_u32 suppressed_keys[UX_HOTKEY_PENDING_CAPACITY];
+     * to that chord.  Each physical pending make is retained: virtual key
+     * alone is not an identity because left/right modifiers share it. */
+    ux_hotkey_suppressed_key suppressed_keys[UX_HOTKEY_SUPPRESSED_CAPACITY];
     lib_u32 suppressed_count;
 } ux_hotkey_matcher;
 

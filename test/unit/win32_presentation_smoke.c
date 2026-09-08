@@ -41,17 +41,20 @@ int main(void)
     ux_hotkey_matcher_initialize(&matcher, &registry);
     event.type = UX_EVENT_KEY;
     event.data.key.virtual_key = UX_HOTKEY_KEY_CONTROL;
+    event.data.key.scan_code = 0x1du;
     event.data.key.pressed = 1u;
     event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
         &capture));
     event.data.key.virtual_key = UX_HOTKEY_KEY_ALT;
+    event.data.key.scan_code = 0x38u;
     event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL |
         UX_HOTKEY_MODIFIER_ALT;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
         &capture));
     event.type = UX_EVENT_KEY;
     event.data.key.virtual_key = 'P';
+    event.data.key.scan_code = 0x19u;
     event.data.key.pressed = 1u;
     event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL |
         UX_HOTKEY_MODIFIER_ALT;
@@ -64,12 +67,46 @@ int main(void)
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
         &capture));
     event.data.key.virtual_key = UX_HOTKEY_KEY_ALT;
+    event.data.key.scan_code = 0x38u;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
         &capture));
     event.data.key.virtual_key = UX_HOTKEY_KEY_CONTROL;
+    event.data.key.scan_code = 0x1du;
     event.data.key.hotkey_modifiers = 0u;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
         &capture));
+    assert(capture.count == 1u);
+    /* Both physical Ctrl keys use VK_CONTROL, but a matched chord must
+       suppress both breaks rather than leaking the second to the guest. */
+    capture.count = 0u;
+    ux_hotkey_matcher_initialize(&matcher, &registry);
+    event.type = UX_EVENT_KEY;
+    event.data.key.virtual_key = UX_HOTKEY_KEY_CONTROL;
+    event.data.key.scan_code = 0x1du;
+    event.data.key.pressed = 1u;
+    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
+    event.data.key.scan_code = 0x11du;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
+    event.data.key.virtual_key = UX_HOTKEY_KEY_ALT;
+    event.data.key.scan_code = 0x38u;
+    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL |
+        UX_HOTKEY_MODIFIER_ALT;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
+    event.data.key.virtual_key = 'P';
+    event.data.key.scan_code = 0x19u;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
+    assert(capture.count == 1u && capture.events[0].type == UX_EVENT_HOTKEY);
+    event.data.key.pressed = 0u;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
+    event.data.key.virtual_key = UX_HOTKEY_KEY_ALT;
+    event.data.key.scan_code = 0x38u;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
+    event.data.key.virtual_key = UX_HOTKEY_KEY_CONTROL;
+    event.data.key.scan_code = 0x1du;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
+    event.data.key.scan_code = 0x11du;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
     assert(capture.count == 1u);
     /* An uncompleted registered prefix is never swallowed: the original
        modifier and the mismatching key replay in their source order. */

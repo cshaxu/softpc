@@ -315,6 +315,20 @@ static void win32_window_advance_cursor_blink(HWND window,
         InvalidateRect(window, &cursor, FALSE);
 }
 
+static DWORD win32_window_cursor_blink_timeout(
+    const ux_win32_window_context *context)
+{
+    DWORD now;
+
+    if (context == NULL || context->frame == NULL ||
+        !ux_frame_is_valid(context->frame) || context->frame->graphics != 0u ||
+        context->frame->cursor_visible == 0u || context->frame->cursor_phase == 0u)
+        return INFINITE;
+    now = GetTickCount();
+    return (LONG)(now - context->cursor_blink_due) >= 0 ? 0u :
+        context->cursor_blink_due - now;
+}
+
 static void win32_window_transition(ux_win32_window_context *context,
     WPARAM key, LPARAM lparam, int released)
 {
@@ -649,7 +663,8 @@ static DWORD WINAPI ux_window_worker(void *opaque)
     while (IsWindow(window)) {
         HANDLE wake = ux_win32_mailbox_wait_handle(
             ux_component_mailboxes_wake(&component->base.mailboxes));
-        DWORD wait = MsgWaitForMultipleObjects(1u, &wake, FALSE, INFINITE,
+        DWORD wait = MsgWaitForMultipleObjects(1u, &wake, FALSE,
+            win32_window_cursor_blink_timeout(context),
             QS_ALLINPUT);
         if (wait == WAIT_OBJECT_0) {
             if (atomic_load_explicit(&component->base.stopping, memory_order_acquire) != 0)
@@ -661,6 +676,8 @@ static DWORD WINAPI ux_window_worker(void *opaque)
             atomic_store_explicit(&component->base.stopping, 1, memory_order_release);
             DestroyWindow(window);
         }
+        else if (wait == WAIT_TIMEOUT)
+            win32_window_advance_cursor_blink(window, context);
         while (PeekMessageA(&message, NULL, 0, 0, PM_REMOVE)) {
             if (message.message == WM_QUIT) {
                 atomic_store_explicit(&component->base.stopping, 1, memory_order_release);

@@ -206,7 +206,11 @@ static void app_monitor_help(app_monitor_console *monitor)
         "  floppy eject          eject drive A media while stopped/paused\r\n"
         "  help                  show this help\r\n"
         "  exit                  quit\r\n\r\n"
-        "Raw VM Console hotkeys: Ctrl+Alt+P/D/F/M\r\n");
+        "While the guest is running in a raw VM Console:\r\n"
+        "  Ctrl+Alt+P            pause or resume\r\n"
+        "  Ctrl+Alt+D            send Ctrl+Alt+Del to the guest\r\n"
+        "  Ctrl+Alt+F            send Alt+Enter to the guest\r\n"
+        "  Ctrl+Alt+M            release captured mouse\r\n");
 }
 
 static int app_monitor_drive(app_runtime *runtime, app_presentation *presentation)
