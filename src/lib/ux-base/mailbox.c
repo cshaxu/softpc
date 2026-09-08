@@ -49,12 +49,20 @@ lib_status ux_component_mailboxes_enqueue_control(
         control->kind > UX_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE)
         return LIB_STATUS_INVALID_ARGUMENT;
     ux_component_mailboxes_lock(&mailboxes->control_lock);
-    if (mailboxes->control_count == UX_COMPONENT_CONTROL_CAPACITY) {
+    if (control->kind == UX_COMPONENT_CONTROL_STOP) {
+        if (mailboxes->stop_queued != LIB_FALSE) {
+            ux_component_mailboxes_unlock(&mailboxes->control_lock);
+            return LIB_STATUS_OK;
+        }
+        mailboxes->stop_queued = LIB_TRUE;
+    } else if (mailboxes->stop_queued != LIB_FALSE ||
+        mailboxes->control_count == UX_COMPONENT_CONTROL_CAPACITY) {
         ux_component_mailboxes_unlock(&mailboxes->control_lock);
-        return LIB_STATUS_LIMIT_EXCEEDED;
+        return mailboxes->stop_queued != LIB_FALSE ? LIB_STATUS_INVALID_STATE :
+            LIB_STATUS_LIMIT_EXCEEDED;
     }
     index = (mailboxes->control_head + mailboxes->control_count) %
-        UX_COMPONENT_CONTROL_CAPACITY;
+        UX_COMPONENT_CONTROL_STORAGE_CAPACITY;
     mailboxes->controls[index] = *control;
     ++mailboxes->control_count;
     ux_component_mailboxes_unlock(&mailboxes->control_lock);
@@ -73,7 +81,7 @@ lib_bool ux_component_mailboxes_take_control(ux_component_mailboxes *mailboxes,
     }
     *out_control = mailboxes->controls[mailboxes->control_head];
     mailboxes->control_head = (mailboxes->control_head + 1u) %
-        UX_COMPONENT_CONTROL_CAPACITY;
+        UX_COMPONENT_CONTROL_STORAGE_CAPACITY;
     --mailboxes->control_count;
     ux_component_mailboxes_unlock(&mailboxes->control_lock);
     return LIB_TRUE;

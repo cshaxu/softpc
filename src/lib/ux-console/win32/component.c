@@ -107,8 +107,11 @@ static DWORD WINAPI ux_console_worker(void *opaque)
             break;
         while (ux_component_mailboxes_take_control(&console->base.mailboxes, &control)) {
             if (control.kind == UX_COMPONENT_CONTROL_STOP) {
+                /* Detach waits for any in-flight native callback.  Retirement
+                 * is therefore the final input fact from this source. */
+                (void)lib_console_set_event_sink(console->logical_console,
+                    LIB_NULL, LIB_NULL);
                 ux_component_emit_source_retired(&console->base);
-                atomic_store_explicit(&console->base.stopping, 1, memory_order_release);
                 return 0u;
             }
             /* ux-console has no title or mouse surface. Unsupported Window
@@ -157,7 +160,6 @@ void ux_console_native_stop(ux_console *console)
     /* ux_component_destroy has queued STOP; wait for the Console worker to
      * consume it before detaching the event sink or releasing state. */
     (void)WaitForSingleObject(state->worker, INFINITE);
-    (void)lib_console_set_event_sink(console->logical_console, LIB_NULL, LIB_NULL);
     CloseHandle(state->worker);
     console->native_state = LIB_NULL;
     free(state);

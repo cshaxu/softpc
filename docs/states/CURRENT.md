@@ -4,9 +4,9 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T42 S5 closed — S6–S8 await separate owner admission |
+| Identifier Mode | M9 T42 S6 active — generic Console/UX lifecycle contracts |
 | Admission And Approval | T42 S2/S3 completed the logical Console and Current Console Object broker; S4 completed the split UX corpus; the owner admitted and has now closed S5. |
-| Objective | S5 made SoftPC's one control path derive Window/VM-Console component existence, Current Console Object, and lifecycle effects from `display`, `console_control`, frames, monitor intent, and UX events. |
+| Objective | S6 makes host Current Console replacement, stale-event rejection, UX terminal stop, and input-delivery failure explicit generic contracts before further runtime integration. |
 | Outcome | Closed: SoftPC alone parses monitor input and interprets copied UX identifiers/events; lib host and UX expose mechanics only. No UX callback directly mutates lifecycle or Window state. See [S5 history](../history/M9-T42-S5-softpc-monitor-reconciler.md). |
 | Non-goals | No modification to `src/mvdm/softpc.new/`, its MVDM-local Win32 calls, or WinNT-derived implementation; no SoftPC lifecycle, DISPLAY policy, `console_control`, monitor syntax, or guest-hotkey semantics in lib; no permanent SoftPC-only lib fork or NXVM runtime/build dependency; no package configuration or guest-media change. |
 | Affected Boundaries | `src/app/` owns the reconciler, monitor bridge, lifecycle/event queue, and component/broker ordering. `src/lib` is consumed unchanged through its public APIs. Non-library `src/host/`, `storage`, and `src/mvdm/softpc.new/` remain unchanged. |
@@ -15,7 +15,7 @@
 | Full Regression | S5: GCC x64 and MSYS2 MinGW32 configure/build plus full CTest each passed 26/26; package artifacts were refreshed while preserving `assets/binary/softpc.ini` and guest media. Documentation governance and source-boundary checks passed. |
 | Similar-Issue Sweep | Search `src/app` for direct UX callback lifecycle/window calls, raw Console readers outside host, `fgets` monitor ownership, old presenter/router paths, and a second active Console object. |
 | Stop Conditions | Stop for owner direction if an API encodes SoftPC policy, changes MVDM, lets a UX component open/register native Console I/O, permits cross-component hotkey matching, leaves an old unified UX path, or cannot be adopted by NXVM unchanged. |
-| Exit Criteria | S5 is closed. T42 still requires separately admitted S6 real-thread integration, S7 owner runtime acceptance, and S8 NXVM exact adoption/re-import/manifest verification. |
+| Exit Criteria | S6 proves the generic contracts with deterministic fakes. T42 then requires S7 real-thread integration, S8 owner runtime acceptance, and S9 NXVM exact adoption/re-import/manifest verification. |
 | Original Owner Request | “请你直接收口T41吧，我们开T42来做刚才的全套设计”；“准入下一任务” |
 
 ## Current Technical Baseline

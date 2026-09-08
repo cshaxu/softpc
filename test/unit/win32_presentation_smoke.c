@@ -6,14 +6,14 @@
 #include <string.h>
 
 typedef struct ux_capture {
-    ux_input_event events[4];
+    ux_input_event events[16];
     unsigned int count;
 } ux_capture;
 
 static int ux_capture_event(void *opaque, const ux_input_event *event)
 {
     ux_capture *capture = (ux_capture *)opaque;
-    if (capture == NULL || event == NULL || capture->count == 4u) return 0;
+    if (capture == NULL || event == NULL || capture->count == 16u) return 0;
     capture->events[capture->count++] = *event;
     return 1;
 }
@@ -71,6 +71,21 @@ int main(void)
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
         &capture));
     assert(capture.count == 1u);
+    /* An uncompleted registered prefix is never swallowed: the original
+       modifier and the mismatching key replay in their source order. */
+    capture.count = 0u;
+    ux_hotkey_matcher_initialize(&matcher, &registry);
+    event.type = UX_EVENT_KEY;
+    event.data.key.virtual_key = UX_HOTKEY_KEY_CONTROL;
+    event.data.key.pressed = 1u;
+    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
+    event.data.key.virtual_key = 'X';
+    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL;
+    assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
+    assert(capture.count == 2u);
+    assert(capture.events[0].data.key.virtual_key == UX_HOTKEY_KEY_CONTROL);
+    assert(capture.events[1].data.key.virtual_key == 'X');
     free(frame);
     return 0;
 }

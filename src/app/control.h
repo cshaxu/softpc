@@ -15,7 +15,8 @@ typedef enum app_control_event_kind {
     APP_CONTROL_RUNTIME_COMPLETED,
     APP_CONTROL_FRAME_COMPLETED,
     APP_CONTROL_COMPONENT_COMPLETED,
-    APP_CONTROL_BROKER_COMPLETED
+    APP_CONTROL_BROKER_COMPLETED,
+    APP_CONTROL_UX_DELIVERY_FAILED
 } app_control_event_kind;
 
 typedef enum app_control_component_kind {
@@ -35,6 +36,7 @@ typedef struct app_control_event {
         struct { uint32_t sequence; int graphics; } frame;
         struct { app_control_component_kind component; int exists; } component;
         int broker_vm_console_current;
+        struct { uint64_t source_identity; lib_status status; } delivery_failure;
     } value;
 } app_control_event;
 
@@ -54,6 +56,8 @@ int app_control_queue_push_component_completed(app_control_queue *queue,
     app_control_component_kind component, int exists, uint32_t run_generation);
 int app_control_queue_push_broker_completed(app_control_queue *queue,
     int vm_console_current, uint32_t run_generation);
+int app_control_queue_push_ux_delivery_failed(app_control_queue *queue,
+    uint64_t source_identity, lib_status status, uint32_t run_generation);
 int app_control_queue_take(app_control_queue *queue,
     app_control_event *out_event, unsigned long timeout_ms);
 int app_control_handle_ux(app_control_queue *queue, app_runtime *runtime,

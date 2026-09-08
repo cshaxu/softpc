@@ -147,7 +147,31 @@ properties are one inseparable acceptance set:
    stale-generation rejection, and the complete display/console-control/X/
    lifecycle matrix.  These tests use completion barriers, not `Sleep()`.
 
-### S6 — Integration and concurrency boundaries
+### S6 — Lib Console/UX lifecycle contracts
+
+Tighten the generic library before further app-thread integration.  The host
+broker is the process-wide owner of one native Console I/O endpoint: normal
+replacement prepares non-disruptive prerequisites, then serially stops/joins
+the old reader, invalidates its binding, activates the next binding and either
+commits it or restores the old binding before returning.  Logical Console
+generation is host-private and rejects stale native callbacks before an app
+sink observes them.  Native text/frame writes and output-sink switches share
+one serialized boundary; a non-current Console returns `NOT_CURRENT`.
+
+Each UX leaf retains private frame/control mailboxes and a unique, non-reused
+source identity.  STOP is FIFO-ordered and terminal: the worker consumes it,
+quiesces native input, emits exactly one source-retired event, then exits;
+destroy waits for that exit.  Every non-droppable copied input must be accepted
+by the application sink or produce an explicit generic delivery-failure
+callback.  Registered hotkeys remain source-local identifiers only.  Tests use
+controllable fakes and barriers, never sleeps, for rollback, stale callbacks,
+output serialization, hotkey suppression/replay, and retirement.
+
+**Exit:** generic host/UX mechanics contain no SoftPC policy, one-current and
+retirement contracts are proven deterministically, and the shared corpus is
+ready for S7 integration.
+
+### S7 — Integration and concurrency boundaries
 
 Connect S3–S5 in the actual non-MVDM runtime. Add only narrow real-thread
 barrier/event tests for reader replacement during callback, destruction racing
@@ -155,14 +179,14 @@ queued input, and raw/cooked switching; no timing sleeps. **Exit:** no second
 reader/output path remains, source audit is clean, and both widths build/test
 to the extent available on the host.
 
-### S7 — Owner runtime acceptance
+### S8 — Owner runtime acceptance
 
 Produce the two package widths without touching `softpc.ini` or media, then
 run the approved Console/Window acceptance matrix with the owner. **Exit:**
 owner accepts runtime behavior or records bounded defects; no design change is
 silently folded in.
 
-### S8 — NXVM adoption and re-import closure
+### S9 — NXVM adoption and re-import closure
 
 Submit only the generic `src/lib` corpus, obtain NXVM's byte-identical
 adoption, atomically re-import it into SoftPC, and verify the returned manifest

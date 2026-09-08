@@ -58,6 +58,15 @@ static int app_presentation_input(void *opaque, const ux_input_event *event)
     return app_presentation_guest_input(context, event);
 }
 
+static void app_presentation_delivery_failed(void *opaque,
+    lib_u64 source_identity, lib_status status)
+{
+    app_presentation_context *context = (app_presentation_context *)opaque;
+    if (context != NULL)
+        (void)app_control_queue_push_ux_delivery_failed(context->control_queue,
+            source_identity, status, app_runtime_run_generation(context->runtime));
+}
+
 static int app_presentation_create_window(app_presentation_context *context)
 {
     ux_window_options options = { 0 };
@@ -65,6 +74,8 @@ static int app_presentation_create_window(app_presentation_context *context)
     if (context == NULL || context->window != NULL) return context != NULL;
     options.input_context = context;
     options.input_sink = app_presentation_input;
+    options.failure_context = context;
+    options.failure_sink = app_presentation_delivery_failed;
     options.hotkeys = context->hotkeys;
     if (ux_window_create(&context->window, &options) != LIB_STATUS_OK)
         return 0;
@@ -81,6 +92,8 @@ static int app_presentation_create_console(app_presentation_context *context)
     if (context == NULL || context->console != NULL) return context != NULL;
     options.input_context = context;
     options.input_sink = app_presentation_input;
+    options.failure_context = context;
+    options.failure_sink = app_presentation_delivery_failed;
     options.hotkeys = context->hotkeys;
     return ux_console_create(&context->console, &options) == LIB_STATUS_OK;
 }

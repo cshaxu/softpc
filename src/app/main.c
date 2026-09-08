@@ -305,6 +305,11 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                     line[control_event.value.line.length] = '\0';
                     break;
                 }
+                if (control_event.kind == APP_CONTROL_UX_DELIVERY_FAILED) {
+                    app_monitor_console_write(monitor,
+                        "UX input delivery failed.\r\n");
+                    goto failed;
+                }
                 if (control_event.run_generation != 0u &&
                     control_event.run_generation != app_runtime_run_generation(runtime))
                     continue;

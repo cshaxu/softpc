@@ -25,7 +25,8 @@ lib_status ux_console_create(ux_console **out_console,
     lib_status status;
 
     if (out_console == LIB_NULL || options == LIB_NULL ||
-        options->input_sink == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+        options->input_sink == LIB_NULL || options->failure_sink == LIB_NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
     *out_console = LIB_NULL;
     console = calloc(1u, sizeof(*console));
     if (console == LIB_NULL) return LIB_STATUS_NO_MEMORY;

@@ -9,11 +9,7 @@ struct host_console_native {
     HANDLE output;
     HANDLE stop_event;
     HANDLE reader;
-    HANDLE prepared_stop_event;
-    HANDLE prepared_start_event;
-    HANDLE prepared_ready_event;
-    HANDLE prepared_reader;
-    volatile LONG prepared_reader_waiting;
+    CRITICAL_SECTION output_lock;
     DWORD original_mode;
     lib_console *console;
     host_console_mode mode;
@@ -89,13 +85,6 @@ static void host_console_emit_mouse(host_console_native *native_console,
 static DWORD WINAPI host_console_reader(void *context)
 {
     host_console_native *native_console = (host_console_native *)context;
-    if (InterlockedCompareExchange(&native_console->prepared_reader_waiting, 0, 0) != 0) {
-        HANDLE gates[2] = { native_console->prepared_stop_event,
-            native_console->prepared_start_event };
-        (void)SetEvent(native_console->prepared_ready_event);
-        if (WaitForMultipleObjects(2u, gates, FALSE, INFINITE) != WAIT_OBJECT_0 + 1u)
-            return 0u;
-    }
     if (native_console->mode == HOST_CONSOLE_COOKED_LINES) {
         for (;;) {
             char text[LIB_CONSOLE_LINE_MAX];
@@ -150,6 +139,7 @@ lib_status host_console_native_create(host_console_native **out_native)
         return LIB_STATUS_UNSUPPORTED;
     }
     native_console->original_mode = mode;
+    InitializeCriticalSection(&native_console->output_lock);
     *out_native = native_console;
     return LIB_STATUS_OK;
 }
@@ -157,10 +147,10 @@ lib_status host_console_native_create(host_console_native **out_native)
 void host_console_native_destroy(host_console_native *native_console)
 {
     if (native_console == LIB_NULL) return;
-    host_console_native_discard_prepare(native_console);
     host_console_native_deactivate(native_console);
     if (native_console->input != INVALID_HANDLE_VALUE) CloseHandle(native_console->input);
     if (native_console->output != INVALID_HANDLE_VALUE) CloseHandle(native_console->output);
+    DeleteCriticalSection(&native_console->output_lock);
     free(native_console);
 }
 
@@ -174,51 +164,11 @@ lib_status host_console_native_prepare(host_console_native *native_console,
     if (native_console->input == INVALID_HANDLE_VALUE ||
         native_console->output == INVALID_HANDLE_VALUE ||
         !GetConsoleMode(native_console->input, &ignored)) return LIB_STATUS_IO_ERROR;
-    if (native_console->prepared_reader != NULL) return LIB_STATUS_INVALID_STATE;
-    native_console->prepared_stop_event = CreateEventA(NULL, TRUE, FALSE, NULL);
-    native_console->prepared_start_event = CreateEventA(NULL, TRUE, FALSE, NULL);
-    native_console->prepared_ready_event = CreateEventA(NULL, TRUE, FALSE, NULL);
-    if (native_console->prepared_stop_event == NULL ||
-        native_console->prepared_start_event == NULL ||
-        native_console->prepared_ready_event == NULL) {
-        host_console_native_discard_prepare(native_console);
-        return LIB_STATUS_NO_MEMORY;
-    }
-    InterlockedExchange(&native_console->prepared_reader_waiting, 1);
-    native_console->prepared_reader = CreateThread(NULL, 0u, host_console_reader,
-        native_console, 0u, NULL);
-    if (native_console->prepared_reader == NULL) {
-        host_console_native_discard_prepare(native_console);
-        return LIB_STATUS_NO_MEMORY;
-    }
-    if (WaitForSingleObject(native_console->prepared_ready_event, INFINITE) !=
-        WAIT_OBJECT_0) {
-        host_console_native_discard_prepare(native_console);
-        return LIB_STATUS_IO_ERROR;
-    }
     return LIB_STATUS_OK;
 }
 
 void host_console_native_discard_prepare(host_console_native *native_console)
-{
-    if (native_console == LIB_NULL) return;
-    if (native_console->prepared_reader != NULL) {
-        (void)SetEvent(native_console->prepared_stop_event);
-        (void)WaitForSingleObject(native_console->prepared_reader, INFINITE);
-        CloseHandle(native_console->prepared_reader);
-    }
-    if (native_console->prepared_start_event != NULL)
-        CloseHandle(native_console->prepared_start_event);
-    if (native_console->prepared_ready_event != NULL)
-        CloseHandle(native_console->prepared_ready_event);
-    if (native_console->prepared_stop_event != NULL)
-        CloseHandle(native_console->prepared_stop_event);
-    native_console->prepared_reader = NULL;
-    native_console->prepared_start_event = NULL;
-    native_console->prepared_ready_event = NULL;
-    native_console->prepared_stop_event = NULL;
-    InterlockedExchange(&native_console->prepared_reader_waiting, 0);
-}
+{ (void)native_console; }
 
 lib_status host_console_native_activate(host_console_native *native_console,
     lib_console *console, host_console_mode mode, lib_u32 generation)
@@ -232,9 +182,7 @@ lib_status host_console_native_activate(host_console_native *native_console,
             ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS;
     else configured |= ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT;
     if (!SetConsoleMode(native_console->input, configured)) return LIB_STATUS_IO_ERROR;
-    native_console->stop_event = native_console->prepared_stop_event;
-    if (native_console->stop_event == NULL)
-        native_console->stop_event = CreateEventA(NULL, TRUE, FALSE, NULL);
+    native_console->stop_event = CreateEventA(NULL, TRUE, FALSE, NULL);
     if (native_console->stop_event == NULL) return LIB_STATUS_NO_MEMORY;
     native_console->console = console;
     native_console->mode = mode;
@@ -246,64 +194,69 @@ lib_status host_console_native_activate(host_console_native *native_console,
         sizeof(native_console->previous_palette));
     native_console->previous_columns = 0u;
     native_console->previous_rows = 0u;
-    native_console->reader = native_console->prepared_reader;
-    if (native_console->reader == NULL)
-        native_console->reader = CreateThread(NULL, 0u, host_console_reader,
-            native_console, 0u, NULL);
+    native_console->reader = CreateThread(NULL, 0u, host_console_reader,
+        native_console, 0u, NULL);
     if (native_console->reader == NULL) {
         CloseHandle(native_console->stop_event);
         native_console->stop_event = NULL;
         native_console->console = LIB_NULL;
         return LIB_STATUS_NO_MEMORY;
     }
-    if (native_console->prepared_reader != NULL) {
-        HANDLE start = native_console->prepared_start_event;
-        HANDLE ready = native_console->prepared_ready_event;
-        native_console->prepared_reader = NULL;
-        native_console->prepared_start_event = NULL;
-        native_console->prepared_stop_event = NULL;
-        native_console->prepared_ready_event = NULL;
-        if (!SetEvent(start)) {
-            CloseHandle(start);
-            host_console_native_deactivate(native_console);
-            return LIB_STATUS_IO_ERROR;
-        }
-        CloseHandle(start);
-        CloseHandle(ready);
-        InterlockedExchange(&native_console->prepared_reader_waiting, 0);
-    }
     return LIB_STATUS_OK;
 }
 
 void host_console_native_deactivate(host_console_native *native_console)
 {
-    if (native_console == LIB_NULL || native_console->reader == NULL) return;
-    (void)SetEvent(native_console->stop_event);
-    (void)CancelSynchronousIo(native_console->reader);
-    (void)WaitForSingleObject(native_console->reader, INFINITE);
-    CloseHandle(native_console->reader);
-    CloseHandle(native_console->stop_event);
+    if (native_console == LIB_NULL) return;
+    if (native_console->reader != NULL) {
+        (void)SetEvent(native_console->stop_event);
+        (void)CancelSynchronousIo(native_console->reader);
+        (void)WaitForSingleObject(native_console->reader, INFINITE);
+        CloseHandle(native_console->reader);
+    }
+    if (native_console->stop_event != NULL) CloseHandle(native_console->stop_event);
     native_console->reader = NULL;
     native_console->stop_event = NULL;
     native_console->console = LIB_NULL;
+    native_console->generation = 0u;
     (void)SetConsoleMode(native_console->input, native_console->original_mode);
 }
 
-lib_status host_console_native_write(void *context, const char *text,
+void host_console_native_lock_output(host_console_native *native_console)
+{
+    if (native_console != LIB_NULL) EnterCriticalSection(&native_console->output_lock);
+}
+
+void host_console_native_unlock_output(host_console_native *native_console)
+{
+    if (native_console != LIB_NULL) LeaveCriticalSection(&native_console->output_lock);
+}
+
+lib_status host_console_native_write_bound(host_console_native *native_console,
+    lib_console *expected_console, lib_u32 expected_generation, const char *text,
     lib_size length)
 {
-    host_console_native *native_console = (host_console_native *)context;
     DWORD written = 0u;
     if (native_console == LIB_NULL || (text == LIB_NULL && length != 0u) ||
         length > (lib_size)UINT32_MAX) return LIB_STATUS_INVALID_ARGUMENT;
-    return WriteConsoleA(native_console->output, text, (DWORD)length, &written, NULL) &&
-        written == (DWORD)length ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+    host_console_native_lock_output(native_console);
+    if (native_console->console != expected_console ||
+        native_console->generation != expected_generation) {
+        host_console_native_unlock_output(native_console);
+        return LIB_STATUS_NOT_CURRENT;
+    }
+    {
+        lib_status status = WriteConsoleA(native_console->output, text, (DWORD)length,
+            &written, NULL) && written == (DWORD)length ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+        host_console_native_unlock_output(native_console);
+        return status;
+    }
 }
 
-lib_status host_console_native_write_text_frame(void *context,
+lib_status host_console_native_write_text_frame_bound(host_console_native *native_console,
+    lib_console *expected_console, lib_u32 expected_generation,
     const lib_console_text_frame *frame)
 {
-    host_console_native *native_console = (host_console_native *)context;
     CHAR_INFO cells[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
     COORD size = { LIB_CONSOLE_TEXT_COLUMNS, LIB_CONSOLE_TEXT_ROWS };
     COORD position = { 0, 0 };
@@ -311,10 +264,18 @@ lib_status host_console_native_write_text_frame(void *context,
         LIB_CONSOLE_TEXT_ROWS - 1 };
     lib_u32 row;
 
-    if (native_console == LIB_NULL || frame == LIB_NULL ||
-        native_console->console == LIB_NULL ||
-        !host_console_ensure_text_surface(native_console->output))
+    if (native_console == LIB_NULL || frame == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
+    host_console_native_lock_output(native_console);
+    if (native_console->console != expected_console ||
+        native_console->generation != expected_generation) {
+        host_console_native_unlock_output(native_console);
+        return LIB_STATUS_NOT_CURRENT;
+    }
+    if (!host_console_ensure_text_surface(native_console->output)) {
+        host_console_native_unlock_output(native_console);
+        return LIB_STATUS_IO_ERROR;
+    }
     if (memcmp(frame->palette, native_console->previous_palette,
             sizeof(frame->palette)) != 0) {
         CONSOLE_SCREEN_BUFFER_INFOEX info;
@@ -349,7 +310,10 @@ lib_status host_console_native_write_text_frame(void *context,
             }
         }
         if (!WriteConsoleOutputA(native_console->output, cells, size, position,
-                &region)) return LIB_STATUS_IO_ERROR;
+                &region)) {
+            host_console_native_unlock_output(native_console);
+            return LIB_STATUS_IO_ERROR;
+        }
         memcpy(native_console->previous, frame->text, sizeof(frame->text));
         memcpy(native_console->previous_attributes, frame->attributes,
             sizeof(frame->attributes));
@@ -373,6 +337,7 @@ lib_status host_console_native_write_text_frame(void *context,
         }
         (void)SetConsoleCursorInfo(native_console->output, &cursor);
     }
+    host_console_native_unlock_output(native_console);
     return LIB_STATUS_OK;
 }
 #endif

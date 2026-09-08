@@ -24,7 +24,8 @@ lib_status ux_window_create(ux_window **out_window,
     lib_status status;
 
     if (out_window == LIB_NULL || options == LIB_NULL ||
-        options->input_sink == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+        options->input_sink == LIB_NULL || options->failure_sink == LIB_NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
     *out_window = LIB_NULL;
     window = calloc(1u, sizeof(*window));
     if (window == LIB_NULL) return LIB_STATUS_NO_MEMORY;

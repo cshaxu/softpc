@@ -5,6 +5,7 @@
 #include "lib/ux-base/mailbox_native.h"
 
 #define UX_COMPONENT_CONTROL_CAPACITY 32u
+#define UX_COMPONENT_CONTROL_STORAGE_CAPACITY (UX_COMPONENT_CONTROL_CAPACITY + 1u)
 #define UX_COMPONENT_WINDOW_TITLE_CAPACITY 128u
 
 typedef enum ux_component_control_kind {
@@ -30,9 +31,10 @@ typedef struct ux_component_mailboxes {
     atomic_flag control_lock;
     ux_frame frame;
     lib_u32 frame_generation;
-    ux_component_control controls[UX_COMPONENT_CONTROL_CAPACITY];
+    ux_component_control controls[UX_COMPONENT_CONTROL_STORAGE_CAPACITY];
     lib_u32 control_head;
     lib_u32 control_count;
+    lib_bool stop_queued;
     ux_mailbox_native *wake;
 } ux_component_mailboxes;
 

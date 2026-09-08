@@ -11,6 +11,8 @@ struct ux_component {
     ux_component_mailboxes mailboxes;
     void *input_context;
     ux_input_sink input_sink;
+    void *failure_context;
+    ux_component_failure_sink failure_sink;
     ux_hotkey_matcher hotkey_matcher;
     lib_u64 source_identity;
     atomic_int stopping;

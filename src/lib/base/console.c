@@ -2,6 +2,9 @@
 
 struct lib_console {
     atomic_flag lock;
+    /* Serializes sink replacement against an in-flight copied event callback.
+       A retiring UX source waits here before publishing SOURCE_RETIRED. */
+    atomic_flag event_gate;
     atomic_flag output_lock;
     atomic_uint references;
     lib_console_event_sink event_sink;
@@ -11,7 +14,7 @@ struct lib_console {
     lib_console_text_frame_sink text_frame_sink;
     void *text_frame_context;
     lib_u32 binding_generation;
-    lib_bool binding_known;
+    lib_bool binding_active;
 };
 
 static void lib_console_lock(lib_console *console)
@@ -43,6 +46,7 @@ lib_status lib_console_create(lib_console **out_console)
     console = calloc(1u, sizeof(*console));
     if (console == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     atomic_flag_clear(&console->lock);
+    atomic_flag_clear(&console->event_gate);
     atomic_flag_clear(&console->output_lock);
     atomic_init(&console->references, 1u);
     *out_console = console;
@@ -74,10 +78,13 @@ lib_status lib_console_set_event_sink(lib_console *console,
     lib_console_event_sink sink, void *context)
 {
     if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    while (atomic_flag_test_and_set_explicit(&console->event_gate,
+        memory_order_acquire)) { }
     lib_console_lock(console);
     console->event_sink = sink;
     console->event_context = context;
     lib_console_unlock(console);
+    atomic_flag_clear_explicit(&console->event_gate, memory_order_release);
     return LIB_STATUS_OK;
 }
 
@@ -119,29 +126,49 @@ lib_status lib_console_deliver_event(lib_console *console,
     if (console == LIB_NULL || !lib_console_event_valid(event))
         return LIB_STATUS_INVALID_ARGUMENT;
     copied = *event;
+    while (atomic_flag_test_and_set_explicit(&console->event_gate,
+        memory_order_acquire)) { }
     lib_console_lock(console);
-    if (console->binding_known != LIB_FALSE &&
+    if (console->binding_active == LIB_FALSE ||
+        copied.binding_generation == 0u ||
         copied.binding_generation != console->binding_generation) {
         lib_console_unlock(console);
+        atomic_flag_clear_explicit(&console->event_gate, memory_order_release);
         return LIB_STATUS_NOT_CURRENT;
     }
     sink = console->event_sink;
     context = console->event_context;
     lib_console_unlock(console);
-    if (sink == LIB_NULL) return LIB_STATUS_INVALID_STATE;
+    if (sink == LIB_NULL) {
+        atomic_flag_clear_explicit(&console->event_gate, memory_order_release);
+        return LIB_STATUS_INVALID_STATE;
+    }
+    /* The sink is deliberately called while the event gate is held.  This
+       makes detach a quiescence barrier: after it returns no old callback can
+       enter a component before that component reports retirement. */
     sink(context, &copied);
+    atomic_flag_clear_explicit(&console->event_gate, memory_order_release);
     return LIB_STATUS_OK;
 }
 
 lib_status lib_console_bind_generation(lib_console *console,
     lib_u32 generation)
 {
-    if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    if (console == LIB_NULL || generation == 0u) return LIB_STATUS_INVALID_ARGUMENT;
     lib_console_lock(console);
     console->binding_generation = generation;
-    console->binding_known = LIB_TRUE;
+    console->binding_active = LIB_TRUE;
     lib_console_unlock(console);
     return LIB_STATUS_OK;
+}
+
+void lib_console_invalidate_binding(lib_console *console)
+{
+    if (console == LIB_NULL) return;
+    lib_console_lock(console);
+    console->binding_generation = 0u;
+    console->binding_active = LIB_FALSE;
+    lib_console_unlock(console);
 }
 
 lib_status lib_console_write_text(lib_console *console,

@@ -56,20 +56,26 @@ lib_status host_console_native_activate(host_console_native *native_console,
 void host_console_native_deactivate(host_console_native *native_console)
 { native_console->active = LIB_NULL; }
 
-lib_status host_console_native_write(void *context, const char *text,
+void host_console_native_lock_output(host_console_native *native_console)
+{ (void)native_console; }
+void host_console_native_unlock_output(host_console_native *native_console)
+{ (void)native_console; }
+lib_status host_console_native_write_bound(host_console_native *native_console,
+    lib_console *expected_console, lib_u32 expected_generation, const char *text,
     lib_size length)
 {
-    host_console_native *native_console = (host_console_native *)context;
     (void)text;
-    return native_console->active == LIB_NULL || length == 0u ?
+    return native_console->active != expected_console ||
+        native_console->generation != expected_generation || length == 0u ?
         LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
 
-lib_status host_console_native_write_text_frame(void *context,
+lib_status host_console_native_write_text_frame_bound(host_console_native *native_console,
+    lib_console *expected_console, lib_u32 expected_generation,
     const lib_console_text_frame *frame)
 {
-    host_console_native *native_console = (host_console_native *)context;
-    return native_console->active == LIB_NULL || frame == LIB_NULL ?
+    return native_console->active != expected_console ||
+        native_console->generation != expected_generation || frame == LIB_NULL ?
         LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
 
