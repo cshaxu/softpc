@@ -11,6 +11,7 @@ struct host_console_native {
 
 static int host_console_fail_next_activation;
 static int host_console_fail_next_prepare;
+static int host_console_prepare_saw_active;
 
 lib_status host_console_native_create(host_console_native **out_native)
 {
@@ -26,6 +27,8 @@ void host_console_native_destroy(host_console_native *native_console)
 lib_status host_console_native_prepare(host_console_native *native_console,
     lib_console *console, host_console_mode mode)
 {
+    if (native_console != NULL && native_console->active != LIB_NULL)
+        host_console_prepare_saw_active = 1;
     if (host_console_fail_next_prepare) {
         host_console_fail_next_prepare = 0;
         return LIB_STATUS_IO_ERROR;
@@ -87,13 +90,16 @@ int main(void)
     assert(lib_console_write_text(first, "a", 1u) == LIB_STATUS_OK);
     assert(host_console_replace_active(broker, first, second,
         HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK);
+    assert(host_console_prepare_saw_active);
     assert(lib_console_write_text(first, "a", 1u) == LIB_STATUS_NOT_CURRENT);
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_OK);
     host_console_fail_next_prepare = 1;
+    host_console_prepare_saw_active = 0;
     assert(host_console_replace_active(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);
     /* Preflight failure did not stop or detach the old current object. */
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_OK);
+    assert(host_console_prepare_saw_active);
     host_console_fail_next_activation = 1;
     assert(host_console_replace_active(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);
