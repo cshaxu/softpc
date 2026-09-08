@@ -303,8 +303,23 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                     control_event.run_generation != app_runtime_run_generation(runtime))
                     continue;
                 if (control_event.kind == APP_CONTROL_RUNTIME_COMPLETED)
-                    app_presentation_note_runtime_completed(presenter,
-                        control_event.value.runtime_state);
+                {
+                    app_runtime_state completed = control_event.value.runtime_state;
+                    if (completed == SOFTPC_RUNTIME_PAUSED &&
+                        state != SOFTPC_MONITOR_PAUSED) {
+                        state = SOFTPC_MONITOR_PAUSED;
+                        app_monitor_console_write(monitor, "Machine paused.\r\n");
+                        prompt_pending = 1;
+                    } else if (completed == SOFTPC_RUNTIME_RUNNING) {
+                        state = SOFTPC_MONITOR_RUNNING;
+                    } else if (completed == SOFTPC_RUNTIME_STOPPED &&
+                        state == SOFTPC_MONITOR_RUNNING) {
+                        state = SOFTPC_MONITOR_STOPPED;
+                        app_monitor_console_write(monitor, "Machine stopped.\r\n");
+                        prompt_pending = 1;
+                    }
+                    app_presentation_note_runtime_completed(presenter, completed);
+                }
                 else if (control_event.kind == APP_CONTROL_FRAME_COMPLETED)
                     app_presentation_note_frame_completed(presenter,
                         control_event.value.frame.graphics);
@@ -318,20 +333,8 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                 if (!app_monitor_drive(runtime, presenter)) goto failed;
                 continue;
             }
-            app_runtime_state actual = app_runtime_get_state(runtime);
-            if (actual == SOFTPC_RUNTIME_PAUSED && state != SOFTPC_MONITOR_PAUSED) {
-                state = SOFTPC_MONITOR_PAUSED;
-                app_monitor_console_write(monitor, "Machine paused.\r\n");
-                prompt_pending = 1;
-            } else if (actual == SOFTPC_RUNTIME_STOPPED &&
-                state == SOFTPC_MONITOR_RUNNING) {
-                state = SOFTPC_MONITOR_STOPPED;
-                app_monitor_console_write(monitor, "Machine stopped.\r\n");
-                prompt_pending = 1;
-            }
             if (prompt_pending && app_monitor_console_write(monitor, "SoftPC> "))
                 prompt_pending = 0;
-            if (!app_monitor_drive(runtime, presenter)) goto failed;
         }
         if (!app_monitor_drive(runtime, presenter)) goto failed;
         command = app_trim(line);
