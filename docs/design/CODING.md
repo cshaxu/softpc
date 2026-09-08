@@ -9,7 +9,7 @@ src/
   host/
     ordinary host C/H files
     compat/{ccpu,cvidc,...}/
-  lib/{base,host,storage,ux}/
+  lib/{base,host,storage,ux-base,ux-window,ux-console}/
     byte-identical NXVM shared platform implementation
   app/
     main.c, runtime.c, presentation.c, keyboard.c, firmware.rc
