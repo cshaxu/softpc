@@ -47,16 +47,28 @@ lib_status host_console_native_write(void *context, const char *text,
         LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
 
+lib_status host_console_native_write_text_frame(void *context,
+    const lib_console_text_frame *frame)
+{
+    host_console_native *native_console = (host_console_native *)context;
+    return native_console->active == LIB_NULL || frame == LIB_NULL ?
+        LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
+}
+
 int main(void)
 {
     lib_console *first = LIB_NULL;
     lib_console *second = LIB_NULL;
     host_console_broker *broker = LIB_NULL;
+    host_console_broker *second_broker = LIB_NULL;
 
     assert(lib_console_create(&first) == LIB_STATUS_OK);
     assert(lib_console_create(&second) == LIB_STATUS_OK);
     assert(host_console_broker_create(&broker, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_OK);
+    assert(host_console_broker_create(&second_broker, second,
+        HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_INVALID_STATE);
+    assert(second_broker == LIB_NULL);
     assert(lib_console_write_text(first, "a", 1u) == LIB_STATUS_OK);
     assert(host_console_replace_active(broker, first, second,
         HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK);
@@ -68,6 +80,9 @@ int main(void)
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_OK);
     host_console_broker_destroy(broker);
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_NOT_CURRENT);
+    assert(host_console_broker_create(&second_broker, first,
+        HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_OK);
+    host_console_broker_destroy(second_broker);
     lib_console_destroy(first);
     lib_console_destroy(second);
     return 0;
