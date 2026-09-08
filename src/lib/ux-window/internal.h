@@ -23,11 +23,8 @@ struct ux_window {
 lib_status ux_window_submit_input(ux_window *window,
     const ux_input_event *event);
 lib_status ux_window_request_close(ux_window *window);
-/* Paint may observe copied presentation state at any time.  It must never
- * consume a control request: only the native worker takes those requests. */
-lib_status ux_window_capture_paint_state(const ux_window *window,
-    ux_frame *out_frame, lib_u32 *out_generation);
-lib_status ux_window_take_control_state(ux_window *window,
+lib_status ux_window_capture_state(const ux_window *window,
+    ux_frame *out_frame, lib_u32 *out_generation,
     char out_title[UX_WINDOW_TITLE_CAPACITY], lib_bool *out_mouse_enabled,
     lib_bool *out_release_mouse);
 lib_status ux_window_native_start(ux_window *window);

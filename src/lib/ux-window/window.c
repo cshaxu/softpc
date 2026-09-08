@@ -137,26 +137,21 @@ lib_status ux_window_request_close(ux_window *window)
     return status == LIB_STATUS_OK ? window->input_sink(window->input_context, &event) : status;
 }
 
-lib_status ux_window_capture_paint_state(const ux_window *window,
-    ux_frame *out_frame, lib_u32 *out_generation)
+lib_status ux_window_capture_state(const ux_window *window, ux_frame *out_frame,
+    lib_u32 *out_generation, char out_title[UX_WINDOW_TITLE_CAPACITY],
+    lib_bool *out_mouse_enabled, lib_bool *out_release_mouse)
 {
-    if (window == LIB_NULL || out_frame == LIB_NULL || out_generation == LIB_NULL)
+    ux_window *mutable_window = (ux_window *)window;
+    if (window == LIB_NULL || out_frame == LIB_NULL || out_generation == LIB_NULL ||
+        out_title == LIB_NULL || out_mouse_enabled == LIB_NULL || out_release_mouse == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
-    return ux_frame_mailbox_take(&window->frames, out_frame, out_generation);
-}
-
-lib_status ux_window_take_control_state(ux_window *window,
-    char out_title[UX_WINDOW_TITLE_CAPACITY], lib_bool *out_mouse_enabled,
-    lib_bool *out_release_mouse)
-{
-    if (window == LIB_NULL || out_title == LIB_NULL ||
-        out_mouse_enabled == LIB_NULL || out_release_mouse == LIB_NULL)
-        return LIB_STATUS_INVALID_ARGUMENT;
-    ux_window_lock(window);
+    if (ux_frame_mailbox_take(&window->frames, out_frame, out_generation) != LIB_STATUS_OK)
+        return LIB_STATUS_INVALID_STATE;
+    ux_window_lock(mutable_window);
     memcpy(out_title, window->title, UX_WINDOW_TITLE_CAPACITY);
     *out_mouse_enabled = window->mouse_enabled;
     *out_release_mouse = window->mouse_release_requested;
-    window->mouse_release_requested = LIB_FALSE;
-    ux_window_unlock(window);
+    mutable_window->mouse_release_requested = LIB_FALSE;
+    ux_window_unlock(mutable_window);
     return LIB_STATUS_OK;
 }
