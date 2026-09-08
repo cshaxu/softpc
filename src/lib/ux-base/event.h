@@ -31,7 +31,10 @@ typedef struct ux_input_event {
             lib_u16 scan_code;
             /* A host-native or neutral key identity. Zero means absent. */
             lib_u32 virtual_key;
+            /* Native guest-injection state (for example ENHANCED_KEY). */
             lib_u32 modifiers;
+            /* Platform-neutral Ctrl/Alt/Shift mask used only by matcher. */
+            lib_u8 hotkey_modifiers;
             lib_u8 pressed;
         } key;
         struct {

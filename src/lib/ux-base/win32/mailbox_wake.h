@@ -7,6 +7,7 @@
 #include <windows.h>
 
 HANDLE ux_win32_presenter_wait_handle(const ux_presenter *presenter);
+HANDLE ux_win32_mailbox_wait_handle(const ux_mailbox_native *native_mailbox);
 #endif
 
 #endif

@@ -36,6 +36,11 @@ HANDLE ux_win32_presenter_wait_handle(const ux_presenter *presenter)
 {
     ux_mailbox_native *native_mailbox = ux_mailbox_native_for_presenter(presenter);
 
+    return ux_win32_mailbox_wait_handle(native_mailbox);
+}
+
+HANDLE ux_win32_mailbox_wait_handle(const ux_mailbox_native *native_mailbox)
+{
     return native_mailbox == NULL ? NULL : native_mailbox->event;
 }
 #endif

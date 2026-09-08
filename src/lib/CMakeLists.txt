@@ -21,6 +21,7 @@ set(LIBRARY_UX_SOURCES
     ux-base/actions.c
     ux-base/hotkey.c
     ux-base/mailbox.c
+    ux-console/console.c
     ux-base/linux/input.c
     ux/presenter.c)
 if(WIN32)
@@ -29,13 +30,15 @@ if(WIN32)
         ux-base/win32/actions.c
         ux-base/win32/color.c
         ux-console/win32/console.c
+        ux-console/win32/component.c
         ux-window/win32/geometry.c
         ux-base/win32/input.c
         ux-window/win32/mouse.c
         ux/win32/runner.c
         ux-window/win32/window.c)
 else()
-    list(APPEND LIBRARY_UX_SOURCES ux-base/linux/mailbox.c ux-console/linux/console.c)
+    list(APPEND LIBRARY_UX_SOURCES ux-base/linux/mailbox.c ux-console/linux/console.c
+        ux-console/linux/component.c)
 endif()
 add_library(ux STATIC ${LIBRARY_UX_SOURCES})
 library_root(ux)

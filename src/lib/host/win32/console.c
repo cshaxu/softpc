@@ -61,7 +61,10 @@ static void host_console_emit_key(host_console_native *native_console,
     event.binding_generation = native_console->generation;
     event.value.raw_key.key = key->wVirtualKeyCode;
     event.value.raw_key.unicode = key->uChar.UnicodeChar;
+    event.value.raw_key.scan_code = key->wVirtualScanCode;
     event.value.raw_key.modifiers = host_console_modifiers(key->dwControlKeyState);
+    event.value.raw_key.extended =
+        (key->dwControlKeyState & ENHANCED_KEY) != 0u ? LIB_TRUE : LIB_FALSE;
     event.value.raw_key.pressed = key->bKeyDown ? LIB_TRUE : LIB_FALSE;
     (void)lib_console_deliver_event(native_console->console, &event);
 }

@@ -23,7 +23,9 @@ typedef enum lib_console_event_kind {
 typedef struct lib_console_raw_key {
     lib_u32 key;
     lib_u32 unicode;
+    lib_u16 scan_code;
     lib_u8 modifiers;
+    lib_bool extended;
     lib_bool pressed;
 } lib_console_raw_key;
 

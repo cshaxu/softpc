@@ -96,7 +96,7 @@ int ux_hotkey_matcher_submit(ux_hotkey_matcher *matcher,
     }
     if (event->data.key.pressed != 0u && (matched = ux_hotkey_registry_match(
             &matcher->registry, event->data.key.virtual_key,
-            (lib_u8)event->data.key.modifiers)) != LIB_NULL) {
+            event->data.key.hotkey_modifiers)) != LIB_NULL) {
         ux_input_event hotkey = *event;
         matcher->pending_count = 0u;
         matcher->suppressed_key = event->data.key.virtual_key;

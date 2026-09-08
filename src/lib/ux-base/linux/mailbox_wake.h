@@ -6,6 +6,8 @@
 #if !defined(_WIN32)
 int ux_linux_presenter_wait_fd(const ux_presenter *presenter);
 void ux_linux_presenter_consume(const ux_presenter *presenter);
+int ux_linux_mailbox_wait_fd(const ux_mailbox_native *native_mailbox);
+void ux_linux_mailbox_consume(const ux_mailbox_native *native_mailbox);
 #endif
 
 #endif
