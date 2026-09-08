@@ -1,4 +1,14 @@
-#include "lib/ux-console/internal.h"
+#include "lib/ux-console/console.h"
+#include "lib/ux-base/internal.h"
+
+struct ux_console {
+    ux_frame_mailbox frames;
+    ux_hotkey_matcher *hotkeys;
+    ux_input_sink input_sink;
+    void *input_context;
+    lib_console *logical_console;
+    lib_bool started;
+};
 
 static void ux_console_event(void *context, const lib_console_event *event)
 {
@@ -55,11 +65,10 @@ lib_status ux_console_create(ux_console **out_console,
 
 lib_status ux_console_start(ux_console *console)
 {
-    lib_status status;
     if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     if (console->started != LIB_FALSE) return LIB_STATUS_INVALID_STATE;
-    status = ux_console_native_start(console);
-    if (status != LIB_STATUS_OK) return status;
+    /* The platform renderer is independent of host registration.  S4 core
+     * establishes its logical object and event sink before that worker starts. */
     console->started = LIB_TRUE;
     return LIB_STATUS_OK;
 }
@@ -67,7 +76,6 @@ lib_status ux_console_start(ux_console *console)
 void ux_console_destroy(ux_console *console)
 {
     if (console == LIB_NULL) return;
-    ux_console_native_stop(console);
     (void)ux_hotkey_matcher_retire(console->hotkeys, console,
         console->input_sink, console->input_context);
     (void)lib_console_set_event_sink(console->logical_console, LIB_NULL, LIB_NULL);
@@ -78,30 +86,8 @@ void ux_console_destroy(ux_console *console)
 
 lib_status ux_console_publish_frame(ux_console *console, const ux_frame *frame)
 {
-    lib_status status;
-    if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    status = ux_frame_mailbox_publish(&console->frames, frame);
-    if (status == LIB_STATUS_OK) ux_console_native_signal(console);
-    return status;
-}
-
-lib_status ux_console_present_frame(ux_console *console, const ux_frame *frame)
-{
-    lib_console_text_frame text = { 0 };
-    lib_size cells;
-
-    if (console == LIB_NULL || !ux_frame_is_valid(frame)) return LIB_STATUS_INVALID_ARGUMENT;
-    if (frame->graphics != 0u) return LIB_STATUS_OK; /* preserve last text frame */
-    text.columns = frame->text_columns;
-    text.rows = frame->text_rows;
-    text.cursor_column = frame->cursor_column;
-    text.cursor_row = frame->cursor_row;
-    text.cursor_visible = frame->cursor_visible != 0u && frame->cursor_phase != 0u;
-    cells = (lib_size)text.columns * text.rows;
-    memcpy(text.text, frame->text, cells);
-    memcpy(text.attributes, frame->attributes, cells * sizeof(text.attributes[0]));
-    memcpy(text.palette, frame->text_palette, sizeof(text.palette));
-    return lib_console_present_text_frame(console->logical_console, &text);
+    return console == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
+        ux_frame_mailbox_publish(&console->frames, frame);
 }
 
 lib_console *ux_console_get_console(ux_console *console)
