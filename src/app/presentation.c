@@ -75,11 +75,13 @@ static int app_presentation_create_window(app_presentation_context *context)
     ux_window_options options = { 0 };
 
     if (context == NULL || context->window != NULL) return context != NULL;
-    options.input_context = context;
-    options.input_sink = app_presentation_input;
-    options.failure_context = context;
-    options.failure_sink = app_presentation_delivery_failed;
-    options.hotkeys = context->hotkeys;
+    options.component.input_context = context;
+    options.component.input_sink = app_presentation_input;
+    options.component.failure_context = context;
+    options.component.failure_sink = app_presentation_delivery_failed;
+    options.component.hotkeys = context->hotkeys;
+    options.initial_mouse_enabled = context->displayed_state ==
+        SOFTPC_RUNTIME_RUNNING;
     if (ux_window_create(&context->window, &options) != LIB_STATUS_OK)
         return 0;
     context->window_delivered_frame_sequence = 0u;

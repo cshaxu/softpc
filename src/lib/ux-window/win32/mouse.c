@@ -28,21 +28,28 @@ int ux_win32_mouse_capture(ux_win32_mouse *mouse,
     POINT lower_right;
     RECT bounds;
 
-    if (mouse == NULL || window == NULL) return 0;
+    if (mouse == NULL || window == NULL || !GetClientRect(window, &client) ||
+        client.right <= client.left || client.bottom <= client.top) return 0;
     SetFocus(window);
+    if (GetFocus() != window) return 0;
     SetCapture(window);
-    GetClientRect(window, &client);
+    if (GetCapture() != window) return 0;
     upper_left.x = client.left;
     upper_left.y = client.top;
     lower_right.x = client.right;
     lower_right.y = client.bottom;
-    if (ClientToScreen(window, &upper_left) &&
-        ClientToScreen(window, &lower_right)) {
-        bounds.left = upper_left.x;
-        bounds.top = upper_left.y;
-        bounds.right = lower_right.x;
-        bounds.bottom = lower_right.y;
-        (void)ClipCursor(&bounds);
+    if (!ClientToScreen(window, &upper_left) ||
+        !ClientToScreen(window, &lower_right)) {
+        ReleaseCapture();
+        return 0;
+    }
+    bounds.left = upper_left.x;
+    bounds.top = upper_left.y;
+    bounds.right = lower_right.x;
+    bounds.bottom = lower_right.y;
+    if (!ClipCursor(&bounds)) {
+        ReleaseCapture();
+        return 0;
     }
     mouse->x = (int)(short)LOWORD(position);
     mouse->y = (int)(short)HIWORD(position);

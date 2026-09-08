@@ -7,7 +7,13 @@
 
 typedef struct ux_window ux_window;
 
-typedef ux_component_options ux_window_options;
+typedef struct ux_window_options {
+    ux_component_options component;
+    /* Permission to acquire capture, not capture itself.  Supplying it with
+     * construction removes a first-click race with the Window worker's
+     * asynchronous control FIFO. */
+    lib_bool initial_mouse_enabled;
+} ux_window_options;
 
 lib_status ux_window_create(ux_window **out_window,
     const ux_window_options *options);

@@ -693,6 +693,7 @@ lib_status ux_window_native_start(ux_window *component)
         free(state->context); free(state); return LIB_STATUS_NO_MEMORY;
     }
     state->context->component = component;
+    state->context->mouse_capturable = component->initial_mouse_enabled;
     state->ready = CreateEventA(NULL, TRUE, FALSE, NULL);
     if (state->ready == NULL) {
         win32_window_destroy(state->context, NULL); free(state); return LIB_STATUS_NO_MEMORY;

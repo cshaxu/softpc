@@ -6,6 +6,7 @@
 
 struct ux_window {
     ux_component base;
+    lib_bool initial_mouse_enabled;
     void *native_state;
 };
 

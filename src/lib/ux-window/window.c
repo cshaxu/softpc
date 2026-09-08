@@ -24,12 +24,14 @@ lib_status ux_window_create(ux_window **out_window,
     lib_status status;
 
     if (out_window == LIB_NULL || options == LIB_NULL ||
-        options->input_sink == LIB_NULL || options->failure_sink == LIB_NULL)
+        options->component.input_sink == LIB_NULL ||
+        options->component.failure_sink == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     *out_window = LIB_NULL;
     window = calloc(1u, sizeof(*window));
     if (window == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    status = ux_component_initialize(&window->base, options,
+    window->initial_mouse_enabled = options->initial_mouse_enabled != LIB_FALSE;
+    status = ux_component_initialize(&window->base, &options->component,
         ux_window_component_stop, ux_window_component_dispose);
     if (status == LIB_STATUS_OK) status = ux_window_native_start(window);
     if (status != LIB_STATUS_OK) {
