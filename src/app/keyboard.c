@@ -33,21 +33,21 @@ int app_keyboard_inject_machine_event(softpc_machine *machine,
         (uint8_t)!copy.bKeyDown) == SOFTPC_MACHINE_OK;
 }
 
-int app_keyboard_register_hotkeys(ux_hotkey_registry *registry)
+int app_keyboard_hotkeys(ux_hotkey_registry *registry)
 {
-    const uint8_t modifiers = UX_HOTKEY_MODIFIER_CONTROL |
-        UX_HOTKEY_MODIFIER_ALT;
+    static const ux_hotkey_registry hotkeys = {
+        { { 'P', UX_HOTKEY_MODIFIER_CONTROL | UX_HOTKEY_MODIFIER_ALT,
+              "pause-toggle" },
+          { 'D', UX_HOTKEY_MODIFIER_CONTROL | UX_HOTKEY_MODIFIER_ALT,
+              "send-ctrl-alt-del" },
+          { 'F', UX_HOTKEY_MODIFIER_CONTROL | UX_HOTKEY_MODIFIER_ALT,
+              "send-alt-enter" },
+          { 'M', UX_HOTKEY_MODIFIER_CONTROL | UX_HOTKEY_MODIFIER_ALT,
+              "release-window-mouse" } }, 4u };
 
     if (registry == NULL) return 0;
-    ux_hotkey_registry_initialize(registry);
-    return ux_hotkey_registry_register(registry, 'P', modifiers,
-            "pause-toggle") == LIB_STATUS_OK &&
-        ux_hotkey_registry_register(registry, 'D', modifiers,
-            "send-ctrl-alt-del") == LIB_STATUS_OK &&
-        ux_hotkey_registry_register(registry, 'F', modifiers,
-            "send-alt-enter") == LIB_STATUS_OK &&
-        ux_hotkey_registry_register(registry, 'M', modifiers,
-            "release-window-mouse") == LIB_STATUS_OK;
+    *registry = hotkeys;
+    return 1;
 }
 
 static int app_keyboard_emit(void *context, ux_event_sink sink, WORD scan,

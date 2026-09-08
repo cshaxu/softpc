@@ -68,7 +68,7 @@ static DWORD WINAPI retirement_deliver(void *opaque)
 static DWORD WINAPI retirement_destroy(void *opaque)
 {
     destroy_context *context = (destroy_context *)opaque;
-    ux_component_destroy(ux_console_component(context->console));
+    ux_console_destroy(context->console);
     SetEvent(context->done);
     return 0u;
 }

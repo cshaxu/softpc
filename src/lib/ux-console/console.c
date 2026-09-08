@@ -43,8 +43,16 @@ lib_status ux_console_create(ux_console **out_console,
     return LIB_STATUS_OK;
 }
 
-ux_component *ux_console_component(ux_console *console)
-{ return console == LIB_NULL ? LIB_NULL : &console->base; }
+lib_status ux_console_publish_frame(ux_console *console, const ux_frame *frame)
+{
+    return console == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
+        ux_component_publish_frame(&console->base, frame);
+}
+
+void ux_console_destroy(ux_console *console)
+{
+    if (console != LIB_NULL) ux_component_destroy(&console->base);
+}
 
 lib_console *ux_console_get_console(const ux_console *console)
 {

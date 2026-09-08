@@ -1,7 +1,6 @@
 #ifndef APP_MONITOR_H
 #define APP_MONITOR_H
 
-#include "lib/base/console.h"
 #include "lib/host/console.h"
 #include "control.h"
 
@@ -14,8 +13,11 @@ typedef struct app_monitor_console app_monitor_console;
 int app_monitor_console_create(app_monitor_console **out_monitor,
     app_control_queue *control_queue);
 void app_monitor_console_destroy(app_monitor_console *monitor);
-lib_console *app_monitor_console_object(app_monitor_console *monitor);
-host_console_broker *app_monitor_console_broker(app_monitor_console *monitor);
+struct ux_console;
+int app_monitor_console_activate_vm(app_monitor_console *monitor,
+    struct ux_console *console);
+int app_monitor_console_activate_self(app_monitor_console *monitor,
+    struct ux_console *console);
 int app_monitor_console_write(app_monitor_console *monitor, const char *text);
 
 #endif

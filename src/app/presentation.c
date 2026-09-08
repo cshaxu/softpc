@@ -2,7 +2,6 @@
 
 #ifdef _WIN32
 #include "keyboard.h"
-#include "lib/host/console.h"
 #include "presentation_plan.h"
 #include "reconciler.h"
 #include "lib/ux-console/console.h"
@@ -104,14 +103,13 @@ static void app_presentation_destroy_components(app_presentation_context *contex
     /* Replace the VM object before destroying it. Host retains one Current
      * Console for its entire life; presentation merely changes the object. */
     if (context->console != NULL)
-        (void)host_console_replace_active(app_monitor_console_broker(context->monitor),
-            ux_console_get_console(context->console),
-            app_monitor_console_object(context->monitor), HOST_CONSOLE_COOKED_LINES);
+        (void)app_monitor_console_activate_self(context->monitor,
+            context->console);
     context->vm_console_current = 0;
     if (context->window != NULL)
-        ux_component_destroy(ux_window_component(context->window));
+        ux_window_destroy(context->window);
     if (context->console != NULL)
-        ux_component_destroy(ux_console_component(context->console));
+        ux_console_destroy(context->console);
     context->window = NULL;
     context->console = NULL;
 }
@@ -142,11 +140,8 @@ static int app_presentation_apply_next_action(app_presentation_context *context)
             app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_BIND_VM_CONSOLE:
         if (context->console == NULL) return 0;
-        if (host_console_replace_active(
-            app_monitor_console_broker(context->monitor),
-            app_monitor_console_object(context->monitor),
-            ux_console_get_console(context->console), HOST_CONSOLE_RAW_EVENTS) !=
-            LIB_STATUS_OK) {
+        if (!app_monitor_console_activate_vm(context->monitor,
+                context->console)) {
             return 0;
         }
         context->vm_console_current = 1;
@@ -154,25 +149,22 @@ static int app_presentation_apply_next_action(app_presentation_context *context)
             app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_BIND_MONITOR:
         if (context->console == NULL) return 0;
-        if (host_console_replace_active(
-            app_monitor_console_broker(context->monitor),
-            ux_console_get_console(context->console),
-            app_monitor_console_object(context->monitor), HOST_CONSOLE_COOKED_LINES) !=
-            LIB_STATUS_OK) {
+        if (!app_monitor_console_activate_self(context->monitor,
+                context->console)) {
             return 0;
         }
         context->vm_console_current = 0;
         return app_control_queue_push_broker_completed(context->control_queue, 0,
             app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE:
-        ux_component_destroy(ux_console_component(context->console));
+        ux_console_destroy(context->console);
         context->console = NULL;
         context->vm_console_current = 0;
         return app_control_queue_push_component_completed(context->control_queue,
             APP_CONTROL_COMPONENT_VM_CONSOLE, 0,
             app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_DESTROY_WINDOW:
-        ux_component_destroy(ux_window_component(context->window));
+        ux_window_destroy(context->window);
         context->window = NULL;
         return app_control_queue_push_component_completed(context->control_queue,
             APP_CONTROL_COMPONENT_WINDOW, 0,
@@ -221,10 +213,10 @@ static int app_presentation_publish(app_presentation_context *context,
     if (context->reducer.vm_console_actual &&
         context->reducer.current_console_actual == APP_RECONCILER_CONSOLE_VM &&
         context->console != NULL &&
-        ux_component_publish_frame(ux_console_component(context->console), console_frame) !=
+        ux_console_publish_frame(context->console, console_frame) !=
             LIB_STATUS_OK) return 0;
     if (context->reducer.window_actual && context->window != NULL &&
-        ux_component_publish_frame(ux_window_component(context->window), frame) !=
+        ux_window_publish_frame(context->window, frame) !=
             LIB_STATUS_OK) return 0;
     return 1;
 }
@@ -256,7 +248,7 @@ int app_presentation_create(app_presentation **out_presentation,
     *out_presentation = NULL;
     context = calloc(1u, sizeof(*context));
     if (context == NULL) return 0;
-    if (!app_keyboard_register_hotkeys(&context->hotkeys)) {
+    if (!app_keyboard_hotkeys(&context->hotkeys)) {
         free(context);
         return 0;
     }

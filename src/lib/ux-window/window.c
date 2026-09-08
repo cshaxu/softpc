@@ -41,8 +41,16 @@ lib_status ux_window_create(ux_window **out_window,
     return LIB_STATUS_OK;
 }
 
-ux_component *ux_window_component(ux_window *window)
-{ return window == LIB_NULL ? LIB_NULL : &window->base; }
+lib_status ux_window_publish_frame(ux_window *window, const ux_frame *frame)
+{
+    return window == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
+        ux_component_publish_frame(&window->base, frame);
+}
+
+void ux_window_destroy(ux_window *window)
+{
+    if (window != LIB_NULL) ux_component_destroy(&window->base);
+}
 
 lib_status ux_window_set_title(ux_window *window, const char *title)
 {
