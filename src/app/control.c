@@ -231,11 +231,10 @@ int app_control_handle_ux(app_control_queue *queue, app_runtime *runtime,
     if (event->type == UX_EVENT_SOURCE_RETIRED)
         return app_control_release_source(queue, runtime, event->source_identity);
     if (event->type == UX_EVENT_WINDOW_CLOSE)
-        return app_runtime_request_window_close(runtime);
+        return 1;
     if (event->type != UX_EVENT_HOTKEY) return 1;
     if (strcmp(event->data.hotkey.identifier, "pause-toggle") == 0)
-        return app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED ?
-            app_runtime_resume(runtime) : app_runtime_pause(runtime);
+        return 1;
     if (strcmp(event->data.hotkey.identifier, "send-ctrl-alt-del") == 0)
         return app_keyboard_submit_ctrl_alt_del(runtime, app_keyboard_deliver_input);
     if (strcmp(event->data.hotkey.identifier, "send-alt-enter") == 0)

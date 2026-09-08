@@ -243,6 +243,8 @@ static void app_runtime_completed(void *opaque, app_runtime_state state,
 static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
     app_presentation *presentation, const ux_input_event *event)
 {
+    if (event != NULL && event->type == UX_EVENT_WINDOW_CLOSE)
+        return app_runtime_request_window_close(runtime);
     if (event != NULL && event->type == UX_EVENT_HOTKEY &&
         strcmp(event->data.hotkey.identifier, "pause-toggle") == 0) {
         if (app_runtime_get_state(runtime) == SOFTPC_RUNTIME_PAUSED)
