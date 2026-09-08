@@ -381,6 +381,18 @@ static void win32_window_release_mouse(ux_win32_window_context *context)
 {
     if (context == NULL) return;
     win32_window_flush_mouse(context);
+    /* left/right_button is guest state only.  A real guest press must never
+     * survive a host capture release, whereas the host-only capture gesture
+     * leaves both bits clear and therefore emits nothing here. */
+    if ((context->left_button || context->right_button) &&
+        win32_window_accepting_input(context)) {
+        context->left_button = 0;
+        context->right_button = 0;
+        win32_window_emit_mouse(context, 0, 0, 0u);
+    } else {
+        context->left_button = 0;
+        context->right_button = 0;
+    }
     ux_win32_mouse_release(&context->mouse);
 }
 
@@ -528,31 +540,43 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         break;
     case WM_LBUTTONDOWN:
         if (!win32_window_accepting_input(context)) return 0;
+        /* The first client click is the host-only capture gesture.  Guest
+         * button state starts only with a later click while already captured. */
+        if (!ux_win32_mouse_captured(&context->mouse)) {
+            win32_window_capture_mouse(window, context, lparam);
+            return 0;
+        }
         win32_window_flush_mouse(context);
         context->left_button = 1;
-        win32_window_capture_mouse(window, context, lparam);
         win32_window_mouse(window, context, lparam, 1);
         return 0;
     case WM_LBUTTONUP:
         if (!win32_window_accepting_input(context)) return 0;
+        /* A button which was never made guest-visible is the matching
+         * release of the host-only capture gesture. */
+        if (!ux_win32_mouse_captured(&context->mouse) || !context->left_button)
+            return 0;
         win32_window_flush_mouse(context);
         context->left_button = 0;
-        if (ux_win32_mouse_captured(&context->mouse))
-            win32_window_mouse(window, context, lparam, 1);
+        win32_window_mouse(window, context, lparam, 1);
         return 0;
     case WM_RBUTTONDOWN:
         if (!win32_window_accepting_input(context)) return 0;
+        if (!ux_win32_mouse_captured(&context->mouse)) {
+            win32_window_capture_mouse(window, context, lparam);
+            return 0;
+        }
         win32_window_flush_mouse(context);
         context->right_button = 1;
-        win32_window_capture_mouse(window, context, lparam);
         win32_window_mouse(window, context, lparam, 1);
         return 0;
     case WM_RBUTTONUP:
         if (!win32_window_accepting_input(context)) return 0;
+        if (!ux_win32_mouse_captured(&context->mouse) || !context->right_button)
+            return 0;
         win32_window_flush_mouse(context);
         context->right_button = 0;
-        if (ux_win32_mouse_captured(&context->mouse))
-            win32_window_mouse(window, context, lparam, 1);
+        win32_window_mouse(window, context, lparam, 1);
         return 0;
     case WM_KILLFOCUS:
         win32_window_release_mouse(context);
