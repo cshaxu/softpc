@@ -1,7 +1,12 @@
 #include "lib/base/console.h"
+#include "lib/base/internal/console.h"
 #include "lib/host/internal/console_native.h"
 
 #include <assert.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 struct host_console_native {
     lib_console *active;
@@ -12,6 +17,12 @@ struct host_console_native {
 static int host_console_fail_next_activation;
 static int host_console_fail_next_prepare;
 static int host_console_prepare_saw_active;
+static int host_console_wait_for_callback;
+#ifdef _WIN32
+static HANDLE host_console_callback_entered;
+static HANDLE host_console_callback_release;
+static HANDLE host_console_callback_finished;
+#endif
 
 lib_status host_console_native_create(host_console_native **out_native)
 {
@@ -54,7 +65,14 @@ lib_status host_console_native_activate(host_console_native *native_console,
 }
 
 void host_console_native_deactivate(host_console_native *native_console)
-{ native_console->active = LIB_NULL; }
+{
+#ifdef _WIN32
+    if (host_console_wait_for_callback)
+        assert(WaitForSingleObject(host_console_callback_finished, INFINITE) ==
+            WAIT_OBJECT_0);
+#endif
+    native_console->active = LIB_NULL;
+}
 
 void host_console_native_lock_output(host_console_native *native_console)
 { (void)native_console; }
@@ -78,6 +96,48 @@ lib_status host_console_native_write_text_frame_bound(host_console_native *nativ
         native_console->generation != expected_generation || frame == LIB_NULL ?
         LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
+
+#ifdef _WIN32
+typedef struct host_console_replace_probe {
+    host_console_broker *broker;
+    lib_console *old_console;
+    lib_console *next_console;
+    HANDLE completed;
+    lib_status status;
+} host_console_replace_probe;
+
+static void host_console_blocking_sink(void *opaque,
+    const lib_console_event *event)
+{
+    (void)opaque;
+    assert(event != LIB_NULL);
+    SetEvent(host_console_callback_entered);
+    assert(WaitForSingleObject(host_console_callback_release, INFINITE) ==
+        WAIT_OBJECT_0);
+}
+
+static DWORD WINAPI host_console_deliver_old(void *opaque)
+{
+    lib_console *console = (lib_console *)opaque;
+    lib_console_event event = { 0 };
+    event.kind = LIB_CONSOLE_EVENT_RAW_KEY;
+    event.binding_generation = 1u;
+    event.value.raw_key.key = 'X';
+    event.value.raw_key.pressed = LIB_TRUE;
+    assert(lib_console_deliver_event(console, &event) == LIB_STATUS_OK);
+    SetEvent(host_console_callback_finished);
+    return 0u;
+}
+
+static DWORD WINAPI host_console_replace_thread(void *opaque)
+{
+    host_console_replace_probe *probe = (host_console_replace_probe *)opaque;
+    probe->status = host_console_replace_active(probe->broker, probe->old_console,
+        probe->next_console, HOST_CONSOLE_RAW_EVENTS);
+    SetEvent(probe->completed);
+    return 0u;
+}
+#endif
 
 int main(void)
 {
@@ -115,6 +175,43 @@ int main(void)
     assert(host_console_broker_create(&second_broker, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_OK);
     host_console_broker_destroy(second_broker);
+#ifdef _WIN32
+    /* A replacement models a reader join: the new Current Console cannot be
+       committed while the old reader's callback remains in flight. */
+    assert(host_console_broker_create(&broker, first,
+        HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK);
+    assert(lib_console_set_event_sink(first, host_console_blocking_sink, NULL) ==
+        LIB_STATUS_OK);
+    host_console_callback_entered = CreateEventA(NULL, TRUE, FALSE, NULL);
+    host_console_callback_release = CreateEventA(NULL, TRUE, FALSE, NULL);
+    host_console_callback_finished = CreateEventA(NULL, TRUE, FALSE, NULL);
+    { host_console_replace_probe probe = { broker, first, second, NULL,
+            LIB_STATUS_INVALID_STATE };
+      HANDLE delivery;
+      HANDLE replacement;
+      probe.completed = CreateEventA(NULL, TRUE, FALSE, NULL);
+      assert(probe.completed != NULL);
+      delivery = CreateThread(NULL, 0u, host_console_deliver_old, first, 0u, NULL);
+      assert(delivery != NULL);
+      assert(WaitForSingleObject(host_console_callback_entered, INFINITE) ==
+          WAIT_OBJECT_0);
+      host_console_wait_for_callback = 1;
+      replacement = CreateThread(NULL, 0u, host_console_replace_thread, &probe,
+          0u, NULL);
+      assert(replacement != NULL);
+      assert(WaitForSingleObject(probe.completed, 0u) == WAIT_TIMEOUT);
+      SetEvent(host_console_callback_release);
+      assert(WaitForSingleObject(probe.completed, INFINITE) == WAIT_OBJECT_0);
+      assert(probe.status == LIB_STATUS_OK);
+      host_console_wait_for_callback = 0;
+      CloseHandle(delivery);
+      CloseHandle(replacement);
+      CloseHandle(probe.completed); }
+    CloseHandle(host_console_callback_entered);
+    CloseHandle(host_console_callback_release);
+    CloseHandle(host_console_callback_finished);
+    host_console_broker_destroy(broker);
+#endif
     lib_console_destroy(first);
     lib_console_destroy(second);
     return 0;
