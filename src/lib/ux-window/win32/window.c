@@ -24,28 +24,6 @@ static LRESULT CALLBACK ux_window_proc(HWND hwnd, UINT message, WPARAM wparam,
     window = (ux_window *)GetWindowLongPtrA(hwnd, GWLP_USERDATA);
     if (window == LIB_NULL) return DefWindowProcA(hwnd, message, wparam, lparam);
     if (message == WM_CLOSE) { (void)ux_window_request_close(window); return 0; }
-    if (message == WM_PAINT) {
-        PAINTSTRUCT paint;
-        HDC dc = BeginPaint(hwnd, &paint);
-        ux_frame frame;
-        lib_u32 generation;
-        char title[UX_WINDOW_TITLE_CAPACITY];
-        lib_bool mouse_enabled, release_mouse;
-        if (ux_window_capture_state(window, &frame, &generation, title,
-                &mouse_enabled, &release_mouse) == LIB_STATUS_OK &&
-            frame.graphics == 0u && ux_frame_is_valid(&frame)) {
-            lib_u32 row;
-            (void)generation; (void)title; (void)mouse_enabled; (void)release_mouse;
-            for (row = 0u; row < frame.text_rows; ++row) {
-                char line[UX_TEXT_COLUMNS + 1u];
-                memcpy(line, &frame.text[row * UX_TEXT_COLUMNS], frame.text_columns);
-                line[frame.text_columns] = '\0';
-                TextOutA(dc, 0, (int)row * 16, line, frame.text_columns);
-            }
-        }
-        EndPaint(hwnd, &paint);
-        return 0;
-    }
     if (message == WM_KEYDOWN || message == WM_KEYUP || message == WM_SYSKEYDOWN ||
         message == WM_SYSKEYUP) {
         ux_input_event event;
@@ -86,7 +64,6 @@ static DWORD WINAPI ux_window_worker(void *context)
                     &mouse_enabled, &release_mouse) == LIB_STATUS_OK) {
                 (void)frame; (void)generation; (void)mouse_enabled; (void)release_mouse;
                 SetWindowTextA(native->hwnd, title);
-                InvalidateRect(native->hwnd, NULL, FALSE);
             }
         }
         while (PeekMessageA(&message, NULL, 0u, 0u, PM_REMOVE)) {
