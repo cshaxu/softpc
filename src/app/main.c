@@ -287,6 +287,7 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
     if (!app_presentation_create(&presenter, runtime, presentation,
             console_control, monitor, control_queue)) return 1;
     app_monitor_help(monitor);
+    app_monitor_console_write(monitor, "\r\n");
     prompt_pending = 1;
     for (;;) {
         char *command;
