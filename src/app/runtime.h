@@ -51,10 +51,6 @@ int app_runtime_copy_published_frame(app_runtime *runtime,
 uint32_t app_runtime_published_frame_sequence(const app_runtime *runtime);
 uint32_t app_runtime_published_frame_run_generation(const app_runtime *runtime);
 uint32_t app_runtime_run_generation(const app_runtime *runtime);
-int app_runtime_take_window_close(app_runtime *runtime);
-int app_runtime_take_window_mouse_release(app_runtime *runtime);
-int app_runtime_request_window_close(app_runtime *runtime);
-void app_runtime_request_window_mouse_release(app_runtime *runtime);
 void app_runtime_destroy(app_runtime *runtime);
 
 #endif

@@ -255,6 +255,11 @@ static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
                 APP_RECONCILER_INTENT_RESUME : APP_RECONCILER_INTENT_PAUSE);
         return 1;
     }
+    if (event != NULL && event->type == UX_EVENT_HOTKEY &&
+        strcmp(event->data.hotkey.identifier, "release-window-mouse") == 0) {
+        app_presentation_release_window_mouse(presentation);
+        return 1;
+    }
     return app_control_handle_ux(queue, runtime, event);
 }
 

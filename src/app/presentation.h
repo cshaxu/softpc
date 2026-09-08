@@ -26,6 +26,7 @@ void app_presentation_request_intent(app_presentation *presentation,
     app_reconciler_intent intent);
 app_reconciler_action app_presentation_take_runtime_action(
     app_presentation *presentation);
+void app_presentation_release_window_mouse(app_presentation *presentation);
 void app_presentation_note_runtime_completed(app_presentation *presentation,
     app_runtime_state state);
 void app_presentation_note_frame_completed(app_presentation *presentation,

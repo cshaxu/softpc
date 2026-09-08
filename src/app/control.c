@@ -239,10 +239,6 @@ int app_control_handle_ux(app_control_queue *queue, app_runtime *runtime,
         return app_keyboard_submit_ctrl_alt_del(runtime, app_keyboard_deliver_input);
     if (strcmp(event->data.hotkey.identifier, "send-alt-enter") == 0)
         return app_keyboard_submit_alt_enter(runtime, app_keyboard_deliver_input);
-    if (strcmp(event->data.hotkey.identifier, "release-window-mouse") == 0) {
-        app_runtime_request_window_mouse_release(runtime);
-        return 1;
-    }
     return 0;
 }
 #endif

@@ -62,8 +62,6 @@ struct app_runtime {
     volatile LONG start_requested;
     volatile LONG terminate_requested;
     volatile LONG media_requested;
-    volatile LONG window_close_requested;
-    volatile LONG window_mouse_release_requested;
     app_runtime_completion_sink completion_sink;
     void *completion_context;
     softpc_machine_result media_result;
@@ -651,11 +649,6 @@ uint32_t app_runtime_run_generation(const app_runtime *runtime)
         (volatile LONG *)&runtime->run_generation, 0, 0);
 }
 
-int app_runtime_take_window_close(app_runtime *runtime)
-{ return runtime != NULL && InterlockedExchange(&runtime->window_close_requested, 0); }
-
-int app_runtime_take_window_mouse_release(app_runtime *runtime)
-{ return runtime != NULL && InterlockedExchange(&runtime->window_mouse_release_requested, 0); }
 
 void app_runtime_destroy(app_runtime *runtime)
 {
@@ -675,18 +668,4 @@ void app_runtime_destroy(app_runtime *runtime)
     free(runtime->frame_buffers[1]);
     host_sync_event_destroy(runtime->command_event);
     free(runtime);
-}
-
-int app_runtime_request_window_close(app_runtime *runtime)
-{
-    if (runtime == NULL || InterlockedCompareExchange(&runtime->state, 0, 0) !=
-        SOFTPC_RUNTIME_RUNNING) return 0;
-    InterlockedExchange(&runtime->window_close_requested, 1);
-    return app_runtime_pause(runtime);
-}
-
-void app_runtime_request_window_mouse_release(app_runtime *runtime)
-{
-    if (runtime != NULL)
-        InterlockedExchange(&runtime->window_mouse_release_requested, 1);
 }

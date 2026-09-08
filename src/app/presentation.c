@@ -22,10 +22,7 @@ struct app_presentation {
     app_monitor_console *monitor;
     app_control_queue *control_queue;
     ux_hotkey_registry hotkeys;
-    unsigned int text_frames_since_graphics;
     app_runtime_state displayed_state;
-    int close_requested;
-    uint32_t displayed_run_generation;
     uint32_t observed_frame_sequence;
     uint32_t delivered_frame_sequence;
     app_runtime_frame observed_frame;
@@ -238,7 +235,6 @@ int app_presentation_create(app_presentation **out_presentation,
     context->monitor = monitor;
     context->control_queue = control_queue;
     context->displayed_state = app_runtime_get_state(runtime);
-    context->displayed_run_generation = app_runtime_run_generation(runtime);
     app_reconciler_initialize(&context->reducer, presentation, console_control);
     *out_presentation = context;
     return 1;
@@ -314,17 +310,15 @@ app_reconciler_action app_presentation_take_runtime_action(
     return action;
 }
 
+void app_presentation_release_window_mouse(app_presentation *presentation)
+{
+    if (presentation != NULL && presentation->window != NULL)
+        (void)ux_window_release_mouse(presentation->window);
+}
+
 int app_presentation_reconcile(app_presentation *context)
 {
     if (context == NULL) return 0;
-    if (app_runtime_take_window_mouse_release(context->runtime) &&
-        context->window != NULL)
-        (void)ux_window_release_mouse(context->window);
-    if (app_runtime_take_window_close(context->runtime)) {
-        context->close_requested = 1;
-        app_reconciler_note_intent(&context->reducer,
-            APP_RECONCILER_INTENT_WINDOW_CLOSE);
-    }
     /* Component and broker actual state only arrives through their completion
      * records.  A non-NULL local handle means merely that a request was
      * issued; treating it as actual here reintroduces a second control path. */
