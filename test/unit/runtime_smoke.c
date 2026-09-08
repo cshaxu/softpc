@@ -98,35 +98,31 @@ int main(void)
     assert(app_runtime_published_frame_sequence(runtime) == frame->sequence);
     assert(app_runtime_published_frame_run_generation(runtime) == first_run);
     assert(frame->sequence != 0u);
+    {
+        uint32_t stable_sequence = frame->sequence;
+        /* An unchanged text screen is not an executor heartbeat.  Repeated
+           publication would flood the app control FIFO and starve Console
+           raw input behind redundant frame completions. */
+        Sleep(150u);
+        assert(app_runtime_copy_frame(runtime, frame));
+        assert(frame->sequence == stable_sequence);
+    }
     /* Runtime owns copied frame production only.  Component existence and
        Console/Window selection belong to the app presentation reconciler,
        not a shared UX target router. */
-    {
-        ux_input_event hotkey = { 0 };
-        hotkey.type = UX_EVENT_HOTKEY;
-        memcpy(hotkey.data.hotkey.identifier, "pause-toggle",
-            sizeof("pause-toggle"));
-        { app_control_queue *queue = NULL; assert(app_control_queue_create(&queue));
-          assert(app_control_handle_ux(queue, runtime, &hotkey));
-          app_control_queue_destroy(queue); }
-    }
+    /* Lifecycle intent is interpreted by the SoftPC control/reconciler;
+       this runtime unit directly proves the executor request/completion ABI. */
+    assert(app_runtime_pause(runtime));
     assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_PAUSED));
     assert(app_runtime_set_floppy(runtime, NULL));
-    {
-        ux_input_event hotkey = { 0 };
-        hotkey.type = UX_EVENT_HOTKEY;
-        memcpy(hotkey.data.hotkey.identifier, "pause-toggle",
-            sizeof("pause-toggle"));
-        { app_control_queue *queue = NULL; assert(app_control_queue_create(&queue));
-          assert(app_control_handle_ux(queue, runtime, &hotkey));
-          app_control_queue_destroy(queue); }
-    }
+    assert(app_runtime_resume(runtime));
     assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_RUNNING));
     assert(app_runtime_stop(runtime));
-    assert(app_runtime_get_state(runtime) == SOFTPC_RUNTIME_STOPPED);
+    assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_STOPPED));
     assert(app_runtime_start(runtime));
     assert(app_runtime_run_generation(runtime) != first_run);
     assert(app_runtime_stop(runtime));
+    assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_STOPPED));
     assert(app_runtime_set_floppy(runtime, NULL));
     free(frame);
     app_runtime_destroy(runtime);

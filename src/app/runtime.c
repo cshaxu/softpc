@@ -82,6 +82,38 @@ static void app_runtime_notify_state(app_runtime *runtime)
             app_runtime_run_generation(runtime));
 }
 
+/* A published frame is a completed product fact, not an executor heartbeat.
+ * Text mode has no native dirty rectangle, so the executor can visit this
+ * path many times while the guest image is unchanged.  Republishing that
+ * identical image would flood the single control FIFO, starving real input
+ * behind frame-completed records and needlessly forcing the Console cursor.
+ * Graphics frames have already passed the machine dirty gate and therefore
+ * remain publishable as-is. */
+static int app_runtime_text_frame_changed(const ux_frame *previous,
+    const ux_frame *candidate)
+{
+    if (previous == NULL || previous->valid == 0u ||
+        previous->graphics != 0u) return 1;
+    return previous->text_columns != candidate->text_columns ||
+        previous->text_rows != candidate->text_rows ||
+        previous->cursor_column != candidate->cursor_column ||
+        previous->cursor_row != candidate->cursor_row ||
+        previous->cursor_top != candidate->cursor_top ||
+        previous->cursor_bottom != candidate->cursor_bottom ||
+        previous->cursor_visible != candidate->cursor_visible ||
+        previous->cursor_phase != candidate->cursor_phase ||
+        previous->font_height != candidate->font_height ||
+        previous->attribute_font_select != candidate->attribute_font_select ||
+        memcmp(previous->text, candidate->text, sizeof(candidate->text)) != 0 ||
+        memcmp(previous->attributes, candidate->attributes,
+            sizeof(candidate->attributes)) != 0 ||
+        memcmp(previous->text_palette, candidate->text_palette,
+            sizeof(candidate->text_palette)) != 0 ||
+        memcmp(previous->font, candidate->font, sizeof(candidate->font)) != 0 ||
+        memcmp(previous->secondary_font, candidate->secondary_font,
+            sizeof(candidate->secondary_font)) != 0;
+}
+
 static void app_runtime_publish(app_runtime *runtime)
 {
     app_runtime_frame *frame;
@@ -271,6 +303,12 @@ static void app_runtime_publish(app_runtime *runtime)
         frame->dirty_bottom = -1;
         frame->valid = 1u;
         published = 1;
+    }
+    if (published && frame->graphics == 0u &&
+        !app_runtime_text_frame_changed(
+            runtime->frame_buffers[runtime->published_frame_index], frame)) {
+        /* Keep the last completed frame and sequence intact. */
+        published = 0;
     }
     if (published) {
         frame->sequence = ++runtime->published_frame_sequence;
