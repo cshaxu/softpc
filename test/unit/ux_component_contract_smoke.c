@@ -38,8 +38,10 @@ static void component_probe_dispose(ux_component *component)
 int main(void)
 {
     component_probe probe = { 0 };
-    ux_component first = { 0 };
-    ux_component second = { 0 };
+    /* Each private mailbox owns a complete ux_frame.  Keep both test
+       components out of the small default 32-bit thread stack. */
+    static ux_component first;
+    static ux_component second;
     ux_component_options options = { 0 };
     ux_input_event event = { 0 };
     ux_component_control control = { UX_COMPONENT_CONTROL_SET_WINDOW_MOUSE_ENABLED,
