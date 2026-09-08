@@ -177,8 +177,13 @@ lib_status host_console_native_activate(host_console_native *native_console,
     if (native_console == LIB_NULL || console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     configured = native_console->original_mode;
     if (mode == HOST_CONSOLE_RAW_EVENTS)
+        /* ReadConsoleInput consumes classic INPUT_RECORD values.  A parent
+         * Windows Terminal may have enabled VT input; retaining that flag
+         * converts keyboard input into byte sequences for ReadConsole/ReadFile
+         * instead, leaving this raw reader with no KEY_EVENT records. */
         configured = (configured & ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT |
-            ENABLE_PROCESSED_INPUT | ENABLE_QUICK_EDIT_MODE)) |
+            ENABLE_PROCESSED_INPUT | ENABLE_QUICK_EDIT_MODE |
+            ENABLE_VIRTUAL_TERMINAL_INPUT)) |
             ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS;
     else configured |= ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT;
     if (!SetConsoleMode(native_console->input, configured)) return LIB_STATUS_IO_ERROR;
