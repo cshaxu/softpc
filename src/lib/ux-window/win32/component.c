@@ -42,6 +42,7 @@ typedef struct ux_win32_window_context {
     int client_width;
     int client_height;
     lib_bool mouse_capturable;
+    HCURSOR transparent_cursor;
 } ux_win32_window_context;
 
 static ux_win32_window_context *win32_window_context(HWND window)
@@ -66,6 +67,29 @@ static int win32_window_emit(ux_win32_window_context *context,
 static int win32_window_emit_normalized(void *opaque, const ux_event *event)
 {
     return win32_window_emit((ux_win32_window_context *)opaque, event);
+}
+
+static HCURSOR win32_window_create_transparent_cursor(void)
+{
+    unsigned char and_mask[32u * 4u];
+    unsigned char xor_mask[32u * 4u];
+
+    /* AND=1, XOR=0 preserves every underlying pixel, which is a transparent
+       monochrome cursor.  Unlike SetCursor(NULL), this is an actual cursor
+       image for remote-desktop cursor transport. */
+    memset(and_mask, 0xff, sizeof(and_mask));
+    memset(xor_mask, 0, sizeof(xor_mask));
+    return CreateCursor(GetModuleHandleA(NULL), 0, 0, 32, 32,
+        and_mask, xor_mask);
+}
+
+static void win32_window_set_client_cursor(
+    const ux_win32_window_context *context, int captured)
+{
+    if (captured && context != NULL && context->transparent_cursor != NULL)
+        SetCursor(context->transparent_cursor);
+    else
+        SetCursor(LoadCursorA(NULL, IDC_ARROW));
 }
 
 static void win32_window_destroy_surface(ux_win32_window_context *context)
@@ -402,7 +426,7 @@ static void win32_window_capture_mouse(HWND window,
     if (!win32_window_accepting_input(context) || context->mouse_capturable ==
         LIB_FALSE) return;
     if (!ux_win32_mouse_capture(&context->mouse, window, position)) return;
-    SetCursor(NULL);
+    win32_window_set_client_cursor(context, 1);
 }
 
 static void win32_window_consume_frame(HWND window,
@@ -533,8 +557,9 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
             win32_window_mouse(window, context, lparam, 0);
         return 0;
     case WM_SETCURSOR:
-        if (ux_win32_mouse_captured(&context->mouse) && LOWORD(lparam) == HTCLIENT) {
-            SetCursor(NULL);
+        if (LOWORD(lparam) == HTCLIENT) {
+            win32_window_set_client_cursor(context,
+                ux_win32_mouse_captured(&context->mouse));
             return TRUE;
         }
         break;
@@ -599,6 +624,8 @@ static void win32_window_destroy(ux_win32_window_context *context, HWND window)
 {
     if (window != NULL && IsWindow(window)) DestroyWindow(window);
     win32_window_destroy_surface(context);
+    if (context != NULL && context->transparent_cursor != NULL)
+        DestroyCursor(context->transparent_cursor);
     if (context != NULL) free(context->frame);
     free(context);
 }
@@ -624,7 +651,10 @@ static DWORD WINAPI ux_window_worker(void *opaque)
     ZeroMemory(&klass, sizeof(klass));
     klass.lpfnWndProc = win32_window_proc;
     klass.hInstance = GetModuleHandleA(NULL);
-    klass.hCursor = LoadCursorA(NULL, IDC_ARROW);
+    /* Client cursor selection is explicit in WM_SETCURSOR.  A class arrow
+       would be restored by Windows (and, in practice, an RDP client) as the
+       pointer moves, defeating guest capture. */
+    klass.hCursor = NULL;
     klass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
     klass.lpszClassName = "SoftPCUxWindow";
     if (RegisterClassA(&klass) == 0 && GetLastError() != ERROR_CLASS_ALREADY_EXISTS) {
@@ -641,6 +671,7 @@ static DWORD WINAPI ux_window_worker(void *opaque)
         SetEvent(state->ready);
         return 0u;
     }
+    context->transparent_cursor = win32_window_create_transparent_cursor();
     state->startup_status = LIB_STATUS_OK;
     ux_win32_mouse_reset(&context->mouse);
     SendMessageA(window, WIN32_WINDOW_MAILBOX_READY, 0, 0);
