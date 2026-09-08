@@ -1,6 +1,6 @@
 #include "lib/base/base.h"
-#include "lib/ux/internal/mailbox_native.h"
-#include "lib/ux/internal/linux_presenter_wake.h"
+#include "lib/ux-base/mailbox_native.h"
+#include "lib/ux-base/linux/mailbox_wake.h"
 
 struct ux_mailbox_native {
     int read_fd;

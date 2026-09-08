@@ -23,7 +23,7 @@ set(LIBRARY_UX_SOURCES
     ux/presenter.c)
 if(WIN32)
     list(APPEND LIBRARY_UX_SOURCES
-        ux/win32/mailbox.c
+        ux-base/win32/mailbox.c
         ux-base/win32/actions.c
         ux-base/win32/color.c
         ux-console/win32/console.c
@@ -33,7 +33,7 @@ if(WIN32)
         ux/win32/runner.c
         ux-window/win32/window.c)
 else()
-    list(APPEND LIBRARY_UX_SOURCES ux/linux/mailbox.c ux-console/linux/console.c)
+    list(APPEND LIBRARY_UX_SOURCES ux-base/linux/mailbox.c ux-console/linux/console.c)
 endif()
 add_library(ux STATIC ${LIBRARY_UX_SOURCES})
 library_root(ux)

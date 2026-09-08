@@ -1,5 +1,5 @@
-#include "lib/ux/internal/mailbox_native.h"
-#include "lib/ux/internal/win32_presenter_wake.h"
+#include "lib/ux-base/mailbox_native.h"
+#include "lib/ux-base/win32/mailbox_wake.h"
 
 #ifdef _WIN32
 #include <windows.h>

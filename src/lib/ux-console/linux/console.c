@@ -1,7 +1,7 @@
 #include "lib/base/base.h"
 #include "lib/ux-console/linux/console.h"
 #include "lib/ux-base/linux/input.h"
-#include "lib/ux/internal/linux_presenter_wake.h"
+#include "lib/ux-base/linux/mailbox_wake.h"
 #include "lib/ux/internal/presenter_internal.h"
 
 #if !defined(_WIN32)
