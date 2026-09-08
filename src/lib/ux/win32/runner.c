@@ -3,7 +3,7 @@
 
 #ifdef _WIN32
 #include "lib/ux/internal/win32_console.h"
-#include "lib/ux/internal/win32_window.h"
+#include "lib/ux-window/win32/window.h"
 
 ux_run_result ux_run(const ux_binding *binding)
 {

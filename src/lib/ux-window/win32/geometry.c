@@ -1,4 +1,4 @@
-#include "lib/ux/internal/win32_geometry.h"
+#include "lib/ux-window/win32/geometry.h"
 
 #ifdef _WIN32
 int ux_win32_display_rect(int client_width, int client_height,
@@ -31,11 +31,6 @@ void ux_win32_map_dirty_rect(const RECT *source, const RECT *display,
         (int)source_height - 1) / (int)source_height;
     if (target->right <= target->left) target->right = target->left + 1;
     if (target->bottom <= target->top) target->bottom = target->top + 1;
-}
-
-COLORREF ux_win32_colorref_from_rgb(uint32_t rgb)
-{
-    return RGB((rgb >> 16u) & 0xffu, (rgb >> 8u) & 0xffu, rgb & 0xffu);
 }
 
 int ux_win32_resize_client(HWND window, uint32_t width,

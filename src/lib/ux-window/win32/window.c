@@ -1,13 +1,13 @@
 #include "lib/base/base.h"
-#include "lib/ux/internal/win32_window.h"
+#include "lib/ux-window/win32/window.h"
 
 #ifdef _WIN32
 #include "lib/ux-base/win32/actions.h"
-#include "lib/ux/internal/win32_geometry.h"
+#include "lib/ux-window/win32/geometry.h"
 #include "lib/ux-base/win32/input.h"
 #include "lib/ux/internal/presenter_internal.h"
 #include "lib/ux/internal/win32_presenter_wake.h"
-#include "lib/ux/internal/win32_mouse.h"
+#include "lib/ux-window/win32/mouse.h"
 
 #include <windows.h>
 #include <stdlib.h>

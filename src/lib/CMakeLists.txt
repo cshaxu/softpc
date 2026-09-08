@@ -25,12 +25,13 @@ if(WIN32)
     list(APPEND LIBRARY_UX_SOURCES
         ux/win32/mailbox.c
         ux-base/win32/actions.c
+        ux-base/win32/color.c
         ux/win32/console.c
-        ux/win32/geometry.c
+        ux-window/win32/geometry.c
         ux-base/win32/input.c
-        ux/win32/mouse.c
+        ux-window/win32/mouse.c
         ux/win32/runner.c
-        ux/win32/window.c)
+        ux-window/win32/window.c)
 else()
     list(APPEND LIBRARY_UX_SOURCES ux/linux/mailbox.c ux/linux/console.c)
 endif()

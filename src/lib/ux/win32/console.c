@@ -3,7 +3,7 @@
 
 #ifdef _WIN32
 #include "lib/ux-base/win32/actions.h"
-#include "lib/ux/internal/win32_geometry.h"
+#include "lib/ux-base/win32/color.h"
 #include "lib/ux-base/win32/input.h"
 #include "lib/ux/internal/presenter_internal.h"
 #include "lib/ux/internal/win32_presenter_wake.h"
