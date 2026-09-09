@@ -264,12 +264,20 @@ int app_control_queue_take(app_control_queue *queue,
 }
 
 int app_control_accept_ux_event(const app_control_event *event,
-    uint32_t current_run_generation, int guest_input_active)
+    uint32_t current_run_generation, app_runtime_state runtime_state)
 {
+    const ux_input_event *input;
+
     if (event == NULL || event->kind != APP_CONTROL_UX_INPUT ||
-        !guest_input_active) return 0;
-    return event->run_generation == 0u || event->run_generation ==
-        current_run_generation;
+        (event->run_generation != 0u && event->run_generation !=
+            current_run_generation)) return 0;
+    if (runtime_state == SOFTPC_RUNTIME_RUNNING) return 1;
+    if (runtime_state != SOFTPC_RUNTIME_PAUSED) return 0;
+    input = &event->value.ux;
+    return input->type == UX_EVENT_WINDOW_CLOSE ||
+        input->type == UX_EVENT_SOURCE_RETIRED ||
+        (input->type == UX_EVENT_KEY && input->data.key.pressed == 0u) ||
+        (input->type == UX_EVENT_MOUSE && input->data.mouse.buttons == 0u);
 }
 
 static void app_control_forget_pressed(app_control_queue *queue,

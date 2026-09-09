@@ -305,7 +305,10 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                      * enter the already-stopped machine path. */
                     if (!app_control_accept_ux_event(&control_event,
                             app_runtime_run_generation(runtime),
-                            state != SOFTPC_MONITOR_STOPPED))
+                            state == SOFTPC_MONITOR_RUNNING ?
+                                SOFTPC_RUNTIME_RUNNING :
+                            state == SOFTPC_MONITOR_PAUSED ?
+                                SOFTPC_RUNTIME_PAUSED : SOFTPC_RUNTIME_STOPPED))
                         continue;
                     if (!app_monitor_handle_ux(control_queue, runtime, presenter,
                             state, &control_event.value.ux))

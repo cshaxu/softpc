@@ -62,7 +62,25 @@ static int win32_window_accepting_input(const ux_win32_window_context *context)
         atomic_load_explicit(&context->component->base.stopping, memory_order_acquire) == 0;
 }
 
+/* Frozen is an application-requested input boundary. It is deliberately
+ * separate from component lifetime: Window close and capture-release cleanup
+ * still use accepting_input(), but no new guest input or registered hotkey
+ * may leave a frozen Window. */
+static int win32_window_accepting_guest_input(
+    const ux_win32_window_context *context)
+{
+    return win32_window_accepting_input(context) &&
+        context->frozen == LIB_FALSE;
+}
+
 static int win32_window_emit(ux_win32_window_context *context,
+    const ux_input_event *event)
+{
+    return !win32_window_accepting_guest_input(context) ? 0 :
+        ux_component_emit(&context->component->base, event);
+}
+
+static int win32_window_emit_lifecycle(ux_win32_window_context *context,
     const ux_input_event *event)
 {
     return !win32_window_accepting_input(context) ? 0 :
@@ -409,7 +427,7 @@ static void win32_window_emit_mouse(ux_win32_window_context *context,
 {
     ux_event event = { 0 };
 
-    if (!win32_window_accepting_input(context)) return;
+    if (!win32_window_accepting_guest_input(context)) return;
     event.type = UX_EVENT_MOUSE;
     event.data.mouse.delta_x = dx;
     event.data.mouse.delta_y = dy;
@@ -451,7 +469,7 @@ static void win32_window_mouse(HWND window, ux_win32_window_context *context,
     int dx = 0;
     int dy = 0;
 
-    if (!win32_window_accepting_input(context) ||
+    if (!win32_window_accepting_guest_input(context) ||
         !ux_win32_mouse_move(&context->mouse, position, context->client_width,
             context->client_height, context->surface_width, context->surface_height,
             &dx, &dy)) return;
@@ -485,7 +503,7 @@ static void win32_window_release_mouse(ux_win32_window_context *context)
 static void win32_window_capture_mouse(HWND window,
     ux_win32_window_context *context, LPARAM position)
 {
-    if (!win32_window_accepting_input(context) || context->frozen != LIB_FALSE)
+    if (!win32_window_accepting_guest_input(context))
         return;
     if (!ux_win32_mouse_capture(&context->mouse, window, position)) return;
     win32_window_set_client_cursor(context, 1);
@@ -602,16 +620,16 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         return TRUE;
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
-        if (win32_window_accepting_input(context))
+        if (win32_window_accepting_guest_input(context))
             win32_window_transition(context, wparam, lparam, 0);
         return 0;
     case WM_KEYUP:
     case WM_SYSKEYUP:
-        if (win32_window_accepting_input(context))
+        if (win32_window_accepting_guest_input(context))
             win32_window_transition(context, wparam, lparam, 1);
         return 0;
     case WM_CHAR:
-        if (win32_window_accepting_input(context) &&
+        if (win32_window_accepting_guest_input(context) &&
             ((uint32_t)lparam >> 16u & 0xffu) == 0u &&
             !ux_win32_keyboard_consume_duplicate_character(&context->keyboard_normalizer,
                 (WORD)wparam))
@@ -630,7 +648,7 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         }
         break;
     case WM_LBUTTONDOWN:
-        if (!win32_window_accepting_input(context)) return 0;
+        if (!win32_window_accepting_guest_input(context)) return 0;
         /* The first client click is the host-only capture gesture.  Guest
          * button state starts only with a later click while already captured. */
         if (!ux_win32_mouse_captured(&context->mouse)) {
@@ -642,7 +660,7 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         win32_window_mouse(window, context, lparam, 1);
         return 0;
     case WM_LBUTTONUP:
-        if (!win32_window_accepting_input(context)) return 0;
+        if (!win32_window_accepting_guest_input(context)) return 0;
         /* A button which was never made guest-visible is the matching
          * release of the host-only capture gesture. */
         if (!ux_win32_mouse_captured(&context->mouse) || !context->left_button)
@@ -652,7 +670,7 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         win32_window_mouse(window, context, lparam, 1);
         return 0;
     case WM_RBUTTONDOWN:
-        if (!win32_window_accepting_input(context)) return 0;
+        if (!win32_window_accepting_guest_input(context)) return 0;
         if (!ux_win32_mouse_captured(&context->mouse)) {
             win32_window_capture_mouse(window, context, lparam);
             return 0;
@@ -662,7 +680,7 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         win32_window_mouse(window, context, lparam, 1);
         return 0;
     case WM_RBUTTONUP:
-        if (!win32_window_accepting_input(context)) return 0;
+        if (!win32_window_accepting_guest_input(context)) return 0;
         if (!ux_win32_mouse_captured(&context->mouse) || !context->right_button)
             return 0;
         win32_window_flush_mouse(context);
@@ -676,7 +694,7 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         { ux_input_event close_event = { 0 };
         win32_window_release_mouse(context);
         close_event.type = UX_EVENT_WINDOW_CLOSE;
-        (void)win32_window_emit(context, &close_event); }
+        (void)win32_window_emit_lifecycle(context, &close_event); }
         return 0;
     case WM_DESTROY:
         win32_window_release_mouse(context);

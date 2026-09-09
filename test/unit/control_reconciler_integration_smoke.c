@@ -46,7 +46,7 @@ int main(void)
     take(queue, &event); assert(event.kind == APP_CONTROL_BROKER_COMPLETED &&
         event.value.broker_vm_console_current);
     take(queue, &event); assert(event.kind == APP_CONTROL_UX_INPUT &&
-        app_control_accept_ux_event(&event, 7u, 1));
+        app_control_accept_ux_event(&event, 7u, SOFTPC_RUNTIME_RUNNING));
     take(queue, &event); assert(event.kind == APP_CONTROL_BROKER_COMPLETED &&
         !event.value.broker_vm_console_current);
     take(queue, &event); assert(event.kind == APP_CONTROL_MONITOR_LINE);
@@ -55,15 +55,25 @@ int main(void)
        the former Console can never be delivered after Window owns a new run. */
     assert(app_control_queue_push_ux_for_run(queue, &raw_key, 6u));
     take(queue, &event);
-    assert(!app_control_accept_ux_event(&event, 7u, 1));
+    assert(!app_control_accept_ux_event(&event, 7u, SOFTPC_RUNTIME_RUNNING));
 
     /* Retirement is useful while input is active, but a late retirement after
        stop is rejected before app_control_handle_ux can touch guest input. */
     retired.type = UX_EVENT_SOURCE_RETIRED;
     retired.source_identity = raw_key.source_identity;
     assert(app_control_queue_push_ux_for_run(queue, &retired, 7u));
-    take(queue, &event); assert(app_control_accept_ux_event(&event, 7u, 1));
-    assert(!app_control_accept_ux_event(&event, 7u, 0));
+    take(queue, &event); assert(app_control_accept_ux_event(&event, 7u,
+        SOFTPC_RUNTIME_RUNNING));
+    assert(!app_control_accept_ux_event(&event, 7u, SOFTPC_RUNTIME_STOPPED));
+
+    /* A frozen Window must not affect a paused VM with a late ordinary key
+       make. Cleanup records still enter so a guest cannot retain a key or
+       mouse button across the paused boundary. */
+    assert(!app_control_accept_ux_event(&event, 7u, SOFTPC_RUNTIME_PAUSED));
+    raw_key.data.key.pressed = 0u;
+    assert(app_control_queue_push_ux_for_run(queue, &raw_key, 7u));
+    take(queue, &event); assert(app_control_accept_ux_event(&event, 7u,
+        SOFTPC_RUNTIME_PAUSED));
 
     /* A UX component's capacity failure is a product control fact, not a
        swallowed leaf-local status. The monitor consumer reports this kind. */

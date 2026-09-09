@@ -124,6 +124,12 @@ only a later client-area click may capture. `release_mouse()` remains the
 explicit non-freezing capture release operation. Title, STOP, source-retired,
 FIFO ordering, and capacity behavior do not change.
 
+A frozen Window emits no new guest key, mouse, or registered-hotkey record.
+Window-close and pre-existing input cleanup remain lifecycle records. SoftPC
+independently rejects any delayed ordinary record while paused, so asynchronous
+freeze delivery can never turn a stale key press into a fatal runtime-delivery
+failure.
+
 **Exit:** Window-local blink advances every 250 ms only when unfrozen; freeze
 releases capture and stops blinking; unfreeze waits for a click to capture;
 all old enable/disable names and mouse-enabled state are absent; x64/x86 build

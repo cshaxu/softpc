@@ -64,11 +64,11 @@ int app_control_queue_push_ux_delivery_failed(app_control_queue *queue,
     uint64_t source_identity, lib_status status, uint32_t run_generation);
 int app_control_queue_take(app_control_queue *queue,
     app_control_event *out_event, unsigned long timeout_ms);
-/* A UX producer belongs to one VM run. Once the product has stopped accepting
- * guest input, even a same-generation retirement event is too late to enter
- * the machine path. Monitor lines and completion facts use separate rules. */
+/* A UX producer belongs to one VM run. Paused accepts only cleanup/lifecycle
+ * records; ordinary guest input and product hotkeys wait for a running VM.
+ * Monitor lines and completion facts use separate rules. */
 int app_control_accept_ux_event(const app_control_event *event,
-    uint32_t current_run_generation, int guest_input_active);
+    uint32_t current_run_generation, app_runtime_state runtime_state);
 int app_control_handle_ux(app_control_queue *queue, app_runtime *runtime,
     const ux_input_event *event);
 
