@@ -2,9 +2,9 @@
 
 ## Current Work
 
-M9 T45 is active. S1 records the owner-validated interaction closeout without
-duplicating an already committed implementation; S2 repairs RDP raw-Console
-registered-hotkey normalization in the shared library. See the
+M9 T45 S2 is active: it investigates and repairs raw-Console registered
+hotkeys (CAP/CAD/CAF), with RDP as a reported environment rather than an
+assumed exclusive cause. See the
 [T45 proposal](../proposals/m9-t45-lib-ux-rdp-followups.md).
 
 ## Current Technical Baseline
@@ -27,6 +27,10 @@ registered-hotkey normalization in the shared library. See the
   `reset -> stop -> start -> pause -> resume -> running`; x64 Debug full
   CTest and x86 full CTest each passed 32/32. See [T44 history]
   (../history/M9-T44-cold-restart-lifecycle.md).
+
+- M9 T45 S1 revalidated the cold-reset boundary and the completed
+  `stop -> start` plus `reset -> pause -> resume` executor chains on x64 and
+  x86. See [S1 history](../history/M9-T45-S1-reset-pause-resume-lifecycle.md).
 
 - M9 T43 closed at S7 after owner acceptance of raw Console recovery. S7
   supersedes the S6 foreground experiment: successful raw host activation

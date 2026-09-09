@@ -2,26 +2,32 @@
 
 ## Purpose
 
-Close the owner-validated pre-admission interaction repair without rewriting
-its already-committed implementation history, then repair the separately
-reported RDP raw-Console registered-hotkey path.  The work is limited to the
-shared host/UX library and its deterministic probes.  SoftPC remains the
-owner of all hotkey meanings and guest-input mapping.
+Close the reset/pause/resume lifecycle repair, then repair the separately
+reported raw-Console registered-hotkey path. SoftPC remains the owner of all
+lifecycle and hotkey meanings and guest-input mapping.
 
-## S1 — Owner-validated interaction closeout
+## S1 — Reset, pause, and resume lifecycle
 
-The owner reports the immediately preceding interaction defect resolved.  The
-working tree contains no uncommitted implementation for that repair: its code
-and package evidence were already committed before this T45 admission.  S8
-therefore records the acceptance and leaves the source tree untouched.  It
-does not re-label or duplicate the earlier task's code commit.
+The owner reported that `reset -> resume` could strand the VM at BIOS and
+`stop -> start` could fail.  The implementation in `010c401` makes public
+standalone reset a cold reset while retaining the original guest hardware warm
+reset path.  Its real executor proof covers `stop -> start -> running` and
+`reset -> stop -> start -> pause -> resume -> running`.
 
-**Exit:** this P1 record is committed and pushed; the worktree remains clean.
+S1 independently reviews that implementation against the task boundary,
+records the focused x64/x86 evidence, refreshes the package only if a rebuild
+is required, and closes without changing MVDM source or reinterpreting guest
+hardware reset.
 
-## S2 — RDP raw-Console registered hotkeys
+**Exit:** the cold-reset boundary and both completed lifecycle chains are
+reviewed and evidenced for x64 and x86; the result is committed and pushed
+with a clean worktree.
 
-When a VM raw Console is active through RDP, registered Ctrl+Alt+D and
-Ctrl+Alt+P may fail even though ordinary raw keys work.  Win32 `INPUT_RECORD`
+## S2 — Raw-Console registered hotkeys
+
+When a VM raw Console is active, registered Ctrl+Alt+D, Ctrl+Alt+P, and
+Ctrl+Alt+F may fail even though ordinary raw keys work. RDP is the reported
+environment, not an assumed exclusive trigger. Win32 `INPUT_RECORD`
 already supplies the per-record Ctrl/Alt state in `dwControlKeyState`; host
 copies it into the platform-neutral `lib_console_raw_key.modifiers` field.
 The current `ux-console` adapter discards that field, and the common Win32
