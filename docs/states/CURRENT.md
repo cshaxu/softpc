@@ -4,18 +4,18 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T43 S1 active |
-| Admission And Approval | Owner admitted T43 as the post-T42 shared-library test/repair task and specified S1. |
-| Objective | Complete the native focus handoff from a focused `ux-window` to the host Current Console when the Console broker activates either raw VM input or cooked monitor input. |
-| Non-goals | No SoftPC product decision, app queue/reconciler change, MVDM change, Console ownership-policy change, Window behavior change, configuration/media modification, or NXVM runtime dependency. |
-| Affected Boundaries | `src/lib/host/win32/console.*`, the host-native Console contract if needed, focused host/broker tests, and T43 task records only. Product code requests an existing broker replacement and does not call a Win32 focus API. |
+| Identifier Mode | M9 T43 S2 active |
+| Admission And Approval | Owner authorized serial execution of T43 S1–S4, with an exit-condition audit and push required before each subtask transition. S1 is closed. |
+| Objective | Close the shared-library README and manifest contract around the delivered `ux-base` / `ux-window` / `ux-console` split. |
+| Non-goals | No UX behavior, mailbox algorithm, product policy, MVDM, configuration, media, or package-executable change. S3 owns any mailbox implementation change. |
+| Affected Boundaries | Shared-library README/public contract comments, manifest metadata, source-boundary documentation test, and T43 task records. |
 | Applicable Rules | Execution, architecture, coding, and documentation authorities; [T43 proposal](../proposals/m9-t43-lib-console-ux-test-repairs.md); [System Architecture](../design/ARCHITECTURE.md); [Product UX](../design/UI.md). |
-| Focused Verification | Prove through the native Console seam that a successful raw and cooked activation requests native Console input focus exactly once after the new binding/reader is active; preparation failure, failed activation, and output-only paths do not request focus. |
-| Full Regression | Build and run focused host tests, then x64 and x86 full CTest/package builds. Preserve `assets/binary/softpc.ini` and guest media. |
-| Similar-Issue Sweep | Inspect every Current Console activation path—initial cooked creation, raw replacement, cooked restoration, and failed-replacement restoration—to establish one focus request per successful active binding without product-side Win32 calls. |
-| Stop Conditions | Stop for owner direction if Windows cannot reliably focus the process Console without an app/product decision, if the change would require foreground-stealing policy beyond the Current Console activation contract, or if a MVDM change is implicated. |
-| Exit Criteria | Broker activation gives its Current Console native input focus symmetrically with Window creation; failure paths leave focus untouched; dual-width evidence passes; owner validates Window-to-Console interaction. |
-| Original Owner Request | “补齐 Window → Console 的原生焦点交接…应修在 `host/win32/console` 内部；产品只请求切换，不碰 Win32 API。” |
+| Focused Verification | Audit every shared-library README/manifest/public contract assertion against the actual component source and CMake dependencies; prove no obsolete unified-presenter terminology or prohibited dependency remains. |
+| Full Regression | Documentation governance, library manifest, source-boundary checks, then x64/x86 focused documentation/manifest CTest. Preserve `assets/binary/softpc.ini` and media. |
+| Similar-Issue Sweep | Compare component CMake targets, public headers, mailbox implementation, and lifecycle tests so documentation names the implemented capacity, error, FIFO/STOP, latest-frame, identity, retirement, and neutral Console contracts exactly. |
+| Stop Conditions | Stop for owner direction if accurate documentation would expose an implementation-contract deficiency; record that deficiency for S3 or a new subtask rather than silently rewriting behavior. |
+| Exit Criteria | README/manifest and source-boundary proof accurately describe the split UX graph and all required contracts; no legacy unified-presenter wording remains; verification passes. |
+| Original Owner Request | “必修：收口 README 与 manifest…明确 `ux-base + ux-window + ux-console` 的实际依赖图…写清 mailbox/frame/source identity/logical Console 契约。” |
 
 ## Current Technical Baseline
 
@@ -29,6 +29,13 @@
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T43 S1 closed native Current Console focus handoff. The generic broker
+  requests focus only after a raw/cooked binding and reader are active; the
+  Win32 leaf performs the best-effort Console focus request. Broker seam tests
+  cover initial activation, replacement, restoration, and non-committing
+  failure paths. Fresh x64/x86 full CTest each passed 30/30. See [S1 history]
+  (../history/M9-T43-S1-console-focus-handoff.md).
 
 - M9 T42 S5 closed with the SoftPC monitor/derived-state reconciler, immutable
   two-buffer frame publication, unchanged-text publication gate, staged

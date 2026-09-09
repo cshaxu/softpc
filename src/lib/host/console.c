@@ -116,6 +116,7 @@ static lib_status host_console_activate_bound(host_console_broker *broker,
     status = host_console_native_activate(broker->native_console, console, mode,
         generation);
     if (status != LIB_STATUS_OK) lib_console_invalidate_binding(console);
+    else host_console_native_request_focus(broker->native_console);
     return status;
 }
 
