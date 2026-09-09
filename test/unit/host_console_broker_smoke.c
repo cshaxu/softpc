@@ -17,6 +17,7 @@ struct host_console_native {
 
 static int host_console_fail_next_activation;
 static int host_console_fail_next_prepare;
+static int host_console_fail_next_retirement;
 static int host_console_prepare_saw_active;
 static int host_console_wait_for_callback;
 #ifdef _WIN32
@@ -65,14 +66,19 @@ lib_status host_console_native_activate(host_console_native *native_console,
     return LIB_STATUS_OK;
 }
 
-void host_console_native_deactivate(host_console_native *native_console)
+lib_status host_console_native_deactivate(host_console_native *native_console)
 {
+    if (host_console_fail_next_retirement) {
+        host_console_fail_next_retirement = 0;
+        return LIB_STATUS_IO_ERROR;
+    }
 #ifdef _WIN32
     if (host_console_wait_for_callback)
         assert(WaitForSingleObject(host_console_callback_finished, INFINITE) ==
             WAIT_OBJECT_0);
 #endif
     native_console->active = LIB_NULL;
+    return LIB_STATUS_OK;
 }
 
 lib_status host_console_native_request_cooked_line(
@@ -164,6 +170,22 @@ int main(void)
     assert(host_console_prepare_saw_active);
     assert(lib_console_write_text(first, "a", 1u) == LIB_STATUS_NOT_CURRENT);
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_OK);
+    /* Reader retirement is an explicit transaction boundary.  A failed
+       retirement keeps the previous Current Console completely usable. */
+    host_console_fail_next_retirement = 1;
+    assert(host_console_replace_active(broker, second, first,
+        HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);
+    assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_OK);
+    /* The one native path is mode-agnostic: all four replacement pairs use
+       the same retirement-before-activation contract. */
+    assert(host_console_replace_active(broker, second, first,
+        HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_OK);
+    assert(host_console_replace_active(broker, first, second,
+        HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_OK);
+    assert(host_console_replace_active(broker, second, first,
+        HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK);
+    assert(host_console_replace_active(broker, first, second,
+        HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK);
     host_console_fail_next_prepare = 1;
     host_console_prepare_saw_active = 0;
     assert(host_console_replace_active(broker, second, first,

@@ -20,7 +20,10 @@ lib_status host_console_native_activate(host_console_native *native_console,
  * keeps a completed `start` line from racing a later raw-Console takeover. */
 lib_status host_console_native_request_cooked_line(
     host_console_native *native_console);
-void host_console_native_deactivate(host_console_native *native_console);
+/* Retire the current native reader before a broker can invalidate its logical
+ * binding or activate another one.  Failure leaves the current native object
+ * intact, so a replacement remains an all-or-nothing ownership transaction. */
+lib_status host_console_native_deactivate(host_console_native *native_console);
 /* The broker holds this gate across an indivisible native takeover.  Bound
  * writers take the same gate and validate their logical Console/generation
  * after it opens, so an old write can never land on a new Current Console. */

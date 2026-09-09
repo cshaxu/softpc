@@ -157,7 +157,7 @@ lib_status host_console_native_create(host_console_native **out_native)
 void host_console_native_destroy(host_console_native *native_console)
 {
     if (native_console == LIB_NULL) return;
-    host_console_native_deactivate(native_console);
+    (void)host_console_native_deactivate(native_console);
     if (native_console->input != INVALID_HANDLE_VALUE) CloseHandle(native_console->input);
     if (native_console->output != INVALID_HANDLE_VALUE) CloseHandle(native_console->output);
     DeleteCriticalSection(&native_console->output_lock);
@@ -291,30 +291,59 @@ lib_status host_console_native_request_cooked_line(
     return host_console_start_reader(native_console);
 }
 
-void host_console_native_deactivate(host_console_native *native_console)
+static lib_status host_console_retire_reader(host_console_native *native_console)
 {
-    if (native_console == LIB_NULL) return;
-    if (native_console->reader != NULL) {
-        (void)SetEvent(native_console->stop_event);
-        /* Cooked ReadConsoleA is line-buffered.  CancelSynchronousIo alone
-         * is not reliable for that Console operation under all terminal
-         * hosts: it can otherwise remain blocked until the user presses
-         * Enter, consuming and then discarding that whole line while a raw
-         * VM Console is waiting to take ownership.  Cancel the input-handle
-         * I/O process-wide first; the reader-thread cancellation remains a
-         * compatible fallback for a pending raw ReadConsoleInput call. */
-        (void)CancelIoEx(native_console->input, NULL);
-        (void)CancelSynchronousIo(native_console->reader);
-        (void)WaitForSingleObject(native_console->reader, INFINITE);
-        CloseHandle(native_console->reader);
+    DWORD completed;
+
+    if (native_console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    if (native_console->reader == NULL) return LIB_STATUS_OK;
+    if (native_console->stop_event == NULL ||
+        !SetEvent(native_console->stop_event)) return LIB_STATUS_IO_ERROR;
+    /* A reader owns the process Console until it has exited.  Cancellation is
+       deliberately best effort because Console implementations differ; the
+       completion observation below is the actual ownership proof. */
+    (void)CancelIoEx(native_console->input, NULL);
+    (void)CancelSynchronousIo(native_console->reader);
+    completed = WaitForSingleObject(native_console->reader, 0u);
+    if (completed == WAIT_TIMEOUT && native_console->mode == HOST_CONSOLE_COOKED_LINES) {
+        INPUT_RECORD wake = { 0 };
+        DWORD written = 0u;
+        /* Some terminal hosts do not interrupt a line-buffered ReadConsoleA
+           even after both documented cancellation requests.  Supply the
+           terminating record ourselves while the old reader is still the
+           sole owner.  It observes stop_event and discards this synthetic
+           line; the new binding cannot observe it. */
+        wake.EventType = KEY_EVENT;
+        wake.Event.KeyEvent.bKeyDown = TRUE;
+        wake.Event.KeyEvent.wRepeatCount = 1u;
+        wake.Event.KeyEvent.wVirtualKeyCode = VK_RETURN;
+        wake.Event.KeyEvent.wVirtualScanCode = (WORD)MapVirtualKeyA(VK_RETURN,
+            MAPVK_VK_TO_VSC);
+        wake.Event.KeyEvent.uChar.AsciiChar = '\r';
+        if (!WriteConsoleInputA(native_console->input, &wake, 1u, &written) ||
+            written != 1u) return LIB_STATUS_IO_ERROR;
     }
-    if (native_console->stop_event != NULL) CloseHandle(native_console->stop_event);
+    completed = WaitForSingleObject(native_console->reader, INFINITE);
+    if (completed != WAIT_OBJECT_0) return LIB_STATUS_IO_ERROR;
+    CloseHandle(native_console->reader);
     native_console->reader = NULL;
-    native_console->stop_event = NULL;
     InterlockedExchange(&native_console->cooked_line_pending, 0);
+    return LIB_STATUS_OK;
+}
+
+lib_status host_console_native_deactivate(host_console_native *native_console)
+{
+    lib_status status;
+
+    if (native_console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    status = host_console_retire_reader(native_console);
+    if (status != LIB_STATUS_OK) return status;
+    if (native_console->stop_event != NULL) CloseHandle(native_console->stop_event);
+    native_console->stop_event = NULL;
     native_console->console = LIB_NULL;
     native_console->generation = 0u;
     (void)SetConsoleMode(native_console->input, native_console->original_mode);
+    return LIB_STATUS_OK;
 }
 
 void host_console_native_lock_output(host_console_native *native_console)

@@ -220,7 +220,17 @@ lib_status host_console_replace_active(host_console_broker *broker,
     /* Every bound writer blocks behind this native gate. Once it opens,
        validation makes an old write NOT_CURRENT and a next write current. */
     host_console_native_lock_output(broker->native_console);
-    host_console_native_deactivate(broker->native_console);
+    status = host_console_native_deactivate(broker->native_console);
+    if (status != LIB_STATUS_OK) {
+        /* The old reader/binding is still current.  Do not invalidate it or
+           expose the prepared next binding as an alternative input owner. */
+        host_console_native_unlock_output(broker->native_console);
+        host_console_native_discard_prepare(broker->native_console);
+        host_console_remove_output_binding(next, next_output);
+        lib_console_release(next);
+        host_console_unlock(broker);
+        return status;
+    }
     lib_console_invalidate_binding(old);
     status = host_console_activate_bound(broker, next, next_mode, next_generation);
     if (status != LIB_STATUS_OK) {
@@ -271,7 +281,7 @@ void host_console_broker_destroy(host_console_broker *broker)
     broker->current = LIB_NULL;
     broker->current_output = LIB_NULL;
     host_console_native_lock_output(broker->native_console);
-    host_console_native_deactivate(broker->native_console);
+    (void)host_console_native_deactivate(broker->native_console);
     if (current != LIB_NULL) lib_console_invalidate_binding(current);
     host_console_native_unlock_output(broker->native_console);
     host_console_unlock(broker);

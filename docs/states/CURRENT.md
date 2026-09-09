@@ -2,10 +2,14 @@
 
 ## Current Work
 
-No implementation subtask is active. M9 T47 S1 closed after owner acceptance
-of [Frozen Window hotkey recovery]
-(../history/M9-T47-S1-frozen-window-hotkey-recovery.md). T47 S2 requires a
-separate owner-provided scope before admission.
+M9 T47 S2 is active: [Win3.1 Prompt raw-Console recovery]
+(../proposals/m9-t47-win31-prompt-raw-console-recovery.md). It changes only
+the shared host Console broker's native-reader retirement/activation contract
+and its focused proof. `src/mvdm/softpc.new/`, SoftPC reconciler, UX key
+normalization, monitor semantics, guest media, and user-owned
+`assets/binary/softpc.ini` are out of scope. Closure requires the focused
+barrier test, x64/x86 full CTest, refreshed executable pair, committed/pushed
+evidence, and a clean worktree.
 
 ## Current Technical Baseline
 
