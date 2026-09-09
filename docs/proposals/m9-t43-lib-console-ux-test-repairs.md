@@ -104,12 +104,38 @@ timing assumptions.
 bounded newly added test; the evidence states exactly what it proves and what
 it intentionally does not prove.
 
+## S5 — Window cursor blink and freeze API
+
+The recovered MVDM cursor contract exposes guest cursor position, shape, and
+enabled state.  It does not expose a blink phase; the original `nt_graph`
+Console path lets native Console/Terminal rendering blink independently.
+`ux-window` therefore owns the equivalent Window-only drawing cadence: when
+unfrozen, it toggles its drawn guest cursor every 250 ms using its existing
+Window worker wait deadline.  SoftPC runtime keeps `cursor_phase=1` and does
+not publish timer-only frames.  `ux-console` retains native Console behavior.
+
+Rename the Window mouse-control contract around its actual lifecycle meaning:
+`enable_mouse()` becomes `unfreeze()` and `disable_mouse()` becomes
+`freeze()`.  Rename the backing flag to `frozen`. `freeze()` atomically queues
+the frozen state followed by mouse release; it prevents capture and freezes the
+Window cursor at its current visible/hidden state. `unfreeze()` clears frozen
+but never captures a mouse;
+only a later client-area click may capture. `release_mouse()` remains the
+explicit non-freezing capture release operation. Title, STOP, source-retired,
+FIFO ordering, and capacity behavior do not change.
+
+**Exit:** Window-local blink advances every 250 ms only when unfrozen; freeze
+releases capture and stops blinking; unfreeze waits for a click to capture;
+all old enable/disable names and mouse-enabled state are absent; x64/x86 build
+and full CTest evidence passes.
+
 ## Boundaries
 
-- May change: generic `lib/host/win32` Console implementation and its narrow
-  host/broker tests.
-- Must not change: `src/mvdm/softpc.new/**`, SoftPC app/reconciler policy,
-  Window component behavior, package configuration, guest media, or native
+- May change: `lib/ux-window` public/control/native Window implementation,
+  its narrow tests, the SoftPC presentation binding, shared-library manifest,
+  and refreshed executable packages.
+- Must not change: `src/mvdm/softpc.new/**`, guest timer/device behavior,
+  Console ownership policy, package configuration, guest media, or native
   focus calls outside `lib/host/win32`.
 - The shared library remains platform-neutral above the Win32 leaf; a future
   Linux leaf may implement the same logical activation contract separately.

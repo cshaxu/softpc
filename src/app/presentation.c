@@ -80,14 +80,13 @@ static int app_presentation_create_window(app_presentation_context *context)
     options.component.failure_context = context;
     options.component.failure_sink = app_presentation_delivery_failed;
     options.component.hotkeys = context->hotkeys;
-    options.initial_mouse_enabled = context->displayed_state ==
-        SOFTPC_RUNTIME_RUNNING;
+    options.initial_frozen = context->displayed_state != SOFTPC_RUNTIME_RUNNING;
     if (ux_window_create(&context->window, &options) != LIB_STATUS_OK)
         return 0;
     context->window_delivered_frame_sequence = 0u;
     app_presentation_publish_title(context);
     if (context->displayed_state == SOFTPC_RUNTIME_RUNNING)
-        (void)ux_window_enable_mouse(context->window);
+        (void)ux_window_unfreeze(context->window);
     return 1;
 }
 
@@ -298,9 +297,9 @@ void app_presentation_note_runtime_completed(app_presentation *presentation,
     app_presentation_publish_title(presentation);
     if (presentation->window != NULL) {
         if (state == SOFTPC_RUNTIME_RUNNING)
-            (void)ux_window_enable_mouse(presentation->window);
+            (void)ux_window_unfreeze(presentation->window);
         else if (state == SOFTPC_RUNTIME_PAUSED)
-            (void)ux_window_disable_mouse(presentation->window);
+            (void)ux_window_freeze(presentation->window);
     }
     app_reconciler_note_runtime(&presentation->reducer, state);
 }

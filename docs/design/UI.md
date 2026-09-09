@@ -26,6 +26,11 @@ by the runtime. It sends normalized keyboard and mouse records to the runtime
 queue. It never decodes guest VRAM, locks a SoftPC device, waits for the
 executor, or executes a guest instruction on the UI thread.
 
+For text frames, cursor position, shape, and enabled state are copied frame
+data. The native VM Console/Terminal owns its own blink behavior. `ux-window`
+draws the corresponding guest cursor and owns a 250 ms Window-local blink
+cadence while unfrozen; no SoftPC runtime or guest timer phase is invented.
+
 The console and window are equivalent input producers. RDP is supported by
 the same normalized key path; no frontend may depend on raw local-only key
 state as its sole input source.

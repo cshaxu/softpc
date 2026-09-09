@@ -9,10 +9,9 @@ typedef struct ux_window ux_window;
 
 typedef struct ux_window_options {
     ux_component_options component;
-    /* Permission to acquire capture, not capture itself.  Supplying it with
-     * construction removes a first-click race with the Window worker's
-     * asynchronous control FIFO. */
-    lib_bool initial_mouse_enabled;
+    /* Frozen forbids capture and cursor blink.  It does not own a capture;
+     * an unfrozen Window still waits for a client-area click to acquire one. */
+    lib_bool initial_frozen;
 } ux_window_options;
 
 lib_status ux_window_create(ux_window **out_window,
@@ -20,10 +19,12 @@ lib_status ux_window_create(ux_window **out_window,
 lib_status ux_window_publish_frame(ux_window *window, const ux_frame *frame);
 void ux_window_destroy(ux_window *window);
 lib_status ux_window_set_title(ux_window *window, const char *title);
-lib_status ux_window_enable_mouse(ux_window *window);
-/* Disabling is terminal for current capture: it queues the disabled flag and
- * an explicit release in FIFO order. */
-lib_status ux_window_disable_mouse(ux_window *window);
+/* Freeze atomically prevents future capture, stops the Window-local cursor
+ * blink, and releases any current capture in FIFO order. */
+lib_status ux_window_freeze(ux_window *window);
+/* Unfreeze permits a later client-area click to capture. It never captures
+ * the mouse itself and resumes the Window-local cursor blink. */
+lib_status ux_window_unfreeze(ux_window *window);
 lib_status ux_window_release_mouse(ux_window *window);
 
 #endif

@@ -11,7 +11,7 @@
 typedef enum ux_component_control_kind {
     UX_COMPONENT_CONTROL_STOP,
     UX_COMPONENT_CONTROL_SET_WINDOW_TITLE,
-    UX_COMPONENT_CONTROL_SET_WINDOW_MOUSE_ENABLED,
+    UX_COMPONENT_CONTROL_SET_WINDOW_FROZEN,
     UX_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE
 } ux_component_control_kind;
 
@@ -19,7 +19,7 @@ typedef struct ux_component_control {
     ux_component_control_kind kind;
     union {
         char title[UX_COMPONENT_WINDOW_TITLE_CAPACITY];
-        lib_bool window_mouse_enabled;
+        lib_bool window_frozen;
     } value;
 } ux_component_control;
 

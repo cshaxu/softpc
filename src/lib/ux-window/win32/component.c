@@ -18,6 +18,7 @@
 #define WIN32_WINDOW_MOUSE_READY (WM_APP + 2u)
 #define WIN32_WINDOW_DEFAULT_WIDTH 680
 #define WIN32_WINDOW_DEFAULT_HEIGHT 560
+#define WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS 250u
 
 typedef struct ux_win32_window_context {
     ux_window *component;
@@ -43,7 +44,9 @@ typedef struct ux_win32_window_context {
     uint32_t client_surface_height;
     int client_width;
     int client_height;
-    lib_bool mouse_capturable;
+    lib_bool frozen;
+    lib_bool cursor_blink_visible;
+    DWORD cursor_blink_due;
     HCURSOR transparent_cursor;
 } ux_win32_window_context;
 
@@ -310,7 +313,7 @@ static int win32_window_cursor_rect(HWND window,
     if (window == NULL || context == NULL || cursor == NULL ||
         (frame = context->frame) == NULL || !ux_frame_is_valid(frame) ||
         frame->graphics != 0u || frame->cursor_visible == 0u ||
-        frame->cursor_phase == 0u || frame->cursor_column < 0 ||
+        frame->cursor_column < 0 ||
         frame->cursor_row < 0 || frame->cursor_column >= (lib_i32)frame->text_columns ||
         frame->cursor_row >= (lib_i32)frame->text_rows ||
         !win32_window_display_rect(context, context->surface_width,
@@ -345,9 +348,39 @@ static void win32_window_paint(HWND window, ux_win32_window_context *context,
     StretchBlt(dc, display.left, display.top, display.right - display.left,
         display.bottom - display.top, context->surface_dc, 0, 0,
         (int)context->surface_width, (int)context->surface_height, SRCCOPY);
+    if (context->cursor_blink_visible) {
+        RECT cursor;
+        if (win32_window_cursor_rect(window, context, &cursor))
+            InvertRect(dc, &cursor);
+    }
+}
+
+static void win32_window_advance_cursor_blink(HWND window,
+    ux_win32_window_context *context)
+{
     RECT cursor;
+
+    if (!win32_window_accepting_input(context) ||
+        context->frozen != LIB_FALSE) return;
+    context->cursor_blink_visible = context->cursor_blink_visible == LIB_FALSE;
+    context->cursor_blink_due = GetTickCount() + WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS;
     if (win32_window_cursor_rect(window, context, &cursor))
-        InvertRect(dc, &cursor);
+        InvalidateRect(window, &cursor, FALSE);
+}
+
+static DWORD win32_window_cursor_blink_timeout(
+    const ux_win32_window_context *context)
+{
+    DWORD now;
+
+    if (!win32_window_accepting_input(context) ||
+        context->frozen != LIB_FALSE ||
+        context->frame == NULL || !ux_frame_is_valid(context->frame) ||
+        context->frame->graphics != 0u || context->frame->cursor_visible == 0u)
+        return INFINITE;
+    now = GetTickCount();
+    return (LONG)(now - context->cursor_blink_due) >= 0 ? 0u :
+        context->cursor_blink_due - now;
 }
 
 static void win32_window_transition(ux_win32_window_context *context,
@@ -452,8 +485,8 @@ static void win32_window_release_mouse(ux_win32_window_context *context)
 static void win32_window_capture_mouse(HWND window,
     ux_win32_window_context *context, LPARAM position)
 {
-    if (!win32_window_accepting_input(context) || context->mouse_capturable ==
-        LIB_FALSE) return;
+    if (!win32_window_accepting_input(context) || context->frozen != LIB_FALSE)
+        return;
     if (!ux_win32_mouse_capture(&context->mouse, window, position)) return;
     win32_window_set_client_cursor(context, 1);
 }
@@ -509,10 +542,14 @@ static int win32_window_consume_mailboxes(HWND window,
         }
         if (control.kind == UX_COMPONENT_CONTROL_SET_WINDOW_TITLE)
             SetWindowTextA(window, control.value.title);
-        else if (control.kind == UX_COMPONENT_CONTROL_SET_WINDOW_MOUSE_ENABLED) {
-            context->mouse_capturable = control.value.window_mouse_enabled;
-            if (context->mouse_capturable == LIB_FALSE)
-                win32_window_release_mouse(context);
+        else if (control.kind == UX_COMPONENT_CONTROL_SET_WINDOW_FROZEN) {
+            context->frozen = control.value.window_frozen;
+            if (context->frozen == LIB_FALSE) {
+                context->cursor_blink_visible = LIB_TRUE;
+                context->cursor_blink_due = GetTickCount() +
+                    WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS;
+            }
+            InvalidateRect(window, NULL, FALSE);
         } else if (control.kind == UX_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE)
             win32_window_release_mouse(context);
     }
@@ -719,8 +756,8 @@ static DWORD WINAPI ux_window_worker(void *opaque)
     while (IsWindow(window)) {
         HANDLE wake = ux_win32_mailbox_wait_handle(
             ux_component_mailboxes_wake(&component->base.mailboxes));
-        DWORD wait = MsgWaitForMultipleObjects(1u, &wake, FALSE, INFINITE,
-            QS_ALLINPUT);
+        DWORD wait = MsgWaitForMultipleObjects(1u, &wake, FALSE,
+            win32_window_cursor_blink_timeout(context), QS_ALLINPUT);
         if (wait == WAIT_OBJECT_0) {
             if (atomic_load_explicit(&component->base.stopping, memory_order_acquire) != 0)
                 DestroyWindow(window);
@@ -731,6 +768,8 @@ static DWORD WINAPI ux_window_worker(void *opaque)
             atomic_store_explicit(&component->base.stopping, 1, memory_order_release);
             DestroyWindow(window);
         }
+        else if (wait == WAIT_TIMEOUT)
+            win32_window_advance_cursor_blink(window, context);
         while (PeekMessageA(&message, NULL, 0, 0, PM_REMOVE)) {
             if (message.message == WM_QUIT) {
                 atomic_store_explicit(&component->base.stopping, 1, memory_order_release);
@@ -760,7 +799,10 @@ lib_status ux_window_native_start(ux_window *component)
         free(state->context); free(state); return LIB_STATUS_NO_MEMORY;
     }
     state->context->component = component;
-    state->context->mouse_capturable = component->initial_mouse_enabled;
+    state->context->frozen = component->initial_frozen;
+    state->context->cursor_blink_visible = LIB_TRUE;
+    state->context->cursor_blink_due = GetTickCount() +
+        WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS;
     state->ready = CreateEventA(NULL, TRUE, FALSE, NULL);
     if (state->ready == NULL) {
         win32_window_destroy(state->context, NULL); free(state); return LIB_STATUS_NO_MEMORY;

@@ -30,7 +30,7 @@ lib_status ux_window_create(ux_window **out_window,
     *out_window = LIB_NULL;
     window = calloc(1u, sizeof(*window));
     if (window == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    window->initial_mouse_enabled = options->initial_mouse_enabled != LIB_FALSE;
+    window->initial_frozen = options->initial_frozen != LIB_FALSE;
     status = ux_component_initialize(&window->base, &options->component,
         ux_window_component_stop, ux_window_component_dispose);
     if (status == LIB_STATUS_OK) status = ux_window_native_start(window);
@@ -65,22 +65,22 @@ lib_status ux_window_set_title(ux_window *window, const char *title)
     return ux_window_enqueue(window, control);
 }
 
-lib_status ux_window_enable_mouse(ux_window *window)
+lib_status ux_window_unfreeze(ux_window *window)
 {
-    ux_component_control control = { UX_COMPONENT_CONTROL_SET_WINDOW_MOUSE_ENABLED,
+    ux_component_control control = { UX_COMPONENT_CONTROL_SET_WINDOW_FROZEN,
         { 0 } };
-    control.value.window_mouse_enabled = LIB_TRUE;
+    control.value.window_frozen = LIB_FALSE;
     return ux_window_enqueue(window, control);
 }
 
-lib_status ux_window_disable_mouse(ux_window *window)
+lib_status ux_window_freeze(ux_window *window)
 {
     ux_component_control controls[2] = {
-        { UX_COMPONENT_CONTROL_SET_WINDOW_MOUSE_ENABLED, { 0 } },
+        { UX_COMPONENT_CONTROL_SET_WINDOW_FROZEN, { 0 } },
         { UX_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE, { 0 } }
     };
     if (window == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    controls[0].value.window_mouse_enabled = LIB_FALSE;
+    controls[0].value.window_frozen = LIB_TRUE;
     return ux_component_enqueue_controls(&window->base, controls, 2u);
 }
 

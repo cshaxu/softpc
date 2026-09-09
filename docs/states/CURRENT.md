@@ -4,18 +4,18 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T43 S4 active |
-| Admission And Approval | Owner authorized serial execution of T43 S1–S4, with an exit-condition audit and push required before each subtask transition. S1–S3 are closed. |
-| Objective | Audit and complete deterministic SoftPC-level verification for Console/Window handoff, source retirement, stale input, and UX control-capacity failure paths. |
-| Non-goals | No new product feature, MVDM change, Console ownership-policy redesign, configuration/media change, timing sleep, or dependence on a real interactive desktop. |
-| Affected Boundaries | SoftPC app control/reconciler/monitor test seam only as necessary; controllable fakes, focused integration tests, test registration, manifest only if library source changes, and T43 records. |
+| Identifier Mode | M9 T43 S5 active |
+| Admission And Approval | Owner authorized T43 S5 after S1–S4 implementation: restore Window-local cursor blinking and rename the Window mouse-control API to freeze/unfreeze, with an exit-condition audit and push required before closure. |
+| Objective | Keep VM Console cursor behavior native, while `ux-window` draws and blinks its guest cursor every 250 ms; make freeze/unfreeze the one Window input/cursor lifecycle API. |
+| Non-goals | No MVDM modification, guest timer/device change, SoftPC/runtime cursor phase, Console ownership-policy change, configuration/media change, or automatic mouse capture on unfreeze. |
+| Affected Boundaries | `ux-window`, its public/control mailbox API, SoftPC presentation binding, focused tests, shared-library manifest, refreshed packages, and T43 records. |
 | Applicable Rules | Execution, architecture, coding, and documentation authorities; [T43 proposal](../proposals/m9-t43-lib-console-ux-test-repairs.md); [System Architecture](../design/ARCHITECTURE.md); [Product UX](../design/UI.md). |
-| Focused Verification | Exercise monitor→raw→monitor, Window→Console readiness, Console→Window stale-input rejection, stopped-path late source retirement, and product-observable UX delivery failure using controllable completions—not sleeps. |
-| Full Regression | Focused S4 integration tests plus x64/x86 full package builds and CTest. Preserve `assets/binary/softpc.ini` and media. |
-| Similar-Issue Sweep | For every new test event, verify it traverses SoftPC control queue/run-generation/reconciler handling rather than asserting a library fake in isolation. |
-| Stop Conditions | Stop for owner direction if a required product path cannot be deterministically exercised without changing public/runtime architecture; do not disguise manual UI testing as unit evidence. |
-| Exit Criteria | Each of the five approved S4 scenarios has named deterministic SoftPC-level coverage and a concise boundary statement; dual-width evidence passes. |
-| Original Owner Request | “SoftPC 应验证这些实际场景…需要审计当前测试是否覆盖。” |
+| Focused Verification | Prove Window cursor blink uses a 250 ms Window-worker deadline only while unfrozen; freeze releases capture and stops blink; unfreeze waits for an explicit client click before capture. |
+| Full Regression | Focused Window API/worker tests plus x64/x86 full package builds and CTest. Preserve `assets/binary/softpc.ini` and media. |
+| Similar-Issue Sweep | Verify no `enable_mouse`, `disable_mouse`, or mouse-enabled state remains; title, release, STOP, source retirement, and control FIFO semantics remain intact. |
+| Stop Conditions | Stop for owner direction if the existing Window worker cannot own blink/freeze without changing the private mailbox contract or introducing a second product path. |
+| Exit Criteria | `freeze()` atomically disables capture, releases mouse, and freezes cursor blink; `unfreeze()` enables future click capture without capturing; no Window blink occurs while frozen; 250 ms blink works while unfrozen; x64/x86 evidence passes. |
+| Original Owner Request | “继续 ux-window 负责光标的绘制和闪烁；采用250ms…enable-mouse, disable-mouse 改成 freeze(), unfreeze()。” |
 
 ## Current Technical Baseline
 

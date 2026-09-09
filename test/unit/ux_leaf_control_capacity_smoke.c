@@ -63,6 +63,30 @@ int main(void)
     assert(window_probe.last_failure == LIB_STATUS_LIMIT_EXCEEDED);
     leaf_drain(&window.base);
 
+    /* Window freeze is one atomic ordered control batch: first it makes future
+       capture impossible, then it releases current capture. Unfreeze is one
+       independent permission change and never implies a capture request. */
+    {
+        ux_component_control taken;
+        assert(ux_window_freeze(&window) == LIB_STATUS_OK);
+        assert(ux_component_mailboxes_take_control(&window.base.mailboxes,
+            &taken));
+        assert(taken.kind == UX_COMPONENT_CONTROL_SET_WINDOW_FROZEN);
+        assert(taken.value.window_frozen == LIB_TRUE);
+        assert(ux_component_mailboxes_take_control(&window.base.mailboxes,
+            &taken));
+        assert(taken.kind == UX_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE);
+        assert(!ux_component_mailboxes_take_control(&window.base.mailboxes,
+            &taken));
+        assert(ux_window_unfreeze(&window) == LIB_STATUS_OK);
+        assert(ux_component_mailboxes_take_control(&window.base.mailboxes,
+            &taken));
+        assert(taken.kind == UX_COMPONENT_CONTROL_SET_WINDOW_FROZEN);
+        assert(taken.value.window_frozen == LIB_FALSE);
+        assert(!ux_component_mailboxes_take_control(&window.base.mailboxes,
+            &taken));
+    }
+
     options.failure_context = &console_probe;
     assert(ux_component_initialize(&console.base, &options, leaf_stop,
         leaf_dispose) == LIB_STATUS_OK);
