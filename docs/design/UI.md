@@ -21,8 +21,8 @@ call a CPU, controller, BOP, or renderer function.
 
 Lifecycle commands have one stable-state matrix. `init` is the monitor before
 its first machine completion; it differs from `stopped` only in its local
-message. A rejected cell prints its fixed explanation and immediately returns
-to the prompt; it does not enqueue an intent.
+message. A rejected cell names every lifecycle command usable in that state,
+immediately returns to the prompt, and does not enqueue an intent.
 
 | Command | init | stopped | paused | running |
 | --- | --- | --- | --- | --- |

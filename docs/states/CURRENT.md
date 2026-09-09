@@ -2,9 +2,10 @@
 
 ## Current Work
 
-M9 T47 remains active; S5 is closed. Its next implementation subtask requires
-separate owner admission. See [S5 history]
-(../history/M9-T47-S5-monitor-lifecycle-command-matrix.md), [S4 history]
+M9 T47 S6 is active: [Monitor command guidance]
+(../proposals/m9-t47-monitor-command-guidance.md). It makes every rejected
+lifecycle command name the commands usable in the current stable state. S5 is
+closed; see [S5 history](../history/M9-T47-S5-monitor-lifecycle-command-matrix.md), [S4 history]
 (../history/M9-T47-S4-softpc-console-broker-adoption.md), [S3 history]
 (../history/M9-T47-S3-neutral-console-broker-api.md), [S2 history]
 (../history/M9-T47-S2-win31-prompt-raw-console-recovery.md), and [S1 history]
