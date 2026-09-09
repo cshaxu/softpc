@@ -2,8 +2,20 @@
 
 ## Current Work
 
-No implementation task is active. M9 T42 closed after S9 owner acceptance.
-The ordered candidate queue remains the only source for a future admission.
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | M9 T43 S1 active |
+| Admission And Approval | Owner admitted T43 as the post-T42 shared-library test/repair task and specified S1. |
+| Objective | Complete the native focus handoff from a focused `ux-window` to the host Current Console when the Console broker activates either raw VM input or cooked monitor input. |
+| Non-goals | No SoftPC product decision, app queue/reconciler change, MVDM change, Console ownership-policy change, Window behavior change, configuration/media modification, or NXVM runtime dependency. |
+| Affected Boundaries | `src/lib/host/win32/console.*`, the host-native Console contract if needed, focused host/broker tests, and T43 task records only. Product code requests an existing broker replacement and does not call a Win32 focus API. |
+| Applicable Rules | Execution, architecture, coding, and documentation authorities; [T43 proposal](../proposals/m9-t43-lib-console-ux-test-repairs.md); [System Architecture](../design/ARCHITECTURE.md); [Product UX](../design/UI.md). |
+| Focused Verification | Prove through the native Console seam that a successful raw and cooked activation requests native Console input focus exactly once after the new binding/reader is active; preparation failure, failed activation, and output-only paths do not request focus. |
+| Full Regression | Build and run focused host tests, then x64 and x86 full CTest/package builds. Preserve `assets/binary/softpc.ini` and guest media. |
+| Similar-Issue Sweep | Inspect every Current Console activation path—initial cooked creation, raw replacement, cooked restoration, and failed-replacement restoration—to establish one focus request per successful active binding without product-side Win32 calls. |
+| Stop Conditions | Stop for owner direction if Windows cannot reliably focus the process Console without an app/product decision, if the change would require foreground-stealing policy beyond the Current Console activation contract, or if a MVDM change is implicated. |
+| Exit Criteria | Broker activation gives its Current Console native input focus symmetrically with Window creation; failure paths leave focus untouched; dual-width evidence passes; owner validates Window-to-Console interaction. |
+| Original Owner Request | “补齐 Window → Console 的原生焦点交接…应修在 `host/win32/console` 内部；产品只请求切换，不碰 Win32 API。” |
 
 ## Current Technical Baseline
 
