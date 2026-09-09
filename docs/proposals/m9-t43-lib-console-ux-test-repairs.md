@@ -79,11 +79,12 @@ documented reserve.
 Audit the actual SoftPC tests against these product-observable paths, then add
 only the missing deterministic coverage:
 
-- monitor CLI → guest raw Console → monitor CLI: raw activation intentionally
-  flushes records already left in the native Console input buffer before the
-  ownership cutover.  Once each cutover completes, input newly produced for
-  the new owner is usable, cannot enter the former owner, and Console input
-  newly produced after return to the monitor is normally readable;
+- monitor CLI → guest raw Console → monitor CLI: every native Current-Console
+  activation intentionally flushes records already left in the host input
+  buffer before the ownership cutover.  Once each cutover completes, input
+  newly produced for the new owner is usable, cannot enter the former owner,
+  and Console input newly produced after return to the monitor is normally
+  readable;
 - Window → Console: the newly current native Console is immediately usable for
   input;
 - Console → Window: an old Console input cannot be delivered into the active

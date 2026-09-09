@@ -207,8 +207,11 @@ lib_status host_console_native_activate(host_console_native *native_console,
             ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS;
     else configured |= ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT;
     if (!SetConsoleMode(native_console->input, configured)) return LIB_STATUS_IO_ERROR;
-    if (mode == HOST_CONSOLE_RAW_EVENTS &&
-        !FlushConsoleInputBuffer(native_console->input))
+    /* A Current-Console cutover has one ownership boundary regardless of
+     * input mode.  Records already buffered before it belong to neither the
+     * old nor the newly activated logical Console, so discard them before
+     * starting the new reader. */
+    if (!FlushConsoleInputBuffer(native_console->input))
         return LIB_STATUS_IO_ERROR;
     native_console->stop_event = CreateEventA(NULL, TRUE, FALSE, NULL);
     if (native_console->stop_event == NULL) return LIB_STATUS_NO_MEMORY;

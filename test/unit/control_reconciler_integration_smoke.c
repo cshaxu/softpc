@@ -35,7 +35,7 @@ int main(void)
 
     /* Application events admitted after each completed monitor -> raw ->
        monitor handoff remain one FIFO. Native records left in the host input
-       buffer before raw activation are deliberately flushed by the broker;
+       buffer before either activation are deliberately flushed by the broker;
        this test does not claim to preserve those pre-cutover records. */
     assert(app_control_queue_push_monitor_line(queue, &start));
     assert(app_control_queue_push_broker_completed(queue, 1, 7u));
