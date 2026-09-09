@@ -2,11 +2,10 @@
 
 ## Current Work
 
-M9 T47 S5 is active: [Monitor lifecycle command matrix]
-(../proposals/m9-t47-monitor-lifecycle-command-matrix.md). It makes every
-`start`/`pause`/`resume`/`reset`/`stop` command explicit for init, stopped,
-paused, and running, with a pure matrix test. S3 and S4 are closed; see [S4
-history](../history/M9-T47-S4-softpc-console-broker-adoption.md), [S3 history]
+M9 T47 remains active; S5 is closed. Its next implementation subtask requires
+separate owner admission. See [S5 history]
+(../history/M9-T47-S5-monitor-lifecycle-command-matrix.md), [S4 history]
+(../history/M9-T47-S4-softpc-console-broker-adoption.md), [S3 history]
 (../history/M9-T47-S3-neutral-console-broker-api.md), [S2 history]
 (../history/M9-T47-S2-win31-prompt-raw-console-recovery.md), and [S1 history]
 (../history/M9-T47-S1-frozen-window-hotkey-recovery.md).
@@ -36,6 +35,11 @@ history](../history/M9-T47-S4-softpc-console-broker-adoption.md), [S3 history]
   the app. The legacy monitor-specific host wrapper is removed; fresh x64/x86
   full CTest each passed 32/32. See [S4 history]
   (../history/M9-T47-S4-softpc-console-broker-adoption.md).
+
+- M9 T47 S5 makes all five monitor lifecycle commands total over init,
+  stopped, paused, and running. Its deterministic twenty-cell matrix and
+  existing cold-reset chain passed with fresh x64/x86 full CTest, 33/33. See
+  [S5 history](../history/M9-T47-S5-monitor-lifecycle-command-matrix.md).
 
 - M9 T47 S1 preserves registered Window hotkeys while frozen without allowing
   ordinary guest input through, and keeps paused CAD/CAF out of the VM input
