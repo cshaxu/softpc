@@ -2,10 +2,8 @@
 
 ## Current Work
 
-M9 T46 S1 is active: it repairs the `display=console`,
-`console_control=1` text-to-graphics handoff so the monitor, rather than the
-raw VM Console, becomes Current Console. See the
-[T46 proposal](../proposals/m9-t46-console-control-graphics-handoff.md).
+No implementation task is active. M9 T46 S1 closed after owner acceptance of
+the `console_control=1` graphics handoff.
 
 ## Current Technical Baseline
 
@@ -35,6 +33,10 @@ raw VM Console, becomes Current Console. See the
 - M9 T45 S2 repairs raw-Console CAP/CAD/CAF normalization from copied native
   record state; focused coverage and x64/x86 32/32 CTest passed, and the owner
   accepted RDP behavior. See [S2 history](../history/M9-T45-S2-raw-console-hotkeys.md).
+
+- M9 T46 S1 rearmed the cooked monitor prompt after the accepted
+  `console_control=1` text-to-graphics handoff; x64/x86 full CTest each passed
+  32/32. See [S1 history](../history/M9-T46-S1-console-control-graphics-handoff.md).
 
 - M9 T43 closed at S7 after owner acceptance of raw Console recovery. S7
   supersedes the S6 foreground experiment: successful raw host activation
