@@ -2,11 +2,12 @@
 
 ## Current Work
 
-M9 T47 has no active subtask. S7 closed the [Shared-lib product identity
-sweep](../history/M9-T47-S7-shared-lib-product-identity-sweep.md): it removes
-product identity from shared Window registration, initial title, manifest, and
-library prose, while retaining the admitted NXVM standalone-CMake identity and
-adding a recurrence guard. See [S6 history]
+M9 T47 S8 is active: [Neutral shared UX input ABI]
+(../proposals/m9-t47-neutral-ux-input-abi.md). It replaces platform-numeric
+key and injection semantics in the public UX event with lib-defined copied
+values while preserving the single input route and external SoftPC guest
+binding. S7 closed the [Shared-lib product identity sweep]
+(../history/M9-T47-S7-shared-lib-product-identity-sweep.md). See [S6 history]
 (../history/M9-T47-S6-monitor-command-guidance.md), [S5 history]
 (../history/M9-T47-S5-monitor-lifecycle-command-matrix.md), [S4 history]
 (../history/M9-T47-S4-softpc-console-broker-adoption.md), [S3 history]
