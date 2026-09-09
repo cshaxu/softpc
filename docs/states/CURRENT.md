@@ -2,10 +2,10 @@
 
 ## Current Work
 
-M9 T47 S6 is active: [Monitor command guidance]
-(../proposals/m9-t47-monitor-command-guidance.md). It makes every rejected
-lifecycle command name the commands usable in the current stable state. S5 is
-closed; see [S5 history](../history/M9-T47-S5-monitor-lifecycle-command-matrix.md), [S4 history]
+M9 T47 remains active; S6 is closed. Its next implementation subtask requires
+separate owner admission. See [S6 history]
+(../history/M9-T47-S6-monitor-command-guidance.md), [S5 history]
+(../history/M9-T47-S5-monitor-lifecycle-command-matrix.md), [S4 history]
 (../history/M9-T47-S4-softpc-console-broker-adoption.md), [S3 history]
 (../history/M9-T47-S3-neutral-console-broker-api.md), [S2 history]
 (../history/M9-T47-S2-win31-prompt-raw-console-recovery.md), and [S1 history]
@@ -41,6 +41,11 @@ closed; see [S5 history](../history/M9-T47-S5-monitor-lifecycle-command-matrix.m
   stopped, paused, and running. Its deterministic twenty-cell matrix and
   existing cold-reset chain passed with fresh x64/x86 full CTest, 33/33. See
   [S5 history](../history/M9-T47-S5-monitor-lifecycle-command-matrix.md).
+
+- M9 T47 S6 makes each rejected monitor lifecycle command name the other
+  commands available in its current stable state. Fresh x64/x86 full CTest
+  each passed 33/33. See [S6 history]
+  (../history/M9-T47-S6-monitor-command-guidance.md).
 
 - M9 T47 S1 preserves registered Window hotkeys while frozen without allowing
   ordinary guest input through, and keeps paused CAD/CAF out of the VM input
