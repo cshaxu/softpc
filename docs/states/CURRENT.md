@@ -2,12 +2,10 @@
 
 ## Current Work
 
-M9 T47 S1 — [Frozen Window hotkey recovery]
-(../proposals/m9-t47-frozen-window-hotkey-recovery.md) is active. It preserves
-generic registered-hotkey recognition through a frozen Window while keeping
-ordinary guest input discarded, then admits only product-safe hotkeys while
-paused. It changes no MVDM source, guest behavior, user-owned configuration,
-or media.
+No implementation subtask is active. M9 T47 S1 closed after owner acceptance
+of [Frozen Window hotkey recovery]
+(../history/M9-T47-S1-frozen-window-hotkey-recovery.md). T47 S2 requires a
+separate owner-provided scope before admission.
 
 ## Current Technical Baseline
 
@@ -21,6 +19,11 @@ or media.
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T47 S1 preserves registered Window hotkeys while frozen without allowing
+  ordinary guest input through, and keeps paused CAD/CAF out of the VM input
+  queue. x64/x86 full CTest each passed 32/32. See [S1 history]
+  (../history/M9-T47-S1-frozen-window-hotkey-recovery.md).
 
 - M9 T44 repaired monitor cold restart semantics: every public standalone
   machine reset now takes the original cold-reset path, while guest hardware
