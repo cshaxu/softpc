@@ -67,12 +67,6 @@ int app_monitor_console_request_line(app_monitor_console *monitor)
         LIB_STATUS_OK;
 }
 
-void app_monitor_console_request_focus(app_monitor_console *monitor)
-{
-    if (monitor != NULL)
-        host_console_cooked_request_focus(monitor->cooked);
-}
-
 int app_monitor_console_write(app_monitor_console *monitor, const char *text)
 {
     if (monitor == NULL || text == NULL) return 0;

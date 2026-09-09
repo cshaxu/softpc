@@ -4,18 +4,18 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T43 S6 closed |
-| Admission And Approval | Owner authorized T43 S6: restore the pre-S1 Console focus policy. Console activation must not foreground the Console while a Window exists; after confirmed Window destruction, SoftPC requests host to foreground the current Console only when Console is the sole active surface. |
-| Objective | Separate Current Console I/O activation from foreground focus. Retain Window self-focus at Window creation; make SoftPC issue the one generic host Console-focus request at the completed Console-only transition. |
-| Non-goals | No MVDM modification, guest timer/device change, direct app Win32 calls, configuration/media change, Console reader/mode semantics, or automatic focus while a Window exists. |
-| Affected Boundaries | `lib/host` generic Console focus API and Win32 leaf, SoftPC presentation/reconciler completion path, focused tests, shared-library manifest, refreshed packages, and T43 records. |
+| Identifier Mode | M9 T43 S7 active |
+| Admission And Approval | Owner reported that S6's SetFocus path leaves VM raw Console unable to receive input after a Window has existed and retired, including on normal Windows desktop. |
+| Objective | Remove invalid Console focus mutation and restore raw Console input after the Window-to-Console transition. |
+| Non-goals | No MVDM modification, guest timer/device change, direct app Win32 calls, configuration/media change, Console reader/mode semantics, or attempt to fix raw input with Console focus changes. |
+| Affected Boundaries | `lib/host` Console focus surface and native leaves, SoftPC presentation/reconciler cleanup, focused tests, shared-library manifest, refreshed packages, and T43 records. |
 | Applicable Rules | Execution, architecture, coding, and documentation authorities; [T43 proposal](../proposals/m9-t43-lib-console-ux-test-repairs.md); [System Architecture](../design/ARCHITECTURE.md); [Product UX](../design/UI.md). |
-| Focused Verification | Prove activation alone issues no focus request; SoftPC requests host focus only after Window destroy completion has established a Console-only actual surface; Window creation retains self-focus. |
+| Focused Verification | Prove no host/native/app Console focus path remains; Window retains its self-focus; verify raw VM Console inputs after Window retirement. |
 | Full Regression | Focused broker/presentation tests plus x64/x86 full package builds and CTest. Preserve user-owned `assets/binary/softpc.ini` and media. |
-| Similar-Issue Sweep | Verify replacement, raw/cooked activation, restoration, and Window creation cannot independently foreground Console; verify a failed/late completion cannot issue focus while a Window remains. |
-| Stop Conditions | Stop for owner direction if focus cannot be requested through the generic host API after actual Window destruction without exposing host-native handles to SoftPC. |
-| Exit Criteria | Console-only completed transition requests host focus exactly once; every activation while a Window exists requests none; Window creation remains self-focused; x64/x86 evidence passes. |
-| Original Owner Request | “Window destroyed -> SoftPC 若 Console 是当前唯一 surface，则请求 host focus Console。” |
+| Similar-Issue Sweep | Verify raw/cooked activation, restoration, Window destroy, and Window creation have no residual Console-focus side effect. |
+| Stop Conditions | Stop if removing the focus mutation does not restore raw Console input after owner reproduction. |
+| Exit Criteria | No Console-focus API or native focus call remains; x64/x86 package builds and full CTest pass; owner validates the reported transition. |
+| Original Owner Request | “就是在你最新的修改之后呀，set focus相关的。” |
 
 ## Current Technical Baseline
 

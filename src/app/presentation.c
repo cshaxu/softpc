@@ -322,17 +322,10 @@ void app_presentation_note_component_completed(app_presentation *presentation,
     app_control_component_kind component, int exists)
 {
     if (presentation == NULL) return;
-    if (component == APP_CONTROL_COMPONENT_WINDOW) {
+    if (component == APP_CONTROL_COMPONENT_WINDOW)
         app_reconciler_note_window(&presentation->reducer, exists);
-        /* Native Window destruction is the one product completion that may
-         * foreground Console. Binding itself never changes foreground: this
-         * avoids a raw/cooked handoff raising Console over a live Window. */
-        if (!exists && app_reconciler_console_only_actual(
-                &presentation->reducer))
-            app_monitor_console_request_focus(presentation->monitor);
-    } else {
+    else
         app_reconciler_note_vm_console(&presentation->reducer, exists);
-    }
 }
 
 void app_presentation_note_broker_completed(app_presentation *presentation,

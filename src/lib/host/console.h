@@ -25,9 +25,6 @@ lib_status host_console_cooked_activate_self(host_console_cooked *cooked,
 /* Idempotently arms one native cooked line while this is Current Console.
  * It does nothing when a line is already pending. */
 lib_status host_console_cooked_request_line(host_console_cooked *cooked);
-/* Request foreground keyboard focus for whichever logical Console is Current.
- * Binding a raw or cooked Console never requests focus implicitly. */
-void host_console_cooked_request_focus(host_console_cooked *cooked);
 lib_status host_console_cooked_write(host_console_cooked *cooked,
     const char *text, lib_size length);
 

@@ -71,9 +71,9 @@ to monitor, then SoftPC destroys the Window component. Until native Window
 destruction, normal Window input remains valid.
 
 Creating a Window may foreground that Window. Binding or replacing the Current
-Console never foregrounds Console: it configures native I/O only. After a
-confirmed Window-destroy completion, SoftPC may explicitly ask host to focus
-the Current Console only when the derived active surface is Console-only.
+Console configures native I/O only. Window destruction relies on the native
+desktop's normal foreground restoration; SoftPC does not directly manipulate
+Console focus because raw Console input ownership is independent of it.
 
 ## UX Components And Registered Hotkeys
 

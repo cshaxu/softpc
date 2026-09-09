@@ -310,15 +310,6 @@ lib_status host_console_cooked_create(host_console_cooked **out_cooked,
     return LIB_STATUS_OK;
 }
 
-void host_console_broker_request_focus(host_console_broker *broker)
-{
-    if (broker == LIB_NULL) return;
-    host_console_lock(broker);
-    if (!broker->broken && broker->current != LIB_NULL)
-        host_console_native_request_focus(broker->native_console);
-    host_console_unlock(broker);
-}
-
 void host_console_cooked_destroy(host_console_cooked *cooked)
 {
     if (cooked == LIB_NULL) return;
@@ -361,12 +352,6 @@ lib_status host_console_cooked_request_line(host_console_cooked *cooked)
     status = host_console_native_request_cooked_line(cooked->broker->native_console);
     host_console_unlock(cooked->broker);
     return status;
-}
-
-void host_console_cooked_request_focus(host_console_cooked *cooked)
-{
-    if (cooked != LIB_NULL)
-        host_console_broker_request_focus(cooked->broker);
 }
 
 lib_status host_console_cooked_write(host_console_cooked *cooked,

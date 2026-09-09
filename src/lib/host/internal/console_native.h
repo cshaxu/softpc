@@ -15,10 +15,6 @@ lib_status host_console_native_prepare(host_console_native *native_console,
 void host_console_native_discard_prepare(host_console_native *native_console);
 lib_status host_console_native_activate(host_console_native *native_console,
     lib_console *console, host_console_mode mode, lib_u32 generation);
-/* Request focus for the successfully activated native Console. This is
- * best-effort because Windows foreground policy may reject it; it never
- * changes the logical Current Console transaction's success/failure result. */
-void host_console_native_request_focus(host_console_native *native_console);
 /* Cooked input is deliberately one line per reader.  The product asks for
  * the next native line only when its monitor is actually ready for it; this
  * keeps a completed `start` line from racing a later raw-Console takeover. */

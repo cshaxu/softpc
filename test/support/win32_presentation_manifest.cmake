@@ -10,7 +10,7 @@ endif()
 file(SHA256 "${manifest}" manifest_hash)
 string(TOUPPER "${manifest_hash}" manifest_hash)
 if(NOT manifest_hash STREQUAL
-    "E669348557997F2DFB8DD7DC8C4F22B4BD745C7E180DCC4E160C4B89BDD77D04")
+    "BAB7E2917919E121771DB9E24C6A62D670262658381B0502999FF901B0D50C95")
     message(FATAL_ERROR "Shared library manifest differs from the admitted T43 corpus")
 endif()
 message(STATUS "Admitted T43 shared library manifest is valid")

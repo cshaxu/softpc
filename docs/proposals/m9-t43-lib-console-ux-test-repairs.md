@@ -164,3 +164,22 @@ retains its self-focus; x64/x86 package builds and full CTest pass.
   focus calls outside `lib/host/win32`.
 - The shared library remains platform-neutral above the Win32 leaf; a future
   Linux leaf may implement the same logical activation contract separately.
+
+## S7 — Revert invalid Console focus mutation
+
+Owner runtime validation found that S6's explicit Console
+`SetForegroundWindow()` / `SetFocus()` request breaks raw VM Console input
+after a Window has existed and retired on both ordinary Windows desktop and
+remote-terminal hosts. This is a product regression, not a host-specific
+compatibility exception.
+
+Remove the explicit focus API and all native Console focus calls. Current
+Console activation remains an I/O-only operation and Window keeps its creation
+focus. After Window retirement, native desktop foreground restoration is left
+alone; no component is allowed to claim that it can fix raw input by changing
+Console focus.
+
+**Exit:** no host/native/app Console focus API or `SetForegroundWindow` /
+`SetFocus` call remains; raw VM Console remains readable after the
+graphics-Window-to-text-Console transition; x64/x86 focused and full tests
+pass.

@@ -234,18 +234,6 @@ lib_status host_console_native_activate(host_console_native *native_console,
     return LIB_STATUS_OK;
 }
 
-void host_console_native_request_focus(host_console_native *native_console)
-{
-    HWND window;
-
-    if (native_console == LIB_NULL || native_console->console == LIB_NULL ||
-        native_console->reader == NULL) return;
-    window = GetConsoleWindow();
-    if (window == NULL) return;
-    (void)SetForegroundWindow(window);
-    (void)SetFocus(window);
-}
-
 lib_status host_console_native_request_cooked_line(
     host_console_native *native_console)
 {
