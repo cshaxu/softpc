@@ -2,13 +2,12 @@
 
 ## Current Work
 
-M9 T47 S9 is active: [Stop/start cold-boot recovery]
-(../proposals/m9-t47-stop-start-cold-boot-recovery.md). After monitor `stop`,
-the next `start` can stall at BIOS despite reaching the coarse runtime
-`RUNNING` fact. S9 traces and repairs the one standalone cold-run lifecycle,
-then proves configured boot progress rather than merely executor re-entry.
-S8 closed the [Neutral shared UX input ABI]
-(../history/M9-T47-S7-shared-lib-product-identity-sweep.md). See [S6 history]
+M9 T47 has no active subtask. S9 closed the [Stop/start cold-boot recovery]
+(../history/M9-T47-S9-stop-start-cold-boot-recovery.md): later starts now
+preserve the original reset routine's initialized-machine lifecycle, and a
+configured-media regression proves both cold runs leave BIOS. S8 closed the
+[Neutral shared UX input ABI]
+(../history/M9-T47-S8-neutral-ux-input-abi.md). See [S6 history]
 (../history/M9-T47-S6-monitor-command-guidance.md), [S5 history]
 (../history/M9-T47-S5-monitor-lifecycle-command-matrix.md), [S4 history]
 (../history/M9-T47-S4-softpc-console-broker-adoption.md), [S3 history]
@@ -28,6 +27,14 @@ S8 closed the [Neutral shared UX input ABI]
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T47 S9 restores the original initialized-machine reset branch for a
+  monitor `stop -> start`; forcing its internal `soft_reset` fact to first-run
+  semantics had suppressed original timer, keyboard, and device lifecycle
+  rebuild work. A configured installed-media regression proves both runs
+  leave BIOS without a fixed-duration assumption. Fresh x64/x86 full CTest
+  each passed 34/34. See [S9 history]
+  (../history/M9-T47-S9-stop-start-cold-boot-recovery.md).
 
 - M9 T47 S8 closes the neutral shared UX input ABI. `ux-base` owns copied key
   identities, generic modifiers, and an extended-key flag; Win32-to-neutral

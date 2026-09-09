@@ -11,6 +11,18 @@
 #ifdef _WIN32
 #include <windows.h>
 
+/* CMake's package configurations define NDEBUG.  This smoke owns real
+ * lifecycle side effects, so a standard assert would erase the test itself
+ * in precisely the build that ships the executable. */
+#undef assert
+#define assert(condition) do { \
+    if (!(condition)) { \
+        fprintf(stderr, "runtime smoke check failed: %s at line %d\n", \
+            #condition, __LINE__); \
+        return 1; \
+    } \
+} while (0)
+
 typedef struct runtime_completion_probe {
     volatile LONG state_facts;
     volatile LONG frame_facts;

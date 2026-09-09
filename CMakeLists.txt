@@ -440,6 +440,21 @@ target_include_directories(softpc-runtime-smoke PRIVATE src/app)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
 set_tests_properties(softpc-runtime-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-runtime-restart-boot-smoke
+    test/integration/runtime_restart_boot_smoke.c
+    src/app/control.c
+    src/app/runtime.c
+    src/app/input_queue.c
+    src/app/keyboard.c
+    src/app/prompt_trace.c)
+target_link_libraries(softpc-runtime-restart-boot-smoke PRIVATE
+    softpc-machine ux host-sync storage-medium)
+target_include_directories(softpc-runtime-restart-boot-smoke PRIVATE src/app)
+add_test(NAME softpc-runtime-restart-boot-smoke
+    COMMAND softpc-runtime-restart-boot-smoke)
+set_tests_properties(softpc-runtime-restart-boot-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    LABELS "integration")
 add_executable(softpc-runtime-input-continuation-smoke
     test/unit/runtime_input_continuation_smoke.c
     src/app/control.c
@@ -563,6 +578,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-quick-time-smoke
     softpc-lifecycle-smoke
     softpc-runtime-smoke
+    softpc-runtime-restart-boot-smoke
     softpc-runtime-input-continuation-smoke
     softpc-win32-keyboard-smoke
     softpc-win32-presentation-smoke

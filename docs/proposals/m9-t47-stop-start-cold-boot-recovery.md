@@ -2,8 +2,8 @@
 
 ## Original request
 
-After the monitor accepts `stop`, a later `start` must boot the configured
-machine all the way back to a DOS prompt. It currently can remain at BIOS.
+After the monitor accepts `stop`, a later `start` must re-enter the configured
+guest boot path. It currently can remain at BIOS.
 
 ## Objective
 
@@ -43,9 +43,9 @@ It must identify the real stale or missing fact before changing behavior.
 1. Add focused executor-host observability/fakes or deterministic probes that
    distinguish a merely-entered `RUNNING` state from a second cold boot whose
    original timer/executor rendezvous is live.
-2. Reproduce the `stop -> start` chain with configured boot media where a
-   bounded test can prove post-BIOS progress without reading guest state from
-   a frontend.
+2. Reproduce the `pause -> stop -> start` chain with configured installed
+   boot media. A test-only paused snapshot may prove post-BIOS progress; the
+   product frontend remains unable to inspect guest state.
 3. Apply the smallest fix at the owning standalone runtime/host boundary and
    extend the existing `runtime_smoke` lifecycle chain to prevent regression.
 4. Audit the adjacent `reset -> stop -> start -> pause -> resume` chain for
@@ -57,6 +57,6 @@ It must identify the real stale or missing fact before changing behavior.
 ## Exit criteria
 
 The configured package no longer stalls at BIOS after monitor `stop` then
-`start`; deterministic regression proves the repaired cold-run sequence and
-the adjacent reset chain; MVDM is unchanged; x64/x86 full CTest passes; all
-changes are committed and pushed with a clean worktree.
+`start`; deterministic regression proves post-BIOS progress on both cold runs
+without assuming a fixed boot duration; MVDM is unchanged; x64/x86 full CTest
+passes; all changes are committed and pushed with a clean worktree.
