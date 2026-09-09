@@ -25,9 +25,10 @@ teaching lib any SoftPC hotkey meaning or changing guest keyboard injection.
 ## Local-desktop scope
 
 Local and RDP raw Console use the same `ReadConsoleInputA` record path, so
-CAP and CAF receive the same repair.  Native Windows may intercept local
-Ctrl+Alt+Del as the secure-attention sequence before an application receives
-it; that is an OS boundary, not a lib hotkey failure.
+CAP, CAD, and CAF receive the same repair.  CAD here is the host
+Ctrl+Alt+D registration, which SoftPC may later translate to guest
+Ctrl+Alt+Del; it is not the Windows secure-attention chord and is delivered
+normally to the raw Console.
 
 ## Closure
 
