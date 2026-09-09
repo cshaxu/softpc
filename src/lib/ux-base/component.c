@@ -71,6 +71,18 @@ int ux_component_emit(ux_component *component, const ux_input_event *event)
     return 1;
 }
 
+lib_status ux_component_enqueue_controls(ux_component *component,
+    const ux_component_control *controls, lib_u32 control_count)
+{
+    lib_status status;
+
+    if (component == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    status = ux_component_mailboxes_enqueue_controls(&component->mailboxes,
+        controls, control_count);
+    if (status != LIB_STATUS_OK) ux_component_report_failure(component, status);
+    return status;
+}
+
 void ux_component_emit_source_retired(ux_component *component)
 {
     ux_input_event event = { 0 };
@@ -92,7 +104,7 @@ lib_status ux_component_request_stop(ux_component *component)
 {
     ux_component_control control = { UX_COMPONENT_CONTROL_STOP, { 0 } };
     return component == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
-        ux_component_mailboxes_enqueue_control(&component->mailboxes, &control);
+        ux_component_enqueue_controls(component, &control, 1u);
 }
 
 void ux_component_destroy(ux_component *component)

@@ -61,14 +61,18 @@ with the actual library; no legacy unified-presenter terminology remains.
 ## S3 — Fail-closed UX control-mailbox capacity
 
 `ux-window` and `ux-console` control mailboxes must never overwrite a control
-request. When their private FIFO is full, `set_title`, mouse-control, or STOP
-enqueue returns an explicit, checkable capacity error to its caller. The
-existing control FIFO order, STOP barrier semantics, and latest-wins frame
-behavior remain unchanged.
+request. Their fixed 32-record ordinary FIFO returns an explicit, checkable
+capacity error for the next title or mouse-control request. STOP remains a
+separate one-record terminal reserve: it never overwrites an ordinary request,
+is idempotent once queued, and prevents a full ordinary FIFO from making
+synchronous destruction impossible. Multi-record control operations must be
+all-or-nothing. The existing FIFO order, STOP barrier semantics, and
+latest-wins frame behavior remain unchanged.
 
-**Exit:** focused tests fill each component control mailbox and prove that the
-next control request returns the declared error, preserves all queued control
-records in order, and does not mutate/overwrite any request.
+**Exit:** focused tests fill each component ordinary control mailbox and prove
+that the next ordinary request returns the declared error, preserves all queued
+records in order, and does not mutate/overwrite any request; STOP consumes its
+documented reserve.
 
 ## S4 — SoftPC integration-path verification audit
 

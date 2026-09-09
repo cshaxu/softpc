@@ -44,6 +44,12 @@ lib_status ux_component_mailboxes_publish_frame(ux_component_mailboxes *mailboxe
     const ux_frame *frame);
 lib_status ux_component_mailboxes_enqueue_control(
     ux_component_mailboxes *mailboxes, const ux_component_control *control);
+/* Appends a non-empty control batch atomically. A capacity failure leaves the
+ * existing FIFO and every requested control unchanged. STOP is terminal and
+ * must be submitted as its own one-record batch. */
+lib_status ux_component_mailboxes_enqueue_controls(
+    ux_component_mailboxes *mailboxes, const ux_component_control *controls,
+    lib_u32 control_count);
 lib_bool ux_component_mailboxes_take_control(ux_component_mailboxes *mailboxes,
     ux_component_control *out_control);
 lib_bool ux_component_mailboxes_capture_frame(ux_component_mailboxes *mailboxes,

@@ -27,7 +27,8 @@ typedef struct ux_component_options {
 lib_status ux_component_publish_frame(ux_component *component,
     const ux_frame *frame);
 /* Appends one FIFO STOP record. A repeated request is idempotent; a full
- * ordinary control queue still has its reserved STOP slot. */
+ * ordinary control queue still has its reserved STOP slot. Other control
+ * enqueue failures are returned and reported through the failure sink. */
 lib_status ux_component_request_stop(ux_component *component);
 /* Synchronous destruction: returns only after the worker consumed STOP,
  * emitted SOURCE_RETIRED, and no worker remains. */

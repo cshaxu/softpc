@@ -481,6 +481,14 @@ add_test(NAME softpc-ux-component-contract-smoke
     COMMAND softpc-ux-component-contract-smoke)
 set_tests_properties(softpc-ux-component-contract-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-ux-leaf-control-capacity-smoke
+    test/unit/ux_leaf_control_capacity_smoke.c)
+target_link_libraries(softpc-ux-leaf-control-capacity-smoke PRIVATE
+    ux-window ux-console)
+add_test(NAME softpc-ux-leaf-control-capacity-smoke
+    COMMAND softpc-ux-leaf-control-capacity-smoke)
+set_tests_properties(softpc-ux-leaf-control-capacity-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-ux-console-retirement-barrier-smoke
     test/unit/ux_console_retirement_barrier_smoke.c)
 target_link_libraries(softpc-ux-console-retirement-barrier-smoke PRIVATE ux-console)

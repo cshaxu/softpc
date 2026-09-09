@@ -42,11 +42,16 @@ int main(void)
        components out of the small default 32-bit thread stack. */
     static ux_component first;
     static ux_component second;
+    static ux_component third;
     ux_component_options options = { 0 };
     ux_input_event event = { 0 };
     ux_component_control control = { UX_COMPONENT_CONTROL_SET_WINDOW_MOUSE_ENABLED,
         { 0 } };
     ux_component_control taken;
+    ux_component_control disable_controls[2] = {
+        { UX_COMPONENT_CONTROL_SET_WINDOW_MOUSE_ENABLED, { 0 } },
+        { UX_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE, { 0 } }
+    };
     atomic_uint_fast64_t identity_next;
     lib_u64 identity;
     unsigned int index;
@@ -59,6 +64,8 @@ int main(void)
     assert(ux_component_initialize(&first, &options, component_probe_stop,
         component_probe_dispose) == LIB_STATUS_OK);
     assert(ux_component_initialize(&second, &options, component_probe_stop,
+        component_probe_dispose) == LIB_STATUS_OK);
+    assert(ux_component_initialize(&third, &options, component_probe_stop,
         component_probe_dispose) == LIB_STATUS_OK);
     assert(first.source_identity != 0u);
     assert(second.source_identity != 0u);
@@ -87,8 +94,14 @@ int main(void)
     assert(probe.last_failure == LIB_STATUS_IO_ERROR);
 
     for (index = 0u; index < UX_COMPONENT_CONTROL_CAPACITY; ++index)
-        assert(ux_component_mailboxes_enqueue_control(&second.mailboxes,
-            &control) == LIB_STATUS_OK);
+        assert(ux_component_enqueue_controls(&second, &control, 1u) ==
+            LIB_STATUS_OK);
+    /* A full ordinary FIFO rejects the next request and retains every
+       original record. The failure is reported as well as returned. */
+    assert(ux_component_enqueue_controls(&second, &control, 1u) ==
+        LIB_STATUS_LIMIT_EXCEEDED);
+    assert(probe.failure_count == 2u);
+    assert(probe.last_failure == LIB_STATUS_LIMIT_EXCEEDED);
     /* STOP has one reserved FIFO slot.  A full normal queue cannot make
        destroy wait forever for a stop record it could not enqueue. */
     assert(ux_component_request_stop(&second) == LIB_STATUS_OK);
@@ -100,7 +113,26 @@ int main(void)
     assert(taken.kind == UX_COMPONENT_CONTROL_STOP);
     assert(!ux_component_mailboxes_take_control(&second.mailboxes, &taken));
 
+    /* Multi-record control requests are all-or-nothing. This is the exact
+       shape used by Window disable-mouse: no disabled flag may be left queued
+       without its following release when only one ordinary slot remains. */
+    for (index = 0u; index + 1u < UX_COMPONENT_CONTROL_CAPACITY; ++index)
+        assert(ux_component_enqueue_controls(&third, &control, 1u) ==
+            LIB_STATUS_OK);
+    disable_controls[0].value.window_mouse_enabled = LIB_FALSE;
+    assert(ux_component_enqueue_controls(&third, disable_controls, 2u) ==
+        LIB_STATUS_LIMIT_EXCEEDED);
+    assert(probe.failure_count == 3u);
+    assert(probe.last_failure == LIB_STATUS_LIMIT_EXCEEDED);
+    for (index = 0u; index + 1u < UX_COMPONENT_CONTROL_CAPACITY; ++index) {
+        assert(ux_component_mailboxes_take_control(&third.mailboxes, &taken));
+        assert(taken.kind == UX_COMPONENT_CONTROL_SET_WINDOW_MOUSE_ENABLED);
+        assert(taken.value.window_mouse_enabled == LIB_FALSE);
+    }
+    assert(!ux_component_mailboxes_take_control(&third.mailboxes, &taken));
+
     ux_component_destroy(&first);
     ux_component_destroy(&second);
+    ux_component_destroy(&third);
     return 0;
 }

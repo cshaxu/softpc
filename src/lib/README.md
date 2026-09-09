@@ -45,7 +45,9 @@ mailboxes. Callers never share or address a mailbox directly.
   enqueue beyond that limit returns `LIB_STATUS_LIMIT_EXCEEDED` without
   overwriting an existing record. A STOP record has one reserved FIFO slot and
   is idempotent. Once STOP is queued, a later non-STOP control request returns
-  `LIB_STATUS_INVALID_STATE`.
+  `LIB_STATUS_INVALID_STATE`. A multi-record operation is all-or-nothing:
+  insufficient ordinary capacity leaves every requested record unqueued. A
+  non-OK control enqueue is also reported through the component failure sink.
 - A worker drains control records in FIFO order before it considers the latest
   frame. On STOP it consumes no later control or frame: it retires native
   input/output, emits exactly one `UX_EVENT_SOURCE_RETIRED`, and exits.

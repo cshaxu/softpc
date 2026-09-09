@@ -14,7 +14,7 @@ static lib_status ux_window_enqueue(ux_window *window,
     ux_component_control control)
 {
     return window == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
-        ux_component_mailboxes_enqueue_control(&window->base.mailboxes, &control);
+        ux_component_enqueue_controls(&window->base, &control, 1u);
 }
 
 lib_status ux_window_create(ux_window **out_window,
@@ -75,12 +75,13 @@ lib_status ux_window_enable_mouse(ux_window *window)
 
 lib_status ux_window_disable_mouse(ux_window *window)
 {
-    ux_component_control control = { UX_COMPONENT_CONTROL_SET_WINDOW_MOUSE_ENABLED,
-        { 0 } };
-    lib_status status;
-    control.value.window_mouse_enabled = LIB_FALSE;
-    status = ux_window_enqueue(window, control);
-    return status == LIB_STATUS_OK ? ux_window_release_mouse(window) : status;
+    ux_component_control controls[2] = {
+        { UX_COMPONENT_CONTROL_SET_WINDOW_MOUSE_ENABLED, { 0 } },
+        { UX_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE, { 0 } }
+    };
+    if (window == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    controls[0].value.window_mouse_enabled = LIB_FALSE;
+    return ux_component_enqueue_controls(&window->base, controls, 2u);
 }
 
 lib_status ux_window_release_mouse(ux_window *window)

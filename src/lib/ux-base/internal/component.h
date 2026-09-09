@@ -28,6 +28,8 @@ lib_status ux_component_initialize(ux_component *component,
 lib_status ux_component_allocate_source_identity(atomic_uint_fast64_t *next,
     lib_u64 *out_identity);
 int ux_component_emit(ux_component *component, const ux_input_event *event);
+lib_status ux_component_enqueue_controls(ux_component *component,
+    const ux_component_control *controls, lib_u32 control_count);
 void ux_component_emit_source_retired(ux_component *component);
 
 #endif

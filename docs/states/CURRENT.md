@@ -4,18 +4,18 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T43 S3 active |
-| Admission And Approval | Owner authorized serial execution of T43 S1–S4, with an exit-condition audit and push required before each subtask transition. S1 and S2 are closed. |
-| Objective | Make `ux-window` and `ux-console` control-mailbox capacity failure explicit and fail-closed: no control request may overwrite another. |
-| Non-goals | No product policy, app queue/reconciler change, host Console ownership change, MVDM change, configuration/media change, or frame-mailbox behavior change. |
-| Affected Boundaries | `src/lib/ux-base` mailbox/component contract, the two leaf control APIs only as needed to propagate status, focused UX component/leaf tests, manifest, and T43 records. |
+| Identifier Mode | M9 T43 S4 active |
+| Admission And Approval | Owner authorized serial execution of T43 S1–S4, with an exit-condition audit and push required before each subtask transition. S1–S3 are closed. |
+| Objective | Audit and complete deterministic SoftPC-level verification for Console/Window handoff, source retirement, stale input, and UX control-capacity failure paths. |
+| Non-goals | No new product feature, MVDM change, Console ownership-policy redesign, configuration/media change, timing sleep, or dependence on a real interactive desktop. |
+| Affected Boundaries | SoftPC app control/reconciler/monitor test seam only as necessary; controllable fakes, focused integration tests, test registration, manifest only if library source changes, and T43 records. |
 | Applicable Rules | Execution, architecture, coding, and documentation authorities; [T43 proposal](../proposals/m9-t43-lib-console-ux-test-repairs.md); [System Architecture](../design/ARCHITECTURE.md); [Product UX](../design/UI.md). |
-| Focused Verification | Fill each leaf's private control FIFO, issue every public control kind including STOP, and prove the declared capacity error preserves the queued records and their FIFO order without overwriting a frame or control. |
-| Full Regression | x64/x86 focused UX tests, manifest/source-boundary checks, then full package builds and CTest. Preserve `assets/binary/softpc.ini` and media. |
-| Similar-Issue Sweep | Trace title, mouse enabled/disabled/release, and destroy/STOP calls from every leaf API to mailbox enqueue and worker consumption; ensure no caller discards an explicit capacity error. |
-| Stop Conditions | Stop for owner direction if making STOP fail at full capacity makes synchronous destroy impossible without a new lifecycle contract; do not invent a retry or overwrite path. |
-| Exit Criteria | Every full control mailbox returns a checkable error for the next request, all queued records survive in order, no control request is overwritten, and both leaves expose the result to callers. |
-| Original Owner Request | “ux-console ux-window两个的control mailbox，如果队列满了，必须返回可检查错误，不能覆盖控制请求。” |
+| Focused Verification | Exercise monitor→raw→monitor, Window→Console readiness, Console→Window stale-input rejection, stopped-path late source retirement, and product-observable UX delivery failure using controllable completions—not sleeps. |
+| Full Regression | Focused S4 integration tests plus x64/x86 full package builds and CTest. Preserve `assets/binary/softpc.ini` and media. |
+| Similar-Issue Sweep | For every new test event, verify it traverses SoftPC control queue/run-generation/reconciler handling rather than asserting a library fake in isolation. |
+| Stop Conditions | Stop for owner direction if a required product path cannot be deterministically exercised without changing public/runtime architecture; do not disguise manual UI testing as unit evidence. |
+| Exit Criteria | Each of the five approved S4 scenarios has named deterministic SoftPC-level coverage and a concise boundary statement; dual-width evidence passes. |
+| Original Owner Request | “SoftPC 应验证这些实际场景…需要审计当前测试是否覆盖。” |
 
 ## Current Technical Baseline
 
@@ -42,6 +42,12 @@
   latest-frame delivery, source retirement, and neutral logical Console;
   source-boundary and manifest tests passed for both widths. See [S2 history]
   (../history/M9-T43-S2-library-contract-closure.md).
+
+- M9 T43 S3 closed fail-closed UX control capacity. Ordinary control requests
+  return/report capacity failure without mutation; multi-record mouse disable
+  is atomic; STOP retains its documented terminal reserve. Both leaf mailboxes
+  and full x64/x86 regressions passed. See [S3 history]
+  (../history/M9-T43-S3-ux-control-capacity.md).
 
 - M9 T42 S5 closed with the SoftPC monitor/derived-state reconciler, immutable
   two-buffer frame publication, unchanged-text publication gate, staged
