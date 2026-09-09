@@ -1,6 +1,13 @@
 # M9 T47 S9 — Stop/start cold-boot recovery
 
-## Outcome
+## Superseded outcome
+
+This record was closed by `e991d93`, but manual acceptance showed that its
+`soft_reset` conclusion did not fix the product path. It is retained as the
+historical P2 claim only; S9 was immediately reopened in CURRENT and the
+corrected evidence/closure is recorded by the subsequent P3 commit.
+
+## Original P2 outcome
 
 The standalone machine boundary again preserves the original reset routine's
 internal `soft_reset` fact. A later product `start` is a new run, but it is
@@ -25,8 +32,8 @@ No MVDM source changed. The persistent SoftPC executor and its single
   executables were rebuilt. User-owned `assets/binary/softpc.ini` and guest
   media were not changed.
 
-## Closure
+## Superseded closure
 
-This closes T47 S9. The manual acceptance path remains monitor `stop`, then
-`start`, through the normal configured boot route. T47 remains active; a
-later subtask must be separately admitted.
+This P2 closure is superseded. The manual acceptance path remained failing,
+so T47 S9 was reopened rather than treating the direct-runtime observation as
+product acceptance.

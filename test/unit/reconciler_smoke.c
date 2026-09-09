@@ -43,6 +43,34 @@ int main(void)
     app_reconciler_note_runtime(&state, SOFTPC_RUNTIME_STOPPED);
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
 
+    /* A stopped graphical run must retire its old outputs before a later
+       monitor start.  The next run begins with no inherited route and its
+       first completed text frame is sufficient to rebuild the raw Console
+       path.  This is the reducer half of `pause -> stop -> start`; runtime
+       integration separately proves the new run publishes that frame. */
+    app_reconciler_initialize(&state, SOFTPC_PRESENTATION_CONSOLE, 1);
+    app_reconciler_note_runtime(&state, SOFTPC_RUNTIME_RUNNING);
+    app_reconciler_note_frame(&state, 1);
+    assert(app_reconciler_take_action(&state) ==
+        APP_RECONCILER_ACTION_CREATE_WINDOW);
+    app_reconciler_note_window(&state, 1);
+    app_reconciler_note_intent(&state, APP_RECONCILER_INTENT_STOP);
+    assert(app_reconciler_take_action(&state) ==
+        APP_RECONCILER_ACTION_RUNTIME_STOP);
+    app_reconciler_note_runtime(&state, SOFTPC_RUNTIME_STOPPED);
+    assert(app_reconciler_take_action(&state) ==
+        APP_RECONCILER_ACTION_DESTROY_WINDOW);
+    app_reconciler_note_window(&state, 0);
+    assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
+    app_reconciler_note_intent(&state, APP_RECONCILER_INTENT_START);
+    assert(app_reconciler_take_action(&state) ==
+        APP_RECONCILER_ACTION_RUNTIME_START);
+    app_reconciler_note_runtime(&state, SOFTPC_RUNTIME_RUNNING);
+    assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
+    app_reconciler_note_frame(&state, 0);
+    assert(app_reconciler_take_action(&state) ==
+        APP_RECONCILER_ACTION_CREATE_VM_CONSOLE);
+
     /* Console graphics with console_control=0 needs three completed actions:
        Window, VM Console object, then Current Console binding. */
     app_reconciler_initialize(&state, SOFTPC_PRESENTATION_CONSOLE, 0);

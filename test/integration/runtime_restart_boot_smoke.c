@@ -5,6 +5,12 @@
 #ifdef _WIN32
 #include <windows.h>
 
+typedef struct runtime_frame_probe {
+    volatile LONG last_sequence;
+    volatile LONG last_generation;
+    volatile LONG frame_count;
+} runtime_frame_probe;
+
 #define REQUIRE(condition) do { \
     if (!(condition)) { \
         fprintf(stderr, "runtime restart boot check failed: %s at line %d\n", \
@@ -23,32 +29,60 @@ static int wait_for_state(app_runtime *runtime, app_runtime_state state)
     return 0;
 }
 
+static void receive_frame(void *opaque, uint32_t sequence, int graphics,
+    uint32_t run_generation)
+{
+    runtime_frame_probe *probe = (runtime_frame_probe *)opaque;
+    (void)graphics;
+    if (probe == NULL) return;
+    InterlockedExchange(&probe->last_sequence, (LONG)sequence);
+    InterlockedExchange(&probe->last_generation, (LONG)run_generation);
+    InterlockedIncrement(&probe->frame_count);
+}
+
+static int wait_for_frame_of_run(const runtime_frame_probe *probe,
+    uint32_t run_generation, uint32_t after_sequence)
+{
+    DWORD deadline = GetTickCount() + 10000u;
+    do {
+        uint32_t sequence = (uint32_t)InterlockedCompareExchange(
+            (volatile LONG *)&probe->last_sequence, 0, 0);
+        uint32_t generation = (uint32_t)InterlockedCompareExchange(
+            (volatile LONG *)&probe->last_generation, 0, 0);
+        if (generation == run_generation && sequence > after_sequence)
+            return 1;
+        Sleep(10u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    return 0;
+}
+
 /* Pause before sampling the public instruction pointer.  This does not give
  * a frontend access to guest state: it is an integration-only proof that a
  * configured boot has left the firmware reset segment on each cold run. */
-static int run_reaches_post_bios(app_runtime *runtime, softpc_machine *machine)
+static int run_reaches_post_bios(app_runtime *runtime, softpc_machine *machine,
+    runtime_frame_probe *probe, uint32_t run_generation,
+    uint32_t prior_sequence, DWORD uninterrupted_runtime_ms)
 {
     uint16_t cs = 0u;
     uint32_t eip = 0u;
-    unsigned int attempt;
 
     REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_RUNNING));
-    /* CPU width and host load change how long firmware takes.  Sample only
-     * while paused, then resume if it has not yet left reset; never guess a
-     * fixed boot duration. */
-    for (attempt = 0u; attempt < 20u; ++attempt) {
-        Sleep(500u);
-        REQUIRE(app_runtime_pause(runtime));
-        REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_PAUSED));
-        REQUIRE(softpc_machine_instruction_pointer(machine, &cs, &eip) ==
-            SOFTPC_MACHINE_OK);
-        REQUIRE(app_runtime_resume(runtime));
-        REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_RUNNING));
-        if (cs != 0xf000u) return 1;
-    }
-    fprintf(stderr, "runtime restart boot check failed: firmware did not "
-        "leave reset within 10 seconds\n");
-    return 0;
+    /* This is deliberately stronger than an executor/IP check: a new cold
+     * run must commit a copied frame tagged with its own run generation.
+     * Otherwise the product layer could retain the previous run's surface
+     * and make a live VM look stalled after `pause -> stop -> start`. */
+    REQUIRE(wait_for_frame_of_run(probe, run_generation, prior_sequence));
+    /* Do not repeatedly pause/resume as a test-side wake-up.  The reported
+     * failure is an otherwise idle second boot, so it must make progress
+     * under its normal clock alone before this one diagnostic pause. */
+    Sleep(uninterrupted_runtime_ms);
+    REQUIRE(app_runtime_pause(runtime));
+    REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_PAUSED));
+    REQUIRE(softpc_machine_instruction_pointer(machine, &cs, &eip) ==
+        SOFTPC_MACHINE_OK);
+    REQUIRE(cs != 0xf000u);
+    REQUIRE(app_runtime_resume(runtime));
+    return wait_for_state(runtime, SOFTPC_RUNTIME_RUNNING);
 }
 
 int main(void)
@@ -58,6 +92,8 @@ int main(void)
     app_runtime *runtime = NULL;
     uint32_t first_generation;
     uint32_t second_generation;
+    uint32_t first_sequence;
+    runtime_frame_probe frame_probe = { 0 };
 
     options.hard_disk_path = "assets/media/win31_en_installed.img";
     options.memory_bytes = 16u * 1024u * 1024u;
@@ -65,14 +101,15 @@ int main(void)
     options.media_mode = SOFTPC_MEDIA_OVERLAY;
     REQUIRE(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     REQUIRE(app_runtime_create(machine, &runtime));
+    app_runtime_set_frame_sink(runtime, receive_frame, &frame_probe);
 
     REQUIRE(app_runtime_start(runtime));
     first_generation = app_runtime_run_generation(runtime);
     REQUIRE(first_generation != 0u);
-    REQUIRE(run_reaches_post_bios(runtime, machine));
-    /* Exercise the same long-running state as an interactive DOS session,
-       rather than stopping the first scheduler turn after startup. */
-    Sleep(5000u);
+    REQUIRE(run_reaches_post_bios(runtime, machine, &frame_probe,
+        first_generation, 0u, 5000u));
+    first_sequence = (uint32_t)InterlockedCompareExchange(
+        &frame_probe.last_sequence, 0, 0);
 
     /* Monitor `stop` normally arrives after pause has returned Current
        Console to the cooked monitor.  This is a different executor exit
@@ -85,7 +122,8 @@ int main(void)
     REQUIRE(app_runtime_start(runtime));
     second_generation = app_runtime_run_generation(runtime);
     REQUIRE(second_generation != first_generation);
-    REQUIRE(run_reaches_post_bios(runtime, machine));
+    REQUIRE(run_reaches_post_bios(runtime, machine, &frame_probe,
+        second_generation, first_sequence, 10000u));
 
     REQUIRE(app_runtime_stop(runtime));
     REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_STOPPED));

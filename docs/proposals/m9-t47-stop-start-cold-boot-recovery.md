@@ -7,11 +7,12 @@ guest boot path. It currently can remain at BIOS.
 
 ## Objective
 
-Repair the single standalone cold-run lifecycle so `running -> stop -> start`
-fully re-enters the same configured boot path as the first `start`. The
-runtime must not report a misleading successful restart merely because the
-executor re-entered; guest timer, media, original reset, and executor-host
-state required to progress beyond BIOS must be live for the new run.
+Repair the one standalone `running -> stop -> start` product path so the
+second run both re-enters the configured boot path and replaces the former
+run's visible presentation fact. An executor/IP observation alone is not
+sufficient: the new run must publish a copied frame with its own SoftPC run
+generation, and the app reducer must rebuild its route from that new frame
+rather than retaining an old Window/Console image.
 
 ## Baseline and suspected boundary
 
@@ -22,10 +23,11 @@ run generation, and asks its persistent executor worker to call the public
 boot progresses past firmware. The observed package failure is therefore an
 incomplete lifecycle proof, not permission to edit MVDM.
 
-The audit must trace, on the executor thread, the order of: CCPU exit request
-clear, cold reset, media reattachment, original timer reset/setup, standalone
-heartbeat, executor callback, and first continuous `c_cpu_simulate` entry.
-It must identify the real stale or missing fact before changing behavior.
+The audit must preserve T44's approved `soft_reset = 0` public cold-start
+policy. The earlier S9 claim that changing this original internal fact solved
+the issue is superseded: it did not change the owner-observed failure. The
+audit must instead trace the completed runtime frame, run generation, and app
+route after the second start.
 
 ## Boundaries and non-goals
 
@@ -40,23 +42,22 @@ It must identify the real stale or missing fact before changing behavior.
 
 ## Implementation and proof
 
-1. Add focused executor-host observability/fakes or deterministic probes that
-   distinguish a merely-entered `RUNNING` state from a second cold boot whose
-   original timer/executor rendezvous is live.
-2. Reproduce the `pause -> stop -> start` chain with configured installed
-   boot media. A test-only paused snapshot may prove post-BIOS progress; the
-   product frontend remains unable to inspect guest state.
-3. Apply the smallest fix at the owning standalone runtime/host boundary and
-   extend the existing `runtime_smoke` lifecycle chain to prevent regression.
+1. Prove with configured installed media that both runs leave firmware and
+   each commits a copied frame tagged with its own run generation.
+2. Invalidate the completed snapshot at the explicit new-run boundary; retain
+   monotonic frame sequence identity, but never let a new run inherit the old
+   frame as its current output.
+3. Prove the reducer retires a stopped graphical route and waits for the new
+   run's first frame before rebuilding a text/graphic route.
 4. Audit the adjacent `reset -> stop -> start -> pause -> resume` chain for
-   the same stale lifecycle fact.
+   the same stale presentation fact.
 5. Build x64 and x86, run their full CTest suites and package smoke, refresh
-   only the two agent-owned package executables, then retain evidence in S9
-   history.
+   only the two agent-owned package executables, then retain corrected S9
+   evidence in history.
 
 ## Exit criteria
 
-The configured package no longer stalls at BIOS after monitor `stop` then
-`start`; deterministic regression proves post-BIOS progress on both cold runs
-without assuming a fixed boot duration; MVDM is unchanged; x64/x86 full CTest
-passes; all changes are committed and pushed with a clean worktree.
+The configured package no longer retains a prior-run display after monitor
+`stop` then `start`; deterministic regression proves post-BIOS progress and a
+new-generation published frame on both cold runs; MVDM is unchanged; x64/x86
+full CTest passes; all changes are committed and pushed with a clean worktree.

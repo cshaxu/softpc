@@ -195,13 +195,13 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     if (!softpc_platform_floppy_attach(machine->options.floppy_path,
         machine->options.media_mode))
         return SOFTPC_MACHINE_IO_ERROR;
-    /* A monitor start is a new product run, but `soft_reset` is the original
-       reset routine's internal "has this machine already been initialized?"
-       fact.  Clearing it on every later run suppresses the original host
-       timer, keyboard, and device teardown/rebuild branch.  Preserve that
-       original lifecycle distinction here; guest Ctrl+Alt+Del remains the
-       separate CCPU hardware warm-reset path. */
-    soft_reset = machine->reset ? 1 : 0;
+    /* This public standalone operation is the monitor's cold-start boundary,
+       not the guest's hardware warm-reset line.  Reusing `machine` after a
+       stopped run must therefore repeat the original cold initialisation
+       (FDC, mouse and fixed-disk setup included).  Guest Ctrl+Alt+Del still
+       reaches CCPU's independent CPU reset path and retains its original
+       warm-reset semantics. */
+    soft_reset = 0;
     softpc_platform_set_boot_clock(1);
     reset();
     softpc_platform_set_boot_clock(0);

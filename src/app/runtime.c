@@ -76,6 +76,23 @@ struct app_runtime {
     uint32_t graphics_visible_width;
 };
 
+/* A completed frame belongs to precisely one running VM generation.  Starting
+ * another cold run must never make the previous run's final Window/Console
+ * image look like a frame of the new run while the original renderer is
+ * preparing its first update.  Keep the sequence monotonic (it is the
+ * cross-thread publication identity), but invalidate both snapshot slots
+ * before the executor can begin the next reset. */
+static void app_runtime_invalidate_published_frame(app_runtime *runtime)
+{
+    if (runtime == NULL) return;
+    EnterCriticalSection(&runtime->frame_lock);
+    memset(runtime->frame_buffers[0], 0, sizeof(*runtime->frame_buffers[0]));
+    memset(runtime->frame_buffers[1], 0, sizeof(*runtime->frame_buffers[1]));
+    runtime->published_frame_index = 0;
+    InterlockedExchange(&runtime->published_frame_run_generation, 0);
+    LeaveCriticalSection(&runtime->frame_lock);
+}
+
 static void app_runtime_notify_state(app_runtime *runtime)
 {
     if (runtime != NULL && runtime->state_sink != NULL)
@@ -535,6 +552,7 @@ int app_runtime_start(app_runtime *runtime)
     if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
         SOFTPC_RUNTIME_STOPPED) return 0;
     host_sync_event_reset(runtime->ready_event);
+    app_runtime_invalidate_published_frame(runtime);
     InterlockedExchange(&runtime->pause_requested, 0);
     InterlockedExchange(&runtime->stop_requested, 0);
     InterlockedExchange(&runtime->result, SOFTPC_MACHINE_IO_ERROR);
