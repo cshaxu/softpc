@@ -77,6 +77,19 @@ if(EXISTS "${SOFTPC_SOURCE_DIR}/src/lib/ux" OR
     message(FATAL_ERROR "Standalone retains the removed unified UX route")
 endif()
 
+# Host owns only generic native Console I/O. The product monitor owns its
+# logical Console and line sink, and binds it through the public broker API.
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/host/console.h" host_console_public)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/host/console.c" host_console_source)
+file(READ "${SOFTPC_SOURCE_DIR}/src/app/monitor.c" app_monitor_source)
+if(host_console_public MATCHES "host_console_cooked" OR
+   host_console_source MATCHES "host_console_cooked" OR
+   app_monitor_source MATCHES "host_console_cooked" OR
+   NOT app_monitor_source MATCHES "host_console_broker_replace" OR
+   NOT app_monitor_source MATCHES "host_console_broker_request_cooked_line")
+    message(FATAL_ERROR "Console broker retains monitor-specific ownership")
+endif()
+
 # The split shared UX graph is deliberately narrow.  These target links make
 # its allowed component edges executable rather than README-only claims.
 file(READ "${SOFTPC_SOURCE_DIR}/src/lib/CMakeLists.txt" lib_cmake_source)

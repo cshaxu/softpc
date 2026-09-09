@@ -33,9 +33,7 @@ presenter API.
   retires and confirms the old native reader, then activates the next binding;
   it uses the same transaction for every raw/cooked pair. If retirement cannot
   complete, no next reader starts and the broker fails closed with host-I/O
-  failure rather than claiming either Console is usable. The obsolete
-  `host_console_cooked` adapter is retained only as a T47 S3 source-compatible
-  bridge for SoftPC; new callers use the broker directly and S4 deletes it.
+  failure rather than claiming either Console is usable.
 - `storage` provides file and byte-medium primitives.
 - `ux-base` provides copied frame/input values, source-local registered-hotkey
   matching, source identities, and private mailbox mechanics.

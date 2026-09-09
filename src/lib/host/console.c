@@ -15,15 +15,6 @@ struct host_console_broker {
     lib_bool broken;
 };
 
-/* S4 removes this compatibility adapter after the app creates its own logical
- * monitor Console and owns the broker directly. */
-struct host_console_cooked {
-    lib_console *console;
-    host_console_broker *broker;
-    host_console_cooked_line_sink line_sink;
-    void *line_context;
-};
-
 typedef struct host_console_output_binding {
     host_console_native *native_console;
     lib_console *console;
@@ -31,16 +22,6 @@ typedef struct host_console_output_binding {
 } host_console_output_binding;
 
 static atomic_flag host_console_process_claimed = ATOMIC_FLAG_INIT;
-
-static void host_console_cooked_receive(void *opaque,
-    const lib_console_event *event)
-{
-    host_console_cooked *cooked = (host_console_cooked *)opaque;
-    if (cooked != LIB_NULL && event != LIB_NULL &&
-        event->kind == LIB_CONSOLE_EVENT_COOKED_LINE &&
-        cooked->line_sink != LIB_NULL)
-        cooked->line_sink(cooked->line_context, &event->value.line);
-}
 
 static void host_console_lock(host_console_broker *broker)
 {
@@ -327,72 +308,4 @@ void host_console_broker_destroy(host_console_broker *broker)
     host_console_native_destroy(broker->native_console);
     free(broker);
     atomic_flag_clear_explicit(&host_console_process_claimed, memory_order_release);
-}
-
-lib_status host_console_cooked_create(host_console_cooked **out_cooked,
-    host_console_cooked_line_sink line_sink, void *line_context)
-{
-    host_console_cooked *cooked;
-    lib_status status;
-
-    if (out_cooked == LIB_NULL || line_sink == LIB_NULL)
-        return LIB_STATUS_INVALID_ARGUMENT;
-    *out_cooked = LIB_NULL;
-    cooked = calloc(1u, sizeof(*cooked));
-    if (cooked == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    cooked->line_sink = line_sink;
-    cooked->line_context = line_context;
-    status = lib_console_create(&cooked->console);
-    if (status == LIB_STATUS_OK)
-        status = lib_console_set_event_sink(cooked->console,
-            host_console_cooked_receive, cooked);
-    if (status == LIB_STATUS_OK)
-        status = host_console_broker_create(&cooked->broker, cooked->console,
-            HOST_CONSOLE_COOKED_LINES);
-    if (status != LIB_STATUS_OK) {
-        host_console_cooked_destroy(cooked);
-        return status;
-    }
-    *out_cooked = cooked;
-    return LIB_STATUS_OK;
-}
-
-void host_console_cooked_destroy(host_console_cooked *cooked)
-{
-    if (cooked == LIB_NULL) return;
-    host_console_broker_destroy(cooked->broker);
-    if (cooked->console != LIB_NULL) {
-        (void)lib_console_set_event_sink(cooked->console, LIB_NULL, LIB_NULL);
-        lib_console_release(cooked->console);
-    }
-    free(cooked);
-}
-
-lib_status host_console_cooked_activate_raw(host_console_cooked *cooked,
-    lib_console *raw_console)
-{
-    return cooked == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
-        host_console_broker_replace(cooked->broker, cooked->console, raw_console,
-            HOST_CONSOLE_RAW_EVENTS);
-}
-
-lib_status host_console_cooked_activate_self(host_console_cooked *cooked,
-    lib_console *raw_console)
-{
-    return cooked == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
-        host_console_broker_replace(cooked->broker, raw_console, cooked->console,
-            HOST_CONSOLE_COOKED_LINES);
-}
-
-lib_status host_console_cooked_request_line(host_console_cooked *cooked)
-{
-    return cooked == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
-        host_console_broker_request_cooked_line(cooked->broker, cooked->console);
-}
-
-lib_status host_console_cooked_write(host_console_cooked *cooked,
-    const char *text, lib_size length)
-{
-    return cooked == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
-        lib_console_write_text(cooked->console, text, length);
 }
