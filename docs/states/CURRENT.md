@@ -2,10 +2,9 @@
 
 ## Current Work
 
-M9 T47 S4 is active: [Console broker API recomposition]
-(../proposals/m9-t47-console-broker-api-recomposition.md). S3 has exposed the
-neutral generic broker; S4 migrates SoftPC's sole monitor caller and removes
-the temporary legacy adapter. See [S3 history]
+M9 T47 remains active; S3 and S4 are closed. Its next implementation subtask
+requires separate owner admission. See [S4 history]
+(../history/M9-T47-S4-softpc-console-broker-adoption.md), [S3 history]
 (../history/M9-T47-S3-neutral-console-broker-api.md), [S2 history]
 (../history/M9-T47-S2-win31-prompt-raw-console-recovery.md), and [S1 history]
 (../history/M9-T47-S1-frozen-window-hotkey-recovery.md).
@@ -29,6 +28,12 @@ the temporary legacy adapter. See [S3 history]
   rather than hanging. The owner accepted the Win3.1 Prompt route; x64/x86
   full CTest each passed 32/32. See [S2 history]
   (../history/M9-T47-S2-win31-prompt-raw-console-recovery.md).
+
+- M9 T47 S3/S4 exposed the neutral generic Current-Console broker and moved
+  SoftPC's monitor logical Console, cooked-line sink, and prompt ownership to
+  the app. The legacy monitor-specific host wrapper is removed; fresh x64/x86
+  full CTest each passed 32/32. See [S4 history]
+  (../history/M9-T47-S4-softpc-console-broker-adoption.md).
 
 - M9 T47 S1 preserves registered Window hotkeys while frozen without allowing
   ordinary guest input through, and keeps paused CAD/CAF out of the VM input
