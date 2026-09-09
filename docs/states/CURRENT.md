@@ -2,20 +2,8 @@
 
 ## Current Work
 
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | M9 T43 S7 active |
-| Admission And Approval | Owner reproduction disproved the cooked-reader hypothesis: raw Console consumes Enter, but current split `ux-console` bypasses the common RDP scan-code recovery used by Window and the historical standalone runner. |
-| Objective | Restore raw VM Console input after a Window-to-Console transition by routing raw Console key packets through the same `ux-base` Win32 transition normalizer as Window. |
-| Non-goals | No MVDM modification, guest timer/device change, public app focus API, configuration/media change, or reconciler ordering change. |
-| Affected Boundaries | `lib/ux-console/win32` raw-key normalization, focused tests, shared-library manifest, refreshed packages, and T43 records. |
-| Applicable Rules | Execution, architecture, coding, and documentation authorities; [T43 proposal](../proposals/m9-t43-lib-console-ux-test-repairs.md); [System Architecture](../design/ARCHITECTURE.md); [Product UX](../design/UI.md). |
-| Focused Verification | Prove a scan-less raw Console virtual-key transition is recovered to its Win32 scan-code make/break pair through the common normalizer; build and owner-evaluate raw VM Console input after Window retirement. |
-| Full Regression | Focused broker/presentation tests plus x64/x86 full package builds and CTest. Preserve user-owned `assets/binary/softpc.ini` and media. |
-| Similar-Issue Sweep | Verify Window and raw Console share the same scan-less virtual-key recovery route and that no Console leaf retains a separate Unicode-only fallback. |
-| Stop Conditions | Stop if the normalized raw Console path still cannot deliver the first post-handoff virtual-key transition. |
-| Exit Criteria | Raw Console key packets use the shared Win32 transition normalizer; scan-less Enter test proves an `0x1c` make/break pair; x64/x86 package builds and full CTest pass; owner validates the reported transition. |
-| Original Owner Request | “就是在你最新的修改之后呀，set focus相关的。” |
+No implementation task is active. M9 T43 closed after S7 owner acceptance.
+The ordered candidate queue remains the only source for a future admission.
 
 ## Current Technical Baseline
 
@@ -30,12 +18,13 @@
 
 ## Recent Governance
 
-- M9 T43 S6 supersedes the S1 foreground policy: Current Console activation,
-  replacement, and restoration configure I/O only and never foreground
-  Console. Window retains its creation self-focus; only SoftPC, after actual
-  Window retirement into a Console-only state, asks host to focus Current
-  Console. Fresh x64/x86 full CTest each passed 32/32. See [S6 history]
-  (../history/M9-T43-S6-console-only-focus.md).
+- M9 T43 closed at S7 after owner acceptance of raw Console recovery. S7
+  supersedes the S6 foreground experiment: successful raw host activation
+  restores native Console focus only after its reader starts, while cooked
+  binding remains non-foreground and is armed only by an explicit monitor
+  prompt request. `ux-console` and `ux-window` now share the RDP-safe Win32
+  transition normalizer. Fresh x64/x86 full CTest each passed 32/32. See [S7
+  history](../history/M9-T43-S7-raw-console-input-recovery.md).
 
 - M9 T43 S2 closed the shared-library split-UX contract documentation and
   manifest: README now records the component graph, mailbox semantics,
