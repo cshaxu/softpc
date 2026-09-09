@@ -2,8 +2,10 @@
 
 ## Current Work
 
-No implementation task is active. M9 T44 closed after dual-width asserted
-runtime lifecycle proof.
+M9 T45 is active. S8 records the owner-validated interaction closeout without
+duplicating an already committed implementation; S9 repairs RDP raw-Console
+registered-hotkey normalization in the shared library. See the
+[T45 proposal](../proposals/m9-t45-lib-ux-rdp-followups.md).
 
 ## Current Technical Baseline
 
