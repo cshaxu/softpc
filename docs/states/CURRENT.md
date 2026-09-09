@@ -5,16 +5,16 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | M9 T43 S7 active |
-| Admission And Approval | Owner reported that S6's SetFocus path leaves VM raw Console unable to receive input after a Window has existed and retired, including on normal Windows desktop. |
-| Objective | Remove invalid Console focus mutation and restore raw Console input after the Window-to-Console transition. |
-| Non-goals | No MVDM modification, guest timer/device change, direct app Win32 calls, configuration/media change, Console reader/mode semantics, or attempt to fix raw input with Console focus changes. |
-| Affected Boundaries | `lib/host` Console focus surface and native leaves, SoftPC presentation/reconciler cleanup, focused tests, shared-library manifest, refreshed packages, and T43 records. |
+| Admission And Approval | Owner approved a bounded historical-semantics experiment: successful raw broker activation restores native Console focus; retain existing SoftPC component ordering so the owner can evaluate Window-plus-raw coexistence. |
+| Objective | Evaluate whether broker-owned raw Console activation restores raw VM input after a Window-to-Console transition. |
+| Non-goals | No MVDM modification, guest timer/device change, public app focus API, configuration/media change, raw/cooked reader-mode semantic change, or reconciler ordering change. |
+| Affected Boundaries | `lib/host/win32` raw-Console activation, focused tests, shared-library manifest, refreshed packages, and T43 records. |
 | Applicable Rules | Execution, architecture, coding, and documentation authorities; [T43 proposal](../proposals/m9-t43-lib-console-ux-test-repairs.md); [System Architecture](../design/ARCHITECTURE.md); [Product UX](../design/UI.md). |
-| Focused Verification | Prove no host/native/app Console focus path remains; Window retains its self-focus; verify raw VM Console inputs after Window retirement. |
+| Focused Verification | Prove only successful raw activation restores Console input focus; verify raw VM Console inputs after Window retirement and owner-evaluate Window-plus-raw coexistence. |
 | Full Regression | Focused broker/presentation tests plus x64/x86 full package builds and CTest. Preserve user-owned `assets/binary/softpc.ini` and media. |
-| Similar-Issue Sweep | Verify raw/cooked activation, restoration, Window destroy, and Window creation have no residual Console-focus side effect. |
-| Stop Conditions | Stop if removing the focus mutation does not restore raw Console input after owner reproduction. |
-| Exit Criteria | No Console-focus API or native focus call remains; x64/x86 package builds and full CTest pass; owner validates the reported transition. |
+| Similar-Issue Sweep | Verify raw/cooked activation, restoration, Window destroy, and Window creation have no unintended Console activation path. |
+| Stop Conditions | Stop if raw-only broker activation does not restore raw Console input after owner reproduction. |
+| Exit Criteria | No public app/broker focus API exists; only successful raw activation restores Console foreground; x64/x86 package builds and full CTest pass; owner validates the reported transition. |
 | Original Owner Request | “就是在你最新的修改之后呀，set focus相关的。” |
 
 ## Current Technical Baseline

@@ -56,6 +56,7 @@ int main(void)
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_BIND_VM_CONSOLE);
     app_reconciler_note_current_console(&state, APP_RECONCILER_CONSOLE_VM);
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
+
     /* Component facts also clear only their own pending action. */
     app_reconciler_initialize(&state, SOFTPC_PRESENTATION_WINDOW, 1);
     app_reconciler_note_intent(&state, APP_RECONCILER_INTENT_START);

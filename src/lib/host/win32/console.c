@@ -174,6 +174,28 @@ static lib_status host_console_start_reader(host_console_native *native_console)
     return LIB_STATUS_OK;
 }
 
+/* The native raw VM Console is the input surface.  This historical behavior
+ * is coupled to successful raw activation rather than exposed as a product
+ * API: the broker owns the one process Console handle and knows whether a
+ * live raw reader exists.  Cooked activation intentionally does not make a
+ * native foreground request. */
+static void host_console_activate_raw_input_surface(
+    host_console_native *native_console)
+{
+    HWND window;
+
+    if (native_console == LIB_NULL ||
+        native_console->mode != HOST_CONSOLE_RAW_EVENTS ||
+        native_console->console == LIB_NULL || native_console->reader == NULL)
+        return;
+    window = GetConsoleWindow();
+    if (window == NULL) return;
+    if (IsIconic(window)) (void)ShowWindow(window, SW_RESTORE);
+    (void)SetForegroundWindow(window);
+    (void)SetActiveWindow(window);
+    (void)SetFocus(window);
+}
+
 lib_status host_console_native_prepare(host_console_native *native_console,
     lib_console *console, host_console_mode mode)
 {
@@ -231,6 +253,8 @@ lib_status host_console_native_activate(host_console_native *native_console,
         native_console->console = LIB_NULL;
         return LIB_STATUS_NO_MEMORY;
     }
+    if (mode == HOST_CONSOLE_RAW_EVENTS)
+        host_console_activate_raw_input_surface(native_console);
     return LIB_STATUS_OK;
 }
 
