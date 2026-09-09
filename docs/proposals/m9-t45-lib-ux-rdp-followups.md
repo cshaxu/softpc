@@ -8,7 +8,7 @@ reported RDP raw-Console registered-hotkey path.  The work is limited to the
 shared host/UX library and its deterministic probes.  SoftPC remains the
 owner of all hotkey meanings and guest-input mapping.
 
-## S8 — Owner-validated interaction closeout
+## S1 — Owner-validated interaction closeout
 
 The owner reports the immediately preceding interaction defect resolved.  The
 working tree contains no uncommitted implementation for that repair: its code
@@ -18,7 +18,7 @@ does not re-label or duplicate the earlier task's code commit.
 
 **Exit:** this P1 record is committed and pushed; the worktree remains clean.
 
-## S9 — RDP raw-Console registered hotkeys
+## S2 — RDP raw-Console registered hotkeys
 
 When a VM raw Console is active through RDP, registered Ctrl+Alt+D and
 Ctrl+Alt+P may fail even though ordinary raw keys work.  Win32 `INPUT_RECORD`
@@ -58,4 +58,3 @@ worktree.
 - Must not change: `src/mvdm/softpc.new/**`, SoftPC lifecycle policy, hotkey
   identifiers or meanings, guest keyboard protocol, user-owned `softpc.ini`,
   or guest media.
-
