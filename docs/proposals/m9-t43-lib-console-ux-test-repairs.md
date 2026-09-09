@@ -70,6 +70,32 @@ behavior remain unchanged.
 next control request returns the declared error, preserves all queued control
 records in order, and does not mutate/overwrite any request.
 
+## S4 — SoftPC integration-path verification audit
+
+Audit the actual SoftPC tests against these product-observable paths, then add
+only the missing deterministic coverage:
+
+- monitor CLI → guest raw Console → monitor CLI: neither input handoff loses
+  an input record;
+- Window → Console: the newly current native Console is immediately usable for
+  input;
+- Console → Window: an old Console input cannot be delivered into the active
+  product path;
+- Window closure and `SOURCE_RETIRED`: no late event reaches an already
+  stopped product path;
+- UX FIFO control-capacity failure: the product receives and reports the
+  failure rather than silently allowing desired/actual state to diverge.
+
+The audit must identify each existing test by file and assertion. A generic
+library fake alone is insufficient where it does not traverse SoftPC's control
+queue, reconciler, monitor, runtime envelope, and component binding. Missing
+coverage must use controllable fakes/completion barriers rather than sleeps or
+timing assumptions.
+
+**Exit:** each path has either a named deterministic SoftPC-level test or a
+bounded newly added test; the evidence states exactly what it proves and what
+it intentionally does not prove.
+
 ## Boundaries
 
 - May change: generic `lib/host/win32` Console implementation and its narrow
