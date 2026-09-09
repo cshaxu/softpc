@@ -2,8 +2,10 @@
 
 ## Current Work
 
-No implementation task is active. M9 T45 closed after owner acceptance of
-raw-Console registered hotkeys.
+M9 T46 S1 is active: it repairs the `display=console`,
+`console_control=1` text-to-graphics handoff so the monitor, rather than the
+raw VM Console, becomes Current Console. See the
+[T46 proposal](../proposals/m9-t46-console-control-graphics-handoff.md).
 
 ## Current Technical Baseline
 

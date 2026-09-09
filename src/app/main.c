@@ -366,9 +366,22 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                     app_presentation_note_component_completed(presenter,
                         control_event.value.component.component,
                         control_event.value.component.exists);
-                else if (control_event.kind == APP_CONTROL_BROKER_COMPLETED)
+                else if (control_event.kind == APP_CONTROL_BROKER_COMPLETED) {
+                    int vm_console_current =
+                        control_event.value.broker_vm_console_current;
                     app_presentation_note_broker_completed(presenter,
-                        control_event.value.broker_vm_console_current);
+                        vm_console_current);
+                    /* `display=console, console_control=1` changes a running
+                       graphic guest from raw VM Console to this cooked
+                       monitor. The broker handoff preserves the old native
+                       screen, so the monitor must explicitly publish and arm
+                       its next prompt; otherwise it looks raw but accepts no
+                       monitor line. Paused/stopped paths already request
+                       their prompt from their runtime completion. */
+                    if (!vm_console_current &&
+                        state == SOFTPC_MONITOR_RUNNING)
+                        prompt_pending = 1;
+                }
                 if (!app_monitor_drive(runtime, presenter)) goto failed;
                 continue;
             }

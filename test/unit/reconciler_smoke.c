@@ -57,6 +57,33 @@ int main(void)
     app_reconciler_note_current_console(&state, APP_RECONCILER_CONSOLE_VM);
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
 
+    /* This is the real Win3.1 transition, not a fresh graphics startup:
+       first text has created and bound raw VM Console; then graphics with
+       console_control=1 must return native Console to the monitor before
+       retiring the VM Console object. */
+    app_reconciler_initialize(&state, SOFTPC_PRESENTATION_CONSOLE, 1);
+    app_reconciler_note_intent(&state, APP_RECONCILER_INTENT_START);
+    app_reconciler_note_runtime(&state, SOFTPC_RUNTIME_RUNNING);
+    app_reconciler_note_frame(&state, 0);
+    assert(app_reconciler_take_action(&state) ==
+        APP_RECONCILER_ACTION_CREATE_VM_CONSOLE);
+    app_reconciler_note_vm_console(&state, 1);
+    assert(app_reconciler_take_action(&state) ==
+        APP_RECONCILER_ACTION_BIND_VM_CONSOLE);
+    app_reconciler_note_current_console(&state, APP_RECONCILER_CONSOLE_VM);
+    assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
+    app_reconciler_note_frame(&state, 1);
+    assert(app_reconciler_take_action(&state) ==
+        APP_RECONCILER_ACTION_CREATE_WINDOW);
+    app_reconciler_note_window(&state, 1);
+    assert(app_reconciler_take_action(&state) ==
+        APP_RECONCILER_ACTION_BIND_MONITOR);
+    app_reconciler_note_current_console(&state, APP_RECONCILER_CONSOLE_MONITOR);
+    assert(app_reconciler_take_action(&state) ==
+        APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE);
+    app_reconciler_note_vm_console(&state, 0);
+    assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
+
     /* Component facts also clear only their own pending action. */
     app_reconciler_initialize(&state, SOFTPC_PRESENTATION_WINDOW, 1);
     app_reconciler_note_intent(&state, APP_RECONCILER_INTENT_START);

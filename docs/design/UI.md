@@ -65,6 +65,9 @@ to `1`. Window display ignores it. Paused uses the monitor object with
 `console_enabled=false`; an existing Window remains only when product intent
 retains it. Stopped has no UX component. Resume first restores the derived
 running component set and Current Console Object, then resumes the VM.
+When a running graphical Console-display route returns Current Console from
+raw VM input to the monitor, SoftPC publishes and arms a fresh `SoftPC>`
+prompt; retaining the prior guest text alone is not a monitor handoff.
 
 Window X is a SoftPC close request: running first reaches paused, host switches
 to monitor, then SoftPC destroys the Window component. Until native Window
