@@ -2,10 +2,8 @@
 
 ## Current Work
 
-M9 T45 S2 is active: it investigates and repairs raw-Console registered
-hotkeys (CAP/CAD/CAF), with RDP as a reported environment rather than an
-assumed exclusive cause. See the
-[T45 proposal](../proposals/m9-t45-lib-ux-rdp-followups.md).
+No implementation task is active. M9 T45 closed after owner acceptance of
+raw-Console registered hotkeys.
 
 ## Current Technical Baseline
 
@@ -31,6 +29,10 @@ assumed exclusive cause. See the
 - M9 T45 S1 revalidated the cold-reset boundary and the completed
   `stop -> start` plus `reset -> pause -> resume` executor chains on x64 and
   x86. See [S1 history](../history/M9-T45-S1-reset-pause-resume-lifecycle.md).
+
+- M9 T45 S2 repairs raw-Console CAP/CAD/CAF normalization from copied native
+  record state; focused coverage and x64/x86 32/32 CTest passed, and the owner
+  accepted RDP behavior. See [S2 history](../history/M9-T45-S2-raw-console-hotkeys.md).
 
 - M9 T43 closed at S7 after owner acceptance of raw Console recovery. S7
   supersedes the S6 foreground experiment: successful raw host activation
