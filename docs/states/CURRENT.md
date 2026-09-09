@@ -2,14 +2,10 @@
 
 ## Current Work
 
-M9 T47 S2 is active: [Win3.1 Prompt raw-Console recovery]
-(../proposals/m9-t47-win31-prompt-raw-console-recovery.md). It changes only
-the shared host Console broker's native-reader retirement/activation contract
-and its focused proof. `src/mvdm/softpc.new/`, SoftPC reconciler, UX key
-normalization, monitor semantics, guest media, and user-owned
-`assets/binary/softpc.ini` are out of scope. Closure requires the focused
-barrier test, x64/x86 full CTest, refreshed executable pair, committed/pushed
-evidence, and a clean worktree.
+M9 T47 remains active; S1 and S2 are closed. Its next implementation subtask
+requires separate owner admission. See [S1 history]
+(../history/M9-T47-S1-frozen-window-hotkey-recovery.md) and [S2 history]
+(../history/M9-T47-S2-win31-prompt-raw-console-recovery.md).
 
 ## Current Technical Baseline
 
@@ -23,6 +19,13 @@ evidence, and a clean worktree.
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T47 S2 repaired the generic host Console reader handoff: old native
+  reader retirement is now confirmed before next activation, cooked-read
+  cancellation has an internal fallback, and an unretired reader fails closed
+  rather than hanging. The owner accepted the Win3.1 Prompt route; x64/x86
+  full CTest each passed 32/32. See [S2 history]
+  (../history/M9-T47-S2-win31-prompt-raw-console-recovery.md).
 
 - M9 T47 S1 preserves registered Window hotkeys while frozen without allowing
   ordinary guest input through, and keeps paused CAD/CAF out of the VM input
