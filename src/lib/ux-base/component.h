@@ -23,9 +23,14 @@ typedef struct ux_component_options {
     ux_hotkey_registry hotkeys;
 } ux_component_options;
 
+/* Copies into this component's one-slot latest-wins frame mailbox. */
 lib_status ux_component_publish_frame(ux_component *component,
     const ux_frame *frame);
+/* Appends one FIFO STOP record. A repeated request is idempotent; a full
+ * ordinary control queue still has its reserved STOP slot. */
 lib_status ux_component_request_stop(ux_component *component);
+/* Synchronous destruction: returns only after the worker consumed STOP,
+ * emitted SOURCE_RETIRED, and no worker remains. */
 void ux_component_destroy(ux_component *component);
 
 #endif

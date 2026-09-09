@@ -77,6 +77,20 @@ if(EXISTS "${SOFTPC_SOURCE_DIR}/src/lib/ux" OR
     message(FATAL_ERROR "Standalone retains the removed unified UX route")
 endif()
 
+# The split shared UX graph is deliberately narrow.  These target links make
+# its allowed component edges executable rather than README-only claims.
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/CMakeLists.txt" lib_cmake_source)
+if(NOT lib_cmake_source MATCHES
+   "target_link_libraries\\(ux-base PUBLIC base-console\\)" OR
+   NOT lib_cmake_source MATCHES
+   "target_link_libraries\\(ux-window PUBLIC base-console ux-base\\)" OR
+   NOT lib_cmake_source MATCHES
+   "target_link_libraries\\(ux-console PUBLIC base-console ux-base\\)" OR
+   lib_cmake_source MATCHES
+   "target_link_libraries\\(ux-(window|console) [^\\)]*(host-sync|storage-medium)")
+    message(FATAL_ERROR "Shared UX component dependency graph is not split")
+endif()
+
 file(STRINGS "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/c-files"
     ccpu_source_names)
 foreach(name IN LISTS ccpu_source_names)

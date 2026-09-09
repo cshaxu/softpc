@@ -4,18 +4,18 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T43 S2 active |
-| Admission And Approval | Owner authorized serial execution of T43 S1–S4, with an exit-condition audit and push required before each subtask transition. S1 is closed. |
-| Objective | Close the shared-library README and manifest contract around the delivered `ux-base` / `ux-window` / `ux-console` split. |
-| Non-goals | No UX behavior, mailbox algorithm, product policy, MVDM, configuration, media, or package-executable change. S3 owns any mailbox implementation change. |
-| Affected Boundaries | Shared-library README/public contract comments, manifest metadata, source-boundary documentation test, and T43 task records. |
+| Identifier Mode | M9 T43 S3 active |
+| Admission And Approval | Owner authorized serial execution of T43 S1–S4, with an exit-condition audit and push required before each subtask transition. S1 and S2 are closed. |
+| Objective | Make `ux-window` and `ux-console` control-mailbox capacity failure explicit and fail-closed: no control request may overwrite another. |
+| Non-goals | No product policy, app queue/reconciler change, host Console ownership change, MVDM change, configuration/media change, or frame-mailbox behavior change. |
+| Affected Boundaries | `src/lib/ux-base` mailbox/component contract, the two leaf control APIs only as needed to propagate status, focused UX component/leaf tests, manifest, and T43 records. |
 | Applicable Rules | Execution, architecture, coding, and documentation authorities; [T43 proposal](../proposals/m9-t43-lib-console-ux-test-repairs.md); [System Architecture](../design/ARCHITECTURE.md); [Product UX](../design/UI.md). |
-| Focused Verification | Audit every shared-library README/manifest/public contract assertion against the actual component source and CMake dependencies; prove no obsolete unified-presenter terminology or prohibited dependency remains. |
-| Full Regression | Documentation governance, library manifest, source-boundary checks, then x64/x86 focused documentation/manifest CTest. Preserve `assets/binary/softpc.ini` and media. |
-| Similar-Issue Sweep | Compare component CMake targets, public headers, mailbox implementation, and lifecycle tests so documentation names the implemented capacity, error, FIFO/STOP, latest-frame, identity, retirement, and neutral Console contracts exactly. |
-| Stop Conditions | Stop for owner direction if accurate documentation would expose an implementation-contract deficiency; record that deficiency for S3 or a new subtask rather than silently rewriting behavior. |
-| Exit Criteria | README/manifest and source-boundary proof accurately describe the split UX graph and all required contracts; no legacy unified-presenter wording remains; verification passes. |
-| Original Owner Request | “必修：收口 README 与 manifest…明确 `ux-base + ux-window + ux-console` 的实际依赖图…写清 mailbox/frame/source identity/logical Console 契约。” |
+| Focused Verification | Fill each leaf's private control FIFO, issue every public control kind including STOP, and prove the declared capacity error preserves the queued records and their FIFO order without overwriting a frame or control. |
+| Full Regression | x64/x86 focused UX tests, manifest/source-boundary checks, then full package builds and CTest. Preserve `assets/binary/softpc.ini` and media. |
+| Similar-Issue Sweep | Trace title, mouse enabled/disabled/release, and destroy/STOP calls from every leaf API to mailbox enqueue and worker consumption; ensure no caller discards an explicit capacity error. |
+| Stop Conditions | Stop for owner direction if making STOP fail at full capacity makes synchronous destroy impossible without a new lifecycle contract; do not invent a retry or overwrite path. |
+| Exit Criteria | Every full control mailbox returns a checkable error for the next request, all queued records survive in order, no control request is overwritten, and both leaves expose the result to callers. |
+| Original Owner Request | “ux-console ux-window两个的control mailbox，如果队列满了，必须返回可检查错误，不能覆盖控制请求。” |
 
 ## Current Technical Baseline
 
@@ -36,6 +36,12 @@
   cover initial activation, replacement, restoration, and non-committing
   failure paths. Fresh x64/x86 full CTest each passed 30/30. See [S1 history]
   (../history/M9-T43-S1-console-focus-handoff.md).
+
+- M9 T43 S2 closed the shared-library split-UX contract documentation and
+  manifest: README now records the component graph, mailbox semantics,
+  latest-frame delivery, source retirement, and neutral logical Console;
+  source-boundary and manifest tests passed for both widths. See [S2 history]
+  (../history/M9-T43-S2-library-contract-closure.md).
 
 - M9 T42 S5 closed with the SoftPC monitor/derived-state reconciler, immutable
   two-buffer frame publication, unchanged-text publication gate, staged

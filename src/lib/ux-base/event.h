@@ -12,8 +12,9 @@ typedef enum ux_event_type {
     UX_EVENT_MOUSE,
     UX_EVENT_HOTKEY,
     UX_EVENT_WINDOW_CLOSE,
-    /* A raw component is permanently retiring. The application must clear
-     * any guest pressed-state associated with this source before forgetting it. */
+    /* A raw component is permanently retiring. This is its final asynchronous
+     * lifetime fact; the application clears pressed state by source_identity
+     * and must not dereference the borrowed source handle. */
     UX_EVENT_SOURCE_RETIRED
 } ux_event_type;
 
