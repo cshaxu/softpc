@@ -2,8 +2,8 @@
 
 ## Current Work
 
-No implementation task is active. M9 T43 closed after S7 owner acceptance.
-The ordered candidate queue remains the only source for a future admission.
+No implementation task is active. M9 T44 closed after dual-width asserted
+runtime lifecycle proof.
 
 ## Current Technical Baseline
 
@@ -17,6 +17,14 @@ The ordered candidate queue remains the only source for a future admission.
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T44 repaired monitor cold restart semantics: every public standalone
+  machine reset now takes the original cold-reset path, while guest hardware
+  warm reset remains unchanged.  Its real executor regression proves
+  `stop -> start -> running` and
+  `reset -> stop -> start -> pause -> resume -> running`; x64 Debug full
+  CTest and x86 full CTest each passed 32/32. See [T44 history]
+  (../history/M9-T44-cold-restart-lifecycle.md).
 
 - M9 T43 closed at S7 after owner acceptance of raw Console recovery. S7
   supersedes the S6 foreground experiment: successful raw host activation

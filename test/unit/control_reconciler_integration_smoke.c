@@ -69,6 +69,8 @@ int main(void)
     /* A frozen Window must not affect a paused VM with a late ordinary key
        make. Cleanup records still enter so a guest cannot retain a key or
        mouse button across the paused boundary. */
+    assert(app_control_queue_push_ux_for_run(queue, &raw_key, 7u));
+    take(queue, &event);
     assert(!app_control_accept_ux_event(&event, 7u, SOFTPC_RUNTIME_PAUSED));
     raw_key.data.key.pressed = 0u;
     assert(app_control_queue_push_ux_for_run(queue, &raw_key, 7u));

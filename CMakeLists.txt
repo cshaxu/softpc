@@ -430,6 +430,8 @@ add_executable(softpc-runtime-smoke
     src/app/runtime.c
     src/app/input_queue.c
     src/app/keyboard.c
+    src/app/presentation_plan.c
+    src/app/reconciler.c
     src/app/prompt_trace.c)
 target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine ux host-sync
     storage-medium)
