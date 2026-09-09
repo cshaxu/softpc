@@ -174,18 +174,28 @@ experiment retains no public focus API: the Win32 broker restores the native
 Console only after a raw reader has started successfully.  Cooked binding,
 failed activation, preparation, and restoration never request foreground.
 
-Owner reproduction further showed that cooked activation was incorrectly
-starting a blocked `ReadConsoleA` even though the monitor had not displayed a
-prompt.  That stale reader consumed the first Enter after raw takeover.  A
-cooked activation now binds only its logical Console/output surface; the sole
-reader-start path is `host_console_cooked_request_line()`, called after
-SoftPC writes `SoftPC> `.  Raw activation alone starts a reader automatically.
+The initial cooked-reader explanation was disproved by owner reproduction:
+raw Console did consume the first Enter, but only the second Enter made later
+keys usable.  The actual split-UX regression is in `ux-console`: its raw
+`INPUT_RECORD` adapter had bypassed the shared `ux-base` Win32 transition
+normalizer.  Under RDP, a record can have `wVirtualKeyCode` with a zero
+physical scan code; sending that zero to the SoftPC key table silently loses
+the transition.  Window already uses `ux_win32_keyboard_submit_transition()`
+to recover the scan through the active layout.  Console now uses that exact
+path for every raw key, preserving make/break symmetry and removing its
+Unicode-only zero-scan special case.
+
+Cooked activation continues to bind only its logical Console/output surface;
+the sole reader-start path is `host_console_cooked_request_line()`, called
+after SoftPC writes `SoftPC> `.  Raw activation alone starts a reader
+automatically.
 
 The existing SoftPC reconciler ordering is deliberately unchanged during this
 owner evaluation, including Window-plus-raw coexistence for
 `console_control=0`.
 
-**Exit:** no public app/broker focus API exists; only successful raw activation
-contains native Console focus; cooked binding alone never starts `ReadConsoleA`;
-x64/x86 focused and full tests pass and owner evaluates both Console-only
-recovery and Window-plus-raw coexistence.
+**Exit:** no public app/broker focus API exists; raw Console uses the same
+shared scan-less transition normalization as Window; the keyboard smoke proves
+zero-scan `VK_RETURN` becomes the `0x1c` make/break pair; cooked binding alone
+never starts `ReadConsoleA`; x64/x86 focused and full tests pass and owner
+evaluates both Console-only recovery and Window-plus-raw coexistence.

@@ -8,7 +8,6 @@
 
 typedef struct ux_console_win32_state {
     HANDLE worker;
-    ux_win32_keyboard_normalizer keyboard;
     COORD previous_mouse;
     int previous_mouse_valid;
 } ux_console_win32_state;
@@ -37,20 +36,17 @@ static void ux_console_receive_event(void *context,
     if (event->kind == LIB_CONSOLE_EVENT_RAW_KEY) {
         const lib_console_raw_key *key = &event->value.raw_key;
 
-        if (key->scan_code == 0u && key->pressed != LIB_FALSE &&
-            key->unicode != 0u) {
-            (void)ux_win32_keyboard_submit_utf16(&state->keyboard, console,
-                ux_console_emit_normalized, (WORD)key->unicode);
-            return;
-        }
-        input.type = UX_EVENT_KEY;
-        input.data.key.scan_code = (lib_u16)(key->scan_code |
-            (key->extended != LIB_FALSE ? 0x0100u : 0u));
-        input.data.key.virtual_key = key->key;
-        input.data.key.modifiers = key->extended != LIB_FALSE ? ENHANCED_KEY : 0u;
-        input.data.key.hotkey_modifiers = key->modifiers;
-        input.data.key.pressed = key->pressed != LIB_FALSE;
-        (void)ux_console_emit(console, &input);
+        /* Console INPUT_RECORD packets and Window messages must take the
+         * same normalization path.  In particular, RDP can provide a
+         * virtual key while omitting its physical scan code; passing zero to
+         * the SoftPC key table makes that first post-handoff key disappear.
+         * ux-base recovers the scan code through the active Win32 layout. */
+        (void)ux_win32_keyboard_submit_transition(console,
+            ux_console_emit_normalized,
+            (WORD)(key->scan_code | (key->extended != LIB_FALSE ?
+                0x0100u : 0u)), (WORD)key->key,
+            key->extended != LIB_FALSE ? ENHANCED_KEY : 0u,
+            key->pressed != LIB_FALSE);
     } else if (event->kind == LIB_CONSOLE_EVENT_RAW_MOUSE) {
         const lib_console_raw_mouse *mouse = &event->value.raw_mouse;
 

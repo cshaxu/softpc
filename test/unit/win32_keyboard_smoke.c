@@ -44,6 +44,18 @@ int main(void)
     assert(capture.keys[0] == 0x01u && capture.releases[0] == 0u);
     assert(capture.keys[1] == 0x01u && capture.releases[1] == 1u);
 
+    /* A raw Console record from RDP can retain VK_RETURN while reporting no
+       physical scan.  Both UX leaves use this shared recovery path, so the
+       guest still receives the normal Enter make/break pair. */
+    capture.count = 0u;
+    assert(ux_win32_keyboard_submit_transition(&capture, capture_key,
+        0u, VK_RETURN, 0u, 1));
+    assert(ux_win32_keyboard_submit_transition(&capture, capture_key,
+        0u, VK_RETURN, 0u, 0));
+    assert(capture.count == 2u);
+    assert(capture.keys[0] == 0x1cu && capture.releases[0] == 0u);
+    assert(capture.keys[1] == 0x1cu && capture.releases[1] == 1u);
+
     /* A scan-less RDP key followed by its WM_CHAR must not inject twice. */
     ux_win32_keyboard_note_recovered_key(&normalizer, 'A');
     assert(ux_win32_keyboard_consume_duplicate_character(&normalizer,
