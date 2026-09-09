@@ -2,8 +2,11 @@
 
 ## Current Work
 
-M9 T47 remains active; S6 is closed. Its next implementation subtask requires
-separate owner admission. See [S6 history]
+M9 T47 S7 is active: [Shared-lib product identity sweep]
+(../proposals/m9-t47-lib-product-identity-sweep.md). It removes product
+identity from shared Window registration, initial title, manifest, and library
+prose, while retaining the admitted NXVM standalone-CMake identity, and adds a
+recurrence guard. S6 is closed; see [S6 history]
 (../history/M9-T47-S6-monitor-command-guidance.md), [S5 history]
 (../history/M9-T47-S5-monitor-lifecycle-command-matrix.md), [S4 history]
 (../history/M9-T47-S4-softpc-console-broker-adoption.md), [S3 history]

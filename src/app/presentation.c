@@ -80,6 +80,8 @@ static int app_presentation_create_window(app_presentation_context *context)
     options.component.failure_context = context;
     options.component.failure_sink = app_presentation_delivery_failed;
     options.component.hotkeys = context->hotkeys;
+    options.initial_title = context->displayed_state == SOFTPC_RUNTIME_PAUSED ?
+        "Insignia SoftPC (Paused)" : "Insignia SoftPC (Running)";
     options.initial_frozen = context->displayed_state != SOFTPC_RUNTIME_RUNNING;
     if (ux_window_create(&context->window, &options) != LIB_STATUS_OK)
         return 0;

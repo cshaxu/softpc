@@ -67,6 +67,36 @@ foreach(source IN LISTS shared_win32_sources)
     endif()
 endforeach()
 
+# The checked-in shared corpus must be reusable without exposing either
+# importing product's identity through native class registration or source.
+# The standalone CMake project name is an explicit NXVM compatibility
+# exemption and is deliberately not included here.
+file(GLOB_RECURSE shared_identity_sources
+    "${SOFTPC_SOURCE_DIR}/src/lib/*.[ch]"
+    "${SOFTPC_SOURCE_DIR}/src/lib/README.md")
+foreach(source IN LISTS shared_identity_sources)
+    file(READ "${source}" shared_identity_contents)
+    string(TOLOWER "${shared_identity_contents}" normalized_shared_identity)
+    if(normalized_shared_identity MATCHES "(softpc|insignia|nxvm)")
+        message(FATAL_ERROR "Shared library leaks importing product identity: ${source}")
+    endif()
+endforeach()
+
+# ux-window owns no product default.  The application supplies one creation
+# title, ux-window copies it before native startup, and the native Window uses
+# that copy rather than a hidden literal.
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-window/window.h" window_header)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-window/window.c" window_source)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-window/win32/component.c"
+    native_window_source)
+string(FIND "${window_header}" "const char *initial_title" title_option_index)
+string(FIND "${window_source}" "memcpy(window->initial_title" title_copy_index)
+string(FIND "${native_window_source}" "component->initial_title" title_native_index)
+if(title_option_index EQUAL -1 OR title_copy_index EQUAL -1 OR
+    title_native_index EQUAL -1)
+    message(FATAL_ERROR "ux-window must use the application's copied initial title")
+endif()
+
 # Component selection is application policy.  Shared UX must not retain the
 # removed unified runner or a target router.
 file(READ "${SOFTPC_SOURCE_DIR}/src/app/main.c" app_main_source)

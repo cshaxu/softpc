@@ -764,7 +764,7 @@ static DWORD WINAPI ux_window_worker(void *opaque)
        pointer moves, defeating guest capture. */
     klass.hCursor = NULL;
     klass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-    klass.lpszClassName = "SoftPCUxWindow";
+    klass.lpszClassName = "LibUxWindow";
     if (RegisterClassA(&klass) == 0 && GetLastError() != ERROR_CLASS_ALREADY_EXISTS) {
         state->startup_status = LIB_STATUS_INVALID_STATE;
         SetEvent(state->ready);
@@ -772,7 +772,7 @@ static DWORD WINAPI ux_window_worker(void *opaque)
     }
     win32_window_initial_bounds(&initial_left, &initial_top, &initial_width,
         &initial_height);
-    window = CreateWindowExA(0, klass.lpszClassName, "Insignia SoftPC",
+    window = CreateWindowExA(0, klass.lpszClassName, component->initial_title,
         WS_THICKFRAME | WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
         WS_MINIMIZEBOX | WS_MAXIMIZEBOX, initial_left, initial_top,
         initial_width, initial_height,

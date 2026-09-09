@@ -1,8 +1,8 @@
 # Shared Library
 
 `src/lib` contains product-neutral, copied-value platform capabilities. It has
-no SoftPC machine pointer, runtime queue, monitor command, lifecycle policy, or
-native SDK type in a public API. `MANIFEST.sha256` lists every source file and
+no application machine pointer, runtime queue, monitor command, lifecycle
+policy, or native SDK type in a public API. `MANIFEST.sha256` lists every source file and
 its exact corpus revision; `verify_manifest.cmake` rejects an unlisted, stale,
 or changed library file.
 

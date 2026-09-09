@@ -91,8 +91,9 @@ typedef struct ux_input_event {
     } data;
 } ux_input_event;
 
-/* Legacy spellings preserve the existing input producer ABI while the split
- * components and SoftPC FIFO migrate to the explicit input-event name. */
+/* Legacy spellings preserve the existing input producer ABI while split
+ * components and the application FIFO migrate to the explicit input-event
+ * name. */
 typedef ux_input_event ux_event;
 
 typedef int (*ux_input_sink)(void *context, const ux_input_event *event);

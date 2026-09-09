@@ -6,6 +6,7 @@
 
 struct ux_window {
     ux_component base;
+    char initial_title[UX_WINDOW_TITLE_CAPACITY];
     lib_bool initial_frozen;
     void *native_state;
 };

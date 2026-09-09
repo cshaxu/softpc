@@ -9,6 +9,9 @@ typedef struct ux_window ux_window;
 
 typedef struct ux_window_options {
     ux_component_options component;
+    /* Copied during creation.  The application owns both initial product
+     * identity and later title changes; ux-window never supplies one. */
+    const char *initial_title;
     /* Frozen forbids capture and cursor blink.  It does not own a capture;
      * an unfrozen Window still waits for a client-area click to acquire one. */
     lib_bool initial_frozen;

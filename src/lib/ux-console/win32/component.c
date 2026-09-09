@@ -51,7 +51,8 @@ static void ux_console_receive_event(void *context,
         /* Console INPUT_RECORD packets and Window messages must take the
          * same normalization path.  In particular, RDP can provide a
          * virtual key while omitting its physical scan code; passing zero to
-         * the SoftPC key table makes that first post-handoff key disappear.
+         * zero physical scan code would drop the first post-handoff key in a
+         * consumer key mapper.
          * ux-base recovers the scan code through the active Win32 layout. */
         (void)ux_win32_keyboard_submit_transition(console,
             ux_console_emit_normalized,
