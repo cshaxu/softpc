@@ -2,11 +2,11 @@
 
 ## Current Work
 
-M9 T47 S7 is active: [Shared-lib product identity sweep]
-(../proposals/m9-t47-lib-product-identity-sweep.md). It removes product
-identity from shared Window registration, initial title, manifest, and library
-prose, while retaining the admitted NXVM standalone-CMake identity, and adds a
-recurrence guard. S6 is closed; see [S6 history]
+M9 T47 has no active subtask. S7 closed the [Shared-lib product identity
+sweep](../history/M9-T47-S7-shared-lib-product-identity-sweep.md): it removes
+product identity from shared Window registration, initial title, manifest, and
+library prose, while retaining the admitted NXVM standalone-CMake identity and
+adding a recurrence guard. See [S6 history]
 (../history/M9-T47-S6-monitor-command-guidance.md), [S5 history]
 (../history/M9-T47-S5-monitor-lifecycle-command-matrix.md), [S4 history]
 (../history/M9-T47-S4-softpc-console-broker-adoption.md), [S3 history]
@@ -26,6 +26,13 @@ recurrence guard. S6 is closed; see [S6 history]
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T47 S7 removed SoftPC/NXVM product identity from the reusable Window
+  class, initial title path, manifest revision, and shared prose. Application
+  code now supplies the copied initial title; the standalone
+  `nxvm_shared_library` CMake project name is the one owner-approved
+  exemption. Fresh x64/x86 full CTest each passed 33/33. See [S7 history]
+  (../history/M9-T47-S7-shared-lib-product-identity-sweep.md).
 
 - M9 T47 S2 repaired the generic host Console reader handoff: old native
   reader retirement is now confirmed before next activation, cooked-read
