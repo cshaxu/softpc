@@ -2,11 +2,12 @@
 
 ## Current Work
 
-M9 T47 has no active subtask. S8 closed the [Neutral shared UX input ABI]
-(../history/M9-T47-S8-neutral-ux-input-abi.md): public UX events now carry
-lib-defined copied key identities, generic modifiers, and neutral injection
-flags, while platform and guest-protocol conversion remain private at their
-respective boundaries. S7 closed the [Shared-lib product identity sweep]
+M9 T47 S9 is active: [Stop/start cold-boot recovery]
+(../proposals/m9-t47-stop-start-cold-boot-recovery.md). After monitor `stop`,
+the next `start` can stall at BIOS despite reaching the coarse runtime
+`RUNNING` fact. S9 traces and repairs the one standalone cold-run lifecycle,
+then proves configured boot progress rather than merely executor re-entry.
+S8 closed the [Neutral shared UX input ABI]
 (../history/M9-T47-S7-shared-lib-product-identity-sweep.md). See [S6 history]
 (../history/M9-T47-S6-monitor-command-guidance.md), [S5 history]
 (../history/M9-T47-S5-monitor-lifecycle-command-matrix.md), [S4 history]
