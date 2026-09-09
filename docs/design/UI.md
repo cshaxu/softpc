@@ -104,6 +104,15 @@ alone maps identifiers to pause/resume, stop/reset/start, mouse release, or
 synthetic guest input such as Ctrl+Alt+Del and Alt+Enter. The cooked monitor
 does not use a UX component or hotkey registry and accepts only monitor lines.
 
+Freezing a Window is a guest-input boundary, not a registered-hotkey boundary:
+its native key transitions still pass through the source-local matcher. A
+matched `UX_HOTKEY` reaches SoftPC; all ordinary key/text/mouse output is
+silently discarded and is never buffered for resume. While paused, SoftPC
+accepts current-run hotkeys and monitor lines as product control input, but it
+must consume guest-input-producing hotkeys before they can enter the VM input
+queue. Thus pause-toggle may request resume, while CAD/CAF cannot inject guest
+keys into a paused VM.
+
 Every user input produced by either UX component is a copied `ux_input_event`:
 ordinary key/text/mouse input and registered-hotkey input are variants of that
 one UX event family. `ux-base` provides its single construction path and each

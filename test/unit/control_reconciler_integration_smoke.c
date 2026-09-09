@@ -5,14 +5,18 @@
 #include <assert.h>
 #include <string.h>
 
-/* control.c's guest adapter is not exercised by this queue/reconciler proof.
- * These stubs keep the test at the application control boundary. */
+/* These stubs keep the test at the application control boundary while making
+ * the paused guest-injection barrier observable. */
+static unsigned int delivered_guest_input;
+static unsigned int delivered_cad;
+static unsigned int delivered_caf;
+
 int app_keyboard_deliver_input(void *context, const ux_event *event)
-{ (void)context; (void)event; return 1; }
+{ (void)context; (void)event; ++delivered_guest_input; return 1; }
 int app_keyboard_submit_ctrl_alt_del(void *context, ux_event_sink sink)
-{ (void)context; (void)sink; return 1; }
+{ (void)context; (void)sink; ++delivered_cad; return 1; }
 int app_keyboard_submit_alt_enter(void *context, ux_event_sink sink)
-{ (void)context; (void)sink; return 1; }
+{ (void)context; (void)sink; ++delivered_caf; return 1; }
 
 static void take(app_control_queue *queue, app_control_event *event)
 { assert(app_control_queue_take(queue, event, 0u)); }
@@ -26,6 +30,7 @@ int main(void)
     lib_console_line pause = { 5u, "pause" };
     ux_input_event raw_key = { 0 };
     ux_input_event retired = { 0 };
+    ux_input_event hotkey = { 0 };
 
     assert(app_control_queue_create(&queue));
     raw_key.type = UX_EVENT_KEY;
@@ -76,6 +81,26 @@ int main(void)
     assert(app_control_queue_push_ux_for_run(queue, &raw_key, 7u));
     take(queue, &event); assert(app_control_accept_ux_event(&event, 7u,
         SOFTPC_RUNTIME_PAUSED));
+
+    /* Paused still admits a current-run registered hotkey for product
+       handling. A stale run remains rejected. Guest-producing hotkeys are
+       consumed at the control/guest boundary while paused. */
+    hotkey.type = UX_EVENT_HOTKEY;
+    strcpy(hotkey.data.hotkey.identifier, "pause-toggle");
+    assert(app_control_queue_push_ux_for_run(queue, &hotkey, 7u));
+    take(queue, &event);
+    assert(app_control_accept_ux_event(&event, 7u, SOFTPC_RUNTIME_PAUSED));
+    assert(app_control_queue_push_ux_for_run(queue, &hotkey, 6u));
+    take(queue, &event);
+    assert(!app_control_accept_ux_event(&event, 7u, SOFTPC_RUNTIME_PAUSED));
+    strcpy(hotkey.data.hotkey.identifier, "send-ctrl-alt-del");
+    assert(app_control_handle_ux(queue, (app_runtime *)1, &hotkey,
+        SOFTPC_RUNTIME_PAUSED));
+    strcpy(hotkey.data.hotkey.identifier, "send-alt-enter");
+    assert(app_control_handle_ux(queue, (app_runtime *)1, &hotkey,
+        SOFTPC_RUNTIME_PAUSED));
+    assert(delivered_guest_input == 0u && delivered_cad == 0u &&
+        delivered_caf == 0u);
 
     /* A UX component's capacity failure is a product control fact, not a
        swallowed leaf-local status. The monitor consumer reports this kind. */

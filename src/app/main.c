@@ -270,7 +270,10 @@ static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
         app_presentation_release_window_mouse(presentation);
         return 1;
     }
-    return app_control_handle_ux(queue, runtime, event);
+    return app_control_handle_ux(queue, runtime, event,
+        monitor_state == SOFTPC_MONITOR_RUNNING ? SOFTPC_RUNTIME_RUNNING :
+        monitor_state == SOFTPC_MONITOR_PAUSED ? SOFTPC_RUNTIME_PAUSED :
+        SOFTPC_RUNTIME_STOPPED);
 }
 
 static int app_monitor(app_runtime *runtime, softpc_presentation presentation,

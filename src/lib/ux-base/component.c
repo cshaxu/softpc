@@ -56,19 +56,27 @@ lib_status ux_component_initialize(ux_component *component,
     return ux_component_mailboxes_create(&component->mailboxes);
 }
 
-int ux_component_emit(ux_component *component, const ux_input_event *event)
+int ux_component_emit_to(ux_component *component, const ux_input_event *event,
+    ux_input_sink delivery_sink, void *delivery_context)
 {
     ux_input_event copied;
-    if (component == LIB_NULL || event == LIB_NULL || component->input_sink == LIB_NULL ||
+    if (component == LIB_NULL || event == LIB_NULL || delivery_sink == LIB_NULL ||
         atomic_load_explicit(&component->stopping, memory_order_acquire) != 0) return 0;
     copied = *event;
     ux_input_event_set_source(&copied, component, component->source_identity);
     if (!ux_hotkey_matcher_submit(&component->hotkey_matcher, &copied,
-            component->input_sink, component->input_context)) {
+            delivery_sink, delivery_context)) {
         ux_component_report_failure(component, LIB_STATUS_IO_ERROR);
         return 0;
     }
     return 1;
+}
+
+int ux_component_emit(ux_component *component, const ux_input_event *event)
+{
+    if (component == LIB_NULL) return 0;
+    return ux_component_emit_to(component, event, component->input_sink,
+        component->input_context);
 }
 
 lib_status ux_component_enqueue_controls(ux_component *component,

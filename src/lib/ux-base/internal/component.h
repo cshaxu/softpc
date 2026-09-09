@@ -28,6 +28,11 @@ lib_status ux_component_initialize(ux_component *component,
 lib_status ux_component_allocate_source_identity(atomic_uint_fast64_t *next,
     lib_u64 *out_identity);
 int ux_component_emit(ux_component *component, const ux_input_event *event);
+/* Uses the component's normal source attribution and source-local matcher,
+ * but lets a leaf choose how to deliver matcher output.  This is internal:
+ * leaves may filter delivery but never replace matching semantics. */
+int ux_component_emit_to(ux_component *component, const ux_input_event *event,
+    ux_input_sink delivery_sink, void *delivery_context);
 lib_status ux_component_enqueue_controls(ux_component *component,
     const ux_component_control *controls, lib_u32 control_count);
 void ux_component_emit_source_retired(ux_component *component);

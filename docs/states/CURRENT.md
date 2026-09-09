@@ -2,8 +2,12 @@
 
 ## Current Work
 
-No implementation task is active. M9 T46 S1 closed after owner acceptance of
-the `console_control=1` graphics handoff.
+M9 T47 S1 — [Frozen Window hotkey recovery]
+(../proposals/m9-t47-frozen-window-hotkey-recovery.md) is active. It preserves
+generic registered-hotkey recognition through a frozen Window while keeping
+ordinary guest input discarded, then admits only product-safe hotkeys while
+paused. It changes no MVDM source, guest behavior, user-owned configuration,
+or media.
 
 ## Current Technical Baseline
 

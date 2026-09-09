@@ -63,10 +63,10 @@ static int win32_window_accepting_input(const ux_win32_window_context *context)
         atomic_load_explicit(&context->component->base.stopping, memory_order_acquire) == 0;
 }
 
-/* Frozen is an application-requested input boundary. It is deliberately
+/* Frozen is an application-requested guest-input boundary. It is deliberately
  * separate from component lifetime: Window close and capture-release cleanup
- * still use accepting_input(), but no new guest input or registered hotkey
- * may leave a frozen Window. */
+ * still use accepting_input(). Native key transitions still reach ux-base's
+ * generic matcher so a registered product hotkey can be delivered. */
 static int win32_window_accepting_guest_input(
     const ux_win32_window_context *context)
 {
@@ -88,9 +88,27 @@ static int win32_window_emit_lifecycle(ux_win32_window_context *context,
         ux_component_emit(&context->component->base, event);
 }
 
+/* ux-base has already attributed and matched this event.  Frozen Window
+ * consumes ordinary matcher output, including mismatch replay, but continues
+ * to forward the copied registered-hotkey event to the application sink. */
+static int win32_window_deliver_normalized(void *opaque,
+    const ux_input_event *event)
+{
+    ux_win32_window_context *context = (ux_win32_window_context *)opaque;
+
+    if (!win32_window_accepting_input(context) || event == LIB_NULL) return 0;
+    if (context->frozen != LIB_FALSE && event->type != UX_EVENT_HOTKEY) return 1;
+    return context->component->base.input_sink(
+        context->component->base.input_context, event);
+}
+
 static int win32_window_emit_normalized(void *opaque, const ux_event *event)
 {
-    return win32_window_emit((ux_win32_window_context *)opaque, event);
+    ux_win32_window_context *context = (ux_win32_window_context *)opaque;
+
+    if (!win32_window_accepting_input(context)) return 0;
+    return ux_component_emit_to(&context->component->base, event,
+        win32_window_deliver_normalized, context);
 }
 
 static HCURSOR win32_window_create_transparent_cursor(void)
@@ -622,12 +640,12 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         return TRUE;
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
-        if (win32_window_accepting_guest_input(context))
+        if (win32_window_accepting_input(context))
             win32_window_transition(context, wparam, lparam, 0);
         return 0;
     case WM_KEYUP:
     case WM_SYSKEYUP:
-        if (win32_window_accepting_guest_input(context))
+        if (win32_window_accepting_input(context))
             win32_window_transition(context, wparam, lparam, 1);
         return 0;
     case WM_CHAR:

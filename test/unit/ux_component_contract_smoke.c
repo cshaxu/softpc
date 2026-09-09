@@ -1,12 +1,15 @@
 #include "lib/ux-base/internal/component.h"
 
 #include <assert.h>
+#include <string.h>
 
 typedef struct component_probe {
     unsigned int input_count;
     unsigned int failure_count;
     lib_u64 last_identity;
     lib_status last_failure;
+    ux_event_type last_type;
+    char last_hotkey[UX_HOTKEY_IDENTIFIER_CAPACITY];
     int accept_input;
 } component_probe;
 
@@ -16,7 +19,20 @@ static int component_probe_input(void *opaque, const ux_input_event *event)
     if (probe == LIB_NULL || event == LIB_NULL || !probe->accept_input) return 0;
     ++probe->input_count;
     probe->last_identity = event->source_identity;
+    probe->last_type = event->type;
+    if (event->type == UX_EVENT_HOTKEY)
+        memcpy(probe->last_hotkey, event->data.hotkey.identifier,
+            sizeof(probe->last_hotkey));
     return 1;
+}
+
+/* Leaf policy belongs after ux-base attribution and matching. This test probe
+ * models frozen Window delivery: regular matcher output succeeds but does not
+ * enter the application sink; registered hotkeys still do. */
+static int component_probe_hotkeys_only(void *opaque, const ux_input_event *event)
+{
+    return event != LIB_NULL && event->type != UX_EVENT_HOTKEY ? 1 :
+        component_probe_input(opaque, event);
 }
 
 static void component_probe_failure(void *opaque, lib_u64 source_identity,
@@ -53,14 +69,20 @@ int main(void)
         { UX_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE, { 0 } }
     };
     atomic_uint_fast64_t identity_next;
+    ux_hotkey_registry hotkeys;
     lib_u64 identity;
     unsigned int index;
 
     probe.accept_input = 1;
+    ux_hotkey_registry_initialize(&hotkeys);
+    assert(ux_hotkey_registry_register(&hotkeys, 'P',
+        UX_HOTKEY_MODIFIER_CONTROL | UX_HOTKEY_MODIFIER_ALT,
+        "pause-toggle") == LIB_STATUS_OK);
     options.input_context = &probe;
     options.input_sink = component_probe_input;
     options.failure_context = &probe;
     options.failure_sink = component_probe_failure;
+    options.hotkeys = hotkeys;
     assert(ux_component_initialize(&first, &options, component_probe_stop,
         component_probe_dispose) == LIB_STATUS_OK);
     assert(ux_component_initialize(&second, &options, component_probe_stop,
@@ -92,6 +114,38 @@ int main(void)
     assert(!ux_component_emit(&first, &event));
     assert(probe.failure_count == 1u);
     assert(probe.last_failure == LIB_STATUS_IO_ERROR);
+
+    /* A frozen Window's delivery policy must not bypass matching. It silently
+       consumes ordinary/mismatched records after ux-base has attributed them,
+       while forwarding only the copied matched identifier to the app sink. */
+    probe.accept_input = 1;
+    probe.input_count = 0u;
+    ux_hotkey_matcher_initialize(&first.hotkey_matcher, &hotkeys);
+    event.data.key.virtual_key = UX_HOTKEY_KEY_CONTROL;
+    event.data.key.scan_code = 0x1du;
+    event.data.key.pressed = 1u;
+    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL;
+    assert(ux_component_emit_to(&first, &event, component_probe_hotkeys_only,
+        &probe));
+    event.data.key.virtual_key = UX_HOTKEY_KEY_ALT;
+    event.data.key.scan_code = 0x38u;
+    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL |
+        UX_HOTKEY_MODIFIER_ALT;
+    assert(ux_component_emit_to(&first, &event, component_probe_hotkeys_only,
+        &probe));
+    event.data.key.virtual_key = 'P';
+    event.data.key.scan_code = 0x19u;
+    assert(ux_component_emit_to(&first, &event, component_probe_hotkeys_only,
+        &probe));
+    assert(probe.input_count == 1u && probe.last_type == UX_EVENT_HOTKEY);
+    assert(strcmp(probe.last_hotkey, "pause-toggle") == 0);
+    assert(probe.last_identity == first.source_identity);
+    event.data.key.virtual_key = 'X';
+    event.data.key.scan_code = 0x2du;
+    event.data.key.hotkey_modifiers = 0u;
+    assert(ux_component_emit_to(&first, &event, component_probe_hotkeys_only,
+        &probe));
+    assert(probe.input_count == 1u);
 
     for (index = 0u; index < UX_COMPONENT_CONTROL_CAPACITY; ++index)
         assert(ux_component_enqueue_controls(&second, &control, 1u) ==

@@ -276,6 +276,7 @@ int app_control_accept_ux_event(const app_control_event *event,
     input = &event->value.ux;
     return input->type == UX_EVENT_WINDOW_CLOSE ||
         input->type == UX_EVENT_SOURCE_RETIRED ||
+        input->type == UX_EVENT_HOTKEY ||
         (input->type == UX_EVENT_KEY && input->data.key.pressed == 0u) ||
         (input->type == UX_EVENT_MOUSE && input->data.mouse.buttons == 0u);
 }
@@ -324,7 +325,7 @@ static int app_control_release_source(app_control_queue *queue,
 }
 
 int app_control_handle_ux(app_control_queue *queue, app_runtime *runtime,
-    const ux_input_event *event)
+    const ux_input_event *event, app_runtime_state runtime_state)
 {
     if (queue == NULL || runtime == NULL || event == NULL) return 0;
     if (event->type == UX_EVENT_KEY) {
@@ -339,6 +340,9 @@ int app_control_handle_ux(app_control_queue *queue, app_runtime *runtime,
     if (event->type == UX_EVENT_WINDOW_CLOSE)
         return 1;
     if (event->type != UX_EVENT_HOTKEY) return 1;
+    /* Hotkeys are product control records, so paused admits them.  Guest
+     * injections they would otherwise request must not cross this boundary. */
+    if (runtime_state != SOFTPC_RUNTIME_RUNNING) return 1;
     if (strcmp(event->data.hotkey.identifier, "pause-toggle") == 0)
         return 1;
     if (strcmp(event->data.hotkey.identifier, "send-ctrl-alt-del") == 0)
