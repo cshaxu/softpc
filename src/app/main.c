@@ -1,5 +1,6 @@
 #include "presentation.h"
 #include "monitor.h"
+#include "monitor_command.h"
 #include "runtime.h"
 #include "machine.h"
 #include "prompt_trace.h"
@@ -187,12 +188,6 @@ invalid:
     return 0;
 }
 
-typedef enum app_monitor_state {
-    SOFTPC_MONITOR_STOPPED,
-    SOFTPC_MONITOR_RUNNING,
-    SOFTPC_MONITOR_PAUSED
-} app_monitor_state;
-
 static void app_monitor_help(app_monitor_console *monitor)
 {
     app_monitor_console_write(monitor,
@@ -261,7 +256,7 @@ static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
     if (event != NULL && event->type == UX_EVENT_HOTKEY &&
         strcmp(event->data.hotkey.identifier, "pause-toggle") == 0) {
         app_presentation_request_intent(presentation,
-            monitor_state == SOFTPC_MONITOR_PAUSED ?
+            monitor_state == APP_MONITOR_PAUSED ?
                 APP_RECONCILER_INTENT_RESUME : APP_RECONCILER_INTENT_PAUSE);
         return 1;
     }
@@ -271,8 +266,8 @@ static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
         return 1;
     }
     return app_control_handle_ux(queue, runtime, event,
-        monitor_state == SOFTPC_MONITOR_RUNNING ? SOFTPC_RUNTIME_RUNNING :
-        monitor_state == SOFTPC_MONITOR_PAUSED ? SOFTPC_RUNTIME_PAUSED :
+        monitor_state == APP_MONITOR_RUNNING ? SOFTPC_RUNTIME_RUNNING :
+        monitor_state == APP_MONITOR_PAUSED ? SOFTPC_RUNTIME_PAUSED :
         SOFTPC_RUNTIME_STOPPED);
 }
 
@@ -281,7 +276,7 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
     app_control_queue *control_queue)
 {
     char line[SOFTPC_CONFIG_PATH_MAX + 64u];
-    app_monitor_state state = SOFTPC_MONITOR_STOPPED;
+    app_monitor_state state = APP_MONITOR_INIT;
     int stop_requested = 0;
     int reset_requested = 0;
     app_presentation *presenter = NULL;
@@ -295,6 +290,8 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
     for (;;) {
         char *command;
         char *argument;
+        app_monitor_lifecycle_command lifecycle_command;
+        app_monitor_command_result lifecycle_result;
         if (prompt_pending && app_monitor_console_write(monitor, "SoftPC> ")) {
             (void)app_monitor_console_request_line(monitor);
             prompt_pending = 0;
@@ -308,9 +305,9 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                      * enter the already-stopped machine path. */
                     if (!app_control_accept_ux_event(&control_event,
                             app_runtime_run_generation(runtime),
-                            state == SOFTPC_MONITOR_RUNNING ?
+                            state == APP_MONITOR_RUNNING ?
                                 SOFTPC_RUNTIME_RUNNING :
-                            state == SOFTPC_MONITOR_PAUSED ?
+                            state == APP_MONITOR_PAUSED ?
                                 SOFTPC_RUNTIME_PAUSED : SOFTPC_RUNTIME_STOPPED))
                         continue;
                     if (!app_monitor_handle_ux(control_queue, runtime, presenter,
@@ -343,21 +340,26 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                 {
                     app_runtime_state completed = control_event.value.runtime_state;
                     if (completed == SOFTPC_RUNTIME_PAUSED &&
-                        state != SOFTPC_MONITOR_PAUSED) {
-                        state = SOFTPC_MONITOR_PAUSED;
+                        state != APP_MONITOR_PAUSED) {
+                        state = APP_MONITOR_PAUSED;
                         app_monitor_console_write(monitor, reset_requested ?
                             "Machine reset and paused.\r\n" : "Machine paused.\r\n");
                         reset_requested = 0;
                         prompt_pending = 1;
                     } else if (completed == SOFTPC_RUNTIME_RUNNING) {
-                        state = SOFTPC_MONITOR_RUNNING;
+                        state = APP_MONITOR_RUNNING;
                     } else if (completed == SOFTPC_RUNTIME_STOPPED &&
-                        (state != SOFTPC_MONITOR_STOPPED || stop_requested)) {
-                        state = SOFTPC_MONITOR_STOPPED;
-                        if (!reset_requested)
+                        (state != APP_MONITOR_STOPPED || stop_requested)) {
+                        state = APP_MONITOR_STOPPED;
+                        if (!reset_requested) {
                             app_monitor_console_write(monitor, "Machine stopped.\r\n");
+                            prompt_pending = 1;
+                        }
+                        /* Reset's stopped completion is an internal stage of
+                         * cold restart. Do not rearm cooked input between its
+                         * stop and start actions, or a second line could
+                         * replace the reset intent before it reaches paused. */
                         stop_requested = 0;
-                        prompt_pending = 1;
                     }
                     app_presentation_note_runtime_completed(presenter, completed);
                 }
@@ -382,7 +384,7 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                        monitor line. Paused/stopped paths already request
                        their prompt from their runtime completion. */
                     if (!vm_console_current &&
-                        state == SOFTPC_MONITOR_RUNNING)
+                        state == APP_MONITOR_RUNNING)
                         prompt_pending = 1;
                 }
                 if (!app_monitor_drive(runtime, presenter)) goto failed;
@@ -413,36 +415,22 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
             app_presentation_destroy(presenter);
             return 0;
         }
-        else if (strcmp(command, "start") == 0) {
-            app_presentation_request_intent(presenter, APP_RECONCILER_INTENT_START);
-            if (!app_monitor_drive(runtime, presenter)) goto failed;
-        } else if (strcmp(command, "resume") == 0) {
-            if (state != SOFTPC_MONITOR_PAUSED)
-            {
-                app_monitor_console_write(monitor, "Machine is not paused.\r\n");
+        else if ((lifecycle_command = app_monitor_command_parse(command)) !=
+            APP_MONITOR_COMMAND_NONE) {
+            lifecycle_result = app_monitor_command_resolve(state,
+                lifecycle_command);
+            if (lifecycle_result.intent == APP_RECONCILER_INTENT_NONE) {
+                app_monitor_console_write(monitor, lifecycle_result.message);
                 prompt_pending = 1;
-            }
-            else { app_presentation_request_intent(presenter, APP_RECONCILER_INTENT_RESUME);
-                if (!app_monitor_drive(runtime, presenter)) goto failed; }
-        } else if (strcmp(command, "pause") == 0) {
-            if (state == SOFTPC_MONITOR_PAUSED)
-            {
-                app_monitor_console_write(monitor, "Machine is paused.\r\n");
-                prompt_pending = 1;
-            }
-            else {
+            } else {
+                if (lifecycle_result.intent == APP_RECONCILER_INTENT_STOP)
+                    stop_requested = 1;
+                if (lifecycle_result.intent == APP_RECONCILER_INTENT_RESET)
+                    reset_requested = 1;
                 app_presentation_request_intent(presenter,
-                    APP_RECONCILER_INTENT_PAUSE);
+                    lifecycle_result.intent);
                 if (!app_monitor_drive(runtime, presenter)) goto failed;
             }
-        } else if (strcmp(command, "stop") == 0) {
-            stop_requested = 1;
-            app_presentation_request_intent(presenter, APP_RECONCILER_INTENT_STOP);
-            if (!app_monitor_drive(runtime, presenter)) goto failed;
-        } else if (strcmp(command, "reset") == 0) {
-            reset_requested = 1;
-            app_presentation_request_intent(presenter, APP_RECONCILER_INTENT_RESET);
-            if (!app_monitor_drive(runtime, presenter)) goto failed;
         } else if (strcmp(command, "floppy") == 0) {
             char *verb = argument;
             char *path = verb;

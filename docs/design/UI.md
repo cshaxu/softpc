@@ -19,6 +19,24 @@ small fixed command set:
 Commands enqueue requests and receive a published result. They never directly
 call a CPU, controller, BOP, or renderer function.
 
+Lifecycle commands have one stable-state matrix. `init` is the monitor before
+its first machine completion; it differs from `stopped` only in its local
+message. A rejected cell prints its fixed explanation and immediately returns
+to the prompt; it does not enqueue an intent.
+
+| Command | init | stopped | paused | running |
+| --- | --- | --- | --- | --- |
+| `start` | cold start → running | cold start → running | use `resume` | already running |
+| `pause` | not started | stopped | already paused | pause → paused |
+| `resume` | not started | stopped | resume → running | already running |
+| `reset` | cold start → paused | cold start → paused | cold reset → paused | stop → cold start → paused |
+| `stop` | not started | already stopped | stop → stopped | stop → stopped |
+
+The monitor does not arm a second cooked line during an accepted lifecycle
+transition. In particular, reset's intermediate stopped completion is internal
+to its cold restart chain; the next prompt appears only after its final paused
+completion.
+
 ## Window And Input
 
 The optional Win32 window displays copied text or graphical frames published
