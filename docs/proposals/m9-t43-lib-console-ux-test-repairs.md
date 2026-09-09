@@ -174,10 +174,18 @@ experiment retains no public focus API: the Win32 broker restores the native
 Console only after a raw reader has started successfully.  Cooked binding,
 failed activation, preparation, and restoration never request foreground.
 
+Owner reproduction further showed that cooked activation was incorrectly
+starting a blocked `ReadConsoleA` even though the monitor had not displayed a
+prompt.  That stale reader consumed the first Enter after raw takeover.  A
+cooked activation now binds only its logical Console/output surface; the sole
+reader-start path is `host_console_cooked_request_line()`, called after
+SoftPC writes `SoftPC> `.  Raw activation alone starts a reader automatically.
+
 The existing SoftPC reconciler ordering is deliberately unchanged during this
 owner evaluation, including Window-plus-raw coexistence for
 `console_control=0`.
 
 **Exit:** no public app/broker focus API exists; only successful raw activation
-contains native Console focus; x64/x86 focused and full tests pass and owner
-evaluates both Console-only recovery and Window-plus-raw coexistence.
+contains native Console focus; cooked binding alone never starts `ReadConsoleA`;
+x64/x86 focused and full tests pass and owner evaluates both Console-only
+recovery and Window-plus-raw coexistence.

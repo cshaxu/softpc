@@ -247,14 +247,20 @@ lib_status host_console_native_activate(host_console_native *native_console,
         sizeof(native_console->previous_palette));
     native_console->previous_columns = 0u;
     native_console->previous_rows = 0u;
-    if (host_console_start_reader(native_console) != LIB_STATUS_OK) {
-        CloseHandle(native_console->stop_event);
-        native_console->stop_event = NULL;
-        native_console->console = LIB_NULL;
-        return LIB_STATUS_NO_MEMORY;
-    }
-    if (mode == HOST_CONSOLE_RAW_EVENTS)
+    /* Cooked mode is a monitor surface, not an input request.  Its reader is
+       armed solely by host_console_native_request_cooked_line() after the app
+       has actually published a prompt.  Starting ReadConsoleA here leaves a
+       hidden line reader alive while a graphic Window is running; it can eat
+       the first Enter after the later raw takeover. */
+    if (mode == HOST_CONSOLE_RAW_EVENTS) {
+        if (host_console_start_reader(native_console) != LIB_STATUS_OK) {
+            CloseHandle(native_console->stop_event);
+            native_console->stop_event = NULL;
+            native_console->console = LIB_NULL;
+            return LIB_STATUS_NO_MEMORY;
+        }
         host_console_activate_raw_input_surface(native_console);
+    }
     return LIB_STATUS_OK;
 }
 

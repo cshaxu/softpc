@@ -5,16 +5,16 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | M9 T43 S7 active |
-| Admission And Approval | Owner approved a bounded historical-semantics experiment: successful raw broker activation restores native Console focus; retain existing SoftPC component ordering so the owner can evaluate Window-plus-raw coexistence. |
-| Objective | Evaluate whether broker-owned raw Console activation restores raw VM input after a Window-to-Console transition. |
-| Non-goals | No MVDM modification, guest timer/device change, public app focus API, configuration/media change, raw/cooked reader-mode semantic change, or reconciler ordering change. |
-| Affected Boundaries | `lib/host/win32` raw-Console activation, focused tests, shared-library manifest, refreshed packages, and T43 records. |
+| Admission And Approval | Owner approved a bounded historical-semantics experiment: successful raw broker activation restores native Console focus; owner reproduction then established that an unprompted cooked reader consumes the first input after raw takeover. |
+| Objective | Restore raw VM Console input after a Window-to-Console transition: raw activation owns its reader and focus; cooked input is armed only by an explicit monitor prompt request. |
+| Non-goals | No MVDM modification, guest timer/device change, public app focus API, configuration/media change, or reconciler ordering change. |
+| Affected Boundaries | `lib/host/win32` Console activation/reader lifecycle, focused tests, shared-library manifest, refreshed packages, and T43 records. |
 | Applicable Rules | Execution, architecture, coding, and documentation authorities; [T43 proposal](../proposals/m9-t43-lib-console-ux-test-repairs.md); [System Architecture](../design/ARCHITECTURE.md); [Product UX](../design/UI.md). |
-| Focused Verification | Prove only successful raw activation restores Console input focus; verify raw VM Console inputs after Window retirement and owner-evaluate Window-plus-raw coexistence. |
+| Focused Verification | Prove only successful raw activation restores Console input focus; prove cooked activation does not arm `ReadConsoleA` until an explicit prompt request; verify raw VM Console inputs after Window retirement and owner-evaluate Window-plus-raw coexistence. |
 | Full Regression | Focused broker/presentation tests plus x64/x86 full package builds and CTest. Preserve user-owned `assets/binary/softpc.ini` and media. |
-| Similar-Issue Sweep | Verify raw/cooked activation, restoration, Window destroy, and Window creation have no unintended Console activation path. |
-| Stop Conditions | Stop if raw-only broker activation does not restore raw Console input after owner reproduction. |
-| Exit Criteria | No public app/broker focus API exists; only successful raw activation restores Console foreground; x64/x86 package builds and full CTest pass; owner validates the reported transition. |
+| Similar-Issue Sweep | Verify raw/cooked activation, restoration, Window destroy, and Window creation leave no unprompted cooked reader or unintended Console activation path. |
+| Stop Conditions | Stop if raw takeover can still be preceded by an unprompted cooked reader after owner reproduction. |
+| Exit Criteria | No public app/broker focus API exists; only successful raw activation restores Console foreground; cooked reader starts only at explicit prompt request; x64/x86 package builds and full CTest pass; owner validates the reported transition. |
 | Original Owner Request | “就是在你最新的修改之后呀，set focus相关的。” |
 
 ## Current Technical Baseline
