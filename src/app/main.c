@@ -301,11 +301,11 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
             if (app_control_queue_take(control_queue, &control_event, 100u)) {
                 if (control_event.kind == APP_CONTROL_UX_INPUT) {
                     /* A component can have queued an event just before an
-                     * old VM run stopped.  It belongs to that run, never to
-                     * a later start which happens to reuse the same UI. */
-                    if (control_event.run_generation != 0u &&
-                        control_event.run_generation !=
-                            app_runtime_run_generation(runtime))
+                     * old VM run stopped. It cannot affect a later run, nor
+                     * enter the already-stopped machine path. */
+                    if (!app_control_accept_ux_event(&control_event,
+                            app_runtime_run_generation(runtime),
+                            state != SOFTPC_MONITOR_STOPPED))
                         continue;
                     if (!app_monitor_handle_ux(control_queue, runtime, presenter,
                             state, &control_event.value.ux))

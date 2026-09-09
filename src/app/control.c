@@ -263,6 +263,15 @@ int app_control_queue_take(app_control_queue *queue,
     return 1;
 }
 
+int app_control_accept_ux_event(const app_control_event *event,
+    uint32_t current_run_generation, int guest_input_active)
+{
+    if (event == NULL || event->kind != APP_CONTROL_UX_INPUT ||
+        !guest_input_active) return 0;
+    return event->run_generation == 0u || event->run_generation ==
+        current_run_generation;
+}
+
 static void app_control_forget_pressed(app_control_queue *queue,
     const ux_input_event *event)
 {

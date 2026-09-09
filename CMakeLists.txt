@@ -511,6 +511,17 @@ target_include_directories(softpc-reconciler-smoke PRIVATE src/app src/host src)
 add_test(NAME softpc-reconciler-smoke COMMAND softpc-reconciler-smoke)
 set_tests_properties(softpc-reconciler-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-control-reconciler-integration-smoke
+    test/unit/control_reconciler_integration_smoke.c
+    src/app/control.c src/app/reconciler.c src/app/presentation_plan.c)
+target_include_directories(softpc-control-reconciler-integration-smoke PRIVATE
+    src/app src/host src)
+target_link_libraries(softpc-control-reconciler-integration-smoke PRIVATE
+    base-console)
+add_test(NAME softpc-control-reconciler-integration-smoke
+    COMMAND softpc-control-reconciler-integration-smoke)
+set_tests_properties(softpc-control-reconciler-integration-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/test/support/standalone_source_boundary.cmake")
