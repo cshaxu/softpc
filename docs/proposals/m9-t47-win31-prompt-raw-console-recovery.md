@@ -36,8 +36,10 @@ decision.
 - Make native reader retirement report success only after the reader has
   actually stopped.  Its cancellation fallback must wake a line-buffered
   cooked read without relying on user input.
-- Preserve old Current Console state on a failed retirement and activate no
-  new reader until retirement has completed.
+- Use a bounded completion barrier.  A failed retirement activates no new
+  reader and makes the broker fail closed with explicit host-I/O failure;
+  cancellation has made the old reader's future behavior unknowable, so it
+  must not be advertised as Current.
 - Apply the same retirement/activation transaction to every mode pair:
   cooked-to-raw, raw-to-cooked, raw-to-raw, and cooked-to-cooked.
 - Add controllable broker/native tests which prove those orderings and the

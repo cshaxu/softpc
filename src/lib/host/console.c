@@ -222,13 +222,21 @@ lib_status host_console_replace_active(host_console_broker *broker,
     host_console_native_lock_output(broker->native_console);
     status = host_console_native_deactivate(broker->native_console);
     if (status != LIB_STATUS_OK) {
-        /* The old reader/binding is still current.  Do not invalidate it or
-           expose the prepared next binding as an alternative input owner. */
+        /* A cancellation request whose reader never completed has no
+           trustworthy Current Console.  Do not start next, and do not claim
+           old remains usable: it may still consume input after this point.
+           Fail closed so the product can terminate/report host I/O failure
+           rather than operating two indeterminate input paths. */
+        broker->broken = LIB_TRUE;
+        lib_console_invalidate_binding(old);
+        old_output = broker->current_output;
+        broker->current_output = LIB_NULL;
         host_console_native_unlock_output(broker->native_console);
         host_console_native_discard_prepare(broker->native_console);
         host_console_remove_output_binding(next, next_output);
         lib_console_release(next);
         host_console_unlock(broker);
+        host_console_remove_output_binding(old, old_output);
         return status;
     }
     lib_console_invalidate_binding(old);
@@ -274,14 +282,23 @@ void host_console_broker_destroy(host_console_broker *broker)
 {
     lib_console *current;
     host_console_output_binding *output;
+    lib_status status;
     if (broker == LIB_NULL) return;
     host_console_lock(broker);
     current = broker->current;
     output = broker->current_output;
+    host_console_native_lock_output(broker->native_console);
+    status = host_console_native_deactivate(broker->native_console);
+    if (status != LIB_STATUS_OK) {
+        /* A live reader still references native_console and current.  This is
+           already a terminal broker failure; retain its process-lifetime
+           state rather than releasing either object underneath that worker. */
+        host_console_native_unlock_output(broker->native_console);
+        host_console_unlock(broker);
+        return;
+    }
     broker->current = LIB_NULL;
     broker->current_output = LIB_NULL;
-    host_console_native_lock_output(broker->native_console);
-    (void)host_console_native_deactivate(broker->native_console);
     if (current != LIB_NULL) lib_console_invalidate_binding(current);
     host_console_native_unlock_output(broker->native_console);
     host_console_unlock(broker);

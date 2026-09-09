@@ -10,7 +10,7 @@ endif()
 file(SHA256 "${manifest}" manifest_hash)
 string(TOUPPER "${manifest_hash}" manifest_hash)
 if(NOT manifest_hash STREQUAL
-    "2E86D56064BFF6BDE95E3D3AFE84D0E78B8B0367E1C6F82567767FC575C7F087")
+    "67DF277F48ED411BA15A04023BB81BDF81B6865D05040E6A90AE76B4A2B6650E")
     message(FATAL_ERROR "Shared library manifest differs from the admitted T47 S2 corpus")
 endif()
 message(STATUS "Admitted T47 S2 shared library manifest is valid")

@@ -170,14 +170,22 @@ int main(void)
     assert(host_console_prepare_saw_active);
     assert(lib_console_write_text(first, "a", 1u) == LIB_STATUS_NOT_CURRENT);
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_OK);
-    /* Reader retirement is an explicit transaction boundary.  A failed
-       retirement keeps the previous Current Console completely usable. */
+    /* Reader retirement is an explicit transaction boundary.  After a failed
+       retirement cancellation may already have disturbed the old reader, so
+       the broker fails closed: neither old nor next is advertised Current. */
     host_console_fail_next_retirement = 1;
     assert(host_console_replace_active(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);
-    assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_OK);
+    assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_NOT_CURRENT);
+    assert(host_console_replace_active(broker, second, first,
+        HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_INVALID_STATE);
+    host_console_broker_destroy(broker);
+    broker = NULL;
+
     /* The one native path is mode-agnostic: all four replacement pairs use
        the same retirement-before-activation contract. */
+    assert(host_console_broker_create(&broker, second,
+        HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK);
     assert(host_console_replace_active(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_OK);
     assert(host_console_replace_active(broker, first, second,

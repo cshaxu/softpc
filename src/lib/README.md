@@ -26,7 +26,11 @@ presenter API.
 - `base` provides scalar aliases and the logical Console object. A logical
   Console is a neutral copied-value endpoint: it has no native handle, platform
   input mode, Window, VM, monitor, or product-lifecycle meaning.
-- `host` binds one logical Console to native I/O and provides clock/sync.
+- `host` binds one logical Console to native I/O and provides clock/sync.  A
+  replacement first retires and confirms the old native reader, then activates
+  the next binding; it uses the same transaction for every raw/cooked pair. If
+  retirement cannot complete, no next reader starts and the broker fails
+  closed with host-I/O failure rather than claiming either Console is usable.
 - `storage` provides file and byte-medium primitives.
 - `ux-base` provides copied frame/input values, source-local registered-hotkey
   matching, source identities, and private mailbox mechanics.

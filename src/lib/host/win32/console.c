@@ -26,6 +26,12 @@ struct host_console_native {
     lib_u16 previous_rows;
 };
 
+/* This is a liveness boundary, not an input debounce or product timer.
+ * Normal cancellation completes immediately.  If the native Console does not
+ * retire its sole reader in this interval, host I/O is no longer trustworthy
+ * and the broker fails closed instead of hanging the control thread. */
+#define HOST_CONSOLE_READER_RETIRE_TIMEOUT_MS 2000u
+
 static COLORREF host_console_colorref_from_rgb(lib_u32 rgb)
 {
     return RGB((rgb >> 16u) & 0xffu, (rgb >> 8u) & 0xffu, rgb & 0xffu);
@@ -156,8 +162,16 @@ lib_status host_console_native_create(host_console_native **out_native)
 
 void host_console_native_destroy(host_console_native *native_console)
 {
+    lib_status status;
     if (native_console == LIB_NULL) return;
-    (void)host_console_native_deactivate(native_console);
+    status = host_console_native_deactivate(native_console);
+    if (status != LIB_STATUS_OK) {
+        /* A live reader still owns native_console and its logical Console.
+           Broker failure is terminal and the process must exit; intentionally
+           retain these process-lifetime resources rather than free storage
+           underneath a live native worker. */
+        return;
+    }
     if (native_console->input != INVALID_HANDLE_VALUE) CloseHandle(native_console->input);
     if (native_console->output != INVALID_HANDLE_VALUE) CloseHandle(native_console->output);
     DeleteCriticalSection(&native_console->output_lock);
@@ -323,7 +337,8 @@ static lib_status host_console_retire_reader(host_console_native *native_console
         if (!WriteConsoleInputA(native_console->input, &wake, 1u, &written) ||
             written != 1u) return LIB_STATUS_IO_ERROR;
     }
-    completed = WaitForSingleObject(native_console->reader, INFINITE);
+    completed = WaitForSingleObject(native_console->reader,
+        HOST_CONSOLE_READER_RETIRE_TIMEOUT_MS);
     if (completed != WAIT_OBJECT_0) return LIB_STATUS_IO_ERROR;
     CloseHandle(native_console->reader);
     native_console->reader = NULL;
@@ -342,8 +357,8 @@ lib_status host_console_native_deactivate(host_console_native *native_console)
     native_console->stop_event = NULL;
     native_console->console = LIB_NULL;
     native_console->generation = 0u;
-    (void)SetConsoleMode(native_console->input, native_console->original_mode);
-    return LIB_STATUS_OK;
+    return SetConsoleMode(native_console->input, native_console->original_mode) ?
+        LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
 void host_console_native_lock_output(host_console_native *native_console)
