@@ -289,7 +289,7 @@ static void app_control_forget_pressed(app_control_queue *queue,
         app_control_pressed_key *pressed = &queue->pressed[index];
         if (pressed->source == event->source_identity &&
             pressed->event.data.key.scan_code == event->data.key.scan_code &&
-            pressed->event.data.key.virtual_key == event->data.key.virtual_key) {
+            pressed->event.data.key.key == event->data.key.key) {
             pressed[0] = queue->pressed[--queue->pressed_count];
             return;
         }

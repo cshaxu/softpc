@@ -97,6 +97,16 @@ if(title_option_index EQUAL -1 OR title_copy_index EQUAL -1 OR
     message(FATAL_ERROR "ux-window must use the application's copied initial title")
 endif()
 
+# The public UX input ABI uses only lib-defined key identities and flags. Win32
+# values are permitted inside the private win32 adapter and SoftPC binding, not
+# in the shared public event contract.
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-base/event.h" ux_event_header)
+if(ux_event_header MATCHES "VK_[A-Za-z0-9_]+" OR
+    ux_event_header MATCHES "ENHANCED_KEY" OR
+    ux_event_header MATCHES "KEY_EVENT_RECORD")
+    message(FATAL_ERROR "Public UX input ABI leaks a Win32 key/injection value")
+endif()
+
 # Component selection is application policy.  Shared UX must not retain the
 # removed unified runner or a target router.
 file(READ "${SOFTPC_SOURCE_DIR}/src/app/main.c" app_main_source)

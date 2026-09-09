@@ -35,7 +35,7 @@ int main(void)
     assert(app_control_queue_create(&queue));
     raw_key.type = UX_EVENT_KEY;
     raw_key.source_identity = 41u;
-    raw_key.data.key.virtual_key = 'A';
+    raw_key.data.key.key = 'A';
     raw_key.data.key.pressed = 1u;
 
     /* Application events admitted after each completed monitor -> raw ->

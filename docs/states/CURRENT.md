@@ -2,11 +2,11 @@
 
 ## Current Work
 
-M9 T47 S8 is active: [Neutral shared UX input ABI]
-(../proposals/m9-t47-neutral-ux-input-abi.md). It replaces platform-numeric
-key and injection semantics in the public UX event with lib-defined copied
-values while preserving the single input route and external SoftPC guest
-binding. S7 closed the [Shared-lib product identity sweep]
+M9 T47 has no active subtask. S8 closed the [Neutral shared UX input ABI]
+(../history/M9-T47-S8-neutral-ux-input-abi.md): public UX events now carry
+lib-defined copied key identities, generic modifiers, and neutral injection
+flags, while platform and guest-protocol conversion remain private at their
+respective boundaries. S7 closed the [Shared-lib product identity sweep]
 (../history/M9-T47-S7-shared-lib-product-identity-sweep.md). See [S6 history]
 (../history/M9-T47-S6-monitor-command-guidance.md), [S5 history]
 (../history/M9-T47-S5-monitor-lifecycle-command-matrix.md), [S4 history]
@@ -27,6 +27,14 @@ binding. S7 closed the [Shared-lib product identity sweep]
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T47 S8 closes the neutral shared UX input ABI. `ux-base` owns copied key
+  identities, generic modifiers, and an extended-key flag; Win32-to-neutral
+  conversion is private in the platform adapter and SoftPC's inverse guest
+  binding remains private in the app. Public-header source-boundary,
+  manifest, and documentation checks passed; fresh x64/x86 full CTest each
+  passed 33/33. See [S8 history]
+  (../history/M9-T47-S8-neutral-ux-input-abi.md).
 
 - M9 T47 S7 removed SoftPC/NXVM product identity from the reusable Window
   class, initial title path, manifest revision, and shared prose. Application

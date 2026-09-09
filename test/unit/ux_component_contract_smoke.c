@@ -105,7 +105,7 @@ int main(void)
     assert(atomic_load_explicit(&identity_next, memory_order_relaxed) == 0u);
 
     event.type = UX_EVENT_KEY;
-    event.data.key.virtual_key = 'A';
+    event.data.key.key = 'A';
     event.data.key.pressed = 1u;
     assert(ux_component_emit(&first, &event));
     assert(probe.input_count == 1u);
@@ -121,28 +121,28 @@ int main(void)
     probe.accept_input = 1;
     probe.input_count = 0u;
     ux_hotkey_matcher_initialize(&first.hotkey_matcher, &hotkeys);
-    event.data.key.virtual_key = UX_HOTKEY_KEY_CONTROL;
+    event.data.key.key = UX_HOTKEY_KEY_CONTROL;
     event.data.key.scan_code = 0x1du;
     event.data.key.pressed = 1u;
-    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL;
+    event.data.key.modifiers = UX_HOTKEY_MODIFIER_CONTROL;
     assert(ux_component_emit_to(&first, &event, component_probe_hotkeys_only,
         &probe));
-    event.data.key.virtual_key = UX_HOTKEY_KEY_ALT;
+    event.data.key.key = UX_HOTKEY_KEY_ALT;
     event.data.key.scan_code = 0x38u;
-    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL |
+    event.data.key.modifiers = UX_HOTKEY_MODIFIER_CONTROL |
         UX_HOTKEY_MODIFIER_ALT;
     assert(ux_component_emit_to(&first, &event, component_probe_hotkeys_only,
         &probe));
-    event.data.key.virtual_key = 'P';
+    event.data.key.key = 'P';
     event.data.key.scan_code = 0x19u;
     assert(ux_component_emit_to(&first, &event, component_probe_hotkeys_only,
         &probe));
     assert(probe.input_count == 1u && probe.last_type == UX_EVENT_HOTKEY);
     assert(strcmp(probe.last_hotkey, "pause-toggle") == 0);
     assert(probe.last_identity == first.source_identity);
-    event.data.key.virtual_key = 'X';
+    event.data.key.key = 'X';
     event.data.key.scan_code = 0x2du;
-    event.data.key.hotkey_modifiers = 0u;
+    event.data.key.modifiers = 0u;
     assert(ux_component_emit_to(&first, &event, component_probe_hotkeys_only,
         &probe));
     assert(probe.input_count == 1u);

@@ -8,7 +8,9 @@
 typedef struct softpc_keyboard_capture {
     uint8_t keys[16];
     uint8_t releases[16];
-    uint8_t hotkey_modifiers[16];
+    uint8_t modifiers[16];
+    lib_u32 identities[16];
+    lib_u32 flags[16];
     unsigned int count;
 } softpc_keyboard_capture;
 
@@ -19,7 +21,9 @@ static int capture_key(void *context, const ux_event *event)
         capture->count == sizeof(capture->keys)) return 0;
     capture->keys[capture->count] = (uint8_t)event->data.key.scan_code;
     capture->releases[capture->count] = (uint8_t)!event->data.key.pressed;
-    capture->hotkey_modifiers[capture->count++] = event->data.key.hotkey_modifiers;
+    capture->modifiers[capture->count] = event->data.key.modifiers;
+    capture->identities[capture->count] = event->data.key.key;
+    capture->flags[capture->count++] = event->data.key.flags;
     return 1;
 }
 
@@ -88,6 +92,7 @@ int main(void)
     assert(capture.count == 2u);
     assert(capture.keys[0] == 0x1eu && capture.releases[0] == 0u);
     assert(capture.keys[1] == 0x1eu && capture.releases[1] == 1u);
+    assert(capture.identities[0] == 'A' && capture.identities[1] == 'A');
 
     /* Esc is an ordinary original key-table entry (key 110), not a host
        stop command. */
@@ -111,6 +116,15 @@ int main(void)
     assert(capture.count == 2u);
     assert(capture.keys[0] == 0x1cu && capture.releases[0] == 0u);
     assert(capture.keys[1] == 0x1cu && capture.releases[1] == 1u);
+    assert(capture.identities[0] == UX_KEY_ENTER &&
+        capture.identities[1] == UX_KEY_ENTER);
+
+    /* Extended state is a neutral UX flag, not a copied Win32 control bit. */
+    capture.count = 0u;
+    assert(ux_win32_keyboard_submit_transition(&capture, capture_key,
+        0xe04du, VK_RIGHT, ENHANCED_KEY, 0u, 1));
+    assert(capture.count == 1u && capture.identities[0] == UX_KEY_RIGHT);
+    assert(capture.flags[0] == UX_KEY_FLAG_EXTENDED);
 
     /* Raw Console input provides its own per-record modifier state.  These
        registrations must not depend on process-global GetKeyState(), which
@@ -126,7 +140,7 @@ int main(void)
         0x19u, 'P', 0u, UX_HOTKEY_MODIFIER_CONTROL |
         UX_HOTKEY_MODIFIER_ALT, 1));
     assert(capture.count == 1u);
-    assert(capture.hotkey_modifiers[0] == (UX_HOTKEY_MODIFIER_CONTROL |
+    assert(capture.modifiers[0] == (UX_HOTKEY_MODIFIER_CONTROL |
         UX_HOTKEY_MODIFIER_ALT));
 
     /* A scan-less RDP key followed by its WM_CHAR must not inject twice. */

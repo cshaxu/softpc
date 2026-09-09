@@ -35,7 +35,7 @@ lib_bool ux_linux_key_to_event(ux_linux_key key, ux_event *out_event)
     }
     memset(out_event, 0, sizeof(*out_event));
     out_event->type = UX_EVENT_KEY;
-    out_event->data.key.virtual_key = key_identity;
+    out_event->data.key.key = key_identity;
     out_event->data.key.pressed = LIB_TRUE;
     return LIB_TRUE;
 }

@@ -1,4 +1,5 @@
 #include "runtime.h"
+#include "lib/ux-base/win32/input.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -336,6 +337,11 @@ static void dump_palette_history(void)
 
 static int enqueue_virtual_key_pair(app_runtime *runtime, WORD virtual_key);
 
+static int enqueue_ux_event(void *opaque, const ux_event *event)
+{
+    return app_runtime_enqueue_input_event((app_runtime *)opaque, event);
+}
+
 static int send_key(app_runtime *runtime, uint8_t key_number)
 {
     WORD virtual_key = key_number == 31u ? 'S' :
@@ -347,7 +353,6 @@ static int enqueue_virtual_key(app_runtime *runtime, WORD virtual_key,
     DWORD control_state, uint8_t released)
 {
     WORD scan;
-    ux_event event = { 0 };
 
     /* Match win32_keyboard.c exactly: the Setup menu distinguishes the
        extended cursor Up key from keypad 8. */
@@ -359,14 +364,8 @@ static int enqueue_virtual_key(app_runtime *runtime, WORD virtual_key,
        so the smoke tests the original arrow, rather than keypad 8. */
     if (virtual_key == VK_UP) scan = 0xe048u;
     if (virtual_key == VK_DOWN) scan = 0xe050u;
-    event.type = UX_EVENT_KEY;
-    event.data.key.scan_code = (scan & 0xff00u) == 0xe000u ?
-        (lib_u16)(0x0100u | (scan & 0xffu)) : (lib_u16)(scan & 0xffu);
-    event.data.key.virtual_key = virtual_key;
-    event.data.key.modifiers = control_state;
-    event.data.key.pressed = released == 0u;
-    return event.data.key.scan_code != 0u &&
-        app_runtime_enqueue_input_event(runtime, &event);
+    return ux_win32_keyboard_submit_transition(runtime, enqueue_ux_event,
+        scan, virtual_key, control_state, 0u, released == 0u);
 }
 
 /* Match the Win32 frontend's ordinary key transition contract: the host

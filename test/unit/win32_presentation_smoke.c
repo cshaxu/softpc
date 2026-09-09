@@ -40,23 +40,23 @@ int main(void)
         "pause-toggle") == LIB_STATUS_OK);
     ux_hotkey_matcher_initialize(&matcher, &registry);
     event.type = UX_EVENT_KEY;
-    event.data.key.virtual_key = UX_HOTKEY_KEY_CONTROL;
+    event.data.key.key = UX_HOTKEY_KEY_CONTROL;
     event.data.key.scan_code = 0x1du;
     event.data.key.pressed = 1u;
-    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL;
+    event.data.key.modifiers = UX_HOTKEY_MODIFIER_CONTROL;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
         &capture));
-    event.data.key.virtual_key = UX_HOTKEY_KEY_ALT;
+    event.data.key.key = UX_HOTKEY_KEY_ALT;
     event.data.key.scan_code = 0x38u;
-    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL |
+    event.data.key.modifiers = UX_HOTKEY_MODIFIER_CONTROL |
         UX_HOTKEY_MODIFIER_ALT;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
         &capture));
     event.type = UX_EVENT_KEY;
-    event.data.key.virtual_key = 'P';
+    event.data.key.key = 'P';
     event.data.key.scan_code = 0x19u;
     event.data.key.pressed = 1u;
-    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL |
+    event.data.key.modifiers = UX_HOTKEY_MODIFIER_CONTROL |
         UX_HOTKEY_MODIFIER_ALT;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
         &capture));
@@ -66,13 +66,13 @@ int main(void)
     event.data.key.pressed = 0u;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
         &capture));
-    event.data.key.virtual_key = UX_HOTKEY_KEY_ALT;
+    event.data.key.key = UX_HOTKEY_KEY_ALT;
     event.data.key.scan_code = 0x38u;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
         &capture));
-    event.data.key.virtual_key = UX_HOTKEY_KEY_CONTROL;
+    event.data.key.key = UX_HOTKEY_KEY_CONTROL;
     event.data.key.scan_code = 0x1du;
-    event.data.key.hotkey_modifiers = 0u;
+    event.data.key.modifiers = 0u;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event,
         &capture));
     assert(capture.count == 1u);
@@ -81,28 +81,28 @@ int main(void)
     capture.count = 0u;
     ux_hotkey_matcher_initialize(&matcher, &registry);
     event.type = UX_EVENT_KEY;
-    event.data.key.virtual_key = UX_HOTKEY_KEY_CONTROL;
+    event.data.key.key = UX_HOTKEY_KEY_CONTROL;
     event.data.key.scan_code = 0x1du;
     event.data.key.pressed = 1u;
-    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL;
+    event.data.key.modifiers = UX_HOTKEY_MODIFIER_CONTROL;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
     event.data.key.scan_code = 0x11du;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
-    event.data.key.virtual_key = UX_HOTKEY_KEY_ALT;
+    event.data.key.key = UX_HOTKEY_KEY_ALT;
     event.data.key.scan_code = 0x38u;
-    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL |
+    event.data.key.modifiers = UX_HOTKEY_MODIFIER_CONTROL |
         UX_HOTKEY_MODIFIER_ALT;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
-    event.data.key.virtual_key = 'P';
+    event.data.key.key = 'P';
     event.data.key.scan_code = 0x19u;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
     assert(capture.count == 1u && capture.events[0].type == UX_EVENT_HOTKEY);
     event.data.key.pressed = 0u;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
-    event.data.key.virtual_key = UX_HOTKEY_KEY_ALT;
+    event.data.key.key = UX_HOTKEY_KEY_ALT;
     event.data.key.scan_code = 0x38u;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
-    event.data.key.virtual_key = UX_HOTKEY_KEY_CONTROL;
+    event.data.key.key = UX_HOTKEY_KEY_CONTROL;
     event.data.key.scan_code = 0x1du;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
     event.data.key.scan_code = 0x11du;
@@ -113,16 +113,16 @@ int main(void)
     capture.count = 0u;
     ux_hotkey_matcher_initialize(&matcher, &registry);
     event.type = UX_EVENT_KEY;
-    event.data.key.virtual_key = UX_HOTKEY_KEY_CONTROL;
+    event.data.key.key = UX_HOTKEY_KEY_CONTROL;
     event.data.key.pressed = 1u;
-    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL;
+    event.data.key.modifiers = UX_HOTKEY_MODIFIER_CONTROL;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
-    event.data.key.virtual_key = 'X';
-    event.data.key.hotkey_modifiers = UX_HOTKEY_MODIFIER_CONTROL;
+    event.data.key.key = 'X';
+    event.data.key.modifiers = UX_HOTKEY_MODIFIER_CONTROL;
     assert(ux_hotkey_matcher_submit(&matcher, &event, ux_capture_event, &capture));
     assert(capture.count == 2u);
-    assert(capture.events[0].data.key.virtual_key == UX_HOTKEY_KEY_CONTROL);
-    assert(capture.events[1].data.key.virtual_key == 'X');
+    assert(capture.events[0].data.key.key == UX_HOTKEY_KEY_CONTROL);
+    assert(capture.events[1].data.key.key == 'X');
     free(frame);
     return 0;
 }

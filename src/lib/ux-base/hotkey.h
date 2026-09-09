@@ -8,16 +8,16 @@
 #define UX_HOTKEY_SUPPRESSED_CAPACITY (UX_HOTKEY_PENDING_CAPACITY + 1u)
 
 enum {
-    UX_HOTKEY_MODIFIER_CONTROL = 0x01u,
-    UX_HOTKEY_MODIFIER_ALT = 0x02u,
-    UX_HOTKEY_MODIFIER_SHIFT = 0x04u,
-    UX_HOTKEY_KEY_CONTROL = 0x11u,
-    UX_HOTKEY_KEY_ALT = 0x12u,
-    UX_HOTKEY_KEY_SHIFT = 0x10u
+    UX_HOTKEY_MODIFIER_CONTROL = UX_KEY_MODIFIER_CONTROL,
+    UX_HOTKEY_MODIFIER_ALT = UX_KEY_MODIFIER_ALT,
+    UX_HOTKEY_MODIFIER_SHIFT = UX_KEY_MODIFIER_SHIFT,
+    UX_HOTKEY_KEY_CONTROL = UX_KEY_CONTROL,
+    UX_HOTKEY_KEY_ALT = UX_KEY_ALT,
+    UX_HOTKEY_KEY_SHIFT = UX_KEY_SHIFT
 };
 
 typedef struct ux_hotkey_registration {
-    lib_u32 key;
+    ux_key key;
     lib_u8 modifiers;
     char identifier[UX_HOTKEY_IDENTIFIER_CAPACITY];
 } ux_hotkey_registration;
@@ -28,7 +28,7 @@ typedef struct ux_hotkey_registry {
 } ux_hotkey_registry;
 
 typedef struct ux_hotkey_suppressed_key {
-    lib_u32 virtual_key;
+    ux_key key;
     lib_u16 scan_code;
 } ux_hotkey_suppressed_key;
 
@@ -37,7 +37,7 @@ typedef struct ux_hotkey_matcher {
     ux_input_event pending[UX_HOTKEY_PENDING_CAPACITY];
     lib_u32 pending_count;
     /* A matched chord suppresses every make and every later break belonging
-     * to that chord.  Each physical pending make is retained: virtual key
+     * to that chord.  Each physical pending make is retained: key identity
      * alone is not an identity because left/right modifiers share it. */
     ux_hotkey_suppressed_key suppressed_keys[UX_HOTKEY_SUPPRESSED_CAPACITY];
     lib_u32 suppressed_count;
@@ -45,7 +45,7 @@ typedef struct ux_hotkey_matcher {
 
 void ux_hotkey_registry_initialize(ux_hotkey_registry *registry);
 lib_status ux_hotkey_registry_register(ux_hotkey_registry *registry,
-    lib_u32 key, lib_u8 modifiers, const char *identifier);
+    ux_key key, lib_u8 modifiers, const char *identifier);
 void ux_hotkey_matcher_initialize(ux_hotkey_matcher *matcher,
     const ux_hotkey_registry *registry);
 /* Emits ordinary events and matched UX_EVENT_HOTKEY values through `sink`.

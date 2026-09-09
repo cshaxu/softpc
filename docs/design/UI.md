@@ -141,6 +141,13 @@ SoftPC's one input queue accepts both event families as distinct payloads in
 arrival order; its control thread is their sole consumer. No monitor line is
 mislabeled as a UX event, and no UX component parses monitor commands.
 
+For key events, the shared ABI carries a lib-defined `ux_key`, optional
+physical scan code, neutral key flags (currently `UX_KEY_FLAG_EXTENDED`),
+generic Ctrl/Alt/Shift state, and make/break. It never carries a native
+virtual-key code or native control-state word. A platform adapter translates
+native input before emitting the event; SoftPC's private keyboard binding
+performs any conversion required by its original machine key mapper.
+
 ## Responsiveness
 
 The frontend remains responsive while the guest runs. Frame presentation is

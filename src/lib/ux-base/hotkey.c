@@ -1,6 +1,6 @@
 #include "lib/ux-base/hotkey.h"
 
-static lib_u8 ux_hotkey_modifier_bit(lib_u32 key)
+static lib_u8 ux_hotkey_modifier_bit(ux_key key)
 {
     if (key == UX_HOTKEY_KEY_CONTROL) return UX_HOTKEY_MODIFIER_CONTROL;
     if (key == UX_HOTKEY_KEY_ALT) return UX_HOTKEY_MODIFIER_ALT;
@@ -9,7 +9,7 @@ static lib_u8 ux_hotkey_modifier_bit(lib_u32 key)
 }
 
 static const ux_hotkey_registration *ux_hotkey_registry_match(
-    const ux_hotkey_registry *registry, lib_u32 key, lib_u8 modifiers)
+    const ux_hotkey_registry *registry, ux_key key, lib_u8 modifiers)
 {
     lib_u32 index;
     if (registry == LIB_NULL) return LIB_NULL;
@@ -49,8 +49,8 @@ static lib_bool ux_hotkey_is_suppressed(const ux_hotkey_matcher *matcher,
     lib_u32 index;
     if (matcher == LIB_NULL || event == LIB_NULL) return LIB_FALSE;
     for (index = 0u; index < matcher->suppressed_count; ++index)
-        if (matcher->suppressed_keys[index].virtual_key ==
-                event->data.key.virtual_key &&
+        if (matcher->suppressed_keys[index].key ==
+                event->data.key.key &&
             matcher->suppressed_keys[index].scan_code ==
                 event->data.key.scan_code) return LIB_TRUE;
     return LIB_FALSE;
@@ -64,11 +64,11 @@ static void ux_hotkey_suppress_chord(ux_hotkey_matcher *matcher,
     for (index = 0u; index < matcher->pending_count; ++index) {
         matcher->suppressed_keys[matcher->suppressed_count++] =
             (ux_hotkey_suppressed_key) {
-                matcher->pending[index].data.key.virtual_key,
+                matcher->pending[index].data.key.key,
                 matcher->pending[index].data.key.scan_code };
     }
     matcher->suppressed_keys[matcher->suppressed_count++] =
-        (ux_hotkey_suppressed_key) { trigger->data.key.virtual_key,
+        (ux_hotkey_suppressed_key) { trigger->data.key.key,
             trigger->data.key.scan_code };
     matcher->pending_count = 0u;
 }
@@ -79,7 +79,7 @@ void ux_hotkey_registry_initialize(ux_hotkey_registry *registry)
 }
 
 lib_status ux_hotkey_registry_register(ux_hotkey_registry *registry,
-    lib_u32 key, lib_u8 modifiers, const char *identifier)
+    ux_key key, lib_u8 modifiers, const char *identifier)
 {
     lib_u32 index;
     const char *end;
@@ -123,8 +123,8 @@ int ux_hotkey_matcher_submit(ux_hotkey_matcher *matcher,
             event)) {
         lib_u32 index;
         for (index = 0u; index < matcher->suppressed_count; ++index) {
-            if (matcher->suppressed_keys[index].virtual_key ==
-                    event->data.key.virtual_key &&
+            if (matcher->suppressed_keys[index].key ==
+                    event->data.key.key &&
                 matcher->suppressed_keys[index].scan_code ==
                     event->data.key.scan_code) {
                 matcher->suppressed_keys[index] = matcher->suppressed_keys[
@@ -136,8 +136,8 @@ int ux_hotkey_matcher_submit(ux_hotkey_matcher *matcher,
         return 1;
     }
     if (event->data.key.pressed != 0u && (matched = ux_hotkey_registry_match(
-            &matcher->registry, event->data.key.virtual_key,
-            event->data.key.hotkey_modifiers)) != LIB_NULL) {
+            &matcher->registry, event->data.key.key,
+            event->data.key.modifiers)) != LIB_NULL) {
         ux_input_event hotkey = *event;
         ux_hotkey_suppress_chord(matcher, event);
         hotkey.type = UX_EVENT_HOTKEY;
@@ -145,7 +145,7 @@ int ux_hotkey_matcher_submit(ux_hotkey_matcher *matcher,
             sizeof(hotkey.data.hotkey.identifier));
         return sink(context, &hotkey);
     }
-    modifier = ux_hotkey_modifier_bit(event->data.key.virtual_key);
+    modifier = ux_hotkey_modifier_bit(event->data.key.key);
     if (event->data.key.pressed != 0u && modifier != 0u &&
         ux_hotkey_registry_has_modifier(&matcher->registry, modifier)) {
         if (matcher->pending_count == UX_HOTKEY_PENDING_CAPACITY &&

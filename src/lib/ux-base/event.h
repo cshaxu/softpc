@@ -3,8 +3,8 @@
 
 #include "lib/base/base.h"
 
-/* Product-neutral host input emitted by the presentation library.  Virtual
- * keys and scan codes describe a host physical transition; text is the
+/* Product-neutral host input emitted by the presentation library. Key
+ * identities and scan codes describe a host physical transition; text is the
  * Unicode scalar that could not be represented by such a transition. */
 typedef enum ux_event_type {
     UX_EVENT_KEY,
@@ -20,9 +20,12 @@ typedef enum ux_event_type {
 
 #define UX_HOTKEY_IDENTIFIER_CAPACITY 64u
 
+typedef lib_u32 ux_key;
+
 enum {
-    /* Neutral terminal key identities.  These describe input only; registered
-     * hotkey interpretation remains an application concern. */
+    /* Neutral key identities. Printable keys use their ASCII scalar. These
+     * values describe input only; product hotkey interpretation remains an
+     * application concern. */
     UX_KEY_F1 = 0x00010001u,
     UX_KEY_F2 = 0x00010002u,
     UX_KEY_F3 = 0x00010003u,
@@ -47,9 +50,56 @@ enum {
     UX_KEY_PAGE_DOWN = 0x0002000au,
     UX_KEY_INSERT = 0x0002000bu,
     UX_KEY_DELETE = 0x0002000cu,
+    UX_KEY_ESCAPE = 0x00030001u,
+    UX_KEY_TAB = 0x00030002u,
+    UX_KEY_SHIFT = 0x00030003u,
+    UX_KEY_CONTROL = 0x00030004u,
+    UX_KEY_ALT = 0x00030005u,
+    UX_KEY_CAPS_LOCK = 0x00030006u,
+    UX_KEY_NUM_LOCK = 0x00030007u,
+    UX_KEY_SCROLL_LOCK = 0x00030008u,
+    UX_KEY_PAUSE = 0x00030009u,
+    UX_KEY_PRINT_SCREEN = 0x0003000au,
+    UX_KEY_LEFT_WINDOWS = 0x0003000bu,
+    UX_KEY_RIGHT_WINDOWS = 0x0003000cu,
+    UX_KEY_MENU = 0x0003000du,
+    UX_KEY_KEYPAD_0 = 0x00040000u,
+    UX_KEY_KEYPAD_1,
+    UX_KEY_KEYPAD_2,
+    UX_KEY_KEYPAD_3,
+    UX_KEY_KEYPAD_4,
+    UX_KEY_KEYPAD_5,
+    UX_KEY_KEYPAD_6,
+    UX_KEY_KEYPAD_7,
+    UX_KEY_KEYPAD_8,
+    UX_KEY_KEYPAD_9,
+    UX_KEY_KEYPAD_MULTIPLY,
+    UX_KEY_KEYPAD_ADD,
+    UX_KEY_KEYPAD_SUBTRACT,
+    UX_KEY_KEYPAD_DECIMAL,
+    UX_KEY_KEYPAD_DIVIDE,
+    UX_KEY_F13 = 0x0005000du,
+    UX_KEY_F14,
+    UX_KEY_F15,
+    UX_KEY_F16,
+    UX_KEY_F17,
+    UX_KEY_F18,
+    UX_KEY_F19,
+    UX_KEY_F20,
+    UX_KEY_F21,
+    UX_KEY_F22,
+    UX_KEY_F23,
+    UX_KEY_F24,
     UX_MOUSE_BUTTON_LEFT = 0x01u,
     UX_MOUSE_BUTTON_RIGHT = 0x02u,
     UX_MOUSE_BUTTON_MIDDLE = 0x04u
+};
+
+enum {
+    UX_KEY_FLAG_EXTENDED = 0x01u,
+    UX_KEY_MODIFIER_CONTROL = 0x01u,
+    UX_KEY_MODIFIER_ALT = 0x02u,
+    UX_KEY_MODIFIER_SHIFT = 0x04u
 };
 
 typedef struct ux_input_event {
@@ -64,12 +114,12 @@ typedef struct ux_input_event {
     union {
         struct {
             lib_u16 scan_code;
-            /* A host-native or neutral key identity. Zero means absent. */
-            lib_u32 virtual_key;
-            /* Native guest-injection state (for example ENHANCED_KEY). */
-            lib_u32 modifiers;
-            /* Platform-neutral Ctrl/Alt/Shift mask used only by matcher. */
-            lib_u8 hotkey_modifiers;
+            /* A ux-base-defined key identity. Zero means absent. */
+            ux_key key;
+            /* Platform-neutral physical-key facts. */
+            lib_u32 flags;
+            /* Current Ctrl/Alt/Shift state for the generic matcher. */
+            lib_u8 modifiers;
             lib_u8 pressed;
         } key;
         struct {

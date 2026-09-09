@@ -44,6 +44,12 @@ temporarily originate in SoftPC only when its active packet requires NXVM to
 adopt the exact code and requires SoftPC to re-import it before task closure;
 this is a delivery order, not a permanent project fork.
 
+Shared UX key events are copied `ux_key`, physical scan, neutral injection
+flags, generic Ctrl/Alt/Shift state, and make/break values. Platform adapters
+translate native records before the event reaches the shared contract; only
+the application guest binding may translate that neutral value to a product's
+guest-input protocol.
+
 The runtime executor is the sole caller of the machine and compatibility host.
 Input producers enqueue records and signal it. The executor publishes complete
 text or graphic frame snapshots; frontends consume only those snapshots.
