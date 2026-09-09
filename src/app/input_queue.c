@@ -83,4 +83,13 @@ int app_input_queue_pending(app_input_queue *queue)
     LeaveCriticalSection(&queue->lock);
     return pending;
 }
+
+void app_input_queue_clear(app_input_queue *queue)
+{
+    if (queue == NULL) return;
+    EnterCriticalSection(&queue->lock);
+    queue->head = 0u;
+    queue->tail = 0u;
+    LeaveCriticalSection(&queue->lock);
+}
 #endif

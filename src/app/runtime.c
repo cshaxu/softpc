@@ -552,6 +552,11 @@ int app_runtime_start(app_runtime *runtime)
     if (InterlockedCompareExchange(&runtime->state, 0, 0) !=
         SOFTPC_RUNTIME_STOPPED) return 0;
     host_sync_event_reset(runtime->ready_event);
+    /* The VM queue is not a monitor queue: every record in it represents
+       guest input for the previous run.  Do this before reset and before the
+       new executor can service an event, so BIOS cannot consume a stale key
+       or mouse transition from a stopped machine. */
+    app_input_queue_clear(runtime->input_queue);
     app_runtime_invalidate_published_frame(runtime);
     InterlockedExchange(&runtime->pause_requested, 0);
     InterlockedExchange(&runtime->stop_requested, 0);
@@ -640,11 +645,10 @@ int app_runtime_enqueue_input_event(app_runtime *runtime,
     LONG state;
     if (runtime == NULL || event == NULL) return 0;
     state = InterlockedCompareExchange(&runtime->state, 0, 0);
-    if (state != SOFTPC_RUNTIME_RUNNING &&
-        !(state == SOFTPC_RUNTIME_PAUSED &&
-          (event->type == UX_EVENT_HOTKEY || event->type == UX_EVENT_WINDOW_CLOSE ||
-           (event->type == UX_EVENT_KEY && event->data.key.pressed == 0u) ||
-           (event->type == UX_EVENT_MOUSE && event->data.mouse.buttons == 0u))))
+    /* This is the VM ingress queue, not the control queue.  Pause may still
+       receive monitor commands and registered hotkeys upstream, but no key,
+       mouse, make, or break record may cross into a paused guest. */
+    if (state != SOFTPC_RUNTIME_RUNNING)
         return 0;
     if (!app_input_queue_push(runtime->input_queue, event))
         return 0;

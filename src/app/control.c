@@ -308,7 +308,7 @@ static void app_control_remember_pressed(app_control_queue *queue,
 }
 
 static int app_control_release_source(app_control_queue *queue,
-    app_runtime *runtime, uint64_t source)
+    app_runtime *runtime, uint64_t source, app_runtime_state runtime_state)
 {
     unsigned int index = 0u;
     while (index < queue->pressed_count) {
@@ -318,7 +318,11 @@ static int app_control_release_source(app_control_queue *queue,
             continue;
         }
         pressed->event.data.key.pressed = 0u;
-        if (!app_keyboard_deliver_input(runtime, &pressed->event)) return 0;
+        /* Source retirement is ledger cleanup.  It can reach the control
+           queue after pause, but must not turn into a late guest release in
+           the paused or stopped VM. */
+        if (runtime_state == SOFTPC_RUNTIME_RUNNING &&
+            !app_keyboard_deliver_input(runtime, &pressed->event)) return 0;
         queue->pressed[index] = queue->pressed[--queue->pressed_count];
     }
     return 1;
@@ -331,12 +335,15 @@ int app_control_handle_ux(app_control_queue *queue, app_runtime *runtime,
     if (event->type == UX_EVENT_KEY) {
         if (event->data.key.pressed != 0u) app_control_remember_pressed(queue, event);
         else app_control_forget_pressed(queue, event);
-        return app_keyboard_deliver_input(runtime, event);
+        return runtime_state != SOFTPC_RUNTIME_RUNNING ||
+            app_keyboard_deliver_input(runtime, event);
     }
     if (event->type == UX_EVENT_MOUSE)
-        return app_keyboard_deliver_input(runtime, event);
+        return runtime_state != SOFTPC_RUNTIME_RUNNING ||
+            app_keyboard_deliver_input(runtime, event);
     if (event->type == UX_EVENT_SOURCE_RETIRED)
-        return app_control_release_source(queue, runtime, event->source_identity);
+        return app_control_release_source(queue, runtime, event->source_identity,
+            runtime_state);
     if (event->type == UX_EVENT_WINDOW_CLOSE)
         return 1;
     if (event->type != UX_EVENT_HOTKEY) return 1;

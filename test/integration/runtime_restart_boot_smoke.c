@@ -56,33 +56,92 @@ static int wait_for_frame_of_run(const runtime_frame_probe *probe,
     return 0;
 }
 
-/* Pause before sampling the public instruction pointer.  This does not give
- * a frontend access to guest state: it is an integration-only proof that a
- * configured boot has left the firmware reset segment on each cold run. */
-static int run_reaches_post_bios(app_runtime *runtime, softpc_machine *machine,
-    runtime_frame_probe *probe, uint32_t run_generation,
-    uint32_t prior_sequence, DWORD uninterrupted_runtime_ms)
+/* This test consumes the copied runtime snapshot, never the original video
+ * surface.  A real command prompt is the owner-observed post-BIOS fact for
+ * this installed image; CS merely leaving F000 is not an adequate proxy. */
+static int frame_has_dos_prompt(const app_runtime_frame *frame)
 {
-    uint16_t cs = 0u;
-    uint32_t eip = 0u;
+    uint32_t row;
 
-    REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_RUNNING));
+    if (frame == NULL || frame->valid == 0u || frame->graphics != 0u)
+        return 0;
+    for (row = 0u; row < frame->text_rows; ++row) {
+        const uint8_t *line = &frame->text[row * SOFTPC_RUNTIME_TEXT_COLUMNS];
+        uint32_t column;
+
+        for (column = 0u; column + 2u < frame->text_columns; ++column) {
+            if (((line[column] >= 'A' && line[column] <= 'Z') ||
+                 (line[column] >= 'a' && line[column] <= 'z')) &&
+                (line[column + 1u] == '>' ||
+                 (line[column + 1u] == ':' &&
+                  (line[column + 2u] == '>' ||
+                   (column + 3u < frame->text_columns &&
+                    line[column + 2u] == '\\' && line[column + 3u] == '>')))))
+                return 1;
+        }
+    }
+    return 0;
+}
+
+static void report_last_frame(app_runtime *runtime)
+{
+    app_runtime_frame frame;
+    uint32_t row;
+
+    if (!app_runtime_copy_frame(runtime, &frame)) return;
+    fprintf(stderr, "last frame: valid=%u graphics=%u text=%ux%u sequence=%lu\n",
+        (unsigned int)frame.valid, (unsigned int)frame.graphics,
+        (unsigned int)frame.text_columns, (unsigned int)frame.text_rows,
+        (unsigned long)frame.sequence);
+    if (frame.graphics != 0u) return;
+    for (row = 0u; row < frame.text_rows; ++row) {
+        char line[SOFTPC_RUNTIME_TEXT_COLUMNS + 1u];
+        uint32_t column;
+        int nonblank = 0;
+
+        for (column = 0u; column < frame.text_columns; ++column) {
+            uint8_t c = frame.text[row * SOFTPC_RUNTIME_TEXT_COLUMNS + column];
+            line[column] = c >= 0x20u && c < 0x7fu ? (char)c : ' ';
+            if (line[column] != ' ') nonblank = 1;
+        }
+        line[frame.text_columns] = '\0';
+        if (nonblank) fprintf(stderr, "%s\n", line);
+    }
+}
+
+static int wait_for_dos_prompt(app_runtime *runtime, DWORD timeout_ms)
+{
+    app_runtime_frame frame;
+    DWORD deadline = GetTickCount() + timeout_ms;
+
+    do {
+        if (app_runtime_copy_frame(runtime, &frame) && frame_has_dos_prompt(&frame))
+            return 1;
+        Sleep(10u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    return 0;
+}
+
+static int run_reaches_post_bios(app_runtime *runtime,
+    runtime_frame_probe *probe, uint32_t run_generation,
+    uint32_t prior_sequence)
+{
+    if (!wait_for_state(runtime, SOFTPC_RUNTIME_RUNNING)) goto failed;
     /* This is deliberately stronger than an executor/IP check: a new cold
      * run must commit a copied frame tagged with its own run generation.
      * Otherwise the product layer could retain the previous run's surface
      * and make a live VM look stalled after `pause -> stop -> start`. */
-    REQUIRE(wait_for_frame_of_run(probe, run_generation, prior_sequence));
-    /* Do not repeatedly pause/resume as a test-side wake-up.  The reported
-     * failure is an otherwise idle second boot, so it must make progress
-     * under its normal clock alone before this one diagnostic pause. */
-    Sleep(uninterrupted_runtime_ms);
-    REQUIRE(app_runtime_pause(runtime));
-    REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_PAUSED));
-    REQUIRE(softpc_machine_instruction_pointer(machine, &cs, &eip) ==
-        SOFTPC_MACHINE_OK);
-    REQUIRE(cs != 0xf000u);
-    REQUIRE(app_runtime_resume(runtime));
-    return wait_for_state(runtime, SOFTPC_RUNTIME_RUNNING);
+    if (!wait_for_frame_of_run(probe, run_generation, prior_sequence)) goto failed;
+    /* No test-side wake-up: every boot must reach its normal DOS command
+     * prompt under the ordinary executor clock within the product's ten
+     * second expectation. */
+    return wait_for_dos_prompt(runtime, 10000u);
+
+failed:
+    fprintf(stderr, "runtime restart boot check failed: run=%lu state=%d\n",
+        (unsigned long)run_generation, (int)app_runtime_get_state(runtime));
+    report_last_frame(runtime);
+    return 0;
 }
 
 int main(void)
@@ -90,9 +149,9 @@ int main(void)
     softpc_machine_options options = { 0 };
     softpc_machine *machine = NULL;
     app_runtime *runtime = NULL;
-    uint32_t first_generation;
-    uint32_t second_generation;
-    uint32_t first_sequence;
+    uint32_t generation;
+    uint32_t sequence;
+    unsigned int cycle;
     runtime_frame_probe frame_probe = { 0 };
 
     options.hard_disk_path = "assets/media/win31_en_installed.img";
@@ -104,26 +163,29 @@ int main(void)
     app_runtime_set_frame_sink(runtime, receive_frame, &frame_probe);
 
     REQUIRE(app_runtime_start(runtime));
-    first_generation = app_runtime_run_generation(runtime);
-    REQUIRE(first_generation != 0u);
-    REQUIRE(run_reaches_post_bios(runtime, machine, &frame_probe,
-        first_generation, 0u, 5000u));
-    first_sequence = (uint32_t)InterlockedCompareExchange(
+    generation = app_runtime_run_generation(runtime);
+    REQUIRE(generation != 0u);
+    REQUIRE(run_reaches_post_bios(runtime, &frame_probe,
+        generation, 0u));
+    sequence = (uint32_t)InterlockedCompareExchange(
         &frame_probe.last_sequence, 0, 0);
 
     /* Monitor `stop` normally arrives after pause has returned Current
-       Console to the cooked monitor.  This is a different executor exit
-       path from a direct running stop and must cold-start just as cleanly. */
-    REQUIRE(app_runtime_pause(runtime));
-    REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_PAUSED));
-    REQUIRE(app_runtime_stop(runtime));
-    REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_STOPPED));
-
-    REQUIRE(app_runtime_start(runtime));
-    second_generation = app_runtime_run_generation(runtime);
-    REQUIRE(second_generation != first_generation);
-    REQUIRE(run_reaches_post_bios(runtime, machine, &frame_probe,
-        second_generation, first_sequence, 10000u));
+       Console to the cooked monitor.  Repeat that exact public path: reset
+       bugs often appear only after one or more prior controller lifetimes. */
+    for (cycle = 0u; cycle < 3u; ++cycle) {
+        REQUIRE(app_runtime_pause(runtime));
+        REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_PAUSED));
+        REQUIRE(app_runtime_stop(runtime));
+        REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_STOPPED));
+        REQUIRE(app_runtime_start(runtime));
+        generation = app_runtime_run_generation(runtime);
+        REQUIRE(generation != 0u);
+        REQUIRE(run_reaches_post_bios(runtime, &frame_probe,
+            generation, sequence));
+        sequence = (uint32_t)InterlockedCompareExchange(
+            &frame_probe.last_sequence, 0, 0);
+    }
 
     REQUIRE(app_runtime_stop(runtime));
     REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_STOPPED));

@@ -29,6 +29,7 @@ int main(void)
     lib_console_line start = { 5u, "start" };
     lib_console_line pause = { 5u, "pause" };
     ux_input_event raw_key = { 0 };
+    ux_input_event raw_mouse = { 0 };
     ux_input_event retired = { 0 };
     ux_input_event hotkey = { 0 };
 
@@ -71,9 +72,9 @@ int main(void)
         SOFTPC_RUNTIME_RUNNING));
     assert(!app_control_accept_ux_event(&event, 7u, SOFTPC_RUNTIME_STOPPED));
 
-    /* A frozen Window must not affect a paused VM with a late ordinary key
-       make. Cleanup records still enter so a guest cannot retain a key or
-       mouse button across the paused boundary. */
+    /* A frozen Window must not affect a paused VM with any late ordinary
+       input. Releases remain admitted only for the app's pressed-key ledger;
+       they must not cross the separate VM ingress boundary. */
     assert(app_control_queue_push_ux_for_run(queue, &raw_key, 7u));
     take(queue, &event);
     assert(!app_control_accept_ux_event(&event, 7u, SOFTPC_RUNTIME_PAUSED));
@@ -81,6 +82,13 @@ int main(void)
     assert(app_control_queue_push_ux_for_run(queue, &raw_key, 7u));
     take(queue, &event); assert(app_control_accept_ux_event(&event, 7u,
         SOFTPC_RUNTIME_PAUSED));
+    assert(app_control_handle_ux(queue, (app_runtime *)1, &event.value.ux,
+        SOFTPC_RUNTIME_PAUSED));
+    raw_mouse.type = UX_EVENT_MOUSE;
+    raw_mouse.data.mouse.buttons = 0u;
+    assert(app_control_handle_ux(queue, (app_runtime *)1, &raw_mouse,
+        SOFTPC_RUNTIME_PAUSED));
+    assert(delivered_guest_input == 0u);
 
     /* Paused still admits a current-run registered hotkey for product
        handling. A stale run remains rejected. Guest-producing hotkeys are

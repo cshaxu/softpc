@@ -1,5 +1,6 @@
 #include "runtime.h"
 #include "control.h"
+#include "input_queue.h"
 #include "reconciler.h"
 #include "test_cleanup.h"
 
@@ -108,6 +109,20 @@ int main(void)
             assert(copied.value.ux.data.text.scalar == index);
         }
         app_control_queue_destroy(queue);
+    }
+    {
+        app_input_queue *queue = NULL;
+        ux_event event = { 0 };
+
+        assert(app_input_queue_create(&queue));
+        event.type = UX_EVENT_KEY;
+        event.data.key.scan_code = 0x1eu;
+        event.data.key.pressed = 1u;
+        assert(app_input_queue_push(queue, &event));
+        assert(app_input_queue_pending(queue));
+        app_input_queue_clear(queue);
+        assert(!app_input_queue_pending(queue));
+        app_input_queue_destroy(queue);
     }
     assert(app_runtime_start(runtime));
     first_run = app_runtime_run_generation(runtime);

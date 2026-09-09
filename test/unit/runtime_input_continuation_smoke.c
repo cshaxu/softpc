@@ -23,6 +23,16 @@ static int runtime_input_wait_for_byte(softpc_machine *machine,
     return 0;
 }
 
+static int runtime_input_wait_for_state(app_runtime *runtime,
+    app_runtime_state expected, DWORD deadline)
+{
+    do {
+        if (app_runtime_get_state(runtime) == expected) return 1;
+        Sleep(1u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    return 0;
+}
+
 static int runtime_input_enqueue_key(app_runtime *runtime, uint16_t scan,
     lib_u32 key, uint8_t pressed)
 {
@@ -60,6 +70,7 @@ int main(void)
     DWORD started_at;
     DWORD deadline;
     uint8_t delivered = 0u;
+    uint8_t reset_irq_count = 0u;
 
     memcpy(sector, boot_code, sizeof(boot_code));
     sector[510] = 0x55u;
@@ -76,6 +87,10 @@ int main(void)
     assert(app_runtime_start(runtime));
     assert(runtime_input_wait_for_byte(machine, 0x501u, 0x55u,
         GetTickCount() + 5000u, NULL));
+    Sleep(250u);
+    assert(softpc_machine_read_physical(machine, 0x500u, &delivered,
+        sizeof(delivered)) == SOFTPC_MACHINE_OK);
+    reset_irq_count = delivered;
 
     started_at = GetTickCount();
     assert(runtime_input_enqueue_key(runtime, 0x1fu, 'S', 1u));
@@ -89,6 +104,25 @@ int main(void)
        wakes must deliver the rest without three 50 ms device-timer waits. */
     assert((DWORD)(GetTickCount() - started_at) < 125u);
     assert(app_runtime_get_state(runtime) == SOFTPC_RUNTIME_RUNNING);
+
+    /* Paused is a monitor/control state, not a second guest-input mode.  A
+       release is as much a guest record as a make: it must be rejected here,
+       then a subsequent cold run must reach its boot code with no IRQ1 from
+       that rejected old-run input. */
+    assert(app_runtime_pause(runtime));
+    assert(runtime_input_wait_for_state(runtime, SOFTPC_RUNTIME_PAUSED,
+        GetTickCount() + 5000u));
+    assert(!runtime_input_enqueue_key(runtime, 0x1fu, 'S', 0u));
+    assert(app_runtime_stop(runtime));
+    assert(runtime_input_wait_for_state(runtime, SOFTPC_RUNTIME_STOPPED,
+        GetTickCount() + 5000u));
+    assert(app_runtime_start(runtime));
+    assert(runtime_input_wait_for_byte(machine, 0x501u, 0x55u,
+        GetTickCount() + 5000u, NULL));
+    Sleep(250u);
+    assert(softpc_machine_read_physical(machine, 0x500u, &delivered,
+        sizeof(delivered)) == SOFTPC_MACHINE_OK);
+    assert(delivered == reset_irq_count);
 
     assert(app_runtime_stop(runtime));
     app_runtime_destroy(runtime);

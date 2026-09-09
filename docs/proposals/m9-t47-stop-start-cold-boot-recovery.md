@@ -7,27 +7,26 @@ guest boot path. It currently can remain at BIOS.
 
 ## Objective
 
-Repair the one standalone `running -> stop -> start` product path so the
-second run both re-enters the configured boot path and replaces the former
-run's visible presentation fact. An executor/IP observation alone is not
-sufficient: the new run must publish a copied frame with its own SoftPC run
-generation, and the app reducer must rebuild its route from that new frame
-rather than retaining an old Window/Console image.
+Repair the standalone `running -> pause -> stop -> start` path so every new
+run re-enters the configured DOS boot path without accepting any guest input
+belonging to the prior run. An executor/IP observation alone is not
+sufficient: each run must publish a copied `C:\\>` text frame with its own
+SoftPC run generation.
 
 ## Baseline and suspected boundary
 
 `app_runtime_start()` clears the app stop request, increments the SoftPC-only
 run generation, and asks its persistent executor worker to call the public
-`softpc_machine_reset()` boundary. Existing runtime smoke verifies it reaches
-`RUNNING`, but uses a tiny synthetic image and does not prove a configured DOS
-boot progresses past firmware. The observed package failure is therefore an
-incomplete lifecycle proof, not permission to edit MVDM.
+`softpc_machine_reset()` boundary. The runtime's VM input FIFO previously
+survived that boundary, and paused key/mouse releases could still enter it.
+Those are guest facts from the old controller lifetime; a new BIOS must never
+consume them. Monitor lines and registered hotkeys remain in the independent
+product control FIFO and are not affected.
 
-The audit must preserve T44's approved `soft_reset = 0` public cold-start
-policy. The earlier S9 claim that changing this original internal fact solved
-the issue is superseded: it did not change the owner-observed failure. The
-audit must instead trace the completed runtime frame, run generation, and app
-route after the second start.
+The audit preserves T44's approved `soft_reset = 0` public cold-start policy.
+The earlier S9 claim that changing this original internal fact solved the issue
+is superseded: it did not change the owner-observed failure. No MVDM reset
+branch is modified; the standalone runtime owns its own input lifetime.
 
 ## Boundaries and non-goals
 
@@ -42,22 +41,23 @@ route after the second start.
 
 ## Implementation and proof
 
-1. Prove with configured installed media that both runs leave firmware and
-   each commits a copied frame tagged with its own run generation.
-2. Invalidate the completed snapshot at the explicit new-run boundary; retain
-   monotonic frame sequence identity, but never let a new run inherit the old
-   frame as its current output.
-3. Prove the reducer retires a stopped graphical route and waits for the new
-   run's first frame before rebuilding a text/graphic route.
-4. Audit the adjacent `reset -> stop -> start -> pause -> resume` chain for
-   the same stale presentation fact.
+1. Clear the VM-input FIFO before each new run; do not clear or reinterpret
+   the monitor/control FIFO.
+2. Keep all ordinary guest key/mouse events, including releases and source
+   retirement cleanup, out of a paused or stopped VM. Registered hotkeys and
+   monitor commands continue through the product control path.
+3. Prove with configured installed media that the initial run plus three
+   successive `pause -> stop -> start` runs each publish their own copied
+   `C:\\>` frame within ten seconds.
+4. Prove the low-level queue clear and paused ingress gate independently;
+   retain the existing run-generation frame boundary test.
 5. Build x64 and x86, run their full CTest suites and package smoke, refresh
    only the two agent-owned package executables, then retain corrected S9
    evidence in history.
 
 ## Exit criteria
 
-The configured package no longer retains a prior-run display after monitor
-`stop` then `start`; deterministic regression proves post-BIOS progress and a
-new-generation published frame on both cold runs; MVDM is unchanged; x64/x86
-full CTest passes; all changes are committed and pushed with a clean worktree.
+The configured package reaches a new `C:\\>` frame after each tested monitor
+`pause -> stop -> start`; stale VM input cannot reach a paused/stopped guest or
+survive into a cold run; MVDM is unchanged; x64/x86 full CTest passes; all
+changes are committed and pushed with a clean worktree.
