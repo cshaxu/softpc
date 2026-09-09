@@ -65,6 +65,9 @@ void app_reconciler_note_vm_console(app_reconciler *reconciler, int exists);
 void app_reconciler_note_current_console(app_reconciler *reconciler,
     app_reconciler_console_actual current);
 app_presentation_plan app_reconciler_desired(const app_reconciler *reconciler);
+/* A product-side actual fact used only after Window completion to decide
+ * whether the one Current Console may be foregrounded. */
+int app_reconciler_console_only_actual(const app_reconciler *reconciler);
 app_reconciler_action app_reconciler_next_action(const app_reconciler *reconciler);
 app_reconciler_action app_reconciler_take_action(app_reconciler *reconciler);
 

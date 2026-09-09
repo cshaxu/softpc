@@ -12,6 +12,9 @@ lib_status host_console_broker_create(host_console_broker **out_broker,
 lib_status host_console_replace_active(host_console_broker *broker,
     lib_console *old_console, lib_console *next_console,
     host_console_mode next_mode);
+/* Foregrounding is an explicit product request, independent of binding a
+ * Current Console for native I/O.  It is deliberately best effort. */
+void host_console_broker_request_focus(host_console_broker *broker);
 void host_console_broker_destroy(host_console_broker *broker);
 
 #endif

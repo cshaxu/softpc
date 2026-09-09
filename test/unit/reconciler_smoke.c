@@ -37,8 +37,12 @@ int main(void)
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_RUNTIME_PAUSE);
     app_reconciler_note_runtime(&state, SOFTPC_RUNTIME_PAUSED);
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_DESTROY_WINDOW);
-
+    /* Window destruction is the completion barrier for the only product
+       foreground request: no focus while Window is actual; exactly a
+       Console-only actual surface afterwards. */
+    assert(!app_reconciler_console_only_actual(&state));
     app_reconciler_note_window(&state, 0);
+    assert(app_reconciler_console_only_actual(&state));
     app_reconciler_note_intent(&state, APP_RECONCILER_INTENT_STOP);
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_RUNTIME_STOP);
     app_reconciler_note_runtime(&state, SOFTPC_RUNTIME_STOPPED);
@@ -57,6 +61,16 @@ int main(void)
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_BIND_VM_CONSOLE);
     app_reconciler_note_current_console(&state, APP_RECONCILER_CONSOLE_VM);
     assert(app_reconciler_next_action(&state) == APP_RECONCILER_ACTION_NONE);
+    /* A live Window forbids foregrounding even if VM Console is Current. */
+    assert(!app_reconciler_console_only_actual(&state));
+    /* A later completed text frame derives Console-only, but focus still
+       waits for the old Window's actual destroy completion. */
+    app_reconciler_note_frame(&state, 0);
+    assert(app_reconciler_next_action(&state) ==
+        APP_RECONCILER_ACTION_DESTROY_WINDOW);
+    assert(!app_reconciler_console_only_actual(&state));
+    app_reconciler_note_window(&state, 0);
+    assert(app_reconciler_console_only_actual(&state));
 
     /* Component facts also clear only their own pending action. */
     app_reconciler_initialize(&state, SOFTPC_PRESENTATION_WINDOW, 1);

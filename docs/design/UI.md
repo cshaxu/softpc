@@ -70,6 +70,11 @@ Window X is a SoftPC close request: running first reaches paused, host switches
 to monitor, then SoftPC destroys the Window component. Until native Window
 destruction, normal Window input remains valid.
 
+Creating a Window may foreground that Window. Binding or replacing the Current
+Console never foregrounds Console: it configures native I/O only. After a
+confirmed Window-destroy completion, SoftPC may explicitly ask host to focus
+the Current Console only when the derived active surface is Console-only.
+
 ## UX Components And Registered Hotkeys
 
 Shared UX is three independent components, not one controller that combines

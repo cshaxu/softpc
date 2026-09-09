@@ -135,11 +135,30 @@ releases capture and stops blinking; unfreeze waits for a click to capture;
 all old enable/disable names and mouse-enabled state are absent; x64/x86 build
 and full CTest evidence passes.
 
+## S6 — Console-only focus after completed Window retirement
+
+Restore the pre-S1 separation between Current Console activation and native
+foreground focus. `host_console_native_activate()` must configure the current
+logical Console, reader, and output only; it must never independently call
+`SetForegroundWindow()` or `SetFocus()`. Keep the generic host-native focus
+primitive, but expose it only as an explicit broker request.
+
+`ux-window` continues to focus itself when its Window is successfully created.
+SoftPC remains the product-policy owner: after receiving the actual Window
+destroy completion, it may request focus through the generic host broker only
+when its completed presenter set is Console-only and Current Console is already
+the desired active object. The app never receives or uses a Win32 handle.
+
+**Exit:** broker activation/replacement/restoration requests no focus by
+itself; a deterministic SoftPC-level completion test proves focus occurs once
+only after actual Window retirement into a Console-only state; Window creation
+retains its self-focus; x64/x86 package builds and full CTest pass.
+
 ## Boundaries
 
-- May change: `lib/ux-window` public/control/native Window implementation,
-  its narrow tests, the SoftPC presentation binding, shared-library manifest,
-  and refreshed executable packages.
+- May change: `lib/host` generic Console focus API and Win32 leaf, SoftPC
+  presentation/reconciler binding, narrow tests, shared-library manifest, and
+  refreshed executable packages.
 - Must not change: `src/mvdm/softpc.new/**`, guest timer/device behavior,
   Console ownership policy, package configuration, guest media, or native
   focus calls outside `lib/host/win32`.

@@ -100,6 +100,19 @@ app_presentation_plan app_reconciler_desired(const app_reconciler *reconciler)
     return plan;
 }
 
+int app_reconciler_console_only_actual(const app_reconciler *reconciler)
+{
+    app_presentation_plan desired;
+
+    if (reconciler == NULL || reconciler->window_actual) return 0;
+    desired = app_reconciler_desired(reconciler);
+    if (desired.window_enabled) return 0;
+    if (reconciler->current_console_actual == APP_RECONCILER_CONSOLE_MONITOR)
+        return 1;
+    return desired.vm_console_enabled && reconciler->vm_console_actual &&
+        reconciler->current_console_actual == APP_RECONCILER_CONSOLE_VM;
+}
+
 app_reconciler_action app_reconciler_next_action(const app_reconciler *reconciler)
 {
     app_presentation_plan desired;

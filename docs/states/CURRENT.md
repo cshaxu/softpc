@@ -4,18 +4,18 @@
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | M9 T43 S5 active |
-| Admission And Approval | Owner authorized T43 S5 after S1–S4 implementation: restore Window-local cursor blinking and rename the Window mouse-control API to freeze/unfreeze, with an exit-condition audit and push required before closure. |
-| Objective | Keep VM Console cursor behavior native, while `ux-window` draws and blinks its guest cursor every 250 ms; make freeze/unfreeze the one Window input/cursor lifecycle API. |
-| Non-goals | No MVDM modification, guest timer/device change, SoftPC/runtime cursor phase, Console ownership-policy change, configuration/media change, or automatic mouse capture on unfreeze. |
-| Affected Boundaries | `ux-window`, its public/control mailbox API, SoftPC presentation binding, focused tests, shared-library manifest, refreshed packages, and T43 records. |
+| Identifier Mode | M9 T43 S6 closed |
+| Admission And Approval | Owner authorized T43 S6: restore the pre-S1 Console focus policy. Console activation must not foreground the Console while a Window exists; after confirmed Window destruction, SoftPC requests host to foreground the current Console only when Console is the sole active surface. |
+| Objective | Separate Current Console I/O activation from foreground focus. Retain Window self-focus at Window creation; make SoftPC issue the one generic host Console-focus request at the completed Console-only transition. |
+| Non-goals | No MVDM modification, guest timer/device change, direct app Win32 calls, configuration/media change, Console reader/mode semantics, or automatic focus while a Window exists. |
+| Affected Boundaries | `lib/host` generic Console focus API and Win32 leaf, SoftPC presentation/reconciler completion path, focused tests, shared-library manifest, refreshed packages, and T43 records. |
 | Applicable Rules | Execution, architecture, coding, and documentation authorities; [T43 proposal](../proposals/m9-t43-lib-console-ux-test-repairs.md); [System Architecture](../design/ARCHITECTURE.md); [Product UX](../design/UI.md). |
-| Focused Verification | Prove Window cursor blink uses a 250 ms Window-worker deadline only while unfrozen; freeze releases capture and stops blink; unfreeze waits for an explicit client click before capture. |
-| Full Regression | Focused Window API/worker tests plus x64/x86 full package builds and CTest. Preserve `assets/binary/softpc.ini` and media. |
-| Similar-Issue Sweep | Verify no `enable_mouse`, `disable_mouse`, or mouse-enabled state remains; title, release, STOP, source retirement, and control FIFO semantics remain intact. |
-| Stop Conditions | Stop for owner direction if the existing Window worker cannot own blink/freeze without changing the private mailbox contract or introducing a second product path. |
-| Exit Criteria | `freeze()` atomically disables capture, releases mouse, and freezes cursor blink; `unfreeze()` enables future click capture without capturing; no Window blink occurs while frozen; 250 ms blink works while unfrozen; x64/x86 evidence passes. |
-| Original Owner Request | “继续 ux-window 负责光标的绘制和闪烁；采用250ms…enable-mouse, disable-mouse 改成 freeze(), unfreeze()。” |
+| Focused Verification | Prove activation alone issues no focus request; SoftPC requests host focus only after Window destroy completion has established a Console-only actual surface; Window creation retains self-focus. |
+| Full Regression | Focused broker/presentation tests plus x64/x86 full package builds and CTest. Preserve user-owned `assets/binary/softpc.ini` and media. |
+| Similar-Issue Sweep | Verify replacement, raw/cooked activation, restoration, and Window creation cannot independently foreground Console; verify a failed/late completion cannot issue focus while a Window remains. |
+| Stop Conditions | Stop for owner direction if focus cannot be requested through the generic host API after actual Window destruction without exposing host-native handles to SoftPC. |
+| Exit Criteria | Console-only completed transition requests host focus exactly once; every activation while a Window exists requests none; Window creation remains self-focused; x64/x86 evidence passes. |
+| Original Owner Request | “Window destroyed -> SoftPC 若 Console 是当前唯一 surface，则请求 host focus Console。” |
 
 ## Current Technical Baseline
 
@@ -30,12 +30,12 @@
 
 ## Recent Governance
 
-- M9 T43 S1 closed native Current Console focus handoff. The generic broker
-  requests focus only after a raw/cooked binding and reader are active; the
-  Win32 leaf performs the best-effort Console focus request. Broker seam tests
-  cover initial activation, replacement, restoration, and non-committing
-  failure paths. Fresh x64/x86 full CTest each passed 30/30. See [S1 history]
-  (../history/M9-T43-S1-console-focus-handoff.md).
+- M9 T43 S6 supersedes the S1 foreground policy: Current Console activation,
+  replacement, and restoration configure I/O only and never foreground
+  Console. Window retains its creation self-focus; only SoftPC, after actual
+  Window retirement into a Console-only state, asks host to focus Current
+  Console. Fresh x64/x86 full CTest each passed 32/32. See [S6 history]
+  (../history/M9-T43-S6-console-only-focus.md).
 
 - M9 T43 S2 closed the shared-library split-UX contract documentation and
   manifest: README now records the component graph, mailbox semantics,

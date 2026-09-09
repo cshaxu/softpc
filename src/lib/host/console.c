@@ -116,7 +116,6 @@ static lib_status host_console_activate_bound(host_console_broker *broker,
     status = host_console_native_activate(broker->native_console, console, mode,
         generation);
     if (status != LIB_STATUS_OK) lib_console_invalidate_binding(console);
-    else host_console_native_request_focus(broker->native_console);
     return status;
 }
 
@@ -311,6 +310,15 @@ lib_status host_console_cooked_create(host_console_cooked **out_cooked,
     return LIB_STATUS_OK;
 }
 
+void host_console_broker_request_focus(host_console_broker *broker)
+{
+    if (broker == LIB_NULL) return;
+    host_console_lock(broker);
+    if (!broker->broken && broker->current != LIB_NULL)
+        host_console_native_request_focus(broker->native_console);
+    host_console_unlock(broker);
+}
+
 void host_console_cooked_destroy(host_console_cooked *cooked)
 {
     if (cooked == LIB_NULL) return;
@@ -353,6 +361,12 @@ lib_status host_console_cooked_request_line(host_console_cooked *cooked)
     status = host_console_native_request_cooked_line(cooked->broker->native_console);
     host_console_unlock(cooked->broker);
     return status;
+}
+
+void host_console_cooked_request_focus(host_console_cooked *cooked)
+{
+    if (cooked != LIB_NULL)
+        host_console_broker_request_focus(cooked->broker);
 }
 
 lib_status host_console_cooked_write(host_console_cooked *cooked,
