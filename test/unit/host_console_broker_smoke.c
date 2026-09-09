@@ -1,6 +1,6 @@
 #include "lib/base/console.h"
 #include "lib/base/internal/console.h"
-#include "lib/host/internal/console.h"
+#include "lib/host/console.h"
 #include "lib/host/internal/console_native.h"
 
 #include <assert.h>
@@ -143,7 +143,7 @@ static DWORD WINAPI host_console_deliver_old(void *opaque)
 static DWORD WINAPI host_console_replace_thread(void *opaque)
 {
     host_console_replace_probe *probe = (host_console_replace_probe *)opaque;
-    probe->status = host_console_replace_active(probe->broker, probe->old_console,
+    probe->status = host_console_broker_replace(probe->broker, probe->old_console,
         probe->next_console, HOST_CONSOLE_RAW_EVENTS);
     SetEvent(probe->completed);
     return 0u;
@@ -161,11 +161,15 @@ int main(void)
     assert(lib_console_create(&second) == LIB_STATUS_OK);
     assert(host_console_broker_create(&broker, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_OK);
+    assert(host_console_broker_request_cooked_line(broker, second) ==
+        LIB_STATUS_NOT_CURRENT);
+    assert(host_console_broker_request_cooked_line(broker, first) ==
+        LIB_STATUS_OK);
     assert(host_console_broker_create(&second_broker, second,
         HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_INVALID_STATE);
     assert(second_broker == LIB_NULL);
     assert(lib_console_write_text(first, "a", 1u) == LIB_STATUS_OK);
-    assert(host_console_replace_active(broker, first, second,
+    assert(host_console_broker_replace(broker, first, second,
         HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK);
     assert(host_console_prepare_saw_active);
     assert(lib_console_write_text(first, "a", 1u) == LIB_STATUS_NOT_CURRENT);
@@ -174,10 +178,10 @@ int main(void)
        retirement cancellation may already have disturbed the old reader, so
        the broker fails closed: neither old nor next is advertised Current. */
     host_console_fail_next_retirement = 1;
-    assert(host_console_replace_active(broker, second, first,
+    assert(host_console_broker_replace(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_NOT_CURRENT);
-    assert(host_console_replace_active(broker, second, first,
+    assert(host_console_broker_replace(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_INVALID_STATE);
     host_console_broker_destroy(broker);
     broker = NULL;
@@ -186,23 +190,23 @@ int main(void)
        the same retirement-before-activation contract. */
     assert(host_console_broker_create(&broker, second,
         HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK);
-    assert(host_console_replace_active(broker, second, first,
+    assert(host_console_broker_replace(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_OK);
-    assert(host_console_replace_active(broker, first, second,
+    assert(host_console_broker_replace(broker, first, second,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_OK);
-    assert(host_console_replace_active(broker, second, first,
+    assert(host_console_broker_replace(broker, second, first,
         HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK);
-    assert(host_console_replace_active(broker, first, second,
+    assert(host_console_broker_replace(broker, first, second,
         HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK);
     host_console_fail_next_prepare = 1;
     host_console_prepare_saw_active = 0;
-    assert(host_console_replace_active(broker, second, first,
+    assert(host_console_broker_replace(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);
     /* Preflight failure did not stop or detach the old current object. */
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_OK);
     assert(host_console_prepare_saw_active);
     host_console_fail_next_activation = 1;
-    assert(host_console_replace_active(broker, second, first,
+    assert(host_console_broker_replace(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_OK);
     /* If the next reader and the mandatory old-reader restoration both fail,
@@ -210,10 +214,10 @@ int main(void)
        Current. The application must stop; a later replacement cannot revive
        an indeterminate native Console transaction. */
     host_console_fail_next_activation = 2;
-    assert(host_console_replace_active(broker, second, first,
+    assert(host_console_broker_replace(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_NOT_CURRENT);
-    assert(host_console_replace_active(broker, second, first,
+    assert(host_console_broker_replace(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_INVALID_STATE);
     host_console_broker_destroy(broker);
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_NOT_CURRENT);

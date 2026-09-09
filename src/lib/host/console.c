@@ -1,5 +1,5 @@
 #include "lib/base/internal/console.h"
-#include "lib/host/internal/console.h"
+#include "lib/host/console.h"
 #include "lib/host/internal/console_native.h"
 
 struct host_console_broker {
@@ -15,6 +15,8 @@ struct host_console_broker {
     lib_bool broken;
 };
 
+/* S4 removes this compatibility adapter after the app creates its own logical
+ * monitor Console and owns the broker directly. */
 struct host_console_cooked {
     lib_console *console;
     host_console_broker *broker;
@@ -168,8 +170,8 @@ lib_status host_console_broker_create(host_console_broker **out_broker,
     return LIB_STATUS_OK;
 }
 
-lib_status host_console_replace_active(host_console_broker *broker,
-    lib_console *old_console, lib_console *next_console,
+lib_status host_console_broker_replace(host_console_broker *broker,
+    lib_console *expected_current, lib_console *next_console,
     host_console_mode next_mode)
 {
     lib_status status;
@@ -178,12 +180,12 @@ lib_status host_console_replace_active(host_console_broker *broker,
     host_console_output_binding *next_output;
     host_console_output_binding *old_output;
     lib_u32 next_generation;
-    if (broker == LIB_NULL || old_console == LIB_NULL || next_console == LIB_NULL ||
-        old_console == next_console ||
+    if (broker == LIB_NULL || expected_current == LIB_NULL || next_console == LIB_NULL ||
+        expected_current == next_console ||
         (next_mode != HOST_CONSOLE_RAW_EVENTS &&
          next_mode != HOST_CONSOLE_COOKED_LINES)) return LIB_STATUS_INVALID_ARGUMENT;
     host_console_lock(broker);
-    if (broker->broken || broker->current != old_console) {
+    if (broker->broken || broker->current != expected_current) {
         host_console_unlock(broker);
         return LIB_STATUS_INVALID_STATE;
     }
@@ -278,6 +280,24 @@ lib_status host_console_replace_active(host_console_broker *broker,
     return LIB_STATUS_OK;
 }
 
+lib_status host_console_broker_request_cooked_line(host_console_broker *broker,
+    lib_console *expected_current)
+{
+    lib_status status;
+
+    if (broker == LIB_NULL || expected_current == LIB_NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    host_console_lock(broker);
+    if (broker->broken || broker->current != expected_current ||
+        broker->current_mode != HOST_CONSOLE_COOKED_LINES) {
+        host_console_unlock(broker);
+        return LIB_STATUS_NOT_CURRENT;
+    }
+    status = host_console_native_request_cooked_line(broker->native_console);
+    host_console_unlock(broker);
+    return status;
+}
+
 void host_console_broker_destroy(host_console_broker *broker)
 {
     lib_console *current;
@@ -352,7 +372,7 @@ lib_status host_console_cooked_activate_raw(host_console_cooked *cooked,
     lib_console *raw_console)
 {
     return cooked == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
-        host_console_replace_active(cooked->broker, cooked->console, raw_console,
+        host_console_broker_replace(cooked->broker, cooked->console, raw_console,
             HOST_CONSOLE_RAW_EVENTS);
 }
 
@@ -360,25 +380,14 @@ lib_status host_console_cooked_activate_self(host_console_cooked *cooked,
     lib_console *raw_console)
 {
     return cooked == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
-        host_console_replace_active(cooked->broker, raw_console, cooked->console,
+        host_console_broker_replace(cooked->broker, raw_console, cooked->console,
             HOST_CONSOLE_COOKED_LINES);
 }
 
 lib_status host_console_cooked_request_line(host_console_cooked *cooked)
 {
-    lib_status status;
-
-    if (cooked == LIB_NULL || cooked->broker == LIB_NULL)
-        return LIB_STATUS_INVALID_ARGUMENT;
-    host_console_lock(cooked->broker);
-    if (cooked->broker->broken || cooked->broker->current != cooked->console ||
-        cooked->broker->current_mode != HOST_CONSOLE_COOKED_LINES) {
-        host_console_unlock(cooked->broker);
-        return LIB_STATUS_NOT_CURRENT;
-    }
-    status = host_console_native_request_cooked_line(cooked->broker->native_console);
-    host_console_unlock(cooked->broker);
-    return status;
+    return cooked == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
+        host_console_broker_request_cooked_line(cooked->broker, cooked->console);
 }
 
 lib_status host_console_cooked_write(host_console_cooked *cooked,

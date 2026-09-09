@@ -2,10 +2,12 @@
 
 ## Current Work
 
-M9 T47 remains active; S1 and S2 are closed. Its next implementation subtask
-requires separate owner admission. See [S1 history]
-(../history/M9-T47-S1-frozen-window-hotkey-recovery.md) and [S2 history]
-(../history/M9-T47-S2-win31-prompt-raw-console-recovery.md).
+M9 T47 S3 is active: [Console broker API recomposition]
+(../proposals/m9-t47-console-broker-api-recomposition.md). It promotes the
+generic Current-Console broker out of the legacy monitor-specific wrapper;
+S4 then adapts SoftPC's monitor to that public neutral API. S1 and S2 are
+closed; see [S1 history](../history/M9-T47-S1-frozen-window-hotkey-recovery.md)
+and [S2 history](../history/M9-T47-S2-win31-prompt-raw-console-recovery.md).
 
 ## Current Technical Baseline
 
