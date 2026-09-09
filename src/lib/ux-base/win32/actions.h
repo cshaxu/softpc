@@ -6,9 +6,10 @@
 #ifdef _WIN32
 #include <windows.h>
 
-/* Native translation only. Chord ownership and matching remain in ux/. */
+/* Window messages expose no per-record modifier mask, so the Window leaf
+ * samples its own native input state before submitting a transition. Chord
+ * ownership and matching remain in ux/. */
 lib_u8 ux_win32_modifiers_from_key_state(void);
-lib_u8 ux_win32_modifiers_from_console_state(DWORD control_state);
 #endif
 
 #endif

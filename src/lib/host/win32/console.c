@@ -53,9 +53,12 @@ static int host_console_ensure_text_surface(HANDLE output)
 static lib_u8 host_console_modifiers(DWORD state)
 {
     lib_u8 modifiers = 0u;
-    if ((state & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) != 0u) modifiers |= 1u;
-    if ((state & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)) != 0u) modifiers |= 2u;
-    if ((state & SHIFT_PRESSED) != 0u) modifiers |= 4u;
+    if ((state & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) != 0u)
+        modifiers |= LIB_CONSOLE_MODIFIER_CONTROL;
+    if ((state & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)) != 0u)
+        modifiers |= LIB_CONSOLE_MODIFIER_ALT;
+    if ((state & SHIFT_PRESSED) != 0u)
+        modifiers |= LIB_CONSOLE_MODIFIER_SHIFT;
     return modifiers;
 }
 

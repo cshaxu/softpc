@@ -22,6 +22,18 @@ static int ux_console_emit_normalized(void *context, const ux_event *event)
     return ux_console_emit((ux_console *)context, event);
 }
 
+static lib_u8 ux_console_hotkey_modifiers(lib_u8 modifiers)
+{
+    lib_u8 result = 0u;
+    if ((modifiers & LIB_CONSOLE_MODIFIER_CONTROL) != 0u)
+        result |= UX_HOTKEY_MODIFIER_CONTROL;
+    if ((modifiers & LIB_CONSOLE_MODIFIER_ALT) != 0u)
+        result |= UX_HOTKEY_MODIFIER_ALT;
+    if ((modifiers & LIB_CONSOLE_MODIFIER_SHIFT) != 0u)
+        result |= UX_HOTKEY_MODIFIER_SHIFT;
+    return result;
+}
+
 static void ux_console_receive_event(void *context,
     const lib_console_event *event)
 {
@@ -46,6 +58,7 @@ static void ux_console_receive_event(void *context,
             (WORD)(key->scan_code | (key->extended != LIB_FALSE ?
                 0x0100u : 0u)), (WORD)key->key,
             key->extended != LIB_FALSE ? ENHANCED_KEY : 0u,
+            ux_console_hotkey_modifiers(key->modifiers),
             key->pressed != LIB_FALSE);
     } else if (event->kind == LIB_CONSOLE_EVENT_RAW_MOUSE) {
         const lib_console_raw_mouse *mouse = &event->value.raw_mouse;

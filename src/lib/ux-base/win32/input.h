@@ -19,7 +19,7 @@ typedef struct ux_win32_keyboard_normalizer {
    physical record to its own input protocol and owns its input queue. */
 int ux_win32_keyboard_submit_transition(void *context,
     ux_event_sink sink, WORD scan, WORD virtual_key,
-    DWORD control_state, int pressed);
+    DWORD control_state, lib_u8 hotkey_modifiers, int pressed);
 int ux_win32_keyboard_submit_utf16(
     ux_win32_keyboard_normalizer *state, void *context,
     ux_event_sink sink, WORD code_unit);

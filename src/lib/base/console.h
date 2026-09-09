@@ -20,6 +20,14 @@ typedef enum lib_console_event_kind {
     LIB_CONSOLE_EVENT_REJECTED_LINE
 } lib_console_event_kind;
 
+/* Copied native raw-Console modifier state.  These bits describe this input
+ * record only; they do not encode a product hotkey or guest protocol. */
+enum {
+    LIB_CONSOLE_MODIFIER_CONTROL = 0x01u,
+    LIB_CONSOLE_MODIFIER_ALT = 0x02u,
+    LIB_CONSOLE_MODIFIER_SHIFT = 0x04u
+};
+
 typedef struct lib_console_raw_key {
     lib_u32 key;
     lib_u32 unicode;

@@ -1,5 +1,5 @@
 #include "lib/ux-base/win32/input.h"
-#include "lib/ux-base/win32/actions.h"
+#include "lib/ux-base/hotkey.h"
 
 #ifdef _WIN32
 static WORD ux_win32_keyboard_decode_scan(WORD raw_scan)
@@ -16,7 +16,7 @@ static WORD ux_win32_keyboard_resolve_scan(WORD virtual_key)
 
 static int ux_win32_keyboard_emit(void *context,
     ux_event_sink sink, WORD scan, WORD virtual_key,
-    DWORD control_state, int pressed)
+    DWORD control_state, lib_u8 hotkey_modifiers, int pressed)
 {
     ux_event event;
     if (sink == NULL || virtual_key == 0u || scan == 0u) return 0;
@@ -26,17 +26,17 @@ static int ux_win32_keyboard_emit(void *context,
     event.data.key.virtual_key = virtual_key;
     event.data.key.scan_code = scan;
     event.data.key.modifiers = control_state;
-    event.data.key.hotkey_modifiers = ux_win32_modifiers_from_key_state();
+    event.data.key.hotkey_modifiers = hotkey_modifiers;
     return sink(context, &event);
 }
 
 int ux_win32_keyboard_submit_transition(void *context,
     ux_event_sink sink, WORD scan, WORD virtual_key,
-    DWORD control_state, int pressed)
+    DWORD control_state, lib_u8 hotkey_modifiers, int pressed)
 {
     if (scan == 0u) scan = ux_win32_keyboard_resolve_scan(virtual_key);
     return ux_win32_keyboard_emit(context, sink, scan, virtual_key,
-        control_state, pressed);
+        control_state, hotkey_modifiers, pressed);
 }
 
 void ux_win32_keyboard_note_recovered_key(
@@ -75,6 +75,7 @@ static int ux_win32_keyboard_submit_character(void *context,
     WORD virtual_key;
     WORD scan;
     uint8_t modifiers;
+    lib_u8 hotkey_modifiers = 0u;
 
     if (scalar == 0u || scalar > 0xffffu ||
         (scalar >= 0xd800u && scalar <= 0xdfffu)) return 0;
@@ -90,21 +91,41 @@ static int ux_win32_keyboard_submit_character(void *context,
     scan = ux_win32_keyboard_resolve_scan(virtual_key);
     if (scan == 0u) return 0;
     modifiers = (uint8_t)((mapped >> 8u) & 0xffu);
-    if ((modifiers & 2u) != 0u && !ux_win32_keyboard_emit(context, sink,
-            0x1du, VK_CONTROL, 0u, 1)) return 0;
-    if ((modifiers & 4u) != 0u && !ux_win32_keyboard_emit(context, sink,
-            0x38u, VK_MENU, 0u, 1)) return 0;
-    if ((modifiers & 1u) != 0u && !ux_win32_keyboard_emit(context, sink,
-            0x2au, VK_SHIFT, 0u, 1)) return 0;
-    if (!ux_win32_keyboard_emit(context, sink, scan, virtual_key, 0u, 1) ||
-        !ux_win32_keyboard_emit(context, sink, scan, virtual_key, 0u, 0))
+    if ((modifiers & 2u) != 0u) {
+        hotkey_modifiers |= UX_HOTKEY_MODIFIER_CONTROL;
+        if (!ux_win32_keyboard_emit(context, sink, 0x1du, VK_CONTROL, 0u,
+                hotkey_modifiers, 1)) return 0;
+    }
+    if ((modifiers & 4u) != 0u) {
+        hotkey_modifiers |= UX_HOTKEY_MODIFIER_ALT;
+        if (!ux_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u,
+                hotkey_modifiers, 1)) return 0;
+    }
+    if ((modifiers & 1u) != 0u) {
+        hotkey_modifiers |= UX_HOTKEY_MODIFIER_SHIFT;
+        if (!ux_win32_keyboard_emit(context, sink, 0x2au, VK_SHIFT, 0u,
+                hotkey_modifiers, 1)) return 0;
+    }
+    if (!ux_win32_keyboard_emit(context, sink, scan, virtual_key, 0u,
+            hotkey_modifiers, 1) ||
+        !ux_win32_keyboard_emit(context, sink, scan, virtual_key, 0u,
+            hotkey_modifiers, 0))
         return 0;
-    if ((modifiers & 1u) != 0u && !ux_win32_keyboard_emit(context, sink,
-            0x2au, VK_SHIFT, 0u, 0)) return 0;
-    if ((modifiers & 4u) != 0u && !ux_win32_keyboard_emit(context, sink,
-            0x38u, VK_MENU, 0u, 0)) return 0;
-    if ((modifiers & 2u) != 0u && !ux_win32_keyboard_emit(context, sink,
-            0x1du, VK_CONTROL, 0u, 0)) return 0;
+    if ((modifiers & 1u) != 0u) {
+        hotkey_modifiers &= (lib_u8)~UX_HOTKEY_MODIFIER_SHIFT;
+        if (!ux_win32_keyboard_emit(context, sink, 0x2au, VK_SHIFT, 0u,
+                hotkey_modifiers, 0)) return 0;
+    }
+    if ((modifiers & 4u) != 0u) {
+        hotkey_modifiers &= (lib_u8)~UX_HOTKEY_MODIFIER_ALT;
+        if (!ux_win32_keyboard_emit(context, sink, 0x38u, VK_MENU, 0u,
+                hotkey_modifiers, 0)) return 0;
+    }
+    if ((modifiers & 2u) != 0u) {
+        hotkey_modifiers &= (lib_u8)~UX_HOTKEY_MODIFIER_CONTROL;
+        if (!ux_win32_keyboard_emit(context, sink, 0x1du, VK_CONTROL, 0u,
+                hotkey_modifiers, 0)) return 0;
+    }
     return 1;
 }
 

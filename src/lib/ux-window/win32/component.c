@@ -4,6 +4,7 @@
 #ifdef _WIN32
 #include "lib/ux-window/win32/geometry.h"
 #include "lib/ux-base/win32/input.h"
+#include "lib/ux-base/win32/actions.h"
 #include "lib/ux-base/internal/mailbox.h"
 #include "lib/ux-base/win32/mailbox_wake.h"
 #include "lib/ux-window/win32/mouse.h"
@@ -413,7 +414,8 @@ static void win32_window_transition(ux_win32_window_context *context,
         ux_win32_keyboard_release_recovered_key(&context->keyboard_normalizer,
             (WORD)key);
     (void)ux_win32_keyboard_submit_transition(context,
-        win32_window_emit_normalized, scan, (WORD)key, control_state, !released);
+        win32_window_emit_normalized, scan, (WORD)key, control_state,
+        ux_win32_modifiers_from_key_state(), !released);
 }
 
 static lib_i32 win32_window_mouse_clamp(lib_i64 value)
