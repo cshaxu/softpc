@@ -73,10 +73,13 @@ current object.
 
 SoftPC control is the sole product-state writer. VM, host, and UX workers only
 enqueue copied events/completions to its app-owned queue. The control thread
-derives the required component instances from config, frame route, FIFO intent,
-and completed actual state, then advances one reconciler. VM `run_generation`
-is SoftPC-only. Component readiness is returned by each component's own
-creation/start contract; shared UX carries no global configuration generation.
+derives runtime commands independently from the required component instances,
+using config, frame route, and completed actual state; a derived action is
+control-private and is never a shared VM/presenter intent. Runtime owns the
+internal sequence of every accepted command, including reset, and reports its
+one completed public fact. VM `run_generation` is SoftPC-only. Component
+readiness is returned by each component's own creation/start contract; shared
+UX carries no global configuration generation.
 
 SoftPC passes copied `{chord, identifier}` registrations to each UX component.
 The components may generically recognize and suppress a registered chord, but

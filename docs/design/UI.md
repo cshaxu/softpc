@@ -29,13 +29,13 @@ immediately returns to the prompt, and does not enqueue an intent.
 | `start` | cold start → running | cold start → running | use `resume` | already running |
 | `pause` | not started | stopped | already paused | pause → paused |
 | `resume` | not started | stopped | resume → running | already running |
-| `reset` | cold start → paused | cold start → paused | cold reset → paused | stop → cold start → paused |
+| `reset` | cold reset → paused | cold reset → paused | cold reset → paused | cold reset → paused |
 | `stop` | not started | already stopped | stop → stopped | stop → stopped |
 
 The monitor does not arm a second cooked line during an accepted lifecycle
-transition. In particular, reset's intermediate stopped completion is internal
-to its cold restart chain; the next prompt appears only after its final paused
-completion.
+transition. `reset` is one runtime command: the VM owns every internal
+cold-reset stage and reports one reset-completed fact with its final paused
+state. The next prompt appears only after that public completion.
 
 ## Window And Input
 
