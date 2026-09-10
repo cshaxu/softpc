@@ -1,7 +1,7 @@
 #include "lib/base/base_interface.h"
 
 #include "lib/storage/medium_interface.h"
-#include "lib/storage/native.h"
+#include "lib/storage/file_backend.h"
 
 #define LIB_STORAGE_MEDIUM_PAGE_BYTES 4096u
 
@@ -45,10 +45,10 @@ lib_status lib_storage_medium_open(const char *path, lib_storage_medium_mode mod
         mode > LIB_STORAGE_MEDIUM_OVERLAY)
         return LIB_STATUS_INVALID_ARGUMENT;
     *out_medium = LIB_NULL;
-    file = lib_storage_native_open(path, mode);
-    if (file == LIB_NULL || lib_storage_native_seek_64(file, 0, SEEK_END) != 0 ||
-        (length = lib_storage_native_tell_64(file)) < 0 ||
-        (uint64_t)length > SIZE_MAX || lib_storage_native_seek_64(file, 0, SEEK_SET) != 0) {
+    file = lib_storage_file_backend_open(path, mode);
+    if (file == LIB_NULL || lib_storage_file_backend_seek_64(file, 0, SEEK_END) != 0 ||
+        (length = lib_storage_file_backend_tell_64(file)) < 0 ||
+        (uint64_t)length > SIZE_MAX || lib_storage_file_backend_seek_64(file, 0, SEEK_SET) != 0) {
         if (file != LIB_NULL) (void)fclose(file);
         return LIB_STATUS_IO_ERROR;
     }
@@ -128,7 +128,7 @@ static lib_status lib_storage_medium_read_base(const lib_storage_medium *medium,
         memset(bytes, 0, byte_count);
         return LIB_STATUS_OK;
     }
-    return lib_storage_native_seek_64(medium->file, (int64_t)offset, SEEK_SET) != 0 ||
+    return lib_storage_file_backend_seek_64(medium->file, (int64_t)offset, SEEK_SET) != 0 ||
         fread(bytes, 1u, byte_count, medium->file) != byte_count ?
         LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
@@ -201,7 +201,7 @@ lib_status lib_storage_medium_write_at(lib_storage_medium *medium,
         return LIB_STATUS_INVALID_ARGUMENT;
     if (medium->mode == LIB_STORAGE_MEDIUM_READONLY) return LIB_STATUS_INVALID_STATE;
     if (medium->mode == LIB_STORAGE_MEDIUM_DIRECT) {
-        return lib_storage_native_seek_64(medium->file, (int64_t)offset, SEEK_SET) != 0 ||
+        return lib_storage_file_backend_seek_64(medium->file, (int64_t)offset, SEEK_SET) != 0 ||
             fwrite(bytes, 1u, byte_count, medium->file) != byte_count ||
             fflush(medium->file) != 0 ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
     }

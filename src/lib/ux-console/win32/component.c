@@ -151,7 +151,7 @@ lib_status ux_console_native_start(ux_console *console)
     if (lib_console_set_event_sink(console->logical_console,
             ux_console_receive_event, console) != LIB_STATUS_OK) {
         atomic_store_explicit(&console->base.stopping, 1, memory_order_release);
-        ux_mailbox_native_signal(ux_component_mailboxes_wake(&console->base.mailboxes));
+        ux_mailbox_wake_signal(ux_component_mailboxes_wake(&console->base.mailboxes));
         (void)WaitForSingleObject(state->worker, INFINITE);
         CloseHandle(state->worker);
         console->native_state = LIB_NULL;

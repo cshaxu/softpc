@@ -1,7 +1,7 @@
 #include "lib/base/base_interface.h"
 
 #include "lib/storage/file_interface.h"
-#include "lib/storage/native.h"
+#include "lib/storage/file_backend.h"
 
 struct lib_storage_file_writer { FILE *file; };
 
@@ -19,9 +19,9 @@ lib_status lib_storage_file_read_owned(const char *path, size_t maximum,
     *out_byte_count = 0u;
     file = fopen(path, "rb");
     if (file == LIB_NULL) return LIB_STATUS_IO_ERROR;
-    if (lib_storage_native_seek_64(file, 0, SEEK_END) != 0 ||
-        (length = lib_storage_native_tell_64(file)) < 0 || (lib_u64)length > maximum ||
-        lib_storage_native_seek_64(file, 0, SEEK_SET) != 0 ||
+    if (lib_storage_file_backend_seek_64(file, 0, SEEK_END) != 0 ||
+        (length = lib_storage_file_backend_tell_64(file)) < 0 || (lib_u64)length > maximum ||
+        lib_storage_file_backend_seek_64(file, 0, SEEK_SET) != 0 ||
         (bytes = malloc((size_t)length == 0u ? 1u : (size_t)length)) == LIB_NULL ||
         ((size_t)length != 0u && fread(bytes, 1u, (size_t)length, file) !=
             (size_t)length)) {

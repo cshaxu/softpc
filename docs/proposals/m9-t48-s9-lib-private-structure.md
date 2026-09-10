@@ -15,7 +15,7 @@ header is private implementation and uses its short component-local name.
 
 `base`, `host`, `storage`, and `ux-base` currently each have an `internal/`
 directory.  They contain respectively the logical-Console binding bridge, the
-host-native Console bridge, storage native-file helpers, and shared UX
+host Console backend, storage file-backend helpers, and shared UX
 mailbox/component implementation contracts.  They are not extra runtime
 components or another public API.
 

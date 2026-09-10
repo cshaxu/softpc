@@ -1,7 +1,7 @@
 #include "lib/base/console_interface.h"
 #include "lib/base/console.h"
 #include "lib/host/console_interface.h"
-#include "lib/host/console_native.h"
+#include "lib/host/console_backend.h"
 
 #include <assert.h>
 
@@ -9,7 +9,7 @@
 #include <windows.h>
 #endif
 
-struct host_console_native {
+struct host_console_backend {
     lib_console *active;
     host_console_mode mode;
     lib_u32 generation;
@@ -26,18 +26,18 @@ static HANDLE host_console_callback_release;
 static HANDLE host_console_callback_finished;
 #endif
 
-lib_status host_console_native_create(host_console_native **out_native)
+lib_status host_console_backend_create(host_console_backend **out_native)
 {
-    static host_console_native native_console;
+    static host_console_backend native_console;
     native_console.active = LIB_NULL;
     *out_native = &native_console;
     return LIB_STATUS_OK;
 }
 
-void host_console_native_destroy(host_console_native *native_console)
+void host_console_backend_destroy(host_console_backend *native_console)
 { (void)native_console; }
 
-lib_status host_console_native_prepare(host_console_native *native_console,
+lib_status host_console_backend_prepare(host_console_backend *native_console,
     lib_console *console, host_console_mode mode)
 {
     if (native_console != NULL && native_console->active != LIB_NULL)
@@ -50,10 +50,10 @@ lib_status host_console_native_prepare(host_console_native *native_console,
         (mode != HOST_CONSOLE_RAW_EVENTS && mode != HOST_CONSOLE_COOKED_LINES) ?
         LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_OK;
 }
-void host_console_native_discard_prepare(host_console_native *native_console)
+void host_console_backend_discard_prepare(host_console_backend *native_console)
 { (void)native_console; }
 
-lib_status host_console_native_activate(host_console_native *native_console,
+lib_status host_console_backend_activate(host_console_backend *native_console,
     lib_console *console, host_console_mode mode, lib_u32 generation)
 {
     if (host_console_fail_next_activation > 0) {
@@ -66,7 +66,7 @@ lib_status host_console_native_activate(host_console_native *native_console,
     return LIB_STATUS_OK;
 }
 
-lib_status host_console_native_deactivate(host_console_native *native_console)
+lib_status host_console_backend_deactivate(host_console_backend *native_console)
 {
     if (host_console_fail_next_retirement) {
         host_console_fail_next_retirement = 0;
@@ -81,15 +81,15 @@ lib_status host_console_native_deactivate(host_console_native *native_console)
     return LIB_STATUS_OK;
 }
 
-lib_status host_console_native_request_cooked_line(
-    host_console_native *native_console)
+lib_status host_console_backend_request_cooked_line(
+    host_console_backend *native_console)
 { return native_console == NULL ? LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_OK; }
 
-void host_console_native_lock_output(host_console_native *native_console)
+void host_console_backend_lock_output(host_console_backend *native_console)
 { (void)native_console; }
-void host_console_native_unlock_output(host_console_native *native_console)
+void host_console_backend_unlock_output(host_console_backend *native_console)
 { (void)native_console; }
-lib_status host_console_native_write_bound(host_console_native *native_console,
+lib_status host_console_backend_write_bound(host_console_backend *native_console,
     lib_console *expected_console, lib_u32 expected_generation, const char *text,
     lib_size length)
 {
@@ -99,7 +99,7 @@ lib_status host_console_native_write_bound(host_console_native *native_console,
         LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
 
-lib_status host_console_native_write_text_frame_bound(host_console_native *native_console,
+lib_status host_console_backend_write_text_frame_bound(host_console_backend *native_console,
     lib_console *expected_console, lib_u32 expected_generation,
     const lib_console_text_frame *frame)
 {

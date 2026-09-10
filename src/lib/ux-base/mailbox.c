@@ -16,14 +16,14 @@ lib_status ux_component_mailboxes_create(ux_component_mailboxes *mailboxes)
     memset(mailboxes, 0, sizeof(*mailboxes));
     atomic_flag_clear(&mailboxes->frame_lock);
     atomic_flag_clear(&mailboxes->control_lock);
-    mailboxes->wake = ux_mailbox_native_create();
+    mailboxes->wake = ux_mailbox_wake_create();
     return mailboxes->wake == LIB_NULL ? LIB_STATUS_NO_MEMORY : LIB_STATUS_OK;
 }
 
 void ux_component_mailboxes_destroy(ux_component_mailboxes *mailboxes)
 {
     if (mailboxes == LIB_NULL) return;
-    ux_mailbox_native_destroy(mailboxes->wake);
+    ux_mailbox_wake_destroy(mailboxes->wake);
     mailboxes->wake = LIB_NULL;
 }
 
@@ -36,7 +36,7 @@ lib_status ux_component_mailboxes_publish_frame(ux_component_mailboxes *mailboxe
     mailboxes->frame = *frame;
     mailboxes->frame.sequence = ++mailboxes->frame_generation;
     ux_component_mailboxes_unlock(&mailboxes->frame_lock);
-    ux_mailbox_native_signal(mailboxes->wake);
+    ux_mailbox_wake_signal(mailboxes->wake);
     return LIB_STATUS_OK;
 }
 
@@ -81,7 +81,7 @@ lib_status ux_component_mailboxes_enqueue_controls(
         ++mailboxes->control_count;
     }
     ux_component_mailboxes_unlock(&mailboxes->control_lock);
-    ux_mailbox_native_signal(mailboxes->wake);
+    ux_mailbox_wake_signal(mailboxes->wake);
     return LIB_STATUS_OK;
 }
 
@@ -124,7 +124,7 @@ lib_bool ux_component_mailboxes_capture_frame(ux_component_mailboxes *mailboxes,
     return LIB_TRUE;
 }
 
-ux_mailbox_native *ux_component_mailboxes_wake(
+ux_mailbox_wake *ux_component_mailboxes_wake(
     const ux_component_mailboxes *mailboxes)
 {
     return mailboxes == LIB_NULL ? LIB_NULL : mailboxes->wake;
