@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 T50 S3 is active: post-library dual-width proof.
+No implementation subtask is active.
 
 ## Current Technical Baseline
 
@@ -30,6 +30,10 @@ M9 T50 S3 is active: post-library dual-width proof.
   identity and passed fresh 36/36 CTest at both widths.
   [Record](../history/M9-T50-S1-build-presets-artifact-identity.md)
 
+- **M9 T50 S3:** The final post-library source tree rebuilt both fixed package
+  widths and passed 36/36 CTest at each width.
+  [Record](../history/M9-T50-S3-dual-width-post-lib-proof.md)
+
 ## Recent Governance
 
 - **M9 Td S6:** Console-object design was promoted to current architecture/UI
@@ -46,24 +50,3 @@ M9 T50 S3 is active: post-library dual-width proof.
 - **M9 Td S9:** Future-task closure audit, whole-domain convergence, complete
   P discipline, path accounting, and build hygiene now match the relevant
   NXVM governance standard. [Record](../history/M9-Td-S9-execution-closure-quality.md)
-
-## M9 T50 S3 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Corrective |
-| Admission And Approval | Automatic sequential governance route approved by owner; closure audit found current-source dual-width proof absent after T50 S2. |
-| Objective | Re-establish x64/x86 package build and test evidence after the private shared-library atomics portability change. |
-| Non-goals | No source, ABI, UX, MVDM, CI, or manual guest-behavior change. |
-| Reference Baseline | T50 S1 preset contract; T50 S2 private atomics change; current `CMakePresets.json`. |
-| Candidate Proposal | [M9 T50 S3 dual-width post-lib proof](../proposals/m9-t50-s3-dual-width-post-lib-proof.md). |
-| Files And ABI Surface | Build trees and agent-owned `assets/binary/softpc32.exe`/`softpc64.exe` only; no source ABI. |
-| Applicable Rules | Execution, Coding, Architecture Rules; package-configuration protection. |
-| Verification | Fresh preset configure/build/package/CTest for both widths; PE architecture/name check; documentation gate. |
-| Expected Markers | `softpc32.exe`, `softpc64.exe`, 32-bit/64-bit PE evidence, full CTest success, unchanged `softpc.ini`. |
-| Asset Needs | Existing user-owned package configuration and reusable local media only; do not modify either. |
-| Reporting Requirements | Report exact build/test results, artifact widths, configuration preservation, and no manual runtime claim. |
-| Stop Conditions | Stop on unavailable matching x86 toolchain, configuration mutation, or build/test failure; do not substitute a different toolchain. |
-| Exit Criteria | Both current-source package paths pass their full CTest suites and architecture checks; artifacts and closure evidence are pushed. |
-| Original Owner Request | Upgrade this repository's governance quality to NXVM level or higher. |
-| Similar-Issue Sweep | Audit every current release preset/package target for declared width, fixed output name, and post-S2 evidence. |
