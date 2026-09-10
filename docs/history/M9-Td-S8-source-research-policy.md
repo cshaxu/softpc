@@ -34,3 +34,15 @@ level as NXVM, without asserting rights that this repository has not proved.
   verifier rejects a missing or structurally incomplete policy.
 - Real gate, accepted/rejected verifier fixtures, and diff checks pass; the
   work is committed and pushed with a clean worktree.
+
+## Completion evidence
+
+- The indexed policy distinguishes preserved source mirror, project code,
+  exact shared-corpus adoption, and read-only comparison trees.
+- It records existing ROM/media inputs as legacy material, not a license grant,
+  and bars new external source, binary, firmware, media, or redistribution
+  claims without a dedicated owner/legal task.
+- The architecture rule links the policy; the documentation verifier rejects a
+  missing policy and its accepted/rejected fixture suite passes.
+- Fresh x64 and x86 CTest each passed 36/36 after the policy change. No source,
+  binary, package, or media asset changed.
