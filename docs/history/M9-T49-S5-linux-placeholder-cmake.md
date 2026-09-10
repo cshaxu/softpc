@@ -29,3 +29,15 @@ project-name exception.
 Linux CMake configuration succeeds without Curses discovery; host-sync keeps
 its pthread linkage; project identity remains `nxvm_shared_library`; existing
 Windows x64/x86 regression and manifest checks remain clean.
+
+## Completion evidence
+
+- The Linux branch no longer discovers, includes, or links Curses.  Its only
+  platform dependency is `Threads::Threads` on `host-sync`, the sole target
+  whose Linux implementation uses pthread.
+- `verify_linux_build_contract.cmake` proves that source-level contract, while
+  the standalone shared-library configuration and CTest run passed 2/2.
+- Strict Windows x64 and x86 root builds each completed with the existing
+  regression suite passing 34/34.  Manifest and whitespace checks passed.
+- `project(nxvm_shared_library ...)` remains the owner-approved exception.
+- Implementation: `7631880` (`M9 T49 S5 P2`).

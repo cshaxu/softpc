@@ -2,10 +2,8 @@
 
 ## Current Work
 
-M9 T49 S5 is active: [Linux placeholder build contract]
-(../proposals/m9-t49-s5-linux-placeholder-cmake.md). It removes the unused
-Linux Curses dependency, keeps pthread linkage where `host-sync` needs it,
-and preserves the owner-approved `nxvm_shared_library` project-name exception.
+No implementation subtask is active. M9 T49 has closed after its admitted
+shared-library quality sequence (S1–S5).
 
 ## Current Technical Baseline
 
@@ -19,6 +17,13 @@ and preserves the owner-approved `nxvm_shared_library` project-name exception.
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T49 closes at S5. The reusable corpus now independently supports strict
+  warnings, exposes only neutral base types, contains neutral terminology, and
+  has no unused Linux Curses dependency; Linux pthread support remains scoped
+  to `host-sync`. Standalone library CTest passed 2/2 and fresh strict x64/x86
+  root CTest each passed 34/34. See [S5 history]
+  (../history/M9-T49-S5-linux-placeholder-cmake.md).
 
 - M9 T49 S4 closes after neutralizing the reusable corpus terminology. C/H
   comments and private helpers now use application/content/raw-Console terms;
