@@ -43,3 +43,16 @@ it is no longer a current candidate.
   the repository's valid active/idle state through self-tests.
 - Documentation governance checks pass; the governance task is committed and
   pushed with a clean worktree.
+
+## Completion evidence
+
+- `CURRENT.md` now has a fixed, non-empty active-packet schema and the
+  verifier rejects malformed fields, invalid allocation modes, orphaned
+  proposals, and unprioritized TODO entries.
+- The real repository gate and its accepted/rejected fixture suite pass; both
+  are registered in CTest.
+- All 46 stale, non-queued proposals were preserved verbatim below
+  `docs/history/`; the two direct historical links affected by the move were
+  repaired.
+- Fresh x64 and x86 CTest each passed 36/36. No runtime code or package asset
+  changed.
