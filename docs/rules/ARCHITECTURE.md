@@ -17,3 +17,7 @@ The concrete SoftPC ownership map is [System Architecture](../design/ARCHITECTUR
   reinterpret a device protocol, BIOS service, BOP selector, or guest media.
 - Transitional adapters state their owner, scope, removal condition, and a
   verification that prevents a second production route.
+- Source provenance and research material follow the
+  [Source And Research Policy](../etc/operations/policy/source-research-policy.md).
+  No external source, binary, firmware, or license conclusion crosses into
+  product scope without its separately admitted review boundary.
