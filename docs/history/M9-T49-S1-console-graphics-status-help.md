@@ -10,9 +10,10 @@ then one trailing blank line. Do not duplicate the hotkey text.
 ## Objective
 
 Make `app/command.c` own two reusable monitor-help constants: command help and
-raw-VM-Console hotkey help. The monitor's full help composes both constants;
-the graphical raw-Console status frame composes its existing first line and
-the same hotkey constant.
+running hotkey help. The monitor's full help composes both constants; the
+graphical raw-Console status frame composes its existing first line and the
+same hotkey constant. The wording applies equally to registered hotkeys from
+the Window and raw Console routes.
 
 ## Boundaries
 

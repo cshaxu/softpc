@@ -2,10 +2,11 @@
 
 ## Current Work
 
-M9 T49 S1 is active: [Console graphics status help reuse]
-(../proposals/m9-t49-s1-console-graphics-status-help.md). It makes the raw VM
-Console's graphical-running status surface reuse the monitor help's hotkey
-section without changing VM, host, or shared-library behavior.
+M9 T49 S2 is active: [Strict shared-library boundaries]
+(../proposals/m9-t49-s2-lib-strict-boundaries.md). It makes the reusable
+corpus independently strict-buildable, neutralizes its public/internal type
+boundary and prose, and removes an unused Linux Curses dependency without
+changing application or MVDM behavior.
 
 ## Current Technical Baseline
 
@@ -19,6 +20,11 @@ section without changing VM, host, or shared-library behavior.
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T49 S1 closes after owner acceptance. Console graphics status now reuses
+  the monitor's exact running-hotkey text with one source of truth; x64 full
+  CTest passed 34/34 and focused x86 command coverage passed. See [S1 history]
+  (../history/M9-T49-S1-console-graphics-status-help.md).
 
 - M9 T48 S9 closes after owner acceptance. The canonical SoftPC shared corpus
   now has flat private structure: `*_interface.h` is the sole public contract,
