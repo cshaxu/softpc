@@ -541,7 +541,9 @@ add_test(NAME softpc-control-reconciler-integration-smoke
 set_tests_properties(softpc-control-reconciler-integration-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-command-smoke test/unit/command_smoke.c
-    src/app/command.c)
+    src/app/command.c
+    src/app/reconciler.c
+    src/app/presentation_plan.c)
 target_include_directories(softpc-command-smoke PRIVATE src/app src/host src)
 add_test(NAME softpc-command-smoke COMMAND softpc-command-smoke)
 set_tests_properties(softpc-command-smoke PROPERTIES

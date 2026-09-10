@@ -1,4 +1,5 @@
 #include "command.h"
+#include "reconciler.h"
 
 #include <assert.h>
 #include <string.h>
@@ -73,6 +74,13 @@ static void complete_intent(app_command_session *session,
         app_command_session_note_runtime(session, SOFTPC_RUNTIME_STOPPED,
             &effect);
         assert(!effect.arm_prompt && effect.text[0] == '\0');
+        /* Reset is a cold start followed by a pause.  RUNNING here is an
+         * internal runtime fact, not a stable monitor state: accepting a
+         * prompt at this point permits a command to race the required pause. */
+        app_command_session_note_runtime(session, SOFTPC_RUNTIME_RUNNING,
+            &effect);
+        assert(app_command_session_state(session) == APP_MONITOR_STOPPED);
+        assert(!effect.arm_prompt && effect.text[0] == '\0');
         app_command_session_note_runtime(session, SOFTPC_RUNTIME_PAUSED,
             &effect);
         assert(app_command_session_state(session) == APP_MONITOR_PAUSED);
@@ -146,12 +154,80 @@ static void run_all_three_command_sequences(void)
     }
 }
 
+static void submit_with_reconciler(app_command_session *session,
+    app_reconciler *reconciler, const char *text,
+    app_reconciler_intent expected)
+{
+    app_command_effect effect;
+
+    app_command_session_submit_line(session, text, &effect);
+    assert(effect.intent == expected);
+    app_reconciler_note_intent(reconciler, effect.intent);
+}
+
+static void note_pair(app_command_session *session,
+    app_reconciler *reconciler, app_runtime_state state,
+    app_reconciler_action next)
+{
+    app_command_effect effect;
+
+    app_command_session_note_runtime(session, state, &effect);
+    app_reconciler_note_runtime(reconciler, state);
+    assert(app_reconciler_take_action(reconciler) == next);
+}
+
+static void test_start_stop_start_reset_chain(void)
+{
+    app_command_session session;
+    app_reconciler reconciler;
+
+    app_command_session_initialize(&session, SOFTPC_PRESENTATION_WINDOW);
+    app_reconciler_initialize(&reconciler, SOFTPC_PRESENTATION_WINDOW, 1);
+
+    submit_with_reconciler(&session, &reconciler, "start",
+        APP_RECONCILER_INTENT_START);
+    assert(app_reconciler_take_action(&reconciler) ==
+        APP_RECONCILER_ACTION_RUNTIME_START);
+    note_pair(&session, &reconciler, SOFTPC_RUNTIME_RUNNING,
+        APP_RECONCILER_ACTION_CREATE_WINDOW);
+    app_reconciler_note_window(&reconciler, 1);
+
+    submit_with_reconciler(&session, &reconciler, "stop",
+        APP_RECONCILER_INTENT_STOP);
+    assert(app_reconciler_take_action(&reconciler) ==
+        APP_RECONCILER_ACTION_RUNTIME_STOP);
+    note_pair(&session, &reconciler, SOFTPC_RUNTIME_STOPPED,
+        APP_RECONCILER_ACTION_DESTROY_WINDOW);
+    app_reconciler_note_window(&reconciler, 0);
+
+    submit_with_reconciler(&session, &reconciler, "start",
+        APP_RECONCILER_INTENT_START);
+    assert(app_reconciler_take_action(&reconciler) ==
+        APP_RECONCILER_ACTION_RUNTIME_START);
+    note_pair(&session, &reconciler, SOFTPC_RUNTIME_RUNNING,
+        APP_RECONCILER_ACTION_CREATE_WINDOW);
+    app_reconciler_note_window(&reconciler, 1);
+
+    submit_with_reconciler(&session, &reconciler, "reset",
+        APP_RECONCILER_INTENT_RESET);
+    assert(app_reconciler_take_action(&reconciler) ==
+        APP_RECONCILER_ACTION_RUNTIME_STOP);
+    note_pair(&session, &reconciler, SOFTPC_RUNTIME_STOPPED,
+        APP_RECONCILER_ACTION_RUNTIME_START);
+    note_pair(&session, &reconciler, SOFTPC_RUNTIME_RUNNING,
+        APP_RECONCILER_ACTION_RUNTIME_PAUSE);
+    note_pair(&session, &reconciler, SOFTPC_RUNTIME_PAUSED,
+        APP_RECONCILER_ACTION_NONE);
+    assert(app_command_session_state(&session) == APP_MONITOR_PAUSED);
+}
+
 int main(void)
 {
     app_command_session session;
     app_command_effect effect;
 
     run_all_three_command_sequences();
+    test_start_stop_start_reset_chain();
 
     app_command_session_initialize(&session, SOFTPC_PRESENTATION_WINDOW);
     session.state = APP_MONITOR_STOPPED;
