@@ -848,6 +848,7 @@ static DWORD WINAPI ux_window_worker(void *opaque)
 lib_status ux_window_native_start(ux_window *component)
 {
     ux_window_win32_state *state;
+    lib_status startup_status;
 
     if (component == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     state = calloc(1u, sizeof(*state));
@@ -876,11 +877,12 @@ lib_status ux_window_native_start(ux_window *component)
     }
     (void)WaitForSingleObject(state->ready, INFINITE);
     if (state->startup_status != LIB_STATUS_OK) {
+        startup_status = state->startup_status;
         (void)WaitForSingleObject(state->worker, INFINITE);
         CloseHandle(state->worker); CloseHandle(state->ready);
         if (state->context != LIB_NULL) win32_window_destroy(state->context, NULL);
         component->native_state = LIB_NULL; free(state);
-        return state->startup_status;
+        return startup_status;
     }
     return LIB_STATUS_OK;
 }

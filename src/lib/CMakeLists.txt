@@ -10,6 +10,14 @@ endif()
 
 set(LIBRARY_SOURCE_ROOT "${CMAKE_CURRENT_LIST_DIR}/..")
 
+set(LIBRARY_STRICT_WARNINGS_DEFAULT OFF)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(LIBRARY_STRICT_WARNINGS_DEFAULT ON)
+endif()
+option(LIBRARY_STRICT_WARNINGS
+    "Build shared-library implementation targets with strict compiler warnings"
+    ${LIBRARY_STRICT_WARNINGS_DEFAULT})
+
 function(library_root target)
     target_include_directories(${target} PUBLIC "${LIBRARY_SOURCE_ROOT}")
 endfunction()
@@ -93,6 +101,14 @@ endif()
 # peer root remains independently compilable and depends only on `base`.
 add_library(lib-neutral-corpus INTERFACE)
 target_link_libraries(lib-neutral-corpus INTERFACE base-console ux host-sync storage-medium)
+
+if(LIBRARY_STRICT_WARNINGS AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    foreach(library_target IN ITEMS
+            base-console ux-base ux-window ux-console host-sync storage-medium)
+        target_compile_options(${library_target} PRIVATE
+            -Wall -Wextra -Wpedantic -Werror)
+    endforeach()
+endif()
 
 add_custom_target(lib-verify-manifest
     COMMAND "${CMAKE_COMMAND}" -DLIBRARY_ROOT:PATH=${CMAKE_CURRENT_LIST_DIR}
