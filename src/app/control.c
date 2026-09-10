@@ -268,12 +268,16 @@ int app_control_accept_ux_event(const app_control_event *event,
 {
     const ux_input_event *input;
 
-    if (event == NULL || event->kind != APP_CONTROL_UX_INPUT ||
-        (event->run_generation != 0u && event->run_generation !=
-            current_run_generation)) return 0;
+    if (event == NULL || event->kind != APP_CONTROL_UX_INPUT) return 0;
+    input = &event->value.ux;
+    /* Source identity is globally monotonic.  Retirement is not guest input:
+       it must always reach the ledger, even when the component belonged to a
+       retired run, so a later allocation cannot inherit its held keys. */
+    if (input->type == UX_EVENT_SOURCE_RETIRED) return 1;
+    if (event->run_generation != 0u && event->run_generation !=
+        current_run_generation) return 0;
     if (runtime_state == SOFTPC_RUNTIME_RUNNING) return 1;
     if (runtime_state != SOFTPC_RUNTIME_PAUSED) return 0;
-    input = &event->value.ux;
     return input->type == UX_EVENT_WINDOW_CLOSE ||
         input->type == UX_EVENT_SOURCE_RETIRED ||
         input->type == UX_EVENT_HOTKEY ||

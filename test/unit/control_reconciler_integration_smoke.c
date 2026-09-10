@@ -61,14 +61,17 @@ int main(void)
     take(queue, &event);
     assert(!app_control_accept_ux_event(&event, 7u, SOFTPC_RUNTIME_RUNNING));
 
-    /* Retirement is useful while input is active, but a late retirement after
-       stop is rejected before app_control_handle_ux can touch guest input. */
+    /* Retirement is ledger cleanup, never guest input.  It remains admitted
+       after a run changes so the unique source cannot leave held keys behind;
+       app_control_handle_ux still emits no guest release while stopped. */
     retired.type = UX_EVENT_SOURCE_RETIRED;
     retired.source_identity = raw_key.source_identity;
     assert(app_control_queue_push_ux_for_run(queue, &retired, 7u));
     take(queue, &event); assert(app_control_accept_ux_event(&event, 7u,
         SOFTPC_RUNTIME_RUNNING));
-    assert(!app_control_accept_ux_event(&event, 7u, SOFTPC_RUNTIME_STOPPED));
+    assert(app_control_accept_ux_event(&event, 8u, SOFTPC_RUNTIME_STOPPED));
+    assert(app_control_handle_ux(queue, (app_runtime *)1, &event.value.ux,
+        SOFTPC_RUNTIME_STOPPED));
 
     /* A frozen Window must not affect a paused VM with any late ordinary
        input. Releases remain admitted only for the app's pressed-key ledger;
