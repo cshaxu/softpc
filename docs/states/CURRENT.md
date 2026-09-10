@@ -2,10 +2,10 @@
 
 ## Current Work
 
-M9 T49 S4 is active: [Shared-library neutral language]
-(../proposals/m9-t49-s4-lib-neutral-language.md). It removes SoftPC
-product-model terminology from the reusable corpus without changing its public
-ABI, input semantics, application code, or MVDM behavior.
+M9 T49 S5 is active: [Linux placeholder build contract]
+(../proposals/m9-t49-s5-linux-placeholder-cmake.md). It removes the unused
+Linux Curses dependency, keeps pthread linkage where `host-sync` needs it,
+and preserves the owner-approved `nxvm_shared_library` project-name exception.
 
 ## Current Technical Baseline
 
@@ -19,6 +19,11 @@ ABI, input semantics, application code, or MVDM behavior.
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T49 S4 closes after neutralizing the reusable corpus terminology. C/H
+  comments and private helpers now use application/content/raw-Console terms;
+  strict-lib and x64/x86 CTest passed. See [S4 history]
+  (../history/M9-T49-S4-lib-neutral-language.md).
 
 - M9 T49 S3 closes after tightening the shared type boundary. Public base now
   carries only required C definitions, private consumers own their includes,

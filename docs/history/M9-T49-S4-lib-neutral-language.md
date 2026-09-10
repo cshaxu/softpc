@@ -24,3 +24,11 @@ the same source describes application/content/input behavior for every adopter.
 A C/H corpus search finds no non-historical product-model wording; strict
 build, focused behavior tests, manifest verification, and dual-width regression
 show no behavioral or ABI change.
+
+## Completion evidence
+
+- The library C/H corpus has no remaining `VM`, `guest`, `machine`, or
+  `guest_input` wording. The private Window acceptance helper now names
+  content input without changing its freeze/capture behavior.
+- Standalone strict-lib verification and root x64/x86 CTest each passed 34/34.
+  `c90c900` contains the implementation and refreshed package pair.
