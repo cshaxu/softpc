@@ -374,8 +374,12 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
         }
         if (command_effect.text[0] != '\0')
             (void)app_monitor_console_write(monitor, command_effect.text);
-        if (command_effect.intent != APP_RECONCILER_INTENT_NONE)
-            app_presentation_request_intent(presenter, command_effect.intent);
+        {
+            app_reconciler_intent intent =
+                app_command_session_take_intent(&session);
+            if (intent != APP_RECONCILER_INTENT_NONE)
+                app_presentation_request_intent(presenter, intent);
+        }
         if (!app_monitor_drive(runtime, presenter)) goto failed;
         if (!app_monitor_arm_if_ready(&session, presenter, monitor)) goto failed;
     }

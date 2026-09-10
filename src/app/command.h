@@ -13,11 +13,14 @@ typedef enum app_command_action { APP_COMMAND_ACTION_NONE, APP_COMMAND_ACTION_EJ
 typedef struct app_command_session {
     softpc_presentation display;
     app_monitor_state state;
+    app_reconciler_intent pending_intent;
+    app_reconciler_intent turn_intent;
+    int dispatch_pending;
+    int turn_pending;
     int start_requested, reset_requested, stop_requested, prompt_due, line_active;
 } app_command_session;
 
 typedef struct app_command_effect {
-    app_reconciler_intent intent;
     app_command_action action;
     int exit_requested, arm_prompt;
     char text[APP_COMMAND_TEXT_CAPACITY];
@@ -27,6 +30,9 @@ typedef struct app_command_effect {
 void app_command_session_initialize(app_command_session *, softpc_presentation);
 void app_command_session_open(app_command_session *, app_command_effect *);
 void app_command_session_submit_line(app_command_session *, const char *, app_command_effect *);
+/* The only lifecycle-dispatch path.  An accepted command is taken exactly
+ * once; rejected and local commands have no dispatchable intent. */
+app_reconciler_intent app_command_session_take_intent(app_command_session *);
 void app_command_session_complete_floppy(app_command_session *, app_command_action, int, app_command_effect *);
 void app_command_session_note_runtime(app_command_session *, app_runtime_state, app_command_effect *);
 void app_command_session_note_broker(app_command_session *, int,

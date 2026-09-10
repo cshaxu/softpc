@@ -112,19 +112,24 @@ static void run_sequence(const command_case *sequence, size_t count)
     assert(strstr(effect.text, "Insignia SoftPC") != NULL);
     arm_window_monitor(&session);
     app_command_session_submit_line(&session, "start", &effect);
-    assert(effect.intent == APP_RECONCILER_INTENT_START);
+    assert(app_command_session_take_intent(&session) ==
+        APP_RECONCILER_INTENT_START);
     complete_intent(&session, APP_RECONCILER_INTENT_START);
 
     for (index = 0u; index < count; ++index) {
         app_monitor_state before = app_command_session_state(&session);
         app_command_session_submit_line(&session, sequence[index].text, &effect);
-        assert(effect.intent == expected_intent(before, sequence[index].text));
-        if (effect.intent == APP_RECONCILER_INTENT_NONE) {
-            assert(app_command_session_state(&session) == before);
-            assert(effect.text[0] != '\0');
-            arm_window_monitor(&session);
-        } else {
-            complete_intent(&session, effect.intent);
+        {
+            app_reconciler_intent intent =
+                app_command_session_take_intent(&session);
+            assert(intent == expected_intent(before, sequence[index].text));
+            if (intent == APP_RECONCILER_INTENT_NONE) {
+                assert(app_command_session_state(&session) == before);
+                assert(effect.text[0] != '\0');
+                arm_window_monitor(&session);
+            } else {
+                complete_intent(&session, intent);
+            }
         }
     }
 }
@@ -161,8 +166,8 @@ static void submit_with_reconciler(app_command_session *session,
     app_command_effect effect;
 
     app_command_session_submit_line(session, text, &effect);
-    assert(effect.intent == expected);
-    app_reconciler_note_intent(reconciler, effect.intent);
+    assert(app_command_session_take_intent(session) == expected);
+    app_reconciler_note_intent(reconciler, expected);
 }
 
 static void note_pair(app_command_session *session,
