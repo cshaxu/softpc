@@ -146,7 +146,7 @@ int main(void)
     test_error_returns_monitor_transaction();
     app_command_session_initialize(&session, SOFTPC_PRESENTATION_WINDOW);
     assert(strstr(app_command_hotkey_help(),
-        "While the guest is running in a raw VM Console:") != NULL);
+        "While the guest is running:") != NULL);
     app_command_session_open(&session, &effect);
     assert(strstr(effect.text, "cold-reset and run the machine") != NULL);
     assert(strstr(effect.text, app_command_hotkey_help()) != NULL);

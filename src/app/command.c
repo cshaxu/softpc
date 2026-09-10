@@ -15,7 +15,7 @@ static const char HELP_COMMANDS[] =
     "  floppy eject          eject drive A media while stopped/paused\r\n"
     "  help                  show this help\r\n  exit                  quit\r\n";
 static const char HELP_HOTKEYS[] =
-    "While the guest is running in a raw VM Console:\r\n"
+    "While the guest is running:\r\n"
     "  Ctrl+Alt+P            pause or resume\r\n"
     "  Ctrl+Alt+D            send Ctrl+Alt+Del to the guest\r\n"
     "  Ctrl+Alt+F            send Alt+Enter to the guest\r\n"
