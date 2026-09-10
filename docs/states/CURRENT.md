@@ -2,10 +2,10 @@
 
 ## Current Work
 
-M9 T48 S7 is active: [Presenter completion hardening]
-(../proposals/m9-t48-s7-presenter-completion-hardening.md). It verifies the
-one-way component/broker lifecycle: all facts re-enter control, stale facts
-cannot mutate a newer run, and Window close remains a control request.
+M9 T48 S8 is active: [Deterministic control matrix]
+(../proposals/m9-t48-s8-deterministic-control-matrix.md). It proves the whole
+control/runtime/presenter state matrix through copied facts and completion
+barriers, then refreshes dual-width package evidence for owner acceptance.
 
 ## Current Technical Baseline
 
@@ -34,6 +34,11 @@ cannot mutate a newer run, and Window close remains a control request.
 - M9 T48 S6 closes the completion-owned monitor transaction and its raw-route
   discard rule; focused x64/x86 tests passed. See [S6 history]
   (../history/M9-T48-S6-monitor-completion-transaction.md).
+
+- M9 T48 S7 closes stale presenter/source-retirement hardening: stale ordinary
+  input remains rejected while globally unique retire facts clear only their
+  ledger. Fresh x64/x86 CTest each passed 33/33. See [S7 history]
+  (../history/M9-T48-S7-presenter-completion-hardening.md).
 
 - M9 T48 S2 closes after owner acceptance. Generic Win32 Window geometry now
   keeps the copied-frame aspect through drag, system resize, and maximum

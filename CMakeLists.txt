@@ -273,6 +273,7 @@ add_executable(softpcvm
     src/app/control.c
     src/app/monitor.c
     src/app/command.c
+    src/app/control_state.c
     src/app/presentation.c
     src/app/presentation_plan.c
     src/app/reconciler.c
@@ -540,6 +541,15 @@ add_test(NAME softpc-control-reconciler-integration-smoke
     COMMAND softpc-control-reconciler-integration-smoke)
 set_tests_properties(softpc-control-reconciler-integration-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-control-state-matrix-smoke
+    test/unit/control_state_matrix_smoke.c
+    src/app/control_state.c src/app/reconciler.c src/app/presentation_plan.c)
+target_include_directories(softpc-control-state-matrix-smoke PRIVATE
+    src/app src/host src)
+add_test(NAME softpc-control-state-matrix-smoke
+    COMMAND softpc-control-state-matrix-smoke)
+set_tests_properties(softpc-control-state-matrix-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-command-smoke test/unit/command_smoke.c
     src/app/command.c
     src/app/reconciler.c
@@ -589,6 +599,7 @@ list(APPEND SOFTPC_TEST_TARGETS softpc-ux-component-contract-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-ux-console-retirement-barrier-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-plan-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-reconciler-smoke)
+list(APPEND SOFTPC_TEST_TARGETS softpc-control-state-matrix-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-command-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
@@ -627,6 +638,7 @@ set(SOFTPC_UNIT_TESTS
     softpc-ux-console-retirement-barrier-smoke
     softpc-presentation-plan-smoke
     softpc-reconciler-smoke
+    softpc-control-state-matrix-smoke
     softpc-command-smoke
     softpc-standalone-source-boundary
     softpc-documentation-governance)

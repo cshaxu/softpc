@@ -1,6 +1,7 @@
 #include "presentation.h"
 #include "monitor.h"
 #include "command.h"
+#include "control_state.h"
 #include "runtime.h"
 #include "machine.h"
 #include "prompt_trace.h"
@@ -26,29 +27,10 @@ typedef struct app_startup_config {
     softpc_media_mode media_mode;
 } app_startup_config;
 
-/* This is the one product-state object.  It lives exclusively on the control
- * thread: runtime and UX workers submit copied facts, while presentation only
- * executes actions selected from this state. */
-typedef struct app_control_state {
-    app_reconciler presentation;
-    app_monitor_state monitor_actual;
+typedef struct app_monitor_control {
+    app_control_state state;
     app_runtime_frame frame;
-    uint32_t observed_frame_sequence;
-} app_control_state;
-
-static void app_control_note_runtime(app_control_state *state,
-    app_runtime_state completed)
-{
-    if (state == NULL) return;
-    if (completed == SOFTPC_RUNTIME_RESET_COMPLETED ||
-        completed == SOFTPC_RUNTIME_PAUSED)
-        state->monitor_actual = APP_MONITOR_PAUSED;
-    else if (completed == SOFTPC_RUNTIME_RUNNING)
-        state->monitor_actual = APP_MONITOR_RUNNING;
-    else if (completed == SOFTPC_RUNTIME_STOPPED ||
-        completed == SOFTPC_RUNTIME_ERROR)
-        state->monitor_actual = APP_MONITOR_STOPPED;
-}
+} app_monitor_control;
 
 static char *app_trim(char *text)
 {
@@ -212,55 +194,24 @@ invalid:
     return 0;
 }
 
-static int app_control_monitor_is_current(const app_control_state *state)
-{
-    app_presentation_plan desired;
-    if (state == NULL) return 0;
-    desired = app_reconciler_desired(&state->presentation);
-    return desired.monitor_console_enabled &&
-        state->presentation.current_console_actual ==
-            APP_RECONCILER_CONSOLE_MONITOR &&
-        state->presentation.in_flight != APP_RECONCILER_ACTION_BIND_VM_CONSOLE;
-}
-
-static int app_control_monitor_is_running_graphics_surface(
-    const app_control_state *state)
-{
-    return state != NULL &&
-        state->presentation.display == SOFTPC_PRESENTATION_CONSOLE &&
-        state->presentation.runtime_actual == SOFTPC_RUNTIME_RUNNING &&
-        state->presentation.frame_actual && state->presentation.graphics_actual &&
-        app_control_monitor_is_current(state);
-}
-
-static int app_control_frame_targets_ready(const app_control_state *state)
-{
-    app_presentation_plan desired;
-    if (state == NULL) return 0;
-    desired = app_reconciler_desired(&state->presentation);
-    if (!desired.window_enabled && !desired.vm_console_enabled) return 0;
-    if (desired.window_enabled && !state->presentation.window_actual) return 0;
-    return !desired.vm_console_enabled ||
-        (state->presentation.vm_console_actual &&
-         state->presentation.current_console_actual == APP_RECONCILER_CONSOLE_VM);
-}
-
 static int app_monitor_drive(app_runtime *runtime, app_presentation *presentation,
-    app_control_state *state)
+    app_monitor_control *control)
 {
     app_reconciler_action action;
     int console_status_surface;
-    if (presentation == NULL || state == NULL) return 0;
-    action = app_reconciler_take_action(&state->presentation);
+    app_control_state *state;
+    if (presentation == NULL || control == NULL) return 0;
+    state = &control->state;
+    action = app_control_state_take_action(state);
     if (action != APP_RECONCILER_ACTION_NONE &&
         !app_presentation_apply_action(presentation, action,
             state->presentation.runtime_actual)) return 0;
     if (state->observed_frame_sequence == 0u ||
-        !app_control_frame_targets_ready(state)) return 1;
+        !app_control_state_frame_targets_ready(state)) return 1;
     console_status_surface = state->presentation.display ==
         SOFTPC_PRESENTATION_CONSOLE && !state->presentation.console_control &&
-        state->frame.graphics != 0u;
-    return app_presentation_publish_frame(presentation, &state->frame,
+        control->frame.graphics != 0u;
+    return app_presentation_publish_frame(presentation, &control->frame,
         state->presentation.window_actual,
         state->presentation.vm_console_actual &&
             state->presentation.current_console_actual == APP_RECONCILER_CONSOLE_VM,
@@ -289,7 +240,7 @@ static int app_monitor_arm_if_ready(app_command_session *session,
 {
     app_command_effect effect = { 0 };
     app_command_session_note_monitor_current(session,
-        app_control_monitor_is_current(state), &effect);
+        app_control_state_monitor_is_current(state), &effect);
     if (!effect.arm_prompt) return 1;
     return (effect.text[0] == '\0' ||
         app_monitor_console_write(monitor, effect.text)) &&
@@ -320,14 +271,16 @@ static void app_runtime_frame_published(void *opaque, uint32_t sequence,
  * ordering required by the Console-object contract. */
 static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
     app_presentation *presentation, app_command_session *session,
-    app_control_state *state,
+    app_monitor_control *control,
     const ux_input_event *event)
 {
+    app_control_state *state = control == NULL ? NULL : &control->state;
+    if (state == NULL) return 0;
     if (event != NULL && event->type == UX_EVENT_WINDOW_CLOSE) {
         if (state->monitor_actual == APP_MONITOR_RUNNING &&
             !app_command_session_begin_external(session,
                 state->monitor_actual, APP_LIFECYCLE_REQUEST_PAUSE)) return 0;
-        app_reconciler_note_window_close(&state->presentation);
+        app_control_state_note_window_close(state);
         return app_runtime_get_state(runtime) != SOFTPC_RUNTIME_RUNNING ||
             app_runtime_pause(runtime);
     }
@@ -360,15 +313,16 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
     app_command_session session;
     app_command_effect command_effect;
     app_presentation *presenter = NULL;
-    app_control_state state = { 0 };
+    app_monitor_control control = { 0 };
+    app_control_state *state = &control.state;
     if (!app_presentation_create(&presenter, runtime, monitor, control_queue))
         return 1;
-    app_reconciler_initialize(&state.presentation, presentation, console_control);
+    app_control_state_initialize(state, presentation, console_control);
     app_command_session_initialize(&session, presentation);
     app_command_session_open(&session, &command_effect);
     if (command_effect.text[0] != '\0')
         (void)app_monitor_console_write(monitor, command_effect.text);
-    if (!app_monitor_arm_if_ready(&session, &state, monitor)) goto failed;
+    if (!app_monitor_arm_if_ready(&session, state, monitor)) goto failed;
     for (;;) {
         for (;;) {
             app_control_event control_event;
@@ -380,16 +334,16 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                      * enter the already-stopped machine path. */
                     if (!app_control_accept_ux_event(&control_event,
                             app_runtime_run_generation(runtime),
-                            state.monitor_actual == APP_MONITOR_RUNNING ?
+                            state->monitor_actual == APP_MONITOR_RUNNING ?
                                 SOFTPC_RUNTIME_RUNNING :
-                            state.monitor_actual == APP_MONITOR_PAUSED ?
+                            state->monitor_actual == APP_MONITOR_PAUSED ?
                                 SOFTPC_RUNTIME_PAUSED : SOFTPC_RUNTIME_STOPPED))
                         continue;
                     if (!app_monitor_handle_ux(control_queue, runtime, presenter,
-                            &session, &state, &control_event.value.ux))
+                            &session, &control, &control_event.value.ux))
                         goto failed;
-                    if (!app_monitor_drive(runtime, presenter, &state)) goto failed;
-                    if (!app_monitor_arm_if_ready(&session, &state, monitor)) goto failed;
+                    if (!app_monitor_drive(runtime, presenter, &control)) goto failed;
+                    if (!app_monitor_arm_if_ready(&session, state, monitor)) goto failed;
                     continue;
                 }
                 if (control_event.kind == APP_CONTROL_MONITOR_LINE) {
@@ -416,60 +370,57 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                 {
                     app_runtime_state completed = control_event.value.runtime_state;
                     app_command_session_note_runtime(&session,
-                        state.monitor_actual, completed, &command_effect);
-                    app_control_note_runtime(&state, completed);
-                    if (completed == SOFTPC_RUNTIME_RESET_COMPLETED)
-                        completed = SOFTPC_RUNTIME_PAUSED;
-                    app_reconciler_note_runtime(&state.presentation, completed);
-                    app_presentation_set_runtime_state(presenter, completed);
+                        state->monitor_actual, completed, &command_effect);
+                    app_control_state_note_runtime(state, completed);
+                    app_presentation_set_runtime_state(presenter,
+                        completed == SOFTPC_RUNTIME_RESET_COMPLETED ?
+                            SOFTPC_RUNTIME_PAUSED : completed);
                 }
                 else if (control_event.kind == APP_CONTROL_FRAME_COMPLETED) {
                     uint32_t frame_run;
                     uint32_t sequence = control_event.value.frame.sequence;
-                    if (sequence > state.observed_frame_sequence &&
-                        app_runtime_copy_published_frame(runtime, &state.frame,
-                            &frame_run) && state.frame.sequence == sequence &&
+                    if (sequence > state->observed_frame_sequence &&
+                        app_runtime_copy_published_frame(runtime, &control.frame,
+                            &frame_run) && control.frame.sequence == sequence &&
                         frame_run == control_event.run_generation) {
-                        state.observed_frame_sequence = sequence;
-                        app_reconciler_note_frame(&state.presentation,
+                        (void)app_control_state_note_frame(state, sequence,
                             control_event.value.frame.graphics);
                     }
                 }
                 else if (control_event.kind == APP_CONTROL_COMPONENT_COMPLETED) {
                     if (control_event.value.component.component ==
                         APP_CONTROL_COMPONENT_WINDOW)
-                        app_reconciler_note_window(&state.presentation,
+                        app_control_state_note_window(state,
                             control_event.value.component.exists);
-                    else app_reconciler_note_vm_console(&state.presentation,
+                    else app_control_state_note_vm_console(state,
                         control_event.value.component.exists);
                 }
                 else if (control_event.kind == APP_CONTROL_BROKER_COMPLETED) {
                     int vm_console_current =
                         control_event.value.broker_vm_console_current;
-                    app_reconciler_note_current_console(&state.presentation,
-                        vm_console_current ? APP_RECONCILER_CONSOLE_VM :
-                        APP_RECONCILER_CONSOLE_MONITOR);
+                    app_control_state_note_current_console(state,
+                        vm_console_current);
                     broker_monitor_completed = !vm_console_current;
                 }
-                if (!app_monitor_drive(runtime, presenter, &state)) goto failed;
+                if (!app_monitor_drive(runtime, presenter, &control)) goto failed;
                 /* A monitor completion can be stale with respect to a new
                  * Console-mode VM binding.  Only the reconciled actual owner
                  * may make its prompt due. */
                 if (broker_monitor_completed &&
-                    app_control_monitor_is_current(&state))
+                    app_control_state_monitor_is_current(state))
                     app_command_session_note_broker(&session,
-                        state.monitor_actual, 0,
-                        app_control_monitor_is_running_graphics_surface(&state));
-                if (!app_monitor_arm_if_ready(&session, &state, monitor)) goto failed;
+                        state->monitor_actual, 0,
+                        app_control_state_monitor_is_running_graphics_surface(state));
+                if (!app_monitor_arm_if_ready(&session, state, monitor)) goto failed;
                 continue;
             }
         }
-        if (!app_monitor_drive(runtime, presenter, &state)) goto failed;
-        app_command_session_submit_line(&session, state.monitor_actual, line,
+        if (!app_monitor_drive(runtime, presenter, &control)) goto failed;
+        app_command_session_submit_line(&session, state->monitor_actual, line,
             &command_effect);
         if (command_effect.exit_requested) {
             (void)app_runtime_stop(runtime);
-            (void)app_monitor_drive(runtime, presenter, &state);
+            (void)app_monitor_drive(runtime, presenter, &control);
             app_presentation_destroy(presenter);
             return 0;
         }
@@ -484,8 +435,8 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
             (void)app_monitor_console_write(monitor, command_effect.text);
         if (!app_monitor_dispatch_lifecycle(runtime,
                 app_command_session_take_request(&session))) goto failed;
-        if (!app_monitor_drive(runtime, presenter, &state)) goto failed;
-        if (!app_monitor_arm_if_ready(&session, &state, monitor)) goto failed;
+        if (!app_monitor_drive(runtime, presenter, &control)) goto failed;
+        if (!app_monitor_arm_if_ready(&session, state, monitor)) goto failed;
     }
 failed:
     app_presentation_destroy(presenter);
