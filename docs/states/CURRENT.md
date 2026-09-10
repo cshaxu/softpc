@@ -2,9 +2,8 @@
 
 ## Current Work
 
-M9 T49 S6 is complete: [shared-library neutral corpus prose]
-(../history/M9-T49-S6-lib-neutral-corpus-prose.md). The owner is now verifying
-the rebuilt x86/x64 package pair; T49 remains open until that acceptance.
+No implementation subtask is active. M9 T49 closed after owner acceptance of
+the S6 x86/x64 package pair.
 
 ## Current Technical Baseline
 
@@ -19,10 +18,9 @@ the rebuilt x86/x64 package pair; T49 remains open until that acceptance.
 
 ## Recent Governance
 
-- M9 T49 S6 closes the remaining shared-library prose gap. Every checked-in
-  library C/header/README file now has a product-execution terminology gate;
-  strict x64/x86 builds each passed 35/35 CTest. T49 remains open pending
-  owner package acceptance. See [S6 history]
+- M9 T49 closes at S6 after owner package acceptance. Every checked-in library
+  C/header/README file now has a product-execution terminology gate; strict
+  x64/x86 builds each passed 35/35 CTest. See [S6 history]
   (../history/M9-T49-S6-lib-neutral-corpus-prose.md).
 
 - M9 T49 closes at S5. The reusable corpus now independently supports strict

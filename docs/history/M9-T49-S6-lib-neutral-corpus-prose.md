@@ -59,3 +59,4 @@ scan is clean.
   check passed.
 - Fresh strict Windows x64 and x86 builds each passed all 35 CTest cases,
   including their fixed-package smoke test.
+- Owner manual package testing passed; this completes T49.
