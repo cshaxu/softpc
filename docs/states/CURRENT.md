@@ -2,10 +2,10 @@
 
 ## Current Work
 
-M9 T49 S3 is active: [Shared-library type boundary]
-(../proposals/m9-t49-s3-lib-type-boundary.md). It removes accidental public
-standard-library dependencies and makes library-owned scalar state use neutral
-`lib_*` aliases without changing application, outer-host, or MVDM behavior.
+M9 T49 S4 is active: [Shared-library neutral language]
+(../proposals/m9-t49-s4-lib-neutral-language.md). It removes SoftPC
+product-model terminology from the reusable corpus without changing its public
+ABI, input semantics, application code, or MVDM behavior.
 
 ## Current Technical Baseline
 
@@ -19,6 +19,11 @@ standard-library dependencies and makes library-owned scalar state use neutral
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T49 S3 closes after tightening the shared type boundary. Public base now
+  carries only required C definitions, private consumers own their includes,
+  and library state uses neutral aliases; strict-lib and x64/x86 CTest passed.
+  See [S3 history](../history/M9-T49-S3-lib-type-boundary.md).
 
 - M9 T49 S2 closes after independently strict-building the reusable corpus.
   The union initialization, Win32 wait-array, and Window startup lifetime

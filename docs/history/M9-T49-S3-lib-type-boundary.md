@@ -28,3 +28,13 @@ instead of direct standard fixed-width types.
 Private consumers compile without transitive base includes; the public base
 header has no accidental implementation headers; library-owned scalar state is
 neutral; x64/x86 tests and the manifest pass without ABI or behavior changes.
+
+## Completion evidence
+
+- `base_interface.h` now contains only `<stddef.h>` and `<stdint.h>`; every
+  private consumer declares its own standard-library dependency.
+- The corpus search leaves direct standard scalar types only at the base alias
+  definitions. Library-owned values now use `lib_u8`/`lib_u32`/`lib_u64`,
+  `lib_i32`/`lib_i64`, and `lib_size`.
+- The standalone strict-lib test and root x64/x86 CTest each passed 34/34.
+  `d16331c` contains the implementation and refreshed package pair.
