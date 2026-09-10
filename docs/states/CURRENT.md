@@ -2,7 +2,7 @@
 
 ## Current Work
 
-No implementation subtask is active.
+M9 T50 S2 is active: shared-library CI.
 
 ## Current Technical Baseline
 
@@ -27,6 +27,27 @@ No implementation subtask is active.
 - **M9 T50 S1:** Checked-in x64/x86 presets now bind compiler width to package
   identity and passed fresh 36/36 CTest at both widths.
   [Record](../history/M9-T50-S1-build-presets-artifact-identity.md)
+
+## M9 T50 S2 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Automatic sequential governance route approved by owner; T50 S1 is closed. |
+| Objective | Add a path-scoped standalone shared-library CI gate. |
+| Non-goals | No full VM/package CI or runtime behavior change. |
+| Reference Baseline | NXVM `.github/workflows/lib.yml` and SoftPC `src/lib/CMakeLists.txt`. |
+| Candidate Proposal | [M9 T50 S2 lib CI](../proposals/m9-t50-s2-lib-ci.md). |
+| Files And ABI Surface | `.github/workflows/lib.yml`, task records only; no ABI. |
+| Applicable Rules | Execution, Documentation, Architecture Rules. |
+| Verification | YAML review; standalone lib configure/manifest/build/CTest locally; governance gate. |
+| Expected Markers | `src/lib/**` paths, manifest target, build and CTest commands. |
+| Asset Needs | None. |
+| Reporting Requirements | Report trigger scope and exact CI proof. |
+| Stop Conditions | Stop before adding VM/package CI or changing source. |
+| Exit Criteria | Workflow is committed/pushed and standalone library proof passes. |
+| Original Owner Request | Upgrade governance to NXVM level. |
+| Similar-Issue Sweep | Compare all existing CI/workflow surfaces and standalone lib targets. |
 
 ## Recent Governance
 
