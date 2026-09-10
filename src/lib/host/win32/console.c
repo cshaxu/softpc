@@ -1,5 +1,5 @@
-#include "lib/base/internal/console.h"
-#include "lib/host/internal/console_native.h"
+#include "lib/base/console.h"
+#include "lib/host/console_native.h"
 
 #ifdef _WIN32
 #include <windows.h>

@@ -1,4 +1,4 @@
-#include "lib/ux-base/internal/component.h"
+#include "lib/ux-base/component.h"
 
 #include <assert.h>
 #include <string.h>

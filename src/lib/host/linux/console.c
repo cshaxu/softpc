@@ -1,4 +1,4 @@
-#include "lib/host/internal/console_native.h"
+#include "lib/host/console_native.h"
 
 #ifndef _WIN32
 struct host_console_native { int unavailable; };

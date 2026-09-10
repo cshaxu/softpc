@@ -1,8 +1,8 @@
 #ifndef APP_KEYBOARD_H
 #define APP_KEYBOARD_H
 
-#include "lib/ux-base/event.h"
-#include "lib/ux-base/hotkey.h"
+#include "lib/ux-base/event_interface.h"
+#include "lib/ux-base/hotkey_interface.h"
 #include "machine.h"
 
 #ifdef _WIN32

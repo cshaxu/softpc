@@ -1,7 +1,7 @@
-#ifndef UX_FRAME_H
-#define UX_FRAME_H
+#ifndef UX_FRAME_INTERFACE_H
+#define UX_FRAME_INTERFACE_H
 
-#include "lib/base/base.h"
+#include "lib/base/base_interface.h"
 
 /* Value-only ABI shared between a project runtime and the Win32 presenter.
  * It intentionally carries no renderer pointer, machine pointer, or lock. */

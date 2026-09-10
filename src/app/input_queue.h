@@ -1,7 +1,7 @@
 #ifndef APP_INPUT_QUEUE_H
 #define APP_INPUT_QUEUE_H
 
-#include "lib/ux-base/event.h"
+#include "lib/ux-base/event_interface.h"
 
 typedef struct app_input_queue app_input_queue;
 

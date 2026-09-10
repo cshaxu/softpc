@@ -2,8 +2,8 @@
 
 #ifdef _WIN32
 #include "keyboard.h"
-#include "lib/ux-console/console.h"
-#include "lib/ux-window/window.h"
+#include "lib/ux-console/console_interface.h"
+#include "lib/ux-window/window_interface.h"
 
 #include <stdlib.h>
 #include <string.h>

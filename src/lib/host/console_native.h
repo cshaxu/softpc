@@ -1,7 +1,7 @@
-#ifndef LIB_HOST_INTERNAL_CONSOLE_NATIVE_H
-#define LIB_HOST_INTERNAL_CONSOLE_NATIVE_H
+#ifndef LIB_HOST_CONSOLE_NATIVE_H
+#define LIB_HOST_CONSOLE_NATIVE_H
 
-#include "lib/host/console.h"
+#include "lib/host/console_interface.h"
 
 typedef struct host_console_native host_console_native;
 

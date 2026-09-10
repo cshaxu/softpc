@@ -1,4 +1,4 @@
-#include "lib/base/internal/console.h"
+#include "lib/base/console.h"
 
 struct lib_console {
     atomic_flag lock;

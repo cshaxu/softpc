@@ -1,8 +1,8 @@
 #ifndef APP_CONTROL_H
 #define APP_CONTROL_H
 
-#include "lib/base/console.h"
-#include "lib/ux-base/event.h"
+#include "lib/base/console_interface.h"
+#include "lib/ux-base/event_interface.h"
 #include "runtime.h"
 
 typedef struct app_control_queue app_control_queue;

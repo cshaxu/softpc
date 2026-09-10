@@ -1,4 +1,4 @@
-#include "lib/ux-base/internal/component.h"
+#include "lib/ux-base/component.h"
 
 static atomic_uint_fast64_t ux_component_next_source_identity = 1u;
 

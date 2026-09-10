@@ -2,8 +2,8 @@
 #include "keyboard.h"
 #include "input_queue.h"
 #include "prompt_trace.h"
-#include "lib/host/clock.h"
-#include "lib/host/sync.h"
+#include "lib/host/clock_interface.h"
+#include "lib/host/sync_interface.h"
 
 #include <windows.h>
 

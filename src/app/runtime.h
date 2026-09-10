@@ -2,8 +2,8 @@
 #define SOFTPC_VM_RUNTIME_H
 
 #include "machine.h"
-#include "lib/ux-base/event.h"
-#include "lib/ux-base/frame.h"
+#include "lib/ux-base/event_interface.h"
+#include "lib/ux-base/frame_interface.h"
 
 #include <stdint.h>
 

@@ -1,5 +1,5 @@
-#include "lib/ux-window/internal.h"
-#include "lib/ux-console/internal.h"
+#include "lib/ux-window/window.h"
+#include "lib/ux-console/console.h"
 
 #include <assert.h>
 

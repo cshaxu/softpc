@@ -1,5 +1,5 @@
 #include "prompt_trace.h"
-#include "lib/storage/file.h"
+#include "lib/storage/file_interface.h"
 
 #include <stdarg.h>
 #include <stdio.h>

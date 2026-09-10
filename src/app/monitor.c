@@ -1,7 +1,7 @@
 #include "monitor.h"
 
 #ifdef _WIN32
-#include "lib/ux-console/console.h"
+#include "lib/ux-console/console_interface.h"
 #include <windows.h>
 
 #include <stdlib.h>

@@ -1,7 +1,7 @@
-#ifndef UX_BASE_INTERNAL_MAILBOX_H
-#define UX_BASE_INTERNAL_MAILBOX_H
+#ifndef UX_BASE_MAILBOX_H
+#define UX_BASE_MAILBOX_H
 
-#include "lib/ux-base/frame.h"
+#include "lib/ux-base/frame_interface.h"
 #include "lib/ux-base/mailbox_native.h"
 
 #define UX_COMPONENT_CONTROL_CAPACITY 32u

@@ -1,4 +1,4 @@
-#include "lib/ux-console/internal.h"
+#include "lib/ux-console/console.h"
 
 #ifdef _WIN32
 #include "lib/ux-base/win32/input.h"

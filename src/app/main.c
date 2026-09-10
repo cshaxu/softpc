@@ -5,7 +5,7 @@
 #include "runtime.h"
 #include "machine.h"
 #include "prompt_trace.h"
-#include "lib/storage/file.h"
+#include "lib/storage/file_interface.h"
 
 #include <windows.h>
 

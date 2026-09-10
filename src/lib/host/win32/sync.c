@@ -1,5 +1,5 @@
-#include "lib/base/base.h"
-#include "lib/host/sync.h"
+#include "lib/base/base_interface.h"
+#include "lib/host/sync_interface.h"
 
 #include <windows.h>
 

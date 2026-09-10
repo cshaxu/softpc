@@ -8,8 +8,8 @@ for component `internal/` directories.
 ## Objective
 
 Keep the public/shared boundary explicit while flattening incidental directory
-nesting.  A private implementation header remains private because of its
-contract and name, not because it lives behind a one-file directory.
+nesting.  A `*_interface.h` header is the only external contract; every other
+header is private implementation and uses its short component-local name.
 
 ## Baseline
 
@@ -22,9 +22,10 @@ components or another public API.
 ## Planned work
 
 - Audit every lib header by consumer and dependency direction.
-- Replace one-off `internal/` directory paths with component-local,
-  explicitly named private headers such as `console_internal.h` and
-  `mailbox_internal.h`; use `git mv` and repair direct includes.
+- Replace one-off `internal/` directory paths. Rename the public headers to
+  `*_interface.h`; retain concise names such as `console.h` and `mailbox.h`
+  for private implementation contracts. Use `git mv` and repair direct
+  includes.
 - Retain private contracts shared by allowed dependents (`ux-window` and
   `ux-console` may consume `ux-base` private mailbox/component mechanics).
 - Make the README state the public/private naming convention and verify no
@@ -48,5 +49,6 @@ components or another public API.
 
 ## Exit criteria
 
-Each shared component has a flat, self-explanatory private-header layout;
-the public ABI and allowed dependency graph remain unchanged and proven.
+Each shared component has a flat, self-explanatory header layout: public ABI
+is visibly `*_interface.h`, while private implementation has no false public
+appearance. The allowed dependency graph remains unchanged and proven.

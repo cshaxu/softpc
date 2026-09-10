@@ -1,5 +1,5 @@
 #include "lib/ux-base/win32/input.h"
-#include "lib/ux-base/hotkey.h"
+#include "lib/ux-base/hotkey_interface.h"
 
 #include <assert.h>
 #include <string.h>

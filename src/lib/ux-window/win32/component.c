@@ -1,11 +1,11 @@
-#include "lib/base/base.h"
+#include "lib/base/base_interface.h"
 #include "lib/ux-window/win32/component.h"
 
 #ifdef _WIN32
 #include "lib/ux-window/win32/geometry.h"
 #include "lib/ux-base/win32/input.h"
 #include "lib/ux-base/win32/actions.h"
-#include "lib/ux-base/internal/mailbox.h"
+#include "lib/ux-base/mailbox.h"
 #include "lib/ux-base/win32/mailbox_wake.h"
 #include "lib/ux-window/win32/mouse.h"
 

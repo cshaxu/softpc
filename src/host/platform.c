@@ -34,8 +34,8 @@
 #include "lifecycle.h"
 #include "input.h"
 #include "hdd_media.h"
-#include "lib/host/clock.h"
-#include "lib/host/sync.h"
+#include "lib/host/clock_interface.h"
+#include "lib/host/sync_interface.h"
 
 /*
  * Minimal host ports for the detached CCPU.  These are deliberately machine

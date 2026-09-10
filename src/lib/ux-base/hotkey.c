@@ -1,4 +1,4 @@
-#include "lib/ux-base/hotkey.h"
+#include "lib/ux-base/hotkey_interface.h"
 
 static lib_u8 ux_hotkey_modifier_bit(ux_key key)
 {

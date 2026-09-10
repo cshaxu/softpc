@@ -1,7 +1,7 @@
 #ifndef APP_MONITOR_H
 #define APP_MONITOR_H
 
-#include "lib/host/console.h"
+#include "lib/host/console_interface.h"
 #include "control.h"
 
 #include <stddef.h>

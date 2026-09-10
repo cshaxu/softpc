@@ -1,6 +1,6 @@
-#include "lib/base/internal/console.h"
-#include "lib/host/console.h"
-#include "lib/host/internal/console_native.h"
+#include "lib/base/console.h"
+#include "lib/host/console_interface.h"
+#include "lib/host/console_native.h"
 
 struct host_console_broker {
     atomic_flag lock;

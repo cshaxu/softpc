@@ -1,5 +1,5 @@
-#include "lib/base/internal/console.h"
-#include "lib/ux-console/console.h"
+#include "lib/base/console.h"
+#include "lib/ux-console/console_interface.h"
 
 #include <assert.h>
 

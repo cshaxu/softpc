@@ -1,6 +1,6 @@
 #include "machine.h"
 #include "compat/ccpu/lifecycle.h"
-#include "lib/storage/medium.h"
+#include "lib/storage/medium_interface.h"
 
 #include <stdio.h>
 #include <stdlib.h>

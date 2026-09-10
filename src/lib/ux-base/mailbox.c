@@ -1,4 +1,4 @@
-#include "lib/ux-base/internal/mailbox.h"
+#include "lib/ux-base/mailbox.h"
 
 static void ux_component_mailboxes_lock(atomic_flag *lock)
 {

@@ -6,6 +6,17 @@ policy, or native SDK type in a public API. `MANIFEST.sha256` lists every source
 its exact corpus revision; `verify_manifest.cmake` rejects an unlisted, stale,
 or changed library file.
 
+## Header visibility
+
+Headers named `*_interface.h` are the complete public library ABI. Every
+other library header is implementation-private, including native-platform
+adapters. Private headers use short component-local names and live directly in
+their owning directory; no `internal/` directory exists. Only the owning
+component and an explicitly permitted dependent may include a private header:
+`ux-window` and `ux-console` may consume `ux-base` mailbox and component
+implementation contracts. Application/product code may include only
+`*_interface.h`; an interface header never includes a private header.
+
 ## Component graph
 
 An arrow means the component on the right may use the generic contract of the

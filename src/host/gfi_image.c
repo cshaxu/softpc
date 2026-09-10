@@ -10,7 +10,7 @@
 #include "gfi.h"
 #include "config.h"
 #include "machine.h"
-#include "lib/storage/medium.h"
+#include "lib/storage/medium_interface.h"
 
 /*
  * This is a host media port, not an FDC implementation.  The original FLA,

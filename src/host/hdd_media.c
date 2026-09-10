@@ -2,7 +2,7 @@
 #include "host_def.h"
 
 #include "fdisk.h"
-#include "lib/storage/medium.h"
+#include "lib/storage/medium_interface.h"
 #include "machine.h"
 #include "hdd_media.h"
 

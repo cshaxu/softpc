@@ -1,5 +1,5 @@
 #include "lib/ux-base/win32/input.h"
-#include "lib/ux-base/hotkey.h"
+#include "lib/ux-base/hotkey_interface.h"
 
 #ifdef _WIN32
 static WORD ux_win32_keyboard_decode_scan(WORD raw_scan)

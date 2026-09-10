@@ -1,4 +1,4 @@
-#include "lib/base/base.h"
+#include "lib/base/base_interface.h"
 #include "lib/ux-base/linux/input.h"
 
 lib_bool ux_linux_key_to_event(ux_linux_key key, ux_event *out_event)

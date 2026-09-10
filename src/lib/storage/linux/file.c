@@ -1,10 +1,10 @@
-#include "lib/base/base.h"
+#include "lib/base/base_interface.h"
 
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "lib/storage/internal/native.h"
+#include "lib/storage/native.h"
 
 FILE *lib_storage_native_open(const char *path, lib_storage_medium_mode mode)
 {

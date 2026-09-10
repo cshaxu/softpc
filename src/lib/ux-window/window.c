@@ -1,4 +1,4 @@
-#include "lib/ux-window/internal.h"
+#include "lib/ux-window/window.h"
 
 static void ux_window_component_stop(ux_component *base)
 { ux_window_native_stop((ux_window *)base); }

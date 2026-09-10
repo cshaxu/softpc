@@ -82,10 +82,29 @@ foreach(source IN LISTS shared_identity_sources)
     endif()
 endforeach()
 
+# A shared public contract is visibly named. Product code must not reach a
+# component implementation header, and one public contract may compose only
+# other public contracts.
+file(GLOB_RECURSE product_lib_consumers
+    "${SOFTPC_SOURCE_DIR}/src/app/*.[ch]"
+    "${SOFTPC_SOURCE_DIR}/src/host/*.[ch]")
+file(GLOB_RECURSE shared_interface_headers
+    "${SOFTPC_SOURCE_DIR}/src/lib/*_interface.h")
+foreach(source IN LISTS product_lib_consumers shared_interface_headers)
+    file(STRINGS "${source}" include_lines REGEX
+        "#[ \t]*include[ \t]+\"lib/[^\"]+\.h\"")
+    foreach(include_line IN LISTS include_lines)
+        string(FIND "${include_line}" "_interface.h\"" interface_suffix)
+        if(interface_suffix EQUAL -1)
+            message(FATAL_ERROR "Non-interface library header crosses a public boundary: ${source}")
+        endif()
+    endforeach()
+endforeach()
+
 # ux-window owns no product default.  The application supplies one creation
 # title, ux-window copies it before native startup, and the native Window uses
 # that copy rather than a hidden literal.
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-window/window.h" window_header)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-window/window_interface.h" window_header)
 file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-window/window.c" window_source)
 file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-window/win32/component.c"
     native_window_source)
@@ -100,7 +119,7 @@ endif()
 # The public UX input ABI uses only lib-defined key identities and flags. Win32
 # values are permitted inside the private win32 adapter and SoftPC binding, not
 # in the shared public event contract.
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-base/event.h" ux_event_header)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-base/event_interface.h" ux_event_header)
 if(ux_event_header MATCHES "VK_[A-Za-z0-9_]+" OR
     ux_event_header MATCHES "ENHANCED_KEY" OR
     ux_event_header MATCHES "KEY_EVENT_RECORD")
@@ -119,7 +138,7 @@ endif()
 
 # Host owns only generic native Console I/O. The product monitor owns its
 # logical Console and line sink, and binds it through the public broker API.
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/host/console.h" host_console_public)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/host/console_interface.h" host_console_public)
 file(READ "${SOFTPC_SOURCE_DIR}/src/lib/host/console.c" host_console_source)
 file(READ "${SOFTPC_SOURCE_DIR}/src/app/monitor.c" app_monitor_source)
 if(host_console_public MATCHES "host_console_cooked" OR

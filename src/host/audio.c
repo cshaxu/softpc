@@ -1,6 +1,6 @@
 #include "insignia.h"
 #include "host_def.h"
-#include "lib/host/sync.h"
+#include "lib/host/sync_interface.h"
 
 /* Standalone audio is only a presentation sink.  nt_sound.c owns the
    original PPI/Timer2 state transitions and requests a frequency here. */

@@ -1,9 +1,9 @@
 #ifndef LIB_STORAGE_NATIVE_H
 #define LIB_STORAGE_NATIVE_H
 
-#include "lib/base/base.h"
+#include "lib/base/base_interface.h"
 
-#include "lib/storage/medium.h"
+#include "lib/storage/medium_interface.h"
 
 FILE *lib_storage_native_open(const char *path, lib_storage_medium_mode mode);
 int lib_storage_native_seek_64(FILE *file, lib_i64 offset, int origin);
