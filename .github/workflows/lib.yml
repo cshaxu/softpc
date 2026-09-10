@@ -19,7 +19,7 @@ jobs:
       - name: Restore manifest-preserving LF checkout
         shell: pwsh
         run: |
-          git config --global core.autocrlf false
+          git -C $env:GITHUB_WORKSPACE config core.autocrlf false
           git -C $env:GITHUB_WORKSPACE reset --hard HEAD
       - name: Configure standalone library
         run: cmake -G Ninja -S src/lib -B build/lib -DCMAKE_BUILD_TYPE=Release
