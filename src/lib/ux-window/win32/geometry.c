@@ -74,8 +74,6 @@ int ux_win32_fit_client_size(const RECT *work_area, int decoration_width,
 {
     int available_width;
     int available_height;
-    int width;
-    int height;
 
     if (work_area == NULL || fitted_width == NULL || fitted_height == NULL ||
         decoration_width < 0 || decoration_height < 0 || desired_width <= 0 ||
@@ -83,24 +81,110 @@ int ux_win32_fit_client_size(const RECT *work_area, int decoration_width,
     available_width = (work_area->right - work_area->left) - decoration_width;
     available_height = (work_area->bottom - work_area->top) - decoration_height;
     if (available_width <= 0 || available_height <= 0) return 0;
-    width = desired_width;
-    height = desired_height;
-    if (width > available_width || height > available_height) {
-        if ((uint64_t)available_width * (uint64_t)desired_height <=
-            (uint64_t)available_height * (uint64_t)desired_width) {
-            width = available_width;
-            height = (int)((uint64_t)width * (uint64_t)desired_height /
-                (uint64_t)desired_width);
-        } else {
-            height = available_height;
-            width = (int)((uint64_t)height * (uint64_t)desired_width /
-                (uint64_t)desired_height);
-        }
-        if (width <= 0 || height <= 0) return 0;
+    if (desired_width <= available_width && desired_height <= available_height) {
+        *fitted_width = desired_width;
+        *fitted_height = desired_height;
+        return 1;
     }
+    return ux_win32_fit_aspect_size(available_width, available_height,
+        (uint32_t)desired_width, (uint32_t)desired_height, fitted_width,
+        fitted_height);
+}
+
+int ux_win32_fit_aspect_size(int available_width, int available_height,
+    uint32_t source_width, uint32_t source_height, int *fitted_width,
+    int *fitted_height)
+{
+    int width;
+    int height;
+
+    if (available_width <= 0 || available_height <= 0 || source_width == 0u ||
+        source_height == 0u || fitted_width == NULL || fitted_height == NULL)
+        return 0;
+    if ((uint64_t)available_width * source_height <=
+        (uint64_t)available_height * source_width) {
+        width = available_width;
+        height = (int)((uint64_t)width * source_height / source_width);
+    } else {
+        height = available_height;
+        width = (int)((uint64_t)height * source_width / source_height);
+    }
+    if (width <= 0 || height <= 0) return 0;
     *fitted_width = width;
     *fitted_height = height;
     return 1;
+}
+
+static int ux_win32_window_decoration(HWND window, int *width, int *height)
+{
+    RECT outer;
+    RECT client;
+
+    if (window == NULL || width == NULL || height == NULL ||
+        !GetWindowRect(window, &outer) || !GetClientRect(window, &client))
+        return 0;
+    *width = (outer.right - outer.left) - (client.right - client.left);
+    *height = (outer.bottom - outer.top) - (client.bottom - client.top);
+    return *width >= 0 && *height >= 0;
+}
+
+int ux_win32_enforce_client_aspect(HWND window, uint32_t source_width,
+    uint32_t source_height)
+{
+    RECT client;
+    int decoration_width;
+    int decoration_height;
+    int target_width;
+    int target_height;
+
+    if (window == NULL || source_width == 0u || source_height == 0u ||
+        !GetClientRect(window, &client) || !ux_win32_window_decoration(window,
+            &decoration_width, &decoration_height) ||
+        !ux_win32_fit_aspect_size(client.right - client.left,
+            client.bottom - client.top, source_width, source_height,
+            &target_width, &target_height)) return 0;
+    if (target_width == client.right - client.left &&
+        target_height == client.bottom - client.top) return 1;
+    return SetWindowPos(window, NULL, 0, 0, target_width + decoration_width,
+        target_height + decoration_height,
+        SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE) != FALSE;
+}
+
+int ux_win32_maximize_client(HWND window, uint32_t source_width,
+    uint32_t source_height)
+{
+    MONITORINFO monitor_info;
+    HMONITOR monitor;
+    int decoration_width;
+    int decoration_height;
+    int client_width;
+    int client_height;
+    int outer_width;
+    int outer_height;
+    int available_width;
+    int available_height;
+
+    if (window == NULL || source_width == 0u || source_height == 0u ||
+        !ux_win32_window_decoration(window, &decoration_width,
+            &decoration_height)) return 0;
+    monitor = MonitorFromWindow(window, MONITOR_DEFAULTTONEAREST);
+    ZeroMemory(&monitor_info, sizeof(monitor_info));
+    monitor_info.cbSize = sizeof(monitor_info);
+    if (monitor == NULL || !GetMonitorInfoA(monitor, &monitor_info)) return 0;
+    available_width = (monitor_info.rcWork.right - monitor_info.rcWork.left) -
+        decoration_width;
+    available_height = (monitor_info.rcWork.bottom - monitor_info.rcWork.top) -
+        decoration_height;
+    if (!ux_win32_fit_aspect_size(available_width, available_height,
+            source_width, source_height, &client_width, &client_height)) return 0;
+    outer_width = client_width + decoration_width;
+    outer_height = client_height + decoration_height;
+    return SetWindowPos(window, NULL,
+        monitor_info.rcWork.left + ((monitor_info.rcWork.right -
+            monitor_info.rcWork.left) - outer_width) / 2,
+        monitor_info.rcWork.top + ((monitor_info.rcWork.bottom -
+            monitor_info.rcWork.top) - outer_height) / 2,
+        outer_width, outer_height, SWP_NOZORDER | SWP_NOACTIVATE) != FALSE;
 }
 
 int ux_win32_resize_client(HWND window, uint32_t width,

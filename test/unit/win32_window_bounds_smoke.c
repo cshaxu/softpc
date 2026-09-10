@@ -50,5 +50,23 @@ int main(void)
         assert(client_width + 16 <= work_area.right - work_area.left);
         assert(client_height + 39 <= work_area.bottom - work_area.top);
     }
+    {
+        int client_width;
+        int client_height;
+
+        assert(ux_win32_fit_aspect_size(1920, 1041, 640, 480,
+            &client_width, &client_height));
+        assert(client_width == 1388);
+        assert(client_height == 1041);
+        assert(client_width <= 1920);
+        assert(client_height <= 1041);
+
+        assert(ux_win32_fit_aspect_size(600, 900, 640, 480,
+            &client_width, &client_height));
+        assert(client_width == 600);
+        assert(client_height == 450);
+        assert(client_width <= 600);
+        assert(client_height <= 900);
+    }
     return 0;
 }

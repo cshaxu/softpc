@@ -2,10 +2,10 @@
 
 ## Current Work
 
-M9 T48 S1 is active: [Monitor command session extraction]
-(../proposals/m9-t48-monitor-command-session.md). It moves monitor command
-turn/prompt policy out of `main.c` into an app-owned state machine and repairs
-the missing post-`start`/`resume` cooked monitor prompt for `display=window`.
+M9 T48 S2 is active: [UX Window aspect-preserving bounds]
+(../proposals/m9-t48-s2-ux-window-aspect-bounds.md). It makes the copied guest
+frame ratio a native Window geometry invariant: drag, maximize, and system
+resize keep a uniformly scaled, full-client image with no black bars.
 
 ## Current Technical Baseline
 
@@ -20,7 +20,11 @@ the missing post-`start`/`resume` cooked monitor prompt for `display=window`.
 
 ## Recent Governance
 
-- M9 T48 S1 is active. The monitor command session becomes the sole owner of
+- M9 T48 S2 is active. The native Window geometry owns the copied-frame aspect
+  invariant and maximum work-area fit. It neither changes copied frame data nor
+  introduces SoftPC product geometry policy.
+
+- M9 T48 S1 completed the monitor command session. The session becomes the sole owner of
   monitor-line parsing, lifecycle turn completion, and prompt eligibility;
   `main.c` remains queue/object orchestration. The approved static Window
   route keeps the cooked monitor available while running, independent of

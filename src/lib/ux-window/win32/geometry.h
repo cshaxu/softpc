@@ -17,8 +17,15 @@ int ux_win32_fit_outer_rect(const RECT *work_area, int desired_width,
 int ux_win32_fit_client_size(const RECT *work_area, int decoration_width,
     int decoration_height, int desired_width, int desired_height,
     int *fitted_width, int *fitted_height);
+int ux_win32_fit_aspect_size(int available_width, int available_height,
+    uint32_t source_width, uint32_t source_height, int *fitted_width,
+    int *fitted_height);
 int ux_win32_resize_client(HWND window, uint32_t width,
     uint32_t height);
+int ux_win32_enforce_client_aspect(HWND window, uint32_t source_width,
+    uint32_t source_height);
+int ux_win32_maximize_client(HWND window, uint32_t source_width,
+    uint32_t source_height);
 void ux_win32_constrain_sizing(HWND window, WPARAM edge,
     RECT *outer, uint32_t source_width, uint32_t source_height);
 #endif

@@ -45,6 +45,7 @@ typedef struct ux_win32_window_context {
     uint32_t client_surface_height;
     int client_width;
     int client_height;
+    lib_bool correcting_aspect;
     lib_bool frozen;
     lib_bool cursor_blink_visible;
     DWORD cursor_blink_due;
@@ -233,6 +234,17 @@ static void win32_window_capture_client_size(HWND window,
     GetClientRect(window, &client);
     context->client_width = client.right - client.left;
     context->client_height = client.bottom - client.top;
+}
+
+static void win32_window_enforce_aspect(HWND window,
+    ux_win32_window_context *context)
+{
+    if (context == NULL || context->correcting_aspect != LIB_FALSE ||
+        context->surface_width == 0u || context->surface_height == 0u) return;
+    context->correcting_aspect = LIB_TRUE;
+    (void)ux_win32_enforce_client_aspect(window, context->surface_width,
+        context->surface_height);
+    context->correcting_aspect = LIB_FALSE;
 }
 
 static void win32_window_resize_client(HWND window,
@@ -620,6 +632,8 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         return 0;
     case WM_SIZE:
         win32_window_capture_client_size(window, context);
+        win32_window_enforce_aspect(window, context);
+        InvalidateRect(window, NULL, FALSE);
         return 0;
     case WM_ERASEBKGND:
         return 1;
@@ -630,6 +644,14 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
             context->client_surface_height = 0u;
             if (context->surface_width != 0u)
                 win32_window_resize_client(window, context, context->surface_width,
+                    context->surface_height);
+            return 0;
+        }
+        break;
+    case WM_SYSCOMMAND:
+        if ((wparam & 0xfff0u) == SC_MAXIMIZE) {
+            if (context->surface_width != 0u && context->surface_height != 0u)
+                (void)ux_win32_maximize_client(window, context->surface_width,
                     context->surface_height);
             return 0;
         }
