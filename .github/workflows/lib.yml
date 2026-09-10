@@ -13,10 +13,6 @@ on:
 jobs:
   library-windows:
     runs-on: windows-latest
-    env:
-      GIT_CONFIG_COUNT: 1
-      GIT_CONFIG_KEY_0: core.autocrlf
-      GIT_CONFIG_VALUE_0: "false"
     defaults:
       run:
         shell: msys2 {0}
@@ -30,6 +26,10 @@ jobs:
             mingw-w64-ucrt-x86_64-cmake
             mingw-w64-ucrt-x86_64-gcc
             mingw-w64-ucrt-x86_64-ninja
+      - name: Restore manifest-preserving LF checkout
+        run: |
+          git config core.autocrlf false
+          git reset --hard HEAD
       - name: Configure standalone library
         run: cmake -G Ninja -S src/lib -B build/lib
       - name: Verify complete manifest
