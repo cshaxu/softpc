@@ -22,7 +22,15 @@ static const char HELP[] =
 
 static void clear(app_command_effect *e) { memset(e, 0, sizeof(*e)); }
 static void text(app_command_effect *e, const char *s) { (void)snprintf(e->text, sizeof(e->text), "%s", s); }
+/* Product prompt demand is separate from the host's one cooked reader.  The
+ * broker alone owns that reader and safely makes its arm request idempotent. */
 static void prompt(app_command_session *s) { s->prompt_due = 1; }
+static void outcome(app_command_session *s, const char *message)
+{
+    (void)snprintf(s->pending_monitor_text, sizeof(s->pending_monitor_text),
+        "%s", message);
+    prompt(s);
+}
 static void reject(app_command_session *s, app_command_effect *e, const char *message) { (void)snprintf(e->text, sizeof(e->text), "%s\r\n", message); prompt(s); }
 static char *trim(char *s) { char *e; while (*s && isspace((unsigned char)*s)) ++s; e=s+strlen(s); while(e!=s&&isspace((unsigned char)e[-1]))--e; *e=0; return s; }
 static void lower(char *s) { while (*s) { *s=(char)tolower((unsigned char)*s); ++s; } }
@@ -60,7 +68,7 @@ void app_command_session_initialize(app_command_session *s, softpc_presentation 
 void app_command_session_open(app_command_session *s, app_command_effect *e) { clear(e); (void)snprintf(e->text,sizeof(e->text),"%s\r\n",HELP);prompt(s); }
 void app_command_session_submit_line(app_command_session *s,const char *line,app_command_effect *e)
 {
-    char b[APP_COMMAND_TEXT_CAPACITY],*c,*a,*p; size_t n; clear(e);s->line_active=0;
+    char b[APP_COMMAND_TEXT_CAPACITY],*c,*a,*p; size_t n; clear(e);
     if(!line||(n=strlen(line))>=sizeof(b)){reject(s,e,line?"Command is too long.":"Unknown command.");return;}
     memcpy(b,line,n+1);c=trim(b);a=c;while(*a&&!isspace((unsigned char)*a))++a;if(*a)*a++=0;a=trim(a);lower(c);
     if(!*c){prompt(s);return;} if(!strcmp(c,"help")){(void)snprintf(e->text,sizeof(e->text),"%s\r\n",HELP);prompt(s);return;} if(!strcmp(c,"exit")){e->exit_requested=1;return;}
@@ -84,7 +92,70 @@ app_reconciler_intent app_command_session_take_intent(app_command_session *s)
 void app_command_session_complete_floppy(app_command_session *s,app_command_action a,int ok,app_command_effect *e)
 { clear(e); text(e,a==APP_COMMAND_ACTION_EJECT_FLOPPY?(ok?"Floppy ejected.\r\n":"Cannot eject floppy.\r\n"):(ok?"Floppy inserted.\r\n":"Cannot insert floppy.\r\n"));prompt(s); }
 void app_command_session_note_runtime(app_command_session *s,app_runtime_state state,app_command_effect *e)
-{ clear(e);if(state==SOFTPC_RUNTIME_PAUSED&&s->state!=APP_MONITOR_PAUSED){s->state=APP_MONITOR_PAUSED;text(e,s->reset_requested?"Machine reset and paused.\r\n":"Machine paused.\r\n");s->reset_requested=0;prompt(s);if(s->turn_intent==APP_RECONCILER_INTENT_RESET||s->turn_intent==APP_RECONCILER_INTENT_PAUSE)s->turn_pending=0;}else if(state==SOFTPC_RUNTIME_RUNNING){if(s->reset_requested)return;s->state=APP_MONITOR_RUNNING;s->start_requested=0;if(s->display==SOFTPC_PRESENTATION_WINDOW)prompt(s);if(s->turn_intent==APP_RECONCILER_INTENT_START||s->turn_intent==APP_RECONCILER_INTENT_RESUME)s->turn_pending=0;}else if(state==SOFTPC_RUNTIME_STOPPED&&(s->state!=APP_MONITOR_STOPPED||s->stop_requested)){s->state=APP_MONITOR_STOPPED;if(!s->reset_requested&&!s->start_requested){text(e,"Machine stopped.\r\n");prompt(s);}s->stop_requested=0;if(s->turn_intent==APP_RECONCILER_INTENT_STOP)s->turn_pending=0;} }
-void app_command_session_note_broker(app_command_session *s,int vm,int monitor_running_surface){if(!vm&&s->state==APP_MONITOR_RUNNING&&monitor_running_surface)prompt(s);}
-void app_command_session_note_monitor_current(app_command_session *s,int current,app_command_effect *e){if(s->prompt_due&&current&&!s->line_active){e->arm_prompt=1;s->prompt_due=0;s->line_active=1;}}
+{
+    app_reconciler_intent completed_intent;
+
+    if (s == NULL || e == NULL) return;
+    clear(e);
+    completed_intent = s->turn_intent;
+    if (state == SOFTPC_RUNTIME_PAUSED && s->state != APP_MONITOR_PAUSED) {
+        s->state = APP_MONITOR_PAUSED;
+        outcome(s, s->reset_requested ? "Machine reset and paused.\r\n" :
+            "Machine paused.\r\n");
+        s->reset_requested = 0;
+        if (completed_intent == APP_RECONCILER_INTENT_RESET ||
+            completed_intent == APP_RECONCILER_INTENT_PAUSE) {
+            s->turn_pending = 0;
+            s->turn_intent = APP_RECONCILER_INTENT_NONE;
+        }
+    } else if (state == SOFTPC_RUNTIME_RUNNING) {
+        if (s->reset_requested) return;
+        s->state = APP_MONITOR_RUNNING;
+        s->start_requested = 0;
+        if (completed_intent == APP_RECONCILER_INTENT_START)
+            outcome(s, "Machine started.\r\n");
+        else if (completed_intent == APP_RECONCILER_INTENT_RESUME)
+            outcome(s, "Machine resumed.\r\n");
+        else if (s->display == SOFTPC_PRESENTATION_WINDOW)
+            prompt(s);
+        if (completed_intent == APP_RECONCILER_INTENT_START ||
+            completed_intent == APP_RECONCILER_INTENT_RESUME) {
+            s->turn_pending = 0;
+            s->turn_intent = APP_RECONCILER_INTENT_NONE;
+        }
+    } else if (state == SOFTPC_RUNTIME_STOPPED &&
+        (s->state != APP_MONITOR_STOPPED || s->stop_requested)) {
+        s->state = APP_MONITOR_STOPPED;
+        if (!s->reset_requested && !s->start_requested)
+            outcome(s, "Machine stopped.\r\n");
+        s->stop_requested = 0;
+        if (completed_intent == APP_RECONCILER_INTENT_STOP) {
+            s->turn_pending = 0;
+            s->turn_intent = APP_RECONCILER_INTENT_NONE;
+        }
+    }
+}
+
+void app_command_session_note_broker(app_command_session *s, int vm,
+    int monitor_running_surface)
+{
+    if (s == NULL) return;
+    if (vm && s->state == APP_MONITOR_RUNNING) {
+        s->prompt_due = 0;
+        s->pending_monitor_text[0] = '\0';
+    } else if (!vm && s->state == APP_MONITOR_RUNNING &&
+        monitor_running_surface) prompt(s);
+}
+
+void app_command_session_note_monitor_current(app_command_session *s,
+    int current, app_command_effect *e)
+{
+    if (s == NULL || e == NULL) return;
+    clear(e);
+    if (!s->prompt_due || !current) return;
+    text(e, s->pending_monitor_text);
+    s->pending_monitor_text[0] = '\0';
+    s->prompt_due = 0;
+    e->arm_prompt = 1;
+}
 app_monitor_state app_command_session_state(const app_command_session *s){return s->state;}

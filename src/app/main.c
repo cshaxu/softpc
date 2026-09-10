@@ -210,7 +210,9 @@ static int app_monitor_arm_if_ready(app_command_session *session,
     app_command_session_note_monitor_current(session,
         app_presentation_monitor_is_current(presentation), &effect);
     if (!effect.arm_prompt) return 1;
-    return app_monitor_console_write(monitor, "SoftPC> ") &&
+    return (effect.text[0] == '\0' ||
+        app_monitor_console_write(monitor, effect.text)) &&
+        app_monitor_console_write(monitor, "SoftPC> ") &&
         app_monitor_console_request_line(monitor);
 }
 
@@ -325,8 +327,6 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                     app_runtime_state completed = control_event.value.runtime_state;
                     app_command_session_note_runtime(&session, completed,
                         &command_effect);
-                    if (command_effect.text[0] != '\0')
-                        (void)app_monitor_console_write(monitor, command_effect.text);
                     app_presentation_note_runtime_completed(presenter, completed);
                 }
                 else if (control_event.kind == APP_CONTROL_FRAME_COMPLETED)

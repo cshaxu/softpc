@@ -17,7 +17,8 @@ typedef struct app_command_session {
     app_reconciler_intent turn_intent;
     int dispatch_pending;
     int turn_pending;
-    int start_requested, reset_requested, stop_requested, prompt_due, line_active;
+    int start_requested, reset_requested, stop_requested, prompt_due;
+    char pending_monitor_text[APP_COMMAND_TEXT_CAPACITY];
 } app_command_session;
 
 typedef struct app_command_effect {

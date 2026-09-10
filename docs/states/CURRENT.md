@@ -2,8 +2,10 @@
 
 ## Current Work
 
-M9 T48 has no active subtask. T48 S1 and S2 are complete; further T48 work
-requires owner admission.
+M9 T48 S3 is active: [Paused monitor prompt completion]
+(../proposals/m9-t48-s3-paused-monitor-prompt.md). It makes settled lifecycle
+outcomes publish through the Current monitor as `outcome → prompt → cooked
+line`, including the missing paused prompt and monitor-route start/resume text.
 
 ## Current Technical Baseline
 
@@ -17,6 +19,10 @@ requires owner admission.
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T48 S3 is active. It makes the accepted lifecycle completion path one
+  transaction: a settled monitor-route outcome, then a fresh prompt, then a
+  cooked line after the monitor is Current Console.
 
 - M9 T48 S2 closes after owner acceptance. Generic Win32 Window geometry now
   keeps the copied-frame aspect through drag, system resize, and maximum

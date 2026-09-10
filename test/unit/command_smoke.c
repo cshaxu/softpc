@@ -33,11 +33,46 @@ static app_reconciler_intent expected_intent(app_monitor_state state,
     return APP_RECONCILER_INTENT_NONE;
 }
 
-static void arm_window_monitor(app_command_session *session)
+static void arm_window_monitor(app_command_session *session,
+    const char *expected_outcome)
 {
     app_command_effect effect;
     app_command_session_note_monitor_current(session, 1, &effect);
     assert(effect.arm_prompt);
+    if (expected_outcome != NULL)
+        assert(strstr(effect.text, expected_outcome) != NULL);
+}
+
+static void test_hotkey_pause_renews_window_monitor_prompt(void)
+{
+    app_command_session session;
+    app_command_effect effect;
+
+    app_command_session_initialize(&session, SOFTPC_PRESENTATION_WINDOW);
+    app_command_session_open(&session, &effect);
+    arm_window_monitor(&session, NULL);
+    session.state = APP_MONITOR_RUNNING;
+    /* A Window CAP pause does not submit the already armed cooked line.  Its
+       completion must nevertheless replace that old prompt with a fresh one. */
+    app_command_session_note_runtime(&session, SOFTPC_RUNTIME_PAUSED, &effect);
+    assert(effect.text[0] == '\0');
+    arm_window_monitor(&session, "Machine paused");
+}
+
+static void test_raw_running_discards_monitor_outcome(void)
+{
+    app_command_session session;
+    app_command_effect effect;
+
+    app_command_session_initialize(&session, SOFTPC_PRESENTATION_CONSOLE);
+    session.state = APP_MONITOR_STOPPED;
+    app_command_session_submit_line(&session, "start", &effect);
+    assert(app_command_session_take_intent(&session) ==
+        APP_RECONCILER_INTENT_START);
+    app_command_session_note_runtime(&session, SOFTPC_RUNTIME_RUNNING, &effect);
+    app_command_session_note_broker(&session, 1, 0);
+    app_command_session_note_monitor_current(&session, 1, &effect);
+    assert(!effect.arm_prompt && effect.text[0] == '\0');
 }
 
 static void complete_intent(app_command_session *session,
@@ -55,20 +90,19 @@ static void complete_intent(app_command_session *session,
         app_command_session_note_runtime(session, SOFTPC_RUNTIME_RUNNING,
             &effect);
         assert(app_command_session_state(session) == APP_MONITOR_RUNNING);
-        arm_window_monitor(session);
+        arm_window_monitor(session, "Machine started");
         break;
     case APP_RECONCILER_INTENT_PAUSE:
         app_command_session_note_runtime(session, SOFTPC_RUNTIME_PAUSED,
             &effect);
         assert(app_command_session_state(session) == APP_MONITOR_PAUSED);
-        assert(strstr(effect.text, "Machine paused") != NULL);
-        arm_window_monitor(session);
+        arm_window_monitor(session, "Machine paused");
         break;
     case APP_RECONCILER_INTENT_RESUME:
         app_command_session_note_runtime(session, SOFTPC_RUNTIME_RUNNING,
             &effect);
         assert(app_command_session_state(session) == APP_MONITOR_RUNNING);
-        arm_window_monitor(session);
+        arm_window_monitor(session, "Machine resumed");
         break;
     case APP_RECONCILER_INTENT_RESET:
         app_command_session_note_runtime(session, SOFTPC_RUNTIME_STOPPED,
@@ -84,15 +118,13 @@ static void complete_intent(app_command_session *session,
         app_command_session_note_runtime(session, SOFTPC_RUNTIME_PAUSED,
             &effect);
         assert(app_command_session_state(session) == APP_MONITOR_PAUSED);
-        assert(strstr(effect.text, "Machine reset and paused") != NULL);
-        arm_window_monitor(session);
+        arm_window_monitor(session, "Machine reset and paused");
         break;
     case APP_RECONCILER_INTENT_STOP:
         app_command_session_note_runtime(session, SOFTPC_RUNTIME_STOPPED,
             &effect);
         assert(app_command_session_state(session) == APP_MONITOR_STOPPED);
-        assert(strstr(effect.text, "Machine stopped") != NULL);
-        arm_window_monitor(session);
+        arm_window_monitor(session, "Machine stopped");
         break;
     case APP_RECONCILER_INTENT_NONE:
         break;
@@ -110,7 +142,7 @@ static void run_sequence(const command_case *sequence, size_t count)
     app_command_session_initialize(&session, SOFTPC_PRESENTATION_WINDOW);
     app_command_session_open(&session, &effect);
     assert(strstr(effect.text, "Insignia SoftPC") != NULL);
-    arm_window_monitor(&session);
+    arm_window_monitor(&session, NULL);
     app_command_session_submit_line(&session, "start", &effect);
     assert(app_command_session_take_intent(&session) ==
         APP_RECONCILER_INTENT_START);
@@ -126,7 +158,7 @@ static void run_sequence(const command_case *sequence, size_t count)
             if (intent == APP_RECONCILER_INTENT_NONE) {
                 assert(app_command_session_state(&session) == before);
                 assert(effect.text[0] != '\0');
-                arm_window_monitor(&session);
+                arm_window_monitor(&session, NULL);
             } else {
                 complete_intent(&session, intent);
             }
@@ -233,6 +265,8 @@ int main(void)
 
     run_all_three_command_sequences();
     test_start_stop_start_reset_chain();
+    test_hotkey_pause_renews_window_monitor_prompt();
+    test_raw_running_discards_monitor_outcome();
 
     app_command_session_initialize(&session, SOFTPC_PRESENTATION_WINDOW);
     session.state = APP_MONITOR_STOPPED;
