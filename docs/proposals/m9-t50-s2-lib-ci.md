@@ -8,11 +8,13 @@ and CTest check in GitHub Actions.
 ## Scope
 
 - Add one path-scoped workflow equivalent to NXVM's shared-library gate.
-- Validate lib manifest, standalone build, and standalone CTest on Windows.
+- Validate lib manifest, standalone MSVC build, and standalone CTest on
+  GitHub-hosted Windows.
 
 ## Non-goals
 
-- No full VM/package CI, source/runtime change, or external service dependency.
+- No full VM/package CI or source/runtime change. The workflow does not
+  install or depend on MSYS2/MinGW; it uses the hosted Visual Studio toolchain.
 
 ## Exit criteria
 

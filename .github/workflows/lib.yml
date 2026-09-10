@@ -13,26 +13,16 @@ on:
 jobs:
   library-windows:
     runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
     steps:
       - uses: actions/checkout@v4
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: UCRT64
-          update: true
-          install: >-
-            mingw-w64-ucrt-x86_64-cmake
-            mingw-w64-ucrt-x86_64-gcc
-            mingw-w64-ucrt-x86_64-ninja
+      - uses: ilammy/msvc-dev-cmd@v1
       - name: Restore manifest-preserving LF checkout
         shell: pwsh
         run: |
           git config --global core.autocrlf false
           git -C $env:GITHUB_WORKSPACE reset --hard HEAD
       - name: Configure standalone library
-        run: cmake -G Ninja -S src/lib -B build/lib
+        run: cmake -G Ninja -S src/lib -B build/lib -DCMAKE_BUILD_TYPE=Release
       - name: Verify complete manifest
         run: cmake --build build/lib --target lib-verify-manifest
       - name: Build selected platform library
