@@ -2,11 +2,11 @@
 
 ## Current Work
 
-No implementation subtask is active. T49 S2–S5 are separately planned:
-[strict warnings](../proposals/m9-t49-s2-lib-strict-boundaries.md),
-[type boundary](../proposals/m9-t49-s3-lib-type-boundary.md),
-[neutral language](../proposals/m9-t49-s4-lib-neutral-language.md), and
-[Linux placeholder CMake](../proposals/m9-t49-s5-linux-placeholder-cmake.md).
+M9 T49 S2 is active: [Strict shared-library warning contract]
+(../proposals/m9-t49-s2-lib-strict-boundaries.md). It clears the independently
+reproduced strict-warning failures solely inside shared-library targets; type
+boundary, neutral-language, and Linux-CMake hygiene remain separately planned
+as T49 S3–S5.
 
 ## Current Technical Baseline
 
