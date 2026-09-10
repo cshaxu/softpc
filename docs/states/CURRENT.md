@@ -2,10 +2,8 @@
 
 ## Current Work
 
-M9 T48 S2 is active: [UX Window aspect-preserving bounds]
-(../proposals/m9-t48-s2-ux-window-aspect-bounds.md). It makes the copied guest
-frame ratio a native Window geometry invariant: drag, maximize, and system
-resize keep a uniformly scaled, full-client image with no black bars.
+M9 T48 has no active subtask. T48 S1 and S2 are complete; further T48 work
+requires owner admission.
 
 ## Current Technical Baseline
 
@@ -20,9 +18,10 @@ resize keep a uniformly scaled, full-client image with no black bars.
 
 ## Recent Governance
 
-- M9 T48 S2 is active. The native Window geometry owns the copied-frame aspect
-  invariant and maximum work-area fit. It neither changes copied frame data nor
-  introduces SoftPC product geometry policy.
+- M9 T48 S2 closes after owner acceptance. Generic Win32 Window geometry now
+  keeps the copied-frame aspect through drag, system resize, and maximum
+  work-area bounds; it fills the client area uniformly without black bars.
+  See [S2 history](../history/M9-T48-S2-ux-window-aspect-bounds.md).
 
 - M9 T48 S1 completed the monitor command session. The session becomes the sole owner of
   monitor-line parsing, lifecycle turn completion, and prompt eligibility;
