@@ -116,6 +116,12 @@ int main(void)
     assert(app_runtime_stop(runtime));
     assert(runtime_input_wait_for_state(runtime, SOFTPC_RUNTIME_STOPPED,
         GetTickCount() + 5000u));
+    /* Guest RAM survives a reset. Clear the boot marker while stopped, so
+       the next wait proves that the next cold run reached this boot sector
+       rather than observing the prior run's retained 55h. */
+    delivered = 0u;
+    assert(softpc_machine_write_physical(machine, 0x501u, &delivered,
+        sizeof(delivered)) == SOFTPC_MACHINE_OK);
     assert(app_runtime_start(runtime));
     assert(runtime_input_wait_for_byte(machine, 0x501u, 0x55u,
         GetTickCount() + 5000u, NULL));

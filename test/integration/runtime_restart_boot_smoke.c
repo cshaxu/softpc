@@ -69,14 +69,10 @@ static int frame_has_dos_prompt(const app_runtime_frame *frame)
         const uint8_t *line = &frame->text[row * SOFTPC_RUNTIME_TEXT_COLUMNS];
         uint32_t column;
 
-        for (column = 0u; column + 2u < frame->text_columns; ++column) {
-            if (((line[column] >= 'A' && line[column] <= 'Z') ||
-                 (line[column] >= 'a' && line[column] <= 'z')) &&
-                (line[column + 1u] == '>' ||
-                 (line[column + 1u] == ':' &&
-                  (line[column + 2u] == '>' ||
-                   (column + 3u < frame->text_columns &&
-                    line[column + 2u] == '\\' && line[column + 3u] == '>')))))
+        for (column = 0u; column + 3u < frame->text_columns; ++column) {
+            if ((line[column] == 'C' || line[column] == 'c') &&
+                line[column + 1u] == ':' && line[column + 2u] == '\\' &&
+                line[column + 3u] == '>')
                 return 1;
         }
     }

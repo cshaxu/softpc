@@ -1,4 +1,5 @@
 #include "machine.h"
+#include "compat/ccpu/lifecycle.h"
 #include "lib/storage/medium.h"
 
 #include <stdio.h>
@@ -35,8 +36,6 @@ extern void softpc_device_bop_register_machine_services(void);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
 extern int softpc_platform_keyboard_key(int key, int released);
 extern void softpc_platform_request_executor_wake(void);
-extern void softpc_ccpu_lifecycle_request_exit(void);
-extern void softpc_ccpu_lifecycle_clear_exit(void);
 extern void mouse_send(int delta_x, int delta_y, int left, int right);
 extern void softpc_platform_presentation_request_refresh(void);
 extern void time_strobe(void);
@@ -153,6 +152,10 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
 {
     if (machine == NULL) return SOFTPC_MACHINE_INVALID_ARGUMENT;
     softpc_ccpu_lifecycle_clear_exit();
+    /* A public cold run starts only after the executor completed the prior
+       run. CCPU's private asynchronous-event map is not reset by
+       c_cpu_reset(), so old-run bits must not redirect the new reset vector. */
+    softpc_ccpu_lifecycle_clear_pending_interrupts();
     if (!machine->hardware_initialized) {
         sas_init(machine->memory_bytes);
         softpc_device_bop_register_machine_services();

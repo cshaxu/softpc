@@ -12,6 +12,7 @@ static SOFTPC_CCPU_THREAD_LOCAL unsigned long softpc_ccpu_frame_depth;
 static volatile LONG softpc_ccpu_exit_requested;
 
 extern void ccpu386UnsimulateOuter(void);
+extern unsigned long *softpc_ccpu_interrupt_map_address(void);
 
 void softpc_ccpu_lifecycle_enter(void)
 {
@@ -32,6 +33,12 @@ void softpc_ccpu_lifecycle_request_exit(void)
 void softpc_ccpu_lifecycle_clear_exit(void)
 {
     InterlockedExchange(&softpc_ccpu_exit_requested, 0);
+}
+
+void softpc_ccpu_lifecycle_clear_pending_interrupts(void)
+{
+    unsigned long *interrupt_map = softpc_ccpu_interrupt_map_address();
+    if (interrupt_map != NULL) *interrupt_map = 0u;
 }
 
 int softpc_ccpu_lifecycle_exit_requested(void)

@@ -5,8 +5,9 @@
 M9 T47 S9 is active: [Stop/start cold-boot recovery]
 (../proposals/m9-t47-stop-start-cold-boot-recovery.md). The prior S9 reset
 flag conclusion did not alter the owner-observed `pause -> stop -> start`
-failure. The active repair makes the VM-input lifetime explicit at the public
-cold-start boundary and proves a real copied DOS prompt across repeated runs.
+failure. The active repair isolates old-run VM input and clears CCPU's private
+pending-interrupt map at the public cold-start boundary; package proof drives
+the real Console path through repeated fresh DOS prompts.
 S8
 closed the [Neutral shared UX input ABI]
 (../history/M9-T47-S8-neutral-ux-input-abi.md). See [S6 history]
@@ -32,8 +33,9 @@ closed the [Neutral shared UX input ABI]
 
 - M9 T47 S9 remains active. Its P2 `soft_reset` conclusion is superseded by
   owner acceptance: the observed `pause -> stop -> start` path was unchanged.
-  The active repair instead isolates old-run VM input from a new cold run and
-  verifies four real copied DOS prompts (initial plus three restarts).
+  The active repair isolates old-run VM input and clears the private CCPU
+  pending-interrupt map before a new cold run; it verifies a real package
+  Console CAP -> pause -> stop -> start path, not only copied executor frames.
 
 - M9 T47 S8 closes the neutral shared UX input ABI. `ux-base` owns copied key
   identities, generic modifiers, and an extended-key flag; Win32-to-neutral
