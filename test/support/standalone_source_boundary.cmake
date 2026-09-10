@@ -82,6 +82,21 @@ foreach(source IN LISTS shared_identity_sources)
     endif()
 endforeach()
 
+# Shared implementation and its component documentation describe only generic
+# application mechanics. Product execution vocabulary belongs in the importer.
+file(GLOB_RECURSE shared_neutral_corpus
+    "${SOFTPC_SOURCE_DIR}/src/lib/*.[ch]"
+    "${SOFTPC_SOURCE_DIR}/src/lib/*.md")
+foreach(source IN LISTS shared_neutral_corpus)
+    file(READ "${source}" shared_neutral_contents)
+    string(TOLOWER "${shared_neutral_contents}" normalized_shared_neutral)
+    if(normalized_shared_neutral MATCHES
+        "(^|[^[:alnum:]_])(guest|vm|machine)([^[:alnum:]_]|$)")
+        message(FATAL_ERROR
+            "Shared library leaks product execution terminology: ${source}")
+    endif()
+endforeach()
+
 # A shared public contract is visibly named. Product code must not reach a
 # component implementation header, and one public contract may compose only
 # other public contracts.

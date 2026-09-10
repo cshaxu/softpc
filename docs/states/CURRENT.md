@@ -2,10 +2,9 @@
 
 ## Current Work
 
-M9 T49 is reopened at S6: [shared-library neutral corpus prose]
-(../proposals/m9-t49-s6-lib-neutral-corpus-prose.md). It extends the existing
-product-neutral vocabulary boundary to every checked-in `src/lib/` C, header,
-and README file, without changing library behavior or public API.
+M9 T49 S6 is complete: [shared-library neutral corpus prose]
+(../history/M9-T49-S6-lib-neutral-corpus-prose.md). The owner is now verifying
+the rebuilt x86/x64 package pair; T49 remains open until that acceptance.
 
 ## Current Technical Baseline
 
@@ -19,6 +18,12 @@ and README file, without changing library behavior or public API.
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T49 S6 closes the remaining shared-library prose gap. Every checked-in
+  library C/header/README file now has a product-execution terminology gate;
+  strict x64/x86 builds each passed 35/35 CTest. T49 remains open pending
+  owner package acceptance. See [S6 history]
+  (../history/M9-T49-S6-lib-neutral-corpus-prose.md).
 
 - M9 T49 closes at S5. The reusable corpus now independently supports strict
   warnings, exposes only neutral base types, contains neutral terminology, and

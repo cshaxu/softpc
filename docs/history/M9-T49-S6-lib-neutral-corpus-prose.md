@@ -22,7 +22,7 @@ README, or other checked-in `src/lib/` prose may use the conceptual terms
 
 ## Baseline audit
 
-The current full-tree word-boundary audit finds ten occurrences, all in
+The current full-tree word-boundary audit finds eight occurrences, all in
 component/root README prose: `src/lib/README.md`, `ux-base/README.md`,
 `ux-window/README.md`, and `ux-console/README.md`.  The prior S4 C/H corpus
 scan is clean.
@@ -48,3 +48,14 @@ scan is clean.
   pass without behavior changes.
 - The worktree is clean after committed, pushed implementation and closure
   records.
+
+## Completion evidence
+
+- The recursive C/H/README scan now has zero standalone-word matches for
+  `guest`, `vm`, and `machine` in `src/lib/`.
+- `standalone_source_boundary.cmake` now makes that complete corpus rule
+  executable, in addition to the existing product-identity boundary.
+- The library manifest, source-boundary check, and documentation governance
+  check passed.
+- Fresh strict Windows x64 and x86 builds each passed all 35 CTest cases,
+  including their fixed-package smoke test.
