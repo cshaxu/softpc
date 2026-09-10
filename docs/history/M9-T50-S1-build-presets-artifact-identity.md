@@ -24,3 +24,15 @@ not match the selected compiler.
   width-correct executable names.
 - Architecture mismatch is rejected and preset shape is machine-checked.
 - x64/x86 regression passes; changes are committed and pushed cleanly.
+
+## Completion evidence
+
+- `CMakePresets.json` provides the two release configure paths plus separate
+  package and complete-test build presets.
+- `SOFTPC_I686_BIN` and `SOFTPC_I686_GCC` make the x86 compiler, resource
+  tools, and make program an explicit matching toolchain rather than an
+  accidental host-PATH choice.
+- CMake rejects an explicit artifact architecture that disagrees with the
+  selected compiler pointer width.
+- Fresh x64 and x86 preset builds each passed all 36 CTest cases and refreshed
+  only their fixed package executable. `softpc.ini` and media were unchanged.
