@@ -22,7 +22,6 @@ typedef enum app_lifecycle_request {
 /* Product command policy only: no runtime, presenter, broker, or native I/O. */
 typedef struct app_command_session {
     softpc_presentation display;
-    app_monitor_state state;
     app_lifecycle_request pending_request;
     int dispatch_pending;
     int transition_pending;
@@ -39,7 +38,8 @@ typedef struct app_command_effect {
 
 void app_command_session_initialize(app_command_session *, softpc_presentation);
 void app_command_session_open(app_command_session *, app_command_effect *);
-void app_command_session_submit_line(app_command_session *, const char *, app_command_effect *);
+void app_command_session_submit_line(app_command_session *, app_monitor_state,
+    const char *, app_command_effect *);
 /* The only monitor lifecycle-request path.  An accepted command is taken
  * exactly once; rejected and local commands have no request. */
 app_lifecycle_request app_command_session_take_request(app_command_session *);
@@ -47,12 +47,12 @@ app_lifecycle_request app_command_session_take_request(app_command_session *);
  * monitor-line request, but they reserve the same transition boundary before
  * control dispatches their already-derived runtime command. */
 int app_command_session_begin_external(app_command_session *,
-    app_lifecycle_request);
+    app_monitor_state, app_lifecycle_request);
 void app_command_session_complete_floppy(app_command_session *, app_command_action, int, app_command_effect *);
-void app_command_session_note_runtime(app_command_session *, app_runtime_state, app_command_effect *);
-void app_command_session_note_broker(app_command_session *, int,
-    int monitor_running_surface);
+void app_command_session_note_runtime(app_command_session *, app_monitor_state,
+    app_runtime_state, app_command_effect *);
+void app_command_session_note_broker(app_command_session *, app_monitor_state,
+    int vm, int monitor_running_surface);
 void app_command_session_note_monitor_current(app_command_session *, int, app_command_effect *);
-app_monitor_state app_command_session_state(const app_command_session *);
 
 #endif

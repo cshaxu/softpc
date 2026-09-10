@@ -43,37 +43,41 @@ static void accept(app_command_session *session,
     session->transition_pending = 1;
 }
 
-static void lifecycle(app_command_session *s, const char *c, app_command_effect *e)
+static void lifecycle(app_command_session *s, app_monitor_state state,
+    const char *c, app_command_effect *e)
 {
     if (s->transition_pending || s->dispatch_pending) {
         reject(s, e, "Machine state transition is in progress.");
         return;
     }
     if (!strcmp(c,"start")) {
-        if(s->state==APP_MONITOR_INIT||s->state==APP_MONITOR_STOPPED){accept(s,APP_LIFECYCLE_REQUEST_START);}
-        else reject(s,e,s->state==APP_MONITOR_PAUSED?"Machine is paused; use resume, reset, or stop.":"Machine is already running; use pause, reset, or stop.");
+        if(state==APP_MONITOR_INIT||state==APP_MONITOR_STOPPED){accept(s,APP_LIFECYCLE_REQUEST_START);}
+        else reject(s,e,state==APP_MONITOR_PAUSED?"Machine is paused; use resume, reset, or stop.":"Machine is already running; use pause, reset, or stop.");
     } else if (!strcmp(c,"pause")) {
-        if(s->state==APP_MONITOR_RUNNING)accept(s,APP_LIFECYCLE_REQUEST_PAUSE);
-        else reject(s,e,s->state==APP_MONITOR_PAUSED?"Machine is paused; use resume, reset, or stop.":s->state==APP_MONITOR_INIT?"Machine has not started; use start or reset.":"Machine is stopped; use start or reset.");
+        if(state==APP_MONITOR_RUNNING)accept(s,APP_LIFECYCLE_REQUEST_PAUSE);
+        else reject(s,e,state==APP_MONITOR_PAUSED?"Machine is paused; use resume, reset, or stop.":state==APP_MONITOR_INIT?"Machine has not started; use start or reset.":"Machine is stopped; use start or reset.");
     } else if (!strcmp(c,"resume")) {
-        if(s->state==APP_MONITOR_PAUSED)accept(s,APP_LIFECYCLE_REQUEST_RESUME);
-        else reject(s,e,s->state==APP_MONITOR_RUNNING?"Machine is already running; use pause, reset, or stop.":s->state==APP_MONITOR_INIT?"Machine has not started; use start or reset.":"Machine is stopped; use start or reset.");
+        if(state==APP_MONITOR_PAUSED)accept(s,APP_LIFECYCLE_REQUEST_RESUME);
+        else reject(s,e,state==APP_MONITOR_RUNNING?"Machine is already running; use pause, reset, or stop.":state==APP_MONITOR_INIT?"Machine has not started; use start or reset.":"Machine is stopped; use start or reset.");
     } else if (!strcmp(c,"reset")) { accept(s,APP_LIFECYCLE_REQUEST_RESET); }
     else if (!strcmp(c,"stop")) {
-        if(s->state==APP_MONITOR_RUNNING||s->state==APP_MONITOR_PAUSED){accept(s,APP_LIFECYCLE_REQUEST_STOP);}
-        else reject(s,e,s->state==APP_MONITOR_INIT?"Machine has not started; use start or reset.":"Machine is stopped; use start or reset.");
+        if(state==APP_MONITOR_RUNNING||state==APP_MONITOR_PAUSED){accept(s,APP_LIFECYCLE_REQUEST_STOP);}
+        else reject(s,e,state==APP_MONITOR_INIT?"Machine has not started; use start or reset.":"Machine is stopped; use start or reset.");
     } else reject(s,e,"Unknown command.");
 }
 
-void app_command_session_initialize(app_command_session *s, softpc_presentation display) { memset(s,0,sizeof(*s));s->display=display;s->state=APP_MONITOR_INIT; }
+void app_command_session_initialize(app_command_session *s, softpc_presentation display) { memset(s,0,sizeof(*s));s->display=display; }
 void app_command_session_open(app_command_session *s, app_command_effect *e) { clear(e); (void)snprintf(e->text,sizeof(e->text),"%s\r\n",HELP);prompt(s); }
-void app_command_session_submit_line(app_command_session *s,const char *line,app_command_effect *e)
+void app_command_session_submit_line(app_command_session *s, app_monitor_state state,
+    const char *line,app_command_effect *e)
 {
     char b[APP_COMMAND_TEXT_CAPACITY],*c,*a,*p; size_t n; clear(e);
     if(!line||(n=strlen(line))>=sizeof(b)){reject(s,e,line?"Command is too long.":"Unknown command.");return;}
     memcpy(b,line,n+1);c=trim(b);a=c;while(*a&&!isspace((unsigned char)*a))++a;if(*a)*a++=0;a=trim(a);lower(c);
     if(!*c){prompt(s);return;} if(!strcmp(c,"help")){(void)snprintf(e->text,sizeof(e->text),"%s\r\n",HELP);prompt(s);return;} if(!strcmp(c,"exit")){e->exit_requested=1;return;}
-    if(strcmp(c,"floppy")){lifecycle(s,c,e);return;}
+    /* The parser does not own machine state.  It receives control's current
+       stable fact for the one command validation below. */
+    if(strcmp(c,"floppy")){lifecycle(s,state,c,e);return;}
     p=a;while(*p&&!isspace((unsigned char)*p))++p;if(*p)*p++=0;p=trim(p);lower(a);
     if(!strcmp(a,"eject")&&!*p)e->action=APP_COMMAND_ACTION_EJECT_FLOPPY;
     else if(!strcmp(a,"insert")&&*p&&strlen(p)<sizeof(e->path)){e->action=APP_COMMAND_ACTION_INSERT_FLOPPY;memcpy(e->path,p,strlen(p)+1);}
@@ -89,41 +93,36 @@ app_lifecycle_request app_command_session_take_request(app_command_session *s)
     return request;
 }
 int app_command_session_begin_external(app_command_session *s,
-    app_lifecycle_request request)
+    app_monitor_state state, app_lifecycle_request request)
 {
     if (s == NULL || s->transition_pending ||
         request == APP_LIFECYCLE_REQUEST_NONE) return 0;
     if ((request == APP_LIFECYCLE_REQUEST_PAUSE &&
-            s->state != APP_MONITOR_RUNNING) ||
+            state != APP_MONITOR_RUNNING) ||
         (request == APP_LIFECYCLE_REQUEST_RESUME &&
-            s->state != APP_MONITOR_PAUSED) ||
+            state != APP_MONITOR_PAUSED) ||
         (request == APP_LIFECYCLE_REQUEST_STOP &&
-            s->state != APP_MONITOR_RUNNING && s->state != APP_MONITOR_PAUSED))
+            state != APP_MONITOR_RUNNING && state != APP_MONITOR_PAUSED))
         return 0;
     s->transition_pending = 1;
     return 1;
 }
 void app_command_session_complete_floppy(app_command_session *s,app_command_action a,int ok,app_command_effect *e)
 { clear(e); text(e,a==APP_COMMAND_ACTION_EJECT_FLOPPY?(ok?"Floppy ejected.\r\n":"Cannot eject floppy.\r\n"):(ok?"Floppy inserted.\r\n":"Cannot insert floppy.\r\n"));prompt(s); }
-void app_command_session_note_runtime(app_command_session *s,app_runtime_state state,app_command_effect *e)
+void app_command_session_note_runtime(app_command_session *s,
+    app_monitor_state prior, app_runtime_state state,app_command_effect *e)
 {
-    app_monitor_state prior;
-
     if (s == NULL || e == NULL) return;
     clear(e);
-    prior = s->state;
     if (state == SOFTPC_RUNTIME_RESET_COMPLETED) {
-        s->state = APP_MONITOR_PAUSED;
         s->transition_pending = 0;
         outcome(s, "Machine reset and paused.\r\n");
         return;
     }
     if (state == SOFTPC_RUNTIME_PAUSED && prior != APP_MONITOR_PAUSED) {
-        s->state = APP_MONITOR_PAUSED;
         s->transition_pending = 0;
         outcome(s, "Machine paused.\r\n");
     } else if (state == SOFTPC_RUNTIME_RUNNING) {
-        s->state = APP_MONITOR_RUNNING;
         s->transition_pending = 0;
         if (prior == APP_MONITOR_INIT || prior == APP_MONITOR_STOPPED)
             outcome(s, "Machine started.\r\n");
@@ -133,24 +132,23 @@ void app_command_session_note_runtime(app_command_session *s,app_runtime_state s
             prompt(s);
     } else if (state == SOFTPC_RUNTIME_STOPPED &&
         prior != APP_MONITOR_STOPPED) {
-        s->state = APP_MONITOR_STOPPED;
         s->transition_pending = 0;
         outcome(s, "Machine stopped.\r\n");
     } else if (state == SOFTPC_RUNTIME_ERROR) {
-        s->state = APP_MONITOR_STOPPED;
         s->transition_pending = 0;
         outcome(s, "Machine error.\r\n");
     }
 }
 
-void app_command_session_note_broker(app_command_session *s, int vm,
+void app_command_session_note_broker(app_command_session *s,
+    app_monitor_state state, int vm,
     int monitor_running_surface)
 {
     if (s == NULL) return;
-    if (vm && s->state == APP_MONITOR_RUNNING) {
+    if (vm && state == APP_MONITOR_RUNNING) {
         s->prompt_due = 0;
         s->pending_monitor_text[0] = '\0';
-    } else if (!vm && s->state == APP_MONITOR_RUNNING &&
+    } else if (!vm && state == APP_MONITOR_RUNNING &&
         monitor_running_surface) prompt(s);
 }
 
@@ -165,4 +163,3 @@ void app_command_session_note_monitor_current(app_command_session *s,
     s->prompt_due = 0;
     e->arm_prompt = 1;
 }
-app_monitor_state app_command_session_state(const app_command_session *s){return s->state;}

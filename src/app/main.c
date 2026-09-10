@@ -31,9 +31,24 @@ typedef struct app_startup_config {
  * executes actions selected from this state. */
 typedef struct app_control_state {
     app_reconciler presentation;
+    app_monitor_state monitor_actual;
     app_runtime_frame frame;
     uint32_t observed_frame_sequence;
 } app_control_state;
+
+static void app_control_note_runtime(app_control_state *state,
+    app_runtime_state completed)
+{
+    if (state == NULL) return;
+    if (completed == SOFTPC_RUNTIME_RESET_COMPLETED ||
+        completed == SOFTPC_RUNTIME_PAUSED)
+        state->monitor_actual = APP_MONITOR_PAUSED;
+    else if (completed == SOFTPC_RUNTIME_RUNNING)
+        state->monitor_actual = APP_MONITOR_RUNNING;
+    else if (completed == SOFTPC_RUNTIME_STOPPED ||
+        completed == SOFTPC_RUNTIME_ERROR)
+        state->monitor_actual = APP_MONITOR_STOPPED;
+}
 
 static char *app_trim(char *text)
 {
@@ -309,9 +324,9 @@ static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
     const ux_input_event *event)
 {
     if (event != NULL && event->type == UX_EVENT_WINDOW_CLOSE) {
-        if (app_command_session_state(session) == APP_MONITOR_RUNNING &&
+        if (state->monitor_actual == APP_MONITOR_RUNNING &&
             !app_command_session_begin_external(session,
-                APP_LIFECYCLE_REQUEST_PAUSE)) return 0;
+                state->monitor_actual, APP_LIFECYCLE_REQUEST_PAUSE)) return 0;
         app_reconciler_note_window_close(&state->presentation);
         return app_runtime_get_state(runtime) != SOFTPC_RUNTIME_RUNNING ||
             app_runtime_pause(runtime);
@@ -319,9 +334,10 @@ static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
     if (event != NULL && event->type == UX_EVENT_HOTKEY &&
         strcmp(event->data.hotkey.identifier, "pause-toggle") == 0) {
         app_lifecycle_request request =
-            app_command_session_state(session) == APP_MONITOR_PAUSED ?
+            state->monitor_actual == APP_MONITOR_PAUSED ?
                 APP_LIFECYCLE_REQUEST_RESUME : APP_LIFECYCLE_REQUEST_PAUSE;
-        if (!app_command_session_begin_external(session, request)) return 1;
+        if (!app_command_session_begin_external(session, state->monitor_actual,
+                request)) return 1;
         return request == APP_LIFECYCLE_REQUEST_RESUME ?
             app_runtime_resume(runtime) : app_runtime_pause(runtime);
     }
@@ -331,8 +347,8 @@ static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
         return 1;
     }
     return app_control_handle_ux(queue, runtime, event,
-        app_command_session_state(session) == APP_MONITOR_RUNNING ? SOFTPC_RUNTIME_RUNNING :
-        app_command_session_state(session) == APP_MONITOR_PAUSED ? SOFTPC_RUNTIME_PAUSED :
+        state->monitor_actual == APP_MONITOR_RUNNING ? SOFTPC_RUNTIME_RUNNING :
+        state->monitor_actual == APP_MONITOR_PAUSED ? SOFTPC_RUNTIME_PAUSED :
         SOFTPC_RUNTIME_STOPPED);
 }
 
@@ -364,9 +380,9 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                      * enter the already-stopped machine path. */
                     if (!app_control_accept_ux_event(&control_event,
                             app_runtime_run_generation(runtime),
-                            app_command_session_state(&session) == APP_MONITOR_RUNNING ?
+                            state.monitor_actual == APP_MONITOR_RUNNING ?
                                 SOFTPC_RUNTIME_RUNNING :
-                            app_command_session_state(&session) == APP_MONITOR_PAUSED ?
+                            state.monitor_actual == APP_MONITOR_PAUSED ?
                                 SOFTPC_RUNTIME_PAUSED : SOFTPC_RUNTIME_STOPPED))
                         continue;
                     if (!app_monitor_handle_ux(control_queue, runtime, presenter,
@@ -399,8 +415,9 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                 if (control_event.kind == APP_CONTROL_RUNTIME_COMPLETED)
                 {
                     app_runtime_state completed = control_event.value.runtime_state;
-                    app_command_session_note_runtime(&session, completed,
-                        &command_effect);
+                    app_command_session_note_runtime(&session,
+                        state.monitor_actual, completed, &command_effect);
+                    app_control_note_runtime(&state, completed);
                     if (completed == SOFTPC_RUNTIME_RESET_COMPLETED)
                         completed = SOFTPC_RUNTIME_PAUSED;
                     app_reconciler_note_runtime(&state.presentation, completed);
@@ -440,14 +457,16 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                  * may make its prompt due. */
                 if (broker_monitor_completed &&
                     app_control_monitor_is_current(&state))
-                    app_command_session_note_broker(&session, 0,
+                    app_command_session_note_broker(&session,
+                        state.monitor_actual, 0,
                         app_control_monitor_is_running_graphics_surface(&state));
                 if (!app_monitor_arm_if_ready(&session, &state, monitor)) goto failed;
                 continue;
             }
         }
         if (!app_monitor_drive(runtime, presenter, &state)) goto failed;
-        app_command_session_submit_line(&session, line, &command_effect);
+        app_command_session_submit_line(&session, state.monitor_actual, line,
+            &command_effect);
         if (command_effect.exit_requested) {
             (void)app_runtime_stop(runtime);
             (void)app_monitor_drive(runtime, presenter, &state);
