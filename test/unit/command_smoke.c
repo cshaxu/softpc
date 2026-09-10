@@ -91,9 +91,10 @@ static void test_hotkey_completion_is_not_command_provenance(void)
     app_command_session_initialize(&session, SOFTPC_PRESENTATION_WINDOW);
     session.state = APP_MONITOR_PAUSED;
     /* A Window CAP produces no monitor command request; the completion still
-       updates monitor state.  S5 will classify its text from prior state. */
+       classifies its monitor outcome from the prior stable state. */
     app_command_session_note_runtime(&session, SOFTPC_RUNTIME_RUNNING, &effect);
     assert(app_command_session_state(&session) == APP_MONITOR_RUNNING);
+    arm(&session, "Machine resumed");
 }
 
 int main(void)

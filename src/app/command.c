@@ -40,16 +40,17 @@ static void accept(app_command_session *session,
 {
     session->pending_request = request;
     session->dispatch_pending = 1;
+    session->transition_pending = 1;
 }
 
 static void lifecycle(app_command_session *s, const char *c, app_command_effect *e)
 {
-    if (s->turn_pending || s->dispatch_pending) {
+    if (s->transition_pending || s->dispatch_pending) {
         reject(s, e, "Machine state transition is in progress.");
         return;
     }
     if (!strcmp(c,"start")) {
-        if(s->state==APP_MONITOR_INIT||s->state==APP_MONITOR_STOPPED){s->start_requested=1;accept(s,APP_LIFECYCLE_REQUEST_START);}
+        if(s->state==APP_MONITOR_INIT||s->state==APP_MONITOR_STOPPED){accept(s,APP_LIFECYCLE_REQUEST_START);}
         else reject(s,e,s->state==APP_MONITOR_PAUSED?"Machine is paused; use resume, reset, or stop.":"Machine is already running; use pause, reset, or stop.");
     } else if (!strcmp(c,"pause")) {
         if(s->state==APP_MONITOR_RUNNING)accept(s,APP_LIFECYCLE_REQUEST_PAUSE);
@@ -57,9 +58,9 @@ static void lifecycle(app_command_session *s, const char *c, app_command_effect 
     } else if (!strcmp(c,"resume")) {
         if(s->state==APP_MONITOR_PAUSED)accept(s,APP_LIFECYCLE_REQUEST_RESUME);
         else reject(s,e,s->state==APP_MONITOR_RUNNING?"Machine is already running; use pause, reset, or stop.":s->state==APP_MONITOR_INIT?"Machine has not started; use start or reset.":"Machine is stopped; use start or reset.");
-    } else if (!strcmp(c,"reset")) { s->reset_requested=1; accept(s,APP_LIFECYCLE_REQUEST_RESET); }
+    } else if (!strcmp(c,"reset")) { accept(s,APP_LIFECYCLE_REQUEST_RESET); }
     else if (!strcmp(c,"stop")) {
-        if(s->state==APP_MONITOR_RUNNING||s->state==APP_MONITOR_PAUSED){s->stop_requested=1;accept(s,APP_LIFECYCLE_REQUEST_STOP);}
+        if(s->state==APP_MONITOR_RUNNING||s->state==APP_MONITOR_PAUSED){accept(s,APP_LIFECYCLE_REQUEST_STOP);}
         else reject(s,e,s->state==APP_MONITOR_INIT?"Machine has not started; use start or reset.":"Machine is stopped; use start or reset.");
     } else reject(s,e,"Unknown command.");
 }
@@ -85,64 +86,60 @@ app_lifecycle_request app_command_session_take_request(app_command_session *s)
     request = s->pending_request;
     s->pending_request = APP_LIFECYCLE_REQUEST_NONE;
     s->dispatch_pending = 0;
-    s->turn_request = request;
-    s->turn_pending = request != APP_LIFECYCLE_REQUEST_NONE;
     return request;
+}
+int app_command_session_begin_external(app_command_session *s,
+    app_lifecycle_request request)
+{
+    if (s == NULL || s->transition_pending ||
+        request == APP_LIFECYCLE_REQUEST_NONE) return 0;
+    if ((request == APP_LIFECYCLE_REQUEST_PAUSE &&
+            s->state != APP_MONITOR_RUNNING) ||
+        (request == APP_LIFECYCLE_REQUEST_RESUME &&
+            s->state != APP_MONITOR_PAUSED) ||
+        (request == APP_LIFECYCLE_REQUEST_STOP &&
+            s->state != APP_MONITOR_RUNNING && s->state != APP_MONITOR_PAUSED))
+        return 0;
+    s->transition_pending = 1;
+    return 1;
 }
 void app_command_session_complete_floppy(app_command_session *s,app_command_action a,int ok,app_command_effect *e)
 { clear(e); text(e,a==APP_COMMAND_ACTION_EJECT_FLOPPY?(ok?"Floppy ejected.\r\n":"Cannot eject floppy.\r\n"):(ok?"Floppy inserted.\r\n":"Cannot insert floppy.\r\n"));prompt(s); }
 void app_command_session_note_runtime(app_command_session *s,app_runtime_state state,app_command_effect *e)
 {
-    app_lifecycle_request completed_request;
+    app_monitor_state prior;
 
     if (s == NULL || e == NULL) return;
     clear(e);
-    completed_request = s->turn_request;
+    prior = s->state;
     if (state == SOFTPC_RUNTIME_RESET_COMPLETED) {
         s->state = APP_MONITOR_PAUSED;
-        s->start_requested = 0;
-        s->stop_requested = 0;
-        s->reset_requested = 0;
-        s->turn_pending = 0;
-        s->turn_request = APP_LIFECYCLE_REQUEST_NONE;
+        s->transition_pending = 0;
         outcome(s, "Machine reset and paused.\r\n");
         return;
     }
-    if (state == SOFTPC_RUNTIME_PAUSED && s->state != APP_MONITOR_PAUSED) {
+    if (state == SOFTPC_RUNTIME_PAUSED && prior != APP_MONITOR_PAUSED) {
         s->state = APP_MONITOR_PAUSED;
-        outcome(s, s->reset_requested ? "Machine reset and paused.\r\n" :
-            "Machine paused.\r\n");
-        s->reset_requested = 0;
-        if (completed_request == APP_LIFECYCLE_REQUEST_RESET ||
-            completed_request == APP_LIFECYCLE_REQUEST_PAUSE) {
-            s->turn_pending = 0;
-            s->turn_request = APP_LIFECYCLE_REQUEST_NONE;
-        }
+        s->transition_pending = 0;
+        outcome(s, "Machine paused.\r\n");
     } else if (state == SOFTPC_RUNTIME_RUNNING) {
-        if (s->reset_requested) return;
         s->state = APP_MONITOR_RUNNING;
-        s->start_requested = 0;
-        if (completed_request == APP_LIFECYCLE_REQUEST_START)
+        s->transition_pending = 0;
+        if (prior == APP_MONITOR_INIT || prior == APP_MONITOR_STOPPED)
             outcome(s, "Machine started.\r\n");
-        else if (completed_request == APP_LIFECYCLE_REQUEST_RESUME)
+        else if (prior == APP_MONITOR_PAUSED)
             outcome(s, "Machine resumed.\r\n");
         else if (s->display == SOFTPC_PRESENTATION_WINDOW)
             prompt(s);
-        if (completed_request == APP_LIFECYCLE_REQUEST_START ||
-            completed_request == APP_LIFECYCLE_REQUEST_RESUME) {
-            s->turn_pending = 0;
-            s->turn_request = APP_LIFECYCLE_REQUEST_NONE;
-        }
     } else if (state == SOFTPC_RUNTIME_STOPPED &&
-        (s->state != APP_MONITOR_STOPPED || s->stop_requested)) {
+        prior != APP_MONITOR_STOPPED) {
         s->state = APP_MONITOR_STOPPED;
-        if (!s->reset_requested && !s->start_requested)
-            outcome(s, "Machine stopped.\r\n");
-        s->stop_requested = 0;
-        if (completed_request == APP_LIFECYCLE_REQUEST_STOP) {
-            s->turn_pending = 0;
-            s->turn_request = APP_LIFECYCLE_REQUEST_NONE;
-        }
+        s->transition_pending = 0;
+        outcome(s, "Machine stopped.\r\n");
+    } else if (state == SOFTPC_RUNTIME_ERROR) {
+        s->state = APP_MONITOR_STOPPED;
+        s->transition_pending = 0;
+        outcome(s, "Machine error.\r\n");
     }
 }
 

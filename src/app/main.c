@@ -246,17 +246,24 @@ static void app_runtime_frame_published(void *opaque, uint32_t sequence,
  * control path alone decides its lifecycle effect and preserves the resume
  * ordering required by the Console-object contract. */
 static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
-    app_presentation *presentation, app_monitor_state monitor_state,
+    app_presentation *presentation, app_command_session *session,
     const ux_input_event *event)
 {
     if (event != NULL && event->type == UX_EVENT_WINDOW_CLOSE) {
+        if (app_command_session_state(session) == APP_MONITOR_RUNNING &&
+            !app_command_session_begin_external(session,
+                APP_LIFECYCLE_REQUEST_PAUSE)) return 0;
         app_presentation_note_window_close(presentation);
         return app_runtime_get_state(runtime) != SOFTPC_RUNTIME_RUNNING ||
             app_runtime_pause(runtime);
     }
     if (event != NULL && event->type == UX_EVENT_HOTKEY &&
         strcmp(event->data.hotkey.identifier, "pause-toggle") == 0) {
-        return monitor_state == APP_MONITOR_PAUSED ?
+        app_lifecycle_request request =
+            app_command_session_state(session) == APP_MONITOR_PAUSED ?
+                APP_LIFECYCLE_REQUEST_RESUME : APP_LIFECYCLE_REQUEST_PAUSE;
+        if (!app_command_session_begin_external(session, request)) return 1;
+        return request == APP_LIFECYCLE_REQUEST_RESUME ?
             app_runtime_resume(runtime) : app_runtime_pause(runtime);
     }
     if (event != NULL && event->type == UX_EVENT_HOTKEY &&
@@ -265,8 +272,8 @@ static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
         return 1;
     }
     return app_control_handle_ux(queue, runtime, event,
-        monitor_state == APP_MONITOR_RUNNING ? SOFTPC_RUNTIME_RUNNING :
-        monitor_state == APP_MONITOR_PAUSED ? SOFTPC_RUNTIME_PAUSED :
+        app_command_session_state(session) == APP_MONITOR_RUNNING ? SOFTPC_RUNTIME_RUNNING :
+        app_command_session_state(session) == APP_MONITOR_PAUSED ? SOFTPC_RUNTIME_PAUSED :
         SOFTPC_RUNTIME_STOPPED);
 }
 
@@ -302,7 +309,7 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                                 SOFTPC_RUNTIME_PAUSED : SOFTPC_RUNTIME_STOPPED))
                         continue;
                     if (!app_monitor_handle_ux(control_queue, runtime, presenter,
-                            app_command_session_state(&session), &control_event.value.ux))
+                            &session, &control_event.value.ux))
                         goto failed;
                     if (!app_monitor_drive(runtime, presenter)) goto failed;
                     if (!app_monitor_arm_if_ready(&session, presenter, monitor)) goto failed;
