@@ -2,21 +2,8 @@
 
 ## Current Work
 
-M9 T47 S9 is active: [Stop/start cold-boot recovery]
-(../proposals/m9-t47-stop-start-cold-boot-recovery.md). The prior S9 reset
-flag conclusion did not alter the owner-observed `pause -> stop -> start`
-failure. The active repair isolates old-run VM input and clears CCPU's private
-pending-interrupt map at the public cold-start boundary; package proof drives
-the real Console path through repeated fresh DOS prompts.
-S8
-closed the [Neutral shared UX input ABI]
-(../history/M9-T47-S8-neutral-ux-input-abi.md). See [S6 history]
-(../history/M9-T47-S6-monitor-command-guidance.md), [S5 history]
-(../history/M9-T47-S5-monitor-lifecycle-command-matrix.md), [S4 history]
-(../history/M9-T47-S4-softpc-console-broker-adoption.md), [S3 history]
-(../history/M9-T47-S3-neutral-console-broker-api.md), [S2 history]
-(../history/M9-T47-S2-win31-prompt-raw-console-recovery.md), and [S1 history]
-(../history/M9-T47-S1-frozen-window-hotkey-recovery.md).
+No implementation task is active. The next candidate is ordered in
+[Queue](QUEUE.md).
 
 ## Current Technical Baseline
 
@@ -31,11 +18,12 @@ closed the [Neutral shared UX input ABI]
 
 ## Recent Governance
 
-- M9 T47 S9 remains active. Its P2 `soft_reset` conclusion is superseded by
-  owner acceptance: the observed `pause -> stop -> start` path was unchanged.
-  The active repair isolates old-run VM input and clears the private CCPU
-  pending-interrupt map before a new cold run; it verifies a real package
-  Console CAP -> pause -> stop -> start path, not only copied executor frames.
+- M9 T47 closes at S9 after owner acceptance. The final repair clears CCPU's
+  private pending-interrupt map before a new public cold run, alongside the
+  retained VM-input lifetime boundary. Fresh x64/x86 CTest each passed 34/34;
+  the actual package Console CAP -> pause -> stop -> start route passed three
+  consecutive times at each width. See [S9 history]
+  (../history/M9-T47-S9-stop-start-cold-boot-recovery.md).
 
 - M9 T47 S8 closes the neutral shared UX input ABI. `ux-base` owns copied key
   identities, generic modifiers, and an extended-key flag; Win32-to-neutral

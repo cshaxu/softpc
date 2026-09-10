@@ -1,39 +1,42 @@
 # M9 T47 S9 — Stop/start cold-boot recovery
 
-## Superseded outcome
+## Outcome
 
-This record was closed by `e991d93`, but manual acceptance showed that its
-`soft_reset` conclusion did not fix the product path. It is retained as the
-historical P2 claim only; S9 was immediately reopened in CURRENT and the
-corrected evidence/closure is recorded by the subsequent P3 commit.
+The owner-observed `pause -> stop -> start` path now reaches a new DOS
+`C:\\>` prompt. The final root cause was not the original reset routine's
+`soft_reset` fact: `c_cpu_reset()` leaves CCPU's private pending asynchronous-
+interrupt map intact, so a bit from the completed run could redirect a new
+BIOS immediately after its reset vector. The standalone CCPU port-ABI
+lifecycle boundary clears that map only after the old executor run is complete
+and before the public cold-run reset begins.
 
-## Original P2 outcome
-
-The standalone machine boundary again preserves the original reset routine's
-internal `soft_reset` fact. A later product `start` is a new run, but it is
-not the first initialization of the retained machine object: the original
-timer, keyboard, and device teardown/rebuild branch must run before that
-second boot. T44 had forced the fact to zero, which suppressed that branch and
-could leave the second run at BIOS.
-
-No MVDM source changed. The persistent SoftPC executor and its single
-`stop -> start` route remain unchanged.
+The task also retains two independent cold-run invariants: the VM input FIFO
+is cleared before a new run, and ordinary guest key/mouse records—including
+releases—cannot enter a paused or stopped VM. Monitor lines and registered
+hotkeys remain on their independent product-control route. MVDM is unchanged.
 
 ## Evidence
 
-- `runtime_smoke` now uses explicit test checks, so Release `NDEBUG` cannot
-  compile away lifecycle operations embedded in its assertions.
-- New `runtime_restart_boot_smoke` uses the installed configured image with
-  an in-memory media overlay. It exercises `pause -> stop -> start` and proves
-  each run leaves the firmware reset segment. It pauses only to take the
-  test-only public snapshot, then resumes; the bounded loop does not assume a
-  particular x86/x64 boot duration.
-- Fresh x64 CTest passed 34/34; fresh x86 CTest passed 34/34. Both package
-  executables were rebuilt. User-owned `assets/binary/softpc.ini` and guest
-  media were not changed.
+- `runtime_restart_boot_smoke` now requires an exact copied `C:\\>` frame for
+  the new run; it no longer accepts an incidental BIOS/DOS-like prompt.
+- `runtime_input_continuation_smoke` clears its retained-RAM boot marker
+  before the next run, so it proves a newly executed boot sector rather than
+  mistaking prior RAM for a restart.
+- `package_smoke` drives the actual package Console route:
+  `start -> raw CAP -> monitor stop -> start`; it requires the old prompt to
+  disappear, then observes a new boot banner and a new `C:\\>`.
+- Fresh x64 and x86 CTest each passed 34/34. The actual package route passed
+  three consecutive times at each width.
+- `assets/binary/softpc32.exe` and `softpc64.exe` were refreshed. The
+  user-owned `softpc.ini` and guest media were not changed.
 
-## Superseded closure
+## Historical correction
 
-This P2 closure is superseded. The manual acceptance path remained failing,
-so T47 S9 was reopened rather than treating the direct-runtime observation as
-product acceptance.
+P2's `soft_reset` conclusion and P3's presentation repair did not alone fix
+the product path. P3/P4 retain independent correct frame and VM-input
+lifetime semantics; P5 supplies the final CCPU reset-boundary repair.
+
+## Closure
+
+T47 closes at S9 after owner acceptance. The next work, if any, must be
+separately admitted from the queue.
