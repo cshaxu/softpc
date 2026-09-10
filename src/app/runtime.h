@@ -21,7 +21,10 @@ typedef enum app_runtime_state {
     SOFTPC_RUNTIME_STARTING,
     SOFTPC_RUNTIME_RUNNING,
     SOFTPC_RUNTIME_PAUSED,
-    SOFTPC_RUNTIME_ERROR
+    SOFTPC_RUNTIME_ERROR,
+    /* Completion-only fact: runtime is actually paused after it performed
+     * its own atomic cold reset.  app_runtime_get_state() never returns it. */
+    SOFTPC_RUNTIME_RESET_COMPLETED
 } app_runtime_state;
 
 /* State transitions and completed frame publication are independent facts.
@@ -44,6 +47,7 @@ int app_runtime_start(app_runtime *runtime);
 int app_runtime_pause(app_runtime *runtime);
 int app_runtime_resume(app_runtime *runtime);
 int app_runtime_stop(app_runtime *runtime);
+int app_runtime_reset(app_runtime *runtime);
 int app_runtime_set_floppy(app_runtime *runtime, const char *path);
 app_runtime_state app_runtime_get_state(const app_runtime *runtime);
 softpc_machine_result app_runtime_get_result(const app_runtime *runtime);

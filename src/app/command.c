@@ -36,9 +36,9 @@ static char *trim(char *s) { char *e; while (*s && isspace((unsigned char)*s)) +
 static void lower(char *s) { while (*s) { *s=(char)tolower((unsigned char)*s); ++s; } }
 
 static void accept(app_command_session *session,
-    app_reconciler_intent intent)
+    app_lifecycle_request request)
 {
-    session->pending_intent = intent;
+    session->pending_request = request;
     session->dispatch_pending = 1;
 }
 
@@ -49,17 +49,17 @@ static void lifecycle(app_command_session *s, const char *c, app_command_effect 
         return;
     }
     if (!strcmp(c,"start")) {
-        if(s->state==APP_MONITOR_INIT||s->state==APP_MONITOR_STOPPED){s->start_requested=1;accept(s,APP_RECONCILER_INTENT_START);}
+        if(s->state==APP_MONITOR_INIT||s->state==APP_MONITOR_STOPPED){s->start_requested=1;accept(s,APP_LIFECYCLE_REQUEST_START);}
         else reject(s,e,s->state==APP_MONITOR_PAUSED?"Machine is paused; use resume, reset, or stop.":"Machine is already running; use pause, reset, or stop.");
     } else if (!strcmp(c,"pause")) {
-        if(s->state==APP_MONITOR_RUNNING)accept(s,APP_RECONCILER_INTENT_PAUSE);
+        if(s->state==APP_MONITOR_RUNNING)accept(s,APP_LIFECYCLE_REQUEST_PAUSE);
         else reject(s,e,s->state==APP_MONITOR_PAUSED?"Machine is paused; use resume, reset, or stop.":s->state==APP_MONITOR_INIT?"Machine has not started; use start or reset.":"Machine is stopped; use start or reset.");
     } else if (!strcmp(c,"resume")) {
-        if(s->state==APP_MONITOR_PAUSED)accept(s,APP_RECONCILER_INTENT_RESUME);
+        if(s->state==APP_MONITOR_PAUSED)accept(s,APP_LIFECYCLE_REQUEST_RESUME);
         else reject(s,e,s->state==APP_MONITOR_RUNNING?"Machine is already running; use pause, reset, or stop.":s->state==APP_MONITOR_INIT?"Machine has not started; use start or reset.":"Machine is stopped; use start or reset.");
-    } else if (!strcmp(c,"reset")) { s->reset_requested=1; accept(s,APP_RECONCILER_INTENT_RESET); }
+    } else if (!strcmp(c,"reset")) { s->reset_requested=1; accept(s,APP_LIFECYCLE_REQUEST_RESET); }
     else if (!strcmp(c,"stop")) {
-        if(s->state==APP_MONITOR_RUNNING||s->state==APP_MONITOR_PAUSED){s->stop_requested=1;accept(s,APP_RECONCILER_INTENT_STOP);}
+        if(s->state==APP_MONITOR_RUNNING||s->state==APP_MONITOR_PAUSED){s->stop_requested=1;accept(s,APP_LIFECYCLE_REQUEST_STOP);}
         else reject(s,e,s->state==APP_MONITOR_INIT?"Machine has not started; use start or reset.":"Machine is stopped; use start or reset.");
     } else reject(s,e,"Unknown command.");
 }
@@ -78,50 +78,60 @@ void app_command_session_submit_line(app_command_session *s,const char *line,app
     else if(!strcmp(a,"insert")&&*p&&strlen(p)<sizeof(e->path)){e->action=APP_COMMAND_ACTION_INSERT_FLOPPY;memcpy(e->path,p,strlen(p)+1);}
     else reject(s,e,"Usage: floppy insert <image> | eject");
 }
-app_reconciler_intent app_command_session_take_intent(app_command_session *s)
+app_lifecycle_request app_command_session_take_request(app_command_session *s)
 {
-    app_reconciler_intent intent;
-    if (s == NULL || !s->dispatch_pending) return APP_RECONCILER_INTENT_NONE;
-    intent = s->pending_intent;
-    s->pending_intent = APP_RECONCILER_INTENT_NONE;
+    app_lifecycle_request request;
+    if (s == NULL || !s->dispatch_pending) return APP_LIFECYCLE_REQUEST_NONE;
+    request = s->pending_request;
+    s->pending_request = APP_LIFECYCLE_REQUEST_NONE;
     s->dispatch_pending = 0;
-    s->turn_intent = intent;
-    s->turn_pending = intent != APP_RECONCILER_INTENT_NONE;
-    return intent;
+    s->turn_request = request;
+    s->turn_pending = request != APP_LIFECYCLE_REQUEST_NONE;
+    return request;
 }
 void app_command_session_complete_floppy(app_command_session *s,app_command_action a,int ok,app_command_effect *e)
 { clear(e); text(e,a==APP_COMMAND_ACTION_EJECT_FLOPPY?(ok?"Floppy ejected.\r\n":"Cannot eject floppy.\r\n"):(ok?"Floppy inserted.\r\n":"Cannot insert floppy.\r\n"));prompt(s); }
 void app_command_session_note_runtime(app_command_session *s,app_runtime_state state,app_command_effect *e)
 {
-    app_reconciler_intent completed_intent;
+    app_lifecycle_request completed_request;
 
     if (s == NULL || e == NULL) return;
     clear(e);
-    completed_intent = s->turn_intent;
+    completed_request = s->turn_request;
+    if (state == SOFTPC_RUNTIME_RESET_COMPLETED) {
+        s->state = APP_MONITOR_PAUSED;
+        s->start_requested = 0;
+        s->stop_requested = 0;
+        s->reset_requested = 0;
+        s->turn_pending = 0;
+        s->turn_request = APP_LIFECYCLE_REQUEST_NONE;
+        outcome(s, "Machine reset and paused.\r\n");
+        return;
+    }
     if (state == SOFTPC_RUNTIME_PAUSED && s->state != APP_MONITOR_PAUSED) {
         s->state = APP_MONITOR_PAUSED;
         outcome(s, s->reset_requested ? "Machine reset and paused.\r\n" :
             "Machine paused.\r\n");
         s->reset_requested = 0;
-        if (completed_intent == APP_RECONCILER_INTENT_RESET ||
-            completed_intent == APP_RECONCILER_INTENT_PAUSE) {
+        if (completed_request == APP_LIFECYCLE_REQUEST_RESET ||
+            completed_request == APP_LIFECYCLE_REQUEST_PAUSE) {
             s->turn_pending = 0;
-            s->turn_intent = APP_RECONCILER_INTENT_NONE;
+            s->turn_request = APP_LIFECYCLE_REQUEST_NONE;
         }
     } else if (state == SOFTPC_RUNTIME_RUNNING) {
         if (s->reset_requested) return;
         s->state = APP_MONITOR_RUNNING;
         s->start_requested = 0;
-        if (completed_intent == APP_RECONCILER_INTENT_START)
+        if (completed_request == APP_LIFECYCLE_REQUEST_START)
             outcome(s, "Machine started.\r\n");
-        else if (completed_intent == APP_RECONCILER_INTENT_RESUME)
+        else if (completed_request == APP_LIFECYCLE_REQUEST_RESUME)
             outcome(s, "Machine resumed.\r\n");
         else if (s->display == SOFTPC_PRESENTATION_WINDOW)
             prompt(s);
-        if (completed_intent == APP_RECONCILER_INTENT_START ||
-            completed_intent == APP_RECONCILER_INTENT_RESUME) {
+        if (completed_request == APP_LIFECYCLE_REQUEST_START ||
+            completed_request == APP_LIFECYCLE_REQUEST_RESUME) {
             s->turn_pending = 0;
-            s->turn_intent = APP_RECONCILER_INTENT_NONE;
+            s->turn_request = APP_LIFECYCLE_REQUEST_NONE;
         }
     } else if (state == SOFTPC_RUNTIME_STOPPED &&
         (s->state != APP_MONITOR_STOPPED || s->stop_requested)) {
@@ -129,9 +139,9 @@ void app_command_session_note_runtime(app_command_session *s,app_runtime_state s
         if (!s->reset_requested && !s->start_requested)
             outcome(s, "Machine stopped.\r\n");
         s->stop_requested = 0;
-        if (completed_intent == APP_RECONCILER_INTENT_STOP) {
+        if (completed_request == APP_LIFECYCLE_REQUEST_STOP) {
             s->turn_pending = 0;
-            s->turn_intent = APP_RECONCILER_INTENT_NONE;
+            s->turn_request = APP_LIFECYCLE_REQUEST_NONE;
         }
     }
 }

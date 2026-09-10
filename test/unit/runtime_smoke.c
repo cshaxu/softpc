@@ -1,7 +1,6 @@
 #include "runtime.h"
 #include "control.h"
 #include "input_queue.h"
-#include "reconciler.h"
 #include "test_cleanup.h"
 
 #include <assert.h>
@@ -192,40 +191,12 @@ int main(void)
     assert(app_runtime_start(runtime));
     assert(app_runtime_run_generation(runtime) != first_run);
     assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_RUNNING));
-    {
-        app_reconciler reset;
-        uint32_t reset_run;
-
-        /* Drive the same one-way reset plan that monitor control uses:
-           running -> stop -> cold start -> pause -> resume -> running. */
-        app_reconciler_initialize(&reset, SOFTPC_PRESENTATION_CONSOLE, 1);
-        app_reconciler_note_runtime(&reset, SOFTPC_RUNTIME_RUNNING);
-        app_reconciler_note_intent(&reset, APP_RECONCILER_INTENT_RESET);
-        assert(app_reconciler_take_action(&reset) ==
-            APP_RECONCILER_ACTION_RUNTIME_STOP);
-        assert(app_runtime_stop(runtime));
-        assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_STOPPED));
-        app_reconciler_note_runtime(&reset, SOFTPC_RUNTIME_STOPPED);
-        assert(app_reconciler_take_action(&reset) ==
-            APP_RECONCILER_ACTION_RUNTIME_START);
-        assert(app_runtime_start(runtime));
-        reset_run = app_runtime_run_generation(runtime);
-        assert(reset_run != first_run);
-        assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_RUNNING));
-        app_reconciler_note_runtime(&reset, SOFTPC_RUNTIME_RUNNING);
-        assert(app_reconciler_take_action(&reset) ==
-            APP_RECONCILER_ACTION_RUNTIME_PAUSE);
-        assert(app_runtime_pause(runtime));
-        assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_PAUSED));
-        app_reconciler_note_runtime(&reset, SOFTPC_RUNTIME_PAUSED);
-        assert(app_reconciler_next_action(&reset) ==
-            APP_RECONCILER_ACTION_NONE);
-        app_reconciler_note_intent(&reset, APP_RECONCILER_INTENT_RESUME);
-        assert(app_reconciler_take_action(&reset) ==
-            APP_RECONCILER_ACTION_RUNTIME_RESUME);
-        assert(app_runtime_resume(runtime));
-        assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_RUNNING));
-    }
+    /* Reset is now one runtime command.  It hides its stop/start sequence
+       and returns only once the new run has reached its public paused state. */
+    assert(app_runtime_reset(runtime));
+    assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_PAUSED));
+    assert(app_runtime_resume(runtime));
+    assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_RUNNING));
     assert(app_runtime_stop(runtime));
     assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_STOPPED));
     assert(app_runtime_set_floppy(runtime, NULL));

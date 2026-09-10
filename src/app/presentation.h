@@ -20,12 +20,9 @@ int app_presentation_create(app_presentation **out_presentation,
     app_monitor_console *monitor, app_control_queue *control_queue);
 void app_presentation_destroy(app_presentation *presentation);
 int app_presentation_reconcile(app_presentation *presentation);
-/* Product callers submit intent; the single control loop takes a runtime
- * action only after the reducer has completed all prerequisite UX actions. */
-void app_presentation_request_intent(app_presentation *presentation,
-    app_reconciler_intent intent);
-app_reconciler_action app_presentation_take_runtime_action(
-    app_presentation *presentation);
+/* Control records the Window-close fact after it has submitted any required
+ * runtime pause.  Presentation then derives only component/broker teardown. */
+void app_presentation_note_window_close(app_presentation *presentation);
 void app_presentation_release_window_mouse(app_presentation *presentation);
 void app_presentation_note_runtime_completed(app_presentation *presentation,
     app_runtime_state state);

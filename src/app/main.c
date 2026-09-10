@@ -190,17 +190,25 @@ invalid:
 
 static int app_monitor_drive(app_runtime *runtime, app_presentation *presentation)
 {
-    app_reconciler_action action;
-    if (!app_presentation_reconcile(presentation)) return 0;
-    action = app_presentation_take_runtime_action(presentation);
-    switch (action) {
-    case APP_RECONCILER_ACTION_NONE: return 1;
-    case APP_RECONCILER_ACTION_RUNTIME_START: return app_runtime_start(runtime);
-    case APP_RECONCILER_ACTION_RUNTIME_PAUSE: return app_runtime_pause(runtime);
-    case APP_RECONCILER_ACTION_RUNTIME_RESUME: return app_runtime_resume(runtime);
-    case APP_RECONCILER_ACTION_RUNTIME_STOP: return app_runtime_stop(runtime);
-    default: return 0;
+    (void)runtime;
+    return app_presentation_reconcile(presentation);
+}
+
+/* The control loop is the only caller that translates a parsed lifecycle
+ * request into runtime work.  Presentation reconciliation is deliberately
+ * separate and cannot manufacture or consume this request. */
+static int app_monitor_dispatch_lifecycle(app_runtime *runtime,
+    app_lifecycle_request request)
+{
+    switch (request) {
+    case APP_LIFECYCLE_REQUEST_NONE: return 1;
+    case APP_LIFECYCLE_REQUEST_START: return app_runtime_start(runtime);
+    case APP_LIFECYCLE_REQUEST_PAUSE: return app_runtime_pause(runtime);
+    case APP_LIFECYCLE_REQUEST_RESUME: return app_runtime_resume(runtime);
+    case APP_LIFECYCLE_REQUEST_STOP: return app_runtime_stop(runtime);
+    case APP_LIFECYCLE_REQUEST_RESET: return app_runtime_reset(runtime);
     }
+    return 0;
 }
 
 static int app_monitor_arm_if_ready(app_command_session *session,
@@ -242,16 +250,14 @@ static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
     const ux_input_event *event)
 {
     if (event != NULL && event->type == UX_EVENT_WINDOW_CLOSE) {
-        app_presentation_request_intent(presentation,
-            APP_RECONCILER_INTENT_WINDOW_CLOSE);
-        return 1;
+        app_presentation_note_window_close(presentation);
+        return app_runtime_get_state(runtime) != SOFTPC_RUNTIME_RUNNING ||
+            app_runtime_pause(runtime);
     }
     if (event != NULL && event->type == UX_EVENT_HOTKEY &&
         strcmp(event->data.hotkey.identifier, "pause-toggle") == 0) {
-        app_presentation_request_intent(presentation,
-            monitor_state == APP_MONITOR_PAUSED ?
-                APP_RECONCILER_INTENT_RESUME : APP_RECONCILER_INTENT_PAUSE);
-        return 1;
+        return monitor_state == APP_MONITOR_PAUSED ?
+            app_runtime_resume(runtime) : app_runtime_pause(runtime);
     }
     if (event != NULL && event->type == UX_EVENT_HOTKEY &&
         strcmp(event->data.hotkey.identifier, "release-window-mouse") == 0) {
@@ -374,12 +380,8 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
         }
         if (command_effect.text[0] != '\0')
             (void)app_monitor_console_write(monitor, command_effect.text);
-        {
-            app_reconciler_intent intent =
-                app_command_session_take_intent(&session);
-            if (intent != APP_RECONCILER_INTENT_NONE)
-                app_presentation_request_intent(presenter, intent);
-        }
+        if (!app_monitor_dispatch_lifecycle(runtime,
+                app_command_session_take_request(&session))) goto failed;
         if (!app_monitor_drive(runtime, presenter)) goto failed;
         if (!app_monitor_arm_if_ready(&session, presenter, monitor)) goto failed;
     }

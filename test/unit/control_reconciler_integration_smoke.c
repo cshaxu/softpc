@@ -1,5 +1,4 @@
 #include "control.h"
-#include "reconciler.h"
 #include "keyboard.h"
 
 #include <assert.h>
@@ -25,7 +24,6 @@ int main(void)
 {
     app_control_queue *queue = NULL;
     app_control_event event;
-    app_reconciler reconciler;
     lib_console_line start = { 5u, "start" };
     lib_console_line pause = { 5u, "pause" };
     ux_input_event raw_key = { 0 };
@@ -118,33 +116,6 @@ int main(void)
     assert(event.kind == APP_CONTROL_UX_DELIVERY_FAILED);
     assert(event.value.delivery_failure.source_identity == 41u);
     assert(event.value.delivery_failure.status == LIB_STATUS_LIMIT_EXCEEDED);
-
-    /* The reconciler supplies the one-way native handoff plan: running text
-       creates and binds raw Console; pause first returns Current Console to
-       monitor and only then retires the VM Console component. */
-    app_reconciler_initialize(&reconciler, SOFTPC_PRESENTATION_CONSOLE, 1);
-    app_reconciler_note_intent(&reconciler, APP_RECONCILER_INTENT_START);
-    assert(app_reconciler_take_action(&reconciler) ==
-        APP_RECONCILER_ACTION_RUNTIME_START);
-    app_reconciler_note_runtime(&reconciler, SOFTPC_RUNTIME_RUNNING);
-    app_reconciler_note_frame(&reconciler, 0);
-    assert(app_reconciler_take_action(&reconciler) ==
-        APP_RECONCILER_ACTION_CREATE_VM_CONSOLE);
-    app_reconciler_note_vm_console(&reconciler, 1);
-    assert(app_reconciler_take_action(&reconciler) ==
-        APP_RECONCILER_ACTION_BIND_VM_CONSOLE);
-    app_reconciler_note_current_console(&reconciler,
-        APP_RECONCILER_CONSOLE_VM);
-    app_reconciler_note_intent(&reconciler, APP_RECONCILER_INTENT_PAUSE);
-    assert(app_reconciler_take_action(&reconciler) ==
-        APP_RECONCILER_ACTION_RUNTIME_PAUSE);
-    app_reconciler_note_runtime(&reconciler, SOFTPC_RUNTIME_PAUSED);
-    assert(app_reconciler_take_action(&reconciler) ==
-        APP_RECONCILER_ACTION_BIND_MONITOR);
-    app_reconciler_note_current_console(&reconciler,
-        APP_RECONCILER_CONSOLE_MONITOR);
-    assert(app_reconciler_take_action(&reconciler) ==
-        APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE);
 
     app_control_queue_destroy(queue);
     return 0;

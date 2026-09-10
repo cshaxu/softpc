@@ -30,7 +30,6 @@ struct app_presentation {
     uint32_t console_delivered_frame_sequence;
     app_runtime_frame observed_frame;
     app_reconciler reducer;
-    app_reconciler_action pending_runtime_action;
 };
 
 typedef struct app_presentation app_presentation_context;
@@ -134,12 +133,6 @@ static int app_presentation_apply_next_action(app_presentation_context *context)
     action = app_reconciler_take_action(&context->reducer);
     switch (action) {
     case APP_RECONCILER_ACTION_NONE:
-        return 1;
-    case APP_RECONCILER_ACTION_RUNTIME_START:
-    case APP_RECONCILER_ACTION_RUNTIME_PAUSE:
-    case APP_RECONCILER_ACTION_RUNTIME_RESUME:
-    case APP_RECONCILER_ACTION_RUNTIME_STOP:
-        context->pending_runtime_action = action;
         return 1;
     case APP_RECONCILER_ACTION_CREATE_WINDOW:
         if (!app_presentation_create_window(context)) return 0;
@@ -295,6 +288,8 @@ void app_presentation_note_runtime_completed(app_presentation *presentation,
     app_runtime_state state)
 {
     if (presentation == NULL) return;
+    if (state == SOFTPC_RUNTIME_RESET_COMPLETED)
+        state = SOFTPC_RUNTIME_PAUSED;
     presentation->displayed_state = state;
     app_presentation_publish_title(presentation);
     if (presentation->window != NULL) {
@@ -357,21 +352,10 @@ int app_presentation_monitor_is_running_graphics_surface(
         app_presentation_monitor_is_current(presentation);
 }
 
-void app_presentation_request_intent(app_presentation *presentation,
-    app_reconciler_intent intent)
+void app_presentation_note_window_close(app_presentation *presentation)
 {
     if (presentation != NULL)
-        app_reconciler_note_intent(&presentation->reducer, intent);
-}
-
-app_reconciler_action app_presentation_take_runtime_action(
-    app_presentation *presentation)
-{
-    app_reconciler_action action;
-    if (presentation == NULL) return APP_RECONCILER_ACTION_NONE;
-    action = presentation->pending_runtime_action;
-    presentation->pending_runtime_action = APP_RECONCILER_ACTION_NONE;
-    return action;
+        app_reconciler_note_window_close(&presentation->reducer);
 }
 
 void app_presentation_release_window_mouse(app_presentation *presentation)

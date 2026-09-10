@@ -11,15 +11,9 @@ void app_reconciler_initialize(app_reconciler *reconciler,
     reconciler->current_console_actual = APP_RECONCILER_CONSOLE_MONITOR;
 }
 
-void app_reconciler_note_intent(app_reconciler *reconciler,
-    app_reconciler_intent intent)
+void app_reconciler_note_window_close(app_reconciler *reconciler)
 {
-    if (reconciler == NULL || intent == APP_RECONCILER_INTENT_NONE) return;
-    if (intent == APP_RECONCILER_INTENT_WINDOW_CLOSE)
-        reconciler->close_requested = 1;
-    if (intent == APP_RECONCILER_INTENT_RESET)
-        reconciler->reset_started = 0;
-    reconciler->intent = intent;
+    if (reconciler != NULL) reconciler->close_requested = 1;
 }
 
 void app_reconciler_note_runtime(app_reconciler *reconciler,
@@ -33,19 +27,6 @@ void app_reconciler_note_runtime(app_reconciler *reconciler,
         reconciler->frame_actual = 0;
         reconciler->graphics_actual = 0;
     }
-    if ((reconciler->in_flight == APP_RECONCILER_ACTION_RUNTIME_START ||
-         reconciler->in_flight == APP_RECONCILER_ACTION_RUNTIME_RESUME) &&
-        state == SOFTPC_RUNTIME_RUNNING)
-        reconciler->in_flight = APP_RECONCILER_ACTION_NONE;
-    else if (reconciler->in_flight == APP_RECONCILER_ACTION_RUNTIME_PAUSE &&
-        state == SOFTPC_RUNTIME_PAUSED)
-        reconciler->in_flight = APP_RECONCILER_ACTION_NONE;
-    else if (reconciler->in_flight == APP_RECONCILER_ACTION_RUNTIME_STOP &&
-        (state == SOFTPC_RUNTIME_STOPPED || state == SOFTPC_RUNTIME_ERROR))
-        reconciler->in_flight = APP_RECONCILER_ACTION_NONE;
-    if (reconciler->intent == APP_RECONCILER_INTENT_RESET &&
-        reconciler->reset_started && state == SOFTPC_RUNTIME_PAUSED)
-        reconciler->intent = APP_RECONCILER_INTENT_NONE;
 }
 
 void app_reconciler_note_frame(app_reconciler *reconciler, int graphics)
@@ -107,30 +88,6 @@ app_reconciler_action app_reconciler_next_action(const app_reconciler *reconcile
     if (reconciler->in_flight != APP_RECONCILER_ACTION_NONE)
         return APP_RECONCILER_ACTION_NONE;
 
-    if (reconciler->intent == APP_RECONCILER_INTENT_STOP) {
-        if (reconciler->runtime_actual != SOFTPC_RUNTIME_STOPPED &&
-            reconciler->runtime_actual != SOFTPC_RUNTIME_ERROR)
-            return APP_RECONCILER_ACTION_RUNTIME_STOP;
-    }
-    if (reconciler->intent == APP_RECONCILER_INTENT_RESET) {
-        if (!reconciler->reset_started &&
-            reconciler->runtime_actual != SOFTPC_RUNTIME_STOPPED &&
-            reconciler->runtime_actual != SOFTPC_RUNTIME_ERROR)
-            return APP_RECONCILER_ACTION_RUNTIME_STOP;
-        if (!reconciler->reset_started)
-            return APP_RECONCILER_ACTION_RUNTIME_START;
-        if (reconciler->runtime_actual == SOFTPC_RUNTIME_RUNNING)
-            return APP_RECONCILER_ACTION_RUNTIME_PAUSE;
-    }
-    if (reconciler->intent == APP_RECONCILER_INTENT_PAUSE ||
-        reconciler->intent == APP_RECONCILER_INTENT_WINDOW_CLOSE) {
-        if (reconciler->runtime_actual == SOFTPC_RUNTIME_RUNNING)
-            return APP_RECONCILER_ACTION_RUNTIME_PAUSE;
-    }
-    if (reconciler->intent == APP_RECONCILER_INTENT_START &&
-        reconciler->runtime_actual == SOFTPC_RUNTIME_STOPPED)
-        return APP_RECONCILER_ACTION_RUNTIME_START;
-
     desired = app_reconciler_desired(reconciler);
     if (desired.window_enabled && !reconciler->window_actual)
         return APP_RECONCILER_ACTION_CREATE_WINDOW;
@@ -146,10 +103,6 @@ app_reconciler_action app_reconciler_next_action(const app_reconciler *reconcile
         return APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE;
     if (!desired.window_enabled && reconciler->window_actual)
         return APP_RECONCILER_ACTION_DESTROY_WINDOW;
-
-    if (reconciler->intent == APP_RECONCILER_INTENT_RESUME &&
-        reconciler->runtime_actual == SOFTPC_RUNTIME_PAUSED)
-        return APP_RECONCILER_ACTION_RUNTIME_RESUME;
     return APP_RECONCILER_ACTION_NONE;
 }
 
@@ -160,8 +113,5 @@ app_reconciler_action app_reconciler_take_action(app_reconciler *reconciler)
     action = app_reconciler_next_action(reconciler);
     if (action != APP_RECONCILER_ACTION_NONE)
         reconciler->in_flight = action;
-    if (action == APP_RECONCILER_ACTION_RUNTIME_START &&
-        reconciler->intent == APP_RECONCILER_INTENT_RESET)
-        reconciler->reset_started = 1;
     return action;
 }
