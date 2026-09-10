@@ -4,7 +4,7 @@
 #include "lib/ux-base/component_interface.h"
 #include "lib/ux-base/mailbox.h"
 
-#include <stdatomic.h>
+#include "lib/base/atomic.h"
 
 typedef void (*ux_component_native_stop_fn)(ux_component *component);
 typedef void (*ux_component_dispose_fn)(ux_component *component);
@@ -17,7 +17,7 @@ struct ux_component {
     ux_component_failure_sink failure_sink;
     ux_hotkey_matcher hotkey_matcher;
     lib_u64 source_identity;
-    atomic_int stopping;
+    lib_atomic_i32 stopping;
     ux_component_native_stop_fn native_stop;
     ux_component_dispose_fn dispose;
 };
@@ -27,7 +27,7 @@ lib_status ux_component_initialize(ux_component *component,
     ux_component_dispose_fn dispose);
 /* A source identity is never recycled.  Zero is the permanent exhausted
  * sentinel, rather than the beginning of a second allocation epoch. */
-lib_status ux_component_allocate_source_identity(atomic_uint_fast64_t *next,
+lib_status ux_component_allocate_source_identity(lib_atomic_u64 *next,
     lib_u64 *out_identity);
 int ux_component_emit(ux_component *component, const ux_input_event *event);
 /* Uses the component's normal source attribution and source-local matcher,

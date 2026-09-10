@@ -4,7 +4,7 @@
 #include "lib/ux-base/frame_interface.h"
 #include "lib/ux-base/mailbox_wake.h"
 
-#include <stdatomic.h>
+#include "lib/base/atomic.h"
 
 #define UX_COMPONENT_CONTROL_CAPACITY 32u
 #define UX_COMPONENT_CONTROL_STORAGE_CAPACITY (UX_COMPONENT_CONTROL_CAPACITY + 1u)
@@ -29,8 +29,8 @@ typedef struct ux_component_control {
  * mailboxes: a latest-wins copied frame and a FIFO control queue. The native
  * wake object is merely their shared wait primitive, never a third mailbox. */
 typedef struct ux_component_mailboxes {
-    atomic_flag frame_lock;
-    atomic_flag control_lock;
+    lib_atomic_flag frame_lock;
+    lib_atomic_flag control_lock;
     ux_frame frame;
     lib_u32 frame_generation;
     ux_component_control controls[UX_COMPONENT_CONTROL_STORAGE_CAPACITY];

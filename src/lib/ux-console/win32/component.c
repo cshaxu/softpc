@@ -44,7 +44,8 @@ static void ux_console_receive_event(void *context,
     ux_input_event input = { 0 };
 
     if (console == LIB_NULL || event == LIB_NULL ||
-        atomic_load_explicit(&console->base.stopping, memory_order_acquire) != 0 ||
+        lib_atomic_i32_load_explicit(&console->base.stopping,
+            LIB_MEMORY_ORDER_ACQUIRE) != 0 ||
         (state = (ux_console_win32_state *)console->native_state) == LIB_NULL)
         return;
     if (event->kind == LIB_CONSOLE_EVENT_RAW_KEY) {
@@ -109,7 +110,8 @@ static DWORD WINAPI ux_console_worker(void *opaque)
     ux_console *console = (ux_console *)opaque;
     lib_u32 generation = 0u;
 
-    while (atomic_load_explicit(&console->base.stopping, memory_order_acquire) == 0) {
+    while (lib_atomic_i32_load_explicit(&console->base.stopping,
+        LIB_MEMORY_ORDER_ACQUIRE) == 0) {
         ux_component_control control;
         ux_frame frame;
         HANDLE wake = ux_win32_mailbox_wait_handle(
@@ -152,7 +154,8 @@ lib_status ux_console_native_start(ux_console *console)
     }
     if (lib_console_set_event_sink(console->logical_console,
             ux_console_receive_event, console) != LIB_STATUS_OK) {
-        atomic_store_explicit(&console->base.stopping, 1, memory_order_release);
+        lib_atomic_i32_store_explicit(&console->base.stopping, 1,
+            LIB_MEMORY_ORDER_RELEASE);
         ux_mailbox_wake_signal(ux_component_mailboxes_wake(&console->base.mailboxes));
         (void)WaitForSingleObject(state->worker, INFINITE);
         CloseHandle(state->worker);

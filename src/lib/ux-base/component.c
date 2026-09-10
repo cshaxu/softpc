@@ -1,24 +1,24 @@
 #include "lib/ux-base/component.h"
 
-static atomic_uint_fast64_t ux_component_next_source_identity = 1u;
+static lib_atomic_u64 ux_component_next_source_identity = 1u;
 
-lib_status ux_component_allocate_source_identity(atomic_uint_fast64_t *next,
+lib_status ux_component_allocate_source_identity(lib_atomic_u64 *next,
     lib_u64 *out_identity)
 {
-    uint_fast64_t identity;
-    uint_fast64_t following;
+    lib_u64 identity;
+    lib_u64 following;
 
     if (next == LIB_NULL || out_identity == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
-    identity = atomic_load_explicit(next, memory_order_relaxed);
+    identity = lib_atomic_u64_load_explicit(next, LIB_MEMORY_ORDER_RELAXED);
     for (;;) {
         /* Zero is written only after UINT64_MAX has been issued.  Do not use
          * fetch-add here: its next failed call would wrap zero to one and
          * eventually reuse a source identity. */
         if (identity == 0u) return LIB_STATUS_LIMIT_EXCEEDED;
         following = identity == UINT64_MAX ? 0u : identity + 1u;
-        if (atomic_compare_exchange_weak_explicit(next, &identity, following,
-                memory_order_relaxed, memory_order_relaxed)) {
+        if (lib_atomic_u64_compare_exchange_weak_explicit(next, &identity, following,
+                LIB_MEMORY_ORDER_RELAXED, LIB_MEMORY_ORDER_RELAXED)) {
             *out_identity = (lib_u64)identity;
             return LIB_STATUS_OK;
         }
@@ -52,7 +52,7 @@ lib_status ux_component_initialize(ux_component *component,
         return LIB_STATUS_LIMIT_EXCEEDED;
     component->source_identity = identity;
     ux_hotkey_matcher_initialize(&component->hotkey_matcher, &options->hotkeys);
-    atomic_init(&component->stopping, 0);
+    lib_atomic_i32_initialize(&component->stopping, 0);
     return ux_component_mailboxes_create(&component->mailboxes);
 }
 
@@ -61,7 +61,8 @@ int ux_component_emit_to(ux_component *component, const ux_input_event *event,
 {
     ux_input_event copied;
     if (component == LIB_NULL || event == LIB_NULL || delivery_sink == LIB_NULL ||
-        atomic_load_explicit(&component->stopping, memory_order_acquire) != 0) return 0;
+        lib_atomic_i32_load_explicit(&component->stopping,
+            LIB_MEMORY_ORDER_ACQUIRE) != 0) return 0;
     copied = *event;
     ux_input_event_set_source(&copied, component, component->source_identity);
     if (!ux_hotkey_matcher_submit(&component->hotkey_matcher, &copied,
@@ -96,7 +97,8 @@ void ux_component_emit_source_retired(ux_component *component)
     ux_input_event event = { .type = UX_EVENT_SOURCE_RETIRED };
     if (component == LIB_NULL || component->input_sink == LIB_NULL) return;
     ux_input_event_set_source(&event, component, component->source_identity);
-    atomic_store_explicit(&component->stopping, 1, memory_order_release);
+    lib_atomic_i32_store_explicit(&component->stopping, 1,
+        LIB_MEMORY_ORDER_RELEASE);
     if (!component->input_sink(component->input_context, &event))
         ux_component_report_failure(component, LIB_STATUS_IO_ERROR);
 }

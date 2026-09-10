@@ -2,22 +2,22 @@
 
 #include <string.h>
 
-static void ux_component_mailboxes_lock(atomic_flag *lock)
+static void ux_component_mailboxes_lock(lib_atomic_flag *lock)
 {
-    while (atomic_flag_test_and_set_explicit(lock, memory_order_acquire)) { }
+    while (lib_atomic_flag_test_and_set_explicit(lock, LIB_MEMORY_ORDER_ACQUIRE)) { }
 }
 
-static void ux_component_mailboxes_unlock(atomic_flag *lock)
+static void ux_component_mailboxes_unlock(lib_atomic_flag *lock)
 {
-    atomic_flag_clear_explicit(lock, memory_order_release);
+    lib_atomic_flag_clear_explicit(lock, LIB_MEMORY_ORDER_RELEASE);
 }
 
 lib_status ux_component_mailboxes_create(ux_component_mailboxes *mailboxes)
 {
     if (mailboxes == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     memset(mailboxes, 0, sizeof(*mailboxes));
-    atomic_flag_clear(&mailboxes->frame_lock);
-    atomic_flag_clear(&mailboxes->control_lock);
+    lib_atomic_flag_clear(&mailboxes->frame_lock);
+    lib_atomic_flag_clear(&mailboxes->control_lock);
     mailboxes->wake = ux_mailbox_wake_create();
     return mailboxes->wake == LIB_NULL ? LIB_STATUS_NO_MEMORY : LIB_STATUS_OK;
 }

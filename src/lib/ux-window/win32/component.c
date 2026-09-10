@@ -61,7 +61,8 @@ static ux_win32_window_context *win32_window_context(HWND window)
 static int win32_window_accepting_input(const ux_win32_window_context *context)
 {
     return context != NULL && context->component != LIB_NULL &&
-        atomic_load_explicit(&context->component->base.stopping, memory_order_acquire) == 0;
+        lib_atomic_i32_load_explicit(&context->component->base.stopping,
+            LIB_MEMORY_ORDER_ACQUIRE) == 0;
 }
 
 /* Frozen is an application-requested content-input boundary. It is deliberately
@@ -553,8 +554,8 @@ static void win32_window_consume_frame(HWND window,
         return;
     if (!win32_window_frame_size(context->frame, &width, &height) ||
         !win32_window_ensure_surface(window, context, width, height)) {
-        atomic_store_explicit(&context->component->base.stopping, 1,
-            memory_order_release);
+        lib_atomic_i32_store_explicit(&context->component->base.stopping, 1,
+            LIB_MEMORY_ORDER_RELEASE);
         DestroyWindow(window);
         return;
     }
@@ -584,8 +585,8 @@ static int win32_window_consume_mailboxes(HWND window,
             &control)) {
         if (control.kind == UX_COMPONENT_CONTROL_STOP) {
             ux_component_emit_source_retired(&context->component->base);
-            atomic_store_explicit(&context->component->base.stopping, 1,
-                memory_order_release);
+            lib_atomic_i32_store_explicit(&context->component->base.stopping, 1,
+                LIB_MEMORY_ORDER_RELEASE);
             win32_window_release_mouse(context);
             DestroyWindow(window);
             return 0;
@@ -819,20 +820,23 @@ static DWORD WINAPI ux_window_worker(void *opaque)
         DWORD wait = MsgWaitForMultipleObjects(1u, &wake, FALSE,
             win32_window_cursor_blink_timeout(context), QS_ALLINPUT);
         if (wait == WAIT_OBJECT_0) {
-            if (atomic_load_explicit(&component->base.stopping, memory_order_acquire) != 0)
+            if (lib_atomic_i32_load_explicit(&component->base.stopping,
+                    LIB_MEMORY_ORDER_ACQUIRE) != 0)
                 DestroyWindow(window);
             else
                 SendMessageA(window, WIN32_WINDOW_MAILBOX_READY, 0, 0);
         }
         else if (wait == WAIT_FAILED) {
-            atomic_store_explicit(&component->base.stopping, 1, memory_order_release);
+            lib_atomic_i32_store_explicit(&component->base.stopping, 1,
+                LIB_MEMORY_ORDER_RELEASE);
             DestroyWindow(window);
         }
         else if (wait == WAIT_TIMEOUT)
             win32_window_advance_cursor_blink(window, context);
         while (PeekMessageA(&message, NULL, 0, 0, PM_REMOVE)) {
             if (message.message == WM_QUIT) {
-                atomic_store_explicit(&component->base.stopping, 1, memory_order_release);
+                lib_atomic_i32_store_explicit(&component->base.stopping, 1,
+                    LIB_MEMORY_ORDER_RELEASE);
                 if (IsWindow(window)) DestroyWindow(window);
                 break;
             }
