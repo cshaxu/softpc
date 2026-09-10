@@ -2,10 +2,10 @@
 
 ## Current Work
 
-M9 T48 S8 is active: [Deterministic control matrix]
-(../proposals/m9-t48-s8-deterministic-control-matrix.md). It proves the whole
-control/runtime/presenter state matrix through copied facts and completion
-barriers, then refreshes dual-width package evidence for owner acceptance.
+M9 T48 S9 is active: [Shared-lib private structure]
+(../proposals/m9-t48-s9-lib-private-structure.md). It audits and flattens
+private shared-library header placement without changing the public ABI or
+product behavior.
 
 ## Current Technical Baseline
 
@@ -19,6 +19,11 @@ barriers, then refreshes dual-width package evidence for owner acceptance.
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T48 S8 closes after owner acceptance. A pure control-state module and
+  deterministic copied-fact matrix now prove presenter actions and completion
+  barriers without timing waits; fresh x64/x86 CTest each passed 34/34. See
+  [S8 history](../history/M9-T48-S8-deterministic-control-matrix.md).
 
 - M9 T48 S4 closes after removing the shared lifecycle/presentation intent,
   making reset a runtime-owned atomic completion, and deriving monitor outcomes
