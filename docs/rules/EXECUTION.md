@@ -21,6 +21,53 @@ A build or one smoke does not close a task. Runnable-path work needs x64 and
 x86 build/test evidence proportional to the change. Artifact media remains
 non-mutating unless its active packet explicitly admits disposable output.
 
+## Active Packet And Identifier State
+
+Every active S is represented by exactly one `## M<milestone> T<task> S<step>
+Packet` or `## M<milestone> Td S<step> Packet` section in `CURRENT.md`.  It
+uses the fixed two-column `Field | Required record` table and has a non-empty
+record for each of these fields:
+
+`Identifier Mode`, `Admission And Approval`, `Objective`, `Non-goals`,
+`Reference Baseline`, `Candidate Proposal`, `Files And ABI Surface`,
+`Applicable Rules`, `Verification`, `Expected Markers`, `Asset Needs`,
+`Reporting Requirements`, `Stop Conditions`, `Exit Criteria`, `Original Owner
+Request`, and `Similar-Issue Sweep`.
+
+The packet is the executable task contract. A material scope, acceptance, or
+risk change requires its owner-approved revision before implementation
+continues. An idle `CURRENT.md` states that no implementation subtask is
+active and contains no packet.
+
+`Identifier Mode` is one of:
+
+- `New`: the next global numeric T, beginning with S1;
+- `Continuation`: the next unused S of the latest open numeric T;
+- `Corrective`: a narrow in-scope repair on the latest closed numeric T;
+- `Owner-Reopen`: an owner-directed reopening with its next unused S; or
+- `Governance`: the next milestone-local Td S and no numeric T allocation.
+
+No mode reuses a T or S identifier. A corrective or owner-reopen must state
+the observed failed contract and preserve the original task boundary. The
+documentation gate verifies packet shape, state mode, Queue/proposal links,
+and TODO form; passing it proves structure, not truthfulness or completion.
+
+## Review, P Commits, And Similar-Issue Sweep
+
+One session may perform both coordinator and executor roles, but it must
+switch roles before acceptance. The executor completes the admitted brief,
+self-reviews, commits, and pushes one complete P. The coordinator then reviews
+the actual worktree/Git changes, original request, applicable rules, and
+verification evidence before accepting or closing that S. A test report or
+executor summary never substitutes for this actual-change review.
+
+Every defect repair records a similar-issue sweep: defect class, searched
+scope and commands, every production-path hit with a disposition, and the
+post-fix focused proof. Mechanically detectable forms receive a permanent
+static gate when practical. Hits outside scope are explicitly transferred to
+`TODO.md` with priority and an admission condition; they are never silently
+ignored.
+
 ## User Package Configuration
 
 `assets/binary/softpc.ini` is user-owned package configuration. An agent

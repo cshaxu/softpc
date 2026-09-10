@@ -25,3 +25,9 @@ One subject has one current authority; link rather than copy. Root `README.md`,
 every supporting subtree with owner, purpose, and promotion/retirement rule.
 Historical terminology remains historical. Do not place local media paths,
 guest data, generated traces, or build outputs in tracked documentation.
+
+`CURRENT.md` is deliberately compact and machine-readable: it has one current
+work statement, one technical baseline, bounded recent closure/governance
+summaries, and at most one active packet in the fixed execution-rule table
+shape. Durable task narratives belong in `history/`; unapproved work belongs
+in a Queue-linked proposal or a prioritized TODO entry.

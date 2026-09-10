@@ -15,6 +15,10 @@ must be machine-checkable rather than only described in prose.
   state, one packet, required non-empty packet fields, ordered Queue entries,
   Queue-to-proposal and proposal-to-Queue links, and TODO priority shape.
 - Add deterministic verifier self-tests for accepted and rejected fixtures.
+- Register that self-test in CTest without changing a production target.
+- Preserve and structurally archive every non-queued, non-active historical
+  proposal under `docs/history/`; repair direct historical links after the
+  move. This is an identity migration, not content deletion.
 
 ## Non-goals
 
@@ -23,6 +27,14 @@ must be machine-checkable rather than only described in prose.
   task.
 - No retroactive rewriting of historical task records beyond the compact
   current-state form required by the new verifier.
+
+## Historical-proposal disposition
+
+The baseline has 46 proposals that are neither the one queued XP candidate nor
+the active S7 proposal. Some carry explicit historic task identifiers and some
+are earlier design/candidate material without a one-to-one T record. All are
+retained as history; none is deleted or treated as lacking value merely because
+it is no longer a current candidate.
 
 ## Exit criteria
 

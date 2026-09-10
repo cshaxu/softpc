@@ -564,6 +564,10 @@ add_test(NAME softpc-standalone-source-boundary
 add_test(NAME softpc-documentation-governance
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tools/Verify-DocumentationGovernance.cmake")
+add_test(NAME softpc-documentation-governance-selftest
+    COMMAND "${CMAKE_COMMAND}" -DSELF_TEST=ON
+        "-DSELF_TEST_ROOT=${CMAKE_BINARY_DIR}/documentation-governance-selftest" -P
+        "${CMAKE_SOURCE_DIR}/tools/Verify-DocumentationGovernance.cmake")
 add_test(NAME softpc-win32-presentation-manifest
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/test/support/win32_presentation_manifest.cmake")

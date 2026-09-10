@@ -4,7 +4,7 @@
 
 这是当前会话中 owner 对 S5 Console/UX 设计所作的原始中文决策摘录、
 助手当时提出的方案结论，以及对当前
-[S5 proposal](../../../proposals/m9-nxvm-library-adoption-and-softpc-binding.md)
+[S5 proposal](../../../history/m9-nxvm-library-adoption-and-softpc-binding.md)
 的交叉核对。它是 supporting evidence，**不定义设计**；冲突时始终以当前
 proposal 为准。
 

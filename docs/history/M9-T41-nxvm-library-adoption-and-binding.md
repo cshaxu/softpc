@@ -10,7 +10,7 @@ at `c7b5e668b7d9fc8e8710c3dd77c863ce07801553` with manifest hash
 T41 established the imported `base`, `host`, `storage`, and `ux` baseline and
 the non-MVDM migration ledger. The incomplete Console/Window product behavior
 is deliberately not declared accepted here: it is transferred intact to the
-separately admitted [T42 proposal](../proposals/m9-t42-console-object-ux-recomposition.md).
+separately admitted [T42 proposal](m9-t42-console-object-ux-recomposition.md).
 
 ## Boundary preserved
 
