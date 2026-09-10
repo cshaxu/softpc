@@ -2,11 +2,11 @@
 
 ## Current Work
 
-M9 T49 S2 is active: [Strict shared-library boundaries]
-(../proposals/m9-t49-s2-lib-strict-boundaries.md). It makes the reusable
-corpus independently strict-buildable, neutralizes its public/internal type
-boundary and prose, and removes an unused Linux Curses dependency without
-changing application or MVDM behavior.
+No implementation subtask is active. T49 S2–S5 are separately planned:
+[strict warnings](../proposals/m9-t49-s2-lib-strict-boundaries.md),
+[type boundary](../proposals/m9-t49-s3-lib-type-boundary.md),
+[neutral language](../proposals/m9-t49-s4-lib-neutral-language.md), and
+[Linux placeholder CMake](../proposals/m9-t49-s5-linux-placeholder-cmake.md).
 
 ## Current Technical Baseline
 
