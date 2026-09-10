@@ -35,8 +35,8 @@ repository root. Build the VM, then set the fixed machine defaults in the
 adjacent `assets/binary/softpc.ini`:
 
 ```text
-cmake -S . -B build -G Ninja
-cmake --build build --parallel 8
+cmake --preset mingw-gcc-x64-release
+cmake --build --preset package-x64 --parallel
 assets/binary/softpc64.exe
 ```
 
@@ -45,13 +45,20 @@ build requires a real i686 MinGW toolchain (including its Windows import and
 CRT libraries), for example:
 
 ```text
-cmake -S . -B build/x86 -G Ninja -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc
-cmake --build build/x86 --parallel 8
+$env:SOFTPC_I686_BIN = "<i686 MinGW bin directory>"
+$env:SOFTPC_I686_GCC = "$env:SOFTPC_I686_BIN/i686-w64-mingw32-gcc.exe"
+cmake --preset mingw-gcc-x86-release
+cmake --build --preset package-x86 --parallel
 ```
 
 The x86 configure writes `assets/binary/softpc32.exe`; the native x64
 configure writes `assets/binary/softpc64.exe`. Both use the same adjacent
 `softpc.ini`.
+
+Run a width's complete regression with `cmake --build --preset tests-x64` then
+`ctest --preset test-x64`, or the corresponding `x86` presets after setting
+the two x86 toolchain variables. The presets validate that the selected
+compiler pointer width and package architecture agree.
 
 `softpc.ini` has five `key=value` keys: `memory_mb`, `floppy`, `hard_disk`,
 `display` (`console` or `window`), and `media_mode`. Both media keys may be

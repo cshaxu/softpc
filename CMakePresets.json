@@ -1,0 +1,41 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 23, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "mingw-gcc-x64-release",
+      "displayName": "MinGW GCC x64 release",
+      "generator": "MinGW Makefiles",
+      "binaryDir": "${sourceDir}/build/mingw-gcc-x64-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_C_COMPILER": "gcc",
+        "SOFTPC_ARTIFACT_ARCHITECTURE": "x64"
+      }
+    },
+    {
+      "name": "mingw-gcc-x86-release",
+      "displayName": "MinGW GCC x86 release",
+      "generator": "MinGW Makefiles",
+      "binaryDir": "${sourceDir}/build/mingw-gcc-x86-release",
+      "environment": {
+        "PATH": "$env{SOFTPC_I686_BIN};$penv{PATH}"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_C_COMPILER": "$env{SOFTPC_I686_GCC}",
+        "SOFTPC_ARTIFACT_ARCHITECTURE": "x86"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "package-x64", "configurePreset": "mingw-gcc-x64-release", "targets": ["softpcvm"] },
+    { "name": "package-x86", "configurePreset": "mingw-gcc-x86-release", "targets": ["softpcvm"] },
+    { "name": "tests-x64", "configurePreset": "mingw-gcc-x64-release" },
+    { "name": "tests-x86", "configurePreset": "mingw-gcc-x86-release" }
+  ],
+  "testPresets": [
+    { "name": "test-x64", "configurePreset": "mingw-gcc-x64-release", "output": { "outputOnFailure": true } },
+    { "name": "test-x86", "configurePreset": "mingw-gcc-x86-release", "output": { "outputOnFailure": true } }
+  ]
+}

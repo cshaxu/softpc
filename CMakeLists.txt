@@ -24,6 +24,17 @@ if(NOT CMAKE_SIZEOF_VOID_P EQUAL 4 AND NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif()
 math(EXPR SOFTPC_HOST_POINTER_BITS "${CMAKE_SIZEOF_VOID_P} * 8")
 message(STATUS "SoftPC host pointer width: ${SOFTPC_HOST_POINTER_BITS}-bit")
+set(SOFTPC_ARTIFACT_ARCHITECTURE "${SOFTPC_ARTIFACT_ARCHITECTURE}" CACHE STRING
+    "Declared package architecture: x86 or x64")
+if(NOT SOFTPC_ARTIFACT_ARCHITECTURE STREQUAL "")
+    if(NOT SOFTPC_ARTIFACT_ARCHITECTURE MATCHES "^(x86|x64)$")
+        message(FATAL_ERROR "SOFTPC_ARTIFACT_ARCHITECTURE must be x86 or x64")
+    endif()
+    if((CMAKE_SIZEOF_VOID_P EQUAL 4 AND NOT SOFTPC_ARTIFACT_ARCHITECTURE STREQUAL "x86")
+        OR (CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT SOFTPC_ARTIFACT_ARCHITECTURE STREQUAL "x64"))
+        message(FATAL_ERROR "SOFTPC_ARTIFACT_ARCHITECTURE does not match the selected compiler")
+    endif()
+endif()
 # MSYS2's windres can otherwise infer the host architecture rather than the
 # selected C toolchain.  Resources are linked into every x86 executable, so
 # make the COFF target explicit.
