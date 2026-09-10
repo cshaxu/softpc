@@ -2,13 +2,11 @@
 
 ## Current Work
 
-M9 T48 S4 is active: [Control / runtime / presenter decoupling]
-(../proposals/m9-t48-s4-control-runtime-presenter-decoupling.md). It makes
-SoftPC control the sole product-state writer: monitor, UX, runtime, component,
-and broker facts enter one control queue; control independently derives runtime
-commands and presenter/broker work. Runtime owns reset as an atomic command
-and reports `RESET_COMPLETED`; control neither scripts nor exposes reset's
-internal stages.
+M9 T48 S5 is active: [Control desired / actual state ownership]
+(../proposals/m9-t48-s5-control-state-ownership.md). It moves completed VM,
+frame-route, component, broker, desired-plan, and in-flight actuator facts into
+one control-owned state; presentation becomes a component/broker actuator and
+copied-frame adapter only.
 
 ## Current Technical Baseline
 
@@ -23,9 +21,11 @@ internal stages.
 
 ## Recent Governance
 
-- M9 T48 S4 supersedes the remaining S3 lifecycle-outcome work. S3 P1's
-  monitor output transaction remains baseline evidence, but its command-origin
-  classification is replaced by S4's completion-driven control reducer.
+- M9 T48 S4 closes after removing the shared lifecycle/presentation intent,
+  making reset a runtime-owned atomic completion, and deriving monitor outcomes
+  from completed facts rather than command origin. Fresh x64/x86 CTest each
+  passed 33/33. See [S4 history]
+  (../history/M9-T48-S4-control-runtime-presenter-decoupling.md).
 
 - M9 T48 S2 closes after owner acceptance. Generic Win32 Window geometry now
   keeps the copied-frame aspect through drag, system resize, and maximum
