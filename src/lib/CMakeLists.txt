@@ -90,11 +90,8 @@ if(WIN32)
     target_link_libraries(ux-window PRIVATE user32 gdi32)
 else()
     add_library(ux-linux-native ALIAS ux)
-    find_package(Curses REQUIRED)
     find_package(Threads REQUIRED)
-    target_include_directories(ux-window PUBLIC ${CURSES_INCLUDE_DIRS})
-    target_link_libraries(ux-window PUBLIC ${CURSES_LIBRARIES} Threads::Threads)
-    target_link_libraries(ux-console PUBLIC ${CURSES_LIBRARIES} Threads::Threads)
+    target_link_libraries(host-sync PUBLIC Threads::Threads)
 endif()
 
 # This build-only aggregate does not create a library-root dependency. Each
@@ -118,4 +115,7 @@ if(BUILD_TESTING)
     add_test(NAME library.manifest
         COMMAND "${CMAKE_COMMAND}" -DLIBRARY_ROOT:PATH=${CMAKE_CURRENT_LIST_DIR}
             -P "${CMAKE_CURRENT_LIST_DIR}/verify_manifest.cmake")
+    add_test(NAME library.linux-build-contract
+        COMMAND "${CMAKE_COMMAND}" -DLIBRARY_CMAKE:FILEPATH=${CMAKE_CURRENT_LIST_FILE}
+            -P "${CMAKE_CURRENT_LIST_DIR}/verify_linux_build_contract.cmake")
 endif()
