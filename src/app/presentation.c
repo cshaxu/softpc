@@ -1,11 +1,13 @@
 #include "presentation.h"
 
 #ifdef _WIN32
+#include "command.h"
 #include "keyboard.h"
 #include "lib/ux-console/console_interface.h"
 #include "lib/ux-window/window_interface.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <windows.h>
 
@@ -183,10 +185,12 @@ int app_presentation_publish_frame(app_presentation *presentation,
      * the product status surface rather than leaving stale guest text. */
     if (context->console != NULL && frame->graphics != 0u &&
         console_status_surface) {
-        static const char message[] =
-            "Insignia SoftPC is running in the Window.\r\n"
-            "Raw VM Console hotkeys: Ctrl+Alt+P/D/F/M\r\n";
+        static const char status_line[] =
+            "Insignia SoftPC is running in the Window.";
+        char message[APP_COMMAND_TEXT_CAPACITY];
         size_t index, row = 0u, column = 0u;
+        (void)snprintf(message, sizeof(message), "%s\r\n\r\n%s\r\n",
+            status_line, app_command_hotkey_help());
         memset(&console_status, 0, sizeof(console_status));
         console_status.valid = 1u;
         console_status.sequence = frame->sequence;
@@ -198,7 +202,7 @@ int app_presentation_publish_frame(app_presentation *presentation,
             console_status.text[index] = ' ';
             console_status.attributes[index] = 0x07u;
         }
-        for (index = 0u; index < sizeof(message) - 1u; ++index) {
+        for (index = 0u; message[index] != '\0'; ++index) {
             if (message[index] == '\r') continue;
             if (message[index] == '\n') { ++row; column = 0u; continue; }
             if (row < UX_TEXT_ROWS && column < UX_TEXT_COLUMNS)

@@ -36,6 +36,9 @@ typedef struct app_command_effect {
     char path[APP_COMMAND_PATH_CAPACITY];
 } app_command_effect;
 
+/* The registered raw-Console hotkey section is product help text shared by
+ * monitor `help` and the graphical raw-Console status surface. */
+const char *app_command_hotkey_help(void);
 void app_command_session_initialize(app_command_session *, softpc_presentation);
 void app_command_session_open(app_command_session *, app_command_effect *);
 void app_command_session_submit_line(app_command_session *, app_monitor_state,

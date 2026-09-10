@@ -2,10 +2,10 @@
 
 ## Current Work
 
-M9 T48 S9 is active: [Shared-lib private structure]
-(../proposals/m9-t48-s9-lib-private-structure.md). It audits and flattens
-private shared-library header placement without changing the public ABI or
-product behavior.
+M9 T49 S1 is active: [Console graphics status help reuse]
+(../proposals/m9-t49-s1-console-graphics-status-help.md). It makes the raw VM
+Console's graphical-running status surface reuse the monitor help's hotkey
+section without changing VM, host, or shared-library behavior.
 
 ## Current Technical Baseline
 
@@ -19,6 +19,13 @@ product behavior.
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T48 S9 closes after owner acceptance. The canonical SoftPC shared corpus
+  now has flat private structure: `*_interface.h` is the sole public contract,
+  private headers use concise component-local names, and `internal/` paths are
+  absent. The resulting corpus is delivered for exact NXVM adoption; fresh
+  x64/x86 CTest each passed 34/34. See [S9 history]
+  (../history/M9-T48-S9-lib-private-structure.md).
 
 - M9 T48 S8 closes after owner acceptance. A pure control-state module and
   deterministic copied-fact matrix now prove presenter actions and completion

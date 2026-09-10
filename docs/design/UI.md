@@ -92,6 +92,10 @@ running component set and Current Console Object, then resumes the VM.
 When a running graphical Console-display route returns Current Console from
 raw VM input to the monitor, SoftPC publishes and arms a fresh `SoftPC>`
 prompt; retaining the prior guest text alone is not a monitor handoff.
+While that graphical route retains the raw VM Console (`console_control=0`),
+its Console status surface keeps the running-in-Window first line, then one
+blank line, the same raw-Console hotkey help section printed by monitor
+`help`, and one trailing blank line.
 
 Window X is a SoftPC close request: running first reaches paused, host switches
 to monitor, then SoftPC destroys the Window component. Until native Window

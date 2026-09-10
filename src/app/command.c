@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static const char HELP[] =
+static const char HELP_COMMANDS[] =
     "Insignia SoftPC\r\n===============\r\n"
     "  start                 cold-reset and run the machine\r\n"
     "  resume                continue a paused machine\r\n"
@@ -13,7 +13,8 @@ static const char HELP[] =
     "  reset                 cold-reset and pause at firmware entry\r\n"
     "  floppy insert <image> insert drive A media while stopped/paused\r\n"
     "  floppy eject          eject drive A media while stopped/paused\r\n"
-    "  help                  show this help\r\n  exit                  quit\r\n\r\n"
+    "  help                  show this help\r\n  exit                  quit\r\n";
+static const char HELP_HOTKEYS[] =
     "While the guest is running in a raw VM Console:\r\n"
     "  Ctrl+Alt+P            pause or resume\r\n"
     "  Ctrl+Alt+D            send Ctrl+Alt+Del to the guest\r\n"
@@ -22,6 +23,11 @@ static const char HELP[] =
 
 static void clear(app_command_effect *e) { memset(e, 0, sizeof(*e)); }
 static void text(app_command_effect *e, const char *s) { (void)snprintf(e->text, sizeof(e->text), "%s", s); }
+static void help(app_command_effect *e)
+{
+    (void)snprintf(e->text, sizeof(e->text), "%s\r\n%s\r\n",
+        HELP_COMMANDS, HELP_HOTKEYS);
+}
 /* Product prompt demand is separate from the host's one cooked reader.  The
  * broker alone owns that reader and safely makes its arm request idempotent. */
 static void prompt(app_command_session *s) { s->prompt_due = 1; }
@@ -67,14 +73,15 @@ static void lifecycle(app_command_session *s, app_monitor_state state,
 }
 
 void app_command_session_initialize(app_command_session *s, softpc_presentation display) { memset(s,0,sizeof(*s));s->display=display; }
-void app_command_session_open(app_command_session *s, app_command_effect *e) { clear(e); (void)snprintf(e->text,sizeof(e->text),"%s\r\n",HELP);prompt(s); }
+const char *app_command_hotkey_help(void) { return HELP_HOTKEYS; }
+void app_command_session_open(app_command_session *s, app_command_effect *e) { clear(e); help(e); prompt(s); }
 void app_command_session_submit_line(app_command_session *s, app_monitor_state state,
     const char *line,app_command_effect *e)
 {
     char b[APP_COMMAND_TEXT_CAPACITY],*c,*a,*p; size_t n; clear(e);
     if(!line||(n=strlen(line))>=sizeof(b)){reject(s,e,line?"Command is too long.":"Unknown command.");return;}
     memcpy(b,line,n+1);c=trim(b);a=c;while(*a&&!isspace((unsigned char)*a))++a;if(*a)*a++=0;a=trim(a);lower(c);
-    if(!*c){prompt(s);return;} if(!strcmp(c,"help")){(void)snprintf(e->text,sizeof(e->text),"%s\r\n",HELP);prompt(s);return;} if(!strcmp(c,"exit")){e->exit_requested=1;return;}
+    if(!*c){prompt(s);return;} if(!strcmp(c,"help")){help(e);prompt(s);return;} if(!strcmp(c,"exit")){e->exit_requested=1;return;}
     /* The parser does not own machine state.  It receives control's current
        stable fact for the one command validation below. */
     if(strcmp(c,"floppy")){lifecycle(s,state,c,e);return;}
