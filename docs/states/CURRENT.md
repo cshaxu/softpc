@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 T50 S2 is active: shared-library MSVC CI and atomics portability.
+No implementation subtask is active.
 
 ## Current Technical Baseline
 
@@ -14,40 +14,21 @@ M9 T50 S2 is active: shared-library MSVC CI and atomics portability.
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
   strict x64/x86 CTest baseline is 35/35 following M9 T49 S6; repository-wide
-  CTest is now 36/36 after the Td S7 governance test.
+  CTest is now 36/36 after the Td S7 governance test. Its path-scoped
+  standalone MSVC manifest/build/CTest gate is live in GitHub Actions.
 
 ## Recent M9 Closures
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
 | T49 | Shared-library quality sequence S1–S6 closed after owner x86/x64 package acceptance. | [T49 S6 history](../history/M9-T49-S6-lib-neutral-corpus-prose.md) |
+| T50 | Build presets/artifact identity and standalone shared-library MSVC CI closed. | [T50 S2 history](../history/M9-T50-S2-lib-ci.md) |
 
 ## Recent M9 Task Progress
 
 - **M9 T50 S1:** Checked-in x64/x86 presets now bind compiler width to package
   identity and passed fresh 36/36 CTest at both widths.
   [Record](../history/M9-T50-S1-build-presets-artifact-identity.md)
-
-## M9 T50 S2 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Automatic sequential governance route approved by owner; T50 S1 is closed. |
-| Objective | Add a path-scoped standalone shared-library MSVC CI gate and make its private atomic implementation boundary MSVC-buildable. |
-| Non-goals | No full VM/package CI, public ABI change, or runtime/product behavior change. |
-| Reference Baseline | NXVM `.github/workflows/lib.yml` and SoftPC `src/lib/CMakeLists.txt`. |
-| Candidate Proposal | [M9 T50 S2 lib CI](../proposals/m9-t50-s2-lib-ci.md). |
-| Files And ABI Surface | `.github/workflows/lib.yml`, private `src/lib/base` atomic boundary and internal consumers, task records; no public ABI. |
-| Applicable Rules | Execution, Documentation, Architecture Rules. |
-| Verification | YAML review; standalone MSVC lib configure/manifest/build/CTest locally and remotely; governance gate. |
-| Expected Markers | `src/lib/**` paths, neutral private atomic abstraction, manifest target, build and CTest commands. |
-| Asset Needs | None. |
-| Reporting Requirements | Report trigger scope and exact CI proof. |
-| Stop Conditions | Stop before adding VM/package CI, public compiler/platform ABI, or product behavior. |
-| Exit Criteria | Workflow is committed/pushed; standalone MSVC library manifest/build/CTest proof passes locally and on GitHub Actions. |
-| Original Owner Request | Upgrade governance to NXVM level. |
-| Similar-Issue Sweep | Compare all existing CI/workflow surfaces and standalone lib targets. |
 
 ## Recent Governance
 
