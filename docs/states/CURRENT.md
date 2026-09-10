@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 T50 S2 is active: shared-library CI.
+M9 T50 S2 is active: shared-library MSVC CI and atomics portability.
 
 ## Current Technical Baseline
 
@@ -34,18 +34,18 @@ M9 T50 S2 is active: shared-library CI.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Automatic sequential governance route approved by owner; T50 S1 is closed. |
-| Objective | Add a path-scoped standalone shared-library CI gate. |
-| Non-goals | No full VM/package CI or runtime behavior change. |
+| Objective | Add a path-scoped standalone shared-library MSVC CI gate and make its private atomic implementation boundary MSVC-buildable. |
+| Non-goals | No full VM/package CI, public ABI change, or runtime/product behavior change. |
 | Reference Baseline | NXVM `.github/workflows/lib.yml` and SoftPC `src/lib/CMakeLists.txt`. |
 | Candidate Proposal | [M9 T50 S2 lib CI](../proposals/m9-t50-s2-lib-ci.md). |
-| Files And ABI Surface | `.github/workflows/lib.yml`, task records only; no ABI. |
+| Files And ABI Surface | `.github/workflows/lib.yml`, private `src/lib/base` atomic boundary and internal consumers, task records; no public ABI. |
 | Applicable Rules | Execution, Documentation, Architecture Rules. |
-| Verification | YAML review; standalone lib configure/manifest/build/CTest locally; governance gate. |
-| Expected Markers | `src/lib/**` paths, manifest target, build and CTest commands. |
+| Verification | YAML review; standalone MSVC lib configure/manifest/build/CTest locally and remotely; governance gate. |
+| Expected Markers | `src/lib/**` paths, neutral private atomic abstraction, manifest target, build and CTest commands. |
 | Asset Needs | None. |
 | Reporting Requirements | Report trigger scope and exact CI proof. |
-| Stop Conditions | Stop before adding VM/package CI or changing source. |
-| Exit Criteria | Workflow is committed/pushed and standalone library proof passes. |
+| Stop Conditions | Stop before adding VM/package CI, public compiler/platform ABI, or product behavior. |
+| Exit Criteria | Workflow is committed/pushed; standalone MSVC library manifest/build/CTest proof passes locally and on GitHub Actions. |
 | Original Owner Request | Upgrade governance to NXVM level. |
 | Similar-Issue Sweep | Compare all existing CI/workflow surfaces and standalone lib targets. |
 
