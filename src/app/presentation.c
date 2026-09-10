@@ -338,6 +338,25 @@ void app_presentation_note_broker_completed(app_presentation *presentation,
         APP_RECONCILER_CONSOLE_MONITOR);
 }
 
+int app_presentation_monitor_is_current(const app_presentation *presentation)
+{
+    app_presentation_plan desired;
+    if (presentation == NULL) return 0;
+    desired = app_reconciler_desired(&presentation->reducer);
+    return desired.monitor_console_enabled && !presentation->vm_console_current &&
+        presentation->reducer.in_flight != APP_RECONCILER_ACTION_BIND_VM_CONSOLE;
+}
+
+int app_presentation_monitor_is_running_graphics_surface(
+    const app_presentation *presentation)
+{
+    return presentation != NULL &&
+        presentation->display == SOFTPC_PRESENTATION_CONSOLE &&
+        presentation->reducer.runtime_actual == SOFTPC_RUNTIME_RUNNING &&
+        presentation->reducer.frame_actual && presentation->reducer.graphics_actual &&
+        app_presentation_monitor_is_current(presentation);
+}
+
 void app_presentation_request_intent(app_presentation *presentation,
     app_reconciler_intent intent)
 {

@@ -35,6 +35,11 @@ void app_presentation_note_component_completed(app_presentation *presentation,
     app_control_component_kind component, int exists);
 void app_presentation_note_broker_completed(app_presentation *presentation,
     int vm_console_current);
+/* True only after the monitor logical Console is the completed current owner,
+ * not merely the reducer's desired target. */
+int app_presentation_monitor_is_current(const app_presentation *presentation);
+int app_presentation_monitor_is_running_graphics_surface(
+    const app_presentation *presentation);
 
 #endif
 

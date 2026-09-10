@@ -1,6 +1,6 @@
 #include "presentation.h"
 #include "monitor.h"
-#include "monitor_command.h"
+#include "command.h"
 #include "runtime.h"
 #include "machine.h"
 #include "prompt_trace.h"
@@ -188,26 +188,6 @@ invalid:
     return 0;
 }
 
-static void app_monitor_help(app_monitor_console *monitor)
-{
-    app_monitor_console_write(monitor,
-        "Insignia SoftPC\r\n===============\r\n"
-        "  start                 cold-reset and run the machine\r\n"
-        "  resume                continue a paused machine\r\n"
-        "  pause                 request machine pause\r\n"
-        "  stop                  stop execution\r\n"
-        "  reset                 cold-reset and pause at firmware entry\r\n"
-        "  floppy insert <image> insert drive A media while stopped/paused\r\n"
-        "  floppy eject          eject drive A media while stopped/paused\r\n"
-        "  help                  show this help\r\n"
-        "  exit                  quit\r\n\r\n"
-        "While the guest is running in a raw VM Console:\r\n"
-        "  Ctrl+Alt+P            pause or resume\r\n"
-        "  Ctrl+Alt+D            send Ctrl+Alt+Del to the guest\r\n"
-        "  Ctrl+Alt+F            send Alt+Enter to the guest\r\n"
-        "  Ctrl+Alt+M            release captured mouse\r\n");
-}
-
 static int app_monitor_drive(app_runtime *runtime, app_presentation *presentation)
 {
     app_reconciler_action action;
@@ -221,6 +201,17 @@ static int app_monitor_drive(app_runtime *runtime, app_presentation *presentatio
     case APP_RECONCILER_ACTION_RUNTIME_STOP: return app_runtime_stop(runtime);
     default: return 0;
     }
+}
+
+static int app_monitor_arm_if_ready(app_command_session *session,
+    app_presentation *presentation, app_monitor_console *monitor)
+{
+    app_command_effect effect = { 0 };
+    app_command_session_note_monitor_current(session,
+        app_presentation_monitor_is_current(presentation), &effect);
+    if (!effect.arm_prompt) return 1;
+    return app_monitor_console_write(monitor, "SoftPC> ") &&
+        app_monitor_console_request_line(monitor);
 }
 
 static void app_runtime_state_completed(void *opaque, app_runtime_state state,
@@ -276,28 +267,20 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
     app_control_queue *control_queue)
 {
     char line[SOFTPC_CONFIG_PATH_MAX + 64u];
-    app_monitor_state state = APP_MONITOR_INIT;
-    int stop_requested = 0;
-    int reset_requested = 0;
+    app_command_session session;
+    app_command_effect command_effect;
     app_presentation *presenter = NULL;
-
-    int prompt_pending = 0;
     if (!app_presentation_create(&presenter, runtime, presentation,
             console_control, monitor, control_queue)) return 1;
-    app_monitor_help(monitor);
-    app_monitor_console_write(monitor, "\r\n");
-    prompt_pending = 1;
+    app_command_session_initialize(&session, presentation);
+    app_command_session_open(&session, &command_effect);
+    if (command_effect.text[0] != '\0')
+        (void)app_monitor_console_write(monitor, command_effect.text);
+    if (!app_monitor_arm_if_ready(&session, presenter, monitor)) goto failed;
     for (;;) {
-        char *command;
-        char *argument;
-        app_monitor_lifecycle_command lifecycle_command;
-        app_monitor_command_result lifecycle_result;
-        if (prompt_pending && app_monitor_console_write(monitor, "SoftPC> ")) {
-            (void)app_monitor_console_request_line(monitor);
-            prompt_pending = 0;
-        }
         for (;;) {
             app_control_event control_event;
+            int broker_monitor_completed = 0;
             if (app_control_queue_take(control_queue, &control_event, 100u)) {
                 if (control_event.kind == APP_CONTROL_UX_INPUT) {
                     /* A component can have queued an event just before an
@@ -305,15 +288,16 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                      * enter the already-stopped machine path. */
                     if (!app_control_accept_ux_event(&control_event,
                             app_runtime_run_generation(runtime),
-                            state == APP_MONITOR_RUNNING ?
+                            app_command_session_state(&session) == APP_MONITOR_RUNNING ?
                                 SOFTPC_RUNTIME_RUNNING :
-                            state == APP_MONITOR_PAUSED ?
+                            app_command_session_state(&session) == APP_MONITOR_PAUSED ?
                                 SOFTPC_RUNTIME_PAUSED : SOFTPC_RUNTIME_STOPPED))
                         continue;
                     if (!app_monitor_handle_ux(control_queue, runtime, presenter,
-                            state, &control_event.value.ux))
+                            app_command_session_state(&session), &control_event.value.ux))
                         goto failed;
                     if (!app_monitor_drive(runtime, presenter)) goto failed;
+                    if (!app_monitor_arm_if_ready(&session, presenter, monitor)) goto failed;
                     continue;
                 }
                 if (control_event.kind == APP_CONTROL_MONITOR_LINE) {
@@ -339,28 +323,10 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                 if (control_event.kind == APP_CONTROL_RUNTIME_COMPLETED)
                 {
                     app_runtime_state completed = control_event.value.runtime_state;
-                    if (completed == SOFTPC_RUNTIME_PAUSED &&
-                        state != APP_MONITOR_PAUSED) {
-                        state = APP_MONITOR_PAUSED;
-                        app_monitor_console_write(monitor, reset_requested ?
-                            "Machine reset and paused.\r\n" : "Machine paused.\r\n");
-                        reset_requested = 0;
-                        prompt_pending = 1;
-                    } else if (completed == SOFTPC_RUNTIME_RUNNING) {
-                        state = APP_MONITOR_RUNNING;
-                    } else if (completed == SOFTPC_RUNTIME_STOPPED &&
-                        (state != APP_MONITOR_STOPPED || stop_requested)) {
-                        state = APP_MONITOR_STOPPED;
-                        if (!reset_requested) {
-                            app_monitor_console_write(monitor, "Machine stopped.\r\n");
-                            prompt_pending = 1;
-                        }
-                        /* Reset's stopped completion is an internal stage of
-                         * cold restart. Do not rearm cooked input between its
-                         * stop and start actions, or a second line could
-                         * replace the reset intent before it reaches paused. */
-                        stop_requested = 0;
-                    }
+                    app_command_session_note_runtime(&session, completed,
+                        &command_effect);
+                    if (command_effect.text[0] != '\0')
+                        (void)app_monitor_console_write(monitor, command_effect.text);
                     app_presentation_note_runtime_completed(presenter, completed);
                 }
                 else if (control_event.kind == APP_CONTROL_FRAME_COMPLETED)
@@ -376,85 +342,42 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                         control_event.value.broker_vm_console_current;
                     app_presentation_note_broker_completed(presenter,
                         vm_console_current);
-                    /* `display=console, console_control=1` changes a running
-                       graphic guest from raw VM Console to this cooked
-                       monitor. The broker handoff preserves the old native
-                       screen, so the monitor must explicitly publish and arm
-                       its next prompt; otherwise it looks raw but accepts no
-                       monitor line. Paused/stopped paths already request
-                       their prompt from their runtime completion. */
-                    if (!vm_console_current &&
-                        state == APP_MONITOR_RUNNING)
-                        prompt_pending = 1;
+                    broker_monitor_completed = !vm_console_current;
                 }
                 if (!app_monitor_drive(runtime, presenter)) goto failed;
+                /* A monitor completion can be stale with respect to a new
+                 * Console-mode VM binding.  Only the reconciled actual owner
+                 * may make its prompt due. */
+                if (broker_monitor_completed &&
+                    app_presentation_monitor_is_current(presenter))
+                    app_command_session_note_broker(&session, 0,
+                        app_presentation_monitor_is_running_graphics_surface(
+                            presenter));
+                if (!app_monitor_arm_if_ready(&session, presenter, monitor)) goto failed;
                 continue;
-            }
-            if (prompt_pending && app_monitor_console_write(monitor, "SoftPC> ")) {
-                (void)app_monitor_console_request_line(monitor);
-                prompt_pending = 0;
             }
         }
         if (!app_monitor_drive(runtime, presenter)) goto failed;
-        command = app_trim(line);
-        argument = command;
-        while (*argument != '\0' && !isspace((unsigned char)*argument))
-            ++argument;
-        if (*argument != '\0') *argument++ = '\0';
-        argument = app_trim(argument);
-        for (char *letter = command; *letter != '\0'; ++letter)
-            *letter = (char)tolower((unsigned char)*letter);
-        if (*command == '\0') { prompt_pending = 1; continue; }
-        if (strcmp(command, "help") == 0) {
-            app_monitor_help(monitor);
-            prompt_pending = 1;
-        }
-        else if (strcmp(command, "exit") == 0) {
+        app_command_session_submit_line(&session, line, &command_effect);
+        if (command_effect.exit_requested) {
             (void)app_runtime_stop(runtime);
             (void)app_presentation_reconcile(presenter);
             app_presentation_destroy(presenter);
             return 0;
         }
-        else if ((lifecycle_command = app_monitor_command_parse(command)) !=
-            APP_MONITOR_COMMAND_NONE) {
-            lifecycle_result = app_monitor_command_resolve(state,
-                lifecycle_command);
-            if (lifecycle_result.intent == APP_RECONCILER_INTENT_NONE) {
-                app_monitor_console_write(monitor, lifecycle_result.message);
-                prompt_pending = 1;
-            } else {
-                if (lifecycle_result.intent == APP_RECONCILER_INTENT_STOP)
-                    stop_requested = 1;
-                if (lifecycle_result.intent == APP_RECONCILER_INTENT_RESET)
-                    reset_requested = 1;
-                app_presentation_request_intent(presenter,
-                    lifecycle_result.intent);
-                if (!app_monitor_drive(runtime, presenter)) goto failed;
-            }
-        } else if (strcmp(command, "floppy") == 0) {
-            char *verb = argument;
-            char *path = verb;
-            while (*path != '\0' && !isspace((unsigned char)*path)) ++path;
-            if (*path != '\0') *path++ = '\0';
-            path = app_trim(path);
-            for (char *letter = verb; *letter != '\0'; ++letter)
-                *letter = (char)tolower((unsigned char)*letter);
-            if (strcmp(verb, "eject") == 0 && *path == '\0') {
-                if (!app_runtime_set_floppy(runtime, NULL))
-                    app_monitor_console_write(monitor, "Cannot eject floppy.\r\n");
-                else app_monitor_console_write(monitor, "Floppy ejected.\r\n");
-            } else if (strcmp(verb, "insert") == 0 && *path != '\0') {
-                if (!app_runtime_set_floppy(runtime, path))
-                    app_monitor_console_write(monitor, "Cannot insert floppy.\r\n");
-                else app_monitor_console_write(monitor, "Floppy inserted.\r\n");
-            } else app_monitor_console_write(monitor,
-                "Usage: floppy insert <image> | eject\r\n");
-            prompt_pending = 1;
-        } else {
-            app_monitor_console_write(monitor, "Unknown command.\r\n");
-            prompt_pending = 1;
+        if (command_effect.action != APP_COMMAND_ACTION_NONE) {
+            int succeeded = command_effect.action == APP_COMMAND_ACTION_EJECT_FLOPPY ?
+                app_runtime_set_floppy(runtime, NULL) :
+                app_runtime_set_floppy(runtime, command_effect.path);
+            app_command_session_complete_floppy(&session, command_effect.action,
+                succeeded, &command_effect);
         }
-        app_monitor_console_write(monitor, "\r\n");
+        if (command_effect.text[0] != '\0')
+            (void)app_monitor_console_write(monitor, command_effect.text);
+        if (command_effect.intent != APP_RECONCILER_INTENT_NONE)
+            app_presentation_request_intent(presenter, command_effect.intent);
+        if (!app_monitor_drive(runtime, presenter)) goto failed;
+        if (!app_monitor_arm_if_ready(&session, presenter, monitor)) goto failed;
     }
 failed:
     app_presentation_destroy(presenter);
