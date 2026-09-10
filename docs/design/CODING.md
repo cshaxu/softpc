@@ -10,7 +10,7 @@ src/
     ordinary host C/H files
     compat/{ccpu,cvidc,...}/
   lib/{base,host,storage,ux-base,ux-window,ux-console}/
-    byte-identical NXVM shared platform implementation
+    canonical shared platform implementation, delivered for exact NXVM adoption
   app/
     main.c, runtime.c, presentation.c, keyboard.c, firmware.rc
 ```

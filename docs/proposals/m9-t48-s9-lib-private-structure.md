@@ -30,8 +30,8 @@ components or another public API.
   `ux-console` may consume `ux-base` private mailbox/component mechanics).
 - Make the README state the public/private naming convention and verify no
   public header includes a private header or gains host/product meaning.
-- Refresh the shared corpus manifest and compare the resulting lib surface
-  with NXVM before closure.
+- Refresh the shared corpus manifest.  This repository's resulting `src/lib/`
+  corpus is the canonical shared-library delivery for NXVM to adopt exactly.
 
 ## Non-goals
 
@@ -45,7 +45,8 @@ components or another public API.
 
 - Source-boundary and manifest checks; targeted include-path audit.
 - Fresh x64/x86 build and full CTest after structural relocation.
-- `git diff --check`, clean worktree, and exact NXVM adoption comparison.
+- `git diff --check`, clean worktree, and a delivery-ready canonical corpus for
+  exact NXVM adoption.
 
 ## Exit criteria
 

@@ -15,7 +15,8 @@ app/
   monitor, and product binding; no machine-state access from frontends
         ↑
 lib/{base,host,storage,ux-base,ux-window,ux-console}/
-  byte-identical NXVM shared platform library: copied-frame mailbox, host
+  canonical shared platform library, delivered for NXVM to adopt exactly:
+  copied-frame mailbox, host
   input normalization, generic registered-chord matching, independent Window/
   VM-Console components, clock,
   synchronization, and storage; no product queue or guest protocol
@@ -32,17 +33,17 @@ the affected point when they remain mechanical and introduce no machine policy.
 capability, ownership, and policy, but does not own guest-visible state.
 `app/` owns the single executor, machine snapshot producer, guest-input
 adapter, monitor, and product binding.
-`lib/` is an exact checked-in NXVM import, not a runtime or build dependency
-on NXVM or NTVDM64. It consumes and produces copied host values only. It owns
+`lib/` is the canonical checked-in shared-library corpus, not a runtime or
+build dependency on NXVM or NTVDM64. NXVM adopts this corpus exactly. It
+consumes and produces copied host values only. It owns
 the generic mailbox mechanics, independent console/window message loops,
 host-input normalization, registered-chord matching, mouse capture, clock,
 synchronization,
 and storage primitives. The app binding owns its executor queue, converts
 events to the guest's input protocol, and makes all product lifecycle and
-action decisions. An owner-admitted generic shared-library candidate may
-temporarily originate in SoftPC only when its active packet requires NXVM to
-adopt the exact code and requires SoftPC to re-import it before task closure;
-this is a delivery order, not a permanent project fork.
+action decisions. SoftPC publishes each admitted shared-library change as the
+canonical corpus for NXVM to adopt exactly; the projects do not maintain
+parallel variants.
 
 Shared UX key events are copied `ux_key`, physical scan, neutral injection
 flags, generic Ctrl/Alt/Shift state, and make/break values. Platform adapters
@@ -56,9 +57,8 @@ text or graphic frame snapshots; frontends consume only those snapshots.
 
 ## Shared Console And UX Composition
 
-An admitted shared-library candidate may originate in SoftPC only when NXVM
-adopts the exact code and SoftPC re-imports it before closure; this is delivery
-order, not a permanent library fork.
+SoftPC's checked-in `lib/` corpus is the shared-library source of truth. NXVM
+adopts it exactly; no runtime or build dependency crosses repositories.
 
 `base` defines copied logical Console objects. `host` owns native Console
 handles/modes, one I/O worker, and exactly one Current Console Object from
