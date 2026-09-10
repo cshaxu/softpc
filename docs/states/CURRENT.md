@@ -2,8 +2,10 @@
 
 ## Current Work
 
-No implementation task is active. The next candidate is ordered in
-[Queue](QUEUE.md).
+M9 T48 S1 is active: [Monitor command session extraction]
+(../proposals/m9-t48-monitor-command-session.md). It moves monitor command
+turn/prompt policy out of `main.c` into an app-owned state machine and repairs
+the missing post-`start`/`resume` cooked monitor prompt for `display=window`.
 
 ## Current Technical Baseline
 
@@ -17,6 +19,12 @@ No implementation task is active. The next candidate is ordered in
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T48 S1 is active. The monitor command session becomes the sole owner of
+  monitor-line parsing, lifecycle turn completion, and prompt eligibility;
+  `main.c` remains queue/object orchestration. The approved static Window
+  route keeps the cooked monitor available while running, independent of
+  `console_control`.
 
 - M9 T47 closes at S9 after owner acceptance. The final repair clears CCPU's
   private pending-interrupt map before a new public cold run, alongside the
