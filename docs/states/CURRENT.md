@@ -2,11 +2,10 @@
 
 ## Current Work
 
-M9 T48 S6 is active: [Monitor completion transaction]
-(../proposals/m9-t48-s6-monitor-completion-transaction.md). It makes every
-runtime completion decide exactly one monitor outcome at control, then either
-commit `outcome → prompt → cooked line` while monitor is Current Console or
-discard that monitor-only outcome for a raw VM-Console route.
+M9 T48 S7 is active: [Presenter completion hardening]
+(../proposals/m9-t48-s7-presenter-completion-hardening.md). It verifies the
+one-way component/broker lifecycle: all facts re-enter control, stale facts
+cannot mutate a newer run, and Window close remains a control request.
 
 ## Current Technical Baseline
 
@@ -31,6 +30,10 @@ discard that monitor-only outcome for a raw VM-Console route.
   is now an actuator/copy adapter and command session no longer mirrors machine
   state; fresh x64/x86 CTest each passed 33/33. See [S5 history]
   (../history/M9-T48-S5-control-state-ownership.md).
+
+- M9 T48 S6 closes the completion-owned monitor transaction and its raw-route
+  discard rule; focused x64/x86 tests passed. See [S6 history]
+  (../history/M9-T48-S6-monitor-completion-transaction.md).
 
 - M9 T48 S2 closes after owner acceptance. Generic Win32 Window geometry now
   keeps the copied-frame aspect through drag, system resize, and maximum
