@@ -1,5 +1,7 @@
 #include "lib/ux-base/mailbox.h"
 
+#include <string.h>
+
 static void ux_component_mailboxes_lock(atomic_flag *lock)
 {
     while (atomic_flag_test_and_set_explicit(lock, memory_order_acquire)) { }

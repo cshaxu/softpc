@@ -4,6 +4,8 @@
 #include "lib/ux-base/frame_interface.h"
 #include "lib/ux-base/mailbox_wake.h"
 
+#include <stdatomic.h>
+
 #define UX_COMPONENT_CONTROL_CAPACITY 32u
 #define UX_COMPONENT_CONTROL_STORAGE_CAPACITY (UX_COMPONENT_CONTROL_CAPACITY + 1u)
 #define UX_COMPONENT_WINDOW_TITLE_CAPACITY 128u

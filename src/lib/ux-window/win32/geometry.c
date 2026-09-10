@@ -2,7 +2,7 @@
 
 #ifdef _WIN32
 int ux_win32_display_rect(int client_width, int client_height,
-    uint32_t source_width, uint32_t source_height, RECT *display)
+    lib_u32 source_width, lib_u32 source_height, RECT *display)
 {
     if (display == NULL || source_width == 0u || source_height == 0u ||
         client_width <= 0 || client_height <= 0) return 0;
@@ -14,7 +14,7 @@ int ux_win32_display_rect(int client_width, int client_height,
 }
 
 void ux_win32_map_dirty_rect(const RECT *source, const RECT *display,
-    uint32_t source_width, uint32_t source_height, RECT *target)
+    lib_u32 source_width, lib_u32 source_height, RECT *target)
 {
     int width;
     int height;
@@ -49,15 +49,15 @@ int ux_win32_fit_outer_rect(const RECT *work_area, int desired_width,
     width = desired_width;
     height = desired_height;
     if (width > available_width || height > available_height) {
-        if ((uint64_t)available_width * (uint64_t)desired_height <=
-            (uint64_t)available_height * (uint64_t)desired_width) {
+        if ((lib_u64)available_width * (lib_u64)desired_height <=
+            (lib_u64)available_height * (lib_u64)desired_width) {
             width = available_width;
-            height = (int)((uint64_t)width * (uint64_t)desired_height /
-                (uint64_t)desired_width);
+            height = (int)((lib_u64)width * (lib_u64)desired_height /
+                (lib_u64)desired_width);
         } else {
             height = available_height;
-            width = (int)((uint64_t)height * (uint64_t)desired_width /
-                (uint64_t)desired_height);
+            width = (int)((lib_u64)height * (lib_u64)desired_width /
+                (lib_u64)desired_height);
         }
         if (width <= 0 || height <= 0) return 0;
     }
@@ -87,12 +87,12 @@ int ux_win32_fit_client_size(const RECT *work_area, int decoration_width,
         return 1;
     }
     return ux_win32_fit_aspect_size(available_width, available_height,
-        (uint32_t)desired_width, (uint32_t)desired_height, fitted_width,
+        (lib_u32)desired_width, (lib_u32)desired_height, fitted_width,
         fitted_height);
 }
 
 int ux_win32_fit_aspect_size(int available_width, int available_height,
-    uint32_t source_width, uint32_t source_height, int *fitted_width,
+    lib_u32 source_width, lib_u32 source_height, int *fitted_width,
     int *fitted_height)
 {
     int width;
@@ -101,13 +101,13 @@ int ux_win32_fit_aspect_size(int available_width, int available_height,
     if (available_width <= 0 || available_height <= 0 || source_width == 0u ||
         source_height == 0u || fitted_width == NULL || fitted_height == NULL)
         return 0;
-    if ((uint64_t)available_width * source_height <=
-        (uint64_t)available_height * source_width) {
+    if ((lib_u64)available_width * source_height <=
+        (lib_u64)available_height * source_width) {
         width = available_width;
-        height = (int)((uint64_t)width * source_height / source_width);
+        height = (int)((lib_u64)width * source_height / source_width);
     } else {
         height = available_height;
-        width = (int)((uint64_t)height * source_width / source_height);
+        width = (int)((lib_u64)height * source_width / source_height);
     }
     if (width <= 0 || height <= 0) return 0;
     *fitted_width = width;
@@ -128,8 +128,8 @@ static int ux_win32_window_decoration(HWND window, int *width, int *height)
     return *width >= 0 && *height >= 0;
 }
 
-int ux_win32_enforce_client_aspect(HWND window, uint32_t source_width,
-    uint32_t source_height)
+int ux_win32_enforce_client_aspect(HWND window, lib_u32 source_width,
+    lib_u32 source_height)
 {
     RECT client;
     int decoration_width;
@@ -150,8 +150,8 @@ int ux_win32_enforce_client_aspect(HWND window, uint32_t source_width,
         SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE) != FALSE;
 }
 
-int ux_win32_maximize_client(HWND window, uint32_t source_width,
-    uint32_t source_height)
+int ux_win32_maximize_client(HWND window, lib_u32 source_width,
+    lib_u32 source_height)
 {
     MONITORINFO monitor_info;
     HMONITOR monitor;
@@ -187,8 +187,8 @@ int ux_win32_maximize_client(HWND window, uint32_t source_width,
         outer_width, outer_height, SWP_NOZORDER | SWP_NOACTIVATE) != FALSE;
 }
 
-int ux_win32_resize_client(HWND window, uint32_t width,
-    uint32_t height)
+int ux_win32_resize_client(HWND window, lib_u32 width,
+    lib_u32 height)
 {
     RECT outer;
     MONITORINFO monitor_info;
@@ -221,7 +221,7 @@ int ux_win32_resize_client(HWND window, uint32_t width,
 }
 
 void ux_win32_constrain_sizing(HWND window, WPARAM edge,
-    RECT *outer, uint32_t source_width, uint32_t source_height)
+    RECT *outer, lib_u32 source_width, lib_u32 source_height)
 {
     RECT current_window;
     RECT current_client;
@@ -246,17 +246,17 @@ void ux_win32_constrain_sizing(HWND window, WPARAM edge,
     client_height = target_height - frame_height;
     if (client_width <= 0 || client_height <= 0) return;
     if (edge == WMSZ_LEFT || edge == WMSZ_RIGHT) {
-        client_height = (int)((uint64_t)client_width * source_height /
+        client_height = (int)((lib_u64)client_width * source_height /
             source_width);
     } else if (edge == WMSZ_TOP || edge == WMSZ_BOTTOM) {
-        client_width = (int)((uint64_t)client_height * source_width /
+        client_width = (int)((lib_u64)client_height * source_width /
             source_height);
-    } else if ((uint64_t)client_width * source_height >=
-        (uint64_t)client_height * source_width) {
-        client_height = (int)((uint64_t)client_width * source_height /
+    } else if ((lib_u64)client_width * source_height >=
+        (lib_u64)client_height * source_width) {
+        client_height = (int)((lib_u64)client_width * source_height /
             source_width);
     } else {
-        client_width = (int)((uint64_t)client_height * source_width /
+        client_width = (int)((lib_u64)client_height * source_width /
             source_height);
     }
     target_width = client_width + frame_width;

@@ -5,6 +5,8 @@
 #include "lib/ux-base/win32/mailbox_wake.h"
 
 #include <windows.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct ux_console_win32_state {
     HANDLE worker;

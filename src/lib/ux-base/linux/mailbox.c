@@ -2,6 +2,8 @@
 #include "lib/ux-base/mailbox_wake.h"
 #include "lib/ux-base/linux/mailbox_wake.h"
 
+#include <stdlib.h>
+
 struct ux_mailbox_wake {
     int read_fd;
     int write_fd;

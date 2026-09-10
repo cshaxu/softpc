@@ -1,5 +1,8 @@
 #include "lib/base/console.h"
 
+#include <stdatomic.h>
+#include <stdlib.h>
+
 struct lib_console {
     atomic_flag lock;
     /* Serializes sink replacement against an in-flight copied event callback.

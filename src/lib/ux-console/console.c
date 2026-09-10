@@ -1,5 +1,7 @@
 #include "lib/ux-console/console.h"
 
+#include <stdlib.h>
+
 static void ux_console_dispose(ux_console *console)
 {
     if (console == LIB_NULL) return;

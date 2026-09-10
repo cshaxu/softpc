@@ -3,6 +3,8 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <stdlib.h>
+#include <string.h>
 
 struct host_console_backend {
     HANDLE input;

@@ -1,5 +1,7 @@
 #include "lib/ux-base/hotkey_interface.h"
 
+#include <string.h>
+
 static lib_u8 ux_hotkey_modifier_bit(ux_key key)
 {
     if (key == UX_HOTKEY_KEY_CONTROL) return UX_HOTKEY_MODIFIER_CONTROL;

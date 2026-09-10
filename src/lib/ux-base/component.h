@@ -4,6 +4,8 @@
 #include "lib/ux-base/component_interface.h"
 #include "lib/ux-base/mailbox.h"
 
+#include <stdatomic.h>
+
 typedef void (*ux_component_native_stop_fn)(ux_component *component);
 typedef void (*ux_component_dispose_fn)(ux_component *component);
 

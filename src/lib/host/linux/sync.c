@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <sched.h>
+#include <stdlib.h>
 #include <time.h>
 
 struct host_sync_event {

@@ -27,12 +27,12 @@ typedef struct ux_win32_window_context {
     HDC surface_dc;
     HBITMAP surface_bitmap;
     HGDIOBJ surface_previous_bitmap;
-    uint32_t *surface_pixels;
-    uint32_t surface_width;
-    uint32_t surface_height;
-    uint32_t graphics_palette[UX_GRAPHICS_PALETTE_ENTRIES];
+    lib_u32 *surface_pixels;
+    lib_u32 surface_width;
+    lib_u32 surface_height;
+    lib_u32 graphics_palette[UX_GRAPHICS_PALETTE_ENTRIES];
     int graphics_valid;
-    uint32_t displayed_sequence;
+    lib_u32 displayed_sequence;
     ux_win32_keyboard_normalizer keyboard_normalizer;
     int left_button;
     int right_button;
@@ -41,8 +41,8 @@ typedef struct ux_win32_window_context {
     lib_u32 pending_mouse_buttons;
     int mouse_delivery_posted;
     ux_win32_mouse mouse;
-    uint32_t client_surface_width;
-    uint32_t client_surface_height;
+    lib_u32 client_surface_width;
+    lib_u32 client_surface_height;
     int client_width;
     int client_height;
     lib_bool correcting_aspect;
@@ -179,7 +179,7 @@ static void win32_window_destroy_surface(ux_win32_window_context *context)
 }
 
 static int win32_window_ensure_surface(HWND window,
-    ux_win32_window_context *context, uint32_t width, uint32_t height)
+    ux_win32_window_context *context, lib_u32 width, lib_u32 height)
 {
     BITMAPINFO info;
     HDC dc;
@@ -214,12 +214,12 @@ static int win32_window_ensure_surface(HWND window,
     context->surface_height = height;
     context->graphics_valid = 0;
     memset(context->surface_pixels, 0,
-        (size_t)width * height * sizeof(*context->surface_pixels));
+        (lib_size)width * height * sizeof(*context->surface_pixels));
     return 1;
 }
 
 static int win32_window_display_rect(const ux_win32_window_context *context,
-    uint32_t source_width, uint32_t source_height, RECT *display)
+    lib_u32 source_width, lib_u32 source_height, RECT *display)
 {
     return context != NULL && ux_win32_display_rect(context->client_width,
         context->client_height, source_width, source_height, display);
@@ -248,7 +248,7 @@ static void win32_window_enforce_aspect(HWND window,
 }
 
 static void win32_window_resize_client(HWND window,
-    ux_win32_window_context *context, uint32_t width, uint32_t height)
+    ux_win32_window_context *context, lib_u32 width, lib_u32 height)
 {
     if (window == NULL || context == NULL || width == 0u || height == 0u ||
         (context->client_surface_width == width &&
@@ -258,8 +258,8 @@ static void win32_window_resize_client(HWND window,
     context->client_surface_height = height;
 }
 
-static int win32_window_frame_size(const ux_frame *frame, uint32_t *width,
-    uint32_t *height)
+static int win32_window_frame_size(const ux_frame *frame, lib_u32 *width,
+    lib_u32 *height)
 {
     if (!ux_frame_is_valid(frame) || width == NULL || height == NULL) return 0;
     if (frame->graphics != 0u) {
@@ -275,27 +275,27 @@ static int win32_window_frame_size(const ux_frame *frame, uint32_t *width,
 static void win32_window_update_text(ux_win32_window_context *context)
 {
     ux_frame *frame;
-    uint32_t row;
+    lib_u32 row;
 
     if (context == NULL || context->surface_pixels == NULL ||
         (frame = context->frame) == NULL || frame->graphics != 0u) return;
-    memset(context->surface_pixels, 0, (size_t)context->surface_width *
+    memset(context->surface_pixels, 0, (lib_size)context->surface_width *
         context->surface_height * sizeof(*context->surface_pixels));
     for (row = 0u; row < frame->text_rows; ++row) {
-        uint32_t column;
+        lib_u32 column;
         for (column = 0u; column < frame->text_columns; ++column) {
-            size_t index = (size_t)row * UX_TEXT_COLUMNS + column;
+            lib_size index = (lib_size)row * UX_TEXT_COLUMNS + column;
             lib_u8 character = frame->text[index];
             lib_u16 attribute = frame->attributes[index];
-            uint32_t scan;
+            lib_u32 scan;
             for (scan = 0u; scan < WIN32_WINDOW_TEXT_CELL_HEIGHT; ++scan) {
                 const lib_u8 *font = frame->attribute_font_select != 0u &&
                     (attribute & 0x08u) != 0u ? frame->secondary_font : frame->font;
-                lib_u8 bits = font[(size_t)character * 16u + scan];
-                uint32_t *pixels = context->surface_pixels +
-                    ((size_t)row * WIN32_WINDOW_TEXT_CELL_HEIGHT + scan) *
+                lib_u8 bits = font[(lib_size)character * 16u + scan];
+                lib_u32 *pixels = context->surface_pixels +
+                    ((lib_size)row * WIN32_WINDOW_TEXT_CELL_HEIGHT + scan) *
                     context->surface_width + column * WIN32_WINDOW_TEXT_CELL_WIDTH;
-                uint32_t bit;
+                lib_u32 bit;
                 for (bit = 0u; bit < WIN32_WINDOW_TEXT_CELL_WIDTH; ++bit)
                     pixels[bit] = frame->text_palette[
                         (bits & (0x80u >> bit)) != 0u ? attribute & 0x0fu :
@@ -310,11 +310,11 @@ static int win32_window_update_graphics(ux_win32_window_context *context,
 {
     ux_frame *frame;
     int full_refresh;
-    int32_t left;
-    int32_t top;
-    int32_t right;
-    int32_t bottom;
-    uint32_t row;
+    lib_i32 left;
+    lib_i32 top;
+    lib_i32 right;
+    lib_i32 bottom;
+    lib_u32 row;
 
     if (context == NULL || context->surface_pixels == NULL || changed == NULL ||
         (frame = context->frame) == NULL || frame->graphics == 0u ||
@@ -324,18 +324,18 @@ static int win32_window_update_graphics(ux_win32_window_context *context,
         frame->graphics_palette, sizeof(context->graphics_palette)) != 0;
     left = full_refresh ? 0 : frame->dirty_left;
     top = full_refresh ? 0 : frame->dirty_top;
-    right = full_refresh ? (int32_t)frame->graphics_width - 1 : frame->dirty_right;
-    bottom = full_refresh ? (int32_t)frame->graphics_height - 1 : frame->dirty_bottom;
+    right = full_refresh ? (lib_i32)frame->graphics_width - 1 : frame->dirty_right;
+    bottom = full_refresh ? (lib_i32)frame->graphics_height - 1 : frame->dirty_bottom;
     if (left < 0) left = 0;
     if (top < 0) top = 0;
-    if (right >= (int32_t)frame->graphics_width) right = (int32_t)frame->graphics_width - 1;
-    if (bottom >= (int32_t)frame->graphics_height) bottom = (int32_t)frame->graphics_height - 1;
+    if (right >= (lib_i32)frame->graphics_width) right = (lib_i32)frame->graphics_width - 1;
+    if (bottom >= (lib_i32)frame->graphics_height) bottom = (lib_i32)frame->graphics_height - 1;
     if (right < left || bottom < top) return 0;
-    for (row = (uint32_t)top; row <= (uint32_t)bottom; ++row) {
+    for (row = (lib_u32)top; row <= (lib_u32)bottom; ++row) {
         const lib_u8 *source = frame->graphics_pixels + row * frame->graphics_stride;
-        uint32_t *destination = context->surface_pixels + row * context->surface_width;
-        uint32_t column;
-        for (column = (uint32_t)left; column <= (uint32_t)right; ++column)
+        lib_u32 *destination = context->surface_pixels + row * context->surface_width;
+        lib_u32 column;
+        for (column = (lib_u32)left; column <= (lib_u32)right; ++column)
             destination[column] = frame->graphics_palette[source[column]];
     }
     memcpy(context->graphics_palette, frame->graphics_palette,
@@ -357,7 +357,7 @@ static int win32_window_cursor_rect(HWND window,
     int height;
     int cell_height;
     int cursor_height;
-    uint32_t cursor_percent;
+    lib_u32 cursor_percent;
 
     if (window == NULL || context == NULL || cursor == NULL ||
         (frame = context->frame) == NULL || !ux_frame_is_valid(frame) ||
@@ -544,8 +544,8 @@ static void win32_window_capture_mouse(HWND window,
 static void win32_window_consume_frame(HWND window,
     ux_win32_window_context *context)
 {
-    uint32_t width;
-    uint32_t height;
+    lib_u32 width;
+    lib_u32 height;
 
     if (context == NULL || context->component == LIB_NULL ||
         !ux_component_mailboxes_capture_frame(&context->component->base.mailboxes,
@@ -672,7 +672,7 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         return 0;
     case WM_CHAR:
         if (win32_window_accepting_guest_input(context) &&
-            ((uint32_t)lparam >> 16u & 0xffu) == 0u &&
+            ((lib_u32)lparam >> 16u & 0xffu) == 0u &&
             !ux_win32_keyboard_consume_duplicate_character(&context->keyboard_normalizer,
                 (WORD)wparam))
             (void)ux_win32_keyboard_submit_utf16(&context->keyboard_normalizer,

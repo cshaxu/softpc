@@ -2,6 +2,9 @@
 #include "lib/host/console_interface.h"
 #include "lib/host/console_backend.h"
 
+#include <stdatomic.h>
+#include <stdlib.h>
+
 struct host_console_broker {
     atomic_flag lock;
     host_console_backend *backend;

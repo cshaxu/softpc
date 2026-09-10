@@ -1,6 +1,8 @@
 #include "lib/ux-base/mailbox_wake.h"
 #include "lib/ux-base/win32/mailbox_wake.h"
 
+#include <stdlib.h>
+
 #ifdef _WIN32
 #include <windows.h>
 
