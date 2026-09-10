@@ -2,11 +2,10 @@
 
 ## Current Work
 
-M9 T49 S2 is active: [Strict shared-library warning contract]
-(../proposals/m9-t49-s2-lib-strict-boundaries.md). It clears the independently
-reproduced strict-warning failures solely inside shared-library targets; type
-boundary, neutral-language, and Linux-CMake hygiene remain separately planned
-as T49 S3–S5.
+M9 T49 S3 is active: [Shared-library type boundary]
+(../proposals/m9-t49-s3-lib-type-boundary.md). It removes accidental public
+standard-library dependencies and makes library-owned scalar state use neutral
+`lib_*` aliases without changing application, outer-host, or MVDM behavior.
 
 ## Current Technical Baseline
 
@@ -20,6 +19,12 @@ as T49 S3–S5.
   from `src/mvdm/softpc.new/roms/`; no runtime ROM artifact root is active.
 
 ## Recent Governance
+
+- M9 T49 S2 closes after independently strict-building the reusable corpus.
+  The union initialization, Win32 wait-array, and Window startup lifetime
+  diagnostics are repaired; standalone strict x64 plus root strict-lib x64/x86
+  CTest each passed. See [S2 history]
+  (../history/M9-T49-S2-lib-strict-boundaries.md).
 
 - M9 T49 S1 closes after owner acceptance. Console graphics status now reuses
   the monitor's exact running-hotkey text with one source of truth; x64 full

@@ -41,3 +41,12 @@ alter public type ownership, wording, or Linux dependency policy.
 
 The reusable corpus passes strict compilation and retains exact runtime
 semantics; all other shared-library hygiene changes remain separately planned.
+
+## Completion evidence
+
+- The standalone GCC x64 library build completed with
+  `-Wall -Wextra -Wpedantic -Werror`, including the checked-in manifest test.
+- Root x64 and x86 builds used `LIBRARY_STRICT_WARNINGS=ON`; each full CTest
+  run passed 34/34, excluding only the owner-configured package smoke.
+- The package pair was refreshed. `9329d3a` contains the implementation and
+  was pushed before closure.
