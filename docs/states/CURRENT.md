@@ -2,10 +2,13 @@
 
 ## Current Work
 
-M9 T48 S3 is active: [Paused monitor prompt completion]
-(../proposals/m9-t48-s3-paused-monitor-prompt.md). It makes settled lifecycle
-outcomes publish through the Current monitor as `outcome → prompt → cooked
-line`, including the missing paused prompt and monitor-route start/resume text.
+M9 T48 S4 is active: [Control / runtime / presenter decoupling]
+(../proposals/m9-t48-s4-control-runtime-presenter-decoupling.md). It makes
+SoftPC control the sole product-state writer: monitor, UX, runtime, component,
+and broker facts enter one control queue; control independently derives runtime
+commands and presenter/broker work. Runtime owns reset as an atomic command
+and reports `RESET_COMPLETED`; control neither scripts nor exposes reset's
+internal stages.
 
 ## Current Technical Baseline
 
@@ -20,9 +23,9 @@ line`, including the missing paused prompt and monitor-route start/resume text.
 
 ## Recent Governance
 
-- M9 T48 S3 is active. It makes the accepted lifecycle completion path one
-  transaction: a settled monitor-route outcome, then a fresh prompt, then a
-  cooked line after the monitor is Current Console.
+- M9 T48 S4 supersedes the remaining S3 lifecycle-outcome work. S3 P1's
+  monitor output transaction remains baseline evidence, but its command-origin
+  classification is replaced by S4's completion-driven control reducer.
 
 - M9 T48 S2 closes after owner acceptance. Generic Win32 Window geometry now
   keeps the copied-frame aspect through drag, system resize, and maximum

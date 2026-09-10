@@ -57,9 +57,11 @@ presenter / broker completion ────────────────�
   control requests, then derives independently:
   1. the next runtime command; and
   2. the required presenter set, component controls, and Current Console.
-- A reset is a control-private lifecycle plan (`stop → cold start → pause`).
-  It exists only to select the next runtime command and classify its internal
-  completions. It is not a presenter intent and is never exposed to lib UX.
+- Reset is an atomic runtime command. Control submits `RESET` exactly as it
+  submits `START`, `PAUSE`, `RESUME`, and `STOP`; runtime owns its cold-reset
+  sequence and emits one copied `RESET_COMPLETED` fact with its final public
+  state. Control does not observe or invent reset-internal `STOPPED`/
+  `RUNNING` stages, and never exposes them to presenters or monitor output.
 - A runtime completion is the sole trigger for a human-facing lifecycle
   outcome. Once monitor is actual Current Console, control atomically orders:
   `outcome text → SoftPC> → request cooked line`. Raw VM-Console running routes
@@ -67,17 +69,18 @@ presenter / broker completion ────────────────�
 
 ## Required migration
 
-1. Retire `app_reconciler_intent` as the shared VM/presenter control token.
-   Replace it with a control-owned lifecycle request/plan consumed only to
-   issue runtime commands.
+1. Retire `app_reconciler_intent` as a shared VM/presenter control token. A
+   control-internal derived result may select the next runtime command, but it
+   is not an app-facing interface and cannot encode presenter work.
 2. Make presenter reconciliation a pure derivation of configuration, actual
    runtime state, copied frame route, Window-close fact, component completions,
    and broker completions. It must not receive a lifecycle request.
 3. Route every registered hotkey—Window and VM Console alike—through the same
    control request reducer. Hotkey receipt produces no monitor status text.
 4. Classify `RUNNING` by prior stable control state, not command provenance:
-   `INIT|STOPPED → started`, `PAUSED → resumed`; retain reset's internal-stage
-   suppression. Handle paused, stopped, and error by the same outcome path.
+   `INIT|STOPPED → started`, `PAUSED → resumed`. Classify the runtime's
+   explicit `RESET_COMPLETED` fact as the reset outcome. Handle paused,
+   stopped, reset, and error by the same outcome path.
 5. Preserve all existing shared-lib contracts. This is app orchestration work;
    no new product semantics enter `lib/`.
 
@@ -86,8 +89,9 @@ presenter / broker completion ────────────────�
 - Deterministic fake-driven control tests cover monitor and both UX sources for
   pause/resume, including CAP; prove only a runtime completion emits status.
 - Prove `INIT|STOPPED → RUNNING` emits `Machine started.`, `PAUSED → RUNNING`
-  emits `Machine resumed.`, reset suppresses internal completions, and error
-  returns monitor text/prompt.
+  emits `Machine resumed.`, runtime `RESET_COMPLETED` emits the reset outcome
+  without any control-synthesized intermediate state, and error returns
+  monitor text/prompt.
 - Prove raw VM Console routes never emit a delayed monitor running outcome;
   monitor routes order outcome, prompt, then cooked-line request.
 - Prove no presenter callback and no runtime callback can call another
