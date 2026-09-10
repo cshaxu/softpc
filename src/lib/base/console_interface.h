@@ -21,7 +21,7 @@ typedef enum lib_console_event_kind {
 } lib_console_event_kind;
 
 /* Copied native raw-Console modifier state.  These bits describe this input
- * record only; they do not encode a product hotkey or guest protocol. */
+ * record only; they do not encode a product hotkey or application protocol. */
 enum {
     LIB_CONSOLE_MODIFIER_CONTROL = 0x01u,
     LIB_CONSOLE_MODIFIER_ALT = 0x02u,
@@ -48,9 +48,9 @@ typedef struct lib_console_line {
     char text[LIB_CONSOLE_LINE_MAX];
 } lib_console_line;
 
-/* Copied guest-text output for a logical Console. It is deliberately a
+/* Copied text output for a logical Console. It is deliberately a
  * Console value rather than a UX/window frame: native host renderers consume
- * it without learning a machine or Window protocol. Palette values use
+ * it without learning an application or Window protocol. Palette values use
  * 0x00RRGGBB. */
 typedef struct lib_console_text_frame {
     lib_u16 columns;

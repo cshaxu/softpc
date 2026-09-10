@@ -64,11 +64,11 @@ static int win32_window_accepting_input(const ux_win32_window_context *context)
         atomic_load_explicit(&context->component->base.stopping, memory_order_acquire) == 0;
 }
 
-/* Frozen is an application-requested guest-input boundary. It is deliberately
+/* Frozen is an application-requested content-input boundary. It is deliberately
  * separate from component lifetime: Window close and capture-release cleanup
  * still use accepting_input(). Native key transitions still reach ux-base's
  * generic matcher so a registered product hotkey can be delivered. */
-static int win32_window_accepting_guest_input(
+static int win32_window_accepting_content_input(
     const ux_win32_window_context *context)
 {
     return win32_window_accepting_input(context) &&
@@ -78,7 +78,7 @@ static int win32_window_accepting_guest_input(
 static int win32_window_emit(ux_win32_window_context *context,
     const ux_input_event *event)
 {
-    return !win32_window_accepting_guest_input(context) ? 0 :
+    return !win32_window_accepting_content_input(context) ? 0 :
         ux_component_emit(&context->component->base, event);
 }
 
@@ -459,7 +459,7 @@ static void win32_window_emit_mouse(ux_win32_window_context *context,
 {
     ux_event event = { 0 };
 
-    if (!win32_window_accepting_guest_input(context)) return;
+    if (!win32_window_accepting_content_input(context)) return;
     event.type = UX_EVENT_MOUSE;
     event.data.mouse.delta_x = dx;
     event.data.mouse.delta_y = dy;
@@ -501,7 +501,7 @@ static void win32_window_mouse(HWND window, ux_win32_window_context *context,
     int dx = 0;
     int dy = 0;
 
-    if (!win32_window_accepting_guest_input(context) ||
+    if (!win32_window_accepting_content_input(context) ||
         !ux_win32_mouse_move(&context->mouse, position, context->client_width,
             context->client_height, context->surface_width, context->surface_height,
             &dx, &dy)) return;
@@ -517,7 +517,7 @@ static void win32_window_release_mouse(ux_win32_window_context *context)
 {
     if (context == NULL) return;
     win32_window_flush_mouse(context);
-    /* left/right_button is guest state only.  A real guest press must never
+    /* left/right_button is content state only. A real content press must never
      * survive a host capture release, whereas the host-only capture gesture
      * leaves both bits clear and therefore emits nothing here. */
     if ((context->left_button || context->right_button) &&
@@ -535,7 +535,7 @@ static void win32_window_release_mouse(ux_win32_window_context *context)
 static void win32_window_capture_mouse(HWND window,
     ux_win32_window_context *context, LPARAM position)
 {
-    if (!win32_window_accepting_guest_input(context))
+    if (!win32_window_accepting_content_input(context))
         return;
     if (!ux_win32_mouse_capture(&context->mouse, window, position)) return;
     win32_window_set_client_cursor(context, 1);
@@ -671,7 +671,7 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
             win32_window_transition(context, wparam, lparam, 1);
         return 0;
     case WM_CHAR:
-        if (win32_window_accepting_guest_input(context) &&
+        if (win32_window_accepting_content_input(context) &&
             ((lib_u32)lparam >> 16u & 0xffu) == 0u &&
             !ux_win32_keyboard_consume_duplicate_character(&context->keyboard_normalizer,
                 (WORD)wparam))
@@ -690,8 +690,8 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         }
         break;
     case WM_LBUTTONDOWN:
-        if (!win32_window_accepting_guest_input(context)) return 0;
-        /* The first client click is the host-only capture gesture.  Guest
+        if (!win32_window_accepting_content_input(context)) return 0;
+        /* The first client click is the host-only capture gesture. Content
          * button state starts only with a later click while already captured. */
         if (!ux_win32_mouse_captured(&context->mouse)) {
             win32_window_capture_mouse(window, context, lparam);
@@ -702,8 +702,8 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         win32_window_mouse(window, context, lparam, 1);
         return 0;
     case WM_LBUTTONUP:
-        if (!win32_window_accepting_guest_input(context)) return 0;
-        /* A button which was never made guest-visible is the matching
+        if (!win32_window_accepting_content_input(context)) return 0;
+        /* A button which was never made content-visible is the matching
          * release of the host-only capture gesture. */
         if (!ux_win32_mouse_captured(&context->mouse) || !context->left_button)
             return 0;
@@ -712,7 +712,7 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         win32_window_mouse(window, context, lparam, 1);
         return 0;
     case WM_RBUTTONDOWN:
-        if (!win32_window_accepting_guest_input(context)) return 0;
+        if (!win32_window_accepting_content_input(context)) return 0;
         if (!ux_win32_mouse_captured(&context->mouse)) {
             win32_window_capture_mouse(window, context, lparam);
             return 0;
@@ -722,7 +722,7 @@ static LRESULT CALLBACK win32_window_proc(HWND window, UINT message,
         win32_window_mouse(window, context, lparam, 1);
         return 0;
     case WM_RBUTTONUP:
-        if (!win32_window_accepting_guest_input(context)) return 0;
+        if (!win32_window_accepting_content_input(context)) return 0;
         if (!ux_win32_mouse_captured(&context->mouse) || !context->right_button)
             return 0;
         win32_window_flush_mouse(context);
@@ -783,7 +783,7 @@ static DWORD WINAPI ux_window_worker(void *opaque)
     klass.hInstance = GetModuleHandleA(NULL);
     /* Client cursor selection is explicit in WM_SETCURSOR.  A class arrow
        would be restored by Windows (and, in practice, an RDP client) as the
-       pointer moves, defeating guest capture. */
+       pointer moves, defeating content capture. */
     klass.hCursor = NULL;
     klass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
     klass.lpszClassName = "LibUxWindow";

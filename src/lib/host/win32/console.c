@@ -193,7 +193,7 @@ static lib_status host_console_start_reader(host_console_backend *backend)
     return LIB_STATUS_OK;
 }
 
-/* The native raw VM Console is the input surface.  This historical behavior
+/* The native raw Console is the input surface. This behavior
  * is coupled to successful raw activation rather than exposed as a product
  * API: the broker owns the one process Console handle and knows whether a
  * live raw reader exists.  Cooked activation intentionally does not make a
