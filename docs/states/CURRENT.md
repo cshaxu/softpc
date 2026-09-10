@@ -2,8 +2,10 @@
 
 ## Current Work
 
-No implementation subtask is active. M9 T49 has closed after its admitted
-shared-library quality sequence (S1–S5).
+M9 T49 is reopened at S6: [shared-library neutral corpus prose]
+(../proposals/m9-t49-s6-lib-neutral-corpus-prose.md). It extends the existing
+product-neutral vocabulary boundary to every checked-in `src/lib/` C, header,
+and README file, without changing library behavior or public API.
 
 ## Current Technical Baseline
 
