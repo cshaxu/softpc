@@ -68,6 +68,54 @@ static gate when practical. Hits outside scope are explicitly transferred to
 `TODO.md` with priority and an admission condition; they are never silently
 ignored.
 
+## Completion Audit, Coverage, And P Discipline
+
+An implementation P is a complete, pushed executor delivery for its admitted
+S: implementation, focused proof, required regression, evidence, and
+similar-issue disposition travel together. It is not a planning marker or a
+partial local vector. After that push, the coordinator independently reviews
+the actual changed paths against the packet, authorities, and evidence; only a
+truthful status/history closure may follow as the next governance P.
+
+An S closes only after its exit criteria and applicable gates pass. A numeric T
+closes only after a separate T-level audit maps the original owner request,
+every admitted S, relevant open TODO/Queue transfers, changed production path,
+and applicable full regression evidence to its stated completion standard. A
+passing narrow test, artifact build, or one S is never evidence that a T is
+closed.
+
+Any task claiming complete, all, closure, audit, qualification, or another
+whole-domain result first records a finite convergence ledger in its proposal
+or named evidence. The ledger defines its frozen universe, unit of coverage,
+permitted dispositions, proof/receiver for every member, and completion
+predicate. A discovery may refine the ledger only with a recorded reason and
+disposition for affected members. This requirement does not turn a bounded
+repair into a whole-domain claim.
+
+Runnable-path verification names the actual focused and full regression
+evidence in its packet. x86/x64 build and test evidence remains required in
+proportion to the changed path; a task must not invent an unavailable external
+media/ROM integration gate merely to make a closure look stronger.
+
+## Changed-Path Accounting And Build Hygiene
+
+Every code-changing S records its counted tracked production and test paths,
+excluding documentation and generated/artifact paths. At closure it reports
+added, removed, and net lines using a reproducible diff method; it identifies
+the retained production path/state owner and either removes obsolete or
+duplicate paths in scope or records each retained path's distinct reason and
+receiver. Non-positive net code is a design preference, not permission to
+delete correct necessary behavior.
+
+`build/` is disposable evidence space. After a completed or failed owned
+build, test, smoke, or diagnostic run, remove no-longer-needed owned children
+of `build/` only after resolving their path below `build/`, excluding
+`build/output/`, and stopping processes that hold them. Never clean user
+configuration, guest media, or a path not owned by the active packet. A raw
+trace/recording requires a packet-declared ignored path, size/time/no-progress
+budget, process cleanup owner, and retained checkpoint; it is never committed
+as a fixture or product input.
+
 ## User Package Configuration
 
 `assets/binary/softpc.ini` is user-owned package configuration. An agent

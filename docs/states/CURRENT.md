@@ -2,7 +2,7 @@
 
 ## Current Work
 
-No implementation subtask is active.
+M9 Td S9 is active: execution closure quality.
 
 ## Current Technical Baseline
 
@@ -42,3 +42,24 @@ No implementation subtask is active.
 - **M9 Td S8:** Source provenance, research, legacy-material, and
   license-decision boundaries are now explicit and verifier-backed.
   [Record](../history/M9-Td-S8-source-research-policy.md)
+
+## M9 Td S9 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Governance |
+| Admission And Approval | Owner-approved automatic sequential governance route: raise SoftPC to NXVM-level governance. |
+| Objective | Strengthen future-task closure, coverage, cleanup, and actual-review requirements to the relevant NXVM standard. |
+| Non-goals | No product, MVDM, lib ABI, package, CI behavior, or fictional external integration requirement. |
+| Reference Baseline | NXVM `docs/rules/EXECUTION.md`; current SoftPC execution/documentation rules and verifier. |
+| Candidate Proposal | [M9 Td S9 execution closure quality](../proposals/m9-td-s9-execution-closure-quality.md). |
+| Files And ABI Surface | `docs/rules/EXECUTION.md`, `tools/Verify-DocumentationGovernance.cmake`, state/history records; no runtime ABI. |
+| Applicable Rules | Execution, Documentation Rules. |
+| Verification | Governance gate and self-test; manual authority/diff review against scoped NXVM rules. |
+| Expected Markers | T-level closure audit, coverage-ledger condition, complete P, source/test-path accounting, build-tree hygiene. |
+| Asset Needs | None. |
+| Reporting Requirements | Record exact adopted rules, structural gate coverage, and intentionally non-imported NXVM policy. |
+| Stop Conditions | Stop before altering product code, runtime acceptance, package artifacts, or creating a second documentation authority. |
+| Exit Criteria | Rules are concise, enforceable where mechanical, self-tested, pushed, and closure history records the actual review. |
+| Original Owner Request | Upgrade this repository's governance quality to NXVM level or higher. |
+| Similar-Issue Sweep | Compare all SoftPC execution-rule sections against NXVM headings; disposition every relevant stronger rule as adopted, already covered, or intentionally inapplicable. |
