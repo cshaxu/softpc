@@ -106,12 +106,44 @@ static void test_hotkey_completion_is_not_command_provenance(void)
     arm(&session, "Machine resumed");
 }
 
+static void test_raw_route_discards_running_outcome(void)
+{
+    app_command_session session;
+    app_command_effect effect;
+
+    app_command_session_initialize(&session, SOFTPC_PRESENTATION_CONSOLE);
+    app_command_session_submit_line(&session, APP_MONITOR_STOPPED, "start",
+        &effect);
+    assert(app_command_session_take_request(&session) ==
+        APP_LIFECYCLE_REQUEST_START);
+    app_command_session_note_runtime(&session, APP_MONITOR_STOPPED,
+        SOFTPC_RUNTIME_RUNNING, &effect);
+    /* The raw broker completion owns the decision to discard a monitor-only
+       running outcome. A later monitor current fact cannot replay it. */
+    app_command_session_note_broker(&session, APP_MONITOR_RUNNING, 1, 0);
+    app_command_session_note_monitor_current(&session, 1, &effect);
+    assert(!effect.arm_prompt && effect.text[0] == '\0');
+}
+
+static void test_error_returns_monitor_transaction(void)
+{
+    app_command_session session;
+    app_command_effect effect;
+
+    app_command_session_initialize(&session, SOFTPC_PRESENTATION_WINDOW);
+    app_command_session_note_runtime(&session, APP_MONITOR_RUNNING,
+        SOFTPC_RUNTIME_ERROR, &effect);
+    arm(&session, "Machine error");
+}
+
 int main(void)
 {
     app_command_session session;
     app_command_effect effect;
     run_matrix();
     test_hotkey_completion_is_not_command_provenance();
+    test_raw_route_discards_running_outcome();
+    test_error_returns_monitor_transaction();
     app_command_session_initialize(&session, SOFTPC_PRESENTATION_WINDOW);
     app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
         "floppy eject", &effect);
