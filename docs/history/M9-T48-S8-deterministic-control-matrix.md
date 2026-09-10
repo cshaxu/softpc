@@ -24,4 +24,3 @@ rejection.
 ## Closure
 
 The owner manually accepted the package behavior. S8 closes with `89be61c`.
-

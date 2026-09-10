@@ -50,4 +50,3 @@ components or another public API.
 
 Each shared component has a flat, self-explanatory private-header layout;
 the public ABI and allowed dependency graph remain unchanged and proven.
-
