@@ -2,8 +2,8 @@
 
 ## Current Work
 
-M9 T51 S2 is active: make the shared-library and every active SoftPC consumer
-rename in one atomic, buildable migration.
+M9 T51 S4 is active: perform whole-corpus verification and T51 closure audit
+against the normalized component graph.
 
 ## Current Technical Baseline
 
@@ -35,6 +35,14 @@ rename in one atomic, buildable migration.
   widths and passed 36/36 CTest at each width.
   [Record](../history/M9-T50-S3-dual-width-post-lib-proof.md)
 
+- **M9 T51 S2:** The entire library and every active SoftPC consumer moved in
+  one buildable rename to `types`, `console`, and `ui-*`; fixed x64/x86 CTest
+  each passed 36/36. [Record](../history/M9-T51-S2-lib-component-normalization.md)
+
+- **M9 T51 S3:** Current architecture, UI, source-layout, component README,
+  and executable boundary authority now agree on the normalized component DAG.
+  [Record](../history/M9-T51-S3-component-boundary-authority.md)
+
 ## Recent Governance
 
 - **M9 Td S6:** Console-object design was promoted to current architecture/UI
@@ -52,23 +60,23 @@ rename in one atomic, buildable migration.
   P discipline, path accounting, and build hygiene now match the relevant
   NXVM governance standard. [Record](../history/M9-Td-S9-execution-closure-quality.md)
 
-## M9 T51 S2 Packet
+## M9 T51 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approved T51’s full normalization plan and automatic sequential S admission; S1 ledger closure found one atomic migration is required to preserve a buildable root tree. |
-| Objective | Atomically rename the library to `types`, `console`, `host`, `storage`, `ui-base`, `ui-window`, and `ui-console`, and migrate every frozen SoftPC consumer, target, include path, and public `ux_*` ABI spelling. |
-| Non-goals | No behavior, lifecycle, threading, mailbox, MVDM, package, media, user `softpc.ini`, or Linux-support change; no compatibility alias, forwarding header, or duplicate old path. |
-| Reference Baseline | T51 S1 frozen ledger and closed T50 x86/x64 package proof; current source is the old `base`/`ux-*` corpus. |
+| Admission And Approval | Owner approved T51’s full normalization plan and automatic sequential S admission; S2 and S3 are completed and pushed. |
+| Objective | Verify the final normalized corpus, execute fresh fixed-width package/test proof, audit changed paths/assets/obsolete paths, and close T51 if every exit condition holds. |
+| Non-goals | No behavior, lifecycle, threading, mailbox, MVDM, configuration, media, Linux-support, or compatibility-path change. |
+| Reference Baseline | T51 S1 ledger, T51 S2/S3 records, and the normalized current architecture/source-layout authority. |
 | Candidate Proposal | [M9 T51 proposal](../proposals/m9-t51-lib-component-normalization.md) |
-| Files And ABI Surface | All 72 `src/lib` files, `src/app`, `src/host`, enumerated tests, root/library CMake, library manifest, source-boundary verifier, and the documentation-governance continuation self-test; public include paths and `ux_*` names intentionally become `types`/`console`/`ui-*`. |
+| Files And ABI Surface | No planned source/API change. Closure evidence may update active state/history and refresh agent-owned x86/x64 package executables. |
 | Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, and `DOCUMENT.md`; `src/mvdm/softpc.new/` remains immutable. |
-| Verification | `git mv`-based path audit; standalone library manifest build; root build/configure; old-name zero scan over the ledger scope; focused library/component tests and source-boundary gate. |
-| Expected Markers | No old directory, target, public include path, `ux_*` public ABI, or aggregate alias remains in the active corpus; root CMake names direct normalized targets. |
-| Asset Needs | Build output beneath owned `build/` paths and agent-owned `assets/binary/softpc32.exe` / `assets/binary/softpc64.exe` may refresh. `softpc.ini` and guest media are not modified in S2. |
-| Reporting Requirements | Record changed source/test paths and line accounting; identify each deleted aggregate/old path, direct app ABI consumer, remaining target link, and any migration discovery. |
-| Stop Conditions | Stop before behavior/API move if an undisclosed consumer, cycle, MVDM touchpoint, or public binary compatibility commitment is found. |
-| Exit Criteria | Every S1-ledger member uses the normalized path/name or is removed, the root and standalone library configure/build, no old path or target alias remains, focused tests/gates pass, and implementation P is pushed for coordinator review. |
-| Original Owner Request | “base should become type(s); ux components should become ui components; types may be depended on by all components and ui-base only by the two UI leaves.” |
+| Verification | Manifest, library Linux contract, source-boundary, documentation-governance and old-name gates; fresh x64/x86 package build and all CTest proof; changed-path/asset/MVDM closure audit. |
+| Expected Markers | No old component path/target/ABI name or aggregate alias; exact manifest; both fixed-width builds/tests pass; only declared agent-owned executables may change. |
+| Asset Needs | Agent-owned `assets/binary/softpc32.exe` / `assets/binary/softpc64.exe` may refresh. `softpc.ini`, media, and MVDM must not change. |
+| Reporting Requirements | Record command results, test totals, changed-path accounting, obsolete-path absence, asset scope, MVDM result, and final T51 decision. |
+| Stop Conditions | Stop before closure if any test/gate fails, an old-name exception is not historical, a forbidden edge appears, or an undeclared asset/MVDM diff exists. |
+| Exit Criteria | All verification passes on the final committed source, T51 history is complete, implementation P is pushed, and the worktree is clean. |
+| Original Owner Request | Base becomes types; UI components use `ui-*`; types may be depended on by all components and ui-base only by the two UI leaves. |
 | Similar-Issue Sweep | Re-run the S1 full-corpus scan after every `git mv`; inspect all zero-scan exceptions individually. Search for hidden aggregate/alias target names and non-interface private-header crossings in the renamed corpus. |

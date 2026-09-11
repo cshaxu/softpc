@@ -19,7 +19,7 @@ Then apply the change triggers:
   [Source Layout](design/CODING.md), [Architecture Rules](rules/ARCHITECTURE.md),
   and [Coding Rules](rules/CODING.md).
 - Documentation or governance work reads [Documentation Rules](rules/DOCUMENT.md)
-  and every authority it changes. UX work reads [Product UX](design/UI.md).
+  and every authority it changes. UI work reads [Product UI](design/UI.md).
 
 Read the fixed set on first entry to a subtask and first resume; re-read an
 authority when its requirements or the affected surface changes.

@@ -14,7 +14,7 @@ app/
   one executor, machine snapshot producer, guest-input adapter, lifecycle,
   monitor, and product binding; no machine-state access from frontends
         ↑
-lib/{base,host,storage,ux-base,ux-window,ux-console}/
+lib/{types,console,host,storage,ui-base,ui-window,ui-console}/
   canonical shared platform library, delivered for NXVM to adopt exactly:
   copied-frame mailbox, host
   input normalization, generic registered-chord matching, independent Window/
@@ -45,7 +45,7 @@ action decisions. SoftPC publishes each admitted shared-library change as the
 canonical corpus for NXVM to adopt exactly; the projects do not maintain
 parallel variants.
 
-Shared UX key events are copied `ux_key`, physical scan, neutral injection
+Shared UI key events are copied `ui_key`, physical scan, neutral injection
 flags, generic Ctrl/Alt/Shift state, and make/break values. Platform adapters
 translate native records before the event reaches the shared contract; only
 the application guest binding may translate that neutral value to a product's
@@ -55,23 +55,38 @@ The runtime executor is the sole caller of the machine and compatibility host.
 Input producers enqueue records and signal it. The executor publishes complete
 text or graphic frame snapshots; frontends consume only those snapshots.
 
-## Shared Console And UX Composition
+## Shared Console And UI Composition
 
 SoftPC's checked-in `lib/` corpus is the shared-library source of truth. NXVM
 adopts it exactly; no runtime or build dependency crosses repositories.
 
-`base` defines copied logical Console objects. `host` owns native Console
+`types` defines universal copied scalar/status values. `console` defines
+copied logical Console objects. `host` owns native Console
 handles/modes, one I/O worker, and exactly one Current Console Object from
-broker creation to destruction; replacement is transactional. Shared UX is
-split into `ux-base` (copied UX values, one event-construction path,
+broker creation to destruction; replacement is transactional. Shared UI is
+split into `ui-base` (copied UI values, one event-construction path,
 private-mailbox helpers, and source-local generic hotkey matcher),
-`ux-window` (one Window lifecycle), and `ux-console` (one VM Console lifecycle).
-The latter creates an optional logical VM Console object but neither UX
+`ui-window` (one Window lifecycle), and `ui-console` (one VM Console lifecycle).
+The latter creates an optional logical VM Console object but neither UI
 component opens or registers the process Console. SoftPC owns its monitor
-object and alone decides which UX components exist and asks host to replace the
+object and alone decides which UI components exist and asks host to replace the
 current object.
 
-SoftPC control is the sole product-state writer. VM, host, and UX workers only
+The library's only direct component edges are:
+
+```text
+types    -> console + host + storage + ui-base + ui-window + ui-console
+console  -> host + ui-console
+ui-base  -> ui-window + ui-console
+```
+
+There is no other library edge and no aggregate UI target. In particular,
+`ui-window` does not depend on `console` or `host`, while `host` does not
+depend on UI. `ui-base` is only a library dependency of the two UI leaves;
+the application may consume its public copied-value interfaces where the
+control/input ABI requires them, never its private mailbox/component headers.
+
+SoftPC control is the sole product-state writer. VM, host, and UI workers only
 enqueue copied events/completions to its app-owned queue. The control thread
 derives runtime commands independently from the required component instances,
 using config, frame route, and completed actual state; a derived action is
@@ -79,14 +94,14 @@ control-private and is never a shared VM/presenter intent. Runtime owns the
 internal sequence of every accepted command, including reset, and reports its
 one completed public fact. VM `run_generation` is SoftPC-only. Component
 readiness is returned by each component's own creation/start contract; shared
-UX carries no global configuration generation.
+UI carries no global configuration generation.
 
-SoftPC passes copied `{chord, identifier}` registrations to each UX component.
+SoftPC passes copied `{chord, identifier}` registrations to each UI component.
 The components may generically recognize and suppress a registered chord, but
-only enqueue `UX_HOTKEY(identifier)`; they never execute a product callback or
+only enqueue `UI_HOTKEY(identifier)`; they never execute a product callback or
 interpret pause, reset, guest CAD, or another identifier. Their ordinary input
-and matched-hotkey events are `ux_input_event` variants, constructed through the
-one `ux-base` utility path and carrying their source component handle for
+and matched-hotkey events are `ui_input_event` variants, constructed through the
+one `ui-base` utility path and carrying their source component handle for
 lifetime tracing only. The cooked monitor instead produces handle-free
 `monitor_input_event` values. Both families enter SoftPC's one input FIFO as
 distinct payloads in arrival order; the control thread is their sole consumer.
@@ -95,10 +110,10 @@ component instance, preserving guest-input order on mismatch. A Window and a
 VM Console each process only their own raw key sequence, so no cross-component
 key combination is possible.
 
-Every `ux-window` and `ux-console` instance owns private control/frame/input
+Every `ui-window` and `ui-console` instance owns private control/frame/input
 mailboxes and its own native worker(s). Their common mailbox mechanics live in
-`ux-base`; the mailbox instances remain per-component implementation details,
-never public handles or shared UX infrastructure. SoftPC invokes the specific
+`ui-base`; the mailbox instances remain per-component implementation details,
+never public handles or shared UI infrastructure. SoftPC invokes the specific
 component API it has chosen; components communicate back only through the
 copied input-queue entry supplied at creation.
 
