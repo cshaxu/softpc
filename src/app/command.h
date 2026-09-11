@@ -46,7 +46,7 @@ void app_command_session_submit_line(app_command_session *, app_monitor_state,
 /* The only monitor lifecycle-request path.  An accepted command is taken
  * exactly once; rejected and local commands have no request. */
 app_lifecycle_request app_command_session_take_request(app_command_session *);
-/* Registered UX hotkeys are product control input too.  They do not create a
+/* Registered UI hotkeys are product control input too.  They do not create a
  * monitor-line request, but they reserve the same transition boundary before
  * control dispatches their already-derived runtime command. */
 int app_command_session_begin_external(app_command_session *,

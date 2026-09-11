@@ -2,16 +2,16 @@
 #define SOFTPC_VM_RUNTIME_H
 
 #include "machine.h"
-#include "lib/ux-base/event_interface.h"
-#include "lib/ux-base/frame_interface.h"
+#include "lib/ui-base/event_interface.h"
+#include "lib/ui-base/frame_interface.h"
 
 #include <stdint.h>
 
-#define SOFTPC_RUNTIME_TEXT_COLUMNS UX_TEXT_COLUMNS
-#define SOFTPC_RUNTIME_TEXT_ROWS UX_TEXT_ROWS
-#define SOFTPC_RUNTIME_DIB_MAX_WIDTH UX_GRAPHICS_MAX_WIDTH
-#define SOFTPC_RUNTIME_DIB_MAX_HEIGHT UX_GRAPHICS_MAX_HEIGHT
-#define SOFTPC_RUNTIME_DIB_MAX_BYTES UX_GRAPHICS_MAX_PIXELS
+#define SOFTPC_RUNTIME_TEXT_COLUMNS UI_TEXT_COLUMNS
+#define SOFTPC_RUNTIME_TEXT_ROWS UI_TEXT_ROWS
+#define SOFTPC_RUNTIME_DIB_MAX_WIDTH UI_GRAPHICS_MAX_WIDTH
+#define SOFTPC_RUNTIME_DIB_MAX_HEIGHT UI_GRAPHICS_MAX_HEIGHT
+#define SOFTPC_RUNTIME_DIB_MAX_BYTES UI_GRAPHICS_MAX_PIXELS
 #define SOFTPC_RUNTIME_PATH_MAX 1024u
 
 typedef struct app_runtime app_runtime;
@@ -36,7 +36,7 @@ typedef void (*app_runtime_state_sink)(void *context,
 typedef void (*app_runtime_frame_sink)(void *context,
     uint32_t frame_sequence, int frame_graphics, uint32_t run_generation);
 
-typedef ux_frame app_runtime_frame;
+typedef ui_frame app_runtime_frame;
 
 int app_runtime_create(softpc_machine *machine, app_runtime **out);
 void app_runtime_set_state_sink(app_runtime *runtime,
@@ -52,7 +52,7 @@ int app_runtime_set_floppy(app_runtime *runtime, const char *path);
 app_runtime_state app_runtime_get_state(const app_runtime *runtime);
 softpc_machine_result app_runtime_get_result(const app_runtime *runtime);
 int app_runtime_enqueue_input_event(app_runtime *runtime,
-    const ux_event *event);
+    const ui_event *event);
 int app_runtime_copy_frame(app_runtime *runtime,
     app_runtime_frame *destination);
 int app_runtime_copy_published_frame(app_runtime *runtime,

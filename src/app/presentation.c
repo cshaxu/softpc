@@ -3,8 +3,8 @@
 #ifdef _WIN32
 #include "command.h"
 #include "keyboard.h"
-#include "lib/ux-console/console_interface.h"
-#include "lib/ux-window/window_interface.h"
+#include "lib/ui-console/console_interface.h"
+#include "lib/ui-window/window_interface.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,11 +13,11 @@
 
 struct app_presentation {
     app_runtime *runtime;
-    ux_window *window;
-    ux_console *console;
+    ui_window *window;
+    ui_console *console;
     app_monitor_console *monitor;
     app_control_queue *control_queue;
-    ux_hotkey_registry hotkeys;
+    ui_hotkey_registry hotkeys;
     /* Delivery is a property of an individual output object.  A recreated
      * Window/Console must receive the last completed frame even when the VM
      * has not published a newer sequence. */
@@ -31,23 +31,23 @@ static void app_presentation_publish_title(app_presentation_context *context,
     app_runtime_state state)
 {
     if (context == NULL || context->window == NULL) return;
-    (void)ux_window_set_title(context->window,
+    (void)ui_window_set_title(context->window,
         state == SOFTPC_RUNTIME_PAUSED ?
             "Insignia SoftPC (Paused)" : "Insignia SoftPC (Running)");
 }
 
-static int app_presentation_guest_input(void *opaque, const ux_event *event)
+static int app_presentation_guest_input(void *opaque, const ui_event *event)
 {
     app_presentation_context *context = (app_presentation_context *)opaque;
-    return context != NULL && app_control_queue_push_ux_for_run(
+    return context != NULL && app_control_queue_push_ui_for_run(
         context->control_queue, event,
         app_runtime_run_generation(context->runtime));
 }
 
 /* One app-owned queue sink for Window and VM-Console events.  The source
- * handle is retained by ux-base for tracing only; action meaning is the
+ * handle is retained by ui-base for tracing only; action meaning is the
  * registered identifier, never a leaf-specific callback. */
-static int app_presentation_input(void *opaque, const ux_input_event *event)
+static int app_presentation_input(void *opaque, const ui_input_event *event)
 {
     app_presentation_context *context = (app_presentation_context *)opaque;
     if (context == NULL || event == NULL) return 0;
@@ -59,14 +59,14 @@ static void app_presentation_delivery_failed(void *opaque,
 {
     app_presentation_context *context = (app_presentation_context *)opaque;
     if (context != NULL)
-        (void)app_control_queue_push_ux_delivery_failed(context->control_queue,
+        (void)app_control_queue_push_ui_delivery_failed(context->control_queue,
             source_identity, status, app_runtime_run_generation(context->runtime));
 }
 
 static int app_presentation_create_window(app_presentation_context *context,
     app_runtime_state state)
 {
-    ux_window_options options = { 0 };
+    ui_window_options options = { 0 };
 
     if (context == NULL || context->window != NULL) return context != NULL;
     options.component.input_context = context;
@@ -77,18 +77,18 @@ static int app_presentation_create_window(app_presentation_context *context,
     options.initial_title = state == SOFTPC_RUNTIME_PAUSED ?
         "Insignia SoftPC (Paused)" : "Insignia SoftPC (Running)";
     options.initial_frozen = state != SOFTPC_RUNTIME_RUNNING;
-    if (ux_window_create(&context->window, &options) != LIB_STATUS_OK)
+    if (ui_window_create(&context->window, &options) != LIB_STATUS_OK)
         return 0;
     context->window_delivered_frame_sequence = 0u;
     app_presentation_publish_title(context, state);
     if (state == SOFTPC_RUNTIME_RUNNING)
-        (void)ux_window_unfreeze(context->window);
+        (void)ui_window_unfreeze(context->window);
     return 1;
 }
 
 static int app_presentation_create_console(app_presentation_context *context)
 {
-    ux_console_options options = { 0 };
+    ui_console_options options = { 0 };
 
     if (context == NULL || context->console != NULL) return context != NULL;
     options.input_context = context;
@@ -96,7 +96,7 @@ static int app_presentation_create_console(app_presentation_context *context)
     options.failure_context = context;
     options.failure_sink = app_presentation_delivery_failed;
     options.hotkeys = context->hotkeys;
-    if (ux_console_create(&context->console, &options) != LIB_STATUS_OK)
+    if (ui_console_create(&context->console, &options) != LIB_STATUS_OK)
         return 0;
     context->console_delivered_frame_sequence = 0u;
     return 1;
@@ -111,9 +111,9 @@ static void app_presentation_destroy_components(app_presentation_context *contex
         (void)app_monitor_console_activate_self(context->monitor,
             context->console);
     if (context->window != NULL)
-        ux_window_destroy(context->window);
+        ui_window_destroy(context->window);
     if (context->console != NULL)
-        ux_console_destroy(context->console);
+        ui_console_destroy(context->console);
     context->window = NULL;
     context->console = NULL;
     context->window_delivered_frame_sequence = 0u;
@@ -155,14 +155,14 @@ int app_presentation_apply_action(app_presentation *presentation,
         return app_control_queue_push_broker_completed(context->control_queue, 0,
             app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE:
-        ux_console_destroy(context->console);
+        ui_console_destroy(context->console);
         context->console = NULL;
         context->console_delivered_frame_sequence = 0u;
         return app_control_queue_push_component_completed(context->control_queue,
             APP_CONTROL_COMPONENT_VM_CONSOLE, 0,
             app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_DESTROY_WINDOW:
-        ux_window_destroy(context->window);
+        ui_window_destroy(context->window);
         context->window = NULL;
         context->window_delivered_frame_sequence = 0u;
         return app_control_queue_push_component_completed(context->control_queue,
@@ -177,8 +177,8 @@ int app_presentation_publish_frame(app_presentation *presentation,
     int vm_console_current, int console_status_surface)
 {
     app_presentation_context *context = presentation;
-    ux_frame console_status;
-    const ux_frame *console_frame = frame;
+    ui_frame console_status;
+    const ui_frame *console_frame = frame;
     if (context == NULL || frame == NULL) return 0;
     /* A graphics frame has no console rendering contract.  In the one mode
      * where the VM raw Console remains active beside Window, SoftPC provides
@@ -194,8 +194,8 @@ int app_presentation_publish_frame(app_presentation *presentation,
         memset(&console_status, 0, sizeof(console_status));
         console_status.valid = 1u;
         console_status.sequence = frame->sequence;
-        console_status.text_columns = UX_TEXT_COLUMNS;
-        console_status.text_rows = UX_TEXT_ROWS;
+        console_status.text_columns = UI_TEXT_COLUMNS;
+        console_status.text_rows = UI_TEXT_ROWS;
         console_status.cursor_column = -1;
         console_status.cursor_row = -1;
         for (index = 0u; index < sizeof(console_status.text); ++index) {
@@ -205,8 +205,8 @@ int app_presentation_publish_frame(app_presentation *presentation,
         for (index = 0u; message[index] != '\0'; ++index) {
             if (message[index] == '\r') continue;
             if (message[index] == '\n') { ++row; column = 0u; continue; }
-            if (row < UX_TEXT_ROWS && column < UX_TEXT_COLUMNS)
-                console_status.text[row * UX_TEXT_COLUMNS + column] =
+            if (row < UI_TEXT_ROWS && column < UI_TEXT_COLUMNS)
+                console_status.text[row * UI_TEXT_COLUMNS + column] =
                     (lib_u8)message[index];
             ++column;
         }
@@ -214,13 +214,13 @@ int app_presentation_publish_frame(app_presentation *presentation,
     }
     if (vm_console_current && context->console != NULL &&
         context->console_delivered_frame_sequence != frame->sequence) {
-        if (ux_console_publish_frame(context->console, console_frame) !=
+        if (ui_console_publish_frame(context->console, console_frame) !=
             LIB_STATUS_OK) return 0;
         context->console_delivered_frame_sequence = frame->sequence;
     }
     if (window_actual && context->window != NULL &&
         context->window_delivered_frame_sequence != frame->sequence) {
-        if (ux_window_publish_frame(context->window, frame) != LIB_STATUS_OK)
+        if (ui_window_publish_frame(context->window, frame) != LIB_STATUS_OK)
             return 0;
         context->window_delivered_frame_sequence = frame->sequence;
     }
@@ -259,7 +259,7 @@ void app_presentation_destroy(app_presentation *presentation)
 void app_presentation_release_window_mouse(app_presentation *presentation)
 {
     if (presentation != NULL && presentation->window != NULL)
-        (void)ux_window_release_mouse(presentation->window);
+        (void)ui_window_release_mouse(presentation->window);
 }
 
 void app_presentation_set_runtime_state(app_presentation *presentation,
@@ -269,9 +269,9 @@ void app_presentation_set_runtime_state(app_presentation *presentation,
     app_presentation_publish_title(presentation, state);
     if (presentation->window != NULL) {
         if (state == SOFTPC_RUNTIME_RUNNING)
-            (void)ux_window_unfreeze(presentation->window);
+            (void)ui_window_unfreeze(presentation->window);
         else if (state == SOFTPC_RUNTIME_PAUSED)
-            (void)ux_window_freeze(presentation->window);
+            (void)ui_window_freeze(presentation->window);
     }
 }
 

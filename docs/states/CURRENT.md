@@ -66,7 +66,7 @@ rename in one atomic, buildable migration.
 | Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, and `DOCUMENT.md`; `src/mvdm/softpc.new/` remains immutable. |
 | Verification | `git mv`-based path audit; standalone library manifest build; root build/configure; old-name zero scan over the ledger scope; focused library/component tests and source-boundary gate. |
 | Expected Markers | No old directory, target, public include path, `ux_*` public ABI, or aggregate alias remains in the active corpus; root CMake names direct normalized targets. |
-| Asset Needs | Build output only beneath owned `build/` paths. Package binaries, `softpc.ini`, and media are not modified in S2. |
+| Asset Needs | Build output beneath owned `build/` paths and agent-owned `assets/binary/softpc32.exe` / `assets/binary/softpc64.exe` may refresh. `softpc.ini` and guest media are not modified in S2. |
 | Reporting Requirements | Record changed source/test paths and line accounting; identify each deleted aggregate/old path, direct app ABI consumer, remaining target link, and any migration discovery. |
 | Stop Conditions | Stop before behavior/API move if an undisclosed consumer, cycle, MVDM touchpoint, or public binary compatibility commitment is found. |
 | Exit Criteria | Every S1-ledger member uses the normalized path/name or is removed, the root and standalone library configure/build, no old path or target alias remains, focused tests/gates pass, and implementation P is pushed for coordinator review. |

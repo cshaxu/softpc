@@ -1,5 +1,5 @@
 #include "runtime.h"
-#include "lib/ux-base/win32/input.h"
+#include "lib/ui-base/win32/input.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -337,7 +337,7 @@ static void dump_palette_history(void)
 
 static int enqueue_virtual_key_pair(app_runtime *runtime, WORD virtual_key);
 
-static int enqueue_ux_event(void *opaque, const ux_event *event)
+static int enqueue_ui_event(void *opaque, const ui_event *event)
 {
     return app_runtime_enqueue_input_event((app_runtime *)opaque, event);
 }
@@ -364,7 +364,7 @@ static int enqueue_virtual_key(app_runtime *runtime, WORD virtual_key,
        so the smoke tests the original arrow, rather than keypad 8. */
     if (virtual_key == VK_UP) scan = 0xe048u;
     if (virtual_key == VK_DOWN) scan = 0xe050u;
-    return ux_win32_keyboard_submit_transition(runtime, enqueue_ux_event,
+    return ui_win32_keyboard_submit_transition(runtime, enqueue_ui_event,
         scan, virtual_key, control_state, 0u, released == 0u);
 }
 
@@ -891,8 +891,8 @@ int main(int argc, char **argv)
                             setup_mouse_surface_before_hash =
                                 graphics_frame_hash(frame);
                             if (setup_mouse_surface_before_hash == 0u) break;
-                            { ux_event mouse = { 0 };
-                              mouse.type = UX_EVENT_MOUSE;
+                            { ui_event mouse = { 0 };
+                              mouse.type = UI_EVENT_MOUSE;
                               mouse.data.mouse.delta_x = 96;
                               mouse.data.mouse.delta_y = 96;
                               mouse.data.mouse.relative = 1u;

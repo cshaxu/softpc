@@ -14,7 +14,7 @@
 
 typedef struct app_control_pressed_key {
     uint64_t source;
-    ux_input_event event;
+    ui_input_event event;
 } app_control_pressed_key;
 
 struct app_control_queue {
@@ -147,19 +147,19 @@ void app_control_queue_destroy(app_control_queue *queue)
 }
 
 int app_control_queue_push_ux(app_control_queue *queue,
-    const ux_input_event *event)
+    const ui_input_event *event)
 {
-    return app_control_queue_push_ux_for_run(queue, event, 0u);
+    return app_control_queue_push_ui_for_run(queue, event, 0u);
 }
 
-int app_control_queue_push_ux_for_run(app_control_queue *queue,
-    const ux_input_event *event, uint32_t run_generation)
+int app_control_queue_push_ui_for_run(app_control_queue *queue,
+    const ui_input_event *event, uint32_t run_generation)
 {
     app_control_event copied = { 0 };
     if (event == NULL) return 0;
-    copied.kind = APP_CONTROL_UX_INPUT;
+    copied.kind = APP_CONTROL_UI_INPUT;
     copied.run_generation = run_generation;
-    copied.value.ux = *event;
+    copied.value.ui = *event;
     if (app_control_queue_push(queue, &copied)) return 1;
     app_control_queue_latch_delivery_failure(queue, event->source_identity,
         LIB_STATUS_NO_MEMORY, run_generation);
@@ -210,10 +210,10 @@ int app_control_queue_push_broker_completed(app_control_queue *queue,
     return app_control_queue_push_required(queue, &event);
 }
 
-int app_control_queue_push_ux_delivery_failed(app_control_queue *queue,
+int app_control_queue_push_ui_delivery_failed(app_control_queue *queue,
     uint64_t source_identity, lib_status status, uint32_t run_generation)
 {
-    app_control_event event = { APP_CONTROL_UX_DELIVERY_FAILED, run_generation };
+    app_control_event event = { APP_CONTROL_UI_DELIVERY_FAILED, run_generation };
     event.value.delivery_failure.source_identity = source_identity;
     event.value.delivery_failure.status = status;
     return app_control_queue_push_required(queue, &event);
@@ -228,7 +228,7 @@ int app_control_queue_take(app_control_queue *queue,
     EnterCriticalSection(&queue->lock);
     if (queue->count == 0u && queue->fatal_delivery_pending) {
         memset(out_event, 0, sizeof(*out_event));
-        out_event->kind = APP_CONTROL_UX_DELIVERY_FAILED;
+        out_event->kind = APP_CONTROL_UI_DELIVERY_FAILED;
         out_event->run_generation = queue->fatal_delivery_generation;
         out_event->value.delivery_failure.source_identity = queue->fatal_delivery_source;
         out_event->value.delivery_failure.status = queue->fatal_delivery_status;
@@ -263,30 +263,30 @@ int app_control_queue_take(app_control_queue *queue,
     return 1;
 }
 
-int app_control_accept_ux_event(const app_control_event *event,
+int app_control_accept_ui_event(const app_control_event *event,
     uint32_t current_run_generation, app_runtime_state runtime_state)
 {
-    const ux_input_event *input;
+    const ui_input_event *input;
 
-    if (event == NULL || event->kind != APP_CONTROL_UX_INPUT) return 0;
-    input = &event->value.ux;
+    if (event == NULL || event->kind != APP_CONTROL_UI_INPUT) return 0;
+    input = &event->value.ui;
     /* Source identity is globally monotonic.  Retirement is not guest input:
        it must always reach the ledger, even when the component belonged to a
        retired run, so a later allocation cannot inherit its held keys. */
-    if (input->type == UX_EVENT_SOURCE_RETIRED) return 1;
+    if (input->type == UI_EVENT_SOURCE_RETIRED) return 1;
     if (event->run_generation != 0u && event->run_generation !=
         current_run_generation) return 0;
     if (runtime_state == SOFTPC_RUNTIME_RUNNING) return 1;
     if (runtime_state != SOFTPC_RUNTIME_PAUSED) return 0;
-    return input->type == UX_EVENT_WINDOW_CLOSE ||
-        input->type == UX_EVENT_SOURCE_RETIRED ||
-        input->type == UX_EVENT_HOTKEY ||
-        (input->type == UX_EVENT_KEY && input->data.key.pressed == 0u) ||
-        (input->type == UX_EVENT_MOUSE && input->data.mouse.buttons == 0u);
+    return input->type == UI_EVENT_WINDOW_CLOSE ||
+        input->type == UI_EVENT_SOURCE_RETIRED ||
+        input->type == UI_EVENT_HOTKEY ||
+        (input->type == UI_EVENT_KEY && input->data.key.pressed == 0u) ||
+        (input->type == UI_EVENT_MOUSE && input->data.mouse.buttons == 0u);
 }
 
 static void app_control_forget_pressed(app_control_queue *queue,
-    const ux_input_event *event)
+    const ui_input_event *event)
 {
     unsigned int index;
     for (index = 0u; index < queue->pressed_count; ++index) {
@@ -301,7 +301,7 @@ static void app_control_forget_pressed(app_control_queue *queue,
 }
 
 static void app_control_remember_pressed(app_control_queue *queue,
-    const ux_input_event *event)
+    const ui_input_event *event)
 {
     unsigned int index;
     app_control_forget_pressed(queue, event);
@@ -333,24 +333,24 @@ static int app_control_release_source(app_control_queue *queue,
 }
 
 int app_control_handle_ux(app_control_queue *queue, app_runtime *runtime,
-    const ux_input_event *event, app_runtime_state runtime_state)
+    const ui_input_event *event, app_runtime_state runtime_state)
 {
     if (queue == NULL || runtime == NULL || event == NULL) return 0;
-    if (event->type == UX_EVENT_KEY) {
+    if (event->type == UI_EVENT_KEY) {
         if (event->data.key.pressed != 0u) app_control_remember_pressed(queue, event);
         else app_control_forget_pressed(queue, event);
         return runtime_state != SOFTPC_RUNTIME_RUNNING ||
             app_keyboard_deliver_input(runtime, event);
     }
-    if (event->type == UX_EVENT_MOUSE)
+    if (event->type == UI_EVENT_MOUSE)
         return runtime_state != SOFTPC_RUNTIME_RUNNING ||
             app_keyboard_deliver_input(runtime, event);
-    if (event->type == UX_EVENT_SOURCE_RETIRED)
+    if (event->type == UI_EVENT_SOURCE_RETIRED)
         return app_control_release_source(queue, runtime, event->source_identity,
             runtime_state);
-    if (event->type == UX_EVENT_WINDOW_CLOSE)
+    if (event->type == UI_EVENT_WINDOW_CLOSE)
         return 1;
-    if (event->type != UX_EVENT_HOTKEY) return 1;
+    if (event->type != UI_EVENT_HOTKEY) return 1;
     /* Hotkeys are product control records, so paused admits them.  Guest
      * injections they would otherwise request must not cross this boundary. */
     if (runtime_state != SOFTPC_RUNTIME_RUNNING) return 1;

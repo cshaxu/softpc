@@ -8,7 +8,7 @@
 
 struct app_input_queue {
     CRITICAL_SECTION lock;
-    ux_event entries[APP_INPUT_QUEUE_CAPACITY];
+    ui_event entries[APP_INPUT_QUEUE_CAPACITY];
     unsigned int head;
     unsigned int tail;
 };
@@ -32,16 +32,16 @@ void app_input_queue_destroy(app_input_queue *queue)
     free(queue);
 }
 
-int app_input_queue_push(app_input_queue *queue, const ux_event *event)
+int app_input_queue_push(app_input_queue *queue, const ui_event *event)
 {
     unsigned int next;
     if (queue == NULL || event == NULL) return 0;
     EnterCriticalSection(&queue->lock);
-    if (event->type == UX_EVENT_MOUSE && queue->tail != queue->head) {
+    if (event->type == UI_EVENT_MOUSE && queue->tail != queue->head) {
         unsigned int last = queue->head == 0u ? APP_INPUT_QUEUE_CAPACITY - 1u :
             queue->head - 1u;
-        ux_event *prior = &queue->entries[last];
-        if (prior->type == UX_EVENT_MOUSE &&
+        ui_event *prior = &queue->entries[last];
+        if (prior->type == UI_EVENT_MOUSE &&
             prior->data.mouse.buttons == event->data.mouse.buttons) {
             prior->data.mouse.delta_x += event->data.mouse.delta_x;
             prior->data.mouse.delta_y += event->data.mouse.delta_y;
@@ -60,7 +60,7 @@ int app_input_queue_push(app_input_queue *queue, const ux_event *event)
     return 1;
 }
 
-int app_input_queue_pop(app_input_queue *queue, ux_event *event)
+int app_input_queue_pop(app_input_queue *queue, ui_event *event)
 {
     if (queue == NULL || event == NULL) return 0;
     EnterCriticalSection(&queue->lock);

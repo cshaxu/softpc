@@ -93,28 +93,28 @@ int main(void)
        silently dropped make/break sequence at its old fixed-64 boundary. */
     {
         app_control_queue *queue = NULL;
-        ux_input_event event = { 0 };
+        ui_input_event event = { 0 };
         app_control_event copied;
         unsigned int index;
         assert(app_control_queue_create(&queue));
-        event.type = UX_EVENT_TEXT;
+        event.type = UI_EVENT_TEXT;
         for (index = 0u; index < 96u; ++index) {
             event.data.text.scalar = index;
             assert(app_control_queue_push_ux(queue, &event));
         }
         for (index = 0u; index < 96u; ++index) {
             assert(app_control_queue_take(queue, &copied, 0u));
-            assert(copied.kind == APP_CONTROL_UX_INPUT);
-            assert(copied.value.ux.data.text.scalar == index);
+            assert(copied.kind == APP_CONTROL_UI_INPUT);
+            assert(copied.value.ui.data.text.scalar == index);
         }
         app_control_queue_destroy(queue);
     }
     {
         app_input_queue *queue = NULL;
-        ux_event event = { 0 };
+        ui_event event = { 0 };
 
         assert(app_input_queue_create(&queue));
-        event.type = UX_EVENT_KEY;
+        event.type = UI_EVENT_KEY;
         event.data.key.scan_code = 0x1eu;
         event.data.key.pressed = 1u;
         assert(app_input_queue_push(queue, &event));
@@ -175,7 +175,7 @@ int main(void)
     }
     /* Runtime owns copied frame production only.  Component existence and
        Console/Window selection belong to the app presentation reconciler,
-       not a shared UX target router. */
+       not a shared UI target router. */
     /* Lifecycle intent is interpreted by the SoftPC control/reconciler;
        this runtime unit directly proves the executor request/completion ABI. */
     assert(app_runtime_pause(runtime));

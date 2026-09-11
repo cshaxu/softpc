@@ -52,13 +52,13 @@ foreach(app_source IN ITEMS
     endif()
 endforeach()
 
-# The imported UX component consumes copied values only.
+# The imported UI component consumes copied values only.
 # It cannot acquire SoftPC's runtime, machine, renderer, or original key-map
 # ownership; those remain in the project binding under src/app.
 file(GLOB_RECURSE shared_win32_sources
-    "${SOFTPC_SOURCE_DIR}/src/lib/ux-base/*.[ch]"
-    "${SOFTPC_SOURCE_DIR}/src/lib/ux-window/*.[ch]"
-    "${SOFTPC_SOURCE_DIR}/src/lib/ux-console/*.[ch]")
+    "${SOFTPC_SOURCE_DIR}/src/lib/ui-base/*.[ch]"
+    "${SOFTPC_SOURCE_DIR}/src/lib/ui-window/*.[ch]"
+    "${SOFTPC_SOURCE_DIR}/src/lib/ui-console/*.[ch]")
 foreach(source IN LISTS shared_win32_sources)
     file(READ "${source}" shared_win32_contents)
     if(shared_win32_contents MATCHES
@@ -116,39 +116,39 @@ foreach(source IN LISTS product_lib_consumers shared_interface_headers)
     endforeach()
 endforeach()
 
-# ux-window owns no product default.  The application supplies one creation
-# title, ux-window copies it before native startup, and the native Window uses
+# ui-window owns no product default.  The application supplies one creation
+# title, ui-window copies it before native startup, and the native Window uses
 # that copy rather than a hidden literal.
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-window/window_interface.h" window_header)
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-window/window.c" window_source)
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-window/win32/component.c"
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ui-window/window_interface.h" window_header)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ui-window/window.c" window_source)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ui-window/win32/component.c"
     native_window_source)
 string(FIND "${window_header}" "const char *initial_title" title_option_index)
 string(FIND "${window_source}" "memcpy(window->initial_title" title_copy_index)
 string(FIND "${native_window_source}" "component->initial_title" title_native_index)
 if(title_option_index EQUAL -1 OR title_copy_index EQUAL -1 OR
     title_native_index EQUAL -1)
-    message(FATAL_ERROR "ux-window must use the application's copied initial title")
+    message(FATAL_ERROR "ui-window must use the application's copied initial title")
 endif()
 
-# The public UX input ABI uses only lib-defined key identities and flags. Win32
+# The public UI input ABI uses only lib-defined key identities and flags. Win32
 # values are permitted inside the private win32 adapter and SoftPC binding, not
 # in the shared public event contract.
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-base/event_interface.h" ux_event_header)
-if(ux_event_header MATCHES "VK_[A-Za-z0-9_]+" OR
-    ux_event_header MATCHES "ENHANCED_KEY" OR
-    ux_event_header MATCHES "KEY_EVENT_RECORD")
-    message(FATAL_ERROR "Public UX input ABI leaks a Win32 key/injection value")
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ui-base/event_interface.h" ui_event_header)
+if(ui_event_header MATCHES "VK_[A-Za-z0-9_]+" OR
+    ui_event_header MATCHES "ENHANCED_KEY" OR
+    ui_event_header MATCHES "KEY_EVENT_RECORD")
+    message(FATAL_ERROR "Public UI input ABI leaks a Win32 key/injection value")
 endif()
 
-# Component selection is application policy.  Shared UX must not retain the
+# Component selection is application policy.  Shared UI must not retain the
 # removed unified runner or a target router.
 file(READ "${SOFTPC_SOURCE_DIR}/src/app/main.c" app_main_source)
 file(READ "${SOFTPC_SOURCE_DIR}/src/app/presentation.c" app_presentation_source)
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/lib/ux" OR
-   app_main_source MATCHES "ux_presenter|ux_run" OR
-   app_presentation_source MATCHES "ux_presenter|ux_run")
-    message(FATAL_ERROR "Standalone retains the removed unified UX route")
+   app_main_source MATCHES "ui_presenter|ui_run" OR
+   app_presentation_source MATCHES "ui_presenter|ui_run")
+    message(FATAL_ERROR "Standalone retains the removed unified UI route")
 endif()
 
 # Host owns only generic native Console I/O. The product monitor owns its
@@ -164,18 +164,20 @@ if(host_console_public MATCHES "host_console_cooked" OR
     message(FATAL_ERROR "Console broker retains monitor-specific ownership")
 endif()
 
-# The split shared UX graph is deliberately narrow.  These target links make
+# The split shared UI graph is deliberately narrow. These target links make
 # its allowed component edges executable rather than README-only claims.
 file(READ "${SOFTPC_SOURCE_DIR}/src/lib/CMakeLists.txt" lib_cmake_source)
 if(NOT lib_cmake_source MATCHES
-   "target_link_libraries\\(ux-base PUBLIC base-console\\)" OR
+   "target_link_libraries\\(console PUBLIC types\\)" OR
    NOT lib_cmake_source MATCHES
-   "target_link_libraries\\(ux-window PUBLIC base-console ux-base\\)" OR
+   "target_link_libraries\\(ui-base PUBLIC types\\)" OR
    NOT lib_cmake_source MATCHES
-   "target_link_libraries\\(ux-console PUBLIC base-console ux-base\\)" OR
+   "target_link_libraries\\(ui-window PUBLIC types ui-base\\)" OR
+   NOT lib_cmake_source MATCHES
+   "target_link_libraries\\(ui-console PUBLIC types console ui-base\\)" OR
    lib_cmake_source MATCHES
-   "target_link_libraries\\(ux-(window|console) [^\\)]*(host-sync|storage-medium)")
-    message(FATAL_ERROR "Shared UX component dependency graph is not split")
+   "target_link_libraries\\(ui-(window|console) [^\\)]*(host|storage)")
+    message(FATAL_ERROR "Shared UI component dependency graph is not normalized")
 endif()
 
 file(STRINGS "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/c-files"
@@ -310,13 +312,13 @@ endif()
 
 # Presentation is deliberately a DIB consumer.  Controller planes and DAC
 # interpretation stay in the original nt_cga/nt_ega/nt_vga renderer path.
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-window/win32/component.c" window_frontend)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ui-window/win32/component.c" window_frontend)
 string(TOLOWER "${window_frontend}" normalized_window_frontend)
 if(normalized_window_frontend MATCHES "ega_planes|\\bdac\\b")
     message(FATAL_ERROR "Standalone window bypasses the original SoftPC renderer")
 endif()
 
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ux-console/win32/component.c" console_frontend)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ui-console/win32/component.c" console_frontend)
 string(TOLOWER "${window_frontend}${console_frontend}" normalized_frontends)
 if(normalized_frontends MATCHES "host_key_(down|up)|mouse_send")
     message(FATAL_ERROR "Standalone frontend bypasses original SoftPC input controllers")

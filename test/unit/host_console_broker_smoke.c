@@ -1,5 +1,5 @@
-#include "lib/base/console_interface.h"
-#include "lib/base/console.h"
+#include "lib/console/console_interface.h"
+#include "lib/console/console.h"
 #include "lib/host/console_interface.h"
 #include "lib/host/console_backend.h"
 

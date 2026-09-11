@@ -1,8 +1,8 @@
-#include "lib/base/console.h"
+#include "lib/console/console.h"
 #include "lib/host/console_interface.h"
 #include "lib/host/console_backend.h"
 
-#include "lib/base/atomic.h"
+#include "lib/types/atomic.h"
 #include <stdlib.h>
 
 struct host_console_broker {
