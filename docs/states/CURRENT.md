@@ -2,8 +2,8 @@
 
 ## Current Work
 
-M9 T51 S1 is active: freeze the exact shared-library component-normalization
-ledger and public dependency contract before any source move.
+M9 T51 S2 is active: make the shared-library and every active SoftPC consumer
+rename in one atomic, buildable migration.
 
 ## Current Technical Baseline
 
@@ -52,23 +52,23 @@ ledger and public dependency contract before any source move.
   P discipline, path accounting, and build hygiene now match the relevant
   NXVM governance standard. [Record](../history/M9-Td-S9-execution-closure-quality.md)
 
-## M9 T51 S1 Packet
+## M9 T51 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner approved T51 admission, Queue insertion, and S1 execution on 2026-09-10. |
-| Objective | Freeze the complete migration ledger and authoritative component graph for `types`, `console`, `host`, `storage`, `ui-base`, `ui-window`, and `ui-console`. |
-| Non-goals | No source move, public API rename, runtime behavior, MVDM, package, media, or `softpc.ini` change in S1. |
-| Reference Baseline | Closed T50 final source proof; current lib graph is `base -> ux-base + host + storage`, `ux-base -> ux-window + ux-console`, with legacy CMake target aggregates. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approved T51’s full normalization plan and automatic sequential S admission; S1 ledger closure found one atomic migration is required to preserve a buildable root tree. |
+| Objective | Atomically rename the library to `types`, `console`, `host`, `storage`, `ui-base`, `ui-window`, and `ui-console`, and migrate every frozen SoftPC consumer, target, include path, and public `ux_*` ABI spelling. |
+| Non-goals | No behavior, lifecycle, threading, mailbox, MVDM, package, media, user `softpc.ini`, or Linux-support change; no compatibility alias, forwarding header, or duplicate old path. |
+| Reference Baseline | T51 S1 frozen ledger and closed T50 x86/x64 package proof; current source is the old `base`/`ux-*` corpus. |
 | Candidate Proposal | [M9 T51 proposal](../proposals/m9-t51-lib-component-normalization.md) |
-| Files And ABI Surface | Proposal, Queue, Current packet, indexed T51 ledger, and their documentation index; `src/lib/CMakeLists.txt` and public interfaces are read-only inventory inputs in S1. |
+| Files And ABI Surface | All 72 `src/lib` files, `src/app`, `src/host`, enumerated tests, root/library CMake, library manifest, and source-boundary verifier; public include paths and `ux_*` names intentionally become `types`/`console`/`ui-*`. |
 | Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, and `DOCUMENT.md`; `src/mvdm/softpc.new/` remains immutable. |
-| Verification | Reproducible `rg` inventory of old source/build names; CMake documentation-governance gate; review that every ledger member has a disposition and no implementation occurred. |
-| Expected Markers | Frozen path/target/API ledger, approved component DAG, explicit external-app exception for public `ui-base` ABI, and prohibited-old-name scan scope. |
-| Asset Needs | None. No build output or package artifact is admitted. |
-| Reporting Requirements | Report each path class, all direct SoftPC public-ABI dependencies, target-link changes planned for S3, and any discovery requiring proposal revision. |
-| Stop Conditions | Stop before any behavior/API move if the inventory discovers a cycle, a non-SoftPC consumer, a public binary compatibility commitment, or a change touching MVDM. |
-| Exit Criteria | The ledger is complete and reproducible, the authoritative graph is updated without duplicate rules, governance verification passes, and S1 is committed/pushed with coordinator review. |
+| Verification | `git mv`-based path audit; standalone library manifest build; root build/configure; old-name zero scan over the ledger scope; focused library/component tests and source-boundary gate. |
+| Expected Markers | No old directory, target, public include path, `ux_*` public ABI, or aggregate alias remains in the active corpus; root CMake names direct normalized targets. |
+| Asset Needs | Build output only beneath owned `build/` paths. Package binaries, `softpc.ini`, and media are not modified in S2. |
+| Reporting Requirements | Record changed source/test paths and line accounting; identify each deleted aggregate/old path, direct app ABI consumer, remaining target link, and any migration discovery. |
+| Stop Conditions | Stop before behavior/API move if an undisclosed consumer, cycle, MVDM touchpoint, or public binary compatibility commitment is found. |
+| Exit Criteria | Every S1-ledger member uses the normalized path/name or is removed, the root and standalone library configure/build, no old path or target alias remains, focused tests/gates pass, and implementation P is pushed for coordinator review. |
 | Original Owner Request | “base should become type(s); ux components should become ui components; types may be depended on by all components and ui-base only by the two UI leaves.” |
-| Similar-Issue Sweep | Search all tracked `src/lib`, `src/app`, `src/host`, `test`, root CMake, and library CMake paths for old include, target, and identifier forms; record every hit rather than treating a directory rename as complete. |
+| Similar-Issue Sweep | Re-run the S1 full-corpus scan after every `git mv`; inspect all zero-scan exceptions individually. Search for hidden aggregate/alias target names and non-interface private-header crossings in the renamed corpus. |

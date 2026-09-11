@@ -67,21 +67,21 @@ consumer boundary, exact prohibited-old-name scan, and tests that prove no
 behavior contract moves. Revise current design/architecture authority only as
 needed to state the intended graph before implementation.
 
-### S2 — Atomic library corpus normalization
+### S2 — Atomic corpus and consumer normalization
 
 Use `git mv` to split `types` and `console`, rename the three UX components to
-their `ui-*` names, update all library-local public/private includes and CMake
-targets, remove obsolete aggregation aliases, and regenerate the exact library
-manifest. The tree must build after this S; no forwarding compatibility path is
-allowed.
+their `ui-*` names, update all library-local and SoftPC consumer public/private
+includes and CMake targets, remove obsolete aggregation aliases, and regenerate
+the exact library manifest. This S includes the root CMake target references
+and every enumerated app/host/unit consumer because the root tree must remain
+buildable; no forwarding compatibility path is allowed.
 
-### S3 — SoftPC consumer adoption and boundary proof
+### S3 — Dependency-boundary proof and corpus documentation
 
-Migrate all application/host/test consumers to the new public interface and
-target names. Make the executable target explicitly link the public components
-it directly consumes; retain only intentional application consumption of
-`types`, `console`, and `ui-base` ABI. Update static boundary tests and
-component README dependency declarations.
+Make the executable target explicitly link the public components it directly
+consumes; retain only intentional application consumption of `types`,
+`console`, and `ui-base` ABI. Update static boundary tests, component README
+dependency declarations, and current architecture/source-layout authorities.
 
 ### S4 — Whole-corpus verification and T closure
 
@@ -102,3 +102,18 @@ line-count, obsolete-path, and task-level closure audit.
   media.
 - Every implementation P is pushed, reviewed against its packet, and recorded
   with reproducible changed-path accounting.
+
+## S1 Closure Record
+
+S1 froze the complete, finite migration universe before any implementation
+change. The indexed [ledger](../etc/evidence/softpc/m9-t51-s1-lib-normalization-ledger.md)
+records all 72 shared-library paths, all active app/host/test consumers, and
+all build/static-gate consumers of existing component names.
+
+No MVDM touchpoint, external source consumer, public binary compatibility
+promise, or forbidden dependency cycle was found. The audit also established
+that library and application consumer renames cannot be split without leaving
+the root tree unbuildable; the plan therefore makes S2 one atomic migration.
+P1 `a3406c8` was pushed after the documentation-governance gate and
+`git diff --check` passed. Its five changed paths were independently reviewed
+and contain no implementation change.
