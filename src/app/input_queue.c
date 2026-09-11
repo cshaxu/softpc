@@ -37,18 +37,6 @@ int app_input_queue_push(app_input_queue *queue, const ui_event *event)
     unsigned int next;
     if (queue == NULL || event == NULL) return 0;
     EnterCriticalSection(&queue->lock);
-    if (event->type == UI_EVENT_MOUSE && queue->tail != queue->head) {
-        unsigned int last = queue->head == 0u ? APP_INPUT_QUEUE_CAPACITY - 1u :
-            queue->head - 1u;
-        ui_event *prior = &queue->entries[last];
-        if (prior->type == UI_EVENT_MOUSE &&
-            prior->data.mouse.buttons == event->data.mouse.buttons) {
-            prior->data.mouse.delta_x += event->data.mouse.delta_x;
-            prior->data.mouse.delta_y += event->data.mouse.delta_y;
-            LeaveCriticalSection(&queue->lock);
-            return 1;
-        }
-    }
     next = (queue->head + 1u) % APP_INPUT_QUEUE_CAPACITY;
     if (next == queue->tail) {
         LeaveCriticalSection(&queue->lock);

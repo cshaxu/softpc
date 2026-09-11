@@ -525,13 +525,6 @@ add_test(NAME softpc-ui-console-retirement-barrier-smoke
     COMMAND softpc-ui-console-retirement-barrier-smoke)
 set_tests_properties(softpc-ui-console-retirement-barrier-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-ui-console-mouse-scale-smoke
-    test/unit/ui_console_mouse_scale_smoke.c)
-target_link_libraries(softpc-ui-console-mouse-scale-smoke PRIVATE ui-console)
-add_test(NAME softpc-ui-console-mouse-scale-smoke
-    COMMAND softpc-ui-console-mouse-scale-smoke)
-set_tests_properties(softpc-ui-console-mouse-scale-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-presentation-plan-smoke
     test/unit/presentation_plan_smoke.c
     src/app/presentation_plan.c)
@@ -574,6 +567,14 @@ add_executable(softpc-command-smoke test/unit/command_smoke.c
 target_include_directories(softpc-command-smoke PRIVATE src/app src/host src)
 add_test(NAME softpc-command-smoke COMMAND softpc-command-smoke)
 set_tests_properties(softpc-command-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-input-queue-mouse-fifo-smoke
+    test/unit/input_queue_mouse_fifo_smoke.c
+    src/app/input_queue.c)
+target_include_directories(softpc-input-queue-mouse-fifo-smoke PRIVATE src/app src)
+add_test(NAME softpc-input-queue-mouse-fifo-smoke
+    COMMAND softpc-input-queue-mouse-fifo-smoke)
+set_tests_properties(softpc-input-queue-mouse-fifo-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
@@ -618,11 +619,11 @@ set(SOFTPC_TEST_TARGETS
     softpc-win32-window-bounds-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-ui-component-contract-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-ui-console-retirement-barrier-smoke)
-list(APPEND SOFTPC_TEST_TARGETS softpc-ui-console-mouse-scale-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-plan-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-reconciler-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-control-state-matrix-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-command-smoke)
+list(APPEND SOFTPC_TEST_TARGETS softpc-input-queue-mouse-fifo-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
     # Keep every executable test self-contained, just like the launcher.
@@ -658,11 +659,11 @@ set(SOFTPC_UNIT_TESTS
     softpc-win32-window-bounds-smoke
     softpc-ui-component-contract-smoke
     softpc-ui-console-retirement-barrier-smoke
-    softpc-ui-console-mouse-scale-smoke
     softpc-presentation-plan-smoke
     softpc-reconciler-smoke
     softpc-control-state-matrix-smoke
     softpc-command-smoke
+    softpc-input-queue-mouse-fifo-smoke
     softpc-standalone-source-boundary
     softpc-documentation-governance)
 

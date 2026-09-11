@@ -2,7 +2,28 @@
 
 ## Current Work
 
-No implementation subtask is active.
+M9 T54 S1 is active: correct T53 raw-Console mouse-scale regression.
+
+## M9 T54 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner directed withdrawal of T53's unsupported scale change and authorized corrective implementation, dual-width test, commit, and push. |
+| Objective | Restore the established raw Console character-cell conversion of X×8 and Y×16 mickeys, and preserve individual mouse packets through the app FIFO. |
+| Non-goals | No host, MVDM, UI Window private coalescing, Console capture/broker, guest-driver, or `softpc.ini` changes. |
+| Reference Baseline | `13c5075` / `87df10f`; production comparison also uses pre-T53 `291afe4`. |
+| Candidate Proposal | [M9 T54 Console Mouse Scale Correction](../proposals/m9-t54-console-mouse-scale-correction.md). |
+| Files And ABI Surface | `ui-console` conversion, app input FIFO, focused FIFO smoke/CMake registration, T53-only smoke removal, library manifest, records, and rebuilt package EXEs; no public ABI. |
+| Applicable Rules | Execution, Architecture, Coding, Documentation, Architecture design, and UI design authorities. |
+| Verification | Exact path comparison to T51/T53 baselines; manifest/governance/diff gates; fresh x64/x86 build and CTest. |
+| Expected Markers | Y conversion is sixteen; two same-button mouse events remain two FIFO entries; no T53 mouse-scale target remains; no changed production path outside `ui-console` and app FIFO. |
+| Asset Needs | Refresh only `softpc32.exe` and `softpc64.exe`; preserve `softpc.ini` and media. |
+| Reporting Requirements | Report exact retained/reverted path set, dual-width evidence, commits, and package links. |
+| Stop Conditions | Stop for any required change outside the declared paths. |
+| Exit Criteria | T53 source assumption is removed, exact scope audit passes, both widths pass, and all changes are pushed and closed. |
+| Original Owner Request | “那我怎么知道你没有改掉其他不该改的地方？…行。你处理掉吧。” |
+| Similar-Issue Sweep | Compare all T53-touched paths to `291afe4`; inspect every app-side mouse coalescing site and retain only UI-leaf-private coalescing. |
 
 ## Current Technical Baseline
 
