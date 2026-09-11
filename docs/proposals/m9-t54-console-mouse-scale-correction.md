@@ -7,5 +7,7 @@ cross-source mouse coalescing: original InPort acceleration is packet-sized,
 so the shared queue must preserve individual relative records.  `ui-window`'s
 private native-message coalescing remains unchanged. Each copied UI movement
 is delivered as one InPort movement record, preserving the original adapter's
-packet and velocity semantics. No host, recovered machine,
+packet and velocity semantics. The focused hardware smoke also proves that
+the original InPort, not the application FIFO, accumulates relative records
+until the guest's HOLD transition latches them. No host, recovered machine,
 Console ownership, or user configuration changes.

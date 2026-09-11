@@ -114,6 +114,23 @@ int main(void)
     inb(MOUSE_PORT_1, &value);
     assert(value == 0xfdu);
 
+    /* The InPort itself—not the app FIFO—accumulates host movement until
+       the guest raises HOLD.  Preserve this original device fact explicitly:
+       two ingress calls before one HOLD become one latched relative record. */
+    outb(MOUSE_PORT_0, 0x87u);
+    outb(MOUSE_PORT_1, 0x10u);
+    assert(softpc_machine_mouse_input(machine, 3, 4, 1u, 0u) ==
+        SOFTPC_MACHINE_OK);
+    assert(softpc_machine_mouse_input(machine, 5, 6, 1u, 0u) ==
+        SOFTPC_MACHINE_OK);
+    outb(MOUSE_PORT_1, 0x30u);
+    outb(MOUSE_PORT_0, INTERNAL_DATA1_REG);
+    inb(MOUSE_PORT_1, &value);
+    assert(value == 8u);
+    outb(MOUSE_PORT_0, INTERNAL_DATA2_REG);
+    inb(MOUSE_PORT_1, &value);
+    assert(value == 10u);
+
     /* A second event must travel through the original InPort, slave PIC,
        CCPU interrupt delivery and guest handler.  Windows' Microsoft
        MOUSE.DRV uses this exact machine path to draw and update its own

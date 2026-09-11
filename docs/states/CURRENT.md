@@ -17,7 +17,7 @@ M9 T54 S1 is active: correct T53 raw-Console mouse-scale regression.
 | Files And ABI Surface | `ui-console` conversion, app input FIFO, focused FIFO smoke/CMake registration, T53-only smoke removal, library manifest, records, and rebuilt package EXEs; no public ABI. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, Architecture design, and UI design authorities. |
 | Verification | Exact path comparison to T51/T53 baselines; manifest/governance/diff gates; fresh x64/x86 build and CTest. |
-| Expected Markers | Y conversion is sixteen; two same-button mouse events remain two FIFO entries; no T53 mouse-scale target remains; no changed production path outside `ui-console` and app FIFO. |
+| Expected Markers | Y conversion is sixteen; two same-button mouse events remain two FIFO entries; the original InPort accumulates two pre-HOLD movements into one exact latched relative record; no T53 mouse-scale target remains; no changed production path outside `ui-console` and app FIFO. |
 | Asset Needs | Refresh only `softpc32.exe` and `softpc64.exe`; preserve `softpc.ini` and media. |
 | Reporting Requirements | Report exact retained/reverted path set, dual-width evidence, commits, and package links. |
 | Stop Conditions | Stop for any required change outside the declared paths. |
