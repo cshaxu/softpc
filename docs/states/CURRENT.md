@@ -2,7 +2,8 @@
 
 ## Current Work
 
-No implementation subtask is active.
+M9 T51 S1 is active: freeze the exact shared-library component-normalization
+ledger and public dependency contract before any source move.
 
 ## Current Technical Baseline
 
@@ -50,3 +51,24 @@ No implementation subtask is active.
 - **M9 Td S9:** Future-task closure audit, whole-domain convergence, complete
   P discipline, path accounting, and build hygiene now match the relevant
   NXVM governance standard. [Record](../history/M9-Td-S9-execution-closure-quality.md)
+
+## M9 T51 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner approved T51 admission, Queue insertion, and S1 execution on 2026-09-10. |
+| Objective | Freeze the complete migration ledger and authoritative component graph for `types`, `console`, `host`, `storage`, `ui-base`, `ui-window`, and `ui-console`. |
+| Non-goals | No source move, public API rename, runtime behavior, MVDM, package, media, or `softpc.ini` change in S1. |
+| Reference Baseline | Closed T50 final source proof; current lib graph is `base -> ux-base + host + storage`, `ux-base -> ux-window + ux-console`, with legacy CMake target aggregates. |
+| Candidate Proposal | [M9 T51 proposal](../proposals/m9-t51-lib-component-normalization.md) |
+| Files And ABI Surface | Proposal, Queue, Current packet, indexed T51 ledger, and their documentation index; `src/lib/CMakeLists.txt` and public interfaces are read-only inventory inputs in S1. |
+| Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, and `DOCUMENT.md`; `src/mvdm/softpc.new/` remains immutable. |
+| Verification | Reproducible `rg` inventory of old source/build names; CMake documentation-governance gate; review that every ledger member has a disposition and no implementation occurred. |
+| Expected Markers | Frozen path/target/API ledger, approved component DAG, explicit external-app exception for public `ui-base` ABI, and prohibited-old-name scan scope. |
+| Asset Needs | None. No build output or package artifact is admitted. |
+| Reporting Requirements | Report each path class, all direct SoftPC public-ABI dependencies, target-link changes planned for S3, and any discovery requiring proposal revision. |
+| Stop Conditions | Stop before any behavior/API move if the inventory discovers a cycle, a non-SoftPC consumer, a public binary compatibility commitment, or a change touching MVDM. |
+| Exit Criteria | The ledger is complete and reproducible, the authoritative graph is updated without duplicate rules, governance verification passes, and S1 is committed/pushed with coordinator review. |
+| Original Owner Request | “base should become type(s); ux components should become ui components; types may be depended on by all components and ui-base only by the two UI leaves.” |
+| Similar-Issue Sweep | Search all tracked `src/lib`, `src/app`, `src/host`, `test`, root CMake, and library CMake paths for old include, target, and identifier forms; record every hit rather than treating a directory rename as complete. |
