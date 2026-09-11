@@ -14,6 +14,11 @@ typedef struct ui_console_win32_state {
     int previous_mouse_valid;
 } ui_console_win32_state;
 
+/* Raw Console mouse records are expressed in character cells.  UI relative
+ * input uses an eight-unit logical cell on both axes; rendering font height
+ * is deliberately not part of this input conversion. */
+#define UI_CONSOLE_LOGICAL_MOUSE_CELL 8
+
 static int ui_console_emit(ui_console *console, const ui_input_event *event)
 {
     return console == LIB_NULL ? 0 : ui_component_emit(&console->base, event);
@@ -70,8 +75,10 @@ static void ui_console_receive_event(void *context,
         input.type = UI_EVENT_MOUSE;
         input.data.mouse.relative = 1u;
         if (state->previous_mouse_valid) {
-            input.data.mouse.delta_x = (mouse->delta_x - state->previous_mouse.X) * 8;
-            input.data.mouse.delta_y = (mouse->delta_y - state->previous_mouse.Y) * 16;
+            input.data.mouse.delta_x = (mouse->delta_x - state->previous_mouse.X) *
+                UI_CONSOLE_LOGICAL_MOUSE_CELL;
+            input.data.mouse.delta_y = (mouse->delta_y - state->previous_mouse.Y) *
+                UI_CONSOLE_LOGICAL_MOUSE_CELL;
         }
         state->previous_mouse.X = (SHORT)mouse->delta_x;
         state->previous_mouse.Y = (SHORT)mouse->delta_y;

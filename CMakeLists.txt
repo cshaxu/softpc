@@ -525,6 +525,13 @@ add_test(NAME softpc-ui-console-retirement-barrier-smoke
     COMMAND softpc-ui-console-retirement-barrier-smoke)
 set_tests_properties(softpc-ui-console-retirement-barrier-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-ui-console-mouse-scale-smoke
+    test/unit/ui_console_mouse_scale_smoke.c)
+target_link_libraries(softpc-ui-console-mouse-scale-smoke PRIVATE ui-console)
+add_test(NAME softpc-ui-console-mouse-scale-smoke
+    COMMAND softpc-ui-console-mouse-scale-smoke)
+set_tests_properties(softpc-ui-console-mouse-scale-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-presentation-plan-smoke
     test/unit/presentation_plan_smoke.c
     src/app/presentation_plan.c)
@@ -611,6 +618,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-win32-window-bounds-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-ui-component-contract-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-ui-console-retirement-barrier-smoke)
+list(APPEND SOFTPC_TEST_TARGETS softpc-ui-console-mouse-scale-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-plan-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-reconciler-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-control-state-matrix-smoke)
@@ -650,6 +658,7 @@ set(SOFTPC_UNIT_TESTS
     softpc-win32-window-bounds-smoke
     softpc-ui-component-contract-smoke
     softpc-ui-console-retirement-barrier-smoke
+    softpc-ui-console-mouse-scale-smoke
     softpc-presentation-plan-smoke
     softpc-reconciler-smoke
     softpc-control-state-matrix-smoke
