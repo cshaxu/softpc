@@ -10,14 +10,14 @@ M9 T54 S1 is active: correct T53 raw-Console mouse-scale regression.
 | --- | --- |
 | Identifier Mode | New |
 | Admission And Approval | Owner directed withdrawal of T53's unsupported scale change and authorized corrective implementation, dual-width test, commit, and push. |
-| Objective | Restore the established raw Console character-cell conversion of X×8 and Y×16 mickeys, preserve individual FIFO records, and split relative movement into stable InPort packets. |
+| Objective | Restore the established raw Console character-cell conversion of X×8 and Y×16 surface pixels, preserve individual FIFO records, convert copied surface-pixel Y movement to the selected InPort two-mickeys-per-pixel ratio, and split relative movement into stable InPort packets. |
 | Non-goals | No host, MVDM, UI Window private coalescing, Console capture/broker, guest-driver, or `softpc.ini` changes. |
 | Reference Baseline | `13c5075` / `87df10f`; production comparison also uses pre-T53 `291afe4`. |
 | Candidate Proposal | [M9 T54 Console Mouse Scale Correction](../proposals/m9-t54-console-mouse-scale-correction.md). |
 | Files And ABI Surface | `ui-console` conversion, app input FIFO and guest mouse-packet adapter, focused FIFO/packet smokes and CMake registration, T53-only smoke removal, library manifest, records, and rebuilt package EXEs; no public ABI. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, Architecture design, and UI design authorities. |
 | Verification | Exact path comparison to T51/T53 baselines; manifest/governance/diff gates; fresh x64/x86 build and CTest. |
-| Expected Markers | Y conversion is sixteen; two same-button mouse events remain two FIFO entries; `{8,16}` becomes four packets of at most four units per axis with exact conserved sum; no T53 mouse-scale target remains. |
+| Expected Markers | Raw Console conversion is X×8/Y×16 surface pixels; two same-button mouse events remain two FIFO entries; guest adaptation converts `{8,16}` surface pixels to `{8,32}` mickeys and delivers eight packets of at most four units per axis with exact converted sum; no T53 mouse-scale target remains. |
 | Asset Needs | Refresh only `softpc32.exe` and `softpc64.exe`; preserve `softpc.ini` and media. |
 | Reporting Requirements | Report exact retained/reverted path set, dual-width evidence, commits, and package links. |
 | Stop Conditions | Stop for any required change outside the declared paths. |

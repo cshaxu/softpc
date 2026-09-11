@@ -395,6 +395,7 @@ static void app_runtime_drain_input(app_runtime *runtime)
         event = runtime->pending_mouse;
         runtime->pending_mouse_valid = 0;
     } else if (app_input_queue_pop(runtime->input_queue, &event)) {
+        if (event.type == UI_EVENT_MOUSE) app_mouse_packet_prepare(&event);
         if (event.type == UI_EVENT_KEY) {
             if (getenv("SOFTPC_INPUT_TRACE") != NULL)
                 fprintf(stderr, "softpc input drain scan=%u released=%u\n",
