@@ -1,7 +1,6 @@
 #include "runtime.h"
 #include "keyboard.h"
 #include "input_queue.h"
-#include "mouse_packet.h"
 #include "prompt_trace.h"
 #include "lib/host/clock_interface.h"
 #include "lib/host/sync_interface.h"
@@ -44,8 +43,6 @@ static void app_runtime_prompt_trace(uint32_t sequence, uint32_t mode_type,
 struct app_runtime {
     softpc_machine *machine;
     app_input_queue *input_queue;
-    ui_event pending_mouse;
-    int pending_mouse_valid;
     ui_frame *frame_buffers[2];
     CRITICAL_SECTION frame_lock;
     int published_frame_index;
@@ -383,7 +380,6 @@ done:
 static void app_runtime_drain_input(app_runtime *runtime)
 {
     ui_event event;
-    ui_event packet;
 
     /* keyboard_io can enter a nested host_simulate frame for the original
        BIOS INT 15 keyboard hook.  A Windows make/break pair may already be
@@ -391,11 +387,7 @@ static void app_runtime_drain_input(app_runtime *runtime)
        into that frame corrupts the original controller's service ordering.
        Deliver precisely one hardware scan event per executor callback; the
        restored 20 Hz host timer naturally schedules the next one. */
-    if (runtime->pending_mouse_valid) {
-        event = runtime->pending_mouse;
-        runtime->pending_mouse_valid = 0;
-    } else if (app_input_queue_pop(runtime->input_queue, &event)) {
-        if (event.type == UI_EVENT_MOUSE) app_mouse_packet_prepare(&event);
+    if (app_input_queue_pop(runtime->input_queue, &event)) {
         if (event.type == UI_EVENT_KEY) {
             if (getenv("SOFTPC_INPUT_TRACE") != NULL)
                 fprintf(stderr, "softpc input drain scan=%u released=%u\n",
@@ -403,22 +395,17 @@ static void app_runtime_drain_input(app_runtime *runtime)
                     (unsigned int)!event.data.key.pressed);
             (void)app_keyboard_inject_machine_event(runtime->machine, &event);
         } else if (event.type == UI_EVENT_MOUSE) {
-            app_mouse_packet_take(&event, &packet);
             (void)softpc_machine_mouse_input(runtime->machine,
-                packet.data.mouse.delta_x, packet.data.mouse.delta_y,
-                (packet.data.mouse.buttons & UI_MOUSE_BUTTON_LEFT) != 0u,
-                (packet.data.mouse.buttons & UI_MOUSE_BUTTON_RIGHT) != 0u);
-            if (app_mouse_packet_pending(&event)) {
-                runtime->pending_mouse = event;
-                runtime->pending_mouse_valid = 1;
-            }
+                event.data.mouse.delta_x, event.data.mouse.delta_y,
+                (event.data.mouse.buttons & UI_MOUSE_BUTTON_LEFT) != 0u,
+                (event.data.mouse.buttons & UI_MOUSE_BUTTON_RIGHT) != 0u);
         }
         /* The original keyboard path can re-enter the CCPU while servicing
            one transition.  It remains deliberately one transition per
            executor callback.  If the standalone queue already has another
            transition, arrange a new CCPU-safe callback rather than waiting
            for the unrelated 20 Hz device clock. */
-        if (runtime->pending_mouse_valid || app_input_queue_pending(runtime->input_queue))
+        if (app_input_queue_pending(runtime->input_queue))
             softpc_machine_request_wake(runtime->machine);
     }
 }
