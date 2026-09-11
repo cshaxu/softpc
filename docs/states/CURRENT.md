@@ -62,7 +62,7 @@ rename in one atomic, buildable migration.
 | Non-goals | No behavior, lifecycle, threading, mailbox, MVDM, package, media, user `softpc.ini`, or Linux-support change; no compatibility alias, forwarding header, or duplicate old path. |
 | Reference Baseline | T51 S1 frozen ledger and closed T50 x86/x64 package proof; current source is the old `base`/`ux-*` corpus. |
 | Candidate Proposal | [M9 T51 proposal](../proposals/m9-t51-lib-component-normalization.md) |
-| Files And ABI Surface | All 72 `src/lib` files, `src/app`, `src/host`, enumerated tests, root/library CMake, library manifest, and source-boundary verifier; public include paths and `ux_*` names intentionally become `types`/`console`/`ui-*`. |
+| Files And ABI Surface | All 72 `src/lib` files, `src/app`, `src/host`, enumerated tests, root/library CMake, library manifest, source-boundary verifier, and the documentation-governance continuation self-test; public include paths and `ux_*` names intentionally become `types`/`console`/`ui-*`. |
 | Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, and `DOCUMENT.md`; `src/mvdm/softpc.new/` remains immutable. |
 | Verification | `git mv`-based path audit; standalone library manifest build; root build/configure; old-name zero scan over the ledger scope; focused library/component tests and source-boundary gate. |
 | Expected Markers | No old directory, target, public include path, `ux_*` public ABI, or aggregate alias remains in the active corpus; root CMake names direct normalized targets. |

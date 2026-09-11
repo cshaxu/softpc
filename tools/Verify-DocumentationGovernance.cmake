@@ -106,6 +106,7 @@ endfunction()
 
 function(softpc_validate_current_state root)
     file(READ "${root}/docs/states/CURRENT.md" status)
+    set(active_task "")
     foreach(heading IN ITEMS
         "# Project Status" "## Current Work" "## Current Technical Baseline"
         "## Recent M9 Closures" "## Recent Governance")
@@ -135,6 +136,7 @@ function(softpc_validate_current_state root)
         set(packet_kind "${CMAKE_MATCH_2}")
         set(packet_task "${CMAKE_MATCH_3}")
         set(packet_step "${CMAKE_MATCH_4}")
+        set(active_task "${packet_task}")
         string(FIND "${status}" "| Field | Required record |" table_header_at)
         string(FIND "${status}" "| --- | --- |" table_separator_at)
         if(table_header_at EQUAL -1 OR table_separator_at EQUAL -1)
@@ -215,7 +217,12 @@ function(softpc_validate_current_state root)
     if(NOT highest_history_task EQUAL 0)
         softpc_current_has_closed_task("${status}" "${highest_history_task}"
             highest_task_is_closed)
-        if(NOT highest_task_is_closed)
+        # A continuation records a completed earlier S in history while the
+        # same numeric T remains active. Requiring a T-level closure row here
+        # would make that valid lifecycle impossible; an active packet is the
+        # single authoritative exception.
+        if(NOT highest_task_is_closed AND NOT
+           (NOT active_task STREQUAL "" AND active_task EQUAL highest_history_task))
             softpc_fail("CURRENT.md must retain the highest recorded numeric T closure row")
         endif()
     endif()
@@ -336,6 +343,9 @@ if(SELF_TEST)
         stale_closure "${packet}")
     softpc_write_fixture("${SELF_TEST_ROOT}/stale-closure" "${stale_closure}" "${queue}" "${todo}")
     softpc_expect_fixture("${SELF_TEST_ROOT}/stale-closure" FALSE)
+    set(continuation_packet "# Project Status\n\n## Current Work\n\nM9 T1 S2 is active.\n\n## Current Technical Baseline\n\nbaseline\n\n## Recent M9 Closures\n\n| Task | Closure | Evidence |\n| --- | --- | --- |\n| T0 | closed | evidence |\n\n## Recent Governance\n\n## M9 T1 S2 Packet\n\n| Field | Required record |\n| --- | --- |\n| Identifier Mode | Continuation |\n| Admission And Approval | owner |\n| Objective | objective |\n| Non-goals | none |\n| Reference Baseline | baseline |\n| Candidate Proposal | [active](../proposals/active.md) |\n| Files And ABI Surface | docs |\n| Applicable Rules | rules |\n| Verification | test |\n| Expected Markers | markers |\n| Asset Needs | none |\n| Reporting Requirements | report |\n| Stop Conditions | stop |\n| Exit Criteria | exit |\n| Original Owner Request | request |\n| Similar-Issue Sweep | sweep |\n")
+    softpc_write_fixture("${SELF_TEST_ROOT}/active-continuation" "${continuation_packet}" "${queue}" "${todo}")
+    softpc_expect_fixture("${SELF_TEST_ROOT}/active-continuation" TRUE)
     message(STATUS "SoftPC documentation governance self-tests passed")
 else()
     if(NOT DEFINED SOFTPC_SOURCE_DIR)
