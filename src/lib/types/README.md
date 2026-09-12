@@ -12,3 +12,6 @@ uniform component-private contract: `host` owns synchronization and Console
 native work, `storage` owns file native work, and `ui-base`/the UI leaves own
 their own wake, input, and rendering work. `types` never interprets a
 consumer's state machine or input protocol.
+
+`win32/file.h` groups external CRT file declarations only. File operations
+and ownership remain in `storage/win32/file.c`; there is no runtime layer.

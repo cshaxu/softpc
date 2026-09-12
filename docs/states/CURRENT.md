@@ -6,6 +6,9 @@ M9 T55 S2 is active: make `lib/types` header-only external vocabulary while
 each owning component supplies its selected same-shape platform source,
 without changing component behavior.
 
+Owner explicitly requires T55 to remain open; this naming correction does
+not close either T55 or its active S2.
+
 ## M9 T55 S2 Packet
 
 | Field | Required record |

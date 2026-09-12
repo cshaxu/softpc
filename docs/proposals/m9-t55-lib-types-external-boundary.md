@@ -96,3 +96,18 @@ flow changed. The source-boundary gate rejects recurrence in paths and code
 identifiers, excluding comments. x64 and x86 full CTest each passed 38/38;
 the strict library build and its two checks passed. Both package EXEs were
 rebuilt. T55 S2 remains active pending owner acceptance.
+
+## P17 file declaration header naming
+
+Rename the sole `*_runtime` header, `types/win32_runtime.h`, to
+`types/win32/file.h` and update its only consumer, `storage/win32/file.c`.
+This is a declaration-header relocation, not a completed typed-wrapper
+migration: the external declarations remain unchanged and file implementation
+stays in storage. No runtime layer is introduced. T55 and S2 remain active
+by explicit owner direction.
+
+Verification: no `*_runtime` path or old header reference remains in the
+library; x64 and x86 rebuilt and each passed 38/38 CTest, including package
+smoke. Strict library build, 2/2 standalone checks, documentation governance
+and diff checks passed. Production changes are limited to the header move,
+include guard and its one include site; no executable logic changed.

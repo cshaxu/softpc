@@ -1,7 +1,7 @@
 #include "lib/types/types_interface.h"
 
 #include "lib/types/win32.h"
-#include "lib/types/win32_runtime.h"
+#include "lib/types/win32/file.h"
 
 #include "lib/storage/file.h"
 
