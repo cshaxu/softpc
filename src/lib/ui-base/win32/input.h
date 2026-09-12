@@ -56,17 +56,17 @@ typedef struct ui_win32_keyboard_normalizer {
 /* These functions only normalize host packets.  A project binding maps each
    physical record to its own input protocol and owns its input queue. */
 int ui_win32_keyboard_submit_transition(void *context,
-    ui_event_sink sink, lib_u16 scan, lib_u16 native_key,
-    lib_u8 native_flags, lib_u8 hotkey_modifiers, int pressed);
+    ui_event_sink sink, lib_u16 scan, lib_u16 virtual_key,
+    lib_u8 record_flags, lib_u8 hotkey_modifiers, int pressed);
 int ui_win32_keyboard_submit_utf16(
     ui_win32_keyboard_normalizer *state, void *context,
     ui_event_sink sink, lib_u16 code_unit);
 void ui_win32_keyboard_note_recovered_key(
-    ui_win32_keyboard_normalizer *state, lib_u16 native_key);
+    ui_win32_keyboard_normalizer *state, lib_u16 virtual_key);
 void ui_win32_keyboard_release_recovered_key(
-    ui_win32_keyboard_normalizer *state, lib_u16 native_key);
+    ui_win32_keyboard_normalizer *state, lib_u16 virtual_key);
 int ui_win32_keyboard_consume_duplicate_character(
     ui_win32_keyboard_normalizer *state, lib_u16 code_unit);
-lib_u8 ui_win32_keyboard_flags_from_lparam(lib_u64 native_lparam);
+lib_u8 ui_win32_keyboard_flags_from_lparam(lib_u64 message_lparam);
 
 #endif

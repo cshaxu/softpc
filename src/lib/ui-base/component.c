@@ -34,18 +34,18 @@ static void ui_component_report_failure(ui_component *component, lib_status stat
 }
 
 lib_status ui_component_initialize(ui_component *component,
-    const ui_component_options *options, ui_component_native_stop_fn native_stop,
+    const ui_component_options *options, ui_component_join_fn join_worker,
     ui_component_dispose_fn dispose)
 {
     lib_u64 identity;
     if (component == LIB_NULL || options == LIB_NULL || options->input_sink == LIB_NULL ||
         options->failure_sink == LIB_NULL ||
-        native_stop == LIB_NULL || dispose == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+        join_worker == LIB_NULL || dispose == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     component->input_context = options->input_context;
     component->input_sink = options->input_sink;
     component->failure_context = options->failure_context;
     component->failure_sink = options->failure_sink;
-    component->native_stop = native_stop;
+    component->join_worker = join_worker;
     component->dispose = dispose;
     if (ui_component_allocate_source_identity(&ui_component_next_source_identity,
             &identity) != LIB_STATUS_OK)
@@ -123,6 +123,6 @@ void ui_component_destroy(ui_component *component)
         ui_component_report_failure(component, LIB_STATUS_INVALID_STATE);
         return;
     }
-    component->native_stop(component);
+    component->join_worker(component);
     component->dispose(component);
 }

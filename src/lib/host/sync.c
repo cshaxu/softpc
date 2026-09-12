@@ -77,8 +77,8 @@ host_sync_wait_result host_sync_wait_any(host_sync_event *const *events,
     lib_u32 timeout_milliseconds, lib_u32 *out_event_index)
 {
     const host_sync_platform_event *platform_events[64];
-    lib_u32 native_count = 0u;
-    lib_u32 native_index = 0u;
+    lib_u32 event_count_with_cancel = 0u;
+    lib_u32 signaled_index = 0u;
     lib_u32 index;
     lib_bool signaled = LIB_FALSE;
     lib_status status;
@@ -91,21 +91,21 @@ host_sync_wait_result host_sync_wait_any(host_sync_event *const *events,
         if (cancel_task->cancellation == LIB_NULL ||
             cancel_task->cancellation->platform == LIB_NULL)
             return HOST_SYNC_WAIT_INVALID_ARGUMENT;
-        platform_events[native_count++] = cancel_task->cancellation->platform;
+        platform_events[event_count_with_cancel++] = cancel_task->cancellation->platform;
     }
     for (index = 0u; index < event_count; ++index) {
         if (events[index] == LIB_NULL || events[index]->platform == LIB_NULL)
             return HOST_SYNC_WAIT_INVALID_ARGUMENT;
-        platform_events[native_count++] = events[index]->platform;
+        platform_events[event_count_with_cancel++] = events[index]->platform;
     }
-    status = host_sync_platform_event_wait_many(platform_events, native_count,
-        timeout_milliseconds, &signaled, &native_index);
+    status = host_sync_platform_event_wait_many(platform_events, event_count_with_cancel,
+        timeout_milliseconds, &signaled, &signaled_index);
     if (status != LIB_STATUS_OK || signaled == LIB_FALSE)
         return host_sync_wait_result_from_platform(status, signaled);
-    if (cancel_task != LIB_NULL && native_index == 0u)
+    if (cancel_task != LIB_NULL && signaled_index == 0u)
         return HOST_SYNC_WAIT_CANCELLED;
     if (out_event_index != LIB_NULL)
-        *out_event_index = native_index - (cancel_task != LIB_NULL ? 1u : 0u);
+        *out_event_index = signaled_index - (cancel_task != LIB_NULL ? 1u : 0u);
     return HOST_SYNC_WAIT_SIGNALED;
 }
 

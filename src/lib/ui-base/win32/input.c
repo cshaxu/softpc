@@ -1,42 +1,42 @@
 #include "lib/ui-base/win32/input.h"
 #include "lib/ui-base/hotkey_interface.h"
-#include "lib/types/native_input.h"
+#include "lib/types/input.h"
 
-static lib_u16 ui_win32_keyboard_resolve_scan(lib_u16 native_key)
+static lib_u16 ui_win32_keyboard_resolve_scan(lib_u16 virtual_key)
 {
-    return lib_native_input_scan_code(native_key);
+    return lib_input_scan_code(virtual_key);
 }
 
 /* Layout interpretation belongs to the UI keyboard adapter.  types exposes
  * only raw key-state and scan-code queries. */
 static lib_bool ui_win32_keyboard_map_scalar(lib_u32 scalar,
-    lib_u16 *out_native_key, lib_u8 *out_modifiers)
+    lib_u16 *out_virtual_key, lib_u8 *out_modifiers)
 {
     SHORT mapped;
 
-    if (out_native_key == LIB_NULL || out_modifiers == LIB_NULL || scalar > 0xffu)
+    if (out_virtual_key == LIB_NULL || out_modifiers == LIB_NULL || scalar > 0xffu)
         return LIB_FALSE;
     mapped = VkKeyScanA((CHAR)scalar);
     if (mapped == -1) return LIB_FALSE;
-    *out_native_key = (lib_u16)(mapped & 0xff);
+    *out_virtual_key = (lib_u16)(mapped & 0xff);
     *out_modifiers = (lib_u8)((mapped >> 8) & 0xff);
     return LIB_TRUE;
 }
 
 /* Native values stop at this adapter boundary.  This component decides how
  * they become neutral UI key identities. */
-static lib_u32 ui_win32_keyboard_key(lib_u16 native_key)
+static lib_u32 ui_win32_keyboard_key(lib_u16 virtual_key)
 {
-    if ((native_key >= UI_WIN32_KEY_0 && native_key <= UI_WIN32_KEY_9) ||
-        (native_key >= UI_WIN32_KEY_A && native_key <= UI_WIN32_KEY_Z))
-        return native_key;
-    if (native_key >= UI_WIN32_KEY_NUMPAD_0 && native_key <= UI_WIN32_KEY_NUMPAD_9)
-        return UI_KEY_KEYPAD_0 + native_key - UI_WIN32_KEY_NUMPAD_0;
-    if (native_key >= UI_WIN32_KEY_F1 && native_key <= UI_WIN32_KEY_F12)
-        return UI_KEY_F1 + native_key - UI_WIN32_KEY_F1;
-    if (native_key >= UI_WIN32_KEY_F13 && native_key <= UI_WIN32_KEY_F24)
-        return UI_KEY_F13 + native_key - UI_WIN32_KEY_F13;
-    switch (native_key) {
+    if ((virtual_key >= UI_WIN32_KEY_0 && virtual_key <= UI_WIN32_KEY_9) ||
+        (virtual_key >= UI_WIN32_KEY_A && virtual_key <= UI_WIN32_KEY_Z))
+        return virtual_key;
+    if (virtual_key >= UI_WIN32_KEY_NUMPAD_0 && virtual_key <= UI_WIN32_KEY_NUMPAD_9)
+        return UI_KEY_KEYPAD_0 + virtual_key - UI_WIN32_KEY_NUMPAD_0;
+    if (virtual_key >= UI_WIN32_KEY_F1 && virtual_key <= UI_WIN32_KEY_F12)
+        return UI_KEY_F1 + virtual_key - UI_WIN32_KEY_F1;
+    if (virtual_key >= UI_WIN32_KEY_F13 && virtual_key <= UI_WIN32_KEY_F24)
+        return UI_KEY_F13 + virtual_key - UI_WIN32_KEY_F13;
+    switch (virtual_key) {
     case UI_WIN32_KEY_SPACE: return ' ';
     case UI_WIN32_KEY_OEM_1: return ';'; case UI_WIN32_KEY_OEM_PLUS: return '=';
     case UI_WIN32_KEY_OEM_COMMA: return ','; case UI_WIN32_KEY_OEM_MINUS: return '-';
@@ -66,11 +66,11 @@ static lib_u32 ui_win32_keyboard_key(lib_u16 native_key)
 }
 
 static int ui_win32_keyboard_emit(void *context, ui_event_sink sink,
-    lib_u16 scan, lib_u16 native_key, lib_u8 native_flags,
+    lib_u16 scan, lib_u16 virtual_key, lib_u8 record_flags,
     lib_u8 hotkey_modifiers, int pressed)
 {
     ui_event event;
-    lib_u32 key = ui_win32_keyboard_key(native_key);
+    lib_u32 key = ui_win32_keyboard_key(virtual_key);
 
     if (sink == LIB_NULL || key == 0u || scan == 0u) return 0;
     lib_memory_set(&event, 0, sizeof(event));
@@ -78,46 +78,46 @@ static int ui_win32_keyboard_emit(void *context, ui_event_sink sink,
     event.data.key.pressed = pressed != 0;
     event.data.key.key = key;
     event.data.key.scan_code = scan;
-    event.data.key.flags = (native_flags & UI_WIN32_INPUT_FLAG_EXTENDED) != 0u ?
+    event.data.key.flags = (record_flags & UI_WIN32_INPUT_FLAG_EXTENDED) != 0u ?
         UI_KEY_FLAG_EXTENDED : 0u;
     event.data.key.modifiers = hotkey_modifiers;
     return sink(context, &event);
 }
 
 int ui_win32_keyboard_submit_transition(void *context, ui_event_sink sink,
-    lib_u16 scan, lib_u16 native_key, lib_u8 native_flags,
+    lib_u16 scan, lib_u16 virtual_key, lib_u8 record_flags,
     lib_u8 hotkey_modifiers, int pressed)
 {
-    if (scan == 0u) scan = ui_win32_keyboard_resolve_scan(native_key);
-    return ui_win32_keyboard_emit(context, sink, scan, native_key,
-        native_flags, hotkey_modifiers, pressed);
+    if (scan == 0u) scan = ui_win32_keyboard_resolve_scan(virtual_key);
+    return ui_win32_keyboard_emit(context, sink, scan, virtual_key,
+        record_flags, hotkey_modifiers, pressed);
 }
 
 void ui_win32_keyboard_note_recovered_key(
-    ui_win32_keyboard_normalizer *state, lib_u16 native_key)
+    ui_win32_keyboard_normalizer *state, lib_u16 virtual_key)
 {
     if (state != LIB_NULL) state->recovered_virtual_key =
-        ui_win32_keyboard_resolve_scan(native_key) == 0u ? 0u : native_key;
+        ui_win32_keyboard_resolve_scan(virtual_key) == 0u ? 0u : virtual_key;
 }
 
 void ui_win32_keyboard_release_recovered_key(
-    ui_win32_keyboard_normalizer *state, lib_u16 native_key)
+    ui_win32_keyboard_normalizer *state, lib_u16 virtual_key)
 {
-    if (state != LIB_NULL && state->recovered_virtual_key == native_key)
+    if (state != LIB_NULL && state->recovered_virtual_key == virtual_key)
         state->recovered_virtual_key = 0u;
 }
 
 int ui_win32_keyboard_consume_duplicate_character(
     ui_win32_keyboard_normalizer *state, lib_u16 code_unit)
 {
-    lib_u16 native_key;
+    lib_u16 virtual_key;
     lib_u8 modifiers;
     int duplicate;
 
     if (state == LIB_NULL || state->recovered_virtual_key == 0u || code_unit == 0u ||
         (code_unit >= 0xd800u && code_unit <= 0xdfffu)) return 0;
-    duplicate = ui_win32_keyboard_map_scalar(code_unit, &native_key, &modifiers) &&
-        native_key == state->recovered_virtual_key;
+    duplicate = ui_win32_keyboard_map_scalar(code_unit, &virtual_key, &modifiers) &&
+        virtual_key == state->recovered_virtual_key;
     state->recovered_virtual_key = 0u;
     return duplicate;
 }
@@ -125,21 +125,21 @@ int ui_win32_keyboard_consume_duplicate_character(
 static int ui_win32_keyboard_submit_character(void *context,
     ui_event_sink sink, lib_u32 scalar)
 {
-    lib_u16 native_key;
+    lib_u16 virtual_key;
     lib_u16 scan;
     lib_u8 modifiers;
     lib_u8 hotkey_modifiers = 0u;
 
     if (scalar == 0u || scalar > 0xffffu ||
         (scalar >= 0xd800u && scalar <= 0xdfffu)) return 0;
-    if (!ui_win32_keyboard_map_scalar(scalar, &native_key, &modifiers)) {
+    if (!ui_win32_keyboard_map_scalar(scalar, &virtual_key, &modifiers)) {
         ui_event event;
         lib_memory_set(&event, 0, sizeof(event));
         event.type = UI_EVENT_TEXT;
         event.data.text.scalar = scalar;
         return sink != LIB_NULL && sink(context, &event);
     }
-    scan = ui_win32_keyboard_resolve_scan(native_key);
+    scan = ui_win32_keyboard_resolve_scan(virtual_key);
     if (scan == 0u) return 0;
     if ((modifiers & UI_WIN32_INPUT_MODIFIER_CONTROL) != 0u) {
         hotkey_modifiers |= UI_HOTKEY_MODIFIER_CONTROL;
@@ -156,9 +156,9 @@ static int ui_win32_keyboard_submit_character(void *context,
         if (!ui_win32_keyboard_emit(context, sink, 0x2au, UI_WIN32_KEY_SHIFT, 0u,
                 hotkey_modifiers, 1)) return 0;
     }
-    if (!ui_win32_keyboard_emit(context, sink, scan, native_key, 0u,
+    if (!ui_win32_keyboard_emit(context, sink, scan, virtual_key, 0u,
             hotkey_modifiers, 1) ||
-        !ui_win32_keyboard_emit(context, sink, scan, native_key, 0u,
+        !ui_win32_keyboard_emit(context, sink, scan, virtual_key, 0u,
             hotkey_modifiers, 0)) return 0;
     if ((modifiers & UI_WIN32_INPUT_MODIFIER_SHIFT) != 0u) {
         hotkey_modifiers &= (lib_u8)~UI_HOTKEY_MODIFIER_SHIFT;
@@ -203,8 +203,8 @@ int ui_win32_keyboard_submit_utf16(ui_win32_keyboard_normalizer *state,
     return ui_win32_keyboard_submit_character(context, sink, code_unit);
 }
 
-lib_u8 ui_win32_keyboard_flags_from_lparam(lib_u64 native_lparam)
+lib_u8 ui_win32_keyboard_flags_from_lparam(lib_u64 message_lparam)
 {
-    return (native_lparam & 0x01000000u) != 0u ?
+    return (message_lparam & 0x01000000u) != 0u ?
         UI_WIN32_INPUT_FLAG_EXTENDED : 0u;
 }

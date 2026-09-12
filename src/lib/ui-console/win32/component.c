@@ -42,7 +42,7 @@ static void ui_console_receive_event(void *context,
     if (console == LIB_NULL || event == LIB_NULL ||
         lib_atomic_i32_load_explicit(&console->base.stopping,
             LIB_MEMORY_ORDER_ACQUIRE) != 0 ||
-        (state = (ui_console_win32_state *)console->native_state) == LIB_NULL)
+        (state = (ui_console_win32_state *)console->worker_state) == LIB_NULL)
         return;
     if (event->kind == LIB_CONSOLE_EVENT_RAW_KEY) {
         const lib_console_raw_key *key = &event->value.raw_key;
@@ -134,7 +134,7 @@ static DWORD WINAPI ui_console_worker(void *opaque)
     return 0u;
 }
 
-lib_status ui_console_native_start(ui_console *console)
+lib_status ui_console_worker_start(ui_console *console)
 {
     ui_console_win32_state *state;
 
@@ -142,10 +142,10 @@ lib_status ui_console_native_start(ui_console *console)
         return LIB_STATUS_INVALID_ARGUMENT;
     state = lib_allocate_zero(1u, sizeof(*state));
     if (state == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    console->native_state = state;
+    console->worker_state = state;
     state->worker = CreateThread(NULL, 0u, ui_console_worker, console, 0u, NULL);
     if (state->worker == NULL) {
-        console->native_state = LIB_NULL;
+        console->worker_state = LIB_NULL;
         lib_release(state);
         return LIB_STATUS_NO_MEMORY;
     }
@@ -156,23 +156,23 @@ lib_status ui_console_native_start(ui_console *console)
         ui_mailbox_wake_signal(ui_component_mailboxes_wake(&console->base.mailboxes));
         (void)WaitForSingleObject(state->worker, INFINITE);
         CloseHandle(state->worker);
-        console->native_state = LIB_NULL;
+        console->worker_state = LIB_NULL;
         lib_release(state);
         return LIB_STATUS_INVALID_STATE;
     }
     return LIB_STATUS_OK;
 }
 
-void ui_console_native_stop(ui_console *console)
+void ui_console_worker_join(ui_console *console)
 {
     ui_console_win32_state *state;
 
     if (console == LIB_NULL || (state = (ui_console_win32_state *)
-            console->native_state) == LIB_NULL) return;
+            console->worker_state) == LIB_NULL) return;
     /* ui_component_destroy has queued STOP; wait for the Console worker to
      * consume it before detaching the event sink or releasing state. */
     (void)WaitForSingleObject(state->worker, INFINITE);
     CloseHandle(state->worker);
-    console->native_state = LIB_NULL;
+    console->worker_state = LIB_NULL;
     lib_release(state);
 }

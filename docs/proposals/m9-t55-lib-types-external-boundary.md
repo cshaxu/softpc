@@ -59,6 +59,13 @@ own events/tasks, or implement Console/Window behavior. In particular:
 
 ## Invariants
 
+- Implementation filenames and identifiers describe their operation, without
+  `native`, `internal`, or `private` qualifiers. `types/clock.h` and
+  `types/input.h` define wrappers; `host/sync_interface.h` is the public sync
+  contract and `host/sync.h` declares the selected platform operations.
+  UI worker start/join/state names describe actual lifecycle responsibilities.
+  This naming pass changes no control flow or synchronization behavior.
+
 - Public interfaces expose only `lib_*` copied values and opaque component
   objects; no `FILE`, `HANDLE`, `HWND`, `DWORD`, or `pthread_*` value leaks.
 - The component DAG remains:
@@ -77,3 +84,15 @@ own events/tasks, or implement Console/Window behavior. In particular:
 - Public interface audit rejects native SDK/POSIX types.
 - Fresh strict library, x86/x64 full CTest, package smoke, manifest and
   governance checks pass after the complete migration.
+
+## P16 naming audit
+
+The owner requested removal of ambiguous `native`, `internal`, and `private`
+names. The bounded universe is library filenames and C identifiers, together
+with their test references. Both remaining prefixed headers were renamed;
+all matching identifier qualifiers now name their actual operation or value.
+Comments describing OS behavior are prose, not another API layer. No control
+flow changed. The source-boundary gate rejects recurrence in paths and code
+identifiers, excluding comments. x64 and x86 full CTest each passed 38/38;
+the strict library build and its two checks passed. Both package EXEs were
+rebuilt. T55 S2 remains active pending owner acceptance.

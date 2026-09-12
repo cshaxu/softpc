@@ -6,7 +6,7 @@
 
 #include "lib/types/atomic.h"
 
-typedef void (*ui_component_native_stop_fn)(ui_component *component);
+typedef void (*ui_component_join_fn)(ui_component *component);
 typedef void (*ui_component_dispose_fn)(ui_component *component);
 
 struct ui_component {
@@ -18,12 +18,12 @@ struct ui_component {
     ui_hotkey_matcher hotkey_matcher;
     lib_u64 source_identity;
     lib_atomic_i32 stopping;
-    ui_component_native_stop_fn native_stop;
+    ui_component_join_fn join_worker;
     ui_component_dispose_fn dispose;
 };
 
 lib_status ui_component_initialize(ui_component *component,
-    const ui_component_options *options, ui_component_native_stop_fn native_stop,
+    const ui_component_options *options, ui_component_join_fn join_worker,
     ui_component_dispose_fn dispose);
 /* A source identity is never recycled.  Zero is the permanent exhausted
  * sentinel, rather than the beginning of a second allocation epoch. */

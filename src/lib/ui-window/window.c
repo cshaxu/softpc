@@ -1,7 +1,7 @@
 #include "lib/ui-window/window.h"
 
 static void ui_window_component_stop(ui_component *base)
-{ ui_window_native_stop((ui_window *)base); }
+{ ui_window_worker_join((ui_window *)base); }
 
 static void ui_window_component_dispose(ui_component *base)
 {
@@ -37,7 +37,7 @@ lib_status ui_window_create(ui_window **out_window,
     window->initial_frozen = options->initial_frozen != LIB_FALSE;
     status = ui_component_initialize(&window->base, &options->component,
         ui_window_component_stop, ui_window_component_dispose);
-    if (status == LIB_STATUS_OK) status = ui_window_native_start(window);
+    if (status == LIB_STATUS_OK) status = ui_window_worker_start(window);
     if (status != LIB_STATUS_OK) {
         ui_component_mailboxes_destroy(&window->base.mailboxes);
         lib_release(window);

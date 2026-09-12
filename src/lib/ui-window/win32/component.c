@@ -764,7 +764,7 @@ static DWORD WINAPI ui_window_worker(void *opaque)
 {
     ui_window *component = (ui_window *)opaque;
     ui_window_win32_state *state = component == LIB_NULL ? LIB_NULL :
-        (ui_window_win32_state *)component->native_state;
+        (ui_window_win32_state *)component->worker_state;
     ui_win32_window_context *context;
     WNDCLASSA klass;
     MSG message;
@@ -844,7 +844,7 @@ static DWORD WINAPI ui_window_worker(void *opaque)
     return 0u;
 }
 
-lib_status ui_window_native_start(ui_window *component)
+lib_status ui_window_worker_start(ui_window *component)
 {
     ui_window_win32_state *state;
     lib_status startup_status;
@@ -867,10 +867,10 @@ lib_status ui_window_native_start(ui_window *component)
     if (state->ready == NULL) {
         win32_window_destroy(state->context, NULL); lib_release(state); return LIB_STATUS_NO_MEMORY;
     }
-    component->native_state = state;
+    component->worker_state = state;
     state->worker = CreateThread(NULL, 0u, ui_window_worker, component, 0u, NULL);
     if (state->worker == NULL) {
-        component->native_state = LIB_NULL;
+        component->worker_state = LIB_NULL;
         CloseHandle(state->ready); win32_window_destroy(state->context, NULL);
         lib_release(state); return LIB_STATUS_NO_MEMORY;
     }
@@ -880,23 +880,23 @@ lib_status ui_window_native_start(ui_window *component)
         (void)WaitForSingleObject(state->worker, INFINITE);
         CloseHandle(state->worker); CloseHandle(state->ready);
         if (state->context != LIB_NULL) win32_window_destroy(state->context, NULL);
-        component->native_state = LIB_NULL; lib_release(state);
+        component->worker_state = LIB_NULL; lib_release(state);
         return startup_status;
     }
     return LIB_STATUS_OK;
 }
 
-void ui_window_native_stop(ui_window *component)
+void ui_window_worker_join(ui_window *component)
 {
     ui_window_win32_state *state;
     if (component == LIB_NULL || (state = (ui_window_win32_state *)
-            component->native_state) == LIB_NULL) return;
+            component->worker_state) == LIB_NULL) return;
     /* STOP is already in the control FIFO.  The worker consumes it, closes
      * its Window, and thereby establishes completion before this join. */
     (void)WaitForSingleObject(state->worker, INFINITE);
     CloseHandle(state->worker);
     CloseHandle(state->ready);
     if (state->context != LIB_NULL) win32_window_destroy(state->context, NULL);
-    component->native_state = LIB_NULL;
+    component->worker_state = LIB_NULL;
     lib_release(state);
 }

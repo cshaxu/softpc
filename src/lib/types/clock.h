@@ -1,5 +1,5 @@
-#ifndef LIB_TYPES_NATIVE_CLOCK_H
-#define LIB_TYPES_NATIVE_CLOCK_H
+#ifndef LIB_TYPES_CLOCK_H
+#define LIB_TYPES_CLOCK_H
 
 #include "lib/types/types_interface.h"
 
@@ -7,7 +7,7 @@
  * conversion policy. */
 #ifdef _WIN32
 #include "lib/types/win32.h"
-static inline lib_status lib_native_monotonic_counter(lib_u64 *out_units,
+static inline lib_status lib_clock_counter(lib_u64 *out_units,
     lib_u64 *out_units_per_second)
 {
     LARGE_INTEGER counter;
@@ -23,7 +23,7 @@ static inline lib_status lib_native_monotonic_counter(lib_u64 *out_units,
 }
 #else
 #include "lib/types/posix.h"
-static inline lib_status lib_native_monotonic_counter(lib_u64 *out_units,
+static inline lib_status lib_clock_counter(lib_u64 *out_units,
     lib_u64 *out_units_per_second)
 {
     struct timespec value;

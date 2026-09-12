@@ -17,9 +17,20 @@ endforeach()
 file(GLOB_RECURSE shared_library_paths RELATIVE "${SOFTPC_SOURCE_DIR}/src/lib"
     "${SOFTPC_SOURCE_DIR}/src/lib/*")
 foreach(shared_library_path IN LISTS shared_library_paths)
-    if(shared_library_path MATCHES "(_private|_internal)\\.(c|h)$")
+    if(shared_library_path MATCHES "(^|/|_)(private|internal|native)(_|\\.|/)")
         message(FATAL_ERROR
             "Shared library implementation has a redundant private/internal suffix: ${shared_library_path}")
+    endif()
+endforeach()
+
+file(GLOB_RECURSE library_named_sources "${SOFTPC_SOURCE_DIR}/src/lib/*.[ch]")
+foreach(source IN LISTS library_named_sources)
+    file(READ "${source}" naming_source)
+    string(REGEX REPLACE "/\\*([^*]|\\*+[^*/])*\\*+/" " " naming_source "${naming_source}")
+    string(REGEX REPLACE "//[^\n]*" " " naming_source "${naming_source}")
+    if(naming_source MATCHES "[A-Za-z_][A-Za-z0-9_]*_(native|internal|private)(_|[^A-Za-z0-9_])" OR
+       naming_source MATCHES "(^|[^A-Za-z0-9_])(native|internal|private)_[A-Za-z0-9_]+")
+        message(FATAL_ERROR "Library identifier must name its operation: ${source}")
     endif()
 endforeach()
 

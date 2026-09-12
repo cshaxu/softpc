@@ -1,5 +1,5 @@
-#ifndef LIB_TYPES_NATIVE_INPUT_H
-#define LIB_TYPES_NATIVE_INPUT_H
+#ifndef LIB_TYPES_INPUT_H
+#define LIB_TYPES_INPUT_H
 
 #include "lib/types/types_interface.h"
 
@@ -7,7 +7,7 @@
  * returned copied values. */
 #ifdef _WIN32
 #include "lib/types/win32.h"
-static inline lib_u8 lib_native_input_current_modifiers(void)
+static inline lib_u8 lib_input_current_modifiers(void)
 {
     lib_u8 modifiers = 0u;
 
@@ -17,15 +17,15 @@ static inline lib_u8 lib_native_input_current_modifiers(void)
     return modifiers;
 }
 
-static inline lib_u16 lib_native_input_scan_code(lib_u16 native_key)
-{ return (lib_u16)MapVirtualKeyA((UINT)native_key, MAPVK_VK_TO_VSC); }
+static inline lib_u16 lib_input_scan_code(lib_u16 virtual_key)
+{ return (lib_u16)MapVirtualKeyA((UINT)virtual_key, MAPVK_VK_TO_VSC); }
 
 #else
-static inline lib_u8 lib_native_input_current_modifiers(void)
+static inline lib_u8 lib_input_current_modifiers(void)
 { return 0u; }
 
-static inline lib_u16 lib_native_input_scan_code(lib_u16 native_key)
-{ (void)native_key; return 0u; }
+static inline lib_u16 lib_input_scan_code(lib_u16 virtual_key)
+{ (void)virtual_key; return 0u; }
 
 #endif
 
