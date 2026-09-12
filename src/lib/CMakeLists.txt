@@ -121,6 +121,9 @@ add_custom_target(lib-verify-manifest
         -P "${CMAKE_CURRENT_LIST_DIR}/verify_manifest.cmake"
     VERBATIM)
 if(BUILD_TESTING)
+    add_test(NAME library.types-layout
+        COMMAND "${CMAKE_COMMAND}" -DLIBRARY_ROOT:PATH=${CMAKE_CURRENT_LIST_DIR}
+            -P "${CMAKE_CURRENT_LIST_DIR}/verify_types_layout.cmake")
     add_test(NAME library.manifest
         COMMAND "${CMAKE_COMMAND}" -DLIBRARY_ROOT:PATH=${CMAKE_CURRENT_LIST_DIR}
             -P "${CMAKE_CURRENT_LIST_DIR}/verify_manifest.cmake")

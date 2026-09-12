@@ -2,33 +2,38 @@
 
 ## Current Work
 
-M9 T55 S2 is active: make `lib/types` header-only external vocabulary while
-each owning component supplies its selected same-shape platform source,
-without changing component behavior.
+M9 T55 S3 is active: normalize types into common C/compiler headers and
+explicit win32/linux declaration headers, moving clock/input composition
+back to their owning components without changing behavior.
 
-Owner explicitly requires T55 to remain open; this naming correction does
-not close either T55 or its active S2.
+Implementation and review evidence are ready for owner inspection: x64
+41/41; x86 serial 41/41 after one recorded concurrent package-smoke failure
+and three isolated passes; strict library 3/3. Linux execution is unverified.
 
-## M9 T55 S2 Packet
+T55 remains open. S2 is superseded for this boundary cleanup by the owner's
+S3 admission, not accepted as a completed whole-library migration.
+[S2 handoff record](../history/M9-T55-S2-types-boundary-handoff.md).
+
+## M9 T55 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approved: “准入S2，目标是：所有lib里面的原始 c 标准库和win32/linux等外部库的类型和函数定义，全部收归 lib/types 所有”. |
-| Objective | Make `lib/types` the header-only shared-library vocabulary for C runtime, Windows SDK, Linux/POSIX and compiler atomics; each owning component supplies its selected same-shape platform implementation; retain existing behavior. |
+| Admission And Approval | Owner approved: “同意，按照这个准入一个S任务清理lib types，要求符合收口标准后供我检查。” |
+| Objective | Remove OS selection from top-level types headers; localize SDK/POSIX declarations by platform and purpose; retain compiler-only atomic selection; move clock composition and modifier interpretation into host/ui-base. |
 | Non-goals | No `src/mvdm/softpc.new/`, guest media, `softpc.ini`, app/host product policy, UI semantics, NXVM checkout mutation, or duplicate platform path. |
-| Reference Baseline | SoftPC `aa90f1e`; canonical library corpus imported from NXVM `64d211c9`. |
+| Reference Baseline | SoftPC `1b368d4`; preserve the owner's existing formatting changes in types/atomic.h. |
 | Candidate Proposal | [M9 T55 Types-Owned External Boundary](../proposals/m9-t55-lib-types-external-boundary.md) |
 | Files And ABI Surface | Entire `src/lib/` corpus, its CMake/manifest/READMEs, static boundary tests, required behavior tests, and only agent-owned package EXEs. `types` is header-only: it defines `lib_*` copied values, opaque native representations, and typed inline façades; component platform sources compose those façades into their own internal operations. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout, and UI authorities. |
-| Verification | Ledger-backed static external-boundary scan; approved component-DAG link audit; strict library build; manifest; fresh x86/x64 build and full CTest; package smoke; diff and governance gates. |
-| Expected Markers | `types` contains no `.c` and is an INTERFACE target; neutral component bases contain no platform branch; `win32`/`linux` peer sources implement the same component-private operation shape using `types` vocabulary; package EXEs refresh without INI/media change. |
+| Verification | S3 seven-header ledger and include-site sweep; executable types layout gate; clock and atomic smoke; existing keyboard tests; strict library build; manifest; x86/x64 full CTest and package smoke; Linux compile/run if available, otherwise explicit coverage limitation; diff and governance gates. |
+| Expected Markers | types remains header-only/INTERFACE; top-level headers have no OS branch or platform includes; no win32.h/posix.h umbrella; each platform consumer explicitly includes its platform vocabulary; host owns counter composition and ui-base owns modifier interpretation. |
 | Asset Needs | Refresh only agent-owned `assets/binary/softpc32.exe` and `softpc64.exe`; preserve user-owned INI and all media. |
 | Reporting Requirements | Report frozen ledger count/dispositions, contract/API changes, direct-link removal evidence, x86/x64 results, changed-path accounting, commits, and package links. |
 | Stop Conditions | Stop for any required MVDM, media, INI, product-semantics, app/host policy, or platform dependency that cannot be represented as a neutral `types` primitive. |
-| Exit Criteria | Every ledger member is disposed by the static gate; `types` owns external declaration vocabulary while each selected component platform source owns only its own operation implementation; all required builds/tests pass; owner manually accepts packages; a separate T-level closure audit is pushed. |
-| Original Owner Request | “准入S2，目标是：所有lib里面的原始 c 标准库和win32/linux等外部库的类型和函数定义，全部收归 lib/types 所有”. |
-| Similar-Issue Sweep | Enumerate all `#include <...>`, native type names, native function calls, and direct native CMake link entries below `src/lib/`; every hit is migrated to `types`, explicitly whitelisted as a language/compiler builtin, or transferred to TODO with owner approval. |
+| Exit Criteria | S3 ledger and focused/full checks pass; actual diff reviewed for behavior preservation; all changes committed/pushed with clean worktree; deliver EXEs for owner inspection. Keep S3 awaiting owner acceptance and do not close T55. |
+| Original Owner Request | “同意，按照这个准入一个S任务清理lib types，要求符合收口标准后供我检查。” |
+| Similar-Issue Sweep | Enumerate every types header, OS selection, SDK/POSIX include and old-header consumer; move or retain each with the S3 ledger disposition. Check moved clock/input bodies against baseline and preserve other platform bodies. This is not certification of all S2 raw-call wrappers. |
 
 ## Current Technical Baseline
 

@@ -2,7 +2,7 @@
 #define UI_WIN32_MOUSE_H
 
 #include "lib/ui-base/capture.h"
-#include "lib/types/win32.h"
+#include "lib/types/win32/window.h"
 
 /* Host-only relative-pointer state. The caller owns input-device buttons and
  * lifecycle policy; this component owns explicit Win32 client capture only. */

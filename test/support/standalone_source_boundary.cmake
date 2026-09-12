@@ -36,6 +36,8 @@ endforeach()
 
 # types is vocabulary only: platform behavior is implemented by the owning
 # component's selected win32/linux source, never by a hidden types target.
+set(LIBRARY_ROOT "${SOFTPC_SOURCE_DIR}/src/lib")
+include("${LIBRARY_ROOT}/verify_types_layout.cmake")
 file(GLOB_RECURSE types_implementation_sources
     "${SOFTPC_SOURCE_DIR}/src/lib/types/*.c")
 if(types_implementation_sources)

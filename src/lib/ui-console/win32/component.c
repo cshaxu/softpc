@@ -2,7 +2,7 @@
 
 #include "lib/ui-base/win32/input.h"
 
-#include "lib/types/win32.h"
+#include "lib/types/win32/console.h"
 
 typedef struct ui_console_win32_state {
     HANDLE worker;

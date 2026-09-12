@@ -1,6 +1,6 @@
 #include "lib/types/types_interface.h"
 
-#include "lib/types/posix.h"
+#include "lib/types/linux/file.h"
 
 #include "lib/storage/file.h"
 

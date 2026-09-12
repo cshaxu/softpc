@@ -1,7 +1,7 @@
 #include "lib/console/console.h"
 #include "lib/host/console_backend.h"
 
-#include "lib/types/win32.h"
+#include "lib/types/win32/console.h"
 
 struct host_console_backend {
     HANDLE input;

@@ -60,7 +60,11 @@ text or graphic frame snapshots; frontends consume only those snapshots.
 SoftPC's checked-in `lib/` corpus is the shared-library source of truth. NXVM
 adopts it exactly; no runtime or build dependency crosses repositories.
 
-`types` defines universal copied scalar/status values. `console` defines
+`types` defines universal copied scalar/status values and header-only external
+C/compiler/platform vocabulary. Platform declaration headers contain no
+component policy; host owns clock composition, and ui-base owns input
+interpretation. Component platform implementations are selected by the build,
+not by a generic types dispatcher. `console` defines
 copied logical Console objects. `host` owns native Console
 handles/modes, one I/O worker, and exactly one Current Console Object from
 broker creation to destruction; replacement is transactional. Shared UI is

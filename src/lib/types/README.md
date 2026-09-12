@@ -13,5 +13,24 @@ native work, `storage` owns file native work, and `ui-base`/the UI leaves own
 their own wake, input, and rendering work. `types` never interprets a
 consumer's state machine or input protocol.
 
-`win32/file.h` groups external CRT file declarations only. File operations
-and ownership remain in `storage/win32/file.c`; there is no runtime layer.
+The layout has one rule:
+
+- Top-level headers contain only common scalar/status, ISO C library, or
+  compiler atomic vocabulary. They never select an operating system.
+- `win32/` contains the used Windows file, clock, input, sync, Console and
+  Window declaration groups. `linux/` contains the used POSIX file, clock and
+  sync declaration groups. Platform sources explicitly include the matching
+  group; no common header selects one and no platform header dispatches again.
+- `atomic.h` may select MSVC intrinsics versus C atomics by `_MSC_VER`.
+  This compiler-only exception does not select component behavior.
+
+Platform headers preserve SDK/POSIX signatures. Windows groups include the
+SDK's common windows.h declaration source; repeated guarded SDK includes do
+not create implementations or independent types. The groups name usage, not
+a promise that windows.h hides unrelated SDK declarations.
+
+`file.h` contains common C stream declarations. `win32/file.h` and
+`linux/file.h` add their platform declarations. File operations and ownership
+remain in storage. Counter validation/composition belongs to host; key-state
+interpretation belongs to ui-base. There is no runtime layer or zero-result
+fallback pretending to implement another platform's input query.

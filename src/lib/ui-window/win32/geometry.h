@@ -3,7 +3,7 @@
 
 #include "lib/types/types_interface.h"
 
-#include "lib/types/win32.h"
+#include "lib/types/win32/window.h"
 
 /* Host-only geometry helpers.  They map copied source coordinates to a Win32
  * client surface and own no product rendering or lifecycle policy. */

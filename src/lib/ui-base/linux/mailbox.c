@@ -2,7 +2,8 @@
 
 #include "lib/ui-base/mailbox_wake.h"
 
-#include "lib/types/posix.h"
+#include "lib/types/linux/sync.h"
+#include "lib/types/linux/clock.h"
 
 struct ui_mailbox_wake {
     pthread_mutex_t lock;

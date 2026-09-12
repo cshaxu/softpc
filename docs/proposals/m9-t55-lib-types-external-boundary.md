@@ -1,4 +1,4 @@
-# M9 T55 S2 — Types Vocabulary and Component Platform Boundaries
+# M9 T55 — Types Vocabulary and Component Platform Boundaries
 
 ## Objective
 
@@ -60,8 +60,8 @@ own events/tasks, or implement Console/Window behavior. In particular:
 ## Invariants
 
 - Implementation filenames and identifiers describe their operation, without
-  `native`, `internal`, or `private` qualifiers. `types/clock.h` and
-  `types/input.h` define wrappers; `host/sync_interface.h` is the public sync
+  `native`, `internal`, or `private` qualifiers. Platform vocabulary lives in
+  `types/win32/` or `types/linux/`; `host/sync_interface.h` is the public sync
   contract and `host/sync.h` declares the selected platform operations.
   UI worker start/join/state names describe actual lifecycle responsibilities.
   This naming pass changes no control flow or synchronization behavior.
@@ -111,3 +111,90 @@ library; x64 and x86 rebuilt and each passed 38/38 CTest, including package
 smoke. Strict library build, 2/2 standalone checks, documentation governance
 and diff checks passed. Production changes are limited to the header move,
 include guard and its one include site; no executable logic changed.
+
+## S3 admission: types platform layout
+
+Original owner request: “同意，按照这个准入一个S任务清理lib types，要求符合收口标准后供我检查。”
+Baseline: `1b368d4`, plus the owner's formatting-only atomic.h changes.
+S3 supersedes S2's unfinished layout/ownership cleanup; it does not certify
+the broader S2 external-vocabulary migration or close T55.
+
+The frozen source universe is all seven baseline types headers and every
+direct consumer. Disposition requires both a source review and an executable
+layout gate, plus focused tests where function bodies move.
+
+| Baseline header | Disposition / owner |
+| --- | --- |
+| types_interface.h | Retain common scalar/status and C-runtime wrappers; no OS selection. |
+| atomic.h | Retain compiler-only MSVC/C atomics selection and owner formatting. |
+| win32.h | Remove umbrella; explicit purpose headers under types/win32. |
+| posix.h | Remove umbrella; explicit purpose headers under types/linux. |
+| win32/file.h | Keep Windows file declarations; common stdio declarations move to types/file.h. |
+| clock.h | Move combined counter validation/conversion to host/{win32,linux}/clock.c; only raw clock declarations/wrappers in platform types headers. |
+| input.h | Move modifier interpretation to ui-base/win32/actions.c; direct key-state/layout wrappers in types/win32/input.h; remove unused Linux zero-result fallback. |
+| README.md (documentation companion, not a header) | Describe the one platform layout and compiler exception. |
+
+Only actually consumed purpose headers are created. No new platform runtime,
+implementation C file in types, duplicated registry, state owner or generic
+platform dispatcher is allowed. CMake continues selecting the owning
+component's same-shape platform implementation. Platform headers themselves
+do not need OS-selection branches. Windows SDK declarations keep their exact
+external signatures; this task does not manufacture a second OS API or claim
+that header organization alone completes S2's entire wrapper audit.
+
+Verification: layout/forbidden-include checks, header-only and DAG gates,
+counter/atomic smoke, existing keyboard coverage, strict library compilation,
+x86/x64 full CTest and package smoke, manifest and documentation governance.
+Existing Linux function bodies are preserved (clock is relocated verbatim).
+Linux execution coverage must be reported separately from Windows results.
+No MVDM, app policy, INI or media change. S3 is delivered for owner inspection;
+T55 remains open.
+
+## S3 P1 verification and review
+
+All seven baseline header dispositions are implemented. The resulting types
+tree has 12 headers: three common, six Windows and three Linux. Every old
+umbrella/dispatcher reference is removed from production and tests. The
+layout gate rejects OS branching, platform imports from common headers,
+non-C common includes, platform control flow and external include bypasses;
+its self-test deliberately submits seven invalid forms and valid controls.
+
+Focused proof exercises the actual moved Windows clock/actions bodies with
+controlled external queries: null arguments do not query, query failures and
+invalid counters preserve outputs, valid counters are copied, all eight
+modifier combinations retain their original meaning. Common C/atomic and
+real public monotonic-clock calls pass at both widths. All nine common/Windows
+types headers compile independently with strict GCC warnings. The existing
+keyboard/hotkey tests remain in the full suite.
+
+- x64 full CTest: 41/41 passed.
+- x86 simultaneous parallel run: 40/41; package smoke failed at stage 7
+  (CAP sent, cooked SoftPC prompt not observed within its existing deadline).
+  No source or timeout was changed in response. Isolated package smoke then
+  passed three consecutive runs (5.52, 5.35, 5.55 seconds), followed by a full
+  serial x86 41/41 pass. The concurrent failure is recorded, not claimed fixed
+  or conclusively attributed to scheduling. Owner review remains required.
+- Strict library build and standalone CTest: 3/3 passed, including manifest,
+  types layout and the Linux CMake contract. The latter is not a Linux runtime
+  test. WSL is not installed; no Linux execution claim is made.
+- Documentation governance, source boundary and diff checks passed.
+
+Changed-path accounting uses `git diff --numstat --no-renames 1b368d4`:
+production C/H is 32 paths, +146/-132 (net +14); test/support is 5 paths,
++156/-3 (net +153); build/check CMake is 3 paths, +85/-0. Documentation,
+manifest and package EXEs are excluded. The atomic formatting was present on
+entry and retained; only its old BASE include guard was renamed by S3.
+storage/file.h gained its missing direct types include, eliminating implicit
+include-order dependence without changing its contract.
+
+Reviewer compared clock/error behavior and modifier bits against `1b368d4`;
+other Windows and Linux component changes are include substitutions, not
+worker/reader/mailbox rewrites. MVDM, app, standalone host, INI and media have
+no changes. Ownership remains host clock and ui-base input, with no types
+platform control flow. Delivery is for owner inspection, not T55 closure.
+
+The remaining T55 whole-library review is still required. In particular, the
+pre-existing Linux mailbox wait currently uses a timed sleep rather than
+waiting on its signaled condition; Linux host sync also polls. Those bodies
+were not introduced or rewritten by S3. Their behavior and S2's wider raw-call
+wrapper coverage are not certified by this layout-only delivery.

@@ -7,7 +7,7 @@
 #include "lib/ui-base/mailbox.h"
 #include "lib/ui-window/win32/mouse.h"
 
-#include "lib/types/win32.h"
+#include "lib/types/win32/window.h"
 
 #define WIN32_WINDOW_TEXT_CELL_WIDTH 8u
 #define WIN32_WINDOW_TEXT_CELL_HEIGHT 16u

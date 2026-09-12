@@ -1,6 +1,6 @@
 #include "lib/ui-base/mailbox_wake.h"
 
-#include "lib/types/win32.h"
+#include "lib/types/win32/sync.h"
 
 struct ui_mailbox_wake { HANDLE handle; };
 

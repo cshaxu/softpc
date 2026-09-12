@@ -1,6 +1,6 @@
 #include "lib/ui-base/win32/input.h"
 #include "lib/ui-base/hotkey_interface.h"
-#include "lib/types/input.h"
+#include "lib/types/win32/input.h"
 
 #include <assert.h>
 #include <string.h>
@@ -65,13 +65,13 @@ static void assert_registered_raw_chord(lib_u32 trigger, const char *identifier)
     assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
         0x38u, UI_WIN32_KEY_ALT, 0u, control_alt, 1));
     assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
-        lib_input_scan_code((lib_u16)trigger), (lib_u16)trigger,
+        (lib_u16)lib_win32_map_virtual_key((UINT)trigger, MAPVK_VK_TO_VSC), (lib_u16)trigger,
         0u, control_alt, 1));
     assert(capture.count == 1u && capture.events[0].type == UI_EVENT_HOTKEY);
     assert(strcmp(capture.events[0].data.hotkey.identifier, identifier) == 0);
     /* Every make and break in the matched raw chord is private to UI. */
     assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
-        lib_input_scan_code((lib_u16)trigger), (lib_u16)trigger,
+        (lib_u16)lib_win32_map_virtual_key((UINT)trigger, MAPVK_VK_TO_VSC), (lib_u16)trigger,
         0u, control_alt, 0));
     assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
         0x38u, UI_WIN32_KEY_ALT, 0u, UI_HOTKEY_MODIFIER_CONTROL, 0));

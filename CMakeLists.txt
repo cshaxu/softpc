@@ -488,6 +488,22 @@ add_test(NAME softpc-runtime-input-continuation-smoke
     COMMAND softpc-runtime-input-continuation-smoke)
 set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-types-contract-smoke test/unit/types_contract_smoke.c)
+target_link_libraries(softpc-types-contract-smoke PRIVATE host)
+add_test(NAME softpc-types-contract-smoke COMMAND softpc-types-contract-smoke)
+add_executable(softpc-win32-vocabulary-ownership-smoke
+    test/unit/win32_vocabulary_ownership_smoke.c)
+target_link_libraries(softpc-win32-vocabulary-ownership-smoke PRIVATE types)
+add_test(NAME softpc-win32-vocabulary-ownership-smoke
+    COMMAND softpc-win32-vocabulary-ownership-smoke)
+set_tests_properties(softpc-types-contract-smoke
+    softpc-win32-vocabulary-ownership-smoke PROPERTIES LABELS "unit")
+add_test(NAME softpc-types-layout-selftest COMMAND "${CMAKE_COMMAND}"
+    "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}"
+    "-DTEST_WORK_DIR=${CMAKE_CURRENT_BINARY_DIR}"
+    -P "${CMAKE_SOURCE_DIR}/test/support/types_layout_selftest.cmake")
+set_tests_properties(softpc-types-layout-selftest PROPERTIES LABELS "unit")
+
 add_executable(softpc-win32-keyboard-smoke
     test/unit/win32_keyboard_smoke.c)
 target_link_libraries(softpc-win32-keyboard-smoke PRIVATE

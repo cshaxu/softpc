@@ -3,6 +3,7 @@
 
 #include <fcntl.h>
 #include <io.h>
-#include <stdio.h>
+#include <windows.h>
+#include "lib/types/file.h"
 
 #endif

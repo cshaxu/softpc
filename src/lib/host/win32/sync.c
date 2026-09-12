@@ -1,6 +1,6 @@
 #include "lib/host/sync.h"
 
-#include "lib/types/win32.h"
+#include "lib/types/win32/sync.h"
 
 struct host_sync_platform_event { HANDLE handle; };
 struct host_sync_platform_task { HANDLE thread; };

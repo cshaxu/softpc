@@ -17,7 +17,8 @@ names and live directly in their owning directory; no filename carries a
 permitted dependent may include an implementation header:
 `ui-window` and `ui-console` may consume `ui-base` mailbox and component
 implementation contracts. Application/product code may include only
-`*_interface.h`; an interface header never includes an implementation header.
+`*_interface.h`. The common types interface may include its own atomic
+vocabulary helper; it never imports platform SDK headers.
 
 ## Component graph
 
@@ -40,7 +41,9 @@ lifecycle controller, or public unified presenter API.
   helpers, and typed wrappers around C-runtime/SDK vocabulary. It owns no
   compiled platform worker, component state, or I/O policy. Every component's
   selected platform source supplies the same component-private operation shape
-  to its platform-neutral base source.
+  to its platform-neutral base source. Common types headers contain no OS
+  selection; platform declaration groups live in `types/win32` and
+  `types/linux`. The compiler-only atomic adaptation remains common.
 - `console` provides the logical Console object. It is a neutral copied-value
   endpoint: it has no native handle, platform input mode, Window, raw Console,
   monitor, or product-lifecycle meaning.

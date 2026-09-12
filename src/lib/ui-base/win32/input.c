@@ -1,10 +1,10 @@
 #include "lib/ui-base/win32/input.h"
 #include "lib/ui-base/hotkey_interface.h"
-#include "lib/types/input.h"
+#include "lib/types/win32/input.h"
 
 static lib_u16 ui_win32_keyboard_resolve_scan(lib_u16 virtual_key)
 {
-    return lib_input_scan_code(virtual_key);
+    return (lib_u16)lib_win32_map_virtual_key((UINT)virtual_key, MAPVK_VK_TO_VSC);
 }
 
 /* Layout interpretation belongs to the UI keyboard adapter.  types exposes
@@ -12,11 +12,11 @@ static lib_u16 ui_win32_keyboard_resolve_scan(lib_u16 virtual_key)
 static lib_bool ui_win32_keyboard_map_scalar(lib_u32 scalar,
     lib_u16 *out_virtual_key, lib_u8 *out_modifiers)
 {
-    SHORT mapped;
+    lib_win32_key_state mapped;
 
     if (out_virtual_key == LIB_NULL || out_modifiers == LIB_NULL || scalar > 0xffu)
         return LIB_FALSE;
-    mapped = VkKeyScanA((CHAR)scalar);
+    mapped = lib_win32_key_scan((CHAR)scalar);
     if (mapped == -1) return LIB_FALSE;
     *out_virtual_key = (lib_u16)(mapped & 0xff);
     *out_modifiers = (lib_u8)((mapped >> 8) & 0xff);

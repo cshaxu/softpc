@@ -1,6 +1,8 @@
 #ifndef LIB_STORAGE_FILE_H
 #define LIB_STORAGE_FILE_H
 
+#include "lib/types/types_interface.h"
+
 typedef struct storage_file_platform storage_file_platform;
 
 typedef struct lib_storage_file {

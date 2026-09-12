@@ -2,7 +2,8 @@
 
 #include "lib/host/sync.h"
 
-#include "lib/types/posix.h"
+#include "lib/types/linux/sync.h"
+#include "lib/types/linux/clock.h"
 
 struct host_sync_platform_event {
     pthread_mutex_t lock;
