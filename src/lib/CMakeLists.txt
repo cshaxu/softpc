@@ -94,7 +94,9 @@ library_root(storage)
 target_link_libraries(storage PUBLIC types)
 
 if(WIN32)
-    target_link_libraries(ui-window PRIVATE user32 gdi32)
+    # types is the sole owner of native platform linkage.  UI leaves consume
+    # copied values and opaque types primitives only.
+    target_link_libraries(types PUBLIC user32 gdi32)
 else()
     find_package(Threads REQUIRED)
     target_link_libraries(types PUBLIC Threads::Threads)
