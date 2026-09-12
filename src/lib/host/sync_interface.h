@@ -3,31 +3,40 @@
 
 #include "lib/types/types_interface.h"
 
-/* Host uses the neutral synchronization contract. These aliases preserve the
- * host-facing vocabulary while keeping all platform implementation in types. */
-typedef lib_sync_wait_result host_sync_wait_result;
-typedef lib_sync_event host_sync_event;
-typedef lib_sync_task host_sync_task;
-typedef lib_sync_task_entry host_sync_task_entry;
+typedef enum host_sync_wait_result {
+    HOST_SYNC_WAIT_SIGNALED,
+    HOST_SYNC_WAIT_CANCELLED,
+    HOST_SYNC_WAIT_TIMED_OUT,
+    HOST_SYNC_WAIT_INVALID_ARGUMENT,
+    HOST_SYNC_WAIT_FAULT
+} host_sync_wait_result;
 
-#define HOST_SYNC_WAIT_SIGNALED LIB_SYNC_WAIT_SIGNALED
-#define HOST_SYNC_WAIT_CANCELLED LIB_SYNC_WAIT_CANCELLED
-#define HOST_SYNC_WAIT_TIMED_OUT LIB_SYNC_WAIT_TIMED_OUT
-#define HOST_SYNC_WAIT_INVALID_ARGUMENT LIB_SYNC_WAIT_INVALID_ARGUMENT
-#define HOST_SYNC_WAIT_FAULT LIB_SYNC_WAIT_FAULT
-#define host_sync_sleep_milliseconds lib_sync_sleep_milliseconds
-#define host_sync_yield lib_sync_yield
-#define host_sync_event_create lib_sync_event_create
-#define host_sync_event_destroy lib_sync_event_destroy
-#define host_sync_event_signal lib_sync_event_signal
-#define host_sync_event_reset lib_sync_event_reset
-#define host_sync_event_wait lib_sync_event_wait
-#define host_sync_wait_any lib_sync_wait_any
-#define host_sync_task_create lib_sync_task_create
-#define host_sync_task_request_cancel lib_sync_task_request_cancel
-#define host_sync_task_cancelled lib_sync_task_cancelled
-#define host_sync_task_wait_cancel lib_sync_task_wait_cancel
-#define host_sync_task_join lib_sync_task_join
-#define host_sync_task_destroy lib_sync_task_destroy
+typedef struct host_sync_event host_sync_event;
+typedef struct host_sync_task host_sync_task;
+
+typedef void (*host_sync_task_entry)(void *context,
+    const host_sync_task *task);
+
+void host_sync_sleep_milliseconds(lib_u32 milliseconds);
+void host_sync_yield(void);
+lib_status host_sync_event_create(host_sync_event **out_event);
+void host_sync_event_destroy(host_sync_event *event);
+void host_sync_event_signal(host_sync_event *event);
+void host_sync_event_reset(host_sync_event *event);
+host_sync_wait_result host_sync_event_wait(host_sync_event *event,
+    lib_u32 timeout_milliseconds);
+/* Cancellation wins when it is observable together with an event; otherwise
+ * the lowest event index wins. */
+host_sync_wait_result host_sync_wait_any(host_sync_event *const *events,
+    lib_u32 event_count, const host_sync_task *cancel_task,
+    lib_u32 timeout_milliseconds, lib_u32 *out_event_index);
+lib_status host_sync_task_create(host_sync_task_entry entry, void *context,
+    host_sync_task **out_task);
+void host_sync_task_request_cancel(host_sync_task *task);
+int host_sync_task_cancelled(const host_sync_task *task);
+host_sync_wait_result host_sync_task_wait_cancel(const host_sync_task *task,
+    lib_u32 timeout_milliseconds);
+void host_sync_task_join(host_sync_task *task);
+void host_sync_task_destroy(host_sync_task *task);
 
 #endif

@@ -38,19 +38,20 @@ the named component source.
 | Current direct consumer | Native dependency | `types` disposition |
 | --- | --- | --- |
 | `host/win32/clock.c` | Win32 monotonic clock | `types/win32` copied-time primitive. |
-| `host/win32/sync.c` | Win32 event/thread/wait handles | `types/win32` opaque event/task primitives. |
-| `host/linux/sync.c` | POSIX mutex/condition/thread/time | `types/linux` implementation of the same opaque event/task primitives. |
-| `host/win32/console.c` | Win32 Console reader, renderer, focus, output serialization | `types/win32` opaque native-console primitive; `host` retains only broker policy. |
-| `ui-base/win32/{actions,input,mailbox}.c` and private headers | keyboard state, native records, wake event | `types/win32` copied key transition and opaque wake primitive. |
-| `ui-window/win32/{component,geometry,mouse}.c` and private headers | Window handle/message loop, drawing, geometry, pointer capture | `types/win32` opaque native-window/surface/pointer primitives; `ui-window` retains only frame/control/input policy. |
-| `ui-console/win32/component.c` | worker handle and Console coupling | `types/win32` opaque worker primitive and neutral Console binding. |
+| `host/win32/sync.c` | Win32 event/thread/wait handles | `types/win32` exposes raw opaque handles and raw waits; `host` retains manual-reset, cancellation, ordering, and task policy. |
+| `host/linux/sync.c` | POSIX mutex/condition/thread/time | Same boundary where Linux exists; unsupported platform-only primitives return explicit `UNSUPPORTED`, never a simulated policy. |
+| `host/win32/console.c` | Win32 Console reader, renderer, focus, output serialization | `types/win32` wraps native handles and calls only; `host` retains reader, renderer, focus, serialization, and broker behavior. |
+| `ui-base/win32/{actions,input,mailbox}.c` and private headers | keyboard state, native records, wake event | `types/win32` supplies raw layout/scan/modifier facts and wake calls; `ui-base` retains the normalizer and all event mapping. |
+| `ui-window/win32/{component,geometry,mouse}.c` and private headers | Window handle/message loop, drawing, geometry, pointer capture | `types/win32` supplies only raw window/surface/pointer calls and copied values; `ui-window` retains its complete lifecycle, input, geometry, and rendering policy. |
+| `ui-console/win32/component.c` | worker handle and Console coupling | `types/win32` supplies raw worker and Console calls; `ui-console` retains its binding, input, frame, and worker behavior. |
 
 No component may receive a native pointer, integer handle, SDK structure, or
 SDK callback signature as an escape hatch. Where a platform callback is
-unavoidable, it is declared and called wholly inside `types`; its component
-consumer receives a copied neutral event or invokes a neutral callback supplied
-by `types`. The replacement must preserve the existing component DAG and all
-observable behavior.
+unavoidable, its raw declaration and invocation remain in `types`; the owning
+component receives copied facts through a neutral callback. That bridge does
+not transfer the component's state machine or policy to `types`. The
+replacement must preserve the existing component DAG and all observable
+behavior.
 
 ## Design
 

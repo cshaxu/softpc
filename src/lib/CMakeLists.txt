@@ -80,9 +80,11 @@ library_root(ui-console)
 target_link_libraries(ui-console PUBLIC types console ui-base)
 
 if(WIN32)
-    set(LIBRARY_HOST_SOURCES host/clock.c host/console.c host/win32/console.c)
+    set(LIBRARY_HOST_SOURCES host/clock.c host/console.c host/sync.c
+        host/win32/console.c)
 else()
-    set(LIBRARY_HOST_SOURCES host/clock.c host/console.c host/linux/console.c)
+    set(LIBRARY_HOST_SOURCES host/clock.c host/console.c host/sync.c
+        host/linux/console.c)
 endif()
 add_library(host STATIC ${LIBRARY_HOST_SOURCES})
 library_root(host)

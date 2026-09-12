@@ -443,7 +443,8 @@ static void win32_window_transition(ui_win32_window_context *context,
         ui_win32_keyboard_release_recovered_key(&context->keyboard_normalizer,
             (WORD)key);
     (void)ui_win32_keyboard_submit_transition(context,
-        win32_window_emit_normalized, scan, (WORD)key, control_state,
+        win32_window_emit_normalized, (lib_u16)scan, (lib_u16)key,
+        lib_native_input_flags((lib_u64)control_state),
         ui_win32_modifiers_from_key_state(), !released);
 }
 

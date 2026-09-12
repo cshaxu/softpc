@@ -57,9 +57,9 @@ static void ui_console_receive_event(void *context,
          * ui-base recovers the scan code through the active Win32 layout. */
         (void)ui_win32_keyboard_submit_transition(console,
             ui_console_emit_normalized,
-            (WORD)(key->scan_code | (key->extended != LIB_FALSE ?
-                0x0100u : 0u)), (WORD)key->key,
-            key->extended != LIB_FALSE ? ENHANCED_KEY : 0u,
+            (lib_u16)(key->scan_code | (key->extended != LIB_FALSE ?
+                0x0100u : 0u)), (lib_u16)key->key,
+            key->extended != LIB_FALSE ? LIB_NATIVE_INPUT_FLAG_EXTENDED : 0u,
             ui_console_hotkey_modifiers(key->modifiers),
             key->pressed != LIB_FALSE);
     } else if (event->kind == LIB_CONSOLE_EVENT_RAW_MOUSE) {

@@ -60,22 +60,22 @@ static void assert_registered_raw_chord(lib_u32 trigger, const char *identifier)
         identifier) == LIB_STATUS_OK);
     ui_hotkey_matcher_initialize(&capture.matcher, &registry);
     assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
-        0x1du, VK_CONTROL, 0u, UI_HOTKEY_MODIFIER_CONTROL, 1));
+        0x1du, LIB_NATIVE_KEY_CONTROL, 0u, UI_HOTKEY_MODIFIER_CONTROL, 1));
     assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
-        0x38u, VK_MENU, 0u, control_alt, 1));
+        0x38u, LIB_NATIVE_KEY_ALT, 0u, control_alt, 1));
     assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
-        (WORD)MapVirtualKeyW((UINT)trigger, MAPVK_VK_TO_VSC), (WORD)trigger,
+        lib_native_input_scan_code((lib_u16)trigger), (lib_u16)trigger,
         0u, control_alt, 1));
     assert(capture.count == 1u && capture.events[0].type == UI_EVENT_HOTKEY);
     assert(strcmp(capture.events[0].data.hotkey.identifier, identifier) == 0);
     /* Every make and break in the matched raw chord is private to UI. */
     assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
-        (WORD)MapVirtualKeyW((UINT)trigger, MAPVK_VK_TO_VSC), (WORD)trigger,
+        lib_native_input_scan_code((lib_u16)trigger), (lib_u16)trigger,
         0u, control_alt, 0));
     assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
-        0x38u, VK_MENU, 0u, UI_HOTKEY_MODIFIER_CONTROL, 0));
+        0x38u, LIB_NATIVE_KEY_ALT, 0u, UI_HOTKEY_MODIFIER_CONTROL, 0));
     assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
-        0x1du, VK_CONTROL, 0u, 0u, 0));
+        0x1du, LIB_NATIVE_KEY_CONTROL, 0u, 0u, 0));
     assert(capture.count == 1u);
 }
 
@@ -98,9 +98,9 @@ int main(void)
        stop command. */
     capture.count = 0u;
     assert(ui_win32_keyboard_submit_transition(&capture, capture_key,
-        0x01u, VK_ESCAPE, 0u, 0u, 1));
+        0x01u, LIB_NATIVE_KEY_ESCAPE, 0u, 0u, 1));
     assert(ui_win32_keyboard_submit_transition(&capture, capture_key,
-        0x01u, VK_ESCAPE, 0u, 0u, 0));
+        0x01u, LIB_NATIVE_KEY_ESCAPE, 0u, 0u, 0));
     assert(capture.count == 2u);
     assert(capture.keys[0] == 0x01u && capture.releases[0] == 0u);
     assert(capture.keys[1] == 0x01u && capture.releases[1] == 1u);
@@ -110,9 +110,9 @@ int main(void)
        guest still receives the normal Enter make/break pair. */
     capture.count = 0u;
     assert(ui_win32_keyboard_submit_transition(&capture, capture_key,
-        0u, VK_RETURN, 0u, 0u, 1));
+        0u, LIB_NATIVE_KEY_RETURN, 0u, 0u, 1));
     assert(ui_win32_keyboard_submit_transition(&capture, capture_key,
-        0u, VK_RETURN, 0u, 0u, 0));
+        0u, LIB_NATIVE_KEY_RETURN, 0u, 0u, 0));
     assert(capture.count == 2u);
     assert(capture.keys[0] == 0x1cu && capture.releases[0] == 0u);
     assert(capture.keys[1] == 0x1cu && capture.releases[1] == 1u);
@@ -122,7 +122,7 @@ int main(void)
     /* Extended state is a neutral UI flag, not a copied Win32 control bit. */
     capture.count = 0u;
     assert(ui_win32_keyboard_submit_transition(&capture, capture_key,
-        0xe04du, VK_RIGHT, ENHANCED_KEY, 0u, 1));
+        0xe04du, LIB_NATIVE_KEY_RIGHT, LIB_NATIVE_INPUT_FLAG_EXTENDED, 0u, 1));
     assert(capture.count == 1u && capture.identities[0] == UI_KEY_RIGHT);
     assert(capture.flags[0] == UI_KEY_FLAG_EXTENDED);
 
