@@ -1,8 +1,6 @@
 #include "lib/types/types_interface.h"
 #include "lib/ui-base/linux/input.h"
 
-#include <string.h>
-
 lib_bool ui_linui_key_to_event(ui_linui_key key, ui_event *out_event)
 {
     lib_u32 key_identity;
@@ -35,7 +33,7 @@ lib_bool ui_linui_key_to_event(ui_linui_key key, ui_event *out_event)
     case UI_LINUI_KEY_DELETE: key_identity = UI_KEY_DELETE; break;
     default: return LIB_FALSE;
     }
-    memset(out_event, 0, sizeof(*out_event));
+    lib_memory_set(out_event, 0, sizeof(*out_event));
     out_event->type = UI_EVENT_KEY;
     out_event->data.key.key = key_identity;
     out_event->data.key.pressed = LIB_TRUE;

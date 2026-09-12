@@ -3,7 +3,6 @@
 #include "lib/host/console_backend.h"
 
 #include "lib/types/atomic.h"
-#include <stdlib.h>
 
 struct host_console_broker {
     lib_atomic_flag lock;
@@ -61,7 +60,7 @@ static host_console_output_binding *host_console_output_binding_create(
     host_console_output_binding *binding;
     if (broker == LIB_NULL || console == LIB_NULL || generation == 0u)
         return LIB_NULL;
-    binding = calloc(1u, sizeof(*binding));
+    binding = lib_allocate_zero(1u, sizeof(*binding));
     if (binding != LIB_NULL) {
         binding->backend = broker->backend;
         binding->console = console;
@@ -90,7 +89,7 @@ static void host_console_remove_output_binding(lib_console *console,
     if (console == LIB_NULL) return;
     (void)lib_console_set_output_sink(console, LIB_NULL, LIB_NULL);
     (void)lib_console_set_text_frame_sink(console, LIB_NULL, LIB_NULL);
-    free(binding);
+    lib_release(binding);
 }
 
 static lib_status host_console_activate_bound(host_console_broker *broker,
@@ -116,7 +115,7 @@ lib_status host_console_broker_create(host_console_broker **out_broker,
     *out_broker = LIB_NULL;
     if (lib_atomic_flag_test_and_set_explicit(&host_console_process_claimed,
             LIB_MEMORY_ORDER_ACQ_REL)) return LIB_STATUS_INVALID_STATE;
-    broker = calloc(1u, sizeof(*broker));
+    broker = lib_allocate_zero(1u, sizeof(*broker));
     if (broker == LIB_NULL) {
         lib_atomic_flag_clear_explicit(&host_console_process_claimed,
             LIB_MEMORY_ORDER_RELEASE);
@@ -145,7 +144,7 @@ lib_status host_console_broker_create(host_console_broker **out_broker,
         host_console_remove_output_binding(broker->current, broker->current_output);
         if (broker->current != LIB_NULL) lib_console_release(broker->current);
         host_console_backend_destroy(broker->backend);
-        free(broker);
+        lib_release(broker);
         lib_atomic_flag_clear_explicit(&host_console_process_claimed,
             LIB_MEMORY_ORDER_RELEASE);
         return status;
@@ -198,7 +197,7 @@ lib_status host_console_broker_replace(host_console_broker *broker,
     status = host_console_install_output_binding(next, next_output);
     if (status != LIB_STATUS_OK) {
         host_console_backend_discard_prepare(broker->backend);
-        free(next_output);
+        lib_release(next_output);
         lib_console_release(next);
         host_console_unlock(broker);
         return status;
@@ -309,6 +308,6 @@ void host_console_broker_destroy(host_console_broker *broker)
     host_console_remove_output_binding(current, output);
     if (current != LIB_NULL) lib_console_release(current);
     host_console_backend_destroy(broker->backend);
-    free(broker);
+    lib_release(broker);
     lib_atomic_flag_clear_explicit(&host_console_process_claimed, LIB_MEMORY_ORDER_RELEASE);
 }

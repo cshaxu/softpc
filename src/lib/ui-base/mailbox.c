@@ -1,7 +1,5 @@
 #include "lib/ui-base/mailbox.h"
 
-#include <string.h>
-
 static void ui_component_mailboxes_lock(lib_atomic_flag *lock)
 {
     while (lib_atomic_flag_test_and_set_explicit(lock, LIB_MEMORY_ORDER_ACQUIRE)) { }
@@ -15,7 +13,7 @@ static void ui_component_mailboxes_unlock(lib_atomic_flag *lock)
 lib_status ui_component_mailboxes_create(ui_component_mailboxes *mailboxes)
 {
     if (mailboxes == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    memset(mailboxes, 0, sizeof(*mailboxes));
+    lib_memory_set(mailboxes, 0, sizeof(*mailboxes));
     lib_atomic_flag_clear(&mailboxes->frame_lock);
     lib_atomic_flag_clear(&mailboxes->control_lock);
     mailboxes->wake = ui_mailbox_wake_create();

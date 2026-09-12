@@ -15,6 +15,18 @@ typedef size_t lib_size;
 typedef int lib_bool;
 typedef va_list lib_format_arguments;
 
+typedef struct lib_file lib_file;
+
+typedef enum lib_file_access {
+    LIB_FILE_ACCESS_READONLY,
+    LIB_FILE_ACCESS_READWRITE
+} lib_file_access;
+
+typedef enum lib_file_write_mode {
+    LIB_FILE_WRITE_TRUNCATE,
+    LIB_FILE_WRITE_APPEND
+} lib_file_write_mode;
+
 typedef int lib_status;
 
 enum {
@@ -38,6 +50,7 @@ void *lib_memory_set(void *destination, int value, lib_size byte_count);
 void *lib_memory_copy(void *destination, const void *source, lib_size byte_count);
 void *lib_memory_move(void *destination, const void *source, lib_size byte_count);
 int lib_memory_compare(const void *left, const void *right, lib_size byte_count);
+const void *lib_memory_find(const void *bytes, int value, lib_size byte_count);
 
 lib_size lib_text_length(const char *text);
 int lib_text_compare(const char *left, const char *right);
@@ -55,6 +68,20 @@ int lib_text_format_append_v(char **cursor, lib_size *remaining,
 void *lib_allocate(lib_size byte_count);
 void *lib_allocate_zero(lib_size count, lib_size byte_count);
 void lib_release(void *memory);
+
+/* Neutral byte-stream primitive.  Native descriptors and C FILE objects stay
+ * entirely within types. */
+lib_status lib_file_open(const char *path, lib_file_access access,
+    lib_file **out_file);
+lib_status lib_file_open_writer(const char *path, lib_file_write_mode mode,
+    lib_file **out_file);
+lib_status lib_file_read_exact(lib_file *file, void *bytes, lib_size byte_count);
+lib_status lib_file_write_exact(lib_file *file, const void *bytes,
+    lib_size byte_count);
+lib_status lib_file_flush(lib_file *file);
+lib_status lib_file_seek_absolute(lib_file *file, lib_i64 offset);
+lib_status lib_file_byte_count(lib_file *file, lib_i64 *out_byte_count);
+lib_status lib_file_close(lib_file **file);
 
 #include "lib/types/atomic.h"
 

@@ -3,8 +3,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <stdlib.h>
-#include <string.h>
 
 struct host_console_backend {
     HANDLE input;
@@ -118,7 +116,7 @@ static DWORD WINAPI host_console_reader(void *context)
         event.kind = LIB_CONSOLE_EVENT_COOKED_LINE;
         event.binding_generation = backend->generation;
         event.value.line.length = read;
-        memcpy(event.value.line.text, text, read);
+        lib_memory_copy(event.value.line.text, text, read);
         event.value.line.text[read] = '\0';
         (void)lib_console_deliver_event(backend->console, &event);
     } else {
@@ -142,7 +140,7 @@ lib_status host_console_backend_create(host_console_backend **out_backend)
     DWORD mode;
     if (out_backend == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_backend = LIB_NULL;
-    backend = calloc(1u, sizeof(*backend));
+    backend = lib_allocate_zero(1u, sizeof(*backend));
     if (backend == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     backend->input = CreateFileA("CONIN$", GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
@@ -153,7 +151,7 @@ lib_status host_console_backend_create(host_console_backend **out_backend)
         !GetConsoleMode(backend->input, &mode)) {
         if (backend->input != INVALID_HANDLE_VALUE) CloseHandle(backend->input);
         if (backend->output != INVALID_HANDLE_VALUE) CloseHandle(backend->output);
-        free(backend);
+        lib_release(backend);
         return LIB_STATUS_UNSUPPORTED;
     }
     backend->original_mode = mode;
@@ -177,7 +175,7 @@ void host_console_backend_destroy(host_console_backend *backend)
     if (backend->input != INVALID_HANDLE_VALUE) CloseHandle(backend->input);
     if (backend->output != INVALID_HANDLE_VALUE) CloseHandle(backend->output);
     DeleteCriticalSection(&backend->output_lock);
-    free(backend);
+    lib_release(backend);
 }
 
 static lib_status host_console_start_reader(host_console_backend *backend)
@@ -259,10 +257,10 @@ lib_status host_console_backend_activate(host_console_backend *backend,
     backend->console = console;
     backend->mode = mode;
     backend->generation = generation;
-    memset(backend->previous, 0xff, sizeof(backend->previous));
-    memset(backend->previous_attributes, 0xff,
+    lib_memory_set(backend->previous, 0xff, sizeof(backend->previous));
+    lib_memory_set(backend->previous_attributes, 0xff,
         sizeof(backend->previous_attributes));
-    memset(backend->previous_palette, 0xff,
+    lib_memory_set(backend->previous_palette, 0xff,
         sizeof(backend->previous_palette));
     backend->previous_columns = 0u;
     backend->previous_rows = 0u;
@@ -417,12 +415,12 @@ lib_status host_console_backend_write_text_frame_bound(host_console_backend *bac
         host_console_backend_unlock_output(backend);
         return LIB_STATUS_IO_ERROR;
     }
-    if (memcmp(frame->palette, backend->previous_palette,
+    if (lib_memory_compare(frame->palette, backend->previous_palette,
             sizeof(frame->palette)) != 0) {
         CONSOLE_SCREEN_BUFFER_INFOEX info;
         lib_u32 index;
 
-        memset(&info, 0, sizeof(info));
+        lib_memory_set(&info, 0, sizeof(info));
         info.cbSize = sizeof(info);
         if (GetConsoleScreenBufferInfoEx(backend->output, &info)) {
             for (index = 0u; index < 16u; ++index)
@@ -430,14 +428,14 @@ lib_status host_console_backend_write_text_frame_bound(host_console_backend *bac
                     frame->palette[index]);
             (void)SetConsoleScreenBufferInfoEx(backend->output, &info);
         }
-        memcpy(backend->previous_palette, frame->palette,
+        lib_memory_copy(backend->previous_palette, frame->palette,
             sizeof(frame->palette));
     }
     if (backend->previous_columns != frame->columns ||
         backend->previous_rows != frame->rows ||
-        memcmp(frame->text, backend->previous,
+        lib_memory_compare(frame->text, backend->previous,
             sizeof(frame->text)) != 0 ||
-        memcmp(frame->attributes, backend->previous_attributes,
+        lib_memory_compare(frame->attributes, backend->previous_attributes,
             sizeof(frame->attributes)) != 0) {
         for (row = 0u; row < LIB_CONSOLE_TEXT_ROWS; ++row) {
             lib_u32 column;
@@ -455,8 +453,8 @@ lib_status host_console_backend_write_text_frame_bound(host_console_backend *bac
             host_console_backend_unlock_output(backend);
             return LIB_STATUS_IO_ERROR;
         }
-        memcpy(backend->previous, frame->text, sizeof(frame->text));
-        memcpy(backend->previous_attributes, frame->attributes,
+        lib_memory_copy(backend->previous, frame->text, sizeof(frame->text));
+        lib_memory_copy(backend->previous_attributes, frame->attributes,
             sizeof(frame->attributes));
         backend->previous_columns = frame->columns;
         backend->previous_rows = frame->rows;

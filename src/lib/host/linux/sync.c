@@ -6,7 +6,6 @@
 #include <errno.h>
 #include <pthread.h>
 #include <sched.h>
-#include <stdlib.h>
 #include <time.h>
 
 struct host_sync_event {
@@ -124,10 +123,10 @@ lib_status host_sync_event_create(host_sync_event **out_event)
 
     if (out_event == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_event = LIB_NULL;
-    event = calloc(1u, sizeof(*event));
+    event = lib_allocate_zero(1u, sizeof(*event));
     if (event == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     if (host_sync_event_initialize(event) != LIB_STATUS_OK) {
-        free(event);
+        lib_release(event);
         return LIB_STATUS_IO_ERROR;
     }
     *out_event = event;
@@ -138,7 +137,7 @@ void host_sync_event_destroy(host_sync_event *event)
 {
     if (event == LIB_NULL) return;
     host_sync_event_finalize(event);
-    free(event);
+    lib_release(event);
 }
 
 void host_sync_event_signal(host_sync_event *event)
@@ -218,17 +217,17 @@ lib_status host_sync_task_create(host_sync_task_entry entry, void *context,
 
     if (entry == LIB_NULL || out_task == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_task = LIB_NULL;
-    task = calloc(1u, sizeof(*task));
+    task = lib_allocate_zero(1u, sizeof(*task));
     if (task == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     task->entry = entry;
     task->context = context;
     if (host_sync_event_initialize(&task->cancellation) != LIB_STATUS_OK) {
-        free(task);
+        lib_release(task);
         return LIB_STATUS_IO_ERROR;
     }
     if (pthread_create(&task->thread, LIB_NULL, host_sync_task_main, task) != 0) {
         host_sync_event_finalize(&task->cancellation);
-        free(task);
+        lib_release(task);
         return LIB_STATUS_IO_ERROR;
     }
     *out_task = task;
@@ -267,5 +266,5 @@ void host_sync_task_destroy(host_sync_task *task)
     host_sync_task_request_cancel(task);
     host_sync_task_join(task);
     host_sync_event_finalize(&task->cancellation);
-    free(task);
+    lib_release(task);
 }

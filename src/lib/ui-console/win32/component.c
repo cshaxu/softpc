@@ -5,8 +5,6 @@
 #include "lib/ui-base/win32/mailbox_wake.h"
 
 #include <windows.h>
-#include <stdlib.h>
-#include <string.h>
 
 typedef struct ui_console_win32_state {
     HANDLE worker;
@@ -92,9 +90,9 @@ static void ui_console_publish_text_frame(ui_console *console,
     if (console == LIB_NULL || frame == LIB_NULL || frame->graphics != 0u) return;
     text_frame.columns = frame->text_columns;
     text_frame.rows = frame->text_rows;
-    memcpy(text_frame.text, frame->text, sizeof(text_frame.text));
-    memcpy(text_frame.attributes, frame->attributes, sizeof(text_frame.attributes));
-    memcpy(text_frame.palette, frame->text_palette, sizeof(text_frame.palette));
+    lib_memory_copy(text_frame.text, frame->text, sizeof(text_frame.text));
+    lib_memory_copy(text_frame.attributes, frame->attributes, sizeof(text_frame.attributes));
+    lib_memory_copy(text_frame.palette, frame->text_palette, sizeof(text_frame.palette));
     text_frame.cursor_column = frame->cursor_column;
     text_frame.cursor_row = frame->cursor_row;
     text_frame.cursor_top = frame->cursor_top;
@@ -143,13 +141,13 @@ lib_status ui_console_native_start(ui_console *console)
 
     if (console == LIB_NULL || console->logical_console == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
-    state = calloc(1u, sizeof(*state));
+    state = lib_allocate_zero(1u, sizeof(*state));
     if (state == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     console->native_state = state;
     state->worker = CreateThread(NULL, 0u, ui_console_worker, console, 0u, NULL);
     if (state->worker == NULL) {
         console->native_state = LIB_NULL;
-        free(state);
+        lib_release(state);
         return LIB_STATUS_NO_MEMORY;
     }
     if (lib_console_set_event_sink(console->logical_console,
@@ -160,7 +158,7 @@ lib_status ui_console_native_start(ui_console *console)
         (void)WaitForSingleObject(state->worker, INFINITE);
         CloseHandle(state->worker);
         console->native_state = LIB_NULL;
-        free(state);
+        lib_release(state);
         return LIB_STATUS_INVALID_STATE;
     }
     return LIB_STATUS_OK;
@@ -177,6 +175,6 @@ void ui_console_native_stop(ui_console *console)
     (void)WaitForSingleObject(state->worker, INFINITE);
     CloseHandle(state->worker);
     console->native_state = LIB_NULL;
-    free(state);
+    lib_release(state);
 }
 #endif

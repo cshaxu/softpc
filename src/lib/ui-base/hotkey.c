@@ -1,7 +1,5 @@
 #include "lib/ui-base/hotkey_interface.h"
 
-#include <string.h>
-
 static lib_u8 ui_hotkey_modifier_bit(ui_key key)
 {
     if (key == UI_HOTKEY_KEY_CONTROL) return UI_HOTKEY_MODIFIER_CONTROL;
@@ -77,7 +75,7 @@ static void ui_hotkey_suppress_chord(ui_hotkey_matcher *matcher,
 
 void ui_hotkey_registry_initialize(ui_hotkey_registry *registry)
 {
-    if (registry != LIB_NULL) memset(registry, 0, sizeof(*registry));
+    if (registry != LIB_NULL) lib_memory_set(registry, 0, sizeof(*registry));
 }
 
 lib_status ui_hotkey_registry_register(ui_hotkey_registry *registry,
@@ -87,7 +85,7 @@ lib_status ui_hotkey_registry_register(ui_hotkey_registry *registry,
     const char *end;
 
     if (registry == LIB_NULL || key == 0u || identifier == LIB_NULL ||
-        (end = memchr(identifier, '\0', UI_HOTKEY_IDENTIFIER_CAPACITY)) == LIB_NULL)
+        (end = lib_memory_find(identifier, '\0', UI_HOTKEY_IDENTIFIER_CAPACITY)) == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     for (index = 0u; index < registry->count; ++index) {
         if (registry->entries[index].key == key &&
@@ -97,7 +95,7 @@ lib_status ui_hotkey_registry_register(ui_hotkey_registry *registry,
     if (registry->count == UI_HOTKEY_CAPACITY) return LIB_STATUS_LIMIT_EXCEEDED;
     registry->entries[registry->count] = (ui_hotkey_registration) { key, modifiers,
         { 0 } };
-    memcpy(registry->entries[registry->count].identifier, identifier,
+    lib_memory_copy(registry->entries[registry->count].identifier, identifier,
         (lib_size)(end - identifier) + 1u);
     ++registry->count;
     return LIB_STATUS_OK;
@@ -107,7 +105,7 @@ void ui_hotkey_matcher_initialize(ui_hotkey_matcher *matcher,
     const ui_hotkey_registry *registry)
 {
     if (matcher == LIB_NULL) return;
-    memset(matcher, 0, sizeof(*matcher));
+    lib_memory_set(matcher, 0, sizeof(*matcher));
     if (registry != LIB_NULL) matcher->registry = *registry;
 }
 
@@ -143,7 +141,7 @@ int ui_hotkey_matcher_submit(ui_hotkey_matcher *matcher,
         ui_input_event hotkey = *event;
         ui_hotkey_suppress_chord(matcher, event);
         hotkey.type = UI_EVENT_HOTKEY;
-        memcpy(hotkey.data.hotkey.identifier, matched->identifier,
+        lib_memory_copy(hotkey.data.hotkey.identifier, matched->identifier,
             sizeof(hotkey.data.hotkey.identifier));
         return sink(context, &hotkey);
     }

@@ -1,7 +1,7 @@
+#include "lib/types/types_interface.h"
 #include "lib/ui-base/mailbox_wake.h"
 #include "lib/ui-base/win32/mailbox_wake.h"
 
-#include <stdlib.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -12,12 +12,12 @@ struct ui_mailbox_wake {
 
 ui_mailbox_wake *ui_mailbox_wake_create(void)
 {
-    ui_mailbox_wake *wake = calloc(1u, sizeof(*wake));
+    ui_mailbox_wake *wake = lib_allocate_zero(1u, sizeof(*wake));
 
     if (wake == NULL) return NULL;
     wake->event = CreateEventA(NULL, FALSE, FALSE, NULL);
     if (wake->event != NULL) return wake;
-    free(wake);
+    lib_release(wake);
     return NULL;
 }
 
@@ -25,7 +25,7 @@ void ui_mailbox_wake_destroy(ui_mailbox_wake *wake)
 {
     if (wake == NULL) return;
     if (wake->event != NULL) CloseHandle(wake->event);
-    free(wake);
+    lib_release(wake);
 }
 
 void ui_mailbox_wake_signal(ui_mailbox_wake *wake)

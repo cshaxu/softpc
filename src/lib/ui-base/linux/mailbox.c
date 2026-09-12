@@ -2,7 +2,6 @@
 #include "lib/ui-base/mailbox_wake.h"
 #include "lib/ui-base/linux/mailbox_wake.h"
 
-#include <stdlib.h>
 
 struct ui_mailbox_wake {
     int read_fd;
@@ -18,11 +17,11 @@ static int ui_linui_mailbox_make_nonblocking(int fd)
 
 ui_mailbox_wake *ui_mailbox_wake_create(void)
 {
-    ui_mailbox_wake *wake = calloc(1u, sizeof(*wake));
+    ui_mailbox_wake *wake = lib_allocate_zero(1u, sizeof(*wake));
     int fds[2];
 
     if (wake == NULL || pipe(fds) != 0) {
-        free(wake);
+        lib_release(wake);
         return NULL;
     }
     wake->read_fd = fds[0];
@@ -31,7 +30,7 @@ ui_mailbox_wake *ui_mailbox_wake_create(void)
         !ui_linui_mailbox_make_nonblocking(wake->write_fd)) {
         (void)close(wake->read_fd);
         (void)close(wake->write_fd);
-        free(wake);
+        lib_release(wake);
         return NULL;
     }
     return wake;
@@ -42,7 +41,7 @@ void ui_mailbox_wake_destroy(ui_mailbox_wake *wake)
     if (wake == NULL) return;
     (void)close(wake->read_fd);
     (void)close(wake->write_fd);
-    free(wake);
+    lib_release(wake);
 }
 
 void ui_mailbox_wake_signal(ui_mailbox_wake *wake)

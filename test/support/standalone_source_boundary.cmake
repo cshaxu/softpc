@@ -123,7 +123,7 @@ file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ui-window/window.c" window_source)
 file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ui-window/win32/component.c"
     native_window_source)
 string(FIND "${window_header}" "const char *initial_title" title_option_index)
-string(FIND "${window_source}" "memcpy(window->initial_title" title_copy_index)
+string(FIND "${window_source}" "lib_memory_copy(window->initial_title" title_copy_index)
 string(FIND "${native_window_source}" "component->initial_title" title_native_index)
 if(title_option_index EQUAL -1 OR title_copy_index EQUAL -1 OR
     title_native_index EQUAL -1)

@@ -76,11 +76,11 @@ lib_status host_sync_event_create(host_sync_event **out_event)
 
     if (out_event == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_event = LIB_NULL;
-    event = calloc(1u, sizeof(*event));
+    event = lib_allocate_zero(1u, sizeof(*event));
     if (event == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     event->handle = CreateEventA(NULL, TRUE, FALSE, NULL);
     if (event->handle == NULL) {
-        free(event);
+        lib_release(event);
         return LIB_STATUS_IO_ERROR;
     }
     *out_event = event;
@@ -91,7 +91,7 @@ void host_sync_event_destroy(host_sync_event *event)
 {
     if (event == LIB_NULL) return;
     if (event->handle != NULL) (void)CloseHandle(event->handle);
-    free(event);
+    lib_release(event);
 }
 
 void host_sync_event_signal(host_sync_event *event)
@@ -117,7 +117,7 @@ lib_status host_sync_task_create(host_sync_task_entry entry, void *context,
 
     if (entry == LIB_NULL || out_task == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_task = LIB_NULL;
-    task = calloc(1u, sizeof(*task));
+    task = lib_allocate_zero(1u, sizeof(*task));
     if (task == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     task->entry = entry;
     task->context = context;
@@ -126,7 +126,7 @@ lib_status host_sync_task_create(host_sync_task_entry entry, void *context,
         host_sync_task_main, task, 0u, NULL);
     if (task->thread == NULL) {
         if (task->cancellation != NULL) (void)CloseHandle(task->cancellation);
-        free(task);
+        lib_release(task);
         return LIB_STATUS_IO_ERROR;
     }
     *out_task = task;
@@ -170,5 +170,5 @@ void host_sync_task_destroy(host_sync_task *task)
     host_sync_task_join(task);
     if (task->thread != NULL) (void)CloseHandle(task->thread);
     if (task->cancellation != NULL) (void)CloseHandle(task->cancellation);
-    free(task);
+    lib_release(task);
 }

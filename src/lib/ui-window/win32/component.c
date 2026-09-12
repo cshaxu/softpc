@@ -10,8 +10,6 @@
 #include "lib/ui-window/win32/mouse.h"
 
 #include <windows.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define WIN32_WINDOW_TEXT_CELL_WIDTH 8u
 #define WIN32_WINDOW_TEXT_CELL_HEIGHT 16u
@@ -121,8 +119,8 @@ static HCURSOR win32_window_create_transparent_cursor(void)
     /* AND=1, XOR=0 preserves every underlying pixel, which is a transparent
        monochrome cursor.  Unlike SetCursor(NULL), this is an actual cursor
        image for remote-desktop cursor transport. */
-    memset(and_mask, 0xff, sizeof(and_mask));
-    memset(xor_mask, 0, sizeof(xor_mask));
+    lib_memory_set(and_mask, 0xff, sizeof(and_mask));
+    lib_memory_set(xor_mask, 0, sizeof(xor_mask));
     return CreateCursor(GetModuleHandleA(NULL), 0, 0, 32, 32,
         and_mask, xor_mask);
 }
@@ -214,7 +212,7 @@ static int win32_window_ensure_surface(HWND window,
     context->surface_width = width;
     context->surface_height = height;
     context->graphics_valid = 0;
-    memset(context->surface_pixels, 0,
+    lib_memory_set(context->surface_pixels, 0,
         (lib_size)width * height * sizeof(*context->surface_pixels));
     return 1;
 }
@@ -280,7 +278,7 @@ static void win32_window_update_text(ui_win32_window_context *context)
 
     if (context == NULL || context->surface_pixels == NULL ||
         (frame = context->frame) == NULL || frame->graphics != 0u) return;
-    memset(context->surface_pixels, 0, (lib_size)context->surface_width *
+    lib_memory_set(context->surface_pixels, 0, (lib_size)context->surface_width *
         context->surface_height * sizeof(*context->surface_pixels));
     for (row = 0u; row < frame->text_rows; ++row) {
         lib_u32 column;
@@ -321,7 +319,7 @@ static int win32_window_update_graphics(ui_win32_window_context *context,
         (frame = context->frame) == NULL || frame->graphics == 0u ||
         context->surface_width != frame->graphics_width ||
         context->surface_height != frame->graphics_height) return 0;
-    full_refresh = !context->graphics_valid || memcmp(context->graphics_palette,
+    full_refresh = !context->graphics_valid || lib_memory_compare(context->graphics_palette,
         frame->graphics_palette, sizeof(context->graphics_palette)) != 0;
     left = full_refresh ? 0 : frame->dirty_left;
     top = full_refresh ? 0 : frame->dirty_top;
@@ -339,7 +337,7 @@ static int win32_window_update_graphics(ui_win32_window_context *context,
         for (column = (lib_u32)left; column <= (lib_u32)right; ++column)
             destination[column] = frame->graphics_palette[source[column]];
     }
-    memcpy(context->graphics_palette, frame->graphics_palette,
+    lib_memory_copy(context->graphics_palette, frame->graphics_palette,
         sizeof(context->graphics_palette));
     context->graphics_valid = 1;
     changed->left = left;
@@ -753,8 +751,8 @@ static void win32_window_destroy(ui_win32_window_context *context, HWND window)
     win32_window_destroy_surface(context);
     if (context != NULL && context->transparent_cursor != NULL)
         DestroyCursor(context->transparent_cursor);
-    if (context != NULL) free(context->frame);
-    free(context);
+    if (context != NULL) lib_release(context->frame);
+    lib_release(context);
 }
 
 typedef struct ui_window_win32_state {
@@ -855,13 +853,13 @@ lib_status ui_window_native_start(ui_window *component)
     lib_status startup_status;
 
     if (component == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    state = calloc(1u, sizeof(*state));
+    state = lib_allocate_zero(1u, sizeof(*state));
     if (state == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    state->context = calloc(1u, sizeof(*state->context));
-    if (state->context == LIB_NULL) { free(state); return LIB_STATUS_NO_MEMORY; }
-    state->context->frame = calloc(1u, sizeof(*state->context->frame));
+    state->context = lib_allocate_zero(1u, sizeof(*state->context));
+    if (state->context == LIB_NULL) { lib_release(state); return LIB_STATUS_NO_MEMORY; }
+    state->context->frame = lib_allocate_zero(1u, sizeof(*state->context->frame));
     if (state->context->frame == LIB_NULL) {
-        free(state->context); free(state); return LIB_STATUS_NO_MEMORY;
+        lib_release(state->context); lib_release(state); return LIB_STATUS_NO_MEMORY;
     }
     state->context->component = component;
     state->context->frozen = component->initial_frozen;
@@ -870,14 +868,14 @@ lib_status ui_window_native_start(ui_window *component)
         WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS;
     state->ready = CreateEventA(NULL, TRUE, FALSE, NULL);
     if (state->ready == NULL) {
-        win32_window_destroy(state->context, NULL); free(state); return LIB_STATUS_NO_MEMORY;
+        win32_window_destroy(state->context, NULL); lib_release(state); return LIB_STATUS_NO_MEMORY;
     }
     component->native_state = state;
     state->worker = CreateThread(NULL, 0u, ui_window_worker, component, 0u, NULL);
     if (state->worker == NULL) {
         component->native_state = LIB_NULL;
         CloseHandle(state->ready); win32_window_destroy(state->context, NULL);
-        free(state); return LIB_STATUS_NO_MEMORY;
+        lib_release(state); return LIB_STATUS_NO_MEMORY;
     }
     (void)WaitForSingleObject(state->ready, INFINITE);
     if (state->startup_status != LIB_STATUS_OK) {
@@ -885,7 +883,7 @@ lib_status ui_window_native_start(ui_window *component)
         (void)WaitForSingleObject(state->worker, INFINITE);
         CloseHandle(state->worker); CloseHandle(state->ready);
         if (state->context != LIB_NULL) win32_window_destroy(state->context, NULL);
-        component->native_state = LIB_NULL; free(state);
+        component->native_state = LIB_NULL; lib_release(state);
         return startup_status;
     }
     return LIB_STATUS_OK;
@@ -903,6 +901,6 @@ void ui_window_native_stop(ui_window *component)
     CloseHandle(state->ready);
     if (state->context != LIB_NULL) win32_window_destroy(state->context, NULL);
     component->native_state = LIB_NULL;
-    free(state);
+    lib_release(state);
 }
 #endif

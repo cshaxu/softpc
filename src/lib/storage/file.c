@@ -1,17 +1,13 @@
 #include "lib/types/types_interface.h"
 
 #include "lib/storage/file_interface.h"
-#include "lib/storage/file_backend.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
-struct lib_storage_file_writer { FILE *file; };
+struct lib_storage_file_writer { lib_file *file; };
 
 lib_status lib_storage_file_read_owned(const char *path, lib_size maximum,
     void **out_bytes, lib_size *out_byte_count)
 {
-    FILE *file;
+    lib_file *file = LIB_NULL;
     lib_i64 length;
     void *bytes = LIB_NULL;
 
@@ -20,20 +16,17 @@ lib_status lib_storage_file_read_owned(const char *path, lib_size maximum,
     }
     *out_bytes = LIB_NULL;
     *out_byte_count = 0u;
-    file = fopen(path, "rb");
-    if (file == LIB_NULL) return LIB_STATUS_IO_ERROR;
-    if (lib_storage_file_backend_seek_64(file, 0, SEEK_END) != 0 ||
-        (length = lib_storage_file_backend_tell_64(file)) < 0 || (lib_u64)length > maximum ||
-        lib_storage_file_backend_seek_64(file, 0, SEEK_SET) != 0 ||
-        (bytes = malloc((lib_size)length == 0u ? 1u : (lib_size)length)) == LIB_NULL ||
-        ((lib_size)length != 0u && fread(bytes, 1u, (lib_size)length, file) !=
-            (lib_size)length)) {
-        (void)fclose(file);
-        free(bytes);
+    if (lib_file_open(path, LIB_FILE_ACCESS_READONLY, &file) != LIB_STATUS_OK ||
+        lib_file_byte_count(file, &length) != LIB_STATUS_OK || length < 0 ||
+        (lib_u64)length > maximum ||
+        (bytes = lib_allocate((lib_size)length == 0u ? 1u : (lib_size)length)) == LIB_NULL ||
+        lib_file_read_exact(file, bytes, (lib_size)length) != LIB_STATUS_OK) {
+        (void)lib_file_close(&file);
+        lib_release(bytes);
         return LIB_STATUS_IO_ERROR;
     }
-    if (fclose(file) != 0) {
-        free(bytes);
+    if (lib_file_close(&file) != LIB_STATUS_OK) {
+        lib_release(bytes);
         return LIB_STATUS_IO_ERROR;
     }
     *out_bytes = bytes;
@@ -51,11 +44,12 @@ lib_status lib_storage_file_writer_open(const char *path,
         mode < LIB_STORAGE_FILE_WRITER_TRUNCATE ||
         mode > LIB_STORAGE_FILE_WRITER_APPEND) return LIB_STATUS_INVALID_ARGUMENT;
     *out_writer = LIB_NULL;
-    writer = malloc(sizeof(*writer));
+    writer = lib_allocate(sizeof(*writer));
     if (writer == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    writer->file = fopen(path, mode == LIB_STORAGE_FILE_WRITER_TRUNCATE ? "wb" : "ab");
-    if (writer->file == LIB_NULL) {
-        free(writer);
+    if (lib_file_open_writer(path,
+            mode == LIB_STORAGE_FILE_WRITER_TRUNCATE ? LIB_FILE_WRITE_TRUNCATE :
+            LIB_FILE_WRITE_APPEND, &writer->file) != LIB_STATUS_OK) {
+        lib_release(writer);
         return LIB_STATUS_IO_ERROR;
     }
     *out_writer = writer;
@@ -67,16 +61,15 @@ lib_status lib_storage_file_writer_write(lib_storage_file_writer *writer,
 {
     if (writer == LIB_NULL || (bytes == LIB_NULL && byte_count != 0u))
         return LIB_STATUS_INVALID_ARGUMENT;
-    return byte_count == 0u || fwrite(bytes, 1u, byte_count, writer->file) ==
-        byte_count ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+    return lib_file_write_exact(writer->file, bytes, byte_count);
 }
 
 lib_status lib_storage_file_writer_close(lib_storage_file_writer *writer)
 {
-    int result;
-
     if (writer == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    result = fclose(writer->file);
-    free(writer);
-    return result == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+    {
+        lib_status status = lib_file_close(&writer->file);
+        lib_release(writer);
+        return status;
+    }
 }

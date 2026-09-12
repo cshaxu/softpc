@@ -1,7 +1,5 @@
 #include "lib/ui-console/console.h"
 
-#include <stdlib.h>
-
 static void ui_console_dispose(ui_console *console)
 {
     if (console == LIB_NULL) return;
@@ -11,7 +9,7 @@ static void ui_console_dispose(ui_console *console)
         lib_console_release(console->logical_console);
     }
     ui_component_mailboxes_destroy(&console->base.mailboxes);
-    free(console);
+    lib_release(console);
 }
 
 static void ui_console_component_stop(ui_component *base)
@@ -30,7 +28,7 @@ lib_status ui_console_create(ui_console **out_console,
         options->input_sink == LIB_NULL || options->failure_sink == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     *out_console = LIB_NULL;
-    console = calloc(1u, sizeof(*console));
+    console = lib_allocate_zero(1u, sizeof(*console));
     if (console == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     status = ui_component_initialize(&console->base, options,
         ui_console_component_stop, ui_console_component_dispose);

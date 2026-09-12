@@ -1,7 +1,6 @@
 #include "lib/console/console.h"
 
 #include "lib/types/atomic.h"
-#include <stdlib.h>
 
 struct lib_console {
     lib_atomic_flag lock;
@@ -46,7 +45,7 @@ lib_status lib_console_create(lib_console **out_console)
     lib_console *console;
     if (out_console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_console = LIB_NULL;
-    console = calloc(1u, sizeof(*console));
+    console = lib_allocate_zero(1u, sizeof(*console));
     if (console == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     lib_atomic_flag_clear(&console->lock);
     lib_atomic_flag_clear(&console->event_gate);
@@ -69,7 +68,7 @@ void lib_console_release(lib_console *console)
     if (console == LIB_NULL) return;
     if (lib_atomic_u32_fetch_sub_explicit(&console->references, 1u,
             LIB_MEMORY_ORDER_ACQ_REL) == 1u)
-        free(console);
+        lib_release(console);
 }
 
 void lib_console_destroy(lib_console *console)

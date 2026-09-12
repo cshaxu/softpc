@@ -25,6 +25,11 @@ int lib_memory_compare(const void *left, const void *right, lib_size byte_count)
     return memcmp(left, right, byte_count);
 }
 
+const void *lib_memory_find(const void *bytes, int value, lib_size byte_count)
+{
+    return memchr(bytes, value, byte_count);
+}
+
 lib_size lib_text_length(const char *text)
 {
     return strlen(text);
