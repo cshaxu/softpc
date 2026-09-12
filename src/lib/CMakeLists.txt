@@ -27,7 +27,7 @@ function(library_root target)
     endif()
 endfunction()
 
-set(LIBRARY_TYPES_SOURCES types/runtime.c types/file.c)
+set(LIBRARY_TYPES_SOURCES types/runtime.c)
 if(WIN32)
     list(APPEND LIBRARY_TYPES_SOURCES types/win32/clock.c types/win32/file.c
         types/win32/sync.c types/win32/input_state.c)
