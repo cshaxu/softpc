@@ -1,6 +1,6 @@
 #include "lib/ui-base/win32/input.h"
 #include "lib/ui-base/hotkey_interface.h"
-#include "lib/types/win32/input.h"
+#include "lib/types/native_input.h"
 
 #ifdef _WIN32
 static lib_u16 ui_win32_keyboard_resolve_scan(lib_u16 native_key)

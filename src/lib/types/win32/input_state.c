@@ -1,4 +1,4 @@
-#include "lib/types/win32/input.h"
+#include "lib/types/native_input.h"
 #include "lib/types/types_interface.h"
 
 #ifdef _WIN32

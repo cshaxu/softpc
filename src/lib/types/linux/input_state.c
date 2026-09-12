@@ -1,4 +1,4 @@
-#include "lib/types/win32/input.h"
+#include "lib/types/native_input.h"
 
 lib_u8 lib_native_input_current_modifiers(void)
 {
