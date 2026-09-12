@@ -1,4 +1,4 @@
-#include "lib/console/console.h"
+#include "lib/console/binding_interface.h"
 
 #include "lib/types/atomic.h"
 

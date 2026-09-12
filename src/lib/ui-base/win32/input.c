@@ -1,5 +1,5 @@
 #include "lib/types/win32/scalar.h"
-#include "lib/ui-base/win32/input.h"
+#include "lib/ui-base/win32/input_interface.h"
 #include "lib/ui-base/hotkey_interface.h"
 #include "lib/types/win32/input.h"
 

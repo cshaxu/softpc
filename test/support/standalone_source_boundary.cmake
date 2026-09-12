@@ -174,6 +174,11 @@ foreach(source IN LISTS product_lib_consumers)
         if(interface_suffix EQUAL -1)
             message(FATAL_ERROR "Non-interface library header crosses a public boundary: ${source}")
         endif()
+        if(include_line MATCHES "lib/ui-base/(worker|mailbox|mailbox_wake)_interface.h" OR
+           include_line MATCHES "lib/ui-base/win32/" OR
+           include_line MATCHES "lib/console/binding_interface.h")
+            message(FATAL_ERROR "Leaf-support contract crosses an application boundary: ${source}")
+        endif()
     endforeach()
 endforeach()
 

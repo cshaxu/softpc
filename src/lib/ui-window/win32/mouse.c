@@ -7,16 +7,16 @@ void ui_win32_mouse_reset(ui_win32_mouse *mouse)
     mouse->x = 0;
     mouse->y = 0;
     mouse->valid = 0;
-    ui_capture_initialize(&mouse->capture);
+    mouse->captured = LIB_FALSE;
 }
 
 void ui_win32_mouse_release(ui_win32_mouse *mouse)
 {
-    if (mouse == LIB_NULL || !ui_capture_is_active(&mouse->capture)) return;
+    if (mouse == LIB_NULL || !mouse->captured) return;
     lib_win32_clip_cursor(LIB_NULL);
     lib_win32_release_capture();
     lib_win32_set_cursor(lib_win32_load_cursor_a(LIB_NULL, LIB_WIN32_IDC_ARROW));
-    ui_capture_release(&mouse->capture);
+    mouse->captured = LIB_FALSE;
     mouse->valid = 0;
 }
 
@@ -54,7 +54,7 @@ int ui_win32_mouse_capture(ui_win32_mouse *mouse,
     mouse->x = (int)(short)lib_win32_loword(position);
     mouse->y = (int)(short)lib_win32_hiword(position);
     mouse->valid = 1;
-    ui_capture_activate(&mouse->capture);
+    mouse->captured = LIB_TRUE;
     return 1;
 }
 
@@ -82,5 +82,5 @@ int ui_win32_mouse_move(ui_win32_mouse *mouse,
 
 int ui_win32_mouse_captured(const ui_win32_mouse *mouse)
 {
-    return mouse != LIB_NULL && ui_capture_is_active(&mouse->capture);
+    return mouse != LIB_NULL && mouse->captured;
 }

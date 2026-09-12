@@ -1,4 +1,4 @@
-#include "lib/ui-base/mailbox.h"
+#include "lib/ui-base/mailbox_interface.h"
 
 static void ui_component_mailboxes_lock(lib_atomic_flag *lock)
 {
@@ -70,9 +70,10 @@ lib_status ui_component_mailboxes_enqueue_controls(
         mailboxes->stop_queued = LIB_TRUE;
     } else if (mailboxes->stop_queued != LIB_FALSE || ordinary_count >
         UI_COMPONENT_CONTROL_CAPACITY - mailboxes->control_count) {
+        lib_status status = mailboxes->stop_queued != LIB_FALSE ?
+            LIB_STATUS_INVALID_STATE : LIB_STATUS_LIMIT_EXCEEDED;
         ui_component_mailboxes_unlock(&mailboxes->control_lock);
-        return mailboxes->stop_queued != LIB_FALSE ? LIB_STATUS_INVALID_STATE :
-            LIB_STATUS_LIMIT_EXCEEDED;
+        return status;
     }
     for (control_index = 0u; control_index < control_count; ++control_index) {
         index = (mailboxes->control_head + mailboxes->control_count) %

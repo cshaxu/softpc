@@ -42,7 +42,6 @@ if(WIN32)
     list(APPEND LIBRARY_UI_BASE_SOURCES
         ui-base/win32/actions.c
         ui-base/win32/mailbox.c
-        ui-base/win32/color.c
         ui-base/win32/input.c)
 else()
     list(APPEND LIBRARY_UI_BASE_SOURCES

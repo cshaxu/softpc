@@ -489,6 +489,11 @@ add_test(NAME softpc-runtime-input-continuation-smoke
 set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-types-contract-smoke test/unit/types_contract_smoke.c)
+add_executable(softpc-linux-wait-contract-smoke test/unit/linux_wait_contract_smoke.c)
+target_link_libraries(softpc-linux-wait-contract-smoke PRIVATE types)
+target_include_directories(softpc-linux-wait-contract-smoke PRIVATE test/support)
+add_test(NAME softpc-linux-wait-contract-smoke COMMAND softpc-linux-wait-contract-smoke)
+set_tests_properties(softpc-linux-wait-contract-smoke PROPERTIES LABELS "unit")
 target_link_libraries(softpc-types-contract-smoke PRIVATE host)
 add_test(NAME softpc-types-contract-smoke COMMAND softpc-types-contract-smoke)
 add_executable(softpc-win32-vocabulary-ownership-smoke
@@ -542,8 +547,8 @@ add_test(NAME softpc-ui-leaf-control-capacity-smoke
 set_tests_properties(softpc-ui-leaf-control-capacity-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-ui-console-retirement-barrier-smoke
-    test/unit/ui_console_retirement_barrier_smoke.c)
-target_link_libraries(softpc-ui-console-retirement-barrier-smoke PRIVATE ui-console)
+    test/unit/ui_console_retirement_barrier_smoke.c src/lib/ui-console/console.c)
+target_link_libraries(softpc-ui-console-retirement-barrier-smoke PRIVATE ui-base console)
 add_test(NAME softpc-ui-console-retirement-barrier-smoke
     COMMAND softpc-ui-console-retirement-barrier-smoke)
 set_tests_properties(softpc-ui-console-retirement-barrier-smoke PROPERTIES
@@ -641,6 +646,9 @@ set(SOFTPC_TEST_TARGETS
     softpc-win32-presentation-smoke
     softpc-win32-window-bounds-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-ui-component-contract-smoke)
+list(APPEND SOFTPC_TEST_TARGETS softpc-ui-leaf-control-capacity-smoke)
+list(APPEND SOFTPC_TEST_TARGETS softpc-linux-wait-contract-smoke)
+list(APPEND SOFTPC_TEST_TARGETS softpc-control-reconciler-integration-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-ui-console-retirement-barrier-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-plan-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-reconciler-smoke)

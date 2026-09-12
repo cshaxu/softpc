@@ -2,7 +2,7 @@
 #define UI_WINDOW_H
 
 #include "lib/ui-window/window_interface.h"
-#include "lib/ui-base/component.h"
+#include "lib/ui-base/worker_interface.h"
 
 struct ui_window {
     ui_component base;

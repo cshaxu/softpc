@@ -17,7 +17,7 @@ lib_status host_clock_milliseconds(lib_u64 *out_milliseconds)
 
     if (out_milliseconds == LIB_NULL ||
         host_clock_monotonic_counter(&units, &units_per_second) != LIB_STATUS_OK ||
-        units_per_second == 0u || units / units_per_second > UINT64_MAX / 1000u) {
+        units_per_second == 0u || units / units_per_second > LIB_UINT64_MAX / 1000u) {
         return LIB_STATUS_IO_ERROR;
     }
     *out_milliseconds = (units / units_per_second) * 1000u +

@@ -1,5 +1,5 @@
-#ifndef UI_MAILBOX_WAKE_H
-#define UI_MAILBOX_WAKE_H
+#ifndef UI_MAILBOX_WAKE_INTERFACE_H
+#define UI_MAILBOX_WAKE_INTERFACE_H
 
 #include "lib/types/types_interface.h"
 

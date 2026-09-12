@@ -3,7 +3,7 @@
 #include "lib/types/win32/sync.h"
 #include "lib/ui-console/console.h"
 
-#include "lib/ui-base/win32/input.h"
+#include "lib/ui-base/win32/input_interface.h"
 
 #include "lib/types/win32/console.h"
 
@@ -117,16 +117,13 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_console_worker(void *opaque)
 
         wake = ui_mailbox_wake_wait(
             ui_component_mailboxes_wake(&console->base.mailboxes), LIB_UINT32_MAX);
-        if (wake != UI_MAILBOX_WAKE_WAIT_WAKE)
+        if (wake != UI_MAILBOX_WAKE_WAIT_WAKE) {
+            ui_component_report_failure(&console->base, LIB_STATUS_IO_ERROR);
             break;
+        }
         while (ui_component_mailboxes_take_control(&console->base.mailboxes, &control)) {
             if (control.kind == UI_COMPONENT_CONTROL_STOP) {
-                /* Detach waits for any in-flight native callback.  Retirement
-                 * is therefore the final input fact from this source. */
-                (void)lib_console_set_event_sink(console->logical_console,
-                    LIB_NULL, LIB_NULL);
-                ui_component_emit_source_retired(&console->base);
-                return 0u;
+                goto retired;
             }
             /* ui-console has no title or mouse surface. Unsupported Window
              * control entries are intentionally consumed as no-ops. */
@@ -134,6 +131,11 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_console_worker(void *opaque)
         if (ui_component_mailboxes_capture_frame(&console->base.mailboxes,
                 &generation, &frame)) ui_console_publish_text_frame(console, &frame);
     }
+retired:
+    /* Detach waits for any in-flight callback on every exit, including a
+     * failed wake. Retirement is the final input fact from this source. */
+    (void)lib_console_set_event_sink(console->logical_console, LIB_NULL, LIB_NULL);
+    ui_component_emit_source_retired(&console->base);
     return 0u;
 }
 
@@ -146,22 +148,20 @@ lib_status ui_console_worker_start(ui_console *console)
     state = lib_allocate_zero(1u, sizeof(*state));
     if (state == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     console->worker_state = state;
-    state->worker = lib_win32_create_thread(LIB_NULL, 0u, ui_console_worker, console, 0u, LIB_NULL);
-    if (state->worker == LIB_NULL) {
-        console->worker_state = LIB_NULL;
-        lib_release(state);
-        return LIB_STATUS_NO_MEMORY;
-    }
+    /* Install before starting: an immediate worker failure must not be
+     * followed by reattaching the retired source from this thread. */
     if (lib_console_set_event_sink(console->logical_console,
             ui_console_receive_event, console) != LIB_STATUS_OK) {
-        lib_atomic_i32_store_explicit(&console->base.stopping, 1,
-            LIB_MEMORY_ORDER_RELEASE);
-        ui_mailbox_wake_signal(ui_component_mailboxes_wake(&console->base.mailboxes));
-        (void)lib_win32_wait_for_single_object(state->worker, LIB_WIN32_INFINITE);
-        lib_win32_close_handle(state->worker);
         console->worker_state = LIB_NULL;
         lib_release(state);
         return LIB_STATUS_INVALID_STATE;
+    }
+    state->worker = lib_win32_create_thread(LIB_NULL, 0u, ui_console_worker, console, 0u, LIB_NULL);
+    if (state->worker == LIB_NULL) {
+        (void)lib_console_set_event_sink(console->logical_console, LIB_NULL, LIB_NULL);
+        console->worker_state = LIB_NULL;
+        lib_release(state);
+        return LIB_STATUS_NO_MEMORY;
     }
     return LIB_STATUS_OK;
 }

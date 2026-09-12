@@ -1,4 +1,4 @@
-#include "lib/ui-base/component.h"
+#include "lib/ui-base/worker_interface.h"
 
 static lib_atomic_u64 ui_component_next_source_identity = 1u;
 
@@ -16,7 +16,7 @@ lib_status ui_component_allocate_source_identity(lib_atomic_u64 *next,
          * fetch-add here: its next failed call would wrap zero to one and
          * eventually reuse a source identity. */
         if (identity == 0u) return LIB_STATUS_LIMIT_EXCEEDED;
-        following = identity == UINT64_MAX ? 0u : identity + 1u;
+        following = identity == LIB_UINT64_MAX ? 0u : identity + 1u;
         if (lib_atomic_u64_compare_exchange_weak_explicit(next, &identity, following,
                 LIB_MEMORY_ORDER_RELAXED, LIB_MEMORY_ORDER_RELAXED)) {
             *out_identity = (lib_u64)identity;
@@ -25,7 +25,7 @@ lib_status ui_component_allocate_source_identity(lib_atomic_u64 *next,
     }
 }
 
-static void ui_component_report_failure(ui_component *component, lib_status status)
+void ui_component_report_failure(ui_component *component, lib_status status)
 {
     if (component != LIB_NULL && component->failure_sink != LIB_NULL &&
         status != LIB_STATUS_OK)

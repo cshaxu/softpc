@@ -8,16 +8,17 @@ or changed library file.
 
 ## Header visibility
 
-Headers named `*_interface.h` are the complete public library ABI. Every
-other library header is a component implementation header, including
-native-platform adapters. Implementation headers use short component-local
+Cross-component contracts are named `*_interface.h`. Application-facing
+copied-value APIs are distinct from the leaf-support contracts:
+`ui-base/worker_interface.h`, `mailbox_interface.h`, `mailbox_wake_interface.h`,
+and the Win32 input/actions interfaces serve only the UI leaves;
+`console/binding_interface.h` serves host binding implementations.
+Other component headers are exclusively component-local. They use short
 names and live directly in their owning directory; no filename carries a
 `_private`, `_internal`, or `_native` qualifier. Names describe the operation:
-`clock.h`, `input.h`, and worker start/join/state. Only the owning component and an explicitly
-permitted dependent may include an implementation header:
-`ui-window` and `ui-console` may consume `ui-base` mailbox and component
-implementation contracts. Application/product code may include only
-`*_interface.h`. The common types interface may include its own atomic
+`clock.h`, `input.h`, and worker start/join/state. Application code may include
+only application-facing `*_interface.h`, not the leaf-support contracts.
+Types declaration headers are the explicit naming exception. The common types interface includes its own atomic
 vocabulary helper; it never imports platform SDK headers.
 
 ## Component graph
@@ -89,6 +90,14 @@ clear source-specific pressed-input state and must not dereference the source
 handle from it.
 
 ## Platform scope
+
+Linux event waits share one host-sync mutex/condition, so a waiter on multiple
+events sleeps until a predicate can change instead of polling. Auto-reset
+consumption occurs under the same lock. Timed waits use a monotonic deadline;
+infinite waits have no deadline. Callers must join all waiters before destroying
+their event objects. The shared wait primitive has process lifetime and
+contains no application context. Mailbox waits use a per-mailbox monotonic
+condition with the same timeout and spurious-wake semantics.
 
 The public component contracts are cross-platform. This corpus currently has
 supported Win32 leaves; Linux UI leaves are intentional

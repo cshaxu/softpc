@@ -1,8 +1,8 @@
-#ifndef UI_BASE_MAILBOX_H
-#define UI_BASE_MAILBOX_H
+#ifndef UI_BASE_MAILBOX_INTERFACE_H
+#define UI_BASE_MAILBOX_INTERFACE_H
 
 #include "lib/ui-base/frame_interface.h"
-#include "lib/ui-base/mailbox_wake.h"
+#include "lib/ui-base/mailbox_wake_interface.h"
 
 #include "lib/types/atomic.h"
 

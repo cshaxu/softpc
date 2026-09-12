@@ -49,7 +49,8 @@ lib_status ui_hotkey_registry_register(ui_hotkey_registry *registry,
 void ui_hotkey_matcher_initialize(ui_hotkey_matcher *matcher,
     const ui_hotkey_registry *registry);
 /* Emits ordinary events and matched UI_EVENT_HOTKEY values through `sink`.
- * A false return means the sink rejected an event; no background retry path
+ * A false return means delivery failed or suppressed-key capacity was exceeded;
+ * no events are overwritten and no background retry path
  * exists, so caller owns its component-local failure policy. */
 int ui_hotkey_matcher_submit(ui_hotkey_matcher *matcher,
     const ui_input_event *event, ui_input_sink sink, void *context);

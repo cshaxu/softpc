@@ -1,5 +1,5 @@
-#ifndef UI_WIN32_INPUT_H
-#define UI_WIN32_INPUT_H
+#ifndef UI_WIN32_INPUT_INTERFACE_H
+#define UI_WIN32_INPUT_INTERFACE_H
 
 #include "lib/ui-base/event_interface.h"
 

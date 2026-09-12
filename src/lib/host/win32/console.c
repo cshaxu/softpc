@@ -4,7 +4,7 @@
 #include "lib/types/win32/scalar.h"
 #include "lib/types/win32/sync.h"
 #include "lib/types/win32/window.h"
-#include "lib/console/console.h"
+#include "lib/console/binding_interface.h"
 #include "lib/host/console_backend.h"
 
 #include "lib/types/win32/console.h"

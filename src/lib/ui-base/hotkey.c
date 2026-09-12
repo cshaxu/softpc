@@ -56,21 +56,27 @@ static lib_bool ui_hotkey_is_suppressed(const ui_hotkey_matcher *matcher,
     return LIB_FALSE;
 }
 
-static void ui_hotkey_suppress_chord(ui_hotkey_matcher *matcher,
+static int ui_hotkey_suppress_key(ui_hotkey_matcher *matcher,
+    const ui_input_event *event)
+{
+    if (ui_hotkey_is_suppressed(matcher, event)) return 1;
+    if (matcher->suppressed_count == UI_HOTKEY_SUPPRESSED_CAPACITY) return 0;
+    matcher->suppressed_keys[matcher->suppressed_count++] =
+        (ui_hotkey_suppressed_key) { event->data.key.key, event->data.key.scan_code };
+    return 1;
+}
+
+static int ui_hotkey_suppress_chord(ui_hotkey_matcher *matcher,
     const ui_input_event *trigger)
 {
     lib_u32 index;
-    matcher->suppressed_count = 0u;
+    /* Held keys from earlier chords remain suppressed until their breaks. */
     for (index = 0u; index < matcher->pending_count; ++index) {
-        matcher->suppressed_keys[matcher->suppressed_count++] =
-            (ui_hotkey_suppressed_key) {
-                matcher->pending[index].data.key.key,
-                matcher->pending[index].data.key.scan_code };
+        if (!ui_hotkey_suppress_key(matcher, &matcher->pending[index])) return 0;
     }
-    matcher->suppressed_keys[matcher->suppressed_count++] =
-        (ui_hotkey_suppressed_key) { trigger->data.key.key,
-            trigger->data.key.scan_code };
+    if (!ui_hotkey_suppress_key(matcher, trigger)) return 0;
     matcher->pending_count = 0u;
+    return 1;
 }
 
 void ui_hotkey_registry_initialize(ui_hotkey_registry *registry)
@@ -139,12 +145,15 @@ int ui_hotkey_matcher_submit(ui_hotkey_matcher *matcher,
             &matcher->registry, event->data.key.key,
             event->data.key.modifiers)) != LIB_NULL) {
         ui_input_event hotkey = *event;
-        ui_hotkey_suppress_chord(matcher, event);
+        if (!ui_hotkey_suppress_chord(matcher, event)) return 0;
         hotkey.type = UI_EVENT_HOTKEY;
         lib_memory_copy(hotkey.data.hotkey.identifier, matched->identifier,
             sizeof(hotkey.data.hotkey.identifier));
         return sink(context, &hotkey);
     }
+    /* A repeat of a consumed key is not an ordinary make, even if the
+     * modifier mask changed since its original matched chord. */
+    if (ui_hotkey_is_suppressed(matcher, event)) return 1;
     modifier = ui_hotkey_modifier_bit(event->data.key.key);
     if (event->data.key.pressed != 0u && modifier != 0u &&
         ui_hotkey_registry_has_modifier(&matcher->registry, modifier)) {

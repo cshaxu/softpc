@@ -1,5 +1,99 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S3 P3 admission: nine-item audit repair
+
+Owner request: “开始”, approving the preceding whole-library audit. Baseline
+`d236757`. Continue S3; do not close T55. Freeze these nine dispositions before
+implementation; completion requires each focused proof plus dual-width full
+regression, strict build, manifest, actual diff review and pushed clean delivery.
+
+| Finding | Repair and proof |
+| --- | --- |
+| UINT64_MAX bypass | types alias, both consumers migrated, negative gate probe. |
+| Alias-derived gate blind spot | Independent finite external vocabulary patterns and unwrapped negative probes. |
+| Window-only capture abstraction | Store its boolean in Window mouse state; delete unused shared abstraction, preserve capture behavior. |
+| Unused UI color helper | Remove helper and build references after full caller sweep. |
+| Shared header names | Cross-component contracts use `_interface.h`; own implementation headers remain unqualified. Enforce direct includes. |
+| Repeated chord leaks releases | Preserve outstanding suppressed keys, suppress repeats, bound capacity; deterministic repeated-chord and mismatch tests. |
+| Console wake fault skips retirement | One detach/retire exit for STOP and wake failure; failure notification, callback barrier tests. |
+| Linux waits poll/sleep | Real condition waits, monotonic deadlines, safe initialization unwinding; deterministic fake-platform proof. |
+| Missing Linux cooked-line operation | Same-signature UNSUPPORTED implementation and link proof. |
+
+No new component or types implementation, product callback, MVDM/media/INI
+change, or mouse scaling change. Linux existing behavior is repaired, not
+expanded into UI parity. Fake-platform evidence must not be presented as a
+real Linux desktop/runtime test. Relevant Linux debt is now admitted here.
+
+Verification discovery: the release-build assertion list omitted the existing
+leaf-control-capacity and control-reconciler-integration tests. Add both and the
+new Linux test to that list, so full regression executes their operations
+instead of compiling out assertions. This is test proof repair, not a product
+state-machine change. The Console startup review also found that starting the
+worker before installing the input sink could reattach it after an immediate
+worker fault; install it first and detach on thread-create failure.
+The shared-mailbox review found its enqueue error return rereading
+`stop_queued` after unlocking. Snapshot the result under the existing lock;
+capacity/STOP semantics are unchanged and covered by the enabled tests.
+The x86 repeated full run exposed a stale negative-probe file in the types
+layout self-test: its initial positive control read `UI_WIN32_KEY_CONTROL`
+from a prior probe. Explicitly remove the three owned probe files at entry;
+the production gate must still reject every deliberate negative probe.
+
+### P3 executor verification
+
+All nine dispositions are implemented. The resulting library contains 71 C/H
+files, including 41 headers. No new production file or execution layer was
+added: six contracts were renamed with `git mv`, and Window-only capture plus
+unused UI color helpers were removed. Types remains header-only. The mouse
+capture field substitution preserves the exact Win32 calls/order and no raw
+Console coordinate conversion changed. No app, standalone host, MVDM, INI or
+media file changed.
+
+Evidence by ledger member:
+
+1. `LIB_UINT64_MAX` owns the external constant; both production uses migrated.
+2. The layout gate adds independent integer/SDK/POSIX/CRT families and
+   cross-component include validation. Negative tests cover unwrapped tokens
+   and calls; both widths passed three consecutive self-test runs. It remains
+   a finite static check, supplemented by the whole C/H call/include sweep.
+3. `ui_win32_mouse` alone owns the boolean capture field; the old shared
+   capture header has no remaining production caller.
+4. `ui_win32_colorref_from_rgb` and its CMake entry are gone; the separate
+   host Console color path remains untouched.
+5. Shared binding, worker, mailbox, wake and Windows input/action headers now
+   have `_interface.h` names; application access to these leaf-support
+   contracts is rejected by the source-boundary gate.
+6. The repeated Ctrl/Alt/P regression failed against the baseline matcher,
+   then passed with preserved suppression state. Tests include auto-repeat,
+   trigger re-press, modifier repeats, final breaks, mismatch replay, and
+   capacity rejection without overwriting existing entries.
+7. The actual Console worker runs under real Windows threads with a controlled
+   wake result. Both STOP and fault wait for an in-flight callback, retire once,
+   join before destroy returns, and reject later input on a retained logical
+   Console. Fault reports IO_ERROR. No new lifecycle callback was introduced.
+8. Actual Linux host/mailbox sources run against deterministic POSIX fakes:
+   all initialization failures unwind, spurious wakes reuse one monotonic
+   deadline, infinite waits wake, event reset semantics hold, wait/clock errors
+   report failure, and interrupted sleep uses the remaining interval. The wait
+   paths make zero sleep calls. Platform sources also pass strict syntax checks
+   against the available Windows pthread headers; this is not Linux execution.
+9. The Linux cooked-line placeholder is linked and returns UNSUPPORTED with
+   the same signature as its Windows implementation.
+
+Final regression: x64 42/42 (17.02 s), x86 42/42 (20.33 s), serial and including
+both fixed-package smokes. Strict library build and standalone 3/3 pass; all
+41 headers independently pass C17 Wall/Wextra/Wpedantic/Werror on the available
+compiler. Documentation governance, manifest and diff checks pass. Earlier
+x86 runs failed only the stale-fixture self-test (41/42); that failed evidence
+is retained here, not replaced by a claim that every run passed. Linux desktop
+execution/parity remains explicitly unverified and outside this delivery.
+
+Changed-path accounting uses `git diff --numstat --no-renames d236757`:
+production C/H 37 paths, +369/-366, net +3; tests/support 12 paths,
++281/-13, net +268; build/static-check 3 paths, +28/-3, net +25.
+Documentation, manifest and EXEs are excluded. The increase is predominantly
+tests, not new abstraction. T55 remains open and S3 awaits owner inspection.
+
 ## S3 follow-up admission and convergence ledger
 
 Original request: “准入使用当前或者新的S任务修复以上所有问题，完成后工作区清理干净并让我检查。”

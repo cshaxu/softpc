@@ -1,4 +1,4 @@
-#include "lib/ui-base/component.h"
+#include "lib/ui-base/worker_interface.h"
 
 #include <assert.h>
 #include <string.h>

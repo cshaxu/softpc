@@ -88,7 +88,9 @@ There is no other library edge and no aggregate UI target. In particular,
 `ui-window` does not depend on `console` or `host`, while `host` does not
 depend on UI. `ui-base` is only a library dependency of the two UI leaves;
 the application may consume its public copied-value interfaces where the
-control/input ABI requires them, never its private mailbox/component headers.
+control/input ABI requires them, never its leaf-support worker/mailbox or
+platform input interfaces. Cross-component support contracts use the same
+`_interface.h` naming rule but have an explicitly narrower consumer set.
 
 SoftPC control is the sole product-state writer. VM, host, and UI workers only
 enqueue copied events/completions to its app-owned queue. The control thread

@@ -1,7 +1,7 @@
 #ifndef UI_WIN32_MOUSE_H
 #define UI_WIN32_MOUSE_H
 
-#include "lib/ui-base/capture.h"
+#include "lib/types/types_interface.h"
 #include "lib/types/win32/window.h"
 
 /* Host-only relative-pointer state. The caller owns input-device buttons and
@@ -10,7 +10,7 @@ typedef struct ui_win32_mouse {
     int x;
     int y;
     int valid;
-    ui_capture capture;
+    lib_bool captured;
 } ui_win32_mouse;
 
 void ui_win32_mouse_reset(ui_win32_mouse *mouse);

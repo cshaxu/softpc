@@ -1,6 +1,6 @@
 #include "lib/types/win32/scalar.h"
 #include "lib/types/win32/window.h"
-#include "lib/ui-base/mailbox_wake.h"
+#include "lib/ui-base/mailbox_wake_interface.h"
 
 #include "lib/types/win32/sync.h"
 
