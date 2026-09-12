@@ -1,5 +1,5 @@
 #include "runtime.h"
-#include "lib/ui-base/win32/input_interface.h"
+#include "lib/ui-base/input_interface.h"
 
 #include <stdio.h>
 #include <stdlib.h>

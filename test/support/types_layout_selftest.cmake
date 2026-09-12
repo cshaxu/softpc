@@ -7,7 +7,9 @@ file(COPY "${SOFTPC_SOURCE_DIR}/src/lib/types" DESTINATION "${fixture}")
 # A failed/aborted negative probe must not poison the next positive control.
 # These are the only scratch files owned by this self-test.
 file(REMOVE "${fixture}/consumer.c" "${fixture}/types/probe.h"
-    "${fixture}/types/win32/probe.h")
+    "${fixture}/types/win32/probe.h" "${fixture}/ui-base/probe_interface.h"
+    "${fixture}/ui-window/win32/probe.c"
+    "${fixture}/ui-base/win32/probe_interface.h")
 set(probe "${fixture}/types/probe.h")
 function(check_layout expected)
     execute_process(COMMAND "${CMAKE_COMMAND}" "-DLIBRARY_ROOT=${fixture}"
@@ -50,4 +52,31 @@ check_layout(fail)
 file(WRITE "${fixture}/consumer.c" "void probe(void) { lib_win32_handle h; }\n")
 check_layout(pass)
 file(REMOVE "${fixture}/consumer.c" "${probe}")
+check_layout(pass)
+
+# Root support contracts are public to allowed leaves. A public-looking suffix
+# cannot make another component's platform implementation accessible.
+set(platform_probe "${fixture}/ui-window/win32/probe.c")
+file(MAKE_DIRECTORY "${fixture}/ui-window/win32" "${fixture}/ui-base")
+foreach(header IN ITEMS ui-base/input_interface.h ui-window/win32/mouse.h types/win32/input.h)
+    file(WRITE "${platform_probe}" "#include \"lib/${header}\"\n")
+    check_layout(pass)
+endforeach()
+foreach(header IN ITEMS ui-base/win32/input_interface.h ui-base/linux/input.h ui-window/linux/input.h types/linux/sync.h ui-base/../ui-base/win32/input.h)
+    file(WRITE "${platform_probe}" "#include \"lib/${header}\"\n")
+    check_layout(fail)
+endforeach()
+file(REMOVE "${platform_probe}")
+# A root forwarding header must not smuggle the private platform header out.
+file(WRITE "${fixture}/ui-base/probe_interface.h"
+    "#include \"lib/ui-base/win32/input.h\"\n")
+check_layout(fail)
+file(REMOVE "${fixture}/ui-base/probe_interface.h")
+file(MAKE_DIRECTORY "${fixture}/ui-base/win32")
+file(WRITE "${fixture}/ui-base/win32/probe_interface.h" "/* forbidden public location */\n")
+check_layout(fail)
+file(REMOVE "${fixture}/ui-base/win32/probe_interface.h")
+file(WRITE "${platform_probe}" "#include \"../../ui-base/win32/input.h\"\n")
+check_layout(fail)
+file(REMOVE "${platform_probe}")
 check_layout(pass)

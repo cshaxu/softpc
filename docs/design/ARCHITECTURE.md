@@ -89,8 +89,17 @@ There is no other library edge and no aggregate UI target. In particular,
 depend on UI. `ui-base` is only a library dependency of the two UI leaves;
 the application may consume its public copied-value interfaces where the
 control/input ABI requires them, never its leaf-support worker/mailbox or
-platform input interfaces. Cross-component support contracts use the same
+input support interfaces. Cross-component support contracts use the same
 `_interface.h` naming rule but have an explicitly narrower consumer set.
+
+All cross-component contracts are declared at the owning component root.
+Each component's `win32/` and `linux/` files are exclusively its own platform
+implementation; neither sibling components nor root forwarding headers may
+include them. The exception is `types/{win32,linux}`, which supplies shared
+external vocabulary to matching platform sources. Existing Windows input
+normalization support is declared by ui-base root interfaces and implemented
+only by ui-base; callers never reach its platform headers. This does not turn
+Windows record helpers into a cross-platform application input API.
 
 SoftPC control is the sole product-state writer. VM, host, and UI workers only
 enqueue copied events/completions to its app-owned queue. The control thread

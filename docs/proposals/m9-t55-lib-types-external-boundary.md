@@ -1,5 +1,63 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S3 P4 admission: component-private platform directories
+
+Original owner request: “很好 所以所有的lib组件 win32和linux都只是组件内部的实现，组件外不能访问 包括隔壁其他的lib组件 对吗”,
+then “没错 你说的完全正确 请开始实现”. Baseline `a6bf81f`.
+Continue S3, keep T55 open. The frozen universe is all library C/H include
+edges and all consumers of the two current Windows input/action headers.
+
+- Move their actual copied-value declarations to ui-base root support
+  interfaces with git mv; update every caller. Keep implementation, symbols,
+  state and behavior unchanged, without forwarding headers or a second path.
+- Platform-specific helper contracts remain explicitly Windows-specific; they
+  are not the same-shape operations called by platform-neutral parent sources.
+  Do not invent Linux implementations for Windows record decoding. Existing
+  Linux mappings and the 41 same-shape parent operations remain unchanged.
+- Enforce root-only cross-component interfaces and forbid importing platform
+  implementation headers from parent sources or other components. Only types
+  platform vocabulary is shared, from the matching platform implementation.
+- Add positive and negative boundary probes, including a misleading interface
+  suffix, root forwarding, sibling platform access and types exceptions.
+- Refresh current design/READMEs and manifest; build both widths, run full
+  regression, strict standalone tests and review the exact body-preserving diff.
+
+No new API behavior, product policy, Linux parity, MVDM, media or INI changes.
+The owner-provided command.c formatting is preserved unchanged and ships in
+this P under the owner's additional instruction “请一起提交 不留尾巴”.
+Completion requires all five dispositions, a complete pushed P, and package
+links for owner inspection; it does not close T55.
+
+### P4 verification
+
+All five dispositions are implemented. The only library C-body differences
+from `a6bf81f` are include substitutions in four files; exact comparisons after
+those substitutions pass. Two declarations moved with git mv; guards and a
+contract comment changed, not symbols, struct layout or signatures. Existing
+Linux code, types, parent operation contracts and CMake selection are unchanged.
+The complete C/H include sweep has no remaining cross-component platform
+include. Tests deliberately retain forbidden path strings as negative probes.
+
+The gate now requires canonical paths, rejects public headers in platform
+directories, root forwarding, cross-component platform includes even with an
+interface suffix, opposite-platform includes and relative traversal. Positive
+controls cover root support access, own-platform helpers and matching types
+vocabulary. Application production is separately barred from leaf-support APIs.
+The two relocated headers independently pass C17 strict syntax compilation.
+
+Both package EXEs were rebuilt. Full x64: 42/42 in 21.47 s; full x86: 42/42
+in 27.34 s, serial including package smoke. Strict library build and 3/3
+standalone checks, manifest, documentation governance and diff checks pass.
+These are Windows tests, not a claim of Linux desktop parity.
+
+Accounting (`git diff --numstat --no-renames a6bf81f`, excluding documentation,
+manifest and EXEs): library C/H eight paths +59/-55, net +4 (the contract
+comment); tests/support four paths +34/-5, net +29; library static gate one
+path +18/-1, net +17. Separately, owner-provided command.c formatting is one
+path +186/-61, net +125, included unchanged by explicit owner request.
+No new compiled code, runtime layer, API route or platform behavior was added.
+S3 remains for owner inspection; T55 is not closed.
+
 ## S3 P3 admission: nine-item audit repair
 
 Owner request: “开始”, approving the preceding whole-library audit. Baseline

@@ -1,5 +1,5 @@
-#ifndef UI_WIN32_ACTIONS_INTERFACE_H
-#define UI_WIN32_ACTIONS_INTERFACE_H
+#ifndef UI_ACTIONS_INTERFACE_H
+#define UI_ACTIONS_INTERFACE_H
 
 #include "lib/ui-base/hotkey_interface.h"
 

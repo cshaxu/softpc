@@ -8,10 +8,15 @@ or changed library file.
 
 ## Header visibility
 
-Cross-component contracts are named `*_interface.h`. Application-facing
+Cross-component contracts live at the component root and are named
+`*_interface.h`. All component `win32/` and `linux/` implementation files are
+accessible only from that component's corresponding platform implementation,
+not from a sibling component or a forwarding root header. The sole exception
+is `types/{win32,linux}`: these shared external declarations may be included
+by matching platform implementations. Application-facing
 copied-value APIs are distinct from the leaf-support contracts:
 `ui-base/worker_interface.h`, `mailbox_interface.h`, `mailbox_wake_interface.h`,
-and the Win32 input/actions interfaces serve only the UI leaves;
+`ui-base/input_interface.h` and `actions_interface.h` serve only the UI leaves;
 `console/binding_interface.h` serves host binding implementations.
 Other component headers are exclusively component-local. They use short
 names and live directly in their owning directory; no filename carries a
@@ -20,6 +25,12 @@ names and live directly in their owning directory; no filename carries a
 only application-facing `*_interface.h`, not the leaf-support contracts.
 Types declaration headers are the explicit naming exception. The common types interface includes its own atomic
 vocabulary helper; it never imports platform SDK headers.
+
+The input/actions support declarations describe existing Windows record
+conversion and key-state queries, using copied scalar values. Their Windows
+implementations remain in ui-base; no application input ABI or Linux parity
+is implied. Platform-neutral parent sources still call their existing
+same-signature platform operations selected by CMake.
 
 ## Component graph
 

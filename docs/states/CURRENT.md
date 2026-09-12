@@ -9,6 +9,9 @@ The owner-admitted nine-item follow-up is implemented and verified: x64 42/42,
 x86 42/42, strict library 3/3, and 41 independent headers pass. The proposal
 records focused proofs and the repaired negative-test fixture failure. Delivery
 awaits owner inspection; Linux desktop execution remains unverified.
+S3 P4 is implemented and verified: component-private platform directories,
+root UI support declarations, and negative boundary tests; x64 and x86 each
+pass 42/42 and strict standalone passes 3/3. Owner formatting ships unchanged.
 
 T55 remains open. S2 is superseded for this boundary cleanup by the owner's
 S3 admission, not accepted as a completed whole-library migration.
@@ -19,14 +22,14 @@ S3 admission, not accepted as a completed whole-library migration.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approved S3 full audit repairs and then “开始” for the nine-item follow-up ledger in the proposal. |
-| Objective | Complete all nine P3 audit dispositions: external vocabulary gate, shared header contracts, remove unused abstractions, repeated hotkey suppression, Console failure retirement, and Linux wait/placeholder corrections. |
+| Admission And Approval | Owner approved S3 full audit repairs; P4: “没错 你说的完全正确 请开始实现” approves component-private platform directories, with the types vocabulary exception. |
+| Objective | P4 enforces component-private platform directories, root-only support declarations, the types vocabulary exception and negative boundary proofs; retain completed P3 dispositions and all existing behavior. |
 | Non-goals | No MVDM, guest media, INI, app product policy, NXVM checkout mutation, mouse mapping change, or duplicate platform path. Behavioral corrections are limited to the approved hotkey suppression, Console fault retirement, Linux wait and missing placeholder contracts. |
-| Reference Baseline | Current nine-item repair: `d236757`. Preserve the owner's types/atomic.h formatting. |
+| Reference Baseline | P4: `a6bf81f`; retain the owner-provided command.c formatting unchanged. P3 ledger remains historical evidence. |
 | Candidate Proposal | [M9 T55 Types-Owned External Boundary](../proposals/m9-t55-lib-types-external-boundary.md) |
 | Files And ABI Surface | Entire `src/lib/` corpus, its CMake/manifest/READMEs, static boundary tests, required behavior tests, and only agent-owned package EXEs. `types` is header-only: it defines `lib_*` copied values, opaque native representations, and typed inline façades; component platform sources compose those façades into their own internal operations. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout, and UI authorities. |
-| Verification | P3 nine-item ledger; negative vocabulary/include tests; repeated hotkey/mismatch/capacity tests; real-thread Console STOP/fault retirement barrier and late-input rejection; deterministic actual Linux sources with POSIX fakes; strict build and independent headers; x86/x64 full CTest/package smoke; manifest, actual diff and governance review. No real Linux execution claim. |
+| Verification | P4 five-disposition ledger; positive/negative include-boundary probes; byte-for-byte implementation comparison after include substitution; independent moved headers; x64 42/42 (21.47 s), x86 42/42 (27.34 s), strict 3/3; manifest and governance. Retain P3 behavioral proofs. No real Linux execution claim. |
 | Expected Markers | types remains header-only/INTERFACE; top-level headers have no OS branch or platform includes; no win32.h/posix.h umbrella; each platform consumer explicitly includes its platform vocabulary; host owns counter composition and ui-base owns modifier interpretation. |
 | Asset Needs | Refresh only agent-owned `assets/binary/softpc32.exe` and `softpc64.exe`; preserve user-owned INI and all media. |
 | Reporting Requirements | Report frozen ledger count/dispositions, contract/API changes, direct-link removal evidence, x86/x64 results, changed-path accounting, commits, and package links. |

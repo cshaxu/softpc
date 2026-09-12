@@ -21,6 +21,9 @@ vocabulary; explicit `win32/` and `linux/` headers group external platform
 declarations by purpose. Common types headers never select an OS. Only the
 owning component's corresponding platform implementation imports these
 platform headers. Compiler selection for atomic primitives remains permitted.
+Other components' `win32/` and `linux/` directories are implementation-only.
+Cross-component declarations belong in root `*_interface.h` files, never in
+platform directories or root headers forwarding to platform implementation.
 `mvdm/softpc.new` contains the selected repository-owned recovered-source
 subset moved from the former baseline tree. Every retained path and name
 permits a direct T14-ledger comparison with the selected read-only OpenNT

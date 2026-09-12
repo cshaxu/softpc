@@ -1,4 +1,4 @@
-#include "lib/ui-base/win32/actions_interface.h"
+#include "lib/ui-base/actions_interface.h"
 #include "lib/types/win32/input.h"
 #include "lib/ui-base/hotkey_interface.h"
 

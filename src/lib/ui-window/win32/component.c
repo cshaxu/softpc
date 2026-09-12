@@ -4,8 +4,8 @@
 #include "lib/ui-window/win32/component.h"
 
 #include "lib/ui-window/win32/geometry.h"
-#include "lib/ui-base/win32/input_interface.h"
-#include "lib/ui-base/win32/actions_interface.h"
+#include "lib/ui-base/input_interface.h"
+#include "lib/ui-base/actions_interface.h"
 #include "lib/ui-base/mailbox_interface.h"
 #include "lib/ui-window/win32/mouse.h"
 

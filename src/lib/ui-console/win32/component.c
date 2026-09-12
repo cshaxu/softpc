@@ -3,7 +3,7 @@
 #include "lib/types/win32/sync.h"
 #include "lib/ui-console/console.h"
 
-#include "lib/ui-base/win32/input_interface.h"
+#include "lib/ui-base/input_interface.h"
 
 #include "lib/types/win32/console.h"
 

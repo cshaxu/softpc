@@ -1,5 +1,9 @@
-#ifndef UI_WIN32_INPUT_INTERFACE_H
-#define UI_WIN32_INPUT_INTERFACE_H
+#ifndef UI_INPUT_INTERFACE_H
+#define UI_INPUT_INTERFACE_H
+
+/* Leaf-support contract for Windows records, not an application input ABI.
+ * Declarations live here; the selected implementation remains component-local.
+ * Callers own one zero-initialized normalizer per input source. */
 
 #include "lib/ui-base/event_interface.h"
 
