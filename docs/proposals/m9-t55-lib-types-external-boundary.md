@@ -54,8 +54,12 @@ observable behavior.
 
 ## Design
 
-- `types` owns platform-private adapter implementations under `types/win32/`
-  and `types/linux/`, plus C-runtime wrappers already begun in `runtime.c`.
+- `types` owns only platform-private type declarations and direct function
+  façades under `types/win32/` and `types/linux/`, plus C-runtime wrappers.
+  It never owns a component state machine or derived behavior: Console event
+  schemas remain in `console`; manual-reset/cancellation/wait policy remains
+  in `host`; input normalization remains in `ui-base`; Window/Console
+  lifecycle and rendering policy remain in their respective leaves.
 - `types/win32/**` and `types/linux/**` are the **only** shared-library
   sources permitted to include an external platform header, name a native
   type/constant/callback signature, call a native function, or own a direct

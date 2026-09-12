@@ -12,22 +12,50 @@
 
 typedef struct lib_console lib_console;
 
-/* Console retains its logical endpoint and output surface. Input record ABI
- * is a types-owned platform-neutral copied value, re-exported here only for
- * compatibility with existing Console consumers. */
-#define LIB_CONSOLE_LINE_MAX LIB_NATIVE_CONSOLE_LINE_MAX
-#define LIB_CONSOLE_EVENT_RAW_KEY LIB_NATIVE_CONSOLE_EVENT_RAW_KEY
-#define LIB_CONSOLE_EVENT_RAW_MOUSE LIB_NATIVE_CONSOLE_EVENT_RAW_MOUSE
-#define LIB_CONSOLE_EVENT_COOKED_LINE LIB_NATIVE_CONSOLE_EVENT_COOKED_LINE
-#define LIB_CONSOLE_EVENT_REJECTED_LINE LIB_NATIVE_CONSOLE_EVENT_REJECTED_LINE
-#define LIB_CONSOLE_MODIFIER_CONTROL LIB_NATIVE_CONSOLE_MODIFIER_CONTROL
-#define LIB_CONSOLE_MODIFIER_ALT LIB_NATIVE_CONSOLE_MODIFIER_ALT
-#define LIB_CONSOLE_MODIFIER_SHIFT LIB_NATIVE_CONSOLE_MODIFIER_SHIFT
-typedef lib_native_console_event_kind lib_console_event_kind;
-typedef lib_native_console_raw_key lib_console_raw_key;
-typedef lib_native_console_raw_mouse lib_console_raw_mouse;
-typedef lib_native_console_line lib_console_line;
-typedef lib_native_console_event lib_console_event;
+#define LIB_CONSOLE_LINE_MAX 1024u
+
+typedef enum lib_console_event_kind {
+    LIB_CONSOLE_EVENT_RAW_KEY,
+    LIB_CONSOLE_EVENT_RAW_MOUSE,
+    LIB_CONSOLE_EVENT_COOKED_LINE,
+    LIB_CONSOLE_EVENT_REJECTED_LINE
+} lib_console_event_kind;
+
+enum {
+    LIB_CONSOLE_MODIFIER_CONTROL = 0x01u,
+    LIB_CONSOLE_MODIFIER_ALT = 0x02u,
+    LIB_CONSOLE_MODIFIER_SHIFT = 0x04u
+};
+
+typedef struct lib_console_raw_key {
+    lib_u32 key;
+    lib_u32 unicode;
+    lib_u16 scan_code;
+    lib_u8 modifiers;
+    lib_bool extended;
+    lib_bool pressed;
+} lib_console_raw_key;
+
+typedef struct lib_console_raw_mouse {
+    lib_i32 delta_x;
+    lib_i32 delta_y;
+    lib_u32 buttons;
+} lib_console_raw_mouse;
+
+typedef struct lib_console_line {
+    lib_u32 length;
+    char text[LIB_CONSOLE_LINE_MAX];
+} lib_console_line;
+
+typedef struct lib_console_event {
+    lib_console_event_kind kind;
+    lib_u32 binding_generation;
+    union {
+        lib_console_raw_key raw_key;
+        lib_console_raw_mouse raw_mouse;
+        lib_console_line line;
+    } value;
+} lib_console_event;
 
 /* Copied text output for a logical Console. It is deliberately a
  * Console value rather than a UI/window frame: native host renderers consume

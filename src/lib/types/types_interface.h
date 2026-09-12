@@ -19,51 +19,6 @@ typedef struct lib_file lib_file;
 typedef struct lib_sync_event lib_sync_event;
 typedef struct lib_sync_task lib_sync_task;
 
-#define LIB_NATIVE_CONSOLE_LINE_MAX 1024u
-
-typedef enum lib_native_console_event_kind {
-    LIB_NATIVE_CONSOLE_EVENT_RAW_KEY,
-    LIB_NATIVE_CONSOLE_EVENT_RAW_MOUSE,
-    LIB_NATIVE_CONSOLE_EVENT_COOKED_LINE,
-    LIB_NATIVE_CONSOLE_EVENT_REJECTED_LINE
-} lib_native_console_event_kind;
-
-enum {
-    LIB_NATIVE_CONSOLE_MODIFIER_CONTROL = 0x01u,
-    LIB_NATIVE_CONSOLE_MODIFIER_ALT = 0x02u,
-    LIB_NATIVE_CONSOLE_MODIFIER_SHIFT = 0x04u
-};
-
-typedef struct lib_native_console_raw_key {
-    lib_u32 key;
-    lib_u32 unicode;
-    lib_u16 scan_code;
-    lib_u8 modifiers;
-    lib_bool extended;
-    lib_bool pressed;
-} lib_native_console_raw_key;
-
-typedef struct lib_native_console_raw_mouse {
-    lib_i32 delta_x;
-    lib_i32 delta_y;
-    lib_u32 buttons;
-} lib_native_console_raw_mouse;
-
-typedef struct lib_native_console_line {
-    lib_u32 length;
-    char text[LIB_NATIVE_CONSOLE_LINE_MAX];
-} lib_native_console_line;
-
-typedef struct lib_native_console_event {
-    lib_native_console_event_kind kind;
-    lib_u32 binding_generation;
-    union {
-        lib_native_console_raw_key raw_key;
-        lib_native_console_raw_mouse raw_mouse;
-        lib_native_console_line line;
-    } value;
-} lib_native_console_event;
-
 typedef enum lib_file_access {
     LIB_FILE_ACCESS_READONLY,
     LIB_FILE_ACCESS_READWRITE
