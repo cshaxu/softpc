@@ -70,17 +70,21 @@ behavior.
 - Its public contract exposes only `lib_*` scalar/copied values and opaque
   handles. It does not expose `FILE`, `HANDLE`, `HWND`, `DWORD`, `pthread_*`,
   or another native type.
-- A `types` primitive is capability-level (`lib_monotonic_*`,
-  `lib_native_event_*`, `lib_native_task_*`, `lib_native_console_*`,
-  `lib_native_window_*`, or `lib_file_*`), never product- or component-level.
+- A `types` primitive is a raw ABI wrapper, never a component contract. Its
+  adapter headers may expose an opaque `lib_native_*` handle only when two
+  peer components require the same primitive. Component-facing operations
+  remain in their owner: file open/read/write policy in `storage`, time and
+  task/wait policy in `host`, native input mapping and mailbox interpretation
+  in `ui-base`, and native Console/Window lifecycle in their respective
+  owners.
   It carries no `host_*`, `ui_*`, monitor, lifecycle, or machine policy. A
   required native callback remains wholly within `types`; its consumer gets a
   copied neutral event or an opaque `lib_native_*` handle.
-- `ui-base` owns the one native-input normalizer and its conversion to
-  `ui_input_event` before the existing source-identity and registered-hotkey
-  path. It obtains native-only facts (layout translation, scan lookup and
-  modifier sampling) through small `types` primitives. Neither `types` nor
-  either UI leaf interprets a hotkey or owns a second event mapping route.
+- `ui-base` owns the one native-input normalizer, its Win32 key vocabulary,
+  and its conversion to `ui_input_event` before the existing source-identity
+  and registered-hotkey path. `types` performs only the raw SDK calls that
+  produce requested facts. Neither `types` nor either UI leaf interprets a
+  hotkey or owns a second event mapping route.
 - Component-specific behavior stays in its present owner: storage still owns
   storage policy, host still owns broker/synchronization policy, and UI leaves
   still own UI lifecycle and rendering decisions. They request primitive

@@ -1,29 +1,16 @@
-#include "lib/types/types_interface.h"
-
 #include "lib/types/file.h"
-#include "lib/types/file_native.h"
+#include "lib/types/file_private.h"
 
-lib_status lib_file_open(const char *path, lib_file_access access,
-    lib_file **out_file)
-{
-    if (path == LIB_NULL || out_file == LIB_NULL ||
-        (access != LIB_FILE_ACCESS_READONLY &&
-         access != LIB_FILE_ACCESS_READWRITE)) return LIB_STATUS_INVALID_ARGUMENT;
-    *out_file = LIB_NULL;
-    return lib_file_native_open(path, access, out_file);
-}
-
-lib_status lib_file_open_writer(const char *path, lib_file_write_mode mode,
-    lib_file **out_file)
+static lib_status lib_native_file_open_writer(const char *path,
+    const char *mode, lib_native_file **out_file)
 {
     FILE *stream;
-    lib_file *file;
+    lib_native_file *file;
 
-    if (path == LIB_NULL || out_file == LIB_NULL ||
-        (mode != LIB_FILE_WRITE_TRUNCATE && mode != LIB_FILE_WRITE_APPEND))
+    if (path == LIB_NULL || mode == LIB_NULL || out_file == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     *out_file = LIB_NULL;
-    stream = fopen(path, mode == LIB_FILE_WRITE_TRUNCATE ? "wb" : "ab");
+    stream = fopen(path, mode);
     if (stream == LIB_NULL) return LIB_STATUS_IO_ERROR;
     file = lib_allocate_zero(1u, sizeof(*file));
     if (file == LIB_NULL) {
@@ -35,44 +22,43 @@ lib_status lib_file_open_writer(const char *path, lib_file_write_mode mode,
     return LIB_STATUS_OK;
 }
 
-lib_status lib_file_read_exact(lib_file *file, void *bytes, lib_size byte_count)
+lib_status lib_native_file_open_truncate(const char *path,
+    lib_native_file **out_file)
+{ return lib_native_file_open_writer(path, "wb", out_file); }
+
+lib_status lib_native_file_open_append(const char *path,
+    lib_native_file **out_file)
+{ return lib_native_file_open_writer(path, "ab", out_file); }
+
+lib_status lib_native_file_read(lib_native_file *file, void *bytes,
+    lib_size byte_count, lib_size *out_byte_count)
 {
-    if (file == LIB_NULL || (bytes == LIB_NULL && byte_count != 0u))
+    if (file == LIB_NULL || out_byte_count == LIB_NULL ||
+        (bytes == LIB_NULL && byte_count != 0u))
         return LIB_STATUS_INVALID_ARGUMENT;
-    return byte_count == 0u || fread(bytes, 1u, byte_count, file->stream) == byte_count ?
-        LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+    *out_byte_count = fread(bytes, 1u, byte_count, file->stream);
+    return ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-lib_status lib_file_write_exact(lib_file *file, const void *bytes,
-    lib_size byte_count)
+lib_status lib_native_file_write(lib_native_file *file, const void *bytes,
+    lib_size byte_count, lib_size *out_byte_count)
 {
-    if (file == LIB_NULL || (bytes == LIB_NULL && byte_count != 0u))
+    if (file == LIB_NULL || out_byte_count == LIB_NULL ||
+        (bytes == LIB_NULL && byte_count != 0u))
         return LIB_STATUS_INVALID_ARGUMENT;
-    return byte_count == 0u || fwrite(bytes, 1u, byte_count, file->stream) == byte_count ?
-        LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+    *out_byte_count = fwrite(bytes, 1u, byte_count, file->stream);
+    return ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-lib_status lib_file_flush(lib_file *file)
+lib_status lib_native_file_flush(lib_native_file *file)
 {
     if (file == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     return fflush(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-lib_status lib_file_seek_absolute(lib_file *file, lib_i64 offset)
+lib_status lib_native_file_close(lib_native_file **file)
 {
-    if (file == LIB_NULL || offset < 0) return LIB_STATUS_INVALID_ARGUMENT;
-    return lib_file_native_seek_absolute(file, offset);
-}
-
-lib_status lib_file_byte_count(lib_file *file, lib_i64 *out_byte_count)
-{
-    if (file == LIB_NULL || out_byte_count == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    return lib_file_native_byte_count(file, out_byte_count);
-}
-
-lib_status lib_file_close(lib_file **file)
-{
-    lib_file *value;
+    lib_native_file *value;
     int result;
 
     if (file == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;

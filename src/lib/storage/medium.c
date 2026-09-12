@@ -1,5 +1,6 @@
 #include "lib/types/types_interface.h"
 
+#include "lib/storage/file.h"
 #include "lib/storage/medium_interface.h"
 
 #define LIB_STORAGE_MEDIUM_PAGE_BYTES 4096u
@@ -11,13 +12,13 @@ typedef struct lib_storage_medium_page {
 } lib_storage_medium_page;
 
 struct lib_storage_medium {
-    lib_file *file;
+    lib_storage_file *file;
     lib_storage_medium_page *pages;
     lib_size byte_count;
     lib_storage_medium_mode mode;
 };
 
-static lib_status lib_storage_medium_create(lib_file *file, lib_size byte_count,
+static lib_status lib_storage_medium_create(lib_storage_file *file, lib_size byte_count,
     lib_storage_medium_mode mode, lib_storage_medium **out_medium)
 {
     lib_storage_medium *medium;
@@ -36,7 +37,7 @@ static lib_status lib_storage_medium_create(lib_file *file, lib_size byte_count,
 lib_status lib_storage_medium_open(const char *path, lib_storage_medium_mode mode,
     lib_storage_medium **out_medium)
 {
-    lib_file *file = LIB_NULL;
+    lib_storage_file *file = LIB_NULL;
     lib_i64 length;
     lib_status status;
 
@@ -44,15 +45,16 @@ lib_status lib_storage_medium_open(const char *path, lib_storage_medium_mode mod
         mode > LIB_STORAGE_MEDIUM_OVERLAY)
         return LIB_STATUS_INVALID_ARGUMENT;
     *out_medium = LIB_NULL;
-    if (lib_file_open(path, mode == LIB_STORAGE_MEDIUM_DIRECT ?
-            LIB_FILE_ACCESS_READWRITE : LIB_FILE_ACCESS_READONLY, &file) != LIB_STATUS_OK ||
-        lib_file_byte_count(file, &length) != LIB_STATUS_OK || length < 0 ||
+    if ((mode == LIB_STORAGE_MEDIUM_DIRECT ?
+            lib_storage_file_open_readwrite(path, &file) :
+            lib_storage_file_open_readonly(path, &file)) != LIB_STATUS_OK ||
+        lib_storage_file_byte_count(file, &length) != LIB_STATUS_OK || length < 0 ||
         (lib_u64)length > (lib_u64)(lib_size)-1) {
-        (void)lib_file_close(&file);
+        (void)lib_storage_file_close(&file);
         return LIB_STATUS_IO_ERROR;
     }
     status = lib_storage_medium_create(file, (lib_size)length, mode, out_medium);
-    if (status != LIB_STATUS_OK) (void)lib_file_close(&file);
+    if (status != LIB_STATUS_OK) (void)lib_storage_file_close(&file);
     return status;
 }
 
@@ -94,7 +96,7 @@ void lib_storage_medium_destroy(lib_storage_medium **medium)
     value = *medium;
     *medium = LIB_NULL;
     if (value == LIB_NULL) return;
-    if (value->file != LIB_NULL) (void)lib_file_close(&value->file);
+    if (value->file != LIB_NULL) (void)lib_storage_file_close(&value->file);
     lib_storage_medium_pages_destroy(value->pages);
     lib_release(value);
 }
@@ -127,8 +129,8 @@ static lib_status lib_storage_medium_read_base(const lib_storage_medium *medium,
         lib_memory_set(bytes, 0, byte_count);
         return LIB_STATUS_OK;
     }
-    return lib_file_seek_absolute(medium->file, (lib_i64)offset) != LIB_STATUS_OK ||
-        lib_file_read_exact(medium->file, bytes, byte_count) != LIB_STATUS_OK ?
+    return lib_storage_file_seek_absolute(medium->file, (lib_i64)offset) != LIB_STATUS_OK ||
+        lib_storage_file_read_exact(medium->file, bytes, byte_count) != LIB_STATUS_OK ?
         LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
 
@@ -200,9 +202,9 @@ lib_status lib_storage_medium_write_at(lib_storage_medium *medium,
         return LIB_STATUS_INVALID_ARGUMENT;
     if (medium->mode == LIB_STORAGE_MEDIUM_READONLY) return LIB_STATUS_INVALID_STATE;
     if (medium->mode == LIB_STORAGE_MEDIUM_DIRECT) {
-        return lib_file_seek_absolute(medium->file, (lib_i64)offset) != LIB_STATUS_OK ||
-            lib_file_write_exact(medium->file, bytes, byte_count) != LIB_STATUS_OK ||
-            lib_file_flush(medium->file) != LIB_STATUS_OK ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
+        return lib_storage_file_seek_absolute(medium->file, (lib_i64)offset) != LIB_STATUS_OK ||
+            lib_storage_file_write_exact(medium->file, bytes, byte_count) != LIB_STATUS_OK ||
+            lib_storage_file_flush(medium->file) != LIB_STATUS_OK ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
     }
     while (byte_count != 0u) {
         lib_size page_index = offset / LIB_STORAGE_MEDIUM_PAGE_BYTES;

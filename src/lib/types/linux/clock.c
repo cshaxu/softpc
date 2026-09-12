@@ -1,10 +1,10 @@
 #define _POSIX_C_SOURCE 200809L
 
-#include "lib/types/types_interface.h"
+#include "lib/types/native_clock.h"
 
 #include <time.h>
 
-lib_status lib_monotonic_counter(lib_u64 *out_units,
+lib_status lib_native_monotonic_counter(lib_u64 *out_units,
     lib_u64 *out_units_per_second)
 {
     struct timespec value;

@@ -1,4 +1,5 @@
 #include "lib/host/sync_interface.h"
+#include "lib/types/native_sync.h"
 
 struct host_sync_event {
     lib_native_event *native;
@@ -19,14 +20,12 @@ static void host_sync_task_main(void *opaque)
         task->entry(task->context, task);
 }
 
-static host_sync_wait_result host_sync_wait_result_from_native(
-    lib_native_wait_result result)
+static host_sync_wait_result host_sync_wait_result_from_native(lib_status status,
+    lib_bool signaled)
 {
-    switch (result) {
-    case LIB_NATIVE_WAIT_SIGNALED: return HOST_SYNC_WAIT_SIGNALED;
-    case LIB_NATIVE_WAIT_TIMED_OUT: return HOST_SYNC_WAIT_TIMED_OUT;
-    default: return HOST_SYNC_WAIT_FAULT;
-    }
+    return status != LIB_STATUS_OK ? HOST_SYNC_WAIT_FAULT :
+        signaled != LIB_FALSE ? HOST_SYNC_WAIT_SIGNALED :
+        HOST_SYNC_WAIT_TIMED_OUT;
 }
 
 void host_sync_sleep_milliseconds(lib_u32 milliseconds)
@@ -82,7 +81,8 @@ host_sync_wait_result host_sync_wait_any(host_sync_event *const *events,
     lib_u32 native_count = 0u;
     lib_u32 native_index = 0u;
     lib_u32 index;
-    lib_native_wait_result result;
+    lib_bool signaled = LIB_FALSE;
+    lib_status status;
 
     if ((event_count != 0u && events == LIB_NULL) ||
         (event_count == 0u && cancel_task == LIB_NULL) || event_count > 63u)
@@ -99,10 +99,10 @@ host_sync_wait_result host_sync_wait_any(host_sync_event *const *events,
             return HOST_SYNC_WAIT_INVALID_ARGUMENT;
         native_events[native_count++] = events[index]->native;
     }
-    result = lib_native_event_wait_many(native_events, native_count,
-        timeout_milliseconds, &native_index);
-    if (result != LIB_NATIVE_WAIT_SIGNALED)
-        return host_sync_wait_result_from_native(result);
+    status = lib_native_event_wait_many(native_events, native_count,
+        timeout_milliseconds, &signaled, &native_index);
+    if (status != LIB_STATUS_OK || signaled == LIB_FALSE)
+        return host_sync_wait_result_from_native(status, signaled);
     if (cancel_task != LIB_NULL && native_index == 0u)
         return HOST_SYNC_WAIT_CANCELLED;
     if (out_event_index != LIB_NULL)
@@ -149,9 +149,11 @@ void host_sync_task_request_cancel(host_sync_task *task)
 
 int host_sync_task_cancelled(const host_sync_task *task)
 {
+    lib_bool signaled = LIB_FALSE;
+
     return task != LIB_NULL && task->cancellation != LIB_NULL &&
-        lib_native_event_wait(task->cancellation->native, 0u) ==
-            LIB_NATIVE_WAIT_SIGNALED;
+        lib_native_event_wait(task->cancellation->native, 0u, &signaled) ==
+            LIB_STATUS_OK && signaled != LIB_FALSE;
 }
 
 host_sync_wait_result host_sync_task_wait_cancel(const host_sync_task *task,

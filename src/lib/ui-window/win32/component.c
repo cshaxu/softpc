@@ -6,7 +6,6 @@
 #include "lib/ui-base/win32/input.h"
 #include "lib/ui-base/win32/actions.h"
 #include "lib/ui-base/mailbox.h"
-#include "lib/ui-base/win32/mailbox_wake.h"
 #include "lib/ui-window/win32/mouse.h"
 
 #include <windows.h>
@@ -435,7 +434,6 @@ static void win32_window_transition(ui_win32_window_context *context,
     WPARAM key, LPARAM lparam, int released)
 {
     WORD scan = (WORD)((lparam >> 16) & 0xffu);
-    DWORD control_state = (lparam & 0x01000000L) != 0 ? ENHANCED_KEY : 0u;
 
     if (scan == 0u && !released)
         ui_win32_keyboard_note_recovered_key(&context->keyboard_normalizer, (WORD)key);
@@ -444,7 +442,7 @@ static void win32_window_transition(ui_win32_window_context *context,
             (WORD)key);
     (void)ui_win32_keyboard_submit_transition(context,
         win32_window_emit_normalized, (lib_u16)scan, (lib_u16)key,
-        lib_native_input_flags((lib_u64)control_state),
+        ui_win32_keyboard_flags_from_lparam((lib_u64)lparam),
         ui_win32_modifiers_from_key_state(), !released);
 }
 
@@ -814,23 +812,22 @@ static DWORD WINAPI ui_window_worker(void *opaque)
     SetFocus(window);
     SetEvent(state->ready);
     while (IsWindow(window)) {
-        HANDLE wake = ui_win32_mailbox_wait_handle(
-            ui_component_mailboxes_wake(&component->base.mailboxes));
-        DWORD wait = MsgWaitForMultipleObjects(1u, &wake, FALSE,
-            win32_window_cursor_blink_timeout(context), QS_ALLINPUT);
-        if (wait == WAIT_OBJECT_0) {
+        ui_mailbox_wake_wait_result wait = ui_mailbox_wake_wait_messages(
+            ui_component_mailboxes_wake(&component->base.mailboxes),
+            win32_window_cursor_blink_timeout(context));
+        if (wait == UI_MAILBOX_WAKE_WAIT_WAKE) {
             if (lib_atomic_i32_load_explicit(&component->base.stopping,
                     LIB_MEMORY_ORDER_ACQUIRE) != 0)
                 DestroyWindow(window);
             else
                 SendMessageA(window, WIN32_WINDOW_MAILBOX_READY, 0, 0);
         }
-        else if (wait == WAIT_FAILED) {
+        else if (wait == UI_MAILBOX_WAKE_WAIT_FAULT) {
             lib_atomic_i32_store_explicit(&component->base.stopping, 1,
                 LIB_MEMORY_ORDER_RELEASE);
             DestroyWindow(window);
         }
-        else if (wait == WAIT_TIMEOUT)
+        else if (wait == UI_MAILBOX_WAKE_WAIT_TIMED_OUT)
             win32_window_advance_cursor_blink(window, context);
         while (PeekMessageA(&message, NULL, 0, 0, PM_REMOVE)) {
             if (message.message == WM_QUIT) {

@@ -1,66 +1,52 @@
-#include "lib/types/types_interface.h"
 #include "lib/ui-base/mailbox_wake.h"
-#include "lib/ui-base/linux/mailbox_wake.h"
+#include "lib/types/native_sync.h"
 
-
+#if !defined(_WIN32)
 struct ui_mailbox_wake {
-    int read_fd;
-    int write_fd;
+    lib_native_event *native;
 };
-
-static int ui_linui_mailbox_make_nonblocking(int fd)
-{
-    int flags = fcntl(fd, F_GETFL);
-
-    return flags != -1 && fcntl(fd, F_SETFL, flags | O_NONBLOCK) != -1;
-}
 
 ui_mailbox_wake *ui_mailbox_wake_create(void)
 {
-    ui_mailbox_wake *wake = lib_allocate_zero(1u, sizeof(*wake));
-    int fds[2];
+    ui_mailbox_wake *wake = (ui_mailbox_wake *)lib_allocate_zero(1u,
+        sizeof(*wake));
 
-    if (wake == NULL || pipe(fds) != 0) {
+    if (wake == LIB_NULL || lib_native_event_create(LIB_FALSE,
+            &wake->native) != LIB_STATUS_OK) {
         lib_release(wake);
-        return NULL;
-    }
-    wake->read_fd = fds[0];
-    wake->write_fd = fds[1];
-    if (!ui_linui_mailbox_make_nonblocking(wake->read_fd) ||
-        !ui_linui_mailbox_make_nonblocking(wake->write_fd)) {
-        (void)close(wake->read_fd);
-        (void)close(wake->write_fd);
-        lib_release(wake);
-        return NULL;
+        return LIB_NULL;
     }
     return wake;
 }
 
 void ui_mailbox_wake_destroy(ui_mailbox_wake *wake)
 {
-    if (wake == NULL) return;
-    (void)close(wake->read_fd);
-    (void)close(wake->write_fd);
+    if (wake == LIB_NULL) return;
+    lib_native_event_destroy(wake->native);
     lib_release(wake);
 }
 
 void ui_mailbox_wake_signal(ui_mailbox_wake *wake)
 {
-    static const char wake = 1;
-
-    if (wake != NULL)
-        (void)write(wake->write_fd, &wake, sizeof(wake));
+    if (wake != LIB_NULL) lib_native_event_signal(wake->native);
 }
 
-int ui_linui_mailbox_wait_fd(const ui_mailbox_wake *wake)
+ui_mailbox_wake_wait_result ui_mailbox_wake_wait(
+    const ui_mailbox_wake *wake, lib_u32 timeout_milliseconds)
 {
-    return wake == NULL ? -1 : wake->read_fd;
+    lib_bool signaled = LIB_FALSE;
+
+    return wake == LIB_NULL || lib_native_event_wait(wake->native,
+            timeout_milliseconds, &signaled) != LIB_STATUS_OK ?
+        UI_MAILBOX_WAKE_WAIT_FAULT : signaled != LIB_FALSE ?
+        UI_MAILBOX_WAKE_WAIT_WAKE : UI_MAILBOX_WAKE_WAIT_TIMED_OUT;
 }
 
-void ui_linui_mailbox_consume(const ui_mailbox_wake *wake)
+ui_mailbox_wake_wait_result ui_mailbox_wake_wait_messages(
+    const ui_mailbox_wake *wake, lib_u32 timeout_milliseconds)
 {
-    char bytes[64];
-    int fd = ui_linui_mailbox_wait_fd(wake);
-
-    while (fd >= 0 && read(fd, bytes, sizeof(bytes)) > 0) {}
+    (void)wake;
+    (void)timeout_milliseconds;
+    return UI_MAILBOX_WAKE_WAIT_FAULT;
 }
+#endif

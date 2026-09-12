@@ -1,4 +1,4 @@
-#include "lib/types/types_interface.h"
+#include "lib/types/win32/input.h"
 #include "lib/types/types_interface.h"
 
 #ifdef _WIN32
@@ -9,18 +9,12 @@ lib_u8 lib_native_input_current_modifiers(void)
     lib_u8 modifiers = 0u;
 
     if ((GetKeyState(VK_CONTROL) & 0x8000) != 0)
-        modifiers |= LIB_NATIVE_INPUT_MODIFIER_CONTROL;
+        modifiers |= 0x01u;
     if ((GetKeyState(VK_MENU) & 0x8000) != 0)
-        modifiers |= LIB_NATIVE_INPUT_MODIFIER_ALT;
+        modifiers |= 0x02u;
     if ((GetKeyState(VK_SHIFT) & 0x8000) != 0)
-        modifiers |= LIB_NATIVE_INPUT_MODIFIER_SHIFT;
+        modifiers |= 0x04u;
     return modifiers;
-}
-
-lib_u8 lib_native_input_flags(lib_u64 native_control_state)
-{
-    return ((DWORD)native_control_state & ENHANCED_KEY) != 0u ?
-        LIB_NATIVE_INPUT_FLAG_EXTENDED : 0u;
 }
 
 lib_u16 lib_native_input_scan_code(lib_u16 native_key)
@@ -45,11 +39,11 @@ lib_bool lib_native_input_map_scalar(lib_u32 scalar, lib_u16 *out_native_key,
     *out_native_key = (lib_u16)((lib_u16)mapped & 0xffu);
     *out_modifiers = 0u;
     if (((lib_u16)mapped & 0x0100u) != 0u)
-        *out_modifiers |= LIB_NATIVE_INPUT_MODIFIER_SHIFT;
+        *out_modifiers |= 0x04u;
     if (((lib_u16)mapped & 0x0200u) != 0u)
-        *out_modifiers |= LIB_NATIVE_INPUT_MODIFIER_CONTROL;
+        *out_modifiers |= 0x01u;
     if (((lib_u16)mapped & 0x0400u) != 0u)
-        *out_modifiers |= LIB_NATIVE_INPUT_MODIFIER_ALT;
+        *out_modifiers |= 0x02u;
     return LIB_TRUE;
 }
 

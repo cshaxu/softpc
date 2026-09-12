@@ -1,6 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 
-#include "lib/types/types_interface.h"
+#include "lib/types/native_sync.h"
 
 #include <errno.h>
 #include <pthread.h>
@@ -157,19 +157,22 @@ void lib_native_event_reset(lib_native_event *event)
     lib_native_hub_notify();
 }
 
-lib_native_wait_result lib_native_event_wait_many(
+lib_status lib_native_event_wait_many(
     const lib_native_event *const *events, lib_u32 event_count,
-    lib_u32 timeout_milliseconds, lib_u32 *out_event_index)
+    lib_u32 timeout_milliseconds, lib_bool *out_signaled,
+    lib_u32 *out_event_index)
 {
     struct timespec deadline;
     lib_u32 index;
 
-    if (events == LIB_NULL || event_count == 0u ||
-        lib_native_hub_ready() != LIB_STATUS_OK ||
+    if (events == LIB_NULL || out_signaled == LIB_NULL || event_count == 0u)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    if (lib_native_hub_ready() != LIB_STATUS_OK ||
         !lib_native_deadline(timeout_milliseconds, &deadline))
-        return LIB_NATIVE_WAIT_FAULT;
+        return LIB_STATUS_IO_ERROR;
+    *out_signaled = LIB_FALSE;
     for (index = 0u; index < event_count; ++index) {
-        if (events[index] == LIB_NULL) return LIB_NATIVE_WAIT_FAULT;
+        if (events[index] == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     }
     for (;;) {
         lib_u64 observed;
@@ -181,10 +184,11 @@ lib_native_wait_result lib_native_event_wait_many(
         for (index = 0u; index < event_count; ++index) {
             if (lib_native_event_take_signal(events[index])) {
                 if (out_event_index != LIB_NULL) *out_event_index = index;
-                return LIB_NATIVE_WAIT_SIGNALED;
+                *out_signaled = LIB_TRUE;
+                return LIB_STATUS_OK;
             }
         }
-        if (timeout_milliseconds == 0u) return LIB_NATIVE_WAIT_TIMED_OUT;
+        if (timeout_milliseconds == 0u) return LIB_STATUS_OK;
         (void)pthread_mutex_lock(&lib_native_hub.mutex);
         if (lib_native_hub.generation != observed) {
             (void)pthread_mutex_unlock(&lib_native_hub.mutex);
@@ -193,16 +197,28 @@ lib_native_wait_result lib_native_event_wait_many(
         result = pthread_cond_timedwait(&lib_native_hub.condition,
             &lib_native_hub.mutex, &deadline);
         (void)pthread_mutex_unlock(&lib_native_hub.mutex);
-        if (result == ETIMEDOUT) return LIB_NATIVE_WAIT_TIMED_OUT;
-        if (result != 0) return LIB_NATIVE_WAIT_FAULT;
+        if (result == ETIMEDOUT) return LIB_STATUS_OK;
+        if (result != 0) return LIB_STATUS_IO_ERROR;
     }
 }
 
-lib_native_wait_result lib_native_event_wait(const lib_native_event *event,
-    lib_u32 timeout_milliseconds)
+lib_status lib_native_event_wait(const lib_native_event *event,
+    lib_u32 timeout_milliseconds, lib_bool *out_signaled)
 {
     return lib_native_event_wait_many(&event, 1u, timeout_milliseconds,
-        LIB_NULL);
+        out_signaled, LIB_NULL);
+}
+
+lib_status lib_native_event_wait_messages(const lib_native_event *event,
+    lib_u32 timeout_milliseconds, lib_bool *out_wake, lib_bool *out_message)
+{
+    (void)event;
+    (void)timeout_milliseconds;
+    if (out_wake == LIB_NULL || out_message == LIB_NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    *out_wake = LIB_FALSE;
+    *out_message = LIB_FALSE;
+    return LIB_STATUS_UNSUPPORTED;
 }
 
 lib_status lib_native_task_create(lib_native_task_entry entry, void *context,

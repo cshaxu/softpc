@@ -1,13 +1,7 @@
-#include "lib/types/types_interface.h"
+#include "lib/types/win32/input.h"
 
 lib_u8 lib_native_input_current_modifiers(void)
 {
-    return 0u;
-}
-
-lib_u8 lib_native_input_flags(lib_u64 native_control_state)
-{
-    (void)native_control_state;
     return 0u;
 }
 

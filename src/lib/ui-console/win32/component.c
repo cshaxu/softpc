@@ -2,7 +2,6 @@
 
 #ifdef _WIN32
 #include "lib/ui-base/win32/input.h"
-#include "lib/ui-base/win32/mailbox_wake.h"
 
 #include <windows.h>
 
@@ -59,7 +58,7 @@ static void ui_console_receive_event(void *context,
             ui_console_emit_normalized,
             (lib_u16)(key->scan_code | (key->extended != LIB_FALSE ?
                 0x0100u : 0u)), (lib_u16)key->key,
-            key->extended != LIB_FALSE ? LIB_NATIVE_INPUT_FLAG_EXTENDED : 0u,
+            key->extended != LIB_FALSE ? UI_WIN32_INPUT_FLAG_EXTENDED : 0u,
             ui_console_hotkey_modifiers(key->modifiers),
             key->pressed != LIB_FALSE);
     } else if (event->kind == LIB_CONSOLE_EVENT_RAW_MOUSE) {
@@ -112,10 +111,11 @@ static DWORD WINAPI ui_console_worker(void *opaque)
         LIB_MEMORY_ORDER_ACQUIRE) == 0) {
         ui_component_control control;
         ui_frame frame;
-        HANDLE wake = ui_win32_mailbox_wait_handle(
-            ui_component_mailboxes_wake(&console->base.mailboxes));
+        ui_mailbox_wake_wait_result wake;
 
-        if (wake == NULL || WaitForSingleObject(wake, INFINITE) != WAIT_OBJECT_0)
+        wake = ui_mailbox_wake_wait(
+            ui_component_mailboxes_wake(&console->base.mailboxes), UINT32_MAX);
+        if (wake != UI_MAILBOX_WAKE_WAIT_WAKE)
             break;
         while (ui_component_mailboxes_take_control(&console->base.mailboxes, &control)) {
             if (control.kind == UI_COMPONENT_CONTROL_STOP) {

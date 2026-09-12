@@ -1,4 +1,4 @@
-#include "lib/types/types_interface.h"
+#include "lib/types/native_sync.h"
 
 #include <windows.h>
 
@@ -74,36 +74,63 @@ void lib_native_event_reset(lib_native_event *event)
         (void)ResetEvent(event->handle);
 }
 
-lib_native_wait_result lib_native_event_wait_many(
+lib_status lib_native_event_wait_many(
     const lib_native_event *const *events, lib_u32 event_count,
-    lib_u32 timeout_milliseconds, lib_u32 *out_event_index)
+    lib_u32 timeout_milliseconds, lib_bool *out_signaled,
+    lib_u32 *out_event_index)
 {
     HANDLE handles[MAXIMUM_WAIT_OBJECTS];
     DWORD result;
     lib_u32 index;
 
-    if (events == LIB_NULL || event_count == 0u ||
+    if (events == LIB_NULL || out_signaled == LIB_NULL || event_count == 0u ||
         event_count > (lib_u32)MAXIMUM_WAIT_OBJECTS)
-        return LIB_NATIVE_WAIT_FAULT;
+        return LIB_STATUS_INVALID_ARGUMENT;
+    *out_signaled = LIB_FALSE;
     for (index = 0u; index < event_count; ++index) {
         if (events[index] == LIB_NULL || events[index]->handle == NULL)
-            return LIB_NATIVE_WAIT_FAULT;
+            return LIB_STATUS_INVALID_ARGUMENT;
         handles[index] = events[index]->handle;
     }
     result = WaitForMultipleObjects((DWORD)event_count, handles, FALSE,
         (DWORD)timeout_milliseconds);
     if (result < WAIT_OBJECT_0 + event_count) {
         if (out_event_index != LIB_NULL) *out_event_index = result - WAIT_OBJECT_0;
-        return LIB_NATIVE_WAIT_SIGNALED;
+        *out_signaled = LIB_TRUE;
+        return LIB_STATUS_OK;
     }
-    return result == WAIT_TIMEOUT ? LIB_NATIVE_WAIT_TIMED_OUT : LIB_NATIVE_WAIT_FAULT;
+    return result == WAIT_TIMEOUT ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-lib_native_wait_result lib_native_event_wait(const lib_native_event *event,
-    lib_u32 timeout_milliseconds)
+lib_status lib_native_event_wait(const lib_native_event *event,
+    lib_u32 timeout_milliseconds, lib_bool *out_signaled)
 {
     return lib_native_event_wait_many(&event, 1u, timeout_milliseconds,
-        LIB_NULL);
+        out_signaled, LIB_NULL);
+}
+
+lib_status lib_native_event_wait_messages(const lib_native_event *event,
+    lib_u32 timeout_milliseconds, lib_bool *out_wake, lib_bool *out_message)
+{
+    HANDLE handle;
+    DWORD result;
+
+    if (event == LIB_NULL || event->handle == NULL || out_wake == LIB_NULL ||
+        out_message == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *out_wake = LIB_FALSE;
+    *out_message = LIB_FALSE;
+    handle = event->handle;
+    result = MsgWaitForMultipleObjects(1u, &handle, FALSE,
+        (DWORD)timeout_milliseconds, QS_ALLINPUT);
+    if (result == WAIT_OBJECT_0) {
+        *out_wake = LIB_TRUE;
+        return LIB_STATUS_OK;
+    }
+    if (result == WAIT_OBJECT_0 + 1u) {
+        *out_message = LIB_TRUE;
+        return LIB_STATUS_OK;
+    }
+    return result == WAIT_TIMEOUT ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
 lib_status lib_native_task_create(lib_native_task_entry entry, void *context,
