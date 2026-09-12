@@ -2,30 +2,29 @@
 
 ## Current Work
 
-M9 T55 S1 is active: import the current NXVM shared library exactly and make
-the narrow non-MVDM SoftPC writer and cold-run keyboard-boundary adaptations
-required by its new contract and regression proof.
+M9 T55 S2 is active: consolidate every shared-library external runtime and
+native-platform boundary under `lib/types` without changing component behavior.
 
-## M9 T55 S1 Packet
+## M9 T55 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner approved a new task to import the original latest NXVM library, with SoftPC-side adaptation only where required for recovery. |
-| Objective | Replace `src/lib/` with NXVM `64d211c9` exactly, adapt the non-MVDM prompt trace to the explicit byte-writer API, clear stale completed-run keyboard delivery at the cold-run boundary, and recover fixed x86/x64 packages. |
-| Non-goals | No `src/mvdm/softpc.new/`, guest-media, `softpc.ini`, NXVM-repository, product-lifecycle, UI, or mass C-runtime-call refactor. |
-| Reference Baseline | SoftPC `9f563db`; read-only NXVM `64d211c9` `src/lib/`. |
-| Candidate Proposal | [M9 T55 Exact NXVM Library Refresh](../proposals/m9-t55-nxvm-lib-refresh.md) |
-| Files And ABI Surface | Entire imported `src/lib/` corpus and manifest; `src/app/prompt_trace.c`; `src/host/machine.c` cold-run keyboard-IRQ clear; the existing runtime-input smoke's exact scan-code oracle; focused storage/trace proof and CMake registration only if required; refreshed `softpc32.exe`/`softpc64.exe`. The writer API changes from text to `{bytes, byte_count}`. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approved: “准入S2，目标是：所有lib里面的原始 c 标准库和win32/linux等外部库的类型和函数定义，全部收归 lib/types 所有”. |
+| Objective | Make `lib/types` the sole shared-library owner of C runtime, Windows SDK, Linux/POSIX, compiler-atomic types, declarations, calls, and native link dependencies; retain existing library behavior. |
+| Non-goals | No `src/mvdm/softpc.new/`, guest media, `softpc.ini`, app/host product policy, UI semantics, NXVM checkout mutation, or duplicate platform path. |
+| Reference Baseline | SoftPC `aa90f1e`; canonical library corpus imported from NXVM `64d211c9`. |
+| Candidate Proposal | [M9 T55 Types-Owned External Boundary](../proposals/m9-t55-lib-types-external-boundary.md) |
+| Files And ABI Surface | Entire `src/lib/` corpus, its CMake/manifest/READMEs, static boundary tests, required behavior tests, and only agent-owned package EXEs. Public library contracts change from native external values to `lib_*` copied values/opaque handles. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout, and UI authorities. |
-| Verification | Compare complete relative-path SHA-256 inventories to frozen NXVM; verify manifest; build and full CTest x64/x86; package smoke; prove the restart smoke rejects its exact first-run scan set instead of using total BIOS IRQ count as an oracle; diff and governance gates. |
-| Expected Markers | Zero SoftPC-only files or byte differences below `src/lib/`; two length-bearing prompt-trace writes; explicit trace line endings; the completed non-repeating old-run input cannot reach a subsequent cold run; both package EXEs refreshed while `softpc.ini` and media remain untouched. |
+| Verification | Ledger-backed static external-boundary scan; approved component-DAG link audit; strict library build; manifest; fresh x86/x64 build and full CTest; package smoke; diff and governance gates. |
+| Expected Markers | Outside `types`, zero direct external headers/types/functions/native links; `types` owns all platform adapters; no component behavior route is duplicated; package EXEs refreshed without INI/media change. |
 | Asset Needs | Refresh only agent-owned `assets/binary/softpc32.exe` and `softpc64.exe`; preserve user-owned INI and all media. |
-| Reporting Requirements | Report imported corpus revision, exact app adaptation paths, SHA-256 equality evidence, dual-width results, changed-path accounting, commits, and package links. |
-| Stop Conditions | Stop for any required MVDM, media, INI, NXVM-source, product-semantic, or non-writer SoftPC change beyond the admitted standalone cold-run keyboard-IRQ clear. Stop and re-audit if NXVM `src/lib/` moves from the frozen revision. |
-| Exit Criteria | Exact corpus equality, prompt trace compiles under the byte writer without behavior drift, required tests/gates pass at both widths, packages are refreshed, and a separate T-level closure audit is pushed. |
-| Original Owner Request | “好的，准入一个T任务，用于原版导入最新nxvm的lib”. |
-| Similar-Issue Sweep | Search every SoftPC production caller of `lib_storage_file_writer_write`; inspect all `src/lib/` relative paths and hashes, with each mismatch either imported exactly or rejected under the stop condition. |
+| Reporting Requirements | Report frozen ledger count/dispositions, contract/API changes, direct-link removal evidence, x86/x64 results, changed-path accounting, commits, and package links. |
+| Stop Conditions | Stop for any required MVDM, media, INI, product-semantics, app/host policy, or platform dependency that cannot be represented as a neutral `types` primitive. |
+| Exit Criteria | Every ledger member is disposed by the static gate; only `types` directly owns external-library boundary/link definitions; all required builds/tests pass; owner manually accepts packages; a separate T-level closure audit is pushed. |
+| Original Owner Request | “准入S2，目标是：所有lib里面的原始 c 标准库和win32/linux等外部库的类型和函数定义，全部收归 lib/types 所有”. |
+| Similar-Issue Sweep | Enumerate all `#include <...>`, native type names, native function calls, and direct native CMake link entries below `src/lib/`; every hit is migrated to `types`, explicitly whitelisted as a language/compiler builtin, or transferred to TODO with owner approval. |
 
 ## Current Technical Baseline
 

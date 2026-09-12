@@ -1,5 +1,8 @@
 # M9 T55 — Exact NXVM Library Refresh
 
+> Historical admitted proposal. T55 S1 closed; see
+> [the closure record](M9-T55-S1-nxvm-library-refresh-closure.md).
+
 ## Objective
 
 Replace SoftPC's checked-in `src/lib/` corpus with the current NXVM corpus at
@@ -39,5 +42,5 @@ library directory. The two existing SoftPC prompt-trace writer calls use the
 length-bearing API and preserve their intended bytes. The standalone cold-run
 boundary removes an old IRQ1 and its invalid backing byte without modifying
 MVDM. Fresh x64 and x86 builds and complete CTest pass; the restart smoke
-checks its exact first-run scan set, library manifests verify, and the two package EXEs
-are refreshed without modifying the INI or media.
+checks its exact first-run scan set, library manifests verify, and the two
+package EXEs are refreshed without modifying the INI or media.
