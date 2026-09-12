@@ -6,6 +6,6 @@
 #include "lib/types/win32/window.h"
 
 /* Shared native-boundary conversion for copied 0x00RRGGBB palette values. */
-COLORREF ui_win32_colorref_from_rgb(lib_u32 rgb);
+lib_win32_colorref ui_win32_colorref_from_rgb(lib_u32 rgb);
 
 #endif

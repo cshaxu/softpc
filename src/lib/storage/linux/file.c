@@ -1,3 +1,4 @@
+#include "lib/types/file.h"
 #include "lib/types/types_interface.h"
 
 #include "lib/types/linux/file.h"
@@ -5,23 +6,23 @@
 #include "lib/storage/file.h"
 
 struct storage_file_platform {
-    FILE *stream;
+    lib_c_file *stream;
 };
 
 static lib_status storage_file_platform_open_writer(const char *path,
     const char *mode, storage_file_platform **out_file)
 {
-    FILE *stream;
+    lib_c_file *stream;
     storage_file_platform *file;
 
     if (path == LIB_NULL || mode == LIB_NULL || out_file == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     *out_file = LIB_NULL;
-    stream = fopen(path, mode);
+    stream = lib_c_fopen(path, mode);
     if (stream == LIB_NULL) return LIB_STATUS_IO_ERROR;
     file = lib_allocate_zero(1u, sizeof(*file));
     if (file == LIB_NULL) {
-        (void)fclose(stream);
+        (void)lib_c_fclose(stream);
         return LIB_STATUS_NO_MEMORY;
     }
     file->stream = stream;
@@ -32,20 +33,20 @@ static lib_status storage_file_platform_open_writer(const char *path,
 static lib_status storage_file_platform_open(const char *path, lib_bool readwrite,
     storage_file_platform **out_file)
 {
-    struct flock lock = { 0 };
+    lib_linux_file_lock lock = { 0 };
     storage_file_platform *file = lib_allocate_zero(1u, sizeof(*file));
 
     if (file == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    file->stream = fopen(path,
+    file->stream = lib_c_fopen(path,
         readwrite != LIB_FALSE ? "rb+" : "rb");
     if (file->stream == LIB_NULL) {
         lib_release(file);
         return LIB_STATUS_IO_ERROR;
     }
-    lock.l_type = readwrite != LIB_FALSE ? F_WRLCK : F_RDLCK;
-    lock.l_whence = SEEK_SET;
-    if (fcntl(fileno(file->stream), F_SETLK, &lock) != 0) {
-        (void)fclose(file->stream);
+    lock.l_type = readwrite != LIB_FALSE ? LIB_LINUX_F_WRLCK : LIB_LINUX_F_RDLCK;
+    lock.l_whence = LIB_SEEK_SET;
+    if (lib_linux_fcntl(lib_linux_fileno(file->stream), LIB_LINUX_F_SETLK, &lock) != 0) {
+        (void)lib_c_fclose(file->stream);
         lib_release(file);
         return LIB_STATUS_IO_ERROR;
     }
@@ -75,8 +76,8 @@ lib_status storage_file_platform_read(storage_file_platform *file, void *bytes,
     if (file == LIB_NULL || out_byte_count == LIB_NULL ||
         (bytes == LIB_NULL && byte_count != 0u))
         return LIB_STATUS_INVALID_ARGUMENT;
-    *out_byte_count = fread(bytes, 1u, byte_count, file->stream);
-    return ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+    *out_byte_count = lib_c_fread(bytes, 1u, byte_count, file->stream);
+    return lib_c_ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
 lib_status storage_file_platform_write(storage_file_platform *file, const void *bytes,
@@ -85,14 +86,14 @@ lib_status storage_file_platform_write(storage_file_platform *file, const void *
     if (file == LIB_NULL || out_byte_count == LIB_NULL ||
         (bytes == LIB_NULL && byte_count != 0u))
         return LIB_STATUS_INVALID_ARGUMENT;
-    *out_byte_count = fwrite(bytes, 1u, byte_count, file->stream);
-    return ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+    *out_byte_count = lib_c_fwrite(bytes, 1u, byte_count, file->stream);
+    return lib_c_ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
 lib_status storage_file_platform_flush(storage_file_platform *file)
 {
     if (file == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    return fflush(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+    return lib_c_fflush(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
 lib_status storage_file_platform_close(storage_file_platform **file)
@@ -104,23 +105,23 @@ lib_status storage_file_platform_close(storage_file_platform **file)
     value = *file;
     *file = LIB_NULL;
     if (value == LIB_NULL) return LIB_STATUS_OK;
-    result = fclose(value->stream);
+    result = lib_c_fclose(value->stream);
     lib_release(value);
     return result == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
 lib_status storage_file_platform_seek_absolute(storage_file_platform *file, lib_i64 offset)
-{ return fseeko(file->stream, (off_t)offset, SEEK_SET) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR; }
+{ return lib_linux_fseeko(file->stream, (lib_linux_off_t)offset, LIB_SEEK_SET) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR; }
 
 lib_status storage_file_platform_byte_count(storage_file_platform *file, lib_i64 *out_byte_count)
 {
-    off_t offset = ftello(file->stream);
-    off_t length;
+    lib_linux_off_t offset = lib_linux_ftello(file->stream);
+    lib_linux_off_t length;
 
-    if (offset < 0 || fseeko(file->stream, 0, SEEK_END) != 0)
+    if (offset < 0 || lib_linux_fseeko(file->stream, 0, LIB_SEEK_END) != 0)
         return LIB_STATUS_IO_ERROR;
-    length = ftello(file->stream);
-    if (length < 0 || fseeko(file->stream, offset, SEEK_SET) != 0)
+    length = lib_linux_ftello(file->stream);
+    if (length < 0 || lib_linux_fseeko(file->stream, offset, LIB_SEEK_SET) != 0)
         return LIB_STATUS_IO_ERROR;
     *out_byte_count = (lib_i64)length;
     return LIB_STATUS_OK;

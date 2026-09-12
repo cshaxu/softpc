@@ -1,3 +1,6 @@
+#include "lib/types/file.h"
+#include "lib/types/win32/scalar.h"
+#include "lib/types/win32/sync.h"
 #include "lib/types/types_interface.h"
 
 #include "lib/types/win32/file.h"
@@ -5,23 +8,23 @@
 #include "lib/storage/file.h"
 
 struct storage_file_platform {
-    FILE *stream;
+    lib_c_file *stream;
 };
 
 static lib_status storage_file_platform_open_writer(const char *path,
     const char *mode, storage_file_platform **out_file)
 {
-    FILE *stream;
+    lib_c_file *stream;
     storage_file_platform *file;
 
     if (path == LIB_NULL || mode == LIB_NULL || out_file == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     *out_file = LIB_NULL;
-    stream = fopen(path, mode);
+    stream = lib_c_fopen(path, mode);
     if (stream == LIB_NULL) return LIB_STATUS_IO_ERROR;
     file = lib_allocate_zero(1u, sizeof(*file));
     if (file == LIB_NULL) {
-        (void)fclose(stream);
+        (void)lib_c_fclose(stream);
         return LIB_STATUS_NO_MEMORY;
     }
     file->stream = stream;
@@ -32,31 +35,31 @@ static lib_status storage_file_platform_open_writer(const char *path,
 static lib_status storage_file_platform_open(const char *path, lib_bool readwrite,
     storage_file_platform **out_file)
 {
-    HANDLE handle;
+    lib_win32_handle handle;
     int descriptor;
     storage_file_platform *file;
-    DWORD access_flags = readwrite != LIB_FALSE ?
-        GENERIC_READ | GENERIC_WRITE : GENERIC_READ;
-    DWORD share = readwrite != LIB_FALSE ? 0u : FILE_SHARE_READ;
+    lib_win32_dword access_flags = readwrite != LIB_FALSE ?
+        LIB_WIN32_GENERIC_READ | LIB_WIN32_GENERIC_WRITE : LIB_WIN32_GENERIC_READ;
+    lib_win32_dword share = readwrite != LIB_FALSE ? 0u : LIB_WIN32_FILE_SHARE_READ;
 
-    handle = CreateFileA(path, access_flags, share, LIB_NULL, OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL, LIB_NULL);
-    if (handle == INVALID_HANDLE_VALUE) return LIB_STATUS_IO_ERROR;
-    descriptor = _open_osfhandle((intptr_t)handle,
-        readwrite != LIB_FALSE ? _O_RDWR | _O_BINARY : _O_RDONLY | _O_BINARY);
+    handle = lib_win32_create_file_a(path, access_flags, share, LIB_NULL, LIB_WIN32_OPEN_EXISTING,
+        LIB_WIN32_FILE_ATTRIBUTE_NORMAL, LIB_NULL);
+    if (handle == LIB_WIN32_INVALID_HANDLE_VALUE) return LIB_STATUS_IO_ERROR;
+    descriptor = lib_win32_open_osfhandle((lib_iptr)handle,
+        readwrite != LIB_FALSE ? LIB_WIN32_O_RDWR | LIB_WIN32_O_BINARY : LIB_WIN32_O_RDONLY | LIB_WIN32_O_BINARY);
     if (descriptor == -1) {
-        (void)CloseHandle(handle);
+        (void)lib_win32_close_handle(handle);
         return LIB_STATUS_IO_ERROR;
     }
     file = lib_allocate_zero(1u, sizeof(*file));
     if (file == LIB_NULL) {
-        (void)_close(descriptor);
+        (void)lib_win32_close(descriptor);
         return LIB_STATUS_NO_MEMORY;
     }
-    file->stream = _fdopen(descriptor,
+    file->stream = lib_win32_fdopen(descriptor,
         readwrite != LIB_FALSE ? "rb+" : "rb");
     if (file->stream == LIB_NULL) {
-        (void)_close(descriptor);
+        (void)lib_win32_close(descriptor);
         lib_release(file);
         return LIB_STATUS_IO_ERROR;
     }
@@ -86,8 +89,8 @@ lib_status storage_file_platform_read(storage_file_platform *file, void *bytes,
     if (file == LIB_NULL || out_byte_count == LIB_NULL ||
         (bytes == LIB_NULL && byte_count != 0u))
         return LIB_STATUS_INVALID_ARGUMENT;
-    *out_byte_count = fread(bytes, 1u, byte_count, file->stream);
-    return ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+    *out_byte_count = lib_c_fread(bytes, 1u, byte_count, file->stream);
+    return lib_c_ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
 lib_status storage_file_platform_write(storage_file_platform *file, const void *bytes,
@@ -96,14 +99,14 @@ lib_status storage_file_platform_write(storage_file_platform *file, const void *
     if (file == LIB_NULL || out_byte_count == LIB_NULL ||
         (bytes == LIB_NULL && byte_count != 0u))
         return LIB_STATUS_INVALID_ARGUMENT;
-    *out_byte_count = fwrite(bytes, 1u, byte_count, file->stream);
-    return ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+    *out_byte_count = lib_c_fwrite(bytes, 1u, byte_count, file->stream);
+    return lib_c_ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
 lib_status storage_file_platform_flush(storage_file_platform *file)
 {
     if (file == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    return fflush(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+    return lib_c_fflush(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
 lib_status storage_file_platform_close(storage_file_platform **file)
@@ -115,23 +118,23 @@ lib_status storage_file_platform_close(storage_file_platform **file)
     value = *file;
     *file = LIB_NULL;
     if (value == LIB_NULL) return LIB_STATUS_OK;
-    result = fclose(value->stream);
+    result = lib_c_fclose(value->stream);
     lib_release(value);
     return result == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
 lib_status storage_file_platform_seek_absolute(storage_file_platform *file, lib_i64 offset)
-{ return _fseeki64(file->stream, offset, SEEK_SET) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR; }
+{ return lib_win32_fseeki64(file->stream, offset, LIB_SEEK_SET) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR; }
 
 lib_status storage_file_platform_byte_count(storage_file_platform *file, lib_i64 *out_byte_count)
 {
-    lib_i64 offset = _ftelli64(file->stream);
+    lib_i64 offset = lib_win32_ftelli64(file->stream);
     lib_i64 length;
 
-    if (offset < 0 || _fseeki64(file->stream, 0, SEEK_END) != 0)
+    if (offset < 0 || lib_win32_fseeki64(file->stream, 0, LIB_SEEK_END) != 0)
         return LIB_STATUS_IO_ERROR;
-    length = _ftelli64(file->stream);
-    if (length < 0 || _fseeki64(file->stream, offset, SEEK_SET) != 0)
+    length = lib_win32_ftelli64(file->stream);
+    if (length < 0 || lib_win32_fseeki64(file->stream, offset, LIB_SEEK_SET) != 0)
         return LIB_STATUS_IO_ERROR;
     *out_byte_count = length;
     return LIB_STATUS_OK;

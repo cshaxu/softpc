@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 #include "lib/host/sync.h"
 
 struct host_sync_event {
@@ -86,7 +87,7 @@ host_sync_wait_result host_sync_wait_any(host_sync_event *const *events,
     if ((event_count != 0u && events == LIB_NULL) ||
         (event_count == 0u && cancel_task == LIB_NULL) || event_count > 63u)
         return HOST_SYNC_WAIT_INVALID_ARGUMENT;
-    if (out_event_index != LIB_NULL) *out_event_index = UINT32_MAX;
+    if (out_event_index != LIB_NULL) *out_event_index = LIB_UINT32_MAX;
     if (cancel_task != LIB_NULL) {
         if (cancel_task->cancellation == LIB_NULL ||
             cancel_task->cancellation->platform == LIB_NULL)

@@ -8,6 +8,9 @@ static int counter_ok = 1, frequency_ok = 1;
 static LONGLONG counter_value = 123, frequency_value = 1000;
 static unsigned query_count;
 static unsigned pressed;
+static SHORT layout_result;
+static SHORT fake_key_scan(CHAR scalar)
+{ (void)scalar; return layout_result; }
 
 static BOOL fake_counter(lib_win32_counter *out)
 { ++query_count; out->QuadPart = counter_value; return counter_ok; }
@@ -25,8 +28,21 @@ static lib_win32_key_state fake_key_state(int key)
 #define lib_win32_query_performance_counter fake_counter
 #define lib_win32_query_performance_frequency fake_frequency
 #define lib_win32_get_key_state fake_key_state
+#undef lib_win32_key_scan
+#define lib_win32_key_scan fake_key_scan
 #include "lib/host/win32/clock.c"
 #include "lib/ui-base/win32/actions.c"
+#include "lib/ui-base/win32/input.c"
+
+static ui_event emitted[8];
+static unsigned emitted_count;
+static int capture(void *context, const ui_event *event)
+{
+    (void)context;
+    if (emitted_count == 8u) return 0;
+    emitted[emitted_count++] = *event;
+    return 1;
+}
 
 #define CHECK(expression) do { if (!(expression)) return __LINE__; } while (0)
 int main(void)
@@ -57,5 +73,33 @@ int main(void)
         if ((pressed & 4u) != 0u) expected |= UI_HOTKEY_MODIFIER_SHIFT;
         CHECK(ui_win32_modifiers_from_key_state() == expected);
     }
+    /* VkKeyScan uses a DIFFERENT mask from GetKeyState/UI modifiers.
+     * Exercise all raw combinations and the actual emitted make/break path. */
+    for (unsigned raw = 0u; raw != 8u; ++raw) {
+        lib_u16 key;
+        lib_u8 modifiers, expected = 0u;
+        unsigned count = 0u;
+        ui_win32_keyboard_normalizer state = { 0 };
+        if (raw & 1u) { expected |= UI_WIN32_INPUT_MODIFIER_SHIFT; ++count; }
+        if (raw & 2u) { expected |= UI_WIN32_INPUT_MODIFIER_CONTROL; ++count; }
+        if (raw & 4u) { expected |= UI_WIN32_INPUT_MODIFIER_ALT; ++count; }
+        layout_result = (SHORT)((raw << 8u) | 'A');
+        CHECK(ui_win32_keyboard_map_scalar('a', &key, &modifiers));
+        CHECK(key == 'A' && modifiers == expected);
+        emitted_count = 0u;
+        CHECK(ui_win32_keyboard_submit_utf16(&state, LIB_NULL, capture, 'a'));
+        CHECK(emitted_count == count * 2u + 2u);
+        CHECK(emitted[count].data.key.key == 'A');
+        CHECK(emitted[count].data.key.modifiers == expected);
+        for (unsigned i = 0u; i != count; ++i) {
+            CHECK(emitted[i].data.key.pressed);
+            CHECK(!emitted[emitted_count - 1u - i].data.key.pressed);
+            CHECK(emitted[i].data.key.key == emitted[emitted_count - 1u - i].data.key.key);
+        }
+    }
+    layout_result = -1;
+    { lib_u16 key = 99u; lib_u8 modifiers = 99u;
+      CHECK(!ui_win32_keyboard_map_scalar('a', &key, &modifiers));
+      CHECK(key == 99u && modifiers == 99u); }
     return 0;
 }

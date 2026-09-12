@@ -13,6 +13,7 @@ typedef uint64_t lib_u64;
 typedef int32_t lib_i32;
 typedef int64_t lib_i64;
 typedef size_t lib_size;
+typedef intptr_t lib_iptr;
 typedef int lib_bool;
 
 typedef int lib_status;
@@ -25,13 +26,15 @@ enum {
     LIB_STATUS_UNSUPPORTED = 3,
     LIB_STATUS_NO_MEMORY = 4,
     LIB_STATUS_IO_ERROR = 5,
-    LIB_STATUS_NOT_CURRENT = 6,
     LIB_STATUS_LIMIT_EXCEEDED = 7
 };
 
 #define LIB_FALSE 0
 #define LIB_TRUE 1
 #define LIB_NULL NULL
+#define LIB_INT32_MAX INT32_MAX
+#define LIB_INT32_MIN INT32_MIN
+#define LIB_UINT32_MAX UINT32_MAX
 
 /* Cross-platform C runtime vocabulary.  These functions deliberately expose
  * no platform handle, product state, or I/O policy. */
@@ -52,7 +55,7 @@ static inline const void *lib_memory_find(const void *bytes, int value,
 { return memchr(bytes, value, byte_count); }
 
 static inline lib_size lib_text_length(const char *text)
-{ return text == LIB_NULL ? 0u : strlen(text); }
+{ return strlen(text); }
 
 static inline void *lib_allocate(lib_size byte_count)
 { return malloc(byte_count); }

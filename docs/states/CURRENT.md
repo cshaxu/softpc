@@ -2,13 +2,12 @@
 
 ## Current Work
 
-M9 T55 S3 is active: normalize types into common C/compiler headers and
-explicit win32/linux declaration headers, moving clock/input composition
-back to their owning components without changing behavior.
+M9 T55 S3 is active: complete types-owned external vocabulary adoption,
+retain component-owned behavior, and correct the keyboard layout modifier map.
 
-Implementation and review evidence are ready for owner inspection: x64
-41/41; x86 serial 41/41 after one recorded concurrent package-smoke failure
-and three isolated passes; strict library 3/3. Linux execution is unverified.
+Follow-up repairs are implemented and verified: x64 41/41, x86 41/41,
+strict library 3/3 and ten standalone common/Windows headers pass. Delivery
+awaits owner inspection; Linux execution remains unverified.
 
 T55 remains open. S2 is superseded for this boundary cleanup by the owner's
 S3 admission, not accepted as a completed whole-library migration.
@@ -19,21 +18,21 @@ S3 admission, not accepted as a completed whole-library migration.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approved: “同意，按照这个准入一个S任务清理lib types，要求符合收口标准后供我检查。” |
-| Objective | Remove OS selection from top-level types headers; localize SDK/POSIX declarations by platform and purpose; retain compiler-only atomic selection; move clock composition and modifier interpretation into host/ui-base. |
-| Non-goals | No `src/mvdm/softpc.new/`, guest media, `softpc.ini`, app/host product policy, UI semantics, NXVM checkout mutation, or duplicate platform path. |
-| Reference Baseline | SoftPC `1b368d4`; preserve the owner's existing formatting changes in types/atomic.h. |
+| Admission And Approval | Owner approved S3 and its full audit repair continuation: “准入使用当前或者新的S任务修复以上所有问题，完成后工作区清理干净并让我检查。” |
+| Objective | Complete the approved audit ledger in the proposal: actual typed external vocabulary adoption, component-owned policy, correct keyboard layout modifier translation, and executable bypass checks; preserve component platform behavior. |
+| Non-goals | No `src/mvdm/softpc.new/`, guest media, `softpc.ini`, app/host product policy, NXVM checkout mutation, or duplicate platform path. Preserve UI behavior except the approved VkKeyScan modifier correction. |
+| Reference Baseline | Original S3: `1b368d4`; follow-up P2: `2f54899`. Preserve the owner's types/atomic.h formatting. |
 | Candidate Proposal | [M9 T55 Types-Owned External Boundary](../proposals/m9-t55-lib-types-external-boundary.md) |
 | Files And ABI Surface | Entire `src/lib/` corpus, its CMake/manifest/READMEs, static boundary tests, required behavior tests, and only agent-owned package EXEs. `types` is header-only: it defines `lib_*` copied values, opaque native representations, and typed inline façades; component platform sources compose those façades into their own internal operations. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout, and UI authorities. |
-| Verification | S3 seven-header ledger and include-site sweep; executable types layout gate; clock and atomic smoke; existing keyboard tests; strict library build; manifest; x86/x64 full CTest and package smoke; Linux compile/run if available, otherwise explicit coverage limitation; diff and governance gates. |
+| Verification | Nine-class audit ledger, all C/H external-token sweep, negative bypass tests, deterministic eight-combination keyboard map/emission test, clock/atomic/keyboard tests, strict library build, manifest, x86/x64 full CTest and package smoke, standalone headers, actual diff and governance review; explicitly unverified Linux execution. |
 | Expected Markers | types remains header-only/INTERFACE; top-level headers have no OS branch or platform includes; no win32.h/posix.h umbrella; each platform consumer explicitly includes its platform vocabulary; host owns counter composition and ui-base owns modifier interpretation. |
 | Asset Needs | Refresh only agent-owned `assets/binary/softpc32.exe` and `softpc64.exe`; preserve user-owned INI and all media. |
 | Reporting Requirements | Report frozen ledger count/dispositions, contract/API changes, direct-link removal evidence, x86/x64 results, changed-path accounting, commits, and package links. |
 | Stop Conditions | Stop for any required MVDM, media, INI, product-semantics, app/host policy, or platform dependency that cannot be represented as a neutral `types` primitive. |
 | Exit Criteria | S3 ledger and focused/full checks pass; actual diff reviewed for behavior preservation; all changes committed/pushed with clean worktree; deliver EXEs for owner inspection. Keep S3 awaiting owner acceptance and do not close T55. |
-| Original Owner Request | “同意，按照这个准入一个S任务清理lib types，要求符合收口标准后供我检查。” |
-| Similar-Issue Sweep | Enumerate every types header, OS selection, SDK/POSIX include and old-header consumer; move or retain each with the S3 ledger disposition. Check moved clock/input bodies against baseline and preserve other platform bodies. This is not certification of all S2 raw-call wrappers. |
+| Original Owner Request | “同意，按照这个准入一个S任务清理lib types，要求符合收口标准后供我检查。” Follow-up: “准入使用当前或者新的S任务修复以上所有问题，完成后工作区清理干净并让我检查。” |
+| Similar-Issue Sweep | Entire library C/H corpus: external includes, raw types/functions/constants, copied virtual keys, null text-length callers, and NOT_CURRENT consumers. Gate derives prohibited tokens from types declarations; component workers remain token-equivalent after alias substitution, except the approved keyboard conversion. |
 
 ## Current Technical Baseline
 

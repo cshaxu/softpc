@@ -1,5 +1,77 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S3 follow-up admission and convergence ledger
+
+Original request: “准入使用当前或者新的S任务修复以上所有问题，完成后工作区清理干净并让我检查。”
+Continue S3 from `2f54899`; do not close T55. The frozen universe is every
+library C/H external vocabulary consumer, plus the nine audit classes below.
+Each requires implementation, direct-call sweep and focused/full proof before
+delivery. Types wraps original external definitions even for a single consumer;
+component-defined behavior and contracts stay in their owning component.
+
+| Audit class | Required disposition |
+| --- | --- |
+| Include-only types shells | Replace with actually consumed external aliases; no duplicate SDK definitions. |
+| Windows host and UI SDK use | Adopt types vocabulary without moving/reimplementing worker behavior. |
+| Linux pthread/time use | Adopt existing wrappers and fill missing ones; retain platform ownership. |
+| Storage CRT/OS use | Wrap original file definitions in types; storage retains file policy. |
+| Copied UI Windows key constants | SDK-backed definitions in types; neutral mapping stays ui-base. |
+| VkKeyScan modifier mismatch | Translate raw SHIFT=1/CTRL=2/ALT=4 to UI masks; deterministic tests. |
+| Console raw numeric contract | Document raw platform values at the Console boundary; UI alone normalizes. |
+| Root policy leakage | Move NOT_CURRENT to Console; make text length direct CRT and audit null callers. |
+| Weak static proof | Reject raw external tokens outside types, with negative tests, not only includes. |
+
+No new types implementation files, component edges, product policy, MVDM or
+media changes. Refresh both EXEs, test both widths, review the actual diff,
+commit/push all changes and leave a clean worktree for owner inspection.
+
+### S3 P2 result
+
+All nine audit classes above are addressed. The complete library C/H universe
+is 74 files (73 at P2 entry plus the shared Windows scalar declaration header).
+Twenty-one non-types C/H consumers changed; component sources retain their
+original operations and sequencing. Windows/POSIX/CRT types, calls and constants
+now use types-owned aliases. UI virtual keys bind SDK values rather than a
+second numeric table. Types remains header-only/INTERFACE; no component DAG
+or SoftPC product path changes.
+
+The only executable semantic correction is the UI-owned conversion of
+VkKeyScan's high-byte SHIFT=1, CONTROL=2, ALT=4 into the existing UI masks.
+The deterministic test compiles the actual input implementation with a fake
+layout query and covers all eight combinations, emitted make/break symmetry,
+and failed-query output preservation. Existing hotkey/input tests still pass.
+Console's raw platform key/button/cell-position contract is documented without
+moving event types or UI normalization to types/host. NOT_CURRENT retains value
+6 but is declared by Console. Both production text-length callers already
+reject null before calling; the root wrapper now matches strlen exactly.
+
+The static gate derives raw tokens from external aliases and rejects their use
+outside types. Eight new negative probes cover SDK/CRT/POSIX types and calls,
+SDK key constants and the removed UI key table; all original probes remain.
+Manual call-site and type sweeps supplement this finite-token gate: it is not
+a claim that a regex understands arbitrary future C code. No speculative unused
+wrappers were retained.
+
+Verification: x64 41/41 (42.53 seconds), x86 41/41 (58.38 seconds), each serial
+and including fixed-package smoke; strict library build and 3/3 standalone
+checks; ten common/Windows headers independently compile with C17 and
+Wall/Wextra/Wpedantic/Werror. Linux platform aliases are source-reviewed but
+not executed on Linux. Existing Linux wait-policy debt described below is not
+claimed repaired by this vocabulary migration. Documentation and diff gates
+pass. Both package EXEs are rebuilt. T55 remains open for owner review.
+
+After removing unused new aliases, both widths were rebuilt and the full suites
+repeated: x64 41/41 in 42.47 seconds, x86 41/41 in 53.60 seconds; strict library
+3/3 repeated. The pre-existing Linux execution gaps are explicitly retained in
+[TODO](../states/TODO.md), not silently certified by these Windows results.
+
+P2 changed-path accounting (`git diff --numstat --no-renames 2f54899`, including
+the added scalar header): production C/H 32 paths, +1038/-684, net +354;
+tests 3 paths, +59/-9, net +50; static gate 1 path, +33/-0. Documentation,
+manifest and package binaries are excluded. Added declarations replace direct
+SDK usage, not parallel production execution. The original component workers,
+storage operations, Console broker and UI normalizer remain the sole owners.
+
 ## Objective
 
 Make `lib/types` the header-only shared vocabulary for C-runtime, SDK, POSIX,

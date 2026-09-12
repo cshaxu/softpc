@@ -1,3 +1,6 @@
+#include "lib/types/types_interface.h"
+#include "lib/types/win32/scalar.h"
+#include "lib/types/win32/sync.h"
 #include "lib/ui-console/console.h"
 
 #include "lib/ui-base/win32/input.h"
@@ -5,8 +8,8 @@
 #include "lib/types/win32/console.h"
 
 typedef struct ui_console_win32_state {
-    HANDLE worker;
-    COORD previous_mouse;
+    lib_win32_handle worker;
+    lib_win32_coord previous_mouse;
     int previous_mouse_valid;
 } ui_console_win32_state;
 
@@ -69,12 +72,12 @@ static void ui_console_receive_event(void *context,
             input.data.mouse.delta_x = (mouse->delta_x - state->previous_mouse.X) * 8;
             input.data.mouse.delta_y = (mouse->delta_y - state->previous_mouse.Y) * 16;
         }
-        state->previous_mouse.X = (SHORT)mouse->delta_x;
-        state->previous_mouse.Y = (SHORT)mouse->delta_y;
+        state->previous_mouse.X = (lib_win32_short)mouse->delta_x;
+        state->previous_mouse.Y = (lib_win32_short)mouse->delta_y;
         state->previous_mouse_valid = 1;
-        input.data.mouse.buttons = (mouse->buttons & FROM_LEFT_1ST_BUTTON_PRESSED) != 0u ?
+        input.data.mouse.buttons = (mouse->buttons & LIB_WIN32_FROM_LEFT_1ST_BUTTON_PRESSED) != 0u ?
             UI_MOUSE_BUTTON_LEFT : 0u;
-        if ((mouse->buttons & RIGHTMOST_BUTTON_PRESSED) != 0u)
+        if ((mouse->buttons & LIB_WIN32_RIGHTMOST_BUTTON_PRESSED) != 0u)
             input.data.mouse.buttons |= UI_MOUSE_BUTTON_RIGHT;
         (void)ui_console_emit(console, &input);
     }
@@ -101,7 +104,7 @@ static void ui_console_publish_text_frame(ui_console *console,
     (void)lib_console_write_text_frame(console->logical_console, &text_frame);
 }
 
-static DWORD WINAPI ui_console_worker(void *opaque)
+static lib_win32_dword LIB_WIN32_WINAPI ui_console_worker(void *opaque)
 {
     ui_console *console = (ui_console *)opaque;
     lib_u32 generation = 0u;
@@ -113,7 +116,7 @@ static DWORD WINAPI ui_console_worker(void *opaque)
         ui_mailbox_wake_wait_result wake;
 
         wake = ui_mailbox_wake_wait(
-            ui_component_mailboxes_wake(&console->base.mailboxes), UINT32_MAX);
+            ui_component_mailboxes_wake(&console->base.mailboxes), LIB_UINT32_MAX);
         if (wake != UI_MAILBOX_WAKE_WAIT_WAKE)
             break;
         while (ui_component_mailboxes_take_control(&console->base.mailboxes, &control)) {
@@ -143,8 +146,8 @@ lib_status ui_console_worker_start(ui_console *console)
     state = lib_allocate_zero(1u, sizeof(*state));
     if (state == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     console->worker_state = state;
-    state->worker = CreateThread(NULL, 0u, ui_console_worker, console, 0u, NULL);
-    if (state->worker == NULL) {
+    state->worker = lib_win32_create_thread(LIB_NULL, 0u, ui_console_worker, console, 0u, LIB_NULL);
+    if (state->worker == LIB_NULL) {
         console->worker_state = LIB_NULL;
         lib_release(state);
         return LIB_STATUS_NO_MEMORY;
@@ -154,8 +157,8 @@ lib_status ui_console_worker_start(ui_console *console)
         lib_atomic_i32_store_explicit(&console->base.stopping, 1,
             LIB_MEMORY_ORDER_RELEASE);
         ui_mailbox_wake_signal(ui_component_mailboxes_wake(&console->base.mailboxes));
-        (void)WaitForSingleObject(state->worker, INFINITE);
-        CloseHandle(state->worker);
+        (void)lib_win32_wait_for_single_object(state->worker, LIB_WIN32_INFINITE);
+        lib_win32_close_handle(state->worker);
         console->worker_state = LIB_NULL;
         lib_release(state);
         return LIB_STATUS_INVALID_STATE;
@@ -171,8 +174,8 @@ void ui_console_worker_join(ui_console *console)
             console->worker_state) == LIB_NULL) return;
     /* ui_component_destroy has queued STOP; wait for the Console worker to
      * consume it before detaching the event sink or releasing state. */
-    (void)WaitForSingleObject(state->worker, INFINITE);
-    CloseHandle(state->worker);
+    (void)lib_win32_wait_for_single_object(state->worker, LIB_WIN32_INFINITE);
+    lib_win32_close_handle(state->worker);
     console->worker_state = LIB_NULL;
     lib_release(state);
 }

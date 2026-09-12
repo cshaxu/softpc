@@ -3,6 +3,9 @@
 
 #include "lib/types/types_interface.h"
 
+/* Console-only status; the established numeric ABI is unchanged. */
+enum { LIB_STATUS_NOT_CURRENT = 6 };
+
 /* A logical Console is a copied-value endpoint.  It deliberately has no
  * native handle, process ownership, reader, or presentation policy.  Host is
  * the only component that binds one logical object to native Console I/O. */
@@ -28,6 +31,8 @@ enum {
 };
 
 typedef struct lib_console_raw_key {
+    /* Opaque platform key value, interpreted by the matching UI adapter.
+     * Windows producers use the SDK virtual-key vocabulary wrapped in types. */
     lib_u32 key;
     lib_u32 unicode;
     lib_u16 scan_code;
@@ -37,6 +42,9 @@ typedef struct lib_console_raw_key {
 } lib_console_raw_key;
 
 typedef struct lib_console_raw_mouse {
+    /* Raw Console cell position (historical field names), not UI motion.
+     * buttons is the platform input-record mask. The matching UI adapter
+     * computes motion and translates buttons before emitting a UI event. */
     lib_i32 delta_x;
     lib_i32 delta_y;
     lib_u32 buttons;

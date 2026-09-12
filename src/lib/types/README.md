@@ -29,6 +29,19 @@ SDK's common windows.h declaration source; repeated guarded SDK includes do
 not create implementations or independent types. The groups name usage, not
 a promise that windows.h hides unrelated SDK declarations.
 
+Consumers use the `lib_win32_*`, `lib_linux_*` and `lib_c_*` aliases rather
+than raw external identifiers. `win32/scalar.h` owns shared SDK scalar and
+handle aliases; purpose headers own the corresponding SDK operations and
+records. Aliases preserve the original calling convention, return value and
+error behavior. They do not add component semantics. The layout gate derives
+forbidden raw tokens from these declarations and checks every consumer.
+
+The number of consumers does not decide ownership: even a single-use original
+SDK definition belongs here. Conversely, Console statuses, UI modifier
+mapping, storage open policy and worker state belong to their components.
+`lib_text_length` has the same non-null precondition as `strlen`; nullable
+input is validated by its consumer, not silently reinterpreted here.
+
 `file.h` contains common C stream declarations. `win32/file.h` and
 `linux/file.h` add their platform declarations. File operations and ownership
 remain in storage. Counter validation/composition belongs to host; key-state

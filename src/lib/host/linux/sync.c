@@ -6,22 +6,22 @@
 #include "lib/types/linux/clock.h"
 
 struct host_sync_platform_event {
-    pthread_mutex_t lock;
-    pthread_cond_t changed;
+    lib_linux_pthread_mutex_t lock;
+    lib_linux_pthread_cond_t changed;
     lib_bool signaled;
     lib_bool manual_reset;
 };
-struct host_sync_platform_task { pthread_t thread; lib_bool joined; };
+struct host_sync_platform_task { lib_linux_pthread_t thread; lib_bool joined; };
 typedef struct host_sync_platform_start {
     host_sync_platform_task_entry entry;
     void *context;
 } host_sync_platform_start;
 
 static lib_bool host_sync_platform_deadline(lib_u32 milliseconds,
-    struct timespec *deadline)
+    lib_linux_timespec *deadline)
 {
-    if (clock_gettime(CLOCK_REALTIME, deadline) != 0) return LIB_FALSE;
-    deadline->tv_sec += (time_t)(milliseconds / 1000u);
+    if (lib_linux_clock_gettime(LIB_LINUX_CLOCK_REALTIME, deadline) != 0) return LIB_FALSE;
+    deadline->tv_sec += (lib_linux_time_t)(milliseconds / 1000u);
     deadline->tv_nsec += (long)(milliseconds % 1000u) * 1000000L;
     if (deadline->tv_nsec >= 1000000000L) {
         ++deadline->tv_sec; deadline->tv_nsec -= 1000000000L;
@@ -29,11 +29,11 @@ static lib_bool host_sync_platform_deadline(lib_u32 milliseconds,
     return LIB_TRUE;
 }
 
-static lib_bool host_sync_platform_expired(const struct timespec *deadline)
+static lib_bool host_sync_platform_expired(const lib_linux_timespec *deadline)
 {
-    struct timespec now;
+    lib_linux_timespec now;
 
-    if (clock_gettime(CLOCK_REALTIME, &now) != 0) return LIB_TRUE;
+    if (lib_linux_clock_gettime(LIB_LINUX_CLOCK_REALTIME, &now) != 0) return LIB_TRUE;
     return now.tv_sec > deadline->tv_sec ||
         (now.tv_sec == deadline->tv_sec && now.tv_nsec >= deadline->tv_nsec) ?
         LIB_TRUE : LIB_FALSE;
@@ -42,11 +42,11 @@ static lib_bool host_sync_platform_expired(const struct timespec *deadline)
 static lib_bool host_sync_platform_take(host_sync_platform_event *event)
 {
     lib_bool signaled;
-    (void)pthread_mutex_lock(&event->lock);
+    (void)lib_linux_pthread_mutex_lock(&event->lock);
     signaled = event->signaled;
     if (signaled != LIB_FALSE && event->manual_reset == LIB_FALSE)
         event->signaled = LIB_FALSE;
-    (void)pthread_mutex_unlock(&event->lock);
+    (void)lib_linux_pthread_mutex_unlock(&event->lock);
     return signaled;
 }
 
@@ -62,11 +62,11 @@ static void *host_sync_platform_main(void *opaque)
 
 void host_sync_platform_sleep_milliseconds(lib_u32 milliseconds)
 {
-    struct timespec duration = { (time_t)(milliseconds / 1000u),
+    lib_linux_timespec duration = { (lib_linux_time_t)(milliseconds / 1000u),
         (long)(milliseconds % 1000u) * 1000000L };
-    (void)nanosleep(&duration, LIB_NULL);
+    (void)lib_linux_nanosleep(&duration, LIB_NULL);
 }
-void host_sync_platform_yield(void) { (void)sched_yield(); }
+void host_sync_platform_yield(void) { (void)lib_linux_sched_yield(); }
 
 lib_status host_sync_platform_event_create(lib_bool manual_reset,
     host_sync_platform_event **out_event)
@@ -76,9 +76,9 @@ lib_status host_sync_platform_event_create(lib_bool manual_reset,
     *out_event = LIB_NULL;
     event = lib_allocate_zero(1u, sizeof(*event));
     if (event == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    if (pthread_mutex_init(&event->lock, LIB_NULL) != 0 ||
-        pthread_cond_init(&event->changed, LIB_NULL) != 0) {
-        (void)pthread_mutex_destroy(&event->lock); lib_release(event);
+    if (lib_linux_pthread_mutex_init(&event->lock, LIB_NULL) != 0 ||
+        lib_linux_pthread_cond_init(&event->changed, LIB_NULL) != 0) {
+        (void)lib_linux_pthread_mutex_destroy(&event->lock); lib_release(event);
         return LIB_STATUS_IO_ERROR;
     }
     event->manual_reset = manual_reset != LIB_FALSE;
@@ -88,21 +88,21 @@ lib_status host_sync_platform_event_create(lib_bool manual_reset,
 void host_sync_platform_event_destroy(host_sync_platform_event *event)
 {
     if (event == LIB_NULL) return;
-    (void)pthread_cond_destroy(&event->changed);
-    (void)pthread_mutex_destroy(&event->lock);
+    (void)lib_linux_pthread_cond_destroy(&event->changed);
+    (void)lib_linux_pthread_mutex_destroy(&event->lock);
     lib_release(event);
 }
 void host_sync_platform_event_signal(host_sync_platform_event *event)
 {
     if (event == LIB_NULL) return;
-    (void)pthread_mutex_lock(&event->lock); event->signaled = LIB_TRUE;
-    (void)pthread_cond_broadcast(&event->changed); (void)pthread_mutex_unlock(&event->lock);
+    (void)lib_linux_pthread_mutex_lock(&event->lock); event->signaled = LIB_TRUE;
+    (void)lib_linux_pthread_cond_broadcast(&event->changed); (void)lib_linux_pthread_mutex_unlock(&event->lock);
 }
 void host_sync_platform_event_reset(host_sync_platform_event *event)
 {
     if (event == LIB_NULL) return;
-    (void)pthread_mutex_lock(&event->lock); event->signaled = LIB_FALSE;
-    (void)pthread_mutex_unlock(&event->lock);
+    (void)lib_linux_pthread_mutex_lock(&event->lock); event->signaled = LIB_FALSE;
+    (void)lib_linux_pthread_mutex_unlock(&event->lock);
 }
 
 lib_status host_sync_platform_event_wait_many(
@@ -111,7 +111,7 @@ lib_status host_sync_platform_event_wait_many(
     lib_u32 *out_event_index)
 {
     lib_u32 index;
-    struct timespec deadline;
+    lib_linux_timespec deadline;
     if (events == LIB_NULL || event_count == 0u || out_signaled == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     *out_signaled = LIB_FALSE;
@@ -141,12 +141,12 @@ lib_status host_sync_platform_task_create(host_sync_platform_task_entry entry,
     task = lib_allocate_zero(1u, sizeof(*task)); start = lib_allocate_zero(1u, sizeof(*start));
     if (task == LIB_NULL || start == LIB_NULL) { lib_release(start); lib_release(task); return LIB_STATUS_NO_MEMORY; }
     start->entry = entry; start->context = context;
-    if (pthread_create(&task->thread, LIB_NULL, host_sync_platform_main, start) != 0) {
+    if (lib_linux_pthread_create(&task->thread, LIB_NULL, host_sync_platform_main, start) != 0) {
         lib_release(start); lib_release(task); return LIB_STATUS_IO_ERROR;
     }
     *out_task = task; return LIB_STATUS_OK;
 }
 void host_sync_platform_task_join(host_sync_platform_task *task)
-{ if (task != LIB_NULL && task->joined == LIB_FALSE) { (void)pthread_join(task->thread, LIB_NULL); task->joined = LIB_TRUE; } }
+{ if (task != LIB_NULL && task->joined == LIB_FALSE) { (void)lib_linux_pthread_join(task->thread, LIB_NULL); task->joined = LIB_TRUE; } }
 void host_sync_platform_task_destroy(host_sync_platform_task *task)
 { if (task != LIB_NULL) { host_sync_platform_task_join(task); lib_release(task); } }
