@@ -2,9 +2,14 @@
 
 #include <fcntl.h>
 #include <io.h>
+#include <stdio.h>
 #include <windows.h>
 
-#include "lib/types/file_private.h"
+#include "lib/types/file.h"
+
+struct lib_native_file {
+    FILE *stream;
+};
 
 static lib_status lib_native_file_open_writer(const char *path,
     const char *mode, lib_native_file **out_file)

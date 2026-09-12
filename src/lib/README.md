@@ -9,13 +9,14 @@ or changed library file.
 ## Header visibility
 
 Headers named `*_interface.h` are the complete public library ABI. Every
-other library header is implementation-private, including native-platform
-adapters. Private headers use short component-local names and live directly in
-their owning directory; no `internal/` directory exists. Only the owning
-component and an explicitly permitted dependent may include a private header:
+other library header is a component implementation header, including
+native-platform adapters. Implementation headers use short component-local
+names and live directly in their owning directory; no filename carries a
+`_private` or `_internal` suffix. Only the owning component and an explicitly
+permitted dependent may include an implementation header:
 `ui-window` and `ui-console` may consume `ui-base` mailbox and component
 implementation contracts. Application/product code may include only
-`*_interface.h`; an interface header never includes a private header.
+`*_interface.h`; an interface header never includes an implementation header.
 
 ## Component graph
 

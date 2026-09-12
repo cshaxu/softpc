@@ -12,6 +12,17 @@ foreach(host_entry IN LISTS host_entries)
     endif()
 endforeach()
 
+# Implementation headers are private by default. Their filenames carry their
+# local role; only public contracts use the *_interface.h suffix.
+file(GLOB_RECURSE shared_library_paths RELATIVE "${SOFTPC_SOURCE_DIR}/src/lib"
+    "${SOFTPC_SOURCE_DIR}/src/lib/*")
+foreach(shared_library_path IN LISTS shared_library_paths)
+    if(shared_library_path MATCHES "(_private|_internal)\\.(c|h)$")
+        message(FATAL_ERROR
+            "Shared library implementation has a redundant private/internal suffix: ${shared_library_path}")
+    endif()
+endforeach()
+
 set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/host/compat/ccpu/facade.c"
     "${SOFTPC_SOURCE_DIR}/src/host/compat/cvidc/gdp_state.c"
