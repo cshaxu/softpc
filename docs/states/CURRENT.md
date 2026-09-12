@@ -2,7 +2,29 @@
 
 ## Current Work
 
-No implementation subtask is active.
+M9 T55 S1 is active: import the current NXVM shared library exactly and make
+the narrow non-MVDM SoftPC writer adaptation required by its new contract.
+
+## M9 T55 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner approved a new task to import the original latest NXVM library, with SoftPC-side adaptation only where required for recovery. |
+| Objective | Replace `src/lib/` with NXVM `64d211c9` exactly, adapt the non-MVDM prompt trace to the explicit byte-writer API, and recover fixed x86/x64 packages. |
+| Non-goals | No `src/mvdm/softpc.new/`, guest-media, `softpc.ini`, NXVM-repository, product-lifecycle, UI, or mass C-runtime-call refactor. |
+| Reference Baseline | SoftPC `9f563db`; read-only NXVM `64d211c9` `src/lib/`. |
+| Candidate Proposal | [M9 T55 Exact NXVM Library Refresh](../proposals/m9-t55-nxvm-lib-refresh.md) |
+| Files And ABI Surface | Entire imported `src/lib/` corpus and manifest; `src/app/prompt_trace.c`; focused storage/trace proof and CMake registration only if required; refreshed `softpc32.exe`/`softpc64.exe`. The writer API changes from text to `{bytes, byte_count}`. |
+| Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout, and UI authorities. |
+| Verification | Compare complete relative-path SHA-256 inventories to frozen NXVM; verify manifest; build and full CTest x64/x86; package smoke; diff and governance gates. |
+| Expected Markers | Zero SoftPC-only files or byte differences below `src/lib/`; two length-bearing prompt-trace writes; explicit trace line endings; both package EXEs refreshed while `softpc.ini` and media remain untouched. |
+| Asset Needs | Refresh only agent-owned `assets/binary/softpc32.exe` and `softpc64.exe`; preserve user-owned INI and all media. |
+| Reporting Requirements | Report imported corpus revision, exact app adaptation paths, SHA-256 equality evidence, dual-width results, changed-path accounting, commits, and package links. |
+| Stop Conditions | Stop for any required MVDM, media, INI, NXVM-source, product-semantic, or non-writer SoftPC change; stop and re-audit if NXVM `src/lib/` moves from the frozen revision. |
+| Exit Criteria | Exact corpus equality, prompt trace compiles under the byte writer without behavior drift, required tests/gates pass at both widths, packages are refreshed, and a separate T-level closure audit is pushed. |
+| Original Owner Request | “好的，准入一个T任务，用于原版导入最新nxvm的lib”. |
+| Similar-Issue Sweep | Search every SoftPC production caller of `lib_storage_file_writer_write`; inspect all `src/lib/` relative paths and hashes, with each mismatch either imported exactly or rejected under the stop condition. |
 
 ## Current Technical Baseline
 
