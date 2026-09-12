@@ -1,12 +1,38 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include "lib/types/types_interface.h"
-#include "lib/host/sync_interface.h"
 
 #include <errno.h>
 #include <pthread.h>
 #include <sched.h>
 #include <time.h>
+
+/* The implementation predates the types boundary.  Keep its algorithm while
+ * compiling every exported and private synchronization symbol as lib_sync.
+ * No host type or platform ABI crosses this adapter boundary. */
+#define host_sync_event lib_sync_event
+#define host_sync_task lib_sync_task
+#define host_sync_wait_result lib_sync_wait_result
+#define host_sync_task_entry lib_sync_task_entry
+#define HOST_SYNC_WAIT_SIGNALED LIB_SYNC_WAIT_SIGNALED
+#define HOST_SYNC_WAIT_CANCELLED LIB_SYNC_WAIT_CANCELLED
+#define HOST_SYNC_WAIT_TIMED_OUT LIB_SYNC_WAIT_TIMED_OUT
+#define HOST_SYNC_WAIT_INVALID_ARGUMENT LIB_SYNC_WAIT_INVALID_ARGUMENT
+#define HOST_SYNC_WAIT_FAULT LIB_SYNC_WAIT_FAULT
+#define host_sync_sleep_milliseconds lib_sync_sleep_milliseconds
+#define host_sync_yield lib_sync_yield
+#define host_sync_event_create lib_sync_event_create
+#define host_sync_event_destroy lib_sync_event_destroy
+#define host_sync_event_signal lib_sync_event_signal
+#define host_sync_event_reset lib_sync_event_reset
+#define host_sync_event_wait lib_sync_event_wait
+#define host_sync_wait_any lib_sync_wait_any
+#define host_sync_task_create lib_sync_task_create
+#define host_sync_task_request_cancel lib_sync_task_request_cancel
+#define host_sync_task_cancelled lib_sync_task_cancelled
+#define host_sync_task_wait_cancel lib_sync_task_wait_cancel
+#define host_sync_task_join lib_sync_task_join
+#define host_sync_task_destroy lib_sync_task_destroy
 
 struct host_sync_event {
     pthread_mutex_t mutex;

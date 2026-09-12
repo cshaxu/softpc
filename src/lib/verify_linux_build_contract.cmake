@@ -10,9 +10,9 @@ endif()
 
 string(FIND "${library_cmake}" "find_package(Threads REQUIRED)" threads_find)
 string(FIND "${library_cmake}"
-    "target_link_libraries(host PUBLIC Threads::Threads)" host_sync_threads)
-if(threads_find EQUAL -1 OR host_sync_threads EQUAL -1)
-    message(FATAL_ERROR "Linux host must retain its explicit Threads linkage")
+    "target_link_libraries(types PUBLIC Threads::Threads)" types_sync_threads)
+if(threads_find EQUAL -1 OR types_sync_threads EQUAL -1)
+    message(FATAL_ERROR "Linux types must retain its explicit Threads linkage")
 endif()
 
 message(STATUS "Linux shared-library build contract verified")

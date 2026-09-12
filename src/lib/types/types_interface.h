@@ -16,6 +16,8 @@ typedef int lib_bool;
 typedef va_list lib_format_arguments;
 
 typedef struct lib_file lib_file;
+typedef struct lib_sync_event lib_sync_event;
+typedef struct lib_sync_task lib_sync_task;
 
 typedef enum lib_file_access {
     LIB_FILE_ACCESS_READONLY,
@@ -28,6 +30,17 @@ typedef enum lib_file_write_mode {
 } lib_file_write_mode;
 
 typedef int lib_status;
+
+typedef enum lib_sync_wait_result {
+    LIB_SYNC_WAIT_SIGNALED,
+    LIB_SYNC_WAIT_CANCELLED,
+    LIB_SYNC_WAIT_TIMED_OUT,
+    LIB_SYNC_WAIT_INVALID_ARGUMENT,
+    LIB_SYNC_WAIT_FAULT
+} lib_sync_wait_result;
+
+typedef void (*lib_sync_task_entry)(void *context,
+    const lib_sync_task *task);
 
 enum {
     LIB_STATUS_OK = 0,
@@ -71,6 +84,28 @@ void lib_release(void *memory);
 /* Host monotonic time as a copied counter and its copied frequency. */
 lib_status lib_monotonic_counter(lib_u64 *out_units,
     lib_u64 *out_units_per_second);
+
+/* Neutral synchronization primitives. Platform handles and thread ABI remain
+ * private to the selected types platform adapter. */
+void lib_sync_sleep_milliseconds(lib_u32 milliseconds);
+void lib_sync_yield(void);
+lib_status lib_sync_event_create(lib_sync_event **out_event);
+void lib_sync_event_destroy(lib_sync_event *event);
+void lib_sync_event_signal(lib_sync_event *event);
+void lib_sync_event_reset(lib_sync_event *event);
+lib_sync_wait_result lib_sync_event_wait(lib_sync_event *event,
+    lib_u32 timeout_milliseconds);
+lib_sync_wait_result lib_sync_wait_any(lib_sync_event *const *events,
+    lib_u32 event_count, const lib_sync_task *cancel_task,
+    lib_u32 timeout_milliseconds, lib_u32 *out_event_index);
+lib_status lib_sync_task_create(lib_sync_task_entry entry, void *context,
+    lib_sync_task **out_task);
+void lib_sync_task_request_cancel(lib_sync_task *task);
+int lib_sync_task_cancelled(const lib_sync_task *task);
+lib_sync_wait_result lib_sync_task_wait_cancel(const lib_sync_task *task,
+    lib_u32 timeout_milliseconds);
+void lib_sync_task_join(lib_sync_task *task);
+void lib_sync_task_destroy(lib_sync_task *task);
 
 /* Neutral byte-stream primitive.  Native descriptors and C FILE objects stay
  * entirely within types. */
