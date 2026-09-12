@@ -19,6 +19,51 @@ typedef struct lib_file lib_file;
 typedef struct lib_sync_event lib_sync_event;
 typedef struct lib_sync_task lib_sync_task;
 
+#define LIB_NATIVE_CONSOLE_LINE_MAX 1024u
+
+typedef enum lib_native_console_event_kind {
+    LIB_NATIVE_CONSOLE_EVENT_RAW_KEY,
+    LIB_NATIVE_CONSOLE_EVENT_RAW_MOUSE,
+    LIB_NATIVE_CONSOLE_EVENT_COOKED_LINE,
+    LIB_NATIVE_CONSOLE_EVENT_REJECTED_LINE
+} lib_native_console_event_kind;
+
+enum {
+    LIB_NATIVE_CONSOLE_MODIFIER_CONTROL = 0x01u,
+    LIB_NATIVE_CONSOLE_MODIFIER_ALT = 0x02u,
+    LIB_NATIVE_CONSOLE_MODIFIER_SHIFT = 0x04u
+};
+
+typedef struct lib_native_console_raw_key {
+    lib_u32 key;
+    lib_u32 unicode;
+    lib_u16 scan_code;
+    lib_u8 modifiers;
+    lib_bool extended;
+    lib_bool pressed;
+} lib_native_console_raw_key;
+
+typedef struct lib_native_console_raw_mouse {
+    lib_i32 delta_x;
+    lib_i32 delta_y;
+    lib_u32 buttons;
+} lib_native_console_raw_mouse;
+
+typedef struct lib_native_console_line {
+    lib_u32 length;
+    char text[LIB_NATIVE_CONSOLE_LINE_MAX];
+} lib_native_console_line;
+
+typedef struct lib_native_console_event {
+    lib_native_console_event_kind kind;
+    lib_u32 binding_generation;
+    union {
+        lib_native_console_raw_key raw_key;
+        lib_native_console_raw_mouse raw_mouse;
+        lib_native_console_line line;
+    } value;
+} lib_native_console_event;
+
 typedef enum lib_file_access {
     LIB_FILE_ACCESS_READONLY,
     LIB_FILE_ACCESS_READWRITE
@@ -106,6 +151,14 @@ lib_sync_wait_result lib_sync_task_wait_cancel(const lib_sync_task *task,
     lib_u32 timeout_milliseconds);
 void lib_sync_task_join(lib_sync_task *task);
 void lib_sync_task_destroy(lib_sync_task *task);
+
+/* Current generic modifier state for a native input dispatch. */
+enum {
+    LIB_NATIVE_INPUT_MODIFIER_CONTROL = 0x01u,
+    LIB_NATIVE_INPUT_MODIFIER_ALT = 0x02u,
+    LIB_NATIVE_INPUT_MODIFIER_SHIFT = 0x04u
+};
+lib_u8 lib_native_input_current_modifiers(void);
 
 /* Neutral byte-stream primitive.  Native descriptors and C FILE objects stay
  * entirely within types. */

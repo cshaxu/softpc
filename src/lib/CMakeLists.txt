@@ -30,10 +30,10 @@ endfunction()
 set(LIBRARY_TYPES_SOURCES types/runtime.c types/file.c)
 if(WIN32)
     list(APPEND LIBRARY_TYPES_SOURCES types/win32/clock.c types/win32/file.c
-        types/win32/sync.c)
+        types/win32/sync.c types/win32/input_state.c)
 else()
     list(APPEND LIBRARY_TYPES_SOURCES types/linux/clock.c types/linux/file.c
-        types/linux/sync.c)
+        types/linux/sync.c types/linux/input_state.c)
 endif()
 add_library(types STATIC ${LIBRARY_TYPES_SOURCES})
 library_root(types)
@@ -46,12 +46,12 @@ set(LIBRARY_UI_BASE_SOURCES
     ui-base/component.c
     ui-base/hotkey.c
     ui-base/mailbox.c
+    ui-base/actions.c
     ui-base/linux/input.c)
 if(WIN32)
     list(APPEND LIBRARY_UI_BASE_SOURCES
         ui-base/win32/mailbox.c
         ui-base/win32/color.c
-        ui-base/win32/actions.c
         ui-base/win32/input.c)
 else()
     list(APPEND LIBRARY_UI_BASE_SOURCES ui-base/linux/mailbox.c)
