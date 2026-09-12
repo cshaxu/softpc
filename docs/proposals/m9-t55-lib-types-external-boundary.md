@@ -65,9 +65,9 @@ are removed, with every production caller migrated in this P.
 
 Fresh full tests: x64 46/46 (53.10 s), x86 46/46 (69.26 s), including package
 smoke. A subsequent test-only atomic cleanup of the broker probe passed again
-at both widths. Strict C17 `-Wall -Wextra -Wpedantic -Werror` library build and
+at both widths. Strict C11 `-Wall -Wextra -Wpedantic -Werror` library build and
 3/3 standalone checks pass; all 18 public/support interface headers independently
-compile. Manifest and documentation gates pass. Linux input/host contract fakes
+compile as strict C17. Manifest and documentation gates pass. Linux input/host contract fakes
 are not evidence of Linux desktop execution; manual package acceptance is pending.
 
 During verification, strict compilation caught a neutral key narrowed to u16
@@ -88,6 +88,17 @@ EXEs: library C/H 30 paths +465/-438 (net +27); app 11 paths +43/-27 (net +16);
 tests 14 paths +470/-49 (net +421); build/gates five paths +94/-14 (net +80).
 No MVDM, media or user INI changes. The two package EXEs are refreshed.
 S3 awaits owner inspection; this delivery does not close T55.
+
+### P6 post-push review
+
+Reviewer inspected the actual `3a71b50..996e4c6` changed paths and critical
+worker, broker, input, mailbox and app failure diffs against the twelve-item
+ledger, then checked the verification evidence and protected-path diff.
+No unresolved delivery blocker was found. The generated standalone flags are
+C11 with all four strict warning switches; the independent header probe used
+C17. This evidence correction changes documentation only. Both package EXEs
+belong to P5, and no MVDM/media/INI path changed. Owner acceptance remains
+pending; neither S3 nor T55 is closed by this review.
 
 ## S3 P4 admission: component-private platform directories
 
