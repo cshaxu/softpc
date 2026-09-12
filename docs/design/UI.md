@@ -121,7 +121,7 @@ chords and identifier strings. `ui-base` provides only generic source-local
 matching. A matched chord is discarded as normal input and produces one copied
 `ui_HOTKEY(identifier)` event at SoftPC's queue entry; lib does not interpret
 the identifier. Unmatched input is emitted as ordinary copied key/text/mouse
-events in its original order. Matcher state is per component instance: keys
+events in keyboard order; mouse/close events do not wait behind keyboard prefixes. Matcher state is per component instance: keys
 from Window and VM Console never combine into one chord.
 
 The matcher withholds only a possible registered-chord prefix until it can

@@ -37,7 +37,10 @@ static int ui_hotkey_flush_pending(ui_hotkey_matcher *matcher,
 {
     lib_u32 index;
     for (index = 0u; index < matcher->pending_count; ++index) {
-        if (sink == LIB_NULL || !sink(context, &matcher->pending[index])) return 0;
+        if (sink == LIB_NULL || !sink(context, &matcher->pending[index])) {
+            matcher->pending_count = 0u;
+            return 0;
+        }
     }
     matcher->pending_count = 0u;
     return 1;
@@ -123,7 +126,8 @@ int ui_hotkey_matcher_submit(ui_hotkey_matcher *matcher,
 
     if (matcher == LIB_NULL || event == LIB_NULL || sink == LIB_NULL) return 0;
     if (event->type != UI_EVENT_KEY) {
-        return ui_hotkey_flush_pending(matcher, sink, context) && sink(context, event);
+        return (event->type != UI_EVENT_TEXT ||
+            ui_hotkey_flush_pending(matcher, sink, context)) && sink(context, event);
     }
     if (event->data.key.pressed == 0u && ui_hotkey_is_suppressed(matcher,
             event)) {

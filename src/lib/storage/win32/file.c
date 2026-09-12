@@ -8,11 +8,10 @@
 #include "lib/storage/file.h"
 
 static lib_status storage_file_platform_open(const char *path, lib_bool readwrite,
-    storage_file_platform **out_file)
+    lib_storage_file *file)
 {
     lib_win32_handle handle;
     int descriptor;
-    storage_file_platform *file;
     lib_win32_dword access_flags = readwrite != LIB_FALSE ?
         LIB_WIN32_GENERIC_READ | LIB_WIN32_GENERIC_WRITE : LIB_WIN32_GENERIC_READ;
     lib_win32_dword share = readwrite != LIB_FALSE ? 0u : LIB_WIN32_FILE_SHARE_READ;
@@ -26,34 +25,27 @@ static lib_status storage_file_platform_open(const char *path, lib_bool readwrit
         (void)lib_win32_close_handle(handle);
         return LIB_STATUS_IO_ERROR;
     }
-    file = lib_allocate_zero(1u, sizeof(*file));
-    if (file == LIB_NULL) {
-        (void)lib_win32_close(descriptor);
-        return LIB_STATUS_NO_MEMORY;
-    }
     file->stream = lib_win32_fdopen(descriptor,
         readwrite != LIB_FALSE ? "rb+" : "rb");
     if (file->stream == LIB_NULL) {
         (void)lib_win32_close(descriptor);
-        lib_release(file);
         return LIB_STATUS_IO_ERROR;
     }
-    *out_file = file;
     return LIB_STATUS_OK;
 }
 
 lib_status storage_file_platform_open_readonly(const char *path,
-    storage_file_platform **out_file)
-{ return storage_file_platform_open(path, LIB_FALSE, out_file); }
+    lib_storage_file *file)
+{ return storage_file_platform_open(path, LIB_FALSE, file); }
 
 lib_status storage_file_platform_open_readwrite(const char *path,
-    storage_file_platform **out_file)
-{ return storage_file_platform_open(path, LIB_TRUE, out_file); }
+    lib_storage_file *file)
+{ return storage_file_platform_open(path, LIB_TRUE, file); }
 
-lib_status storage_file_platform_seek_absolute(storage_file_platform *file, lib_i64 offset)
+lib_status storage_file_platform_seek_absolute(lib_storage_file *file, lib_i64 offset)
 { return lib_win32_fseeki64(file->stream, offset, LIB_SEEK_SET) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR; }
 
-lib_status storage_file_platform_byte_count(storage_file_platform *file, lib_i64 *out_byte_count)
+lib_status storage_file_platform_byte_count(lib_storage_file *file, lib_i64 *out_byte_count)
 {
     lib_i64 offset = lib_win32_ftelli64(file->stream);
     lib_i64 length;

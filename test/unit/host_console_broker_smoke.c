@@ -13,6 +13,9 @@ struct host_console_backend {
     lib_console *active;
     host_console_mode mode;
     lib_u32 generation;
+#ifdef _WIN32
+    CRITICAL_SECTION transaction;
+#endif
 };
 
 static int host_console_fail_next_activation;
@@ -30,12 +33,21 @@ lib_status host_console_backend_create(host_console_backend **out_native)
 {
     static host_console_backend native_console;
     native_console.active = LIB_NULL;
+#ifdef _WIN32
+    InitializeCriticalSection(&native_console.transaction);
+#endif
     *out_native = &native_console;
     return LIB_STATUS_OK;
 }
 
 void host_console_backend_destroy(host_console_backend *native_console)
-{ (void)native_console; }
+{
+#ifdef _WIN32
+    DeleteCriticalSection(&native_console->transaction);
+#else
+    (void)native_console;
+#endif
+}
 
 lib_status host_console_backend_prepare(host_console_backend *native_console,
     lib_console *console, host_console_mode mode)
@@ -163,23 +175,23 @@ static lib_status tracked_output_sink(lib_console *console,
     }
     return lib_console_set_output_sink(console, sink, context);
 }
-static int tracked_try_lock(lib_atomic_flag *lock, lib_memory_order order)
+void host_console_backend_lock_transaction(host_console_backend *backend)
 {
-    int busy = lib_atomic_flag_test_and_set_explicit(lock, order);
     if (GetCurrentThreadId() == (DWORD)InterlockedCompareExchange(&challenger, 0, 0)) {
-        InterlockedExchange(&observed_busy, busy);
+        int entered = TryEnterCriticalSection(&backend->transaction);
+        InterlockedExchange(&observed_busy, !entered);
         SetEvent(replacement_attempted);
+        if (entered) return;
     }
-    return busy;
+    EnterCriticalSection(&backend->transaction);
 }
-#undef lib_atomic_flag_test_and_set_explicit
-#define lib_atomic_flag_test_and_set_explicit tracked_try_lock
+void host_console_backend_unlock_transaction(host_console_backend *backend)
+{ LeaveCriticalSection(&backend->transaction); }
 #define lib_console_set_output_sink tracked_output_sink
 #endif
 #include "lib/host/console.c"
 #ifdef _WIN32
 #undef lib_console_set_output_sink
-#undef lib_atomic_flag_test_and_set_explicit
 static DWORD WINAPI reverse_replace(void *opaque)
 {
     InterlockedExchange(&challenger, (LONG)GetCurrentThreadId());

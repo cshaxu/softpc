@@ -27,21 +27,23 @@ typedef struct ui_component_control {
 
 /* Each UI leaf owns exactly one of these. It contains two independent
  * mailboxes: a latest-wins copied frame and a FIFO control queue. The native
- * wake object is merely their shared wait primitive, never a third mailbox. */
+ * wake object is merely their shared wait primitive, never a third mailbox.
+ * One short lock serializes frame/control admission with terminal closure;
+ * it never covers I/O or callbacks. */
 typedef struct ui_component_mailboxes {
-    lib_atomic_flag frame_lock;
-    lib_atomic_flag control_lock;
+    lib_atomic_flag lock;
     ui_frame frame;
     lib_u32 frame_generation;
     lib_bool frame_pending;
     ui_component_control controls[UI_COMPONENT_CONTROL_STORAGE_CAPACITY];
     lib_u32 control_head;
     lib_u32 control_count;
-    lib_bool stop_queued;
+    lib_bool closed;
     ui_mailbox_wake *wake;
 } ui_component_mailboxes;
 
 lib_status ui_component_mailboxes_create(ui_component_mailboxes *mailboxes);
+void ui_component_mailboxes_close(ui_component_mailboxes *mailboxes);
 void ui_component_mailboxes_destroy(ui_component_mailboxes *mailboxes);
 lib_status ui_component_mailboxes_publish_frame(ui_component_mailboxes *mailboxes,
     const ui_frame *frame);

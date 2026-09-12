@@ -43,7 +43,7 @@ if(EXISTS "${LIBRARY_ROOT}/CMakeLists.txt")
                 library_check_edge("${owner}" "${dependency}")
             elseif((dependency STREQUAL "user32" AND owner MATCHES "^(host|ui-base|ui-window)$") OR
                    (dependency STREQUAL "gdi32" AND owner STREQUAL "ui-window") OR
-                   (dependency STREQUAL "threads::threads" AND owner MATCHES "^(host|ui-base)$"))
+                   (dependency STREQUAL "threads::threads" AND owner MATCHES "^(console|host|ui-base)$"))
                 continue()
             else()
                 message(FATAL_ERROR "Unadmitted link: ${owner} -> ${dependency}")

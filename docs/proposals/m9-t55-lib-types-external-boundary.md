@@ -1,5 +1,83 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S4 admission: single input and lifetime paths
+
+Owner: “按照这些准入新的S任务修复以上7条反馈意见。” Baseline
+`5ea133c`. This admits S4, not T55 closure. Freeze these seven dispositions:
+
+| Item | Sole owner / implementation | Proof |
+| --- | --- | --- |
+| 1 | Window uses its existing final normalized delivery filter for every event; remove duplicate sink filtering, retain local capture/blink guards. | Frozen Ctrl then X sends only close; hotkeys still work. |
+| 2 | ui-base matcher changes keyboard prefixes only for key/text sequence; mouse/X pass without flushing. Keyboard order is retained, keyboard/mouse interleaving is not buffered. | Ctrl/mouse/Alt/P complete suppression; mismatch/release replay. |
+| 3 | Partial sink failure clears pending state, closes input/admission, wakes worker and uses its single retirement path; no retry. | Rejected second replay emits first make once, no later ordinary events, fault/retirement once. |
+| 4 | STOP and fault share mailbox admission closure; frame and ordinary control reject after closure, STOP idempotent. Accepted controls drain FIFO up to STOP. | Concurrent admission barrier, STOP ordering, failed worker rejection. |
+| 5 | console event/output gates and host broker transaction use component-private blocking locks. Keep lock order and quiescence; callbacks cannot reenter binding/destruction. | Real contenders block behind output/callback/replace barriers; native backend output critical section unchanged. |
+| 6 | Storage embeds stream state in the writer/file owner instead of separate pointer-only allocations. Public API and platform-specific open/lock/seek behavior remain. | Binary writer/read/medium tests, allocation/cleanup review. |
+| 7 | Add TODO at linear overlay page lookup; defer algorithm by owner decision. | Only comment changes in medium, matching deferred debt entry. |
+
+No new public lock API, dependency edge, app policy, mouse scale, MVDM/media/INI
+change. Same-shape blocking helpers live inside console/host platform owners;
+types supplies external declarations only. Full x64/x86, strict library,
+manifest, DAG and documentation checks precede complete P push. Review actual
+diff after push; deliver packages and leave T55 open.
+
+### S4 P1 executor verification
+
+All seven dispositions are implemented. The seventh is deliberately only an
+O(n) lookup TODO and its long-term ledger entry, not an algorithm change.
+The Window's old ordinary/lifecycle delivery wrappers are removed; the existing
+final normalized sink is the sole frozen event filter. Local capture and blink
+guards remain because they control native behavior rather than sink delivery.
+Source retirement remains the base worker's terminal event after quiescence.
+
+The matcher preserves keyboard ordering while mouse/close bypass pending-key
+replay. A rejected replay clears its pending state and fails the component;
+no later ordinary event can retry the partially delivered stream. Worker
+retirement reports the stored failure and attempts SOURCE_RETIRED once.
+STOP closes both mailbox admission paths under the same short lock without
+skipping controls accepted before STOP. Fault closure uses that same boundary.
+
+Console output and callback gates use private blocking mutexes; the host
+transaction lock uses its backend critical section. The short field/mailbox
+locks remain spin locks because they do not cover native I/O or callbacks.
+Lock scopes and replacement cleanup ordering are preserved. Callback reentry
+into binding/destruction remains forbidden. Linux logical Console mutexes use
+pthread; the unsupported Linux host Console backend stays explicitly unsupported.
+No Linux desktop execution is claimed.
+
+Storage writer now embeds the stream-bearing file; medium file owns one stream
+object. Separate file-platform and writer-file allocations are removed. Binary
+open modes, platform locking/seeking and public writer/file ABI are unchanged.
+
+Focused proof includes frozen Ctrl/close/release, mouse-interleaved CAP and all
+breaks, rejected second replay with no duplicate make, actual Window worker
+failure/retirement, FIFO controls before STOP, concurrent publish/STOP, and
+proven contending output/callback/replace threads held behind completion barriers.
+No Sleep-based scheduling assertion is used. Existing binary writer and media
+tests cover the flattened storage path.
+
+Fresh final tests: x64 48/48 (28.34 s), x86 48/48 (71.33 s), strict standalone
+library 3/3. Both package EXEs rebuilt. Strict library build uses C11 with
+`-Wall -Wextra -Wpedantic -Werror`; 18 public headers passed independent C17
+compile checks. Manifest, exact DAG, Linux build contract and documentation
+gates pass. An initial documentation test exposed missing S3 history; the
+truthful S3 handoff was added, then both complete suites were rerun.
+
+Accounting from `git diff --cached --numstat --no-renames` against `5ea133c`:
+22 production C/H paths +235/-173 (net +62); five test C paths +263/-13
+(net +250); four CMake/gate paths +9/-3 (net +6). Documentation, manifest and
+two EXEs are excluded from those code totals. No app, standalone host, MVDM,
+guest media, INI or Console mouse conversion changed. No owned temporary
+diagnostic directory remains; reusable build caches are retained.
+
+Similar-issue sweep used `rg` over Window `input_sink`/emit/accepting paths,
+matcher pending replay, component stopping/failure/retire and mailbox admission;
+Console event/output atomic gates and host transaction entry/exit; and storage
+allocate/release/open/close paths. Each hit belongs to the seven dispositions
+above: one final Window sink, one worker failure path, one admission boundary,
+three replaced long-held gates, and one stream owner. No extra repair is
+silently added. Overlay's only medium diff is its approved TODO.
+
 ## S3 P5 admission: correctness and boundary convergence
 
 Original owner requests: “以上。写入设计/任务文档，然后开始清理”,

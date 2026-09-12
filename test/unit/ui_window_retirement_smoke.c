@@ -5,7 +5,8 @@
 
 static HANDLE waiting, proceed;
 static HWND created;
-static int scenario, retired, failures;
+static int scenario, retired, failures, ordinary, closes;
+static void input_scenario(void);
 static HWND WINAPI create_window(DWORD ex, LPCSTR klass, LPCSTR title,
     DWORD style, int x, int y, int width, int height, HWND parent, HMENU menu,
     HINSTANCE instance, LPVOID param)
@@ -29,6 +30,7 @@ static ui_mailbox_wake_wait_result controlled_wait(const ui_mailbox_wake *wake,
     if (scenario == 1 || scenario == 6) return UI_MAILBOX_WAKE_WAIT_FAULT;
     if (scenario == 3) PostQuitMessage(0);
     if (scenario == 4) assert(DestroyWindow(created));
+    if (scenario >= 7) input_scenario();
     return UI_MAILBOX_WAKE_WAIT_WAKE;
 }
 #undef lib_win32_create_window_ex_a
@@ -47,9 +49,11 @@ static ui_mailbox_wake_wait_result controlled_wait(const ui_mailbox_wake *wake,
 static int input(void *context, const ui_input_event *event)
 {
     (void)context;
+    if (scenario == 7 && event->type == UI_EVENT_KEY) { ++ordinary; return 0; }
+    if (scenario == 8 && event->type == UI_EVENT_WINDOW_CLOSE) { ++closes; return 1; }
     assert(event->type == UI_EVENT_SOURCE_RETIRED);
     ++retired;
-    return scenario < 5;
+    return scenario < 5 || scenario >= 7;
 }
 static void failure(void *context, lib_u64 identity, lib_status status)
 {
@@ -57,19 +61,40 @@ static void failure(void *context, lib_u64 identity, lib_status status)
     assert(identity != 0u && status == LIB_STATUS_IO_ERROR);
     ++failures;
 }
+static void input_scenario(void)
+{
+    ui_win32_window_context *ctx = win32_window_context(created);
+    ui_input_event key = { .type = UI_EVENT_KEY };
+    key.data.key.pressed = 1; key.data.key.scan_code = 0x1d;
+    key.data.key.key = scenario == 7 ? 'A' : UI_KEY_CONTROL;
+    key.data.key.modifiers = UI_HOTKEY_MODIFIER_CONTROL;
+    if (scenario == 7) {
+        assert(!win32_window_emit_normalized(ctx, &key));
+        assert(!win32_window_emit_normalized(ctx, &key));
+    } else {
+        assert(win32_window_emit_normalized(ctx, &key));
+        SendMessageA(created, WM_CLOSE, 0, 0);
+        key.data.key.pressed = 0;
+        assert(win32_window_emit_normalized(ctx, &key));
+        assert(ui_component_request_stop(&ctx->component->base) == LIB_STATUS_OK);
+    }
+}
 int main(void)
 {
     static ui_frame frame;
-    for (scenario = 0; scenario != 7; ++scenario) {
+    for (scenario = 0; scenario != 9; ++scenario) {
         ui_window_options options = { 0 };
         ui_window *window = NULL;
         waiting = CreateEventA(NULL, TRUE, FALSE, NULL);
         proceed = CreateEventA(NULL, TRUE, FALSE, NULL);
         assert(waiting && proceed);
-        retired = failures = 0;
+        retired = failures = ordinary = closes = 0;
         options.component.input_sink = input;
         options.component.failure_sink = failure;
         options.initial_title = "retirement proof";
+        options.initial_frozen = scenario == 8;
+        assert(ui_hotkey_registry_register(&options.component.hotkeys, 'P',
+            UI_HOTKEY_MODIFIER_CONTROL | UI_HOTKEY_MODIFIER_ALT, "toggle") == LIB_STATUS_OK);
         assert(ui_window_create(&window, &options) == LIB_STATUS_OK);
         assert(WaitForSingleObject(waiting, INFINITE) == WAIT_OBJECT_0);
         frame.valid = 1u; frame.text_columns = 80u; frame.text_rows = 25u;
@@ -80,8 +105,10 @@ int main(void)
         /* Wait for the actual worker before destroy queues an additional STOP. */
         ui_window_win32_state *state = window->worker_state;
         assert(WaitForSingleObject(state->worker, 5000u) == WAIT_OBJECT_0);
-        assert(retired == 1 && failures == (scenario != 0));
+        assert(retired == 1 && failures == (scenario != 0 && scenario != 8));
         assert(!IsWindow(created));
+        assert(ordinary == (scenario == 7) && closes == (scenario == 8));
+        assert(ui_window_publish_frame(window, &frame) == LIB_STATUS_INVALID_STATE);
         ui_window_destroy(window);
         assert(retired == 1);
         CloseHandle(waiting); CloseHandle(proceed);

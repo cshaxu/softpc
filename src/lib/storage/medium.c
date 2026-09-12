@@ -116,6 +116,8 @@ static lib_status lib_storage_medium_range(const lib_storage_medium *medium,
 static lib_storage_medium_page *lib_storage_medium_find_page(
     const lib_storage_medium *medium, lib_size index)
 {
+    /* TODO: replace O(n) page lookup with a measured page index when large
+     * dirty-page workloads justify it. */
     lib_storage_medium_page *page = medium->pages;
     while (page != LIB_NULL && page->index != index) page = page->next;
     return page;

@@ -75,20 +75,6 @@ static int win32_window_accepting_content_input(
         context->frozen == LIB_FALSE;
 }
 
-static int win32_window_emit(ui_win32_window_context *context,
-    const ui_input_event *event)
-{
-    return !win32_window_accepting_content_input(context) ? 0 :
-        ui_component_emit(&context->component->base, event);
-}
-
-static int win32_window_emit_lifecycle(ui_win32_window_context *context,
-    const ui_input_event *event)
-{
-    return !win32_window_accepting_input(context) ? 0 :
-        ui_component_emit(&context->component->base, event);
-}
-
 /* ui-base has already attributed and matched this event.  Frozen Window
  * consumes ordinary matcher output, including mismatch replay, but continues
  * to forward the copied registered-hotkey event to the application sink. */
@@ -98,7 +84,9 @@ static int win32_window_deliver_normalized(void *opaque,
     ui_win32_window_context *context = (ui_win32_window_context *)opaque;
 
     if (!win32_window_accepting_input(context) || event == LIB_NULL) return 0;
-    if (context->frozen != LIB_FALSE && event->type != UI_EVENT_HOTKEY) return 1;
+    if (context->frozen != LIB_FALSE &&
+        (event->type == UI_EVENT_KEY || event->type == UI_EVENT_TEXT ||
+         event->type == UI_EVENT_MOUSE)) return 1;
     return context->component->base.input_sink(
         context->component->base.input_context, event);
 }
@@ -459,13 +447,12 @@ static void win32_window_emit_mouse(ui_win32_window_context *context,
 {
     ui_input_event event = { 0 };
 
-    if (!win32_window_accepting_content_input(context)) return;
     event.type = UI_EVENT_MOUSE;
     event.data.mouse.delta_x = dx;
     event.data.mouse.delta_y = dy;
     event.data.mouse.relative = 1u;
     event.data.mouse.buttons = buttons;
-    (void)win32_window_emit(context, &event);
+    (void)win32_window_emit_normalized(context, &event);
 }
 
 static void win32_window_flush_mouse(ui_win32_window_context *context)
@@ -668,7 +655,7 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
             win32_window_transition(context, wparam, lparam, 1);
         return 0;
     case LIB_WIN32_WM_CHAR:
-        if (win32_window_accepting_content_input(context) &&
+        if (win32_window_accepting_input(context) &&
             ((lib_u32)lparam >> 16u & 0xffu) == 0u &&
             !ui_keyboard_consume_duplicate_character(&context->keyboard_normalizer,
                 (lib_win32_word)wparam))
@@ -733,7 +720,7 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
         { ui_input_event close_event = { 0 };
         win32_window_release_mouse(context);
         close_event.type = UI_EVENT_WINDOW_CLOSE;
-        (void)win32_window_emit_lifecycle(context, &close_event); }
+        (void)win32_window_emit_normalized(context, &close_event); }
         return 0;
     case LIB_WIN32_WM_DESTROY:
         win32_window_release_mouse(context);

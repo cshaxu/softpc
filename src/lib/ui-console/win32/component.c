@@ -11,7 +11,6 @@ typedef struct ui_console_win32_state {
     lib_win32_handle worker;
     lib_win32_coord previous_mouse;
     int previous_mouse_valid;
-    lib_atomic_i32 io_failure;
 } ui_console_win32_state;
 
 static int ui_console_emit(ui_console *console, const ui_input_event *event)
@@ -49,11 +48,7 @@ static void ui_console_receive_event(void *context,
         (state = (ui_console_win32_state *)console->worker_state) == LIB_NULL)
         return;
     if (event->kind == LIB_CONSOLE_EVENT_IO_FAILURE) {
-        lib_atomic_i32_store_explicit(&state->io_failure, LIB_STATUS_IO_ERROR,
-            LIB_MEMORY_ORDER_RELEASE);
-        lib_atomic_i32_store_explicit(&console->base.stopping, 1,
-            LIB_MEMORY_ORDER_RELEASE);
-        ui_mailbox_wake_signal(ui_component_mailboxes_wake(&console->base.mailboxes));
+        ui_component_fail(&console->base, LIB_STATUS_IO_ERROR);
     } else if (event->kind == LIB_CONSOLE_EVENT_RAW_KEY) {
         const lib_console_raw_key *key = &event->value.raw_key;
 
@@ -115,7 +110,6 @@ static lib_status ui_console_publish_text_frame(ui_console *console,
 static lib_win32_dword LIB_WIN32_WINAPI ui_console_worker(void *opaque)
 {
     ui_console *console = (ui_console *)opaque;
-    ui_console_win32_state *state = console->worker_state;
     lib_u32 generation = 0u;
 
     while (lib_atomic_i32_load_explicit(&console->base.stopping,
@@ -129,8 +123,7 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_console_worker(void *opaque)
         if (lib_atomic_i32_load_explicit(&console->base.stopping,
                 LIB_MEMORY_ORDER_ACQUIRE) != 0) break;
         if (wake != UI_MAILBOX_WAKE_WAIT_WAKE) {
-            lib_atomic_i32_store_explicit(&state->io_failure, LIB_STATUS_IO_ERROR,
-                LIB_MEMORY_ORDER_RELEASE);
+            ui_component_fail(&console->base, LIB_STATUS_IO_ERROR);
             break;
         }
         while (ui_component_mailboxes_take_control(&console->base.mailboxes, &control)) {
@@ -144,8 +137,7 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_console_worker(void *opaque)
                 &generation, &frame)) {
             lib_status status = ui_console_publish_text_frame(console, &frame);
             if (status != LIB_STATUS_OK && status != LIB_STATUS_NOT_CURRENT) {
-                lib_atomic_i32_store_explicit(&state->io_failure, status,
-                    LIB_MEMORY_ORDER_RELEASE);
+                ui_component_fail(&console->base, status);
                 break;
             }
         }
@@ -155,8 +147,7 @@ retired:
      * failed wake. Retirement is the final input fact from this source. */
     lib_atomic_i32_store_explicit(&console->base.stopping, 1, LIB_MEMORY_ORDER_RELEASE);
     (void)lib_console_set_event_sink(console->logical_console, LIB_NULL, LIB_NULL);
-    ui_component_retire(&console->base,
-        lib_atomic_i32_load_explicit(&state->io_failure, LIB_MEMORY_ORDER_ACQUIRE));
+    ui_component_retire(&console->base, LIB_STATUS_OK);
     return 0u;
 }
 
@@ -168,7 +159,6 @@ lib_status ui_console_worker_start(ui_console *console)
         return LIB_STATUS_INVALID_ARGUMENT;
     state = lib_allocate_zero(1u, sizeof(*state));
     if (state == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    lib_atomic_i32_initialize(&state->io_failure, LIB_STATUS_OK);
     console->worker_state = state;
     /* Install before starting: an immediate worker failure must not be
      * followed by reattaching the retired source from this thread. */

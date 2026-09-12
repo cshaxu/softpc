@@ -18,6 +18,7 @@ struct ui_component {
     ui_hotkey_matcher hotkey_matcher;
     lib_u64 source_identity;
     lib_atomic_i32 stopping;
+    lib_atomic_i32 failure;
     ui_component_join_fn join_worker;
     ui_component_dispose_fn dispose;
 };
@@ -38,6 +39,9 @@ int ui_component_emit_to(ui_component *component, const ui_input_event *event,
 lib_status ui_component_enqueue_controls(ui_component *component,
     const ui_component_control *controls, lib_u32 control_count);
 void ui_component_retire(ui_component *component, lib_status status);
+/* Terminal input failure: closes admission and wakes the worker. The worker
+ * detaches input and reports failure/retirement once at its normal exit. */
+void ui_component_fail(ui_component *component, lib_status status);
 void ui_component_report_failure(ui_component *component, lib_status status);
 
 #endif

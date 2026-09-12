@@ -53,6 +53,7 @@ lib_status ui_component_initialize(ui_component *component,
     component->source_identity = identity;
     ui_hotkey_matcher_initialize(&component->hotkey_matcher, &options->hotkeys);
     lib_atomic_i32_initialize(&component->stopping, 0);
+    lib_atomic_i32_initialize(&component->failure, LIB_STATUS_OK);
     return ui_component_mailboxes_create(&component->mailboxes);
 }
 
@@ -67,7 +68,8 @@ int ui_component_emit_to(ui_component *component, const ui_input_event *event,
     ui_input_event_set_source(&copied, component, component->source_identity);
     if (!ui_hotkey_matcher_submit(&component->hotkey_matcher, &copied,
             delivery_sink, delivery_context)) {
-        ui_component_report_failure(component, LIB_STATUS_IO_ERROR);
+        ui_hotkey_matcher_discard(&component->hotkey_matcher);
+        ui_component_fail(component, LIB_STATUS_IO_ERROR);
         return 0;
     }
     return 1;
@@ -99,6 +101,10 @@ void ui_component_retire(ui_component *component, lib_status status)
     ui_input_event_set_source(&event, component, component->source_identity);
     lib_atomic_i32_store_explicit(&component->stopping, 1,
         LIB_MEMORY_ORDER_RELEASE);
+    ui_component_mailboxes_close(&component->mailboxes);
+    ui_hotkey_matcher_discard(&component->hotkey_matcher);
+    if (lib_atomic_i32_load_explicit(&component->failure, LIB_MEMORY_ORDER_ACQUIRE) != LIB_STATUS_OK)
+        status = lib_atomic_i32_load_explicit(&component->failure, LIB_MEMORY_ORDER_ACQUIRE);
     ui_component_report_failure(component, status);
     if (!component->input_sink(component->input_context, &event) && status == LIB_STATUS_OK)
         ui_component_report_failure(component, LIB_STATUS_IO_ERROR);
@@ -126,4 +132,12 @@ void ui_component_destroy(ui_component *component)
     }
     component->join_worker(component);
     component->dispose(component);
+}
+
+void ui_component_fail(ui_component *component, lib_status status)
+{
+    lib_atomic_i32_store_explicit(&component->failure, status, LIB_MEMORY_ORDER_RELEASE);
+    ui_component_mailboxes_close(&component->mailboxes);
+    lib_atomic_i32_store_explicit(&component->stopping, 1, LIB_MEMORY_ORDER_RELEASE);
+    ui_mailbox_wake_signal(ui_component_mailboxes_wake(&component->mailboxes));
 }

@@ -26,6 +26,8 @@ lib_status host_console_backend_deactivate(host_console_backend *backend);
 /* The broker holds this gate across an indivisible native takeover.  Bound
  * writers take the same gate and validate their logical Console/generation
  * after it opens, so an old write can never land on a new Current Console. */
+void host_console_backend_lock_transaction(host_console_backend *backend);
+void host_console_backend_unlock_transaction(host_console_backend *backend);
 void host_console_backend_lock_output(host_console_backend *backend);
 void host_console_backend_unlock_output(host_console_backend *backend);
 lib_status host_console_backend_write_bound(host_console_backend *backend,

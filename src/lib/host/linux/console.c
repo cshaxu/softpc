@@ -32,3 +32,9 @@ lib_status host_console_backend_write_text_frame_bound(host_console_backend *bac
     const lib_console_text_frame *frame)
 { (void)backend; (void)expected_console; (void)expected_generation;
   (void)frame; return LIB_STATUS_NOT_CURRENT; }
+
+/* No backend can be created on this platform yet. */
+void host_console_backend_lock_transaction(host_console_backend *backend)
+{ (void)backend; }
+void host_console_backend_unlock_transaction(host_console_backend *backend)
+{ (void)backend; }

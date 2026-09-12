@@ -80,12 +80,13 @@ mailboxes. Callers never share or address a mailbox directly.
 
 - The frame mailbox holds one copied frame. Publishing replaces that value:
   frames are **latest-wins**, but unconsumed dirty rectangles are unioned under
-  the frame lock. Consumption takes latest complete pixels and accumulated
+  the mailbox admission lock. Consumption takes latest complete pixels and accumulated
   damage together. Dimensions, mode or palette changes invalidate the full image.
 - The control mailbox is FIFO. It accepts up to 32 ordinary control records;
   enqueue beyond that limit returns `LIB_STATUS_LIMIT_EXCEEDED` without
   overwriting an existing record. A STOP record has one reserved FIFO slot and
-  is idempotent. Once STOP is queued, a later non-STOP control request returns
+  is idempotent. Once STOP is queued or a terminal fault closes admission, later
+  frame and non-STOP control requests return
   `LIB_STATUS_INVALID_STATE`. A multi-record operation is all-or-nothing:
   insufficient ordinary capacity leaves every requested record unqueued. A
   non-OK control enqueue is also reported through the component failure sink.
@@ -123,3 +124,14 @@ condition with the same timeout and spurious-wake semantics.
 The public component contracts are cross-platform. This corpus currently has
 supported Win32 leaves; Linux UI leaves are intentional
 `LIB_STATUS_UNSUPPORTED` placeholders, not claimed presenter implementations.
+
+Unrecoverable input delivery rejection closes the source immediately; the
+worker wakes, quiesces input, reports the failure and retires once. Pending
+keyboard replay is never retried after a partial sink failure. Mouse/close
+records do not flush keyboard prefixes; only keyboard order, not key/mouse
+interleaving, is retained while a prefix is pending.
+
+Console callback/output gates and broker replacement use component-private
+blocking locks; no sibling host dependency is introduced into console. Native
+I/O lock ordering and detach barriers are unchanged. Callbacks must not
+synchronously reenter binding replacement or destruction on the same owner.

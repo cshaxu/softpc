@@ -14,8 +14,7 @@ lib_status ui_component_mailboxes_create(ui_component_mailboxes *mailboxes)
 {
     if (mailboxes == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     lib_memory_set(mailboxes, 0, sizeof(*mailboxes));
-    lib_atomic_flag_clear(&mailboxes->frame_lock);
-    lib_atomic_flag_clear(&mailboxes->control_lock);
+    lib_atomic_flag_clear(&mailboxes->lock);
     mailboxes->wake = ui_mailbox_wake_create();
     return mailboxes->wake == LIB_NULL ? LIB_STATUS_NO_MEMORY : LIB_STATUS_OK;
 }
@@ -34,7 +33,11 @@ lib_status ui_component_mailboxes_publish_frame(ui_component_mailboxes *mailboxe
     lib_bool full;
     if (mailboxes == LIB_NULL || !ui_frame_is_valid(frame))
         return LIB_STATUS_INVALID_ARGUMENT;
-    ui_component_mailboxes_lock(&mailboxes->frame_lock);
+    ui_component_mailboxes_lock(&mailboxes->lock);
+    if (mailboxes->closed) {
+        ui_component_mailboxes_unlock(&mailboxes->lock);
+        return LIB_STATUS_INVALID_STATE;
+    }
     full = mailboxes->frame_generation == 0u ||
         mailboxes->frame.graphics != frame->graphics ||
         mailboxes->frame.graphics_width != frame->graphics_width ||
@@ -59,7 +62,7 @@ lib_status ui_component_mailboxes_publish_frame(ui_component_mailboxes *mailboxe
     mailboxes->frame.dirty_right = right; mailboxes->frame.dirty_bottom = bottom;
     mailboxes->frame_pending = LIB_TRUE;
     mailboxes->frame.sequence = ++mailboxes->frame_generation;
-    ui_component_mailboxes_unlock(&mailboxes->frame_lock);
+    ui_component_mailboxes_unlock(&mailboxes->lock);
     ui_mailbox_wake_signal(mailboxes->wake);
     return LIB_STATUS_OK;
 }
@@ -85,18 +88,18 @@ lib_status ui_component_mailboxes_enqueue_controls(
     }
     if (includes_stop != LIB_FALSE && control_count != 1u)
         return LIB_STATUS_INVALID_ARGUMENT;
-    ui_component_mailboxes_lock(&mailboxes->control_lock);
+    ui_component_mailboxes_lock(&mailboxes->lock);
     if (includes_stop != LIB_FALSE) {
-        if (mailboxes->stop_queued != LIB_FALSE) {
-            ui_component_mailboxes_unlock(&mailboxes->control_lock);
+        if (mailboxes->closed != LIB_FALSE) {
+            ui_component_mailboxes_unlock(&mailboxes->lock);
             return LIB_STATUS_OK;
         }
-        mailboxes->stop_queued = LIB_TRUE;
-    } else if (mailboxes->stop_queued != LIB_FALSE || ordinary_count >
+        mailboxes->closed = LIB_TRUE;
+    } else if (mailboxes->closed != LIB_FALSE || ordinary_count >
         UI_COMPONENT_CONTROL_CAPACITY - mailboxes->control_count) {
-        lib_status status = mailboxes->stop_queued != LIB_FALSE ?
+        lib_status status = mailboxes->closed != LIB_FALSE ?
             LIB_STATUS_INVALID_STATE : LIB_STATUS_LIMIT_EXCEEDED;
-        ui_component_mailboxes_unlock(&mailboxes->control_lock);
+        ui_component_mailboxes_unlock(&mailboxes->lock);
         return status;
     }
     for (control_index = 0u; control_index < control_count; ++control_index) {
@@ -105,7 +108,7 @@ lib_status ui_component_mailboxes_enqueue_controls(
         mailboxes->controls[index] = controls[control_index];
         ++mailboxes->control_count;
     }
-    ui_component_mailboxes_unlock(&mailboxes->control_lock);
+    ui_component_mailboxes_unlock(&mailboxes->lock);
     ui_mailbox_wake_signal(mailboxes->wake);
     return LIB_STATUS_OK;
 }
@@ -120,16 +123,16 @@ lib_bool ui_component_mailboxes_take_control(ui_component_mailboxes *mailboxes,
     ui_component_control *out_control)
 {
     if (mailboxes == LIB_NULL || out_control == LIB_NULL) return LIB_FALSE;
-    ui_component_mailboxes_lock(&mailboxes->control_lock);
+    ui_component_mailboxes_lock(&mailboxes->lock);
     if (mailboxes->control_count == 0u) {
-        ui_component_mailboxes_unlock(&mailboxes->control_lock);
+        ui_component_mailboxes_unlock(&mailboxes->lock);
         return LIB_FALSE;
     }
     *out_control = mailboxes->controls[mailboxes->control_head];
     mailboxes->control_head = (mailboxes->control_head + 1u) %
         UI_COMPONENT_CONTROL_STORAGE_CAPACITY;
     --mailboxes->control_count;
-    ui_component_mailboxes_unlock(&mailboxes->control_lock);
+    ui_component_mailboxes_unlock(&mailboxes->lock);
     return LIB_TRUE;
 }
 
@@ -138,15 +141,15 @@ lib_bool ui_component_mailboxes_capture_frame(ui_component_mailboxes *mailboxes,
 {
     if (mailboxes == LIB_NULL || in_out_generation == LIB_NULL ||
         out_frame == LIB_NULL) return LIB_FALSE;
-    ui_component_mailboxes_lock(&mailboxes->frame_lock);
+    ui_component_mailboxes_lock(&mailboxes->lock);
     if (*in_out_generation == mailboxes->frame_generation) {
-        ui_component_mailboxes_unlock(&mailboxes->frame_lock);
+        ui_component_mailboxes_unlock(&mailboxes->lock);
         return LIB_FALSE;
     }
     *out_frame = mailboxes->frame;
     *in_out_generation = mailboxes->frame_generation;
     mailboxes->frame_pending = LIB_FALSE;
-    ui_component_mailboxes_unlock(&mailboxes->frame_lock);
+    ui_component_mailboxes_unlock(&mailboxes->lock);
     return LIB_TRUE;
 }
 
@@ -154,4 +157,11 @@ ui_mailbox_wake *ui_component_mailboxes_wake(
     const ui_component_mailboxes *mailboxes)
 {
     return mailboxes == LIB_NULL ? LIB_NULL : mailboxes->wake;
+}
+
+void ui_component_mailboxes_close(ui_component_mailboxes *mailboxes)
+{
+    ui_component_mailboxes_lock(&mailboxes->lock);
+    mailboxes->closed = LIB_TRUE;
+    ui_component_mailboxes_unlock(&mailboxes->lock);
 }

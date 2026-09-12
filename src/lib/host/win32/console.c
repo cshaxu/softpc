@@ -20,6 +20,7 @@ struct host_console_backend {
      * returning from its callback. */
     volatile lib_win32_long cooked_line_pending;
     lib_win32_critical_section output_lock;
+    lib_win32_critical_section transaction_lock;
     lib_win32_dword original_mode;
     lib_console *console;
     host_console_mode mode;
@@ -174,6 +175,7 @@ lib_status host_console_backend_create(host_console_backend **out_backend)
     }
     backend->original_mode = mode;
     lib_win32_initialize_critical_section(&backend->output_lock);
+    lib_win32_initialize_critical_section(&backend->transaction_lock);
     *out_backend = backend;
     return LIB_STATUS_OK;
 }
@@ -193,6 +195,7 @@ void host_console_backend_destroy(host_console_backend *backend)
     if (backend->input != LIB_WIN32_INVALID_HANDLE_VALUE) lib_win32_close_handle(backend->input);
     if (backend->output != LIB_WIN32_INVALID_HANDLE_VALUE) lib_win32_close_handle(backend->output);
     lib_win32_delete_critical_section(&backend->output_lock);
+    lib_win32_delete_critical_section(&backend->transaction_lock);
     lib_release(backend);
 }
 
@@ -495,3 +498,8 @@ lib_status host_console_backend_write_text_frame_bound(host_console_backend *bac
     host_console_backend_unlock_output(backend);
     return LIB_STATUS_OK;
 }
+
+void host_console_backend_lock_transaction(host_console_backend *backend)
+{ lib_win32_enter_critical_section(&backend->transaction_lock); }
+void host_console_backend_unlock_transaction(host_console_backend *backend)
+{ lib_win32_leave_critical_section(&backend->transaction_lock); }

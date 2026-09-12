@@ -112,8 +112,14 @@ int main(void)
     assert(probe.last_identity == first.source_identity);
     probe.accept_input = 0;
     assert(!ui_component_emit(&first, &event));
+    assert(probe.failure_count == 0u);
+    assert(!ui_component_emit(&first, &event));
+    ui_component_retire(&first, LIB_STATUS_OK);
     assert(probe.failure_count == 1u);
     assert(probe.last_failure == LIB_STATUS_IO_ERROR);
+    ui_component_mailboxes_destroy(&first.mailboxes);
+    assert(ui_component_initialize(&first, &options, component_probe_stop,
+        component_probe_dispose) == LIB_STATUS_OK);
 
     /* A frozen Window's delivery policy must not bypass matching. It silently
        consumes ordinary/mismatched records after ui-base has attributed them,

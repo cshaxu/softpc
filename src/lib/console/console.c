@@ -1,13 +1,14 @@
 #include "lib/console/binding_interface.h"
 
 #include "lib/types/atomic.h"
+#include "lib/console/mutex.h"
 
 struct lib_console {
     lib_atomic_flag lock;
     /* Serializes sink replacement against an in-flight copied event callback.
        A retiring UI source waits here before publishing SOURCE_RETIRED. */
-    lib_atomic_flag event_gate;
-    lib_atomic_flag output_lock;
+    console_mutex *event_gate;
+    console_mutex *output_lock;
     lib_atomic_u32 references;
     lib_console_event_sink event_sink;
     void *event_context;
@@ -49,8 +50,12 @@ lib_status lib_console_create(lib_console **out_console)
     console = lib_allocate_zero(1u, sizeof(*console));
     if (console == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     lib_atomic_flag_clear(&console->lock);
-    lib_atomic_flag_clear(&console->event_gate);
-    lib_atomic_flag_clear(&console->output_lock);
+    if (console_mutex_create(&console->event_gate) != LIB_STATUS_OK ||
+        console_mutex_create(&console->output_lock) != LIB_STATUS_OK) {
+        console_mutex_destroy(console->event_gate);
+        lib_release(console);
+        return LIB_STATUS_NO_MEMORY;
+    }
     lib_atomic_u32_initialize(&console->references, 1u);
     *out_console = console;
     return LIB_STATUS_OK;
@@ -68,8 +73,11 @@ void lib_console_release(lib_console *console)
 {
     if (console == LIB_NULL) return;
     if (lib_atomic_u32_fetch_sub_explicit(&console->references, 1u,
-            LIB_MEMORY_ORDER_ACQ_REL) == 1u)
+            LIB_MEMORY_ORDER_ACQ_REL) == 1u) {
+        console_mutex_destroy(console->event_gate);
+        console_mutex_destroy(console->output_lock);
         lib_release(console);
+    }
 }
 
 void lib_console_destroy(lib_console *console)
@@ -81,13 +89,12 @@ lib_status lib_console_set_event_sink(lib_console *console,
     lib_console_event_sink sink, void *context)
 {
     if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    while (lib_atomic_flag_test_and_set_explicit(&console->event_gate,
-        LIB_MEMORY_ORDER_ACQUIRE)) { }
+    console_mutex_enter(console->event_gate);
     lib_console_lock(console);
     console->event_sink = sink;
     console->event_context = context;
     lib_console_unlock(console);
-    lib_atomic_flag_clear_explicit(&console->event_gate, LIB_MEMORY_ORDER_RELEASE);
+    console_mutex_leave(console->event_gate);
     return LIB_STATUS_OK;
 }
 
@@ -95,13 +102,12 @@ lib_status lib_console_set_output_sink(lib_console *console,
     lib_console_output_sink sink, void *context)
 {
     if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    while (lib_atomic_flag_test_and_set_explicit(&console->output_lock,
-        LIB_MEMORY_ORDER_ACQUIRE)) { }
+    console_mutex_enter(console->output_lock);
     lib_console_lock(console);
     console->output_sink = sink;
     console->output_context = context;
     lib_console_unlock(console);
-    lib_atomic_flag_clear_explicit(&console->output_lock, LIB_MEMORY_ORDER_RELEASE);
+    console_mutex_leave(console->output_lock);
     return LIB_STATUS_OK;
 }
 
@@ -109,13 +115,12 @@ lib_status lib_console_set_text_frame_sink(lib_console *console,
     lib_console_text_frame_sink sink, void *context)
 {
     if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    while (lib_atomic_flag_test_and_set_explicit(&console->output_lock,
-        LIB_MEMORY_ORDER_ACQUIRE)) { }
+    console_mutex_enter(console->output_lock);
     lib_console_lock(console);
     console->text_frame_sink = sink;
     console->text_frame_context = context;
     lib_console_unlock(console);
-    lib_atomic_flag_clear_explicit(&console->output_lock, LIB_MEMORY_ORDER_RELEASE);
+    console_mutex_leave(console->output_lock);
     return LIB_STATUS_OK;
 }
 
@@ -129,28 +134,27 @@ lib_status lib_console_deliver_event(lib_console *console,
     if (console == LIB_NULL || !lib_console_event_valid(event))
         return LIB_STATUS_INVALID_ARGUMENT;
     copied = *event;
-    while (lib_atomic_flag_test_and_set_explicit(&console->event_gate,
-        LIB_MEMORY_ORDER_ACQUIRE)) { }
+    console_mutex_enter(console->event_gate);
     lib_console_lock(console);
     if (console->binding_active == LIB_FALSE ||
         copied.binding_generation == 0u ||
         copied.binding_generation != console->binding_generation) {
         lib_console_unlock(console);
-        lib_atomic_flag_clear_explicit(&console->event_gate, LIB_MEMORY_ORDER_RELEASE);
+        console_mutex_leave(console->event_gate);
         return LIB_STATUS_NOT_CURRENT;
     }
     sink = console->event_sink;
     context = console->event_context;
     lib_console_unlock(console);
     if (sink == LIB_NULL) {
-        lib_atomic_flag_clear_explicit(&console->event_gate, LIB_MEMORY_ORDER_RELEASE);
+        console_mutex_leave(console->event_gate);
         return LIB_STATUS_INVALID_STATE;
     }
     /* The sink is deliberately called while the event gate is held.  This
        makes detach a quiescence barrier: after it returns no old callback can
        enter a component before that component reports retirement. */
     sink(context, &copied);
-    lib_atomic_flag_clear_explicit(&console->event_gate, LIB_MEMORY_ORDER_RELEASE);
+    console_mutex_leave(console->event_gate);
     return LIB_STATUS_OK;
 }
 
@@ -182,14 +186,13 @@ lib_status lib_console_write_text(lib_console *console,
     lib_status status;
     if (console == LIB_NULL || (text == LIB_NULL && length != 0u))
         return LIB_STATUS_INVALID_ARGUMENT;
-    while (lib_atomic_flag_test_and_set_explicit(&console->output_lock,
-        LIB_MEMORY_ORDER_ACQUIRE)) { }
+    console_mutex_enter(console->output_lock);
     lib_console_lock(console);
     sink = console->output_sink;
     context = console->output_context;
     lib_console_unlock(console);
     status = sink == LIB_NULL ? LIB_STATUS_NOT_CURRENT : sink(context, text, length);
-    lib_atomic_flag_clear_explicit(&console->output_lock, LIB_MEMORY_ORDER_RELEASE);
+    console_mutex_leave(console->output_lock);
     return status;
 }
 
@@ -203,13 +206,12 @@ lib_status lib_console_write_text_frame(lib_console *console,
     if (console == LIB_NULL || frame == LIB_NULL || frame->columns == 0u ||
         frame->columns > LIB_CONSOLE_TEXT_COLUMNS || frame->rows == 0u ||
         frame->rows > LIB_CONSOLE_TEXT_ROWS) return LIB_STATUS_INVALID_ARGUMENT;
-    while (lib_atomic_flag_test_and_set_explicit(&console->output_lock,
-        LIB_MEMORY_ORDER_ACQUIRE)) { }
+    console_mutex_enter(console->output_lock);
     lib_console_lock(console);
     sink = console->text_frame_sink;
     context = console->text_frame_context;
     lib_console_unlock(console);
     status = sink == LIB_NULL ? LIB_STATUS_NOT_CURRENT : sink(context, frame);
-    lib_atomic_flag_clear_explicit(&console->output_lock, LIB_MEMORY_ORDER_RELEASE);
+    console_mutex_leave(console->output_lock);
     return status;
 }

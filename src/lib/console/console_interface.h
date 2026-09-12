@@ -1,6 +1,10 @@
 #ifndef LIB_BASE_CONSOLE_INTERFACE_H
 #define LIB_BASE_CONSOLE_INTERFACE_H
 
+/* Sink callbacks must not synchronously reenter sink replacement or destroy
+ * on the same Console. Detach waits for callbacks; output replacement waits
+ * for writes. These gates block instead of busy-waiting. */
+
 #include "lib/types/types_interface.h"
 
 /* Console-only status; the established numeric ABI is unchanged. */

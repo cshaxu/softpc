@@ -155,3 +155,19 @@ The original host timer remains the only source advancing original SoftPC
 timer/device work. Runtime scheduling may wait or yield host CPU time but may
 not manufacture guest ticks, map nominal MHz to instruction counts, or add a
 second guest clock.
+
+## UI Input And Shutdown Admission
+
+Window has one final event filter after shared matching. Frozen ordinary
+key/text/mouse is consumed there; local capture/blink guards remain independent.
+Only keyboard events determine prefix replay; mouse and close do not flush it.
+Keyboard order is preserved without buffering key/mouse interleaving. A partial
+sink failure is terminal, never retried; worker quiescence precedes its one
+failure/retirement completion. STOP/fault closes both frame and control admission
+atomically without bypassing FIFO control consumption up to STOP.
+
+Logical Console event/output gates and broker transactions use private blocking
+locks in their owning components, preserving existing lock order and callback
+barriers. No callback may synchronously reenter binding/destruction. Storage
+owns each CRT stream directly; writer embeds file state instead of separately
+allocated pointer wrappers.
