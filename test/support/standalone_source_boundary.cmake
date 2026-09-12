@@ -23,6 +23,44 @@ foreach(shared_library_path IN LISTS shared_library_paths)
     endif()
 endforeach()
 
+# types is vocabulary only: platform behavior is implemented by the owning
+# component's selected win32/linux source, never by a hidden types target.
+file(GLOB_RECURSE types_implementation_sources
+    "${SOFTPC_SOURCE_DIR}/src/lib/types/*.c")
+if(types_implementation_sources)
+    message(FATAL_ERROR
+        "types must be header-only: ${types_implementation_sources}")
+endif()
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/CMakeLists.txt" lib_cmake_types_source)
+if(NOT lib_cmake_types_source MATCHES "add_library\\(types INTERFACE\\)" OR
+   lib_cmake_types_source MATCHES "LIBRARY_TYPES_SOURCES")
+    message(FATAL_ERROR "types must remain an INTERFACE-only vocabulary target")
+endif()
+foreach(platform_neutral_base IN ITEMS
+    "src/lib/host/clock.c"
+    "src/lib/host/sync.c"
+    "src/lib/storage/file.c"
+    "src/lib/ui-base/mailbox.c")
+    file(READ "${SOFTPC_SOURCE_DIR}/${platform_neutral_base}" base_source)
+    if(base_source MATCHES "#[ \\t]*(if|ifdef|ifndef)[^\\n]*(WIN32|__linux__|__APPLE__)")
+        message(FATAL_ERROR
+            "Neutral component base contains platform selection: ${platform_neutral_base}")
+    endif()
+endforeach()
+foreach(component_platform_source IN ITEMS
+    "src/lib/host/win32/clock.c"
+    "src/lib/host/linux/clock.c"
+    "src/lib/host/win32/sync.c"
+    "src/lib/host/linux/sync.c"
+    "src/lib/storage/win32/file.c"
+    "src/lib/storage/linux/file.c"
+    "src/lib/ui-base/win32/mailbox.c"
+    "src/lib/ui-base/linux/mailbox.c")
+    if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/${component_platform_source}")
+        message(FATAL_ERROR "Missing selected-platform peer: ${component_platform_source}")
+    endif()
+endforeach()
+
 set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/host/compat/ccpu/facade.c"
     "${SOFTPC_SOURCE_DIR}/src/host/compat/cvidc/gdp_state.c"

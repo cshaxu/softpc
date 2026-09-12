@@ -1,6 +1,5 @@
 #include "lib/host/console_backend.h"
 
-#ifndef _WIN32
 struct host_console_backend { int unavailable; };
 lib_status host_console_backend_create(host_console_backend **out_backend)
 {
@@ -33,4 +32,3 @@ lib_status host_console_backend_write_text_frame_bound(host_console_backend *bac
     const lib_console_text_frame *frame)
 { (void)backend; (void)expected_console; (void)expected_generation;
   (void)frame; return LIB_STATUS_NOT_CURRENT; }
-#endif

@@ -35,9 +35,11 @@ calls `console` or `host`; `ui-console` consumes only the neutral `console`
 contract. `host` does not include UI. There is no unified UI aggregate,
 lifecycle controller, or public unified presenter API.
 
-- `types` provides scalar aliases, status values, platform-neutral C-runtime
-  vocabulary for memory, text, bounded formatting, allocation, and opaque
-  byte-file primitives. It owns no product I/O policy.
+- `types` is header-only and provides scalar aliases, status values, atomic
+  helpers, and typed wrappers around C-runtime/SDK vocabulary. It owns no
+  compiled platform worker, component state, or I/O policy. Every component's
+  selected platform source supplies the same component-private operation shape
+  to its platform-neutral base source.
 - `console` provides the logical Console object. It is a neutral copied-value
   endpoint: it has no native handle, platform input mode, Window, raw Console,
   monitor, or product-lifecycle meaning.

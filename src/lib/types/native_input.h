@@ -5,9 +5,28 @@
 
 /* Raw keyboard/layout queries. UI-base owns all interpretation of the
  * returned copied values. */
-lib_u8 lib_native_input_current_modifiers(void);
-lib_u16 lib_native_input_scan_code(lib_u16 native_key);
-lib_bool lib_native_input_map_scalar(lib_u32 scalar, lib_u16 *out_native_key,
-    lib_u8 *out_modifiers);
+#ifdef _WIN32
+#include "lib/types/win32.h"
+static inline lib_u8 lib_native_input_current_modifiers(void)
+{
+    lib_u8 modifiers = 0u;
+
+    if ((GetKeyState(VK_CONTROL) & 0x8000) != 0) modifiers |= 0x01u;
+    if ((GetKeyState(VK_MENU) & 0x8000) != 0) modifiers |= 0x02u;
+    if ((GetKeyState(VK_SHIFT) & 0x8000) != 0) modifiers |= 0x04u;
+    return modifiers;
+}
+
+static inline lib_u16 lib_native_input_scan_code(lib_u16 native_key)
+{ return (lib_u16)MapVirtualKeyA((UINT)native_key, MAPVK_VK_TO_VSC); }
+
+#else
+static inline lib_u8 lib_native_input_current_modifiers(void)
+{ return 0u; }
+
+static inline lib_u16 lib_native_input_scan_code(lib_u16 native_key)
+{ (void)native_key; return 0u; }
+
+#endif
 
 #endif

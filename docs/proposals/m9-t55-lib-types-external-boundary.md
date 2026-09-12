@@ -1,112 +1,79 @@
-# M9 T55 S2 — Types-Owned External Boundary
+# M9 T55 S2 — Types Vocabulary and Component Platform Boundaries
 
 ## Objective
 
-Make `lib/types` the sole library component that directly declares, includes,
-links, or calls the C runtime and native platform libraries. Every other
-library component consumes only copied `lib_*` values, opaque `types` handles,
-and `types` wrapper functions. This is a structural boundary change: it must
-retain the existing observable library behavior.
+Make `lib/types` the header-only shared vocabulary for C-runtime, SDK, POSIX,
+and compiler-atomic declarations. Preserve every observable library behavior
+while moving all compiled platform behavior into the component that owns its
+meaning.
 
-## Frozen convergence ledger
+`types` is not a runtime component. It has no `.c` files, worker, handle
+ownership, state machine, product policy, or component dependency. Its typed
+inline façades are one-to-one external vocabulary only.
 
-The universe is every tracked `*.c` and `*.h` below `src/lib/`, classified by
-its direct external dependency:
+## Final boundary
 
-| Class | Current direct consumers outside `types` | Required disposition |
-| --- | --- | --- |
-| C runtime | `console`, `host`, `storage`, `ui-base`, `ui-window`, `ui-console` | Replace direct allocation, memory/text, formatting, and file/runtime calls with `types` API. |
-| Windows SDK | `host/win32`, `storage/win32`, `ui-base/win32`, `ui-window/win32`, `ui-console/win32` | Move all `windows.h` types, constants, callbacks, API calls, and `user32`/`gdi32` link ownership into `types/win32` adapters. |
-| Linux/POSIX | `host/linux`, `storage/linux`, `ui-base/linux` | Move all POSIX headers, types, calls, and thread-library link ownership into `types/linux` adapters. |
-| Compiler atomics | `types/atomic.h` | Retain in `types`; no other component may expose or call the compiler primitive directly. |
+Each component has a platform-neutral base source and a selected platform
+source with one identical component-private operation shape:
 
-Completion means the scan finds no external-system include, external type
-name, or external function call outside `src/lib/types/`, except C language
-keywords and compiler-required builtins explicitly enumerated by the static
-gate. `types` remains component-rooted: it gains no dependency on `console`,
-`host`, `storage`, or either UI component.
+```text
+host/clock.c       -> host_clock_platform_counter(...)
+host/sync.c        -> host_sync_platform_*(...)
+storage/file.c     -> storage_file_platform_*(...)
+ui-base/mailbox.c  -> ui_mailbox_wake_*(...)
+```
 
-## Frozen remaining platform ledger
+The `win32` and `linux` implementations of each shape are peers. CMake selects
+exactly one. A base source does not use platform preprocessor branches, raw SDK
+types, or platform function declarations. A platform source may implement only
+its owning component's internal shape; it cannot introduce a cross-component
+runtime, dependency, or product policy.
 
-The C-runtime/file members are complete: only `types` includes the C-runtime
-headers or calls its allocation, memory, text, and byte-file functions. The
-remaining direct platform consumers are frozen below. They are the only
-allowed work universe for the next implementation pass; each must end with no
-external header, native type, constant, callback signature, or native call in
-the named component source.
+`types` centralizes the external header and typed wrapper vocabulary used by
+those sources. It does not normalize UI keys, define a storage file object,
+own events/tasks, or implement Console/Window behavior. In particular:
 
-| Current direct consumer | Native dependency | `types` disposition |
-| --- | --- | --- |
-| `host/win32/clock.c` | Win32 monotonic clock | `types/win32` copied-time primitive. |
-| `host/win32/sync.c` | Win32 event/thread/wait handles | `types/win32` exposes raw opaque handles and raw waits; `host` retains manual-reset, cancellation, ordering, and task policy. |
-| `host/linux/sync.c` | POSIX mutex/condition/thread/time | Same boundary where Linux exists; unsupported platform-only primitives return explicit `UNSUPPORTED`, never a simulated policy. |
-| `host/win32/console.c` | Win32 Console reader, renderer, focus, output serialization | `types/win32` wraps native handles and calls only; `host` retains reader, renderer, focus, serialization, and broker behavior. |
-| `ui-base/win32/{actions,input,mailbox}.c` and private headers | keyboard state, native records, wake event | `types/win32` supplies raw layout/scan/modifier facts and wake calls; `ui-base` retains the normalizer and all event mapping. |
-| `ui-window/win32/{component,geometry,mouse}.c` and private headers | Window handle/message loop, drawing, geometry, pointer capture | `types/win32` supplies only raw window/surface/pointer calls and copied values; `ui-window` retains its complete lifecycle, input, geometry, and rendering policy. |
-| `ui-console/win32/component.c` | worker handle and Console coupling | `types/win32` supplies raw worker and Console calls; `ui-console` retains its binding, input, frame, and worker behavior. |
+- `storage` owns file access, exact-transfer and ownership policy;
+- `host` owns synchronization, task/cancellation, clock and Console policy;
+- `ui-base` owns event normalization, hotkey matching and mailbox meaning;
+- `ui-window` and `ui-console` own their lifecycle and rendering behavior.
 
-No component may receive a native pointer, integer handle, SDK structure, or
-SDK callback signature as an escape hatch. Where a platform callback is
-unavoidable, its raw declaration and invocation remain in `types`; the owning
-component receives copied facts through a neutral callback. That bridge does
-not transfer the component's state machine or policy to `types`. The
-replacement must preserve the existing component DAG and all observable
-behavior.
+## Required changes
 
-## Design
+- Delete every `src/lib/types/**/*.c`; make CMake target `types` INTERFACE.
+- Move compiled raw file work to `storage/win32/file.c` and
+  `storage/linux/file.c`, behind `storage_file_platform_*`.
+- Move compiled synchronization/task work to `host/win32/sync.c` and
+  `host/linux/sync.c`, behind `host_sync_platform_*`.
+- Keep mailbox wake work in the existing `ui-base/win32` and `ui-base/linux`
+  sources, with the identical `ui_mailbox_wake_*` contract.
+- Keep platform clock work in `host/win32/clock.c` and
+  `host/linux/clock.c` behind `host_clock_platform_counter`.
+- Move the Win32-only modifier query to `ui-base/win32/actions.c`; do not
+  retain a generic UI source which includes a platform adapter.
+- Move text-to-native-key layout interpretation into `ui-base/win32/input.c`.
+  `types` exposes only raw SDK facts, never UI input mapping policy.
+- Centralize external SDK/CRT/POSIX declaration headers under `types`; the
+  component source consumes that vocabulary and exposes no native type through
+  any public `*_interface.h`.
 
-- `types` owns only platform-private type declarations and direct function
-  façades under `types/win32/` and `types/linux/`, plus C-runtime wrappers.
-  It never owns a component state machine or derived behavior: Console event
-  schemas remain in `console`; manual-reset/cancellation/wait policy remains
-  in `host`; input normalization remains in `ui-base`; Window/Console
-  lifecycle and rendering policy remain in their respective leaves.
-- `types/win32/**` and `types/linux/**` are the **only** shared-library
-  sources permitted to include an external platform header, name a native
-  type/constant/callback signature, call a native function, or own a direct
-  native link dependency. A path such as `host/win32/**` or
-  `ui-window/win32/**` receives no exception merely because its name names a
-  platform.
-- Its public contract exposes only `lib_*` scalar/copied values and opaque
-  handles. It does not expose `FILE`, `HANDLE`, `HWND`, `DWORD`, `pthread_*`,
-  or another native type.
-- A `types` primitive is a raw ABI wrapper, never a component contract. Its
-  adapter headers may expose an opaque `lib_native_*` handle only when two
-  peer components require the same primitive. Component-facing operations
-  remain in their owner: file open/read/write policy in `storage`, time and
-  task/wait policy in `host`, native input mapping and mailbox interpretation
-  in `ui-base`, and native Console/Window lifecycle in their respective
-  owners.
-  It carries no `host_*`, `ui_*`, monitor, lifecycle, or machine policy. A
-  required native callback remains wholly within `types`; its consumer gets a
-  copied neutral event or an opaque `lib_native_*` handle.
-- `ui-base` owns the one native-input normalizer, its Win32 key vocabulary,
-  and its conversion to `ui_input_event` before the existing source-identity
-  and registered-hotkey path. `types` performs only the raw SDK calls that
-  produce requested facts. Neither `types` nor either UI leaf interprets a
-  hotkey or owns a second event mapping route.
-- Component-specific behavior stays in its present owner: storage still owns
-  storage policy, host still owns broker/synchronization policy, and UI leaves
-  still own UI lifecycle and rendering decisions. They request primitive
-  operations from `types`; `types` does not learn their product semantics.
-- CMake makes `types` the sole owner of native link libraries. Other library
-  targets link only library component targets in the approved DAG.
-- Add a permanent static boundary gate over all library source/header paths,
-  plus existing behavior tests. The gate is the proof receiver for every
-  mechanically discoverable direct external dependency.
+## Invariants
 
-## Boundaries
-
-No MVDM, guest media, `softpc.ini`, application/host product behavior, or
-NXVM checkout changes are admitted. The canonical library changes here become
-the source corpus for NXVM to adopt; exact equality with the old NXVM revision
-is intentionally no longer an S2 acceptance condition.
+- Public interfaces expose only `lib_*` copied values and opaque component
+  objects; no `FILE`, `HANDLE`, `HWND`, `DWORD`, or `pthread_*` value leaks.
+- The component DAG remains:
+  `types -> console + host + storage + ui-base + ui-window + ui-console`,
+  `console -> host + ui-console`, and `ui-base -> ui-window + ui-console`.
+- No MVDM source, guest media, `softpc.ini`, or SoftPC product behavior is
+  changed.
+- Existing x86/x64 observable behavior is retained.
 
 ## Verification
 
-- Ledger-backed static gate finds zero external includes/types/functions
-  outside `types`.
-- Component CMake DAG has no direct native-link ownership outside `types`.
-- Existing library, host, storage, UI, and package tests retain behavior.
-- Fresh x64 and x86 build, full CTest, strict-library build, manifest, and
-  documentation-governance checks pass.
+- Static gate proves `types` has no `.c` and CMake declares it as an INTERFACE
+  target.
+- Static audit proves every neutral base delegates platform work through its
+  component-private same-shape operation, rather than a platform `#ifdef`.
+- Public interface audit rejects native SDK/POSIX types.
+- Fresh strict library, x86/x64 full CTest, package smoke, manifest and
+  governance checks pass after the complete migration.

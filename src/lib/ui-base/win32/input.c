@@ -2,10 +2,25 @@
 #include "lib/ui-base/hotkey_interface.h"
 #include "lib/types/native_input.h"
 
-#ifdef _WIN32
 static lib_u16 ui_win32_keyboard_resolve_scan(lib_u16 native_key)
 {
     return lib_native_input_scan_code(native_key);
+}
+
+/* Layout interpretation belongs to the UI keyboard adapter.  types exposes
+ * only raw key-state and scan-code queries. */
+static lib_bool ui_win32_keyboard_map_scalar(lib_u32 scalar,
+    lib_u16 *out_native_key, lib_u8 *out_modifiers)
+{
+    SHORT mapped;
+
+    if (out_native_key == LIB_NULL || out_modifiers == LIB_NULL || scalar > 0xffu)
+        return LIB_FALSE;
+    mapped = VkKeyScanA((CHAR)scalar);
+    if (mapped == -1) return LIB_FALSE;
+    *out_native_key = (lib_u16)(mapped & 0xff);
+    *out_modifiers = (lib_u8)((mapped >> 8) & 0xff);
+    return LIB_TRUE;
 }
 
 /* Native values stop at this adapter boundary.  This component decides how
@@ -101,7 +116,7 @@ int ui_win32_keyboard_consume_duplicate_character(
 
     if (state == LIB_NULL || state->recovered_virtual_key == 0u || code_unit == 0u ||
         (code_unit >= 0xd800u && code_unit <= 0xdfffu)) return 0;
-    duplicate = lib_native_input_map_scalar(code_unit, &native_key, &modifiers) &&
+    duplicate = ui_win32_keyboard_map_scalar(code_unit, &native_key, &modifiers) &&
         native_key == state->recovered_virtual_key;
     state->recovered_virtual_key = 0u;
     return duplicate;
@@ -117,7 +132,7 @@ static int ui_win32_keyboard_submit_character(void *context,
 
     if (scalar == 0u || scalar > 0xffffu ||
         (scalar >= 0xd800u && scalar <= 0xdfffu)) return 0;
-    if (!lib_native_input_map_scalar(scalar, &native_key, &modifiers)) {
+    if (!ui_win32_keyboard_map_scalar(scalar, &native_key, &modifiers)) {
         ui_event event;
         lib_memory_set(&event, 0, sizeof(event));
         event.type = UI_EVENT_TEXT;
@@ -193,4 +208,3 @@ lib_u8 ui_win32_keyboard_flags_from_lparam(lib_u64 native_lparam)
     return (native_lparam & 0x01000000u) != 0u ?
         UI_WIN32_INPUT_FLAG_EXTENDED : 0u;
 }
-#endif

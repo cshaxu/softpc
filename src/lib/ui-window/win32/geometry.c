@@ -1,6 +1,5 @@
 #include "lib/ui-window/win32/geometry.h"
 
-#ifdef _WIN32
 int ui_win32_display_rect(int client_width, int client_height,
     lib_u32 source_width, lib_u32 source_height, RECT *display)
 {
@@ -270,4 +269,3 @@ void ui_win32_constrain_sizing(HWND window, WPARAM edge,
     else
         outer->bottom = outer->top + target_height;
 }
-#endif

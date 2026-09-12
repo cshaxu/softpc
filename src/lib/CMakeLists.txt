@@ -27,15 +27,7 @@ function(library_root target)
     endif()
 endfunction()
 
-set(LIBRARY_TYPES_SOURCES types/runtime.c)
-if(WIN32)
-    list(APPEND LIBRARY_TYPES_SOURCES types/win32/clock.c types/win32/file.c
-        types/win32/sync.c types/win32/input_state.c)
-else()
-    list(APPEND LIBRARY_TYPES_SOURCES types/linux/clock.c types/linux/file.c
-        types/linux/sync.c types/linux/input_state.c)
-endif()
-add_library(types STATIC ${LIBRARY_TYPES_SOURCES})
+add_library(types INTERFACE)
 library_root(types)
 
 add_library(console STATIC console/console.c)
@@ -45,16 +37,17 @@ target_link_libraries(console PUBLIC types)
 set(LIBRARY_UI_BASE_SOURCES
     ui-base/component.c
     ui-base/hotkey.c
-    ui-base/mailbox.c
-    ui-base/actions.c
-    ui-base/linux/input.c)
+    ui-base/mailbox.c)
 if(WIN32)
     list(APPEND LIBRARY_UI_BASE_SOURCES
+        ui-base/win32/actions.c
         ui-base/win32/mailbox.c
         ui-base/win32/color.c
         ui-base/win32/input.c)
 else()
-    list(APPEND LIBRARY_UI_BASE_SOURCES ui-base/linux/mailbox.c)
+    list(APPEND LIBRARY_UI_BASE_SOURCES
+        ui-base/linux/mailbox.c
+        ui-base/linux/input.c)
 endif()
 add_library(ui-base STATIC ${LIBRARY_UI_BASE_SOURCES})
 library_root(ui-base)
@@ -81,27 +74,32 @@ target_link_libraries(ui-console PUBLIC types console ui-base)
 
 if(WIN32)
     set(LIBRARY_HOST_SOURCES host/clock.c host/console.c host/sync.c
-        host/win32/console.c)
+        host/win32/clock.c host/win32/console.c host/win32/sync.c)
 else()
     set(LIBRARY_HOST_SOURCES host/clock.c host/console.c host/sync.c
-        host/linux/console.c)
+        host/linux/clock.c host/linux/console.c host/linux/sync.c)
 endif()
 add_library(host STATIC ${LIBRARY_HOST_SOURCES})
 library_root(host)
 target_link_libraries(host PUBLIC types console)
 
 set(LIBRARY_STORAGE_SOURCES storage/file.c storage/medium.c)
+if(WIN32)
+    list(APPEND LIBRARY_STORAGE_SOURCES storage/win32/file.c)
+else()
+    list(APPEND LIBRARY_STORAGE_SOURCES storage/linux/file.c)
+endif()
 add_library(storage STATIC ${LIBRARY_STORAGE_SOURCES})
 library_root(storage)
 target_link_libraries(storage PUBLIC types)
 
 if(WIN32)
-    # types is the sole owner of native platform linkage.  UI leaves consume
-    # copied values and opaque types primitives only.
-    target_link_libraries(types PUBLIC user32 gdi32)
+    # types is the header-only vocabulary root and owns propagated native
+    # linkage. Selected component platform sources consume that vocabulary.
+    target_link_libraries(types INTERFACE user32 gdi32)
 else()
     find_package(Threads REQUIRED)
-    target_link_libraries(types PUBLIC Threads::Threads)
+    target_link_libraries(types INTERFACE Threads::Threads)
 endif()
 
 # This build-only aggregate does not create a library-root dependency. Each
@@ -112,7 +110,7 @@ target_link_libraries(lib-neutral-corpus INTERFACE
 
 if(LIBRARY_STRICT_WARNINGS AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     foreach(library_target IN ITEMS
-            types console ui-base ui-window ui-console host storage)
+            console ui-base ui-window ui-console host storage)
         target_compile_options(${library_target} PRIVATE
             -Wall -Wextra -Wpedantic -Werror)
     endforeach()

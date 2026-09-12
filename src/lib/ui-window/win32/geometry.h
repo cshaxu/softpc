@@ -3,8 +3,7 @@
 
 #include "lib/types/types_interface.h"
 
-#ifdef _WIN32
-#include <windows.h>
+#include "lib/types/win32.h"
 
 /* Host-only geometry helpers.  They map copied source coordinates to a Win32
  * client surface and own no product rendering or lifecycle policy. */
@@ -28,6 +27,4 @@ int ui_win32_maximize_client(HWND window, lib_u32 source_width,
     lib_u32 source_height);
 void ui_win32_constrain_sizing(HWND window, WPARAM edge,
     RECT *outer, lib_u32 source_width, lib_u32 source_height);
-#endif
-
 #endif

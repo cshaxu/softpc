@@ -1,21 +1,19 @@
 #include "lib/types/types_interface.h"
 
-#include <fcntl.h>
-#include <io.h>
-#include <stdio.h>
-#include <windows.h>
+#include "lib/types/win32.h"
+#include "lib/types/win32_runtime.h"
 
-#include "lib/types/file.h"
+#include "lib/storage/file.h"
 
-struct lib_native_file {
+struct storage_file_platform {
     FILE *stream;
 };
 
-static lib_status lib_native_file_open_writer(const char *path,
-    const char *mode, lib_native_file **out_file)
+static lib_status storage_file_platform_open_writer(const char *path,
+    const char *mode, storage_file_platform **out_file)
 {
     FILE *stream;
-    lib_native_file *file;
+    storage_file_platform *file;
 
     if (path == LIB_NULL || mode == LIB_NULL || out_file == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
@@ -32,12 +30,12 @@ static lib_status lib_native_file_open_writer(const char *path,
     return LIB_STATUS_OK;
 }
 
-static lib_status lib_native_file_open(const char *path, lib_bool readwrite,
-    lib_native_file **out_file)
+static lib_status storage_file_platform_open(const char *path, lib_bool readwrite,
+    storage_file_platform **out_file)
 {
     HANDLE handle;
     int descriptor;
-    lib_native_file *file;
+    storage_file_platform *file;
     DWORD native_access = readwrite != LIB_FALSE ?
         GENERIC_READ | GENERIC_WRITE : GENERIC_READ;
     DWORD share = readwrite != LIB_FALSE ? 0u : FILE_SHARE_READ;
@@ -67,23 +65,23 @@ static lib_status lib_native_file_open(const char *path, lib_bool readwrite,
     return LIB_STATUS_OK;
 }
 
-lib_status lib_native_file_open_readonly(const char *path,
-    lib_native_file **out_file)
-{ return lib_native_file_open(path, LIB_FALSE, out_file); }
+lib_status storage_file_platform_open_readonly(const char *path,
+    storage_file_platform **out_file)
+{ return storage_file_platform_open(path, LIB_FALSE, out_file); }
 
-lib_status lib_native_file_open_readwrite(const char *path,
-    lib_native_file **out_file)
-{ return lib_native_file_open(path, LIB_TRUE, out_file); }
+lib_status storage_file_platform_open_readwrite(const char *path,
+    storage_file_platform **out_file)
+{ return storage_file_platform_open(path, LIB_TRUE, out_file); }
 
-lib_status lib_native_file_open_truncate(const char *path,
-    lib_native_file **out_file)
-{ return lib_native_file_open_writer(path, "wb", out_file); }
+lib_status storage_file_platform_open_truncate(const char *path,
+    storage_file_platform **out_file)
+{ return storage_file_platform_open_writer(path, "wb", out_file); }
 
-lib_status lib_native_file_open_append(const char *path,
-    lib_native_file **out_file)
-{ return lib_native_file_open_writer(path, "ab", out_file); }
+lib_status storage_file_platform_open_append(const char *path,
+    storage_file_platform **out_file)
+{ return storage_file_platform_open_writer(path, "ab", out_file); }
 
-lib_status lib_native_file_read(lib_native_file *file, void *bytes,
+lib_status storage_file_platform_read(storage_file_platform *file, void *bytes,
     lib_size byte_count, lib_size *out_byte_count)
 {
     if (file == LIB_NULL || out_byte_count == LIB_NULL ||
@@ -93,7 +91,7 @@ lib_status lib_native_file_read(lib_native_file *file, void *bytes,
     return ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-lib_status lib_native_file_write(lib_native_file *file, const void *bytes,
+lib_status storage_file_platform_write(storage_file_platform *file, const void *bytes,
     lib_size byte_count, lib_size *out_byte_count)
 {
     if (file == LIB_NULL || out_byte_count == LIB_NULL ||
@@ -103,15 +101,15 @@ lib_status lib_native_file_write(lib_native_file *file, const void *bytes,
     return ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-lib_status lib_native_file_flush(lib_native_file *file)
+lib_status storage_file_platform_flush(storage_file_platform *file)
 {
     if (file == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     return fflush(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-lib_status lib_native_file_close(lib_native_file **file)
+lib_status storage_file_platform_close(storage_file_platform **file)
 {
-    lib_native_file *value;
+    storage_file_platform *value;
     int result;
 
     if (file == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
@@ -123,18 +121,10 @@ lib_status lib_native_file_close(lib_native_file **file)
     return result == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-lib_status lib_native_file_seek_absolute(lib_native_file *file, lib_i64 offset)
+lib_status storage_file_platform_seek_absolute(storage_file_platform *file, lib_i64 offset)
 { return _fseeki64(file->stream, offset, SEEK_SET) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR; }
 
-lib_status lib_native_file_tell(lib_native_file *file, lib_i64 *out_offset)
-{
-    lib_i64 offset = _ftelli64(file->stream);
-    if (offset < 0) return LIB_STATUS_IO_ERROR;
-    *out_offset = offset;
-    return LIB_STATUS_OK;
-}
-
-lib_status lib_native_file_byte_count(lib_native_file *file, lib_i64 *out_byte_count)
+lib_status storage_file_platform_byte_count(storage_file_platform *file, lib_i64 *out_byte_count)
 {
     lib_i64 offset = _ftelli64(file->stream);
     lib_i64 length;

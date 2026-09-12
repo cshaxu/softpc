@@ -1,8 +1,7 @@
 #include "lib/console/console.h"
 #include "lib/host/console_backend.h"
 
-#ifdef _WIN32
-#include <windows.h>
+#include "lib/types/win32.h"
 
 struct host_console_backend {
     HANDLE input;
@@ -479,4 +478,3 @@ lib_status host_console_backend_write_text_frame_bound(host_console_backend *bac
     host_console_backend_unlock_output(backend);
     return LIB_STATUS_OK;
 }
-#endif

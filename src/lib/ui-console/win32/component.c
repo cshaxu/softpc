@@ -1,9 +1,8 @@
 #include "lib/ui-console/console.h"
 
-#ifdef _WIN32
 #include "lib/ui-base/win32/input.h"
 
-#include <windows.h>
+#include "lib/types/win32.h"
 
 typedef struct ui_console_win32_state {
     HANDLE worker;
@@ -177,4 +176,3 @@ void ui_console_native_stop(ui_console *console)
     console->native_state = LIB_NULL;
     lib_release(state);
 }
-#endif

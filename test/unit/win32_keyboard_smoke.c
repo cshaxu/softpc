@@ -1,5 +1,6 @@
 #include "lib/ui-base/win32/input.h"
 #include "lib/ui-base/hotkey_interface.h"
+#include "lib/types/native_input.h"
 
 #include <assert.h>
 #include <string.h>

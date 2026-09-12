@@ -3,6 +3,8 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef uint8_t lib_u8;
 typedef uint16_t lib_u16;
@@ -33,16 +35,33 @@ enum {
 
 /* Cross-platform C runtime vocabulary.  These functions deliberately expose
  * no platform handle, product state, or I/O policy. */
-void *lib_memory_set(void *destination, int value, lib_size byte_count);
-void *lib_memory_copy(void *destination, const void *source, lib_size byte_count);
-int lib_memory_compare(const void *left, const void *right, lib_size byte_count);
-const void *lib_memory_find(const void *bytes, int value, lib_size byte_count);
+static inline void *lib_memory_set(void *destination, int value,
+    lib_size byte_count)
+{ return memset(destination, value, byte_count); }
 
-lib_size lib_text_length(const char *text);
+static inline void *lib_memory_copy(void *destination, const void *source,
+    lib_size byte_count)
+{ return memcpy(destination, source, byte_count); }
 
-void *lib_allocate(lib_size byte_count);
-void *lib_allocate_zero(lib_size count, lib_size byte_count);
-void lib_release(void *memory);
+static inline int lib_memory_compare(const void *left, const void *right,
+    lib_size byte_count)
+{ return memcmp(left, right, byte_count); }
+
+static inline const void *lib_memory_find(const void *bytes, int value,
+    lib_size byte_count)
+{ return memchr(bytes, value, byte_count); }
+
+static inline lib_size lib_text_length(const char *text)
+{ return text == LIB_NULL ? 0u : strlen(text); }
+
+static inline void *lib_allocate(lib_size byte_count)
+{ return malloc(byte_count); }
+
+static inline void *lib_allocate_zero(lib_size count, lib_size byte_count)
+{ return calloc(count, byte_count); }
+
+static inline void lib_release(void *memory)
+{ free(memory); }
 
 #include "lib/types/atomic.h"
 

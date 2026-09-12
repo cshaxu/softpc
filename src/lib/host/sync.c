@@ -1,12 +1,11 @@
-#include "lib/host/sync_interface.h"
-#include "lib/types/native_sync.h"
+#include "lib/host/sync.h"
 
 struct host_sync_event {
-    lib_native_event *native;
+    host_sync_platform_event *platform;
 };
 
 struct host_sync_task {
-    lib_native_task *native;
+    host_sync_platform_task *platform;
     host_sync_event *cancellation;
     host_sync_task_entry entry;
     void *context;
@@ -20,7 +19,7 @@ static void host_sync_task_main(void *opaque)
         task->entry(task->context, task);
 }
 
-static host_sync_wait_result host_sync_wait_result_from_native(lib_status status,
+static host_sync_wait_result host_sync_wait_result_from_platform(lib_status status,
     lib_bool signaled)
 {
     return status != LIB_STATUS_OK ? HOST_SYNC_WAIT_FAULT :
@@ -30,12 +29,12 @@ static host_sync_wait_result host_sync_wait_result_from_native(lib_status status
 
 void host_sync_sleep_milliseconds(lib_u32 milliseconds)
 {
-    lib_native_sleep_milliseconds(milliseconds);
+    host_sync_platform_sleep_milliseconds(milliseconds);
 }
 
 void host_sync_yield(void)
 {
-    lib_native_yield();
+    host_sync_platform_yield();
 }
 
 lib_status host_sync_event_create(host_sync_event **out_event)
@@ -47,7 +46,7 @@ lib_status host_sync_event_create(host_sync_event **out_event)
     *out_event = LIB_NULL;
     event = (host_sync_event *)lib_allocate_zero(1u, sizeof(*event));
     if (event == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    status = lib_native_event_create(LIB_TRUE, &event->native);
+    status = host_sync_platform_event_create(LIB_TRUE, &event->platform);
     if (status != LIB_STATUS_OK) {
         lib_release(event);
         return status;
@@ -59,25 +58,25 @@ lib_status host_sync_event_create(host_sync_event **out_event)
 void host_sync_event_destroy(host_sync_event *event)
 {
     if (event == LIB_NULL) return;
-    lib_native_event_destroy(event->native);
+    host_sync_platform_event_destroy(event->platform);
     lib_release(event);
 }
 
 void host_sync_event_signal(host_sync_event *event)
 {
-    if (event != LIB_NULL) lib_native_event_signal(event->native);
+    if (event != LIB_NULL) host_sync_platform_event_signal(event->platform);
 }
 
 void host_sync_event_reset(host_sync_event *event)
 {
-    if (event != LIB_NULL) lib_native_event_reset(event->native);
+    if (event != LIB_NULL) host_sync_platform_event_reset(event->platform);
 }
 
 host_sync_wait_result host_sync_wait_any(host_sync_event *const *events,
     lib_u32 event_count, const host_sync_task *cancel_task,
     lib_u32 timeout_milliseconds, lib_u32 *out_event_index)
 {
-    const lib_native_event *native_events[64];
+    const host_sync_platform_event *platform_events[64];
     lib_u32 native_count = 0u;
     lib_u32 native_index = 0u;
     lib_u32 index;
@@ -90,19 +89,19 @@ host_sync_wait_result host_sync_wait_any(host_sync_event *const *events,
     if (out_event_index != LIB_NULL) *out_event_index = UINT32_MAX;
     if (cancel_task != LIB_NULL) {
         if (cancel_task->cancellation == LIB_NULL ||
-            cancel_task->cancellation->native == LIB_NULL)
+            cancel_task->cancellation->platform == LIB_NULL)
             return HOST_SYNC_WAIT_INVALID_ARGUMENT;
-        native_events[native_count++] = cancel_task->cancellation->native;
+        platform_events[native_count++] = cancel_task->cancellation->platform;
     }
     for (index = 0u; index < event_count; ++index) {
-        if (events[index] == LIB_NULL || events[index]->native == LIB_NULL)
+        if (events[index] == LIB_NULL || events[index]->platform == LIB_NULL)
             return HOST_SYNC_WAIT_INVALID_ARGUMENT;
-        native_events[native_count++] = events[index]->native;
+        platform_events[native_count++] = events[index]->platform;
     }
-    status = lib_native_event_wait_many(native_events, native_count,
+    status = host_sync_platform_event_wait_many(platform_events, native_count,
         timeout_milliseconds, &signaled, &native_index);
     if (status != LIB_STATUS_OK || signaled == LIB_FALSE)
-        return host_sync_wait_result_from_native(status, signaled);
+        return host_sync_wait_result_from_platform(status, signaled);
     if (cancel_task != LIB_NULL && native_index == 0u)
         return HOST_SYNC_WAIT_CANCELLED;
     if (out_event_index != LIB_NULL)
@@ -132,7 +131,7 @@ lib_status host_sync_task_create(host_sync_task_entry entry, void *context,
     task->context = context;
     status = host_sync_event_create(&task->cancellation);
     if (status == LIB_STATUS_OK)
-        status = lib_native_task_create(host_sync_task_main, task, &task->native);
+        status = host_sync_platform_task_create(host_sync_task_main, task, &task->platform);
     if (status != LIB_STATUS_OK) {
         host_sync_event_destroy(task->cancellation);
         lib_release(task);
@@ -149,11 +148,13 @@ void host_sync_task_request_cancel(host_sync_task *task)
 
 int host_sync_task_cancelled(const host_sync_task *task)
 {
+    const host_sync_platform_event *events[1];
     lib_bool signaled = LIB_FALSE;
 
-    return task != LIB_NULL && task->cancellation != LIB_NULL &&
-        lib_native_event_wait(task->cancellation->native, 0u, &signaled) ==
-            LIB_STATUS_OK && signaled != LIB_FALSE;
+    if (task == LIB_NULL || task->cancellation == LIB_NULL) return 0;
+    events[0] = task->cancellation->platform;
+    return host_sync_platform_event_wait_many(events, 1u, 0u, &signaled,
+        LIB_NULL) == LIB_STATUS_OK && signaled != LIB_FALSE;
 }
 
 host_sync_wait_result host_sync_task_wait_cancel(const host_sync_task *task,
@@ -166,7 +167,7 @@ host_sync_wait_result host_sync_task_wait_cancel(const host_sync_task *task,
 
 void host_sync_task_join(host_sync_task *task)
 {
-    if (task != LIB_NULL) lib_native_task_join(task->native);
+    if (task != LIB_NULL) host_sync_platform_task_join(task->platform);
 }
 
 void host_sync_task_destroy(host_sync_task *task)
@@ -174,7 +175,7 @@ void host_sync_task_destroy(host_sync_task *task)
     if (task == LIB_NULL) return;
     host_sync_task_request_cancel(task);
     host_sync_task_join(task);
-    lib_native_task_destroy(task->native);
+    host_sync_platform_task_destroy(task->platform);
     host_sync_event_destroy(task->cancellation);
     lib_release(task);
 }

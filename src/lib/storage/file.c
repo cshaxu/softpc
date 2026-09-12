@@ -6,17 +6,17 @@
 struct lib_storage_file_writer { lib_storage_file *file; };
 
 static lib_status lib_storage_file_open(const char *path,
-    lib_status (*open_native)(const char *, lib_native_file **),
+    lib_status (*open_platform)(const char *, storage_file_platform **),
     lib_storage_file **out_file)
 {
     lib_storage_file *file;
 
-    if (path == LIB_NULL || open_native == LIB_NULL || out_file == LIB_NULL)
+    if (path == LIB_NULL || open_platform == LIB_NULL || out_file == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     *out_file = LIB_NULL;
     file = (lib_storage_file *)lib_allocate_zero(1u, sizeof(*file));
     if (file == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    if (open_native(path, &file->native) != LIB_STATUS_OK) {
+    if (open_platform(path, &file->platform) != LIB_STATUS_OK) {
         lib_release(file);
         return LIB_STATUS_IO_ERROR;
     }
@@ -26,19 +26,19 @@ static lib_status lib_storage_file_open(const char *path,
 
 lib_status lib_storage_file_open_readonly(const char *path,
     lib_storage_file **out_file)
-{ return lib_storage_file_open(path, lib_native_file_open_readonly, out_file); }
+{ return lib_storage_file_open(path, storage_file_platform_open_readonly, out_file); }
 
 lib_status lib_storage_file_open_readwrite(const char *path,
     lib_storage_file **out_file)
-{ return lib_storage_file_open(path, lib_native_file_open_readwrite, out_file); }
+{ return lib_storage_file_open(path, storage_file_platform_open_readwrite, out_file); }
 
 lib_status lib_storage_file_open_truncate(const char *path,
     lib_storage_file **out_file)
-{ return lib_storage_file_open(path, lib_native_file_open_truncate, out_file); }
+{ return lib_storage_file_open(path, storage_file_platform_open_truncate, out_file); }
 
 lib_status lib_storage_file_open_append(const char *path,
     lib_storage_file **out_file)
-{ return lib_storage_file_open(path, lib_native_file_open_append, out_file); }
+{ return lib_storage_file_open(path, storage_file_platform_open_append, out_file); }
 
 lib_status lib_storage_file_read_exact(lib_storage_file *file, void *bytes,
     lib_size byte_count)
@@ -47,7 +47,7 @@ lib_status lib_storage_file_read_exact(lib_storage_file *file, void *bytes,
 
     if (file == LIB_NULL || (bytes == LIB_NULL && byte_count != 0u))
         return LIB_STATUS_INVALID_ARGUMENT;
-    return lib_native_file_read(file->native, bytes, byte_count, &transferred) !=
+    return storage_file_platform_read(file->platform, bytes, byte_count, &transferred) !=
             LIB_STATUS_OK || transferred != byte_count ? LIB_STATUS_IO_ERROR :
             LIB_STATUS_OK;
 }
@@ -59,24 +59,24 @@ lib_status lib_storage_file_write_exact(lib_storage_file *file,
 
     if (file == LIB_NULL || (bytes == LIB_NULL && byte_count != 0u))
         return LIB_STATUS_INVALID_ARGUMENT;
-    return lib_native_file_write(file->native, bytes, byte_count, &transferred) !=
+    return storage_file_platform_write(file->platform, bytes, byte_count, &transferred) !=
             LIB_STATUS_OK || transferred != byte_count ? LIB_STATUS_IO_ERROR :
             LIB_STATUS_OK;
 }
 
 lib_status lib_storage_file_flush(lib_storage_file *file)
 { return file == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
-    lib_native_file_flush(file->native); }
+    storage_file_platform_flush(file->platform); }
 
 lib_status lib_storage_file_seek_absolute(lib_storage_file *file,
     lib_i64 offset)
 { return file == LIB_NULL || offset < 0 ? LIB_STATUS_INVALID_ARGUMENT :
-    lib_native_file_seek_absolute(file->native, offset); }
+    storage_file_platform_seek_absolute(file->platform, offset); }
 
 lib_status lib_storage_file_byte_count(lib_storage_file *file,
     lib_i64 *out_byte_count)
 { return file == LIB_NULL || out_byte_count == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
-    lib_native_file_byte_count(file->native, out_byte_count); }
+    storage_file_platform_byte_count(file->platform, out_byte_count); }
 
 lib_status lib_storage_file_close(lib_storage_file **file)
 {
@@ -87,7 +87,7 @@ lib_status lib_storage_file_close(lib_storage_file **file)
     value = *file;
     *file = LIB_NULL;
     if (value == LIB_NULL) return LIB_STATUS_OK;
-    status = lib_native_file_close(&value->native);
+    status = storage_file_platform_close(&value->platform);
     lib_release(value);
     return status;
 }

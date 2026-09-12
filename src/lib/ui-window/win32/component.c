@@ -1,14 +1,13 @@
 #include "lib/types/types_interface.h"
 #include "lib/ui-window/win32/component.h"
 
-#ifdef _WIN32
 #include "lib/ui-window/win32/geometry.h"
 #include "lib/ui-base/win32/input.h"
 #include "lib/ui-base/win32/actions.h"
 #include "lib/ui-base/mailbox.h"
 #include "lib/ui-window/win32/mouse.h"
 
-#include <windows.h>
+#include "lib/types/win32.h"
 
 #define WIN32_WINDOW_TEXT_CELL_WIDTH 8u
 #define WIN32_WINDOW_TEXT_CELL_HEIGHT 16u
@@ -901,4 +900,3 @@ void ui_window_native_stop(ui_window *component)
     component->native_state = LIB_NULL;
     lib_release(state);
 }
-#endif

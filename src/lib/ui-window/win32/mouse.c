@@ -1,6 +1,5 @@
 #include "lib/ui-window/win32/mouse.h"
 
-#ifdef _WIN32
 void ui_win32_mouse_reset(ui_win32_mouse *mouse)
 {
     if (mouse == NULL) return;
@@ -84,5 +83,3 @@ int ui_win32_mouse_captured(const ui_win32_mouse *mouse)
 {
     return mouse != NULL && ui_capture_is_active(&mouse->capture);
 }
-
-#endif
