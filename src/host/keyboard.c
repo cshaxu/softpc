@@ -7,6 +7,7 @@ extern void AT_kbd_init(void);
 extern void AT_kbd_post(void);
 extern void host_key_down(int key);
 extern void host_key_up(int key);
+extern unsigned char output_contents;
 
 static void softpc_keyboard_host_void(void)
 {
@@ -44,6 +45,15 @@ void softpc_platform_keyboard_reset(void)
     keyboard_post();
     AT_kbd_init();
     AT_kbd_post();
+}
+
+void softpc_platform_keyboard_discard_stale_output(void)
+{
+    /* The original reset clears the 8042 full/status state but retains the
+       backing data byte. After the host drops a completed run's IRQ1, that
+       byte must not be observable through a spurious acknowledgement in the
+       new cold run. */
+    output_contents = 0u;
 }
 
 int softpc_platform_keyboard_key(int key, int released)

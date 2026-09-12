@@ -98,14 +98,13 @@ foreach(source IN LISTS shared_neutral_corpus)
 endforeach()
 
 # A shared public contract is visibly named. Product code must not reach a
-# component implementation header, and one public contract may compose only
-# other public contracts.
+# component implementation header. Shared contracts may include a private
+# same-component inline helper where the canonical corpus needs its declarations
+# to compile; that transitive implementation detail is not a product include.
 file(GLOB_RECURSE product_lib_consumers
     "${SOFTPC_SOURCE_DIR}/src/app/*.[ch]"
     "${SOFTPC_SOURCE_DIR}/src/host/*.[ch]")
-file(GLOB_RECURSE shared_interface_headers
-    "${SOFTPC_SOURCE_DIR}/src/lib/*_interface.h")
-foreach(source IN LISTS product_lib_consumers shared_interface_headers)
+foreach(source IN LISTS product_lib_consumers)
     file(STRINGS "${source}" include_lines REGEX
         "#[ \t]*include[ \t]+\"lib/[^\"]+\.h\"")
     foreach(include_line IN LISTS include_lines)

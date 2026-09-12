@@ -25,6 +25,7 @@ extern void softpc_gdp_destroy_global(void);
 extern void setup_vga_globals(void);
 extern void softpc_ccpu_install_video_vector(void);
 extern void reset(void);
+extern void (*ica_clear_int_func)(unsigned long adapter, unsigned long line);
 extern int soft_reset;
 extern unsigned long softpc_ccpu_instruction_budget;
 extern int softpc_ccpu_instruction_budget_active;
@@ -35,6 +36,7 @@ extern int softpc_platform_read_physical(unsigned long address,
 extern void softpc_device_bop_register_machine_services(void);
 extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
 extern int softpc_platform_keyboard_key(int key, int released);
+extern void softpc_platform_keyboard_discard_stale_output(void);
 extern void softpc_platform_request_executor_wake(void);
 extern void mouse_send(int delta_x, int delta_y, int left, int right);
 extern void softpc_platform_presentation_request_refresh(void);
@@ -207,6 +209,17 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     soft_reset = 0;
     softpc_platform_set_boot_clock(1);
     reset();
+    /* The original reset recreates the keyboard controller, but an IRQ1 that
+       was already asserted by the completed standalone run is an interrupt
+       line, not controller state.  Drop that line at the cold-run boundary;
+       the new controller will assert it again only for new input. */
+    if (ica_clear_int_func != NULL)
+        ica_clear_int_func(0u, 1u);
+    softpc_platform_keyboard_discard_stale_output();
+    /* reset() can service the old PIC line while rebuilding devices. Clear
+       the CCPU delivery map after that final line drop, rather than only
+       before reset(), so no old IRQ1 reaches the new boot image. */
+    softpc_ccpu_lifecycle_clear_pending_interrupts();
     softpc_platform_set_boot_clock(0);
     softpc_platform_install_timer2_sound_gate();
     machine->reset = 1;

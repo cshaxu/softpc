@@ -42,7 +42,8 @@ void app_prompt_trace_reset(void)
             LIB_STORAGE_FILE_WRITER_TRUNCATE, &writer) != LIB_STATUS_OK)
         return;
     (void)lib_storage_file_writer_write(writer,
-        "Insignia SoftPC Prompt transition trace\n");
+        "Insignia SoftPC Prompt transition trace\r\n",
+        sizeof("Insignia SoftPC Prompt transition trace\r\n") - 1u);
     (void)lib_storage_file_writer_close(writer);
 }
 
@@ -62,17 +63,19 @@ void app_prompt_trace(const char *format, ...)
     va_copy(copied_arguments, arguments);
     length = vsnprintf(NULL, 0u, format, copied_arguments);
     va_end(copied_arguments);
-    if (length < 0 || (text = malloc((size_t)length + 2u)) == NULL) {
+    if (length < 0 || (text = malloc((size_t)length + 3u)) == NULL) {
         va_end(arguments);
         return;
     }
     (void)vsnprintf(text, (size_t)length + 1u, format, arguments);
     va_end(arguments);
-    text[length] = '\n';
-    text[length + 1] = '\0';
+    text[length] = '\r';
+    text[length + 1] = '\n';
+    text[length + 2] = '\0';
     if (lib_storage_file_writer_open(trace_path,
             LIB_STORAGE_FILE_WRITER_APPEND, &writer) == LIB_STATUS_OK) {
-        (void)lib_storage_file_writer_write(writer, text);
+        (void)lib_storage_file_writer_write(writer, text,
+            (lib_size)length + 2u);
         (void)lib_storage_file_writer_close(writer);
     }
     free(text);

@@ -12,6 +12,15 @@ needed to compile, link, and retain its existing behavior.
 - Adapt SoftPC's prompt-trace writer to the writer's explicit
   `{bytes, byte_count}` contract. Preserve the trace's deliberate line-ending
   behavior explicitly rather than relying on C text-mode translation.
+- Replace the existing runtime-input restart smoke's unstable total-IRQ
+  comparison with a non-repeating exact test-only scan-code marker. The
+  assertion then proves whether first-run input reaches the second run,
+  without treating ordinary BIOS/controller records or original typematic
+  output as leaked input.
+- Clear the completed standalone run's residual keyboard IRQ line after the
+  original cold reset. This narrow host integration correction preserves the
+  MVDM controller and guest warm-reset behavior; the next run receives only
+  newly asserted input.
 - Prove exact corpus equality against the frozen NXVM source, build and test
   both package widths, and refresh only the two agent-owned package executables.
 
@@ -27,6 +36,8 @@ NXVM, and does not invent a SoftPC-specific variant of any library file.
 After completion, every `src/lib/` path and SHA-256 equals the frozen NXVM
 `src/lib/` corpus at `64d211c9`; no source change remains under SoftPC's
 library directory. The two existing SoftPC prompt-trace writer calls use the
-length-bearing API and preserve their intended bytes. Fresh x64 and x86 builds
-and complete CTest pass, library manifests verify, and the two package EXEs
+length-bearing API and preserve their intended bytes. The standalone cold-run
+boundary removes an old IRQ1 and its invalid backing byte without modifying
+MVDM. Fresh x64 and x86 builds and complete CTest pass; the restart smoke
+checks its exact first-run scan set, library manifests verify, and the two package EXEs
 are refreshed without modifying the INI or media.
