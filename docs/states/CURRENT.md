@@ -5,8 +5,8 @@
 M9 T55 S4 is admitted and active: the seven approved UI input, shutdown,
 blocking-lock and storage cleanup dispositions. S3 P5/P6 is delivered and
 reviewed at `5ea133c`; it is not the active implementation packet.
-T55 remains open. S4 implementation and automated verification are complete;
-the complete P delivery, post-push review and owner package inspection follow.
+T55 remains open. S4 P1 `fe620cb` is implemented, verified and pushed;
+post-push actual-diff review passed. Owner package inspection remains pending.
 
 ## M9 T55 S4 Packet
 

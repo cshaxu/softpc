@@ -78,6 +78,24 @@ above: one final Window sink, one worker failure path, one admission boundary,
 three replaced long-held gates, and one stream owner. No extra repair is
 silently added. Overlay's only medium diff is its approved TODO.
 
+### S4 P2 coordinator review
+
+After P1 `fe620cb` was pushed, the coordinator role inspected the actual
+`git diff 5ea133c..fe620cb` against this packet, including the event/filter,
+matcher, admission, worker retirement, Console/host lock scopes, storage
+ownership, selected-platform implementations, regression tests and CMake DAG.
+The seven dispositions match the approved scope. Previously separate Window
+delivery wrappers and storage allocations are removed; retained short locks,
+capture/blink guards and source-retirement path have the distinct purposes
+recorded above. No product routing or input ABI change was introduced.
+
+P1's x64/x86 48/48 results and strict 3/3 checks are accepted as automated
+evidence for this bounded repair, not Linux desktop parity or a whole-library
+qualification. Both EXEs are tracked in P1. This P2 changes only review/status
+documentation; documentation checks are rerun. S4 awaits owner package
+inspection and T55 remains open. The O(n) overlay debt remains explicitly
+deferred rather than being reported as a performance fix.
+
 ## S3 P5 admission: correctness and boundary convergence
 
 Original owner requests: “以上。写入设计/任务文档，然后开始清理”,
