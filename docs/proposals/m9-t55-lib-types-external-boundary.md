@@ -71,6 +71,11 @@ observable behavior.
   It carries no `host_*`, `ui_*`, monitor, lifecycle, or machine policy. A
   required native callback remains wholly within `types`; its consumer gets a
   copied neutral event or an opaque `lib_native_*` handle.
+- `ui-base` owns the one native-input normalizer and its conversion to
+  `ui_input_event` before the existing source-identity and registered-hotkey
+  path. It obtains native-only facts (layout translation, scan lookup and
+  modifier sampling) through small `types` primitives. Neither `types` nor
+  either UI leaf interprets a hotkey or owns a second event mapping route.
 - Component-specific behavior stays in its present owner: storage still owns
   storage policy, host still owns broker/synchronization policy, and UI leaves
   still own UI lifecycle and rendering decisions. They request primitive
