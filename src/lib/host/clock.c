@@ -1,4 +1,4 @@
-#include "lib/host/clock.h"
+#include "lib/host/clock_interface.h"
 
 lib_status host_clock_monotonic_counter(lib_u64 *out_units,
     lib_u64 *out_units_per_second)
@@ -6,7 +6,7 @@ lib_status host_clock_monotonic_counter(lib_u64 *out_units,
     if (out_units == LIB_NULL || out_units_per_second == LIB_NULL) {
         return LIB_STATUS_INVALID_ARGUMENT;
     }
-    return host_clock_platform_monotonic_counter(out_units, out_units_per_second);
+    return lib_monotonic_counter(out_units, out_units_per_second);
 }
 
 lib_status host_clock_milliseconds(lib_u64 *out_milliseconds)

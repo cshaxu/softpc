@@ -1,9 +1,9 @@
-#include "lib/host/clock.h"
+#include "lib/types/types_interface.h"
 
 #include <windows.h>
 
 
-lib_status host_clock_platform_monotonic_counter(lib_u64 *out_units,
+lib_status lib_monotonic_counter(lib_u64 *out_units,
     lib_u64 *out_units_per_second)
 {
     LARGE_INTEGER counter;

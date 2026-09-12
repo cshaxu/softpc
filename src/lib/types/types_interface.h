@@ -68,6 +68,10 @@ void *lib_allocate(lib_size byte_count);
 void *lib_allocate_zero(lib_size count, lib_size byte_count);
 void lib_release(void *memory);
 
+/* Host monotonic time as a copied counter and its copied frequency. */
+lib_status lib_monotonic_counter(lib_u64 *out_units,
+    lib_u64 *out_units_per_second);
+
 /* Neutral byte-stream primitive.  Native descriptors and C FILE objects stay
  * entirely within types. */
 lib_status lib_file_open(const char *path, lib_file_access access,
