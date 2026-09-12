@@ -40,11 +40,6 @@ int lib_text_compare(const char *left, const char *right)
     return strcmp(left, right);
 }
 
-char *lib_text_tokenize(char *text, const char *delimiters)
-{
-    return strtok(text, delimiters);
-}
-
 void lib_text_ascii_lower(char *text)
 {
     if (text == LIB_NULL) return;

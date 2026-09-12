@@ -54,7 +54,6 @@ const void *lib_memory_find(const void *bytes, int value, lib_size byte_count);
 
 lib_size lib_text_length(const char *text);
 int lib_text_compare(const char *left, const char *right);
-char *lib_text_tokenize(char *text, const char *delimiters);
 void lib_text_ascii_lower(char *text);
 int lib_text_format(char *destination, lib_size destination_capacity,
     const char *format, ...);

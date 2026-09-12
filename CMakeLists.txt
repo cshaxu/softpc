@@ -349,6 +349,13 @@ target_link_libraries(softpc-partition-image-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-partition-image-smoke COMMAND softpc-partition-image-smoke)
 set_tests_properties(softpc-partition-image-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-storage-file-writer-binary-smoke
+    test/unit/storage_file_writer_binary_smoke.c)
+target_link_libraries(softpc-storage-file-writer-binary-smoke PRIVATE storage)
+add_test(NAME softpc-storage-file-writer-binary-smoke
+    COMMAND softpc-storage-file-writer-binary-smoke)
+set_tests_properties(softpc-storage-file-writer-binary-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-irq-smoke test/unit/irq_smoke.c)
 target_link_libraries(softpc-irq-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-irq-smoke PRIVATE
