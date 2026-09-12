@@ -64,7 +64,7 @@ static void retirement_failure(void *opaque, lib_u64 source_identity,
     lib_status status)
 {
     retirement_probe *probe = opaque;
-    assert(fail_wake && source_identity != 0u && status == LIB_STATUS_IO_ERROR);
+    assert(source_identity != 0u && status == LIB_STATUS_IO_ERROR);
     InterlockedIncrement(&probe->failures);
 }
 
@@ -159,10 +159,54 @@ static void check_retirement(int fault)
     CloseHandle(probe.destroyed);
 }
 
+static HANDLE write_called;
+static lib_status write_result;
+static lib_status failing_frame(void *context, const lib_console_text_frame *frame)
+{
+    (void)context; (void)frame;
+    SetEvent(write_called);
+    return write_result;
+}
+static void check_io_failure(int reader, lib_status output_status)
+{
+    retirement_probe probe = { 0 };
+    ui_console_options options = { 0 };
+    ui_console *console;
+    static ui_frame frame;
+    InterlockedExchange(&fail_wake, 0);
+    probe.retired = CreateEventA(NULL, TRUE, FALSE, NULL);
+    write_called = CreateEventA(NULL, TRUE, FALSE, NULL);
+    options.input_sink = retirement_input; options.input_context = &probe;
+    options.failure_sink = retirement_failure; options.failure_context = &probe;
+    assert(ui_console_create(&console, &options) == LIB_STATUS_OK);
+    lib_console *logical = ui_console_get_console(console);
+    assert(lib_console_bind_generation(logical, 1u) == LIB_STATUS_OK);
+    if (reader) {
+        lib_console_event event = { 0 };
+        event.kind = LIB_CONSOLE_EVENT_IO_FAILURE; event.binding_generation = 1u;
+        assert(lib_console_deliver_event(logical, &event) == LIB_STATUS_OK);
+    } else {
+        write_result = output_status;
+        assert(lib_console_set_text_frame_sink(logical, failing_frame, NULL) == LIB_STATUS_OK);
+        frame.valid = 1u; frame.text_columns = 80u; frame.text_rows = 25u;
+        assert(ui_console_publish_frame(console, &frame) == LIB_STATUS_OK);
+        assert(WaitForSingleObject(write_called, 5000u) == WAIT_OBJECT_0);
+    }
+    if (reader || output_status == LIB_STATUS_IO_ERROR)
+        assert(WaitForSingleObject(probe.retired, 5000u) == WAIT_OBJECT_0);
+    ui_console_destroy(console);
+    assert(probe.event_count == 1 && probe.events[0].type == UI_EVENT_SOURCE_RETIRED);
+    assert(probe.failures == (reader || output_status == LIB_STATUS_IO_ERROR));
+    CloseHandle(probe.retired); CloseHandle(write_called);
+}
+
 int main(void)
 {
     check_retirement(0);
     check_retirement(1);
+    check_io_failure(1, LIB_STATUS_OK);
+    check_io_failure(0, LIB_STATUS_IO_ERROR);
+    check_io_failure(0, LIB_STATUS_NOT_CURRENT);
     return 0;
 }
 #else

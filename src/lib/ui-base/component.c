@@ -92,14 +92,15 @@ lib_status ui_component_enqueue_controls(ui_component *component,
     return status;
 }
 
-void ui_component_emit_source_retired(ui_component *component)
+void ui_component_retire(ui_component *component, lib_status status)
 {
     ui_input_event event = { .type = UI_EVENT_SOURCE_RETIRED };
     if (component == LIB_NULL || component->input_sink == LIB_NULL) return;
     ui_input_event_set_source(&event, component, component->source_identity);
     lib_atomic_i32_store_explicit(&component->stopping, 1,
         LIB_MEMORY_ORDER_RELEASE);
-    if (!component->input_sink(component->input_context, &event))
+    ui_component_report_failure(component, status);
+    if (!component->input_sink(component->input_context, &event) && status == LIB_STATUS_OK)
         ui_component_report_failure(component, LIB_STATUS_IO_ERROR);
 }
 

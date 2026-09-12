@@ -44,6 +44,7 @@ input is validated by its consumer, not silently reinterpreted here.
 
 `file.h` contains common C stream declarations. `win32/file.h` and
 `linux/file.h` add their platform declarations. File operations and ownership
-remain in storage. Counter validation/composition belongs to host; key-state
-interpretation belongs to ui-base. There is no runtime layer or zero-result
+remain in storage. Counter validation/composition belongs to host; input
+normalization belongs to ui-base and Window key-state queries to ui-window.
+There is no runtime layer or zero-result
 fallback pretending to implement another platform's input query.

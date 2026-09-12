@@ -4,10 +4,7 @@
 void ui_win32_mouse_reset(ui_win32_mouse *mouse)
 {
     if (mouse == LIB_NULL) return;
-    mouse->x = 0;
-    mouse->y = 0;
-    mouse->valid = 0;
-    mouse->captured = LIB_FALSE;
+    lib_memory_set(mouse, 0, sizeof(*mouse));
 }
 
 void ui_win32_mouse_release(ui_win32_mouse *mouse)
@@ -18,6 +15,7 @@ void ui_win32_mouse_release(ui_win32_mouse *mouse)
     lib_win32_set_cursor(lib_win32_load_cursor_a(LIB_NULL, LIB_WIN32_IDC_ARROW));
     mouse->captured = LIB_FALSE;
     mouse->valid = 0;
+    mouse->remainder_x = mouse->remainder_y = 0;
 }
 
 int ui_win32_mouse_capture(ui_win32_mouse *mouse,
@@ -55,6 +53,7 @@ int ui_win32_mouse_capture(ui_win32_mouse *mouse,
     mouse->y = (int)(short)lib_win32_hiword(position);
     mouse->valid = 1;
     mouse->captured = LIB_TRUE;
+    mouse->remainder_x = mouse->remainder_y = 0;
     return 1;
 }
 
@@ -73,10 +72,22 @@ int ui_win32_mouse_move(ui_win32_mouse *mouse,
     mouse->x = x;
     mouse->y = y;
     mouse->valid = 1;
-    if (client_width > 0 && content_width != 0u)
-        *dx = (int)((long long)*dx * (long long)content_width / client_width);
-    if (client_height > 0 && content_height != 0u)
-        *dy = (int)((long long)*dy * (long long)content_height / client_height);
+    if (mouse->client_width != client_width || mouse->content_width != content_width)
+        mouse->remainder_x = 0;
+    if (mouse->client_height != client_height || mouse->content_height != content_height)
+        mouse->remainder_y = 0;
+    mouse->client_width = client_width; mouse->client_height = client_height;
+    mouse->content_width = content_width; mouse->content_height = content_height;
+    if (client_width > 0 && content_width != 0u) {
+        lib_i64 total = (lib_i64)*dx * content_width + mouse->remainder_x;
+        *dx = (int)(total / client_width);
+        mouse->remainder_x = total % client_width;
+    }
+    if (client_height > 0 && content_height != 0u) {
+        lib_i64 total = (lib_i64)*dy * content_height + mouse->remainder_y;
+        *dy = (int)(total / client_height);
+        mouse->remainder_y = total % client_height;
+    }
     return 1;
 }
 

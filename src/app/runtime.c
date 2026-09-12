@@ -379,7 +379,7 @@ done:
 
 static void app_runtime_drain_input(app_runtime *runtime)
 {
-    ui_event event;
+    ui_input_event event;
 
     /* keyboard_io can enter a nested host_simulate frame for the original
        BIOS INT 15 keyboard hook.  A Windows make/break pair may already be
@@ -664,7 +664,7 @@ softpc_machine_result app_runtime_get_result(const app_runtime *runtime)
 }
 
 int app_runtime_enqueue_input_event(app_runtime *runtime,
-    const ui_event *event)
+    const ui_input_event *event)
 {
     LONG state;
     if (runtime == NULL || event == NULL) return 0;

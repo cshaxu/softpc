@@ -37,10 +37,10 @@ target_link_libraries(console PUBLIC types)
 set(LIBRARY_UI_BASE_SOURCES
     ui-base/component.c
     ui-base/hotkey.c
+    ui-base/input.c
     ui-base/mailbox.c)
 if(WIN32)
     list(APPEND LIBRARY_UI_BASE_SOURCES
-        ui-base/win32/actions.c
         ui-base/win32/mailbox.c
         ui-base/win32/input.c)
 else()
@@ -54,7 +54,7 @@ target_link_libraries(ui-base PUBLIC types)
 
 add_library(ui-window STATIC ui-window/window.c)
 if(WIN32)
-    target_sources(ui-window PRIVATE ui-window/win32/geometry.c
+    target_sources(ui-window PRIVATE ui-window/win32/geometry.c ui-window/win32/input.c
         ui-window/win32/mouse.c ui-window/win32/component.c)
 else()
     target_sources(ui-window PRIVATE ui-window/linux/component.c)
@@ -93,12 +93,13 @@ library_root(storage)
 target_link_libraries(storage PUBLIC types)
 
 if(WIN32)
-    # types is the header-only vocabulary root and owns propagated native
-    # linkage. Selected component platform sources consume that vocabulary.
-    target_link_libraries(types INTERFACE user32 gdi32)
+    target_link_libraries(ui-base PRIVATE user32)
+    target_link_libraries(ui-window PRIVATE user32 gdi32)
+    target_link_libraries(host PRIVATE user32)
 else()
     find_package(Threads REQUIRED)
-    target_link_libraries(types INTERFACE Threads::Threads)
+    target_link_libraries(host PRIVATE Threads::Threads)
+    target_link_libraries(ui-base PRIVATE Threads::Threads)
 endif()
 
 # This build-only aggregate does not create a library-root dependency. Each

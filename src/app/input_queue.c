@@ -8,7 +8,7 @@
 
 struct app_input_queue {
     CRITICAL_SECTION lock;
-    ui_event entries[APP_INPUT_QUEUE_CAPACITY];
+    ui_input_event entries[APP_INPUT_QUEUE_CAPACITY];
     unsigned int head;
     unsigned int tail;
 };
@@ -32,7 +32,7 @@ void app_input_queue_destroy(app_input_queue *queue)
     free(queue);
 }
 
-int app_input_queue_push(app_input_queue *queue, const ui_event *event)
+int app_input_queue_push(app_input_queue *queue, const ui_input_event *event)
 {
     unsigned int next;
     if (queue == NULL || event == NULL) return 0;
@@ -48,7 +48,7 @@ int app_input_queue_push(app_input_queue *queue, const ui_event *event)
     return 1;
 }
 
-int app_input_queue_pop(app_input_queue *queue, ui_event *event)
+int app_input_queue_pop(app_input_queue *queue, ui_input_event *event)
 {
     if (queue == NULL || event == NULL) return 0;
     EnterCriticalSection(&queue->lock);

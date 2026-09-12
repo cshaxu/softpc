@@ -10,13 +10,13 @@
  * owns host packet recovery; this adapter alone invokes the original nt_keycd
  * table and queues its resulting SoftPC key number. */
 int app_keyboard_deliver_input(void *context,
-    const ui_event *event);
+    const ui_input_event *event);
 int app_keyboard_inject_machine_event(softpc_machine *machine,
-    const ui_event *event);
+    const ui_input_event *event);
 int app_keyboard_hotkeys(ui_hotkey_registry *registry);
-int app_keyboard_release_ctrl_alt(void *context, ui_event_sink sink);
-int app_keyboard_submit_ctrl_alt_del(void *context, ui_event_sink sink);
-int app_keyboard_submit_alt_enter(void *context, ui_event_sink sink);
+int app_keyboard_release_ctrl_alt(void *context, ui_input_sink sink);
+int app_keyboard_submit_ctrl_alt_del(void *context, ui_input_sink sink);
+int app_keyboard_submit_alt_enter(void *context, ui_input_sink sink);
 #endif
 
 #endif

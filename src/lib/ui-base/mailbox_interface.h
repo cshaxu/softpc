@@ -33,6 +33,7 @@ typedef struct ui_component_mailboxes {
     lib_atomic_flag control_lock;
     ui_frame frame;
     lib_u32 frame_generation;
+    lib_bool frame_pending;
     ui_component_control controls[UI_COMPONENT_CONTROL_STORAGE_CAPACITY];
     lib_u32 control_head;
     lib_u32 control_count;

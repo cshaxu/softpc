@@ -50,8 +50,6 @@ lib_status host_console_backend_prepare(host_console_backend *native_console,
         (mode != HOST_CONSOLE_RAW_EVENTS && mode != HOST_CONSOLE_COOKED_LINES) ?
         LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_OK;
 }
-void host_console_backend_discard_prepare(host_console_backend *native_console)
-{ (void)native_console; }
 
 lib_status host_console_backend_activate(host_console_backend *native_console,
     lib_console *console, host_console_mode mode, lib_u32 generation)
@@ -147,6 +145,79 @@ static DWORD WINAPI host_console_replace_thread(void *opaque)
         probe->next_console, HOST_CONSOLE_RAW_EVENTS);
     SetEvent(probe->completed);
     return 0u;
+}
+#endif
+
+#ifdef _WIN32
+#include "lib/types/atomic.h"
+static HANDLE cleanup_entered, cleanup_release, replacement_attempted;
+static lib_console *cleanup_console;
+static LONG challenger;
+static LONG observed_busy;
+static lib_status tracked_output_sink(lib_console *console,
+    lib_console_output_sink sink, void *context)
+{
+    if (console == cleanup_console && sink == NULL) {
+        SetEvent(cleanup_entered);
+        assert(WaitForSingleObject(cleanup_release, INFINITE) == WAIT_OBJECT_0);
+    }
+    return lib_console_set_output_sink(console, sink, context);
+}
+static int tracked_try_lock(lib_atomic_flag *lock, lib_memory_order order)
+{
+    int busy = lib_atomic_flag_test_and_set_explicit(lock, order);
+    if (GetCurrentThreadId() == (DWORD)InterlockedCompareExchange(&challenger, 0, 0)) {
+        InterlockedExchange(&observed_busy, busy);
+        SetEvent(replacement_attempted);
+    }
+    return busy;
+}
+#undef lib_atomic_flag_test_and_set_explicit
+#define lib_atomic_flag_test_and_set_explicit tracked_try_lock
+#define lib_console_set_output_sink tracked_output_sink
+#endif
+#include "lib/host/console.c"
+#ifdef _WIN32
+#undef lib_console_set_output_sink
+#undef lib_atomic_flag_test_and_set_explicit
+static DWORD WINAPI reverse_replace(void *opaque)
+{
+    InterlockedExchange(&challenger, (LONG)GetCurrentThreadId());
+    return host_console_replace_thread(opaque);
+}
+static void check_serial_cleanup(void)
+{
+    host_console_broker *broker;
+    lib_console *a, *b;
+    assert(lib_console_create(&a) == LIB_STATUS_OK);
+    assert(lib_console_create(&b) == LIB_STATUS_OK);
+    assert(host_console_broker_create(&broker, a, HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK);
+    cleanup_entered = CreateEventA(NULL, TRUE, FALSE, NULL);
+    cleanup_release = CreateEventA(NULL, TRUE, FALSE, NULL);
+    replacement_attempted = CreateEventA(NULL, TRUE, FALSE, NULL);
+    assert(cleanup_entered && cleanup_release && replacement_attempted);
+    cleanup_console = a;
+    host_console_replace_probe forward = { broker, a, b,
+        CreateEventA(NULL, TRUE, FALSE, NULL), LIB_STATUS_INVALID_STATE };
+    host_console_replace_probe reverse = { broker, b, a,
+        CreateEventA(NULL, TRUE, FALSE, NULL), LIB_STATUS_INVALID_STATE };
+    HANDLE first = CreateThread(NULL, 0, host_console_replace_thread, &forward, 0, NULL);
+    assert(first && WaitForSingleObject(cleanup_entered, 5000) == WAIT_OBJECT_0);
+    HANDLE second = CreateThread(NULL, 0, reverse_replace, &reverse, 0, NULL);
+    assert(second && WaitForSingleObject(replacement_attempted, 5000) == WAIT_OBJECT_0);
+    assert(InterlockedCompareExchange(&observed_busy, 0, 0) == 1);
+    SetEvent(cleanup_release);
+    assert(WaitForSingleObject(first, 5000) == WAIT_OBJECT_0);
+    assert(WaitForSingleObject(second, 5000) == WAIT_OBJECT_0);
+    assert(forward.status == LIB_STATUS_OK && reverse.status == LIB_STATUS_OK);
+    assert(lib_console_write_text(a, "a", 1u) == LIB_STATUS_OK);
+    cleanup_console = NULL;
+    InterlockedExchange(&challenger, 0);
+    host_console_broker_destroy(broker);
+    lib_console_release(a); lib_console_release(b);
+    CloseHandle(first); CloseHandle(second);
+    CloseHandle(forward.completed); CloseHandle(reverse.completed);
+    CloseHandle(cleanup_entered); CloseHandle(cleanup_release); CloseHandle(replacement_attempted);
 }
 #endif
 
@@ -263,5 +334,8 @@ int main(void)
 #endif
     lib_console_destroy(first);
     lib_console_destroy(second);
+#ifdef _WIN32
+    check_serial_cleanup();
+#endif
     return 0;
 }

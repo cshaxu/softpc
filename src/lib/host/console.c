@@ -189,14 +189,12 @@ lib_status host_console_broker_replace(host_console_broker *broker,
     }
     next_output = host_console_output_binding_create(broker, next, next_generation);
     if (next_output == LIB_NULL) {
-        host_console_backend_discard_prepare(broker->backend);
         lib_console_release(next);
         host_console_unlock(broker);
         return LIB_STATUS_NO_MEMORY;
     }
     status = host_console_install_output_binding(next, next_output);
     if (status != LIB_STATUS_OK) {
-        host_console_backend_discard_prepare(broker->backend);
         lib_release(next_output);
         lib_console_release(next);
         host_console_unlock(broker);
@@ -217,11 +215,10 @@ lib_status host_console_broker_replace(host_console_broker *broker,
         old_output = broker->current_output;
         broker->current_output = LIB_NULL;
         host_console_backend_unlock_output(broker->backend);
-        host_console_backend_discard_prepare(broker->backend);
         host_console_remove_output_binding(next, next_output);
         lib_console_release(next);
-        host_console_unlock(broker);
         host_console_remove_output_binding(old, old_output);
+        host_console_unlock(broker);
         return status;
     }
     lib_console_invalidate_binding(old);
@@ -234,7 +231,6 @@ lib_status host_console_broker_replace(host_console_broker *broker,
          * that old remains active. */
         restore_status = host_console_activate_bound(broker, old, broker->current_mode,
             broker->generation);
-        host_console_backend_discard_prepare(broker->backend);
         host_console_backend_unlock_output(broker->backend);
         host_console_remove_output_binding(next, next_output);
         lib_console_release(next);
@@ -242,8 +238,8 @@ lib_status host_console_broker_replace(host_console_broker *broker,
             broker->broken = LIB_TRUE;
             old_output = broker->current_output;
             broker->current_output = LIB_NULL;
-            host_console_unlock(broker);
             host_console_remove_output_binding(old, old_output);
+            host_console_unlock(broker);
             return restore_status;
         }
         host_console_unlock(broker);
@@ -255,11 +251,11 @@ lib_status host_console_broker_replace(host_console_broker *broker,
     old_output = broker->current_output;
     broker->current_output = next_output;
     host_console_backend_unlock_output(broker->backend);
-    host_console_unlock(broker);
     /* The old binding is still safe until this setter has waited out any
        already-entered base write. Its native validation now rejects it. */
     host_console_remove_output_binding(old, old_output);
     lib_console_release(old);
+    host_console_unlock(broker);
     return LIB_STATUS_OK;
 }
 

@@ -19,7 +19,8 @@ typedef enum app_control_event_kind {
     APP_CONTROL_UI_DELIVERY_FAILED,
     /* The queue could not retain a control fact.  Continuing would leave the
        reducer waiting for an event which was silently lost. */
-    APP_CONTROL_QUEUE_DELIVERY_FAILED
+    APP_CONTROL_QUEUE_DELIVERY_FAILED,
+    APP_CONTROL_CONSOLE_FAILED
 } app_control_event_kind;
 
 typedef enum app_control_component_kind {
@@ -52,6 +53,7 @@ int app_control_queue_push_ui_for_run(app_control_queue *queue,
     const ui_input_event *event, uint32_t run_generation);
 int app_control_queue_push_monitor_line(app_control_queue *queue,
     const lib_console_line *line);
+int app_control_queue_push_console_failed(app_control_queue *queue);
 int app_control_queue_push_runtime_completed(app_control_queue *queue,
     app_runtime_state state, uint32_t run_generation);
 int app_control_queue_push_frame_completed(app_control_queue *queue,

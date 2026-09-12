@@ -176,6 +176,13 @@ int app_control_queue_push_monitor_line(app_control_queue *queue,
     return app_control_queue_push_required(queue, &copied);
 }
 
+int app_control_queue_push_console_failed(app_control_queue *queue)
+{
+    app_control_event event = { 0 };
+    event.kind = APP_CONTROL_CONSOLE_FAILED;
+    return app_control_queue_push_required(queue, &event);
+}
+
 int app_control_queue_push_runtime_completed(app_control_queue *queue,
     app_runtime_state state, uint32_t run_generation)
 {

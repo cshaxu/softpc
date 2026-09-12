@@ -15,7 +15,7 @@ typedef struct softpc_keyboard_capture {
     unsigned int count;
 } softpc_keyboard_capture;
 
-static int capture_key(void *context, const ui_event *event)
+static int capture_key(void *context, const ui_input_event *event)
 {
     softpc_keyboard_capture *capture = (softpc_keyboard_capture *)context;
     if (event == NULL || event->type != UI_EVENT_KEY ||
@@ -30,11 +30,11 @@ static int capture_key(void *context, const ui_event *event)
 
 typedef struct softpc_hotkey_capture {
     ui_hotkey_matcher matcher;
-    ui_event events[8];
+    ui_input_event events[8];
     unsigned int count;
 } softpc_hotkey_capture;
 
-static int capture_hotkey(void *context, const ui_event *event)
+static int capture_hotkey(void *context, const ui_input_event *event)
 {
     softpc_hotkey_capture *capture = (softpc_hotkey_capture *)context;
     if (capture == NULL || event == NULL || capture->count == 8u) return 0;
@@ -42,7 +42,7 @@ static int capture_hotkey(void *context, const ui_event *event)
     return 1;
 }
 
-static int normalize_and_match(void *context, const ui_event *event)
+static int normalize_and_match(void *context, const ui_input_event *event)
 {
     softpc_hotkey_capture *capture = (softpc_hotkey_capture *)context;
     return capture != NULL && ui_hotkey_matcher_submit(&capture->matcher,
@@ -60,22 +60,22 @@ static void assert_registered_raw_chord(lib_u32 trigger, const char *identifier)
     assert(ui_hotkey_registry_register(&registry, trigger, control_alt,
         identifier) == LIB_STATUS_OK);
     ui_hotkey_matcher_initialize(&capture.matcher, &registry);
-    assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
+    assert(ui_keyboard_submit_transition(&capture, normalize_and_match,
         0x1du, LIB_WIN32_KEY_CONTROL, 0u, UI_HOTKEY_MODIFIER_CONTROL, 1));
-    assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
+    assert(ui_keyboard_submit_transition(&capture, normalize_and_match,
         0x38u, LIB_WIN32_KEY_ALT, 0u, control_alt, 1));
-    assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
+    assert(ui_keyboard_submit_transition(&capture, normalize_and_match,
         (lib_u16)lib_win32_map_virtual_key((UINT)trigger, MAPVK_VK_TO_VSC), (lib_u16)trigger,
         0u, control_alt, 1));
     assert(capture.count == 1u && capture.events[0].type == UI_EVENT_HOTKEY);
     assert(strcmp(capture.events[0].data.hotkey.identifier, identifier) == 0);
     /* Every make and break in the matched raw chord is private to UI. */
-    assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
+    assert(ui_keyboard_submit_transition(&capture, normalize_and_match,
         (lib_u16)lib_win32_map_virtual_key((UINT)trigger, MAPVK_VK_TO_VSC), (lib_u16)trigger,
         0u, control_alt, 0));
-    assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
+    assert(ui_keyboard_submit_transition(&capture, normalize_and_match,
         0x38u, LIB_WIN32_KEY_ALT, 0u, UI_HOTKEY_MODIFIER_CONTROL, 0));
-    assert(ui_win32_keyboard_submit_transition(&capture, normalize_and_match,
+    assert(ui_keyboard_submit_transition(&capture, normalize_and_match,
         0x1du, LIB_WIN32_KEY_CONTROL, 0u, 0u, 0));
     assert(capture.count == 1u);
 }
@@ -83,12 +83,27 @@ static void assert_registered_raw_chord(lib_u32 trigger, const char *identifier)
 int main(void)
 {
     softpc_keyboard_capture capture = { 0 };
-    ui_win32_keyboard_normalizer normalizer = { 0 };
+    ui_keyboard_normalizer normalizer = { 0 };
+    softpc_hotkey_capture text = { 0 };
+    assert(ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0xd83du));
+    assert(text.count == 0u);
+    assert(ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0xde00u));
+    assert(text.count == 1u && text.events[0].type == UI_EVENT_TEXT &&
+        text.events[0].data.text.scalar == 0x1f600u);
+    assert(!ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0xdc00u));
+    assert(ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0xd800u));
+    assert(!ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0xd800u));
+    assert(normalizer.pending_high_surrogate == 0u);
+    assert(ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0xd800u));
+    assert(!ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 'a'));
+    assert(ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0x4e00u));
+    text.count = 8u;
+    assert(!ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0x4e00u));
 
     /* The shared component preserves the host physical scan; each project maps it. */
-    assert(ui_win32_keyboard_submit_transition(&capture, capture_key,
+    assert(ui_keyboard_submit_transition(&capture, capture_key,
         0x1eu, 'A', 0u, 0u, 1));
-    assert(ui_win32_keyboard_submit_transition(&capture, capture_key,
+    assert(ui_keyboard_submit_transition(&capture, capture_key,
         0x1eu, 'A', 0u, 0u, 0));
     assert(capture.count == 2u);
     assert(capture.keys[0] == 0x1eu && capture.releases[0] == 0u);
@@ -98,9 +113,9 @@ int main(void)
     /* Esc is an ordinary original key-table entry (key 110), not a host
        stop command. */
     capture.count = 0u;
-    assert(ui_win32_keyboard_submit_transition(&capture, capture_key,
+    assert(ui_keyboard_submit_transition(&capture, capture_key,
         0x01u, LIB_WIN32_KEY_ESCAPE, 0u, 0u, 1));
-    assert(ui_win32_keyboard_submit_transition(&capture, capture_key,
+    assert(ui_keyboard_submit_transition(&capture, capture_key,
         0x01u, LIB_WIN32_KEY_ESCAPE, 0u, 0u, 0));
     assert(capture.count == 2u);
     assert(capture.keys[0] == 0x01u && capture.releases[0] == 0u);
@@ -110,9 +125,9 @@ int main(void)
        physical scan.  Both UI leaves use this shared recovery path, so the
        guest still receives the normal Enter make/break pair. */
     capture.count = 0u;
-    assert(ui_win32_keyboard_submit_transition(&capture, capture_key,
+    assert(ui_keyboard_submit_transition(&capture, capture_key,
         0u, LIB_WIN32_KEY_RETURN, 0u, 0u, 1));
-    assert(ui_win32_keyboard_submit_transition(&capture, capture_key,
+    assert(ui_keyboard_submit_transition(&capture, capture_key,
         0u, LIB_WIN32_KEY_RETURN, 0u, 0u, 0));
     assert(capture.count == 2u);
     assert(capture.keys[0] == 0x1cu && capture.releases[0] == 0u);
@@ -122,8 +137,8 @@ int main(void)
 
     /* Extended state is a neutral UI flag, not a copied Win32 control bit. */
     capture.count = 0u;
-    assert(ui_win32_keyboard_submit_transition(&capture, capture_key,
-        0xe04du, LIB_WIN32_KEY_RIGHT, UI_WIN32_INPUT_FLAG_EXTENDED, 0u, 1));
+    assert(ui_keyboard_submit_transition(&capture, capture_key,
+        0xe04du, LIB_WIN32_KEY_RIGHT, UI_INPUT_FLAG_EXTENDED, 0u, 1));
     assert(capture.count == 1u && capture.identities[0] == UI_KEY_RIGHT);
     assert(capture.flags[0] == UI_KEY_FLAG_EXTENDED);
 
@@ -137,7 +152,7 @@ int main(void)
     /* Window supplies a mask at its own native boundary; the common
        normalizer preserves that value rather than replacing it globally. */
     capture.count = 0u;
-    assert(ui_win32_keyboard_submit_transition(&capture, capture_key,
+    assert(ui_keyboard_submit_transition(&capture, capture_key,
         0x19u, 'P', 0u, UI_HOTKEY_MODIFIER_CONTROL |
         UI_HOTKEY_MODIFIER_ALT, 1));
     assert(capture.count == 1u);
@@ -145,16 +160,16 @@ int main(void)
         UI_HOTKEY_MODIFIER_ALT));
 
     /* A scan-less RDP key followed by its WM_CHAR must not inject twice. */
-    ui_win32_keyboard_note_recovered_key(&normalizer, 'A');
-    assert(ui_win32_keyboard_consume_duplicate_character(&normalizer,
+    ui_keyboard_note_recovered_key(&normalizer, 'A');
+    assert(ui_keyboard_consume_duplicate_character(&normalizer,
         L'a'));
-    assert(!ui_win32_keyboard_consume_duplicate_character(&normalizer,
+    assert(!ui_keyboard_consume_duplicate_character(&normalizer,
         L'a'));
 
     /* UTF-16 input uses the active host layout to synthesize make/break;
        it never places text directly in guest memory. */
     capture.count = 0u;
-    assert(ui_win32_keyboard_submit_utf16(&normalizer, &capture,
+    assert(ui_keyboard_submit_utf16(&normalizer, &capture,
         capture_key, L'a'));
     assert(capture.count == 2u);
     assert(capture.keys[0] == 0x1eu && capture.releases[0] == 0u);

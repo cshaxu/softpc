@@ -353,6 +353,11 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                     line[control_event.value.line.length] = '\0';
                     break;
                 }
+                if (control_event.kind == APP_CONTROL_CONSOLE_FAILED) {
+                    (void)app_monitor_console_write(monitor,
+                        "Console input failed.\r\n");
+                    goto failed;
+                }
                 if (control_event.kind == APP_CONTROL_UI_DELIVERY_FAILED) {
                     app_monitor_console_write(monitor,
                         "UI input delivery failed.\r\n");
@@ -506,9 +511,9 @@ int main(int argc, char **argv)
 done:
     if (result != SOFTPC_MACHINE_OK)
         fprintf(stderr, "softpcvm: %s\n", softpc_machine_result_name(result));
+    app_runtime_destroy(runtime);
     app_monitor_console_destroy(monitor);
     app_control_queue_destroy(control_queue);
-    app_runtime_destroy(runtime);
     softpc_machine_destroy(machine);
     return result != SOFTPC_MACHINE_OK;
 }

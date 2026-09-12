@@ -36,7 +36,7 @@ static void app_presentation_publish_title(app_presentation_context *context,
             "Insignia SoftPC (Paused)" : "Insignia SoftPC (Running)");
 }
 
-static int app_presentation_guest_input(void *opaque, const ui_event *event)
+static int app_presentation_guest_input(void *opaque, const ui_input_event *event)
 {
     app_presentation_context *context = (app_presentation_context *)opaque;
     return context != NULL && app_control_queue_push_ui_for_run(

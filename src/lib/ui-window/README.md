@@ -16,6 +16,11 @@ matcher. A matched hotkey is delivered to the application sink; ordinary
 key/text/mouse input is silently consumed and is never retained for a later
 unfreeze. The Window does not interpret a hotkey identifier.
 
+Relative mouse scaling retains signed integer remainders per axis. Capture,
+release and scale changes reset those remainders; copied event deltas remain
+integers. All post-start worker exits stop input, release capture, close the
+Window, report any failure and retire the source once before releasing storage.
+
 The public component contract is cross-platform. This corpus currently has a
 supported Win32 implementation only; the Linux leaf is an intentional
 `LIB_STATUS_UNSUPPORTED` placeholder, not a claimed Linux presenter.

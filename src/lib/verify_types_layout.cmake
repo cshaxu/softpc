@@ -1,6 +1,8 @@
 if(NOT DEFINED LIBRARY_ROOT)
     set(LIBRARY_ROOT "${CMAKE_CURRENT_LIST_DIR}")
 endif()
+cmake_policy(SET CMP0057 NEW)
+include("${CMAKE_CURRENT_LIST_DIR}/verify_component_dependencies.cmake")
 
 file(GLOB_RECURSE types_files RELATIVE "${LIBRARY_ROOT}/types"
     "${LIBRARY_ROOT}/types/*")
@@ -94,6 +96,12 @@ foreach(path IN LISTS library_sources)
     endif()
     file(STRINGS "${LIBRARY_ROOT}/${path}" includes REGEX "^[ \t]*#[ \t]*include")
     foreach(line IN LISTS includes)
+        if(NOT line MATCHES "#[ \t]*include[ \t]*[\"<]")
+            message(FATAL_ERROR "Computed include bypasses ownership check: ${path}: ${line}")
+        endif()
+        if(line MATCHES "<lib/")
+            message(FATAL_ERROR "Library includes require canonical quoted paths: ${path}: ${line}")
+        endif()
         # Canonical paths make ownership checkable; relative traversal must not
         # bypass the same cross-component boundary enforced below.
         if(line MATCHES "\"([^\"]+)\"")
@@ -106,6 +114,7 @@ foreach(path IN LISTS library_sources)
             set(dependency "${CMAKE_MATCH_1}")
             set(header "${CMAKE_MATCH_2}")
             string(REGEX REPLACE "/.*" "" owner "${path}")
+            library_check_edge("${owner}" "${dependency}")
             if(NOT dependency STREQUAL owner AND NOT dependency STREQUAL "types" AND
                NOT header MATCHES "^[^/]+_interface\\.h$")
                 message(FATAL_ERROR "Cross-component implementation include: ${path}: ${line}")

@@ -16,7 +16,7 @@ is `types/{win32,linux}`: these shared external declarations may be included
 by matching platform implementations. Application-facing
 copied-value APIs are distinct from the leaf-support contracts:
 `ui-base/worker_interface.h`, `mailbox_interface.h`, `mailbox_wake_interface.h`,
-`ui-base/input_interface.h` and `actions_interface.h` serve only the UI leaves;
+`ui-base/input_interface.h` serves only the UI leaves;
 `console/binding_interface.h` serves host binding implementations.
 Other component headers are exclusively component-local. They use short
 names and live directly in their owning directory; no filename carries a
@@ -26,11 +26,10 @@ only application-facing `*_interface.h`, not the leaf-support contracts.
 Types declaration headers are the explicit naming exception. The common types interface includes its own atomic
 vocabulary helper; it never imports platform SDK headers.
 
-The input/actions support declarations describe existing Windows record
-conversion and key-state queries, using copied scalar values. Their Windows
-implementations remain in ui-base; no application input ABI or Linux parity
-is implied. Platform-neutral parent sources still call their existing
-same-signature platform operations selected by CMake.
+Input support owns common normalization and copied-event delivery in ui-base.
+Its same-signature platform operations decode keys and query physical text
+layout. Window message flags and key-state queries are Window-local. External
+declarations remain types-owned; actual consumers declare OS link libraries.
 
 ## Component graph
 
@@ -80,7 +79,9 @@ Every `ui-window` and `ui-console` instance owns a separate, private pair of
 mailboxes. Callers never share or address a mailbox directly.
 
 - The frame mailbox holds one copied frame. Publishing replaces that value:
-  frames are **latest-wins**.
+  frames are **latest-wins**, but unconsumed dirty rectangles are unioned under
+  the frame lock. Consumption takes latest complete pixels and accumulated
+  damage together. Dimensions, mode or palette changes invalidate the full image.
 - The control mailbox is FIFO. It accepts up to 32 ordinary control records;
   enqueue beyond that limit returns `LIB_STATUS_LIMIT_EXCEEDED` without
   overwriting an existing record. A STOP record has one reserved FIFO slot and
@@ -91,6 +92,15 @@ mailboxes. Callers never share or address a mailbox directly.
 - A worker drains control records in FIFO order before it considers the latest
   frame. On STOP it consumes no later control or frame: it retires native
   input/output, emits exactly one `UI_EVENT_SOURCE_RETIRED`, and exits.
+  Post-start Window failures use that same cleanup path, reporting the fault;
+  creation failure is distinct and does not retire an uncreated source.
+
+Unexpected native Console reader errors emit `LIB_CONSOLE_EVENT_IO_FAILURE`.
+Normal replacement cancellation is not failure. A UI Console reports genuine
+input/output errors through its failure sink and retires; NOT_CURRENT output
+is an expected inactive-object write. Neither path makes application decisions.
+Broker replacement holds its transaction lock through old output-sink cleanup;
+the backend output lock is released first so in-flight writes can complete.
 
 Each component receives a process-wide monotonic, never-reused
 `source_identity`. Every `ui_input_event` carries both that identity and a

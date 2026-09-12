@@ -1,5 +1,6 @@
 #include "control.h"
 #include "keyboard.h"
+#include "app/monitor.c"
 
 #include <assert.h>
 #include <string.h>
@@ -10,11 +11,11 @@ static unsigned int delivered_guest_input;
 static unsigned int delivered_cad;
 static unsigned int delivered_caf;
 
-int app_keyboard_deliver_input(void *context, const ui_event *event)
+int app_keyboard_deliver_input(void *context, const ui_input_event *event)
 { (void)context; (void)event; ++delivered_guest_input; return 1; }
-int app_keyboard_submit_ctrl_alt_del(void *context, ui_event_sink sink)
+int app_keyboard_submit_ctrl_alt_del(void *context, ui_input_sink sink)
 { (void)context; (void)sink; ++delivered_cad; return 1; }
-int app_keyboard_submit_alt_enter(void *context, ui_event_sink sink)
+int app_keyboard_submit_alt_enter(void *context, ui_input_sink sink)
 { (void)context; (void)sink; ++delivered_caf; return 1; }
 
 static void take(app_control_queue *queue, app_control_event *event)
@@ -120,6 +121,14 @@ int main(void)
     assert(event.value.delivery_failure.source_identity == 41u);
     assert(event.value.delivery_failure.status == LIB_STATUS_LIMIT_EXCEEDED);
 
+    { app_monitor_console monitor = { 0 };
+      lib_console_event failure = { 0 };
+      monitor.control_queue = queue;
+      failure.kind = LIB_CONSOLE_EVENT_IO_FAILURE;
+      app_monitor_receive(&monitor, &failure);
+      take(queue, &event);
+      assert(event.kind == APP_CONTROL_CONSOLE_FAILED);
+      assert(!app_control_queue_take(queue, &event, 0u)); }
     app_control_queue_destroy(queue);
     return 0;
 }

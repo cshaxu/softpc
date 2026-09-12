@@ -36,7 +36,7 @@ static int runtime_input_wait_for_state(app_runtime *runtime,
 static int runtime_input_enqueue_key(app_runtime *runtime, uint16_t scan,
     lib_u32 key, uint8_t pressed)
 {
-    ui_event event = { 0 };
+    ui_input_event event = { 0 };
 
     event.type = UI_EVENT_KEY;
     event.data.key.scan_code = scan;

@@ -12,7 +12,6 @@ void host_console_backend_destroy(host_console_backend *backend);
  * creates a competing reader. */
 lib_status host_console_backend_prepare(host_console_backend *backend,
     lib_console *console, host_console_mode mode);
-void host_console_backend_discard_prepare(host_console_backend *backend);
 lib_status host_console_backend_activate(host_console_backend *backend,
     lib_console *console, host_console_mode mode, lib_u32 generation);
 /* Cooked input is deliberately one line per reader.  The product asks for

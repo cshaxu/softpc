@@ -11,6 +11,9 @@ typedef struct ui_win32_mouse {
     int y;
     int valid;
     lib_bool captured;
+    lib_i64 remainder_x, remainder_y;
+    int client_width, client_height;
+    lib_u32 content_width, content_height;
 } ui_win32_mouse;
 
 void ui_win32_mouse_reset(ui_win32_mouse *mouse);

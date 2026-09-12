@@ -111,7 +111,7 @@ int main(void)
     }
     {
         app_input_queue *queue = NULL;
-        ui_event event = { 0 };
+        ui_input_event event = { 0 };
 
         assert(app_input_queue_create(&queue));
         event.type = UI_EVENT_KEY;

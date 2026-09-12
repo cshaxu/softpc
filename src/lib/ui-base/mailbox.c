@@ -30,10 +30,34 @@ void ui_component_mailboxes_destroy(ui_component_mailboxes *mailboxes)
 lib_status ui_component_mailboxes_publish_frame(ui_component_mailboxes *mailboxes,
     const ui_frame *frame)
 {
+    lib_i32 left, top, right, bottom;
+    lib_bool full;
     if (mailboxes == LIB_NULL || !ui_frame_is_valid(frame))
         return LIB_STATUS_INVALID_ARGUMENT;
     ui_component_mailboxes_lock(&mailboxes->frame_lock);
+    full = mailboxes->frame_generation == 0u ||
+        mailboxes->frame.graphics != frame->graphics ||
+        mailboxes->frame.graphics_width != frame->graphics_width ||
+        mailboxes->frame.graphics_height != frame->graphics_height ||
+        mailboxes->frame.graphics_stride != frame->graphics_stride ||
+        lib_memory_compare(mailboxes->frame.graphics_palette,
+            frame->graphics_palette, sizeof(frame->graphics_palette)) != 0;
+    left = frame->dirty_left; top = frame->dirty_top;
+    right = frame->dirty_right; bottom = frame->dirty_bottom;
+    if (frame->graphics && full) {
+        left = top = 0u;
+        right = frame->graphics_width - 1u;
+        bottom = frame->graphics_height - 1u;
+    } else if (frame->graphics && mailboxes->frame_pending) {
+        if (mailboxes->frame.dirty_left < left) left = mailboxes->frame.dirty_left;
+        if (mailboxes->frame.dirty_top < top) top = mailboxes->frame.dirty_top;
+        if (mailboxes->frame.dirty_right > right) right = mailboxes->frame.dirty_right;
+        if (mailboxes->frame.dirty_bottom > bottom) bottom = mailboxes->frame.dirty_bottom;
+    }
     mailboxes->frame = *frame;
+    mailboxes->frame.dirty_left = left; mailboxes->frame.dirty_top = top;
+    mailboxes->frame.dirty_right = right; mailboxes->frame.dirty_bottom = bottom;
+    mailboxes->frame_pending = LIB_TRUE;
     mailboxes->frame.sequence = ++mailboxes->frame_generation;
     ui_component_mailboxes_unlock(&mailboxes->frame_lock);
     ui_mailbox_wake_signal(mailboxes->wake);
@@ -121,6 +145,7 @@ lib_bool ui_component_mailboxes_capture_frame(ui_component_mailboxes *mailboxes,
     }
     *out_frame = mailboxes->frame;
     *in_out_generation = mailboxes->frame_generation;
+    mailboxes->frame_pending = LIB_FALSE;
     ui_component_mailboxes_unlock(&mailboxes->frame_lock);
     return LIB_TRUE;
 }

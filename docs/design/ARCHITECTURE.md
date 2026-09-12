@@ -98,8 +98,10 @@ implementation; neither sibling components nor root forwarding headers may
 include them. The exception is `types/{win32,linux}`, which supplies shared
 external vocabulary to matching platform sources. Existing Windows input
 normalization support is declared by ui-base root interfaces and implemented
-only by ui-base; callers never reach its platform headers. This does not turn
-Windows record helpers into a cross-platform application input API.
+only by ui-base; callers never reach its platform headers. Common normalization
+delegates raw decoding to same-shape selected platform functions; Window-only
+message decoding and key-state queries remain in ui-window. This support API
+is not an application input API.
 
 SoftPC control is the sole product-state writer. VM, host, and UI workers only
 enqueue copied events/completions to its app-owned queue. The control thread
@@ -131,6 +133,14 @@ mailboxes and its own native worker(s). Their common mailbox mechanics live in
 never public handles or shared UI infrastructure. SoftPC invokes the specific
 component API it has chosen; components communicate back only through the
 copied input-queue entry supplied at creation.
+
+Shared frame mailboxes accumulate unconsumed dirty bounds with the latest
+complete image under one lock. Window displacement retains integer remainders
+internally without changing the copied input ABI. Post-start worker exits share
+one failure/retirement cleanup path; startup failure remains distinct. Unexpected
+Console I/O failures are copied events, not product decisions. Broker replacement
+includes old-binding cleanup before the next transaction can enter. Types owns
+external declarations; actual component consumers own OS linkage requirements.
 
 ## BOP And Firmware Boundary
 

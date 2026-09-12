@@ -6,9 +6,9 @@
 int main(void)
 {
     app_input_queue *queue = NULL;
-    ui_event first = { 0 };
-    ui_event second = { 0 };
-    ui_event actual = { 0 };
+    ui_input_event first = { 0 };
+    ui_input_event second = { 0 };
+    ui_input_event actual = { 0 };
 
     first.type = UI_EVENT_MOUSE;
     first.data.mouse.relative = 1u;

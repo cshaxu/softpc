@@ -52,7 +52,7 @@ int app_runtime_set_floppy(app_runtime *runtime, const char *path);
 app_runtime_state app_runtime_get_state(const app_runtime *runtime);
 softpc_machine_result app_runtime_get_result(const app_runtime *runtime);
 int app_runtime_enqueue_input_event(app_runtime *runtime,
-    const ui_event *event);
+    const ui_input_event *event);
 int app_runtime_copy_frame(app_runtime *runtime,
     app_runtime_frame *destination);
 int app_runtime_copy_published_frame(app_runtime *runtime,

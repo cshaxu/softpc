@@ -21,7 +21,9 @@ typedef enum lib_console_event_kind {
     LIB_CONSOLE_EVENT_RAW_KEY,
     LIB_CONSOLE_EVENT_RAW_MOUSE,
     LIB_CONSOLE_EVENT_COOKED_LINE,
-    LIB_CONSOLE_EVENT_REJECTED_LINE
+    LIB_CONSOLE_EVENT_REJECTED_LINE,
+    /* Unexpected reader failure; cancellation during replacement is not failure. */
+    LIB_CONSOLE_EVENT_IO_FAILURE
 } lib_console_event_kind;
 
 enum {

@@ -101,6 +101,16 @@ static void host_console_emit_mouse(host_console_backend *backend,
     (void)lib_console_deliver_event(backend->console, &event);
 }
 
+static void host_console_reader_failed(host_console_backend *backend)
+{
+    lib_console_event event = { 0 };
+    if (lib_win32_wait_for_single_object(backend->stop_event, 0u) == LIB_WIN32_WAIT_OBJECT_0)
+        return;
+    event.kind = LIB_CONSOLE_EVENT_IO_FAILURE;
+    event.binding_generation = backend->generation;
+    (void)lib_console_deliver_event(backend->console, &event);
+}
+
 static lib_win32_dword LIB_WIN32_WINAPI host_console_reader(void *context)
 {
     host_console_backend *backend = (host_console_backend *)context;
@@ -111,6 +121,7 @@ static lib_win32_dword LIB_WIN32_WINAPI host_console_reader(void *context)
         if (!lib_win32_read_console_a(backend->input, text,
                 LIB_CONSOLE_LINE_MAX - 1u, &read, LIB_NULL)) {
             lib_win32_interlocked_exchange(&backend->cooked_line_pending, 0);
+            host_console_reader_failed(backend);
             return 0u;
         }
         lib_win32_interlocked_exchange(&backend->cooked_line_pending, 0);
@@ -130,11 +141,13 @@ static lib_win32_dword LIB_WIN32_WINAPI host_console_reader(void *context)
             lib_win32_input_record record;
             lib_win32_dword read = 0u;
             if (!lib_win32_read_console_input_a(backend->input, &record, 1u, &read)) break;
+            if (read == 0u) continue;
             if (record.EventType == LIB_WIN32_KEY_EVENT) host_console_emit_key(backend,
                 &record.Event.KeyEvent);
             else if (record.EventType == LIB_WIN32_MOUSE_EVENT) host_console_emit_mouse(backend,
                 &record.Event.MouseEvent);
         }
+        host_console_reader_failed(backend);
     }
     return 0u;
 }
@@ -231,8 +244,6 @@ lib_status host_console_backend_prepare(host_console_backend *backend,
     return LIB_STATUS_OK;
 }
 
-void host_console_backend_discard_prepare(host_console_backend *backend)
-{ (void)backend; }
 
 lib_status host_console_backend_activate(host_console_backend *backend,
     lib_console *console, host_console_mode mode, lib_u32 generation)

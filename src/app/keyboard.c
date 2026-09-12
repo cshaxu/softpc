@@ -44,14 +44,14 @@ static WORD app_keyboard_to_virtual_key(lib_u32 key)
 }
 
 int app_keyboard_deliver_input(void *context,
-    const ui_event *event)
+    const ui_input_event *event)
 {
     return context != NULL && event != NULL && app_runtime_enqueue_input_event(
         (app_runtime *)context, event);
 }
 
 int app_keyboard_inject_machine_event(softpc_machine *machine,
-    const ui_event *event)
+    const ui_input_event *event)
 {
     KEY_EVENT_RECORD copy;
     BYTE key_number;
@@ -87,10 +87,10 @@ int app_keyboard_hotkeys(ui_hotkey_registry *registry)
     return 1;
 }
 
-static int app_keyboard_emit(void *context, ui_event_sink sink, WORD scan,
+static int app_keyboard_emit(void *context, ui_input_sink sink, WORD scan,
     lib_u32 key, int pressed)
 {
-    ui_event event = { 0 };
+    ui_input_event event = { 0 };
     if (sink == NULL) return 0;
     event.type = UI_EVENT_KEY;
     event.data.key.scan_code = scan;
@@ -100,13 +100,13 @@ static int app_keyboard_emit(void *context, ui_event_sink sink, WORD scan,
     return sink(context, &event);
 }
 
-int app_keyboard_release_ctrl_alt(void *context, ui_event_sink sink)
+int app_keyboard_release_ctrl_alt(void *context, ui_input_sink sink)
 {
     return app_keyboard_emit(context, sink, 0x1du, UI_KEY_CONTROL, 0) &&
         app_keyboard_emit(context, sink, 0x38u, UI_KEY_ALT, 0);
 }
 
-int app_keyboard_submit_ctrl_alt_del(void *context, ui_event_sink sink)
+int app_keyboard_submit_ctrl_alt_del(void *context, ui_input_sink sink)
 {
     return app_keyboard_emit(context, sink, 0x1du, UI_KEY_CONTROL, 1) &&
         app_keyboard_emit(context, sink, 0x38u, UI_KEY_ALT, 1) &&
@@ -116,7 +116,7 @@ int app_keyboard_submit_ctrl_alt_del(void *context, ui_event_sink sink)
         app_keyboard_emit(context, sink, 0x1du, UI_KEY_CONTROL, 0);
 }
 
-int app_keyboard_submit_alt_enter(void *context, ui_event_sink sink)
+int app_keyboard_submit_alt_enter(void *context, ui_input_sink sink)
 {
     return app_keyboard_release_ctrl_alt(context, sink) &&
         app_keyboard_emit(context, sink, 0x38u, UI_KEY_ALT, 1) &&

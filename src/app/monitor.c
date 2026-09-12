@@ -16,10 +16,12 @@ struct app_monitor_console {
 static void app_monitor_receive(void *opaque, const lib_console_event *event)
 {
     app_monitor_console *monitor = (app_monitor_console *)opaque;
-    if (monitor == NULL || event == NULL ||
-        event->kind != LIB_CONSOLE_EVENT_COOKED_LINE) return;
-    (void)app_control_queue_push_monitor_line(monitor->control_queue,
-        &event->value.line);
+    if (monitor == NULL || event == NULL) return;
+    if (event->kind == LIB_CONSOLE_EVENT_IO_FAILURE)
+        (void)app_control_queue_push_console_failed(monitor->control_queue);
+    else if (event->kind == LIB_CONSOLE_EVENT_COOKED_LINE)
+        (void)app_control_queue_push_monitor_line(monitor->control_queue,
+            &event->value.line);
 }
 
 int app_monitor_console_create(app_monitor_console **out_monitor,

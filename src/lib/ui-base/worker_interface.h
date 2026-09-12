@@ -37,7 +37,7 @@ int ui_component_emit_to(ui_component *component, const ui_input_event *event,
     ui_input_sink delivery_sink, void *delivery_context);
 lib_status ui_component_enqueue_controls(ui_component *component,
     const ui_component_control *controls, lib_u32 control_count);
-void ui_component_emit_source_retired(ui_component *component);
+void ui_component_retire(ui_component *component, lib_status status);
 void ui_component_report_failure(ui_component *component, lib_status status);
 
 #endif

@@ -1,11 +1,11 @@
 #include "lib/types/win32/scalar.h"
 #include "lib/types/win32/sync.h"
 #include "lib/types/types_interface.h"
-#include "lib/ui-window/win32/component.h"
+#include "lib/ui-window/window.h"
 
 #include "lib/ui-window/win32/geometry.h"
 #include "lib/ui-base/input_interface.h"
-#include "lib/ui-base/actions_interface.h"
+#include "lib/ui-window/win32/input.h"
 #include "lib/ui-base/mailbox_interface.h"
 #include "lib/ui-window/win32/mouse.h"
 
@@ -31,7 +31,7 @@ typedef struct ui_win32_window_context {
     lib_u32 graphics_palette[UI_GRAPHICS_PALETTE_ENTRIES];
     int graphics_valid;
     lib_u32 displayed_sequence;
-    ui_win32_keyboard_normalizer keyboard_normalizer;
+    ui_keyboard_normalizer keyboard_normalizer;
     int left_button;
     int right_button;
     lib_i64 pending_mouse_dx;
@@ -48,6 +48,7 @@ typedef struct ui_win32_window_context {
     lib_bool cursor_blink_visible;
     lib_win32_dword cursor_blink_due;
     lib_win32_hcursor transparent_cursor;
+    lib_status exit_status;
 } ui_win32_window_context;
 
 static ui_win32_window_context *win32_window_context(lib_win32_hwnd window)
@@ -102,7 +103,7 @@ static int win32_window_deliver_normalized(void *opaque,
         context->component->base.input_context, event);
 }
 
-static int win32_window_emit_normalized(void *opaque, const ui_event *event)
+static int win32_window_emit_normalized(void *opaque, const ui_input_event *event)
 {
     ui_win32_window_context *context = (ui_win32_window_context *)opaque;
 
@@ -437,14 +438,14 @@ static void win32_window_transition(ui_win32_window_context *context,
     lib_win32_word scan = (lib_win32_word)((lparam >> 16) & 0xffu);
 
     if (scan == 0u && !released)
-        ui_win32_keyboard_note_recovered_key(&context->keyboard_normalizer, (lib_win32_word)key);
+        ui_keyboard_note_recovered_key(&context->keyboard_normalizer, (lib_win32_word)key);
     if (scan == 0u && released)
-        ui_win32_keyboard_release_recovered_key(&context->keyboard_normalizer,
+        ui_keyboard_release_recovered_key(&context->keyboard_normalizer,
             (lib_win32_word)key);
-    (void)ui_win32_keyboard_submit_transition(context,
+    (void)ui_keyboard_submit_transition(context,
         win32_window_emit_normalized, (lib_u16)scan, (lib_u16)key,
-        ui_win32_keyboard_flags_from_lparam((lib_u64)lparam),
-        ui_win32_modifiers_from_key_state(), !released);
+        ui_window_keyboard_flags_from_lparam((lib_u64)lparam),
+        ui_window_modifiers_from_key_state(), !released);
 }
 
 static lib_i32 win32_window_mouse_clamp(lib_i64 value)
@@ -456,7 +457,7 @@ static lib_i32 win32_window_mouse_clamp(lib_i64 value)
 static void win32_window_emit_mouse(ui_win32_window_context *context,
     lib_i32 dx, lib_i32 dy, lib_u32 buttons)
 {
-    ui_event event = { 0 };
+    ui_input_event event = { 0 };
 
     if (!win32_window_accepting_content_input(context)) return;
     event.type = UI_EVENT_MOUSE;
@@ -552,9 +553,9 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
         return;
     if (!win32_window_frame_size(context->frame, &width, &height) ||
         !win32_window_ensure_surface(window, context, width, height)) {
+        context->exit_status = LIB_STATUS_IO_ERROR;
         lib_atomic_i32_store_explicit(&context->component->base.stopping, 1,
             LIB_MEMORY_ORDER_RELEASE);
-        lib_win32_destroy_window(window);
         return;
     }
     win32_window_resize_client(window, context, width, height);
@@ -582,11 +583,8 @@ static int win32_window_consume_mailboxes(lib_win32_hwnd window,
     while (ui_component_mailboxes_take_control(&context->component->base.mailboxes,
             &control)) {
         if (control.kind == UI_COMPONENT_CONTROL_STOP) {
-            ui_component_emit_source_retired(&context->component->base);
             lib_atomic_i32_store_explicit(&context->component->base.stopping, 1,
                 LIB_MEMORY_ORDER_RELEASE);
-            win32_window_release_mouse(context);
-            lib_win32_destroy_window(window);
             return 0;
         }
         if (control.kind == UI_COMPONENT_CONTROL_SET_WINDOW_TITLE)
@@ -672,9 +670,9 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
     case LIB_WIN32_WM_CHAR:
         if (win32_window_accepting_content_input(context) &&
             ((lib_u32)lparam >> 16u & 0xffu) == 0u &&
-            !ui_win32_keyboard_consume_duplicate_character(&context->keyboard_normalizer,
+            !ui_keyboard_consume_duplicate_character(&context->keyboard_normalizer,
                 (lib_win32_word)wparam))
-            (void)ui_win32_keyboard_submit_utf16(&context->keyboard_normalizer,
+            (void)ui_keyboard_submit_utf16(&context->keyboard_normalizer,
                 context, win32_window_emit_normalized, (lib_win32_word)wparam);
         return 0;
     case LIB_WIN32_WM_MOUSEMOVE:
@@ -812,35 +810,39 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
     lib_win32_set_foreground_window(window);
     lib_win32_set_focus(window);
     lib_win32_set_event(state->ready);
-    while (lib_win32_is_window(window)) {
+    while (lib_win32_is_window(window) && win32_window_accepting_input(context)) {
         ui_mailbox_wake_wait_result wait = ui_mailbox_wake_wait_messages(
             ui_component_mailboxes_wake(&component->base.mailboxes),
             win32_window_cursor_blink_timeout(context));
         if (wait == UI_MAILBOX_WAKE_WAIT_WAKE) {
-            if (lib_atomic_i32_load_explicit(&component->base.stopping,
-                    LIB_MEMORY_ORDER_ACQUIRE) != 0)
-                lib_win32_destroy_window(window);
-            else
+            if (win32_window_accepting_input(context))
                 lib_win32_send_message_a(window, WIN32_WINDOW_MAILBOX_READY, 0, 0);
         }
         else if (wait == UI_MAILBOX_WAKE_WAIT_FAULT) {
+            context->exit_status = LIB_STATUS_IO_ERROR;
             lib_atomic_i32_store_explicit(&component->base.stopping, 1,
                 LIB_MEMORY_ORDER_RELEASE);
-            lib_win32_destroy_window(window);
         }
         else if (wait == UI_MAILBOX_WAKE_WAIT_TIMED_OUT)
             win32_window_advance_cursor_blink(window, context);
-        while (lib_win32_peek_message_a(&message, LIB_NULL, 0, 0, LIB_WIN32_PM_REMOVE)) {
+        while (win32_window_accepting_input(context) &&
+            lib_win32_peek_message_a(&message, LIB_NULL, 0, 0, LIB_WIN32_PM_REMOVE)) {
             if (message.message == LIB_WIN32_WM_QUIT) {
+                context->exit_status = LIB_STATUS_IO_ERROR;
                 lib_atomic_i32_store_explicit(&component->base.stopping, 1,
                     LIB_MEMORY_ORDER_RELEASE);
-                if (lib_win32_is_window(window)) lib_win32_destroy_window(window);
                 break;
             }
             lib_win32_translate_message(&message);
             lib_win32_dispatch_message_a(&message);
         }
     }
+    if (!lib_win32_is_window(window)) context->exit_status = LIB_STATUS_IO_ERROR;
+    lib_atomic_i32_store_explicit(&component->base.stopping, 1,
+        LIB_MEMORY_ORDER_RELEASE);
+    win32_window_release_mouse(context);
+    if (lib_win32_is_window(window)) lib_win32_destroy_window(window);
+    ui_component_retire(&component->base, context->exit_status);
     win32_window_destroy(context, LIB_NULL);
     state->context = LIB_NULL;
     return 0u;

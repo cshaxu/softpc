@@ -13,8 +13,6 @@ lib_status host_console_backend_request_cooked_line(host_console_backend *backen
 lib_status host_console_backend_prepare(host_console_backend *backend,
     lib_console *console, host_console_mode mode)
 { (void)backend; (void)console; (void)mode; return LIB_STATUS_UNSUPPORTED; }
-void host_console_backend_discard_prepare(host_console_backend *backend)
-{ (void)backend; }
 lib_status host_console_backend_activate(host_console_backend *backend,
     lib_console *console, host_console_mode mode, lib_u32 generation)
 { (void)backend; (void)console; (void)mode; (void)generation; return LIB_STATUS_UNSUPPORTED; }

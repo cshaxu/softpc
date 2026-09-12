@@ -1,5 +1,94 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S3 P5 admission: correctness and boundary convergence
+
+Original owner requests: “以上。写入设计/任务文档，然后开始清理”,
+“我有一些疑问的你先解答一下，然后可以执行/”, and
+“照此办理，请你执行。” Baseline `3a71b50`; continue S3; keep T55 open.
+Freeze these twelve approved classes and all callers of their changed contracts.
+
+| Item | Change / sole owner | Focused proof |
+| --- | --- | --- |
+| 1 | ui-base mailbox accumulates unconsumed dirty bounds with latest complete pixels; incompatible mode/size/palette forces full refresh. | Skipped frames, consume reset, incompatible images. |
+| 2 | Window worker has one post-start cleanup/retirement path, separate from startup failure. | STOP, render/wait failure, disappearance; retire once and join. |
+| 3 | Console unexpected I/O failures follow logical events and UI failure sink; monitor forwards to control for fault termination, not prompt rearm. Cancellation/NOT_CURRENT are expected. | Reader/output failure and expected handoff; no product decision in lib. |
+| 4 | Broker transaction lock includes old binding cleanup after backend output unlock. | A-to-B cleanup completes before B-to-A can enter; no lock inversion. |
+| 5 | Window retains integer scaling remainders, reset on capture/release/ratio change. | Positive/negative/alternating/resize; integer ABI and Console X8/Y16 unchanged. |
+| 6 | ui-base delivers valid Unicode scalars through TEXT and clears malformed surrogate state. | Supplementary, malformed/recovery, rejected sink. |
+| 7 | Window-only message/key-state decoding returns to Window; shared normalizer stays ui-base with same-shape selected-platform API. | All callers, RDP/scan/chord regression, explicit Linux unsupported cases. |
+| 8 | Actual consumers declare OS linkage; types retains declarations only. | Direct link contracts; storage does not inherit UI libraries. |
+| 9 | storage root shares identical CRT stream operations; platform open/lock/seek differences remain selected implementations. | Storage smoke and both implementation shapes. |
+| 10 | Remove duplicate Window component header. | Include sweep and independent headers. |
+| 11 | Delete unused suppression field, empty discard-prepare and obsolete event/sink aliases after migrating callers. | Zero obsolete references and regression. |
+| 12 | Enforce exact permitted include and CMake component DAG. | Every allowed/forbidden edge and platform/traversal exceptions. |
+
+Execution order: shared frame/input fixes; worker and Console transactions;
+platform/storage consolidation and dependency gates; full diff review and fresh
+strict/x64/x86 build/tests. Every disposition needs focused evidence before
+delivery; no silent deferral. Existing Linux paths remain connected, unavailable
+UI parity stays explicit; no claim of Linux desktop execution. No MVDM, media,
+INI, Console mouse conversion or product routing change. App changes only
+propagate faults and adopt renamed contracts. Refresh only the two package EXEs;
+commit/push complete delivery, account changed paths and leave T55 open. Ignored
+build/t55-lib-audit probes are bounded diagnostics to remove after permanent
+tests replace them.
+
+### P5 executor verification
+
+All twelve ledger items are implemented without deferral. Shared damage uses
+latest complete pixels plus the enclosing pending rectangle, never an extra
+pixel queue. Window mouse uses signed integer remainders, not floating-point
+events; Console X8/Y16 is unchanged. The neutral keyboard path preserves the
+existing Windows layout/scan recovery and hotkey sequence; Linux terminal key
+mapping remains connected and text without a physical mapping uses TEXT.
+Window-only message flags/key-state queries are now private Window helpers.
+
+Worker proofs execute the actual production worker with controlled barriers:
+STOP, wake failure, surface allocation failure, WM_QUIT, unexpected destruction,
+retirement rejection and fault plus retirement rejection. Retirement is once,
+exit failure is reported once, and destroy joins. Console tests cover reader
+failure, output failure, expected NOT_CURRENT and callback/detach ordering.
+The host reader reports generation-checked IO_FAILURE; ui-console retires via
+its failure path. Monitor posts a copied control failure and the app terminates
+the failed path without arming another prompt. Failure cleanup now destroys
+runtime before monitor/control queue, keeping callback targets alive until join.
+This is failure plumbing, not a lifecycle/routing policy change.
+
+The broker test pauses A-to-B during old sink cleanup and proves the reverse
+thread actually encounters the held transaction lock; only after cleanup can
+B-to-A install A again. Its final output write succeeds. Static gates test all
+49 include and 49 CMake edges, uppercase commands, computed/angle includes,
+component-private platforms and traversal. OS libraries are attached to actual
+consumers, not types. Repeated CRT stream bodies, obsolete event/sink aliases,
+unused suppression state, empty prepare rollback and duplicate Window header
+are removed, with every production caller migrated in this P.
+
+Fresh full tests: x64 46/46 (53.10 s), x86 46/46 (69.26 s), including package
+smoke. A subsequent test-only atomic cleanup of the broker probe passed again
+at both widths. Strict C17 `-Wall -Wextra -Wpedantic -Werror` library build and
+3/3 standalone checks pass; all 18 public/support interface headers independently
+compile. Manifest and documentation gates pass. Linux input/host contract fakes
+are not evidence of Linux desktop execution; manual package acceptance is pending.
+
+During verification, strict compilation caught a neutral key narrowed to u16
+and a missing scalar vocabulary include; both were corrected before delivery.
+The first focused run passed 7/9: the new Console IO_FAILURE kind was missing
+from event validation. Adding its validation case made both tests pass, followed
+by the full passes above. No failed verification is treated as acceptance.
+
+Similar-issue sweep: inspect all worker STOP/fault/destruction exits, all Console
+read/write sinks, both broker terminal failures and success cleanup; search
+`ui_event`, `ui_event_sink`, `suppressed_virtual_key`, `discard_prepare` and old
+`ui_win32_keyboard` names across src/test (zero obsolete references). Review all
+changed input callers and selected platform operations; exact DAG negative
+fixtures permanently guard the mechanically detectable boundary errors.
+
+Accounting versus `3a71b50`, no rename detection, excluding documents/manifest/
+EXEs: library C/H 30 paths +465/-438 (net +27); app 11 paths +43/-27 (net +16);
+tests 14 paths +470/-49 (net +421); build/gates five paths +94/-14 (net +80).
+No MVDM, media or user INI changes. The two package EXEs are refreshed.
+S3 awaits owner inspection; this delivery does not close T55.
+
 ## S3 P4 admission: component-private platform directories
 
 Original owner request: “很好 所以所有的lib组件 win32和linux都只是组件内部的实现，组件外不能访问 包括隔壁其他的lib组件 对吗”,

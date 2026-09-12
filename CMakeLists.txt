@@ -329,8 +329,7 @@ add_test(NAME softpc-lib-console-event-gate-smoke
 set_tests_properties(softpc-lib-console-event-gate-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-host-console-broker-smoke
-    test/unit/host_console_broker_smoke.c
-    src/lib/host/console.c)
+    test/unit/host_console_broker_smoke.c)
 target_link_libraries(softpc-host-console-broker-smoke PRIVATE console)
 add_test(NAME softpc-host-console-broker-smoke
     COMMAND softpc-host-console-broker-smoke)
@@ -498,7 +497,7 @@ target_link_libraries(softpc-types-contract-smoke PRIVATE host)
 add_test(NAME softpc-types-contract-smoke COMMAND softpc-types-contract-smoke)
 add_executable(softpc-win32-vocabulary-ownership-smoke
     test/unit/win32_vocabulary_ownership_smoke.c)
-target_link_libraries(softpc-win32-vocabulary-ownership-smoke PRIVATE types)
+target_link_libraries(softpc-win32-vocabulary-ownership-smoke PRIVATE types user32)
 add_test(NAME softpc-win32-vocabulary-ownership-smoke
     COMMAND softpc-win32-vocabulary-ownership-smoke)
 set_tests_properties(softpc-types-contract-smoke
@@ -574,7 +573,7 @@ add_executable(softpc-control-reconciler-integration-smoke
 target_include_directories(softpc-control-reconciler-integration-smoke PRIVATE
     src/app src/host src)
 target_link_libraries(softpc-control-reconciler-integration-smoke PRIVATE
-    console)
+    host ui-console)
 add_test(NAME softpc-control-reconciler-integration-smoke
     COMMAND softpc-control-reconciler-integration-smoke)
 set_tests_properties(softpc-control-reconciler-integration-smoke PROPERTIES
@@ -646,6 +645,19 @@ set(SOFTPC_TEST_TARGETS
     softpc-win32-presentation-smoke
     softpc-win32-window-bounds-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-ui-component-contract-smoke)
+add_executable(softpc-linux-input-contract-smoke test/unit/linux_input_contract_smoke.c
+    src/lib/ui-base/input.c src/lib/ui-base/linux/input.c)
+target_link_libraries(softpc-linux-input-contract-smoke PRIVATE types)
+add_test(NAME softpc-linux-input-contract-smoke COMMAND softpc-linux-input-contract-smoke)
+set_tests_properties(softpc-linux-input-contract-smoke PROPERTIES LABELS "unit")
+list(APPEND SOFTPC_TEST_TARGETS softpc-linux-input-contract-smoke)
+foreach(probe IN ITEMS ui_frame_damage_mouse ui_window_retirement host_console_reader_failure)
+    add_executable(softpc-${probe}-smoke test/unit/${probe}_smoke.c)
+    target_link_libraries(softpc-${probe}-smoke PRIVATE ui-window console)
+    add_test(NAME softpc-${probe}-smoke COMMAND softpc-${probe}-smoke)
+    set_tests_properties(softpc-${probe}-smoke PROPERTIES LABELS "unit" TIMEOUT 15)
+    list(APPEND SOFTPC_TEST_TARGETS softpc-${probe}-smoke)
+endforeach()
 list(APPEND SOFTPC_TEST_TARGETS softpc-ui-leaf-control-capacity-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-linux-wait-contract-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-control-reconciler-integration-smoke)
