@@ -2,8 +2,30 @@
 
 ## Current Work
 
-No implementation subtask is active. M9 T55 closed after the owner accepted
-the final KVM corpus package test. Owner package INI and media are preserved.
+M9 Td S12 is active: plan the SoftPC-first common extraction and staged
+executable acceptance. T55 remains closed; no numeric implementation T is
+allocated. Preserve owner configuration bytes and commit its existing change.
+
+## M9 Td S12 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Governance |
+| Admission And Approval | Owner requests Td planning, proposal update, bounded S deliveries, commit/push and clean worktree. |
+| Objective | Define five common components, CLI injection, app configuration/thread composition, exact deletion boundaries and per-S dual-width executable acceptance. |
+| Non-goals | No production code, lib, MVDM, executable rebuild, product behavior or numeric-T admission. |
+| Reference Baseline | 5707ee8 proposal; accepted T55 binaries from 987d82e, x86/x64 58/58 and strict lib 8/8. |
+| Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
+| Files And ABI Surface | Candidate proposal, Current and Td history; existing owner INI change ships unchanged. |
+| Applicable Rules | Execution/documentation rules and architecture/execution/documentation governance skills. |
+| Verification | Requirement-to-S review, dependency/thread ownership review, documentation gate and git diff hygiene. |
+| Expected Markers | Every proposed S has deletion ownership and runnable EXE acceptance; no common split or NXVM-first behavioral replacement. |
+| Asset Needs | No new EXE; preserve configuration bytes and media. |
+| Reporting Requirements | Proposed S sequence, governance commit/push and clean worktree proof. |
+| Stop Conditions | Do not hide migration leftovers, invent tested implementation, or weaken the common-only lib-call boundary. |
+| Exit Criteria | Reviewed proposal and history committed/pushed, Current idle and worktree clean. |
+| Original Owner Request | See the verbatim request in the linked candidate proposal. |
+| Similar-Issue Sweep | All five components, product CLI/configuration, thread ownership, lib consumers, deletion gates and each S acceptance. |
 
 ## Current Technical Baseline
 
