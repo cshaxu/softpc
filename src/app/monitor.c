@@ -2,7 +2,7 @@
 #include "monitor.h"
 
 #ifdef _WIN32
-#include "lib/ui-console/console_interface.h"
+#include "lib/kvm-console/console_interface.h"
 #include <windows.h>
 
 #include <stdlib.h>
@@ -66,18 +66,18 @@ void app_monitor_console_destroy(app_monitor_console *monitor)
 }
 
 int app_monitor_console_activate_vm(app_monitor_console *monitor,
-    ui_console *console)
+    kvm_console *console)
 {
     return monitor != NULL && console != NULL &&
         host_console_broker_replace(monitor->broker, monitor->console,
-            ui_console_get_console(console), HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK;
+            kvm_console_get_console(console), HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK;
 }
 
 int app_monitor_console_activate_self(app_monitor_console *monitor,
-    ui_console *console)
+    kvm_console *console)
 {
     return monitor != NULL && console != NULL &&
-        host_console_broker_replace(monitor->broker, ui_console_get_console(console),
+        host_console_broker_replace(monitor->broker, kvm_console_get_console(console),
             monitor->console, HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_OK;
 }
 

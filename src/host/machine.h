@@ -68,7 +68,7 @@ void softpc_machine_request_wake(softpc_machine *machine);
  * asynchronous host thread or a nested host_simulate frame. */
 void softpc_machine_request_stop(softpc_machine *machine);
 /* Register the single VM executor with the original CCPU TLS simulation
- * stack. These calls belong to that executor's lifetime, never to a UI
+ * stack. These calls belong to that executor's lifetime, never to a KVM
  * thread. */
 void softpc_machine_executor_thread_enter(softpc_machine *machine);
 void softpc_machine_executor_thread_leave(softpc_machine *machine);

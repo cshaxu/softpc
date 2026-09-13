@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void app_runtime_cursor_shape(ui_frame *frame, uint32_t percent)
+static void app_runtime_cursor_shape(kvm_frame *frame, uint32_t percent)
 {
     /* CONSOLE_CURSOR_INFO is a bottom-aligned percentage, not scanline bounds. */
     uint32_t height = frame->font_height;
@@ -55,7 +55,7 @@ static void app_runtime_prompt_trace(uint32_t sequence, uint32_t mode_type,
 struct app_runtime {
     softpc_machine *machine;
     app_input_queue *input_queue;
-    ui_frame *frame_buffers[2];
+    kvm_frame *frame_buffers[2];
     CRITICAL_SECTION frame_lock;
     int published_frame_index;
     uint32_t published_frame_sequence;
@@ -140,8 +140,8 @@ static int app_runtime_schedule_cold_run(app_runtime *runtime,
  * behind frame-completed records and needlessly forcing the Console cursor.
  * Graphics frames have already passed the machine dirty gate and therefore
  * remain publishable as-is. */
-static int app_runtime_text_frame_changed(const ui_frame *previous,
-    const ui_frame *candidate)
+static int app_runtime_text_frame_changed(const kvm_frame *previous,
+    const kvm_frame *candidate)
 {
     if (previous == NULL || previous->valid == 0u ||
         previous->graphics != 0u) return 1;
@@ -259,7 +259,7 @@ static void app_runtime_publish(app_runtime *runtime)
                     memcpy(frame->graphics_pixels + row * visible_width,
                         source + row * row_stride, visible_width);
                 for (palette_index = 0u;
-                        palette_index < UI_GRAPHICS_PALETTE_ENTRIES;
+                        palette_index < KVM_GRAPHICS_PALETTE_ENTRIES;
                         ++palette_index) {
                     const RGBQUAD *colour = &dib->bmiColors[palette_index];
                     frame->graphics_palette[palette_index] =
@@ -389,7 +389,7 @@ done:
 
 static void app_runtime_drain_input(app_runtime *runtime)
 {
-    ui_input_event event;
+    kvm_input_event event;
 
     /* keyboard_io can enter a nested host_simulate frame for the original
        BIOS INT 15 keyboard hook.  A Windows make/break pair may already be
@@ -398,17 +398,17 @@ static void app_runtime_drain_input(app_runtime *runtime)
        Deliver precisely one hardware scan event per executor callback; the
        restored 20 Hz host timer naturally schedules the next one. */
     if (app_input_queue_pop(runtime->input_queue, &event)) {
-        if (event.type == UI_EVENT_KEY) {
+        if (event.type == KVM_EVENT_KEY) {
             if (getenv("SOFTPC_INPUT_TRACE") != NULL)
                 fprintf(stderr, "softpc input drain scan=%u released=%u\n",
                     (unsigned int)event.data.key.scan_code,
                     (unsigned int)!event.data.key.pressed);
             (void)app_keyboard_inject_machine_event(runtime->machine, &event);
-        } else if (event.type == UI_EVENT_MOUSE) {
+        } else if (event.type == KVM_EVENT_MOUSE) {
             (void)softpc_machine_mouse_input(runtime->machine,
                 event.data.mouse.delta_x, event.data.mouse.delta_y,
-                (event.data.mouse.buttons & UI_MOUSE_BUTTON_LEFT) != 0u,
-                (event.data.mouse.buttons & UI_MOUSE_BUTTON_RIGHT) != 0u);
+                (event.data.mouse.buttons & KVM_MOUSE_BUTTON_LEFT) != 0u,
+                (event.data.mouse.buttons & KVM_MOUSE_BUTTON_RIGHT) != 0u);
         }
         /* The original keyboard path can re-enter the CCPU while servicing
            one transition.  It remains deliberately one transition per
@@ -674,7 +674,7 @@ softpc_machine_result app_runtime_get_result(const app_runtime *runtime)
 }
 
 int app_runtime_enqueue_input_event(app_runtime *runtime,
-    const ui_input_event *event)
+    const kvm_input_event *event)
 {
     LONG state;
     if (runtime == NULL || event == NULL) return 0;

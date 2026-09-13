@@ -36,9 +36,9 @@ static int runtime_input_wait_for_state(app_runtime *runtime,
 static int runtime_input_enqueue_key(app_runtime *runtime, uint16_t scan,
     lib_u32 key, uint8_t pressed)
 {
-    ui_input_event event = { 0 };
+    kvm_input_event event = { 0 };
 
-    event.type = UI_EVENT_KEY;
+    event.type = KVM_EVENT_KEY;
     event.data.key.scan_code = scan;
     event.data.key.key = key;
     event.data.key.pressed = pressed;
@@ -96,8 +96,8 @@ int main(void)
         sizeof(stale_input)) == SOFTPC_MACHINE_OK);
     assert(stale_input == 0u);
 
-    assert(runtime_input_enqueue_key(runtime, 0x1du, UI_KEY_CONTROL, 1u));
-    assert(runtime_input_enqueue_key(runtime, 0x1du, UI_KEY_CONTROL, 0u));
+    assert(runtime_input_enqueue_key(runtime, 0x1du, KVM_KEY_CONTROL, 1u));
+    assert(runtime_input_enqueue_key(runtime, 0x1du, KVM_KEY_CONTROL, 0u));
     deadline = GetTickCount() + 1000u;
     assert(runtime_input_wait_for_byte(machine, 0x502u, 0x01u, deadline,
         &delivered));
@@ -111,7 +111,7 @@ int main(void)
     assert(app_runtime_pause(runtime));
     assert(runtime_input_wait_for_state(runtime, SOFTPC_RUNTIME_PAUSED,
         GetTickCount() + 5000u));
-    assert(!runtime_input_enqueue_key(runtime, 0x1du, UI_KEY_CONTROL, 0u));
+    assert(!runtime_input_enqueue_key(runtime, 0x1du, KVM_KEY_CONTROL, 0u));
     assert(app_runtime_stop(runtime));
     assert(runtime_input_wait_for_state(runtime, SOFTPC_RUNTIME_STOPPED,
         GetTickCount() + 5000u));

@@ -4,8 +4,8 @@
 #ifdef _WIN32
 #include "command.h"
 #include "keyboard.h"
-#include "lib/ui-console/console_interface.h"
-#include "lib/ui-window/window_interface.h"
+#include "lib/kvm-console/console_interface.h"
+#include "lib/kvm-window/window_interface.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,11 +14,11 @@
 
 struct app_presentation {
     app_runtime *runtime;
-    ui_window *window;
-    ui_console *console;
+    kvm_window *window;
+    kvm_console *console;
     app_monitor_console *monitor;
     app_control_queue *control_queue;
-    ui_hotkey_registry hotkeys;
+    kvm_hotkey_registry hotkeys;
     /* Delivery is a property of an individual output object.  A recreated
      * Window/Console must receive the last completed frame even when the VM
      * has not published a newer sequence. */
@@ -34,7 +34,7 @@ static void app_presentation_delivery_failed(void *opaque,
 static void app_presentation_check_request(app_presentation_context *context,
     lib_status status)
 {
-    /* UI requests return an error only before the component accepts them.
+    /* KVM requests return an error only before the component accepts them.
      * An accepted request that later fails reports through failure_sink. */
     if (status != LIB_STATUS_OK)
         app_presentation_delivery_failed(context, 0u, status);
@@ -45,23 +45,23 @@ static void app_presentation_publish_title(app_presentation_context *context,
     app_runtime_state state)
 {
     if (context == NULL || context->window == NULL) return;
-    app_presentation_check_request(context, ui_window_set_title(context->window,
+    app_presentation_check_request(context, kvm_window_set_title(context->window,
         state == SOFTPC_RUNTIME_PAUSED ?
             "Insignia SoftPC (Paused)" : "Insignia SoftPC (Running)"));
 }
 
-static int app_presentation_guest_input(void *opaque, const ui_input_event *event)
+static int app_presentation_guest_input(void *opaque, const kvm_input_event *event)
 {
     app_presentation_context *context = (app_presentation_context *)opaque;
-    return context != NULL && app_control_queue_push_ui_for_run(
+    return context != NULL && app_control_queue_push_kvm_for_run(
         context->control_queue, event,
         app_runtime_run_generation(context->runtime));
 }
 
 /* One app-owned queue sink for Window and VM-Console events.  The source
- * handle is retained by ui-base for tracing only; action meaning is the
+ * handle is retained by kvm-base for tracing only; action meaning is the
  * registered identifier, never a leaf-specific callback. */
-static int app_presentation_input(void *opaque, const ui_input_event *event)
+static int app_presentation_input(void *opaque, const kvm_input_event *event)
 {
     app_presentation_context *context = (app_presentation_context *)opaque;
     if (context == NULL || event == NULL) return 0;
@@ -73,14 +73,14 @@ static void app_presentation_delivery_failed(void *opaque,
 {
     app_presentation_context *context = (app_presentation_context *)opaque;
     if (context != NULL)
-        (void)app_control_queue_push_ui_delivery_failed(context->control_queue,
+        (void)app_control_queue_push_kvm_delivery_failed(context->control_queue,
             source_identity, status, app_runtime_run_generation(context->runtime));
 }
 
 static int app_presentation_create_window(app_presentation_context *context,
     app_runtime_state state)
 {
-    ui_window_options options = { 0 };
+    kvm_window_options options = { 0 };
     lib_status status;
 
     if (context == NULL || context->window != NULL) return context != NULL;
@@ -92,7 +92,7 @@ static int app_presentation_create_window(app_presentation_context *context,
     options.initial_title = state == SOFTPC_RUNTIME_PAUSED ?
         "Insignia SoftPC (Paused)" : "Insignia SoftPC (Running)";
     options.initial_frozen = state != SOFTPC_RUNTIME_RUNNING;
-    status = ui_window_create(&context->window, &options);
+    status = kvm_window_create(&context->window, &options);
     if (status != LIB_STATUS_OK) {
         softpc_host_require_status(status, "Window startup");
         return 0; /* Unreachable; preserves the ordinary create signature. */
@@ -100,13 +100,13 @@ static int app_presentation_create_window(app_presentation_context *context,
     context->window_delivered_frame_sequence = 0u;
     app_presentation_publish_title(context, state);
     if (state == SOFTPC_RUNTIME_RUNNING)
-        app_presentation_check_request(context, ui_window_unfreeze(context->window));
+        app_presentation_check_request(context, kvm_window_unfreeze(context->window));
     return 1;
 }
 
 static int app_presentation_create_console(app_presentation_context *context)
 {
-    ui_console_options options = { 0 };
+    kvm_console_options options = { 0 };
     lib_status status;
 
     if (context == NULL || context->console != NULL) return context != NULL;
@@ -115,7 +115,7 @@ static int app_presentation_create_console(app_presentation_context *context)
     options.failure_context = context;
     options.failure_sink = app_presentation_delivery_failed;
     options.hotkeys = context->hotkeys;
-    status = ui_console_create(&context->console, &options);
+    status = kvm_console_create(&context->console, &options);
     if (status != LIB_STATUS_OK) {
         softpc_host_require_status(status, "Console startup");
         return 0;
@@ -133,9 +133,9 @@ static void app_presentation_destroy_components(app_presentation_context *contex
         (void)app_monitor_console_activate_self(context->monitor,
             context->console);
     if (context->window != NULL)
-        softpc_host_require_status(ui_window_destroy(context->window), "UI destroy");
+        softpc_host_require_status(kvm_window_destroy(context->window), "KVM destroy");
     if (context->console != NULL)
-        softpc_host_require_status(ui_console_destroy(context->console), "UI destroy");
+        softpc_host_require_status(kvm_console_destroy(context->console), "KVM destroy");
     context->window = NULL;
     context->console = NULL;
     context->window_delivered_frame_sequence = 0u;
@@ -177,14 +177,14 @@ int app_presentation_apply_action(app_presentation *presentation,
         return app_control_queue_push_broker_completed(context->control_queue, 0,
             app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE:
-        softpc_host_require_status(ui_console_destroy(context->console), "UI destroy");
+        softpc_host_require_status(kvm_console_destroy(context->console), "KVM destroy");
         context->console = NULL;
         context->console_delivered_frame_sequence = 0u;
         return app_control_queue_push_component_completed(context->control_queue,
             APP_CONTROL_COMPONENT_VM_CONSOLE, 0,
             app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_DESTROY_WINDOW:
-        softpc_host_require_status(ui_window_destroy(context->window), "UI destroy");
+        softpc_host_require_status(kvm_window_destroy(context->window), "KVM destroy");
         context->window = NULL;
         context->window_delivered_frame_sequence = 0u;
         return app_control_queue_push_component_completed(context->control_queue,
@@ -199,8 +199,8 @@ int app_presentation_publish_frame(app_presentation *presentation,
     int vm_console_current, int console_status_surface)
 {
     app_presentation_context *context = presentation;
-    ui_frame console_status;
-    const ui_frame *console_frame = frame;
+    kvm_frame console_status;
+    const kvm_frame *console_frame = frame;
     if (context == NULL || frame == NULL) return 0;
     /* A graphics frame has no console rendering contract.  In the one mode
      * where the VM raw Console remains active beside Window, SoftPC provides
@@ -216,8 +216,8 @@ int app_presentation_publish_frame(app_presentation *presentation,
         memset(&console_status, 0, sizeof(console_status));
         console_status.valid = 1u;
         console_status.sequence = frame->sequence;
-        console_status.text_columns = UI_TEXT_COLUMNS;
-        console_status.text_rows = UI_TEXT_ROWS;
+        console_status.text_columns = KVM_TEXT_COLUMNS;
+        console_status.text_rows = KVM_TEXT_ROWS;
         console_status.cursor_column = -1;
         console_status.cursor_row = -1;
         for (index = 0u; index < sizeof(console_status.text); ++index) {
@@ -227,8 +227,8 @@ int app_presentation_publish_frame(app_presentation *presentation,
         for (index = 0u; message[index] != '\0'; ++index) {
             if (message[index] == '\r') continue;
             if (message[index] == '\n') { ++row; column = 0u; continue; }
-            if (row < UI_TEXT_ROWS && column < UI_TEXT_COLUMNS)
-                console_status.text[row * UI_TEXT_COLUMNS + column] =
+            if (row < KVM_TEXT_ROWS && column < KVM_TEXT_COLUMNS)
+                console_status.text[row * KVM_TEXT_COLUMNS + column] =
                     (lib_u8)message[index];
             ++column;
         }
@@ -236,13 +236,13 @@ int app_presentation_publish_frame(app_presentation *presentation,
     }
     if (vm_console_current && context->console != NULL &&
         context->console_delivered_frame_sequence != frame->sequence) {
-        if (ui_console_publish_frame(context->console, console_frame) !=
+        if (kvm_console_publish_frame(context->console, console_frame) !=
             LIB_STATUS_OK) return 0;
         context->console_delivered_frame_sequence = frame->sequence;
     }
     if (window_actual && context->window != NULL &&
         context->window_delivered_frame_sequence != frame->sequence) {
-        if (ui_window_publish_frame(context->window, frame) != LIB_STATUS_OK)
+        if (kvm_window_publish_frame(context->window, frame) != LIB_STATUS_OK)
             return 0;
         context->window_delivered_frame_sequence = frame->sequence;
     }
@@ -281,7 +281,7 @@ void app_presentation_destroy(app_presentation *presentation)
 void app_presentation_release_window_mouse(app_presentation *presentation)
 {
     if (presentation != NULL && presentation->window != NULL)
-        app_presentation_check_request(presentation, ui_window_release_mouse(presentation->window));
+        app_presentation_check_request(presentation, kvm_window_release_mouse(presentation->window));
 }
 
 void app_presentation_set_runtime_state(app_presentation *presentation,
@@ -291,9 +291,9 @@ void app_presentation_set_runtime_state(app_presentation *presentation,
     app_presentation_publish_title(presentation, state);
     if (presentation->window != NULL) {
         if (state == SOFTPC_RUNTIME_RUNNING)
-            app_presentation_check_request(presentation, ui_window_unfreeze(presentation->window));
+            app_presentation_check_request(presentation, kvm_window_unfreeze(presentation->window));
         else if (state == SOFTPC_RUNTIME_PAUSED)
-            app_presentation_check_request(presentation, ui_window_freeze(presentation->window));
+            app_presentation_check_request(presentation, kvm_window_freeze(presentation->window));
     }
 }
 

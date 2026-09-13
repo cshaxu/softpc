@@ -231,7 +231,7 @@ static BOOL CALLBACK package_find_window(HWND window, LPARAM opaque)
     char name[64];
     GetWindowThreadProcessId(window, &process);
     if (process == probe->process && GetClassNameA(window, name, sizeof(name)) &&
-        strcmp(name, "LibUxWindow") == 0) probe->window = window;
+        strcmp(name, "LibKvmWindow") == 0) probe->window = window;
     return TRUE;
 }
 

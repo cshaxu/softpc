@@ -1,15 +1,15 @@
 #include "linux_wait_fakes.h"
 #include "lib/host/linux/sync.c"
-#include "lib/ui-base/linux/mailbox.c"
+#include "lib/kvm-base/linux/mailbox.c"
 #include "lib/host/linux/console.c"
 
 static host_sync_event *signal_event;
-static ui_mailbox_wake *signal_wake;
+static kvm_mailbox_wake *signal_wake;
 static void signal_on_second_wait(void)
 {
     if (wait_calls != 2) return; /* First return is spurious. */
     if (signal_event) host_sync_platform_event_signal(signal_event);
-    if (signal_wake) ui_mailbox_wake_signal(signal_wake);
+    if (signal_wake) kvm_mailbox_wake_signal(signal_wake);
 }
 
 int main(void)
@@ -17,14 +17,14 @@ int main(void)
     host_sync_event *events[2];
     lib_bool signaled;
     lib_u32 index;
-    ui_mailbox_wake_wait_result wake_result;
+    kvm_mailbox_wake_wait_result wake_result;
     int failure;
     host_console_backend *backend = (void *)1;
 
     for (failure = 1; failure <= 4; ++failure) {
         fail_init_step = failure; init_step = 0;
         signal_wake = NULL;
-        assert(ui_mailbox_wake_create(&signal_wake) == LIB_STATUS_IO_ERROR);
+        assert(kvm_mailbox_wake_create(&signal_wake) == LIB_STATUS_IO_ERROR);
         assert(signal_wake == NULL);
         assert(live_mutexes == 0 && live_conditions == 0 && live_attributes == 0);
     }
@@ -39,42 +39,42 @@ int main(void)
     host_sync_once = LIB_LINUX_PTHREAD_ONCE_INIT;
     fail_init_step = 0; init_step = 0;
     signal_wake = NULL;
-    assert(ui_mailbox_wake_create(&signal_wake) == LIB_STATUS_OK);
+    assert(kvm_mailbox_wake_create(&signal_wake) == LIB_STATUS_OK);
     assert(signal_wake != NULL);
-    assert(ui_mailbox_wake_wait(signal_wake, 0, &wake_result) == LIB_STATUS_OK &&
-        wake_result == UI_MAILBOX_WAKE_WAIT_TIMED_OUT);
-    assert(ui_mailbox_wake_signal(signal_wake)==LIB_STATUS_OK);
-    assert(ui_mailbox_wake_wait(signal_wake, 0, &wake_result) == LIB_STATUS_OK &&
-        wake_result == UI_MAILBOX_WAKE_WAIT_WAKE);
+    assert(kvm_mailbox_wake_wait(signal_wake, 0, &wake_result) == LIB_STATUS_OK &&
+        wake_result == KVM_MAILBOX_WAKE_WAIT_TIMED_OUT);
+    assert(kvm_mailbox_wake_signal(signal_wake)==LIB_STATUS_OK);
+    assert(kvm_mailbox_wake_wait(signal_wake, 0, &wake_result) == LIB_STATUS_OK &&
+        wake_result == KVM_MAILBOX_WAKE_WAIT_WAKE);
     assert(wait_calls == 0);
     wait_hook = signal_on_second_wait;
-    assert(ui_mailbox_wake_wait(signal_wake, 250, &wake_result) == LIB_STATUS_OK &&
-        wake_result == UI_MAILBOX_WAKE_WAIT_WAKE);
+    assert(kvm_mailbox_wake_wait(signal_wake, 250, &wake_result) == LIB_STATUS_OK &&
+        wake_result == KVM_MAILBOX_WAKE_WAIT_WAKE);
     assert(wait_calls == 2 && observed_deadline.tv_sec == 101 &&
         observed_deadline.tv_nsec == 150000000L);
     wait_calls = 0;
-    assert(ui_mailbox_wake_wait(signal_wake, LIB_UINT32_MAX, &wake_result) == LIB_STATUS_OK &&
-        wake_result == UI_MAILBOX_WAKE_WAIT_WAKE);
+    assert(kvm_mailbox_wake_wait(signal_wake, LIB_UINT32_MAX, &wake_result) == LIB_STATUS_OK &&
+        wake_result == KVM_MAILBOX_WAKE_WAIT_WAKE);
     assert(wait_calls == 2);
     wait_hook = NULL; wait_calls = 0; wait_result = LIB_LINUX_ETIMEDOUT;
-    assert(ui_mailbox_wake_wait(signal_wake, 1, &wake_result) == LIB_STATUS_OK &&
-        wake_result == UI_MAILBOX_WAKE_WAIT_TIMED_OUT);
+    assert(kvm_mailbox_wake_wait(signal_wake, 1, &wake_result) == LIB_STATUS_OK &&
+        wake_result == KVM_MAILBOX_WAKE_WAIT_TIMED_OUT);
     wait_calls = 0; wait_result = 5;
-    assert(ui_mailbox_wake_wait(signal_wake, LIB_UINT32_MAX, &wake_result) == LIB_STATUS_IO_ERROR);
+    assert(kvm_mailbox_wake_wait(signal_wake, LIB_UINT32_MAX, &wake_result) == LIB_STATUS_IO_ERROR);
     clock_failure = 1;
-    assert(ui_mailbox_wake_wait(signal_wake, 1, &wake_result) == LIB_STATUS_IO_ERROR);
+    assert(kvm_mailbox_wake_wait(signal_wake, 1, &wake_result) == LIB_STATUS_IO_ERROR);
     clock_failure = 0;
-    assert(ui_mailbox_wake_signal(NULL)==LIB_STATUS_INVALID_ARGUMENT);
+    assert(kvm_mailbox_wake_signal(NULL)==LIB_STATUS_INVALID_ARGUMENT);
     fail_lock=1;
-    assert(ui_mailbox_wake_signal(signal_wake)==LIB_STATUS_IO_ERROR);
+    assert(kvm_mailbox_wake_signal(signal_wake)==LIB_STATUS_IO_ERROR);
     assert(!signal_wake->lock.locked);
     fail_lock=0;fail_signal=1;
-    assert(ui_mailbox_wake_signal(signal_wake)==LIB_STATUS_IO_ERROR);
+    assert(kvm_mailbox_wake_signal(signal_wake)==LIB_STATUS_IO_ERROR);
     assert(!signal_wake->lock.locked);
     fail_signal=0;fail_unlock=1;
-    assert(ui_mailbox_wake_signal(signal_wake)==LIB_STATUS_IO_ERROR);
+    assert(kvm_mailbox_wake_signal(signal_wake)==LIB_STATUS_IO_ERROR);
     fail_unlock=0;
-    ui_mailbox_wake_destroy(signal_wake); signal_wake = NULL;
+    kvm_mailbox_wake_destroy(signal_wake); signal_wake = NULL;
     assert(live_mutexes == 0 && live_conditions == 0);
 
     assert(host_sync_platform_event_create(0, &events[0]) == LIB_STATUS_OK);

@@ -2,9 +2,9 @@
 
 ## Current Work
 
-M9 T55 S21 is admitted: rename the shared keyboard/video/mouse corpus from
-`ui-*` to `kvm-*` without changing its behavior or extending it to the cooked
-monitor. T55 remains open.
+M9 T55 S21 is admitted: give the shared keyboard/video/mouse corpus its
+accurate `kvm-*` identity without changing behavior or extending it to the
+cooked monitor. T55 remains open.
 Owner package INI and media are preserved.
 
 ## M9 T55 S21 Packet
@@ -12,21 +12,21 @@ Owner package INI and media are preserved.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepted S20 manual testing and directed this pure rename: `ui-base` -> `kvm-base`, `ui-window` -> `kvm-window`, `ui-console` -> `kvm-console`, with their symbols renamed to `kvm`. |
+| Admission And Approval | Owner accepted S20 manual testing and directed the three shared keyboard/video/mouse components and symbols to use the `kvm` namespace. |
 | Objective | Make the shared corpus accurately name its keyboard/video/mouse responsibility while preserving every existing runtime behavior and boundary. |
-| Non-goals | No MVDM/media change, monitor migration, product UI redesign, lifecycle/input semantic change, ABI shape change other than mechanical identifier/path spelling, new queue/worker, Linux parity expansion, or T closure. |
+| Non-goals | No MVDM/media change, monitor migration, product-interface redesign, lifecycle/input semantic change, ABI shape change other than mechanical identifier/path spelling, new queue/worker, Linux parity expansion, or T closure. |
 | Reference Baseline | 2ea35ce; clean S20 P2 commit, x64/x86 57/57 CTest, strict library 6/6, preserved package media; owner accepted manual package testing. |
 | Candidate Proposal | [S21 kvm corpus rename](../proposals/m9-t55-s21-kvm-corpus-rename.md). |
-| Files And ABI Surface | `src/lib/ui-*` directories and all affected lib/app/test CMake paths, `ui_`/`UI_` symbols, lib prose/manifest/DAG fixtures, and application consumers; no behavioral API contract change. |
+| Files And ABI Surface | The three presentation-component directories and all affected lib/app/test CMake paths, `kvm_`/`KVM_` symbols, lib prose/manifest/DAG fixtures, and application consumers; no behavioral API contract change. |
 | Applicable Rules | Architecture, coding, execution and documentation rules/skills and design authorities. |
-| Verification | Zero-old-name source/path gate, focused renamed UI/KVM tests, fresh x64/x86 builds and full CTest, strict library CTest, manifest/DAG/source-boundary/documentation gates. |
-| Expected Markers | No production, test, CMake, manifest, or current documentation reference to `ui-base`, `ui-window`, `ui-console`, `ui_`, or `UI_` remains except retained historical records; `kvm-*` components retain the same allowed DAG. |
+| Verification | Zero-old-name source/path gate, focused renamed KVM tests, fresh x64/x86 builds and full CTest, strict library CTest, manifest/DAG/source-boundary/documentation gates. |
+| Expected Markers | No active production, test, CMake, manifest, or current documentation reference to the retired component namespace remains; `kvm-*` components retain the same allowed DAG. |
 | Asset Needs | Refresh fixed x86/x64 EXEs only; preserve media and INI bytes. |
 | Reporting Requirements | Frozen ledger, changed-path/line accounting, focused/full tests, executor P push and separate actual-diff coordinator review. |
 | Stop Conditions | Do not rename or alter the cooked monitor as KVM, leave a parallel old spelling, change data/layout/control semantics, loosen the DAG, or alter MVDM. |
 | Exit Criteria | Every admitted spelling/path is mechanically migrated, zero-old-name gate and all builds/tests/gates pass, commit/push; await manual package testing and keep T55 open. |
-| Original Owner Request | “ui-base 改名 kvm-base; ui-window -> kvm-window; ui-console -> kvm-console.” |
-| Similar-Issue Sweep | All non-historical `ui` component paths, identifiers, CMake targets, source includes, test names, manifest entries, component prose, and app consumers. |
+| Original Owner Request | “将共享 keyboard/video/mouse 组件改名为 kvm。” |
+| Similar-Issue Sweep | All non-historical former presentation component paths, identifiers, CMake targets, source includes, test names, manifest entries, component prose, and app consumers. |
 
 ## Current Technical Baseline
 
@@ -37,9 +37,9 @@ Owner package INI and media are preserved.
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
-  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus has S20 x64/x86
-  builds with 57/57 CTest;
-  strict standalone library gates pass 6/6. Its path-scoped standalone MSVC
+  normalized `types`/`console`/`host`/`storage`/`kvm-*` corpus has S21 x64/x86
+  builds with 58/58 CTest;
+  strict standalone library gates pass 8/8. Its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 
 ## Recent M9 Closures
@@ -48,7 +48,7 @@ Owner package INI and media are preserved.
 | --- | --- | --- |
 | T49 | Shared-library quality sequence S1–S6 closed after owner x86/x64 package acceptance. | [T49 S6 history](../history/M9-T49-S6-lib-neutral-corpus-prose.md) |
 | T50 | Build presets/artifact identity and standalone shared-library MSVC CI closed. | [T50 S2 history](../history/M9-T50-S2-lib-ci.md) |
-| T51 | Shared library normalized to `types`, `console`, `host`, `storage`, and independent `ui-*` components; dual-width verification closed. | [T51 S4 history](../history/M9-T51-S4-lib-component-normalization-closure.md) |
+| T51 | Shared library normalized to `types`, `console`, `host`, `storage`, and independent presentation components; dual-width verification closed. | [T51 S4 history](../history/M9-T51-S4-lib-component-normalization-closure.md) |
 | T52 | Native Console pointer capture was withdrawn: supported terminal hosts cannot provide a reliable visible client rectangle; no implementation remains. | [T52 record](../history/M9-T52-console-pointer-capture-withdrawn.md) |
 | T53 | Raw Console one-cell input now maps to eight logical units on both axes; dual-width 37/37 verification closed. | [T53 S1 closure](../history/M9-T53-S1-console-logical-mouse-scale.md) |
 | T54 | Restored the original X×8/Y×16 raw-Console InPort conversion, removed app-side mouse merging, and proved original InPort accumulation; owner accepted the balanced physical-input behavior. | [T54 S1 closure](../history/M9-T54-S1-console-mouse-scale-closure.md) |
@@ -62,10 +62,10 @@ Owner package INI and media are preserved.
   [Record](../history/M9-T50-S3-dual-width-post-lib-proof.md)
 
 - **M9 T51 S2:** The entire library and every active SoftPC consumer moved in
-  one buildable rename to `types`, `console`, and `ui-*`; fixed x64/x86 CTest
+  one buildable rename to `types`, `console`, and presentation components; fixed x64/x86 CTest
   each passed 36/36. [Record](../history/M9-T51-S2-lib-component-normalization.md)
 
-- **M9 T51 S3:** Current architecture, UI, source-layout, component README,
+- **M9 T51 S3:** Current architecture, presentation design, source-layout, component README,
   and executable boundary authority now agree on the normalized component DAG.
   [Record](../history/M9-T51-S3-component-boundary-authority.md)
 
@@ -75,7 +75,7 @@ Owner package INI and media are preserved.
 
 ## Recent Governance
 
-- **M9 Td S6:** Console-object design was promoted to current architecture/UI
+- **M9 Td S6:** Console-object design was promoted to current architecture/presentation
   authorities. [Record](../history/M9-Td-S6-console-object-governance.md)
 
 - **M9 Td S7:** Active-packet contract, identifier-mode checks, Queue/TODO

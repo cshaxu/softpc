@@ -265,18 +265,18 @@ static void app_runtime_frame_published(void *opaque, uint32_t sequence,
         run_generation);
 }
 
-/* Product hotkey interpretation lives with the control/reconciler.  The UI
+/* Product hotkey interpretation lives with the control/reconciler.  The KVM
  * leaf has already converted a matching chord into a copied identifier; the
  * control path alone decides its lifecycle effect and preserves the resume
  * ordering required by the Console-object contract. */
 static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
     app_presentation *presentation, app_command_session *session,
     app_monitor_control *control,
-    const ui_input_event *event)
+    const kvm_input_event *event)
 {
     app_control_state *state = control == NULL ? NULL : &control->state;
     if (state == NULL) return 0;
-    if (event != NULL && event->type == UI_EVENT_WINDOW_CLOSE) {
+    if (event != NULL && event->type == KVM_EVENT_WINDOW_CLOSE) {
         if (state->monitor_actual == APP_MONITOR_RUNNING &&
             !app_command_session_begin_external(session,
                 state->monitor_actual, APP_LIFECYCLE_REQUEST_PAUSE)) return 0;
@@ -284,7 +284,7 @@ static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
         return app_runtime_get_state(runtime) != SOFTPC_RUNTIME_RUNNING ||
             app_runtime_pause(runtime);
     }
-    if (event != NULL && event->type == UI_EVENT_HOTKEY &&
+    if (event != NULL && event->type == KVM_EVENT_HOTKEY &&
         strcmp(event->data.hotkey.identifier, "pause-toggle") == 0) {
         app_lifecycle_request request =
             state->monitor_actual == APP_MONITOR_PAUSED ?
@@ -294,7 +294,7 @@ static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
         return request == APP_LIFECYCLE_REQUEST_RESUME ?
             app_runtime_resume(runtime) : app_runtime_pause(runtime);
     }
-    if (event != NULL && event->type == UI_EVENT_HOTKEY &&
+    if (event != NULL && event->type == KVM_EVENT_HOTKEY &&
         strcmp(event->data.hotkey.identifier, "release-window-mouse") == 0) {
         app_presentation_release_window_mouse(presentation);
         return 1;
@@ -328,11 +328,11 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
             app_control_event control_event;
             int broker_monitor_completed = 0;
             if (app_control_queue_take(control_queue, &control_event, 100u)) {
-                if (control_event.kind == APP_CONTROL_UI_INPUT) {
+                if (control_event.kind == APP_CONTROL_KVM_INPUT) {
                     /* A component can have queued an event just before an
                      * old VM run stopped. It cannot affect a later run, nor
                      * enter the already-stopped machine path. */
-                    if (!app_control_accept_ui_event(&control_event,
+                    if (!app_control_accept_kvm_event(&control_event,
                             app_runtime_run_generation(runtime),
                             state->monitor_actual == APP_MONITOR_RUNNING ?
                                 SOFTPC_RUNTIME_RUNNING :
@@ -340,7 +340,7 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                                 SOFTPC_RUNTIME_PAUSED : SOFTPC_RUNTIME_STOPPED))
                         continue;
                     if (!app_monitor_handle_ux(control_queue, runtime, presenter,
-                            &session, &control, &control_event.value.ui))
+                            &session, &control, &control_event.value.kvm))
                         goto failed;
                     if (!app_monitor_drive(runtime, presenter, &control)) goto failed;
                     if (!app_monitor_arm_if_ready(&session, state, monitor)) goto failed;
@@ -364,9 +364,9 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                         "Console input failed.\r\n");
                     goto failed;
                 }
-                if (control_event.kind == APP_CONTROL_UI_DELIVERY_FAILED) {
+                if (control_event.kind == APP_CONTROL_KVM_DELIVERY_FAILED) {
                     app_monitor_console_write(monitor,
-                        "UI input delivery failed.\r\n");
+                        "KVM input delivery failed.\r\n");
                     goto failed;
                 }
                 if (control_event.kind == APP_CONTROL_QUEUE_DELIVERY_FAILED) {

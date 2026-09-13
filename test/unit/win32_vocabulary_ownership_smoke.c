@@ -1,5 +1,5 @@
 /* Compile the real component bodies against controlled external queries.
- * No UI interaction, sleeping, or timing-dependent assertion is needed. */
+ * No KVM interaction, sleeping, or timing-dependent assertion is needed. */
 #include "lib/types/win32/clock.h"
 #include "lib/types/win32/input.h"
 #include "lib/types/types_interface.h"
@@ -31,14 +31,14 @@ static lib_win32_key_state fake_key_state(int key)
 #undef lib_win32_key_scan
 #define lib_win32_key_scan fake_key_scan
 #include "lib/host/win32/clock.c"
-#include "lib/ui-window/win32/input.c"
-#include "lib/ui-base/win32/input.c"
-#include "lib/ui-base/input.c"
-#include "lib/ui-base/hotkey.c"
+#include "lib/kvm-window/win32/input.c"
+#include "lib/kvm-base/win32/input.c"
+#include "lib/kvm-base/input.c"
+#include "lib/kvm-base/hotkey.c"
 
-static ui_input_event emitted[8];
+static kvm_input_event emitted[8];
 static unsigned emitted_count;
-static int capture(void *context, const ui_input_event *event)
+static int capture(void *context, const kvm_input_event *event)
 {
     (void)context;
     if (emitted_count == 8u) return 0;
@@ -70,27 +70,27 @@ int main(void)
     CHECK(units == 123u && frequency == 1000u);
     for (pressed = 0u; pressed != 8u; ++pressed) {
         lib_u8 expected = 0u;
-        if ((pressed & 1u) != 0u) expected |= UI_HOTKEY_MODIFIER_CONTROL;
-        if ((pressed & 2u) != 0u) expected |= UI_HOTKEY_MODIFIER_ALT;
-        if ((pressed & 4u) != 0u) expected |= UI_HOTKEY_MODIFIER_SHIFT;
-        CHECK(ui_window_modifiers_from_key_state() == expected);
+        if ((pressed & 1u) != 0u) expected |= KVM_HOTKEY_MODIFIER_CONTROL;
+        if ((pressed & 2u) != 0u) expected |= KVM_HOTKEY_MODIFIER_ALT;
+        if ((pressed & 4u) != 0u) expected |= KVM_HOTKEY_MODIFIER_SHIFT;
+        CHECK(kvm_window_modifiers_from_key_state() == expected);
     }
-    /* VkKeyScan uses a DIFFERENT mask from GetKeyState/UI modifiers.
+    /* VkKeyScan uses a DIFFERENT mask from GetKeyState/KVM modifiers.
      * Exercise all raw combinations and the actual emitted make/break path. */
     for (unsigned raw = 0u; raw != 8u; ++raw) {
         lib_u16 key;
         lib_u8 modifiers, expected = 0u;
         unsigned count = 0u;
-        ui_keyboard_normalizer state = { 0 };
-        if (raw & 1u) { expected |= UI_INPUT_MODIFIER_SHIFT; ++count; }
-        if (raw & 2u) { expected |= UI_INPUT_MODIFIER_CONTROL; ++count; }
-        if (raw & 4u) { expected |= UI_INPUT_MODIFIER_ALT; ++count; }
+        kvm_keyboard_normalizer state = { 0 };
+        if (raw & 1u) { expected |= KVM_INPUT_MODIFIER_SHIFT; ++count; }
+        if (raw & 2u) { expected |= KVM_INPUT_MODIFIER_CONTROL; ++count; }
+        if (raw & 4u) { expected |= KVM_INPUT_MODIFIER_ALT; ++count; }
         layout_result = (SHORT)((raw << 8u) | 'A');
-        CHECK(ui_keyboard_platform_map_scalar('a', &key, &modifiers));
+        CHECK(kvm_keyboard_platform_map_scalar('a', &key, &modifiers));
         CHECK(key == 'A' && modifiers == expected);
         emitted_count = 0u;
-        CHECK(ui_keyboard_submit_record(&state, NULL, LIB_NULL, capture,
-        &(ui_keyboard_record){ .kind=UI_KEYBOARD_CHARACTER, .utf16='a', .repeat_count=1u }));
+        CHECK(kvm_keyboard_submit_record(&state, NULL, LIB_NULL, capture,
+        &(kvm_keyboard_record){ .kind=KVM_KEYBOARD_CHARACTER, .utf16='a', .repeat_count=1u }));
         CHECK(emitted_count == count * 2u + 2u);
         CHECK(emitted[count].data.key.key == 'A');
         CHECK(emitted[count].data.key.modifiers == expected);
@@ -102,18 +102,18 @@ int main(void)
     }
     layout_result = -1;
     { lib_u16 key = 99u; lib_u8 modifiers = 99u;
-      CHECK(!ui_keyboard_platform_map_scalar('a', &key, &modifiers));
+      CHECK(!kvm_keyboard_platform_map_scalar('a', &key, &modifiers));
       CHECK(key == 99u && modifiers == 99u); }
     /* Layout success is not proof of a representable neutral physical key. */
     {
-        ui_keyboard_normalizer state = {0};
+        kvm_keyboard_normalizer state = {0};
         layout_result = VK_OEM_102;
         emitted_count = 0;
-        CHECK(ui_keyboard_submit_record(&state, NULL, NULL, capture,
-        &(ui_keyboard_record){ .kind=UI_KEYBOARD_CHARACTER, .utf16='<', .repeat_count=3 }));
+        CHECK(kvm_keyboard_submit_record(&state, NULL, NULL, capture,
+        &(kvm_keyboard_record){ .kind=KVM_KEYBOARD_CHARACTER, .utf16='<', .repeat_count=3 }));
         CHECK(emitted_count == 3);
         for (unsigned i = 0; i < emitted_count; ++i)
-            CHECK(emitted[i].type == UI_EVENT_TEXT && emitted[i].data.text.scalar == '<');
+            CHECK(emitted[i].type == KVM_EVENT_TEXT && emitted[i].data.text.scalar == '<');
     }
     return 0;
 }

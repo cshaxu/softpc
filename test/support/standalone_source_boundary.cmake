@@ -53,7 +53,7 @@ foreach(platform_neutral_base IN ITEMS
     "src/lib/host/clock.c"
     "src/lib/host/sync.c"
     "src/lib/storage/file.c"
-    "src/lib/ui-base/mailbox.c")
+    "src/lib/kvm-base/mailbox.c")
     file(READ "${SOFTPC_SOURCE_DIR}/${platform_neutral_base}" base_source)
     if(base_source MATCHES "#[ \\t]*(if|ifdef|ifndef)[^\\n]*(WIN32|__linux__|__APPLE__)")
         message(FATAL_ERROR
@@ -67,8 +67,8 @@ foreach(component_platform_source IN ITEMS
     "src/lib/host/linux/sync.c"
     "src/lib/storage/win32/file.c"
     "src/lib/storage/linux/file.c"
-    "src/lib/ui-base/win32/mailbox.c"
-    "src/lib/ui-base/linux/mailbox.c")
+    "src/lib/kvm-base/win32/mailbox.c"
+    "src/lib/kvm-base/linux/mailbox.c")
     if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/${component_platform_source}")
         message(FATAL_ERROR "Missing selected-platform peer: ${component_platform_source}")
     endif()
@@ -114,13 +114,13 @@ foreach(app_source IN ITEMS
     endif()
 endforeach()
 
-# The imported UI component consumes copied values only.
+# The imported KVM component consumes copied values only.
 # It cannot acquire SoftPC's runtime, machine, renderer, or original key-map
 # ownership; those remain in the project binding under src/app.
 file(GLOB_RECURSE shared_win32_sources
-    "${SOFTPC_SOURCE_DIR}/src/lib/ui-base/*.[ch]"
-    "${SOFTPC_SOURCE_DIR}/src/lib/ui-window/*.[ch]"
-    "${SOFTPC_SOURCE_DIR}/src/lib/ui-console/*.[ch]")
+    "${SOFTPC_SOURCE_DIR}/src/lib/kvm-base/*.[ch]"
+    "${SOFTPC_SOURCE_DIR}/src/lib/kvm-window/*.[ch]"
+    "${SOFTPC_SOURCE_DIR}/src/lib/kvm-console/*.[ch]")
 foreach(source IN LISTS shared_win32_sources)
     file(READ "${source}" shared_win32_contents)
     if(shared_win32_contents MATCHES
@@ -174,7 +174,7 @@ foreach(source IN LISTS product_lib_consumers)
         if(interface_suffix EQUAL -1)
             message(FATAL_ERROR "Non-interface library header crosses a public boundary: ${source}")
         endif()
-        if(include_line MATCHES "lib/ui-base/(worker|mailbox|mailbox_wake|input|actions)_interface.h" OR
+        if(include_line MATCHES "lib/kvm-base/(worker|mailbox|mailbox_wake|input|actions)_interface.h" OR
            include_line MATCHES "lib/[^/]+/(win32|linux)/" OR
            include_line MATCHES "lib/console/binding_interface.h")
             message(FATAL_ERROR "Leaf-support contract crosses an application boundary: ${source}")
@@ -182,39 +182,39 @@ foreach(source IN LISTS product_lib_consumers)
     endforeach()
 endforeach()
 
-# ui-window owns no product default.  The application supplies one creation
-# title, ui-window copies it before native startup, and the native Window uses
+# kvm-window owns no product default.  The application supplies one creation
+# title, kvm-window copies it before native startup, and the native Window uses
 # that copy rather than a hidden literal.
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ui-window/window_interface.h" window_header)
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ui-window/window.c" window_source)
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ui-window/win32/component.c"
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/kvm-window/window_interface.h" window_header)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/kvm-window/window.c" window_source)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/kvm-window/win32/component.c"
     native_window_source)
 string(FIND "${window_header}" "const char *initial_title" title_option_index)
 string(FIND "${window_source}" "lib_memory_copy(window->initial_title" title_copy_index)
 string(FIND "${native_window_source}" "component->initial_title" title_native_index)
 if(title_option_index EQUAL -1 OR title_copy_index EQUAL -1 OR
     title_native_index EQUAL -1)
-    message(FATAL_ERROR "ui-window must use the application's copied initial title")
+    message(FATAL_ERROR "kvm-window must use the application's copied initial title")
 endif()
 
-# The public UI input ABI uses only lib-defined key identities and flags. Win32
+# The public KVM input ABI uses only lib-defined key identities and flags. Win32
 # values are permitted inside the private win32 adapter and SoftPC binding, not
 # in the shared public event contract.
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ui-base/event_interface.h" ui_event_header)
-if(ui_event_header MATCHES "VK_[A-Za-z0-9_]+" OR
-    ui_event_header MATCHES "ENHANCED_KEY" OR
-    ui_event_header MATCHES "KEY_EVENT_RECORD")
-    message(FATAL_ERROR "Public UI input ABI leaks a Win32 key/injection value")
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/kvm-base/event_interface.h" kvm_event_header)
+if(kvm_event_header MATCHES "VK_[A-Za-z0-9_]+" OR
+    kvm_event_header MATCHES "ENHANCED_KEY" OR
+    kvm_event_header MATCHES "KEY_EVENT_RECORD")
+    message(FATAL_ERROR "Public KVM input ABI leaks a Win32 key/injection value")
 endif()
 
-# Component selection is application policy.  Shared UI must not retain the
+# Component selection is application policy.  Shared KVM must not retain the
 # removed unified runner or a target router.
 file(READ "${SOFTPC_SOURCE_DIR}/src/app/main.c" app_main_source)
 file(READ "${SOFTPC_SOURCE_DIR}/src/app/presentation.c" app_presentation_source)
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/lib/ux" OR
-   app_main_source MATCHES "ui_presenter|ui_run" OR
-   app_presentation_source MATCHES "ui_presenter|ui_run")
-    message(FATAL_ERROR "Standalone retains the removed unified UI route")
+   app_main_source MATCHES "kvm_presenter|kvm_run" OR
+   app_presentation_source MATCHES "kvm_presenter|kvm_run")
+    message(FATAL_ERROR "Standalone retains the removed unified KVM route")
 endif()
 
 # Host owns only generic native Console I/O. The product monitor owns its
@@ -230,20 +230,20 @@ if(host_console_public MATCHES "host_console_cooked" OR
     message(FATAL_ERROR "Console broker retains monitor-specific ownership")
 endif()
 
-# The split shared UI graph is deliberately narrow. These target links make
+# The split shared KVM graph is deliberately narrow. These target links make
 # its allowed component edges executable rather than README-only claims.
 file(READ "${SOFTPC_SOURCE_DIR}/src/lib/CMakeLists.txt" lib_cmake_source)
 if(NOT lib_cmake_source MATCHES
    "target_link_libraries\\(console PUBLIC types\\)" OR
    NOT lib_cmake_source MATCHES
-   "target_link_libraries\\(ui-base PUBLIC types\\)" OR
+   "target_link_libraries\\(kvm-base PUBLIC types\\)" OR
    NOT lib_cmake_source MATCHES
-   "target_link_libraries\\(ui-window PUBLIC types ui-base\\)" OR
+   "target_link_libraries\\(kvm-window PUBLIC types kvm-base\\)" OR
    NOT lib_cmake_source MATCHES
-   "target_link_libraries\\(ui-console PUBLIC types console ui-base\\)" OR
+   "target_link_libraries\\(kvm-console PUBLIC types console kvm-base\\)" OR
    lib_cmake_source MATCHES
-   "target_link_libraries\\(ui-(window|console) [^\\)]*(host|storage)")
-    message(FATAL_ERROR "Shared UI component dependency graph is not normalized")
+   "target_link_libraries\\(kvm-(window|console) [^\\)]*(host|storage)")
+    message(FATAL_ERROR "Shared KVM component dependency graph is not normalized")
 endif()
 
 file(STRINGS "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/c-files"
@@ -378,13 +378,13 @@ endif()
 
 # Presentation is deliberately a DIB consumer.  Controller planes and DAC
 # interpretation stay in the original nt_cga/nt_ega/nt_vga renderer path.
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ui-window/win32/component.c" window_frontend)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/kvm-window/win32/component.c" window_frontend)
 string(TOLOWER "${window_frontend}" normalized_window_frontend)
 if(normalized_window_frontend MATCHES "ega_planes|\\bdac\\b")
     message(FATAL_ERROR "Standalone window bypasses the original SoftPC renderer")
 endif()
 
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/ui-console/win32/component.c" console_frontend)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/kvm-console/win32/component.c" console_frontend)
 string(TOLOWER "${window_frontend}${console_frontend}" normalized_frontends)
 if(normalized_frontends MATCHES "host_key_(down|up)|mouse_send")
     message(FATAL_ERROR "Standalone frontend bypasses original SoftPC input controllers")
@@ -412,12 +412,12 @@ foreach(source IN LISTS standalone_owner_sources)
     endif()
 endforeach()
 
-# A live UI/native-Console worker must be joined before its owner is released.
+# A live KVM/native-Console worker must be joined before its owner is released.
 # These are the application's only terminal infrastructure boundaries; ordinary
 # synchronization primitives deliberately remain local implementation details.
 file(GLOB app_shutdown_sources "${SOFTPC_SOURCE_DIR}/src/app/*.c"
     "${SOFTPC_SOURCE_DIR}/src/host/*.c")
-set(checked_shutdown "ui_(window|console)_destroy|host_console_broker_destroy")
+set(checked_shutdown "kvm_(window|console)_destroy|host_console_broker_destroy")
 foreach(source IN LISTS app_shutdown_sources)
     file(STRINGS "${source}" shutdown_lines REGEX "(${checked_shutdown})[ \t]*\\(")
     foreach(line IN LISTS shutdown_lines)

@@ -51,10 +51,10 @@ bitmap font and therefore remains the exact custom-font renderer.
 The optional Win32 window displays copied text or graphical frames published
 by the runtime. It sends normalized keyboard and mouse records to the runtime
 queue. It never decodes guest VRAM, locks a SoftPC device, waits for the
-executor, or executes a guest instruction on the UI thread.
+executor, or executes a guest instruction on the KVM worker thread.
 
 For text frames, cursor position, shape, and enabled state are copied frame
-data. The native VM Console/Terminal owns its own blink behavior. `ui-window`
+data. The native VM Console/Terminal owns its own blink behavior. `kvm-window`
 draws the corresponding guest cursor and owns a 250 ms Window-local blink
 cadence while unfrozen; no SoftPC runtime or guest timer phase is invented.
 The runtime converts compatibility cursor-size percentages into bottom-aligned
@@ -67,7 +67,7 @@ state as its sole input source.
 
 ### Default Window Bounds
 
-`ui-window` selects the initial Win32 outer bounds from the monitor work area.
+`kvm-window` selects the initial Win32 outer bounds from the monitor work area.
 It retains the desired default bounds when they fit. If either dimension would
 exceed the work area, it proportionally scales both dimensions down and centers
 the resulting Window in that work area. The same work-area limit applies when
@@ -81,25 +81,25 @@ copied-frame client size (or its largest work-area fit); maximize selects the
 largest ratio-preserving Window in that work area rather than the native
 full-work-area rectangle.
 
-## UI Component And Console Product Policy
+## KVM Component And Console Product Policy
 
 SoftPC distinguishes static `display=console|window`, the active component set
 `{window_enabled, console_enabled}`, and the one Current Console Object bound
-by host. That object is either the SoftPC cooked monitor or the UI raw VM
+by host. That object is either the SoftPC cooked monitor or the KVM raw VM
 object. A monitor never implements SoftPC hotkeys; it accepts normal line
 commands only.
 
 | Running condition | Active component set | Current Console Object |
 | --- | --- | --- |
-| `display=console`, text frame | `{false,true}` | UI raw VM object |
-| `display=console`, graphic frame, `console_control=0` | `{true,true}` | UI raw VM object |
+| `display=console`, text frame | `{false,true}` | KVM raw VM object |
+| `display=console`, graphic frame, `console_control=0` | `{true,true}` | KVM raw VM object |
 | `display=console`, graphic frame, `console_control=1` | `{true,false}` | SoftPC cooked monitor |
 | `display=window`, text or graphic frame | `{true,false}` | SoftPC cooked monitor |
 
 `console_control` is read only for `display=console`; it is `0|1` and defaults
 to `1`. Window display ignores it. Paused uses the monitor object with
 `console_enabled=false`; an existing Window remains only when product intent
-retains it. Stopped has no UI component. Resume first restores the derived
+retains it. Stopped has no KVM component. Resume first restores the derived
 running component set and Current Console Object, then resumes the VM.
 When a running graphical Console-display route returns Current Console from
 raw VM input to the monitor, SoftPC publishes and arms a fresh `SoftPC>`
@@ -122,20 +122,20 @@ When a running view needs both surfaces, control completes Console ownership
 work before creating Window or unfreezing an existing Window. This orders the
 foreground requests without retries, timers or platform calls in SoftPC.
 
-## UI Components And Registered Hotkeys
+## KVM Components And Registered Hotkeys
 
-Shared UI is three independent components, not one controller that combines
-their lifecycles: `lib/ui-base/` contains copied values, generic event construction,
+Shared KVM is three independent components, not one controller that combines
+their lifecycles: `lib/kvm-base/` contains copied values, generic event construction,
 and reusable private-mailbox helpers;
-`lib/ui-window/` owns one Window lifecycle; and `lib/ui-console/` owns one VM
+`lib/kvm-window/` owns one Window lifecycle; and `lib/kvm-console/` owns one VM
 Console lifecycle. Each of Window and VM Console has its own Win32 and Linux
 implementation. Neither component owns the SoftPC monitor Console, native
 Console handles/modes, or the product decision to exist.
 
 SoftPC creates either component with a copied table of registered host-hotkey
-chords and identifier strings. `ui-base` provides only generic source-local
+chords and identifier strings. `kvm-base` provides only generic source-local
 matching. A matched chord is discarded as normal input and produces one copied
-`ui_HOTKEY(identifier)` event at SoftPC's queue entry; lib does not interpret
+`kvm_HOTKEY(identifier)` event at SoftPC's queue entry; lib does not interpret
 the identifier. Unmatched input is emitted as ordinary copied key/text/mouse
 events in keyboard order; mouse/close events do not wait behind keyboard prefixes. Matcher state is per component instance: keys
 are not merged across Window and VM Console. A record's modifier snapshot may
@@ -148,7 +148,7 @@ emits only that identifier, never partial Ctrl/Alt/P guest input. Ctrl+Alt+X
 when not registered flushes Ctrl, Alt, and X as normal input in order. SoftPC
 alone maps identifiers to pause/resume, stop/reset/start, mouse release, or
 synthetic guest input such as Ctrl+Alt+Del and Alt+Enter. The cooked monitor
-does not use a UI component or hotkey registry and accepts only monitor lines.
+does not use a KVM component or hotkey registry and accepts only monitor lines.
 
 On the actual frozen-to-unfrozen transition, the Window requests activation
 once; repeated unfreeze calls do not refocus it, restart blink timing or capture
@@ -156,7 +156,7 @@ the mouse.
 
 Freezing a Window is a guest-input boundary, not a registered-hotkey boundary:
 its native key transitions still pass through the source-local matcher. A
-matched `ui_HOTKEY` reaches SoftPC; all ordinary key/text/mouse output is
+matched `kvm_HOTKEY` reaches SoftPC; all ordinary key/text/mouse output is
 silently discarded and is never buffered for resume. A frozen-origin cached
 make remains ineligible for ordinary replay after unfreeze, but can still
 complete a hotkey. This is not make/break balancing: cross-freeze releases
@@ -167,18 +167,18 @@ must consume guest-input-producing hotkeys before they can enter the VM input
 queue. Thus pause-toggle may request resume, while CAD/CAF cannot inject guest
 keys into a paused VM.
 
-Every user input produced by either UI component is a copied `ui_input_event`:
+Every user input produced by either KVM component is a copied `kvm_input_event`:
 ordinary key/text/mouse input and registered-hotkey input are variants of that
-one UI event family. `ui-base` provides its single construction path and each
+one KVM event family. `kvm-base` provides its single construction path and each
 such value carries its originating Window or VM-Console component handle for
 lifetime tracing; SoftPC does not assign product semantics by source. A cooked
-monitor line is instead a `monitor_input_event` and carries no UI handle.
+monitor line is instead a `monitor_input_event` and carries no KVM handle.
 SoftPC's one input queue accepts both event families as distinct payloads in
 arrival order; its control thread is their sole consumer. No monitor line is
-mislabeled as a UI event, and no UI component parses monitor commands.
+mislabeled as a KVM event, and no KVM component parses monitor commands.
 
-For key events, the shared ABI carries a lib-defined `ui_key`, optional
-physical scan code, neutral key flags (currently `ui_KEY_FLAG_EXTENDED`),
+For key events, the shared ABI carries a lib-defined `kvm_key`, optional
+physical scan code, neutral key flags (currently `kvm_KEY_FLAG_EXTENDED`),
 generic Ctrl/Alt/Shift state, and make/break. It never carries a native
 virtual-key code or native control-state word. A platform adapter translates
 native input before emitting the event; SoftPC's private keyboard binding
@@ -189,4 +189,4 @@ performs any conversion required by its original machine key mapper.
 The frontend remains responsive while the guest runs. Frame presentation is
 coalesced, not tied to input delivery, and idle execution must wait rather
 than busy-spin. Guest timing remains owned by the original host-timer contract,
-not by a UI frame rate or an instruction-count throttle.
+not by a KVM frame rate or an instruction-count throttle.

@@ -6,14 +6,14 @@
 int main(void)
 {
     app_input_queue *queue = NULL;
-    ui_input_event first = { 0 };
-    ui_input_event second = { 0 };
-    ui_input_event actual = { 0 };
+    kvm_input_event first = { 0 };
+    kvm_input_event second = { 0 };
+    kvm_input_event actual = { 0 };
 
-    first.type = UI_EVENT_MOUSE;
+    first.type = KVM_EVENT_MOUSE;
     first.data.mouse.relative = 1u;
     first.data.mouse.delta_y = 16;
-    first.data.mouse.buttons = UI_MOUSE_BUTTON_LEFT;
+    first.data.mouse.buttons = KVM_MOUSE_BUTTON_LEFT;
     second = first;
     second.data.mouse.delta_y = 16;
     assert(app_input_queue_create(&queue));

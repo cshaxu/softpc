@@ -2,8 +2,8 @@
 #include "lib/host/sync_interface.h"
 #include "lib/storage/file_interface.h"
 #include "lib/storage/medium_interface.h"
-#include "lib/ui-console/console_interface.h"
-#include "lib/ui-window/window_interface.h"
+#include "lib/kvm-console/console_interface.h"
+#include "lib/kvm-window/window_interface.h"
 
 #include <assert.h>
 
@@ -15,8 +15,8 @@ int main(void)
     lib_storage_medium *medium = (lib_storage_medium *)1;
     host_sync_task *task = (host_sync_task *)1;
     host_console_broker *broker = (host_console_broker *)1;
-    ui_console *console = (ui_console *)1;
-    ui_window *window = (ui_window *)1;
+    kvm_console *console = (kvm_console *)1;
+    kvm_window *window = (kvm_window *)1;
 
     assert(lib_storage_file_read_owned(LIB_NULL, 1u, &bytes, &byte_count) ==
         LIB_STATUS_INVALID_ARGUMENT && bytes == LIB_NULL);
@@ -32,9 +32,9 @@ int main(void)
         LIB_STATUS_INVALID_ARGUMENT && task == LIB_NULL);
     assert(host_console_broker_create(&broker, LIB_NULL, HOST_CONSOLE_RAW_EVENTS) ==
         LIB_STATUS_INVALID_ARGUMENT && broker == LIB_NULL);
-    assert(ui_console_create(&console, LIB_NULL) == LIB_STATUS_INVALID_ARGUMENT &&
+    assert(kvm_console_create(&console, LIB_NULL) == LIB_STATUS_INVALID_ARGUMENT &&
         console == LIB_NULL);
-    assert(ui_window_create(&window, LIB_NULL) == LIB_STATUS_INVALID_ARGUMENT &&
+    assert(kvm_window_create(&window, LIB_NULL) == LIB_STATUS_INVALID_ARGUMENT &&
         window == LIB_NULL);
     return 0;
 }

@@ -3,18 +3,18 @@
 ## Admission
 
 The owner accepted S20 package testing and directed a pure shared-library
-rename. The existing `ui-*` vocabulary is too broad: these components implement
-keyboard, video, and mouse presentation, while the cooked monitor remains a
-separate application-owned console interaction.
+rename. The former presentation vocabulary is too broad: these components
+implement keyboard, video, and mouse presentation, while the cooked monitor
+remains a separate application-owned console interaction.
 
 ## Frozen ledger
 
 | Item | Required change | Explicit exclusion | Proof |
 | --- | --- | --- | --- |
-| Component paths and targets | Rename `ui-base`, `ui-window`, and `ui-console` directories, root headers, CMake targets, manifest entries, and every include to `kvm-base`, `kvm-window`, and `kvm-console`. | Do not merge components or change their allowed DAG. | Configure/build graph and strict library CTest. |
-| C identifier namespace | Rename every active lib/app/test `ui_` function/type/variable and `UI_` constant to the equivalent `kvm_`/`KVM_` spelling. | Do not change value layouts, signatures, event meanings, hotkey rules, or runtime protocol. | Focused tests plus both full CTest runs. |
-| Neutral external identity/prose | Rename active lib prose and the native Window class from UX/UI wording to KVM wording where they identify this corpus. | Cooked monitor remains monitor/console, not KVM; retained historical records are not rewritten. | Zero-old-name static gate and documentation gate. |
-| Static regression gate | Add a repository check that rejects active non-historical old component paths and `ui_`/`UI_` identifiers in source, tests, CMake, manifest, and current authorities. | Do not scan or rewrite historical records. | Positive gate plus an old-spelling fixture/probe. |
+| Component paths and targets | Rename the three former component directories, root headers, CMake targets, manifest entries, and every include to `kvm-base`, `kvm-window`, and `kvm-console`. | Do not merge components or change their allowed DAG. | Configure/build graph and strict library CTest. |
+| C identifier namespace | Rename every active lib/app/test former component function/type/variable and constant to the equivalent `kvm_`/`KVM_` spelling. | Do not change value layouts, signatures, event meanings, hotkey rules, or runtime protocol. | Focused tests plus both full CTest runs. |
+| Neutral external identity/prose | Rename active lib prose and the native Window class to KVM wording where they identify this corpus. | Cooked monitor remains monitor/console, not KVM; retained historical records are not rewritten. | Zero-old-name static gate and documentation gate. |
+| Static regression gate | Add a repository check that rejects active non-historical retired component paths and identifiers in source, tests, CMake, manifest, and current authorities. | Do not scan or rewrite historical records. | Positive gate plus an old-spelling fixture/probe. |
 
 ## Design
 
@@ -36,7 +36,7 @@ semantic is added.
 ## Non-goals
 
 Do not alter `src/mvdm/softpc.new`, package INI/media, frame delivery, broker
-transactions, monitor commands, UI behavior, native platform implementation,
+transactions, monitor commands, presentation behavior, native platform implementation,
 or Linux support. Do not retain alias headers, target aliases, compatibility
 macros, or any second old-name production path.
 

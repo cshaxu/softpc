@@ -324,7 +324,7 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
     } else {
         softpc_ccpu_instruction_budget = (unsigned long)instruction_budget;
         /* The original timer subsystem starts the standalone host timer during
-           reset.  Do not manufacture a second timer tick at every UI slice. */
+           reset.  Do not manufacture a second timer tick at every KVM slice. */
         softpc_ccpu_instruction_budget_active = 1;
     }
     c_cpu_simulate();
