@@ -21,3 +21,14 @@ gates.
   56/56 tests.
 - Strict-library CTest passed 3/3. The manifest, component dependency,
   standalone-source boundary and documentation-governance gates passed.
+
+## Post-P1 independent review
+
+- `git diff --check` passed. The P1 diff has no MVDM, package INI or guest
+  media change; only the two explicitly rebuilt package executables changed.
+- No `ui_component_mailboxes_set_notify` caller remains. The sole selected
+  notifier is Window startup, and the focused smoke proves repeated selection
+  is rejected.
+- The medium result paths no longer turn a concrete seek/read/write/flush
+  failure into a generic I/O status. Remaining platform file I/O returns are
+  direct native operation results, not chained result collapse.
