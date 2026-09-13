@@ -103,6 +103,25 @@ static void rendering(void)
         assert(cursor.bottom - cursor.top <= 3);
     }
     text.text_columns = text.text_rows = 1;
+    text.cursor_row = 0;
+    display = (ui_window_rect){10,20,18,36};
+    for (unsigned top=0;top<16;++top) {
+        text.cursor_top=(lib_u8)top; text.cursor_bottom=(lib_u8)top;
+        assert(ui_window_cursor_rect(&text,&display,&cursor));
+        assert(cursor.top==20+(int)top && cursor.bottom==21+(int)top);
+    }
+    text.cursor_top=4; text.cursor_bottom=7;
+    display.bottom=52;
+    assert(ui_window_cursor_rect(&text,&display,&cursor));
+    assert(cursor.top==28 && cursor.bottom==36);
+    text.cursor_top=15; text.cursor_bottom=255;
+    assert(ui_window_cursor_rect(&text,&display,&cursor) && cursor.bottom==52);
+    text.cursor_top=16;
+    assert(!ui_window_cursor_rect(&text,&display,&cursor));
+    text.cursor_top=9; text.cursor_bottom=8;
+    assert(ui_window_cursor_rect(&text,&display,&cursor) && cursor.top==20 && cursor.bottom==52);
+    text.font_height=0;
+    assert(ui_window_cursor_rect(&text,&display,&cursor) && cursor.top==20 && cursor.bottom==52);
     text.font[0] = 0x80; text.attributes[0] = 0x21;
     text.text_palette[1] = 0x112233; text.text_palette[2] = 0x445566;
     ui_window_render_text(&text, pixels, 8, 16);

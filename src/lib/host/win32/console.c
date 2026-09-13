@@ -420,6 +420,8 @@ lib_status host_console_backend_write_bound(host_console_backend *backend,
         return LIB_STATUS_NOT_CURRENT;
     }
     {
+        /* A partial write can change cells even when the API reports failure. */
+        if (length != 0u) backend->previous_columns = backend->previous_rows = 0u;
         lib_status status = lib_win32_write_console_a(backend->output, text, (lib_win32_dword)length,
             &written, LIB_NULL) && written == (lib_win32_dword)length ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
         host_console_backend_unlock_output(backend);

@@ -2,31 +2,31 @@
 
 ## Current Work
 
-M9 T55 S12 is verified and awaiting owner testing: all seven approved
-shared-library audit repairs, both fixed EXEs and 52/52 CTest at each width.
-Executor P1 `a3e7797` is pushed; coordinator reviewed its actual committed diff
-against the seven-item ledger. S11 remains closed; T55 is open.
+M9 T55 S13 implementation and verification are complete; executor P1 delivery
+and coordinator review are being finalized before owner testing. The four
+repairs passed x64 52/52, x86 52/52 and strict-library 3/3 tests. S12's verified
+delivery is retained without inferring owner acceptance. T55 remains open.
 
-## M9 T55 S12 Packet
+## M9 T55 S13 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: “对啊，那就这么办。其他的按你说的来。” |
-| Objective | Repair all seven S12 ledger entries through their existing component owners. |
-| Non-goals | No MVDM, media, INI, app lifecycle, mouse scaling, or deferred mode-roundtrip repair; no T closure. |
-| Reference Baseline | a0d0d37, clean main after S11 closure. |
+| Admission And Approval | Owner: “准入一个新的S任务完成修复、编译、测试、提交、推送，并等我测试”. |
+| Objective | Complete the four S13 ledger entries without additional owners or execution paths. |
+| Non-goals | No matcher snapshot restriction, MVDM, media, INI, app lifecycle, mouse scaling, deferred mode-roundtrip repair or T closure. |
+| Reference Baseline | fccf9ab, clean main after S12 delivery. |
 | Candidate Proposal | [Shared-library audit repairs](../proposals/m9-lib-activation-audit-repairs.md). |
-| Files And ABI Surface | lib console activation event; host private rollback contract; shared frame acknowledgement; hotkey, Window, Linux input; corresponding tests and READMEs. |
+| Files And ABI Surface | Console INPUT_RESET event, host binding helper, ui-console input state, Window surface/geometry, host text cache; corresponding tests and design/READMEs. |
 | Applicable Rules | Architecture, coding, execution and documentation rules and linked skills; current architecture, source layout and UI authorities. |
-| Verification | Deterministic rollback, physical-key lifetime, frame acknowledgement/activation, geometry failure and blink-deadline probes; full x64/x86 CTest and strict lib checks. |
-| Expected Markers | All seven ledger rows have focused evidence; independent UI leaves and component DAG retained. |
+| Verification | Reset before native activation, prepare failure/rollback and input rebind probes; SelectObject failure, cursor scanline mapping, mixed text/frame writes; full x64/x86 CTest and strict lib. |
+| Expected Markers | Four ledger rows proved; accepted modifier snapshots preserved; no new worker, lock or persistent state. |
 | Asset Needs | Existing non-mutating package media; refresh only fixed x86/x64 EXEs; no trace recordings. |
 | Reporting Requirements | Per-item proof, similar-issue dispositions, production/test line accounting, executor commit/push then coordinator actual-diff review. |
 | Stop Conditions | Do not expand product semantics or hide failed tests; unresolved boundary changes require owner direction. |
-| Exit Criteria | Seven repairs verified, both EXEs built, manifest/DAG/governance and full regression pass, complete pushed delivery and clean worktree for owner testing. |
-| Original Owner Request | Bind ui-console: draw its pending mailbox if any, otherwise nothing; “其他的按你说的来。” |
-| Similar-Issue Sweep | Scan broker activation/retirement callers, all frame consumers, key identity comparisons, geometry results, worker blink wake paths and host product comments. |
+| Exit Criteria | Four repairs verified, both EXEs built, manifest/DAG/governance and full regression pass, executor push and coordinator review, clean worktree awaiting owner testing. |
+| Original Owner Request | Keep matcher snapshots; reset component input before the next reader; check SelectObject failure; honor cursor top/bottom; invalidate frame cache after text writes. |
+| Similar-Issue Sweep | All binding/activation and logical event consumers; surface creation/selection cleanup; cursor calculations; native text/frame writers and cache updates. |
 
 ## Current Technical Baseline
 

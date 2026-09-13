@@ -10,6 +10,18 @@ static unsigned releases, clips, events;
 static unsigned focus_requests, foreground_requests;
 static int clip_ok = 1, resize_ok = 1, title_ok = 1, client_ok = 1;
 static DWORD ticks;
+static int selection_ok;
+static unsigned selections, deleted_bitmaps, deleted_dcs;
+static lib_u32 surface_bits[64];
+static HDC WINAPI surface_dc(HWND w) { (void)w; return (HDC)1; }
+static HDC WINAPI compatible_dc(HDC d) { (void)d; return (HDC)2; }
+static HBITMAP WINAPI bitmap(HDC d,const BITMAPINFO *i,UINT u,void **p,HANDLE s,DWORD o)
+{ (void)d;(void)i;(void)u;(void)s;(void)o;*p=surface_bits;return (HBITMAP)3; }
+static int WINAPI release_dc(HWND w,HDC d) { (void)w;(void)d;return 1; }
+static HGDIOBJ WINAPI select_bitmap(HDC d,HGDIOBJ o)
+{ (void)d;assert(o==(HGDIOBJ)3 || o==(HGDIOBJ)4);++selections;return selection_ok ? (HGDIOBJ)4 : NULL; }
+static BOOL WINAPI delete_bitmap(HGDIOBJ o) { assert(o==(HGDIOBJ)3);++deleted_bitmaps;return TRUE; }
+static BOOL WINAPI delete_dc(HDC d) { assert(d==(HDC)2);++deleted_dcs;return TRUE; }
 static DWORD WINAPI clock_tick(void) { return ticks; }
 static void *context;
 static void notify_loss(void);
@@ -60,6 +72,20 @@ static BOOL WINAPI title(HWND w,LPCSTR text) { (void)w;(void)text;return title_o
 #define lib_win32_set_window_text_a title
 #undef lib_win32_get_tick_count
 #define lib_win32_get_tick_count clock_tick
+#undef lib_win32_get_dc
+#undef lib_win32_create_compatible_dc
+#undef lib_win32_create_dibsection
+#undef lib_win32_release_dc
+#undef lib_win32_select_object
+#undef lib_win32_delete_object
+#undef lib_win32_delete_dc
+#define lib_win32_get_dc surface_dc
+#define lib_win32_create_compatible_dc compatible_dc
+#define lib_win32_create_dibsection bitmap
+#define lib_win32_release_dc release_dc
+#define lib_win32_select_object select_bitmap
+#define lib_win32_delete_object delete_bitmap
+#define lib_win32_delete_dc delete_dc
 #include "lib/ui-window/win32/mouse.c"
 #include "lib/ui-window/win32/geometry.c"
 #include "lib/ui-window/win32/component.c"
@@ -73,6 +99,15 @@ static void join(ui_component *p) { (void)p; }
 static void dispose(ui_component *p) { ui_component_mailboxes_destroy(&p->mailboxes); }
 int main(void)
 {
+    static ui_win32_window_context surface;
+    assert(!win32_window_ensure_surface((HWND)1,&surface,8,8));
+    assert(!surface.surface_width && !surface.surface_height && !surface.surface_dc && !surface.surface_pixels);
+    assert(selections==1 && deleted_bitmaps==1 && deleted_dcs==1);
+    selection_ok=1;
+    assert(win32_window_ensure_surface((HWND)1,&surface,8,8));
+    assert(surface.surface_width==8 && selections==2);
+    win32_window_destroy_surface(&surface);
+    assert(selections==3 && deleted_bitmaps==2 && deleted_dcs==2);
     static ui_window window;
     static ui_win32_window_context c;
     ui_component_options options={.input_sink=input,.failure_sink=failure};

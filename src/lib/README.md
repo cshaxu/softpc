@@ -97,6 +97,10 @@ mailboxes. Callers never share or address a mailbox directly.
   creation failure is distinct and does not retire an uncreated source.
 
 Unexpected native Console reader errors emit `LIB_CONSOLE_EVENT_IO_FAILURE`.
+Before native activation, after old input quiesces, host delivers INPUT_RESET
+synchronously through the logical Console. Consumers clear local input history
+before the next reader starts; this is distinct from successful ACTIVATED and
+permanent UI source retirement. Rollback uses the same reset-before-reader path.
 Normal replacement cancellation is not failure. A UI Console reports genuine
 input/output errors through its failure sink and retires; NOT_CURRENT output
 is an expected inactive-object write. Neither path makes application decisions.
@@ -147,3 +151,5 @@ Palette caches advance only after successful native palette application;
 unavailable palette support may retry without terminating text output. Text
 and cursor I/O failures remain explicit. Window sizing/title completion likewise
 never records an unsuccessful native call as completed.
+Nonempty native text writes invalidate the prior frame cache, even on partial
+failure; an unchanged subsequent frame must overwrite those intervening cells.

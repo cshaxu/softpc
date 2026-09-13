@@ -44,7 +44,11 @@ static void ui_console_receive_event(void *context,
             LIB_MEMORY_ORDER_ACQUIRE) != 0 ||
         (state = (ui_console_win32_state *)console->worker_state) == LIB_NULL)
         return;
-    if (event->kind == LIB_CONSOLE_EVENT_ACTIVATED) {
+    if (event->kind == LIB_CONSOLE_EVENT_INPUT_RESET) {
+        ui_hotkey_matcher_discard(&console->base.hotkey_matcher);
+        lib_memory_set(&state->keyboard, 0, sizeof(state->keyboard));
+        state->previous_mouse_valid = 0;
+    } else if (event->kind == LIB_CONSOLE_EVENT_ACTIVATED) {
         ui_mailbox_wake_signal(ui_component_mailboxes_wake(&console->base.mailboxes));
     } else if (event->kind == LIB_CONSOLE_EVENT_IO_FAILURE) {
         ui_component_fail(&console->base, LIB_STATUS_IO_ERROR);

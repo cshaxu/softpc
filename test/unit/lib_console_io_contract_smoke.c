@@ -20,6 +20,10 @@ static BOOL WINAPI read_chunk(HANDLE h, LPVOID bytes, DWORD capacity, LPDWORD co
     return TRUE;
 }
 static unsigned palette_attempts, palette_sets, writes;
+static int text_result=1;
+static DWORD text_written=1;
+static BOOL WINAPI text_write(HANDLE h,LPCVOID text,DWORD n,LPDWORD written,LPVOID r)
+{ (void)h;(void)text;(void)r;*written=n==0 ? 0 : text_written;return text_result; }
 static int palette_query_ok, palette_set_ok, cursor_ok = 1;
 static WCHAR first_cell;
 static BOOL WINAPI screen_info(HANDLE h, PCONSOLE_SCREEN_BUFFER_INFO p)
@@ -52,6 +56,8 @@ static HANDLE WINAPI start_reader(LPSECURITY_ATTRIBUTES a, SIZE_T size,
 #define lib_win32_flush_console_input_buffer flush_input
 #undef lib_win32_read_console_a
 #define lib_win32_read_console_a read_chunk
+#undef lib_win32_write_console_a
+#define lib_win32_write_console_a text_write
 #undef lib_win32_get_console_screen_buffer_info
 #define lib_win32_get_console_screen_buffer_info screen_info
 #undef lib_win32_get_console_screen_buffer_info_ex
@@ -146,6 +152,19 @@ int main(void)
     assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_IO_ERROR);
     cursor_ok=1;
     assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+    unsigned previous_writes=writes;
+    assert(host_console_backend_write_bound(&b,b.console,2,"x",1)==LIB_STATUS_NOT_CURRENT);
+    assert(host_console_backend_write_bound(&b,b.console,1,"",0)==LIB_STATUS_OK);
+    assert(b.previous_columns==80 && b.previous_rows==25);
+    assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==0 && writes==previous_writes);
+    for (int scenario=0;scenario<3;++scenario) {
+        text_result=scenario!=2; text_written=scenario==1 ? 0 : 1;
+        assert(host_console_backend_write_bound(&b,b.console,1,"x",1)==
+            (scenario==0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR));
+        assert(!b.previous_columns && !b.previous_rows);
+        assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
+        assert(writes==++previous_writes && b.previous_columns==80);
+    }
     DeleteCriticalSection(&b.transaction_lock);DeleteCriticalSection(&b.output_lock);CloseHandle(stop);lib_console_release(b.console);
     cooked_restore();
     return 0;

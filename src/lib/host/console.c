@@ -95,8 +95,13 @@ static lib_status host_console_activate_bound(host_console_broker *broker,
     lib_bool restore_cooked_request)
 {
     lib_status status;
+    lib_console_event reset = { .kind = LIB_CONSOLE_EVENT_INPUT_RESET };
     status = lib_console_bind_generation(console, generation);
     if (status != LIB_STATUS_OK) return status;
+    /* Old reader is quiescent. Reset local input before any next reader can
+     * deliver; a logical Console without an input sink needs no reset work. */
+    reset.binding_generation = generation;
+    (void)lib_console_deliver_event(console, &reset);
     status = host_console_backend_activate(broker->backend, console, mode,
         generation, restore_cooked_request);
     if (status != LIB_STATUS_OK) lib_console_invalidate_binding(console);

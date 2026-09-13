@@ -117,8 +117,8 @@ int ui_window_fit_aspect_size(int available_width, int available_height,
 int ui_window_cursor_rect(const ui_frame *frame, const ui_window_rect *display,
     ui_window_rect *cursor)
 {
-    int width, height, cell_top, cell_bottom, cursor_height;
-    lib_u32 percent;
+    int width, height, cell_top, cell_bottom;
+    lib_u32 top, bottom;
     if (!ui_frame_is_valid(frame) || !display || !cursor || frame->graphics ||
         !frame->cursor_visible || frame->cursor_column < 0 || frame->cursor_row < 0 ||
         frame->cursor_column >= frame->text_columns || frame->cursor_row >= frame->text_rows)
@@ -128,14 +128,20 @@ int ui_window_cursor_rect(const ui_frame *frame, const ui_window_rect *display,
     if (width <= 0 || height <= 0) return 0;
     cell_top = (int)((lib_i64)frame->cursor_row*height/frame->text_rows);
     cell_bottom = (int)((lib_i64)(frame->cursor_row+1)*height/frame->text_rows);
-    percent = frame->cursor_bottom >= frame->cursor_top && frame->font_height ?
-        (frame->cursor_bottom-frame->cursor_top+1u)*100u/frame->font_height : 100u;
-    if (!percent || percent > 100u) percent = 100u;
-    cursor_height = (int)(((lib_i64)(cell_bottom-cell_top)*percent+99u)/100u);
     cursor->left = display->left+(lib_i32)((lib_i64)frame->cursor_column*width/frame->text_columns);
     cursor->right = display->left+(lib_i32)((lib_i64)(frame->cursor_column+1)*width/frame->text_columns);
+    cursor->top = display->top+cell_top;
     cursor->bottom = display->top+cell_bottom;
-    cursor->top = cursor->bottom-cursor_height;
+    if (frame->font_height && frame->cursor_bottom >= frame->cursor_top) {
+        top = frame->cursor_top;
+        if (top >= frame->font_height) return 0;
+        bottom = (lib_u32)frame->cursor_bottom + 1u;
+        if (bottom > frame->font_height) bottom = frame->font_height;
+        cursor->top = display->top+cell_top+(lib_i32)(
+            (lib_i64)(cell_bottom-cell_top)*top/frame->font_height);
+        cursor->bottom = display->top+cell_top+(lib_i32)(
+            ((lib_i64)(cell_bottom-cell_top)*bottom+frame->font_height-1u)/frame->font_height);
+    }
     return cursor->right > cursor->left && cursor->bottom > cursor->top;
 }
 

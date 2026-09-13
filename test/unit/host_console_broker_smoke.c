@@ -25,9 +25,14 @@ static int host_console_fail_next_retirement;
 static int host_console_prepare_saw_active;
 static int host_console_wait_for_callback;
 static unsigned activations;
+static unsigned input_resets, activation_attempts;
+static lib_console *reset_console;
+static lib_u32 reset_generation;
+static host_console_backend *test_backend;
 static void activated_sink(void *context, const lib_console_event *event)
 {
     (void)context;
+    if (event->kind == LIB_CONSOLE_EVENT_INPUT_RESET) return;
     assert(event->kind == LIB_CONSOLE_EVENT_ACTIVATED && event->binding_generation);
     ++activations;
 }
@@ -41,6 +46,7 @@ lib_status host_console_backend_create(host_console_backend **out_native)
 {
     static host_console_backend native_console;
     native_console.active = LIB_NULL;
+    test_backend = &native_console;
 #ifdef _WIN32
     InitializeCriticalSection(&native_console.transaction);
 #endif
@@ -75,6 +81,8 @@ lib_status host_console_backend_activate(host_console_backend *native_console,
     lib_console *console, host_console_mode mode, lib_u32 generation,
     lib_bool restore_cooked_request)
 {
+    assert(reset_console == console && reset_generation == generation);
+    assert(input_resets == ++activation_attempts);
     if (host_console_fail_next_activation > 0) {
         --host_console_fail_next_activation;
         return LIB_STATUS_IO_ERROR;
@@ -206,7 +214,19 @@ void host_console_backend_unlock_transaction(host_console_backend *backend)
 { LeaveCriticalSection(&backend->transaction); }
 #define lib_console_set_output_sink tracked_output_sink
 #endif
+static lib_status tracked_delivery(lib_console *console, const lib_console_event *event)
+{
+    if (event->kind == LIB_CONSOLE_EVENT_INPUT_RESET) {
+        assert(test_backend->active == NULL); /* Old reader already quiesced. */
+        reset_console = console;
+        reset_generation = event->binding_generation;
+        ++input_resets;
+    }
+    return lib_console_deliver_event(console, event);
+}
+#define lib_console_deliver_event tracked_delivery
 #include "lib/host/console.c"
+#undef lib_console_deliver_event
 #ifdef _WIN32
 #undef lib_console_set_output_sink
 static DWORD WINAPI reverse_replace(void *opaque)
@@ -292,9 +312,11 @@ int main(void)
        retirement cancellation may already have disturbed the old reader, so
        the broker fails closed: neither old nor next is advertised Current. */
     host_console_fail_next_retirement = 1;
+    unsigned resets_before_failure = input_resets;
     assert(host_console_broker_replace(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_NOT_CURRENT);
+    assert(input_resets == resets_before_failure);
     assert(host_console_broker_replace(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_INVALID_STATE);
     host_console_broker_destroy(broker);
@@ -313,12 +335,14 @@ int main(void)
     assert(host_console_broker_replace(broker, first, second,
         HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_OK);
     host_console_fail_next_prepare = 1;
+    resets_before_failure = input_resets;
     host_console_prepare_saw_active = 0;
     assert(host_console_broker_replace(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);
     /* Preflight failure did not stop or detach the old current object. */
     assert(lib_console_write_text(second, "b", 1u) == LIB_STATUS_OK);
     assert(host_console_prepare_saw_active);
+    assert(input_resets == resets_before_failure);
     host_console_fail_next_activation = 1;
     assert(host_console_broker_replace(broker, second, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);

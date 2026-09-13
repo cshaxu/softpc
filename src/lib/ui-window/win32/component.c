@@ -198,6 +198,10 @@ static int win32_window_ensure_surface(lib_win32_hwnd window,
     }
     context->surface_previous_bitmap = lib_win32_select_object(context->surface_dc,
         context->surface_bitmap);
+    if (context->surface_previous_bitmap == LIB_NULL) {
+        win32_window_destroy_surface(context);
+        return 0;
+    }
     context->surface_width = width;
     context->surface_height = height;
     context->graphics_valid = 0;

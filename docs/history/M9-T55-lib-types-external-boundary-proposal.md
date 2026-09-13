@@ -1,5 +1,94 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S13 admission: four boundary repairs
+
+Baseline `fccf9ab`. Owner: “准入一个新的S任务完成修复、编译、测试、提交、推送，并等我测试”.
+The owner accepts modifier-snapshot matching: “我觉得这个没有必要处理。就这样也可以了。”
+Matcher implementation and per-instance storage remain unchanged; the earlier
+stronger claim that snapshot modifiers cannot span focus sources is withdrawn.
+
+The finite repair universe is the following four rows and their direct peers.
+Completion requires focused proof for every row plus full dual-width tests,
+strict standalone lib and boundary/manifest/governance gates. No new thread,
+queue, lock, persistent state, product callback or application generation.
+
+| Item | Owner and single path | Required proof |
+| --- | --- | --- |
+| Input reset | Existing host activate-bound helper binds generation, synchronously delivers neutral INPUT_RESET, then calls native activation. ui-console clears matcher pending/held state, UTF-16 prefix and mouse baseline; registrations and frame mailbox survive. ACTIVATED remains after successful activation and only wakes drawing. | Create and all raw/cooked replacements reset before reader activation; prepare failure leaves old state; rollback resets before restarting old; retirement failure starts neither. Adapter tests rebind Ctrl, surrogate and mouse state, retain registered hotkeys and pending frames, reject stale generation. |
+| Surface failure | Window checks SelectObject before committing dimensions; invalid return is never restored as a bitmap. Reuse surface cleanup and worker fault path. | NULL selection fails cleanly, no completed surface cache; valid selection remains usable. |
+| Cursor placement | Existing root geometry maps top and bottom scanlines into the current cell, with bounded clipping and nonzero coverage. No new cursor state. | Top, middle, bottom, scaled/nonintegral row height, invalid/clipped shapes. |
+| Output cache | Under existing backend output gate invalidate prior frame dimensions for any nonempty attempted text write, including partial/failing writes. | Frame A, text X, unchanged frame A redraws; partial/failing text cannot leave a trusted cache; empty and NOT_CURRENT writes do not invalidate. |
+
+INPUT_RESET describes the beginning of a new input stream, not successful
+activation or source retirement. It is delivered only after old reader
+quiescence (or on initial creation). Its callback does local state work only,
+never rendering, broker reentry or destruction. A failed next activation can
+leave next reset without any input; restoring old uses the same helper and
+resets old before its restarted reader. Cooked activation still does not arm
+a line except the existing rollback restoration of an unfinished request.
+Existing app queues/pressed-key product policy are not changed.
+
+No MVDM, compatibility host, media, INI, mouse scale or deferred Win3.1
+mode-roundtrip changes. S12 verification is retained without inventing owner
+acceptance. S13 delivers both fixed EXEs and waits for owner testing; T55 stays
+open. Similar-issue sweep and changed-path accounting accompany executor P1,
+followed by coordinator review of that actual pushed diff.
+
+### S13 implementation and peer sweep
+
+- All three callers of `host_console_activate_bound` (create, replace, rollback)
+  use its one synchronous reset boundary. Native activation is never called
+  elsewhere by the parent. Prepare and failed retirement do not reach it.
+  The callback runs through the existing generation check/event gate and does
+  only local input cleanup; no new event queue, worker, lock or stored flag.
+  The monitor already ignores non-line, non-failure notifications. Linux's
+  unsupported backend is unchanged, without claiming new platform support.
+- ui-console discards its existing held-key ledger, clears the existing
+  normalizer and invalidates its mouse baseline. Registered hotkeys and pending
+  frames survive. It does not synthesize source retirement, change the app
+  pressed-key policy or restrict accepted modifier snapshots.
+- Window bitmap selection has one creation call and one restoration call.
+  Failed creation now releases the unselected bitmap/DC and keeps dimensions
+  zero. Restoration remains in the existing cleanup; the deterministic probe
+  verifies failure cleanup, a subsequent valid surface, and one restoration.
+- All Window cursor rectangles delegate to the same root geometry function.
+  Tests cover each of 16 scanlines, middle/bottom ranges, scaling, nonintegral
+  row heights and clipped/invalid bounds. No new platform geometry wrapper.
+- Native text output has one bound writer. Its existing output lock covers
+  cache invalidation and writing. An attempted nonempty write invalidates even
+  on partial/failing output; empty or rejected non-current writes do not.
+  Frame writing still commits its completed cache only on successful output.
+- Source accounting against `fccf9ab`: seven library C/header files, +36/-10;
+  five existing unit-test files, +158/-0. Remaining changes are documentation,
+  the corpus manifest and the two fixed EXEs. No app, MVDM, media, INI or
+  matcher implementation changes.
+
+### S13 executor verification
+
+Focused x64 tests passed 5/5. Both fixed package builds completed; the first
+x64 link was blocked by the old running package (PID 30108), which was closed
+under the owner's existing authorization before rebuilding. The strict C11
+library compiled with `-Wall -Wextra -Wpedantic -Werror`; its three tests passed.
+Initial gate checks caught lowercase manifest hashes and a missing standalone
+S12 delivery index; both records were corrected, without changing gate rules.
+Full dual-width regression and final delivery evidence are recorded below.
+
+- Final `ctest --preset test-x64`: 52/52, including fixed-package smoke.
+- Final `ctest --preset test-x86`: 52/52, including fixed-package smoke.
+- Strict standalone library: build passed and 3/3 CTest; documentation
+  governance, component DAG/types layout and corpus manifest passed.
+- `softpc32.exe`: PE machine `014C`, SHA256
+  `C173B29BA625C817F67D07229079AC49C4F3AE0D72E3A2270D450365C5FC4BEF`.
+- `softpc64.exe`: PE machine `8664`, SHA256
+  `DC26FBFE3F12BC73BAA693316F24157E3B80265319AB378365A2340270180589`.
+- The old audit scratch and this run's two types-layout and two documentation
+  self-test fixture directories are disposable build artifacts; remove those
+  exact children after verification. Keep build caches/logs and all unrelated
+  historical build trees, user configuration and media.
+
+Executor delivery is complete for P1. Coordinator review follows its push;
+owner interactive testing is still required and T55 is not closed.
+
 ## S12 admission: seven shared-library audit repairs
 
 Baseline `a0d0d37`. Owner: “对啊，那就这么办。其他的按你说的来。”

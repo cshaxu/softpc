@@ -30,7 +30,11 @@ typedef enum lib_console_event_kind {
     LIB_CONSOLE_EVENT_IO_FAILURE,
     /* Binding succeeded. Receivers may wake output workers; callbacks must
      * not synchronously reenter the broker or render into the binding. */
-    LIB_CONSOLE_EVENT_ACTIVATED
+    LIB_CONSOLE_EVENT_ACTIVATED,
+    /* New binding input begins after this synchronous callback returns.
+     * Clear local input state only: no output, broker reentry or destruction.
+     * This is not activation success or permanent source retirement. */
+    LIB_CONSOLE_EVENT_INPUT_RESET
 } lib_console_event_kind;
 
 enum {

@@ -135,7 +135,9 @@ matching. A matched chord is discarded as normal input and produces one copied
 `ui_HOTKEY(identifier)` event at SoftPC's queue entry; lib does not interpret
 the identifier. Unmatched input is emitted as ordinary copied key/text/mouse
 events in keyboard order; mouse/close events do not wait behind keyboard prefixes. Matcher state is per component instance: keys
-from Window and VM Console never combine into one chord.
+are not merged across Window and VM Console. A record's modifier snapshot may
+still satisfy a chord without preceding modifier makes in that same instance;
+this accepted behavior preserves the existing input path.
 
 The matcher withholds only a possible registered-chord prefix until it can
 decide match versus mismatch. Thus Ctrl+Alt+P registered as `pause-toggle`

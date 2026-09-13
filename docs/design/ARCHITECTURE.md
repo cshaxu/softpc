@@ -123,9 +123,10 @@ lifetime tracing only. The cooked monitor instead produces handle-free
 `monitor_input_event` values. Both families enter SoftPC's one input FIFO as
 distinct payloads in arrival order; the control thread is their sole consumer.
 The generic matcher keeps pending only possible chord prefixes inside its own
-component instance, preserving guest-input order on mismatch. A Window and a
-VM Console each process only their own raw key sequence, so no cross-component
-key combination is possible.
+component instance, preserving guest-input order on mismatch. Window and VM
+Console maintain separate ledgers. Matching accepts each record's modifier
+snapshot even when a modifier make was not observed in that instance; no
+additional source-local modifier-participation restriction is imposed.
 
 Every `ui-window` and `ui-console` instance owns private control/frame/input
 mailboxes and its own native worker(s). Their common mailbox mechanics live in
@@ -140,6 +141,11 @@ acknowledgement clears only that still-current publication. Host reports logical
 Console activation through its neutral event sink after binding succeeds;
 ui-console only wakes its existing worker to draw pending content. Empty means
 no output, and NOT_CURRENT retains pending content without a retry loop.
+Before native activation, the existing host binding helper synchronously sends
+INPUT_RESET through the logical Console after old-reader quiescence. ui-console
+clears its held keys, incomplete text and mouse baseline, retaining registrations
+and pending frames. No new input can precede that reset. Rollback uses the same
+helper; RESET is not activation success or permanent UI source retirement.
 Cooked rollback restores only an unfinished line request observed after reader
 join; ordinary cooked activation remains explicitly armed by the caller.
 Window displacement retains integer remainders

@@ -273,6 +273,66 @@ static void check_activation_frame(void)
     CloseHandle(probe.retired); CloseHandle(frame_idle); frame_idle=NULL;
 }
 
+static ui_input_event reset_events[16];
+static unsigned reset_event_count;
+static int reset_input(void *opaque, const ui_input_event *event)
+{
+    (void)opaque;
+    assert(reset_event_count < 16);
+    reset_events[reset_event_count++] = *event;
+    return 1;
+}
+static void reset_failure(void *opaque, lib_u64 id, lib_status status)
+{ (void)opaque; (void)id; (void)status; assert(0); }
+static void check_input_reset(void)
+{
+    ui_console *c;
+    ui_console_options options = { .input_sink=reset_input, .failure_sink=reset_failure };
+    lib_console_event e = { .kind=LIB_CONSOLE_EVENT_RAW_KEY, .binding_generation=1 };
+    static ui_frame frame = { .valid=1, .text_columns=80, .text_rows=25 }, copied;
+    lib_u32 generation;
+    assert(ui_hotkey_registry_register(&options.hotkeys,'P',3,"CAP")==0);
+    assert(ui_console_create(&c,&options)==0);
+    lib_console *logical=ui_console_get_console(c);
+    assert(lib_console_bind_generation(logical,1)==0);
+    e.value.raw_key=(lib_console_raw_key){ .key=VK_CONTROL, .scan_code=0x1d, .pressed=1, .modifiers=1 };
+    assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==0);
+    e.value.raw_key=(lib_console_raw_key){ .unicode=0xd83d, .pressed=1 };
+    assert(lib_console_deliver_event(logical,&e)==0);
+    e.kind=LIB_CONSOLE_EVENT_RAW_MOUSE;
+    e.value.raw_mouse=(lib_console_raw_mouse){ .delta_x=1, .delta_y=1 };
+    assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==1);
+    assert(ui_console_publish_frame(c,&frame)==0); /* No output sink: pending. */
+    assert(lib_console_bind_generation(logical,2)==0);
+    e.kind=LIB_CONSOLE_EVENT_INPUT_RESET;
+    assert(lib_console_deliver_event(logical,&e)==LIB_STATUS_NOT_CURRENT);
+    assert(c->base.hotkey_matcher.held_count==1);
+    e.binding_generation=2;
+    assert(lib_console_deliver_event(logical,&e)==0);
+    assert(!c->base.hotkey_matcher.held_count && c->base.hotkey_matcher.registry.count==1);
+    assert(ui_component_mailboxes_capture_frame(&c->base.mailboxes,&generation,&copied));
+    assert(copied.text_columns==80);
+    e.kind=LIB_CONSOLE_EVENT_RAW_KEY;
+    e.value.raw_key=(lib_console_raw_key){ .unicode=0xde00, .pressed=1 };
+    assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==1);
+    e.value.raw_key=(lib_console_raw_key){ .key='A', .scan_code=0x1e, .pressed=1 };
+    assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==2);
+    assert(reset_events[1].type==UI_EVENT_KEY && reset_events[1].data.key.key=='A');
+    e.kind=LIB_CONSOLE_EVENT_RAW_MOUSE;
+    e.value.raw_mouse=(lib_console_raw_mouse){ .delta_x=61, .delta_y=21 };
+    assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==3);
+    assert(reset_events[2].data.mouse.delta_x==0 && reset_events[2].data.mouse.delta_y==0);
+    ++e.value.raw_mouse.delta_x; ++e.value.raw_mouse.delta_y;
+    assert(lib_console_deliver_event(logical,&e)==0);
+    assert(reset_events[3].data.mouse.delta_x==8 && reset_events[3].data.mouse.delta_y==16);
+    e.kind=LIB_CONSOLE_EVENT_RAW_KEY;
+    e.value.raw_key=(lib_console_raw_key){ .key='P', .scan_code=0x19, .pressed=1, .modifiers=3 };
+    assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==5);
+    assert(reset_events[4].type==UI_EVENT_HOTKEY); /* Accepted snapshot policy survives. */
+    ui_console_destroy(c);
+    assert(reset_event_count==6 && reset_events[5].type==UI_EVENT_SOURCE_RETIRED);
+}
+
 int main(void)
 {
     check_retirement(0);
@@ -281,6 +341,7 @@ int main(void)
     check_io_failure(0, LIB_STATUS_IO_ERROR);
     check_io_failure(0, LIB_STATUS_NOT_CURRENT);
     check_activation_frame();
+    check_input_reset();
     return 0;
 }
 #else

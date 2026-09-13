@@ -8,6 +8,9 @@ Its internal component emission helper may let a leaf filter matcher output,
 but source attribution and chord matching always remain in this component.
 This permits a frozen Window to discard ordinary content input while forwarding
 registered hotkeys without creating a second matcher path.
+Each instance owns its ledger; modifier snapshots may satisfy chord modifiers
+without corresponding makes in that instance. This accepted behavior does not
+merge ledgers or require a second modifier-state table.
 
 `worker_interface.h`, `mailbox_interface.h`, `mailbox_wake_interface.h` and
 the root `input_interface.h` are shared leaf-support contracts, not
