@@ -14,9 +14,9 @@ lib_bool ui_keyboard_platform_map_scalar(lib_u32 scalar,
 {
     lib_win32_key_state mapped;
 
-    if (out_virtual_key == LIB_NULL || out_modifiers == LIB_NULL || scalar > 0xffu)
+    if (out_virtual_key == LIB_NULL || out_modifiers == LIB_NULL || scalar > 0xffffu)
         return LIB_FALSE;
-    mapped = lib_win32_key_scan((lib_win32_char)scalar);
+    mapped = lib_win32_key_scan((lib_win32_wchar)scalar);
     if (mapped == -1) return LIB_FALSE;
     *out_virtual_key = (lib_u16)(mapped & 0xff);
     *out_modifiers = 0u;

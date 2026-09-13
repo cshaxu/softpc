@@ -12,10 +12,10 @@ int main(void)
         0u, 0u, 1));
     assert(received.type == UI_EVENT_KEY && received.data.key.key == UI_KEY_UP &&
         received.data.key.scan_code == 0u);
-    assert(ui_keyboard_submit_utf16(&state, NULL, capture, 'a'));
+    assert(ui_keyboard_submit_utf16(&state, NULL, NULL, capture, 'a'));
     assert(received.type == UI_EVENT_TEXT && received.data.text.scalar == 'a');
-    assert(ui_keyboard_submit_utf16(&state, NULL, capture, 0xd83du));
-    assert(ui_keyboard_submit_utf16(&state, NULL, capture, 0xde00u));
+    assert(ui_keyboard_submit_utf16(&state, NULL, NULL, capture, 0xd83du));
+    assert(ui_keyboard_submit_utf16(&state, NULL, NULL, capture, 0xde00u));
     assert(received.type == UI_EVENT_TEXT && received.data.text.scalar == 0x1f600u);
     assert(!ui_keyboard_submit_transition(NULL, capture, 0u, 0xffffu, 0u, 0u, 1));
     return 0;

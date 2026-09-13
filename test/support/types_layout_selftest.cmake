@@ -124,6 +124,19 @@ check_layout(fail)
 file(REMOVE "${fixture}/types/win32/probe.h")
 check_layout(pass)
 
+# Native character producers must not silently narrow Unicode records.
+foreach(component IN ITEMS host ui-window)
+    set(encoding_probe "${fixture}/${component}/win32/encoding_probe.c")
+    file(MAKE_DIRECTORY "${fixture}/${component}/win32")
+    foreach(call IN ITEMS read_console_input_a register_class_a create_window_ex_a dispatch_message_a peek_message_a)
+        file(WRITE "${encoding_probe}" "void probe(void) { lib_win32_${call}\n\t(0); }\n")
+        check_layout(fail)
+    endforeach()
+    file(WRITE "${encoding_probe}" "void probe(void) { lib_win32_read_console_input_w(0); }\n")
+    check_layout(pass)
+    file(REMOVE "${encoding_probe}")
+endforeach()
+
 # Both leaves must use the same record-level decision, not a low-level bypass.
 foreach(leaf IN ITEMS ui-window ui-console)
     set(input_probe "${fixture}/${leaf}/input_probe.c")

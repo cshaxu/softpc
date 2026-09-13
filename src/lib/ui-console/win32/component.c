@@ -54,7 +54,8 @@ static void ui_console_receive_event(void *context,
             (lib_u16)key->unicode,
             key->extended != LIB_FALSE ? UI_INPUT_FLAG_EXTENDED : 0u,
             ui_console_hotkey_modifiers(key->modifiers), key->pressed };
-        (void)ui_keyboard_submit_record(&state->keyboard, console,
+        (void)ui_keyboard_submit_record(&state->keyboard,
+            &console->base.hotkey_matcher, console,
             ui_console_emit_normalized, &record);
     } else if (event->kind == LIB_CONSOLE_EVENT_RAW_MOUSE) {
         const lib_console_raw_mouse *mouse = &event->value.raw_mouse;

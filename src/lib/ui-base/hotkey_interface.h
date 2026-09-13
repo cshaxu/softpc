@@ -57,5 +57,9 @@ void ui_hotkey_matcher_initialize(ui_hotkey_matcher *matcher,
 int ui_hotkey_matcher_submit(ui_hotkey_matcher *matcher,
     const ui_input_event *event, ui_input_sink sink, void *context);
 void ui_hotkey_matcher_discard(ui_hotkey_matcher *matcher);
+/* Borrowed until the next submit/discard. Includes either physical side of a
+ * modifier; synthesis must not release a key already owned by this ledger. */
+const ui_input_event *ui_hotkey_matcher_held_key(
+    const ui_hotkey_matcher *matcher, ui_key key);
 
 #endif

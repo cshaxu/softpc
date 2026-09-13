@@ -6,6 +6,7 @@
  * Callers own one zero-initialized normalizer per input source. */
 
 #include "lib/ui-base/event_interface.h"
+#include "lib/ui-base/hotkey_interface.h"
 
 /* Copied adapter flags, never a raw platform control-state word. */
 enum {
@@ -20,7 +21,6 @@ enum {
 
 typedef struct ui_keyboard_normalizer {
     lib_u16 pending_high_surrogate;
-    lib_u16 character_key;
 } ui_keyboard_normalizer;
 
 /* These functions only normalize host packets.  A project binding maps each
@@ -29,12 +29,14 @@ int ui_keyboard_submit_transition(void *context,
     ui_input_sink sink, lib_u16 scan, lib_u16 virtual_key,
     lib_u8 record_flags, lib_u8 hotkey_modifiers, int pressed);
 int ui_keyboard_submit_utf16(
-    ui_keyboard_normalizer *state, void *context,
+    ui_keyboard_normalizer *state, const ui_hotkey_matcher *held_keys, void *context,
     ui_input_sink sink, lib_u16 code_unit);
 /* Native adapters copy either separate transition/character messages or one
- * combined record. In a CHARACTER packet, nonzero scan identifies a character
- * translated from a physical message, not independent text. This entry alone
- * selects physical vs text and deduplicates. */
+ * combined record. Translate a separate native transition into characters only
+ * on UI_KEYBOARD_UNMAPPED; accepted physical keys must not generate a second
+ * character record. CHARACTER is independent text, not a physical echo.
+ * held_keys is the same matcher used by sink, NULL only for isolated decoding. */
+enum { UI_KEYBOARD_REJECTED = 0, UI_KEYBOARD_ACCEPTED = 1, UI_KEYBOARD_UNMAPPED = 2 };
 typedef enum ui_keyboard_record_kind {
     UI_KEYBOARD_TRANSITION,
     UI_KEYBOARD_CHARACTER,
@@ -51,7 +53,8 @@ typedef struct ui_keyboard_record {
     lib_bool pressed;
 } ui_keyboard_record;
 
-int ui_keyboard_submit_record(ui_keyboard_normalizer *state, void *context,
+int ui_keyboard_submit_record(ui_keyboard_normalizer *state,
+    const ui_hotkey_matcher *held_keys, void *context,
     ui_input_sink sink, const ui_keyboard_record *record);
 
 #endif

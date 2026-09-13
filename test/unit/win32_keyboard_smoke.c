@@ -86,20 +86,20 @@ int main(void)
     softpc_keyboard_capture capture = { 0 };
     ui_keyboard_normalizer normalizer = { 0 };
     softpc_hotkey_capture text = { 0 };
-    assert(ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0xd83du));
+    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xd83du));
     assert(text.count == 0u);
-    assert(ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0xde00u));
+    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xde00u));
     assert(text.count == 1u && text.events[0].type == UI_EVENT_TEXT &&
         text.events[0].data.text.scalar == 0x1f600u);
-    assert(!ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0xdc00u));
-    assert(ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0xd800u));
-    assert(!ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0xd800u));
+    assert(!ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xdc00u));
+    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xd800u));
+    assert(!ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xd800u));
     assert(normalizer.pending_high_surrogate == 0u);
-    assert(ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0xd800u));
-    assert(!ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 'a'));
-    assert(ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0x4e00u));
+    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xd800u));
+    assert(!ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 'a'));
+    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0x4e00u));
     text.count = 8u;
-    assert(!ui_keyboard_submit_utf16(&normalizer, &text, capture_hotkey, 0x4e00u));
+    assert(!ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0x4e00u));
 
     /* The shared component preserves the host physical scan; each project maps it. */
     assert(ui_keyboard_submit_transition(&capture, capture_key,
@@ -164,21 +164,24 @@ int main(void)
     assert(capture.modifiers[0] == (UI_HOTKEY_MODIFIER_CONTROL |
         UI_HOTKEY_MODIFIER_ALT));
 
-    /* A scan-less RDP key followed by its WM_CHAR must not inject twice. */
+    /* Only unmapped transitions ask the native adapter for character translation. */
     capture.count = 0;
     ui_keyboard_record record = { UI_KEYBOARD_TRANSITION, 0, 'A', 0, 0, 0, 1 };
-    assert(ui_keyboard_submit_record(&normalizer, &capture, capture_key, &record));
-    record.kind = UI_KEYBOARD_CHARACTER; record.utf16 = 'a';
-    assert(ui_keyboard_submit_record(&normalizer, &capture, capture_key, &record));
-    assert(capture.count == 1); /* not a second make/break */
-    record.kind = UI_KEYBOARD_TRANSITION; record.pressed = 0;
-    assert(ui_keyboard_submit_record(&normalizer, &capture, capture_key, &record));
+    assert(ui_keyboard_submit_record(&normalizer, NULL, &capture, capture_key, &record) ==
+        UI_KEYBOARD_ACCEPTED);
+    record.pressed = 0;
+    assert(ui_keyboard_submit_record(&normalizer, NULL, &capture, capture_key, &record) ==
+        UI_KEYBOARD_ACCEPTED);
+    assert(capture.count == 2);
+    record.key = VK_PACKET; record.pressed = 1;
+    assert(ui_keyboard_submit_record(&normalizer, NULL, &capture, capture_key, &record) ==
+        UI_KEYBOARD_UNMAPPED);
     assert(capture.count == 2);
 
     /* UTF-16 input uses the active host layout to synthesize make/break;
        it never places text directly in guest memory. */
     capture.count = 0u;
-    assert(ui_keyboard_submit_utf16(&normalizer, &capture,
+    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &capture,
         capture_key, L'a'));
     assert(capture.count == 2u);
     assert(capture.keys[0] == 0x1eu && capture.releases[0] == 0u);

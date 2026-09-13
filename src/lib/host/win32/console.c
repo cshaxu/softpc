@@ -87,7 +87,9 @@ static void host_console_emit_key(host_console_backend *backend,
     event.value.raw_key.extended =
         (key->dwControlKeyState & LIB_WIN32_ENHANCED_KEY) != 0u ? LIB_TRUE : LIB_FALSE;
     event.value.raw_key.pressed = key->bKeyDown ? LIB_TRUE : LIB_FALSE;
-    (void)lib_console_deliver_event(backend->console, &event);
+    lib_u32 count = key->bKeyDown && key->wRepeatCount > 1u ? key->wRepeatCount : 1u;
+    while (count-- != 0u)
+        if (lib_console_deliver_event(backend->console, &event) != LIB_STATUS_OK) break;
 }
 
 static void host_console_emit_mouse(host_console_backend *backend,
@@ -141,7 +143,7 @@ static lib_win32_dword LIB_WIN32_WINAPI host_console_reader(void *context)
         while (lib_win32_wait_for_multiple_objects(2u, waits, LIB_WIN32_FALSE, LIB_WIN32_INFINITE) == LIB_WIN32_WAIT_OBJECT_0 + 1u) {
             lib_win32_input_record record;
             lib_win32_dword read = 0u;
-            if (!lib_win32_read_console_input_a(backend->input, &record, 1u, &read)) break;
+            if (!lib_win32_read_console_input_w(backend->input, &record, 1u, &read)) break;
             if (read == 0u) continue;
             if (record.EventType == LIB_WIN32_KEY_EVENT) host_console_emit_key(backend,
                 &record.Event.KeyEvent);

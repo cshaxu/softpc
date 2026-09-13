@@ -184,7 +184,10 @@ startup parameters until join. Root task destroy performs the join once before
 platform disposal.
 
 Both UI leaves marshal native keyboard records into the same ui-base record
-entry. It owns physical-versus-text choice, surrogate processing and character
-deduplication. One source-local held-key ledger owns pending/delivered/consumed
+entry. It owns physical-versus-text choice and surrogate processing. Native Window
+translation is requested only for unmapped transitions, so physical input has
+no duplicate character stream. Text synthesis borrows the existing matcher
+ledger and releases only keys it introduces, never separately tracking held
+keys. One source-local held-key ledger owns pending/delivered/consumed
 lifetimes for ordinary keys and modifiers alike. Repeats reuse their state;
 a delivered make cannot retrospectively become a consumed chord.

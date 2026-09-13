@@ -41,9 +41,13 @@ The ledger is released at retirement; destroy also handles workerless cleanup.
 
 Both leaves submit copied keyboard records through ui_keyboard_submit_record:
 Window supplies separate transitions/characters, Console combined records.
-The common entry chooses physical versus UTF-16 input and suppresses a
-character carried by a combined physical record or marked as translated from a
-physical Window message. Independent text uses zero character scan; scan-less
-recovered transitions retain the existing source-local character deduplication.
-Text-only breaks do not produce text.
-Surrogate processing and text synthesis remain in ui-base, not in either leaf.
+The common entry chooses physical versus UTF-16 input. An accepted physical
+transition must not also be translated to a character by the native caller.
+Only UNMAPPED asks the Window adapter for character translation; combined
+Console records consume their attached text when a physical key is available.
+Independent character records always enter UTF-16; there is no timing or
+character-credit deduplication table. Text-only breaks do not produce text.
+Text synthesis reads the same matcher's held-key ledger and releases only the
+keys it introduces. Existing keys (including either modifier side) remain held;
+a held trigger receives a repeat make with its original physical identity.
+The ledger borrow is used synchronously on the same input owner as submission.

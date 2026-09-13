@@ -6,8 +6,19 @@
 static BOOL WINAPI failed_read(HANDLE input, LPVOID bytes, DWORD length,
     LPDWORD read, LPVOID reserved)
 { (void)input; (void)bytes; (void)length; (void)read; (void)reserved; return FALSE; }
+static INPUT_RECORD records[5];
+static unsigned record_count, record_index, raw_count;
+static unsigned raw_unicode[16];
+static BOOL WINAPI read_wide(HANDLE input, PINPUT_RECORD record, DWORD length, LPDWORD read)
+{
+    (void)input; assert(length == 1 && record_index < record_count);
+    *record = records[record_index++]; *read = 1; return TRUE;
+}
 static DWORD WINAPI failed_wait(DWORD count, const HANDLE *handles, BOOL all, DWORD timeout)
-{ (void)count; (void)handles; (void)all; (void)timeout; return WAIT_FAILED; }
+{ (void)count; (void)handles; (void)all; (void)timeout;
+  return record_index < record_count ? WAIT_OBJECT_0 + 1 : WAIT_FAILED; }
+#undef lib_win32_read_console_input_w
+#define lib_win32_read_console_input_w read_wide
 #undef lib_win32_read_console_a
 #undef lib_win32_wait_for_multiple_objects
 #define lib_win32_read_console_a failed_read
@@ -18,6 +29,11 @@ static int failures;
 static void receive(void *context, const lib_console_event *event)
 {
     (void)context;
+    if (event->kind == LIB_CONSOLE_EVENT_RAW_KEY) {
+        assert(raw_count < 16);
+        raw_unicode[raw_count++] = event->value.raw_key.unicode;
+        return;
+    }
     assert(event->kind == LIB_CONSOLE_EVENT_IO_FAILURE);
     ++failures;
 }
@@ -43,6 +59,23 @@ int main(void)
     backend.generation = 2u;
     host_console_reader(&backend);
     assert(failures == 2);
+    backend.generation = 1u;
+    backend.mode = HOST_CONSOLE_RAW_EVENTS;
+    record_count = 5;
+    for (unsigned i = 0; i < record_count; ++i) {
+        records[i].EventType = KEY_EVENT;
+        records[i].Event.KeyEvent.bKeyDown = TRUE;
+        records[i].Event.KeyEvent.wRepeatCount = i == 0 ? 5 : 1;
+        records[i].Event.KeyEvent.uChar.UnicodeChar =
+            i == 0 ? 0x4e00 : i == 1 ? 0xd83d : i == 2 ? 0xde00 : 0;
+    }
+    records[3].Event.KeyEvent.bKeyDown = FALSE;
+    records[3].Event.KeyEvent.wRepeatCount = 5; /* one physical release */
+    records[4].Event.KeyEvent.wRepeatCount = 0; /* preserve synthetic single record */
+    host_console_reader(&backend);
+    assert(record_index == 5 && raw_count == 9 && failures == 3);
+    for (unsigned i = 0; i < 5; ++i) assert(raw_unicode[i] == 0x4e00);
+    assert(raw_unicode[5] == 0xd83d && raw_unicode[6] == 0xde00);
     CloseHandle(backend.stop_event);
     lib_console_release(backend.console);
     return 0;

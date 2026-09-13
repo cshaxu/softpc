@@ -21,7 +21,7 @@ typedef SMALL_RECT lib_win32_small_rect;
 #define lib_win32_get_console_screen_buffer_info_ex GetConsoleScreenBufferInfoEx
 #define lib_win32_get_console_window GetConsoleWindow
 #define lib_win32_read_console_a ReadConsoleA
-#define lib_win32_read_console_input_a ReadConsoleInputA
+#define lib_win32_read_console_input_w ReadConsoleInputW
 #define lib_win32_set_console_cursor_info SetConsoleCursorInfo
 #define lib_win32_set_console_cursor_position SetConsoleCursorPosition
 #define lib_win32_set_console_mode SetConsoleMode

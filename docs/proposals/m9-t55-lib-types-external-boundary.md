@@ -1,5 +1,91 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S7 admission: native input provenance and synthesis ownership
+
+Owner: “请问这次修复会加代码还是减代码 是否能干净的实现”;
+“准入修复 要求代码设计有全局观 干净”. Baseline `5be6fc4`.
+S6 manual tests passed; that does not establish native-boundary completeness.
+
+| Frozen input-boundary sweep | Disposition/owner | Required proof |
+| --- | --- | --- |
+| Separate Window transition/character production | ui-base reports unmapped transitions; Window invokes native character translation only for those. Remove character_key guessing rather than adding a second queue. | Interleaved scan-less physical keys generate no duplicate character; unknown keys still translate. |
+| Text synthesis and all held key identities | Read the existing matcher ledger, never a second pressed table. Synthesis releases only keys it pressed, respects either modifier side and keeps a held trigger down. | Held modifiers/trigger, ordinary text, replay and sink rejection. |
+| Native Unicode input, both leaves | Raw host reads W records; Window uses a Unicode class/message path. Existing narrow title API retains its native ANSI conversion. | Native reader record and actual Window procedure, non-ASCII/surrogate pair, not just pre-normalized fixtures. |
+| Native repeat batches | Host expands raw record repetitions; Window handles message repeat count at its input boundary. Public event schema unchanged. | Batch versus individual equivalence and failure mid-batch. |
+
+One normalization entry and one matcher remain. No new component, product
+callback, input channel or duplicated pressed state. The Window ANSI class is
+an encoding peer discovered in the same scan (including VkKeyScanW instead
+of narrowing Unicode through VkKeyScanA): fake WM_CHAR tests had bypassed
+its native conversion, just as fake Console records bypassed ReadConsoleInputA.
+Do not rewrite MVDM/app policy, mouse scaling, cooked line encoding, storage or
+Linux parity. Complete the four rows and native peers with focused tests,
+full dual-width tests/builds, strict gates, manifest and actual-diff review.
+Record production/test changes separately; leave T55 open for owner testing.
+
+### S7 executor evidence and peer dispositions
+
+Physical input no longer generates its own WM_CHAR echo: the one normalizer
+returns UNMAPPED only when the selected platform cannot represent a transition.
+Window translates only that case, inside its existing native message handler.
+Removed character_key entirely instead of adding credits, a timer, or a queue.
+Console still chooses the physical representation of a combined record first.
+Independent Unicode text still uses the existing physical synthesis/TEXT policy.
+
+Synthesis takes a synchronous read-only borrow of the component's existing
+matcher ledger. A four-key stack chord snapshots identities before callbacks
+can grow that ledger, reuses either held modifier side and a held trigger, and
+releases only keys it introduced. No second persistent pressed state exists.
+Both leaves pass their same matcher explicitly; focused standalone decoders
+pass NULL. All sink failure routes still terminate through the existing owner.
+
+Native peers: ReadConsoleInputW, Unicode Window class/create/dispatch/peek/default
+procedure and VkKeyScanW preserve Unicode before normalization. Narrow titles
+retain SetWindowTextA conversion before the hidden Window is first shown.
+MapVirtualKeyA is retained for scan lookup (not character conversion); custom
+integer messages, native userdata access, and existing cooked/output encoding
+remain unchanged. Types contains only the corresponding declaration vocabulary.
+Host expands raw make repeat counts, treating zero as the historical single
+synthetic record; releases remain single. Window expands its message count too.
+No public event-schema, app, MVDM, media, INI or mouse-scale change.
+
+Focused proof includes the prior 432 chord permutations plus 128 combinations
+of held modifiers, physical sides and held trigger during repeated text
+synthesis; all four synthesis rejection positions; mid-repeat rejection;
+interleaved scan-less transitions without translation, unknown-key translation,
+separate/combined equivalence, and BMP/surrogate records. The host reader test
+drives its actual read loop with a controlled wide API, including repeat batches,
+zero count and single release. Actual hidden Window creation asserts a Unicode
+window. This is native-adapter proof, not a claim of full IME or RDP desktop QA.
+The static gate now rejects ANSI input producers; negative probes cover both
+affected native components. Existing dependency and low-level bypass gates stay.
+
+During verification the isolated vocabulary test initially lacked the now-used
+matcher body; its fixture now includes that actual implementation. One x86
+build was invoked without its compiler DLL PATH and failed without diagnostics;
+the checked-in preset with SOFTPC_I686_BIN restored the declared environment.
+Neither issue changed production semantics. The S6 handoff history was also
+recorded so S7 satisfies the strictly increasing step gate.
+
+An initial x64 full run passed 49/50 but its package probe timed out at stage 7
+(CAP to monitor after reaching DOS). A direct rerun, the subsequent complete
+x64 run (50/50, 56.22 s), and five consecutive package runs (26.38 s) passed.
+No root cause was established; it is explicitly tracked in TODO, not claimed
+fixed by these four repairs. Do not weaken that acceptance assertion or alter
+unrelated product lifecycle on this evidence. Strict lib built successfully and
+passed 3/3. Final x86 passed 50/50 (72.10 s); its package probe passed too.
+The committed-diff coordinator review follows executor P1 delivery.
+
+Sweep: rg over all keyboard submits, translation calls, character_key, input A/W
+vocabulary and native repeat handling; every production hit is accounted above.
+Production C/H: 12 paths, +144/-105, net +39. Test C: six paths,
++172/-34, net +138. Three CMake/gate paths: +18/-1. Counts use
+git diff --numstat against `5be6fc4`, excluding docs, manifest and EXEs.
+
+Package SHA256:
+- softpc32.exe: `958BD3E15CCDFCCF93809D2386A42C646641A1799E530B57AA4DC28CFAAEDA1F`
+- softpc64.exe: `DB4EAA31430C359BAEEF90E2DB24EF77FCE6097E6D7A87D7B74906DC83698CC3`
+
 ## S6 admission: complete key lifetimes and common normalization
 
 Owner: “准入下一个S任务修复以上问题；类似问题也要扫描同样思路处理”.

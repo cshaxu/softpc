@@ -9,7 +9,7 @@ static LONGLONG counter_value = 123, frequency_value = 1000;
 static unsigned query_count;
 static unsigned pressed;
 static SHORT layout_result;
-static SHORT fake_key_scan(CHAR scalar)
+static SHORT fake_key_scan(WCHAR scalar)
 { (void)scalar; return layout_result; }
 
 static BOOL fake_counter(lib_win32_counter *out)
@@ -34,6 +34,7 @@ static lib_win32_key_state fake_key_state(int key)
 #include "lib/ui-window/win32/input.c"
 #include "lib/ui-base/win32/input.c"
 #include "lib/ui-base/input.c"
+#include "lib/ui-base/hotkey.c"
 
 static ui_input_event emitted[8];
 static unsigned emitted_count;
@@ -88,7 +89,7 @@ int main(void)
         CHECK(ui_keyboard_platform_map_scalar('a', &key, &modifiers));
         CHECK(key == 'A' && modifiers == expected);
         emitted_count = 0u;
-        CHECK(ui_keyboard_submit_utf16(&state, LIB_NULL, capture, 'a'));
+        CHECK(ui_keyboard_submit_utf16(&state, NULL, LIB_NULL, capture, 'a'));
         CHECK(emitted_count == count * 2u + 2u);
         CHECK(emitted[count].data.key.key == 'A');
         CHECK(emitted[count].data.key.modifiers == expected);

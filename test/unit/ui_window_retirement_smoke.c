@@ -7,12 +7,13 @@ static HANDLE waiting, proceed;
 static HWND created;
 static int scenario, retired, failures, ordinary, closes;
 static void input_scenario(void);
-static HWND WINAPI create_window(DWORD ex, LPCSTR klass, LPCSTR title,
+static HWND WINAPI create_window(DWORD ex, LPCWSTR klass, LPCWSTR title,
     DWORD style, int x, int y, int width, int height, HWND parent, HMENU menu,
     HINSTANCE instance, LPVOID param)
 {
-    created = CreateWindowExA(ex, klass, title, style, x, y, width, height,
+    created = CreateWindowExW(ex, klass, title, style, x, y, width, height,
         parent, menu, instance, param);
+    assert(created == NULL || IsWindowUnicode(created));
     return created;
 }
 static BOOL WINAPI hide_window(HWND window, int command)
@@ -33,12 +34,12 @@ static ui_mailbox_wake_wait_result controlled_wait(const ui_mailbox_wake *wake,
     if (scenario >= 7) input_scenario();
     return UI_MAILBOX_WAKE_WAIT_WAKE;
 }
-#undef lib_win32_create_window_ex_a
+#undef lib_win32_create_window_ex_w
 #undef lib_win32_show_window
 #undef lib_win32_set_foreground_window
 #undef lib_win32_set_focus
 #undef lib_win32_create_compatible_dc
-#define lib_win32_create_window_ex_a create_window
+#define lib_win32_create_window_ex_w create_window
 #define lib_win32_show_window hide_window
 #define lib_win32_set_foreground_window no_foreground
 #define lib_win32_set_focus no_focus

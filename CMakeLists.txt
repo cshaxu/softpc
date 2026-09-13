@@ -646,7 +646,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-win32-window-bounds-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-ui-component-contract-smoke)
 add_executable(softpc-linux-input-contract-smoke test/unit/linux_input_contract_smoke.c
-    src/lib/ui-base/input.c src/lib/ui-base/linux/input.c)
+    src/lib/ui-base/input.c src/lib/ui-base/linux/input.c src/lib/ui-base/hotkey.c)
 target_link_libraries(softpc-linux-input-contract-smoke PRIVATE types)
 add_test(NAME softpc-linux-input-contract-smoke COMMAND softpc-linux-input-contract-smoke)
 set_tests_properties(softpc-linux-input-contract-smoke PROPERTIES LABELS "unit")

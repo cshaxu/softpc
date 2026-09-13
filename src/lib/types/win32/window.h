@@ -18,8 +18,8 @@ typedef WPARAM lib_win32_wparam;
 typedef RECT lib_win32_rect;
 typedef POINT lib_win32_point;
 typedef MSG lib_win32_msg;
-typedef WNDCLASSA lib_win32_wndclassa;
-typedef CREATESTRUCTA lib_win32_createstructa;
+typedef WNDCLASSW lib_win32_wndclassw;
+typedef CREATESTRUCTW lib_win32_createstructw;
 typedef PAINTSTRUCT lib_win32_paintstruct;
 typedef MONITORINFO lib_win32_monitorinfo;
 typedef BITMAPINFO lib_win32_bitmapinfo;
@@ -30,13 +30,13 @@ typedef BITMAPINFO lib_win32_bitmapinfo;
 #define lib_win32_create_compatible_dc CreateCompatibleDC
 #define lib_win32_create_cursor CreateCursor
 #define lib_win32_create_dibsection CreateDIBSection
-#define lib_win32_create_window_ex_a CreateWindowExA
-#define lib_win32_def_window_proc_a DefWindowProcA
+#define lib_win32_create_window_ex_w CreateWindowExW
+#define lib_win32_def_window_proc_w DefWindowProcW
 #define lib_win32_delete_dc DeleteDC
 #define lib_win32_delete_object DeleteObject
 #define lib_win32_destroy_cursor DestroyCursor
 #define lib_win32_destroy_window DestroyWindow
-#define lib_win32_dispatch_message_a DispatchMessageA
+#define lib_win32_dispatch_message_w DispatchMessageW
 #define lib_win32_end_paint EndPaint
 #define lib_win32_get_capture GetCapture
 #define lib_win32_get_client_rect GetClientRect
@@ -59,9 +59,9 @@ typedef BITMAPINFO lib_win32_bitmapinfo;
 #define lib_win32_monitor_from_point MonitorFromPoint
 #define lib_win32_monitor_from_window MonitorFromWindow
 #define lib_win32_msg_wait_for_multiple_objects MsgWaitForMultipleObjects
-#define lib_win32_peek_message_a PeekMessageA
+#define lib_win32_peek_message_w PeekMessageW
 #define lib_win32_post_message_a PostMessageA
-#define lib_win32_register_class_a RegisterClassA
+#define lib_win32_register_class_w RegisterClassW
 #define lib_win32_release_capture ReleaseCapture
 #define lib_win32_release_dc ReleaseDC
 #define lib_win32_select_object SelectObject
@@ -108,6 +108,7 @@ typedef BITMAPINFO lib_win32_bitmapinfo;
 #define LIB_WIN32_SWP_NOZORDER SWP_NOZORDER
 #define LIB_WIN32_WM_APP WM_APP
 #define LIB_WIN32_WM_CHAR WM_CHAR
+#define LIB_WIN32_WM_SYSCHAR WM_SYSCHAR
 #define LIB_WIN32_WM_CLOSE WM_CLOSE
 #define LIB_WIN32_WM_DESTROY WM_DESTROY
 #define LIB_WIN32_WM_ERASEBKGND WM_ERASEBKGND

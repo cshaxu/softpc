@@ -29,64 +29,69 @@ int ui_keyboard_submit_transition(void *context, ui_input_sink sink,
         record_flags, hotkey_modifiers, pressed);
 }
 
-static int ui_keyboard_submit_character(void *context,
-    ui_input_sink sink, lib_u32 scalar)
+static int ui_keyboard_submit_character(const ui_hotkey_matcher *held_keys,
+    void *context, ui_input_sink sink, lib_u32 scalar)
 {
-    lib_u16 virtual_key;
-    lib_u32 key;
-    lib_u16 scan;
-    lib_u8 modifiers;
-    lib_u8 hotkey_modifiers = 0u;
+    static const ui_key modifier_keys[] = { UI_KEY_CONTROL, UI_KEY_ALT, UI_KEY_SHIFT };
+    static const lib_u16 modifier_scans[] = { 0x1du, 0x38u, 0x2au };
+    ui_input_event keys[4] = { 0 };
+    lib_bool owned[4] = { 0 };
+    lib_u16 virtual_key, scan;
+    lib_u32 key, i, count = 0u;
+    lib_u8 modifiers, active = 0u;
 
     if (scalar == 0u || scalar > 0x10ffffu ||
         (scalar >= 0xd800u && scalar <= 0xdfffu)) return 0;
     if (!ui_keyboard_platform_map_scalar(scalar, &virtual_key, &modifiers)) {
-        ui_input_event event;
-        lib_memory_set(&event, 0, sizeof(event));
-        event.type = UI_EVENT_TEXT;
+        ui_input_event event = { .type = UI_EVENT_TEXT };
         event.data.text.scalar = scalar;
         return sink != LIB_NULL && sink(context, &event);
     }
-    if (!ui_keyboard_platform_transition(0u, virtual_key, &scan, &key)) return 0;
-    if ((modifiers & UI_INPUT_MODIFIER_CONTROL) != 0u) {
-        hotkey_modifiers |= UI_HOTKEY_MODIFIER_CONTROL;
-        if (!ui_keyboard_emit(context, sink, 0x1du, UI_KEY_CONTROL, 0u,
-                hotkey_modifiers, 1)) return 0;
+    if (sink == LIB_NULL ||
+        !ui_keyboard_platform_transition(0u, virtual_key, &scan, &key)) return 0;
+    /* Snapshot before any delivery can grow the shared ledger. This local
+     * chord owns only the keys it adds; it is not a second held-key table. */
+    for (i = 0u; i < 4u; ++i) {
+        ui_key identity = i < 3u ? modifier_keys[i] : key;
+        const ui_input_event *held = ui_hotkey_matcher_held_key(held_keys, identity);
+        if (i < 3u) {
+            if (held != LIB_NULL) active |= (lib_u8)(1u << i);
+            if ((modifiers & (1u << i)) == 0u) continue;
+        }
+        if (held != LIB_NULL) keys[count] = *held;
+        else {
+            keys[count].type = UI_EVENT_KEY;
+            keys[count].data.key.key = identity;
+            keys[count].data.key.scan_code = i < 3u ? modifier_scans[i] : scan;
+            owned[count] = LIB_TRUE;
+        }
+        ++count;
     }
-    if ((modifiers & UI_INPUT_MODIFIER_ALT) != 0u) {
-        hotkey_modifiers |= UI_HOTKEY_MODIFIER_ALT;
-        if (!ui_keyboard_emit(context, sink, 0x38u, UI_KEY_ALT, 0u,
-                hotkey_modifiers, 1)) return 0;
+    for (i = 0u; i < count; ++i) {
+        if (i + 1u < count) {
+            if (!owned[i]) continue;
+            active |= keys[i].data.key.key == UI_KEY_CONTROL ? UI_INPUT_MODIFIER_CONTROL :
+                keys[i].data.key.key == UI_KEY_ALT ? UI_INPUT_MODIFIER_ALT : UI_INPUT_MODIFIER_SHIFT;
+        }
+        keys[i].data.key.pressed = LIB_TRUE;
+        keys[i].data.key.modifiers = active;
+        if (!sink(context, &keys[i])) return 0;
     }
-    if ((modifiers & UI_INPUT_MODIFIER_SHIFT) != 0u) {
-        hotkey_modifiers |= UI_HOTKEY_MODIFIER_SHIFT;
-        if (!ui_keyboard_emit(context, sink, 0x2au, UI_KEY_SHIFT, 0u,
-                hotkey_modifiers, 1)) return 0;
-    }
-    if (!ui_keyboard_emit(context, sink, scan, key, 0u,
-            hotkey_modifiers, 1) ||
-        !ui_keyboard_emit(context, sink, scan, key, 0u,
-            hotkey_modifiers, 0)) return 0;
-    if ((modifiers & UI_INPUT_MODIFIER_SHIFT) != 0u) {
-        hotkey_modifiers &= (lib_u8)~UI_HOTKEY_MODIFIER_SHIFT;
-        if (!ui_keyboard_emit(context, sink, 0x2au, UI_KEY_SHIFT, 0u,
-                hotkey_modifiers, 0)) return 0;
-    }
-    if ((modifiers & UI_INPUT_MODIFIER_ALT) != 0u) {
-        hotkey_modifiers &= (lib_u8)~UI_HOTKEY_MODIFIER_ALT;
-        if (!ui_keyboard_emit(context, sink, 0x38u, UI_KEY_ALT, 0u,
-                hotkey_modifiers, 0)) return 0;
-    }
-    if ((modifiers & UI_INPUT_MODIFIER_CONTROL) != 0u) {
-        hotkey_modifiers &= (lib_u8)~UI_HOTKEY_MODIFIER_CONTROL;
-        if (!ui_keyboard_emit(context, sink, 0x1du, UI_KEY_CONTROL, 0u,
-                hotkey_modifiers, 0)) return 0;
+    while (count != 0u) {
+        --count;
+        if (!owned[count]) continue;
+        keys[count].data.key.pressed = LIB_FALSE;
+        if (keys[count].data.key.key == UI_KEY_CONTROL) active &= (lib_u8)~UI_INPUT_MODIFIER_CONTROL;
+        if (keys[count].data.key.key == UI_KEY_ALT) active &= (lib_u8)~UI_INPUT_MODIFIER_ALT;
+        if (keys[count].data.key.key == UI_KEY_SHIFT) active &= (lib_u8)~UI_INPUT_MODIFIER_SHIFT;
+        keys[count].data.key.modifiers = active;
+        if (!sink(context, &keys[count])) return 0;
     }
     return 1;
 }
 
 int ui_keyboard_submit_utf16(ui_keyboard_normalizer *state,
-    void *context, ui_input_sink sink, lib_u16 code_unit)
+    const ui_hotkey_matcher *held_keys, void *context, ui_input_sink sink, lib_u16 code_unit)
 {
     lib_u32 scalar;
 
@@ -104,44 +109,35 @@ int ui_keyboard_submit_utf16(ui_keyboard_normalizer *state,
         scalar = 0x10000u + (((lib_u32)state->pending_high_surrogate -
             0xd800u) << 10u) + ((lib_u32)code_unit - 0xdc00u);
         state->pending_high_surrogate = 0u;
-        return ui_keyboard_submit_character(context, sink, scalar);
+        return ui_keyboard_submit_character(held_keys, context, sink, scalar);
     }
     if (state->pending_high_surrogate != 0u) {
         state->pending_high_surrogate = 0u;
         return 0;
     }
-    return ui_keyboard_submit_character(context, sink, code_unit);
+    return ui_keyboard_submit_character(held_keys, context, sink, code_unit);
 }
 
-int ui_keyboard_submit_record(ui_keyboard_normalizer *state, void *context,
+int ui_keyboard_submit_record(ui_keyboard_normalizer *state,
+    const ui_hotkey_matcher *held_keys, void *context,
     ui_input_sink sink, const ui_keyboard_record *record)
 {
-    lib_u16 scan, key;
+    lib_u16 scan;
     lib_u32 identity;
-    lib_u8 modifiers;
-    lib_bool physical;
-    if (state == LIB_NULL || sink == LIB_NULL || record == LIB_NULL) return 0;
-    if (record->kind == UI_KEYBOARD_CHARACTER) {
-        physical = record->scan != 0u ||
-            (state->character_key != 0u &&
-             ui_keyboard_platform_map_scalar(record->utf16, &key, &modifiers) &&
-             key == state->character_key);
-        state->character_key = 0u;
-        if (physical) return 1;
-        return ui_keyboard_submit_utf16(state, context, sink, record->utf16);
-    }
+    if (state == LIB_NULL || sink == LIB_NULL || record == LIB_NULL) return UI_KEYBOARD_REJECTED;
+    if (record->kind == UI_KEYBOARD_CHARACTER)
+        return ui_keyboard_submit_utf16(state, held_keys, context, sink, record->utf16);
     if (record->kind != UI_KEYBOARD_TRANSITION &&
-        record->kind != UI_KEYBOARD_COMBINED) return 0;
-    physical = ui_keyboard_platform_transition(record->scan, record->key, &scan, &identity);
-    if (physical) {
+        record->kind != UI_KEYBOARD_COMBINED) return UI_KEYBOARD_REJECTED;
+    if (ui_keyboard_platform_transition(record->scan, record->key, &scan, &identity)) {
         state->pending_high_surrogate = 0u;
-        state->character_key = record->kind == UI_KEYBOARD_TRANSITION &&
-            record->scan == 0u && record->pressed ? record->key : 0u;
         return ui_keyboard_emit(context, sink, scan, identity,
             record->flags, record->modifiers, record->pressed);
     }
-    state->character_key = 0u;
-    if (record->kind == UI_KEYBOARD_COMBINED && record->pressed && record->utf16 != 0u)
-        return ui_keyboard_submit_utf16(state, context, sink, record->utf16);
-    return 1; /* No physical or character representation in this packet. */
+    if (record->kind == UI_KEYBOARD_COMBINED) {
+        if (record->pressed && record->utf16 != 0u)
+            return ui_keyboard_submit_utf16(state, held_keys, context, sink, record->utf16);
+        return UI_KEYBOARD_ACCEPTED;
+    }
+    return UI_KEYBOARD_UNMAPPED;
 }

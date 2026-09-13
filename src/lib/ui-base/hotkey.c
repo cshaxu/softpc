@@ -176,3 +176,14 @@ void ui_hotkey_matcher_discard(ui_hotkey_matcher *matcher)
     matcher->held_count = matcher->held_capacity = 0u;
     matcher->failed = LIB_FALSE;
 }
+
+const ui_input_event *ui_hotkey_matcher_held_key(
+    const ui_hotkey_matcher *matcher, ui_key key)
+{
+    lib_size i;
+    if (matcher != LIB_NULL)
+        for (i = 0u; i < matcher->held_count; ++i)
+            if (matcher->held[i].make.data.key.key == key)
+                return &matcher->held[i].make;
+    return LIB_NULL;
+}

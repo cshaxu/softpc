@@ -1,3 +1,5 @@
 # Long-Term Review Ledger
 
+- TODO(Medium): package acceptance owner — T55 S7 observed one x64 stage-7 CAP-to-monitor timeout after DOS; direct rerun, a full rerun and five consecutive package runs passed. Root cause is not established. Admit a baseline-comparison investigation if it recurs or the owner requests it; preserve the current assertion and do not label the symptom fixed.
+
 - TODO(Low): storage owner — overlay page lookup is O(n) per page. Owner explicitly deferred algorithm changes in T55 S4; admit a measured page-index optimization only when a large dirty-page workload demonstrates a useful gain. Preserve current medium semantics.

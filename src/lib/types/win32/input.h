@@ -7,7 +7,7 @@
 typedef SHORT lib_win32_key_state;
 #define lib_win32_get_key_state GetKeyState
 #define lib_win32_map_virtual_key MapVirtualKeyA
-#define lib_win32_key_scan VkKeyScanA
+#define lib_win32_key_scan VkKeyScanW
 
 /* VkKeyScan high-byte flags, as specified by the Win32 API. */
 #define LIB_WIN32_KEY_SCAN_SHIFT 1u

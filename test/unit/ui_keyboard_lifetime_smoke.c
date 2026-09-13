@@ -13,6 +13,11 @@ static void *test_reallocate(void *memory, lib_size size)
 
 /* Execute both production message adapters without owning desktop focus. */
 static void *window_context;
+static unsigned translations;
+static BOOL WINAPI translate_unmapped(const MSG *message)
+{ assert(message->wParam == VK_PACKET); ++translations; return TRUE; }
+#undef lib_win32_translate_message
+#define lib_win32_translate_message translate_unmapped
 static LONG_PTR WINAPI context_pointer(HWND window, int index)
 { (void)window; (void)index; return (LONG_PTR)window_context; }
 #undef lib_win32_get_window_long_ptr_a
@@ -139,23 +144,25 @@ static void adapter_equivalence(unsigned scan)
     HWND handle = (HWND)1;
     LPARAM lp = (LPARAM)scan << 16;
     win32_window_proc(handle, WM_KEYDOWN, 'A', lp);
-    win32_window_proc(handle, WM_CHAR, 'a', lp);
     win32_window_proc(handle, WM_KEYUP, 'A', lp);
     console_record(&console, 'A', scan, 'a', 1);
     console_record(&console, 'A', scan, 'a', 0);
     assert(w.count == 2 && c.count == 2);
-    /* TranslateMessage may enqueue characters behind other physical messages. */
-    win32_window_proc(handle, WM_KEYDOWN, 'A', 0x1e0000);
-    win32_window_proc(handle, WM_KEYDOWN, 'B', 0x300000);
-    win32_window_proc(handle, WM_CHAR, 'a', 0x1e0000);
-    win32_window_proc(handle, WM_CHAR, 'b', 0x300000);
+    assert(translations == 0);
+    /* No characters are generated for physical keys, including scan-less RDP
+     * packets interleaved with releases. No correlation credits can be lost. */
+    win32_window_proc(handle, WM_KEYDOWN, 'A', 0);
+    win32_window_proc(handle, WM_KEYDOWN, 'B', 0);
     win32_window_proc(handle, WM_KEYUP, 'B', 0x300000);
     win32_window_proc(handle, WM_KEYUP, 'A', 0x1e0000);
     console_record(&console, 'A', 0x1e, 'a', 1);
     console_record(&console, 'B', 0x30, 'b', 1);
     console_record(&console, 'B', 0x30, 'b', 0);
     console_record(&console, 'A', 0x1e, 'a', 0);
-    assert(w.count == 6 && c.count == 6);
+    assert(w.count == 6 && c.count == 6 && translations == 0);
+    win32_window_proc(handle, WM_KEYDOWN, VK_PACKET, 0);
+    assert(translations == 1 && w.count == 6);
+    translations = 0;
     assert(lib_memory_compare(w.events, c.events, w.count * sizeof(w.events[0])) == 0);
     w.count = w.attempts = c.count = c.attempts = 0;
     for (unsigned i = 0; i < 2; ++i) {
@@ -167,6 +174,22 @@ static void adapter_equivalence(unsigned scan)
     assert(w.count == 1 && c.count == 1);
     assert(w.events[0].type == UI_EVENT_TEXT && w.events[0].data.text.scalar == 0x1f600);
     assert(lib_memory_compare(w.events, c.events, w.count * sizeof(w.events[0])) == 0);
+    /* Native repeat batches expand at the leaf boundary, preserving schema. */
+    w.count = w.attempts = c.count = c.attempts = 0;
+    win32_window_proc(handle, WM_KEYDOWN, 'A', 0x1e0004);
+    win32_window_proc(handle, WM_KEYUP, 'A', 0x1e0001);
+    for (unsigned i = 0; i < 4; ++i) console_record(&console, 'A', 0x1e, 'a', 1);
+    console_record(&console, 'A', 0x1e, 'a', 0);
+    assert(w.count == 5 && c.count == 5);
+    assert(lib_memory_compare(w.events, c.events, w.count * sizeof(w.events[0])) == 0);
+    w.count = w.attempts = c.count = c.attempts = 0;
+    win32_window_proc(handle, WM_CHAR, 0x4e00, 3);
+    for (unsigned i = 0; i < 3; ++i) console_record(&console, 0, 0, 0x4e00, 1);
+    assert(w.count == 3 && c.count == 3);
+    assert(lib_memory_compare(w.events, c.events, w.count * sizeof(w.events[0])) == 0);
+    w.count = w.attempts = c.count = c.attempts = 0;
+    win32_window_proc(handle, WM_CHAR, 0x4e00, 1);
+    console_record(&console, 0, 0, 0x4e00, 1);
     /* Malformed text does not poison the next complete pair. */
     win32_window_proc(handle, WM_CHAR, 0xdc00, 0);
     console_record(&console, 0, 0, 0xdc00, 1);
@@ -184,10 +207,87 @@ static void adapter_equivalence(unsigned scan)
     ui_component_destroy(&window.base);
     ui_component_destroy(&console.base);
 }
+static void repeat_delivery_failure(void)
+{
+    static ui_window window;
+    static ui_win32_window_context context;
+    lib_memory_set(&window, 0, sizeof(window));
+    lib_memory_set(&context, 0, sizeof(context));
+    capture c = { .reject_at = 3 };
+    ui_component_options options = { .input_context = &c,
+        .input_sink = capture_event, .failure_sink = no_failure };
+    assert(ui_component_initialize(&window.base, &options, no_join, no_dispose) == LIB_STATUS_OK);
+    context.component = &window; window_context = &context;
+    win32_window_proc((HWND)1, WM_KEYDOWN, 'A', 0x1e0005);
+    assert(c.count == 2 && c.attempts == 3 && window.base.stopping);
+    win32_window_proc((HWND)1, WM_KEYDOWN, 'B', 0x300001);
+    assert(c.attempts == 3);
+    ui_component_destroy(&window.base);
+}
+
+static int match_normalized(void *opaque, const ui_input_event *event)
+{
+    void **pair = opaque;
+    return ui_hotkey_matcher_submit(pair[0], event, capture_event, pair[1]);
+}
+static void synthesis_lifetimes(void)
+{
+    /* Reuse the one physical ledger for both sides of all modifiers and an
+     * already-held trigger. Synthesis must release only keys it introduces. */
+    for (unsigned mask = 0; mask < 8; ++mask)
+    for (unsigned side = 0; side < 8; ++side)
+    for (unsigned trigger = 0; trigger < 2; ++trigger) {
+        ui_hotkey_matcher m;
+        ui_keyboard_normalizer n = {0};
+        capture c = {0};
+        void *pair[] = { &m, &c };
+        const ui_key keys[] = { UI_KEY_CONTROL, UI_KEY_ALT, UI_KEY_SHIFT, 'A' };
+        const unsigned scans[] = {0x1d, 0x38, side & 4 ? 0x36 : 0x2a, 0x1e};
+        unsigned flags[] = {side & 1, (side >> 1) & 1, 0, 0};
+        unsigned held = 0;
+        ui_hotkey_matcher_initialize(&m, NULL);
+        for (unsigned i = 0; i < 4; ++i)
+            if (i == 3 ? trigger : (mask & (1u << i))) {
+                assert(submit(&m, &c, keys[i], scans[i], flags[i], mask, 1));
+                ++held;
+            }
+        unsigned first = c.count;
+        ui_keyboard_record text = { .kind = UI_KEYBOARD_CHARACTER, .utf16 = 'A', .pressed = 1 };
+        for (unsigned repeat = 0; repeat < 3; ++repeat)
+            assert(ui_keyboard_submit_record(&n, &m, pair, match_normalized, &text));
+        assert(m.held_count == held);
+        for (unsigned j = first; j < c.count; ++j)
+            if (c.events[j].type == UI_EVENT_KEY && !c.events[j].data.key.pressed)
+                for (unsigned i = 0; i < 4; ++i)
+                    if (i == 3 ? trigger : (mask & (1u << i)))
+                        assert(c.events[j].data.key.key != keys[i]);
+        for (unsigned i = 0; i < 4; ++i)
+            if (i == 3 ? trigger : (mask & (1u << i)))
+                assert(submit(&m, &c, keys[i], scans[i], flags[i], 0, 0));
+        assert(m.held_count == 0);
+        ui_hotkey_matcher_discard(&m);
+    }
+    for (unsigned reject = 1; reject <= 4; ++reject) {
+        ui_hotkey_matcher m;
+        ui_keyboard_normalizer n = {0};
+        capture c = { .reject_at = reject };
+        void *pair[] = { &m, &c };
+        ui_hotkey_matcher_initialize(&m, NULL);
+        ui_keyboard_record text = { .kind = UI_KEYBOARD_CHARACTER, .utf16 = 'A', .pressed = 1 };
+        assert(!ui_keyboard_submit_record(&n, &m, pair, match_normalized, &text));
+        assert(m.failed && c.attempts == reject);
+        assert(!ui_keyboard_submit_record(&n, &m, pair, match_normalized, &text));
+        assert(c.attempts == reject);
+        ui_hotkey_matcher_discard(&m);
+    }
+}
+
 int main(void)
 {
     permutations();
     failure_paths();
+    synthesis_lifetimes();
+    repeat_delivery_failure();
     adapter_equivalence(0);
     adapter_equivalence(0x1e);
     return 0;

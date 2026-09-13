@@ -305,7 +305,7 @@ static lib_win32_dword win32_window_cursor_blink_timeout(
         context->cursor_blink_due - now;
 }
 
-static void win32_window_transition(ui_win32_window_context *context,
+static int win32_window_transition(ui_win32_window_context *context,
     lib_win32_wparam key, lib_win32_lparam lparam, int released)
 {
     ui_keyboard_record record = {
@@ -313,8 +313,16 @@ static void win32_window_transition(ui_win32_window_context *context,
         (lib_u16)key, 0u,
         ui_window_keyboard_flags_from_lparam((lib_u64)lparam),
         ui_window_modifiers_from_key_state(), !released };
-    (void)ui_keyboard_submit_record(&context->keyboard_normalizer, context,
-        win32_window_emit_normalized, &record);
+    lib_u32 count = released ? 1u : (lib_u16)lparam;
+    int result = UI_KEYBOARD_ACCEPTED;
+    if (count == 0u) count = 1u;
+    while (count-- != 0u) {
+        result = ui_keyboard_submit_record(&context->keyboard_normalizer,
+            &context->component->base.hotkey_matcher, context,
+            win32_window_emit_normalized, &record);
+        if (result != UI_KEYBOARD_ACCEPTED) break;
+    }
+    return result;
 }
 
 static lib_i32 win32_window_mouse_clamp(lib_i64 value)
@@ -480,11 +488,11 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
     ui_win32_window_context *context;
 
     if (message == LIB_WIN32_WM_NCCREATE) {
-        lib_win32_createstructa *create = (lib_win32_createstructa *)lparam;
+        lib_win32_createstructw *create = (lib_win32_createstructw *)lparam;
         lib_win32_set_window_long_ptr_a(window, LIB_WIN32_GWLP_USERDATA, (lib_win32_long_ptr)create->lpCreateParams);
     }
     context = win32_window_context(window);
-    if (context == LIB_NULL) return lib_win32_def_window_proc_a(window, message, wparam, lparam);
+    if (context == LIB_NULL) return lib_win32_def_window_proc_w(window, message, wparam, lparam);
     switch (message) {
     case WIN32_WINDOW_MAILBOX_READY:
         if (win32_window_consume_mailboxes(window, context)) {
@@ -530,8 +538,15 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
         return LIB_WIN32_TRUE;
     case LIB_WIN32_WM_KEYDOWN:
     case LIB_WIN32_WM_SYSKEYDOWN:
-        if (win32_window_accepting_input(context))
-            win32_window_transition(context, wparam, lparam, 0);
+        if (win32_window_accepting_input(context) &&
+            win32_window_transition(context, wparam, lparam, 0) == UI_KEYBOARD_UNMAPPED) {
+            lib_win32_msg native = { 0 };
+            native.hwnd = window; native.message = message;
+            native.wParam = wparam; native.lParam = lparam;
+            /* Only unmapped keys may produce characters. Accepted physical
+             * input has no second WM_CHAR stream to correlate or suppress. */
+            lib_win32_translate_message(&native);
+        }
         return 0;
     case LIB_WIN32_WM_KEYUP:
     case LIB_WIN32_WM_SYSKEYUP:
@@ -539,12 +554,17 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
             win32_window_transition(context, wparam, lparam, 1);
         return 0;
     case LIB_WIN32_WM_CHAR:
+    case LIB_WIN32_WM_SYSCHAR:
         if (win32_window_accepting_input(context)) {
             ui_keyboard_record record = {
                 UI_KEYBOARD_CHARACTER, (lib_u16)((lparam >> 16) & 0xffu),
                 0u, (lib_u16)wparam, 0u, 0u, LIB_TRUE };
-            (void)ui_keyboard_submit_record(&context->keyboard_normalizer,
-                context, win32_window_emit_normalized, &record);
+            lib_u32 count = (lib_u16)lparam;
+            if (count == 0u) count = 1u;
+            while (count-- != 0u)
+                if (ui_keyboard_submit_record(&context->keyboard_normalizer,
+                        &context->component->base.hotkey_matcher, context,
+                        win32_window_emit_normalized, &record) == UI_KEYBOARD_REJECTED) break;
         }
         return 0;
     case LIB_WIN32_WM_MOUSEMOVE:
@@ -612,7 +632,7 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
         lib_win32_set_window_long_ptr_a(window, LIB_WIN32_GWLP_USERDATA, 0);
         return 0;
     }
-    return lib_win32_def_window_proc_a(window, message, wparam, lparam);
+    return lib_win32_def_window_proc_w(window, message, wparam, lparam);
 }
 
 static void win32_window_destroy(ui_win32_window_context *context, lib_win32_hwnd window)
@@ -636,7 +656,7 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
     ui_window_win32_state *state = component == LIB_NULL ? LIB_NULL :
         (ui_window_win32_state *)component->worker_state;
     ui_win32_window_context *context;
-    lib_win32_wndclassa klass;
+    lib_win32_wndclassw klass;
     lib_win32_msg message;
     lib_win32_hwnd window;
     int initial_left;
@@ -654,15 +674,15 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
        pointer moves, defeating content capture. */
     klass.hCursor = LIB_NULL;
     klass.hbrBackground = (lib_win32_hbrush)lib_win32_get_stock_object(LIB_WIN32_BLACK_BRUSH);
-    klass.lpszClassName = "LibUxWindow";
-    if (lib_win32_register_class_a(&klass) == 0 && lib_win32_get_last_error() != LIB_WIN32_ERROR_CLASS_ALREADY_EXISTS) {
+    klass.lpszClassName = L"LibUxWindow";
+    if (lib_win32_register_class_w(&klass) == 0 && lib_win32_get_last_error() != LIB_WIN32_ERROR_CLASS_ALREADY_EXISTS) {
         state->startup_status = LIB_STATUS_INVALID_STATE;
         lib_win32_set_event(state->ready);
         return 0u;
     }
     win32_window_initial_bounds(&initial_left, &initial_top, &initial_width,
         &initial_height);
-    window = lib_win32_create_window_ex_a(0, klass.lpszClassName, component->initial_title,
+    window = lib_win32_create_window_ex_w(0, klass.lpszClassName, L"",
         LIB_WIN32_WS_THICKFRAME | LIB_WIN32_WS_OVERLAPPED | LIB_WIN32_WS_CAPTION | LIB_WIN32_WS_SYSMENU |
         LIB_WIN32_WS_MINIMIZEBOX | LIB_WIN32_WS_MAXIMIZEBOX, initial_left, initial_top,
         initial_width, initial_height,
@@ -672,6 +692,7 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
         lib_win32_set_event(state->ready);
         return 0u;
     }
+    lib_win32_set_window_text_a(window, component->initial_title);
     context->transparent_cursor = win32_window_create_transparent_cursor();
     state->startup_status = LIB_STATUS_OK;
     ui_win32_mouse_reset(&context->mouse);
@@ -695,13 +716,12 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
         else if (wait == UI_MAILBOX_WAKE_WAIT_TIMED_OUT)
             win32_window_advance_cursor_blink(window, context);
         while (win32_window_accepting_input(context) &&
-            lib_win32_peek_message_a(&message, LIB_NULL, 0, 0, LIB_WIN32_PM_REMOVE)) {
+            lib_win32_peek_message_w(&message, LIB_NULL, 0, 0, LIB_WIN32_PM_REMOVE)) {
             if (message.message == LIB_WIN32_WM_QUIT) {
                 ui_component_fail(&component->base, LIB_STATUS_IO_ERROR);
                 break;
             }
-            lib_win32_translate_message(&message);
-            lib_win32_dispatch_message_a(&message);
+            lib_win32_dispatch_message_w(&message);
         }
     }
     if (!lib_win32_is_window(window)) ui_component_fail(&component->base, LIB_STATUS_IO_ERROR);

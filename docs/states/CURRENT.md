@@ -2,30 +2,31 @@
 
 ## Current Work
 
-M9 T55 S6 is delivered for owner inspection. Executor P1 `5282f42` is
-pushed; coordinator reviewed its actual diff against the three-item packet.
-Both widths passed 50/50; strict lib passed 3/3. T55 remains open.
+M9 T55 S7 executor delivery is verified, pending committed-diff review.
+Final x64/x86 passed 50/50; strict lib passed 3/3. One earlier package CAP
+timeout is retained in TODO; subsequent full and repeated runs passed.
+Baseline is `5be6fc4`; T55 remains open for owner inspection.
 
-## M9 T55 S6 Packet
+## M9 T55 S7 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: “准入下一个S任务修复以上问题；类似问题也要扫描同样思路处理”. |
-| Objective | Complete key lifetimes, shared physical/text policy for both leaves, direct neutral geometry. |
+| Admission And Approval | Owner: “准入修复 要求代码设计有全局观 干净”. |
+| Objective | Eliminate duplicate physical/character production, share held-key ownership during text synthesis, preserve native Unicode and repeat records. |
 | Non-goals | No MVDM/media/INI, app policy, Console mouse scale, DAG or Linux UI parity change. |
-| Reference Baseline | `2f9d9f1`, delivered S5. |
+| Reference Baseline | `5be6fc4`, owner-tested S6. |
 | Candidate Proposal | [T55 proposal](../proposals/m9-t55-lib-types-external-boundary.md) |
-| Files And ABI Surface | ui-base, both UI leaves, header-only C vocabulary additions, direct tests, docs/manifest and dual EXEs; app-facing ABI unchanged. |
+| Files And ABI Surface | ui-base, both UI leaves, host raw input, types vocabulary, tests, docs/manifest and dual EXEs; app-facing ABI unchanged. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout and Product UI; referenced skills. |
-| Verification | Key lifecycle/permutation, replay/rejection, separate/combined text equivalence, actual adapters, geometry, full x64/x86 and strict lib. |
-| Expected Markers | One key-state ledger; one record normalization entry; no calculation-only native wrappers. |
+| Verification | Interleaved physical/text input, held-key synthesis, real native Unicode entry, repeat batches, failure paths, full x64/x86 and strict lib. |
+| Expected Markers | One held-key ledger; no character-credit table; native translation only for unmapped transitions; Unicode raw reader. |
 | Asset Needs | Rebuild softpc32.exe and softpc64.exe; preserve INI/media. |
-| Reporting Requirements | Three-item ledger, peer sweep, evidence/accounting, complete P push and actual-diff review. |
+| Reporting Requirements | Four-item ledger and native-entry peers, evidence/accounting, complete P push and actual-diff review. |
 | Stop Conditions | Escalate new product semantics or dependency edge; no unrelated repair. |
 | Exit Criteria | Findings and peers verified; dual artifacts, pushed complete P, reviewed diff and clean worktree for owner inspection; T55 open. |
-| Original Owner Request | “有没有系统性的方案解决？我不想添油战术”; “是不是应该统一制作和进入ui-base的字符处理?”; “类似问题记得一并处理。” |
-| Similar-Issue Sweep | All lib key/character callers and state; all ui-window rectangle adapters and calculation wrappers. |
+| Original Owner Request | “请问这次修复会加代码还是减代码 是否能干净的实现”; “准入修复 要求代码设计有全局观 干净”. |
+| Similar-Issue Sweep | Every physical/text producer, synthesis lifetime, native character encoding and repeat boundary in lib. |
 
 ## Current Technical Baseline
 
@@ -36,7 +37,7 @@ Both widths passed 50/50; strict lib passed 3/3. T55 remains open.
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
-  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus passes 49/49
+  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus passes 50/50
   fixed x64 and x86 CTest; its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 
