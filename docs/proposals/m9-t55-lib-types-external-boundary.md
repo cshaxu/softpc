@@ -97,6 +97,26 @@ Package SHA256:
 - softpc32.exe: `5A65F61C2A7AA946A65B3CE45BF33FA0E5167F5DC5824A22EC2A04A9BBB4C016`
 - softpc64.exe: `F55BDB732FC2D091EB432B6651CF92E6652C729B1E370989763AD39E2C4F0BCD`
 
+### S6 P2 coordinator actual-diff review
+
+After P1 `5282f42` was pushed, the coordinator role reviewed the committed
+`2f9d9f1..5282f42` diff: all 27 paths map to the three findings, necessary
+typed C vocabulary, targeted tests/gates, documentary handoff or dual artifacts.
+The matcher retains registry matching and failure semantics; it removes the
+three-list ownership split rather than adding a second matcher. Destruction
+joins before final ledger disposal; retirement's discard leaves a null pointer,
+so worker and workerless cleanup are safe. Both native input producers use
+one record entry, existing physical-key recovery and shared character handling.
+No product action, frame schema, mouse scale or app queue behavior changes.
+
+Removed geometry wrappers have no callers; native marshalling and actual SDK
+operations remain private to Window. Static bypass checks are proven with
+negative direct and split-line calls in both leaves. Rechecked strict lib
+3/3 and governance after push; x86 focused layout/manifest/lifetime 3/3 passed.
+Full x64/x86 results and artifact hashes agree with executor evidence.
+No unresolved item was identified within this bounded S6 ledger. Delivery is
+for owner inspection; neither whole-library perfection nor T55 closure is claimed.
+
 ## S5 admission: identities, independent gates and minimal ownership
 
 Owner: “以上，开始清理。” Baseline `183fc8f`; T55 remains open.
