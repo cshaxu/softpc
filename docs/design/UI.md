@@ -148,7 +148,8 @@ synthetic guest input such as Ctrl+Alt+Del and Alt+Enter. The cooked monitor
 does not use a UI component or hotkey registry and accepts only monitor lines.
 
 On the actual frozen-to-unfrozen transition, the Window requests activation
-once; repeated unfreeze calls do not refocus it or capture the mouse.
+once; repeated unfreeze calls do not refocus it, restart blink timing or capture
+the mouse.
 
 Freezing a Window is a guest-input boundary, not a registered-hotkey boundary:
 its native key transitions still pass through the source-local matcher. A

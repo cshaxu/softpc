@@ -138,6 +138,10 @@ foreach(component IN ITEMS host ui-window)
 endforeach()
 
 # Both leaves must use the same record-level decision, not a low-level bypass.
+file(WRITE "${fixture}/ui-base/probe_interface.h" "int ui_keyboard_submit_utf16(void);\n")
+check_layout(fail)
+file(REMOVE "${fixture}/ui-base/probe_interface.h")
+check_layout(pass)
 foreach(leaf IN ITEMS ui-window ui-console)
     set(input_probe "${fixture}/${leaf}/input_probe.c")
     foreach(call IN ITEMS ui_keyboard_submit_transition ui_keyboard_submit_utf16

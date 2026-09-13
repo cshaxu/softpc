@@ -20,26 +20,38 @@ static BOOL WINAPI read_chunk(HANDLE h, LPVOID bytes, DWORD capacity, LPDWORD co
     return TRUE;
 }
 static unsigned palette_attempts, palette_sets, writes;
+static int partial_write;
 static int text_result=1;
 static DWORD text_written=1;
 static BOOL WINAPI text_write(HANDLE h,LPCVOID text,DWORD n,LPDWORD written,LPVOID r)
 { (void)h;(void)text;(void)r;*written=n==0 ? 0 : text_written;return text_result; }
 static int palette_query_ok, palette_set_ok, cursor_ok = 1;
 static WCHAR first_cell;
+static COORD buffer_size={80,25};
 static BOOL WINAPI screen_info(HANDLE h, PCONSOLE_SCREEN_BUFFER_INFO p)
-{ (void)h; memset(p, 0, sizeof(*p)); p->dwSize.X=80; p->dwSize.Y=25; return TRUE; }
+{ (void)h; memset(p, 0, sizeof(*p)); p->dwSize=buffer_size; return TRUE; }
+static BOOL WINAPI resize_buffer(HANDLE h,COORD size)
+{ (void)h; buffer_size=size; return TRUE; }
 static BOOL WINAPI palette_get(HANDLE h, PCONSOLE_SCREEN_BUFFER_INFOEX p)
 { (void)h; (void)p; ++palette_attempts; return palette_query_ok; }
 static BOOL WINAPI palette_set(HANDLE h, PCONSOLE_SCREEN_BUFFER_INFOEX p)
-{ (void)h; (void)p; ++palette_sets; return palette_set_ok; }
+{ (void)h; (void)p; ++palette_sets; if(palette_set_ok) buffer_size.Y=24; return palette_set_ok; }
 static BOOL WINAPI write_cells(HANDLE h, const CHAR_INFO *p, COORD a, COORD b, PSMALL_RECT r)
-{ (void)h; (void)a; (void)b; (void)r; ++writes; first_cell=p[0].Char.UnicodeChar; return TRUE; }
+{
+    (void)h; (void)a; (void)b; ++writes; first_cell=p[0].Char.UnicodeChar;
+    if (r->Bottom>=buffer_size.Y) r->Bottom=buffer_size.Y-1;
+    if (partial_write==1) r->Right=39;
+    if (partial_write==2) r->Bottom=11;
+    if (partial_write==3) r->Left=1;
+    if (partial_write==4) r->Top=1;
+    return partial_write!=5;
+}
 static BOOL WINAPI cursor_info(HANDLE h, const CONSOLE_CURSOR_INFO *p)
 { (void)h; (void)p; return cursor_ok; }
 static BOOL WINAPI cursor_position(HANDLE h, COORD p)
 { (void)h; (void)p; return cursor_ok; }
-static unsigned readers_started;
-static BOOL WINAPI set_mode(HANDLE h, DWORD mode) { (void)h; (void)mode; return TRUE; }
+static unsigned readers_started, mode_sets;
+static BOOL WINAPI set_mode(HANDLE h, DWORD mode) { (void)h; (void)mode; ++mode_sets; return TRUE; }
 static BOOL WINAPI flush_input(HANDLE h) { (void)h; return TRUE; }
 static HANDLE WINAPI start_reader(LPSECURITY_ATTRIBUTES a, SIZE_T size,
     LPTHREAD_START_ROUTINE entry, LPVOID arg, DWORD flags, LPDWORD id)
@@ -60,6 +72,8 @@ static HANDLE WINAPI start_reader(LPSECURITY_ATTRIBUTES a, SIZE_T size,
 #define lib_win32_write_console_a text_write
 #undef lib_win32_get_console_screen_buffer_info
 #define lib_win32_get_console_screen_buffer_info screen_info
+#undef lib_win32_set_console_screen_buffer_size
+#define lib_win32_set_console_screen_buffer_size resize_buffer
 #undef lib_win32_get_console_screen_buffer_info_ex
 #define lib_win32_get_console_screen_buffer_info_ex palette_get
 #undef lib_win32_set_console_screen_buffer_info_ex
@@ -144,6 +158,7 @@ int main(void)
     palette_set_ok=1;
     assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
     assert(b.previous_palette[0]==1 && palette_sets==2);
+    assert(buffer_size.Y==25); /* Palette must precede surface preparation. */
     assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
     assert(palette_sets==2);
     cursor_ok=0;
@@ -165,7 +180,26 @@ int main(void)
         assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
         assert(writes==++previous_writes && b.previous_columns==80);
     }
+    /* Failed B can partly overwrite A: retrying A must not hit the old cache. */
+    for (int failure=1;failure<=5;++failure) {
+        partial_write=failure; f.text[0]='B';
+        assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_IO_ERROR);
+        assert(!b.previous_columns && !b.previous_rows);
+        unsigned attempted=writes;
+        partial_write=0; f.text[0]=0xdb;
+        assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+        assert(writes==attempted+1 && b.previous_columns==80);
+    }
     DeleteCriticalSection(&b.transaction_lock);DeleteCriticalSection(&b.output_lock);CloseHandle(stop);lib_console_release(b.console);
     cooked_restore();
+    /* Disposal must not restore native mode a second time. */
+    host_console_backend *disposed=calloc(1,sizeof(*disposed));
+    disposed->input=disposed->output=INVALID_HANDLE_VALUE;
+    InitializeCriticalSection(&disposed->output_lock);
+    InitializeCriticalSection(&disposed->transaction_lock);
+    assert(host_console_backend_deactivate(disposed,NULL)==LIB_STATUS_OK);
+    unsigned restored=mode_sets;
+    host_console_backend_destroy(disposed);
+    assert(mode_sets==restored);
     return 0;
 }

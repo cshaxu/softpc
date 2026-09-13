@@ -1,5 +1,133 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S14 native completion and lifecycle repairs
+
+Baseline `3cabea6`. Original owner admission: “准入新的S任务执行；单人双角色，
+完成后，编译测试提交推送，并等我测试。这次发现的问题的同类问题也要一并解决，
+拒绝拖泥带水。要求第一性原理顶层设计，禁止添油战术。”
+
+One existing worker fault/retirement path remains authoritative. No recovery
+loop, new state owner, worker or product policy is introduced. Broker owns
+deactivation sequencing; backend disposal only frees inactive resources.
+
+| Repair | Required proof |
+| --- | --- |
+| Repeated unfreeze has no transition side effects | Controlled clock: repeated calls neither refocus nor postpone blink. |
+| Console full-frame completion is truthful | Clipped/failed native writes invalidate completed cache; identical retry reaches native output. |
+| Window output failures reach its existing fault tail | Inject paint, cursor inversion and invalidation failures; reject later requests and retire once. |
+| Console deactivation has one owner | Broker normal/create-failure cleanup deactivates once; disposal never deactivates. Existing failed-reader retention remains. |
+| UTF-16 helper is implementation-only | All tests use CHARACTER records; no public declaration or compatibility wrapper remains. |
+
+Finite similar-issue universe: every native call in ui-window/win32 component,
+geometry and mouse; ui-console/win32 component; host/win32 Console; their common
+lifecycle callers and Linux counterparts; every submit_utf16 reference.
+Unit of coverage is a call family with all production sites accounted for.
+Dispositions are mandatory checked success, deliberate best effort (with
+contractual reason), expected cancellation/no-work, or repaired and tested.
+Completion requires each family classified, focused fault-injection evidence,
+full dual-width regression, strict library and manifest/DAG/governance checks,
+actual committed-diff coordinator review and pushed clean owner-test handoff.
+No whole-library defect-free claim follows from this bounded sweep.
+
+Native-call classification and outcomes will be retained in the S14 record.
+Existing modifier snapshots, frozen input policy, mouse scaling, Linux
+placeholders, app/MVDM, media/INI and deferred fullscreen/CLS work are unchanged.
+
+### S14 native-call coverage and evidence
+
+#### Scope and ownership
+
+Owner admission and the five-item finite ledger are in the
+[retained proposal](M9-T55-lib-types-external-boundary-proposal.md#s14-native-completion-and-lifecycle-repairs).
+Baseline: `3cabea6`. No app, MVDM, media, INI, input ABI or Linux capability
+change. Single executor, then coordinator reviewing the committed diff.
+
+#### Native-call convergence ledger
+
+Inventory command: `rg -n 'lib_win32_[a-z_]+\('` over ui-window/win32,
+ui-console/win32 and host/win32/console.c; read their common creation/disposal
+callers and Linux counterparts. Each row accounts for all sites of the named
+families, including cleanup sites. Supporting mailbox wake and input adapters
+were also inspected. This is bounded native completion/lifecycle coverage,
+not a claim that every possible library defect has been eliminated.
+
+| Call family / sites | Disposition and evidence |
+| --- | --- |
+| Window GetDC, CreateCompatibleDC, CreateDIBSection, SelectObject | Required resource results already checked; surface state commits only after selection. Existing selection/DC fault probes retained. |
+| Window BeginPaint, StretchBlt, InvertRect | Required; newly propagate to existing component fault/retirement tail. EndPaint always follows acquired paint DC even on failure. Retirement test injects each failure. |
+| All Window InvalidateRect sites: frame, blink, frozen control, resize | Required; one local checked redraw helper. Failed frame invalidation is not acknowledged. Retirement test injects rejection. |
+| Window CreateCursor | Required capture-visibility resource; NULL now fails startup with cleanup, no source-retired event. Retirement test covers creation failure. |
+| RegisterClassW, CreateWindowExW, SetWindowTextA, CreateEventA, CreateThread (both leaves) | Existing startup results checked; class-already-exists is accepted. Title control failure uses existing terminal path. |
+| Window GetCursorPos, MonitorFromPoint/Window, GetMonitorInfo, AdjustWindowRectEx, GetWindowRect, GetClientRect, SetWindowPos | Geometry is best effort: retain old actual size/cache on query/resize failure, use documented initial-size fallback. No failed resize is cached complete. Bounds/capture tests retained. Zero-sized/minimized surfaces need no paint. |
+| ShowWindow, SetForegroundWindow, SetActiveWindow, SetFocus, UpdateWindow | Best-effort foreground or immediate-paint request, not proof of reader ownership or frame completion. ShowWindow returns prior visibility, not success. Paint errors are handled in WM_PAINT. No focus retry loop. |
+| Get/SetCapture, ClientToScreen, ClipCursor (capture/update) | Capture validates actual owner; failed clipping cancels/releases capture. Capture-change and geometry probes retained. |
+| SetCursor, LoadCursor, capture release/unclip | SetCursor returns previous cursor, not success. Shared system arrow and explicit release are cleanup; no retrying or stealing another owner's capture. Transparent cursor acquisition is checked separately. |
+| Window PostMessage mouse wake | Existing failed post immediately flushes its owned pending delta through the same checked input sink; no lost pending mouse event. |
+| PeekMessage, DispatchMessage, SendMessage, TranslateMessage, DefWindowProc | Returns are message presence/results, not generic success. Unexpected QUIT/destroy reaches the terminal path. Only unmapped transitions request text; tests retain sink-failure/frozen behavior. |
+| Window Get/SetWindowLongPtr, IsWindow/IsZoomed, GetModuleHandle, GetStockObject, GetTickCount and input GetKeyState | Identity/query values, not output completion. Handles/resources stay private to their owning worker. No extra product state. |
+| Window ReleaseDC, restore SelectObject, DeleteObject/DC, DestroyCursor/Window; native CloseHandle and critical-section teardown | One-way cleanup on owned valid resources, not output completion; no recursive recovery or fake retry. Window destruction occurs on its creating worker, private handles close only after join. Native object misuse/corruption is outside the supported ownership contract. |
+| Private readiness SetEvent and leaf worker joins | Event/thread handles never escape or close before join; no supported competing close. These are ownership invariants, not recoverable rendering failures. Runtime mailbox waits decode FAULT; deterministic worker-exit tests retain barrier proof. |
+| Console CreateFile/GetConsoleMode, SetConsoleMode, FlushConsoleInputBuffer, stop-event/thread creation | Checked startup/activation results. Broker now owns failed-initial-activation deactivation as well as normal destruction; backend destroy only disposes. Fake broker checks cleanup and process claim reuse. |
+| Console ReadConsoleA/ReadConsoleInputW and reader waits | Unexpected failure reports IO_FAILURE; signaled retirement is expected cancellation. Existing raw/cooked reader failure probes retained. |
+| Console SetEvent, CancelIoEx/CancelSynchronousIo, WriteConsoleInputA, retirement waits | Stop signal and synthetic write/count checked. Cancellation requests are best effort; joined reader is the proof. Failure retains live-reader storage; no next reader starts. Existing broker and reader tests retained. |
+| Console GetConsoleScreenBufferInfo/SetConsoleScreenBufferSize | Required surface preconditions already checked. SetConsoleWindowInfo viewport is best effort across terminal hosts. |
+| Console Get/SetConsoleScreenBufferInfoEx palette | Best effort for terminal capability; palette cache commits only after successful application. Existing palette refusal probes retained. |
+| Console WriteConsoleA, WriteConsoleOutputW | Required byte count/full returned rectangle; invalidate cache before potentially partial mutation, commit only on full output. Added four clipped edges and API failure, followed by old-frame retry. |
+| Console SetConsoleCursorPosition/Info | Required and already propagated; existing cursor-failure tests retained. Native text cache truth is separate from cursor state. |
+| Logical Console event delivery, sink detach and ui-console frame output | Void event consumer, optional absent sink and stale generation are expected; ui-base owns UI sink failure. NOT_CURRENT retains frame without spinning, real output failure retires. Removed root ui-console disposal's redundant detach; worker or failed start is sole detach owner. Barrier tests retained. |
+| Linux host Console / UI leaves | Explicit unsupported startup and inert disposal; no native worker exists to deactivate. No parity expansion. |
+| UTF-16 helper references | Implementation-local only; all three former direct test consumers use CHARACTER records. Static gate rejects exported/bypass helper references. |
+
+Repeated unfreeze now skips all transition work. Controlled-clock tests check
+the phase/deadline, not just focus. The five primary repairs introduce no
+additional thread, lock, persistent flag or recovery state machine.
+
+Native contract references: [WriteConsoleOutput](https://learn.microsoft.com/en-us/windows/console/writeconsoleoutput)
+reports the actual written rectangle; [EndPaint](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-endpaint)
+has an always-nonzero return; [SetCursor](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setcursor)
+returns the previous cursor. These distinctions prevent meaningless generic
+return-value checks.
+
+#### Verification
+
+Initial x64 regression exposed two failures, neither waived: a premature S14
+history filename made the governance gate expect S15 (evidence is now retained
+in this proposal until closure), and real package startup returned host I/O
+failure. The latter repeated identically: a bounded temporary diagnostic showed
+WriteConsoleOutput's actual rectangle `0,0,79,23`, despite an 80x25 request.
+Palette application occurred AFTER the size precondition and changed native
+geometry. Moved the existing size preparation AFTER palette application, with
+no additional native calls, retries or persistent state. Added a fake palette
+setter that shrinks the buffer to 24 rows; the same production path must restore
+25 before writing. The unchanged real package sequence then passed. Diagnostic
+code was removed; it was not a permanent output path or committed trace.
+
+Final x64 regression: 52/52 (59.17 s); final x86: 52/52 (36.92 s).
+Real package sequence passed at both widths, including start/ver/cls/CAP/
+stop/start and observing a fresh DOS boot. The first x86 invocation ended
+after test 24 without a failed assertion or completed CTest report; it is not
+counted as a pass. An unchanged complete rerun supplied the result above.
+No timeout or assertion was weakened. Strict C11 library build with
+`-Wall -Wextra -Wpedantic -Werror` and standalone CTest: 3/3.
+Manifest, component DAG, negative gate self-test and documentation governance
+passed. Linux decoder tests use the selected Linux body on Windows; no Linux
+desktop runtime parity claim is made. Committed-diff coordinator review is pending.
+
+Fixed artifact identities:
+
+- softpc32.exe: PE 014C, 4662537 bytes, SHA256
+  `EBB111A21D7FEC4EAB4407CFF0309E07CB2FBA9911F389C551EFCAE7B0E2536F`.
+- softpc64.exe: PE 8664, 2517202 bytes, SHA256
+  `FACC845A84790C59EABD5DADF4BEF13EA7C8A66A8366819DB2507BAC3E530C60`.
+
+Tracked production C/H accounting (`git diff --numstat 3cabea6 -- src/lib`):
+7 paths, +54/-34, net +20. Tests: 7 unit paths +134/-23; one static-gate
+self-test +4/-0; library gate +3/-0. Documentation, manifest and the two fixed
+EXEs are excluded. No MVDM, app, standalone host, INI or media changes.
+One checked redraw helper replaces repeated unchecked calls, one native
+output sequence establishes its preconditions last, and existing worker and
+broker owners retain all state. No transitional public helper remains.
+
 ## S13 admission: four boundary repairs
 
 Baseline `fccf9ab`. Owner: “准入一个新的S任务完成修复、编译、测试、提交、推送，并等我测试”.

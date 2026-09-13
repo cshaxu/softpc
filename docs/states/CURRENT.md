@@ -2,32 +2,31 @@
 
 ## Current Work
 
-M9 T55 S13 implementation and verification are complete and await owner testing.
-Executor P1 `6609562` is pushed; coordinator review of that committed diff passed.
-The four repairs passed x64 52/52, x86 52/52 and strict-library 3/3 tests.
-S12's verified delivery is retained without inferring owner acceptance.
-T55 remains open; no next S is admitted while awaiting this test response.
+M9 T55 S14 implementation and verification are complete: x64 52/52, x86 52/52,
+strict library 3/3. Executor delivery and committed-diff coordinator review
+are next. S13 verified delivery is retained without inferring owner testing.
+T55 remains open; this delivery awaits the owner's manual test.
 
-## M9 T55 S13 Packet
+## M9 T55 S14 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: “准入一个新的S任务完成修复、编译、测试、提交、推送，并等我测试”. |
-| Objective | Complete the four S13 ledger entries without additional owners or execution paths. |
+| Admission And Approval | Owner: “准入新的S任务执行；单人双角色，完成后，编译测试提交推送，并等我测试。” |
+| Objective | Complete the five S14 repairs and classify every related native failure path, using existing owners and fault cleanup. |
 | Non-goals | No matcher snapshot restriction, MVDM, media, INI, app lifecycle, mouse scaling, deferred mode-roundtrip repair or T closure. |
-| Reference Baseline | fccf9ab, clean main after S12 delivery. |
+| Reference Baseline | 3cabea6, clean main after S13 delivery and read-only audit. |
 | Candidate Proposal | [Shared-library audit repairs](../proposals/m9-lib-activation-audit-repairs.md). |
-| Files And ABI Surface | Console INPUT_RESET event, host binding helper, ui-console input state, Window surface/geometry, host text cache; corresponding tests and design/READMEs. |
+| Files And ABI Surface | Window paint/control/startup, host Console output/disposal, shared input helper visibility; tests and component contracts. No new public API. |
 | Applicable Rules | Architecture, coding, execution and documentation rules and linked skills; current architecture, source layout and UI authorities. |
-| Verification | Reset before native activation, prepare failure/rollback and input rebind probes; SelectObject failure, cursor scanline mapping, mixed text/frame writes; full x64/x86 CTest and strict lib. |
-| Expected Markers | Four ledger rows proved; accepted modifier snapshots preserved; no new worker, lock or persistent state. |
+| Verification | Native drawing/partial-output failure injection, unfreeze timing, single deactivation/create failure, record-based UTF-16; full x64/x86 CTest and strict lib. |
+| Expected Markers | Five ledger rows and native-call dispositions proved; no new worker, lock, state machine or recovery loop. |
 | Asset Needs | Existing non-mutating package media; refresh only fixed x86/x64 EXEs; no trace recordings. |
 | Reporting Requirements | Per-item proof, similar-issue dispositions, production/test line accounting, executor commit/push then coordinator actual-diff review. |
 | Stop Conditions | Do not expand product semantics or hide failed tests; unresolved boundary changes require owner direction. |
-| Exit Criteria | Four repairs verified, both EXEs built, manifest/DAG/governance and full regression pass, executor push and coordinator review, clean worktree awaiting owner testing. |
-| Original Owner Request | Keep matcher snapshots; reset component input before the next reader; check SelectObject failure; honor cursor top/bottom; invalidate frame cache after text writes. |
-| Similar-Issue Sweep | All binding/activation and logical event consumers; surface creation/selection cleanup; cursor calculations; native text/frame writers and cache updates. |
+| Exit Criteria | Five repairs and similar-path sweep verified, both EXEs built, manifest/DAG/governance and full regression pass, executor push and coordinator review, clean worktree awaiting owner testing. |
+| Original Owner Request | “这次发现的问题的同类问题也要一并解决，拒绝拖泥带水。要求第一性原理顶层设计，禁止添油战术。” |
+| Similar-Issue Sweep | Window/Console native creation, drawing, update, wait and disposal calls; completed caches, transition side effects and all UTF-16 helper callers. |
 
 ## Current Technical Baseline
 

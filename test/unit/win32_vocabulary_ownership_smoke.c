@@ -89,7 +89,8 @@ int main(void)
         CHECK(ui_keyboard_platform_map_scalar('a', &key, &modifiers));
         CHECK(key == 'A' && modifiers == expected);
         emitted_count = 0u;
-        CHECK(ui_keyboard_submit_utf16(&state, NULL, LIB_NULL, capture, 'a', 1u));
+        CHECK(ui_keyboard_submit_record(&state, NULL, LIB_NULL, capture,
+        &(ui_keyboard_record){ .kind=UI_KEYBOARD_CHARACTER, .utf16='a', .repeat_count=1u }));
         CHECK(emitted_count == count * 2u + 2u);
         CHECK(emitted[count].data.key.key == 'A');
         CHECK(emitted[count].data.key.modifiers == expected);
@@ -108,7 +109,8 @@ int main(void)
         ui_keyboard_normalizer state = {0};
         layout_result = VK_OEM_102;
         emitted_count = 0;
-        CHECK(ui_keyboard_submit_utf16(&state, NULL, NULL, capture, '<', 3));
+        CHECK(ui_keyboard_submit_record(&state, NULL, NULL, capture,
+        &(ui_keyboard_record){ .kind=UI_KEYBOARD_CHARACTER, .utf16='<', .repeat_count=3 }));
         CHECK(emitted_count == 3);
         for (unsigned i = 0; i < emitted_count; ++i)
             CHECK(emitted[i].type == UI_EVENT_TEXT && emitted[i].data.text.scalar == '<');

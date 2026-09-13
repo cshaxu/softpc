@@ -23,6 +23,8 @@ static HGDIOBJ WINAPI select_bitmap(HDC d,HGDIOBJ o)
 static BOOL WINAPI delete_bitmap(HGDIOBJ o) { assert(o==(HGDIOBJ)3);++deleted_bitmaps;return TRUE; }
 static BOOL WINAPI delete_dc(HDC d) { assert(d==(HDC)2);++deleted_dcs;return TRUE; }
 static DWORD WINAPI clock_tick(void) { return ticks; }
+static BOOL WINAPI invalidate(HWND w,const RECT *r,BOOL erase)
+{ (void)w;(void)r;(void)erase;return TRUE; }
 static void *context;
 static void notify_loss(void);
 static HWND WINAPI get_capture(void) { return owner; }
@@ -72,6 +74,8 @@ static BOOL WINAPI title(HWND w,LPCSTR text) { (void)w;(void)text;return title_o
 #define lib_win32_set_window_text_a title
 #undef lib_win32_get_tick_count
 #define lib_win32_get_tick_count clock_tick
+#undef lib_win32_invalidate_rect
+#define lib_win32_invalidate_rect invalidate
 #undef lib_win32_get_dc
 #undef lib_win32_create_compatible_dc
 #undef lib_win32_create_dibsection
@@ -162,6 +166,12 @@ int main(void)
     assert(c.cursor_blink_visible);
     win32_window_advance_cursor_blink((HWND)1,&c);
     assert(!c.cursor_blink_visible && c.cursor_blink_due==500);
+    /* A repeated unfreeze must not reset either phase or deadline. */
+    for (ticks=300;ticks<500;ticks+=50) {
+        assert(ui_window_unfreeze(&window)==LIB_STATUS_OK);
+        assert(win32_window_consume_mailboxes((HWND)1,&c));
+        assert(!c.cursor_blink_visible && c.cursor_blink_due==500);
+    }
     c.frozen=1; ticks=500; win32_window_advance_cursor_blink((HWND)1,&c);
     assert(!c.cursor_blink_visible);
     c.frozen=0; c.cursor_blink_due=10; ticks=0xfffffff0u;

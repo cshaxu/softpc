@@ -25,6 +25,7 @@ static int host_console_fail_next_retirement;
 static int host_console_prepare_saw_active;
 static int host_console_wait_for_callback;
 static unsigned activations;
+static unsigned deactivations, disposals;
 static unsigned input_resets, activation_attempts;
 static lib_console *reset_console;
 static lib_u32 reset_generation;
@@ -56,6 +57,8 @@ lib_status host_console_backend_create(host_console_backend **out_native)
 
 void host_console_backend_destroy(host_console_backend *native_console)
 {
+    assert(native_console->active==NULL);
+    ++disposals;
 #ifdef _WIN32
     DeleteCriticalSection(&native_console->transaction);
 #else
@@ -97,6 +100,7 @@ lib_status host_console_backend_activate(host_console_backend *native_console,
 lib_status host_console_backend_deactivate(host_console_backend *native_console,
     lib_bool *out_cooked_request)
 {
+    ++deactivations;
     if (host_console_fail_next_retirement) {
         host_console_fail_next_retirement = 0;
         return LIB_STATUS_IO_ERROR;
@@ -279,6 +283,10 @@ int main(void)
 
     assert(lib_console_create(&first) == LIB_STATUS_OK);
     assert(lib_console_create(&second) == LIB_STATUS_OK);
+    host_console_fail_next_activation=1;
+    assert(host_console_broker_create(&broker,first,HOST_CONSOLE_RAW_EVENTS)==LIB_STATUS_IO_ERROR);
+    assert(!broker && deactivations==1 && disposals==1);
+    assert(lib_console_write_text(first,"x",1)==LIB_STATUS_NOT_CURRENT);
     assert(lib_console_set_event_sink(first, activated_sink, NULL) == LIB_STATUS_OK);
     assert(host_console_broker_create(&broker, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_OK);
