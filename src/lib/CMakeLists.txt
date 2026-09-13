@@ -143,5 +143,12 @@ if(BUILD_TESTING)
         COMMAND "${CMAKE_COMMAND}"
             -DLIBRARY_ROOT:PATH=${LIBRARY_SOURCE_ROOT}/../test/fixtures/lib-component-dag
             -DLIBRARY_VERIFIER:FILEPATH=${CMAKE_CURRENT_LIST_DIR}/verify_component_dependencies.cmake
+            "-DLIBRARY_EXPECTED_ERROR:STRING=Forbidden component edge: host -> ui-window"
+            -P "${LIBRARY_SOURCE_ROOT}/../test/support/component_dag_forbidden_include_smoke.cmake")
+    add_test(NAME library.component-dag-relative-include
+        COMMAND "${CMAKE_COMMAND}"
+            -DLIBRARY_ROOT:PATH=${LIBRARY_SOURCE_ROOT}/../test/fixtures/lib-component-relative-include
+            -DLIBRARY_VERIFIER:FILEPATH=${CMAKE_CURRENT_LIST_DIR}/verify_component_dependencies.cmake
+            "-DLIBRARY_EXPECTED_ERROR:STRING=canonical lib/"
             -P "${LIBRARY_SOURCE_ROOT}/../test/support/component_dag_forbidden_include_smoke.cmake")
 endif()

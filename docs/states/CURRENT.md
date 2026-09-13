@@ -4,8 +4,8 @@
 
 M9 T55 S20 is admitted: make library pointer-output failures deterministic and
 turn the approved component DAG into a source-level as well as build-level
-gate. It also removes two narrow local contract/ownership tails. T55 remains
-open.
+gate, including canonical source include spelling. It also removes narrow local
+contract/ownership and no-op forwarding tails. T55 remains open.
 Owner package INI and media are preserved.
 
 ## M9 T55 S20 Packet
@@ -18,16 +18,16 @@ Owner package INI and media are preserved.
 | Non-goals | No MVDM/media changes, product lifecycle redesign, frame/broker/UI-leaf merger, Linux parity expansion, new error framework, extra queue/worker/retry path, ABI signature change, or T closure. |
 | Reference Baseline | 88e52bb; clean worktree, dual-width S19 56/56 CTest, strict library gates, preserved package INI/media. |
 | Candidate Proposal | [S20 contract and boundary gates](../proposals/m9-t55-s20-lib-contract-and-boundary-gates.md). |
-| Files And ABI Surface | Applicable lib output APIs, component-DAG verifier and focused tests, ui-console/storage local status/ownership paths, and current baseline prose; no public function signature change. |
+| Files And ABI Surface | Applicable lib output APIs, component-DAG verifier and focused tests, ui-console/storage local status/ownership paths, one internal ui-window forwarding helper, and current baseline prose; no public function signature change. |
 | Applicable Rules | Architecture, coding, execution and documentation rules/skills and design authorities. |
 | Verification | Focused output-contract/DAG/status proofs, fresh x64/x86 builds and full CTest, strict library CTest, manifest/DAG/documentation gates. |
-| Expected Markers | Applicable pointer outputs are null after failure; forbidden source includes fail the gate; local status/ownership tails are gone. |
+| Expected Markers | Applicable pointer outputs are null after failure; forbidden direct and relative source includes fail the gate; local status/ownership and no-op forwarding tails are gone. |
 | Asset Needs | Refresh fixed x86/x64 EXEs only; preserve media and INI bytes. |
 | Reporting Requirements | Frozen ledger, changed-path/line accounting, focused/full tests, executor P push and separate actual-diff coordinator review. |
 | Stop Conditions | Do not merge components, change UI/product semantics, create a runtime boundary layer, loosen the DAG, or expand storage behavior. |
 | Exit Criteria | Each ledger row is implemented/proved, all applicable pointer-output hits are disposed, builds/tests/gates pass, commit/push; wait for manual testing and keep T55 open. |
 | Original Owner Request | “批准。” |
-| Similar-Issue Sweep | All production output-pointer APIs, all lib direct component includes, and all same-class null/no-op or transferred-ownership cleanup paths. |
+| Similar-Issue Sweep | All production output-pointer APIs, all quoted lib component includes, and all same-class null/no-op or transferred-ownership cleanup paths. |
 
 ## Current Technical Baseline
 
@@ -38,9 +38,9 @@ Owner package INI and media are preserved.
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
-  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus has S19 x64/x86
-  builds with 56/56 CTest;
-  standalone library gates pass 3/3. Its path-scoped standalone MSVC
+  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus has S20 x64/x86
+  builds with 57/57 CTest;
+  strict standalone library gates pass 6/6. Its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 
 ## Recent M9 Closures

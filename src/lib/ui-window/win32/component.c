@@ -226,8 +226,14 @@ static int win32_window_ensure_surface(lib_win32_hwnd window,
 static int win32_window_display_rect(const ui_win32_window_context *context,
     lib_u32 source_width, lib_u32 source_height, ui_window_rect *display)
 {
-    return context != LIB_NULL && ui_window_display_rect(context->client_width,
-        context->client_height, source_width, source_height, display);
+    if (context == LIB_NULL || display == LIB_NULL || source_width == 0u ||
+        source_height == 0u || context->client_width <= 0 ||
+        context->client_height <= 0) return 0;
+    display->left = 0;
+    display->top = 0;
+    display->right = context->client_width;
+    display->bottom = context->client_height;
+    return 1;
 }
 
 static void win32_window_capture_client_size(lib_win32_hwnd window,

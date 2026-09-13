@@ -10,14 +10,18 @@ The admitted S20 scope is recorded in
   ownership-transfer API `lib_storage_medium_replace` is intentionally
   excluded: invalid replacement must preserve its existing lease/retired-slot
   contract.
-- The existing component dependency verifier now scans direct quoted
-  `lib/<component>/...` includes in every library source/header and validates
-  them against the same exact edge map as CMake linkage. A tracked fixture
-  proves `host -> ui-window` is rejected.
+- The component dependency verifier now scans every quoted include in each
+  library source/header: each must use canonical `lib/<component>/...`
+  spelling, then its edge is validated against the same exact map as CMake
+  linkage. Tracked fixtures prove both `host -> ui-window` and a relative
+  include are rejected.
 - `ui_console_publish_text_frame` rejects null required arguments but retains
   a graphics-frame no-op. `lib_storage_medium_open` no longer performs the
   known no-op close after successful file ownership transfer.
-- `CURRENT.md` now reports the prior S19's actual 56/56 dual-width baseline.
+- The S20 P1 technical baseline is recorded as its actual 57/57 dual-width
+  and 5/5 strict-library result.
+- The one-caller internal `ui_window_display_rect()` forwarding helper was
+  removed; its only Window caller constructs the unchanged full client rect.
 
 ## Verification
 
@@ -25,13 +29,16 @@ The admitted S20 scope is recorded in
   every public object-output API whose failure can be reached without native
   allocation or a running worker.
 - x64 and x86 both build and pass full CTest: 57/57.
-- Strict-library CTest passes 5/5, including the normal source-DAG gate and
-  its forbidden-include fixture.
+- Strict-library CTest passes 6/6, including the normal source-DAG gate and
+  its forbidden-edge and relative-include fixtures.
 - Manifest, source boundary and documentation-governance gates pass.
 
 ## Accounting
 
-Tracked production paths: 15; tracked test/gate paths: 3. Source/test change
-is +151/-40 lines before documentation and generated package executables.
-The retained public paths keep their existing ownership; no duplicate runtime
-path, queue, worker, or callback was added.
+S20 P1 tracked production paths: 15; tracked test/gate paths: 3. Its
+source/test change was +151/-40 lines before documentation and generated
+package executables. S20 P2 changes five production/gate paths (+25/-21) and
+two focused test paths (+6/-4), excluding the regenerated manifest,
+documentation, and package executables. The retained public paths keep their
+existing ownership; no duplicate runtime path, queue, worker, or callback was
+added.

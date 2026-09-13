@@ -29,11 +29,16 @@ foreach(source IN LISTS library_component_sources)
         continue()
     endif()
     file(READ "${source}" source_text)
-    string(REGEX MATCHALL "#[ \t]*include[ \t]*\"lib/[^/]+/[^\"]+\""
-        component_includes "${source_text}")
-    foreach(component_include IN LISTS component_includes)
-        string(REGEX REPLACE ".*\"lib/([^/]+)/.*" "\\1"
-            dependency "${component_include}")
+    string(REGEX MATCHALL "#[ \t]*include[ \t]*\"[^\"]+\""
+        quoted_includes "${source_text}")
+    foreach(quoted_include IN LISTS quoted_includes)
+        string(REGEX REPLACE ".*\"([^\"]+)\"" "\\1"
+            include_path "${quoted_include}")
+        if(NOT include_path MATCHES "^lib/([^/]+)/")
+            message(FATAL_ERROR "Library source include must use canonical lib/<component>/ path: ${relative_source}: ${include_path}")
+        endif()
+        string(REGEX REPLACE "^lib/([^/]+)/.*" "\\1"
+            dependency "${include_path}")
         if(dependency IN_LIST library_components)
             library_check_edge("${owner}" "${dependency}")
         endif()
