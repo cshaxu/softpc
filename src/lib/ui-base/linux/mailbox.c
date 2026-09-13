@@ -66,6 +66,3 @@ ui_mailbox_wake_wait_result ui_mailbox_wake_wait(
     (void)lib_linux_pthread_mutex_unlock(&value->lock);
     return outcome;
 }
-ui_mailbox_wake_wait_result ui_mailbox_wake_wait_messages(
-    const ui_mailbox_wake *wake, lib_u32 timeout_milliseconds)
-{ return ui_mailbox_wake_wait(wake, timeout_milliseconds); }

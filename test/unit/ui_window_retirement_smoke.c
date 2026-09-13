@@ -10,6 +10,12 @@ static void input_scenario(void);
 static void paint_scenario(void);
 static unsigned paint_ends;
 static int inject_output_failure;
+static unsigned notification_attempts;
+static BOOL WINAPI notify(HWND w, UINT m, WPARAM a, LPARAM b)
+{
+    if (scenario == 14 && notification_attempts++ == 0) return FALSE;
+    return SendNotifyMessageW(w,m,a,b);
+}
 static BOOL WINAPI invalidate(HWND w,const RECT *r,BOOL erase)
 { return inject_output_failure && scenario==9 ? FALSE : InvalidateRect(w,r,erase); }
 static BOOL WINAPI blit(HDC d,int x,int y,int w,int h,HDC s,int sx,int sy,int sw,int sh,DWORD op)
@@ -37,19 +43,20 @@ static BOOL WINAPI no_foreground(HWND window) { (void)window; return TRUE; }
 static HWND WINAPI no_focus(HWND window) { return window; }
 static HDC WINAPI create_dc(HDC dc)
 { return scenario == 2 ? NULL : CreateCompatibleDC(dc); }
-static ui_mailbox_wake_wait_result controlled_wait(const ui_mailbox_wake *wake,
-    lib_u32 timeout)
+static DWORD WINAPI controlled_wait(DWORD count, const HANDLE *handles,
+    BOOL all, DWORD timeout, DWORD mask)
 {
-    (void)wake; (void)timeout;
+    (void)count; (void)handles; (void)all; (void)mask; (void)timeout;
     SetEvent(waiting);
     assert(WaitForSingleObject(proceed, INFINITE) == WAIT_OBJECT_0);
     inject_output_failure=1;
-    if (scenario == 1 || scenario == 6) return UI_MAILBOX_WAKE_WAIT_FAULT;
+    if (scenario == 1 || scenario == 6) return WAIT_FAILED;
     if (scenario == 3) PostQuitMessage(0);
     if (scenario == 4) assert(DestroyWindow(created));
     if (scenario == 7 || scenario == 8) input_scenario();
     if (scenario >= 10 && scenario <= 12) paint_scenario();
-    return UI_MAILBOX_WAKE_WAIT_WAKE;
+    SendMessageW(created, WM_APP + 1, 0, 0);
+    return WAIT_OBJECT_0;
 }
 #undef lib_win32_create_window_ex_w
 #undef lib_win32_show_window
@@ -73,7 +80,10 @@ static ui_mailbox_wake_wait_result controlled_wait(const ui_mailbox_wake *wake,
 #define lib_win32_begin_paint begin
 #define lib_win32_end_paint end
 #define lib_win32_create_cursor make_cursor
-#define ui_mailbox_wake_wait_messages controlled_wait
+#undef lib_win32_send_notify_message_w
+#define lib_win32_send_notify_message_w notify
+#undef lib_win32_msg_wait_for_multiple_objects
+#define lib_win32_msg_wait_for_multiple_objects controlled_wait
 static void checked_fail(ui_component *component, lib_status status)
 {
     static ui_frame rejected = { .valid = 1, .text_columns = 80, .text_rows = 25 };
@@ -130,7 +140,7 @@ static void paint_scenario(void)
 int main(void)
 {
     static ui_frame frame;
-    for (scenario = 0; scenario != 14; ++scenario) {
+    for (scenario = 0; scenario != 15; ++scenario) {
         ui_window_options options = { 0 };
         ui_window *window = NULL;
         waiting = CreateEventA(NULL, TRUE, FALSE, NULL);
@@ -139,6 +149,7 @@ int main(void)
         retired = failures = ordinary = closes = 0;
         paint_ends=0;
         inject_output_failure=0;
+        notification_attempts=0;
         options.component.input_sink = input;
         options.component.failure_sink = failure;
         options.initial_title = "retirement proof";
@@ -155,7 +166,8 @@ int main(void)
         assert(WaitForSingleObject(waiting, INFINITE) == WAIT_OBJECT_0);
         frame.valid = 1u; frame.text_columns = 80u; frame.text_rows = 25u;
         frame.cursor_visible=1; frame.font_height=16; frame.cursor_top=14; frame.cursor_bottom=15;
-        assert(ui_window_publish_frame(window, &frame) == LIB_STATUS_OK);
+        assert(ui_window_publish_frame(window, &frame) ==
+            (scenario==14 ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK));
         if (scenario == 0 || scenario == 5)
             assert(ui_component_request_stop(&window->base) == LIB_STATUS_OK);
         SetEvent(proceed);

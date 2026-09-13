@@ -7,6 +7,7 @@ static HWND owner, focused;
 static RECT client = {0,0,640,480}, clipped;
 static POINT origin = {100,200};
 static unsigned releases, clips, events;
+static int reject_input;
 static unsigned focus_requests, foreground_requests;
 static int clip_ok = 1, resize_ok = 1, title_ok = 1, client_ok = 1;
 static DWORD ticks;
@@ -27,6 +28,8 @@ static BOOL WINAPI invalidate(HWND w,const RECT *r,BOOL erase)
 { (void)w;(void)r;(void)erase;return TRUE; }
 static void *context;
 static void notify_loss(void);
+static int reenter_title;
+static void title_notification(void);
 static HWND WINAPI get_capture(void) { return owner; }
 static HWND WINAPI set_capture(HWND w) { HWND old=owner; owner=w; return old; }
 static BOOL WINAPI release_capture(void)
@@ -45,7 +48,8 @@ static LONG_PTR WINAPI get_context(HWND w, int index)
 { (void)w; return index==GWLP_USERDATA ? (LONG_PTR)context : 0; }
 static BOOL WINAPI resize(HWND w, HWND after, int x,int y,int cx,int cy,UINT f)
 { (void)w;(void)after;(void)x;(void)y;(void)cx;(void)cy;(void)f;return resize_ok; }
-static BOOL WINAPI title(HWND w,LPCSTR text) { (void)w;(void)text;return title_ok; }
+static BOOL WINAPI title(HWND w,LPCSTR text)
+{ (void)w;(void)text; if(reenter_title) title_notification(); return title_ok; }
 #undef lib_win32_get_capture
 #undef lib_win32_set_capture
 #undef lib_win32_release_capture
@@ -95,8 +99,18 @@ static BOOL WINAPI title(HWND w,LPCSTR text) { (void)w;(void)text;return title_o
 #include "lib/ui-window/win32/component.c"
 
 static void notify_loss(void) { win32_window_proc((HWND)1,WM_CAPTURECHANGED,0,0); }
+static lib_status immediate_notification(void *p)
+{ (void)p; win32_window_proc((HWND)1,WIN32_WINDOW_MAILBOX_READY,0,0); return 0; }
+static void title_notification(void)
+{
+    ui_win32_window_context *c=context;
+    reenter_title=0;
+    assert(c->consuming && c->frozen);
+    assert(ui_window_unfreeze(c->component)==0);
+    assert(c->frozen); /* Nested notification must not drain ahead of this control. */
+}
 static int input(void *p,const ui_input_event *e)
-{ (void)p; assert(e->type==UI_EVENT_MOUSE); ++events; return 1; }
+{ (void)p; assert(e->type==UI_EVENT_MOUSE); ++events; return !reject_input; }
 static void failure(void *p,lib_u64 id,lib_status status)
 { (void)p;(void)id;(void)status; }
 static void join(ui_component *p) { (void)p; }
@@ -186,6 +200,26 @@ int main(void)
     ui_component_control command={.kind=UI_COMPONENT_CONTROL_SET_WINDOW_TITLE};
     assert(ui_component_mailboxes_enqueue_controls(&window.base.mailboxes,&command,1)==0);
     assert(!win32_window_consume_mailboxes((HWND)1,&c) && window.base.stopping);
+    ui_component_destroy(&window.base);
+    assert(ui_component_initialize(&window.base,&options,join,dispose)==0);
+    c.component=&window; c.frozen=1; title_ok=1; reenter_title=1;
+    ui_component_mailboxes_set_notify(&window.base.mailboxes,immediate_notification,&c);
+    assert(!ui_component_mailboxes_wake(&window.base.mailboxes));
+    assert(ui_window_set_title(&window,"reentrant notification")==0);
+    assert(!c.frozen && !c.consuming && !window.base.mailboxes.control_count);
+    ui_component_destroy(&window.base);
+    /* A release callback faults mid-FIFO: later controls and frame stay untouched. */
+    assert(ui_component_initialize(&window.base,&options,join,dispose)==0);
+    c.component=&window; c.frozen=0; c.left_button=1;
+    reject_input=1; foreground_requests=0;
+    assert(ui_window_release_mouse(&window)==0);
+    assert(ui_window_freeze(&window)==0);
+    assert(ui_window_unfreeze(&window)==0);
+    assert(ui_window_publish_frame(&window,&c.frame)==0);
+    win32_window_proc((HWND)1,WIN32_WINDOW_MAILBOX_READY,0,0);
+    assert(window.base.stopping && !c.frozen && !foreground_requests);
+    assert(window.base.mailboxes.control_count==3);
+    assert(window.base.mailboxes.frame_pending);
     ui_component_destroy(&window.base);
     for (unsigned edge=UI_WINDOW_EDGE_LEFT;edge<=UI_WINDOW_EDGE_BOTTOMRIGHT;++edge) {
         ui_window_rect r={10,20,826,749};

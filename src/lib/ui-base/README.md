@@ -4,6 +4,15 @@
 copied frame/input values, source-local hotkey matching, and private mailbox
 mechanics to `ui-window` and `ui-console`.
 
+Each mailbox selects one notification implementation before caller publication.
+Console retains the default wait primitive; Window replaces it with a native
+message notifier and releases the unused wait primitive. Frame, control and
+terminal fault all use that selected entry, outside mailbox locks. Context
+remains valid through worker join; as with destruction, callers must quiesce
+concurrent API use before releasing the component. Notification IO_ERROR is
+after enqueue, closes component admission and is not permission to replay.
+The existing terminal notification and worker retirement report the failure.
+
 Its internal component emission helper may let a leaf filter matcher output,
 but source attribution and chord matching always remain in this component.
 This permits a frozen Window to discard ordinary content input while forwarding

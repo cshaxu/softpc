@@ -4,6 +4,14 @@
 copied UI events to the application queue entry. It never includes `host` or
 makes product decisions.
 
+Win32 mailbox notifications use SendNotifyMessage to the owned Window, not an
+Event-to-message bridge. Notifications coalesce; requests stay in the private
+control FIFO/latest-frame mailbox. Native move/size/menu loops dispatch the
+same notification. The worker-thread consumer prevents recursive drains and
+stops before further controls/frames on terminal failure. STOP cancels native
+modal interaction before the worker's existing destruction/retirement tail.
+This changes only leaf-support implementation, not application APIs.
+
 The Window owns only host presentation mechanics: it draws a content text cursor
 from copied position/shape/enabled frame fields and toggles that drawing every
 250 ms while unfrozen. `freeze()` atomically prevents capture, releases any

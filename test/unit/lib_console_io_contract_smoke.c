@@ -161,6 +161,15 @@ int main(void)
     assert(buffer_size.Y==25); /* Palette must precede surface preparation. */
     assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
     assert(palette_sets==2);
+    for (int axis=0;axis<2;++axis) {
+        unsigned before=writes;
+        if (axis==0) buffer_size.Y=24;
+        else buffer_size.X=40;
+        assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
+        assert(buffer_size.X>=80 && buffer_size.Y>=25 && writes==before+1);
+        assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
+        assert(writes==before+1);
+    }
     cursor_ok=0;
     assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_IO_ERROR);
     f.cursor_visible=f.cursor_phase=1;

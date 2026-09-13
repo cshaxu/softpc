@@ -1,5 +1,84 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S15 mailbox notification and completed-surface repairs
+
+Baseline `e140ec5`. Owner: “批准了 按照这个方案修复 s提交推送等我测试”.
+The owner approved replacing the fixed Event wake with one selected internal
+notification implementation per mailbox instance. Window uses native messages;
+Console retains its wait primitive. Application APIs, copied events, FIFO and
+latest-frame contracts remain unchanged. S14's verified delivery is retained;
+this admission does not infer manual acceptance or close T55.
+
+| Finite repair unit | Acceptance |
+| --- | --- |
+| Native Console surface reconstruction | A cached identical frame is redrawn after the native buffer loses rows/columns; failed output never commits completion. |
+| Terminal failure during control consumption | No later control or frame executes after a callback faults; normal STOP retains FIFO order. |
+| Window mailbox notification | One consumer receives work during normal and native modal loops; no Event bridge, recursive drain, lost STOP or silently successful failed notification. |
+
+Implementation boundary: ui-base leaf-support notification contract, Win32
+Window message integration, corresponding existing Console/platform wake
+selection, host Win32 output; no app, MVDM, INI, media or product policy change.
+Notification failure occurs after publication and must not invite replay of an
+already accepted control. Teardown must quiesce notification users before
+releasing its target. These are part of the repair, not deferred edge cases.
+
+Similar-issue sweep covers every mailbox publication/control/STOP/fault wake,
+every Window control-to-native callback and frame entry, and every host output
+operation invalidating a completed surface. Each hit must be repaired/tested or
+recorded with its distinct invariant. No whole-library defect-free claim.
+Verification: deterministic cache/fault tests, real Win32 modal-loop barriers,
+full x64/x86 regression, strict library, manifest/DAG/governance, both fixed
+EXEs, executor commit/push and coordinator committed-diff review. T stays open
+for owner testing. Code accounting distinguishes production from tests.
+
+### S15 implementation and convergence evidence
+
+The selected notifier is a ui-base leaf-support contract, not an application
+API. Selection happens once before create returns. Window releases the unused
+Event and uses coalesced SendNotifyMessageW (asynchronous cross-thread, without
+posted-message quota); Console retains the original waiter. The old
+wait_messages bridge and both platform implementations were removed. There
+is no new thread, timer, recovery loop, input queue or product state machine.
+Window retains a consumer reentry guard plus pending notification bookkeeping.
+Same-thread notifications defer work to the current drain, preserving FIFO.
+STOP cancels the native modal operation; destruction remains in the worker tail.
+
+| Searched family / command | Disposition and proof |
+| --- | --- |
+| `rg ui_mailbox_wake_signal\|mailboxes_notify\|set_notify src/lib` | Frame, control, fault and Console activation reach the selected mailbox entry. Only the default notifier signals the waiter. Selection precedes public handle exposure; destroy requires caller quiescence and joins before releasing context. |
+| Window `consume_mailboxes`, `consume_frame`, focus/resize callbacks | The existing stopping flag gates FIFO iteration, the return to frame processing, and reentrant native focus/resize completion. Injected mouse-release sink rejection leaves all later controls and pending frame untouched. |
+| Window notification success/failure and nested dispatch | Existing retirement fake injects notification rejection: API returns IO_ERROR, admission closes and terminal notification retires once. Request is not replayed. A synchronous notification inside title handling cannot drain unfreeze until title handling returns. Native handle validity/lifetime is owned by Window, never by callers. |
+| Native move/size/menu dispatch | Real Window test enters each modal loop with event barriers, applies freeze/title, verifies the title before modal exit, then destroys without external Enter/cancel. Modal-exit and exactly-one-retirement barriers both pass. Watchdog is test-only. |
+| host `ensure_text_surface`, palette and text/frame output | Actual dimension repair invalidates completed rows/columns before native resize. Identical-frame tests shrink width and height independently, require one redraw and then cache reuse. S14 partial-write/palette and text-invalidates-frame tests remain. No attribution to the deferred fullscreen/CLS issue. |
+| Console control consumption / Linux UI | Console controls other than STOP are inert and cannot synchronously fault; existing reader-failure/retirement barriers remain. Linux unsupported leaves acquire no Window notifier; existing Linux waiter tests pass. No capability expansion. |
+| Static prevention | Component gate rejects Window references to the removed Event bridge; component DAG and typed-vocabulary gates remain enabled. |
+
+Initial compilation found a missing typed WAIT_FAILED constant; added only the
+external spelling. The first real modal test used the mouse-drag low bits for
+SC_MOVE without a mouse-down and did not enter that loop; corrected the test to
+the native keyboard SC_MOVE entry. No failed behavioral assertion was waived.
+
+Production C/H accounting against `e140ec5`: 10 paths, +103/-49, net +54.
+Tests: 4 unit paths including the new modal test, +151/-10, net +141.
+One build registration changes +1/-1; static guard +7. Documentation, manifest
+and EXEs are excluded from those counts. This is a small net increase, not a
+claimed zero-line refactor; the added lines own notification selection,
+reentrancy and failure boundaries, rather than duplicate consumers.
+
+Final verification: x64 53/53 and x86 53/53, including package smoke; strict
+`-Wall -Wextra -Wpedantic -Werror` library build and standalone CTest 3/3.
+The final full reruns include the added synchronous-reentry test and the
+Console activation routing cleanup. Manifest, component DAG, types-layout
+negative self-test and documentation gates pass. No assertion or timeout was
+weakened. Linux waiter/decoder tests are not Linux desktop parity acceptance.
+No app, compatibility host, MVDM, media or user INI changes occur.
+
+Fixed binaries: softpc32.exe 4663455 bytes, SHA256
+`370D02B455E57A8B9B56775CCADA6A2DC62CC362034CDA8725B7E50484EA067B`;
+softpc64.exe 2518621 bytes, SHA256
+`9C92E1E4BCEF82E8DE91CE0E831077991CF0940B1DA411BFD50E51578D145D6A`.
+Owner manual verification and T55 closure remain separate.
+
 ## S14 native completion and lifecycle repairs
 
 Baseline `3cabea6`. Original owner admission: “准入新的S任务执行；单人双角色，

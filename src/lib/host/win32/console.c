@@ -43,8 +43,9 @@ static lib_win32_colorref host_console_colorref_from_rgb(lib_u32 rgb)
     return lib_win32_rgb((rgb >> 16u) & 0xffu, (rgb >> 8u) & 0xffu, rgb & 0xffu);
 }
 
-static int host_console_ensure_text_surface(lib_win32_handle output)
+static int host_console_ensure_text_surface(host_console_backend *backend)
 {
+    lib_win32_handle output = backend->output;
     lib_win32_console_screen_buffer_info info;
     lib_win32_coord required;
     lib_win32_small_rect viewport = { 0, 0, LIB_CONSOLE_TEXT_COLUMNS - 1,
@@ -56,8 +57,11 @@ static int host_console_ensure_text_surface(lib_win32_handle output)
         (lib_win32_short)LIB_CONSOLE_TEXT_COLUMNS : info.dwSize.X;
     required.Y = info.dwSize.Y < (lib_win32_short)LIB_CONSOLE_TEXT_ROWS ?
         (lib_win32_short)LIB_CONSOLE_TEXT_ROWS : info.dwSize.Y;
-    if ((required.X != info.dwSize.X || required.Y != info.dwSize.Y) &&
-        !lib_win32_set_console_screen_buffer_size(output, required)) return 0;
+    if (required.X != info.dwSize.X || required.Y != info.dwSize.Y) {
+        /* Restoring dimensions cannot restore cells lost by a native shrink. */
+        backend->previous_columns = backend->previous_rows = 0u;
+        if (!lib_win32_set_console_screen_buffer_size(output, required)) return 0;
+    }
     (void)lib_win32_set_console_window_info(output, LIB_WIN32_TRUE, &viewport);
     return 1;
 }
@@ -459,7 +463,7 @@ lib_status host_console_backend_write_text_frame_bound(host_console_backend *bac
     }
     /* Palette application can also change native buffer/viewport geometry.
      * Establish the write surface after that operation, never before it. */
-    if (!host_console_ensure_text_surface(backend->output)) {
+    if (!host_console_ensure_text_surface(backend)) {
         host_console_backend_unlock_output(backend);
         return LIB_STATUS_IO_ERROR;
     }

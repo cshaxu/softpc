@@ -47,6 +47,10 @@ typedef struct ui_win32_window_context {
     lib_bool cursor_blink_visible;
     lib_win32_dword cursor_blink_due;
     lib_win32_hcursor transparent_cursor;
+    lib_win32_hwnd window;
+    lib_bool consuming;
+    lib_bool notified;
+    volatile lib_win32_long notification_pending;
 } ui_win32_window_context;
 
 static ui_win32_window_context *win32_window_context(lib_win32_hwnd window)
@@ -428,7 +432,7 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
     lib_u32 width;
     lib_u32 height;
 
-    if (context == LIB_NULL || context->component == LIB_NULL ||
+    if (!win32_window_accepting_input(context) ||
         !ui_component_mailboxes_capture_frame(&context->component->base.mailboxes,
             &context->displayed_sequence, &context->frame))
         return;
@@ -438,6 +442,7 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
         return;
     }
     win32_window_resize_client(window, context, width, height);
+    if (!win32_window_accepting_input(context)) return;
     if (context->frame.graphics != 0u) {
         ui_window_rect changed;
         ui_window_rect changed_target;
@@ -466,7 +471,8 @@ static int win32_window_consume_mailboxes(lib_win32_hwnd window,
     ui_component_control control;
 
     if (context == LIB_NULL || context->component == LIB_NULL) return 0;
-    while (ui_component_mailboxes_take_control(&context->component->base.mailboxes,
+    while (win32_window_accepting_input(context) &&
+        ui_component_mailboxes_take_control(&context->component->base.mailboxes,
             &control)) {
         if (control.kind == UI_COMPONENT_CONTROL_STOP) {
             lib_atomic_i32_store_explicit(&context->component->base.stopping, 1,
@@ -483,7 +489,9 @@ static int win32_window_consume_mailboxes(lib_win32_hwnd window,
             if (context->frozen == control.value.window_frozen) continue;
             if (context->frozen && !control.value.window_frozen) {
                 (void)lib_win32_set_foreground_window(window);
+                if (!win32_window_accepting_input(context)) return 0;
                 (void)lib_win32_set_focus(window);
+                if (!win32_window_accepting_input(context)) return 0;
             }
             context->frozen = control.value.window_frozen;
             if (context->frozen == LIB_FALSE) {
@@ -495,7 +503,21 @@ static int win32_window_consume_mailboxes(lib_win32_hwnd window,
         } else if (control.kind == UI_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE)
             win32_window_release_mouse(context);
     }
-    return 1;
+    return win32_window_accepting_input(context);
+}
+
+static lib_status win32_window_notify(void *opaque)
+{
+    ui_win32_window_context *context = opaque;
+    if (lib_win32_interlocked_exchange(&context->notification_pending, 1))
+        return LIB_STATUS_OK;
+    /* Asynchronous across threads, also delivered by native modal loops.
+     * Unlike posted messages this does not consume the posted-message quota.
+     * Same-thread delivery can reenter; the sole consumer below guards it. */
+    if (lib_win32_send_notify_message_w(context->window,
+            WIN32_WINDOW_MAILBOX_READY, 0, 0)) return LIB_STATUS_OK;
+    lib_win32_interlocked_exchange(&context->notification_pending, 0);
+    return LIB_STATUS_IO_ERROR;
 }
 
 static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd window, lib_win32_uint message,
@@ -511,9 +533,19 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
     if (context == LIB_NULL) return lib_win32_def_window_proc_w(window, message, wparam, lparam);
     switch (message) {
     case WIN32_WINDOW_MAILBOX_READY:
-        if (win32_window_consume_mailboxes(window, context)) {
-            win32_window_consume_frame(window, context);
-        }
+        context->notified = LIB_TRUE;
+        if (context->consuming) return 0;
+        context->consuming = LIB_TRUE;
+        do {
+            context->notified = LIB_FALSE;
+            lib_win32_interlocked_exchange(&context->notification_pending, 0);
+            if (win32_window_consume_mailboxes(window, context))
+                win32_window_consume_frame(window, context);
+        } while (context->notified && win32_window_accepting_input(context));
+        /* Unwind native move/size/menu loops before the worker's cleanup. */
+        if (!win32_window_accepting_input(context))
+            lib_win32_send_message_a(window, LIB_WIN32_WM_CANCELMODE, 0, 0);
+        context->consuming = LIB_FALSE;
         return 0;
     case WIN32_WINDOW_MOUSE_READY:
         win32_window_flush_mouse(context);
@@ -734,6 +766,9 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
         return 0u;
     }
     state->startup_status = LIB_STATUS_OK;
+    context->window = window;
+    ui_component_mailboxes_set_notify(&component->base.mailboxes,
+        win32_window_notify, context);
     ui_win32_mouse_reset(&context->mouse);
     lib_win32_send_message_a(window, WIN32_WINDOW_MAILBOX_READY, 0, 0);
     lib_win32_show_window(window, LIB_WIN32_SW_SHOW);
@@ -742,14 +777,10 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
     lib_win32_set_focus(window);
     lib_win32_set_event(state->ready);
     while (lib_win32_is_window(window) && win32_window_accepting_input(context)) {
-        ui_mailbox_wake_wait_result wait = ui_mailbox_wake_wait_messages(
-            ui_component_mailboxes_wake(&component->base.mailboxes),
-            win32_window_cursor_blink_timeout(context));
-        if (wait == UI_MAILBOX_WAKE_WAIT_WAKE) {
-            if (win32_window_accepting_input(context))
-                lib_win32_send_message_a(window, WIN32_WINDOW_MAILBOX_READY, 0, 0);
-        }
-        else if (wait == UI_MAILBOX_WAKE_WAIT_FAULT) {
+        lib_win32_dword wait = lib_win32_msg_wait_for_multiple_objects(
+            0u, LIB_NULL, LIB_WIN32_FALSE,
+            win32_window_cursor_blink_timeout(context), LIB_WIN32_QS_ALLINPUT);
+        if (wait == LIB_WIN32_WAIT_FAILED) {
             ui_component_fail(&component->base, LIB_STATUS_IO_ERROR);
         }
         win32_window_advance_cursor_blink(window, context);

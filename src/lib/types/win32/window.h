@@ -66,6 +66,9 @@ typedef BITMAPINFO lib_win32_bitmapinfo;
 #define lib_win32_release_dc ReleaseDC
 #define lib_win32_select_object SelectObject
 #define lib_win32_send_message_a SendMessageA
+#define lib_win32_send_notify_message_w SendNotifyMessageW
+#define LIB_WIN32_WM_CANCELMODE WM_CANCELMODE
+#define LIB_WIN32_WAIT_FAILED WAIT_FAILED
 #define lib_win32_set_active_window SetActiveWindow
 #define lib_win32_set_capture SetCapture
 #define lib_win32_set_cursor SetCursor

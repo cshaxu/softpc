@@ -18,6 +18,13 @@ function(library_check_edge owner dependency)
     endif()
 endfunction()
 
+if(EXISTS "${LIBRARY_ROOT}/ui-window/win32/component.c")
+    file(READ "${LIBRARY_ROOT}/ui-window/win32/component.c" window_worker)
+    if(window_worker MATCHES "ui_mailbox_wake_wait|ui_component_mailboxes_wake")
+        message(FATAL_ERROR "Window must use its selected message notifier, not an Event bridge")
+    endif()
+endif()
+
 if(EXISTS "${LIBRARY_ROOT}/CMakeLists.txt")
     file(READ "${LIBRARY_ROOT}/CMakeLists.txt" build_contract)
     string(REGEX REPLACE "#[^\n]*" "" build_contract "${build_contract}")

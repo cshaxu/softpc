@@ -90,7 +90,8 @@ lib_status ui_component_enqueue_controls(ui_component *component,
     if (component == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     status = ui_component_mailboxes_enqueue_controls(&component->mailboxes,
         controls, control_count);
-    if (status != LIB_STATUS_OK) ui_component_report_failure(component, status);
+    if (status == LIB_STATUS_IO_ERROR) ui_component_fail(component, status);
+    else if (status != LIB_STATUS_OK) ui_component_report_failure(component, status);
     return status;
 }
 
@@ -112,8 +113,11 @@ void ui_component_retire(ui_component *component, lib_status status)
 
 lib_status ui_component_publish_frame(ui_component *component, const ui_frame *frame)
 {
-    return component == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
-        ui_component_mailboxes_publish_frame(&component->mailboxes, frame);
+    lib_status status;
+    if (component == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    status = ui_component_mailboxes_publish_frame(&component->mailboxes, frame);
+    if (status == LIB_STATUS_IO_ERROR) ui_component_fail(component, status);
+    return status;
 }
 
 lib_status ui_component_request_stop(ui_component *component)
@@ -125,8 +129,11 @@ lib_status ui_component_request_stop(ui_component *component)
 
 void ui_component_destroy(ui_component *component)
 {
+    lib_status status;
     if (component == LIB_NULL) return;
-    if (ui_component_request_stop(component) != LIB_STATUS_OK) {
+    status = ui_component_request_stop(component);
+    /* Notification failure is already terminal, not an unaccepted STOP. */
+    if (status != LIB_STATUS_OK && status != LIB_STATUS_IO_ERROR) {
         ui_component_report_failure(component, LIB_STATUS_INVALID_STATE);
         return;
     }
@@ -140,5 +147,5 @@ void ui_component_fail(ui_component *component, lib_status status)
     lib_atomic_i32_store_explicit(&component->failure, status, LIB_MEMORY_ORDER_RELEASE);
     ui_component_mailboxes_close(&component->mailboxes);
     lib_atomic_i32_store_explicit(&component->stopping, 1, LIB_MEMORY_ORDER_RELEASE);
-    ui_mailbox_wake_signal(ui_component_mailboxes_wake(&component->mailboxes));
+    (void)ui_component_mailboxes_notify(&component->mailboxes);
 }

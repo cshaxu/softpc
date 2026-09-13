@@ -49,7 +49,7 @@ static void ui_console_receive_event(void *context,
         lib_memory_set(&state->keyboard, 0, sizeof(state->keyboard));
         state->previous_mouse_valid = 0;
     } else if (event->kind == LIB_CONSOLE_EVENT_ACTIVATED) {
-        ui_mailbox_wake_signal(ui_component_mailboxes_wake(&console->base.mailboxes));
+        (void)ui_component_mailboxes_notify(&console->base.mailboxes);
     } else if (event->kind == LIB_CONSOLE_EVENT_IO_FAILURE) {
         ui_component_fail(&console->base, LIB_STATUS_IO_ERROR);
     } else if (event->kind == LIB_CONSOLE_EVENT_RAW_KEY) {

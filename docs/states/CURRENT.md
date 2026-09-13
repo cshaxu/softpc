@@ -2,31 +2,32 @@
 
 ## Current Work
 
-M9 T55 S14 implementation and verification are complete: x64 52/52, x86 52/52,
-strict library 3/3. Executor P1 `4724a1d` is pushed; coordinator review of
-the committed diff passed. S13 delivery is retained without inferring owner testing.
-T55 remains open; this delivery awaits the owner's manual test.
+M9 T55 S15 implementation and verification are complete: x64 53/53, x86 53/53,
+strict library 3/3. Executor delivery is being recorded before committed-diff
+coordinator review. The three repairs preserve application APIs. S14's verified
+delivery is retained without inferring manual acceptance. T55 remains open;
+this delivery awaits the owner's manual test.
 
-## M9 T55 S14 Packet
+## M9 T55 S15 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: “准入新的S任务执行；单人双角色，完成后，编译测试提交推送，并等我测试。” |
-| Objective | Complete the five S14 repairs and classify every related native failure path, using existing owners and fault cleanup. |
+| Admission And Approval | Owner: “批准了 按照这个方案修复 s提交推送等我测试”. Internal selected mailbox notification adjustment explicitly approved. |
+| Objective | Complete the three S15 repairs with one notification path and existing cleanup owners. |
 | Non-goals | No matcher snapshot restriction, MVDM, media, INI, app lifecycle, mouse scaling, deferred mode-roundtrip repair or T closure. |
-| Reference Baseline | 3cabea6, clean main after S13 delivery and read-only audit. |
+| Reference Baseline | e140ec5, clean main after S14 delivery and reproduced three-item audit. |
 | Candidate Proposal | [Shared-library audit repairs](../proposals/m9-lib-activation-audit-repairs.md). |
-| Files And ABI Surface | Window paint/control/startup, host Console output/disposal, shared input helper visibility; tests and component contracts. No new public API. |
+| Files And ABI Surface | ui-base leaf-support wake selection, Window platform consumer, host Console surface cache, tests/contracts. Application public APIs unchanged. |
 | Applicable Rules | Architecture, coding, execution and documentation rules and linked skills; current architecture, source layout and UI authorities. |
-| Verification | Native drawing/partial-output failure injection, unfreeze timing, single deactivation/create failure, record-based UTF-16; full x64/x86 CTest and strict lib. |
-| Expected Markers | Five ledger rows and native-call dispositions proved; no new worker, lock, state machine or recovery loop. |
+| Verification | Cache reconstruction and fault-during-control injection; real modal-loop notification/STOP barriers; full x64/x86 CTest, strict lib and static gates. |
+| Expected Markers | Three finite ledger rows proved; one notifier per instance and one Window consumer; no additional worker or polling recovery loop. |
 | Asset Needs | Existing non-mutating package media; refresh only fixed x86/x64 EXEs; no trace recordings. |
 | Reporting Requirements | Per-item proof, similar-issue dispositions, production/test line accounting, executor commit/push then coordinator actual-diff review. |
 | Stop Conditions | Do not expand product semantics or hide failed tests; unresolved boundary changes require owner direction. |
-| Exit Criteria | Five repairs and similar-path sweep verified, both EXEs built, manifest/DAG/governance and full regression pass, executor push and coordinator review, clean worktree awaiting owner testing. |
-| Original Owner Request | “这次发现的问题的同类问题也要一并解决，拒绝拖泥带水。要求第一性原理顶层设计，禁止添油战术。” |
-| Similar-Issue Sweep | Window/Console native creation, drawing, update, wait and disposal calls; completed caches, transition side effects and all UTF-16 helper callers. |
+| Exit Criteria | Three repairs and similar-path sweep verified, both EXEs built, manifest/DAG/governance and full regression pass, executor push and coordinator review, clean worktree awaiting owner testing. |
+| Original Owner Request | “批准了 准入一个新的S任务修复 编译 测试 提交 推送 等我测试”; selected internal notification design subsequently approved. |
+| Similar-Issue Sweep | Every mailbox frame/control/STOP/fault notification, Window callback/consumer boundary and native Console cache-invalidating operation. |
 
 ## Current Technical Baseline
 
@@ -37,7 +38,7 @@ T55 remains open; this delivery awaits the owner's manual test.
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
-  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus passes 52/52
+  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus passes 53/53
   fixed x64 and x86 CTest; its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 
