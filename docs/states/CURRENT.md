@@ -2,31 +2,8 @@
 
 ## Current Work
 
-M9 T55 S21 is admitted: give the shared keyboard/video/mouse corpus its
-accurate `kvm-*` identity without changing behavior or extending it to the
-cooked monitor. T55 remains open.
-Owner package INI and media are preserved.
-
-## M9 T55 S21 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner accepted S20 manual testing and directed the three shared keyboard/video/mouse components and symbols to use the `kvm` namespace. |
-| Objective | Make the shared corpus accurately name its keyboard/video/mouse responsibility while preserving every existing runtime behavior and boundary. |
-| Non-goals | No MVDM/media change, monitor migration, product-interface redesign, lifecycle/input semantic change, ABI shape change other than mechanical identifier/path spelling, new queue/worker, Linux parity expansion, or T closure. |
-| Reference Baseline | 2ea35ce; clean S20 P2 commit, x64/x86 57/57 CTest, strict library 6/6, preserved package media; owner accepted manual package testing. |
-| Candidate Proposal | [S21 kvm corpus rename](../proposals/m9-t55-s21-kvm-corpus-rename.md). |
-| Files And ABI Surface | The three presentation-component directories and all affected lib/app/test CMake paths, `kvm_`/`KVM_` symbols, lib prose/manifest/DAG fixtures, and application consumers; no behavioral API contract change. |
-| Applicable Rules | Architecture, coding, execution and documentation rules/skills and design authorities. |
-| Verification | Zero-old-name source/path gate, focused renamed KVM tests, fresh x64/x86 builds and full CTest, strict library CTest, manifest/DAG/source-boundary/documentation gates. |
-| Expected Markers | No active production, test, CMake, manifest, or current documentation reference to the retired component namespace remains; `kvm-*` components retain the same allowed DAG. |
-| Asset Needs | Refresh fixed x86/x64 EXEs only; preserve media and INI bytes. |
-| Reporting Requirements | Frozen ledger, changed-path/line accounting, focused/full tests, executor P push and separate actual-diff coordinator review. |
-| Stop Conditions | Do not rename or alter the cooked monitor as KVM, leave a parallel old spelling, change data/layout/control semantics, loosen the DAG, or alter MVDM. |
-| Exit Criteria | Every admitted spelling/path is mechanically migrated, zero-old-name gate and all builds/tests/gates pass, commit/push; await manual package testing and keep T55 open. |
-| Original Owner Request | “将共享 keyboard/video/mouse 组件改名为 kvm。” |
-| Similar-Issue Sweep | All non-historical former presentation component paths, identifiers, CMake targets, source includes, test names, manifest entries, component prose, and app consumers. |
+No implementation subtask is active. M9 T55 closed after the owner accepted
+the final KVM corpus package test. Owner package INI and media are preserved.
 
 ## Current Technical Baseline
 
@@ -46,6 +23,7 @@ Owner package INI and media are preserved.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T55 | Canonical shared library refreshed, normalized, simplified, boundary-gated, and renamed to the KVM corpus; owner accepted final package testing. | [T55 closure](../history/M9-T55-closure-kvm-corpus.md) |
 | T49 | Shared-library quality sequence S1–S6 closed after owner x86/x64 package acceptance. | [T49 S6 history](../history/M9-T49-S6-lib-neutral-corpus-prose.md) |
 | T50 | Build presets/artifact identity and standalone shared-library MSVC CI closed. | [T50 S2 history](../history/M9-T50-S2-lib-ci.md) |
 | T51 | Shared library normalized to `types`, `console`, `host`, `storage`, and independent presentation components; dual-width verification closed. | [T51 S4 history](../history/M9-T51-S4-lib-component-normalization-closure.md) |

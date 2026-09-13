@@ -2,7 +2,7 @@
 
 The owner accepted S20 package testing and directed the mechanical namespace
 rename. The admitted design remains in
-[`m9-t55-s21-kvm-corpus-rename.md`](../../../proposals/m9-t55-s21-kvm-corpus-rename.md).
+[`M9-T55-S21-kvm-corpus-rename.md`](../../../history/M9-T55-S21-kvm-corpus-rename.md).
 
 ## Result
 
