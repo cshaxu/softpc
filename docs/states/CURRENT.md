@@ -2,8 +2,8 @@
 
 ## Current Work
 
-M9 T55 S10 is active: approved whole-library audit repairs.
-S9 delivery baseline is `bad9ab2`; T55 remains open.
+M9 T55 S10 is delivered for owner testing: approved nine-item audit repairs.
+Executor P1 `fe11510` was pushed and its actual diff reviewed; T55 remains open.
 
 ## M9 T55 S10 Packet
 
@@ -17,7 +17,7 @@ S9 delivery baseline is `bad9ab2`; T55 remains open.
 | Candidate Proposal | [T55 proposal](../proposals/m9-t55-lib-types-external-boundary.md) |
 | Files And ABI Surface | lib Window/host/console/ui-base/storage, tests and docs; fixed byte-to-Unicode display contract, no frame mapping table. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout, Product UI and referenced skills. |
-| Verification | Deterministic capture loss/geometry, overlong lines, glyphs, failure caches, shared input path; full dual-width tests, strict build, manifest and governance. |
+| Verification | x64/x86 52/52; final strengthened x64 focused 2/2; strict build and lib gates 3/3; manifest, DAG and governance passed. Evidence in proposal. |
 | Expected Markers | Single cleanup/calculation/input paths; only successful native operations advance caches; complete-line delivery. |
 | Asset Needs | Refresh fixed softpc32.exe and softpc64.exe; preserve INI and media. |
 | Reporting Requirements | Nine-item convergence ledger, peer sweep, line accounting and pushed committed-diff review. |
@@ -35,7 +35,7 @@ S9 delivery baseline is `bad9ab2`; T55 remains open.
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
-  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus passes 50/50
+  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus passes 52/52
   fixed x64 and x86 CTest; its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 

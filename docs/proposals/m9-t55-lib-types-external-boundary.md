@@ -89,6 +89,27 @@ Package SHA256:
 - softpc32.exe: `7EA56F88820519F17737A5EEB7B3319E8546909A90A4BADFDF13387B8B016927`
 - softpc64.exe: `78147A7B42B9986E946621043A6D859C58E6270B0B605980144DBECC6E06B6BB`
 
+### S10 P2 coordinator committed-diff review
+
+Executor P1 `fe11510` was pushed before review. Coordinator inspected its
+actual 43-path Git change, not just executor evidence, against all nine rows.
+The shared corpus retains the same component DAG. Mouse cleanup is idempotent
+before reentrant release; native capture belonging to another HWND is not
+released. Bounds refresh is restricted to existing capture. Host retains one
+reader/transaction path. Fixed glyph conversion occurs only at text-cell output;
+no text-frame schema or application code-page policy was added. The only app
+change carries rejected cooked lines to the existing command reporter/prompt.
+
+Removed wrappers have no surviving declaration or caller, and changed tests
+exercise the production adapters/worker helpers under controlled native
+results. Geometry tests check non-proportional bounds and all anchors; native
+output tests check both cursor failure sites and recovery. Final package hashes
+match P1 and recorded evidence. Manifest and governance passed after commit.
+No unrelated source/media/config changes are included; generated fixture
+copies were removed. No additional blocker was found within the admitted
+nine-item repair set. S10 is delivered for owner testing; T55 stays open,
+and the existing intermittent package TODO is not claimed fixed.
+
 ## S9 admission: pending ordinary replay permission
 
 Owner: “同意 如果frozen期间到frozen之后都没匹配 确实可以丢弃”;
