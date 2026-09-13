@@ -69,6 +69,13 @@ common/ui 管理 broker 和 KVM 对象；lib 内部 native worker 仍由 lib
 CLI、debug、xasm32 默认不新增线程。S1 逐个记录既有线程、入口、context、
 唤醒、join、销毁所有者；每步核对线程数和职责不漂移。
 
+app 是全部线程实体的组装点：它创建 common/session、common/machine、
+common/ui 与产品 adapter，并以其生命周期接口启动和回收它们。组件可在自己的边界内调用 lib
+创建 native worker，但不得自行从产品回调或惰性 I/O 路径额外生成一条未被
+app 组装、停止和等待的生产线程。S1 现状账本已识别两条 worker：runtime
+executor（S4 转 common/machine）和 speaker worker（S5 改为由 app 显式
+组装的 SoftPC audio adapter 生命周期）。
+
 ```text
 cooked line / KVM input / machine fact / UI completion
   -> session 唯一 control queue -> reducer
@@ -129,6 +136,75 @@ S6/S7 “原版”指生产源码字节一致，common CMake 接线属于集成�
 需要新 CPU 调试能力或 MVDM 修改时另取产品功能准入。默认启用 debugger
 命令会改变产品体验，不在本次架构重整内；debug 必须完成真实契约测试，
 不能只复制目录后称为已接通。
+
+## T56 S1 冻结账本（`121de7c`）
+
+账本的有限全集是该提交下 `git ls-files src/app src/host` 的 60 个路径：
+`src/app` 24 个、`src/host` 36 个。路径是覆盖单位；混合职责文件按下列
+receiver 拆分，后续 S 必须在同一提交删除已迁出的符号、状态、测试旁路和
+CMake 输入。`retain` 不是永久豁免，而是仍有唯一产品职责或指定后续审查。
+
+| 路径集合 | 当前唯一职责 | S/处置 |
+| --- | --- | --- |
+| `app/control.[ch]`, `control_state.[ch]`, `reconciler.[ch]`, `presentation_plan.[ch]` | 唯一 control FIFO、状态归约、desired/actual 和展示动作推导 | S3 移入 common/session；原实现删除 |
+| `app/runtime.[ch]`, `input_queue.[ch]` | 唯一 executor、机器请求/输入队列、run generation、frame/state publish | S4 移入 common/machine；原实现删除 |
+| `app/presentation.[ch]`, `monitor.[ch]` | broker、raw/cooked Console、Window/KVM 对象和展示执行 | S2 移入 common/ui；原实现删除 |
+| `app/keyboard.[ch]` | SoftPC key/mouse injection adapter 与产品 hotkey 后果 | S4 保留为产品 driver 部分；仅通用入口迁入 common/machine |
+| `app/command.[ch]` | SoftPC monitor CLI、帮助与产品文案 | S3 保留为唯一注入 provider；只拆走通用 session 调度 |
+| `app/main.c`, `firmware.rc` | 配置读取/校验、标题/热键策略、实体组装、进程入口和资源 | retain app；S3/S5 删除已迁 reducer/资源管理，app 可直接 storage 读 INI |
+| `app/prompt_trace.[ch]` | SoftPC trace 产品文件契约 | retain app；S5 复核其直接 storage 调用与 CRLF/NUL 行为 |
+| `host/machine.[ch]` | SoftPC machine driver/原始 callback 组装，含当前 generic lifecycle 接线 | S4 拆出 common/machine 通用边界；保留唯一 SoftPC driver |
+| `host/gfi_image.c`, `hdd_media.[ch]` | SoftPC FDD/HDD product media providers | retain product adapter；S5 审查 direct storage 所有权、无重复资源实现 |
+| `host/audio.c` | SoftPC speaker adapter 和当前 speaker worker | retain product adapter；S5 使 app 显式组装/停止/join worker，保留 device 语义 |
+| `host/device_bop.c`, `memory.c`, `keyboard.c`, `mouse_instance.c`, `serial.c`, `parallel.c`, `platform.c`, `video.c`, `v7_pointer.c`, `dib_surface.[ch]`, `input.h`, `status.h` | 原始 host callback、设备/呈现/端点适配和产品状态 | retain SoftPC driver/adapter；S4/S5 逐项删除任何已迁 generic lifecycle 或 lib ownership 重复部分 |
+| `host/compat/**` 16 路径 | 保持 MVDM/CCPU/C-VID/BIOS/设备接口的 SoftPC compatibility adapter | retain product compatibility；不得移入 common 或修改机器语义 |
+
+`src/app` 精确路径为：`command.[ch]`、`control.[ch]`、`control_state.[ch]`、
+`firmware.rc`、`input_queue.[ch]`、`keyboard.[ch]`、`main.c`、`monitor.[ch]`、
+`presentation.[ch]`、`presentation_plan.[ch]`、`prompt_trace.[ch]`、
+`reconciler.[ch]`、`runtime.[ch]`。`src/host` 精确路径为上表顶层集合以及
+`compat/bios/host_def.h`、`compat/ccpu/{facade.c,lifecycle.[ch],legacy/{gdpvar.h,PigReg_c.h,sas4gen.h}}`、
+`compat/cmos/port.h`、`compat/conapi.h`、`compat/cvidc/{gdp_rule_access.h,gdp_slots.h,gdp_state.[ch]}`、
+`compat/{edl_fast_bop.c,graphics_console_compat.c,keymouse/cpu4.h,system/error.h}`。
+
+现有后台活动账本：
+
+| Worker | 创建/停止现状 | 接收者与验收 |
+| --- | --- | --- |
+| runtime executor | `app_runtime_create()` 经 `host_sync_task_create()` 创建；`app_runtime_destroy()` 请求停止并 join | S4 common/machine；保留一条 executor，测试唯一启动/停止/join 与 run generation |
+| speaker worker | `softpc_host_speaker_enable()` 懒创建；`softpc_host_speaker_stop()` join | S5 产品 audio adapter；app 显式组装和停止，禁止惰性第二生产路径 |
+| lib Console/KVM native workers | common/ui 通过 lib 生命周期间接拥有 | S2；app 不持有 lib 内部句柄，lib 不理解产品状态 |
+
+S1 lib-call 处置：presentation/monitor 的 console/host/kvm 调用随 S2；
+runtime 的 host sync/clock 与 generic queue 调用随 S4；`prompt_trace` 的
+writer 及 `main` 的 INI storage 调用保留 app；`machine`/media 的 storage
+调用保留产品 adapter、在 S5 验证资源所有权；audio 的 host-sync 调用保留
+adapter、在 S5 调整组装路径。所有其他 lib call 在 S1 的 CMake/source
+inventory中按同一 receiver 复核；不以调用发生在 app/host 为错误。
+
+已存在、可承接迁移的自动证据：runtime restart/cursor/input、lifecycle、
+command、control-state/reconciler、presentation plan/shutdown、KVM
+admission/control/retirement、machine/device/media/boot smoke。S1 不新增
+第二套行为测试；其 focused proof 是这些测试的测试目标与上述 receiver 的
+一对一映射，随后两种宽度全 CTest 证明现状基线。任何发现的真实缺口才可在
+本 S 增加最小外部行为测试。
+
+### S1 P1 执行证据
+
+构建只复用现有已验收生产源码；账本审查没有发现一个能以不改变生产架构的
+最小外部行为测试填补的空白，故未新增测试或制造重复测试路径。2026-09-13
+实际执行 `cmake --build --preset tests-x64`、`ctest --preset test-x64`，
+以及 x86 对应命令：x64 58/58、x86 58/58 全部通过。独立
+`cmake -S src/lib -B build/lib-strict -DLIBRARY_STRICT_WARNINGS=ON`、构建和
+CTest 通过 8/8；文档门禁和 `git diff --check` 通过。
+
+固定包 SHA-256：`softpc32.exe`
+`FDE1E2BEF0802AE92FC6434A0F8B4524AC9AE53F57F8BAC9C55DCC335922797A`；
+`softpc64.exe`
+`8BC57B396190BC97994AF042E817E95C23A3E6E6E437AAC8D1D4EBD5D15D696C`。
+构建没有改写 INI 或媒体，也没有产生生产源码 diff。用户手测以这两个包为
+准：monitor `help/start`，DOS，Win3.1，pause/resume、stop/start；后续
+S2--S8 均以相同体验作为对照。
 
 ## 每个 S 的退出条件
 
