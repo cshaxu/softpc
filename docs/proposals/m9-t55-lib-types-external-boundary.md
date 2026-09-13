@@ -99,6 +99,28 @@ No task-specific scratch build tree was created; fixed x86/x64 trees and the
 existing strict-lib configuration remain available for owner inspection.
 T55 remains open. This executor delivery requires post-push actual-diff review.
 
+### S5 P2 coordinator review
+
+Reviewed actual committed diff `183fc8f..d6d801b` after executor push, not
+only its report: all 47 changed paths map to S5 implementation, tests,
+architecture/packet/ledger, prior S4 handoff, manifest or two package artifacts.
+No app/MVDM/INI/media path changed. The normalizer and matcher remain single
+ui-base paths; scan/extended reach the unchanged app binding correctly.
+STOP acquires frame then control, with no reverse acquisition; fault closes
+the same gates before worker cleanup. Normal STOP remains ordered FIFO.
+Window frame/context storage is kept until worker join; native resources are
+released once by the worker. Host cancellation remains root-owned and platform
+thread disposal no longer joins. Geometry/render/motion are extracted existing
+operations, not alternate implementations; retained SDK marshalling has no
+resource allocation or duplicate arithmetic.
+
+Verified the finite component dispositions and removed-symbol call sites;
+rechecked neutral boundary/DAG and corpus manifest after push. Confirmed
+49/49 at both widths, strict 3/3, independent 18-header proof and both artifact
+hashes. No remaining blocker was identified in this admitted S5 scope.
+S5 is delivered for owner inspection; T55 is explicitly not closed. The broader
+T-level audit and owner acceptance are not inferred from these regression results.
+
 ## S4 admission: single input and lifetime paths
 
 Owner: “按照这些准入新的S任务修复以上7条反馈意见。” Baseline

@@ -2,10 +2,10 @@
 
 ## Current Work
 
-M9 T55 S5 implementation and verification are complete; executor P1 is ready
-for push and actual-diff review. Both widths passed 49/49; strict lib passed 3/3.
-Baseline `183fc8f`; the proposal records the seven-component audit and accounting.
-T55 remains open.
+M9 T55 S5 is delivered for owner inspection. Executor P1 `d6d801b` is pushed;
+coordinator reviewed its actual diff and accepted the bounded S5 delivery.
+Both widths passed 49/49; strict lib passed 3/3. The proposal records the
+seven-component audit, accounting and review. T55 remains open.
 
 ## M9 T55 S5 Packet
 
@@ -15,7 +15,7 @@ T55 remains open.
 | Admission And Approval | Owner: “以上，开始清理。” with the preceding approved seven findings and library-wide wrapper/dead-code sweep. |
 | Objective | One normalizer/matcher, correct physical-key state, one fault entry, independent mailboxes, component-owned pure math and nonduplicated resource ownership. |
 | Non-goals | No MVDM/media/INI change, product policy change, new component, types implementation or Linux UI parity. Overlay indexing remains deferred. |
-| Reference Baseline | `183fc8f`, S4 reviewed delivery. |
+| Reference Baseline | `183fc8f`, S4 reviewed input; delivered S5 implementation `d6d801b`. |
 | Candidate Proposal | [T55 proposal](../proposals/m9-t55-lib-types-external-boundary.md) |
 | Files And ABI Surface | Entire lib C/H inventory for audit; component implementations and support APIs as needed, direct consumers/tests, CMake, manifest, docs and dual EXEs. Preserve app-facing behavior. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout and Product UI. |
