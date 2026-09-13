@@ -3,8 +3,8 @@
 ## Current Work
 
 M9 T55 S15 implementation and verification are complete: x64 53/53, x86 53/53,
-strict library 3/3. Executor delivery is being recorded before committed-diff
-coordinator review. The three repairs preserve application APIs. S14's verified
+strict library 3/3. Executor P1 `f36c560` is pushed; coordinator review of the
+actual committed diff passed. The three repairs preserve application APIs. S14's verified
 delivery is retained without inferring manual acceptance. T55 remains open;
 this delivery awaits the owner's manual test.
 

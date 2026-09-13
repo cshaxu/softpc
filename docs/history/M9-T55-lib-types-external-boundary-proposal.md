@@ -79,6 +79,18 @@ softpc64.exe 2518621 bytes, SHA256
 `9C92E1E4BCEF82E8DE91CE0E831077991CF0940B1DA411BFD50E51578D145D6A`.
 Owner manual verification and T55 closure remain separate.
 
+### S15 coordinator review
+
+After executor P1 `f36c560` was pushed, the coordinator reviewed the actual
+`e140ec5..f36c560` production/test/build/contract changes and checked each of
+the three admitted repair rows against the evidence. Notification selection
+is startup-only, outside mailbox locks on use; one Window consumer owns modal
+dispatch, STOP and reentry. Removed Event bridge code has no caller. Host cache
+invalidation stays inside the existing output transaction. Application APIs,
+SoftPC behavior owners and preserved MVDM remain unchanged. Both fixed EXEs
+are part of P1. The reviewed delivery is ready for owner testing; neither owner
+acceptance nor T55 closure is inferred. P2 records only this review/status.
+
 ## S14 native completion and lifecycle repairs
 
 Baseline `3cabea6`. Original owner admission: “准入新的S任务执行；单人双角色，
