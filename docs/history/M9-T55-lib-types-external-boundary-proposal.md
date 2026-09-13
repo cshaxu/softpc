@@ -89,6 +89,25 @@ Full dual-width regression and final delivery evidence are recorded below.
 Executor delivery is complete for P1. Coordinator review follows its push;
 owner interactive testing is still required and T55 is not closed.
 
+### S13 coordinator review and test handoff
+
+After P1 `660956203141e00e275adfcd7e649dac83c8e2ec` was pushed, the same
+session switched from executor to coordinator. Review used `git show`, the
+actual parent-to-commit production/test/docs diff, the four-row admission,
+the existing callback/worker cleanup call chains and retained CTest evidence.
+
+The review accepts this bounded delivery: reset remains before native input
+and separate from successful activation; failure and geometry changes reuse
+their existing owners; mixed output invalidates under the existing lock.
+Per-instance modifier snapshots remain accepted. No app/MVDM changes, native
+capture changes, added execution paths or edits to user INI/media are present.
+The two EXE hashes and PE widths match the verified delivery. P1 and origin
+were equal and the worktree was clean before this documentation-only P2.
+
+Owner testing is pending. No claim is made that the deferred Win3.1 mode
+roundtrip/CLS issue is fixed, or that S12 received owner acceptance. T55 stays
+open. This P2 records review and hands over both fixed package paths.
+
 ## S12 admission: seven shared-library audit repairs
 
 Baseline `a0d0d37`. Owner: “对啊，那就这么办。其他的按你说的来。”
