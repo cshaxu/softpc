@@ -86,6 +86,27 @@ Package SHA256:
 - softpc32.exe: `958BD3E15CCDFCCF93809D2386A42C646641A1799E530B57AA4DC28CFAAEDA1F`
 - softpc64.exe: `DB4EAA31430C359BAEEF90E2DB24EF77FCE6097E6D7A87D7B74906DC83698CC3`
 
+### S7 P2 coordinator committed-diff review
+
+After executor P1 `e2e3e5c` was pushed, the coordinator reviewed the actual
+`5be6fc4..e2e3e5c` production, test, vocabulary, build and documentary changes
+(30 paths), not only the executor summary. The explicit shared-ledger borrow,
+pre-delivery synthesis snapshot, selective native translation and wide record
+boundaries implement the four rows without new persistent state or an app ABI.
+Tests removed artificial physical WM_CHAR injection because the producer now
+does not translate those keys; the replacement explicitly asserts no translation
+and verifies unmapped-key translation rather than relaxing output counts.
+Existing source retirement, capture/freeze, FIFO, geometry and product lifecycle
+implementations are unchanged. No app/MVDM/INI/media diff exists.
+
+All four bounded repairs have verification evidence; the single unresolved
+package timeout remains visible in TODO and in this report, with no inferred
+root cause or silent test waiver. Final serial x64/x86 full runs passed 50/50;
+strict build/3-test gates and governance passed. Five consecutive x64 package
+runs passed. Fixed build caches remain; this task's two temporary layout-fixture
+directories were removed after testing. P2 records delivery for owner testing,
+not T55 closure or an assertion that every library defect is absent.
+
 ## S6 admission: complete key lifetimes and common normalization
 
 Owner: “准入下一个S任务修复以上问题；类似问题也要扫描同样思路处理”.
