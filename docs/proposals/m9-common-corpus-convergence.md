@@ -19,15 +19,13 @@ common/xasm32  shared assembler/disassembler
 common/debug   shared debugger command/runtime layer
 common/machine shared ordered machine-adapter boundary
 common/session shared reducer/control lifecycle
-common/kvm     shared Window/raw-Console presentation composition
-common/console shared cooked-Console/broker composition
+common/ui      shared monitor/raw-Console/Window presentation composition
 ```
 
-`common/kvm` is the accurate successor to the KVM part of NXVM's current
-`common/ui`: it owns keyboard/video/mouse presentation composition, not the
-cooked product monitor. `common/console` is the neutral common Console/broker
-owner required by the "common alone calls lib" boundary; product command words
-and policy remain outside it.
+`common/ui` is intentionally broader than `lib/kvm-*`: it owns the cooked
+monitor Console, raw VM Console, Window, and their broker handoff. It is the
+sole common caller of `lib/console`, `lib/host`, and `lib/kvm-*` for this
+presentation path. Product command words and policy remain outside it.
 
 ## Frozen principles
 
@@ -48,13 +46,13 @@ and policy remain outside it.
 
 ## Baseline and upstream disposition
 
-NXVM `common` is comparison material, not this task's source authority. It
-already exposes useful machine/session/KVM concepts, but its current
-`common/ui` also owns cooked Console behavior and its CMake still carries old
-component targets. Those are design inputs for the SoftPC extraction, not a
-license to import a behavior-changing mixed component. The final SoftPC
-`common/kvm`/`common/console` split, public contracts, manifest, and tests are
-what NXVM must adopt unchanged.
+NXVM `common` is comparison material, not this task's source authority. Its
+`common/ui` ownership is the intended simple shape: Session decides the next
+surface action, while UI owns monitor/raw Console/Window objects and performs
+broker replacement. Its stale CMake component names and any SoftPC behavioral
+gap are design inputs for the SoftPC extraction, not a license to import a
+behavior-changing variant. The final SoftPC `common/ui` public contract,
+manifest, and tests are what NXVM must adopt unchanged.
 
 ## Proposed serial S breakdown
 
@@ -63,10 +61,10 @@ what NXVM must adopt unchanged.
    specification. Record every `app/`/`host/` responsibility as common,
    product policy, or immutable MVDM adapter; use NXVM common only as a design
    comparison.
-2. **S2: extract common console and KVM.** Move the existing accepted broker,
-   cooked Console composition, and KVM composition into separate
-   `common/console` and `common/kvm` components without changing calls,
-   queues, completion ordering, or tests. Common alone invokes the relevant
+2. **S2: extract common UI.** Move the existing accepted monitor/raw Console,
+   Window, and broker composition into `common/ui` without changing calls,
+   queues, completion ordering, or tests. Session continues to derive actions;
+   UI alone owns the objects and applies them. UI alone invokes the relevant
    lib components; delete the replaced app implementation in the same change.
 3. **S3: extract common session.** Move the existing central control/reducer
    into `common/session`, retaining SoftPC's product CLI provider, state
@@ -90,8 +88,8 @@ what NXVM must adopt unchanged.
   prove the extraction does not change accepted SoftPC experience.
 - A manifest and static diff gate prove the final SoftPC `src/common/` corpus
   is self-contained and is the exact revision offered to NXVM.
-- Dependency gates prove shared control/Console/KVM product source does not
-  call a lib component directly and no common source depends on MVDM or
+- Dependency gates prove shared control/UI product source does not call a lib
+  component directly and no common source depends on MVDM or
   product types.
 - Machine request, lifecycle, monitor-to-raw-Console, raw-to-monitor, KVM
   input, frame, pause/resume/reset/stop, and source-retirement matrix tests
