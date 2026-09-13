@@ -2,34 +2,32 @@
 
 ## Current Work
 
-M9 T55 S18 is admitted: complete S17 G1-G6 using the smallest correct failure
-and ownership contract.  Synchronous request rejection returns `lib_status`;
-accepted asynchronous UI work reports its first failure once through the
-existing sink; only live native-worker join barriers reach SoftPC's terminal
-infrastructure boundary.  S17 delivery remains unaccepted by manual testing;
-its 55/56 package limitation is carried into S18 verification. T55 remains
-open. Owner package INI and media are preserved.
+M9 T55 S19 is admitted: simplify three audited lib seams without changing the
+approved product model.  It corrects stale public create prose, makes storage
+result handling linear and preserves concrete local status, and makes Window's
+one startup notifier replacement impossible to repeat. T55 remains open.
+Owner package INI and media are preserved.
 
-## M9 T55 S18 Packet
+## M9 T55 S19 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approved a minimal, uniform interaction contract: rejection status before acceptance, once-only component failure after acceptance, and one terminal boundary for unjoinable live native workers. |
-| Objective | Resolve S17 G1-G6 across lib/platform/app boundaries without promoting ordinary synchronization or cleanup into application-wide error plumbing. |
-| Non-goals | No MVDM/media changes, product lifecycle redesign, deferred CLS fix, Linux parity expansion, new error framework, extra queue/worker/retry path, or T closure. |
-| Reference Baseline | 4c06235; both builds and 55/56 CTest, with preserved display=window INI and known package fixture mismatch. |
-| Candidate Proposal | [Shared-library audit repairs](../proposals/m9-lib-activation-audit-repairs.md). |
-| Files And ABI Surface | Seven lib components, Windows/Linux implementations, changed public/support status and callback contracts, all callers/tests; [S18 brief](../etc/evidence/m9-t55-s18-unified-status-contract.md). |
+| Admission And Approval | Owner approved the post-S18 audit's stale-contract, linear-storage-status, and notifier-selection cleanup. |
+| Objective | Improve lib maintainability and preserve correct failure semantics by removing misleading contracts, result-collapsing chains, and repeatable startup-only notifier setup. |
+| Non-goals | No MVDM/media changes, product lifecycle redesign, frame/broker/UI-leaf merger, Linux parity expansion, new error framework, extra queue/worker/retry path, or T closure. |
+| Reference Baseline | f700315; clean worktree, dual-width S18 builds/tests, strict library gates, preserved package INI/media. |
+| Candidate Proposal | [S19 simplification sweep](../proposals/m9-t55-s19-lib-simplification-sweep.md). |
+| Files And ABI Surface | ui-window/ui-console public prose, ui-base private mailbox support, storage medium result flow and focused tests; no public function signature change. |
 | Applicable Rules | Architecture, coding, execution and documentation rules/skills and design authorities. |
-| Verification | Deterministic native-failure/ownership matrices, complete glyph/cursor and delayed-phase proofs, fresh x64/x86 56/56 CTest, strict-library 3/3 CTest, configuration-aware package test, manifest/DAG/governance gates. |
-| Expected Markers | No hidden failed completion or freed live dependency; first fault reported independently of retirement; no half-object create contract; no duplicate production error path. |
+| Verification | Focused storage/notifier/header proofs, fresh x64/x86 builds and full CTest, strict library CTest, manifest/DAG/documentation gates. |
+| Expected Markers | Failed create is truthfully documented; storage does not discard a prior concrete result; notifier selection cannot silently replace an active wake path. |
 | Asset Needs | Refresh fixed x86/x64 EXEs only; preserve media and INI bytes. |
-| Reporting Requirements | Complete G1-G6 ledger, API/ownership changes, changed-path/line accounting, tests, complete executor P push and separate actual-diff coordinator review. |
-| Stop Conditions | Do not invent recovery policy, extra worker/queue, platform parity, owner test acceptance or successful regression; expose any necessary scope expansion. |
-| Exit Criteria | All admitted ledger rows proved, callers migrated, obsolete paths removed, both EXEs/tests and gates verified, commit/push; wait for manual testing and keep T55 open. |
-| Original Owner Request | “主要是api要有统一的状态返回值 调用方采用统一的状态处理机制…按这个思路 统一解决 准入一个s任务”. |
-| Similar-Issue Sweep | Whole create/accept/notify/fail/join/dispose chains across every component and app consumer; include startup exits, both platform implementations and expected-outcome exceptions. |
+| Reporting Requirements | Frozen three-item ledger, changed-path/line accounting, focused/full tests, executor P push and separate actual-diff coordinator review. |
+| Stop Conditions | Do not merge required components, change UI/product semantics, create a second notification path, or expand storage behavior beyond local result preservation. |
+| Exit Criteria | Each ledger row is implemented/proved, all touched callers and similar forms are disposed, builds/tests/gates pass, commit/push; wait for manual testing and keep T55 open. |
+| Original Owner Request | “准入s任务予以清理”. |
+| Similar-Issue Sweep | All public create documentation, all storage OR-chain result collapses, and all default-wake replacement call sites across lib and tests. |
 
 ## Current Technical Baseline
 

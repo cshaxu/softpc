@@ -8,8 +8,8 @@ typedef struct ui_console ui_console;
 
 typedef ui_component_options ui_console_options;
 
-/* A non-NULL output on failure retains cleanup ownership and dependencies;
- * do not operate it or free dependencies unless checked destruction succeeds. */
+/* On failure *out_console remains NULL. A live worker that cannot be joined is
+ * a terminal application infrastructure fault, not a caller-owned half object. */
 lib_status ui_console_create(ui_console **out_console,
     const ui_console_options *options);
 lib_status ui_console_publish_frame(ui_console *console, const ui_frame *frame);

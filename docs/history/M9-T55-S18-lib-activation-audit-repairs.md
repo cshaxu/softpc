@@ -1,4 +1,4 @@
-# Shared-library activation and audit repairs
++# Shared-library activation and audit repairs
 
 The owner approved one simple whole-library interaction contract: status for
 rejection before acceptance, once-only component failure after accepted

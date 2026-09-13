@@ -231,7 +231,10 @@ int main(void)
     assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
     assert(ui_component_initialize(&window.base,&options,join,dispose)==0);
     c.component=&window; c.frozen=1; title_ok=1; reenter_title=1;
-    ui_component_mailboxes_set_notify(&window.base.mailboxes,immediate_notification,&c);
+    assert(ui_component_mailboxes_select_notify(&window.base.mailboxes,
+        immediate_notification,&c) == LIB_STATUS_OK);
+    assert(ui_component_mailboxes_select_notify(&window.base.mailboxes,
+        immediate_notification,&c) == LIB_STATUS_INVALID_STATE);
     assert(!ui_component_mailboxes_wake(&window.base.mailboxes));
     assert(ui_window_set_title(&window,"reentrant notification")==0);
     assert(!c.frozen && !c.consuming && !window.base.mailboxes.control_count);

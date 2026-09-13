@@ -811,7 +811,7 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
     }
     state->startup_status = LIB_STATUS_OK;
     context->window = window;
-    state->startup_status = ui_component_mailboxes_set_notify(&component->base.mailboxes,
+    state->startup_status = ui_component_mailboxes_select_notify(&component->base.mailboxes,
         win32_window_notify, context);
     if (state->startup_status != LIB_STATUS_OK) {
         (void)win32_window_destroy(context, window);

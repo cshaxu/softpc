@@ -17,8 +17,8 @@ typedef struct ui_window_options {
     lib_bool initial_frozen;
 } ui_window_options;
 
-/* On failure a non-NULL output retains cleanup ownership if the started worker
- * could not be joined. Never free callback context until destroy succeeds. */
+/* On failure *out_window remains NULL. A live worker that cannot be joined is
+ * a terminal application infrastructure fault, not a caller-owned half object. */
 lib_status ui_window_create(ui_window **out_window,
     const ui_window_options *options);
 lib_status ui_window_publish_frame(ui_window *window, const ui_frame *frame);

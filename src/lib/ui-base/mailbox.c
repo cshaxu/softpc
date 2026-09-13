@@ -15,14 +15,16 @@ static lib_status ui_component_notify_waiter(void *context)
     return ui_mailbox_wake_signal(context);
 }
 
-lib_status ui_component_mailboxes_set_notify(ui_component_mailboxes *mailboxes,
+lib_status ui_component_mailboxes_select_notify(ui_component_mailboxes *mailboxes,
     ui_mailbox_notify_fn notify, void *context)
 {
     if (mailboxes == LIB_NULL || notify == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    if (mailboxes->notifier_selected) return LIB_STATUS_INVALID_STATE;
     ui_mailbox_wake_destroy(mailboxes->wake);
     mailboxes->wake = LIB_NULL;
     mailboxes->notify = notify;
     mailboxes->notify_context = context;
+    mailboxes->notifier_selected = LIB_TRUE;
     return LIB_STATUS_OK;
 }
 

@@ -42,16 +42,19 @@ typedef struct ui_component_mailboxes {
     lib_u32 control_head;
     lib_u32 control_count;
     lib_bool closed;
+    /* The native leaf may replace the default wait primitive once, during
+     * startup, with its own notifier.  It cannot be changed after that. */
+    lib_bool notifier_selected;
     ui_mailbox_wake *wake;
     ui_mailbox_notify_fn notify;
     void *notify_context;
 } ui_component_mailboxes;
 
 lib_status ui_component_mailboxes_create(ui_component_mailboxes *mailboxes);
-/* Startup-only selection, before publishing the component to any caller.
+/* One-time startup selection, before publishing the component to any caller.
  * Replaces the default wait primitive. Context lives until worker join and
  * caller quiescence. Failure is after enqueue: do not replay the request. */
-lib_status ui_component_mailboxes_set_notify(ui_component_mailboxes *mailboxes,
+lib_status ui_component_mailboxes_select_notify(ui_component_mailboxes *mailboxes,
     ui_mailbox_notify_fn notify, void *context);
 lib_status ui_component_mailboxes_notify(ui_component_mailboxes *mailboxes);
 void ui_component_mailboxes_close(ui_component_mailboxes *mailboxes);
