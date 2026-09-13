@@ -68,6 +68,25 @@ Package SHA256:
 - softpc32.exe: `46126CA58E864FC4EB8D0BC4938098CCF68C7C5765839EA2972A07CB0123D67E`
 - softpc64.exe: `87F58496944ABEFBB878F1F33A156E947B4B53CC8DA6A3A4620D44C20B66E294`
 
+### S8 P2 coordinator review
+
+Executor P1 `939755d` was pushed before this review. The coordinator checked
+its actual 19-path committed diff against the three-row packet: one counted
+decoder, both native adapters, the Console copied contract, five test files,
+manifest, design/current/history and both artifacts. The two previous producer
+loops are removed, not retained beside the common decoder. The only added
+persistent decoder value is its pending prefix count; no matcher state is copied.
+
+Old malformed-prefix assertions were deliberately changed because they encoded
+the reported loss; adapter tests additionally verify the recovered output, not
+merely successful return. Host tests now assert preservation of metadata rather
+than expansion; the leaf tests assert the final expansion. Failure tests still
+require terminal stop and exact attempt counts. Dependency gates, full-width
+tests and strict warnings passed without waiver. Artifacts match recorded hashes.
+The owned fixture copies were deleted; no app/MVDM/INI/media changes or remaining
+worktree changes belong outside the packet. S8 is delivered for owner testing;
+T55 stays open, and the historical CAP timeout remains explicitly unresolved.
+
 ## S7 admission: native input provenance and synthesis ownership
 
 Owner: “请问这次修复会加代码还是减代码 是否能干净的实现”;

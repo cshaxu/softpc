@@ -2,9 +2,10 @@
 
 ## Current Work
 
-M9 T55 S8 implementation and verification are complete; executor delivery
-and coordinator committed-diff review follow. x64/x86 passed 50/50 and strict
-lib passed 3/3. S7 is recorded in [its handoff](../history/M9-T55-S7-native-input-handoff.md).
+M9 T55 S8 is delivered for owner inspection. Executor P1 `939755d` is pushed;
+coordinator reviewed its actual 19-path diff against the three-item packet.
+x64/x86 passed 50/50 and strict lib passed 3/3. S7 is recorded in
+[its handoff](../history/M9-T55-S7-native-input-handoff.md).
 T55 remains open; the package CAP timeout in TODO is not claimed resolved.
 
 ## M9 T55 S8 Packet
