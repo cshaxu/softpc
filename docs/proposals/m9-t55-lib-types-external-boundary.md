@@ -1,5 +1,71 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S11 admission: text clearing and unfreeze activation
+
+Owner: “噢好的。请你修复这两点。” Baseline `54fe10e`.
+Architecture/coding/execution/documentation skills apply. T55 remains open.
+The finite scope is two repairs plus their fill/scroll and focus peer callers.
+
+| Item | Single owner / design | Proof required |
+| --- | --- | --- |
+| CLS | Owner subsequently confirmed “噢不对，dos下面cls成功的”. The real DOS and package probes also pass on the baseline. No production repair is justified. | Retain package ver-to-cls regression; remove experimental compatibility changes. |
+| Focus | Existing Window control FIFO requests activation only for frozen to unfrozen; repeated unfreeze is idempotent, no capture. | Actual worker control consumption with counted native focus requests; full regressions. |
+| Focus ordering | Owner reports resume briefly activates Window then returns foreground to Console. Control must finish raw binding before unfreeze; when both objects are needed, bind Console before creating Window. Preserve raw activation focus. | Reducer completion ordering plus main-call-path review and Window focus probe. |
+
+No MVDM, media, INI or lifecycle modifications. Tests use existing overlay
+media and bounded polling; no raw trace files or new diagnostic processes.
+Exit: both ledger rows proved, both EXEs, full dual-width tests, strict lib,
+manifest/DAG/governance, executor push and committed-diff coordinator review.
+
+Diagnosis correction: no-op legacy fill/scroll was an inspection finding, not
+proof of the reported CLS cause. A copied-frame test and native package test
+both passed with the baseline compatibility implementation. The owner confirmed
+DOS CLS succeeds, so the trial fill/scroll implementation was entirely removed.
+The extra diagnostic copied-frame test was removed; the four-line native
+package ver/cls check remains as the direct end-to-end regression.
+
+Owner then isolated the failing sequence: “windows里面的msdos提示符，全屏，
+然后按CAF变成窗口，然后再按ALT+Enter回到dos全屏提示符，cls才坏了” and
+“看来这个问题需要另外处理，不是cls的问题”. This mode-roundtrip defect is
+explicitly transferred to [TODO](../states/TODO.md), not claimed fixed by S11.
+
+### S11 implementation and peer sweep
+
+- Window consumes the existing frozen control and checks its prior frozen
+  flag. Only true-to-false requests foreground and focus; native refusal is
+  not an I/O failure. No capture, new API, new state or delay is introduced.
+- The one control-loop state publication is moved after presentation drive,
+  guarded by completed frame targets for running. Broker completion can finish
+  a previously deferred resume. Reconciler creates Window only after Console
+  ownership work, so initial Both creation cannot finish by refocusing Console.
+- Peer search: `rg -n 'set_runtime_state|apply_action' src/app` and
+  `rg -n 'set_foreground_window|set_focus' src/lib/ui-window src/lib/host`.
+  Creation and unfreeze remain Window-owned; click capture focus is unchanged;
+  raw broker activation retains its focus request, cooked does not acquire one.
+  No per-frame focus path, timer, platform call in app, or compatibility change.
+- Focus probe consumes actual worker controls with counted native calls:
+  already unfrozen, freeze, unfreeze, duplicate unfreeze and uncaptured state.
+  Reducer/matrix tests cover Console-before-Window and resume blocked until
+  broker completion. Package smoke adds actual native DOS ver/cls.
+- Code accounting via `git diff --numstat 54fe10e -- src/app/main.c
+  src/app/reconciler.c src/lib/ui-window/win32/component.c
+  src/lib/ui-window/window_interface.h test`: 4 production paths +19/-6
+  (net +13); 4 test paths +37/-10 (net +27). Documentation, manifest and
+  EXEs excluded. No build-target changes or additional ownership layer.
+
+### S11 executor evidence
+
+- `cmake --build --preset tests-x64 --parallel 6` and the matching x86
+  preset (existing explicit i686 compiler): success, fixed EXEs refreshed.
+- `ctest --preset test-x64 -j1 --output-on-failure`: 52/52 (59.89 s).
+- `ctest --preset test-x86 -j1 --output-on-failure`: 52/52 (76.39 s).
+- Strict lib rebuild and CTest: 3/3, including manifest, DAG/layout and Linux
+  build contract. Governance and diff whitespace checks pass.
+- Working-data policy: INI, media and MVDM untouched. No trace files retained;
+  generated test fixtures cleaned after runs. Native focus behavior awaits
+  owner Win3.1 fullscreen pause/resume verification; OS foreground policy is
+  not overridden. T55 remains open.
+
 ## S10 admission: complete approved audit repair set
 
 Owner: “按照这些协议，把前面我批准的所有修复做一下，好了就提交推送，然后让我来测。”

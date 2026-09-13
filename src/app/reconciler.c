@@ -89,8 +89,6 @@ app_reconciler_action app_reconciler_next_action(const app_reconciler *reconcile
         return APP_RECONCILER_ACTION_NONE;
 
     desired = app_reconciler_desired(reconciler);
-    if (desired.window_enabled && !reconciler->window_actual)
-        return APP_RECONCILER_ACTION_CREATE_WINDOW;
     if (desired.vm_console_enabled && !reconciler->vm_console_actual)
         return APP_RECONCILER_ACTION_CREATE_VM_CONSOLE;
     if (desired.vm_console_enabled &&
@@ -101,6 +99,10 @@ app_reconciler_action app_reconciler_next_action(const app_reconciler *reconcile
         return APP_RECONCILER_ACTION_BIND_MONITOR;
     if (!desired.vm_console_enabled && reconciler->vm_console_actual)
         return APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE;
+    /* Console activation may request foreground. Finish its ownership work
+       before creating the Window that should receive the final activation. */
+    if (desired.window_enabled && !reconciler->window_actual)
+        return APP_RECONCILER_ACTION_CREATE_WINDOW;
     if (!desired.window_enabled && reconciler->window_actual)
         return APP_RECONCILER_ACTION_DESTROY_WINDOW;
     return APP_RECONCILER_ACTION_NONE;

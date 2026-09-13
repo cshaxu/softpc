@@ -7,6 +7,7 @@ static HWND owner, focused;
 static RECT client = {0,0,640,480}, clipped;
 static POINT origin = {100,200};
 static unsigned releases, clips, events;
+static unsigned focus_requests, foreground_requests;
 static int clip_ok = 1, resize_ok = 1, title_ok = 1;
 static void *context;
 static void notify_loss(void);
@@ -14,7 +15,8 @@ static HWND WINAPI get_capture(void) { return owner; }
 static HWND WINAPI set_capture(HWND w) { HWND old=owner; owner=w; return old; }
 static BOOL WINAPI release_capture(void)
 { ++releases; owner=NULL; notify_loss(); return TRUE; }
-static HWND WINAPI set_focus(HWND w) { focused=w; return w; }
+static HWND WINAPI set_focus(HWND w) { ++focus_requests; focused=w; return w; }
+static BOOL WINAPI foreground(HWND w) { (void)w; ++foreground_requests; return TRUE; }
 static HWND WINAPI get_focus(void) { return focused; }
 static BOOL WINAPI clip(const RECT *r)
 { ++clips; if (r) clipped=*r; return r ? clip_ok : TRUE; }
@@ -31,6 +33,7 @@ static BOOL WINAPI title(HWND w,LPCSTR text) { (void)w;(void)text;return title_o
 #undef lib_win32_set_capture
 #undef lib_win32_release_capture
 #undef lib_win32_set_focus
+#undef lib_win32_set_foreground_window
 #undef lib_win32_get_focus
 #undef lib_win32_clip_cursor
 #undef lib_win32_get_client_rect
@@ -43,6 +46,7 @@ static BOOL WINAPI title(HWND w,LPCSTR text) { (void)w;(void)text;return title_o
 #define lib_win32_set_capture set_capture
 #define lib_win32_release_capture release_capture
 #define lib_win32_set_focus set_focus
+#define lib_win32_set_foreground_window foreground
 #define lib_win32_get_focus get_focus
 #define lib_win32_clip_cursor clip
 #define lib_win32_get_client_rect get_client
@@ -97,6 +101,19 @@ int main(void)
     resize_ok=1;
     win32_window_resize_client((HWND)1,&c,640,480);
     assert(c.client_surface_width==640 && c.client_surface_height==480);
+    focus_requests=foreground_requests=0;
+    assert(ui_window_unfreeze(&window)==LIB_STATUS_OK);
+    assert(win32_window_consume_mailboxes((HWND)1,&c));
+    assert(focus_requests==0 && foreground_requests==0);
+    assert(ui_window_freeze(&window)==LIB_STATUS_OK);
+    assert(win32_window_consume_mailboxes((HWND)1,&c));
+    assert(focus_requests==0 && foreground_requests==0);
+    assert(ui_window_unfreeze(&window)==LIB_STATUS_OK);
+    assert(win32_window_consume_mailboxes((HWND)1,&c));
+    assert(focus_requests==1 && foreground_requests==1 && !c.mouse.captured);
+    assert(ui_window_unfreeze(&window)==LIB_STATUS_OK);
+    assert(win32_window_consume_mailboxes((HWND)1,&c));
+    assert(focus_requests==1 && foreground_requests==1 && !c.mouse.captured);
     title_ok=0;
     ui_component_control command={.kind=UI_COMPONENT_CONTROL_SET_WINDOW_TITLE};
     assert(ui_component_mailboxes_enqueue_controls(&window.base.mailboxes,&command,1)==0);

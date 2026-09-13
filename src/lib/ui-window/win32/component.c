@@ -466,6 +466,10 @@ static int win32_window_consume_mailboxes(lib_win32_hwnd window,
             }
         }
         else if (control.kind == UI_COMPONENT_CONTROL_SET_WINDOW_FROZEN) {
+            if (context->frozen && !control.value.window_frozen) {
+                (void)lib_win32_set_foreground_window(window);
+                (void)lib_win32_set_focus(window);
+            }
             context->frozen = control.value.window_frozen;
             if (context->frozen == LIB_FALSE) {
                 context->cursor_blink_visible = LIB_TRUE;

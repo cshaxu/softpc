@@ -2,29 +2,29 @@
 
 ## Current Work
 
-M9 T55 S10 is delivered for owner testing: approved nine-item audit repairs.
-Executor P1 `fe11510` was pushed and its actual diff reviewed; T55 remains open.
+M9 T55 S11 is verified, preparing executor delivery: Window activation ordering.
+S10 delivery was accepted for continuation; T55 remains open.
 
-## M9 T55 S10 Packet
+## M9 T55 S11 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approved all audit repairs and fixed PC-glyph mapping; build, test, commit and push. |
-| Objective | Repair capture ownership/bounds, cooked line boundaries, Console glyph output and completion caches; remove duplicate interfaces and correct docs. |
-| Non-goals | No MVDM, media, INI, VM lifecycle, hotkey or frozen semantics change; no dynamic character mapping or Linux UI implementation. |
-| Reference Baseline | `bad9ab2`, S9 delivery. |
+| Admission And Approval | Owner: “噢好的。请你修复这两点。” Build, test, commit and push authorized. |
+| Objective | Request Window focus only on frozen-to-unfrozen transition, after Console binding; mode-roundtrip display defect separately deferred by owner. |
+| Non-goals | No MVDM, media, INI, lifecycle, capture or new public focus API changes. |
+| Reference Baseline | `54fe10e`, S10 delivery. |
 | Candidate Proposal | [T55 proposal](../proposals/m9-t55-lib-types-external-boundary.md) |
-| Files And ABI Surface | lib Window/host/console/ui-base/storage, tests and docs; fixed byte-to-Unicode display contract, no frame mapping table. |
+| Files And ABI Surface | Window unfreeze behavior and SoftPC control/reconciler activation order, tests and docs; no new public API. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout, Product UI and referenced skills. |
-| Verification | x64/x86 52/52; final strengthened x64 focused 2/2; strict build and lib gates 3/3; manifest, DAG and governance passed. Evidence in proposal. |
-| Expected Markers | Single cleanup/calculation/input paths; only successful native operations advance caches; complete-line delivery. |
-| Asset Needs | Refresh fixed softpc32.exe and softpc64.exe; preserve INI and media. |
-| Reporting Requirements | Nine-item convergence ledger, peer sweep, line accounting and pushed committed-diff review. |
-| Stop Conditions | Escalate product policy or new component ownership changes. |
-| Exit Criteria | Approved ledger implemented and tested, dual EXEs, reviewed pushed changes and clean worktree; T55 remains open. |
-| Original Owner Request | “按照这些协议，把前面我批准的所有修复做一下，好了就提交推送，然后让我来测。” |
-| Similar-Issue Sweep | Native capture/bounds/output results, line completion, input entry callers, internal exports, storage wrappers and current docs. |
+| Verification | x64 52/52, x86 52/52; strict lib build and 3/3 checks; manifest, DAG and governance passed. Focus-count and binding-order probes passed. |
+| Expected Markers | Console binding precedes Window activation; transition-only activation through existing FIFO; no speculative text changes. |
+| Asset Needs | Refresh fixed softpc32.exe and softpc64.exe; preserve INI/media. |
+| Reporting Requirements | Two-item ledger, peer sweep, line accounting and pushed committed-diff review. |
+| Stop Conditions | Escalate MVDM or product policy changes. |
+| Exit Criteria | Focus repairs verified, mode-roundtrip defect explicitly transferred, dual EXEs built, committed/pushed and clean worktree for owner testing; T55 stays open. |
+| Original Owner Request | “噢好的。请你修复这两点。” |
+| Similar-Issue Sweep | Character/attribute fill and scroll callers; initial/repeated unfreeze and native focus callers. |
 
 ## Current Technical Baseline
 

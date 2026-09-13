@@ -253,6 +253,10 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
     if (!package_wait_for_text(output, "SoftPC>", 5000u)) { stage = 3; goto done; }
     if (!package_send_text(input, "start\r")) { stage = 4; goto done; }
     if (!package_wait_for_text(output, "C:\\>", 10000u)) { stage = 5; goto done; }
+    if (!package_send_text(input, "ver\r") ||
+        !package_wait_for_text(output, "Version", 5000u)) { stage = 14; goto done; }
+    if (!package_send_text(input, "cls\r") ||
+        !package_wait_for_absent_text(output, "Version", 5000u)) { stage = 15; goto done; }
     if (!package_send_pause_hotkey(input)) { stage = 6; goto done; }
     /* The product attaches the monitor Console only after PAUSED completion;
        the visible proof is its rearmed cooked prompt, not text written while

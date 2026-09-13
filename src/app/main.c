@@ -383,9 +383,6 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                     app_command_session_note_runtime(&session,
                         state->monitor_actual, completed, &command_effect);
                     app_control_state_note_runtime(state, completed);
-                    app_presentation_set_runtime_state(presenter,
-                        completed == SOFTPC_RUNTIME_RESET_COMPLETED ?
-                            SOFTPC_RUNTIME_PAUSED : completed);
                 }
                 else if (control_event.kind == APP_CONTROL_FRAME_COMPLETED) {
                     uint32_t frame_run;
@@ -414,6 +411,14 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                     broker_monitor_completed = !vm_console_current;
                 }
                 if (!app_monitor_drive(runtime, presenter, &control)) goto failed;
+                /* Resume activation belongs after the raw Console handoff,
+                   never before a broker that can take foreground back. */
+                if ((control_event.kind == APP_CONTROL_RUNTIME_COMPLETED ||
+                     control_event.kind == APP_CONTROL_BROKER_COMPLETED) &&
+                    (state->presentation.runtime_actual != SOFTPC_RUNTIME_RUNNING ||
+                     app_control_state_frame_targets_ready(state)))
+                    app_presentation_set_runtime_state(presenter,
+                        state->presentation.runtime_actual);
                 /* A monitor completion can be stale with respect to a new
                  * Console-mode VM binding.  Only the reconciled actual owner
                  * may make its prompt due. */

@@ -115,6 +115,9 @@ requests native foreground/focus; cooked activation does not. SoftPC does not
 call Win32 focus APIs. Foreground requests and confirmed reader ownership are
 distinct: input takeover is completed by the broker's retirement/activation
 transaction, not by focusing a window.
+When a running view needs both surfaces, control completes Console ownership
+work before creating Window or unfreezing an existing Window. This orders the
+foreground requests without retries, timers or platform calls in SoftPC.
 
 ## UI Components And Registered Hotkeys
 
@@ -141,6 +144,9 @@ when not registered flushes Ctrl, Alt, and X as normal input in order. SoftPC
 alone maps identifiers to pause/resume, stop/reset/start, mouse release, or
 synthetic guest input such as Ctrl+Alt+Del and Alt+Enter. The cooked monitor
 does not use a UI component or hotkey registry and accepts only monitor lines.
+
+On the actual frozen-to-unfrozen transition, the Window requests activation
+once; repeated unfreeze calls do not refocus it or capture the mouse.
 
 Freezing a Window is a guest-input boundary, not a registered-hotkey boundary:
 its native key transitions still pass through the source-local matcher. A
