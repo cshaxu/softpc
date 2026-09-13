@@ -2,11 +2,30 @@
 
 ## Current Work
 
-No implementation subtask is active. M9 T55 S11 is closed after the owner
-requested repair and closure. T55 remains open; no next S is admitted.
-Executor P3 `bcf2353` was pushed and its actual diff reviewed.
-See [S11 closure](../history/M9-T55-S11-window-activation-closure.md) and the
-active T-level [proposal](../history/M9-T55-lib-types-external-boundary-proposal.md).
+M9 T55 S12 is implemented and verified: all seven approved shared-library
+audit repairs, both fixed EXEs and 52/52 CTest at each width. Executor delivery
+is ready for commit/push and coordinator review. S11 remains closed; T55 is open.
+
+## M9 T55 S12 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner: “对啊，那就这么办。其他的按你说的来。” |
+| Objective | Repair all seven S12 ledger entries through their existing component owners. |
+| Non-goals | No MVDM, media, INI, app lifecycle, mouse scaling, or deferred mode-roundtrip repair; no T closure. |
+| Reference Baseline | a0d0d37, clean main after S11 closure. |
+| Candidate Proposal | [Shared-library audit repairs](../proposals/m9-lib-activation-audit-repairs.md). |
+| Files And ABI Surface | lib console activation event; host private rollback contract; shared frame acknowledgement; hotkey, Window, Linux input; corresponding tests and READMEs. |
+| Applicable Rules | Architecture, coding, execution and documentation rules and linked skills; current architecture, source layout and UI authorities. |
+| Verification | Deterministic rollback, physical-key lifetime, frame acknowledgement/activation, geometry failure and blink-deadline probes; full x64/x86 CTest and strict lib checks. |
+| Expected Markers | All seven ledger rows have focused evidence; independent UI leaves and component DAG retained. |
+| Asset Needs | Existing non-mutating package media; refresh only fixed x86/x64 EXEs; no trace recordings. |
+| Reporting Requirements | Per-item proof, similar-issue dispositions, production/test line accounting, executor commit/push then coordinator actual-diff review. |
+| Stop Conditions | Do not expand product semantics or hide failed tests; unresolved boundary changes require owner direction. |
+| Exit Criteria | Seven repairs verified, both EXEs built, manifest/DAG/governance and full regression pass, complete pushed delivery and clean worktree for owner testing. |
+| Original Owner Request | Bind ui-console: draw its pending mailbox if any, otherwise nothing; “其他的按你说的来。” |
+| Similar-Issue Sweep | Scan broker activation/retirement callers, all frame consumers, key identity comparisons, geometry results, worker blink wake paths and host product comments. |
 
 ## Current Technical Baseline
 
@@ -31,12 +50,6 @@ active T-level [proposal](../history/M9-T55-lib-types-external-boundary-proposal
 | T52 | Native Console pointer capture was withdrawn: supported terminal hosts cannot provide a reliable visible client rectangle; no implementation remains. | [T52 record](../history/M9-T52-console-pointer-capture-withdrawn.md) |
 | T53 | Raw Console one-cell input now maps to eight logical units on both axes; dual-width 37/37 verification closed. | [T53 S1 closure](../history/M9-T53-S1-console-logical-mouse-scale.md) |
 | T54 | Restored the original X×8/Y×16 raw-Console InPort conversion, removed app-side mouse merging, and proved original InPort accumulation; owner accepted the balanced physical-input behavior. | [T54 S1 closure](../history/M9-T54-S1-console-mouse-scale-closure.md) |
-
-## Recent M9 Task Progress
-
-| Task | Open-task status | Evidence |
-| --- | --- | --- |
-| T55 | S11 closed; T55 remains open, with no active S. This is not a T-level closure. | [S11 record](../history/M9-T55-S11-window-activation-closure.md) |
 
 - **M9 T50 S1:** Checked-in x64/x86 presets now bind compiler width to package
   identity and passed fresh 36/36 CTest at both widths.

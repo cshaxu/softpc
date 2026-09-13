@@ -35,10 +35,11 @@ static lib_bool ui_hotkey_registry_has_modifier(const ui_hotkey_registry *regist
 static lib_bool ui_hotkey_same_key(const ui_input_event *a,
     const ui_input_event *b)
 {
-    return a->data.key.key == b->data.key.key &&
-        a->data.key.scan_code == b->data.key.scan_code &&
-        (a->data.key.flags & UI_KEY_FLAG_EXTENDED) ==
-        (b->data.key.flags & UI_KEY_FLAG_EXTENDED);
+    if ((a->data.key.flags & UI_KEY_FLAG_EXTENDED) !=
+        (b->data.key.flags & UI_KEY_FLAG_EXTENDED)) return LIB_FALSE;
+    if (a->data.key.scan_code != 0u || b->data.key.scan_code != 0u)
+        return a->data.key.scan_code == b->data.key.scan_code;
+    return a->data.key.key == b->data.key.key;
 }
 
 static int ui_hotkey_flush_pending(ui_hotkey_matcher *matcher,
@@ -61,11 +62,19 @@ static int ui_hotkey_transition(ui_hotkey_matcher *matcher,
     lib_size i, index;
     ui_hotkey_held_key *key;
     const ui_hotkey_registration *matched;
+    ui_input_event held_transition;
     lib_bool eligible = LIB_TRUE;
-    lib_u8 modifier = ui_hotkey_modifier_bit(event->data.key.key);
+    lib_u8 modifier;
 
     for (index = 0u; index < matcher->held_count; ++index)
         if (ui_hotkey_same_key(&matcher->held[index].make, event)) break;
+    if (index != matcher->held_count) {
+        /* Layout/lock changes must not change an already held key's lifetime. */
+        held_transition = *event;
+        held_transition.data.key.key = matcher->held[index].make.data.key.key;
+        event = &held_transition;
+    }
+    modifier = ui_hotkey_modifier_bit(event->data.key.key);
     if (!event->data.key.pressed) {
         if (index == matcher->held_count)
             return ui_hotkey_flush_pending(matcher, sink, context) && sink(context, event);

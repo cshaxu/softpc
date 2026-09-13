@@ -57,7 +57,11 @@ lib_status ui_component_mailboxes_enqueue_controls(
 lib_bool ui_component_mailboxes_take_control(ui_component_mailboxes *mailboxes,
     ui_component_control *out_control);
 lib_bool ui_component_mailboxes_capture_frame(ui_component_mailboxes *mailboxes,
-    lib_u32 *in_out_generation, ui_frame *out_frame);
+    lib_u32 *out_generation, ui_frame *out_frame);
+/* Capture leaves the latest frame pending. Acknowledge only after success;
+ * acknowledging an older capture never clears a newer publication. */
+void ui_component_mailboxes_acknowledge_frame(ui_component_mailboxes *mailboxes,
+    lib_u32 generation);
 ui_mailbox_wake *ui_component_mailboxes_wake(
     const ui_component_mailboxes *mailboxes);
 

@@ -13,10 +13,13 @@ lib_status host_console_backend_prepare(host_console_backend *backend,
     lib_console *console, host_console_mode mode)
 { (void)backend; (void)console; (void)mode; return LIB_STATUS_UNSUPPORTED; }
 lib_status host_console_backend_activate(host_console_backend *backend,
-    lib_console *console, host_console_mode mode, lib_u32 generation)
-{ (void)backend; (void)console; (void)mode; (void)generation; return LIB_STATUS_UNSUPPORTED; }
-lib_status host_console_backend_deactivate(host_console_backend *backend)
-{ (void)backend; return LIB_STATUS_UNSUPPORTED; }
+    lib_console *console, host_console_mode mode, lib_u32 generation,
+    lib_bool restore_cooked_request)
+{ (void)backend; (void)console; (void)mode; (void)generation;
+  (void)restore_cooked_request; return LIB_STATUS_UNSUPPORTED; }
+lib_status host_console_backend_deactivate(host_console_backend *backend,
+    lib_bool *out_cooked_request)
+{ (void)backend; (void)out_cooked_request; return LIB_STATUS_UNSUPPORTED; }
 void host_console_backend_lock_output(host_console_backend *backend)
 { (void)backend; }
 void host_console_backend_unlock_output(host_console_backend *backend)

@@ -219,7 +219,7 @@ static void win32_window_capture_client_size(lib_win32_hwnd window,
     lib_win32_rect client;
 
     if (window == LIB_NULL || context == LIB_NULL) return;
-    lib_win32_get_client_rect(window, &client);
+    if (!lib_win32_get_client_rect(window, &client)) return;
     context->client_width = client.right - client.left;
     context->client_height = client.bottom - client.top;
 }
@@ -277,19 +277,6 @@ static void win32_window_paint(lib_win32_hwnd window, ui_win32_window_context *c
     }
 }
 
-static void win32_window_advance_cursor_blink(lib_win32_hwnd window,
-    ui_win32_window_context *context)
-{
-    lib_win32_rect cursor;
-
-    if (!win32_window_accepting_input(context) ||
-        context->frozen != LIB_FALSE) return;
-    context->cursor_blink_visible = context->cursor_blink_visible == LIB_FALSE;
-    context->cursor_blink_due = lib_win32_get_tick_count() + WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS;
-    if (win32_window_cursor_rect(window, context, &cursor))
-        lib_win32_invalidate_rect(window, &cursor, LIB_WIN32_FALSE);
-}
-
 static lib_win32_dword win32_window_cursor_blink_timeout(
     const ui_win32_window_context *context)
 {
@@ -303,6 +290,18 @@ static lib_win32_dword win32_window_cursor_blink_timeout(
     now = lib_win32_get_tick_count();
     return (lib_win32_long)(now - context->cursor_blink_due) >= 0 ? 0u :
         context->cursor_blink_due - now;
+}
+
+static void win32_window_advance_cursor_blink(lib_win32_hwnd window,
+    ui_win32_window_context *context)
+{
+    lib_win32_rect cursor;
+
+    if (win32_window_cursor_blink_timeout(context) != 0u) return;
+    context->cursor_blink_visible = context->cursor_blink_visible == LIB_FALSE;
+    context->cursor_blink_due = lib_win32_get_tick_count() + WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS;
+    if (win32_window_cursor_rect(window, context, &cursor))
+        lib_win32_invalidate_rect(window, &cursor, LIB_WIN32_FALSE);
 }
 
 static int win32_window_transition(ui_win32_window_context *context,
@@ -444,6 +443,8 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
             context->surface_width, context->surface_height);
         lib_win32_invalidate_rect(window, LIB_NULL, LIB_WIN32_FALSE);
     }
+    ui_component_mailboxes_acknowledge_frame(&context->component->base.mailboxes,
+        context->displayed_sequence);
 }
 
 static int win32_window_consume_mailboxes(lib_win32_hwnd window,
@@ -725,8 +726,7 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
         else if (wait == UI_MAILBOX_WAKE_WAIT_FAULT) {
             ui_component_fail(&component->base, LIB_STATUS_IO_ERROR);
         }
-        else if (wait == UI_MAILBOX_WAKE_WAIT_TIMED_OUT)
-            win32_window_advance_cursor_blink(window, context);
+        win32_window_advance_cursor_blink(window, context);
         while (win32_window_accepting_input(context) &&
             lib_win32_peek_message_w(&message, LIB_NULL, 0, 0, LIB_WIN32_PM_REMOVE)) {
             if (message.message == LIB_WIN32_WM_QUIT) {
@@ -734,6 +734,7 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
                 break;
             }
             lib_win32_dispatch_message_w(&message);
+            win32_window_advance_cursor_blink(window, context);
         }
     }
     if (!lib_win32_is_window(window)) ui_component_fail(&component->base, LIB_STATUS_IO_ERROR);

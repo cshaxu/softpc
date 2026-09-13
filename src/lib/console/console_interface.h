@@ -27,7 +27,10 @@ typedef enum lib_console_event_kind {
     LIB_CONSOLE_EVENT_COOKED_LINE,
     LIB_CONSOLE_EVENT_REJECTED_LINE,
     /* Unexpected reader failure; cancellation during replacement is not failure. */
-    LIB_CONSOLE_EVENT_IO_FAILURE
+    LIB_CONSOLE_EVENT_IO_FAILURE,
+    /* Binding succeeded. Receivers may wake output workers; callbacks must
+     * not synchronously reenter the broker or render into the binding. */
+    LIB_CONSOLE_EVENT_ACTIVATED
 } lib_console_event_kind;
 
 enum {

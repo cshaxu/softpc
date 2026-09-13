@@ -44,7 +44,9 @@ static void ui_console_receive_event(void *context,
             LIB_MEMORY_ORDER_ACQUIRE) != 0 ||
         (state = (ui_console_win32_state *)console->worker_state) == LIB_NULL)
         return;
-    if (event->kind == LIB_CONSOLE_EVENT_IO_FAILURE) {
+    if (event->kind == LIB_CONSOLE_EVENT_ACTIVATED) {
+        ui_mailbox_wake_signal(ui_component_mailboxes_wake(&console->base.mailboxes));
+    } else if (event->kind == LIB_CONSOLE_EVENT_IO_FAILURE) {
         ui_component_fail(&console->base, LIB_STATUS_IO_ERROR);
     } else if (event->kind == LIB_CONSOLE_EVENT_RAW_KEY) {
         const lib_console_raw_key *key = &event->value.raw_key;
@@ -106,6 +108,9 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_console_worker(void *opaque)
         if (ui_component_mailboxes_capture_frame(&console->base.mailboxes,
                 &generation, &frame)) {
             lib_status status = ui_console_publish_text_frame(console, &frame);
+            if (status == LIB_STATUS_OK)
+                ui_component_mailboxes_acknowledge_frame(&console->base.mailboxes,
+                    generation);
             if (status != LIB_STATUS_OK && status != LIB_STATUS_NOT_CURRENT) {
                 ui_component_fail(&console->base, status);
                 break;

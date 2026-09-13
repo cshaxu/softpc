@@ -8,7 +8,9 @@ static RECT client = {0,0,640,480}, clipped;
 static POINT origin = {100,200};
 static unsigned releases, clips, events;
 static unsigned focus_requests, foreground_requests;
-static int clip_ok = 1, resize_ok = 1, title_ok = 1;
+static int clip_ok = 1, resize_ok = 1, title_ok = 1, client_ok = 1;
+static DWORD ticks;
+static DWORD WINAPI clock_tick(void) { return ticks; }
 static void *context;
 static void notify_loss(void);
 static HWND WINAPI get_capture(void) { return owner; }
@@ -20,7 +22,8 @@ static BOOL WINAPI foreground(HWND w) { (void)w; ++foreground_requests; return T
 static HWND WINAPI get_focus(void) { return focused; }
 static BOOL WINAPI clip(const RECT *r)
 { ++clips; if (r) clipped=*r; return r ? clip_ok : TRUE; }
-static BOOL WINAPI get_client(HWND w, RECT *r) { (void)w; *r=client; return TRUE; }
+static BOOL WINAPI get_client(HWND w, RECT *r)
+{ (void)w; if (!client_ok) return FALSE; *r=client; return TRUE; }
 static BOOL WINAPI to_screen(HWND w, POINT *p)
 { (void)w; p->x+=origin.x; p->y+=origin.y; return TRUE; }
 static HCURSOR WINAPI cursor(HCURSOR c) { return c; }
@@ -55,6 +58,8 @@ static BOOL WINAPI title(HWND w,LPCSTR text) { (void)w;(void)text;return title_o
 #define lib_win32_get_window_long_ptr_a get_context
 #define lib_win32_set_window_pos resize
 #define lib_win32_set_window_text_a title
+#undef lib_win32_get_tick_count
+#define lib_win32_get_tick_count clock_tick
 #include "lib/ui-window/win32/mouse.c"
 #include "lib/ui-window/win32/geometry.c"
 #include "lib/ui-window/win32/component.c"
@@ -111,6 +116,24 @@ int main(void)
     assert(ui_window_unfreeze(&window)==LIB_STATUS_OK);
     assert(win32_window_consume_mailboxes((HWND)1,&c));
     assert(focus_requests==1 && foreground_requests==1 && !c.mouse.captured);
+    c.client_width=320; c.client_height=240; client_ok=0;
+    win32_window_capture_client_size((HWND)1,&c);
+    assert(c.client_width==320 && c.client_height==240);
+    client_ok=1;
+    c.frame.valid=1; c.frame.text_columns=80; c.frame.text_rows=25;
+    c.frame.cursor_visible=1; c.frame.font_height=16;
+    c.cursor_blink_due=250; c.cursor_blink_visible=1;
+    for (ticks=0;ticks<250;++ticks) win32_window_advance_cursor_blink((HWND)1,&c);
+    assert(c.cursor_blink_visible);
+    win32_window_advance_cursor_blink((HWND)1,&c);
+    assert(!c.cursor_blink_visible && c.cursor_blink_due==500);
+    c.frozen=1; ticks=500; win32_window_advance_cursor_blink((HWND)1,&c);
+    assert(!c.cursor_blink_visible);
+    c.frozen=0; c.cursor_blink_due=10; ticks=0xfffffff0u;
+    win32_window_advance_cursor_blink((HWND)1,&c); assert(!c.cursor_blink_visible);
+    ticks=10; win32_window_advance_cursor_blink((HWND)1,&c); assert(c.cursor_blink_visible);
+    c.frame.cursor_visible=0; ticks=1000;
+    win32_window_advance_cursor_blink((HWND)1,&c); assert(c.cursor_blink_visible);
     assert(ui_window_unfreeze(&window)==LIB_STATUS_OK);
     assert(win32_window_consume_mailboxes((HWND)1,&c));
     assert(focus_requests==1 && foreground_requests==1 && !c.mouse.captured);

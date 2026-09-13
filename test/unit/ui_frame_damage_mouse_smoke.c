@@ -17,6 +17,7 @@ static void damage(void)
     assert(ui_component_mailboxes_publish_frame(&mailbox, &frame) == LIB_STATUS_OK);
     assert(ui_component_mailboxes_capture_frame(&mailbox, &generation, &received));
     assert(received.dirty_right == 3 && received.dirty_bottom == 3);
+    ui_component_mailboxes_acknowledge_frame(&mailbox, generation);
     frame.dirty_left = frame.dirty_top = frame.dirty_right = frame.dirty_bottom = 1;
     frame.graphics_pixels[5] = 1u;
     assert(ui_component_mailboxes_publish_frame(&mailbox, &frame) == LIB_STATUS_OK);
@@ -27,10 +28,21 @@ static void damage(void)
     assert(received.dirty_left == 1 && received.dirty_top == 1 &&
         received.dirty_right == 2 && received.dirty_bottom == 2);
     assert(received.graphics_pixels[5] == 1u && received.graphics_pixels[10] == 2u);
+    ui_component_mailboxes_acknowledge_frame(&mailbox, generation);
     assert(!ui_component_mailboxes_capture_frame(&mailbox, &generation, &received));
     assert(ui_component_mailboxes_publish_frame(&mailbox, &frame) == LIB_STATUS_OK);
     assert(ui_component_mailboxes_capture_frame(&mailbox, &generation, &received));
     assert(received.dirty_left == 2 && received.dirty_top == 2);
+    /* Failed output has no acknowledgement; capture remains available.
+     * A newer publication cannot be erased by the older write's success. */
+    lib_u32 old = generation;
+    assert(ui_component_mailboxes_capture_frame(&mailbox, &generation, &received));
+    assert(generation == old);
+    assert(ui_component_mailboxes_publish_frame(&mailbox, &frame) == LIB_STATUS_OK);
+    ui_component_mailboxes_acknowledge_frame(&mailbox, old);
+    assert(ui_component_mailboxes_capture_frame(&mailbox, &generation, &received));
+    assert(generation != old);
+    ui_component_mailboxes_acknowledge_frame(&mailbox, generation);
     frame.graphics_palette[1] = 0xffu;
     assert(ui_component_mailboxes_publish_frame(&mailbox, &frame) == LIB_STATUS_OK);
     assert(ui_component_mailboxes_capture_frame(&mailbox, &generation, &received));

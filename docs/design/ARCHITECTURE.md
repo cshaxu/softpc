@@ -135,7 +135,14 @@ component API it has chosen; components communicate back only through the
 copied input-queue entry supplied at creation.
 
 Shared frame mailboxes accumulate unconsumed dirty bounds with the latest
-complete image under one lock. Window displacement retains integer remainders
+complete image under one lock. Capture does not consume; a successful-output
+acknowledgement clears only that still-current publication. Host reports logical
+Console activation through its neutral event sink after binding succeeds;
+ui-console only wakes its existing worker to draw pending content. Empty means
+no output, and NOT_CURRENT retains pending content without a retry loop.
+Cooked rollback restores only an unfinished line request observed after reader
+join; ordinary cooked activation remains explicitly armed by the caller.
+Window displacement retains integer remainders
 internally without changing the copied input ABI. Post-start worker exits share
 one failure/retirement cleanup path; startup failure remains distinct. Unexpected
 Console I/O failures are copied events, not product decisions. Broker replacement

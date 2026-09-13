@@ -135,20 +135,29 @@ lib_bool ui_component_mailboxes_take_control(ui_component_mailboxes *mailboxes,
 }
 
 lib_bool ui_component_mailboxes_capture_frame(ui_component_mailboxes *mailboxes,
-    lib_u32 *in_out_generation, ui_frame *out_frame)
+    lib_u32 *out_generation, ui_frame *out_frame)
 {
-    if (mailboxes == LIB_NULL || in_out_generation == LIB_NULL ||
+    if (mailboxes == LIB_NULL || out_generation == LIB_NULL ||
         out_frame == LIB_NULL) return LIB_FALSE;
     ui_component_mailboxes_lock(&mailboxes->frame_lock);
-    if (*in_out_generation == mailboxes->frame_generation) {
+    if (!mailboxes->frame_pending) {
         ui_component_mailboxes_unlock(&mailboxes->frame_lock);
         return LIB_FALSE;
     }
     *out_frame = mailboxes->frame;
-    *in_out_generation = mailboxes->frame_generation;
-    mailboxes->frame_pending = LIB_FALSE;
+    *out_generation = mailboxes->frame_generation;
     ui_component_mailboxes_unlock(&mailboxes->frame_lock);
     return LIB_TRUE;
+}
+
+void ui_component_mailboxes_acknowledge_frame(ui_component_mailboxes *mailboxes,
+    lib_u32 generation)
+{
+    if (mailboxes == LIB_NULL) return;
+    ui_component_mailboxes_lock(&mailboxes->frame_lock);
+    if (generation == mailboxes->frame_generation)
+        mailboxes->frame_pending = LIB_FALSE;
+    ui_component_mailboxes_unlock(&mailboxes->frame_lock);
 }
 
 ui_mailbox_wake *ui_component_mailboxes_wake(

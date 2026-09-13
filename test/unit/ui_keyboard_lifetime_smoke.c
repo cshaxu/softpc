@@ -334,8 +334,37 @@ static void synthesis_lifetimes(void)
     }
 }
 
+static void physical_identity(void)
+{
+    ui_hotkey_matcher m;
+    capture c = {0};
+    ui_hotkey_matcher_initialize(&m, NULL);
+    assert(submit(&m, &c, UI_KEY_KEYPAD_7, 0x47, 0, 0, 1));
+    assert(submit(&m, &c, UI_KEY_HOME, 0x47, 0, 0, 1));
+    assert(m.held_count == 1 && c.events[1].data.key.key == UI_KEY_KEYPAD_7);
+    assert(submit(&m, &c, UI_KEY_HOME, 0x47, 0, 0, 0));
+    assert(m.held_count == 0 && c.count == 3);
+    assert(c.events[2].data.key.key == UI_KEY_KEYPAD_7 && !c.events[2].data.key.pressed);
+    assert(submit(&m, &c, UI_KEY_HOME, 0x47, UI_KEY_FLAG_EXTENDED, 0, 1));
+    assert(submit(&m, &c, UI_KEY_KEYPAD_7, 0x47, 0, 0, 1));
+    assert(m.held_count == 2);
+    assert(submit(&m, &c, UI_KEY_HOME, 0x47, 0, 0, 0));
+    assert(submit(&m, &c, UI_KEY_HOME, 0x47, UI_KEY_FLAG_EXTENDED, 0, 0));
+    assert(m.held_count == 0);
+    assert(submit(&m, &c, 'A', 0, 0, 0, 1));
+    assert(submit(&m, &c, 'B', 0, 0, 0, 1));
+    assert(submit(&m, &c, 'A', 0x1e, 0, 0, 1));
+    assert(m.held_count == 3);
+    assert(submit(&m, &c, 'A', 0, 0, 0, 0));
+    assert(submit(&m, &c, 'B', 0, 0, 0, 0));
+    assert(submit(&m, &c, 'A', 0x1e, 0, 0, 0));
+    assert(m.held_count == 0);
+    ui_hotkey_matcher_discard(&m);
+}
+
 int main(void)
 {
+    physical_identity();
     permutations();
     failure_paths();
     synthesis_lifetimes();

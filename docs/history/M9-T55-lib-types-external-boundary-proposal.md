@@ -1,5 +1,82 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S12 admission: seven shared-library audit repairs
+
+Baseline `a0d0d37`. Owner: “对啊，那就这么办。其他的按你说的来。”
+The fourth-item decision is: on broker binding, ui-console draws its pending
+mailbox, if present; an empty mailbox produces nothing. All seven rows below
+are the finite repair universe, including their direct peer call sites.
+
+| Item | Single owner and repair | Focused proof |
+| --- | --- | --- |
+| Cooked rollback | Host restores an unfinished cooked read request only when rolling back; ordinary cooked activation still does not arm input. Capture unfinished state after retirement, not before a racing completed line. | Armed, unarmed, completed and failed retirement/activation paths. |
+| Physical key identity | Existing ui-base held-key ledger uses scan plus extended flag, with logical-key fallback only for scanless input. A held key keeps its original logical identity. | Changed logical key at release/repeat, scanless and extended isolation. |
+| Client geometry failure | Window preserves completed dimensions when GetClientRect fails. | Native failure probe. |
+| Console activation frame | Host sends a neutral logical-Console activation event after successful binding; ui-console only wakes its existing worker. Shared mailbox capture is acknowledged only after success; NOT_CURRENT retains pending data without retries or a second renderer. An old acknowledgement cannot discard newer content. | Empty activation, pre-binding publication, NOT_CURRENT, newer publication during write, STOP and rebind. |
+| Blink progress | Window checks its existing 250 ms deadline on wakes/messages as well as timeout; no extra timer or thread. | Busy wake, early/due, frozen and wrapping-clock cases. |
+| Linux input simplification | Existing platform key conversion returns the key directly, not an intermediate full event. | Platform contract and existing normalization tests. |
+| Neutral host prose | Describe cooked line arming without monitor/prompt product policy. | Full host comment/caller sweep. |
+
+No MVDM, app lifecycle, configuration, media, mouse-scale or deferred
+mode-roundtrip changes. Implement all rows before building and testing both
+package widths. Delivery requires full regression, strict lib, manifest,
+boundary/governance checks, complete executor P1 push and coordinator review.
+T55 remains open. Temporary test data stays in the existing ignored build trees;
+no unbounded traces or additional interactive processes are admitted.
+
+### S12 implementation and peer sweep
+
+- Host keeps the existing pending-line field through cancellation until join.
+  Deactivation returns its completed snapshot; only failed replacement restores
+  that request. A completed line is not restarted. The Windows cancellation and
+  reader-join mechanism, including its timeout failure, is unchanged. Linux's
+  private backend signature is updated without claiming new support.
+- Host sends ACTIVATED only after successful create, replacement or rollback,
+  after releasing the native output gate and before a later replacement can
+  enter. Logical Console retains its generation rejection and callback barrier.
+  The monitor ignores this non-input notification; no app change is needed.
+- Both frame consumers use the existing shared capture and explicit successful
+  acknowledgement. Only ui-console treats NOT_CURRENT as pending output. Its
+  activation callback only signals the same wake; no binding query, second
+  renderer, native lock across mailbox copying or automatic retry was added.
+- `rg -n 'capture_frame|acknowledge_frame' src/lib` finds exactly the two leaf
+  consumers and shared implementation. Both were migrated. Deterministic worker
+  barriers cover empty activation, retained NOT_CURRENT, newer B during A output,
+  and STOP ahead of the next frame even when activation also arrives.
+- `rg -n 'same_key|scan_code ==' src/lib --glob '*.c'` confirms one physical
+  ledger owner. Its tests cover changed logical identity during a held scan,
+  extended separation and scanless fallback, alongside existing chord matrices.
+  First full regression caught a test-fixture defect: mismatch X reused Ctrl's
+  scan 0x1d. The fixture now supplies X's 0x2d; its original replay assertions
+  remain unchanged. This is not evidence of a native keyboard regression.
+- `rg -n 'get_client_rect|cursor_blink' src/lib --glob '*.c'`: mouse/geometry
+  peer callers already check failure; the Window size-cache caller is repaired.
+  Blink has one deadline predicate and one advancement function, checked on wake
+  and after native messages, retaining 250 ms, frozen and hidden-cursor guards.
+- Linux input drops the intermediate event, retaining the existing mapping and
+  TEXT fallback. `rg -n '\b(monitor|prompt|SoftPC|NXVM|guest|VM|machine)\b'
+  src/lib/host --glob '*.c' --glob '*.h'` returns no matches after prose cleanup.
+- `git diff --numstat a0d0d37 -- 'src/lib/*.c' 'src/lib/*.h' 'test/*.c'` counts
+  12 production files +117/-70 (net +47), and 7 test files +219/-5 (net +214).
+  Documentation, manifest and EXEs are excluded. No new worker, persistent
+  owner, alternative production path or compatibility adapter was introduced.
+
+### S12 executor verification
+
+Both `cmake --build --preset tests-x64 --parallel 6` and the corresponding
+tests-x86 build with the configured explicit i686 compiler succeeded. The final
+full serial CTest runs passed x64 52/52 (41.17 s), x86 52/52 (78.34 s), including
+the actual package smoke. Standalone strict lib rebuild uses
+`-Wall -Wextra -Wpedantic -Werror`; its three CTests pass. Manifest, component
+boundary and documentation gates pass. The earlier x64 run's single failed
+fixture and its correction are recorded above, not hidden by the final result.
+
+Fixed package binaries are refreshed (PE x86 0x014c, x64 0x8664). No app,
+compatibility host, MVDM, media or INI edits exist. Disposable types-layout and
+documentation-selftest fixtures from these two builds were removed; configured
+build trees and compact CTest evidence remain. The seven repairs are delivered
+for owner testing; neither a manual Win3.1 acceptance nor T55 closure is claimed.
+
 ## S11 admission: text clearing and unfreeze activation
 
 Owner: “噢好的。请你修复这两点。” Baseline `54fe10e`.

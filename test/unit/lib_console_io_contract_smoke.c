@@ -34,6 +34,22 @@ static BOOL WINAPI cursor_info(HANDLE h, const CONSOLE_CURSOR_INFO *p)
 { (void)h; (void)p; return cursor_ok; }
 static BOOL WINAPI cursor_position(HANDLE h, COORD p)
 { (void)h; (void)p; return cursor_ok; }
+static unsigned readers_started;
+static BOOL WINAPI set_mode(HANDLE h, DWORD mode) { (void)h; (void)mode; return TRUE; }
+static BOOL WINAPI flush_input(HANDLE h) { (void)h; return TRUE; }
+static HANDLE WINAPI start_reader(LPSECURITY_ATTRIBUTES a, SIZE_T size,
+    LPTHREAD_START_ROUTINE entry, LPVOID arg, DWORD flags, LPDWORD id)
+{
+    (void)a; (void)size; (void)entry; (void)arg; (void)flags; (void)id;
+    ++readers_started;
+    return CreateEventA(NULL, TRUE, TRUE, NULL); /* deterministic joined worker */
+}
+#undef lib_win32_create_thread
+#define lib_win32_create_thread start_reader
+#undef lib_win32_set_console_mode
+#define lib_win32_set_console_mode set_mode
+#undef lib_win32_flush_console_input_buffer
+#define lib_win32_flush_console_input_buffer flush_input
 #undef lib_win32_read_console_a
 #define lib_win32_read_console_a read_chunk
 #undef lib_win32_get_console_screen_buffer_info
@@ -54,6 +70,33 @@ static unsigned delivered;
 static lib_console_event received;
 static void receive(void *p, const lib_console_event *event)
 { (void)p; received=*event; ++delivered; }
+static void cooked_restore(void)
+{
+    host_console_backend b={0};
+    lib_console *c;
+    lib_bool pending;
+    assert(lib_console_create(&c)==LIB_STATUS_OK);
+    assert(host_console_backend_activate(&b,c,HOST_CONSOLE_COOKED_LINES,1,0)==0);
+    assert(!b.reader && !b.cooked_line_pending && readers_started==0);
+    assert(host_console_backend_request_cooked_line(&b)==0);
+    assert(b.reader && b.cooked_line_pending && readers_started==1);
+    /* Cancellation preserves an unfinished request until join. */
+    stop=b.stop_event; input="discarded\r\n"; reads=0; cancel_at=1;
+    host_console_reader(&b); cancel_at=0;
+    assert(b.cooked_line_pending);
+    assert(host_console_backend_deactivate(&b,&pending)==0 && pending);
+    assert(!b.reader && !b.cooked_line_pending);
+    assert(host_console_backend_activate(&b,c,HOST_CONSOLE_COOKED_LINES,1,pending)==0);
+    assert(b.reader && b.cooked_line_pending && readers_started==2);
+    input="complete\r\n";
+    host_console_reader(&b);
+    assert(!b.cooked_line_pending);
+    assert(host_console_backend_deactivate(&b,&pending)==0 && !pending);
+    assert(host_console_backend_activate(&b,c,HOST_CONSOLE_COOKED_LINES,1,pending)==0);
+    assert(!b.reader && readers_started==2);
+    assert(host_console_backend_deactivate(&b,&pending)==0 && !pending);
+    lib_console_release(c);
+}
 int main(void)
 {
     host_console_backend b={0};
@@ -104,5 +147,6 @@ int main(void)
     cursor_ok=1;
     assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
     DeleteCriticalSection(&b.transaction_lock);DeleteCriticalSection(&b.output_lock);CloseHandle(stop);lib_console_release(b.console);
+    cooked_restore();
     return 0;
 }

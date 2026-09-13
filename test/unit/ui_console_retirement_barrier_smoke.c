@@ -8,9 +8,11 @@
 #include "lib/ui-console/console.h"
 
 static LONG fail_wake;
+static HANDLE frame_idle;
 static ui_mailbox_wake_wait_result retirement_wait(
     const ui_mailbox_wake *wake, lib_u32 timeout)
 {
+    if (frame_idle) assert(ReleaseSemaphore(frame_idle, 1, NULL));
     ui_mailbox_wake_wait_result result = ui_mailbox_wake_wait(wake, timeout);
     return InterlockedCompareExchange(&fail_wake, 0, 0) ?
         UI_MAILBOX_WAKE_WAIT_FAULT : result;
@@ -200,6 +202,77 @@ static void check_io_failure(int reader, lib_status output_status)
     CloseHandle(probe.retired); CloseHandle(write_called);
 }
 
+static unsigned frame_writes;
+static char last_frame_text;
+static int stop_after_publication;
+static ui_console *publishing_console;
+static ui_frame next_frame;
+static lib_status activation_frame(void *opaque, const lib_console_text_frame *frame)
+{
+    (void)opaque;
+    ++frame_writes;
+    last_frame_text=(char)frame->text[0];
+    if (frame->text[0]=='A') {
+        next_frame.text[0]='B';
+        assert(ui_console_publish_frame(publishing_console,&next_frame)==0);
+        if (stop_after_publication) {
+            lib_console_event activation={0};
+            activation.kind=LIB_CONSOLE_EVENT_ACTIVATED;
+            activation.binding_generation=1;
+            assert(ui_component_request_stop(&publishing_console->base)==0);
+            assert(lib_console_deliver_event(ui_console_get_console(publishing_console),
+                &activation)==0);
+        }
+    }
+    return write_result;
+}
+static void idle_frame(void)
+{ assert(WaitForSingleObject(frame_idle,5000)==WAIT_OBJECT_0); }
+static void check_activation_frame(void)
+{
+    retirement_probe probe={0};
+    ui_console_options options={0};
+    lib_console_event activated={0};
+    ui_console *c;
+    lib_u32 generation=0;
+    static ui_frame copied;
+    InterlockedExchange(&fail_wake,0);
+    frame_idle=CreateSemaphoreA(NULL,0,32,NULL); assert(frame_idle);
+    probe.retired=CreateEventA(NULL,TRUE,FALSE,NULL);
+    options.input_sink=retirement_input; options.input_context=&probe;
+    options.failure_sink=retirement_failure; options.failure_context=&probe;
+    assert(ui_console_create(&c,&options)==0); idle_frame();
+    lib_console *logical=ui_console_get_console(c);
+    assert(lib_console_bind_generation(logical,1)==0);
+    assert(lib_console_set_text_frame_sink(logical,activation_frame,NULL)==0);
+    activated.kind=LIB_CONSOLE_EVENT_ACTIVATED; activated.binding_generation=1;
+    assert(lib_console_deliver_event(logical,&activated)==0); idle_frame();
+    assert(frame_writes==0); /* Empty activation never invents output. */
+    next_frame.valid=1; next_frame.text_columns=80; next_frame.text_rows=25;
+    next_frame.text[0]='X'; write_result=LIB_STATUS_NOT_CURRENT;
+    assert(ui_console_publish_frame(c,&next_frame)==0); idle_frame();
+    assert(frame_writes==1 && ui_component_mailboxes_capture_frame(
+        &c->base.mailboxes,&generation,&copied));
+    write_result=LIB_STATUS_OK;
+    assert(lib_console_deliver_event(logical,&activated)==0); idle_frame();
+    assert(frame_writes==2 && !ui_component_mailboxes_capture_frame(
+        &c->base.mailboxes,&generation,&copied));
+    assert(lib_console_deliver_event(logical,&activated)==0); idle_frame();
+    assert(frame_writes==2);
+    publishing_console=c; next_frame.text[0]='A';
+    assert(ui_console_publish_frame(c,&next_frame)==0);
+    idle_frame(); idle_frame();
+    assert(frame_writes==4 && last_frame_text=='B' && !ui_component_mailboxes_capture_frame(
+        &c->base.mailboxes,&generation,&copied));
+    assert(copied.text[0]=='X'); /* An empty capture does not change output. */
+    next_frame.text[0]='A'; stop_after_publication=1;
+    assert(ui_console_publish_frame(c,&next_frame)==0);
+    assert(WaitForSingleObject(probe.retired,5000)==WAIT_OBJECT_0);
+    ui_console_destroy(c);
+    assert(probe.event_count==1 && probe.failures==0 && frame_writes==5);
+    CloseHandle(probe.retired); CloseHandle(frame_idle); frame_idle=NULL;
+}
+
 int main(void)
 {
     check_retirement(0);
@@ -207,6 +280,7 @@ int main(void)
     check_io_failure(1, LIB_STATUS_OK);
     check_io_failure(0, LIB_STATUS_IO_ERROR);
     check_io_failure(0, LIB_STATUS_NOT_CURRENT);
+    check_activation_frame();
     return 0;
 }
 #else

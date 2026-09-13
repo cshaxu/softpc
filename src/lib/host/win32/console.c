@@ -126,12 +126,13 @@ static lib_win32_dword LIB_WIN32_WINAPI host_console_reader(void *context)
             lib_win32_dword read = 0u, i;
             if (!lib_win32_read_console_a(backend->input, text,
                     LIB_CONSOLE_LINE_MAX - 1u, &read, LIB_NULL) || read == 0u) {
-                lib_win32_interlocked_exchange(&backend->cooked_line_pending, 0);
+                if (lib_win32_wait_for_single_object(backend->stop_event, 0u) !=
+                        LIB_WIN32_WAIT_OBJECT_0)
+                    lib_win32_interlocked_exchange(&backend->cooked_line_pending, 0);
                 host_console_reader_failed(backend);
                 return 0u;
             }
             if (lib_win32_wait_for_single_object(backend->stop_event, 0u) == LIB_WIN32_WAIT_OBJECT_0) {
-                lib_win32_interlocked_exchange(&backend->cooked_line_pending, 0);
                 return 0u;
             }
             for (i = 0u; i < read; ++i) {
@@ -196,7 +197,7 @@ void host_console_backend_destroy(host_console_backend *backend)
 {
     lib_status status;
     if (backend == LIB_NULL) return;
-    status = host_console_backend_deactivate(backend);
+    status = host_console_backend_deactivate(backend, LIB_NULL);
     if (status != LIB_STATUS_OK) {
         /* A live reader still owns backend and its logical Console.
            Broker failure is terminal and the process must exit; intentionally
@@ -261,7 +262,8 @@ lib_status host_console_backend_prepare(host_console_backend *backend,
 
 
 lib_status host_console_backend_activate(host_console_backend *backend,
-    lib_console *console, host_console_mode mode, lib_u32 generation)
+    lib_console *console, host_console_mode mode, lib_u32 generation,
+    lib_bool restore_cooked_request)
 {
     lib_win32_dword configured;
     if (backend == LIB_NULL || console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
@@ -295,12 +297,9 @@ lib_status host_console_backend_activate(host_console_backend *backend,
         sizeof(backend->previous_palette));
     backend->previous_columns = 0u;
     backend->previous_rows = 0u;
-    /* Cooked mode is a monitor surface, not an input request.  Its reader is
-       armed solely by host_console_backend_request_cooked_line() after the app
-       has actually published a prompt.  Starting ReadConsoleA here leaves a
-       hidden line reader alive while a graphic Window is running; it can eat
-       the first Enter after the later raw takeover. */
-    if (mode == HOST_CONSOLE_RAW_EVENTS) {
+    /* Normal cooked activation is not a line request. Rollback alone may
+     * restore the unfinished request captured after the old reader joined. */
+    if (mode == HOST_CONSOLE_RAW_EVENTS || restore_cooked_request) {
         if (host_console_start_reader(backend) != LIB_STATUS_OK) {
             lib_win32_close_handle(backend->stop_event);
             backend->stop_event = LIB_NULL;
@@ -373,17 +372,22 @@ static lib_status host_console_retire_reader(host_console_backend *backend)
     if (completed != LIB_WIN32_WAIT_OBJECT_0) return LIB_STATUS_IO_ERROR;
     lib_win32_close_handle(backend->reader);
     backend->reader = LIB_NULL;
-    lib_win32_interlocked_exchange(&backend->cooked_line_pending, 0);
     return LIB_STATUS_OK;
 }
 
-lib_status host_console_backend_deactivate(host_console_backend *backend)
+lib_status host_console_backend_deactivate(host_console_backend *backend,
+    lib_bool *out_cooked_request)
 {
     lib_status status;
 
     if (backend == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     status = host_console_retire_reader(backend);
     if (status != LIB_STATUS_OK) return status;
+    /* A completed line clears pending before delivery; cancelled reads retain
+     * it until this join. Never snapshot it while the reader can still finish. */
+    if (out_cooked_request != LIB_NULL)
+        *out_cooked_request = backend->cooked_line_pending != 0;
+    lib_win32_interlocked_exchange(&backend->cooked_line_pending, 0);
     if (backend->stop_event != LIB_NULL) lib_win32_close_handle(backend->stop_event);
     backend->stop_event = LIB_NULL;
     backend->console = LIB_NULL;

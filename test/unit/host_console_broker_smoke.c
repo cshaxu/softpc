@@ -13,6 +13,7 @@ struct host_console_backend {
     lib_console *active;
     host_console_mode mode;
     lib_u32 generation;
+    lib_bool cooked_request;
 #ifdef _WIN32
     CRITICAL_SECTION transaction;
 #endif
@@ -23,6 +24,13 @@ static int host_console_fail_next_prepare;
 static int host_console_fail_next_retirement;
 static int host_console_prepare_saw_active;
 static int host_console_wait_for_callback;
+static unsigned activations;
+static void activated_sink(void *context, const lib_console_event *event)
+{
+    (void)context;
+    assert(event->kind == LIB_CONSOLE_EVENT_ACTIVATED && event->binding_generation);
+    ++activations;
+}
 #ifdef _WIN32
 static HANDLE host_console_callback_entered;
 static HANDLE host_console_callback_release;
@@ -64,7 +72,8 @@ lib_status host_console_backend_prepare(host_console_backend *native_console,
 }
 
 lib_status host_console_backend_activate(host_console_backend *native_console,
-    lib_console *console, host_console_mode mode, lib_u32 generation)
+    lib_console *console, host_console_mode mode, lib_u32 generation,
+    lib_bool restore_cooked_request)
 {
     if (host_console_fail_next_activation > 0) {
         --host_console_fail_next_activation;
@@ -73,10 +82,12 @@ lib_status host_console_backend_activate(host_console_backend *native_console,
     native_console->active = console;
     native_console->mode = mode;
     native_console->generation = generation;
+    native_console->cooked_request = restore_cooked_request;
     return LIB_STATUS_OK;
 }
 
-lib_status host_console_backend_deactivate(host_console_backend *native_console)
+lib_status host_console_backend_deactivate(host_console_backend *native_console,
+    lib_bool *out_cooked_request)
 {
     if (host_console_fail_next_retirement) {
         host_console_fail_next_retirement = 0;
@@ -88,12 +99,18 @@ lib_status host_console_backend_deactivate(host_console_backend *native_console)
             WAIT_OBJECT_0);
 #endif
     native_console->active = LIB_NULL;
+    if (out_cooked_request) *out_cooked_request = native_console->cooked_request;
+    native_console->cooked_request = LIB_FALSE;
     return LIB_STATUS_OK;
 }
 
 lib_status host_console_backend_request_cooked_line(
     host_console_backend *native_console)
-{ return native_console == NULL ? LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_OK; }
+{
+    if (native_console == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    native_console->cooked_request = LIB_TRUE;
+    return LIB_STATUS_OK;
+}
 
 void host_console_backend_lock_output(host_console_backend *native_console)
 { (void)native_console; }
@@ -242,12 +259,26 @@ int main(void)
 
     assert(lib_console_create(&first) == LIB_STATUS_OK);
     assert(lib_console_create(&second) == LIB_STATUS_OK);
+    assert(lib_console_set_event_sink(first, activated_sink, NULL) == LIB_STATUS_OK);
     assert(host_console_broker_create(&broker, first,
         HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_OK);
+    assert(activations == 1);
     assert(host_console_broker_request_cooked_line(broker, second) ==
         LIB_STATUS_NOT_CURRENT);
     assert(host_console_broker_request_cooked_line(broker, first) ==
         LIB_STATUS_OK);
+    host_console_fail_next_activation = 1;
+    assert(host_console_broker_replace(broker, first, second,
+        HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_IO_ERROR);
+    assert(broker->backend->active == first && broker->backend->cooked_request);
+    assert(activations == 2);
+    broker->backend->cooked_request = LIB_FALSE; /* A delivered line is not restarted. */
+    host_console_fail_next_activation = 1;
+    assert(host_console_broker_replace(broker, first, second,
+        HOST_CONSOLE_COOKED_LINES) == LIB_STATUS_IO_ERROR);
+    assert(broker->backend->active == first && !broker->backend->cooked_request);
+    assert(activations == 3);
+    assert(lib_console_set_event_sink(first, NULL, NULL) == LIB_STATUS_OK);
     assert(host_console_broker_create(&second_broker, second,
         HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_INVALID_STATE);
     assert(second_broker == LIB_NULL);

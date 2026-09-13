@@ -139,6 +139,7 @@ int main(void)
     event.data.key.modifiers = UI_HOTKEY_MODIFIER_CONTROL;
     assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event, &capture, LIB_TRUE));
     event.data.key.key = 'X';
+    event.data.key.scan_code = 0x2du;
     event.data.key.modifiers = UI_HOTKEY_MODIFIER_CONTROL;
     assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event, &capture, LIB_TRUE));
     assert(capture.count == 2u);

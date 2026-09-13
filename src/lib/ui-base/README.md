@@ -23,7 +23,10 @@ recovery and delivery state. Same-shape platform operations decode raw keys and
 text layout; Linux terminal text uses TEXT rather than inventing physical keys.
 Window message decoding and key-state queries belong only to ui-window.
 Mailbox wake operations remain selected by the build. Frame damage accumulates
-until consumption even when intermediate complete pixel frames are replaced.
+until successful consumption even when intermediate complete pixel frames are
+replaced. Capture copies without consuming; acknowledgement clears pending only
+if that publication is still latest. Failed output keeps it pending without
+restoring a stale copy over newer content or signalling another retry.
 
 Mouse and close events never flush a keyboard prefix. Mismatch/keyboard release
 replays pending keyboard events in order; keyboard/mouse interleaving is not
@@ -34,8 +37,9 @@ ordinary control never waits for frame copying. FIFO processing up to
 STOP is unchanged. Window's sole final filter discards ordinary frozen input,
 not registered hotkeys or lifetime events.
 
-Physical key identity is key + scan code + EXTENDED flag, normalized identically
-for both leaves. Ordinary keys and modifiers follow the same lifetime: a
+Physical key identity is scan code + EXTENDED flag, with logical key fallback
+only when the scan is absent. A held key retains its original logical key across
+lock/layout changes. Both leaves share this ledger. Ordinary keys and modifiers follow the same lifetime: a
 delivered make always retains its break and never becomes consumed later.
 The ledger is released at retirement; destroy also handles workerless cleanup.
 

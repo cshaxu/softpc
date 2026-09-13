@@ -39,7 +39,8 @@ static lib_bool lib_console_event_valid(const lib_console_event *event)
         return event->value.line.length < LIB_CONSOLE_LINE_MAX;
     return event->kind == LIB_CONSOLE_EVENT_RAW_KEY ||
         event->kind == LIB_CONSOLE_EVENT_RAW_MOUSE ||
-        event->kind == LIB_CONSOLE_EVENT_IO_FAILURE;
+        event->kind == LIB_CONSOLE_EVENT_IO_FAILURE ||
+        event->kind == LIB_CONSOLE_EVENT_ACTIVATED;
 }
 
 lib_status lib_console_create(lib_console **out_console)
