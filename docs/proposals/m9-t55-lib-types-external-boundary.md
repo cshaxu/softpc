@@ -1,5 +1,104 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S5 admission: identities, independent gates and minimal ownership
+
+Owner: “以上，开始清理。” Baseline `183fc8f`; T55 remains open.
+Original approvals: use the existing ui-base normalizer, never one per leaf;
+restore independent locks; remove storage orphan paths; audit and clean all
+library pointer-only wrappers/dead code; move non-platform computation to its
+own component root. Earlier approved items include physical-key state, one
+Window failure entry and corrected cursor geometry.
+
+Frozen universe: all C/H in types, console, host, storage, ui-base, ui-window,
+ui-console and their callers. Per component record removed, made-local or
+retained-with-real-responsibility dispositions. Externally useful public API,
+one-to-one types vocabulary, selected-platform boundaries and unsupported Linux
+UI placeholders are not dead merely because SoftPC does not use them.
+
+| Ledger | Owner and required proof |
+| --- | --- |
+| Physical keys | Existing ui-base normalizer emits consistent scan/extended; matcher compares that identity. Both Ctrl sides/releases and leaf equality. |
+| Chord state | Distinct physical held keys own pending/delivered/consumed states. Repeat cannot overflow pending; delivered makes retain breaks and cannot become consumed retrospectively. No timer or separate matcher. |
+| Fault | Every Window post-start fault uses component failure entry immediately; STOP remains FIFO. No duplicate exit status. |
+| Mailboxes | Separate frame/control locks; STOP/fault acquire frame then control to close both atomically. Ordinary controls never acquire frame lock. |
+| Pure computations | Audit every platform source: extract Window geometry/cursor/scaling arithmetic into ui-window root; retain genuine native operations. Preserve renderer behavior. |
+| Storage | Remove orphan internal create modes and localize file-only helpers; keep binary/public modes. |
+| All-library ownership | Remove pointer-only event wrappers and duplicate join; inspect remaining allocated structs and internal symbols in every component. No new generic runtime. |
+
+Proof: focused controlled tests before full x64/x86, strict lib, manifest/DAG/
+governance checks. Match original request against actual diff after complete
+P push. Do not change MVDM, media, INI, Console mouse scale, routing or overlay
+algorithm. Each retained platform operation must describe a native responsibility,
+not hide shared computation behind a platform name.
+
+### S5 convergence audit
+
+Frozen implementation inventory: 81 C/H files across seven components
+(types 13, console 6, host 15, storage 7, ui-base 18, ui-window 17,
+ui-console 5). Existing platform source coverage includes every win32/linux C
+file, not just the Windows leaf. Operations/allocations and identifier callers
+were inspected with `rg` plus a whole-corpus C/H identifier occurrence scan.
+Externally exposed APIs were checked against application/test callers before
+classifying an internal declaration as orphaned.
+
+| Component | Disposition |
+| --- | --- |
+| types | Retained header-only C/SDK vocabulary and compiler atomics: definitions, not resource wrappers. A macro without a current app caller is not an obsolete component implementation. |
+| console | Kept the logical object's two blocking gates and copied bindings; they enforce different callback/output barriers. Preserve actual mutex creation errors. Platform mutex objects own real OS mutexes. |
+| host | Removed event's pointer-only parent allocation, separate thread-start allocation, duplicate platform destroy/join and unused Linux backend dummy struct. Keep task cancellation/entry state and broker/output binding snapshots: they carry real state and binding generation until old output drains. Linux condition deadlines and Windows handle waits remain platform implementation. |
+| storage | Removed orphan allocating truncate/append entries and file-only external declarations. Writer binary modes remain public; medium/file handles own streams. Open locking/large-file offsets remain platform-local. Overlay's range check after allocation was unreachable after caller validation and removed; O(n) lookup remains explicitly deferred. |
+| ui-base | One normalizer, low scan plus separate extended flag; shared matcher tracks physical pending/delivered/consumed modifiers. Separate locks. Removed test-only single-control forwarding entry; all producers use the existing atomic batch entry. Wake objects retain real OS event/condition state. |
+| ui-window | Pure geometry/cursor, frame size/pixel conversion and relative motion moved to root. Worker/context/frame now one allocation. All post-start faults close admission through component failure. Native rectangle marshalling, WMSZ edge anchoring, GDI resources, capture and message cadence remain Windows-owned. |
+| ui-console | Pure copied text-frame conversion moved to root; redundant event forwarding wrapper removed. Keep record modifier/button decoding and native cell-coordinate handling in Windows adapter; X8/Y16 scale unchanged. Thread state owns native worker and prior input position. Linux UI placeholder remains explicit unsupported. |
+
+No remaining two-occurrence internal entry was found after this cleanup;
+remaining declaration/definition-only corpus matches are supported public APIs
+with app/test consumers. Platform function pairs have identical parent contracts.
+No second matcher, alternate rendering route, product policy, types C file or
+cross-component platform include is introduced. Struct ownership retained above
+is intentional, not a transitional forwarding layer.
+
+### S5 P1 executor evidence
+
+Final fixed-preset builds completed for x64 and x86. Full
+`ctest --preset test-x64 -j1 --output-on-failure` passed 49/49 (30.66 s);
+x86 passed 49/49 (74.41 s). Strict standalone lib built with
+`LIBRARY_STRICT_WARNINGS=ON` (-Wall/-Wextra/-Wpedantic/-Werror) and passed
+3/3 layout/manifest/Linux-build-contract checks. All 18 public headers compiled
+independently with C17 and the same strict warnings. Linux wait/text contract
+fakes compiled and passed on both Windows widths; no Linux desktop run claimed.
+
+Focused checks cover equal extended scan identity, simultaneous left/right
+Ctrl and all breaks, 100 repeated pending makes, delivered-modifier mismatch,
+existing repeated hotkeys, frozen/close filtering, partial sink rejection,
+STOP/publish races, a control producer and consumer completing while the frame
+lock is deliberately held, nine real hidden Window exit scenarios with immediate
+fault-admission assertions, non-integral cursor row bounds, text pixel palette,
+dirty accumulation, signed mouse scaling and host allocation/join ownership.
+The new host test creates a real worker: event has one platform allocation,
+thread startup has no separate allocation, and destroy issues exactly one join.
+
+An initial extracted file lacked its explicit Win32 vocabulary includes and an
+added variable violated the neutral naming gate; both were corrected before
+final verification. The extended-key test fixture was corrected to clear its
+right-Ctrl flag before constructing ordinary left Alt/P events. These were
+caught by compilation/tests, not deferred to owner testing.
+
+Accounting: `git diff --numstat 183fc8f -- src test CMakeLists.txt`, restricted
+to C/H for code (exclude docs, manifest and EXEs): production 28 paths,
++563/-534 = +29; tests 8 paths, +151/-19 = +132; build files 2 paths,
++3/-2 = +1. Root helper extraction preserves platform behavior rather than
+introducing a parallel implementation. Removed ownership and dead paths are
+listed in the component ledger. MVDM, INI and guest-media diff is empty.
+
+Package SHA256:
+- softpc32.exe: `680EE4F32B1851B2BB68A6555DF3FB68C61E7E988422C11AC89A5216939BD506`
+- softpc64.exe: `AF91CB4A86EBAF9658FD7DA83F341304C235FAA958684AB93F0E2281813B489E`
+
+No task-specific scratch build tree was created; fixed x86/x64 trees and the
+existing strict-lib configuration remain available for owner inspection.
+T55 remains open. This executor delivery requires post-push actual-diff review.
+
 ## S4 admission: single input and lifetime paths
 
 Owner: “按照这些准入新的S任务修复以上7条反馈意见。” Baseline

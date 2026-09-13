@@ -28,6 +28,12 @@ Mouse and close events never flush a keyboard prefix. Mismatch/keyboard release
 replays pending keyboard events in order; keyboard/mouse interleaving is not
 buffered. A rejected input sink closes the source and clears pending state;
 only the worker's quiesced exit reports failure and retirement. STOP/fault closes
-frame and control admission under the same short lock; FIFO processing up to
+frame and control admission by taking the independent frame then control locks;
+ordinary control never waits for frame copying. FIFO processing up to
 STOP is unchanged. Window's sole final filter discards ordinary frozen input,
 not registered hotkeys or lifetime events.
+
+Physical key identity is key + scan code + EXTENDED flag, normalized identically
+for both leaves. Modifier states are disjoint: pending, delivered or consumed.
+Repeated pending makes do not allocate another slot; a delivered modifier cannot
+later be retroactively consumed as part of a chord.

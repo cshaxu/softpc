@@ -58,3 +58,25 @@ lib_console *ui_console_get_console(const ui_console *console)
 {
     return console == LIB_NULL ? LIB_NULL : console->logical_console;
 }
+
+lib_status ui_console_publish_text_frame(ui_console *console,
+    const ui_frame *frame)
+{
+    lib_console_text_frame text_frame = { 0 };
+
+    if (console == LIB_NULL || frame == LIB_NULL || frame->graphics != 0u)
+        return LIB_STATUS_OK;
+    text_frame.columns = frame->text_columns;
+    text_frame.rows = frame->text_rows;
+    lib_memory_copy(text_frame.text, frame->text, sizeof(text_frame.text));
+    lib_memory_copy(text_frame.attributes, frame->attributes, sizeof(text_frame.attributes));
+    lib_memory_copy(text_frame.palette, frame->text_palette, sizeof(text_frame.palette));
+    text_frame.cursor_column = frame->cursor_column;
+    text_frame.cursor_row = frame->cursor_row;
+    text_frame.cursor_top = frame->cursor_top;
+    text_frame.cursor_bottom = frame->cursor_bottom;
+    text_frame.cursor_visible = frame->cursor_visible;
+    text_frame.cursor_phase = frame->cursor_phase;
+    text_frame.font_height = frame->font_height;
+    return lib_console_write_text_frame(console->logical_console, &text_frame);
+}

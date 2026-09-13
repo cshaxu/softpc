@@ -28,10 +28,11 @@ typedef struct ui_component_control {
 /* Each UI leaf owns exactly one of these. It contains two independent
  * mailboxes: a latest-wins copied frame and a FIFO control queue. The native
  * wake object is merely their shared wait primitive, never a third mailbox.
- * One short lock serializes frame/control admission with terminal closure;
- * it never covers I/O or callbacks. */
+ * Independent locks protect frames and controls. Terminal closure takes
+ * frame then control; ordinary control never waits for a frame copy. */
 typedef struct ui_component_mailboxes {
-    lib_atomic_flag lock;
+    lib_atomic_flag frame_lock;
+    lib_atomic_flag control_lock;
     ui_frame frame;
     lib_u32 frame_generation;
     lib_bool frame_pending;
@@ -47,8 +48,6 @@ void ui_component_mailboxes_close(ui_component_mailboxes *mailboxes);
 void ui_component_mailboxes_destroy(ui_component_mailboxes *mailboxes);
 lib_status ui_component_mailboxes_publish_frame(ui_component_mailboxes *mailboxes,
     const ui_frame *frame);
-lib_status ui_component_mailboxes_enqueue_control(
-    ui_component_mailboxes *mailboxes, const ui_component_control *control);
 /* Appends a non-empty control batch atomically. A capacity failure leaves the
  * existing FIFO and every requested control unchanged. STOP is terminal and
  * must be submitted as its own one-record batch. */

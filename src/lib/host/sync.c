@@ -1,10 +1,6 @@
 #include "lib/types/types_interface.h"
 #include "lib/host/sync.h"
 
-struct host_sync_event {
-    host_sync_platform_event *platform;
-};
-
 struct host_sync_task {
     host_sync_platform_task *platform;
     host_sync_event *cancellation;
@@ -40,44 +36,30 @@ void host_sync_yield(void)
 
 lib_status host_sync_event_create(host_sync_event **out_event)
 {
-    host_sync_event *event;
-    lib_status status;
-
-    if (out_event == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    *out_event = LIB_NULL;
-    event = (host_sync_event *)lib_allocate_zero(1u, sizeof(*event));
-    if (event == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    status = host_sync_platform_event_create(LIB_TRUE, &event->platform);
-    if (status != LIB_STATUS_OK) {
-        lib_release(event);
-        return status;
-    }
-    *out_event = event;
-    return LIB_STATUS_OK;
+    return host_sync_platform_event_create(LIB_TRUE, out_event);
 }
 
 void host_sync_event_destroy(host_sync_event *event)
 {
     if (event == LIB_NULL) return;
-    host_sync_platform_event_destroy(event->platform);
-    lib_release(event);
+    host_sync_platform_event_destroy(event);
 }
 
 void host_sync_event_signal(host_sync_event *event)
 {
-    if (event != LIB_NULL) host_sync_platform_event_signal(event->platform);
+    if (event != LIB_NULL) host_sync_platform_event_signal(event);
 }
 
 void host_sync_event_reset(host_sync_event *event)
 {
-    if (event != LIB_NULL) host_sync_platform_event_reset(event->platform);
+    if (event != LIB_NULL) host_sync_platform_event_reset(event);
 }
 
 host_sync_wait_result host_sync_wait_any(host_sync_event *const *events,
     lib_u32 event_count, const host_sync_task *cancel_task,
     lib_u32 timeout_milliseconds, lib_u32 *out_event_index)
 {
-    const host_sync_platform_event *platform_events[64];
+    const host_sync_event *platform_events[64];
     lib_u32 event_count_with_cancel = 0u;
     lib_u32 signaled_index = 0u;
     lib_u32 index;
@@ -89,15 +71,14 @@ host_sync_wait_result host_sync_wait_any(host_sync_event *const *events,
         return HOST_SYNC_WAIT_INVALID_ARGUMENT;
     if (out_event_index != LIB_NULL) *out_event_index = LIB_UINT32_MAX;
     if (cancel_task != LIB_NULL) {
-        if (cancel_task->cancellation == LIB_NULL ||
-            cancel_task->cancellation->platform == LIB_NULL)
+        if (cancel_task->cancellation == LIB_NULL)
             return HOST_SYNC_WAIT_INVALID_ARGUMENT;
-        platform_events[event_count_with_cancel++] = cancel_task->cancellation->platform;
+        platform_events[event_count_with_cancel++] = cancel_task->cancellation;
     }
     for (index = 0u; index < event_count; ++index) {
-        if (events[index] == LIB_NULL || events[index]->platform == LIB_NULL)
+        if (events[index] == LIB_NULL)
             return HOST_SYNC_WAIT_INVALID_ARGUMENT;
-        platform_events[event_count_with_cancel++] = events[index]->platform;
+        platform_events[event_count_with_cancel++] = events[index];
     }
     status = host_sync_platform_event_wait_many(platform_events, event_count_with_cancel,
         timeout_milliseconds, &signaled, &signaled_index);
@@ -149,11 +130,11 @@ void host_sync_task_request_cancel(host_sync_task *task)
 
 int host_sync_task_cancelled(const host_sync_task *task)
 {
-    const host_sync_platform_event *events[1];
+    const host_sync_event *events[1];
     lib_bool signaled = LIB_FALSE;
 
     if (task == LIB_NULL || task->cancellation == LIB_NULL) return 0;
-    events[0] = task->cancellation->platform;
+    events[0] = task->cancellation;
     return host_sync_platform_event_wait_many(events, 1u, 0u, &signaled,
         LIB_NULL) == LIB_STATUS_OK && signaled != LIB_FALSE;
 }

@@ -14,8 +14,8 @@ void ui_win32_mouse_release(ui_win32_mouse *mouse)
     lib_win32_release_capture();
     lib_win32_set_cursor(lib_win32_load_cursor_a(LIB_NULL, LIB_WIN32_IDC_ARROW));
     mouse->captured = LIB_FALSE;
-    mouse->valid = 0;
-    mouse->remainder_x = mouse->remainder_y = 0;
+    mouse->motion.valid = 0;
+    mouse->motion.remainder_x = mouse->motion.remainder_y = 0;
 }
 
 int ui_win32_mouse_capture(ui_win32_mouse *mouse,
@@ -49,11 +49,11 @@ int ui_win32_mouse_capture(ui_win32_mouse *mouse,
         lib_win32_release_capture();
         return 0;
     }
-    mouse->x = (int)(short)lib_win32_loword(position);
-    mouse->y = (int)(short)lib_win32_hiword(position);
-    mouse->valid = 1;
+    mouse->motion.x = (int)(short)lib_win32_loword(position);
+    mouse->motion.y = (int)(short)lib_win32_hiword(position);
+    mouse->motion.valid = 1;
     mouse->captured = LIB_TRUE;
-    mouse->remainder_x = mouse->remainder_y = 0;
+    mouse->motion.remainder_x = mouse->motion.remainder_y = 0;
     return 1;
 }
 
@@ -61,34 +61,9 @@ int ui_win32_mouse_move(ui_win32_mouse *mouse,
     lib_win32_lparam position, int client_width, int client_height,
     unsigned int content_width, unsigned int content_height, int *dx, int *dy)
 {
-    int x;
-    int y;
-
-    if (mouse == LIB_NULL || dx == LIB_NULL || dy == LIB_NULL) return 0;
-    x = (int)(short)lib_win32_loword(position);
-    y = (int)(short)lib_win32_hiword(position);
-    *dx = mouse->valid ? x - mouse->x : 0;
-    *dy = mouse->valid ? y - mouse->y : 0;
-    mouse->x = x;
-    mouse->y = y;
-    mouse->valid = 1;
-    if (mouse->client_width != client_width || mouse->content_width != content_width)
-        mouse->remainder_x = 0;
-    if (mouse->client_height != client_height || mouse->content_height != content_height)
-        mouse->remainder_y = 0;
-    mouse->client_width = client_width; mouse->client_height = client_height;
-    mouse->content_width = content_width; mouse->content_height = content_height;
-    if (client_width > 0 && content_width != 0u) {
-        lib_i64 total = (lib_i64)*dx * content_width + mouse->remainder_x;
-        *dx = (int)(total / client_width);
-        mouse->remainder_x = total % client_width;
-    }
-    if (client_height > 0 && content_height != 0u) {
-        lib_i64 total = (lib_i64)*dy * content_height + mouse->remainder_y;
-        *dy = (int)(total / client_height);
-        mouse->remainder_y = total % client_height;
-    }
-    return 1;
+    return mouse != LIB_NULL && ui_window_motion_move(&mouse->motion,
+        (int)(short)lib_win32_loword(position), (int)(short)lib_win32_hiword(position),
+        client_width, client_height, content_width, content_height, dx, dy);
 }
 
 int ui_win32_mouse_captured(const ui_win32_mouse *mouse)

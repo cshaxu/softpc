@@ -147,11 +147,9 @@ static lib_status lib_storage_medium_page_for_write(lib_storage_medium *medium,
         *out_page = page;
         return LIB_STATUS_OK;
     }
+    /* Caller range validation already bounds the derived page index. */
     page = lib_allocate(sizeof(*page));
     if (page == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    if (index > medium->byte_count / LIB_STORAGE_MEDIUM_PAGE_BYTES) {
-        return LIB_STATUS_INVALID_ARGUMENT;
-    }
     offset = index * LIB_STORAGE_MEDIUM_PAGE_BYTES;
     count = medium->byte_count - offset;
     if (count > LIB_STORAGE_MEDIUM_PAGE_BYTES) count = LIB_STORAGE_MEDIUM_PAGE_BYTES;

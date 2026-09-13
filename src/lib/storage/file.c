@@ -12,15 +12,15 @@ static lib_status storage_file_open_writer(const char *path,
     return file->stream == LIB_NULL ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
 
-lib_status storage_file_open_truncate(const char *path,
+static lib_status storage_file_open_truncate(const char *path,
     lib_storage_file *file)
 { return storage_file_open_writer(path, "wb", file); }
 
-lib_status storage_file_open_append(const char *path,
+static lib_status storage_file_open_append(const char *path,
     lib_storage_file *file)
 { return storage_file_open_writer(path, "ab", file); }
 
-lib_status storage_file_read(lib_storage_file *file, void *bytes,
+static lib_status storage_file_read(lib_storage_file *file, void *bytes,
     lib_size byte_count, lib_size *out_byte_count)
 {
     if (file == LIB_NULL || out_byte_count == LIB_NULL ||
@@ -30,7 +30,7 @@ lib_status storage_file_read(lib_storage_file *file, void *bytes,
     return lib_c_ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-lib_status storage_file_write(lib_storage_file *file, const void *bytes,
+static lib_status storage_file_write(lib_storage_file *file, const void *bytes,
     lib_size byte_count, lib_size *out_byte_count)
 {
     if (file == LIB_NULL || out_byte_count == LIB_NULL ||
@@ -40,13 +40,13 @@ lib_status storage_file_write(lib_storage_file *file, const void *bytes,
     return lib_c_ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-lib_status storage_file_flush(lib_storage_file *file)
+static lib_status storage_file_flush(lib_storage_file *file)
 {
     if (file == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     return lib_c_fflush(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-lib_status storage_file_close(lib_storage_file *file)
+static lib_status storage_file_close(lib_storage_file *file)
 {
     int result;
     if (file == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
@@ -84,14 +84,6 @@ lib_status lib_storage_file_open_readonly(const char *path,
 lib_status lib_storage_file_open_readwrite(const char *path,
     lib_storage_file **out_file)
 { return lib_storage_file_open(path, storage_file_platform_open_readwrite, out_file); }
-
-lib_status lib_storage_file_open_truncate(const char *path,
-    lib_storage_file **out_file)
-{ return lib_storage_file_open(path, storage_file_open_truncate, out_file); }
-
-lib_status lib_storage_file_open_append(const char *path,
-    lib_storage_file **out_file)
-{ return lib_storage_file_open(path, storage_file_open_append, out_file); }
 
 lib_status lib_storage_file_read_exact(lib_storage_file *file, void *bytes,
     lib_size byte_count)

@@ -6,14 +6,14 @@
 #include <string.h>
 
 typedef struct ui_capture {
-    ui_input_event events[16];
+    ui_input_event events[UI_HOTKEY_SUPPRESSED_CAPACITY + 8];
     unsigned int count;
 } ui_capture;
 
 static int ui_capture_event(void *opaque, const ui_input_event *event)
 {
     ui_capture *capture = (ui_capture *)opaque;
-    if (capture == NULL || event == NULL || capture->count == 16u) return 0;
+    if (capture == NULL || event == NULL || capture->count == UI_HOTKEY_SUPPRESSED_CAPACITY + 8u) return 0;
     capture->events[capture->count++] = *event;
     return 1;
 }
@@ -47,6 +47,7 @@ int main(void)
     assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event,
         &capture));
     event.data.key.key = UI_HOTKEY_KEY_ALT;
+    event.data.key.flags = 0u;
     event.data.key.scan_code = 0x38u;
     event.data.key.modifiers = UI_HOTKEY_MODIFIER_CONTROL |
         UI_HOTKEY_MODIFIER_ALT;
@@ -77,6 +78,7 @@ int main(void)
     assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event,
         &capture));
     event.data.key.key = UI_HOTKEY_KEY_ALT;
+    event.data.key.flags = 0u;
     event.data.key.scan_code = 0x38u;
     event.data.key.pressed = 1u;
     assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event, &capture));
@@ -100,9 +102,10 @@ int main(void)
     event.data.key.pressed = 1u;
     event.data.key.modifiers = UI_HOTKEY_MODIFIER_CONTROL;
     assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event, &capture));
-    event.data.key.scan_code = 0x11du;
+    event.data.key.flags = UI_KEY_FLAG_EXTENDED;
     assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event, &capture));
     event.data.key.key = UI_HOTKEY_KEY_ALT;
+    event.data.key.flags = 0u;
     event.data.key.scan_code = 0x38u;
     event.data.key.modifiers = UI_HOTKEY_MODIFIER_CONTROL |
         UI_HOTKEY_MODIFIER_ALT;
@@ -114,14 +117,16 @@ int main(void)
     event.data.key.pressed = 0u;
     assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event, &capture));
     event.data.key.key = UI_HOTKEY_KEY_ALT;
+    event.data.key.flags = 0u;
     event.data.key.scan_code = 0x38u;
     assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event, &capture));
     event.data.key.key = UI_HOTKEY_KEY_CONTROL;
     event.data.key.scan_code = 0x1du;
     assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event, &capture));
-    event.data.key.scan_code = 0x11du;
+    event.data.key.flags = UI_KEY_FLAG_EXTENDED;
     assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event, &capture));
     assert(capture.count == 1u);
+    event.data.key.flags = 0u;
     /* An uncompleted registered prefix is never swallowed: the original
        modifier and the mismatching key replay in their source order. */
     capture.count = 0u;
@@ -137,6 +142,28 @@ int main(void)
     assert(capture.count == 2u);
     assert(capture.events[0].data.key.key == UI_HOTKEY_KEY_CONTROL);
     assert(capture.events[1].data.key.key == 'X');
+    /* Once Ctrl was delivered with X, later Alt/P cannot consume that make. */
+    event.data.key.key = UI_KEY_ALT; event.data.key.scan_code = 0x38;
+    event.data.key.modifiers = 3;
+    assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event, &capture));
+    event.data.key.key = 'P'; event.data.key.scan_code = 0x19;
+    assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event, &capture));
+    assert(capture.count == 4 && capture.events[3].type == UI_EVENT_KEY);
+
+    /* Repeated pending make consumes no new physical-key slot. */
+    capture.count = 0;
+    ui_hotkey_matcher_initialize(&matcher, &registry);
+    event.data.key.key = UI_KEY_CONTROL; event.data.key.scan_code = 0x1d;
+    event.data.key.modifiers = 1;
+    for (unsigned i = 0; i != 100; ++i)
+        assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event, &capture));
+    assert(matcher.pending_count == 1 && capture.count == 0);
+    event.data.key.key = UI_KEY_ALT; event.data.key.scan_code = 0x38;
+    event.data.key.modifiers = 3;
+    assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event, &capture));
+    event.data.key.key = 'P'; event.data.key.scan_code = 0x19;
+    assert(ui_hotkey_matcher_submit(&matcher, &event, ui_capture_event, &capture));
+    assert(capture.count == 1 && capture.events[0].type == UI_EVENT_HOTKEY);
     /* Saturation rejects the next chord; it never overwrites a held key. */
     capture.count = 0u;
     ui_hotkey_matcher_initialize(&matcher, &registry);

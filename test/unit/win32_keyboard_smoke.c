@@ -141,6 +141,10 @@ int main(void)
         0xe04du, LIB_WIN32_KEY_RIGHT, UI_INPUT_FLAG_EXTENDED, 0u, 1));
     assert(capture.count == 1u && capture.identities[0] == UI_KEY_RIGHT);
     assert(capture.flags[0] == UI_KEY_FLAG_EXTENDED);
+    assert(capture.keys[0] == 0x4du);
+    assert(ui_keyboard_submit_transition(&capture, capture_key,
+        0x4du, LIB_WIN32_KEY_RIGHT, UI_INPUT_FLAG_EXTENDED, 0u, 1));
+    assert(capture.keys[1] == capture.keys[0] && capture.flags[1] == capture.flags[0]);
 
     /* Raw Console input provides its own per-record modifier state.  These
        registrations must not depend on process-global GetKeyState(), which

@@ -1,6 +1,5 @@
 #include "lib/host/console_backend.h"
 
-struct host_console_backend { int unavailable; };
 lib_status host_console_backend_create(host_console_backend **out_backend)
 {
     if (out_backend != LIB_NULL) *out_backend = LIB_NULL;

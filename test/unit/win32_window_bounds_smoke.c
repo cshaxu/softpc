@@ -54,14 +54,14 @@ int main(void)
         int client_width;
         int client_height;
 
-        assert(ui_win32_fit_aspect_size(1920, 1041, 640, 480,
+        assert(ui_window_fit_aspect_size(1920, 1041, 640, 480,
             &client_width, &client_height));
         assert(client_width == 1388);
         assert(client_height == 1041);
         assert(client_width <= 1920);
         assert(client_height <= 1041);
 
-        assert(ui_win32_fit_aspect_size(600, 900, 640, 480,
+        assert(ui_window_fit_aspect_size(600, 900, 640, 480,
             &client_width, &client_height));
         assert(client_width == 600);
         assert(client_height == 450);

@@ -75,7 +75,7 @@ lib_bool ui_keyboard_platform_transition(lib_u16 scan, lib_u16 raw_key,
     lib_u16 *out_scan, lib_u32 *out_key)
 {
     if (scan == 0u) scan = ui_keyboard_resolve_scan(raw_key);
-    *out_scan = scan;
+    *out_scan = scan & 0xffu;
     *out_key = ui_keyboard_key(raw_key);
     return scan != 0u && *out_key != 0u;
 }

@@ -3,7 +3,7 @@
 #include "lib/ui-base/linux/mailbox.c"
 #include "lib/host/linux/console.c"
 
-static host_sync_platform_event *signal_event;
+static host_sync_event *signal_event;
 static ui_mailbox_wake *signal_wake;
 static void signal_on_second_wait(void)
 {
@@ -14,7 +14,7 @@ static void signal_on_second_wait(void)
 
 int main(void)
 {
-    host_sync_platform_event *events[2];
+    host_sync_event *events[2];
     lib_bool signaled;
     lib_u32 index;
     int failure;
@@ -62,27 +62,27 @@ int main(void)
     assert(host_sync_platform_event_create(1, &events[1]) == LIB_STATUS_OK);
     signal_event = events[1]; wait_calls = 0; wait_result = 0;
     wait_hook = signal_on_second_wait;
-    assert(host_sync_platform_event_wait_many((const host_sync_platform_event *const *)events,
+    assert(host_sync_platform_event_wait_many((const host_sync_event *const *)events,
         2, 250, &signaled, &index) == LIB_STATUS_OK && signaled && index == 1);
     assert(wait_calls == 2 && observed_deadline.tv_sec == 101 &&
         observed_deadline.tv_nsec == 150000000L);
-    assert(host_sync_platform_event_wait_many((const host_sync_platform_event *const *)events,
+    assert(host_sync_platform_event_wait_many((const host_sync_event *const *)events,
         2, 0, &signaled, &index) == LIB_STATUS_OK && signaled && index == 1);
     host_sync_platform_event_reset(events[1]);
     signal_event = events[0]; wait_calls = 0;
-    assert(host_sync_platform_event_wait_many((const host_sync_platform_event *const *)events,
+    assert(host_sync_platform_event_wait_many((const host_sync_event *const *)events,
         2, LIB_UINT32_MAX, &signaled, &index) == LIB_STATUS_OK && signaled && index == 0);
     assert(wait_calls == 2);
-    assert(host_sync_platform_event_wait_many((const host_sync_platform_event *const *)events,
+    assert(host_sync_platform_event_wait_many((const host_sync_event *const *)events,
         2, 0, &signaled, &index) == LIB_STATUS_OK && !signaled);
     wait_hook = NULL; wait_calls = 0; wait_result = LIB_LINUX_ETIMEDOUT;
-    assert(host_sync_platform_event_wait_many((const host_sync_platform_event *const *)events,
+    assert(host_sync_platform_event_wait_many((const host_sync_event *const *)events,
         2, 1, &signaled, &index) == LIB_STATUS_OK && !signaled);
     wait_calls = 0; wait_result = 5;
-    assert(host_sync_platform_event_wait_many((const host_sync_platform_event *const *)events,
+    assert(host_sync_platform_event_wait_many((const host_sync_event *const *)events,
         2, LIB_UINT32_MAX, &signaled, &index) == LIB_STATUS_IO_ERROR);
     clock_failure = 1;
-    assert(host_sync_platform_event_wait_many((const host_sync_platform_event *const *)events,
+    assert(host_sync_platform_event_wait_many((const host_sync_event *const *)events,
         2, 1, &signaled, &index) == LIB_STATUS_IO_ERROR);
     assert(!host_sync_lock.locked && sleep_calls == 0);
     interrupt_sleep = 1;

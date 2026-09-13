@@ -10,6 +10,8 @@ struct ui_console {
     void *worker_state;
 };
 
+lib_status ui_console_publish_text_frame(ui_console *console, const ui_frame *frame);
+
 lib_status ui_console_worker_start(ui_console *console);
 void ui_console_worker_join(ui_console *console);
 

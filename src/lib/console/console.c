@@ -45,16 +45,18 @@ static lib_bool lib_console_event_valid(const lib_console_event *event)
 lib_status lib_console_create(lib_console **out_console)
 {
     lib_console *console;
+    lib_status status;
     if (out_console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_console = LIB_NULL;
     console = lib_allocate_zero(1u, sizeof(*console));
     if (console == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     lib_atomic_flag_clear(&console->lock);
-    if (console_mutex_create(&console->event_gate) != LIB_STATUS_OK ||
-        console_mutex_create(&console->output_lock) != LIB_STATUS_OK) {
+    status = console_mutex_create(&console->event_gate);
+    if (status == LIB_STATUS_OK) status = console_mutex_create(&console->output_lock);
+    if (status != LIB_STATUS_OK) {
         console_mutex_destroy(console->event_gate);
         lib_release(console);
-        return LIB_STATUS_NO_MEMORY;
+        return status;
     }
     lib_atomic_u32_initialize(&console->references, 1u);
     *out_console = console;

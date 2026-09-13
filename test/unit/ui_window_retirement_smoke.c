@@ -44,7 +44,19 @@ static ui_mailbox_wake_wait_result controlled_wait(const ui_mailbox_wake *wake,
 #define lib_win32_set_focus no_focus
 #define lib_win32_create_compatible_dc create_dc
 #define ui_mailbox_wake_wait_messages controlled_wait
+static void checked_fail(ui_component *component, lib_status status)
+{
+    static ui_frame rejected = { .valid = 1, .text_columns = 80, .text_rows = 25 };
+    ui_component_fail(component, status);
+    assert(ui_component_mailboxes_publish_frame(&component->mailboxes, &rejected) ==
+        LIB_STATUS_INVALID_STATE);
+    ui_component_control title = { .kind = UI_COMPONENT_CONTROL_SET_WINDOW_TITLE };
+    assert(ui_component_mailboxes_enqueue_controls(&component->mailboxes, &title, 1u) ==
+        LIB_STATUS_INVALID_STATE);
+}
+#define ui_component_fail checked_fail
 #include "lib/ui-window/win32/component.c"
+#undef ui_component_fail
 
 static int input(void *context, const ui_input_event *event)
 {

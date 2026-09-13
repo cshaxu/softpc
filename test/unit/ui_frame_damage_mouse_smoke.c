@@ -1,5 +1,7 @@
 #include "lib/ui-base/mailbox_interface.h"
 #include "lib/ui-window/win32/mouse.h"
+#include "lib/ui-window/geometry.h"
+#include "lib/ui-window/render.h"
 #include <assert.h>
 
 static ui_component_mailboxes mailbox;
@@ -65,10 +67,33 @@ static void motion(void)
     assert(ui_win32_mouse_move(&mouse, 0x10001, 200, 200, 100, 100, &dx, &dy));
     assert(dx == 0 && dy == 0);
     assert(ui_win32_mouse_move(&mouse, 0, 200, 200, 100, 100, &dx, &dy));
-    assert(dx == 0 && dy == 0 && mouse.remainder_x == 0 && mouse.remainder_y == 0);
+    assert(dx == 0 && dy == 0 && mouse.motion.remainder_x == 0 && mouse.motion.remainder_y == 0);
     assert(ui_win32_mouse_move(&mouse, 0x10001, 200, 200, 100, 100, &dx, &dy));
     assert(ui_win32_mouse_move(&mouse, 0x20002, 100, 100, 100, 100, &dx, &dy));
-    assert(dx == 1 && dy == 1 && mouse.remainder_x == 0 && mouse.remainder_y == 0);
+    assert(dx == 1 && dy == 1 && mouse.motion.remainder_x == 0 && mouse.motion.remainder_y == 0);
 }
 
-int main(void) { damage(); motion(); return 0; }
+static void rendering(void)
+{
+    ui_frame text = { 0 };
+    ui_window_rect display = { 0, 0, 640, 410 }, cursor;
+    lib_u32 pixels[8 * 16];
+    text.valid = 1; text.text_columns = 80; text.text_rows = 25;
+    text.cursor_visible = 1; text.cursor_column = 0; text.cursor_row = 24;
+    text.font_height = 16; text.cursor_top = 14; text.cursor_bottom = 15;
+    assert(ui_window_cursor_rect(&text, &display, &cursor));
+    assert(cursor.bottom == 410 && cursor.top == 407);
+    for (int row = 0; row < 25; ++row) {
+        text.cursor_row = row;
+        assert(ui_window_cursor_rect(&text, &display, &cursor));
+        assert(cursor.top >= row * 410 / 25);
+        assert(cursor.bottom == (row + 1) * 410 / 25);
+        assert(cursor.bottom - cursor.top <= 3);
+    }
+    text.text_columns = text.text_rows = 1;
+    text.font[0] = 0x80; text.attributes[0] = 0x21;
+    text.text_palette[1] = 0x112233; text.text_palette[2] = 0x445566;
+    ui_window_render_text(&text, pixels, 8, 16);
+    assert(pixels[0] == 0x112233 && pixels[1] == 0x445566 && pixels[127] == 0x445566);
+}
+int main(void) { damage(); motion(); rendering(); return 0; }

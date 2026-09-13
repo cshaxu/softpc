@@ -164,10 +164,21 @@ Only keyboard events determine prefix replay; mouse and close do not flush it.
 Keyboard order is preserved without buffering key/mouse interleaving. A partial
 sink failure is terminal, never retried; worker quiescence precedes its one
 failure/retirement completion. STOP/fault closes both frame and control admission
-atomically without bypassing FIFO control consumption up to STOP.
+atomically without bypassing FIFO control consumption up to STOP. Frame and
+control have independent locks; only terminal admission takes both, frame first.
+Ordinary control does not wait for frame copying.
 
 Logical Console event/output gates and broker transactions use private blocking
 locks in their owning components, preserving existing lock order and callback
 barriers. No callback may synchronously reenter binding/destruction. Storage
 owns each CRT stream directly; writer embeds file state instead of separately
 allocated pointer wrappers.
+
+Pure Window geometry, cursor rectangles, frame pixel conversion and relative
+motion scaling belong to ui-window root helpers. Native files marshal SDK
+values and own actual drawing/messages/capture. Worker context and frame share
+one allocation; native cleanup runs on the worker, storage release after join.
+Host event is one opaque platform allocation, not a pointer-only outer wrapper.
+Task owns cancellation and entry/context; its platform thread object retains
+startup parameters until join. Root task destroy performs the join once before
+platform disposal.

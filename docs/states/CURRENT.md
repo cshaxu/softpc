@@ -2,32 +2,31 @@
 
 ## Current Work
 
-M9 T55 S4 is admitted and active: the seven approved UI input, shutdown,
-blocking-lock and storage cleanup dispositions. S3 P5/P6 is delivered and
-reviewed at `5ea133c`; it is not the active implementation packet.
-T55 remains open. S4 P1 `fe620cb` is implemented, verified and pushed;
-post-push actual-diff review passed. Owner package inspection remains pending.
+M9 T55 S5 implementation and verification are complete; executor P1 is ready
+for push and actual-diff review. Both widths passed 49/49; strict lib passed 3/3.
+Baseline `183fc8f`; the proposal records the seven-component audit and accounting.
+T55 remains open.
 
-## M9 T55 S4 Packet
+## M9 T55 S5 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: “按照这些准入新的S任务修复以上7条反馈意见。” |
-| Objective | Unify frozen delivery, isolate keyboard prefixes, terminate failed input, close request admission on STOP/fault, replace three long-held spin gates, flatten storage allocation, and annotate deferred overlay indexing. |
-| Non-goals | No MVDM, media, INI, app policy, mouse scaling, overlay algorithm or public synchronization API changes. |
-| Reference Baseline | `5ea133c`, T55 S3 P6. |
+| Admission And Approval | Owner: “以上，开始清理。” with the preceding approved seven findings and library-wide wrapper/dead-code sweep. |
+| Objective | One normalizer/matcher, correct physical-key state, one fault entry, independent mailboxes, component-owned pure math and nonduplicated resource ownership. |
+| Non-goals | No MVDM/media/INI change, product policy change, new component, types implementation or Linux UI parity. Overlay indexing remains deferred. |
+| Reference Baseline | `183fc8f`, S4 reviewed delivery. |
 | Candidate Proposal | [T55 proposal](../proposals/m9-t55-lib-types-external-boundary.md) |
-| Files And ABI Surface | lib console/host/storage/ui-base/ui-window/ui-console, selected platform helpers and types declarations if needed; tests, CMake, manifest, docs and two package EXEs. |
+| Files And ABI Surface | Entire lib C/H inventory for audit; component implementations and support APIs as needed, direct consumers/tests, CMake, manifest, docs and dual EXEs. Preserve app-facing behavior. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout and Product UI. |
-| Verification | Seven-item finite ledger; frozen close/prefix/mouse and partial sink failure tests; STOP/frame race and FIFO barriers; blocking Console/broker barriers; storage regression; full x86/x64 and strict lib plus DAG/manifest/governance. |
-| Expected Markers | One Window delivery filter; keyboard-only matcher state; fault ends input once; one mailbox admission boundary; long waits block without changing lock order; one stream owner; overlay unchanged except TODO. |
-| Asset Needs | Rebuild only softpc32.exe and softpc64.exe; preserve user INI and guest media. |
-| Reporting Requirements | Seven dispositions, exact tests, production/test accounting, actual diff review, pushed commit and EXE links; keep T55 open. |
-| Stop Conditions | Escalate any required product policy, protected input or component DAG change; do not silently expand. |
-| Exit Criteria | All seven dispositions verified (overlay optimization explicitly deferred), dual-width artifacts/tests, complete P committed/pushed and actual diff reviewed; clean worktree for owner inspection. |
-| Original Owner Request | “按照这些准入新的S任务修复以上7条反馈意见。” The preceding approvals require removing duplicate frozen filtering, keyboard-only prefix order, fail-stop delivery, atomic STOP admission, three concrete long-held lock replacements, storage flattening and only an overlay TODO. |
-| Similar-Issue Sweep | Every Window sink path, matcher replay, UI worker fault/STOP exit, Console output/event gate and broker transaction lock, storage stream allocations/close paths. |
+| Verification | Hotkey identity/repeat/replay proofs; control independent of frame copy; STOP/fault barrier; cursor/geometry/mouse math; sync ownership and storage regressions; both widths full CTest and strict lib. |
+| Expected Markers | No second normalizer; no pointer-only event wrapper or duplicate join; no orphan internal entry; pure math outside SDK-only files. |
+| Asset Needs | Rebuild softpc32.exe and softpc64.exe only; preserve INI/media. |
+| Reporting Requirements | Finite component inventory/dispositions, tests, changed-code accounting, complete P push and actual-diff review. |
+| Stop Conditions | Escalate newly required product behavior or component edge; no silent scope expansion. |
+| Exit Criteria | All admitted dispositions verified, dual artifacts, pushed complete P, actual diff review and clean workspace for owner inspection. T55 remains open. |
+| Original Owner Request | “现在存在normalizer吗？…避免层层嵌套！”; independent locks approved; storage cleanup approved; “审计所有lib中层层包装的问题和死代码的问题，一并清理干净。” |
+| Similar-Issue Sweep | All seven lib components: internal function callers, platform pure functions, allocation ownership, stop/failure/join paths. Retain externally usable APIs and true platform boundaries with explicit reasons. |
 
 ## Current Technical Baseline
 
@@ -38,7 +37,7 @@ post-push actual-diff review passed. Owner package inspection remains pending.
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
-  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus passes 48/48
+  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus passes 49/49
   fixed x64 and x86 CTest; its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 

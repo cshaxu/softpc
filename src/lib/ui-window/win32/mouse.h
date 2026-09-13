@@ -1,19 +1,14 @@
 #ifndef UI_WIN32_MOUSE_H
 #define UI_WIN32_MOUSE_H
 
-#include "lib/types/types_interface.h"
+#include "lib/ui-window/motion.h"
 #include "lib/types/win32/window.h"
 
 /* Host-only relative-pointer state. The caller owns input-device buttons and
  * lifecycle policy; this component owns explicit Win32 client capture only. */
 typedef struct ui_win32_mouse {
-    int x;
-    int y;
-    int valid;
+    ui_window_motion motion;
     lib_bool captured;
-    lib_i64 remainder_x, remainder_y;
-    int client_width, client_height;
-    lib_u32 content_width, content_height;
 } ui_win32_mouse;
 
 void ui_win32_mouse_reset(ui_win32_mouse *mouse);

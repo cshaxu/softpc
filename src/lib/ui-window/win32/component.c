@@ -2,6 +2,7 @@
 #include "lib/types/win32/sync.h"
 #include "lib/types/types_interface.h"
 #include "lib/ui-window/window.h"
+#include "lib/ui-window/render.h"
 
 #include "lib/ui-window/win32/geometry.h"
 #include "lib/ui-base/input_interface.h"
@@ -11,8 +12,6 @@
 
 #include "lib/types/win32/window.h"
 
-#define WIN32_WINDOW_TEXT_CELL_WIDTH 8u
-#define WIN32_WINDOW_TEXT_CELL_HEIGHT 16u
 #define WIN32_WINDOW_MAILBOX_READY (LIB_WIN32_WM_APP + 1u)
 #define WIN32_WINDOW_MOUSE_READY (LIB_WIN32_WM_APP + 2u)
 #define WIN32_WINDOW_DEFAULT_WIDTH 680
@@ -21,7 +20,7 @@
 
 typedef struct ui_win32_window_context {
     ui_window *component;
-    ui_frame *frame;
+    ui_frame frame;
     lib_win32_hdc surface_dc;
     lib_win32_hbitmap surface_bitmap;
     lib_win32_hgdiobj surface_previous_bitmap;
@@ -48,7 +47,6 @@ typedef struct ui_win32_window_context {
     lib_bool cursor_blink_visible;
     lib_win32_dword cursor_blink_due;
     lib_win32_hcursor transparent_cursor;
-    lib_status exit_status;
 } ui_win32_window_context;
 
 static ui_win32_window_context *win32_window_context(lib_win32_hwnd window)
@@ -246,131 +244,17 @@ static void win32_window_resize_client(lib_win32_hwnd window,
     context->client_surface_height = height;
 }
 
-static int win32_window_frame_size(const ui_frame *frame, lib_u32 *width,
-    lib_u32 *height)
-{
-    if (!ui_frame_is_valid(frame) || width == LIB_NULL || height == LIB_NULL) return 0;
-    if (frame->graphics != 0u) {
-        *width = frame->graphics_width;
-        *height = frame->graphics_height;
-    } else {
-        *width = frame->text_columns * WIN32_WINDOW_TEXT_CELL_WIDTH;
-        *height = frame->text_rows * WIN32_WINDOW_TEXT_CELL_HEIGHT;
-    }
-    return 1;
-}
-
-static void win32_window_update_text(ui_win32_window_context *context)
-{
-    ui_frame *frame;
-    lib_u32 row;
-
-    if (context == LIB_NULL || context->surface_pixels == LIB_NULL ||
-        (frame = context->frame) == LIB_NULL || frame->graphics != 0u) return;
-    lib_memory_set(context->surface_pixels, 0, (lib_size)context->surface_width *
-        context->surface_height * sizeof(*context->surface_pixels));
-    for (row = 0u; row < frame->text_rows; ++row) {
-        lib_u32 column;
-        for (column = 0u; column < frame->text_columns; ++column) {
-            lib_size index = (lib_size)row * UI_TEXT_COLUMNS + column;
-            lib_u8 character = frame->text[index];
-            lib_u16 attribute = frame->attributes[index];
-            lib_u32 scan;
-            for (scan = 0u; scan < WIN32_WINDOW_TEXT_CELL_HEIGHT; ++scan) {
-                const lib_u8 *font = frame->attribute_font_select != 0u &&
-                    (attribute & 0x08u) != 0u ? frame->secondary_font : frame->font;
-                lib_u8 bits = font[(lib_size)character * 16u + scan];
-                lib_u32 *pixels = context->surface_pixels +
-                    ((lib_size)row * WIN32_WINDOW_TEXT_CELL_HEIGHT + scan) *
-                    context->surface_width + column * WIN32_WINDOW_TEXT_CELL_WIDTH;
-                lib_u32 bit;
-                for (bit = 0u; bit < WIN32_WINDOW_TEXT_CELL_WIDTH; ++bit)
-                    pixels[bit] = frame->text_palette[
-                        (bits & (0x80u >> bit)) != 0u ? attribute & 0x0fu :
-                            (attribute >> 4) & 0x0fu];
-            }
-        }
-    }
-}
-
-static int win32_window_update_graphics(ui_win32_window_context *context,
-    lib_win32_rect *changed)
-{
-    ui_frame *frame;
-    int full_refresh;
-    lib_i32 left;
-    lib_i32 top;
-    lib_i32 right;
-    lib_i32 bottom;
-    lib_u32 row;
-
-    if (context == LIB_NULL || context->surface_pixels == LIB_NULL || changed == LIB_NULL ||
-        (frame = context->frame) == LIB_NULL || frame->graphics == 0u ||
-        context->surface_width != frame->graphics_width ||
-        context->surface_height != frame->graphics_height) return 0;
-    full_refresh = !context->graphics_valid || lib_memory_compare(context->graphics_palette,
-        frame->graphics_palette, sizeof(context->graphics_palette)) != 0;
-    left = full_refresh ? 0 : frame->dirty_left;
-    top = full_refresh ? 0 : frame->dirty_top;
-    right = full_refresh ? (lib_i32)frame->graphics_width - 1 : frame->dirty_right;
-    bottom = full_refresh ? (lib_i32)frame->graphics_height - 1 : frame->dirty_bottom;
-    if (left < 0) left = 0;
-    if (top < 0) top = 0;
-    if (right >= (lib_i32)frame->graphics_width) right = (lib_i32)frame->graphics_width - 1;
-    if (bottom >= (lib_i32)frame->graphics_height) bottom = (lib_i32)frame->graphics_height - 1;
-    if (right < left || bottom < top) return 0;
-    for (row = (lib_u32)top; row <= (lib_u32)bottom; ++row) {
-        const lib_u8 *source = frame->graphics_pixels + row * frame->graphics_stride;
-        lib_u32 *destination = context->surface_pixels + row * context->surface_width;
-        lib_u32 column;
-        for (column = (lib_u32)left; column <= (lib_u32)right; ++column)
-            destination[column] = frame->graphics_palette[source[column]];
-    }
-    lib_memory_copy(context->graphics_palette, frame->graphics_palette,
-        sizeof(context->graphics_palette));
-    context->graphics_valid = 1;
-    changed->left = left;
-    changed->top = top;
-    changed->right = right + 1;
-    changed->bottom = bottom + 1;
-    return 1;
-}
-
 static int win32_window_cursor_rect(lib_win32_hwnd window,
     const ui_win32_window_context *context, lib_win32_rect *cursor)
 {
     lib_win32_rect display;
-    const ui_frame *frame;
-    int width;
-    int height;
-    int cell_height;
-    int cursor_height;
-    lib_u32 cursor_percent;
-
-    if (window == LIB_NULL || context == LIB_NULL || cursor == LIB_NULL ||
-        (frame = context->frame) == LIB_NULL || !ui_frame_is_valid(frame) ||
-        frame->graphics != 0u || frame->cursor_visible == 0u ||
-        frame->cursor_column < 0 ||
-        frame->cursor_row < 0 || frame->cursor_column >= (lib_i32)frame->text_columns ||
-        frame->cursor_row >= (lib_i32)frame->text_rows ||
-        !win32_window_display_rect(context, context->surface_width,
-            context->surface_height, &display)) return 0;
-    width = display.right - display.left;
-    height = display.bottom - display.top;
-    cell_height = height / frame->text_rows;
-    if (width <= 0 || cell_height <= 0) return 0;
-    cursor_percent = frame->cursor_bottom >= frame->cursor_top &&
-        frame->font_height != 0u ? (frame->cursor_bottom - frame->cursor_top + 1u) *
-            100u / frame->font_height : 100u;
-    if (cursor_percent == 0u || cursor_percent > 100u) cursor_percent = 100u;
-    cursor_height = (int)((cell_height * cursor_percent + 99u) / 100u);
-    if (cursor_height > cell_height) cursor_height = cell_height;
-    cursor->left = display.left + frame->cursor_column * width / frame->text_columns;
-    cursor->right = display.left + (frame->cursor_column + 1) * width /
-        frame->text_columns;
-    cursor->top = display.top + (frame->cursor_row + 1) * cell_height - cursor_height;
-    cursor->bottom = display.top + (frame->cursor_row + 1) * height / frame->text_rows;
-    return cursor->right > cursor->left && cursor->bottom > cursor->top;
+    ui_window_rect area, result;
+    if (!window || !context || !cursor || !win32_window_display_rect(context,
+            context->surface_width, context->surface_height, &display)) return 0;
+    area=ui_win32_rect_value(&display);
+    if (!ui_window_cursor_rect(&context->frame,&area,&result)) return 0;
+    ui_win32_rect_store(cursor,&result);
+    return 1;
 }
 
 static void win32_window_paint(lib_win32_hwnd window, ui_win32_window_context *context,
@@ -379,7 +263,7 @@ static void win32_window_paint(lib_win32_hwnd window, ui_win32_window_context *c
     lib_win32_rect display;
 
     if (context == LIB_NULL || context->surface_dc == LIB_NULL ||
-        !ui_frame_is_valid(context->frame) ||
+        !ui_frame_is_valid(&context->frame) ||
         !win32_window_display_rect(context, context->surface_width,
             context->surface_height, &display)) return;
     lib_win32_stretch_blt(dc, display.left, display.top, display.right - display.left,
@@ -412,8 +296,8 @@ static lib_win32_dword win32_window_cursor_blink_timeout(
 
     if (!win32_window_accepting_input(context) ||
         context->frozen != LIB_FALSE ||
-        context->frame == LIB_NULL || !ui_frame_is_valid(context->frame) ||
-        context->frame->graphics != 0u || context->frame->cursor_visible == 0u)
+        !ui_frame_is_valid(&context->frame) ||
+        context->frame.graphics != 0u || context->frame.cursor_visible == 0u)
         return LIB_WIN32_INFINITE;
     now = lib_win32_get_tick_count();
     return (lib_win32_long)(now - context->cursor_blink_due) >= 0 ? 0u :
@@ -536,27 +420,30 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
 
     if (context == LIB_NULL || context->component == LIB_NULL ||
         !ui_component_mailboxes_capture_frame(&context->component->base.mailboxes,
-            &context->displayed_sequence, context->frame))
+            &context->displayed_sequence, &context->frame))
         return;
-    if (!win32_window_frame_size(context->frame, &width, &height) ||
+    if (!ui_window_frame_size(&context->frame, &width, &height) ||
         !win32_window_ensure_surface(window, context, width, height)) {
-        context->exit_status = LIB_STATUS_IO_ERROR;
-        lib_atomic_i32_store_explicit(&context->component->base.stopping, 1,
-            LIB_MEMORY_ORDER_RELEASE);
+        ui_component_fail(&context->component->base, LIB_STATUS_IO_ERROR);
         return;
     }
     win32_window_resize_client(window, context, width, height);
-    if (context->frame->graphics != 0u) {
-        lib_win32_rect changed;
+    if (context->frame.graphics != 0u) {
+        ui_window_rect changed;
+        lib_win32_rect changed_rect;
         lib_win32_rect display;
         lib_win32_rect target;
-        if (win32_window_update_graphics(context, &changed) &&
+        if (ui_window_render_graphics(&context->frame, context->surface_pixels,
+                context->surface_width, context->surface_height, context->graphics_palette,
+                &context->graphics_valid, &changed) &&
             win32_window_display_rect(context, width, height, &display)) {
-            ui_win32_map_dirty_rect(&changed, &display, width, height, &target);
+            ui_win32_rect_store(&changed_rect, &changed);
+            ui_win32_map_dirty_rect(&changed_rect, &display, width, height, &target);
             lib_win32_invalidate_rect(window, &target, LIB_WIN32_FALSE);
         }
     } else {
-        win32_window_update_text(context);
+        ui_window_render_text(&context->frame, context->surface_pixels,
+            context->surface_width, context->surface_height);
         lib_win32_invalidate_rect(window, LIB_NULL, LIB_WIN32_FALSE);
     }
 }
@@ -736,15 +623,13 @@ static void win32_window_destroy(ui_win32_window_context *context, lib_win32_hwn
     win32_window_destroy_surface(context);
     if (context != LIB_NULL && context->transparent_cursor != LIB_NULL)
         lib_win32_destroy_cursor(context->transparent_cursor);
-    if (context != LIB_NULL) lib_release(context->frame);
-    lib_release(context);
 }
 
 typedef struct ui_window_win32_state {
     lib_win32_handle worker;
     lib_win32_handle ready;
     lib_status startup_status;
-    ui_win32_window_context *context;
+    ui_win32_window_context context;
 } ui_window_win32_state;
 
 static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
@@ -761,7 +646,8 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
     int initial_width;
     int initial_height;
 
-    if (state == LIB_NULL || (context = state->context) == LIB_NULL) return 0u;
+    if (state == LIB_NULL) return 0u;
+    context = &state->context;
     lib_win32_zero_memory(&klass, sizeof(klass));
     klass.lpfnWndProc = win32_window_proc;
     klass.hInstance = lib_win32_get_module_handle_a(LIB_NULL);
@@ -806,32 +692,25 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
                 lib_win32_send_message_a(window, WIN32_WINDOW_MAILBOX_READY, 0, 0);
         }
         else if (wait == UI_MAILBOX_WAKE_WAIT_FAULT) {
-            context->exit_status = LIB_STATUS_IO_ERROR;
-            lib_atomic_i32_store_explicit(&component->base.stopping, 1,
-                LIB_MEMORY_ORDER_RELEASE);
+            ui_component_fail(&component->base, LIB_STATUS_IO_ERROR);
         }
         else if (wait == UI_MAILBOX_WAKE_WAIT_TIMED_OUT)
             win32_window_advance_cursor_blink(window, context);
         while (win32_window_accepting_input(context) &&
             lib_win32_peek_message_a(&message, LIB_NULL, 0, 0, LIB_WIN32_PM_REMOVE)) {
             if (message.message == LIB_WIN32_WM_QUIT) {
-                context->exit_status = LIB_STATUS_IO_ERROR;
-                lib_atomic_i32_store_explicit(&component->base.stopping, 1,
-                    LIB_MEMORY_ORDER_RELEASE);
+                ui_component_fail(&component->base, LIB_STATUS_IO_ERROR);
                 break;
             }
             lib_win32_translate_message(&message);
             lib_win32_dispatch_message_a(&message);
         }
     }
-    if (!lib_win32_is_window(window)) context->exit_status = LIB_STATUS_IO_ERROR;
-    lib_atomic_i32_store_explicit(&component->base.stopping, 1,
-        LIB_MEMORY_ORDER_RELEASE);
+    if (!lib_win32_is_window(window)) ui_component_fail(&component->base, LIB_STATUS_IO_ERROR);
     win32_window_release_mouse(context);
     if (lib_win32_is_window(window)) lib_win32_destroy_window(window);
-    ui_component_retire(&component->base, context->exit_status);
+    ui_component_retire(&component->base, LIB_STATUS_OK);
     win32_window_destroy(context, LIB_NULL);
-    state->context = LIB_NULL;
     return 0u;
 }
 
@@ -843,26 +722,20 @@ lib_status ui_window_worker_start(ui_window *component)
     if (component == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     state = lib_allocate_zero(1u, sizeof(*state));
     if (state == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    state->context = lib_allocate_zero(1u, sizeof(*state->context));
-    if (state->context == LIB_NULL) { lib_release(state); return LIB_STATUS_NO_MEMORY; }
-    state->context->frame = lib_allocate_zero(1u, sizeof(*state->context->frame));
-    if (state->context->frame == LIB_NULL) {
-        lib_release(state->context); lib_release(state); return LIB_STATUS_NO_MEMORY;
-    }
-    state->context->component = component;
-    state->context->frozen = component->initial_frozen;
-    state->context->cursor_blink_visible = LIB_TRUE;
-    state->context->cursor_blink_due = lib_win32_get_tick_count() +
+    state->context.component = component;
+    state->context.frozen = component->initial_frozen;
+    state->context.cursor_blink_visible = LIB_TRUE;
+    state->context.cursor_blink_due = lib_win32_get_tick_count() +
         WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS;
     state->ready = lib_win32_create_event_a(LIB_NULL, LIB_WIN32_TRUE, LIB_WIN32_FALSE, LIB_NULL);
     if (state->ready == LIB_NULL) {
-        win32_window_destroy(state->context, LIB_NULL); lib_release(state); return LIB_STATUS_NO_MEMORY;
+        lib_release(state); return LIB_STATUS_NO_MEMORY;
     }
     component->worker_state = state;
     state->worker = lib_win32_create_thread(LIB_NULL, 0u, ui_window_worker, component, 0u, LIB_NULL);
     if (state->worker == LIB_NULL) {
         component->worker_state = LIB_NULL;
-        lib_win32_close_handle(state->ready); win32_window_destroy(state->context, LIB_NULL);
+        lib_win32_close_handle(state->ready);
         lib_release(state); return LIB_STATUS_NO_MEMORY;
     }
     (void)lib_win32_wait_for_single_object(state->ready, LIB_WIN32_INFINITE);
@@ -870,7 +743,6 @@ lib_status ui_window_worker_start(ui_window *component)
         startup_status = state->startup_status;
         (void)lib_win32_wait_for_single_object(state->worker, LIB_WIN32_INFINITE);
         lib_win32_close_handle(state->worker); lib_win32_close_handle(state->ready);
-        if (state->context != LIB_NULL) win32_window_destroy(state->context, LIB_NULL);
         component->worker_state = LIB_NULL; lib_release(state);
         return startup_status;
     }
@@ -887,7 +759,6 @@ void ui_window_worker_join(ui_window *component)
     (void)lib_win32_wait_for_single_object(state->worker, LIB_WIN32_INFINITE);
     lib_win32_close_handle(state->worker);
     lib_win32_close_handle(state->ready);
-    if (state->context != LIB_NULL) win32_window_destroy(state->context, LIB_NULL);
     component->worker_state = LIB_NULL;
     lib_release(state);
 }

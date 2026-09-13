@@ -13,14 +13,10 @@ typedef struct ui_console_win32_state {
     int previous_mouse_valid;
 } ui_console_win32_state;
 
-static int ui_console_emit(ui_console *console, const ui_input_event *event)
-{
-    return console == LIB_NULL ? 0 : ui_component_emit(&console->base, event);
-}
-
 static int ui_console_emit_normalized(void *context, const ui_input_event *event)
 {
-    return ui_console_emit((ui_console *)context, event);
+    ui_console *console = context;
+    return console == LIB_NULL ? 0 : ui_component_emit(&console->base, event);
 }
 
 static lib_u8 ui_console_hotkey_modifiers(lib_u8 modifiers)
@@ -54,14 +50,13 @@ static void ui_console_receive_event(void *context,
 
         /* Console INPUT_RECORD packets and Window messages must take the
          * same normalization path.  In particular, RDP can provide a
-         * virtual key while omitting its physical scan code; passing zero to
-         * zero physical scan code would drop the first post-handoff key in a
+         * virtual key while omitting its physical scan code; zero would drop
+         * the first post-handoff key in a
          * consumer key mapper.
          * ui-base recovers the scan code through the active Win32 layout. */
         (void)ui_keyboard_submit_transition(console,
             ui_console_emit_normalized,
-            (lib_u16)(key->scan_code | (key->extended != LIB_FALSE ?
-                0x0100u : 0u)), (lib_u16)key->key,
+            key->scan_code, (lib_u16)key->key,
             key->extended != LIB_FALSE ? UI_INPUT_FLAG_EXTENDED : 0u,
             ui_console_hotkey_modifiers(key->modifiers),
             key->pressed != LIB_FALSE);
@@ -81,30 +76,8 @@ static void ui_console_receive_event(void *context,
             UI_MOUSE_BUTTON_LEFT : 0u;
         if ((mouse->buttons & LIB_WIN32_RIGHTMOST_BUTTON_PRESSED) != 0u)
             input.data.mouse.buttons |= UI_MOUSE_BUTTON_RIGHT;
-        (void)ui_console_emit(console, &input);
+        (void)ui_console_emit_normalized(console, &input);
     }
-}
-
-static lib_status ui_console_publish_text_frame(ui_console *console,
-    const ui_frame *frame)
-{
-    lib_console_text_frame text_frame = { 0 };
-
-    if (console == LIB_NULL || frame == LIB_NULL || frame->graphics != 0u)
-        return LIB_STATUS_OK;
-    text_frame.columns = frame->text_columns;
-    text_frame.rows = frame->text_rows;
-    lib_memory_copy(text_frame.text, frame->text, sizeof(text_frame.text));
-    lib_memory_copy(text_frame.attributes, frame->attributes, sizeof(text_frame.attributes));
-    lib_memory_copy(text_frame.palette, frame->text_palette, sizeof(text_frame.palette));
-    text_frame.cursor_column = frame->cursor_column;
-    text_frame.cursor_row = frame->cursor_row;
-    text_frame.cursor_top = frame->cursor_top;
-    text_frame.cursor_bottom = frame->cursor_bottom;
-    text_frame.cursor_visible = frame->cursor_visible;
-    text_frame.cursor_phase = frame->cursor_phase;
-    text_frame.font_height = frame->font_height;
-    return lib_console_write_text_frame(console->logical_console, &text_frame);
 }
 
 static lib_win32_dword LIB_WIN32_WINAPI ui_console_worker(void *opaque)

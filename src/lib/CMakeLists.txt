@@ -57,7 +57,7 @@ add_library(ui-base STATIC ${LIBRARY_UI_BASE_SOURCES})
 library_root(ui-base)
 target_link_libraries(ui-base PUBLIC types)
 
-add_library(ui-window STATIC ui-window/window.c)
+add_library(ui-window STATIC ui-window/window.c ui-window/geometry.c ui-window/render.c ui-window/motion.c)
 if(WIN32)
     target_sources(ui-window PRIVATE ui-window/win32/geometry.c ui-window/win32/input.c
         ui-window/win32/mouse.c ui-window/win32/component.c)

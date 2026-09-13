@@ -4,8 +4,8 @@
 #include "lib/ui-base/event_interface.h"
 
 #define UI_HOTKEY_CAPACITY 16u
-#define UI_HOTKEY_PENDING_CAPACITY 4u
-#define UI_HOTKEY_SUPPRESSED_CAPACITY (UI_HOTKEY_PENDING_CAPACITY + 1u)
+#define UI_HOTKEY_PENDING_CAPACITY 6u /* left/right Ctrl, Alt and Shift */
+#define UI_HOTKEY_SUPPRESSED_CAPACITY (UI_HOTKEY_PENDING_CAPACITY + UI_HOTKEY_CAPACITY)
 
 enum {
     UI_HOTKEY_MODIFIER_CONTROL = UI_KEY_MODIFIER_CONTROL,
@@ -27,19 +27,24 @@ typedef struct ui_hotkey_registry {
     lib_u32 count;
 } ui_hotkey_registry;
 
-typedef struct ui_hotkey_suppressed_key {
+typedef struct ui_hotkey_key_identity {
     ui_key key;
     lib_u16 scan_code;
-} ui_hotkey_suppressed_key;
+    lib_u32 flags;
+} ui_hotkey_key_identity;
 
 typedef struct ui_hotkey_matcher {
     ui_hotkey_registry registry;
     ui_input_event pending[UI_HOTKEY_PENDING_CAPACITY];
     lib_u32 pending_count;
+    /* Delivered modifier makes keep their matching breaks. They can no
+     * longer belong to a fully consumed chord until released. */
+    ui_hotkey_key_identity delivered[UI_HOTKEY_PENDING_CAPACITY];
+    lib_u32 delivered_count;
     /* A matched chord suppresses every make and every later break belonging
      * to that chord.  Each physical pending make is retained: key identity
      * alone is not an identity because left/right modifiers share it. */
-    ui_hotkey_suppressed_key suppressed_keys[UI_HOTKEY_SUPPRESSED_CAPACITY];
+    ui_hotkey_key_identity suppressed_keys[UI_HOTKEY_SUPPRESSED_CAPACITY];
     lib_u32 suppressed_count;
 } ui_hotkey_matcher;
 

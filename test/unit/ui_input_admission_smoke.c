@@ -49,6 +49,12 @@ static DWORD WINAPI publish(void *unused)
     publish_status = ui_window_publish_frame(&window, &frame);
     return 0;
 }
+static DWORD WINAPI enqueue_title(void *unused)
+{
+    (void)unused;
+    assert(ui_window_set_title(&window, "independent") == LIB_STATUS_OK);
+    return 0;
+}
 int main(void)
 {
     ui_input_event event = { .type = UI_EVENT_WINDOW_CLOSE };
@@ -102,12 +108,24 @@ int main(void)
     assert(ui_window_publish_frame(&window, &frame) == LIB_STATUS_INVALID_STATE);
     /* Call mailbox API so ordinary rejected control does not add a failure report. */
     ui_component_control title = { .kind = UI_COMPONENT_CONTROL_SET_WINDOW_TITLE };
-    assert(ui_component_mailboxes_enqueue_control(&window.base.mailboxes, &title) == LIB_STATUS_INVALID_STATE);
+    assert(ui_component_mailboxes_enqueue_controls(&window.base.mailboxes, &title, 1u) == LIB_STATUS_INVALID_STATE);
     assert(ui_component_mailboxes_take_control(&window.base.mailboxes, &taken));
     assert(taken.kind == UI_COMPONENT_CONTROL_SET_WINDOW_TITLE);
     assert(ui_component_mailboxes_take_control(&window.base.mailboxes, &taken));
     assert(taken.kind == UI_COMPONENT_CONTROL_STOP);
     assert(!ui_component_mailboxes_take_control(&window.base.mailboxes, &taken));
+    ui_component_destroy(&window.base);
+    /* A held frame-copy lock must not block control producer/consumer. */
+    initialize();
+    assert(!lib_atomic_flag_test_and_set_explicit(&window.base.mailboxes.frame_lock,
+        LIB_MEMORY_ORDER_ACQUIRE));
+    HANDLE control_thread = CreateThread(NULL, 0, enqueue_title, NULL, 0, NULL);
+    assert(control_thread);
+    assert(WaitForSingleObject(control_thread, 5000) == WAIT_OBJECT_0);
+    assert(ui_component_mailboxes_take_control(&window.base.mailboxes, &taken));
+    assert(taken.kind == UI_COMPONENT_CONTROL_SET_WINDOW_TITLE);
+    lib_atomic_flag_clear_explicit(&window.base.mailboxes.frame_lock, LIB_MEMORY_ORDER_RELEASE);
+    CloseHandle(control_thread);
     ui_component_destroy(&window.base);
     /* Either producer may win the admission lock, but no publish may commit
      * after STOP's boundary. Repeat the public concurrent paths without Sleep. */

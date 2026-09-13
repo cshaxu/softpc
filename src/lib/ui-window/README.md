@@ -24,3 +24,7 @@ Window, report any failure and retire the source once before releasing storage.
 The public component contract is cross-platform. This corpus currently has a
 supported Win32 implementation only; the Linux leaf is an intentional
 `LIB_STATUS_UNSUPPORTED` placeholder, not a claimed Linux presenter.
+
+Pure rectangle/cursor calculations, pixel conversion and relative-motion scaling
+live at the component root. Platform code only obtains native values, marshals
+rectangles and performs native drawing, capture and message operations.

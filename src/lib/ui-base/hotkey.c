@@ -32,15 +32,43 @@ static lib_bool ui_hotkey_registry_has_modifier(const ui_hotkey_registry *regist
     return LIB_FALSE;
 }
 
+static lib_bool ui_hotkey_same_key(const ui_hotkey_key_identity *key,
+    const ui_input_event *event)
+{
+    return key->key == event->data.key.key &&
+        key->scan_code == event->data.key.scan_code &&
+        key->flags == (event->data.key.flags & UI_KEY_FLAG_EXTENDED);
+}
+
+static ui_hotkey_key_identity ui_hotkey_physical_key(const ui_input_event *event)
+{
+    return (ui_hotkey_key_identity) { event->data.key.key,
+        event->data.key.scan_code, event->data.key.flags & UI_KEY_FLAG_EXTENDED };
+}
+
+static void ui_hotkey_release_delivered(ui_hotkey_matcher *matcher,
+    const ui_input_event *event)
+{
+    lib_u32 i;
+    for (i = 0u; i < matcher->delivered_count; ++i)
+        if (ui_hotkey_same_key(&matcher->delivered[i], event)) {
+            matcher->delivered[i] = matcher->delivered[--matcher->delivered_count];
+            return;
+        }
+}
+
 static int ui_hotkey_flush_pending(ui_hotkey_matcher *matcher,
     ui_input_sink sink, void *context)
 {
     lib_u32 index;
     for (index = 0u; index < matcher->pending_count; ++index) {
+        if (matcher->delivered_count == UI_HOTKEY_PENDING_CAPACITY) return 0;
         if (sink == LIB_NULL || !sink(context, &matcher->pending[index])) {
             matcher->pending_count = 0u;
             return 0;
         }
+        matcher->delivered[matcher->delivered_count++] =
+            ui_hotkey_physical_key(&matcher->pending[index]);
     }
     matcher->pending_count = 0u;
     return 1;
@@ -52,10 +80,7 @@ static lib_bool ui_hotkey_is_suppressed(const ui_hotkey_matcher *matcher,
     lib_u32 index;
     if (matcher == LIB_NULL || event == LIB_NULL) return LIB_FALSE;
     for (index = 0u; index < matcher->suppressed_count; ++index)
-        if (matcher->suppressed_keys[index].key ==
-                event->data.key.key &&
-            matcher->suppressed_keys[index].scan_code ==
-                event->data.key.scan_code) return LIB_TRUE;
+        if (ui_hotkey_same_key(&matcher->suppressed_keys[index], event)) return LIB_TRUE;
     return LIB_FALSE;
 }
 
@@ -65,7 +90,7 @@ static int ui_hotkey_suppress_key(ui_hotkey_matcher *matcher,
     if (ui_hotkey_is_suppressed(matcher, event)) return 1;
     if (matcher->suppressed_count == UI_HOTKEY_SUPPRESSED_CAPACITY) return 0;
     matcher->suppressed_keys[matcher->suppressed_count++] =
-        (ui_hotkey_suppressed_key) { event->data.key.key, event->data.key.scan_code };
+        ui_hotkey_physical_key(event);
     return 1;
 }
 
@@ -123,6 +148,8 @@ int ui_hotkey_matcher_submit(ui_hotkey_matcher *matcher,
 {
     const ui_hotkey_registration *matched;
     lib_u8 modifier;
+    lib_u32 i;
+    lib_bool delivered_modifier = LIB_FALSE;
 
     if (matcher == LIB_NULL || event == LIB_NULL || sink == LIB_NULL) return 0;
     if (event->type != UI_EVENT_KEY) {
@@ -133,10 +160,7 @@ int ui_hotkey_matcher_submit(ui_hotkey_matcher *matcher,
             event)) {
         lib_u32 index;
         for (index = 0u; index < matcher->suppressed_count; ++index) {
-            if (matcher->suppressed_keys[index].key ==
-                    event->data.key.key &&
-                matcher->suppressed_keys[index].scan_code ==
-                    event->data.key.scan_code) {
+            if (ui_hotkey_same_key(&matcher->suppressed_keys[index], event)) {
                 matcher->suppressed_keys[index] = matcher->suppressed_keys[
                     matcher->suppressed_count - 1u];
                 --matcher->suppressed_count;
@@ -145,7 +169,10 @@ int ui_hotkey_matcher_submit(ui_hotkey_matcher *matcher,
         }
         return 1;
     }
-    if (event->data.key.pressed != 0u && (matched = ui_hotkey_registry_match(
+    for (i = 0u; i < matcher->delivered_count; ++i)
+        if ((ui_hotkey_modifier_bit(matcher->delivered[i].key) &
+                event->data.key.modifiers) != 0u) delivered_modifier = LIB_TRUE;
+    if (!delivered_modifier && event->data.key.pressed != 0u && (matched = ui_hotkey_registry_match(
             &matcher->registry, event->data.key.key,
             event->data.key.modifiers)) != LIB_NULL) {
         ui_input_event hotkey = *event;
@@ -161,12 +188,21 @@ int ui_hotkey_matcher_submit(ui_hotkey_matcher *matcher,
     modifier = ui_hotkey_modifier_bit(event->data.key.key);
     if (event->data.key.pressed != 0u && modifier != 0u &&
         ui_hotkey_registry_has_modifier(&matcher->registry, modifier)) {
-        if (matcher->pending_count == UI_HOTKEY_PENDING_CAPACITY &&
-            !ui_hotkey_flush_pending(matcher, sink, context)) return 0;
+        for (i = 0u; i < matcher->pending_count; ++i) {
+            ui_hotkey_key_identity key = ui_hotkey_physical_key(&matcher->pending[i]);
+            if (ui_hotkey_same_key(&key, event)) return 1;
+        }
+        for (i = 0u; i < matcher->delivered_count; ++i)
+            if (ui_hotkey_same_key(&matcher->delivered[i], event))
+                return ui_hotkey_flush_pending(matcher, sink, context) && sink(context, event);
+        if (matcher->pending_count + matcher->delivered_count ==
+                UI_HOTKEY_PENDING_CAPACITY) return 0;
         matcher->pending[matcher->pending_count++] = *event;
         return 1;
     }
-    return ui_hotkey_flush_pending(matcher, sink, context) && sink(context, event);
+    if (!ui_hotkey_flush_pending(matcher, sink, context)) return 0;
+    if (!event->data.key.pressed) ui_hotkey_release_delivered(matcher, event);
+    return sink(context, event);
 }
 
 void ui_hotkey_matcher_discard(ui_hotkey_matcher *matcher)
@@ -174,4 +210,5 @@ void ui_hotkey_matcher_discard(ui_hotkey_matcher *matcher)
     if (matcher == LIB_NULL) return;
     matcher->pending_count = 0u;
     matcher->suppressed_count = 0u;
+    matcher->delivered_count = 0u;
 }
