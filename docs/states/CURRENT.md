@@ -5,8 +5,9 @@
 Owner accepted S15 manual testing. M9 T55 S16 implementation and verification
 are complete: x64 55/55, x86 55/55, strict library 3/3. Owner-approved checked
 destruction retains live resources on failed join; SoftPC reports and exits.
-Both fixed package EXEs are refreshed. Executor delivery and coordinator
-committed-diff review follow; T55 remains open, awaiting owner testing.
+Both fixed package EXEs are refreshed. Executor P1 `6500f1d` is pushed;
+coordinator review of the actual committed diff passed. S16 is delivered and
+awaits owner manual testing; T55 remains open.
 
 ## M9 T55 S16 Packet
 

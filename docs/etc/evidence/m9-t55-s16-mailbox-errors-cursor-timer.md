@@ -146,3 +146,21 @@ were not modified.
 Executor self-review completed against the finite ledger and actual diff.
 P1 carries all implementation, tests, both EXEs and this evidence; coordinator
 review follows its push. Owner manual testing is pending; T55 is not closed.
+
+## Coordinator review of pushed P1
+
+Switched from executor to coordinator after pushing `6500f1d`. Reviewed the
+actual commit against f319017, not only its test summary: wake adapters and
+callers, shared/leaf destroy signatures and both native joins, all four app
+consumers, timer transitions/dispatch/cleanup, permanent fixtures, build wiring,
+static gates, manifest and unchanged protected paths. The new destruction ABI
+matches the owner's explicit approval; no API-level product policy entered lib.
+
+Retained failure resources are not freed or reported as retired until worker
+exit. Only the app owns terminal process exit. Timer replaces the old scheduling
+calls rather than adding another timing route. No ordinary STOP reorder, second
+notification channel, MVDM change, media/config edit or deferred bug repair is
+present. Both EXEs and the full regression evidence are in P1. Re-ran the
+documentation gate and confirmed HEAD/origin main divergence 0/0 with a clean
+worktree before this review record. Delivery accepted for owner testing, not
+manual acceptance or T-level closure. P2 only records this review and status.
