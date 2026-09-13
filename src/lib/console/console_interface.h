@@ -96,6 +96,10 @@ typedef struct lib_console_text_frame {
 typedef void (*lib_console_event_sink)(void *context,
     const lib_console_event *event);
 
+/* Fixed PC display-byte mapping (CP437 graphics), independent of host code page.
+ * Zero is a blank cell; custom raster fonts cannot be reproduced by this map. */
+lib_u16 lib_console_pc_glyph(lib_u8 value);
+
 lib_status lib_console_create(lib_console **out_console);
 lib_console *lib_console_retain(lib_console *console);
 void lib_console_release(lib_console *console);

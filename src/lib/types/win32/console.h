@@ -30,7 +30,7 @@ typedef SMALL_RECT lib_win32_small_rect;
 #define lib_win32_set_console_window_info SetConsoleWindowInfo
 #define lib_win32_write_console_a WriteConsoleA
 #define lib_win32_write_console_input_a WriteConsoleInputA
-#define lib_win32_write_console_output_a WriteConsoleOutputA
+#define lib_win32_write_console_output_w WriteConsoleOutputW
 #define LIB_WIN32_ENABLE_ECHO_INPUT ENABLE_ECHO_INPUT
 #define LIB_WIN32_ENABLE_EXTENDED_FLAGS ENABLE_EXTENDED_FLAGS
 #define LIB_WIN32_ENABLE_LINE_INPUT ENABLE_LINE_INPUT

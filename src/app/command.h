@@ -41,6 +41,7 @@ typedef struct app_command_effect {
 const char *app_command_hotkey_help(void);
 void app_command_session_initialize(app_command_session *, softpc_presentation);
 void app_command_session_open(app_command_session *, app_command_effect *);
+void app_command_session_reject_line(app_command_session *, app_command_effect *);
 void app_command_session_submit_line(app_command_session *, app_monitor_state,
     const char *, app_command_effect *);
 /* The only monitor lifecycle-request path.  An accepted command is taken

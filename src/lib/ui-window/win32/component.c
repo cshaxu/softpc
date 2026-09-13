@@ -459,8 +459,12 @@ static int win32_window_consume_mailboxes(lib_win32_hwnd window,
                 LIB_MEMORY_ORDER_RELEASE);
             return 0;
         }
-        if (control.kind == UI_COMPONENT_CONTROL_SET_WINDOW_TITLE)
-            lib_win32_set_window_text_a(window, control.value.title);
+        if (control.kind == UI_COMPONENT_CONTROL_SET_WINDOW_TITLE) {
+            if (!lib_win32_set_window_text_a(window, control.value.title)) {
+                ui_component_fail(&context->component->base, LIB_STATUS_IO_ERROR);
+                return 0;
+            }
+        }
         else if (control.kind == UI_COMPONENT_CONTROL_SET_WINDOW_FROZEN) {
             context->frozen = control.value.window_frozen;
             if (context->frozen == LIB_FALSE) {
@@ -502,7 +506,16 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
     case LIB_WIN32_WM_SIZE:
         win32_window_capture_client_size(window, context);
         win32_window_enforce_aspect(window, context);
+        if (!ui_win32_mouse_refresh_bounds(&context->mouse))
+            win32_window_release_mouse(context);
         lib_win32_invalidate_rect(window, LIB_NULL, LIB_WIN32_FALSE);
+        return 0;
+    case LIB_WIN32_WM_MOVE:
+        if (!ui_win32_mouse_refresh_bounds(&context->mouse))
+            win32_window_release_mouse(context);
+        return 0;
+    case LIB_WIN32_WM_CAPTURECHANGED:
+        win32_window_release_mouse(context);
         return 0;
     case LIB_WIN32_WM_ERASEBKGND:
         return 1;
@@ -682,7 +695,12 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
         lib_win32_set_event(state->ready);
         return 0u;
     }
-    lib_win32_set_window_text_a(window, component->initial_title);
+    if (!lib_win32_set_window_text_a(window, component->initial_title)) {
+        lib_win32_destroy_window(window);
+        state->startup_status = LIB_STATUS_IO_ERROR;
+        lib_win32_set_event(state->ready);
+        return 0u;
+    }
     context->transparent_cursor = win32_window_create_transparent_cursor();
     state->startup_status = LIB_STATUS_OK;
     ui_win32_mouse_reset(&context->mouse);

@@ -25,7 +25,7 @@ lib_status ui_component_allocate_source_identity(lib_atomic_u64 *next,
     }
 }
 
-void ui_component_report_failure(ui_component *component, lib_status status)
+static void ui_component_report_failure(ui_component *component, lib_status status)
 {
     if (component != LIB_NULL && component->failure_sink != LIB_NULL &&
         status != LIB_STATUS_OK)

@@ -103,58 +103,31 @@ int ui_win32_resize_client(lib_win32_hwnd window, lib_u32 width,
             lib_win32_set_rect(&outer, 0, 0, fitted_width + decoration_width,
                 fitted_height + decoration_height);
     }
-    lib_win32_set_window_pos(window, LIB_NULL, 0, 0, outer.right - outer.left,
-        outer.bottom - outer.top, LIB_WIN32_SWP_NOMOVE | LIB_WIN32_SWP_NOZORDER | LIB_WIN32_SWP_NOACTIVATE);
-    return 1;
+    return lib_win32_set_window_pos(window, LIB_NULL, 0, 0, outer.right - outer.left,
+        outer.bottom - outer.top, LIB_WIN32_SWP_NOMOVE | LIB_WIN32_SWP_NOZORDER |
+        LIB_WIN32_SWP_NOACTIVATE) != LIB_WIN32_FALSE;
 }
 
 void ui_win32_constrain_sizing(lib_win32_hwnd window, lib_win32_wparam edge,
     lib_win32_rect *outer, lib_u32 source_width, lib_u32 source_height)
 {
-    lib_win32_rect current_window;
-    lib_win32_rect current_client;
-    int frame_width;
-    int frame_height;
-    int client_width;
-    int client_height;
-    int target_width;
-    int target_height;
-
-    if (window == LIB_NULL || outer == LIB_NULL || source_width == 0u ||
-        source_height == 0u) return;
-    lib_win32_get_window_rect(window, &current_window);
-    lib_win32_get_client_rect(window, &current_client);
-    frame_width = (current_window.right - current_window.left) -
-        (current_client.right - current_client.left);
-    frame_height = (current_window.bottom - current_window.top) -
-        (current_client.bottom - current_client.top);
-    target_width = outer->right - outer->left;
-    target_height = outer->bottom - outer->top;
-    client_width = target_width - frame_width;
-    client_height = target_height - frame_height;
-    if (client_width <= 0 || client_height <= 0) return;
-    if (edge == LIB_WIN32_WMSZ_LEFT || edge == LIB_WIN32_WMSZ_RIGHT) {
-        client_height = (int)((lib_u64)client_width * source_height /
-            source_width);
-    } else if (edge == LIB_WIN32_WMSZ_TOP || edge == LIB_WIN32_WMSZ_BOTTOM) {
-        client_width = (int)((lib_u64)client_height * source_width /
-            source_height);
-    } else if ((lib_u64)client_width * source_height >=
-        (lib_u64)client_height * source_width) {
-        client_height = (int)((lib_u64)client_width * source_height /
-            source_width);
-    } else {
-        client_width = (int)((lib_u64)client_height * source_width /
-            source_height);
+    int frame_width, frame_height;
+    ui_window_edge direction;
+    ui_window_rect value;
+    if (!outer || !ui_win32_window_decoration(window, &frame_width, &frame_height)) return;
+    switch (edge) {
+    case LIB_WIN32_WMSZ_LEFT: direction = UI_WINDOW_EDGE_LEFT; break;
+    case LIB_WIN32_WMSZ_RIGHT: direction = UI_WINDOW_EDGE_RIGHT; break;
+    case LIB_WIN32_WMSZ_TOP: direction = UI_WINDOW_EDGE_TOP; break;
+    case LIB_WIN32_WMSZ_BOTTOM: direction = UI_WINDOW_EDGE_BOTTOM; break;
+    case LIB_WIN32_WMSZ_TOPLEFT: direction = UI_WINDOW_EDGE_TOPLEFT; break;
+    case LIB_WIN32_WMSZ_TOPRIGHT: direction = UI_WINDOW_EDGE_TOPRIGHT; break;
+    case LIB_WIN32_WMSZ_BOTTOMLEFT: direction = UI_WINDOW_EDGE_BOTTOMLEFT; break;
+    case LIB_WIN32_WMSZ_BOTTOMRIGHT: direction = UI_WINDOW_EDGE_BOTTOMRIGHT; break;
+    default: return;
     }
-    target_width = client_width + frame_width;
-    target_height = client_height + frame_height;
-    if (edge == LIB_WIN32_WMSZ_LEFT || edge == LIB_WIN32_WMSZ_TOPLEFT || edge == LIB_WIN32_WMSZ_BOTTOMLEFT)
-        outer->left = outer->right - target_width;
-    else
-        outer->right = outer->left + target_width;
-    if (edge == LIB_WIN32_WMSZ_TOP || edge == LIB_WIN32_WMSZ_TOPLEFT || edge == LIB_WIN32_WMSZ_TOPRIGHT)
-        outer->top = outer->bottom - target_height;
-    else
-        outer->bottom = outer->top + target_height;
+    value = ui_win32_rect_value(outer);
+    ui_window_constrain_sizing(&value, direction, frame_width, frame_height,
+        source_width, source_height);
+    ui_win32_rect_store(outer, &value);
 }

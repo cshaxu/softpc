@@ -37,6 +37,15 @@ transition. `reset` is one runtime command: the VM owns every internal
 cold-reset stage and reports one reset-completed fact with its final paused
 state. The next prompt appears only after that public completion.
 
+Cooked commands are complete lines, limited to 1023 bytes excluding CR/LF.
+An overlong line is drained through its terminator and reported once as
+`Command is too long.` before rearming the prompt; no tail becomes a command.
+
+Raw text cells use lib\'s fixed PC-display byte-to-Unicode mapping, including
+box/block glyphs. It is an approximation for the traditional character set,
+not detection of a DOS code page or an uploaded font. Window retains the copied
+bitmap font and therefore remains the exact custom-font renderer.
+
 ## Window And Input
 
 The optional Win32 window displays copied text or graphical frames published
@@ -101,10 +110,11 @@ Window X is a SoftPC close request: running first reaches paused, host switches
 to monitor, then SoftPC destroys the Window component. Until native Window
 destruction, normal Window input remains valid.
 
-Creating a Window may foreground that Window. Binding or replacing the Current
-Console configures native I/O only. Window destruction relies on the native
-desktop's normal foreground restoration; SoftPC does not directly manipulate
-Console focus because raw Console input ownership is independent of it.
+Creating a Window may foreground that Window. Host raw Console activation also
+requests native foreground/focus; cooked activation does not. SoftPC does not
+call Win32 focus APIs. Foreground requests and confirmed reader ownership are
+distinct: input takeover is completed by the broker's retirement/activation
+transaction, not by focusing a window.
 
 ## UI Components And Registered Hotkeys
 

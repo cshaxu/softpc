@@ -33,6 +33,7 @@ typedef struct app_control_event {
     /* Zero is monitor/local input.  UI producers stamp the currently active
      * machine run so a queued old input cannot affect a later start. */
     uint32_t run_generation;
+    int monitor_line_rejected;
     union {
         ui_input_event ui;
         lib_console_line line;
@@ -52,7 +53,7 @@ int app_control_queue_push_ux(app_control_queue *queue,
 int app_control_queue_push_ui_for_run(app_control_queue *queue,
     const ui_input_event *event, uint32_t run_generation);
 int app_control_queue_push_monitor_line(app_control_queue *queue,
-    const lib_console_line *line);
+    const lib_console_line *line, int rejected);
 int app_control_queue_push_console_failed(app_control_queue *queue);
 int app_control_queue_push_runtime_completed(app_control_queue *queue,
     app_runtime_state state, uint32_t run_generation);

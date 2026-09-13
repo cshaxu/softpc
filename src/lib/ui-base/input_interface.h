@@ -26,9 +26,6 @@ typedef struct ui_keyboard_normalizer {
 
 /* These functions only normalize host packets.  A project binding maps each
    physical record to its own input protocol and owns its input queue. */
-int ui_keyboard_submit_transition(void *context,
-    ui_input_sink sink, lib_u16 scan, lib_u16 virtual_key,
-    lib_u8 record_flags, lib_u8 hotkey_modifiers, int pressed);
 int ui_keyboard_submit_utf16(
     ui_keyboard_normalizer *state, const ui_hotkey_matcher *held_keys, void *context,
     ui_input_sink sink, lib_u16 code_unit, lib_u16 repeat_count);

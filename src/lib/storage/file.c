@@ -3,49 +3,6 @@
 #include "lib/storage/file.h"
 #include "lib/storage/file_interface.h"
 
-static lib_status storage_file_open_writer(const char *path,
-    const char *mode, lib_storage_file *file)
-{
-    if (path == LIB_NULL || mode == LIB_NULL || file == LIB_NULL)
-        return LIB_STATUS_INVALID_ARGUMENT;
-    file->stream = lib_c_fopen(path, mode);
-    return file->stream == LIB_NULL ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
-}
-
-static lib_status storage_file_open_truncate(const char *path,
-    lib_storage_file *file)
-{ return storage_file_open_writer(path, "wb", file); }
-
-static lib_status storage_file_open_append(const char *path,
-    lib_storage_file *file)
-{ return storage_file_open_writer(path, "ab", file); }
-
-static lib_status storage_file_read(lib_storage_file *file, void *bytes,
-    lib_size byte_count, lib_size *out_byte_count)
-{
-    if (file == LIB_NULL || out_byte_count == LIB_NULL ||
-        (bytes == LIB_NULL && byte_count != 0u))
-        return LIB_STATUS_INVALID_ARGUMENT;
-    *out_byte_count = lib_c_fread(bytes, 1u, byte_count, file->stream);
-    return lib_c_ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
-}
-
-static lib_status storage_file_write(lib_storage_file *file, const void *bytes,
-    lib_size byte_count, lib_size *out_byte_count)
-{
-    if (file == LIB_NULL || out_byte_count == LIB_NULL ||
-        (bytes == LIB_NULL && byte_count != 0u))
-        return LIB_STATUS_INVALID_ARGUMENT;
-    *out_byte_count = lib_c_fwrite(bytes, 1u, byte_count, file->stream);
-    return lib_c_ferror(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
-}
-
-static lib_status storage_file_flush(lib_storage_file *file)
-{
-    if (file == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    return lib_c_fflush(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
-}
-
 static lib_status storage_file_close(lib_storage_file *file)
 {
     int result;
@@ -92,9 +49,9 @@ lib_status lib_storage_file_read_exact(lib_storage_file *file, void *bytes,
 
     if (file == LIB_NULL || (bytes == LIB_NULL && byte_count != 0u))
         return LIB_STATUS_INVALID_ARGUMENT;
-    return storage_file_read(file, bytes, byte_count, &transferred) !=
-            LIB_STATUS_OK || transferred != byte_count ? LIB_STATUS_IO_ERROR :
-            LIB_STATUS_OK;
+    transferred = lib_c_fread(bytes, 1u, byte_count, file->stream);
+    return transferred == byte_count && !lib_c_ferror(file->stream) ?
+        LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
 lib_status lib_storage_file_write_exact(lib_storage_file *file,
@@ -104,14 +61,14 @@ lib_status lib_storage_file_write_exact(lib_storage_file *file,
 
     if (file == LIB_NULL || (bytes == LIB_NULL && byte_count != 0u))
         return LIB_STATUS_INVALID_ARGUMENT;
-    return storage_file_write(file, bytes, byte_count, &transferred) !=
-            LIB_STATUS_OK || transferred != byte_count ? LIB_STATUS_IO_ERROR :
-            LIB_STATUS_OK;
+    transferred = lib_c_fwrite(bytes, 1u, byte_count, file->stream);
+    return transferred == byte_count && !lib_c_ferror(file->stream) ?
+        LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
 lib_status lib_storage_file_flush(lib_storage_file *file)
 { return file == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
-    storage_file_flush(file); }
+    lib_c_fflush(file->stream) == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR; }
 
 lib_status lib_storage_file_seek_absolute(lib_storage_file *file,
     lib_i64 offset)
@@ -179,9 +136,9 @@ lib_status lib_storage_file_writer_open(const char *path,
     *out_writer = LIB_NULL;
     writer = lib_allocate(sizeof(*writer));
     if (writer == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    if ((mode == LIB_STORAGE_FILE_WRITER_TRUNCATE ?
-            storage_file_open_truncate(path, &writer->file) :
-            storage_file_open_append(path, &writer->file)) != LIB_STATUS_OK) {
+    writer->file.stream = lib_c_fopen(path,
+        mode == LIB_STORAGE_FILE_WRITER_TRUNCATE ? "wb" : "ab");
+    if (writer->file.stream == LIB_NULL) {
         lib_release(writer);
         return LIB_STATUS_IO_ERROR;
     }
@@ -192,8 +149,7 @@ lib_status lib_storage_file_writer_open(const char *path,
 lib_status lib_storage_file_writer_write(lib_storage_file_writer *writer,
     const void *bytes, lib_size byte_count)
 {
-    if (writer == LIB_NULL || (bytes == LIB_NULL && byte_count != 0u))
-        return LIB_STATUS_INVALID_ARGUMENT;
+    if (writer == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     return lib_storage_file_write_exact(&writer->file, bytes, byte_count);
 }
 

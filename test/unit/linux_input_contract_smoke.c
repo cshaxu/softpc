@@ -8,8 +8,9 @@ static int capture(void *context, const ui_input_event *event)
 int main(void)
 {
     ui_keyboard_normalizer state = { 0 };
-    assert(ui_keyboard_submit_transition(NULL, capture, 0u, UI_LINUI_KEY_UP,
-        0u, 0u, 1));
+    assert(ui_keyboard_submit_record(&(ui_keyboard_normalizer){ 0 }, NULL,
+        NULL, capture, &(ui_keyboard_record){ UI_KEYBOARD_TRANSITION,
+            0u, UI_LINUI_KEY_UP, 0u, 0u, 0u, 1, 1u }));
     assert(received.type == UI_EVENT_KEY && received.data.key.key == UI_KEY_UP &&
         received.data.key.scan_code == 0u);
     assert(ui_keyboard_submit_utf16(&state, NULL, NULL, capture, 'a', 1u));
@@ -17,6 +18,8 @@ int main(void)
     assert(ui_keyboard_submit_utf16(&state, NULL, NULL, capture, 0xd83du, 1u));
     assert(ui_keyboard_submit_utf16(&state, NULL, NULL, capture, 0xde00u, 1u));
     assert(received.type == UI_EVENT_TEXT && received.data.text.scalar == 0x1f600u);
-    assert(!ui_keyboard_submit_transition(NULL, capture, 0u, 0xffffu, 0u, 0u, 1));
+    assert(ui_keyboard_submit_record(&(ui_keyboard_normalizer){ 0 }, NULL,
+        NULL, capture, &(ui_keyboard_record){ UI_KEYBOARD_TRANSITION,
+            0u, 0xffffu, 0u, 0u, 0u, 1, 1u }) == UI_KEYBOARD_UNMAPPED);
     return 0;
 }

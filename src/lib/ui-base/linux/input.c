@@ -2,7 +2,7 @@
 #include "lib/ui-base/linux/input.h"
 #include "lib/ui-base/input.h"
 
-lib_bool ui_linui_key_to_event(ui_linui_key key, ui_input_event *out_event)
+static lib_bool ui_linui_key_to_event(ui_linui_key key, ui_input_event *out_event)
 {
     lib_u32 key_identity;
 

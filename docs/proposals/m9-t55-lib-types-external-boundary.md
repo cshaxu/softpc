@@ -1,5 +1,94 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S10 admission: complete approved audit repair set
+
+Owner: “按照这些协议，把前面我批准的所有修复做一下，好了就提交推送，然后让我来测。”
+Baseline `bad9ab2`. S9 delivery is retained below; T55 stays open.
+The fixed universe is the nine approved findings from the 93-file audit.
+Each row must have implementation and focused proof before delivery.
+
+| Item | Owner and single-path design | Required proof |
+| --- | --- | --- |
+| Capture loss | ui-window clears its existing capture/button/motion state once; never releases another window's capture. | Native loss and reentrant voluntary release. |
+| Cooked line size | host collects a complete bounded line; oversized input drains to terminator and emits one rejection. | Exact limit, split terminator, overlong tail, next line and cancellation. |
+| Capture bounds | ui-window refreshes current client clipping on geometry change; failure releases capture. | Move/resize, uncaptured noop, failed refresh. |
+| Text glyphs | console owns a fixed PC-display glyph-to-Unicode mapping, not a font ROM or inferred guest encoding; host writes wide cells. | ASCII, low symbols, box/block and extended characters; no frame ABI expansion. |
+| Native outcomes | Only successful native operations advance completion caches; unsupported palette capabilities may retry without a false applied cache. | Palette failure/retry, resize failure, title/cursor failure. |
+| Input entry | Remove obsolete transition entry; tests/diagnostics use record normalization. | No production or test old caller, keyboard regressions. |
+| Internal simplification | Single-file helpers static; storage exact read/write/flush directly own checks and CRT calls. | Existing storage and input proofs. |
+| Geometry ownership | Pure sizing/anchor arithmetic in existing root geometry; Win32 only marshals. | All drag edges and geometry regressions. |
+| Documentation | Correct focus and terminal broker-failure descriptions to approved behavior. | Governance and implementation comparison. |
+
+Peer sweep found SoftPC ignored REJECTED_LINE. Its monitor adapter and existing
+control queue now carry rejection explicitly to command reporting/prompt;
+no line-boundary policy moves out of host. This narrow consumer adaptation is
+required for the approved once-only visible rejection.
+No changes to MVDM, product lifecycle, INI/media, Console mouse scaling,
+frozen key semantics or Linux UI parity. Fixed display mapping is a deliberate
+approximation for host fonts, not recognition of arbitrary uploaded fonts.
+Executor performs full x86/x64 builds/tests and strict library checks, updates
+manifest and packages, pushes P1; coordinator reviews actual P1 before P2.
+
+### S10 executor evidence and nine-item disposition
+
+All nine rows are implemented. Capture loss and bounds share the existing
+Window cleanup and one refresh helper; HWND is ownership identity, not an
+additional capture flag. Tests invoke the production message procedure for
+WM_CAPTURECHANGED, voluntary reentrant release, move/resize and failed clipping.
+Pure sizing now lives in root geometry; all eight drag anchors are checked
+from non-proportional proposed bounds. Native resize failure leaves its cache
+unchanged, and title failure enters the existing component fault path.
+
+The host reader accumulates at most 1023 bytes, drains overflow to LF, and
+delivers one rejection. Tests use one-byte and 1023-byte native chunks at
+1022/1023/1024 lengths, split CR/LF, a following help line and mid-read
+cancellation. Monitor rejection traverses the existing control queue and
+command prompt path; no partial command is dispatched. No VM state changed.
+
+The fixed 256-entry mapping replaces ASCII filtering at wide-cell output.
+Proof covers blank/ASCII, low display symbols, accented characters, box/block
+glyphs; it is not a bitmap font or code-page inference. Failed palette query
+or application does not advance the palette cache; a later success does.
+Cursor-info and cursor-position failures report IO_ERROR. Tests exercise the
+production host backend with controlled native calls, without desktop sleeps.
+
+The obsolete transition function has no implementation/declaration/caller;
+all affected tests and the boot diagnostic use record normalization.
+Unmapped status is explicitly preserved at boolean callers. File-local
+failure/key helpers are static. Storage removes redundant read/write/flush
+layers and the single-caller writer-open wrapper; stream ownership and public
+writer behavior remain unchanged. No compatibility forwarding entry remains.
+Types-layout now forbids restoring the obsolete entry or ANSI cell output.
+The existing negative layout selftest still passes.
+
+Peer sweep used rg over src/lib and test for the removed transition/open
+names, both file-local helpers, capture APIs, previous caches, and native
+text/cursor/title/size operations. Remaining helper references are local;
+removed names occur only in negative gates. Palette and size are retryable
+without false completion; required text/cursor/title errors are explicit.
+Focus and retirement-failure docs now describe the implemented contract.
+No MVDM, INI, media, Console mouse scaling, frozen filtering, hotkey policy,
+or Linux UI parity change is included. Existing TODOs remain unchanged.
+
+Verification: x64 full 52/52 (60.16 s), plus the final strengthened geometry
+and cursor focused tests 2/2; x86 full final 52/52 (77.88 s). Both package
+smokes passed. Strict -Wall -Wextra -Wpedantic -Werror build and standalone
+3/3 passed; manifest, DAG and documentation gates passed. The initial full
+run's only failure was the missing S9 handoff history, now recorded; it was
+not a product failure. Early compilation caught a missing constant alias and
+a test fake/local-name collision; both were corrected before final runs.
+
+Against bad9ab2: 25 production C/H paths +242/-182 (net +60); seven test
+paths +288/-40 (net +248); two build/gate paths +5/-2. Counts use git diff
+--numstat with new test files included, excluding docs, manifest and EXEs.
+The fixed mapping accounts for 42 production lines; cleanup removes duplicate
+paths rather than introducing a new platform layer. Owned types-layout test
+fixture copies are removed after verification; reusable build caches remain.
+
+Package SHA256:
+- softpc32.exe: `7EA56F88820519F17737A5EEB7B3319E8546909A90A4BADFDF13387B8B016927`
+- softpc64.exe: `78147A7B42B9986E946621043A6D859C58E6270B0B605980144DBECC6E06B6BB`
+
 ## S9 admission: pending ordinary replay permission
 
 Owner: “同意 如果frozen期间到frozen之后都没匹配 确实可以丢弃”;

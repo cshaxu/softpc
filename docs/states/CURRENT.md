@@ -2,33 +2,29 @@
 
 ## Current Work
 
-M9 T55 S9 is delivered for owner inspection. Executor P1 `8df0599` is pushed
-and the coordinator reviewed its actual 19-path diff. x64/x86 passed 50/50
-and strict lib passed 3/3. Only frozen-origin pending make replay changed;
-release filtering is unchanged.
-S8 delivery is recorded in [its handoff](../history/M9-T55-S8-character-recovery-handoff.md).
-T55 remains open; the package timeout in TODO is not claimed resolved.
+M9 T55 S10 is active: approved whole-library audit repairs.
+S9 delivery baseline is `bad9ab2`; T55 remains open.
 
-## M9 T55 S9 Packet
+## M9 T55 S10 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: “批准实施 干净为准”. |
-| Objective | Remember ordinary replay permission on the existing pending make; frozen-origin prefixes never replay after unfreeze, but still match hotkeys. |
-| Non-goals | No balanced make/break policy, synthetic release, matcher reset, second ledger, app/MVDM/INI/media, mouse or lifecycle change. |
-| Reference Baseline | `8761fad`, S8 delivery. |
+| Admission And Approval | Owner approved all audit repairs and fixed PC-glyph mapping; build, test, commit and push. |
+| Objective | Repair capture ownership/bounds, cooked line boundaries, Console glyph output and completion caches; remove duplicate interfaces and correct docs. |
+| Non-goals | No MVDM, media, INI, VM lifecycle, hotkey or frozen semantics change; no dynamic character mapping or Linux UI implementation. |
+| Reference Baseline | `bad9ab2`, S9 delivery. |
 | Candidate Proposal | [T55 proposal](../proposals/m9-t55-lib-types-external-boundary.md) |
-| Files And ABI Surface | ui-base matcher/leaf-support emit signatures, Window caller, existing tests, docs/manifest and dual EXEs; ui_input_event unchanged. |
-| Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout and Product UI; referenced skills. |
-| Verification | Freeze-origin mismatch/release/text replay, cross-boundary successful hotkey, normal-origin replay and repeated makes, rejection, full x86/x64 and strict lib. |
-| Expected Markers | One immutable replay permission per held make; Window supplies policy, Console always permits; matching unchanged. |
-| Asset Needs | Refresh fixed softpc32.exe and softpc64.exe; preserve INI/media. |
-| Reporting Requirements | Bounded peer sweep and code accounting, complete pushed P then committed-diff review. |
-| Stop Conditions | Escalate broader input lifecycle policy or new state owners; do not force make/break pairing. |
-| Exit Criteria | Focused and dual-width proofs, strict/manifest/governance, reviewed pushed delivery and clean worktree; T55 open. |
-| Original Owner Request | “同意 如果frozen期间到frozen之后都没匹配 确实可以丢弃”; “批准实施 干净为准”. |
-| Similar-Issue Sweep | Every matcher pending flush, submit and leaf emit caller; repeat does not overwrite original permission. |
+| Files And ABI Surface | lib Window/host/console/ui-base/storage, tests and docs; fixed byte-to-Unicode display contract, no frame mapping table. |
+| Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout, Product UI and referenced skills. |
+| Verification | Deterministic capture loss/geometry, overlong lines, glyphs, failure caches, shared input path; full dual-width tests, strict build, manifest and governance. |
+| Expected Markers | Single cleanup/calculation/input paths; only successful native operations advance caches; complete-line delivery. |
+| Asset Needs | Refresh fixed softpc32.exe and softpc64.exe; preserve INI and media. |
+| Reporting Requirements | Nine-item convergence ledger, peer sweep, line accounting and pushed committed-diff review. |
+| Stop Conditions | Escalate product policy or new component ownership changes. |
+| Exit Criteria | Approved ledger implemented and tested, dual EXEs, reviewed pushed changes and clean worktree; T55 remains open. |
+| Original Owner Request | “按照这些协议，把前面我批准的所有修复做一下，好了就提交推送，然后让我来测。” |
+| Similar-Issue Sweep | Native capture/bounds/output results, line completion, input entry callers, internal exports, storage wrappers and current docs. |
 
 ## Current Technical Baseline
 

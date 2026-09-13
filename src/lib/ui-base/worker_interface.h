@@ -43,6 +43,5 @@ void ui_component_retire(ui_component *component, lib_status status);
 /* Terminal input failure: closes admission and wakes the worker. The worker
  * detaches input and reports failure/retirement once at its normal exit. */
 void ui_component_fail(ui_component *component, lib_status status);
-void ui_component_report_failure(ui_component *component, lib_status status);
 
 #endif

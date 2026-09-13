@@ -118,24 +118,35 @@ static lib_win32_dword LIB_WIN32_WINAPI host_console_reader(void *context)
     host_console_backend *backend = (host_console_backend *)context;
     if (backend->mode == HOST_CONSOLE_COOKED_LINES) {
         char text[LIB_CONSOLE_LINE_MAX];
-        lib_win32_dword read = 0u;
         lib_console_event event = { 0 };
-        if (!lib_win32_read_console_a(backend->input, text,
-                LIB_CONSOLE_LINE_MAX - 1u, &read, LIB_NULL)) {
-            lib_win32_interlocked_exchange(&backend->cooked_line_pending, 0);
-            host_console_reader_failed(backend);
-            return 0u;
+        lib_bool overflow = LIB_FALSE, complete = LIB_FALSE;
+        /* ReadConsole may return a buffer fragment rather than a whole line.
+         * Keep bounded storage, but drain an oversized line through its LF. */
+        while (!complete) {
+            lib_win32_dword read = 0u, i;
+            if (!lib_win32_read_console_a(backend->input, text,
+                    LIB_CONSOLE_LINE_MAX - 1u, &read, LIB_NULL) || read == 0u) {
+                lib_win32_interlocked_exchange(&backend->cooked_line_pending, 0);
+                host_console_reader_failed(backend);
+                return 0u;
+            }
+            if (lib_win32_wait_for_single_object(backend->stop_event, 0u) == LIB_WIN32_WAIT_OBJECT_0) {
+                lib_win32_interlocked_exchange(&backend->cooked_line_pending, 0);
+                return 0u;
+            }
+            for (i = 0u; i < read; ++i) {
+                if (text[i] == '\n') { complete = LIB_TRUE; break; }
+                if (text[i] == '\r') continue;
+                if (event.value.line.length == LIB_CONSOLE_LINE_MAX - 1u)
+                    overflow = LIB_TRUE;
+                else event.value.line.text[event.value.line.length++] = text[i];
+            }
         }
         lib_win32_interlocked_exchange(&backend->cooked_line_pending, 0);
-        if (lib_win32_wait_for_single_object(backend->stop_event, 0u) == LIB_WIN32_WAIT_OBJECT_0)
-            return 0u;
-        while (read != 0u && (text[read - 1u] == '\r' || text[read - 1u] == '\n'))
-            --read;
-        event.kind = LIB_CONSOLE_EVENT_COOKED_LINE;
+        event.kind = overflow ? LIB_CONSOLE_EVENT_REJECTED_LINE : LIB_CONSOLE_EVENT_COOKED_LINE;
         event.binding_generation = backend->generation;
-        event.value.line.length = read;
-        lib_memory_copy(event.value.line.text, text, read);
-        event.value.line.text[read] = '\0';
+        if (overflow) event.value.line.length = 0u;
+        event.value.line.text[event.value.line.length] = '\0';
         (void)lib_console_deliver_event(backend->console, &event);
     } else {
         lib_win32_handle waits[2] = { backend->stop_event, backend->input };
@@ -446,10 +457,12 @@ lib_status host_console_backend_write_text_frame_bound(host_console_backend *bac
             for (index = 0u; index < 16u; ++index)
                 info.ColorTable[index] = host_console_colorref_from_rgb(
                     frame->palette[index]);
-            (void)lib_win32_set_console_screen_buffer_info_ex(backend->output, &info);
+            if (lib_win32_set_console_screen_buffer_info_ex(backend->output, &info))
+                lib_memory_copy(backend->previous_palette, frame->palette,
+                    sizeof(frame->palette));
         }
-        lib_memory_copy(backend->previous_palette, frame->palette,
-            sizeof(frame->palette));
+        /* Some terminal hosts cannot apply a palette. Do not mark it applied:
+         * another frame may retry while text output remains usable. */
     }
     if (backend->previous_columns != frame->columns ||
         backend->previous_rows != frame->rows ||
@@ -461,14 +474,13 @@ lib_status host_console_backend_write_text_frame_bound(host_console_backend *bac
             lib_u32 column;
             for (column = 0u; column < LIB_CONSOLE_TEXT_COLUMNS; ++column) {
                 lib_size offset = (lib_size)row * LIB_CONSOLE_TEXT_COLUMNS + column;
-                cells[offset].Char.AsciiChar = row < frame->rows &&
-                    column < frame->columns && frame->text[offset] >= 0x20u &&
-                    frame->text[offset] < 0x7fu ? (lib_win32_char)frame->text[offset] : ' ';
+                cells[offset].Char.UnicodeChar = row < frame->rows &&
+                    column < frame->columns ? lib_console_pc_glyph(frame->text[offset]) : ' ';
                 cells[offset].Attributes = (lib_win32_word)(row < frame->rows &&
                     column < frame->columns ? frame->attributes[offset] : 0u);
             }
         }
-        if (!lib_win32_write_console_output_a(backend->output, cells, size, position,
+        if (!lib_win32_write_console_output_w(backend->output, cells, size, position,
                 &region)) {
             host_console_backend_unlock_output(backend);
             return LIB_STATUS_IO_ERROR;
@@ -492,9 +504,15 @@ lib_status host_console_backend_write_text_frame_bound(host_console_backend *bac
         if (cursor.bVisible) {
             position.X = (lib_win32_short)frame->cursor_column;
             position.Y = (lib_win32_short)frame->cursor_row;
-            (void)lib_win32_set_console_cursor_position(backend->output, position);
+            if (!lib_win32_set_console_cursor_position(backend->output, position)) {
+                host_console_backend_unlock_output(backend);
+                return LIB_STATUS_IO_ERROR;
+            }
         }
-        (void)lib_win32_set_console_cursor_info(backend->output, &cursor);
+        if (!lib_win32_set_console_cursor_info(backend->output, &cursor)) {
+            host_console_backend_unlock_output(backend);
+            return LIB_STATUS_IO_ERROR;
+        }
     }
     host_console_backend_unlock_output(backend);
     return LIB_STATUS_OK;

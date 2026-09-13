@@ -155,5 +155,9 @@ int main(void)
     assert(effect.action == APP_COMMAND_ACTION_EJECT_FLOPPY);
     app_command_session_complete_floppy(&session, effect.action, 1, &effect);
     assert(strstr(effect.text, "Floppy ejected") != NULL);
+    app_command_session_reject_line(&session, &effect);
+    assert(strstr(effect.text, "Command is too long.") != NULL);
+    assert(app_command_session_take_request(&session) == APP_LIFECYCLE_REQUEST_NONE);
+    arm(&session, NULL);
     return 0;
 }

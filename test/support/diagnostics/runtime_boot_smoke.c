@@ -364,8 +364,9 @@ static int enqueue_virtual_key(app_runtime *runtime, WORD virtual_key,
        so the smoke tests the original arrow, rather than keypad 8. */
     if (virtual_key == VK_UP) scan = 0xe048u;
     if (virtual_key == VK_DOWN) scan = 0xe050u;
-    return ui_keyboard_submit_transition(runtime, enqueue_ui_event,
-        scan, virtual_key, control_state, 0u, released == 0u);
+    return ui_keyboard_submit_record(&(ui_keyboard_normalizer){ 0 }, NULL,
+        runtime, enqueue_ui_event, &(ui_keyboard_record){ UI_KEYBOARD_TRANSITION,
+            scan, virtual_key, 0u, control_state, 0u, released == 0u, 1u }) == UI_KEYBOARD_ACCEPTED;
 }
 
 /* Match the Win32 frontend's ordinary key transition contract: the host

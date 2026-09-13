@@ -135,3 +135,15 @@ Console callback/output gates and broker replacement use component-private
 blocking locks; no sibling host dependency is introduced into console. Native
 I/O lock ordering and detach barriers are unchanged. Callbacks must not
 synchronously reenter binding replacement or destruction on the same owner.
+
+
+Win32 cooked input emits only complete bounded lines. Overflow drains through
+LF, emits one REJECTED_LINE, and never submits a truncated tail. Raw activation
+requests native foreground/focus; cooked activation does not. The reader's
+confirmed retirement, not focus, establishes the input handoff.
+
+Console text frames use the fixed PC-display mapping documented by `console`.
+Palette caches advance only after successful native palette application;
+unavailable palette support may retry without terminating text output. Text
+and cursor I/O failures remain explicit. Window sizing/title completion likewise
+never records an unsuccessful native call as completed.

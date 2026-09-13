@@ -42,11 +42,11 @@ int main(void)
        monitor handoff remain one FIFO. Native records left in the host input
        buffer before either activation are deliberately flushed by the broker;
        this test does not claim to preserve those pre-cutover records. */
-    assert(app_control_queue_push_monitor_line(queue, &start));
+    assert(app_control_queue_push_monitor_line(queue, &start, 0));
     assert(app_control_queue_push_broker_completed(queue, 1, 7u));
     assert(app_control_queue_push_ui_for_run(queue, &raw_key, 7u));
     assert(app_control_queue_push_broker_completed(queue, 0, 7u));
-    assert(app_control_queue_push_monitor_line(queue, &pause));
+    assert(app_control_queue_push_monitor_line(queue, &pause, 0));
     take(queue, &event); assert(event.kind == APP_CONTROL_MONITOR_LINE);
     take(queue, &event); assert(event.kind == APP_CONTROL_BROKER_COMPLETED &&
         event.value.broker_vm_console_current);
@@ -128,6 +128,10 @@ int main(void)
       app_monitor_receive(&monitor, &failure);
       take(queue, &event);
       assert(event.kind == APP_CONTROL_CONSOLE_FAILED);
+      failure.kind = LIB_CONSOLE_EVENT_REJECTED_LINE;
+      app_monitor_receive(&monitor, &failure);
+      take(queue, &event);
+      assert(event.kind == APP_CONTROL_MONITOR_LINE && event.monitor_line_rejected);
       assert(!app_control_queue_take(queue, &event, 0u)); }
     app_control_queue_destroy(queue);
     return 0;

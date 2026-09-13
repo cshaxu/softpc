@@ -134,6 +134,11 @@ void app_command_session_open(app_command_session *s, app_command_effect *e)
     help(e);
     prompt(s);
 }
+void app_command_session_reject_line(app_command_session *s, app_command_effect *e)
+{
+    clear(e);
+    reject(s, e, "Command is too long.");
+}
 void app_command_session_submit_line(app_command_session *s, app_monitor_state state,
                                      const char *line, app_command_effect *e)
 {

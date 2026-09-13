@@ -19,16 +19,6 @@ static int ui_keyboard_emit(void *context, ui_input_sink sink,
     return sink(context, &event);
 }
 
-int ui_keyboard_submit_transition(void *context, ui_input_sink sink,
-    lib_u16 scan, lib_u16 virtual_key, lib_u8 record_flags,
-    lib_u8 hotkey_modifiers, int pressed)
-{
-    lib_u32 key;
-    if (!ui_keyboard_platform_transition(scan, virtual_key, &scan, &key)) return 0;
-    return ui_keyboard_emit(context, sink, scan, key,
-        record_flags, hotkey_modifiers, pressed);
-}
-
 static int ui_keyboard_submit_character(const ui_hotkey_matcher *held_keys,
     void *context, ui_input_sink sink, lib_u32 scalar)
 {

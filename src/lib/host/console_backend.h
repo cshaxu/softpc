@@ -19,9 +19,9 @@ lib_status host_console_backend_activate(host_console_backend *backend,
  * keeps a completed `start` line from racing a later raw-Console takeover. */
 lib_status host_console_backend_request_cooked_line(
     host_console_backend *backend);
-/* Retire the current native reader before a broker can invalidate its logical
- * binding or activate another one.  Failure leaves the current native object
- * intact, so a replacement remains an all-or-nothing ownership transaction. */
+/* Retire and join the current reader before invalidating its binding or
+ * activating another. Retirement failure is terminal: do not start next or
+ * claim that old remains usable. The broker fails closed. */
 lib_status host_console_backend_deactivate(host_console_backend *backend);
 /* The broker holds this gate across an indivisible native takeover.  Bound
  * writers take the same gate and validate their logical Console/generation

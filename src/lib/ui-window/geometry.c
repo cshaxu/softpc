@@ -138,3 +138,41 @@ int ui_window_cursor_rect(const ui_frame *frame, const ui_window_rect *display,
     cursor->top = cursor->bottom-cursor_height;
     return cursor->right > cursor->left && cursor->bottom > cursor->top;
 }
+
+
+void ui_window_constrain_sizing(ui_window_rect *outer, ui_window_edge edge,
+    int frame_width, int frame_height, lib_u32 source_width, lib_u32 source_height)
+{
+    int client_width, client_height, target_width, target_height;
+    if (!outer || !source_width || !source_height ||
+        frame_width < 0 || frame_height < 0) return;
+    target_width = outer->right - outer->left;
+    target_height = outer->bottom - outer->top;
+    client_width = target_width - frame_width;
+    client_height = target_height - frame_height;
+    if (client_width <= 0 || client_height <= 0) return;
+    if (edge == UI_WINDOW_EDGE_LEFT || edge == UI_WINDOW_EDGE_RIGHT) {
+        client_height = (int)((lib_u64)client_width * source_height /
+            source_width);
+    } else if (edge == UI_WINDOW_EDGE_TOP || edge == UI_WINDOW_EDGE_BOTTOM) {
+        client_width = (int)((lib_u64)client_height * source_width /
+            source_height);
+    } else if ((lib_u64)client_width * source_height >=
+        (lib_u64)client_height * source_width) {
+        client_height = (int)((lib_u64)client_width * source_height /
+            source_width);
+    } else {
+        client_width = (int)((lib_u64)client_height * source_width /
+            source_height);
+    }
+    target_width = client_width + frame_width;
+    target_height = client_height + frame_height;
+    if (edge == UI_WINDOW_EDGE_LEFT || edge == UI_WINDOW_EDGE_TOPLEFT || edge == UI_WINDOW_EDGE_BOTTOMLEFT)
+        outer->left = outer->right - target_width;
+    else
+        outer->right = outer->left + target_width;
+    if (edge == UI_WINDOW_EDGE_TOP || edge == UI_WINDOW_EDGE_TOPLEFT || edge == UI_WINDOW_EDGE_TOPRIGHT)
+        outer->top = outer->bottom - target_height;
+    else
+        outer->bottom = outer->top + target_height;
+}

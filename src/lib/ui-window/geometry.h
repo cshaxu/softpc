@@ -3,6 +3,13 @@
 #include "lib/ui-base/frame_interface.h"
 
 typedef struct ui_window_rect { lib_i32 left, top, right, bottom; } ui_window_rect;
+typedef enum ui_window_edge {
+    UI_WINDOW_EDGE_LEFT, UI_WINDOW_EDGE_RIGHT, UI_WINDOW_EDGE_TOP,
+    UI_WINDOW_EDGE_BOTTOM, UI_WINDOW_EDGE_TOPLEFT, UI_WINDOW_EDGE_TOPRIGHT,
+    UI_WINDOW_EDGE_BOTTOMLEFT, UI_WINDOW_EDGE_BOTTOMRIGHT
+} ui_window_edge;
+void ui_window_constrain_sizing(ui_window_rect *outer, ui_window_edge edge,
+    int frame_width, int frame_height, lib_u32 source_width, lib_u32 source_height);
 int ui_window_display_rect(int width, int height, lib_u32 source_width,
     lib_u32 source_height, ui_window_rect *out);
 void ui_window_map_dirty_rect(const ui_window_rect *source, const ui_window_rect *display,

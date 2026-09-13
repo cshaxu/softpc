@@ -167,12 +167,13 @@ int app_control_queue_push_ui_for_run(app_control_queue *queue,
 }
 
 int app_control_queue_push_monitor_line(app_control_queue *queue,
-    const lib_console_line *line)
+    const lib_console_line *line, int rejected)
 {
     app_control_event copied = { 0 };
     if (line == NULL) return 0;
     copied.kind = APP_CONTROL_MONITOR_LINE;
     copied.value.line = *line;
+    copied.monitor_line_rejected = rejected;
     return app_control_queue_push_required(queue, &copied);
 }
 

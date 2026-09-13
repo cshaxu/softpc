@@ -347,6 +347,12 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                     continue;
                 }
                 if (control_event.kind == APP_CONTROL_MONITOR_LINE) {
+                    if (control_event.monitor_line_rejected) {
+                        app_command_session_reject_line(&session, &command_effect);
+                        if (!app_monitor_console_write(monitor, command_effect.text) ||
+                            !app_monitor_arm_if_ready(&session, state, monitor)) goto failed;
+                        continue;
+                    }
                     if (control_event.value.line.length >= sizeof(line)) return 1;
                     memcpy(line, control_event.value.line.text,
                         control_event.value.line.length);
