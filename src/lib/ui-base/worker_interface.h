@@ -41,8 +41,8 @@ int ui_component_emit_to(ui_component *component, const ui_input_event *event,
 lib_status ui_component_enqueue_controls(ui_component *component,
     const ui_component_control *controls, lib_u32 control_count);
 void ui_component_retire(ui_component *component, lib_status status);
-/* Terminal input failure: closes admission and wakes the worker. The worker
- * detaches input and reports failure/retirement once at its normal exit. */
+/* Terminal failure: closes admission and reports once on the detecting thread,
+ * then wakes the worker. Retirement follows input quiescence, not reporting. */
 void ui_component_fail(ui_component *component, lib_status status);
 
 #endif

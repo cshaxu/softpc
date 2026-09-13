@@ -21,6 +21,6 @@ void console_mutex_destroy(console_mutex *mutex)
     lib_release(mutex);
 }
 void console_mutex_enter(console_mutex *mutex)
-{ (void)lib_linux_pthread_mutex_lock(&mutex->gate); }
+{ if (mutex != LIB_NULL) (void)lib_linux_pthread_mutex_lock(&mutex->gate); }
 void console_mutex_leave(console_mutex *mutex)
-{ (void)lib_linux_pthread_mutex_unlock(&mutex->gate); }
+{ if (mutex != LIB_NULL) (void)lib_linux_pthread_mutex_unlock(&mutex->gate); }

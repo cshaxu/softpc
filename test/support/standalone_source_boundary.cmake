@@ -406,18 +406,23 @@ foreach(source IN LISTS standalone_owner_sources)
     string(REPLACE "softpc_machine" "" owner_source "${owner_source}")
     string(REPLACE "softpc_presentation" "" owner_source "${owner_source}")
     string(REPLACE "softpc_media_mode" "" owner_source "${owner_source}")
+    string(REPLACE "softpc_host_require_status" "" owner_source "${owner_source}")
     if(owner_source MATCHES "(^|[^[:alnum:]_])softpc_[A-Za-z0-9_]+")
         message(FATAL_ERROR "Standalone application retains an unowned softpc_ symbol: ${source}")
     endif()
 endforeach()
 
-# UI destruction is a checked terminal boundary, never a discarded status.
-file(GLOB app_shutdown_sources "${SOFTPC_SOURCE_DIR}/src/app/*.c")
+# A live UI/native-Console worker must be joined before its owner is released.
+# These are the application's only terminal infrastructure boundaries; ordinary
+# synchronization primitives deliberately remain local implementation details.
+file(GLOB app_shutdown_sources "${SOFTPC_SOURCE_DIR}/src/app/*.c"
+    "${SOFTPC_SOURCE_DIR}/src/host/*.c")
+set(checked_shutdown "ui_(window|console)_destroy|host_console_broker_destroy")
 foreach(source IN LISTS app_shutdown_sources)
-    file(STRINGS "${source}" shutdown_lines REGEX "ui_(window|console)_destroy[ \t]*\\(")
+    file(STRINGS "${source}" shutdown_lines REGEX "(${checked_shutdown})[ \t]*\\(")
     foreach(line IN LISTS shutdown_lines)
-        if(NOT line MATCHES "app_presentation_require_destroy\\(ui_(window|console)_destroy")
-            message(FATAL_ERROR "Unchecked UI destruction: ${source}: ${line}")
+        if(NOT line MATCHES "softpc_host_require_status\\((${checked_shutdown})")
+            message(FATAL_ERROR "Unchecked host operation: ${source}: ${line}")
         endif()
     endforeach()
 endforeach()

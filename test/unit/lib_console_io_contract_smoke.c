@@ -96,6 +96,8 @@ static void cooked_restore(void)
     lib_console *c;
     lib_bool pending;
     assert(lib_console_create(&c)==LIB_STATUS_OK);
+    assert(lib_console_bind_generation(c,1)==LIB_STATUS_OK);
+    assert(lib_console_set_event_sink(c,receive,NULL)==LIB_STATUS_OK);
     assert(host_console_backend_activate(&b,c,HOST_CONSOLE_COOKED_LINES,1,0)==0);
     assert(!b.reader && !b.cooked_line_pending && readers_started==0);
     assert(host_console_backend_request_cooked_line(&b)==0);

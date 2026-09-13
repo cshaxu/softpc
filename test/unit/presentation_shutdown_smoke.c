@@ -7,10 +7,10 @@ int main(int argc,char **argv)
 {
     (void)argv;
     if(argc>1) {
-        app_presentation_require_destroy(LIB_STATUS_IO_ERROR);
+        softpc_host_require_status(LIB_STATUS_IO_ERROR, "UI destroy");
         return 99;
     }
-    app_presentation_require_destroy(LIB_STATUS_OK);
+    softpc_host_require_status(LIB_STATUS_OK, "UI destroy");
     char executable[MAX_PATH], command[MAX_PATH+32];
     STARTUPINFOA startup={.cb=sizeof(startup)};
     PROCESS_INFORMATION child={0};

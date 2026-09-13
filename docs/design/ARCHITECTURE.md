@@ -178,8 +178,9 @@ Window denies it for makes received while frozen; later unfreeze/repeats do
 not upgrade that cached make. This does not alter chord matching or releases,
 and ui-base has no frozen state. Only keyboard events determine prefix replay; mouse and close do not flush it.
 Keyboard order is preserved without buffering key/mouse interleaving. A partial
-sink failure is terminal, never retried; worker quiescence precedes its one
-failure/retirement completion. STOP/fault closes both frame and control admission
+sink failure is terminal, never retried; the detecting thread reports the first
+failure independently of wake success. Worker quiescence precedes retirement,
+not fault notification. STOP/fault closes both frame and control admission
 atomically without bypassing FIFO control consumption up to STOP. Frame and
 control have independent locks; only terminal admission takes both, frame first.
 Ordinary control does not wait for frame copying.
@@ -195,16 +196,25 @@ motion scaling belong to ui-window root helpers. Native files marshal SDK
 values and own actual drawing/messages/capture. Worker context and frame share
 one allocation; native cleanup runs on the worker, storage release after join.
 Host event is one opaque platform allocation, not a pointer-only outer wrapper.
-UI destruction returns a checked status after one bounded 5000 ms join. Success
-releases storage; failure retains the live worker's objects and callback context.
-SoftPC treats that failure as terminal and exits without retrying cleanup or
-freeing dependencies. Lib never terminates the process. UI notification failures
-are returned, not converted into success or request replay. Window blinking uses
+UI destruction performs one bounded 5000 ms join. An unjoinable live worker is
+an application-terminal infrastructure failure; Lib never terminates the
+process or exposes a half-object recovery protocol. A UI notification failure
+after copied work has been accepted reports once through the existing failure
+sink; it is not a second request rejection and is never replayed. Window blinking uses
 one native timer message path, including native modal loops, not outer-loop
 timeout scheduling.
 Task owns cancellation and entry/context; its platform thread object retains
 startup parameters until join. Root task destroy performs the join once before
 platform disposal.
+
+Synchronous request rejection returns `lib_status`, with normal wait outcomes
+separated into output values. Ordinary synchronization and local cleanup stay
+inside their owning component. A failed public create leaves its output null;
+failed file close consumes the stream and cannot be retried. Expected local
+outcomes remain local; only terminal live-worker/native-reader ownership
+failures use the application's status boundary. Accepted UI requests report
+asynchronous failure through the existing control-queue sink. No alternate
+event path exists.
 
 Both UI leaves marshal native keyboard records into the same ui-base record
 entry. It owns physical-versus-text choice and surrogate processing. Native Window

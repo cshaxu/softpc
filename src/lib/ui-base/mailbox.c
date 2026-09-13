@@ -15,13 +15,15 @@ static lib_status ui_component_notify_waiter(void *context)
     return ui_mailbox_wake_signal(context);
 }
 
-void ui_component_mailboxes_set_notify(ui_component_mailboxes *mailboxes,
+lib_status ui_component_mailboxes_set_notify(ui_component_mailboxes *mailboxes,
     ui_mailbox_notify_fn notify, void *context)
 {
+    if (mailboxes == LIB_NULL || notify == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     ui_mailbox_wake_destroy(mailboxes->wake);
     mailboxes->wake = LIB_NULL;
     mailboxes->notify = notify;
     mailboxes->notify_context = context;
+    return LIB_STATUS_OK;
 }
 
 lib_status ui_component_mailboxes_notify(ui_component_mailboxes *mailboxes)
@@ -31,14 +33,15 @@ lib_status ui_component_mailboxes_notify(ui_component_mailboxes *mailboxes)
 
 lib_status ui_component_mailboxes_create(ui_component_mailboxes *mailboxes)
 {
+    lib_status status;
     if (mailboxes == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     lib_memory_set(mailboxes, 0, sizeof(*mailboxes));
     lib_atomic_flag_clear(&mailboxes->frame_lock);
     lib_atomic_flag_clear(&mailboxes->control_lock);
-    mailboxes->wake = ui_mailbox_wake_create();
+    status = ui_mailbox_wake_create(&mailboxes->wake);
     mailboxes->notify = ui_component_notify_waiter;
     mailboxes->notify_context = mailboxes->wake;
-    return mailboxes->wake == LIB_NULL ? LIB_STATUS_NO_MEMORY : LIB_STATUS_OK;
+    return status;
 }
 
 void ui_component_mailboxes_destroy(ui_component_mailboxes *mailboxes)
@@ -85,7 +88,7 @@ lib_status ui_component_mailboxes_publish_frame(ui_component_mailboxes *mailboxe
     mailboxes->frame_pending = LIB_TRUE;
     mailboxes->frame.sequence = ++mailboxes->frame_generation;
     ui_component_mailboxes_unlock(&mailboxes->frame_lock);
-    return ui_component_mailboxes_notify(mailboxes);
+    return LIB_STATUS_OK;
 }
 
 lib_status ui_component_mailboxes_enqueue_controls(
@@ -133,7 +136,7 @@ lib_status ui_component_mailboxes_enqueue_controls(
     }
     ui_component_mailboxes_unlock(&mailboxes->control_lock);
     if (includes_stop) ui_component_mailboxes_unlock(&mailboxes->frame_lock);
-    return ui_component_mailboxes_notify(mailboxes);
+    return LIB_STATUS_OK;
 }
 
 lib_bool ui_component_mailboxes_take_control(ui_component_mailboxes *mailboxes,

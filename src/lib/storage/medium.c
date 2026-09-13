@@ -88,17 +88,19 @@ static void lib_storage_medium_pages_destroy(lib_storage_medium_page *page)
     }
 }
 
-void lib_storage_medium_destroy(lib_storage_medium **medium)
+lib_status lib_storage_medium_destroy(lib_storage_medium **medium)
 {
     lib_storage_medium *value;
+    lib_status status;
 
-    if (medium == LIB_NULL) return;
+    if (medium == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     value = *medium;
     *medium = LIB_NULL;
-    if (value == LIB_NULL) return;
-    if (value->file != LIB_NULL) (void)lib_storage_file_close(&value->file);
+    if (value == LIB_NULL) return LIB_STATUS_OK;
+    status = lib_storage_file_close(&value->file);
     lib_storage_medium_pages_destroy(value->pages);
     lib_release(value);
+    return status;
 }
 
 lib_size lib_storage_medium_byte_count(const lib_storage_medium *medium)

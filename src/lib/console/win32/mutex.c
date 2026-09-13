@@ -18,6 +18,6 @@ void console_mutex_destroy(console_mutex *mutex)
     lib_release(mutex);
 }
 void console_mutex_enter(console_mutex *mutex)
-{ lib_win32_enter_critical_section(&mutex->gate); }
+{ if (mutex != LIB_NULL) lib_win32_enter_critical_section(&mutex->gate); }
 void console_mutex_leave(console_mutex *mutex)
-{ lib_win32_leave_critical_section(&mutex->gate); }
+{ if (mutex != LIB_NULL) lib_win32_leave_critical_section(&mutex->gate); }

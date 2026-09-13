@@ -12,6 +12,8 @@ static unsigned paint_ends;
 static int inject_output_failure;
 static unsigned notification_attempts;
 static int reject_join;
+static BOOL WINAPI startup_signal(HANDLE h)
+{ return scenario==19 || scenario==22 ? FALSE : SetEvent(h); }
 static DWORD WINAPI join_wait(HANDLE h,DWORD timeout)
 {
     if(reject_join && timeout==UI_COMPONENT_DESTROY_TIMEOUT_MS) return WAIT_TIMEOUT;
@@ -36,7 +38,9 @@ static BOOL WINAPI invert(HDC d,const RECT *r)
 static HDC WINAPI begin(HWND w,PAINTSTRUCT *p)
 { return inject_output_failure && scenario==12 ? NULL : BeginPaint(w,p); }
 static BOOL WINAPI end(HWND w,const PAINTSTRUCT *p)
-{ ++paint_ends; return EndPaint(w,p); }
+{ ++paint_ends; BOOL result=EndPaint(w,p); return scenario==20 && inject_output_failure ? FALSE : result; }
+static BOOL WINAPI dispose_cursor(HCURSOR cursor)
+{ return scenario==21 ? FALSE : DestroyCursor(cursor); }
 static HCURSOR WINAPI make_cursor(HINSTANCE i,int x,int y,int w,int h,const void *a,const void *b)
 { return scenario==13 ? NULL : CreateCursor(i,x,y,w,h,a,b); }
 static HWND WINAPI create_window(DWORD ex, LPCWSTR klass, LPCWSTR title,
@@ -65,7 +69,7 @@ static DWORD WINAPI controlled_wait(DWORD count, const HANDLE *handles,
     if (scenario == 3) PostQuitMessage(0);
     if (scenario == 4) assert(DestroyWindow(created));
     if (scenario == 7 || scenario == 8) input_scenario();
-    if (scenario >= 10 && scenario <= 12) paint_scenario();
+    if ((scenario >= 10 && scenario <= 12) || scenario==20) paint_scenario();
     SendMessageW(created, WM_APP + 1, 0, 0);
     return WAIT_OBJECT_0;
 }
@@ -91,6 +95,8 @@ static DWORD WINAPI controlled_wait(DWORD count, const HANDLE *handles,
 #define lib_win32_begin_paint begin
 #define lib_win32_end_paint end
 #define lib_win32_create_cursor make_cursor
+#undef lib_win32_destroy_cursor
+#define lib_win32_destroy_cursor dispose_cursor
 #undef lib_win32_send_notify_message_w
 #define lib_win32_send_notify_message_w notify
 #undef lib_win32_set_timer
@@ -101,6 +107,8 @@ static DWORD WINAPI controlled_wait(DWORD count, const HANDLE *handles,
 #define lib_win32_msg_wait_for_multiple_objects controlled_wait
 #undef lib_win32_wait_for_single_object
 #define lib_win32_wait_for_single_object join_wait
+#undef lib_win32_set_event
+#define lib_win32_set_event startup_signal
 static void checked_fail(ui_component *component, lib_status status)
 {
     static ui_frame rejected = { .valid = 1, .text_columns = 80, .text_rows = 25 };
@@ -157,7 +165,7 @@ static void paint_scenario(void)
 int main(void)
 {
     static ui_frame frame;
-    for (scenario = 0; scenario != 19; ++scenario) {
+    for (scenario = 0; scenario != 22; ++scenario) {
         ui_window_options options = { 0 };
         ui_window *window = NULL;
         waiting = CreateEventA(NULL, TRUE, FALSE, NULL);
@@ -174,9 +182,9 @@ int main(void)
         options.initial_frozen = scenario == 8 || scenario == 16;
         assert(ui_hotkey_registry_register(&options.component.hotkeys, 'P',
             UI_HOTKEY_MODIFIER_CONTROL | UI_HOTKEY_MODIFIER_ALT, "toggle") == LIB_STATUS_OK);
-        if (scenario==13 || scenario==15) {
+        if (scenario==13 || scenario==15 || scenario==19) {
             assert(ui_window_create(&window,&options)==LIB_STATUS_IO_ERROR && !window);
-            assert(!IsWindow(created) && retired==0);
+            assert(!IsWindow(created) && retired==(scenario==19));
             CloseHandle(waiting); CloseHandle(proceed);
             continue;
         }
@@ -184,16 +192,19 @@ int main(void)
         assert(WaitForSingleObject(waiting, INFINITE) == WAIT_OBJECT_0);
         frame.valid = 1u; frame.text_columns = 80u; frame.text_rows = 25u;
         frame.cursor_visible=1; frame.font_height=16; frame.cursor_top=14; frame.cursor_bottom=15;
-        assert(ui_window_publish_frame(window, &frame) ==
-            (scenario==14 || scenario==18 ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK));
+        assert(ui_window_publish_frame(window, &frame) == LIB_STATUS_OK);
         if(scenario==18) {
             void *retained=window->worker_state;
             reject_join=1;
             assert(ui_window_destroy(window)==LIB_STATUS_IO_ERROR);
-            assert(window->worker_state==retained && !retired && notification_attempts==2);
+            assert(window->worker_state==retained);
+            assert(!retired);
+            /* Native wake coalescing is private.  The contract is the
+             * independently reported component fault, not its attempt count. */
+            assert(failures==1);
             reject_join=0;
         }
-        if (scenario == 0 || scenario == 5)
+        if (scenario == 0 || scenario == 5 || scenario==21)
             assert(ui_component_request_stop(&window->base) == LIB_STATUS_OK);
         if (scenario==16) assert(ui_window_unfreeze(window)==LIB_STATUS_OK);
         if (scenario==17) assert(ui_window_freeze(window)==LIB_STATUS_OK);

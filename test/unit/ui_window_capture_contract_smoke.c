@@ -8,6 +8,7 @@ static RECT client = {0,0,640,480}, clipped;
 static POINT origin = {100,200};
 static unsigned releases, clips, events;
 static int reject_input;
+static int release_ok=1;
 static unsigned focus_requests, foreground_requests;
 static int clip_ok = 1, resize_ok = 1, title_ok = 1, client_ok = 1;
 static DWORD ticks;
@@ -39,7 +40,7 @@ static void title_notification(void);
 static HWND WINAPI get_capture(void) { return owner; }
 static HWND WINAPI set_capture(HWND w) { HWND old=owner; owner=w; return old; }
 static BOOL WINAPI release_capture(void)
-{ ++releases; owner=NULL; notify_loss(); return TRUE; }
+{ ++releases; owner=NULL; notify_loss(); return release_ok; }
 static HWND WINAPI set_focus(HWND w) { ++focus_requests; focused=w; return w; }
 static BOOL WINAPI foreground(HWND w) { (void)w; ++foreground_requests; return TRUE; }
 static HWND WINAPI get_focus(void) { return focused; }
@@ -143,7 +144,7 @@ int main(void)
     assert(ui_component_initialize(&window.base,&options,join,dispose)==LIB_STATUS_OK);
     c.component=&window; context=&c;
     assert(ui_win32_mouse_refresh_bounds(&c.mouse) && clips==0);
-    assert(ui_win32_mouse_capture(&c.mouse,(HWND)1,0));
+    assert(ui_win32_mouse_capture(&c.mouse,(HWND)1,0) == LIB_STATUS_OK);
     assert(clipped.left==100 && clipped.top==200 && clipped.right==740 && clipped.bottom==680);
     origin.x=-300; origin.y=50;
     win32_window_proc((HWND)1,WM_MOVE,0,0);
@@ -156,17 +157,19 @@ int main(void)
     assert(!c.mouse.captured && !c.left_button && !c.mouse.motion.valid);
     assert(!c.mouse.motion.remainder_x && releases==0 && events==1 && owner==(HWND)2);
     notify_loss(); assert(events==1 && releases==0);
-    assert(ui_win32_mouse_capture(&c.mouse,(HWND)1,0));
+    assert(ui_win32_mouse_capture(&c.mouse,(HWND)1,0) == LIB_STATUS_OK);
     c.right_button=1; win32_window_release_mouse(&c);
     assert(releases==1 && events==2 && !c.mouse.captured && !c.right_button);
-    assert(ui_win32_mouse_capture(&c.mouse,(HWND)1,0));
+    assert(ui_win32_mouse_capture(&c.mouse,(HWND)1,0) == LIB_STATUS_OK);
     clip_ok=0; win32_window_proc((HWND)1,WM_MOVE,0,0);
     assert(!c.mouse.captured && releases==2);
     unsigned previous=clips;
     win32_window_proc((HWND)1,WM_MOVE,0,0); assert(clips==previous);
     resize_ok=0;
     win32_window_resize_client((HWND)1,&c,640,480);
-    assert(c.client_surface_width==0);
+    assert(c.client_surface_width==0 && window.base.stopping);
+    assert(ui_component_destroy(&window.base)==LIB_STATUS_OK);
+    assert(ui_component_initialize(&window.base,&options,join,dispose)==LIB_STATUS_OK);
     resize_ok=1;
     win32_window_resize_client((HWND)1,&c,640,480);
     assert(c.client_surface_width==640 && c.client_surface_height==480);
@@ -182,7 +185,9 @@ int main(void)
     assert(focus_requests==1 && foreground_requests==1 && !c.mouse.captured);
     c.client_width=320; c.client_height=240; client_ok=0;
     win32_window_capture_client_size((HWND)1,&c);
-    assert(c.client_width==320 && c.client_height==240);
+    assert(c.client_width==320 && c.client_height==240 && window.base.stopping);
+    assert(ui_component_destroy(&window.base)==LIB_STATUS_OK);
+    assert(ui_component_initialize(&window.base,&options,join,dispose)==LIB_STATUS_OK);
     client_ok=1;
     c.frame.valid=1; c.frame.text_columns=80; c.frame.text_rows=25;
     c.frame.cursor_visible=1; c.frame.font_height=16;
@@ -191,6 +196,16 @@ int main(void)
     assert(c.cursor_blink_visible);
     win32_window_proc((HWND)1,WM_TIMER,WIN32_WINDOW_CURSOR_TIMER,0);
     assert(!c.cursor_blink_visible && c.cursor_blink_due==500);
+    /* Delayed delivery preserves phase against the original 250ms grid. */
+    c.cursor_blink_due=250; c.cursor_blink_visible=1;
+    const DWORD delayed[]={260,500,750,1000};
+    for (unsigned i=0;i<4;++i) {
+        ticks=delayed[i];
+        win32_window_proc((HWND)1,WM_TIMER,WIN32_WINDOW_CURSOR_TIMER,0);
+        assert(c.cursor_blink_visible == (i % 2 != 0));
+        assert(c.cursor_blink_due == (i+2)*250);
+    }
+    c.cursor_blink_visible=0; c.cursor_blink_due=500;
     /* A repeated unfreeze must not restart the native timer or reset phase. */
     unsigned starts_before=timer_starts, stops_before=timer_stops;
     for (ticks=300;ticks<500;ticks+=50) {
@@ -234,6 +249,14 @@ int main(void)
     assert(window.base.mailboxes.control_count==3);
     assert(window.base.mailboxes.frame_pending);
     assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
+    assert(ui_component_initialize(&window.base,&options,join,dispose)==LIB_STATUS_OK);
+    c.component=&window; c.left_button=c.right_button=0; reject_input=0;
+    c.mouse.captured=LIB_TRUE; c.mouse.window=(HWND)1; owner=(HWND)1;
+    release_ok=0;
+    win32_window_release_mouse(&c);
+    assert(window.base.failure==LIB_STATUS_IO_ERROR && window.base.stopping);
+    assert(!c.mouse.captured);
+    assert(ui_component_destroy(&window.base)==LIB_STATUS_OK);
     for (unsigned edge=UI_WINDOW_EDGE_LEFT;edge<=UI_WINDOW_EDGE_BOTTOMRIGHT;++edge) {
         ui_window_rect r={10,20,826,749};
         ui_window_constrain_sizing(&r,(ui_window_edge)edge,16,29,640,480);

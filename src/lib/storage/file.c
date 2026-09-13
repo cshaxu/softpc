@@ -20,15 +20,17 @@ static lib_status lib_storage_file_open(const char *path,
     lib_storage_file **out_file)
 {
     lib_storage_file *file;
+    lib_status status;
 
     if (path == LIB_NULL || open_platform == LIB_NULL || out_file == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     *out_file = LIB_NULL;
     file = (lib_storage_file *)lib_allocate_zero(1u, sizeof(*file));
     if (file == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    if (open_platform(path, file) != LIB_STATUS_OK) {
+    status = open_platform(path, file);
+    if (status != LIB_STATUS_OK) {
         lib_release(file);
-        return LIB_STATUS_IO_ERROR;
+        return status;
     }
     *out_file = file;
     return LIB_STATUS_OK;
@@ -100,24 +102,27 @@ lib_status lib_storage_file_read_owned(const char *path, lib_size maximum,
     lib_storage_file *file = LIB_NULL;
     lib_i64 length;
     void *bytes = LIB_NULL;
+    lib_status status, close_status;
 
     if (path == LIB_NULL || out_bytes == LIB_NULL || out_byte_count == LIB_NULL) {
         return LIB_STATUS_INVALID_ARGUMENT;
     }
     *out_bytes = LIB_NULL;
     *out_byte_count = 0u;
-    if (lib_storage_file_open_readonly(path, &file) != LIB_STATUS_OK ||
-        lib_storage_file_byte_count(file, &length) != LIB_STATUS_OK || length < 0 ||
-        (lib_u64)length > maximum ||
-        (bytes = lib_allocate((lib_size)length == 0u ? 1u : (lib_size)length)) == LIB_NULL ||
-        lib_storage_file_read_exact(file, bytes, (lib_size)length) != LIB_STATUS_OK) {
-        (void)lib_storage_file_close(&file);
-        lib_release(bytes);
-        return LIB_STATUS_IO_ERROR;
+    status = lib_storage_file_open_readonly(path, &file);
+    if (status == LIB_STATUS_OK) status = lib_storage_file_byte_count(file, &length);
+    if (status == LIB_STATUS_OK && (length < 0 || (lib_u64)length > maximum))
+        status = LIB_STATUS_LIMIT_EXCEEDED;
+    if (status == LIB_STATUS_OK) {
+        bytes = lib_allocate((lib_size)length == 0u ? 1u : (lib_size)length);
+        status = bytes == LIB_NULL ? LIB_STATUS_NO_MEMORY :
+            lib_storage_file_read_exact(file, bytes, (lib_size)length);
     }
-    if (lib_storage_file_close(&file) != LIB_STATUS_OK) {
+    close_status = lib_storage_file_close(&file);
+    if (status == LIB_STATUS_OK) status = close_status;
+    if (status != LIB_STATUS_OK) {
         lib_release(bytes);
-        return LIB_STATUS_IO_ERROR;
+        return status;
     }
     *out_bytes = bytes;
     *out_byte_count = (lib_size)length;

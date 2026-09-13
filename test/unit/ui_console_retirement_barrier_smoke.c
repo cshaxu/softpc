@@ -9,13 +9,13 @@
 
 static LONG fail_wake;
 static HANDLE frame_idle;
-static ui_mailbox_wake_wait_result retirement_wait(
-    const ui_mailbox_wake *wake, lib_u32 timeout)
+static lib_status retirement_wait(
+    const ui_mailbox_wake *wake, lib_u32 timeout, ui_mailbox_wake_wait_result *out_result)
 {
     if (frame_idle) assert(ReleaseSemaphore(frame_idle, 1, NULL));
-    ui_mailbox_wake_wait_result result = ui_mailbox_wake_wait(wake, timeout);
+    lib_status result = ui_mailbox_wake_wait(wake, timeout, out_result);
     return InterlockedCompareExchange(&fail_wake, 0, 0) ?
-        UI_MAILBOX_WAKE_WAIT_FAULT : result;
+        LIB_STATUS_IO_ERROR : result;
 }
 /* Compile the production worker; only its wait result is controllable. */
 #define ui_mailbox_wake_wait retirement_wait

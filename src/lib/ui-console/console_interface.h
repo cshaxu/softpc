@@ -8,10 +8,12 @@ typedef struct ui_console ui_console;
 
 typedef ui_component_options ui_console_options;
 
+/* A non-NULL output on failure retains cleanup ownership and dependencies;
+ * do not operate it or free dependencies unless checked destruction succeeds. */
 lib_status ui_console_create(ui_console **out_console,
     const ui_console_options *options);
 lib_status ui_console_publish_frame(ui_console *console, const ui_frame *frame);
-/* Same checked destruction/retained-on-failure contract as ui_component_destroy. */
+/* Same checked destruction contract as ui_component_destroy. */
 lib_status ui_console_destroy(ui_console *console);
 /* Borrowed logical Console object. The application passes it to host for
  * Current Console registration before it permits raw input. */

@@ -59,8 +59,7 @@ int main(void)
     for (index = 0u; index < UI_COMPONENT_CONTROL_CAPACITY; ++index)
         assert(ui_window_set_title(&window, "x") == LIB_STATUS_OK);
     assert(ui_window_set_title(&window, "x") == LIB_STATUS_LIMIT_EXCEEDED);
-    assert(window_probe.failures == 1u);
-    assert(window_probe.last_failure == LIB_STATUS_LIMIT_EXCEEDED);
+    assert(window_probe.failures == 0u);
     leaf_drain(&window.base);
 
     /* Window freeze is one atomic ordered control batch: first it makes future
@@ -96,8 +95,7 @@ int main(void)
             LIB_STATUS_OK);
     assert(ui_component_enqueue_controls(&console.base, &title, 1u) ==
         LIB_STATUS_LIMIT_EXCEEDED);
-    assert(console_probe.failures == 1u);
-    assert(console_probe.last_failure == LIB_STATUS_LIMIT_EXCEEDED);
+    assert(console_probe.failures == 0u);
     leaf_drain(&console.base);
 
     /* These are synthetic leaf storage objects: no native worker was started,

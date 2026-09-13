@@ -9,8 +9,9 @@ static BOOL WINAPI reject_signal(HANDLE h) { (void)h; ++attempts; return FALSE; 
 #undef lib_win32_set_event
 #define lib_win32_set_event reject_signal
 #include "lib/ui-base/win32/mailbox.c"
-static ui_mailbox_wake_wait_result observed_wait(const ui_mailbox_wake *w,lib_u32 timeout)
-{ SetEvent(asleep); return ui_mailbox_wake_wait(w,timeout); }
+static lib_status observed_wait(const ui_mailbox_wake *w,lib_u32 timeout,
+    ui_mailbox_wake_wait_result *out_result)
+{ SetEvent(asleep); return ui_mailbox_wake_wait(w,timeout,out_result); }
 static DWORD WINAPI bounded_join(HANDLE h,DWORD timeout)
 {
     assert(timeout==UI_COMPONENT_DESTROY_TIMEOUT_MS);
@@ -41,14 +42,14 @@ int main(void)
         assert(WaitForSingleObject(asleep,3000)==WAIT_OBJECT_0);
         void *state=c->worker_state;
         ui_console_win32_state *worker=state;
-        if(mode==0) assert(ui_component_request_stop(&c->base)==LIB_STATUS_IO_ERROR);
+        if(mode==0) assert(ui_component_request_stop(&c->base)==LIB_STATUS_OK);
         if(mode==1) {
             ui_component_control title={.kind=UI_COMPONENT_CONTROL_SET_WINDOW_TITLE};
-            assert(ui_component_enqueue_controls(&c->base,&title,1)==LIB_STATUS_IO_ERROR);
+            assert(ui_component_enqueue_controls(&c->base,&title,1)==LIB_STATUS_OK);
         }
         if(mode==2) {
             static ui_frame frame={.valid=1,.text_columns=80,.text_rows=25};
-            assert(ui_console_publish_frame(c,&frame)==LIB_STATUS_IO_ERROR);
+            assert(ui_console_publish_frame(c,&frame)==LIB_STATUS_OK);
         }
         if(mode==3) {
             lib_console_event activated={.kind=LIB_CONSOLE_EVENT_ACTIVATED,.binding_generation=1};
@@ -57,7 +58,7 @@ int main(void)
         }
         assert(attempts==2 && c->base.stopping && !retired);
         assert(ui_console_destroy(c)==LIB_STATUS_IO_ERROR);
-        assert(joins==1 && c->worker_state==state && !retired && !failures);
+        assert(joins==1 && c->worker_state==state && !retired && failures==1);
         assert(WaitForSingleObject(worker->worker,0)==WAIT_TIMEOUT);
         /* Test-only rescue after proving no premature retirement/free. */
         assert(SetEvent(c->base.mailboxes.wake->handle));

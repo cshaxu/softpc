@@ -3,11 +3,11 @@
 static void ui_console_dispose(ui_console *console)
 {
     if (console == LIB_NULL) return;
+    ui_component_mailboxes_destroy(&console->base.mailboxes);
     if (console->logical_console != LIB_NULL) {
         /* The worker (or failed start) already detached and drained its sink. */
         lib_console_release(console->logical_console);
     }
-    ui_component_mailboxes_destroy(&console->base.mailboxes);
     lib_release(console);
 }
 
@@ -35,7 +35,8 @@ lib_status ui_console_create(ui_console **out_console,
         status = lib_console_create(&console->logical_console);
     if (status == LIB_STATUS_OK) status = ui_console_worker_start(console);
     if (status != LIB_STATUS_OK) {
-        ui_console_dispose(console);
+        if (console->worker_state == LIB_NULL)
+            ui_console_dispose(console);
         return status;
     }
     *out_console = console;

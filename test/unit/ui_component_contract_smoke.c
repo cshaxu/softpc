@@ -112,7 +112,7 @@ int main(void)
     assert(probe.last_identity == first.source_identity);
     probe.accept_input = 0;
     assert(!ui_component_emit(&first, &event));
-    assert(probe.failure_count == 0u);
+    assert(probe.failure_count == 1u);
     assert(!ui_component_emit(&first, &event));
     ui_component_retire(&first, LIB_STATUS_OK);
     assert(probe.failure_count == 1u);
@@ -157,11 +157,10 @@ int main(void)
         assert(ui_component_enqueue_controls(&second, &control, 1u) ==
             LIB_STATUS_OK);
     /* A full ordinary FIFO rejects the next request and retains every
-       original record. The failure is reported as well as returned. */
+       original record. Rejection is returned; the component remains healthy. */
     assert(ui_component_enqueue_controls(&second, &control, 1u) ==
         LIB_STATUS_LIMIT_EXCEEDED);
-    assert(probe.failure_count == 2u);
-    assert(probe.last_failure == LIB_STATUS_LIMIT_EXCEEDED);
+    assert(probe.failure_count == 1u);
     /* STOP has one reserved FIFO slot.  A full normal queue cannot make
        destroy wait forever for a stop record it could not enqueue. */
     assert(ui_component_request_stop(&second) == LIB_STATUS_OK);
@@ -182,8 +181,7 @@ int main(void)
     disable_controls[0].value.window_frozen = LIB_TRUE;
     assert(ui_component_enqueue_controls(&third, disable_controls, 2u) ==
         LIB_STATUS_LIMIT_EXCEEDED);
-    assert(probe.failure_count == 3u);
-    assert(probe.last_failure == LIB_STATUS_LIMIT_EXCEEDED);
+    assert(probe.failure_count == 1u);
     for (index = 0u; index + 1u < UI_COMPONENT_CONTROL_CAPACITY; ++index) {
         assert(ui_component_mailboxes_take_control(&third.mailboxes, &taken));
         assert(taken.kind == UI_COMPONENT_CONTROL_SET_WINDOW_FROZEN);

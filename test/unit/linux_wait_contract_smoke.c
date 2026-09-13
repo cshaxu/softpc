@@ -17,12 +17,15 @@ int main(void)
     host_sync_event *events[2];
     lib_bool signaled;
     lib_u32 index;
+    ui_mailbox_wake_wait_result wake_result;
     int failure;
     host_console_backend *backend = (void *)1;
 
     for (failure = 1; failure <= 4; ++failure) {
         fail_init_step = failure; init_step = 0;
-        assert(ui_mailbox_wake_create() == NULL);
+        signal_wake = NULL;
+        assert(ui_mailbox_wake_create(&signal_wake) == LIB_STATUS_IO_ERROR);
+        assert(signal_wake == NULL);
         assert(live_mutexes == 0 && live_conditions == 0 && live_attributes == 0);
     }
     /* Host one-time condition preparation has three fallible stages. */
@@ -35,25 +38,31 @@ int main(void)
     }
     host_sync_once = LIB_LINUX_PTHREAD_ONCE_INIT;
     fail_init_step = 0; init_step = 0;
-    signal_wake = ui_mailbox_wake_create();
-    assert(signal_wake);
-    assert(ui_mailbox_wake_wait(signal_wake, 0) == UI_MAILBOX_WAKE_WAIT_TIMED_OUT);
+    signal_wake = NULL;
+    assert(ui_mailbox_wake_create(&signal_wake) == LIB_STATUS_OK);
+    assert(signal_wake != NULL);
+    assert(ui_mailbox_wake_wait(signal_wake, 0, &wake_result) == LIB_STATUS_OK &&
+        wake_result == UI_MAILBOX_WAKE_WAIT_TIMED_OUT);
     assert(ui_mailbox_wake_signal(signal_wake)==LIB_STATUS_OK);
-    assert(ui_mailbox_wake_wait(signal_wake, 0) == UI_MAILBOX_WAKE_WAIT_WAKE);
+    assert(ui_mailbox_wake_wait(signal_wake, 0, &wake_result) == LIB_STATUS_OK &&
+        wake_result == UI_MAILBOX_WAKE_WAIT_WAKE);
     assert(wait_calls == 0);
     wait_hook = signal_on_second_wait;
-    assert(ui_mailbox_wake_wait(signal_wake, 250) == UI_MAILBOX_WAKE_WAIT_WAKE);
+    assert(ui_mailbox_wake_wait(signal_wake, 250, &wake_result) == LIB_STATUS_OK &&
+        wake_result == UI_MAILBOX_WAKE_WAIT_WAKE);
     assert(wait_calls == 2 && observed_deadline.tv_sec == 101 &&
         observed_deadline.tv_nsec == 150000000L);
     wait_calls = 0;
-    assert(ui_mailbox_wake_wait(signal_wake, LIB_UINT32_MAX) == UI_MAILBOX_WAKE_WAIT_WAKE);
+    assert(ui_mailbox_wake_wait(signal_wake, LIB_UINT32_MAX, &wake_result) == LIB_STATUS_OK &&
+        wake_result == UI_MAILBOX_WAKE_WAIT_WAKE);
     assert(wait_calls == 2);
     wait_hook = NULL; wait_calls = 0; wait_result = LIB_LINUX_ETIMEDOUT;
-    assert(ui_mailbox_wake_wait(signal_wake, 1) == UI_MAILBOX_WAKE_WAIT_TIMED_OUT);
+    assert(ui_mailbox_wake_wait(signal_wake, 1, &wake_result) == LIB_STATUS_OK &&
+        wake_result == UI_MAILBOX_WAKE_WAIT_TIMED_OUT);
     wait_calls = 0; wait_result = 5;
-    assert(ui_mailbox_wake_wait(signal_wake, LIB_UINT32_MAX) == UI_MAILBOX_WAKE_WAIT_FAULT);
+    assert(ui_mailbox_wake_wait(signal_wake, LIB_UINT32_MAX, &wake_result) == LIB_STATUS_IO_ERROR);
     clock_failure = 1;
-    assert(ui_mailbox_wake_wait(signal_wake, 1) == UI_MAILBOX_WAKE_WAIT_FAULT);
+    assert(ui_mailbox_wake_wait(signal_wake, 1, &wake_result) == LIB_STATUS_IO_ERROR);
     clock_failure = 0;
     assert(ui_mailbox_wake_signal(NULL)==LIB_STATUS_INVALID_ARGUMENT);
     fail_lock=1;

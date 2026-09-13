@@ -51,7 +51,7 @@ lib_status ui_component_mailboxes_create(ui_component_mailboxes *mailboxes);
 /* Startup-only selection, before publishing the component to any caller.
  * Replaces the default wait primitive. Context lives until worker join and
  * caller quiescence. Failure is after enqueue: do not replay the request. */
-void ui_component_mailboxes_set_notify(ui_component_mailboxes *mailboxes,
+lib_status ui_component_mailboxes_set_notify(ui_component_mailboxes *mailboxes,
     ui_mailbox_notify_fn notify, void *context);
 lib_status ui_component_mailboxes_notify(ui_component_mailboxes *mailboxes);
 void ui_component_mailboxes_close(ui_component_mailboxes *mailboxes);

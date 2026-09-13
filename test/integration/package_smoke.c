@@ -18,6 +18,7 @@
 static char package_last_screen[4096];
 static DWORD package_last_screen_width;
 static DWORD package_last_screen_length;
+static int package_window_display;
 
 static char *trim(char *text)
 {
@@ -95,6 +96,8 @@ static int verify_fixed_ini(void)
         } else if (strcmp(key, "media_mode") == 0 &&
             strcmp(value, "overlay") != 0 && strcmp(value, "readonly") != 0) {
             valid = 0;
+        } else if (strcmp(key, "display") == 0) {
+            package_window_display = strcmp(value, "window") == 0;
         }
     }
     fclose(file);
@@ -220,6 +223,55 @@ static int package_wait_for_absent_text(HANDLE output, const char *needle,
     return 0;
 }
 
+typedef struct package_window_probe { DWORD process; HWND window; } package_window_probe;
+static BOOL CALLBACK package_find_window(HWND window, LPARAM opaque)
+{
+    package_window_probe *probe = (package_window_probe *)opaque;
+    DWORD process;
+    char name[64];
+    GetWindowThreadProcessId(window, &process);
+    if (process == probe->process && GetClassNameA(window, name, sizeof(name)) &&
+        strcmp(name, "LibUxWindow") == 0) probe->window = window;
+    return TRUE;
+}
+
+static int package_wait_window(DWORD process, const char *state)
+{
+    DWORD deadline = GetTickCount() + 10000u;
+    do {
+        package_window_probe probe = { process, NULL };
+        char title[128];
+        EnumWindows(package_find_window, (LPARAM)&probe);
+        if (state == NULL && probe.window == NULL) return 1;
+        if (state != NULL && probe.window != NULL && IsWindowVisible(probe.window) &&
+            GetWindowTextA(probe.window, title, sizeof(title)) && strstr(title, state))
+            return SendMessageTimeoutA(probe.window, WM_NULL, 0, 0,
+                SMTO_ABORTIFHUNG, 1000u, NULL) != 0;
+        Sleep(20u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    return 0;
+}
+
+/* A Window-configured package keeps this Console cooked. Assert that actual
+ * route instead of looking for DOS pixels in the monitor, without editing INI.
+ * DOS boot/frame correctness is independently covered by the runtime suites. */
+static int package_window_restart(PROCESS_INFORMATION *process, HANDLE input, HANDLE output)
+{
+    if (!package_wait_for_text(output, "Machine started.", 10000u) ||
+        !package_wait_window(process->dwProcessId, "Running")) return 0;
+    if (!package_send_text(input, "pause\r") ||
+        !package_wait_for_text(output, "Machine paused.", 5000u) ||
+        !package_wait_window(process->dwProcessId, "Paused")) return 0;
+    if (!package_send_text(input, "stop\r") ||
+        !package_wait_for_text(output, "Machine stopped.", 5000u) ||
+        !package_wait_window(process->dwProcessId, NULL)) return 0;
+    if (!package_send_text(input, "start\r") ||
+        !package_wait_window(process->dwProcessId, "Running")) return 0;
+    /* A fresh monitor command proves input has been rearmed after restart. */
+    return package_send_text(input, "pause\r") &&
+        package_wait_window(process->dwProcessId, "Paused");
+}
+
 /* This drives the shipping executable through the same native Console route
  * as the reported failure.  It intentionally does not call app_runtime_*
  * directly: monitor lines, raw CAP recognition, reconciler actions, broker
@@ -252,6 +304,11 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
     }
     if (!package_wait_for_text(output, "SoftPC>", 5000u)) { stage = 3; goto done; }
     if (!package_send_text(input, "start\r")) { stage = 4; goto done; }
+    if (package_window_display) {
+        success = package_window_restart(process, input, output);
+        stage = 16;
+        goto done;
+    }
     if (!package_wait_for_text(output, "C:\\>", 10000u)) { stage = 5; goto done; }
     if (!package_send_text(input, "ver\r") ||
         !package_wait_for_text(output, "Version", 5000u)) { stage = 14; goto done; }
@@ -311,7 +368,7 @@ int main(void)
         return 1;
     }
     if (!verify_package_monitor_restart(&process, &stage, &error)) {
-        fprintf(stderr, "softpc-package-smoke: monitor pause-stop-start did not return to DOS (stage=%d error=%lu)\n",
+        fprintf(stderr, "softpc-package-smoke: configured monitor pause-stop-start route failed (stage=%d error=%lu)\n",
             stage, (unsigned long)error);
         package_report_last_screen();
         TerminateProcess(process.hProcess, 1u);

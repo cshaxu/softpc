@@ -1,3 +1,4 @@
+#include "host/status.h"
 #include "presentation.h"
 
 #ifdef _WIN32
@@ -27,22 +28,26 @@ struct app_presentation {
 
 typedef struct app_presentation app_presentation_context;
 
-static void app_presentation_require_destroy(lib_status status)
+static void app_presentation_delivery_failed(void *opaque,
+    lib_u64 source_identity, lib_status status);
+
+static void app_presentation_check_request(app_presentation_context *context,
+    lib_status status)
 {
-    if (status == LIB_STATUS_OK) return;
-    /* A retained UI worker can still use runtime/queue/callback context.
-     * Do not retry normal cleanup or run exit handlers that may free them. */
-    fputs("softpcvm: UI shutdown failed; terminating.\n", stderr);
-    _Exit(EXIT_FAILURE);
+    /* UI requests return an error only before the component accepts them.
+     * An accepted request that later fails reports through failure_sink. */
+    if (status != LIB_STATUS_OK)
+        app_presentation_delivery_failed(context, 0u, status);
 }
+
 
 static void app_presentation_publish_title(app_presentation_context *context,
     app_runtime_state state)
 {
     if (context == NULL || context->window == NULL) return;
-    (void)ui_window_set_title(context->window,
+    app_presentation_check_request(context, ui_window_set_title(context->window,
         state == SOFTPC_RUNTIME_PAUSED ?
-            "Insignia SoftPC (Paused)" : "Insignia SoftPC (Running)");
+            "Insignia SoftPC (Paused)" : "Insignia SoftPC (Running)"));
 }
 
 static int app_presentation_guest_input(void *opaque, const ui_input_event *event)
@@ -76,6 +81,7 @@ static int app_presentation_create_window(app_presentation_context *context,
     app_runtime_state state)
 {
     ui_window_options options = { 0 };
+    lib_status status;
 
     if (context == NULL || context->window != NULL) return context != NULL;
     options.component.input_context = context;
@@ -86,18 +92,22 @@ static int app_presentation_create_window(app_presentation_context *context,
     options.initial_title = state == SOFTPC_RUNTIME_PAUSED ?
         "Insignia SoftPC (Paused)" : "Insignia SoftPC (Running)";
     options.initial_frozen = state != SOFTPC_RUNTIME_RUNNING;
-    if (ui_window_create(&context->window, &options) != LIB_STATUS_OK)
-        return 0;
+    status = ui_window_create(&context->window, &options);
+    if (status != LIB_STATUS_OK) {
+        softpc_host_require_status(status, "Window startup");
+        return 0; /* Unreachable; preserves the ordinary create signature. */
+    }
     context->window_delivered_frame_sequence = 0u;
     app_presentation_publish_title(context, state);
     if (state == SOFTPC_RUNTIME_RUNNING)
-        (void)ui_window_unfreeze(context->window);
+        app_presentation_check_request(context, ui_window_unfreeze(context->window));
     return 1;
 }
 
 static int app_presentation_create_console(app_presentation_context *context)
 {
     ui_console_options options = { 0 };
+    lib_status status;
 
     if (context == NULL || context->console != NULL) return context != NULL;
     options.input_context = context;
@@ -105,8 +115,11 @@ static int app_presentation_create_console(app_presentation_context *context)
     options.failure_context = context;
     options.failure_sink = app_presentation_delivery_failed;
     options.hotkeys = context->hotkeys;
-    if (ui_console_create(&context->console, &options) != LIB_STATUS_OK)
+    status = ui_console_create(&context->console, &options);
+    if (status != LIB_STATUS_OK) {
+        softpc_host_require_status(status, "Console startup");
         return 0;
+    }
     context->console_delivered_frame_sequence = 0u;
     return 1;
 }
@@ -120,9 +133,9 @@ static void app_presentation_destroy_components(app_presentation_context *contex
         (void)app_monitor_console_activate_self(context->monitor,
             context->console);
     if (context->window != NULL)
-        app_presentation_require_destroy(ui_window_destroy(context->window));
+        softpc_host_require_status(ui_window_destroy(context->window), "UI destroy");
     if (context->console != NULL)
-        app_presentation_require_destroy(ui_console_destroy(context->console));
+        softpc_host_require_status(ui_console_destroy(context->console), "UI destroy");
     context->window = NULL;
     context->console = NULL;
     context->window_delivered_frame_sequence = 0u;
@@ -164,14 +177,14 @@ int app_presentation_apply_action(app_presentation *presentation,
         return app_control_queue_push_broker_completed(context->control_queue, 0,
             app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE:
-        app_presentation_require_destroy(ui_console_destroy(context->console));
+        softpc_host_require_status(ui_console_destroy(context->console), "UI destroy");
         context->console = NULL;
         context->console_delivered_frame_sequence = 0u;
         return app_control_queue_push_component_completed(context->control_queue,
             APP_CONTROL_COMPONENT_VM_CONSOLE, 0,
             app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_DESTROY_WINDOW:
-        app_presentation_require_destroy(ui_window_destroy(context->window));
+        softpc_host_require_status(ui_window_destroy(context->window), "UI destroy");
         context->window = NULL;
         context->window_delivered_frame_sequence = 0u;
         return app_control_queue_push_component_completed(context->control_queue,
@@ -268,7 +281,7 @@ void app_presentation_destroy(app_presentation *presentation)
 void app_presentation_release_window_mouse(app_presentation *presentation)
 {
     if (presentation != NULL && presentation->window != NULL)
-        (void)ui_window_release_mouse(presentation->window);
+        app_presentation_check_request(presentation, ui_window_release_mouse(presentation->window));
 }
 
 void app_presentation_set_runtime_state(app_presentation *presentation,
@@ -278,9 +291,9 @@ void app_presentation_set_runtime_state(app_presentation *presentation,
     app_presentation_publish_title(presentation, state);
     if (presentation->window != NULL) {
         if (state == SOFTPC_RUNTIME_RUNNING)
-            (void)ui_window_unfreeze(presentation->window);
+            app_presentation_check_request(presentation, ui_window_unfreeze(presentation->window));
         else if (state == SOFTPC_RUNTIME_PAUSED)
-            (void)ui_window_freeze(presentation->window);
+            app_presentation_check_request(presentation, ui_window_freeze(presentation->window));
     }
 }
 

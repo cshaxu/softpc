@@ -39,8 +39,11 @@ lib_status ui_window_create(ui_window **out_window,
         ui_window_component_stop, ui_window_component_dispose);
     if (status == LIB_STATUS_OK) status = ui_window_worker_start(window);
     if (status != LIB_STATUS_OK) {
-        ui_component_mailboxes_destroy(&window->base.mailboxes);
-        lib_release(window);
+        /* The worker start path has either joined its failed worker or has
+         * entered the process-terminal failure path at the application edge.
+         * A normal create failure never exposes a half-created Window. */
+        if (window->worker_state == LIB_NULL)
+            ui_window_component_dispose(&window->base);
         return status;
     }
     *out_window = window;

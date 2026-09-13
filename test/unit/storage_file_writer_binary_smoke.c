@@ -1,8 +1,22 @@
 #include "lib/storage/file_interface.h"
+#include "lib/types/file.h"
 #include "test_cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>
+
+static int reject_close;
+static unsigned close_calls;
+static int close_stream(FILE *stream)
+{
+    int result = fclose(stream);
+    ++close_calls;
+    return reject_close ? EOF : result;
+}
+#undef lib_c_fclose
+#define lib_c_fclose close_stream
+#include "lib/storage/file.c"
+#include "lib/storage/medium.c"
 
 int main(void)
 {
@@ -23,6 +37,14 @@ int main(void)
     assert(fgetc(file) == EOF);
     assert(fclose(file) == 0);
     assert(lib_memory_compare(actual, payload, sizeof(payload)) == 0);
+    lib_storage_medium *medium = NULL;
+    assert(lib_storage_medium_open(path, LIB_STORAGE_MEDIUM_READONLY, &medium) == LIB_STATUS_OK);
+    unsigned prior = close_calls;
+    reject_close = 1;
+    assert(lib_storage_medium_destroy(&medium) == LIB_STATUS_IO_ERROR);
+    assert(medium == NULL && close_calls == prior + 1);
+    assert(lib_storage_medium_destroy(&medium) == LIB_STATUS_OK);
+    assert(close_calls == prior + 1); /* Consumed close must never be retried. */
     assert(softpc_test_remove_image(path));
     return 0;
 }

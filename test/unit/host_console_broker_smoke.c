@@ -55,7 +55,7 @@ lib_status host_console_backend_create(host_console_backend **out_native)
     return LIB_STATUS_OK;
 }
 
-void host_console_backend_destroy(host_console_backend *native_console)
+lib_status host_console_backend_destroy(host_console_backend *native_console)
 {
     assert(native_console->active==NULL);
     ++disposals;
@@ -64,6 +64,7 @@ void host_console_backend_destroy(host_console_backend *native_console)
 #else
     (void)native_console;
 #endif
+    return LIB_STATUS_OK;
 }
 
 lib_status host_console_backend_prepare(host_console_backend *native_console,

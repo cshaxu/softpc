@@ -1,3 +1,4 @@
+#include "host/status.h"
 #include "monitor.h"
 
 #ifdef _WIN32
@@ -29,19 +30,25 @@ int app_monitor_console_create(app_monitor_console **out_monitor,
     app_control_queue *control_queue)
 {
     app_monitor_console *monitor;
+    lib_status status;
     if (out_monitor == NULL || control_queue == NULL) return 0;
     *out_monitor = NULL;
     monitor = calloc(1u, sizeof(*monitor));
     if (monitor == NULL) return 0;
     monitor->control_queue = control_queue;
-    if (lib_console_create(&monitor->console) != LIB_STATUS_OK ||
-        lib_console_set_event_sink(monitor->console, app_monitor_receive,
-            monitor) != LIB_STATUS_OK ||
-        host_console_broker_create(&monitor->broker, monitor->console,
-            HOST_CONSOLE_COOKED_LINES) != LIB_STATUS_OK) {
+    status = lib_console_create(&monitor->console);
+    if (status != LIB_STATUS_OK ||
+        (status = lib_console_set_event_sink(monitor->console,
+            app_monitor_receive, monitor)) != LIB_STATUS_OK) {
         app_monitor_console_destroy(monitor);
         return 0;
     }
+    status = host_console_broker_create(&monitor->broker, monitor->console,
+        HOST_CONSOLE_COOKED_LINES);
+    /* A failed native Console activation can leave a reader that cannot be
+     * proved quiescent.  It is an application-terminal infrastructure fault,
+     * not a partly-created monitor for the caller to unwind. */
+    softpc_host_require_status(status, "host_console_broker_create");
     *out_monitor = monitor;
     return 1;
 }
@@ -49,7 +56,8 @@ int app_monitor_console_create(app_monitor_console **out_monitor,
 void app_monitor_console_destroy(app_monitor_console *monitor)
 {
     if (monitor == NULL) return;
-    host_console_broker_destroy(monitor->broker);
+    softpc_host_require_status(host_console_broker_destroy(monitor->broker),
+        "host_console_broker_destroy");
     if (monitor->console != NULL) {
         (void)lib_console_set_event_sink(monitor->console, NULL, NULL);
         lib_console_release(monitor->console);

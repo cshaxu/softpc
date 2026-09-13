@@ -17,10 +17,12 @@ typedef struct ui_window_options {
     lib_bool initial_frozen;
 } ui_window_options;
 
+/* On failure a non-NULL output retains cleanup ownership if the started worker
+ * could not be joined. Never free callback context until destroy succeeds. */
 lib_status ui_window_create(ui_window **out_window,
     const ui_window_options *options);
 lib_status ui_window_publish_frame(ui_window *window, const ui_frame *frame);
-/* Same checked destruction/retained-on-failure contract as ui_component_destroy. */
+/* Same checked destruction contract as ui_component_destroy. */
 lib_status ui_window_destroy(ui_window *window);
 lib_status ui_window_set_title(ui_window *window, const char *title);
 /* Freeze atomically prevents future capture, stops the Window-local cursor

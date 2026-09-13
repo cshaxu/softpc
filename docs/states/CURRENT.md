@@ -2,37 +2,34 @@
 
 ## Current Work
 
-M9 T55 S17 is active: fix the reported Window cursor position and audit the
-whole shared-library failure/lifetime chain. S16 is delivered, not manually
-accepted. T55 remains open. Owner package INI edits are preserved.
+M9 T55 S18 is admitted: complete S17 G1-G6 using the smallest correct failure
+and ownership contract.  Synchronous request rejection returns `lib_status`;
+accepted asynchronous UI work reports its first failure once through the
+existing sink; only live native-worker join barriers reach SoftPC's terminal
+infrastructure boundary.  S17 delivery remains unaccepted by manual testing;
+its 55/56 package limitation is carried into S18 verification. T55 remains
+open. Owner package INI and media are preserved.
 
-S17 cursor implementation and all-component audit were delivered in P1 c09220e. Both
-EXEs built; each full CTest run passed 55/56. Package stage 5 assumes raw Console
-but owner configuration selects Window; no full package acceptance is claimed.
-Remaining global contract findings and proposed repair boundaries are retained
-in the linked S17 evidence/TODO, not declared fixed. Await owner cursor testing
-and admission of the unified fault/ownership design.
-
-## M9 T55 S17 Packet
+## M9 T55 S18 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner requires cursor repair and global lib audit, explicitly rejecting local-only fault repairs. |
-| Objective | Correct percentage-to-scanline producer semantics and inventory whole-lib failure, notification and disposal contracts with a unified repair design. |
-| Non-goals | No MVDM, media, mouse changes, deferred CLS fix or T closure; do not silently broaden public ABI. |
-| Reference Baseline | 77d3d7f; S16 55/55 both widths; owner-modified package INI. |
+| Admission And Approval | Owner approved a minimal, uniform interaction contract: rejection status before acceptance, once-only component failure after acceptance, and one terminal boundary for unjoinable live native workers. |
+| Objective | Resolve S17 G1-G6 across lib/platform/app boundaries without promoting ordinary synchronization or cleanup into application-wide error plumbing. |
+| Non-goals | No MVDM/media changes, product lifecycle redesign, deferred CLS fix, Linux parity expansion, new error framework, extra queue/worker/retry path, or T closure. |
+| Reference Baseline | 4c06235; both builds and 55/56 CTest, with preserved display=window INI and known package fixture mismatch. |
 | Candidate Proposal | [Shared-library audit repairs](../proposals/m9-lib-activation-audit-repairs.md). |
-| Files And ABI Surface | app runtime cursor conversion/test; all lib components audited, no new public ABI without design approval. |
+| Files And ABI Surface | Seven lib components, Windows/Linux implementations, changed public/support status and callback contracts, all callers/tests; [S18 brief](../etc/evidence/m9-t55-s18-unified-status-contract.md). |
 | Applicable Rules | Architecture, coding, execution and documentation rules/skills and design authorities. |
-| Verification | Producer-to-render cursor matrix, actual runtime frame, dual builds/full CTest, lib gates; deterministic fault probes and all-component ledger. |
-| Expected Markers | Bottom-aligned percent conversion uses actual font height; gaps named with complete operation chains rather than concealed by passing tests. |
+| Verification | Deterministic native-failure/ownership matrices, complete glyph/cursor and delayed-phase proofs, dual builds/full tests, configuration-aware package test, manifest/DAG/governance gates. |
+| Expected Markers | No hidden failed completion or freed live dependency; first fault reported independently of retirement; no half-object create contract; no duplicate production error path. |
 | Asset Needs | Refresh fixed x86/x64 EXEs only; preserve media and INI bytes. |
-| Reporting Requirements | Root cause, whole-lib ledger, remaining gap design, exact changed-path count, complete P push and coordinator review. |
-| Stop Conditions | New external ABI/behavior decisions need owner approval; never declare known fault gaps fixed or infer manual acceptance. |
-| Exit Criteria | Cursor fixed/proved and EXEs delivered; global audit and proposed repair boundaries recorded; not global fault-repair closure. |
-| Original Owner Request | “光标位置完全错了…要求修复…我要你全局审计而不是局部审计和修复”. |
-| Similar-Issue Sweep | All lib components and app consumers: creation, notification, sink failure, worker retirement, wait, resource release; cursor producer/consumer unit consistency. |
+| Reporting Requirements | Complete G1-G6 ledger, API/ownership changes, changed-path/line accounting, tests, complete executor P push and separate actual-diff coordinator review. |
+| Stop Conditions | Do not invent recovery policy, extra worker/queue, platform parity, owner test acceptance or successful regression; expose any necessary scope expansion. |
+| Exit Criteria | All admitted ledger rows proved, callers migrated, obsolete paths removed, both EXEs/tests and gates verified, commit/push; wait for manual testing and keep T55 open. |
+| Original Owner Request | “主要是api要有统一的状态返回值 调用方采用统一的状态处理机制…按这个思路 统一解决 准入一个s任务”. |
+| Similar-Issue Sweep | Whole create/accept/notify/fail/join/dispose chains across every component and app consumer; include startup exits, both platform implementations and expected-outcome exceptions. |
 
 ## Current Technical Baseline
 
@@ -43,8 +40,9 @@ and admission of the unified fault/ownership design.
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
-  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus passes 55/55
-  fixed x64 and x86 CTest; its path-scoped standalone MSVC
+  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus has S17 x64/x86
+  builds with 55/56 CTest (package fixture expects Console with a Window INI);
+  standalone library gates pass 3/3. Its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 
 ## Recent M9 Closures

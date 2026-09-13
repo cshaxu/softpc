@@ -94,9 +94,14 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_console_worker(void *opaque)
         ui_component_control control;
         ui_frame frame;
         ui_mailbox_wake_wait_result wake;
+        lib_status wait_status;
 
-        wake = ui_mailbox_wake_wait(
-            ui_component_mailboxes_wake(&console->base.mailboxes), LIB_UINT32_MAX);
+        wait_status = ui_mailbox_wake_wait(
+            ui_component_mailboxes_wake(&console->base.mailboxes), LIB_UINT32_MAX, &wake);
+        if (wait_status != LIB_STATUS_OK) {
+            ui_component_fail(&console->base, wait_status);
+            break;
+        }
         if (lib_atomic_i32_load_explicit(&console->base.stopping,
                 LIB_MEMORY_ORDER_ACQUIRE) != 0) break;
         if (wake != UI_MAILBOX_WAKE_WAIT_WAKE) {
@@ -150,7 +155,8 @@ lib_status ui_console_worker_start(ui_console *console)
     }
     state->worker = lib_win32_create_thread(LIB_NULL, 0u, ui_console_worker, console, 0u, LIB_NULL);
     if (state->worker == LIB_NULL) {
-        (void)lib_console_set_event_sink(console->logical_console, LIB_NULL, LIB_NULL);
+        if (lib_console_set_event_sink(console->logical_console, LIB_NULL, LIB_NULL) != LIB_STATUS_OK)
+            return LIB_STATUS_IO_ERROR;
         console->worker_state = LIB_NULL;
         lib_release(state);
         return LIB_STATUS_NO_MEMORY;
@@ -168,7 +174,7 @@ lib_status ui_console_worker_join(ui_console *console, lib_u32 timeout_ms)
      * consume it before detaching the event sink or releasing state. */
     if (lib_win32_wait_for_single_object(state->worker, timeout_ms) != LIB_WIN32_WAIT_OBJECT_0)
         return LIB_STATUS_IO_ERROR;
-    lib_win32_close_handle(state->worker);
+    if (!lib_win32_close_handle(state->worker)) return LIB_STATUS_IO_ERROR;
     console->worker_state = LIB_NULL;
     lib_release(state);
     return LIB_STATUS_OK;
