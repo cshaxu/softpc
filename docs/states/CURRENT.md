@@ -2,8 +2,8 @@
 
 ## Current Work
 
-M9 T55 S11 is verified, preparing executor delivery: Window activation ordering.
-S10 delivery was accepted for continuation; T55 remains open.
+M9 T55 S11 is delivered for owner testing: Window activation ordering.
+Executor P1 `16fa420` was pushed and its actual diff reviewed; T55 remains open.
 
 ## M9 T55 S11 Packet
 

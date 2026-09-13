@@ -66,6 +66,17 @@ explicitly transferred to [TODO](../states/TODO.md), not claimed fixed by S11.
   owner Win3.1 fullscreen pause/resume verification; OS foreground policy is
   not overridden. T55 remains open.
 
+### S11 coordinator review
+
+Reviewed pushed executor `16fa420` using `git show`, the original requests,
+owner's narrowed mode-roundtrip report and the actual eight code/test paths.
+Console binding precedes final Window activation; no app Win32 focus call,
+new mailbox, timer, capture or VM lifecycle command was added. Both EXEs match
+the tested build. No MVDM, media, INI or compatibility-buffer diff remains.
+The scope ledger is satisfied by tested focus changes and the owner's explicit
+separate-handling decision for the mode-roundtrip defect. Delivery is accepted
+for owner testing, not declared a T55 closure or proof of that deferred fix.
+
 ## S10 admission: complete approved audit repair set
 
 Owner: “按照这些协议，把前面我批准的所有修复做一下，好了就提交推送，然后让我来测。”
