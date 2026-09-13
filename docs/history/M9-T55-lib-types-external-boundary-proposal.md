@@ -77,6 +77,25 @@ documentation-selftest fixtures from these two builds were removed; configured
 build trees and compact CTest evidence remain. The seven repairs are delivered
 for owner testing; neither a manual Win3.1 acceptance nor T55 closure is claimed.
 
+### S12 coordinator review
+
+Reviewed pushed P1 `a3e7797` with `git show --stat`, `git show --check`, the
+actual changed production paths, the original seven-item ledger and retained
+test evidence. Binding notification preserves the component DAG and stays
+outside native output locking; only the existing Console worker renders.
+Both leaf captures are acknowledged, so no legacy consuming caller remains.
+Rollback uses post-join request state; normal cooked activation remains idle.
+Key identity retains one held ledger, client geometry commits only on success,
+and blink uses the existing deadline without a second timer or message source.
+Linux simplification and neutral host prose match the approved scope.
+
+All seven rows have implementation and focused proof, with full x86/x64 package
+regression. The corrected synthetic X scan retains the test's original expected
+behavior. Source/INI/media exclusions and changed-line accounting were checked
+against the committed paths. Delivery is accepted for owner testing; S12 is not
+declared owner-accepted and T55 remains open. The existing separate mode-roundtrip
+TODO is unchanged and is not claimed fixed by these repairs.
+
 ## S11 admission: text clearing and unfreeze activation
 
 Owner: “噢好的。请你修复这两点。” Baseline `54fe10e`.

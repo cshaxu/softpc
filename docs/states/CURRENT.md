@@ -2,9 +2,10 @@
 
 ## Current Work
 
-M9 T55 S12 is implemented and verified: all seven approved shared-library
-audit repairs, both fixed EXEs and 52/52 CTest at each width. Executor delivery
-is ready for commit/push and coordinator review. S11 remains closed; T55 is open.
+M9 T55 S12 is verified and awaiting owner testing: all seven approved
+shared-library audit repairs, both fixed EXEs and 52/52 CTest at each width.
+Executor P1 `a3e7797` is pushed; coordinator reviewed its actual committed diff
+against the seven-item ledger. S11 remains closed; T55 is open.
 
 ## M9 T55 S12 Packet
 
