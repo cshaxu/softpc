@@ -22,7 +22,7 @@ open. Owner package INI and media are preserved.
 | Candidate Proposal | [Shared-library audit repairs](../proposals/m9-lib-activation-audit-repairs.md). |
 | Files And ABI Surface | Seven lib components, Windows/Linux implementations, changed public/support status and callback contracts, all callers/tests; [S18 brief](../etc/evidence/m9-t55-s18-unified-status-contract.md). |
 | Applicable Rules | Architecture, coding, execution and documentation rules/skills and design authorities. |
-| Verification | Deterministic native-failure/ownership matrices, complete glyph/cursor and delayed-phase proofs, dual builds/full tests, configuration-aware package test, manifest/DAG/governance gates. |
+| Verification | Deterministic native-failure/ownership matrices, complete glyph/cursor and delayed-phase proofs, fresh x64/x86 56/56 CTest, strict-library 3/3 CTest, configuration-aware package test, manifest/DAG/governance gates. |
 | Expected Markers | No hidden failed completion or freed live dependency; first fault reported independently of retirement; no half-object create contract; no duplicate production error path. |
 | Asset Needs | Refresh fixed x86/x64 EXEs only; preserve media and INI bytes. |
 | Reporting Requirements | Complete G1-G6 ledger, API/ownership changes, changed-path/line accounting, tests, complete executor P push and separate actual-diff coordinator review. |

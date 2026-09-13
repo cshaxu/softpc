@@ -63,6 +63,21 @@ is dual-width build/CTest, strict-library CTest, manifest, and documentation
 boundary gates.  The owner alone performs final interactive package acceptance;
 T55 remains open after S18 delivery.
 
+## Executor and coordinator record
+
+P1 is `07b149e` (`M9 T55 S18 P1: simplify shared failure boundaries`). The
+post-commit coordinator audit found one over-broad application boundary only:
+ordinary host synchronization had been treated like worker teardown. The final
+corpus keeps `softpc_host_require_status` only for UI and native-Console
+creation/destruction, where a live worker or reader may still exist. The
+source-boundary gate enforces that narrow set and does not require application
+handling for event signal, reset, lock, or reference-release mechanics.
+
+Fresh x64 and x86 builds completed. Each width completed all 56 CTest cases;
+the strict-library build completed its three library checks. The manifest,
+component-boundary and documentation-governance checks also passed. The two
+fixed package executables are refreshed in `assets/binary/`.
+
 ## Non-goals
 
 No MVDM/media change, product lifecycle redesign, new error manager, retry
