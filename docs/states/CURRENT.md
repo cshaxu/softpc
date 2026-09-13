@@ -2,32 +2,31 @@
 
 ## Current Work
 
-M9 T55 S20 is admitted: make library pointer-output failures deterministic and
-turn the approved component DAG into a source-level as well as build-level
-gate, including canonical source include spelling. It also removes narrow local
-contract/ownership and no-op forwarding tails. T55 remains open.
+M9 T55 S21 is admitted: rename the shared keyboard/video/mouse corpus from
+`ui-*` to `kvm-*` without changing its behavior or extending it to the cooked
+monitor. T55 remains open.
 Owner package INI and media are preserved.
 
-## M9 T55 S20 Packet
+## M9 T55 S21 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approved the post-S19 audit's pointer-output contract sweep, source-DAG verifier, and two narrow local contract cleanups. |
-| Objective | Make lib failure outputs deterministic and component boundaries mechanically enforceable without changing product behavior. |
-| Non-goals | No MVDM/media changes, product lifecycle redesign, frame/broker/UI-leaf merger, Linux parity expansion, new error framework, extra queue/worker/retry path, ABI signature change, or T closure. |
-| Reference Baseline | 88e52bb; clean worktree, dual-width S19 56/56 CTest, strict library gates, preserved package INI/media. |
-| Candidate Proposal | [S20 contract and boundary gates](../proposals/m9-t55-s20-lib-contract-and-boundary-gates.md). |
-| Files And ABI Surface | Applicable lib output APIs, component-DAG verifier and focused tests, ui-console/storage local status/ownership paths, one internal ui-window forwarding helper, and current baseline prose; no public function signature change. |
+| Admission And Approval | Owner accepted S20 manual testing and directed this pure rename: `ui-base` -> `kvm-base`, `ui-window` -> `kvm-window`, `ui-console` -> `kvm-console`, with their symbols renamed to `kvm`. |
+| Objective | Make the shared corpus accurately name its keyboard/video/mouse responsibility while preserving every existing runtime behavior and boundary. |
+| Non-goals | No MVDM/media change, monitor migration, product UI redesign, lifecycle/input semantic change, ABI shape change other than mechanical identifier/path spelling, new queue/worker, Linux parity expansion, or T closure. |
+| Reference Baseline | 2ea35ce; clean S20 P2 commit, x64/x86 57/57 CTest, strict library 6/6, preserved package media; owner accepted manual package testing. |
+| Candidate Proposal | [S21 kvm corpus rename](../proposals/m9-t55-s21-kvm-corpus-rename.md). |
+| Files And ABI Surface | `src/lib/ui-*` directories and all affected lib/app/test CMake paths, `ui_`/`UI_` symbols, lib prose/manifest/DAG fixtures, and application consumers; no behavioral API contract change. |
 | Applicable Rules | Architecture, coding, execution and documentation rules/skills and design authorities. |
-| Verification | Focused output-contract/DAG/status proofs, fresh x64/x86 builds and full CTest, strict library CTest, manifest/DAG/documentation gates. |
-| Expected Markers | Applicable pointer outputs are null after failure; forbidden direct and relative source includes fail the gate; local status/ownership and no-op forwarding tails are gone. |
+| Verification | Zero-old-name source/path gate, focused renamed UI/KVM tests, fresh x64/x86 builds and full CTest, strict library CTest, manifest/DAG/source-boundary/documentation gates. |
+| Expected Markers | No production, test, CMake, manifest, or current documentation reference to `ui-base`, `ui-window`, `ui-console`, `ui_`, or `UI_` remains except retained historical records; `kvm-*` components retain the same allowed DAG. |
 | Asset Needs | Refresh fixed x86/x64 EXEs only; preserve media and INI bytes. |
 | Reporting Requirements | Frozen ledger, changed-path/line accounting, focused/full tests, executor P push and separate actual-diff coordinator review. |
-| Stop Conditions | Do not merge components, change UI/product semantics, create a runtime boundary layer, loosen the DAG, or expand storage behavior. |
-| Exit Criteria | Each ledger row is implemented/proved, all applicable pointer-output hits are disposed, builds/tests/gates pass, commit/push; wait for manual testing and keep T55 open. |
-| Original Owner Request | “批准。” |
-| Similar-Issue Sweep | All production output-pointer APIs, all quoted lib component includes, and all same-class null/no-op or transferred-ownership cleanup paths. |
+| Stop Conditions | Do not rename or alter the cooked monitor as KVM, leave a parallel old spelling, change data/layout/control semantics, loosen the DAG, or alter MVDM. |
+| Exit Criteria | Every admitted spelling/path is mechanically migrated, zero-old-name gate and all builds/tests/gates pass, commit/push; await manual package testing and keep T55 open. |
+| Original Owner Request | “ui-base 改名 kvm-base; ui-window -> kvm-window; ui-console -> kvm-console.” |
+| Similar-Issue Sweep | All non-historical `ui` component paths, identifiers, CMake targets, source includes, test names, manifest entries, component prose, and app consumers. |
 
 ## Current Technical Baseline
 

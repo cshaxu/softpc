@@ -1,7 +1,7 @@
 # M9 T55 S20: lib contract and boundary gates
 
-The admitted S20 scope is recorded in
-[`m9-t55-s20-lib-contract-and-boundary-gates.md`](../../../proposals/m9-t55-s20-lib-contract-and-boundary-gates.md).
+The admitted S20 scope is retained in
+[`M9-T55-S20-lib-contract-and-boundary-gates.md`](../../../history/M9-T55-S20-lib-contract-and-boundary-gates.md).
 
 ## Frozen-ledger disposition
 
