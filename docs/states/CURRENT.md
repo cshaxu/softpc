@@ -6,7 +6,7 @@ M9 T55 S17 is active: fix the reported Window cursor position and audit the
 whole shared-library failure/lifetime chain. S16 is delivered, not manually
 accepted. T55 remains open. Owner package INI edits are preserved.
 
-S17 cursor implementation and all-component audit are complete locally. Both
+S17 cursor implementation and all-component audit were delivered in P1 c09220e. Both
 EXEs built; each full CTest run passed 55/56. Package stage 5 assumes raw Console
 but owner configuration selects Window; no full package acceptance is claimed.
 Remaining global contract findings and proposed repair boundaries are retained

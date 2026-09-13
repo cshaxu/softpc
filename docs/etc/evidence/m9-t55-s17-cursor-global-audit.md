@@ -178,10 +178,20 @@ injection or actual Linux runtime validation is made.
 ## Executor delivery accounting
 
 Production: one C path (`app/runtime.c`), +13/-3. Tests: two C paths,
-+29/-0 including the new 26-line fixture. Build wiring: one path, +9/-0.
-Total code/build +51/-3, net +48; no lib production or public header changes.
-Method: `git diff --numstat 77d3d7f` plus new fixture line count before staging.
++30/-0 including the new 27-line fixture. Build wiring: one path, +9/-0.
+Total code/build +52/-3, net +49; no lib production or public header changes.
+Method: `git diff --numstat 77d3d7f c09220e` (including blank lines).
 The runtime is the sole percentage-to-scanline owner; no parallel rendering path.
 Standalone library gates 3/3 and documentation governance passed. Both EXEs
 are delivered for manual cursor testing, not as a clean full-regression claim.
 S17/T55 remain open; P delivery does not imply owner acceptance.
+
+## Coordinator review of P1 c09220e
+
+Reviewed actual committed diff, not executor summary: 13 changed paths;
+production conversion stays in runtime, literal lib cursor semantics preserved;
+no src/lib, MVDM or media changes. Owner INI change is only display=window and
+was preserved. Corrected line accounting to include the fixture's blank line.
+Documentation gate passed after the commit. Accept this as cursor implementation
+and audit delivery only: package tests are 55/56, global G1-G6 remain open, and
+neither manual acceptance nor S/T closure is granted by this review.
