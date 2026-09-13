@@ -78,6 +78,7 @@ static void assert_registered_raw_chord(lib_u32 trigger, const char *identifier)
     assert(ui_keyboard_submit_transition(&capture, normalize_and_match,
         0x1du, LIB_WIN32_KEY_CONTROL, 0u, 0u, 0));
     assert(capture.count == 1u);
+    ui_hotkey_matcher_discard(&capture.matcher);
 }
 
 int main(void)
@@ -164,11 +165,15 @@ int main(void)
         UI_HOTKEY_MODIFIER_ALT));
 
     /* A scan-less RDP key followed by its WM_CHAR must not inject twice. */
-    ui_keyboard_note_recovered_key(&normalizer, 'A');
-    assert(ui_keyboard_consume_duplicate_character(&normalizer,
-        L'a'));
-    assert(!ui_keyboard_consume_duplicate_character(&normalizer,
-        L'a'));
+    capture.count = 0;
+    ui_keyboard_record record = { UI_KEYBOARD_TRANSITION, 0, 'A', 0, 0, 0, 1 };
+    assert(ui_keyboard_submit_record(&normalizer, &capture, capture_key, &record));
+    record.kind = UI_KEYBOARD_CHARACTER; record.utf16 = 'a';
+    assert(ui_keyboard_submit_record(&normalizer, &capture, capture_key, &record));
+    assert(capture.count == 1); /* not a second make/break */
+    record.kind = UI_KEYBOARD_TRANSITION; record.pressed = 0;
+    assert(ui_keyboard_submit_record(&normalizer, &capture, capture_key, &record));
+    assert(capture.count == 2);
 
     /* UTF-16 input uses the active host layout to synthesize make/break;
        it never places text directly in guest memory. */

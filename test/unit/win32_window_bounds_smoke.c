@@ -1,8 +1,8 @@
-#include "lib/ui-window/win32/geometry.h"
+#include "lib/ui-window/geometry.h"
 
 #include <assert.h>
 
-static void assert_inside(const RECT *inner, const RECT *outer)
+static void assert_inside(const ui_window_rect *inner, const ui_window_rect *outer)
 {
     assert(inner->left >= outer->left);
     assert(inner->top >= outer->top);
@@ -12,17 +12,17 @@ static void assert_inside(const RECT *inner, const RECT *outer)
 
 int main(void)
 {
-    RECT work_area = { 0, 0, 1920, 1080 };
-    RECT fitted;
+    ui_window_rect work_area = { 0, 0, 1920, 1080 };
+    ui_window_rect fitted;
 
-    assert(ui_win32_fit_outer_rect(&work_area, 680, 560, &fitted));
+    assert(ui_window_fit_outer_rect(&work_area, 680, 560, &fitted));
     assert(fitted.right - fitted.left == 680);
     assert(fitted.bottom - fitted.top == 560);
     assert_inside(&fitted, &work_area);
 
     work_area.right = 600;
     work_area.bottom = 900;
-    assert(ui_win32_fit_outer_rect(&work_area, 680, 560, &fitted));
+    assert(ui_window_fit_outer_rect(&work_area, 680, 560, &fitted));
     assert(fitted.right - fitted.left == 600);
     assert(fitted.bottom - fitted.top == 494);
     assert_inside(&fitted, &work_area);
@@ -31,7 +31,7 @@ int main(void)
     work_area.top = 50;
     work_area.right = 1700;
     work_area.bottom = 450;
-    assert(ui_win32_fit_outer_rect(&work_area, 680, 560, &fitted));
+    assert(ui_window_fit_outer_rect(&work_area, 680, 560, &fitted));
     assert(fitted.right - fitted.left == 485);
     assert(fitted.bottom - fitted.top == 400);
     assert_inside(&fitted, &work_area);
@@ -43,7 +43,7 @@ int main(void)
     {
         int client_width;
         int client_height;
-        assert(ui_win32_fit_client_size(&work_area, 16, 39, 640, 480,
+        assert(ui_window_fit_client_size(&work_area, 16, 39, 640, 480,
             &client_width, &client_height));
         assert(client_width == 584);
         assert(client_height == 438);

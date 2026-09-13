@@ -1,5 +1,102 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S6 admission: complete key lifetimes and common normalization
+
+Owner: “准入下一个S任务修复以上问题；类似问题也要扫描同样思路处理”.
+Original feedback: “有没有系统性的方案解决？我不想添油战术”;
+“如何保证ui-console和ui-window能同样处理？…是不是应该统一制作和进入ui-base的字符处理?”;
+geometry: “同意！类似问题记得一并处理。” Baseline `2f9d9f1`.
+S5 is the delivered baseline, not proof that follow-up findings are absent.
+
+| Frozen sweep | Sole owner/disposition | Proof |
+| --- | --- | --- |
+| All matcher transitions and leaf callers | ui-base replaces three key collections with one ordered held-key ledger: pending, delivered or consumed until release. Ordinary/modifier keys obey the same lifetime; repeats reuse entries; delivered never becomes consumed. | P-before-modifiers retains break; both sides; mismatch/mouse/repeat/chords/rejection and permutation matrix. |
+| All lib key/text submissions | One ui-base copied-record entry: Window marshals separate messages, Console combined records; shared decoding, surrogate and deduplication before existing matcher/sink. | Equal separate/combined output, scan-less RDP recovery, BMP/surrogates, no text on break, malformed/rejected input and actual adapters. |
+| All Window rectangle adapters/callers | Neutral arithmetic, conversions only at SDK boundaries; remove calculation-forwarding wrappers, keep actual native operations. | Bounds/aspect/cursor/dirty regression and no conversion round trip. |
+
+Held-key storage grows for distinct simultaneous keys only, not repeats or
+released keys. Allocation/delivery failure uses existing terminal failure;
+retirement/destroy releases storage. No retry or new component.
+A physical transition consumes its corresponding character; only text without
+a usable physical representation enters UTF-16. State is per source. Only
+attempted rejected delivery triggers sink failure, not unrecognized raw input.
+
+Non-goals: MVDM, app lifecycle, INI/media, Console mouse scale, overlay indexing,
+app ABI and Linux UI parity. DAG unchanged. Focused tests, full x64/x86, strict
+lib/manifest/governance and peer dispositions precede complete P push and
+actual-diff review. T55 remains open.
+
+### S6 executor verification and peer dispositions
+
+Implementation retains the existing registry and component failure/frozen
+filter; one ordered dynamically sized ledger replaces three partial key lists.
+All held keys use pending/delivered/consumed states. Repeat adds no entry;
+release removes it in stable order; partial delivery and allocation failure
+cannot retry the stream. Retirement clears storage and destroy also covers
+workerless cleanup. types gained only header-only realloc/memmove/SIZE_MAX
+vocabulary, not behavior or an OS dependency.
+
+Every production leaf keyboard path now calls ui_keyboard_submit_record:
+Window transition and WM_CHAR, and Console's combined record callback.
+Low-level transition/UTF-16 operations remain in ui-base for implementation and
+focused diagnostics; three old recovery/deduplication support entry points are
+removed. The static source gate rejects low-level bypasses from either leaf,
+including split-line calls; negative/positive probes cover both consumers.
+Window's established translated-character scan convention is preserved, so
+queued physical A/B followed by their characters does not duplicate input.
+Independent character records use zero scan; raw Console physical records
+consume their attached character, while text-only press records use shared
+UTF-16. Text-only releases produce no duplicate. No text interpretation is
+added to either leaf.
+
+Rectangle sweep: removed display/map-dirty/fit-outer/fit-client forwarding
+wrappers and updated all callers. Dirty and cursor paths no longer convert
+neutral -> SDK -> neutral. Monitor work-area input converts once; invalidation
+and cursor drawing convert once at their SDK boundary. Two rectangle marshalling
+helpers and native resize/maximize/sizing operations are retained because they
+actually cross the SDK boundary. Arithmetic remains in ui-window root.
+
+Focused proof: 432 combinations (three registered trigger keys, four left/right
+modifier choices, six make orders and six break orders), with sixteen trigger
+repeats per combination, assert balanced delivered key lifetimes and correct
+hotkey counts. Additional tests cover 64 distinct held identities, pending
+repeats, both Ctrl sides, mouse interleaving, frozen filtering, allocation
+failure and partial replay rejection. Both actual native adapter bodies are
+exercised with controlled context lookup (no desktop focus ownership): physical
+scan/no-scan input, delayed translated characters, a text-only surrogate pair
+and its breaks, malformed input, rejected sink and no later input.
+
+The new test initially exceeded the Windows stack with three large frame
+fixtures and omitted the required failure sink; fixtures were corrected before
+acceptance. Later assertion indices were corrected after adding the delayed
+character case. No production error was hidden by weakening existing tests.
+
+Final fixed-preset builds updated both package EXEs. x64 full CTest passed
+50/50 (61.85 s); x86 passed 50/50 (70.05 s). Strict standalone lib built with
+-Wall/-Wextra/-Wpedantic/-Werror and passed 3/3. Expanded whitespace-negative
+source-gate self-test passed again after the full runs; manifest/governance
+are rechecked before delivery. Linux common input/wait contract fakes pass;
+Linux desktop execution is not claimed.
+
+Sweep commands: rg over every lib keyboard submit/normalizer/matcher field
+and every ui-window rect conversion/caller; actual diff inspection for all
+changed paths. Obsolete matcher collections, recovery helpers and four
+calculation wrappers have no live callers. Library component edges, external
+declaration gate and source-boundary tests pass. No app, standalone host,
+MVDM, media, user INI, Console mouse scaling or overlay implementation changed.
+No new deferred debt. Fixed build caches are retained; no scratch build tree
+or source diagnostic was introduced. T55 remains open for owner inspection.
+
+Accounting against `2f9d9f1` using `git diff --cached --numstat`:
+production C/H 10 paths, +212/-254 (net -42); test C 5 paths, +233/-26
+(net +207); CMake/gates 3 paths, +21/-1 (net +20). Docs, manifest and EXEs
+are excluded. The test growth is the deterministic lifecycle/adapter matrix;
+production removes more code than it adds.
+
+Package SHA256:
+- softpc32.exe: `5A65F61C2A7AA946A65B3CE45BF33FA0E5167F5DC5824A22EC2A04A9BBB4C016`
+- softpc64.exe: `F55BDB732FC2D091EB432B6651CF92E6652C729B1E370989763AD39E2C4F0BCD`
+
 ## S5 admission: identities, independent gates and minimal ownership
 
 Owner: “以上，开始清理。” Baseline `183fc8f`; T55 remains open.

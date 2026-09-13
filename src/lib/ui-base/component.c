@@ -131,6 +131,7 @@ void ui_component_destroy(ui_component *component)
         return;
     }
     component->join_worker(component);
+    ui_hotkey_matcher_discard(&component->hotkey_matcher);
     component->dispose(component);
 }
 

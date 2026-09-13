@@ -92,7 +92,7 @@ int main(void)
     reject_at = 2;
     assert(!key('A', 0x1e, 1, 3));
     assert(count == 1 && delivered[0].data.key.key == UI_KEY_CONTROL);
-    assert(window.base.hotkey_matcher.pending_count == 0);
+    assert(window.base.hotkey_matcher.held_count == 0);
     assert(!key('B', 0x30, 1, 0));
     assert(attempts == 2 && count == 1);
     assert(ui_window_publish_frame(&window, &frame) == LIB_STATUS_INVALID_STATE);

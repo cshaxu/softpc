@@ -29,37 +29,6 @@ int ui_keyboard_submit_transition(void *context, ui_input_sink sink,
         record_flags, hotkey_modifiers, pressed);
 }
 
-void ui_keyboard_note_recovered_key(
-    ui_keyboard_normalizer *state, lib_u16 virtual_key)
-{
-    lib_u16 scan;
-    lib_u32 key;
-    if (state != LIB_NULL) state->recovered_virtual_key =
-        ui_keyboard_platform_transition(0u, virtual_key, &scan, &key) ? virtual_key : 0u;
-}
-
-void ui_keyboard_release_recovered_key(
-    ui_keyboard_normalizer *state, lib_u16 virtual_key)
-{
-    if (state != LIB_NULL && state->recovered_virtual_key == virtual_key)
-        state->recovered_virtual_key = 0u;
-}
-
-int ui_keyboard_consume_duplicate_character(
-    ui_keyboard_normalizer *state, lib_u16 code_unit)
-{
-    lib_u16 virtual_key;
-    lib_u8 modifiers;
-    int duplicate;
-
-    if (state == LIB_NULL || state->recovered_virtual_key == 0u || code_unit == 0u ||
-        (code_unit >= 0xd800u && code_unit <= 0xdfffu)) return 0;
-    duplicate = ui_keyboard_platform_map_scalar(code_unit, &virtual_key, &modifiers) &&
-        virtual_key == state->recovered_virtual_key;
-    state->recovered_virtual_key = 0u;
-    return duplicate;
-}
-
 static int ui_keyboard_submit_character(void *context,
     ui_input_sink sink, lib_u32 scalar)
 {
@@ -142,4 +111,37 @@ int ui_keyboard_submit_utf16(ui_keyboard_normalizer *state,
         return 0;
     }
     return ui_keyboard_submit_character(context, sink, code_unit);
+}
+
+int ui_keyboard_submit_record(ui_keyboard_normalizer *state, void *context,
+    ui_input_sink sink, const ui_keyboard_record *record)
+{
+    lib_u16 scan, key;
+    lib_u32 identity;
+    lib_u8 modifiers;
+    lib_bool physical;
+    if (state == LIB_NULL || sink == LIB_NULL || record == LIB_NULL) return 0;
+    if (record->kind == UI_KEYBOARD_CHARACTER) {
+        physical = record->scan != 0u ||
+            (state->character_key != 0u &&
+             ui_keyboard_platform_map_scalar(record->utf16, &key, &modifiers) &&
+             key == state->character_key);
+        state->character_key = 0u;
+        if (physical) return 1;
+        return ui_keyboard_submit_utf16(state, context, sink, record->utf16);
+    }
+    if (record->kind != UI_KEYBOARD_TRANSITION &&
+        record->kind != UI_KEYBOARD_COMBINED) return 0;
+    physical = ui_keyboard_platform_transition(record->scan, record->key, &scan, &identity);
+    if (physical) {
+        state->pending_high_surrogate = 0u;
+        state->character_key = record->kind == UI_KEYBOARD_TRANSITION &&
+            record->scan == 0u && record->pressed ? record->key : 0u;
+        return ui_keyboard_emit(context, sink, scan, identity,
+            record->flags, record->modifiers, record->pressed);
+    }
+    state->character_key = 0u;
+    if (record->kind == UI_KEYBOARD_COMBINED && record->pressed && record->utf16 != 0u)
+        return ui_keyboard_submit_utf16(state, context, sink, record->utf16);
+    return 1; /* No physical or character representation in this packet. */
 }

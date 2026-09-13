@@ -6,3 +6,6 @@ that object. It never opens, registers, or renders native Console I/O.
 The public component contract is cross-platform. This corpus currently has a
 supported Win32 implementation only; the Linux leaf is an intentional
 `LIB_STATUS_UNSUPPORTED` placeholder, not a claimed Linux presenter.
+
+Combined raw key/UTF-16 records enter ui-base's shared record normalizer.
+The Console adapter does not synthesize characters or decide text fallback.

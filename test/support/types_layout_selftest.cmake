@@ -123,3 +123,18 @@ file(WRITE "${fixture}/types/win32/probe.h" "#include SELECTED_HEADER\n")
 check_layout(fail)
 file(REMOVE "${fixture}/types/win32/probe.h")
 check_layout(pass)
+
+# Both leaves must use the same record-level decision, not a low-level bypass.
+foreach(leaf IN ITEMS ui-window ui-console)
+    set(input_probe "${fixture}/${leaf}/input_probe.c")
+    foreach(call IN ITEMS ui_keyboard_submit_transition ui_keyboard_submit_utf16
+            ui_keyboard_platform_transition ui_keyboard_note_recovered_key)
+        file(WRITE "${input_probe}" "void probe(void) { ${call}(0); }\n")
+        check_layout(fail)
+        file(WRITE "${input_probe}" "void probe(void) { ${call}\n\t(0); }\n")
+        check_layout(fail)
+    endforeach()
+    file(WRITE "${input_probe}" "void probe(void) { ui_keyboard_submit_record(0); }\n")
+    check_layout(pass)
+    file(REMOVE "${input_probe}")
+endforeach()

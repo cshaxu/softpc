@@ -9,6 +9,7 @@
 
 typedef struct ui_console_win32_state {
     lib_win32_handle worker;
+    ui_keyboard_normalizer keyboard;
     lib_win32_coord previous_mouse;
     int previous_mouse_valid;
 } ui_console_win32_state;
@@ -48,18 +49,13 @@ static void ui_console_receive_event(void *context,
     } else if (event->kind == LIB_CONSOLE_EVENT_RAW_KEY) {
         const lib_console_raw_key *key = &event->value.raw_key;
 
-        /* Console INPUT_RECORD packets and Window messages must take the
-         * same normalization path.  In particular, RDP can provide a
-         * virtual key while omitting its physical scan code; zero would drop
-         * the first post-handoff key in a
-         * consumer key mapper.
-         * ui-base recovers the scan code through the active Win32 layout. */
-        (void)ui_keyboard_submit_transition(console,
-            ui_console_emit_normalized,
-            key->scan_code, (lib_u16)key->key,
+        ui_keyboard_record record = {
+            UI_KEYBOARD_COMBINED, key->scan_code, (lib_u16)key->key,
+            (lib_u16)key->unicode,
             key->extended != LIB_FALSE ? UI_INPUT_FLAG_EXTENDED : 0u,
-            ui_console_hotkey_modifiers(key->modifiers),
-            key->pressed != LIB_FALSE);
+            ui_console_hotkey_modifiers(key->modifiers), key->pressed };
+        (void)ui_keyboard_submit_record(&state->keyboard, console,
+            ui_console_emit_normalized, &record);
     } else if (event->kind == LIB_CONSOLE_EVENT_RAW_MOUSE) {
         const lib_console_raw_mouse *mouse = &event->value.raw_mouse;
 

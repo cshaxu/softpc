@@ -2,31 +2,30 @@
 
 ## Current Work
 
-M9 T55 S5 is delivered for owner inspection. Executor P1 `d6d801b` is pushed;
-coordinator reviewed its actual diff and accepted the bounded S5 delivery.
-Both widths passed 49/49; strict lib passed 3/3. The proposal records the
-seven-component audit, accounting and review. T55 remains open.
+M9 T55 S6 implementation is verified: both widths passed 50/50 and strict
+library passed 3/3. Executor delivery and post-push review are in progress.
+The reference baseline is S5 `2f9d9f1`; T55 remains open.
 
-## M9 T55 S5 Packet
+## M9 T55 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: “以上，开始清理。” with the preceding approved seven findings and library-wide wrapper/dead-code sweep. |
-| Objective | One normalizer/matcher, correct physical-key state, one fault entry, independent mailboxes, component-owned pure math and nonduplicated resource ownership. |
-| Non-goals | No MVDM/media/INI change, product policy change, new component, types implementation or Linux UI parity. Overlay indexing remains deferred. |
-| Reference Baseline | `183fc8f`, S4 reviewed input; delivered S5 implementation `d6d801b`. |
+| Admission And Approval | Owner: “准入下一个S任务修复以上问题；类似问题也要扫描同样思路处理”. |
+| Objective | Complete key lifetimes, shared physical/text policy for both leaves, direct neutral geometry. |
+| Non-goals | No MVDM/media/INI, app policy, Console mouse scale, DAG or Linux UI parity change. |
+| Reference Baseline | `2f9d9f1`, delivered S5. |
 | Candidate Proposal | [T55 proposal](../proposals/m9-t55-lib-types-external-boundary.md) |
-| Files And ABI Surface | Entire lib C/H inventory for audit; component implementations and support APIs as needed, direct consumers/tests, CMake, manifest, docs and dual EXEs. Preserve app-facing behavior. |
-| Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout and Product UI. |
-| Verification | Hotkey identity/repeat/replay proofs; control independent of frame copy; STOP/fault barrier; cursor/geometry/mouse math; sync ownership and storage regressions; both widths full CTest and strict lib. |
-| Expected Markers | No second normalizer; no pointer-only event wrapper or duplicate join; no orphan internal entry; pure math outside SDK-only files. |
-| Asset Needs | Rebuild softpc32.exe and softpc64.exe only; preserve INI/media. |
-| Reporting Requirements | Finite component inventory/dispositions, tests, changed-code accounting, complete P push and actual-diff review. |
-| Stop Conditions | Escalate newly required product behavior or component edge; no silent scope expansion. |
-| Exit Criteria | All admitted dispositions verified, dual artifacts, pushed complete P, actual diff review and clean workspace for owner inspection. T55 remains open. |
-| Original Owner Request | “现在存在normalizer吗？…避免层层嵌套！”; independent locks approved; storage cleanup approved; “审计所有lib中层层包装的问题和死代码的问题，一并清理干净。” |
-| Similar-Issue Sweep | All seven lib components: internal function callers, platform pure functions, allocation ownership, stop/failure/join paths. Retain externally usable APIs and true platform boundaries with explicit reasons. |
+| Files And ABI Surface | ui-base, both UI leaves, header-only C vocabulary additions, direct tests, docs/manifest and dual EXEs; app-facing ABI unchanged. |
+| Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout and Product UI; referenced skills. |
+| Verification | Key lifecycle/permutation, replay/rejection, separate/combined text equivalence, actual adapters, geometry, full x64/x86 and strict lib. |
+| Expected Markers | One key-state ledger; one record normalization entry; no calculation-only native wrappers. |
+| Asset Needs | Rebuild softpc32.exe and softpc64.exe; preserve INI/media. |
+| Reporting Requirements | Three-item ledger, peer sweep, evidence/accounting, complete P push and actual-diff review. |
+| Stop Conditions | Escalate new product semantics or dependency edge; no unrelated repair. |
+| Exit Criteria | Findings and peers verified; dual artifacts, pushed complete P, reviewed diff and clean worktree for owner inspection; T55 open. |
+| Original Owner Request | “有没有系统性的方案解决？我不想添油战术”; “是不是应该统一制作和进入ui-base的字符处理?”; “类似问题记得一并处理。” |
+| Similar-Issue Sweep | All lib key/character callers and state; all ui-window rectangle adapters and calculation wrappers. |
 
 ## Current Technical Baseline
 

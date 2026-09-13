@@ -127,7 +127,7 @@ static void win32_window_initial_bounds(int *left, int *top, int *width,
     lib_win32_point point = { 0, 0 };
     lib_win32_monitorinfo monitor_info;
     lib_win32_hmonitor monitor;
-    lib_win32_rect fitted;
+    ui_window_rect work, fitted;
 
     if (left == LIB_NULL || top == LIB_NULL || width == LIB_NULL || height == LIB_NULL) return;
     *left = LIB_WIN32_CW_USEDEFAULT;
@@ -138,8 +138,10 @@ static void win32_window_initial_bounds(int *left, int *top, int *width,
     monitor = lib_win32_monitor_from_point(point, LIB_WIN32_MONITOR_DEFAULTTOPRIMARY);
     lib_win32_zero_memory(&monitor_info, sizeof(monitor_info));
     monitor_info.cbSize = sizeof(monitor_info);
-    if (monitor == LIB_NULL || !lib_win32_get_monitor_info_a(monitor, &monitor_info) ||
-        !ui_win32_fit_outer_rect(&monitor_info.rcWork,
+    if (monitor == LIB_NULL || !lib_win32_get_monitor_info_a(monitor, &monitor_info))
+        return;
+    work = ui_win32_rect_value(&monitor_info.rcWork);
+    if (!ui_window_fit_outer_rect(&work,
             WIN32_WINDOW_DEFAULT_WIDTH, WIN32_WINDOW_DEFAULT_HEIGHT, &fitted))
         return;
     *left = fitted.left;
@@ -205,9 +207,9 @@ static int win32_window_ensure_surface(lib_win32_hwnd window,
 }
 
 static int win32_window_display_rect(const ui_win32_window_context *context,
-    lib_u32 source_width, lib_u32 source_height, lib_win32_rect *display)
+    lib_u32 source_width, lib_u32 source_height, ui_window_rect *display)
 {
-    return context != LIB_NULL && ui_win32_display_rect(context->client_width,
+    return context != LIB_NULL && ui_window_display_rect(context->client_width,
         context->client_height, source_width, source_height, display);
 }
 
@@ -247,20 +249,19 @@ static void win32_window_resize_client(lib_win32_hwnd window,
 static int win32_window_cursor_rect(lib_win32_hwnd window,
     const ui_win32_window_context *context, lib_win32_rect *cursor)
 {
-    lib_win32_rect display;
-    ui_window_rect area, result;
+    ui_window_rect display;
+    ui_window_rect result;
     if (!window || !context || !cursor || !win32_window_display_rect(context,
             context->surface_width, context->surface_height, &display)) return 0;
-    area=ui_win32_rect_value(&display);
-    if (!ui_window_cursor_rect(&context->frame,&area,&result)) return 0;
-    ui_win32_rect_store(cursor,&result);
+    if (!ui_window_cursor_rect(&context->frame, &display, &result)) return 0;
+    ui_win32_rect_store(cursor, &result);
     return 1;
 }
 
 static void win32_window_paint(lib_win32_hwnd window, ui_win32_window_context *context,
     lib_win32_hdc dc)
 {
-    lib_win32_rect display;
+    ui_window_rect display;
 
     if (context == LIB_NULL || context->surface_dc == LIB_NULL ||
         !ui_frame_is_valid(&context->frame) ||
@@ -307,17 +308,13 @@ static lib_win32_dword win32_window_cursor_blink_timeout(
 static void win32_window_transition(ui_win32_window_context *context,
     lib_win32_wparam key, lib_win32_lparam lparam, int released)
 {
-    lib_win32_word scan = (lib_win32_word)((lparam >> 16) & 0xffu);
-
-    if (scan == 0u && !released)
-        ui_keyboard_note_recovered_key(&context->keyboard_normalizer, (lib_win32_word)key);
-    if (scan == 0u && released)
-        ui_keyboard_release_recovered_key(&context->keyboard_normalizer,
-            (lib_win32_word)key);
-    (void)ui_keyboard_submit_transition(context,
-        win32_window_emit_normalized, (lib_u16)scan, (lib_u16)key,
+    ui_keyboard_record record = {
+        UI_KEYBOARD_TRANSITION, (lib_u16)((lparam >> 16) & 0xffu),
+        (lib_u16)key, 0u,
         ui_window_keyboard_flags_from_lparam((lib_u64)lparam),
-        ui_window_modifiers_from_key_state(), !released);
+        ui_window_modifiers_from_key_state(), !released };
+    (void)ui_keyboard_submit_record(&context->keyboard_normalizer, context,
+        win32_window_emit_normalized, &record);
 }
 
 static lib_i32 win32_window_mouse_clamp(lib_i64 value)
@@ -430,15 +427,15 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
     win32_window_resize_client(window, context, width, height);
     if (context->frame.graphics != 0u) {
         ui_window_rect changed;
-        lib_win32_rect changed_rect;
-        lib_win32_rect display;
+        ui_window_rect changed_target;
+        ui_window_rect display;
         lib_win32_rect target;
         if (ui_window_render_graphics(&context->frame, context->surface_pixels,
                 context->surface_width, context->surface_height, context->graphics_palette,
                 &context->graphics_valid, &changed) &&
             win32_window_display_rect(context, width, height, &display)) {
-            ui_win32_rect_store(&changed_rect, &changed);
-            ui_win32_map_dirty_rect(&changed_rect, &display, width, height, &target);
+            ui_window_map_dirty_rect(&changed, &display, width, height, &changed_target);
+            ui_win32_rect_store(&target, &changed_target);
             lib_win32_invalidate_rect(window, &target, LIB_WIN32_FALSE);
         }
     } else {
@@ -542,12 +539,13 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
             win32_window_transition(context, wparam, lparam, 1);
         return 0;
     case LIB_WIN32_WM_CHAR:
-        if (win32_window_accepting_input(context) &&
-            ((lib_u32)lparam >> 16u & 0xffu) == 0u &&
-            !ui_keyboard_consume_duplicate_character(&context->keyboard_normalizer,
-                (lib_win32_word)wparam))
-            (void)ui_keyboard_submit_utf16(&context->keyboard_normalizer,
-                context, win32_window_emit_normalized, (lib_win32_word)wparam);
+        if (win32_window_accepting_input(context)) {
+            ui_keyboard_record record = {
+                UI_KEYBOARD_CHARACTER, (lib_u16)((lparam >> 16) & 0xffu),
+                0u, (lib_u16)wparam, 0u, 0u, LIB_TRUE };
+            (void)ui_keyboard_submit_record(&context->keyboard_normalizer,
+                context, win32_window_emit_normalized, &record);
+        }
         return 0;
     case LIB_WIN32_WM_MOUSEMOVE:
         if (ui_win32_mouse_captured(&context->mouse))

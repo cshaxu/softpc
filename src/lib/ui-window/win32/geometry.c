@@ -96,7 +96,8 @@ int ui_win32_resize_client(lib_win32_hwnd window, lib_u32 width,
         int decoration_height = (outer.bottom - outer.top) - (int)height;
         int fitted_width;
         int fitted_height;
-        if (ui_win32_fit_client_size(&monitor_info.rcWork, decoration_width,
+        ui_window_rect work = ui_win32_rect_value(&monitor_info.rcWork);
+        if (ui_window_fit_client_size(&work, decoration_width,
                 decoration_height, (int)width, (int)height, &fitted_width,
                 &fitted_height))
             lib_win32_set_rect(&outer, 0, 0, fitted_width + decoration_width,

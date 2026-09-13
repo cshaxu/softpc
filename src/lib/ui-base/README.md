@@ -13,8 +13,9 @@ registered hotkeys without creating a second matcher path.
 the root `input_interface.h` are shared leaf-support contracts, not
 application entry points. Each leaf owns its own state; Window capture is
 Window-local. Outstanding suppressed keys survive subsequent matched chords
-until their breaks. Repeats never add duplicate suppression entries; capacity
-exhaustion fails delivery explicitly rather than overwriting held-key state.
+until their breaks. One ordered held-key ledger gives every physical key one
+pending, delivered or consumed disposition. Repeats reuse it, releases remove
+it, and storage growth failure is terminal rather than dropping key state.
 
 No leaf includes anything under `ui-base/win32` or `ui-base/linux`. The root
 input declarations expose copied input normalization with common surrogate,
@@ -34,6 +35,15 @@ STOP is unchanged. Window's sole final filter discards ordinary frozen input,
 not registered hotkeys or lifetime events.
 
 Physical key identity is key + scan code + EXTENDED flag, normalized identically
-for both leaves. Modifier states are disjoint: pending, delivered or consumed.
-Repeated pending makes do not allocate another slot; a delivered modifier cannot
-later be retroactively consumed as part of a chord.
+for both leaves. Ordinary keys and modifiers follow the same lifetime: a
+delivered make always retains its break and never becomes consumed later.
+The ledger is released at retirement; destroy also handles workerless cleanup.
+
+Both leaves submit copied keyboard records through ui_keyboard_submit_record:
+Window supplies separate transitions/characters, Console combined records.
+The common entry chooses physical versus UTF-16 input and suppresses a
+character carried by a combined physical record or marked as translated from a
+physical Window message. Independent text uses zero character scan; scan-less
+recovered transitions retain the existing source-local character deduplication.
+Text-only breaks do not produce text.
+Surrogate processing and text synthesis remain in ui-base, not in either leaf.

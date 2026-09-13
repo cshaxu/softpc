@@ -182,3 +182,9 @@ Host event is one opaque platform allocation, not a pointer-only outer wrapper.
 Task owns cancellation and entry/context; its platform thread object retains
 startup parameters until join. Root task destroy performs the join once before
 platform disposal.
+
+Both UI leaves marshal native keyboard records into the same ui-base record
+entry. It owns physical-versus-text choice, surrogate processing and character
+deduplication. One source-local held-key ledger owns pending/delivered/consumed
+lifetimes for ordinary keys and modifiers alike. Repeats reuse their state;
+a delivered make cannot retrospectively become a consumed chord.

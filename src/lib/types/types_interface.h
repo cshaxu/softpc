@@ -36,6 +36,7 @@ enum {
 #define LIB_INT32_MIN INT32_MIN
 #define LIB_UINT32_MAX UINT32_MAX
 #define LIB_UINT64_MAX UINT64_MAX
+#define LIB_SIZE_MAX SIZE_MAX
 
 /* Cross-platform C runtime vocabulary.  These functions deliberately expose
  * no platform handle, product state, or I/O policy. */
@@ -46,6 +47,10 @@ static inline void *lib_memory_set(void *destination, int value,
 static inline void *lib_memory_copy(void *destination, const void *source,
     lib_size byte_count)
 { return memcpy(destination, source, byte_count); }
+
+static inline void *lib_memory_move(void *destination, const void *source,
+    lib_size byte_count)
+{ return memmove(destination, source, byte_count); }
 
 static inline int lib_memory_compare(const void *left, const void *right,
     lib_size byte_count)
@@ -63,6 +68,9 @@ static inline void *lib_allocate(lib_size byte_count)
 
 static inline void *lib_allocate_zero(lib_size count, lib_size byte_count)
 { return calloc(count, byte_count); }
+
+static inline void *lib_reallocate(void *memory, lib_size byte_count)
+{ return realloc(memory, byte_count); }
 
 static inline void lib_release(void *memory)
 { free(memory); }

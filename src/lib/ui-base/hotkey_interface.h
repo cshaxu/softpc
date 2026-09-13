@@ -4,8 +4,6 @@
 #include "lib/ui-base/event_interface.h"
 
 #define UI_HOTKEY_CAPACITY 16u
-#define UI_HOTKEY_PENDING_CAPACITY 6u /* left/right Ctrl, Alt and Shift */
-#define UI_HOTKEY_SUPPRESSED_CAPACITY (UI_HOTKEY_PENDING_CAPACITY + UI_HOTKEY_CAPACITY)
 
 enum {
     UI_HOTKEY_MODIFIER_CONTROL = UI_KEY_MODIFIER_CONTROL,
@@ -27,25 +25,24 @@ typedef struct ui_hotkey_registry {
     lib_u32 count;
 } ui_hotkey_registry;
 
-typedef struct ui_hotkey_key_identity {
-    ui_key key;
-    lib_u16 scan_code;
-    lib_u32 flags;
-} ui_hotkey_key_identity;
+typedef enum ui_hotkey_key_state {
+    UI_HOTKEY_PENDING,
+    UI_HOTKEY_DELIVERED,
+    UI_HOTKEY_CONSUMED
+} ui_hotkey_key_state;
+
+typedef struct ui_hotkey_held_key {
+    ui_input_event make;
+    ui_hotkey_key_state state;
+} ui_hotkey_held_key;
 
 typedef struct ui_hotkey_matcher {
     ui_hotkey_registry registry;
-    ui_input_event pending[UI_HOTKEY_PENDING_CAPACITY];
-    lib_u32 pending_count;
-    /* Delivered modifier makes keep their matching breaks. They can no
-     * longer belong to a fully consumed chord until released. */
-    ui_hotkey_key_identity delivered[UI_HOTKEY_PENDING_CAPACITY];
-    lib_u32 delivered_count;
-    /* A matched chord suppresses every make and every later break belonging
-     * to that chord.  Each physical pending make is retained: key identity
-     * alone is not an identity because left/right modifiers share it. */
-    ui_hotkey_key_identity suppressed_keys[UI_HOTKEY_SUPPRESSED_CAPACITY];
-    lib_u32 suppressed_count;
+    /* In make order; every held physical key has exactly one disposition. */
+    ui_hotkey_held_key *held;
+    lib_size held_count;
+    lib_size held_capacity;
+    lib_bool failed;
 } ui_hotkey_matcher;
 
 void ui_hotkey_registry_initialize(ui_hotkey_registry *registry);
@@ -53,10 +50,10 @@ lib_status ui_hotkey_registry_register(ui_hotkey_registry *registry,
     ui_key key, lib_u8 modifiers, const char *identifier);
 void ui_hotkey_matcher_initialize(ui_hotkey_matcher *matcher,
     const ui_hotkey_registry *registry);
-/* Emits ordinary events and matched UI_EVENT_HOTKEY values through `sink`.
- * A false return means delivery failed or suppressed-key capacity was exceeded;
- * no events are overwritten and no background retry path
- * exists, so caller owns its component-local failure policy. */
+/* Emits ordinary events and matched UI_EVENT_HOTKEY values through sink.
+ * Repeats retain their original disposition; delivered makes retain breaks.
+ * Failure is terminal until discard; no partial replay is retried.
+ * Initialize once; discard releases held storage before reuse or destruction. */
 int ui_hotkey_matcher_submit(ui_hotkey_matcher *matcher,
     const ui_input_event *event, ui_input_sink sink, void *context);
 void ui_hotkey_matcher_discard(ui_hotkey_matcher *matcher);
