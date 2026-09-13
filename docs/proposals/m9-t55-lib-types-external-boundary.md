@@ -1,5 +1,60 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S9 admission: pending ordinary replay permission
+
+Owner: “同意 如果frozen期间到frozen之后都没匹配 确实可以丢弃”;
+“批准实施 干净为准”. Baseline `8761fad`.
+The broader audit's make/break balancing proposal is explicitly NOT admitted.
+Window continues per-event frozen filtering; releases do not gain exceptions.
+
+| Frozen sweep | Owner/disposition | Proof |
+| --- | --- | --- |
+| All pending make creation/flush paths | Existing matcher entry captures generic allow_replay once. False skips only its ordinary make on flush, then follows the existing resolved state; matching and releases are unchanged. | Mismatch, release and TEXT flush; repeat cannot grant an old make permission. |
+| Window vs other emit callers | Window supplies !frozen through existing emit_to; default component emit and Console supply true. No frozen state in ui-base. | Frozen-to-unfrozen successful chord still produces hotkey; ordinary Console path unchanged. |
+| Native/control and failure boundaries | Existing Window final filter remains the only current-state output policy. No second table/reset/synthetic releases. | Actual control mailbox transitions, sink failure, both half-pair cases retain approved per-event semantics. |
+
+No new component/queue/input event field or normalization change. Existing tests
+gain the cross-boundary cases; complete x64/x86 build/test, strict gates and
+manifest precede pushed P and actual-diff review. T55 stays open.
+Only this admitted pending-replay defect is fixed; no claim of whole-lib closure.
+
+### S9 executor evidence and peer sweep
+
+The original pending-make insertion captures allow_replay. The single
+ui_hotkey_flush_pending skips an ineligible make and advances its existing
+disposition; it does not mark the chord consumed or alter release handling.
+No predicate was added to registry matching. Repeats cannot rewrite the stored
+permission. Window supplies !frozen through the existing emit_to path; ordinary
+component emit supplies true, preserving Console behavior and source attribution.
+The Window final frozen filter is unchanged. No app-facing input schema,
+new heap allocation, pressed table, thread or callback was introduced.
+
+All submit/emit callers were swept with rg; four existing test files adapt to
+the explicit argument. The focused Window test adds six origin/flush cases
+(mismatch, release and TEXT for each origin), repeats after thaw, both
+cross-boundary hotkey directions, both deliberately unbalanced make/break
+directions, and one terminal sink-failure case. Control changes use the real
+mailbox consumer, without sleeps or an actual desktop-focus dependency.
+This proves the approved small contract rather than silently broadening it.
+
+Final x64 full passed 50/50 (34.61 s), x86 50/50 (41.22 s), including both
+package tests; strict -Wall -Wextra -Wpedantic -Werror build and 3/3 gates passed.
+The earlier focused five-test x64 run passed before adding the two explicit
+half-pair non-regression cases; those final cases passed in both full runs.
+Manifest, dependency and governance gates passed. No new test failure or
+unrelated runtime repair occurred. Existing TODOs remain unchanged.
+
+Against `8761fad`: five production C/H paths +20/-13, net +7; five test C
+paths +107/-34, net +73 (including signature updates). Counts use
+git diff --numstat, excluding docs/manifest and artifacts. The initial test
+estimate was exceeded by explicit non-regression cases, not production scope.
+No app/MVDM/standalone-host/INI/media edits. Owned types-layout-fixture copies
+are removed after tests; fixed build caches remain.
+
+Package SHA256:
+- softpc32.exe: `095D2BA3F266F8D13497A8049EBAA2B8D7337CFE816ED06B60DB7747173ECBCC`
+- softpc64.exe: `B43FA7EBB789F27C50E6C1B8DAFF8790F8368652A648663215BBB4E239FD41A3`
+
 ## S8 admission: complete-character repetition and recovery
 
 Owner: “批准修复s任务 干净”. Baseline `0ca0875`.

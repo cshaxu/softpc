@@ -48,14 +48,15 @@ static int ui_hotkey_flush_pending(ui_hotkey_matcher *matcher,
     for (i = 0u; i < matcher->held_count; ++i) {
         ui_hotkey_held_key *key = &matcher->held[i];
         if (key->state != UI_HOTKEY_PENDING) continue;
-        if (!sink(context, &key->make)) return 0;
+        if (key->allow_replay && !sink(context, &key->make)) return 0;
         key->state = UI_HOTKEY_DELIVERED;
     }
     return 1;
 }
 
 static int ui_hotkey_transition(ui_hotkey_matcher *matcher,
-    const ui_input_event *event, ui_input_sink sink, void *context)
+    const ui_input_event *event, ui_input_sink sink, void *context,
+    lib_bool allow_replay)
 {
     lib_size i, index;
     ui_hotkey_held_key *key;
@@ -88,7 +89,7 @@ static int ui_hotkey_transition(ui_hotkey_matcher *matcher,
             matcher->held_capacity = capacity;
         }
         matcher->held[matcher->held_count++] = (ui_hotkey_held_key) {
-            *event, UI_HOTKEY_PENDING };
+            *event, UI_HOTKEY_PENDING, allow_replay };
     }
     key = &matcher->held[index];
     if (key->state == UI_HOTKEY_DELIVERED)
@@ -154,13 +155,14 @@ void ui_hotkey_matcher_initialize(ui_hotkey_matcher *matcher,
 }
 
 int ui_hotkey_matcher_submit(ui_hotkey_matcher *matcher,
-    const ui_input_event *event, ui_input_sink sink, void *context)
+    const ui_input_event *event, ui_input_sink sink, void *context,
+    lib_bool allow_replay)
 {
     int delivered;
     if (matcher == LIB_NULL || event == LIB_NULL || sink == LIB_NULL ||
         matcher->failed) return 0;
     if (event->type == UI_EVENT_KEY)
-        delivered = ui_hotkey_transition(matcher, event, sink, context);
+        delivered = ui_hotkey_transition(matcher, event, sink, context, allow_replay);
     else
         delivered = (event->type != UI_EVENT_TEXT ||
             ui_hotkey_flush_pending(matcher, sink, context)) && sink(context, event);

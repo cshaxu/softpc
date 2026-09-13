@@ -58,7 +58,7 @@ lib_status ui_component_initialize(ui_component *component,
 }
 
 int ui_component_emit_to(ui_component *component, const ui_input_event *event,
-    ui_input_sink delivery_sink, void *delivery_context)
+    ui_input_sink delivery_sink, void *delivery_context, lib_bool allow_replay)
 {
     ui_input_event copied;
     if (component == LIB_NULL || event == LIB_NULL || delivery_sink == LIB_NULL ||
@@ -67,7 +67,7 @@ int ui_component_emit_to(ui_component *component, const ui_input_event *event,
     copied = *event;
     ui_input_event_set_source(&copied, component, component->source_identity);
     if (!ui_hotkey_matcher_submit(&component->hotkey_matcher, &copied,
-            delivery_sink, delivery_context)) {
+            delivery_sink, delivery_context, allow_replay)) {
         ui_hotkey_matcher_discard(&component->hotkey_matcher);
         ui_component_fail(component, LIB_STATUS_IO_ERROR);
         return 0;
@@ -79,7 +79,7 @@ int ui_component_emit(ui_component *component, const ui_input_event *event)
 {
     if (component == LIB_NULL) return 0;
     return ui_component_emit_to(component, event, component->input_sink,
-        component->input_context);
+        component->input_context, LIB_TRUE);
 }
 
 lib_status ui_component_enqueue_controls(ui_component *component,

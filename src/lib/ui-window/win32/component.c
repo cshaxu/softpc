@@ -95,7 +95,7 @@ static int win32_window_emit_normalized(void *opaque, const ui_input_event *even
 
     if (!win32_window_accepting_input(context)) return 0;
     return ui_component_emit_to(&context->component->base, event,
-        win32_window_deliver_normalized, context);
+        win32_window_deliver_normalized, context, context->frozen == LIB_FALSE);
 }
 
 static lib_win32_hcursor win32_window_create_transparent_cursor(void)

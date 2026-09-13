@@ -46,7 +46,7 @@ static int normalize_and_match(void *context, const ui_input_event *event)
 {
     softpc_hotkey_capture *capture = (softpc_hotkey_capture *)context;
     return capture != NULL && ui_hotkey_matcher_submit(&capture->matcher,
-        event, capture_hotkey, capture);
+        event, capture_hotkey, capture, LIB_TRUE);
 }
 
 static void assert_registered_raw_chord(lib_u32 trigger, const char *identifier)

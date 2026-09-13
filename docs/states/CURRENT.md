@@ -2,32 +2,32 @@
 
 ## Current Work
 
-M9 T55 S8 is delivered for owner inspection. Executor P1 `939755d` is pushed;
-coordinator reviewed its actual 19-path diff against the three-item packet.
-x64/x86 passed 50/50 and strict lib passed 3/3. S7 is recorded in
-[its handoff](../history/M9-T55-S7-native-input-handoff.md).
-T55 remains open; the package CAP timeout in TODO is not claimed resolved.
+M9 T55 S9 implementation and verification are complete; executor push and
+committed-diff review follow. x64/x86 passed 50/50 and strict lib passed 3/3.
+Only frozen-origin pending make replay changed; release filtering is unchanged.
+S8 delivery is recorded in [its handoff](../history/M9-T55-S8-character-recovery-handoff.md).
+T55 remains open; the package timeout in TODO is not claimed resolved.
 
-## M9 T55 S8 Packet
+## M9 T55 S9 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: “批准修复s任务 干净”. |
-| Objective | Decode repeated UTF-16 characters before expansion, recover malformed prefixes, retain legal text when physical mapping is incomplete. |
-| Non-goals | No app/MVDM/INI/media, lifecycle, mouse, DAG or Linux UI parity change. |
-| Reference Baseline | `0ca0875`, S7 delivery. |
+| Admission And Approval | Owner: “批准实施 干净为准”. |
+| Objective | Remember ordinary replay permission on the existing pending make; frozen-origin prefixes never replay after unfreeze, but still match hotkeys. |
+| Non-goals | No balanced make/break policy, synthetic release, matcher reset, second ledger, app/MVDM/INI/media, mouse or lifecycle change. |
+| Reference Baseline | `8761fad`, S8 delivery. |
 | Candidate Proposal | [T55 proposal](../proposals/m9-t55-lib-types-external-boundary.md) |
-| Files And ABI Surface | ui-base normalizer, both native inputs, Console copied repeat metadata, tests, docs/manifest and dual EXEs; ui_input_event unchanged. |
+| Files And ABI Surface | ui-base matcher/leaf-support emit signatures, Window caller, existing tests, docs/manifest and dual EXEs; ui_input_event unchanged. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout and Product UI; referenced skills. |
-| Verification | Combined repeat/surrogate and recovery matrix, incomplete map fake, native-entry peers, failure mid-batch, full x86/x64 and strict lib. |
-| Expected Markers | One repeat/decode owner in ui-base; adapters copy counts, no per-leaf text expansion; existing TEXT fallback. |
-| Asset Needs | Rebuild fixed softpc32.exe and softpc64.exe; preserve INI/media. |
-| Reporting Requirements | Three-row sweep, measured evidence and code accounting; complete P push followed by committed-diff review. |
-| Stop Conditions | Escalate unrelated semantics or dependency changes; no incidental product repair. |
-| Exit Criteria | Three findings verified, dual artifacts/tests, manifest/governance, pushed reviewed P and clean worktree for owner testing; T55 open. |
-| Original Owner Request | “再次审计 谢谢 就怕你还留尾巴”; “批准修复s任务 干净”. |
-| Similar-Issue Sweep | All UTF-16/repeat producers and consumers, physical-text fallback and rejected-delivery exits. |
+| Verification | Freeze-origin mismatch/release/text replay, cross-boundary successful hotkey, normal-origin replay and repeated makes, rejection, full x86/x64 and strict lib. |
+| Expected Markers | One immutable replay permission per held make; Window supplies policy, Console always permits; matching unchanged. |
+| Asset Needs | Refresh fixed softpc32.exe and softpc64.exe; preserve INI/media. |
+| Reporting Requirements | Bounded peer sweep and code accounting, complete pushed P then committed-diff review. |
+| Stop Conditions | Escalate broader input lifecycle policy or new state owners; do not force make/break pairing. |
+| Exit Criteria | Focused and dual-width proofs, strict/manifest/governance, reviewed pushed delivery and clean worktree; T55 open. |
+| Original Owner Request | “同意 如果frozen期间到frozen之后都没匹配 确实可以丢弃”; “批准实施 干净为准”. |
+| Similar-Issue Sweep | Every matcher pending flush, submit and leaf emit caller; repeat does not overwrite original permission. |
 
 ## Current Technical Baseline
 

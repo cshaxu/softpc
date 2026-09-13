@@ -59,3 +59,8 @@ are rejected and cleared. A new high replaces an unfinished high; a valid BMP
 unit is processed even after a malformed prefix. Both layout-map failure and
 unrepresentable physical mapping fall back to the same TEXT event. A rejected
 delivery ends a batch immediately without retry.
+
+A held make captures leaf-supplied allow_replay once. False prevents its cached
+ordinary make from being replayed, without changing chord matching or release
+semantics. Repeats cannot upgrade the original permission. Default component
+delivery permits replay; a filtering leaf supplies its own permission.

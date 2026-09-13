@@ -135,7 +135,11 @@ does not use a UI component or hotkey registry and accepts only monitor lines.
 Freezing a Window is a guest-input boundary, not a registered-hotkey boundary:
 its native key transitions still pass through the source-local matcher. A
 matched `ui_HOTKEY` reaches SoftPC; all ordinary key/text/mouse output is
-silently discarded and is never buffered for resume. While paused, SoftPC
+silently discarded and is never buffered for resume. A frozen-origin cached
+make remains ineligible for ordinary replay after unfreeze, but can still
+complete a hotkey. This is not make/break balancing: cross-freeze releases
+still obey the current per-event frozen filter, without synthetic cleanup.
+While paused, SoftPC
 accepts current-run hotkeys and monitor lines as product control input, but it
 must consume guest-input-producing hotkeys before they can enter the VM input
 queue. Thus pause-toggle may request resume, while CAD/CAF cannot inject guest

@@ -34,6 +34,7 @@ typedef enum ui_hotkey_key_state {
 typedef struct ui_hotkey_held_key {
     ui_input_event make;
     ui_hotkey_key_state state;
+    lib_bool allow_replay;
 } ui_hotkey_held_key;
 
 typedef struct ui_hotkey_matcher {
@@ -53,9 +54,12 @@ void ui_hotkey_matcher_initialize(ui_hotkey_matcher *matcher,
 /* Emits ordinary events and matched UI_EVENT_HOTKEY values through sink.
  * Repeats retain their original disposition; delivered makes retain breaks.
  * Failure is terminal until discard; no partial replay is retried.
- * Initialize once; discard releases held storage before reuse or destruction. */
+ * allow_replay is captured on the first make, not refreshed by repeats.
+ * False suppresses only delayed ordinary make replay, never chord matching
+ * or later releases. Initialize once; discard releases held storage. */
 int ui_hotkey_matcher_submit(ui_hotkey_matcher *matcher,
-    const ui_input_event *event, ui_input_sink sink, void *context);
+    const ui_input_event *event, ui_input_sink sink, void *context,
+    lib_bool allow_replay);
 void ui_hotkey_matcher_discard(ui_hotkey_matcher *matcher);
 /* Borrowed until the next submit/discard. Includes either physical side of a
  * modifier; synthesis must not release a key already owned by this ledger. */

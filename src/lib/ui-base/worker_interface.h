@@ -33,9 +33,10 @@ lib_status ui_component_allocate_source_identity(lib_atomic_u64 *next,
 int ui_component_emit(ui_component *component, const ui_input_event *event);
 /* Uses the component's normal source attribution and source-local matcher,
  * but lets a leaf choose how to deliver matcher output.  This is internal:
- * leaves may filter delivery but never replace matching semantics. */
+ * leaves may filter delivery but never replace matching semantics.
+ * allow_replay tags this make's eligibility for later ordinary replay. */
 int ui_component_emit_to(ui_component *component, const ui_input_event *event,
-    ui_input_sink delivery_sink, void *delivery_context);
+    ui_input_sink delivery_sink, void *delivery_context, lib_bool allow_replay);
 lib_status ui_component_enqueue_controls(ui_component *component,
     const ui_component_control *controls, lib_u32 control_count);
 void ui_component_retire(ui_component *component, lib_status status);

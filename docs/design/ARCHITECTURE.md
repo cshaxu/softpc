@@ -160,7 +160,10 @@ second guest clock.
 
 Window has one final event filter after shared matching. Frozen ordinary
 key/text/mouse is consumed there; local capture/blink guards remain independent.
-Only keyboard events determine prefix replay; mouse and close do not flush it.
+The existing pending make stores a leaf-supplied ordinary replay permission.
+Window denies it for makes received while frozen; later unfreeze/repeats do
+not upgrade that cached make. This does not alter chord matching or releases,
+and ui-base has no frozen state. Only keyboard events determine prefix replay; mouse and close do not flush it.
 Keyboard order is preserved without buffering key/mouse interleaving. A partial
 sink failure is terminal, never retried; worker quiescence precedes its one
 failure/retirement completion. STOP/fault closes both frame and control admission

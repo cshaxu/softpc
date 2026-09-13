@@ -132,17 +132,17 @@ int main(void)
     event.data.key.pressed = 1u;
     event.data.key.modifiers = UI_HOTKEY_MODIFIER_CONTROL;
     assert(ui_component_emit_to(&first, &event, component_probe_hotkeys_only,
-        &probe));
+        &probe, LIB_TRUE));
     event.data.key.key = UI_HOTKEY_KEY_ALT;
     event.data.key.scan_code = 0x38u;
     event.data.key.modifiers = UI_HOTKEY_MODIFIER_CONTROL |
         UI_HOTKEY_MODIFIER_ALT;
     assert(ui_component_emit_to(&first, &event, component_probe_hotkeys_only,
-        &probe));
+        &probe, LIB_TRUE));
     event.data.key.key = 'P';
     event.data.key.scan_code = 0x19u;
     assert(ui_component_emit_to(&first, &event, component_probe_hotkeys_only,
-        &probe));
+        &probe, LIB_TRUE));
     assert(probe.input_count == 1u && probe.last_type == UI_EVENT_HOTKEY);
     assert(strcmp(probe.last_hotkey, "pause-toggle") == 0);
     assert(probe.last_identity == first.source_identity);
@@ -150,7 +150,7 @@ int main(void)
     event.data.key.scan_code = 0x2du;
     event.data.key.modifiers = 0u;
     assert(ui_component_emit_to(&first, &event, component_probe_hotkeys_only,
-        &probe));
+        &probe, LIB_TRUE));
     assert(probe.input_count == 1u);
 
     for (index = 0u; index < UI_COMPONENT_CONTROL_CAPACITY; ++index)

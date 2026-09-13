@@ -45,7 +45,7 @@ static int submit(ui_hotkey_matcher *m, capture *c, ui_key key, unsigned scan,
     ui_input_event e = { .type = UI_EVENT_KEY };
     e.data.key.key = key; e.data.key.scan_code = scan;
     e.data.key.flags = flags; e.data.key.modifiers = mods; e.data.key.pressed = down;
-    return ui_hotkey_matcher_submit(m, &e, capture_event, c);
+    return ui_hotkey_matcher_submit(m, &e, capture_event, c, LIB_TRUE);
 }
 static void permutations(void)
 {
@@ -280,7 +280,7 @@ static void repeat_delivery_failure(void)
 static int match_normalized(void *opaque, const ui_input_event *event)
 {
     void **pair = opaque;
-    return ui_hotkey_matcher_submit(pair[0], event, capture_event, pair[1]);
+    return ui_hotkey_matcher_submit(pair[0], event, capture_event, pair[1], LIB_TRUE);
 }
 static void synthesis_lifetimes(void)
 {
