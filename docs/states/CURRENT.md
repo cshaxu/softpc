@@ -2,28 +2,11 @@
 
 ## Current Work
 
-M9 Td S13 is active: revise the queued common dependency boundary.
+No implementation subtask is active.
 
-## M9 Td S13 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Governance |
-| Admission And Approval | Owner requests updating the proposal and S tasks to allow direct lib use outside common. |
-| Objective | Replace blanket lib-call isolation with responsibility and resource ownership boundaries. |
-| Non-goals | No production code, builds, numeric T admission or behavior changes. |
-| Reference Baseline | 2bc73d6; T55 remains closed. |
-| Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | Proposal, Current and Td history; no ABI changes. |
-| Applicable Rules | Execution and documentation rules and their referenced governance skills. |
-| Verification | Review all candidate dependency, migration and acceptance statements; documentation gate and diff hygiene. |
-| Expected Markers | App configuration may use storage directly; no bypass of common-owned lifecycle or pure forwarding layer. |
-| Asset Needs | None; existing EXEs and configuration unchanged. |
-| Reporting Requirements | Updated S boundaries, commit/push and clean worktree. |
-| Stop Conditions | Do not weaken deletion of transferred implementations or implement the candidate. |
-| Exit Criteria | Consistent candidate and closure records verified, committed and pushed. |
-| Original Owner Request | 修订好proposal和s任务吧 更新好 |
-| Similar-Issue Sweep | Ownership table, DAG, migration ledger, S1/S2/S5/S8 and common-only wording. |
+M9 Td S13 dependency-boundary revision is complete. T55 remains closed;
+the common extraction proposal remains first in the queue, awaiting
+implementation admission. No numeric T was allocated.
 
 ## Current Technical Baseline
 
@@ -72,6 +55,10 @@ M9 Td S13 is active: revise the queued common dependency boundary.
   [Record](../history/M9-T51-S4-lib-component-normalization-closure.md)
 
 ## Recent Governance
+
+- **M9 Td S13:** Common extraction now permits responsibility-owned direct lib
+  calls outside common; migration and acceptance reject duplicate ownership,
+  not legitimate dependencies. [Record](../history/M9-Td-S13-common-lib-boundary.md)
 
 - **M9 Td S12:** SoftPC-first common extraction now has five component ownership
   boundaries and eight sequential dual-width executable acceptance stages.
