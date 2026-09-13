@@ -2,7 +2,8 @@
 
 lib_status host_console_backend_create(host_console_backend **out_backend)
 {
-    if (out_backend != LIB_NULL) *out_backend = LIB_NULL;
+    if (out_backend == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *out_backend = LIB_NULL;
     return LIB_STATUS_UNSUPPORTED;
 }
 lib_status host_console_backend_destroy(host_console_backend *backend)

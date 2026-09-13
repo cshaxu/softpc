@@ -355,6 +355,14 @@ add_test(NAME softpc-storage-file-writer-binary-smoke
     COMMAND softpc-storage-file-writer-binary-smoke)
 set_tests_properties(softpc-storage-file-writer-binary-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-lib-failure-output-contract-smoke
+    test/unit/lib_failure_output_contract_smoke.c)
+target_link_libraries(softpc-lib-failure-output-contract-smoke PRIVATE
+    ui-window ui-console host storage console ui-base types)
+add_test(NAME softpc-lib-failure-output-contract-smoke
+    COMMAND softpc-lib-failure-output-contract-smoke)
+set_tests_properties(softpc-lib-failure-output-contract-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-irq-smoke test/unit/irq_smoke.c)
 target_link_libraries(softpc-irq-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-irq-smoke PRIVATE
@@ -627,6 +635,8 @@ set(SOFTPC_TEST_TARGETS
     softpc-host-console-broker-smoke
     softpc-dual-media-smoke
     softpc-partition-image-smoke
+    softpc-storage-file-writer-binary-smoke
+    softpc-lib-failure-output-contract-smoke
     softpc-irq-smoke
     softpc-fdc-smoke
     softpc-printer-smoke

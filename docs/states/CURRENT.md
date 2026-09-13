@@ -2,32 +2,32 @@
 
 ## Current Work
 
-M9 T55 S19 is admitted: simplify three audited lib seams without changing the
-approved product model.  It corrects stale public create prose, makes storage
-result handling linear and preserves concrete local status, and makes Window's
-one startup notifier replacement impossible to repeat. T55 remains open.
+M9 T55 S20 is admitted: make library pointer-output failures deterministic and
+turn the approved component DAG into a source-level as well as build-level
+gate. It also removes two narrow local contract/ownership tails. T55 remains
+open.
 Owner package INI and media are preserved.
 
-## M9 T55 S19 Packet
+## M9 T55 S20 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approved the post-S18 audit's stale-contract, linear-storage-status, and notifier-selection cleanup. |
-| Objective | Improve lib maintainability and preserve correct failure semantics by removing misleading contracts, result-collapsing chains, and repeatable startup-only notifier setup. |
-| Non-goals | No MVDM/media changes, product lifecycle redesign, frame/broker/UI-leaf merger, Linux parity expansion, new error framework, extra queue/worker/retry path, or T closure. |
-| Reference Baseline | f700315; clean worktree, dual-width S18 builds/tests, strict library gates, preserved package INI/media. |
-| Candidate Proposal | [S19 simplification sweep](../proposals/m9-t55-s19-lib-simplification-sweep.md). |
-| Files And ABI Surface | ui-window/ui-console public prose, ui-base private mailbox support, storage medium result flow and focused tests; no public function signature change. |
+| Admission And Approval | Owner approved the post-S19 audit's pointer-output contract sweep, source-DAG verifier, and two narrow local contract cleanups. |
+| Objective | Make lib failure outputs deterministic and component boundaries mechanically enforceable without changing product behavior. |
+| Non-goals | No MVDM/media changes, product lifecycle redesign, frame/broker/UI-leaf merger, Linux parity expansion, new error framework, extra queue/worker/retry path, ABI signature change, or T closure. |
+| Reference Baseline | 88e52bb; clean worktree, dual-width S19 56/56 CTest, strict library gates, preserved package INI/media. |
+| Candidate Proposal | [S20 contract and boundary gates](../proposals/m9-t55-s20-lib-contract-and-boundary-gates.md). |
+| Files And ABI Surface | Applicable lib output APIs, component-DAG verifier and focused tests, ui-console/storage local status/ownership paths, and current baseline prose; no public function signature change. |
 | Applicable Rules | Architecture, coding, execution and documentation rules/skills and design authorities. |
-| Verification | Focused storage/notifier/header proofs, fresh x64/x86 builds and full CTest, strict library CTest, manifest/DAG/documentation gates. |
-| Expected Markers | Failed create is truthfully documented; storage does not discard a prior concrete result; notifier selection cannot silently replace an active wake path. |
+| Verification | Focused output-contract/DAG/status proofs, fresh x64/x86 builds and full CTest, strict library CTest, manifest/DAG/documentation gates. |
+| Expected Markers | Applicable pointer outputs are null after failure; forbidden source includes fail the gate; local status/ownership tails are gone. |
 | Asset Needs | Refresh fixed x86/x64 EXEs only; preserve media and INI bytes. |
-| Reporting Requirements | Frozen three-item ledger, changed-path/line accounting, focused/full tests, executor P push and separate actual-diff coordinator review. |
-| Stop Conditions | Do not merge required components, change UI/product semantics, create a second notification path, or expand storage behavior beyond local result preservation. |
-| Exit Criteria | Each ledger row is implemented/proved, all touched callers and similar forms are disposed, builds/tests/gates pass, commit/push; wait for manual testing and keep T55 open. |
-| Original Owner Request | “准入s任务予以清理”. |
-| Similar-Issue Sweep | All public create documentation, all storage OR-chain result collapses, and all default-wake replacement call sites across lib and tests. |
+| Reporting Requirements | Frozen ledger, changed-path/line accounting, focused/full tests, executor P push and separate actual-diff coordinator review. |
+| Stop Conditions | Do not merge components, change UI/product semantics, create a runtime boundary layer, loosen the DAG, or expand storage behavior. |
+| Exit Criteria | Each ledger row is implemented/proved, all applicable pointer-output hits are disposed, builds/tests/gates pass, commit/push; wait for manual testing and keep T55 open. |
+| Original Owner Request | “批准。” |
+| Similar-Issue Sweep | All production output-pointer APIs, all lib direct component includes, and all same-class null/no-op or transferred-ownership cleanup paths. |
 
 ## Current Technical Baseline
 
@@ -38,8 +38,8 @@ Owner package INI and media are preserved.
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
-  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus has S17 x64/x86
-  builds with 55/56 CTest (package fixture expects Console with a Window INI);
+  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus has S19 x64/x86
+  builds with 56/56 CTest;
   standalone library gates pass 3/3. Its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 

@@ -40,12 +40,12 @@ lib_status lib_storage_medium_open(const char *path, lib_storage_medium_mode mod
     lib_storage_file *file = LIB_NULL;
     lib_i64 length;
     lib_status status;
-    lib_status close_status;
 
-    if (path == LIB_NULL || out_medium == LIB_NULL || mode < LIB_STORAGE_MEDIUM_DIRECT ||
+    if (out_medium == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *out_medium = LIB_NULL;
+    if (path == LIB_NULL || mode < LIB_STORAGE_MEDIUM_DIRECT ||
         mode > LIB_STORAGE_MEDIUM_OVERLAY)
         return LIB_STATUS_INVALID_ARGUMENT;
-    *out_medium = LIB_NULL;
     status = mode == LIB_STORAGE_MEDIUM_DIRECT ?
         lib_storage_file_open_readwrite(path, &file) :
         lib_storage_file_open_readonly(path, &file);
@@ -57,8 +57,11 @@ lib_status lib_storage_medium_open(const char *path, lib_storage_medium_mode mod
         status = lib_storage_medium_create(file, (lib_size)length, mode, out_medium);
         if (status == LIB_STATUS_OK) file = LIB_NULL;
     }
-    close_status = lib_storage_file_close(&file);
-    return status == LIB_STATUS_OK ? close_status : status;
+    if (file == LIB_NULL) return status;
+    {
+        lib_status close_status = lib_storage_file_close(&file);
+        return status == LIB_STATUS_OK ? close_status : status;
+    }
 }
 
 lib_status lib_storage_medium_create_overlay(const void *bytes, lib_size byte_count,
@@ -66,6 +69,8 @@ lib_status lib_storage_medium_create_overlay(const void *bytes, lib_size byte_co
 {
     lib_status status;
 
+    if (out_medium == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *out_medium = LIB_NULL;
     if (byte_count != 0u && bytes == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     status = lib_storage_medium_create(LIB_NULL, byte_count,
         LIB_STORAGE_MEDIUM_OVERLAY, out_medium);

@@ -23,13 +23,14 @@ lib_status ui_window_create(ui_window **out_window,
     ui_window *window;
     lib_status status;
 
-    if (out_window == LIB_NULL || options == LIB_NULL ||
+    if (out_window == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *out_window = LIB_NULL;
+    if (options == LIB_NULL ||
         options->initial_title == LIB_NULL ||
         lib_memory_find(options->initial_title, '\0', UI_WINDOW_TITLE_CAPACITY) == LIB_NULL ||
         options->component.input_sink == LIB_NULL ||
         options->component.failure_sink == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
-    *out_window = LIB_NULL;
     window = lib_allocate_zero(1u, sizeof(*window));
     if (window == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     lib_memory_copy(window->initial_title, options->initial_title,

@@ -5,8 +5,8 @@ the S18 failure and ownership contract intact while correcting three narrow
 implementation seams: stale public create prose, storage status collapsing, and
 repeatable startup notifier selection.
 
-The associated admitted design is
-[`m9-t55-s19-lib-simplification-sweep.md`](../../../proposals/m9-t55-s19-lib-simplification-sweep.md).
+The associated admitted design is retained in
+[`M9-T55-S19-lib-simplification-sweep.md`](../../../history/M9-T55-S19-lib-simplification-sweep.md).
 
 Verification records the focused notifier rejection proof, x64/x86 builds and
 full CTest, strict-library CTest, and manifest, dependency and documentation

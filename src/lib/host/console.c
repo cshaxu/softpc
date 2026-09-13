@@ -127,10 +127,11 @@ lib_status host_console_broker_create(host_console_broker **out_broker,
 {
     host_console_broker *broker;
     lib_status status;
-    if (out_broker == LIB_NULL || initial_console == LIB_NULL ||
+    if (out_broker == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *out_broker = LIB_NULL;
+    if (initial_console == LIB_NULL ||
         (initial_mode != HOST_CONSOLE_RAW_EVENTS &&
          initial_mode != HOST_CONSOLE_COOKED_LINES)) return LIB_STATUS_INVALID_ARGUMENT;
-    *out_broker = LIB_NULL;
     if (lib_atomic_flag_test_and_set_explicit(&host_console_process_claimed,
             LIB_MEMORY_ORDER_ACQ_REL)) return LIB_STATUS_INVALID_STATE;
     broker = lib_allocate_zero(1u, sizeof(*broker));

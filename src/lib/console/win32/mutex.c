@@ -4,8 +4,10 @@
 struct console_mutex { lib_win32_critical_section gate; };
 lib_status console_mutex_create(console_mutex **out_mutex)
 {
-    console_mutex *mutex = lib_allocate(sizeof(*mutex));
+    console_mutex *mutex;
+    if (out_mutex == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_mutex = LIB_NULL;
+    mutex = lib_allocate(sizeof(*mutex));
     if (mutex == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     lib_win32_initialize_critical_section(&mutex->gate);
     *out_mutex = mutex;

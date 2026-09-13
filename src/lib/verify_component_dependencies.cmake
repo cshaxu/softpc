@@ -18,6 +18,28 @@ function(library_check_edge owner dependency)
     endif()
 endfunction()
 
+file(GLOB_RECURSE library_component_sources LIST_DIRECTORIES FALSE
+    "${LIBRARY_ROOT}/*.c" "${LIBRARY_ROOT}/*.h")
+foreach(source IN LISTS library_component_sources)
+    file(RELATIVE_PATH relative_source "${LIBRARY_ROOT}" "${source}")
+    string(REPLACE "\\" "/" relative_source "${relative_source}")
+    string(REGEX MATCH "^([^/]+)/" ignored "${relative_source}")
+    set(owner "${CMAKE_MATCH_1}")
+    if(NOT owner IN_LIST library_components)
+        continue()
+    endif()
+    file(READ "${source}" source_text)
+    string(REGEX MATCHALL "#[ \t]*include[ \t]*\"lib/[^/]+/[^\"]+\""
+        component_includes "${source_text}")
+    foreach(component_include IN LISTS component_includes)
+        string(REGEX REPLACE ".*\"lib/([^/]+)/.*" "\\1"
+            dependency "${component_include}")
+        if(dependency IN_LIST library_components)
+            library_check_edge("${owner}" "${dependency}")
+        endif()
+    endforeach()
+endforeach()
+
 if(EXISTS "${LIBRARY_ROOT}/ui-window/win32/component.c")
     file(READ "${LIBRARY_ROOT}/ui-window/win32/component.c" window_worker)
     if(window_worker MATCHES "ui_mailbox_wake_wait|ui_component_mailboxes_wake")
