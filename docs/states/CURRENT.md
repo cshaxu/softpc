@@ -2,30 +2,29 @@
 
 ## Current Work
 
-M9 T56 S1 is active: freeze the accepted SoftPC baseline and write the finite
-common-extraction migration ledger. This is the first implementation/build
-version for common extraction.
+M9 T56 S2 is active: extract the accepted UI ownership into `common/ui` and
+make SoftPC use it, while preserving all presentation behavior.
 
-## M9 T56 S1 Packet
+## M9 T56 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner admitted the queued common-extraction work. |
-| Objective | Freeze every tracked app/host responsibility, thread, lib call and test receiver; prove the current executable behavior with fresh x86/x64 packages before moving any production responsibility. |
-| Non-goals | Do not create common production code, alter MVDM/lib/product behavior, resolve deferred TODOs, or change owner configuration/media. |
-| Reference Baseline | T55 accepted corpus `987d82e`; current source `121de7c`; previous x86/x64 CTest 58/58 and strict lib 8/8 are historical reference only. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner admitted T56 and authorizes automatic sequential S progression after each tested, reviewed and pushed delivery. |
+| Objective | Move the broker, raw/cooked Console, Window/KVM object and presentation execution from app into common/ui; retain injected product title/hotkey/help/status policy and delete the old app UI implementation. |
+| Non-goals | Do not move session reducer/CLI/machine executor, alter MVDM/lib/product behavior, resolve deferred TODOs, or change owner configuration/media. |
+| Reference Baseline | T56 S1 `b22a32e`: x86/x64 58/58, strict lib 8/8, frozen 60-path ledger and package hashes. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | Current packet; T56 S1 record; migration ledger/evidence and only focused baseline tests if a verified coverage gap exists; fixed x86/x64 EXEs. |
+| Files And ABI Surface | New `src/common/ui` public interface/implementation/CMake target and focused tests; moved/deleted app presentation/monitor implementation and changed product composition; fixed x86/x64 EXEs. |
 | Applicable Rules | Execution, architecture, coding, documentation authorities; Product UI; shared execution/architecture/coding/documentation governance skills. |
-| Verification | Exact inventory and ownership review; existing behavior-matrix test audit; fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/DAG gates, package hashes and diff hygiene. |
-| Expected Markers | One finite ledger covers 24 app and 36 host tracked paths at admission; each has one disposition/receiver; every existing thread and lib call has an owner; no production relocation or second common path. |
+| Verification | Presentation/handoff/retirement/X/freeze/focus tests through common/ui; static proof old app presentation/monitor implementation and UI lib calls are gone; fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/DAG gates and diff hygiene. |
+| Expected Markers | Common/ui is sole owner of broker, monitor logical Console and KVM objects; session-facing copied events remain injected; product policy is injected; no second UI implementation or raw app UI lib call remains. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe`; preserve adjacent user-owned INI and all media bytes. |
-| Reporting Requirements | P1 commit/push contains ledger, test disposition, source/artifact hashes and x86/x64 EXE links; report changed-path counts and user hand-test steps. |
-| Stop Conditions | Stop and record a proposal/TODO if a behavior gap requires MVDM change, external source import, product-semantics decision, or a broader test redesign. |
-| Exit Criteria | Ledger is finite and reviewed, dual packages/tests/gates pass, no unintended production change exists, P1 is pushed, and user receives both EXEs for baseline confirmation. |
-| Original Owner Request | 建立 common 组件并提取 debug、xasm32、session、UI、machine；CLI 注入 session，app 保持配置和实体组装；每个 S 删除旧实现并给可验收双 EXE，体验不变。 |
-| Similar-Issue Sweep | All `src/app`/`src/host` tracked C/H/resource paths, CMake sources/targets, tests, threads, lib consumers, lifecycle queues and configuration/media boundaries. |
+| Reporting Requirements | P commit/push contains moved/deleted path ledger, tests, source/artifact hashes, x86/x64 EXE links and changed-path counts; user tests asynchronously. |
+| Stop Conditions | Stop and record a proposal/TODO if preserving an accepted presentation behavior requires MVDM change, external source import, product-semantics decision, or a second UI route. |
+| Exit Criteria | Common/ui runs the production presentation path, old app UI ownership is deleted, all named tests/gates and dual packages pass, review/push complete and EXE links reported. |
+| Original Owner Request | 建立 common 组件并提取 debug、xasm32、session、UI、machine；CLI 注入 session，app 保持配置和实体组装；每个 S 删除旧实现并给可验收双 EXE，体验不变；手测异步进行。 |
+| Similar-Issue Sweep | All presentation/monitor/broker/KVM creation, destruction, input/event sinks, title/freeze/frame calls, CMake/test sources and every UI-related lib consumer. |
 
 ## Current Technical Baseline
 
