@@ -11,8 +11,8 @@ static void ui_console_dispose(ui_console *console)
     lib_release(console);
 }
 
-static void ui_console_component_stop(ui_component *base)
-{ ui_console_worker_join((ui_console *)base); }
+static lib_status ui_console_component_stop(ui_component *base, lib_u32 timeout_ms)
+{ return ui_console_worker_join((ui_console *)base, timeout_ms); }
 
 static void ui_console_component_dispose(ui_component *base)
 { ui_console_dispose((ui_console *)base); }
@@ -48,9 +48,9 @@ lib_status ui_console_publish_frame(ui_console *console, const ui_frame *frame)
         ui_component_publish_frame(&console->base, frame);
 }
 
-void ui_console_destroy(ui_console *console)
+lib_status ui_console_destroy(ui_console *console)
 {
-    if (console != LIB_NULL) ui_component_destroy(&console->base);
+    return console == LIB_NULL ? LIB_STATUS_OK : ui_component_destroy(&console->base);
 }
 
 lib_console *ui_console_get_console(const ui_console *console)

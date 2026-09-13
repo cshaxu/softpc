@@ -32,8 +32,16 @@ release:
 }
 void ui_mailbox_wake_destroy(ui_mailbox_wake *wake)
 { if (wake != LIB_NULL) { (void)lib_linux_pthread_cond_destroy(&wake->changed); (void)lib_linux_pthread_mutex_destroy(&wake->lock); lib_release(wake); } }
-void ui_mailbox_wake_signal(ui_mailbox_wake *wake)
-{ if (wake != LIB_NULL) { (void)lib_linux_pthread_mutex_lock(&wake->lock); wake->signaled = LIB_TRUE; (void)lib_linux_pthread_cond_signal(&wake->changed); (void)lib_linux_pthread_mutex_unlock(&wake->lock); } }
+lib_status ui_mailbox_wake_signal(ui_mailbox_wake *wake)
+{
+    int result;
+    if (wake == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    if (lib_linux_pthread_mutex_lock(&wake->lock) != 0) return LIB_STATUS_IO_ERROR;
+    wake->signaled = LIB_TRUE;
+    result = lib_linux_pthread_cond_signal(&wake->changed);
+    if (lib_linux_pthread_mutex_unlock(&wake->lock) != 0) result = -1;
+    return result == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+}
 ui_mailbox_wake_wait_result ui_mailbox_wake_wait(
     const ui_mailbox_wake *wake, lib_u32 timeout_milliseconds)
 {

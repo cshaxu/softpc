@@ -17,6 +17,7 @@
 #define WIN32_WINDOW_DEFAULT_WIDTH 680
 #define WIN32_WINDOW_DEFAULT_HEIGHT 560
 #define WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS 250u
+#define WIN32_WINDOW_CURSOR_TIMER 1u
 
 typedef struct ui_win32_window_context {
     ui_window *component;
@@ -294,27 +295,18 @@ static int win32_window_invalidate(lib_win32_hwnd window,
     return 0;
 }
 
-static lib_win32_dword win32_window_cursor_blink_timeout(
-    const ui_win32_window_context *context)
-{
-    lib_win32_dword now;
-
-    if (!win32_window_accepting_input(context) ||
-        context->frozen != LIB_FALSE ||
-        !ui_frame_is_valid(&context->frame) ||
-        context->frame.graphics != 0u || context->frame.cursor_visible == 0u)
-        return LIB_WIN32_INFINITE;
-    now = lib_win32_get_tick_count();
-    return (lib_win32_long)(now - context->cursor_blink_due) >= 0 ? 0u :
-        context->cursor_blink_due - now;
-}
-
 static void win32_window_advance_cursor_blink(lib_win32_hwnd window,
     ui_win32_window_context *context)
 {
     lib_win32_rect cursor;
 
-    if (win32_window_cursor_blink_timeout(context) != 0u) return;
+    /* KillTimer does not remove an already queued tick. The frozen/due guards
+     * also prevent an old tick from advancing a newly unfrozen phase early. */
+    if (!win32_window_accepting_input(context) || context->frozen ||
+        !ui_frame_is_valid(&context->frame) || context->frame.graphics ||
+        !context->frame.cursor_visible ||
+        (lib_win32_long)(lib_win32_get_tick_count() - context->cursor_blink_due) < 0)
+        return;
     context->cursor_blink_visible = context->cursor_blink_visible == LIB_FALSE;
     context->cursor_blink_due = lib_win32_get_tick_count() + WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS;
     if (win32_window_cursor_rect(window, context, &cursor))
@@ -499,6 +491,13 @@ static int win32_window_consume_mailboxes(lib_win32_hwnd window,
                 context->cursor_blink_due = lib_win32_get_tick_count() +
                     WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS;
             }
+            if (context->frozen ?
+                !lib_win32_kill_timer(window, WIN32_WINDOW_CURSOR_TIMER) :
+                !lib_win32_set_timer(window, WIN32_WINDOW_CURSOR_TIMER,
+                    WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS, LIB_NULL)) {
+                ui_component_fail(&context->component->base, LIB_STATUS_IO_ERROR);
+                return 0;
+            }
             if (!win32_window_invalidate(window, context, LIB_NULL)) return 0;
         } else if (control.kind == UI_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE)
             win32_window_release_mouse(context);
@@ -532,6 +531,12 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
     context = win32_window_context(window);
     if (context == LIB_NULL) return lib_win32_def_window_proc_w(window, message, wparam, lparam);
     switch (message) {
+    case LIB_WIN32_WM_TIMER:
+        if (wparam == WIN32_WINDOW_CURSOR_TIMER) {
+            win32_window_advance_cursor_blink(window, context);
+            return 0;
+        }
+        break;
     case WIN32_WINDOW_MAILBOX_READY:
         context->notified = LIB_TRUE;
         if (context->consuming) return 0;
@@ -765,6 +770,13 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
         lib_win32_set_event(state->ready);
         return 0u;
     }
+    if (!context->frozen && !lib_win32_set_timer(window,
+            WIN32_WINDOW_CURSOR_TIMER, WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS, LIB_NULL)) {
+        win32_window_destroy(context, window);
+        state->startup_status = LIB_STATUS_IO_ERROR;
+        lib_win32_set_event(state->ready);
+        return 0u;
+    }
     state->startup_status = LIB_STATUS_OK;
     context->window = window;
     ui_component_mailboxes_set_notify(&component->base.mailboxes,
@@ -779,11 +791,10 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
     while (lib_win32_is_window(window) && win32_window_accepting_input(context)) {
         lib_win32_dword wait = lib_win32_msg_wait_for_multiple_objects(
             0u, LIB_NULL, LIB_WIN32_FALSE,
-            win32_window_cursor_blink_timeout(context), LIB_WIN32_QS_ALLINPUT);
+            LIB_WIN32_INFINITE, LIB_WIN32_QS_ALLINPUT);
         if (wait == LIB_WIN32_WAIT_FAILED) {
             ui_component_fail(&component->base, LIB_STATUS_IO_ERROR);
         }
-        win32_window_advance_cursor_blink(window, context);
         while (win32_window_accepting_input(context) &&
             lib_win32_peek_message_w(&message, LIB_NULL, 0, 0, LIB_WIN32_PM_REMOVE)) {
             if (message.message == LIB_WIN32_WM_QUIT) {
@@ -791,7 +802,6 @@ static lib_win32_dword LIB_WIN32_WINAPI ui_window_worker(void *opaque)
                 break;
             }
             lib_win32_dispatch_message_w(&message);
-            win32_window_advance_cursor_blink(window, context);
         }
     }
     if (!lib_win32_is_window(window)) ui_component_fail(&component->base, LIB_STATUS_IO_ERROR);
@@ -837,16 +847,18 @@ lib_status ui_window_worker_start(ui_window *component)
     return LIB_STATUS_OK;
 }
 
-void ui_window_worker_join(ui_window *component)
+lib_status ui_window_worker_join(ui_window *component, lib_u32 timeout_ms)
 {
     ui_window_win32_state *state;
     if (component == LIB_NULL || (state = (ui_window_win32_state *)
-            component->worker_state) == LIB_NULL) return;
+            component->worker_state) == LIB_NULL) return LIB_STATUS_OK;
     /* STOP is already in the control FIFO.  The worker consumes it, closes
      * its Window, and thereby establishes completion before this join. */
-    (void)lib_win32_wait_for_single_object(state->worker, LIB_WIN32_INFINITE);
+    if (lib_win32_wait_for_single_object(state->worker, timeout_ms) != LIB_WIN32_WAIT_OBJECT_0)
+        return LIB_STATUS_IO_ERROR;
     lib_win32_close_handle(state->worker);
     lib_win32_close_handle(state->ready);
     component->worker_state = LIB_NULL;
     lib_release(state);
+    return LIB_STATUS_OK;
 }

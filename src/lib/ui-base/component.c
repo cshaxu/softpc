@@ -127,19 +127,21 @@ lib_status ui_component_request_stop(ui_component *component)
         ui_component_enqueue_controls(component, &control, 1u);
 }
 
-void ui_component_destroy(ui_component *component)
+lib_status ui_component_destroy(ui_component *component)
 {
     lib_status status;
-    if (component == LIB_NULL) return;
+    if (component == LIB_NULL) return LIB_STATUS_OK;
     status = ui_component_request_stop(component);
     /* Notification failure is already terminal, not an unaccepted STOP. */
     if (status != LIB_STATUS_OK && status != LIB_STATUS_IO_ERROR) {
         ui_component_report_failure(component, LIB_STATUS_INVALID_STATE);
-        return;
+        return status;
     }
-    component->join_worker(component);
+    status = component->join_worker(component, UI_COMPONENT_DESTROY_TIMEOUT_MS);
+    if (status != LIB_STATUS_OK) return status;
     ui_hotkey_matcher_discard(&component->hotkey_matcher);
     component->dispose(component);
+    return LIB_STATUS_OK;
 }
 
 void ui_component_fail(ui_component *component, lib_status status)

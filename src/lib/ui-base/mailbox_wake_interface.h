@@ -13,7 +13,7 @@ typedef enum ui_mailbox_wake_wait_result {
 
 ui_mailbox_wake *ui_mailbox_wake_create(void);
 void ui_mailbox_wake_destroy(ui_mailbox_wake *wake);
-void ui_mailbox_wake_signal(ui_mailbox_wake *wake);
+lib_status ui_mailbox_wake_signal(ui_mailbox_wake *wake);
 ui_mailbox_wake_wait_result ui_mailbox_wake_wait(
     const ui_mailbox_wake *wake, lib_u32 timeout_milliseconds);
 #endif

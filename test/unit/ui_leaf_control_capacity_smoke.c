@@ -20,8 +20,8 @@ static void leaf_failure(void *opaque, lib_u64 identity, lib_status status)
     probe->last_failure = status;
 }
 
-static void leaf_stop(ui_component *component)
-{ (void)component; }
+static lib_status leaf_stop(ui_component *component, lib_u32 timeout_ms)
+{ (void)component; (void)timeout_ms; return LIB_STATUS_OK; }
 
 static void leaf_dispose(ui_component *component)
 { ui_component_mailboxes_destroy(&component->mailboxes); }

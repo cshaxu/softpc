@@ -11,8 +11,19 @@ static void paint_scenario(void);
 static unsigned paint_ends;
 static int inject_output_failure;
 static unsigned notification_attempts;
+static int reject_join;
+static DWORD WINAPI join_wait(HANDLE h,DWORD timeout)
+{
+    if(reject_join && timeout==UI_COMPONENT_DESTROY_TIMEOUT_MS) return WAIT_TIMEOUT;
+    return WaitForSingleObject(h,timeout);
+}
+static UINT_PTR WINAPI start_timer(HWND w,UINT_PTR id,UINT ms,TIMERPROC fn)
+{ return scenario==15 || scenario==16 ? 0 : SetTimer(w,id,ms,fn); }
+static BOOL WINAPI stop_timer(HWND w,UINT_PTR id)
+{ return scenario==17 ? FALSE : KillTimer(w,id); }
 static BOOL WINAPI notify(HWND w, UINT m, WPARAM a, LPARAM b)
 {
+    if(scenario==18) { ++notification_attempts; return FALSE; }
     if (scenario == 14 && notification_attempts++ == 0) return FALSE;
     return SendNotifyMessageW(w,m,a,b);
 }
@@ -82,8 +93,14 @@ static DWORD WINAPI controlled_wait(DWORD count, const HANDLE *handles,
 #define lib_win32_create_cursor make_cursor
 #undef lib_win32_send_notify_message_w
 #define lib_win32_send_notify_message_w notify
+#undef lib_win32_set_timer
+#undef lib_win32_kill_timer
+#define lib_win32_set_timer start_timer
+#define lib_win32_kill_timer stop_timer
 #undef lib_win32_msg_wait_for_multiple_objects
 #define lib_win32_msg_wait_for_multiple_objects controlled_wait
+#undef lib_win32_wait_for_single_object
+#define lib_win32_wait_for_single_object join_wait
 static void checked_fail(ui_component *component, lib_status status)
 {
     static ui_frame rejected = { .valid = 1, .text_columns = 80, .text_rows = 25 };
@@ -140,7 +157,7 @@ static void paint_scenario(void)
 int main(void)
 {
     static ui_frame frame;
-    for (scenario = 0; scenario != 15; ++scenario) {
+    for (scenario = 0; scenario != 19; ++scenario) {
         ui_window_options options = { 0 };
         ui_window *window = NULL;
         waiting = CreateEventA(NULL, TRUE, FALSE, NULL);
@@ -150,13 +167,14 @@ int main(void)
         paint_ends=0;
         inject_output_failure=0;
         notification_attempts=0;
+        reject_join=0;
         options.component.input_sink = input;
         options.component.failure_sink = failure;
         options.initial_title = "retirement proof";
-        options.initial_frozen = scenario == 8;
+        options.initial_frozen = scenario == 8 || scenario == 16;
         assert(ui_hotkey_registry_register(&options.component.hotkeys, 'P',
             UI_HOTKEY_MODIFIER_CONTROL | UI_HOTKEY_MODIFIER_ALT, "toggle") == LIB_STATUS_OK);
-        if (scenario==13) {
+        if (scenario==13 || scenario==15) {
             assert(ui_window_create(&window,&options)==LIB_STATUS_IO_ERROR && !window);
             assert(!IsWindow(created) && retired==0);
             CloseHandle(waiting); CloseHandle(proceed);
@@ -167,9 +185,18 @@ int main(void)
         frame.valid = 1u; frame.text_columns = 80u; frame.text_rows = 25u;
         frame.cursor_visible=1; frame.font_height=16; frame.cursor_top=14; frame.cursor_bottom=15;
         assert(ui_window_publish_frame(window, &frame) ==
-            (scenario==14 ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK));
+            (scenario==14 || scenario==18 ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK));
+        if(scenario==18) {
+            void *retained=window->worker_state;
+            reject_join=1;
+            assert(ui_window_destroy(window)==LIB_STATUS_IO_ERROR);
+            assert(window->worker_state==retained && !retired && notification_attempts==2);
+            reject_join=0;
+        }
         if (scenario == 0 || scenario == 5)
             assert(ui_component_request_stop(&window->base) == LIB_STATUS_OK);
+        if (scenario==16) assert(ui_window_unfreeze(window)==LIB_STATUS_OK);
+        if (scenario==17) assert(ui_window_freeze(window)==LIB_STATUS_OK);
         SetEvent(proceed);
         /* Wait for the actual worker before destroy queues an additional STOP. */
         ui_window_win32_state *state = window->worker_state;
@@ -179,7 +206,7 @@ int main(void)
         if (scenario==10 || scenario==11) assert(paint_ends>0);
         assert(ordinary == (scenario == 7) && closes == (scenario == 8));
         assert(ui_window_publish_frame(window, &frame) == LIB_STATUS_INVALID_STATE);
-        ui_window_destroy(window);
+        assert(ui_window_destroy(window)==LIB_STATUS_OK);
         assert(retired == 1);
         CloseHandle(waiting); CloseHandle(proceed);
     }

@@ -31,8 +31,10 @@ lib_status ui_component_publish_frame(ui_component *component,
  * ordinary control queue still has its reserved STOP slot. Other control
  * enqueue failures are returned and reported through the failure sink. */
 lib_status ui_component_request_stop(ui_component *component);
-/* Synchronous destruction: returns only after the worker consumed STOP,
- * emitted SOURCE_RETIRED, and no worker remains. */
-void ui_component_destroy(ui_component *component);
+/* Synchronous destruction: OK means the worker completed and storage is freed.
+ * Join waits at most 5000 ms. Failure retains all resources potentially used
+ * by the worker, including the caller-owned callback context. Treat failure as
+ * terminal; do not reuse the object or release its context. NULL returns OK. */
+lib_status ui_component_destroy(ui_component *component);
 
 #endif

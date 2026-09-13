@@ -1,7 +1,7 @@
 #include "lib/ui-window/window.h"
 
-static void ui_window_component_stop(ui_component *base)
-{ ui_window_worker_join((ui_window *)base); }
+static lib_status ui_window_component_stop(ui_component *base, lib_u32 timeout_ms)
+{ return ui_window_worker_join((ui_window *)base, timeout_ms); }
 
 static void ui_window_component_dispose(ui_component *base)
 {
@@ -53,9 +53,9 @@ lib_status ui_window_publish_frame(ui_window *window, const ui_frame *frame)
         ui_component_publish_frame(&window->base, frame);
 }
 
-void ui_window_destroy(ui_window *window)
+lib_status ui_window_destroy(ui_window *window)
 {
-    if (window != LIB_NULL) ui_component_destroy(&window->base);
+    return window == LIB_NULL ? LIB_STATUS_OK : ui_component_destroy(&window->base);
 }
 
 lib_status ui_window_set_title(ui_window *window, const char *title)

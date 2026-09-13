@@ -11,6 +11,12 @@ static int reject_input;
 static unsigned focus_requests, foreground_requests;
 static int clip_ok = 1, resize_ok = 1, title_ok = 1, client_ok = 1;
 static DWORD ticks;
+static unsigned timer_starts, timer_stops;
+static int timer_ok = 1;
+static UINT_PTR WINAPI start_timer(HWND w,UINT_PTR id,UINT ms,TIMERPROC fn)
+{ (void)w; assert(id==1 && ms==250 && !fn); ++timer_starts; return timer_ok ? id : 0; }
+static BOOL WINAPI stop_timer(HWND w,UINT_PTR id)
+{ (void)w; assert(id==1); ++timer_stops; return timer_ok; }
 static int selection_ok;
 static unsigned selections, deleted_bitmaps, deleted_dcs;
 static lib_u32 surface_bits[64];
@@ -78,6 +84,10 @@ static BOOL WINAPI title(HWND w,LPCSTR text)
 #define lib_win32_set_window_text_a title
 #undef lib_win32_get_tick_count
 #define lib_win32_get_tick_count clock_tick
+#undef lib_win32_set_timer
+#undef lib_win32_kill_timer
+#define lib_win32_set_timer start_timer
+#define lib_win32_kill_timer stop_timer
 #undef lib_win32_invalidate_rect
 #define lib_win32_invalidate_rect invalidate
 #undef lib_win32_get_dc
@@ -113,7 +123,8 @@ static int input(void *p,const ui_input_event *e)
 { (void)p; assert(e->type==UI_EVENT_MOUSE); ++events; return !reject_input; }
 static void failure(void *p,lib_u64 id,lib_status status)
 { (void)p;(void)id;(void)status; }
-static void join(ui_component *p) { (void)p; }
+static lib_status join(ui_component *p, lib_u32 timeout_ms)
+{ (void)p; (void)timeout_ms; return LIB_STATUS_OK; }
 static void dispose(ui_component *p) { ui_component_mailboxes_destroy(&p->mailboxes); }
 int main(void)
 {
@@ -176,23 +187,25 @@ int main(void)
     c.frame.valid=1; c.frame.text_columns=80; c.frame.text_rows=25;
     c.frame.cursor_visible=1; c.frame.font_height=16;
     c.cursor_blink_due=250; c.cursor_blink_visible=1;
-    for (ticks=0;ticks<250;++ticks) win32_window_advance_cursor_blink((HWND)1,&c);
+    for (ticks=0;ticks<250;++ticks) win32_window_proc((HWND)1,WM_TIMER,WIN32_WINDOW_CURSOR_TIMER,0);
     assert(c.cursor_blink_visible);
-    win32_window_advance_cursor_blink((HWND)1,&c);
+    win32_window_proc((HWND)1,WM_TIMER,WIN32_WINDOW_CURSOR_TIMER,0);
     assert(!c.cursor_blink_visible && c.cursor_blink_due==500);
-    /* A repeated unfreeze must not reset either phase or deadline. */
+    /* A repeated unfreeze must not restart the native timer or reset phase. */
+    unsigned starts_before=timer_starts, stops_before=timer_stops;
     for (ticks=300;ticks<500;ticks+=50) {
         assert(ui_window_unfreeze(&window)==LIB_STATUS_OK);
         assert(win32_window_consume_mailboxes((HWND)1,&c));
         assert(!c.cursor_blink_visible && c.cursor_blink_due==500);
+        assert(timer_starts==starts_before && timer_stops==stops_before);
     }
-    c.frozen=1; ticks=500; win32_window_advance_cursor_blink((HWND)1,&c);
+    c.frozen=1; ticks=500; win32_window_proc((HWND)1,WM_TIMER,WIN32_WINDOW_CURSOR_TIMER,0);
     assert(!c.cursor_blink_visible);
     c.frozen=0; c.cursor_blink_due=10; ticks=0xfffffff0u;
-    win32_window_advance_cursor_blink((HWND)1,&c); assert(!c.cursor_blink_visible);
-    ticks=10; win32_window_advance_cursor_blink((HWND)1,&c); assert(c.cursor_blink_visible);
+    win32_window_proc((HWND)1,WM_TIMER,WIN32_WINDOW_CURSOR_TIMER,0); assert(!c.cursor_blink_visible);
+    ticks=10; win32_window_proc((HWND)1,WM_TIMER,WIN32_WINDOW_CURSOR_TIMER,0); assert(c.cursor_blink_visible);
     c.frame.cursor_visible=0; ticks=1000;
-    win32_window_advance_cursor_blink((HWND)1,&c); assert(c.cursor_blink_visible);
+    win32_window_proc((HWND)1,WM_TIMER,WIN32_WINDOW_CURSOR_TIMER,0); assert(c.cursor_blink_visible);
     assert(ui_window_unfreeze(&window)==LIB_STATUS_OK);
     assert(win32_window_consume_mailboxes((HWND)1,&c));
     assert(focus_requests==1 && foreground_requests==1 && !c.mouse.captured);
@@ -200,14 +213,14 @@ int main(void)
     ui_component_control command={.kind=UI_COMPONENT_CONTROL_SET_WINDOW_TITLE};
     assert(ui_component_mailboxes_enqueue_controls(&window.base.mailboxes,&command,1)==0);
     assert(!win32_window_consume_mailboxes((HWND)1,&c) && window.base.stopping);
-    ui_component_destroy(&window.base);
+    assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
     assert(ui_component_initialize(&window.base,&options,join,dispose)==0);
     c.component=&window; c.frozen=1; title_ok=1; reenter_title=1;
     ui_component_mailboxes_set_notify(&window.base.mailboxes,immediate_notification,&c);
     assert(!ui_component_mailboxes_wake(&window.base.mailboxes));
     assert(ui_window_set_title(&window,"reentrant notification")==0);
     assert(!c.frozen && !c.consuming && !window.base.mailboxes.control_count);
-    ui_component_destroy(&window.base);
+    assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
     /* A release callback faults mid-FIFO: later controls and frame stay untouched. */
     assert(ui_component_initialize(&window.base,&options,join,dispose)==0);
     c.component=&window; c.frozen=0; c.left_button=1;
@@ -220,7 +233,7 @@ int main(void)
     assert(window.base.stopping && !c.frozen && !foreground_requests);
     assert(window.base.mailboxes.control_count==3);
     assert(window.base.mailboxes.frame_pending);
-    ui_component_destroy(&window.base);
+    assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
     for (unsigned edge=UI_WINDOW_EDGE_LEFT;edge<=UI_WINDOW_EDGE_BOTTOMRIGHT;++edge) {
         ui_window_rect r={10,20,826,749};
         ui_window_constrain_sizing(&r,(ui_window_edge)edge,16,29,640,480);

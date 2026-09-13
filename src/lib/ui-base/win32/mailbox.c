@@ -15,8 +15,11 @@ ui_mailbox_wake *ui_mailbox_wake_create(void)
 }
 void ui_mailbox_wake_destroy(ui_mailbox_wake *wake)
 { if (wake != LIB_NULL) { if (wake->handle != LIB_NULL) (void)lib_win32_close_handle(wake->handle); lib_release(wake); } }
-void ui_mailbox_wake_signal(ui_mailbox_wake *wake)
-{ if (wake != LIB_NULL && wake->handle != LIB_NULL) (void)lib_win32_set_event(wake->handle); }
+lib_status ui_mailbox_wake_signal(ui_mailbox_wake *wake)
+{
+    if (wake == LIB_NULL || wake->handle == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    return lib_win32_set_event(wake->handle) ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+}
 
 ui_mailbox_wake_wait_result ui_mailbox_wake_wait(
     const ui_mailbox_wake *wake, lib_u32 timeout_milliseconds)

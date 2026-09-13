@@ -54,6 +54,12 @@ only when the scan is absent. A held key retains its original logical key across
 lock/layout changes. Both leaves share this ledger. Ordinary keys and modifiers follow the same lifetime: a
 delivered make always retains its break and never becomes consumed later.
 The ledger is released at retirement; destroy also handles workerless cleanup.
+Destroy returns a checked status: one join waits at most 5000 ms. Only success
+releases the component. Failure retains handles, mailbox and callback context
+dependencies and is terminal for the caller; do not reuse or free that state.
+The library does not terminate the application or add a fallback wake channel.
+Both selected wake implementations return native signal failures to the request
+caller; notification failure does not roll back or replay the queued request.
 
 Both leaves submit copied keyboard records through ui_keyboard_submit_record:
 Window supplies separate transitions/characters, Console combined records.

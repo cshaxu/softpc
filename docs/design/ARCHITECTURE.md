@@ -195,6 +195,13 @@ motion scaling belong to ui-window root helpers. Native files marshal SDK
 values and own actual drawing/messages/capture. Worker context and frame share
 one allocation; native cleanup runs on the worker, storage release after join.
 Host event is one opaque platform allocation, not a pointer-only outer wrapper.
+UI destruction returns a checked status after one bounded 5000 ms join. Success
+releases storage; failure retains the live worker's objects and callback context.
+SoftPC treats that failure as terminal and exits without retrying cleanup or
+freeing dependencies. Lib never terminates the process. UI notification failures
+are returned, not converted into success or request replay. Window blinking uses
+one native timer message path, including native modal loops, not outer-loop
+timeout scheduling.
 Task owns cancellation and entry/context; its platform thread object retains
 startup parameters until join. Root task destroy performs the join once before
 platform disposal.

@@ -411,6 +411,17 @@ foreach(source IN LISTS standalone_owner_sources)
     endif()
 endforeach()
 
+# UI destruction is a checked terminal boundary, never a discarded status.
+file(GLOB app_shutdown_sources "${SOFTPC_SOURCE_DIR}/src/app/*.c")
+foreach(source IN LISTS app_shutdown_sources)
+    file(STRINGS "${source}" shutdown_lines REGEX "ui_(window|console)_destroy[ \t]*\\(")
+    foreach(line IN LISTS shutdown_lines)
+        if(NOT line MATCHES "app_presentation_require_destroy\\(ui_(window|console)_destroy")
+            message(FATAL_ERROR "Unchecked UI destruction: ${source}: ${line}")
+        endif()
+    endforeach()
+endforeach()
+
 # M8 T1: test tiers are an input boundary, not merely a CTest convention.
 # Unit fixtures may write their tiny disk bytes under build/, but neither their
 # source nor their resource scripts may name product artifacts. Integration is

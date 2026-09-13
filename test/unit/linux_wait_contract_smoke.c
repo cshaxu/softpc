@@ -38,7 +38,7 @@ int main(void)
     signal_wake = ui_mailbox_wake_create();
     assert(signal_wake);
     assert(ui_mailbox_wake_wait(signal_wake, 0) == UI_MAILBOX_WAKE_WAIT_TIMED_OUT);
-    ui_mailbox_wake_signal(signal_wake);
+    assert(ui_mailbox_wake_signal(signal_wake)==LIB_STATUS_OK);
     assert(ui_mailbox_wake_wait(signal_wake, 0) == UI_MAILBOX_WAKE_WAIT_WAKE);
     assert(wait_calls == 0);
     wait_hook = signal_on_second_wait;
@@ -55,6 +55,16 @@ int main(void)
     clock_failure = 1;
     assert(ui_mailbox_wake_wait(signal_wake, 1) == UI_MAILBOX_WAKE_WAIT_FAULT);
     clock_failure = 0;
+    assert(ui_mailbox_wake_signal(NULL)==LIB_STATUS_INVALID_ARGUMENT);
+    fail_lock=1;
+    assert(ui_mailbox_wake_signal(signal_wake)==LIB_STATUS_IO_ERROR);
+    assert(!signal_wake->lock.locked);
+    fail_lock=0;fail_signal=1;
+    assert(ui_mailbox_wake_signal(signal_wake)==LIB_STATUS_IO_ERROR);
+    assert(!signal_wake->lock.locked);
+    fail_signal=0;fail_unlock=1;
+    assert(ui_mailbox_wake_signal(signal_wake)==LIB_STATUS_IO_ERROR);
+    fail_unlock=0;
     ui_mailbox_wake_destroy(signal_wake); signal_wake = NULL;
     assert(live_mutexes == 0 && live_conditions == 0);
 

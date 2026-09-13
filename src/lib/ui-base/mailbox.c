@@ -12,8 +12,7 @@ static void ui_component_mailboxes_unlock(lib_atomic_flag *lock)
 
 static lib_status ui_component_notify_waiter(void *context)
 {
-    ui_mailbox_wake_signal(context);
-    return LIB_STATUS_OK;
+    return ui_mailbox_wake_signal(context);
 }
 
 void ui_component_mailboxes_set_notify(ui_component_mailboxes *mailboxes,

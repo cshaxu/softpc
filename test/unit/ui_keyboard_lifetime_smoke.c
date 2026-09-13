@@ -114,7 +114,8 @@ static void failure_paths(void)
 }
 static void no_failure(void *opaque, lib_u64 source, lib_status status)
 { (void)opaque; (void)source; (void)status; }
-static void no_join(ui_component *component) { (void)component; }
+static lib_status no_join(ui_component *component, lib_u32 timeout_ms)
+{ (void)component; (void)timeout_ms; return LIB_STATUS_OK; }
 static void no_dispose(ui_component *component)
 { ui_component_mailboxes_destroy(&component->mailboxes); }
 static void console_record(ui_console *console, unsigned key, unsigned scan,
@@ -256,8 +257,8 @@ static void adapter_equivalence(unsigned scan)
     win32_window_proc(handle, WM_KEYDOWN, 'B', 0);
     console_record(&console, 'B', 0, 'b', 1, 0);
     assert(w.attempts == 3 && c.attempts == 3 && w.count == 2 && c.count == 2);
-    ui_component_destroy(&window.base);
-    ui_component_destroy(&console.base);
+    assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
+    assert(ui_component_destroy(&console.base) == LIB_STATUS_OK);
 }
 static void repeat_delivery_failure(void)
 {
@@ -274,7 +275,7 @@ static void repeat_delivery_failure(void)
     assert(c.count == 2 && c.attempts == 3 && window.base.stopping);
     win32_window_proc((HWND)1, WM_KEYDOWN, 'B', 0x300001);
     assert(c.attempts == 3);
-    ui_component_destroy(&window.base);
+    assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
 }
 
 static int match_normalized(void *opaque, const ui_input_event *event)

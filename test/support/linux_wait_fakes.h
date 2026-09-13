@@ -25,6 +25,7 @@ static int lib_linux_errno;
 static int fail_init_step, init_step, live_mutexes, live_conditions, live_attributes;
 static int wait_calls, wait_result, clock_failure, sleep_calls;
 static int interrupt_sleep;
+static int fail_signal, fail_lock, fail_unlock;
 static void (*wait_hook)(void);
 static lib_linux_timespec observed_deadline;
 static int init_failed(void) { return ++init_step == fail_init_step; }
@@ -33,9 +34,9 @@ static inline int lib_linux_pthread_mutex_init(lib_linux_pthread_mutex_t *m, con
 static inline int lib_linux_pthread_mutex_destroy(lib_linux_pthread_mutex_t *m)
 { assert(m->alive && !m->locked); m->alive = 0; --live_mutexes; return 0; }
 static inline int lib_linux_pthread_mutex_lock(lib_linux_pthread_mutex_t *m)
-{ assert(m->alive && !m->locked); m->locked = 1; return 0; }
+{ assert(m->alive && !m->locked); if(fail_lock) return 1; m->locked = 1; return 0; }
 static inline int lib_linux_pthread_mutex_unlock(lib_linux_pthread_mutex_t *m)
-{ assert(m->alive && m->locked); m->locked = 0; return 0; }
+{ assert(m->alive && m->locked); m->locked = 0; return fail_unlock; }
 static inline int lib_linux_pthread_condattr_init(lib_linux_pthread_condattr_t *a)
 { if (init_failed()) return 1; a->alive = 1; a->clock = 0; ++live_attributes; return 0; }
 static inline int lib_linux_pthread_condattr_setclock(lib_linux_pthread_condattr_t *a, int clock)
@@ -47,7 +48,7 @@ static inline int lib_linux_pthread_cond_init(lib_linux_pthread_cond_t *c, const
 static inline int lib_linux_pthread_cond_destroy(lib_linux_pthread_cond_t *c)
 { assert(c->alive); c->alive = 0; --live_conditions; return 0; }
 static inline int lib_linux_pthread_cond_signal(lib_linux_pthread_cond_t *c)
-{ assert(c->alive); return 0; }
+{ assert(c->alive); return fail_signal; }
 static inline int lib_linux_pthread_cond_broadcast(lib_linux_pthread_cond_t *c)
 { return lib_linux_pthread_cond_signal(c); }
 static inline int lib_linux_pthread_once(lib_linux_pthread_once_t *once, void (*fn)(void))

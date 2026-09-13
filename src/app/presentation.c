@@ -27,6 +27,15 @@ struct app_presentation {
 
 typedef struct app_presentation app_presentation_context;
 
+static void app_presentation_require_destroy(lib_status status)
+{
+    if (status == LIB_STATUS_OK) return;
+    /* A retained UI worker can still use runtime/queue/callback context.
+     * Do not retry normal cleanup or run exit handlers that may free them. */
+    fputs("softpcvm: UI shutdown failed; terminating.\n", stderr);
+    _Exit(EXIT_FAILURE);
+}
+
 static void app_presentation_publish_title(app_presentation_context *context,
     app_runtime_state state)
 {
@@ -111,9 +120,9 @@ static void app_presentation_destroy_components(app_presentation_context *contex
         (void)app_monitor_console_activate_self(context->monitor,
             context->console);
     if (context->window != NULL)
-        ui_window_destroy(context->window);
+        app_presentation_require_destroy(ui_window_destroy(context->window));
     if (context->console != NULL)
-        ui_console_destroy(context->console);
+        app_presentation_require_destroy(ui_console_destroy(context->console));
     context->window = NULL;
     context->console = NULL;
     context->window_delivered_frame_sequence = 0u;
@@ -155,14 +164,14 @@ int app_presentation_apply_action(app_presentation *presentation,
         return app_control_queue_push_broker_completed(context->control_queue, 0,
             app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE:
-        ui_console_destroy(context->console);
+        app_presentation_require_destroy(ui_console_destroy(context->console));
         context->console = NULL;
         context->console_delivered_frame_sequence = 0u;
         return app_control_queue_push_component_completed(context->control_queue,
             APP_CONTROL_COMPONENT_VM_CONSOLE, 0,
             app_runtime_run_generation(context->runtime));
     case APP_RECONCILER_ACTION_DESTROY_WINDOW:
-        ui_window_destroy(context->window);
+        app_presentation_require_destroy(ui_window_destroy(context->window));
         context->window = NULL;
         context->window_delivered_frame_sequence = 0u;
         return app_control_queue_push_component_completed(context->control_queue,

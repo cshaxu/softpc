@@ -14,7 +14,13 @@ This changes only leaf-support implementation, not application APIs.
 
 The Window owns only host presentation mechanics: it draws a content text cursor
 from copied position/shape/enabled frame fields and toggles that drawing every
-250 ms while unfrozen. `freeze()` atomically prevents capture, releases any
+250 ms while unfrozen, using one owned native Window timer. No outer-loop blink
+timeout remains; native move/size/menu loops dispatch the same timer message.
+Timer startup/transition failures use the existing failure path. Native Window
+destruction removes its timer; stale queued ticks cannot bypass frozen/due checks.
+Checked destroy uses the shared 5000 ms join contract; a failed join retains the
+component and all callback dependencies, never freeing a live worker.
+`freeze()` atomically prevents capture, releases any
 capture, and holds the cursor at its current drawn state; `unfreeze()` resumes
 the blink but waits for a later client-area click before it captures. A real
 frozen-to-unfrozen transition requests foreground/focus once, subject to host

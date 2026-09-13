@@ -45,8 +45,8 @@ static void component_probe_failure(void *opaque, lib_u64 source_identity,
     probe->last_failure = status;
 }
 
-static void component_probe_stop(ui_component *component)
-{ (void)component; }
+static lib_status component_probe_stop(ui_component *component, lib_u32 timeout_ms)
+{ (void)component; assert(timeout_ms == UI_COMPONENT_DESTROY_TIMEOUT_MS); return LIB_STATUS_OK; }
 
 static void component_probe_dispose(ui_component *component)
 { ui_component_mailboxes_destroy(&component->mailboxes); }
@@ -191,8 +191,8 @@ int main(void)
     }
     assert(!ui_component_mailboxes_take_control(&third.mailboxes, &taken));
 
-    ui_component_destroy(&first);
-    ui_component_destroy(&second);
-    ui_component_destroy(&third);
+    assert(ui_component_destroy(&first) == LIB_STATUS_OK);
+    assert(ui_component_destroy(&second) == LIB_STATUS_OK);
+    assert(ui_component_destroy(&third) == LIB_STATUS_OK);
     return 0;
 }

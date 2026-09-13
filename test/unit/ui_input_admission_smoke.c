@@ -1,4 +1,16 @@
 #include "lib/ui-window/window.h"
+#include "lib/types/win32/window.h"
+/* This matcher fixture has no native Window; timer lifecycle is verified by
+ * the capture/retirement/modal fixtures, not by creating thread timers here. */
+static UINT_PTR WINAPI test_set_timer(HWND window, UINT_PTR id, UINT interval,
+    TIMERPROC callback)
+{ (void)window; (void)interval; (void)callback; return id; }
+static BOOL WINAPI test_kill_timer(HWND window, UINT_PTR id)
+{ (void)window; (void)id; return TRUE; }
+#undef lib_win32_set_timer
+#undef lib_win32_kill_timer
+#define lib_win32_set_timer test_set_timer
+#define lib_win32_kill_timer test_kill_timer
 #include "lib/ui-window/win32/component.c"
 #include <assert.h>
 
@@ -17,7 +29,8 @@ static int sink(void *opaque, const ui_input_event *event)
 }
 static void failure(void *opaque, lib_u64 identity, lib_status status)
 { (void)opaque; assert(identity && status == LIB_STATUS_IO_ERROR); ++failures; }
-static void join(ui_component *component) { (void)component; }
+static lib_status join(ui_component *component, lib_u32 timeout_ms)
+{ (void)component; (void)timeout_ms; return LIB_STATUS_OK; }
 static void dispose(ui_component *component)
 { ui_component_mailboxes_destroy(&component->mailboxes); }
 static void initialize(void)
@@ -74,7 +87,7 @@ static void frozen_prefix_replay(void)
         if (cause == 0) assert(delivered[count - 1].data.key.key == 'A');
         if (cause == 1) assert(!delivered[count - 1].data.key.pressed);
         if (cause == 2) assert(delivered[count - 1].type == UI_EVENT_TEXT);
-        ui_component_destroy(&window.base);
+        assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
     }
     /* Neither freezing direction may disable an otherwise matched hotkey. */
     for (unsigned frozen = 0; frozen < 2; ++frozen) {
@@ -89,7 +102,7 @@ static void frozen_prefix_replay(void)
         assert(key(UI_KEY_ALT, 0x38, 0, 1));
         assert(key(UI_KEY_CONTROL, 0x1d, 0, 0));
         assert(count == 1);
-        ui_component_destroy(&window.base);
+        assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
     }
     /* Owner explicitly retains per-event filtering, not make/break balancing. */
     for (unsigned frozen = 0; frozen < 2; ++frozen) {
@@ -100,7 +113,7 @@ static void frozen_prefix_replay(void)
         assert(key('A', 0x1e, 0, 0));
         assert(count == 1 && delivered[0].data.key.key == 'A' &&
             delivered[0].data.key.pressed == !frozen);
-        ui_component_destroy(&window.base);
+        assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
     }
     initialize();
     set_frozen(LIB_TRUE);
@@ -110,7 +123,7 @@ static void frozen_prefix_replay(void)
     assert(!key('A', 0x1e, 1, 1));
     assert(count == 0 && attempts == 1 && window.base.stopping);
     assert(!key('B', 0x30, 1, 0) && attempts == 1);
-    ui_component_destroy(&window.base);
+    assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
 }
 static HANDLE start_race;
 static lib_status publish_status;
@@ -145,7 +158,7 @@ int main(void)
     assert(key(UI_KEY_ALT, 0x38, 1, 3));
     assert(key('P', 0x19, 1, 3));
     assert(count == 2 && delivered[1].type == UI_EVENT_HOTKEY);
-    ui_component_destroy(&window.base);
+    assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
 
     initialize();
     assert(key(UI_KEY_CONTROL, 0x1d, 1, 1));
@@ -157,7 +170,7 @@ int main(void)
     assert(key(UI_KEY_ALT, 0x38, 0, 1));
     assert(key(UI_KEY_CONTROL, 0x1d, 0, 0));
     assert(count == 2 && delivered[1].type == UI_EVENT_HOTKEY);
-    ui_component_destroy(&window.base);
+    assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
 
     initialize();
     assert(key(UI_KEY_CONTROL, 0x1d, 1, 1));
@@ -171,7 +184,7 @@ int main(void)
     assert(ui_window_publish_frame(&window, &frame) == LIB_STATUS_INVALID_STATE);
     ui_component_retire(&window.base, LIB_STATUS_OK);
     assert(failures == 1 && count == 2 && delivered[1].type == UI_EVENT_SOURCE_RETIRED);
-    ui_component_destroy(&window.base);
+    assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
 
     initialize();
     assert(ui_window_set_title(&window, "first") == LIB_STATUS_OK);
@@ -187,7 +200,7 @@ int main(void)
     assert(ui_component_mailboxes_take_control(&window.base.mailboxes, &taken));
     assert(taken.kind == UI_COMPONENT_CONTROL_STOP);
     assert(!ui_component_mailboxes_take_control(&window.base.mailboxes, &taken));
-    ui_component_destroy(&window.base);
+    assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
     /* A held frame-copy lock must not block control producer/consumer. */
     initialize();
     assert(!lib_atomic_flag_test_and_set_explicit(&window.base.mailboxes.frame_lock,
@@ -199,7 +212,7 @@ int main(void)
     assert(taken.kind == UI_COMPONENT_CONTROL_SET_WINDOW_TITLE);
     lib_atomic_flag_clear_explicit(&window.base.mailboxes.frame_lock, LIB_MEMORY_ORDER_RELEASE);
     CloseHandle(control_thread);
-    ui_component_destroy(&window.base);
+    assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
     /* Either producer may win the admission lock, but no publish may commit
      * after STOP's boundary. Repeat the public concurrent paths without Sleep. */
     for (unsigned i = 0; i != 32; ++i) {
@@ -214,7 +227,7 @@ int main(void)
         assert(publish_status == LIB_STATUS_OK || publish_status == LIB_STATUS_INVALID_STATE);
         assert(window.base.mailboxes.frame_generation == stopped_sequence);
         assert(ui_window_publish_frame(&window, &frame) == LIB_STATUS_INVALID_STATE);
-        ui_component_destroy(&window.base);
+        assert(ui_component_destroy(&window.base) == LIB_STATUS_OK);
         CloseHandle(thread); CloseHandle(start_race);
     }
     return 0;

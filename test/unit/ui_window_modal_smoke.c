@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "lib/ui-window/window_interface.h"
 
-static HANDLE entered, exited, retired, done;
+static HANDLE entered, exited, retired, done, ticked;
 static WNDPROC original;
 static HWND target;
 static LONG retire_count;
@@ -13,6 +13,7 @@ static LRESULT CALLBACK observe(HWND w, UINT m, WPARAM a, LPARAM b)
 {
     if (m == WM_ENTERSIZEMOVE || m == WM_ENTERMENULOOP) SetEvent(entered);
     if (m == WM_EXITSIZEMOVE || m == WM_EXITMENULOOP) SetEvent(exited);
+    if (m == WM_TIMER) SetEvent(ticked);
     return CallWindowProcW(original, w, m, a, b);
 }
 static BOOL CALLBACK find_window(HWND w, LPARAM unused)
@@ -51,8 +52,9 @@ int main(void)
     exited = CreateEventA(NULL, TRUE, FALSE, NULL);
     retired = CreateEventA(NULL, TRUE, FALSE, NULL);
     done = CreateEventA(NULL, TRUE, FALSE, NULL);
+    ticked = CreateEventA(NULL, TRUE, FALSE, NULL);
     HANDLE guard = CreateThread(NULL, 0, watchdog, NULL, 0, NULL);
-    assert(entered && exited && retired && done && guard);
+    assert(entered && exited && retired && done && ticked && guard);
     for (unsigned i = 0; i < sizeof(commands)/sizeof(commands[0]); ++i) {
         ui_window *w = NULL;
         ui_window_options o = { 0 };
@@ -68,19 +70,22 @@ int main(void)
         printf("modal case %u\n", i); fflush(stdout);
         assert(PostMessageW(target, WM_SYSCOMMAND, commands[i], i == 2 ? ' ' : 0));
         assert(WaitForSingleObject(entered, 3000) == WAIT_OBJECT_0);
+        ResetEvent(ticked);
+        assert(WaitForSingleObject(ticked, 3000) == WAIT_OBJECT_0);
+        assert(WaitForSingleObject(exited, 0) == WAIT_TIMEOUT);
         assert(ui_window_freeze(w) == LIB_STATUS_OK);
         assert(ui_window_set_title(w, "modal-after") == LIB_STATUS_OK);
         assert(SendMessageTimeoutW(target, WM_NULL, 0, 0, SMTO_ABORTIFHUNG, 3000, &result));
         GetWindowTextA(target, title, sizeof(title));
         assert(strcmp(title, "modal-after") == 0);
         /* STOP must unwind the nested loop without an external cancel/Enter. */
-        ui_window_destroy(w);
+        assert(ui_window_destroy(w)==LIB_STATUS_OK);
         assert(WaitForSingleObject(exited, 0) == WAIT_OBJECT_0);
         assert(WaitForSingleObject(retired, 0) == WAIT_OBJECT_0);
         assert(retire_count == 1 && !IsWindow(target));
     }
     SetEvent(done); assert(WaitForSingleObject(guard, 3000) == WAIT_OBJECT_0);
     CloseHandle(guard); CloseHandle(entered); CloseHandle(exited);
-    CloseHandle(retired); CloseHandle(done);
+    CloseHandle(retired); CloseHandle(done); CloseHandle(ticked);
     return 0;
 }

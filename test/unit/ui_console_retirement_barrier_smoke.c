@@ -86,7 +86,7 @@ static DWORD WINAPI retirement_deliver(void *opaque)
 static DWORD WINAPI retirement_destroy(void *opaque)
 {
     destroy_context *context = (destroy_context *)opaque;
-    ui_console_destroy(context->console);
+    assert(ui_console_destroy(context->console) == LIB_STATUS_OK);
     SetEvent(context->done);
     return 0u;
 }
@@ -196,7 +196,7 @@ static void check_io_failure(int reader, lib_status output_status)
     }
     if (reader || output_status == LIB_STATUS_IO_ERROR)
         assert(WaitForSingleObject(probe.retired, 5000u) == WAIT_OBJECT_0);
-    ui_console_destroy(console);
+    assert(ui_console_destroy(console) == LIB_STATUS_OK);
     assert(probe.event_count == 1 && probe.events[0].type == UI_EVENT_SOURCE_RETIRED);
     assert(probe.failures == (reader || output_status == LIB_STATUS_IO_ERROR));
     CloseHandle(probe.retired); CloseHandle(write_called);
@@ -268,7 +268,7 @@ static void check_activation_frame(void)
     next_frame.text[0]='A'; stop_after_publication=1;
     assert(ui_console_publish_frame(c,&next_frame)==0);
     assert(WaitForSingleObject(probe.retired,5000)==WAIT_OBJECT_0);
-    ui_console_destroy(c);
+    assert(ui_console_destroy(c) == LIB_STATUS_OK);
     assert(probe.event_count==1 && probe.failures==0 && frame_writes==5);
     CloseHandle(probe.retired); CloseHandle(frame_idle); frame_idle=NULL;
 }
@@ -329,7 +329,7 @@ static void check_input_reset(void)
     e.value.raw_key=(lib_console_raw_key){ .key='P', .scan_code=0x19, .pressed=1, .modifiers=3 };
     assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==5);
     assert(reset_events[4].type==UI_EVENT_HOTKEY); /* Accepted snapshot policy survives. */
-    ui_console_destroy(c);
+    assert(ui_console_destroy(c) == LIB_STATUS_OK);
     assert(reset_event_count==6 && reset_events[5].type==UI_EVENT_SOURCE_RETIRED);
 }
 

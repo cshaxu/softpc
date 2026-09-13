@@ -2,32 +2,32 @@
 
 ## Current Work
 
-M9 T55 S15 implementation and verification are complete: x64 53/53, x86 53/53,
-strict library 3/3. Executor P1 `f36c560` is pushed; coordinator review of the
-actual committed diff passed. The three repairs preserve application APIs. S14's verified
-delivery is retained without inferring manual acceptance. T55 remains open;
-this delivery awaits the owner's manual test.
+Owner accepted S15 manual testing. M9 T55 S16 implementation and verification
+are complete: x64 55/55, x86 55/55, strict library 3/3. Owner-approved checked
+destruction retains live resources on failed join; SoftPC reports and exits.
+Both fixed package EXEs are refreshed. Executor delivery and coordinator
+committed-diff review follow; T55 remains open, awaiting owner testing.
 
-## M9 T55 S15 Packet
+## M9 T55 S16 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: “批准了 按照这个方案修复 s提交推送等我测试”. Internal selected mailbox notification adjustment explicitly approved. |
-| Objective | Complete the three S15 repairs with one notification path and existing cleanup owners. |
+| Admission And Approval | Owner: “请你准入s任务 干净修复 类似问题下次审计不要再出现了！”; then “批准” after the bounded destruction/status and app terminal-exit explanation. |
+| Objective | Propagate native wake errors, use one Window cursor timer, and prove persistent notification failure behavior without speculative fallback channels. |
 | Non-goals | No matcher snapshot restriction, MVDM, media, INI, app lifecycle, mouse scaling, deferred mode-roundtrip repair or T closure. |
-| Reference Baseline | e140ec5, clean main after S14 delivery and reproduced three-item audit. |
+| Reference Baseline | f319017, clean main; S15 manually accepted; subsequent audit confirmed swallowed SetEvent failure. |
 | Candidate Proposal | [Shared-library audit repairs](../proposals/m9-lib-activation-audit-repairs.md). |
-| Files And ABI Surface | ui-base leaf-support wake selection, Window platform consumer, host Console surface cache, tests/contracts. Application public APIs unchanged. |
+| Files And ABI Surface | ui-base selected wake/join result, both UI destroy APIs now return lib_status, SoftPC checks every destroy call; Window timer and tests/contracts; types only wraps timer declarations. |
 | Applicable Rules | Architecture, coding, execution and documentation rules and linked skills; current architecture, source layout and UI authorities. |
-| Verification | Cache reconstruction and fault-during-control injection; real modal-loop notification/STOP barriers; full x64/x86 CTest, strict lib and static gates. |
-| Expected Markers | Three finite ledger rows proved; one notifier per instance and one Window consumer; no additional worker or polling recovery loop. |
+| Verification | Failed signal propagation on both implementations; timer transition, failure and native modal-loop proof; persistent rejection without incidental wake; x64/x86 builds and full CTest, strict lib and static gates. |
+| Expected Markers | Finite S16 ledger; one notifier and one cursor timing owner; no added worker, control replay or unapproved polling recovery. |
 | Asset Needs | Existing non-mutating package media; refresh only fixed x86/x64 EXEs; no trace recordings. |
 | Reporting Requirements | Per-item proof, similar-issue dispositions, production/test line accounting, executor commit/push then coordinator actual-diff review. |
 | Stop Conditions | Do not expand product semantics or hide failed tests; unresolved boundary changes require owner direction. |
-| Exit Criteria | Three repairs and similar-path sweep verified, both EXEs built, manifest/DAG/governance and full regression pass, executor push and coordinator review, clean worktree awaiting owner testing. |
-| Original Owner Request | “批准了 准入一个新的S任务修复 编译 测试 提交 推送 等我测试”; selected internal notification design subsequently approved. |
-| Similar-Issue Sweep | Every mailbox frame/control/STOP/fault notification, Window callback/consumer boundary and native Console cache-invalidating operation. |
+| Exit Criteria | Admitted repairs and bounded-destroy failure retention verified, both EXEs built, all gates pass, complete executor push and coordinator review, clean worktree awaiting owner test. |
+| Original Owner Request | “请你准入s任务 干净修复 类似问题下次审计不要再出现了！” |
+| Similar-Issue Sweep | Both UI wake implementations and all callers, frame/control/STOP/fault/activation notification, all Window blink/timer startup-transition-cleanup paths. |
 
 ## Current Technical Baseline
 
@@ -38,7 +38,7 @@ this delivery awaits the owner's manual test.
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
-  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus passes 53/53
+  normalized `types`/`console`/`host`/`storage`/`ui-*` corpus passes 55/55
   fixed x64 and x86 CTest; its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 

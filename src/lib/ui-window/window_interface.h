@@ -20,7 +20,8 @@ typedef struct ui_window_options {
 lib_status ui_window_create(ui_window **out_window,
     const ui_window_options *options);
 lib_status ui_window_publish_frame(ui_window *window, const ui_frame *frame);
-void ui_window_destroy(ui_window *window);
+/* Same checked destruction/retained-on-failure contract as ui_component_destroy. */
+lib_status ui_window_destroy(ui_window *window);
 lib_status ui_window_set_title(ui_window *window, const char *title);
 /* Freeze atomically prevents future capture, stops the Window-local cursor
  * blink, and releases any current capture in FIFO order. */

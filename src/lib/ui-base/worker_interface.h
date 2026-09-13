@@ -6,7 +6,8 @@
 
 #include "lib/types/atomic.h"
 
-typedef void (*ui_component_join_fn)(ui_component *component);
+#define UI_COMPONENT_DESTROY_TIMEOUT_MS 5000u
+typedef lib_status (*ui_component_join_fn)(ui_component *component, lib_u32 timeout_ms);
 typedef void (*ui_component_dispose_fn)(ui_component *component);
 
 struct ui_component {

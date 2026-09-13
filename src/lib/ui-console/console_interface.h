@@ -11,7 +11,8 @@ typedef ui_component_options ui_console_options;
 lib_status ui_console_create(ui_console **out_console,
     const ui_console_options *options);
 lib_status ui_console_publish_frame(ui_console *console, const ui_frame *frame);
-void ui_console_destroy(ui_console *console);
+/* Same checked destruction/retained-on-failure contract as ui_component_destroy. */
+lib_status ui_console_destroy(ui_console *console);
 /* Borrowed logical Console object. The application passes it to host for
  * Current Console registration before it permits raw input. */
 lib_console *ui_console_get_console(const ui_console *console);

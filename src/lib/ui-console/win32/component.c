@@ -49,7 +49,8 @@ static void ui_console_receive_event(void *context,
         lib_memory_set(&state->keyboard, 0, sizeof(state->keyboard));
         state->previous_mouse_valid = 0;
     } else if (event->kind == LIB_CONSOLE_EVENT_ACTIVATED) {
-        (void)ui_component_mailboxes_notify(&console->base.mailboxes);
+        lib_status status = ui_component_mailboxes_notify(&console->base.mailboxes);
+        if (status != LIB_STATUS_OK) ui_component_fail(&console->base, status);
     } else if (event->kind == LIB_CONSOLE_EVENT_IO_FAILURE) {
         ui_component_fail(&console->base, LIB_STATUS_IO_ERROR);
     } else if (event->kind == LIB_CONSOLE_EVENT_RAW_KEY) {
@@ -157,16 +158,18 @@ lib_status ui_console_worker_start(ui_console *console)
     return LIB_STATUS_OK;
 }
 
-void ui_console_worker_join(ui_console *console)
+lib_status ui_console_worker_join(ui_console *console, lib_u32 timeout_ms)
 {
     ui_console_win32_state *state;
 
     if (console == LIB_NULL || (state = (ui_console_win32_state *)
-            console->worker_state) == LIB_NULL) return;
+            console->worker_state) == LIB_NULL) return LIB_STATUS_OK;
     /* ui_component_destroy has queued STOP; wait for the Console worker to
      * consume it before detaching the event sink or releasing state. */
-    (void)lib_win32_wait_for_single_object(state->worker, LIB_WIN32_INFINITE);
+    if (lib_win32_wait_for_single_object(state->worker, timeout_ms) != LIB_WIN32_WAIT_OBJECT_0)
+        return LIB_STATUS_IO_ERROR;
     lib_win32_close_handle(state->worker);
     console->worker_state = LIB_NULL;
     lib_release(state);
+    return LIB_STATUS_OK;
 }
