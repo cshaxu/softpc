@@ -1,5 +1,73 @@
 # M9 T55 — Types Vocabulary and Component Platform Boundaries
 
+## S8 admission: complete-character repetition and recovery
+
+Owner: “批准修复s任务 干净”. Baseline `0ca0875`.
+The preceding audit used controlled input, not a real-desktop reproduction.
+
+| Frozen sweep | Owner / implementation | Proof |
+| --- | --- | --- |
+| All native repetition and UTF-16 producers | Host/Window copy repeat count; ui-base expands physical makes or decoded complete characters, not surrogate units. Console raw metadata gains count; zero means one, physical break stays single. | Both leaves: BMP and paired non-BMP count batches, single-record equivalence and sink rejection. |
+| Malformed UTF-16 prefix transitions | ui-base discards an obsolete high surrogate but processes the next valid BMP/high unit; lone lows rejected, count-mismatched pair rejected and reset. | High-BMP, high-high-low, isolated low, intervening physical record, subsequent valid input. |
+| Every scalar-to-physical map failure | Existing TEXT fallback covers both layout failure and unrepresentable mapped physical key. | Controlled platform map, scalar unchanged, no synthesized partial keys. |
+
+Only pending high-surrogate/count state is required; no extra queue, matcher,
+component or product callback. Both halves of a repeated pair must agree in
+count; an inconsistent pair is malformed, never silently truncated or multiplied.
+The existing one-unit helper becomes the same counted helper (all callers
+updated), not a second forwarding API. Full x86/x64 and strict tests, manifest,
+peer scan, complete P push and actual-diff review precede delivery. No app,
+MVDM, media/INI, mouse-scale or lifecycle changes. T55 stays open.
+
+### S8 executor evidence and similar-issue dispositions
+
+The repeat owner is now ui-base. Native Window transition/character messages and
+host wide raw records copy their original count; Console forwards it unchanged.
+The common normalizer expands physical makes (one break), or full decoded
+scalars. Only the pending UTF-16 prefix gains a count. The app-facing
+ui_input_event, matcher ledger and failure/retirement owners are unchanged.
+The Console raw struct and leaf-support helper are source-contract changes;
+consumers must rebuild, and raw-input consumers must interpret copied count.
+No compatibility forwarding path or duplicate repetition loop is retained.
+
+Both current platform adapters run the same seven-case repeated/recovery
+matrix: paired repeat and individual equivalence, replacing a bad high,
+isolated low recovery, mismatched counts then recovery, zero-as-one and
+high-then-BMP. Additional assertions cover a physical event interrupting a
+prefix, break counts staying single, text-only releases not resetting prefixes,
+and failure on the second decoded scalar stopping both components without retry.
+The actual host reader fixture checks copied wide units and count values;
+the controlled layout query returns VK_OEM_102, proving an unrepresentable
+physical mapping produces three unchanged TEXT scalars. Linux's existing
+normalizer contract is updated and still passes; no new Linux UI claim.
+
+Sweep used rg over every submit_utf16/submit_record, repeat_count, raw_key and
+native repeat producer in src/lib and tests. Production peers are Window,
+host raw reader and Console adapter, all changed together. Isolated test
+callers use count one; zero-initialized synthetic records remain count one.
+No app, standalone host, MVDM, INI or media path changed. Unmapped transitions
+still invoke native translation only once, carrying the native count onward.
+Malformed data rejection remains distinct from an attempted sink failure.
+
+Verification: x64 full 50/50 (58.25 s), x86 full 50/50 (76.22 s);
+both package tests passed. Strict library build uses
+-Wall -Wextra -Wpedantic -Werror and passed 3/3, including manifest,
+DAG/types and Linux build contract. Focused x64 five-test run passed too.
+The first manifest refresh accidentally listed the manifest itself; its gate
+caught this and the entry was removed before final passing verification.
+No runtime/test assertion was weakened for that tooling error.
+
+Against `0ca0875`, production C/H six paths: +50/-46, net +4.
+Test C five paths: +104/-39, net +65. Counts use git diff --numstat,
+excluding docs/manifest/EXEs. Reused existing test targets and the shared
+normalizer; no new component, queue, heap object or test executable.
+Owned types-layout-fixture copies are removed after testing; build caches remain.
+The S7 intermittent package timeout remains in TODO, not closed by these passes.
+
+Package SHA256:
+- softpc32.exe: `46126CA58E864FC4EB8D0BC4938098CCF68C7C5765839EA2972A07CB0123D67E`
+- softpc64.exe: `87F58496944ABEFBB878F1F33A156E947B4B53CC8DA6A3A4620D44C20B66E294`
+
 ## S7 admission: native input provenance and synthesis ownership
 
 Owner: “请问这次修复会加代码还是减代码 是否能干净的实现”;

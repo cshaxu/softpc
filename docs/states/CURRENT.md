@@ -2,32 +2,31 @@
 
 ## Current Work
 
-M9 T55 S7 is delivered for owner inspection. Executor P1 `e2e3e5c` is pushed;
-coordinator reviewed the committed diff against the four-item packet.
-Final x64/x86 passed 50/50; strict lib passed 3/3. One earlier package CAP
-timeout is retained in TODO; subsequent full and repeated runs passed.
-T55 remains open; no claim that the intermittent symptom is resolved.
+M9 T55 S8 implementation and verification are complete; executor delivery
+and coordinator committed-diff review follow. x64/x86 passed 50/50 and strict
+lib passed 3/3. S7 is recorded in [its handoff](../history/M9-T55-S7-native-input-handoff.md).
+T55 remains open; the package CAP timeout in TODO is not claimed resolved.
 
-## M9 T55 S7 Packet
+## M9 T55 S8 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: “准入修复 要求代码设计有全局观 干净”. |
-| Objective | Eliminate duplicate physical/character production, share held-key ownership during text synthesis, preserve native Unicode and repeat records. |
-| Non-goals | No MVDM/media/INI, app policy, Console mouse scale, DAG or Linux UI parity change. |
-| Reference Baseline | `5be6fc4`, owner-tested S6. |
+| Admission And Approval | Owner: “批准修复s任务 干净”. |
+| Objective | Decode repeated UTF-16 characters before expansion, recover malformed prefixes, retain legal text when physical mapping is incomplete. |
+| Non-goals | No app/MVDM/INI/media, lifecycle, mouse, DAG or Linux UI parity change. |
+| Reference Baseline | `0ca0875`, S7 delivery. |
 | Candidate Proposal | [T55 proposal](../proposals/m9-t55-lib-types-external-boundary.md) |
-| Files And ABI Surface | ui-base, both UI leaves, host raw input, types vocabulary, tests, docs/manifest and dual EXEs; app-facing ABI unchanged. |
+| Files And ABI Surface | ui-base normalizer, both native inputs, Console copied repeat metadata, tests, docs/manifest and dual EXEs; ui_input_event unchanged. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout and Product UI; referenced skills. |
-| Verification | Interleaved physical/text input, held-key synthesis, real native Unicode entry, repeat batches, failure paths, full x64/x86 and strict lib. |
-| Expected Markers | One held-key ledger; no character-credit table; native translation only for unmapped transitions; Unicode raw reader. |
-| Asset Needs | Rebuild softpc32.exe and softpc64.exe; preserve INI/media. |
-| Reporting Requirements | Four-item ledger and native-entry peers, evidence/accounting, complete P push and actual-diff review. |
-| Stop Conditions | Escalate new product semantics or dependency edge; no unrelated repair. |
-| Exit Criteria | Findings and peers verified; dual artifacts, pushed complete P, reviewed diff and clean worktree for owner inspection; T55 open. |
-| Original Owner Request | “请问这次修复会加代码还是减代码 是否能干净的实现”; “准入修复 要求代码设计有全局观 干净”. |
-| Similar-Issue Sweep | Every physical/text producer, synthesis lifetime, native character encoding and repeat boundary in lib. |
+| Verification | Combined repeat/surrogate and recovery matrix, incomplete map fake, native-entry peers, failure mid-batch, full x86/x64 and strict lib. |
+| Expected Markers | One repeat/decode owner in ui-base; adapters copy counts, no per-leaf text expansion; existing TEXT fallback. |
+| Asset Needs | Rebuild fixed softpc32.exe and softpc64.exe; preserve INI/media. |
+| Reporting Requirements | Three-row sweep, measured evidence and code accounting; complete P push followed by committed-diff review. |
+| Stop Conditions | Escalate unrelated semantics or dependency changes; no incidental product repair. |
+| Exit Criteria | Three findings verified, dual artifacts/tests, manifest/governance, pushed reviewed P and clean worktree for owner testing; T55 open. |
+| Original Owner Request | “再次审计 谢谢 就怕你还留尾巴”; “批准修复s任务 干净”. |
+| Similar-Issue Sweep | All UTF-16/repeat producers and consumers, physical-text fallback and rejected-delivery exits. |
 
 ## Current Technical Baseline
 

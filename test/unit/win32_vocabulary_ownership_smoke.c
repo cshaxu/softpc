@@ -89,7 +89,7 @@ int main(void)
         CHECK(ui_keyboard_platform_map_scalar('a', &key, &modifiers));
         CHECK(key == 'A' && modifiers == expected);
         emitted_count = 0u;
-        CHECK(ui_keyboard_submit_utf16(&state, NULL, LIB_NULL, capture, 'a'));
+        CHECK(ui_keyboard_submit_utf16(&state, NULL, LIB_NULL, capture, 'a', 1u));
         CHECK(emitted_count == count * 2u + 2u);
         CHECK(emitted[count].data.key.key == 'A');
         CHECK(emitted[count].data.key.modifiers == expected);
@@ -103,5 +103,15 @@ int main(void)
     { lib_u16 key = 99u; lib_u8 modifiers = 99u;
       CHECK(!ui_keyboard_platform_map_scalar('a', &key, &modifiers));
       CHECK(key == 99u && modifiers == 99u); }
+    /* Layout success is not proof of a representable neutral physical key. */
+    {
+        ui_keyboard_normalizer state = {0};
+        layout_result = VK_OEM_102;
+        emitted_count = 0;
+        CHECK(ui_keyboard_submit_utf16(&state, NULL, NULL, capture, '<', 3));
+        CHECK(emitted_count == 3);
+        for (unsigned i = 0; i < emitted_count; ++i)
+            CHECK(emitted[i].type == UI_EVENT_TEXT && emitted[i].data.text.scalar == '<');
+    }
     return 0;
 }

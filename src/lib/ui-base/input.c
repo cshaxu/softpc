@@ -42,13 +42,13 @@ static int ui_keyboard_submit_character(const ui_hotkey_matcher *held_keys,
 
     if (scalar == 0u || scalar > 0x10ffffu ||
         (scalar >= 0xd800u && scalar <= 0xdfffu)) return 0;
-    if (!ui_keyboard_platform_map_scalar(scalar, &virtual_key, &modifiers)) {
+    if (!ui_keyboard_platform_map_scalar(scalar, &virtual_key, &modifiers) ||
+        !ui_keyboard_platform_transition(0u, virtual_key, &scan, &key)) {
         ui_input_event event = { .type = UI_EVENT_TEXT };
         event.data.text.scalar = scalar;
         return sink != LIB_NULL && sink(context, &event);
     }
-    if (sink == LIB_NULL ||
-        !ui_keyboard_platform_transition(0u, virtual_key, &scan, &key)) return 0;
+    if (sink == LIB_NULL) return 0;
     /* Snapshot before any delivery can grow the shared ledger. This local
      * chord owns only the keys it adds; it is not a second held-key table. */
     for (i = 0u; i < 4u; ++i) {
@@ -91,31 +91,34 @@ static int ui_keyboard_submit_character(const ui_hotkey_matcher *held_keys,
 }
 
 int ui_keyboard_submit_utf16(ui_keyboard_normalizer *state,
-    const ui_hotkey_matcher *held_keys, void *context, ui_input_sink sink, lib_u16 code_unit)
+    const ui_hotkey_matcher *held_keys, void *context, ui_input_sink sink,
+    lib_u16 code_unit, lib_u16 repeat_count)
 {
-    lib_u32 scalar;
+    lib_u32 scalar = code_unit;
+    lib_u16 high, prior_count;
 
     if (state == LIB_NULL) return 0;
+    if (repeat_count == 0u) repeat_count = 1u;
+    high = state->pending_high_surrogate;
+    prior_count = state->pending_repeat_count;
+    state->pending_high_surrogate = 0u;
+    state->pending_repeat_count = 0u;
     if (code_unit >= 0xd800u && code_unit <= 0xdbffu) {
-        if (state->pending_high_surrogate != 0u) {
-            state->pending_high_surrogate = 0u;
-            return 0;
-        }
+        /* A new high replaces a malformed unfinished prefix. */
         state->pending_high_surrogate = code_unit;
+        state->pending_repeat_count = repeat_count;
         return 1;
     }
     if (code_unit >= 0xdc00u && code_unit <= 0xdfffu) {
-        if (state->pending_high_surrogate == 0u) return 0;
-        scalar = 0x10000u + (((lib_u32)state->pending_high_surrogate -
-            0xd800u) << 10u) + ((lib_u32)code_unit - 0xdc00u);
-        state->pending_high_surrogate = 0u;
-        return ui_keyboard_submit_character(held_keys, context, sink, scalar);
+        if (high == 0u || prior_count != repeat_count) return 0;
+        scalar = 0x10000u + (((lib_u32)high - 0xd800u) << 10u) +
+            ((lib_u32)code_unit - 0xdc00u);
     }
-    if (state->pending_high_surrogate != 0u) {
-        state->pending_high_surrogate = 0u;
-        return 0;
-    }
-    return ui_keyboard_submit_character(held_keys, context, sink, code_unit);
+    /* A valid BMP unit survives a malformed prefix. Expand complete scalars,
+     * stopping immediately on delivery failure, never retrying a partial batch. */
+    while (repeat_count-- != 0u)
+        if (!ui_keyboard_submit_character(held_keys, context, sink, scalar)) return 0;
+    return 1;
 }
 
 int ui_keyboard_submit_record(ui_keyboard_normalizer *state,
@@ -126,17 +129,22 @@ int ui_keyboard_submit_record(ui_keyboard_normalizer *state,
     lib_u32 identity;
     if (state == LIB_NULL || sink == LIB_NULL || record == LIB_NULL) return UI_KEYBOARD_REJECTED;
     if (record->kind == UI_KEYBOARD_CHARACTER)
-        return ui_keyboard_submit_utf16(state, held_keys, context, sink, record->utf16);
+        return ui_keyboard_submit_utf16(state, held_keys, context, sink, record->utf16, record->repeat_count);
     if (record->kind != UI_KEYBOARD_TRANSITION &&
         record->kind != UI_KEYBOARD_COMBINED) return UI_KEYBOARD_REJECTED;
     if (ui_keyboard_platform_transition(record->scan, record->key, &scan, &identity)) {
+        lib_u32 count = record->pressed && record->repeat_count != 0u ?
+            record->repeat_count : 1u;
         state->pending_high_surrogate = 0u;
-        return ui_keyboard_emit(context, sink, scan, identity,
-            record->flags, record->modifiers, record->pressed);
+        state->pending_repeat_count = 0u;
+        while (count-- != 0u)
+            if (!ui_keyboard_emit(context, sink, scan, identity,
+                    record->flags, record->modifiers, record->pressed)) return UI_KEYBOARD_REJECTED;
+        return UI_KEYBOARD_ACCEPTED;
     }
     if (record->kind == UI_KEYBOARD_COMBINED) {
         if (record->pressed && record->utf16 != 0u)
-            return ui_keyboard_submit_utf16(state, held_keys, context, sink, record->utf16);
+            return ui_keyboard_submit_utf16(state, held_keys, context, sink, record->utf16, record->repeat_count);
         return UI_KEYBOARD_ACCEPTED;
     }
     return UI_KEYBOARD_UNMAPPED;

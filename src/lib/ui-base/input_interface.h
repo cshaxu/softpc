@@ -21,6 +21,7 @@ enum {
 
 typedef struct ui_keyboard_normalizer {
     lib_u16 pending_high_surrogate;
+    lib_u16 pending_repeat_count;
 } ui_keyboard_normalizer;
 
 /* These functions only normalize host packets.  A project binding maps each
@@ -30,7 +31,7 @@ int ui_keyboard_submit_transition(void *context,
     lib_u8 record_flags, lib_u8 hotkey_modifiers, int pressed);
 int ui_keyboard_submit_utf16(
     ui_keyboard_normalizer *state, const ui_hotkey_matcher *held_keys, void *context,
-    ui_input_sink sink, lib_u16 code_unit);
+    ui_input_sink sink, lib_u16 code_unit, lib_u16 repeat_count);
 /* Native adapters copy either separate transition/character messages or one
  * combined record. Translate a separate native transition into characters only
  * on UI_KEYBOARD_UNMAPPED; accepted physical keys must not generate a second
@@ -51,6 +52,9 @@ typedef struct ui_keyboard_record {
     lib_u8 flags;
     lib_u8 modifiers;
     lib_bool pressed;
+    /* Zero means one. Decode complete characters before expanding repeats.
+     * Physical breaks are single. Surrogate halves must have equal counts. */
+    lib_u16 repeat_count;
 } ui_keyboard_record;
 
 int ui_keyboard_submit_record(ui_keyboard_normalizer *state,

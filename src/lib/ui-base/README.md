@@ -51,3 +51,11 @@ Text synthesis reads the same matcher's held-key ledger and releases only the
 keys it introduces. Existing keys (including either modifier side) remain held;
 a held trigger receives a repeat make with its original physical identity.
 The ledger borrow is used synchronously on the same input owner as submission.
+
+Native adapters preserve repeat counts in copied records. This normalizer alone
+expands physical makes (breaks stay single), or complete decoded characters.
+Zero count means one. UTF-16 halves must have matching counts; malformed pairs
+are rejected and cleared. A new high replaces an unfinished high; a valid BMP
+unit is processed even after a malformed prefix. Both layout-map failure and
+unrepresentable physical mapping fall back to the same TEXT event. A rejected
+delivery ends a batch immediately without retry.

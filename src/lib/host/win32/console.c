@@ -87,9 +87,8 @@ static void host_console_emit_key(host_console_backend *backend,
     event.value.raw_key.extended =
         (key->dwControlKeyState & LIB_WIN32_ENHANCED_KEY) != 0u ? LIB_TRUE : LIB_FALSE;
     event.value.raw_key.pressed = key->bKeyDown ? LIB_TRUE : LIB_FALSE;
-    lib_u32 count = key->bKeyDown && key->wRepeatCount > 1u ? key->wRepeatCount : 1u;
-    while (count-- != 0u)
-        if (lib_console_deliver_event(backend->console, &event) != LIB_STATUS_OK) break;
+    event.value.raw_key.repeat_count = key->wRepeatCount;
+    (void)lib_console_deliver_event(backend->console, &event);
 }
 
 static void host_console_emit_mouse(host_console_backend *backend,

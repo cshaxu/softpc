@@ -8,7 +8,7 @@ static BOOL WINAPI failed_read(HANDLE input, LPVOID bytes, DWORD length,
 { (void)input; (void)bytes; (void)length; (void)read; (void)reserved; return FALSE; }
 static INPUT_RECORD records[5];
 static unsigned record_count, record_index, raw_count;
-static unsigned raw_unicode[16];
+static unsigned raw_unicode[16], raw_repeat[16];
 static BOOL WINAPI read_wide(HANDLE input, PINPUT_RECORD record, DWORD length, LPDWORD read)
 {
     (void)input; assert(length == 1 && record_index < record_count);
@@ -31,6 +31,7 @@ static void receive(void *context, const lib_console_event *event)
     (void)context;
     if (event->kind == LIB_CONSOLE_EVENT_RAW_KEY) {
         assert(raw_count < 16);
+        raw_repeat[raw_count] = event->value.raw_key.repeat_count;
         raw_unicode[raw_count++] = event->value.raw_key.unicode;
         return;
     }
@@ -73,9 +74,11 @@ int main(void)
     records[3].Event.KeyEvent.wRepeatCount = 5; /* one physical release */
     records[4].Event.KeyEvent.wRepeatCount = 0; /* preserve synthetic single record */
     host_console_reader(&backend);
-    assert(record_index == 5 && raw_count == 9 && failures == 3);
-    for (unsigned i = 0; i < 5; ++i) assert(raw_unicode[i] == 0x4e00);
-    assert(raw_unicode[5] == 0xd83d && raw_unicode[6] == 0xde00);
+    assert(record_index == 5 && raw_count == 5 && failures == 3);
+    assert(raw_unicode[0] == 0x4e00 && raw_repeat[0] == 5);
+    assert(raw_unicode[1] == 0xd83d && raw_unicode[2] == 0xde00);
+    assert(raw_repeat[1] == 1 && raw_repeat[2] == 1);
+    assert(raw_repeat[3] == 5 && raw_repeat[4] == 0);
     CloseHandle(backend.stop_event);
     lib_console_release(backend.console);
     return 0;

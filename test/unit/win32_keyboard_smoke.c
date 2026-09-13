@@ -86,20 +86,20 @@ int main(void)
     softpc_keyboard_capture capture = { 0 };
     ui_keyboard_normalizer normalizer = { 0 };
     softpc_hotkey_capture text = { 0 };
-    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xd83du));
+    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xd83du, 1u));
     assert(text.count == 0u);
-    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xde00u));
+    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xde00u, 1u));
     assert(text.count == 1u && text.events[0].type == UI_EVENT_TEXT &&
         text.events[0].data.text.scalar == 0x1f600u);
-    assert(!ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xdc00u));
-    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xd800u));
-    assert(!ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xd800u));
-    assert(normalizer.pending_high_surrogate == 0u);
-    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xd800u));
-    assert(!ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 'a'));
-    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0x4e00u));
+    assert(!ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xdc00u, 1u));
+    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xd800u, 1u));
+    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xd800u, 1u));
+    assert(normalizer.pending_high_surrogate == 0xd800u);
+    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0xd800u, 1u));
+    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 'a', 1u));
+    assert(ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0x4e00u, 1u));
     text.count = 8u;
-    assert(!ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0x4e00u));
+    assert(!ui_keyboard_submit_utf16(&normalizer, NULL, &text, capture_hotkey, 0x4e00u, 1u));
 
     /* The shared component preserves the host physical scan; each project maps it. */
     assert(ui_keyboard_submit_transition(&capture, capture_key,
@@ -182,7 +182,7 @@ int main(void)
        it never places text directly in guest memory. */
     capture.count = 0u;
     assert(ui_keyboard_submit_utf16(&normalizer, NULL, &capture,
-        capture_key, L'a'));
+        capture_key, L'a', 1u));
     assert(capture.count == 2u);
     assert(capture.keys[0] == 0x1eu && capture.releases[0] == 0u);
     assert(capture.keys[1] == 0x1eu && capture.releases[1] == 1u);

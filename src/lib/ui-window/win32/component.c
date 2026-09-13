@@ -312,17 +312,10 @@ static int win32_window_transition(ui_win32_window_context *context,
         UI_KEYBOARD_TRANSITION, (lib_u16)((lparam >> 16) & 0xffu),
         (lib_u16)key, 0u,
         ui_window_keyboard_flags_from_lparam((lib_u64)lparam),
-        ui_window_modifiers_from_key_state(), !released };
-    lib_u32 count = released ? 1u : (lib_u16)lparam;
-    int result = UI_KEYBOARD_ACCEPTED;
-    if (count == 0u) count = 1u;
-    while (count-- != 0u) {
-        result = ui_keyboard_submit_record(&context->keyboard_normalizer,
-            &context->component->base.hotkey_matcher, context,
-            win32_window_emit_normalized, &record);
-        if (result != UI_KEYBOARD_ACCEPTED) break;
-    }
-    return result;
+        ui_window_modifiers_from_key_state(), !released, (lib_u16)lparam };
+    return ui_keyboard_submit_record(&context->keyboard_normalizer,
+        &context->component->base.hotkey_matcher, context,
+        win32_window_emit_normalized, &record);
 }
 
 static lib_i32 win32_window_mouse_clamp(lib_i64 value)
@@ -558,13 +551,10 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
         if (win32_window_accepting_input(context)) {
             ui_keyboard_record record = {
                 UI_KEYBOARD_CHARACTER, (lib_u16)((lparam >> 16) & 0xffu),
-                0u, (lib_u16)wparam, 0u, 0u, LIB_TRUE };
-            lib_u32 count = (lib_u16)lparam;
-            if (count == 0u) count = 1u;
-            while (count-- != 0u)
-                if (ui_keyboard_submit_record(&context->keyboard_normalizer,
-                        &context->component->base.hotkey_matcher, context,
-                        win32_window_emit_normalized, &record) == UI_KEYBOARD_REJECTED) break;
+                0u, (lib_u16)wparam, 0u, 0u, LIB_TRUE, (lib_u16)lparam };
+            (void)ui_keyboard_submit_record(&context->keyboard_normalizer,
+                &context->component->base.hotkey_matcher, context,
+                win32_window_emit_normalized, &record);
         }
         return 0;
     case LIB_WIN32_WM_MOUSEMOVE:

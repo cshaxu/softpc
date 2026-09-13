@@ -45,6 +45,9 @@ typedef struct lib_console_raw_key {
     lib_u8 modifiers;
     lib_bool extended;
     lib_bool pressed;
+    /* Copied native repetitions; zero denotes a single record.
+     * The input consumer, not host, interprets characters and expands counts. */
+    lib_u16 repeat_count;
 } lib_console_raw_key;
 
 typedef struct lib_console_raw_mouse {

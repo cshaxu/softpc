@@ -118,11 +118,12 @@ static void no_join(ui_component *component) { (void)component; }
 static void no_dispose(ui_component *component)
 { ui_component_mailboxes_destroy(&component->mailboxes); }
 static void console_record(ui_console *console, unsigned key, unsigned scan,
-    unsigned text, int down)
+    unsigned text, int down, unsigned repeat)
 {
     lib_console_event e = { .kind = LIB_CONSOLE_EVENT_RAW_KEY };
     e.value.raw_key.key = key; e.value.raw_key.scan_code = scan;
     e.value.raw_key.unicode = text; e.value.raw_key.pressed = down;
+    e.value.raw_key.repeat_count = repeat;
     ui_console_receive_event(console, &e);
 }
 static void adapter_equivalence(unsigned scan)
@@ -145,8 +146,8 @@ static void adapter_equivalence(unsigned scan)
     LPARAM lp = (LPARAM)scan << 16;
     win32_window_proc(handle, WM_KEYDOWN, 'A', lp);
     win32_window_proc(handle, WM_KEYUP, 'A', lp);
-    console_record(&console, 'A', scan, 'a', 1);
-    console_record(&console, 'A', scan, 'a', 0);
+    console_record(&console, 'A', scan, 'a', 1, 0);
+    console_record(&console, 'A', scan, 'a', 0, 0);
     assert(w.count == 2 && c.count == 2);
     assert(translations == 0);
     /* No characters are generated for physical keys, including scan-less RDP
@@ -155,10 +156,10 @@ static void adapter_equivalence(unsigned scan)
     win32_window_proc(handle, WM_KEYDOWN, 'B', 0);
     win32_window_proc(handle, WM_KEYUP, 'B', 0x300000);
     win32_window_proc(handle, WM_KEYUP, 'A', 0x1e0000);
-    console_record(&console, 'A', 0x1e, 'a', 1);
-    console_record(&console, 'B', 0x30, 'b', 1);
-    console_record(&console, 'B', 0x30, 'b', 0);
-    console_record(&console, 'A', 0x1e, 'a', 0);
+    console_record(&console, 'A', 0x1e, 'a', 1, 0);
+    console_record(&console, 'B', 0x30, 'b', 1, 0);
+    console_record(&console, 'B', 0x30, 'b', 0, 0);
+    console_record(&console, 'A', 0x1e, 'a', 0, 0);
     assert(w.count == 6 && c.count == 6 && translations == 0);
     win32_window_proc(handle, WM_KEYDOWN, VK_PACKET, 0);
     assert(translations == 1 && w.count == 6);
@@ -168,42 +169,93 @@ static void adapter_equivalence(unsigned scan)
     for (unsigned i = 0; i < 2; ++i) {
         unsigned unit = i ? 0xde00 : 0xd83d;
         win32_window_proc(handle, WM_CHAR, unit, 0);
-        console_record(&console, 0, 0, unit, 1);
-        console_record(&console, 0, 0, unit, 0);
+        console_record(&console, 0, 0, unit, 1, 0);
+        console_record(&console, 0, 0, unit, 0, 0);
     }
     assert(w.count == 1 && c.count == 1);
     assert(w.events[0].type == UI_EVENT_TEXT && w.events[0].data.text.scalar == 0x1f600);
     assert(lib_memory_compare(w.events, c.events, w.count * sizeof(w.events[0])) == 0);
-    /* Native repeat batches expand at the leaf boundary, preserving schema. */
+    /* Adapters preserve counts; only the shared normalizer expands batches. */
     w.count = w.attempts = c.count = c.attempts = 0;
     win32_window_proc(handle, WM_KEYDOWN, 'A', 0x1e0004);
     win32_window_proc(handle, WM_KEYUP, 'A', 0x1e0001);
-    for (unsigned i = 0; i < 4; ++i) console_record(&console, 'A', 0x1e, 'a', 1);
-    console_record(&console, 'A', 0x1e, 'a', 0);
+    console_record(&console, 'A', 0x1e, 'a', 1, 4);
+    console_record(&console, 'A', 0x1e, 'a', 0, 0);
     assert(w.count == 5 && c.count == 5);
     assert(lib_memory_compare(w.events, c.events, w.count * sizeof(w.events[0])) == 0);
     w.count = w.attempts = c.count = c.attempts = 0;
     win32_window_proc(handle, WM_CHAR, 0x4e00, 3);
-    for (unsigned i = 0; i < 3; ++i) console_record(&console, 0, 0, 0x4e00, 1);
+    console_record(&console, 0, 0, 0x4e00, 1, 3);
     assert(w.count == 3 && c.count == 3);
     assert(lib_memory_compare(w.events, c.events, w.count * sizeof(w.events[0])) == 0);
     w.count = w.attempts = c.count = c.attempts = 0;
     win32_window_proc(handle, WM_CHAR, 0x4e00, 1);
-    console_record(&console, 0, 0, 0x4e00, 1);
+    console_record(&console, 0, 0, 0x4e00, 1, 0);
+    /* Repetition and malformed-prefix recovery through BOTH actual adapters.
+     * Expected scalars use supplementary characters, independent of keyboard layout. */
+    {
+        static const struct {
+            unsigned units[4], repeats[4], length, expected, scalar;
+        } cases[] = {
+            {{0xd83d,0xde00}, {2,2}, 2,2,0x1f600},
+            {{0xd83d,0xde00,0xd83d,0xde00}, {1,1,1,1}, 4,2,0x1f600},
+            {{0xd800,0xd83d,0xde00}, {1,3,3}, 3,3,0x1f600},
+            {{0xdc00,0xd83d,0xde00}, {1,2,2}, 3,2,0x1f600},
+            {{0xd83d,0xde00,0xd83d,0xde00}, {2,1,1,1}, 4,1,0x1f600},
+            {{0xd83d,0xde00}, {0,0}, 2,1,0x1f600},
+            {{0xd800,'a'}, {2,2}, 2,4,0} /* physical 'a' pairs after bad prefix */
+        };
+        for (unsigned n = 0; n < sizeof(cases)/sizeof(cases[0]); ++n) {
+            w.count = w.attempts = c.count = c.attempts = 0;
+            for (unsigned i = 0; i < cases[n].length; ++i) {
+                win32_window_proc(handle, WM_CHAR, cases[n].units[i], cases[n].repeats[i]);
+                console_record(&console, 0, 0, cases[n].units[i], 1, cases[n].repeats[i]);
+                console_record(&console, 0, 0, cases[n].units[i], 0, cases[n].repeats[i]);
+            }
+            assert(w.count == cases[n].expected && c.count == w.count);
+            assert(lib_memory_compare(w.events, c.events, w.count * sizeof(w.events[0])) == 0);
+            for (unsigned i = 0; i < w.count; ++i) {
+                if (cases[n].scalar)
+                    assert(w.events[i].type == UI_EVENT_TEXT &&
+                        w.events[i].data.text.scalar == cases[n].scalar);
+                else
+                    assert(w.events[i].type == UI_EVENT_KEY &&
+                        w.events[i].data.key.key == 'A' &&
+                        w.events[i].data.key.pressed == (i % 2 == 0));
+            }
+            assert(context.keyboard_normalizer.pending_high_surrogate == 0 &&
+                state.keyboard.pending_high_surrogate == 0);
+        }
+    }
+    /* A physical record cancels an unfinished text prefix on both inputs. */
+    w.count = w.attempts = c.count = c.attempts = 0;
+    win32_window_proc(handle, WM_CHAR, 0xd83d, 2);
+    console_record(&console, 0, 0, 0xd83d, 1, 2);
+    win32_window_proc(handle, WM_KEYDOWN, 'A', 0x1e0001);
+    console_record(&console, 'A', 0x1e, 'a', 1, 1);
+    win32_window_proc(handle, WM_KEYUP, 'A', 0x1e0005);
+    console_record(&console, 'A', 0x1e, 'a', 0, 5);
+    win32_window_proc(handle, WM_CHAR, 0xde00, 2);
+    console_record(&console, 0, 0, 0xde00, 1, 2);
+    assert(w.count == 2 && c.count == 2);
+    assert(lib_memory_compare(w.events, c.events, w.count * sizeof(w.events[0])) == 0);
+    w.count = w.attempts = c.count = c.attempts = 0;
+    win32_window_proc(handle, WM_CHAR, 0x4e00, 1);
+    console_record(&console, 0, 0, 0x4e00, 1, 1);
     /* Malformed text does not poison the next complete pair. */
     win32_window_proc(handle, WM_CHAR, 0xdc00, 0);
-    console_record(&console, 0, 0, 0xdc00, 1);
+    console_record(&console, 0, 0, 0xdc00, 1, 0);
     assert(w.count == 1 && c.count == 1);
-    w.reject_at = c.reject_at = 2;
+    w.reject_at = c.reject_at = 3;
     for (unsigned i = 0; i < 2; ++i) {
         unsigned unit = i ? 0xde00 : 0xd83d;
-        win32_window_proc(handle, WM_CHAR, unit, 0);
-        console_record(&console, 0, 0, unit, 1);
+        win32_window_proc(handle, WM_CHAR, unit, 4);
+        console_record(&console, 0, 0, unit, 1, 4);
     }
     assert(window.base.stopping && console.base.stopping);
     win32_window_proc(handle, WM_KEYDOWN, 'B', 0);
-    console_record(&console, 'B', 0, 'b', 1);
-    assert(w.attempts == 2 && c.attempts == 2);
+    console_record(&console, 'B', 0, 'b', 1, 0);
+    assert(w.attempts == 3 && c.attempts == 3 && w.count == 2 && c.count == 2);
     ui_component_destroy(&window.base);
     ui_component_destroy(&console.base);
 }

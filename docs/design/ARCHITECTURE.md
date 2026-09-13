@@ -191,3 +191,8 @@ ledger and releases only keys it introduces, never separately tracking held
 keys. One source-local held-key ledger owns pending/delivered/consumed
 lifetimes for ordinary keys and modifiers alike. Repeats reuse their state;
 a delivered make cannot retrospectively become a consumed chord.
+
+Native adapters copy repetition metadata without expanding UTF-16 units.
+ui-base owns repetition after complete-character decoding, malformed-prefix
+recovery, and TEXT fallback when either stage of physical mapping is unavailable.
+This changes Console raw metadata, not the application UI event schema.

@@ -53,7 +53,7 @@ static void ui_console_receive_event(void *context,
             UI_KEYBOARD_COMBINED, key->scan_code, (lib_u16)key->key,
             (lib_u16)key->unicode,
             key->extended != LIB_FALSE ? UI_INPUT_FLAG_EXTENDED : 0u,
-            ui_console_hotkey_modifiers(key->modifiers), key->pressed };
+            ui_console_hotkey_modifiers(key->modifiers), key->pressed, key->repeat_count };
         (void)ui_keyboard_submit_record(&state->keyboard,
             &console->base.hotkey_matcher, console,
             ui_console_emit_normalized, &record);
