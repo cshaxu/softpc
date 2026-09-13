@@ -2,7 +2,8 @@
 
 ## Current Work
 
-M9 T55 S11 is delivered for owner testing: Window activation ordering.
+M9 T55 S11 is verified: stale Window close request repaired; executor delivery
+and committed-diff closure review are pending.
 Executor P1 `16fa420` was pushed and its actual diff reviewed; T55 remains open.
 
 ## M9 T55 S11 Packet
@@ -11,19 +12,19 @@ Executor P1 `16fa420` was pushed and its actual diff reviewed; T55 remains open.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner: “噢好的。请你修复这两点。” Build, test, commit and push authorized. |
-| Objective | Request Window focus only on frozen-to-unfrozen transition, after Console binding; mode-roundtrip display defect separately deferred by owner. |
+| Objective | Complete focus ordering and expire an old X request on a new RUNNING transition, so later CAP retains Window; mode-roundtrip display defect separately deferred. |
 | Non-goals | No MVDM, media, INI, lifecycle, capture or new public focus API changes. |
 | Reference Baseline | `54fe10e`, S10 delivery. |
 | Candidate Proposal | [T55 proposal](../proposals/m9-t55-lib-types-external-boundary.md) |
 | Files And ABI Surface | Window unfreeze behavior and SoftPC control/reconciler activation order, tests and docs; no new public API. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, System Architecture, Source Layout, Product UI and referenced skills. |
-| Verification | x64 52/52, x86 52/52; strict lib build and 3/3 checks; manifest, DAG and governance passed. Focus-count and binding-order probes passed. |
+| Verification | Fresh x64 52/52 (34.96 s), x86 52/52 (36.02 s), lib checks 3/3; eight-case stale-X matrix fails before and passes after repair; earlier strict build and focus/order probes retained. |
 | Expected Markers | Console binding precedes Window activation; transition-only activation through existing FIFO; no speculative text changes. |
 | Asset Needs | Refresh fixed softpc32.exe and softpc64.exe; preserve INI/media. |
-| Reporting Requirements | Two-item ledger, peer sweep, line accounting and pushed committed-diff review. |
+| Reporting Requirements | Four-entry ledger, peer sweep, line accounting and pushed committed-diff review. |
 | Stop Conditions | Escalate MVDM or product policy changes. |
 | Exit Criteria | Focus repairs verified, mode-roundtrip defect explicitly transferred, dual EXEs built, committed/pushed and clean worktree for owner testing; T55 stays open. |
-| Original Owner Request | “噢好的。请你修复这两点。” |
+| Original Owner Request | “噢好的。请你修复这两点。” Follow-up: “还真是，之前没点过X就没事！” and “请帮我修复，然后收口提交推送这个S任务！” |
 | Similar-Issue Sweep | Character/attribute fill and scroll callers; initial/repeated unfreeze and native focus callers. |
 
 ## Current Technical Baseline

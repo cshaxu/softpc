@@ -20,6 +20,11 @@ void app_reconciler_note_runtime(app_reconciler *reconciler,
     app_runtime_state state)
 {
     if (reconciler == NULL) return;
+    /* X belongs to the closed pause, not future pauses. Keep it through
+       destruction; clearing there would recreate the still-paused Window. */
+    if (state == SOFTPC_RUNTIME_RUNNING &&
+        reconciler->runtime_actual != SOFTPC_RUNTIME_RUNNING)
+        reconciler->close_requested = 0;
     reconciler->runtime_actual = state;
     if (state == SOFTPC_RUNTIME_STOPPED || state == SOFTPC_RUNTIME_ERROR) {
         /* A subsequent run must not inherit the previous run's display

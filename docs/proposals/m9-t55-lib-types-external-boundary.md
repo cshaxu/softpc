@@ -4,17 +4,19 @@
 
 Owner: “噢好的。请你修复这两点。” Baseline `54fe10e`.
 Architecture/coding/execution/documentation skills apply. T55 remains open.
-The finite scope is two repairs plus their fill/scroll and focus peer callers.
+The finite scope is the four ledger entries below, including the owner-reported
+stale-X follow-up, plus their fill/scroll, focus and close-state peer callers.
 
 | Item | Single owner / design | Proof required |
 | --- | --- | --- |
 | CLS | Owner subsequently confirmed “噢不对，dos下面cls成功的”. The real DOS and package probes also pass on the baseline. No production repair is justified. | Retain package ver-to-cls regression; remove experimental compatibility changes. |
 | Focus | Existing Window control FIFO requests activation only for frozen to unfrozen; repeated unfreeze is idempotent, no capture. | Actual worker control consumption with counted native focus requests; full regressions. |
 | Focus ordering | Owner reports resume briefly activates Window then returns foreground to Console. Control must finish raw binding before unfreeze; when both objects are needed, bind Console before creating Window. Preserve raw activation focus. | Reducer completion ordering plus main-call-path review and Window focus probe. |
+| Stale X request | Owner: “还真是，之前没点过X就没事！”; “请帮我修复，然后收口提交推送这个S任务！” Clear close_requested only on entry to a new RUNNING phase. Keep it while paused, including after Window destruction. | Baseline-failing X/resume/CAP and X/stop/start/CAP reducer matrix; repeated RUNNING must not erase a pending X. No lib or MVDM change. |
 
 No MVDM, media, INI or lifecycle modifications. Tests use existing overlay
 media and bounded polling; no raw trace files or new diagnostic processes.
-Exit: both ledger rows proved, both EXEs, full dual-width tests, strict lib,
+Exit: all ledger rows proved, both EXEs, full dual-width tests, strict lib,
 manifest/DAG/governance, executor push and committed-diff coordinator review.
 
 Diagnosis correction: no-op legacy fill/scroll was an inspection finding, not
@@ -76,6 +78,26 @@ the tested build. No MVDM, media, INI or compatibility-buffer diff remains.
 The scope ledger is satisfied by tested focus changes and the owner's explicit
 separate-handling decision for the mode-roundtrip defect. Delivery is accepted
 for owner testing, not declared a T55 closure or proof of that deferred fix.
+
+### S11 P3 stale-close delivery
+
+The follow-up exposed a pre-existing close_requested latch, not a lib CAP
+failure. `rg -n 'close_requested|note_window_close' src/app` finds one owner
+(reconciler), one control forwarding entry and the Window-close dispatch.
+CAP dispatch never sets this latch. No duplicate close state needs removal.
+The latch now expires on a transition into RUNNING; duplicate RUNNING facts,
+paused Window destruction and paused frame updates do not clear it.
+
+The new eight-case reducer matrix failed on the old source at its second
+PAUSED Window assertion. After repair it passes for both display values,
+both console_control values, and resume versus stop/start. Existing action
+ordering and runtime/control integration tests remain in the full suite.
+Both EXEs rebuilt; x64 52/52 (34.96 s), x86 52/52 (36.02 s), standalone lib
+checks 3/3. This proves the state regression, not a new manual Win3.1 session.
+P3 adds 5 production lines in one file and 35 test lines in one file; no new
+state, API, lib or MVDM changes. Whole-S11 code accounting from `54fe10e`:
+4 production paths +24/-6 (net +18), 4 test paths +72/-10 (net +62), excluding
+documentation, manifest and binaries. The mode-roundtrip TODO stays deferred.
 
 ## S10 admission: complete approved audit repair set
 
