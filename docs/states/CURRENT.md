@@ -2,9 +2,10 @@
 
 ## Current Work
 
-M9 T55 S9 implementation and verification are complete; executor push and
-committed-diff review follow. x64/x86 passed 50/50 and strict lib passed 3/3.
-Only frozen-origin pending make replay changed; release filtering is unchanged.
+M9 T55 S9 is delivered for owner inspection. Executor P1 `8df0599` is pushed
+and the coordinator reviewed its actual 19-path diff. x64/x86 passed 50/50
+and strict lib passed 3/3. Only frozen-origin pending make replay changed;
+release filtering is unchanged.
 S8 delivery is recorded in [its handoff](../history/M9-T55-S8-character-recovery-handoff.md).
 T55 remains open; the package timeout in TODO is not claimed resolved.
 

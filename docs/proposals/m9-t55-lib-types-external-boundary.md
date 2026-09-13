@@ -55,6 +55,22 @@ Package SHA256:
 - softpc32.exe: `095D2BA3F266F8D13497A8049EBAA2B8D7337CFE816ED06B60DB7747173ECBCC`
 - softpc64.exe: `B43FA7EBB789F27C50E6C1B8DAFF8790F8368652A648663215BBB4E239FD41A3`
 
+### S9 P2 coordinator committed-diff review
+
+Executor P1 `8df0599` was pushed before coordinator review of its actual
+19-path diff against the narrowed owner request. The five production C/H
+paths add one stored permission and thread it through existing calls.
+Registry matching, current frozen filter, release path, normalization and
+Console native implementation remain unchanged. The only replay sink call
+is gated; all three flush causes use it. Tests verify exact ordinary/hotkey
+outputs rather than only success statuses, including the explicitly retained
+half-pair semantics. Signature-only test changes preserve prior assertions.
+
+Both fixed EXEs match recorded hashes. Full x86/x64 50/50, strict 3/3 and
+governance passed; no app/MVDM/INI/media edits exist. Owned fixture copies
+were removed. S9 is delivered for owner inspection, not T55 closure; the
+existing intermittent package TODO is not claimed resolved.
+
 ## S8 admission: complete-character repetition and recovery
 
 Owner: “批准修复s任务 干净”. Baseline `0ca0875`.
