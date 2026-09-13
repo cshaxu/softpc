@@ -6,4 +6,4 @@ malformed-prefix recovery and incomplete physical-map fallback gaps.
 Owner admitted their repair: “批准修复s任务 干净”. They transfer to S8;
 T55 remains open. The previously observed package CAP timeout remains in TODO.
 Original bounded evidence is in the
-[T55 proposal](../proposals/m9-t55-lib-types-external-boundary.md).
+[T55 proposal](../history/M9-T55-lib-types-external-boundary-proposal.md).

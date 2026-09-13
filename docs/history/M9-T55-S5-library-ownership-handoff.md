@@ -6,4 +6,4 @@ audit then exposed ordinary-key lifecycle incompleteness, missing Console text
 fallback and unnecessary rectangle conversion round trips. These are explicitly
 admitted to S6; S5's passing tests do not certify their absence or close T55.
 Original requests and prior evidence remain in the
-[T55 proposal](../proposals/m9-t55-lib-types-external-boundary.md).
+[T55 proposal](../history/M9-T55-lib-types-external-boundary-proposal.md).

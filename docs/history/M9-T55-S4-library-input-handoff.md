@@ -6,4 +6,4 @@ Subsequent owner review identified incomplete physical-key identity, Window
 fault admission and excessive frame/control lock coupling, alongside additional
 cleanup. The owner approved their correction and the all-lib wrapper/dead-code
 sweep. S5 owns these findings; this handoff does not claim whole-library or
-T55 closure. See the [proposal](../proposals/m9-t55-lib-types-external-boundary.md).
+T55 closure. See the [proposal](../history/M9-T55-lib-types-external-boundary-proposal.md).

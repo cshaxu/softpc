@@ -10,7 +10,7 @@ and component clock/input interpretation still in types.
 
 The owner admitted a new S for that correction. T55 S3 now owns the seven-header
 layout ledger and direct-consumer repairs in the
-[active proposal](../proposals/m9-t55-lib-types-external-boundary.md).
+[active proposal](../history/M9-T55-lib-types-external-boundary-proposal.md).
 S2 is superseded for that work, not closed as an accepted migration. T55 must
 remain open for owner review and its eventual whole-task audit. Existing SDK
 declaration aggregation is not evidence that all external calls have acquired

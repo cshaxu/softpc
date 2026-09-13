@@ -8,4 +8,4 @@ modifier, and found ANSI raw reads plus ignored native repeat counts.
 These findings are explicitly admitted to S7; neither S6's tests nor manual
 acceptance certified their absence. T55 remains open.
 Original requests and evidence remain in the
-[T55 proposal](../proposals/m9-t55-lib-types-external-boundary.md).
+[T55 proposal](../history/M9-T55-lib-types-external-boundary-proposal.md).

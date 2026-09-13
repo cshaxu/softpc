@@ -5,7 +5,7 @@ ledger through P5 `996e4c6`; P6 `5ea133c` recorded the post-push review and
 corrected the strict-build accounting (library C11, standalone headers C17).
 P5 passed x64 46/46 and x86 46/46 CTest, strict-library 3/3 tests, and 18
 independent public-header compile checks. The implementation and evidence
-remain in the [proposal](../proposals/m9-t55-lib-types-external-boundary.md).
+remain in the [proposal](../history/M9-T55-lib-types-external-boundary-proposal.md).
 
 Subsequent review found seven further issues. The owner explicitly requested
 a new S to repair them; T55 S4 now owns that finite ledger. This records the
