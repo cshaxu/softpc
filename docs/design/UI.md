@@ -57,6 +57,9 @@ For text frames, cursor position, shape, and enabled state are copied frame
 data. The native VM Console/Terminal owns its own blink behavior. `ui-window`
 draws the corresponding guest cursor and owns a 250 ms Window-local blink
 cadence while unfrozen; no SoftPC runtime or guest timer phase is invented.
+The runtime converts compatibility cursor-size percentages into bottom-aligned
+scanline bounds using the copied font height. The library draws those bounds
+literally; it must not force every caller's cursor shape to the cell bottom.
 
 The console and window are equivalent input producers. RDP is supported by
 the same normalized key path; no frontend may depend on raw local-only key

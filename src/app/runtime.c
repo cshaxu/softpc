@@ -12,6 +12,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+static void app_runtime_cursor_shape(ui_frame *frame, uint32_t percent)
+{
+    /* CONSOLE_CURSOR_INFO is a bottom-aligned percentage, not scanline bounds. */
+    uint32_t height = frame->font_height;
+    uint32_t lines;
+    if (height == 0u || height > 16u) height = 16u;
+    if (percent == 0u || percent > 100u) percent = 100u;
+    lines = (height * percent + 99u) / 100u;
+    frame->cursor_top = (uint8_t)(height - lines);
+    frame->cursor_bottom = (uint8_t)(height - 1u);
+}
+
 static void app_runtime_prompt_trace(uint32_t sequence, uint32_t mode_type,
     uint32_t screen_state, uint32_t graphics, uint32_t columns,
     uint32_t rows, uint32_t stride, uint32_t width, uint32_t height,
@@ -331,9 +343,7 @@ static void app_runtime_publish(app_runtime *runtime)
         frame->graphics = 0u;
         frame->text_columns = (uint16_t)columns;
         frame->text_rows = (uint16_t)rows;
-        frame->cursor_top = 0u;
-        frame->cursor_bottom = cursor_size == 0u ? 15u :
-            (uint8_t)((cursor_size * 16u + 99u) / 100u - 1u);
+        app_runtime_cursor_shape(frame, cursor_size);
         frame->cursor_visible = cursor_column >= 0 && cursor_row >= 0;
         frame->cursor_phase = 1u;
         frame->dirty_left = 0;

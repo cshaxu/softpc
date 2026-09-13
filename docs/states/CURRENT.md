@@ -2,33 +2,37 @@
 
 ## Current Work
 
-Owner accepted S15 manual testing. M9 T55 S16 implementation and verification
-are complete: x64 55/55, x86 55/55, strict library 3/3. Owner-approved checked
-destruction retains live resources on failed join; SoftPC reports and exits.
-Both fixed package EXEs are refreshed. Executor P1 `6500f1d` is pushed;
-coordinator review of the actual committed diff passed. S16 is delivered and
-awaits owner manual testing; T55 remains open.
+M9 T55 S17 is active: fix the reported Window cursor position and audit the
+whole shared-library failure/lifetime chain. S16 is delivered, not manually
+accepted. T55 remains open. Owner package INI edits are preserved.
 
-## M9 T55 S16 Packet
+S17 cursor implementation and all-component audit are complete locally. Both
+EXEs built; each full CTest run passed 55/56. Package stage 5 assumes raw Console
+but owner configuration selects Window; no full package acceptance is claimed.
+Remaining global contract findings and proposed repair boundaries are retained
+in the linked S17 evidence/TODO, not declared fixed. Await owner cursor testing
+and admission of the unified fault/ownership design.
+
+## M9 T55 S17 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: “请你准入s任务 干净修复 类似问题下次审计不要再出现了！”; then “批准” after the bounded destruction/status and app terminal-exit explanation. |
-| Objective | Propagate native wake errors, use one Window cursor timer, and prove persistent notification failure behavior without speculative fallback channels. |
-| Non-goals | No matcher snapshot restriction, MVDM, media, INI, app lifecycle, mouse scaling, deferred mode-roundtrip repair or T closure. |
-| Reference Baseline | f319017, clean main; S15 manually accepted; subsequent audit confirmed swallowed SetEvent failure. |
+| Admission And Approval | Owner requires cursor repair and global lib audit, explicitly rejecting local-only fault repairs. |
+| Objective | Correct percentage-to-scanline producer semantics and inventory whole-lib failure, notification and disposal contracts with a unified repair design. |
+| Non-goals | No MVDM, media, mouse changes, deferred CLS fix or T closure; do not silently broaden public ABI. |
+| Reference Baseline | 77d3d7f; S16 55/55 both widths; owner-modified package INI. |
 | Candidate Proposal | [Shared-library audit repairs](../proposals/m9-lib-activation-audit-repairs.md). |
-| Files And ABI Surface | ui-base selected wake/join result, both UI destroy APIs now return lib_status, SoftPC checks every destroy call; Window timer and tests/contracts; types only wraps timer declarations. |
-| Applicable Rules | Architecture, coding, execution and documentation rules and linked skills; current architecture, source layout and UI authorities. |
-| Verification | Failed signal propagation on both implementations; timer transition, failure and native modal-loop proof; persistent rejection without incidental wake; x64/x86 builds and full CTest, strict lib and static gates. |
-| Expected Markers | Finite S16 ledger; one notifier and one cursor timing owner; no added worker, control replay or unapproved polling recovery. |
-| Asset Needs | Existing non-mutating package media; refresh only fixed x86/x64 EXEs; no trace recordings. |
-| Reporting Requirements | Per-item proof, similar-issue dispositions, production/test line accounting, executor commit/push then coordinator actual-diff review. |
-| Stop Conditions | Do not expand product semantics or hide failed tests; unresolved boundary changes require owner direction. |
-| Exit Criteria | Admitted repairs and bounded-destroy failure retention verified, both EXEs built, all gates pass, complete executor push and coordinator review, clean worktree awaiting owner test. |
-| Original Owner Request | “请你准入s任务 干净修复 类似问题下次审计不要再出现了！” |
-| Similar-Issue Sweep | Both UI wake implementations and all callers, frame/control/STOP/fault/activation notification, all Window blink/timer startup-transition-cleanup paths. |
+| Files And ABI Surface | app runtime cursor conversion/test; all lib components audited, no new public ABI without design approval. |
+| Applicable Rules | Architecture, coding, execution and documentation rules/skills and design authorities. |
+| Verification | Producer-to-render cursor matrix, actual runtime frame, dual builds/full CTest, lib gates; deterministic fault probes and all-component ledger. |
+| Expected Markers | Bottom-aligned percent conversion uses actual font height; gaps named with complete operation chains rather than concealed by passing tests. |
+| Asset Needs | Refresh fixed x86/x64 EXEs only; preserve media and INI bytes. |
+| Reporting Requirements | Root cause, whole-lib ledger, remaining gap design, exact changed-path count, complete P push and coordinator review. |
+| Stop Conditions | New external ABI/behavior decisions need owner approval; never declare known fault gaps fixed or infer manual acceptance. |
+| Exit Criteria | Cursor fixed/proved and EXEs delivered; global audit and proposed repair boundaries recorded; not global fault-repair closure. |
+| Original Owner Request | “光标位置完全错了…要求修复…我要你全局审计而不是局部审计和修复”. |
+| Similar-Issue Sweep | All lib components and app consumers: creation, notification, sink failure, worker retirement, wait, resource release; cursor producer/consumer unit consistency. |
 
 ## Current Technical Baseline
 

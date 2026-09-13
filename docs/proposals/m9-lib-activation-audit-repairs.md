@@ -1,11 +1,11 @@
 # Shared-library activation and audit repairs
 
-The owner accepted S15 and admitted notification-error propagation, one native
-Window cursor timer and a persistent-notification-failure investigation.
+The owner reported a Window cursor regression and required whole-library
+failure/notification/lifetime auditing, not another local repair claim.
 Modifier-snapshot matching is retained.
 
 The admitted design, original approval, finite ledger, non-goals
 and verification requirements are recorded in the retained
-[S16 brief](../etc/evidence/m9-t55-s16-mailbox-errors-cursor-timer.md).
+[S17 brief](../etc/evidence/m9-t55-s17-cursor-global-audit.md).
 Current admission and execution status belong only to
 [CURRENT](../states/CURRENT.md).

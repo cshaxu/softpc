@@ -152,6 +152,9 @@ int main(void)
            frame.  Both outer frontends consume this value without reading a
            controller register or a guest-memory pointer. */
         assert(cursor_seen);
+        assert(frame->font_height > 0u && frame->font_height <= 16u);
+        assert(frame->cursor_bottom == frame->font_height - 1u);
+        assert(frame->cursor_top <= frame->cursor_bottom);
     }
     assert(app_runtime_published_frame_sequence(runtime) == frame->sequence);
     assert(app_runtime_published_frame_run_generation(runtime) == first_run);
