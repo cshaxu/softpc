@@ -2,10 +2,29 @@
 
 ## Current Work
 
-No implementation subtask is active. Owner explicitly requested T56 closure.
-The remaining whole-task audit is completed as S19 (S13 is not reused);
-T56 is closed. Wait for owner instructions; the next queue item is not admitted.
-See the [completion audit](../history/M9-T56-S19-completion-audit.md).
+T57 S1 is active: extract app configuration before the VM/Compat relocation.
+T56 remains closed; no shared corpus or MVDM change is admitted.
+
+## M9 T57 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner admits new T to implement the confirmed app/vm/compat refactor. |
+| Objective | Move configuration parsing/path resolution from main into app/config with unchanged behavior. |
+| Non-goals | No shared Lib/Common/MVDM or product semantics change. |
+| Reference Baseline | cfc88cf, clean main, x64/x86 83/83. |
+| Candidate Proposal | [Refactor](../proposals/m9-app-vm-compat-boundaries.md). |
+| Files And ABI Surface | app main/config, product test and CMake; app-owned configuration contract. |
+| Applicable Rules | Architecture, coding, execution, documentation and their linked governance skills. |
+| Verification | Focused config test, full x86/x64 suites, protected corpus diff and documentation gate. |
+| Expected Markers | One parser, same defaults/paths/error behavior, both fixed EXEs. |
+| Asset Needs | Refresh fixed EXEs only; no INI/media edits. Bounded logs under build; no new media. |
+| Reporting Requirements | Executor commit/push then actual-diff review; both-width evidence and accounting. |
+| Stop Conditions | Protected corpus changes or product behavior redesign require owner direction. |
+| Exit Criteria | Config extraction and tests complete, dual builds/tests, commit/push and independent review. |
+| Original Owner Request | 准入一个新的t任务实施重构；app main is the only permitted VM consumer. |
+| Similar-Issue Sweep | All configuration consumers/parser/build/test references; old parser removed from main. |
 
 ## Current Technical Baseline
 

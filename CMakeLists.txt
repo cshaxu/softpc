@@ -284,6 +284,7 @@ target_compile_definitions(softpc-machine PRIVATE
 
 add_executable(softpcvm
     src/app/main.c
+    src/app/config.c
     src/app/command_binding.c
     src/app/machine_driver.c
     src/app/keyboard.c
@@ -312,6 +313,11 @@ set_target_properties(softpcvm PROPERTIES
 
 enable_testing()
 add_executable(softpc-machine-smoke test/unit/machine_smoke.c)
+add_executable(softpc-config-smoke test/unit/config_smoke.c src/app/config.c)
+target_include_directories(softpc-config-smoke PRIVATE src)
+target_link_libraries(softpc-config-smoke PRIVATE types)
+add_test(NAME softpc-config-smoke COMMAND softpc-config-smoke)
+set_tests_properties(softpc-config-smoke PROPERTIES LABELS "unit")
 target_link_libraries(softpc-machine-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-machine-smoke COMMAND softpc-machine-smoke)
 set_tests_properties(softpc-machine-smoke PROPERTIES

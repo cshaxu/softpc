@@ -1,0 +1,56 @@
+# T57: App / VM / Compat boundary refactor
+
+## Owner request and scope
+
+Original requests: “要求：app部分config抽取合理；将softpc转换成common/vm的适配层应该整理到组件 src/vm 中；为softpc本体提供host支持的部分，应该是src/compat; 还有 app只能和common和lib产生联系，不应该认识mvdm compat或者vm。”
+Clarification: “本次修改不得改动lib或common 我说的vm是src/vm”；
+“组装入口还是可以接触vm的 但是仅此一处”；“准入一个新的t任务实施重构”。
+
+Baseline cfc88cf, T56 closed, clean main, x64/x86 83/83.
+No changes to src/lib, src/common, src/mvdm or their shared test corpora.
+No guest timing, media, input, rendering, debug or lifecycle policy changes.
+No new registration mechanism, executor or forwarding layer. Existing INI and
+media remain untouched. The queued XP mirror task is not admitted.
+
+## Finite ownership ledger
+
+Coverage is every tracked app/host file at baseline plus affected CMake,
+product tests and source-boundary gates. Every file is retained with a distinct
+role or moved once; no old production path survives.
+
+| Current responsibility | Destination |
+| --- | --- |
+| main configuration/path parser | app/config.c,h; main only calls it |
+| CLI/debug selection, title/hotkey policy | app; only common/lib contracts |
+| Common driver, machine input/frame/debug conversion | src/vm |
+| concrete machine creation and original host callbacks | src/compat, with VM public creation boundary for main |
+| host/compat CPU/GDP/header replacements | src/compat, no nested compat; isolated same-name headers retained |
+| machine execution trace | VM-owned, no VM dependency on app |
+| original source and shared corpora | unchanged |
+
+Only app/main.c may include VM public interfaces. It may not include Compat
+or MVDM. Other app sources cannot include them directly or through app headers.
+VM consumes existing common/machine driver contracts and Compat; Compat
+provides original host services and does not depend on app. Debug adaptation
+using Common requests belongs to VM, not Compat. Original ABI symbols remain
+unchanged unless purely local app-driver names move to VM ownership.
+
+## Sequential steps and exits
+
+1. S1: extract config with preserved defaults/parser/path behavior; focused
+   configuration regression, full x86/x64 suites and fixed EXEs, commit/push.
+2. S2: move VM and Compat responsibilities from current implementation;
+   remove app machine-header dependencies, wire only main to VM, enforce
+   include boundaries including negative probes; dual-width full regression,
+   protected-tree zero diff, docs and artifact delivery; commit/push.
+3. S3: separately audit entire ledger, old path removal, source accounting,
+   preserved behavior evidence and debt; archive and close only after exits.
+
+Single agent, executor then actual-commit reviewer. Each implementation P is
+complete and pushed, each S has both fixed EXEs. No synchronous user test wait
+is required between steps. Unexpected need to edit protected corpora stops
+that part for owner decision. Historic known TODOs remain distinct.
+
+This task does not split platform.c algorithms, replace timer APIs or redesign
+borrowed frame contracts. Such changes are unnecessary for the approved
+ownership relocation and must not be hidden in a mechanical move.
