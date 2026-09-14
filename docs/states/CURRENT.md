@@ -2,29 +2,7 @@
 
 ## Current Work
 
-M9 T56 S9 is active: owner reopened the closed task to normalize monitor
-command-result spacing without changing command or lifecycle semantics.
-
-## M9 T56 S9 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Owner-Reopen |
-| Admission And Approval | Owner explicitly admitted S9 after T56 closure; permanent commit/push authority remains in effect. |
-| Objective | Every nonempty monitor command/result text ends with one blank line before the next prompt; pure Enter remains text-free. |
-| Non-goals | Do not change MVDM, command vocabulary, command acceptance, lifecycle ordering, Console/KVM ownership, lib, or product configuration/media. |
-| Reference Baseline | T56 S8 closed at `455ca6a`; x86/x64 62/62, strict lib 8/8, and both packages were rebuilt. |
-| Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | Product UI wording contract, app command-format helper, command smoke, task record and fixed package EXEs; no public C ABI change. |
-| Applicable Rules | Execution, architecture, coding and documentation authorities; Product UI. |
-| Verification | Command-spacing assertions for unknown/rejected/local/lifecycle outputs and empty Enter; fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/boundary gates and diff hygiene. Every S is incomplete unless both fixed-width packages are rebuilt and tested. |
-| Expected Markers | One shared nonempty-result formatter; no special-case Unknown-command branch; next prompt follows exactly one blank line. |
-| Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe`; preserve adjacent user-owned INI and all media bytes. |
-| Reporting Requirements | Every P is committed and pushed; final report includes both EXE links, hashes and x86/x64 test evidence. |
-| Stop Conditions | Stop if a required format change alters command/lifecycle semantics or needs an MVDM/lib change. |
-| Exit Criteria | One formatter covers all named product command results, focused and full dual-width tests pass, packages refresh, review/push complete and worktree is clean. |
-| Original Owner Request | `Unknown command.` 后应有空行；除纯回车无命令外，每条命令输出后保持空行。 |
-| Similar-Issue Sweep | Every command result producer, queued lifecycle completion text, local media result, parser rejection and prompt-only empty-line path. |
+No implementation subtask is active.
 
 ## Current Technical Baseline
 
@@ -47,10 +25,11 @@ command-result spacing without changing command or lifecycle semantics.
 | T56 S6 | Exact NXVM xasm32 source is a dormant `common-xasm32` component with copied byte/text contract tests. | [S6 closure](../history/M9-T56-S6-xasm32-source-provenance.md) |
 | T56 S7 | Exact NXVM debug source is a dormant `common-debug` component behind a typed optional paused-state machine adapter. | [S7 closure](../history/M9-T56-S7-debug-source-provenance.md) |
 | T56 S8 | Boundary gates prohibit app/host reaches into common implementation; common documentation and CMake ownership have converged. | [S8 closure](../history/M9-T56-S8-common-corpus-convergence.md) |
+| T56 S9 | All nonempty monitor command results now use one blank-line formatter; pure Enter remains prompt-only. | [S9 closure](../history/M9-T56-S9-monitor-output-spacing.md) |
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
-| T56 | SoftPC-first common corpus is closed: UI, session, machine, xasm32 and debug each have one owner; both fixed packages and all gates passed. | [S8 closure](../history/M9-T56-S8-common-corpus-convergence.md) |
+| T56 | SoftPC-first common corpus is closed: UI, session, machine, xasm32 and debug each have one owner; monitor command results retain one blank line; both fixed packages and all gates passed. | [S9 closure](../history/M9-T56-S9-monitor-output-spacing.md) |
 | T55 | Canonical shared library refreshed, normalized, simplified, boundary-gated, and renamed to the KVM corpus; owner accepted final package testing. | [T55 closure](../history/M9-T55-closure-kvm-corpus.md) |
 | T49 | Shared-library quality sequence S1–S6 closed after owner x86/x64 package acceptance. | [T49 S6 history](../history/M9-T49-S6-lib-neutral-corpus-prose.md) |
 | T50 | Build presets/artifact identity and standalone shared-library MSVC CI closed. | [T50 S2 history](../history/M9-T50-S2-lib-ci.md) |
