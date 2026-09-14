@@ -74,6 +74,15 @@ mapping, lifecycle, or hotkey meaning.
 
 ## Build Output Layout
 
+Root CMake assigns all `src/vm/*.c` to `softpc-vm`; other targets link it
+instead of copying its implementation list. The original machine OBJECT
+groups remain intact. The build-ownership gate checks actual target source
+membership and VM completeness at configure time; its negative tests reject
+duplicate/foreign source ownership. Product include gates check reverse
+dependencies across the six roots, including relative paths. Tests may use
+private implementation contracts for focused proof; production consumers may
+not bypass the VM public boundary.
+
 The complete `build/` tree is ignored. It holds CMake build trees, generated
 sources, test binaries, compiler intermediates, logs, captures, diagnostic
 scripts, and disposable test media. Additional host-width configurations use

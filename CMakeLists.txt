@@ -620,3 +620,10 @@ set_tests_properties(softpc-package-smoke softpc-package-compact-console PROPERT
     LABELS "integration;${SOFTPC_TEST_WIDTH_LABEL}"
     TIMEOUT 90
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+
+set(SOFTPC_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+include(test/support/build_ownership.cmake)
+add_test(NAME softpc-build-ownership-negative COMMAND "${CMAKE_COMMAND}"
+    "-DSOFTPC_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/test/support/build_ownership.cmake")
+set_tests_properties(softpc-build-ownership-negative PROPERTIES LABELS "unit")

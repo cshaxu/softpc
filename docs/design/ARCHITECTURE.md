@@ -54,6 +54,35 @@ public interface exposes only copied options and Common/Lib contracts.
 Compat never calls app or Common. `common/machine` owns the
 single generic executor, request/input queues, run generation and copied-frame
 publication; its injected VM driver calls the SoftPC machine boundary.
+
+### Product Build And ABI Boundaries
+
+These are ownership boundaries, not six mandatory forwarding layers. Device
+I/O follows original MVDM host callbacks into Compat and then Lib storage;
+Common machine schedules execution, not individual disk reads/writes. Original
+CPU debug observations call the VM observer symbols without importing Common
+or App implementation. Such callbacks do not transfer CPU state ownership.
+
+All VM C sources belong to one `softpc-vm` OBJECT target. App and product
+integration tests link it; the exe's own sources are App and resources only.
+The recovered `softpc-machine` archive retains its CCPU/device/Compat OBJECT
+composition. VM objects are explicit because the original CPU calls debug
+observers; no pair of mutually extracting static archives is introduced.
+
+`vm_create` owns the process-single-machine resource admission, before machine
+or audio acquisition. A second live/concurrent creation fails without touching
+the first; failure releases admission and destruction releases it after cleanup.
+This restriction reflects original global CPU/device state, not a new machine
+lifecycle state. Internal non-owning driver wrappers serve serialized low-level
+tests, not an alternative application creation API.
+
+Compat's narrow CCPU ABI and host support declarations are internal contracts.
+Existing original declarations are reused where applicable; the narrow CPU
+contract avoids leaking original CPU macros into the VM adapter. Declaration
+consolidation does not add forwarding functions, duplicate state or change the
+original device ABI. Lib and Common remain product-independent; neither may
+import App, VM, Compat or MVDM.
+
 `lib/` is the canonical checked-in shared-library corpus, not a runtime or
 build dependency on NXVM or NTVDM64. NXVM adopts this corpus exactly. It
 consumes and produces copied host values only. It owns

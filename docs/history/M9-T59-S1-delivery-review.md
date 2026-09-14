@@ -9,10 +9,5 @@ The owner admitted S2 build ownership, S3 original ABI declarations, S4 single-i
 admission and S5 architecture gates. CURRENT owns active status; the proposal owns
 the finite scope/exit ledger. T59 stays open.
 
-## S2 implementation record
-
-Baseline a7c2e86. Preserve recovered machine OBJECT source order and all runtime
-semantics. VM is an OBJECT target because original CCPU objects call VM debug
-observers: placing both sides in separate ordinary archives would introduce an
-archive-order dependency. Consumers link this one target, not another source list.
-No additional runtime layer or executor is introduced.
+Subsequent implementation and review are recorded in the individual S histories;
+this record does not claim owner manual acceptance or whole-task closure.
