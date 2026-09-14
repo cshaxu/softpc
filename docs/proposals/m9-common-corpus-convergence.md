@@ -21,6 +21,87 @@ lib 调用的强制中转层；以下任务与验收按此修订执行。
 
 ## 五个组件及组装边界
 
+### T56 S17：Common 一致性与简化
+
+原始准入：“很好。我现在要你准入一个S任务修复以上common所有问题；
+先在不改动lib的前提下完成。如果有需要改动lib的修复，留待完成后我们再审核。”
+基线 662ed4b，S16 用户测试通过，NXVM adoption 等待外部反馈，T56 不收口。
+
+有限全集为本轮审计的七组 Common 问题及其全部调用点；每组必须有实际
+diff、针对性证明和删除/保留处置。保持唯一 session、UI、executor 所有权。
+
+| 项 | 修复与验证 |
+| --- | --- |
+| 帧快照/路由 | FRAME_COMPLETED 是读取提示；采用同一完整快照的 sequence、graphics、content。拒绝旧 run，不让旧通知覆盖新路由；确定性测试较旧通知遇较新快照、重复通知、失效帧。 |
+| UI run generation | 控制线程写、native callback 读的同一字段改用已有 Types atomic；测试 callback 携带当前代际，不新增锁或代际体系。 |
+| action 词汇 | session 直接使用 UI 所有的 common_ui_action；删除重复枚举和逐项映射，更新全部消费者、依赖与矩阵测试。 |
+| status frame | 仅在 Current Console 确需投递新帧时构造状态文本帧；保留 latest-frame 与失败重投语义，不新增缓存。 |
+| 初始 Window | initial_frozen 已表达初态，删除 running 创建后的重复 unfreeze；保留后续 resume，测试两种初态及恢复。 |
+| 无职责接口 | 删除 test-only push_ux wrapper，测试改用已有 run-aware 入口；debug_invalidate 收为文件内 static。扫全 Common 引用，不保留过渡别名。 |
+| 帧锁元数据 | published_frame_run_generation 所有运行期访问既已受 frame_lock 保护，改为普通 lib_u32；其他跨线程原子保留，测试发布/失效快照。 |
+
+不改 src/lib 或 test/lib。Lib mailbox 初始化后替换 wake 的多余分配属于
+另一项优化，明确留待本 S 完成后 owner 审核。若 Common 修复需要新 Lib
+契约则停止该项并报告，不以 Common 平台实现或旁路绕过。
+双宽度全回归、共享 Common suite、四目录 manifest/DAG 和文档门禁通过；
+刷新双 EXE，执行者完整提交推送后切换审查角色，按实际 diff 核计净行数。
+
+快照接口的最小调整：copy_published_frame 第三参数从输出 run 指针改为
+请求 run 值。Machine 在同一 frame_lock 内先检查有效性及 run，成功才
+复制；失败保持 destination 不变。Session 直接用通知的 run 请求快照，
+采用快照自身的 sequence/graphics。删除“先破坏缓存再核验”的路径；
+所有测试调用同步更新，不增加兼容 wrapper 或第二个 API。
+
+#### S17 实施、同类扫描与验证
+
+七组全部在 Common 内解决，Lib 源/测试零修改。UI action 仅由内部
+reconciler include 所有者接口；Session 公共头仍借用 opaque UI 类型，
+没有扩大 CMake PUBLIC 依赖。frame copy 的第三参数是本次 Common
+源码接口变更；NXVM adoption 应同步采用 expected-run 调用，不能继续
+传输出指针。debug_invalidate 不再是公开契约，旧 action 名称没有别名。
+
+同类扫描：`rg run_generation|delivered_frame|unfreeze` 覆盖 Common UI
+全部回调/发布路径；四处回调/完成标签统一读取同一 atomic，构造前初始化，
+控制线程唯一写。options 创建后不变，对象/帧去重仅由控制线程访问。
+`rg published_frame_run_generation|frame_lock` 证明发布、失效、读取和
+getter 全受已有锁保护，故只删除该冗余 atomic；其他独立跨线程 atomics
+保留。`rg SESSION_UI_ACTION|session_ui_action|queue_push_ux` 在生产/测试
+零命中；debug_invalidate 的七处引用均在 machine.c。其他 runtime getter
+仍被现有测试使用，保留其实际快照/观察职责，不盲删接口。
+
+`session_frame` 使用实际 completion consumer/reducer 和独立 publication
+替身，覆盖通知 N 对快照 N+1、重复、无效、错误 run、旧 run、正反路由及
+component completion 屏障。`composition` 使用实际 Common UI 和 Lib
+接口替身，计数状态帧构造/实际投递，覆盖非 Current、重复、失败再提交、
+文本直通、两种初态、freeze/resume；两个来源的真实 Host worker 与控制
+线程并发读写代际，失败回调也验证标签。该压力用例不冒充 race detector；
+数据竞争消除依据是全部访问统一到 atomic。Machine 现有真实 executor
+测试新增 INIT 无帧、错误 run、跨 reset 旧 run 拒绝且 destination 不变。
+STOP 保留最后完成帧是原语义，未用新断言强制清空。
+
+隔离旧代码副本反例：原 ui.c 被 initial-unfreeze 断言拒绝；仅移除该
+多余请求后又被非 Current 的 status-build 断言拒绝。原 session.c 只为
+当前头做 action 拼写替换、保留旧 snapshot 算法和输出-run 替身，确定性
+产生 graphics 帧投给无 Window 路由而失败。现行实现相同测试通过。
+副本/编译文件仅在 build/s17-common，未修改生产源或固定 EXE；删除该
+测试自有目录前检查无存活进程并验证路径，保留短 build/test 日志。
+
+最终 x64 全量 82/82（52.00s），x86 82/82（90.50s），含真实 package
+普通/compact Console、debug、restart、输入及全部 Lib 回归；独立 Common
+构建使用 strict Lib，Common suite 16/16（4.29s）。四目录 manifest、
+Common DAG 正反例、文档 gate、diff hygiene 通过。首次 full run 只被
+新测试名称的旧 KVM 前缀拦住，已改名 composition，不豁免或修改 Lib gate。
+不声明本机完成 Linux 或人工 Win3.1/RDP 新一轮视觉验收。
+
+对 662ed4b 的 `git diff --numstat -- src/common test`，按 C/H 统计：
+Common 11 文件 +68/-98，净 -30；测试 7 文件 +334/-30，净 +304。
+测试 CMake +2 行，README/manifest/治理/EXE 单列。不增加生产线程、锁、
+frame cache、队列或状态机；唯一 snapshot/dispatch/资源所有者保持不变。
+src/lib、test/lib、src/app、src/host、MVDM、INI/media 零修改。
+
+双 EXE SHA256：x86 `2CCB6CC88F1540EC292CBF46467E0CE89E2883A201DDB4CA71EF39E092646BE4`；
+x64 `6B9C6016F1835EBBCEAAC17A593F087C4E620B1D8FAD5636B265A32058E5D5F6`。
+
 ### T56 S16：共享测试目录及物理键身份
 
 原始准入：“准入。同时增补任务要求：common/test这个玩意要去掉。

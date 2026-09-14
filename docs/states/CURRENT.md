@@ -2,42 +2,33 @@
 
 ## Current Work
 
-M9 T56 S14 passed owner visual testing ("确认没问题，跟之前不一样了").
-[S14 closure](../history/M9-T56-S14-console-display-handoff.md) records its delivery.
-T56 S15 is verified and delivered in `864a74f` / `4cf8629`.
-T56 S16 implementation is verified: Common physical-key identity corrected;
-shared tests relocated to test/common and test/lib. Both final product suites
-passed 79/79; four-directory isolation passed Lib 37/37 and Common 14/14.
-Executor delivery `09d8c90` is pushed. Coordinator actual-diff review passed:
-existing test assertions retained, no public ABI change, no product-source
-dependency in the isolated shared suites. Owner rejected S16 testing: first
-start exits with host I/O error. The S16 correction now positions the viewport
-before ensuring frame capacity; x86/x64 full regression passes 80/80 and strict
-standalone Lib passes 37/37. Correction `8179def` is pushed and actual-diff
-review passed; compact startup passed three consecutive runs per width.
-S16 awaits owner retesting; no next S or T closure is admitted here.
+Owner retesting passed; [S16 is accepted](../history/M9-T56-S16-shared-tests-and-console-correction.md).
+T56 S17 Common-only repairs are implemented and verified: x64/x86 82/82,
+standalone Common 16/16. Executor delivery and actual-diff review are pending.
+Lib changes require later owner review; the deferred wake-allocation item is
+recorded in TODO. No product lifecycle policy was changed.
 T56 remains open; the suspended S13 whole-task audit is not claimed complete.
 
-## M9 T56 S16 Packet
+## M9 T56 S17 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits S16 and requires removal of common/test; src/lib, src/common, test/lib and test/common must transfer unchanged to NXVM. |
-| Objective | Correct source-local physical key retirement, externalize shared tests, and repair the owner-reproduced first-start Console I/O failure without changing lifecycle policy. |
-| Non-goals | No lifecycle, MVDM, CLI, focus, display or executor topology changes; no Common win32/linux implementations; no T closure. |
-| Reference Baseline | 4cf8629; S15 x86/x64 68/68, strict Lib 8/8 and isolated Common 4/4. |
+| Admission And Approval | Owner admits the next S to repair all audited Common findings without modifying Lib. |
+| Objective | Make frame content and route one snapshot; synchronize UI callback generation; remove redundant action mapping, frame construction, controls, wrappers and atomic state. |
+| Non-goals | No src/lib changes, lifecycle/CLI/MVDM policy changes, new threads or state machine; no T closure. |
+| Reference Baseline | 662ed4b; owner-tested S16, x86/x64 80/80 and standalone Lib 37/37. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | Common pressed-key comparison; shared suites; Host Win32 text-surface geometry and native display regression; no new public ABI. |
+| Files And ABI Surface | Common session/ui/machine and tests/manifests; frame copy takes an expected run instead of an output run pointer; remove duplicate UI action enum and unused debug helper; Lib ABI unchanged. |
 | Applicable Rules | Execution, documentation, architecture and coding authorities. |
-| Verification | Corrected x64/x86 80/80 and strict Lib 37/37; native narrow-frame regression fails before and passes after; compact first-command start, DOS input/CLS, pause/stop/restart pass. Prior Common 14/14 isolation remains unchanged. Intermittent stage-14 observation is not claimed fixed. |
-| Expected Markers | No src/common/test; shared tests have no app/host/MVDM or product-root dependency; EXTENDED distinguishes physical keys. |
+| Verification | x64 82/82 (52.00s), x86 82/82 (90.50s), standalone Common 16/16 (4.29s); isolated old code fails frame-route, redundant-unfreeze and eager-status-build assertions; all manifests/DAG/documentation pass; zero Lib diff. |
+| Expected Markers | One copied snapshot drives frame and route; atomic callback generation; UI owns action vocabulary; no duplicate wrappers or lock-protected atomic metadata. |
 | Asset Needs | Both fixed EXEs; bounded logs and disposable standalone verification trees under build; preserve INI and media. |
 | Reporting Requirements | Complete P commit/push, independent actual-diff review, counted production/test changes and clean tree. |
-| Stop Conditions | Product semantic changes, MVDM changes or a new synchronization framework require separate approval. |
-| Exit Criteria | Platform boundary and standalone proof pass; dual-width packages and regression delivered, reviewed and pushed. |
-| Original Owner Request | 准入。同时增补任务要求：common/test这个玩意要去掉。我需要你在 test/目录下增加 common 和 lib 用于覆盖当前 common 和 lib 的单元测试。src/lib, src/common, test/lib, test/common，这几个将来都要原样导入给nxvm的。反馈：失败：启动后输入start直接闪退。继续 找到原因然后彻底修复。 |
-| Similar-Issue Sweep | Shared-test and Common key-identity sweeps retained; all Host native geometry writers examined. Palette precedes frame-capacity proof; output switching preserves existing owner. Horizontal-scrollback metadata probe recorded separately in TODO, not claimed fixed. |
+| Stop Conditions | A required Lib modification, product semantic change, or new synchronization framework requires separate review. |
+| Exit Criteria | All seven Common ledger groups verified; dual-width packages and regression delivered, actual-diff reviewed, committed/pushed with clean tree. |
+| Original Owner Request | 很好。我现在要你准入一个S任务修复以上common所有问题；先在不改动lib的前提下完成。如果有需要改动lib的修复，留待完成后我们再审核。 |
+| Similar-Issue Sweep | Common frame consumers, callback-shared fields, action definitions, initial-state controls, duplicate wrappers and locked frame metadata; imported debug/xasm algorithms are not rewritten. |
 
 ## Current Technical Baseline
 

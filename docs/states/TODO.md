@@ -1,5 +1,7 @@
 # Long-Term Review Ledger
 
+- TODO(Low): Lib KVM mailbox owner — T56 S17 Common-only admission explicitly leaves the Window mailbox's create-then-replace wake allocation unchanged. Review selecting the notification mechanism at initialization after this Common delivery; no new API or Lib modification is admitted by S17. This is an allocation simplification, not a prerequisite for the Common repairs.
+
 - TODO(Medium): Lib Host display owner — T56 S16 corrective probe with an artificial 30x30 buffer and 20x10 viewport observed cooked restoration as 30x10; restoring capacity afterward changed the viewport width instead. Normal full-width narrow/short/scrolled viewports pass. This is distinct from the fixed first-start frame-capacity ordering; admit a host-specific horizontal-scrollback preservation investigation if required, rather than add iterative resize compensation to this startup repair.
 
 - TODO(Medium): SoftPC CPU owner — T56 S12 disposable FNINIT/FILD qword/FISTP qword probe observed an indefinite integer write after a finite read. The debug observation matches actual stored bytes; arithmetic correctness and pre-hook baseline equivalence were not this debug-ABI task's scope. Admit a separate original-x87 baseline comparison if requested; preserve media and do not alter CPU arithmetic in a debugger adapter.

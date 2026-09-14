@@ -62,10 +62,18 @@ static inline int app_runtime_enqueue_input_event(app_runtime *runtime,
     const kvm_input_event *event)
 { return runtime != NULL && common_machine_enqueue_input(runtime->machine, event); }
 static inline int app_runtime_copy_frame(app_runtime *runtime, app_runtime_frame *frame)
-{ return runtime != NULL && common_machine_copy_published_frame(runtime->machine, frame, NULL); }
+{ return runtime != NULL && common_machine_copy_published_frame(runtime->machine, frame,
+    common_machine_run_generation(runtime->machine)); }
 static inline int app_runtime_copy_published_frame(app_runtime *runtime,
     app_runtime_frame *frame, lib_u32 *generation)
-{ return runtime != NULL && common_machine_copy_published_frame(runtime->machine, frame, generation); }
+{
+    lib_u32 run;
+    if (runtime == NULL) return 0;
+    run = common_machine_run_generation(runtime->machine);
+    if (!common_machine_copy_published_frame(runtime->machine, frame, run)) return 0;
+    if (generation != NULL) *generation = run;
+    return 1;
+}
 static inline lib_u32 app_runtime_published_frame_sequence(const app_runtime *runtime)
 { return runtime == NULL ? 0u : common_machine_published_frame_sequence(runtime->machine); }
 static inline lib_u32 app_runtime_published_frame_run_generation(const app_runtime *runtime)

@@ -100,7 +100,7 @@ int main(void)
         event.type = KVM_EVENT_TEXT;
         for (index = 0u; index < 96u; ++index) {
             event.data.text.scalar = index;
-            assert(common_session_queue_push_ux(queue, &event));
+            assert(common_session_queue_push_kvm_for_run(queue, &event, 0u));
         }
         for (index = 0u; index < 96u; ++index) {
             assert(common_session_queue_take(queue, &copied, 0u));
