@@ -10,9 +10,13 @@ host/
   standalone host callback implementations: timer, media, BOP services,
   conapi-compatible surfaces, input, audio, serial and parallel endpoints
         ↑
+common/ui/
+  broker, cooked monitor Console, raw VM Console, Window/KVM instances and
+  presentation execution; copied events are injected into the product
+        ↑
 app/
-  one executor, machine snapshot producer, guest-input adapter, lifecycle,
-  monitor, and product binding; no machine-state access from frontends
+  product configuration, title/hotkey/status policy, control/executor and
+  guest-input adapter; no machine-state access from frontends
         ↑
 lib/{types,console,host,storage,kvm-base,kvm-window,kvm-console}/
   canonical shared platform library, delivered for NXVM to adopt exactly:
@@ -31,8 +35,11 @@ and pointer-representation corrections may be direct, source-visible diffs at
 the affected point when they remain mechanical and introduce no machine policy.
 `host/` owns larger host adaptations, including new state, lifecycle,
 capability, ownership, and policy, but does not own guest-visible state.
-`app/` owns the single executor, machine snapshot producer, guest-input
-adapter, monitor, and product binding.
+`common/ui` is the sole owner of the monitor logical Console, broker, raw VM
+Console and Window/KVM instances; it receives only copied product policy and
+returns copied events. `app/` currently owns the single executor, machine
+snapshot producer, guest-input adapter and product binding; later common
+extraction does not change the current UI ownership boundary.
 `lib/` is the canonical checked-in shared-library corpus, not a runtime or
 build dependency on NXVM or NTVDM64. NXVM adopts this corpus exactly. It
 consumes and produces copied host values only. It owns
@@ -72,9 +79,10 @@ split into `kvm-base` (copied KVM values, one event-construction path,
 private-mailbox helpers, and source-local generic hotkey matcher),
 `kvm-window` (one Window lifecycle), and `kvm-console` (one VM Console lifecycle).
 The latter creates an optional logical VM Console object but neither KVM
-component opens or registers the process Console. SoftPC owns its monitor
-object and alone decides which KVM components exist and asks host to replace the
-current object.
+component opens or registers the process Console. `common/ui` owns the monitor
+object, decides which KVM components exist from injected actions and asks host
+to replace the current object. SoftPC app policy derives and injects those
+actions; common/ui does not interpret their product meaning.
 
 The library's only direct component edges are:
 

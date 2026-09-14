@@ -107,12 +107,14 @@ endif()
 foreach(app_source IN ITEMS
     "src/app/main.c"
     "src/app/runtime.c"
-    "src/app/presentation.c"
     "src/app/keyboard.c")
     if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/${app_source}")
         message(FATAL_ERROR "Standalone application source is missing: ${app_source}")
     endif()
 endforeach()
+if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/src/common/ui/ui.c")
+    message(FATAL_ERROR "Common UI source is missing")
+endif()
 
 # The imported KVM component consumes copied values only.
 # It cannot acquire SoftPC's runtime, machine, renderer, or original key-map
@@ -210,23 +212,23 @@ endif()
 # Component selection is application policy.  Shared KVM must not retain the
 # removed unified runner or a target router.
 file(READ "${SOFTPC_SOURCE_DIR}/src/app/main.c" app_main_source)
-file(READ "${SOFTPC_SOURCE_DIR}/src/app/presentation.c" app_presentation_source)
+file(READ "${SOFTPC_SOURCE_DIR}/src/common/ui/ui.c" common_ui_source)
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/lib/ux" OR
    app_main_source MATCHES "kvm_presenter|kvm_run" OR
-   app_presentation_source MATCHES "kvm_presenter|kvm_run")
+   common_ui_source MATCHES "kvm_presenter|kvm_run")
     message(FATAL_ERROR "Standalone retains the removed unified KVM route")
 endif()
 
-# Host owns only generic native Console I/O. The product monitor owns its
-# logical Console and line sink, and binds it through the public broker API.
+# Host owns only generic native Console I/O. Common UI owns its logical
+# Console and line sink, and binds it through the public broker API.
 file(READ "${SOFTPC_SOURCE_DIR}/src/lib/host/console_interface.h" host_console_public)
 file(READ "${SOFTPC_SOURCE_DIR}/src/lib/host/console.c" host_console_source)
-file(READ "${SOFTPC_SOURCE_DIR}/src/app/monitor.c" app_monitor_source)
+file(READ "${SOFTPC_SOURCE_DIR}/src/common/ui/ui.c" common_ui_console_source)
 if(host_console_public MATCHES "host_console_cooked" OR
    host_console_source MATCHES "host_console_cooked" OR
-   app_monitor_source MATCHES "host_console_cooked" OR
-   NOT app_monitor_source MATCHES "host_console_broker_replace" OR
-   NOT app_monitor_source MATCHES "host_console_broker_request_cooked_line")
+   common_ui_console_source MATCHES "host_console_cooked" OR
+   NOT common_ui_console_source MATCHES "host_console_broker_replace" OR
+   NOT common_ui_console_source MATCHES "host_console_broker_request_cooked_line")
     message(FATAL_ERROR "Console broker retains monitor-specific ownership")
 endif()
 

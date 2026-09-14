@@ -2,29 +2,29 @@
 
 ## Current Work
 
-M9 T56 S2 is active: extract the accepted UI ownership into `common/ui` and
-make SoftPC use it, while preserving all presentation behavior.
+M9 T56 S3 is active: extract the accepted session control ownership into
+`common/session`, inject SoftPC's CLI policy, and preserve all behavior.
 
-## M9 T56 S2 Packet
+## M9 T56 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admitted T56 and authorizes automatic sequential S progression after each tested, reviewed and pushed delivery. |
-| Objective | Move the broker, raw/cooked Console, Window/KVM object and presentation execution from app into common/ui; retain injected product title/hotkey/help/status policy and delete the old app UI implementation. |
-| Non-goals | Do not move session reducer/CLI/machine executor, alter MVDM/lib/product behavior, resolve deferred TODOs, or change owner configuration/media. |
-| Reference Baseline | T56 S1 `b22a32e`: x86/x64 58/58, strict lib 8/8, frozen 60-path ledger and package hashes. |
+| Admission And Approval | Owner admitted T56 and authorizes automatic sequential S progression after each tested, reviewed and pushed delivery; async package testing does not block the next S. |
+| Objective | Move the product-neutral control queue, control state, reconciler and presentation-plan execution into `common/session`; keep `app/command` as the injected SoftPC CLI provider and delete the old app session implementation. |
+| Non-goals | Do not move the machine executor/input queue, alter UI ownership now in `common/ui`, alter MVDM/lib/product behavior, resolve deferred TODOs, or change owner configuration/media. |
+| Reference Baseline | T56 S2 common UI extraction: x86/x64 58/58, strict lib 8/8; `common/ui` is production UI owner and old app UI implementation is deleted. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | New `src/common/ui` public interface/implementation/CMake target and focused tests; moved/deleted app presentation/monitor implementation and changed product composition; fixed x86/x64 EXEs. |
+| Files And ABI Surface | New `src/common/session` public interface/implementation/CMake target and focused tests; moved/deleted app control/control-state/reconciler/presentation-plan implementation; app command provider and common/ui/machine integration change; fixed x86/x64 EXEs. |
 | Applicable Rules | Execution, architecture, coding, documentation authorities; Product UI; shared execution/architecture/coding/documentation governance skills. |
-| Verification | Presentation/handoff/retirement/X/freeze/focus tests through common/ui; static proof old app presentation/monitor implementation and UI lib calls are gone; fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/DAG gates and diff hygiene. |
-| Expected Markers | Common/ui is sole owner of broker, monitor logical Console and KVM objects; session-facing copied events remain injected; product policy is injected; no second UI implementation or raw app UI lib call remains. |
+| Verification | Command matrix, start plus ordered lifecycle commands, reject-before-dispatch, completed state text/prompt, stale event and paused-input tests through common/session; static proof app has no reducer/session queue; fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/DAG gates and diff hygiene. |
+| Expected Markers | Common/session is sole owner of the product-neutral control event queue and reducer; command parsing/effects remain injected from app; completed VM/UI facts drive independent machine/UI calls; no second session implementation or presenter lifecycle decision remains. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe`; preserve adjacent user-owned INI and all media bytes. |
 | Reporting Requirements | P commit/push contains moved/deleted path ledger, tests, source/artifact hashes, x86/x64 EXE links and changed-path counts; user tests asynchronously. |
-| Stop Conditions | Stop and record a proposal/TODO if preserving an accepted presentation behavior requires MVDM change, external source import, product-semantics decision, or a second UI route. |
-| Exit Criteria | Common/ui runs the production presentation path, old app UI ownership is deleted, all named tests/gates and dual packages pass, review/push complete and EXE links reported. |
+| Stop Conditions | Stop and record a proposal/TODO if preserving an accepted command/session behavior requires MVDM change, external source import, product-semantics decision, or a second session/reducer route. |
+| Exit Criteria | Common/session runs the production control path, old app session ownership is deleted, all named tests/gates and dual packages pass, review/push complete and EXE links reported. |
 | Original Owner Request | 建立 common 组件并提取 debug、xasm32、session、UI、machine；CLI 注入 session，app 保持配置和实体组装；每个 S 删除旧实现并给可验收双 EXE，体验不变；手测异步进行。 |
-| Similar-Issue Sweep | All presentation/monitor/broker/KVM creation, destruction, input/event sinks, title/freeze/frame calls, CMake/test sources and every UI-related lib consumer. |
+| Similar-Issue Sweep | All control/reducer/queue/reconciler/presentation-plan and command dispatch paths, CMake/test sources, common/ui event bridges, runtime request dispatch, monitor prompt/status output, and every app session consumer. |
 
 ## Current Technical Baseline
 

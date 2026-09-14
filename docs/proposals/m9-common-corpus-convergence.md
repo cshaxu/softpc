@@ -207,6 +207,21 @@ CTest 通过 8/8；文档门禁和 `git diff --check` 通过。
 准：monitor `help/start`，DOS，Win3.1，pause/resume、stop/start；后续
 S2--S8 均以相同体验作为对照。
 
+### S2 P1 执行证据
+
+`common/ui` 现为生产路径中 broker、cooked monitor logical Console、raw VM
+Console、Window/KVM 实例及其创建、销毁、绑定、frame、title、freeze 和 monitor
+输出/arm 的唯一所有者。`app/main.c` 只注入复制 hotkey、标题和图形 raw-Console
+状态文本，并把 common 的复制事件桥接到既有 control queue；它不再创建或销毁
+lib Console/KVM/broker 对象。旧 `app/monitor.[ch]` 与
+`app/presentation.[ch]` 已删除，CMake 与测试的旧路径同步清理。
+
+执行了两固定宽度完整 CTest（各 58/58）、strict standalone lib CTest（8/8）、
+文档/DAG 门禁及 diff hygiene。两个 package EXE 只刷新
+`assets/binary/softpc32.exe` 和 `softpc64.exe`，没有修改 INI 或 media。S2
+结束后进入 S3；session reducer/CLI/machine executor 仍是 app 的唯一实现，
+没有宣称已迁移。
+
 ## 每个 S 的退出条件
 
 1. 迁入职责在 SoftPC 生产路径实际使用（S6/S7 新能力按上表契约验收）；

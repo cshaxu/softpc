@@ -9,10 +9,12 @@ src/
   host/
     ordinary host C/H files
     compat/{ccpu,cvidc,...}/
+  common/
+    ui/          broker, monitor Console and KVM composition
   lib/{types,console,host,storage,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
   app/
-    main.c, runtime.c, presentation.c, keyboard.c, firmware.rc
+    main.c, runtime.c, keyboard.c, firmware.rc
 ```
 
 Directories appear only in their admitted migration task.
@@ -36,8 +38,9 @@ mechanical compiler, declaration, calling-ABI, and pointer-representation
 corrections live as reviewable source diffs at their affected points. Generated
 transformed C/H files are not build inputs. `host` owns platform capability
 implementations and larger functional adaptations; `app` owns
-orchestration, machine snapshot production, guest-input conversion, monitor
-KVM, and product lifecycle policy. `lib` owns copied-value platform mechanics:
+configuration, orchestration, machine snapshot production, guest-input
+conversion and product lifecycle policy. `common/ui` owns monitor/KVM
+composition and Console handoff. `lib` owns copied-value platform mechanics:
 mailbox, host input normalization, action registration, console/window loops,
 routing, geometry, capture, clock, synchronization, and storage. It never
 owns a project runtime, machine, renderer, product input queue, guest-input

@@ -1,7 +1,8 @@
 /* Exercise the real application terminal boundary in a child process, linking
  * the real app collaborators without starting a machine or reading media. */
-#include "app/presentation.c"
+#include "host/status.h"
 #include <assert.h>
+#include <windows.h>
 
 int main(int argc,char **argv)
 {

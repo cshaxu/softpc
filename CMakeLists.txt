@@ -51,6 +51,7 @@ target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 # dependency. Project bindings retain all machine and lifecycle decisions;
 # the imported library owns generic host, storage, and KVM mechanics.
 add_subdirectory(src/lib)
+add_subdirectory(src/common)
 target_link_libraries(softpc-machine PRIVATE storage host)
 
 # The original CCPU manifest is the executable x86 core.  It deliberately
@@ -282,16 +283,14 @@ add_executable(softpcvm
     src/app/input_queue.c
     src/app/keyboard.c
     src/app/control.c
-    src/app/monitor.c
     src/app/command.c
     src/app/control_state.c
-    src/app/presentation.c
     src/app/presentation_plan.c
     src/app/reconciler.c
     src/app/prompt_trace.c
     src/app/firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
-target_link_libraries(softpcvm PRIVATE types console host storage kvm-base kvm-window kvm-console)
+target_link_libraries(softpcvm PRIVATE types storage kvm-base common-ui)
 if(WIN32)
     target_link_libraries(softpcvm PRIVATE user32 gdi32)
 endif()
@@ -676,7 +675,7 @@ target_link_libraries(softpc-kvm_shutdown_failure-smoke PRIVATE kvm-console)
 add_executable(softpc-presentation-shutdown-smoke test/unit/presentation_shutdown_smoke.c)
 target_include_directories(softpc-presentation-shutdown-smoke PRIVATE src src/host src/app)
 get_target_property(shutdown_test_sources softpcvm SOURCES)
-list(REMOVE_ITEM shutdown_test_sources src/app/main.c src/app/presentation.c src/app/firmware.rc)
+list(REMOVE_ITEM shutdown_test_sources src/app/main.c src/app/firmware.rc)
 target_sources(softpc-presentation-shutdown-smoke PRIVATE ${shutdown_test_sources})
 get_target_property(shutdown_test_links softpcvm LINK_LIBRARIES)
 target_link_libraries(softpc-presentation-shutdown-smoke PRIVATE ${shutdown_test_links})

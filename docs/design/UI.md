@@ -85,8 +85,9 @@ full-work-area rectangle.
 
 SoftPC distinguishes static `display=console|window`, the active component set
 `{window_enabled, console_enabled}`, and the one Current Console Object bound
-by host. That object is either the SoftPC cooked monitor or the KVM raw VM
-object. A monitor never implements SoftPC hotkeys; it accepts normal line
+by host. `common/ui` owns the cooked monitor logical Console and selects it or
+the KVM raw VM object through the broker. A monitor never implements SoftPC
+hotkeys; it accepts normal line
 commands only.
 
 | Running condition | Active component set | Current Console Object |
@@ -129,7 +130,7 @@ their lifecycles: `lib/kvm-base/` contains copied values, generic event construc
 and reusable private-mailbox helpers;
 `lib/kvm-window/` owns one Window lifecycle; and `lib/kvm-console/` owns one VM
 Console lifecycle. Each of Window and VM Console has its own Win32 and Linux
-implementation. Neither component owns the SoftPC monitor Console, native
+implementation. Neither component owns the product monitor Console, native
 Console handles/modes, or the product decision to exist.
 
 SoftPC creates either component with a copied table of registered host-hotkey

@@ -1,6 +1,5 @@
 #include "control.h"
 #include "keyboard.h"
-#include "app/monitor.c"
 
 #include <assert.h>
 #include <string.h>
@@ -121,18 +120,12 @@ int main(void)
     assert(event.value.delivery_failure.source_identity == 41u);
     assert(event.value.delivery_failure.status == LIB_STATUS_LIMIT_EXCEEDED);
 
-    { app_monitor_console monitor = { 0 };
-      lib_console_event failure = { 0 };
-      monitor.control_queue = queue;
-      failure.kind = LIB_CONSOLE_EVENT_IO_FAILURE;
-      app_monitor_receive(&monitor, &failure);
-      take(queue, &event);
-      assert(event.kind == APP_CONTROL_CONSOLE_FAILED);
-      failure.kind = LIB_CONSOLE_EVENT_REJECTED_LINE;
-      app_monitor_receive(&monitor, &failure);
-      take(queue, &event);
-      assert(event.kind == APP_CONTROL_MONITOR_LINE && event.monitor_line_rejected);
-      assert(!app_control_queue_take(queue, &event, 0u)); }
+    /* UI owns native monitor delivery now; the app queue still records its
+       copied terminal failure as one control fact. */
+    assert(app_control_queue_push_console_failed(queue));
+    take(queue, &event);
+    assert(event.kind == APP_CONTROL_CONSOLE_FAILED);
+    assert(!app_control_queue_take(queue, &event, 0u));
     app_control_queue_destroy(queue);
     return 0;
 }

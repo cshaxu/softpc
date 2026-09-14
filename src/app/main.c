@@ -1,10 +1,11 @@
-#include "presentation.h"
-#include "monitor.h"
 #include "command.h"
+#include "control.h"
 #include "control_state.h"
 #include "runtime.h"
 #include "machine.h"
 #include "prompt_trace.h"
+#include "keyboard.h"
+#include "common/ui/ui_interface.h"
 #include "lib/storage/file_interface.h"
 
 #include <windows.h>
@@ -194,28 +195,82 @@ invalid:
     return 0;
 }
 
-static int app_monitor_drive(app_runtime *runtime, app_presentation *presentation,
+static common_ui_state app_ui_state(app_runtime_state state)
+{
+    switch (state) {
+    case SOFTPC_RUNTIME_RUNNING: return COMMON_UI_STATE_RUNNING;
+    case SOFTPC_RUNTIME_PAUSED: return COMMON_UI_STATE_PAUSED;
+    case SOFTPC_RUNTIME_ERROR: return COMMON_UI_STATE_ERROR;
+    default: return COMMON_UI_STATE_STOPPED;
+    }
+}
+
+static common_ui_action app_ui_action(app_reconciler_action action)
+{
+    switch (action) {
+    case APP_RECONCILER_ACTION_NONE: return COMMON_UI_ACTION_NONE;
+    case APP_RECONCILER_ACTION_CREATE_WINDOW: return COMMON_UI_ACTION_CREATE_WINDOW;
+    case APP_RECONCILER_ACTION_CREATE_VM_CONSOLE: return COMMON_UI_ACTION_CREATE_VM_CONSOLE;
+    case APP_RECONCILER_ACTION_BIND_VM_CONSOLE: return COMMON_UI_ACTION_BIND_VM_CONSOLE;
+    case APP_RECONCILER_ACTION_BIND_MONITOR: return COMMON_UI_ACTION_BIND_MONITOR;
+    case APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE: return COMMON_UI_ACTION_DESTROY_VM_CONSOLE;
+    case APP_RECONCILER_ACTION_DESTROY_WINDOW: return COMMON_UI_ACTION_DESTROY_WINDOW;
+    }
+    return COMMON_UI_ACTION_NONE;
+}
+
+static int app_ui_event_enqueue(void *opaque, const common_ui_event *event)
+{
+    app_control_queue *queue = (app_control_queue *)opaque;
+    if (queue == NULL || event == NULL) return 0;
+    switch (event->kind) {
+    case COMMON_UI_EVENT_KVM_INPUT:
+        return app_control_queue_push_kvm_for_run(queue, &event->value.kvm,
+            event->run_generation);
+    case COMMON_UI_EVENT_MONITOR_LINE:
+        return app_control_queue_push_monitor_line(queue, &event->value.line,
+            event->monitor_line_rejected);
+    case COMMON_UI_EVENT_COMPONENT_COMPLETED:
+        return app_control_queue_push_component_completed(queue,
+            event->value.component.component == COMMON_UI_COMPONENT_WINDOW ?
+                APP_CONTROL_COMPONENT_WINDOW : APP_CONTROL_COMPONENT_VM_CONSOLE,
+            event->value.component.exists, event->run_generation);
+    case COMMON_UI_EVENT_BROKER_COMPLETED:
+        return app_control_queue_push_broker_completed(queue,
+            event->value.broker_vm_console_current, event->run_generation);
+    case COMMON_UI_EVENT_KVM_DELIVERY_FAILED:
+        return app_control_queue_push_kvm_delivery_failed(queue,
+            event->value.delivery_failure.source_identity,
+            event->value.delivery_failure.status, event->run_generation);
+    case COMMON_UI_EVENT_CONSOLE_FAILED:
+        return app_control_queue_push_console_failed(queue);
+    }
+    return 0;
+}
+
+static int app_monitor_drive(app_runtime *runtime, common_ui *ui,
     app_monitor_control *control)
 {
     app_reconciler_action action;
     int console_status_surface;
     app_control_state *state;
-    if (presentation == NULL || control == NULL) return 0;
+    if (ui == NULL || control == NULL) return 0;
     state = &control->state;
+    common_ui_set_run_generation(ui, app_runtime_run_generation(runtime));
     action = app_control_state_take_action(state);
     if (action != APP_RECONCILER_ACTION_NONE &&
-        !app_presentation_apply_action(presentation, action,
-            state->presentation.runtime_actual)) return 0;
+        common_ui_apply_action(ui, app_ui_action(action),
+            app_ui_state(state->presentation.runtime_actual)) != LIB_STATUS_OK) return 0;
     if (state->observed_frame_sequence == 0u ||
         !app_control_state_frame_targets_ready(state)) return 1;
     console_status_surface = state->presentation.display ==
         SOFTPC_PRESENTATION_CONSOLE && !state->presentation.console_control &&
         control->frame.graphics != 0u;
-    return app_presentation_publish_frame(presentation, &control->frame,
+    return common_ui_publish_frame(ui, &control->frame,
         state->presentation.window_actual,
         state->presentation.vm_console_actual &&
             state->presentation.current_console_actual == APP_RECONCILER_CONSOLE_VM,
-        console_status_surface);
+        console_status_surface) == LIB_STATUS_OK;
 }
 
 /* The control loop is the only caller that translates a parsed lifecycle
@@ -236,16 +291,16 @@ static int app_monitor_dispatch_lifecycle(app_runtime *runtime,
 }
 
 static int app_monitor_arm_if_ready(app_command_session *session,
-    const app_control_state *state, app_monitor_console *monitor)
+    const app_control_state *state, common_ui *ui)
 {
     app_command_effect effect = { 0 };
     app_command_session_note_monitor_current(session,
         app_control_state_monitor_is_current(state), &effect);
     if (!effect.arm_prompt) return 1;
     return (effect.text[0] == '\0' ||
-        app_monitor_console_write(monitor, effect.text)) &&
-        app_monitor_console_write(monitor, "SoftPC> ") &&
-        app_monitor_console_request_line(monitor);
+        common_ui_write_monitor(ui, effect.text) == LIB_STATUS_OK) &&
+        common_ui_write_monitor(ui, "SoftPC> ") == LIB_STATUS_OK &&
+        common_ui_request_monitor_line(ui) == LIB_STATUS_OK;
 }
 
 static void app_runtime_state_completed(void *opaque, app_runtime_state state,
@@ -270,7 +325,7 @@ static void app_runtime_frame_published(void *opaque, uint32_t sequence,
  * control path alone decides its lifecycle effect and preserves the resume
  * ordering required by the Console-object contract. */
 static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
-    app_presentation *presentation, app_command_session *session,
+    common_ui *ui, app_command_session *session,
     app_monitor_control *control,
     const kvm_input_event *event)
 {
@@ -296,8 +351,7 @@ static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
     }
     if (event != NULL && event->type == KVM_EVENT_HOTKEY &&
         strcmp(event->data.hotkey.identifier, "release-window-mouse") == 0) {
-        app_presentation_release_window_mouse(presentation);
-        return 1;
+        return common_ui_release_window_mouse(ui) == LIB_STATUS_OK;
     }
     return app_control_handle_ux(queue, runtime, event,
         state->monitor_actual == APP_MONITOR_RUNNING ? SOFTPC_RUNTIME_RUNNING :
@@ -306,23 +360,20 @@ static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
 }
 
 static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
-    int console_control, app_monitor_console *monitor,
+    int console_control, common_ui *ui,
     app_control_queue *control_queue)
 {
     char line[SOFTPC_CONFIG_PATH_MAX + 64u];
     app_command_session session;
     app_command_effect command_effect;
-    app_presentation *presenter = NULL;
     app_monitor_control control = { 0 };
     app_control_state *state = &control.state;
-    if (!app_presentation_create(&presenter, runtime, monitor, control_queue))
-        return 1;
     app_control_state_initialize(state, presentation, console_control);
     app_command_session_initialize(&session, presentation);
     app_command_session_open(&session, &command_effect);
     if (command_effect.text[0] != '\0')
-        (void)app_monitor_console_write(monitor, command_effect.text);
-    if (!app_monitor_arm_if_ready(&session, state, monitor)) goto failed;
+        (void)common_ui_write_monitor(ui, command_effect.text);
+    if (!app_monitor_arm_if_ready(&session, state, ui)) goto failed;
     for (;;) {
         for (;;) {
             app_control_event control_event;
@@ -339,18 +390,18 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                             state->monitor_actual == APP_MONITOR_PAUSED ?
                                 SOFTPC_RUNTIME_PAUSED : SOFTPC_RUNTIME_STOPPED))
                         continue;
-                    if (!app_monitor_handle_ux(control_queue, runtime, presenter,
+                    if (!app_monitor_handle_ux(control_queue, runtime, ui,
                             &session, &control, &control_event.value.kvm))
                         goto failed;
-                    if (!app_monitor_drive(runtime, presenter, &control)) goto failed;
-                    if (!app_monitor_arm_if_ready(&session, state, monitor)) goto failed;
+                    if (!app_monitor_drive(runtime, ui, &control)) goto failed;
+                    if (!app_monitor_arm_if_ready(&session, state, ui)) goto failed;
                     continue;
                 }
                 if (control_event.kind == APP_CONTROL_MONITOR_LINE) {
                     if (control_event.monitor_line_rejected) {
                         app_command_session_reject_line(&session, &command_effect);
-                        if (!app_monitor_console_write(monitor, command_effect.text) ||
-                            !app_monitor_arm_if_ready(&session, state, monitor)) goto failed;
+                        if (common_ui_write_monitor(ui, command_effect.text) != LIB_STATUS_OK ||
+                            !app_monitor_arm_if_ready(&session, state, ui)) goto failed;
                         continue;
                     }
                     if (control_event.value.line.length >= sizeof(line)) return 1;
@@ -360,17 +411,17 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                     break;
                 }
                 if (control_event.kind == APP_CONTROL_CONSOLE_FAILED) {
-                    (void)app_monitor_console_write(monitor,
+                    (void)common_ui_write_monitor(ui,
                         "Console input failed.\r\n");
                     goto failed;
                 }
                 if (control_event.kind == APP_CONTROL_KVM_DELIVERY_FAILED) {
-                    app_monitor_console_write(monitor,
+                    common_ui_write_monitor(ui,
                         "KVM input delivery failed.\r\n");
                     goto failed;
                 }
                 if (control_event.kind == APP_CONTROL_QUEUE_DELIVERY_FAILED) {
-                    app_monitor_console_write(monitor,
+                    common_ui_write_monitor(ui,
                         "Control queue delivery failed.\r\n");
                     goto failed;
                 }
@@ -410,15 +461,16 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                         vm_console_current);
                     broker_monitor_completed = !vm_console_current;
                 }
-                if (!app_monitor_drive(runtime, presenter, &control)) goto failed;
+                if (!app_monitor_drive(runtime, ui, &control)) goto failed;
                 /* Resume activation belongs after the raw Console handoff,
                    never before a broker that can take foreground back. */
                 if ((control_event.kind == APP_CONTROL_RUNTIME_COMPLETED ||
                      control_event.kind == APP_CONTROL_BROKER_COMPLETED) &&
                     (state->presentation.runtime_actual != SOFTPC_RUNTIME_RUNNING ||
                      app_control_state_frame_targets_ready(state)))
-                    app_presentation_set_runtime_state(presenter,
-                        state->presentation.runtime_actual);
+                    if (common_ui_set_state(ui,
+                            app_ui_state(state->presentation.runtime_actual)) != LIB_STATUS_OK)
+                        goto failed;
                 /* A monitor completion can be stale with respect to a new
                  * Console-mode VM binding.  Only the reconciled actual owner
                  * may make its prompt due. */
@@ -427,17 +479,16 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                     app_command_session_note_broker(&session,
                         state->monitor_actual, 0,
                         app_control_state_monitor_is_running_graphics_surface(state));
-                if (!app_monitor_arm_if_ready(&session, state, monitor)) goto failed;
+                if (!app_monitor_arm_if_ready(&session, state, ui)) goto failed;
                 continue;
             }
         }
-        if (!app_monitor_drive(runtime, presenter, &control)) goto failed;
+        if (!app_monitor_drive(runtime, ui, &control)) goto failed;
         app_command_session_submit_line(&session, state->monitor_actual, line,
             &command_effect);
         if (command_effect.exit_requested) {
             (void)app_runtime_stop(runtime);
-            (void)app_monitor_drive(runtime, presenter, &control);
-            app_presentation_destroy(presenter);
+            (void)app_monitor_drive(runtime, ui, &control);
             return 0;
         }
         if (command_effect.action != APP_COMMAND_ACTION_NONE) {
@@ -448,15 +499,13 @@ static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
                 succeeded, &command_effect);
         }
         if (command_effect.text[0] != '\0')
-            (void)app_monitor_console_write(monitor, command_effect.text);
+            (void)common_ui_write_monitor(ui, command_effect.text);
         if (!app_monitor_dispatch_lifecycle(runtime,
                 app_command_session_take_request(&session))) goto failed;
-        if (!app_monitor_drive(runtime, presenter, &control)) goto failed;
-        if (!app_monitor_arm_if_ready(&session, state, monitor)) goto failed;
+        if (!app_monitor_drive(runtime, ui, &control)) goto failed;
+        if (!app_monitor_arm_if_ready(&session, state, ui)) goto failed;
     }
-failed:
-    app_presentation_destroy(presenter);
-    return 1;
+failed: return 1;
 }
 
 int main(int argc, char **argv)
@@ -467,7 +516,10 @@ int main(int argc, char **argv)
     softpc_machine_options options = { 0 };
     softpc_machine *machine = NULL;
     app_runtime *runtime = NULL;
-    app_monitor_console *monitor = NULL;
+    common_ui *ui = NULL;
+    common_ui_options common_options = { 0 };
+    kvm_hotkey_registry hotkeys;
+    char graphics_console_status[APP_COMMAND_TEXT_CAPACITY];
     app_control_queue *control_queue = NULL;
     softpc_machine_result result;
     (void)argv;
@@ -510,20 +562,33 @@ int main(int argc, char **argv)
         goto done;
     }
     if (!app_control_queue_create(&control_queue) ||
-        !app_monitor_console_create(&monitor, control_queue)) {
+        !app_keyboard_hotkeys(&hotkeys)) {
+        result = SOFTPC_MACHINE_IO_ERROR;
+        goto done;
+    }
+    (void)snprintf(graphics_console_status, sizeof(graphics_console_status),
+        "Insignia SoftPC is running in the Window.\r\n\r\n%s\r\n",
+        app_command_hotkey_help());
+    common_options.event_context = control_queue;
+    common_options.event_sink = app_ui_event_enqueue;
+    common_options.hotkeys = hotkeys;
+    common_options.running_window_title = "Insignia SoftPC (Running)";
+    common_options.paused_window_title = "Insignia SoftPC (Paused)";
+    common_options.graphics_console_status_text = graphics_console_status;
+    if (common_ui_create(&ui, &common_options) != LIB_STATUS_OK) {
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
     }
     app_runtime_set_state_sink(runtime, app_runtime_state_completed, control_queue);
     app_runtime_set_frame_sink(runtime, app_runtime_frame_published, control_queue);
     if (app_monitor(runtime, options.presentation, config.console_control,
-            monitor, control_queue) != 0)
+            ui, control_queue) != 0)
         result = SOFTPC_MACHINE_IO_ERROR;
 done:
     if (result != SOFTPC_MACHINE_OK)
         fprintf(stderr, "softpcvm: %s\n", softpc_machine_result_name(result));
     app_runtime_destroy(runtime);
-    app_monitor_console_destroy(monitor);
+    (void)common_ui_destroy(ui);
     app_control_queue_destroy(control_queue);
     softpc_machine_destroy(machine);
     return result != SOFTPC_MACHINE_OK;
