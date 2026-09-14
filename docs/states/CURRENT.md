@@ -2,28 +2,11 @@
 
 ## Current Work
 
-T58 S3 is active: move the application assembly into composition.
+No implementation subtask is active.
+Open task awaiting owner: T58.
 
-## M9 T58 S3 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner approves moving assembly from main into composition. |
-| Objective | One composition owner creates, connects, runs and destroys existing entities. |
-| Non-goals | No behavior, lifecycle ordering, shared corpus or VM/Compat/MVDM change. |
-| Reference Baseline | 1cc141e; S2 dual-width 85/85. |
-| Candidate Proposal | [S3 ledger](../proposals/m9-common-test-sync.md). |
-| Files And ABI Surface | App main/composition, product boundary tests/build and design; no shared ABI change. |
-| Applicable Rules | Architecture, coding, execution, documentation and linked skills. |
-| Verification | Exact moved-body review, boundary positive/negative tests, dual builds and full suites. |
-| Expected Markers | Main loads config and calls composition; only composition includes VM. |
-| Asset Needs | Both fixed EXEs; bounded build logs; preserve INI/media. |
-| Reporting Requirements | Executor P push, actual-diff review, S closure, clean tree; T remains open. |
-| Stop Conditions | Any behavior or protected-source change needed. |
-| Exit Criteria | Complete relocation ledger and required verification, commit/push. |
-| Original Owner Request | 准入一个s任务进行搬迁。 |
-| Similar-Issue Sweep | All entity constructors/destructors, machine callbacks and App VM includes. |
+T58 S3 is closed after [assembly review](../history/M9-T58-S3-application-assembly.md).
+Both fixed EXEs are ready for owner testing; no S4 is admitted.
 
 ## Current Technical Baseline
 
@@ -33,10 +16,10 @@ T58 S3 is active: move the application assembly into composition.
 - `src/mvdm/softpc.new/` is the preserved selected SoftPC baseline. Its ROM
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
-- T58 S2 product baseline retains the T57 app/config, vm and flat compat
-  layout, with command/keyboard policy wired by app/composition. Both fixed
-  packages pass 85/85 CTest. Only app/main includes the VM interface; protected
-  source and shared tests are unchanged from T58 S1.
+- T58 S3 product baseline retains the T57 app/config, vm and flat compat
+  layout; app/composition now owns all entity assembly and event wiring.
+  Main loads config. Both fixed packages pass 85/85 CTest. Only composition
+  includes the VM interface; protected source/shared tests remain unchanged.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
   normalized `types`/`console`/`host`/`storage`/`kvm-*` corpus has S18 one-time
   wake selection; the T56 baseline passed x64/x86 83/83 CTest;
