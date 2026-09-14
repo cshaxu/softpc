@@ -2,11 +2,28 @@
 
 ## Current Work
 
-No implementation subtask is active.
-T58 is closed on owner approval after the
-[whole-task audit](../history/M9-T58-completion-audit.md).
-[Td S14](../history/M9-Td-S14-win31-display-queue.md) promoted the Win3.1
-display-roundtrip defect to queue tail. No next task is admitted.
+M9 Td S15 is active: promote overlay lookup optimization to queue tail.
+
+## M9 Td S15 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Governance |
+| Admission And Approval | Owner requests overlay proposal and Td delivery, then admission of the other seven TODOs. |
+| Objective | Transfer overlay debt into a queue-tail candidate. |
+| Non-goals | No optimization or runtime change in this Td. |
+| Reference Baseline | 3fd862a; T58 closed, eight TODOs, two queued candidates. |
+| Candidate Proposal | [Overlay index](../proposals/m9-overlay-page-index.md). |
+| Files And ABI Surface | Documentation only; no ABI. |
+| Applicable Rules | Execution/document governance and linked skills. |
+| Verification | Documentation gates; existing queue order and seven other debts preserved. |
+| Expected Markers | Overlay third in queue; not claimed fixed. |
+| Asset Needs | None. |
+| Reporting Requirements | Commit/push delivery, reviewed closure, then T59 S1 admission. |
+| Stop Conditions | Runtime implementation required. |
+| Exit Criteria | Proposal linked at queue tail with duplicate TODO removed. |
+| Original Owner Request | overlay 页查询 O(n) 这个加入一个队列proposal，td提交；然后所有其他todo，请你准入一个s任务予以处理 |
+| Similar-Issue Sweep | All eight TODO ownership transfers accounted for; no silent resolution. |
 
 ## Current Technical Baseline
 
