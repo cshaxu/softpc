@@ -13,7 +13,9 @@ existing test assertions retained, no public ABI change, no product-source
 dependency in the isolated shared suites. Owner rejected S16 testing: first
 start exits with host I/O error. The S16 correction now positions the viewport
 before ensuring frame capacity; x86/x64 full regression passes 80/80 and strict
-standalone Lib passes 37/37. Corrective commit and actual-diff review follow.
+standalone Lib passes 37/37. Correction `8179def` is pushed and actual-diff
+review passed; compact startup passed three consecutive runs per width.
+S16 awaits owner retesting; no next S or T closure is admitted here.
 T56 remains open; the suspended S13 whole-task audit is not claimed complete.
 
 ## M9 T56 S16 Packet

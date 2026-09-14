@@ -941,9 +941,18 @@ restoration limits; the rejected extra resize did not solve both dimensions
 and viewport, so it was removed and the finding transferred explicitly to TODO.
 This delivery repairs first-start failure, not every terminal geometry variant.
 The compact shipping route additionally passes three consecutive runs at each
-width (16.42s x64, approximately 17s x86). Owned diagnostic source/EXE and the
+width (16.42s x64, 16.75s x86). Owned diagnostic source/EXE and the
 standalone build tree were removed after checking process lifetime and resolved
 paths; short logs and fixed deliverables remain. User INI and media are unchanged.
+
+P4 review inspected actual `8179def` against `20ca47f`: the only production
+change is the Host helper's operation ordering and zero-origin guard. Complete
+write rejection, broker ownership, and original package/debug assertions remain.
+The new test option belongs to the test runner, not SoftPC. Narrow/short and
+active-scroll native checks retain full cell/cooked-geometry assertions. Public
+ABI, user INI, media and non-Lib production sources are untouched; binaries
+match the recorded hashes. Corrective delivery is reviewed, awaiting owner
+retest, not a whole-T closure or a claim about all host geometry variants.
 
 ### Initial review record (before owner rejection)
 
