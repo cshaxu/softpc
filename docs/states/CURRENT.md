@@ -2,28 +2,28 @@
 
 ## Current Work
 
-M9 T59 S3 is active. S2 f45777c is reviewed/pushed and closed, dual-width 86/86. S1 is verified/pushed; no owner manual-test result is claimed. T59 remains open.
+M9 T59 S4 is active. S2/S3 are reviewed/pushed and closed, latest delivery 6db7c45 and dual-width 86/86. S1 is verified/pushed; no owner manual-test result is claimed. T59 remains open.
 
-## M9 T59 S3 Packet
+## M9 T59 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner admits the four proposed architecture stages as S2–S5 in T59, with proposal updated first. |
-| Objective | Consolidate original ABI declarations by owning boundary, reusing existing declarations and removing duplicates without wrappers. |
+| Objective | Make the public VM create/destroy boundary enforce the existing process-single-machine resource contract. |
 | Non-goals | No Lib/Common/MVDM source edits, behavior changes, new forwarding layer or machine OBJECT reimplementation. |
-| Reference Baseline | f45777c; S2 reviewed, both 86-test suites passed. |
+| Reference Baseline | 6db7c45; S3 reviewed, both 86-test suites passed. |
 | Candidate Proposal | [Remaining TODO investigation](../proposals/m9-remaining-todo-investigation.md). |
-| Files And ABI Surface | VM/Compat internal C/H declarations, necessary private include setup and task documentation; no public ABI or behavior change. |
+| Files And ABI Surface | vm/driver.c, vm_interface.h and product unit tests; second concurrent/live vm_create explicitly returns INVALID_STATE without touching the owner. |
 | Applicable Rules | Execution, document, architecture and coding rules with linked skills before implementation. |
-| Verification | Compare declarations to original definitions, audit every extern hit; dual-width full builds and CTest including debug and lifecycle. |
-| Expected Markers | One declaration source for each shared ABI group; no new forwarding functions or machine state. |
-| Asset Needs | Refresh both fixed EXEs; preserve INI/media; temporary evidence only in build/t59-s3. |
+| Verification | Existing driver creation callers; failed create then retry, duplicate rejection, destroy/recreate; dual-width full builds and CTest. |
+| Expected Markers | One public resource-admission point, rejection before native resources, failure and destroy release admission; no product state machine added. |
+| Asset Needs | Refresh both fixed EXEs; preserve INI/media; use existing disposable command-provider image and build logs. |
 | Reporting Requirements | Actual changed paths, line accounting, tests, dual EXEs, complete P commits/pushes and coordinator review. |
-| Stop Conditions | Declaration differences require an actual calling-ABI behavior change or protected-corpus edit. |
-| Exit Criteria | Declaration ownership clear, duplicates removed, dual-width full regression passes and reviewed delivery pushed. |
+| Stop Conditions | Multi-machine support, changed normal lifecycle semantics or protected-corpus edits become necessary. |
+| Exit Criteria | Explicit single owner and proved failure/recreate paths; dual-width full regression passes and reviewed delivery pushed. |
 | Original Owner Request | 准入为当前T任务的多个s任务开始执行，记得先更新t任务的proposal |
-| Similar-Issue Sweep | All hand-written extern declarations in VM and Compat; existing original headers, local-only declarations and shared missing prototypes each receive a disposition. |
+| Similar-Issue Sweep | vm_create/vm_destroy and internal non-owning driver wrappers; every acquire, failure and cleanup branch; preserve serial low-level machine tests. |
 
 ## Current Technical Baseline
 
