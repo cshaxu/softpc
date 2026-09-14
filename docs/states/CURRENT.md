@@ -2,8 +2,8 @@
 
 ## Current Work
 
-M9 T56 S14 is implemented and verified, awaiting owner testing of both refreshed
-EXEs after commit/push. The raw-to-cooked display repair stays in lib host;
+M9 T56 S14 implementation `07b278e` is verified, pushed and coordinator-reviewed,
+awaiting owner testing of both refreshed EXEs. The display repair stays in lib host;
 common, app, MVDM and lifecycle semantics are unchanged. Full x64/x86 CTest
 passed 64/64 each, strict lib 8/8. S14 and T56 are not yet closed.
 [S13's T-level audit](../history/M9-T56-S13-audit-suspension.md) is suspended;

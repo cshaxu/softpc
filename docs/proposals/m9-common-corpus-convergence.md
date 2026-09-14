@@ -84,6 +84,18 @@ x64 `9354F747CFECD34EC47F0B8DDFA5E4C84BA3522CD616E8515CE8C0005C4BEF43`。
 空回车及短命令，再 resume/CAP 往返；确认光标、残字和历史恢复。
 S14 保留等待用户反馈，不冒充 T56 总审计完成。
 
+#### S14 P2 独立复核
+
+Executor 已提交推送 `07b278e`。同一代理切换 coordinator 角色，读取
+该提交的完整生产/测试 diff、统计、任务原始要求和实际日志后复核：
+新增原生资源仅归 host backend，全部首次/切换/回滚/退出入口有处置；
+公共 ABI、common/app/MVDM、INI/media 未改。测试没有放宽旧断言，
+只将 package 的屏幕读取绑定到真正的 active buffer，并增加原生失败
+与恢复证明。独立确认 64/64 双宽度、8/8 strict、最终 focused tests、
+manifest/文档门禁与产物哈希。接受实现交付；保持 S14 等待用户视觉
+反馈，S13 的总审计仍未完成。诊断 probe 目录已安全删除，无残留 probe
+进程或新增源/构建依赖；短构建/测试日志保留在 ignored build。
+
 | 所有者 | 负责 | 契约及禁止事项 |
 | --- | --- | --- |
 | app | 读取、解析、校验原有配置；选择 SoftPC driver、CLI、热键/标题/状态文案策略；组装启动全部所需线程实体，按序停止回收 | 可直接使用 lib 公共接口完成自身职责；通过 common 接口管理其拥有的实体，注入配置与 callbacks；不复制 reducer、broker 或 executor loop |
