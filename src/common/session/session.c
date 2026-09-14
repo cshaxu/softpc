@@ -84,7 +84,7 @@ static int common_session_arm_if_ready(common_session *session)
         common_session_state_monitor_is_current(&session->state), &result);
     if (!result.arm_prompt) return 1;
     return common_session_write_result(session, &result) &&
-        common_ui_write_monitor(session->ui, "SoftPC> ") == LIB_STATUS_OK &&
+        common_ui_write_monitor(session->ui, result.prompt) == LIB_STATUS_OK &&
         common_ui_request_monitor_line(session->ui) == LIB_STATUS_OK;
 }
 

@@ -6,7 +6,8 @@
 #include "lib/kvm-base/frame_interface.h"
 #include "common/machine/machine_interface.h"
 
-#define COMMON_SESSION_TEXT_CAPACITY 2048u
+#define COMMON_SESSION_TEXT_CAPACITY 16384u
+#define COMMON_SESSION_PROMPT_CAPACITY 64u
 
 typedef struct common_session common_session;
 
@@ -59,10 +60,12 @@ typedef enum common_session_request {
 } common_session_request;
 
 /* A product command provider returns copied presentation text plus, at most,
- * one neutral machine request.  It never calls a shared UI or machine object
- * itself; session remains the unique dispatcher. */
+ * one neutral lifecycle request. Session is the unique lifecycle dispatcher
+ * and UI owner. Synchronous debug/media access uses the machine's serialized
+ * executor boundary from this same control thread. */
 typedef struct common_session_command_result {
     char text[COMMON_SESSION_TEXT_CAPACITY];
+    char prompt[COMMON_SESSION_PROMPT_CAPACITY];
     common_session_request request;
     lib_bool exit_requested;
     lib_bool arm_prompt;

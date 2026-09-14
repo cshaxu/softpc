@@ -19,6 +19,7 @@ typedef struct machine_fake {
     LONG runs;
     LONG inputs;
     LONG debug_calls;
+    DWORD executor_thread;
 } machine_fake;
 
 static lib_bool fake_reset(void *opaque)
@@ -35,6 +36,7 @@ static lib_bool fake_run(void *opaque)
     machine_fake *fake = (machine_fake *)opaque;
     HANDLE events[2] = { fake->stopped, fake->wake };
     InterlockedIncrement(&fake->runs);
+    fake->executor_thread = GetCurrentThreadId();
     if (fake->callback != NULL) fake->callback(fake->callback_context);
     for (;;) {
         DWORD result = WaitForMultipleObjects(2u, events, FALSE, 5000u);
@@ -80,6 +82,7 @@ static lib_status fake_execute_debug(void *opaque,
 {
     machine_fake *fake = (machine_fake *)opaque;
     if (request == NULL || result == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    assert(GetCurrentThreadId() == fake->executor_thread);
     InterlockedIncrement(&fake->debug_calls);
     *result = (common_machine_debug_result) { .value = request->address };
     return LIB_STATUS_OK;
@@ -137,6 +140,15 @@ int main(void)
     assert(common_machine_create(&machine, &driver) == LIB_STATUS_OK);
     common_machine_set_state_sink(machine, note_state, &fake);
     common_machine_set_frame_sink(machine, note_frame, &fake);
+    assert(common_debug_create(&debug) == LIB_STATUS_OK);
+    assert(common_debug_open(debug, machine) == LIB_STATUS_OK);
+    assert(fake.debug_calls == 0);
+    assert(common_debug_submit_line(debug, "?", &debug_command_result) == LIB_STATUS_OK);
+    assert(debug_command_result.keep_active && fake.debug_calls == 0);
+    assert(common_debug_submit_line(debug, "h 1 2", &debug_command_result) == LIB_STATUS_OK);
+    assert(strstr(debug_command_result.text, "0003") != NULL && fake.debug_calls == 0);
+    assert(common_debug_submit_line(debug, "r", &debug_command_result) == LIB_STATUS_OK);
+    assert(strstr(debug_command_result.text, "must be paused") != NULL && fake.debug_calls == 0);
     assert(common_machine_start(machine));
     assert(WaitForSingleObject(fake.running, 5000u) == WAIT_OBJECT_0);
     assert(WaitForSingleObject(fake.frame, 5000u) == WAIT_OBJECT_0);
@@ -148,6 +160,13 @@ int main(void)
     assert(common_machine_enqueue_input(machine, &input));
     assert(WaitForSingleObject(fake.input, 5000u) == WAIT_OBJECT_0);
     assert(InterlockedCompareExchange(&fake.inputs, 0, 0) == 1);
+    assert(common_debug_submit_line(debug, "d", &debug_command_result) == LIB_STATUS_OK);
+    assert(strstr(debug_command_result.text, "must be paused") != NULL);
+    assert(common_debug_submit_line(debug, "q", &debug_command_result) == LIB_STATUS_OK);
+    assert(!debug_command_result.keep_active);
+    assert(common_machine_state_get(machine) == COMMON_MACHINE_RUNNING);
+    assert(common_debug_open(debug, machine) == LIB_STATUS_OK);
+    assert(fake.debug_calls == 0);
     ResetEvent(fake.running);
     assert(common_machine_reset(machine));
     assert(WaitForSingleObject(fake.reset_completed, 5000u) == WAIT_OBJECT_0);
@@ -160,8 +179,8 @@ int main(void)
             .address = 0x1234u }, &debug_result) == LIB_STATUS_OK);
     assert(debug_result.value == 0x1234u &&
         InterlockedCompareExchange(&fake.debug_calls, 0, 0) == 1);
-    assert(common_debug_create(&debug) == LIB_STATUS_OK);
     assert(common_debug_open(debug, machine) == LIB_STATUS_OK);
+    assert(fake.debug_calls == 1);
     assert(common_debug_submit_line(debug, "?", &debug_command_result) ==
         LIB_STATUS_OK);
     assert(strstr(debug_command_result.text, "assemble") != NULL);

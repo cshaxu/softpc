@@ -15,6 +15,7 @@ static const char HELP_COMMANDS[] =
     "  floppy insert <image> insert drive A media while stopped/paused\r\n"
     "  floppy eject          eject drive A media while stopped/paused\r\n"
     "  help                  show this help\r\n"
+    "  debug                 enter debugger (q returns to monitor)\r\n"
     "  exit                  quit\r\n";
 static const char HELP_HOTKEYS[] =
     "While the guest is running:\r\n"
@@ -176,6 +177,12 @@ void app_command_session_submit_line(app_command_session *s, app_monitor_state s
     if (!strcmp(c, "exit"))
     {
         e->exit_requested = 1;
+        return;
+    }
+    if (!strcmp(c, "debug") && !*a)
+    {
+        e->action = APP_COMMAND_ACTION_DEBUG;
+        prompt(s);
         return;
     }
     /* The parser does not own machine state.  It receives control's current

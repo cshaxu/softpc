@@ -15,6 +15,7 @@ small fixed command set:
 - `floppy insert <image>` and `floppy eject` swap configured drive-A media
   while stopped or paused; and
 - `help` and `exit` are local monitor commands.
+- `debug` enters the debugger CLI without changing machine state.
 
 Commands enqueue requests and receive a published result. They never directly
 call a CPU, controller, BOP, or renderer function.
@@ -49,6 +50,27 @@ Raw text cells use lib\'s fixed PC-display byte-to-Unicode mapping, including
 box/block glyphs. It is an approximation for the traditional character set,
 not detection of a DOS code page or an uploaded font. Window retains the copied
 bitmap font and therefore remains the exact custom-font renderer.
+
+### Debugger
+
+The user may enter and remain in debug CLI in init, stopped, running or paused
+state. Its prompt is `-` (or a command-specific continuation prompt); `q`
+returns to the monitor without pausing, resuming or stopping the machine.
+Help, hexadecimal arithmetic and filename selection do not access the machine.
+Synchronous machine access requires paused state and otherwise reports an
+error while retaining the CLI. Opening the CLI does not read CS/IP or acquire
+a lease; address defaults are initialized lazily by the first machine command.
+Registered KVM hotkeys still reach the same session control path: CAP can
+pause/resume while debug remains active. Normal guest input stays blocked when
+paused. Cooked debugger input is never reinterpreted as a KVM hotkey.
+
+The initial SoftPC adapter supports general-register reads/writes, read-only
+IP/flags/segment/CR0/CR2/CR3 registers, and memory inspection/editing with paging
+disabled through the existing physical-memory boundary. Assembly/disassembly
+uses the common xasm32 engine. Plain `g` requests normal resume; trace,
+breakpoints, watchpoints, ports, descriptor snapshots, paging-enabled memory
+access, CR1/CR4 and control/segment/IP/flags writes explicitly report unsupported.
+These are adapter capability limits, not restrictions on entering the CLI.
 
 ## Window And Input
 

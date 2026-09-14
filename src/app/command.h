@@ -8,7 +8,7 @@
 #define APP_COMMAND_PATH_CAPACITY 1024u
 
 typedef enum app_monitor_state { APP_MONITOR_INIT, APP_MONITOR_STOPPED, APP_MONITOR_PAUSED, APP_MONITOR_RUNNING } app_monitor_state;
-typedef enum app_command_action { APP_COMMAND_ACTION_NONE, APP_COMMAND_ACTION_EJECT_FLOPPY, APP_COMMAND_ACTION_INSERT_FLOPPY } app_command_action;
+typedef enum app_command_action { APP_COMMAND_ACTION_NONE, APP_COMMAND_ACTION_EJECT_FLOPPY, APP_COMMAND_ACTION_INSERT_FLOPPY, APP_COMMAND_ACTION_DEBUG } app_command_action;
 /* A parsed lifecycle request is control input, not a presentation intent.
  * Only the control loop may consume it and submit it to runtime. */
 typedef enum app_lifecycle_request {

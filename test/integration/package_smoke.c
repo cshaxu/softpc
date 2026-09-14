@@ -303,6 +303,15 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
         stage = 2; goto done;
     }
     if (!package_wait_for_text(output, "SoftPC>", 5000u)) { stage = 3; goto done; }
+    /* Exercise the shipping CLI provider, not only the debug library link.
+       Entering before start must leave the machine stopped and permit help. */
+    if (!package_send_text(input, "debug\r") ||
+        !package_wait_for_text(output, "Debugger:", 5000u) ||
+        !package_send_text(input, "r\r") ||
+        !package_wait_for_text(output, "Machine must be paused", 5000u) ||
+        !package_send_text(input, "?\r") ||
+        !package_wait_for_text(output, "debug32", 5000u) ||
+        !package_send_text(input, "q\r")) { stage = 17; goto done; }
     if (!package_send_text(input, "start\r")) { stage = 4; goto done; }
     if (package_window_display) {
         success = package_window_restart(process, input, output);

@@ -19,8 +19,8 @@ common/machine/
   and injected product-machine driver boundary
         ↑
 common/debug/ + common/xasm32/
-  dormant generic debug/assembly capabilities; debug consumes the optional
-  paused-state machine adapter and neither component adds a product command
+  generic debug/assembly capabilities; app injects the debugger CLI, and
+  synchronous machine access consumes the paused-state executor boundary
         ↑
 common/ui/
   broker, cooked monitor Console, raw VM Console, Window/KVM instances and
@@ -71,12 +71,18 @@ canonical corpus for NXVM to adopt exactly; the projects do not maintain
 parallel variants.
 
 `common/xasm32` is an imported copied byte/text assembly capability and
-`common/debug` is an imported generic debug command capability.  They remain
-dormant until an importing product deliberately injects and exposes them.
+`common/debug` is an imported generic debug command capability. SoftPC exposes
+it through its injected app command binding, not through a second input loop.
 `common/debug` depends on `common/machine`'s optional paused-state adapter and
 on `common/xasm32`; neither component may create an executor, own a Console,
-or add a product command path.  Their source corpus and hashes are frozen in
-their task records for exact downstream adoption.
+or add a product command path. Import hashes remain provenance evidence; the
+S9 integration changes to these components form the updated downstream corpus.
+The control thread serializes lifecycle, media and synchronous debug requests.
+Debug requests are copied into the machine's existing command rendezvous and
+executed by the parked executor, never by the calling frontend. The machine
+checks paused state and the lease again there; callbacks must not synchronously
+reenter this control-thread API. `app/command_binding` owns debugger selection
+and copied prompts; machine state changes do not select or exit the CLI.
 
 Shared KVM key events are copied `kvm_key`, physical scan, neutral injection
 flags, generic Ctrl/Alt/Shift state, and make/break values. Platform adapters

@@ -160,6 +160,65 @@ S6/S7 “原版”指生产源码字节一致，common CMake 接线属于集成�
   monitor 空行回归及实际 SoftPC adapter；最终交付 x86/x64 EXE 和全量测试。
   本次准入不是实现完成或 S9 收口。
 
+### S9 实施范围与同类扫描
+
+有限全集为 `common_machine_debug_operation` 的 17 种操作、两处反汇编
+调用、monitor/debug 两种 CLI 的全部 provider callbacks。唯一入口分别是
+app command binding、session lifecycle dispatch、machine paused executor
+rendezvous；无第二输入循环、executor 或 MVDM 源码改动。
+
+| 操作集合 | SoftPC adapter 处置 | 验证接收者 |
+| --- | --- | --- |
+| READ/WRITE_REGISTER | 八个通用寄存器读写；IP、flags、六个段寄存器、CR0/2/3 只读；其他明确 unsupported | real debug binding smoke：AX 写入、读回及恢复，R 输出 |
+| READ/WRITE_REAL、READ/WRITE_LINEAR | 分页关闭时经过已有 physical-memory copy；分页开启明确 unsupported，不自行实现地址翻译或伪造读取 | real smoke：E/D、A/NOP/D、无效范围失败 |
+| GET_CODE_DEFAULT_SIZE、GET_CODE_BASE | 原始 CCPU CS 属性和缓存基址 | R/U、汇编/反汇编实际调用 |
+| READ/WRITE_PORT、GET_CPU_SNAPSHOT | 未接安全产品能力，明确 unsupported | real smoke 逐操作拒绝 |
+| SET/CLEAR/GET_WATCH | 未接内存访问观察点，明确 unsupported | real smoke 逐操作拒绝 |
+| SET_EXECUTION_PLAN、GET_EXECUTION_RESULT | 未接逐指令 trace/break，明确 unsupported，不递归执行 CPU | real smoke 逐操作拒绝，T 不发 RESUME |
+| CLEAR_EXECUTION_PLAN | adapter 无可安装计划，清除为空操作；允许普通 G 通过 session 请求 resume | real smoke：G 只返回 lifecycle request |
+
+同类扫描检查了 debug 的集中 `command_execute`、read/write helpers、
+U/XU、文件 L/W、异步 observation、续行 prompt 和原有全局地址记录。
+失败状态统一阻止后续机器调用并替换伪造的结果文本；read failure 不留下
+未初始化数据，W 不写失败读取的内容；复制请求先验证容量。地址记录改为
+每个 debug 对象自己的状态。进入和重开 CLI 不读取机器。
+
+真实 U 测试曾在 `f000:fff0` 卡住：原导入 debugger 将 xasm32 返回的
+文本长度当作指令长度，且零长度/16-bit wrap 未保证循环前进。修复在同一
+反汇编 API 增加独立的 instruction-byte count 输出，同步更新两处生产
+调用和所有测试；没有添加第二 decoder。U 对零进展立即退出，先以较宽
+整数计算下一地址再截断。S6/S7 导入哈希是历史来源，不再用于声称当前
+修改后的 common 与 NXVM 字节相同。
+
+高级 CPU 能力不是本次伪实现的范围。端口需要规定访问宽度和原始设备的
+副作用边界；trace/break 需要已验证的逐指令停点；watch 需要真实访问
+观察；分页内存和特殊寄存器写入需要各自完整的地址/异常/恢复证明。
+这些返回 unsupported 的能力仍须后续明确准入，不能以本 S 的 CLI 接通
+宣称全部 DEBUG 命令已实现。
+
+### S9 P5 交付证据
+
+2026-09-13：`cmake --build --preset tests-x64/tests-x86` 均成功；
+`ctest --preset test-x64/test-x86 --output-on-failure` 各 63/63 通过，
+包含真实 adapter、四状态 CLI、CAP、G、续行、失败和 package 交互。
+`build/lib-t56-s8-strict` 使用 `-Wall -Wextra -Wpedantic -Werror`
+构建成功，独立 CTest 8/8 通过。文档治理和 `git diff --check` 通过。
+
+本次仍保留 S9 等待 owner 测试，不作 S/T 收口。生产路径是
+app command provider → common/debug → common/machine 同步 executor rendezvous
+→ SoftPC adapter；CLI provider 从 main 移到 command_binding，原位置删除，
+没有第二 CLI、executor、reader 或 MVDM 改动。
+
+变更统计以 P4 `2ab3f1f` 为基线，使用 `git diff --numstat`，排除文档和
+二进制：生产及 CMake 16 个路径 +590/-222（净 +368），测试 5 个路径
++219/-5（净 +214）。新增是实际 adapter、CLI 注入和执行线程交接；
+main 中原有 provider 实现迁出，不保留转发副本。
+
+交付文件 SHA-256：
+
+- x86：`05A4DAD7E88D1369B909522C6AA9D3E886E123D438B895D6819225CDB93BE65C`
+- x64：`8B1979A256E85E24034655D6B82A932E0A62603037E9A8BD58C8DA1797472272`
+
 ## T56 S1 冻结账本（`121de7c`）
 
 账本的有限全集是该提交下 `git ls-files src/app src/host` 的 60 个路径：

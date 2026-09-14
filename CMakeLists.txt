@@ -43,6 +43,7 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 4)
 endif()
 
 add_library(softpc-machine
+    src/host/debug.c
     src/host/machine.c)
 target_include_directories(softpc-machine PUBLIC src/host PRIVATE src)
 target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
@@ -279,13 +280,14 @@ target_compile_definitions(softpc-machine PRIVATE
 
 add_executable(softpcvm
     src/app/main.c
+    src/app/command_binding.c
     src/app/machine_driver.c
     src/app/keyboard.c
     src/app/command.c
     src/app/prompt_trace.c
     src/app/firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
-target_link_libraries(softpcvm PRIVATE types storage kvm-base common-ui common-session common-machine)
+target_link_libraries(softpcvm PRIVATE types storage kvm-base common-ui common-session common-machine common-debug)
 if(WIN32)
     target_link_libraries(softpcvm PRIVATE user32 gdi32)
 endif()
@@ -496,6 +498,13 @@ add_test(NAME softpc-runtime-input-continuation-smoke
 set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-common-machine-smoke test/unit/common_machine_smoke.c)
+add_executable(softpc-debug-binding-smoke test/unit/debug_binding_smoke.c
+    src/app/command_binding.c src/app/command.c src/app/machine_driver.c
+    src/app/keyboard.c src/app/prompt_trace.c)
+target_link_libraries(softpc-debug-binding-smoke PRIVATE softpc-machine common-debug common-machine)
+add_test(NAME softpc-debug-binding-smoke COMMAND softpc-debug-binding-smoke)
+set_tests_properties(softpc-debug-binding-smoke PROPERTIES LABELS "unit" TIMEOUT 45
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 target_link_libraries(softpc-common-machine-smoke PRIVATE common-machine common-debug host kvm-base)
 add_test(NAME softpc-common-machine-smoke COMMAND softpc-common-machine-smoke)
 set_tests_properties(softpc-common-machine-smoke PROPERTIES
@@ -720,6 +729,7 @@ list(APPEND SOFTPC_TEST_TARGETS softpc-reconciler-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-control-state-matrix-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-command-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-input-queue-mouse-fifo-smoke)
+list(APPEND SOFTPC_TEST_TARGETS softpc-debug-binding-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
     # Keep every executable test self-contained, just like the launcher.

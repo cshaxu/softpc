@@ -4,6 +4,9 @@
 
 M9 T56 S9 is active: owner reopened the closed task; retain the completed
 monitor-spacing repair and connect the admitted common debug command path.
+S9 P5 is implemented and verified: x86/x64 each pass 63/63 tests, strict
+standalone lib passes 8/8, and both package EXEs are refreshed. Await owner
+testing; neither S9 nor T56 is closed by this delivery.
 
 ## M9 T56 S9 Packet
 
@@ -15,7 +18,7 @@ monitor-spacing repair and connect the admitted common debug command path.
 | Non-goals | Do not bypass common/machine, create a second executor, directly access MVDM from common/debug, or alter existing monitor command/lifecycle semantics. |
 | Reference Baseline | S9 P1 `1750ed7` normalized all nonempty monitor output; P2 dual packages built at `de2ff79`, but the owner kept S9 open for debug connection. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | Common debug/session injection, SoftPC debug driver adapter and focused tests; any machine debug operation must remain behind the existing copied request/result ABI. |
+| Files And ABI Surface | Common debug/session injection, SoftPC debug driver adapter and focused tests; machine access stays behind copied request/result. Disassembly now returns instruction byte count separately from text length: the live U test exposed their conflation and a zero-progress loop. |
 | Applicable Rules | Execution, architecture, coding and documentation authorities; Product UI; common ownership boundary. |
 | Verification | Audit every debug operation against the product driver; test debug entry/stay/exit in INIT, STOPPED, RUNNING and PAUSED without implicit machine access or pause; test CAP while debug remains active, lazy register defaults, explicit non-paused access errors, lease invalidation and unsupported operations; fresh package-x86/x64, test-x86/x64, strict lib and governance gates. |
 | Expected Markers | Monitor dispatches a debug session only through common/session injection; common/debug reaches SoftPC only through common/machine's lease callback; no MVDM include outside the product adapter. |

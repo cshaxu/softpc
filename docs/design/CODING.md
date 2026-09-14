@@ -18,7 +18,7 @@ src/
   lib/{types,console,host,storage,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
   app/
-    main.c, machine_driver.c, keyboard.c, firmware.rc
+    main.c, command.c, command_binding.c, machine_driver.c, keyboard.c, firmware.rc
 ```
 
 Directories appear only in their admitted migration task.

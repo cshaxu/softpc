@@ -15,6 +15,9 @@ options and injected callbacks.  It never includes app, host, or MVDM source.
 `session` calls `machine` and `ui`.  `debug` calls `machine` and `xasm32`.
 No other common component edge is permitted.  Application and host code may
 compose only the root `*_interface.h` contracts; implementation headers and
-source files remain component-local.  `xasm32` and `debug` are dormant generic
-capabilities: importing products decide whether to inject an adapter or expose
-a command, and neither component creates a product execution or Console path.
+source files remain component-local. Importing products decide whether to inject
+an adapter or expose a command. SoftPC now selects debug through its app CLI
+binding; neither component creates a product execution or Console path.
+The machine debug contract is synchronous to the control-thread caller and
+serviced by the existing paused executor. Disassembly reports instruction byte
+count separately from text length; callers must not use text length as a PC step.

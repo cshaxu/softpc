@@ -22,9 +22,10 @@ typedef enum common_machine_state {
     COMMON_MACHINE_RESET_COMPLETED
 } common_machine_state;
 
-/* Debug is a synchronous, paused-state adapter contract. Common owns only
- * lease validity; product adapters own any CPU/device access and may report
- * unsupported without creating a second executor. */
+/* Debug is synchronous to the sole control-thread caller; execution occurs
+ * on the existing paused executor. Lifecycle, media and debug requests must
+ * be serialized by that caller, never issued from a driver/sink callback.
+ * Common owns lease validity and rendezvous; the product owns CPU access. */
 typedef enum common_machine_debug_operation {
     COMMON_MACHINE_DEBUG_READ_REGISTER,
     COMMON_MACHINE_DEBUG_WRITE_REGISTER,

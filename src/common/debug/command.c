@@ -31,6 +31,11 @@ typedef enum command_run_kind {
 
 struct common_debug_command {
     common_machine *machine;
+    lib_status access_status;
+    lib_bool defaults_ready;
+    type_unsigned_32 assemble_linear;
+    type_unsigned_32 dump_linear;
+    type_unsigned_32 unassemble_linear;
     common_debug_result *result;
     STD_SIZE_T error_position;
     STD_SIZE_T argument_count;
@@ -125,11 +130,15 @@ static C_INT command_execute(command_context *debugContext,
 {
     common_machine_debug_lease lease;
 
-    if (debugContext == STD_NULL || request == STD_NULL || result == STD_NULL ||
-        common_machine_debug_acquire(debugContext->machine, &lease) != LIB_STATUS_OK)
-        return 1;
-    return common_machine_debug_execute_with_lease(debugContext->machine, &lease,
-        request, result) == LIB_STATUS_OK ? 0 : 1;
+    if (debugContext == STD_NULL || request == STD_NULL || result == STD_NULL) return 1;
+    STD_MEMSET(result, 0, sizeof(*result));
+    if (debugContext->access_status != LIB_STATUS_OK) return 1;
+    debugContext->access_status = common_machine_debug_acquire(debugContext->machine, &lease);
+    if (debugContext->access_status == LIB_STATUS_OK)
+        debugContext->access_status = common_machine_debug_execute_with_lease(
+            debugContext->machine, &lease, request, result);
+    if (debugContext->access_status != LIB_STATUS_OK) debugContext->error_position = 1u;
+    return debugContext->access_status != LIB_STATUS_OK;
 }
 
 static C_INT command_read_register(command_context *debugContext,
@@ -161,6 +170,11 @@ static C_INT command_access_memory(command_context *debugContext,
 {
     common_machine_debug_request request = {0};
     common_machine_debug_result result;
+    if (data == STD_NULL || bytes > sizeof(request.data)) {
+        debugContext->access_status = LIB_STATUS_INVALID_ARGUMENT;
+        debugContext->error_position = 1u;
+        return 1;
+    }
     request.operation = operation;
     request.address = address;
     request.segment = segment;
@@ -169,7 +183,11 @@ static C_INT command_access_memory(command_context *debugContext,
     if (operation == COMMON_MACHINE_DEBUG_WRITE_LINEAR ||
         operation == COMMON_MACHINE_DEBUG_WRITE_REAL)
         STD_MEMCPY(request.data, data, bytes);
-    if (command_execute(debugContext, &request, &result)) return 1;
+    if (command_execute(debugContext, &request, &result)) {
+        if (operation == COMMON_MACHINE_DEBUG_READ_LINEAR ||
+            operation == COMMON_MACHINE_DEBUG_READ_REAL) STD_MEMSET(data, 0, bytes);
+        return 1;
+    }
     if (operation == COMMON_MACHINE_DEBUG_READ_LINEAR ||
         operation == COMMON_MACHINE_DEBUG_READ_REAL)
         STD_MEMCPY(data, result.data, bytes);
@@ -1106,7 +1124,8 @@ static C_VOID l(command_context *debugContext)
     status = lib_storage_medium_open(strFileName, LIB_STORAGE_MEDIUM_READONLY,
         &medium);
     total = status == LIB_STATUS_OK ? lib_storage_medium_byte_count(medium) : 0u;
-    while (!nErrPos && status == LIB_STATUS_OK && len < total) {
+    while (!nErrPos && debugContext->access_status == LIB_STATUS_OK &&
+        status == LIB_STATUS_OK && len < total) {
         lib_size index;
 
         bytes = total - len < sizeof(data) ? total - len : sizeof(data);
@@ -1210,12 +1229,14 @@ static type_unsigned_8 uprintins(command_context *debugContext, type_unsigned_16
     }
     else
     {
+        lib_size instruction_bytes = 0u;
         if (common_xasm32_disassemble(ucode, sizeof(ucode), stmt,
-                sizeof(stmt), &i,
+                sizeof(stmt), &i, &instruction_bytes,
                 command_machine_get_code_default_size()) != TYPE_STATUS_OK) {
             len = 0u;
+            (void)snprintf(stmt, sizeof(stmt), "<ERROR>");
         } else {
-            len = (type_unsigned_8)i;
+            len = (type_unsigned_8)instruction_bytes;
         }
         sbin[0] = 0;
         sbin_cursor = sbin;
@@ -1662,8 +1683,9 @@ static C_VOID uprint(command_context *debugContext, type_unsigned_16 segment, ty
     while (start <= end)
     {
         len = uprintins(debugContext, segment, start);
-        start += len;
+        if (len == 0u) break;
         boundary = (type_unsigned_32)start + (type_unsigned_32)len;
+        start = (type_unsigned_16)boundary;
         if (boundary > 0xffff)
         {
             break;
@@ -1777,6 +1799,7 @@ static C_VOID w(command_context *debugContext)
         lib_size index;
         for (index = 0u; index < count; ++index)
             command_machine_read_real(seg, (type_unsigned_16)(ptr + i + index), &data[index], 1);
+        if (debugContext->access_status != LIB_STATUS_OK) break;
         if (lib_storage_file_writer_write(writer, data, count) !=
                 LIB_STATUS_OK) {
             STD_PRINTF("File write failed\n");
@@ -1790,9 +1813,9 @@ static C_VOID w(command_context *debugContext)
 /* DEBUG CMD END */
 
 /* EXTENDED DEBUG CMD BEGIN */
-type_unsigned_32 xalin;
-type_unsigned_32 xdlin;
-type_unsigned_32 xulin;
+#define xalin debugContext->assemble_linear
+#define xdlin debugContext->dump_linear
+#define xulin debugContext->unassemble_linear
 /* print */
 static type_unsigned_8 xuprintins(command_context *debugContext, type_unsigned_32 linear)
 {
@@ -1811,12 +1834,14 @@ static type_unsigned_8 xuprintins(command_context *debugContext, type_unsigned_3
     }
     else
     {
+        lib_size instruction_bytes = 0u;
         if (common_xasm32_disassemble(ucode, sizeof(ucode), stmt,
-                sizeof(stmt), &i,
+                sizeof(stmt), &i, &instruction_bytes,
                 command_machine_get_code_default_size()) != TYPE_STATUS_OK) {
             len = 0u;
+            (void)snprintf(stmt, sizeof(stmt), "<ERROR>");
         } else {
-            len = (type_unsigned_8)i;
+            len = (type_unsigned_8)instruction_bytes;
         }
         sbin[0] = 0;
         sbin_cursor = sbin;
@@ -2981,20 +3006,10 @@ void common_debug_command_destroy(common_debug_command *command)
 lib_status common_debug_command_open(common_debug_command *command,
     common_machine *machine)
 {
-    command_context *debugContext = command;
-
     if (command == STD_NULL || machine == STD_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     command_machine_finalize_arguments(command);
     command_initialize(command, machine);
     if (command->arguments == STD_NULL) return LIB_STATUS_NO_MEMORY;
-    strFileName[0] = '\0';
-    asmSegRec = uasmSegRec = _cs;
-    asmPtrRec = uasmPtrRec = _ip;
-    dumpSegRec = _ds;
-    dumpPtrRec = (type_unsigned_16)(_ip) / 0x10 * 0x10;
-    xalin = 0u;
-    xdlin = 0u;
-    xulin = command_machine_get_code_base() + _eip;
     return LIB_STATUS_OK;
 }
 
@@ -3049,6 +3064,53 @@ static void command_prepare_continuation(common_debug_command *command)
     }
 }
 
+/* CLI lifetime is independent of machine access. Help, arithmetic, filename
+ * selection and exit do not acquire a machine lease or initialize addresses. */
+static lib_bool command_needs_machine(common_debug_command *command)
+{
+    const char *name;
+    if (command->continuation != COMMAND_CONTINUATION_NONE) return LIB_TRUE;
+    if (command->argument_count == 0u) return LIB_FALSE;
+    name = command->arguments[0];
+    if (strchr("acdefgilmorstuvwx", name[0]) == NULL) return LIB_FALSE;
+    return strcmp(name, "?") != 0 && strcmp(name, "h") != 0 &&
+        strcmp(name, "n") != 0 && strcmp(name, "q") != 0 &&
+        !(strcmp(name, "x") == 0 && command->argument_count == 2u &&
+            strcmp(command->arguments[1], "?") == 0);
+}
+
+static lib_bool command_prepare_machine(common_debug_command *debugContext)
+{
+    common_machine_debug_lease lease;
+    debugContext->access_status = common_machine_debug_acquire(debugContext->machine, &lease);
+    if (debugContext->access_status != LIB_STATUS_OK) return LIB_FALSE;
+    if (!debugContext->defaults_ready) {
+        asmSegRec = uasmSegRec = _cs;
+        asmPtrRec = uasmPtrRec = _ip;
+        dumpSegRec = _ds;
+        dumpPtrRec = (type_unsigned_16)(_ip) / 0x10 * 0x10;
+        xulin = command_machine_get_code_base() + _eip;
+        debugContext->defaults_ready = debugContext->access_status == LIB_STATUS_OK;
+    }
+    return debugContext->access_status == LIB_STATUS_OK;
+}
+
+static void command_report_access(common_debug_command *command)
+{
+    if (command->access_status == LIB_STATUS_OK) return;
+    command->continuation = COMMAND_CONTINUATION_NONE;
+    command->pending_line_available = 0;
+    command->awaiting_pause = 0;
+    command->run_kind = COMMAND_RUN_NONE;
+    command->result->lifecycle_request = COMMON_DEBUG_LIFECYCLE_NONE;
+    (void)snprintf(command->result->text, sizeof(command->result->text), "%s\r\n\r\n",
+        command->access_status == LIB_STATUS_INVALID_STATE ?
+            "Machine must be paused for this debug operation." :
+        command->access_status == LIB_STATUS_UNSUPPORTED ?
+            "Debug operation is unsupported by this machine." :
+            "Debug machine access failed.");
+}
+
 lib_status common_debug_command_submit_line(common_debug_command *command,
     const char *line, common_debug_result *out_result)
 {
@@ -3061,13 +3123,21 @@ lib_status common_debug_command_submit_line(common_debug_command *command,
     STD_MEMSET(out_result, 0, sizeof(*out_result));
     out_result->keep_active = LIB_TRUE;
     command->result = out_result;
+    command->access_status = LIB_STATUS_OK;
+    if (strlen(line) >= sizeof(command->command_buffer)) {
+        command_printf(command, "Debug command is too long.\r\n\r\n");
+        goto finished;
+    }
     if (command->continuation == COMMAND_CONTINUATION_NONE) {
         if (!command_copy_text_checked(strCmdBuff, sizeof(strCmdBuff), line))
             return LIB_STATUS_INVALID_ARGUMENT;
         parse(debugContext);
+        if (command_needs_machine(command) && !command_prepare_machine(command))
+            goto finished;
         command_prepare_continuation(command);
         exec(debugContext);
     } else {
+        if (!command_prepare_machine(command)) goto finished;
         if (!command_copy_text_checked(command->pending_line,
                 sizeof(command->pending_line), line)) return LIB_STATUS_INVALID_ARGUMENT;
         command->pending_line_available = 1;
@@ -3093,6 +3163,8 @@ lib_status common_debug_command_submit_line(common_debug_command *command,
         for (i = 0u; i < nErrPos; ++i) STD_PRINTF(" ");
         STD_PRINTF("^ Error\n");
     }
+finished:
+    command_report_access(command);
     command_prompt(command);
     if (flagExit) out_result->keep_active = LIB_FALSE;
     command->result = STD_NULL;
@@ -3122,8 +3194,14 @@ lib_status common_debug_command_observe_machine(common_debug_command *command,
     out_result->keep_active = LIB_TRUE;
     if (state != COMMON_DEBUG_MACHINE_PAUSED || status != LIB_STATUS_OK ||
         !command->awaiting_pause) return LIB_STATUS_OK;
-    if (command_get_execution_result(command, &executed)) return LIB_STATUS_OK;
     command->result = out_result;
+    command->access_status = LIB_STATUS_OK;
+    if (command_get_execution_result(command, &executed)) {
+        command_report_access(command);
+        command_prompt(command);
+        command->result = STD_NULL;
+        return LIB_STATUS_OK;
+    }
     command->awaiting_pause = 0;
     switch (command->run_kind) {
     case COMMAND_RUN_TRACE_REAL:
@@ -3153,6 +3231,7 @@ lib_status common_debug_command_observe_machine(common_debug_command *command,
         command->trace_remaining != 0u) {
         if (command_set_trace(command, 1u)) {
             command->run_kind = COMMAND_RUN_NONE;
+            command_report_access(command);
             command_prompt(command);
             command->result = STD_NULL;
             return LIB_STATUS_OK;
@@ -3163,6 +3242,7 @@ lib_status common_debug_command_observe_machine(common_debug_command *command,
         command->breakpoint_remaining != 0u) {
         if (command_set_break(command, command->breakpoint_linear)) {
             command->run_kind = COMMAND_RUN_NONE;
+            command_report_access(command);
             command_prompt(command);
             command->result = STD_NULL;
             return LIB_STATUS_OK;
@@ -3173,6 +3253,7 @@ lib_status common_debug_command_observe_machine(common_debug_command *command,
         command->run_kind = COMMAND_RUN_NONE;
         command_clear_break(command);
     }
+    command_report_access(command);
     command_prompt(command);
     command->result = STD_NULL;
     return LIB_STATUS_OK;

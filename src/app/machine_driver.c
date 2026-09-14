@@ -1,6 +1,7 @@
 #include "app/machine_driver.h"
 #include "app/keyboard.h"
 #include "app/prompt_trace.h"
+#include "host/debug.h"
 
 #include <windows.h>
 #include <stdlib.h>
@@ -255,6 +256,13 @@ static lib_bool app_machine_driver_set_removable_media(void *opaque,
         SOFTPC_MACHINE_OK;
 }
 
+static lib_status app_machine_driver_debug(void *opaque,
+    const common_machine_debug_request *request, common_machine_debug_result *result)
+{
+    app_machine_driver *driver = opaque;
+    return softpc_machine_debug(driver->machine, request, result);
+}
+
 lib_status app_machine_driver_create(app_machine_driver **out_driver,
     softpc_machine *machine)
 {
@@ -288,5 +296,6 @@ void app_machine_driver_describe(app_machine_driver *driver,
     out_driver->deliver_input = app_machine_driver_deliver_input;
     out_driver->copy_frame = app_machine_driver_copy_frame;
     out_driver->set_removable_media = app_machine_driver_set_removable_media;
+    out_driver->execute_debug = app_machine_driver_debug;
     out_driver->frame_published = app_machine_driver_trace_frame;
 }

@@ -1,4 +1,5 @@
 #include "command.h"
+#include "command_binding.h"
 #include "common/session/session_interface.h"
 #include "common/machine/machine_interface.h"
 #include "machine_driver.h"
@@ -28,13 +29,6 @@ typedef struct app_startup_config {
     int console_control;
     softpc_media_mode media_mode;
 } app_startup_config;
-
-/* app owns the SoftPC CLI policy and machine adapter.  common/session only
- * sees this copied, product-neutral provider contract. */
-typedef struct app_command_binding {
-    app_command_session session;
-    common_machine *machine;
-} app_command_binding;
 
 static char *app_trim(char *text)
 {
@@ -216,172 +210,6 @@ static common_session_machine_state app_session_state(common_machine_state state
     }
 }
 
-/* app/ owns the product machine ABI. common/session owns its neutral copied
- * completion facts; convert explicitly at this one composition boundary.
- * The numeric enum values are deliberately not a cross-component contract. */
-static common_machine_state app_machine_completed_state(
-    common_session_machine_state state)
-{
-    switch (state) {
-    case COMMON_SESSION_MACHINE_RUNNING: return COMMON_MACHINE_RUNNING;
-    case COMMON_SESSION_MACHINE_PAUSED: return COMMON_MACHINE_PAUSED;
-    case COMMON_SESSION_MACHINE_ERROR: return COMMON_MACHINE_ERROR;
-    case COMMON_SESSION_MACHINE_RESET_COMPLETED:
-        return COMMON_MACHINE_RESET_COMPLETED;
-    default: return COMMON_MACHINE_STOPPED;
-    }
-}
-
-static app_monitor_state app_command_state(common_session_machine_state state)
-{
-    switch (state) {
-    case COMMON_SESSION_MACHINE_INIT: return APP_MONITOR_INIT;
-    case COMMON_SESSION_MACHINE_RUNNING: return APP_MONITOR_RUNNING;
-    case COMMON_SESSION_MACHINE_PAUSED: return APP_MONITOR_PAUSED;
-    default: return APP_MONITOR_STOPPED;
-    }
-}
-
-static common_session_request app_session_request(app_lifecycle_request request)
-{
-    switch (request) {
-    case APP_LIFECYCLE_REQUEST_START: return COMMON_SESSION_REQUEST_START;
-    case APP_LIFECYCLE_REQUEST_RESUME: return COMMON_SESSION_REQUEST_RESUME;
-    case APP_LIFECYCLE_REQUEST_PAUSE: return COMMON_SESSION_REQUEST_PAUSE;
-    case APP_LIFECYCLE_REQUEST_STOP: return COMMON_SESSION_REQUEST_STOP;
-    case APP_LIFECYCLE_REQUEST_RESET: return COMMON_SESSION_REQUEST_RESET;
-    default: return COMMON_SESSION_REQUEST_NONE;
-    }
-}
-
-static app_lifecycle_request app_lifecycle_request_from_session(
-    common_session_request request)
-{
-    switch (request) {
-    case COMMON_SESSION_REQUEST_START: return APP_LIFECYCLE_REQUEST_START;
-    case COMMON_SESSION_REQUEST_RESUME: return APP_LIFECYCLE_REQUEST_RESUME;
-    case COMMON_SESSION_REQUEST_PAUSE: return APP_LIFECYCLE_REQUEST_PAUSE;
-    case COMMON_SESSION_REQUEST_STOP: return APP_LIFECYCLE_REQUEST_STOP;
-    case COMMON_SESSION_REQUEST_RESET: return APP_LIFECYCLE_REQUEST_RESET;
-    default: return APP_LIFECYCLE_REQUEST_NONE;
-    }
-}
-
-static void app_command_copy_effect(common_session_command_result *out,
-    const app_command_effect *effect)
-{
-    if (out == NULL || effect == NULL) return;
-    *out = (common_session_command_result) { 0 };
-    (void)snprintf(out->text, sizeof(out->text), "%s", effect->text);
-    out->exit_requested = effect->exit_requested != 0;
-    out->arm_prompt = effect->arm_prompt != 0;
-}
-
-static void app_command_provider_open(void *opaque,
-    common_session_command_result *out)
-{
-    app_command_binding *binding = (app_command_binding *)opaque;
-    app_command_effect effect = { 0 };
-    app_command_session_open(&binding->session, &effect);
-    app_command_copy_effect(out, &effect);
-}
-
-static void app_command_provider_reject_line(void *opaque,
-    common_session_command_result *out)
-{
-    app_command_binding *binding = (app_command_binding *)opaque;
-    app_command_effect effect = { 0 };
-    app_command_session_reject_line(&binding->session, &effect);
-    app_command_copy_effect(out, &effect);
-}
-
-static void app_command_provider_submit_line(void *opaque,
-    common_session_machine_state state, const char *line,
-    common_session_command_result *out)
-{
-    app_command_binding *binding = (app_command_binding *)opaque;
-    app_command_effect effect = { 0 };
-    app_command_session_submit_line(&binding->session, app_command_state(state), line,
-        &effect);
-    if (effect.action != APP_COMMAND_ACTION_NONE) {
-        int succeeded = effect.action == APP_COMMAND_ACTION_EJECT_FLOPPY ?
-            common_machine_set_removable_media(binding->machine, NULL) :
-            common_machine_set_removable_media(binding->machine, effect.path);
-        app_command_session_complete_floppy(&binding->session, effect.action,
-            succeeded, &effect);
-    }
-    app_command_copy_effect(out, &effect);
-    out->request = app_session_request(
-        app_command_session_take_request(&binding->session));
-}
-
-static lib_bool app_command_provider_begin_external(void *opaque,
-    common_session_machine_state state, common_session_request request)
-{
-    app_command_binding *binding = (app_command_binding *)opaque;
-    return app_command_session_begin_external(&binding->session,
-        app_command_state(state), app_lifecycle_request_from_session(request)) != 0;
-}
-
-static void app_command_provider_note_runtime(void *opaque,
-    common_session_machine_state prior, common_session_machine_state completed,
-    common_session_command_result *out)
-{
-    app_command_binding *binding = (app_command_binding *)opaque;
-    app_command_effect effect = { 0 };
-    app_command_session_note_runtime(&binding->session, app_command_state(prior),
-        app_machine_completed_state(completed), &effect);
-    app_command_copy_effect(out, &effect);
-}
-
-static void app_command_provider_note_broker(void *opaque,
-    common_session_machine_state state, lib_bool vm_console_current,
-    lib_bool monitor_running_surface)
-{
-    app_command_binding *binding = (app_command_binding *)opaque;
-    app_command_session_note_broker(&binding->session, app_command_state(state),
-        vm_console_current != 0, monitor_running_surface != 0);
-}
-
-static void app_command_provider_note_monitor_current(void *opaque,
-    lib_bool current, common_session_command_result *out)
-{
-    app_command_binding *binding = (app_command_binding *)opaque;
-    app_command_effect effect = { 0 };
-    app_command_session_note_monitor_current(&binding->session, current != 0,
-        &effect);
-    app_command_copy_effect(out, &effect);
-}
-
-static lib_bool app_command_provider_handle_hotkey(void *opaque,
-    common_session_machine_state state, const char *identifier,
-    common_session_command_result *out)
-{
-    app_command_binding *binding = (app_command_binding *)opaque;
-    common_session_request request = COMMON_SESSION_REQUEST_NONE;
-    *out = (common_session_command_result) { 0 };
-    if (identifier == NULL) return LIB_FALSE;
-    if (strcmp(identifier, "pause-toggle") == 0) {
-        request = state == COMMON_SESSION_MACHINE_PAUSED ?
-            COMMON_SESSION_REQUEST_RESUME : COMMON_SESSION_REQUEST_PAUSE;
-        if (!app_command_provider_begin_external(binding, state, request))
-            return LIB_TRUE;
-        out->request = request;
-        return LIB_TRUE;
-    }
-    if (strcmp(identifier, "release-window-mouse") == 0) {
-        out->release_window_mouse = LIB_TRUE;
-        return LIB_TRUE;
-    }
-    if (state != COMMON_SESSION_MACHINE_RUNNING) return LIB_TRUE;
-    if (strcmp(identifier, "send-ctrl-alt-del") == 0)
-        return app_keyboard_submit_ctrl_alt_del(binding->machine,
-            app_keyboard_deliver_input) != 0;
-    if (strcmp(identifier, "send-alt-enter") == 0)
-        return app_keyboard_submit_alt_enter(binding->machine,
-            app_keyboard_deliver_input) != 0;
-    return LIB_TRUE;
-}
 
 static void app_machine_state_completed(void *opaque, common_machine_state state,
     lib_u32 run_generation)
@@ -469,20 +297,14 @@ int main(int argc, char **argv)
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
     }
-    command_binding.machine = machine_runtime;
-    app_command_session_initialize(&command_binding.session, options.presentation);
     session_options.display = app_session_display(options.presentation);
     session_options.console_control = config.console_control != 0;
     session_options.machine = machine_runtime;
-    session_options.command.context = &command_binding;
-    session_options.command.open = app_command_provider_open;
-    session_options.command.reject_line = app_command_provider_reject_line;
-    session_options.command.submit_line = app_command_provider_submit_line;
-    session_options.command.begin_external = app_command_provider_begin_external;
-    session_options.command.note_runtime = app_command_provider_note_runtime;
-    session_options.command.note_broker = app_command_provider_note_broker;
-    session_options.command.note_monitor_current = app_command_provider_note_monitor_current;
-    session_options.command.handle_hotkey = app_command_provider_handle_hotkey;
+    if (app_command_binding_initialize(&command_binding, machine_runtime,
+            options.presentation, &session_options.command) != LIB_STATUS_OK) {
+        result = SOFTPC_MACHINE_IO_ERROR;
+        goto done;
+    }
     if (common_session_create(&session, &session_options) != LIB_STATUS_OK) {
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
@@ -511,6 +333,7 @@ int main(int argc, char **argv)
 done:
     if (result != SOFTPC_MACHINE_OK)
         fprintf(stderr, "softpcvm: %s\n", softpc_machine_result_name(result));
+    app_command_binding_dispose(&command_binding);
     common_machine_destroy(machine_runtime);
     app_machine_driver_destroy(machine_driver);
     (void)common_ui_destroy(ui);

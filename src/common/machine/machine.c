@@ -20,6 +20,12 @@ struct common_machine {
     host_sync_event *resume_event;
     host_sync_event *input_event;
     host_sync_event *media_event;
+    host_sync_event *debug_event;
+    common_machine_debug_request debug_request;
+    common_machine_debug_result debug_result;
+    common_machine_debug_lease debug_lease;
+    lib_status debug_status;
+    volatile LONG debug_requested;
     host_sync_task *worker;
     volatile LONG state;
     volatile LONG run_generation;
@@ -154,6 +160,22 @@ static void common_machine_service_media(common_machine *machine)
     host_sync_event_signal(machine->media_event);
 }
 
+/* The control thread submits one synchronous operation at a time. Only the
+ * existing executor calls the driver, including while parked in PAUSED. */
+static void common_machine_service_debug(common_machine *machine)
+{
+    if (InterlockedExchange(&machine->debug_requested, 0) == 0) return;
+    machine->debug_status = LIB_STATUS_INVALID_STATE;
+    memset(&machine->debug_result, 0, sizeof(machine->debug_result));
+    if (common_machine_state_get(machine) == COMMON_MACHINE_PAUSED &&
+        InterlockedCompareExchange(&machine->pause_requested, 0, 0) != 0 &&
+        machine->debug_lease.generation == (lib_u64)(lib_u32)
+            InterlockedCompareExchange(&machine->debug_generation, 0, 0))
+        machine->debug_status = machine->driver.execute_debug(
+            machine->driver.context, &machine->debug_request, &machine->debug_result);
+    host_sync_event_signal(machine->debug_event);
+}
+
 static void common_machine_executor_event(void *opaque)
 {
     common_machine *machine = (common_machine *)opaque;
@@ -179,6 +201,7 @@ static void common_machine_executor_event(void *opaque)
             else if (index == 1u) {
                 host_sync_event_reset(machine->command_event);
                 common_machine_service_media(machine);
+                common_machine_service_debug(machine);
             } else {
                 host_sync_event_reset(machine->input_event);
                 common_machine_drain_input(machine);
@@ -225,6 +248,7 @@ static void common_machine_worker(void *opaque, const host_sync_task *task)
         host_sync_event_reset(machine->command_event);
         if (InterlockedCompareExchange(&machine->terminate_requested, 0, 0) != 0)
             break;
+        common_machine_service_debug(machine);
         if (InterlockedCompareExchange(&machine->media_requested, 0, 0) != 0) {
             common_machine_service_media(machine);
             continue;
@@ -291,6 +315,7 @@ lib_status common_machine_create(common_machine **out_machine,
         host_sync_event_create(&machine->resume_event) != LIB_STATUS_OK ||
         host_sync_event_create(&machine->input_event) != LIB_STATUS_OK ||
         host_sync_event_create(&machine->media_event) != LIB_STATUS_OK ||
+        host_sync_event_create(&machine->debug_event) != LIB_STATUS_OK ||
         common_machine_input_queue_create(&machine->input_queue) != LIB_STATUS_OK ||
         (machine->frame_buffers[0] = calloc(1u, sizeof(*machine->frame_buffers[0]))) == NULL ||
         (machine->frame_buffers[1] = calloc(1u, sizeof(*machine->frame_buffers[1]))) == NULL) {
@@ -503,7 +528,15 @@ lib_status common_machine_debug_execute_with_lease(common_machine *machine,
     if (lease->generation == 0u || lease->generation != (lib_u64)(lib_u32)generation)
         return LIB_STATUS_INVALID_STATE;
     if (machine->driver.execute_debug == NULL) return LIB_STATUS_UNSUPPORTED;
-    return machine->driver.execute_debug(machine->driver.context, request, out_result);
+    machine->debug_request = *request;
+    machine->debug_lease = *lease;
+    host_sync_event_reset(machine->debug_event);
+    InterlockedExchange(&machine->debug_requested, 1);
+    host_sync_event_signal(machine->command_event);
+    if (host_sync_event_wait(machine->debug_event, UINT32_MAX) !=
+        HOST_SYNC_WAIT_SIGNALED) return LIB_STATUS_IO_ERROR;
+    *out_result = machine->debug_result;
+    return machine->debug_status;
 }
 
 void common_machine_destroy(common_machine *machine)
@@ -519,6 +552,7 @@ void common_machine_destroy(common_machine *machine)
     host_sync_event_destroy(machine->resume_event);
     host_sync_event_destroy(machine->input_event);
     host_sync_event_destroy(machine->media_event);
+    host_sync_event_destroy(machine->debug_event);
     common_machine_input_queue_destroy(machine->input_queue);
     if (machine->frame_lock_initialized)
         DeleteCriticalSection(&machine->frame_lock);
