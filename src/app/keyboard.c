@@ -1,6 +1,7 @@
 #include "keyboard.h"
 
 #include "common/machine/machine_interface.h"
+#include <string.h>
 
 int app_keyboard_deliver_input(void *context, const kvm_input_event *event)
 {
@@ -61,4 +62,31 @@ int app_keyboard_submit_alt_enter(void *context, kvm_input_sink sink)
         app_keyboard_emit(context, sink, 0x1cu, KVM_KEY_ENTER, 1) &&
         app_keyboard_emit(context, sink, 0x1cu, KVM_KEY_ENTER, 0) &&
         app_keyboard_emit(context, sink, 0x38u, KVM_KEY_ALT, 0);
+}
+
+lib_bool app_keyboard_handle_hotkey(common_machine *machine,
+    common_session_machine_state state, const char *identifier,
+    common_session_command_result *out)
+{
+    common_session_request request = COMMON_SESSION_REQUEST_NONE;
+    *out = (common_session_command_result) { 0 };
+    if (identifier == NULL) return LIB_FALSE;
+    if (strcmp(identifier, "pause-toggle") == 0) {
+        request = state == COMMON_SESSION_MACHINE_PAUSED ?
+            COMMON_SESSION_REQUEST_RESUME : COMMON_SESSION_REQUEST_PAUSE;
+        out->request = request;
+        return LIB_TRUE;
+    }
+    if (strcmp(identifier, "release-window-mouse") == 0) {
+        out->release_window_mouse = LIB_TRUE;
+        return LIB_TRUE;
+    }
+    if (state != COMMON_SESSION_MACHINE_RUNNING) return LIB_TRUE;
+    if (strcmp(identifier, "send-ctrl-alt-del") == 0)
+        return app_keyboard_submit_ctrl_alt_del(machine,
+            app_keyboard_deliver_input) != 0;
+    if (strcmp(identifier, "send-alt-enter") == 0)
+        return app_keyboard_submit_alt_enter(machine,
+            app_keyboard_deliver_input) != 0;
+    return LIB_TRUE;
 }

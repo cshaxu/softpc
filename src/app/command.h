@@ -2,6 +2,7 @@
 #define APP_COMMAND_H
 
 #include "common/machine/machine_interface.h"
+#include "common/debug/debug_interface.h"
 #include "common/session/session_interface.h"
 
 #define APP_COMMAND_TEXT_CAPACITY 2048u
@@ -59,5 +60,30 @@ void app_command_session_note_runtime(app_command_session *, app_monitor_state,
 void app_command_session_note_broker(app_command_session *, app_monitor_state,
     int vm, int monitor_running_surface);
 void app_command_session_note_monitor_current(app_command_session *, int, app_command_effect *);
+
+/* Product CLI state and callbacks; composition installs these directly. */
+/* The app chooses its CLI. Session continues owning dispatch and Console I/O. */
+typedef struct app_command_context {
+    app_command_session session;
+    common_machine *machine;
+    common_debug *debug;
+    lib_bool debug_active;
+    common_debug_result debug_completed;
+    lib_bool debug_completed_pending;
+    char debug_prompt[COMMON_DEBUG_PROMPT_CAPACITY];
+} app_command_context;
+
+lib_status app_command_initialize(app_command_context *, common_machine *, common_session_display);
+void app_command_dispose(app_command_context *);
+void app_command_provider_open(void *, common_session_command_result *);
+void app_command_provider_reject_line(void *, common_session_command_result *);
+void app_command_provider_submit_line(void *, common_session_machine_state,
+    const char *, common_session_command_result *);
+lib_bool app_command_provider_begin_external(void *, common_session_machine_state,
+    common_session_request);
+void app_command_provider_note_runtime(void *, common_session_machine_state,
+    common_session_machine_state, common_session_command_result *);
+void app_command_provider_note_broker(void *, common_session_machine_state, lib_bool, lib_bool);
+void app_command_provider_note_monitor_current(void *, lib_bool, common_session_command_result *);
 
 #endif

@@ -81,3 +81,48 @@ it is transferred to the package acceptance TODO. Final comparison confirms
 src/lib 94/94, src/common 36/36, test/lib 39/39 identical; test/common has 16
 paths and only the approved manifest differs. Source diff from a1c24ce is zero.
 Governance checker/self-tests and the real Common test manifest pass.
+
+## S2: Application composition (owner-admitted extension)
+
+Owner asks for a composition file integrating command and keyboard with
+Common session, then admits: “准入S任务。编译测试，提交推送，保持工作区干净”。
+The earlier no-src restriction applied to S1; S2 explicitly changes app only,
+plus product tests/build/design. Lib, Common, VM, Compat, MVDM and shared tests
+remain unchanged from 00d4461. T58 remains open after this S.
+
+Finite ledger: every command_binding function/state and every consumer.
+Command/debug/effect conversion moves into command; hotkey interpretation
+moves to keyboard; composition holds only provider wiring and the adapter
+that reserves command admission for a keyboard-derived lifecycle request.
+No duplicate dispatcher, extra thread, policy rewrite or new state is allowed.
+Main remains the sole VM consumer and owns entity construction; composition
+does not take over the VM. Remove command_binding C/H and all live references.
+Retain parser and debugger integration tests; extend provider-level hotkey
+coverage, enforce the single wiring boundary, and run both full-width suites.
+Complete executor commit/push then actual-diff review closes S2, not T58.
+
+## S2 executor evidence
+
+The former binding ledger is exhausted: seven provider callbacks and their
+debug/conversion helpers moved to command; hotkey interpretation moved to
+keyboard; provider registration and its single context/admission adapter are
+in composition. Main constructs the same entities. Old binding C/H are gone.
+No additional state, allocation, worker or dispatch queue was introduced.
+The adapter still reserves the original command transition before returning
+a CAP-derived request; rejected transitions return no request as before.
+
+Both package builds succeed. Serial full x64 tests pass 85/85 (53.31 s),
+x86 85/85 (61.74 s), including real debugger/provider integration, paused
+CAD/CAF suppression, CAM, CAP reservation, CLI policy and package tests.
+The existing debugger assertions remain; the renamed provider test additionally
+checks direct callback wiring. The source gate rejects retired binding files,
+policy interpretation in composition and hotkey registration elsewhere in app.
+Protected src/lib, src/common, src/vm, src/compat, src/mvdm, test/lib and
+test/common have zero diff from 00d4461; no INI or media changes.
+
+Accounting via git diff 00d4461 --numstat: src/app +335/-304 (net +31),
+primarily declarations required for direct provider wiring; product test C
++40/-24 (net +16), build CMake +8/-7, source-boundary gate +17/-0.
+No compatibility forwarding implementation remains. Package SHA256:
+softpc32.exe CF7A8B9096361EBEF02C711E7023C3D9A87B37F5B13A00F3B288408A9F145EEC;
+softpc64.exe 427AEF45CCD85FD4DB001A22464FFD727D9DE964FFBCA53BA457F2FE1CF10E30.

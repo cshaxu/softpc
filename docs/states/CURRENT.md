@@ -2,11 +2,28 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T58.
-T58 S1 is closed after import, manifest correction and dual-width verification.
-T58 remains open for owner testing; no S2 or next T is admitted.
-See [S1 acceptance](../history/M9-T58-S1-common-test-sync.md).
+T58 S1 is closed; owner admits S2 application composition refactor.
+
+## M9 T58 S2 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approves composition/command/keyboard separation, dual builds/tests and commit/push. |
+| Objective | Remove command_binding; command owns CLI/debug, keyboard owns hotkeys, composition only wires Common providers. |
+| Non-goals | No Lib/Common/VM/Compat/MVDM/shared-test or product semantic change. |
+| Reference Baseline | 00d4461, S1 full x64/x86 85/85. |
+| Candidate Proposal | [Scope and ledger](../proposals/m9-common-test-sync.md). |
+| Files And ABI Surface | app, product tests/CMake and current design; Common ABI unchanged. |
+| Applicable Rules | Architecture, coding, execution, documentation and their linked skills. |
+| Verification | CLI/debug/hotkey provider tests, boundary gate, dual full suites, protected roots zero diff. |
+| Expected Markers | No command_binding implementation; one composition registration; unchanged policy. |
+| Asset Needs | Both fixed EXEs; bounded ignored build logs; no INI/media edits. |
+| Reporting Requirements | Complete P push, actual-diff acceptance, clean worktree; T remains open. |
+| Stop Conditions | Product policy or protected source change needed. |
+| Exit Criteria | Ledger completed, tests/builds and governance pass, commit/push, S2 acceptance. |
+| Original Owner Request | composition集成command和keyboard到common/session；准入S，编译测试提交推送保持干净。 |
+| Similar-Issue Sweep | Every old binding function, state, include, test and build consumer. |
 
 ## Current Technical Baseline
 

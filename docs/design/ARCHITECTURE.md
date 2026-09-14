@@ -38,6 +38,9 @@ configuration or interpret machine internals. `common/ui` is the sole owner
 of the monitor logical Console, broker, raw VM Console and Window/KVM
 instances; it receives only copied product policy and returns copied events.
 `app/` owns configuration, entity assembly and the SoftPC CLI/hotkey binding.
+Within app, command owns CLI/debug semantics, keyboard owns hotkey semantics,
+and composition wires their callbacks into Common session. Composition does
+not parse commands or hotkey identifiers and holds no independent state.
 Only app/main.c consumes vm/vm_interface.h; no app source consumes Compat or
 MVDM. `vm/` owns the concrete machine driver, frame/input conversion and debug
 adapter. Its implementation calls Compat and the original machine while its
@@ -68,7 +71,7 @@ The control thread serializes lifecycle, media and synchronous debug requests.
 Debug requests are copied into the machine's existing command rendezvous and
 executed by the parked executor, never by the calling frontend. The machine
 checks paused state and the lease again there; callbacks must not synchronously
-reenter this control-thread API. `app/command_binding` owns debugger selection
+reenter this control-thread API. `app/command` owns debugger selection
 and copied prompts; machine state changes do not select or exit the CLI.
 
 T56's owner-approved debug port adds observation calls at original CCPU

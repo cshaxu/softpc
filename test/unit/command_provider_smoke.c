@@ -1,4 +1,4 @@
-#include "app/command_binding.h"
+#include "app/composition.h"
 #include "vm/driver.h"
 
 #include <windows.h>
@@ -562,7 +562,7 @@ static void trace_cli(common_machine *machine, common_machine_debug_lease *lease
 
 int main(void)
 {
-    const char *path = "debug-binding-smoke.img";
+    const char *path = "debug-commands-smoke.img";
     unsigned char sector[512] = { 0xeb, 0xfe };
     FILE *file;
     softpc_machine_options options = { .floppy_path = path,
@@ -572,7 +572,7 @@ int main(void)
     vm_driver *adapter = NULL;
     common_machine_driver driver = { 0 };
     common_machine *machine = NULL;
-    app_command_binding binding = { 0 };
+    app_command_context commands = { 0 };
     common_session_command_provider provider = { 0 };
     common_session_command_result result = { 0 };
     common_machine_debug_lease lease;
@@ -599,23 +599,35 @@ int main(void)
     driver.copy_frame = observe_program;
     assert(common_machine_create(&machine, &driver) == LIB_STATUS_OK);
     common_machine_set_state_sink(machine, note_state, &events);
-    assert(app_command_binding_initialize(&binding, machine,
+    assert(app_composition_initialize(&commands, machine,
         options.presentation, &provider) == LIB_STATUS_OK);
+    /* Exercise the actual composed provider, not a second hotkey dispatcher. */
+    assert(provider.context == &commands && provider.open == app_command_provider_open);
+    assert(provider.submit_line == app_command_provider_submit_line);
+    assert(provider.begin_external == app_command_provider_begin_external);
+    assert(provider.handle_hotkey(provider.context, COMMON_SESSION_MACHINE_PAUSED,
+        "send-ctrl-alt-del", &result) && result.request == COMMON_SESSION_REQUEST_NONE);
+    assert(provider.handle_hotkey(provider.context, COMMON_SESSION_MACHINE_PAUSED,
+        "send-alt-enter", &result) && result.request == COMMON_SESSION_REQUEST_NONE);
+    assert(provider.handle_hotkey(provider.context, COMMON_SESSION_MACHINE_PAUSED,
+        "release-window-mouse", &result) && result.release_window_mouse);
+    assert(!provider.handle_hotkey(provider.context, COMMON_SESSION_MACHINE_PAUSED,
+        NULL, &result));
     for (index = 0u; index < sizeof(inactive) / sizeof(inactive[0]); ++index) {
         submit(&provider, inactive[index], "debug", &result);
-        assert(binding.debug_active && result.request == COMMON_SESSION_REQUEST_NONE);
-        provider.note_monitor_current(&binding, LIB_TRUE, &result);
+        assert(commands.debug_active && result.request == COMMON_SESSION_REQUEST_NONE);
+        provider.note_monitor_current(&commands, LIB_TRUE, &result);
         assert(result.arm_prompt && strcmp(result.prompt, "-") == 0);
         submit(&provider, inactive[index], "?", &result);
         assert(strstr(result.text, "assemble") != NULL);
         submit(&provider, inactive[index], "r", &result);
-        assert(strstr(result.text, "must be paused") != NULL && binding.debug_active);
+        assert(strstr(result.text, "must be paused") != NULL && commands.debug_active);
         submit(&provider, inactive[index], "q", &result);
-        assert(!binding.debug_active && common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
+        assert(!commands.debug_active && common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
     }
     assert(common_machine_reset(machine));
     wait_for(events.paused);
-    provider.note_runtime(&binding, COMMON_SESSION_MACHINE_INIT,
+    provider.note_runtime(&commands, COMMON_SESSION_MACHINE_INIT,
         COMMON_SESSION_MACHINE_RESET_COMPLETED, &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "debug", &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "r", &result);
@@ -627,7 +639,7 @@ int main(void)
             .register_id = COMMON_DEBUG_EAX }, &value) == LIB_STATUS_OK);
     saved_eax = value.value;
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "r ax", &result);
-    provider.note_monitor_current(&binding, LIB_TRUE, &result);
+    provider.note_monitor_current(&commands, LIB_TRUE, &result);
     assert(result.arm_prompt && strcmp(result.prompt, ":") == 0);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "1234", &result);
     assert(common_machine_debug_execute_with_lease(machine, &lease,
@@ -643,7 +655,7 @@ int main(void)
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "u f000:fff0", &result);
     assert(strstr(result.text, "F000:FFF0") != NULL);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "a 0:510", &result);
-    provider.note_monitor_current(&binding, LIB_TRUE, &result);
+    provider.note_monitor_current(&commands, LIB_TRUE, &result);
     assert(result.arm_prompt && strcmp(result.prompt, "assemble> ") == 0);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "nop", &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "", &result);
@@ -655,24 +667,28 @@ int main(void)
     /* With A20 wrapping enabled this is the last ROM byte, not an invalid
      * host pointer. The original SAS bus, not host RAM bounds, decides. */
     assert(strstr(result.text, "failed") == NULL);
-    assert(provider.handle_hotkey(&binding, COMMON_SESSION_MACHINE_PAUSED,
+    assert(provider.handle_hotkey(&commands, COMMON_SESSION_MACHINE_PAUSED,
         "pause-toggle", &result));
-    assert(binding.debug_active && result.request == COMMON_SESSION_REQUEST_RESUME);
+    assert(commands.debug_active && result.request == COMMON_SESSION_REQUEST_RESUME);
+    /* A second CAP cannot bypass the command transition reservation. */
+    assert(provider.handle_hotkey(&commands, COMMON_SESSION_MACHINE_PAUSED,
+        "pause-toggle", &result));
+    assert(result.request == COMMON_SESSION_REQUEST_NONE);
     assert(common_machine_resume(machine));
     wait_for(events.running);
-    provider.note_runtime(&binding, COMMON_SESSION_MACHINE_PAUSED,
+    provider.note_runtime(&commands, COMMON_SESSION_MACHINE_PAUSED,
         COMMON_SESSION_MACHINE_RUNNING, &result);
     submit(&provider, COMMON_SESSION_MACHINE_RUNNING, "r", &result);
-    assert(strstr(result.text, "must be paused") != NULL && binding.debug_active);
+    assert(strstr(result.text, "must be paused") != NULL && commands.debug_active);
     submit(&provider, COMMON_SESSION_MACHINE_RUNNING, "q", &result);
     submit(&provider, COMMON_SESSION_MACHINE_RUNNING, "debug", &result);
-    assert(binding.debug_active && common_machine_state_get(machine) == COMMON_MACHINE_RUNNING);
-    assert(provider.handle_hotkey(&binding, COMMON_SESSION_MACHINE_RUNNING,
+    assert(commands.debug_active && common_machine_state_get(machine) == COMMON_MACHINE_RUNNING);
+    assert(provider.handle_hotkey(&commands, COMMON_SESSION_MACHINE_RUNNING,
         "pause-toggle", &result));
     assert(result.request == COMMON_SESSION_REQUEST_PAUSE);
     assert(common_machine_pause(machine));
     wait_for(events.paused);
-    provider.note_runtime(&binding, COMMON_SESSION_MACHINE_RUNNING,
+    provider.note_runtime(&commands, COMMON_SESSION_MACHINE_RUNNING,
         COMMON_SESSION_MACHINE_PAUSED, &result);
     assert(common_machine_debug_execute_with_lease(machine, &lease,
         &(common_machine_debug_request){0}, &value) == LIB_STATUS_INVALID_STATE);
@@ -693,7 +709,7 @@ int main(void)
         .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_BREAK_LINEAR, .address = 0x12345678u });
     assert(common_machine_reset(machine));
     wait_for(events.paused);
-    provider.note_runtime(&binding, COMMON_SESSION_MACHINE_PAUSED,
+    provider.note_runtime(&commands, COMMON_SESSION_MACHINE_PAUSED,
         COMMON_SESSION_MACHINE_RESET_COMPLETED, &result);
     assert(common_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
     assert(!access(machine, &lease, (common_machine_debug_request){
@@ -708,24 +724,24 @@ int main(void)
     setreg(machine, &lease, COMMON_DEBUG_CS, 0u);
     setreg(machine, &lease, COMMON_DEBUG_EIP, 0x520u);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "g", &result);
-    assert(result.request == COMMON_SESSION_REQUEST_RESUME && binding.debug_active);
+    assert(result.request == COMMON_SESSION_REQUEST_RESUME && commands.debug_active);
     assert(common_machine_resume(machine));
     wait_for(events.running);
     wait_for(program_completed);
-    provider.note_runtime(&binding, COMMON_SESSION_MACHINE_PAUSED,
+    provider.note_runtime(&commands, COMMON_SESSION_MACHINE_PAUSED,
         COMMON_SESSION_MACHINE_RUNNING, &result);
     assert(common_machine_stop(machine));
     wait_for(events.stopped);
     submit(&provider, COMMON_SESSION_MACHINE_STOPPED, "q", &result);
-    provider.note_monitor_current(&binding, LIB_TRUE, &result);
+    provider.note_monitor_current(&commands, LIB_TRUE, &result);
     assert(result.arm_prompt && strcmp(result.prompt, "SoftPC> ") == 0);
-    app_command_binding_dispose(&binding);
+    app_command_dispose(&commands);
     common_machine_destroy(machine);
     vm_driver_destroy(adapter);
     softpc_machine_destroy(product);
     assert(remove(path) == 0);
     CloseHandle(events.paused); CloseHandle(events.running); CloseHandle(events.stopped);
     CloseHandle(program_completed);
-    puts("debug binding: four-state CLI, real registers/memory, CAP and errors passed");
+    puts("debug commands: four-state CLI, real registers/memory, CAP and errors passed");
     return 0;
 }

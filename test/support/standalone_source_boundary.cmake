@@ -113,6 +113,8 @@ foreach(app_source IN ITEMS
     endif()
 endforeach()
 foreach(retired_machine_source IN ITEMS
+    "src/app/command_binding.c"
+    "src/app/command_binding.h"
     "src/app/machine_driver.c"
     "src/app/machine_driver.h"
     "src/app/prompt_trace.c"
@@ -483,6 +485,21 @@ foreach(source IN LISTS standalone_owner_sources)
     string(REPLACE "softpc_host_require_status" "" owner_source "${owner_source}")
     if(owner_source MATCHES "(^|[^[:alnum:]_])softpc_[A-Za-z0-9_]+")
         message(FATAL_ERROR "Standalone application retains an unowned softpc_ symbol: ${source}")
+    endif()
+endforeach()
+
+# Product provider registration has one policy-free composition boundary.
+file(READ "${SOFTPC_SOURCE_DIR}/src/app/composition.c" composition_source)
+if(composition_source MATCHES "strcmp|common_debug_|pause-toggle|send-ctrl-alt-del|send-alt-enter")
+    message(FATAL_ERROR "Composition must not interpret commands, hotkeys or debugger policy")
+endif()
+file(GLOB app_provider_sources "${SOFTPC_SOURCE_DIR}/src/app/*.c")
+foreach(source IN LISTS app_provider_sources)
+    if(NOT source MATCHES "/composition\\.c$")
+        file(READ "${source}" contents)
+        if(contents MATCHES "\\.handle_hotkey[ \t]*=")
+            message(FATAL_ERROR "Only composition may register the product hotkey provider")
+        endif()
     endif()
 endforeach()
 

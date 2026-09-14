@@ -1,6 +1,6 @@
 #include "command.h"
 #include "config.h"
-#include "command_binding.h"
+#include "composition.h"
 #include "common/session/session_interface.h"
 #include "common/machine/machine_interface.h"
 #include "vm/vm_interface.h"
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
     common_ui *ui = NULL;
     common_ui_options common_options = { 0 };
     common_session_options session_options = { 0 };
-    app_command_binding command_binding = { 0 };
+    app_command_context commands = { 0 };
     kvm_hotkey_registry hotkeys;
     char graphics_console_status[APP_COMMAND_TEXT_CAPACITY];
     common_session *session = NULL;
@@ -102,7 +102,7 @@ int main(int argc, char **argv)
     session_options.display = config.presentation;
     session_options.console_control = config.console_control != 0;
     session_options.machine = machine_runtime;
-    if (app_command_binding_initialize(&command_binding, machine_runtime,
+    if (app_composition_initialize(&commands, machine_runtime,
             config.presentation, &session_options.command) != LIB_STATUS_OK) {
         result = LIB_STATUS_IO_ERROR;
         goto done;
@@ -136,7 +136,7 @@ done:
     if (result != LIB_STATUS_OK)
         fprintf(stderr, "softpcvm: %s\n", result == LIB_STATUS_INVALID_ARGUMENT ?
             "invalid argument or media" : "host I/O error");
-    app_command_binding_dispose(&command_binding);
+    app_command_dispose(&commands);
     common_machine_destroy(machine_runtime);
     (void)common_ui_destroy(ui);
     (void)common_session_destroy(session);

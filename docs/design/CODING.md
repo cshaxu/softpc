@@ -20,7 +20,7 @@ src/
   lib/{types,console,host,storage,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
   app/
-    main.c, config.c, command.c, command_binding.c, keyboard.c, firmware.rc
+    main.c, config.c, command.c, composition.c, keyboard.c, firmware.rc
 ```
 
 Directories appear only in their admitted migration task.
@@ -52,6 +52,10 @@ transformed C/H files are not build inputs. `compat` owns original host
 callbacks and larger functional adaptations. `vm` owns the injected SoftPC
 driver, guest-input/frame conversion, debug adaptation and diagnostic trace.
 `app` owns configuration, entity assembly and product CLI/hotkey policy.
+`command` owns monitor/debug state and command callbacks; `keyboard` owns
+hotkey interpretation and input sequences. `composition` installs their one
+Common provider and coordinates request admission without interpreting input.
+It has no separate state, command table or debugger. Main owns VM assembly.
 Only app/main.c may include vm/vm_interface.h; no app file may include Compat
 or MVDM, and no other app file may include VM. VM's public header exposes only
 copied options, opaque identity and existing Common/Lib contracts. Compat
