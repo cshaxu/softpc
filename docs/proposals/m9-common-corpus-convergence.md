@@ -196,6 +196,97 @@ U/XU、文件 L/W、异步 observation、续行 prompt 和原有全局地址记�
 这些返回 unsupported 的能力仍须后续明确准入，不能以本 S 的 CLI 接通
 宣称全部 DEBUG 命令已实现。
 
+### 后续 S10–S12：调试机器能力完成设计
+
+原始请求：
+> 你得告诉我哪些操作没有安全接线，怎样才能安全接通而不是半途而废？
+> 准入，请你设计一下。是否需要加开S任务？
+
+以 S9 P5 `d193638` 为设计基线，继续 T56，不新开 T，不扩大 S9。
+本轮批准设计和后续顺序；S9 当前等待反馈，未自动宣布收口，也不同时
+激活 S10。以下为后续实施简报，进入实施时须更新唯一 CURRENT packet。
+
+#### 共同契约
+
+- 沿用 copied debug request/result、暂停 executor rendezvous 和现有
+  session control queue，不增加 debugger worker、CPU 副本或第二消息通路。
+- CLI 始终独立于机器状态。同步访问只在 PAUSED 执行；异步 trace/break
+  是安装计划后恢复唯一 executor，完成才发事件，不能让 control 阻塞等停点。
+- 原始 CPU/device 是唯一语义所有者；产品 adapter 复用其函数。common
+  只表达请求和完成，不 include MVDM。lib 不变。
+- 每一项 unsupported 必须区分架构不支持与尚未接通。后者不能靠拒绝测试
+  宣称完成；若必须改 MVDM，列出准确挂钩、调用频率、异常行为和最窄
+  port-ABI diff，等单独批准。此次设计不是修改保留源码的授权。
+- 全集继续采用 17 种 debug operation，另按寄存器 ID、地址模式、执行
+  计划种类逐项细分。结案只接受真实通过、架构不适用（说明依据）、owner
+  批准延期；实现困难不自动转成永久 unsupported。
+
+#### S10：同步机器访问完成
+
+范围：`host/debug.c`、产品 driver、必要的 common debug request 字段及
+调用者、测试。复用当前通用 executor，不改变生命周期或 UI。
+
+1. CPU snapshot：在一次 executor 请求中复制段缓存、表寄存器和控制
+   寄存器；验证读快照不加载描述符、不修改 CPU。不能仅从 selector 推算缓存。
+2. 特殊寄存器写：复用原 setter，分别验证 EIP/EFLAGS、段加载、CR 写入
+   的失败和后续执行；不直接写全局状态。非法 selector 不伪成功，CR1 等
+   架构不存在项继续明确拒绝。逐项确认 setter 的返回及异常边界。
+3. 端口：给现有请求明确访问宽度，标准 I/O 命令固定 byte；扩展命令只
+   按实际已有语法支持，不新增猜测。调用原设备分发，验证一次请求仅有
+   一次预期副作用，不能失败后自动重试端口读取/写入。
+4. 内存：明确 real segment:offset 与 linear 的地址契约；复用原有
+   `xtrn2phy` 候选接口前核对权限及 accessed/dirty 行为，按页拆分，
+   不产生客户机 #PF、不误改 CR2。RAM、ROM、显存/A20 分别核对已有
+   访问入口。跨页写先验证可验证部分，不承诺设备副作用可回滚；失败
+   返回须明确，禁止将部分成功冒充整请求成功。
+
+退出：寄存器写后恢复执行、快照无副作用、端口宽度/次数、分页跨页与
+未映射/只读/特殊区域均有真实 adapter 测试；同步调用仍只在 executor。
+交付双 EXE，可测试 R/寄存器修改、D/E/A/U、I/O；明确具体支持矩阵。
+
+#### S11：单步、执行断点及完成通知
+
+先验证当前构建实际启用的逐指令挂钩：`c_main.c` 的 `check_I`、相关
+stub、异常路径和编译条件；仅发现函数名不算可用停点。不得用帧回调、
+定时器、另起 CPU 循环或客户机 TF/#DB 冒充宿主调试。
+
+沿用 execution plan，产品 adapter 唯一拥有正在执行的计划及结果。
+安装成功后经 session 派发 resume；真正达到停点后，executor 在安全
+指令边界停下，machine 投递 copied debug completion（原因、位置、
+执行数及现有 run 身份）。session 消费后经注入 provider 通知 debug，
+debug 生成文本/后续请求；不得在 CPU callback 中输出或重入同步 API。
+GET_EXECUTION_RESULT 查询同一结果，不保留第二状态副本。
+
+定义并测试：trace 计数的指令完成边界、REP/异常/中断；断点停在目标
+指令执行前；从断点继续不能原地无限再命中。CAP/stop/reset/q 对未完成
+计划统一取消，清理归 adapter；迟到完成不得恢复机器或污染新 CLI/run。
+无计划的 CLEAR 幂等，取消不得留下补丁字节或占用客户机 DR/TF。
+
+退出：真实小程序证明 T 精确执行、G 到目标停止、取消/复位无遗留、
+guest 自身调试机制不变；fake completion barrier 证明事件时序与拒绝。
+若现有挂钩不足，停止相关实现并给出 port-ABI 决策，不用轮询替代。
+交付双 EXE，可测试 T、带地址 G 和 CAP 取消；CLI 始终保持可用。
+
+#### S12：watchpoint 与整体调试验收
+
+复用 S11 的停止/结果/取消路径，只增加原执行/内存访问边界的观察。
+SET/CLEAR/GET_WATCH 共用 adapter 一份登记表；公共接口按现有单地址
+语义处理跨字节重叠，不预造任意范围容器。read/write/execute 的触发点
+及命中信息明确；CPU 访问与 debugger 自己读取必须区分，调试检查
+不能触发自己。DMA/设备访问是否在原命令承诺内须先核对，不能暗中
+声称覆盖所有物理访问。保留客户机 DR0–DR7 的原有功能。
+
+退出：真实读写/执行各命中一次，未命中正常运行，查询/清除一致，
+debugger 读取不自触发；CAP、q、stop/reset 清理和迟到事件复用 S11
+测试。全集每项有命令级正反例，未接项必须获得明确延期决定。
+交付双 EXE，运行完整 monitor/debug、DOS/Windows、CAP/X/resume、
+stop/start/reset 回归；不能只以新增单测通过宣布全部 debugger 可用。
+
+每个实施 S 均要求：确定性测试 + 真实 adapter/EXE 测试、x86/x64 全量
+回归、双 EXE/哈希、同类扫描、旧路径清理、提交推送和干净工作区。
+新增状态只允许服务于真实请求/完成所有权；不因本设计引入能力框架、
+额外线程、重复调度器或 lib 产品语义。
+
 ### S9 P5 交付证据
 
 2026-09-13：`cmake --build --preset tests-x64/tests-x86` 均成功；

@@ -7,6 +7,10 @@ monitor-spacing repair and connect the admitted common debug command path.
 S9 P5 is implemented and verified: x86/x64 each pass 63/63 tests, strict
 standalone lib passes 8/8, and both package EXEs are refreshed. Await owner
 testing; neither S9 nor T56 is closed by this delivery.
+Owner approved the follow-on debug capability design: S10 synchronous access,
+S11 execution control, S12 watchpoints and end-to-end acceptance, detailed in
+the linked proposal. These are sequential planned scopes, not concurrent active
+packets; S9 remains the sole active step pending feedback.
 
 ## M9 T56 S9 Packet
 
