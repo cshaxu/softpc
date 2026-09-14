@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 T59 S1 implementation passes both 86-test suites; delivery review and owner testing remain. T59 stays open.
+M9 T59 S1 P1 (2c05238) is pushed and reviewed; both 86-test suites pass. Awaiting owner testing; S1/T59 stay open.
 
 ## M9 T59 S1 Packet
 
