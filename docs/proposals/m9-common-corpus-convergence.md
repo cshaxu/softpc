@@ -888,6 +888,22 @@ history 记录 hash。现有 SoftPC adapter 未注册 debug executor，因此只
 x86/x64 全量 CTest 各 62/62，strict lib 8/8 通过；S7 package hashes 见
 S7 provenance record。
 
+## S16 coordinator review
+
+Reviewed executor commit `09d8c90` against `4cf8629`: the 43 structural moves
+retain their assertions; the mouse FIFO test removes only the product alias
+and uses the underlying Common queue directly. Both new test entry points
+link shared targets, not product resources. Common and Lib source verifiers
+remain source-owned; test registration and fixtures now have one external
+owner. The new physical-key regression covers both explicit-release orders,
+repeat, fallback key identity, unrelated source and repeated retirement.
+Only two production C files change (+6/-3); public headers are unchanged.
+The requested private `lib_size` cleanup is included. Four manifests and
+documentation gates pass after delivery. The recorded intermittent package
+stage-14 failure is not claimed repaired by this structural task; final
+dual-width full runs and bounded baseline/current comparisons passed.
+S16 is delivered for owner testing; T56 and its suspended S13 audit remain open.
+
 ## 每个 S 的退出条件
 
 1. 迁入职责在 SoftPC 生产路径实际使用（S6/S7 新能力按上表契约验收）；

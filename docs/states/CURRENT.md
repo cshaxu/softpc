@@ -8,7 +8,9 @@ T56 S15 is verified and delivered in `864a74f` / `4cf8629`.
 T56 S16 implementation is verified: Common physical-key identity corrected;
 shared tests relocated to test/common and test/lib. Both final product suites
 passed 79/79; four-directory isolation passed Lib 37/37 and Common 14/14.
-Executor commit/push and coordinator actual-diff review are next.
+Executor delivery `09d8c90` is pushed. Coordinator actual-diff review passed:
+existing test assertions retained, no public ABI change, no product-source
+dependency in the isolated shared suites. S16 is delivered for owner testing.
 T56 remains open; the suspended S13 whole-task audit is not claimed complete.
 
 ## M9 T56 S16 Packet
