@@ -2,31 +2,15 @@
 
 ## Current Work
 
-M9 T56 S11 is closed. S12 implementation is verified and awaiting the
-coordinator's actual-commit review under the owner's narrow MVDM approval:
-“批准对mvdm的小范围必要改动”. Both final packages passed 63/63; strict lib 8/8.
-Read/write/execute watches and copied observations now reach the real CPU/CLI.
+M9 T56 S12 is closed after implementation `edc7065` and coordinator review.
+No implementation subtask is active. T56 remains open for its separate T-level
+closure audit; the owner may test both refreshed packages asynchronously.
 
-## M9 T56 S12 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner: 非常好，准入实施，完成debug和xasm32彻底接通测试。 Sequential S10–S12 plan and permanent commit/push approval apply. |
-| Objective | Connect read/write/execute watches and copied access observations; audit all 17 debug operations and command consumers, remove remaining unconnected paths, and verify both packages. |
-| Non-goals | No second executor, lib changes, guest media edits, direct common-to-MVDM dependencies or unapproved preserved-source changes. S11/S12 own execution plans/watchpoints. |
-| Reference Baseline | S11 delivery 8feab8b and its reviewed closure; approved follow-on design f4a8648. |
-| Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | Product debug adapter, copied machine results, debug consumers and tests; necessary original CPU operand notifications in c_page/c_main. No CPU algorithm or guest TF/DR changes. |
-| Applicable Rules | Execution, documentation, architecture, coding authorities and Product UI. |
-| Verification | Real read/write/execute watch hits, non-hits, overlap/fault/inspection isolation, query/clear, cancellation and command output; all debug operation ledger entries; dual-width full suites, strict lib and shipping package. |
-| Expected Markers | Single command/executor rendezvous; original CPU/device functions own behavior; no fake successful read or ignored rejection. |
-| Asset Needs | Refresh both fixed EXEs only; preserve user INI/media. Test-only disposable memory/program fixtures. |
-| Reporting Requirements | Every complete P committed/pushed; retain operation ledger, line accounting, tests and both EXE links. |
-| Stop Conditions | A missing safe boundary requiring MVDM change must be presented with exact evidence and a separate port-ABI approval; no guessed CPU semantics. |
-| Exit Criteria | Every operation and command path has actual positive/negative proof or explicit architectural non-applicability; watch/observation paths connected, dual-width tests/packages, review, commit/push and clean tree. Unsupported is not completion. |
-| Original Owner Request | 准入实施，完成debug和xasm32彻底接通测试。 |
-| Similar-Issue Sweep | Operand read/write families, access nesting, faults, debugger inspection, watch matching/retirement, remaining dormant public paths and CLI failure propagation. |
+Debug/xasm32 integration now has all 17 machine debug operations connected,
+including original-CPU trace/break/watch completion and copied operand records.
+Final x64/x86 suites passed 63/63 each; strict lib passed 8/8. Architectural
+CR1/CR4 non-applicability and the separately recorded x87 observation are not
+claimed fixed. See [S12 closure](../history/M9-T56-S12-debug-watch-integration.md).
 
 ## Current Technical Baseline
 
