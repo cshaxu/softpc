@@ -1,7 +1,7 @@
 # M9 T58 S5: Release Package Flags Acceptance
 
 Owner request: “okay, can you please investigate and fix this in a new S task.
-always reply in chinese”. The [proposal](../proposals/m9-common-test-sync.md)
+always reply in chinese”. The [proposal](M9-T58-common-test-sync-proposal.md)
 retains the finite ledger, cause evidence, verification and package hashes.
 
 Coordinator reviewed pushed executor 118734b against 5d213af. Exactly two

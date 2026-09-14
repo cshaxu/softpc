@@ -1,6 +1,6 @@
 # M9 T58 S2: App Composition Acceptance
 
-Owner request and finite ledger: [proposal](../proposals/m9-common-test-sync.md).
+Owner request and finite ledger: [proposal](M9-T58-common-test-sync-proposal.md).
 Executor delivery a472600 was committed and pushed before this actual-change
 review. This S closes; T58 remains open awaiting owner testing.
 

@@ -1,7 +1,7 @@
 # M9 T58 S4: Machine Shutdown And Ordered Disposal
 
 Owner approved the minimal synchronous shutdown design: “好的。批准。开始执行。”
-The [proposal ledger](../proposals/m9-common-test-sync.md) retains the scope,
+The [proposal ledger](M9-T58-common-test-sync-proposal.md) retains the scope,
 similar-issue sweep, implementation accounting and full verification evidence.
 
 Coordinator reviewed pushed executor 8dbe551 against f30b6c5, including the

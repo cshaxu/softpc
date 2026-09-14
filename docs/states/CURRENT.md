@@ -3,10 +3,9 @@
 ## Current Work
 
 No implementation subtask is active.
-Open task awaiting owner: T58.
-
-T58 S5 is closed after [Release preset acceptance](../history/M9-T58-S5-release-flags.md).
-No next subtask is admitted.
+T58 is closed on owner approval after the
+[whole-task audit](../history/M9-T58-completion-audit.md).
+No next task is admitted.
 
 ## Current Technical Baseline
 
@@ -47,6 +46,7 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T58 | Common test synchronization and owner-admitted App/build follow-ups closed; S1–S5 complete, dual-width 85/85. | [Whole-task audit](../history/M9-T58-completion-audit.md) |
 | T57 | App/config, VM and flat Compat refactor closed on owner approval; protected corpora unchanged, dual-width 85/85. | [S3 closure](../history/M9-T57-S3-completion-audit.md) |
 | T56 | Common extraction, debug integration and follow-up repairs closed on owner request after whole-task audit; known debts retained. | [S19 final audit](../history/M9-T56-S19-completion-audit.md) |
 | T55 | Canonical shared library refreshed, normalized, simplified, boundary-gated, and renamed to the KVM corpus; owner accepted final package testing. | [T55 closure](../history/M9-T55-closure-kvm-corpus.md) |

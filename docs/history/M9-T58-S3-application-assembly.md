@@ -2,7 +2,7 @@
 
 Original request: “准入一个s任务进行搬迁。” The owner-approved design moves
 entity assembly from main into composition, without new product behavior.
-The complete ledger and verification are in the [proposal](../proposals/m9-common-test-sync.md).
+The complete ledger and verification are in the [proposal](M9-T58-common-test-sync-proposal.md).
 
 Reviewed pushed executor commit 2c6a695 against 1cc141e: VM/options conversion,
 machine/session/UI creation, both machine completion callbacks, sink binding,

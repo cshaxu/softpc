@@ -1,6 +1,6 @@
 # M9 T58 S1: Common Test Sync Acceptance
 
-Original request and finite ledger: [proposal](../proposals/m9-common-test-sync.md).
+Original request and finite ledger: [proposal](M9-T58-common-test-sync-proposal.md).
 Owner approved S1 closure but explicitly requires T58 to remain open, and
 approved SoftPC as canonical after discovery of the upstream stale manifest.
 
