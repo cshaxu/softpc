@@ -2,30 +2,31 @@
 
 ## Current Work
 
-M9 T56 S4 is active: extract the generic executor, request/input queues,
-published frame and completion machinery into `common/machine`, while keeping
-the SoftPC driver and MVDM-specific behavior in the product adapter.
+M9 T56 S5 is active: audit and remove duplicate ownership or direct calls that
+bypass the admitted `common/ui`, `common/session` and `common/machine`
+boundaries, while retaining app and product-adapter responsibilities that
+legitimately call lib directly.
 
-## M9 T56 S4 Packet
+## M9 T56 S5 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner admitted T56 and authorizes automatic sequential S progression after each tested, reviewed and pushed delivery; async package testing does not block the next S. |
-| Objective | Move the generic executor lifecycle, lifecycle request queue, KVM input queue, run generation, complete-frame publication and completion sinks from `app/runtime` and `app/input_queue` into `common/machine`; retain exactly one SoftPC driver adapter for original machine operations. |
-| Non-goals | Do not change MVDM, guest input protocol, UI/session semantics, command vocabulary, lib behavior, deferred TODOs, owner configuration/media, or import debug/xasm32 yet. |
-| Reference Baseline | T56 S3 `cc60255`: `common/session` is the production control owner; x86/x64 58/58 and strict lib 8/8 passed, with refreshed dual package EXEs. |
+| Objective | Reconcile remaining app/host direct lib calls and resource ownership after UI/session/machine extraction: remove only duplicated or bypassing implementations; retain configuration, product media, trace and compatibility responsibilities at their true owner. Make app explicitly own product audio adapter lifecycle if the audit confirms the currently lazy path is a second production route. |
+| Non-goals | Do not change MVDM, guest input protocol, UI/session/machine behavior, command vocabulary, lib behavior, deferred TODOs, owner configuration/media, or import debug/xasm32 yet. |
+| Reference Baseline | T56 S4 `7946ce0`: common/machine is the production executor owner; x86/x64 59/59 and strict lib 8/8 passed, with refreshed dual package EXEs. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | New `src/common/machine` interface/implementation/CMake target and focused tests; moved/deleted generic `app/runtime` and `app/input_queue` ownership; explicit SoftPC machine driver adapter; `common/session` injected machine interface and fixed x86/x64 EXEs. |
+| Files And ABI Surface | S1 ledger entries for audio, media, configuration, trace and host adapters; their direct lib calls and lifecycle/CMake ownership; focused tests and static ownership gate as needed. No new general-purpose lib wrapper layer. |
 | Applicable Rules | Execution, architecture, coding, documentation authorities; Product UI; shared execution/architecture/coding/documentation governance skills. |
-| Verification | Existing runtime/restart/input-continuation/lifecycle/package tests must exercise `common/machine`; add deterministic driver fake coverage for request order, exactly-one executor/start/stop/join, one reset completion, run generation and stale input; static proof app has no generic executor/input queue; fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/DAG gates and diff hygiene. |
-| Expected Markers | `common/machine` is the sole generic request/input queue and executor owner; app owns only the injected SoftPC driver and guest input conversion; `common/session` requests machine work through one neutral adapter; no second runtime/input queue or executor exists. |
+| Verification | Start with a complete ownership/call inventory, then use focused lifecycle/media/trace/configuration coverage for any changed owner; static proof no common-managed broker/KVM/executor bypass remains; fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/DAG gates and diff hygiene. |
+| Expected Markers | App retains only configuration, entity assembly, product driver/CLI/adapter responsibilities; common-owned UI/session/machine resources have one implementation and one lifecycle route; no unnecessary forwarding wrappers exist. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe`; preserve adjacent user-owned INI and all media bytes. |
 | Reporting Requirements | P commit/push contains moved/deleted path ledger, tests, source/artifact hashes, x86/x64 EXE links and changed-path counts; user tests asynchronously. |
 | Stop Conditions | Stop and record a proposal/TODO if preserving an accepted driver/lifecycle behavior requires MVDM change, external source import, product-semantics decision, or a second executor/driver route. |
-| Exit Criteria | Common/machine runs the production executor path, old app generic runtime/input ownership is deleted, all named tests/gates and dual packages pass, review/push complete and EXE links reported. |
+| Exit Criteria | Every retained direct call has one recorded owner; every duplicate/bypass route is deleted or moved; audio lifecycle has one explicit owner if changed; all named tests/gates and dual packages pass, review/push complete and EXE links reported. |
 | Original Owner Request | 建立 common 组件并提取 debug、xasm32、session、UI、machine；CLI 注入 session，app 保持配置和实体组装；每个 S 删除旧实现并给可验收双 EXE，体验不变；手测异步进行。 |
-| Similar-Issue Sweep | All runtime/executor/input queue/lifecycle/reset/frame/run-generation and machine-driver paths, CMake/test sources, common/session adapter calls, startup/shutdown ownership, and every app runtime consumer. |
+| Similar-Issue Sweep | All app/host direct lib calls, thread/resource construction and destruction, CMake/test sources, media/configuration/trace contracts, common boundary crossings and every retained exception in the S1 ledger. |
 
 ## Current Technical Baseline
 
@@ -37,11 +38,13 @@ the SoftPC driver and MVDM-specific behavior in the product adapter.
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
   normalized `types`/`console`/`host`/`storage`/`kvm-*` corpus has S21 x64/x86
-  builds with 58/58 CTest;
+  builds with 59/59 CTest;
   strict standalone library gates pass 8/8. Its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 
 ## Recent M9 Closures
+
+| T56 S4 | Generic executor, lifecycle/input queues, run generation and completed-frame publication now belong to `common/machine`; app retains only its injected SoftPC driver. | [S4 closure](../history/M9-T56-S4-common-machine-extraction.md) |
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
