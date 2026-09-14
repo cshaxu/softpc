@@ -2,28 +2,11 @@
 
 ## Current Work
 
-M9 Td S14 is active: promote the Win3.1 display-roundtrip TODO to queue tail.
-
-## M9 Td S14 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Governance |
-| Admission And Approval | Owner requests Td proposal and queue-tail promotion only. |
-| Objective | Preserve the exact Win3.1 display defect in an unnumbered proposal and remove duplicate TODO ownership. |
-| Non-goals | No runtime investigation/fix, source/build/EXE change or numeric T allocation. |
-| Reference Baseline | e0c9ae3; T58 closed, XP candidate first, nine TODOs. |
-| Candidate Proposal | [Display roundtrip](../proposals/m9-win31-display-roundtrip.md). |
-| Files And ABI Surface | Proposal, Queue, TODO, Current and Td history; no ABI. |
-| Applicable Rules | Execution/document rules and their governance skills. |
-| Verification | Exact reproduction and scope preserved; XP remains first; eight unrelated TODOs unchanged; documentation gates. |
-| Expected Markers | Two queued candidates; defect still unresolved and unadmitted. |
-| Asset Needs | None; preserve all packages/config/media. |
-| Reporting Requirements | Commit/push delivery and reviewed Td closure with clean worktree. |
-| Stop Conditions | Implementation or new policy required. |
-| Exit Criteria | Linked proposal at queue tail, duplicate TODO removed, gates pass. |
-| Original Owner Request | 接下来 td治理：把todo里 修复windows msdos提示符显示异常的任务做成proposal加入队列 放在队尾 |
-| Similar-Issue Sweep | Queue/TODO ownership and links for this defect only; other debts remain separate. |
+No implementation subtask is active.
+T58 is closed on owner approval after the
+[whole-task audit](../history/M9-T58-completion-audit.md).
+[Td S14](../history/M9-Td-S14-win31-display-queue.md) promoted the Win3.1
+display-roundtrip defect to queue tail. No next task is admitted.
 
 ## Current Technical Baseline
 
