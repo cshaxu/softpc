@@ -60,6 +60,16 @@ compact-console stage 14 出现已记载的 DOS ver 可见性超时，后续全�
 保留 build/s18-*.log 的精简证据，删除任务自建独立构建和探针目录。
 Common/app/host/MVDM、用户 INI 与媒体均零改动，测试产物仅刷新双 EXE。
 
+#### S18 审查收口
+
+执行者 P1 09f0b38 已推送。切换审查角色检查实际 diff：唯一选择发生在
+worker/调用方公开前，notify 同时作为选择完成标记；Window 消息就绪点
+未改，Console 分配失败走原 dispose；两平台失败不留 wake，默认资源
+仍由原 destroy 单独负责。测试没有删除或放宽既有断言，新增测试能使
+旧实现失败。没有第二通知路径或产品行为改动。生产/测试计数与提交
+numstat 一致。接受本项有界修复，S18 收口待 owner 测试，T56 保持开放；
+compact-console 既有间歇症状明确保留，不属于本项已修复结论。
+
 ### T56 S17：Common 一致性与简化
 
 原始准入：“很好。我现在要你准入一个S任务修复以上common所有问题；
