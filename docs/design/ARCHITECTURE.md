@@ -93,6 +93,12 @@ the result through the paused rendezvous. No per-instruction frontend events,
 second executor or guest TF/DR ownership are introduced. CCPU refetches after
 the pause so edited CS:EIP/code/translation are observed. Cancellation uses the
 existing command wake; pause, stop/reset and debugger close clear the plan.
+CPU operand notifications in `c_page.c` copy successful accesses into the same
+driver-owned instruction record. Retirement commits watch hits; the next
+instruction boundary parks the executor. Three independent watch addresses and
+bounded copied observations use the existing result query, not a second event
+queue or instruction sink. Fault candidates are discarded before the next
+instruction; internal translation/device/debugger reads are outside this boundary.
 
 Shared KVM key events are copied `kvm_key`, physical scan, neutral injection
 flags, generic Ctrl/Alt/Shift state, and make/break values. Platform adapters

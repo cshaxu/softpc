@@ -278,6 +278,238 @@ static void execution_plans(common_machine *machine, common_machine_debug_lease 
     setreg(machine, lease, COMMON_DEBUG_EFLAGS, flags);
 }
 
+static void command_matrix(common_machine *machine, common_machine_debug_lease *lease,
+    common_session_command_provider *provider)
+{
+    common_session_command_result result;
+    common_machine_debug_result bytes;
+    const struct { const char *line, *contains; } commands[] = {
+        {"e 0:b00 12 34", ""}, {"f 0:b02 b03 56", ""},
+        {"m 0:b00 b03 0:b10", ""}, {"c 0:b00 b03 0:b10", ""},
+        {"s 0:b10 b13 12 34", "0000:0B10"}, {"d 0:b10 b13", "12 34 56 56"},
+        {"xe b20 90 90", ""}, {"xf b22 2 cc", ""}, {"xd b20 4", "90 90 CC CC"},
+        {"xm b20 b30 4", ""}, {"xc b20 b30 4", ""},
+        {"xs b30 4 90 90", "00000B30"}, {"xd b30 4", "90 90 CC CC"},
+        {"xa b40", ""}, {"nop", ""}, {"", ""},
+        {"xu b40 1", "NOP"}, {"xreg", "AX="}, {"xsreg", "CS"}, {"xcreg", "CR0"},
+        {"h 1 2", "0003"}, {"v", ""}, {"AB", "41 42"},
+        {"xw r b00", ""}, {"xw", "Watch-read"}, {"xw r", "removed"},
+        {"xw w b00", ""}, {"xw w", "removed"}, {"xw e b40", ""}, {"xw e", "removed"},
+        {"n debug-cli-transfer.bin", ""}, {"w 0:b00", "Writing"},
+        {"l 0:b50", ""}, {"d 0:b50 b53", "12 34 56 56"}
+    };
+    unsigned i;
+    setreg(machine, lease, COMMON_DEBUG_EBX, 0u);
+    setreg(machine, lease, COMMON_DEBUG_ECX, 4u);
+    for (i = 0; i < sizeof(commands)/sizeof(commands[0]); ++i) {
+        submit(provider, COMMON_SESSION_MACHINE_PAUSED, commands[i].line, &result);
+        assert(!strstr(result.text, "failed") && !strstr(result.text, "unsupported"));
+        assert(strstr(result.text, commands[i].contains));
+        assert(result.request == COMMON_SESSION_REQUEST_NONE);
+    }
+    bytes = access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0xb50u, .bytes = 4u });
+    assert(memcmp(bytes.data, "\x12\x34\x56\x56", 4u) == 0);
+    assert(remove("debug-cli-transfer.bin") == 0);
+    /* Invalid watch/register/plan requests cannot dispatch execution. */
+    submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xw w nonsense", &result);
+    assert(result.request == COMMON_SESSION_REQUEST_NONE);
+    assert(!access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_GET_WATCH, .watch_kind = COMMON_MACHINE_DEBUG_WATCH_WRITE }).enabled);
+    {
+        lib_u32 ip = reg(machine, lease, COMMON_DEBUG_EIP);
+        submit(provider, COMMON_SESSION_MACHINE_PAUSED, "g 0:800 nonsense", &result);
+        assert(result.request == COMMON_SESSION_REQUEST_NONE);
+        assert(reg(machine, lease, COMMON_DEBUG_EIP) == ip);
+        submit(provider, COMMON_SESSION_MACHINE_PAUSED, "t 0:800 nonsense", &result);
+        assert(result.request == COMMON_SESSION_REQUEST_NONE);
+        assert(reg(machine, lease, COMMON_DEBUG_EIP) == ip);
+        submit(provider, COMMON_SESSION_MACHINE_PAUSED, "t 0:800 0", &result);
+        assert(result.request == COMMON_SESSION_REQUEST_NONE);
+        assert(reg(machine, lease, COMMON_DEBUG_EIP) == ip);
+    }
+    assert(common_machine_debug_execute_with_lease(machine, lease,
+        &(common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_SET_WATCH,
+            .watch_kind = (common_machine_debug_watch_kind)3 }, &bytes) == LIB_STATUS_INVALID_ARGUMENT);
+}
+
+static void watchpoints(common_machine *machine, common_machine_debug_lease *lease,
+    completions *events, common_session_command_provider *provider)
+{
+    common_machine_debug_result value;
+    common_session_command_result output;
+    unsigned kind;
+    setreg(machine, lease, COMMON_DEBUG_CS, 0u);
+    setreg(machine, lease, COMMON_DEBUG_DS, 0u);
+    setreg(machine, lease, COMMON_DEBUG_EFLAGS, 2u);
+    /* word store, word load, loop. Watch the SECOND byte to prove overlap. */
+    (void)access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x800u, .bytes = 11u,
+        .data = { 0xc7,0x06,0x00,0x0a,0x34,0x12,0xa1,0x00,0x0a,0xeb,0xf5 } });
+    for (kind = 0u; kind < 3u; ++kind) {
+        lib_u32 target = kind == COMMON_MACHINE_DEBUG_WATCH_EXECUTE ? 0x806u : 0xa01u;
+        setreg(machine, lease, COMMON_DEBUG_EIP, 0x800u);
+        (void)access(machine, lease, (common_machine_debug_request){
+            .operation = COMMON_MACHINE_DEBUG_CLEAR_EXECUTION_PLAN });
+        value = access(machine, lease, (common_machine_debug_request){
+            .operation = COMMON_MACHINE_DEBUG_SET_WATCH, .watch_kind = kind, .address = target });
+        assert(value.enabled && value.value == target);
+        value = access(machine, lease, (common_machine_debug_request){
+            .operation = COMMON_MACHINE_DEBUG_GET_WATCH, .watch_kind = kind });
+        assert(value.enabled && value.value == target);
+        /* Inspection and debugger writes cannot self-trigger the watch. */
+        memory_word(machine, lease, 0xa00u, 0u);
+        (void)access(machine, lease, (common_machine_debug_request){
+            .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0xa00u, .bytes = 2u });
+        assert(!access(machine, lease, (common_machine_debug_request){
+            .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT }).enabled);
+        submit(provider, COMMON_SESSION_MACHINE_PAUSED, "g", &output);
+        assert(output.request == COMMON_SESSION_REQUEST_RESUME);
+        assert(common_machine_resume(machine));
+        wait_for(events->running);
+        provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_PAUSED,
+            COMMON_SESSION_MACHINE_RUNNING, &output);
+        wait_for(events->paused);
+        assert(common_machine_debug_acquire(machine, lease) == LIB_STATUS_OK);
+        value = access(machine, lease, (common_machine_debug_request){
+            .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT });
+        assert(value.enabled && value.observation.watch_hit);
+        assert(value.observation.watch_kind == kind && value.observation.watch_address == target);
+        assert(reg(machine, lease, COMMON_DEBUG_EIP) == (kind == 0u ? 0x809u : 0x806u));
+        if (kind < 2u) {
+            assert(value.observation.count == 1u);
+            assert(value.observation.accesses[0].data == 0x1234u);
+            assert(value.observation.accesses[0].bytes == 2u);
+        }
+        provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_RUNNING,
+            COMMON_SESSION_MACHINE_PAUSED, &output);
+        provider->note_monitor_current(provider->context, LIB_TRUE, &output);
+        assert(strstr(output.text, "Watch-") && strstr(output.text, " hit:"));
+        assert(output.request == COMMON_SESSION_REQUEST_NONE);
+        if (kind == COMMON_MACHINE_DEBUG_WATCH_EXECUTE) {
+            /* T from the just-hit execute watch must execute, not re-hit. */
+            run_plan(machine, lease, events, (common_machine_debug_request){
+                .operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
+                .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_TRACE,
+                .instruction_count = 1u }, 0x809u, 1u);
+            assert(!access(machine, lease, (common_machine_debug_request){
+                .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT }).observation.watch_hit);
+        }
+        (void)access(machine, lease, (common_machine_debug_request){
+            .operation = COMMON_MACHINE_DEBUG_CLEAR_WATCH, .watch_kind = kind });
+        assert(!access(machine, lease, (common_machine_debug_request){
+            .operation = COMMON_MACHINE_DEBUG_GET_WATCH, .watch_kind = kind }).enabled);
+    }
+    /* A non-overlapping watch must not stop the first store; trace does. */
+    setreg(machine, lease, COMMON_DEBUG_EIP, 0x800u);
+    (void)access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_SET_WATCH, .watch_kind = COMMON_MACHINE_DEBUG_WATCH_WRITE,
+        .address = 0xa02u });
+    run_plan(machine, lease, events, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
+        .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_TRACE, .instruction_count = 1u }, 0x806u, 1u);
+    value = access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT });
+    assert(!value.observation.watch_hit && value.observation.count == 1u);
+    submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xw u", &output);
+    assert(strstr(output.text, "All watch points removed"));
+    /* XT receives its observation through the same copied result, not a sink. */
+    setreg(machine, lease, COMMON_DEBUG_EIP, 0x800u);
+    submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xt", &output);
+    assert(output.request == COMMON_SESSION_REQUEST_RESUME);
+    assert(common_machine_resume(machine)); wait_for(events->running); wait_for(events->paused);
+    provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_RUNNING,
+        COMMON_SESSION_MACHINE_PAUSED, &output);
+    provider->note_monitor_current(provider->context, LIB_TRUE, &output);
+    assert(strstr(output.text, "Write: Lin=00000a00"));
+    assert(common_machine_debug_acquire(machine, lease) == LIB_STATUS_OK);
+}
+
+static void access_boundaries(common_machine *machine, common_machine_debug_lease *lease,
+    completions *events)
+{
+    common_machine_debug_request trace = {
+        .operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
+        .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_TRACE, .instruction_count = 1u };
+    common_machine_debug_result value;
+    /* Byte and dword operands; implicit stack; reverse-buffer x87 qword. */
+    const unsigned char program[] = {
+        0xa0,0x00,0x0a, 0x66,0xa1,0x00,0x0a, 0xa2,0x04,0x0a,
+        0x66,0xa3,0x04,0x0a, 0x50,0x58, 0xdb,0xe3, 0xdf,0x2e,0x00,0x0a,
+        0xdf,0x3e,0x10,0x0a };
+    const unsigned ends[] = {3,7,10,14,15,16,18,22,26};
+    const unsigned widths[] = {1,4,1,4,2,2,0,8,8};
+    unsigned i;
+    common_machine_debug_request write = { .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR,
+        .address = 0x800u, .bytes = sizeof(program) };
+    memcpy(write.data, program, sizeof(program));
+    (void)access(machine, lease, write);
+    /* Exactly representable by the recovered x87 implementation as well as
+     * the integer bus; this test checks observation, not FP precision. */
+    memory_word(machine, lease, 0xa00u, 0x1234u);
+    memory_word(machine, lease, 0xa04u, 0u);
+    setreg(machine, lease, COMMON_DEBUG_EIP, 0x800u);
+    setreg(machine, lease, COMMON_DEBUG_SS, 0u);
+    setreg(machine, lease, COMMON_DEBUG_ESP, 0x900u);
+    for (i = 0; i < sizeof(ends)/sizeof(ends[0]); ++i) {
+        run_plan(machine, lease, events, trace, 0x800u + ends[i], 1u);
+        value = access(machine, lease, (common_machine_debug_request){
+            .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT });
+        assert(value.observation.count == (widths[i] ? 1u : 0u));
+        if (!widths[i]) continue;
+        assert(value.observation.accesses[0].bytes == widths[i]);
+        if (i == 7u)
+            assert(value.observation.accesses[0].data == 0x0000123400001234ull);
+        if (i == 8u) {
+            lib_u64 stored;
+            common_machine_debug_result bytes = access(machine, lease,
+                (common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_READ_LINEAR,
+                    .address = 0xa10u, .bytes = 8u });
+            memcpy(&stored, bytes.data, sizeof(stored));
+            /* Observe exactly what this CPU wrote, including its possible
+             * x87 indefinite integer; do not turn this into an FPU rewrite. */
+            assert(value.observation.accesses[0].data == stored);
+        }
+    }
+    /* Observation capacity never limits watch matching: hit byte 39. */
+    (void)access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x800u,
+        .bytes = 2u, .data = {0xf3,0xaa} });
+    setreg(machine, lease, COMMON_DEBUG_EIP, 0x800u);
+    setreg(machine, lease, COMMON_DEBUG_ES, 0u);
+    setreg(machine, lease, COMMON_DEBUG_EDI, 0xa00u);
+    setreg(machine, lease, COMMON_DEBUG_ECX, 40u);
+    (void)access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_SET_WATCH,
+        .watch_kind = COMMON_MACHINE_DEBUG_WATCH_WRITE, .address = 0xa27u });
+    run_plan(machine, lease, events, trace, 0x802u, 1u);
+    value = access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT });
+    assert(value.observation.truncated && value.observation.count == 32u);
+    assert(value.observation.watch_hit && value.observation.watch_address == 0xa27u);
+    (void)access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_CLEAR_WATCH, .watch_kind = COMMON_MACHINE_DEBUG_WATCH_WRITE });
+    /* #UD's internal exception stack writes are not a completed instruction. */
+    memory_word(machine, lease, 24u, 0x700u);
+    setreg(machine, lease, COMMON_DEBUG_ESP, 0x900u);
+    setreg(machine, lease, COMMON_DEBUG_EIP, 0x800u);
+    (void)access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x800u,
+        .bytes = 2u, .data = {0x0f,0xff} });
+    (void)access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_SET_WATCH,
+        .watch_kind = COMMON_MACHINE_DEBUG_WATCH_WRITE, .address = 0x8ffu });
+    run_plan(machine, lease, events, trace, 0x701u, 1u);
+    value = access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT });
+    assert(!value.observation.watch_hit && value.observation.count == 0u);
+    common_machine_debug_cancel(machine);
+    /* Synchronous query is ordered after cancel on the same executor. */
+    assert(!access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_GET_WATCH,
+        .watch_kind = COMMON_MACHINE_DEBUG_WATCH_WRITE }).enabled);
+}
+
 static void trace_cli(common_machine *machine, common_machine_debug_lease *lease,
     completions *events, common_session_command_provider *provider)
 {
@@ -303,6 +535,29 @@ static void trace_cli(common_machine *machine, common_machine_debug_lease *lease
     }
     assert(common_machine_debug_acquire(machine, lease) == LIB_STATUS_OK);
     assert(reg(machine, lease, COMMON_DEBUG_EIP) == 0x702u);
+    (void)access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x700u,
+        .bytes = 3u, .data = {0x40,0xeb,0xfd} });
+    setreg(machine, lease, COMMON_DEBUG_EIP, 0x700u);
+    submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xg 701 2", &result);
+    assert(result.request == COMMON_SESSION_REQUEST_RESUME);
+    for (index = 0u; index < 2u; ++index) {
+        assert(common_machine_resume(machine)); wait_for(events->running);
+        provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_PAUSED,
+            COMMON_SESSION_MACHINE_RUNNING, &result);
+        wait_for(events->paused);
+        provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_RUNNING,
+            COMMON_SESSION_MACHINE_PAUSED, &result);
+        provider->note_monitor_current(provider->context, LIB_TRUE, &result);
+        assert(strstr(result.text, "instructions executed before the break point."));
+        assert(result.request == (index == 0u ? COMMON_SESSION_REQUEST_RESUME :
+            COMMON_SESSION_REQUEST_NONE));
+    }
+    assert(common_machine_debug_acquire(machine, lease) == LIB_STATUS_OK);
+    /* Restore the fault-handler fixture used by the operand tests. */
+    (void)access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x700u,
+        .bytes = 2u, .data = {0x90,0x90} });
 }
 
 int main(void)
@@ -394,16 +649,6 @@ int main(void)
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "", &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "d 0:510", &result);
     assert(strstr(result.text, "90") != NULL);
-    {
-        const common_machine_debug_operation unsupported[] = {
-            COMMON_MACHINE_DEBUG_SET_WATCH,
-            COMMON_MACHINE_DEBUG_CLEAR_WATCH, COMMON_MACHINE_DEBUG_GET_WATCH
-        };
-        for (index = 0u; index < sizeof(unsupported) / sizeof(unsupported[0]); ++index)
-            assert(common_machine_debug_execute_with_lease(machine, &lease,
-                &(common_machine_debug_request){ .operation = unsupported[index] },
-                &value) == LIB_STATUS_UNSUPPORTED);
-    }
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "i 60", &result);
     assert(strstr(result.text, "unsupported") == NULL && strstr(result.text, "failed") == NULL);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "xd ffffffff 1", &result);
@@ -436,7 +681,13 @@ int main(void)
     assert(common_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
     /* mov word [0600],1234; mov word [0602],5678; jmp $ */
     execution_plans(machine, &lease, &events);
+    command_matrix(machine, &lease, &provider);
     trace_cli(machine, &lease, &events, &provider);
+    watchpoints(machine, &lease, &events, &provider);
+    access_boundaries(machine, &lease, &events);
+    (void)access(machine, &lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_SET_WATCH, .watch_kind = COMMON_MACHINE_DEBUG_WATCH_READ,
+        .address = 0xa00u });
     (void)access(machine, &lease, (common_machine_debug_request){
         .operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
         .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_BREAK_LINEAR, .address = 0x12345678u });
@@ -447,6 +698,8 @@ int main(void)
     assert(common_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
     assert(!access(machine, &lease, (common_machine_debug_request){
         .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT }).enabled);
+    assert(!access(machine, &lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_GET_WATCH, .watch_kind = COMMON_MACHINE_DEBUG_WATCH_READ }).enabled);
     (void)access(machine, &lease, (common_machine_debug_request){
         .operation = COMMON_MACHINE_DEBUG_WRITE_REAL, .offset = 0x520u, .bytes = 14u,
         .data = { 0xc7,0x06,0x00,0x06,0x34,0x12,0xc7,0x06,0x02,0x06,0x78,0x56,0xeb,0xfe } });

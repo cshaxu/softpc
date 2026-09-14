@@ -131,13 +131,33 @@ int softpc_host_debug_begin(void)
 {
     softpc_debug_state *state = active_debug;
     lib_u32 address;
-    if (state == NULL || state->kind == COMMON_MACHINE_DEBUG_EXECUTION_NONE) return 0;
-    address = c_getCS_BASE() + c_getEIP();
-    if (state->skip_first) { state->skip_first = LIB_FALSE; return 0; }
-    if (!state->stop_pending &&
-        !(state->kind != COMMON_MACHINE_DEBUG_EXECUTION_TRACE && address == state->address))
+    lib_bool skip;
+    if (state == NULL) return 0;
+    if (state->kind == COMMON_MACHINE_DEBUG_EXECUTION_NONE && !state->stop_pending &&
+        !state->watches[0].enabled && !state->watches[1].enabled && !state->watches[2].enabled) {
+        state->in_instruction = LIB_FALSE;
         return 0;
+    }
+    address = c_getCS_BASE() + c_getEIP();
+    skip = state->skip_first && state->stopped_address == address;
+    state->skip_first = LIB_FALSE;
+    if (!state->stop_pending) {
+        state->observation = (common_machine_debug_observation) { 0 };
+        state->result_ready = LIB_FALSE;
+        if (!skip && state->watches[COMMON_MACHINE_DEBUG_WATCH_EXECUTE].enabled &&
+            state->watches[COMMON_MACHINE_DEBUG_WATCH_EXECUTE].address == address) {
+            state->observation.watch_hit = LIB_TRUE;
+            state->observation.watch_kind = COMMON_MACHINE_DEBUG_WATCH_EXECUTE;
+            state->observation.watch_address = address;
+        } else if (skip || state->kind < COMMON_MACHINE_DEBUG_EXECUTION_BREAK_REAL ||
+            address != state->address) {
+            state->in_instruction = LIB_TRUE;
+            return 0;
+        }
+    }
+    state->in_instruction = LIB_FALSE;
     state->stopped_address = address;
+    state->skip_first = LIB_TRUE;
     state->result_ready = LIB_TRUE;
     state->stop_pending = LIB_TRUE;
     state->kind = COMMON_MACHINE_DEBUG_EXECUTION_NONE;
@@ -148,10 +168,50 @@ int softpc_host_debug_begin(void)
 void softpc_host_debug_retired(void)
 {
     softpc_debug_state *state = active_debug;
-    if (state == NULL || state->kind == COMMON_MACHINE_DEBUG_EXECUTION_NONE) return;
+    if (state == NULL) return;
+    state->in_instruction = LIB_FALSE;
+    if (state->kind == COMMON_MACHINE_DEBUG_EXECUTION_NONE &&
+        !state->watches[0].enabled && !state->watches[1].enabled && !state->watches[2].enabled) return;
     if (state->executed != UINT32_MAX) ++state->executed;
     if (state->kind == COMMON_MACHINE_DEBUG_EXECUTION_TRACE &&
         state->executed >= state->target_count) state->stop_pending = LIB_TRUE;
+    if (state->observation.watch_hit) state->stop_pending = LIB_TRUE;
+}
+
+/* CCPU copied operand notification. Never read memory again for tracing. */
+void softpc_host_debug_access(unsigned long address, unsigned long bytes,
+    int write, const unsigned char *data, int reversed)
+{
+    softpc_debug_state *state = active_debug;
+    common_machine_debug_observation *record;
+    common_machine_debug_watch_kind kind = write ? COMMON_MACHINE_DEBUG_WATCH_WRITE :
+        COMMON_MACHINE_DEBUG_WATCH_READ;
+    lib_u32 index;
+    lib_u64 value = 0;
+    if (state == NULL || !state->in_instruction || bytes == 0u) return;
+    record = &state->observation;
+    if (state->watches[kind].enabled &&
+        (lib_u32)(state->watches[kind].address - address) < bytes && !record->watch_hit) {
+        record->watch_hit = LIB_TRUE;
+        record->watch_kind = kind;
+        record->watch_address = state->watches[kind].address;
+    }
+    if (state->kind != COMMON_MACHINE_DEBUG_EXECUTION_TRACE && !record->watch_hit) return;
+    if (record->count == COMMON_MACHINE_DEBUG_ACCESS_CAPACITY) {
+        record->truncated = LIB_TRUE;
+        return;
+    }
+    for (index = 0u; index < bytes && index < 8u; ++index)
+        value |= (lib_u64)data[reversed ? bytes - 1u - index : index] << (index * 8u);
+    record->accesses[record->count++] = (common_machine_debug_memory_access) {
+        .write = write != 0, .linear = address, .bytes = bytes, .data = value };
+}
+
+unsigned long softpc_host_debug_read(unsigned long address, unsigned long bytes,
+    unsigned long data)
+{
+    softpc_host_debug_access(address, bytes, 0, (const unsigned char *)&data, 0);
+    return data;
 }
 
 lib_status softpc_machine_debug(softpc_machine *machine, softpc_debug_state *state,
@@ -217,7 +277,10 @@ lib_status softpc_machine_debug(softpc_machine *machine, softpc_debug_state *sta
         result->bytes = request->bytes;
         return LIB_STATUS_OK;
     case COMMON_MACHINE_DEBUG_CLEAR_EXECUTION_PLAN:
-        *state = (softpc_debug_state) { 0 };
+        state->kind = COMMON_MACHINE_DEBUG_EXECUTION_NONE;
+        state->executed = 0u;
+        state->stop_pending = state->result_ready = LIB_FALSE;
+        state->observation = (common_machine_debug_observation) { 0 };
         return LIB_STATUS_OK;
     case COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN:
         if (request->execution_kind < COMMON_MACHINE_DEBUG_EXECUTION_TRACE ||
@@ -227,15 +290,33 @@ lib_status softpc_machine_debug(softpc_machine *machine, softpc_debug_state *sta
             return LIB_STATUS_INVALID_ARGUMENT;
         address = request->execution_kind == COMMON_MACHINE_DEBUG_EXECUTION_BREAK_REAL ?
             ((lib_u32)request->segment << 4u) + request->offset : request->address;
-        write = state->result_ready && state->stopped_address == address &&
-            address == c_getCS_BASE() + c_getEIP();
-        *state = (softpc_debug_state) { .kind = request->execution_kind,
-            .target_count = request->instruction_count, .address = address,
-            .skip_first = write && request->execution_kind != COMMON_MACHINE_DEBUG_EXECUTION_TRACE };
+        write = (state->result_ready || state->skip_first) &&
+            state->stopped_address == c_getCS_BASE() + c_getEIP();
+        state->kind = request->execution_kind;
+        state->target_count = request->instruction_count;
+        state->address = address;
+        state->executed = 0u;
+        state->stop_pending = state->result_ready = LIB_FALSE;
+        state->skip_first = write;
+        state->observation = (common_machine_debug_observation) { 0 };
         return LIB_STATUS_OK;
     case COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT:
         result->enabled = state->result_ready;
         result->value = state->executed;
+        result->observation = state->observation;
+        return LIB_STATUS_OK;
+    case COMMON_MACHINE_DEBUG_SET_WATCH:
+    case COMMON_MACHINE_DEBUG_CLEAR_WATCH:
+    case COMMON_MACHINE_DEBUG_GET_WATCH:
+        if ((unsigned)request->watch_kind > COMMON_MACHINE_DEBUG_WATCH_EXECUTE)
+            return LIB_STATUS_INVALID_ARGUMENT;
+        if (request->operation == COMMON_MACHINE_DEBUG_SET_WATCH) {
+            state->watches[request->watch_kind].address = request->address;
+            state->watches[request->watch_kind].enabled = LIB_TRUE;
+        } else if (request->operation == COMMON_MACHINE_DEBUG_CLEAR_WATCH)
+            state->watches[request->watch_kind].enabled = LIB_FALSE;
+        result->enabled = state->watches[request->watch_kind].enabled;
+        result->value = state->watches[request->watch_kind].address;
         return LIB_STATUS_OK;
     default:
         return LIB_STATUS_UNSUPPORTED;

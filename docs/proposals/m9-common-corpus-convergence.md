@@ -372,6 +372,71 @@ real-break/reset 断言另经 x64 focused debug/package 通过，x86 全量包�
 SHA-256：x86 `658DFEB69B9312864C43B94F91224D88532AA2B8436BC03E07A70952F8A30A7E`；
 x64 `72ED204622B6B615073C158921A9520A11022E1B7BF83764BA2C1FCFAAF87859`。
 
+### S12 有界观察账本
+
+冻结范围为 17 项 machine debug operation、现有 command 消费者，以及
+CCPU 的 vir_read/write byte/word/dword/bytes 八条操作数访问路径。
+栈和字符串指令复用该边界；spr/phy 内部翻译、描述符、DMA 与 debugger
+检查不作为操作数监视。PIG cannot_write 不执行真实写入，不加通知。
+访问通知只记录本指令候选；成功退休才可命中，异常指令的候选丢弃。
+EXECUTE 在解码前停，继续跳过刚命中的同址一次；READ/WRITE 在成功
+指令结束后的安全点停。watch 三个单地址槽，无新容器或执行线程。
+
+访问记录通过现有 GET_EXECUTION_RESULT 复制，删除无人调用的
+observe_instruction 第二入口。每指令最多 32 条记录；超出明确标记，
+监视匹配仍检查全部访问。大块访问记录其完整宽度和最低 8 字节，
+不为观察重读内存/设备。CLEAR_PLAN 不删除独立 watch 登记；外部取消、
+q、stop/reset 清理所有调试状态。证明逐项覆盖命中/非命中/重叠、
+故障隔离、检查隔离、清理、XT/XW/G 消费和双宽度 package。
+
+#### S12 操作/命令处置与同类扫描
+
+全集按 operation 枚举 17 项分组：寄存器读写 2、real/linear 内存读写 4、
+byte port 读写 2、code base/default-size 2、CPU snapshot 1、watch 三项、
+execution plan 三项。全部由实际 SoftPC adapter 承接；架构不存在的
+CR1/CR4 明确不适用，非法参数/非 paused/stale lease 仍拒绝。
+`debug_binding_smoke` 的 synchronous_access、execution_plans、command_matrix、
+trace_cli、watchpoints、access_boundaries 是逐组证明；原 xasm32 byte/text
+测试和真实 A/U、XA/XU 证明汇编/反汇编接线。完整 suites 保留 lifecycle、
+输入、frame、UI 和 shipping DOS/package 证明，不声称代替人工 Win3.1 验收。
+
+命令族覆盖 E/F/M/C/S/D 与 XE/XF/XM/XC/XS/XD、寄存器/有效段/控制快照、
+H/V、N/W/L 一次性 host 文件、A/U 和 XA/XU；T/XT/G/XG 包含真实 CPU
+完成与多次自动续行；XW 包含三类设定/查询/清除及 G 命中文案。
+无效 G/T 地址/计数、XW 参数及 watch kind 不派发执行/不安装错误状态。
+四状态 CLI、CAP、q、stale lease 和端口 byte 范围沿用 S9/S10 真实测试。
+
+扫描命令：`rg vir_read|vir_write|spr_|phy_` 覆盖 c_page/c_oprnd/c_stack/
+c_main；byte/word/dword/bytes 都已接通知，stack/string 复用它们；PIG
+cannot_write 与内部 spr/phy 不新增通知。真实测试含两种标量宽度、
+byte、stack、x87 reverse-buffer、REP 40 次（记录截断但第 40 次监视
+仍命中）、异常 handler 不继承故障指令候选、debugger 检查不自触发。
+x87 写入观察与实际存入内存的 8 字节比较；不把原 CPU 的浮点结果
+改造成测试期望，额外观察到的不定整数现象交 TODO 独立核查。
+
+`rg observe_instruction|awaiting_pause` 旧入口/只写标记已清零；没有第二
+观察 sink 或每指令 frontend 队列。命令矩阵发现 inline XE 错留续行，
+现与 E 一样仅缺值时续行；XR 同类计数收紧。G/T/XW 在错误参数后
+不再先改状态。结果输出仍经既有 PAUSED → session → provider 路径。
+
+#### S12 P1 交付证据
+
+最终 `tests-x64/tests-x86` 构建成功，CTest 各 63/63（43.42s / 44.52s）；
+严格 lib 8/8，文档治理与 diff hygiene 通过。原 package smoke 已在
+Console/Window 路由执行 G/T/XW 实际命中，再 stop/cold start 至 DOS。
+未修改 lib、用户 INI 或媒体；只刷新两个固定 EXE。
+
+以 S11 closure `53c6625` 为基线，`git diff --numstat -- src test`：
+生产 8 文件 +176/-86，净 +90；测试 2 文件 +268/-10，净 +258。
+本 S 的 MVDM 仅 `c_page.c` +21/-6，净 +15：八条访问的成功通知及
+保留原地址/缓冲区的局部变量，没有访存/翻译/异常算法修改。
+
+SHA-256：x86 `67BAFC9EE9A5BD6552FC423ED09FD47A51A8652BC02297D637F5E145607E4ED0`；
+x64 `BB3886C042DBF4A6B01DE9EAF2A10C8C707373878D62E40B271662407E249D4F`。
+保留忽略目录内的短 build/test 日志作为证据，无残留运行测试进程、
+临时调试程序文件或新增构建树。人工 Win3.1/GUI 测试等待 owner；
+本记录不以自动测试冒充该人工验收，也不提前收口整个 T56。
+
 ### S9 P5 交付证据
 
 2026-09-13：`cmake --build --preset tests-x64/tests-x86` 均成功；

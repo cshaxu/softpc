@@ -2,10 +2,10 @@
 
 ## Current Work
 
-M9 T56 S11 is closed after implementation `8feab8b` and coordinator review.
-S12 is active under the owner's sequential admission and narrow MVDM approval:
-“批准对mvdm的小范围必要改动”. S11 passed dual-width 63/63 and strict lib 8/8;
-watchpoints and final debugger convergence are not yet complete.
+M9 T56 S11 is closed. S12 implementation is verified and awaiting the
+coordinator's actual-commit review under the owner's narrow MVDM approval:
+“批准对mvdm的小范围必要改动”. Both final packages passed 63/63; strict lib 8/8.
+Read/write/execute watches and copied observations now reach the real CPU/CLI.
 
 ## M9 T56 S12 Packet
 

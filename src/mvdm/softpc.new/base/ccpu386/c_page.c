@@ -433,6 +433,10 @@ IFN2(
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /* Virtual Read Bytes from memory.                                   */
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* T56 port ABI: copied successful operand access, no debugger memory read. */
+extern void softpc_host_debug_access(unsigned long, unsigned long, int,
+                                    const unsigned char *, int);
+extern unsigned long softpc_host_debug_read(unsigned long, unsigned long, unsigned long);
 GLOBAL void
 vir_read_bytes
        	    	               
@@ -443,6 +447,9 @@ IFN4(
 	IU32, num_bytes
     )
    {
+   IU8 *debug_data = destbuff;
+   IU32 debug_bytes = num_bytes;
+   LIN_ADDR debug_address = lin_addr;
    if ( nr_data_break )
       {
       check_for_data_exception(lin_addr, D_R, D_BYTE);
@@ -460,6 +467,7 @@ IFN4(
 		lin_addr--;
    	}
    }
+   softpc_host_debug_access(debug_address, debug_bytes, 0, debug_data, 1);
 }
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -482,11 +490,11 @@ IFN2(
 
    if ( phy_addr )
       {
-      return phy_read_byte(phy_addr);
+      return softpc_host_debug_read(lin_addr, 1, phy_read_byte(phy_addr));
       }
    else
       {
-      return spr_read_byte(lin_addr);
+      return softpc_host_debug_read(lin_addr, 1, spr_read_byte(lin_addr));
       }
    }
 
@@ -510,11 +518,11 @@ IFN2(
 
    if ( phy_addr )
       {
-      return phy_read_dword(phy_addr);
+      return softpc_host_debug_read(lin_addr, 4, phy_read_dword(phy_addr));
       }
    else
       {
-      return spr_read_dword(lin_addr);
+      return softpc_host_debug_read(lin_addr, 4, spr_read_dword(lin_addr));
       }
    }
 
@@ -538,11 +546,11 @@ IFN2(
 
    if ( phy_addr )
       {
-      return phy_read_word(phy_addr);
+      return softpc_host_debug_read(lin_addr, 2, phy_read_word(phy_addr));
       }
    else
       {
-      return spr_read_word(lin_addr);
+      return softpc_host_debug_read(lin_addr, 2, spr_read_word(lin_addr));
       }
    }
 
@@ -560,6 +568,9 @@ IFN4(
     )
    {
    IU8 data_byte;
+   IU8 *debug_data = data;
+   IU32 debug_bytes = num_bytes;
+   LIN_ADDR debug_address = lin_addr;
 
    check_D(lin_addr, num_bytes);
    if ( nr_data_break ) {
@@ -580,6 +591,7 @@ IFN4(
 		lin_addr--;
       }
    }
+   softpc_host_debug_access(debug_address, debug_bytes, 1, debug_data, 1);
 }
 
 
@@ -611,6 +623,7 @@ IFN3(
       {
       spr_write_byte(lin_addr, data);
       }
+   softpc_host_debug_access(lin_addr, 1, 1, (const unsigned char *)&data, 0);
    }
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -641,6 +654,7 @@ IFN3(
       {
       spr_write_dword(lin_addr, data);
       }
+   softpc_host_debug_access(lin_addr, 4, 1, (const unsigned char *)&data, 0);
    }
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -671,6 +685,7 @@ IFN3(
       {
       spr_write_word(lin_addr, data);
       }
+   softpc_host_debug_access(lin_addr, 2, 1, (const unsigned char *)&data, 0);
    }
 
 

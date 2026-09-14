@@ -267,6 +267,11 @@ static int package_debug_execution(HANDLE input, HANDLE output)
         package_wait_for_text(output, "IP=0501", 5000u) &&
         package_send_text(input, "t 2\r") &&
         package_wait_for_text(output, "IP=0503", 5000u) &&
+        package_send_text(input, "xw e 504\r") &&
+        package_send_text(input, "g\r") &&
+        package_wait_for_text(output, "Watch-execute hit: Lin=00000504", 5000u) &&
+        package_send_text(input, "xw u\r") &&
+        package_wait_for_text(output, "All watch points removed.", 5000u) &&
         package_send_text(input, "q\r");
 }
 

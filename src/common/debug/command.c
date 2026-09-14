@@ -58,11 +58,8 @@ struct common_debug_command {
     type_unsigned_32 breakpoint_linear;
     STD_SIZE_T breakpoint_remaining;
     STD_SIZE_T trace_remaining;
-    C_INT awaiting_pause;
     command_run_kind run_kind;
-    common_debug_memory_access
-        memory_accesses[COMMON_DEBUG_MEMORY_ACCESS_CAPACITY];
-    type_unsigned_8 memory_access_count;
+    common_machine_debug_observation observation;
 };
 
 typedef common_debug_command command_context;
@@ -332,6 +329,7 @@ static C_INT command_get_execution_result(command_context *debugContext,
                 .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT },
             &result) || !result.enabled) return 1;
     *out_executed = result.value;
+    debugContext->observation = result.observation;
     return 0;
 }
 
@@ -342,7 +340,6 @@ static C_INT command_begin_trace(command_context *debugContext,
             count < 0x100u ? 1u : count)) return 1;
     debugContext->run_kind = kind;
     debugContext->trace_remaining = count < 0x100u ? count : 1u;
-    debugContext->awaiting_pause = 1;
     return 0;
 }
 
@@ -352,7 +349,6 @@ static C_VOID command_begin_break(command_context *debugContext,
     if (debugContext == STD_NULL) return;
     debugContext->run_kind = COMMAND_RUN_BREAK_LINEAR;
     debugContext->breakpoint_remaining = count;
-    debugContext->awaiting_pause = 1;
 }
 
 static C_INT command_copy_text_checked(C_CHAR *destination,
@@ -538,13 +534,16 @@ static C_VOID command_print_memory_accesses(command_context *debugContext)
 {
     type_unsigned_8 index;
 
-    for (index = 0u; index < debugContext->memory_access_count; ++index) {
-        const common_debug_memory_access *access =
-            &debugContext->memory_accesses[index];
-        command_printf(debugContext, "%s: Lin=%08x, Data=%08x, Bytes=%1x\n",
+    for (index = 0u; index < debugContext->observation.count; ++index) {
+        const common_machine_debug_memory_access *access =
+            &debugContext->observation.accesses[index];
+        command_printf(debugContext, "%s: Lin=%08x, Data=%08x%08x, Bytes=%x\n",
             access->write ? "Write" : "Read", access->linear,
+            (type_unsigned_32)(access->data >> 32u),
             (type_unsigned_32)access->data, access->bytes);
     }
+    if (debugContext->observation.truncated)
+        command_printf(debugContext, "Additional accesses omitted (record capacity).\n");
 }
 
 #define _eax debug_register(debugContext, COMMAND_REGISTER_EAX)
@@ -1024,6 +1023,7 @@ static C_VOID f(command_context *debugContext)
 static C_VOID rprintregs(command_context *debugContext);
 static C_VOID g(command_context *debugContext)
 {
+    type_unsigned_16 start_segment, start_offset;
     if (command_machine_is_running())
     {
         STD_PRINTF("Machine is already running.\n");
@@ -1036,17 +1036,20 @@ static C_VOID g(command_context *debugContext)
         break;
     case 2:
         addrparse(debugContext, _cs, arg[1]);
+        if (nErrPos) return;
         if (command_machine_set_break_real(seg, ptr)) return;
         break;
     case 3:
         addrparse(debugContext, _cs, arg[1]);
-        if (debug_set_register(debugContext, COMMAND_REGISTER_CS, seg))
+        start_segment = seg; start_offset = ptr;
+        addrparse(debugContext, start_segment, arg[2]);
+        if (nErrPos) return;
+        if (debug_set_register(debugContext, COMMAND_REGISTER_CS, start_segment))
         {
-            STD_PRINTF("debug: fail to load cs from %04X\n", seg);
+            STD_PRINTF("debug: fail to load cs from %04X\n", start_segment);
             return;
         }
-        debug_set_register(debugContext, COMMAND_REGISTER_EIP, ptr);
-        addrparse(debugContext, _cs, arg[2]);
+        if (debug_set_register(debugContext, COMMAND_REGISTER_EIP, start_offset)) return;
         if (command_machine_set_break_real(seg, ptr)) return;
         break;
     default:
@@ -1059,7 +1062,6 @@ static C_VOID g(command_context *debugContext)
     }
     if (narg != 1u) {
         debugContext->run_kind = COMMAND_RUN_BREAK_REAL;
-        debugContext->awaiting_pause = 1;
     }
     command_machine_resume();
 }
@@ -1647,13 +1649,15 @@ static C_VOID t(command_context *debugContext)
         break;
     case 3:
         addrparse(debugContext, _cs, arg[1]);
+        count = scannubit16(debugContext, arg[2]);
+        if (count == 0u) seterr(debugContext, 2);
+        if (nErrPos) return;
         if (debug_set_register(debugContext, COMMAND_REGISTER_CS, seg))
         {
             STD_PRINTF("debug: fail to load cs from %04X\n", seg);
             return;
         }
         debug_set_register(debugContext, COMMAND_REGISTER_EIP, ptr);
-        count = scannubit16(debugContext, arg[2]);
         break;
     default:
         seterr(debugContext, narg - 1);
@@ -2681,21 +2685,21 @@ static C_VOID xw(command_context *debugContext)
         switch (arg[1][0])
         {
         case 'r':
-            command_machine_clear_watch(COMMAND_REGISTER_WATCH_READ);
+            if (command_machine_clear_watch(COMMAND_REGISTER_WATCH_READ)) return;
             STD_PRINTF("Watch-read point removed.\n");
             break;
         case 'w':
-            command_machine_clear_watch(COMMAND_REGISTER_WATCH_WRITE);
+            if (command_machine_clear_watch(COMMAND_REGISTER_WATCH_WRITE)) return;
             STD_PRINTF("Watch-write point removed.\n");
             break;
         case 'e':
-            command_machine_clear_watch(COMMAND_REGISTER_WATCH_EXECUTE);
+            if (command_machine_clear_watch(COMMAND_REGISTER_WATCH_EXECUTE)) return;
             STD_PRINTF("Watch-exec point removed.\n");
             break;
         case 'u':
-            command_machine_clear_watch(COMMAND_REGISTER_WATCH_READ);
-            command_machine_clear_watch(COMMAND_REGISTER_WATCH_WRITE);
-            command_machine_clear_watch(COMMAND_REGISTER_WATCH_EXECUTE);
+            if (command_machine_clear_watch(COMMAND_REGISTER_WATCH_READ) ||
+                command_machine_clear_watch(COMMAND_REGISTER_WATCH_WRITE) ||
+                command_machine_clear_watch(COMMAND_REGISTER_WATCH_EXECUTE)) return;
             STD_PRINTF("All watch points removed.\n");
             break;
         default:
@@ -2708,14 +2712,17 @@ static C_VOID xw(command_context *debugContext)
         {
         case 'r':
             linear = scannubit32(debugContext, arg[2]);
+            if (nErrPos) return;
             command_machine_set_watch(COMMAND_REGISTER_WATCH_READ, linear);
             break;
         case 'w':
             linear = scannubit32(debugContext, arg[2]);
+            if (nErrPos) return;
             command_machine_set_watch(COMMAND_REGISTER_WATCH_WRITE, linear);
             break;
         case 'e':
             linear = scannubit32(debugContext, arg[2]);
+            if (nErrPos) return;
             command_machine_set_watch(COMMAND_REGISTER_WATCH_EXECUTE, linear);
             break;
         default:
@@ -3059,10 +3066,11 @@ static void command_prepare_continuation(common_debug_command *command)
         command->argument_count >= 2u) {
         if (!STD_STRCMP(command->arguments[1], "a"))
             command->continuation = COMMAND_CONTINUATION_XASSEMBLE;
-        else if (!STD_STRCMP(command->arguments[1], "e"))
+        else if (!STD_STRCMP(command->arguments[1], "e") &&
+            command->argument_count == 3u)
             command->continuation = COMMAND_CONTINUATION_XENTER;
         else if (!STD_STRCMP(command->arguments[1], "r") &&
-            command->argument_count >= 3u)
+            command->argument_count == 3u)
             command->continuation = COMMAND_CONTINUATION_XREGISTER;
     }
 }
@@ -3103,7 +3111,6 @@ static void command_report_access(common_debug_command *command)
     if (command->access_status == LIB_STATUS_OK) return;
     command->continuation = COMMAND_CONTINUATION_NONE;
     command->pending_line_available = 0;
-    command->awaiting_pause = 0;
     command->run_kind = COMMAND_RUN_NONE;
     command->result->lifecycle_request = COMMON_DEBUG_LIFECYCLE_NONE;
     (void)snprintf(command->result->text, sizeof(command->result->text), "%s\r\n\r\n",
@@ -3174,17 +3181,6 @@ finished:
     return LIB_STATUS_OK;
 }
 
-void common_debug_command_observe_instruction(common_debug_command *command,
-    const common_debug_instruction_observation *observation)
-{
-    if (command == STD_NULL || observation == STD_NULL) return;
-    command->memory_access_count = observation->memory_access_count <
-        COMMON_DEBUG_MEMORY_ACCESS_CAPACITY ? observation->memory_access_count :
-        COMMON_DEBUG_MEMORY_ACCESS_CAPACITY;
-    STD_MEMCPY(command->memory_accesses, observation->memory_accesses,
-        command->memory_access_count * sizeof(command->memory_accesses[0]));
-}
-
 lib_status common_debug_command_observe_machine(common_debug_command *command,
     common_debug_machine_state state, lib_status status,
     common_debug_result *out_result)
@@ -3197,23 +3193,27 @@ lib_status common_debug_command_observe_machine(common_debug_command *command,
     out_result->keep_active = LIB_TRUE;
     if (state == COMMON_DEBUG_MACHINE_STOPPED || state == COMMON_DEBUG_MACHINE_RESET ||
         state == COMMON_DEBUG_MACHINE_FAULT) {
-        command->awaiting_pause = 0;
         command->run_kind = COMMAND_RUN_NONE;
         return LIB_STATUS_OK;
     }
-    if (state != COMMON_DEBUG_MACHINE_PAUSED || status != LIB_STATUS_OK ||
-        !command->awaiting_pause) return LIB_STATUS_OK;
+    if (state != COMMON_DEBUG_MACHINE_PAUSED || status != LIB_STATUS_OK) return LIB_STATUS_OK;
     command->result = out_result;
     command->access_status = LIB_STATUS_OK;
     if (command_get_execution_result(command, &executed)) {
-        command->awaiting_pause = 0;
         command->run_kind = COMMAND_RUN_NONE;
         command_report_access(command);
         command_prompt(command);
         command->result = STD_NULL;
         return LIB_STATUS_OK;
     }
-    command->awaiting_pause = 0;
+    if (command->observation.watch_hit) {
+        const char *names[] = { "read", "write", "execute" };
+        command_printf(command, "Watch-%s hit: Lin=%08x\n",
+            names[command->observation.watch_kind], command->observation.watch_address);
+        command_print_memory_accesses(command);
+        command->run_kind = COMMAND_RUN_NONE;
+        xrprintreg(command);
+    }
     switch (command->run_kind) {
     case COMMAND_RUN_TRACE_REAL:
         rprintregs(command);
@@ -3247,7 +3247,6 @@ lib_status common_debug_command_observe_machine(common_debug_command *command,
             command->result = STD_NULL;
             return LIB_STATUS_OK;
         }
-        command->awaiting_pause = 1;
         out_result->lifecycle_request = COMMON_DEBUG_LIFECYCLE_RESUME;
     } else if (command->run_kind == COMMAND_RUN_BREAK_LINEAR &&
         command->breakpoint_remaining != 0u) {
@@ -3258,7 +3257,6 @@ lib_status common_debug_command_observe_machine(common_debug_command *command,
             command->result = STD_NULL;
             return LIB_STATUS_OK;
         }
-        command->awaiting_pause = 1;
         out_result->lifecycle_request = COMMON_DEBUG_LIFECYCLE_RESUME;
     } else {
         command->run_kind = COMMAND_RUN_NONE;

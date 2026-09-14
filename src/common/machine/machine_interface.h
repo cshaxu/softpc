@@ -105,12 +105,30 @@ typedef struct common_machine_debug_request {
     lib_u8 data[COMMON_MACHINE_DEBUG_BYTES];
 } common_machine_debug_request;
 
+#define COMMON_MACHINE_DEBUG_ACCESS_CAPACITY 32u
+typedef struct common_machine_debug_memory_access {
+    lib_bool write;
+    lib_u32 linear;
+    lib_u32 bytes;
+    lib_u64 data; /* Lowest-addressed up to eight bytes, little endian. */
+} common_machine_debug_memory_access;
+
+typedef struct common_machine_debug_observation {
+    common_machine_debug_memory_access accesses[COMMON_MACHINE_DEBUG_ACCESS_CAPACITY];
+    lib_u8 count;
+    lib_bool truncated;
+    lib_bool watch_hit;
+    common_machine_debug_watch_kind watch_kind;
+    lib_u32 watch_address;
+} common_machine_debug_observation;
+
 typedef struct common_machine_debug_result {
     lib_u32 value;
     lib_bool enabled;
     lib_u8 bytes;
     lib_u8 data[COMMON_MACHINE_DEBUG_BYTES];
     common_machine_debug_cpu_snapshot cpu;
+    common_machine_debug_observation observation;
 } common_machine_debug_result;
 
 typedef struct common_machine_debug_lease {

@@ -10,6 +10,9 @@ typedef struct softpc_debug_state {
     lib_u64 target_count;
     lib_u32 address, executed, stopped_address;
     lib_bool stop_pending, result_ready, skip_first;
+    lib_bool in_instruction;
+    struct { lib_bool enabled; lib_u32 address; } watches[3];
+    common_machine_debug_observation observation;
 } softpc_debug_state;
 
 void softpc_debug_bind(softpc_debug_state *state);

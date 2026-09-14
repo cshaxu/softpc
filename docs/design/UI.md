@@ -82,8 +82,18 @@ and guest TF retain their original behavior (trace can enter their handlers).
 HLT retains its original wait until an interrupt; host pause/stop remain usable
 while waiting. Repeating a breakpoint at its just-hit address first permits
 progress. Pause, stop/reset and leaving debug cancel unfinished execution plans.
-Watchpoints and architecturally unavailable CR1/CR4 still report unsupported;
-watchpoint completion belongs to the next admitted stage.
+`XW` registers one linear address for each read/write/execute watch. Read/write
+matches any byte of a successfully completed CPU operand access (including
+stack/string operations); execute stops before decoding that instruction.
+Faulted instructions, debugger inspection, DMA, page-table/descriptor internals
+are not operand hits. Continuing permits the just-hit instruction to progress.
+`XT` reports copied accesses from the last completed instruction, up to 32;
+overflow is explicitly marked without limiting watch matching. Data shows the
+lowest-addressed eight bytes in little-endian order for wider operands.
+Ordinary `G` preserves watches; external pause, stop/reset and leaving debug
+cancel them. A watch hit cancels trace/break auto-continuation and reports via
+the normal paused completion. Only architecturally unavailable CR1/CR4 remain
+unsupported; no register, memory, port, plan or watch operation is a placeholder.
 
 ## Window And Input
 
