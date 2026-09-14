@@ -2,29 +2,30 @@
 
 ## Current Work
 
-M9 T56 S3 is active: extract the accepted session control ownership into
-`common/session`, inject SoftPC's CLI policy, and preserve all behavior.
+M9 T56 S4 is active: extract the generic executor, request/input queues,
+published frame and completion machinery into `common/machine`, while keeping
+the SoftPC driver and MVDM-specific behavior in the product adapter.
 
-## M9 T56 S3 Packet
+## M9 T56 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner admitted T56 and authorizes automatic sequential S progression after each tested, reviewed and pushed delivery; async package testing does not block the next S. |
-| Objective | Move the product-neutral control queue, control state, reconciler and presentation-plan execution into `common/session`; keep `app/command` as the injected SoftPC CLI provider and delete the old app session implementation. |
-| Non-goals | Do not move the machine executor/input queue, alter UI ownership now in `common/ui`, alter MVDM/lib/product behavior, resolve deferred TODOs, or change owner configuration/media. |
-| Reference Baseline | T56 S2 common UI extraction: x86/x64 58/58, strict lib 8/8; `common/ui` is production UI owner and old app UI implementation is deleted. |
+| Objective | Move the generic executor lifecycle, lifecycle request queue, KVM input queue, run generation, complete-frame publication and completion sinks from `app/runtime` and `app/input_queue` into `common/machine`; retain exactly one SoftPC driver adapter for original machine operations. |
+| Non-goals | Do not change MVDM, guest input protocol, UI/session semantics, command vocabulary, lib behavior, deferred TODOs, owner configuration/media, or import debug/xasm32 yet. |
+| Reference Baseline | T56 S3 `cc60255`: `common/session` is the production control owner; x86/x64 58/58 and strict lib 8/8 passed, with refreshed dual package EXEs. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | New `src/common/session` public interface/implementation/CMake target and focused tests; moved/deleted app control/control-state/reconciler/presentation-plan implementation; app command provider and common/ui/machine integration change; fixed x86/x64 EXEs. |
+| Files And ABI Surface | New `src/common/machine` interface/implementation/CMake target and focused tests; moved/deleted generic `app/runtime` and `app/input_queue` ownership; explicit SoftPC machine driver adapter; `common/session` injected machine interface and fixed x86/x64 EXEs. |
 | Applicable Rules | Execution, architecture, coding, documentation authorities; Product UI; shared execution/architecture/coding/documentation governance skills. |
-| Verification | Command matrix, start plus ordered lifecycle commands, reject-before-dispatch, completed state text/prompt, stale event and paused-input tests through common/session; static proof app has no reducer/session queue; fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/DAG gates and diff hygiene. |
-| Expected Markers | Common/session is sole owner of the product-neutral control event queue and reducer; command parsing/effects remain injected from app; completed VM/UI facts drive independent machine/UI calls; no second session implementation or presenter lifecycle decision remains. |
+| Verification | Existing runtime/restart/input-continuation/lifecycle/package tests must exercise `common/machine`; add deterministic driver fake coverage for request order, exactly-one executor/start/stop/join, one reset completion, run generation and stale input; static proof app has no generic executor/input queue; fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/DAG gates and diff hygiene. |
+| Expected Markers | `common/machine` is the sole generic request/input queue and executor owner; app owns only the injected SoftPC driver and guest input conversion; `common/session` requests machine work through one neutral adapter; no second runtime/input queue or executor exists. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe`; preserve adjacent user-owned INI and all media bytes. |
 | Reporting Requirements | P commit/push contains moved/deleted path ledger, tests, source/artifact hashes, x86/x64 EXE links and changed-path counts; user tests asynchronously. |
-| Stop Conditions | Stop and record a proposal/TODO if preserving an accepted command/session behavior requires MVDM change, external source import, product-semantics decision, or a second session/reducer route. |
-| Exit Criteria | Common/session runs the production control path, old app session ownership is deleted, all named tests/gates and dual packages pass, review/push complete and EXE links reported. |
+| Stop Conditions | Stop and record a proposal/TODO if preserving an accepted driver/lifecycle behavior requires MVDM change, external source import, product-semantics decision, or a second executor/driver route. |
+| Exit Criteria | Common/machine runs the production executor path, old app generic runtime/input ownership is deleted, all named tests/gates and dual packages pass, review/push complete and EXE links reported. |
 | Original Owner Request | 建立 common 组件并提取 debug、xasm32、session、UI、machine；CLI 注入 session，app 保持配置和实体组装；每个 S 删除旧实现并给可验收双 EXE，体验不变；手测异步进行。 |
-| Similar-Issue Sweep | All control/reducer/queue/reconciler/presentation-plan and command dispatch paths, CMake/test sources, common/ui event bridges, runtime request dispatch, monitor prompt/status output, and every app session consumer. |
+| Similar-Issue Sweep | All runtime/executor/input queue/lifecycle/reset/frame/run-generation and machine-driver paths, CMake/test sources, common/session adapter calls, startup/shutdown ownership, and every app runtime consumer. |
 
 ## Current Technical Baseline
 
