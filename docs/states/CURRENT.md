@@ -2,39 +2,34 @@
 
 ## Current Work
 
-M9 T56 S14 implementation `07b278e` is verified, pushed and coordinator-reviewed,
-awaiting owner testing of both refreshed EXEs. The display repair stays in lib host;
-common, app, MVDM and lifecycle semantics are unchanged. Full x64/x86 CTest
-passed 64/64 each, strict lib 8/8. S14 and T56 are not yet closed.
-[S13's T-level audit](../history/M9-T56-S13-audit-suspension.md) is suspended;
-resume its remaining work under a fresh S after this repair.
+M9 T56 S14 passed owner visual testing ("确认没问题，跟之前不一样了").
+[S14 closure](../history/M9-T56-S14-console-display-handoff.md) records its delivery.
+T56 S15 implementation is verified: Common platform dependencies removed, minimal
+Lib Host mutex added, independent Common corpus verification restored.
+Full x64/x86 CTest passed 68/68 each, strict Lib 8/8, isolated Common 4/4.
+Executor delivery and independent review are pending.
+T56 remains open; the suspended S13 whole-task audit is not claimed complete.
 
-Debug/xasm32 integration now has all 17 machine debug operations connected,
-including original-CPU trace/break/watch completion and copied operand records.
-Final x64/x86 suites passed 63/63 each; strict lib passed 8/8. Architectural
-CR1/CR4 non-applicability and the separately recorded x87 observation are not
-claimed fixed. See [S12 closure](../history/M9-T56-S12-debug-watch-integration.md).
-
-## M9 T56 S14 Packet
+## M9 T56 S15 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner explicitly requests a new S to repair raw-to-cooked display handoff, build, test, commit and push for manual testing. |
-| Objective | Restore a usable cooked display after raw output, without stale cells, raw cursor styling or a pinned raw viewport; retain the existing reader transaction. |
-| Non-goals | No startup/reset/start/stop changes, MVDM edits, command-specific clearing, focus policy changes or T closure. |
-| Reference Baseline | Reviewed S12 implementation edc7065; unchanged x86/x64 packages passed 63/63 each and strict lib 8/8. |
+| Admission And Approval | Owner approves one new S to repair Common and minimally extend Lib for its needs. |
+| Objective | One platform-independent Common implementation using public Host synchronization and Types atomics, with independent manifest and component DAG proof. |
+| Non-goals | No product behavior, MVDM, CLI, focus, display or executor topology changes; no Common win32/linux implementations; no T closure. |
+| Reference Baseline | 53667ab, owner-accepted S14; x86/x64 64/64 and strict lib 8/8. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | lib host Win32 Console backend, types declaration aliases only if needed, existing Console tests and documentation/manifest; public ABI unchanged. |
-| Applicable Rules | Execution, documentation, architecture, coding authorities and Product UI. |
-| Verification | Native baseline leak reproduced; transition/failure tests passed, full x86/x64 CTest 64/64 each, strict lib 8/8, manifest and documentation gates passed; final initial-raw failure test passed separately at both widths. |
-| Expected Markers | Display handoff completes before cooked input is armed; no per-command redraw or extra reader; repeated replacements do not degrade geometry. |
-| Asset Needs | Refresh both fixed EXEs; no INI/media writes. Bounded diagnostic logs and disposable native Console probe under ignored build, no guest writes. |
-| Reporting Requirements | Audit against actual changes, not summaries; commit/push every completed P and preserve a clean tree. |
-| Stop Conditions | A new public display API, alternate reader, CPU fix or unrelated product behavior requires a separate disposition. |
-| Exit Criteria | Focused and full tests pass, both EXEs refreshed, actual diff reviewed, complete delivery committed/pushed and clean tree; owner visual testing remains explicit. |
-| Original Owner Request | cooked console 从 raw console 回来后显示与光标异常；准入新的 S 修复，提交推送后让我测试。 |
-| Similar-Issue Sweep | Native frame/stream writes, palette/viewport/cursor mutation, activation rollback, same-mode replacements and broker destruction; Linux remains scoped to existing behavior. |
+| Files And ABI Surface | Common machine/session synchronization, Common build/verification/tests; minimal opaque Host mutex and Types atomic primitives, manifests and documentation. |
+| Applicable Rules | Execution, documentation, architecture and coding authorities. |
+| Verification | Full x64/x86 68/68, strict Lib 8/8, isolated Common 4/4 and common-verify passed; final focused 5/5 at each width includes Linux mutex fake failure cases. Native Linux runtime was not available; no parity claim. |
+| Expected Markers | Zero platform headers/types/calls/conditional implementations in Common; existing lifecycle and queue behavior preserved. |
+| Asset Needs | Both fixed EXEs; bounded logs and disposable standalone verification trees under build; preserve INI and media. |
+| Reporting Requirements | Complete P commit/push, independent actual-diff review, counted production/test changes and clean tree. |
+| Stop Conditions | Product semantic changes, MVDM changes or a new synchronization framework require separate approval. |
+| Exit Criteria | Platform boundary and standalone proof pass; dual-width packages and regression delivered, reviewed and pushed. |
+| Original Owner Request | 批准，准入一个新的S任务修复common，并对lib做最小增补修改以服务common的需求。common组件不得自带任何 win32, linux。 |
+| Similar-Issue Sweep | All Common C/H/CMake includes, platform calls, atomics, private cross-component references and independent verification dependencies. |
 
 ## Current Technical Baseline
 

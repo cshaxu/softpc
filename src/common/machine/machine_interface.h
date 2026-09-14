@@ -5,8 +5,6 @@
 #include "lib/kvm-base/frame_interface.h"
 #include "lib/types/types_interface.h"
 
-#include <stdint.h>
-
 #define COMMON_MACHINE_PATH_CAPACITY 1024u
 #define COMMON_MACHINE_DEBUG_BYTES 32u
 

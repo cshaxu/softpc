@@ -32,16 +32,16 @@ typedef struct common_session_event {
     common_session_event_kind kind;
     /* Zero is monitor/local input.  KVM producers stamp the currently active
      * machine run so a queued old input cannot affect a later start. */
-    uint32_t run_generation;
+    lib_u32 run_generation;
     int monitor_line_rejected;
     union {
         kvm_input_event kvm;
         lib_console_line line;
         common_session_machine_state runtime_state;
-        struct { uint32_t sequence; int graphics; } frame;
+        struct { lib_u32 sequence; int graphics; } frame;
         struct { common_session_component_kind component; int exists; } component;
         int broker_vm_console_current;
-        struct { uint64_t source_identity; lib_status status; } delivery_failure;
+        struct { lib_u64 source_identity; lib_status status; } delivery_failure;
         lib_status queue_delivery_status;
     } value;
 } common_session_event;
@@ -51,27 +51,27 @@ void common_session_queue_destroy(common_session_queue *queue);
 int common_session_queue_push_ux(common_session_queue *queue,
     const kvm_input_event *event);
 int common_session_queue_push_kvm_for_run(common_session_queue *queue,
-    const kvm_input_event *event, uint32_t run_generation);
+    const kvm_input_event *event, lib_u32 run_generation);
 int common_session_queue_push_monitor_line(common_session_queue *queue,
     const lib_console_line *line, int rejected);
 int common_session_queue_push_console_failed(common_session_queue *queue);
 int common_session_queue_push_runtime_completed(common_session_queue *queue,
-    common_session_machine_state state, uint32_t run_generation);
+    common_session_machine_state state, lib_u32 run_generation);
 int common_session_queue_push_frame_completed(common_session_queue *queue,
-    uint32_t sequence, int graphics, uint32_t run_generation);
+    lib_u32 sequence, int graphics, lib_u32 run_generation);
 int common_session_queue_push_component_completed(common_session_queue *queue,
-    common_session_component_kind component, int exists, uint32_t run_generation);
+    common_session_component_kind component, int exists, lib_u32 run_generation);
 int common_session_queue_push_broker_completed(common_session_queue *queue,
-    int vm_console_current, uint32_t run_generation);
+    int vm_console_current, lib_u32 run_generation);
 int common_session_queue_push_kvm_delivery_failed(common_session_queue *queue,
-    uint64_t source_identity, lib_status status, uint32_t run_generation);
+    lib_u64 source_identity, lib_status status, lib_u32 run_generation);
 int common_session_queue_take(common_session_queue *queue,
-    common_session_event *out_event, unsigned long timeout_ms);
+    common_session_event *out_event, lib_u32 timeout_ms);
 /* A KVM producer belongs to one VM run. Paused admits cleanup/lifecycle and
  * registered-hotkey records for product handling, but ordinary guest input
  * remains rejected. Monitor lines and completion facts use separate rules. */
 int common_session_accept_kvm_event(const common_session_event *event,
-    uint32_t current_run_generation, common_session_machine_state runtime_state);
+    lib_u32 current_run_generation, common_session_machine_state runtime_state);
 typedef int (*common_session_input_sink)(void *context,
     const kvm_input_event *event);
 int common_session_dispatch_input(common_session_queue *queue, const kvm_input_event *event,

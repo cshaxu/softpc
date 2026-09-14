@@ -8,6 +8,11 @@ or changed library file.
 
 ## Header visibility
 
+Host's public synchronization contract includes opaque blocking mutexes.
+Lock/unlock require a live object, same-thread ownership and no recursive
+locking; destroy requires all users to have stopped. Platform implementations
+own the allocation and native lock directly, without an outer pointer wrapper.
+
 Cross-component contracts live at the component root and are named
 `*_interface.h`. All component `win32/` and `linux/` implementation files are
 accessible only from that component's corresponding platform implementation,

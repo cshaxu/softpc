@@ -9,7 +9,7 @@
 typedef struct common_session_state {
     common_session_reconciler presentation;
     common_session_machine_state monitor_actual;
-    uint32_t observed_frame_sequence;
+    lib_u32 observed_frame_sequence;
 } common_session_state;
 
 void common_session_state_initialize(common_session_state *state,
@@ -20,7 +20,7 @@ void common_session_state_note_window_close(common_session_state *state);
  * available to the command session that owns monitor wording. */
 void common_session_state_note_runtime(common_session_state *state,
     common_session_machine_state completed);
-int common_session_state_note_frame(common_session_state *state, uint32_t sequence,
+int common_session_state_note_frame(common_session_state *state, lib_u32 sequence,
     int graphics);
 void common_session_state_note_window(common_session_state *state, int exists);
 void common_session_state_note_vm_console(common_session_state *state, int exists);

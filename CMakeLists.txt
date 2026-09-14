@@ -52,6 +52,8 @@ target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 # dependency. Project bindings retain all machine and lifecycle decisions;
 # the imported library owns generic host, storage, and KVM mechanics.
 add_subdirectory(src/lib)
+enable_testing()
+set(COMMON_BUILD_TESTING ON)
 add_subdirectory(src/common)
 target_link_libraries(softpc-machine PRIVATE storage host)
 
@@ -633,6 +635,7 @@ add_executable(softpc-input-queue-mouse-fifo-smoke
     test/unit/input_queue_mouse_fifo_smoke.c
     src/common/machine/input_queue.c)
 target_include_directories(softpc-input-queue-mouse-fifo-smoke PRIVATE test/support src)
+target_link_libraries(softpc-input-queue-mouse-fifo-smoke PRIVATE host)
 add_test(NAME softpc-input-queue-mouse-fifo-smoke
     COMMAND softpc-input-queue-mouse-fifo-smoke)
 set_tests_properties(softpc-input-queue-mouse-fifo-smoke PROPERTIES

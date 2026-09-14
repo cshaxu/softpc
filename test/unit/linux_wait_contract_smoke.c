@@ -20,6 +20,22 @@ int main(void)
     kvm_mailbox_wake_wait_result wake_result;
     int failure;
     host_console_backend *backend = (void *)1;
+    host_sync_mutex *mutex = (void *)1;
+
+    assert(host_sync_mutex_create(NULL) == LIB_STATUS_INVALID_ARGUMENT);
+    fail_init_step = 1; init_step = 0;
+    assert(host_sync_mutex_create(&mutex) == LIB_STATUS_IO_ERROR);
+    assert(mutex == NULL && live_mutexes == 0);
+    fail_init_step = 0; init_step = 0;
+    assert(host_sync_mutex_create(&mutex) == LIB_STATUS_OK);
+    assert(live_mutexes == 1);
+    host_sync_mutex_lock(mutex);
+    assert(mutex->gate.locked);
+    host_sync_mutex_unlock(mutex);
+    assert(!mutex->gate.locked);
+    host_sync_mutex_destroy(mutex);
+    host_sync_mutex_destroy(NULL);
+    assert(live_mutexes == 0);
 
     for (failure = 1; failure <= 4; ++failure) {
         fail_init_step = failure; init_step = 0;

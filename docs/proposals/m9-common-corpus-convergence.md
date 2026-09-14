@@ -21,6 +21,72 @@ lib 调用的强制中转层；以下任务与验收按此修订执行。
 
 ## 五个组件及组装边界
 
+### T56 S15：Common 平台边界及独立证明
+
+原始准入：“批准，准入一个新的S任务修复common，并对lib做最小增补修改以服务common的需求。”
+硬约束：“common组件不得自带任何 win32, linux”。
+
+有限全集是准入基线 53667ab 的全部 Common C/H/CMake，以及新增的独立
+验证文件。逐项扫描平台类型/API/条件编译和跨组件私有依赖；每项须迁移
+到已存在的 Lib 公共契约，或在 Lib 增补实际缺失的最小原语。
+
+1. Host 提供不透明、阻塞、非递归 mutex 的 create/destroy/lock/unlock；
+   平台实现仍在 Host 内，Common 不保存任何 Win32/Linux 类型。
+2. machine/input_queue、session/control 共用既有 Host event/wait 及新 mutex；
+   machine 原子字段改用 Types，保留原先的原子 RMW 和内存序语义。
+   删除整段 Windows 条件实现，Common 不另写 Linux 分支。
+3. Common 自带完整 manifest、standalone CMake/CTest 和 component DAG 门禁，
+   只接受显式 Lib 路径或已有 Lib targets；不依赖 SoftPC 根项目或测试路径。
+   公共 ABI 统一 Lib types，禁止借 Types 平台头绕过 Host。
+
+验收：mutex 互斥、队列唤醒/清空和 frame 发布的确定性测试；独立 corpus
+及 DAG 正反例；双宽度全回归及 EXE，strict Lib 与文档门禁。平台构建
+证据单独报告，不能以去掉 ifdef 冒充 Linux 已跑通。保留线程数、队列容量、
+命令/调试/输入/展示语义。完成单人双角色实际 diff 审计并提交推送。
+
+#### S15 P1 实施、自证与同类扫描
+
+生产唯一资源所有者未变。Common machine 的 13 个原子字段在发布对象前
+逐一初始化；load/exchange/fetch-add 保留顺序一致内存序，不以普通 volatile
+或弱内存序替代。frame 与 input queue 各自持有 Host mutex；session 保留
+原 FIFO、64 起始动态容量、固定无分配失败记录和锁内 signal/reset。
+Host mutex 在对应平台中直接分配原生锁，不新增包装对象、线程或 Common
+平台分支；创建失败保留原始 status，经已有唯一销毁路径清理。
+
+有限全集：Common 全部生产 C/H、四个 CMakeLists 和新增 corpus 自证入口。
+`rg windows.h|_WIN32|Interlocked|CRITICAL_SECTION|HANDLE|pthread` 的生产命中
+均为 machine/input_queue、machine/machine、session/control，已迁移；
+额外 control_state 的标准整数残留统一 Lib 类型。xasm32 的 DWORD 文本是
+汇编语法，不是平台类型；门禁区分字面量与实际声明，不能删掉正确产品输出。
+保留标准 C 处理及 Types 的中性头，禁止平台 Types 绕过和 sibling 私有头。
+原产品测试直接编译 input_queue 的链接补 Host，没有另一份锁或队列。
+
+Common 自带完整 LF manifest、独立 configure/build/CTest 与 common-verify；
+门禁检查源 include、实际 CMake 直接边及平台条件实现，负例覆盖 Win32 头、
+隐藏 HANDLE、pthread、平台 Types、非法 sibling、private/KVM support、
+相对路径、native link 和未列入 manifest 的文件。Common 文件按 .gitattributes
+统一 LF；原 CRLF-only 规范化不改变指令、debug 或 source 语义。
+
+验证记录：x64 全量 68/68（71.19s），x86 68/68（90.24s）；严格 Lib 8/8
+（3.32s）。Common+Lib 单独复制到 ignored 隔离目录，无 SoftPC 源码/测试，
+独立构建、common-verify 和 CTest 4/4（最终门禁复核 1.98s）通过。最后补充 Linux mutex
+的初始化失败/清理测试后，两宽度重新构建并 focused 5/5 通过；生产/EXE
+不因此改变。Linux Host 实现已被现有可控 POSIX fake 编译/测试，但本机没有
+WSL，未声称完成真实 Linux 运行或 KVM 原生显示 parity。
+
+统计方法为基线 53667ab 的 `git diff --numstat`，排除文档和产物：
+生产 C/H 12 路径 +296/-202，净 +94（Common 净 +7，Lib 净 +87）；
+测试 3 路径 +159/-0；CMake/自证脚本 5 路径 +231/-1。
+增加的生产代码是实际缺失的 Host mutex/atomic 原语和初始化/错误清理，
+不新增业务状态机。两个 manifest 与文档不计生产代码。
+
+EXE SHA-256：x86 `64B12A8D82B176B98110ECA53AC4E3A480C664DA2F75308EC777D029119B403B`；
+x64 `38D71AFB9B0050E07E8B05306F1EE38D3F02371DFA5142D8523CB0935B88A589`。
+MVDM、app、原始 host、INI 和媒体均未改动。T56 总审计不在本次收口声明内。
+最后门禁反例还覆盖同组件前缀下的 parent traversal 和大写 CMake 调用，
+已在独立树重跑；临时独立构建树、复制 corpus 和空 probe 目录清理，
+只保留 ignored build 中的短构建/测试日志，双交付 EXE 保留。
+
 ### T56 S14：raw → cooked 显示交接修复
 
 原始反馈：“cooked console，从 raw console回到cooked console之后屏幕光标和显示就不正常了，换行也不会清理本行残余字符，而且光标始终好像在倒数第二行”。

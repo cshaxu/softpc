@@ -31,7 +31,7 @@ void common_session_state_note_runtime(common_session_state *state,
     common_session_reconciler_note_runtime(&state->presentation, presentation_state);
 }
 
-int common_session_state_note_frame(common_session_state *state, uint32_t sequence,
+int common_session_state_note_frame(common_session_state *state, lib_u32 sequence,
     int graphics)
 {
     if (state == NULL || sequence == 0u ||

@@ -22,6 +22,9 @@ src/
 ```
 
 Directories appear only in their admitted migration task.
+Common never contains win32/linux directories or platform-selected source.
+Its independent verification and tests live with the Common corpus; only Lib
+provides the underlying platform implementation.
 Shared `lib/types` is header-only. Its top level contains common C/compiler
 vocabulary; explicit `win32/` and `linux/` headers group external platform
 declarations by purpose. Common types headers never select an OS. Only the
