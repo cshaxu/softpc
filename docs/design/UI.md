@@ -159,6 +159,12 @@ its Console status surface keeps the running-in-Window first line, then one
 blank line, the same raw-Console hotkey help section printed by monitor
 `help`, and one trailing blank line.
 
+Returning from raw to cooked restores the native monitor screen, cursor and
+scrollback rather than printing over the last raw frame. Status and prompt
+still follow the existing completion path; no command clears individual lines
+to compensate for raw output. A cooked-to-cooked binding leaves the display
+untouched. The raw frame does not force the host window to shrink to 80x25.
+
 Window X is a SoftPC close request: running first reaches paused, host switches
 to monitor, then SoftPC destroys the Window component. Until native Window
 destruction, normal Window input remains valid.

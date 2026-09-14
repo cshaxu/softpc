@@ -161,6 +161,17 @@ LF, emits one REJECTED_LINE, and never submits a truncated tail. Raw activation
 requests native foreground/focus; cooked activation does not. The reader's
 confirmed retirement, not focus, establishes the input handoff.
 
+Win32 host keeps stream output in the original screen buffer and frame output
+in one lazily allocated alternate buffer, both owned by the same broker.
+Selection and display-metadata restoration are inside the existing output
+transaction, before the next reader starts. Same-mode replacement does not
+switch screens. Raw frame output preserves the native window extent rather
+than shrinking it to the frame; cooked cells, cursor and scrollback therefore
+survive the roundtrip. Native palette/geometry snapshots are restored on switch
+and rollback; an incomplete restore never replaces a saved snapshot. Destruction
+restores the original buffer before closing the alternate. No new public API,
+input owner, reader, or command-specific clearing is involved.
+
 Console text frames use the fixed PC-display mapping documented by `console`.
 Palette caches advance only after successful native palette application;
 unavailable palette support may retry without terminating text output. Text

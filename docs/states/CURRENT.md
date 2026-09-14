@@ -2,10 +2,12 @@
 
 ## Current Work
 
-M9 T56 S12 is closed after implementation `edc7065` and coordinator review.
-S13 is admitted for the separate T-level closure audit under the owner's
-sequential-task authorization. T56 remains open; both refreshed packages are
-available for asynchronous owner testing.
+M9 T56 S14 is implemented and verified, awaiting owner testing of both refreshed
+EXEs after commit/push. The raw-to-cooked display repair stays in lib host;
+common, app, MVDM and lifecycle semantics are unchanged. Full x64/x86 CTest
+passed 64/64 each, strict lib 8/8. S14 and T56 are not yet closed.
+[S13's T-level audit](../history/M9-T56-S13-audit-suspension.md) is suspended;
+resume its remaining work under a fresh S after this repair.
 
 Debug/xasm32 integration now has all 17 machine debug operations connected,
 including original-CPU trace/break/watch completion and copied operand records.
@@ -13,26 +15,26 @@ Final x64/x86 suites passed 63/63 each; strict lib passed 8/8. Architectural
 CR1/CR4 non-applicability and the separately recorded x87 observation are not
 claimed fixed. See [S12 closure](../history/M9-T56-S12-debug-watch-integration.md).
 
-## M9 T56 S13 Packet
+## M9 T56 S14 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner authorized sequential S completion without waiting for manual acceptance; this is the required T-level audit of the original T56 objective, not new product scope. |
-| Objective | Map original common extraction and admitted S1–S12 deliveries to their boundaries, deletion ledger, debug/xasm integration and full regression evidence before deciding T56 closure. |
-| Non-goals | No additional product features, CPU algorithm changes, NXVM writes or premature T closure. |
+| Admission And Approval | Owner explicitly requests a new S to repair raw-to-cooked display handoff, build, test, commit and push for manual testing. |
+| Objective | Restore a usable cooked display after raw output, without stale cells, raw cursor styling or a pinned raw viewport; retain the existing reader transaction. |
+| Non-goals | No startup/reset/start/stop changes, MVDM edits, command-specific clearing, focus policy changes or T closure. |
 | Reference Baseline | Reviewed S12 implementation edc7065; unchanged x86/x64 packages passed 63/63 each and strict lib 8/8. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | Current/proposal/history and original-request coverage audit; no new production ABI admitted. |
+| Files And ABI Surface | lib host Win32 Console backend, types declaration aliases only if needed, existing Console tests and documentation/manifest; public ABI unchanged. |
 | Applicable Rules | Execution, documentation, architecture, coding authorities and Product UI. |
-| Verification | Actual S commits, complete migration/operation ledger, retained TODO ownership, dual-width final evidence and documentation gate. |
-| Expected Markers | Every extracted owner has one production path; no dormant debug adapter or duplicate executor; deferred unrelated issues are explicit. |
-| Asset Needs | Both fixed S12 EXEs remain available; no INI/media writes. Any necessary code repair requires bounded scope and refreshed dual-width proof. |
+| Verification | Native baseline leak reproduced; transition/failure tests passed, full x86/x64 CTest 64/64 each, strict lib 8/8, manifest and documentation gates passed; final initial-raw failure test passed separately at both widths. |
+| Expected Markers | Display handoff completes before cooked input is armed; no per-command redraw or extra reader; repeated replacements do not degrade geometry. |
+| Asset Needs | Refresh both fixed EXEs; no INI/media writes. Bounded diagnostic logs and disposable native Console probe under ignored build, no guest writes. |
 | Reporting Requirements | Audit against actual changes, not summaries; commit/push every completed P and preserve a clean tree. |
-| Stop Conditions | Missing original-request proof or new behavior repair requires an explicit disposition before T closure. |
-| Exit Criteria | T-level ledger supports a truthful closure or names the exact remaining in-scope work; no T closure merely because S12 passed. |
-| Original Owner Request | Complete SoftPC-first common extraction and debug/xasm32 integration; automatically continue sequential S deliveries with both EXEs, tests, commits and pushes. |
-| Similar-Issue Sweep | All transferred app/host owners, allowed direct lib calls, common component boundaries, dormant/duplicate paths, source provenance and actual command consumers. |
+| Stop Conditions | A new public display API, alternate reader, CPU fix or unrelated product behavior requires a separate disposition. |
+| Exit Criteria | Focused and full tests pass, both EXEs refreshed, actual diff reviewed, complete delivery committed/pushed and clean tree; owner visual testing remains explicit. |
+| Original Owner Request | cooked console 从 raw console 回来后显示与光标异常；准入新的 S 修复，提交推送后让我测试。 |
+| Similar-Issue Sweep | Native frame/stream writes, palette/viewport/cursor mutation, activation rollback, same-mode replacements and broker destruction; Linux remains scoped to existing behavior. |
 
 ## Current Technical Baseline
 

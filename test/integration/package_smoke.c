@@ -168,15 +168,26 @@ static int package_screen_contains(HANDLE output, const char *needle)
     COORD origin;
     DWORD count;
 
-    if (output == INVALID_HANDLE_VALUE || needle == NULL ||
-        !GetConsoleScreenBufferInfo(output, &info)) return 0;
+    if (output == INVALID_HANDLE_VALUE || needle == NULL) return 0;
+    /* CONOUT$ resolves the currently displayed buffer at open time. A saved
+       handle still observes cooked history while the raw surface is active. */
+    output = CreateFileA("CONOUT$", GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0u, NULL);
+    if (output == INVALID_HANDLE_VALUE) return 0;
+    if (!GetConsoleScreenBufferInfo(output, &info)) {
+        CloseHandle(output);
+        return 0;
+    }
     origin.X = info.srWindow.Left;
     origin.Y = info.srWindow.Top;
     count = (DWORD)(info.srWindow.Right - info.srWindow.Left + 1) *
         (DWORD)(info.srWindow.Bottom - info.srWindow.Top + 1);
     if (count >= sizeof(text)) count = sizeof(text) - 1u;
-    if (!ReadConsoleOutputCharacterA(output, text, count, origin, &read))
+    if (!ReadConsoleOutputCharacterA(output, text, count, origin, &read)) {
+        CloseHandle(output);
         return 0;
+    }
+    CloseHandle(output);
     text[read] = '\0';
     memcpy(package_last_screen, text, read + 1u);
     package_last_screen_width =

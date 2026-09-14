@@ -205,6 +205,12 @@ and pending frames. No new input can precede that reset. Rollback uses the same
 helper; RESET is not activation success or permanent KVM source retirement.
 Cooked rollback restores only an unfinished line request observed after reader
 join; ordinary cooked activation remains explicitly armed by the caller.
+Win32 host isolates raw frame output from the original cooked screen buffer.
+The broker selects and restores native display metadata inside its existing
+output transaction, before reader startup; same-mode replacements do not switch
+screens. Frame output does not shrink the native window to its fixed cell grid.
+The original cooked text/cursor/scrollback remain native-owned, not copied or
+reconstructed by common/UI. Broker disposal restores that original buffer.
 Window displacement retains integer remainders
 internally without changing the copied input ABI. Post-start worker exits share
 one failure/retirement cleanup path; startup failure remains distinct. Unexpected

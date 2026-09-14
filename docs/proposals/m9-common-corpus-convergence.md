@@ -21,6 +21,69 @@ lib 调用的强制中转层；以下任务与验收按此修订执行。
 
 ## 五个组件及组装边界
 
+### T56 S14：raw → cooked 显示交接修复
+
+原始反馈：“cooked console，从 raw console回到cooked console之后屏幕光标和显示就不正常了，换行也不会清理本行残余字符，而且光标始终好像在倒数第二行”。
+原始准入：“你帮我准入一个新的S任务修复一下试试看，记得提交推送后让我测试。”
+
+S13 总审计暂停而非收口。本 S 只修 lib host 的原生显示交接：查明 raw
+frame 对 viewport、cells、palette、cursor 的修改及 cooked 激活缺失的恢复。
+显示恢复纳入既有串行交接，不在 CLI 或 session 添加逐命令清行，不改变
+reader 取消/join、焦点和 VM 生命周期，不新增公开 API 或线程。
+正常 cooked→cooked 不应清掉交互，失败回滚不得重新武装已完成的行。
+通过 native display probe 与现有可控测试证明缺陷和修复，再做双宽度全量
+CTest、严格 lib、manifest/文档门禁，提交推送双 EXE 后等待用户视觉验证。
+同类扫描限于 host 原生 frame/stream 输出、显示元数据和全部绑定/销毁出口；
+旧 Win3.1 CLS debt 不在本次声明的修复范围。
+
+实施设计：Win32 broker 懒创建一个 raw screen buffer，保留原 cooked
+screen buffer；没有新增 native Console 或 reader。既有输出事务内完成
+选择、必要的 palette/geometry 恢复，再启动 reader；同模式不切屏。
+原生测试发现 raw 强制 80x25 视口会使 cooked 再激活时截断较宽历史，因此
+raw 只滚回原点而不缩小宿主窗口。Win32 palette setter 的右/下边界转换
+同时纠正；切换失败复用 broker 原有回滚，恢复失败的半状态不覆盖快照。
+新增原生测试保存 120x30 显示（含 80x25 外文字），验证反复交接、短行
+输出、同模式、分配/选择/读取器/metadata 失败回滚和 raw 下销毁。
+package 观察端每次重新打开 CONOUT$，只观察当前可见屏幕，不读旧句柄
+绑定的隐藏 cooked 缓冲区；产品输出路径未因此增加第二实现。
+
+#### S14 P1 证据与同类扫描
+
+旧版 `ca810bf` backend 的隔离原生探针已复现：120x30 cooked 画面经过
+raw frame 后变成 80x25，光标由 (0,2) 变 (0,0)，cells/palette/cursor
+style 同时改变。该探针只用于基线诊断，失败为预期；未修改用户 Console。
+最终 `host_console_display_smoke` 使用隐藏的独立原生 Console、真实
+屏幕 API 和可控 reader/startup 故障，不用 Sleep。验证跨模式、同模式、
+宽屏历史保留、短行空白、native query/allocation/selection/metadata/reader
+失败后的旧屏恢复、初始 raw 失败和 raw 下销毁。原生 Console 的 palette
+与窗口几何并非由分开的 handle 自动完全隔离，故保留两个 native metadata
+快照和一个“恢复已完成”标记；后者防止失败回滚覆盖原先有效快照。
+
+`rg set_console_screen_buffer|set_console_window|set_console_cursor|write_console|CONOUT`
+扫描 common/app/host/KVM，所有真实显示修改仍在 host Win32 backend；
+common 只使用既有 broker/Console API。初始激活、正常 replace、失败
+回滚及销毁都复用唯一 screen-selection helper；没有清屏回调、额外 reader
+或第二输出队列。Linux 无对应 Win32 screen-buffer 逻辑，不改其现状。
+旧 Win3.1 CLS debt 与本 cooked 交接无同一原因证明，保留原 TODO。
+
+两固定 EXE 完成构建；全量 x64 CTest 64/64（63.72s）、x86 64/64
+（83.47s）；严格 lib 构建和 CTest 8/8（3.41s），manifest、DAG、文档与
+diff gates 通过。最后增加的初始 raw 故障断言单独重建并通过双宽度
+focused test；生产及 EXE 没有再改。真实 package 测试同时保留输入、
+DOS cls、CAP、debug 及 stop/start 行为，不冒充用户 Terminal/RDP 视觉验收。
+
+以 `ca810bf` 为基线，生产 C/H 两路径 +87/-3（净 +84）；测试源码两文件
+及 CMake 共三路径 +212/-4（净 +208），用 `git diff --numstat` 计数。
+lib manifest 与 README、
+设计/状态文档单列；common/app/MVDM/用户 INI/media 零修改。
+只保留短构建/测试日志，隔离 baseline probe 退出后清理。
+
+EXE SHA-256：x86 `C188518695143C3D9B12CDA4949F9418FAA2A3287C87FAF9AB2683D74D8F16FF`；
+x64 `9354F747CFECD34EC47F0B8DDFA5E4C84BA3522CD616E8515CE8C0005C4BEF43`。
+手测：console display 下 start → DOS → CAP 回 monitor，输入 help、
+空回车及短命令，再 resume/CAP 往返；确认光标、残字和历史恢复。
+S14 保留等待用户反馈，不冒充 T56 总审计完成。
+
 | 所有者 | 负责 | 契约及禁止事项 |
 | --- | --- | --- |
 | app | 读取、解析、校验原有配置；选择 SoftPC driver、CLI、热键/标题/状态文案策略；组装启动全部所需线程实体，按序停止回收 | 可直接使用 lib 公共接口完成自身职责；通过 common 接口管理其拥有的实体，注入配置与 callbacks；不复制 reducer、broker 或 executor loop |
