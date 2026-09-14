@@ -2,28 +2,11 @@
 
 ## Current Work
 
-T58 S1 is closed; owner admits S2 application composition refactor.
+No implementation subtask is active.
+Open task awaiting owner: T58.
 
-## M9 T58 S2 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner approves composition/command/keyboard separation, dual builds/tests and commit/push. |
-| Objective | Remove command_binding; command owns CLI/debug, keyboard owns hotkeys, composition only wires Common providers. |
-| Non-goals | No Lib/Common/VM/Compat/MVDM/shared-test or product semantic change. |
-| Reference Baseline | 00d4461, S1 full x64/x86 85/85. |
-| Candidate Proposal | [Scope and ledger](../proposals/m9-common-test-sync.md). |
-| Files And ABI Surface | app, product tests/CMake and current design; Common ABI unchanged. |
-| Applicable Rules | Architecture, coding, execution, documentation and their linked skills. |
-| Verification | CLI/debug/hotkey provider tests, boundary gate, dual full suites, protected roots zero diff. |
-| Expected Markers | No command_binding implementation; one composition registration; unchanged policy. |
-| Asset Needs | Both fixed EXEs; bounded ignored build logs; no INI/media edits. |
-| Reporting Requirements | Complete P push, actual-diff acceptance, clean worktree; T remains open. |
-| Stop Conditions | Product policy or protected source change needed. |
-| Exit Criteria | Ledger completed, tests/builds and governance pass, commit/push, S2 acceptance. |
-| Original Owner Request | composition集成command和keyboard到common/session；准入S，编译测试提交推送保持干净。 |
-| Similar-Issue Sweep | Every old binding function, state, include, test and build consumer. |
+T58 S1 and [S2](../history/M9-T58-S2-app-composition.md) are closed;
+both fixed EXEs are ready for owner testing. T58 remains open; no S3 admitted.
 
 ## Current Technical Baseline
 
@@ -33,9 +16,10 @@ T58 S1 is closed; owner admits S2 application composition refactor.
 - `src/mvdm/softpc.new/` is the preserved selected SoftPC baseline. Its ROM
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
-- T57 product baseline is the app/config, vm and flat compat layout; both
-  fixed packages passed 85/85 CTest. Only app/main includes the VM interface;
-  Lib, Common, MVDM and shared tests are unchanged from the T56 closure.
+- T58 S2 product baseline retains the T57 app/config, vm and flat compat
+  layout, with command/keyboard policy wired by app/composition. Both fixed
+  packages pass 85/85 CTest. Only app/main includes the VM interface; protected
+  source and shared tests are unchanged from T58 S1.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
   normalized `types`/`console`/`host`/`storage`/`kvm-*` corpus has S18 one-time
   wake selection; the T56 baseline passed x64/x86 83/83 CTest;
