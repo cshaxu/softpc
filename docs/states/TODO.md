@@ -1,7 +1,5 @@
 # Long-Term Review Ledger
 
-- TODO(Low): Lib KVM mailbox owner — T56 S17 Common-only admission explicitly leaves the Window mailbox's create-then-replace wake allocation unchanged. Review selecting the notification mechanism at initialization after this Common delivery; no new API or Lib modification is admitted by S17. This is an allocation simplification, not a prerequisite for the Common repairs.
-
 - TODO(Medium): Lib Host display owner — T56 S16 corrective probe with an artificial 30x30 buffer and 20x10 viewport observed cooked restoration as 30x10; restoring capacity afterward changed the viewport width instead. Normal full-width narrow/short/scrolled viewports pass. This is distinct from the fixed first-start frame-capacity ordering; admit a host-specific horizontal-scrollback preservation investigation if required, rather than add iterative resize compensation to this startup repair.
 
 - TODO(Medium): SoftPC CPU owner — T56 S12 disposable FNINIT/FILD qword/FISTP qword probe observed an indefinite integer write after a finite read. The debug observation matches actual stored bytes; arithmetic correctness and pre-hook baseline equivalence were not this debug-ABI task's scope. Admit a separate original-x87 baseline comparison if requested; preserve media and do not alter CPU arithmetic in a debugger adapter.
@@ -10,6 +8,6 @@
 
 - TODO(Medium): package acceptance owner — T55 S7 observed one x64 stage-7 CAP-to-monitor timeout after DOS; direct rerun, a full rerun and five consecutive package runs passed. Root cause is not established. Admit a baseline-comparison investigation if it recurs or the owner requests it; preserve the current assertion and do not label the symptom fixed.
 
-- TODO(Medium): package acceptance owner — T56 S16 observed two x64 stage-14 DOS ver visibility timeouts, including a serial run. Full serial regression passed, and identical S15/current-EXE comparison passed three times each. No input/focus change or weakened assertion was made; root cause remains unproven. Admit a bounded startup-input timing investigation if this recurs or the owner requests it.
+- TODO(Medium): package acceptance owner — T56 S16 observed two x64 stage-14 DOS ver visibility timeouts, including a serial run. Full serial regression passed, and identical S15/current-EXE comparison passed three times each. S18 first full x64 run reproduced the compact-console stage-14 symptom; the subsequent full unchanged suite passed 83/83, as did x86. No input/focus change or weakened assertion was made; root cause remains unproven. This recurrence remains a separate bounded startup-input timing investigation, not a wake-allocation repair claim.
 
 - TODO(Low): storage owner — overlay page lookup is O(n) per page. Owner explicitly deferred algorithm changes in T55 S4; admit a measured page-index optimization only when a large dirty-page workload demonstrates a useful gain. Preserve current medium semantics.

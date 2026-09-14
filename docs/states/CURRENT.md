@@ -2,34 +2,32 @@
 
 ## Current Work
 
-Owner retesting passed; [S16 is accepted](../history/M9-T56-S16-shared-tests-and-console-correction.md).
-T56 S17 Common-only repairs are implemented and verified: x64/x86 82/82,
-standalone Common 16/16. Executor delivery `cf0e31b` is pushed; coordinator
-actual-diff review passed. S17 awaits owner/NXVM feedback, not T closure.
-Lib changes require later owner review; the deferred wake-allocation item is
-recorded in TODO. No product lifecycle policy was changed.
+T56 S17 is implemented, verified and reviewed in cf0e31b / 0d4a252;
+owner/NXVM feedback remains pending. Owner now admits T56 S18, the separate
+Lib wake-allocation cleanup, with dual-width verification and S closure.
 T56 remains open; the suspended S13 whole-task audit is not claimed complete.
 
-## M9 T56 S17 Packet
+## M9 T56 S18 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits the next S to repair all audited Common findings without modifying Lib. |
-| Objective | Make frame content and route one snapshot; synchronize UI callback generation; remove redundant action mapping, frame construction, controls, wrappers and atomic state. |
-| Non-goals | No src/lib changes, lifecycle/CLI/MVDM policy changes, new threads or state machine; no T closure. |
-| Reference Baseline | 662ed4b; owner-tested S16, x86/x64 80/80 and standalone Lib 37/37. |
+| Admission And Approval | Owner approves the explained one-time mailbox notification selection cleanup and admits the next S. |
+| Objective | Initialize mailbox data without an unused Event; Console explicitly selects the default wake, Window selects its existing native notifier; remove duplicate selection state. |
+| Non-goals | No Common, app, host, MVDM, input, rendering, focus, FIFO, thread topology or public leaf API change; no T closure. |
+| Reference Baseline | 0d4a252; S17 x64/x86 82/82, standalone Common 16/16; clean main. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | Common session/ui/machine and tests/manifests; frame copy takes an expected run instead of an output run pointer; remove duplicate UI action enum and unused debug helper; Lib ABI unchanged. |
-| Applicable Rules | Execution, documentation, architecture and coding authorities. |
-| Verification | x64 82/82 (52.00s), x86 82/82 (90.50s), standalone Common 16/16 (4.29s); isolated old code fails frame-route, redundant-unfreeze and eager-status-build assertions; all manifests/DAG/documentation pass; zero Lib diff. |
-| Expected Markers | One copied snapshot drives frame and route; atomic callback generation; UI owns action vocabulary; no duplicate wrappers or lock-protected atomic metadata. |
-| Asset Needs | Both fixed EXEs; bounded logs and disposable standalone verification trees under build; preserve INI and media. |
-| Reporting Requirements | Complete P commit/push, independent actual-diff review, counted production/test changes and clean tree. |
-| Stop Conditions | A required Lib modification, product semantic change, or new synchronization framework requires separate review. |
-| Exit Criteria | All seven Common ledger groups verified; dual-width packages and regression delivered, actual-diff reviewed, committed/pushed with clean tree. |
-| Original Owner Request | 很好。我现在要你准入一个S任务修复以上common所有问题；先在不改动lib的前提下完成。如果有需要改动lib的修复，留待完成后我们再审核。 |
-| Similar-Issue Sweep | Common frame consumers, callback-shared fields, action definitions, initial-state controls, duplicate wrappers and locked frame metadata; imported debug/xasm algorithms are not rewritten. |
+| Files And ABI Surface | kvm-base mailbox implementation/support header, kvm-console creation, Lib tests/README/manifests; no application API change. |
+| Applicable Rules | Architecture, coding, execution and documentation authorities and linked governance skills. |
+| Verification | x64/x86 83/83; strict standalone Lib 38/38; focused native/selection tests 9/9; old-code allocation counterexample fails as expected. First x64 compact-console stage-14 timeout retained in proposal/TODO. Ready for executor commit and actual-diff review. |
+| Expected Markers | Window allocates no default wake; Console allocates one; failed selection leaves unselected state; duplicate selection cannot change notifier. |
+| Asset Needs | Refresh both fixed EXEs only; bounded build/s18 logs and disposable standalone build; preserve INI/media. |
+| Reporting Requirements | Executor complete P commit/push, coordinator actual-diff review and S closure commit/push; clean workspace and two EXE links. |
+| Stop Conditions | A runtime notification switch, new state machine, public leaf API or product behavior change requires owner review. |
+| Exit Criteria | All startup-selection ledger cases pass; both EXEs built/tested, implementation pushed, reviewed and S closed; wait for owner test. |
+| Original Owner Request | 批准这个改动，请你查看最新代码，在最新的S任务编号后加1，准入执行。单人双角色模式，做完以后要编译/测试/提交/推送/收口这个新S任务，然后汇报给我，等我测试。 |
+| Similar-Issue Sweep | All mailbox/component initialize, notify selection, notify and wake wait callers; both production leaves and direct test fixtures must select before notification. |
+
 
 ## Current Technical Baseline
 
@@ -40,9 +38,9 @@ T56 remains open; the suspended S13 whole-task audit is not claimed complete.
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
-  normalized `types`/`console`/`host`/`storage`/`kvm-*` corpus is unchanged by S17;
-  current x64/x86 product builds pass 82/82 CTest;
-  strict standalone library suite passes 37/37. Its path-scoped standalone MSVC
+  normalized `types`/`console`/`host`/`storage`/`kvm-*` corpus has S18 one-time
+  wake selection; current x64/x86 product builds pass 83/83 CTest;
+  strict standalone library suite passes 38/38. Its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 
 ## Recent M9 Closures

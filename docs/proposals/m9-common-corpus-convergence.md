@@ -21,6 +21,45 @@ lib 调用的强制中转层；以下任务与验收按此修订执行。
 
 ## 五个组件及组装边界
 
+### T56 S18：Lib 唤醒初始化简化
+
+原始准入：“批准这个改动，请你查看最新代码，在最新的S任务编号后加1，
+准入执行。单人双角色模式，做完以后要编译/测试/提交/推送/收口这个新S任务，
+然后汇报给我，等我测试。”基线 0d4a252；S17 的 Common-only 交付不改变。
+
+范围仅是原 TODO 的 create-then-replace wake 分配。mailboxes_create 只
+初始化数据/锁；select_notify(NULL,NULL) 创建默认 wake，非空 callback
+直接登记已有 Window 消息通知。notify 非空即选择完成，删除重复 flag。
+Console 在 worker 启动前显式选择，Window 保留原生窗口就绪后的现有
+选择点；选择完成前不对外发布组件。无需修改公共 leaf API 或 Common。
+
+有限验收账本：无通知资源的初始化及销毁；Window 零默认 wake 分配；
+Console 一次分配及一次销毁；默认分配失败保持未选择；两种方向的重复
+选择均不改状态；notify 调用唯一选定实现；原 FIFO/STOP/故障/创建失败
+语义保留。遍历全部 initialize/select/wait/notify 生产及测试调用点，
+修复测试接线但不削弱断言。双宽度全量、严格 Lib、manifest/DAG/文档
+验证后执行者提交推送；审查实际 diff 后收口 S18，T56 仍不收口。
+
+#### S18 实施与验证
+
+生产 C/H 三文件 +19/-16，净 +3；移除 notifier_selected，不新增状态。
+测试 C 六文件 +89/-0，CMake 一文件 +1/-0（manifest/文档/EXE 不计入代码）。
+Window 原有 select 调用不变，Console 明确选择一次默认 wake，资源仍由
+mailbox destroy 释放。Windows/Linux wake_create 失败均不交出资源；
+启动失败沿既有 dispose 路径处理。数据型 frame 单测不等待/通知，保持
+无 wake；五个直接初始化组件的测试 fixture 补上一次选择，不削弱断言。
+新增计数测试覆盖未选择销毁、失败、零/一次分配、重复拒绝、唯一通知。
+对 0d4a252 原实现运行同一测试，默认分配故障使 create 断言确定性失败。
+
+双 EXE 已用 tests-x64/tests-x86 preset 构建。最终完整测试各 83/83；
+严格独立 Lib 38/38，专项 9/9，含真实 Window modal/retirement 与 Console
+retirement barrier。完整套件包含四目录 manifest、组件 DAG 和文档门禁。
+首轮 x64 81/83：文档门禁缺 S17 历史交付记录，已补存已有审查事实；
+compact-console stage 14 出现已记载的 DOS ver 可见性超时，后续全量
+原断言通过。未修改 package 测试、输入/focus 或超时，未宣称修复此旧债。
+保留 build/s18-*.log 的精简证据，删除任务自建独立构建和探针目录。
+Common/app/host/MVDM、用户 INI 与媒体均零改动，测试产物仅刷新双 EXE。
+
 ### T56 S17：Common 一致性与简化
 
 原始准入：“很好。我现在要你准入一个S任务修复以上common所有问题；
