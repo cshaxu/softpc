@@ -1,4 +1,5 @@
 #include "common/machine/machine_interface.h"
+#include "common/debug/debug_interface.h"
 
 #include <windows.h>
 #include <assert.h>
@@ -17,6 +18,7 @@ typedef struct machine_fake {
     LONG resets;
     LONG runs;
     LONG inputs;
+    LONG debug_calls;
 } machine_fake;
 
 static lib_bool fake_reset(void *opaque)
@@ -72,6 +74,16 @@ static lib_bool fake_copy_frame(void *opaque, kvm_frame *frame)
     frame->text_rows = KVM_TEXT_ROWS;
     return LIB_TRUE;
 }
+static lib_status fake_execute_debug(void *opaque,
+    const common_machine_debug_request *request,
+    common_machine_debug_result *result)
+{
+    machine_fake *fake = (machine_fake *)opaque;
+    if (request == NULL || result == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    InterlockedIncrement(&fake->debug_calls);
+    *result = (common_machine_debug_result) { .value = request->address };
+    return LIB_STATUS_OK;
+}
 static void note_state(void *opaque, common_machine_state state,
     lib_u32 generation)
 {
@@ -97,6 +109,10 @@ int main(void)
     kvm_input_event input = { 0 };
     kvm_frame frame = { 0 };
     lib_u32 generation = 0u;
+    common_machine_debug_lease lease = { 0 };
+    common_machine_debug_result debug_result = { 0 };
+    common_debug *debug = NULL;
+    common_debug_result debug_command_result = { 0 };
 
     fake.stopped = CreateEventA(NULL, TRUE, FALSE, NULL);
     fake.state_stopped = CreateEventA(NULL, TRUE, FALSE, NULL);
@@ -117,6 +133,7 @@ int main(void)
     driver.set_executor_callback = fake_set_callback;
     driver.deliver_input = fake_deliver_input;
     driver.copy_frame = fake_copy_frame;
+    driver.execute_debug = fake_execute_debug;
     assert(common_machine_create(&machine, &driver) == LIB_STATUS_OK);
     common_machine_set_state_sink(machine, note_state, &fake);
     common_machine_set_frame_sink(machine, note_frame, &fake);
@@ -136,7 +153,24 @@ int main(void)
     assert(WaitForSingleObject(fake.reset_completed, 5000u) == WAIT_OBJECT_0);
     assert(InterlockedCompareExchange(&fake.resets, 0, 0) == 2);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
+    assert(common_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
+    assert(common_machine_debug_execute_with_lease(machine, &lease,
+        &(common_machine_debug_request) {
+            .operation = COMMON_MACHINE_DEBUG_READ_REGISTER,
+            .address = 0x1234u }, &debug_result) == LIB_STATUS_OK);
+    assert(debug_result.value == 0x1234u &&
+        InterlockedCompareExchange(&fake.debug_calls, 0, 0) == 1);
+    assert(common_debug_create(&debug) == LIB_STATUS_OK);
+    assert(common_debug_open(debug, machine) == LIB_STATUS_OK);
+    assert(common_debug_submit_line(debug, "?", &debug_command_result) ==
+        LIB_STATUS_OK);
+    assert(strstr(debug_command_result.text, "assemble") != NULL);
+    common_debug_close(debug);
+    common_debug_destroy(debug);
     assert(common_machine_resume(machine));
+    assert(common_machine_debug_execute_with_lease(machine, &lease,
+        &(common_machine_debug_request) { 0 }, &debug_result) ==
+        LIB_STATUS_INVALID_STATE);
     assert(WaitForSingleObject(fake.running, 5000u) == WAIT_OBJECT_0);
     assert(common_machine_stop(machine));
     assert(WaitForSingleObject(fake.state_stopped, 5000u) == WAIT_OBJECT_0);

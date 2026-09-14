@@ -23,6 +23,7 @@ struct common_machine {
     host_sync_task *worker;
     volatile LONG state;
     volatile LONG run_generation;
+    volatile LONG debug_generation;
     volatile LONG pause_requested;
     volatile LONG stop_requested;
     volatile LONG start_requested;
@@ -44,6 +45,11 @@ static void common_machine_notify_state(common_machine *machine,
     if (machine != NULL && machine->state_sink != NULL)
         machine->state_sink(machine->state_context, completed,
             common_machine_run_generation(machine));
+}
+
+void common_machine_debug_invalidate(common_machine *machine)
+{
+    if (machine != NULL) (void)InterlockedIncrement(&machine->debug_generation);
 }
 
 static void common_machine_invalidate_published_frame(common_machine *machine)
@@ -188,6 +194,7 @@ static void common_machine_executor_event(void *opaque)
 static void common_machine_begin_cold_run(common_machine *machine,
     lib_bool pause_after_start)
 {
+    common_machine_debug_invalidate(machine);
     common_machine_input_queue_clear(machine->input_queue);
     common_machine_invalidate_published_frame(machine);
     InterlockedExchange(&machine->pause_requested, pause_after_start != 0);
@@ -250,6 +257,7 @@ static void common_machine_worker(void *opaque, const host_sync_task *task)
             InterlockedCompareExchange(&machine->terminate_requested, 0, 0) == 0);
         machine->driver.set_heartbeat(machine->driver.context, LIB_FALSE);
         machine->driver.set_executor_callback(machine->driver.context, NULL, NULL);
+        common_machine_debug_invalidate(machine);
         if (succeeded && InterlockedExchange(&machine->reset_requested, 0) != 0) {
             InterlockedExchange(&machine->stop_requested, 0);
             common_machine_begin_cold_run(machine, LIB_TRUE);
@@ -290,6 +298,7 @@ lib_status common_machine_create(common_machine **out_machine,
         return LIB_STATUS_NO_MEMORY;
     }
     machine->state = COMMON_MACHINE_STOPPED;
+    machine->debug_generation = 1;
     InitializeCriticalSection(&machine->frame_lock);
     machine->frame_lock_initialized = LIB_TRUE;
     if (host_sync_task_create(common_machine_worker, machine, &machine->worker) !=
@@ -334,6 +343,7 @@ lib_bool common_machine_resume(common_machine *machine)
 {
     if (machine == NULL || InterlockedCompareExchange(&machine->state, 0, 0) !=
         COMMON_MACHINE_PAUSED) return LIB_FALSE;
+    common_machine_debug_invalidate(machine);
     InterlockedExchange(&machine->pause_requested, 0);
     host_sync_event_signal(machine->resume_event);
     return LIB_TRUE;
@@ -346,6 +356,7 @@ lib_bool common_machine_stop(common_machine *machine)
     state = InterlockedCompareExchange(&machine->state, 0, 0);
     if (state == COMMON_MACHINE_STOPPED) return LIB_TRUE;
     if (state == COMMON_MACHINE_ERROR) return LIB_FALSE;
+    common_machine_debug_invalidate(machine);
     host_sync_event_reset(machine->ready_event);
     InterlockedExchange(&machine->stop_requested, 1);
     InterlockedExchange(&machine->pause_requested, 0);
@@ -367,6 +378,7 @@ lib_bool common_machine_reset(common_machine *machine)
     }
     if (state != COMMON_MACHINE_RUNNING && state != COMMON_MACHINE_PAUSED)
         return LIB_FALSE;
+    common_machine_debug_invalidate(machine);
     InterlockedExchange(&machine->reset_active, 1);
     InterlockedExchange(&machine->reset_requested, 1);
     InterlockedExchange(&machine->stop_requested, 1);
@@ -461,9 +473,43 @@ lib_u32 common_machine_run_generation(const common_machine *machine)
         (volatile LONG *)&machine->run_generation, 0, 0);
 }
 
+lib_status common_machine_debug_acquire(common_machine *machine,
+    common_machine_debug_lease *out_lease)
+{
+    LONG generation;
+
+    if (machine == NULL || out_lease == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    if (common_machine_state_get(machine) != COMMON_MACHINE_PAUSED)
+        return LIB_STATUS_INVALID_STATE;
+    if (machine->driver.execute_debug == NULL) return LIB_STATUS_UNSUPPORTED;
+    generation = InterlockedCompareExchange(&machine->debug_generation, 0, 0);
+    if (generation == 0) return LIB_STATUS_INVALID_STATE;
+    out_lease->generation = (lib_u64)(lib_u32)generation;
+    return LIB_STATUS_OK;
+}
+
+lib_status common_machine_debug_execute_with_lease(common_machine *machine,
+    const common_machine_debug_lease *lease,
+    const common_machine_debug_request *request,
+    common_machine_debug_result *out_result)
+{
+    LONG generation;
+
+    if (machine == NULL || lease == NULL || request == NULL || out_result == NULL ||
+        request->bytes > COMMON_MACHINE_DEBUG_BYTES) return LIB_STATUS_INVALID_ARGUMENT;
+    if (common_machine_state_get(machine) != COMMON_MACHINE_PAUSED)
+        return LIB_STATUS_INVALID_STATE;
+    generation = InterlockedCompareExchange(&machine->debug_generation, 0, 0);
+    if (lease->generation == 0u || lease->generation != (lib_u64)(lib_u32)generation)
+        return LIB_STATUS_INVALID_STATE;
+    if (machine->driver.execute_debug == NULL) return LIB_STATUS_UNSUPPORTED;
+    return machine->driver.execute_debug(machine->driver.context, request, out_result);
+}
+
 void common_machine_destroy(common_machine *machine)
 {
     if (machine == NULL) return;
+    common_machine_debug_invalidate(machine);
     (void)common_machine_stop(machine);
     InterlockedExchange(&machine->terminate_requested, 1);
     if (machine->resume_event != NULL) host_sync_event_signal(machine->resume_event);

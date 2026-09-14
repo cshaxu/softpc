@@ -496,7 +496,7 @@ add_test(NAME softpc-runtime-input-continuation-smoke
 set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-common-machine-smoke test/unit/common_machine_smoke.c)
-target_link_libraries(softpc-common-machine-smoke PRIVATE common-machine host kvm-base)
+target_link_libraries(softpc-common-machine-smoke PRIVATE common-machine common-debug host kvm-base)
 add_test(NAME softpc-common-machine-smoke COMMAND softpc-common-machine-smoke)
 set_tests_properties(softpc-common-machine-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
