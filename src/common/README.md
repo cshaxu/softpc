@@ -8,7 +8,7 @@ options and injected callbacks.  It never includes app, host, or MVDM source.
 | --- | --- | --- |
 | `machine` | executor, lifecycle/input queues, frame publication, optional paused debug adapter | `machine_interface.h` |
 | `session` | one control queue, completed-fact reduction and dispatch | `session_interface.h` |
-| `ui` | monitor logical Console, broker and KVM composition | `ui_interface.h` |
+| interaction owner | monitor logical Console, broker and KVM composition | its root public contract |
 | `xasm32` | copied byte/text assembly and disassembly | `xasm32_interface.h` |
 | `debug` | generic debug command engine using the optional machine adapter | `debug_interface.h` |
 
