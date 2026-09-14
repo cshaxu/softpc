@@ -2,7 +2,7 @@
 
 Executor delivery bdc78a8 was pushed before this acceptance review.
 Scope, changed-path accounting, verification and the full ownership ledger
-remain in the [refactor proposal](../proposals/m9-app-vm-compat-boundaries.md).
+remain in the [refactor proposal](M9-T57-app-vm-compat-proposal.md).
 
 Actual-commit review checked main acquisition/destruction and failure paths,
 the relocated driver/input/debug/trace implementations, all Compat renames,

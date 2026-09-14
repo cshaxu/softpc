@@ -2,31 +2,9 @@
 
 ## Current Work
 
-T57 S1 and S2 are closed after dual-width proof and actual-diff review.
-S3 whole-request audit is verified; implementation is complete, awaiting
-owner package feedback and T closure approval. No further code work is active.
-T56 remains closed; no shared corpus or MVDM change is admitted.
-
-## M9 T57 S3 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner admits new T to implement the confirmed app/vm/compat refactor. |
-| Objective | Audit all admitted refactor paths, retained semantics, artifacts and debt against the frozen ledger. |
-| Non-goals | No shared Lib/Common/MVDM or product semantics change. |
-| Reference Baseline | bdc78a8, S2 x64/x86 85/85; original task baseline cfc88cf. |
-| Candidate Proposal | [Refactor](../proposals/m9-app-vm-compat-boundaries.md). |
-| Files And ABI Surface | app, vm, compat, product tests/CMake and current design; existing Common driver and original machine ABI unchanged. |
-| Applicable Rules | Architecture, coding, execution, documentation and their linked governance skills. |
-| Verification | Boundary positive/negative probes, full x86/x64 suites, five protected corpora zero diff and documentation gate. |
-| Expected Markers | No src/host or app machine driver; no app->Compat/MVDM; only main->VM; both fixed EXEs. |
-| Asset Needs | Refresh fixed EXEs only; no INI/media edits. Bounded logs under build; no new media. |
-| Reporting Requirements | S3 evidence is in the proposal; commit/push audit, report fixed dual-width EXEs and wait for owner closure. |
-| Stop Conditions | Protected corpus changes or product behavior redesign require owner direction. |
-| Exit Criteria | Whole-request ledger and source accounting pass, protected corpora unchanged, both artifacts verified, commit/push and owner closure decision. |
-| Original Owner Request | 准入一个新的t任务实施重构；app main is the only permitted VM consumer. |
-| Similar-Issue Sweep | All app/host includes, symbols, build sources, source-boundary checks and product test consumers. |
+No implementation subtask is active.
+T57 S1-S3 and the whole task are closed on owner approval.
+The XP mirror candidate remains queued, not admitted.
 
 ## Current Technical Baseline
 
@@ -61,6 +39,7 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T57 | App/config, VM and flat Compat refactor closed on owner approval; protected corpora unchanged, dual-width 85/85. | [S3 closure](../history/M9-T57-S3-completion-audit.md) |
 | T56 | Common extraction, debug integration and follow-up repairs closed on owner request after whole-task audit; known debts retained. | [S19 final audit](../history/M9-T56-S19-completion-audit.md) |
 | T55 | Canonical shared library refreshed, normalized, simplified, boundary-gated, and renamed to the KVM corpus; owner accepted final package testing. | [T55 closure](../history/M9-T55-closure-kvm-corpus.md) |
 | T49 | Shared-library quality sequence S1–S6 closed after owner x86/x64 package acceptance. | [T49 S6 history](../history/M9-T49-S6-lib-neutral-corpus-prose.md) |

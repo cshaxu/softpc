@@ -2,7 +2,7 @@
 
 Owner admits the app/vm/compat refactor, with only main allowed to know VM,
 and no Lib/Common/MVDM modifications. Full original request and frozen
-ownership ledger: [proposal](../proposals/m9-app-vm-compat-boundaries.md).
+ownership ledger: [proposal](M9-T57-app-vm-compat-proposal.md).
 Baseline cfc88cf; configuration extraction is the first bounded step.
 
 Moved the existing parser and path helpers, preserving record splitting,
