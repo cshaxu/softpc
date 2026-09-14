@@ -46,3 +46,8 @@ removed by tests, and no owned test process remains. Architectural CR1/CR4 are
 explicitly unsupported. The separate original-x87 arithmetic observation is
 recorded in TODO with a baseline-comparison admission condition, not silently
 changed or presented as a debugger fix.
+
+The P2 closure record initially left T56 open without a next active packet;
+the documentation gate rejects that state. P3 corrects the task continuation
+by admitting the required S13 T-level audit, rather than falsely marking T56
+closed. No production source or tested binary changes in this correction.
