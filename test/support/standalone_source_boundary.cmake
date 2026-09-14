@@ -106,12 +106,24 @@ if(EXISTS "${SOFTPC_SOURCE_DIR}/src/core")
 endif()
 foreach(app_source IN ITEMS
     "src/app/main.c"
-    "src/app/runtime.c"
+    "src/app/machine_driver.c"
     "src/app/keyboard.c")
     if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/${app_source}")
         message(FATAL_ERROR "Standalone application source is missing: ${app_source}")
     endif()
 endforeach()
+foreach(retired_machine_source IN ITEMS
+    "src/app/runtime.c"
+    "src/app/runtime.h"
+    "src/app/input_queue.c"
+    "src/app/input_queue.h")
+    if(EXISTS "${SOFTPC_SOURCE_DIR}/${retired_machine_source}")
+        message(FATAL_ERROR "Application retains a second machine implementation: ${retired_machine_source}")
+    endif()
+endforeach()
+if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/src/common/machine/machine.c")
+    message(FATAL_ERROR "Common machine source is missing")
+endif()
 if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/src/common/ui/ui.c")
     message(FATAL_ERROR "Common UI source is missing")
 endif()

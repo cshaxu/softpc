@@ -4,6 +4,7 @@
 #include "lib/types/types_interface.h"
 #include "lib/kvm-base/event_interface.h"
 #include "lib/kvm-base/frame_interface.h"
+#include "common/machine/machine_interface.h"
 
 #define COMMON_SESSION_TEXT_CAPACITY 2048u
 
@@ -68,15 +69,6 @@ typedef struct common_session_command_result {
     lib_bool release_window_mouse;
 } common_session_command_result;
 
-typedef struct common_session_machine_adapter {
-    void *context;
-    lib_u32 (*run_generation)(void *context);
-    lib_bool (*copy_published_frame)(void *context, kvm_frame *out_frame,
-        lib_u32 *out_run_generation);
-    lib_bool (*request)(void *context, common_session_request request);
-    lib_bool (*deliver_input)(void *context, const kvm_input_event *event);
-} common_session_machine_adapter;
-
 typedef struct common_session_command_provider {
     void *context;
     void (*open)(void *context, common_session_command_result *out_result);
@@ -101,7 +93,7 @@ typedef struct common_session_command_provider {
 typedef struct common_session_options {
     common_session_display display;
     lib_bool console_control;
-    common_session_machine_adapter machine;
+    common_machine *machine;
     common_session_command_provider command;
 } common_session_options;
 

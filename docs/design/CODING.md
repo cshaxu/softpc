@@ -12,10 +12,11 @@ src/
   common/
     ui/          broker, monitor Console and KVM composition
     session/     neutral control FIFO, reduction and UI dispatch
+    machine/     generic executor, lifecycle/input queues and frame publication
   lib/{types,console,host,storage,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
   app/
-    main.c, runtime.c, keyboard.c, firmware.rc
+    main.c, machine_driver.c, keyboard.c, firmware.rc
 ```
 
 Directories appear only in their admitted migration task.
@@ -39,8 +40,10 @@ mechanical compiler, declaration, calling-ABI, and pointer-representation
 corrections live as reviewable source diffs at their affected points. Generated
 transformed C/H files are not build inputs. `host` owns platform capability
 implementations and larger functional adaptations; `app` owns
-configuration, entity assembly, machine snapshot production, guest-input
-conversion and product CLI policy. `common/session` owns the control FIFO,
+configuration, entity assembly, the injected SoftPC machine driver, guest-input
+conversion and product CLI policy. `common/machine` owns the one generic
+executor, lifecycle/input queues, run generation and copied-frame publication.
+`common/session` owns the control FIFO,
 completed-fact reduction, prompt scheduling and dispatch to injected machine/
 UI adapters. `common/ui` owns monitor/KVM composition and Console handoff.
 `lib` owns copied-value platform mechanics:

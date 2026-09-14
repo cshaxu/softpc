@@ -1,7 +1,7 @@
 #include "keyboard.h"
 
 #ifdef _WIN32
-#include "runtime.h"
+#include "common/machine/machine_interface.h"
 #include <windows.h>
 
 extern BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD key_event);
@@ -43,11 +43,10 @@ static WORD app_keyboard_to_virtual_key(lib_u32 key)
     }
 }
 
-int app_keyboard_deliver_input(void *context,
-    const kvm_input_event *event)
+int app_keyboard_deliver_input(void *context, const kvm_input_event *event)
 {
-    return context != NULL && event != NULL && app_runtime_enqueue_input_event(
-        (app_runtime *)context, event);
+    return context != NULL && event != NULL && common_machine_enqueue_input(
+        (common_machine *)context, event) != 0;
 }
 
 int app_keyboard_inject_machine_event(softpc_machine *machine,

@@ -1,6 +1,7 @@
 #include "command.h"
 #include "common/session/session_interface.h"
-#include "runtime.h"
+#include "common/machine/machine_interface.h"
+#include "machine_driver.h"
 #include "machine.h"
 #include "prompt_trace.h"
 #include "keyboard.h"
@@ -31,7 +32,7 @@ typedef struct app_startup_config {
  * sees this copied, product-neutral provider contract. */
 typedef struct app_command_binding {
     app_command_session session;
-    app_runtime *runtime;
+    common_machine *machine;
 } app_command_binding;
 
 static char *app_trim(char *text)
@@ -202,31 +203,31 @@ static common_session_display app_session_display(softpc_presentation display)
         COMMON_SESSION_DISPLAY_WINDOW : COMMON_SESSION_DISPLAY_CONSOLE;
 }
 
-static common_session_machine_state app_session_state(app_runtime_state state)
+static common_session_machine_state app_session_state(common_machine_state state)
 {
     switch (state) {
-    case SOFTPC_RUNTIME_RUNNING: return COMMON_SESSION_MACHINE_RUNNING;
-    case SOFTPC_RUNTIME_PAUSED: return COMMON_SESSION_MACHINE_PAUSED;
-    case SOFTPC_RUNTIME_ERROR: return COMMON_SESSION_MACHINE_ERROR;
-    case SOFTPC_RUNTIME_RESET_COMPLETED:
+    case COMMON_MACHINE_RUNNING: return COMMON_SESSION_MACHINE_RUNNING;
+    case COMMON_MACHINE_PAUSED: return COMMON_SESSION_MACHINE_PAUSED;
+    case COMMON_MACHINE_ERROR: return COMMON_SESSION_MACHINE_ERROR;
+    case COMMON_MACHINE_RESET_COMPLETED:
         return COMMON_SESSION_MACHINE_RESET_COMPLETED;
     default: return COMMON_SESSION_MACHINE_STOPPED;
     }
 }
 
-/* app/ owns the product runtime ABI.  common/session owns its neutral copied
+/* app/ owns the product machine ABI. common/session owns its neutral copied
  * completion facts; convert explicitly at this one composition boundary.
  * The numeric enum values are deliberately not a cross-component contract. */
-static app_runtime_state app_runtime_completed_state(
+static common_machine_state app_machine_completed_state(
     common_session_machine_state state)
 {
     switch (state) {
-    case COMMON_SESSION_MACHINE_RUNNING: return SOFTPC_RUNTIME_RUNNING;
-    case COMMON_SESSION_MACHINE_PAUSED: return SOFTPC_RUNTIME_PAUSED;
-    case COMMON_SESSION_MACHINE_ERROR: return SOFTPC_RUNTIME_ERROR;
+    case COMMON_SESSION_MACHINE_RUNNING: return COMMON_MACHINE_RUNNING;
+    case COMMON_SESSION_MACHINE_PAUSED: return COMMON_MACHINE_PAUSED;
+    case COMMON_SESSION_MACHINE_ERROR: return COMMON_MACHINE_ERROR;
     case COMMON_SESSION_MACHINE_RESET_COMPLETED:
-        return SOFTPC_RUNTIME_RESET_COMPLETED;
-    default: return SOFTPC_RUNTIME_STOPPED;
+        return COMMON_MACHINE_RESET_COMPLETED;
+    default: return COMMON_MACHINE_STOPPED;
     }
 }
 
@@ -275,39 +276,6 @@ static void app_command_copy_effect(common_session_command_result *out,
     out->arm_prompt = effect->arm_prompt != 0;
 }
 
-static lib_bool app_session_machine_request(void *opaque,
-    common_session_request request)
-{
-    app_runtime *runtime = (app_runtime *)opaque;
-    switch (request) {
-    case COMMON_SESSION_REQUEST_NONE: return LIB_TRUE;
-    case COMMON_SESSION_REQUEST_START: return app_runtime_start(runtime) != 0;
-    case COMMON_SESSION_REQUEST_RESUME: return app_runtime_resume(runtime) != 0;
-    case COMMON_SESSION_REQUEST_PAUSE: return app_runtime_pause(runtime) != 0;
-    case COMMON_SESSION_REQUEST_STOP: return app_runtime_stop(runtime) != 0;
-    case COMMON_SESSION_REQUEST_RESET: return app_runtime_reset(runtime) != 0;
-    }
-    return LIB_FALSE;
-}
-
-static lib_u32 app_session_run_generation(void *opaque)
-{
-    return app_runtime_run_generation((app_runtime *)opaque);
-}
-
-static lib_bool app_session_copy_frame(void *opaque, kvm_frame *frame,
-    lib_u32 *out_run_generation)
-{
-    return app_runtime_copy_published_frame((app_runtime *)opaque, frame,
-        out_run_generation) != 0;
-}
-
-static lib_bool app_session_deliver_input(void *opaque,
-    const kvm_input_event *event)
-{
-    return app_keyboard_deliver_input((app_runtime *)opaque, event) != 0;
-}
-
 static void app_command_provider_open(void *opaque,
     common_session_command_result *out)
 {
@@ -336,8 +304,8 @@ static void app_command_provider_submit_line(void *opaque,
         &effect);
     if (effect.action != APP_COMMAND_ACTION_NONE) {
         int succeeded = effect.action == APP_COMMAND_ACTION_EJECT_FLOPPY ?
-            app_runtime_set_floppy(binding->runtime, NULL) :
-            app_runtime_set_floppy(binding->runtime, effect.path);
+            common_machine_set_removable_media(binding->machine, NULL) :
+            common_machine_set_removable_media(binding->machine, effect.path);
         app_command_session_complete_floppy(&binding->session, effect.action,
             succeeded, &effect);
     }
@@ -361,7 +329,7 @@ static void app_command_provider_note_runtime(void *opaque,
     app_command_binding *binding = (app_command_binding *)opaque;
     app_command_effect effect = { 0 };
     app_command_session_note_runtime(&binding->session, app_command_state(prior),
-        app_runtime_completed_state(completed), &effect);
+        app_machine_completed_state(completed), &effect);
     app_command_copy_effect(out, &effect);
 }
 
@@ -406,24 +374,24 @@ static lib_bool app_command_provider_handle_hotkey(void *opaque,
     }
     if (state != COMMON_SESSION_MACHINE_RUNNING) return LIB_TRUE;
     if (strcmp(identifier, "send-ctrl-alt-del") == 0)
-        return app_keyboard_submit_ctrl_alt_del(binding->runtime,
+        return app_keyboard_submit_ctrl_alt_del(binding->machine,
             app_keyboard_deliver_input) != 0;
     if (strcmp(identifier, "send-alt-enter") == 0)
-        return app_keyboard_submit_alt_enter(binding->runtime,
+        return app_keyboard_submit_alt_enter(binding->machine,
             app_keyboard_deliver_input) != 0;
     return LIB_TRUE;
 }
 
-static void app_runtime_state_completed(void *opaque, app_runtime_state state,
-    uint32_t run_generation)
+static void app_machine_state_completed(void *opaque, common_machine_state state,
+    lib_u32 run_generation)
 {
     common_session *session = (common_session *)opaque;
     (void)common_session_enqueue_runtime_completed(session, app_session_state(state),
         run_generation);
 }
 
-static void app_runtime_frame_published(void *opaque, uint32_t sequence,
-    int graphics, uint32_t run_generation)
+static void app_machine_frame_published(void *opaque, lib_u32 sequence,
+    lib_bool graphics, lib_u32 run_generation)
 {
     common_session *session = (common_session *)opaque;
     (void)common_session_enqueue_frame_completed(session, sequence,
@@ -437,7 +405,9 @@ int main(int argc, char **argv)
         SOFTPC_PRESENTATION_CONSOLE, 1, SOFTPC_MEDIA_OVERLAY };
     softpc_machine_options options = { 0 };
     softpc_machine *machine = NULL;
-    app_runtime *runtime = NULL;
+    common_machine *machine_runtime = NULL;
+    app_machine_driver *machine_driver = NULL;
+    common_machine_driver driver = { 0 };
     common_ui *ui = NULL;
     common_ui_options common_options = { 0 };
     common_session_options session_options = { 0 };
@@ -481,7 +451,12 @@ int main(int argc, char **argv)
         config.printer_output_path;
     result = softpc_machine_create(&options, &machine);
     if (result != SOFTPC_MACHINE_OK) goto done;
-    if (!app_runtime_create(machine, &runtime)) {
+    if (app_machine_driver_create(&machine_driver, machine) != LIB_STATUS_OK) {
+        result = SOFTPC_MACHINE_IO_ERROR;
+        goto done;
+    }
+    app_machine_driver_describe(machine_driver, &driver);
+    if (common_machine_create(&machine_runtime, &driver) != LIB_STATUS_OK) {
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
     }
@@ -489,15 +464,11 @@ int main(int argc, char **argv)
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
     }
-    command_binding.runtime = runtime;
+    command_binding.machine = machine_runtime;
     app_command_session_initialize(&command_binding.session, options.presentation);
     session_options.display = app_session_display(options.presentation);
     session_options.console_control = config.console_control != 0;
-    session_options.machine.context = runtime;
-    session_options.machine.run_generation = app_session_run_generation;
-    session_options.machine.copy_published_frame = app_session_copy_frame;
-    session_options.machine.request = app_session_machine_request;
-    session_options.machine.deliver_input = app_session_deliver_input;
+    session_options.machine = machine_runtime;
     session_options.command.context = &command_binding;
     session_options.command.open = app_command_provider_open;
     session_options.command.reject_line = app_command_provider_reject_line;
@@ -528,14 +499,15 @@ int main(int argc, char **argv)
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
     }
-    app_runtime_set_state_sink(runtime, app_runtime_state_completed, session);
-    app_runtime_set_frame_sink(runtime, app_runtime_frame_published, session);
+    common_machine_set_state_sink(machine_runtime, app_machine_state_completed, session);
+    common_machine_set_frame_sink(machine_runtime, app_machine_frame_published, session);
     if (common_session_run(session) == 0)
         result = SOFTPC_MACHINE_IO_ERROR;
 done:
     if (result != SOFTPC_MACHINE_OK)
         fprintf(stderr, "softpcvm: %s\n", softpc_machine_result_name(result));
-    app_runtime_destroy(runtime);
+    common_machine_destroy(machine_runtime);
+    app_machine_driver_destroy(machine_driver);
     (void)common_ui_destroy(ui);
     (void)common_session_destroy(session);
     softpc_machine_destroy(machine);

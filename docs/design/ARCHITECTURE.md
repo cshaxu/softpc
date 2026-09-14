@@ -12,7 +12,11 @@ host/
         ↑
 common/session/
   control FIFO, copied completion reduction, command/provider injection and
-  dispatch to the selected UI and machine adapters
+  dispatch to the selected UI and machine interfaces
+        ↑
+common/machine/
+  sole generic executor, lifecycle/input queues, complete-frame publication
+  and injected product-machine driver boundary
         ↑
 common/ui/
   broker, cooked monitor Console, raw VM Console, Window/KVM instances and
@@ -20,7 +24,8 @@ common/ui/
         ↑
 app/
   product configuration, entity assembly, CLI/title/hotkey/status policy,
-  machine executor and guest-input adapter; no control reduction in app
+  SoftPC machine driver and guest-input adapter; no control reduction or
+  generic executor in app
         ↑
 lib/{types,console,host,storage,kvm-base,kvm-window,kvm-console}/
   canonical shared platform library, delivered for NXVM to adopt exactly:
@@ -45,8 +50,10 @@ the SoftPC CLI and machine adapter as injected callbacks; it does not parse
 configuration or interpret machine internals. `common/ui` is the sole owner
 of the monitor logical Console, broker, raw VM Console and Window/KVM
 instances; it receives only copied product policy and returns copied events.
-`app/` owns configuration, entity assembly, the single executor, machine
-snapshot producer, guest-input adapter and the SoftPC CLI binding.
+`app/` owns configuration, entity assembly, the SoftPC machine driver,
+guest-input adapter and the SoftPC CLI binding. `common/machine` owns the
+single generic executor, request/input queues, run generation and copied-frame
+publication; its injected app driver alone calls the SoftPC machine boundary.
 `lib/` is the canonical checked-in shared-library corpus, not a runtime or
 build dependency on NXVM or NTVDM64. NXVM adopts this corpus exactly. It
 consumes and produces copied host values only. It owns
@@ -65,9 +72,10 @@ translate native records before the event reaches the shared contract; only
 the application guest binding may translate that neutral value to a product's
 guest-input protocol.
 
-The runtime executor is the sole caller of the machine and compatibility host.
-Input producers enqueue records and signal it. The executor publishes complete
-text or graphic frame snapshots; frontends consume only those snapshots.
+The common-machine executor is the sole caller of the injected machine driver
+and compatibility host. Input producers enqueue records and signal it. The
+executor publishes complete text or graphic frame snapshots; frontends consume
+only those snapshots.
 
 ## Shared Console And KVM Composition
 

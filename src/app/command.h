@@ -1,7 +1,8 @@
 #ifndef APP_COMMAND_H
 #define APP_COMMAND_H
 
-#include "runtime.h"
+#include "common/machine/machine_interface.h"
+#include "machine.h"
 
 #define APP_COMMAND_TEXT_CAPACITY 2048u
 #define APP_COMMAND_PATH_CAPACITY 1024u
@@ -54,7 +55,7 @@ int app_command_session_begin_external(app_command_session *,
     app_monitor_state, app_lifecycle_request);
 void app_command_session_complete_floppy(app_command_session *, app_command_action, int, app_command_effect *);
 void app_command_session_note_runtime(app_command_session *, app_monitor_state,
-    app_runtime_state, app_command_effect *);
+    common_machine_state, app_command_effect *);
 void app_command_session_note_broker(app_command_session *, app_monitor_state,
     int vm, int monitor_running_surface);
 void app_command_session_note_monitor_current(app_command_session *, int, app_command_effect *);

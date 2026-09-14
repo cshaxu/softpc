@@ -243,6 +243,34 @@ queue/state/reconciler 实现。types-layout self-test 在每次运行前删除�
 8/8、documentation/DAG gate 与 diff hygiene 通过。两个交付 EXE 同步刷新：
 `assets/binary/softpc32.exe` 和 `assets/binary/softpc64.exe`；INI 与媒体未改。
 
+### S4 P1 执行证据
+
+`common/machine` 现在是唯一生产 executor、lifecycle/input queue、run
+generation 与完整 frame publication 所有者。原
+`app/runtime.[ch]`、`app/input_queue.[ch]` 已从生产树删除；`app` 仅创建
+`app_machine_driver`，把 SoftPC reset/run/stop/wake、guest-input conversion、
+MVDM frame capture 与 removable-media 操作注入 common。`common/session`
+直接调用一个中性的 `common_machine`，不再通过 runtime adapter。prompt trace
+仍在产品 driver 的 published-frame observation 中执行，未进入 common。
+
+新增无 Sleep 的 fake-driver smoke，覆盖 cold start、run generation、完整 frame、
+input wake、reset 的一次最终 completion、resume、stop 与 join；原
+runtime/restart/input-continuation smoke 通过 test-only compatibility surface
+实际执行 common/machine，不形成第二生产实现。静态 boundary gate 同时证明 app
+没有遗留的 generic runtime/input queue 源。
+
+`CMakePresets.json` 的 x86 preset 现在显式固定到
+`D:/programs/msys64/mingw32/bin`，确保其 GCC/cc1/DLL 同属一套 32 位 runtime；
+这修正了先前外部 PATH 混入异构 DLL 时只产生 x64 包的构建环境问题。S4 的每次
+baseline 与交付均以 `softpc32.exe`、`softpc64.exe` 同时存在为必要条件。
+
+本次固定 package SHA-256：`softpc32.exe`
+`7C735F8AE9474BE5DFCCEC59C4BCFCCA87050BD245437CD5B2C99BEF5A6210E9`；
+`softpc64.exe`
+`26DC5A9FA1175A3D3B80B3969591285E8506D72B73D57EA5CCFC9483890378C0`。
+双宽度完整 CTest 各 59/59；strict lib 8/8、documentation/DAG gates 与
+`git diff --check` 通过。构建仅刷新两个 EXE，未改写 INI 或 media。
+
 ## 每个 S 的退出条件
 
 1. 迁入职责在 SoftPC 生产路径实际使用（S6/S7 新能力按上表契约验收）；

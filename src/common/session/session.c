@@ -11,7 +11,7 @@ struct common_session {
     common_session_queue *queue;
     common_session_state state;
     kvm_frame frame;
-    common_session_machine_adapter machine;
+    common_machine *machine;
     common_session_command_provider command;
     common_ui *ui;
 };
@@ -54,12 +54,25 @@ static int common_session_write_result(common_session *session,
         common_ui_write_monitor(session->ui, result->text) == LIB_STATUS_OK;
 }
 
+static int common_session_deliver_machine_input(void *context,
+    const kvm_input_event *event)
+{
+    return common_machine_enqueue_input((common_machine *)context, event) != 0;
+}
+
 static int common_session_dispatch_request(common_session *session,
     common_session_request request)
 {
-    return request == COMMON_SESSION_REQUEST_NONE ||
-        (session != NULL && session->machine.request != NULL &&
-         session->machine.request(session->machine.context, request));
+    if (request == COMMON_SESSION_REQUEST_NONE) return 1;
+    if (session == NULL || session->machine == NULL) return 0;
+    switch (request) {
+    case COMMON_SESSION_REQUEST_START: return common_machine_start(session->machine);
+    case COMMON_SESSION_REQUEST_RESUME: return common_machine_resume(session->machine);
+    case COMMON_SESSION_REQUEST_PAUSE: return common_machine_pause(session->machine);
+    case COMMON_SESSION_REQUEST_STOP: return common_machine_stop(session->machine);
+    case COMMON_SESSION_REQUEST_RESET: return common_machine_reset(session->machine);
+    default: return 0;
+    }
 }
 
 static int common_session_arm_if_ready(common_session *session)
@@ -79,10 +92,10 @@ static int common_session_drive(common_session *session)
 {
     common_session_ui_action action;
     lib_bool console_status_surface;
-    if (session == NULL || session->ui == NULL || session->machine.run_generation == NULL)
+    if (session == NULL || session->ui == NULL || session->machine == NULL)
         return 0;
     common_ui_set_run_generation(session->ui,
-        session->machine.run_generation(session->machine.context));
+        common_machine_run_generation(session->machine));
     action = common_session_state_take_action(&session->state);
     if (action != COMMON_SESSION_UI_ACTION_NONE &&
         common_ui_apply_action(session->ui, common_session_map_ui_action(action),
@@ -127,7 +140,7 @@ static int common_session_handle_kvm_input(common_session *session,
             common_session_dispatch_request(session, result.request);
     }
     return common_session_dispatch_input(session->queue, event, state,
-        session->machine.deliver_input, session->machine.context);
+        common_session_deliver_machine_input, session->machine);
 }
 
 static int common_session_process_completed(common_session *session,
@@ -137,7 +150,7 @@ static int common_session_process_completed(common_session *session,
     lib_bool broker_monitor_completed = LIB_FALSE;
     if (session == NULL || event == NULL) return 0;
     if (event->run_generation != 0u &&
-        event->run_generation != session->machine.run_generation(session->machine.context))
+        event->run_generation != common_machine_run_generation(session->machine))
         return 1;
     common_session_clear_result(&result);
     if (event->kind == COMMON_SESSION_EVENT_RUNTIME_COMPLETED) {
@@ -149,7 +162,7 @@ static int common_session_process_completed(common_session *session,
         lib_u32 frame_run;
         lib_u32 sequence = event->value.frame.sequence;
         if (sequence > session->state.observed_frame_sequence &&
-            session->machine.copy_published_frame(session->machine.context, &session->frame,
+            common_machine_copy_published_frame(session->machine, &session->frame,
                 &frame_run) && session->frame.sequence == sequence &&
             frame_run == event->run_generation)
             (void)common_session_state_note_frame(&session->state, sequence,
@@ -188,9 +201,8 @@ lib_status common_session_create(common_session **out_session,
     const common_session_options *options)
 {
     common_session *session;
-    if (out_session == NULL || options == NULL || options->machine.run_generation == NULL ||
-        options->machine.copy_published_frame == NULL || options->machine.request == NULL ||
-        options->machine.deliver_input == NULL || options->command.open == NULL ||
+    if (out_session == NULL || options == NULL || options->machine == NULL ||
+        options->command.open == NULL ||
         options->command.submit_line == NULL || options->command.note_runtime == NULL ||
         options->command.note_monitor_current == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_session = NULL;
@@ -281,7 +293,7 @@ int common_session_run(common_session *session)
         if (!common_session_queue_take(session->queue, &event, 100u)) continue;
         if (event.kind == COMMON_SESSION_EVENT_KVM_INPUT) {
             if (!common_session_accept_kvm_event(&event,
-                    session->machine.run_generation(session->machine.context),
+                    common_machine_run_generation(session->machine),
                     session->state.monitor_actual)) continue;
             if (!common_session_handle_kvm_input(session, &event.value.kvm) ||
                 !common_session_drive(session) || !common_session_arm_if_ready(session)) return 0;

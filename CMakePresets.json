@@ -19,7 +19,9 @@
       "generator": "MinGW Makefiles",
       "binaryDir": "${sourceDir}/build/mingw-gcc-x86-release",
       "environment": {
-        "PATH": "$env{SOFTPC_I686_BIN};$penv{PATH}"
+        "SOFTPC_I686_BIN": "D:/programs/msys64/mingw32/bin",
+        "SOFTPC_I686_GCC": "D:/programs/msys64/mingw32/bin/i686-w64-mingw32-gcc.exe",
+        "PATH": "D:/programs/msys64/mingw32/bin;$penv{PATH}"
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",

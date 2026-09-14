@@ -232,23 +232,23 @@ void app_command_session_complete_floppy(app_command_session *s, app_command_act
     prompt(s);
 }
 void app_command_session_note_runtime(app_command_session *s,
-                                      app_monitor_state prior, app_runtime_state state, app_command_effect *e)
+                                      app_monitor_state prior, common_machine_state state, app_command_effect *e)
 {
     if (s == NULL || e == NULL)
         return;
     clear(e);
-    if (state == SOFTPC_RUNTIME_RESET_COMPLETED)
+    if (state == COMMON_MACHINE_RESET_COMPLETED)
     {
         s->transition_pending = 0;
         outcome(s, "Machine reset and paused.\r\n");
         return;
     }
-    if (state == SOFTPC_RUNTIME_PAUSED && prior != APP_MONITOR_PAUSED)
+    if (state == COMMON_MACHINE_PAUSED && prior != APP_MONITOR_PAUSED)
     {
         s->transition_pending = 0;
         outcome(s, "Machine paused.\r\n");
     }
-    else if (state == SOFTPC_RUNTIME_RUNNING)
+    else if (state == COMMON_MACHINE_RUNNING)
     {
         s->transition_pending = 0;
         if (prior == APP_MONITOR_INIT || prior == APP_MONITOR_STOPPED)
@@ -258,13 +258,13 @@ void app_command_session_note_runtime(app_command_session *s,
         else if (s->display == SOFTPC_PRESENTATION_WINDOW)
             prompt(s);
     }
-    else if (state == SOFTPC_RUNTIME_STOPPED &&
+    else if (state == COMMON_MACHINE_STOPPED &&
              prior != APP_MONITOR_STOPPED)
     {
         s->transition_pending = 0;
         outcome(s, "Machine stopped.\r\n");
     }
-    else if (state == SOFTPC_RUNTIME_ERROR)
+    else if (state == COMMON_MACHINE_ERROR)
     {
         s->transition_pending = 0;
         outcome(s, "Machine error.\r\n");

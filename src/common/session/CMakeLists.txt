@@ -8,4 +8,4 @@ target_include_directories(common-session PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../
 target_include_directories(common-session PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../../app
     ${CMAKE_CURRENT_SOURCE_DIR}/../../host)
-target_link_libraries(common-session PUBLIC kvm-base PRIVATE common-ui)
+target_link_libraries(common-session PUBLIC kvm-base common-machine PRIVATE common-ui)

@@ -279,14 +279,13 @@ target_compile_definitions(softpc-machine PRIVATE
 
 add_executable(softpcvm
     src/app/main.c
-    src/app/runtime.c
-    src/app/input_queue.c
+    src/app/machine_driver.c
     src/app/keyboard.c
     src/app/command.c
     src/app/prompt_trace.c
     src/app/firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
-target_link_libraries(softpcvm PRIVATE types storage kvm-base common-ui common-session)
+target_link_libraries(softpcvm PRIVATE types storage kvm-base common-ui common-session common-machine)
 if(WIN32)
     target_link_libraries(softpcvm PRIVATE user32 gdi32)
 endif()
@@ -448,28 +447,28 @@ set_tests_properties(softpc-lifecycle-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-runtime-smoke
     test/unit/runtime_smoke.c
+    test/support/common_machine_test.c
     src/common/session/control.c
-    src/app/runtime.c
-    src/app/input_queue.c
+    src/app/machine_driver.c
     src/app/keyboard.c
     src/common/session/presentation_plan.c
     src/common/session/reconciler.c
     src/app/prompt_trace.c)
-target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine types console host storage kvm-base kvm-window kvm-console)
-target_include_directories(softpc-runtime-smoke PRIVATE src/app)
+target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine common-machine types console host storage kvm-base kvm-window kvm-console)
+target_include_directories(softpc-runtime-smoke PRIVATE test/support src/app)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
 set_tests_properties(softpc-runtime-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-runtime-restart-boot-smoke
     test/integration/runtime_restart_boot_smoke.c
+    test/support/common_machine_test.c
     src/common/session/control.c
-    src/app/runtime.c
-    src/app/input_queue.c
+    src/app/machine_driver.c
     src/app/keyboard.c
     src/app/prompt_trace.c)
 target_link_libraries(softpc-runtime-restart-boot-smoke PRIVATE
-    softpc-machine types console host storage kvm-base kvm-window kvm-console)
-target_include_directories(softpc-runtime-restart-boot-smoke PRIVATE src/app)
+    softpc-machine common-machine types console host storage kvm-base kvm-window kvm-console)
+target_include_directories(softpc-runtime-restart-boot-smoke PRIVATE test/support src/app)
 add_test(NAME softpc-runtime-restart-boot-smoke
     COMMAND softpc-runtime-restart-boot-smoke)
 set_tests_properties(softpc-runtime-restart-boot-smoke PROPERTIES
@@ -477,18 +476,23 @@ set_tests_properties(softpc-runtime-restart-boot-smoke PROPERTIES
     LABELS "integration")
 add_executable(softpc-runtime-input-continuation-smoke
     test/unit/runtime_input_continuation_smoke.c
+    test/support/common_machine_test.c
     src/common/session/control.c
-    src/app/runtime.c
-    src/app/input_queue.c
+    src/app/machine_driver.c
     src/app/keyboard.c
     src/app/prompt_trace.c)
 target_link_libraries(softpc-runtime-input-continuation-smoke PRIVATE
-    softpc-machine types console host storage kvm-base kvm-window kvm-console)
+    softpc-machine common-machine types console host storage kvm-base kvm-window kvm-console)
 target_include_directories(softpc-runtime-input-continuation-smoke PRIVATE
-    src/app test/support)
+    test/support src/app)
 add_test(NAME softpc-runtime-input-continuation-smoke
     COMMAND softpc-runtime-input-continuation-smoke)
 set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-common-machine-smoke test/unit/common_machine_smoke.c)
+target_link_libraries(softpc-common-machine-smoke PRIVATE common-machine host kvm-base)
+add_test(NAME softpc-common-machine-smoke COMMAND softpc-common-machine-smoke)
+set_tests_properties(softpc-common-machine-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-types-contract-smoke test/unit/types_contract_smoke.c)
 add_executable(softpc-linux-wait-contract-smoke test/unit/linux_wait_contract_smoke.c)
@@ -600,8 +604,8 @@ set_tests_properties(softpc-command-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-input-queue-mouse-fifo-smoke
     test/unit/input_queue_mouse_fifo_smoke.c
-    src/app/input_queue.c)
-target_include_directories(softpc-input-queue-mouse-fifo-smoke PRIVATE src/app src)
+    src/common/machine/input_queue.c)
+target_include_directories(softpc-input-queue-mouse-fifo-smoke PRIVATE test/support src)
 add_test(NAME softpc-input-queue-mouse-fifo-smoke
     COMMAND softpc-input-queue-mouse-fifo-smoke)
 set_tests_properties(softpc-input-queue-mouse-fifo-smoke PROPERTIES
@@ -681,8 +685,9 @@ list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-shutdown-smoke)
 add_executable(softpc-runtime-cursor-smoke test/unit/runtime_cursor_smoke.c)
 target_include_directories(softpc-runtime-cursor-smoke PRIVATE src src/host src/app)
 get_target_property(cursor_test_sources softpcvm SOURCES)
-list(REMOVE_ITEM cursor_test_sources src/app/main.c src/app/runtime.c src/app/firmware.rc)
-target_sources(softpc-runtime-cursor-smoke PRIVATE ${cursor_test_sources})
+list(REMOVE_ITEM cursor_test_sources src/app/main.c src/app/machine_driver.c src/app/firmware.rc)
+target_sources(softpc-runtime-cursor-smoke PRIVATE ${cursor_test_sources}
+    src/app/machine_driver.c)
 target_link_libraries(softpc-runtime-cursor-smoke PRIVATE ${shutdown_test_links})
 add_test(NAME softpc-runtime-cursor-smoke COMMAND softpc-runtime-cursor-smoke)
 set_tests_properties(softpc-runtime-cursor-smoke PROPERTIES LABELS "unit")
