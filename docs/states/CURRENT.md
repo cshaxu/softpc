@@ -3,8 +3,8 @@
 ## Current Work
 
 M9 T56 S10 is closed after implementation `6e11d50` and coordinator review.
-S11 is the next admitted stage, paused at its explicit port-ABI approval
-boundary. No preserved-source edit is authorized yet. S10 passed dual-width
+S11 is active. Owner approved necessary narrow MVDM changes on 2026-09-13:
+“批准对mvdm的小范围必要改动”. S10 passed dual-width
 63/63 and strict lib 8/8; this is not completion of S11/S12 debugger capabilities.
 
 ## M9 T56 S11 Packet
@@ -13,11 +13,11 @@ boundary. No preserved-source edit is authorized yet. S10 passed dual-width
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner: 非常好，准入实施，完成debug和xasm32彻底接通测试。 Sequential S10–S12 plan and permanent commit/push approval apply. |
-| Objective | Implement instruction-count/execute-break plans on the existing executor after the separately approved safe instruction-boundary port ABI. Currently awaiting that decision. |
+| Objective | Implement instruction-count/execute-break plans on the existing executor using the owner-approved narrow instruction-boundary port ABI. |
 | Non-goals | No second executor, lib changes, guest media edits, direct common-to-MVDM dependencies or unapproved preserved-source changes. S11/S12 own execution plans/watchpoints. |
 | Reference Baseline | S10 delivery 6e11d50 and approved follow-on design f4a8648; S10 closure below. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | Product debug adapter, machine execution-plan/result contract and focused tests. Proposed c_main instruction notifications require separate owner port-ABI approval before edits. |
+| Files And ABI Surface | Product debug adapter, machine execution-plan/result contract and tests; owner-approved necessary c_main instruction notifications and refetch handling, plus later S12 operand notifications. No CPU algorithm or guest TF/DR changes. |
 | Applicable Rules | Execution, documentation, architecture, coding authorities and Product UI. |
 | Verification | Deterministic real instruction-count/break tests including special control-transfer and exception paths, pause/resume/cancel/reset, followed by both full test/build suites. Not yet executed for S11. |
 | Expected Markers | Single command/executor rendezvous; original CPU/device functions own behavior; no fake successful read or ignored rejection. |

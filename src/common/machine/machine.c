@@ -26,6 +26,7 @@ struct common_machine {
     common_machine_debug_lease debug_lease;
     lib_status debug_status;
     volatile LONG debug_requested;
+    volatile LONG debug_cancel_requested;
     host_sync_task *worker;
     volatile LONG state;
     volatile LONG run_generation;
@@ -164,6 +165,9 @@ static void common_machine_service_media(common_machine *machine)
  * existing executor calls the driver, including while parked in PAUSED. */
 static void common_machine_service_debug(common_machine *machine)
 {
+    if (InterlockedExchange(&machine->debug_cancel_requested, 0) != 0 &&
+        machine->driver.cancel_debug != NULL)
+        machine->driver.cancel_debug(machine->driver.context);
     if (InterlockedExchange(&machine->debug_requested, 0) == 0) return;
     machine->debug_status = LIB_STATUS_INVALID_STATE;
     memset(&machine->debug_result, 0, sizeof(machine->debug_result));
@@ -179,6 +183,15 @@ static void common_machine_service_debug(common_machine *machine)
 static void common_machine_executor_event(void *opaque)
 {
     common_machine *machine = (common_machine *)opaque;
+    lib_bool debug_stop = machine->driver.take_debug_stop != NULL &&
+        machine->driver.take_debug_stop(machine->driver.context);
+    if ((InterlockedExchange(&machine->debug_cancel_requested, 0) != 0 ||
+         InterlockedCompareExchange(&machine->pause_requested, 0, 0) != 0) &&
+        machine->driver.cancel_debug != NULL) {
+        machine->driver.cancel_debug(machine->driver.context);
+        debug_stop = LIB_FALSE;
+    }
+    if (debug_stop) InterlockedExchange(&machine->pause_requested, 1);
     common_machine_drain_input(machine);
     common_machine_publish(machine);
     if (InterlockedCompareExchange(&machine->pause_requested, 0, 0) != 0 &&
@@ -281,6 +294,8 @@ static void common_machine_worker(void *opaque, const host_sync_task *task)
             InterlockedCompareExchange(&machine->terminate_requested, 0, 0) == 0);
         machine->driver.set_heartbeat(machine->driver.context, LIB_FALSE);
         machine->driver.set_executor_callback(machine->driver.context, NULL, NULL);
+        if (machine->driver.cancel_debug != NULL)
+            machine->driver.cancel_debug(machine->driver.context);
         common_machine_debug_invalidate(machine);
         if (succeeded && InterlockedExchange(&machine->reset_requested, 0) != 0) {
             InterlockedExchange(&machine->stop_requested, 0);
@@ -354,6 +369,14 @@ void common_machine_set_frame_sink(common_machine *machine,
 lib_bool common_machine_start(common_machine *machine)
 {
     return common_machine_schedule_cold_run(machine, LIB_FALSE);
+}
+
+void common_machine_debug_cancel(common_machine *machine)
+{
+    if (machine == NULL) return;
+    InterlockedExchange(&machine->debug_cancel_requested, 1);
+    host_sync_event_signal(machine->command_event);
+    machine->driver.request_wake(machine->driver.context);
 }
 
 lib_bool common_machine_pause(common_machine *machine)

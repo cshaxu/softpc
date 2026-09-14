@@ -1,7 +1,7 @@
 #include "app/machine_driver.h"
 #include "app/keyboard.h"
 #include "app/prompt_trace.h"
-#include "host/debug.h"
+#include "host/machine_debug.h"
 
 #include <windows.h>
 #include <stdlib.h>
@@ -9,6 +9,7 @@
 
 struct app_machine_driver {
     softpc_machine *machine;
+    softpc_debug_state debug;
     lib_u32 graphics_source_width;
     lib_u32 graphics_source_height;
     lib_u32 graphics_visible_width;
@@ -60,6 +61,7 @@ void app_machine_driver_cursor_shape(kvm_frame *frame, lib_u32 percent)
 static lib_bool app_machine_driver_reset(void *opaque)
 {
     app_machine_driver *driver = (app_machine_driver *)opaque;
+    if (driver != NULL) driver->debug = (softpc_debug_state) { 0 };
     return driver != NULL && softpc_machine_reset(driver->machine) ==
         SOFTPC_MACHINE_OK;
 }
@@ -67,8 +69,12 @@ static lib_bool app_machine_driver_reset(void *opaque)
 static lib_bool app_machine_driver_run(void *opaque)
 {
     app_machine_driver *driver = (app_machine_driver *)opaque;
-    return driver != NULL && softpc_machine_run(driver->machine,
-        (uint64_t)-1) == SOFTPC_MACHINE_OK;
+    lib_bool result;
+    if (driver == NULL) return LIB_FALSE;
+    softpc_debug_bind(&driver->debug);
+    result = softpc_machine_run(driver->machine, UINT64_MAX) == SOFTPC_MACHINE_OK;
+    softpc_debug_bind(NULL);
+    return result;
 }
 
 static void app_machine_driver_request_stop(void *opaque)
@@ -260,7 +266,21 @@ static lib_status app_machine_driver_debug(void *opaque,
     const common_machine_debug_request *request, common_machine_debug_result *result)
 {
     app_machine_driver *driver = opaque;
-    return softpc_machine_debug(driver->machine, request, result);
+    return softpc_machine_debug(driver->machine, &driver->debug, request, result);
+}
+
+static lib_bool app_machine_driver_take_debug_stop(void *opaque)
+{
+    app_machine_driver *driver = opaque;
+    lib_bool pending = driver->debug.stop_pending && driver->debug.result_ready;
+    if (pending) driver->debug.stop_pending = LIB_FALSE;
+    return pending;
+}
+
+static void app_machine_driver_cancel_debug(void *opaque)
+{
+    app_machine_driver *driver = opaque;
+    driver->debug = (softpc_debug_state) { 0 };
 }
 
 lib_status app_machine_driver_create(app_machine_driver **out_driver,
@@ -297,5 +317,7 @@ void app_machine_driver_describe(app_machine_driver *driver,
     out_driver->copy_frame = app_machine_driver_copy_frame;
     out_driver->set_removable_media = app_machine_driver_set_removable_media;
     out_driver->execute_debug = app_machine_driver_debug;
+    out_driver->take_debug_stop = app_machine_driver_take_debug_stop;
+    out_driver->cancel_debug = app_machine_driver_cancel_debug;
     out_driver->frame_published = app_machine_driver_trace_frame;
 }

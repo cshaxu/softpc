@@ -255,6 +255,21 @@ static int package_wait_window(DWORD process, const char *state)
 /* A Window-configured package keeps this Console cooked. Assert that actual
  * route instead of looking for DOS pixels in the monitor, without editing INI.
  * DOS boot/frame correctness is independently covered by the runtime suites. */
+static int package_debug_execution(HANDLE input, HANDLE output)
+{
+    /* Disposable RAM only; the surrounding test stops and cold-starts next.
+     * Unique IP values prove actual G/T completion through the shipping queue,
+     * not an old prompt or a library-only callback. */
+    return package_send_text(input, "debug\r") &&
+        package_wait_for_text(output, "Debugger:", 5000u) &&
+        package_send_text(input, "e 0:500 fa 90 90 90 90 eb fe\r") &&
+        package_send_text(input, "g 0:500 0:501\r") &&
+        package_wait_for_text(output, "IP=0501", 5000u) &&
+        package_send_text(input, "t 2\r") &&
+        package_wait_for_text(output, "IP=0503", 5000u) &&
+        package_send_text(input, "q\r");
+}
+
 static int package_window_restart(PROCESS_INFORMATION *process, HANDLE input, HANDLE output)
 {
     if (!package_wait_for_text(output, "Machine started.", 10000u) ||
@@ -262,6 +277,7 @@ static int package_window_restart(PROCESS_INFORMATION *process, HANDLE input, HA
     if (!package_send_text(input, "pause\r") ||
         !package_wait_for_text(output, "Machine paused.", 5000u) ||
         !package_wait_window(process->dwProcessId, "Paused")) return 0;
+    if (!package_debug_execution(input, output)) return 0;
     if (!package_send_text(input, "stop\r") ||
         !package_wait_for_text(output, "Machine stopped.", 5000u) ||
         !package_wait_window(process->dwProcessId, NULL)) return 0;
@@ -330,6 +346,7 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
     if (!package_wait_for_text(output, "SoftPC>", 5000u)) {
         stage = 7; goto done;
     }
+    if (!package_debug_execution(input, output)) { stage = 18; goto done; }
     if (!package_send_text(input, "stop\r")) { stage = 8; goto done; }
     if (!package_wait_for_text(output, "Machine stopped.", 5000u)) {
         stage = 9; goto done;

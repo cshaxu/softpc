@@ -142,6 +142,9 @@ typedef struct common_machine_driver {
     lib_bool (*copy_frame)(void *context, kvm_frame *out_frame);
     lib_bool (*set_removable_media)(void *context, const char *path);
     common_machine_debug_execute execute_debug;
+    /* Executor-only stop notification and cancellation of product debug plans. */
+    lib_bool (*take_debug_stop)(void *context);
+    void (*cancel_debug)(void *context);
     /* Optional product-owned observation after a complete frame has been
      * published. It must not call machine lifecycle APIs. */
     void (*frame_published)(void *context, const kvm_frame *frame);
@@ -175,6 +178,8 @@ lib_status common_machine_debug_execute_with_lease(common_machine *machine,
     const common_machine_debug_request *request,
     common_machine_debug_result *out_result);
 void common_machine_debug_invalidate(common_machine *machine);
+/* Asynchronous cancellation, allowed in every state; uses the existing queue. */
+void common_machine_debug_cancel(common_machine *machine);
 void common_machine_destroy(common_machine *machine);
 
 #endif

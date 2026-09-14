@@ -65,6 +65,9 @@ extern IBOOL softpc_platform_consume_executor_wake(void);
 extern IBOOL softpc_platform_consume_instruction_budget(void);
 extern void softpc_platform_pace_instruction(void);
 extern void softpc_platform_wait_for_executor_event(void);
+/* T56 port ABI: observation only; debug policy/state remains in host. */
+extern int softpc_host_debug_begin(void);
+extern void softpc_host_debug_retired(void);
 #include  <aaa.h>	/* The workers */
 #include  <aad.h>	/*     ...     */
 #include  <aam.h>	/*     ...     */
@@ -809,7 +812,9 @@ IFN1(
    goto NEXT_INST;
 
 DO_INST:
-
+   /* A paused debugger may change CS:EIP, code or address translation. */
+   if (softpc_host_debug_begin())
+      goto NEXT_INST;
 
    /* INSIGNIA debugging */
 #ifdef	PIG
@@ -978,7 +983,7 @@ TYPE05:
          {
          /* locally update IP - interrupts are supressed after POP SS */
          UPDATE_INTEL_IP(p);
-
+         softpc_host_debug_retired();
          goto NEXT_INST;
          }
       break;
@@ -2717,7 +2722,7 @@ TYPE83_0:
          {
          /* locally update IP - interrupts are supressed after MOV SS,xx */
          UPDATE_INTEL_IP(p);
-
+         softpc_host_debug_retired();
          goto NEXT_INST;
          }
       break;
@@ -2862,7 +2867,7 @@ TYPE9A:
 
 	  single_instruction_delay = TRUE;
 	  PIG_SYNCH(CHECK_ALL);
-
+          softpc_host_debug_retired();
           goto NEXT_INST;
       }
 #endif /* PIG */
@@ -3532,6 +3537,7 @@ TYPEC4:
       c_cpu_unsimulate();
 #endif /* PIG */
 
+      softpc_host_debug_retired();
       goto NEXT_INST;
       break;
 
@@ -4241,6 +4247,7 @@ TYPEF7_6:
       single_instruction_delay = TRUE;
       PIG_SYNCH(CHECK_ALL);
 #endif /* PIG */
+      softpc_host_debug_retired();
       goto NEXT_INST;
 
    case 0xfc:   /* T0 CLD */
@@ -4363,6 +4370,7 @@ TYPEFF_3:
    /*
       Now check for interrupts/external events/breakpoints...
     */
+   softpc_host_debug_retired();
 
    /* The original quick path skips NEXT_INST.  A standalone host
       timer or control wake must therefore first leave quick mode,

@@ -3001,7 +3001,7 @@ lib_status common_debug_command_create(common_debug_command **out_command)
 void common_debug_command_destroy(common_debug_command *command)
 {
     if (command == STD_NULL) return;
-    command_machine_finalize_arguments(command);
+    common_debug_command_close(command);
     STD_FREE(command);
 }
 
@@ -3009,7 +3009,7 @@ lib_status common_debug_command_open(common_debug_command *command,
     common_machine *machine)
 {
     if (command == STD_NULL || machine == STD_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    command_machine_finalize_arguments(command);
+    common_debug_command_close(command);
     command_initialize(command, machine);
     if (command->arguments == STD_NULL) return LIB_STATUS_NO_MEMORY;
     return LIB_STATUS_OK;
@@ -3018,6 +3018,7 @@ lib_status common_debug_command_open(common_debug_command *command,
 void common_debug_command_close(common_debug_command *command)
 {
     if (command == STD_NULL) return;
+    common_machine_debug_cancel(command->machine);
     command_machine_finalize_arguments(command);
     command->machine = STD_NULL;
     command->continuation = COMMAND_CONTINUATION_NONE;
@@ -3194,11 +3195,19 @@ lib_status common_debug_command_observe_machine(common_debug_command *command,
         return LIB_STATUS_INVALID_ARGUMENT;
     STD_MEMSET(out_result, 0, sizeof(*out_result));
     out_result->keep_active = LIB_TRUE;
+    if (state == COMMON_DEBUG_MACHINE_STOPPED || state == COMMON_DEBUG_MACHINE_RESET ||
+        state == COMMON_DEBUG_MACHINE_FAULT) {
+        command->awaiting_pause = 0;
+        command->run_kind = COMMAND_RUN_NONE;
+        return LIB_STATUS_OK;
+    }
     if (state != COMMON_DEBUG_MACHINE_PAUSED || status != LIB_STATUS_OK ||
         !command->awaiting_pause) return LIB_STATUS_OK;
     command->result = out_result;
     command->access_status = LIB_STATUS_OK;
     if (command_get_execution_result(command, &executed)) {
+        command->awaiting_pause = 0;
+        command->run_kind = COMMAND_RUN_NONE;
         command_report_access(command);
         command_prompt(command);
         command->result = STD_NULL;

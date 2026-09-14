@@ -11,6 +11,8 @@ typedef struct app_command_binding {
     common_machine *machine;
     common_debug *debug;
     lib_bool debug_active;
+    common_debug_result debug_completed;
+    lib_bool debug_completed_pending;
     char debug_prompt[COMMON_DEBUG_PROMPT_CAPACITY];
 } app_command_binding;
 

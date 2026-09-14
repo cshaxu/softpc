@@ -84,6 +84,16 @@ checks paused state and the lease again there; callbacks must not synchronously
 reenter this control-thread API. `app/command_binding` owns debugger selection
 and copied prompts; machine state changes do not select or exit the CLI.
 
+T56's owner-approved debug port adds observation calls at original CCPU
+instruction entry and successful completion, including interrupt-shadow
+bypasses. The product driver owns the plan/result and binds it only during
+its executor run. A hit parks that same executor through its existing callback;
+the existing copied PAUSED fact reaches session, whose debug provider reads
+the result through the paused rendezvous. No per-instruction frontend events,
+second executor or guest TF/DR ownership are introduced. CCPU refetches after
+the pause so edited CS:EIP/code/translation are observed. Cancellation uses the
+existing command wake; pause, stop/reset and debugger close clear the plan.
+
 Shared KVM key events are copied `kvm_key`, physical scan, neutral injection
 flags, generic Ctrl/Alt/Shift state, and make/break values. Platform adapters
 translate native records before the event reaches the shared contract; only

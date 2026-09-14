@@ -75,9 +75,15 @@ bits or inject a guest page fault. Real addresses mean segment*16+offset;
 linear addresses are not protected-mode selector addresses.
 I/O commands perform one byte access through the original device dispatcher;
 reads may have device side effects and are not retried. Assembly/disassembly
-uses common xasm32. Plain `g` requests normal resume. Trace, breakpoints,
-watchpoints and architecturally unavailable CR1/CR4 still report unsupported
-pending the admitted execution-observation work, not because of CLI state.
+uses common xasm32. Plain `g` requests normal resume; `t` counts successfully
+completed original CPU instructions and addressed `g` stops before its target.
+REP is one instruction, faults do not retire an instruction, and interrupts
+and guest TF retain their original behavior (trace can enter their handlers).
+HLT retains its original wait until an interrupt; host pause/stop remain usable
+while waiting. Repeating a breakpoint at its just-hit address first permits
+progress. Pause, stop/reset and leaving debug cancel unfinished execution plans.
+Watchpoints and architecturally unavailable CR1/CR4 still report unsupported;
+watchpoint completion belongs to the next admitted stage.
 
 ## Window And Input
 

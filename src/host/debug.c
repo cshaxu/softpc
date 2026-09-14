@@ -1,4 +1,4 @@
-#include "host/debug.h"
+#include "host/machine_debug.h"
 #include "common/debug/debug_interface.h"
 
 #include <string.h>
@@ -111,13 +111,56 @@ static common_machine_debug_segment_snapshot softpc_debug_segment(
     return value;
 }
 
-lib_status softpc_machine_debug(softpc_machine *machine,
+#if defined(_MSC_VER)
+static __declspec(thread) softpc_debug_state *active_debug;
+#else
+static __thread softpc_debug_state *active_debug;
+#endif
+
+extern void softpc_platform_executor_event(void);
+
+void softpc_debug_bind(softpc_debug_state *state)
+{
+    active_debug = state;
+}
+
+/* Stop only before an instruction, after original inter-instruction work.
+ * The existing executor rendezvous parks this same thread. CCPU must refetch
+ * on return because paused debug access may have changed CS:EIP or memory. */
+int softpc_host_debug_begin(void)
+{
+    softpc_debug_state *state = active_debug;
+    lib_u32 address;
+    if (state == NULL || state->kind == COMMON_MACHINE_DEBUG_EXECUTION_NONE) return 0;
+    address = c_getCS_BASE() + c_getEIP();
+    if (state->skip_first) { state->skip_first = LIB_FALSE; return 0; }
+    if (!state->stop_pending &&
+        !(state->kind != COMMON_MACHINE_DEBUG_EXECUTION_TRACE && address == state->address))
+        return 0;
+    state->stopped_address = address;
+    state->result_ready = LIB_TRUE;
+    state->stop_pending = LIB_TRUE;
+    state->kind = COMMON_MACHINE_DEBUG_EXECUTION_NONE;
+    softpc_platform_executor_event();
+    return 1;
+}
+
+void softpc_host_debug_retired(void)
+{
+    softpc_debug_state *state = active_debug;
+    if (state == NULL || state->kind == COMMON_MACHINE_DEBUG_EXECUTION_NONE) return;
+    if (state->executed != UINT32_MAX) ++state->executed;
+    if (state->kind == COMMON_MACHINE_DEBUG_EXECUTION_TRACE &&
+        state->executed >= state->target_count) state->stop_pending = LIB_TRUE;
+}
+
+lib_status softpc_machine_debug(softpc_machine *machine, softpc_debug_state *state,
     const common_machine_debug_request *request,
     common_machine_debug_result *result)
 {
     lib_u32 address;
     lib_bool write;
-    if (machine == NULL || request == NULL || result == NULL ||
+    if (machine == NULL || state == NULL || request == NULL || result == NULL ||
         request->bytes > COMMON_MACHINE_DEBUG_BYTES)
         return LIB_STATUS_INVALID_ARGUMENT;
     memset(result, 0, sizeof(*result));
@@ -174,7 +217,25 @@ lib_status softpc_machine_debug(softpc_machine *machine,
         result->bytes = request->bytes;
         return LIB_STATUS_OK;
     case COMMON_MACHINE_DEBUG_CLEAR_EXECUTION_PLAN:
-        /* No plan can be installed by this adapter. Plain G still resumes. */
+        *state = (softpc_debug_state) { 0 };
+        return LIB_STATUS_OK;
+    case COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN:
+        if (request->execution_kind < COMMON_MACHINE_DEBUG_EXECUTION_TRACE ||
+            request->execution_kind > COMMON_MACHINE_DEBUG_EXECUTION_BREAK_LINEAR ||
+            (request->execution_kind == COMMON_MACHINE_DEBUG_EXECUTION_TRACE &&
+                (request->instruction_count == 0u || request->instruction_count > UINT32_MAX)))
+            return LIB_STATUS_INVALID_ARGUMENT;
+        address = request->execution_kind == COMMON_MACHINE_DEBUG_EXECUTION_BREAK_REAL ?
+            ((lib_u32)request->segment << 4u) + request->offset : request->address;
+        write = state->result_ready && state->stopped_address == address &&
+            address == c_getCS_BASE() + c_getEIP();
+        *state = (softpc_debug_state) { .kind = request->execution_kind,
+            .target_count = request->instruction_count, .address = address,
+            .skip_first = write && request->execution_kind != COMMON_MACHINE_DEBUG_EXECUTION_TRACE };
+        return LIB_STATUS_OK;
+    case COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT:
+        result->enabled = state->result_ready;
+        result->value = state->executed;
         return LIB_STATUS_OK;
     default:
         return LIB_STATUS_UNSUPPORTED;

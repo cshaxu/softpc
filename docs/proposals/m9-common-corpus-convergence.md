@@ -316,7 +316,11 @@ S10 保留唯一 paused executor，未改 lib 或 MVDM。实际完成：
   原 XD ffffffff 用例在 A20 包裹下是合法 ROM 读，改为验证实际总线语义；
   不再以旧 host 越界拒绝作为“正确”期望。
 
-#### 需 owner 决策的 port-ABI 边界（尚未修改）
+#### 已批准的窄 port-ABI 边界
+
+2026-09-13 owner：“批准对mvdm的小范围必要改动”。S11/S12 可增加
+必要的指令/访问通知和暂停后 refetch 接线；这是此前 MVDM 不动约束的
+明确限域例外。原执行、分页和设备算法不重写，调试状态留在外部。
 
 现有入口不足以直接证明计划中的完整执行/观察语义：
 
@@ -337,9 +341,36 @@ S10 保留唯一 paused executor，未改 lib 或 MVDM。实际完成：
 通知仅记命中，不能在读写进行一半时阻塞 executor。页表遍历、描述符
 内部读取、DMA 是否属于 watch 的覆盖范围须显式区别，不能声称全覆盖。
 
-此方案需要突破“本次不修改任何 MVDM”的明确非目标，因此现在只记录
-证据和拟议边界，不使用链接拦截、轮询、客户机 TF/DR 或第二 executor
-绕过。S11/S12 不得以拒绝操作测试收口；等待此窄 port-ABI 的明确批准。
+按上述限域授权执行，仍禁止链接拦截、轮询、客户机 TF/DR 或第二
+executor 绕过。S11/S12 不得以拒绝操作测试收口。
+
+### S11 有界收敛账本与 port-ABI 处置
+
+Owner 允许小范围必要 MVDM 改动；本阶段只改 `base/ccpu386/c_main.c`。
+新增两个观察声明、DO_INST 命中后 refetch、正常完成和五处成功绕行的
+完成通知。没有新增 CPU 状态或改动原 opcode、异常、分页、TF/DR 算法。
+这是本阶段原始源码差异的明确保留处置，不把差异称作 pristine。
+
+| 冻结全集 | 唯一所有者及证明 |
+| --- | --- |
+| TRACE、BREAK_REAL、BREAK_LINEAR、CLEAR、GET_RESULT | product driver 的单份 state；真实程序验证精确 IP/count、同址重设前进、取消和 reset 清除 |
+| 普通/quick 完成、POP SS、MOV SS、PIG POPF、IRET、STI | 原 CPU 相应成功路径通知；运行配置的绕行全部有真实 instruction proof；PIG 非当前配置但保留对称通知 |
+| 异常/TF/中断/REP/HLT | 异常不计成功；REP 完成一次；真实 fault/TF handler 测试；HLT 不制造完成或中断，等待原 CPU 返回，原 host pause/stop 路径保留 |
+| 完成、输出、自动续步 | 原 PAUSED copied event → session provider → paused GET_RESULT；无需新增每指令事件队列。真实 provider `t 2` 和 shipping EXE G/T 检查唯一 IP |
+| 取消/关闭/销毁/复位 | 现有 command wake 处理取消；外部暂停取消、driver run 退出取消、reset 清零；close/destroy/reopen 共用关闭路径 |
+| 旧路径 | host/debug.h 遮蔽原 CCPU debug.h，改名 machine_debug.h；不保留转发头。同步/异步 debug 输出共用转换函数 |
+
+首次 shipping G/T 测试未隔离 DOS 定时中断，观察到正确进入 ISR 的 IP。
+测试程序加入自身 CLI 指令以验证固定 IP；产品不屏蔽中断，单独 TF 测试
+仍证明 guest trap 保留。所有测试代码只写一次性 RAM，随后 cold reset；
+未修改媒体或用户配置。S12 的 watch/访问记录仍未交付，不作全 debug 收口。
+
+S11 验证：x64/x86 全量 CTest 各 63/63；strict lib 8/8；最后追加的
+real-break/reset 断言另经 x64 focused debug/package 通过，x86 全量包含它们。
+以 `6483f63` 为基线，生产 11 个路径（含一次头文件改名）+217/-49，净 +168；
+测试两个文件 +168/-4，净 +164。MVDM 只改一文件 +12/-4，净 +8。
+SHA-256：x86 `658DFEB69B9312864C43B94F91224D88532AA2B8436BC03E07A70952F8A30A7E`；
+x64 `72ED204622B6B615073C158921A9520A11022E1B7BF83764BA2C1FCFAAF87859`。
 
 ### S9 P5 交付证据
 

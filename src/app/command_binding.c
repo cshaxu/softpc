@@ -88,6 +88,36 @@ static void app_command_provider_reject_line(void *opaque,
     app_command_copy_effect(out, &effect);
 }
 
+static void app_command_copy_debug(app_command_binding *binding,
+    common_session_machine_state state, const common_debug_result *result,
+    common_session_command_result *out)
+{
+    size_t source, target = strlen(out->text);
+    if (target + 2u * strlen(result->text) >= sizeof(out->text)) {
+        (void)snprintf(out->text, sizeof(out->text), "Debug output exceeds Console capacity.\r\n\r\n");
+        common_machine_debug_cancel(binding->machine);
+        return;
+    }
+    for (source = 0u; result->text[source] != '\0'; ++source) {
+        if (result->text[source] == '\n' &&
+            (source == 0u || result->text[source - 1u] != '\r')) out->text[target++] = '\r';
+        out->text[target++] = result->text[source];
+    }
+    out->text[target] = '\0';
+    (void)snprintf(binding->debug_prompt, sizeof(binding->debug_prompt), "%s", result->prompt);
+    if (!result->keep_active) {
+        common_debug_close(binding->debug);
+        binding->debug_active = LIB_FALSE;
+        binding->debug_completed_pending = LIB_FALSE;
+    }
+    if (result->lifecycle_request == COMMON_DEBUG_LIFECYCLE_RESUME &&
+        app_command_session_begin_external(&binding->session,
+            app_command_state(state), APP_LIFECYCLE_REQUEST_RESUME))
+        out->request = COMMON_SESSION_REQUEST_RESUME;
+    else if (result->lifecycle_request != COMMON_DEBUG_LIFECYCLE_NONE)
+        (void)snprintf(out->text, sizeof(out->text), "Debug lifecycle request is not applicable.\r\n\r\n");
+}
+
 static void app_command_provider_submit_line(void *opaque,
     common_session_machine_state state, const char *line,
     common_session_command_result *out)
@@ -97,33 +127,11 @@ static void app_command_provider_submit_line(void *opaque,
     if (binding->debug_active) {
         common_debug_result result = { 0 };
         lib_status status = common_debug_submit_line(binding->debug, line, &result);
-        size_t source;
-        size_t target = 0u;
         *out = (common_session_command_result) { 0 };
         if (status != LIB_STATUS_OK) {
             (void)snprintf(out->text, sizeof(out->text), "Debug command failed.\r\n\r\n");
         } else {
-            /* Imported debugger uses LF; the copied Console output is literal. */
-            for (source = 0u; result.text[source] != '\0'; ++source) {
-                if (result.text[source] == '\n' &&
-                    (source == 0u || result.text[source - 1u] != '\r'))
-                    out->text[target++] = '\r';
-                out->text[target++] = result.text[source];
-            }
-            out->text[target] = '\0';
-            (void)snprintf(binding->debug_prompt, sizeof(binding->debug_prompt),
-                "%s", result.prompt);
-            if (!result.keep_active) {
-                common_debug_close(binding->debug);
-                binding->debug_active = LIB_FALSE;
-            }
-            if (result.lifecycle_request == COMMON_DEBUG_LIFECYCLE_RESUME &&
-                app_command_session_begin_external(&binding->session,
-                    app_command_state(state), APP_LIFECYCLE_REQUEST_RESUME))
-                out->request = COMMON_SESSION_REQUEST_RESUME;
-            else if (result.lifecycle_request != COMMON_DEBUG_LIFECYCLE_NONE)
-                (void)snprintf(out->text, sizeof(out->text),
-                    "Debug lifecycle request is not applicable.\r\n\r\n");
+            app_command_copy_debug(binding, state, &result, out);
         }
         binding->session.prompt_due = out->request == COMMON_SESSION_REQUEST_NONE;
         return;
@@ -166,6 +174,19 @@ static void app_command_provider_note_runtime(void *opaque,
     app_command_session_note_runtime(&binding->session, app_command_state(prior),
         app_machine_completed_state(completed), &effect);
     app_command_copy_effect(out, &effect);
+    if (binding->debug_active) {
+        if (completed != COMMON_SESSION_MACHINE_PAUSED)
+            binding->debug_completed_pending = LIB_FALSE;
+        common_debug_machine_state state = completed == COMMON_SESSION_MACHINE_PAUSED ?
+            COMMON_DEBUG_MACHINE_PAUSED : completed == COMMON_SESSION_MACHINE_RUNNING ?
+            COMMON_DEBUG_MACHINE_RUNNING : COMMON_DEBUG_MACHINE_STOPPED;
+        common_debug_result result = { 0 };
+        (void)common_debug_observe_machine(binding->debug, state, LIB_STATUS_OK, &result);
+        if (result.prompt_ready) {
+            binding->debug_completed = result;
+            binding->debug_completed_pending = LIB_TRUE;
+        }
+    }
 }
 
 static void app_command_provider_note_broker(void *opaque,
@@ -185,6 +206,12 @@ static void app_command_provider_note_monitor_current(void *opaque,
     app_command_session_note_monitor_current(&binding->session, current != 0,
         &effect);
     app_command_copy_effect(out, &effect);
+    if (current && binding->debug_completed_pending) {
+        binding->debug_completed_pending = LIB_FALSE;
+        app_command_copy_debug(binding, COMMON_SESSION_MACHINE_PAUSED,
+            &binding->debug_completed, out);
+        out->arm_prompt = out->request == COMMON_SESSION_REQUEST_NONE;
+    }
     (void)snprintf(out->prompt, sizeof(out->prompt), "%s",
         binding->debug_active ? binding->debug_prompt : "SoftPC> ");
 }
