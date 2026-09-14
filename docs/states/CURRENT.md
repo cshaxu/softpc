@@ -2,8 +2,9 @@
 
 ## Current Work
 
-T57 S1 and S2 are closed after dual-width proof and actual-diff review;
-S3 audits the complete app/VM/Compat ownership ledger.
+T57 S1 and S2 are closed after dual-width proof and actual-diff review.
+S3 whole-request audit is verified; implementation is complete, awaiting
+owner package feedback and T closure approval. No further code work is active.
 T56 remains closed; no shared corpus or MVDM change is admitted.
 
 ## M9 T57 S3 Packet
@@ -21,7 +22,7 @@ T56 remains closed; no shared corpus or MVDM change is admitted.
 | Verification | Boundary positive/negative probes, full x86/x64 suites, five protected corpora zero diff and documentation gate. |
 | Expected Markers | No src/host or app machine driver; no app->Compat/MVDM; only main->VM; both fixed EXEs. |
 | Asset Needs | Refresh fixed EXEs only; no INI/media edits. Bounded logs under build; no new media. |
-| Reporting Requirements | Executor commit/push then actual-diff review; both-width evidence and accounting. |
+| Reporting Requirements | S3 evidence is in the proposal; commit/push audit, report fixed dual-width EXEs and wait for owner closure. |
 | Stop Conditions | Protected corpus changes or product behavior redesign require owner direction. |
 | Exit Criteria | Whole-request ledger and source accounting pass, protected corpora unchanged, both artifacts verified, commit/push and owner closure decision. |
 | Original Owner Request | 准入一个新的t任务实施重构；app main is the only permitted VM consumer. |
@@ -35,9 +36,12 @@ T56 remains closed; no shared corpus or MVDM change is admitted.
 - `src/mvdm/softpc.new/` is the preserved selected SoftPC baseline. Its ROM
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
+- T57 product baseline is the app/config, vm and flat compat layout; both
+  fixed packages passed 85/85 CTest. Only app/main includes the VM interface;
+  Lib, Common, MVDM and shared tests are unchanged from the T56 closure.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
   normalized `types`/`console`/`host`/`storage`/`kvm-*` corpus has S18 one-time
-  wake selection; current x64/x86 product builds pass 83/83 CTest;
+  wake selection; the T56 baseline passed x64/x86 83/83 CTest;
   strict standalone library suite passes 38/38. Its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 

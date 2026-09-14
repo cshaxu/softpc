@@ -88,3 +88,39 @@ The five protected source/test corpora have zero diff from cfc88cf.
 Historical T14/T16 evidence generators retain historical src/host paths;
 they are not current runtime/build/acceptance dependencies. Current product
 sources and source lists contain no surviving src/host implementation.
+
+## S3 whole-request audit
+
+Reviewed the actual pushed S1/S2 commits, not only their test summaries.
+Frozen source universe: 51 baseline app/host paths from
+`git ls-tree -r --name-only cfc88cf src/app src/host`. Every path resolves to
+one retained or relocated implementation; no missing destination.
+
+| Ledger member | Final disposition / proof |
+| --- | --- |
+| Main/config | Existing parser moved to config C/H; config smoke and package suites pass. |
+| App command/binding/keyboard | Product policy retained; physical injection moved to VM. Only main includes vm/vm_interface.h. |
+| App driver/trace, host debug | VM driver/trace/debug; mechanical names/includes and one public creation boundary. |
+| Remaining host paths | Compat with nested compat removed; original callbacks and replacement-header ownership retained. |
+| Firmware resource | app/firmware.rc unchanged, embedded source ROM inputs unchanged. |
+| Build and product tests | All current source lists/quoted headers relocated; boundary gate plus six rejecting fixtures. |
+| Lib/Common/MVDM/shared tests | git diff cfc88cf HEAD --quiet on all five roots exits zero. |
+| User configuration/media | No changed paths; no new runtime/build external dependency. |
+
+Whole-task rename-aware `git diff cfc88cf HEAD --numstat -- src`: 57 changed
+entries, +455/-398, net +57 production lines. Test accounting: 23 entries,
++188/-56, net +132. CMake/docs/binaries excluded. Growth is the explicit config
+and VM boundary plus regression/boundary proofs, not extra runtime states,
+queues, threads, or a forwarding framework. Old app driver/trace and src/host
+are absent. Historical source evidence scripts are intentionally historical.
+
+Final executable SHA256:
+
+- softpc32.exe: 21517FC0A451F70438B2950D8563DC36778F5723ED542608F8A6F3428170EC8B
+- softpc64.exe: 6528DCE4413619297ECBF2EF881ADCD9D35CEBD861F92A99063305EB883F02E5
+
+S3 changes no code, so the S2 dual-width 85/85 proof and binaries apply
+unchanged. This is automated package evidence, not a claim of owner GUI/RDP
+acceptance. Existing six TODO entries retain their original owners/admission
+conditions; none is claimed solved by relocation. The XP proposal is not
+admitted. Implementation and audit are complete; T closure awaits the owner.
