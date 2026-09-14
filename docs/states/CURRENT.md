@@ -2,31 +2,31 @@
 
 ## Current Work
 
-M9 T56 S10 is active. Owner admitted sequential implementation of the remaining
-debug/xasm32 capability plan. S9 CLI delivery `d193638` passed dual-width
-63/63 and strict lib 8/8; its bounded integration work is accepted as the
-baseline, not as completion of the remaining machine capabilities.
+M9 T56 S10 is closed after implementation `6e11d50` and coordinator review.
+S11 is the next admitted stage, paused at its explicit port-ABI approval
+boundary. No preserved-source edit is authorized yet. S10 passed dual-width
+63/63 and strict lib 8/8; this is not completion of S11/S12 debugger capabilities.
 
-## M9 T56 S10 Packet
+## M9 T56 S11 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner: 非常好，准入实施，完成debug和xasm32彻底接通测试。 Sequential S10–S12 plan and permanent commit/push approval apply. |
-| Objective | Complete synchronous debug access: snapshot, special register writes, explicit byte port I/O and translated memory, using original machine interfaces. |
+| Objective | Implement instruction-count/execute-break plans on the existing executor after the separately approved safe instruction-boundary port ABI. Currently awaiting that decision. |
 | Non-goals | No second executor, lib changes, guest media edits, direct common-to-MVDM dependencies or unapproved preserved-source changes. S11/S12 own execution plans/watchpoints. |
-| Reference Baseline | S9 delivery d193638 and approved follow-on design f4a8648. |
+| Reference Baseline | S10 delivery 6e11d50 and approved follow-on design f4a8648; S10 closure below. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | Product host debug/CCPU adapter, copied machine request, debug consumers and focused tests; all mutation on paused executor. |
+| Files And ABI Surface | Product debug adapter, machine execution-plan/result contract and focused tests. Proposed c_main instruction notifications require separate owner port-ABI approval before edits. |
 | Applicable Rules | Execution, documentation, architecture, coding authorities and Product UI. |
-| Verification | Real adapter register restore, snapshot, port width, paged/unmapped/cross-page memory and failure tests; x86/x64 full CTest and package build; strict lib and governance. |
+| Verification | Deterministic real instruction-count/break tests including special control-transfer and exception paths, pause/resume/cancel/reset, followed by both full test/build suites. Not yet executed for S11. |
 | Expected Markers | Single command/executor rendezvous; original CPU/device functions own behavior; no fake successful read or ignored rejection. |
 | Asset Needs | Refresh both fixed EXEs only; preserve user INI/media. Test-only disposable memory/program fixtures. |
 | Reporting Requirements | Every complete P committed/pushed; retain operation ledger, line accounting, tests and both EXE links. |
 | Stop Conditions | A missing safe boundary requiring MVDM change must be presented with exact evidence and a separate port-ABI approval; no guessed CPU semantics. |
-| Exit Criteria | All S10 operation families have real positive/negative proof or explicit owner-approved disposition; dual-width tests/packages, review, commit/push and clean tree. |
+| Exit Criteria | S11 execution plans have real positive/negative instruction-boundary proof; dual-width tests/packages, review, commit/push and clean tree. Unsupported is not completion. |
 | Original Owner Request | 准入实施，完成debug和xasm32彻底接通测试。 |
-| Similar-Issue Sweep | All register IDs, memory address modes, port width consumers, snapshot fields and synchronous failure propagation; early feasibility audit of S11/S12 hooks. |
+| Similar-Issue Sweep | All instruction completion bypasses, exception paths, refetch after paused CS:EIP edits, plan cancellation and guest TF/DR isolation. |
 
 ## Current Technical Baseline
 
@@ -44,6 +44,7 @@ baseline, not as completion of the remaining machine capabilities.
 
 ## Recent M9 Closures
 
+| T56 S10 | Synchronous debug access completed; S11/S12 need explicit port-ABI decision. | [S10 closure](../history/M9-T56-S10-synchronous-debug-access.md) |
 | T56 S4 | Generic executor, lifecycle/input queues, run generation and completed-frame publication now belong to `common/machine`; app retains only its injected SoftPC driver. | [S4 closure](../history/M9-T56-S4-common-machine-extraction.md) |
 | T56 S5 | App/host direct lib ownership was audited; the speaker worker now has one explicit app-managed lifecycle. | [S5 closure](../history/M9-T56-S5-ownership-audio-lifecycle.md) |
 | T56 S6 | Exact NXVM xasm32 source is a dormant `common-xasm32` component with copied byte/text contract tests. | [S6 closure](../history/M9-T56-S6-xasm32-source-provenance.md) |
