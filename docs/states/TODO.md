@@ -1,15 +1,5 @@
 # Long-Term Review Ledger
 
-- TODO(Low): local toolchain owner — T58 S3 observed make subprocess Error -1 and one diagnostics-free types-layout self-test exit; unchanged focused types-layout rerun passed. No compiler diagnostic or source change explains these transient exits. Investigate runner/toolchain process termination if reproducible; do not alter shared tests or product behavior to hide it.
-
-- TODO(Medium): package acceptance owner — T58 S3 first full x64 suite failed startup debugger help at package stage 17; captured viewport was 30 columns and text wrapped. The unchanged focused package rerun passed. Root cause and relation to Console geometry are unproven; admit a bounded package/viewport investigation if this recurs. Do not weaken the help assertion or change shared Console behavior in an App relocation task.
-
-- TODO(Medium): package acceptance owner — T58 S1 first full x64 run timed out in compact Console at stage 5 while x86 tests ran concurrently; the subsequent serial x64 full suite passed 85/85. Product src and both EXE hashes are unchanged from T57. Concurrency is context, not a proven cause; admit a bounded baseline-package investigation if this stage recurs, without weakening assertions or modifying runtime in the test-corpus task.
-
-- TODO(Medium): Lib Host display owner — T56 S16 corrective probe with an artificial 30x30 buffer and 20x10 viewport observed cooked restoration as 30x10; restoring capacity afterward changed the viewport width instead. Normal full-width narrow/short/scrolled viewports pass. This is distinct from the fixed first-start frame-capacity ordering; admit a host-specific horizontal-scrollback preservation investigation if required, rather than add iterative resize compensation to this startup repair.
-
-- TODO(Medium): SoftPC CPU owner — T56 S12 disposable FNINIT/FILD qword/FISTP qword probe observed an indefinite integer write after a finite read. The debug observation matches actual stored bytes; arithmetic correctness and pre-hook baseline equivalence were not this debug-ABI task's scope. Admit a separate original-x87 baseline comparison if requested; preserve media and do not alter CPU arithmetic in a debugger adapter.
-
-- TODO(Medium): package acceptance owner — T55 S7 observed one x64 stage-7 CAP-to-monitor timeout after DOS; direct rerun, a full rerun and five consecutive package runs passed. Root cause is not established. Admit a baseline-comparison investigation if it recurs or the owner requests it; preserve the current assertion and do not label the symptom fixed.
-
-- TODO(Medium): package acceptance owner — T56 S16 observed two x64 stage-14 DOS ver visibility timeouts, including a serial run. Full serial regression passed, and identical S15/current-EXE comparison passed three times each. S18 first full x64 run reproduced the compact-console stage-14 symptom; the subsequent full unchanged suite passed 83/83, as did x86. No input/focus change or weakened assertion was made; root cause remains unproven. This recurrence remains a separate bounded startup-input timing investigation, not a wake-allocation repair claim.
+No deferred entries. Seven unresolved items are now owned by
+[T59 S1](../proposals/m9-remaining-todo-investigation.md); overlay optimization is in
+[Queue](QUEUE.md). Transfer is not a claim of resolution.

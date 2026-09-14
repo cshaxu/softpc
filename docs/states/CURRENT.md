@@ -2,9 +2,28 @@
 
 ## Current Work
 
-No implementation subtask is active. T58 remains closed.
-[Td S15](../history/M9-Td-S15-overlay-queue.md) promoted overlay indexing to
-queue tail; the other seven TODOs await the owner-approved T59 S1 admission.
+M9 T59 S1 is active: investigate and resolve the seven remaining TODOs.
+
+## M9 T59 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner explicitly admits all seven non-overlay TODOs in one S. |
+| Objective | Establish and resolve each debt using the seven-member ledger. |
+| Non-goals | No overlay optimization, Win3.1 display-roundtrip repair, speculative CPU change or product redesign. |
+| Reference Baseline | bea5f8b; T58 closed; original seven TODOs retained verbatim in task record. |
+| Candidate Proposal | [Remaining TODO investigation](../proposals/m9-remaining-todo-investigation.md). |
+| Files And ABI Surface | Relevant product/lib/common tests and proven owning implementation; MVDM read-only absent further approval. |
+| Applicable Rules | Execution, document, architecture and coding rules with linked skills before implementation. |
+| Verification | Seven-item ledger; bounded reproduction; same-cause sweep; dual-width builds and full suites after repairs. |
+| Expected Markers | Each debt has evidence-backed disposition; no weakened assertions or silent error suppression. |
+| Asset Needs | Preserve INI/media; bounded disposable diagnostics defined in task brief. |
+| Reporting Requirements | Actual root causes, changed-path accounting, tests, dual EXEs, complete repair P commits/pushes. |
+| Stop Conditions | CPU source mutation, product semantic change or unbounded investigation requires owner decision. |
+| Exit Criteria | All seven independently resolved or owner-approved disposition; reviewed complete delivery. |
+| Original Owner Request | overlay 页查询 O(n) 这个加入一个队列proposal，td提交；然后所有其他todo，请你准入一个s任务予以处理 |
+| Similar-Issue Sweep | Four package symptoms share investigation but retain separate proof; independent geometry, x87 and toolchain checks. |
 
 ## Current Technical Baseline
 
