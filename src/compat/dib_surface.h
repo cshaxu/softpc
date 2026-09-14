@@ -1,5 +1,6 @@
 #ifndef SOFTPC_STANDALONE_DIB_H
 #define SOFTPC_STANDALONE_DIB_H
+#include <windows.h>
 
 /* The original nt_ega.c/nt_vga.c render into this small Console-DIB
  * contract. Standalone owns the surface and receives only dirty rectangles. */

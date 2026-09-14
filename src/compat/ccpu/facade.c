@@ -9,7 +9,6 @@
 #ifndef PIG
 
 extern struct VideoVector C_Video;
-extern struct VideoVector Video;
 
 /* The original CPU_40 product bootstrap installs the generated C-VID vector
  * before EGA/VGA port initialisation.  The detached one-machine host owns

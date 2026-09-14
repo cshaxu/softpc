@@ -13,5 +13,7 @@ void softpc_ccpu_lifecycle_clear_exit(void);
 void softpc_ccpu_lifecycle_clear_pending_interrupts(void);
 int softpc_ccpu_lifecycle_exit_requested(void);
 void softpc_ccpu_lifecycle_return_outer(void);
+/* Original keyba's narrow reset-bit access, not a product state API. */
+unsigned long *softpc_ccpu_interrupt_map_address(void);
 
 #endif

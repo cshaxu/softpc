@@ -9,6 +9,7 @@
  */
 #include "insignia.h"
 #include "host_def.h"
+#include "platform.h"
 
 #include <stdlib.h>
 #include <stdio.h>

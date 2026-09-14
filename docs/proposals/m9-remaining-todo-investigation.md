@@ -37,6 +37,32 @@ VM 负责适配，Compat 提供原始宿主边界，MVDM 仍拥有机器状态�
 共享三棵源树及用户 INI/介质未改；两份固定 EXE 已重建。
 原 VGA 测试的 TEXT 宏重定义警告保留，此次不修改受保护源或测试语义。
 
+### S3 声明整理与全量命中处置
+
+扫描 `rg -n 'extern ' src/vm src/compat -g '*.c'`，包括函数内部声明。
+冻结单位为命中文件/职责组；不是清空所有 extern 或扩大原始头文件暴露面。
+
+| 命中组 | 处置 |
+| --- | --- |
+| VM debug、Compat machine 的 CCPU 寄存器/线程声明 | 集中 compat/ccpu/abi.h；与 cpu4gen.h、c_reg.c、ntthread.c 类型核对，不改变函数实现或 ABI。该窄声明避免把原始整套 CPU 宏带入 VM。 |
+| lifecycle 与 keymouse 的 interrupt-map 声明 | 归入已有 ccpu/lifecycle.h，两处共用；只暴露原有地址 accessor，不新增状态。 |
+| Compat machine 的宿主、媒体、视频/调试桥接；VM debug 的 executor wake | 集中 compat/platform.h，所有本地实现文件也包含它以校验定义；原 DIB/text surface 复用 dib_surface.h，GDP 销毁复用 gdp_state.h。 |
+| VM input 的 KeyMsgToKeyCode | 复用原 nt_uis.h，删除手写声明。 |
+| Compat keyboard 的初始化、video/v7 的 planes/palette/refresh；facade 的 Video | 复用已存在的 keyba/egaports/gfx_upd/egagraph/nt_graph/evidgen 声明，删除重复。 |
+| platform 的 c_cpu_simulate、floppy config、executor event、sound gate | 复用 c_main.h、platform.h、audio.h；删除本地重复/前置声明。 |
+| machine 其余原始 bootstrap、计时/设备全局；device_bop BIOS 入口注册 | 保留调用点窄 ABI，分别服务原机器初始化和有限 BOP 表；不引入宏污染较广的全套原始头，也不改原初始化顺序。 |
+| debug 的 inb/outb；memory 的 xtrn2phy；keyboard 的 host_key_down/up/output_contents | 保留唯一该宿主消费者的原始端口/地址翻译/键盘协议声明，不增无消费者公共接口。 |
+| cvidc Gdp；facade C_Video；platform soft_reset、nt_video_funcs、keyboard/error 表 | 保留原始全局绑定所需声明，不复制对象。error.h 在当前非 BUILDING_CPU_TOOL 配置没有 working_error_funcs 声明，不能仅凭文本搜索删除。 |
+
+尝试把寄存器声明带入原 keyba 的旧式无原型编译域，会触发短整数默认提升的声明冲突；
+已撤销该扩大引用，使用原有 lifecycle 头的唯一 accessor。没有因此改变参数或返回值。
+中间一次 x64 CTest 进程在共享 DAG 检查期间无诊断退出 -1，不作为通过证据；
+最终构建后重新运行完整 suite，禁止放宽断言或修改共享代码。
+
+最终 S3 双宽度完整构建通过；x64 86/86（103.41s），x86 86/86（89.89s）。
+生产 C/H 21 文件 +122/-107，净 +15（包含两个新声明头）；没有新增函数、状态或测试路径。
+三棵受保护源码无 diff，EXE 已刷新。遗留声明按上表保留，不宣称原始全部头文件现代化。
+
 ## 原始请求与准入
 
 “overlay 页查询 O(n) 这个加入一个队列proposal，td提交；然后所有其他todo，请你准入一个s任务予以处理”。

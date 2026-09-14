@@ -1,5 +1,6 @@
 #include "insignia.h"
 #include "host_def.h"
+#include "platform.h"
 
 #include "fdisk.h"
 #include "lib/storage/medium_interface.h"

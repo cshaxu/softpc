@@ -32,7 +32,6 @@ static long softpc_v7_pointer_right;
 static long softpc_v7_pointer_bottom;
 static int softpc_v7_pointer_visible;
 
-extern byte *EGA_planes;
 
 static void softpc_v7_pointer_clear(x, y)
 word x;

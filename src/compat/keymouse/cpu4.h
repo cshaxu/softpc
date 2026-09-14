@@ -6,7 +6,7 @@
  */
 #include "../../mvdm/softpc.new/base/inc/cpu4.h"
 
-extern IU32 *softpc_ccpu_interrupt_map_address(void);
+#include "../ccpu/lifecycle.h"
 #define cpu_interrupt_map (*softpc_ccpu_interrupt_map_address())
 
 /* CPU_40's selected CCPU representation reserves bit 14 for reset. */

@@ -1,5 +1,6 @@
 #include "insignia.h"
 #include "host_def.h"
+#include "platform.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -24,10 +25,6 @@ boolean stream_io_enabled = FALSE;
 word stream_io_buffer_size = 0;
 word *stream_io_dirty_count_ptr = NULL;
 
-extern byte *EGA_planes;
-extern byte *video_copy;
-extern PC_palette *DAC;
-extern void nt_mark_screen_refresh(void);
 
 int softpc_platform_presentation_is_graphics(void)
 {

@@ -1,5 +1,6 @@
 #include "insignia.h"
 #include "host_def.h"
+#include "platform.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -34,6 +35,8 @@
 #include "lifecycle.h"
 #include "input.h"
 #include "hdd_media.h"
+#include "audio.h"
+#include "c_main.h"
 #include "lib/host/clock_interface.h"
 #include "lib/host/sync_interface.h"
 
@@ -43,7 +46,6 @@
  * notification.  There is no product-session or service-dispatch layer here.
  */
 
-extern void c_cpu_simulate();
 IU32 softpc_ccpu_instruction_budget = 0;
 IBOOL softpc_ccpu_instruction_budget_active = FALSE;
 
@@ -61,7 +63,6 @@ static lib_u64 softpc_executor_pacing_origin;
 static lib_u64 softpc_executor_pacing_frequency;
 #endif
 
-extern void softpc_standalone_sound_timer2_gate(half_word value);
 
 static void softpc_standalone_timer_gate(io_addr port, half_word value)
 {
@@ -86,7 +87,6 @@ static volatile LONG softpc_clock_pending_ticks;
 static volatile LONG softpc_executor_wake_pending;
 static void (*softpc_executor_callback)(void *);
 static void *softpc_executor_callback_context;
-void softpc_platform_executor_event(void);
 
 static IBOOL softpc_platform_take_pending(volatile LONG *pending)
 {
@@ -322,7 +322,6 @@ void host_release_timeslice(void)
  * A standalone fixed machine exposes no mutable product configuration: its
  * concrete media and memory are already supplied by softpc_machine_options. */
 static CHAR softpc_empty_config_value[] = "";
-extern char *softpc_platform_floppy_config_value(void);
 #define SOFTPC_CONFIG_HARD_DISK1_NAME 25u
 #define SOFTPC_CONFIG_HARD_DISK2_NAME 26u
 #define SOFTPC_CONFIG_FLOPPY_A_DEVICE 51u
@@ -766,6 +765,7 @@ static ERRORFUNCS softpc_error_functions = {
     softpc_error_ignore,
     softpc_error_ignore,
     softpc_error_ignore};
+/* Original error.h only declares this table for BUILDING_CPU_TOOL. */
 extern ERRORFUNCS *working_error_funcs;
 extern VIDEOFUNCS nt_video_funcs;
 

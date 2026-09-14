@@ -1,4 +1,5 @@
 #include "lifecycle.h"
+#include "abi.h"
 
 #include <windows.h>
 
@@ -11,8 +12,6 @@
 static SOFTPC_CCPU_THREAD_LOCAL unsigned long softpc_ccpu_frame_depth;
 static volatile LONG softpc_ccpu_exit_requested;
 
-extern void ccpu386UnsimulateOuter(void);
-extern unsigned long *softpc_ccpu_interrupt_map_address(void);
 
 void softpc_ccpu_lifecycle_enter(void)
 {

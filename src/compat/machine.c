@@ -1,5 +1,9 @@
 #include "machine.h"
 #include "ccpu/lifecycle.h"
+#include "ccpu/abi.h"
+#include "cvidc/gdp_state.h"
+#include "platform.h"
+#include "dib_surface.h"
 #include "lib/storage/medium_interface.h"
 
 #include <stdio.h>
@@ -8,20 +12,10 @@
 
 /* CCPU's standalone executor entry points.  The wrapper intentionally calls
  * the core directly instead of the historical host shim. */
-extern void c_cpu_init(void);
-extern void c_cpu_reset(void);
-extern void c_cpu_simulate(void);
-extern void c_cpu_terminate(void);
-extern void ccpu386newthread(void);
-extern void ccpu386exitthread(void);
-extern unsigned short c_getCS(void);
-extern unsigned long c_getCS_BASE(void);
-extern unsigned long c_getEIP(void);
 extern void sas_init(unsigned long size);
 extern void sas_term(void);
 extern void gfi_init(void);
 extern void *setup_global_data_ptr(void);
-extern void softpc_gdp_destroy_global(void);
 extern void setup_vga_globals(void);
 extern void softpc_ccpu_install_video_vector(void);
 extern void reset(void);
@@ -29,39 +23,13 @@ extern void (*ica_clear_int_func)(unsigned long adapter, unsigned long line);
 extern int soft_reset;
 extern unsigned long softpc_ccpu_instruction_budget;
 extern int softpc_ccpu_instruction_budget_active;
-extern int softpc_platform_write_physical(unsigned long address,
-    const unsigned char *bytes, unsigned long length);
-extern int softpc_platform_read_physical(unsigned long address,
-    unsigned char *bytes, unsigned long length);
-extern void softpc_device_bop_register_machine_services(void);
-extern int softpc_platform_keyboard_scancode(unsigned char scan_code);
-extern int softpc_platform_keyboard_key(int key, int released);
-extern void softpc_platform_keyboard_discard_stale_output(void);
-extern void softpc_platform_request_executor_wake(void);
 extern void mouse_send(int delta_x, int delta_y, int left, int right);
-extern void softpc_platform_presentation_request_refresh(void);
 extern void time_strobe(void);
 extern void host_timer_shutdown(void);
-extern void softpc_platform_set_boot_clock(int active);
-extern void softpc_platform_set_runtime_heartbeat(int enabled);
-extern void softpc_platform_set_executor_callback(void (*callback)(void *),
-    void *context);
 extern void q_event_init(void);
 extern void tic_event_init(void);
 extern void host_lpt_close_all(void);
 extern void host_com_close_all(void);
-extern int softpc_host_com_set_output_path(int adapter, const char *path);
-extern int softpc_host_lpt_set_output_path(int adapter, const char *path);
-extern int softpc_platform_hdd_attach(const char *hard_disk_path,
-    softpc_media_mode mode);
-extern void softpc_platform_hdd_detach(void);
-extern int softpc_platform_floppy_attach(const char *path, softpc_media_mode mode);
-extern void softpc_platform_floppy_detach(void);
-extern int softpc_platform_video_buffers_init(void);
-extern void softpc_platform_bind_reset_host_functions(void);
-extern void softpc_platform_install_timer2_sound_gate(void);
-extern int softpc_standalone_dib_take_dirty(long *left, long *top,
-    long *right, long *bottom);
 extern FILE *trace_file;
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
@@ -393,7 +361,6 @@ softpc_machine_result softpc_machine_instruction_address(
 
 int softpc_machine_presentation_is_graphics(const softpc_machine *machine)
 {
-    extern int softpc_platform_presentation_is_graphics(void);
     return machine != NULL && machine->reset &&
         softpc_platform_presentation_is_graphics();
 }
@@ -401,7 +368,6 @@ int softpc_machine_presentation_is_graphics(const softpc_machine *machine)
 int softpc_machine_presentation_state(const softpc_machine *machine,
     uint32_t *mode_type_out, uint32_t *screen_state_out)
 {
-    extern int softpc_platform_presentation_state(uint32_t *, uint32_t *);
     if (machine == NULL || !machine->reset || mode_type_out == NULL ||
         screen_state_out == NULL) return 0;
     return softpc_platform_presentation_state(mode_type_out, screen_state_out);
@@ -430,8 +396,6 @@ int softpc_machine_presentation_dib(const softpc_machine *machine,
 {
     unsigned long width;
     unsigned long height;
-    extern int softpc_standalone_dib_surface(const void **, const void **,
-        unsigned long *, unsigned long *);
     if (machine == NULL || bits_out == NULL || info_out == NULL ||
         width_out == NULL || height_out == NULL ||
         !softpc_standalone_dib_surface(bits_out, info_out, &width, &height))
@@ -449,8 +413,6 @@ int softpc_machine_presentation_text(const softpc_machine *machine,
     unsigned long rows;
     unsigned long stride;
     unsigned long cell_bytes;
-    extern int softpc_standalone_text_surface(const void **, unsigned long *,
-        unsigned long *, unsigned long *, unsigned long *);
     if (machine == NULL || !machine->reset || cells_out == NULL ||
         columns_out == NULL || rows_out == NULL || stride_out == NULL ||
         cell_bytes_out == NULL || !softpc_standalone_text_surface(cells_out,
@@ -468,8 +430,6 @@ int softpc_machine_presentation_cursor(const softpc_machine *machine,
     long column;
     long row;
     unsigned long size;
-    extern int softpc_platform_presentation_cursor(long *, long *,
-        unsigned long *);
     if (machine == NULL || !machine->reset || column_out == NULL ||
         row_out == NULL || size_out == NULL ||
         !softpc_platform_presentation_cursor(&column, &row, &size)) return 0;
@@ -482,7 +442,6 @@ int softpc_machine_presentation_cursor(const softpc_machine *machine,
 int softpc_machine_presentation_font(const softpc_machine *machine,
     uint8_t glyphs[256u * 16u], uint32_t *height_out)
 {
-    extern int softpc_platform_presentation_font(uint8_t *, unsigned long *);
     unsigned long height;
     if (machine == NULL || !machine->reset || glyphs == NULL ||
         height_out == NULL || !softpc_platform_presentation_font(glyphs,
@@ -495,8 +454,6 @@ int softpc_machine_presentation_fonts(const softpc_machine *machine,
     uint8_t primary[256u * 16u], uint8_t secondary[256u * 16u],
     uint32_t *height_out, uint32_t *attribute_select_out)
 {
-    extern int softpc_platform_presentation_fonts(uint8_t *, uint8_t *,
-        unsigned long *, unsigned long *);
     unsigned long height;
     unsigned long attribute_select;
 

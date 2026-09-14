@@ -1,10 +1,10 @@
 #include "insignia.h"
 #include "host_def.h"
+#include "platform.h"
 #include "keyboard.h"
 #include "input.h"
+#include "keyba.h"
 
-extern void AT_kbd_init(void);
-extern void AT_kbd_post(void);
 extern void host_key_down(int key);
 extern void host_key_up(int key);
 extern unsigned char output_contents;
@@ -38,8 +38,6 @@ char *extra_text;
 
 void softpc_platform_keyboard_reset(void)
 {
-    extern void keyboard_init(void);
-    extern void keyboard_post(void);
 
     keyboard_init();
     keyboard_post();
