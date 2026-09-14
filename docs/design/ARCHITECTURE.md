@@ -43,6 +43,10 @@ Within app, command owns CLI/debug semantics, keyboard owns hotkey semantics,
 and composition creates the entities, wires their callbacks into Common
 session, runs it and performs teardown. Main validates arguments/configuration.
 Composition does not parse commands or hotkey identifiers or add a state machine.
+At exit it synchronously shuts down the machine worker with callback targets
+still alive, then destroys UI, session, command/debug, machine and VM in order.
+Machine shutdown and destroy share one stop/join path; shutdown retains storage
+so referenced objects can be released safely before the machine itself.
 Only app/composition.c consumes vm/vm_interface.h; no app source consumes Compat or
 MVDM. `vm/` owns the concrete machine driver, frame/input conversion and debug
 adapter. Its implementation calls Compat and the original machine while its

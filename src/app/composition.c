@@ -140,10 +140,11 @@ done:
     if (result != LIB_STATUS_OK)
         fprintf(stderr, "softpcvm: %s\n", result == LIB_STATUS_INVALID_ARGUMENT ?
             "invalid argument or media" : "host I/O error");
-    app_command_dispose(&commands);
-    common_machine_destroy(machine_runtime);
+    common_machine_shutdown(machine_runtime);
     (void)common_ui_destroy(ui);
     (void)common_session_destroy(session);
+    app_command_dispose(&commands);
+    common_machine_destroy(machine_runtime);
     vm_destroy(machine_driver);
     return result;
 }

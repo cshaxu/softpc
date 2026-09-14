@@ -185,3 +185,65 @@ made between these runs; final serial x64 acceptance is recorded below.
 Final serial x64 suite passed 85/85 (49.34 s). Both widths therefore have
 complete passing runs of the delivered code, with earlier observations retained
 above and in TODO. Documentation governance and boundary negative checks pass.
+
+## S4: Quiescence before ordered teardown
+
+Owner requests UI -> session -> machine -> VM destruction. Inspection found
+session exit only requests asynchronous stop; the machine can still emit state
+and frame callbacks into session. Owner explicitly approved extracting the
+existing stop/join into synchronous shutdown: “好的。批准。开始执行。”
+Baseline f30b6c5. This supersedes the earlier Common no-change restriction only
+for machine shutdown and its shared tests/docs/manifests. Lib/VM/Compat/MVDM
+remain untouched. No new thread, state machine, lock or shutdown event.
+
+Finite ledger: existing destroy stop/join, never-started/active/paused worker,
+outstanding callbacks, repeated shutdown/destroy, partial create failure,
+post-shutdown requests that would otherwise wait for a dead worker, and the
+one App cleanup path. Shutdown permanently joins and clears the existing worker
+handle; destroy delegates before resource disposal. The serialized owner must
+not call shutdown from a worker callback or race it with API calls. Product stop
+remains restartable; shutdown is not a new product command.
+App shuts down first while all sinks live, destroys UI while session can still
+receive retirement events, then session, command/debug, machine and VM.
+Test callback completion with barriers, not sleeps; retain normal stop/restart
+coverage and prove no second disposal callback. Add a permanent order check.
+Build both fixed EXEs, run full suites/manifests, push executor then review
+actual changes for S acceptance. T58 remains open.
+
+### S4 implementation ledger
+
+- Worker stop/join: extracted from destroy into shutdown; destroy delegates.
+  Existing worker pointer becomes NULL after join, so repetition is a no-op.
+- Callback targets: App shuts down while session/command/UI/VM are alive, then
+  destroys UI, session, command/debug, machine, VM. UI retirement can still
+  enqueue into the live session. Debug close can still reference machine.
+- Request sweep: cold-run admission rejects a missing worker (start/reset);
+  media admission rejects it before waiting. Pause/resume/input/debug execution
+  already reject the terminal stopped/error state. Stop and debug cancellation
+  do not synchronously wait or emit callbacks in this state. No new state enum.
+- Partial create: all handles start NULL and worker is created last; shutdown
+  skips a missing worker while destroy still releases each allocated resource.
+- Verification: the shared machine smoke retains normal lifecycle/debug tests,
+  covers never-started and stopped shutdown, and blocks a final callback during
+  running/paused shutdown. A helper-thread completion barrier proves shutdown
+  waits; repeated shutdown and destroy leave notification count unchanged.
+  No sleep or polling delay is used to assert the barrier.
+- Single production route: rg of App destroy calls finds only composition;
+  its exact ordered cleanup is guarded in the existing source-boundary test.
+  Lib, VM, Compat, MVDM and test/lib have zero diff from f30b6c5.
+
+Accounting: production C/H +21/-7, net +14 (App +3/-2, machine C +12/-5,
+public declaration/contract +6/-0); shared test C +64/-0; product gate +3/-0.
+No added runtime object, state field, synchronization primitive or ABI payload.
+Common source/test manifests mark shared-t58-s4-p1 for downstream adoption.
+
+S4 verification: x64 build passed; focused machine/barrier, manifests and
+source-boundary checks passed 4/4. Full x64 passed 85/85 (88.85 s), full x86
+passed 85/85 (94.64 s), run serially. The first x86 parallel build command
+reported exit -1 after linking the package without a compiler diagnostic;
+the subsequent serial build was confirmed exit 0. No source or assertion was
+changed for that retry. Documentation governance and diff checks pass.
+Both fixed package hashes:
+softpc32.exe 4DC9840EBDB285900898DD1373687DC9B66739086162C6F9D1F47868C369337A;
+softpc64.exe 2FC00B4E09124D21EAC5FC30B4099F641B8807B8A4D698AED736374D85F4A64B.
+INI and media are unchanged. Owner interactive acceptance remains separate.

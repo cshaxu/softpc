@@ -2,11 +2,28 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T58.
+T58 S4 is active: quiesce machine callbacks before ordered teardown.
 
-T58 S3 is closed after [assembly review](../history/M9-T58-S3-application-assembly.md).
-Both fixed EXEs are ready for owner testing; no S4 is admitted.
+## M9 T58 S4 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approves synchronous shutdown extraction and ordered App teardown. |
+| Objective | Join the machine worker before UI/session destruction; one shutdown path reused by destroy. |
+| Non-goals | No new lifecycle state/thread/queue; no Lib, VM, Compat or MVDM changes. |
+| Reference Baseline | f30b6c5; S3 dual-width 85/85. |
+| Candidate Proposal | [S4 ledger](../proposals/m9-common-test-sync.md). |
+| Files And ABI Surface | Common machine adds shutdown, App cleanup, Common tests/manifests and product boundary proof. |
+| Applicable Rules | Architecture, coding, execution, documentation and linked governance skills. |
+| Verification | Callback barrier, repeated shutdown/destroy, stopped/running/paused, cleanup order, dual full suites. |
+| Expected Markers | shutdown then UI, session, command, machine, VM; no callback after shutdown returns. |
+| Asset Needs | Both fixed EXEs; bounded ignored build/test logs; preserve INI/media. |
+| Reporting Requirements | Commit/push executor P, actual-diff review and S closure; T stays open. |
+| Stop Conditions | New synchronization or product semantics needed beyond approved shutdown. |
+| Exit Criteria | Ledger verified, dual builds/tests, corpus manifests, clean committed/pushed delivery. |
+| Original Owner Request | UI → session → machine → VM；批准提取同步 shutdown；好的。批准。开始执行。 |
+| Similar-Issue Sweep | All machine request admissions, creation failure cleanup, callbacks and App destructor calls. |
 
 ## Current Technical Baseline
 
