@@ -24,4 +24,12 @@ move with one small contract, not a parser rewrite. Existing TODOs unchanged.
 Verification: both fixed EXEs built; x64 full suite 84/84 (76.37 s).
 x86 full suite 84/84 (97.33 s). Documentation gate passes; protected five corpora
 have zero diff. Final acceptance and actual-commit review follow the complete
-dual-width delivery; S2 has not yet begun.
+dual-width delivery.
+
+Actual-commit review of 393f4a0: parser body is moved rather than rewritten;
+new display/media types are converted explicitly at composition; production
+and fake-input assertions preserve behavior. Both package suites passed.
+Creating this history record made the old New/S1 packet stale; the final
+documentation check rejected it, although the shell continued to commit.
+S2 admission now advances the packet and reruns the gate, without weakening
+the verifier. S1 is accepted; no runtime defect was hidden by this correction.

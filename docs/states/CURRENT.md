@@ -2,29 +2,30 @@
 
 ## Current Work
 
-T57 S1 is active: extract app configuration before the VM/Compat relocation.
+T57 S1 is closed after dual-width proof and actual-diff review; S2 is active:
+relocate VM/Compat and enforce the approved application boundary.
 T56 remains closed; no shared corpus or MVDM change is admitted.
 
-## M9 T57 S1 Packet
+## M9 T57 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
+| Identifier Mode | Continuation |
 | Admission And Approval | Owner admits new T to implement the confirmed app/vm/compat refactor. |
-| Objective | Move configuration parsing/path resolution from main into app/config with unchanged behavior. |
+| Objective | Move SoftPC driver to src/vm and host support to src/compat; only app/main may consume VM public interfaces. |
 | Non-goals | No shared Lib/Common/MVDM or product semantics change. |
-| Reference Baseline | cfc88cf, clean main, x64/x86 83/83. |
+| Reference Baseline | 393f4a0, S1 x64/x86 84/84. |
 | Candidate Proposal | [Refactor](../proposals/m9-app-vm-compat-boundaries.md). |
-| Files And ABI Surface | app main/config, product test and CMake; app-owned configuration contract. |
+| Files And ABI Surface | app, vm, compat, product tests/CMake and current design; existing Common driver and original machine ABI unchanged. |
 | Applicable Rules | Architecture, coding, execution, documentation and their linked governance skills. |
-| Verification | Focused config test, full x86/x64 suites, protected corpus diff and documentation gate. |
-| Expected Markers | One parser, same defaults/paths/error behavior, both fixed EXEs. |
+| Verification | Boundary positive/negative probes, full x86/x64 suites, five protected corpora zero diff and documentation gate. |
+| Expected Markers | No src/host or app machine driver; no app->Compat/MVDM; only main->VM; both fixed EXEs. |
 | Asset Needs | Refresh fixed EXEs only; no INI/media edits. Bounded logs under build; no new media. |
 | Reporting Requirements | Executor commit/push then actual-diff review; both-width evidence and accounting. |
 | Stop Conditions | Protected corpus changes or product behavior redesign require owner direction. |
-| Exit Criteria | Config extraction and tests complete, dual builds/tests, commit/push and independent review. |
+| Exit Criteria | All relocated paths single-owned, headers/build/tests converged, dual builds/tests, commit/push and actual-diff review. |
 | Original Owner Request | 准入一个新的t任务实施重构；app main is the only permitted VM consumer. |
-| Similar-Issue Sweep | All configuration consumers/parser/build/test references; old parser removed from main. |
+| Similar-Issue Sweep | All app/host includes, symbols, build sources, source-boundary checks and product test consumers. |
 
 ## Current Technical Baseline
 
