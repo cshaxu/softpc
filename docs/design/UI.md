@@ -64,13 +64,20 @@ Registered KVM hotkeys still reach the same session control path: CAP can
 pause/resume while debug remains active. Normal guest input stays blocked when
 paused. Cooked debugger input is never reinterpreted as a KVM hotkey.
 
-The initial SoftPC adapter supports general-register reads/writes, read-only
-IP/flags/segment/CR0/CR2/CR3 registers, and memory inspection/editing with paging
-disabled through the existing physical-memory boundary. Assembly/disassembly
-uses the common xasm32 engine. Plain `g` requests normal resume; trace,
-breakpoints, watchpoints, ports, descriptor snapshots, paging-enabled memory
-access, CR1/CR4 and control/segment/IP/flags writes explicitly report unsupported.
-These are adapter capability limits, not restrictions on entering the CLI.
+The SoftPC adapter supports general/IP/flags/segment/CR0/CR2/CR3 reads and
+writes through the original CPU setters, and effective CPU segment-cache
+snapshots. These are the CPU's effective attributes, not a reread of raw
+descriptor memory; LDTR exposes its cached selector/base/limit only.
+Memory inspection/editing uses original external linear translation and SAS
+physical bus access, including paging and A20. Invalid mappings and ROM writes
+are rejected before bus access; inspection does not set page accessed/dirty
+bits or inject a guest page fault. Real addresses mean segment*16+offset;
+linear addresses are not protected-mode selector addresses.
+I/O commands perform one byte access through the original device dispatcher;
+reads may have device side effects and are not retried. Assembly/disassembly
+uses common xasm32. Plain `g` requests normal resume. Trace, breakpoints,
+watchpoints and architecturally unavailable CR1/CR4 still report unsupported
+pending the admitted execution-observation work, not because of CLI state.
 
 ## Window And Input
 

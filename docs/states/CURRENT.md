@@ -2,36 +2,31 @@
 
 ## Current Work
 
-M9 T56 S9 is active: owner reopened the closed task; retain the completed
-monitor-spacing repair and connect the admitted common debug command path.
-S9 P5 is implemented and verified: x86/x64 each pass 63/63 tests, strict
-standalone lib passes 8/8, and both package EXEs are refreshed. Await owner
-testing; neither S9 nor T56 is closed by this delivery.
-Owner approved the follow-on debug capability design: S10 synchronous access,
-S11 execution control, S12 watchpoints and end-to-end acceptance, detailed in
-the linked proposal. These are sequential planned scopes, not concurrent active
-packets; S9 remains the sole active step pending feedback.
+M9 T56 S10 is active. Owner admitted sequential implementation of the remaining
+debug/xasm32 capability plan. S9 CLI delivery `d193638` passed dual-width
+63/63 and strict lib 8/8; its bounded integration work is accepted as the
+baseline, not as completion of the remaining machine capabilities.
 
-## M9 T56 S9 Packet
+## M9 T56 S10 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | Owner-Reopen |
-| Admission And Approval | Owner explicitly withdrew the premature S9 closure and admitted debug-command connection within S9; permanent commit/push authority remains in effect. |
-| Objective | Retain monitor spacing and connect debug CLI independently of VM state; only synchronous machine access requires PAUSED through common/machine. |
-| Non-goals | Do not bypass common/machine, create a second executor, directly access MVDM from common/debug, or alter existing monitor command/lifecycle semantics. |
-| Reference Baseline | S9 P1 `1750ed7` normalized all nonempty monitor output; P2 dual packages built at `de2ff79`, but the owner kept S9 open for debug connection. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner: 非常好，准入实施，完成debug和xasm32彻底接通测试。 Sequential S10–S12 plan and permanent commit/push approval apply. |
+| Objective | Complete synchronous debug access: snapshot, special register writes, explicit byte port I/O and translated memory, using original machine interfaces. |
+| Non-goals | No second executor, lib changes, guest media edits, direct common-to-MVDM dependencies or unapproved preserved-source changes. S11/S12 own execution plans/watchpoints. |
+| Reference Baseline | S9 delivery d193638 and approved follow-on design f4a8648. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | Common debug/session injection, SoftPC debug driver adapter and focused tests; machine access stays behind copied request/result. Disassembly now returns instruction byte count separately from text length: the live U test exposed their conflation and a zero-progress loop. |
-| Applicable Rules | Execution, architecture, coding and documentation authorities; Product UI; common ownership boundary. |
-| Verification | Audit every debug operation against the product driver; test debug entry/stay/exit in INIT, STOPPED, RUNNING and PAUSED without implicit machine access or pause; test CAP while debug remains active, lazy register defaults, explicit non-paused access errors, lease invalidation and unsupported operations; fresh package-x86/x64, test-x86/x64, strict lib and governance gates. |
-| Expected Markers | Monitor dispatches a debug session only through common/session injection; common/debug reaches SoftPC only through common/machine's lease callback; no MVDM include outside the product adapter. |
-| Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe`; preserve adjacent user-owned INI and all media bytes. |
-| Reporting Requirements | Every P is committed and pushed; final report includes both EXE links, hashes and x86/x64 test evidence. |
-| Stop Conditions | Stop if a required debug operation has no safe product adapter or needs an MVDM semantic change; record each unsupported operation rather than inventing an unsafe direct path. |
-| Exit Criteria | Supported debug commands work via the typed machine lease, unsupported ones are explicit, focused and full dual-width tests pass, packages refresh, review/push complete and worktree is clean. |
-| Original Owner Request | S9 暂不收口，因为还有一个问题：debug命令没有接通无法使用。后续批准：是否可以进入和保持在debug cli，是用户决定 和机器状态无关；只有debug调用机器的同步读写接口，才要paused；如果此时没有paused状态便会报错。好 准入s9。 |
-| Similar-Issue Sweep | CLI provider injection, debug lifetime/open/close, all debug operations, machine lease invalidation, product driver callbacks, prompt ownership and no-direct-MVDM boundary. |
+| Files And ABI Surface | Product host debug/CCPU adapter, copied machine request, debug consumers and focused tests; all mutation on paused executor. |
+| Applicable Rules | Execution, documentation, architecture, coding authorities and Product UI. |
+| Verification | Real adapter register restore, snapshot, port width, paged/unmapped/cross-page memory and failure tests; x86/x64 full CTest and package build; strict lib and governance. |
+| Expected Markers | Single command/executor rendezvous; original CPU/device functions own behavior; no fake successful read or ignored rejection. |
+| Asset Needs | Refresh both fixed EXEs only; preserve user INI/media. Test-only disposable memory/program fixtures. |
+| Reporting Requirements | Every complete P committed/pushed; retain operation ledger, line accounting, tests and both EXE links. |
+| Stop Conditions | A missing safe boundary requiring MVDM change must be presented with exact evidence and a separate port-ABI approval; no guessed CPU semantics. |
+| Exit Criteria | All S10 operation families have real positive/negative proof or explicit owner-approved disposition; dual-width tests/packages, review, commit/push and clean tree. |
+| Original Owner Request | 准入实施，完成debug和xasm32彻底接通测试。 |
+| Similar-Issue Sweep | All register IDs, memory address modes, port width consumers, snapshot fields and synchronous failure propagation; early feasibility audit of S11/S12 hooks. |
 
 ## Current Technical Baseline
 
@@ -57,7 +52,6 @@ packets; S9 remains the sole active step pending feedback.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
-| T56 | SoftPC-first common corpus closed through S8: UI, session, machine, xasm32 and debug each have one owner; S9 is owner-reopened for debug-command connection. | [S8 closure](../history/M9-T56-S8-common-corpus-convergence.md) |
 | T55 | Canonical shared library refreshed, normalized, simplified, boundary-gated, and renamed to the KVM corpus; owner accepted final package testing. | [T55 closure](../history/M9-T55-closure-kvm-corpus.md) |
 | T49 | Shared-library quality sequence S1–S6 closed after owner x86/x64 package acceptance. | [T49 S6 history](../history/M9-T49-S6-lib-neutral-corpus-prose.md) |
 | T50 | Build presets/artifact identity and standalone shared-library MSVC CI closed. | [T50 S2 history](../history/M9-T50-S2-lib-ci.md) |

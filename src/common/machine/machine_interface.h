@@ -101,7 +101,7 @@ typedef struct common_machine_debug_request {
     common_machine_debug_watch_kind watch_kind;
     common_machine_debug_execution_plan_kind execution_kind;
     lib_u64 instruction_count;
-    lib_u8 bytes;
+    lib_u8 bytes; /* Memory payload size; port I/O explicitly requires 1 (byte). */
     lib_u8 data[COMMON_MACHINE_DEBUG_BYTES];
 } common_machine_debug_request;
 

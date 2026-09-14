@@ -199,7 +199,7 @@ static C_INT command_read_port(command_context *debugContext,
 {
     common_machine_debug_result result;
     if (command_execute(debugContext, &(common_machine_debug_request){
-            .operation = COMMON_MACHINE_DEBUG_READ_PORT, .port = port }, &result))
+            .operation = COMMON_MACHINE_DEBUG_READ_PORT, .port = port, .bytes = 1u }, &result))
         return 1;
     *value = result.value;
     return 0;
@@ -219,6 +219,7 @@ static C_INT command_write_port(command_context *debugContext,
     common_machine_debug_request request = {0};
     common_machine_debug_result result;
     request.operation = COMMON_MACHINE_DEBUG_WRITE_PORT;
+    request.bytes = 1u;
     request.port = port;
     request.address = value;
     return command_execute(debugContext, &request, &result);
@@ -494,7 +495,8 @@ static C_VOID command_print_segments(command_context *debugContext)
     command_print_segment(debugContext, &snapshot.fs, "FS");
     command_print_segment(debugContext, &snapshot.gs, "GS");
     command_print_system_segment(debugContext, &snapshot.tr, "TR  ");
-    command_print_system_segment(debugContext, &snapshot.ldtr, "LDTR");
+    command_printf(debugContext, "LDTR=%04X, Base=%08X, Limit=%08X\n",
+        snapshot.ldtr.selector, snapshot.ldtr.base, snapshot.ldtr.limit);
     command_printf(debugContext, "GDTR Base=%08X, Limit=%04X\n",
         snapshot.gdtr.base, snapshot.gdtr.limit);
     command_printf(debugContext, "IDTR Base=%08X, Limit=%04X\n",

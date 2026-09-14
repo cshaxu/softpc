@@ -287,6 +287,60 @@ stop/start/reset 回归；不能只以新增单测通过宣布全部 debugger �
 新增状态只允许服务于真实请求/完成所有权；不因本设计引入能力框架、
 额外线程、重复调度器或 lib 产品语义。
 
+### S10 实施与 S11/S12 挂钩审计
+
+S10 验证：x64/x86 全量 CTest 各 63/63，strict lib 8/8；最终声明
+去重后双宽度重新构建并通过 debug-binding focused test。真实 executor
+验证修改 CS:EIP 后执行指定程序；分页跨页失败不会部分写入，CR2 和
+页表 A/D 保持不变。没有改动 MVDM、lib、用户 INI 或媒体。
+生产四个文件 +142/-43（净 +99）；测试一个文件 +151/-4（净 +147）。
+最终 package SHA-256：x86
+`2DC7CEC7B417805B9672C4D6045002351657CD3D133287C3631A0738D08FBFA7`；x64
+`C6363E7662817E38A26C9FD6D93B73EB7757D2C0F33721DF7A7413D40C411BE3`。
+
+S10 保留唯一 paused executor，未改 lib 或 MVDM。实际完成：
+
+- 原 setter 连接 IP/flags、段寄存器、CR0/2/3；段加载返回原异常编号
+  转为失败。CR0 的 PG=1/PE=0 在调用原 setter 前拒绝，避免客户机 #GP。
+- snapshot 复制原 CPU 有效缓存；原 getter 不提供 LDTR AR，所以其
+  输出只显示 selector/base/limit，不能伪造 DPL/type。CR1/CR4 属本 CPU
+  架构不支持，不是未接适配。
+- I/O 请求显式 bytes=1，经原 inb/outb，非法宽度/越界 byte 在调用前拒绝。
+- debug 内存使用 xtrn2phy 的无 A/D 更新模式、整请求预检查，再走
+  phy_r8/phy_w8；保留 A20 和 SAS mapping，ROM 写明确失败。
+  同类扫描发现原 host 的 physical 命名接口实际调用线性 SAS 操作；
+  本次 debug 不复用该路径，防止分页后重复翻译，不扩大修改其他调用者。
+- 真实 smoke 验证寄存器恢复、有效缓存、非法 protected selector、非法
+  CR0、PIC mask byte I/O、跨页读写、未映射页不改 CR2/A/D、跨页写失败
+  无前半段修改，以及修改 CS:EIP 后真实 CPU 写出预期程序结果。
+  原 XD ffffffff 用例在 A20 包裹下是合法 ROM 读，改为验证实际总线语义；
+  不再以旧 host 越界拒绝作为“正确”期望。
+
+#### 需 owner 决策的 port-ABI 边界（尚未修改）
+
+现有入口不足以直接证明计划中的完整执行/观察语义：
+
+- `c_main.c:816` 的 check_I 是解码前入口，生产 stubs.c 为空；在此停下
+  时已有本地取指指针，恢复并修改 CS:EIP 后必须重建，不能只调用 pause。
+- `c_main.c:4361` 的正常指令完成路径可区分真实完成，但 MOV SS、
+  POP SS、IRET、STI 等直接进入 NEXT_INST；异常返回也进入 NEXT_INST。
+  因而现有 pace/budget hook 不是统一的“成功退休一条指令”通知。
+- `c_page.c:437/469/497/525` 的 vir_read 路径没有 check_D；现有 check_D
+  只在写路径。Intel check_for_data_exception 则属于客户机 DR/#DB，
+  不能据此偷偷占用客户机调试寄存器来实现宿主 watchpoint。
+
+建议单独准入窄 port-ABI：在 c_main 的实际指令入口/成功完成边界增加
+纯宿主通知，覆盖上述绕行和异常，停机返回时重新建立原取指状态；
+在 c_page 的 CPU operand 读写边界增加带 linear address、字节数、方向
+的通知。原指令、地址翻译、设备及异常算法不重写；计划、匹配、结果、
+取消状态全部留在外部 adapter。暂停只能在完整指令边界执行，访问
+通知仅记命中，不能在读写进行一半时阻塞 executor。页表遍历、描述符
+内部读取、DMA 是否属于 watch 的覆盖范围须显式区别，不能声称全覆盖。
+
+此方案需要突破“本次不修改任何 MVDM”的明确非目标，因此现在只记录
+证据和拟议边界，不使用链接拦截、轮询、客户机 TF/DR 或第二 executor
+绕过。S11/S12 不得以拒绝操作测试收口；等待此窄 port-ABI 的明确批准。
+
 ### S9 P5 交付证据
 
 2026-09-13：`cmake --build --preset tests-x64/tests-x86` 均成功；
