@@ -599,6 +599,8 @@ else()
     set(SOFTPC_TEST_WIDTH_LABEL x64)
 endif()
 add_test(NAME softpc-package-smoke COMMAND softpc-package-smoke)
-set_tests_properties(softpc-package-smoke PROPERTIES
+add_test(NAME softpc-package-compact-console COMMAND softpc-package-smoke --compact-console)
+set_tests_properties(softpc-package-smoke softpc-package-compact-console PROPERTIES
     LABELS "integration;${SOFTPC_TEST_WIDTH_LABEL}"
+    TIMEOUT 90
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")

@@ -96,6 +96,57 @@ static void expect_display(const display_snapshot *expected)
     assert(memcmp(&actual, expected, sizeof(actual)) == 0);
 }
 
+static void check_frame_extent(short columns, short rows, int scrolled)
+{
+    host_console_broker *broker = NULL;
+    lib_console *cooked, *raw;
+    lib_console_text_frame frame = {0};
+    CONSOLE_SCREEN_BUFFER_INFO before, actual;
+    COORD extent = {columns, rows}, origin = {0, 0}, cells_size = {80, 25};
+    SMALL_RECT viewport = {0, 0, 19, 9}, region;
+    CHAR_INFO cells[80 * 25];
+    assert(lib_console_create(&cooked) == 0);
+    assert(lib_console_create(&raw) == 0);
+    assert(host_console_broker_create(&broker, cooked, HOST_CONSOLE_COOKED_LINES) == 0);
+    assert(SetConsoleCursorPosition(broker->backend->output, origin));
+    assert(SetConsoleWindowInfo(broker->backend->output, TRUE, &viewport));
+    assert(SetConsoleScreenBufferSize(broker->backend->output, extent));
+    viewport.Right = columns - 1;
+    viewport.Bottom = rows < 30 ? rows - 1 : 29;
+    if (scrolled) {
+        viewport.Top = 2; viewport.Bottom += 2;
+    }
+    assert(SetConsoleWindowInfo(broker->backend->output, TRUE, &viewport));
+    assert(GetConsoleScreenBufferInfo(broker->backend->output, &before));
+    frame.columns = 80; frame.rows = 25; frame.font_height = 16;
+    memset(frame.text, '#', sizeof(frame.text));
+    for (int round = 0; round < 3; ++round) {
+        assert(host_console_broker_replace(broker, cooked, raw, HOST_CONSOLE_RAW_EVENTS) == 0);
+        if (scrolled)
+            assert(SetConsoleWindowInfo(broker->backend->output, TRUE, &viewport));
+        assert(lib_console_write_text_frame(raw, &frame) == 0);
+        assert(lib_console_write_text_frame(raw, &frame) == 0);
+        region = (SMALL_RECT){0, 0, 79, 24};
+        assert(ReadConsoleOutputW(broker->backend->output, cells, cells_size, origin, &region));
+        assert(region.Left == 0 && region.Top == 0 && region.Right == 79 && region.Bottom == 24);
+        for (unsigned i = 0; i < 80 * 25; ++i) assert(cells[i].Char.UnicodeChar == '#');
+        assert(host_console_broker_replace(broker, raw, cooked, HOST_CONSOLE_COOKED_LINES) == 0);
+        assert(GetConsoleScreenBufferInfo(broker->backend->output, &actual));
+        if (actual.dwSize.X != before.dwSize.X || actual.dwSize.Y != before.dwSize.Y)
+            fprintf(stderr, "extent %d,%d round %d: restored %d,%d expected %d,%d\n",
+                columns, rows, round, actual.dwSize.X, actual.dwSize.Y, before.dwSize.X, before.dwSize.Y);
+        assert(actual.dwSize.X == before.dwSize.X && actual.dwSize.Y == before.dwSize.Y);
+        if (memcmp(&actual.srWindow, &before.srWindow, sizeof(actual.srWindow)) != 0)
+            fprintf(stderr, "viewport %d,%d round %d: %d,%d,%d,%d expected %d,%d,%d,%d\n",
+                columns, rows, round, actual.srWindow.Left, actual.srWindow.Top,
+                actual.srWindow.Right, actual.srWindow.Bottom, before.srWindow.Left,
+                before.srWindow.Top, before.srWindow.Right, before.srWindow.Bottom);
+        assert(memcmp(&actual.srWindow, &before.srWindow, sizeof(actual.srWindow)) == 0);
+    }
+    assert(host_console_broker_destroy(broker) == 0);
+    lib_console_release(raw); lib_console_release(cooked);
+}
+
 int main(void)
 {
     host_console_broker *broker;
@@ -113,6 +164,13 @@ int main(void)
     assert(lib_console_create(&raw) == 0);
     assert(lib_console_create(&other) == 0);
     assert(host_console_broker_create(&broker, cooked, HOST_CONSOLE_COOKED_LINES) == 0);
+    /* AllocConsole inherits host defaults, including very narrow windows. */
+    {
+        SMALL_RECT viewport = {0, 0, 19, 9};
+        COORD size = {120, 60};
+        assert(SetConsoleWindowInfo(broker->backend->output, TRUE, &viewport));
+        assert(SetConsoleScreenBufferSize(broker->backend->output, size));
+    }
     assert(FillConsoleOutputCharacterW(broker->backend->output, L' ', 80 * 25, origin, &written));
     assert(written == 80 * 25);
     assert(SetConsoleCursorPosition(broker->backend->output, origin));
@@ -192,6 +250,9 @@ int main(void)
     assert(host_console_broker_destroy(broker) == 0);
     expect_display(&after);
     lib_console_release(other); lib_console_release(raw); lib_console_release(cooked);
+    check_frame_extent(30, 30, 0);
+    check_frame_extent(80, 12, 0);
+    check_frame_extent(120, 60, 1);
     assert(FreeConsole());
     return 0;
 }

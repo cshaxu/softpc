@@ -61,6 +61,15 @@ static int host_console_ensure_text_surface(host_console_backend *backend)
 
     if (output == LIB_NULL || output == LIB_WIN32_INVALID_HANDLE_VALUE ||
         !lib_win32_get_console_screen_buffer_info(output, &info)) return 0;
+    /* Position first: some hosts resize the backing buffer to the viewport.
+     * Ensure frame capacity only after that operation, never before it. */
+    if (info.srWindow.Left != 0 || info.srWindow.Top != 0) {
+        viewport.Left = viewport.Top = 0;
+        viewport.Right = info.srWindow.Right - info.srWindow.Left;
+        viewport.Bottom = info.srWindow.Bottom - info.srWindow.Top;
+        (void)lib_win32_set_console_window_info(output, LIB_WIN32_TRUE, &viewport);
+        if (!lib_win32_get_console_screen_buffer_info(output, &info)) return 0;
+    }
     required.X = info.dwSize.X < (lib_win32_short)LIB_CONSOLE_TEXT_COLUMNS ?
         (lib_win32_short)LIB_CONSOLE_TEXT_COLUMNS : info.dwSize.X;
     required.Y = info.dwSize.Y < (lib_win32_short)LIB_CONSOLE_TEXT_ROWS ?
@@ -70,13 +79,6 @@ static int host_console_ensure_text_surface(host_console_backend *backend)
         backend->previous_columns = backend->previous_rows = 0u;
         if (!lib_win32_set_console_screen_buffer_size(output, required)) return 0;
     }
-    /* Keep the user's window extent. Shrinking it to the frame dimensions
-     * can truncate the inactive stream buffer when the terminal reactivates
-     * it. Only scroll the frame origin into view; do not resize the window. */
-    viewport.Left = viewport.Top = 0;
-    viewport.Right = info.srWindow.Right - info.srWindow.Left;
-    viewport.Bottom = info.srWindow.Bottom - info.srWindow.Top;
-    (void)lib_win32_set_console_window_info(output, LIB_WIN32_TRUE, &viewport);
     return 1;
 }
 

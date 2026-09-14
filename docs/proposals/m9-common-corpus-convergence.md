@@ -890,6 +890,63 @@ S7 provenance record。
 
 ## S16 coordinator review
 
+### Owner rejection and corrective plan
+
+Owner reports first start exits, then requests cause and complete repair.
+Both shipping widths reproduce stage 5 with host I/O error. A bounded native
+probe with a private 30-column Console proves SetConsoleScreenBufferSize(80)
+succeeds, subsequent SetConsoleWindowInfo(old 30-column viewport) shrinks the
+buffer to 30, and WriteConsoleOutputW succeeds with a clipped 30-column result.
+The full-write check correctly rejects that result. This is not a CPU reset
+failure and is distinct from the unproven stage-14 timing observation.
+
+Keep the same Host-owned surface preparation: position the viewport only when
+its origin needs correction, then query/ensure backing dimensions last.
+No ignored write error, retry, new API or Common/product workaround. Extend the
+existing private-Console test over narrow/short/wide/scrolled surfaces and
+repeated cooked/raw transitions. Sweep every Host geometry writer and preserve
+cooked restoration. Require the new test to fail before repair, then native
+display proof, both full suites and shipping start/pause/restart acceptance.
+Diagnostic source/binary live only under build, bounded to this investigation;
+remove them after verification. T56 remains open; S16 acceptance is suspended
+until this corrective delivery passes review.
+
+Corrective evidence: blame attributes the old-viewport calculation to S14 P1
+`07b278e`, introduced to preserve the monitor screen. S15/S16 did not modify
+that native function. The old display test assumed wide host defaults; it now
+establishes those explicitly and adds 30x30, 80x12 and scrolled 120x60 cases,
+three replacements each, full-cell readback, duplicate frame and cooked-return
+geometry checks. The first new narrow write fails on the original implementation.
+The fixed code only reorders the viewport operation and skips it at origin zero.
+Search `set_console_(screen_buffer|window|active_screen)` over src/lib finds only
+Host operations and Types aliases: palette is followed by surface preparation,
+screen selection remains in the broker transaction. No second geometry owner.
+
+Native product full regressions pass x64 80/80 (79.96s), x86 80/80 (90.02s).
+The final added active-raw scroll assertion passes at both widths; standalone
+strict Lib rerun passes 37/37 (22.24s). New compact package test uses the same
+shipping EXE and user configuration in a test-owned 30x12 Console, directly
+starts before any debugger command, checks DOS input/CLS, CAP, stop and restart.
+The original complete debugger route is unchanged; its column-layout checks
+are not reused in the new compact test. No delays, retries or weakened product
+assertions hide a failure. Source/test manifests and documentation gates pass.
+
+Count against `20ca47f`: one production C file +9/-7, net +2; two test C files
++79/-4, net +75; root CMake +3/-1. No public ABI or src/common, src/app,
+src/host or src/mvdm change.
+Package SHA256: x86 `4BC701D606BA8B21C0087B7CE3E9F1A411F1F8C5E014C2EE71636F4BC4329AC4`;
+x64 `3162EFAF23D0E5D55924B4A3CBB587790184070473A1E3C41EDD5842DBE81986`.
+An artificial buffer wider than its viewport revealed separate host metadata
+restoration limits; the rejected extra resize did not solve both dimensions
+and viewport, so it was removed and the finding transferred explicitly to TODO.
+This delivery repairs first-start failure, not every terminal geometry variant.
+The compact shipping route additionally passes three consecutive runs at each
+width (16.42s x64, approximately 17s x86). Owned diagnostic source/EXE and the
+standalone build tree were removed after checking process lifetime and resolved
+paths; short logs and fixed deliverables remain. User INI and media are unchanged.
+
+### Initial review record (before owner rejection)
+
 Reviewed executor commit `09d8c90` against `4cf8629`: the 43 structural moves
 retain their assertions; the mouse FIFO test removes only the product alias
 and uses the underlying Common queue directly. Both new test entry points

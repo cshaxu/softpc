@@ -19,6 +19,7 @@ static char package_last_screen[4096];
 static DWORD package_last_screen_width;
 static DWORD package_last_screen_length;
 static int package_window_display;
+static int package_compact_console;
 
 static char *trim(char *text)
 {
@@ -334,16 +335,23 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
     if (input == INVALID_HANDLE_VALUE || output == INVALID_HANDLE_VALUE) {
         stage = 2; goto done;
     }
+    if (package_compact_console) {
+        SMALL_RECT viewport = {0, 0, 29, 11};
+        COORD extent = {30, 12};
+        /* Only this test-owned child Console is resized, never the parent. */
+        if (!SetConsoleWindowInfo(output, TRUE, &viewport) ||
+            !SetConsoleScreenBufferSize(output, extent)) { stage = 19; goto done; }
+    }
     if (!package_wait_for_text(output, "SoftPC>", 5000u)) { stage = 3; goto done; }
     /* Exercise the shipping CLI provider, not only the debug library link.
        Entering before start must leave the machine stopped and permit help. */
-    if (!package_send_text(input, "debug\r") ||
+    if (!package_compact_console && (!package_send_text(input, "debug\r") ||
         !package_wait_for_text(output, "Debugger:", 5000u) ||
         !package_send_text(input, "r\r") ||
         !package_wait_for_text(output, "Machine must be paused", 5000u) ||
         !package_send_text(input, "?\r") ||
         !package_wait_for_text(output, "debug32", 5000u) ||
-        !package_send_text(input, "q\r")) { stage = 17; goto done; }
+        !package_send_text(input, "q\r"))) { stage = 17; goto done; }
     if (!package_send_text(input, "start\r")) { stage = 4; goto done; }
     if (package_window_display) {
         success = package_window_restart(process, input, output);
@@ -362,7 +370,10 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
     if (!package_wait_for_text(output, "SoftPC>", 5000u)) {
         stage = 7; goto done;
     }
-    if (!package_debug_execution(input, output)) { stage = 18; goto done; }
+    /* Debugger column-layout assertions belong to the normal-size route. */
+    if (!package_compact_console && !package_debug_execution(input, output)) {
+        stage = 18; goto done;
+    }
     if (!package_send_text(input, "stop\r")) { stage = 8; goto done; }
     if (!package_wait_for_text(output, "Machine stopped.", 5000u)) {
         stage = 9; goto done;
@@ -389,13 +400,16 @@ done:
     return success;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
     STARTUPINFOA startup = { sizeof(startup) };
     PROCESS_INFORMATION process = { 0 };
     DWORD wait_result;
     DWORD error = ERROR_SUCCESS;
     int stage = 0;
+
+    package_compact_console = argc == 2 && strcmp(argv[1], "--compact-console") == 0;
+    if (argc != 1 && !package_compact_console) return 1;
 
     if (!verify_fixed_ini()) {
         fputs("softpc-package-smoke: invalid fixed package configuration\n", stderr);

@@ -10,7 +10,10 @@ shared tests relocated to test/common and test/lib. Both final product suites
 passed 79/79; four-directory isolation passed Lib 37/37 and Common 14/14.
 Executor delivery `09d8c90` is pushed. Coordinator actual-diff review passed:
 existing test assertions retained, no public ABI change, no product-source
-dependency in the isolated shared suites. S16 is delivered for owner testing.
+dependency in the isolated shared suites. Owner rejected S16 testing: first
+start exits with host I/O error. The S16 correction now positions the viewport
+before ensuring frame capacity; x86/x64 full regression passes 80/80 and strict
+standalone Lib passes 37/37. Corrective commit and actual-diff review follow.
 T56 remains open; the suspended S13 whole-task audit is not claimed complete.
 
 ## M9 T56 S16 Packet
@@ -19,20 +22,20 @@ T56 remains open; the suspended S13 whole-task audit is not claimed complete.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner admits S16 and requires removal of common/test; src/lib, src/common, test/lib and test/common must transfer unchanged to NXVM. |
-| Objective | Correct source-local physical key retirement and give each shared corpus one external, self-contained unit-test suite. |
+| Objective | Correct source-local physical key retirement, externalize shared tests, and repair the owner-reproduced first-start Console I/O failure without changing lifecycle policy. |
 | Non-goals | No lifecycle, MVDM, CLI, focus, display or executor topology changes; no Common win32/linux implementations; no T closure. |
 | Reference Baseline | 4cf8629; S15 x86/x64 68/68, strict Lib 8/8 and isolated Common 4/4. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | Common pressed-key comparison; shared test files, fixtures, CMake and verification; no new public ABI. |
+| Files And ABI Surface | Common pressed-key comparison; shared suites; Host Win32 text-surface geometry and native display regression; no new public ABI. |
 | Applicable Rules | Execution, documentation, architecture and coding authorities. |
-| Verification | Final x64/x86 79/79, isolated strict Lib 37/37 and Common 14/14; four-directory hashes match; new physical-key regression failed before and passed after repair; gates pass. Intermittent stage-14 package observation recorded, not claimed fixed. |
+| Verification | Corrected x64/x86 80/80 and strict Lib 37/37; native narrow-frame regression fails before and passes after; compact first-command start, DOS input/CLS, pause/stop/restart pass. Prior Common 14/14 isolation remains unchanged. Intermittent stage-14 observation is not claimed fixed. |
 | Expected Markers | No src/common/test; shared tests have no app/host/MVDM or product-root dependency; EXTENDED distinguishes physical keys. |
 | Asset Needs | Both fixed EXEs; bounded logs and disposable standalone verification trees under build; preserve INI and media. |
 | Reporting Requirements | Complete P commit/push, independent actual-diff review, counted production/test changes and clean tree. |
 | Stop Conditions | Product semantic changes, MVDM changes or a new synchronization framework require separate approval. |
 | Exit Criteria | Platform boundary and standalone proof pass; dual-width packages and regression delivered, reviewed and pushed. |
-| Original Owner Request | 准入。同时增补任务要求：common/test这个玩意要去掉。我需要你在 test/目录下增加 common 和 lib 用于覆盖当前 common 和 lib 的单元测试。src/lib, src/common, test/lib, test/common，这几个将来都要原样导入给nxvm的。 |
-| Similar-Issue Sweep | All test translation units, fixtures, helpers and registrations classified by production dependency; all Common key identity comparisons reviewed. |
+| Original Owner Request | 准入。同时增补任务要求：common/test这个玩意要去掉。我需要你在 test/目录下增加 common 和 lib 用于覆盖当前 common 和 lib 的单元测试。src/lib, src/common, test/lib, test/common，这几个将来都要原样导入给nxvm的。反馈：失败：启动后输入start直接闪退。继续 找到原因然后彻底修复。 |
+| Similar-Issue Sweep | Shared-test and Common key-identity sweeps retained; all Host native geometry writers examined. Palette precedes frame-capacity proof; output switching preserves existing owner. Horizontal-scrollback metadata probe recorded separately in TODO, not claimed fixed. |
 
 ## Current Technical Baseline
 
@@ -44,7 +47,7 @@ T56 remains open; the suspended S13 whole-task audit is not claimed complete.
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
   normalized `types`/`console`/`host`/`storage`/`kvm-*` corpus has S16 x64/x86
-  product builds with 79/79 CTest;
+  corrected product builds with 80/80 CTest;
   strict standalone library suite passes 37/37. Its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 
