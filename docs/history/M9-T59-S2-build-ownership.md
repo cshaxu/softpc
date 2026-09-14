@@ -1,7 +1,7 @@
 # M9 T59 S2 build ownership
 
 Owner admitted the architecture stages in the existing T59; scope and evidence
-are in the [proposal](../proposals/m9-remaining-todo-investigation.md).
+are in the [proposal](../history/M9-T59-product-boundary-cleanup-proposal.md).
 
 Executor delivery f45777c is pushed. Coordinator reviewed actual CMake source
 and link changes: VM has one OBJECT target, all four translation units occur

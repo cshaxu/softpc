@@ -78,4 +78,4 @@ algorithms are unchanged. No build-time transformation or second FPU exists.
 `softpc-x87-layout-smoke` verifies the real header layout; the command-provider
 smoke executes integer, real, BCD and arithmetic instructions on the original
 executor. Both tests pass on x86 and x64. Full delivery evidence belongs to
-the [T59 record](../../../proposals/m9-remaining-todo-investigation.md).
+the [T59 record](../../../history/M9-T59-product-boundary-cleanup-proposal.md).

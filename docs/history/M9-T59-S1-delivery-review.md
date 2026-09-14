@@ -1,7 +1,7 @@
 # M9 T59 S1 delivery review and continuation
 
 S1 debt investigation and delivery evidence are retained in the
-[task proposal](../proposals/m9-remaining-todo-investigation.md).
+[task proposal](../history/M9-T59-product-boundary-cleanup-proposal.md).
 P1 2c05238 and P2 a7c2e86 are verified/pushed; no owner manual acceptance is inferred.
 
 Owner request: “准入为当前T任务的多个s任务开始执行，记得先更新t任务的proposal”。

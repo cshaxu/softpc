@@ -2,28 +2,13 @@
 
 ## Current Work
 
-M9 T59 S5 is active. S2–S4 are reviewed/pushed and closed, latest delivery 7fbca92 and dual-width 86/86. S1 is verified/pushed; no owner manual-test result is claimed. T59 remains open.
+No implementation subtask is active.
+Open task awaiting owner: T59.
 
-## M9 T59 S5 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner admits the four proposed architecture stages as S2–S5 in T59, with proposal updated first. |
-| Objective | Align architecture/source documentation and enforce product include/build ownership with rejecting negative fixtures. |
-| Non-goals | No Lib/Common/MVDM source edits, behavior changes, new forwarding layer or machine OBJECT reimplementation. |
-| Reference Baseline | 7fbca92; S4 reviewed, both 86-test suites passed. |
-| Candidate Proposal | [Remaining TODO investigation](../proposals/m9-remaining-todo-investigation.md). |
-| Files And ABI Surface | Root CMake, test/support boundary gates and docs/design/task records; no production ABI change or shared-corpus writes. |
-| Applicable Rules | Execution, document, architecture and coding rules with linked skills before implementation. |
-| Verification | Actual include/target graph plus legal and forbidden fixtures; final dual-width builds and full CTest. |
-| Expected Markers | Gate rejects reverse product dependencies and VM source duplication; docs distinguish callbacks, includes and targets. |
-| Asset Needs | Build both fixed EXEs; preserve INI/media; negative fixtures only in build trees, remove after tests. |
-| Reporting Requirements | Actual changed paths, line accounting, tests, dual EXEs, complete P commits/pushes and coordinator review. |
-| Stop Conditions | A production behavior change or modification of Lib/Common/MVDM is necessary to satisfy a new gate. |
-| Exit Criteria | Every S2–S5 ledger item accounted, gates prove rejected violations, full regression passes, clean pushed delivery and coordinator review. |
-| Original Owner Request | 准入为当前T任务的多个s任务开始执行，记得先更新t任务的proposal |
-| Similar-Issue Sweep | Six-root dependency roles, all App/VM/Compat/Common/Lib includes, all root target VM source membership, previous duplicate descriptions. |
+T59 S2–S5 are reviewed, pushed and closed. The [retained task brief](../history/M9-T59-product-boundary-cleanup-proposal.md)
+and [S5 review](../history/M9-T59-S5-boundary-convergence.md) record delivery.
+T59 remains open for owner testing; S1 has verified delivery, not a claimed
+owner manual-test acceptance.
 
 ## Current Technical Baseline
 
