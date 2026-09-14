@@ -27,19 +27,21 @@ count separately from text length; callers must not use text length as a PC step
 
 ## Independent verification
 
-Provide the Lib corpus explicitly; no importing product sources/tests are needed:
+Transfer src/common, src/lib, test/common and test/lib unchanged. No importing
+product sources, configuration or resources are needed:
 
 ```text
-cmake -S path/to/common -B build/common -DCOMMON_LIB_ROOT=path/to/lib
+cmake -S test/common -B build/common
 cmake --build build/common
 cmake --build build/common --target common-verify
 ctest --test-dir build/common --output-on-failure
 ```
 
-The complete LF-normalized corpus (including verification and tests) is covered
-by MANIFEST.sha256. The verifier rejects missing, extra, changed or duplicate
-entries. The source/build DAG gate rejects platform bypasses and sibling private
-includes; its negative tests travel inside this corpus. Lib's own independent
-verification remains its owner's responsibility, not a product test dependency.
+Production sources/verification and the external test suite have separate
+LF-normalized MANIFEST.sha256 files. Verification rejects missing, extra,
+changed or duplicate entries. The source/build DAG gate rejects platform
+bypasses and sibling private includes; its negative tests live in test/common.
+The source-only build still accepts an explicit COMMON_LIB_ROOT when configured
+directly. It does not register or carry test code.
 Common synchronization tests run against actual Host primitives without sleeps.
 Platform backend availability does not imply complete native display parity.

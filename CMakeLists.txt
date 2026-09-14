@@ -53,8 +53,10 @@ target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 # the imported library owns generic host, storage, and KVM mechanics.
 add_subdirectory(src/lib)
 enable_testing()
-set(COMMON_BUILD_TESTING ON)
+
 add_subdirectory(src/common)
+add_subdirectory(test/lib)
+add_subdirectory(test/common)
 target_link_libraries(softpc-machine PRIVATE storage host)
 
 # The original CCPU manifest is the executable x86 core.  It deliberately
@@ -314,25 +316,6 @@ target_link_libraries(softpc-machine-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-machine-smoke COMMAND softpc-machine-smoke)
 set_tests_properties(softpc-machine-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-lib-console-smoke test/unit/lib_console_smoke.c)
-target_link_libraries(softpc-lib-console-smoke PRIVATE console)
-add_test(NAME softpc-lib-console-smoke COMMAND softpc-lib-console-smoke)
-set_tests_properties(softpc-lib-console-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-lib-console-event-gate-smoke
-    test/unit/lib_console_event_gate_smoke.c)
-target_link_libraries(softpc-lib-console-event-gate-smoke PRIVATE console)
-add_test(NAME softpc-lib-console-event-gate-smoke
-    COMMAND softpc-lib-console-event-gate-smoke)
-set_tests_properties(softpc-lib-console-event-gate-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-host-console-broker-smoke
-    test/unit/host_console_broker_smoke.c)
-target_link_libraries(softpc-host-console-broker-smoke PRIVATE console)
-add_test(NAME softpc-host-console-broker-smoke
-    COMMAND softpc-host-console-broker-smoke)
-set_tests_properties(softpc-host-console-broker-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-dual-media-smoke test/unit/dual_media_smoke.c)
 target_link_libraries(softpc-dual-media-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-dual-media-smoke PRIVATE
@@ -345,21 +328,6 @@ add_executable(softpc-partition-image-smoke test/unit/partition_image_smoke.c)
 target_link_libraries(softpc-partition-image-smoke PRIVATE softpc-machine)
 add_test(NAME softpc-partition-image-smoke COMMAND softpc-partition-image-smoke)
 set_tests_properties(softpc-partition-image-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-storage-file-writer-binary-smoke
-    test/unit/storage_file_writer_binary_smoke.c)
-target_link_libraries(softpc-storage-file-writer-binary-smoke PRIVATE storage)
-add_test(NAME softpc-storage-file-writer-binary-smoke
-    COMMAND softpc-storage-file-writer-binary-smoke)
-set_tests_properties(softpc-storage-file-writer-binary-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-lib-failure-output-contract-smoke
-    test/unit/lib_failure_output_contract_smoke.c)
-target_link_libraries(softpc-lib-failure-output-contract-smoke PRIVATE
-    kvm-window kvm-console host storage console kvm-base types)
-add_test(NAME softpc-lib-failure-output-contract-smoke
-    COMMAND softpc-lib-failure-output-contract-smoke)
-set_tests_properties(softpc-lib-failure-output-contract-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-irq-smoke test/unit/irq_smoke.c)
 target_link_libraries(softpc-irq-smoke PRIVATE softpc-machine)
@@ -499,7 +467,6 @@ add_test(NAME softpc-runtime-input-continuation-smoke
     COMMAND softpc-runtime-input-continuation-smoke)
 set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-common-machine-smoke test/unit/common_machine_smoke.c)
 add_executable(softpc-debug-binding-smoke test/unit/debug_binding_smoke.c
     src/app/command_binding.c src/app/command.c src/app/machine_driver.c
     src/app/keyboard.c src/app/prompt_trace.c)
@@ -507,122 +474,6 @@ target_link_libraries(softpc-debug-binding-smoke PRIVATE softpc-machine common-d
 add_test(NAME softpc-debug-binding-smoke COMMAND softpc-debug-binding-smoke)
 set_tests_properties(softpc-debug-binding-smoke PROPERTIES LABELS "unit" TIMEOUT 45
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
-target_link_libraries(softpc-common-machine-smoke PRIVATE common-machine common-debug host kvm-base)
-add_test(NAME softpc-common-machine-smoke COMMAND softpc-common-machine-smoke)
-set_tests_properties(softpc-common-machine-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-common-xasm32-smoke test/common/xasm32/xasm32_smoke.c)
-target_link_libraries(softpc-common-xasm32-smoke PRIVATE common-xasm32)
-add_test(NAME softpc-common-xasm32-smoke COMMAND softpc-common-xasm32-smoke)
-set_tests_properties(softpc-common-xasm32-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-common-xasm32-contract-smoke
-    test/common/xasm32/xasm32_contract_smoke.c)
-target_link_libraries(softpc-common-xasm32-contract-smoke PRIVATE common-xasm32)
-add_test(NAME softpc-common-xasm32-contract-smoke
-    COMMAND softpc-common-xasm32-contract-smoke)
-set_tests_properties(softpc-common-xasm32-contract-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-types-contract-smoke test/unit/types_contract_smoke.c)
-add_executable(softpc-linux-wait-contract-smoke test/unit/linux_wait_contract_smoke.c)
-target_link_libraries(softpc-linux-wait-contract-smoke PRIVATE types)
-target_include_directories(softpc-linux-wait-contract-smoke PRIVATE test/support)
-add_test(NAME softpc-linux-wait-contract-smoke COMMAND softpc-linux-wait-contract-smoke)
-set_tests_properties(softpc-linux-wait-contract-smoke PROPERTIES LABELS "unit")
-target_link_libraries(softpc-types-contract-smoke PRIVATE host)
-add_test(NAME softpc-types-contract-smoke COMMAND softpc-types-contract-smoke)
-add_executable(softpc-win32-vocabulary-ownership-smoke
-    test/unit/win32_vocabulary_ownership_smoke.c)
-target_link_libraries(softpc-win32-vocabulary-ownership-smoke PRIVATE types user32)
-add_test(NAME softpc-win32-vocabulary-ownership-smoke
-    COMMAND softpc-win32-vocabulary-ownership-smoke)
-set_tests_properties(softpc-types-contract-smoke
-    softpc-win32-vocabulary-ownership-smoke PROPERTIES LABELS "unit")
-add_test(NAME softpc-types-layout-selftest COMMAND "${CMAKE_COMMAND}"
-    "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}"
-    "-DTEST_WORK_DIR=${CMAKE_CURRENT_BINARY_DIR}"
-    -P "${CMAKE_SOURCE_DIR}/test/support/types_layout_selftest.cmake")
-set_tests_properties(softpc-types-layout-selftest PROPERTIES LABELS "unit")
-
-add_executable(softpc-win32-keyboard-smoke
-    test/unit/win32_keyboard_smoke.c)
-target_link_libraries(softpc-win32-keyboard-smoke PRIVATE
-    softpc-machine kvm-base)
-add_test(NAME softpc-win32-keyboard-smoke COMMAND softpc-win32-keyboard-smoke)
-set_tests_properties(softpc-win32-keyboard-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-win32-presentation-smoke
-    test/unit/win32_presentation_smoke.c)
-target_link_libraries(softpc-win32-presentation-smoke PRIVATE
-    kvm-base)
-add_test(NAME softpc-win32-presentation-smoke
-    COMMAND softpc-win32-presentation-smoke)
-set_tests_properties(softpc-win32-presentation-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-win32-window-bounds-smoke
-    test/unit/win32_window_bounds_smoke.c)
-target_link_libraries(softpc-win32-window-bounds-smoke PRIVATE kvm-window)
-add_test(NAME softpc-win32-window-bounds-smoke
-    COMMAND softpc-win32-window-bounds-smoke)
-set_tests_properties(softpc-win32-window-bounds-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-kvm-component-contract-smoke
-    test/unit/kvm_component_contract_smoke.c)
-target_link_libraries(softpc-kvm-component-contract-smoke PRIVATE kvm-base)
-add_test(NAME softpc-kvm-component-contract-smoke
-    COMMAND softpc-kvm-component-contract-smoke)
-set_tests_properties(softpc-kvm-component-contract-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-kvm-leaf-control-capacity-smoke
-    test/unit/kvm_leaf_control_capacity_smoke.c)
-target_link_libraries(softpc-kvm-leaf-control-capacity-smoke PRIVATE
-    kvm-window kvm-console)
-add_test(NAME softpc-kvm-leaf-control-capacity-smoke
-    COMMAND softpc-kvm-leaf-control-capacity-smoke)
-set_tests_properties(softpc-kvm-leaf-control-capacity-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-kvm-console-retirement-barrier-smoke
-    test/unit/kvm_console_retirement_barrier_smoke.c src/lib/kvm-console/console.c)
-target_link_libraries(softpc-kvm-console-retirement-barrier-smoke PRIVATE kvm-base console)
-add_test(NAME softpc-kvm-console-retirement-barrier-smoke
-    COMMAND softpc-kvm-console-retirement-barrier-smoke)
-set_tests_properties(softpc-kvm-console-retirement-barrier-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-presentation-plan-smoke
-    test/unit/presentation_plan_smoke.c
-    src/common/session/presentation_plan.c)
-target_include_directories(softpc-presentation-plan-smoke PRIVATE src/app src/host)
-target_include_directories(softpc-presentation-plan-smoke PRIVATE src)
-add_test(NAME softpc-presentation-plan-smoke
-    COMMAND softpc-presentation-plan-smoke)
-set_tests_properties(softpc-presentation-plan-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-reconciler-smoke test/unit/reconciler_smoke.c
-    src/common/session/reconciler.c src/common/session/presentation_plan.c)
-target_include_directories(softpc-reconciler-smoke PRIVATE src/app src/host src)
-add_test(NAME softpc-reconciler-smoke COMMAND softpc-reconciler-smoke)
-set_tests_properties(softpc-reconciler-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-control-reconciler-integration-smoke
-    test/unit/control_reconciler_integration_smoke.c
-    src/common/session/control.c src/common/session/reconciler.c src/common/session/presentation_plan.c)
-target_include_directories(softpc-control-reconciler-integration-smoke PRIVATE
-    src/app src/host src)
-target_link_libraries(softpc-control-reconciler-integration-smoke PRIVATE
-    host kvm-console)
-add_test(NAME softpc-control-reconciler-integration-smoke
-    COMMAND softpc-control-reconciler-integration-smoke)
-set_tests_properties(softpc-control-reconciler-integration-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-control-state-matrix-smoke
-    test/unit/control_state_matrix_smoke.c
-    src/common/session/control_state.c src/common/session/reconciler.c src/common/session/presentation_plan.c)
-target_include_directories(softpc-control-state-matrix-smoke PRIVATE
-    src/app src/host src)
-add_test(NAME softpc-control-state-matrix-smoke
-    COMMAND softpc-control-state-matrix-smoke)
-set_tests_properties(softpc-control-state-matrix-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-command-smoke test/unit/command_smoke.c
     src/app/command.c
     src/common/session/reconciler.c
@@ -630,15 +481,6 @@ add_executable(softpc-command-smoke test/unit/command_smoke.c
 target_include_directories(softpc-command-smoke PRIVATE src/app src/host src)
 add_test(NAME softpc-command-smoke COMMAND softpc-command-smoke)
 set_tests_properties(softpc-command-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-input-queue-mouse-fifo-smoke
-    test/unit/input_queue_mouse_fifo_smoke.c
-    src/common/machine/input_queue.c)
-target_include_directories(softpc-input-queue-mouse-fifo-smoke PRIVATE test/support src)
-target_link_libraries(softpc-input-queue-mouse-fifo-smoke PRIVATE host)
-add_test(NAME softpc-input-queue-mouse-fifo-smoke
-    COMMAND softpc-input-queue-mouse-fifo-smoke)
-set_tests_properties(softpc-input-queue-mouse-fifo-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
@@ -662,13 +504,8 @@ add_test(NAME softpc-win32-presentation-manifest
 # machine library; production targets retain their normal Release NDEBUG.
 set(SOFTPC_TEST_TARGETS
     softpc-machine-smoke
-    softpc-lib-console-smoke
-    softpc-lib-console-event-gate-smoke
-    softpc-host-console-broker-smoke
     softpc-dual-media-smoke
     softpc-partition-image-smoke
-    softpc-storage-file-writer-binary-smoke
-    softpc-lib-failure-output-contract-smoke
     softpc-irq-smoke
     softpc-fdc-smoke
     softpc-printer-smoke
@@ -683,25 +520,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-runtime-smoke
     softpc-runtime-restart-boot-smoke
     softpc-runtime-input-continuation-smoke
-    softpc-win32-keyboard-smoke
-    softpc-win32-presentation-smoke
-    softpc-win32-window-bounds-smoke)
-list(APPEND SOFTPC_TEST_TARGETS softpc-kvm-component-contract-smoke)
-add_executable(softpc-linux-input-contract-smoke test/unit/linux_input_contract_smoke.c
-    src/lib/kvm-base/input.c src/lib/kvm-base/linux/input.c src/lib/kvm-base/hotkey.c)
-target_link_libraries(softpc-linux-input-contract-smoke PRIVATE types)
-add_test(NAME softpc-linux-input-contract-smoke COMMAND softpc-linux-input-contract-smoke)
-set_tests_properties(softpc-linux-input-contract-smoke PROPERTIES LABELS "unit")
-list(APPEND SOFTPC_TEST_TARGETS softpc-linux-input-contract-smoke)
-foreach(probe IN ITEMS kvm_frame_damage_mouse kvm_window_retirement kvm_window_modal kvm_shutdown_failure host_console_reader_failure host_console_display kvm_input_admission console_blocking_gate host_sync_ownership kvm_keyboard_lifetime lib_console_io_contract kvm_window_capture_contract)
-    add_executable(softpc-${probe}-smoke test/unit/${probe}_smoke.c)
-    target_link_libraries(softpc-${probe}-smoke PRIVATE kvm-window console)
-    add_test(NAME softpc-${probe}-smoke COMMAND softpc-${probe}-smoke)
-    set_tests_properties(softpc-${probe}-smoke PROPERTIES LABELS "unit" TIMEOUT 15)
-    list(APPEND SOFTPC_TEST_TARGETS softpc-${probe}-smoke)
-endforeach()
-target_link_libraries(softpc-kvm_keyboard_lifetime-smoke PRIVATE kvm-console)
-target_link_libraries(softpc-kvm_shutdown_failure-smoke PRIVATE kvm-console)
+)
 add_executable(softpc-presentation-shutdown-smoke test/unit/presentation_shutdown_smoke.c)
 target_include_directories(softpc-presentation-shutdown-smoke PRIVATE src src/host src/app)
 get_target_property(shutdown_test_sources softpcvm SOURCES)
@@ -722,16 +541,7 @@ target_link_libraries(softpc-runtime-cursor-smoke PRIVATE ${shutdown_test_links}
 add_test(NAME softpc-runtime-cursor-smoke COMMAND softpc-runtime-cursor-smoke)
 set_tests_properties(softpc-runtime-cursor-smoke PROPERTIES LABELS "unit")
 list(APPEND SOFTPC_TEST_TARGETS softpc-runtime-cursor-smoke)
-target_link_libraries(softpc-host_sync_ownership-smoke PRIVATE host)
-list(APPEND SOFTPC_TEST_TARGETS softpc-kvm-leaf-control-capacity-smoke)
-list(APPEND SOFTPC_TEST_TARGETS softpc-linux-wait-contract-smoke)
-list(APPEND SOFTPC_TEST_TARGETS softpc-control-reconciler-integration-smoke)
-list(APPEND SOFTPC_TEST_TARGETS softpc-kvm-console-retirement-barrier-smoke)
-list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-plan-smoke)
-list(APPEND SOFTPC_TEST_TARGETS softpc-reconciler-smoke)
-list(APPEND SOFTPC_TEST_TARGETS softpc-control-state-matrix-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-command-smoke)
-list(APPEND SOFTPC_TEST_TARGETS softpc-input-queue-mouse-fifo-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-debug-binding-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
@@ -746,9 +556,6 @@ endforeach()
 
 set(SOFTPC_UNIT_TESTS
     softpc-machine-smoke
-    softpc-lib-console-smoke
-    softpc-lib-console-event-gate-smoke
-    softpc-host-console-broker-smoke
     softpc-dual-media-smoke
     softpc-partition-image-smoke
     softpc-irq-smoke
@@ -764,15 +571,7 @@ set(SOFTPC_UNIT_TESTS
     softpc-lifecycle-smoke
     softpc-runtime-smoke
     softpc-runtime-input-continuation-smoke
-    softpc-win32-keyboard-smoke
-    softpc-win32-window-bounds-smoke
-    softpc-kvm-component-contract-smoke
-    softpc-kvm-console-retirement-barrier-smoke
-    softpc-presentation-plan-smoke
-    softpc-reconciler-smoke
-    softpc-control-state-matrix-smoke
     softpc-command-smoke
-    softpc-input-queue-mouse-fifo-smoke
     softpc-standalone-source-boundary
     softpc-documentation-governance)
 

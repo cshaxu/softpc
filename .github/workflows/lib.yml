@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - 'src/lib/**'
+      - 'test/lib/**'
       - '.github/workflows/lib.yml'
   pull_request:
     paths:
       - 'src/lib/**'
+      - 'test/lib/**'
       - '.github/workflows/lib.yml'
 
 jobs:
@@ -17,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Configure standalone library
-        run: cmake -G Ninja -S src/lib -B build/lib -DCMAKE_BUILD_TYPE=Release
+        run: cmake -G Ninja -S test/lib -B build/lib -DCMAKE_BUILD_TYPE=Release
       - name: Verify complete manifest
         run: cmake --build build/lib --target lib-verify-manifest
       - name: Build selected platform library

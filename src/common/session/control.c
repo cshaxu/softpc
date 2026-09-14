@@ -301,8 +301,11 @@ static void common_session_forget_pressed(common_session_queue *queue,
     for (index = 0u; index < queue->pressed_count; ++index) {
         common_session_pressed_key *pressed = &queue->pressed[index];
         if (pressed->source == event->source_identity &&
-            pressed->event.data.key.scan_code == event->data.key.scan_code &&
-            pressed->event.data.key.key == event->data.key.key) {
+            (pressed->event.data.key.flags & KVM_KEY_FLAG_EXTENDED) ==
+                (event->data.key.flags & KVM_KEY_FLAG_EXTENDED) &&
+            ((pressed->event.data.key.scan_code != 0u || event->data.key.scan_code != 0u)
+                ? pressed->event.data.key.scan_code == event->data.key.scan_code
+                : pressed->event.data.key.key == event->data.key.key)) {
             pressed[0] = queue->pressed[--queue->pressed_count];
             return;
         }

@@ -1,5 +1,5 @@
-if(NOT DEFINED SOFTPC_SOURCE_DIR OR NOT DEFINED TEST_WORK_DIR)
-    message(FATAL_ERROR "SOFTPC_SOURCE_DIR and TEST_WORK_DIR required")
+if(NOT DEFINED LIBRARY_ROOT OR NOT DEFINED TEST_WORK_DIR)
+    message(FATAL_ERROR "LIBRARY_ROOT and TEST_WORK_DIR required")
 endif()
 cmake_policy(SET CMP0057 NEW)
 set(fixture "${TEST_WORK_DIR}/types-layout-fixture")
@@ -8,7 +8,7 @@ file(REMOVE "${fixture}/CMakeLists.txt")
 foreach(component types console host storage kvm-base kvm-window kvm-console)
     file(REMOVE "${fixture}/${component}/edge.h")
 endforeach()
-file(COPY "${SOFTPC_SOURCE_DIR}/src/lib/types" DESTINATION "${fixture}")
+file(COPY "${LIBRARY_ROOT}/types" DESTINATION "${fixture}")
 # A failed/aborted negative probe must not poison the next positive control.
 # These are the only scratch files owned by this self-test.
 file(REMOVE "${fixture}/consumer.c" "${fixture}/types/probe.h"
@@ -22,7 +22,7 @@ file(REMOVE "${fixture}/consumer.c" "${fixture}/types/probe.h"
 set(probe "${fixture}/types/probe.h")
 function(check_layout expected)
     execute_process(COMMAND "${CMAKE_COMMAND}" "-DLIBRARY_ROOT=${fixture}"
-        -P "${SOFTPC_SOURCE_DIR}/src/lib/verify_types_layout.cmake"
+        -P "${LIBRARY_ROOT}/verify_types_layout.cmake"
         RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE error)
     if(expected STREQUAL "pass" AND NOT status EQUAL 0)
         message(FATAL_ERROR "Valid layout rejected: ${output}${error}")

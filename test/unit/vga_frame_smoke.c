@@ -1,5 +1,5 @@
 #include "machine.h"
-#include "test_cleanup.h"
+#include "../lib/cleanup.h"
 #include "insignia.h"
 #include "host_def.h"
 #include "xt.h"

@@ -1,5 +1,10 @@
 # Shared Library
 
+Unit tests and fixtures live in `test/lib`, not in the production corpus.
+Configure `cmake -S test/lib -B build/lib-tests`, build that directory, then
+run CTest there. The source-only CMake entry retains its manifest target;
+the external suite owns all test registration and needs no product resources.
+
 `src/lib` contains product-neutral, copied-value platform capabilities. It has
 no application state pointer, runtime queue, monitor command, lifecycle
 policy, or native SDK type in a public API. `MANIFEST.sha256` lists every source file and

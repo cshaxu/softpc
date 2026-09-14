@@ -450,7 +450,7 @@ lib_bool common_machine_reset(common_machine *machine)
 lib_bool common_machine_set_removable_media(common_machine *machine,
     const char *path)
 {
-    size_t length;
+    lib_size length;
     lib_i32 state;
     if (machine == NULL || machine->driver.set_removable_media == NULL)
         return LIB_FALSE;

@@ -1,5 +1,5 @@
 #include "runtime.h"
-#include "test_cleanup.h"
+#include "../lib/cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>

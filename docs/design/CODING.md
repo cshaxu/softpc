@@ -23,8 +23,11 @@ src/
 
 Directories appear only in their admitted migration task.
 Common never contains win32/linux directories or platform-selected source.
-Its independent verification and tests live with the Common corpus; only Lib
-provides the underlying platform implementation.
+Its independent source verification lives with the Common corpus; unit tests
+live in test/common, never src/common/test. Lib tests and their fixtures live
+in test/lib. These two suites and src/common + src/lib form the unchanged
+four-directory transfer set. Product tests remain outside the shared suites.
+Only Lib provides the underlying platform implementation.
 Shared `lib/types` is header-only. Its top level contains common C/compiler
 vocabulary; explicit `win32/` and `linux/` headers group external platform
 declarations by purpose. Common types headers never select an OS. Only the

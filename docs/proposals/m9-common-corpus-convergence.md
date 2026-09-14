@@ -21,6 +21,83 @@ lib 调用的强制中转层；以下任务与验收按此修订执行。
 
 ## 五个组件及组装边界
 
+### T56 S16：共享测试目录及物理键身份
+
+原始准入：“准入。同时增补任务要求：common/test这个玩意要去掉。
+我需要你在 test/目录下增加 common 和 lib 用于覆盖当前 common 和 lib 的单元测试。
+src/lib, src/common, test/lib, test/common，这几个将来都要原样导入给nxvm的”。
+
+基线 `4cf8629`。有限全集为当前 test 下所有 C 单元、支持文件、fixture、
+src/common/test 以及根/共享 CMake 测试注册。按实际依赖分为共享 Lib、
+共享 Common、SoftPC 产品集成三类；迁移用 git mv，保留断言，产品专用
+adapter、固件/媒体测试留在原产品目录。两套共享 suite 各有独立 CMake
+入口，仅使用这四棵目录和编译器/系统库；不复制测试、不依赖 app/MVDM。
+生产 corpus 保留 manifest/DAG 自证，测试由外部 suite 注册；整套目录
+隔离复制后构建运行，证明未来 NXVM 无需改动即可采用。
+
+Common 的 pressed ledger 用来源、scan（缺失时 key）、EXTENDED 区分
+物理键，与 Lib matcher 一致；不新增状态机/API。覆盖左右 Ctrl/Alt、重复
+make、分别释放及 source retirement。双宽度完整回归、独立 suite、
+manifest 和文档门禁全部通过后提交推送，单人双角色复核并给双 EXE。
+
+增补批准：`machine.c` 私有实现的唯一 `size_t length` 改为 `lib_size`；
+没有 ABI 或尺寸行为变化，不扩大到 imported debug/xasm32 源码重写。
+
+#### S16 迁移账本及验证
+
+基线测试翻译单元按实际依赖穷举归类：27 个纯 Lib 单元由 test/unit
+搬到 test/lib；Common 六个原 unit、两个 xasm32 单元，加原 common/test
+sync，统一由 test/common 注册。新增 physical-key identity 单元；共
+27 个 Lib / 10 个 Common 行为测试，不复制旧实现。原测试断言保留。
+Common 的 mouse FIFO 测试直接调用真实 common queue，去掉其旧 app
+测试别名依赖；Lib writer 的 cleanup helper 原件迁到 test/lib，原产品
+测试修订 include 继续用同一 helper，不另造删除实现。
+
+Lib 两个 DAG fixture、KVM 命名 fixture、Linux wait fakes、types-layout
+反例和 support runners 全迁入 test/lib；Common negative verifier 迁入
+test/common。根 CMake 删除对应 target/注册，不再给共享测试附加 SoftPC
+firmware.rc。纯 keyboard 测试原链接 softpc-machine 是多余依赖，改为
+仅 kvm-base；其余 fixture 注入 .c 的测试仍保留原边界而非重写。
+
+仍在产品测试：原始 CPU/控制器/BIOS/媒体、runtime/driver、CLI/debug
+binding、presentation shutdown/cursor 和真实 package/restart。它们调用
+app/host/MVDM 或固件，不能作为原样共享 Common/Lib 单元，未削弱或删除。
+共享源码的 manifest/门禁仍在 src，各 suite 自带单独 manifest 与构建。
+Common DAG 删除原 test 例外；Lib CI 改从 test/lib 配置，并监听其改动。
+
+新物理键测试在未修复代码上确定性失败（两个 make 的退休只产生一个
+break）；修复后 Ctrl/Alt、无 scan 的 fallback、重复 make、分别释放、
+错误来源退休及重复退休通过。生产比较与 Lib matcher 的身份定义相同，
+不改变 matcher、hotkey policy 或 paused 输入屏障。
+
+已通过：产品 x86 79/79、x64 串行 79/79；独立 Lib 严格构建及 37/37，
+Common 14/14。仅复制四目录后的隔离构建再次通过 Lib 37/37、Common
+14/14，无 app/MVDM/产品资源依赖。x64 package stage 14 的 ver 可见性
+出现两次失败（一次并行、一次串行）；完整串行重跑也曾通过，不能归因为
+并行或声称已修。用 4cf8629 原 EXE 和当前 EXE、相同 overlay 配置和原
+package test 各对照三次，均通过；没有放宽断言或修改输入/focus 逻辑。
+诊断只在 build/s16-baseline 下放归档 EXE、临时相同配置及原测试包装，
+各三次、有界原超时，日志不足 16KiB；原 INI/媒体未改。归档目录运行
+结束后删除，保留短日志。该未定因观察归 package acceptance 台账。
+用户同时将 console_control 改为 0，原样保留提交，构建没有改写 INI。
+
+计数（相对 4cf8629，git diff --numstat，迁移不算新增源码）：生产 C/H
+仅两文件 +6/-3，净 +3；新增一份 68 行物理键回归，其余测试只迁移或
+改 include/真实 queue 调用。五个 CMake 文件合计 +159/-265，净减 106
+行；没有测试聚合转发层、产品固件或额外 Lib API。43 个既有文件用 git mv
+迁移；三个测试/fixture runner 的原路径依赖全部收回所属 suite。
+
+最终补充 lib_size 后：x64 79/79（41.02s），x86 79/79（53.56s）；
+最终 Common 隔离 14/14（3.57s），四目录逐文件 SHA-256 对照零差异。
+命名 gate 的产品范围也跟随 test/lib、test/common 搬迁，故意错误的 fixture
+不进入正例扫描，仍由独立反例测试检查。无 MVDM/app/host 源码改动。
+本次临时 Ninja 探测、独立构建、四目录副本和基线诊断目录均已清理，
+只保留 ignored build 内短日志及两个固定 EXE。
+
+最终 EXE SHA-256：x86
+`1713DB04F0EFEFDDBBDA671CFA075500873C393EFAE885F84AA03D9BC0872AC4`；
+x64 `7E82E1458D25510E013BAED3023EDF2264F448C361E260029ECDB28CECC86ED0`。
+
 ### T56 S15：Common 平台边界及独立证明
 
 原始准入：“批准，准入一个新的S任务修复common，并对lib做最小增补修改以服务common的需求。”

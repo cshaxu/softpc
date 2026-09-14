@@ -14,6 +14,8 @@ if(EXISTS "${KVM_NAMING_ROOT}/src/lib")
         "${KVM_NAMING_ROOT}/test/integration"
         "${KVM_NAMING_ROOT}/test/support"
         "${KVM_NAMING_ROOT}/test/unit"
+        "${KVM_NAMING_ROOT}/test/lib"
+        "${KVM_NAMING_ROOT}/test/common"
         "${KVM_NAMING_ROOT}/docs/design"
         "${KVM_NAMING_ROOT}/docs/proposals"
         "${KVM_NAMING_ROOT}/docs/states/CURRENT.md")
@@ -34,7 +36,7 @@ foreach(naming_root IN LISTS naming_roots)
     foreach(naming_file IN LISTS naming_files)
         file(RELATIVE_PATH naming_path "${KVM_NAMING_ROOT}" "${naming_file}")
         string(REPLACE "\\" "/" naming_path "${naming_path}")
-        if(naming_path MATCHES "^common/ui/")
+        if(naming_path MATCHES "^common/ui/" OR naming_path MATCHES "^test/lib/fixtures/")
             continue()
         endif()
         if(naming_path MATCHES "(^|/)${retired_prefix}-" OR

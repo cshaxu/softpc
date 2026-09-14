@@ -118,6 +118,9 @@ native API/types or OS-selected implementation branches. It owns its queues
 and state machines through public Lib Host mutex/event/task/wait contracts and
 Types atomics. Its complete manifest and source/build dependency gate travel
 with the corpus and run independently of the importing product.
+Shared unit suites live in test/common and test/lib, each with its own CMake
+entry and manifest. They require only the four-directory transfer set and
+the toolchain/system libraries, never importing-product adapters or firmware.
 
 SoftPC's checked-in `lib/` corpus is the shared-library source of truth. NXVM
 adopts it exactly; no runtime or build dependency crosses repositories.

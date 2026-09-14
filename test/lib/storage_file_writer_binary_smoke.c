@@ -1,6 +1,6 @@
 #include "lib/storage/file_interface.h"
 #include "lib/types/file.h"
-#include "test_cleanup.h"
+#include "cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>

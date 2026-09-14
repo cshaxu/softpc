@@ -4,33 +4,33 @@
 
 M9 T56 S14 passed owner visual testing ("确认没问题，跟之前不一样了").
 [S14 closure](../history/M9-T56-S14-console-display-handoff.md) records its delivery.
-T56 S15 implementation is verified: Common platform dependencies removed, minimal
-Lib Host mutex added, independent Common corpus verification restored.
-Full x64/x86 CTest passed 68/68 each, strict Lib 8/8, isolated Common 4/4.
-Implementation P1 `864a74f` is committed and pushed. Single-agent coordinator
-review of the actual commit passed; S15 is delivered for owner testing.
+T56 S15 is verified and delivered in `864a74f` / `4cf8629`.
+T56 S16 implementation is verified: Common physical-key identity corrected;
+shared tests relocated to test/common and test/lib. Both final product suites
+passed 79/79; four-directory isolation passed Lib 37/37 and Common 14/14.
+Executor commit/push and coordinator actual-diff review are next.
 T56 remains open; the suspended S13 whole-task audit is not claimed complete.
 
-## M9 T56 S15 Packet
+## M9 T56 S16 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves one new S to repair Common and minimally extend Lib for its needs. |
-| Objective | One platform-independent Common implementation using public Host synchronization and Types atomics, with independent manifest and component DAG proof. |
-| Non-goals | No product behavior, MVDM, CLI, focus, display or executor topology changes; no Common win32/linux implementations; no T closure. |
-| Reference Baseline | 53667ab, owner-accepted S14; x86/x64 64/64 and strict lib 8/8. |
+| Admission And Approval | Owner admits S16 and requires removal of common/test; src/lib, src/common, test/lib and test/common must transfer unchanged to NXVM. |
+| Objective | Correct source-local physical key retirement and give each shared corpus one external, self-contained unit-test suite. |
+| Non-goals | No lifecycle, MVDM, CLI, focus, display or executor topology changes; no Common win32/linux implementations; no T closure. |
+| Reference Baseline | 4cf8629; S15 x86/x64 68/68, strict Lib 8/8 and isolated Common 4/4. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | Common machine/session synchronization, Common build/verification/tests; minimal opaque Host mutex and Types atomic primitives, manifests and documentation. |
+| Files And ABI Surface | Common pressed-key comparison; shared test files, fixtures, CMake and verification; no new public ABI. |
 | Applicable Rules | Execution, documentation, architecture and coding authorities. |
-| Verification | Full x64/x86 68/68, strict Lib 8/8, isolated Common 4/4 and common-verify passed; final focused 5/5 at each width includes Linux mutex fake failure cases. Native Linux runtime was not available; no parity claim. |
-| Expected Markers | Zero platform headers/types/calls/conditional implementations in Common; existing lifecycle and queue behavior preserved. |
+| Verification | Final x64/x86 79/79, isolated strict Lib 37/37 and Common 14/14; four-directory hashes match; new physical-key regression failed before and passed after repair; gates pass. Intermittent stage-14 package observation recorded, not claimed fixed. |
+| Expected Markers | No src/common/test; shared tests have no app/host/MVDM or product-root dependency; EXTENDED distinguishes physical keys. |
 | Asset Needs | Both fixed EXEs; bounded logs and disposable standalone verification trees under build; preserve INI and media. |
 | Reporting Requirements | Complete P commit/push, independent actual-diff review, counted production/test changes and clean tree. |
 | Stop Conditions | Product semantic changes, MVDM changes or a new synchronization framework require separate approval. |
 | Exit Criteria | Platform boundary and standalone proof pass; dual-width packages and regression delivered, reviewed and pushed. |
-| Original Owner Request | 批准，准入一个新的S任务修复common，并对lib做最小增补修改以服务common的需求。common组件不得自带任何 win32, linux。 |
-| Similar-Issue Sweep | All Common C/H/CMake includes, platform calls, atomics, private cross-component references and independent verification dependencies. |
+| Original Owner Request | 准入。同时增补任务要求：common/test这个玩意要去掉。我需要你在 test/目录下增加 common 和 lib 用于覆盖当前 common 和 lib 的单元测试。src/lib, src/common, test/lib, test/common，这几个将来都要原样导入给nxvm的。 |
+| Similar-Issue Sweep | All test translation units, fixtures, helpers and registrations classified by production dependency; all Common key identity comparisons reviewed. |
 
 ## Current Technical Baseline
 
@@ -41,9 +41,9 @@ T56 remains open; the suspended S13 whole-task audit is not claimed complete.
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
-  normalized `types`/`console`/`host`/`storage`/`kvm-*` corpus has S21 x64/x86
-  builds with 59/59 CTest;
-  strict standalone library gates pass 8/8. Its path-scoped standalone MSVC
+  normalized `types`/`console`/`host`/`storage`/`kvm-*` corpus has S16 x64/x86
+  product builds with 79/79 CTest;
+  strict standalone library suite passes 37/37. Its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 
 ## Recent M9 Closures
