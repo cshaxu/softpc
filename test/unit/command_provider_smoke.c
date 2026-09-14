@@ -631,6 +631,30 @@ static void trace_cli(common_machine *machine, common_machine_debug_lease *lease
         .bytes = 2u, .data = {0x90,0x90} });
 }
 
+static void check_vm_owner(const char *path)
+{
+    vm_options options = { .floppy_path = path,
+        .media_mode = LIB_STORAGE_MEDIUM_OVERLAY };
+    vm_options invalid = { .media_mode = LIB_STORAGE_MEDIUM_OVERLAY };
+    vm_driver *first = NULL, *second = NULL;
+    common_machine_driver driver;
+    unsigned int index;
+    /* Failure after ownership acquisition must allow a subsequent create. */
+    assert(vm_create(&invalid, &first) == LIB_STATUS_INVALID_ARGUMENT);
+    assert(first == NULL);
+    for (index = 0u; index < 2u; ++index) {
+        assert(vm_create(&options, &first) == LIB_STATUS_OK);
+        assert(vm_create(&options, &second) == LIB_STATUS_INVALID_STATE);
+        assert(second == NULL);
+        vm_destroy(second); /* Null cleanup must not release the live owner. */
+        assert(vm_create(&invalid, &second) == LIB_STATUS_INVALID_STATE);
+        vm_driver_describe(first, &driver);
+        assert(driver.reset(driver.context));
+        vm_destroy(first);
+        first = NULL;
+    }
+}
+
 int main(void)
 {
     const char *path = "debug-commands-smoke.img";
@@ -811,6 +835,7 @@ int main(void)
     common_machine_destroy(machine);
     vm_driver_destroy(adapter);
     softpc_machine_destroy(product);
+    check_vm_owner(path);
     assert(remove(path) == 0);
     CloseHandle(events.paused); CloseHandle(events.running); CloseHandle(events.stopped);
     CloseHandle(program_completed);

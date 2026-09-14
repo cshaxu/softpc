@@ -14,8 +14,10 @@ typedef struct vm_options {
     lib_storage_medium_mode media_mode;
 } vm_options;
 
-/* Main creates the concrete backend, injects its existing Common driver,
-   and destroys it only after Common has joined the executor. */
+/* Composition creates the process's one concrete backend and injects its driver.
+   A concurrent/live second create returns INVALID_STATE with a null output;
+   failed create releases admission. Destroy releases it only after resource
+   disposal, and must be called after Common has joined the executor. */
 lib_status vm_create(const vm_options *options, vm_driver **out_driver);
 void vm_destroy(vm_driver *driver);
 void vm_driver_describe(vm_driver *driver, common_machine_driver *out_driver);

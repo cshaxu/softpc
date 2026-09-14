@@ -3,6 +3,7 @@
 #include "vm/trace.h"
 #include "vm/debug.h"
 #include "compat/audio.h"
+#include "lib/types/atomic.h"
 
 #include <windows.h>
 #include <stdlib.h>
@@ -15,6 +16,10 @@ struct vm_driver {
     lib_u32 graphics_source_height;
     lib_u32 graphics_visible_width;
 };
+
+/* The recovered core and host endpoints are process-global. This is resource
+ * admission, not a second machine lifecycle state. */
+static lib_atomic_flag vm_owned = LIB_ATOMIC_FLAG_INITIALIZER;
 
 lib_status vm_create(const vm_options *options, vm_driver **out_driver)
 {
@@ -35,17 +40,22 @@ lib_status vm_create(const vm_options *options, vm_driver **out_driver)
         SOFTPC_MEDIA_READONLY : SOFTPC_MEDIA_OVERLAY;
     if (options->media_mode > LIB_STORAGE_MEDIUM_OVERLAY)
         return LIB_STATUS_INVALID_ARGUMENT;
+    if (lib_atomic_flag_test_and_set_explicit(&vm_owned, LIB_MEMORY_ORDER_ACQUIRE))
+        return LIB_STATUS_INVALID_STATE;
     result = softpc_machine_create(&machine_options, &machine);
-    if (result != SOFTPC_MACHINE_OK)
-        return result == SOFTPC_MACHINE_INVALID_ARGUMENT ?
+    if (result != SOFTPC_MACHINE_OK) {
+        status = result == SOFTPC_MACHINE_INVALID_ARGUMENT ?
             LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_IO_ERROR;
+        goto failed;
+    }
     status = softpc_platform_audio_start();
     if (status == LIB_STATUS_OK)
         status = vm_driver_create(out_driver, machine);
-    if (status != LIB_STATUS_OK) {
-        softpc_platform_audio_shutdown();
-        softpc_machine_destroy(machine);
-    }
+    if (status == LIB_STATUS_OK) return status;
+    softpc_platform_audio_shutdown();
+    softpc_machine_destroy(machine);
+failed:
+    lib_atomic_flag_clear_explicit(&vm_owned, LIB_MEMORY_ORDER_RELEASE);
     return status;
 }
 
@@ -55,6 +65,7 @@ void vm_destroy(vm_driver *driver)
     softpc_platform_audio_shutdown();
     softpc_machine_destroy(driver->machine);
     vm_driver_destroy(driver);
+    lib_atomic_flag_clear_explicit(&vm_owned, LIB_MEMORY_ORDER_RELEASE);
 }
 
 static void vm_driver_trace_frame(void *opaque, const kvm_frame *frame)
