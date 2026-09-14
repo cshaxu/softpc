@@ -750,7 +750,6 @@ void host_timer_shutdown(void)
     if (softpc_executor_event != NULL)
         CloseHandle(softpc_executor_event);
     softpc_executor_event = NULL;
-    softpc_platform_audio_shutdown();
 #endif
 }
 void host_reset(void) {}

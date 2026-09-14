@@ -2,31 +2,30 @@
 
 ## Current Work
 
-M9 T56 S5 is active: audit and remove duplicate ownership or direct calls that
-bypass the admitted `common/ui`, `common/session` and `common/machine`
-boundaries, while retaining app and product-adapter responsibilities that
-legitimately call lib directly.
+M9 T56 S6 is active: establish the approved original xasm32 corpus as a
+common component from its fixed NXVM source reference, with no change to the
+existing SoftPC command surface or executor ownership.
 
-## M9 T56 S5 Packet
+## M9 T56 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner admitted T56 and authorizes automatic sequential S progression after each tested, reviewed and pushed delivery; async package testing does not block the next S. |
-| Objective | Reconcile remaining app/host direct lib calls and resource ownership after UI/session/machine extraction: remove only duplicated or bypassing implementations; retain configuration, product media, trace and compatibility responsibilities at their true owner. Make app explicitly own product audio adapter lifecycle if the audit confirms the currently lazy path is a second production route. |
-| Non-goals | Do not change MVDM, guest input protocol, UI/session/machine behavior, command vocabulary, lib behavior, deferred TODOs, owner configuration/media, or import debug/xasm32 yet. |
-| Reference Baseline | T56 S4 `7946ce0`: common/machine is the production executor owner; x86/x64 59/59 and strict lib 8/8 passed, with refreshed dual package EXEs. |
+| Objective | Freeze the exact approved NXVM xasm32 source reference, import it unmodified into `common/xasm32`, link it as a standalone common component and add copied byte/text contract tests. The existing SoftPC product need not expose a new CLI command in this S. |
+| Non-goals | Do not change MVDM, guest input protocol, UI/session/machine behavior, command vocabulary, lib behavior, deferred TODOs, owner configuration/media, or import debug yet. |
+| Reference Baseline | T56 S5: app owns the explicit product audio lifecycle; x86/x64 60/60 and strict lib 8/8 passed, with refreshed dual package EXEs. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | S1 ledger entries for audio, media, configuration, trace and host adapters; their direct lib calls and lifecycle/CMake ownership; focused tests and static ownership gate as needed. No new general-purpose lib wrapper layer. |
+| Files And ABI Surface | New `src/common/xasm32` source corpus/CMake target, source provenance/hash record and focused byte/text contract tests; no existing product ABI replacement. |
 | Applicable Rules | Execution, architecture, coding, documentation authorities; Product UI; shared execution/architecture/coding/documentation governance skills. |
-| Verification | Start with a complete ownership/call inventory, then use focused lifecycle/media/trace/configuration coverage for any changed owner; static proof no common-managed broker/KVM/executor bypass remains; fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/DAG gates and diff hygiene. |
-| Expected Markers | App retains only configuration, entity assembly, product driver/CLI/adapter responsibilities; common-owned UI/session/machine resources have one implementation and one lifecycle route; no unnecessary forwarding wrappers exist. |
+| Verification | Exact source-tree/file hash ledger, focused xasm32 byte/text/error tests, static proof no duplicate corpus remains, fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/DAG gates and diff hygiene. |
+| Expected Markers | `common/xasm32` has one fixed provenance record and one build target; no app/host duplicate xasm32 implementation or unadmitted CLI/executor route exists. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe`; preserve adjacent user-owned INI and all media bytes. |
 | Reporting Requirements | P commit/push contains moved/deleted path ledger, tests, source/artifact hashes, x86/x64 EXE links and changed-path counts; user tests asynchronously. |
 | Stop Conditions | Stop and record a proposal/TODO if preserving an accepted driver/lifecycle behavior requires MVDM change, external source import, product-semantics decision, or a second executor/driver route. |
-| Exit Criteria | Every retained direct call has one recorded owner; every duplicate/bypass route is deleted or moved; audio lifecycle has one explicit owner if changed; all named tests/gates and dual packages pass, review/push complete and EXE links reported. |
+| Exit Criteria | Imported corpus matches frozen source reference; target/test contracts are linked at both widths; all named tests/gates and dual packages pass, review/push complete and EXE links reported. |
 | Original Owner Request | 建立 common 组件并提取 debug、xasm32、session、UI、machine；CLI 注入 session，app 保持配置和实体组装；每个 S 删除旧实现并给可验收双 EXE，体验不变；手测异步进行。 |
-| Similar-Issue Sweep | All app/host direct lib calls, thread/resource construction and destruction, CMake/test sources, media/configuration/trace contracts, common boundary crossings and every retained exception in the S1 ledger. |
+| Similar-Issue Sweep | Source provenance, CMake dependencies, public includes, byte/text/error semantics, duplicate copies, accidental CLI exposure and any executor/control/UI ownership drift. |
 
 ## Current Technical Baseline
 
@@ -45,6 +44,7 @@ legitimately call lib directly.
 ## Recent M9 Closures
 
 | T56 S4 | Generic executor, lifecycle/input queues, run generation and completed-frame publication now belong to `common/machine`; app retains only its injected SoftPC driver. | [S4 closure](../history/M9-T56-S4-common-machine-extraction.md) |
+| T56 S5 | App/host direct lib ownership was audited; the speaker worker now has one explicit app-managed lifecycle. | [S5 closure](../history/M9-T56-S5-ownership-audio-lifecycle.md) |
 
 | Task | Closure | Evidence |
 | --- | --- | --- |

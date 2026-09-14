@@ -1,5 +1,6 @@
 #include "insignia.h"
 #include "host_def.h"
+#include "audio.h"
 #include "lib/host/sync_interface.h"
 
 /* Standalone audio is only a presentation sink.  nt_sound.c owns the
@@ -39,25 +40,27 @@ static void softpc_speaker_worker(void *unused, const host_sync_task *task)
     }
 }
 
-static void softpc_speaker_wake_worker(void)
+lib_status softpc_platform_audio_start(void)
 {
-    if (softpc_speaker_wake == NULL)
-    {
-        if (host_sync_event_create(&softpc_speaker_wake) != LIB_STATUS_OK ||
-            host_sync_event_create(&softpc_speaker_stop) != LIB_STATUS_OK)
-        {
-            host_sync_event_destroy(softpc_speaker_wake);
-            host_sync_event_destroy(softpc_speaker_stop);
-            softpc_speaker_wake = NULL; softpc_speaker_stop = NULL;
-            return;
-        }
+    lib_status status;
+    if (softpc_speaker_task != NULL) return LIB_STATUS_OK;
+    status = host_sync_event_create(&softpc_speaker_wake);
+    if (status != LIB_STATUS_OK) return status;
+    status = host_sync_event_create(&softpc_speaker_stop);
+    if (status != LIB_STATUS_OK) {
+        host_sync_event_destroy(softpc_speaker_wake);
+        softpc_speaker_wake = NULL;
+        return status;
     }
-    if (softpc_speaker_task == NULL)
-    {
-        if (host_sync_task_create(softpc_speaker_worker, NULL,
-                &softpc_speaker_task) != LIB_STATUS_OK) return;
+    status = host_sync_task_create(softpc_speaker_worker, NULL,
+        &softpc_speaker_task);
+    if (status != LIB_STATUS_OK) {
+        host_sync_event_destroy(softpc_speaker_wake);
+        host_sync_event_destroy(softpc_speaker_stop);
+        softpc_speaker_wake = NULL;
+        softpc_speaker_stop = NULL;
     }
-    host_sync_event_signal(softpc_speaker_wake);
+    return status;
 }
 
 void softpc_standalone_audio_set_tone(ULONG frequency, ULONG duration)
@@ -65,8 +68,7 @@ void softpc_standalone_audio_set_tone(ULONG frequency, ULONG duration)
     if (duration < 10u || frequency < SOFTPC_SPEAKER_MIN_HZ ||
         frequency > SOFTPC_SPEAKER_MAX_HZ) frequency = 0u;
     InterlockedExchange(&softpc_speaker_frequency, (LONG)frequency);
-    if (frequency != 0u) softpc_speaker_wake_worker();
-    else if (softpc_speaker_wake != NULL) host_sync_event_signal(softpc_speaker_wake);
+    if (softpc_speaker_wake != NULL) host_sync_event_signal(softpc_speaker_wake);
 }
 
 void softpc_platform_audio_shutdown(void)
@@ -87,5 +89,6 @@ void softpc_platform_audio_shutdown(void)
 #else
 void softpc_standalone_audio_set_tone(ULONG frequency, ULONG duration)
 { UNUSED(frequency); UNUSED(duration); }
+lib_status softpc_platform_audio_start(void) { return LIB_STATUS_OK; }
 void softpc_platform_audio_shutdown(void) {}
 #endif

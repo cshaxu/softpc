@@ -3,6 +3,7 @@
 #include "common/machine/machine_interface.h"
 #include "machine_driver.h"
 #include "machine.h"
+#include "audio.h"
 #include "prompt_trace.h"
 #include "keyboard.h"
 #include "common/ui/ui_interface.h"
@@ -451,6 +452,10 @@ int main(int argc, char **argv)
         config.printer_output_path;
     result = softpc_machine_create(&options, &machine);
     if (result != SOFTPC_MACHINE_OK) goto done;
+    if (softpc_platform_audio_start() != LIB_STATUS_OK) {
+        result = SOFTPC_MACHINE_IO_ERROR;
+        goto done;
+    }
     if (app_machine_driver_create(&machine_driver, machine) != LIB_STATUS_OK) {
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
@@ -510,6 +515,7 @@ done:
     app_machine_driver_destroy(machine_driver);
     (void)common_ui_destroy(ui);
     (void)common_session_destroy(session);
+    softpc_platform_audio_shutdown();
     softpc_machine_destroy(machine);
     return result != SOFTPC_MACHINE_OK;
 }

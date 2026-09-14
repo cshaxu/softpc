@@ -389,6 +389,12 @@ target_include_directories(softpc-sound-smoke PRIVATE
 add_test(NAME softpc-sound-smoke COMMAND softpc-sound-smoke)
 set_tests_properties(softpc-sound-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-audio-lifecycle-smoke test/unit/audio_lifecycle_smoke.c)
+target_link_libraries(softpc-audio-lifecycle-smoke PRIVATE softpc-machine)
+target_include_directories(softpc-audio-lifecycle-smoke PRIVATE src src/host)
+add_test(NAME softpc-audio-lifecycle-smoke COMMAND softpc-audio-lifecycle-smoke)
+set_tests_properties(softpc-audio-lifecycle-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-serial-smoke test/unit/serial_smoke.c)
 target_link_libraries(softpc-serial-smoke PRIVATE softpc-machine)
 target_include_directories(softpc-serial-smoke PRIVATE

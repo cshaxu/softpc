@@ -271,6 +271,29 @@ baseline 与交付均以 `softpc32.exe`、`softpc64.exe` 同时存在为必要�
 双宽度完整 CTest 各 59/59；strict lib 8/8、documentation/DAG gates 与
 `git diff --check` 通过。构建仅刷新两个 EXE，未改写 INI 或 media。
 
+### S5 P1 执行证据
+
+S5 逐一审计 app/host 对 lib 的直接调用。以下均保留在其唯一产品所有者，
+不建立 common 转发层：app 的 INI byte read（storage）、prompt trace 的
+writer（storage）、keyboard 的 copied KVM-to-SoftPC input adapter、machine
+预检以及 FDD/HDD image provider（storage medium），以及 original host pacing
+所需 clock/sync。它们没有碰 common/ui 的 broker/KVM、common/session 的
+control queue 或 common/machine 的 executor/input queue，故不是绕过。
+
+唯一发现的重复生命周期是 speaker worker：第一次 tone request 曾在 host
+callback 中惰性创建线程，且原始 reset 的 timer shutdown 会顺带销毁它。现在
+app 在实体组装时显式 `softpc_platform_audio_start()`，退出时显式 shutdown/join；
+tone callback 只写 frequency 并唤醒已存在 worker，原始 reset 不再创建或销毁
+该 worker。新增 lifecycle smoke 覆盖 start 幂等、shutdown 后 re-create 和
+第二次 join。此改动不改变 original sound/PPI/timer2 状态机。
+
+S5 的双宽度完整 CTest 各 60/60；strict lib 8/8、documentation/DAG gates 与
+`git diff --check` 通过。package SHA-256：`softpc32.exe`
+`58D3B35C91B07FF3A3E2C4E0A343BDF235B0C018BCEE7BD603AB800A57282230`；
+`softpc64.exe`
+`01DF2F0754A8B89944A26F871085C0C79B62BA42C9D33E5A8B436C4B0D352E5E`。
+INI 和 media 保持不变。
+
 ## 每个 S 的退出条件
 
 1. 迁入职责在 SoftPC 生产路径实际使用（S6/S7 新能力按上表契约验收）；
