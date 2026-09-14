@@ -444,8 +444,7 @@ static void access_boundaries(common_machine *machine, common_machine_debug_leas
         .address = 0x800u, .bytes = sizeof(program) };
     memcpy(write.data, program, sizeof(program));
     (void)access(machine, lease, write);
-    /* Exactly representable by the recovered x87 implementation as well as
-     * the integer bus; this test checks observation, not FP precision. */
+    /* Exactly representable: check both operand observation and integer roundtrip. */
     memory_word(machine, lease, 0xa00u, 0x1234u);
     memory_word(machine, lease, 0xa04u, 0u);
     setreg(machine, lease, COMMON_DEBUG_EIP, 0x800u);
@@ -466,9 +465,9 @@ static void access_boundaries(common_machine *machine, common_machine_debug_leas
                 (common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_READ_LINEAR,
                     .address = 0xa10u, .bytes = 8u });
             memcpy(&stored, bytes.data, sizeof(stored));
-            /* Observe exactly what this CPU wrote, including its possible
-             * x87 indefinite integer; do not turn this into an FPU rewrite. */
+            /* Both the observation and arithmetic must preserve this exact integer. */
             assert(value.observation.accesses[0].data == stored);
+            assert(stored == 0x0000123400001234ull);
         }
     }
     /* Observation capacity never limits watch matching: hit byte 39. */
@@ -508,6 +507,78 @@ static void access_boundaries(common_machine *machine, common_machine_debug_leas
     assert(!access(machine, lease, (common_machine_debug_request){
         .operation = COMMON_MACHINE_DEBUG_GET_WATCH,
         .watch_kind = COMMON_MACHINE_DEBUG_WATCH_WRITE }).enabled);
+}
+
+static void x87_values(common_machine *machine, common_machine_debug_lease *lease,
+    completions *events)
+{
+    /* Real instructions on the existing executor; no host FP oracle or media writes. */
+    static const struct {
+        unsigned char opcode, load, store, bytes;
+        unsigned char value[10];
+    } formats[] = {
+        {0xd9,0x06,0x1e,4, {0,0,0xc0,0x3f}}, /* FLD/FSTP single +1.5 */
+        {0xd9,0x06,0x1e,4, {0,0,0xc0,0xbf}}, /* -1.5 */
+        {0xdd,0x06,0x1e,8, {0,0,0,0,0,0,0xf8,0x3f}}, /* double +1.5 */
+        {0xdd,0x06,0x1e,8, {0,0,0,0,0,0,0xf8,0xbf}},
+        {0xdb,0x2e,0x3e,10,{0,0,0,0,0,0,0,0xc0,0xff,0x3f}}, /* extended */
+        {0xdb,0x2e,0x3e,10,{0,0,0,0,0,0,0,0xc0,0xff,0xbf}},
+        {0xdf,0x2e,0x3e,8, {0x34,0x12,0,0,0x34,0x12,0,0}}, /* integer */
+        {0xdf,0x2e,0x3e,8, {0xcc,0xed,0xff,0xff,0xcb,0xed,0xff,0xff}},
+        {0xdf,0x26,0x36,10,{0x56,0x34,0x12,0,0,0,0,0,0,0}}, /* packed BCD */
+        {0xdf,0x26,0x36,10,{0x56,0x34,0x12,0,0,0,0,0,0,0x80}}
+    };
+    static const struct { unsigned char modrm; double expected; } arithmetic[] = {
+        {0x06,8.0}, {0x0e,12.0}, {0x26,4.0}, {0x36,3.0}
+    }; /* FADD/FMUL/FSUB/FDIV m64: 6 op 2 */
+    common_machine_debug_request trace = {
+        .operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
+        .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_TRACE, .instruction_count = 3u };
+    common_machine_debug_request write = { .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR };
+    unsigned i;
+    setreg(machine, lease, COMMON_DEBUG_CS, 0u);
+    setreg(machine, lease, COMMON_DEBUG_DS, 0u);
+    setreg(machine, lease, COMMON_DEBUG_EFLAGS, 2u);
+    for (i = 0; i < sizeof(formats) / sizeof(formats[0]); ++i) {
+        unsigned char program[] = {0xdb,0xe3, formats[i].opcode,formats[i].load,0,0x0a,
+            formats[i].opcode,formats[i].store,0x20,0x0a};
+        common_machine_debug_result result;
+        write.address = 0xa00u; write.bytes = formats[i].bytes;
+        memcpy(write.data, formats[i].value, write.bytes);
+        (void)access(machine, lease, write);
+        write.address = 0x800u; write.bytes = sizeof(program);
+        memcpy(write.data, program, sizeof(program));
+        (void)access(machine, lease, write);
+        setreg(machine, lease, COMMON_DEBUG_EIP, 0x800u);
+        run_plan(machine, lease, events, trace, 0x800u + sizeof(program), 3u);
+        result = access(machine, lease, (common_machine_debug_request){
+            .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0xa20u,
+            .bytes = formats[i].bytes });
+        assert(memcmp(result.data, formats[i].value, formats[i].bytes) == 0);
+    }
+    trace.instruction_count = 4u;
+    for (i = 0; i < sizeof(arithmetic) / sizeof(arithmetic[0]); ++i) {
+        unsigned char program[] = {0xdb,0xe3,0xdd,0x06,0,0x0a,
+            0xdc,arithmetic[i].modrm,0x10,0x0a,0xdd,0x1e,0x20,0x0a};
+        const double operands[] = {6.0,2.0};
+        common_machine_debug_result result;
+        double actual;
+        write.bytes = sizeof(double); write.address = 0xa00u;
+        memcpy(write.data, &operands[0], write.bytes);
+        (void)access(machine, lease, write);
+        write.address = 0xa10u;
+        memcpy(write.data, &operands[1], write.bytes);
+        (void)access(machine, lease, write);
+        write.address = 0x800u; write.bytes = sizeof(program);
+        memcpy(write.data, program, write.bytes);
+        (void)access(machine, lease, write);
+        setreg(machine, lease, COMMON_DEBUG_EIP, 0x800u);
+        run_plan(machine, lease, events, trace, 0x800u + sizeof(program), 4u);
+        result = access(machine, lease, (common_machine_debug_request){
+            .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0xa20u, .bytes = 8u });
+        memcpy(&actual, result.data, sizeof(actual));
+        assert(actual == arithmetic[i].expected);
+    }
 }
 
 static void trace_cli(common_machine *machine, common_machine_debug_lease *lease,
@@ -701,6 +772,7 @@ int main(void)
     trace_cli(machine, &lease, &events, &provider);
     watchpoints(machine, &lease, &events, &provider);
     access_boundaries(machine, &lease, &events);
+    x87_values(machine, &lease, &events);
     (void)access(machine, &lease, (common_machine_debug_request){
         .operation = COMMON_MACHINE_DEBUG_SET_WATCH, .watch_kind = COMMON_MACHINE_DEBUG_WATCH_READ,
         .address = 0xa00u });

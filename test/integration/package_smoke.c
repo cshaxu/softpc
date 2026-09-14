@@ -328,6 +328,9 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
         Sleep(20u);
     } while ((LONG)(GetTickCount() - deadline) < 0);
     if (GetConsoleCP() == 0u) { stage = 1; goto done; }
+    if (!package_window_display && IsWindowVisible(GetConsoleWindow())) {
+        stage = 20; goto done;
+    }
     input = CreateFileA("CONIN$", GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0u, NULL);
     output = CreateFileA("CONOUT$", GENERIC_READ | GENERIC_WRITE,
@@ -359,6 +362,7 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
         goto done;
     }
     if (!package_wait_for_text(output, "C:\\>", 10000u)) { stage = 5; goto done; }
+    if (IsWindowVisible(GetConsoleWindow())) { stage = 20; goto done; }
     if (!package_send_text(input, "ver\r") ||
         !package_wait_for_text(output, "Version", 5000u)) { stage = 14; goto done; }
     if (!package_send_text(input, "cls\r") ||
@@ -416,6 +420,10 @@ int main(int argc, char **argv)
         return 1;
     }
     /* NULL command line is intentional: the package has no CLI surface. */
+    /* Observe the test-owned Console through handles, not a foreground window
+       that can receive the developer's keyboard input during this test. */
+    startup.dwFlags = STARTF_USESHOWWINDOW;
+    startup.wShowWindow = SW_HIDE;
     if (!CreateProcessA(SOFTPC_PACKAGE_EXECUTABLE, NULL, NULL, NULL, FALSE,
             CREATE_NEW_CONSOLE, NULL, SOFTPC_PACKAGE_DIRECTORY, &startup,
             &process)) {

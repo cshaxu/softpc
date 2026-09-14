@@ -111,9 +111,9 @@ static void check_frame_extent(short columns, short rows, int scrolled)
     assert(SetConsoleCursorPosition(broker->backend->output, origin));
     assert(SetConsoleWindowInfo(broker->backend->output, TRUE, &viewport));
     assert(SetConsoleScreenBufferSize(broker->backend->output, extent));
-    viewport.Right = columns - 1;
-    viewport.Bottom = rows < 30 ? rows - 1 : 29;
-    if (scrolled) {
+    viewport.Right = scrolled == 2 ? 19 : columns - 1;
+    viewport.Bottom = scrolled == 2 ? 9 : rows < 30 ? rows - 1 : 29;
+    if (scrolled == 1) {
         viewport.Top = 2; viewport.Bottom += 2;
     }
     assert(SetConsoleWindowInfo(broker->backend->output, TRUE, &viewport));
@@ -251,6 +251,7 @@ int main(void)
     expect_display(&after);
     lib_console_release(other); lib_console_release(raw); lib_console_release(cooked);
     check_frame_extent(30, 30, 0);
+    check_frame_extent(30, 30, 2);
     check_frame_extent(80, 12, 0);
     check_frame_extent(120, 60, 1);
     assert(FreeConsole());

@@ -482,6 +482,12 @@ target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-machine commo
 add_test(NAME softpc-command-provider-smoke COMMAND softpc-command-provider-smoke)
 set_tests_properties(softpc-command-provider-smoke PROPERTIES LABELS "unit" TIMEOUT 45
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+add_executable(softpc-x87-layout-smoke test/unit/x87_layout_smoke.c)
+target_include_directories(softpc-x87-layout-smoke PRIVATE
+    src/mvdm/softpc.new/host/inc src/mvdm/softpc.new/base/inc)
+target_compile_definitions(softpc-x87-layout-smoke PRIVATE LITTLEND SOFTPC_STANDALONE)
+add_test(NAME softpc-x87-layout-smoke COMMAND softpc-x87-layout-smoke)
+set_tests_properties(softpc-x87-layout-smoke PROPERTIES LABELS "unit")
 add_executable(softpc-command-smoke test/unit/command_smoke.c
     src/app/command.c
     src/common/session/reconciler.c
@@ -552,6 +558,7 @@ set_tests_properties(softpc-runtime-cursor-smoke PROPERTIES LABELS "unit")
 list(APPEND SOFTPC_TEST_TARGETS softpc-runtime-cursor-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-command-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-command-provider-smoke)
+list(APPEND SOFTPC_TEST_TARGETS softpc-x87-layout-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
     # Keep every executable test self-contained, just like the launcher.
