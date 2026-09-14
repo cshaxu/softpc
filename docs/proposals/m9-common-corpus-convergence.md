@@ -130,14 +130,35 @@ CHS/InPort/BOP/设备计时等产品语义。每个资源仍只有一个生命�
 | S6 原版 xasm32 | 固定 NXVM 来源提交和目录哈希，逐字导入并接入 common 构建/测试；不删除 MVDM 有真实职责的解码器，不改 CLI | corpus 一致性、汇编/反汇编样例、边界/错误返回、双宽度链接 | 双 EXE 原命令和运行流程不变；新库能力由附带 focused tests 证明，不冒充新增交互 |
 | S7 原版 debug | 固定 NXVM 来源并原样导入，接 common/machine 调试边界；原 CLI 默认入口不变，不新增 debug executor | 可控 machine driver 验证暂停访问、执行请求、lease/错误、CLI provider 注入/关闭；SoftPC 可支持项实测，缺失项明确 unsupported | 双 EXE 原命令、提示符、热键、暂停恢复不变；另附 debug 契约测试，不能以 dormant link 宣称调试器全验收 |
 | S8 总体验收/handoff | 全账本完成处置，删除已迁职责的遗留源/target/API/过渡层，更新 README/架构；冻结 common manifest/接口/测试 | 所有职责唯一归属；双宽度全回归、严格 common/lib；合法直接 lib 调用保留且已审查，越权调用与第二实现为零 | 完整显示/命令/输入/媒体/焦点/退出矩阵总验收；用户通过后才收口 T |
-| S9 monitor/debug corrective | Owner-reopen: retain normalized nonempty monitor output spacing; inject and connect common debug commands through the typed paused-state machine boundary | command-spacing checks plus paused debug command/lease/adapter tests; fresh x86/x64 packages and full tests | unknown command formatting; paused debug prompt, inspect operations, resume/stop safety and explicit unsupported operations |
+| S9 monitor/debug corrective | 保留 monitor 空行修复；debug CLI 与机器状态解耦，仅同步机器访问经过 paused-state machine boundary | 四状态进入/保持/退出、CAP、惰性默认地址、访问错误及 lease/adapter 测试；双宽度完整构建测试 | debug 不自动暂停；运行时检查命令报错但不退出；暂停后可检查；q 不改变机器状态 |
 
 S6/S7 “原版”指生产源码字节一致，common CMake 接线属于集成改动。
 若上游 debug 与抽出的 common/machine 不兼容，先列出签名/语义差异，
 在真正的机器边界统一；不得私改原版源、改坏体验或添加第二 machine façade。
-需要新 CPU 调试能力或 MVDM 修改时另取产品功能准入。默认启用 debugger
-命令会改变产品体验，不在本次架构重整内；debug 必须完成真实契约测试，
-不能只复制目录后称为已接通。
+需要新 CPU 调试能力或 MVDM 修改时另取产品功能准入。上述原样导入与
+不接 CLI 是 S6/S7 的历史范围；后续 S9 已明确批准接通 debugger，并允许
+为以下契约修改 common/debug。保留来源记录，不再声称修改后源码逐字一致。
+
+### S9 已批准的 debug 交互契约
+
+原始补充要求：
+
+> 是否可以进入和保持在debug cli，是用户决定 和机器状态无关；只有debug调用机器的同步读写接口，才要paused；如果此时没有paused状态便会报错。
+
+- `debug` 在 INIT、STOPPED、RUNNING、PAUSED 均可进入，不隐式暂停。
+  打开时只初始化 CLI，不读取寄存器；默认 CS/IP 等在实际需要的命令中惰性取得。
+- `?`、`q` 和其他不访问机器的操作不要求暂停；`q` 只退出 CLI。
+  机器状态变化不关闭 debug CLI，提示符由当前 CLI provider 提供。
+- 同步寄存器、内存、端口等访问统一经过 common/machine 检查；非 PAUSED
+  明确报错并保留 CLI，不返回伪造的零值，不暗中暂停或缓存为稍后执行。
+- Window/raw Console 的 CAP 仍走 session 原有控制入口，与当前 CLI 无关。
+  debug 活跃时可以暂停/恢复；恢复后机器访问立即受同一状态边界拒绝。
+- common/debug 不触碰 MVDM，不增加 executor 或 Console reader。检查 driver
+  的全部操作种类，逐项记录支持与明确 unsupported 的证据；trace、break、watch、
+  port 不得因有命令解析就声称已支持。需要修改 MVDM 的能力另行准入。
+- 验收覆盖上述四状态、续行提示符、失败后继续输入、CAP 与 lease 失效、
+  monitor 空行回归及实际 SoftPC adapter；最终交付 x86/x64 EXE 和全量测试。
+  本次准入不是实现完成或 S9 收口。
 
 ## T56 S1 冻结账本（`121de7c`）
 

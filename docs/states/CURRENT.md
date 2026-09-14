@@ -11,19 +11,19 @@ monitor-spacing repair and connect the admitted common debug command path.
 | --- | --- |
 | Identifier Mode | Owner-Reopen |
 | Admission And Approval | Owner explicitly withdrew the premature S9 closure and admitted debug-command connection within S9; permanent commit/push authority remains in effect. |
-| Objective | Retain the completed monitor-spacing repair and connect common debug commands through the one common/machine paused-state boundary. |
+| Objective | Retain monitor spacing and connect debug CLI independently of VM state; only synchronous machine access requires PAUSED through common/machine. |
 | Non-goals | Do not bypass common/machine, create a second executor, directly access MVDM from common/debug, or alter existing monitor command/lifecycle semantics. |
 | Reference Baseline | S9 P1 `1750ed7` normalized all nonempty monitor output; P2 dual packages built at `de2ff79`, but the owner kept S9 open for debug connection. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
 | Files And ABI Surface | Common debug/session injection, SoftPC debug driver adapter and focused tests; any machine debug operation must remain behind the existing copied request/result ABI. |
 | Applicable Rules | Execution, architecture, coding and documentation authorities; Product UI; common ownership boundary. |
-| Verification | Audit all common-debug command operations against the product driver; prove paused acquisition, command input/output, resume/stop safety and unavailable-operation behavior; fresh package-x86/x64, test-x86/x64, strict lib and governance gates. Every S is incomplete unless both fixed-width packages are rebuilt and tested. |
+| Verification | Audit every debug operation against the product driver; test debug entry/stay/exit in INIT, STOPPED, RUNNING and PAUSED without implicit machine access or pause; test CAP while debug remains active, lazy register defaults, explicit non-paused access errors, lease invalidation and unsupported operations; fresh package-x86/x64, test-x86/x64, strict lib and governance gates. |
 | Expected Markers | Monitor dispatches a debug session only through common/session injection; common/debug reaches SoftPC only through common/machine's lease callback; no MVDM include outside the product adapter. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe`; preserve adjacent user-owned INI and all media bytes. |
 | Reporting Requirements | Every P is committed and pushed; final report includes both EXE links, hashes and x86/x64 test evidence. |
 | Stop Conditions | Stop if a required debug operation has no safe product adapter or needs an MVDM semantic change; record each unsupported operation rather than inventing an unsafe direct path. |
 | Exit Criteria | Supported debug commands work via the typed machine lease, unsupported ones are explicit, focused and full dual-width tests pass, packages refresh, review/push complete and worktree is clean. |
-| Original Owner Request | S9 暂不收口，因为还有一个问题：debug命令没有接通无法使用。 |
+| Original Owner Request | S9 暂不收口，因为还有一个问题：debug命令没有接通无法使用。后续批准：是否可以进入和保持在debug cli，是用户决定 和机器状态无关；只有debug调用机器的同步读写接口，才要paused；如果此时没有paused状态便会报错。好 准入s9。 |
 | Similar-Issue Sweep | CLI provider injection, debug lifetime/open/close, all debug operations, machine lease invalidation, product driver callbacks, prompt ownership and no-direct-MVDM boundary. |
 
 ## Current Technical Baseline
