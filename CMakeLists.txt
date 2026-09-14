@@ -500,6 +500,18 @@ target_link_libraries(softpc-common-machine-smoke PRIVATE common-machine host kv
 add_test(NAME softpc-common-machine-smoke COMMAND softpc-common-machine-smoke)
 set_tests_properties(softpc-common-machine-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-common-xasm32-smoke test/common/xasm32/xasm32_smoke.c)
+target_link_libraries(softpc-common-xasm32-smoke PRIVATE common-xasm32)
+add_test(NAME softpc-common-xasm32-smoke COMMAND softpc-common-xasm32-smoke)
+set_tests_properties(softpc-common-xasm32-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-common-xasm32-contract-smoke
+    test/common/xasm32/xasm32_contract_smoke.c)
+target_link_libraries(softpc-common-xasm32-contract-smoke PRIVATE common-xasm32)
+add_test(NAME softpc-common-xasm32-contract-smoke
+    COMMAND softpc-common-xasm32-contract-smoke)
+set_tests_properties(softpc-common-xasm32-contract-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-types-contract-smoke test/unit/types_contract_smoke.c)
 add_executable(softpc-linux-wait-contract-smoke test/unit/linux_wait_contract_smoke.c)
 target_link_libraries(softpc-linux-wait-contract-smoke PRIVATE types)

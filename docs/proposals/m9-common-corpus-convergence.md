@@ -294,6 +294,16 @@ S5 的双宽度完整 CTest 各 60/60；strict lib 8/8、documentation/DAG gates
 `01DF2F0754A8B89944A26F871085C0C79B62BA42C9D33E5A8B436C4B0D352E5E`。
 INI 和 media 保持不变。
 
+### S6 P1 执行证据
+
+从 NXVM `e894ef8949a0d92719678f9ebd6cec2793256ac0` 的
+`src/common/xasm32` 逐字导入七个源码/头文件，并在
+`docs/history/M9-T56-S6-xasm32-source-provenance.md` 记录逐文件
+SHA-256。`common-xasm32` 只编译原始三份 C 源，原样接入两项 byte/text
+contract smoke；不接 CLI、executor、UI 或 MVDM。x64/x86 完整 CTest 各
+62/62，strict lib 8/8 通过；双 package EXE 保持同一已验证哈希，INI 和
+media 未触碰。
+
 ## 每个 S 的退出条件
 
 1. 迁入职责在 SoftPC 生产路径实际使用（S6/S7 新能力按上表契约验收）；
