@@ -329,6 +329,15 @@ S7 的收敛顺序固定如下：
    proof 是原版 source equality 与 common fake contracts；真正的
    SoftPC debug adapter 是后续明确产品能力任务。
 
+### S7 P2 执行证据
+
+上述中性 boundary 已落地，NXVM 的五个 debug 源文件逐字导入并以 S7
+history 记录 hash。现有 SoftPC adapter 未注册 debug executor，因此只会
+返回 `LIB_STATUS_UNSUPPORTED`；没有 CLI 或 executor 路径变化。common fake
+覆盖 paused lease、result copy、原版 help 与 resume 后 stale lease 拒绝。
+x86/x64 全量 CTest 各 62/62，strict lib 8/8 通过；S7 package hashes 见
+S7 provenance record。
+
 ## 每个 S 的退出条件
 
 1. 迁入职责在 SoftPC 生产路径实际使用（S6/S7 新能力按上表契约验收）；

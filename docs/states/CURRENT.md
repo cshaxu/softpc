@@ -2,30 +2,30 @@
 
 ## Current Work
 
-M9 T56 S7 is active: establish the approved original debug corpus as a common
-component against the admitted common/machine boundary, without changing the
-existing SoftPC command surface or executor ownership.
+M9 T56 S8 is active: complete the common-corpus convergence audit and remove
+any remaining duplicate implementation or boundary bypass without changing
+the accepted SoftPC product experience.
 
-## M9 T56 S7 Packet
+## M9 T56 S8 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner admitted T56 and authorizes automatic sequential S progression after each tested, reviewed and pushed delivery; async package testing does not block the next S. |
-| Objective | Freeze the exact approved NXVM debug source reference, import it unmodified into `common/debug`, and prove its supported common/machine contract through fakes. The existing SoftPC command surface need not expose debug in this S. |
-| Non-goals | Do not change MVDM, guest input protocol, UI/session/machine behavior, command vocabulary, lib behavior, deferred TODOs, owner configuration/media, or add a debug executor. |
-| Reference Baseline | T56 S6: exact xasm32 source corpus is a dormant common component; x86/x64 62/62 and strict lib 8/8 passed, with refreshed dual package EXEs. |
+| Objective | Verify every common responsibility has one production implementation and one owner; remove any leftover migrated app/host route, complete the common manifest/architecture documentation and freeze the canonical corpus for NXVM adoption. |
+| Non-goals | Do not change MVDM, guest input protocol, UI/session/machine behavior, command vocabulary, lib behavior, deferred TODOs, owner configuration/media, or turn dormant xasm32/debug into new product commands. |
+| Reference Baseline | T56 S7: exact debug source is a dormant common component using an optional paused-state machine adapter; x86/x64 62/62 and strict lib 8/8 passed, with refreshed dual package EXEs. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | New `src/common/debug` source corpus/CMake target, source provenance/hash record and focused driver/command contract tests; no existing product ABI replacement. |
+| Files And ABI Surface | Common/app/host source and CMake ownership ledger, architecture/manifest records and targeted boundary tests; no new product ABI. |
 | Applicable Rules | Execution, architecture, coding, documentation authorities; Product UI; shared execution/architecture/coding/documentation governance skills. |
-| Verification | Exact source-tree/file hash ledger, focused debug command/error tests against controllable common/machine fakes, static proof no duplicate corpus remains, fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/DAG gates and diff hygiene. |
-| Expected Markers | `common/debug` has one fixed provenance record and one build target; no app/host duplicate debug implementation or unadmitted CLI/executor route exists. |
+| Verification | Whole-tree ownership/DAG/duplicate-source audit, affected focused tests, fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/DAG gates and diff hygiene. |
+| Expected Markers | Common owns one UI/session/machine/debug/xasm32 implementation each; all allowed app/host calls are documented product adapters, with no second generic executor/control/presentation route. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe`; preserve adjacent user-owned INI and all media bytes. |
 | Reporting Requirements | P commit/push contains moved/deleted path ledger, tests, source/artifact hashes, x86/x64 EXE links and changed-path counts; user tests asynchronously. |
 | Stop Conditions | Stop and record a proposal/TODO if preserving an accepted driver/lifecycle behavior requires MVDM change, external source import, product-semantics decision, or a second executor/driver route. |
 | Exit Criteria | Imported corpus matches frozen source reference; target/test contracts are linked at both widths; all named tests/gates and dual packages pass, review/push complete and EXE links reported. |
 | Original Owner Request | 建立 common 组件并提取 debug、xasm32、session、UI、machine；CLI 注入 session，app 保持配置和实体组装；每个 S 删除旧实现并给可验收双 EXE，体验不变；手测异步进行。 |
-| Similar-Issue Sweep | Source provenance, CMake dependencies, public includes, driver contracts, command/error semantics, duplicate copies, accidental CLI exposure and any executor/control/UI ownership drift. |
+| Similar-Issue Sweep | All app/host/common CMake targets, includes, ownership lifecycle, command/control/UI/machine loops, original-source imports, documentation and remaining transition names. |
 
 ## Current Technical Baseline
 
@@ -46,6 +46,7 @@ existing SoftPC command surface or executor ownership.
 | T56 S4 | Generic executor, lifecycle/input queues, run generation and completed-frame publication now belong to `common/machine`; app retains only its injected SoftPC driver. | [S4 closure](../history/M9-T56-S4-common-machine-extraction.md) |
 | T56 S5 | App/host direct lib ownership was audited; the speaker worker now has one explicit app-managed lifecycle. | [S5 closure](../history/M9-T56-S5-ownership-audio-lifecycle.md) |
 | T56 S6 | Exact NXVM xasm32 source is a dormant `common-xasm32` component with copied byte/text contract tests. | [S6 closure](../history/M9-T56-S6-xasm32-source-provenance.md) |
+| T56 S7 | Exact NXVM debug source is a dormant `common-debug` component behind a typed optional paused-state machine adapter. | [S7 closure](../history/M9-T56-S7-debug-source-provenance.md) |
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
