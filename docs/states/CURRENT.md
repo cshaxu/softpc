@@ -2,28 +2,28 @@
 
 ## Current Work
 
-M9 T59 S2 is active: owner admitted product-boundary cleanup S2–S5 in the existing T. S1 is verified/pushed; no owner manual-test result is claimed. T59 remains open.
+M9 T59 S3 is active. S2 f45777c is reviewed/pushed and closed, dual-width 86/86. S1 is verified/pushed; no owner manual-test result is claimed. T59 remains open.
 
-## M9 T59 S2 Packet
+## M9 T59 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner admits the four proposed architecture stages as S2–S5 in T59, with proposal updated first. |
-| Objective | Give all VM implementation sources one build target and make product/test consumers link it. |
+| Objective | Consolidate original ABI declarations by owning boundary, reusing existing declarations and removing duplicates without wrappers. |
 | Non-goals | No Lib/Common/MVDM source edits, behavior changes, new forwarding layer or machine OBJECT reimplementation. |
-| Reference Baseline | a7c2e86; S1 delivered and reviewed, both 86-test suites passed. |
+| Reference Baseline | f45777c; S2 reviewed, both 86-test suites passed. |
 | Candidate Proposal | [Remaining TODO investigation](../proposals/m9-remaining-todo-investigation.md). |
-| Files And ABI Surface | Root CMake, product build verification and task documentation; no public ABI change. |
+| Files And ABI Surface | VM/Compat internal C/H declarations, necessary private include setup and task documentation; no public ABI or behavior change. |
 | Applicable Rules | Execution, document, architecture and coding rules with linked skills before implementation. |
-| Verification | Audit target source lists, preserve original link resolution, dual-width full builds and CTest. |
-| Expected Markers | VM sources compiled by one target; App-only exe sources; tests reuse the same target. |
-| Asset Needs | Refresh both fixed EXEs; preserve INI/media; temporary evidence only in build/t59-s2. |
+| Verification | Compare declarations to original definitions, audit every extern hit; dual-width full builds and CTest including debug and lifecycle. |
+| Expected Markers | One declaration source for each shared ABI group; no new forwarding functions or machine state. |
+| Asset Needs | Refresh both fixed EXEs; preserve INI/media; temporary evidence only in build/t59-s3. |
 | Reporting Requirements | Actual changed paths, line accounting, tests, dual EXEs, complete P commits/pushes and coordinator review. |
-| Stop Conditions | A source behavior change or protected-corpus edit is required to complete the build regrouping. |
-| Exit Criteria | Target ownership clear, no duplicate VM source route, dual-width full regression passes and reviewed delivery pushed. |
+| Stop Conditions | Declaration differences require an actual calling-ABI behavior change or protected-corpus edit. |
+| Exit Criteria | Declaration ownership clear, duplicates removed, dual-width full regression passes and reviewed delivery pushed. |
 | Original Owner Request | 准入为当前T任务的多个s任务开始执行，记得先更新t任务的proposal |
-| Similar-Issue Sweep | Every src/vm source occurrence in production/test CMake, including tests derived from exe source lists. |
+| Similar-Issue Sweep | All hand-written extern declarations in VM and Compat; existing original headers, local-only declarations and shared missing prototypes each receive a disposition. |
 
 ## Current Technical Baseline
 
