@@ -130,7 +130,7 @@ CHS/InPort/BOP/设备计时等产品语义。每个资源仍只有一个生命�
 | S6 原版 xasm32 | 固定 NXVM 来源提交和目录哈希，逐字导入并接入 common 构建/测试；不删除 MVDM 有真实职责的解码器，不改 CLI | corpus 一致性、汇编/反汇编样例、边界/错误返回、双宽度链接 | 双 EXE 原命令和运行流程不变；新库能力由附带 focused tests 证明，不冒充新增交互 |
 | S7 原版 debug | 固定 NXVM 来源并原样导入，接 common/machine 调试边界；原 CLI 默认入口不变，不新增 debug executor | 可控 machine driver 验证暂停访问、执行请求、lease/错误、CLI provider 注入/关闭；SoftPC 可支持项实测，缺失项明确 unsupported | 双 EXE 原命令、提示符、热键、暂停恢复不变；另附 debug 契约测试，不能以 dormant link 宣称调试器全验收 |
 | S8 总体验收/handoff | 全账本完成处置，删除已迁职责的遗留源/target/API/过渡层，更新 README/架构；冻结 common manifest/接口/测试 | 所有职责唯一归属；双宽度全回归、严格 common/lib；合法直接 lib 调用保留且已审查，越权调用与第二实现为零 | 完整显示/命令/输入/媒体/焦点/退出矩阵总验收；用户通过后才收口 T |
-| S9 monitor output spacing corrective | Owner-reopen: normalize all nonempty monitor command/result text to one trailing blank line; pure Enter remains text-free | command smoke asserts unknown/rejected/local/lifecycle result spacing and empty-line exception; fresh x86/x64 packages and full tests | unknown command, invalid lifecycle command, floppy result, pause/resume/start result, and pure Enter at monitor prompt |
+| S9 monitor/debug corrective | Owner-reopen: retain normalized nonempty monitor output spacing; inject and connect common debug commands through the typed paused-state machine boundary | command-spacing checks plus paused debug command/lease/adapter tests; fresh x86/x64 packages and full tests | unknown command formatting; paused debug prompt, inspect operations, resume/stop safety and explicit unsupported operations |
 
 S6/S7 “原版”指生产源码字节一致，common CMake 接线属于集成改动。
 若上游 debug 与抽出的 common/machine 不兼容，先列出签名/语义差异，
