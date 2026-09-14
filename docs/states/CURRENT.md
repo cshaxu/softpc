@@ -2,11 +2,28 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T58.
+T58 S5 is active: restore consistent optimized dual-width package builds.
 
-T58 S4 is closed after [shutdown/order acceptance](../history/M9-T58-S4-machine-shutdown.md).
-No next subtask is admitted.
+## M9 T58 S5 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner requests investigation and repair in a new S; Chinese responses, permanent main push approval. |
+| Objective | Restore x86 Release optimization and prevent silent preset cache drift. |
+| Non-goals | No product semantics, source corpus or ABI changes; no speculative stripping/toolchain replacement. |
+| Reference Baseline | 5d213af; S4 both widths 85/85, x86 Release flags empty. |
+| Candidate Proposal | [S5 ledger](../proposals/m9-common-test-sync.md). |
+| Files And ABI Surface | Package presets, product build guard, docs and both fixed EXEs; no ABI. |
+| Applicable Rules | Execution, architecture, coding, documentation and their governance skills. |
+| Verification | Trace flags/history; cache and generated command checks; preset regression gate; dual builds and full tests; PE section/size comparison. |
+| Expected Markers | Both preset builds use -O3 -DNDEBUG; test assertions remain enabled; no source behavior change. |
+| Asset Needs | Fixed dual EXEs; bounded ignored build logs; preserve INI/media. |
+| Reporting Requirements | Executor P push, actual-diff acceptance P; clean worktree, T58 remains open. |
+| Stop Conditions | Optimized x86 requires unapproved machine behavior changes or unknown ABI work. |
+| Exit Criteria | Consistent proven flags, dual passing regression, recorded size and cause limits, committed/pushed delivery. |
+| Original Owner Request | okay, can you please investigate and fix this in a new S task. always reply in chinese |
+| Similar-Issue Sweep | Both preset/cache configurations, root compile overrides, test NDEBUG overrides and tracked flag history. |
 
 ## Current Technical Baseline
 

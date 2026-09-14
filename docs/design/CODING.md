@@ -86,6 +86,10 @@ its source-mirror location `src/mvdm/softpc.new/roms/`; no external-ROM asset
 contract exists.
 Repository-root executables and sibling `build-*` directories are forbidden.
 
+The two GNU package presets explicitly select Release with `-O3 -DNDEBUG`,
+including when reusing an existing build cache. Tests separately undefine
+NDEBUG so their operations and assertions remain live in optimized builds.
+
 The preserved SoftPC baseline contains source, headers, scripts, and runtime
 resources only. Checked-in or newly generated object files, libraries, and
 other compiler outputs do not belong beneath `src/`; rebuild them in `build/`.

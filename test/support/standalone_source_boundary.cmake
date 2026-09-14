@@ -1,3 +1,16 @@
+# Package presets must repair stale Release flags in reused build trees.
+file(READ "${SOFTPC_SOURCE_DIR}/CMakePresets.json" package_presets)
+foreach(preset_index RANGE 0 1)
+    string(JSON package_type GET "${package_presets}"
+        configurePresets ${preset_index} cacheVariables CMAKE_BUILD_TYPE)
+    string(JSON package_flags GET "${package_presets}"
+        configurePresets ${preset_index} cacheVariables CMAKE_C_FLAGS_RELEASE)
+    if(NOT package_type STREQUAL "Release" OR
+        NOT package_flags STREQUAL "-O3 -DNDEBUG")
+        message(FATAL_ERROR "Both GNU package presets must select optimized Release flags")
+    endif()
+endforeach()
+
 # New host code has one concrete ownership taxonomy.  No compatibility or
 # convenience aggregate may appear beside these six owners.
 set(allowed_host_taxonomies bios ccpu cmos cvidc keymouse system)

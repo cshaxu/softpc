@@ -247,3 +247,57 @@ Both fixed package hashes:
 softpc32.exe 4DC9840EBDB285900898DD1373687DC9B66739086162C6F9D1F47868C369337A;
 softpc64.exe 2FC00B4E09124D21EAC5FC30B4099F641B8807B8A4D698AED736374D85F4A64B.
 INI and media are unchanged. Owner interactive acceptance remains separate.
+
+## S5: Consistent Release package flags
+
+Original request: “okay, can you please investigate and fix this in a new S
+task. always reply in chinese”. Baseline 5d213af; S4 remains accepted.
+The finite ledger is both package presets/caches, generated production/test
+flags, tracked flag history, binaries and full dual-width regression. No
+production source, shared corpus or product semantics change is intended.
+
+Observed x86 Release cache has empty CMAKE_C_FLAGS_RELEASE, whereas x64 has
+-O3 -DNDEBUG. Both presets specify Release but omit its flags, so configuring
+an existing cache does not repair that override. Tracked history has no
+CMAKE_C_FLAGS_RELEASE assignment or documented x86 optimization exception.
+Existing older x86 build commands contain -O3 -DNDEBUG. The exact local command
+that cleared this ignored cache is not recoverable from retained evidence;
+do not invent a responsible commit or claim a deliberate compatibility fix.
+
+Set the standard GNU Release flags explicitly in both GNU package presets,
+so reconfiguration restores the same contract even in the stale x86 tree.
+Keep generic/custom build configuration behavior unchanged. Extend the existing
+product source-boundary check to require both preset values; verify generated
+commands and live test assertions after configure. Rebuild both EXEs and run
+full suites serially, comparing PE code size and total size without stripping.
+Any optimized-build regression must be investigated, never hidden by disabling
+optimization or weakening assertions. Record results before executor push and
+coordinator acceptance. S5 closes only with the ledger satisfied; T58 stays open.
+
+### S5 evidence and accounting
+
+Reconfigured the existing trees through both presets; both caches now contain
+-O3 -DNDEBUG with no global C/linker flag overrides. Generated x86 CCPU/device
+and launcher commands use optimization; product and shared test commands retain
+-UNDEBUG after -DNDEBUG. Root build logic has no architecture-specific Release
+override. Historical tracked search (`git log -S CMAKE_C_FLAGS_RELEASE`) found
+no assignment; older retained x86 command files used the normal Release flags.
+Both preset slots are covered by the existing source-boundary test. A disposable
+fixture with empty second-preset flags was rejected with the intended diagnostic;
+the real presets passed. The fixture was removed after proof.
+
+Both full builds returned success. Serial full suites passed x64 85/85
+(54.73 s) and x86 85/85 (68.97 s), including package interaction, restart,
+debug, source boundaries and shared corpus manifests. Documentation gate passed.
+No production C/H or shared test/corpus changed. Build config +2/-0 and
+product test guard +13/-0; docs and package bytes excluded from this accounting.
+
+x86 package fell from 5,109,397 to 3,503,225 bytes (31.44%); its text section
+fell from 0x3294c0 to 0x228050 bytes. Remaining width/toolchain differences in
+code, unwind, relocations and symbols are not a required byte-size parity target.
+No stripping or source workaround was introduced. x64 rebuilt identically at
+2,849,636 bytes. Delivered SHA256:
+softpc32.exe 57B7F7069D1FAF12FAB3D56A08BDE65268284620A300AEF895C63C1E38CE489A;
+softpc64.exe 2FC00B4E09124D21EAC5FC30B4099F641B8807B8A4D698AED736374D85F4A64B.
+All ledger members have proof; INI/media unchanged. Exact provenance of the
+old local cache clearing remains unknown, not attributed to a commit.
