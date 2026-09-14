@@ -1,13 +1,14 @@
-#include "app/machine_driver.h"
-#include "app/keyboard.h"
-#include "app/prompt_trace.h"
-#include "host/machine_debug.h"
+#include "vm/driver.h"
+#include "input.h"
+#include "vm/trace.h"
+#include "vm/debug.h"
+#include "compat/audio.h"
 
 #include <windows.h>
 #include <stdlib.h>
 #include <string.h>
 
-struct app_machine_driver {
+struct vm_driver {
     softpc_machine *machine;
     softpc_debug_state debug;
     lib_u32 graphics_source_width;
@@ -15,9 +16,50 @@ struct app_machine_driver {
     lib_u32 graphics_visible_width;
 };
 
-static void app_machine_driver_trace_frame(void *opaque, const kvm_frame *frame)
+lib_status vm_create(const vm_options *options, vm_driver **out_driver)
 {
-    app_machine_driver *driver = (app_machine_driver *)opaque;
+    softpc_machine_options machine_options = { 0 };
+    softpc_machine *machine = NULL;
+    softpc_machine_result result;
+    lib_status status;
+    if (out_driver == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *out_driver = NULL;
+    if (options == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    machine_options.floppy_path = options->floppy_path;
+    machine_options.hard_disk_path = options->hard_disk_path;
+    machine_options.serial_output_path = options->serial_output_path;
+    machine_options.printer_output_path = options->printer_output_path;
+    machine_options.memory_bytes = options->memory_bytes;
+    machine_options.media_mode = options->media_mode == LIB_STORAGE_MEDIUM_DIRECT ?
+        SOFTPC_MEDIA_DIRECT : options->media_mode == LIB_STORAGE_MEDIUM_READONLY ?
+        SOFTPC_MEDIA_READONLY : SOFTPC_MEDIA_OVERLAY;
+    if (options->media_mode > LIB_STORAGE_MEDIUM_OVERLAY)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    result = softpc_machine_create(&machine_options, &machine);
+    if (result != SOFTPC_MACHINE_OK)
+        return result == SOFTPC_MACHINE_INVALID_ARGUMENT ?
+            LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_IO_ERROR;
+    status = softpc_platform_audio_start();
+    if (status == LIB_STATUS_OK)
+        status = vm_driver_create(out_driver, machine);
+    if (status != LIB_STATUS_OK) {
+        softpc_platform_audio_shutdown();
+        softpc_machine_destroy(machine);
+    }
+    return status;
+}
+
+void vm_destroy(vm_driver *driver)
+{
+    if (driver == NULL) return;
+    softpc_platform_audio_shutdown();
+    softpc_machine_destroy(driver->machine);
+    vm_driver_destroy(driver);
+}
+
+static void vm_driver_trace_frame(void *opaque, const kvm_frame *frame)
+{
+    vm_driver *driver = (vm_driver *)opaque;
     static lib_u32 prior_mode = UINT32_MAX;
     static lib_u32 prior_screen = UINT32_MAX;
     static lib_u32 prior_graphics = UINT32_MAX;
@@ -28,14 +70,14 @@ static void app_machine_driver_trace_frame(void *opaque, const kvm_frame *frame)
     lib_u32 mode = 0u;
     lib_u32 screen = 0u;
 
-    if (driver == NULL || frame == NULL || !app_prompt_trace_enabled()) return;
+    if (driver == NULL || frame == NULL || !vm_trace_enabled()) return;
     (void)softpc_machine_presentation_state(driver->machine, &mode, &screen);
     if (prior_mode == mode && prior_screen == screen &&
         prior_graphics == frame->graphics &&
         prior_columns == frame->text_columns && prior_rows == frame->text_rows &&
         prior_width == frame->graphics_width && prior_height == frame->graphics_height)
         return;
-    app_prompt_trace("softpc prompt frame=%lu mode=%lu state=%lu graphics=%lu text=%ux%u dib=%ux%u dirty=%ld,%ld,%ld,%ld",
+    vm_trace("softpc prompt frame=%lu mode=%lu state=%lu graphics=%lu text=%ux%u dib=%ux%u dirty=%ld,%ld,%ld,%ld",
         (unsigned long)frame->sequence, (unsigned long)mode,
         (unsigned long)screen, (unsigned long)frame->graphics,
         (unsigned)frame->text_columns, (unsigned)frame->text_rows,
@@ -47,7 +89,7 @@ static void app_machine_driver_trace_frame(void *opaque, const kvm_frame *frame)
     prior_width = frame->graphics_width; prior_height = frame->graphics_height;
 }
 
-void app_machine_driver_cursor_shape(kvm_frame *frame, lib_u32 percent)
+void vm_driver_cursor_shape(kvm_frame *frame, lib_u32 percent)
 {
     lib_u32 height = frame->font_height;
     lib_u32 lines;
@@ -58,17 +100,17 @@ void app_machine_driver_cursor_shape(kvm_frame *frame, lib_u32 percent)
     frame->cursor_bottom = (lib_u8)(height - 1u);
 }
 
-static lib_bool app_machine_driver_reset(void *opaque)
+static lib_bool vm_driver_reset(void *opaque)
 {
-    app_machine_driver *driver = (app_machine_driver *)opaque;
+    vm_driver *driver = (vm_driver *)opaque;
     if (driver != NULL) driver->debug = (softpc_debug_state) { 0 };
     return driver != NULL && softpc_machine_reset(driver->machine) ==
         SOFTPC_MACHINE_OK;
 }
 
-static lib_bool app_machine_driver_run(void *opaque)
+static lib_bool vm_driver_run(void *opaque)
 {
-    app_machine_driver *driver = (app_machine_driver *)opaque;
+    vm_driver *driver = (vm_driver *)opaque;
     lib_bool result;
     if (driver == NULL) return LIB_FALSE;
     softpc_debug_bind(&driver->debug);
@@ -77,39 +119,39 @@ static lib_bool app_machine_driver_run(void *opaque)
     return result;
 }
 
-static void app_machine_driver_request_stop(void *opaque)
+static void vm_driver_request_stop(void *opaque)
 {
-    app_machine_driver *driver = (app_machine_driver *)opaque;
+    vm_driver *driver = (vm_driver *)opaque;
     if (driver != NULL) softpc_machine_request_stop(driver->machine);
 }
 
-static void app_machine_driver_request_wake(void *opaque)
+static void vm_driver_request_wake(void *opaque)
 {
-    app_machine_driver *driver = (app_machine_driver *)opaque;
+    vm_driver *driver = (vm_driver *)opaque;
     if (driver != NULL) softpc_machine_request_wake(driver->machine);
 }
 
-static void app_machine_driver_set_heartbeat(void *opaque, lib_bool enabled)
+static void vm_driver_set_heartbeat(void *opaque, lib_bool enabled)
 {
-    app_machine_driver *driver = (app_machine_driver *)opaque;
+    vm_driver *driver = (vm_driver *)opaque;
     if (driver != NULL) softpc_machine_set_heartbeat(driver->machine, enabled != 0);
 }
 
-static void app_machine_driver_set_executor_callback(void *opaque,
+static void vm_driver_set_executor_callback(void *opaque,
     common_machine_executor_callback callback, void *callback_context)
 {
-    app_machine_driver *driver = (app_machine_driver *)opaque;
+    vm_driver *driver = (vm_driver *)opaque;
     if (driver != NULL) softpc_machine_set_executor_callback(driver->machine,
         callback, callback_context);
 }
 
-static void app_machine_driver_deliver_input(void *opaque,
+static void vm_driver_deliver_input(void *opaque,
     const kvm_input_event *event)
 {
-    app_machine_driver *driver = (app_machine_driver *)opaque;
+    vm_driver *driver = (vm_driver *)opaque;
     if (driver == NULL || event == NULL) return;
     if (event->type == KVM_EVENT_KEY)
-        (void)app_keyboard_inject_machine_event(driver->machine, event);
+        (void)vm_keyboard_inject_machine_event(driver->machine, event);
     else if (event->type == KVM_EVENT_MOUSE)
         (void)softpc_machine_mouse_input(driver->machine,
             event->data.mouse.delta_x, event->data.mouse.delta_y,
@@ -117,7 +159,7 @@ static void app_machine_driver_deliver_input(void *opaque,
             (event->data.mouse.buttons & KVM_MOUSE_BUTTON_RIGHT) != 0u);
 }
 
-static lib_bool app_machine_driver_copy_graphics(app_machine_driver *driver,
+static lib_bool vm_driver_copy_graphics(vm_driver *driver,
     kvm_frame *frame)
 {
     const void *bits;
@@ -178,7 +220,7 @@ static lib_bool app_machine_driver_copy_graphics(app_machine_driver *driver,
     return LIB_TRUE;
 }
 
-static lib_bool app_machine_driver_copy_text(app_machine_driver *driver,
+static lib_bool vm_driver_copy_text(vm_driver *driver,
     kvm_frame *frame)
 {
     const void *surface;
@@ -234,7 +276,7 @@ static lib_bool app_machine_driver_copy_text(app_machine_driver *driver,
         &frame->attribute_font_select);
     frame->text_columns = (lib_u16)columns;
     frame->text_rows = (lib_u16)rows;
-    app_machine_driver_cursor_shape(frame, cursor_size);
+    vm_driver_cursor_shape(frame, cursor_size);
     frame->cursor_visible = column >= 0 && row >= 0;
     frame->cursor_phase = 1u;
     frame->dirty_left = 0;
@@ -245,48 +287,48 @@ static lib_bool app_machine_driver_copy_text(app_machine_driver *driver,
     return LIB_TRUE;
 }
 
-static lib_bool app_machine_driver_copy_frame(void *opaque, kvm_frame *frame)
+static lib_bool vm_driver_copy_frame(void *opaque, kvm_frame *frame)
 {
-    app_machine_driver *driver = (app_machine_driver *)opaque;
+    vm_driver *driver = (vm_driver *)opaque;
     if (driver == NULL || frame == NULL) return LIB_FALSE;
     return softpc_machine_presentation_is_graphics(driver->machine) ?
-        app_machine_driver_copy_graphics(driver, frame) :
-        app_machine_driver_copy_text(driver, frame);
+        vm_driver_copy_graphics(driver, frame) :
+        vm_driver_copy_text(driver, frame);
 }
 
-static lib_bool app_machine_driver_set_removable_media(void *opaque,
+static lib_bool vm_driver_set_removable_media(void *opaque,
     const char *path)
 {
-    app_machine_driver *driver = (app_machine_driver *)opaque;
+    vm_driver *driver = (vm_driver *)opaque;
     return driver != NULL && softpc_machine_set_floppy(driver->machine, path) ==
         SOFTPC_MACHINE_OK;
 }
 
-static lib_status app_machine_driver_debug(void *opaque,
+static lib_status vm_driver_debug(void *opaque,
     const common_machine_debug_request *request, common_machine_debug_result *result)
 {
-    app_machine_driver *driver = opaque;
+    vm_driver *driver = opaque;
     return softpc_machine_debug(driver->machine, &driver->debug, request, result);
 }
 
-static lib_bool app_machine_driver_take_debug_stop(void *opaque)
+static lib_bool vm_driver_take_debug_stop(void *opaque)
 {
-    app_machine_driver *driver = opaque;
+    vm_driver *driver = opaque;
     lib_bool pending = driver->debug.stop_pending && driver->debug.result_ready;
     if (pending) driver->debug.stop_pending = LIB_FALSE;
     return pending;
 }
 
-static void app_machine_driver_cancel_debug(void *opaque)
+static void vm_driver_cancel_debug(void *opaque)
 {
-    app_machine_driver *driver = opaque;
+    vm_driver *driver = opaque;
     driver->debug = (softpc_debug_state) { 0 };
 }
 
-lib_status app_machine_driver_create(app_machine_driver **out_driver,
+lib_status vm_driver_create(vm_driver **out_driver,
     softpc_machine *machine)
 {
-    app_machine_driver *driver;
+    vm_driver *driver;
     if (out_driver == NULL || machine == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_driver = NULL;
     driver = calloc(1u, sizeof(*driver));
@@ -296,28 +338,28 @@ lib_status app_machine_driver_create(app_machine_driver **out_driver,
     return LIB_STATUS_OK;
 }
 
-void app_machine_driver_destroy(app_machine_driver *driver)
+void vm_driver_destroy(vm_driver *driver)
 {
     free(driver);
 }
 
-void app_machine_driver_describe(app_machine_driver *driver,
+void vm_driver_describe(vm_driver *driver,
     common_machine_driver *out_driver)
 {
     if (out_driver == NULL) return;
     *out_driver = (common_machine_driver) { 0 };
     out_driver->context = driver;
-    out_driver->reset = app_machine_driver_reset;
-    out_driver->run = app_machine_driver_run;
-    out_driver->request_stop = app_machine_driver_request_stop;
-    out_driver->request_wake = app_machine_driver_request_wake;
-    out_driver->set_heartbeat = app_machine_driver_set_heartbeat;
-    out_driver->set_executor_callback = app_machine_driver_set_executor_callback;
-    out_driver->deliver_input = app_machine_driver_deliver_input;
-    out_driver->copy_frame = app_machine_driver_copy_frame;
-    out_driver->set_removable_media = app_machine_driver_set_removable_media;
-    out_driver->execute_debug = app_machine_driver_debug;
-    out_driver->take_debug_stop = app_machine_driver_take_debug_stop;
-    out_driver->cancel_debug = app_machine_driver_cancel_debug;
-    out_driver->frame_published = app_machine_driver_trace_frame;
+    out_driver->reset = vm_driver_reset;
+    out_driver->run = vm_driver_run;
+    out_driver->request_stop = vm_driver_request_stop;
+    out_driver->request_wake = vm_driver_request_wake;
+    out_driver->set_heartbeat = vm_driver_set_heartbeat;
+    out_driver->set_executor_callback = vm_driver_set_executor_callback;
+    out_driver->deliver_input = vm_driver_deliver_input;
+    out_driver->copy_frame = vm_driver_copy_frame;
+    out_driver->set_removable_media = vm_driver_set_removable_media;
+    out_driver->execute_debug = vm_driver_debug;
+    out_driver->take_debug_stop = vm_driver_take_debug_stop;
+    out_driver->cancel_debug = vm_driver_cancel_debug;
+    out_driver->frame_published = vm_driver_trace_frame;
 }

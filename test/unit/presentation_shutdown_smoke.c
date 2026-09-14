@@ -1,6 +1,6 @@
 /* Exercise the real application terminal boundary in a child process, linking
  * the real app collaborators without starting a machine or reading media. */
-#include "host/status.h"
+#include "compat/status.h"
 #include <assert.h>
 #include <windows.h>
 

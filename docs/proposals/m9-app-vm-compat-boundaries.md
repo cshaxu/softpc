@@ -54,3 +54,37 @@ that part for owner decision. Historic known TODOs remain distinct.
 This task does not split platform.c algorithms, replace timer APIs or redesign
 borrowed frame contracts. Such changes are unnecessary for the approved
 ownership relocation and must not be hidden in a mechanical move.
+
+## S2 executor evidence
+
+Existing Common driver, debug adapter, input conversion and trace now belong
+to VM. Main creates/describes/destroys that concrete backend through one
+public header; it still composes the same Common entities. VM creation owns
+the former main machine/audio acquisition and failure cleanup. The original
+borrowed-machine driver binding remains private and is used by production
+creation and product test fixtures. No second driver or allocation wrapper
+was introduced. Display remains app-to-Common policy; the legacy machine's
+unused presentation option is not exposed in the new VM options.
+
+Host support moved to flat Compat; same-name replacement headers retain
+their required small directories. Aside from its lifecycle include path,
+Compat machine.c and the other relocated host implementations keep their
+original algorithms. Keyboard product hotkeys remain app-owned; physical
+SoftPC conversion moved to VM. All product build/test consumers were updated.
+
+The boundary gate validates app, VM and Compat edges, including six negative
+fixtures. Initial x64 regression found one negative-fixture failure: relative
+includes whose targets did not exist were not normalized. Fixing normalization
+and fixture cleanup made the focused probes and final full suites pass.
+No product assertion was weakened. Final x64: 85/85, 53.98 seconds; x86:
+85/85, 92.27 seconds. Both fixed EXEs were rebuilt with the checked-in presets.
+Final focused boundary rerun: 2/2; documentation gate and diff check pass.
+
+Rename-aware staged numstat against S1: src has 55 changed path entries,
++259/-215 (net +44); test has 22 entries, +129/-56 (net +73).
+This excludes CMake, docs and EXEs. The added production boundary replaces
+main's direct backend wiring; the input mapper is moved, not duplicated.
+The five protected source/test corpora have zero diff from cfc88cf.
+Historical T14/T16 evidence generators retain historical src/host paths;
+they are not current runtime/build/acceptance dependencies. Current product
+sources and source lists contain no surviving src/host implementation.

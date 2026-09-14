@@ -3,40 +3,23 @@
 ## Target Ownership
 
 ```text
-mvdm/softpc.new
-  selected original CCPU, C-VID, controllers, BIOS, firmware, BOP and renderers
-        ↑
-host/
-  standalone host callback implementations: timer, media, BOP services,
-  conapi-compatible surfaces, input, audio, serial and parallel endpoints
-        ↑
-common/session/
-  control FIFO, copied completion reduction, command/provider injection and
-  dispatch to the selected UI and machine interfaces
-        ↑
-common/machine/
-  sole generic executor, lifecycle/input queues, complete-frame publication
-  and injected product-machine driver boundary
-        ↑
-common/debug/ + common/xasm32/
-  generic debug/assembly capabilities; app injects the debugger CLI, and
-  synchronous machine access consumes the paused-state executor boundary
-        ↑
-common/ui/
-  broker, cooked monitor Console, raw VM Console, Window/KVM instances and
-  presentation execution; copied events are injected into the product
-        ↑
-app/
-  product configuration, entity assembly, CLI/title/hotkey/status policy,
-  SoftPC machine driver and guest-input adapter; no control reduction or
-  generic executor in app
-        ↑
-lib/{types,console,host,storage,kvm-base,kvm-window,kvm-console}/
-  canonical shared platform library, delivered for NXVM to adopt exactly:
-  copied-frame mailbox, host
-  input normalization, generic registered-chord matching, independent Window/
-  VM-Console components, clock,
-  synchronization, and storage; no product queue or guest protocol
+app/main                    composition: existing Common + vm public interface
+app/config, command, keyboard  configuration and CLI/hotkey policy -> Common/Lib
+
+common/session -> common/ui       control and monitor/KVM composition
+common/session -> common/machine  sole generic executor and copied facts
+common/debug + common/xasm32      shared debugger/assembly contracts
+                         |
+                 injected existing driver callbacks
+                         v
+src/vm                     SoftPC input/frame/debug/backend adaptation
+                         |
+src/compat                 original host callbacks and ABI support
+                         |
+src/mvdm/softpc.new         original CPU, controllers, renderer and firmware
+
+Lib supplies shared platform mechanics to the owning consumers.
+No app -> Compat/MVDM edge; only main -> VM; no VM/Compat -> app edge.
 ```
 
 `mvdm/softpc.new` is the repository-owned selected recovered-machine layout.
@@ -46,7 +29,7 @@ subset: wholly host-specific NT endpoint files may be absent when a standalone
 host endpoint replaces that contract. Narrow compiler, declaration, calling-ABI
 and pointer-representation corrections may be direct, source-visible diffs at
 the affected point when they remain mechanical and introduce no machine policy.
-`host/` owns larger host adaptations, including new state, lifecycle,
+`compat/` owns larger host adaptations, including new state, lifecycle,
 capability, ownership, and policy, but does not own guest-visible state.
 `common/session` is the sole owner of the product-neutral control queue,
 desired/actual reduction, prompt scheduling and dispatch order. It receives
@@ -54,19 +37,23 @@ the SoftPC CLI and machine adapter as injected callbacks; it does not parse
 configuration or interpret machine internals. `common/ui` is the sole owner
 of the monitor logical Console, broker, raw VM Console and Window/KVM
 instances; it receives only copied product policy and returns copied events.
-`app/` owns configuration, entity assembly, the SoftPC machine driver,
-guest-input adapter and the SoftPC CLI binding. `common/machine` owns the
+`app/` owns configuration, entity assembly and the SoftPC CLI/hotkey binding.
+Only app/main.c consumes vm/vm_interface.h; no app source consumes Compat or
+MVDM. `vm/` owns the concrete machine driver, frame/input conversion and debug
+adapter. Its implementation calls Compat and the original machine while its
+public interface exposes only copied options and Common/Lib contracts.
+Compat never calls app or Common. `common/machine` owns the
 single generic executor, request/input queues, run generation and copied-frame
-publication; its injected app driver alone calls the SoftPC machine boundary.
+publication; its injected VM driver calls the SoftPC machine boundary.
 `lib/` is the canonical checked-in shared-library corpus, not a runtime or
 build dependency on NXVM or NTVDM64. NXVM adopts this corpus exactly. It
 consumes and produces copied host values only. It owns
 the generic mailbox mechanics, independent console/window message loops,
 host-input normalization, registered-chord matching, mouse capture, clock,
 synchronization,
-and storage primitives. The app binding owns its executor queue, converts
-events to the guest's input protocol, and makes all product lifecycle and
-action decisions. SoftPC publishes each admitted shared-library change as the
+and storage primitives. Common machine owns its executor queue; VM converts
+copied input to the original machine protocol; app supplies product command
+and hotkey policy to Common session. SoftPC publishes each admitted shared-library change as the
 canonical corpus for NXVM to adopt exactly; the projects do not maintain
 parallel variants.
 
@@ -103,7 +90,7 @@ instruction; internal translation/device/debugger reads are outside this boundar
 Shared KVM key events are copied `kvm_key`, physical scan, neutral injection
 flags, generic Ctrl/Alt/Shift state, and make/break values. Platform adapters
 translate native records before the event reaches the shared contract; only
-the application guest binding may translate that neutral value to a product's
+the VM guest binding may translate that neutral value to a product's
 guest-input protocol.
 
 The common-machine executor is the sole caller of the injected machine driver

@@ -1,7 +1,7 @@
-#ifndef SOFTPC_HOST_MACHINE_DEBUG_H
-#define SOFTPC_HOST_MACHINE_DEBUG_H
+#ifndef VM_DEBUG_H
+#define VM_DEBUG_H
 
-#include "host/machine.h"
+#include "compat/machine.h"
 #include "common/machine/machine_interface.h"
 
 /* Product driver owns this state; only its executor accesses it. */

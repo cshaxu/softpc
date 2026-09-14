@@ -3,13 +3,9 @@
 #include "command_binding.h"
 #include "common/session/session_interface.h"
 #include "common/machine/machine_interface.h"
-#include "machine_driver.h"
-#include "machine.h"
-#include "audio.h"
-#include "prompt_trace.h"
+#include "vm/vm_interface.h"
 #include "keyboard.h"
 #include "common/ui/ui_interface.h"
-
 
 #include <stdio.h>
 #include <string.h>
@@ -48,10 +44,9 @@ int main(int argc, char **argv)
     char config_path[SOFTPC_CONFIG_PATH_MAX];
     app_startup_config config = { { 0 }, { 0 }, { 0 }, { 0 }, 16u * 1024u * 1024u,
         COMMON_SESSION_DISPLAY_CONSOLE, 1, LIB_STORAGE_MEDIUM_OVERLAY };
-    softpc_machine_options options = { 0 };
-    softpc_machine *machine = NULL;
+    vm_options options = { 0 };
     common_machine *machine_runtime = NULL;
-    app_machine_driver *machine_driver = NULL;
+    vm_driver *machine_driver = NULL;
     common_machine_driver driver = { 0 };
     common_ui *ui = NULL;
     common_ui_options common_options = { 0 };
@@ -60,10 +55,10 @@ int main(int argc, char **argv)
     kvm_hotkey_registry hotkeys;
     char graphics_console_status[APP_COMMAND_TEXT_CAPACITY];
     common_session *session = NULL;
-    softpc_machine_result result;
+    lib_status result;
     (void)argv;
 
-    app_prompt_trace_reset();
+    vm_trace_reset();
 
     if (argc != 1) {
         fprintf(stderr, "softpcvm: command-line arguments are not supported\n");
@@ -88,44 +83,32 @@ int main(int argc, char **argv)
     options.floppy_path = config.floppy_path[0] == '\0' ? NULL : config.floppy_path;
     options.hard_disk_path = config.hard_disk_path[0] == '\0' ? NULL : config.hard_disk_path;
     options.memory_bytes = config.memory_bytes;
-    options.presentation = config.presentation == COMMON_SESSION_DISPLAY_WINDOW ?
-        SOFTPC_PRESENTATION_WINDOW : SOFTPC_PRESENTATION_CONSOLE;
-    options.media_mode = config.media_mode == LIB_STORAGE_MEDIUM_DIRECT ?
-        SOFTPC_MEDIA_DIRECT : config.media_mode == LIB_STORAGE_MEDIUM_READONLY ?
-        SOFTPC_MEDIA_READONLY : SOFTPC_MEDIA_OVERLAY;
+    options.media_mode = config.media_mode;
     options.serial_output_path = config.serial_output_path[0] == '\0' ? NULL :
         config.serial_output_path;
     options.printer_output_path = config.printer_output_path[0] == '\0' ? NULL :
         config.printer_output_path;
-    result = softpc_machine_create(&options, &machine);
-    if (result != SOFTPC_MACHINE_OK) goto done;
-    if (softpc_platform_audio_start() != LIB_STATUS_OK) {
-        result = SOFTPC_MACHINE_IO_ERROR;
-        goto done;
-    }
-    if (app_machine_driver_create(&machine_driver, machine) != LIB_STATUS_OK) {
-        result = SOFTPC_MACHINE_IO_ERROR;
-        goto done;
-    }
-    app_machine_driver_describe(machine_driver, &driver);
+    result = vm_create(&options, &machine_driver);
+    if (result != LIB_STATUS_OK) goto done;
+    vm_driver_describe(machine_driver, &driver);
     if (common_machine_create(&machine_runtime, &driver) != LIB_STATUS_OK) {
-        result = SOFTPC_MACHINE_IO_ERROR;
+        result = LIB_STATUS_IO_ERROR;
         goto done;
     }
     if (!app_keyboard_hotkeys(&hotkeys)) {
-        result = SOFTPC_MACHINE_IO_ERROR;
+        result = LIB_STATUS_IO_ERROR;
         goto done;
     }
     session_options.display = config.presentation;
     session_options.console_control = config.console_control != 0;
     session_options.machine = machine_runtime;
     if (app_command_binding_initialize(&command_binding, machine_runtime,
-            options.presentation, &session_options.command) != LIB_STATUS_OK) {
-        result = SOFTPC_MACHINE_IO_ERROR;
+            config.presentation, &session_options.command) != LIB_STATUS_OK) {
+        result = LIB_STATUS_IO_ERROR;
         goto done;
     }
     if (common_session_create(&session, &session_options) != LIB_STATUS_OK) {
-        result = SOFTPC_MACHINE_IO_ERROR;
+        result = LIB_STATUS_IO_ERROR;
         goto done;
     }
     (void)snprintf(graphics_console_status, sizeof(graphics_console_status),
@@ -138,26 +121,25 @@ int main(int argc, char **argv)
     common_options.paused_window_title = "Insignia SoftPC (Paused)";
     common_options.graphics_console_status_text = graphics_console_status;
     if (common_ui_create(&ui, &common_options) != LIB_STATUS_OK) {
-        result = SOFTPC_MACHINE_IO_ERROR;
+        result = LIB_STATUS_IO_ERROR;
         goto done;
     }
     if (common_session_bind_ui(session, ui) != LIB_STATUS_OK) {
-        result = SOFTPC_MACHINE_IO_ERROR;
+        result = LIB_STATUS_IO_ERROR;
         goto done;
     }
     common_machine_set_state_sink(machine_runtime, app_machine_state_completed, session);
     common_machine_set_frame_sink(machine_runtime, app_machine_frame_published, session);
     if (common_session_run(session) == 0)
-        result = SOFTPC_MACHINE_IO_ERROR;
+        result = LIB_STATUS_IO_ERROR;
 done:
-    if (result != SOFTPC_MACHINE_OK)
-        fprintf(stderr, "softpcvm: %s\n", softpc_machine_result_name(result));
+    if (result != LIB_STATUS_OK)
+        fprintf(stderr, "softpcvm: %s\n", result == LIB_STATUS_INVALID_ARGUMENT ?
+            "invalid argument or media" : "host I/O error");
     app_command_binding_dispose(&command_binding);
     common_machine_destroy(machine_runtime);
-    app_machine_driver_destroy(machine_driver);
     (void)common_ui_destroy(ui);
     (void)common_session_destroy(session);
-    softpc_platform_audio_shutdown();
-    softpc_machine_destroy(machine);
-    return result != SOFTPC_MACHINE_OK;
+    vm_destroy(machine_driver);
+    return result != LIB_STATUS_OK;
 }

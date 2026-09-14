@@ -1,5 +1,5 @@
 #include "app/command_binding.h"
-#include "app/machine_driver.h"
+#include "vm/driver.h"
 
 #include <windows.h>
 #include <assert.h>
@@ -569,7 +569,7 @@ int main(void)
         .presentation = SOFTPC_PRESENTATION_WINDOW,
         .media_mode = SOFTPC_MEDIA_OVERLAY };
     softpc_machine *product = NULL;
-    app_machine_driver *adapter = NULL;
+    vm_driver *adapter = NULL;
     common_machine_driver driver = { 0 };
     common_machine *machine = NULL;
     app_command_binding binding = { 0 };
@@ -590,8 +590,8 @@ int main(void)
     assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
     assert(fclose(file) == 0);
     assert(softpc_machine_create(&options, &product) == SOFTPC_MACHINE_OK);
-    assert(app_machine_driver_create(&adapter, product) == LIB_STATUS_OK);
-    app_machine_driver_describe(adapter, &driver);
+    assert(vm_driver_create(&adapter, product) == LIB_STATUS_OK);
+    vm_driver_describe(adapter, &driver);
     observed_product = product;
     program_completed = CreateEventA(NULL, FALSE, FALSE, NULL);
     assert(program_completed != NULL);
@@ -721,7 +721,7 @@ int main(void)
     assert(result.arm_prompt && strcmp(result.prompt, "SoftPC> ") == 0);
     app_command_binding_dispose(&binding);
     common_machine_destroy(machine);
-    app_machine_driver_destroy(adapter);
+    vm_driver_destroy(adapter);
     softpc_machine_destroy(product);
     assert(remove(path) == 0);
     CloseHandle(events.paused); CloseHandle(events.running); CloseHandle(events.stopped);

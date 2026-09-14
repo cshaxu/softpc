@@ -1,5 +1,5 @@
 /* Exercise the copied cursor conversion contract and lib geometry together. */
-#include "app/machine_driver.h"
+#include "vm/driver.h"
 #include "lib/kvm-window/geometry.h"
 #include "lib/kvm-window/render.h"
 #include <assert.h>
@@ -27,7 +27,7 @@ int main(void)
         frame.font['A' * 16 + heights[h] - 1] = 0xff;
         kvm_window_render_text(&frame, pixels, width, height);
         assert(pixels[((7 + 1) * heights[h] - 1) * width + 3 * 8] == 0xffffff);
-        app_machine_driver_cursor_shape(&frame,sizes[s]);
+        vm_driver_cursor_shape(&frame,sizes[s]);
         assert(frame.cursor_top==heights[h]-lines);
         assert(frame.cursor_bottom==heights[h]-1);
         assert(kvm_window_cursor_rect(&frame,&display,&cursor));

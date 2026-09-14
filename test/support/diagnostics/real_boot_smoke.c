@@ -1,4 +1,4 @@
-#include "machine.h"
+#include "compat/machine.h"
 
 #include <stdio.h>
 #include <string.h>

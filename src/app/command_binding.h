@@ -17,7 +17,7 @@ typedef struct app_command_binding {
 } app_command_binding;
 
 lib_status app_command_binding_initialize(app_command_binding *binding,
-    common_machine *machine, softpc_presentation display,
+    common_machine *machine, common_session_display display,
     common_session_command_provider *provider);
 void app_command_binding_dispose(app_command_binding *binding);
 

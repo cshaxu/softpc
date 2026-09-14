@@ -88,7 +88,7 @@ static void run_matrix(void)
             app_command_effect effect;
             app_lifecycle_request request;
             app_monitor_state state = (app_monitor_state)state_index;
-            app_command_session_initialize(&session, SOFTPC_PRESENTATION_WINDOW);
+            app_command_session_initialize(&session, COMMON_SESSION_DISPLAY_WINDOW);
             app_command_session_submit_line(&session, state,
                 commands[command_index].text, &effect);
             request = app_command_session_take_request(&session);
@@ -107,7 +107,7 @@ static void test_hotkey_completion_is_not_command_provenance(void)
     app_command_session session;
     app_command_effect effect;
     app_monitor_state state = APP_MONITOR_PAUSED;
-    app_command_session_initialize(&session, SOFTPC_PRESENTATION_WINDOW);
+    app_command_session_initialize(&session, COMMON_SESSION_DISPLAY_WINDOW);
     /* A Window CAP produces no monitor command request; the completion still
        classifies its monitor outcome from the prior stable state. */
     app_command_session_note_runtime(&session, state, COMMON_MACHINE_RUNNING,
@@ -122,7 +122,7 @@ static void test_raw_route_discards_running_outcome(void)
     app_command_session session;
     app_command_effect effect;
 
-    app_command_session_initialize(&session, SOFTPC_PRESENTATION_CONSOLE);
+    app_command_session_initialize(&session, COMMON_SESSION_DISPLAY_CONSOLE);
     app_command_session_submit_line(&session, APP_MONITOR_STOPPED, "start",
         &effect);
     assert(app_command_session_take_request(&session) ==
@@ -141,7 +141,7 @@ static void test_error_returns_monitor_transaction(void)
     app_command_session session;
     app_command_effect effect;
 
-    app_command_session_initialize(&session, SOFTPC_PRESENTATION_WINDOW);
+    app_command_session_initialize(&session, COMMON_SESSION_DISPLAY_WINDOW);
     app_command_session_note_runtime(&session, APP_MONITOR_RUNNING,
         COMMON_MACHINE_ERROR, &effect);
     arm(&session, "Machine error");
@@ -155,7 +155,7 @@ int main(void)
     test_hotkey_completion_is_not_command_provenance();
     test_raw_route_discards_running_outcome();
     test_error_returns_monitor_transaction();
-    app_command_session_initialize(&session, SOFTPC_PRESENTATION_WINDOW);
+    app_command_session_initialize(&session, COMMON_SESSION_DISPLAY_WINDOW);
     assert(strstr(app_command_hotkey_help(),
         "While the guest is running:") != NULL);
     app_command_session_open(&session, &effect);

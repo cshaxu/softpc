@@ -9,7 +9,7 @@ _Static_assert(COMMON_SESSION_TEXT_CAPACITY >= 2u * COMMON_DEBUG_TEXT_CAPACITY,
 _Static_assert(COMMON_SESSION_PROMPT_CAPACITY >= COMMON_DEBUG_PROMPT_CAPACITY,
     "Session prompt must hold debugger continuation prompts");
 
-/* app/ owns the product machine ABI. common/session owns its neutral copied
+/* app/ owns product command policy. common/session owns its neutral copied
  * completion facts; convert explicitly at this one composition boundary.
  * The numeric enum values are deliberately not a cross-component contract. */
 static common_machine_state app_machine_completed_state(
@@ -248,7 +248,7 @@ static lib_bool app_command_provider_handle_hotkey(void *opaque,
 
 
 lib_status app_command_binding_initialize(app_command_binding *binding,
-    common_machine *machine, softpc_presentation display,
+    common_machine *machine, common_session_display display,
     common_session_command_provider *provider)
 {
     if (binding == NULL || machine == NULL || provider == NULL)

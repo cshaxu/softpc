@@ -126,7 +126,7 @@ static void lifecycle(app_command_session *s, app_monitor_state state,
         reject(s, e, "Unknown command.");
 }
 
-void app_command_session_initialize(app_command_session *s, softpc_presentation display)
+void app_command_session_initialize(app_command_session *s, common_session_display display)
 {
     memset(s, 0, sizeof(*s));
     s->display = display;
@@ -268,7 +268,7 @@ void app_command_session_note_runtime(app_command_session *s,
             outcome(s, "Machine started.");
         else if (prior == APP_MONITOR_PAUSED)
             outcome(s, "Machine resumed.");
-        else if (s->display == SOFTPC_PRESENTATION_WINDOW)
+        else if (s->display == COMMON_SESSION_DISPLAY_WINDOW)
             prompt(s);
     }
     else if (state == COMMON_MACHINE_STOPPED &&

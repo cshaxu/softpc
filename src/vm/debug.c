@@ -1,4 +1,4 @@
-#include "host/machine_debug.h"
+#include "vm/debug.h"
 #include "common/debug/debug_interface.h"
 
 #include <string.h>

@@ -6,9 +6,11 @@ The current source tree is:
 src/
   mvdm/
     softpc.new/
-  host/
-    ordinary host C/H files
-    compat/{ccpu,cvidc,...}/
+  compat/
+    original host callback C/H files and machine boundary
+    {ccpu,cvidc,bios,cmos,system,keymouse}/
+  vm/
+    driver, input, debug, trace; public vm_interface.h
   common/
     ui/          broker, monitor Console and KVM composition
     session/     neutral control FIFO, reduction and UI dispatch
@@ -18,7 +20,7 @@ src/
   lib/{types,console,host,storage,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
   app/
-    main.c, command.c, command_binding.c, machine_driver.c, keyboard.c, firmware.rc
+    main.c, config.c, command.c, command_binding.c, keyboard.c, firmware.rc
 ```
 
 Directories appear only in their admitted migration task.
@@ -46,10 +48,15 @@ firmware only. Historical object,
 library, and other compiler intermediate files are forbidden. Narrow,
 mechanical compiler, declaration, calling-ABI, and pointer-representation
 corrections live as reviewable source diffs at their affected points. Generated
-transformed C/H files are not build inputs. `host` owns platform capability
-implementations and larger functional adaptations; `app` owns
-configuration, entity assembly, the injected SoftPC machine driver, guest-input
-conversion and product CLI policy. `common/machine` owns the one generic
+transformed C/H files are not build inputs. `compat` owns original host
+callbacks and larger functional adaptations. `vm` owns the injected SoftPC
+driver, guest-input/frame conversion, debug adaptation and diagnostic trace.
+`app` owns configuration, entity assembly and product CLI/hotkey policy.
+Only app/main.c may include vm/vm_interface.h; no app file may include Compat
+or MVDM, and no other app file may include VM. VM's public header exposes only
+copied options, opaque identity and existing Common/Lib contracts. Compat
+does not depend on app, VM or Common. Historical same-name replacement headers
+remain isolated; no generic compat wrapper layer is retained. `common/machine` owns the one generic
 executor, lifecycle/input queues, run generation and copied-frame publication.
 `common/session` owns the control FIFO,
 completed-fact reduction, prompt scheduling and dispatch to injected machine/

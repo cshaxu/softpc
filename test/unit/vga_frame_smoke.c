@@ -1,4 +1,4 @@
-#include "machine.h"
+#include "compat/machine.h"
 #include "../lib/cleanup.h"
 #include "insignia.h"
 #include "host_def.h"

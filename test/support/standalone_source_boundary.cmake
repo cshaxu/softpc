@@ -1,10 +1,10 @@
 # New host code has one concrete ownership taxonomy.  No compatibility or
 # convenience aggregate may appear beside these six owners.
-set(allowed_host_taxonomies comms compat input machine media platform video)
-file(GLOB host_entries RELATIVE "${SOFTPC_SOURCE_DIR}/src/host"
-    "${SOFTPC_SOURCE_DIR}/src/host/*")
+set(allowed_host_taxonomies bios ccpu cmos cvidc keymouse system)
+file(GLOB host_entries RELATIVE "${SOFTPC_SOURCE_DIR}/src/compat"
+    "${SOFTPC_SOURCE_DIR}/src/compat/*")
 foreach(host_entry IN LISTS host_entries)
-    if(IS_DIRECTORY "${SOFTPC_SOURCE_DIR}/src/host/${host_entry}")
+    if(IS_DIRECTORY "${SOFTPC_SOURCE_DIR}/src/compat/${host_entry}")
         list(FIND allowed_host_taxonomies "${host_entry}" host_taxonomy_index)
         if(host_taxonomy_index EQUAL -1)
             message(FATAL_ERROR "Standalone host has no taxonomy owner: ${host_entry}")
@@ -75,44 +75,48 @@ foreach(component_platform_source IN ITEMS
 endforeach()
 
 set(standalone_sources
-    "${SOFTPC_SOURCE_DIR}/src/host/compat/ccpu/facade.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/compat/cvidc/gdp_state.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/compat/cvidc/gdp_state.h"
-    "${SOFTPC_SOURCE_DIR}/src/host/compat/cvidc/gdp_slots.h"
+    "${SOFTPC_SOURCE_DIR}/src/compat/ccpu/facade.c"
+    "${SOFTPC_SOURCE_DIR}/src/compat/cvidc/gdp_state.c"
+    "${SOFTPC_SOURCE_DIR}/src/compat/cvidc/gdp_state.h"
+    "${SOFTPC_SOURCE_DIR}/src/compat/cvidc/gdp_slots.h"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/cvidc/sascdef.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/support/ios.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/disks/fdisk.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/gfi_image.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/hdd_media.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/video.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/v7_pointer.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/memory.c"
+    "${SOFTPC_SOURCE_DIR}/src/compat/gfi_image.c"
+    "${SOFTPC_SOURCE_DIR}/src/compat/hdd_media.c"
+    "${SOFTPC_SOURCE_DIR}/src/compat/video.c"
+    "${SOFTPC_SOURCE_DIR}/src/compat/v7_pointer.c"
+    "${SOFTPC_SOURCE_DIR}/src/compat/memory.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/keymouse/keybd_io.c"
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/system/idetect.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/device_bop.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/platform.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/machine.c")
+    "${SOFTPC_SOURCE_DIR}/src/compat/device_bop.c"
+    "${SOFTPC_SOURCE_DIR}/src/compat/platform.c"
+    "${SOFTPC_SOURCE_DIR}/src/compat/machine.c")
 
-if(EXISTS "${SOFTPC_SOURCE_DIR}/src/host/softpc_compat")
+if(EXISTS "${SOFTPC_SOURCE_DIR}/src/compat/softpc_compat")
     message(FATAL_ERROR "Standalone host retains the obsolete softpc_compat taxonomy")
 endif()
 
 # The transitional aggregates must not return after the source-layout move.
-if(EXISTS "${SOFTPC_SOURCE_DIR}/src/vm")
-    message(FATAL_ERROR "Standalone application retains the obsolete src/vm layout")
+if(EXISTS "${SOFTPC_SOURCE_DIR}/src/host")
+    message(FATAL_ERROR "Standalone retains the retired src/host layout")
 endif()
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/core")
     message(FATAL_ERROR "Standalone source retains the obsolete src/core layout")
 endif()
 foreach(app_source IN ITEMS
     "src/app/main.c"
-    "src/app/machine_driver.c"
+    "src/vm/driver.c"
     "src/app/keyboard.c")
     if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/${app_source}")
         message(FATAL_ERROR "Standalone application source is missing: ${app_source}")
     endif()
 endforeach()
 foreach(retired_machine_source IN ITEMS
+    "src/app/machine_driver.c"
+    "src/app/machine_driver.h"
+    "src/app/prompt_trace.c"
+    "src/app/prompt_trace.h"
     "src/app/runtime.c"
     "src/app/runtime.h"
     "src/app/input_queue.c"
@@ -160,7 +164,8 @@ set(allowed_common_product_contracts
     "common/xasm32/xasm32_interface.h")
 file(GLOB_RECURSE product_common_consumers
     "${SOFTPC_SOURCE_DIR}/src/app/*.[ch]"
-    "${SOFTPC_SOURCE_DIR}/src/host/*.[ch]")
+    "${SOFTPC_SOURCE_DIR}/src/vm/*.[ch]"
+    "${SOFTPC_SOURCE_DIR}/src/compat/*.[ch]")
 foreach(source IN LISTS product_common_consumers)
     file(STRINGS "${source}" common_include_lines REGEX
         "#[ \t]*include[ \t]+\"common/[^\"]+\"")
@@ -180,6 +185,8 @@ foreach(source IN LISTS product_common_consumers)
         message(FATAL_ERROR "Product includes a common implementation: ${source}")
     endif()
 endforeach()
+
+include("${SOFTPC_SOURCE_DIR}/test/support/product_boundary.cmake")
 
 # The imported KVM component consumes copied values only.
 # It cannot acquire SoftPC's runtime, machine, renderer, or original key-map
@@ -232,7 +239,7 @@ endforeach()
 # to compile; that transitive implementation detail is not a product include.
 file(GLOB_RECURSE product_lib_consumers
     "${SOFTPC_SOURCE_DIR}/src/app/*.[ch]"
-    "${SOFTPC_SOURCE_DIR}/src/host/*.[ch]")
+    "${SOFTPC_SOURCE_DIR}/src/compat/*.[ch]")
 foreach(source IN LISTS product_lib_consumers)
     file(STRINGS "${source}" include_lines REGEX
         "#[ \t]*include[ \t]+\"lib/[^\"]+\.h\"")
@@ -430,7 +437,7 @@ foreach(source IN LISTS standalone_sources)
     endif()
 endforeach()
 
-file(READ "${SOFTPC_SOURCE_DIR}/src/host/platform.c"
+file(READ "${SOFTPC_SOURCE_DIR}/src/compat/platform.c"
     standalone_platform)
 string(TOLOWER "${standalone_platform}" normalized_platform)
 if(normalized_platform MATCHES "host_ata")
@@ -483,7 +490,7 @@ endforeach()
 # These are the application's only terminal infrastructure boundaries; ordinary
 # synchronization primitives deliberately remain local implementation details.
 file(GLOB app_shutdown_sources "${SOFTPC_SOURCE_DIR}/src/app/*.c"
-    "${SOFTPC_SOURCE_DIR}/src/host/*.c")
+    "${SOFTPC_SOURCE_DIR}/src/compat/*.c")
 set(checked_shutdown "kvm_(window|console)_destroy|host_console_broker_destroy")
 foreach(source IN LISTS app_shutdown_sources)
     file(STRINGS "${source}" shutdown_lines REGEX "(${checked_shutdown})[ \t]*\\(")

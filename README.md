@@ -117,11 +117,12 @@ launcher and validates its adjacent configuration and declared media roots.
   embedded selected BIOS/VGA/CMOS ROM inputs, retained in its historical tree.
 - `src/mvdm/softpc.new/` may contain narrow, reviewable compiler/host-ABI
   source diffs at the affected point; it contains no new machine policy.
-- `src/host/` — standalone platform, media, input, video, compatibility, and
-  machine-boundary implementations.
-- `src/app/` — executable entry point, single runtime executor, console, and Win32
-  presentation and media attachment. It never owns CPU, guest RAM or device
-  state.
+- `src/compat/` — original SoftPC host callbacks, media/video surfaces and ABI support.
+- `src/vm/` — SoftPC backend adaptation to the existing Common machine contract.
+- `src/app/` — configuration, product CLI/hotkey policy and entity assembly;
+  only main consumes the VM public interface.
+- `src/common/` — shared machine executor, session control, UI composition and debug/xasm32.
+- `src/lib/` — shared platform mechanics; unchanged by the app/VM/Compat refactor.
 - `test/unit/`, `test/integration/`, `test/support/` — self-contained unit,
   fixed-package integration, and shared/diagnostic test support respectively.
 

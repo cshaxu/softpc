@@ -2,7 +2,7 @@
 #define APP_COMMAND_H
 
 #include "common/machine/machine_interface.h"
-#include "machine.h"
+#include "common/session/session_interface.h"
 
 #define APP_COMMAND_TEXT_CAPACITY 2048u
 #define APP_COMMAND_PATH_CAPACITY 1024u
@@ -22,7 +22,7 @@ typedef enum app_lifecycle_request {
 
 /* Product command policy only: no runtime, presenter, broker, or native I/O. */
 typedef struct app_command_session {
-    softpc_presentation display;
+    common_session_display display;
     app_lifecycle_request pending_request;
     int dispatch_pending;
     int transition_pending;
@@ -40,7 +40,7 @@ typedef struct app_command_effect {
 /* The registered raw-Console hotkey section is product help text shared by
  * monitor `help` and the graphical raw-Console status surface. */
 const char *app_command_hotkey_help(void);
-void app_command_session_initialize(app_command_session *, softpc_presentation);
+void app_command_session_initialize(app_command_session *, common_session_display);
 void app_command_session_open(app_command_session *, app_command_effect *);
 void app_command_session_reject_line(app_command_session *, app_command_effect *);
 void app_command_session_submit_line(app_command_session *, app_monitor_state,

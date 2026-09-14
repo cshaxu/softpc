@@ -1,4 +1,4 @@
-#include "prompt_trace.h"
+#include "trace.h"
 #include "lib/storage/file_interface.h"
 
 #include <stdarg.h>
@@ -7,35 +7,35 @@
 #include <string.h>
 #include <windows.h>
 
-static char app_prompt_trace_path[MAX_PATH];
+static char vm_trace_path[MAX_PATH];
 
-static const char *app_prompt_trace_get_path(void)
+static const char *vm_trace_get_path(void)
 {
     char module[MAX_PATH];
     char *separator;
 
-    if (app_prompt_trace_path[0] != '\0') return app_prompt_trace_path;
+    if (vm_trace_path[0] != '\0') return vm_trace_path;
     if (!GetModuleFileNameA(NULL, module, sizeof(module))) return NULL;
     separator = strrchr(module, '\\');
     if (separator == NULL) return NULL;
     *separator = '\0';
-    if (snprintf(app_prompt_trace_path, sizeof(app_prompt_trace_path),
+    if (snprintf(vm_trace_path, sizeof(vm_trace_path),
             "%s\\..\\..\\build\\softpc-prompt-trace.log", module) <= 0)
         return NULL;
-    return app_prompt_trace_path;
+    return vm_trace_path;
 }
 
-int app_prompt_trace_enabled(void)
+int vm_trace_enabled(void)
 {
     /* T28 S1 is deliberately self-contained: a package run always leaves
        compact transition evidence in the repository build directory. */
     return 1;
 }
 
-void app_prompt_trace_reset(void)
+void vm_trace_reset(void)
 {
     lib_storage_file_writer *writer;
-    const char *trace_path = app_prompt_trace_get_path();
+    const char *trace_path = vm_trace_get_path();
 
     if (trace_path == NULL) return;
     if (lib_storage_file_writer_open(trace_path,
@@ -47,7 +47,7 @@ void app_prompt_trace_reset(void)
     (void)lib_storage_file_writer_close(writer);
 }
 
-void app_prompt_trace(const char *format, ...)
+void vm_trace(const char *format, ...)
 {
     va_list arguments;
     va_list copied_arguments;
@@ -56,8 +56,8 @@ void app_prompt_trace(const char *format, ...)
     lib_storage_file_writer *writer;
     const char *trace_path;
 
-    if (!app_prompt_trace_enabled()) return;
-    trace_path = app_prompt_trace_get_path();
+    if (!vm_trace_enabled()) return;
+    trace_path = vm_trace_get_path();
     if (trace_path == NULL) return;
     va_start(arguments, format);
     va_copy(copied_arguments, arguments);
