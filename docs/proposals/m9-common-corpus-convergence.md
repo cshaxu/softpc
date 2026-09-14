@@ -304,6 +304,31 @@ contract smoke；不接 CLI、executor、UI 或 MVDM。x64/x86 完整 CTest 各
 62/62，strict lib 8/8 通过；双 package EXE 保持同一已验证哈希，INI 和
 media 未触碰。
 
+### S7 P1 接口收敛审计
+
+NXVM fixed source `e894ef8949a0d92719678f9ebd6cec2793256ac0` 的原版
+`common/debug` 不能只依赖 xasm32：它要求 `common/machine` 提供一条
+暂停态的 typed debug lease/execute 边界。SoftPC 当前 `common/machine`
+是唯一 executor，却尚未公开此边界；SoftPC/MVDM 也没有已有 debug
+adapter。因此不能直接复制 debug 后声称它已工作。
+
+S7 的收敛顺序固定如下：
+
+1. 在 `common/machine` 添加中性 debug request/result、暂停态 lease 和
+   可选 injected debug executor。lease 只在 `PAUSED` 时有效；每次
+   start/reset/stop/destroy 都使旧 lease 无效。该层不读取 CPU 或 MVDM
+   状态，不自建 executor。
+2. SoftPC 的现有 machine driver 暂不提供 debug executor，因此 common
+   边界返回明确 `LIB_STATUS_UNSUPPORTED`；这不是第二实现，也不假装
+   SoftPC 已支持 debug。contract fake 覆盖 lease、有状态拒绝、失效和
+   injected executor 的请求/结果复制。
+3. 仅在上述边界编译通过后，逐字导入 NXVM `common/debug` 的五个
+   文件；若来源需要一个中性 C-runtime/file declaration façade，则只
+   补 types 的声明包装，不复制 storage 或产品逻辑。
+4. debug 不进入 SoftPC monitor CLI，不改 MVDM，也不创建线程。S7 的
+   proof 是原版 source equality 与 common fake contracts；真正的
+   SoftPC debug adapter 是后续明确产品能力任务。
+
 ## 每个 S 的退出条件
 
 1. 迁入职责在 SoftPC 生产路径实际使用（S6/S7 新能力按上表契约验收）；
