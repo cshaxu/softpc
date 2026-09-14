@@ -40,6 +40,10 @@ state. The next prompt appears only after that public completion.
 Cooked commands are complete lines, limited to 1023 bytes excluding CR/LF.
 An overlong line is drained through its terminator and reported once as
 `Command is too long.` before rearming the prompt; no tail becomes a command.
+Every nonempty monitor command result, including a rejected command, a local
+media result, and a completed lifecycle result, ends with one blank line before
+the next prompt. A pure empty line emits no result text and simply rearms the
+prompt.
 
 Raw text cells use lib\'s fixed PC-display byte-to-Unicode mapping, including
 box/block glyphs. It is an approximation for the traditional character set,

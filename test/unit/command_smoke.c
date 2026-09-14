@@ -27,12 +27,22 @@ static app_lifecycle_request expected(app_monitor_state state,
     assert(0); return APP_LIFECYCLE_REQUEST_NONE;
 }
 
+static void assert_blank_line(const char *text)
+{
+    size_t length = strlen(text);
+    assert(length >= 4u);
+    assert(!strcmp(text + length - 4u, "\r\n\r\n"));
+}
+
 static void arm(app_command_session *session, const char *outcome)
 {
     app_command_effect effect;
     app_command_session_note_monitor_current(session, 1, &effect);
     assert(effect.arm_prompt);
-    if (outcome != NULL) assert(strstr(effect.text, outcome) != NULL);
+    if (outcome != NULL) {
+        assert(strstr(effect.text, outcome) != NULL);
+        assert_blank_line(effect.text);
+    }
 }
 
 static void complete(app_command_session *session, app_monitor_state *state,
@@ -85,6 +95,7 @@ static void run_matrix(void)
             assert(request == expected(state, commands[command_index].text));
             if (request == APP_LIFECYCLE_REQUEST_NONE) {
                 assert(effect.text[0] != '\0');
+                assert_blank_line(effect.text);
                 arm(&session, NULL);
             } else complete(&session, &state, request);
         }
@@ -155,9 +166,19 @@ int main(void)
     assert(effect.action == APP_COMMAND_ACTION_EJECT_FLOPPY);
     app_command_session_complete_floppy(&session, effect.action, 1, &effect);
     assert(strstr(effect.text, "Floppy ejected") != NULL);
+    assert_blank_line(effect.text);
     app_command_session_reject_line(&session, &effect);
     assert(strstr(effect.text, "Command is too long.") != NULL);
+    assert_blank_line(effect.text);
     assert(app_command_session_take_request(&session) == APP_LIFECYCLE_REQUEST_NONE);
+    arm(&session, NULL);
+    app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
+        "unknown", &effect);
+    assert(strstr(effect.text, "Unknown command.") != NULL);
+    assert_blank_line(effect.text);
+    arm(&session, NULL);
+    app_command_session_submit_line(&session, APP_MONITOR_STOPPED, "", &effect);
+    assert(effect.text[0] == '\0');
     arm(&session, NULL);
     return 0;
 }

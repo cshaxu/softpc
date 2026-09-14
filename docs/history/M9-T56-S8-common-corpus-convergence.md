@@ -1,4 +1,4 @@
-# M9 T56 closure: canonical common corpus
+# M9 T56 S8 closure: canonical common corpus
 
 ## Outcome
 

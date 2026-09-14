@@ -25,6 +25,10 @@ static const char HELP_HOTKEYS[] =
 
 static void clear(app_command_effect *e) { memset(e, 0, sizeof(*e)); }
 static void text(app_command_effect *e, const char *s) { (void)snprintf(e->text, sizeof(e->text), "%s", s); }
+static void message(char *out, size_t capacity, const char *value)
+{
+    (void)snprintf(out, capacity, "%s\r\n\r\n", value);
+}
 static void help(app_command_effect *e)
 {
     (void)snprintf(e->text, sizeof(e->text), "%s\r\n%s\r\n",
@@ -33,15 +37,14 @@ static void help(app_command_effect *e)
 /* Product prompt demand is separate from the host's one cooked reader.  The
  * broker alone owns that reader and safely makes its arm request idempotent. */
 static void prompt(app_command_session *s) { s->prompt_due = 1; }
-static void outcome(app_command_session *s, const char *message)
+static void outcome(app_command_session *s, const char *value)
 {
-    (void)snprintf(s->pending_monitor_text, sizeof(s->pending_monitor_text),
-                   "%s", message);
+    message(s->pending_monitor_text, sizeof(s->pending_monitor_text), value);
     prompt(s);
 }
-static void reject(app_command_session *s, app_command_effect *e, const char *message)
+static void reject(app_command_session *s, app_command_effect *e, const char *value)
 {
-    (void)snprintf(e->text, sizeof(e->text), "%s\r\n", message);
+    message(e->text, sizeof(e->text), value);
     prompt(s);
 }
 static char *trim(char *s)
@@ -228,7 +231,10 @@ int app_command_session_begin_external(app_command_session *s,
 void app_command_session_complete_floppy(app_command_session *s, app_command_action a, int ok, app_command_effect *e)
 {
     clear(e);
-    text(e, a == APP_COMMAND_ACTION_EJECT_FLOPPY ? (ok ? "Floppy ejected.\r\n" : "Cannot eject floppy.\r\n") : (ok ? "Floppy inserted.\r\n" : "Cannot insert floppy.\r\n"));
+    message(e->text, sizeof(e->text),
+        a == APP_COMMAND_ACTION_EJECT_FLOPPY ?
+            (ok ? "Floppy ejected." : "Cannot eject floppy.") :
+            (ok ? "Floppy inserted." : "Cannot insert floppy."));
     prompt(s);
 }
 void app_command_session_note_runtime(app_command_session *s,
@@ -240,21 +246,21 @@ void app_command_session_note_runtime(app_command_session *s,
     if (state == COMMON_MACHINE_RESET_COMPLETED)
     {
         s->transition_pending = 0;
-        outcome(s, "Machine reset and paused.\r\n");
+        outcome(s, "Machine reset and paused.");
         return;
     }
     if (state == COMMON_MACHINE_PAUSED && prior != APP_MONITOR_PAUSED)
     {
         s->transition_pending = 0;
-        outcome(s, "Machine paused.\r\n");
+        outcome(s, "Machine paused.");
     }
     else if (state == COMMON_MACHINE_RUNNING)
     {
         s->transition_pending = 0;
         if (prior == APP_MONITOR_INIT || prior == APP_MONITOR_STOPPED)
-            outcome(s, "Machine started.\r\n");
+            outcome(s, "Machine started.");
         else if (prior == APP_MONITOR_PAUSED)
-            outcome(s, "Machine resumed.\r\n");
+            outcome(s, "Machine resumed.");
         else if (s->display == SOFTPC_PRESENTATION_WINDOW)
             prompt(s);
     }
@@ -262,12 +268,12 @@ void app_command_session_note_runtime(app_command_session *s,
              prior != APP_MONITOR_STOPPED)
     {
         s->transition_pending = 0;
-        outcome(s, "Machine stopped.\r\n");
+        outcome(s, "Machine stopped.");
     }
     else if (state == COMMON_MACHINE_ERROR)
     {
         s->transition_pending = 0;
-        outcome(s, "Machine error.\r\n");
+        outcome(s, "Machine error.");
     }
 }
 
