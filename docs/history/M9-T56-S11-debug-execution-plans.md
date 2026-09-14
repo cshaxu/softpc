@@ -33,7 +33,7 @@ the debugger queries the result through the existing paused rendezvous.
 - One app output converter handles both synchronous and completed debug text.
   Library, configuration and media are unchanged.
 
-The [proposal](../proposals/m9-common-corpus-convergence.md) records the finite
+The [proposal](M9-T56-common-convergence-proposal.md) records the finite
 operation/bypass/cancellation ledger and source-difference disposition.
 
 ## Verification and accounting

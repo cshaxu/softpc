@@ -21,7 +21,7 @@ reviewed against its diff and S9 packet; P6 `f4a8648` records the approved plan.
   zero-progress/wrap defect was found by the real test and repaired.
 - Remaining special-register, paging, snapshot, port, execution-plan and
   watch capabilities are explicitly assigned to S10/S11/S12 in the
-  [proposal](../proposals/m9-common-corpus-convergence.md), not silently closed.
+  [proposal](M9-T56-common-convergence-proposal.md), not silently closed.
 
 ## Evidence and accounting
 

@@ -2,32 +2,10 @@
 
 ## Current Work
 
-T56 S18 implementation and review are complete (09f0b38); its bounded repair
-is closed and awaits owner testing of the refreshed x86/x64 package. Retain
-the delivery packet while feedback is pending; no further implementation is
-admitted. S17 owner/NXVM feedback remains pending. T56 remains open; the
-suspended S13 whole-task audit is not claimed complete.
-
-## M9 T56 S18 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner approves the explained one-time mailbox notification selection cleanup and admits the next S. |
-| Objective | Initialize mailbox data without an unused Event; Console explicitly selects the default wake, Window selects its existing native notifier; remove duplicate selection state. |
-| Non-goals | No Common, app, host, MVDM, input, rendering, focus, FIFO, thread topology or public leaf API change; no T closure. |
-| Reference Baseline | 0d4a252; S17 x64/x86 82/82, standalone Common 16/16; clean main. |
-| Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | kvm-base mailbox implementation/support header, kvm-console creation, Lib tests/README/manifests; no application API change. |
-| Applicable Rules | Architecture, coding, execution and documentation authorities and linked governance skills. |
-| Verification | x64/x86 83/83; strict standalone Lib 38/38; focused native/selection tests 9/9; old-code allocation counterexample fails as expected. First x64 compact-console stage-14 timeout retained in proposal/TODO. Implementation pushed in 09f0b38; actual-diff review accepted. |
-| Expected Markers | Window allocates no default wake; Console allocates one; failed selection leaves unselected state; duplicate selection cannot change notifier. |
-| Asset Needs | Both fixed EXEs refreshed; bounded build/s18 logs retained, disposable standalone/probe builds removed; INI/media preserved. |
-| Reporting Requirements | Executor P1 pushed, coordinator actual-diff review complete; bounded S repair closed, packet retained only for owner feedback; T56 open. |
-| Stop Conditions | No further implementation before owner feedback or new admission. |
-| Exit Criteria | All startup-selection ledger cases pass; both EXEs built/tested, implementation pushed, reviewed and S closed; wait for owner test. |
-| Original Owner Request | 批准这个改动，请你查看最新代码，在最新的S任务编号后加1，准入执行。单人双角色模式，做完以后要编译/测试/提交/推送/收口这个新S任务，然后汇报给我，等我测试。 |
-| Similar-Issue Sweep | All mailbox/component initialize, notify selection, notify and wake wait callers; both production leaves and direct test fixtures select before notification. |
+No implementation subtask is active. Owner explicitly requested T56 closure.
+The remaining whole-task audit is completed as S19 (S13 is not reused);
+T56 is closed. Wait for owner instructions; the next queue item is not admitted.
+See the [completion audit](../history/M9-T56-S19-completion-audit.md).
 
 ## Current Technical Baseline
 
@@ -45,6 +23,10 @@ suspended S13 whole-task audit is not claimed complete.
 
 ## Recent M9 Closures
 
+T56: Common extraction, debugger integration and bounded follow-up repairs
+closed after the [whole-task audit](../history/M9-T56-S19-completion-audit.md).
+Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
+
 | T56 S11 | Original CPU trace/break execution and CLI completion connected; watchpoints remain S12. | [S11 closure](../history/M9-T56-S11-debug-execution-plans.md) |
 | T56 S10 | Synchronous debug access completed; S11/S12 need explicit port-ABI decision. | [S10 closure](../history/M9-T56-S10-synchronous-debug-access.md) |
 | T56 S4 | Generic executor, lifecycle/input queues, run generation and completed-frame publication now belong to `common/machine`; app retains only its injected SoftPC driver. | [S4 closure](../history/M9-T56-S4-common-machine-extraction.md) |
@@ -55,6 +37,7 @@ suspended S13 whole-task audit is not claimed complete.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T56 | Common extraction, debug integration and follow-up repairs closed on owner request after whole-task audit; known debts retained. | [S19 final audit](../history/M9-T56-S19-completion-audit.md) |
 | T55 | Canonical shared library refreshed, normalized, simplified, boundary-gated, and renamed to the KVM corpus; owner accepted final package testing. | [T55 closure](../history/M9-T55-closure-kvm-corpus.md) |
 | T49 | Shared-library quality sequence S1–S6 closed after owner x86/x64 package acceptance. | [T49 S6 history](../history/M9-T49-S6-lib-neutral-corpus-prose.md) |
 | T50 | Build presets/artifact identity and standalone shared-library MSVC CI closed. | [T50 S2 history](../history/M9-T50-S2-lib-ci.md) |

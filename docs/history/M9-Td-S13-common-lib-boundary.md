@@ -12,7 +12,7 @@ Baseline: `2bc73d6`. P1 `0f70d54` was committed and pushed. The reviewer then
 read the actual committed proposal diff and searched its dependency and
 acceptance wording for blanket common-only restrictions.
 
-The [live candidate](../proposals/m9-common-corpus-convergence.md) now allows
+The [live candidate](M9-T56-common-convergence-proposal.md) now allows
 app/product adapters to use lib public APIs for their own responsibilities,
 including app reading INI through storage. It prohibits bypassing common-owned
 broker/KVM/executor lifecycles and prohibits duplicate implementations or

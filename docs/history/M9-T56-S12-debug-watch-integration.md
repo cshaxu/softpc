@@ -34,7 +34,7 @@ Against `53c6625`, tracked production (`git diff --numstat -- src`) is eight
 files +176/-86, net +90; tests are two files +268/-10, net +258. MVDM changes
 in this stage are only `c_page.c` +21/-6, net +15. Shared lib, media and user
 INI are unchanged. The finite operation/command ledger and individual boundary
-dispositions remain in the [proposal](../proposals/m9-common-corpus-convergence.md).
+dispositions remain in the [proposal](M9-T56-common-convergence-proposal.md).
 
 SHA-256:
 

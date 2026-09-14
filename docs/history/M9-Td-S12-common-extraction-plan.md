@@ -4,7 +4,7 @@
 
 Owner requested governance-only planning, proposal/task decomposition, commit,
 push and a clean worktree. The verbatim request and live candidate are in
-[Common corpus convergence](../proposals/m9-common-corpus-convergence.md).
+[Common corpus convergence](M9-T56-common-convergence-proposal.md).
 No numeric implementation T was allocated; T55 remains closed.
 
 Accepted production reference is `987d82e`: existing x86/x64 CTest 58/58 each

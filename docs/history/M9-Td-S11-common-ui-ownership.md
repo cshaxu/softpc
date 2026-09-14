@@ -7,4 +7,4 @@ common/kvm split. Documentation validation passed.
 
 This record restores the history index for the already-used identifier; it
 does not reopen the task. The live candidate is
-[common convergence](../proposals/m9-common-corpus-convergence.md).
+[common convergence](M9-T56-common-convergence-proposal.md).

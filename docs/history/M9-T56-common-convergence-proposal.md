@@ -1,4 +1,8 @@
-# 候选任务：从 SoftPC 抽取 canonical common
+# M9 T56 retained proposal: canonical common
+
+本文件保留各阶段的原始计划及当时状态，不再是队列候选或活动权威。
+Owner 明确要求“t收口”；最终处置见 [S19 总审计](M9-T56-S19-completion-audit.md)。
+历史“等待/开放”记录仅描述当时状态，T56 已收口。
 
 ## 原始要求与基线
 

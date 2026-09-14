@@ -6,7 +6,7 @@ Implementation P1 `6e11d50` was committed and pushed, then reviewed in the
 coordinator role against the S10 packet, actual production/test diff and
 original CPU interfaces. S10 is closed; T56 remains open. S11/S12 are not
 implemented and need the separate preserved-source port-ABI decision recorded
-in the [proposal](../proposals/m9-common-corpus-convergence.md).
+in the [proposal](M9-T56-common-convergence-proposal.md).
 
 ## Delivered and verified
 

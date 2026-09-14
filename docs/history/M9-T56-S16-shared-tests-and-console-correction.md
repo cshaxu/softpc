@@ -2,7 +2,7 @@
 
 Owner requested Common/Lib tests in test/common and test/lib, with the four
 source/test trees transferable unchanged. Implementation and detailed evidence
-remain in the [Common proposal](../proposals/m9-common-corpus-convergence.md).
+remain in the [Common proposal](M9-T56-common-convergence-proposal.md).
 The delivered private lib_size cleanup and physical-key identity regression
 accompany the test migration; original assertions were preserved.
 

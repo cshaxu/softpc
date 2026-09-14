@@ -5,7 +5,7 @@
 Owner admitted all audited Common repairs without modifying Lib. Baseline
 662ed4b; executor cf0e31b and coordinator review 0d4a252 are pushed.
 The complete seven-item ledger, original request, measured changes and review
-are retained in the [proposal](../proposals/m9-common-corpus-convergence.md).
+are retained in the [proposal](M9-T56-common-convergence-proposal.md).
 
 The reviewed delivery uses expected-run transactional frame copying, snapshot
 route metadata, an atomic UI callback generation, one UI action vocabulary,
@@ -18,5 +18,6 @@ Lib and product policy are unchanged. Production Common C/H is net -30 lines.
 x64/x86 full suites passed 82/82; standalone Common passed 16/16. Baseline
 counterexamples fail the new snapshot and UI tests. Four-corpus manifests,
 DAG and documentation passed. Actual-diff review accepted implementation.
-Owner/NXVM feedback remains pending; this record does not claim owner testing
-of S17 or T56 closure. Owner separately admitted S18 after this delivery.
+Owner subsequently approved S closure and explicitly requested T closure.
+S17 is closed by that approval; NXVM adoption testing is not asserted.
+See the [final T audit](M9-T56-S19-completion-audit.md).

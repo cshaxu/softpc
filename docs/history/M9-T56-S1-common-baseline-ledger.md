@@ -6,7 +6,7 @@ The owner admitted T56 to establish common components for shared VM
 infrastructure while preserving SoftPC behavior. S1 freezes the reference
 before responsibility moves. The full original request, ownership design and
 finite 60-path ledger are in the retained live
-[common convergence proposal](../proposals/m9-common-corpus-convergence.md).
+[common convergence proposal](M9-T56-common-convergence-proposal.md).
 
 The owner subsequently approved asynchronous hand testing: every S still
 requires dual packages, automated proof, review, commit and push, but the next
