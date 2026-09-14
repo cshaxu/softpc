@@ -18,6 +18,10 @@ common/machine/
   sole generic executor, lifecycle/input queues, complete-frame publication
   and injected product-machine driver boundary
         ↑
+common/debug/ + common/xasm32/
+  dormant generic debug/assembly capabilities; debug consumes the optional
+  paused-state machine adapter and neither component adds a product command
+        ↑
 common/ui/
   broker, cooked monitor Console, raw VM Console, Window/KVM instances and
   presentation execution; copied events are injected into the product
@@ -65,6 +69,14 @@ events to the guest's input protocol, and makes all product lifecycle and
 action decisions. SoftPC publishes each admitted shared-library change as the
 canonical corpus for NXVM to adopt exactly; the projects do not maintain
 parallel variants.
+
+`common/xasm32` is an imported copied byte/text assembly capability and
+`common/debug` is an imported generic debug command capability.  They remain
+dormant until an importing product deliberately injects and exposes them.
+`common/debug` depends on `common/machine`'s optional paused-state adapter and
+on `common/xasm32`; neither component may create an executor, own a Console,
+or add a product command path.  Their source corpus and hashes are frozen in
+their task records for exact downstream adoption.
 
 Shared KVM key events are copied `kvm_key`, physical scan, neutral injection
 flags, generic Ctrl/Alt/Shift state, and make/break values. Platform adapters
