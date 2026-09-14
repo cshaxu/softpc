@@ -18,7 +18,7 @@ the accepted SoftPC product experience.
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
 | Files And ABI Surface | Common/app/host source and CMake ownership ledger, architecture/manifest records and targeted boundary tests; no new product ABI. |
 | Applicable Rules | Execution, architecture, coding, documentation authorities; Product UI; shared execution/architecture/coding/documentation governance skills. |
-| Verification | Whole-tree ownership/DAG/duplicate-source audit, affected focused tests, fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/DAG gates and diff hygiene. |
+| Verification | Whole-tree ownership/DAG/duplicate-source audit, affected focused tests, fresh package-x86/x64, test-x86/x64, strict lib gates, documentation/DAG gates and diff hygiene. Every S is incomplete unless both fixed-width packages are rebuilt and tested. |
 | Expected Markers | Common owns one UI/session/machine/debug/xasm32 implementation each; all allowed app/host calls are documented product adapters, with no second generic executor/control/presentation route. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe`; preserve adjacent user-owned INI and all media bytes. |
 | Reporting Requirements | P commit/push contains moved/deleted path ledger, tests, source/artifact hashes, x86/x64 EXE links and changed-path counts; user tests asynchronously. |
