@@ -55,8 +55,9 @@ driver, guest-input/frame conversion, debug adaptation and diagnostic trace.
 `command` owns monitor/debug state and command callbacks; `keyboard` owns
 hotkey interpretation and input sequences. `composition` installs their one
 Common provider and coordinates request admission without interpreting input.
-It has no separate state, command table or debugger. Main owns VM assembly.
-Only app/main.c may include vm/vm_interface.h; no app file may include Compat
+It owns entity assembly, event wiring, the blocking session run and teardown,
+without a separate state machine, command table or debugger. Main loads config.
+Only app/composition.c may include vm/vm_interface.h; no app file may include Compat
 or MVDM, and no other app file may include VM. VM's public header exposes only
 copied options, opaque identity and existing Common/Lib contracts. Compat
 does not depend on app, VM or Common. Historical same-name replacement headers

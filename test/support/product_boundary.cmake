@@ -21,7 +21,7 @@ foreach(owner IN ITEMS app vm compat)
             if(owner STREQUAL "app")
                 if(dependency MATCHES "^(compat|mvdm|host)/" OR
                    (dependency MATCHES "^vm/" AND NOT
-                    (relative STREQUAL "app/main.c" AND dependency STREQUAL "vm/vm_interface.h")))
+                    (relative STREQUAL "app/composition.c" AND dependency STREQUAL "vm/vm_interface.h")))
                     message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
                 endif()
             elseif(owner STREQUAL "vm")

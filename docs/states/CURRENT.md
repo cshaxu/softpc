@@ -2,11 +2,28 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T58.
+T58 S3 is active: move the application assembly into composition.
 
-T58 S1 and [S2](../history/M9-T58-S2-app-composition.md) are closed;
-both fixed EXEs are ready for owner testing. T58 remains open; no S3 admitted.
+## M9 T58 S3 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approves moving assembly from main into composition. |
+| Objective | One composition owner creates, connects, runs and destroys existing entities. |
+| Non-goals | No behavior, lifecycle ordering, shared corpus or VM/Compat/MVDM change. |
+| Reference Baseline | 1cc141e; S2 dual-width 85/85. |
+| Candidate Proposal | [S3 ledger](../proposals/m9-common-test-sync.md). |
+| Files And ABI Surface | App main/composition, product boundary tests/build and design; no shared ABI change. |
+| Applicable Rules | Architecture, coding, execution, documentation and linked skills. |
+| Verification | Exact moved-body review, boundary positive/negative tests, dual builds and full suites. |
+| Expected Markers | Main loads config and calls composition; only composition includes VM. |
+| Asset Needs | Both fixed EXEs; bounded build logs; preserve INI/media. |
+| Reporting Requirements | Executor P push, actual-diff review, S closure, clean tree; T remains open. |
+| Stop Conditions | Any behavior or protected-source change needed. |
+| Exit Criteria | Complete relocation ledger and required verification, commit/push. |
+| Original Owner Request | 准入一个s任务进行搬迁。 |
+| Similar-Issue Sweep | All entity constructors/destructors, machine callbacks and App VM includes. |
 
 ## Current Technical Baseline
 

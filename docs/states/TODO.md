@@ -1,5 +1,9 @@
 # Long-Term Review Ledger
 
+- TODO(Low): local toolchain owner — T58 S3 observed make subprocess Error -1 and one diagnostics-free types-layout self-test exit; unchanged focused types-layout rerun passed. No compiler diagnostic or source change explains these transient exits. Investigate runner/toolchain process termination if reproducible; do not alter shared tests or product behavior to hide it.
+
+- TODO(Medium): package acceptance owner — T58 S3 first full x64 suite failed startup debugger help at package stage 17; captured viewport was 30 columns and text wrapped. The unchanged focused package rerun passed. Root cause and relation to Console geometry are unproven; admit a bounded package/viewport investigation if this recurs. Do not weaken the help assertion or change shared Console behavior in an App relocation task.
+
 - TODO(Medium): package acceptance owner — T58 S1 first full x64 run timed out in compact Console at stage 5 while x86 tests ran concurrently; the subsequent serial x64 full suite passed 85/85. Product src and both EXE hashes are unchanged from T57. Concurrency is context, not a proven cause; admit a bounded baseline-package investigation if this stage recurs, without weakening assertions or modifying runtime in the test-corpus task.
 
 - TODO(Medium): Lib Host display owner — T56 S16 corrective probe with an artificial 30x30 buffer and 20x10 viewport observed cooked restoration as 30x10; restoring capacity afterward changed the viewport width instead. Normal full-width narrow/short/scrolled viewports pass. This is distinct from the fixed first-start frame-capacity ordering; admit a host-specific horizontal-scrollback preservation investigation if required, rather than add iterative resize compensation to this startup repair.

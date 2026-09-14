@@ -478,7 +478,7 @@ set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
 add_executable(softpc-command-provider-smoke test/unit/command_provider_smoke.c
     src/app/composition.c src/app/command.c src/vm/driver.c
     src/app/keyboard.c src/vm/trace.c)
-target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-machine common-debug common-machine)
+target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-machine common-debug common-session common-machine)
 add_test(NAME softpc-command-provider-smoke COMMAND softpc-command-provider-smoke)
 set_tests_properties(softpc-command-provider-smoke PROPERTIES LABELS "unit" TIMEOUT 45
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")

@@ -126,3 +126,62 @@ primarily declarations required for direct provider wiring; product test C
 No compatibility forwarding implementation remains. Package SHA256:
 softpc32.exe CF7A8B9096361EBEF02C711E7023C3D9A87B37F5B13A00F3B288408A9F145EEC;
 softpc64.exe 427AEF45CCD85FD4DB001A22464FFD727D9DE964FFBCA53BA457F2FE1CF10E30.
+
+## S3: Single application assembly owner
+
+Owner approves the proposed relocation: “准入一个s任务进行搬迁”。
+Baseline 1cc141e. Main retains argument/config loading and exit reporting;
+composition owns existing entity construction, event callbacks, session run
+and cleanup via app_composition_run(config). Composition becomes the sole
+App VM consumer. S2's main-only assembly decision is superseded by this request.
+Do not add state, threads, forwarding layers or reorder creation/destruction.
+Protected source and shared tests remain unchanged; T58 remains open.
+
+Finite ledger: main's VM/options conversion, machine/session/UI creation,
+two machine event callbacks, provider/hotkey wiring, session run and cleanup.
+Every member moves to composition; argument/config/path validation stays main.
+Trace reset moves with VM assembly, after config validation: failed startup
+validation now preserves the old diagnostic trace rather than clearing it.
+Normal startup and all product output/order remain unchanged; no extra trace
+API or duplicate trace implementation is introduced.
+Audit the actual old/new body, update all boundary consumers and negative
+fixtures, run both full suites and publish both fixed EXEs. Executor P is
+pushed before actual-diff S acceptance; no production fallback remains.
+
+## S3 implementation review
+
+Every ledger member now resides in composition; main retains only startup
+validation and config loading plus one blocking call. The existing function
+body from options conversion through cleanup is byte-equivalent after changing
+config member access to pointer access and returning lib_status instead of an
+exit-code boolean. Main converts that status to the same exit code. Callbacks
+are moved intact; startup errors still print before cleanup. No new state or
+thread. Provider initialization remains directly used by the existing tests.
+Its test target links Common session because composition now owns that run.
+
+Boundary checks now allow only composition.c -> vm_interface.h; added negative
+fixtures reject main and composition.h as VM consumers. Existing illegal-edge
+fixtures remain. Searches of all app constructors, bindings and VM includes
+find only composition. Protected source and shared test corpora have zero diff.
+Production src/app accounting from 1cc141e: +118/-110, net +8; test C unchanged;
+test support +6/-4, CMake +1/-1. No forwarding or old assembly path retained.
+
+Initial concurrent -j8 builds exited with make Error -1, without compiler
+diagnostics. Lower-concurrency x64 and serial -j1 x86 builds completed.
+First x64 suite was 84/85: package startup debugger-help stage 17 failed with
+a 30-column captured viewport; unchanged focused rerun passed (5.21 s).
+No test or runtime change was made for that failure; the distinct observation
+is recorded in TODO rather than claimed repaired. Final full verification
+follows. Package hashes:
+softpc32.exe 14EFCFB486AE33724291793F56D20967B718E8121809079D9C61143F81BC6642;
+softpc64.exe ED4EA8B39B3A10511323EF515F3E0879B7B31F1668C45CE4F0D48E6AAD5DA4A2.
+
+Second full x64 run passed every product test but the unchanged types-layout
+self-test exited without diagnostics (84/85, 46.70 s). Its verbose focused
+rerun passed (21.10 s); this transient tool exit is recorded separately in TODO.
+x86 full verification passed 85/85 (57.23 s). No code/assertion changes were
+made between these runs; final serial x64 acceptance is recorded below.
+
+Final serial x64 suite passed 85/85 (49.34 s). Both widths therefore have
+complete passing runs of the delivered code, with earlier observations retained
+above and in TODO. Documentation governance and boundary negative checks pass.

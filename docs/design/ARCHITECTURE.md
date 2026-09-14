@@ -3,7 +3,8 @@
 ## Target Ownership
 
 ```text
-app/main                    composition: existing Common + vm public interface
+app/main                    entry/config validation -> app/composition
+app/composition             assembly: existing Common + vm public interface
 app/config, command, keyboard  configuration and CLI/hotkey policy -> Common/Lib
 
 common/session -> common/ui       control and monitor/KVM composition
@@ -19,7 +20,7 @@ src/compat                 original host callbacks and ABI support
 src/mvdm/softpc.new         original CPU, controllers, renderer and firmware
 
 Lib supplies shared platform mechanics to the owning consumers.
-No app -> Compat/MVDM edge; only main -> VM; no VM/Compat -> app edge.
+No app -> Compat/MVDM edge; only composition -> VM; no VM/Compat -> app edge.
 ```
 
 `mvdm/softpc.new` is the repository-owned selected recovered-machine layout.
@@ -39,9 +40,10 @@ of the monitor logical Console, broker, raw VM Console and Window/KVM
 instances; it receives only copied product policy and returns copied events.
 `app/` owns configuration, entity assembly and the SoftPC CLI/hotkey binding.
 Within app, command owns CLI/debug semantics, keyboard owns hotkey semantics,
-and composition wires their callbacks into Common session. Composition does
-not parse commands or hotkey identifiers and holds no independent state.
-Only app/main.c consumes vm/vm_interface.h; no app source consumes Compat or
+and composition creates the entities, wires their callbacks into Common
+session, runs it and performs teardown. Main validates arguments/configuration.
+Composition does not parse commands or hotkey identifiers or add a state machine.
+Only app/composition.c consumes vm/vm_interface.h; no app source consumes Compat or
 MVDM. `vm/` owns the concrete machine driver, frame/input conversion and debug
 adapter. Its implementation calls Compat and the original machine while its
 public interface exposes only copied options and Common/Lib contracts.

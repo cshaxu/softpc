@@ -2,7 +2,7 @@ set(fixture "${CMAKE_CURRENT_BINARY_DIR}/product-boundary-fixture")
 file(REMOVE_RECURSE "${fixture}")
 file(MAKE_DIRECTORY "${fixture}/src/app" "${fixture}/src/vm" "${fixture}/src/compat")
 file(WRITE "${fixture}/src/vm/vm_interface.h" "#include <common/machine/machine_interface.h>\n")
-file(WRITE "${fixture}/src/app/main.c" "#include <vm/vm_interface.h>\n")
+file(WRITE "${fixture}/src/app/composition.c" "#include <vm/vm_interface.h>\n")
 function(check expected)
     execute_process(COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${fixture}"
         -P "${SOFTPC_SOURCE_DIR}/test/support/product_boundary.cmake"
@@ -16,7 +16,8 @@ function(check expected)
     endif()
 endfunction()
 check(pass)
-foreach(pair IN ITEMS "app/config.c|../vm/vm_interface.h" "app/main.c|compat/machine.h"
+foreach(pair IN ITEMS "app/config.c|../vm/vm_interface.h" "app/main.c|vm/vm_interface.h"
+    "app/composition.h|vm/vm_interface.h" "app/main.c|compat/machine.h"
     "app/command.h|../compat/machine.h" "vm/vm_interface.h|compat/machine.h"
     "vm/driver.c|app/config.h" "compat/platform.c|common/machine/machine_interface.h")
     string(REPLACE "|" ";" parts "${pair}")

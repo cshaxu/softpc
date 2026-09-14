@@ -149,7 +149,7 @@ foreach(retired_session_source IN ITEMS
         message(FATAL_ERROR "Application retains a second session implementation: ${retired_session_source}")
     endif()
 endforeach()
-file(READ "${SOFTPC_SOURCE_DIR}/src/app/main.c" app_session_composition)
+file(READ "${SOFTPC_SOURCE_DIR}/src/app/composition.c" app_session_composition)
 if(NOT app_session_composition MATCHES "common_session_create" OR
    app_session_composition MATCHES "common_session_(queue|state|reconciler)_")
     message(FATAL_ERROR "Application must compose, not implement, common session control")
@@ -289,6 +289,7 @@ file(READ "${SOFTPC_SOURCE_DIR}/src/app/main.c" app_main_source)
 file(READ "${SOFTPC_SOURCE_DIR}/src/common/ui/ui.c" common_ui_source)
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/lib/ux" OR
    app_main_source MATCHES "kvm_presenter|kvm_run" OR
+   app_session_composition MATCHES "kvm_presenter|kvm_run" OR
    common_ui_source MATCHES "kvm_presenter|kvm_run")
     message(FATAL_ERROR "Standalone retains the removed unified KVM route")
 endif()
