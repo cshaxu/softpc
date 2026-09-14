@@ -2,19 +2,19 @@
 
 ## Current Work
 
-T57 S1 is closed after dual-width proof and actual-diff review; S2 is active:
-relocate VM/Compat and enforce the approved application boundary.
+T57 S1 and S2 are closed after dual-width proof and actual-diff review;
+S3 audits the complete app/VM/Compat ownership ledger.
 T56 remains closed; no shared corpus or MVDM change is admitted.
 
-## M9 T57 S2 Packet
+## M9 T57 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner admits new T to implement the confirmed app/vm/compat refactor. |
-| Objective | Move SoftPC driver to src/vm and host support to src/compat; only app/main may consume VM public interfaces. |
+| Objective | Audit all admitted refactor paths, retained semantics, artifacts and debt against the frozen ledger. |
 | Non-goals | No shared Lib/Common/MVDM or product semantics change. |
-| Reference Baseline | 393f4a0, S1 x64/x86 84/84. |
+| Reference Baseline | bdc78a8, S2 x64/x86 85/85; original task baseline cfc88cf. |
 | Candidate Proposal | [Refactor](../proposals/m9-app-vm-compat-boundaries.md). |
 | Files And ABI Surface | app, vm, compat, product tests/CMake and current design; existing Common driver and original machine ABI unchanged. |
 | Applicable Rules | Architecture, coding, execution, documentation and their linked governance skills. |
@@ -23,7 +23,7 @@ T56 remains closed; no shared corpus or MVDM change is admitted.
 | Asset Needs | Refresh fixed EXEs only; no INI/media edits. Bounded logs under build; no new media. |
 | Reporting Requirements | Executor commit/push then actual-diff review; both-width evidence and accounting. |
 | Stop Conditions | Protected corpus changes or product behavior redesign require owner direction. |
-| Exit Criteria | All relocated paths single-owned, headers/build/tests converged, dual builds/tests, commit/push and actual-diff review. |
+| Exit Criteria | Whole-request ledger and source accounting pass, protected corpora unchanged, both artifacts verified, commit/push and owner closure decision. |
 | Original Owner Request | 准入一个新的t任务实施重构；app main is the only permitted VM consumer. |
 | Similar-Issue Sweep | All app/host includes, symbols, build sources, source-boundary checks and product test consumers. |
 
