@@ -7,7 +7,8 @@ M9 T56 S14 passed owner visual testing ("确认没问题，跟之前不一样了
 T56 S15 implementation is verified: Common platform dependencies removed, minimal
 Lib Host mutex added, independent Common corpus verification restored.
 Full x64/x86 CTest passed 68/68 each, strict Lib 8/8, isolated Common 4/4.
-Executor delivery and independent review are pending.
+Implementation P1 `864a74f` is committed and pushed. Single-agent coordinator
+review of the actual commit passed; S15 is delivered for owner testing.
 T56 remains open; the suspended S13 whole-task audit is not claimed complete.
 
 ## M9 T56 S15 Packet

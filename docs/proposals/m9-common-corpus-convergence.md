@@ -87,6 +87,16 @@ MVDM、app、原始 host、INI 和媒体均未改动。T56 总审计不在本次
 已在独立树重跑；临时独立构建树、复制 corpus 和空 probe 目录清理，
 只保留 ignored build 中的短构建/测试日志，双交付 EXE 保留。
 
+#### S15 P2 实际提交复核
+
+Executor P1 `864a74f` 已提交并推送 main；随后切换 coordinator 角色复核
+实际提交，而非只看工作区说明。确认 Common 的锁范围、原子顺序、队列容量、
+worker 数量和产品请求/完成路径未变；创建失败初始化与唯一清理路径配套。
+Host 平台实现承担锁资源，Types 仅包装原子原语；Common 无平台实现目录。
+独立构建入口、manifest、DAG 正反例与测试不依赖 SoftPC 根项目，双 EXE
+哈希与上述测试交付相符。无待处理的本 S 阻塞项；真实 Linux 与用户 GUI
+测试不冒充已完成。S15 交付等待用户测试，T56 和 S13 总审计仍未收口。
+
 ### T56 S14：raw → cooked 显示交接修复
 
 原始反馈：“cooked console，从 raw console回到cooked console之后屏幕光标和显示就不正常了，换行也不会清理本行残余字符，而且光标始终好像在倒数第二行”。
