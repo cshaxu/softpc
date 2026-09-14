@@ -1,4 +1,41 @@
-# M9 T59: remaining TODO investigation and repairs
+# M9 T59: remaining TODO investigation and product boundary cleanup
+
+## 后续架构整理准入：S2–S5
+
+原始请求：“准入为当前T任务的多个s任务开始执行，记得先更新t任务的proposal”。
+所有者批准沿用 T59，按此前四项方案顺序实施；不重复分配 S1。
+S1 的已验证交付及尚未收到人工验收的事实保留，后续工作不宣称其手测通过。
+
+目标是不改变产品体验、控制流和设备语义，清楚表达现有六组件职责。
+App 仅 composition 组装 VM/Common；Common 通过注入的 driver 调用 VM；
+VM 负责适配，Compat 提供原始宿主边界，MVDM 仍拥有机器状态。
+设备 I/O 保持 MVDM → Compat → Lib，不经过 Common 二次转发。
+本轮不修改 src/lib、src/common 或 src/mvdm，不支持多 VM，不新增转发层。
+
+冻结收敛台账（每项须有实际 diff、同类扫描及测试证据）：
+
+| S | 范围与方案 | 退出标准 |
+| --- | --- | --- |
+| S2 | 根 CMake：所有 VM 源统一归属 VM target；保留原机器 OBJECT 组合和链接需要；exe 仅 App/资源，测试链接 VM target。 | 无重复编译路径；双宽度完整构建、全量测试、固定 EXE；实际 target/source 审查。 |
+| S3 | VM/Compat 的原始 ABI 声明：优先复用准确已有声明；缺失声明按所属边界集中内部头文件；删除重复声明，不增加包装函数。 | 声明与定义核对；debug、输入、启动/reset 及双宽度全量回归；所有手写 extern 命中有处置。 |
+| S4 | VM 创建/销毁的单实例契约：检查现有保护；缺失时统一入口最小准入，重复创建在改动全局资源前拒绝，失败/销毁释放资格。 | 重复创建、失败后重试、销毁后重建；已有生命周期不变；双宽度全量测试和 EXE。 |
+| S5 | 文档和静态门禁：App→VM 仅 composition；Compat 不反向引用 App/VM/Common；共享层不依赖产品；VM 私有头不被产品组件外引用。 | 非法依赖样本被拒绝；消除本轮旧路径；双宽度全量回归、构建、干净提交推送。 |
+
+每个 S 一个活跃 packet；完整实现、验证及证据作为 P 提交推送后，切换协调者角色审查实际改动再收口。
+若原 ABI/静态链接存在必要回调耦合，明确记录并保留，不以目录整齐为由改产品行为。
+每个 S 输出两份固定 EXE；保护用户 INI/媒体。诊断仅使用当前 S 的 build 子目录，
+单次沿用测试超时，清理自有临时产物，不创建跨项目依赖。
+超出上述范围或需要修改受保护三棵 src 子树时暂停并请求决定。
+
+### S2 交付证据
+
+`softpc-vm` OBJECT target 唯一编译四个 VM C 文件；exe 只含 App/资源。
+所有原 machine 与 runtime 测试改为链接该 target；原 CCPU/设备 OBJECT 组合保持不变。
+扫描根 CMake 的 src/vm 命中只剩唯一四项源清单，无测试复制；检查实际生成链接命令。
+双宽度 tests 构建通过，ctest test-x64/test-x86 均 86/86（96.93s/81.20s），
+包括完整 debug、生命周期、package 和边界测试。生产 C/H 0 改动；根 CMake +41/-41，
+共享三棵源树及用户 INI/介质未改；两份固定 EXE 已重建。
+原 VGA 测试的 TEXT 宏重定义警告保留，此次不修改受保护源或测试语义。
 
 ## 原始请求与准入
 

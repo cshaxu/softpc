@@ -2,28 +2,28 @@
 
 ## Current Work
 
-M9 T59 S1 P1 (2c05238) is pushed and reviewed; both 86-test suites pass. Awaiting owner testing; S1/T59 stay open.
+M9 T59 S2 is active: owner admitted product-boundary cleanup S2–S5 in the existing T. S1 is verified/pushed; no owner manual-test result is claimed. T59 remains open.
 
-## M9 T59 S1 Packet
+## M9 T59 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner admits seven debts; verified defects may be repaired, evidence-free items may close after bounded checks. Owner subsequently approved the cfpu_def.h x87 host-layout correction. |
-| Objective | Establish and resolve each debt using the seven-member ledger. |
-| Non-goals | No overlay optimization, Win3.1 display-roundtrip repair, speculative CPU change or product redesign. |
-| Reference Baseline | bea5f8b; T58 closed; original seven TODOs retained verbatim in task record. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner admits the four proposed architecture stages as S2–S5 in T59, with proposal updated first. |
+| Objective | Give all VM implementation sources one build target and make product/test consumers link it. |
+| Non-goals | No Lib/Common/MVDM source edits, behavior changes, new forwarding layer or machine OBJECT reimplementation. |
+| Reference Baseline | a7c2e86; S1 delivered and reviewed, both 86-test suites passed. |
 | Candidate Proposal | [Remaining TODO investigation](../proposals/m9-remaining-todo-investigation.md). |
-| Files And ABI Surface | Relevant tests and proven owning implementation; approved MVDM change is limited to cfpu_def.h host representation, not CPU algorithms. |
+| Files And ABI Surface | Root CMake, product build verification and task documentation; no public ABI change. |
 | Applicable Rules | Execution, document, architecture and coding rules with linked skills before implementation. |
-| Verification | Seven-item ledger; bounded reproduction; same-cause sweep; dual-width builds and full suites after repairs. |
-| Expected Markers | Each debt has evidence-backed disposition; no weakened assertions or silent error suppression. |
-| Asset Needs | Preserve INI/media; bounded disposable diagnostics defined in task brief. |
-| Reporting Requirements | Actual root causes, changed-path accounting, tests, dual EXEs, complete repair P commits/pushes. |
-| Stop Conditions | CPU changes beyond approved host layout, product policy change or unbounded investigation require owner decision. |
-| Exit Criteria | All seven independently resolved or owner-approved disposition; reviewed complete delivery. |
-| Original Owner Request | overlay 页查询 O(n) 这个加入一个队列proposal，td提交；然后所有其他todo，请你准入一个s任务予以处理 |
-| Similar-Issue Sweep | Four package symptoms share investigation but retain separate proof; independent geometry, x87 and toolchain checks. |
+| Verification | Audit target source lists, preserve original link resolution, dual-width full builds and CTest. |
+| Expected Markers | VM sources compiled by one target; App-only exe sources; tests reuse the same target. |
+| Asset Needs | Refresh both fixed EXEs; preserve INI/media; temporary evidence only in build/t59-s2. |
+| Reporting Requirements | Actual changed paths, line accounting, tests, dual EXEs, complete P commits/pushes and coordinator review. |
+| Stop Conditions | A source behavior change or protected-corpus edit is required to complete the build regrouping. |
+| Exit Criteria | Target ownership clear, no duplicate VM source route, dual-width full regression passes and reviewed delivery pushed. |
+| Original Owner Request | 准入为当前T任务的多个s任务开始执行，记得先更新t任务的proposal |
+| Similar-Issue Sweep | Every src/vm source occurrence in production/test CMake, including tests derived from exe source lists. |
 
 ## Current Technical Baseline
 
