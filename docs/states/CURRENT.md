@@ -2,28 +2,11 @@
 
 ## Current Work
 
-T58 S4 is active: quiesce machine callbacks before ordered teardown.
+No implementation subtask is active.
+Open task awaiting owner: T58.
 
-## M9 T58 S4 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner approves synchronous shutdown extraction and ordered App teardown. |
-| Objective | Join the machine worker before UI/session destruction; one shutdown path reused by destroy. |
-| Non-goals | No new lifecycle state/thread/queue; no Lib, VM, Compat or MVDM changes. |
-| Reference Baseline | f30b6c5; S3 dual-width 85/85. |
-| Candidate Proposal | [S4 ledger](../proposals/m9-common-test-sync.md). |
-| Files And ABI Surface | Common machine adds shutdown, App cleanup, Common tests/manifests and product boundary proof. |
-| Applicable Rules | Architecture, coding, execution, documentation and linked governance skills. |
-| Verification | Callback barrier, repeated shutdown/destroy, stopped/running/paused, cleanup order, dual full suites. |
-| Expected Markers | shutdown then UI, session, command, machine, VM; no callback after shutdown returns. |
-| Asset Needs | Both fixed EXEs; bounded ignored build/test logs; preserve INI/media. |
-| Reporting Requirements | Commit/push executor P, actual-diff review and S closure; T stays open. |
-| Stop Conditions | New synchronization or product semantics needed beyond approved shutdown. |
-| Exit Criteria | Ledger verified, dual builds/tests, corpus manifests, clean committed/pushed delivery. |
-| Original Owner Request | UI → session → machine → VM；批准提取同步 shutdown；好的。批准。开始执行。 |
-| Similar-Issue Sweep | All machine request admissions, creation failure cleanup, callbacks and App destructor calls. |
+T58 S4 is closed after [shutdown/order acceptance](../history/M9-T58-S4-machine-shutdown.md).
+No next subtask is admitted.
 
 ## Current Technical Baseline
 
@@ -33,10 +16,12 @@ T58 S4 is active: quiesce machine callbacks before ordered teardown.
 - `src/mvdm/softpc.new/` is the preserved selected SoftPC baseline. Its ROM
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
-- T58 S3 product baseline retains the T57 app/config, vm and flat compat
+- T58 S4 product baseline retains the T57 app/config, vm and flat compat
   layout; app/composition now owns all entity assembly and event wiring.
   Main loads config. Both fixed packages pass 85/85 CTest. Only composition
-  includes the VM interface; protected source/shared tests remain unchanged.
+  includes the VM interface. Machine shutdown joins callbacks before ordered
+  UI/session/command/machine/VM disposal. Common API/tests/manifests changed
+  under S4 approval; Lib, VM, Compat and MVDM remain unchanged.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
   normalized `types`/`console`/`host`/`storage`/`kvm-*` corpus has S18 one-time
   wake selection; the T56 baseline passed x64/x86 83/83 CTest;
