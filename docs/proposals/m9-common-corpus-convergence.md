@@ -102,6 +102,19 @@ src/lib、test/lib、src/app、src/host、MVDM、INI/media 零修改。
 双 EXE SHA256：x86 `2CCB6CC88F1540EC292CBF46467E0CE89E2883A201DDB4CA71EF39E092646BE4`；
 x64 `6B9C6016F1835EBBCEAAC17A593F087C4E620B1D8FAD5636B265A32058E5D5F6`。
 
+#### S17 P2 实际提交复核
+
+执行者完整交付 cf0e31b 已推送；随后以 coordinator 复核该提交对
+662ed4b 的实际生产/测试 diff、七项原要求、完整日志及产物哈希。
+reconciler 的决策和完成顺序仅改枚举所有者，全部原矩阵断言保留；
+Machine 在既有锁内核验后复制，无额外 frame 分配或先破坏后拒绝。
+UI 原子先初始化后发布对象，所有 run 标签访问一致；既有故障返回与
+resume/freeze 路径保留。新测试替身只在 test/common，不形成生产旁路。
+Lib、test/lib、app、host、MVDM、INI 的基线 diff 精确为零。
+Common/Lib manifest、DAG、命名及文档门禁复核通过；独立树和探针已删除。
+接受七项 Common 交付，S17 等待 owner/NXVM 反馈；T56 不收口。Lib wake
+分配优化只在 TODO 登记，未偷渡实施，也不是本次 Common 的未完成项。
+
 ### T56 S16：共享测试目录及物理键身份
 
 原始准入：“准入。同时增补任务要求：common/test这个玩意要去掉。

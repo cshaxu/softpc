@@ -4,7 +4,8 @@
 
 Owner retesting passed; [S16 is accepted](../history/M9-T56-S16-shared-tests-and-console-correction.md).
 T56 S17 Common-only repairs are implemented and verified: x64/x86 82/82,
-standalone Common 16/16. Executor delivery and actual-diff review are pending.
+standalone Common 16/16. Executor delivery `cf0e31b` is pushed; coordinator
+actual-diff review passed. S17 awaits owner/NXVM feedback, not T closure.
 Lib changes require later owner review; the deferred wake-allocation item is
 recorded in TODO. No product lifecycle policy was changed.
 T56 remains open; the suspended S13 whole-task audit is not claimed complete.
@@ -39,8 +40,8 @@ T56 remains open; the suspended S13 whole-task audit is not claimed complete.
   inputs are embedded source-mirror inputs; no runtime ROM artifact root is
   active.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
-  normalized `types`/`console`/`host`/`storage`/`kvm-*` corpus has S16 x64/x86
-  corrected product builds with 80/80 CTest;
+  normalized `types`/`console`/`host`/`storage`/`kvm-*` corpus is unchanged by S17;
+  current x64/x86 product builds pass 82/82 CTest;
   strict standalone library suite passes 37/37. Its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.
 
