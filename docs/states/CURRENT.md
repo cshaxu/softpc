@@ -2,31 +2,31 @@
 
 ## Current Work
 
-M9 T56 S10 is closed after implementation `6e11d50` and coordinator review.
-S11 is active. Owner approved necessary narrow MVDM changes on 2026-09-13:
-“批准对mvdm的小范围必要改动”. S10 passed dual-width
-63/63 and strict lib 8/8; this is not completion of S11/S12 debugger capabilities.
+M9 T56 S11 is closed after implementation `8feab8b` and coordinator review.
+S12 is active under the owner's sequential admission and narrow MVDM approval:
+“批准对mvdm的小范围必要改动”. S11 passed dual-width 63/63 and strict lib 8/8;
+watchpoints and final debugger convergence are not yet complete.
 
-## M9 T56 S11 Packet
+## M9 T56 S12 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner: 非常好，准入实施，完成debug和xasm32彻底接通测试。 Sequential S10–S12 plan and permanent commit/push approval apply. |
-| Objective | Implement instruction-count/execute-break plans on the existing executor using the owner-approved narrow instruction-boundary port ABI. |
+| Objective | Connect read/write/execute watches and copied access observations; audit all 17 debug operations and command consumers, remove remaining unconnected paths, and verify both packages. |
 | Non-goals | No second executor, lib changes, guest media edits, direct common-to-MVDM dependencies or unapproved preserved-source changes. S11/S12 own execution plans/watchpoints. |
-| Reference Baseline | S10 delivery 6e11d50 and approved follow-on design f4a8648; S10 closure below. |
+| Reference Baseline | S11 delivery 8feab8b and its reviewed closure; approved follow-on design f4a8648. |
 | Candidate Proposal | [Common convergence](../proposals/m9-common-corpus-convergence.md). |
-| Files And ABI Surface | Product debug adapter, machine execution-plan/result contract and tests; owner-approved necessary c_main instruction notifications and refetch handling, plus later S12 operand notifications. No CPU algorithm or guest TF/DR changes. |
+| Files And ABI Surface | Product debug adapter, copied machine results, debug consumers and tests; necessary original CPU operand notifications in c_page/c_main. No CPU algorithm or guest TF/DR changes. |
 | Applicable Rules | Execution, documentation, architecture, coding authorities and Product UI. |
-| Verification | Deterministic real instruction-count/break tests including special control-transfer and exception paths, pause/resume/cancel/reset, followed by both full test/build suites. Not yet executed for S11. |
+| Verification | Real read/write/execute watch hits, non-hits, overlap/fault/inspection isolation, query/clear, cancellation and command output; all debug operation ledger entries; dual-width full suites, strict lib and shipping package. |
 | Expected Markers | Single command/executor rendezvous; original CPU/device functions own behavior; no fake successful read or ignored rejection. |
 | Asset Needs | Refresh both fixed EXEs only; preserve user INI/media. Test-only disposable memory/program fixtures. |
 | Reporting Requirements | Every complete P committed/pushed; retain operation ledger, line accounting, tests and both EXE links. |
 | Stop Conditions | A missing safe boundary requiring MVDM change must be presented with exact evidence and a separate port-ABI approval; no guessed CPU semantics. |
-| Exit Criteria | S11 execution plans have real positive/negative instruction-boundary proof; dual-width tests/packages, review, commit/push and clean tree. Unsupported is not completion. |
+| Exit Criteria | Every operation and command path has actual positive/negative proof or explicit architectural non-applicability; watch/observation paths connected, dual-width tests/packages, review, commit/push and clean tree. Unsupported is not completion. |
 | Original Owner Request | 准入实施，完成debug和xasm32彻底接通测试。 |
-| Similar-Issue Sweep | All instruction completion bypasses, exception paths, refetch after paused CS:EIP edits, plan cancellation and guest TF/DR isolation. |
+| Similar-Issue Sweep | Operand read/write families, access nesting, faults, debugger inspection, watch matching/retirement, remaining dormant public paths and CLI failure propagation. |
 
 ## Current Technical Baseline
 
@@ -44,6 +44,7 @@ S11 is active. Owner approved necessary narrow MVDM changes on 2026-09-13:
 
 ## Recent M9 Closures
 
+| T56 S11 | Original CPU trace/break execution and CLI completion connected; watchpoints remain S12. | [S11 closure](../history/M9-T56-S11-debug-execution-plans.md) |
 | T56 S10 | Synchronous debug access completed; S11/S12 need explicit port-ABI decision. | [S10 closure](../history/M9-T56-S10-synchronous-debug-access.md) |
 | T56 S4 | Generic executor, lifecycle/input queues, run generation and completed-frame publication now belong to `common/machine`; app retains only its injected SoftPC driver. | [S4 closure](../history/M9-T56-S4-common-machine-extraction.md) |
 | T56 S5 | App/host direct lib ownership was audited; the speaker worker now has one explicit app-managed lifecycle. | [S5 closure](../history/M9-T56-S5-ownership-audio-lifecycle.md) |
