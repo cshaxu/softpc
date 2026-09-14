@@ -10,13 +10,17 @@ host/
   standalone host callback implementations: timer, media, BOP services,
   conapi-compatible surfaces, input, audio, serial and parallel endpoints
         ↑
+common/session/
+  control FIFO, copied completion reduction, command/provider injection and
+  dispatch to the selected UI and machine adapters
+        ↑
 common/ui/
   broker, cooked monitor Console, raw VM Console, Window/KVM instances and
   presentation execution; copied events are injected into the product
         ↑
 app/
-  product configuration, title/hotkey/status policy, control/executor and
-  guest-input adapter; no machine-state access from frontends
+  product configuration, entity assembly, CLI/title/hotkey/status policy,
+  machine executor and guest-input adapter; no control reduction in app
         ↑
 lib/{types,console,host,storage,kvm-base,kvm-window,kvm-console}/
   canonical shared platform library, delivered for NXVM to adopt exactly:
@@ -35,11 +39,14 @@ and pointer-representation corrections may be direct, source-visible diffs at
 the affected point when they remain mechanical and introduce no machine policy.
 `host/` owns larger host adaptations, including new state, lifecycle,
 capability, ownership, and policy, but does not own guest-visible state.
-`common/ui` is the sole owner of the monitor logical Console, broker, raw VM
-Console and Window/KVM instances; it receives only copied product policy and
-returns copied events. `app/` currently owns the single executor, machine
-snapshot producer, guest-input adapter and product binding; later common
-extraction does not change the current UI ownership boundary.
+`common/session` is the sole owner of the product-neutral control queue,
+desired/actual reduction, prompt scheduling and dispatch order. It receives
+the SoftPC CLI and machine adapter as injected callbacks; it does not parse
+configuration or interpret machine internals. `common/ui` is the sole owner
+of the monitor logical Console, broker, raw VM Console and Window/KVM
+instances; it receives only copied product policy and returns copied events.
+`app/` owns configuration, entity assembly, the single executor, machine
+snapshot producer, guest-input adapter and the SoftPC CLI binding.
 `lib/` is the canonical checked-in shared-library corpus, not a runtime or
 build dependency on NXVM or NTVDM64. NXVM adopts this corpus exactly. It
 consumes and produces copied host values only. It owns
@@ -111,8 +118,8 @@ delegates raw decoding to same-shape selected platform functions; Window-only
 message decoding and key-state queries remain in kvm-window. This support API
 is not an application input API.
 
-SoftPC control is the sole product-state writer. VM, host, and KVM workers only
-enqueue copied events/completions to its app-owned queue. The control thread
+Common session control is the sole product-state writer. VM, host, and KVM
+workers only enqueue copied events/completions to its common-owned queue. The control thread
 derives runtime commands independently from the required component instances,
 using config, frame route, and completed actual state; a derived action is
 control-private and is never a shared VM/presenter intent. Runtime owns the

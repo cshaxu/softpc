@@ -115,6 +115,27 @@ endforeach()
 if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/src/common/ui/ui.c")
     message(FATAL_ERROR "Common UI source is missing")
 endif()
+if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/src/common/session/session.c")
+    message(FATAL_ERROR "Common session source is missing")
+endif()
+foreach(retired_session_source IN ITEMS
+    "src/app/control.c"
+    "src/app/control.h"
+    "src/app/control_state.c"
+    "src/app/control_state.h"
+    "src/app/reconciler.c"
+    "src/app/reconciler.h"
+    "src/app/presentation_plan.c"
+    "src/app/presentation_plan.h")
+    if(EXISTS "${SOFTPC_SOURCE_DIR}/${retired_session_source}")
+        message(FATAL_ERROR "Application retains a second session implementation: ${retired_session_source}")
+    endif()
+endforeach()
+file(READ "${SOFTPC_SOURCE_DIR}/src/app/main.c" app_session_composition)
+if(NOT app_session_composition MATCHES "common_session_create" OR
+   app_session_composition MATCHES "common_session_(queue|state|reconciler)_")
+    message(FATAL_ERROR "Application must compose, not implement, common session control")
+endif()
 
 # The imported KVM component consumes copied values only.
 # It cannot acquire SoftPC's runtime, machine, renderer, or original key-map

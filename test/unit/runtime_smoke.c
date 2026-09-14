@@ -1,5 +1,5 @@
 #include "runtime.h"
-#include "control.h"
+#include "common/session/control.h"
 #include "input_queue.h"
 #include "test_cleanup.h"
 
@@ -92,22 +92,22 @@ int main(void)
     /* The product control FIFO must not turn a short input burst into a
        silently dropped make/break sequence at its old fixed-64 boundary. */
     {
-        app_control_queue *queue = NULL;
+        common_session_queue *queue = NULL;
         kvm_input_event event = { 0 };
-        app_control_event copied;
+        common_session_event copied;
         unsigned int index;
-        assert(app_control_queue_create(&queue));
+        assert(common_session_queue_create(&queue));
         event.type = KVM_EVENT_TEXT;
         for (index = 0u; index < 96u; ++index) {
             event.data.text.scalar = index;
-            assert(app_control_queue_push_ux(queue, &event));
+            assert(common_session_queue_push_ux(queue, &event));
         }
         for (index = 0u; index < 96u; ++index) {
-            assert(app_control_queue_take(queue, &copied, 0u));
-            assert(copied.kind == APP_CONTROL_KVM_INPUT);
+            assert(common_session_queue_take(queue, &copied, 0u));
+            assert(copied.kind == COMMON_SESSION_EVENT_KVM_INPUT);
             assert(copied.value.kvm.data.text.scalar == index);
         }
-        app_control_queue_destroy(queue);
+        common_session_queue_destroy(queue);
     }
     {
         app_input_queue *queue = NULL;

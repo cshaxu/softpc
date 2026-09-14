@@ -1,22 +1,24 @@
-#include "presentation_plan.h"
+#include "common/session/presentation_plan.h"
 
-app_presentation_plan app_presentation_derive(softpc_presentation display,
-    int console_control, app_runtime_state state, int frame_available,
-    int graphics)
+common_session_presentation_plan common_session_derive_presentation(
+    common_session_display display, lib_bool console_control,
+    common_session_machine_state state, lib_bool frame_available,
+    lib_bool graphics)
 {
-    app_presentation_plan plan = { 0, 0, 1 };
+    common_session_presentation_plan plan = { LIB_FALSE, LIB_FALSE, LIB_TRUE };
 
-    if (state == SOFTPC_RUNTIME_STOPPED || state == SOFTPC_RUNTIME_ERROR)
+    if (state == COMMON_SESSION_MACHINE_STOPPED ||
+        state == COMMON_SESSION_MACHINE_ERROR)
         return plan;
     /* Pause releases the raw VM Console before its component is retired, but
      * an already meaningful Window remains a paused view.  Static Window
      * display always retains it; Console display retains it only when the
      * last completed guest frame was graphical. */
-    if (state == SOFTPC_RUNTIME_PAUSED) {
-        plan.window_enabled = display == SOFTPC_PRESENTATION_WINDOW || graphics;
+    if (state == COMMON_SESSION_MACHINE_PAUSED) {
+        plan.window_enabled = display == COMMON_SESSION_DISPLAY_WINDOW || graphics;
         return plan;
     }
-    if (display == SOFTPC_PRESENTATION_WINDOW) {
+    if (display == COMMON_SESSION_DISPLAY_WINDOW) {
         plan.window_enabled = 1;
         return plan;
     }

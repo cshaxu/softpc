@@ -222,6 +222,27 @@ lib Console/KVM/broker 对象。旧 `app/monitor.[ch]` 与
 结束后进入 S3；session reducer/CLI/machine executor 仍是 app 的唯一实现，
 没有宣称已迁移。
 
+### S3 P1 执行证据
+
+`common/session` 现拥有生产 control FIFO、actual-state reducer、frame
+sequence gate、presentation action 推导、prompt scheduling 以及唯一的
+control-loop dispatch。`app/main.c` 仅读取配置、创建实体，并注入 SoftPC
+runtime adapter 与 `command.c` CLI provider；它不再拥有 queue、reducer、
+presenter action、prompt scheduler 或 control loop。原
+`app/{control,control_state,reconciler,presentation_plan}.[ch]` 已同一交付
+删除。app 对 runtime 枚举和 lifecycle request 的转换均是显式 composition
+boundary，不依赖两个组件的枚举编号相同。
+
+completed runtime 文案继续由 CLI provider 暂存，只有 cooked monitor 为
+Current Console 时才输出；不会在 raw Console 路由中写入 monitor 状态文本。
+新增 source-boundary gate 同时拒绝旧 app session 文件和 main 中重新出现的
+queue/state/reconciler 实现。types-layout self-test 在每次运行前删除全部
+自有 fixture probe，失败/中断后的残留不再污染下一次正向检查。
+
+固定 package 构建、完整 CTest 各 58/58：x64 与 x86 均通过；strict lib CTest
+8/8、documentation/DAG gate 与 diff hygiene 通过。两个交付 EXE 同步刷新：
+`assets/binary/softpc32.exe` 和 `assets/binary/softpc64.exe`；INI 与媒体未改。
+
 ## 每个 S 的退出条件
 
 1. 迁入职责在 SoftPC 生产路径实际使用（S6/S7 新能力按上表契约验收）；

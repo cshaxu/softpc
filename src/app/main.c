@@ -1,6 +1,5 @@
 #include "command.h"
-#include "control.h"
-#include "control_state.h"
+#include "common/session/session_interface.h"
 #include "runtime.h"
 #include "machine.h"
 #include "prompt_trace.h"
@@ -28,10 +27,12 @@ typedef struct app_startup_config {
     softpc_media_mode media_mode;
 } app_startup_config;
 
-typedef struct app_monitor_control {
-    app_control_state state;
-    app_runtime_frame frame;
-} app_monitor_control;
+/* app owns the SoftPC CLI policy and machine adapter.  common/session only
+ * sees this copied, product-neutral provider contract. */
+typedef struct app_command_binding {
+    app_command_session session;
+    app_runtime *runtime;
+} app_command_binding;
 
 static char *app_trim(char *text)
 {
@@ -195,317 +196,238 @@ invalid:
     return 0;
 }
 
-static common_ui_state app_ui_state(app_runtime_state state)
+static common_session_display app_session_display(softpc_presentation display)
+{
+    return display == SOFTPC_PRESENTATION_WINDOW ?
+        COMMON_SESSION_DISPLAY_WINDOW : COMMON_SESSION_DISPLAY_CONSOLE;
+}
+
+static common_session_machine_state app_session_state(app_runtime_state state)
 {
     switch (state) {
-    case SOFTPC_RUNTIME_RUNNING: return COMMON_UI_STATE_RUNNING;
-    case SOFTPC_RUNTIME_PAUSED: return COMMON_UI_STATE_PAUSED;
-    case SOFTPC_RUNTIME_ERROR: return COMMON_UI_STATE_ERROR;
-    default: return COMMON_UI_STATE_STOPPED;
+    case SOFTPC_RUNTIME_RUNNING: return COMMON_SESSION_MACHINE_RUNNING;
+    case SOFTPC_RUNTIME_PAUSED: return COMMON_SESSION_MACHINE_PAUSED;
+    case SOFTPC_RUNTIME_ERROR: return COMMON_SESSION_MACHINE_ERROR;
+    case SOFTPC_RUNTIME_RESET_COMPLETED:
+        return COMMON_SESSION_MACHINE_RESET_COMPLETED;
+    default: return COMMON_SESSION_MACHINE_STOPPED;
     }
 }
 
-static common_ui_action app_ui_action(app_reconciler_action action)
+/* app/ owns the product runtime ABI.  common/session owns its neutral copied
+ * completion facts; convert explicitly at this one composition boundary.
+ * The numeric enum values are deliberately not a cross-component contract. */
+static app_runtime_state app_runtime_completed_state(
+    common_session_machine_state state)
 {
-    switch (action) {
-    case APP_RECONCILER_ACTION_NONE: return COMMON_UI_ACTION_NONE;
-    case APP_RECONCILER_ACTION_CREATE_WINDOW: return COMMON_UI_ACTION_CREATE_WINDOW;
-    case APP_RECONCILER_ACTION_CREATE_VM_CONSOLE: return COMMON_UI_ACTION_CREATE_VM_CONSOLE;
-    case APP_RECONCILER_ACTION_BIND_VM_CONSOLE: return COMMON_UI_ACTION_BIND_VM_CONSOLE;
-    case APP_RECONCILER_ACTION_BIND_MONITOR: return COMMON_UI_ACTION_BIND_MONITOR;
-    case APP_RECONCILER_ACTION_DESTROY_VM_CONSOLE: return COMMON_UI_ACTION_DESTROY_VM_CONSOLE;
-    case APP_RECONCILER_ACTION_DESTROY_WINDOW: return COMMON_UI_ACTION_DESTROY_WINDOW;
+    switch (state) {
+    case COMMON_SESSION_MACHINE_RUNNING: return SOFTPC_RUNTIME_RUNNING;
+    case COMMON_SESSION_MACHINE_PAUSED: return SOFTPC_RUNTIME_PAUSED;
+    case COMMON_SESSION_MACHINE_ERROR: return SOFTPC_RUNTIME_ERROR;
+    case COMMON_SESSION_MACHINE_RESET_COMPLETED:
+        return SOFTPC_RUNTIME_RESET_COMPLETED;
+    default: return SOFTPC_RUNTIME_STOPPED;
     }
-    return COMMON_UI_ACTION_NONE;
 }
 
-static int app_ui_event_enqueue(void *opaque, const common_ui_event *event)
+static app_monitor_state app_command_state(common_session_machine_state state)
 {
-    app_control_queue *queue = (app_control_queue *)opaque;
-    if (queue == NULL || event == NULL) return 0;
-    switch (event->kind) {
-    case COMMON_UI_EVENT_KVM_INPUT:
-        return app_control_queue_push_kvm_for_run(queue, &event->value.kvm,
-            event->run_generation);
-    case COMMON_UI_EVENT_MONITOR_LINE:
-        return app_control_queue_push_monitor_line(queue, &event->value.line,
-            event->monitor_line_rejected);
-    case COMMON_UI_EVENT_COMPONENT_COMPLETED:
-        return app_control_queue_push_component_completed(queue,
-            event->value.component.component == COMMON_UI_COMPONENT_WINDOW ?
-                APP_CONTROL_COMPONENT_WINDOW : APP_CONTROL_COMPONENT_VM_CONSOLE,
-            event->value.component.exists, event->run_generation);
-    case COMMON_UI_EVENT_BROKER_COMPLETED:
-        return app_control_queue_push_broker_completed(queue,
-            event->value.broker_vm_console_current, event->run_generation);
-    case COMMON_UI_EVENT_KVM_DELIVERY_FAILED:
-        return app_control_queue_push_kvm_delivery_failed(queue,
-            event->value.delivery_failure.source_identity,
-            event->value.delivery_failure.status, event->run_generation);
-    case COMMON_UI_EVENT_CONSOLE_FAILED:
-        return app_control_queue_push_console_failed(queue);
+    switch (state) {
+    case COMMON_SESSION_MACHINE_INIT: return APP_MONITOR_INIT;
+    case COMMON_SESSION_MACHINE_RUNNING: return APP_MONITOR_RUNNING;
+    case COMMON_SESSION_MACHINE_PAUSED: return APP_MONITOR_PAUSED;
+    default: return APP_MONITOR_STOPPED;
     }
-    return 0;
 }
 
-static int app_monitor_drive(app_runtime *runtime, common_ui *ui,
-    app_monitor_control *control)
-{
-    app_reconciler_action action;
-    int console_status_surface;
-    app_control_state *state;
-    if (ui == NULL || control == NULL) return 0;
-    state = &control->state;
-    common_ui_set_run_generation(ui, app_runtime_run_generation(runtime));
-    action = app_control_state_take_action(state);
-    if (action != APP_RECONCILER_ACTION_NONE &&
-        common_ui_apply_action(ui, app_ui_action(action),
-            app_ui_state(state->presentation.runtime_actual)) != LIB_STATUS_OK) return 0;
-    if (state->observed_frame_sequence == 0u ||
-        !app_control_state_frame_targets_ready(state)) return 1;
-    console_status_surface = state->presentation.display ==
-        SOFTPC_PRESENTATION_CONSOLE && !state->presentation.console_control &&
-        control->frame.graphics != 0u;
-    return common_ui_publish_frame(ui, &control->frame,
-        state->presentation.window_actual,
-        state->presentation.vm_console_actual &&
-            state->presentation.current_console_actual == APP_RECONCILER_CONSOLE_VM,
-        console_status_surface) == LIB_STATUS_OK;
-}
-
-/* The control loop is the only caller that translates a parsed lifecycle
- * request into runtime work.  Presentation reconciliation is deliberately
- * separate and cannot manufacture or consume this request. */
-static int app_monitor_dispatch_lifecycle(app_runtime *runtime,
-    app_lifecycle_request request)
+static common_session_request app_session_request(app_lifecycle_request request)
 {
     switch (request) {
-    case APP_LIFECYCLE_REQUEST_NONE: return 1;
-    case APP_LIFECYCLE_REQUEST_START: return app_runtime_start(runtime);
-    case APP_LIFECYCLE_REQUEST_PAUSE: return app_runtime_pause(runtime);
-    case APP_LIFECYCLE_REQUEST_RESUME: return app_runtime_resume(runtime);
-    case APP_LIFECYCLE_REQUEST_STOP: return app_runtime_stop(runtime);
-    case APP_LIFECYCLE_REQUEST_RESET: return app_runtime_reset(runtime);
+    case APP_LIFECYCLE_REQUEST_START: return COMMON_SESSION_REQUEST_START;
+    case APP_LIFECYCLE_REQUEST_RESUME: return COMMON_SESSION_REQUEST_RESUME;
+    case APP_LIFECYCLE_REQUEST_PAUSE: return COMMON_SESSION_REQUEST_PAUSE;
+    case APP_LIFECYCLE_REQUEST_STOP: return COMMON_SESSION_REQUEST_STOP;
+    case APP_LIFECYCLE_REQUEST_RESET: return COMMON_SESSION_REQUEST_RESET;
+    default: return COMMON_SESSION_REQUEST_NONE;
     }
-    return 0;
 }
 
-static int app_monitor_arm_if_ready(app_command_session *session,
-    const app_control_state *state, common_ui *ui)
+static app_lifecycle_request app_lifecycle_request_from_session(
+    common_session_request request)
 {
+    switch (request) {
+    case COMMON_SESSION_REQUEST_START: return APP_LIFECYCLE_REQUEST_START;
+    case COMMON_SESSION_REQUEST_RESUME: return APP_LIFECYCLE_REQUEST_RESUME;
+    case COMMON_SESSION_REQUEST_PAUSE: return APP_LIFECYCLE_REQUEST_PAUSE;
+    case COMMON_SESSION_REQUEST_STOP: return APP_LIFECYCLE_REQUEST_STOP;
+    case COMMON_SESSION_REQUEST_RESET: return APP_LIFECYCLE_REQUEST_RESET;
+    default: return APP_LIFECYCLE_REQUEST_NONE;
+    }
+}
+
+static void app_command_copy_effect(common_session_command_result *out,
+    const app_command_effect *effect)
+{
+    if (out == NULL || effect == NULL) return;
+    *out = (common_session_command_result) { 0 };
+    (void)snprintf(out->text, sizeof(out->text), "%s", effect->text);
+    out->exit_requested = effect->exit_requested != 0;
+    out->arm_prompt = effect->arm_prompt != 0;
+}
+
+static lib_bool app_session_machine_request(void *opaque,
+    common_session_request request)
+{
+    app_runtime *runtime = (app_runtime *)opaque;
+    switch (request) {
+    case COMMON_SESSION_REQUEST_NONE: return LIB_TRUE;
+    case COMMON_SESSION_REQUEST_START: return app_runtime_start(runtime) != 0;
+    case COMMON_SESSION_REQUEST_RESUME: return app_runtime_resume(runtime) != 0;
+    case COMMON_SESSION_REQUEST_PAUSE: return app_runtime_pause(runtime) != 0;
+    case COMMON_SESSION_REQUEST_STOP: return app_runtime_stop(runtime) != 0;
+    case COMMON_SESSION_REQUEST_RESET: return app_runtime_reset(runtime) != 0;
+    }
+    return LIB_FALSE;
+}
+
+static lib_u32 app_session_run_generation(void *opaque)
+{
+    return app_runtime_run_generation((app_runtime *)opaque);
+}
+
+static lib_bool app_session_copy_frame(void *opaque, kvm_frame *frame,
+    lib_u32 *out_run_generation)
+{
+    return app_runtime_copy_published_frame((app_runtime *)opaque, frame,
+        out_run_generation) != 0;
+}
+
+static lib_bool app_session_deliver_input(void *opaque,
+    const kvm_input_event *event)
+{
+    return app_keyboard_deliver_input((app_runtime *)opaque, event) != 0;
+}
+
+static void app_command_provider_open(void *opaque,
+    common_session_command_result *out)
+{
+    app_command_binding *binding = (app_command_binding *)opaque;
     app_command_effect effect = { 0 };
-    app_command_session_note_monitor_current(session,
-        app_control_state_monitor_is_current(state), &effect);
-    if (!effect.arm_prompt) return 1;
-    return (effect.text[0] == '\0' ||
-        common_ui_write_monitor(ui, effect.text) == LIB_STATUS_OK) &&
-        common_ui_write_monitor(ui, "SoftPC> ") == LIB_STATUS_OK &&
-        common_ui_request_monitor_line(ui) == LIB_STATUS_OK;
+    app_command_session_open(&binding->session, &effect);
+    app_command_copy_effect(out, &effect);
+}
+
+static void app_command_provider_reject_line(void *opaque,
+    common_session_command_result *out)
+{
+    app_command_binding *binding = (app_command_binding *)opaque;
+    app_command_effect effect = { 0 };
+    app_command_session_reject_line(&binding->session, &effect);
+    app_command_copy_effect(out, &effect);
+}
+
+static void app_command_provider_submit_line(void *opaque,
+    common_session_machine_state state, const char *line,
+    common_session_command_result *out)
+{
+    app_command_binding *binding = (app_command_binding *)opaque;
+    app_command_effect effect = { 0 };
+    app_command_session_submit_line(&binding->session, app_command_state(state), line,
+        &effect);
+    if (effect.action != APP_COMMAND_ACTION_NONE) {
+        int succeeded = effect.action == APP_COMMAND_ACTION_EJECT_FLOPPY ?
+            app_runtime_set_floppy(binding->runtime, NULL) :
+            app_runtime_set_floppy(binding->runtime, effect.path);
+        app_command_session_complete_floppy(&binding->session, effect.action,
+            succeeded, &effect);
+    }
+    app_command_copy_effect(out, &effect);
+    out->request = app_session_request(
+        app_command_session_take_request(&binding->session));
+}
+
+static lib_bool app_command_provider_begin_external(void *opaque,
+    common_session_machine_state state, common_session_request request)
+{
+    app_command_binding *binding = (app_command_binding *)opaque;
+    return app_command_session_begin_external(&binding->session,
+        app_command_state(state), app_lifecycle_request_from_session(request)) != 0;
+}
+
+static void app_command_provider_note_runtime(void *opaque,
+    common_session_machine_state prior, common_session_machine_state completed,
+    common_session_command_result *out)
+{
+    app_command_binding *binding = (app_command_binding *)opaque;
+    app_command_effect effect = { 0 };
+    app_command_session_note_runtime(&binding->session, app_command_state(prior),
+        app_runtime_completed_state(completed), &effect);
+    app_command_copy_effect(out, &effect);
+}
+
+static void app_command_provider_note_broker(void *opaque,
+    common_session_machine_state state, lib_bool vm_console_current,
+    lib_bool monitor_running_surface)
+{
+    app_command_binding *binding = (app_command_binding *)opaque;
+    app_command_session_note_broker(&binding->session, app_command_state(state),
+        vm_console_current != 0, monitor_running_surface != 0);
+}
+
+static void app_command_provider_note_monitor_current(void *opaque,
+    lib_bool current, common_session_command_result *out)
+{
+    app_command_binding *binding = (app_command_binding *)opaque;
+    app_command_effect effect = { 0 };
+    app_command_session_note_monitor_current(&binding->session, current != 0,
+        &effect);
+    app_command_copy_effect(out, &effect);
+}
+
+static lib_bool app_command_provider_handle_hotkey(void *opaque,
+    common_session_machine_state state, const char *identifier,
+    common_session_command_result *out)
+{
+    app_command_binding *binding = (app_command_binding *)opaque;
+    common_session_request request = COMMON_SESSION_REQUEST_NONE;
+    *out = (common_session_command_result) { 0 };
+    if (identifier == NULL) return LIB_FALSE;
+    if (strcmp(identifier, "pause-toggle") == 0) {
+        request = state == COMMON_SESSION_MACHINE_PAUSED ?
+            COMMON_SESSION_REQUEST_RESUME : COMMON_SESSION_REQUEST_PAUSE;
+        if (!app_command_provider_begin_external(binding, state, request))
+            return LIB_TRUE;
+        out->request = request;
+        return LIB_TRUE;
+    }
+    if (strcmp(identifier, "release-window-mouse") == 0) {
+        out->release_window_mouse = LIB_TRUE;
+        return LIB_TRUE;
+    }
+    if (state != COMMON_SESSION_MACHINE_RUNNING) return LIB_TRUE;
+    if (strcmp(identifier, "send-ctrl-alt-del") == 0)
+        return app_keyboard_submit_ctrl_alt_del(binding->runtime,
+            app_keyboard_deliver_input) != 0;
+    if (strcmp(identifier, "send-alt-enter") == 0)
+        return app_keyboard_submit_alt_enter(binding->runtime,
+            app_keyboard_deliver_input) != 0;
+    return LIB_TRUE;
 }
 
 static void app_runtime_state_completed(void *opaque, app_runtime_state state,
     uint32_t run_generation)
 {
-    app_control_queue *queue = (app_control_queue *)opaque;
-    if (queue == NULL) return;
-    (void)app_control_queue_push_runtime_completed(queue, state, run_generation);
+    common_session *session = (common_session *)opaque;
+    (void)common_session_enqueue_runtime_completed(session, app_session_state(state),
+        run_generation);
 }
 
 static void app_runtime_frame_published(void *opaque, uint32_t sequence,
     int graphics, uint32_t run_generation)
 {
-    app_control_queue *queue = (app_control_queue *)opaque;
-    if (queue == NULL) return;
-    (void)app_control_queue_push_frame_completed(queue, sequence, graphics,
-        run_generation);
-}
-
-/* Product hotkey interpretation lives with the control/reconciler.  The KVM
- * leaf has already converted a matching chord into a copied identifier; the
- * control path alone decides its lifecycle effect and preserves the resume
- * ordering required by the Console-object contract. */
-static int app_monitor_handle_ux(app_control_queue *queue, app_runtime *runtime,
-    common_ui *ui, app_command_session *session,
-    app_monitor_control *control,
-    const kvm_input_event *event)
-{
-    app_control_state *state = control == NULL ? NULL : &control->state;
-    if (state == NULL) return 0;
-    if (event != NULL && event->type == KVM_EVENT_WINDOW_CLOSE) {
-        if (state->monitor_actual == APP_MONITOR_RUNNING &&
-            !app_command_session_begin_external(session,
-                state->monitor_actual, APP_LIFECYCLE_REQUEST_PAUSE)) return 0;
-        app_control_state_note_window_close(state);
-        return app_runtime_get_state(runtime) != SOFTPC_RUNTIME_RUNNING ||
-            app_runtime_pause(runtime);
-    }
-    if (event != NULL && event->type == KVM_EVENT_HOTKEY &&
-        strcmp(event->data.hotkey.identifier, "pause-toggle") == 0) {
-        app_lifecycle_request request =
-            state->monitor_actual == APP_MONITOR_PAUSED ?
-                APP_LIFECYCLE_REQUEST_RESUME : APP_LIFECYCLE_REQUEST_PAUSE;
-        if (!app_command_session_begin_external(session, state->monitor_actual,
-                request)) return 1;
-        return request == APP_LIFECYCLE_REQUEST_RESUME ?
-            app_runtime_resume(runtime) : app_runtime_pause(runtime);
-    }
-    if (event != NULL && event->type == KVM_EVENT_HOTKEY &&
-        strcmp(event->data.hotkey.identifier, "release-window-mouse") == 0) {
-        return common_ui_release_window_mouse(ui) == LIB_STATUS_OK;
-    }
-    return app_control_handle_ux(queue, runtime, event,
-        state->monitor_actual == APP_MONITOR_RUNNING ? SOFTPC_RUNTIME_RUNNING :
-        state->monitor_actual == APP_MONITOR_PAUSED ? SOFTPC_RUNTIME_PAUSED :
-        SOFTPC_RUNTIME_STOPPED);
-}
-
-static int app_monitor(app_runtime *runtime, softpc_presentation presentation,
-    int console_control, common_ui *ui,
-    app_control_queue *control_queue)
-{
-    char line[SOFTPC_CONFIG_PATH_MAX + 64u];
-    app_command_session session;
-    app_command_effect command_effect;
-    app_monitor_control control = { 0 };
-    app_control_state *state = &control.state;
-    app_control_state_initialize(state, presentation, console_control);
-    app_command_session_initialize(&session, presentation);
-    app_command_session_open(&session, &command_effect);
-    if (command_effect.text[0] != '\0')
-        (void)common_ui_write_monitor(ui, command_effect.text);
-    if (!app_monitor_arm_if_ready(&session, state, ui)) goto failed;
-    for (;;) {
-        for (;;) {
-            app_control_event control_event;
-            int broker_monitor_completed = 0;
-            if (app_control_queue_take(control_queue, &control_event, 100u)) {
-                if (control_event.kind == APP_CONTROL_KVM_INPUT) {
-                    /* A component can have queued an event just before an
-                     * old VM run stopped. It cannot affect a later run, nor
-                     * enter the already-stopped machine path. */
-                    if (!app_control_accept_kvm_event(&control_event,
-                            app_runtime_run_generation(runtime),
-                            state->monitor_actual == APP_MONITOR_RUNNING ?
-                                SOFTPC_RUNTIME_RUNNING :
-                            state->monitor_actual == APP_MONITOR_PAUSED ?
-                                SOFTPC_RUNTIME_PAUSED : SOFTPC_RUNTIME_STOPPED))
-                        continue;
-                    if (!app_monitor_handle_ux(control_queue, runtime, ui,
-                            &session, &control, &control_event.value.kvm))
-                        goto failed;
-                    if (!app_monitor_drive(runtime, ui, &control)) goto failed;
-                    if (!app_monitor_arm_if_ready(&session, state, ui)) goto failed;
-                    continue;
-                }
-                if (control_event.kind == APP_CONTROL_MONITOR_LINE) {
-                    if (control_event.monitor_line_rejected) {
-                        app_command_session_reject_line(&session, &command_effect);
-                        if (common_ui_write_monitor(ui, command_effect.text) != LIB_STATUS_OK ||
-                            !app_monitor_arm_if_ready(&session, state, ui)) goto failed;
-                        continue;
-                    }
-                    if (control_event.value.line.length >= sizeof(line)) return 1;
-                    memcpy(line, control_event.value.line.text,
-                        control_event.value.line.length);
-                    line[control_event.value.line.length] = '\0';
-                    break;
-                }
-                if (control_event.kind == APP_CONTROL_CONSOLE_FAILED) {
-                    (void)common_ui_write_monitor(ui,
-                        "Console input failed.\r\n");
-                    goto failed;
-                }
-                if (control_event.kind == APP_CONTROL_KVM_DELIVERY_FAILED) {
-                    common_ui_write_monitor(ui,
-                        "KVM input delivery failed.\r\n");
-                    goto failed;
-                }
-                if (control_event.kind == APP_CONTROL_QUEUE_DELIVERY_FAILED) {
-                    common_ui_write_monitor(ui,
-                        "Control queue delivery failed.\r\n");
-                    goto failed;
-                }
-                if (control_event.run_generation != 0u &&
-                    control_event.run_generation != app_runtime_run_generation(runtime))
-                    continue;
-                if (control_event.kind == APP_CONTROL_RUNTIME_COMPLETED)
-                {
-                    app_runtime_state completed = control_event.value.runtime_state;
-                    app_command_session_note_runtime(&session,
-                        state->monitor_actual, completed, &command_effect);
-                    app_control_state_note_runtime(state, completed);
-                }
-                else if (control_event.kind == APP_CONTROL_FRAME_COMPLETED) {
-                    uint32_t frame_run;
-                    uint32_t sequence = control_event.value.frame.sequence;
-                    if (sequence > state->observed_frame_sequence &&
-                        app_runtime_copy_published_frame(runtime, &control.frame,
-                            &frame_run) && control.frame.sequence == sequence &&
-                        frame_run == control_event.run_generation) {
-                        (void)app_control_state_note_frame(state, sequence,
-                            control_event.value.frame.graphics);
-                    }
-                }
-                else if (control_event.kind == APP_CONTROL_COMPONENT_COMPLETED) {
-                    if (control_event.value.component.component ==
-                        APP_CONTROL_COMPONENT_WINDOW)
-                        app_control_state_note_window(state,
-                            control_event.value.component.exists);
-                    else app_control_state_note_vm_console(state,
-                        control_event.value.component.exists);
-                }
-                else if (control_event.kind == APP_CONTROL_BROKER_COMPLETED) {
-                    int vm_console_current =
-                        control_event.value.broker_vm_console_current;
-                    app_control_state_note_current_console(state,
-                        vm_console_current);
-                    broker_monitor_completed = !vm_console_current;
-                }
-                if (!app_monitor_drive(runtime, ui, &control)) goto failed;
-                /* Resume activation belongs after the raw Console handoff,
-                   never before a broker that can take foreground back. */
-                if ((control_event.kind == APP_CONTROL_RUNTIME_COMPLETED ||
-                     control_event.kind == APP_CONTROL_BROKER_COMPLETED) &&
-                    (state->presentation.runtime_actual != SOFTPC_RUNTIME_RUNNING ||
-                     app_control_state_frame_targets_ready(state)))
-                    if (common_ui_set_state(ui,
-                            app_ui_state(state->presentation.runtime_actual)) != LIB_STATUS_OK)
-                        goto failed;
-                /* A monitor completion can be stale with respect to a new
-                 * Console-mode VM binding.  Only the reconciled actual owner
-                 * may make its prompt due. */
-                if (broker_monitor_completed &&
-                    app_control_state_monitor_is_current(state))
-                    app_command_session_note_broker(&session,
-                        state->monitor_actual, 0,
-                        app_control_state_monitor_is_running_graphics_surface(state));
-                if (!app_monitor_arm_if_ready(&session, state, ui)) goto failed;
-                continue;
-            }
-        }
-        if (!app_monitor_drive(runtime, ui, &control)) goto failed;
-        app_command_session_submit_line(&session, state->monitor_actual, line,
-            &command_effect);
-        if (command_effect.exit_requested) {
-            (void)app_runtime_stop(runtime);
-            (void)app_monitor_drive(runtime, ui, &control);
-            return 0;
-        }
-        if (command_effect.action != APP_COMMAND_ACTION_NONE) {
-            int succeeded = command_effect.action == APP_COMMAND_ACTION_EJECT_FLOPPY ?
-                app_runtime_set_floppy(runtime, NULL) :
-                app_runtime_set_floppy(runtime, command_effect.path);
-            app_command_session_complete_floppy(&session, command_effect.action,
-                succeeded, &command_effect);
-        }
-        if (command_effect.text[0] != '\0')
-            (void)common_ui_write_monitor(ui, command_effect.text);
-        if (!app_monitor_dispatch_lifecycle(runtime,
-                app_command_session_take_request(&session))) goto failed;
-        if (!app_monitor_drive(runtime, ui, &control)) goto failed;
-        if (!app_monitor_arm_if_ready(&session, state, ui)) goto failed;
-    }
-failed: return 1;
+    common_session *session = (common_session *)opaque;
+    (void)common_session_enqueue_frame_completed(session, sequence,
+        graphics != 0, run_generation);
 }
 
 int main(int argc, char **argv)
@@ -518,9 +440,11 @@ int main(int argc, char **argv)
     app_runtime *runtime = NULL;
     common_ui *ui = NULL;
     common_ui_options common_options = { 0 };
+    common_session_options session_options = { 0 };
+    app_command_binding command_binding = { 0 };
     kvm_hotkey_registry hotkeys;
     char graphics_console_status[APP_COMMAND_TEXT_CAPACITY];
-    app_control_queue *control_queue = NULL;
+    common_session *session = NULL;
     softpc_machine_result result;
     (void)argv;
 
@@ -561,16 +485,37 @@ int main(int argc, char **argv)
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
     }
-    if (!app_control_queue_create(&control_queue) ||
-        !app_keyboard_hotkeys(&hotkeys)) {
+    if (!app_keyboard_hotkeys(&hotkeys)) {
+        result = SOFTPC_MACHINE_IO_ERROR;
+        goto done;
+    }
+    command_binding.runtime = runtime;
+    app_command_session_initialize(&command_binding.session, options.presentation);
+    session_options.display = app_session_display(options.presentation);
+    session_options.console_control = config.console_control != 0;
+    session_options.machine.context = runtime;
+    session_options.machine.run_generation = app_session_run_generation;
+    session_options.machine.copy_published_frame = app_session_copy_frame;
+    session_options.machine.request = app_session_machine_request;
+    session_options.machine.deliver_input = app_session_deliver_input;
+    session_options.command.context = &command_binding;
+    session_options.command.open = app_command_provider_open;
+    session_options.command.reject_line = app_command_provider_reject_line;
+    session_options.command.submit_line = app_command_provider_submit_line;
+    session_options.command.begin_external = app_command_provider_begin_external;
+    session_options.command.note_runtime = app_command_provider_note_runtime;
+    session_options.command.note_broker = app_command_provider_note_broker;
+    session_options.command.note_monitor_current = app_command_provider_note_monitor_current;
+    session_options.command.handle_hotkey = app_command_provider_handle_hotkey;
+    if (common_session_create(&session, &session_options) != LIB_STATUS_OK) {
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
     }
     (void)snprintf(graphics_console_status, sizeof(graphics_console_status),
         "Insignia SoftPC is running in the Window.\r\n\r\n%s\r\n",
         app_command_hotkey_help());
-    common_options.event_context = control_queue;
-    common_options.event_sink = app_ui_event_enqueue;
+    common_options.event_context = session;
+    common_options.event_sink = common_session_enqueue_ui_event;
     common_options.hotkeys = hotkeys;
     common_options.running_window_title = "Insignia SoftPC (Running)";
     common_options.paused_window_title = "Insignia SoftPC (Paused)";
@@ -579,17 +524,20 @@ int main(int argc, char **argv)
         result = SOFTPC_MACHINE_IO_ERROR;
         goto done;
     }
-    app_runtime_set_state_sink(runtime, app_runtime_state_completed, control_queue);
-    app_runtime_set_frame_sink(runtime, app_runtime_frame_published, control_queue);
-    if (app_monitor(runtime, options.presentation, config.console_control,
-            ui, control_queue) != 0)
+    if (common_session_bind_ui(session, ui) != LIB_STATUS_OK) {
+        result = SOFTPC_MACHINE_IO_ERROR;
+        goto done;
+    }
+    app_runtime_set_state_sink(runtime, app_runtime_state_completed, session);
+    app_runtime_set_frame_sink(runtime, app_runtime_frame_published, session);
+    if (common_session_run(session) == 0)
         result = SOFTPC_MACHINE_IO_ERROR;
 done:
     if (result != SOFTPC_MACHINE_OK)
         fprintf(stderr, "softpcvm: %s\n", softpc_machine_result_name(result));
     app_runtime_destroy(runtime);
     (void)common_ui_destroy(ui);
-    app_control_queue_destroy(control_queue);
+    (void)common_session_destroy(session);
     softpc_machine_destroy(machine);
     return result != SOFTPC_MACHINE_OK;
 }

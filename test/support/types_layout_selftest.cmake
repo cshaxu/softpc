@@ -14,7 +14,11 @@ file(COPY "${SOFTPC_SOURCE_DIR}/src/lib/types" DESTINATION "${fixture}")
 file(REMOVE "${fixture}/consumer.c" "${fixture}/types/probe.h"
     "${fixture}/types/win32/probe.h" "${fixture}/kvm-base/probe_interface.h"
     "${fixture}/kvm-window/win32/probe.c"
-    "${fixture}/kvm-base/win32/probe_interface.h")
+    "${fixture}/kvm-base/win32/probe_interface.h"
+    "${fixture}/host/win32/encoding_probe.c"
+    "${fixture}/kvm-window/win32/encoding_probe.c"
+    "${fixture}/kvm-window/input_probe.c"
+    "${fixture}/kvm-console/input_probe.c")
 set(probe "${fixture}/types/probe.h")
 function(check_layout expected)
     execute_process(COMMAND "${CMAKE_COMMAND}" "-DLIBRARY_ROOT=${fixture}"

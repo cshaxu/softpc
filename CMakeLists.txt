@@ -282,15 +282,11 @@ add_executable(softpcvm
     src/app/runtime.c
     src/app/input_queue.c
     src/app/keyboard.c
-    src/app/control.c
     src/app/command.c
-    src/app/control_state.c
-    src/app/presentation_plan.c
-    src/app/reconciler.c
     src/app/prompt_trace.c
     src/app/firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-machine)
-target_link_libraries(softpcvm PRIVATE types storage kvm-base common-ui)
+target_link_libraries(softpcvm PRIVATE types storage kvm-base common-ui common-session)
 if(WIN32)
     target_link_libraries(softpcvm PRIVATE user32 gdi32)
 endif()
@@ -452,12 +448,12 @@ set_tests_properties(softpc-lifecycle-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-runtime-smoke
     test/unit/runtime_smoke.c
-    src/app/control.c
+    src/common/session/control.c
     src/app/runtime.c
     src/app/input_queue.c
     src/app/keyboard.c
-    src/app/presentation_plan.c
-    src/app/reconciler.c
+    src/common/session/presentation_plan.c
+    src/common/session/reconciler.c
     src/app/prompt_trace.c)
 target_link_libraries(softpc-runtime-smoke PRIVATE softpc-machine types console host storage kvm-base kvm-window kvm-console)
 target_include_directories(softpc-runtime-smoke PRIVATE src/app)
@@ -466,7 +462,7 @@ set_tests_properties(softpc-runtime-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-runtime-restart-boot-smoke
     test/integration/runtime_restart_boot_smoke.c
-    src/app/control.c
+    src/common/session/control.c
     src/app/runtime.c
     src/app/input_queue.c
     src/app/keyboard.c
@@ -481,7 +477,7 @@ set_tests_properties(softpc-runtime-restart-boot-smoke PROPERTIES
     LABELS "integration")
 add_executable(softpc-runtime-input-continuation-smoke
     test/unit/runtime_input_continuation_smoke.c
-    src/app/control.c
+    src/common/session/control.c
     src/app/runtime.c
     src/app/input_queue.c
     src/app/keyboard.c
@@ -561,7 +557,7 @@ set_tests_properties(softpc-kvm-console-retirement-barrier-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-presentation-plan-smoke
     test/unit/presentation_plan_smoke.c
-    src/app/presentation_plan.c)
+    src/common/session/presentation_plan.c)
 target_include_directories(softpc-presentation-plan-smoke PRIVATE src/app src/host)
 target_include_directories(softpc-presentation-plan-smoke PRIVATE src)
 add_test(NAME softpc-presentation-plan-smoke
@@ -569,14 +565,14 @@ add_test(NAME softpc-presentation-plan-smoke
 set_tests_properties(softpc-presentation-plan-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-reconciler-smoke test/unit/reconciler_smoke.c
-    src/app/reconciler.c src/app/presentation_plan.c)
+    src/common/session/reconciler.c src/common/session/presentation_plan.c)
 target_include_directories(softpc-reconciler-smoke PRIVATE src/app src/host src)
 add_test(NAME softpc-reconciler-smoke COMMAND softpc-reconciler-smoke)
 set_tests_properties(softpc-reconciler-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-control-reconciler-integration-smoke
     test/unit/control_reconciler_integration_smoke.c
-    src/app/control.c src/app/reconciler.c src/app/presentation_plan.c)
+    src/common/session/control.c src/common/session/reconciler.c src/common/session/presentation_plan.c)
 target_include_directories(softpc-control-reconciler-integration-smoke PRIVATE
     src/app src/host src)
 target_link_libraries(softpc-control-reconciler-integration-smoke PRIVATE
@@ -587,7 +583,7 @@ set_tests_properties(softpc-control-reconciler-integration-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-control-state-matrix-smoke
     test/unit/control_state_matrix_smoke.c
-    src/app/control_state.c src/app/reconciler.c src/app/presentation_plan.c)
+    src/common/session/control_state.c src/common/session/reconciler.c src/common/session/presentation_plan.c)
 target_include_directories(softpc-control-state-matrix-smoke PRIVATE
     src/app src/host src)
 add_test(NAME softpc-control-state-matrix-smoke
@@ -596,8 +592,8 @@ set_tests_properties(softpc-control-state-matrix-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-command-smoke test/unit/command_smoke.c
     src/app/command.c
-    src/app/reconciler.c
-    src/app/presentation_plan.c)
+    src/common/session/reconciler.c
+    src/common/session/presentation_plan.c)
 target_include_directories(softpc-command-smoke PRIVATE src/app src/host src)
 add_test(NAME softpc-command-smoke COMMAND softpc-command-smoke)
 set_tests_properties(softpc-command-smoke PROPERTIES
