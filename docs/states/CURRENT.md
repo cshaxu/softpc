@@ -2,9 +2,31 @@
 
 ## Current Work
 
-No implementation subtask is active.
-T57 S1-S3 and the whole task are closed on owner approval.
-The XP mirror candidate remains queued, not admitted.
+T58 S1 is active: import NXVM Common tests without changing src.
+T57 remains closed. T58 must stay open after S1 for owner testing.
+Owner approved correcting the stale manifest locally; SoftPC is the canonical
+test corpus for subsequent NXVM adoption. Full verification is in progress.
+
+## M9 T58 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner admits test/common synchronization and S1 closure, explicitly leaves T open. |
+| Objective | Import NXVM tests, correct its stale manifest as approved, deliver canonical SoftPC test corpus. |
+| Non-goals | No src, product semantics, INI or media changes. |
+| Reference Baseline | a1c24ce; source NXVM 4da5d23c checkout. |
+| Candidate Proposal | [Test sync](../proposals/m9-common-test-sync.md). |
+| Files And ABI Surface | test/common, task records and product governance wait-state check; no src or ABI change. |
+| Applicable Rules | Execution, coding, architecture, documentation and linked skills. |
+| Verification | All 16 file hashes, src zero diff, dual-width full tests and governance gate. |
+| Expected Markers | Imported tests identical; corrected manifest; unchanged src; S1 closed and T58 open. |
+| Asset Needs | Fixed x86/x64 EXEs only; ignored bounded build logs, no media edits. |
+| Reporting Requirements | Complete P commit/push, actual-diff review, S1 closure and wait for owner. |
+| Stop Conditions | Any need to change src or product behavior. |
+| Exit Criteria | Snapshot import plus approved manifest correction, both-width proof, reviewed commit/push and clean worktree. |
+| Original Owner Request | 引入nxvm的test/common保持一致；S收口，T开放等测试；不得改src。 |
+| Similar-Issue Sweep | Every relative path and byte hash in both test/common trees. |
 
 ## Current Technical Baseline
 

@@ -1,5 +1,7 @@
 # Long-Term Review Ledger
 
+- TODO(Medium): package acceptance owner — T58 S1 first full x64 run timed out in compact Console at stage 5 while x86 tests ran concurrently; the subsequent serial x64 full suite passed 85/85. Product src and both EXE hashes are unchanged from T57. Concurrency is context, not a proven cause; admit a bounded baseline-package investigation if this stage recurs, without weakening assertions or modifying runtime in the test-corpus task.
+
 - TODO(Medium): Lib Host display owner — T56 S16 corrective probe with an artificial 30x30 buffer and 20x10 viewport observed cooked restoration as 30x10; restoring capacity afterward changed the viewport width instead. Normal full-width narrow/short/scrolled viewports pass. This is distinct from the fixed first-start frame-capacity ordering; admit a host-specific horizontal-scrollback preservation investigation if required, rather than add iterative resize compensation to this startup repair.
 
 - TODO(Medium): SoftPC CPU owner — T56 S12 disposable FNINIT/FILD qword/FISTP qword probe observed an indefinite integer write after a finite read. The debug observation matches actual stored bytes; arithmetic correctness and pre-hook baseline equivalence were not this debug-ABI task's scope. Admit a separate original-x87 baseline comparison if requested; preserve media and do not alter CPU arithmetic in a debugger adapter.
