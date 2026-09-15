@@ -4,7 +4,10 @@
 
 M9 T59 S13 implemented and verified: shared Base synchronization/time, reused
 blocking mutexes, duplicate Console mutex removed. Dual-width 92/92 pass.
-Preparing executor delivery and subsequent actual-patch review for owner audit.
+Executor delivery committed as 3f493f2. Push is blocked by the platform's request
+for explicit authorization of these sources/docs/EXEs to
+https://github.com/cshaxu/softpc.git main. No workaround or S/T closure.
+Post-push coordinator review remains pending.
 S12 delivery bce7fcf/review 780c292 is retained in
 [history](../history/M9-T59-S12-session-event-wait.md); manual acceptance not claimed.
 T59 remains open.

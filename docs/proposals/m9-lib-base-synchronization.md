@@ -98,3 +98,13 @@ Fixed artifacts:
 
 Ready for executor P1 commit/push, then independent actual-patch review P2.
 Await owner testing/audit; neither S13 manual acceptance nor T59 closure claimed.
+
+## Push blocker
+
+Executor P1 is committed as 3f493f2. The initial combined commit/push permission
+review timed out without execution; its permitted local-commit retry succeeded.
+The separate git push origin main was rejected: the platform requires explicit
+owner authorization of this source/document/binary transfer to
+https://github.com/cshaxu/softpc.git main. No workaround or further push retry.
+Local delivery is intact; post-push coordinator review remains pending and no
+closure is claimed. Request that exact authorization before continuing.
