@@ -127,6 +127,13 @@ lib_status host_console_backend_request_cooked_line(
 
 void host_console_backend_lock_output(host_console_backend *native_console)
 { (void)native_console; }
+lib_status host_console_backend_cancel_cooked_line(host_console_backend *native_console,
+    lib_bool *out_completed)
+{
+    *out_completed = !native_console->cooked_request;
+    native_console->cooked_request = LIB_FALSE;
+    return LIB_STATUS_OK;
+}
 void host_console_backend_unlock_output(host_console_backend *native_console)
 { (void)native_console; }
 lib_status host_console_backend_write_bound(host_console_backend *native_console,
@@ -281,6 +288,7 @@ int main(void)
     lib_console *second = LIB_NULL;
     host_console_broker *broker = LIB_NULL;
     host_console_broker *second_broker = LIB_NULL;
+    lib_bool completed;
 
     assert(lib_console_create(&first) == LIB_STATUS_OK);
     assert(lib_console_create(&second) == LIB_STATUS_OK);
@@ -296,6 +304,11 @@ int main(void)
         LIB_STATUS_NOT_CURRENT);
     assert(host_console_broker_request_cooked_line(broker, first) ==
         LIB_STATUS_OK);
+    assert(host_console_broker_cancel_cooked_line(broker, second, &completed) ==
+        LIB_STATUS_NOT_CURRENT && broker->backend->cooked_request);
+    assert(host_console_broker_cancel_cooked_line(broker, first, &completed) ==
+        LIB_STATUS_OK && !completed && !broker->backend->cooked_request);
+    assert(host_console_broker_request_cooked_line(broker, first) == LIB_STATUS_OK);
     host_console_fail_next_activation = 1;
     assert(host_console_broker_replace(broker, first, second,
         HOST_CONSOLE_RAW_EVENTS) == LIB_STATUS_IO_ERROR);

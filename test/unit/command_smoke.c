@@ -43,6 +43,10 @@ static void arm(app_command_session *session, const char *outcome)
         assert(strstr(effect.text, outcome) != NULL);
         assert_blank_line(effect.text);
     }
+    /* Readiness is a level; repeated observations cannot consume a prompt
+     * before Common admits it, nor repeat the already-delivered wording. */
+    app_command_session_note_monitor_current(session, 1, &effect);
+    assert(effect.arm_prompt && effect.text[0] == '\0');
 }
 
 static void complete(app_command_session *session, app_monitor_state *state,

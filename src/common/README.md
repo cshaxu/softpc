@@ -17,6 +17,14 @@ with input callbacks; their run-generation tag uses a Types atomic. Frame
 deduplication and object ownership remain control-thread-local. Native producers
 must be destroyed before the event sink/context is released.
 
+Session owns one pending cooked line until its normal/rejected event is consumed
+or the broker confirms cancellation/handoff. Frame events never request input.
+Provider prompt readiness is level-triggered, not consumed by notification;
+text, explicit requests and prompt admission use one result outlet. While editing,
+notification text first cancels and joins the reader, discarding the partial line.
+A completed queued line remains pending and is still consumed. UI only forwards
+that cancellation to its broker; it owns no second reader state or editor.
+
 | Component | One responsibility | Public contract |
 | --- | --- | --- |
 | `machine` | executor, lifecycle/input queues, frame publication, optional paused debug adapter | `machine_interface.h` |

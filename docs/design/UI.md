@@ -46,6 +46,12 @@ media result, and a completed lifecycle result, ends with one blank line before
 the next prompt. A pure empty line emits no result text and simply rearms the
 prompt.
 
+An asynchronous notification while editing cancels the native read and discards
+the unfinished command. After the reader exits, the notification and fresh prompt
+are printed and a new line is requested. A complete command already in the queue
+is preserved and consumed before another read. This uses native line editing;
+partial input is neither saved nor redrawn.
+
 Raw text cells use lib\'s fixed PC-display byte-to-Unicode mapping, including
 box/block glyphs. It is an approximation for the traditional character set,
 not detection of a DOS code page or an uploaded font. Window retains the copied

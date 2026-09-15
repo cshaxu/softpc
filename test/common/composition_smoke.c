@@ -70,6 +70,9 @@ lib_status host_console_broker_request_cooked_line(host_console_broker *broker,
 { assert(broker->current == expected); return LIB_STATUS_OK; }
 lib_status host_console_broker_destroy(host_console_broker *broker)
 { assert(broker == &broker_fake); return LIB_STATUS_OK; }
+lib_status host_console_broker_cancel_cooked_line(host_console_broker *broker,
+    lib_console *expected, lib_bool *out_completed)
+{ assert(broker->current == expected); *out_completed = LIB_FALSE; return LIB_STATUS_OK; }
 
 static int receive(void *context, const common_ui_event *event)
 {

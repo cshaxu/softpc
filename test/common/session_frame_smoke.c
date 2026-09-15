@@ -36,6 +36,8 @@ lib_status common_ui_write_monitor(common_ui *ui, const char *text)
 { (void)ui; (void)text; return LIB_STATUS_OK; }
 lib_status common_ui_request_monitor_line(common_ui *ui)
 { (void)ui; return LIB_STATUS_OK; }
+lib_status common_ui_cancel_monitor_line(common_ui *ui, lib_bool *out_completed)
+{ (void)ui; *out_completed = LIB_FALSE; return LIB_STATUS_OK; }
 lib_status common_ui_release_window_mouse(common_ui *ui)
 { (void)ui; return LIB_STATUS_OK; }
 lib_status common_ui_publish_frame(common_ui *ui, const kvm_frame *frame,
@@ -86,7 +88,7 @@ int main(void)
     event.value.frame.graphics = 0; /* An earlier text frame. */
     assert(common_session_process_completed(&session, &event));
     assert(copies == 1u && session.state.observed_frame_sequence == 3u);
-    assert(monitor_calls == 1u);
+    assert(monitor_calls == 0u); /* Frames never request a monitor input turn. */
     assert(session.state.presentation.graphics_actual);
     assert(session.state.presentation.in_flight == COMMON_UI_ACTION_CREATE_WINDOW);
     assert(deliveries == 0u); /* Wait for component completion before publishing. */

@@ -35,8 +35,8 @@ static void help(app_command_effect *e)
     (void)snprintf(e->text, sizeof(e->text), "%s\r\n%s\r\n",
                    HELP_COMMANDS, HELP_HOTKEYS);
 }
-/* Product prompt demand is separate from the host's one cooked reader.  The
- * broker alone owns that reader and safely makes its arm request idempotent. */
+/* Product readiness remains true until a command reserves a transition.
+ * Common alone admits one pending line; callbacks never consume readiness. */
 static void prompt(app_command_session *s) { s->prompt_due = 1; }
 static void outcome(app_command_session *s, const char *value)
 {
@@ -74,6 +74,7 @@ static void accept(app_command_session *session,
     session->pending_request = request;
     session->dispatch_pending = 1;
     session->transition_pending = 1;
+    session->prompt_due = 0;
 }
 
 static void lifecycle(app_command_session *s, app_monitor_state state,
@@ -233,6 +234,7 @@ int app_command_session_begin_external(app_command_session *s,
          state != APP_MONITOR_RUNNING && state != APP_MONITOR_PAUSED))
         return 0;
     s->transition_pending = 1;
+    s->prompt_due = 0;
     return 1;
 }
 void app_command_session_complete_floppy(app_command_session *s, app_command_action a, int ok, app_command_effect *e)
@@ -310,7 +312,6 @@ void app_command_session_note_monitor_current(app_command_session *s,
         return;
     text(e, s->pending_monitor_text);
     s->pending_monitor_text[0] = '\0';
-    s->prompt_due = 0;
     e->arm_prompt = 1;
 }
 

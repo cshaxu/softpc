@@ -239,6 +239,13 @@ and pending frames. No new input can precede that reset. Rollback uses the same
 helper; RESET is not activation success or permanent KVM source retirement.
 Cooked rollback restores only an unfinished line request observed after reader
 join; ordinary cooked activation remains explicitly armed by the caller.
+Common session alone holds pending_line through consumption of the copied line
+event. Provider prompt readiness is level-triggered; notifications and explicit
+requests are handled even while that line is pending. Frame events drive display,
+not input admission. Notification output cancels and joins an unfinished cooked
+read through Host's existing retirement path; completed queued commands survive.
+Common UI forwards this operation without new state. Confirmed broker handoff
+also clears pending_line, never a desired-state change alone.
 Win32 host isolates raw frame output from the original cooked screen buffer.
 The broker selects and restores native display metadata inside its existing
 output transaction, before reader startup; same-mode replacements do not switch

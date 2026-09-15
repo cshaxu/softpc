@@ -14,6 +14,7 @@ struct common_session {
     common_machine *machine;
     common_session_command_provider command;
     common_ui *ui;
+    lib_bool pending_line;
 };
 
 static common_ui_state common_session_ui_state(common_session_machine_state state)
@@ -29,14 +30,6 @@ static common_ui_state common_session_ui_state(common_session_machine_state stat
 static void common_session_clear_result(common_session_command_result *result)
 {
     if (result != NULL) *result = (common_session_command_result) { 0 };
-}
-
-static int common_session_write_result(common_session *session,
-    const common_session_command_result *result)
-{
-    if (session == NULL || session->ui == NULL || result == NULL) return 0;
-    return result->text[0] == '\0' ||
-        common_ui_write_monitor(session->ui, result->text) == LIB_STATUS_OK;
 }
 
 static int common_session_deliver_machine_input(void *context,
@@ -60,6 +53,32 @@ static int common_session_dispatch_request(common_session *session,
     }
 }
 
+static int common_session_apply_result(common_session *session,
+    const common_session_command_result *result)
+{
+    if (result->release_window_mouse &&
+        common_ui_release_window_mouse(session->ui) != LIB_STATUS_OK) return 0;
+    if (result->text[0] != '\0' &&
+        common_session_state_monitor_is_current(&session->state)) {
+        if (session->pending_line) {
+            lib_bool completed;
+            if (common_ui_cancel_monitor_line(session->ui, &completed) != LIB_STATUS_OK) return 0;
+            session->pending_line = completed;
+            if (!completed && common_ui_write_monitor(session->ui, "\r\n") != LIB_STATUS_OK)
+                return 0;
+        }
+        if (common_ui_write_monitor(session->ui, result->text) != LIB_STATUS_OK) return 0;
+    }
+    if (!common_session_dispatch_request(session, result->request)) return 0;
+    if (result->request != COMMON_SESSION_REQUEST_NONE ||
+        !result->arm_prompt || session->pending_line ||
+        !common_session_state_monitor_is_current(&session->state)) return 1;
+    if (common_ui_write_monitor(session->ui, result->prompt) != LIB_STATUS_OK ||
+        common_ui_request_monitor_line(session->ui) != LIB_STATUS_OK) return 0;
+    session->pending_line = LIB_TRUE;
+    return 1;
+}
+
 static int common_session_arm_if_ready(common_session *session)
 {
     common_session_command_result result;
@@ -67,13 +86,7 @@ static int common_session_arm_if_ready(common_session *session)
     common_session_clear_result(&result);
     session->command.note_monitor_current(session->command.context,
         common_session_state_monitor_is_current(&session->state), &result);
-    if (result.request != COMMON_SESSION_REQUEST_NONE)
-        return common_session_write_result(session, &result) &&
-            common_session_dispatch_request(session, result.request);
-    if (!result.arm_prompt) return 1;
-    return common_session_write_result(session, &result) &&
-        common_ui_write_monitor(session->ui, result.prompt) == LIB_STATUS_OK &&
-        common_ui_request_monitor_line(session->ui) == LIB_STATUS_OK;
+    return common_session_apply_result(session, &result);
 }
 
 static int common_session_drive(common_session *session)
@@ -122,10 +135,7 @@ static int common_session_handle_kvm_input(common_session *session,
         common_session_clear_result(&result);
         if (!session->command.handle_hotkey(session->command.context, state,
                 event->data.hotkey.identifier, &result)) return 0;
-        return (!result.release_window_mouse ||
-                common_ui_release_window_mouse(session->ui) == LIB_STATUS_OK) &&
-            common_session_write_result(session, &result) &&
-            common_session_dispatch_request(session, result.request);
+        return common_session_apply_result(session, &result);
     }
     return common_session_dispatch_input(session->queue, event, state,
         common_session_deliver_machine_input, session->machine);
@@ -160,10 +170,14 @@ static int common_session_process_completed(common_session *session,
         else common_session_state_note_vm_console(&session->state,
             event->value.component.exists);
     } else if (event->kind == COMMON_SESSION_EVENT_BROKER_COMPLETED) {
+        /* The broker's completed takeover includes old-reader join. */
+        session->pending_line = LIB_FALSE;
         common_session_state_note_current_console(&session->state,
             event->value.broker_vm_console_current);
         broker_monitor_completed = !event->value.broker_vm_console_current;
     } else return 1;
+    if (event->kind == COMMON_SESSION_EVENT_RUNTIME_COMPLETED &&
+        !common_session_apply_result(session, &result)) return 0;
     /* Runtime wording is held by the injected command provider until the
      * monitor is Current.  A raw Console must never receive monitor status
      * text merely because its VM completion arrived first. */
@@ -180,7 +194,8 @@ static int common_session_process_completed(common_session *session,
         session->command.note_broker(session->command.context,
             session->state.monitor_actual, LIB_FALSE,
             common_session_state_monitor_is_running_graphics_surface(&session->state));
-    return common_session_arm_if_ready(session);
+    return event->kind == COMMON_SESSION_EVENT_FRAME_COMPLETED ? 1 :
+        common_session_arm_if_ready(session);
 }
 
 lib_status common_session_create(common_session **out_session,
@@ -272,7 +287,7 @@ int common_session_run(common_session *session)
     if (session == NULL || session->ui == NULL) return 0;
     common_session_clear_result(&result);
     session->command.open(session->command.context, &result);
-    if (!common_session_write_result(session, &result) || !common_session_arm_if_ready(session))
+    if (!common_session_apply_result(session, &result) || !common_session_arm_if_ready(session))
         return 0;
     for (;;) {
         common_session_event event;
@@ -286,6 +301,7 @@ int common_session_run(common_session *session)
             continue;
         }
         if (event.kind == COMMON_SESSION_EVENT_MONITOR_LINE) {
+            session->pending_line = LIB_FALSE;
             common_session_clear_result(&result);
             if (event.monitor_line_rejected) {
                 if (session->command.reject_line == NULL) return 0;
@@ -301,8 +317,7 @@ int common_session_run(common_session *session)
                 (void)common_session_dispatch_request(session, COMMON_SESSION_REQUEST_STOP);
                 return 1;
             }
-            if (!common_session_write_result(session, &result) ||
-                !common_session_dispatch_request(session, result.request) ||
+            if (!common_session_apply_result(session, &result) ||
                 !common_session_drive(session) || !common_session_arm_if_ready(session)) return 0;
             continue;
         }

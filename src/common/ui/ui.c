@@ -321,3 +321,9 @@ lib_status common_ui_request_monitor_line(common_ui *ui)
     return ui == NULL ? LIB_STATUS_INVALID_ARGUMENT :
         host_console_broker_request_cooked_line(ui->broker, ui->monitor);
 }
+
+lib_status common_ui_cancel_monitor_line(common_ui *ui, lib_bool *out_completed)
+{
+    return ui == NULL ? LIB_STATUS_INVALID_ARGUMENT :
+        host_console_broker_cancel_cooked_line(ui->broker, ui->monitor, out_completed);
+}

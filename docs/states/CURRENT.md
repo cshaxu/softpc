@@ -2,8 +2,29 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T59.
+M9 T59 S6 is verified: shared monitor-line admission and raw viewport correctness;
+implementation delivery and coordinator review precede owner manual testing.
+
+## M9 T59 S6 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner admits a new S repairing Common/Lib, simplifying external consumers where justified, then dual-width build/test/commit/push for manual acceptance. |
+| Objective | Separate product notification handling from one outstanding cooked line; ensure raw frame viewport capacity without shrinking existing dimensions. |
+| Non-goals | No MVDM changes, new input loop, focus repair, automatic Window fallback or edits to user configuration/media. |
+| Reference Baseline | d6bbbcc; S2–S5 reviewed and pushed, both 87/87. |
+| Candidate Proposal | [S6 design and ledger](../proposals/m9-monitor-line-viewport.md). |
+| Files And ABI Surface | Common session/UI, Lib Host Win32 display, shared tests/manifests and narrow App provider simplification if required. |
+| Applicable Rules | Architecture/coding/execution/documentation governance skills, repository rules and Product UI. |
+| Verification | New deterministic line-event/frame/notification and cancellation tests; viewport expansion/failure and cooked restoration; x64 and x86 each 89/89, both fixed packages rebuilt. |
+| Expected Markers | No second prompt/reader until consumption or confirmed cancellation; no silently clipped raw surface; cooked restoration preserved. |
+| Asset Needs | Only fixed x86/x64 EXEs refreshed; ignored build/t59-s6-*.log diagnostics bounded to 10 MB each and 10 minutes per run, executor cleans owned logs after retaining evidence; preserve INI/media. |
+| Reporting Requirements | Scope and line accounting, shared manifest verification, tests, pushed complete P, coordinator review and EXE links; await manual testing. |
+| Stop Conditions | Platform expansion requires a second input loop or machine changes; Common gains reader state beyond pending_line. |
+| Exit Criteria | Ledger verified, final dual-width tests pass, complete delivery pushed, clean tree and owner test handoff; do not close T59. |
+| Original Owner Request | 好的，准入一个新的S任务进行修复后编译测试提交推送并报我手动测试。Common和lib修复好了以后，如果app/compat/vm等外部组件可以简化清理，请一并清理。 |
+| Similar-Issue Sweep | All session result/prompt/reader call sites, line rejection/cancellation/completion, external prompt flags, raw surface resizing/restoration and shared negative fixtures. |
 
 T59 S2–S5 are reviewed, pushed and closed. The [retained task brief](../history/M9-T59-product-boundary-cleanup-proposal.md)
 and [S5 review](../history/M9-T59-S5-boundary-convergence.md) record delivery.

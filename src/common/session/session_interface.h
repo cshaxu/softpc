@@ -58,6 +58,9 @@ typedef struct common_session_command_result {
     char prompt[COMMON_SESSION_PROMPT_CAPACITY];
     common_session_request request;
     lib_bool exit_requested;
+    /* Level-triggered readiness, not proof that a reader was requested.
+     * Supply prompt whenever true; session admits it only without a pending
+     * line and while the monitor is Current. Text/requests are still handled. */
     lib_bool arm_prompt;
     lib_bool release_window_mouse;
 } common_session_command_result;

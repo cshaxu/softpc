@@ -319,6 +319,25 @@ lib_status host_console_broker_request_cooked_line(host_console_broker *broker,
     return status;
 }
 
+lib_status host_console_broker_cancel_cooked_line(host_console_broker *broker,
+    lib_console *expected_current, lib_bool *out_completed)
+{
+    lib_status status;
+    if (out_completed != LIB_NULL) *out_completed = LIB_FALSE;
+    if (broker == LIB_NULL || expected_current == LIB_NULL || out_completed == LIB_NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    host_console_lock(broker);
+    if (broker->broken || broker->current != expected_current ||
+        broker->current_mode != HOST_CONSOLE_COOKED_LINES) {
+        host_console_unlock(broker);
+        return LIB_STATUS_NOT_CURRENT;
+    }
+    status = host_console_backend_cancel_cooked_line(broker->backend, out_completed);
+    if (status != LIB_STATUS_OK) broker->broken = LIB_TRUE;
+    host_console_unlock(broker);
+    return status;
+}
+
 lib_status host_console_broker_destroy(host_console_broker *broker)
 {
     lib_console *current;
