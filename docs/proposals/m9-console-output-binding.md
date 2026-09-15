@@ -84,3 +84,21 @@ each has source/caller/test proof above. The source ABI changes only for binding
 adapters, with all in-tree callers migrated. S8's complete reviewed record was
 moved intact to history without claiming owner manual acceptance. Ready for
 executor push and coordinator review; T59 remains open for owner testing.
+
+## P2 coordinator review
+
+After bbc0607 was pushed, reviewed its actual source/API/test changes against
+the original request and finite ledger. Console output fields are accessed only
+under output_lock, held through callback return. Its input/generation path is
+unchanged. Every Host detach still follows backend-output unlock; replacement
+keeps transaction serialization until old context is detached/freed. Native
+prepare/retirement/activation/restoration branches remain, including terminal
+failure handling. Removed branches only tested setters that cannot fail for
+the validated objects. No native implementation or product behavior changed.
+
+The copied-binding test and five deterministic gate cases prove both outputs
+switch together and both wait for old callbacks; broker tests retain reverse
+replacement and generation/rollback checks with added frame assertions. Both
+full suites and four corpus checks pass. HEAD matched origin/main and the tree
+was clean before this review record. Delivery accepted for owner manual testing;
+no claim that the owner has tested S9 or that T59 is closed.

@@ -2,8 +2,8 @@
 
 ## Current Work
 
-M9 T59 S9 is implemented and verified: one Console text/frame output binding.
-Both EXEs pass 90/90 tests; executor delivery awaits push and coordinator review.
+M9 T59 S9 delivery bbc0607 is reviewed and pushed: one Console output binding.
+Both EXEs pass 90/90 tests; await owner manual testing.
 S8 delivery b8dfb78 / review d35b941 is retained in
 [history](../history/M9-T59-S8-kvm-single-control.md); owner testing is not claimed.
 T59 remains open.
