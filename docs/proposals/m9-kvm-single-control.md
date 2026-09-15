@@ -74,3 +74,16 @@ trees were reused; no new diagnostic logs or temporary trees need removal.
 Executor reread the original request and checked each ledger item against its
 source/test evidence. Complete delivery is ready for push and coordinator review;
 owner manual testing and T59 closure are not claimed.
+
+## P2 coordinator review
+
+After b8dfb78 was pushed, switched roles and reviewed the actual committed paths
+and enqueue/worker diff against the original request. Frame publication/take/ack
+and lock ownership are unchanged. STOP still takes frame then control, uses its
+reserved slot and closes admission; ordinary control takes only control_lock.
+Release stays on the Window worker with the existing fault guard, not inside
+the mailbox or caller. All leaf-support callers use the one-record signature.
+No unrelated production paths or public Window APIs changed. The six focused
+tests and both 90/90 suites cover the finite ledger. Corpus manifests reverify;
+the worktree was clean and HEAD matched origin/main before this review record.
+Delivery is accepted for owner testing; T59 remains open.

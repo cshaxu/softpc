@@ -2,8 +2,8 @@
 
 ## Current Work
 
-M9 T59 S8 is implemented and verified: Window freeze uses one control.
-Both fixed EXEs pass 90/90 tests; complete delivery and coordinator review follow.
+M9 T59 S8 delivery b8dfb78 is reviewed and pushed: Window freeze uses one control.
+Both fixed EXEs pass 90/90 tests; await owner manual testing.
 S7 delivery 53753b2 / review 0b853eb remains available for owner testing;
 its [record](../history/M9-T59-S7-debug-original-restoration.md) is retained.
 T59 remains open.
