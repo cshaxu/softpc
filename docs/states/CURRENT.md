@@ -2,9 +2,9 @@
 
 ## Current Work
 
-M9 T59 S17 implemented and verified: Storage ownership and Console disposal
-flattened. Both strict builds and 93/93 tests per width pass. Public API and
-lifecycle unchanged. P1 delivery/coordinator review pending; T59 stays open.
+M9 T59 S17 delivered for owner testing: P1 aa02ed9 pushed and actual-commit
+coordinator review passed. Both strict builds and 93/93 tests per width pass.
+Public API/lifecycle unchanged; production net -48 lines. T59 remains open.
 
 ## M9 T59 S17 Packet
 
