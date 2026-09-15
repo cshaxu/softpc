@@ -202,9 +202,16 @@ static void common_machine_executor_event(void *opaque)
             base_sync_event *events[3] = { machine->resume_event,
                 machine->command_event, machine->input_event };
             lib_u32 index = UINT32_MAX;
-            if (base_sync_wait_any(events, 3u, machine->worker, UINT32_MAX,
-                    &index) != BASE_SYNC_WAIT_SIGNALED)
-                continue;
+            base_sync_wait_result result = base_sync_wait_any(events, 3u,
+                machine->worker, UINT32_MAX, &index);
+            if (result != BASE_SYNC_WAIT_SIGNALED) {
+                if (result != BASE_SYNC_WAIT_CANCELLED)
+                    lib_atomic_i32_exchange_explicit(&machine->state, COMMON_MACHINE_ERROR, LIB_MEMORY_ORDER_SEQ_CST);
+                lib_atomic_i32_exchange_explicit(&machine->reset_requested, 0, LIB_MEMORY_ORDER_SEQ_CST);
+                lib_atomic_i32_exchange_explicit(&machine->stop_requested, 1, LIB_MEMORY_ORDER_SEQ_CST);
+                machine->driver.request_stop(machine->driver.context);
+                break;
+            }
             if (index == 0u)
                 base_sync_event_reset(machine->resume_event);
             else if (index == 1u) {
@@ -293,6 +300,8 @@ static void common_machine_worker(void *opaque, const base_sync_task *task)
         if (machine->driver.cancel_debug != NULL)
             machine->driver.cancel_debug(machine->driver.context);
         common_machine_debug_invalidate(machine);
+        /* A successful driver unwind must not erase a failed executor wait. */
+        succeeded = succeeded && common_machine_state_get(machine) != COMMON_MACHINE_ERROR;
         if (succeeded && lib_atomic_i32_exchange_explicit(&machine->reset_requested, 0, LIB_MEMORY_ORDER_SEQ_CST) != 0) {
             lib_atomic_i32_exchange_explicit(&machine->stop_requested, 0, LIB_MEMORY_ORDER_SEQ_CST);
             common_machine_begin_cold_run(machine, LIB_TRUE);

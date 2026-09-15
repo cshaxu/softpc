@@ -2,31 +2,30 @@
 
 ## Current Work
 
-M9 T59 S18 delivered for owner testing: P1 c5e4438 pushed and actual-commit
-coordinator review passed. Lib Host is now Console Broker; behavior unchanged,
-production net 0 lines. Both strict builds and 93/93 tests per width pass.
-T59 remains open; owner manual testing is pending.
+M9 T59 S19 implemented and verified: failed paused waits stop without retry or
+false resume; production net +9 lines, no new state/API. Both widths build and
+pass 94/94 tests. Executor delivery awaits actual-commit review; T59 stays open.
 
-## M9 T59 S18 Packet
+## M9 T59 S19 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits Host component rename, dual-width build/test, commit and push. |
-| Objective | Rename host component, symbols, targets and consumers to console-broker; retain separate logical Console boundary. |
-| Non-goals | No lifecycle, platform, input/output, focus, failure-policy or product behavior changes; no component merge. |
-| Reference Baseline | 2c0217d, clean main; S17 delivered and reviewed. |
-| Candidate Proposal | [Console broker naming](../proposals/m9-console-broker-naming.md). |
-| Files And ABI Surface | Lib broker public/private names, Common UI callers, shared/product tests, build/gates/docs/manifests and EXEs. Source-name break only; no compatibility aliases. |
-| Applicable Rules | Architecture/coding/execution/documentation skills and repository design, source layout, UI, execution and document rules. |
-| Verification | Six rename-normalized source comparisons pass; old-name sweep and 64-edge negative probes pass. Four manifests/docs pass. Strict x86/x64 builds; x86 93/93 (57.44 s), x64 93/93 (56.81 s). Hashes/counts in proposal. |
-| Expected Markers | No lib/host target/path or host_console production names; KVM Console has no broker dependency. |
-| Asset Needs | Existing build trees and two fixed EXEs; preserve INI/media. |
-| Reporting Requirements | Finite ledger, source/test line counts, executor P1 push then actual-commit coordinator P2 review/push. |
-| Stop Conditions | Behavior change or overlapping worktree mutation requires reassessment. |
-| Exit Criteria | All ledger rows verified, dual-width artifacts/tests and gates pass, committed/pushed clean for owner testing. |
-| Original Owner Request | 根据最新代码 准入一个新的s任务完成host组件重命名工作 完成后 编译测试提交推送 |
-| Similar-Issue Sweep | All broker paths/symbols/CMake targets, source and build edge maps, tests/fixtures and current documentation; historical host vocabulary retained. |
+| Admission And Approval | Owner admits paused-wait fix, dual-width build/test, commit/push and net code report. |
+| Objective | Stop a failed paused run through existing cleanup and report ERROR once; preserve cancellation and normal lifecycle. |
+| Non-goals | No Lib/public ABI, VM/Compat/MVDM, input policy, timing, INI or media changes. |
+| Reference Baseline | e15b70e clean main; S18 delivered and reviewed. |
+| Candidate Proposal | [Machine paused wait failure](../proposals/m9-machine-paused-wait-failure.md). |
+| Files And ABI Surface | Common Machine private wait handling, shared tests/manifests, task records and fixed EXEs. No public ABI change. |
+| Applicable Rules | Architecture/coding/execution/documentation skills and repository architecture, source layout and rules. |
+| Verification | Nine deterministic wait cases and old-path red/green proof; both builds and strict changed-source compilation; x86 94/94 (66.78 s), x64 94/94 (75.52 s); four manifests/corpus/docs pass. |
+| Expected Markers | No failed-wait retry, false RUNNING or reset continuation after fault. |
+| Asset Needs | Existing build trees and two fixed EXEs only; preserve INI/media. |
+| Reporting Requirements | Finite ledger, production/test line counts; executor P1 push then actual-change coordinator P2 review/push. |
+| Stop Conditions | Public contract redesign or unrelated mutations require reassessment. |
+| Exit Criteria | Ledger verified, dual-width artifacts/full tests and gates pass, clean committed/pushed delivery for owner testing. |
+| Original Owner Request | 准入一个s任务修复 完成后编译 测试 提交 推送 并汇报代码净增减 |
+| Similar-Issue Sweep | All Common event/wait call sites, result handling and outer Machine completion/reset path. |
 
 ## Current Technical Baseline
 
