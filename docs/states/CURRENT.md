@@ -2,9 +2,9 @@
 
 ## Current Work
 
-M9 T59 S7 is implemented and verified: original extended debugger output
-restored and Common CRT vocabulary unified through Types; both 89/89.
-Executor delivery and coordinator review follow. T59 stays open for owner tests.
+M9 T59 S7 is verified and reviewed: implementation 8a851e9 is pushed;
+original debugger output restored and Common CRT vocabulary unified through
+Types, both 89/89. Awaiting owner testing; T59 remains open.
 
 ## M9 T59 S7 Packet
 
@@ -14,7 +14,7 @@ Executor delivery and coordinator review follow. T59 stays open for owner tests.
 | Admission And Approval | Owner requests original-source restoration of debugger functionality and style, without inventing structures. |
 | Objective | Compare every extended debugger command with original NXVM and restore migration regressions through existing Common access. |
 | Non-goals | No MVDM changes, second executor, native input loop, global CPU access, or redesign of inherited command semantics. Lib changes are limited to owner-approved thin CRT naming aliases. |
-| Reference Baseline | SoftPC 0299b93; read-only NXVM 9bd08dd8 original and 57c1d6d7 Common extraction. |
+| Reference Baseline | SoftPC 0299b93; reviewed delivery 8a851e9. Read-only NXVM 9bd08dd8 original and 57c1d6d7 Common extraction. |
 | Candidate Proposal | [S7 restoration ledger](../proposals/m9-debug-original-restoration.md). |
 | Files And ABI Surface | Common debug restoration plus owner-approved Common-wide CRT vocabulary cleanup, Types header-only aliases, shared/product tests/manifests and EXEs; no new runtime ABI. |
 | Applicable Rules | Architecture/coding/execution/documentation governance skills, repository rules and Product UI. |

@@ -119,3 +119,15 @@ then route CRT through Types and audit similar cases. These are implemented
 and verified within the ledger, with original edge defects explicitly outside
 restoration. Owner manual testing is still pending; T59 is not closed.
 Owned bounded build/test logs are removed after recording this evidence.
+
+## Coordinator review
+
+After executor push 8a851e9, reviewed its actual 0299b93..8a851e9 changed-path
+set and source/test patch against the three owner instructions. The original
+print sequence is restored in the existing function, while Types supplies only
+definitions. Shared and real-machine tests assert high register bits, not the
+ambiguous AX substring alone. Other Common production changes match the recorded
+token-only proof. The fixture corrections keep semantic field checks and do not
+change keyboard production code. Four manifests verify again after commit;
+main and origin/main match. P2 records this review only, not owner acceptance
+or T59 closure. Both fixed EXEs are ready for manual testing.
