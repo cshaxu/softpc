@@ -95,3 +95,19 @@ all four manifests, Common DAG/negative checks and git diff --check pass.
 Reread the original three requests: each ledger member is verified; no public
 API or debugger semantics changed. Complete delivery is ready for push followed
 by independent actual-patch review. Manual product acceptance remains the owner.
+
+## P2 coordinator review
+
+After ac56ae2 was pushed, switched roles and reviewed its committed production,
+test/build and manifest changes against the original three requirements.
+A literal comparison proves command.c differs only by the admitted include,
+state type and operation renames. Public signatures and command bodies remain
+unchanged; allocation/destruction now have one owner. Session retains original
+completion order, close lifetime and frame gates in the single state object;
+session.c only changes field access. The fixed-status flag has one writer,
+is reset for new Console instances, and cannot acknowledge a failed submission.
+Focused tests exercise the real Common owners with recording Lib boundaries.
+Both full 91/91 suites, package tests and four-corpus checks passed. No new
+failure or deferred item was found in the bounded actual-change review.
+HEAD equaled origin/main and worktree was clean before recording this review.
+S11 delivery is accepted for owner testing; T59 remains open.

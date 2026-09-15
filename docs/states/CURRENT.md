@@ -2,9 +2,9 @@
 
 ## Current Work
 
-M9 T59 S11 is implemented and verified: Common Debug/Session shells removed;
+M9 T59 S11 delivery ac56ae2 is reviewed: Common Debug/Session shells removed;
 fixed Console status follows content changes. Both EXEs pass 91/91 tests.
-Complete executor delivery awaits push and independent actual-patch review.
+Await owner manual testing; T59 remains open.
 S10 delivery 8f60ef6 / review 04d551b is retained in
 [history](../history/M9-T59-S10-alt-tab-hotkey.md); manual testing is not claimed.
 T59 remains open.
