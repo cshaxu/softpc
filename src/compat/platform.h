@@ -14,6 +14,7 @@ int softpc_platform_keyboard_scancode(unsigned char scan_code);
 int softpc_platform_keyboard_key(int key, int released);
 void softpc_platform_keyboard_discard_stale_output(void);
 void softpc_platform_request_executor_wake(void);
+int softpc_platform_executor_ready(void);
 void softpc_platform_presentation_request_refresh(void);
 void softpc_platform_set_boot_clock(int active);
 void softpc_platform_set_runtime_heartbeat(int enabled);

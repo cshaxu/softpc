@@ -83,6 +83,7 @@ void softpc_platform_install_timer2_sound_gate(void)
    on the machine/executor thread where the original device state lives. */
 static HANDLE softpc_clock_timer;
 static HANDLE softpc_executor_event;
+static int softpc_executor_wait_failed;
 static volatile LONG softpc_clock_pending_ticks;
 static volatile LONG softpc_executor_wake_pending;
 static void (*softpc_executor_callback)(void *);
@@ -218,10 +219,22 @@ void softpc_platform_pace_instruction(void)
 void softpc_platform_wait_for_executor_event(void)
 {
 #ifdef _WIN32
-    if (softpc_executor_event != NULL)
-        (void)WaitForSingleObject(softpc_executor_event, INFINITE);
-    else
-        base_sync_sleep_milliseconds(1u);
+    if (softpc_executor_event == NULL ||
+        WaitForSingleObject(softpc_executor_event, INFINITE) != WAIT_OBJECT_0)
+    {
+        softpc_executor_wait_failed = 1;
+        softpc_ccpu_lifecycle_return_outer();
+    }
+#endif
+}
+
+int softpc_platform_executor_ready(void)
+{
+#ifdef _WIN32
+    return softpc_executor_event != NULL && softpc_clock_timer != NULL &&
+        !softpc_executor_wait_failed;
+#else
+    return 0;
 #endif
 }
 
@@ -571,10 +584,12 @@ void host_timer_init(void)
 #ifdef _WIN32
     if (softpc_executor_event == NULL)
         softpc_executor_event = CreateEventA(NULL, FALSE, FALSE, NULL);
+    if (softpc_executor_event == NULL) return;
     if (softpc_clock_timer == NULL)
     {
-        (void)CreateTimerQueueTimer(&softpc_clock_timer, NULL,
-                                    softpc_clock_tick, NULL, 50u, 50u, WT_EXECUTEDEFAULT);
+        if (!CreateTimerQueueTimer(&softpc_clock_timer, NULL,
+                softpc_clock_tick, NULL, 50u, 50u, WT_EXECUTEDEFAULT))
+            softpc_clock_timer = NULL;
     }
 #endif
 }
@@ -749,6 +764,7 @@ void host_timer_shutdown(void)
     if (softpc_executor_event != NULL)
         CloseHandle(softpc_executor_event);
     softpc_executor_event = NULL;
+    softpc_executor_wait_failed = 0;
 #endif
 }
 void host_reset(void) {}

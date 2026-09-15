@@ -25,17 +25,17 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
     {
         if (base_sync_wait_any(waits, 2u, task, UINT32_MAX, &event_index) !=
             BASE_SYNC_WAIT_SIGNALED || event_index == 0u) break;
-        base_sync_event_reset(softpc_speaker_wake);
+        if (base_sync_event_reset(softpc_speaker_wake) != LIB_STATUS_OK) break;
         while (InterlockedCompareExchange(&softpc_speaker_frequency, 0, 0) != 0)
         {
+            base_sync_wait_result result;
             DWORD frequency = (DWORD)InterlockedCompareExchange(
                 &softpc_speaker_frequency, 0, 0);
-            (void)Beep(frequency, SOFTPC_SPEAKER_SLICE_MS);
-            if (base_sync_event_wait(softpc_speaker_stop, 0u) ==
-                BASE_SYNC_WAIT_SIGNALED) return;
-            if (base_sync_event_wait(softpc_speaker_wake, 0u) ==
-                BASE_SYNC_WAIT_SIGNALED)
-                base_sync_event_reset(softpc_speaker_wake);
+            if (!Beep(frequency, SOFTPC_SPEAKER_SLICE_MS)) break;
+            result = base_sync_wait_any(waits, 2u, task, 0u, &event_index);
+            if (result == BASE_SYNC_WAIT_TIMED_OUT) continue;
+            if (result != BASE_SYNC_WAIT_SIGNALED || event_index == 0u) return;
+            if (base_sync_event_reset(softpc_speaker_wake) != LIB_STATUS_OK) return;
         }
     }
 }

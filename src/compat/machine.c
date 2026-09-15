@@ -190,6 +190,7 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     softpc_ccpu_lifecycle_clear_pending_interrupts();
     softpc_platform_set_boot_clock(0);
     softpc_platform_install_timer2_sound_gate();
+    if (!softpc_platform_executor_ready()) return SOFTPC_MACHINE_IO_ERROR;
     machine->reset = 1;
     return SOFTPC_MACHINE_OK;
 }
@@ -281,6 +282,7 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
 {
     if (machine == NULL || !machine->reset || instruction_budget == 0u)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    if (!softpc_platform_executor_ready()) return SOFTPC_MACHINE_IO_ERROR;
     /* CCPU's restored inter-instruction counter is 32-bit.  UINT64_MAX is
        the public API's continuous-execution sentinel: do not truncate it to
        0xffffffff and accidentally turn a VM run into a roughly-20-second
@@ -298,7 +300,8 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
     c_cpu_simulate();
     softpc_ccpu_instruction_budget_active = 0;
     softpc_ccpu_lifecycle_clear_exit();
-    return SOFTPC_MACHINE_OK;
+    return softpc_platform_executor_ready() ? SOFTPC_MACHINE_OK :
+        SOFTPC_MACHINE_IO_ERROR;
 }
 
 void softpc_machine_request_wake(softpc_machine *machine)

@@ -2,31 +2,30 @@
 
 ## Current Work
 
-M9 T59 S19 delivered for owner testing: P1 5a496df pushed and actual-commit
-coordinator review passed. Failed paused waits stop without retry or false
-resume; production net +9 lines, no new state/API. Both widths build and pass
-94/94 tests. T59 remains open; owner manual testing is pending.
+M9 T59 S20 implemented and verified: bounded HLT/audio failure handling in
+Compat; x86/x64 builds and 96/96 tests per width pass. Executor P1 delivery is
+ready for actual-commit review. T59 remains open for owner testing.
 
-## M9 T59 S19 Packet
+## M9 T59 S20 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits paused-wait fix, dual-width build/test, commit/push and net code report. |
-| Objective | Stop a failed paused run through existing cleanup and report ERROR once; preserve cancellation and normal lifecycle. |
-| Non-goals | No Lib/public ABI, VM/Compat/MVDM, input policy, timing, INI or media changes. |
-| Reference Baseline | e15b70e clean main; S18 delivered and reviewed. |
-| Candidate Proposal | [Machine paused wait failure](../proposals/m9-machine-paused-wait-failure.md). |
-| Files And ABI Surface | Common Machine private wait handling, shared tests/manifests, task records and fixed EXEs. No public ABI change. |
-| Applicable Rules | Architecture/coding/execution/documentation skills and repository architecture, source layout and rules. |
-| Verification | Nine deterministic wait cases and old-path red/green proof; both builds and strict changed-source compilation; x86 94/94 (66.78 s), x64 94/94 (75.52 s); four manifests/corpus/docs pass. |
-| Expected Markers | No failed-wait retry, false RUNNING or reset continuation after fault. |
-| Asset Needs | Existing build trees and two fixed EXEs only; preserve INI/media. |
-| Reporting Requirements | Finite ledger, production/test line counts; executor P1 push then actual-change coordinator P2 review/push. |
-| Stop Conditions | Public contract redesign or unrelated mutations require reassessment. |
-| Exit Criteria | Ledger verified, dual-width artifacts/full tests and gates pass, clean committed/pushed delivery for owner testing. |
-| Original Owner Request | 准入一个s任务修复 完成后编译 测试 提交 推送 并汇报代码净增减 |
-| Similar-Issue Sweep | All Common event/wait call sites, result handling and outer Machine completion/reset path. |
+| Admission And Approval | Owner approves HLT/audio failure repair, x86/x64 build/test and commit/push. |
+| Objective | Reject missing HLT resources, unwind failed waits as IO_ERROR, and stop failed audio bursts without busy retry. |
+| Non-goals | No Lib/Common/MVDM changes, pacing/frame changes, audio backend rewrite, INI or media changes. |
+| Reference Baseline | c4e87f3 clean main; S19 delivered and reviewed. |
+| Candidate Proposal | [HLT and audio failure](../proposals/m9-hlt-audio-failure.md). |
+| Files And ABI Surface | Compat platform/machine/audio private implementation/contract, product tests/CMake, docs and two fixed EXEs. |
+| Applicable Rules | Architecture/coding/execution/documentation skills; repository architecture/source layout/rules. |
+| Verification | Native failure injection, real CCPU unwind, deterministic audio fixture, both builds/full regression and documentation/corpus gates. |
+| Expected Markers | No HLT sleep fallback or ignored wait result; no failed Beep immediate retry. |
+| Asset Needs | Existing build trees and fixed EXEs; tests own/remove tiny disposable fixtures; preserve INI/media. |
+| Reporting Requirements | Finite ledger, similar-issue dispositions and source/test counts; complete executor P1 push and actual-change coordinator P2 review/push. |
+| Stop Conditions | CPU semantic or shared-corpus redesign, unrelated worktree changes. |
+| Exit Criteria | Ledger verified, dual-width builds/tests/gates pass; artifacts committed/pushed clean for owner testing. |
+| Original Owner Request | 批准hlt和音频失败处理；请你准入一个s任务 编译测试提交推送。 |
+| Similar-Issue Sweep | Native creation/readiness/wait and playback result branches in Compat platform/audio; Machine reset/run error propagation. |
 
 ## Current Technical Baseline
 

@@ -547,6 +547,21 @@ set(SOFTPC_TEST_TARGETS
     softpc-runtime-restart-boot-smoke
     softpc-runtime-input-continuation-smoke
 )
+foreach(probe IN ITEMS platform audio)
+    set(probe_target softpc-${probe}-failure-smoke)
+    add_executable(${probe_target} test/unit/${probe}_failure_smoke.c)
+    target_link_libraries(${probe_target} PRIVATE softpc-vm)
+    target_include_directories(${probe_target} PRIVATE src
+        $<TARGET_PROPERTY:softpc-machine-compat,INCLUDE_DIRECTORIES>)
+    target_compile_definitions(${probe_target} PRIVATE
+        $<TARGET_PROPERTY:softpc-machine-compat,COMPILE_DEFINITIONS>)
+    # The probes include the actual legacy-facing implementation.
+    set_target_properties(${probe_target} PROPERTIES C_STANDARD 90 C_EXTENSIONS ON)
+    add_test(NAME ${probe_target} COMMAND ${probe_target})
+    set_tests_properties(${probe_target} PROPERTIES LABELS "unit" TIMEOUT 15
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+    list(APPEND SOFTPC_TEST_TARGETS ${probe_target})
+endforeach()
 add_executable(softpc-presentation-shutdown-smoke test/unit/presentation_shutdown_smoke.c)
 target_include_directories(softpc-presentation-shutdown-smoke PRIVATE src src/compat src/app)
 get_target_property(shutdown_test_sources softpcvm SOURCES)

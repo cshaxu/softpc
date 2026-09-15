@@ -1,0 +1,82 @@
+#include <windows.h>
+#include <assert.h>
+#include <stdio.h>
+#include "../lib/cleanup.h"
+
+static int fail_event, fail_timer, fail_wait;
+static unsigned wait_calls, timer_calls;
+static HANDLE WINAPI create_event(LPSECURITY_ATTRIBUTES a, BOOL manual,
+    BOOL signaled, LPCSTR name)
+{ return fail_event ? NULL : CreateEventA(a, manual, signaled, name); }
+static BOOL WINAPI create_timer(PHANDLE timer, HANDLE queue,
+    WAITORTIMERCALLBACK callback, PVOID context, DWORD due, DWORD period, ULONG flags)
+{
+    ++timer_calls;
+    return fail_timer ? FALSE :
+        CreateTimerQueueTimer(timer, queue, callback, context, due, period, flags);
+}
+static DWORD WINAPI wait_event(HANDLE event, DWORD timeout)
+{
+    ++wait_calls;
+    assert(timeout == INFINITE);
+    if (fail_wait) {
+        assert(wait_calls == 1u); /* Never retry an immediately failed HLT. */
+        return WAIT_FAILED;
+    }
+    return WaitForSingleObject(event, timeout);
+}
+#define CreateEventA create_event
+#define CreateTimerQueueTimer create_timer
+#define WaitForSingleObject wait_event
+#include "compat/platform.c"
+#undef WaitForSingleObject
+#undef CreateTimerQueueTimer
+#undef CreateEventA
+
+int main(void)
+{
+    const char *path = "softpc-platform-failure.img";
+    unsigned char sector[512] = {0};
+    const unsigned char halt[] = {0xfa, 0xf4, 0xeb, 0xfd}; /* cli; hlt; loop */
+    softpc_machine_options options = {0};
+    softpc_machine *machine = NULL;
+    FILE *file = fopen(path, "wb");
+    assert(file != NULL);
+    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
+    assert(fclose(file) == 0);
+    options.floppy_path = path;
+    options.media_mode = SOFTPC_MEDIA_OVERLAY;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+
+    fail_event = 1;
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_IO_ERROR);
+    assert(softpc_executor_event == NULL && timer_calls == 0u);
+    fail_event = 0; fail_timer = 1;
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_IO_ERROR);
+    assert(softpc_executor_event != NULL && softpc_clock_timer == NULL);
+    host_timer_shutdown(); /* Partial initialization is disposable. */
+    assert(softpc_executor_event == NULL);
+
+    fail_timer = 0;
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_platform_executor_ready());
+    assert(SetEvent(softpc_executor_event));
+    softpc_platform_wait_for_executor_event();
+    assert(wait_calls == 1u && softpc_platform_executor_ready());
+
+    /* Execute the real CCPU HLT and its existing outer unwind, not a mock jump. */
+    assert(softpc_machine_write_physical(machine, 0x500u, halt, sizeof(halt)) ==
+        SOFTPC_MACHINE_OK);
+    assert(c_setCS(0u) == 0);
+    c_setEIP(0x500u);
+    fail_wait = 1; wait_calls = 0u;
+    assert(softpc_machine_run(machine, UINT64_MAX) == SOFTPC_MACHINE_IO_ERROR);
+    assert(wait_calls == 1u && !softpc_platform_executor_ready());
+    assert(softpc_machine_run(machine, 1u) == SOFTPC_MACHINE_IO_ERROR);
+    assert(wait_calls == 1u); /* Reject execution before entering the CPU again. */
+    softpc_machine_destroy(machine);
+    assert(softpc_executor_event == NULL && softpc_clock_timer == NULL);
+    assert(!softpc_executor_wait_failed);
+    assert(softpc_test_remove_image(path));
+    return 0;
+}
