@@ -79,6 +79,14 @@ R's 16-bit edits preserve the high half of the corresponding 32-bit register.
 Debugger output has no fixed text-capacity cutoff; Session emits the complete
 result through the same monitor output path before the next prompt/request.
 
+Extended linear byte ranges must fit through `FFFFFFFF` without wrapping;
+overflowing ranges are rejected before memory access. `XM` protects overlapping
+ranges by choosing copy direction. `XS` matches only complete patterns within
+its byte count. `XU` accepts a full 32-bit instruction count and stops at the
+address boundary or failed decode; `XA` ends its continuation at that boundary.
+The 16-bit command syntax and XU defaults are unchanged. E/F/XE/XF still write
+incrementally: invalid later byte syntax does not roll back preceding writes.
+
 The SoftPC adapter supports general/IP/flags/segment/CR0/CR2/CR3 reads and
 writes through the original CPU setters, and effective CPU segment-cache
 snapshots. These are the CPU's effective attributes, not a reread of raw

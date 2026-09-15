@@ -1887,6 +1887,15 @@ static C_VOID w(command_context *debugContext)
 #define xalin debugContext->assemble_linear
 #define xdlin debugContext->dump_linear
 #define xulin debugContext->unassemble_linear
+static C_INT xcheckrange(command_context *debugContext,
+    type_unsigned_32 linear, type_unsigned_32 count)
+{
+    if (count != 0u && count - 1u > LIB_UINT32_MAX - linear) {
+        seterr(debugContext, narg - 1);
+        return 0;
+    }
+    return 1;
+}
 /* print */
 static type_unsigned_8 xuprintins(command_context *debugContext, type_unsigned_32 linear)
 {
@@ -1895,10 +1904,13 @@ static type_unsigned_8 xuprintins(command_context *debugContext, type_unsigned_3
     C_INT binary_failed = TYPE_FALSE;
     C_INT format_result;
     type_unsigned_8 len;
-    type_unsigned_8 ucode[15];
+    /* The decoder needs 15 host bytes; accept only bytes read before address end. */
+    type_unsigned_8 ucode[15] = {0};
+    type_unsigned_8 available = linear > LIB_UINT32_MAX - 14u ?
+        (type_unsigned_8)(LIB_UINT32_MAX - linear + 1u) : 15u;
     C_CHAR str[0x100], stmt[0x100], sbin[0x100];
     C_CHAR *sbin_cursor;
-    if (command_machine_read_linear(linear, (C_VOID *)ucode, 15))
+    if (command_machine_read_linear(linear, (C_VOID *)ucode, available))
     {
         len = 0;
         (C_VOID)STD_SNPRINTF(str, sizeof(str), "L%08X <ERROR>", linear);
@@ -1908,7 +1920,8 @@ static type_unsigned_8 xuprintins(command_context *debugContext, type_unsigned_3
         lib_size instruction_bytes = 0u;
         if (common_xasm32_disassemble(ucode, sizeof(ucode), stmt,
                 sizeof(stmt), &i, &instruction_bytes,
-                command_machine_get_code_default_size()) != TYPE_STATUS_OK) {
+                command_machine_get_code_default_size()) != TYPE_STATUS_OK ||
+            instruction_bytes > available) {
             len = 0u;
             (void)lib_c_snprintf(stmt, sizeof(stmt), "<ERROR>");
         } else {
@@ -2008,11 +2021,13 @@ static C_VOID xaconsole(command_context *debugContext)
         }
         else
         {
+            if (!xcheckrange(debugContext, xalin, (type_unsigned_32)len)) return;
             if (command_machine_write_linear(xalin, (C_VOID *)acode, (type_unsigned_8)len))
             {
                 STD_PRINTF("debug: fail to write to L%08X\n", xalin);
                 return;
             }
+            if (len > LIB_UINT32_MAX - xalin) return;
             xalin += (type_unsigned_32)len;
         }
         if (errAsmPos)
@@ -2076,6 +2091,8 @@ static C_VOID xc(command_context *debugContext)
         {
             return;
         }
+        if (!xcheckrange(debugContext, lin1, (type_unsigned_32)count) ||
+            !xcheckrange(debugContext, lin2, (type_unsigned_32)count)) return;
         for (i = 0; i < count; ++i)
         {
             if (command_machine_read_linear((type_unsigned_32)(lin1 + i), (C_VOID *)(&val1), 1))
@@ -2100,15 +2117,15 @@ static C_VOID xdprint(command_context *debugContext, type_unsigned_32 linear, ty
     C_CHAR t, c[0x11];
     type_unsigned_32 ilinear;
     type_unsigned_32 start = linear;
-    type_unsigned_32 end = linear + count - 1;
+    type_unsigned_32 end;
     c[0x10] = '\0';
     if (!count)
     {
         return;
     }
-    if (end < start)
-        end = 0xffffffff;
-    for (ilinear = start - (start % 0x10); ilinear <= end + 0x0f - (end % 0x10); ++ilinear)
+    if (!xcheckrange(debugContext, linear, count)) return;
+    end = linear + (count - 1u);
+    for (ilinear = start - (start % 0x10); ilinear <= (end | 0x0fu); ++ilinear)
     {
         if (ilinear % 0x10 == 0)
             STD_PRINTF("L%08X  ", ilinear);
@@ -2140,7 +2157,7 @@ static C_VOID xdprint(command_context *debugContext, type_unsigned_32 linear, ty
         STD_PRINTF(" ");
         if (ilinear % 0x10 == 7 && ilinear >= start && ilinear < end)
             STD_PRINTF("\b-");
-        if ((ilinear + 1) % 0x10 == 0)
+        if (ilinear % 0x10 == 0x0f)
         {
             STD_PRINTF("  %s\n", c);
         }
@@ -2228,6 +2245,7 @@ static C_VOID xe(command_context *debugContext)
         {
             return;
         }
+        if (!xcheckrange(debugContext, linear, (type_unsigned_32)(narg - 2u))) return;
         for (i = 2; i < narg; ++i)
         {
             val = scannubit8(debugContext, arg[i]);
@@ -2243,7 +2261,7 @@ static C_VOID xe(command_context *debugContext)
             {
                 break;
             }
-            linear++;
+            if (i + 1u < narg) ++linear;
         }
     }
 }
@@ -2270,6 +2288,7 @@ static C_VOID xf(command_context *debugContext)
             return;
         }
         bcount = narg - 3;
+        if (!xcheckrange(debugContext, linear, (type_unsigned_32)count)) return;
         for (i = 0, j = 0; i < count; ++i, ++j)
         {
             val = scannubit8(debugContext, arg[j % bcount + 3]);
@@ -2326,7 +2345,7 @@ static C_VOID xm(command_context *debugContext)
 {
     type_unsigned_8 val;
     STD_SIZE_T i;
-    type_unsigned_32 lin1, lin2, count;
+    type_unsigned_32 lin1, lin2, count, offset;
     if (narg != 4)
     {
         seterr(debugContext, narg - 1);
@@ -2348,16 +2367,19 @@ static C_VOID xm(command_context *debugContext)
         {
             return;
         }
+        if (!xcheckrange(debugContext, lin1, count) ||
+            !xcheckrange(debugContext, lin2, count) || lin1 == lin2) return;
         for (i = 0; i < count; ++i)
         {
-            if (command_machine_read_linear((type_unsigned_32)(lin1 + i), (C_VOID *)(&val), 1))
+            offset = lin2 > lin1 ? count - 1u - (type_unsigned_32)i : (type_unsigned_32)i;
+            if (command_machine_read_linear(lin1 + offset, (C_VOID *)(&val), 1))
             {
-                STD_PRINTF("debug: fail to read from L%08X.\n", lin1 + i);
+                STD_PRINTF("debug: fail to read from L%08X.\n", lin1 + offset);
                 return;
             }
-            if (command_machine_write_linear((type_unsigned_32)(lin2 + i), (C_VOID *)(&val), 1))
+            if (command_machine_write_linear(lin2 + offset, (C_VOID *)(&val), 1))
             {
-                STD_PRINTF("debug: fail to write to L%08X.\n", lin2 + i);
+                STD_PRINTF("debug: fail to write to L%08X.\n", lin2 + offset);
                 return;
             }
         }
@@ -2385,8 +2407,8 @@ static C_VOID xs(command_context *debugContext)
         {
             return;
         }
-        addrparse(debugContext, _ds, arg[1]);
         bcount = narg - 3;
+        if (!xcheckrange(debugContext, linear, (type_unsigned_32)count)) return;
         for (i = 0; i < bcount; ++i)
         {
             val = scannubit8(debugContext, arg[i + 3]);
@@ -2396,7 +2418,8 @@ static C_VOID xs(command_context *debugContext)
             }
             line[i] = val;
         }
-        for (i = 0; i < count; ++i)
+        if (count < bcount) return;
+        for (i = 0; i <= count - bcount; ++i)
         {
             if (command_machine_read_linear((type_unsigned_32)(linear + i), (C_VOID *)mem, (type_unsigned_8)bcount))
             {
@@ -2717,14 +2740,14 @@ static C_VOID xr(command_context *debugContext)
     }
 }
 /* unassemble */
-static C_VOID xuprint(command_context *debugContext, type_unsigned_32 linear, type_unsigned_8 count)
+static C_VOID xuprint(command_context *debugContext, type_unsigned_32 linear, type_unsigned_32 count)
 {
     type_unsigned_32 len = 0;
     STD_SIZE_T i;
     for (i = 0; i < count; ++i)
     {
         len = xuprintins(debugContext, linear);
-        if (!len)
+        if (!len || len > LIB_UINT32_MAX - linear)
         {
             break;
         }

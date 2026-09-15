@@ -40,6 +40,7 @@ common_test(physical_key_identity common-session)
 common_test(session_frame common-session)
 common_test(session_monitor common-session)
 common_test(debug_output common-debug)
+common_test(debug_linear common-debug)
 common_test(composition common-ui console-broker base)
 if(WIN32)
     # Existing native-thread fake verifies the generic machine/debug protocol.

@@ -41,6 +41,14 @@ normalizing LF/CRLF in bounded chunks. No large result is silently truncated;
 allocation/formatting and native write failures remain explicit. Providers must
 not retain a debug result across a producing call without copying its text.
 
+Linear debug byte ranges must fit the 32-bit address space before access.
+XM copies in address-safe direction for overlapping ranges. XS reports only
+patterns wholly inside its byte count and accepts linear addresses only.
+XU retains its full 32-bit instruction count and stops on decode failure or
+address exhaustion, without wrapping the saved next address. XA likewise ends
+its input continuation when the last address is consumed. XE/XF retain original
+incremental validation: an invalid later byte does not undo earlier writes.
+
 | Component | One responsibility | Public contract |
 | --- | --- | --- |
 | `machine` | executor, lifecycle/input queues, frame publication, optional paused debug adapter | `machine_interface.h` |

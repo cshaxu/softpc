@@ -2,32 +2,31 @@
 
 ## Current Work
 
-M9 T59 S20 delivered and reviewed: bounded HLT/audio failure handling in
-Compat; x86/x64 builds and 96/96 tests per width pass. P1 e402c69 is pushed;
-actual-commit review and dual-width focused reruns pass. Owner testing passed;
-T59 remains open. Owner retired the modal-test TODO; inherited debugger edge
-contracts remain the only TODO item.
+M9 T59 S21 implemented and verified: Common Debug linear-command repairs;
+dual-width builds and final 97/97 suites pass. Initial compact-Console test
+failure is recorded separately in TODO. P1 is ready for actual-commit review;
+T59 remains open for owner testing.
 
-## M9 T59 S20 Packet
+## M9 T59 S21 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves HLT/audio failure repair, x86/x64 build/test and commit/push. |
-| Objective | Reject missing HLT resources, unwind failed waits as IO_ERROR, and stop failed audio bursts without busy retry. |
-| Non-goals | No Lib/Common/MVDM changes, pacing/frame changes, audio backend rewrite, INI or media changes. |
-| Reference Baseline | c4e87f3 clean main; S19 delivered and reviewed. |
-| Candidate Proposal | [HLT and audio failure](../proposals/m9-hlt-audio-failure.md). |
-| Files And ABI Surface | Compat platform/machine/audio private implementation/contract, product tests/CMake, docs and two fixed EXEs. |
+| Admission And Approval | Owner approves proposed debugger repairs, dual-width build/test and commit/push. |
+| Objective | Correct XM overlap, XU count narrowing, XS parsing/search bounds and related linear overflow. |
+| Non-goals | No parser/transaction/ABI redesign, 16-bit command changes, Lib/VM/Compat/MVDM/INI/media changes. |
+| Reference Baseline | 2ec18a1 clean main; original NXVM 9bd08dd8 debug.c is read-only comparison. |
+| Candidate Proposal | [Debug linear boundaries](../proposals/m9-debug-linear-boundaries.md). |
+| Files And ABI Surface | Common Debug implementation, shared tests/manifests, UI contract/docs and two fixed EXEs; no ABI change. |
 | Applicable Rules | Architecture/coding/execution/documentation skills; repository architecture/source layout/rules. |
-| Verification | Native failure injection, real CCPU unwind, deterministic audio fixture, both builds/full regression and documentation/corpus gates. |
-| Expected Markers | No HLT sleep fallback or ignored wait result; no failed Beep immediate retry. |
-| Asset Needs | Existing build trees and fixed EXEs; tests own/remove tiny disposable fixtures; preserve INI/media. |
+| Verification | Copied fake-memory boundary cases, existing debugger regressions, both builds/full tests and corpus/documentation gates. |
+| Expected Markers | No count narrowing, XS real parser, out-of-range matching or linear address wrap; directional XM copy. |
+| Asset Needs | Existing build trees, deterministic tests and fixed EXEs; preserve INI/media; no new trace. |
 | Reporting Requirements | Finite ledger, similar-issue dispositions and source/test counts; complete executor P1 push and actual-change coordinator P2 review/push. |
-| Stop Conditions | CPU semantic or shared-corpus redesign, unrelated worktree changes. |
+| Stop Conditions | Machine ABI or generic parser redesign; unrelated worktree changes. |
 | Exit Criteria | Ledger verified, dual-width builds/tests/gates pass; artifacts committed/pushed clean for owner testing. |
-| Original Owner Request | 批准hlt和音频失败处理；请你准入一个s任务 编译测试提交推送。 |
-| Similar-Issue Sweep | Native creation/readiness/wait and playback result branches in Compat platform/audio; Machine reset/run error propagation. |
+| Original Owner Request | 按照你的建议，准入一个S任务修复；完成后：编译测试提交推送。 |
+| Similar-Issue Sweep | Extended-command linear memory access and address progression; explicit retention of original partial-write/parser behavior. |
 
 ## Current Technical Baseline
 
