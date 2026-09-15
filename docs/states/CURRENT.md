@@ -2,8 +2,8 @@
 
 ## Current Work
 
-M9 T59 S10 is implemented and verified: Ctrl+Alt+T sends guest Alt+Tab.
-Both EXEs pass 91/91 tests; delivery awaits push and coordinator review.
+M9 T59 S10 delivery 8f60ef6 is reviewed and pushed: Ctrl+Alt+T sends guest Alt+Tab.
+Both EXEs pass 91/91 tests; await owner testing.
 S9 delivery bbc0607 / review 52dbc21 is retained in
 [history](../history/M9-T59-S9-console-output-binding.md); manual testing is not claimed.
 T59 remains open.

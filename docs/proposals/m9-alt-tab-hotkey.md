@@ -74,3 +74,15 @@ corpus manifest checks pass. Executor reread the original request and verified
 all four ledger items. Ready for complete push and independent coordinator
 review. S9's reviewed record was retained intact in history, not relabeled as
 owner-tested. T59 remains open for owner testing.
+
+## P2 coordinator review
+
+After 8f60ef6 was pushed, switched roles and reviewed the committed App/API and
+test/build changes against the original request. T uses the existing registry,
+running guard and machine enqueue sink. Alt-key helper preserves CAF's release/
+press order, uses scan 0x0f for Tab, stops on a failed sink, and adds no state.
+No native focus, lifecycle, shared library or machine implementation changed.
+The new test isolates only machine enqueue, not the registry/matcher/dispatcher;
+provider and help coverage use their existing production paths. Both 91/91 suites
+and unchanged corpus checks cover the bounded delivery. HEAD matched origin/main
+and worktree was clean before this review. Accepted for owner testing; T stays open.
