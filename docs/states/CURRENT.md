@@ -2,10 +2,9 @@
 
 ## Current Work
 
-M9 T59 S7 expanded restoration is implemented and verified for P3 delivery.
+M9 T59 S7 expanded restoration delivery 53753b2 is reviewed and pushed.
 Owner-approved output ABI and original CLI continuations are restored; both
-fixed EXEs pass 90/90 tests. Coordinator review and owner test handoff follow.
-T59 remains open.
+fixed EXEs pass 90/90 tests. Await owner manual testing; T59 remains open.
 
 ## M9 T59 S7 Packet
 

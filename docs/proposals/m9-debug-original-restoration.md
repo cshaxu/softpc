@@ -221,3 +221,21 @@ transaction and no second command/input path.
 
 Original request reread and executor self-review complete. This delivery awaits
 post-push coordinator review and owner testing, not whole-T closure.
+
+## P4 coordinator review of expanded restoration
+
+After P3 push 53753b2, switched to coordinator and reviewed the actual committed
+23-path set against the owner request, ABI approval and original-source ledger.
+The six production paths match the admitted boundary. Result ownership stays
+with debug; App invalidates old completions before the next producing call;
+Session consumes text before dispatch/prompt. Failure does not report successful
+truncation or retain a half-finished input continuation. Original read sites use
+one continuation adapter, not seven additional input loops. Tests check exact
+prompts, high register halves and complete rows instead of permissive substrings.
+
+Rechecked all four corpus manifests after commit, verified HEAD equals
+origin/main and the worktree was clean. Both fixed package identities and final
+90/90 suites are recorded above. The initial banner-assertion failures remain
+recorded rather than being counted as successful runs. No change to preserved
+source, configuration or media is included. P4 is review/status only. Delivery
+is ready for owner testing; neither manual acceptance nor T59 closure is claimed.
