@@ -2,32 +2,31 @@
 
 ## Current Work
 
-M9 T59 S15 implemented and verified: KVM default wake reuses Base Event;
-production C/H net -143. Strict dual-width builds pass; x86/x64 each 92/92.
-Executor P1 592d05c is pushed; actual-commit coordinator review passed.
-S15 is delivered for owner testing, not T closure. S14 is retained.
-T59 stays open; S16 remains unadmitted. Wait for owner testing.
+M9 T59 S16 implemented and verified: Base Task uses one allocation and trampoline.
+Production C/H net -10; public API and KVM unchanged. Both strict builds pass;
+x86/x64 full suites each 92/92. Executor P1 delivery and coordinator review follow.
+S15 delivery is retained; T59 stays open for owner testing.
 
-## M9 T59 S15 Packet
+## M9 T59 S16 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves S15 implementation, dual-width build/test, commit/push, reducing duplication and complexity. |
-| Objective | Base Event owns manual/automatic reset; KVM deletes duplicate default wake implementation. |
+| Admission And Approval | Owner approves the narrowed Base Task flattening, dual-width build/test and commit/push. |
+| Objective | One Task allocation and one native startup trampoline; unchanged public API and cancellation semantics. |
 | Non-goals | No mailbox policy, native Window notifier, worker/task lifecycle or MVDM/product behavior changes. |
-| Reference Baseline | 1ae987f, clean main. |
-| Candidate Proposal | [Base Event reuse](../proposals/m9-lib-base-synchronization.md). |
-| Files And ABI Surface | Base Event mode/status API, KVM default wake/direct Base edge, mechanical manual-event consumers, tests/build/docs/manifests/EXEs. |
+| Reference Baseline | ea1b0c7, clean main. |
+| Candidate Proposal | [Base Task flattening](../proposals/m9-lib-base-synchronization.md). |
+| Files And ABI Surface | Base private sync implementation and platform task layout; tests/docs/manifests/EXEs. Public ABI unchanged. |
 | Applicable Rules | Architecture/coding/execution/documentation skills and repository architecture/coding/UI design and execution/document rules. |
-| Verification | Reset/failure/no-lost-wake and notifier tests pass; strict builds; x86 92/92 (67.94 s), x64 92/92 (48.85 s); four manifests/docs pass. Initial stale test-DAG assertion repaired and recorded. |
-| Expected Markers | No KVM wake primitive duplicate or forwarding API; one notifier and independent mailbox locks unchanged. |
+| Verification | Allocation/failure/cancellation/join probes pass; strict builds; x86 92/92 (81.18 s), final focused 3/3; x64 92/92 (81.13 s); four manifests/docs pass. |
+| Expected Markers | No outer platform pointer or second startup trampoline; one Task allocation; KVM unchanged. |
 | Asset Needs | Existing build trees, both fixed EXEs; preserve INI/media. |
 | Reporting Requirements | Finite ledger, same-issue scan, production/test line counts, executor P1 and coordinator P2 committed/pushed; wait. |
 | Stop Conditions | Product behavior or worker lifecycle redesign requires further admission. |
 | Exit Criteria | Ledger verified, dual-width tests/builds and gates pass, committed/pushed clean for owner testing. |
-| Original Owner Request | 批准实施 完成后编译测试提交推送 目标是减少重复功能和代码 降低复杂度提高正确性和复用性。 |
-| Similar-Issue Sweep | All Base Event and KVM wake callers; duplicate primitive/build dependencies; preserve distinct native I/O/message ownership. |
+| Original Owner Request | 批准，准入S任务实现；编译测试提交推送 |
+| Similar-Issue Sweep | Both Base platform Task layouts, creation/cleanup and entry paths; all public Task consumers remain unchanged. |
 
 ## Current Technical Baseline
 

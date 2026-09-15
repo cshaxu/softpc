@@ -1,21 +1,6 @@
 #include "lib/types/types_interface.h"
 #include "lib/base/sync.h"
 
-struct base_sync_task {
-    base_sync_platform_task *platform;
-    base_sync_event *cancellation;
-    base_sync_task_entry entry;
-    void *context;
-};
-
-static void base_sync_task_main(void *opaque)
-{
-    base_sync_task *task = (base_sync_task *)opaque;
-
-    if (task != LIB_NULL && task->entry != LIB_NULL)
-        task->entry(task->context, task);
-}
-
 static base_sync_wait_result base_sync_wait_result_from_platform(lib_status status,
     lib_bool signaled)
 {
@@ -109,26 +94,17 @@ base_sync_wait_result base_sync_event_wait(base_sync_event *event,
 lib_status base_sync_task_create(base_sync_task_entry entry, void *context,
     base_sync_task **out_task)
 {
-    base_sync_task *task;
+    base_sync_event *cancellation;
     lib_status status;
 
     if (out_task == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_task = LIB_NULL;
     if (entry == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    task = (base_sync_task *)lib_allocate_zero(1u, sizeof(*task));
-    if (task == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    task->entry = entry;
-    task->context = context;
-    status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &task->cancellation);
-    if (status == LIB_STATUS_OK)
-        status = base_sync_platform_task_create(base_sync_task_main, task, &task->platform);
-    if (status != LIB_STATUS_OK) {
-        base_sync_event_destroy(task->cancellation);
-        lib_release(task);
-        return status;
-    }
-    *out_task = task;
-    return LIB_STATUS_OK;
+    status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &cancellation);
+    if (status != LIB_STATUS_OK) return status;
+    status = base_sync_platform_task_create(entry, context, cancellation, out_task);
+    if (status != LIB_STATUS_OK) base_sync_event_destroy(cancellation);
+    return status;
 }
 
 void base_sync_task_request_cancel(base_sync_task *task)
@@ -157,7 +133,7 @@ base_sync_wait_result base_sync_task_wait_cancel(const base_sync_task *task,
 
 void base_sync_task_join(base_sync_task *task)
 {
-    if (task != LIB_NULL) base_sync_platform_task_join(task->platform);
+    if (task != LIB_NULL) base_sync_platform_task_join(task);
 }
 
 void base_sync_task_destroy(base_sync_task *task)
@@ -165,7 +141,6 @@ void base_sync_task_destroy(base_sync_task *task)
     if (task == LIB_NULL) return;
     base_sync_task_request_cancel(task);
     base_sync_task_join(task);
-    base_sync_platform_task_destroy(task->platform);
     base_sync_event_destroy(task->cancellation);
-    lib_release(task);
+    base_sync_platform_task_destroy(task);
 }

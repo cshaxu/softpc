@@ -315,9 +315,9 @@ after copied work has been accepted reports once through the existing failure
 sink; it is not a second request rejection and is never replayed. Window blinking uses
 one native timer message path, including native modal loops, not outer-loop
 timeout scheduling.
-Task owns cancellation and entry/context; its platform thread object retains
-startup parameters until join. Root task destroy performs the join once before
-platform disposal.
+Task owns cancellation and entry/context, embedded in one platform allocation.
+The native thread directly invokes that entry; root task destroy joins before
+releasing cancellation and disposing the allocation.
 
 Synchronous request rejection returns `lib_status`, with normal wait outcomes
 separated into output values. Ordinary synchronization and local cleanup stay

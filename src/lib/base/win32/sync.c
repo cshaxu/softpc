@@ -33,16 +33,15 @@ void base_sync_mutex_lock(base_sync_mutex *mutex)
 void base_sync_mutex_unlock(base_sync_mutex *mutex)
 { lib_win32_leave_critical_section(&mutex->gate); }
 
-struct base_sync_platform_task {
+struct base_sync_win32_task {
+    base_sync_task task;
     lib_win32_handle thread;
-    base_sync_platform_task_entry entry;
-    void *context;
 };
 
 static lib_win32_dword LIB_WIN32_WINAPI base_sync_platform_main(lib_win32_lpvoid opaque)
 {
-    base_sync_platform_task *task = opaque;
-    task->entry(task->context);
+    struct base_sync_win32_task *state = opaque;
+    state->task.entry(state->task.context, &state->task);
     return 0u;
 }
 
@@ -97,23 +96,30 @@ lib_status base_sync_platform_event_wait_many(
     return result == LIB_WIN32_WAIT_TIMEOUT ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-lib_status base_sync_platform_task_create(base_sync_platform_task_entry entry,
-    void *context, base_sync_platform_task **out_task)
+lib_status base_sync_platform_task_create(base_sync_task_entry entry,
+    void *context, base_sync_event *cancellation, base_sync_task **out_task)
 {
-    base_sync_platform_task *task;
+    struct base_sync_win32_task *task;
     if (out_task == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_task = LIB_NULL;
     if (entry == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     task = lib_allocate_zero(1u, sizeof(*task));
     if (task == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    task->entry = entry; task->context = context;
+    task->task.entry = entry; task->task.context = context;
+    task->task.cancellation = cancellation;
     task->thread = lib_win32_create_thread(LIB_NULL, 0u, base_sync_platform_main, task, 0u, LIB_NULL);
     if (task->thread == LIB_NULL) { lib_release(task); return LIB_STATUS_IO_ERROR; }
-    *out_task = task;
+    *out_task = &task->task;
     return LIB_STATUS_OK;
 }
 
-void base_sync_platform_task_join(base_sync_platform_task *task)
-{ if (task != LIB_NULL && task->thread != LIB_NULL) (void)lib_win32_wait_for_single_object(task->thread, LIB_WIN32_INFINITE); }
-void base_sync_platform_task_destroy(base_sync_platform_task *task)
-{ if (task != LIB_NULL) { if (task->thread != LIB_NULL) (void)lib_win32_close_handle(task->thread); lib_release(task); } }
+void base_sync_platform_task_join(base_sync_task *task)
+{
+    struct base_sync_win32_task *state = (struct base_sync_win32_task *)task;
+    if (state != LIB_NULL) (void)lib_win32_wait_for_single_object(state->thread, LIB_WIN32_INFINITE);
+}
+void base_sync_platform_task_destroy(base_sync_task *task)
+{
+    struct base_sync_win32_task *state = (struct base_sync_win32_task *)task;
+    if (state != LIB_NULL) { (void)lib_win32_close_handle(state->thread); lib_release(state); }
+}

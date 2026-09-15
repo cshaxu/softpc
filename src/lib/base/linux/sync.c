@@ -38,10 +38,9 @@ struct base_sync_event {
     lib_bool signaled;
     lib_bool manual_reset;
 };
-struct base_sync_platform_task {
+struct base_sync_linux_task {
+    base_sync_task task;
     lib_linux_pthread_t thread; lib_bool joined;
-    base_sync_platform_task_entry entry;
-    void *context;
 };
 
 /* One synchronization boundary for wait-any predicates, not a polling loop
@@ -74,8 +73,8 @@ static lib_bool base_sync_platform_deadline(lib_u32 milliseconds,
 
 static void *base_sync_platform_main(void *opaque)
 {
-    base_sync_platform_task *task = opaque;
-    task->entry(task->context);
+    struct base_sync_linux_task *state = opaque;
+    state->task.entry(state->task.context, &state->task);
     return LIB_NULL;
 }
 
@@ -161,22 +160,28 @@ done:
     return result == 0 || result == LIB_LINUX_ETIMEDOUT ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-lib_status base_sync_platform_task_create(base_sync_platform_task_entry entry,
-    void *context, base_sync_platform_task **out_task)
+lib_status base_sync_platform_task_create(base_sync_task_entry entry,
+    void *context, base_sync_event *cancellation, base_sync_task **out_task)
 {
-    base_sync_platform_task *task;
+    struct base_sync_linux_task *task;
     if (out_task == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_task = LIB_NULL;
     if (entry == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     task = lib_allocate_zero(1u, sizeof(*task));
     if (task == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    task->entry = entry; task->context = context;
+    task->task.entry = entry; task->task.context = context;
+    task->task.cancellation = cancellation;
     if (lib_linux_pthread_create(&task->thread, LIB_NULL, base_sync_platform_main, task) != 0) {
         lib_release(task); return LIB_STATUS_IO_ERROR;
     }
-    *out_task = task; return LIB_STATUS_OK;
+    *out_task = &task->task; return LIB_STATUS_OK;
 }
-void base_sync_platform_task_join(base_sync_platform_task *task)
-{ if (task != LIB_NULL && task->joined == LIB_FALSE) { (void)lib_linux_pthread_join(task->thread, LIB_NULL); task->joined = LIB_TRUE; } }
-void base_sync_platform_task_destroy(base_sync_platform_task *task)
-{ if (task != LIB_NULL) { lib_release(task); } }
+void base_sync_platform_task_join(base_sync_task *task)
+{
+    struct base_sync_linux_task *state = (struct base_sync_linux_task *)task;
+    if (state != LIB_NULL && state->joined == LIB_FALSE) {
+        (void)lib_linux_pthread_join(state->thread, LIB_NULL); state->joined = LIB_TRUE;
+    }
+}
+void base_sync_platform_task_destroy(base_sync_task *task)
+{ if (task != LIB_NULL) lib_release(task); }

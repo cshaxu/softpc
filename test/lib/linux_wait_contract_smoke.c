@@ -1,9 +1,27 @@
 #include "linux_wait_fakes.h"
+static unsigned allocations, releases;
+static void *allocate(lib_size count, lib_size size)
+{ ++allocations; return lib_allocate_zero(count, size); }
+static void *allocate_plain(lib_size size)
+{ ++allocations; return lib_allocate(size); }
+static void release(void *memory)
+{ if (memory) ++releases; lib_release(memory); }
+#undef lib_allocate_zero
+#undef lib_allocate
+#undef lib_release
+#define lib_allocate_zero allocate
+#define lib_allocate allocate_plain
+#define lib_release release
 #include "lib/base/linux/sync.c"
 #include "lib/base/sync.c"
 #include "lib/host/linux/console.c"
 
 static base_sync_event *signal_event;
+static void task_entry(void *context, const base_sync_task *task)
+{
+    assert(task == *(base_sync_task **)context);
+    assert(base_sync_task_wait_cancel(task, 0) == BASE_SYNC_WAIT_CANCELLED);
+}
 static void signal_on_second_wait(void)
 {
     if (wait_calls != 2) return; /* First return is spurious. */
@@ -115,5 +133,19 @@ int main(void)
     base_sync_platform_event_destroy(events[1]);
     assert(host_console_backend_create(&backend) == LIB_STATUS_UNSUPPORTED && !backend);
     assert(host_console_backend_request_cooked_line(NULL) == LIB_STATUS_UNSUPPORTED);
+    {
+        base_sync_task *task;
+        unsigned before = allocations;
+        assert(base_sync_task_create(task_entry, &task, &task) == LIB_STATUS_OK);
+        assert(allocations == before + 2); /* Task + existing cancellation Event. */
+        assert(!base_sync_task_cancelled(task));
+        base_sync_task_request_cancel(task);
+        base_sync_task_join(task);
+        base_sync_task_destroy(task);
+        assert(thread_joins == 1 && allocations == releases);
+        fail_thread = 1;
+        assert(base_sync_task_create(task_entry, &task, &task) == LIB_STATUS_IO_ERROR);
+        assert(task == NULL && allocations == releases);
+    }
     return 0;
 }

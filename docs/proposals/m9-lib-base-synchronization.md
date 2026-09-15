@@ -1,132 +1,93 @@
-# Base Event reuse
+# Base Task allocation flattening
 
-## S15 admission
+## S16 admission
 
-Original owner request: 批准实施 完成后编译测试提交推送 目标是减少重复功能和代码 降低复杂度提高正确性和复用性。
+Original owner request: 批准，准入S任务实现；编译测试提交推送
 
-Baseline: 1ae987f, clean main. S14 delivery remains in
-[history](../history/M9-T59-S14-base-mutex-unification.md).
-Only S15 is admitted. T59 stays open; S16 task/worker reuse is not admitted.
+M9 T59 S16 continues from ea1b0c7, clean main. S15 delivery is retained in
+[history](../history/M9-T59-S15-base-event-reuse.md); owner testing is not
+inferred from admission. T59 stays open.
 
-Base owns the reusable Event primitive. Extend its existing creation API with
-explicit manual/automatic reset, and return checked signal/reset status.
-Existing consumers retain manual reset; KVM's default notifier uses automatic
-reset. Window keeps its selected native-message notifier without an Event.
-Delete KVM's separate wake type, platform implementations and forwarding getter.
-No mailbox policy, FIFO, STOP, frame/control lock, worker or product change.
-KVM Console directly consumes Base's public wait contract; declare that edge.
-Do not add a second notification path or another wrapper allocation.
+Approved scope: embed common task fields as the first member of the selected
+platform task. Allocate one task object, retain one cancellation Event, and
+call the user entry directly from the native trampoline. Keep the public API,
+cooperative cancellation and infinite join semantics unchanged. No KVM migration,
+optional cancellation, timed join, readiness framework or product changes.
+
+The public create validates arguments and creates the cancellation Event, then
+passes it to platform creation. Failure destroys that Event; success transfers
+it to the task. All fields exist before thread creation. Destroy cancels, joins,
+releases the Event and disposes the single task allocation. Win32/Linux have
+the same private signatures; platform types stay in their platform files.
 
 ## Finite convergence ledger
 
 | Member | Required result | Proof |
 | --- | --- | --- |
-| Base Event | Two reset modes; checked native signal/reset; failure leaves create output null | Win32 actual primitive plus injected failures; Linux controlled waits |
-| KVM wake | Default notifier directly owns Base auto-reset Event; no duplicate primitive | One-time selection, signal before/during wait, timeout/failure, STOP/retirement |
-| Existing consumers | Explicit manual reset, unchanged sequencing | Common/task/audio call-site scan and dual-width regressions |
-| Boundaries | Removed wake API/sources/Threads edge; direct Base consumer declared | Source/build DAG and Linux build checks |
-| Delivery | Both EXEs, complete manifests, source/test accounting, P1 push then coordinator review/P2 push | Full x86/x64 tests, docs gate, clean tree |
+| Allocation | One task allocation plus existing cancellation Event; no outer task pointer or startup forwarding | Both platform source scan; allocation-count tests |
+| Startup/failure | Copied entry/context and task identity correct before execution; all create failures leave null output and no leak | Allocation/Event/thread failure injection and entry assertions |
+| Shutdown | Existing cancellation/wait-any and join-before-free preserved | Native Win32 task test, controlled Linux task test and full consumer regression |
+| Scope | Public API and KVM/Common/Compat/MVDM unchanged; no new state or wrapper | Baseline diff and old-symbol scan |
+| Delivery | Strict dual-width build/test, manifests/docs, both fixed EXEs and clean pushed P1/P2 | Recorded results and actual-commit coordinator review |
 
-Signal/reset failure propagation already checked by KVM must remain checked.
-Existing manual-event callers keep their present lifecycle/error policy;
-this task does not introduce a product failure state machine. All Event calls
-and duplicate primitive implementations form the similar-issue sweep universe.
-Host native reader cancellation and Window startup/message primitives retain
-their distinct ownership and are outside this default-mailbox migration.
+Similar-issue sweep is bounded to Base task allocation, trampolines and disposal
+in both platform files plus all task API consumers. Existing native KVM and
+Host workers retain their distinct lifecycle; no claim of whole-library thread
+unification. Existing TODOs remain separate.
 
-## Remaining plan
+Use existing build trees; no scratch media, INI changes or raw capture.
+Production/test line counts use git diff ea1b0c7 --numstat on tracked C/H.
+Complete executor P1 before coordinator review and P2. Wait for owner testing.
 
-S16 will separately resolve bounded task completion/join/disposal before KVM
-worker reuse. It requires owner admission. Do not move native I/O cancellation
-or Window message-loop policy into Base.
+## Implementation and bounded sweep
 
-## S15 implementation and bounded sweep
+Both platform structs embed base_sync_task as their first member. The shared
+root no longer allocates an outer task or forwards its startup callback. Event
+creation precedes platform creation, so every worker sees complete cancellation,
+entry and context fields. A failed platform allocation/thread creation releases
+its own allocation and the root releases the Event. Normal destroy joins before
+releasing either resource. No public API, cancellation mode, joined flag or
+consumer behavior changed; KVM and Host native workers are outside this task.
 
-Base Event now takes an explicit reset mode and signal/reset return lib_status.
-Win32 checks SetEvent/ResetEvent; Linux checks lock/broadcast/unlock and retains
-one monotonic deadline across spurious wakeups. The existing process-lifetime
-wait-any predicate lock is the only Linux Event implementation. No new object
-wrapper, state machine, retry or product error protocol was added.
+The ownership test now instruments both root and platform source, rather than
+only counting platform allocations. It proves exactly two allocations including
+the existing Event, task/context identity, cancellation and immediate-return
+entries, both allocation failures, native Event/thread failures and one join on
+destroy. Identity is copied to an integer before disposal, avoiding comparisons
+through dangling test pointers. Linux controlled fakes run the actual platform
+entry on join, verifying the same identity, cancellation, two allocations,
+thread-create failure cleanup and retained joined behavior. No Sleep added.
 
-KVM removes mailbox_wake_interface.h and both platform mailbox.c files.
-The default notifier owns one Base auto-reset Event and reports the checked
-signal result through the existing accepted-request failure path. Console waits
-on it directly. The old pointer getter is deleted. Window native messages,
-mailbox lock scopes/FIFO/latest-wins/STOP and native worker ownership are intact.
+Sweep: rg over Base for base_sync_platform_task_entry, the former platform task
+struct, base_sync_task_main and task->platform returns no hits. Both remaining
+platform creation/join/disposal functions have the same private signature.
+Task production consumers are Common machine and Compat audio; baseline diff
+confirms both unchanged, as are all KVM/public sync interfaces and MVDM.
 
-Creation call-site sweep: six Common machine events, one session queue event,
-two Compat audio events and Base task cancellation all explicitly retain manual
-reset. Common/Compat changes are only those arguments. Existing manual callers'
-failure policy is not redesigned; KVM continues to check notification/wait faults.
-Base's native Event, Host reader stop Event and Window startup-ready Event are
-the remaining Win32 primitive hits. The latter two retain native I/O/startup
-responsibility outside this default-mailbox migration. Host's atomic process
-claim is not a spinlock. No KVM pthread mutex/condition implementation remains.
+Count: git diff ea1b0c7 --numstat on tracked C/H. Production four files:
++57/-67, net -10. Tests three files: +88/-6, net +82. Documentation,
+manifests and binaries excluded. No new implementation file, state, Event,
+framework or compatibility alias. Only src/lib and test/lib manifests change;
+Common corpora are byte-identical. S15 history retains the previous proposal.
 
-Tests reuse existing suites: manual persistence/reset, automatic signal
-coalescing/consumption, invalid arguments and Win32 create/signal/reset failures;
-Linux condition preparation failures, signal before/during wait, spurious returns,
-fixed deadline/infinite wait, timeout and checked failure; mailbox one-time
-selection, no Window Event allocation, failed default selection and retirement
-after wait/notification faults. Three negative fixtures prevent old wake files
-returning. The full 64-edge source/build DAG admits Console's direct Base use.
-Linux Threads linkage is solely Base-owned, not propagated by Types or KVM.
+Both strict GNU package builds passed. A direct x86 target rebuild without its
+preset environment failed before compiler diagnostics; rerunning the admitted
+x86 preset supplied its toolchain PATH and succeeded. No source workaround or
+toolchain change was made. x86 full regression passed 92/92 (81.18 s); the final
+test-only identity refinement then passed the three focused tests (0.23 s).
+Native Linux execution is not claimed; Linux uses controlled boundary fakes.
+No new scratch tree/media or configuration changes; existing build trees retained.
 
-Initial x64 full regression found a stale product-test DAG assertion (91/92,
-81.75 seconds). The product test already invokes the complete shared DAG check;
-deleted its duplicate subset rather than maintaining another edge map. Its
-focused rerun passed. This is a test-authority correction, not a runtime fix.
-A direct script diagnostic without its CTest context was invalid; only the
-normal registered test is counted as proof.
+## Executor verification
 
-Count method: git diff 1ae987f --numstat, tracked src/test C/H only.
-Production 14 paths: +63/-206, net -143. Tests seven paths: +101/-67, net +34.
-Docs, CMake/gates, manifests and fixed binaries are excluded. S14 history is
-preserved unchanged. Four shared manifests advance to shared-t59-s15-p1.
-No App/VM/MVDM, INI or media changes; no new disposable build/media directory.
-Native Linux execution is not claimed; its production wait algorithm is covered
-through controlled platform fakes.
+All five ledger members passed. Final x64 full suite: 92/92 (81.13 s).
+x86 full suite: 92/92 (81.18 s), followed by final focused 3/3 as recorded above.
+Both Base builds use -O3 -DNDEBUG -std=c17 -Wall -Wextra -Wpedantic -Werror.
+Four shared manifests, documentation governance and diff whitespace pass.
+No test failure or product regression observed; no manual UI acceptance claimed.
 
-## S15 executor verification
-
-All five ledger members are implemented and verified. Strict GNU Lib builds
-and complete package/test builds pass for both widths. Final full regression:
-x86 92/92 (67.94 s); x64 92/92 (48.85 s), run sequentially for native UI isolation.
-The initial x64 stale-DAG failure remains recorded above. Native modal coverage
-passed this time; S14's separate intermittent-test TODO is not claimed fixed.
-Four shared manifests and documentation gate pass; diff whitespace check passes.
-Manifest entry order is retained to avoid unrelated diff noise.
-
-Fixed tested outputs:
-
-- softpc32.exe: 3,485,052 bytes,
-  78B155A9C0598612937C9316AE816E062EDF2E302513559F1DA789C126517E7A.
-- softpc64.exe: 2,844,671 bytes,
-  BBD601897615097C69A8BE014317545EAA07D699252A7E7BCCD5B0D44F9134C7.
-
-Both packages are smaller than S14. Existing build trees are retained for
-reproducible testing; no new scratch media or recording remains. Executor P1
-will deliver code/tests/docs/manifests and these binaries together, then switch
-to coordinator review of the actual commit. Await owner testing afterwards.
-
-## S15 coordinator review
-
-Executor P1 592d05c is committed and pushed. Switched roles and reviewed that
-actual patch against the original request and the five-member ledger, not only
-the executor summary. Base validates public arguments before private platform
-operations; manual callers retain their previous reset behavior. KVM receives
-one auto-reset Event only for the default notifier. Windows message notification
-still allocates none. Copied-work admission and worker cleanup are unchanged;
-wait failure reaches the existing failure exit without retry.
-
-Reviewed creation cleanup, Linux predicate/deadline and signal error paths,
-Win32 native failure injection, selection/retirement tests and the exact DAG
-delta. The removed product DAG subset is covered by its existing invocation
-of the shared complete source/build verifier. No forwarding compatibility alias,
-duplicate wake implementation, new worker or lock scope was introduced.
-Production/test C/H counts remain -143/+34. No further in-scope defect found.
-
-Final dual-width suites and four manifests pass. This review P2 changes only
-governance records, so the tested executables remain unchanged. Publish P2,
-leave a clean tree and wait for owner testing. S16 and T59 closure remain
-unadmitted.
+Fixed packages: softpc32.exe 3,484,995 bytes, SHA256
+FE75CF47EAE7330A88DDD04921A217E4C20BF98C0EA7D50CA7B3C7C2C8AA4083;
+softpc64.exe 2,844,615 bytes, SHA256
+9CB56D4812BC476C94D771CCEF1601EB6E7A0D4CAD2D6DC541C4AD5746EB3552.
+Executor P1 includes the entire delivery; coordinator actual-commit review follows.
