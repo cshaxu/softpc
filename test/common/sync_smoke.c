@@ -60,7 +60,7 @@ int main(void)
     assert(p.count == 0u);
     host_sync_mutex_unlock(p.mutex);
     for (i = 0; i < 2000u; ++i) {
-        assert(common_session_queue_take(p.queue, &event, 5000u));
+        assert(common_session_queue_take(p.queue, &event, LIB_UINT32_MAX));
         assert(event.kind == COMMON_SESSION_EVENT_FRAME_COMPLETED);
         assert(event.value.frame.sequence == i && event.run_generation == 7u);
     }

@@ -2,33 +2,35 @@
 
 ## Current Work
 
-M9 T59 S11 delivery ac56ae2 is reviewed: Common Debug/Session shells removed;
-fixed Console status follows content changes. Both EXEs pass 91/91 tests.
-Await owner manual testing; T59 remains open.
-S10 delivery 8f60ef6 / review 04d551b is retained in
-[history](../history/M9-T59-S10-alt-tab-hotkey.md); manual testing is not claimed.
-T59 remains open.
+M9 T59 S12 executor verified: Session waits on events without idle polling;
+narrow-desktop package fixture repaired. Both fixed EXEs pass 91/91 tests.
+P1 locally committed; push blocked by remote-specific safety approval for
+https://github.com/cshaxu/softpc.git main. Coordinator review follows push.
+Owner manual testing is not claimed.
+S11 delivery ac56ae2 / review fa14c62 is retained in
+[history](../history/M9-T59-S11-common-state-simplification.md).
+Manual testing is not claimed; T59 remains open.
 
-## M9 T59 S11 Packet
+## M9 T59 S12 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits the three Common simplifications and build/test/commit/push. |
-| Objective | Remove Debug and Session forwarding shells; submit fixed Console status only on content changes. |
-| Non-goals | No Lib/App/VM/Compat/MVDM or public ABI and product behavior changes. |
-| Reference Baseline | 04d551b, clean main. |
-| Candidate Proposal | [Common simplification](../proposals/m9-common-state-simplification.md). |
-| Files And ABI Surface | Common debug/session/ui internals, callers, tests, build declarations, manifests and EXEs. |
+| Admission And Approval | Owner admits Session wait repair and then explicitly requires the reproduced startup failure fixed within S12; build/test/commit/push. |
+| Objective | Wait indefinitely for queued events; return failure instead of retrying a failed wait. |
+| Non-goals | No unrelated polling, product behavior or INI/media changes. |
+| Reference Baseline | fa14c62, clean main. |
+| Candidate Proposal | [Session event wait](../proposals/m9-session-event-wait.md). |
+| Files And ABI Surface | Session wait and diagnosed startup failure path, regression tests, manifests, docs and fixed EXEs; no speculative ABI change. |
 | Applicable Rules | Architecture/coding/execution/documentation governance skills and repository design/rules/UI. |
-| Verification | Focused 8/8 each; full x64 91/91 (90.47 s), x86 91/91 (83.67 s); governance/four manifests pass. |
-| Expected Markers | One Debug state, one Session state, no repeated fixed status; frame/completion semantics intact. |
+| Verification | Both builds/focused 2/2 pass; full x64 91/91 (77.68 s), x86 91/91 (60.95 s). Four manifests/docs pass. |
+| Expected Markers | No periodic idle wake, no failed-wait retry; queue ordering and input remain intact. |
 | Asset Needs | Existing build trees, both fixed EXEs; preserve INI/media. |
 | Reporting Requirements | Complete executor P and independent review P pushed; line accounting and clean tree. |
-| Stop Conditions | New public ABI, state machine or changes outside Common need further admission. |
+| Stop Conditions | New public ABI/state machine or a cause outside the reproduced startup path requires further admission. |
 | Exit Criteria | Every finite ledger item proven, both builds/tests pass, manifests/docs pass, pushed clean. |
-| Original Owner Request | 以上3个common的问题，准入一个S修复、编译、测试、提交、推送，供我测试。 |
-| Similar-Issue Sweep | All forwarding references and Console content publication paths in the three owners and callers. |
+| Original Owner Request | Common Session 100ms 超时空转：准入一个s修复编译 测试 提交 推送 等我。 |
+| Similar-Issue Sweep | Session queue take callers and signal/reset paths; other components' polling is outside this S. |
 
 ## Current Technical Baseline
 

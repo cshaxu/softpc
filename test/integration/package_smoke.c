@@ -357,6 +357,23 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
     if (input == INVALID_HANDLE_VALUE || output == INVALID_HANDLE_VALUE) {
         stage = 2; goto done;
     }
+    /* This hidden test-owned Console needs room for an 80x25 raw surface.
+     * Narrow desktops can make the inherited font too large. Change only
+     * this child's fixture font, never the user's Console or product policy. */
+    if (!package_window_display) {
+        COORD maximum = GetLargestConsoleWindowSize(output);
+        if (maximum.X < 80 || maximum.Y < 25) {
+            CONSOLE_FONT_INFOEX font = {0};
+            font.cbSize = sizeof(font);
+            font.dwFontSize.Y = 8;
+            font.FontFamily = FF_MODERN;
+            font.FontWeight = FW_NORMAL;
+            memcpy(font.FaceName, L"Consolas", sizeof(L"Consolas"));
+            if (!SetCurrentConsoleFontEx(output, FALSE, &font)) { stage = 21; goto done; }
+            maximum = GetLargestConsoleWindowSize(output);
+            if (maximum.X < 80 || maximum.Y < 25) { stage = 21; goto done; }
+        }
+    }
     if (package_compact_console) {
         SMALL_RECT viewport = {0, 0, 29, 11};
         COORD extent = {30, 12};
