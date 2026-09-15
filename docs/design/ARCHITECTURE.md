@@ -300,8 +300,8 @@ Logical Console metadata/event/output gates, KVM frame/control and Host
 output/transaction locks use Base blocking mutexes. Each consumer owns its lock
 instances, scope and order; Base owns the primitive implementation, not handoff
 policy. No callback may synchronously reenter binding/destruction. Storage
-owns each CRT stream directly; writer embeds file state instead of separately
-allocated pointer wrappers.
+owns each CRT stream directly; medium and writer embed file state, while
+owned-byte reads use a stack file. Close consumes the stream, not its container.
 
 Pure Window geometry, cursor rectangles, frame pixel conversion and relative
 motion scaling belong to kvm-window root helpers. Native files marshal SDK

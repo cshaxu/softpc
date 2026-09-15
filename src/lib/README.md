@@ -79,7 +79,9 @@ lifecycle controller, or public unified presenter API.
   it uses the same transaction for every raw/cooked pair. If retirement cannot
   complete, no next reader starts and the broker fails closed with host-I/O
   failure rather than claiming either Console is usable.
-- `storage` provides file and byte-medium primitives.
+- `storage` provides file and byte-medium primitives. Medium and writer own
+  embedded file storage; owned-byte reads use a stack file. Closing consumes
+  the stream, not its enclosing allocation; failed opens leave it empty.
 - `kvm-base` provides copied frame/input values, source-local registered-hotkey
   matching, source identities, and private mailbox mechanics.
 - `kvm-window` owns one Window lifecycle; `kvm-console` owns one raw-Console

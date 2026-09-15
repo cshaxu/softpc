@@ -2,32 +2,30 @@
 
 ## Current Work
 
-M9 T59 S16 implemented and verified: Base Task uses one allocation and trampoline.
-Production C/H net -10; public API and KVM unchanged. Both strict builds pass;
-x86/x64 full suites each 92/92. Executor P1 927bac3 is pushed; actual-commit
-coordinator review passed. S16 is delivered for owner testing, not T closure.
-S15 delivery is retained; T59 stays open. No next S is admitted.
+M9 T59 S17 implemented and verified: Storage ownership and Console disposal
+flattened. Both strict builds and 93/93 tests per width pass. Public API and
+lifecycle unchanged. P1 delivery/coordinator review pending; T59 stays open.
 
-## M9 T59 S16 Packet
+## M9 T59 S17 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves the narrowed Base Task flattening, dual-width build/test and commit/push. |
-| Objective | One Task allocation and one native startup trampoline; unchanged public API and cancellation semantics. |
-| Non-goals | No mailbox policy, native Window notifier, worker/task lifecycle or MVDM/product behavior changes. |
-| Reference Baseline | ea1b0c7, clean main. |
-| Candidate Proposal | [Base Task flattening](../proposals/m9-lib-base-synchronization.md). |
-| Files And ABI Surface | Base private sync implementation and platform task layout; tests/docs/manifests/EXEs. Public ABI unchanged. |
+| Admission And Approval | Owner approves both Storage ownership and KVM Console disposal cleanup, dual-width build/test and commit/push. |
+| Objective | Embed file in medium, use stack file in read_owned, remove heap file shell; one Console disposal body. |
+| Non-goals | No public ABI, disk mode/locking, worker lifecycle, Common or product behavior changes. |
+| Reference Baseline | 5847799, clean main. |
+| Candidate Proposal | [Storage ownership cleanup](../proposals/m9-storage-ownership-cleanup.md). |
+| Files And ABI Surface | Storage private file/medium implementation, Linux failed-open cleanup, Console disposal; tests/docs/manifests/EXEs. |
 | Applicable Rules | Architecture/coding/execution/documentation skills and repository architecture/coding/UI design and execution/document rules. |
-| Verification | Allocation/failure/cancellation/join probes pass; strict builds; x86 92/92 (81.18 s), final focused 3/3; x64 92/92 (81.13 s); four manifests/docs pass. |
-| Expected Markers | No outer platform pointer or second startup trampoline; one Task allocation; KVM unchanged. |
+| Verification | Allocation/failure/storage mode and Console retirement tests pass; strict builds, x86 93/93 (66.24 s), x64 93/93 (75.57 s); four manifests/docs/DAG pass. Evidence and hashes in proposal. |
+| Expected Markers | No heap file allocation or pointer-transfer helper; single Console disposal; unchanged public headers. |
 | Asset Needs | Existing build trees, both fixed EXEs; preserve INI/media. |
 | Reporting Requirements | Finite ledger, same-issue scan, production/test line counts, executor P1 and coordinator P2 committed/pushed; wait. |
 | Stop Conditions | Product behavior or worker lifecycle redesign requires further admission. |
 | Exit Criteria | Ledger verified, dual-width tests/builds and gates pass, committed/pushed clean for owner testing. |
-| Original Owner Request | 批准，准入S任务实现；编译测试提交推送 |
-| Similar-Issue Sweep | Both Base platform Task layouts, creation/cleanup and entry paths; all public Task consumers remain unchanged. |
+| Original Owner Request | 批准，请进行一个新的S任务 完成以上2个目标。编译测试提交推送。 |
+| Similar-Issue Sweep | Every private Storage file owner/open/close and both platform failure paths; KVM leaf disposal ownership. |
 
 ## Current Technical Baseline
 
