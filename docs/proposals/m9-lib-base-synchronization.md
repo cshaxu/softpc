@@ -108,3 +108,25 @@ Both packages are smaller than S14. Existing build trees are retained for
 reproducible testing; no new scratch media or recording remains. Executor P1
 will deliver code/tests/docs/manifests and these binaries together, then switch
 to coordinator review of the actual commit. Await owner testing afterwards.
+
+## S15 coordinator review
+
+Executor P1 592d05c is committed and pushed. Switched roles and reviewed that
+actual patch against the original request and the five-member ledger, not only
+the executor summary. Base validates public arguments before private platform
+operations; manual callers retain their previous reset behavior. KVM receives
+one auto-reset Event only for the default notifier. Windows message notification
+still allocates none. Copied-work admission and worker cleanup are unchanged;
+wait failure reaches the existing failure exit without retry.
+
+Reviewed creation cleanup, Linux predicate/deadline and signal error paths,
+Win32 native failure injection, selection/retirement tests and the exact DAG
+delta. The removed product DAG subset is covered by its existing invocation
+of the shared complete source/build verifier. No forwarding compatibility alias,
+duplicate wake implementation, new worker or lock scope was introduced.
+Production/test C/H counts remain -143/+34. No further in-scope defect found.
+
+Final dual-width suites and four manifests pass. This review P2 changes only
+governance records, so the tested executables remain unchanged. Publish P2,
+leave a clean tree and wait for owner testing. S16 and T59 closure remain
+unadmitted.

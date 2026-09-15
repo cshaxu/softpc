@@ -4,8 +4,9 @@
 
 M9 T59 S15 implemented and verified: KVM default wake reuses Base Event;
 production C/H net -143. Strict dual-width builds pass; x86/x64 each 92/92.
-Executor delivery awaits commit/push and actual-commit coordinator review.
-S14 is retained; T59 stays open. S16 remains unadmitted; wait for owner testing.
+Executor P1 592d05c is pushed; actual-commit coordinator review passed.
+S15 is delivered for owner testing, not T closure. S14 is retained.
+T59 stays open; S16 remains unadmitted. Wait for owner testing.
 
 ## M9 T59 S15 Packet
 
