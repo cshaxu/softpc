@@ -4,10 +4,9 @@
 
 M9 T59 S13 implemented and verified: shared Base synchronization/time, reused
 blocking mutexes, duplicate Console mutex removed. Dual-width 92/92 pass.
-Executor delivery committed as 3f493f2. Push is blocked by the platform's request
-for explicit authorization of these sources/docs/EXEs to
-https://github.com/cshaxu/softpc.git main. No workaround or S/T closure.
-Post-push coordinator review remains pending.
+Executor delivery 3f493f2 and blocker record efde6fb are pushed to main after
+owner's explicit standing authorization for https://github.com/cshaxu/softpc.git.
+Post-push actual-patch review passed; awaiting owner audit/testing, no T closure.
 S12 delivery bce7fcf/review 780c292 is retained in
 [history](../history/M9-T59-S12-session-event-wait.md); manual acceptance not claimed.
 T59 remains open.
@@ -27,7 +26,7 @@ T59 remains open.
 | Verification | Strict Lib build both widths; focused 8/8 each; full x64 92/92 (79.99 s), x86 92/92 (64.78 s); four manifests/docs pass. |
 | Expected Markers | Frame copy blocks, ordinary control remains independent; old host sync/clock and Console mutex implementations absent. |
 | Asset Needs | Reuse build trees; refresh only fixed EXEs, preserve INI/media. |
-| Reporting Requirements | Production/test line accounting; complete executor P1 and actual-patch review P2 pushed, clean tree. |
+| Reporting Requirements | Production/test line accounting; executor P1, blocker record P2 and actual-patch review P3; pushed clean for owner audit. |
 | Stop Conditions | New synchronization semantics or product policy requires further admission. |
 | Exit Criteria | Finite ledger proven, dual-width builds/tests and all manifests/docs pass, pushed clean for owner audit. |
 | Original Owner Request | 批准这项实现 要求精简代码逻辑架构 完成后编译测试提交推送后等我审计 希望代码减少 |

@@ -108,3 +108,19 @@ owner authorization of this source/document/binary transfer to
 https://github.com/cshaxu/softpc.git main. No workaround or further push retry.
 Local delivery is intact; post-push coordinator review remains pending and no
 closure is claimed. Request that exact authorization before continuing.
+
+## P3 coordinator review and delivery
+
+Owner explicitly granted standing push authorization for the previously named
+origin/main destination. P1 and the P2 blocker record were pushed successfully;
+the blocker is resolved. Switched to coordinator review of committed 3f493f2.
+Rechecked all ten moved files against the original after mechanical substitution,
+Console gate replacement/failed creation cleanup, all frame mutex sites, independent
+control locking and STOP order, and the real-contention/failure regression tests.
+No MVDM, App, VM or user INI changes. No additional defect found in this bounded
+patch. The eight-component DAG matches build linkage without an inverse dependency.
+
+Four manifests verify again and both artifact hashes match the recorded tested
+builds. The prior 92/92 results at each width remain applicable: this review changes
+only documentation. Push P3 and leave a clean tree for owner audit/testing.
+S13 is delivered, not manually accepted; T59 stays open.
