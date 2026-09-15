@@ -17,7 +17,7 @@ src/
     machine/     generic executor, lifecycle/input queues and frame publication
     xasm32/      imported generic assembly/disassembly corpus
     debug/       imported generic debug corpus over the optional machine adapter
-  lib/{types,console,host,storage,kvm-base,kvm-window,kvm-console}/
+  lib/{types,base,console,host,storage,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
   app/
     main.c, config.c, command.c, composition.c, keyboard.c, firmware.rc

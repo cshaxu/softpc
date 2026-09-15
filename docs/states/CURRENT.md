@@ -2,33 +2,33 @@
 
 ## Current Work
 
-M9 T59 S12 delivery bce7fcf is pushed and reviewed: Session waits without idle polling;
-narrow-desktop package fixture repaired. Both fixed EXEs pass 91/91 tests.
-Await owner manual testing; no push approval blocker remains.
-S11 delivery ac56ae2 / review fa14c62 is retained in
-[history](../history/M9-T59-S11-common-state-simplification.md).
-Manual testing is not claimed; T59 remains open.
+M9 T59 S13 implemented and verified: shared Base synchronization/time, reused
+blocking mutexes, duplicate Console mutex removed. Dual-width 92/92 pass.
+Preparing executor delivery and subsequent actual-patch review for owner audit.
+S12 delivery bce7fcf/review 780c292 is retained in
+[history](../history/M9-T59-S12-session-event-wait.md); manual acceptance not claimed.
+T59 remains open.
 
-## M9 T59 S12 Packet
+## M9 T59 S13 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits Session wait repair and then explicitly requires the reproduced startup failure fixed within S12; build/test/commit/push. |
-| Objective | Wait indefinitely for queued events; return failure instead of retrying a failed wait. |
-| Non-goals | No unrelated polling, product behavior or INI/media changes. |
-| Reference Baseline | fa14c62, clean main. |
-| Candidate Proposal | [Session event wait](../proposals/m9-session-event-wait.md). |
-| Files And ABI Surface | Session wait and diagnosed startup failure path, regression tests, manifests, docs and fixed EXEs; no speculative ABI change. |
-| Applicable Rules | Architecture/coding/execution/documentation governance skills and repository design/rules/UI. |
-| Verification | Both builds/focused 2/2 pass; full x64 91/91 (77.68 s), x86 91/91 (60.95 s). Four manifests/docs pass. |
-| Expected Markers | No periodic idle wake, no failed-wait retry; queue ordering and input remain intact. |
-| Asset Needs | Existing build trees, both fixed EXEs; preserve INI/media. |
-| Reporting Requirements | Complete executor P and independent review P pushed; line accounting and clean tree. |
-| Stop Conditions | New public ABI/state machine or a cause outside the reproduced startup path requires further admission. |
-| Exit Criteria | Every finite ledger item proven, both builds/tests pass, manifests/docs pass, pushed clean. |
-| Original Owner Request | Common Session 100ms 超时空转：准入一个s修复编译 测试 提交 推送 等我。 |
-| Similar-Issue Sweep | Session queue take callers and signal/reset paths; other components' polling is outside this S. |
+| Admission And Approval | Owner approves Base extraction, simpler architecture, dual-width build/test/commit/push, then owner audit. |
+| Objective | One generic sync/time implementation, no duplicate Console mutex, blocking KVM frame copy lock. |
+| Non-goals | No product, media/INI, MVDM or unrelated polling changes; no compatibility wrappers. |
+| Reference Baseline | 780c292, clean main. |
+| Candidate Proposal | [Base synchronization](../proposals/m9-lib-base-synchronization.md). |
+| Files And ABI Surface | Lib Base/Host sync-clock relocation, Console/KVM locks, direct consumers/tests/build DAG/docs/manifests and fixed EXEs. |
+| Applicable Rules | Architecture/coding/execution/documentation governance and repository rules/design/UI. |
+| Verification | Strict Lib build both widths; focused 8/8 each; full x64 92/92 (79.99 s), x86 92/92 (64.78 s); four manifests/docs pass. |
+| Expected Markers | Frame copy blocks, ordinary control remains independent; old host sync/clock and Console mutex implementations absent. |
+| Asset Needs | Reuse build trees; refresh only fixed EXEs, preserve INI/media. |
+| Reporting Requirements | Production/test line accounting; complete executor P1 and actual-patch review P2 pushed, clean tree. |
+| Stop Conditions | New synchronization semantics or product policy requires further admission. |
+| Exit Criteria | Finite ledger proven, dual-width builds/tests and all manifests/docs pass, pushed clean for owner audit. |
+| Original Owner Request | 批准这项实现 要求精简代码逻辑架构 完成后编译测试提交推送后等我审计 希望代码减少 |
+| Similar-Issue Sweep | Generic sync/time consumers, duplicate mutex implementations, all frame locking sites and dependency declarations. |
 
 ## Current Technical Baseline
 

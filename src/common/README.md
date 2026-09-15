@@ -4,7 +4,7 @@
 uses public `lib` contracts and accepts product behavior only through copied
 options and injected callbacks.  It never includes app, host, or MVDM source.
 Common has no platform directories, platform types, native calls or OS-selected
-implementations. Host owns blocking mutex/event/task/wait; Types owns the atomic
+implementations. Base owns blocking mutex/event/task/wait; Types owns the atomic
 vocabulary. Common retains queue, lifecycle and frame-publication ownership.
 
 Machine snapshot reads specify the expected run and leave the destination
@@ -82,5 +82,5 @@ changed or duplicate entries. The source/build DAG gate rejects platform
 bypasses and sibling private includes; its negative tests live in test/common.
 The source-only build still accepts an explicit COMMON_LIB_ROOT when configured
 directly. It does not register or carry test code.
-Common synchronization tests run against actual Host primitives without sleeps.
+Common synchronization tests run against actual Base primitives without sleeps.
 Platform backend availability does not imply complete native display parity.

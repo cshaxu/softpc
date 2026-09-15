@@ -1,6 +1,6 @@
 #include "common/ui/ui_interface.h"
 #include "lib/host/console_interface.h"
-#include "lib/host/sync_interface.h"
+#include "lib/base/sync_interface.h"
 #include "lib/kvm-window/window_interface.h"
 #include "lib/kvm-console/console_interface.h"
 #include <assert.h>
@@ -82,7 +82,7 @@ static int receive(void *context, const common_ui_event *event)
     ++received;
     return 1;
 }
-static void input_worker(void *context, const host_sync_task *task)
+static void input_worker(void *context, const base_sync_task *task)
 {
     const kvm_component_options *options = context;
     kvm_input_event input = { 0 };
@@ -97,7 +97,7 @@ int main(void)
 {
     common_ui *ui = NULL;
     common_ui_options options = { 0 };
-    host_sync_task *worker;
+    base_sync_task *worker;
     static kvm_frame frame;
     options.event_sink = receive;
     options.running_window_title = "running";
@@ -187,9 +187,9 @@ int main(void)
         kvm_component_options *component = source ? &console_fake.options :
             &window_fake.options.component;
         lib_u32 prior = received;
-        assert(host_sync_task_create(input_worker, component, &worker) == LIB_STATUS_OK);
+        assert(base_sync_task_create(input_worker, component, &worker) == LIB_STATUS_OK);
         for (lib_u32 i = 0u; i < 10000u; ++i) common_ui_set_run_generation(ui, 11u + i % 2u);
-        host_sync_task_destroy(worker);
+        base_sync_task_destroy(worker);
         assert(received == prior + 10001u);
     }
     common_ui_set_run_generation(ui, 12u);

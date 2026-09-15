@@ -56,7 +56,7 @@ enable_testing()
 add_subdirectory(src/common)
 add_subdirectory(test/lib)
 add_subdirectory(test/common)
-target_link_libraries(softpc-machine PRIVATE storage host)
+target_link_libraries(softpc-machine PRIVATE storage base)
 
 # CCPU calls the driver's debug observers, so include the VM objects directly
 # instead of depending on cyclic static-archive extraction order.

@@ -5,7 +5,7 @@ file(MAKE_DIRECTORY "${fixture}/src/app" "${fixture}/src/vm" "${fixture}/src/com
 file(WRITE "${fixture}/src/vm/vm_interface.h" "#include <common/machine/machine_interface.h>\n")
 file(WRITE "${fixture}/src/app/composition.c" "#include <vm/vm_interface.h>\n")
 file(WRITE "${fixture}/src/app/legal.c" "#include <lib/storage/file_interface.h>\n")
-file(WRITE "${fixture}/src/common/legal.c" "#include <lib/host/sync_interface.h>\n")
+file(WRITE "${fixture}/src/common/legal.c" "#include <lib/base/sync_interface.h>\n")
 file(WRITE "${fixture}/src/vm/legal.c" "#include <compat/machine.h>\n")
 file(WRITE "${fixture}/src/compat/legal.c" "#include <lib/storage/medium_interface.h>\n")
 file(WRITE "${fixture}/src/mvdm/legal.c" "#include <compat/ccpu/lifecycle.h>\n")

@@ -41,9 +41,8 @@ lib_status kvm_component_mailboxes_create(kvm_component_mailboxes *mailboxes)
 {
     if (mailboxes == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     lib_memory_set(mailboxes, 0, sizeof(*mailboxes));
-    lib_atomic_flag_clear(&mailboxes->frame_lock);
     lib_atomic_flag_clear(&mailboxes->control_lock);
-    return LIB_STATUS_OK;
+    return base_sync_mutex_create(&mailboxes->frame_lock);
 }
 
 void kvm_component_mailboxes_destroy(kvm_component_mailboxes *mailboxes)
@@ -51,6 +50,8 @@ void kvm_component_mailboxes_destroy(kvm_component_mailboxes *mailboxes)
     if (mailboxes == LIB_NULL) return;
     kvm_mailbox_wake_destroy(mailboxes->wake);
     mailboxes->wake = LIB_NULL;
+    base_sync_mutex_destroy(mailboxes->frame_lock);
+    mailboxes->frame_lock = LIB_NULL;
 }
 
 lib_status kvm_component_mailboxes_publish_frame(kvm_component_mailboxes *mailboxes,
@@ -60,9 +61,9 @@ lib_status kvm_component_mailboxes_publish_frame(kvm_component_mailboxes *mailbo
     lib_bool full;
     if (mailboxes == LIB_NULL || !kvm_frame_is_valid(frame))
         return LIB_STATUS_INVALID_ARGUMENT;
-    kvm_component_mailboxes_lock(&mailboxes->frame_lock);
+    base_sync_mutex_lock(mailboxes->frame_lock);
     if (mailboxes->closed) {
-        kvm_component_mailboxes_unlock(&mailboxes->frame_lock);
+        base_sync_mutex_unlock(mailboxes->frame_lock);
         return LIB_STATUS_INVALID_STATE;
     }
     full = mailboxes->frame_generation == 0u ||
@@ -89,7 +90,7 @@ lib_status kvm_component_mailboxes_publish_frame(kvm_component_mailboxes *mailbo
     mailboxes->frame.dirty_right = right; mailboxes->frame.dirty_bottom = bottom;
     mailboxes->frame_pending = LIB_TRUE;
     mailboxes->frame.sequence = ++mailboxes->frame_generation;
-    kvm_component_mailboxes_unlock(&mailboxes->frame_lock);
+    base_sync_mutex_unlock(mailboxes->frame_lock);
     return LIB_STATUS_OK;
 }
 
@@ -103,12 +104,12 @@ lib_status kvm_component_mailboxes_enqueue_control(
         control->kind > KVM_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE)
         return LIB_STATUS_INVALID_ARGUMENT;
     stop = control->kind == KVM_COMPONENT_CONTROL_STOP;
-    if (stop) kvm_component_mailboxes_lock(&mailboxes->frame_lock);
+    if (stop) base_sync_mutex_lock(mailboxes->frame_lock);
     kvm_component_mailboxes_lock(&mailboxes->control_lock);
     if (stop) {
         if (mailboxes->closed != LIB_FALSE) {
             kvm_component_mailboxes_unlock(&mailboxes->control_lock);
-            kvm_component_mailboxes_unlock(&mailboxes->frame_lock);
+            base_sync_mutex_unlock(mailboxes->frame_lock);
             return LIB_STATUS_OK;
         }
         mailboxes->closed = LIB_TRUE;
@@ -124,7 +125,7 @@ lib_status kvm_component_mailboxes_enqueue_control(
     mailboxes->controls[index] = *control;
     ++mailboxes->control_count;
     kvm_component_mailboxes_unlock(&mailboxes->control_lock);
-    if (stop) kvm_component_mailboxes_unlock(&mailboxes->frame_lock);
+    if (stop) base_sync_mutex_unlock(mailboxes->frame_lock);
     return LIB_STATUS_OK;
 }
 
@@ -150,14 +151,14 @@ lib_bool kvm_component_mailboxes_capture_frame(kvm_component_mailboxes *mailboxe
 {
     if (mailboxes == LIB_NULL || out_generation == LIB_NULL ||
         out_frame == LIB_NULL) return LIB_FALSE;
-    kvm_component_mailboxes_lock(&mailboxes->frame_lock);
+    base_sync_mutex_lock(mailboxes->frame_lock);
     if (!mailboxes->frame_pending) {
-        kvm_component_mailboxes_unlock(&mailboxes->frame_lock);
+        base_sync_mutex_unlock(mailboxes->frame_lock);
         return LIB_FALSE;
     }
     *out_frame = mailboxes->frame;
     *out_generation = mailboxes->frame_generation;
-    kvm_component_mailboxes_unlock(&mailboxes->frame_lock);
+    base_sync_mutex_unlock(mailboxes->frame_lock);
     return LIB_TRUE;
 }
 
@@ -165,10 +166,10 @@ void kvm_component_mailboxes_acknowledge_frame(kvm_component_mailboxes *mailboxe
     lib_u32 generation)
 {
     if (mailboxes == LIB_NULL) return;
-    kvm_component_mailboxes_lock(&mailboxes->frame_lock);
+    base_sync_mutex_lock(mailboxes->frame_lock);
     if (generation == mailboxes->frame_generation)
         mailboxes->frame_pending = LIB_FALSE;
-    kvm_component_mailboxes_unlock(&mailboxes->frame_lock);
+    base_sync_mutex_unlock(mailboxes->frame_lock);
 }
 
 kvm_mailbox_wake *kvm_component_mailboxes_wake(
@@ -179,9 +180,9 @@ kvm_mailbox_wake *kvm_component_mailboxes_wake(
 
 void kvm_component_mailboxes_close(kvm_component_mailboxes *mailboxes)
 {
-    kvm_component_mailboxes_lock(&mailboxes->frame_lock);
+    base_sync_mutex_lock(mailboxes->frame_lock);
     kvm_component_mailboxes_lock(&mailboxes->control_lock);
     mailboxes->closed = LIB_TRUE;
     kvm_component_mailboxes_unlock(&mailboxes->control_lock);
-    kvm_component_mailboxes_unlock(&mailboxes->frame_lock);
+    base_sync_mutex_unlock(mailboxes->frame_lock);
 }

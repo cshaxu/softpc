@@ -1,6 +1,6 @@
 # kvm-base
 
-`kvm-base` is the shared KVM foundation. It depends only on `types` and provides
+`kvm-base` is the shared KVM foundation. It depends on `types` and `base`, providing
 copied frame/input values, source-local hotkey matching, and private mailbox
 mechanics to `kvm-window` and `kvm-console`.
 
@@ -9,6 +9,12 @@ Capacity rejection returns LIMIT_EXCEEDED without replacing any queued record.
 STOP has a reserved slot, closes admission and is idempotent. The worker consumes
 controls in order through STOP, then ignores later control/frame work. There is
 no batch admission; frame publication remains independently locked, latest-wins.
+
+Frame copying uses a Base blocking mutex, not a spinlock. The independent
+control lock only protects the short FIFO operation. STOP/fault acquires frame
+then control; ordinary control remains independent of a contended frame copy.
+Initialization allocates the mutex and returns failure if it cannot be created;
+disposal releases it after all mailbox users have quiesced.
 
 Each mailbox selects one notification implementation exactly once before caller publication.
 Initialization allocates no wake. Console selects and creates the default wait

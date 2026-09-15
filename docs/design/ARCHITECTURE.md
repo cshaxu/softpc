@@ -146,7 +146,7 @@ only those snapshots.
 
 Common is platform-independent source: it has no platform subdirectories,
 native API/types or OS-selected implementation branches. It owns its queues
-and state machines through public Lib Host mutex/event/task/wait contracts and
+and state machines through public Lib Base mutex/event/task/wait contracts and
 Types atomics. Its complete manifest and source/build dependency gate travel
 with the corpus and run independently of the importing product.
 Shared unit suites live in test/common and test/lib, each with its own CMake
@@ -158,7 +158,7 @@ adopts it exactly; no runtime or build dependency crosses repositories.
 
 `types` defines universal copied scalar/status values and header-only external
 C/compiler/platform vocabulary. Platform declaration headers contain no
-component policy; host owns clock composition, and kvm-base owns input
+component policy; base owns synchronization/clock composition, and kvm-base owns input
 interpretation. Component platform implementations are selected by the build,
 not by a generic types dispatcher. `console` defines
 copied logical Console objects. `host` owns native Console
@@ -176,7 +176,8 @@ actions; common/ui does not interpret their product meaning.
 The library's only direct component edges are:
 
 ```text
-types    -> console + host + storage + kvm-base + kvm-window + kvm-console
+types    -> base + console + host + storage + kvm-base + kvm-window + kvm-console
+base     -> console + kvm-base
 console  -> host + kvm-console
 kvm-base  -> kvm-window + kvm-console
 ```
@@ -295,8 +296,8 @@ atomically without bypassing FIFO control consumption up to STOP. Frame and
 control have independent locks; only terminal admission takes both, frame first.
 Ordinary control does not wait for frame copying.
 
-Logical Console event/output gates and broker transactions use private blocking
-locks in their owning components, preserving existing lock order and callback
+Logical Console event/output gates and KVM frame copies use Base blocking mutexes.
+Broker transactions retain backend-owned blocking locks, preserving lock order and callback
 barriers. No callback may synchronously reenter binding/destruction. Storage
 owns each CRT stream directly; writer embeds file state instead of separately
 allocated pointer wrappers.
@@ -305,7 +306,7 @@ Pure Window geometry, cursor rectangles, frame pixel conversion and relative
 motion scaling belong to kvm-window root helpers. Native files marshal SDK
 values and own actual drawing/messages/capture. Worker context and frame share
 one allocation; native cleanup runs on the worker, storage release after join.
-Host event is one opaque platform allocation, not a pointer-only outer wrapper.
+Base event is one opaque platform allocation, not a pointer-only outer wrapper.
 KVM destruction performs one bounded 5000 ms join. An unjoinable live worker is
 an application-terminal infrastructure failure; Lib never terminates the
 process or exposes a half-object recovery protocol. A KVM notification failure

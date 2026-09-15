@@ -1,20 +1,31 @@
 #include <assert.h>
 #include <windows.h>
-#include "lib/console/win32/mutex.c"
+#include "lib/base/win32/sync.c"
 
 static HANDLE entered, release_gate, blocked;
 static LONG contender;
-static void tracked_enter(console_mutex *mutex)
+static unsigned mutex_creates, fail_mutex;
+static lib_status tracked_create(base_sync_mutex **out)
+{
+    if (++mutex_creates == fail_mutex) {
+        *out = NULL;
+        return LIB_STATUS_NO_MEMORY;
+    }
+    return base_sync_mutex_create(out);
+}
+static void tracked_enter(base_sync_mutex *mutex)
 {
     if (GetCurrentThreadId() == (DWORD)InterlockedCompareExchange(&contender, 0, 0)) {
         if (TryEnterCriticalSection(&mutex->gate)) return;
         SetEvent(blocked); /* proven contention, not a scheduling guess */
     }
-    console_mutex_enter(mutex);
+    base_sync_mutex_lock(mutex);
 }
-#define console_mutex_enter tracked_enter
+#define base_sync_mutex_lock tracked_enter
+#define base_sync_mutex_create tracked_create
 #include "lib/console/console.c"
-#undef console_mutex_enter
+#undef base_sync_mutex_lock
+#undef base_sync_mutex_create
 
 static lib_console *object;
 static int mode;
@@ -68,6 +79,12 @@ static DWORD WINAPI detach(void *unused)
 }
 int main(void)
 {
+    for (fail_mutex = 1; fail_mutex <= 2; ++fail_mutex) {
+        mutex_creates = 0;
+        assert(lib_console_create(&object) == LIB_STATUS_NO_MEMORY);
+        assert(object == NULL);
+    }
+    fail_mutex = 0;
     for (mode = 0; mode != 5; ++mode) {
         HANDLE a, b;
         const lib_console_output_binding binding = { output, frame_output, NULL };

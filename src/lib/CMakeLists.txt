@@ -30,14 +30,18 @@ endfunction()
 add_library(types INTERFACE)
 library_root(types)
 
-add_library(console STATIC console/console.c)
+add_library(base STATIC base/sync.c base/clock.c)
 if(WIN32)
-    target_sources(console PRIVATE console/win32/mutex.c)
+    target_sources(base PRIVATE base/win32/sync.c base/win32/clock.c)
 else()
-    target_sources(console PRIVATE console/linux/mutex.c)
+    target_sources(base PRIVATE base/linux/sync.c base/linux/clock.c)
 endif()
+library_root(base)
+target_link_libraries(base PUBLIC types)
+
+add_library(console STATIC console/console.c)
 library_root(console)
-target_link_libraries(console PUBLIC types)
+target_link_libraries(console PUBLIC types base)
 
 set(LIBRARY_KVM_BASE_SOURCES
     kvm-base/component.c
@@ -55,7 +59,7 @@ else()
 endif()
 add_library(kvm-base STATIC ${LIBRARY_KVM_BASE_SOURCES})
 library_root(kvm-base)
-target_link_libraries(kvm-base PUBLIC types)
+target_link_libraries(kvm-base PUBLIC types base)
 
 add_library(kvm-window STATIC kvm-window/window.c kvm-window/geometry.c kvm-window/render.c kvm-window/motion.c)
 if(WIN32)
@@ -76,14 +80,12 @@ endif()
 library_root(kvm-console)
 target_link_libraries(kvm-console PUBLIC types console kvm-base)
 
+add_library(host STATIC host/console.c)
 if(WIN32)
-    set(LIBRARY_HOST_SOURCES host/clock.c host/console.c host/sync.c
-        host/win32/clock.c host/win32/console.c host/win32/sync.c)
+    target_sources(host PRIVATE host/win32/console.c)
 else()
-    set(LIBRARY_HOST_SOURCES host/clock.c host/console.c host/sync.c
-        host/linux/clock.c host/linux/console.c host/linux/sync.c)
+    target_sources(host PRIVATE host/linux/console.c)
 endif()
-add_library(host STATIC ${LIBRARY_HOST_SOURCES})
 library_root(host)
 target_link_libraries(host PUBLIC types console)
 
@@ -103,8 +105,7 @@ if(WIN32)
     target_link_libraries(host PRIVATE user32)
 else()
     find_package(Threads REQUIRED)
-    target_link_libraries(console PRIVATE Threads::Threads)
-    target_link_libraries(host PRIVATE Threads::Threads)
+    target_link_libraries(base PRIVATE Threads::Threads)
     target_link_libraries(kvm-base PRIVATE Threads::Threads)
 endif()
 
@@ -112,11 +113,11 @@ endif()
 # peer root remains independently compilable and names its exact dependencies.
 add_library(lib-neutral-corpus INTERFACE)
 target_link_libraries(lib-neutral-corpus INTERFACE
-    types console host storage kvm-base kvm-window kvm-console)
+    types base console host storage kvm-base kvm-window kvm-console)
 
 if(LIBRARY_STRICT_WARNINGS AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     foreach(library_target IN ITEMS
-            console kvm-base kvm-window kvm-console host storage)
+            base console kvm-base kvm-window kvm-console host storage)
         target_compile_options(${library_target} PRIVATE
             -Wall -Wextra -Wpedantic -Werror)
     endforeach()

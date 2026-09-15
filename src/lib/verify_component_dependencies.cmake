@@ -1,10 +1,11 @@
 # One exact direct-edge map for source includes and build linkage.
-set(library_components types console host storage kvm-base kvm-window kvm-console)
+set(library_components types base console host storage kvm-base kvm-window kvm-console)
 set(library_dependencies_types "")
-set(library_dependencies_console types)
+set(library_dependencies_base types)
+set(library_dependencies_console types base)
 set(library_dependencies_host types console)
 set(library_dependencies_storage types)
-set(library_dependencies_kvm-base types)
+set(library_dependencies_kvm-base types base)
 set(library_dependencies_kvm-window types kvm-base)
 set(library_dependencies_kvm-console types console kvm-base)
 
@@ -85,7 +86,7 @@ if(EXISTS "${LIBRARY_ROOT}/CMakeLists.txt")
                 library_check_edge("${owner}" "${dependency}")
             elseif((dependency STREQUAL "user32" AND owner MATCHES "^(host|kvm-base|kvm-window)$") OR
                    (dependency STREQUAL "gdi32" AND owner STREQUAL "kvm-window") OR
-                   (dependency STREQUAL "threads::threads" AND owner MATCHES "^(console|host|kvm-base)$"))
+                   (dependency STREQUAL "threads::threads" AND owner MATCHES "^(base|kvm-base)$"))
                 continue()
             else()
                 message(FATAL_ERROR "Unadmitted link: ${owner} -> ${dependency}")

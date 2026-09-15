@@ -63,8 +63,8 @@ if(NOT lib_cmake_types_source MATCHES "add_library\\(types INTERFACE\\)" OR
     message(FATAL_ERROR "types must remain an INTERFACE-only vocabulary target")
 endif()
 foreach(platform_neutral_base IN ITEMS
-    "src/lib/host/clock.c"
-    "src/lib/host/sync.c"
+    "src/lib/base/clock.c"
+    "src/lib/base/sync.c"
     "src/lib/storage/file.c"
     "src/lib/kvm-base/mailbox.c")
     file(READ "${SOFTPC_SOURCE_DIR}/${platform_neutral_base}" base_source)
@@ -74,10 +74,10 @@ foreach(platform_neutral_base IN ITEMS
     endif()
 endforeach()
 foreach(component_platform_source IN ITEMS
-    "src/lib/host/win32/clock.c"
-    "src/lib/host/linux/clock.c"
-    "src/lib/host/win32/sync.c"
-    "src/lib/host/linux/sync.c"
+    "src/lib/base/win32/clock.c"
+    "src/lib/base/linux/clock.c"
+    "src/lib/base/win32/sync.c"
+    "src/lib/base/linux/sync.c"
     "src/lib/storage/win32/file.c"
     "src/lib/storage/linux/file.c"
     "src/lib/kvm-base/win32/mailbox.c"
@@ -324,9 +324,9 @@ endif()
 # its allowed component edges executable rather than README-only claims.
 file(READ "${SOFTPC_SOURCE_DIR}/src/lib/CMakeLists.txt" lib_cmake_source)
 if(NOT lib_cmake_source MATCHES
-   "target_link_libraries\\(console PUBLIC types\\)" OR
+   "target_link_libraries\\(console PUBLIC types base\\)" OR
    NOT lib_cmake_source MATCHES
-   "target_link_libraries\\(kvm-base PUBLIC types\\)" OR
+   "target_link_libraries\\(kvm-base PUBLIC types base\\)" OR
    NOT lib_cmake_source MATCHES
    "target_link_libraries\\(kvm-window PUBLIC types kvm-base\\)" OR
    NOT lib_cmake_source MATCHES

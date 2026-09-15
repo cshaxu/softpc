@@ -13,7 +13,7 @@ or changed library file.
 
 ## Header visibility
 
-Host's public synchronization contract includes opaque blocking mutexes.
+Base's public synchronization contract includes opaque blocking mutexes.
 Lock/unlock require a live object, same-thread ownership and no recursive
 locking; destroy requires all users to have stopped. Platform implementations
 own the allocation and native lock directly, without an outer pointer wrapper.
@@ -47,7 +47,8 @@ An arrow means the component on the right may use the generic contract of the
 component on the left:
 
 ```text
-types -> console + host + storage + kvm-base + kvm-window + kvm-console
+types -> base + console + host + storage + kvm-base + kvm-window + kvm-console
+base -> console + kvm-base
 console -> host + kvm-console
 kvm-base -> kvm-window + kvm-console
 ```
@@ -65,11 +66,13 @@ lifecycle controller, or public unified presenter API.
   to its platform-neutral base source. Common types headers contain no OS
   selection; platform declaration groups live in `types/win32` and
   `types/linux`. The compiler-only atomic adaptation remains common.
+- `base` owns generic sync/time and depends only on Types. Console and KVM
+  frame gates reuse its blocking mutex instead of private implementations.
 - `console` provides the logical Console object. It is a neutral copied-value
   endpoint: it has no native handle, platform input mode, Window, raw Console,
   monitor, or product-lifecycle meaning.
 - `host` exposes an opaque `host_console_broker` that binds one caller-owned
-  logical Console to native I/O and provides clock/sync. A caller supplies its
+  logical Console to native I/O. A caller supplies its
   expected Current Console on every replacement or cooked-line request; host
   has no monitor, raw Console, prompt, or lifecycle vocabulary. A replacement first
   retires and confirms the old native reader, then activates the next binding;
@@ -109,8 +112,7 @@ mailboxes. Callers never share or address a mailbox directly.
   overwriting an existing record. A STOP record has one reserved FIFO slot and
   is idempotent. Once STOP is queued or a terminal fault closes admission, later
   frame and non-STOP control requests return
-  `LIB_STATUS_INVALID_STATE`. A multi-record operation is all-or-nothing:
-  insufficient ordinary capacity leaves every requested record unqueued. A
+  `LIB_STATUS_INVALID_STATE`. Each call admits one control record. A
   rejected control enqueue is returned to its caller without faulting the
   component. Notification failure after acceptance is terminal and also
   reported through the component failure sink; it is not permission to replay.
@@ -141,7 +143,7 @@ handle from it.
 
 ## Platform scope
 
-Linux event waits share one host-sync mutex/condition, so a waiter on multiple
+Linux event waits share one base-sync mutex/condition, so a waiter on multiple
 events sleeps until a predicate can change instead of polling. Auto-reset
 consumption occurs under the same lock. Timed waits use a monotonic deadline;
 infinite waits have no deadline. Callers must join all waiters before destroying
@@ -160,8 +162,8 @@ keyboard replay is never retried after a partial sink failure. Mouse/close
 records do not flush keyboard prefixes; only keyboard order, not key/mouse
 interleaving, is retained while a prefix is pending.
 
-Console callback/output gates and broker replacement use component-private
-blocking locks; no sibling host dependency is introduced into console. Native
+Console callback/output gates use Base blocking mutexes; broker replacement
+retains backend-owned blocking locks. No Console-to-Host dependency exists. Native
 I/O lock ordering and detach barriers are unchanged. Callbacks must not
 synchronously reenter binding replacement or destruction on the same owner.
 

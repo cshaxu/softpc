@@ -27,7 +27,7 @@ function(lib_test name)
 endfunction()
 
 lib_test(lib_console console)
-lib_test(types_contract host)
+lib_test(types_contract base)
 lib_test(storage_file_writer_binary storage)
 lib_test(kvm_component_contract kvm-base)
 lib_test(kvm_mailbox_selection kvm-base)
@@ -41,6 +41,7 @@ target_sources(lib-test-linux_input_contract PRIVATE
 
 if(WIN32)
     lib_test(lib_console_event_gate console)
+    lib_test(kvm_frame_lock kvm-base)
     lib_test(host_console_broker console)
     lib_test(lib_failure_output_contract kvm-window kvm-console host storage)
     lib_test(win32_vocabulary_ownership types user32)
@@ -52,11 +53,11 @@ if(WIN32)
     foreach(probe IN ITEMS kvm_frame_damage_mouse kvm_window_retirement
             kvm_window_modal kvm_shutdown_failure host_console_reader_failure
             host_console_display host_console_cancel kvm_input_admission console_blocking_gate
-            host_sync_ownership kvm_keyboard_lifetime lib_console_io_contract
+            base_sync_ownership kvm_keyboard_lifetime lib_console_io_contract
             kvm_window_capture_contract)
         lib_test(${probe} kvm-window console)
     endforeach()
-    target_link_libraries(lib-test-host_sync_ownership PRIVATE host)
+    target_link_libraries(lib-test-base_sync_ownership PRIVATE base)
     target_link_libraries(lib-test-kvm_keyboard_lifetime PRIVATE kvm-console)
     target_link_libraries(lib-test-kvm_shutdown_failure PRIVATE kvm-console)
 endif()

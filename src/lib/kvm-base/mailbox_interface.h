@@ -5,6 +5,7 @@
 #include "lib/kvm-base/mailbox_wake_interface.h"
 
 #include "lib/types/atomic.h"
+#include "lib/base/sync_interface.h"
 
 #define KVM_COMPONENT_CONTROL_CAPACITY 32u
 #define KVM_COMPONENT_CONTROL_STORAGE_CAPACITY (KVM_COMPONENT_CONTROL_CAPACITY + 1u)
@@ -33,7 +34,7 @@ typedef lib_status (*kvm_mailbox_notify_fn)(void *context);
  * Independent locks protect frames and controls. Terminal closure takes
  * frame then control; ordinary control never waits for a frame copy. */
 typedef struct kvm_component_mailboxes {
-    lib_atomic_flag frame_lock;
+    base_sync_mutex *frame_lock;
     lib_atomic_flag control_lock;
     kvm_frame frame;
     lib_u32 frame_generation;
@@ -48,7 +49,8 @@ typedef struct kvm_component_mailboxes {
     void *notify_context;
 } kvm_component_mailboxes;
 
-/* Initializes only mailbox data and locks, without allocating a wake object. */
+/* Creates the blocking frame lock, without allocating a wake object.
+ * Failure leaves an empty, destroyable mailbox; no operation is then valid. */
 lib_status kvm_component_mailboxes_create(kvm_component_mailboxes *mailboxes);
 /* One-time startup selection, before publishing the component to any caller.
  * NULL notify creates the default wait primitive; otherwise no wake is allocated.

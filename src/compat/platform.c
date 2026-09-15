@@ -37,8 +37,8 @@
 #include "hdd_media.h"
 #include "audio.h"
 #include "c_main.h"
-#include "lib/host/clock_interface.h"
-#include "lib/host/sync_interface.h"
+#include "lib/base/clock_interface.h"
+#include "lib/base/sync_interface.h"
 
 /*
  * Minimal host ports for the detached CCPU.  These are deliberately machine
@@ -189,7 +189,7 @@ void softpc_platform_pace_instruction(void)
         softpc_platform_has_pending_executor_event())
         return;
     if (softpc_executor_pacing_frequency == 0u ||
-        host_clock_monotonic_counter(&now, &units_per_second) != LIB_STATUS_OK)
+        base_clock_monotonic_counter(&now, &units_per_second) != LIB_STATUS_OK)
         return;
     target_units = (softpc_executor_pacing_instructions *
                     (ULONGLONG)softpc_executor_pacing_frequency) /
@@ -202,10 +202,10 @@ void softpc_platform_pace_instruction(void)
         milliseconds = ((target_units - elapsed_units) * 1000ULL) /
                        (ULONGLONG)softpc_executor_pacing_frequency;
         if (milliseconds != 0u)
-            host_sync_sleep_milliseconds(1u);
+            base_sync_sleep_milliseconds(1u);
         else
-            host_sync_yield();
-        if (host_clock_monotonic_counter(&now, &units_per_second) != LIB_STATUS_OK)
+            base_sync_yield();
+        if (base_clock_monotonic_counter(&now, &units_per_second) != LIB_STATUS_OK)
             break;
         elapsed_units = (ULONGLONG)(now - softpc_executor_pacing_origin);
     }
@@ -221,7 +221,7 @@ void softpc_platform_wait_for_executor_event(void)
     if (softpc_executor_event != NULL)
         (void)WaitForSingleObject(softpc_executor_event, INFINITE);
     else
-        host_sync_sleep_milliseconds(1u);
+        base_sync_sleep_milliseconds(1u);
 #endif
 }
 
@@ -244,7 +244,7 @@ void softpc_platform_set_runtime_heartbeat(int enabled)
     lib_u64 units_per_second;
 
     if (enabled &&
-        host_clock_monotonic_counter(&now, &units_per_second) == LIB_STATUS_OK &&
+        base_clock_monotonic_counter(&now, &units_per_second) == LIB_STATUS_OK &&
         units_per_second != 0u)
     {
         softpc_executor_pacing_origin = now;
@@ -314,7 +314,7 @@ void memset4(unsigned int data, unsigned int *destination, unsigned int count)
 void host_release_timeslice(void)
 {
 #ifdef _WIN32
-    host_sync_yield();
+    base_sync_yield();
 #endif
 }
 
@@ -684,7 +684,7 @@ static IUH softpc_clock_ticks(void)
     ULONGLONG remainder;
     ULONGLONG microseconds;
 
-    if (host_clock_monotonic_counter(&counter, &frequency) != LIB_STATUS_OK ||
+    if (base_clock_monotonic_counter(&counter, &frequency) != LIB_STATUS_OK ||
         frequency == 0u)
         return 0;
     seconds = (ULONGLONG)counter / (ULONGLONG)frequency;
