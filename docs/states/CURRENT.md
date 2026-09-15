@@ -2,9 +2,10 @@
 
 ## Current Work
 
-M9 T59 S18 verified: Lib Host renamed to Console Broker without behavior changes.
-Strict dual-width builds and 93/93 tests per width pass; P1 delivery and actual-commit
-coordinator review follow. T59 remains open; owner manual testing is pending.
+M9 T59 S18 delivered for owner testing: P1 c5e4438 pushed and actual-commit
+coordinator review passed. Lib Host is now Console Broker; behavior unchanged,
+production net 0 lines. Both strict builds and 93/93 tests per width pass.
+T59 remains open; owner manual testing is pending.
 
 ## M9 T59 S18 Packet
 
