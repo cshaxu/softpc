@@ -4,8 +4,9 @@
 
 M9 T59 S16 implemented and verified: Base Task uses one allocation and trampoline.
 Production C/H net -10; public API and KVM unchanged. Both strict builds pass;
-x86/x64 full suites each 92/92. Executor P1 delivery and coordinator review follow.
-S15 delivery is retained; T59 stays open for owner testing.
+x86/x64 full suites each 92/92. Executor P1 927bac3 is pushed; actual-commit
+coordinator review passed. S16 is delivered for owner testing, not T closure.
+S15 delivery is retained; T59 stays open. No next S is admitted.
 
 ## M9 T59 S16 Packet
 

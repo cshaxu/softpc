@@ -91,3 +91,23 @@ FE75CF47EAE7330A88DDD04921A217E4C20BF98C0EA7D50CA7B3C7C2C8AA4083;
 softpc64.exe 2,844,615 bytes, SHA256
 9CB56D4812BC476C94D771CCEF1601EB6E7A0D4CAD2D6DC541C4AD5746EB3552.
 Executor P1 includes the entire delivery; coordinator actual-commit review follows.
+
+## Coordinator review
+
+P1 927bac3 is committed and pushed. Switched to coordinator and inspected the
+actual commit, original request and all five ledger rows. Both platform task
+objects begin with the common fields; their native entry invokes the public
+callback directly. Cancellation exists before thread start, task creation
+failure cannot publish an object, and the successful join precedes Event and
+task disposal. No extra allocation, callback, lifetime state or API was added.
+The allocation test instruments the formerly hidden root allocation too; the
+Linux fake preserves the platform joined guard. Existing ignored native join
+results are unchanged, not claimed repaired by this structural task.
+
+Baseline comparison confirms no public/KVM/Common/Compat/App/VM/MVDM changes.
+The archived S15 proposal has the identical Git blob as its original baseline.
+Reviewed two updated manifests, strict builds, both full suites and final x86
+focused rerun. Production -10/test +82 counts are verified against P1. No new
+in-scope finding; existing TODOs are neither changed nor claimed resolved.
+P2 records acceptance of this bounded implementation and leaves S16 delivered
+for owner testing. T59 remains open; no next S is admitted.
