@@ -335,12 +335,12 @@ lib_status common_machine_create(common_machine **out_machine,
     lib_atomic_i32_initialize(&machine->media_requested, 0);
     machine->driver = *driver;
     status = base_sync_mutex_create(&machine->frame_lock);
-    if (status == LIB_STATUS_OK) status = base_sync_event_create(&machine->command_event);
-    if (status == LIB_STATUS_OK) status = base_sync_event_create(&machine->ready_event);
-    if (status == LIB_STATUS_OK) status = base_sync_event_create(&machine->resume_event);
-    if (status == LIB_STATUS_OK) status = base_sync_event_create(&machine->input_event);
-    if (status == LIB_STATUS_OK) status = base_sync_event_create(&machine->media_event);
-    if (status == LIB_STATUS_OK) status = base_sync_event_create(&machine->debug_event);
+    if (status == LIB_STATUS_OK) status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &machine->command_event);
+    if (status == LIB_STATUS_OK) status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &machine->ready_event);
+    if (status == LIB_STATUS_OK) status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &machine->resume_event);
+    if (status == LIB_STATUS_OK) status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &machine->input_event);
+    if (status == LIB_STATUS_OK) status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &machine->media_event);
+    if (status == LIB_STATUS_OK) status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &machine->debug_event);
     if (status == LIB_STATUS_OK) status = common_machine_input_queue_create(&machine->input_queue);
     if (status == LIB_STATUS_OK) {
         machine->frame_buffers[0] = lib_allocate_zero(1u, sizeof(*machine->frame_buffers[0]));

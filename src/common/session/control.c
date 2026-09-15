@@ -125,7 +125,7 @@ int common_session_queue_create(common_session_queue **out_queue)
     queue->capacity = COMMON_SESSION_EVENT_QUEUE_INITIAL_CAPACITY;
     queue->events = lib_allocate_zero(queue->capacity, sizeof(*queue->events));
     if (queue->events == NULL ||
-        base_sync_event_create(&queue->available) != LIB_STATUS_OK) {
+        base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &queue->available) != LIB_STATUS_OK) {
         lib_release(queue->events);
         if (queue->available != NULL) base_sync_event_destroy(queue->available);
         base_sync_mutex_destroy(queue->lock);

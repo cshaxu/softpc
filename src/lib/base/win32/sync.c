@@ -66,10 +66,10 @@ lib_status base_sync_platform_event_create(lib_bool manual_reset,
 
 void base_sync_platform_event_destroy(base_sync_event *event)
 { if (event != LIB_NULL) { if (event->handle != LIB_NULL) (void)lib_win32_close_handle(event->handle); lib_release(event); } }
-void base_sync_platform_event_signal(base_sync_event *event)
-{ if (event != LIB_NULL && event->handle != LIB_NULL) (void)lib_win32_set_event(event->handle); }
-void base_sync_platform_event_reset(base_sync_event *event)
-{ if (event != LIB_NULL && event->handle != LIB_NULL) (void)lib_win32_reset_event(event->handle); }
+lib_status base_sync_platform_event_signal(base_sync_event *event)
+{ return lib_win32_set_event(event->handle) ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR; }
+lib_status base_sync_platform_event_reset(base_sync_event *event)
+{ return lib_win32_reset_event(event->handle) ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR; }
 
 lib_status base_sync_platform_event_wait_many(
     const base_sync_event *const *events, lib_u32 event_count,

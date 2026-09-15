@@ -38,8 +38,8 @@ int main(void)
     assert(base_sync_mutex_create(NULL) == LIB_STATUS_INVALID_ARGUMENT);
     base_sync_mutex_destroy(NULL);
     assert(base_sync_mutex_create(&p.mutex) == LIB_STATUS_OK);
-    assert(base_sync_event_create(&p.entered) == LIB_STATUS_OK);
-    assert(base_sync_event_create(&p.go) == LIB_STATUS_OK);
+    assert(base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &p.entered) == LIB_STATUS_OK);
+    assert(base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &p.go) == LIB_STATUS_OK);
     assert(common_session_queue_create(&p.queue));
     assert(!common_session_queue_take(p.queue, &event, 0u));
     /* Force growth before a consumer exists; no fixed-capacity silent loss. */

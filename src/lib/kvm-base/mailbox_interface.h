@@ -2,7 +2,6 @@
 #define KVM_BASE_MAILBOX_INTERFACE_H
 
 #include "lib/kvm-base/frame_interface.h"
-#include "lib/kvm-base/mailbox_wake_interface.h"
 
 #include "lib/base/sync_interface.h"
 
@@ -43,7 +42,7 @@ typedef struct kvm_component_mailboxes {
     lib_u32 control_count;
     lib_bool closed;
     /* Selected once during startup; non-NULL notify means selection succeeded. */
-    kvm_mailbox_wake *wake;
+    base_sync_event *wake;
     kvm_mailbox_notify_fn notify;
     void *notify_context;
 } kvm_component_mailboxes;
@@ -74,7 +73,5 @@ lib_bool kvm_component_mailboxes_capture_frame(kvm_component_mailboxes *mailboxe
  * acknowledging an older capture never clears a newer publication. */
 void kvm_component_mailboxes_acknowledge_frame(kvm_component_mailboxes *mailboxes,
     lib_u32 generation);
-kvm_mailbox_wake *kvm_component_mailboxes_wake(
-    const kvm_component_mailboxes *mailboxes);
 
 #endif

@@ -107,20 +107,21 @@ void base_sync_platform_event_destroy(base_sync_event *event)
     if (event == LIB_NULL) return;
     lib_release(event);
 }
-void base_sync_platform_event_signal(base_sync_event *event)
+lib_status base_sync_platform_event_signal(base_sync_event *event)
 {
-    if (event == LIB_NULL) return;
-    (void)lib_linux_pthread_mutex_lock(&base_sync_lock);
+    int result;
+    if (lib_linux_pthread_mutex_lock(&base_sync_lock) != 0) return LIB_STATUS_IO_ERROR;
     event->signaled = LIB_TRUE;
-    (void)lib_linux_pthread_cond_broadcast(&base_sync_changed);
-    (void)lib_linux_pthread_mutex_unlock(&base_sync_lock);
+    result = lib_linux_pthread_cond_broadcast(&base_sync_changed);
+    if (lib_linux_pthread_mutex_unlock(&base_sync_lock) != 0) return LIB_STATUS_IO_ERROR;
+    return result == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
-void base_sync_platform_event_reset(base_sync_event *event)
+lib_status base_sync_platform_event_reset(base_sync_event *event)
 {
-    if (event == LIB_NULL) return;
-    (void)lib_linux_pthread_mutex_lock(&base_sync_lock);
+    if (lib_linux_pthread_mutex_lock(&base_sync_lock) != 0) return LIB_STATUS_IO_ERROR;
     event->signaled = LIB_FALSE;
-    (void)lib_linux_pthread_mutex_unlock(&base_sync_lock);
+    return lib_linux_pthread_mutex_unlock(&base_sync_lock) == 0 ?
+        LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
 lib_status base_sync_platform_event_wait_many(
@@ -156,7 +157,7 @@ lib_status base_sync_platform_event_wait_many(
             lib_linux_pthread_cond_timedwait(&base_sync_changed, &base_sync_lock, &deadline);
     }
 done:
-    (void)lib_linux_pthread_mutex_unlock(&base_sync_lock);
+    if (lib_linux_pthread_mutex_unlock(&base_sync_lock) != 0) return LIB_STATUS_IO_ERROR;
     return result == 0 || result == LIB_LINUX_ETIMEDOUT ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 

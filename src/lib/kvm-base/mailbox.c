@@ -2,7 +2,7 @@
 
 static lib_status kvm_component_notify_waiter(void *context)
 {
-    return kvm_mailbox_wake_signal(context);
+    return base_sync_event_signal(context);
 }
 
 lib_status kvm_component_mailboxes_select_notify(kvm_component_mailboxes *mailboxes,
@@ -11,7 +11,8 @@ lib_status kvm_component_mailboxes_select_notify(kvm_component_mailboxes *mailbo
     if (mailboxes == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     if (mailboxes->notify != LIB_NULL) return LIB_STATUS_INVALID_STATE;
     if (notify == LIB_NULL) {
-        lib_status status = kvm_mailbox_wake_create(&mailboxes->wake);
+        lib_status status = base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET,
+            &mailboxes->wake);
         if (status != LIB_STATUS_OK) return status;
         notify = kvm_component_notify_waiter;
         context = mailboxes->wake;
@@ -41,7 +42,7 @@ lib_status kvm_component_mailboxes_create(kvm_component_mailboxes *mailboxes)
 void kvm_component_mailboxes_destroy(kvm_component_mailboxes *mailboxes)
 {
     if (mailboxes == LIB_NULL) return;
-    kvm_mailbox_wake_destroy(mailboxes->wake);
+    base_sync_event_destroy(mailboxes->wake);
     mailboxes->wake = LIB_NULL;
     base_sync_mutex_destroy(mailboxes->frame_lock);
     mailboxes->frame_lock = LIB_NULL;
@@ -165,12 +166,6 @@ void kvm_component_mailboxes_acknowledge_frame(kvm_component_mailboxes *mailboxe
     if (generation == mailboxes->frame_generation)
         mailboxes->frame_pending = LIB_FALSE;
     base_sync_mutex_unlock(mailboxes->frame_lock);
-}
-
-kvm_mailbox_wake *kvm_component_mailboxes_wake(
-    const kvm_component_mailboxes *mailboxes)
-{
-    return mailboxes == LIB_NULL ? LIB_NULL : mailboxes->wake;
 }
 
 void kvm_component_mailboxes_close(kvm_component_mailboxes *mailboxes)

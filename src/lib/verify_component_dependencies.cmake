@@ -1,4 +1,10 @@
 # One exact direct-edge map for source includes and build linkage.
+foreach(retired IN ITEMS kvm-base/mailbox_wake_interface.h
+        kvm-base/win32/mailbox.c kvm-base/linux/mailbox.c)
+    if(EXISTS "${LIBRARY_ROOT}/${retired}")
+        message(FATAL_ERROR "Default mailbox wake must reuse Base Event: ${retired}")
+    endif()
+endforeach()
 set(library_components types base console host storage kvm-base kvm-window kvm-console)
 set(library_dependencies_types "")
 set(library_dependencies_base types)
@@ -7,7 +13,7 @@ set(library_dependencies_host types base console)
 set(library_dependencies_storage types)
 set(library_dependencies_kvm-base types base)
 set(library_dependencies_kvm-window types kvm-base)
-set(library_dependencies_kvm-console types console kvm-base)
+set(library_dependencies_kvm-console types base console kvm-base)
 
 function(library_check_edge owner dependency)
     if(NOT owner IN_LIST library_components OR NOT dependency IN_LIST library_components)
@@ -48,7 +54,7 @@ endforeach()
 
 if(EXISTS "${LIBRARY_ROOT}/kvm-window/win32/component.c")
     file(READ "${LIBRARY_ROOT}/kvm-window/win32/component.c" window_worker)
-    if(window_worker MATCHES "kvm_mailbox_wake_wait|kvm_component_mailboxes_wake")
+    if(window_worker MATCHES "base_sync_event_wait|kvm_mailbox_wake_wait|kvm_component_mailboxes_wake")
         message(FATAL_ERROR "Window must use its selected message notifier, not an Event bridge")
     endif()
     if(window_worker MATCHES "win32_window_cursor_blink_timeout")
@@ -86,7 +92,7 @@ if(EXISTS "${LIBRARY_ROOT}/CMakeLists.txt")
                 library_check_edge("${owner}" "${dependency}")
             elseif((dependency STREQUAL "user32" AND owner MATCHES "^(host|kvm-base|kvm-window)$") OR
                    (dependency STREQUAL "gdi32" AND owner STREQUAL "kvm-window") OR
-                   (dependency STREQUAL "threads::threads" AND owner MATCHES "^(base|kvm-base)$"))
+                   (dependency STREQUAL "threads::threads" AND owner STREQUAL "base"))
                 continue()
             else()
                 message(FATAL_ERROR "Unadmitted link: ${owner} -> ${dependency}")

@@ -177,7 +177,7 @@ The library's only direct component edges are:
 
 ```text
 types    -> base + console + host + storage + kvm-base + kvm-window + kvm-console
-base     -> console + host + kvm-base
+base     -> console + host + kvm-base + kvm-console
 console  -> host + kvm-console
 kvm-base  -> kvm-window + kvm-console
 ```

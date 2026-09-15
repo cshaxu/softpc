@@ -2,34 +2,31 @@
 
 ## Current Work
 
-M9 T59 S14 implemented and verified: consumer mutexes use Base, production
-C/H net -7. Strict dual-width builds pass; x64 92/92, x86 rerun 92/92.
-An initial x86 native-modal early exit is recorded in TODO, not claimed fixed.
-Executor P1 62c5421 is pushed; actual-commit coordinator review passed.
-S13 dc5811f is retained. Work is delivered for owner testing, not T closure.
-S15/S16 are planned, not admitted; await owner testing after S14 delivery.
-T59 remains open.
+M9 T59 S15 implemented and verified: KVM default wake reuses Base Event;
+production C/H net -143. Strict dual-width builds pass; x86/x64 each 92/92.
+Executor delivery awaits commit/push and actual-commit coordinator review.
+S14 is retained; T59 stays open. S16 remains unadmitted; wait for owner testing.
 
-## M9 T59 S14 Packet
+## M9 T59 S15 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner requests proposal S14-S16 and admits S14 only, build/test/commit/push then wait. |
-| Objective | One Base mutex implementation for Host output/transaction, Console metadata and KVM control. |
-| Non-goals | No Event/task migration, product policy, MVDM, Common, App, VM, Compat or INI/media changes. |
-| Reference Baseline | dc5811f, clean main. |
-| Candidate Proposal | [Base synchronization](../proposals/m9-lib-base-synchronization.md). |
-| Files And ABI Surface | Lib consumer lock fields/calls, Host Base build edge, focused tests/gates/docs/manifests/fixed EXEs; no new Base API. |
-| Applicable Rules | Architecture/coding/execution/documentation governance; repository architecture/coding/UI design and execution/document rules. |
-| Verification | Creation failure/real contention/barrier tests pass; full x64 92/92 (77.48 s), x86 second full run 92/92 (48.34 s); four manifests/docs pass. Initial modal failure and 10 isolated passes are recorded. |
-| Expected Markers | No consumer metadata/control spin helpers or Host native mutex implementation; lock scopes/order unchanged. |
-| Asset Needs | Reuse existing build trees; refresh fixed EXEs only, preserve INI/media. |
-| Reporting Requirements | Finite ledger, production/test line accounting, executor P1 push and actual-change coordinator P2 review/push; wait for owner. |
-| Stop Conditions | New primitive API, altered synchronization policy or broader migration requires admission. |
-| Exit Criteria | S14 ledger proven, dual-width tests/builds/gates pass, committed/pushed clean for owner testing. |
-| Original Owner Request | 写入proposal后 准入s14 s14完成后编译测试提交推送后等我 |
-| Similar-Issue Sweep | All Lib mutex/spin implementations; distinguish Base internals, atomic claims and planned Event/thread work. |
+| Admission And Approval | Owner approves S15 implementation, dual-width build/test, commit/push, reducing duplication and complexity. |
+| Objective | Base Event owns manual/automatic reset; KVM deletes duplicate default wake implementation. |
+| Non-goals | No mailbox policy, native Window notifier, worker/task lifecycle or MVDM/product behavior changes. |
+| Reference Baseline | 1ae987f, clean main. |
+| Candidate Proposal | [Base Event reuse](../proposals/m9-lib-base-synchronization.md). |
+| Files And ABI Surface | Base Event mode/status API, KVM default wake/direct Base edge, mechanical manual-event consumers, tests/build/docs/manifests/EXEs. |
+| Applicable Rules | Architecture/coding/execution/documentation skills and repository architecture/coding/UI design and execution/document rules. |
+| Verification | Reset/failure/no-lost-wake and notifier tests pass; strict builds; x86 92/92 (67.94 s), x64 92/92 (48.85 s); four manifests/docs pass. Initial stale test-DAG assertion repaired and recorded. |
+| Expected Markers | No KVM wake primitive duplicate or forwarding API; one notifier and independent mailbox locks unchanged. |
+| Asset Needs | Existing build trees, both fixed EXEs; preserve INI/media. |
+| Reporting Requirements | Finite ledger, same-issue scan, production/test line counts, executor P1 and coordinator P2 committed/pushed; wait. |
+| Stop Conditions | Product behavior or worker lifecycle redesign requires further admission. |
+| Exit Criteria | Ledger verified, dual-width tests/builds and gates pass, committed/pushed clean for owner testing. |
+| Original Owner Request | 批准实施 完成后编译测试提交推送 目标是减少重复功能和代码 降低复杂度提高正确性和复用性。 |
+| Similar-Issue Sweep | All Base Event and KVM wake callers; duplicate primitive/build dependencies; preserve distinct native I/O/message ownership. |
 
 ## Current Technical Baseline
 

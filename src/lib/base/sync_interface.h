@@ -12,6 +12,10 @@ typedef enum base_sync_wait_result {
 } base_sync_wait_result;
 
 typedef struct base_sync_event base_sync_event;
+typedef enum base_sync_event_mode {
+    BASE_SYNC_EVENT_MANUAL_RESET,
+    BASE_SYNC_EVENT_AUTO_RESET
+} base_sync_event_mode;
 typedef struct base_sync_mutex base_sync_mutex;
 typedef struct base_sync_task base_sync_task;
 
@@ -28,10 +32,15 @@ typedef void (*base_sync_task_entry)(void *context,
 
 void base_sync_sleep_milliseconds(lib_u32 milliseconds);
 void base_sync_yield(void);
-lib_status base_sync_event_create(base_sync_event **out_event);
+/* Initially nonsignaled. Manual reset stays signaled until reset; auto reset
+ * releases one waiter per observed signal. Repeated signals may coalesce.
+ * Signal/reset return IO_ERROR on native failure; NULL is INVALID_ARGUMENT.
+ * Destroy requires all users/waiters quiescent. */
+lib_status base_sync_event_create(base_sync_event_mode mode,
+    base_sync_event **out_event);
 void base_sync_event_destroy(base_sync_event *event);
-void base_sync_event_signal(base_sync_event *event);
-void base_sync_event_reset(base_sync_event *event);
+lib_status base_sync_event_signal(base_sync_event *event);
+lib_status base_sync_event_reset(base_sync_event *event);
 base_sync_wait_result base_sync_event_wait(base_sync_event *event,
     lib_u32 timeout_milliseconds);
 /* Cancellation wins when it is observable together with an event; otherwise

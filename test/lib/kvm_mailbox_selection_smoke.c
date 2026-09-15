@@ -11,21 +11,28 @@ static lib_status create_mutex(base_sync_mutex **out)
 static unsigned creates, destroys, signals, notifications;
 static lib_status allocation = LIB_STATUS_NO_MEMORY;
 static int token;
-lib_status kvm_mailbox_wake_create(kvm_mailbox_wake **out)
+lib_status create_event(base_sync_event_mode mode, base_sync_event **out)
 {
+    assert(mode == BASE_SYNC_EVENT_AUTO_RESET);
     ++creates;
-    *out = allocation == LIB_STATUS_OK ? (kvm_mailbox_wake *)&token : NULL;
+    *out = allocation == LIB_STATUS_OK ? (base_sync_event *)&token : NULL;
     return allocation;
 }
-void kvm_mailbox_wake_destroy(kvm_mailbox_wake *wake)
-{ if (wake != NULL) { assert(wake == (kvm_mailbox_wake *)&token); ++destroys; } }
-lib_status kvm_mailbox_wake_signal(kvm_mailbox_wake *wake)
-{ assert(wake == (kvm_mailbox_wake *)&token); ++signals; return LIB_STATUS_OK; }
+static void destroy_event(base_sync_event *wake)
+{ if (wake != NULL) { assert(wake == (base_sync_event *)&token); ++destroys; } }
+static lib_status signal_event(base_sync_event *wake)
+{ assert(wake == (base_sync_event *)&token); ++signals; return LIB_STATUS_OK; }
 static lib_status notify(void *context)
 { assert(context == &token); ++notifications; return LIB_STATUS_OK; }
+#define base_sync_event_create create_event
+#define base_sync_event_destroy destroy_event
+#define base_sync_event_signal signal_event
 #define base_sync_mutex_create create_mutex
 #include "lib/kvm-base/mailbox.c"
 #undef base_sync_mutex_create
+#undef base_sync_event_create
+#undef base_sync_event_destroy
+#undef base_sync_event_signal
 
 int main(void)
 {

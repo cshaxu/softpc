@@ -34,9 +34,15 @@ void base_sync_yield(void)
     base_sync_platform_yield();
 }
 
-lib_status base_sync_event_create(base_sync_event **out_event)
+lib_status base_sync_event_create(base_sync_event_mode mode,
+    base_sync_event **out_event)
 {
-    return base_sync_platform_event_create(LIB_TRUE, out_event);
+    if (out_event == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *out_event = LIB_NULL;
+    if (mode != BASE_SYNC_EVENT_MANUAL_RESET && mode != BASE_SYNC_EVENT_AUTO_RESET)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    return base_sync_platform_event_create(mode == BASE_SYNC_EVENT_MANUAL_RESET,
+        out_event);
 }
 
 void base_sync_event_destroy(base_sync_event *event)
@@ -45,14 +51,16 @@ void base_sync_event_destroy(base_sync_event *event)
     base_sync_platform_event_destroy(event);
 }
 
-void base_sync_event_signal(base_sync_event *event)
+lib_status base_sync_event_signal(base_sync_event *event)
 {
-    if (event != LIB_NULL) base_sync_platform_event_signal(event);
+    return event == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
+        base_sync_platform_event_signal(event);
 }
 
-void base_sync_event_reset(base_sync_event *event)
+lib_status base_sync_event_reset(base_sync_event *event)
 {
-    if (event != LIB_NULL) base_sync_platform_event_reset(event);
+    return event == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
+        base_sync_platform_event_reset(event);
 }
 
 base_sync_wait_result base_sync_wait_any(base_sync_event *const *events,
@@ -111,7 +119,7 @@ lib_status base_sync_task_create(base_sync_task_entry entry, void *context,
     if (task == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     task->entry = entry;
     task->context = context;
-    status = base_sync_event_create(&task->cancellation);
+    status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &task->cancellation);
     if (status == LIB_STATUS_OK)
         status = base_sync_platform_task_create(base_sync_task_main, task, &task->platform);
     if (status != LIB_STATUS_OK) {

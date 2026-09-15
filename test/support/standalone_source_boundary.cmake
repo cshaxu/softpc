@@ -79,9 +79,7 @@ foreach(component_platform_source IN ITEMS
     "src/lib/base/win32/sync.c"
     "src/lib/base/linux/sync.c"
     "src/lib/storage/win32/file.c"
-    "src/lib/storage/linux/file.c"
-    "src/lib/kvm-base/win32/mailbox.c"
-    "src/lib/kvm-base/linux/mailbox.c")
+    "src/lib/storage/linux/file.c")
     if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/${component_platform_source}")
         message(FATAL_ERROR "Missing selected-platform peer: ${component_platform_source}")
     endif()
@@ -320,21 +318,8 @@ if(host_console_public MATCHES "host_console_cooked" OR
     message(FATAL_ERROR "Console broker retains monitor-specific ownership")
 endif()
 
-# The split shared KVM graph is deliberately narrow. These target links make
-# its allowed component edges executable rather than README-only claims.
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/CMakeLists.txt" lib_cmake_source)
-if(NOT lib_cmake_source MATCHES
-   "target_link_libraries\\(console PUBLIC types base\\)" OR
-   NOT lib_cmake_source MATCHES
-   "target_link_libraries\\(kvm-base PUBLIC types base\\)" OR
-   NOT lib_cmake_source MATCHES
-   "target_link_libraries\\(kvm-window PUBLIC types kvm-base\\)" OR
-   NOT lib_cmake_source MATCHES
-   "target_link_libraries\\(kvm-console PUBLIC types console kvm-base\\)" OR
-   lib_cmake_source MATCHES
-   "target_link_libraries\\(kvm-(window|console) [^\\)]*(host|storage)")
-    message(FATAL_ERROR "Shared KVM component dependency graph is not normalized")
-endif()
+# The library's verify_types_layout above owns the complete source/build DAG.
+# Do not keep a second hardcoded subset here.
 
 file(STRINGS "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/c-files"
     ccpu_source_names)

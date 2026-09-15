@@ -44,9 +44,9 @@ lib_status softpc_platform_audio_start(void)
 {
     lib_status status;
     if (softpc_speaker_task != NULL) return LIB_STATUS_OK;
-    status = base_sync_event_create(&softpc_speaker_wake);
+    status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &softpc_speaker_wake);
     if (status != LIB_STATUS_OK) return status;
-    status = base_sync_event_create(&softpc_speaker_stop);
+    status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &softpc_speaker_stop);
     if (status != LIB_STATUS_OK) {
         base_sync_event_destroy(softpc_speaker_wake);
         softpc_speaker_wake = NULL;

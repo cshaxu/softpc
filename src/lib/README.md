@@ -25,7 +25,7 @@ not from a sibling component or a forwarding root header. The sole exception
 is `types/{win32,linux}`: these shared external declarations may be included
 by matching platform implementations. Application-facing
 copied-value APIs are distinct from the leaf-support contracts:
-`kvm-base/worker_interface.h`, `mailbox_interface.h`, `mailbox_wake_interface.h`,
+`kvm-base/worker_interface.h`, `mailbox_interface.h`,
 `kvm-base/input_interface.h` serves only the KVM leaves;
 `console/binding_interface.h` serves host binding implementations.
 Other component headers are exclusively component-local. They use short
@@ -48,7 +48,7 @@ component on the left:
 
 ```text
 types -> base + console + host + storage + kvm-base + kvm-window + kvm-console
-base -> console + host + kvm-base
+base -> console + host + kvm-base + kvm-console
 console -> host + kvm-console
 kvm-base -> kvm-window + kvm-console
 ```
@@ -148,8 +148,8 @@ events sleeps until a predicate can change instead of polling. Auto-reset
 consumption occurs under the same lock. Timed waits use a monotonic deadline;
 infinite waits have no deadline. Callers must join all waiters before destroying
 their event objects. The shared wait primitive has process lifetime and
-contains no application context. Mailbox waits use a per-mailbox monotonic
-condition with the same timeout and spurious-wake semantics.
+contains no application context. Default mailbox waits reuse a Base auto-reset
+Event per mailbox; no separate KVM condition implementation remains.
 
 The public component contracts are cross-platform. This corpus currently has
 supported Win32 leaves; Linux KVM leaves are intentional

@@ -20,6 +20,10 @@ file(REMOVE "${fixture}/consumer.c" "${fixture}/types/probe.h"
     "${fixture}/kvm-window/input_probe.c"
     "${fixture}/kvm-console/input_probe.c")
 set(probe "${fixture}/types/probe.h")
+foreach(retired IN ITEMS kvm-base/mailbox_wake_interface.h
+        kvm-base/win32/mailbox.c kvm-base/linux/mailbox.c)
+    file(REMOVE "${fixture}/${retired}")
+endforeach()
 function(check_layout expected)
     execute_process(COMMAND "${CMAKE_COMMAND}" "-DLIBRARY_ROOT=${fixture}"
         -P "${LIBRARY_ROOT}/verify_types_layout.cmake"
@@ -31,6 +35,15 @@ function(check_layout expected)
     endif()
 endfunction()
 file(WRITE "${probe}" "#include <stdint.h>\n")
+check_layout(pass)
+foreach(retired IN ITEMS kvm-base/mailbox_wake_interface.h
+        kvm-base/win32/mailbox.c kvm-base/linux/mailbox.c)
+    get_filename_component(parent "${fixture}/${retired}" DIRECTORY)
+    file(MAKE_DIRECTORY "${parent}")
+    file(WRITE "${fixture}/${retired}" "/* duplicate Event implementation */\n")
+    check_layout(fail)
+    file(REMOVE "${fixture}/${retired}")
+endforeach()
 check_layout(pass)
 
 foreach(retired IN ITEMS host_sync_mutex host_clock_milliseconds console_mutex)
@@ -62,7 +75,7 @@ set(allowed_host types base console)
 set(allowed_storage types)
 set(allowed_kvm-base types base)
 set(allowed_kvm-window types kvm-base)
-set(allowed_kvm-console types console kvm-base)
+set(allowed_kvm-console types base console kvm-base)
 foreach(owner IN LISTS components)
     file(MAKE_DIRECTORY "${fixture}/${owner}")
     foreach(dependency IN LISTS components)

@@ -50,11 +50,9 @@ set(LIBRARY_KVM_BASE_SOURCES
     kvm-base/mailbox.c)
 if(WIN32)
     list(APPEND LIBRARY_KVM_BASE_SOURCES
-        kvm-base/win32/mailbox.c
         kvm-base/win32/input.c)
 else()
     list(APPEND LIBRARY_KVM_BASE_SOURCES
-        kvm-base/linux/mailbox.c
         kvm-base/linux/input.c)
 endif()
 add_library(kvm-base STATIC ${LIBRARY_KVM_BASE_SOURCES})
@@ -78,7 +76,7 @@ else()
     target_sources(kvm-console PRIVATE kvm-console/linux/component.c)
 endif()
 library_root(kvm-console)
-target_link_libraries(kvm-console PUBLIC types console kvm-base)
+target_link_libraries(kvm-console PUBLIC types base console kvm-base)
 
 add_library(host STATIC host/console.c)
 if(WIN32)
@@ -106,7 +104,6 @@ if(WIN32)
 else()
     find_package(Threads REQUIRED)
     target_link_libraries(base PRIVATE Threads::Threads)
-    target_link_libraries(kvm-base PRIVATE Threads::Threads)
 endif()
 
 # This build-only aggregate does not create a library-root dependency. Each

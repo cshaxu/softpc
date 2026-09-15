@@ -1,6 +1,6 @@
 # kvm-console
 
-`kvm-console` depends on `types`, `console`, and `kvm-base` only. It owns one raw Console lifecycle,
+`kvm-console` depends on `types`, `base`, `console`, and `kvm-base` only. It owns one raw Console lifecycle,
 creates its logical Console object, and publishes copied text frames through
 that object. It never opens, registers, or renders native Console I/O.
 The public component contract is cross-platform. This corpus currently has a
