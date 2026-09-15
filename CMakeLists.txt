@@ -445,7 +445,7 @@ add_executable(softpc-runtime-smoke
     src/common/session/control.c
     src/app/keyboard.c
     src/common/session/presentation_plan.c
-    src/common/session/reconciler.c)
+    src/common/session/control_state.c)
 target_link_libraries(softpc-runtime-smoke PRIVATE softpc-vm common-machine types console host storage kvm-base kvm-window kvm-console)
 target_include_directories(softpc-runtime-smoke PRIVATE test/support src/app)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
@@ -491,7 +491,7 @@ add_test(NAME softpc-x87-layout-smoke COMMAND softpc-x87-layout-smoke)
 set_tests_properties(softpc-x87-layout-smoke PROPERTIES LABELS "unit")
 add_executable(softpc-command-smoke test/unit/command_smoke.c
     src/app/command.c
-    src/common/session/reconciler.c
+    src/common/session/control_state.c
     src/common/session/presentation_plan.c)
 target_link_libraries(softpc-command-smoke PRIVATE common-debug common-machine)
 target_include_directories(softpc-command-smoke PRIVATE src/app src/compat src)

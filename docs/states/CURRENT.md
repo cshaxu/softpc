@@ -2,32 +2,33 @@
 
 ## Current Work
 
-M9 T59 S10 delivery 8f60ef6 is reviewed and pushed: Ctrl+Alt+T sends guest Alt+Tab.
-Both EXEs pass 91/91 tests; await owner testing.
-S9 delivery bbc0607 / review 52dbc21 is retained in
-[history](../history/M9-T59-S9-console-output-binding.md); manual testing is not claimed.
+M9 T59 S11 is implemented and verified: Common Debug/Session shells removed;
+fixed Console status follows content changes. Both EXEs pass 91/91 tests.
+Complete executor delivery awaits push and independent actual-patch review.
+S10 delivery 8f60ef6 / review 04d551b is retained in
+[history](../history/M9-T59-S10-alt-tab-hotkey.md); manual testing is not claimed.
 T59 remains open.
 
-## M9 T59 S10 Packet
+## M9 T59 S11 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner requests the next S: add Ctrl+Alt+T to send guest Alt+Tab. |
-| Objective | Extend the existing product hotkey registry and synthetic Alt-key path. |
-| Non-goals | No Lib/Common/VM/Compat/MVDM, lifecycle, focus or input ABI changes. |
-| Reference Baseline | 52dbc21, clean main. |
-| Candidate Proposal | [Alt+Tab hotkey](../proposals/m9-alt-tab-hotkey.md). |
-| Files And ABI Surface | App keyboard/help, product tests, build test registration, UI docs and fixed EXEs. |
-| Applicable Rules | Repository architecture/coding/execution/documentation governance skills and design/rules/UI. |
-| Verification | Focused 3/3 each; x64 full 91/91 (81.42 s), x86 full 91/91 (82.38 s); governance and four manifests pass. |
-| Expected Markers | CAT reaches guest as Alt+Tab only while running; same registry for both KVM leaves; no cooked hotkey. |
-| Asset Needs | Reuse build trees; both fixed EXEs; preserve INI and media. |
-| Reporting Requirements | Complete P push, independent review P push, line accounting and clean tree. |
-| Stop Conditions | Shared/native changes or new input state machine require further admission. |
-| Exit Criteria | Finite ledger verified, both builds/full suites pass, checks pass and pushed clean. |
-| Original Owner Request | 下一S任务：增加 Ctrl+Alt+T热键，负责往客户机送 Alt+Tab; |
-| Similar-Issue Sweep | Product registry, dispatch and help references; no duplicate matcher or synthetic path. |
+| Admission And Approval | Owner admits the three Common simplifications and build/test/commit/push. |
+| Objective | Remove Debug and Session forwarding shells; submit fixed Console status only on content changes. |
+| Non-goals | No Lib/App/VM/Compat/MVDM or public ABI and product behavior changes. |
+| Reference Baseline | 04d551b, clean main. |
+| Candidate Proposal | [Common simplification](../proposals/m9-common-state-simplification.md). |
+| Files And ABI Surface | Common debug/session/ui internals, callers, tests, build declarations, manifests and EXEs. |
+| Applicable Rules | Architecture/coding/execution/documentation governance skills and repository design/rules/UI. |
+| Verification | Focused 8/8 each; full x64 91/91 (90.47 s), x86 91/91 (83.67 s); governance/four manifests pass. |
+| Expected Markers | One Debug state, one Session state, no repeated fixed status; frame/completion semantics intact. |
+| Asset Needs | Existing build trees, both fixed EXEs; preserve INI/media. |
+| Reporting Requirements | Complete executor P and independent review P pushed; line accounting and clean tree. |
+| Stop Conditions | New public ABI, state machine or changes outside Common need further admission. |
+| Exit Criteria | Every finite ledger item proven, both builds/tests pass, manifests/docs pass, pushed clean. |
+| Original Owner Request | 以上3个common的问题，准入一个S修复、编译、测试、提交、推送，供我测试。 |
+| Similar-Issue Sweep | All forwarding references and Console content publication paths in the three owners and callers. |
 
 ## Current Technical Baseline
 

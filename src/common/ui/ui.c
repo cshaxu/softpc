@@ -14,6 +14,7 @@ struct common_ui {
     lib_atomic_i32 run_generation;
     lib_u32 window_delivered_frame_sequence;
     lib_u32 console_delivered_frame_sequence;
+    lib_bool console_status_delivered;
 };
 
 static int common_ui_emit(common_ui *ui, const common_ui_event *event)
@@ -124,7 +125,10 @@ static lib_status common_ui_create_console(common_ui *ui)
     options.failure_sink = common_ui_delivery_failed;
     options.hotkeys = ui->options.hotkeys;
     status = kvm_console_create(&ui->console, &options);
-    if (status == LIB_STATUS_OK) ui->console_delivered_frame_sequence = 0u;
+    if (status == LIB_STATUS_OK) {
+        ui->console_delivered_frame_sequence = 0u;
+        ui->console_status_delivered = LIB_FALSE;
+    }
     return status;
 }
 
@@ -282,16 +286,20 @@ lib_status common_ui_publish_frame(common_ui *ui, const kvm_frame *frame,
     kvm_frame status_frame;
     const kvm_frame *console_frame = frame;
     lib_status status;
+    lib_bool show_status;
     if (ui == NULL || frame == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    show_status = frame->graphics != 0u && console_status_surface;
     if (vm_console_current && ui->console != NULL &&
-        ui->console_delivered_frame_sequence != frame->sequence) {
-        if (frame->graphics != 0u && console_status_surface) {
+        (show_status != ui->console_status_delivered ||
+         (!show_status && ui->console_delivered_frame_sequence != frame->sequence))) {
+        if (show_status) {
             common_ui_status_frame(&status_frame, frame, ui->options.graphics_console_status_text);
             console_frame = &status_frame;
         }
         status = kvm_console_publish_frame(ui->console, console_frame);
         if (status != LIB_STATUS_OK) return status;
         ui->console_delivered_frame_sequence = frame->sequence;
+        ui->console_status_delivered = show_status;
     }
     if (window_actual && ui->window != NULL &&
         ui->window_delivered_frame_sequence != frame->sequence) {

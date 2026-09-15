@@ -1,7 +1,7 @@
 /* DEBUG is the debug console for users to break, trace, lookup,
  * and print virtual machine devices. */
 
-#include "common/debug/command.h"
+#include "common/debug/debug_interface.h"
 #include "common/debug/command_runtime.h"
 #include "common/xasm32/xasm32_interface.h"
 #include "lib/storage/file_interface.h"
@@ -29,7 +29,7 @@ typedef enum command_run_kind {
     COMMAND_RUN_BREAK_LINEAR
 } command_run_kind;
 
-struct common_debug_command {
+struct common_debug {
     common_machine *machine;
     lib_status access_status;
     lib_bool defaults_ready;
@@ -66,7 +66,7 @@ struct common_debug_command {
     common_machine_debug_observation observation;
 };
 
-typedef common_debug_command command_context;
+typedef common_debug command_context;
 typedef common_debug_register command_register;
 typedef common_machine_debug_watch_kind command_machine_watch_kind;
 
@@ -3075,7 +3075,7 @@ static C_VOID exec(command_context *debugContext)
     }
 }
 
-static C_VOID command_initialize(common_debug_command *command,
+static C_VOID command_initialize(common_debug *command,
     common_machine *machine)
 {
     lib_release(command->output);
@@ -3085,37 +3085,37 @@ static C_VOID command_initialize(common_debug_command *command,
         sizeof(*command->arguments));
 }
 
-lib_status common_debug_command_create(common_debug_command **out_command)
+lib_status common_debug_create(common_debug **out_command)
 {
-    common_debug_command *command;
+    common_debug *command;
 
     if (out_command == STD_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_command = STD_NULL;
-    command = (common_debug_command *)STD_CALLOC(1u, sizeof(*command));
+    command = (common_debug *)STD_CALLOC(1u, sizeof(*command));
     if (command == STD_NULL) return LIB_STATUS_NO_MEMORY;
     *out_command = command;
     return LIB_STATUS_OK;
 }
 
-void common_debug_command_destroy(common_debug_command *command)
+void common_debug_destroy(common_debug *command)
 {
     if (command == STD_NULL) return;
-    common_debug_command_close(command);
+    common_debug_close(command);
     lib_release(command->output);
     STD_FREE(command);
 }
 
-lib_status common_debug_command_open(common_debug_command *command,
+lib_status common_debug_open(common_debug *command,
     common_machine *machine)
 {
     if (command == STD_NULL || machine == STD_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    common_debug_command_close(command);
+    common_debug_close(command);
     command_initialize(command, machine);
     if (command->arguments == STD_NULL) return LIB_STATUS_NO_MEMORY;
     return LIB_STATUS_OK;
 }
 
-void common_debug_command_close(common_debug_command *command)
+void common_debug_close(common_debug *command)
 {
     if (command == STD_NULL) return;
     common_machine_debug_cancel(command->machine);
@@ -3124,7 +3124,7 @@ void common_debug_command_close(common_debug_command *command)
     command->continuation = COMMAND_CONTINUATION_NONE;
 }
 
-static void command_prompt(common_debug_command *command)
+static void command_prompt(common_debug *command)
 {
     const char *prompt = command->continuation == COMMAND_CONTINUATION_NONE ?
         "-" : command->input_prompt;
@@ -3135,7 +3135,7 @@ static void command_prompt(common_debug_command *command)
     }
 }
 
-static void command_prepare_continuation(common_debug_command *command)
+static void command_prepare_continuation(common_debug *command)
 {
     if (command->argument_count == 0u || command->arguments[0] == STD_NULL)
         return;
@@ -3164,7 +3164,7 @@ static void command_prepare_continuation(common_debug_command *command)
 
 /* CLI lifetime is independent of machine access. Help, arithmetic, filename
  * selection and exit do not acquire a machine lease or initialize addresses. */
-static lib_bool command_needs_machine(common_debug_command *command)
+static lib_bool command_needs_machine(common_debug *command)
 {
     const char *name;
     if (command->continuation != COMMAND_CONTINUATION_NONE)
@@ -3178,7 +3178,7 @@ static lib_bool command_needs_machine(common_debug_command *command)
             lib_c_strcmp(command->arguments[1], "?") == 0);
 }
 
-static lib_bool command_prepare_machine(common_debug_command *debugContext)
+static lib_bool command_prepare_machine(common_debug *debugContext)
 {
     common_machine_debug_lease lease;
     debugContext->access_status = common_machine_debug_acquire(debugContext->machine, &lease);
@@ -3194,7 +3194,7 @@ static lib_bool command_prepare_machine(common_debug_command *debugContext)
     return debugContext->access_status == LIB_STATUS_OK;
 }
 
-static void command_report_access(common_debug_command *command)
+static void command_report_access(common_debug *command)
 {
     if (command->access_status == LIB_STATUS_OK) return;
     command->continuation = COMMAND_CONTINUATION_NONE;
@@ -3210,7 +3210,7 @@ static void command_report_access(common_debug_command *command)
             "Debug machine access failed.");
 }
 
-lib_status common_debug_command_submit_line(common_debug_command *command,
+lib_status common_debug_submit_line(common_debug *command,
     const char *line, common_debug_result *out_result)
 {
     command_context *debugContext = command;
@@ -3268,7 +3268,7 @@ finished:
     return command_end_output(command);
 }
 
-lib_status common_debug_command_observe_machine(common_debug_command *command,
+lib_status common_debug_observe_machine(common_debug *command,
     common_debug_machine_state state, lib_status status,
     common_debug_result *out_result)
 {

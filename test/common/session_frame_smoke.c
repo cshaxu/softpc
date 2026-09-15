@@ -89,8 +89,8 @@ int main(void)
     assert(common_session_process_completed(&session, &event));
     assert(copies == 1u && session.state.observed_frame_sequence == 3u);
     assert(monitor_calls == 0u); /* Frames never request a monitor input turn. */
-    assert(session.state.presentation.graphics_actual);
-    assert(session.state.presentation.in_flight == COMMON_UI_ACTION_CREATE_WINDOW);
+    assert(session.state.graphics_actual);
+    assert(session.state.in_flight == COMMON_UI_ACTION_CREATE_WINDOW);
     assert(deliveries == 0u); /* Wait for component completion before publishing. */
     event.kind = COMMON_SESSION_EVENT_COMPONENT_COMPLETED;
     event.value.component.component = COMMON_SESSION_EVENT_COMPONENT_WINDOW;
@@ -107,7 +107,7 @@ int main(void)
     published.valid = 0u;
     assert(common_session_process_completed(&session, &event));
     assert(session.frame.valid && session.frame.sequence == 3u &&
-        session.state.presentation.graphics_actual);
+        session.state.graphics_actual);
     published.valid = 1u;
     published_run = 8u; /* Reset advanced between notification and snapshot. */
     assert(common_session_process_completed(&session, &event));
@@ -121,8 +121,8 @@ int main(void)
     published.graphics = 0u;
     assert(common_session_process_completed(&session, &event));
     assert(session.state.observed_frame_sequence == 5u &&
-        !session.state.presentation.graphics_actual);
-    assert(session.state.presentation.in_flight == COMMON_UI_ACTION_DESTROY_WINDOW);
+        !session.state.graphics_actual);
+    assert(session.state.in_flight == COMMON_UI_ACTION_DESTROY_WINDOW);
     event.kind = COMMON_SESSION_EVENT_COMPONENT_COMPLETED;
     event.value.component.component = COMMON_SESSION_EVENT_COMPONENT_WINDOW;
     event.value.component.exists = 0;

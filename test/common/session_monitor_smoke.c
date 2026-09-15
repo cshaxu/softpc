@@ -137,7 +137,7 @@ int main(void)
     /* Demand survives being non-current; only confirmed handoff clears the
      * outstanding turn, not an intention to create/bind another component. */
     s.pending_line = LIB_TRUE;
-    s.state.presentation.current_console_actual = COMMON_SESSION_CONSOLE_VM;
+    s.state.current_console_actual = COMMON_SESSION_CONSOLE_VM;
     assert(common_session_arm_if_ready(&s) && s.pending_line && requests == 3);
     event.kind = COMMON_SESSION_EVENT_BROKER_COMPLETED;
     event.value.broker_vm_console_current = LIB_FALSE;
@@ -181,7 +181,7 @@ int main(void)
         output_used = writes = 0u; output[0] = '\0'; fail_write = 2u;
         assert(!common_session_apply_result(&s, &large) && writes == 2u);
         fail_write = 0u; output_used = writes = 0u;
-        s.state.presentation.current_console_actual = COMMON_SESSION_CONSOLE_VM;
+        s.state.current_console_actual = COMMON_SESSION_CONSOLE_VM;
         assert(common_session_apply_result(&s, &large) && writes == 0u);
     }
     common_session_queue_destroy(s.queue);

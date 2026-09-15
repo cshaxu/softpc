@@ -17,6 +17,13 @@ with input callbacks; their run-generation tag uses a Types atomic. Frame
 deduplication and object ownership remain control-thread-local. Native producers
 must be destroyed before the event sink/context is released.
 
+The debug command state is the public opaque debug object itself, with no
+separately allocated forwarding owner. Session uses one internal control state
+for completed facts and presentation actions; pure derivation stays separate.
+UI submits the fixed graphical Console explanation only when entering that
+content kind or creating a fresh Console. Text still follows frame sequences;
+only successful submissions update these control-thread-local markers.
+
 Session owns one pending cooked line until its normal/rejected event is consumed
 or the broker confirms cancellation/handoff. Frame events never request input.
 Provider prompt readiness is level-triggered, not consumed by notification;
