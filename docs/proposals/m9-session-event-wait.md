@@ -125,5 +125,22 @@ coordinator review. T59 remains open and manual testing belongs to the owner.
 
 Push was attempted but the safety reviewer rejected external transfer without
 explicit confirmation naming https://github.com/cshaxu/softpc.git main. No
-workaround is attempted. P1 is locally committed; remote delivery and the
-subsequent coordinator P remain blocked pending that confirmation.
+workaround was attempted. The owner then explicitly approved that remote;
+bce7fcf was successfully pushed to main. The approval blocker is resolved.
+
+## P2 coordinator review
+
+After the P1 push, switched roles and reviewed the committed production/test
+patch against the original request and the expanded startup-test scope. The one
+production statement preserves the same sole queue consumer, event dispatch and
+shutdown return contract; no timer work is lost and a failed wait cannot retry.
+Tests assert the infinite argument, failure after one take, normal line/exit
+processing and concurrent FIFO delivery. The package fixture changes only its
+own child Console when native capacity is insufficient, verifies the result and
+retains every product behavior assertion. It does not change product font policy.
+
+Verified that Lib, test/lib, App, VM, Compat and MVDM have no P1 diff; both EXE
+hashes match the executor record. Four manifests and documentation governance
+pass. Prior dual-width 91/91 results remain the executable verification for this
+docs-only review. No additional defect found in the bounded committed patch.
+S12 is delivered for owner testing; T59 stays open. No manual acceptance claimed.

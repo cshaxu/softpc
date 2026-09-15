@@ -2,11 +2,9 @@
 
 ## Current Work
 
-M9 T59 S12 executor verified: Session waits on events without idle polling;
+M9 T59 S12 delivery bce7fcf is pushed and reviewed: Session waits without idle polling;
 narrow-desktop package fixture repaired. Both fixed EXEs pass 91/91 tests.
-P1 locally committed; push blocked by remote-specific safety approval for
-https://github.com/cshaxu/softpc.git main. Coordinator review follows push.
-Owner manual testing is not claimed.
+Await owner manual testing; no push approval blocker remains.
 S11 delivery ac56ae2 / review fa14c62 is retained in
 [history](../history/M9-T59-S11-common-state-simplification.md).
 Manual testing is not claimed; T59 remains open.
