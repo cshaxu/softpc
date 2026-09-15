@@ -15,9 +15,9 @@ static void *counted_set(void *destination, int value, lib_size size)
     if (size == sizeof(kvm_frame)) ++status_builds;
     return memset(destination, value, size);
 }
-#define memset counted_set
+#define lib_memory_set counted_set
 #include "common/ui/ui.c"
-#undef memset
+#undef lib_memory_set
 
 struct kvm_window { kvm_window_options options; };
 struct kvm_console { lib_console *object; kvm_console_options options; };

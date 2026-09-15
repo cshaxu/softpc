@@ -4,8 +4,6 @@
 #include "lib/kvm-console/console_interface.h"
 #include "lib/kvm-window/window_interface.h"
 
-#include <stdlib.h>
-#include <string.h>
 
 struct common_ui {
     lib_console *monitor;
@@ -138,7 +136,7 @@ lib_status common_ui_create(common_ui **out_ui, const common_ui_options *options
         options->running_window_title == NULL || options->paused_window_title == NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     *out_ui = NULL;
-    ui = calloc(1u, sizeof(*ui));
+    ui = lib_allocate_zero(1u, sizeof(*ui));
     if (ui == NULL) return LIB_STATUS_NO_MEMORY;
     lib_atomic_i32_initialize(&ui->run_generation, 0);
     ui->options = *options;
@@ -153,7 +151,7 @@ lib_status common_ui_create(common_ui **out_ui, const common_ui_options *options
             (void)lib_console_set_event_sink(ui->monitor, NULL, NULL);
             lib_console_release(ui->monitor);
         }
-        free(ui);
+        lib_release(ui);
         return status;
     }
     *out_ui = ui;
@@ -186,7 +184,7 @@ lib_status common_ui_destroy(common_ui *ui)
         (void)lib_console_set_event_sink(ui->monitor, NULL, NULL);
         lib_console_release(ui->monitor);
     }
-    free(ui);
+    lib_release(ui);
     return status;
 }
 
@@ -257,7 +255,7 @@ static void common_ui_status_frame(kvm_frame *frame, const kvm_frame *source,
 {
     lib_size index;
     lib_size row = 0u, column = 0u;
-    memset(frame, 0, sizeof(*frame));
+    lib_memory_set(frame, 0, sizeof(*frame));
     frame->valid = 1u;
     frame->sequence = source->sequence;
     frame->text_columns = KVM_TEXT_COLUMNS;
@@ -313,7 +311,7 @@ lib_status common_ui_release_window_mouse(common_ui *ui)
 lib_status common_ui_write_monitor(common_ui *ui, const char *text)
 {
     return ui == NULL || text == NULL ? LIB_STATUS_INVALID_ARGUMENT :
-        lib_console_write_text(ui->monitor, text, strlen(text));
+        lib_console_write_text(ui->monitor, text, lib_text_length(text));
 }
 
 lib_status common_ui_request_monitor_line(common_ui *ui)

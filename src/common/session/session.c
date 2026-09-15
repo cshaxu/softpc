@@ -4,8 +4,6 @@
 #include "common/session/control_state.h"
 #include "common/ui/ui_interface.h"
 
-#include <stdlib.h>
-#include <string.h>
 
 struct common_session {
     common_session_queue *queue;
@@ -207,10 +205,10 @@ lib_status common_session_create(common_session **out_session,
         options->command.submit_line == NULL || options->command.note_runtime == NULL ||
         options->command.note_monitor_current == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_session = NULL;
-    session = calloc(1u, sizeof(*session));
+    session = lib_allocate_zero(1u, sizeof(*session));
     if (session == NULL) return LIB_STATUS_NO_MEMORY;
     if (!common_session_queue_create(&session->queue)) {
-        free(session);
+        lib_release(session);
         return LIB_STATUS_NO_MEMORY;
     }
     session->machine = options->machine;
@@ -232,7 +230,7 @@ lib_status common_session_destroy(common_session *session)
 {
     if (session == NULL) return LIB_STATUS_OK;
     common_session_queue_destroy(session->queue);
-    free(session);
+    lib_release(session);
     return LIB_STATUS_OK;
 }
 
@@ -308,7 +306,7 @@ int common_session_run(common_session *session)
                 session->command.reject_line(session->command.context, &result);
             } else {
                 if (event.value.line.length >= sizeof(line)) return 0;
-                memcpy(line, event.value.line.text, event.value.line.length);
+                lib_memory_copy(line, event.value.line.text, event.value.line.length);
                 line[event.value.line.length] = '\0';
                 session->command.submit_line(session->command.context,
                     session->state.monitor_actual, line, &result);

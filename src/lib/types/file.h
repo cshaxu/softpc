@@ -11,6 +11,7 @@ typedef FILE lib_c_file;
 #define lib_c_fwrite fwrite
 #define lib_c_ferror ferror
 #define lib_c_fflush fflush
+#define lib_c_snprintf snprintf
 #define LIB_SEEK_SET SEEK_SET
 #define LIB_SEEK_END SEEK_END
 

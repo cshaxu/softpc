@@ -291,7 +291,8 @@ static void command_matrix(common_machine *machine, common_machine_debug_lease *
         {"xm b20 b30 4", ""}, {"xc b20 b30 4", ""},
         {"xs b30 4 90 90", "00000B30"}, {"xd b30 4", "90 90 CC CC"},
         {"xa b40", ""}, {"nop", ""}, {"", ""},
-        {"xu b40 1", "NOP"}, {"xreg", "AX="}, {"xsreg", "CS"}, {"xcreg", "CR0"},
+        {"xu b40 1", "NOP"}, {"xr", "EAX=12345678"},
+        {"xreg", "EAX=12345678"}, {"xsreg", "CS"}, {"xcreg", "CR0"},
         {"h 1 2", "0003"}, {"v", ""}, {"AB", "41 42"},
         {"xw r b00", ""}, {"xw", "Watch-read"}, {"xw r", "removed"},
         {"xw w b00", ""}, {"xw w", "removed"}, {"xw e b40", ""}, {"xw e", "removed"},
@@ -299,6 +300,7 @@ static void command_matrix(common_machine *machine, common_machine_debug_lease *
         {"l 0:b50", ""}, {"d 0:b50 b53", "12 34 56 56"}
     };
     unsigned i;
+    setreg(machine, lease, COMMON_DEBUG_EAX, 0x12345678u);
     setreg(machine, lease, COMMON_DEBUG_EBX, 0u);
     setreg(machine, lease, COMMON_DEBUG_ECX, 4u);
     for (i = 0; i < sizeof(commands)/sizeof(commands[0]); ++i) {
@@ -585,27 +587,31 @@ static void trace_cli(common_machine *machine, common_machine_debug_lease *lease
     completions *events, common_session_command_provider *provider)
 {
     common_session_command_result result;
-    unsigned index;
+    unsigned index, kind;
+    const char *trace_commands[] = { "t 2", "xt 2" };
     setreg(machine, lease, COMMON_DEBUG_EFLAGS, 2u);
-    setreg(machine, lease, COMMON_DEBUG_EIP, 0x700u);
-    submit(provider, COMMON_SESSION_MACHINE_PAUSED, "t 2", &result);
-    assert(result.request == COMMON_SESSION_REQUEST_RESUME);
-    for (index = 0; index < 2u; ++index) {
-        assert(common_machine_resume(machine));
-        wait_for(events->running);
-        provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_PAUSED,
-            COMMON_SESSION_MACHINE_RUNNING, &result);
-        wait_for(events->paused);
-        provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_RUNNING,
-            COMMON_SESSION_MACHINE_PAUSED, &result);
-        provider->note_monitor_current(provider->context, LIB_TRUE, &result);
-        assert(strstr(result.text, "AX=") != NULL);
-        assert(strstr(result.text, "Machine paused.") != NULL);
-        assert(result.request == (index == 0u ? COMMON_SESSION_REQUEST_RESUME :
-            COMMON_SESSION_REQUEST_NONE));
+    for (kind = 0u; kind < 2u; ++kind) {
+        setreg(machine, lease, COMMON_DEBUG_EIP, 0x700u);
+        submit(provider, COMMON_SESSION_MACHINE_PAUSED, trace_commands[kind], &result);
+        assert(result.request == COMMON_SESSION_REQUEST_RESUME);
+        for (index = 0; index < 2u; ++index) {
+            assert(common_machine_resume(machine));
+            wait_for(events->running);
+            provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_PAUSED,
+                COMMON_SESSION_MACHINE_RUNNING, &result);
+            wait_for(events->paused);
+            provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_RUNNING,
+                COMMON_SESSION_MACHINE_PAUSED, &result);
+            provider->note_monitor_current(provider->context, LIB_TRUE, &result);
+            assert(strstr(result.text, kind ? "EAX=" : "AX=") != NULL);
+            assert((strstr(result.text, "EIP=") != NULL) == (kind != 0u));
+            assert(strstr(result.text, "Machine paused.") != NULL);
+            assert(result.request == (index == 0u ? COMMON_SESSION_REQUEST_RESUME :
+                COMMON_SESSION_REQUEST_NONE));
+        }
+        assert(common_machine_debug_acquire(machine, lease) == LIB_STATUS_OK);
+        assert(reg(machine, lease, COMMON_DEBUG_EIP) == 0x702u);
     }
-    assert(common_machine_debug_acquire(machine, lease) == LIB_STATUS_OK);
-    assert(reg(machine, lease, COMMON_DEBUG_EIP) == 0x702u);
     (void)access(machine, lease, (common_machine_debug_request){
         .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x700u,
         .bytes = 3u, .data = {0x40,0xeb,0xfd} });
@@ -621,6 +627,7 @@ static void trace_cli(common_machine *machine, common_machine_debug_lease *lease
             COMMON_SESSION_MACHINE_PAUSED, &result);
         provider->note_monitor_current(provider->context, LIB_TRUE, &result);
         assert(strstr(result.text, "instructions executed before the break point."));
+        assert(strstr(result.text, "EAX=") && strstr(result.text, "EIP=00000701"));
         assert(result.request == (index == 0u ? COMMON_SESSION_REQUEST_RESUME :
             COMMON_SESSION_REQUEST_NONE));
     }

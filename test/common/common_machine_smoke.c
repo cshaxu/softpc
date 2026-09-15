@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 
 typedef struct machine_fake {
     HANDLE stopped;
@@ -23,6 +24,9 @@ typedef struct machine_fake {
     HANDLE callback_entered;
     HANDLE callback_release;
     LONG notifications;
+    lib_bool register_fixture;
+    lib_u32 registers[COMMON_DEBUG_REGISTER_COUNT];
+    unsigned real_reads, linear_reads;
 } machine_fake;
 
 static lib_bool fake_reset(void *opaque)
@@ -90,7 +94,89 @@ static lib_status fake_execute_debug(void *opaque,
     assert(GetCurrentThreadId() == fake->executor_thread);
     InterlockedIncrement(&fake->debug_calls);
     *result = (common_machine_debug_result) { .value = request->address };
+    if (fake->register_fixture) {
+        switch (request->operation) {
+        case COMMON_MACHINE_DEBUG_READ_REGISTER:
+            result->value = fake->registers[request->register_id];
+            break;
+        case COMMON_MACHINE_DEBUG_WRITE_REGISTER:
+            fake->registers[request->register_id] = request->address;
+            break;
+        case COMMON_MACHINE_DEBUG_READ_REAL:
+            ++fake->real_reads;
+            memset(result->data, 0x90, sizeof(result->data));
+            break;
+        case COMMON_MACHINE_DEBUG_READ_LINEAR:
+            ++fake->linear_reads;
+            memset(result->data, 0x90, sizeof(result->data));
+            break;
+        case COMMON_MACHINE_DEBUG_GET_CODE_BASE:
+            result->value = 0x10000000u;
+            break;
+        case COMMON_MACHINE_DEBUG_GET_CODE_DEFAULT_SIZE:
+            result->value = 1u;
+            break;
+        case COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT:
+            result->enabled = LIB_TRUE;
+            result->value = 1u;
+            break;
+        default:
+            break;
+        }
+    }
     return LIB_STATUS_OK;
+}
+
+static void extended_registers(common_debug *debug, machine_fake *fake)
+{
+    common_debug_result result;
+    const char *names[] = { "eax", "ecx", "edx", "ebx", "esp", "ebp",
+        "esi", "edi", "eip", "eflags" };
+    const char *commands[] = { "xr", "xreg", "x r", "x reg", "xt", "xg 12345678" };
+    const char *expected =
+        "EAX=12340000 EBX=12340003 ECX=12340001 EDX=12340002\n"
+        "ESP=12340004 EBP=12340005 ESI=12340006 EDI=12340007\n"
+        "EIP=12340008 EFL=00037FD7: VM RF NT IOPL=3 OF DF IF TF SF ZF AF PF CF \n";
+    unsigned index;
+    fake->register_fixture = LIB_TRUE;
+    for (index = 0; index < 10u; ++index)
+        fake->registers[index] = 0x12340000u + index;
+    fake->registers[COMMON_DEBUG_EFLAGS] = 0x37fd7u;
+    for (index = 0; index < sizeof(commands) / sizeof(commands[0]); ++index) {
+        fake->real_reads = fake->linear_reads = 0u;
+        assert(common_debug_submit_line(debug, commands[index], &result) == LIB_STATUS_OK);
+        if (index >= 4u) {
+            assert(result.lifecycle_request == COMMON_DEBUG_LIFECYCLE_RESUME);
+            assert(common_debug_observe_machine(debug, COMMON_DEBUG_MACHINE_PAUSED,
+                LIB_STATUS_OK, &result) == LIB_STATUS_OK);
+        }
+        assert(strstr(result.text, expected) != NULL);
+        assert(strstr(result.text, "L22340008 90") != NULL);
+        assert(fake->real_reads == 0u && fake->linear_reads == 1u);
+    }
+    fake->registers[COMMON_DEBUG_EFLAGS] = 2u;
+    assert(common_debug_submit_line(debug, "xr", &result) == LIB_STATUS_OK);
+    assert(strstr(result.text,
+        "EFL=00000002: vm rf nt IOPL=0 of df if tf sf zf af pf cf \n") != NULL);
+    fake->linear_reads = 0u;
+    assert(common_debug_submit_line(debug, "r", &result) == LIB_STATUS_OK);
+    assert(strncmp(result.text, "AX=0000  BX=0003", 15u) == 0);
+    assert(strstr(result.text, "EAX=") == NULL && fake->linear_reads == 1u);
+    assert(strstr(result.text, "0000:0008 90") != NULL);
+    /* Each original XR register continuation reads and writes the full value. */
+    for (index = 0; index < 10u; ++index) {
+        char line[32];
+        char value[16];
+        snprintf(line, sizeof(line), "xr %s", names[index]);
+        snprintf(value, sizeof(value), "%08X", fake->registers[index]);
+        assert(common_debug_submit_line(debug, line, &result) == LIB_STATUS_OK);
+        assert(strstr(result.text, value) != NULL);
+        assert(common_debug_submit_line(debug, "89abcdef", &result) == LIB_STATUS_OK);
+        assert(fake->registers[index] == 0x89abcdefu);
+    }
+    assert(common_debug_submit_line(debug, "xsreg", &result) == LIB_STATUS_OK);
+    assert(strstr(result.text, "Data, e, rw, big") != NULL);
+    fake->register_fixture = LIB_FALSE;
 }
 static void note_state(void *opaque, common_machine_state state,
     lib_u32 generation)
@@ -241,6 +327,7 @@ int main(void)
     assert(common_debug_submit_line(debug, "?", &debug_command_result) ==
         LIB_STATUS_OK);
     assert(strstr(debug_command_result.text, "assemble") != NULL);
+    extended_registers(debug, &fake);
     common_debug_close(debug);
     common_debug_destroy(debug);
     assert(common_machine_resume(machine));

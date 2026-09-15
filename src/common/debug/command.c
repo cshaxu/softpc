@@ -106,7 +106,7 @@ static C_INT command_printf_capacity(const command_context *debugContext)
 
 #define command_printf(debugContext, ...) \
     ((debugContext) == STD_NULL || (debugContext)->result == STD_NULL || \
-        command_printf_capacity(debugContext) == 0 ? -1 : snprintf( \
+        command_printf_capacity(debugContext) == 0 ? -1 : lib_c_snprintf( \
             (debugContext)->result->text + STD_STRLEN((debugContext)->result->text), \
             (STD_SIZE_T)command_printf_capacity(debugContext), __VA_ARGS__))
 
@@ -414,7 +414,6 @@ static C_VOID command_print_watches(command_context *debugContext);
 #define command_machine_clear_break(linear) command_clear_break(debugContext)
 #define command_machine_set_watch(kind, address) command_set_watch(debugContext, kind, address)
 #define command_machine_clear_watch(kind) command_clear_watch(debugContext, kind)
-#define command_machine_print_registers() rprintregs(debugContext)
 #define command_machine_print_segment_registers() command_print_segments(debugContext)
 #define command_machine_print_control_registers() command_print_controls(debugContext)
 #define command_machine_print_watchpoints() command_print_watches(debugContext)
@@ -466,7 +465,7 @@ static C_VOID command_print_segment(command_context *debugContext,
     } else {
         command_printf(debugContext, "Data, %s, %s, %s\n",
             segment->expdown ? "E" : "e",
-            segment->writable ? "RW" : "Rw",
+            segment->writable ? "RW" : "rw",
             segment->big ? "BIG" : "big");
     }
 }
@@ -1238,7 +1237,7 @@ static type_unsigned_8 uprintins(command_context *debugContext, type_unsigned_16
                 sizeof(stmt), &i, &instruction_bytes,
                 command_machine_get_code_default_size()) != TYPE_STATUS_OK) {
             len = 0u;
-            (void)snprintf(stmt, sizeof(stmt), "<ERROR>");
+            (void)lib_c_snprintf(stmt, sizeof(stmt), "<ERROR>");
         } else {
             len = (type_unsigned_8)instruction_bytes;
         }
@@ -1845,7 +1844,7 @@ static type_unsigned_8 xuprintins(command_context *debugContext, type_unsigned_3
                 sizeof(stmt), &i, &instruction_bytes,
                 command_machine_get_code_default_size()) != TYPE_STATUS_OK) {
             len = 0u;
-            (void)snprintf(stmt, sizeof(stmt), "<ERROR>");
+            (void)lib_c_snprintf(stmt, sizeof(stmt), "<ERROR>");
         } else {
             len = (type_unsigned_8)instruction_bytes;
         }
@@ -1884,7 +1883,32 @@ static type_unsigned_8 xuprintins(command_context *debugContext, type_unsigned_3
 }
 static C_VOID xrprintreg(command_context *debugContext)
 {
-    command_machine_print_registers();
+    type_unsigned_32 flags = _eflags;
+    STD_PRINTF("EAX=%08X", _eax);
+    STD_PRINTF(" EBX=%08X", _ebx);
+    STD_PRINTF(" ECX=%08X", _ecx);
+    STD_PRINTF(" EDX=%08X", _edx);
+    STD_PRINTF("\nESP=%08X", _esp);
+    STD_PRINTF(" EBP=%08X", _ebp);
+    STD_PRINTF(" ESI=%08X", _esi);
+    STD_PRINTF(" EDI=%08X", _edi);
+    STD_PRINTF("\nEIP=%08X", _eip);
+    STD_PRINTF(" EFL=%08X", flags);
+    STD_PRINTF(": ");
+    STD_PRINTF("%s ", flags & 0x20000u ? "VM" : "vm");
+    STD_PRINTF("%s ", flags & 0x10000u ? "RF" : "rf");
+    STD_PRINTF("%s ", flags & 0x04000u ? "NT" : "nt");
+    STD_PRINTF("IOPL=%01X ", (flags >> 12u) & 3u);
+    STD_PRINTF("%s ", flags & 0x00800u ? "OF" : "of");
+    STD_PRINTF("%s ", flags & 0x00400u ? "DF" : "df");
+    STD_PRINTF("%s ", flags & 0x00200u ? "IF" : "if");
+    STD_PRINTF("%s ", flags & 0x00100u ? "TF" : "tf");
+    STD_PRINTF("%s ", flags & 0x00080u ? "SF" : "sf");
+    STD_PRINTF("%s ", flags & 0x00040u ? "ZF" : "zf");
+    STD_PRINTF("%s ", flags & 0x00010u ? "AF" : "af");
+    STD_PRINTF("%s ", flags & 0x00004u ? "PF" : "pf");
+    STD_PRINTF("%s ", flags & 0x00001u ? "CF" : "cf");
+    STD_PRINTF("\n");
     xulin = command_machine_get_code_base() + _eip;
     xuprintins(debugContext, xulin);
 }
@@ -3083,11 +3107,11 @@ static lib_bool command_needs_machine(common_debug_command *command)
     if (command->continuation != COMMAND_CONTINUATION_NONE) return LIB_TRUE;
     if (command->argument_count == 0u) return LIB_FALSE;
     name = command->arguments[0];
-    if (strchr("acdefgilmorstuvwx", name[0]) == NULL) return LIB_FALSE;
-    return strcmp(name, "?") != 0 && strcmp(name, "h") != 0 &&
-        strcmp(name, "n") != 0 && strcmp(name, "q") != 0 &&
-        !(strcmp(name, "x") == 0 && command->argument_count == 2u &&
-            strcmp(command->arguments[1], "?") == 0);
+    if (lib_c_strchr("acdefgilmorstuvwx", name[0]) == NULL) return LIB_FALSE;
+    return lib_c_strcmp(name, "?") != 0 && lib_c_strcmp(name, "h") != 0 &&
+        lib_c_strcmp(name, "n") != 0 && lib_c_strcmp(name, "q") != 0 &&
+        !(lib_c_strcmp(name, "x") == 0 && command->argument_count == 2u &&
+            lib_c_strcmp(command->arguments[1], "?") == 0);
 }
 
 static lib_bool command_prepare_machine(common_debug_command *debugContext)
@@ -3113,7 +3137,7 @@ static void command_report_access(common_debug_command *command)
     command->pending_line_available = 0;
     command->run_kind = COMMAND_RUN_NONE;
     command->result->lifecycle_request = COMMON_DEBUG_LIFECYCLE_NONE;
-    (void)snprintf(command->result->text, sizeof(command->result->text), "%s\r\n\r\n",
+    (void)lib_c_snprintf(command->result->text, sizeof(command->result->text), "%s\r\n\r\n",
         command->access_status == LIB_STATUS_INVALID_STATE ?
             "Machine must be paused for this debug operation." :
         command->access_status == LIB_STATUS_UNSUPPORTED ?
@@ -3134,7 +3158,7 @@ lib_status common_debug_command_submit_line(common_debug_command *command,
     out_result->keep_active = LIB_TRUE;
     command->result = out_result;
     command->access_status = LIB_STATUS_OK;
-    if (strlen(line) >= sizeof(command->command_buffer)) {
+    if (lib_text_length(line) >= sizeof(command->command_buffer)) {
         command_printf(command, "Debug command is too long.\r\n\r\n");
         goto finished;
     }

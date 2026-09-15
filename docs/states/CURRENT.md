@@ -2,29 +2,30 @@
 
 ## Current Work
 
-M9 T59 S6 is verified and reviewed: implementation 3503aa9 is pushed;
-awaiting owner manual testing. T59 remains open.
+M9 T59 S7 is implemented and verified: original extended debugger output
+restored and Common CRT vocabulary unified through Types; both 89/89.
+Executor delivery and coordinator review follow. T59 stays open for owner tests.
 
-## M9 T59 S6 Packet
+## M9 T59 S7 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits a new S repairing Common/Lib, simplifying external consumers where justified, then dual-width build/test/commit/push for manual acceptance. |
-| Objective | Separate product notification handling from one outstanding cooked line; ensure raw frame viewport capacity without shrinking existing dimensions. |
-| Non-goals | No MVDM changes, new input loop, focus repair, automatic Window fallback or edits to user configuration/media. |
-| Reference Baseline | d6bbbcc before S6; implementation 3503aa9 reviewed and pushed, both 89/89. |
-| Candidate Proposal | [S6 design and ledger](../proposals/m9-monitor-line-viewport.md). |
-| Files And ABI Surface | Common session/UI, Lib Host Win32 display, shared tests/manifests and narrow App provider simplification if required. |
+| Admission And Approval | Owner requests original-source restoration of debugger functionality and style, without inventing structures. |
+| Objective | Compare every extended debugger command with original NXVM and restore migration regressions through existing Common access. |
+| Non-goals | No MVDM changes, second executor, native input loop, global CPU access, or redesign of inherited command semantics. Lib changes are limited to owner-approved thin CRT naming aliases. |
+| Reference Baseline | SoftPC 0299b93; read-only NXVM 9bd08dd8 original and 57c1d6d7 Common extraction. |
+| Candidate Proposal | [S7 restoration ledger](../proposals/m9-debug-original-restoration.md). |
+| Files And ABI Surface | Common debug restoration plus owner-approved Common-wide CRT vocabulary cleanup, Types header-only aliases, shared/product tests/manifests and EXEs; no new runtime ABI. |
 | Applicable Rules | Architecture/coding/execution/documentation governance skills, repository rules and Product UI. |
-| Verification | New deterministic line-event/frame/notification and cancellation tests; viewport expansion/failure and cooked restoration; x64 and x86 each 89/89, both fixed packages rebuilt. |
-| Expected Markers | No second prompt/reader until consumption or confirmed cancellation; no silently clipped raw surface; cooked restoration preserved. |
-| Asset Needs | Only fixed x86/x64 EXEs refreshed; ignored build/t59-s6-*.log diagnostics bounded to 10 MB each and 10 minutes per run, executor cleans owned logs after retaining evidence; preserve INI/media. |
+| Verification | Original command comparison, exact 32-bit output/editing and asynchronous completion regression; both full builds/tests 89/89, four manifests and CRT negative gate passed. |
+| Expected Markers | XR/XREG and XT/XG completion retain full registers and original flags, one linear disassembly; R remains 16-bit. |
+| Asset Needs | Fixed x86/x64 EXEs only; build/t59-s7-*.log bounded to 10 MB and 10 minutes per run, executor cleans owned logs; preserve INI/media. |
 | Reporting Requirements | Scope and line accounting, shared manifest verification, tests, pushed complete P, coordinator review and EXE links; await manual testing. |
-| Stop Conditions | Platform expansion requires a second input loop or machine changes; Common gains reader state beyond pending_line. |
+| Stop Conditions | Restoration requires new public ABI or machine behavior; report rather than invent an unsupported register or a second execution path. |
 | Exit Criteria | Ledger verified, final dual-width tests pass, complete delivery pushed, clean tree and owner test handoff; do not close T59. |
-| Original Owner Request | 好的，准入一个新的S任务进行修复后编译测试提交推送并报我手动测试。Common和lib修复好了以后，如果app/compat/vm等外部组件可以简化清理，请一并清理。 |
-| Similar-Issue Sweep | All session result/prompt/reader call sites, line rejection/cancellation/completion, external prompt flags, raw surface resizing/restoration and shared negative fixtures. |
+| Original Owner Request | 请你对照原始代码，按照原始代码的原始风格恢复所有功能；不要自己发明新的结构和风格 |
+| Similar-Issue Sweep | XA/XC/XD/XE/XF/XG/XM/XR/XS/XT/XU/XW and XREG/XSREG/XCREG/help; preserve approved machine adaptation, record inherited defects separately. |
 
 T59 S2–S5 are reviewed, pushed and closed. The [retained task brief](../history/M9-T59-product-boundary-cleanup-proposal.md)
 and [S5 review](../history/M9-T59-S5-boundary-convergence.md) record delivery.
