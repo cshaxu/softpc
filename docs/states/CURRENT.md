@@ -2,9 +2,10 @@
 
 ## Current Work
 
-M9 T59 S20 implemented and verified: bounded HLT/audio failure handling in
-Compat; x86/x64 builds and 96/96 tests per width pass. Executor P1 delivery is
-ready for actual-commit review. T59 remains open for owner testing.
+M9 T59 S20 delivered and reviewed: bounded HLT/audio failure handling in
+Compat; x86/x64 builds and 96/96 tests per width pass. P1 e402c69 is pushed;
+actual-commit review and dual-width focused reruns pass. Await owner testing;
+T59 remains open.
 
 ## M9 T59 S20 Packet
 

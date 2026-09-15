@@ -92,3 +92,21 @@ Existing build trees/evidence remain; regenerated types-layout fixture children
 are removed after tests. The disposable platform test image is removed by its
 test. No new trace, media or build tree is retained. All five ledger members
 are verified for executor P1 delivery; actual-commit review follows separately.
+
+## Coordinator review
+
+Executor P1 e402c69 is pushed to origin/main. Reviewed its actual production,
+test and CMake diff against the original request and c4e87f3. HLT failure
+unwinds before another instruction/wait and remains IO_ERROR after CPU return;
+initialization and disposal share the existing timer/event owner. Failed Beep
+returns to the existing blocking wait; stop/cancel/fault do not enter a retry.
+The normal 40 ms slice and original pacing remain unchanged. The private
+readiness query and one latch are necessary for error propagation across the
+existing outer CCPU return, not a second lifecycle implementation.
+
+Reran both committed failure fixtures on x64 and x86: 2/2 per width. Full
+regression evidence remains 96/96 per width. Confirmed production net +20,
+test net +141 and CMake +15, content-identical S19 archival, and no changes to
+shared corpora, preserved CPU, media or INI. Worktree was clean after P1;
+P2 only records review/status. All five ledger members pass. S20 is delivered
+for owner testing; T59 remains open and manual acceptance is not claimed.
