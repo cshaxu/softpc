@@ -2,30 +2,30 @@
 
 ## Current Work
 
-M9 T59 S17 delivered for owner testing: P1 aa02ed9 pushed and actual-commit
-coordinator review passed. Both strict builds and 93/93 tests per width pass.
-Public API/lifecycle unchanged; production net -48 lines. T59 remains open.
+M9 T59 S18 verified: Lib Host renamed to Console Broker without behavior changes.
+Strict dual-width builds and 93/93 tests per width pass; P1 delivery and actual-commit
+coordinator review follow. T59 remains open; owner manual testing is pending.
 
-## M9 T59 S17 Packet
+## M9 T59 S18 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves both Storage ownership and KVM Console disposal cleanup, dual-width build/test and commit/push. |
-| Objective | Embed file in medium, use stack file in read_owned, remove heap file shell; one Console disposal body. |
-| Non-goals | No public ABI, disk mode/locking, worker lifecycle, Common or product behavior changes. |
-| Reference Baseline | 5847799, clean main. |
-| Candidate Proposal | [Storage ownership cleanup](../proposals/m9-storage-ownership-cleanup.md). |
-| Files And ABI Surface | Storage private file/medium implementation, Linux failed-open cleanup, Console disposal; tests/docs/manifests/EXEs. |
-| Applicable Rules | Architecture/coding/execution/documentation skills and repository architecture/coding/UI design and execution/document rules. |
-| Verification | Allocation/failure/storage mode and Console retirement tests pass; strict builds, x86 93/93 (66.24 s), x64 93/93 (75.57 s); four manifests/docs/DAG pass. Evidence and hashes in proposal. |
-| Expected Markers | No heap file allocation or pointer-transfer helper; single Console disposal; unchanged public headers. |
-| Asset Needs | Existing build trees, both fixed EXEs; preserve INI/media. |
-| Reporting Requirements | Finite ledger, same-issue scan, production/test line counts, executor P1 and coordinator P2 committed/pushed; wait. |
-| Stop Conditions | Product behavior or worker lifecycle redesign requires further admission. |
-| Exit Criteria | Ledger verified, dual-width tests/builds and gates pass, committed/pushed clean for owner testing. |
-| Original Owner Request | 批准，请进行一个新的S任务 完成以上2个目标。编译测试提交推送。 |
-| Similar-Issue Sweep | Every private Storage file owner/open/close and both platform failure paths; KVM leaf disposal ownership. |
+| Admission And Approval | Owner admits Host component rename, dual-width build/test, commit and push. |
+| Objective | Rename host component, symbols, targets and consumers to console-broker; retain separate logical Console boundary. |
+| Non-goals | No lifecycle, platform, input/output, focus, failure-policy or product behavior changes; no component merge. |
+| Reference Baseline | 2c0217d, clean main; S17 delivered and reviewed. |
+| Candidate Proposal | [Console broker naming](../proposals/m9-console-broker-naming.md). |
+| Files And ABI Surface | Lib broker public/private names, Common UI callers, shared/product tests, build/gates/docs/manifests and EXEs. Source-name break only; no compatibility aliases. |
+| Applicable Rules | Architecture/coding/execution/documentation skills and repository design, source layout, UI, execution and document rules. |
+| Verification | Six rename-normalized source comparisons pass; old-name sweep and 64-edge negative probes pass. Four manifests/docs pass. Strict x86/x64 builds; x86 93/93 (57.44 s), x64 93/93 (56.81 s). Hashes/counts in proposal. |
+| Expected Markers | No lib/host target/path or host_console production names; KVM Console has no broker dependency. |
+| Asset Needs | Existing build trees and two fixed EXEs; preserve INI/media. |
+| Reporting Requirements | Finite ledger, source/test line counts, executor P1 push then actual-commit coordinator P2 review/push. |
+| Stop Conditions | Behavior change or overlapping worktree mutation requires reassessment. |
+| Exit Criteria | All ledger rows verified, dual-width artifacts/tests and gates pass, committed/pushed clean for owner testing. |
+| Original Owner Request | 根据最新代码 准入一个新的s任务完成host组件重命名工作 完成后 编译测试提交推送 |
+| Similar-Issue Sweep | All broker paths/symbols/CMake targets, source and build edge maps, tests/fixtures and current documentation; historical host vocabulary retained. |
 
 ## Current Technical Baseline
 
@@ -45,7 +45,7 @@ Public API/lifecycle unchanged; production net -48 lines. T59 remains open.
   builds and full 85/85 suites pass. x86 is 3,503,225 bytes; rebuilt x64 is
   byte-identical to S4. No source corpus or product semantics changed.
 - `src/lib/` is the canonical shared corpus for exact NXVM adoption. Its
-  normalized `types`/`console`/`host`/`storage`/`kvm-*` corpus has S18 one-time
+  normalized `types`/`console`/`console-broker`/`storage`/`kvm-*` corpus has S18 one-time
   wake selection; the T56 baseline passed x64/x86 83/83 CTest;
   strict standalone library suite passes 38/38. Its path-scoped standalone MSVC
   manifest/build/CTest gate is live in GitHub Actions.

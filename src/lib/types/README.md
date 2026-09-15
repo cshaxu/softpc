@@ -8,7 +8,7 @@ resource policy, platform worker, or product behavior.
 `types` is header-only. It centralizes external declarations and typed,
 one-to-one wrappers, but does not compile a platform implementation. Each
 owning component supplies its own selected `win32` or `linux` source behind a
-uniform component-private contract: `base` owns synchronization; `host` owns Console
+uniform component-private contract: `base` owns synchronization; `console-broker` owns Console
 native work, `storage` owns file native work, and `kvm-base`/the KVM leaves own
 their own wake, input, and rendering work. `types` never interprets a
 consumer's state machine or input protocol.

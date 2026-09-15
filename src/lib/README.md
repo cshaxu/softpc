@@ -27,7 +27,7 @@ by matching platform implementations. Application-facing
 copied-value APIs are distinct from the leaf-support contracts:
 `kvm-base/worker_interface.h`, `mailbox_interface.h`,
 `kvm-base/input_interface.h` serves only the KVM leaves;
-`console/binding_interface.h` serves host binding implementations.
+`console/binding_interface.h` serves console-broker binding implementations.
 Other component headers are exclusively component-local. They use short
 names and live directly in their owning directory; no filename carries a
 `_private`, `_internal`, or `_native` qualifier. Names describe the operation:
@@ -47,16 +47,16 @@ An arrow means the component on the right may use the generic contract of the
 component on the left:
 
 ```text
-types -> base + console + host + storage + kvm-base + kvm-window + kvm-console
-base -> console + host + kvm-base + kvm-console
-console -> host + kvm-console
+types -> base + console + console-broker + storage + kvm-base + kvm-window + kvm-console
+base -> console + console-broker + kvm-base + kvm-console
+console -> console-broker + kvm-console
 kvm-base -> kvm-window + kvm-console
 ```
 
-No other component edge is allowed. In particular, `host`, `storage`,
+No other component edge is allowed. In particular, `console-broker`, `storage`,
 `kvm-window`, and `kvm-console` are peers. `kvm-window` neither includes nor
-calls `console` or `host`; `kvm-console` consumes only the neutral `console`
-contract. `host` does not include KVM. There is no unified KVM aggregate,
+calls `console` or `console-broker`; `kvm-console` consumes only the neutral `console`
+contract. `console-broker` does not include KVM. There is no unified KVM aggregate,
 lifecycle controller, or public unified presenter API.
 
 - `types` is header-only and provides scalar aliases, status values, atomic
@@ -71,9 +71,9 @@ lifecycle controller, or public unified presenter API.
 - `console` provides the logical Console object. It is a neutral copied-value
   endpoint: it has no native handle, platform input mode, Window, raw Console,
   monitor, or product-lifecycle meaning.
-- `host` exposes an opaque `host_console_broker` that binds one caller-owned
+- `console-broker` exposes an opaque `console_broker` that binds one caller-owned
   logical Console to native I/O. A caller supplies its
-  expected Current Console on every replacement or cooked-line request; host
+  expected Current Console on every replacement or cooked-line request; the broker
   has no monitor, raw Console, prompt, or lifecycle vocabulary. A replacement first
   retires and confirms the old native reader, then activates the next binding;
   it uses the same transaction for every raw/cooked pair. If retirement cannot
@@ -125,7 +125,7 @@ mailboxes. Callers never share or address a mailbox directly.
   creation failure is distinct and does not retire an uncreated source.
 
 Unexpected native Console reader errors emit `LIB_CONSOLE_EVENT_IO_FAILURE`.
-Before native activation, after old input quiesces, host delivers INPUT_RESET
+Before native activation, after old input quiesces, the broker delivers INPUT_RESET
 synchronously through the logical Console. Consumers clear local input history
 before the next reader starts; this is distinct from successful ACTIVATED and
 permanent KVM source retirement. Rollback uses the same reset-before-reader path.
@@ -165,7 +165,7 @@ records do not flush keyboard prefixes; only keyboard order, not key/mouse
 interleaving, is retained while a prefix is pending.
 
 Console callback/output gates use Base blocking mutexes; broker replacement
-retains backend-owned blocking locks. No Console-to-Host dependency exists. Native
+retains backend-owned blocking locks. No Console-to-Broker dependency exists. Native
 I/O lock ordering and detach barriers are unchanged. Callbacks must not
 synchronously reenter binding replacement or destruction on the same owner.
 
@@ -182,7 +182,7 @@ after join. Callbacks may not synchronously cancel their own reader. Cancellatio
 does not print or rearm; the caller owns those decisions. Linux Console remains
 unsupported through the same API, as for its existing activation contract.
 
-Win32 host keeps stream output in the original screen buffer and frame output
+Win32 broker keeps stream output in the original screen buffer and frame output
 in one lazily allocated alternate buffer, both owned by the same broker.
 Selection and display-metadata restoration are inside the existing output
 transaction, before the next reader starts. Same-mode replacement does not

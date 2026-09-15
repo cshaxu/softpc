@@ -149,7 +149,7 @@ full-work-area rectangle.
 
 SoftPC distinguishes static `display=console|window`, the active component set
 `{window_enabled, console_enabled}`, and the one Current Console Object bound
-by host. `common/ui` owns the cooked monitor logical Console and selects it or
+by the broker. `common/ui` owns the cooked monitor logical Console and selects it or
 the KVM raw VM object through the broker. A monitor never implements SoftPC
 hotkeys; it accepts normal line
 commands only.
@@ -180,11 +180,11 @@ still follow the existing completion path; no command clears individual lines
 to compensate for raw output. A cooked-to-cooked binding leaves the display
 untouched. The raw frame does not force the host window to shrink to 80x25.
 
-Window X is a SoftPC close request: running first reaches paused, host switches
+Window X is a SoftPC close request: running first reaches paused, the broker switches
 to monitor, then SoftPC destroys the Window component. Until native Window
 destruction, normal Window input remains valid.
 
-Creating a Window may foreground that Window. Host raw Console activation also
+Creating a Window may foreground that Window. Broker raw Console activation also
 requests native foreground/focus; cooked activation does not. SoftPC does not
 call Win32 focus APIs. Foreground requests and confirmed reader ownership are
 distinct: input takeover is completed by the broker's retirement/activation

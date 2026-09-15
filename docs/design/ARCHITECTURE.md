@@ -161,7 +161,7 @@ C/compiler/platform vocabulary. Platform declaration headers contain no
 component policy; base owns synchronization/clock composition, and kvm-base owns input
 interpretation. Component platform implementations are selected by the build,
 not by a generic types dispatcher. `console` defines
-copied logical Console objects. `host` owns native Console
+copied logical Console objects. `console-broker` owns native Console
 handles/modes, one I/O worker, and exactly one Current Console Object from
 broker creation to destruction; replacement is transactional. Shared KVM is
 split into `kvm-base` (copied KVM values, one event-construction path,
@@ -169,21 +169,21 @@ private-mailbox helpers, and source-local generic hotkey matcher),
 `kvm-window` (one Window lifecycle), and `kvm-console` (one VM Console lifecycle).
 The latter creates an optional logical VM Console object but neither KVM
 component opens or registers the process Console. `common/ui` owns the monitor
-object, decides which KVM components exist from injected actions and asks host
+object, decides which KVM components exist from injected actions and asks the broker
 to replace the current object. SoftPC app policy derives and injects those
 actions; common/ui does not interpret their product meaning.
 
 The library's only direct component edges are:
 
 ```text
-types    -> base + console + host + storage + kvm-base + kvm-window + kvm-console
-base     -> console + host + kvm-base + kvm-console
-console  -> host + kvm-console
+types    -> base + console + console-broker + storage + kvm-base + kvm-window + kvm-console
+base     -> console + console-broker + kvm-base + kvm-console
+console  -> console-broker + kvm-console
 kvm-base  -> kvm-window + kvm-console
 ```
 
 There is no other library edge and no aggregate KVM target. In particular,
-`kvm-window` does not depend on `console` or `host`, while `host` does not
+`kvm-window` does not depend on `console` or `console-broker`, while `console-broker` does not
 depend on KVM. `kvm-base` is only a library dependency of the two KVM leaves;
 the application may consume its public copied-value interfaces where the
 control/input ABI requires them, never its leaf-support worker/mailbox or
@@ -201,7 +201,7 @@ delegates raw decoding to same-shape selected platform functions; Window-only
 message decoding and key-state queries remain in kvm-window. This support API
 is not an application input API.
 
-Common session control is the sole product-state writer. VM, host, and KVM
+Common session control is the sole product-state writer. VM, broker, and KVM
 workers only enqueue copied events/completions to its common-owned queue. The control thread
 derives runtime commands independently from the required component instances,
 using config, frame route, and completed actual state; a derived action is
@@ -235,11 +235,11 @@ copied input-queue entry supplied at creation.
 
 Shared frame mailboxes accumulate unconsumed dirty bounds with the latest
 complete image under one lock. Capture does not consume; a successful-output
-acknowledgement clears only that still-current publication. Host reports logical
+acknowledgement clears only that still-current publication. The broker reports logical
 Console activation through its neutral event sink after binding succeeds;
 kvm-console only wakes its existing worker to draw pending content. Empty means
 no output, and NOT_CURRENT retains pending content without a retry loop.
-Before native activation, the existing host binding helper synchronously sends
+Before native activation, the existing broker binding helper synchronously sends
 INPUT_RESET through the logical Console after old-reader quiescence. kvm-console
 clears its held keys, incomplete text and mouse baseline, retaining registrations
 and pending frames. No new input can precede that reset. Rollback uses the same
@@ -250,10 +250,10 @@ Common session alone holds pending_line through consumption of the copied line
 event. Provider prompt readiness is level-triggered; notifications and explicit
 requests are handled even while that line is pending. Frame events drive display,
 not input admission. Notification output cancels and joins an unfinished cooked
-read through Host's existing retirement path; completed queued commands survive.
+read through the broker's existing retirement path; completed queued commands survive.
 Common UI forwards this operation without new state. Confirmed broker handoff
 also clears pending_line, never a desired-state change alone.
-Win32 host isolates raw frame output from the original cooked screen buffer.
+Win32 broker isolates raw frame output from the original cooked screen buffer.
 The broker selects and restores native display metadata inside its existing
 output transaction, before reader startup; same-mode replacements do not switch
 screens. Frame output does not shrink the native window to its fixed cell grid.
@@ -296,7 +296,7 @@ atomically without bypassing FIFO control consumption up to STOP. Frame and
 control have independent locks; only terminal admission takes both, frame first.
 Ordinary control does not wait for frame copying.
 
-Logical Console metadata/event/output gates, KVM frame/control and Host
+Logical Console metadata/event/output gates, KVM frame/control and broker
 output/transaction locks use Base blocking mutexes. Each consumer owns its lock
 instances, scope and order; Base owns the primitive implementation, not handoff
 policy. No callback may synchronously reenter binding/destruction. Storage

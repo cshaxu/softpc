@@ -446,7 +446,7 @@ add_executable(softpc-runtime-smoke
     src/app/keyboard.c
     src/common/session/presentation_plan.c
     src/common/session/control_state.c)
-target_link_libraries(softpc-runtime-smoke PRIVATE softpc-vm common-machine types console host storage kvm-base kvm-window kvm-console)
+target_link_libraries(softpc-runtime-smoke PRIVATE softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console)
 target_include_directories(softpc-runtime-smoke PRIVATE test/support src/app)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
 set_tests_properties(softpc-runtime-smoke PROPERTIES
@@ -457,7 +457,7 @@ add_executable(softpc-runtime-restart-boot-smoke
     src/common/session/control.c
     src/app/keyboard.c)
 target_link_libraries(softpc-runtime-restart-boot-smoke PRIVATE
-    softpc-vm common-machine types console host storage kvm-base kvm-window kvm-console)
+    softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console)
 target_include_directories(softpc-runtime-restart-boot-smoke PRIVATE test/support src/app)
 add_test(NAME softpc-runtime-restart-boot-smoke
     COMMAND softpc-runtime-restart-boot-smoke)
@@ -470,7 +470,7 @@ add_executable(softpc-runtime-input-continuation-smoke
     src/common/session/control.c
     src/app/keyboard.c)
 target_link_libraries(softpc-runtime-input-continuation-smoke PRIVATE
-    softpc-vm common-machine types console host storage kvm-base kvm-window kvm-console)
+    softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console)
 target_include_directories(softpc-runtime-input-continuation-smoke PRIVATE
     test/support src/app)
 add_test(NAME softpc-runtime-input-continuation-smoke

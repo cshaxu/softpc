@@ -14,7 +14,7 @@ static void release(void *memory)
 #define lib_release release
 #include "lib/base/linux/sync.c"
 #include "lib/base/sync.c"
-#include "lib/host/linux/console.c"
+#include "lib/console-broker/linux/console.c"
 
 static base_sync_event *signal_event;
 static void task_entry(void *context, const base_sync_task *task)
@@ -34,7 +34,7 @@ int main(void)
     lib_bool signaled;
     lib_u32 index;
     int failure;
-    host_console_backend *backend = (void *)1;
+    console_broker_backend *backend = (void *)1;
     base_sync_mutex *mutex = (void *)1;
 
     assert(base_sync_mutex_create(NULL) == LIB_STATUS_INVALID_ARGUMENT);
@@ -131,8 +131,8 @@ int main(void)
     assert(sleep_calls == 2);
     base_sync_platform_event_destroy(events[0]);
     base_sync_platform_event_destroy(events[1]);
-    assert(host_console_backend_create(&backend) == LIB_STATUS_UNSUPPORTED && !backend);
-    assert(host_console_backend_request_cooked_line(NULL) == LIB_STATUS_UNSUPPORTED);
+    assert(console_broker_backend_create(&backend) == LIB_STATUS_UNSUPPORTED && !backend);
+    assert(console_broker_backend_request_cooked_line(NULL) == LIB_STATUS_UNSUPPORTED);
     {
         base_sync_task *task;
         unsigned before = allocations;

@@ -1,5 +1,5 @@
 #include "common/ui/ui_interface.h"
-#include "lib/host/console_interface.h"
+#include "lib/console-broker/console_interface.h"
 #include "lib/base/sync_interface.h"
 #include "lib/kvm-window/window_interface.h"
 #include "lib/kvm-console/console_interface.h"
@@ -21,10 +21,10 @@ static void *counted_set(void *destination, int value, lib_size size)
 
 struct kvm_window { kvm_window_options options; };
 struct kvm_console { lib_console *object; kvm_console_options options; };
-struct host_console_broker { lib_console *current; };
+struct console_broker { lib_console *current; };
 static struct kvm_window window_fake;
 static struct kvm_console console_fake;
-static struct host_console_broker broker_fake;
+static struct console_broker broker_fake;
 
 lib_status kvm_window_create(kvm_window **out, const kvm_window_options *options)
 { window_fake.options = *options; *out = &window_fake; return LIB_STATUS_OK; }
@@ -58,19 +58,19 @@ lib_status kvm_console_publish_frame(kvm_console *console, const kvm_frame *fram
     ++console_frames;
     return publish_status;
 }
-lib_status host_console_broker_create(host_console_broker **out,
-    lib_console *initial, host_console_mode mode)
-{ assert(mode == HOST_CONSOLE_COOKED_LINES); broker_fake.current = initial;
+lib_status console_broker_create(console_broker **out,
+    lib_console *initial, console_broker_mode mode)
+{ assert(mode == CONSOLE_BROKER_COOKED_LINES); broker_fake.current = initial;
   *out = &broker_fake; return LIB_STATUS_OK; }
-lib_status host_console_broker_replace(host_console_broker *broker,
-    lib_console *expected, lib_console *next, host_console_mode mode)
+lib_status console_broker_replace(console_broker *broker,
+    lib_console *expected, lib_console *next, console_broker_mode mode)
 { (void)mode; assert(broker->current == expected); broker->current = next; return LIB_STATUS_OK; }
-lib_status host_console_broker_request_cooked_line(host_console_broker *broker,
+lib_status console_broker_request_cooked_line(console_broker *broker,
     lib_console *expected)
 { assert(broker->current == expected); return LIB_STATUS_OK; }
-lib_status host_console_broker_destroy(host_console_broker *broker)
+lib_status console_broker_destroy(console_broker *broker)
 { assert(broker == &broker_fake); return LIB_STATUS_OK; }
-lib_status host_console_broker_cancel_cooked_line(host_console_broker *broker,
+lib_status console_broker_cancel_cooked_line(console_broker *broker,
     lib_console *expected, lib_bool *out_completed)
 { assert(broker->current == expected); *out_completed = LIB_FALSE; return LIB_STATUS_OK; }
 

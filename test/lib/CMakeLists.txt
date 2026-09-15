@@ -43,8 +43,8 @@ target_sources(lib-test-linux_input_contract PRIVATE
 if(WIN32)
     lib_test(lib_console_event_gate console)
     lib_test(kvm_frame_lock kvm-base)
-    lib_test(host_console_broker console)
-    lib_test(lib_failure_output_contract kvm-window kvm-console host storage)
+    lib_test(console_broker console)
+    lib_test(lib_failure_output_contract kvm-window kvm-console console-broker storage)
     lib_test(win32_vocabulary_ownership types user32)
     lib_test(win32_keyboard kvm-base)
     lib_test(kvm_leaf_control_capacity kvm-window kvm-console)
@@ -52,8 +52,8 @@ if(WIN32)
     target_sources(lib-test-kvm_console_retirement_barrier PRIVATE
         "${LIB_ROOT}/kvm-console/console.c")
     foreach(probe IN ITEMS kvm_frame_damage_mouse kvm_window_retirement
-            kvm_window_modal kvm_shutdown_failure host_console_reader_failure
-            host_console_display host_console_cancel kvm_input_admission console_blocking_gate
+            kvm_window_modal kvm_shutdown_failure console_broker_reader_failure
+            console_broker_display console_broker_cancel kvm_input_admission console_blocking_gate
             base_sync_ownership kvm_keyboard_lifetime lib_console_io_contract
             kvm_window_capture_contract)
         lib_test(${probe} kvm-window console)
@@ -79,7 +79,7 @@ add_test(NAME library.types-layout
         COMMAND "${CMAKE_COMMAND}"
             -DLIBRARY_ROOT:PATH=${CMAKE_CURRENT_SOURCE_DIR}/fixtures/lib-component-dag
             -DLIBRARY_VERIFIER:FILEPATH=${LIB_ROOT}/verify_component_dependencies.cmake
-            "-DLIBRARY_EXPECTED_ERROR:STRING=Forbidden component edge: host -> kvm-window"
+            "-DLIBRARY_EXPECTED_ERROR:STRING=Forbidden component edge: console-broker -> kvm-window"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/component_dag_forbidden_include_smoke.cmake")
     add_test(NAME library.component-dag-relative-include
         COMMAND "${CMAKE_COMMAND}"

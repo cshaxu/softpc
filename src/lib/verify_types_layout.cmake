@@ -107,7 +107,7 @@ foreach(path IN LISTS library_sources)
            body MATCHES "(^|[^A-Za-z0-9_])kvm_keyboard_(submit_transition|submit_utf16|platform_[A-Za-z0-9_]+|note_recovered_key|release_recovered_key|consume_duplicate_character)[ \t\r\n]*\\(")
             message(FATAL_ERROR "KVM leaf bypasses shared keyboard record entry: ${path}")
         endif()
-        if(path MATCHES "^(host|kvm-window)/win32/" AND
+        if(path MATCHES "^(console-broker|kvm-window)/win32/" AND
            body MATCHES "lib_win32_(read_console_input_a|write_console_output_a|register_class_a|create_window_ex_a|dispatch_message_a|peek_message_a)[ \t\r\n]*\\(")
             message(FATAL_ERROR "ANSI input bypasses Unicode record contract: ${path}")
         endif()

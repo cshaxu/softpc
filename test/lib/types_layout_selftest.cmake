@@ -5,7 +5,7 @@ cmake_policy(SET CMP0057 NEW)
 set(fixture "${TEST_WORK_DIR}/types-layout-fixture")
 file(MAKE_DIRECTORY "${fixture}")
 file(REMOVE "${fixture}/CMakeLists.txt")
-foreach(component types base console host storage kvm-base kvm-window kvm-console)
+foreach(component types base console console-broker storage kvm-base kvm-window kvm-console)
     file(REMOVE "${fixture}/${component}/edge.h")
 endforeach()
 file(COPY "${LIBRARY_ROOT}/types" DESTINATION "${fixture}")
@@ -15,7 +15,7 @@ file(REMOVE "${fixture}/consumer.c" "${fixture}/types/probe.h"
     "${fixture}/types/win32/probe.h" "${fixture}/kvm-base/probe_interface.h"
     "${fixture}/kvm-window/win32/probe.c"
     "${fixture}/kvm-base/win32/probe_interface.h"
-    "${fixture}/host/win32/encoding_probe.c"
+    "${fixture}/console-broker/win32/encoding_probe.c"
     "${fixture}/kvm-window/win32/encoding_probe.c"
     "${fixture}/kvm-window/input_probe.c"
     "${fixture}/kvm-console/input_probe.c")
@@ -46,13 +46,14 @@ foreach(retired IN ITEMS kvm-base/mailbox_wake_interface.h
 endforeach()
 check_layout(pass)
 
-foreach(retired IN ITEMS host_sync_mutex host_clock_milliseconds console_mutex)
+foreach(retired IN ITEMS host_sync_mutex host_clock_milliseconds console_mutex
+        host_console_broker HOST_CONSOLE_RAW_EVENTS)
     file(WRITE "${fixture}/console/edge.h" "void ${retired}(void);\n")
     check_layout(fail)
 endforeach()
 file(REMOVE "${fixture}/console/edge.h")
 
-foreach(owner IN ITEMS host console kvm-base)
+foreach(owner IN ITEMS console-broker console kvm-base)
     file(MAKE_DIRECTORY "${fixture}/${owner}/win32")
     file(WRITE "${fixture}/${owner}/win32/lock_probe.c"
         "lib_win32_critical_section gate;\n")
@@ -67,11 +68,11 @@ endforeach()
 
 # Exact component DAG: exhaust all 64 possible direct edges, not only a few
 # forbidden filename patterns. Each fixture is removed before the next check.
-set(components types base console host storage kvm-base kvm-window kvm-console)
+set(components types base console console-broker storage kvm-base kvm-window kvm-console)
 set(allowed_types "")
 set(allowed_base types)
 set(allowed_console types base)
-set(allowed_host types base console)
+set(allowed_console-broker types base console)
 set(allowed_storage types)
 set(allowed_kvm-base types base)
 set(allowed_kvm-window types kvm-base)
@@ -94,7 +95,7 @@ foreach(owner IN LISTS components)
     endforeach()
 endforeach()
 file(WRITE "${fixture}/CMakeLists.txt"
-    "TARGET_LINK_LIBRARIES(host PRIVATE kvm-window)\n")
+    "TARGET_LINK_LIBRARIES(console-broker PRIVATE kvm-window)\n")
 check_layout(fail)
 file(REMOVE "${fixture}/CMakeLists.txt")
 file(WRITE "${probe}" "#ifdef _WIN32\n#endif\n")
@@ -154,7 +155,7 @@ file(WRITE "${platform_probe}" "#include \"../../kvm-base/win32/input.h\"\n")
 check_layout(fail)
 file(REMOVE "${platform_probe}")
 check_layout(pass)
-file(WRITE "${fixture}/types/win32/probe.h" "#include <lib/host/console_interface.h>\n")
+file(WRITE "${fixture}/types/win32/probe.h" "#include <lib/console-broker/console_interface.h>\n")
 check_layout(fail)
 file(WRITE "${fixture}/types/win32/probe.h" "#include SELECTED_HEADER\n")
 check_layout(fail)
@@ -162,7 +163,7 @@ file(REMOVE "${fixture}/types/win32/probe.h")
 check_layout(pass)
 
 # Native character producers must not silently narrow Unicode records.
-foreach(component IN ITEMS host kvm-window)
+foreach(component IN ITEMS console-broker kvm-window)
     set(encoding_probe "${fixture}/${component}/win32/encoding_probe.c")
     file(MAKE_DIRECTORY "${fixture}/${component}/win32")
     foreach(call IN ITEMS read_console_input_a register_class_a create_window_ex_a dispatch_message_a peek_message_a)

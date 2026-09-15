@@ -305,16 +305,16 @@ if(EXISTS "${SOFTPC_SOURCE_DIR}/src/lib/ux" OR
     message(FATAL_ERROR "Standalone retains the removed unified KVM route")
 endif()
 
-# Host owns only generic native Console I/O. Common UI owns its logical
+# Console Broker owns only native Console I/O. Common UI owns its logical
 # Console and line sink, and binds it through the public broker API.
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/host/console_interface.h" host_console_public)
-file(READ "${SOFTPC_SOURCE_DIR}/src/lib/host/console.c" host_console_source)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/console-broker/console_interface.h" console_broker_public)
+file(READ "${SOFTPC_SOURCE_DIR}/src/lib/console-broker/console.c" console_broker_source)
 file(READ "${SOFTPC_SOURCE_DIR}/src/common/ui/ui.c" common_ui_console_source)
-if(host_console_public MATCHES "host_console_cooked" OR
-   host_console_source MATCHES "host_console_cooked" OR
-   common_ui_console_source MATCHES "host_console_cooked" OR
-   NOT common_ui_console_source MATCHES "host_console_broker_replace" OR
-   NOT common_ui_console_source MATCHES "host_console_broker_request_cooked_line")
+if(console_broker_public MATCHES "console_broker_cooked" OR
+   console_broker_source MATCHES "console_broker_cooked" OR
+   common_ui_console_source MATCHES "console_broker_cooked" OR
+   NOT common_ui_console_source MATCHES "console_broker_replace" OR
+   NOT common_ui_console_source MATCHES "console_broker_request_cooked_line")
     message(FATAL_ERROR "Console broker retains monitor-specific ownership")
 endif()
 
@@ -510,7 +510,7 @@ endforeach()
 # synchronization primitives deliberately remain local implementation details.
 file(GLOB app_shutdown_sources "${SOFTPC_SOURCE_DIR}/src/app/*.c"
     "${SOFTPC_SOURCE_DIR}/src/compat/*.c")
-set(checked_shutdown "kvm_(window|console)_destroy|host_console_broker_destroy")
+set(checked_shutdown "kvm_(window|console)_destroy|console_broker_destroy")
 foreach(source IN LISTS app_shutdown_sources)
     file(STRINGS "${source}" shutdown_lines REGEX "(${checked_shutdown})[ \t]*\\(")
     foreach(line IN LISTS shutdown_lines)

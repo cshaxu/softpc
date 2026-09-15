@@ -32,13 +32,13 @@ static void tracked_enter(base_sync_mutex *mutex)
 #define base_sync_mutex_create tracked_create
 #define base_sync_mutex_destroy tracked_destroy
 #include "lib/console/console.c"
-#include "lib/host/win32/console.c"
+#include "lib/console-broker/win32/console.c"
 #undef base_sync_mutex_lock
 #undef base_sync_mutex_create
 #undef base_sync_mutex_destroy
 
 static lib_console *object;
-static host_console_backend backend;
+static console_broker_backend backend;
 static int mode;
 static int replacement_calls;
 static lib_console_text_frame frame = { .columns = 80u, .rows = 25u };
@@ -94,11 +94,11 @@ static DWORD WINAPI lock_consumer(void *unused)
     InterlockedExchange(&contender, (LONG)GetCurrentThreadId());
     if (mode == 0) assert(lib_console_bind_generation(object, 2) == LIB_STATUS_OK);
     else if (mode == 1) {
-        host_console_backend_lock_output(&backend);
-        host_console_backend_unlock_output(&backend);
+        console_broker_backend_lock_output(&backend);
+        console_broker_backend_unlock_output(&backend);
     } else {
-        host_console_backend_lock_transaction(&backend);
-        host_console_backend_unlock_transaction(&backend);
+        console_broker_backend_lock_transaction(&backend);
+        console_broker_backend_unlock_transaction(&backend);
     }
     return 0;
 }
