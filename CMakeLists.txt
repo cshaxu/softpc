@@ -498,6 +498,16 @@ target_include_directories(softpc-command-smoke PRIVATE src/app src/compat src)
 add_test(NAME softpc-command-smoke COMMAND softpc-command-smoke)
 set_tests_properties(softpc-command-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-keyboard-smoke test/unit/keyboard_smoke.c src/app/keyboard.c)
+target_include_directories(softpc-keyboard-smoke PRIVATE src)
+target_link_libraries(softpc-keyboard-smoke PRIVATE kvm-base)
+if(MSVC)
+    target_compile_options(softpc-keyboard-smoke PRIVATE /UNDEBUG)
+else()
+    target_compile_options(softpc-keyboard-smoke PRIVATE -UNDEBUG)
+endif()
+add_test(NAME softpc-keyboard-smoke COMMAND softpc-keyboard-smoke)
+set_tests_properties(softpc-keyboard-smoke PROPERTIES LABELS "unit")
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/test/support/standalone_source_boundary.cmake")

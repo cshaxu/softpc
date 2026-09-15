@@ -162,6 +162,8 @@ int main(void)
     app_command_session_initialize(&session, COMMON_SESSION_DISPLAY_WINDOW);
     assert(strstr(app_command_hotkey_help(),
         "While the guest is running:") != NULL);
+    assert(strstr(app_command_hotkey_help(),
+        "Ctrl+Alt+T            send Alt+Tab to the guest\r\n") != NULL);
     app_command_session_open(&session, &effect);
     assert(strstr(effect.text, "cold-reset and run the machine") != NULL);
     assert(strstr(effect.text, app_command_hotkey_help()) != NULL);

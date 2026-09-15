@@ -218,7 +218,9 @@ decide match versus mismatch. Thus Ctrl+Alt+P registered as `pause-toggle`
 emits only that identifier, never partial Ctrl/Alt/P guest input. Ctrl+Alt+X
 when not registered flushes Ctrl, Alt, and X as normal input in order. SoftPC
 alone maps identifiers to pause/resume, stop/reset/start, mouse release, or
-synthetic guest input such as Ctrl+Alt+Del and Alt+Enter. The cooked monitor
+synthetic guest input such as Ctrl+Alt+Del and Alt+Enter. Ctrl+Alt+T sends one
+Alt+Tab make/break sequence to the running guest from either KVM surface;
+it is consumed without guest input while paused or inactive. The cooked monitor
 does not use a KVM component or hotkey registry and accepts only monitor lines.
 
 On the actual frozen-to-unfrozen transition, the Window requests activation

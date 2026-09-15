@@ -11,7 +11,6 @@ int app_keyboard_deliver_input(void *context,
 int app_keyboard_hotkeys(kvm_hotkey_registry *registry);
 int app_keyboard_release_ctrl_alt(void *context, kvm_input_sink sink);
 int app_keyboard_submit_ctrl_alt_del(void *context, kvm_input_sink sink);
-int app_keyboard_submit_alt_enter(void *context, kvm_input_sink sink);
 
 lib_bool app_keyboard_handle_hotkey(common_machine *, common_session_machine_state,
     const char *, common_session_command_result *);

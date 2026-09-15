@@ -22,6 +22,7 @@ static const char HELP_HOTKEYS[] =
     "  Ctrl+Alt+P            pause or resume\r\n"
     "  Ctrl+Alt+D            send Ctrl+Alt+Del to the guest\r\n"
     "  Ctrl+Alt+F            send Alt+Enter to the guest\r\n"
+    "  Ctrl+Alt+T            send Alt+Tab to the guest\r\n"
     "  Ctrl+Alt+M            release captured mouse\r\n";
 
 static void clear(app_command_effect *e) { memset(e, 0, sizeof(*e)); }

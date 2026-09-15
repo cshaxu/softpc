@@ -2,32 +2,32 @@
 
 ## Current Work
 
-M9 T59 S9 delivery bbc0607 is reviewed and pushed: one Console output binding.
-Both EXEs pass 90/90 tests; await owner manual testing.
-S8 delivery b8dfb78 / review d35b941 is retained in
-[history](../history/M9-T59-S8-kvm-single-control.md); owner testing is not claimed.
+M9 T59 S10 is implemented and verified: Ctrl+Alt+T sends guest Alt+Tab.
+Both EXEs pass 91/91 tests; delivery awaits push and coordinator review.
+S9 delivery bbc0607 / review 52dbc21 is retained in
+[history](../history/M9-T59-S9-console-output-binding.md); manual testing is not claimed.
 T59 remains open.
 
-## M9 T59 S9 Packet
+## M9 T59 S10 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits the combined Console/Host output-binding repair and push. |
-| Objective | One copied text/frame/context binding; one install/clear barrier. |
-| Non-goals | No input, native handoff, product policy, generation or rollback redesign. |
-| Reference Baseline | d35b941, clean main. |
-| Candidate Proposal | [Output binding repair](../proposals/m9-console-output-binding.md). |
-| Files And ABI Surface | Console binding interface, Host consumer, shared tests/docs/manifests, fixed EXEs. |
-| Applicable Rules | Architecture/coding/execution/documentation governance skills and repository design/rules/UI. |
-| Verification | Focused tests 4/4 each; full x64 90/90 (110.60 s), x86 90/90 (96.11 s); four manifests and governance pass. |
-| Expected Markers | No separate sink setters or partial-binding branches; existing transaction lock order retained. |
-| Asset Needs | Reuse build presets, refresh both fixed EXEs; preserve INI/media. |
-| Reporting Requirements | Complete P push, independent coordinator review push, line accounting, clean tree and EXE links. |
-| Stop Conditions | New native state machine or changed handoff semantics require renewed review. |
-| Exit Criteria | Finite ledger proven, dual-width build/tests and checks pass, pushed clean; await testing. |
-| Original Owner Request | 把两个输出函数和 context 作为一个输出绑定，一次替换、一次清除；保留输出屏障、generation 和 broker 回滚；同步更新测试，提交推送供我测试。 |
-| Similar-Issue Sweep | All separate output setter callers in src/test; create/replace/rollback/destroy partial-binding branches. |
+| Admission And Approval | Owner requests the next S: add Ctrl+Alt+T to send guest Alt+Tab. |
+| Objective | Extend the existing product hotkey registry and synthetic Alt-key path. |
+| Non-goals | No Lib/Common/VM/Compat/MVDM, lifecycle, focus or input ABI changes. |
+| Reference Baseline | 52dbc21, clean main. |
+| Candidate Proposal | [Alt+Tab hotkey](../proposals/m9-alt-tab-hotkey.md). |
+| Files And ABI Surface | App keyboard/help, product tests, build test registration, UI docs and fixed EXEs. |
+| Applicable Rules | Repository architecture/coding/execution/documentation governance skills and design/rules/UI. |
+| Verification | Focused 3/3 each; x64 full 91/91 (81.42 s), x86 full 91/91 (82.38 s); governance and four manifests pass. |
+| Expected Markers | CAT reaches guest as Alt+Tab only while running; same registry for both KVM leaves; no cooked hotkey. |
+| Asset Needs | Reuse build trees; both fixed EXEs; preserve INI and media. |
+| Reporting Requirements | Complete P push, independent review P push, line accounting and clean tree. |
+| Stop Conditions | Shared/native changes or new input state machine require further admission. |
+| Exit Criteria | Finite ledger verified, both builds/full suites pass, checks pass and pushed clean. |
+| Original Owner Request | 下一S任务：增加 Ctrl+Alt+T热键，负责往客户机送 Alt+Tab; |
+| Similar-Issue Sweep | Product registry, dispatch and help references; no duplicate matcher or synthetic path. |
 
 ## Current Technical Baseline
 

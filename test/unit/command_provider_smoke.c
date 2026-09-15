@@ -722,6 +722,8 @@ int main(void)
     assert(provider.handle_hotkey(provider.context, COMMON_SESSION_MACHINE_PAUSED,
         "send-alt-enter", &result) && result.request == COMMON_SESSION_REQUEST_NONE);
     assert(provider.handle_hotkey(provider.context, COMMON_SESSION_MACHINE_PAUSED,
+        "send-alt-tab", &result) && result.request == COMMON_SESSION_REQUEST_NONE);
+    assert(provider.handle_hotkey(provider.context, COMMON_SESSION_MACHINE_PAUSED,
         "release-window-mouse", &result) && result.release_window_mouse);
     assert(!provider.handle_hotkey(provider.context, COMMON_SESSION_MACHINE_PAUSED,
         NULL, &result));

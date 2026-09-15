@@ -18,8 +18,10 @@ int app_keyboard_hotkeys(kvm_hotkey_registry *registry)
               "send-ctrl-alt-del" },
           { 'F', KVM_HOTKEY_MODIFIER_CONTROL | KVM_HOTKEY_MODIFIER_ALT,
               "send-alt-enter" },
+          { 'T', KVM_HOTKEY_MODIFIER_CONTROL | KVM_HOTKEY_MODIFIER_ALT,
+              "send-alt-tab" },
           { 'M', KVM_HOTKEY_MODIFIER_CONTROL | KVM_HOTKEY_MODIFIER_ALT,
-              "release-window-mouse" } }, 4u };
+              "release-window-mouse" } }, 5u };
 
     if (registry == NULL) return 0;
     *registry = hotkeys;
@@ -55,12 +57,13 @@ int app_keyboard_submit_ctrl_alt_del(void *context, kvm_input_sink sink)
         app_keyboard_emit(context, sink, 0x1du, KVM_KEY_CONTROL, 0);
 }
 
-int app_keyboard_submit_alt_enter(void *context, kvm_input_sink sink)
+static int app_keyboard_submit_alt_key(void *context, kvm_input_sink sink,
+    lib_u32 scan, kvm_key key)
 {
     return app_keyboard_release_ctrl_alt(context, sink) &&
         app_keyboard_emit(context, sink, 0x38u, KVM_KEY_ALT, 1) &&
-        app_keyboard_emit(context, sink, 0x1cu, KVM_KEY_ENTER, 1) &&
-        app_keyboard_emit(context, sink, 0x1cu, KVM_KEY_ENTER, 0) &&
+        app_keyboard_emit(context, sink, scan, key, 1) &&
+        app_keyboard_emit(context, sink, scan, key, 0) &&
         app_keyboard_emit(context, sink, 0x38u, KVM_KEY_ALT, 0);
 }
 
@@ -86,7 +89,10 @@ lib_bool app_keyboard_handle_hotkey(common_machine *machine,
         return app_keyboard_submit_ctrl_alt_del(machine,
             app_keyboard_deliver_input) != 0;
     if (strcmp(identifier, "send-alt-enter") == 0)
-        return app_keyboard_submit_alt_enter(machine,
-            app_keyboard_deliver_input) != 0;
+        return app_keyboard_submit_alt_key(machine,
+            app_keyboard_deliver_input, 0x1cu, KVM_KEY_ENTER) != 0;
+    if (strcmp(identifier, "send-alt-tab") == 0)
+        return app_keyboard_submit_alt_key(machine,
+            app_keyboard_deliver_input, 0x0fu, KVM_KEY_TAB) != 0;
     return LIB_TRUE;
 }
