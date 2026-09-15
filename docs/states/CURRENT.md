@@ -2,9 +2,10 @@
 
 ## Current Work
 
-M9 T59 S19 implemented and verified: failed paused waits stop without retry or
-false resume; production net +9 lines, no new state/API. Both widths build and
-pass 94/94 tests. Executor delivery awaits actual-commit review; T59 stays open.
+M9 T59 S19 delivered for owner testing: P1 5a496df pushed and actual-commit
+coordinator review passed. Failed paused waits stop without retry or false
+resume; production net +9 lines, no new state/API. Both widths build and pass
+94/94 tests. T59 remains open; owner manual testing is pending.
 
 ## M9 T59 S19 Packet
 

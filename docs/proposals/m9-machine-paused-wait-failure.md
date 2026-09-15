@@ -84,3 +84,18 @@ Existing build trees remain; only regenerated types-layout test fixtures are
 removed after tests. No new build tree, media, trace or worker is retained.
 All four convergence members are verified; P1 delivers these changes for
 actual-commit coordinator review. T59 stays open for owner testing.
+
+## Coordinator review
+
+Executor P1 5a496df was pushed to origin/main. After switching roles, reviewed
+the actual committed machine.c and test fixture against the original request,
+packet and e15b70e. The stop flag prevents a resumed fact; ERROR survives driver
+success; reset continuation is suppressed. Cleanup remains the existing single
+outer path. No production state/API or unrelated component changes were added.
+
+Rechecked both corpus manifests and EXE hashes; reran the committed nine-case
+fixture at both widths successfully. Full-suite evidence is 94/94 per width.
+Confirmed production +12/-3 and test +138/-0, plus one CMake registration line.
+S18 archival is a content-identical move. Worktree was clean after P1. This
+review/status record is the only P2 change. All four ledger members pass;
+S19 is delivered for owner testing and T59 remains open.
