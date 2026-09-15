@@ -2,32 +2,32 @@
 
 ## Current Work
 
-M9 T59 S8 delivery b8dfb78 is reviewed and pushed: Window freeze uses one control.
-Both fixed EXEs pass 90/90 tests; await owner manual testing.
-S7 delivery 53753b2 / review 0b853eb remains available for owner testing;
-its [record](../history/M9-T59-S7-debug-original-restoration.md) is retained.
+M9 T59 S9 is implemented and verified: one Console text/frame output binding.
+Both EXEs pass 90/90 tests; executor delivery awaits push and coordinator review.
+S8 delivery b8dfb78 / review d35b941 is retained in
+[history](../history/M9-T59-S8-kvm-single-control.md); owner testing is not claimed.
 T59 remains open.
 
-## M9 T59 S8 Packet
+## M9 T59 S9 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits a new S to remove freeze-driven batch control submission. |
-| Objective | One freeze record; Window worker releases mouse; single-record FIFO admission. |
-| Non-goals | No product policy, input schema, frame mailbox, worker lifetime or public Window API change. |
-| Reference Baseline | 0b853eb, clean main. |
-| Candidate Proposal | [Single control repair](../proposals/m9-kvm-single-control.md). |
-| Files And ABI Surface | KVM base leaf-support enqueue API, Window producer/worker, shared tests/readmes/manifests, fixed EXEs. |
+| Admission And Approval | Owner admits the combined Console/Host output-binding repair and push. |
+| Objective | One copied text/frame/context binding; one install/clear barrier. |
+| Non-goals | No input, native handoff, product policy, generation or rollback redesign. |
+| Reference Baseline | d35b941, clean main. |
+| Candidate Proposal | [Output binding repair](../proposals/m9-console-output-binding.md). |
+| Files And ABI Surface | Console binding interface, Host consumer, shared tests/docs/manifests, fixed EXEs. |
 | Applicable Rules | Architecture/coding/execution/documentation governance skills and repository design/rules/UI. |
-| Verification | Focused capacity/STOP/native release/failure tests passed; full x64 90/90 (130.16 s), x86 90/90 (119.89 s); four manifests and governance pass. |
-| Expected Markers | Freeze takes one slot; worker sets frozen then releases; no batch API remains. |
-| Asset Needs | Existing build presets and both fixed EXEs; preserve INI/media; no new raw recordings or temporary build trees. |
-| Reporting Requirements | Complete P commit/push, separate coordinator review, line accounting, clean tree and EXE links. |
-| Stop Conditions | Stop if new lifecycle/state/transaction is needed; do not alter frame or input policy. |
-| Exit Criteria | Finite ledger verified, both full suites pass, delivery/review pushed and clean; await owner test, keep T59 open. |
-| Original Owner Request | freeze 只提交一条消息，Window worker 执行冻结时直接调用现有鼠标释放函数；删除批量机制；FIFO、容量错误、STOP 和独立 frame mailbox 不变。准入一个新的S任务修复。 |
-| Similar-Issue Sweep | All enqueue_controls production/test callers and batch-contract descriptions; no compatibility alias or second enqueue path. |
+| Verification | Focused tests 4/4 each; full x64 90/90 (110.60 s), x86 90/90 (96.11 s); four manifests and governance pass. |
+| Expected Markers | No separate sink setters or partial-binding branches; existing transaction lock order retained. |
+| Asset Needs | Reuse build presets, refresh both fixed EXEs; preserve INI/media. |
+| Reporting Requirements | Complete P push, independent coordinator review push, line accounting, clean tree and EXE links. |
+| Stop Conditions | New native state machine or changed handoff semantics require renewed review. |
+| Exit Criteria | Finite ledger proven, dual-width build/tests and checks pass, pushed clean; await testing. |
+| Original Owner Request | 把两个输出函数和 context 作为一个输出绑定，一次替换、一次清除；保留输出屏障、generation 和 broker 回滚；同步更新测试，提交推送供我测试。 |
+| Similar-Issue Sweep | All separate output setter callers in src/test; create/replace/rollback/destroy partial-binding branches. |
 
 ## Current Technical Baseline
 
