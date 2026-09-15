@@ -2,9 +2,10 @@
 
 ## Current Work
 
-M9 T59 S7 is verified and reviewed: implementation 8a851e9 is pushed;
-original debugger output restored and Common CRT vocabulary unified through
-Types, both 89/89. Awaiting owner testing; T59 remains open.
+M9 T59 S7 expanded restoration is implemented and verified for P3 delivery.
+Owner-approved output ABI and original CLI continuations are restored; both
+fixed EXEs pass 90/90 tests. Coordinator review and owner test handoff follow.
+T59 remains open.
 
 ## M9 T59 S7 Packet
 
@@ -12,20 +13,20 @@ Types, both 89/89. Awaiting owner testing; T59 remains open.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner requests original-source restoration of debugger functionality and style, without inventing structures. |
-| Objective | Compare every extended debugger command with original NXVM and restore migration regressions through existing Common access. |
+| Objective | Restore original debugger CLI transcripts, input continuations, address progression and complete output; compare all command families against original NXVM. |
 | Non-goals | No MVDM changes, second executor, native input loop, global CPU access, or redesign of inherited command semantics. Lib changes are limited to owner-approved thin CRT naming aliases. |
 | Reference Baseline | SoftPC 0299b93; reviewed delivery 8a851e9. Read-only NXVM 9bd08dd8 original and 57c1d6d7 Common extraction. |
 | Candidate Proposal | [S7 restoration ledger](../proposals/m9-debug-original-restoration.md). |
-| Files And ABI Surface | Common debug restoration plus owner-approved Common-wide CRT vocabulary cleanup, Types header-only aliases, shared/product tests/manifests and EXEs; no new runtime ABI. |
+| Files And ABI Surface | Owner-approved debugger result text lifetime and Session long-output contract, App binding, thin Types formatting aliases, shared/product tests/manifests and both EXEs. |
 | Applicable Rules | Architecture/coding/execution/documentation governance skills, repository rules and Product UI. |
-| Verification | Original command comparison, exact 32-bit output/editing and asynchronous completion regression; both full builds/tests 89/89, four manifests and CRT negative gate passed. |
+| Verification | Original-source CLI comparison, seven continuation families, 16/32-bit editing, long output/failure and asynchronous completion tests; final full x64 90/90 (124.92 s), x86 90/90 (107.60 s), four manifests and CRT negative gate passed. |
 | Expected Markers | XR/XREG and XT/XG completion retain full registers and original flags, one linear disassembly; R remains 16-bit. |
 | Asset Needs | Fixed x86/x64 EXEs only; build/t59-s7-*.log bounded to 10 MB and 10 minutes per run, executor cleans owned logs; preserve INI/media. |
 | Reporting Requirements | Scope and line accounting, shared manifest verification, tests, pushed complete P, coordinator review and EXE links; await manual testing. |
-| Stop Conditions | Restoration requires new public ABI or machine behavior; report rather than invent an unsupported register or a second execution path. |
+| Stop Conditions | No new machine behavior, executor, input loop or Console owner; the copied/borrowed output ABI adjustment is explicitly approved. Report any unsupported CPU capability rather than invent it. |
 | Exit Criteria | Ledger verified, final dual-width tests pass, complete delivery pushed, clean tree and owner test handoff; do not close T59. |
-| Original Owner Request | 请你对照原始代码，按照原始代码的原始风格恢复所有功能；不要自己发明新的结构和风格 |
-| Similar-Issue Sweep | XA/XC/XD/XE/XF/XG/XM/XR/XS/XT/XU/XW and XREG/XSREG/XCREG/help; preserve approved machine adaptation, record inherited defects separately. |
+| Original Owner Request | 我要求完全100%恢复原版用户体验；批准调整, 开始执行，完成后核对源代码进行语义审计，编译测试提交推送。 |
+| Similar-Issue Sweep | All command dispatch, A/E/R/V/XA/XE/XR read sites, compact syntax, defaults/reentry, G/T/XG/XT completions and long output; retain approved paused access and inherited algorithms. |
 
 T59 S2–S5 are reviewed, pushed and closed. The [retained task brief](../history/M9-T59-product-boundary-cleanup-proposal.md)
 and [S5 review](../history/M9-T59-S5-boundary-convergence.md) record delivery.

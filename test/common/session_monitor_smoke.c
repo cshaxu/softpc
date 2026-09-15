@@ -4,6 +4,10 @@
 
 static lib_u32 requests, prompts, notices, callbacks, cancellations, commands;
 static lib_bool completed, fail_cancel, fail_request, exit_on_request;
+static lib_bool collect;
+static char output[40000];
+static lib_size output_used;
+static unsigned writes, fail_write;
 static lib_u32 run(const common_machine *m) { (void)m; return 1; }
 static lib_bool copy_frame(common_machine *m, kvm_frame *f, lib_u32 g)
 { (void)m; (void)f; (void)g; return LIB_FALSE; }
@@ -24,6 +28,12 @@ lib_status common_ui_cancel_monitor_line(common_ui *ui, lib_bool *out_completed)
 lib_status common_ui_write_monitor(common_ui *ui, const char *text)
 {
     (void)ui;
+    if (collect) {
+        if (++writes == fail_write) return LIB_STATUS_IO_ERROR;
+        assert(output_used + strlen(text) < sizeof(output));
+        memcpy(output + output_used, text, strlen(text) + 1u);
+        output_used += strlen(text);
+    }
     if (strcmp(text, "> ") == 0) ++prompts;
     else if (strcmp(text, "notice") == 0) ++notices;
     return LIB_STATUS_OK;
@@ -142,6 +152,38 @@ int main(void)
     fail_request = LIB_TRUE;
     assert(!common_session_arm_if_ready(&s));
     assert(!s.pending_line);
+    /* Borrowed long output shares the exact notification/reader transaction.
+     * CRLF and lone LF remain correct across the writer's chunk boundaries. */
+    {
+        static char text[20001], expected[40000];
+        lib_size end = 0u;
+        memset(text, 'x', sizeof(text) - 1u);
+        for (lib_size i = 1020u; i + 1u < sizeof(text) - 1u; i += 1022u) {
+            text[i] = '\r'; text[i + 1u] = '\n';
+        }
+        text[5] = '\n';
+        for (lib_size i = 0; text[i]; ++i) {
+            if (text[i] == '\n' && (i == 0u || text[i - 1u] != '\r')) expected[end++] = '\r';
+            expected[end++] = text[i];
+        }
+        expected[end] = '\0';
+        common_session_command_result large = { .detail = text };
+        collect = LIB_TRUE;
+        assert(common_session_apply_result(&s, &large));
+        assert(strcmp(output, expected) == 0 && writes > 1u);
+        assert(!s.pending_line);
+        output_used = writes = 0u; output[0] = '\0';
+        s.pending_line = LIB_TRUE;
+        before = cancellations;
+        assert(common_session_apply_result(&s, &large));
+        assert(cancellations == before + 1u && !s.pending_line);
+        assert(strncmp(output, "\r\n", 2u) == 0 && strcmp(output + 2, expected) == 0);
+        output_used = writes = 0u; output[0] = '\0'; fail_write = 2u;
+        assert(!common_session_apply_result(&s, &large) && writes == 2u);
+        fail_write = 0u; output_used = writes = 0u;
+        s.state.presentation.current_console_actual = COMMON_SESSION_CONSOLE_VM;
+        assert(common_session_apply_result(&s, &large) && writes == 0u);
+    }
     common_session_queue_destroy(s.queue);
     return 0;
 }

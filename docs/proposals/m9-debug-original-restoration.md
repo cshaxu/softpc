@@ -131,3 +131,93 @@ token-only proof. The fixture corrections keep semantic field checks and do not
 change keyboard production code. Four manifests verify again after commit;
 main and origin/main match. P2 records this review only, not owner acceptance
 or T59 closure. Both fixed EXEs are ready for manual testing.
+
+## Owner-admitted CLI continuation and output restoration
+
+Original requests: “没错，我要求完全100%恢复原版用户体验”;
+“批准调整, 开始执行，完成后核对源代码进行语义审计，编译测试提交推送。”
+
+Baseline for this repair is 0faaf45. The S7 XA disposition above was too broad:
+single-line roundtrip did not prove interactive address advancement. The
+following expanded finite ledger replaces that claim, not the preserved source.
+
+1. Parse/dispatch: empty and whitespace-only Enter do not repeat; compact and
+   spaced syntax, help, invalid command and q retain original handling.
+2. All seven read continuations (A/E/R/V/XA/XE/XR): use the original printed
+   suffix as the next prompt, consume a supplied line without reprinting its
+   prefix, preserve errors/empty-line exit and advance assembly addresses.
+3. D/U/XD/XU defaults and G/T/XG/XT completions: compare original progression
+   and output order, retaining the sole paused executor and approved hotkeys.
+4. Every PRINTF site: retain original command-level formatting and Types
+   vocabulary. Debug owns a growable output buffer, exposed as a borrowed
+   string until the next producing call/open/destroy. Session accepts a borrowed
+   additional text span and writes it through the existing monitor transaction,
+   normalizing LF to CRLF in bounded chunks. No new Console owner or input loop.
+   Allocation/formatting failure is explicit, not successful truncation.
+5. App forwards the borrowed text without copying into its fixed command result;
+   completion text is consumed before another debug-producing call. New commands
+   invalidate an unconsumed completion. Closing q carries no borrowed output.
+
+Focused proof uses shared fake memory/registers for transcripts, compact syntax,
+multiple assembly lines, register/byte continuation and >8192 output; product
+tests verify the same binding against the real CPU. Session tests prove long
+text, CRLF boundaries, one cancellation, no extra prompt and output failure.
+Full dual-width tests and package refresh remain required. Original algorithmic
+edge defects remain original behavior, not a license to redesign commands.
+
+## P3 source-semantic audit
+
+Compared the original 9bd08dd8 debug.c command bodies and vcpu register aliases
+with the final Common implementation, using 57c1d6d7 to identify extraction
+changes. Parsing an empty line returns without repeating a command. All seven
+read continuations now retain original prompts and reentry; XA advances its
+existing address across separate submissions. R word writes, L length registers
+and G/T IP assignments preserve upper register halves, matching original aliases.
+Plain G prints registers on completion; T/XT preserve inter-step blank lines and
+zero counts do not run; XG zero hits likewise does not run. Both disassemblers
+retain the final bytes of a 15-byte instruction. Extended print routines retain
+their original sequential PRINTF style through Types definitions.
+
+The H/help/Xhelp, D/XD, compare/fill/move/search and U/XU command bodies were
+reviewed against original formatting, defaults and loops. No new command
+algorithm or parser was substituted. Exact transcript tests cover continuation
+prompts, memory edits, defaults, disassembly and a 256-row dump exceeding the old
+8192-byte output ceiling. Fault tests cover initial allocation, later growth and
+native output failure. Session owns no new output object: it consumes the borrowed
+debug string synchronously through its existing monitor transaction.
+
+This is original CLI restoration within the approved machine/Console boundary,
+not restoration of original global CPU access or a blocking input loop. Existing
+prevalidation, guarded decode/wrap behavior and the corrected 16-bit W offset
+(the original cast wrapped at eight bits) are retained; known original XS/XM/XU
+edge debts remain in TODO. These are not claimed byte-for-byte invalid-input
+equivalence. VM, Compat, MVDM, INI and media are unchanged.
+
+The first full test pass exposed two shipping-package assertions waiting for
+the removed migration-only `Debugger:` banner. They now inspect the actual
+current `-` prompt at the Console cursor, rather than accepting an old screen
+substring. No production workaround restores the unwanted banner. Final rebuilt
+full-suite results below supersede those initial runs.
+
+## P3 final delivery evidence
+
+Both tests-x64/tests-x86 builds succeeded. Final stable-source test-x64 passed
+90/90 in 124.92 seconds; test-x86 passed 90/90 in 107.60 seconds, including
+shipping Console integration, shared transcript tests, failure injection,
+component/CRT negative gates and all four manifests. Documentation governance
+and diff whitespace checks pass. No temporary research files were created;
+build-owned test logs remain in their normal build trees.
+
+Against 0faaf45, excluding manifests/docs/binaries: six production C/H paths
+add 186/delete 101 lines (net +85); six test C/CMake paths including the new
+debug_output test add 269/delete 25 (net +244). The added output owner is the
+existing debug object, not a new component/thread. There is one monitor write
+transaction and no second command/input path.
+
+- softpc32.exe: 3,490,068 bytes; SHA256
+  079EC8210F54C14910AB18A347BD5C69BDEF5C033CBA94F71ACADDCC53E3CA8E.
+- softpc64.exe: 2,848,783 bytes; SHA256
+  52EC0AF81272D64F720A10A1B3228221E5FA900DAD5E85EB24B2F25ABE970C2D.
+
+Original request reread and executor self-review complete. This delivery awaits
+post-push coordinator review and owner testing, not whole-T closure.

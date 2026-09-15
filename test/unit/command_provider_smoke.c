@@ -54,6 +54,9 @@ static void submit(common_session_command_provider *provider,
     assert(!result->exit_requested);
 }
 
+static const char *debug_text(const common_session_command_result *result)
+{ return result->detail != NULL ? result->detail : result->text; }
+
 static common_machine_debug_result access(common_machine *machine,
     const common_machine_debug_lease *lease, common_machine_debug_request request)
 {
@@ -290,8 +293,8 @@ static void command_matrix(common_machine *machine, common_machine_debug_lease *
         {"xe b20 90 90", ""}, {"xf b22 2 cc", ""}, {"xd b20 4", "90 90 CC CC"},
         {"xm b20 b30 4", ""}, {"xc b20 b30 4", ""},
         {"xs b30 4 90 90", "00000B30"}, {"xd b30 4", "90 90 CC CC"},
-        {"xa b40", ""}, {"nop", ""}, {"", ""},
-        {"xu b40 1", "NOP"}, {"xr", "EAX=12345678"},
+        {"xa b40", ""}, {"nop", ""}, {"clc", ""}, {"", ""},
+        {"xu b40 2", "CLC"}, {"xr", "EAX=12345678"},
         {"xreg", "EAX=12345678"}, {"xsreg", "CS"}, {"xcreg", "CR0"},
         {"h 1 2", "0003"}, {"v", ""}, {"AB", "41 42"},
         {"xw r b00", ""}, {"xw", "Watch-read"}, {"xw r", "removed"},
@@ -305,14 +308,20 @@ static void command_matrix(common_machine *machine, common_machine_debug_lease *
     setreg(machine, lease, COMMON_DEBUG_ECX, 4u);
     for (i = 0; i < sizeof(commands)/sizeof(commands[0]); ++i) {
         submit(provider, COMMON_SESSION_MACHINE_PAUSED, commands[i].line, &result);
-        assert(!strstr(result.text, "failed") && !strstr(result.text, "unsupported"));
-        assert(strstr(result.text, commands[i].contains));
+        assert(!strstr(debug_text(&result), "failed") && !strstr(debug_text(&result), "unsupported"));
+        assert(strstr(debug_text(&result), commands[i].contains));
         assert(result.request == COMMON_SESSION_REQUEST_NONE);
     }
     bytes = access(machine, lease, (common_machine_debug_request){
         .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0xb50u, .bytes = 4u });
     assert(memcmp(bytes.data, "\x12\x34\x56\x56", 4u) == 0);
     assert(remove("debug-cli-transfer.bin") == 0);
+    bytes = access(machine, lease, (common_machine_debug_request){
+        .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0xb40u, .bytes = 2u });
+    assert(bytes.data[0] == 0x90 && bytes.data[1] == 0xf8);
+    submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xd 0 1000", &result);
+    assert(result.detail != NULL && strlen(result.detail) > 16384u);
+    assert(strstr(result.detail, "L00000FF0") != NULL);
     /* Invalid watch/register/plan requests cannot dispatch execution. */
     submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xw w nonsense", &result);
     assert(result.request == COMMON_SESSION_REQUEST_NONE);
@@ -328,7 +337,8 @@ static void command_matrix(common_machine *machine, common_machine_debug_lease *
         assert(reg(machine, lease, COMMON_DEBUG_EIP) == ip);
         submit(provider, COMMON_SESSION_MACHINE_PAUSED, "t 0:800 0", &result);
         assert(result.request == COMMON_SESSION_REQUEST_NONE);
-        assert(reg(machine, lease, COMMON_DEBUG_EIP) == ip);
+        assert(reg(machine, lease, COMMON_DEBUG_EIP) == ((ip & 0xffff0000u) | 0x800u));
+        setreg(machine, lease, COMMON_DEBUG_EIP, ip);
     }
     assert(common_machine_debug_execute_with_lease(machine, lease,
         &(common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_SET_WATCH,
@@ -386,7 +396,7 @@ static void watchpoints(common_machine *machine, common_machine_debug_lease *lea
         provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_RUNNING,
             COMMON_SESSION_MACHINE_PAUSED, &output);
         provider->note_monitor_current(provider->context, LIB_TRUE, &output);
-        assert(strstr(output.text, "Watch-") && strstr(output.text, " hit:"));
+        assert(strstr(debug_text(&output), "Watch-") && strstr(debug_text(&output), " hit:"));
         assert(output.request == COMMON_SESSION_REQUEST_NONE);
         if (kind == COMMON_MACHINE_DEBUG_WATCH_EXECUTE) {
             /* T from the just-hit execute watch must execute, not re-hit. */
@@ -414,7 +424,7 @@ static void watchpoints(common_machine *machine, common_machine_debug_lease *lea
         .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT });
     assert(!value.observation.watch_hit && value.observation.count == 1u);
     submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xw u", &output);
-    assert(strstr(output.text, "All watch points removed"));
+    assert(strstr(debug_text(&output), "All watch points removed"));
     /* XT receives its observation through the same copied result, not a sink. */
     setreg(machine, lease, COMMON_DEBUG_EIP, 0x800u);
     submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xt", &output);
@@ -423,7 +433,7 @@ static void watchpoints(common_machine *machine, common_machine_debug_lease *lea
     provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_RUNNING,
         COMMON_SESSION_MACHINE_PAUSED, &output);
     provider->note_monitor_current(provider->context, LIB_TRUE, &output);
-    assert(strstr(output.text, "Write: Lin=00000a00"));
+    assert(strstr(debug_text(&output), "Write: Lin=00000a00"));
     assert(common_machine_debug_acquire(machine, lease) == LIB_STATUS_OK);
 }
 
@@ -603,8 +613,8 @@ static void trace_cli(common_machine *machine, common_machine_debug_lease *lease
             provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_RUNNING,
                 COMMON_SESSION_MACHINE_PAUSED, &result);
             provider->note_monitor_current(provider->context, LIB_TRUE, &result);
-            assert(strstr(result.text, kind ? "EAX=" : "AX=") != NULL);
-            assert((strstr(result.text, "EIP=") != NULL) == (kind != 0u));
+            assert(strstr(debug_text(&result), kind ? "EAX=" : "AX=") != NULL);
+            assert((strstr(debug_text(&result), "EIP=") != NULL) == (kind != 0u));
             assert(strstr(result.text, "Machine paused.") != NULL);
             assert(result.request == (index == 0u ? COMMON_SESSION_REQUEST_RESUME :
                 COMMON_SESSION_REQUEST_NONE));
@@ -626,8 +636,8 @@ static void trace_cli(common_machine *machine, common_machine_debug_lease *lease
         provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_RUNNING,
             COMMON_SESSION_MACHINE_PAUSED, &result);
         provider->note_monitor_current(provider->context, LIB_TRUE, &result);
-        assert(strstr(result.text, "instructions executed before the break point."));
-        assert(strstr(result.text, "EAX=") && strstr(result.text, "EIP=00000701"));
+        assert(strstr(debug_text(&result), "instructions executed before the break point."));
+        assert(strstr(debug_text(&result), "EAX=") && strstr(debug_text(&result), "EIP=00000701"));
         assert(result.request == (index == 0u ? COMMON_SESSION_REQUEST_RESUME :
             COMMON_SESSION_REQUEST_NONE));
     }
@@ -721,9 +731,9 @@ int main(void)
         provider.note_monitor_current(&commands, LIB_TRUE, &result);
         assert(result.arm_prompt && strcmp(result.prompt, "-") == 0);
         submit(&provider, inactive[index], "?", &result);
-        assert(strstr(result.text, "assemble") != NULL);
+        assert(strstr(debug_text(&result), "assemble") != NULL);
         submit(&provider, inactive[index], "r", &result);
-        assert(strstr(result.text, "must be paused") != NULL && commands.debug_active);
+        assert(strstr(debug_text(&result), "must be paused") != NULL && commands.debug_active);
         submit(&provider, inactive[index], "q", &result);
         assert(!commands.debug_active && common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
     }
@@ -733,7 +743,7 @@ int main(void)
         COMMON_SESSION_MACHINE_RESET_COMPLETED, &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "debug", &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "r", &result);
-    assert(strstr(result.text, "AX=") != NULL && strstr(result.text, "failed") == NULL);
+    assert(strstr(debug_text(&result), "AX=") != NULL && strstr(debug_text(&result), "failed") == NULL);
     assert(common_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
     synchronous_access(machine, &lease);
     assert(common_machine_debug_execute_with_lease(machine, &lease,
@@ -753,22 +763,22 @@ int main(void)
             .register_id = COMMON_DEBUG_EAX, .address = saved_eax }, &value) == LIB_STATUS_OK);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "e 0:500 12 34", &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "d 0:500", &result);
-    assert(strstr(result.text, "12 34") != NULL);
+    assert(strstr(debug_text(&result), "12 34") != NULL);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "u f000:fff0", &result);
-    assert(strstr(result.text, "F000:FFF0") != NULL);
+    assert(strstr(debug_text(&result), "F000:FFF0") != NULL);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "a 0:510", &result);
     provider.note_monitor_current(&commands, LIB_TRUE, &result);
-    assert(result.arm_prompt && strcmp(result.prompt, "assemble> ") == 0);
+    assert(result.arm_prompt && strcmp(result.prompt, "0000:0510 ") == 0);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "nop", &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "", &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "d 0:510", &result);
-    assert(strstr(result.text, "90") != NULL);
+    assert(strstr(debug_text(&result), "90") != NULL);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "i 60", &result);
-    assert(strstr(result.text, "unsupported") == NULL && strstr(result.text, "failed") == NULL);
+    assert(strstr(debug_text(&result), "unsupported") == NULL && strstr(debug_text(&result), "failed") == NULL);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "xd ffffffff 1", &result);
     /* With A20 wrapping enabled this is the last ROM byte, not an invalid
      * host pointer. The original SAS bus, not host RAM bounds, decides. */
-    assert(strstr(result.text, "failed") == NULL);
+    assert(strstr(debug_text(&result), "failed") == NULL);
     assert(provider.handle_hotkey(&commands, COMMON_SESSION_MACHINE_PAUSED,
         "pause-toggle", &result));
     assert(commands.debug_active && result.request == COMMON_SESSION_REQUEST_RESUME);
@@ -781,7 +791,7 @@ int main(void)
     provider.note_runtime(&commands, COMMON_SESSION_MACHINE_PAUSED,
         COMMON_SESSION_MACHINE_RUNNING, &result);
     submit(&provider, COMMON_SESSION_MACHINE_RUNNING, "r", &result);
-    assert(strstr(result.text, "must be paused") != NULL && commands.debug_active);
+    assert(strstr(debug_text(&result), "must be paused") != NULL && commands.debug_active);
     submit(&provider, COMMON_SESSION_MACHINE_RUNNING, "q", &result);
     submit(&provider, COMMON_SESSION_MACHINE_RUNNING, "debug", &result);
     assert(commands.debug_active && common_machine_state_get(machine) == COMMON_MACHINE_RUNNING);
@@ -795,7 +805,7 @@ int main(void)
     assert(common_machine_debug_execute_with_lease(machine, &lease,
         &(common_machine_debug_request){0}, &value) == LIB_STATUS_INVALID_STATE);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "r", &result);
-    assert(strstr(result.text, "AX=") != NULL);
+    assert(strstr(debug_text(&result), "AX=") != NULL);
     assert(common_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
     /* mov word [0600],1234; mov word [0602],5678; jmp $ */
     execution_plans(machine, &lease, &events);

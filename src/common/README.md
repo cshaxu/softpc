@@ -25,6 +25,15 @@ notification text first cancels and joins the reader, discarding the partial lin
 A completed queued line remains pending and is still consumed. UI only forwards
 that cancellation to its broker; it owns no second reader state or editor.
 
+Debugger output is a growable, object-owned string, borrowed until the next
+submit/observe/open/destroy. Its result prompt carries the original input suffix
+(address, byte value, flags or colon), not an additional generic continuation
+label. Session command results may borrow additional text until the next provider
+call. Session consumes it synchronously through its existing monitor transaction,
+normalizing LF/CRLF in bounded chunks. No large result is silently truncated;
+allocation/formatting and native write failures remain explicit. Providers must
+not retain a debug result across a producing call without copying its text.
+
 | Component | One responsibility | Public contract |
 | --- | --- | --- |
 | `machine` | executor, lifecycle/input queues, frame publication, optional paused debug adapter | `machine_interface.h` |

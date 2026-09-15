@@ -70,6 +70,15 @@ Registered KVM hotkeys still reach the same session control path: CAP can
 pause/resume while debug remains active. Normal guest input stays blocked when
 paused. Cooked debugger input is never reinterpreted as a KVM hotkey.
 
+At `-`, empty/whitespace-only Enter does not repeat the previous command.
+Interactive A/XA retain the next assembly address and exit on empty input;
+E/XE and R/XR consume one response without reprinting their already displayed
+prefix. Their original address/value/colon suffix is the input prompt; no
+`assemble>` or `enter>` label is added. V uses `:` and is machine-independent.
+R's 16-bit edits preserve the high half of the corresponding 32-bit register.
+Debugger output has no fixed text-capacity cutoff; Session emits the complete
+result through the same monitor output path before the next prompt/request.
+
 The SoftPC adapter supports general/IP/flags/segment/CR0/CR2/CR3 reads and
 writes through the original CPU setters, and effective CPU segment-cache
 snapshots. These are the CPU's effective attributes, not a reread of raw

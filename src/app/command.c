@@ -315,8 +315,6 @@ void app_command_session_note_monitor_current(app_command_session *s,
     e->arm_prompt = 1;
 }
 
-_Static_assert(COMMON_SESSION_TEXT_CAPACITY >= 2u * COMMON_DEBUG_TEXT_CAPACITY,
-    "Session text must hold debugger output with CRLF expansion");
 _Static_assert(COMMON_SESSION_PROMPT_CAPACITY >= COMMON_DEBUG_PROMPT_CAPACITY,
     "Session prompt must hold debugger continuation prompts");
 
@@ -403,18 +401,7 @@ static void app_command_copy_debug(app_command_context *command,
     common_session_machine_state state, const common_debug_result *result,
     common_session_command_result *out)
 {
-    size_t source, target = strlen(out->text);
-    if (target + 2u * strlen(result->text) >= sizeof(out->text)) {
-        (void)snprintf(out->text, sizeof(out->text), "Debug output exceeds Console capacity.\r\n\r\n");
-        common_machine_debug_cancel(command->machine);
-        return;
-    }
-    for (source = 0u; result->text[source] != '\0'; ++source) {
-        if (result->text[source] == '\n' &&
-            (source == 0u || result->text[source - 1u] != '\r')) out->text[target++] = '\r';
-        out->text[target++] = result->text[source];
-    }
-    out->text[target] = '\0';
+    out->detail = result->text;
     (void)snprintf(command->debug_prompt, sizeof(command->debug_prompt), "%s", result->prompt);
     if (!result->keep_active) {
         common_debug_close(command->debug);
@@ -437,10 +424,13 @@ void app_command_provider_submit_line(void *opaque,
     app_command_effect effect = { 0 };
     if (command->debug_active) {
         common_debug_result result = { 0 };
+        command->debug_completed_pending = LIB_FALSE;
         lib_status status = common_debug_submit_line(command->debug, line, &result);
         *out = (common_session_command_result) { 0 };
         if (status != LIB_STATUS_OK) {
             (void)snprintf(out->text, sizeof(out->text), "Debug command failed.\r\n\r\n");
+            common_machine_debug_cancel(command->machine);
+            (void)snprintf(command->debug_prompt, sizeof(command->debug_prompt), "-");
         } else {
             app_command_copy_debug(command, state, &result, out);
         }
@@ -453,8 +443,7 @@ void app_command_provider_submit_line(void *opaque,
         if (common_debug_open(command->debug, command->machine) == LIB_STATUS_OK) {
             command->debug_active = LIB_TRUE;
             (void)snprintf(command->debug_prompt, sizeof(command->debug_prompt), "-");
-            (void)snprintf(effect.text, sizeof(effect.text),
-                "Debugger: ? for help, q to return. Machine access requires pause.\r\n\r\n");
+            effect.text[0] = '\0';
         } else (void)snprintf(effect.text, sizeof(effect.text), "Cannot open debugger.\r\n\r\n");
     } else if (effect.action != APP_COMMAND_ACTION_NONE) {
         int succeeded = effect.action == APP_COMMAND_ACTION_EJECT_FLOPPY ?
@@ -486,14 +475,16 @@ void app_command_provider_note_runtime(void *opaque,
         app_machine_completed_state(completed), &effect);
     app_command_copy_effect(out, &effect);
     if (command->debug_active) {
-        if (completed != COMMON_SESSION_MACHINE_PAUSED)
-            command->debug_completed_pending = LIB_FALSE;
+        command->debug_completed_pending = LIB_FALSE;
         common_debug_machine_state state = completed == COMMON_SESSION_MACHINE_PAUSED ?
             COMMON_DEBUG_MACHINE_PAUSED : completed == COMMON_SESSION_MACHINE_RUNNING ?
             COMMON_DEBUG_MACHINE_RUNNING : COMMON_DEBUG_MACHINE_STOPPED;
         common_debug_result result = { 0 };
-        (void)common_debug_observe_machine(command->debug, state, LIB_STATUS_OK, &result);
-        if (result.prompt_ready) {
+        if (common_debug_observe_machine(command->debug, state, LIB_STATUS_OK, &result) != LIB_STATUS_OK) {
+            (void)snprintf(out->text, sizeof(out->text), "Debug command failed.\r\n\r\n");
+            common_machine_debug_cancel(command->machine);
+            (void)snprintf(command->debug_prompt, sizeof(command->debug_prompt), "-");
+        } else if (result.prompt_ready) {
             command->debug_completed = result;
             command->debug_completed_pending = LIB_TRUE;
         }

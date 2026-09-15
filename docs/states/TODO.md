@@ -11,9 +11,3 @@ Overlay optimization remains in [Queue](QUEUE.md).
   address arithmetic and permissive argument handling need explicit semantics.
   Admission: owner approves corrections beyond original-source restoration,
   with bounded range/invalid-input tests and no new parser architecture.
-- P2 — Common debugger bounded output. Owner: Common debug/session interface.
-  Long command output can silently fill the fixed copied-result buffer while
-  processing continues. Admission: agree an explicit bounded/paginated output
-  contract compatible with the single command path; do not restore direct
-  stdout or invent a second input/output loop. Evidence and scope distinction:
-  [T59 S7 comparison](../proposals/m9-debug-original-restoration.md).

@@ -224,6 +224,25 @@ static int package_wait_for_text(HANDLE output, const char *needle,
     return 0;
 }
 
+static int package_wait_debug_prompt(HANDLE output)
+{
+    DWORD deadline = GetTickCount() + 5000u;
+    do {
+        CONSOLE_SCREEN_BUFFER_INFO info;
+        COORD position;
+        char character;
+        DWORD read;
+        if (GetConsoleScreenBufferInfo(output, &info) && info.dwCursorPosition.X == 1) {
+            position = info.dwCursorPosition;
+            position.X = 0;
+            if (ReadConsoleOutputCharacterA(output, &character, 1u, position, &read) &&
+                read == 1u && character == '-') return 1;
+        }
+        Sleep(20u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    return 0;
+}
+
 static int package_wait_for_absent_text(HANDLE output, const char *needle,
     DWORD timeout_ms)
 {
@@ -273,7 +292,7 @@ static int package_debug_execution(HANDLE input, HANDLE output)
      * Unique IP values prove actual G/T completion through the shipping queue,
      * not an old prompt or a library-only callback. */
     return package_send_text(input, "debug\r") &&
-        package_wait_for_text(output, "Debugger:", 5000u) &&
+        package_wait_debug_prompt(output) &&
         package_send_text(input, "e 0:500 fa 90 90 90 90 eb fe\r") &&
         package_send_text(input, "g 0:500 0:501\r") &&
         package_wait_for_text(output, "IP=0501", 5000u) &&
@@ -349,7 +368,7 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
     /* Exercise the shipping CLI provider, not only the debug library link.
        Entering before start must leave the machine stopped and permit help. */
     if (!package_compact_console && (!package_send_text(input, "debug\r") ||
-        !package_wait_for_text(output, "Debugger:", 5000u) ||
+        !package_wait_debug_prompt(output) ||
         !package_send_text(input, "r\r") ||
         !package_wait_for_text(output, "Machine must be paused", 5000u) ||
         !package_send_text(input, "?\r") ||

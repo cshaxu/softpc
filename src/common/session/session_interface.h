@@ -55,6 +55,10 @@ typedef enum common_session_request {
  * executor boundary from this same control thread. */
 typedef struct common_session_command_result {
     char text[COMMON_SESSION_TEXT_CAPACITY];
+    /* Optional additional text, borrowed until the next provider call.
+     * Consumed synchronously by Session after text, before requests/prompt.
+     * LF and CRLF are accepted; no fixed-size copy or ownership transfer. */
+    const char *detail;
     char prompt[COMMON_SESSION_PROMPT_CAPACITY];
     common_session_request request;
     lib_bool exit_requested;

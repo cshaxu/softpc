@@ -37,6 +37,10 @@ struct common_debug_command {
     type_unsigned_32 dump_linear;
     type_unsigned_32 unassemble_linear;
     common_debug_result *result;
+    C_CHAR *output;
+    lib_size output_length, output_capacity;
+    lib_status output_status;
+    C_CHAR input_prompt[COMMON_DEBUG_PROMPT_CAPACITY];
     STD_SIZE_T error_position;
     STD_SIZE_T argument_count;
     C_CHAR **arguments;
@@ -94,27 +98,85 @@ static C_INT command_copy_text_checked(C_CHAR *destination,
 #define COMMAND_REGISTER_WATCH_WRITE COMMON_MACHINE_DEBUG_WATCH_WRITE
 #define COMMAND_REGISTER_WATCH_EXECUTE COMMON_MACHINE_DEBUG_WATCH_EXECUTE
 
-static C_INT command_printf_capacity(const command_context *debugContext)
+static C_INT command_printf(command_context *command, const char *format, ...)
 {
-    STD_SIZE_T used;
-
-    if (debugContext == STD_NULL || debugContext->result == STD_NULL) return 0;
-    used = STD_STRLEN(debugContext->result->text);
-    return used < sizeof(debugContext->result->text) ?
-        (C_INT)(sizeof(debugContext->result->text) - used) : 0;
+    lib_c_va_list args, measure;
+    int count;
+    lib_size needed, capacity;
+    char *expanded;
+    if (command == STD_NULL || command->result == STD_NULL) return -1;
+    /* Reentering a read continuation must not print its already displayed
+     * prefix again. Reading the supplied line opens output for its result. */
+    if (command->pending_line_available) return 0;
+    if (command->output_status != LIB_STATUS_OK) return -1;
+    lib_c_va_start(args, format);
+    lib_c_va_copy(measure, args);
+    count = lib_c_vsnprintf(NULL, 0u, format, measure);
+    lib_c_va_end(measure);
+    if (count < 0 || (lib_size)count >= LIB_SIZE_MAX - command->output_length) {
+        command->output_status = LIB_STATUS_IO_ERROR;
+    } else {
+        needed = command->output_length + (lib_size)count + 1u;
+        if (needed > command->output_capacity) {
+            capacity = command->output_capacity > LIB_SIZE_MAX / 2u ? needed :
+                command->output_capacity * 2u;
+            if (capacity < needed) capacity = needed;
+            if (capacity < 1024u) capacity = 1024u;
+            expanded = lib_reallocate(command->output, capacity);
+            if (expanded == NULL) command->output_status = LIB_STATUS_NO_MEMORY;
+            else { command->output = expanded; command->output_capacity = capacity; }
+        }
+        if (command->output_status == LIB_STATUS_OK) {
+            if (lib_c_vsnprintf(command->output + command->output_length,
+                    command->output_capacity - command->output_length, format, args) != count)
+                command->output_status = LIB_STATUS_IO_ERROR;
+            else command->output_length += (lib_size)count;
+        }
+    }
+    lib_c_va_end(args);
+    return command->output_status == LIB_STATUS_OK ? count : -1;
 }
 
-#define command_printf(debugContext, ...) \
-    ((debugContext) == STD_NULL || (debugContext)->result == STD_NULL || \
-        command_printf_capacity(debugContext) == 0 ? -1 : lib_c_snprintf( \
-            (debugContext)->result->text + STD_STRLEN((debugContext)->result->text), \
-            (STD_SIZE_T)command_printf_capacity(debugContext), __VA_ARGS__))
+static void command_begin_output(command_context *command, common_debug_result *result)
+{
+    *result = (common_debug_result) { .text = "", .keep_active = LIB_TRUE };
+    command->result = result;
+    command->output_length = 0u;
+    command->output_status = LIB_STATUS_OK;
+    if (command->output != NULL) command->output[0] = '\0';
+}
+
+static lib_status command_end_output(command_context *command)
+{
+    if (command->output_status != LIB_STATUS_OK) {
+        command->continuation = COMMAND_CONTINUATION_NONE;
+        command->pending_line_available = 0;
+        command->run_kind = COMMAND_RUN_NONE;
+        command->result->lifecycle_request = COMMON_DEBUG_LIFECYCLE_NONE;
+        command->result->prompt[0] = '-';
+        command->result->prompt[1] = '\0';
+    }
+    command->result->text = command->output_length != 0u ? command->output : "";
+    command->result = NULL;
+    return command->output_status;
+}
 
 static C_INT command_read_line(command_context *debugContext,
     C_CHAR *buffer, STD_SIZE_T buffer_size)
 {
-    if (debugContext == STD_NULL || buffer == STD_NULL || buffer_size == 0u ||
-        !debugContext->pending_line_available) return 0;
+    if (debugContext == STD_NULL || buffer == STD_NULL || buffer_size == 0u) return 0;
+    if (!debugContext->pending_line_available) {
+        lib_size start = debugContext->output_length;
+        while (start != 0u && debugContext->output[start - 1u] != '\n') --start;
+        if (debugContext->output_status == LIB_STATUS_OK &&
+            command_copy_text_checked(debugContext->input_prompt,
+                sizeof(debugContext->input_prompt), debugContext->output + start)) {
+            debugContext->output[start] = '\0';
+            debugContext->output_length = start;
+            debugContext->result->prompt_ready = LIB_TRUE;
+        }
+        return 0;
+    }
     if (!command_copy_text_checked(buffer, buffer_size,
             debugContext->pending_line)) return 0;
     debugContext->pending_line_available = 0;
@@ -427,6 +489,12 @@ static type_unsigned_32 debug_register(command_context *debugContext, command_re
 static C_INT debug_set_register(command_context *debugContext, command_register reg, type_unsigned_32 value)
 {
     return command_machine_write_register(reg, value);
+}
+static C_INT debug_set_word(command_context *debugContext, command_register reg, type_unsigned_16 value)
+{
+    /* Original _ax/_ip assignments preserve the upper half of their alias. */
+    return debug_set_register(debugContext, reg,
+        (debug_register(debugContext, reg) & 0xffff0000u) | value);
 }
 static C_INT debug_flag(command_context *debugContext, type_unsigned_32 mask)
 {
@@ -1048,7 +1116,7 @@ static C_VOID g(command_context *debugContext)
             STD_PRINTF("debug: fail to load cs from %04X\n", start_segment);
             return;
         }
-        if (debug_set_register(debugContext, COMMAND_REGISTER_EIP, start_offset)) return;
+        if (debug_set_word(debugContext, COMMAND_REGISTER_EIP, start_offset)) return;
         if (command_machine_set_break_real(seg, ptr)) return;
         break;
     default:
@@ -1059,9 +1127,7 @@ static C_VOID g(command_context *debugContext)
     {
         return;
     }
-    if (narg != 1u) {
-        debugContext->run_kind = COMMAND_RUN_BREAK_REAL;
-    }
+    debugContext->run_kind = COMMAND_RUN_BREAK_REAL;
     command_machine_resume();
 }
 /* hex */
@@ -1141,8 +1207,8 @@ static C_VOID l(command_context *debugContext)
     }
     lib_storage_medium_destroy(&medium);
     if (status != LIB_STATUS_OK) STD_PRINTF("File not found\n");
-    debug_set_register(debugContext, COMMAND_REGISTER_ECX, (type_unsigned_16)(len & 0xffffu));
-    debug_set_register(debugContext, COMMAND_REGISTER_EBX, (type_unsigned_16)(len >> 16u));
+    debug_set_word(debugContext, COMMAND_REGISTER_ECX, (type_unsigned_16)(len & 0xffffu));
+    debug_set_word(debugContext, COMMAND_REGISTER_EBX, (type_unsigned_16)(len >> 16u));
 }
 /* move */
 static C_VOID m(command_context *debugContext)
@@ -1248,7 +1314,7 @@ static type_unsigned_8 uprintins(command_context *debugContext, type_unsigned_16
         {
             format_result = STD_SNPRINTF_APPEND(&sbin_cursor, &sbin_remaining,
                 "%02X", (type_unsigned_8)ucode[i]);
-            if (format_result < 0 || (STD_SIZE_T)format_result >= sbin_remaining) {
+            if (format_result < 0) {
                 binary_failed = TYPE_TRUE;
                 len = 0;
                 (C_VOID)STD_SNPRINTF(str, sizeof(str), "%04X:%04X <ERROR>",
@@ -1324,7 +1390,7 @@ static C_VOID rscanregs(command_context *debugContext)
         value = scannubit16(debugContext, s);
         if (s[0] != '\0' && s[0] != '\n' && !nErrPos)
         {
-            debug_set_register(debugContext, COMMAND_REGISTER_EAX, (type_unsigned_16)value);
+            debug_set_word(debugContext, COMMAND_REGISTER_EAX, value);
         }
     }
     else if (!STD_STRCMP(arg[1], "bx"))
@@ -1336,7 +1402,7 @@ static C_VOID rscanregs(command_context *debugContext)
         value = scannubit16(debugContext, s);
         if (s[0] != '\0' && s[0] != '\n' && !nErrPos)
         {
-            debug_set_register(debugContext, COMMAND_REGISTER_EBX, (type_unsigned_16)value);
+            debug_set_word(debugContext, COMMAND_REGISTER_EBX, value);
         }
     }
     else if (!STD_STRCMP(arg[1], "cx"))
@@ -1348,7 +1414,7 @@ static C_VOID rscanregs(command_context *debugContext)
         value = scannubit16(debugContext, s);
         if (s[0] != '\0' && s[0] != '\n' && !nErrPos)
         {
-            debug_set_register(debugContext, COMMAND_REGISTER_ECX, (type_unsigned_16)value);
+            debug_set_word(debugContext, COMMAND_REGISTER_ECX, value);
         }
     }
     else if (!STD_STRCMP(arg[1], "dx"))
@@ -1360,7 +1426,7 @@ static C_VOID rscanregs(command_context *debugContext)
         value = scannubit16(debugContext, s);
         if (s[0] != '\0' && s[0] != '\n' && !nErrPos)
         {
-            debug_set_register(debugContext, COMMAND_REGISTER_EDX, (type_unsigned_16)value);
+            debug_set_word(debugContext, COMMAND_REGISTER_EDX, value);
         }
     }
     else if (!STD_STRCMP(arg[1], "bp"))
@@ -1372,7 +1438,7 @@ static C_VOID rscanregs(command_context *debugContext)
         value = scannubit16(debugContext, s);
         if (s[0] != '\0' && s[0] != '\n' && !nErrPos)
         {
-            debug_set_register(debugContext, COMMAND_REGISTER_EBP, (type_unsigned_16)value);
+            debug_set_word(debugContext, COMMAND_REGISTER_EBP, value);
         }
     }
     else if (!STD_STRCMP(arg[1], "sp"))
@@ -1384,7 +1450,7 @@ static C_VOID rscanregs(command_context *debugContext)
         value = scannubit16(debugContext, s);
         if (s[0] != '\0' && s[0] != '\n' && !nErrPos)
         {
-            debug_set_register(debugContext, COMMAND_REGISTER_ESP, (type_unsigned_16)value);
+            debug_set_word(debugContext, COMMAND_REGISTER_ESP, value);
         }
     }
     else if (!STD_STRCMP(arg[1], "si"))
@@ -1396,7 +1462,7 @@ static C_VOID rscanregs(command_context *debugContext)
         value = scannubit16(debugContext, s);
         if (s[0] != '\0' && s[0] != '\n' && !nErrPos)
         {
-            debug_set_register(debugContext, COMMAND_REGISTER_ESI, (type_unsigned_16)value);
+            debug_set_word(debugContext, COMMAND_REGISTER_ESI, value);
         }
     }
     else if (!STD_STRCMP(arg[1], "di"))
@@ -1408,7 +1474,7 @@ static C_VOID rscanregs(command_context *debugContext)
         value = scannubit16(debugContext, s);
         if (s[0] != '\0' && s[0] != '\n' && !nErrPos)
         {
-            debug_set_register(debugContext, COMMAND_REGISTER_EDI, (type_unsigned_16)value);
+            debug_set_word(debugContext, COMMAND_REGISTER_EDI, value);
         }
     }
     else if (!STD_STRCMP(arg[1], "ss"))
@@ -1480,7 +1546,7 @@ static C_VOID rscanregs(command_context *debugContext)
         value = scannubit16(debugContext, s);
         if (s[0] != '\0' && s[0] != '\n' && !nErrPos)
         {
-            debug_set_register(debugContext, COMMAND_REGISTER_EIP, value);
+            debug_set_word(debugContext, COMMAND_REGISTER_EIP, value);
         }
     }
     else if (!STD_STRCMP(arg[1], "f"))
@@ -1649,14 +1715,13 @@ static C_VOID t(command_context *debugContext)
     case 3:
         addrparse(debugContext, _cs, arg[1]);
         count = scannubit16(debugContext, arg[2]);
-        if (count == 0u) seterr(debugContext, 2);
         if (nErrPos) return;
         if (debug_set_register(debugContext, COMMAND_REGISTER_CS, seg))
         {
             STD_PRINTF("debug: fail to load cs from %04X\n", seg);
             return;
         }
-        debug_set_register(debugContext, COMMAND_REGISTER_EIP, ptr);
+        debug_set_word(debugContext, COMMAND_REGISTER_EIP, ptr);
         break;
     default:
         seterr(debugContext, narg - 1);
@@ -1669,6 +1734,7 @@ static C_VOID t(command_context *debugContext)
     /* The original loop synchronously waited after each instruction.  The
      * common/session boundary is asynchronous: one trace budget and one
      * resume request preserve the requested stop point without polling. */
+    if (count == 0u) return;
     if (command_begin_trace(debugContext, COMMAND_RUN_TRACE_REAL, count)) return;
     command_machine_resume();
 }
@@ -1855,7 +1921,7 @@ static type_unsigned_8 xuprintins(command_context *debugContext, type_unsigned_3
         {
             format_result = STD_SNPRINTF_APPEND(&sbin_cursor, &sbin_remaining,
                 "%02X", (type_unsigned_8)ucode[i]);
-            if (format_result < 0 || (STD_SIZE_T)format_result >= sbin_remaining) {
+            if (format_result < 0) {
                 binary_failed = TYPE_TRUE;
                 len = 0;
                 (C_VOID)STD_SNPRINTF(str, sizeof(str), "L%08X <ERROR>", linear);
@@ -1913,7 +1979,7 @@ static C_VOID xrprintreg(command_context *debugContext)
     xuprintins(debugContext, xulin);
 }
 /* assemble */
-static C_VOID xaconsole(command_context *debugContext, type_unsigned_32 linear)
+static C_VOID xaconsole(command_context *debugContext)
 {
     STD_SIZE_T i, len, errAsmPos;
     C_CHAR astmt[0x100];
@@ -1921,7 +1987,7 @@ static C_VOID xaconsole(command_context *debugContext, type_unsigned_32 linear)
     C_INT flagExitAsm = 0;
     while (!flagExitAsm)
     {
-        STD_PRINTF("L%08X ", linear);
+        STD_PRINTF("L%08X ", xalin);
         if (!command_machine_read_line(astmt, sizeof(astmt))) return;
         if (STD_STRLEN(astmt) != 0u && astmt[STD_STRLEN(astmt) - 1u] == '\n')
             astmt[STD_STRLEN(astmt) - 1u] = '\0';
@@ -1942,12 +2008,12 @@ static C_VOID xaconsole(command_context *debugContext, type_unsigned_32 linear)
         }
         else
         {
-            if (command_machine_write_linear(linear, (C_VOID *)acode, (type_unsigned_8)len))
+            if (command_machine_write_linear(xalin, (C_VOID *)acode, (type_unsigned_8)len))
             {
-                STD_PRINTF("debug: fail to write to L%08X\n", linear);
+                STD_PRINTF("debug: fail to write to L%08X\n", xalin);
                 return;
             }
-            linear += (type_unsigned_32)len;
+            xalin += (type_unsigned_32)len;
         }
         if (errAsmPos)
         {
@@ -1958,13 +2024,12 @@ static C_VOID xaconsole(command_context *debugContext, type_unsigned_32 linear)
             STD_PRINTF("^ Error\n");
         }
     }
-    xalin = linear;
 }
 static C_VOID xa(command_context *debugContext)
 {
     if (narg == 1)
     {
-        xaconsole(debugContext, xalin);
+        xaconsole(debugContext);
     }
     else if (narg == 2)
     {
@@ -1973,7 +2038,7 @@ static C_VOID xa(command_context *debugContext)
         {
             return;
         }
-        xaconsole(debugContext, xalin);
+        xaconsole(debugContext);
     }
     else
     {
@@ -2251,6 +2316,7 @@ static C_VOID xg(command_context *debugContext)
     {
         return;
     }
+    if (count == 0u) return;
     if (command_machine_set_break_linear(linear)) return;
     command_begin_break(debugContext, count);
     command_machine_resume();
@@ -2369,6 +2435,7 @@ static C_VOID xt(command_context *debugContext)
     {
         return;
     }
+    if (count == 0u) return;
     if (command_begin_trace(debugContext, COMMAND_RUN_TRACE_LINEAR, count)) return;
     command_machine_resume();
 }
@@ -3011,6 +3078,7 @@ static C_VOID exec(command_context *debugContext)
 static C_VOID command_initialize(common_debug_command *command,
     common_machine *machine)
 {
+    lib_release(command->output);
     STD_MEMSET(command, 0, sizeof(*command));
     command->machine = machine;
     command->arguments = (C_CHAR **)STD_CALLOC(DEBUG_MAXNARG,
@@ -3033,6 +3101,7 @@ void common_debug_command_destroy(common_debug_command *command)
 {
     if (command == STD_NULL) return;
     common_debug_command_close(command);
+    lib_release(command->output);
     STD_FREE(command);
 }
 
@@ -3057,14 +3126,8 @@ void common_debug_command_close(common_debug_command *command)
 
 static void command_prompt(common_debug_command *command)
 {
-    const char *prompt = "-";
-    switch (command->continuation) {
-    case COMMAND_CONTINUATION_ASSEMBLE: prompt = "assemble> "; break;
-    case COMMAND_CONTINUATION_ENTER: prompt = "enter> "; break;
-    case COMMAND_CONTINUATION_REGISTER:
-    case COMMAND_CONTINUATION_XREGISTER: prompt = ":"; break;
-    default: break;
-    }
+    const char *prompt = command->continuation == COMMAND_CONTINUATION_NONE ?
+        "-" : command->input_prompt;
     if (command->result != STD_NULL) {
         (void)command_copy_text_checked(command->result->prompt,
             sizeof(command->result->prompt), prompt);
@@ -3076,15 +3139,15 @@ static void command_prepare_continuation(common_debug_command *command)
 {
     if (command->argument_count == 0u || command->arguments[0] == STD_NULL)
         return;
-    if (!STD_STRCMP(command->arguments[0], "a"))
+    if (command->arguments[0][0] == 'a')
         command->continuation = COMMAND_CONTINUATION_ASSEMBLE;
-    else if (!STD_STRCMP(command->arguments[0], "e") &&
+    else if (command->arguments[0][0] == 'e' &&
         command->argument_count == 2u)
         command->continuation = COMMAND_CONTINUATION_ENTER;
-    else if (!STD_STRCMP(command->arguments[0], "r") &&
+    else if (command->arguments[0][0] == 'r' &&
         command->argument_count == 2u)
         command->continuation = COMMAND_CONTINUATION_REGISTER;
-    else if (!STD_STRCMP(command->arguments[0], "v"))
+    else if (command->arguments[0][0] == 'v')
         command->continuation = COMMAND_CONTINUATION_VERBAL;
     else if (command->arguments[0][0] == 'x' &&
         command->argument_count >= 2u) {
@@ -3104,13 +3167,14 @@ static void command_prepare_continuation(common_debug_command *command)
 static lib_bool command_needs_machine(common_debug_command *command)
 {
     const char *name;
-    if (command->continuation != COMMAND_CONTINUATION_NONE) return LIB_TRUE;
+    if (command->continuation != COMMAND_CONTINUATION_NONE)
+        return command->continuation != COMMAND_CONTINUATION_VERBAL;
     if (command->argument_count == 0u) return LIB_FALSE;
     name = command->arguments[0];
-    if (lib_c_strchr("acdefgilmorstuvwx", name[0]) == NULL) return LIB_FALSE;
+    if (lib_c_strchr("acdefgilmorstuwx", name[0]) == NULL) return LIB_FALSE;
     return lib_c_strcmp(name, "?") != 0 && lib_c_strcmp(name, "h") != 0 &&
         lib_c_strcmp(name, "n") != 0 && lib_c_strcmp(name, "q") != 0 &&
-        !(lib_c_strcmp(name, "x") == 0 && command->argument_count == 2u &&
+        !(name[0] == 'x' && command->argument_count == 2u &&
             lib_c_strcmp(command->arguments[1], "?") == 0);
 }
 
@@ -3137,7 +3201,8 @@ static void command_report_access(common_debug_command *command)
     command->pending_line_available = 0;
     command->run_kind = COMMAND_RUN_NONE;
     command->result->lifecycle_request = COMMON_DEBUG_LIFECYCLE_NONE;
-    (void)lib_c_snprintf(command->result->text, sizeof(command->result->text), "%s\r\n\r\n",
+    command->output_length = 0u;
+    command_printf(command, "%s\r\n\r\n",
         command->access_status == LIB_STATUS_INVALID_STATE ?
             "Machine must be paused for this debug operation." :
         command->access_status == LIB_STATUS_UNSUPPORTED ?
@@ -3154,9 +3219,7 @@ lib_status common_debug_command_submit_line(common_debug_command *command,
     if (command == STD_NULL || line == STD_NULL || out_result == STD_NULL ||
         command->machine == STD_NULL || command->arguments == STD_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
-    STD_MEMSET(out_result, 0, sizeof(*out_result));
-    out_result->keep_active = LIB_TRUE;
-    command->result = out_result;
+    command_begin_output(command, out_result);
     command->access_status = LIB_STATUS_OK;
     if (lib_text_length(line) >= sizeof(command->command_buffer)) {
         command_printf(command, "Debug command is too long.\r\n\r\n");
@@ -3171,7 +3234,7 @@ lib_status common_debug_command_submit_line(common_debug_command *command,
         command_prepare_continuation(command);
         exec(debugContext);
     } else {
-        if (!command_prepare_machine(command)) goto finished;
+        if (command_needs_machine(command) && !command_prepare_machine(command)) goto finished;
         if (!command_copy_text_checked(command->pending_line,
                 sizeof(command->pending_line), line)) return LIB_STATUS_INVALID_ARGUMENT;
         command->pending_line_available = 1;
@@ -3184,7 +3247,7 @@ lib_status common_debug_command_submit_line(common_debug_command *command,
         case COMMAND_CONTINUATION_REGISTER: rscanregs(debugContext); command->continuation = COMMAND_CONTINUATION_NONE; break;
         case COMMAND_CONTINUATION_VERBAL: v(debugContext); command->continuation = COMMAND_CONTINUATION_NONE; break;
         case COMMAND_CONTINUATION_XASSEMBLE:
-            xaconsole(debugContext, xalin);
+            xaconsole(debugContext);
             if (line[0] == '\0') command->continuation = COMMAND_CONTINUATION_NONE;
             break;
         case COMMAND_CONTINUATION_XENTER: xe(debugContext); command->continuation = COMMAND_CONTINUATION_NONE; break;
@@ -3192,6 +3255,7 @@ lib_status common_debug_command_submit_line(common_debug_command *command,
         default: break;
         }
     }
+    if (!out_result->prompt_ready) command->continuation = COMMAND_CONTINUATION_NONE;
     if (nErrPos) {
         command->continuation = COMMAND_CONTINUATION_NONE;
         for (i = 0u; i < nErrPos; ++i) STD_PRINTF(" ");
@@ -3201,8 +3265,7 @@ finished:
     command_report_access(command);
     command_prompt(command);
     if (flagExit) out_result->keep_active = LIB_FALSE;
-    command->result = STD_NULL;
-    return LIB_STATUS_OK;
+    return command_end_output(command);
 }
 
 lib_status common_debug_command_observe_machine(common_debug_command *command,
@@ -3213,22 +3276,22 @@ lib_status common_debug_command_observe_machine(common_debug_command *command,
 
     if (command == STD_NULL || out_result == STD_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
-    STD_MEMSET(out_result, 0, sizeof(*out_result));
-    out_result->keep_active = LIB_TRUE;
+    command_begin_output(command, out_result);
     if (state == COMMON_DEBUG_MACHINE_STOPPED || state == COMMON_DEBUG_MACHINE_RESET ||
         state == COMMON_DEBUG_MACHINE_FAULT) {
         command->run_kind = COMMAND_RUN_NONE;
-        return LIB_STATUS_OK;
+        return command_end_output(command);
     }
-    if (state != COMMON_DEBUG_MACHINE_PAUSED || status != LIB_STATUS_OK) return LIB_STATUS_OK;
-    command->result = out_result;
+    if (state != COMMON_DEBUG_MACHINE_PAUSED || status != LIB_STATUS_OK)
+        return command_end_output(command);
     command->access_status = LIB_STATUS_OK;
     if (command_get_execution_result(command, &executed)) {
+        if (command->access_status == LIB_STATUS_OK && command->run_kind == COMMAND_RUN_BREAK_REAL)
+            rprintregs(command);
         command->run_kind = COMMAND_RUN_NONE;
         command_report_access(command);
         command_prompt(command);
-        command->result = STD_NULL;
-        return LIB_STATUS_OK;
+        return command_end_output(command);
     }
     if (command->observation.watch_hit) {
         const char *names[] = { "read", "write", "execute" };
@@ -3264,12 +3327,12 @@ lib_status common_debug_command_observe_machine(common_debug_command *command,
     if ((command->run_kind == COMMAND_RUN_TRACE_REAL ||
             command->run_kind == COMMAND_RUN_TRACE_LINEAR) &&
         command->trace_remaining != 0u) {
+        command_printf(command, "\n");
         if (command_set_trace(command, 1u)) {
             command->run_kind = COMMAND_RUN_NONE;
             command_report_access(command);
             command_prompt(command);
-            command->result = STD_NULL;
-            return LIB_STATUS_OK;
+            return command_end_output(command);
         }
         out_result->lifecycle_request = COMMON_DEBUG_LIFECYCLE_RESUME;
     } else if (command->run_kind == COMMAND_RUN_BREAK_LINEAR &&
@@ -3278,8 +3341,7 @@ lib_status common_debug_command_observe_machine(common_debug_command *command,
             command->run_kind = COMMAND_RUN_NONE;
             command_report_access(command);
             command_prompt(command);
-            command->result = STD_NULL;
-            return LIB_STATUS_OK;
+            return command_end_output(command);
         }
         out_result->lifecycle_request = COMMON_DEBUG_LIFECYCLE_RESUME;
     } else {
@@ -3288,6 +3350,5 @@ lib_status common_debug_command_observe_machine(common_debug_command *command,
     }
     command_report_access(command);
     command_prompt(command);
-    command->result = STD_NULL;
-    return LIB_STATUS_OK;
+    return command_end_output(command);
 }

@@ -51,12 +51,32 @@ static int common_session_dispatch_request(common_session *session,
     }
 }
 
+static int common_session_write_text(common_session *session, const char *text)
+{
+    char chunk[1024];
+    lib_size used = 0u;
+    char previous = '\0';
+    if (text == NULL) return 1;
+    for (; *text != '\0'; ++text) {
+        if (used + 2u >= sizeof(chunk)) {
+            chunk[used] = '\0';
+            if (common_ui_write_monitor(session->ui, chunk) != LIB_STATUS_OK) return 0;
+            used = 0u;
+        }
+        if (*text == '\n' && previous != '\r') chunk[used++] = '\r';
+        chunk[used++] = *text;
+        previous = *text;
+    }
+    chunk[used] = '\0';
+    return used == 0u || common_ui_write_monitor(session->ui, chunk) == LIB_STATUS_OK;
+}
+
 static int common_session_apply_result(common_session *session,
     const common_session_command_result *result)
 {
     if (result->release_window_mouse &&
         common_ui_release_window_mouse(session->ui) != LIB_STATUS_OK) return 0;
-    if (result->text[0] != '\0' &&
+    if ((result->text[0] != '\0' || (result->detail != NULL && result->detail[0] != '\0')) &&
         common_session_state_monitor_is_current(&session->state)) {
         if (session->pending_line) {
             lib_bool completed;
@@ -65,7 +85,8 @@ static int common_session_apply_result(common_session *session,
             if (!completed && common_ui_write_monitor(session->ui, "\r\n") != LIB_STATUS_OK)
                 return 0;
         }
-        if (common_ui_write_monitor(session->ui, result->text) != LIB_STATUS_OK) return 0;
+        if (!common_session_write_text(session, result->text) ||
+            !common_session_write_text(session, result->detail)) return 0;
     }
     if (!common_session_dispatch_request(session, result->request)) return 0;
     if (result->request != COMMON_SESSION_REQUEST_NONE ||

@@ -109,6 +109,12 @@ checks paused state and the lease again there; callbacks must not synchronously
 reenter this control-thread API. `app/command` owns debugger selection
 and copied prompts; machine state changes do not select or exit the CLI.
 
+Debug owns growable command output; its public result borrows that text until
+the next producing call/open/destroy. The App binding forwards it as Session's
+borrowed additional text, valid until the next provider invocation. Session
+consumes it synchronously through its existing output/reader transaction with
+chunked LF normalization. No second output owner or input loop is introduced.
+
 T56's owner-approved debug port adds observation calls at original CCPU
 instruction entry and successful completion, including interrupt-shadow
 bypasses. The product driver owns the plan/result and binds it only during
