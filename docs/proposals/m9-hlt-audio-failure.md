@@ -110,3 +110,14 @@ test net +141 and CMake +15, content-identical S19 archival, and no changes to
 shared corpora, preserved CPU, media or INI. Worktree was clean after P1;
 P2 only records review/status. All five ledger members pass. S20 is delivered
 for owner testing; T59 remains open and manual acceptance is not claimed.
+
+## Owner follow-up
+
+Owner subsequently reports S20 testing passed. T59 remains open. On explicit
+owner direction, remove native modal-test isolation from TODO and cease tracking
+it; retain the historical S14 observation without claiming a code fix.
+Rechecked original NXVM 9bd08dd8 src/nxvm-baseline/debug.c: XU's uint8_t count,
+XS's extra real-address parse and end-of-range pattern reads, XM's forward
+overlap copy, and XE/XF's incremental validation/writes already exist there.
+They are inherited edge behavior, not Common extraction regressions. Debugger
+TODO remains pending a separate semantics decision; no code changes are made.

@@ -4,8 +4,9 @@
 
 M9 T59 S20 delivered and reviewed: bounded HLT/audio failure handling in
 Compat; x86/x64 builds and 96/96 tests per width pass. P1 e402c69 is pushed;
-actual-commit review and dual-width focused reruns pass. Await owner testing;
-T59 remains open.
+actual-commit review and dual-width focused reruns pass. Owner testing passed;
+T59 remains open. Owner retired the modal-test TODO; inherited debugger edge
+contracts remain the only TODO item.
 
 ## M9 T59 S20 Packet
 
