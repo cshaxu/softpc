@@ -2,35 +2,33 @@
 
 ## Current Work
 
-M9 T59 S13 implemented and verified: shared Base synchronization/time, reused
-blocking mutexes, duplicate Console mutex removed. Dual-width 92/92 pass.
-Executor delivery 3f493f2 and blocker record efde6fb are pushed to main after
-owner's explicit standing authorization for https://github.com/cshaxu/softpc.git.
-Post-push actual-patch review passed; awaiting owner audit/testing, no T closure.
-S12 delivery bce7fcf/review 780c292 is retained in
-[history](../history/M9-T59-S12-session-event-wait.md); manual acceptance not claimed.
+M9 T59 S14 implemented and verified: consumer mutexes use Base, production
+C/H net -7. Strict dual-width builds pass; x64 92/92, x86 rerun 92/92.
+An initial x86 native-modal early exit is recorded in TODO, not claimed fixed.
+Ready for executor P1 push and coordinator review. S13 dc5811f is retained.
+S15/S16 are planned, not admitted; await owner testing after S14 delivery.
 T59 remains open.
 
-## M9 T59 S13 Packet
+## M9 T59 S14 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves Base extraction, simpler architecture, dual-width build/test/commit/push, then owner audit. |
-| Objective | One generic sync/time implementation, no duplicate Console mutex, blocking KVM frame copy lock. |
-| Non-goals | No product, media/INI, MVDM or unrelated polling changes; no compatibility wrappers. |
-| Reference Baseline | 780c292, clean main. |
+| Admission And Approval | Owner requests proposal S14-S16 and admits S14 only, build/test/commit/push then wait. |
+| Objective | One Base mutex implementation for Host output/transaction, Console metadata and KVM control. |
+| Non-goals | No Event/task migration, product policy, MVDM, Common, App, VM, Compat or INI/media changes. |
+| Reference Baseline | dc5811f, clean main. |
 | Candidate Proposal | [Base synchronization](../proposals/m9-lib-base-synchronization.md). |
-| Files And ABI Surface | Lib Base/Host sync-clock relocation, Console/KVM locks, direct consumers/tests/build DAG/docs/manifests and fixed EXEs. |
-| Applicable Rules | Architecture/coding/execution/documentation governance and repository rules/design/UI. |
-| Verification | Strict Lib build both widths; focused 8/8 each; full x64 92/92 (79.99 s), x86 92/92 (64.78 s); four manifests/docs pass. |
-| Expected Markers | Frame copy blocks, ordinary control remains independent; old host sync/clock and Console mutex implementations absent. |
-| Asset Needs | Reuse build trees; refresh only fixed EXEs, preserve INI/media. |
-| Reporting Requirements | Production/test line accounting; executor P1, blocker record P2 and actual-patch review P3; pushed clean for owner audit. |
-| Stop Conditions | New synchronization semantics or product policy requires further admission. |
-| Exit Criteria | Finite ledger proven, dual-width builds/tests and all manifests/docs pass, pushed clean for owner audit. |
-| Original Owner Request | 批准这项实现 要求精简代码逻辑架构 完成后编译测试提交推送后等我审计 希望代码减少 |
-| Similar-Issue Sweep | Generic sync/time consumers, duplicate mutex implementations, all frame locking sites and dependency declarations. |
+| Files And ABI Surface | Lib consumer lock fields/calls, Host Base build edge, focused tests/gates/docs/manifests/fixed EXEs; no new Base API. |
+| Applicable Rules | Architecture/coding/execution/documentation governance; repository architecture/coding/UI design and execution/document rules. |
+| Verification | Creation failure/real contention/barrier tests pass; full x64 92/92 (77.48 s), x86 second full run 92/92 (48.34 s); four manifests/docs pass. Initial modal failure and 10 isolated passes are recorded. |
+| Expected Markers | No consumer metadata/control spin helpers or Host native mutex implementation; lock scopes/order unchanged. |
+| Asset Needs | Reuse existing build trees; refresh fixed EXEs only, preserve INI/media. |
+| Reporting Requirements | Finite ledger, production/test line accounting, executor P1 push and actual-change coordinator P2 review/push; wait for owner. |
+| Stop Conditions | New primitive API, altered synchronization policy or broader migration requires admission. |
+| Exit Criteria | S14 ledger proven, dual-width tests/builds/gates pass, committed/pushed clean for owner testing. |
+| Original Owner Request | 写入proposal后 准入s14 s14完成后编译测试提交推送后等我 |
+| Similar-Issue Sweep | All Lib mutex/spin implementations; distinguish Base internals, atomic claims and planned Event/thread work. |
 
 ## Current Technical Baseline
 

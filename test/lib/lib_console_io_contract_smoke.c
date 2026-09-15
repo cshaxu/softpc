@@ -155,7 +155,8 @@ int main(void)
     assert(lib_console_pc_glyph(0xb3)==0x2502 && lib_console_pc_glyph(0xc4)==0x2500);
     assert(lib_console_pc_glyph(0xda)==0x250c && lib_console_pc_glyph(0xdb)==0x2588);
     assert(lib_console_pc_glyph(0x82)==0xe9 && lib_console_pc_glyph(0xff)==0xa0);
-    InitializeCriticalSection(&b.output_lock);InitializeCriticalSection(&b.transaction_lock);b.output=(HANDLE)1;
+    assert(base_sync_mutex_create(&b.output_lock)==LIB_STATUS_OK);
+    assert(base_sync_mutex_create(&b.transaction_lock)==LIB_STATUS_OK);b.output=(HANDLE)1;
     f.columns=80;f.rows=25;f.text[0]=0xdb;f.palette[0]=1;
     for(int i=0;i<2;++i) assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
     assert(first_cell==0x2588 && writes==1 && palette_attempts==2);
@@ -206,13 +207,13 @@ int main(void)
         assert(host_console_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
         assert(writes==attempted+1 && b.previous_columns==80);
     }
-    DeleteCriticalSection(&b.transaction_lock);DeleteCriticalSection(&b.output_lock);CloseHandle(stop);lib_console_release(b.console);
+    base_sync_mutex_destroy(b.transaction_lock);base_sync_mutex_destroy(b.output_lock);CloseHandle(stop);lib_console_release(b.console);
     cooked_restore();
     /* Disposal must not restore native mode a second time. */
     host_console_backend *disposed=calloc(1,sizeof(*disposed));
     disposed->input=disposed->output=INVALID_HANDLE_VALUE;
-    InitializeCriticalSection(&disposed->output_lock);
-    InitializeCriticalSection(&disposed->transaction_lock);
+    assert(base_sync_mutex_create(&disposed->output_lock)==LIB_STATUS_OK);
+    assert(base_sync_mutex_create(&disposed->transaction_lock)==LIB_STATUS_OK);
     assert(host_console_backend_deactivate(disposed,NULL)==LIB_STATUS_OK);
     unsigned restored=mode_sets;
     host_console_backend_destroy(disposed);

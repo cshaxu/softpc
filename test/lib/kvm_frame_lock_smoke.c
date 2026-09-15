@@ -31,14 +31,18 @@ static DWORD WINAPI compete(void *unused)
     else if (operation == 1) {
         assert(kvm_component_mailboxes_capture_frame(&mailbox, &generation, &copy));
         assert(copy.text_columns == 80 && generation == 1);
-    } else
+    } else if (operation == 2)
         assert(kvm_component_mailboxes_enqueue_control(&mailbox, &stop) == LIB_STATUS_OK);
+    else {
+        kvm_component_control control;
+        assert(!kvm_component_mailboxes_take_control(&mailbox, &control));
+    }
     return 0;
 }
 
 int main(void)
 {
-    for (operation = 0; operation < 3; ++operation) {
+    for (operation = 0; operation < 4; ++operation) {
         HANDLE thread;
         kvm_component_control taken;
         const kvm_component_control title = { .kind = KVM_COMPONENT_CONTROL_SET_WINDOW_TITLE };
@@ -46,15 +50,21 @@ int main(void)
         assert(kvm_component_mailboxes_publish_frame(&mailbox, &frame) == LIB_STATUS_OK);
         contended = CreateEventA(NULL, TRUE, FALSE, NULL);
         assert(contended);
-        base_sync_mutex_lock(mailbox.frame_lock);
+        base_sync_mutex *held = operation == 3 ? mailbox.control_lock : mailbox.frame_lock;
+        base_sync_mutex_lock(held);
         thread = CreateThread(NULL, 0, compete, NULL, 0, NULL);
         assert(thread && WaitForSingleObject(contended, 5000) == WAIT_OBJECT_0);
         assert(WaitForSingleObject(thread, 0) == WAIT_TIMEOUT);
         /* Even STOP's pending frame-lock acquisition must not hold control. */
-        assert(kvm_component_mailboxes_enqueue_control(&mailbox, &title) == LIB_STATUS_OK);
-        assert(kvm_component_mailboxes_take_control(&mailbox, &taken));
-        assert(taken.kind == KVM_COMPONENT_CONTROL_SET_WINDOW_TITLE);
-        base_sync_mutex_unlock(mailbox.frame_lock);
+        if (operation == 3) {
+            lib_u32 generation;
+            assert(kvm_component_mailboxes_capture_frame(&mailbox, &generation, &copy));
+        } else {
+            assert(kvm_component_mailboxes_enqueue_control(&mailbox, &title) == LIB_STATUS_OK);
+            assert(kvm_component_mailboxes_take_control(&mailbox, &taken));
+            assert(taken.kind == KVM_COMPONENT_CONTROL_SET_WINDOW_TITLE);
+        }
+        base_sync_mutex_unlock(held);
         assert(WaitForSingleObject(thread, 5000) == WAIT_OBJECT_0);
         if (operation == 2) {
             assert(kvm_component_mailboxes_take_control(&mailbox, &taken));

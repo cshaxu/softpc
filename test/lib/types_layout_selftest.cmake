@@ -39,13 +39,26 @@ foreach(retired IN ITEMS host_sync_mutex host_clock_milliseconds console_mutex)
 endforeach()
 file(REMOVE "${fixture}/console/edge.h")
 
+foreach(owner IN ITEMS host console kvm-base)
+    file(MAKE_DIRECTORY "${fixture}/${owner}/win32")
+    file(WRITE "${fixture}/${owner}/win32/lock_probe.c"
+        "lib_win32_critical_section gate;\n")
+    check_layout(fail)
+    file(REMOVE "${fixture}/${owner}/win32/lock_probe.c")
+endforeach()
+foreach(path IN ITEMS console/lock_probe.c kvm-base/mailbox_probe.c)
+    file(WRITE "${fixture}/${path}" "lib_atomic_flag gate;\n")
+    check_layout(fail)
+    file(REMOVE "${fixture}/${path}")
+endforeach()
+
 # Exact component DAG: exhaust all 64 possible direct edges, not only a few
 # forbidden filename patterns. Each fixture is removed before the next check.
 set(components types base console host storage kvm-base kvm-window kvm-console)
 set(allowed_types "")
 set(allowed_base types)
 set(allowed_console types base)
-set(allowed_host types console)
+set(allowed_host types base console)
 set(allowed_storage types)
 set(allowed_kvm-base types base)
 set(allowed_kvm-window types kvm-base)

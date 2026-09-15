@@ -48,7 +48,7 @@ component on the left:
 
 ```text
 types -> base + console + host + storage + kvm-base + kvm-window + kvm-console
-base -> console + kvm-base
+base -> console + host + kvm-base
 console -> host + kvm-console
 kvm-base -> kvm-window + kvm-console
 ```

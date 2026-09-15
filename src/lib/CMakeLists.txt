@@ -87,7 +87,7 @@ else()
     target_sources(host PRIVATE host/linux/console.c)
 endif()
 library_root(host)
-target_link_libraries(host PUBLIC types console)
+target_link_libraries(host PUBLIC types base console)
 
 set(LIBRARY_STORAGE_SOURCES storage/file.c storage/medium.c)
 if(WIN32)

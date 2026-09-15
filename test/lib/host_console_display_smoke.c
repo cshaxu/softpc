@@ -3,6 +3,21 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
+#include "lib/base/sync_interface.h"
+
+static unsigned mutex_creates, fail_mutex, live_mutexes;
+static lib_status create_mutex(base_sync_mutex **out)
+{
+    if (++mutex_creates == fail_mutex) { *out = NULL; return LIB_STATUS_NO_MEMORY; }
+    lib_status status = base_sync_mutex_create(out);
+    if (status == LIB_STATUS_OK) ++live_mutexes;
+    return status;
+}
+static void destroy_mutex(base_sync_mutex *mutex)
+{
+    if (mutex != NULL) { assert(live_mutexes); --live_mutexes; }
+    base_sync_mutex_destroy(mutex);
+}
 
 /* Native display I/O, deterministic reader/startup failures. The test owns a
  * hidden Console; it never changes the developer's Console or its input. */
@@ -57,7 +72,11 @@ static HWND WINAPI no_foreground(void) { return NULL; }
 #define lib_win32_set_console_screen_buffer_info_ex restore_display
 #undef lib_win32_set_console_window_info
 #define lib_win32_set_console_window_info set_viewport
+#define base_sync_mutex_create create_mutex
+#define base_sync_mutex_destroy destroy_mutex
 #include "lib/host/win32/console.c"
+#undef base_sync_mutex_create
+#undef base_sync_mutex_destroy
 #include "lib/host/console.c"
 
 typedef struct display_snapshot {
@@ -189,6 +208,17 @@ int main(void)
     (void)FreeConsole(); /* An attached pseudoconsole need not have an HWND. */
     assert(AllocConsole());
     ShowWindow(GetConsoleWindow(), SW_HIDE);
+    for (fail_mutex = 1; fail_mutex <= 2; ++fail_mutex) {
+        host_console_backend *failed = NULL;
+        DWORD handles_before, handles_after;
+        mutex_creates = 0;
+        assert(GetProcessHandleCount(GetCurrentProcess(), &handles_before));
+        assert(host_console_backend_create(&failed) == LIB_STATUS_NO_MEMORY);
+        assert(failed == NULL && live_mutexes == 0);
+        assert(GetProcessHandleCount(GetCurrentProcess(), &handles_after));
+        assert(handles_before == handles_after);
+    }
+    fail_mutex = 0;
     assert(lib_console_create(&cooked) == 0);
     assert(lib_console_create(&raw) == 0);
     assert(lib_console_create(&other) == 0);

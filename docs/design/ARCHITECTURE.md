@@ -177,7 +177,7 @@ The library's only direct component edges are:
 
 ```text
 types    -> base + console + host + storage + kvm-base + kvm-window + kvm-console
-base     -> console + kvm-base
+base     -> console + host + kvm-base
 console  -> host + kvm-console
 kvm-base  -> kvm-window + kvm-console
 ```
@@ -296,9 +296,10 @@ atomically without bypassing FIFO control consumption up to STOP. Frame and
 control have independent locks; only terminal admission takes both, frame first.
 Ordinary control does not wait for frame copying.
 
-Logical Console event/output gates and KVM frame copies use Base blocking mutexes.
-Broker transactions retain backend-owned blocking locks, preserving lock order and callback
-barriers. No callback may synchronously reenter binding/destruction. Storage
+Logical Console metadata/event/output gates, KVM frame/control and Host
+output/transaction locks use Base blocking mutexes. Each consumer owns its lock
+instances, scope and order; Base owns the primitive implementation, not handoff
+policy. No callback may synchronously reenter binding/destruction. Storage
 owns each CRT stream directly; writer embeds file state instead of separately
 allocated pointer wrappers.
 

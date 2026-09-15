@@ -1,10 +1,10 @@
 #include "lib/kvm-base/mailbox_interface.h"
 #include <assert.h>
 
-static lib_bool reject_mutex;
+static unsigned mutex_creates, reject_mutex;
 static lib_status create_mutex(base_sync_mutex **out)
 {
-    if (reject_mutex) { *out = NULL; return LIB_STATUS_NO_MEMORY; }
+    if (++mutex_creates == reject_mutex) { *out = NULL; return LIB_STATUS_NO_MEMORY; }
     return base_sync_mutex_create(out);
 }
 /* Count actual wake requests at the platform boundary, including failures. */
@@ -30,11 +30,14 @@ static lib_status notify(void *context)
 int main(void)
 {
     static kvm_component_mailboxes mailbox;
-    reject_mutex = LIB_TRUE;
-    assert(kvm_component_mailboxes_create(&mailbox) == LIB_STATUS_NO_MEMORY);
-    assert(mailbox.frame_lock == NULL && mailbox.wake == NULL && creates == 0);
-    kvm_component_mailboxes_destroy(&mailbox);
-    reject_mutex = LIB_FALSE;
+    for (reject_mutex = 1; reject_mutex <= 2; ++reject_mutex) {
+        mutex_creates = 0;
+        assert(kvm_component_mailboxes_create(&mailbox) == LIB_STATUS_NO_MEMORY);
+        assert(mailbox.frame_lock == NULL && mailbox.control_lock == NULL);
+        assert(mailbox.wake == NULL && creates == 0);
+        kvm_component_mailboxes_destroy(&mailbox);
+    }
+    reject_mutex = 0;
     assert(kvm_component_mailboxes_create(&mailbox) == LIB_STATUS_OK);
     assert(creates == 0u && mailbox.notify == NULL && mailbox.wake == NULL);
     assert(kvm_component_mailboxes_notify(&mailbox) == LIB_STATUS_INVALID_STATE);

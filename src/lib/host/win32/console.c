@@ -6,6 +6,7 @@
 #include "lib/types/win32/window.h"
 #include "lib/console/binding_interface.h"
 #include "lib/host/console_backend.h"
+#include "lib/base/sync_interface.h"
 
 #include "lib/types/win32/console.h"
 
@@ -28,8 +29,8 @@ struct host_console_backend {
      * it without confusing an in-flight line with a thread that is merely
      * returning from its callback. */
     volatile lib_win32_long cooked_line_pending;
-    lib_win32_critical_section output_lock;
-    lib_win32_critical_section transaction_lock;
+    base_sync_mutex *output_lock;
+    base_sync_mutex *transaction_lock;
     lib_win32_dword original_mode;
     lib_console *console;
     host_console_mode mode;
@@ -210,11 +211,15 @@ static lib_win32_dword LIB_WIN32_WINAPI host_console_reader(void *context)
 lib_status host_console_backend_create(host_console_backend **out_backend)
 {
     host_console_backend *backend;
+    lib_status status;
     lib_win32_dword mode;
     if (out_backend == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_backend = LIB_NULL;
     backend = lib_allocate_zero(1u, sizeof(*backend));
     if (backend == LIB_NULL) return LIB_STATUS_NO_MEMORY;
+    status = base_sync_mutex_create(&backend->output_lock);
+    if (status == LIB_STATUS_OK) status = base_sync_mutex_create(&backend->transaction_lock);
+    if (status != LIB_STATUS_OK) goto release;
     backend->input = lib_win32_create_file_a("CONIN$", LIB_WIN32_GENERIC_READ | LIB_WIN32_GENERIC_WRITE,
         LIB_WIN32_FILE_SHARE_READ | LIB_WIN32_FILE_SHARE_WRITE, LIB_NULL, LIB_WIN32_OPEN_EXISTING, 0, LIB_NULL);
     backend->output = lib_win32_create_file_a("CONOUT$", LIB_WIN32_GENERIC_READ | LIB_WIN32_GENERIC_WRITE,
@@ -224,16 +229,19 @@ lib_status host_console_backend_create(host_console_backend **out_backend)
         !lib_win32_get_console_mode(backend->input, &mode)) {
         if (backend->input != LIB_WIN32_INVALID_HANDLE_VALUE) lib_win32_close_handle(backend->input);
         if (backend->output != LIB_WIN32_INVALID_HANDLE_VALUE) lib_win32_close_handle(backend->output);
-        lib_release(backend);
-        return LIB_STATUS_UNSUPPORTED;
+        status = LIB_STATUS_UNSUPPORTED;
+        goto release;
     }
     backend->original_mode = mode;
     backend->cooked_output = backend->output;
     backend->output_ready = LIB_TRUE;
-    lib_win32_initialize_critical_section(&backend->output_lock);
-    lib_win32_initialize_critical_section(&backend->transaction_lock);
     *out_backend = backend;
     return LIB_STATUS_OK;
+release:
+    base_sync_mutex_destroy(backend->transaction_lock);
+    base_sync_mutex_destroy(backend->output_lock);
+    lib_release(backend);
+    return status;
 }
 
 static lib_status host_console_select_output(host_console_backend *backend,
@@ -288,8 +296,8 @@ lib_status host_console_backend_destroy(host_console_backend *backend)
         if (!lib_win32_close_handle(backend->output)) return LIB_STATUS_IO_ERROR;
         backend->output = LIB_WIN32_INVALID_HANDLE_VALUE;
     }
-    lib_win32_delete_critical_section(&backend->output_lock);
-    lib_win32_delete_critical_section(&backend->transaction_lock);
+    base_sync_mutex_destroy(backend->output_lock);
+    base_sync_mutex_destroy(backend->transaction_lock);
     lib_release(backend);
     return LIB_STATUS_OK;
 }
@@ -532,12 +540,12 @@ lib_status host_console_backend_deactivate(host_console_backend *backend,
 
 void host_console_backend_lock_output(host_console_backend *backend)
 {
-    if (backend != LIB_NULL) lib_win32_enter_critical_section(&backend->output_lock);
+    if (backend != LIB_NULL) base_sync_mutex_lock(backend->output_lock);
 }
 
 void host_console_backend_unlock_output(host_console_backend *backend)
 {
-    if (backend != LIB_NULL) lib_win32_leave_critical_section(&backend->output_lock);
+    if (backend != LIB_NULL) base_sync_mutex_unlock(backend->output_lock);
 }
 
 lib_status host_console_backend_write_bound(host_console_backend *backend,
@@ -667,6 +675,6 @@ lib_status host_console_backend_write_text_frame_bound(host_console_backend *bac
 }
 
 void host_console_backend_lock_transaction(host_console_backend *backend)
-{ lib_win32_enter_critical_section(&backend->transaction_lock); }
+{ base_sync_mutex_lock(backend->transaction_lock); }
 void host_console_backend_unlock_transaction(host_console_backend *backend)
-{ lib_win32_leave_critical_section(&backend->transaction_lock); }
+{ base_sync_mutex_unlock(backend->transaction_lock); }

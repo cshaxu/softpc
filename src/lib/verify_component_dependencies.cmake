@@ -3,7 +3,7 @@ set(library_components types base console host storage kvm-base kvm-window kvm-c
 set(library_dependencies_types "")
 set(library_dependencies_base types)
 set(library_dependencies_console types base)
-set(library_dependencies_host types console)
+set(library_dependencies_host types base console)
 set(library_dependencies_storage types)
 set(library_dependencies_kvm-base types base)
 set(library_dependencies_kvm-window types kvm-base)

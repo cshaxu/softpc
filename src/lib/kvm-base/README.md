@@ -10,11 +10,11 @@ STOP has a reserved slot, closes admission and is idempotent. The worker consume
 controls in order through STOP, then ignores later control/frame work. There is
 no batch admission; frame publication remains independently locked, latest-wins.
 
-Frame copying uses a Base blocking mutex, not a spinlock. The independent
-control lock only protects the short FIFO operation. STOP/fault acquires frame
+Frame and control each use an independent Base blocking mutex.
+The control lock only protects the short FIFO operation. STOP/fault acquires frame
 then control; ordinary control remains independent of a contended frame copy.
-Initialization allocates the mutex and returns failure if it cannot be created;
-disposal releases it after all mailbox users have quiesced.
+Initialization creates both mutexes or releases the partial allocation and fails;
+disposal releases them after all mailbox users have quiesced.
 
 Each mailbox selects one notification implementation exactly once before caller publication.
 Initialization allocates no wake. Console selects and creates the default wait

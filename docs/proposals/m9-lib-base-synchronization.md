@@ -1,126 +1,108 @@
-# Shared Base synchronization
+# Shared Base synchronization continuation
 
-## Admission
+## S14-S16 continuation plan
 
-T59 S13, baseline 780c292, clean main. Owner: "批准这项实现 要求精简代码逻辑架构 完成后编译测试提交推送后等我审计 希望代码减少".
-Approved design: extract generic sync/time from Host into Base; Host retains
-native Console ownership. Types stays header-only. Reuse Base locks, remove
-duplicate implementations and forwarding aliases; preserve product behavior.
-Apply architecture/coding/execution/documentation governance. S12 is delivered,
-not claimed manually accepted. T59 stays open.
+Owner request: "写入proposal后 准入s14 s14完成后编译测试提交推送后等我".
+S14 is admitted from dc5811f; S15/S16 are planned only. S13 is delivered,
+not retrospectively claimed manually accepted. T59 remains open.
 
-## Finite convergence ledger
-
-| Member | Implementation boundary | Required evidence |
+| Step | Scope | Exit proof |
 | --- | --- | --- |
-| Base | Move Host sync/clock and platform implementations; rename public symbols/callers | No old sync/clock declarations or forwarding layer; existing ownership/wait tests |
-| Console | Use Base mutex for event/output gates; delete private mutex implementation | Existing callback/output contention barriers and create-failure cleanup |
-| KVM frame | Base blocking mutex; independent short control lock unchanged | Deterministic frame contention, ordinary control progress, STOP closure, create failure |
-| Dependency graph | Base depends only Types; Console/KVM-base depend Base; Host retains Console | Source/build DAG positive and negative gates; Common linkage updated |
-| Delivery | Documentation, four corpus manifests, fixed x86/x64 packages | Full dual-width suite, line accounting, executor and coordinator commits pushed |
+| S14 | Host output/transaction locks, Console metadata lock and KVM control lock use existing Base mutex; remove local spin helpers | Failure cleanup, deterministic contention, independent frame/control, broker replacement/output barriers, full dual-width suite |
+| S15 | Existing Base Event exposes automatic/manual reset and checked signal/reset; KVM reuses it, deletes duplicate platform wake implementation | Reset modes, timeout/failure/no-lost-wake, one notifier per mailbox; native Window messages unchanged |
+| S16 | Resolve Base task bounded completion/join/disposal and cancellation needs, then reuse for KVM workers | Startup failure/early exit, bounded join, FIFO STOP and no live worker after successful disposal; no pointer-only wrapper |
 
-No MVDM, configuration, guest media, input, renderer, lifecycle or focus changes.
-No new synchronization algorithm, thread, recovery loop or compatibility shell.
-Host's native takeover/output locks remain backend-owned: they protect native
-state and are not another allocated generic mutex implementation. KVM wake is
-auto-reset and fallible, unlike the existing manual-reset Base event API; leave
-that distinct contract intact. Console metadata and ordinary control locks stay
-short spinlocks. Terminal admission still takes frame then control.
+Each step delivers both fixed EXEs, tests, manifests, source/test line accounting,
+executor commit/push and actual-patch coordinator review/push. Stop after S14
+for owner testing; later steps require admission. Types stays header-only.
+Host reader's native I/O cancellation and Window message loop remain with
+their owners; neither is forced into a generic thread/cancellation framework.
 
-Move files with git mv. Adapt direct consumers, build edges and tests in the
-same delivery. All existing Linux sync/time implementations move with Windows;
-no new Linux presenter requirement. Stop if preserving behavior needs a new
-public synchronization semantic or product policy. Record bounded similar-issue
-sweep, actual production/test line deltas and test limitations before completion.
-Executor P1 then separate actual-patch coordinator review P2; await owner audit.
+### S14 finite ledger and implementation boundary
 
-## Executor evidence
+The complete bounded universe is the four consumer lock roles below. Each
+must preserve its protected data, acquisition/release sites and ordering;
+only the primitive implementation changes. No new Base API or lock wrapper.
 
-All five ledger members are implemented and verified. Ten Base C/H files compare
-exactly with 780c292 Host files after only path/prefix substitution. The five
-Common/Compat production consumers similarly compare as mechanical substitutions;
-no application, VM, MVDM, INI or media diff exists. Host Console implementation,
-KVM native workers and Types declarations are unchanged.
+| Member | Change | Evidence |
+| --- | --- | --- |
+| Host output + transaction | Existing backend fields become Base mutex pointers; checked creation and cleanup | Both creation failures release resources; existing replacement/rollback/output serialization tests |
+| Console metadata | Existing field becomes Base mutex; delete spin helper pair | All three mutex creation failures; metadata and sink barriers |
+| KVM control | Separate Base mutex, retain frame-before-control terminal order | Either allocation failure clean; contention blocks; ordinary control progresses during frame copy |
+| Boundary/delivery | Host direct Base dependency; gates reject consumer primitive reimplementation | DAG exhaustive tests, primitive scan, manifests, strict x86/x64 builds/full tests |
 
-Console uses the existing Base opaque mutex directly; its three private mutex
-files are deleted, including both platform implementations. Its two gates retain
-the same ownership, acquisition order, callback barrier and failure cleanup.
-KVM creates one frame mutex, returns its creation failure and destroys it after
-quiescence; no new thread or state machine. Publish/capture/ack use that mutex.
-Terminal closure still locks frame then control, ordinary FIFO only control.
-Frame/latest-wins/dirty and input/STOP behavior are unchanged.
+Single atomic process claim and atomic reference/status values are not busy-wait
+locks and remain Types operations. Base's own platform mutex/condition is the
+primitive implementation. KVM's existing wake condition belongs to planned S15;
+native thread/wait paths are reviewed in S16, not changed in S14. No App, Common,
+Compat, VM, MVDM, INI/media or product behavior changes are admitted here.
 
-The new kvm_frame_lock test hooks the real Win32 mutex boundary. Native
-TryEnter failure proves actual contention before asserting the publisher,
-reader or STOP thread remains blocked; control enqueue/take succeeds while the
-frame lock is held. Unlock completes the contender. No Sleep or performance
-threshold. Existing input_admission retains concurrent publish/STOP proof.
-mailbox_selection now rejects mutex creation and disposes the failed mailbox;
-console_blocking_gate rejects either gate creation and retains output/event
-detach barriers. Both widths pass the eight focused cases, including Base task
-ownership, Common synchronization and Linux wait fakes.
+The S13 exclusions in the linked history describe that delivery, not S14's scope.
 
-Source/build dependency self-test exhausts all 64 edges among eight components;
-Base may only use Types, Console/KVM-base may use Base. Negative probes reject
-retired sync/clock aliases. Common machine/session now link Base instead of Host;
-Common UI retains Host. Host receives Base transitively through Console, without
-inventing an unused direct edge. Storage has no new dependency. Threads linkage
-belongs to Base and the distinct Linux KVM wake implementation.
+S13 extraction evidence is retained in
+[history](../history/M9-T59-S13-base-synchronization.md).
 
-Similar-issue sweep: rg over src/test/tools for old host sync/clock and Console
-mutex names finds only deliberate rejection fixtures/gates, not production
-aliases. The mutex/critical-section/pthread scan identifies Base implementation,
-Console gates, KVM frame, Host native transaction/output and Linux wake condition.
-The last two retain their distinct native state/condition responsibility as
-admitted above; no duplicate allocated generic mutex remains. Types is still
-header-only. Corrected the library README's stale multi-record admission text
-while updating the mailbox contract; no code changes to control semantics.
+## S14 executor evidence
 
-Both existing build presets pass with LIBRARY_STRICT_WARNINGS=ON
-(-Wall -Wextra -Wpedantic -Werror on Lib). Full x64: 92/92, 79.99 s;
-x86: 92/92, 64.78 s. Four manifests, dependency/layout gates, documentation
-governance and diff whitespace checks pass. Linux proof is existing fake wait
-coverage and mechanical-source comparison, not a claimed native Linux run.
-Existing build trees are reused for audit; no new diagnostic/media directory.
+All four ledger members are implemented. The production C/H patch is limited
+to console/console.c, host/win32/console.c, kvm-base/mailbox.c and
+kvm-base/mailbox_interface.h. Existing lock scopes and acquisition order are
+unchanged. No Base API or implementation changes, no forwarding aliases and
+no additional state machine. Host creates both mutexes before opening native
+Console handles; allocation failure frees the partial pair without takeover.
+An existing native-open failure also releases the pair. Console releases any
+partial three-mutex allocation; mailbox creation either owns both independent
+mutexes or leaves an empty destroyable object.
 
-Against 780c292, git diff --numstat filtered to tracked src C/H reports
-+531/-592, net -61; test C/H including the new 70-line contention test reports
-+188/-89, net +99. Excludes docs, manifests, CMake and EXEs. The reduction deletes
-one implementation, not compact formatting; tests intentionally grow. All four
-shared manifests use shared-t59-s13-p1.
+Focused real-mutex probes use TryEnterCriticalSection failure to prove actual
+contention before asserting a contender remains blocked. They cover Console
+metadata, event/output barriers, both Host locks, KVM frame publication/capture,
+STOP and control consumption. Frame/control progress is checked in both
+directions: a held frame lock does not stop ordinary control, and a held control
+lock does not stop frame capture. No Sleep or CPU/timing threshold is a proof.
+Console creation rejects each of three allocations with zero tracked live
+mutexes; Host rejects each allocation with zero live mutexes and unchanged
+process handle count; mailbox rejects either allocation and safely disposes.
+Existing broker prepare/commit rollback, output serialization, event generation,
+retirement and input-admission tests remain in the full regression.
 
-Fixed artifacts:
+Similar-issue sweep: rg over all src/lib C/H for critical_section,
+pthread_mutex, atomic_flag and lock loops. Base owns the Win32 mutex and Linux
+mutex/wait implementation. Host process claim remains one atomic operation, not
+a spin loop. The only remaining independent pthread mutex is the KVM Linux
+wake condition explicitly assigned to planned S15; native thread/wait paths
+remain assigned to S16 or Host-specific I/O cancellation. No consumer mutex
+implementation remains in S14's finite universe. The source gate rejects
+non-Base Win32 mutex implementations and Console/mailbox atomic-lock regressions;
+five negative probes plus the exhaustive 64-edge source/build DAG pass.
 
-- softpc32.exe: 3,487,113 bytes, SHA256
-  81B55040BDA76C9867DF5984E2D7FA6A509583BB4D18242FA35C5C85466421BD.
-- softpc64.exe: 2,845,739 bytes, SHA256
-  DD76638CF3442D151CA128178D1B09FC9652DA89801CFA9FC3C2A7F3859F07E8.
+Count method: git diff dc5811f --numstat restricted to tracked src/test C/H.
+Production four paths: +52/-59, net -7. Test five paths: +113/-22, net +91.
+Documentation, CMake/gates, manifests and binaries are excluded from those counts.
+Tests add deterministic proof, not production abstractions. S13 history moved
+unchanged; the replacement proposal contains only this continuation plan/evidence.
+Only src/lib and test/lib manifests advance to shared-t59-s14-p1; unchanged
+Common source/test manifests still verify. No other production corpus changes.
 
-Ready for executor P1 commit/push, then independent actual-patch review P2.
-Await owner testing/audit; neither S13 manual acceptance nor T59 closure claimed.
+Strict GNU builds completed for x64 and x86 using existing build trees.
+Full x64: 92/92 in 77.48 s. First x86 full run: 91/92 in 64.93 s;
+the native modal fixture observed an early OS loop exit at line 75, before
+freeze/STOP. No production/test change was made to suppress it. The exact
+unchanged executable then passed ten consecutive isolated modal runs (26.98 s).
+The cause is not established; fixture-isolation follow-up is recorded in TODO.
+Second complete x86 run: 92/92 in 48.34 s. The isolated runs are not substituted
+for that full-suite proof, and the transient is not claimed fixed.
+Four manifest and documentation gates pass. Native Linux execution is not
+claimed; existing Linux fake wait coverage remains in the suite.
+Build trees are retained for reproducible testing; no new media/trace directory.
 
-## Push blocker
+Fixed tested package hashes:
 
-Executor P1 is committed as 3f493f2. The initial combined commit/push permission
-review timed out without execution; its permitted local-commit retry succeeded.
-The separate git push origin main was rejected: the platform requires explicit
-owner authorization of this source/document/binary transfer to
-https://github.com/cshaxu/softpc.git main. No workaround or further push retry.
-Local delivery is intact; post-push coordinator review remains pending and no
-closure is claimed. Request that exact authorization before continuing.
+- softpc32.exe: 3,487,113 bytes,
+  E26F26C3CB58F69955096E0CFE81D6D3EE797F17630240D7831FF0EB33F3C0DE.
+- softpc64.exe: 2,846,251 bytes,
+  BCF71B4013B4F4BDEC70A55D9C213E97587D19EF3BA1A7DCBEDE95205F82D31C.
 
-## P3 coordinator review and delivery
-
-Owner explicitly granted standing push authorization for the previously named
-origin/main destination. P1 and the P2 blocker record were pushed successfully;
-the blocker is resolved. Switched to coordinator review of committed 3f493f2.
-Rechecked all ten moved files against the original after mechanical substitution,
-Console gate replacement/failed creation cleanup, all frame mutex sites, independent
-control locking and STOP order, and the real-contention/failure regression tests.
-No MVDM, App, VM or user INI changes. No additional defect found in this bounded
-patch. The eight-component DAG matches build linkage without an inverse dependency.
-
-Four manifests verify again and both artifact hashes match the recorded tested
-builds. The prior 92/92 results at each width remain applicable: this review changes
-only documentation. Push P3 and leave a clean tree for owner audit/testing.
-S13 is delivered, not manually accepted; T59 stays open.
+Full verification is complete; push executor P1 then review the actual committed patch
+as coordinator and push P2. Await owner testing; S15/S16 and T closure remain
+unadmitted.
