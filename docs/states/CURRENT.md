@@ -2,10 +2,10 @@
 
 ## Current Work
 
-M9 T59 S21 implemented and verified: Common Debug linear-command repairs;
-dual-width builds and final 97/97 suites pass. Initial compact-Console test
-failure is recorded separately in TODO. P1 is ready for actual-commit review;
-T59 remains open for owner testing.
+M9 T59 S21 delivered and reviewed: Common Debug linear-command repairs;
+P1 bb14a4f pushed, dual-width builds and final 97/97 suites pass. Actual-commit
+review and focused reruns pass. Initial compact-Console test failure remains
+recorded separately in TODO. T59 remains open for owner testing.
 
 ## M9 T59 S21 Packet
 

@@ -102,3 +102,21 @@ VM/Compat/MVDM and user configuration/media remain unchanged. Existing build
 trees and test logs remain; generated types-layout fixtures are removed.
 All six ledger members are verified or explicitly retained as designed.
 Executor P1 delivery is ready for separate actual-commit coordinator review.
+
+## Coordinator review
+
+Reviewed pushed P1 bb14a4f against the original request, baseline 2ec18a1,
+finite ledger and original 16-bit comparison. Actual production diff is confined
+to extended command functions and one local range check. Directional XM copy
+preserves overlap without extra storage; XS subtraction is guarded against a
+short range; XU's terminal instruction is delivered without wrapping. Decoder
+padding cannot be accepted as real memory. XA/XC/XD/XE/XF use the same address
+bound rule while preserving original byte-validation ordering and UI shape.
+No 16-bit implementation, public header, parser, Lib or machine adapter changed.
+
+Committed debug_linear, debug_output and threaded common_machine fixtures pass
+again on both widths (3/3 each); manifests reverify. Full-suite evidence is
+97/97 on both final runs, with the first compact-Console failure explicitly
+retained, not hidden by reruns. Source accounting remains +41/-18 production,
++121 test and +1 CMake. S20 archive is unchanged. P1 left a clean worktree;
+P2 changes review/status only. S21 is delivered for owner testing; T59 stays open.
