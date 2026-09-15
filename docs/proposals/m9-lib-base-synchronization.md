@@ -103,6 +103,24 @@ Fixed tested package hashes:
 - softpc64.exe: 2,846,251 bytes,
   BCF71B4013B4F4BDEC70A55D9C213E97587D19EF3BA1A7DCBEDE95205F82D31C.
 
-Full verification is complete; push executor P1 then review the actual committed patch
-as coordinator and push P2. Await owner testing; S15/S16 and T closure remain
+Executor P1 62c5421 is pushed to the owner's authorized origin/main.
+
+## S14 coordinator review
+
+After executor push, reviewed the actual committed production/test/build patch
+against the original request and four-member ledger. All old acquisition and
+release sites are retained with Base calls; independent mailbox locks and the
+frame-before-control terminal order are unchanged. Console event gate still
+holds through callback/detach; metadata gate is released before callback.
+Host transaction/output policy remains in Host, not Base. Allocation failure
+does not publish a partial object or begin native takeover. No new Base API,
+primitive implementation, worker, callback or forwarding layer was introduced.
+
+Checked real contention and failure-injection tests, all source/build DAG
+changes and primitive negative probes, plus the explicit native-modal failure
+record rather than treating rerun success as a fix. Four manifests reverified;
+the binaries are the tested builds. No further in-scope defect found.
+Production/test C/H accounting remains net -7/+91 respectively.
+This P2 is documentation-only; previous build/test evidence remains applicable.
+Push P2 and leave a clean tree. Await owner testing; S15/S16 and T closure remain
 unadmitted.

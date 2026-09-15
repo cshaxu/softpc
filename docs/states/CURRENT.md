@@ -5,7 +5,8 @@
 M9 T59 S14 implemented and verified: consumer mutexes use Base, production
 C/H net -7. Strict dual-width builds pass; x64 92/92, x86 rerun 92/92.
 An initial x86 native-modal early exit is recorded in TODO, not claimed fixed.
-Ready for executor P1 push and coordinator review. S13 dc5811f is retained.
+Executor P1 62c5421 is pushed; actual-commit coordinator review passed.
+S13 dc5811f is retained. Work is delivered for owner testing, not T closure.
 S15/S16 are planned, not admitted; await owner testing after S14 delivery.
 T59 remains open.
 
