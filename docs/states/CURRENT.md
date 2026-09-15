@@ -2,8 +2,8 @@
 
 ## Current Work
 
-M9 T59 S6 is verified: shared monitor-line admission and raw viewport correctness;
-implementation delivery and coordinator review precede owner manual testing.
+M9 T59 S6 is verified and reviewed: implementation 3503aa9 is pushed;
+awaiting owner manual testing. T59 remains open.
 
 ## M9 T59 S6 Packet
 
@@ -13,7 +13,7 @@ implementation delivery and coordinator review precede owner manual testing.
 | Admission And Approval | Owner admits a new S repairing Common/Lib, simplifying external consumers where justified, then dual-width build/test/commit/push for manual acceptance. |
 | Objective | Separate product notification handling from one outstanding cooked line; ensure raw frame viewport capacity without shrinking existing dimensions. |
 | Non-goals | No MVDM changes, new input loop, focus repair, automatic Window fallback or edits to user configuration/media. |
-| Reference Baseline | d6bbbcc; S2–S5 reviewed and pushed, both 87/87. |
+| Reference Baseline | d6bbbcc before S6; implementation 3503aa9 reviewed and pushed, both 89/89. |
 | Candidate Proposal | [S6 design and ledger](../proposals/m9-monitor-line-viewport.md). |
 | Files And ABI Surface | Common session/UI, Lib Host Win32 display, shared tests/manifests and narrow App provider simplification if required. |
 | Applicable Rules | Architecture/coding/execution/documentation governance skills, repository rules and Product UI. |
