@@ -1,7 +1,8 @@
 # MVDM / OpenNT 当前差异账本
 
-当前结论见文末 **S6 最终复核**。S1 数字和待处理标记是冻结基线；
-S2–S6 的处置记录覆盖其历史状态，不把已完成的候选继续算作欠账。
+镜像数量结论见 **S6 最终复核**；后续边界/重复审计见文末 **S7**。
+S1 数字和待处理标记是冻结基线；S2–S6 的处置记录覆盖其历史状态，
+不把已完成的候选继续算作欠账。
 
 ## 冻结范围与复算
 
@@ -446,3 +447,158 @@ test-x86 **98/98，72.11s**。包含原有 IRQ、BOP、VGA、x87、重启、输�
 固定 EXE SHA256：
 - x86 `33F5E099C169A9509F7A6D3C938A500BCFA17ECDE7220815917F380EFCA23D81`
 - x64 `D05DFAC42A81D687CC3E979BF6C47222F3A65FF6C6F59FCC7D7D0C58FF91F862`
+
+## S7：剩余镜像与 VM/Compat 双向归属审计
+
+### 范围、证据和限制
+
+代码基线 `34f7182817d39a76adde7a963569caf0f8330122`，OpenNT revision
+仍为上述 `5e4619ab61c2aa76151e03973cce340be2933e61`。本阶段只修改文档。
+复跑 Audit-MirrorDiff：498 保留、403 字节相同、95 不同、无原路径者 0；
++23,141/-22,335，5,132 区块；34 个规则文件模式逆比较全部通过。
+95 文件沿用 S6 逐文件/hunk 原因，源码未变；本次额外核查这些差异与外部
+状态、重复声明和宿主支持的关系，不声称重新运行了全部设备语义测试。
+
+VM 9 文件/880 行，Compat 39 文件/7,326 行，共 48 文件/8,206 物理行。
+计数：git ls-files src/vm src/compat 后逐文件 ReadAllLines().Length，含空行。
+读取实现、声明、CMake 实际 source/include/defines，并对候选全树搜索生产、
+测试、构建引用；生成头用完整原始 diff 与宏规则核对，不凭首段推断全文件。
+未选入原始文件按名字/符号定位候选，检查其依赖和行为阻碍；这不是对原始
+650 文件每一个未使用功能的重新认证，也不是已经证明候选替换行为等价。
+
+### 结论 A：优先去掉重复和无消费者实现
+
+1. **两份大头文件重复，1,583 行不是全部必要适配。**
+   `compat/ccpu/legacy/gdpvar.h` 702 行，与已保留
+   `mvdm/softpc.new/base/cvidc/gdpvar.h` 698 行仅末尾 CurrentUniverse、
+   TraceVector/GDP_SIZE、GDP_PTR 等不同；前者不是 ccpu386/gdpvar.h 的同义副本。
+   `legacy/sas4gen.h` 881 行，与已保留 `base/cvidc/sas4gen.h` 837 行相比
+   增加 sas_touch、VirtualiseInstruction、IsPageInstanceData 类型/槽位/入口。
+   当前 CMake 先搜 legacy，cpu4gen/sas.h 的尖括号 include 因此选中副本。
+   建议以已有镜像为声明唯一来源，GDP 的少量覆盖收在已有 gdp_slots.h；
+   不新增 wrapper 层。SAS 的 struct 槽位不能靠事后宏补齐：要么确认无调用的
+   空槽可同步去掉，要么在镜像保留窄 ABI diff，删除整份副本。
+   后一方案会增加约 44 行镜像声明差异，必须单列取舍，不伪称所有指标都减少。
+   预计总体可少约 1,500 行重复文本，不是删除 GDP native-width 实现。
+   实施前需证明每个 translation unit 的 include 选择、SasVector 大小/槽位、
+   GDP 宏展开与选中行为；保留 sascdef 的 c_IOVirtualised 槽位对应关系。
+
+2. **已确认没有外部调用者的六个实现。**
+   `dib_surface.c:130` 的 resize 与 `:271` 的旧 palette setter，全树只有定义和
+   声明；生产是 bind + set_palette_entries。前者还复制了 bind 的几何/指针设置。
+   `keyboard.c:39` 的 keyboard_reset 只有定义，实际 reset 调原始 reset()。
+   memory.c:32–54 的三个 softpc_xms_* helper 仅相互调用，生产/测试没有入口，
+   也是未接线残留，不是当前使用中的 guest XMS 实现。
+   建议连声明一起删除，合计约 100 行量级；不删实际 bind、palette-only dirty 通知或
+   stale 8042 清理。需链接符号/全套测试复核，不能据名称把原始 reset 初始化也删掉。
+
+3. **测试维持的旧壳与无效字段。**
+   `compat/status.h` 18 行只由 presentation_shutdown_smoke 使用，测试并未调用
+   现有 Common 的真实终止边界；不应继续把它当产品退出路径的证明。
+   `softpc_presentation`/machine_options.presentation 没有生产读取者，显示政策
+   已在 App/Common；应删除并修正测试初始化。单字体 API 两层包装仅 VGA 测试
+   调用，生产使用双字体；测试转用双字体后可去掉约 20 多行包装。
+   `legacy/PigReg_c.h` 71 行只在 c_getset.c 的 PIG 条件下 include，当前构建没有
+   PIG；它与原始 host/inc/mips/prod/pigreg_c.h 仅 LDT_limit 宽度不同。
+   当前不应为这个未选中测试模式新增镜像文件；可移除不支持构建的残留头，
+   如未来恢复 PIG，再单独记录来源/ABI。不能宣称两份 PigReg 完全相同。
+
+4. **小范围本地重复，应就地合并而非增加公共工具层。**
+   machine.c 的 set_floppy 在初始化前/后重复提交路径及 options；保留条件 attach，
+   成功后共用一次路径提交。keyboard_scancode 查表后共用 keyboard_key 的 up/down。
+   HDD read/write 的参数、扇区长度和范围检查相同，可用本文件一个验证出口，
+   保留不同读/写操作。serial/parallel 的路径复制虽相似，资源状态/失败含义不同，
+   不值得为十余行再引入跨设备 helper。frame 两处 RGB 打包也不值得建立转换层。
+
+### 结论 B：双向职责归属
+
+| 方向 | 实际位置与判断 | 建议与保留边界 |
+| --- | --- | --- |
+| Compat → VM | machine.c/.h 是 499+139 行的独立机器 create/reset/run/destroy、配置持有与查询边界。生产入口来自 vm/driver.c/input.c；MVDM 不调用 softpc_machine_*。 | 现行架构允许它作为 Compat machine boundary，并非当前禁止依赖；若收紧为“Compat 只实现原始 host 合同”，应将这组内部 backend 编排移入 VM，不再保留转发副本。迁移本身不减行数；media 类型需要消除反向头依赖（可直接采用已使用的 Lib storage mode），host 回调/资源仍留 Compat。不得把原始 reset() 再实现一遍。 |
+| Compat → VM | memory.c:86 的 debug_memory 是 Common 32-byte debug 请求的预检事务，唯一生产调用者 vm/debug.c。 | 32-byte 上限/整体预检更偏 VM debug 适配；可随 backend 一起归 VM。SAS/ROM/A20/page translation 仍调用原核心，RAM 分配留 Compat；优先复用原始 sas_memory_size 查询，避免为迁移新建转发 API。搬迁需保护“不触发 #PF/CR2、不部分写入”契约。 |
+| VM → Compat | driver.c:202 根据半宽 dirty 矩形修改 graphics_visible_width，保留三个几何缓存字段；nt_graph.c:1593 又已按 V7 原始 mode table 修正宽度。 | 这是重叠的宽度推断，不是已证明无用。dirty 只表示更新区域，不应成为第二个模式定义。先覆盖 V7 60h–69h、标准 VGA、partial dirty 与切换；若宿主 DIB 已报告准确尺寸则删 VM 猜测。若仍有异常，把修正留在唯一 surface 生产者，不在两侧猜。 |
+| 镜像 → Compat | nt_sound.c:49 新增 GetTickCount()*10 的宿主时钟实现。 | 可移到现有 audio.c，原始 IMPORT GetPerfCounter 已存在；单独迁出约 4 行，不产生新 wrapper。原始 PPI/Timer2 状态机仍留镜像。尾部三个窄入口访问原始声音状态，不把整个状态机搬出再复制。 |
+| 镜像 → Compat | nt_graph 的 detached lifecycle guard、原始 c_main 的 clock/wake/debug/HLT 调用点。 | host 政策实现已主要在 Compat/VM；镜像调用点是必要接线。CPU 的三个 safe-point 不能因文本相似合成一个执行时机。可以考虑在 Compat 合并相同 clock/wake 消费体，但不能声称简单删 hook 即等价；收益小，非优先。 |
+| Compat → 镜像 | legacy gdpvar/sas4gen 的原始主体。 | 原始主体应复用已有镜像，新增指针表示仍在 Compat；见 A1。不是将全部 Compat 代码搬进镜像。 |
+| 不搬 | VM 的 Common register/event/frame 转换、debug plan、trace；Compat 的 media/DIB/audio/timer/host callbacks。 | 前者是外部协议适配，后者是宿主能力；不能只因原始代码也有寄存器/声音/读盘同名函数而互换。 |
+
+`video.c` 的字体读取虽是展示用途，读取的是原始 VGA planes、font bank 与
+attribute-select，保留为 Compat 的机器读取边界合理。真正的 KVM frame 格式组装
+已在 VM，未发现应整体下移到 Compat 的 Common 适配实现。
+`v7_pointer.c` 是原始 paint_v7ptr/clear_v7ptr 宿主出口的像素合成：原树 stubs.c
+仅把这两个函数指针指向 dummy，不能以原 stub 取代当前可见硬件指针。
+`conapi.h` + graphics_console_compat 是原 renderer 的替代宿主出口，不是用户
+cooked/raw Console owner；不得导入真实 NT Console API，绕开 Common UI/broker。
+
+### 结论 C：新镜像候选及不采用理由
+
+下面为原始文件物理行数；只读研究，不是导入批准或完整移植工作量估算。
+
+| 原始路径 | 行数 | 现有替代及评估 |
+| --- | ---: | --- |
+| host/src/nt_fdisk.c | 760 | 当前 hdd_media.c 152 行；原版 NT raw disk 打开/控制/配置不等于 Lib direct/readonly/overlay。整引入至少多约 608 行再加适配；不推荐。 |
+| host/src/nt_rflop.c | 2,036 | 当前 gfi_image.c 357 行；有 NT physical floppy handle、IOCTL、装盘检测。update_chrn 是明确同源算法（原 UTINY、当前 unsigned int，不宣称溢出语义完全等价）；仅复用该小段不值得引入约 1,679 行差额及 NT 依赖。FLA/GFI/DMA 已是原版，不另造控制器。 |
+| host/src/nt_com.c | 2,206 | 当前 serial.c 234 行；原版串口驱动、OVERLAPPED/线程/NTVDM 依赖，对应的是物理设备，不是当前有界虚拟输出 endpoint。约 1,972 行差额，拒绝为减少 Compat 数字而扩大系统。 |
+| host/src/nt_lpt.c | 698 | 当前 parallel.c 213 行承接原 buffering/status/lifecycle，原版含打印设备配置和 IOCTL/direct access。约 485 行差额；不能整文件原样替代当前同步文件 sink。 |
+| base/bios/virtual.c | 844 | mouse_instance.c 32 行提供单实例 NIDDB；原版是 INSIGNIA.386 协作的多 Windows VM 虚拟化、callbacks/instance tables。引入不是等价去重，不推荐。 |
+| base/bios/bios.c | 887 | 当前 device_bop.c 103 行 + platform BIOS table 负责已选固件服务注册。原表包含 HFX、虚拟化、DOS/产品服务；整表替换改变可达服务。保留有限注册和 D6/C4 BOP 原语义。 |
+| host/src/copy_fnc.c | 195 | 可替代 platform 的 memfill/fwd_word_fill/memset4（约 25 行），但原版有 unsigned-int 指针对齐、NT RtlFill 与字节序路径，还带不用的 copy 入口。需 x64 修补且净增；不推荐。 |
+| host/src/nt_unix.c | 459 | 仅为 host_memset 等小宿主合同引入整文件，会带其他 NT host 行为；不推荐。 |
+| base/support/xt.c | 652 | effective_addr 的选择受 CPU_30_STYLE/CPU_40_STYLE/CCPU 宏约束；当前 CCPU 并无可直接链接的等价入口，不能以同名为由删 facade 的窄适配。descriptor 解码已直接调用原 read_descriptor_linear。 |
+| host/inc/mips/prod/pigreg_c.h | 71 | 仅一字段宽度差异，但当前 PIG 未选中；没有现在引入的价值。 |
+
+原 nt_keycd/nt_sound 已由 S4/S5 收敛为单份原始表/状态机，不能再把它们当作
+449/222 行重复分支建议删除。原字体 offset 表在 video/ega_vide 也存在，但它们
+是函数内表，给外层导出新接口只为去掉 8 个常量得不偿失。
+
+### 有限文件覆盖
+
+以下路径相对各自 src 根。每个组的头与实现一起检查；A/B/C 对应上述处置，
+“保留”仅为本次职责/复用结论，不承诺无任何潜在运行缺陷。
+
+| 根 | 文件（共 48） | 调用/所有权证明及处置 |
+| --- | --- | --- |
+| vm | driver.c, driver.h, vm_interface.h | App composition 经 public API；Common 回调；测试 non-owning wrapper。B 的 backend/宽度候选，其余保留。 |
+| vm | input.c, input.h | KVM neutral event → 原 KeyMsgToKeyCode → machine key；无重复 matcher，保留。 |
+| vm | debug.c, debug.h | Common debug 请求及原 CCPU 观察 hook；单 executor/TLS plan，保留，B 的 memory 边界例外。 |
+| vm | trace.c, trace.h | 诊断 trace 使用 storage，不是原 host trace_file 的 CPU 输出副本；保留。 |
+| compat | machine.c, machine.h | VM/产品测试消费，B backend 迁移候选、A 字段/单字体/路径去重。 |
+| compat | platform.c, platform.h | 原 host 合同、定时/HLT、ROM resources、config、executor wake；保留。C utility 引入不划算。 |
+| compat | memory.c | 原 SAS host allocation/总线读写与 VM debug；B 拆 debug 请求职责，不能统一为 memcpy；A2 删除未接线 XMS helper。 |
+| compat | keyboard.c, input.h | 原 host_key、原 keycode table；A 无调用 reset/重复 dispatch；保留 stale output 修复。 |
+| compat | audio.c, audio.h | 原 LazyBeep sink + VM start/destroy；保留，B 可接收 GetPerfCounter。 |
+| compat | gfi_image.c | 原 gfi_function_table 绑定，DMA/媒体后端；C 比较后保留。 |
+| compat | hdd_media.c, hdd_media.h | 原 fdisk callback + config attachment，A 局部范围检查去重，C 不导入 NT endpoint。 |
+| compat | serial.c, parallel.c | 原 UART/LPT callbacks，配置仅由 machine；C 比较后保留，勿合并设备状态。 |
+| compat | device_bop.c, edl_fast_bop.c | 原 BIOS dispatch/有限服务/未支持 fast-BOP 明确退出；C 保留。 |
+| compat | mouse_instance.c | 原 mouse_io NIDDB provider；C 保留单实例合同。 |
+| compat | dib_surface.c, dib_surface.h | 原 renderer 输出 buffer/palette/dirty，VM 借用复制；A 删除无消费者入口，实际所有权保留。 |
+| compat | conapi.h, graphics_console_compat.c | 原 NT renderer API 到独立 DIB 的窄替代，不触碰实际 monitor Console；保留。 |
+| compat | video.c | 原 stream stubs/原字体读取/renderer init；保留，A 去测试单字体壳。 |
+| compat | v7_pointer.c | 原 V7 host callback 当前真实像素实现，不与 guest InPort 或 KVM 鼠标重复；保留。 |
+| compat | ccpu/abi.h, ccpu/facade.c | 声明及历史 helper ABI，C 对照 xt/cpu 后保留；不是另一 CPU。 |
+| compat | ccpu/lifecycle.c, ccpu/lifecycle.h | 原 CCPU 嵌套执行退出和 interrupt-map 接口，单出口；保留。 |
+| compat | ccpu/legacy/gdpvar.h, ccpu/legacy/sas4gen.h, ccpu/legacy/PigReg_c.h | 完整原始 diff/include 分支核查；A1/A3。 |
+| compat | cvidc/gdp_state.c, cvidc/gdp_state.h, cvidc/gdp_slots.h, cvidc/gdp_rule_access.h | 34 规则模式证明及 selected GDP 宏；native-width 存储和 slot owner 保留，不恢复四字节指针。 |
+| compat | bios/host_def.h, cmos/port.h, system/error.h, keymouse/cpu4.h | CMake 单文件 -iquote/host callback/原声明选择与 interrupt-map 接口；保留，不能按包装数量机械删。 |
+| compat | status.h | 仅 obsolete shutdown smoke，A3。 |
+
+### 建议实施顺序与验收（尚未准入）
+
+1. 删除已无消费者入口/测试旧壳，局部去重；不改镜像语义。
+2. GDP/SAS 原始声明唯一化：先给出精确镜像 diff 代价，再决定 SAS 槽位方案；
+   双宽度预处理/布局/视频启动等价，不引入生成源码或另一套 include overlay。
+3. 若用户批准边界收紧，再将 backend/debug 请求编排归 VM；原 host endpoints
+   留 Compat，测试调用点一并迁移；生命周期顺序、run/reset/wake 和单 executor 不变。
+4. 独立验证 graphics_visible_width 旧补偿，模式/dirty 矩阵证明后删，不与搬迁混改。
+
+每个实施项应有独立双宽度构建/全测和实际 commit 审核。此报告没有删除任何
+源码，没有新 EXE；S6 固定 EXE 保持原哈希。不引入 Lib/Common 改动，不改变
+Queue；候选保留在本报告供 T61 owner 决策，不假称已修复或全部可无风险删除。
+
+### S7 文档交付验证
+
+文档治理检查（指定 SOFTPC_SOURCE_DIR）与 git diff --check 通过。
+src、test、CMakeLists.txt、assets 相对审计基线零改动；两份固定 EXE
+保持上方 S6 SHA256。本次不重跑构建或设备测试，不把 S6 测试冒称为新验证。
+T61 保持开放，实施候选等待 owner 决策。
