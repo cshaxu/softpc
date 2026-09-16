@@ -47,6 +47,16 @@ static int close_stream(FILE *stream)
 
 int main(void)
 {
+    lib_storage_file positioned = { tmpfile() };
+    lib_i64 measured = -1;
+    assert(positioned.stream != NULL);
+    assert(lib_storage_file_byte_count(&positioned, &measured) == LIB_STATUS_OK && measured == 0);
+    assert(lib_storage_file_seek_absolute(&positioned, 4096) == LIB_STATUS_OK);
+    assert(lib_storage_file_write_exact(&positioned, "Z", 1u) == LIB_STATUS_OK);
+    assert(lib_storage_file_seek_absolute(&positioned, 7) == LIB_STATUS_OK);
+    assert(lib_storage_file_byte_count(&positioned, &measured) == LIB_STATUS_OK && measured == 4097);
+    assert(storage_file_platform_tell(&positioned) == 7);
+    assert(lib_storage_file_close(&positioned) == LIB_STATUS_OK);
     static const unsigned char payload[] = { 'A', 0u, 'B', '\n' };
     unsigned char actual[sizeof(payload)] = { 0u };
     const char *path = "softpc-storage-writer-binary-smoke.bin";

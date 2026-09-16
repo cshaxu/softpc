@@ -89,3 +89,19 @@ no S3 implementation began. T61's whole-task audit/closure is committed before
 resuming T62. The S1 verifier relaxation for simultaneous waiting/admission is
 withdrawn, not retained as a new governance policy. S2 actual-commit checks
 passed 6/6 per width; its closure follows only after T61 closure.
+
+## S3 executor delivery
+
+Baseline f4b090b. Production four Storage paths +26/-37 = -11; test C source
+three paths +59/-0; test CMake +1/-0. The root owns the unchanged sequential
+save-position/end/tell/restore algorithm; selected platform files own only
+seek/tell primitives alongside existing open/lock differences. All old private
+position/length names and consumers were searched; no duplicate measurement
+algorithm remains. Public API, short-circuit failures and output-on-success
+semantics are unchanged; no retry or compensation path was introduced.
+
+Both preset builds and fixed EXEs refreshed. Full x64 101/101 (84.96s), x86
+101/101 (72.09s); strict standalone Lib build passed. Focused proof covers
+four injected failures, >4 GiB counts on both widths, empty/hole files and
+nonzero position restoration, including controlled Linux platform calls.
+Manifests, corpus/DAG and documentation gates passed. INI/media unchanged.

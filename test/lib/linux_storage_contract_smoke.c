@@ -49,6 +49,14 @@ int main(void)
                 storage_file_platform_open_readonly("fixture", &file);
             assert(status == (reject_lock ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK));
             assert((file.stream == NULL) == (reject_lock != 0));
+            if (!reject_lock) {
+                lib_i64 length = -1;
+                assert(lib_storage_file_byte_count(&file, &length) == LIB_STATUS_OK && length == 0);
+                assert(lib_storage_file_write_exact(&file, "abc", 3u) == LIB_STATUS_OK);
+                assert(lib_storage_file_seek_absolute(&file, 1) == LIB_STATUS_OK);
+                assert(lib_storage_file_byte_count(&file, &length) == LIB_STATUS_OK && length == 3);
+                assert(storage_file_platform_tell(&file) == 1);
+            }
             assert(lib_storage_file_close(&file) == LIB_STATUS_OK);
             assert(closes == before + 1u && file.stream == NULL);
         }
