@@ -22,3 +22,15 @@ mutex/array/event failure and final disposal; reinitialization succeeds.
 
 S8 closes. All four admitted follow-ups are complete; T62 remains open until
 owner testing and further direction. No next task is admitted.
+
+## Delivery recheck
+
+After e4d350b, checked clean HEAD == origin/main and both recorded EXE hashes.
+A fresh x64 full suite passed 101/101 (55.03s). The first fresh x86 suite
+passed 100/101: machine_smoke.c:1048 asserted bda_tick_low != 0 after fixed
+machine run budgets. Five unchanged-binary repetitions passed, followed by a
+full x86 101/101 (57.14s). This is an intermittent observation, not proof of
+its cause or a claimed repair. The assertion and machine timing were unchanged
+by these four simplifications; a bounded investigation is recorded in TODO.
+No source or EXE changed during the recheck. Retained record replaces the
+three disposable delivery-check logs. Owner testing is still the next step.

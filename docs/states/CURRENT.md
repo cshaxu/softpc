@@ -18,6 +18,9 @@ The three queued candidates are unchanged.
   +141/-38 = +103. Final dual full suites 101/101; post-commit 8/8 each.
   Both fixed EXEs rebuilt, all P commits pushed; public APIs and product
   source/INI/media unchanged. Await owner testing before T62 closure.
+  Delivery recheck: x64 101/101; x86 first 100/101 with an intermittent BIOS
+  tick assertion, then five focused passes and full 101/101 unchanged.
+  The unconfirmed timing/test issue is recorded in TODO, not claimed repaired.
 
 - T62 S1-S4 implementation aa1eabd: four bounded Common/Lib simplifications,
   production +170/-214 = -44 across 12 C/H paths. Final x64/x86 101/101;
