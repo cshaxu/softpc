@@ -5,25 +5,25 @@
 T60 is closed after owner manual acceptance and the whole-task audit.
 T61 is closed on owner direction after the [whole-task audit](../history/M9-T61-completion-audit.md).
 M9 T62 S1-S4 are closed and owner-tested successfully.
-M9 T62 S5-S6 are closed; S7 is active, S8 admitted next.
+M9 T62 S5-S7 are closed; S8 is active.
 T62 remains open until owner acceptance after S8.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
 The three queued candidates are unchanged.
 
-## M9 T62 S7 Packet
+## M9 T62 S8 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner approved four follow-ups, sequential automatic admission and commit/push. |
-| Objective | Remove readonly/readwrite private forwarding wrappers; keep one selected platform open. |
+| Objective | Embed Session queue container; initialize/dispose resources without a second container allocation. |
 | Non-goals | No public ABI, product behavior, App/VM/Compat/MVDM or unrelated cleanup changes. |
-| Reference Baseline | db6d534; preceding S closed after actual-commit review. |
+| Reference Baseline | 666aa67; preceding S closed after actual-commit review. |
 | Candidate Proposal | [Four follow-ups](../proposals/m9-common-lib-followup-simplification.md) |
-| Files And ABI Surface | src/lib/storage/file.h, file.c, medium.c, win32/file.c, linux/file.c; test/lib storage tests; manifests/task records and fixed EXEs. Public ABI unchanged. |
+| Files And ABI Surface | src/common/session/control.h, control.c, session.c; all private queue callers in test/common; manifests/task records and fixed EXEs. Public ABI unchanged. |
 | Applicable Rules | docs/README reading set; execution, architecture, coding, documentation rules and referenced skills. |
-| Verification | Both open modes, missing paths, native sharing/locking and failure cleanup; both fixed EXE builds, full x64/x86 CTest, shared manifest/corpus and documentation gates; actual-commit focused checks. |
-| Expected Markers | One platform open entry; no old forwarding symbols. |
+| Verification | Initialization failure at mutex/array/event, FIFO growth/concurrency, fault latch, monitor/lifecycle tests; both fixed EXE builds, full x64/x86 CTest, shared manifest/corpus and documentation gates; actual-commit focused checks. |
+| Expected Markers | No queue create/destroy allocation wrapper; dynamic event storage retained. |
 | Asset Needs | Only refresh assets/binary/softpc32.exe and softpc64.exe; preserve INI/media. |
 | Reporting Requirements | Before/after audit, estimated/actual production and test numstat, tests, commits, EXE links. |
 | Stop Conditions | Public contract or product behavior change, failed proof or ownership expansion. |
