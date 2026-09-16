@@ -406,16 +406,38 @@ extern VOID (*setDF_func)(IBOOL); extern VOID (*setIF_func)(IBOOL); extern VOID 
 extern VOID (*setPF_func)(IBOOL); extern VOID (*setAF_func)(IBOOL); extern VOID (*setSF_func)(IBOOL);
 extern VOID (*setZF_func)(IBOOL); extern VOID (*setOF_func)(IBOOL); extern VOID (*setCF_func)(IBOOL);
 #else
-extern void (*setAX_func)(); extern void (*setAH_func)(); extern void (*setAL_func)();
-extern void (*setBX_func)(); extern void (*setBH_func)(); extern void (*setBL_func)();
-extern void (*setCX_func)(); extern void (*setCH_func)(); extern void (*setCL_func)();
-extern void (*setDX_func)(); extern void (*setDH_func)(); extern void (*setDL_func)();
-extern void (*setSP_func)(); extern void (*setBP_func)(); extern void (*setSI_func)();
-extern void (*setDI_func)(); extern void (*setIP_func)(); extern void (*setCS_func)();
-extern void (*setDS_func)(); extern void (*setES_func)(); extern void (*setSS_func)();
-extern void (*setMSW_func)(); extern void (*setDF_func)(); extern void (*setIF_func)();
-extern void (*setTF_func)(); extern void (*setPF_func)(); extern void (*setAF_func)();
-extern void (*setSF_func)(); extern void (*setZF_func)(); extern void (*setOF_func)(); extern void (*setCF_func)();
+extern void             (*setAX_func) ();
+extern void             (*setAH_func) ();
+extern void             (*setAL_func) ();
+extern void             (*setBX_func) ();
+extern void             (*setBH_func) ();
+extern void             (*setBL_func) ();
+extern void             (*setCX_func) ();
+extern void             (*setCH_func) ();
+extern void             (*setCL_func) ();
+extern void             (*setDX_func) ();
+extern void             (*setDH_func) ();
+extern void             (*setDL_func) ();
+extern void             (*setSP_func) ();
+extern void             (*setBP_func) ();
+extern void             (*setSI_func) ();
+extern void             (*setDI_func) ();
+extern void             (*setIP_func) ();
+extern void             (*setCS_func) ();
+extern void             (*setDS_func) ();
+extern void             (*setES_func) ();
+extern void             (*setSS_func) ();
+extern void             (*setMSW_func) ();
+extern void             (*setDF_func) ();
+extern void             (*setIF_func) ();
+extern void             (*setTF_func) ();
+extern void             (*setPF_func) ();
+extern void             (*setAF_func) ();
+extern void             (*setSF_func) ();
+extern void             (*setZF_func) ();
+extern void             (*setOF_func) ();
+extern void             (*setCF_func) ();
+
 #endif
 #ifdef CCPU
 /* CCPU-specific WRITE functions */
