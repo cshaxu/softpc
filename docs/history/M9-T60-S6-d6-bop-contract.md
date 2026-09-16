@@ -64,3 +64,8 @@ The proposed SALC-specific tests are not added because that behavior was
 rejected. Assessment limitations above remain limitations, not new repair scope.
 Documentation governance and whitespace checks are required for this delivery;
 coordinator actual-commit review precedes archival and S7 activation.
+
+Coordinator reviewed actual commit 2da47d4: only this assessment and the parent
+plan changed. The owner decision is accurately recorded, no implementation
+was smuggled into the disposition, and the four ledger entries remain intact.
+S6 closes as owner-rejected adoption. T60 stays open for S7 and whole-task review.
