@@ -19,6 +19,9 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   device queues, CPU hidden state and media need the proposed capture boundary.
   Owner requires one binary snapshot, direct/readonly references only, and
   complete FDD/HDD overlay pages. Existing fixed EXEs remain unchanged.
+  Owner narrowed scope after S1: Lib/test-lib unchanged; Common only the two
+  machine-state read/write operations and their necessary executor wiring.
+  Snapshot file policy stays in App, state encoding/restoration in VM/Compat/MVDM.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files
@@ -209,16 +212,16 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner requests snapshot task admission and continued research after T62 closure. S1 design cf2d979 reviewed; begin S2 with source inventory before code. |
 | Objective | Enumerate selected mutable state and all pause entries; prove a recoverable executor and timer boundary before any snapshot payload work. |
-| Non-goals | No save/load CLI or container yet; no second executor, process dump, changed device semantics or user media. No NTVDM-only hook repair. |
+| Non-goals | No save/load CLI or container yet; no second executor, process dump, changed device semantics or user media. No Lib changes or Common changes beyond two machine-state operations and necessary wiring. No NTVDM-only hook repair. |
 | Reference Baseline | ea7e982 production; cf2d979 design; existing fixed x86/x64 EXEs unchanged by S1. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
-| Files And ABI Surface | First inventory CMake-selected MVDM/Compat/VM and Common boundaries. Candidate narrow pause edits: common/machine, vm/driver, compat/platform and ccpu lifecycle, original c_main safe points. Record exact field/file and original-diff estimate before editing. |
+| Files And ABI Surface | First inventory selected MVDM/Compat/VM and Common boundaries. Candidate pause edits: vm/driver, compat/platform and ccpu lifecycle, original c_main safe points. Common machine changes only if necessary for the two state read/write operations; other Common and all Lib excluded. Record exact field/file and original-diff estimate before editing. |
 | Applicable Rules | docs/rules/EXECUTION.md and DOCUMENT.md; design/ARCHITECTURE.md, CODING.md, UI.md; referenced execution, architecture and documentation skills. |
 | Verification | Field ledger and caller sweep; controllable timer/entry barriers, normal/HLT/debug/nested pause reentry tests; if code changes, fixed x86/x64 package builds and full CTest plus focused machine/lifecycle tests and manifest/boundary gates. Documentation gate and actual-commit review. |
 | Expected Markers | No unclassified selected state, no persisted C stack, no extra guest execution after paused, no timer accumulation during capture, one executor. |
 | Asset Needs | No user media mutation. Any later runtime probe uses owned disposable build children with declared size/time/cleanup before execution; none created in S1. |
 | Reporting Requirements | Before code report exact files/ABI and estimated churn; after proof report production/test numstat and original mirror diff separately, tests and both EXE links. |
-| Stop Conditions | Unrepresentable native continuation or required wider product change: report and revise before editing; no force-unwind that drops guest work, no repeated polling or guest reset substitute. |
+| Stop Conditions | Unrepresentable native continuation, missing file-safety capability or required Lib/other Common expansion: report before editing; no force-unwind that drops guest work, no polling or guest reset substitute. |
 | Exit Criteria | Complete selected-state ledger and proven recoverable pause/timer boundary; no change to ordinary lifecycle semantics; required dual-width evidence, commit/push and independent actual-change review. |
-| Original Owner Request | Pause must preserve all runtime state consistently; audit/design/admit snapshots for installation reproduction; one binary file, direct/readonly references, FDD/HDD overlay state. Verbatim in proposal. |
+| Original Owner Request | Consistent paused snapshots, one binary file, direct/readonly references and FDD/HDD overlays; latest owner constraint: no Lib edits, Common only machine-state read/write interfaces. Verbatim in proposal. |
 | Similar-Issue Sweep | Every executor callback caller including nested host_simulate and HLT, timer producer/consumer and queued input; classify CPU/FPU/memory/video/controllers/media/host resources as save, rebuild, external or unselected with evidence. |

@@ -25,6 +25,18 @@ These are unresolved engineering inputs, not patched defects or successful
 restore evidence. Changed DIRECT content cannot be reconstructed without
 payload; installation rollback therefore requires OVERLAY.
 
+## Owner boundary revision after S1
+
+Owner subsequently required no Lib changes and only two Common machine-state
+read/write operations. This supersedes S1's proposed copied-page Lib support
+and broader Common snapshot completion contract. Effective overlay differences
+can be computed using existing read_at and restored through open/write_at;
+the serialized result need not preserve Lib's internal dirty-page membership.
+App owns file I/O, VM owns the state format; Common does not accept paths or
+add snapshot events. File publication safety remains an explicit proof gate,
+not grounds for quietly expanding Lib. The proposal and active S2 packet now
+carry these narrower constraints; no production code was changed.
+
 S1 changes documentation only: production/test C/H delta 0; no EXE rebuild,
 media access or user configuration edit. Documentation governance passed
 before and after the pushed design delivery; git diff check passed. No runtime

@@ -16,6 +16,14 @@ T62 已在 `54b2009` 独立收口提交推送，之后准入 T63 S1。
 媒体合同后续原文：
 > 如果是direct和readonly的snapshot，不需要保存整个磁盘；否则也需要保存软盘 硬盘的overlay快照。整个快照就是一个binary文件
 
+共享组件边界后续原文（取代 S1 初稿的扩展设想）：
+> 原则上不得修改lib；common只允许在vm增加读出机器状态和写入机器状态的两个接口
+
+本仓库该 Common 机器接口层实际为 `common/machine`，不新增 `common/vm`。
+Lib 零修改；Common 仅允许这两个状态读写操作及其在原有 executor 上执行所必需的
+接线、测试和 manifest 更新。其他 Common 组件不改，不增加 save/load 命令、路径、
+文件格式、媒体接口、快照专用事件或独立状态机。若此边界不足，先报告，不自行扩大。
+
 ## 产品合同
 
 目标是同一时刻的 CPU、内存、设备与媒体一致恢复，支持退出进程后再次加载。
@@ -44,12 +52,13 @@ SoftPC> resume
   不承诺跨构建、跨宽度或跨平台迁移；不兼容在改动当前机器前拒绝。
   不用可变 HEAD 文案代替构建兼容标识，交付测试必须覆盖不匹配。
 - DIRECT/READONLY 不保存磁盘内容，只保存媒体引用、模式、大小、内容指纹和几何；
-  OVERLAY 保存基底引用/指纹以及全部 dirty pages，软盘、硬盘均包含，空驱动器也记录。
+  OVERLAY 保存基底引用/指纹以及全部有效差异块，软盘、硬盘均包含，空驱动器也记录。
   文件内容指纹用于拒绝旧内存配新磁盘，不能仅验证路径/大小/修改时间。
   所以 DIRECT 保存后磁盘又被写入时，旧快照一般会因内容不匹配而拒绝加载；
   Win95 安装反复回退必须使用 OVERLAY。READONLY/OVERLAY 的基底也必须保持匹配。
 - 整机状态及所有 overlay 修改都放在单个二进制文件，不产生快照 sidecar。
-  每份快照独立保存当前全部修改页，不建立快照增量链、压缩、去重、后台保存或插件框架。
+  每份快照独立保存当前全部有效差异，不复制 Lib 内部 dirty-page 链表；不建立快照
+  增量链、压缩、去重、后台保存或插件框架。
   安装程序可能在写盘中途被暂停：必须保存控制器缓冲与未完成命令，不能要求客户机
   文件系统已卸载，也不能偷偷把未完成命令执行完后再取快照。
 - 宿主窗口/Console/鼠标捕获、剪贴板、线程、锁、句柄、CLI 行、debug 命令历史不是
@@ -66,7 +75,7 @@ S2 必须完成实际构建选中状态的逐字段账本，才能允许后续�
 
 | 已查生产位置 | 事实与工程影响 |
 | --- | --- |
-| `src/common/machine/machine.c` 的 `common_machine_executor_event` | PAUSED 在 driver 回调里阻塞，debug 已有同一 executor 的同步 rendezvous；没有 save/load driver 契约。复用调度所有权，不把快照塞进 debug opcode。 |
+| `src/common/machine/machine.c` 的 `common_machine_executor_event` | PAUSED 在 driver 回调里阻塞，debug 已有同一 executor 的同步 rendezvous；增加两个状态读写操作的必要接线，不新增 Common save/load 系统或 debug opcode。 |
 | `src/mvdm/softpc.new/base/ccpu386/c_main.c` | CCPU_GR/SR/CR/DR、隐藏段缓存、interrupt map、single_instruction_delay 等状态分散；还有 simulate_level、jmp_buf 和指令局部上下文。debug 寄存器读写不是完整执行恢复接口。 |
 | `src/compat/platform.c` | timer callback 累加 pending ticks；暂停回调并未证明停止该生产者。`set_runtime_heartbeat` 管 pacing，不等于停止 native timer。不能把保存耗时算成客户机后来需补发的全部时间。 |
 | `src/compat/ccpu/lifecycle.c`、原始 `host_simulate` | 存在嵌套模拟与宿主栈返回。保留的 C 栈不能搬到新进程；必须证明新执行入口能从明确的机器状态恢复。 |
@@ -76,8 +85,8 @@ S2 必须完成实际构建选中状态的逐字段账本，才能允许后续�
 | 原始 `ica.c`、`timer.c`、`at_dma.c`、`fdisk.c` 与 FLA/GFI | PIC 请求/屏蔽/服务状态、PIT 编程、DMA、磁盘命令缓冲和阶段不等于 RAM；需要原所属文件的窄状态出口。 |
 | 原始 video/keymouse 与 `src/compat/cvidc/gdp_state.c` | VGA planes/latches/palette/banks、输入协议状态和 GDP 中标量/指针混合；禁止把 GDP slot storage 直接整体保存。 |
 | `src/compat/hdd_media.c`、`gfi_image.c` | 两类媒体有各自独占 lease 与设备几何/当前 cylinder。要统一取同一快照边界，不改变原始控制器实现。 |
-| `src/lib/storage/medium_interface.h`、`medium.c` | 已有有效字节 read_at 和独占 lease replace；overlay 为只读基底+4KiB页。现有公开接口不支持复制 dirty pages/读取基底视图；按新媒体合同需最小通用导出/重建能力，不暴露链表指针，不把整机格式放入 Lib。 |
-| `src/lib/storage/file_interface.h` | 有二进制 writer，没有现成整机快照/事务容器。只在确有缺失时补最小通用文件原语；格式和机器状态不属于 Lib。 |
+| `src/lib/storage/medium_interface.h`、`medium.c` | 已有 read_at、write_at、open(OVERLAY) 和 lease replace；可比较有效视图与只读基底保存差异，再在新 overlay 上写回。不需导出内部页，也不需改 Lib。Win32 只读打开允许 READ sharing；DIRECT 指纹使用原有独占 lease。 |
+| `src/lib/storage/file_interface.h` | 复用二进制 writer 和媒体读取接口。原子发布/拒绝覆盖不是现有 writer 的已证能力，S3 须在不改 Lib 的边界下验证；有缺口就提交设计问题，不绕过或偷偷扩展接口。 |
 
 结论：可沿现有唯一 executor 设计，但并非窄小补丁。最大未知是可序列化暂停边界，
 其次是原始设备私有状态完整性。先证明这两点；不能以“保存文件成功”替代恢复证明。
@@ -87,25 +96,30 @@ S2 必须完成实际构建选中状态的逐字段账本，才能允许后续�
 ### 1. 唯一所有者，不新增执行器
 
 ```text
-app command -> common session -> common machine 的既有 worker/rendezvous
-                                  -> 注入的 VM snapshot 操作
-                                      -> MVDM 状态出口 + Compat 资源/媒体
-                                      -> Lib storage 文件 I/O
-完成结果     <- 同一 control queue <- 同一 executor
+Common 既有 command provider -> App save/load + 既有 Lib 文件 I/O
+                                 -> Common machine read_state / write_state
+                                     -> 既有 executor -> 注入的 VM 状态读写
+                                                         -> MVDM/Compat
+结果：接口 status + 既有机器状态/完整帧通知；不新增 Session 快照事件
 ```
 
-App 只解析路径、发请求并显示完成结果；composition 仍是唯一 VM 组装入口。
-Common 仅增加产品无关的可选保存/加载操作与完成合同，不知道寄存器、磁盘格式、
-设备列表；不另建一个 snapshot manager 或线程。优先扩展现有序列化请求通道，
-不复制另一套 event/lease/轮询状态机；确需新增字段逐一证明职责。
-VM 负责文件格式、兼容校验、保存/恢复顺序；Compat 提供宿主计时/媒体资源屏障；
+App 解析路径、管理文件读写与完成文案；composition 仍是唯一 VM 组装入口，
+命令代码不直接访问 VM/Compat。现有 command provider 处理返回结果，Session 不修改。
+Common 的两个操作为 read_state/write_state（工作名）：只传递不透明状态字节及结果，
+不接收文件路径，不解释格式。字节传递采用有界缓冲或读写回调，具体签名在前审确定；
+不增加 begin/end/size/free 等一组管理接口，不提供通用“任意任务执行”逃逸口。
+两个操作映射到注入 driver 的对应能力，实际访问仍由唯一 executor 完成；必要的
+请求参数/结果存储及唤醒复用现有串行 rendezvous，不直接从 control 线程读写原始机器。
+回调不得重入 machine/session。Common machine 仅承担这些操作必要的状态准入、
+代际隔离和现有状态/帧发布；不扩张 Session/UI/debug/xasm32，不加专属完成事件。
+VM 负责状态格式、兼容校验、保存/恢复顺序；Compat 提供宿主计时/媒体资源屏障；
 原始文件保留设备状态所有权，只增加必要的窄导入/导出/重建接口。
 Lib 不认识 snapshot/CPU；KVM 不改。不得复制设备实现到 VM 或改造全局为第二套机器。
 
 MVDM 必要功能性状态出口属于本候选明确提出的 port-ABI 范围；S2 先列确切文件/字段
 和预估原始 diff 再实施。保持原始格式，最小化相对 OpenNT 的 diff，不做格式重排、
-构建期转换或全局裸内存登记框架。Common/Lib 若需公共 ABI 变化，也必须在对应 S 的
-前审中写清并更新共享测试/manifest，不能混作私有补丁。
+构建期转换或全局裸内存登记框架。Common 的两项 ABI 变化须在前审中写清并更新
+其共享测试/manifest；`src/lib` 与 `test/lib` 保持原样，不补页遍历器或文件原语。
 
 ### 2. 可恢复的暂停屏障是第一项验收，不是附加条件
 
@@ -143,14 +157,21 @@ CPU/RAM/设备分别编码；callback 用本构建的固定语义 ID 与已审�
 恢复后失效并重新建立；硬件 latches、隐藏段缓存、待 IRQ 不是可随意重建的缓存。
 
 每个媒体 section 记录插槽、插入状态、模式、尺寸、几何和基底内容指纹。
-DIRECT/READONLY 没有磁盘 payload；OVERLAY 额外保存页索引及复制页内容，页大小写入格式，
-验证末页有效长度、索引范围和重复索引。未修改页来自已校验的原始基底；保存的是全部
-当前 dirty pages，不是自上次 save 以来的变化。无文件的零基底可显式记录零基底及尺寸；
+DIRECT/READONLY 没有磁盘 payload；OVERLAY 逐块比较有效内容与只读基底，保存差异块
+索引及内容，块大小写入格式，验证末块有效长度、索引范围和重复索引。未修改块来自
+已校验的基底；曾写过但又恢复成基底内容的块可省略，恢复后的字节语义相同。
+保存的是当前全部有效差异，不是自上次 save 以来的变化，也不维护第二套 dirty 标记。
+无文件的零基底可显式记录零基底及尺寸；
 其他内存基底必须有可重建表示，否则拒绝，不写无法解析的宿主地址。
-Lib 只提供复制媒体页/基底读取的最小通用契约，VM 编排编码及指纹校验；不建立第二套
-overlay 实现。DIRECT 校验需在持有同一稳定媒体 lease 时进行；指纹可能需要读全盘，
+只用现有 medium read_at 读取、open(OVERLAY) 新建、write_at 恢复差异；VM/Compat
+编排媒体访问及指纹校验。差异扫描需要读全盘，但不建立第二套运行时 overlay 实现。
+DIRECT 校验需在持有同一稳定媒体 lease 时进行；指纹可能需要读全盘，
 但不把全盘写进快照。保存期间不能有另一个写者改变被校验内容。
-临时文件写完、关闭并校验后再通过文件发布原语产生最终路径；磁盘满/写失败不能覆盖
+文件发布由 App 负责，Common/VM 不拥有用户路径。目标仍是临时文件写完、关闭并校验
+后产生最终路径；原子发布和排他创建需要 S3 单独验证，现有 writer 不提供这些保证，
+不能把“先检查存在再 truncate”称为排他创建。若现有允许能力不足，先提请审阅，
+不改 Lib、不在 Common 偷藏 Win32 调用，也不擅自降低已设计的安全要求。
+磁盘满/写失败不能覆盖
 原有快照。所需空间主要是 RAM、设备和 overlay 修改页，预检不能替代实际写失败处理。
 不把“原子发布”夸大为已实现掉电持久性。
 
@@ -175,7 +196,9 @@ DIRECT 重新接原文件，保持直写；READONLY 仍只读；OVERLAY 重建�
 不承诺旧机器仍可用，不以 reset 掩盖，也不自动重试。普通文件/校验/准备失败保持旧机
 暂停且可 resume，临时资源清理。S7 的故障注入证明每个边界。
 
-成功后 Common 发布新的 run generation 和 paused/load completion；VM 强制生成完整帧，
+写入状态成功后，Common machine 在该接口必要接线内更新 run generation，并复用
+现有 PAUSED 与完整帧通知；App 从接口结果产生加载文案，不增加 load completion 类型。
+VM 强制生成完整帧，
 现有控制路径推导 UI，不等待未来 dirty 才看到画面。恢复的 paused Window 不捕获鼠标。
 之后 resume 走原有 Console 交接和 Window 激活顺序，不能添加第二条 focus 路径。
 
@@ -193,13 +216,13 @@ DIRECT 重新接原文件，保持直写；READONLY 仍只读；OVERLAY 重建�
 | S | 目标及边界 | 初步规模 | 退出证据 |
 | --- | --- | --- | --- |
 | S1 | 源码可行性、产品/工程设计；明确限制及全量审计域 | 0 生产行 | 当前报告与请求交叉审计、文档门禁；不声称恢复已实现 |
-| S2 | 逐字段账本及可恢复暂停/计时屏障；现有 executor 的最小入口调整 | 数百行，需先锁定嵌套执行可行性 | 普通/HLT/debug/嵌套路径可重新进入；无保存期间状态漂移；不满足则停止后续 |
-| S3 | 单文件容器、媒体引用/指纹、FDD/HDD overlay 保存/准备、限长校验和原子发布 | 数百行 | direct/readonly 无磁盘 payload；overlay 有效字节相等；基底变化拒绝，损坏/磁盘满/目标存在无覆盖 |
+| S2 | 逐字段账本及可恢复暂停/计时屏障；限定 Common 两个状态接口的必要接线方案 | 数百行，需先锁定嵌套执行可行性 | 普通/HLT/debug/嵌套路径可重新进入；无保存期间状态漂移；不满足则停止后续；Lib 不改 |
+| S3 | VM 状态容器/媒体差异，App 文件 I/O；使用已有 Storage，验证安全发布缺口 | 数百行 | direct/readonly 无磁盘 payload；overlay 有效字节相等；基底变化拒绝；文件安全未证明不得交付 |
 | S4 | CPU/隐藏缓存/FPU/RAM 状态出口与恢复 | 数百行 | 非平凡 FPU/tag/TOS、分页/A20/段缓存、IRQ/shadow 及内存 roundtrip；不是只比较通用寄存器 |
 | S5 | PIC/PIT/RTC/DMA、q/tic 队列、磁盘控制器待续状态 | 数百至千行级 | 待中断/待事件/半条 I/O 的恢复等价，回调参数和句柄重建；不能遗漏未完成传输 |
 | S6 | 视频/键鼠及剩余启用设备状态；重建宿主绘制/声音资源 | 数百至千行级 | planes/latches/banks/font/palette 与 8042/InPort 保真；恢复即有完整帧；账本无未知设备 |
-| S7 | Common 可选快照请求+VM 单一加载事务，跨进程恢复 | 数百行 | 准备失败保留旧机，提交故障禁止执行，旧事件隔离；新进程恢复不依赖旧地址/栈 |
-| S8 | App save/load 命令、帮助、completion/prompt、UI 衔接 | 百行级 | 命令状态矩阵、失败输出、paused debug/resume、两类 display/console_control；不改既有命令语义 |
+| S7 | Common machine 两个状态读写接口及必要执行接线+VM 单一恢复事务 | 数百行 | Common 仅该组件及必要测试/manifest 变化；准备失败保留旧机，提交故障禁止执行，跨进程重建 |
+| S8 | App save/load 命令、帮助、既有 provider 结果/prompt 接线 | 百行级 | Session/UI 不改；命令矩阵、失败输出、paused debug/resume 与既有两类 display/console_control 路径 |
 | S9 | 全量账本复核、安装长流程与回归、最终交付 | 测试为主 | 以下验收矩阵全通过，x86/x64 EXE，owner 手测后才关 T |
 
 每一实现 S 都是可构建交付：双宽度编译/全套与针对性测试、固定 EXE、完整 P 提交推送，
@@ -226,11 +249,13 @@ S1 文档交付无需伪造重编译；已有 EXE 保持不变。
 - `load -> debug -> resume`、`load -> pause/resume -> stop/start/reset`、Window CAP/X
   和 Console 交接均保留现有体验。VM 加载完成前没有 UI 自行启动机器。
 - 同一快照不接受跨 x86/x64，分别测试两种构建的独立保存/加载。完整回归测试和
-  原始镜像 diff 账本、Common/Lib manifest/边界门禁必须同步更新。
+  原始镜像 diff 账本及 Common 必要 manifest 更新；验证 Lib/test-lib 与其基线零差异，
+  Common 除机器层两个接口必要接线/证明材料外零差异，既有边界门禁继续通过。
 
 ## 当前结论和停止条件
 
 准入目标明确，不能承诺小改动：至少跨 Common 调度、VM、Compat、原始私有设备态。
 第一阶段不修改生产文件、不改媒体。实现前遇到无法表达的宿主栈、未知事件参数、无法
-原子安装的设备态或需要不在此范围内的产品语义，先给出证据和设计修订，不用绕过检查
+原子安装的设备态、需要修改 Lib/其他 Common 组件或未解决文件安全原语，先给出证据
+和设计修订，不用绕过检查
 换取“能打开快照”。不需要在线机器状态迁移、第二执行器或改造 KVM。
