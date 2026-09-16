@@ -533,16 +533,26 @@ static void x87_values(common_machine *machine, common_machine_debug_lease *leas
         {0xd9,0x06,0x1e,4, {0,0,0xc0,0xbf}}, /* -1.5 */
         {0xdd,0x06,0x1e,8, {0,0,0,0,0,0,0xf8,0x3f}}, /* double +1.5 */
         {0xdd,0x06,0x1e,8, {0,0,0,0,0,0,0xf8,0xbf}},
+        {0xdd,0x06,0x1e,8, {0,0,0,0,0,0,0,0}}, /* signed zeros */
+        {0xdd,0x06,0x1e,8, {0,0,0,0,0,0,0,0x80}},
+        {0xdd,0x06,0x1e,8, {0,0,0,0,0,0,0xf0,0x7f}}, /* infinities */
+        {0xdd,0x06,0x1e,8, {0,0,0,0,0,0,0xf0,0xff}},
+        {0xdd,0x06,0x1e,8, {0,0,0,0,0,0,0xf8,0x7f}}, /* quiet NaN */
         {0xdb,0x2e,0x3e,10,{0,0,0,0,0,0,0,0xc0,0xff,0x3f}}, /* extended */
         {0xdb,0x2e,0x3e,10,{0,0,0,0,0,0,0,0xc0,0xff,0xbf}},
+        {0xdb,0x2e,0x3e,10,{1,0,0,0,0,0,0,0x80,0xff,0x3f}}, /* 1 + 2^-63 */
+        {0xdb,0x2e,0x3e,10,{0,0,0,0,0,0,0,0x80,0xff,0x43}}, /* 2^1024 */
         {0xdf,0x2e,0x3e,8, {0x34,0x12,0,0,0x34,0x12,0,0}}, /* integer */
         {0xdf,0x2e,0x3e,8, {0xcc,0xed,0xff,0xff,0xcb,0xed,0xff,0xff}},
         {0xdf,0x26,0x36,10,{0x56,0x34,0x12,0,0,0,0,0,0,0}}, /* packed BCD */
         {0xdf,0x26,0x36,10,{0x56,0x34,0x12,0,0,0,0,0,0,0x80}}
     };
-    static const struct { unsigned char modrm; double expected; } arithmetic[] = {
-        {0x06,8.0}, {0x0e,12.0}, {0x26,4.0}, {0x36,3.0}
-    }; /* FADD/FMUL/FSUB/FDIV m64: 6 op 2 */
+    static const struct { unsigned char modrm; double left, right, expected; } arithmetic[] = {
+        {0x06,6.0,2.0,8.0}, {0x0e,6.0,2.0,12.0},
+        {0x26,6.0,2.0,4.0}, {0x36,6.0,2.0,3.0},
+        /* Characterize the retained double arithmetic limit, not x87 equivalence. */
+        {0x06,9007199254740992.0,1.0,0.0}
+    };
     common_machine_debug_request trace = {
         .operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
         .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_TRACE, .instruction_count = 3u };
@@ -571,25 +581,97 @@ static void x87_values(common_machine *machine, common_machine_debug_lease *leas
     trace.instruction_count = 4u;
     for (i = 0; i < sizeof(arithmetic) / sizeof(arithmetic[0]); ++i) {
         unsigned char program[] = {0xdb,0xe3,0xdd,0x06,0,0x0a,
-            0xdc,arithmetic[i].modrm,0x10,0x0a,0xdd,0x1e,0x20,0x0a};
-        const double operands[] = {6.0,2.0};
+            0xdc,arithmetic[i].modrm,0x10,0x0a,0xdd,0x1e,0x20,0x0a,
+            0xdd,0x1e,0x20,0x0a};
+        unsigned length = 14u, instructions = 4u;
+        const double operands[] = {arithmetic[i].left,arithmetic[i].right};
         common_machine_debug_result result;
         double actual;
+        if (i == 4u) {
+            /* (2^53 + 1) - 2^53 exposes intermediate precision before store. */
+            program[10] = 0xdc; program[11] = 0x26;
+            program[12] = 0; program[13] = 0x0a;
+            length = sizeof(program); instructions = 5u;
+        }
         write.bytes = sizeof(double); write.address = 0xa00u;
         memcpy(write.data, &operands[0], write.bytes);
         (void)access(machine, lease, write);
         write.address = 0xa10u;
         memcpy(write.data, &operands[1], write.bytes);
         (void)access(machine, lease, write);
-        write.address = 0x800u; write.bytes = sizeof(program);
+        write.address = 0x800u; write.bytes = length;
         memcpy(write.data, program, write.bytes);
         (void)access(machine, lease, write);
         setreg(machine, lease, COMMON_DEBUG_EIP, 0x800u);
-        run_plan(machine, lease, events, trace, 0x800u + sizeof(program), 4u);
+        trace.instruction_count = instructions;
+        run_plan(machine, lease, events, trace, 0x800u + length, instructions);
         result = access(machine, lease, (common_machine_debug_request){
             .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0xa20u, .bytes = 8u });
         memcpy(&actual, result.data, sizeof(actual));
         assert(actual == arithmetic[i].expected);
+    }
+}
+
+static void x87_rounding(common_machine *machine, common_machine_debug_lease *lease,
+    completions *events)
+{
+    static const double input[] = {2.5,3.5,-2.5,-3.5,0.5,-0.5,0.25,-0.25,
+        32767.0,32768.0,-32768.0,-32769.0,
+        2147483647.0,2147483648.0,-2147483648.0,-2147483649.0,
+        9223372036854775808.0,-9223372036854775808.0,18446744073709551616.0};
+    static const double limit[] = {32768.0,2147483648.0,9223372036854775808.0};
+    static const int expected[4][8] = {
+        {2,4,-2,-4,0,0,0,0}, {2,3,-3,-4,0,-1,0,-1},
+        {3,4,-2,-3,1,0,1,0}, {2,3,-2,-3,0,0,0,0}
+    };
+    common_machine_debug_request trace = {
+        .operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
+        .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_TRACE, .instruction_count = 4u };
+    common_machine_debug_request write = { .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR };
+    unsigned mode, index, width;
+    setreg(machine, lease, COMMON_DEBUG_CS, 0u);
+    setreg(machine, lease, COMMON_DEBUG_DS, 0u);
+    setreg(machine, lease, COMMON_DEBUG_EFLAGS, 2u);
+    for (mode = 0; mode < 4u; ++mode) {
+        for (index = 0; index < sizeof(input) / sizeof(input[0]); ++index) {
+            for (width = 0; width < 3u; ++width) {
+                /* FNINIT; FLDCW; FLD m64; FISTP m16/m32/m64; FNSTSW. */
+                unsigned char program[] = {0xdb,0xe3,0xd9,0x2e,0x10,0x0a,
+                    0xdd,0x06,0,0x0a,0xdf,0x1e,0x20,0x0a,0xdd,0x3e,0x30,0x0a};
+                unsigned bytes = 2u << width, b;
+                common_machine_debug_result result;
+                double rounded = index < 8u ? expected[mode][index] : input[index];
+                int overflow = rounded < -limit[width] || rounded >= limit[width];
+                lib_u64 bits = overflow
+                    ? (lib_u64)1u << (8u * bytes - 1u) : (lib_u64)(lib_i64)rounded;
+                program[10] = width == 1u ? 0xdb : 0xdf;
+                program[11] = width == 2u ? 0x3e : 0x1e;
+                write.address = 0xa00u; write.bytes = sizeof(double);
+                memcpy(write.data, &input[index], sizeof(double));
+                (void)access(machine, lease, write);
+                memory_word(machine, lease, 0xa10u, (unsigned short)(0x37fu | (mode << 10)));
+                write.address = 0x800u; write.bytes = sizeof(program);
+                memcpy(write.data, program, sizeof(program));
+                (void)access(machine, lease, write);
+                setreg(machine, lease, COMMON_DEBUG_EIP, 0x800u);
+                trace.instruction_count = 5u;
+                run_plan(machine, lease, events, trace, 0x800u + sizeof(program), 5u);
+                result = access(machine, lease, (common_machine_debug_request){
+                    .operation = COMMON_MACHINE_DEBUG_READ_LINEAR,
+                    .address = 0xa20u, .bytes = bytes });
+                for (b = 0; b < bytes; ++b) {
+                    if (result.data[b] != (unsigned char)(bits >> (8u * b)))
+                        fprintf(stderr, "FIST rounding mode=%u input=%g width=%u byte=%u actual=%02x expected=%02x\n",
+                            mode, input[index], bytes, b, result.data[b],
+                            (unsigned char)(bits >> (8u * b)));
+                    assert(result.data[b] == (unsigned char)(bits >> (8u * b)));
+                }
+                result = access(machine, lease, (common_machine_debug_request){
+                    .operation = COMMON_MACHINE_DEBUG_READ_LINEAR,
+                    .address = 0xa30u, .bytes = 2u });
+                assert((result.data[0] & 1u) == (unsigned)overflow);
+            }
+        }
     }
 }
 
@@ -816,6 +898,7 @@ int main(void)
     watchpoints(machine, &lease, &events, &provider);
     access_boundaries(machine, &lease, &events);
     x87_values(machine, &lease, &events);
+    x87_rounding(machine, &lease, &events);
     (void)access(machine, &lease, (common_machine_debug_request){
         .operation = COMMON_MACHINE_DEBUG_SET_WATCH, .watch_kind = COMMON_MACHINE_DEBUG_WATCH_READ,
         .address = 0xa00u });
