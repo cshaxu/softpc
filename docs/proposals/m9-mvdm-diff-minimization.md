@@ -43,9 +43,9 @@ S1 冻结实际 tracked 文件全集、两端 revision/hash、比较工具与参
 C-VID 规则、其余 C-VID、CCPU、base/inc、BIOS、通信、键鼠、support、系统设备、
 视频控制器、host 头、host 实现。新增发现必须有归组/处置，不能静默遗漏。
 
-现有 pristine-divergence-current.md 的历史内容不是有效当前证明。S1 核对其
-引用者和证据索引后建立单一当前清单；历史快照明确归档/标记并修复链接，不并存
-两份“当前”权威。清单只记录事实与理由，不生成或改写构建源码。
+S1 的[当前差异账本](../etc/evidence/softpc/pristine-divergence-current.md)
+记录冻结全集、两种统计口径、逐文件内容原因和处置。原 M1 清单已明确归档为
+历史快照并互链，不并存两份“当前”权威。清单只记录事实与理由，不生成或改写构建源码。
 
 ## 顺序 S 任务
 
