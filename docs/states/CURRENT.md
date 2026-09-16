@@ -2,12 +2,30 @@
 
 ## Current Work
 
-No implementation subtask is active.
+M9 T60 S1 is active: repair rejected PIC acknowledgement at the original
+CPU interrupt boundary. T59 remains closed. The owner admitted this new
+candidate ahead of the existing queue; its other three candidates retain order.
 
-M9 T59 is closed on owner request after the
-[whole-task audit](../history/M9-T59-completion-audit.md). TODO is empty;
-the remaining observation was retired by the owner, not claimed repaired.
-The three queued candidates remain unadmitted and in their existing order.
+## M9 T60 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner admits reference-guided MVDM repairs and execution; Lib/Common changes require separate approval. |
+| Objective | Reject the PIC -1 sentinel before CPU interrupt side effects while retaining valid interrupt semantics. |
+| Non-goals | No Lib/Common/shared-test or manifest changes, new FPU backend, SALC change, renderer change, INI/media/ROM edits. |
+| Reference Baseline | SoftPC 549ed44; NTVDMx64 84a13d2 is read-only research, not imported source. |
+| Candidate Proposal | [MVDM reference repairs](../proposals/m9-mvdm-reference-repairs.md). |
+| Files And ABI Surface | Original c_intr.c and product IRQ regression; unchanged public ABI; proposal records the admitted source-mirror correction. |
+| Applicable Rules | Architecture/coding/execution/documentation governance skills and repository rules; source research policy. |
+| Verification | Original PIC rejection and CPU state assertions, valid interrupt regression, dual-width builds/full tests and governance gates. |
+| Expected Markers | One rejection boundary; no interrupt-frame write or CS:IP change for a rejected acknowledgement. |
+| Asset Needs | Existing build trees and fixed EXEs; owned disposable IRQ fixture, no trace or external media. |
+| Reporting Requirements | Red/green proof, same-class ledger, net code counts, executor commit/push and actual-diff review. |
+| Stop Conditions | Shared corpus change, new CPU policy, external code import or unrelated worktree mutation requires owner direction. |
+| Exit Criteria | Both EXEs built; focused/full tests pass; protected paths unchanged; reviewed and pushed clean. |
+| Original Owner Request | 将以上建议修复加入T任务proposal队列并准入执行；Lib/Common修改必须另行批准。 |
+| Similar-Issue Sweep | Every do_intrupt caller, both CCPU hardware acknowledgement paths and original PIC reject exits. |
 
 ## Current Technical Baseline
 

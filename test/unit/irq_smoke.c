@@ -8,8 +8,50 @@
 #include "insignia.h"
 #include "host_def.h"
 #include "ios.h"
+#include "ica.h"
+#include "compat/ccpu/abi.h"
+#include "../../src/mvdm/softpc.new/base/ccpu386/c_intr.h"
 
 extern void reboot(void);
+extern void host_set_hw_int(void);
+
+static void verify_rejected_interrupt(softpc_machine *machine)
+{
+    IU8 master_mask, slave_mask;
+    IS32 rejected;
+    unsigned short cs = c_getCS();
+    unsigned long ip = c_getEIP(), sp = c_getESP(), flags = c_getEFLAGS();
+    unsigned long stack = c_getSS_BASE() + ((sp - 6u) & 0xffffu);
+    unsigned char before[6], after[6];
+
+    inb(0x21u, &master_mask);
+    inb(0xa1u, &slave_mask);
+    outb(0x21u, 0xffu);
+    outb(0xa1u, 0xffu);
+    rejected = ica_intack();
+    assert(rejected == -1);
+    assert(softpc_machine_read_physical(machine, stack, before,
+        sizeof(before)) == SOFTPC_MACHINE_OK);
+
+    /* Exercise the real PIC result through the original CPU entry, not a
+       duplicate predicate. Rejection must not push an interrupt frame. */
+    do_intrupt((IU16)rejected, FALSE, FALSE, 0u);
+    assert(c_getCS() == cs && c_getEIP() == ip);
+    assert(c_getESP() == sp && c_getEFLAGS() == flags);
+    assert(softpc_machine_read_physical(machine, stack, after,
+        sizeof(after)) == SOFTPC_MACHINE_OK);
+    assert(memcmp(before, after, sizeof(before)) == 0);
+
+    /* A stale CPU request must also survive the actual instruction loop.
+       The boot program is parked on JMP $, with interrupts enabled. */
+    assert((flags & 0x200u) != 0u);
+    host_set_hw_int();
+    assert(softpc_machine_run(machine, 32u) == SOFTPC_MACHINE_OK);
+    assert(c_getCS() == cs && c_getEIP() == ip);
+    assert(c_getESP() == sp && c_getEFLAGS() == flags);
+    outb(0xa1u, slave_mask);
+    outb(0x21u, master_mask);
+}
 
 int main(void)
 {
@@ -57,6 +99,7 @@ int main(void)
     assert(softpc_machine_read_physical(machine, 0x46cu, ticks,
         sizeof(ticks)) == SOFTPC_MACHINE_OK);
     assert(ticks[0] != 0u || ticks[1] != 0u || ticks[2] != 0u || ticks[3] != 0u);
+    verify_rejected_interrupt(machine);
 
     /* The original 8042 output-port pulse requests a CPU reset through the
        original keyboard controller; it is not a standalone reset shortcut. */

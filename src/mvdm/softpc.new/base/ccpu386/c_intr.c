@@ -211,6 +211,10 @@ IFN4(
    IU32 old_ss;        /* Variables used while making stack */
    IU32 old_sp;
 
+   /* T60: a rejected PIC acknowledgement is not an interrupt vector. */
+   if ( vector == (IU16)-1 )
+      return;
+
    if ( GET_PE() == 0 )
       {
       /* Real Mode */
