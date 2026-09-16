@@ -392,7 +392,7 @@ void nt_text(int ScreenOffset, int ScreenX, int ScreenY,
     sub_note_trace4( CGA_HOST_VERBOSE, "t=%d l=%d b=%d r=%d",
                       WriteRegion.Top, WriteRegion.Left,
                       WriteRegion.Bottom, WriteRegion.Right
-	    );
+		    );
 
     if(!InvalidateConsoleDIBits(sc.OutputHandle, &WriteRegion)){
 	/*

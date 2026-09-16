@@ -613,7 +613,7 @@ void nt_ega_lo_graph_std(int offset, int screen_x, int screen_y,
     if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
         screen_x >= sc.PC_W_Width / 2 || screen_y >= sc.PC_W_Height / 2 ||
         offset < 0 || offset >= EGA_PLANE_SIZE || get_offset_per_line() <= 0)
-        return;
+	return;
     width = min(width, (sc.PC_W_Width / 2 - screen_x) / 8);
     height = min(height, sc.PC_W_Height / 2 - screen_y);
     width = min(width, EGA_PLANE_SIZE - offset);
@@ -1063,7 +1063,7 @@ void nt_ega_med_graph_std(int offset, int screen_x, int screen_y,
     if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
         screen_x >= sc.PC_W_Width || screen_y >= sc.PC_W_Height / 2 ||
         offset < 0 || offset >= EGA_PLANE_SIZE || get_offset_per_line() <= 0)
-        return;
+	return;
     width = min(width, (sc.PC_W_Width - screen_x) / 8);
     height = min(height, sc.PC_W_Height / 2 - screen_y);
     width = min(width, EGA_PLANE_SIZE - offset);
@@ -1305,7 +1305,7 @@ void nt_ega_hi_graph_std(int offset, int screen_x, int screen_y,
     if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
         screen_x >= sc.PC_W_Width || screen_y >= sc.PC_W_Height ||
         offset < 0 || offset >= EGA_PLANE_SIZE || get_offset_per_line() <= 0)
-        return;
+	return;
     width = min(width, (sc.PC_W_Width - screen_x) / 8);
     height = min(height, sc.PC_W_Height - screen_y);
     width = min(width, EGA_PLANE_SIZE - offset);
