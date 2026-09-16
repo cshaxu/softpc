@@ -5,31 +5,31 @@
 T60 is closed after owner manual acceptance and the whole-task audit.
 T61 is closed on owner direction after the [whole-task audit](../history/M9-T61-completion-audit.md).
 M9 T62 S1-S4 are closed and owner-tested successfully.
-M9 T62 S5 is active; S6-S8 are admitted in sequence.
+M9 T62 S5 is closed; S6 is active, S7-S8 admitted in sequence.
 T62 remains open until owner acceptance after S8.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
 The three queued candidates are unchanged.
 
-## M9 T62 S5 Packet
+## M9 T62 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admitted four sequential follow-ups and automatic progression; permanent commit/push approval. |
-| Objective | Remove Console duplicate binding-active flag, preserving generation admission. |
-| Non-goals | No public ABI, locking, product semantics, App/VM/Compat/MVDM changes. |
-| Reference Baseline | 8e82e85; S1-S4 manually accepted. |
+| Admission And Approval | Owner approved four follow-ups, sequential automatic admission and commit/push. |
+| Objective | Store pressed input events directly; remove duplicate source wrapper. |
+| Non-goals | No public ABI, product behavior, App/VM/Compat/MVDM or unrelated cleanup changes. |
+| Reference Baseline | 686dea3; preceding S closed after actual-commit review. |
 | Candidate Proposal | [Four follow-ups](../proposals/m9-common-lib-followup-simplification.md) |
-| Files And ABI Surface | src/lib/console/console.c; test/lib Console tests; manifests and task records. Public ABI unchanged. |
-| Applicable Rules | docs/README reading set; execution, architecture, coding and documentation rules and linked skills. |
-| Verification | Console generation/barrier checks; dual fixed EXE builds, full x64/x86 CTest, manifest/corpus/documentation gates; actual-commit focused review. |
-| Expected Markers | No binding_active; zero/stale generation rejected; all gates pass. |
-| Asset Needs | Refresh assets/binary/softpc32.exe and softpc64.exe only; preserve INI/media. |
-| Reporting Requirements | Pre-audit estimate; actual production/test numstat, tests, commits and both EXE links. |
-| Stop Conditions | Public contract/lock change or failed proof requiring wider scope. |
-| Exit Criteria | Complete P1 pushed, actual-diff coordinator review and focused proof, clean P2 closure; then admit S6. |
-| Original Owner Request | Four S tasks, before/after audits and estimates/actual diffs, tests and links; proceed sequentially then wait for owner. |
-| Similar-Issue Sweep | All binding_active/generation writers and production delivery paths; no alternate binding-validity owner. |
+| Files And ABI Surface | src/common/session/control.c and test/common/physical_key_identity_smoke.c; manifests/task records and fixed EXEs. Public ABI unchanged. |
+| Applicable Rules | docs/README reading set; execution, architecture, coding, documentation rules and referenced skills. |
+| Verification | Physical-key/source/retirement tests; both fixed EXE builds, full x64/x86 CTest, shared manifest/corpus and documentation gates; actual-commit focused checks. |
+| Expected Markers | No common_session_pressed_key or duplicate source assignment. |
+| Asset Needs | Only refresh assets/binary/softpc32.exe and softpc64.exe; preserve INI/media. |
+| Reporting Requirements | Before/after audit, estimated/actual production and test numstat, tests, commits, EXE links. |
+| Stop Conditions | Public contract or product behavior change, failed proof or ownership expansion. |
+| Exit Criteria | Complete implementation P1 pushed, coordinator actual-diff audit, post-commit focused tests; P2 closure pushed. |
+| Original Owner Request | Four sequential S tasks; audit/estimate before, audit actual diffs/tests/links after; wait only after all four. |
+| Similar-Issue Sweep | All callers/writers of the removed duplicate responsibility, no retained forwarding compatibility path. |
 
 ## Current Technical Baseline
 
