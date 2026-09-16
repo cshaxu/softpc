@@ -653,7 +653,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 					}
 #else /* IRET_HOOKS */
 					host_com_ioctl(adapter, HOST_COM_INPUT_READY,
-							(intptr_t)&input_ready);
+						(intptr_t)&input_ready);
 					if (input_ready)
 #ifdef DELAYED_INTS
 						recv_char((long)adapter);
@@ -1723,7 +1723,7 @@ static void modem_change IFN1(int, adapter)
 	if (asp->loopback_state == OFF)
 	{
 		/* get current modem input state */
-	host_com_ioctl(adapter, HOST_COM_MODEM, (intptr_t)&modem_status);
+		host_com_ioctl(adapter, HOST_COM_MODEM, (intptr_t)&modem_status);
 		cts_state  = (modem_status & HOST_COM_MODEM_CTS)  ? ON : OFF;
 		dsr_state  = (modem_status & HOST_COM_MODEM_DSR)  ? ON : OFF;
 		rlsd_state = (modem_status & HOST_COM_MODEM_RLSD) ? ON : OFF;
@@ -3252,4 +3252,3 @@ int com_debug()
 }
 #endif /* !PROD */
 /********************************************************/
-

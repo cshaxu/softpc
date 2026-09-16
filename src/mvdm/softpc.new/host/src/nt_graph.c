@@ -1,4 +1,3 @@
-
 #include <windows.h>
 #include "host_def.h"
 #include "insignia.h"
@@ -629,9 +628,6 @@ void nt_init_screen(void)
 
     /*::::::::::::::::::::::::::::::::: Allocate DAC and EGA planes buffers */
 
-    /* The original V7 BIOS reports AX=826Fh: two 256 KiB VRAM blocks.
-       EGA_PLANE_SIZE is 128 KiB in the V7 build, therefore the original
-       four-plane allocation is the fixed card's 512 KiB capacity. */
     if(!EGA_planes) EGA_planes = (byte *) host_malloc(4*EGA_PLANE_SIZE);
     if(!DAC) DAC = (PC_palette *) host_malloc(sizeof(PC_palette) * VGA_DAC_SIZE);
 
@@ -1696,6 +1692,7 @@ void set_the_vlt(void)
             /*..................... Apply new colours to output palette */
 
             SetPaletteEntries(sc.ColPalette, 0, VGA_DAC_SIZE, &vga_color[0]);
+
             /* Progs that cycle the DACs get hit by idle detect unless..*/
 
             IDLE_video();
@@ -2104,16 +2101,6 @@ void textResize(void)
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 void graphicsResize(void)
 {
-#if 0 /* standalone DIB outlet now belongs to host compatibility */
-        /* Preserve all of nt_graph's mode selection and all nt_ega/nt_vga
-           drawing.  Only replace its final NT console-graphics buffer
-           allocation with the detached VM's owned indexed DIB. */
-        if (!softpc_standalone_dib_resize(sc.PC_W_Width, sc.PC_W_Height,
-                sc.BitsPerPixel))
-            assert1(NO, "SoftPC: standalone graphics surface %dx%dx%d failed",
-                sc.PC_W_Width, sc.PC_W_Height, sc.BitsPerPixel);
-        return;
-#else
         DWORD    headerSize;
         LPBITMAPINFO     infoStructPtr;
 
@@ -2365,5 +2352,3 @@ void host_stream_io_update(half_word * buffer, word count)
 		  );
     flush_count = 0;
 }
-
-#endif /* SOFTPC_STANDALONE */

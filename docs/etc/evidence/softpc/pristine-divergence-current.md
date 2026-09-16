@@ -181,3 +181,69 @@ S4/S5 若评估保留，须记录为什么比外移/复用更简单，以及行�
 S1 执行验证：工具复算两遍总数一致；完整规则模式 34/34；通过 T60 3df951c 的
 18 个 mirror 变更路径逐一哈希确认全部与原始相等；双 EXE 哈希如上；
 文档治理和 `git diff --check` 通过。源代码与测试零改动，未运行新的产品测试。
+
+## S2 实施证据
+
+已恢复 keyba.c 两处原始缩进；删除 nt_graph.c 文件头空行、禁用的 standalone
+DIB 分支及匹配 #else/#endif。未改真正执行的 graphicsResize 内容。
+两宽度使用当前 CMake flags.make 的 compiler/defines/includes/flags（含 keyba
+的原有 -iquote）执行 `-E -P`，保留字符串/字符及 token 边界、去掉空白后 SHA256：
+修改前后均一致。
+
+| 宽度/文件 | 前后同值 SHA256 |
+| --- | --- |
+| x64 keyba.c | B33E33F6E9C6B92548E20C9ADFDF596E8F4376AD415B4AE0B2DC9D6788529B6B |
+| x64 nt_graph.c | 57E8D36C20A767BBA77197A54D8B658A7E0058A8A174180227044E65BFBE1B09 |
+| x86 keyba.c | C266EFD8324F8454D2AC1E738067729E3F5670049D56B145633271496153ABF8 |
+| x86 nt_graph.c | 88D27DE4CCAEBCD2FA15B5EB62DF84DA6C2CC754FB5716641841296A0CCFF053 |
+
+临时只读预处理探针位于 build/t61-s2，证据保留后删除。首次探针的 PowerShell
+单字符串 splat 错误、x86 DLL PATH 缺失已修正后重跑；不作为产品构建失败。
+keyba.c 已恢复原始行尾及第一行原有尾空格，SHA256 与 OpenNT 完全相同：
+`D3326210BE154866924CA99F1E44E0A76E9A912E15975305804F6B59C4CF7953`。
+又恢复 com.c 两处缩进/末尾空行、keybd_io.c MONITOR 分支缩进、mouse.c 空行及
+原有 toggle 初始化缩进。两宽度预处理 token 指纹前后相等：
+
+| 文件 | x64 | x86 |
+| --- | --- | --- |
+| keybd_io.c | B9C74FE2B584B3DA9EB5D306A16808696E1B5C98030DDF38FB8E16C23B0164F8 | 41F0835F74535FDD1706495F7065F0E703083CB1FC9B15AB90F1378EAC2B97F2 |
+| mouse.c | 47FC8BD0EA97204FE7DE53B6CE6C41A3C3DAE6A0B3C8ADAD9724CD6BF9193272 | DAA2CFBB8348429C9C8128BC8240F858858574180865CE9CA6192D3D3F06BE98 |
+| com.c | 59750A835947E2120B7AC1DFC3294E701933786A0714907216380EED11B4C135 | 34F78A89C895C8206DE0D0DCD23A8F21823A8BD3D047B0FADD29F52021CD13BF |
+
+全镜像 C/H 扫描：原版没有混合换行文件。48 个当前文件按其各自原版换行格式
+还原，使用单字节无损编码，逐文件断言去掉 CR 后内容完全不变。Git 的自动换行
+规范会隐藏其中大多数工作区字节差异；此项不能冒称 48 个新的 tracked 内容修复，
+也不能保证其他 checkout 配置仍有相同原始字节统计。S6 会同时给出辅助内容口径。
+后续 S2 清理：恢复 cfpu_def.h 原有注释/空行、host_com.h 注释内缩进、ica.c
+原有空行和单调用外括号；删去 ica.c 已由 host_def.h 提供的重复 stdlib include；
+删去 nt_graph.c 不改变代码的新增 VRAM 说明，恢复原有调色板更新后空行。
+
+ica.c 删除括号是唯一选中 token 变化；作用域内仅一条无局部声明的函数调用，
+无宏展开多语句。两宽度 `-S -o -` 生成汇编前后相等：
+x64 `249B3DA64C14E1C008ECDE23EFCA4A4E49644B245FB53E9D6E880E37D8701A0E`；
+x86 `62851A486344075259F5BBDA1B77513B60269588AB392D7A9F15A4FF542ED726`。
+删去重复 include 后预处理结果相对括号清理后不变；FPU、nt_graph、com 的
+注释/格式修改预处理结果不变。全部 C/H 用 `--ignore-space-at-eol -U0` 扫描
+纯空白区块，最后两处命中为 ica/nt_graph 已恢复的空行。
+
+其余候选明确保留：ntstubs.c 空行是删除旧 stub 后保留的原始行，继续删会增加
+原始删除 diff；evidfunc.h 四条重复声明若恢复仍必须改成新 ABI，每条都会新增
+一行差异而不会减少原始删除量，因此不恢复；34 规则文件必要替换同行内的空白
+不另做无意义全量改写；host_cpu.h 非 CCPU 声明及 ios.c 留 S3；键盘/声音留 S4/S5。
+必要功能解释注释保留，不以删去理由来伪造简洁性。
+
+S2 构建前复算：402 同字节，96 差异文件；原始口径 +23,770/-22,442、5,131 区块；
+辅助内容口径 +23,749/-22,421、5,127 区块。辅助口径相对 S1 减少 43 增删行、
+11 区块、1 文件。原始口径的大幅降低主要是 checkout 行尾恢复，不能混为功能精简。
+实际 tracked 生产改动为 8 文件 +17/-34，净 -17；测试源码 0。保护目录零改动。
+`cmake --build --preset tests-x64/tests-x86 -j 8` 双宽度通过；串行 CTest 各
+97/97 通过（x64 92.25s，x86 71.41s），包括 PIC、键码、鼠标、VGA、x87、BOP
+和固定包测试。保护目录、用户 INI/媒体零改动，外部只读参考工作区仍干净。
+`git diff --check` 唯一发现是恢复 keyba.c 第一行原版尾空格：这是原始镜像
+逐字节一致所需的例外；排除此文件后无发现。两份临时预处理脚本已删除。
+文档门禁不允许提前创建当前 S 的收口历史，故实施证据先留本账本，实际提交
+审查完成后才登记历史/下一 S。不能把仅实施验证称为协调者收口。
+
+固定 EXE SHA256：
+- x86 `4D065ECBAF5CBD6B14E5B07876502CEBC343CEBE93E318FC2CE6CC1F571DEBD8`
+- x64 `4D72F82800CAD5326217AB5F960611621F2990194904D2737FCB69DE9536D424`

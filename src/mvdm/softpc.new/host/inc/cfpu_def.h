@@ -51,6 +51,8 @@ IU16	exp:15;
 #endif
 } FP80SE;
 
+//#ifdef BIGEND
+
 typedef struct {
 #ifdef LITTLEND
 IU32	mant_lo;
@@ -89,6 +91,8 @@ IU32	mant_lo;
 #endif
 FP80SE	sign_exp;
 } FP80;
+
+//#endif
 
 /* HOST_ values are based on a byte ordering where 0 represents the first
  * byte.  They are used to copy n-byte values represented in bigendian-order

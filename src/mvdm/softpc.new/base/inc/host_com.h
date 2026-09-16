@@ -74,7 +74,7 @@ char value;
 VOID host_com_ioctl(adapter, request, arg)
 int adapter;
 int request;
- intptr_t arg;
+intptr_t arg;
 {
 	Perform control function "request" qualified by "arg" on the
 	communications channel for "adapter".

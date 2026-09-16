@@ -5,9 +5,6 @@
  *    O/S include files.
  */
 #include <stdio.h>
-#ifdef SOFTPC_STANDALONE
-#include <stdlib.h>
-#endif
 #include TypesH
 
 /*
@@ -1328,9 +1325,7 @@ void SWPIC_hw_interrupt IFN3(IU32, adapter, IU32, line_no, IS32, call_count)
      */
 
     if ((line = ica_scan_irr(adapter)) & 0x80)
-	{
-	    ica_interrupt_cpu(adapter, line & 0x07);
-	}
+	ica_interrupt_cpu(adapter, line & 0x07);
 
     ica_lock_set(0);
     host_ica_unlock();
@@ -1452,6 +1447,7 @@ ica_intack IFN0()
     {
         line = ica_accept(ICA_SLAVE);
 	int_no = line + adapter_state[ICA_SLAVE].ica_base;
+
 #if defined (CPU_40_STYLE) || defined (NTVDM)
 	if (line == -1)	/* skip any spurious ints */
         {

@@ -160,7 +160,6 @@ void mouse_inb IFN2(io_addr, port, half_word *, value)
 	trace(buff,DUMP_NONE);
     }
 #endif
-
 }
 
 
@@ -424,7 +423,7 @@ void mouse_init IFN0()
     }
 #endif
 
-	mouse_inb_toggle = 0;
+    mouse_inb_toggle = 0;
 	mouse_test_state = 0;
 	mouse_test_data = 0;
 
