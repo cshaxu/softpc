@@ -4,7 +4,7 @@
 
 T60 is closed after owner manual acceptance and the whole-task audit.
 T61 is closed on owner direction after the [whole-task audit](../history/M9-T61-completion-audit.md).
-M9 T62 S1-S2 are closed; S3 is active: share Storage file-size measurement.
+M9 T62 S1-S3 are closed; S4 is active: localize Console event ownership.
 No S3 work started before T61 closure (6741721).
 The three queued candidates are unchanged.
 
@@ -17,32 +17,32 @@ The three queued candidates are unchanged.
   [final ledger](../etc/evidence/softpc/pristine-divergence-current.md#s13-最终归属复核).
   Lib/Common and shared tests unchanged within T61; owner has now closed T61.
 
-## M9 T62 S3 Packet
+## M9 T62 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner admits four serial S tasks, automatic next admission, dual EXEs, tests and permanent push permission. |
-| Objective | One Storage save-position/measure/restore algorithm over same-shape platform seek/tell. |
-| Non-goals | No public API, medium mode, locking/open semantics, Common, App, VM, Compat or MVDM changes. |
-| Reference Baseline | db3b6d8 S2 implementation; full suites 100/100 each, post-commit 6/6 each; T61 closed in 6741721. |
+| Objective | Move neutral KVM Console event processing/state to its component root; retain native worker/button decoding in platform. |
+| Non-goals | No public API, input behavior, worker lifecycle, Linux feature, Common, App, VM, Compat or MVDM changes. |
+| Reference Baseline | 0811c31 S3 implementation; full suites 101/101 each, post-commit 11/11 each; T61 closed in 6741721. |
 | Candidate Proposal | [Bounded simplification](../proposals/m9-common-lib-simplification.md). |
-| Files And ABI Surface | lib/storage/file.c/h and win32/linux/file.c; shared storage tests/manifests/fixed EXEs; private platform positioning only. |
+| Files And ABI Surface | lib/kvm-console/console.c/h and platform component.c; README, shared tests/manifests/fixed EXEs; private event/button declarations only. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding rules; design Architecture/Coding/UI; four linked governance skills. |
-| Verification | Position preservation, empty/hole/large-count and injected failures; Linux fake contract; full dual-width suites, manifests/DAG/governance and post-commit focused tests. |
-| Expected Markers | One length algorithm, platform calls preserve original seek/tell errors and 64-bit widths, output count published only on success. |
+| Verification | Input reset, activation/pending frame, keyboard/text equivalence, mouse buttons/baseline, fault/retirement; full dual-width suites, manifests/DAG/governance and post-commit focused tests. |
+| Expected Markers | One root event path; same normalizer/matcher, X8/Y16 mouse scale, native callback retirement barrier; Linux remains UNSUPPORTED. |
 | Asset Needs | Refresh assets/binary/softpc32.exe and softpc64.exe only; preserve INI/media. Existing preset build trees only. |
 | Reporting Requirements | Pre-plan estimate and post-result production/test/build numstat; evidence, pushed P and clean workspace. |
-| Stop Conditions | Changed file locking/modes/error behavior, extra objects or platform conditionals in common algorithm. |
+| Stop Conditions | Changed input/lifecycle behavior, new public API, new state machine or new platform functionality. |
 | Exit Criteria | Both widths build/pass full suite; focused failure proof; manifests/gates pass; implementation pushed and actual-diff coordinator review complete. |
 | Original Owner Request | Original request retained verbatim in linked proposal; each finding becomes its own S, automatically continue after closure, T remains open for owner test. |
-| Similar-Issue Sweep | Both storage platform files and all positioning/byte-count consumers; shared read/write/close remain single implementations. |
+| Similar-Issue Sweep | KVM Console root/platform callbacks, state users and tests; preserve Window-specific decoding and shared kvm-base normalizer. |
 
 - T61 S6 implementation 4f7171d completes the 498-file original-diff audit:
   403 identical, 95 divergent; +23,141/-22,335, 5,132 hunks. Comparable original
   diff reduced by 737 changed lines, production net -539. Full suites 98/98
-  and actual-commit focused 8/8 per width; fixed EXEs refreshed. T61 awaits
-  owner testing. [S6 review](../history/M9-T61-S6-final-mirror-audit.md).
+  and actual-commit focused 8/8 per width; fixed EXEs refreshed. T61 is now
+  closed by the whole-task audit linked above. [S6 review](../history/M9-T61-S6-final-mirror-audit.md).
 
 - T61 S5 implementation a65dc18 shares original sound state; original content
   additions reduced from 222 to 64, production net -158. Dual full suites
