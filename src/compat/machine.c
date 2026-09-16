@@ -237,16 +237,8 @@ softpc_machine_result softpc_machine_set_floppy(softpc_machine *machine,
             !softpc_machine_media_exists(path))
             return SOFTPC_MACHINE_INVALID_ARGUMENT;
     }
-    if (!machine->hardware_initialized) {
-        if (path == NULL) machine->floppy_path[0] = '\0';
-        else {
-            memcpy(machine->floppy_path, path, length + 1u);
-        }
-        machine->options.floppy_path = machine->floppy_path[0] == '\0' ?
-            NULL : machine->floppy_path;
-        return SOFTPC_MACHINE_OK;
-    }
-    if (!softpc_platform_floppy_attach(path, machine->options.media_mode))
+    if (machine->hardware_initialized &&
+        !softpc_platform_floppy_attach(path, machine->options.media_mode))
         return SOFTPC_MACHINE_IO_ERROR;
     if (path == NULL) machine->floppy_path[0] = '\0';
     else {

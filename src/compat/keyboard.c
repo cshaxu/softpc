@@ -36,15 +36,6 @@ char *extra_text;
     return 0;
 }
 
-void softpc_platform_keyboard_reset(void)
-{
-
-    keyboard_init();
-    keyboard_post();
-    AT_kbd_init();
-    AT_kbd_post();
-}
-
 void softpc_platform_keyboard_discard_stale_output(void)
 {
     /* The original reset clears the 8042 full/status state but retains the
@@ -68,11 +59,5 @@ int softpc_platform_keyboard_key(int key, int released)
 int softpc_platform_keyboard_scancode(IU8 scan_code)
 {
     int key = softpc_host_scan1_to_key((unsigned int)(scan_code & 0x7fu));
-    if (key == 0)
-        return 0;
-    if ((scan_code & 0x80u) != 0u)
-        host_key_up(key);
-    else
-        host_key_down(key);
-    return 1;
+    return softpc_platform_keyboard_key(key, (scan_code & 0x80u) != 0u);
 }

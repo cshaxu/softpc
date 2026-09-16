@@ -602,3 +602,38 @@ Queue；候选保留在本报告供 T61 owner 决策，不假称已修复或全�
 src、test、CMakeLists.txt、assets 相对审计基线零改动；两份固定 EXE
 保持上方 S6 SHA256。本次不重跑构建或设备测试，不把 S6 测试冒称为新验证。
 T61 保持开放，实施候选等待 owner 决策。
+
+## S8：无消费者支持入口与局部重复清理
+
+Owner 随后批准拆解与实施；基线 da32558。有限集合为 S7 A2 的六个函数与
+A4 的 keyboard dispatch、floppy path commit、HDD transfer validation。
+其余 A3 测试旧壳、A1 头文件、B 归属/几何分别在后续步骤，不混入本项。
+
+- 删除 dib_resize/旧 dib_set_palette、keyboard_reset、三个 softpc_xms_*；
+  DIB 声明一起删除，memory.c 不再需要 string.h。实际 bind、palette_entries、
+  原始 reset、8042 stale byte 清理、SAS bus read/write 均保持。
+- scancode 查表结果为原始无符号 key number，统一调用现有 keyboard_key；
+  零映射仍拒绝，make/break 的原始 host_key_up/down 调用不变。
+- set_floppy 仅在 hardware_initialized 时 attach，失败仍不提交 path；
+  初始化前与初始化后的成功分支共用原有一次 path/options 更新。
+- HDD 读写共用本文件 static 范围验证；原整数类型、算式、短路顺序和 storage
+  读写调用保留。不借去重修改介质大小、读写权限或错误语义。
+
+同类扫描：rg 搜索全部 src/test/tools/CMakeLists 的六个符号，修改前仅
+定义/声明及 XMS 岛内互调，修改后零命中；两宽度 CMAKE_NM 指定工具检查
+libsoftpc-machine.a，六符号均不存在。现有实际绑定和 palette-only dirty
+路径不是死代码；serial/parallel 等独立设备状态不合并。没有新增共享辅助层。
+
+git diff da32558 --numstat -- src test：六个生产路径 +20/-130，净 -110；
+测试源码 0 改动。复用现有 machine、dual-media、partition、FDC、keycode、
+VGA frame、runtime/restart/input continuation 测试，不删除或弱化旧断言。
+镜像与四个共享 corpus 零改动，原始镜像差异统计保持 S6 值。
+未创建新诊断目录或媒体；测试自有临时镜像由原测试清理，其他 build 保留。
+
+双宽度 tests-x64/tests-x86 构建成功，现存原始头/Compat 编译警告仍可见，
+不宣称 warning-free。串行完整 test-x64 98/98（88.82s）、test-x86 98/98
+（74.47s），无失败；文档治理与 diff-check 通过。固定包 SHA256：
+- x86 `9B884716F7ACC4FF41826723D94BE8E70CA342617473E974467C871EA023DBB5`
+- x64 `8050D3EFFB37DA892F3634D8CCC9991B4F688781B9094996892317FEE66E8B44`
+
+上述为自动证据，不代替用户 GUI/RDP/声音体验验收。

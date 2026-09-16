@@ -3,30 +3,30 @@
 ## Current Work
 
 T60 is closed after owner manual acceptance and the whole-task audit.
-M9 T61 S1-S6 are closed as verified implementation deliveries. T61 remains
-open; owner admits S7 for remaining mirror and VM/Compat reuse auditing.
+M9 T61 S1-S7 are closed; S7 delivered the reviewed ownership audit da32558.
+T61 remains open; owner admits S8 and the serial follow-up plan.
 The three queued candidates are unchanged.
 
-## M9 T61 S7 Packet
+## M9 T61 S8 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner requests remaining MVDM diff and VM/Compat duplication/reuse audit; single-person dual-role. |
-| Objective | Review remaining mirror differences, original/local support duplicates, additional OpenNT mirror reuse and bidirectional Mirror/VM/Compat responsibility placement, preserving semantics and minimizing total complexity. |
-| Non-goals | No production change, source import, shared-corpus edit, ABI change, behavior withdrawal or new EXEs. |
-| Reference Baseline | SoftPC 34f7182; S6 498-path ledger; read-only OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61. |
+| Admission And Approval | Owner approves decomposition and implementation; single-person dual-role; permanent push authorization. |
+| Objective | Remove six uncalled host helpers and consolidate local keyboard/floppy/HDD duplication without changing machine semantics. |
+| Non-goals | No mirror, Lib/Common/shared-test change, header ABI unification, ownership migration, new source import or behavior change. |
+| Reference Baseline | SoftPC da32558; S7 audit and S6 verified dual-width packages. |
 | Candidate Proposal | [Remaining mirror and support ownership audit](../proposals/m9-mirror-support-ownership-audit.md); original requests remain in the retained T61 plan. |
-| Files And ABI Surface | Read all 9 VM and 39 Compat files, remaining 95 mirror differences and original counterparts/build consumers; write audit/governance documentation only. |
+| Files And ABI Surface | Compat dib_surface.c/.h, keyboard.c, memory.c, machine.c and hdd_media.c; focused product tests only as necessary. Remove unused internal declarations, preserve all live host callbacks. |
 | Applicable Rules | Execution, Document, Architecture, Coding, source-research policy and their governance skills. |
-| Verification | Finite path coverage, function/state ownership, real callers/build selection, original counterpart and dependency closure; report removal/import/adapter costs and required equivalence tests; doc gate and unchanged production/artifact hashes. |
-| Expected Markers | Evidence-backed candidates distinguish duplicates, necessary adapters, local repeats and new-mirror opportunities; no unreviewed member labelled safe. |
-| Asset Needs | Keep S6 dual-width artifacts, user INI and media unchanged; read-only audit requires no rebuild. |
-| Reporting Requirements | Per-candidate paths/functions, reason, retained owner, line ranges, dependency/behavior risks and verification plan; complete coverage and explicit limits. |
-| Stop Conditions | No speculative deletion or import, second implementation, weakened compatibility or assumed external license; implementation requires owner decision after audit. |
-| Exit Criteria | Reconciled coverage ledger and findings, actual-code coordinator review, committed/pushed report and clean tree; T61 remains open for owner decisions. |
-| Original Owner Request | 再次审计剩余mvdm的diff；特别关注vm和compat与原始代码重复、内部重复，以及引入新OpenNT镜像文件减少支持代码的机会。同时也要审计：镜像里应当归属vm或compat的部分，vm和compat应当归属镜像的部分，vm和compat应当互相归属的部分。 |
-| Similar-Issue Sweep | All VM/Compat C/H and retained mirror diff groups; functions/tables/constants, lifecycle/state and wrappers including compile-time selection and transitive original dependencies. |
+| Verification | Whole-tree caller census; build tests-x86/tests-x64; full test-x86/test-x64; input, media, palette and restart checks; documentation gate and diff-check. |
+| Expected Markers | No removed live callback, unchanged mirror/shared corpora, one local operation for each deduplicated action. |
+| Asset Needs | Refresh both fixed EXEs; preserve user INI/media; use existing ignored build trees. |
+| Reporting Requirements | Exact production/test added/deleted/net lines, retained owners, test counts and any failure; no claim of manual GUI acceptance. |
+| Stop Conditions | A live consumer or unequal behavior blocks deletion; do not pull S9-S12 into S8. |
+| Exit Criteria | Dual-width builds/full tests and actual-commit review pass; committed/pushed complete delivery, clean tree; T61 stays open. |
+| Original Owner Request | 请拆解一下S任务 并更新当前proposal记录 然后开始准入执行。 |
+| Similar-Issue Sweep | S7 A2/A4 candidate set; search all src/test/tools/CMake consumers; test-only shells belong to S9, header duplication to S10, ownership/geometry to S11-S12. |
 
 ## Current Technical Baseline
 

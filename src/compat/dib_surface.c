@@ -127,42 +127,6 @@ int softpc_standalone_dib_init(void)
     return 1;
 }
 
-int softpc_standalone_dib_resize(int width, int height, int bits_per_pixel)
-{
-    size_t stride;
-    if (width <= 0 || height <= 0 || width > (int)SOFTPC_DIB_MAX_WIDTH ||
-        height > (int)SOFTPC_DIB_MAX_HEIGHT || bits_per_pixel != 8 ||
-        !softpc_standalone_dib_init()) return 0;
-
-    /* The imported EGA/VGA painters calculate their addresses from the
-       current DIB header.  Keep the backing allocation large, but publish
-       the actual mode geometry exactly as nt_graph::graphicsResize did. */
-    softpc_dib_info->bmiHeader.biWidth = width;
-    softpc_dib_info->bmiHeader.biHeight = -height;
-    softpc_dib_info->bmiHeader.biBitCount = (WORD)bits_per_pixel;
-    softpc_dib_info->bmiHeader.biSizeImage =
-        (DWORD)(((unsigned long)width + 3u) & ~3u) * (DWORD)height;
-    softpc_dib_width = (unsigned long)width;
-    softpc_dib_height = (unsigned long)height;
-    stride = ((size_t)width + 3u) & ~(size_t)3u;
-    memset(softpc_dib_bits, 0, stride * (size_t)height);
-    sc.ScreenBufHandle = (HANDLE)softpc_dib_bits;
-    sc.ConsoleBufInfo.lpBitMap = softpc_dib_bits;
-    sc.ConsoleBufInfo.lpBitMapInfo = softpc_dib_info;
-    sc.ConsoleBufInfo.dwBitMapInfoLength = sizeof(BITMAPINFOHEADER) +
-        SOFTPC_DIB_COLOURS * sizeof(RGBQUAD);
-    sc.ConsoleBufInfo.dwUsage = DIB_RGB_COLORS;
-    sc.ActiveOutputBufferHandle = sc.ScreenBufHandle;
-    sc.BitmapLastLine = (char *)softpc_dib_bits +
-        ((size_t)height - 1u) * stride;
-    DIBData = (char *)softpc_dib_bits;
-    MonoDIB = softpc_dib_info;
-    CGADIB = softpc_dib_info;
-    EGADIB = softpc_dib_info;
-    VGADIB = softpc_dib_info;
-    return 1;
-}
-
 int softpc_standalone_dib_bind(PBITMAPINFO painter_info)
 {
     int width;
@@ -268,25 +232,6 @@ int softpc_standalone_text_surface(const void **cells_out,
     *cell_bytes_out = SOFTPC_TEXT_CELL_BYTES;
     return 1;
 }
-void softpc_standalone_dib_set_palette(const void *palette_data, int count)
-{
-    const PC_palette *palette = (const PC_palette *)palette_data;
-    int index;
-    if (softpc_dib_info == NULL || palette == NULL || count <= 0) return;
-    if (count > (int)SOFTPC_DIB_COLOURS) count = (int)SOFTPC_DIB_COLOURS;
-    for (index = 0; index < count; ++index) {
-        softpc_dib_info->bmiColors[index].rgbRed =
-            (BYTE)(palette[index].red << 2);
-        softpc_dib_info->bmiColors[index].rgbGreen =
-            (BYTE)(palette[index].green << 2);
-        softpc_dib_info->bmiColors[index].rgbBlue =
-            (BYTE)(palette[index].blue << 2);
-        softpc_dib_info->bmiColors[index].rgbReserved = 0;
-    }
-    softpc_standalone_dib_record_palette();
-    softpc_standalone_dib_palette_changed();
-}
-
 void softpc_standalone_dib_set_palette_entries(const PALETTEENTRY *entries,
     int count)
 {

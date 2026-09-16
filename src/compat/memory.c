@@ -3,7 +3,6 @@
 #include "platform.h"
 
 #include <stdlib.h>
-#include <string.h>
 
 #include "cpu4.h"
 #include "sas.h"
@@ -27,30 +26,6 @@ UTINY *host_sas_term(void)
     softpc_ram = NULL;
     softpc_ram_size = 0;
     return NULL;
-}
-
-PVOID softpc_xms_physical_pointer(ULONG address, ULONG length)
-{
-    if (softpc_ram == NULL || address > softpc_ram_size ||
-        length > softpc_ram_size - address)
-        return NULL;
-    return softpc_ram + address;
-}
-
-PVOID softpc_xms_guest_pointer(USHORT segment, USHORT offset)
-{
-    return softpc_xms_physical_pointer(((ULONG)segment << 4) + offset, 1u);
-}
-
-BOOL softpc_xms_copy_physical(ULONG destination, ULONG source, ULONG length)
-{
-    PVOID destination_pointer = softpc_xms_physical_pointer(destination, length);
-    PVOID source_pointer = softpc_xms_physical_pointer(source, length);
-    if (destination_pointer == NULL || source_pointer == NULL)
-        return FALSE;
-    memmove(destination_pointer, source_pointer, length);
-    sas_overwrite_memory(destination, length);
-    return TRUE;
 }
 
 int softpc_platform_write_physical(IU32 address, const IU8 *bytes, IU32 length)

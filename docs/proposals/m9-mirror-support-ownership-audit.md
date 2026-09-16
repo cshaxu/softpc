@@ -11,9 +11,27 @@ Mirror-to-VM/Compat, VM/Compat-to-Mirror and VM-to-Compat responsibility checks.
 Use actual consumers, build selection and state ownership, not path names or
 line counts alone. Preserve all current product and D6 BOP behavior.
 
-This is read-only production research: no source import, source change,
-shared-corpus edit or new executable. Findings and finite coverage belong to
+The completed audit was read-only production research. Findings and finite coverage belong to
 [the existing evidence ledger](../etc/evidence/softpc/pristine-divergence-current.md#s7剩余镜像与-vmcompat-双向归属审计).
-Exit requires documented disposition, review, documentation gates, unchanged
-source/package hashes, commit and push. Implementation candidates require a
-subsequent owner decision; this audit does not admit their implementation.
+
+## Owner-approved implementation sequence
+
+Original request: “请拆解一下S任务 并更新当前proposal记录 然后开始准入执行”。
+Continue within T61, serial admission only after the previous exit review.
+Lib/Common and their shared tests stay unchanged. No wholesale external source
+import, generated source overlay, guest behavior change or D6 withdrawal.
+
+| Step | Scope and method | Exit proof / stop boundary |
+| --- | --- | --- |
+| S8 | Remove the six uncalled DIB/keyboard/XMS helpers and declarations; consolidate scancode dispatch, floppy path commit and HDD range validation locally. | Whole-tree caller census; existing input/media/palette/restart tests plus full x86/x64 suites, refreshed fixed EXEs. No mirror change or new abstraction. |
+| S9 | Retire test-only status shell, unused presentation option, single-font wrappers and unselected PIG header; migrate tests to retained production contracts rather than losing coverage. | No production/test/build references to removed interfaces, explicit replacement of obsolete shutdown proof, VGA/font and full dual-width tests. Keep any item whose independent contract is demonstrated. |
+| S10 | Unify GDP/SAS original declarations with the already retained mirror; keep pointer-width mechanics in existing Compat support. | Prove each translation unit's selected header, GDP expansion and SasVector slots before editing; report exact original diff cost. Prefer removing demonstrably unused slots; if new mirror ABI differences are required, present the precise alternative before adopting it. Dual-width layout/video/full tests. |
+| S11 | Move concrete machine lifecycle/config backend and debug-request preflight into VM; keep original host callbacks, memory allocation and media endpoints in Compat. | git mv, no forwarding duplicate, no Compat-to-VM header edge, update architecture and source ownership gate; reset/restart/debug atomicity and full dual-width proof. No rewritten core initialization. |
+| S12 | Resolve the duplicated V7 geometry inference by proving whether original surface geometry suffices; move the small host clock body out of the mirror into existing audio support where equivalent. | V7 60h–69h, standard VGA, partial dirty and transition proof precede deletion; compare original diff and preserve sound timing. If geometry equivalence fails, retain the needed behavior and report the evidence rather than guessing. |
+| S13 | Whole-task convergence review against the S7 finite ledger and owner requests. | Every candidate implemented or explicitly justified; no duplicate production path, dual-width package/full regressions, original diff and production/test accounting, clean committed/pushed tree. T closure requires owner acceptance. |
+
+S8–S12 each deliver one complete implementation P, build/test both widths,
+refresh assets/binary/softpc32.exe and softpc64.exe without editing the INI,
+commit/push, then review the actual commit in the coordinator role. No mere
+relocation is counted as code reduction. Original-import candidates rejected
+in the audit remain rejected, not silently included in this sequence.

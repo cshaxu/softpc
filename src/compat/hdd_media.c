@@ -102,22 +102,28 @@ int *sectors;
         *cylinders = 16383;
 }
 
+static softpc_disk_media *softpc_hdd_transfer(int driveid, int offset,
+    int sectors, size_t *bytes)
+{
+    softpc_disk_media *media;
+    if (driveid < 0 || driveid >= 2 || offset < 0 || sectors < 0)
+        return NULL;
+    media = &softpc_hdd_media[driveid];
+    *bytes = (size_t)sectors * SOFTPC_DISK_SECTOR_BYTES;
+    if (media->medium == NULL || (IU32)offset > media->total_sectors * SOFTPC_DISK_SECTOR_BYTES || *bytes > (size_t)(media->total_sectors * SOFTPC_DISK_SECTOR_BYTES - (IU32)offset))
+        return NULL;
+    return media;
+}
+
 int host_fdisk_rd(driveid, offset, sectors, buffer)
 int driveid;
 int offset;
 int sectors;
 char *buffer;
 {
-    softpc_disk_media *media;
     size_t bytes;
-    if (driveid < 0 || driveid >= 2 || offset < 0 || sectors < 0)
-        return 0;
-    media = &softpc_hdd_media[driveid];
-    bytes = (size_t)sectors * SOFTPC_DISK_SECTOR_BYTES;
-    if (media->medium == NULL || (IU32)offset > media->total_sectors * SOFTPC_DISK_SECTOR_BYTES || bytes > (size_t)(media->total_sectors * SOFTPC_DISK_SECTOR_BYTES - (IU32)offset))
-    {
-        return 0;
-    }
+    softpc_disk_media *media = softpc_hdd_transfer(driveid, offset, sectors, &bytes);
+    if (media == NULL) return 0;
     if (lib_storage_medium_read_at(media->medium, (size_t)offset, buffer,
             bytes) != LIB_STATUS_OK)
         return 0;
@@ -130,16 +136,9 @@ int offset;
 int sectors;
 char *buffer;
 {
-    softpc_disk_media *media;
     size_t bytes;
-    if (driveid < 0 || driveid >= 2 || offset < 0 || sectors < 0)
-        return 0;
-    media = &softpc_hdd_media[driveid];
-    bytes = (size_t)sectors * SOFTPC_DISK_SECTOR_BYTES;
-    if (media->medium == NULL || (IU32)offset > media->total_sectors * SOFTPC_DISK_SECTOR_BYTES || bytes > (size_t)(media->total_sectors * SOFTPC_DISK_SECTOR_BYTES - (IU32)offset))
-    {
-        return 0;
-    }
+    softpc_disk_media *media = softpc_hdd_transfer(driveid, offset, sectors, &bytes);
+    if (media == NULL) return 0;
     if (lib_storage_medium_write_at(media->medium, (size_t)offset, buffer,
             bytes) != LIB_STATUS_OK)
         return 0;
