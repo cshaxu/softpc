@@ -2,31 +2,31 @@
 
 ## Current Work
 
-M9 T59 S21 delivered and reviewed: Common Debug linear-command repairs;
-P1 bb14a4f pushed, dual-width builds and final 97/97 suites pass. Actual-commit
-review and focused reruns pass. Initial compact-Console test failure remains
-recorded separately in TODO. T59 remains open for owner testing.
+M9 T59 S22 implemented and verified: DOS DEBUG memory-command semantics,
+preserving line-based interactive E, host-file behavior and the X extension
+namespace. Both builds and full 97/97 suites pass; executor delivery awaits
+actual-commit review. T59 remains open for owner testing.
 
-## M9 T59 S21 Packet
+## M9 T59 S22 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves proposed debugger repairs, dual-width build/test and commit/push. |
-| Objective | Correct XM overlap, XU count narrowing, XS parsing/search bounds and related linear overflow. |
-| Non-goals | No parser/transaction/ABI redesign, 16-bit command changes, Lib/VM/Compat/MVDM/INI/media changes. |
-| Reference Baseline | 2ec18a1 clean main; original NXVM 9bd08dd8 debug.c is read-only comparison. |
-| Candidate Proposal | [Debug linear boundaries](../proposals/m9-debug-linear-boundaries.md). |
+| Admission And Approval | Owner approves DOS semantic repairs and explicitly retains interactive E and DOS environment behavior; build/test/commit/push approved. |
+| Objective | Align real memory ranges, lists, search/copy and disassembly defaults with DOS DEBUG; share applicable list corrections with X commands. |
+| Non-goals | No raw debugger input, DOS process/EMS/file redesign, execution plan, public ABI, Lib/VM/Compat/MVDM/INI/media changes. |
+| Reference Baseline | f7110d9 clean main; MS-DOS 6.0 cmd/debug is read-only behavioral research, not imported code. |
+| Candidate Proposal | [DOS DEBUG semantics](../proposals/m9-debug-dos-semantics.md). |
 | Files And ABI Surface | Common Debug implementation, shared tests/manifests, UI contract/docs and two fixed EXEs; no ABI change. |
 | Applicable Rules | Architecture/coding/execution/documentation skills; repository architecture/source layout/rules. |
 | Verification | Copied fake-memory boundary cases, existing debugger regressions, both builds/full tests and corpus/documentation gates. |
-| Expected Markers | No count narrowing, XS real parser, out-of-range matching or linear address wrap; directional XM copy. |
+| Expected Markers | Shared real range/list parsing; bounded overlapping search, syntax validation before writes, CS-default U; X count semantics retained. |
 | Asset Needs | Existing build trees, deterministic tests and fixed EXEs; preserve INI/media; no new trace. |
 | Reporting Requirements | Finite ledger, similar-issue dispositions and source/test counts; complete executor P1 push and actual-change coordinator P2 review/push. |
-| Stop Conditions | Machine ABI or generic parser redesign; unrelated worktree changes. |
+| Stop Conditions | Public input/machine ABI or product environment redesign; unrelated worktree changes. |
 | Exit Criteria | Ledger verified, dual-width builds/tests/gates pass; artifacts committed/pushed clean for owner testing. |
-| Original Owner Request | 按照你的建议，准入一个S任务修复；完成后：编译测试提交推送。 |
-| Similar-Issue Sweep | Extended-command linear memory access and address progression; explicit retention of original partial-write/parser behavior. |
+| Original Owner Request | 修复和原始DOS DEBUG工具的语义差距；X系列保持现状，除对应语义修复；交互式E和DOS环境行为不需要改变；编译测试提交推送。 |
+| Similar-Issue Sweep | C/D/E/F/M/S/U range/list consumers and XE/XF/XS counterparts; other commands retain existing ownership and behavior. |
 
 ## Current Technical Baseline
 

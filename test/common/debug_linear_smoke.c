@@ -2,8 +2,9 @@
 #include <assert.h>
 #include <string.h>
 
-static lib_u8 memory[4096];
+static lib_u8 memory[0x110000];
 static lib_u32 memory_base;
+static lib_u16 code_segment, data_segment;
 static unsigned reads, writes;
 static lib_status acquire(common_machine *m, common_machine_debug_lease *lease)
 { (void)m; *lease = (common_machine_debug_lease){0}; return LIB_STATUS_OK; }
@@ -13,7 +14,10 @@ static lib_status execute(common_machine *m, const common_machine_debug_lease *l
 {
     (void)m; (void)lease;
     *result = (common_machine_debug_result){0};
-    if (request->operation == COMMON_MACHINE_DEBUG_GET_CODE_DEFAULT_SIZE) {
+    if (request->operation == COMMON_MACHINE_DEBUG_READ_REGISTER) {
+        if (request->register_id == COMMON_DEBUG_CS) result->value = code_segment;
+        if (request->register_id == COMMON_DEBUG_DS) result->value = data_segment;
+    } else if (request->operation == COMMON_MACHINE_DEBUG_GET_CODE_DEFAULT_SIZE) {
         result->value = 1u;
     } else if (request->operation == COMMON_MACHINE_DEBUG_READ_LINEAR ||
                request->operation == COMMON_MACHINE_DEBUG_WRITE_LINEAR ||
@@ -107,15 +111,70 @@ int main(void)
     assert(writes == 1 && debug->assemble_linear == LIB_UINT32_MAX);
     assert(strcmp(result.prompt, "-") == 0);
 
-    /* Keep the original E/F/XE/XF incremental byte validation/write contract. */
+    /* DOS list syntax is fully validated before any E/F/XE/XF write. */
     memory_base = 0u;
     const char *partial[] = { "e 0:0 11 zz", "f 0:0 1 11 zz",
-        "xe 0 11 zz", "xf 0 2 11 zz" };
+        "xe 0 11 zz", "xf 0 2 11 zz", "f 0 0 11 zz", "xf 0 1 11 zz" };
     for (lib_size i = 0; i < sizeof(partial) / sizeof(partial[0]); ++i) {
         memset(memory, 0, sizeof(memory));
         assert(strstr(submit(partial[i]), "^ Error") != NULL);
-        assert(writes == 1 && memory[0] == 0x11 && memory[1] == 0);
+        assert(writes == 0 && memory[0] == 0 && memory[1] == 0);
     }
+    const char *bad_ranges[] = { "m 20 10 30", "c 20 10 30", "s 20 10 41",
+        "f 20 10 41", "d 20 10", "u 20 10", "f ffff l2 41",
+        "d 1 l0", "u 0 l", "e :10 41", "e 1: 41", "e 1:2:3 41",
+        "e 0 \"unterminated", "xe 0 'bad'zz" };
+    for (lib_size i = 0; i < sizeof(bad_ranges) / sizeof(bad_ranges[0]); ++i) {
+        assert(strstr(submit(bad_ranges[i]), "^ Error"));
+        assert(reads == 0 && writes == 0);
+    }
+    submit("E0:100 \"Ab C\" 21 'D''E' \"\"\"F\"");
+    assert(strcmp(result.text, "") == 0);
+    assert(memcmp(memory + 0x100, "Ab C!D'E\"F", 10) == 0 && writes == 10);
+    submit("xe 120 \"Ab C\" 21 'D''E' \"\"\"F\"");
+    assert(memcmp(memory + 0x100, memory + 0x120, 10) == 0);
+    submit("f 200 l 5 'Ab'"); assert(memcmp(memory + 0x200, "AbAbA", 5) == 0);
+    submit("xf 220 5 'Ab'"); assert(memcmp(memory + 0x220, "AbAbA", 5) == 0);
+    submit("c 200 l5 220"); assert(strcmp(result.text, "") == 0 && reads == 10);
+    submit("m 200 l5 201"); assert(memcmp(memory + 0x200, "AAbAbA", 6) == 0);
+    submit("m 201 205 200"); assert(memcmp(memory + 0x200, "AbAbA", 5) == 0);
+    submit("f 300 l4 'A'");
+    assert(strcmp(submit("s 300 303 'AA'"),
+        "0000:0300  \n0000:0301  \n0000:0302  \n") == 0);
+    assert(strcmp(submit("s 300 l1 'AA'"), "") == 0 && reads == 0);
+    assert(strcmp(submit("xs 300 1 'AA'"), "") == 0 && reads == 0);
+    submit("s 300 l2 'AA'"); assert(reads == 2);
+    submit("f 0  ffff 90"); assert(writes == 65536);
+    submit("s 0 ffff 41"); assert(reads == 65536);
+    submit("f ffff l1 41"); assert(writes == 1 && memory[65535] == 0x41);
+    submit("e ffff 'AB'"); assert(memory[65535] == 'A' && memory[0] == 'B');
+    submit("d ffff"); assert(reads == 1 && debug->dump_offset == 0);
+    submit("d ffff l1"); assert(reads == 1);
+    submit("d ffff:10 l1"); assert(reads == 1); /* No artificial 1 MiB clamp. */
+    memset(memory, 0x90, sizeof(memory));
+    submit("u 0 l20"); assert(debug->unassemble_offset == 32);
+    submit("u ffff l1"); assert(debug->unassemble_offset == 0);
+    memory[65535] = 0xb8; memory[0] = 0x34; memory[1] = 0x12;
+    submit("u ffff l1"); /* Whole instruction crosses the segment offset. */
+    assert(strstr(result.text, "1234") && debug->unassemble_offset == 2);
+    submit("u ffff:10 l1"); assert(strstr(result.text, "<ERROR>") == NULL);
+    submit("d 0"); assert(reads == 128);
+    submit("u 0"); assert(debug->unassemble_offset >= 32);
+    code_segment = 0x100u; data_segment = 0x200u;
+    assert(strncmp(submit("u 0 0"), "0100:0000", 9) == 0);
+    assert(strncmp(submit("u 0 l1"), "0100:0000", 9) == 0);
+    assert(strncmp(submit("d 0 l1"), "0200:0000", 9) == 0);
+    submit("e DS:10 41"); assert(memory[0x2010] == 0x41);
+    code_segment = data_segment = 0u;
+    submit("f 0 l0 42"); assert(writes == 65536);
+    submit("m 0 l0 1000:0"); assert(reads == 65536 && writes == 65536);
+    assert(memory[0x10000] == 0x42 && memory[0x1ffff] == 0x42);
+    submit("c 0 l0 1000:0"); assert(reads == 131072 && strcmp(result.text, "") == 0);
+    submit("f 0 l2 41"); submit("m 0 l2 ffff");
+    assert(memory[0xffff] == 0x41 && memory[0] == 0x41);
+    assert(strstr(submit("s ffff l1 41"), "0000:FFFF"));
+    assert(reads == 1);
+    assert(strcmp(submit(""), "") == 0 && reads == 0 && writes == 0);
     common_debug_destroy(debug);
     return 0;
 }

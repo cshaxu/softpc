@@ -84,8 +84,19 @@ overflowing ranges are rejected before memory access. `XM` protects overlapping
 ranges by choosing copy direction. `XS` matches only complete patterns within
 its byte count. `XU` accepts a full 32-bit instruction count and stops at the
 address boundary or failed decode; `XA` ends its continuation at that boundary.
-The 16-bit command syntax and XU defaults are unchanged. E/F/XE/XF still write
-incrementally: invalid later byte syntax does not roll back preceding writes.
+XU defaults and the X extension namespace are unchanged. Real C/D/F/M/S/U
+ranges accept an inclusive end or L length, reject reversed/cross-segment
+explicit ranges, and represent the full 64 KiB segment without counter wrap.
+Omitted lengths clip to the segment end (D=128, U=32, other ranges=128).
+L 0 denotes 64 KiB and is valid only at offset zero. U uses CS and 16-bit
+decoding; whole instructions may cross the requested end and wrap the offset.
+Memory access still belongs to the machine adapter, with no artificial 1 MiB
+clamp. E/F/S and XE/XF/XS accept quoted case-preserving byte strings including
+spaces and doubled quote escapes. They validate the whole list before memory
+access; malformed tails cause no partial writes. Actual machine write failures
+do not roll back earlier successful writes. S/XS include overlapping matches
+and require the whole pattern inside the range. Interactive E stays line-based;
+DOS process/file/EMS services and execution commands are not redesigned.
 
 The SoftPC adapter supports general/IP/flags/segment/CR0/CR2/CR3 reads and
 writes through the original CPU setters, and effective CPU segment-cache
