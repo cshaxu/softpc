@@ -2,34 +2,20 @@
 
 ## Current Work
 
-M9 T59 S22 delivered and reviewed: DOS DEBUG memory-command semantics,
-preserving line-based interactive E, host-file behavior and the X extension
-namespace. P1 b332b94 pushed; both builds/full 97/97 suites and post-commit
-focused checks pass. Production net -131 lines. T59 remains open for owner testing.
+No implementation subtask is active.
 
-## M9 T59 S22 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner approves DOS semantic repairs and explicitly retains interactive E and DOS environment behavior; build/test/commit/push approved. |
-| Objective | Align real memory ranges, lists, search/copy and disassembly defaults with DOS DEBUG; share applicable list corrections with X commands. |
-| Non-goals | No raw debugger input, DOS process/EMS/file redesign, execution plan, public ABI, Lib/VM/Compat/MVDM/INI/media changes. |
-| Reference Baseline | f7110d9 clean main; MS-DOS 6.0 cmd/debug is read-only behavioral research, not imported code. |
-| Candidate Proposal | [DOS DEBUG semantics](../proposals/m9-debug-dos-semantics.md). |
-| Files And ABI Surface | Common Debug implementation, shared tests/manifests, UI contract/docs and two fixed EXEs; no ABI change. |
-| Applicable Rules | Architecture/coding/execution/documentation skills; repository architecture/source layout/rules. |
-| Verification | Copied fake-memory boundary cases, existing debugger regressions, both builds/full tests and corpus/documentation gates. |
-| Expected Markers | Shared real range/list parsing; bounded overlapping search, syntax validation before writes, CS-default U; X count semantics retained. |
-| Asset Needs | Existing build trees, deterministic tests and fixed EXEs; preserve INI/media; no new trace. |
-| Reporting Requirements | Finite ledger, similar-issue dispositions and source/test counts; complete executor P1 push and actual-change coordinator P2 review/push. |
-| Stop Conditions | Public input/machine ABI or product environment redesign; unrelated worktree changes. |
-| Exit Criteria | Ledger verified, dual-width builds/tests/gates pass; artifacts committed/pushed clean for owner testing. |
-| Original Owner Request | 修复和原始DOS DEBUG工具的语义差距；X系列保持现状，除对应语义修复；交互式E和DOS环境行为不需要改变；编译测试提交推送。 |
-| Similar-Issue Sweep | C/D/E/F/M/S/U range/list consumers and XE/XF/XS counterparts; other commands retain existing ownership and behavior. |
+M9 T59 is closed on owner request after the
+[whole-task audit](../history/M9-T59-completion-audit.md). TODO is empty;
+the remaining observation was retired by the owner, not claimed repaired.
+The three queued candidates remain unadmitted and in their existing order.
 
 ## Current Technical Baseline
 
+- T59 final delivery retains dual-width 97/97 full-suite results and 6/6
+  post-commit focused checks. [S22](../history/M9-T59-S22-debug-dos-semantics.md)
+  records DOS memory-command semantics, retained interactive E/environment
+  behavior and X extensions. Closure changes documentation only; fixed EXEs
+  remain the verified S22 builds.
 - The fixed standalone package is `assets/binary/softpc32.exe` and
   `softpc64.exe`, with adjacent user-owned `softpc.ini`; reusable guest media
   is below `assets/media/`, and README captures are below `assets/readme/`.
@@ -67,6 +53,7 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T59 | S1–S22 closed on owner request; TODO cleared by explicit retirement, final dual-width 97/97. | [Whole-task audit](../history/M9-T59-completion-audit.md) |
 | T58 | Common test synchronization and owner-admitted App/build follow-ups closed; S1–S5 complete, dual-width 85/85. | [Whole-task audit](../history/M9-T58-completion-audit.md) |
 | T57 | App/config, VM and flat Compat refactor closed on owner approval; protected corpora unchanged, dual-width 85/85. | [S3 closure](../history/M9-T57-S3-completion-audit.md) |
 | T56 | Common extraction, debug integration and follow-up repairs closed on owner request after whole-task audit; known debts retained. | [S19 final audit](../history/M9-T56-S19-completion-audit.md) |

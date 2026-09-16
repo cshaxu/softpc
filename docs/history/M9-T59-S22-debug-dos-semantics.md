@@ -131,3 +131,10 @@ after the pushed commit. Full-suite evidence remains first-run 97/97 at both
 widths. P1 left a clean worktree. This P2 updates review/status only; S22 is
 delivered for owner testing, without claiming DOS environment, interactive E,
 historical decoder instruction-table or complete command-set equivalence.
+
+## Owner closure
+
+Owner requests clearing TODO and closing T59, with commit/push approval.
+S22 is closed by that decision. The whole-task evidence and retired-observation
+disposition are in the [T59 audit](M9-T59-completion-audit.md); no additional
+manual-test result or source change is claimed by this governance closure.
