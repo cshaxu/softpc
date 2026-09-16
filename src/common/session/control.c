@@ -2,24 +2,7 @@
 
 #include <limits.h>
 
-#include "lib/base/sync_interface.h"
-
-
 #define COMMON_SESSION_EVENT_QUEUE_INITIAL_CAPACITY 64u
-#define COMMON_SESSION_EVENT_PRESSED_CAPACITY 256u
-
-struct common_session_queue {
-    base_sync_mutex *lock;
-    base_sync_event *available;
-    common_session_event *events;
-    unsigned int first;
-    unsigned int count;
-    unsigned int capacity;
-    kvm_input_event pressed[COMMON_SESSION_EVENT_PRESSED_CAPACITY];
-    unsigned int pressed_count;
-    common_session_event faults[2];
-    int fault_pending[2];
-};
 
 static int common_session_queue_push(common_session_queue *queue,
     const common_session_event *event);
@@ -85,38 +68,28 @@ static int common_session_queue_push(common_session_queue *queue,
     return 1;
 }
 
-int common_session_queue_create(common_session_queue **out_queue)
+int common_session_queue_initialize(common_session_queue *queue)
 {
-    common_session_queue *queue;
-    if (out_queue == NULL) return 0;
-    *out_queue = NULL;
-    queue = lib_allocate_zero(1u, sizeof(*queue));
     if (queue == NULL) return 0;
-    if (base_sync_mutex_create(&queue->lock) != LIB_STATUS_OK) {
-        lib_release(queue);
-        return 0;
-    }
+    *queue = (common_session_queue) { 0 };
+    if (base_sync_mutex_create(&queue->lock) != LIB_STATUS_OK) return 0;
     queue->capacity = COMMON_SESSION_EVENT_QUEUE_INITIAL_CAPACITY;
     queue->events = lib_allocate_zero(queue->capacity, sizeof(*queue->events));
     if (queue->events == NULL ||
         base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &queue->available) != LIB_STATUS_OK) {
-        lib_release(queue->events);
-        if (queue->available != NULL) base_sync_event_destroy(queue->available);
-        base_sync_mutex_destroy(queue->lock);
-        lib_release(queue);
+        common_session_queue_dispose(queue);
         return 0;
     }
-    *out_queue = queue;
     return 1;
 }
 
-void common_session_queue_destroy(common_session_queue *queue)
+void common_session_queue_dispose(common_session_queue *queue)
 {
     if (queue == NULL) return;
     base_sync_event_destroy(queue->available);
     lib_release(queue->events);
     base_sync_mutex_destroy(queue->lock);
-    lib_release(queue);
+    *queue = (common_session_queue) { 0 };
 }
 
 int common_session_queue_push_kvm_for_run(common_session_queue *queue,

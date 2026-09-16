@@ -37,6 +37,30 @@ ownership expansion. Do not substitute code compression for simplification.
 
 ## Execution evidence
 
+S8 pre-audit: Session is the sole production queue owner. Five private test
+consumers must adopt caller-owned storage. Move the existing queue definition
+to private control.h; Session embeds it. Initialize creates only mutex, dynamic
+event array and event; one dispose handles partial failure and final release.
+No new object or public interface. Refined estimate -5 to -15 production lines
+(the struct moves, not disappears), superseding the preliminary -10 to -25.
+Existing growth/concurrent-producer tests remain; inject mutex, allocation and
+event creation failures in the existing queue failure test and count resources.
+
+S8 build discovery: first x64 build exposed one additional private consumer
+in test/unit/runtime_smoke.c and one no-comma queue call in sync_smoke.c.
+Both are mechanical test adaptations within the same queue ownership change;
+all src/test callers now searched, six test paths rather than five. No product
+source expansion. The failed build is retained as evidence; rerun both builds
+and full suites after correction.
+
+S8 executor evidence: three production C/H paths +38/-50 = -12. Six test C
+paths +91/-34 = +57. Both corrected builds and full suites pass: x64 101/101
+(59.91s), x86 101/101 (60.17s). Resource-count injection proves no live mutex,
+event or array on each initialization failure; successful init owns one array,
+not a second queue allocation. Existing growth, concurrent FIFO, fault and
+monitor tests pass. All old create/destroy references gone across src/test.
+Public interfaces and App/VM/Compat/MVDM are unchanged.
+
 S7 pre-audit: both selected platform implementations have the same existing
 open(path, readwrite, file) body and two constant-argument wrappers. Production
 consumers are owned-byte read and medium open only. Expose that private entry,

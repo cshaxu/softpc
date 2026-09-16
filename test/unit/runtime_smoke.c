@@ -91,11 +91,11 @@ int main(void)
     /* The product control FIFO must not turn a short input burst into a
        silently dropped make/break sequence at its old fixed-64 boundary. */
     {
-        common_session_queue *queue = NULL;
+        common_session_queue storage = { 0 }, *queue = &storage;
         kvm_input_event event = { 0 };
         common_session_event copied;
         unsigned int index;
-        assert(common_session_queue_create(&queue));
+        assert(common_session_queue_initialize(queue));
         event.type = KVM_EVENT_TEXT;
         for (index = 0u; index < 96u; ++index) {
             event.data.text.scalar = index;
@@ -106,7 +106,7 @@ int main(void)
             assert(copied.kind == COMMON_SESSION_EVENT_KVM_INPUT);
             assert(copied.value.kvm.data.text.scalar == index);
         }
-        common_session_queue_destroy(queue);
+        common_session_queue_dispose(queue);
     }
     {
         app_input_queue storage = { 0 }, *queue = &storage;

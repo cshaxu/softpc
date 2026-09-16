@@ -25,10 +25,10 @@ static void dispatch(common_session_queue *q, kvm_input_event *event, capture *c
 
 static void check(kvm_key key, lib_u16 scan, int release_first, int extended_first)
 {
-    common_session_queue *q = NULL;
+    common_session_queue storage = { 0 }, *q = &storage;
     kvm_input_event event = { 0 };
     capture c = { 0 };
-    assert(common_session_queue_create(&q));
+    assert(common_session_queue_initialize(q));
     event.type = KVM_EVENT_KEY;
     event.source_identity = 1;
     event.data.key.key = key;
@@ -52,15 +52,15 @@ static void check(kvm_key key, lib_u16 scan, int release_first, int extended_fir
     assert(c.makes == 3 && c.breaks == 2 && c.extended_breaks == 1);
     dispatch(q, &event, &c);
     assert(c.breaks == 2); /* Retirement is idempotent. */
-    common_session_queue_destroy(q);
+    common_session_queue_dispose(q);
 }
 
 static void check_sources(common_session_machine_state retirement_state)
 {
-    common_session_queue *q = NULL;
+    common_session_queue storage = { 0 }, *q = &storage;
     kvm_input_event event = { 0 };
     capture c = { 0 };
-    assert(common_session_queue_create(&q));
+    assert(common_session_queue_initialize(q));
     event.type = KVM_EVENT_KEY;
     event.data.key.key = KVM_KEY_CONTROL;
     event.data.key.scan_code = 0x1d;
@@ -80,7 +80,7 @@ static void check_sources(common_session_machine_state retirement_state)
     event.source_identity = 2;
     dispatch(q, &event, &c);
     assert(c.makes == 3 && c.breaks == before + 1u);
-    common_session_queue_destroy(q);
+    common_session_queue_dispose(q);
 }
 
 int main(void)

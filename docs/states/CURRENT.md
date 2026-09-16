@@ -20,7 +20,7 @@ The three queued candidates are unchanged.
 | Non-goals | No public ABI, product behavior, App/VM/Compat/MVDM or unrelated cleanup changes. |
 | Reference Baseline | 666aa67; preceding S closed after actual-commit review. |
 | Candidate Proposal | [Four follow-ups](../proposals/m9-common-lib-followup-simplification.md) |
-| Files And ABI Surface | src/common/session/control.h, control.c, session.c; all private queue callers in test/common; manifests/task records and fixed EXEs. Public ABI unchanged. |
+| Files And ABI Surface | src/common/session/control.h, control.c, session.c; all private queue callers in test/common and test/unit/runtime_smoke.c; manifests/task records and fixed EXEs. Public ABI unchanged. |
 | Applicable Rules | docs/README reading set; execution, architecture, coding, documentation rules and referenced skills. |
 | Verification | Initialization failure at mutex/array/event, FIFO growth/concurrency, fault latch, monitor/lifecycle tests; both fixed EXE builds, full x64/x86 CTest, shared manifest/corpus and documentation gates; actual-commit focused checks. |
 | Expected Markers | No queue create/destroy allocation wrapper; dynamic event storage retained. |
