@@ -31,7 +31,7 @@ int main(void)
     probe p = { 0 };
     base_sync_task *a = NULL, *b = NULL;
     common_session_event event = { 0 };
-    common_machine_input_queue *input = NULL;
+    common_machine_input_queue storage = { 0 }, *input = &storage;
     kvm_input_event key = { 0 }, copied = { 0 };
     lib_u32 i;
     lib_atomic_i32 atom;
@@ -77,7 +77,7 @@ int main(void)
     base_sync_event_destroy(p.entered);
     base_sync_mutex_destroy(p.mutex);
 
-    assert(common_machine_input_queue_create(&input) == LIB_STATUS_OK);
+    assert(common_machine_input_queue_initialize(input) == LIB_STATUS_OK);
     key.type = KVM_EVENT_KEY;
     for (i = 0; i < 255u; ++i) {
         key.source_identity = i;
@@ -92,7 +92,7 @@ int main(void)
     assert(common_machine_input_queue_push(input, &key));
     common_machine_input_queue_clear(input);
     assert(!common_machine_input_queue_pop(input, &copied));
-    common_machine_input_queue_destroy(input);
+    common_machine_input_queue_dispose(input);
 
     lib_atomic_i32_initialize(&atom, 0);
     assert(lib_atomic_i32_fetch_add_explicit(&atom, 3, LIB_MEMORY_ORDER_SEQ_CST) == 0);

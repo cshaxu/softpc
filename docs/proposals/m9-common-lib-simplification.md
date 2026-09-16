@@ -65,3 +65,18 @@ manifests, corpus/DAG and documentation self-tests. Both fixed EXEs refreshed;
 INI/media unchanged. Documentation verifier now recognizes a prior open task
 awaiting acceptance during New admission, with a positive regression fixture;
 it retains rejection of wrong/closed waiting identifiers. T61 is not closed.
+
+## S2 executor delivery
+
+Baseline c7fafb8. Production three Machine paths +24/-37 = -13; test C/H
+five paths +47/-13 = +34; test CMake +1/-0. Queue storage is embedded in Machine;
+its lock still has one initialize/dispose owner. No allocation wrapper remains.
+Partial Machine creation safely disposes a zero or failed queue. All source/test
+create/destroy references were searched and converted, including the product
+test-only compatibility header. Separate copied-frame allocations and Session
+queue retain distinct ownership and are outside this bounded change.
+
+Both preset builds passed and fixed EXEs refreshed. Full x64 100/100 (89.81s),
+x86 100/100 (75.08s), including allocation-failure/600-cycle queue wrap test,
+capacity/FIFO/clear and machine lifecycle tests, all manifests and gates.
+INI, media, Lib, App, VM, Compat and MVDM remain unchanged.

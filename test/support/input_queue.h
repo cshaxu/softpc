@@ -4,10 +4,10 @@
 #include "common/machine/input_queue.h"
 
 typedef common_machine_input_queue app_input_queue;
-static inline int app_input_queue_create(app_input_queue **queue)
-{ return common_machine_input_queue_create(queue) == LIB_STATUS_OK; }
-static inline void app_input_queue_destroy(app_input_queue *queue)
-{ common_machine_input_queue_destroy(queue); }
+static inline int app_input_queue_initialize(app_input_queue *queue)
+{ return common_machine_input_queue_initialize(queue) == LIB_STATUS_OK; }
+static inline void app_input_queue_dispose(app_input_queue *queue)
+{ common_machine_input_queue_dispose(queue); }
 static inline int app_input_queue_push(app_input_queue *queue,
     const kvm_input_event *event)
 { return common_machine_input_queue_push(queue, event) != 0; }

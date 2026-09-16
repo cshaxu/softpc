@@ -109,10 +109,10 @@ int main(void)
         common_session_queue_destroy(queue);
     }
     {
-        app_input_queue *queue = NULL;
+        app_input_queue storage = { 0 }, *queue = &storage;
         kvm_input_event event = { 0 };
 
-        assert(app_input_queue_create(&queue));
+        assert(app_input_queue_initialize(queue));
         event.type = KVM_EVENT_KEY;
         event.data.key.scan_code = 0x1eu;
         event.data.key.pressed = 1u;
@@ -120,7 +120,7 @@ int main(void)
         assert(app_input_queue_pending(queue));
         app_input_queue_clear(queue);
         assert(!app_input_queue_pending(queue));
-        app_input_queue_destroy(queue);
+        app_input_queue_dispose(queue);
     }
     assert(app_runtime_start(runtime));
     first_run = app_runtime_run_generation(runtime);
