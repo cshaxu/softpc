@@ -3,32 +3,37 @@
 ## Current Work
 
 T60 is closed after owner manual acceptance and the whole-task audit.
-M9 T61 S4 is closed; S5 is admitted and active: assess and minimize the
-standalone sound branch without semantic changes. The owner selected this task ahead of
+M9 T61 S5 is closed; S6 is admitted and active: final whole-tree recount,
+remaining-difference audit and dual-width delivery. The owner selected this task ahead of
 the existing three queued candidates; their relative order is unchanged.
 
-## M9 T61 S5 Packet
+## M9 T61 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner requested T60 closure and immediate T61 admission from the supplied audit; single-person dual-role execution. |
-| Objective | Compare standalone nt_sound state and functions with the original; minimize equivalent mirror diff with one sound-state owner. |
-| Non-goals | No audible/device semantic changes, new audio backend/thread, keyboard safety repair or shared-corpus change. |
-| Reference Baseline | S4 implementation 82fb169 and S1 ledger; readonly OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61, same-path softpc.new files. |
+| Objective | Recount the complete S1 universe, reconcile every remaining original difference and S2-S5 disposition, and deliver verified dual-width artifacts. |
+| Non-goals | No new behavioral repairs, keyboard safety repair, shared-corpus change, external imports or reduction by withdrawing required features. |
+| Reference Baseline | S5 implementation a65dc18 and frozen S1 ledger; readonly OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61, same-path softpc.new files. |
 | Candidate Proposal | [Mirror diff minimization](../proposals/m9-mvdm-diff-minimization.md). |
-| Files And ABI Surface | nt_sound.c; only necessary equivalent existing Compat/build sound-boundary wiring and product test/unit proof; no new public/shared ABI. |
+| Files And ABI Surface | Whole retained MVDM mirror audit, final original-format normalization where necessary, evidence/history/status and fixed EXEs; no ABI changes. |
 | Applicable Rules | Execution, Document, Architecture, Coding and source-research policy; corresponding governance skills. |
-| Verification | Complete state/function/caller comparison; PIT/speaker on/off, frequency, repeated requests, pause/stop/restart and failure paths; full test-x64/test-x86, focused audio/lifecycle checks and protected-path/documentation gates. |
-| Expected Markers | One sound-state owner; reuse original state machine where equivalent, only actual host endpoint differs; no duplicate implementation or added worker. |
+| Verification | Frozen 498-file universe and every remaining hunk disposition; raw versus content statistics, retained C-VID pattern proof, protected-path and original-feature checks; dual builds and full test-x64/test-x86, actual-commit review and documentation gates. |
+| Expected Markers | Reconciled final ledger, per-stage original diff reduction and code delta; no unexplained remaining difference or second implementation. |
 | Asset Needs | Rebuild assets/binary/softpc32.exe and softpc64.exe; no media or INI changes. |
-| Reporting Requirements | Per-file original diff reduction, production/test line delta, all F candidates disposed, dual-width results and actual-commit review. |
+| Reporting Requirements | Whole-task before/after counts, all candidate dispositions and TODO/Queue boundary, production/test/build delta, dual-width evidence, actual-commit audit and testing links. |
 | Stop Conditions | Do not remove necessary ABI/fixes, alter D6 BOP, use external trees as build inputs or touch protected shared corpora. |
-| Exit Criteria | Every sound state/function/caller accounted; behavior equivalent, candidate safely minimized or concretely justified as simpler retained; dual builds/full tests, executor commit/push and actual-commit review. |
+| Exit Criteria | Full original-request audit proves S1-S5 accounted and unnecessary admitted diffs removed; all remaining differences justified, dual builds/full tests, fixed artifacts, commit/push and clean worktree; deliver for owner validation. |
 | Original Owner Request | Audit every MVDM/OpenNT difference and why; remove unnecessary diff without harming behavior; design and admit T61 now. |
-| Similar-Issue Sweep | Whole nt_sound standalone/original branch, Compat audio/platform consumers and device callbacks; account each retained difference and exclude accidental NT service enablement. |
+| Similar-Issue Sweep | All retained original files, format/dead branches/duplicate host implementations and necessary ABI/device/debug changes; each remaining candidate retained with reason or explicitly transferred, never silently omitted. |
 
 ## Current Technical Baseline
+
+- T61 S5 implementation a65dc18 shares original sound state; original content
+  additions reduced from 222 to 64, production net -158. Dual full suites
+  98/98 and post-commit sound checks 4/4 each; fixed EXEs refreshed.
+  [S5 review](../history/M9-T61-S5-original-sound.md).
 
 - T61 S4 implementation 82fb169 shares original keyboard tables and algorithm;
   production net -436, original content diff +449 reduced to +13. Dual full
