@@ -37,6 +37,18 @@ ownership expansion. Do not substitute code compression for simplification.
 
 ## Execution evidence
 
+S6 pre-audit: only control.c owns this wrapper. Forget compares its source,
+remember copies both source and event, and retirement emits its copied event.
+All use the identical event source_identity. Replace with direct event array;
+keep the 256-entry bound, extended/scan identity and failed-sink behavior.
+Estimate -8 to -15 production lines. Extend existing physical-key smoke.
+
+S6 executor evidence: one production C path +12/-20 = -8; one test C path
++30/-0. Both fixed builds and full x64/x86 suites pass 101/101; x64 60.24s.
+The direct event retains source_identity, physical flags and scan code. Added
+independent-source retirement tests, including paused cleanup without late
+breaks. No duplicate wrapper remains; public interfaces and Lib unchanged.
+
 S5 pre-audit: binding_active has only four implementation references; it is
 written together with generation under the same mutex. The generation check
 already rejects zero and stale events. No public header exposes this flag.

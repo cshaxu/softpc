@@ -8,11 +8,6 @@
 #define COMMON_SESSION_EVENT_QUEUE_INITIAL_CAPACITY 64u
 #define COMMON_SESSION_EVENT_PRESSED_CAPACITY 256u
 
-typedef struct common_session_pressed_key {
-    lib_u64 source;
-    kvm_input_event event;
-} common_session_pressed_key;
-
 struct common_session_queue {
     base_sync_mutex *lock;
     base_sync_event *available;
@@ -20,7 +15,7 @@ struct common_session_queue {
     unsigned int first;
     unsigned int count;
     unsigned int capacity;
-    common_session_pressed_key pressed[COMMON_SESSION_EVENT_PRESSED_CAPACITY];
+    kvm_input_event pressed[COMMON_SESSION_EVENT_PRESSED_CAPACITY];
     unsigned int pressed_count;
     common_session_event faults[2];
     int fault_pending[2];
@@ -257,13 +252,13 @@ static void common_session_forget_pressed(common_session_queue *queue,
 {
     unsigned int index;
     for (index = 0u; index < queue->pressed_count; ++index) {
-        common_session_pressed_key *pressed = &queue->pressed[index];
-        if (pressed->source == event->source_identity &&
-            (pressed->event.data.key.flags & KVM_KEY_FLAG_EXTENDED) ==
+        kvm_input_event *pressed = &queue->pressed[index];
+        if (pressed->source_identity == event->source_identity &&
+            (pressed->data.key.flags & KVM_KEY_FLAG_EXTENDED) ==
                 (event->data.key.flags & KVM_KEY_FLAG_EXTENDED) &&
-            ((pressed->event.data.key.scan_code != 0u || event->data.key.scan_code != 0u)
-                ? pressed->event.data.key.scan_code == event->data.key.scan_code
-                : pressed->event.data.key.key == event->data.key.key)) {
+            ((pressed->data.key.scan_code != 0u || event->data.key.scan_code != 0u)
+                ? pressed->data.key.scan_code == event->data.key.scan_code
+                : pressed->data.key.key == event->data.key.key)) {
             pressed[0] = queue->pressed[--queue->pressed_count];
             return;
         }
@@ -273,12 +268,9 @@ static void common_session_forget_pressed(common_session_queue *queue,
 static void common_session_remember_pressed(common_session_queue *queue,
     const kvm_input_event *event)
 {
-    unsigned int index;
     common_session_forget_pressed(queue, event);
     if (queue->pressed_count == COMMON_SESSION_EVENT_PRESSED_CAPACITY) return;
-    index = queue->pressed_count++;
-    queue->pressed[index].source = event->source_identity;
-    queue->pressed[index].event = *event;
+    queue->pressed[queue->pressed_count++] = *event;
 }
 
 static int common_session_release_source(common_session_queue *queue,
@@ -287,17 +279,17 @@ static int common_session_release_source(common_session_queue *queue,
 {
     unsigned int index = 0u;
     while (index < queue->pressed_count) {
-        common_session_pressed_key *pressed = &queue->pressed[index];
-        if (pressed->source != source) {
+        kvm_input_event *pressed = &queue->pressed[index];
+        if (pressed->source_identity != source) {
             ++index;
             continue;
         }
-        pressed->event.data.key.pressed = 0u;
+        pressed->data.key.pressed = 0u;
         /* Source retirement is ledger cleanup.  It can reach the control
            queue after pause, but must not turn into a late guest release in
            the paused or stopped VM. */
         if (runtime_state == COMMON_SESSION_MACHINE_RUNNING &&
-            !sink(sink_context, &pressed->event)) return 0;
+            !sink(sink_context, pressed)) return 0;
         queue->pressed[index] = queue->pressed[--queue->pressed_count];
     }
     return 1;
