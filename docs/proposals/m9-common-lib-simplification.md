@@ -9,7 +9,7 @@
 Preserve public API and product behavior while reducing duplicate implementation
 and allocation ownership. No App, VM, Compat or MVDM changes. No debugger rewrite,
 generic queue framework, broker transaction change, input policy change or new
-Linux functionality. T61 remains awaiting owner acceptance; this is separate work.
+Linux functionality. T61 is closed by owner direction before further T62 work.
 
 ## Serial coverage ledger
 
@@ -80,3 +80,12 @@ Both preset builds passed and fixed EXEs refreshed. Full x64 100/100 (89.81s),
 x86 100/100 (75.08s), including allocation-failure/600-cycle queue wrap test,
 capacity/FIFO/clear and machine lifecycle tests, all manifests and gates.
 INI, media, Lib, App, VM, Compat and MVDM remain unchanged.
+
+## Owner ordering correction
+
+“T61要收口关闭才能开始T62 你先关闭T61”。T62 S1 and S2 P1 had already
+been pushed when this direction arrived. They remain truthful immutable history;
+no S3 implementation began. T61's whole-task audit/closure is committed before
+resuming T62. The S1 verifier relaxation for simultaneous waiting/admission is
+withdrawn, not retained as a new governance policy. S2 actual-commit checks
+passed 6/6 per width; its closure follows only after T61 closure.

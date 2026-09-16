@@ -3,9 +3,9 @@
 ## Current Work
 
 T60 is closed after owner manual acceptance and the whole-task audit.
-M9 T61 S1-S13 are closed. The [S13 convergence review](../history/M9-T61-S13-ownership-convergence.md)
-completes the admitted ownership cleanup. T61 remains unclosed pending owner acceptance.
+T61 is closed on owner direction after the [whole-task audit](../history/M9-T61-completion-audit.md).
 M9 T62 S1 is closed; S2 is active: embed Machine's private input queue.
+S2 implementation is pushed and verified; no S3 work started before T61 closure.
 The three queued candidates are unchanged.
 
 ## Current Technical Baseline
@@ -15,7 +15,7 @@ The three queued candidates are unchanged.
   +23132/-22334, 5131 hunks. Final dual-width 98/98; actual-commit 7/7 each.
   Fixed EXEs remain S12 e2ef91f, hashes in the
   [final ledger](../etc/evidence/softpc/pristine-divergence-current.md#s13-最终归属复核).
-  Lib/Common and shared tests unchanged; T61 awaits owner acceptance.
+  Lib/Common and shared tests unchanged within T61; owner has now closed T61.
 
 ## M9 T62 S2 Packet
 
@@ -138,6 +138,7 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T61 | S1-S13 complete; owner-directed closure; 498-file mirror and VM/Compat ownership audit, final dual-width 98/98. | [Whole-task audit](../history/M9-T61-completion-audit.md) |
 | T60 | S1-S7 complete; owner manual acceptance; D6 retained, dual-width 97/97, protected corpora unchanged. | [Whole-task audit](../history/M9-T60-completion-audit.md) |
 | T59 | S1–S22 closed on owner request; TODO cleared by explicit retirement, final dual-width 97/97. | [Whole-task audit](../history/M9-T59-completion-audit.md) |
 | T58 | Common test synchronization and owner-admitted App/build follow-ups closed; S1–S5 complete, dual-width 85/85. | [Whole-task audit](../history/M9-T58-completion-audit.md) |
