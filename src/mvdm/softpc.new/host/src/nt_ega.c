@@ -649,7 +649,8 @@ void nt_ega_lo_graph_std(int offset, int screen_x, int screen_y,
 
         do
         {
-            data0 = *p0++;
+            data0 = ega_colour_panned_group((unsigned char *)p0++,
+                ega_get_pel_panning(screen_y + height - local_height));
             data3 = HIBYTE(HIWORD(data0));
             data2 = LOBYTE(HIWORD(data0));
             data1 = HIBYTE(LOWORD(data0));
@@ -1093,7 +1094,8 @@ void nt_ega_med_graph_std(int offset, int screen_x, int screen_y,
                             (unsigned int *) dest_ptr,
                             ega_med_and_hi_graph_luts,
                             TWO_SCANLINES,
-                            bytes_per_scanline);
+                            bytes_per_scanline,
+                            ega_get_pel_panning(screen_y + height - local_height));
         p0 += get_offset_per_line();
         dest_ptr += TWO_SCANLINES * bytes_per_scanline;
     }
@@ -1329,7 +1331,8 @@ void nt_ega_hi_graph_std(int offset, int screen_x, int screen_y,
                             (unsigned int *) dest_ptr,
                             ega_med_and_hi_graph_luts,
                             ONE_SCANLINE,
-                            0);
+                            0,
+                            ega_get_pel_panning(screen_y + height - local_height));
         p0 += get_offset_per_line();
         dest_ptr += bytes_per_scanline;
     }

@@ -423,7 +423,9 @@ void high_stretch4(unsigned char *buffer, int length);
 /* functions in nt_munge.c */
 
 IMPORT VOID ega_colour_hi_munge(unsigned char *, int, unsigned int *,
-                                unsigned int *, int, int);
+                                unsigned int *, int, int, int);
+/* T60: shift interleaved plane bytes without mixing their bits. */
+IMPORT unsigned int ega_colour_panned_group(unsigned char *, int);
 
 #ifdef BIGWIN
 

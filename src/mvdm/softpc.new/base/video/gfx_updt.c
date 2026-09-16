@@ -1787,6 +1787,26 @@ cga_hi_graph_update IFN0()
 #include "SOFTPC_EGA.seg"
 #endif
 
+/* T60: panning reads one byte ahead, including across a row/bank boundary. */
+static void mark_panned_neighbours IFN0()
+{
+	int first, last, mark, wrap;
+	if (getVideodirty_total() > 20000 || !ega_get_pel_panning(0)) return;
+	first = getVideodirty_low();
+	last = getVideodirty_high();
+	if (first >= (EGA_PLANE_DISP_SIZE>>2)) return;
+	if (last >= (EGA_PLANE_DISP_SIZE>>2)) last = (EGA_PLANE_DISP_SIZE>>2)-1;
+	wrap = first == 0 && video_copy[0];
+	/* Ascending order never propagates a newly added mark again. */
+	for (mark = first ? first : 1; mark <= last; mark++)
+		if (video_copy[mark]) video_copy[mark-1] = 1;
+	if (first) setVideodirty_low(first-1);
+	if (wrap) {
+		video_copy[(EGA_PLANE_DISP_SIZE>>2)-1] = 1;
+		setVideodirty_high((EGA_PLANE_DISP_SIZE>>2)-1);
+	}
+}
+
 /* T60: complete the original wrap+split upper-region placeholder. */
 static void paint_wrapped_split IFN1(int, height)
 {
@@ -1820,6 +1840,7 @@ void	ega_wrap_split_graph_update IFN0()
 	if ( getVideodirty_total() == 0 || get_display_disabled() )
 		return;
 
+	mark_panned_neighbours();
 	screen_split=get_screen_split()/get_pc_pix_height();
 
 	/*
@@ -1883,6 +1904,7 @@ void	ega_split_graph_update IFN0()
 	if ( getVideodirty_total() == 0 || get_display_disabled() )
 		return;
 
+	mark_panned_neighbours();
 	screen_split  = get_screen_split()/get_pc_pix_height();
 	screen_height = get_screen_height()/get_pc_pix_height();
 
@@ -2148,6 +2170,7 @@ void	ega_graph_update IFN0()
 	if ( getVideodirty_total() == 0 || get_display_disabled() )
 		return;
 
+	mark_panned_neighbours();
     host_start_update();
 
 	if (!HostUpdatedEGA()) {
@@ -2218,6 +2241,7 @@ void	ega_wrap_graph_update IFN0()
 	if ( getVideodirty_total() == 0 || get_display_disabled() )
 		return;
 
+	mark_panned_neighbours();
     	host_start_update();
 
 	if (getVideodirty_total() > 20000 ) {

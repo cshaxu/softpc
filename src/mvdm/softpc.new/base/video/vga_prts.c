@@ -2604,6 +2604,14 @@ GLOBAL VOID	vga_gc_inb IFN2(io_addr,port,half_word *, value)
 	}
 }
 
+GLOBAL int ega_get_pel_panning IFN1(int,line)
+{
+	if (attribute_controller.mode_control.as_bfld.horiz_pan_mode &&
+		line >= get_screen_split()/get_pc_pix_height())
+		return 0;
+	return attribute_controller.horizontal_pel_panning.as.abyte & 7;
+}
+
 GLOBAL VOID	vga_ac_outb IFN2(io_addr,port,half_word,value)
 {
 	struct {
@@ -2688,6 +2696,9 @@ GLOBAL VOID	vga_ac_outb IFN2(io_addr,port,half_word,value)
 				set_colour_select(((AC_MODE_CONTROL*)&new)->as_bfld.select_video_bits);
 				flag_palette_change_required();
 			}
+			/* T60: changing split panning changes pixels without a VRAM write. */
+			if ((attribute_controller.mode_control.as.abyte ^ value) & 0x20)
+				screen_refresh_required();
 			attribute_controller.mode_control.as.abyte = value;
 
      			if (attribute_controller.mode_control.as_bfld.background_intensity_or_blink)
@@ -2722,6 +2733,9 @@ GLOBAL VOID	vga_ac_outb IFN2(io_addr,port,half_word,value)
 			break;
 		case 0x13:
 			note_entrance0("horiz pel panning");
+			/* T60: register-only scrolling changes the visible pixels. */
+			if (attribute_controller.horizontal_pel_panning.as.abyte != value)
+				screen_refresh_required();
 			attribute_controller.horizontal_pel_panning.as.abyte = value;
 			break;
 		case 0x14:

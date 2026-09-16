@@ -71,15 +71,101 @@ extern void ega_wrap_graph_update(void);
 extern void ega_wrap_split_graph_update(void);
 extern void vga_graph_update(void);
 extern void vga_split_graph_update(void);
+extern void vga_ac_outb(io_addr port, half_word value);
+
+static void verify_panning_refresh(void)
+{
+    struct attribute_controller saved = attribute_controller;
+    DISPLAY_GLOBS saved_display = PCDisplay;
+    unsigned char unpanned[16];
+    IU32 dirty = getVideodirty_total();
+    int i;
+    set_offset_per_line(80);
+    for (i = 0; i < 8; ++i)
+        EGA_planes[i] = (unsigned char)(i & 1 ? 0x33 : 0x55);
+    attribute_controller.horizontal_pel_panning.as.abyte = 0;
+    nt_ega_hi_graph_std(0, 0, 0, 2, 1);
+    memcpy(unpanned, sc.ConsoleBufInfo.lpBitMap, sizeof(unpanned));
+    attribute_controller.address.as_bfld.index_state = 0;
+    setVideodirty_total(0);
+    vga_ac_outb(0x3c0, 0x33);
+    vga_ac_outb(0x3c0, 1);
+    assert(attribute_controller.horizontal_pel_panning.as.abyte == 1);
+    assert(getVideodirty_total() > 20000);
+    setVideodirty_total(0);
+    vga_ac_outb(0x3c0, 0x33);
+    vga_ac_outb(0x3c0, 1);
+    assert(getVideodirty_total() == 0);
+    nt_ega_hi_graph_std(0, 0, 0, 1, 1);
+    /* One pel selects pixels 1..8, including the following plane byte. */
+    assert(memcmp(sc.ConsoleBufInfo.lpBitMap, unpanned + 1, 8) == 0);
+    setVideodirty_total(0);
+    vga_ac_outb(0x3c0, 0x30);
+    vga_ac_outb(0x3c0, attribute_controller.mode_control.as.abyte ^ 0x20);
+    assert(getVideodirty_total() > 20000);
+    attribute_controller = saved;
+    PCDisplay = saved_display;
+    setVideodirty_total(dirty);
+}
+
+static void verify_panning_pixels(void)
+{
+    void (*painters[])(int,int,int,int,int) = {
+        nt_ega_lo_graph_std, nt_ega_med_graph_std, nt_ega_hi_graph_std
+    };
+    DISPLAY_GLOBS saved = PCDisplay;
+    struct attribute_controller saved_ac = attribute_controller;
+    int saved_split = EGA_GRAPH.screen_split.as_word;
+    int saved_bank = extensions_controller.ram_bank_select.as_bfld.counter_bank_enable;
+    unsigned char expected[32];
+    unsigned char *surface = sc.ConsoleBufInfo.lpBitMap;
+    int p, bank, wrap, pan, split, row, i;
+    nt_init_ega_lo_graph();
+    set_offset_per_line(80);
+    for (i = 0; i < EGA_PLANE_SIZE * 4; ++i)
+        EGA_planes[i] = (unsigned char)(i * 37 + (i >> 3));
+    for (p = 0; p < 3; ++p)
+    for (bank = 0; bank < 2; ++bank)
+    for (wrap = 0; wrap < 2; ++wrap) {
+        int xscale = p == 0 ? 2 : 1;
+        int yscale = p == 2 ? 1 : 2;
+        int address;
+        extensions_controller.ram_bank_select.as_bfld.counter_bank_enable = bank;
+        address = wrap ? EGA_PLANE_DISP_SIZE - 1 : 0;
+        set_pc_pix_height(yscale);
+        set_screen_split(yscale - 1);
+        attribute_controller.horizontal_pel_panning.as.abyte = 0;
+        painters[p](address, 0, 0, 1, 1);
+        memcpy(expected, surface, 8 * xscale);
+        painters[p](wrap ? 0 : 1, 0, 0, 1, 1);
+        memcpy(expected + 8 * xscale, surface, 8 * xscale);
+        for (pan = 0; pan < 8; ++pan)
+        for (split = 0; split < 2; ++split)
+        for (row = 0; row < 2; ++row) {
+            int shift = split && row ? 0 : pan;
+            attribute_controller.mode_control.as_bfld.horiz_pan_mode = split;
+            attribute_controller.horizontal_pel_panning.as.abyte = pan;
+            painters[p](address, 0, row, 1, 1);
+            for (i = 0; i < yscale; ++i)
+                assert(memcmp(surface + (row * yscale + i) * sc.PC_W_Width,
+                    expected + shift * xscale, 8 * xscale) == 0);
+        }
+    }
+    PCDisplay = saved;
+    attribute_controller = saved_ac;
+    set_screen_split(saved_split);
+    extensions_controller.ram_bank_select.as_bfld.counter_bank_enable = saved_bank;
+}
 
 static void verify_ega_dirty_alignment(void)
 {
     DISPLAY_GLOBS saved = PCDisplay;
+    struct attribute_controller saved_ac = attribute_controller;
     void (*saved_paint)() = paint_screen;
     unsigned char *surface = sc.ConsoleBufInfo.lpBitMap;
     size_t size = (size_t)sc.PC_W_Width * sc.PC_W_Height;
     unsigned char *complete = malloc(size);
-    int offset, i, stride, split, bank, scale;
+    int offset, i, stride, split, bank, scale, pan;
     int saved_split = EGA_GRAPH.screen_split.as_word;
     int saved_bank = extensions_controller.ram_bank_select.as_bfld.counter_bank_enable;
     assert(complete != NULL);
@@ -91,8 +177,10 @@ static void verify_ega_dirty_alignment(void)
     paint_screen = nt_ega_hi_graph_std;
     for (i = 0; i < 4 * EGA_PLANE_SIZE; ++i)
         EGA_planes[i] = (unsigned char)(i * 37 + (i >> 3));
+    for (pan = 0; pan < 2; ++pan)
     for (bank = 0; bank < 2; ++bank) {
     int plane_limit;
+    attribute_controller.horizontal_pel_panning.as.abyte = pan;
     extensions_controller.ram_bank_select.as_bfld.counter_bank_enable = bank;
     plane_limit = EGA_PLANE_DISP_SIZE;
     for (scale = 1; scale <= 2; ++scale)
@@ -185,6 +273,7 @@ static void verify_ega_dirty_alignment(void)
     }
     paint_screen = saved_paint;
     PCDisplay = saved;
+    attribute_controller = saved_ac;
     set_screen_split(saved_split);
     extensions_controller.ram_bank_select.as_bfld.counter_bank_enable = saved_bank;
     free(complete);
@@ -537,6 +626,8 @@ int main(void)
             bottom == (int32_t)height - 1);
     }
     verify_ega_dirty_alignment();
+    verify_panning_refresh();
+    verify_panning_pixels();
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     return 0;

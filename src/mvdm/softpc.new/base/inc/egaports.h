@@ -26,6 +26,8 @@
 
 	extern void ega_init IPT0();
 	extern void ega_term IPT0();
+	/* T60: effective eight-pixel graphics pan at a displayed scanline. */
+	extern int ega_get_pel_panning IPT1(int,line);
 	extern void ega_gc_outb_index IPT2(io_addr,ia,half_word,hw);
 #ifdef	HUNTER
 	extern int ega_get_line_compare IPT0();

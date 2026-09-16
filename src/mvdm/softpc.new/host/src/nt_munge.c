@@ -22,6 +22,8 @@
 #include "gmi.h"
 #include "gfx_upd.h"
 #include "egagraph.h"
+#include "egaports.h"
+#include "vgaports.h"
 #ifdef SOFTPC_STANDALONE
 #include "dib_surface.h"
 #else
@@ -44,10 +46,25 @@ OUTPUT:		A nice bitmap in dest_ptr
 ===========================================================================
 )*/
 
+GLOBAL unsigned int ega_colour_panned_group(unsigned char *source, int pan)
+{
+	unsigned int result;
+	unsigned char *out = (unsigned char *)&result;
+	unsigned char *next;
+	int plane;
+	if (!pan)
+		return *(unsigned int *)source;
+	next = EGA_planes + ((source - EGA_planes + 4) &
+		((EGA_PLANE_DISP_SIZE << 2) - 1));
+	for (plane = 0; plane < 4; plane++)
+		out[plane] = (source[plane] << pan) | (next[plane] >> (8-pan));
+	return result;
+}
+
 GLOBAL	VOID
 ega_colour_hi_munge(unsigned char *plane0_ptr, int width,
 		    unsigned int *dest_ptr, unsigned int *lut0_ptr,
-		    int height, int line_offset)
+		    int height, int line_offset, int pan)
 {
 	unsigned int	*lut1_ptr = lut0_ptr + LUT_OFFSET;
 	unsigned int	*lut2_ptr = lut1_ptr + LUT_OFFSET;
@@ -56,6 +73,7 @@ ega_colour_hi_munge(unsigned char *plane0_ptr, int width,
 	FAST unsigned int	lo_res;
 	FAST unsigned int	*l_ptr;
 	FAST half_word		*data;
+	unsigned int panned;
 
 	/* make sure we get the line offset in ints not bytes */
 	line_offset /= sizeof(int);
@@ -66,6 +84,9 @@ ega_colour_hi_munge(unsigned char *plane0_ptr, int width,
 	{
 	    for ( ; width > 0; width--)
 	    {
+		panned = ega_colour_panned_group(plane0_ptr, pan);
+		plane0_ptr += 4;
+		data = (half_word *)&panned;
 		/* Get 8 bytes (2 longs) of output data from 1 byte of plane 0
 		** data
 		*/
@@ -110,6 +131,9 @@ ega_colour_hi_munge(unsigned char *plane0_ptr, int width,
 	{
 	    for ( ; width > 0; width--)
 	    {
+		panned = ega_colour_panned_group(plane0_ptr, pan);
+		plane0_ptr += 4;
+		data = (half_word *)&panned;
 		/* Get 8 bytes (2 longs) of output data from 1 byte of plane 0
 		** data
 		*/
