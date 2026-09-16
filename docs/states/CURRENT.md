@@ -5,9 +5,30 @@
 T60 S1-S3 are closed after actual-commit review. T60 remains open under the
 owner-approved continuing goal; S4 is next in the
 [reference-repair plan](../history/M9-T60-reference-repairs-proposal.md).
-No implementation subtask is active.
+T60 S4 is active under that continuing goal.
 Lib/Common and their shared tests/manifests remain protected: changes need
 separate owner approval throughout T60. The other queue candidates retain order.
+
+## M9 T60 S4 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner-admitted T60 serial plan and continuing goal; single-person executor/coordinator. |
+| Objective | Correct horizontal pel-panning register state, invalidation and selected graphics output. |
+| Non-goals | No shared-corpus edits, new renderer, global alignment owner or opportunistic MVDM refactor. |
+| Reference Baseline | Closed S3 implementation 6931729; read-only NTVDMx64 84a13d2 and original OpenNT. |
+| Candidate Proposal | [Pel-panning repair](../proposals/m9-pel-panning.md). |
+| Files And ABI Surface | Original attribute/video state and selected painters after inspection; product VGA test; no public ABI change planned. |
+| Applicable Rules | Architecture, Coding, Execution, Document; source-research policy and governance skills. |
+| Verification | Register-only refresh, zero-pan, displacement, split and dirty/full tests; serial full x86/x64 suites and EXEs. |
+| Expected Markers | Panning-only changes visibly update pixels without altering zero-pan output. |
+| Asset Needs | Existing product fixtures; no guest media or INI changes. |
+| Reporting Requirements | Original-source diff necessity, complete finite ledger, exact dual-width proof and actual-commit review. |
+| Stop Conditions | Shared-corpus change, new renderer or ownership requires owner decision. |
+| Exit Criteria | Focused and full proofs, executor commit/push, coordinator actual-diff review and closure commit/push. |
+| Original Owner Request | Execute the admitted ntvdmx64 reference-guided MVDM repairs; preserve minimum original-code diff. |
+| Similar-Issue Sweep | Register writes, panning state readers, invalidation, selected painters and split-region panning behavior. |
 
 ## Current Technical Baseline
 
