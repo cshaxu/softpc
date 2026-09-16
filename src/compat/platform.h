@@ -18,6 +18,10 @@ void softpc_platform_request_executor_wake(void);
 int softpc_platform_executor_ready(void);
 void softpc_platform_presentation_request_refresh(void);
 void softpc_platform_set_boot_clock(int active);
+/* Executor-owned capture barrier. Disabling joins the producer without
+ * consuming pending ticks or closing the executor wake event. Enable before
+ * resuming execution; this does not advance any original device clock. */
+int softpc_platform_set_clock_running(int running);
 void softpc_platform_set_runtime_heartbeat(int enabled);
 void softpc_platform_set_executor_callback(void (*callback)(void *),
     void *context);

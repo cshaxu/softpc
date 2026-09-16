@@ -25,7 +25,11 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   Latest owner admission: read only while running, write only init/stopped;
   success is ordinary paused (resume/reset/stop retain their meanings).
   VM owns the safe-stop condition and a single 1-second monotonic deadline;
-  ordinary pause/debug semantics stay unchanged. No snapshot code exists yet.
+  ordinary pause/debug semantics stay unchanged. S2 adds the isolated Compat
+  timer producer capture barrier; save/load and CPU restoration are not yet
+  implemented. [Implementation record](../history/M9-T63-machine-snapshots.md).
+  Both fixed packages rebuilt; full x64/x86 suites each pass 101/101. S2 stays
+  active for canonical CPU entry, timeout and selected-state inventory work.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files

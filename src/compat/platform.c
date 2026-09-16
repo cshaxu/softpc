@@ -578,18 +578,36 @@ IU32 host_speed(IU32 nominal_instructions)
     return nominal_instructions == 0u ? 1u : nominal_instructions;
 }
 
+int softpc_platform_set_clock_running(int running)
+{
+#ifdef _WIN32
+    if (!running) {
+        if (softpc_clock_timer == NULL) return 1;
+        if (!DeleteTimerQueueTimer(NULL, softpc_clock_timer,
+                INVALID_HANDLE_VALUE)) return 0;
+        softpc_clock_timer = NULL;
+        return 1;
+    }
+    if (softpc_executor_event == NULL) return 0;
+    if (softpc_clock_timer != NULL) return 1;
+    if (!CreateTimerQueueTimer(&softpc_clock_timer, NULL,
+            softpc_clock_tick, NULL, 50u, 50u, WT_EXECUTEDEFAULT)) {
+        softpc_clock_timer = NULL;
+        return 0;
+    }
+    return 1;
+#else
+    UNUSED(running);
+    return 0;
+#endif
+}
+
 void host_timer_init(void)
 {
 #ifdef _WIN32
     if (softpc_executor_event == NULL)
         softpc_executor_event = CreateEventA(NULL, FALSE, FALSE, NULL);
-    if (softpc_executor_event == NULL) return;
-    if (softpc_clock_timer == NULL)
-    {
-        if (!CreateTimerQueueTimer(&softpc_clock_timer, NULL,
-                softpc_clock_tick, NULL, 50u, 50u, WT_EXECUTEDEFAULT))
-            softpc_clock_timer = NULL;
-    }
+    (void)softpc_platform_set_clock_running(1);
 #endif
 }
 
