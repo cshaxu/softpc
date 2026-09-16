@@ -37,6 +37,19 @@ ownership expansion. Do not substitute code compression for simplification.
 
 ## Execution evidence
 
+S7 pre-audit: both selected platform implementations have the same existing
+open(path, readwrite, file) body and two constant-argument wrappers. Production
+consumers are owned-byte read and medium open only. Expose that private entry,
+remove wrappers and use one medium call; no public API or native body change.
+Estimate -15 to -25 production lines. Linux controlled tests cover read/write
+lock modes and failure; native storage tests cover all three medium modes.
+
+S7 executor evidence: five production C/H paths +6/-25 = -19; two test C
+paths +11/-6 = +5. Both builds and full suites pass: x64 101/101 (84.69s),
+x86 101/101 (73.70s). Strict Lib build passed. Both native open bodies are
+unchanged; source sweep finds only two production consumers of the one
+private platform entry and no old forwarding symbols. No public ABI change.
+
 S6 pre-audit: only control.c owns this wrapper. Forget compares its source,
 remember copies both source and event, and retirement emits its copied event.
 All use the identical event source_identity. Replace with direct event array;

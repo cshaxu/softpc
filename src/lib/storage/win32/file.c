@@ -7,7 +7,7 @@
 
 #include "lib/storage/file.h"
 
-static lib_status storage_file_platform_open(const char *path, lib_bool readwrite,
+lib_status storage_file_platform_open(const char *path, lib_bool readwrite,
     lib_storage_file *file)
 {
     lib_win32_handle handle;
@@ -33,14 +33,6 @@ static lib_status storage_file_platform_open(const char *path, lib_bool readwrit
     }
     return LIB_STATUS_OK;
 }
-
-lib_status storage_file_platform_open_readonly(const char *path,
-    lib_storage_file *file)
-{ return storage_file_platform_open(path, LIB_FALSE, file); }
-
-lib_status storage_file_platform_open_readwrite(const char *path,
-    lib_storage_file *file)
-{ return storage_file_platform_open(path, LIB_TRUE, file); }
 
 lib_status storage_file_platform_seek(const lib_storage_file *file, lib_i64 offset,
     int origin)

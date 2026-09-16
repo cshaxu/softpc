@@ -123,7 +123,9 @@ int main(void)
     assert(owned == NULL && live_allocations == 0u);
     reject_close = 0;
     assert(softpc_test_remove_image(path));
-    assert(lib_storage_medium_open(path, LIB_STORAGE_MEDIUM_DIRECT, &medium) == LIB_STATUS_IO_ERROR);
-    assert(medium == NULL && live_allocations == 0u);
+    for (int mode = LIB_STORAGE_MEDIUM_DIRECT; mode <= LIB_STORAGE_MEDIUM_OVERLAY; ++mode) {
+        assert(lib_storage_medium_open(path, (lib_storage_medium_mode)mode, &medium) == LIB_STATUS_IO_ERROR);
+        assert(medium == NULL && live_allocations == 0u);
+    }
     return 0;
 }

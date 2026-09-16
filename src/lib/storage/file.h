@@ -12,9 +12,7 @@ typedef struct lib_storage_file {
 /* Selected platform implementations supply open/locking and large-file
  * positioning. Open requires an empty caller-owned file; failure leaves it
  * empty. Common close consumes the stream, never the enclosing storage. */
-lib_status storage_file_platform_open_readonly(const char *path,
-    lib_storage_file *file);
-lib_status storage_file_platform_open_readwrite(const char *path,
+lib_status storage_file_platform_open(const char *path, lib_bool readwrite,
     lib_storage_file *file);
 lib_status storage_file_platform_seek(const lib_storage_file *file,
     lib_i64 offset, int origin);

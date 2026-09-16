@@ -33,11 +33,11 @@ The three queued candidates are unchanged.
 
 ## Current Technical Baseline
 
-- T62 final implementation aa1eabd: four bounded Common/Lib simplifications,
+- T62 S1-S4 implementation aa1eabd: four bounded Common/Lib simplifications,
   production +170/-214 = -44 across 12 C/H paths. Final x64/x86 101/101;
   actual-commit 14/14 each. Both fixed EXEs refreshed; public APIs, App, VM,
   Compat and MVDM unchanged. S1-S4 implementation and review commits are pushed;
-  owner manual validation remains required before T62 closure.
+  owner manual validation passed; admitted S5-S8 follow-ups remain before T62 closure.
 
 - T61 S13 audit delivery 891e642 verifies all S7 ownership/reuse candidates.
   S8-S12 production net -1847; mirror 498 retained/404 identical/94 divergent,

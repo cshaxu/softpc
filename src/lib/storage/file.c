@@ -75,7 +75,7 @@ lib_status lib_storage_file_read_owned(const char *path, lib_size maximum,
     *out_bytes = LIB_NULL;
     if (out_byte_count == LIB_NULL || path == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_byte_count = 0u;
-    status = storage_file_platform_open_readonly(path, &file);
+    status = storage_file_platform_open(path, LIB_FALSE, &file);
     if (status == LIB_STATUS_OK) status = lib_storage_file_byte_count(&file, &length);
     if (status == LIB_STATUS_OK && (length < 0 || (lib_u64)length > maximum))
         status = LIB_STATUS_LIMIT_EXCEEDED;
