@@ -2,36 +2,19 @@
 
 ## Current Work
 
-M9 T60 S2 is active under the owner's continuing implementation goal.
-S1 is closed after actual-commit review; S2 follows the
+No implementation subtask is active. Open task awaiting owner: T60.
+S1 and S2 are closed after actual-commit review; S3 is next under the
 [reference-repair plan](../history/M9-T60-reference-repairs-proposal.md).
 T59 remains closed; the other three queue candidates retain order.
 Lib/Common and their shared tests/manifests remain protected: changes need
 separate owner approval throughout T60.
 
-## M9 T60 S2 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner admits the serial reference-repair task and explicitly requests continued execution; shared changes require separate approval. |
-| Objective | Correct selected original EGA/VGA painter bounds without changing valid pixel output or coordinate units. |
-| Non-goals | No Lib/Common/shared-test/manifest changes, panning or dirty-address redesign, new renderer, INI/media/ROM edits. |
-| Reference Baseline | ebd3b76; external NTVDMx64 84a13d2 and OpenNT remain read-only research. |
-| Candidate Proposal | [Painter bounds brief](../proposals/m9-painter-bounds.md). |
-| Files And ABI Surface | Original nt_ega.c/nt_vga.c, necessary existing renderer boundary and product tests; no public ABI change. |
-| Applicable Rules | Architecture, coding, execution and documentation governance skills; repository authorities and source research policy. |
-| Verification | Painter/unit ledger; empty/negative rectangles, nonzero origins, edge clipping and guarded buffers; dual-width full builds/tests. |
-| Expected Markers | Valid pixels unchanged; invalid/empty requests cannot enter decrementing loops or write beyond the DIB/source allocation. |
-| Asset Needs | Existing build trees, disposable product test fixtures, fixed x86/x64 EXEs; no new external media or trace. |
-| Reporting Requirements | Red/green evidence, same-class dispositions, source diff counts, complete executor P followed by actual-commit review P. |
-| Stop Conditions | Shared corpus change, new renderer policy or upstream payload import requires separate approval. |
-| Exit Criteria | Full painter coverage ledger resolved; dual-width tests/builds and gates pass; reviewed/pushed clean. |
-| Original Owner Request | 单人双角色模式执行 ntvdmx64 softpc 补丁导入mvdm任务；Lib/Common修改必须先批准。 |
-| Similar-Issue Sweep | EGA/VGA low/medium/high and packed painter geometry, selected scale variants and source/destination units. |
-
 ## Current Technical Baseline
 
+- T60 S2 bounds the seven selected EGA/VGA painters before pointer arithmetic
+  and loops. Its 91-case pixel/canary matrix and full 97/97 suites pass at both
+  widths; post-commit focused tests pass 3/3 each. Fixed EXEs are refreshed.
+  [S2 review](../history/M9-T60-S2-painter-bounds.md). Shared corpora unchanged.
 - T60 S1 rejects PIC acknowledgement -1 at the original CPU interrupt entry.
   Dual-width full suites pass 97/97 and post-commit focused checks pass 3/3
   at each width. Fixed EXEs are refreshed; shared corpora remain unchanged.

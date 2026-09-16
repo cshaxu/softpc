@@ -1,6 +1,6 @@
 # Original painter bounds
 
-This is the active S2 brief under the admitted
+This is the completed S2 record under the admitted
 [T60 repair plan](../history/M9-T60-reference-repairs-proposal.md).
 Original owner request: 单人双角色模式执行 ntvdmx64 softpc 补丁导入mvdm任务.
 Lib/Common and their tests/manifests remain unchanged without separate approval.
@@ -95,3 +95,24 @@ Fixed x64: 2,848,726 bytes, SHA256
 100B6BA1E1DB8B8D571E06EF34D55002A45A6C329A5BA9C456CB6236AFC643C7.
 These replace the earlier S1 checkpoint artifacts. Executor delivery awaits
 actual-commit review; S3-S7 and whole-T60 acceptance remain separate.
+
+## Coordinator actual-commit review
+
+Reviewed pushed b693abe against ebd3b76 and the S2 packet. Each selected painter
+keeps its original address units and inner pixel expansion. Nonpositive sizes
+and negative/outside origins return before pointer formation. Subtraction and
+division bound extents before scaling; source capacity arithmetic is performed
+in bytes for packed modes and plane groups for interleaved modes. The source
+row bound includes the final complete row without a new wrap implementation.
+EGA partial final groups are not painted, preserving whole-group writes.
+
+Tests call the production painters, check every output byte plus guards and
+restore the original DIB pointer before later package assertions. They add
+no test-only production branch. Actual protected-path diff is empty; P1 was
+pushed clean. Post-commit VGA-frame/runtime-cursor/package checks pass 3/3 on
+each width. Full-suite evidence is 97/97 at both widths. Only disposable
+types-layout fixtures were removed; logs/build trees and user data remain.
+
+S2 is closed by this review. P2 changes documentation only; T60 remains open
+for S3-S7. This does not claim testing of nonselected historical scale/frozen
+implementations or resolution of panning/dirty-address questions.
