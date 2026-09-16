@@ -9,6 +9,8 @@
 #include "gvi.h"
 #include "egagraph.h"
 #include "egaports.h"
+#include "compat/dib_surface.h"
+#include "nt_graph.h"
 
 /* Original SoftPC headers erase const for pre-ANSI compilers.  Restore it
    for this C17 test's public-machine API calls. */
@@ -16,6 +18,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <limits.h>
 
 typedef struct {
     unsigned char blue;
@@ -29,14 +32,21 @@ typedef struct {
     softpc_test_rgbquad colours[256];
 } softpc_test_dib_info;
 
-/* Keep this regression on the standalone DIB contract; nt_graph.h carries
-   the historical console-server structure and is intentionally not needed by
-   this direct original-renderer call. */
+/* Direct original-renderer probes use the existing detached DIB, not a UI. */
 extern unsigned char *EGA_planes;
+extern void nt_ega_lo_graph_std(int offset, int screen_x, int screen_y,
+    int width, int height);
+extern void nt_ega_med_graph_std(int offset, int screen_x, int screen_y,
+    int width, int height);
 extern void nt_ega_hi_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
 extern void nt_vga_hi_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
+extern void nt_vga_graph_std(int offset, int screen_x, int screen_y,
+    int width, int height);
+extern void nt_vga_med_graph_std(int offset, int screen_x, int screen_y,
+    int width, int height);
+extern void nt_init_ega_lo_graph(void);
 extern void nt_v7vga_hi_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
 extern void nt_text(int ScreenOffset, int ScreenX, int ScreenY, int len,
@@ -52,6 +62,76 @@ extern unsigned short c_getCX(void);
 extern unsigned char Currently_emulated_video_mode;
 extern void host_timer_event(void);
 extern PC_palette *DAC;
+
+typedef struct {
+    void (*paint)(int, int, int, int, int);
+    int x_pixels, width_pixels, y_pixels, source_group;
+} painter_probe;
+
+static void check_paint(const painter_probe *p, unsigned char *guard,
+    int offset, int x, int y, int width, int height, int expected_w,
+    int expected_h)
+{
+    int dx, dy;
+    size_t size = (size_t)sc.PC_W_Width * sc.PC_W_Height;
+    memset(guard, 0xa5, size + 32u);
+    p->paint(offset, x, y, width, height);
+    for (dy = 0; dy < sc.PC_W_Height; ++dy)
+        for (dx = 0; dx < sc.PC_W_Width; ++dx) {
+            int inside = expected_w > 0 && expected_h > 0 &&
+                dx >= x * p->x_pixels && dy >= y * p->y_pixels &&
+                dx < x * p->x_pixels + expected_w * p->width_pixels &&
+                dy < y * p->y_pixels + expected_h * p->y_pixels;
+            assert(guard[16u + (size_t)dy * sc.PC_W_Width + dx] ==
+                (inside ? 0 : 0xa5));
+        }
+    for (dx = 0; dx < 16; ++dx) {
+        assert(guard[dx] == 0xa5);
+        assert(guard[16u + size + dx] == 0xa5);
+    }
+}
+
+static void verify_painter_bounds(void)
+{
+    static const painter_probe painters[] = {
+        { nt_ega_lo_graph_std, 2, 16, 2, 4 },
+        { nt_ega_med_graph_std, 1, 8, 2, 4 },
+        { nt_ega_hi_graph_std, 1, 8, 1, 4 },
+        { nt_vga_graph_std, 2, 2, 2, 1 },
+        { nt_vga_med_graph_std, 8, 8, 2, 4 },
+        { nt_vga_hi_graph_std, 8, 8, 1, 4 },
+        { nt_v7vga_hi_graph_std, 1, 1, 1, 1 }
+    };
+    void *saved = sc.ConsoleBufInfo.lpBitMap;
+    size_t size = (size_t)sc.PC_W_Width * sc.PC_W_Height;
+    unsigned char *guard = malloc(size + 32u);
+    size_t i;
+    assert(guard != NULL);
+    nt_init_ega_lo_graph();
+    memset(EGA_planes, 0, 4u * EGA_PLANE_SIZE);
+    sc.ConsoleBufInfo.lpBitMap = guard + 16u;
+    for (i = 0; i < sizeof(painters) / sizeof(painters[0]); ++i) {
+        const painter_probe *p = &painters[i];
+        int x = (sc.PC_W_Width - p->width_pixels) / p->x_pixels;
+        int y = sc.PC_W_Height / p->y_pixels - 1;
+        int capacity = 4 * EGA_PLANE_SIZE / p->source_group;
+        check_paint(p, guard, 0, 8, 2, 2, 2, 2, 2);
+        check_paint(p, guard, 0, 0, 0, 1, 0, 0, 0);
+        check_paint(p, guard, 0, 0, 0, 0, 1, 0, 0);
+        check_paint(p, guard, 0, 0, 0, -1, 1, 0, 0);
+        check_paint(p, guard, 0, 0, 0, 1, -1, 0, 0);
+        check_paint(p, guard, 0, -1, 0, 1, 1, 0, 0);
+        check_paint(p, guard, 0, 0, -1, 1, 1, 0, 0);
+        check_paint(p, guard, -1, 0, 0, 1, 1, 0, 0);
+        check_paint(p, guard, INT_MAX, 0, 0, 1, 1, 0, 0);
+        check_paint(p, guard, 0, INT_MAX, INT_MAX, 1, 1, 0, 0);
+        check_paint(p, guard, 0, x, y, INT_MAX, INT_MAX, 1, 1);
+        check_paint(p, guard, capacity - 1, 8, 2, 2, 2, 1, 1);
+        check_paint(p, guard, capacity, 0, 0, 1, 1, 0, 0);
+    }
+    sc.ConsoleBufInfo.lpBitMap = saved;
+    free(guard);
+}
 
 static void make_boot_disk(const char *path)
 {
@@ -146,6 +226,9 @@ int main(void)
     /* A dirty-region transition may be clipped to zero height.  The original
        VGA painter must reject that empty region before its historical
        do/while loop consumes the VGA-plane buffer. */
+    nt_ega_hi_graph_std(0, 0, 0, 1, 0);
+    nt_ega_med_graph_std(0, 0, 0, 1, 0);
+    nt_ega_lo_graph_std(0, 0, 0, 1, 0);
     nt_vga_hi_graph_std(0, 0, 0, 1, 0);
 
     /* A V7 wrap-edge dirty record can name the final source byte but an
@@ -270,6 +353,7 @@ int main(void)
     assert(softpc_machine_presentation_dib(machine, &bits, &info, &width,
         &height));
     assert(width == 800u && height == 600u);
+    verify_painter_bounds();
     {
         int32_t left;
         int32_t top;

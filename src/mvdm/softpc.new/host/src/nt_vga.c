@@ -87,7 +87,10 @@ void nt_vga_graph_std(int offset, int screen_x, int screen_y,
     }
 
     /* If the image is completely outside the display area do nothing. */
-    if ((screen_x >= max_width) || (screen_y >= max_height))
+    /* T60: reject before adding/scaling dimensions or entering paint loops. */
+    if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
+        screen_x >= max_width || screen_y >= max_height ||
+        offset < 0 || offset >= 4 * EGA_PLANE_SIZE || get_bytes_per_line() <= 0)
     {
         sub_note_trace2(EGA_HOST_VERBOSE,
                         "VDM: nt_vga_graph_std() x=%d y=%d",
@@ -99,10 +102,14 @@ void nt_vga_graph_std(int offset, int screen_x, int screen_y,
      * If image partially overlaps display area clip it so we don't start
      * overwriting invalid pieces of memory.
      */
-    if (screen_x + width > max_width)
+    if (width > max_width - screen_x)
         width = max_width - screen_x;
-    if (screen_y + height > max_height)
+    if (height > max_height - screen_y)
         height = max_height - screen_y;
+
+    width = min(width, 4 * EGA_PLANE_SIZE - offset);
+    height = min(height, 1 + (4 * EGA_PLANE_SIZE - offset - width) /
+        get_bytes_per_line());
 
     /*
      * Build up the bitmap: each PC pixel is stored in video memory as one
@@ -440,12 +447,10 @@ void nt_vga_med_graph_std(int offset, int screen_x, int screen_y,
         return;
     }
 
-    /* This mode doubles vertically so, multiply vertical parameters by 2. */
-    screen_y <<= 1;
-    height <<= 1;
-
-    /* If the image is completely outside the display area do nothing. */
-    if (((screen_x << 3) >= sc.PC_W_Width) || (screen_y >= sc.PC_W_Height))
+    /* T60: clip in source rows/groups before doubling the vertical extent. */
+    if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
+        screen_x >= sc.PC_W_Width / 8 || screen_y >= sc.PC_W_Height / 2 ||
+        offset < 0 || offset >= EGA_PLANE_SIZE || get_offset_per_line() <= 0)
     {
         sub_note_trace2(EGA_HOST_VERBOSE,
                         "VDM: nt_vga_med_graph_std() x=%d y=%d",
@@ -457,10 +462,13 @@ void nt_vga_med_graph_std(int offset, int screen_x, int screen_y,
      * If image partially overlaps display area clip it so we don't start
      * overwriting invalid pieces of memory.
      */
-    if (((screen_x + width) << 3) > sc.PC_W_Width)
-        width = (sc.PC_W_Width >> 3) - screen_x;
-    if (screen_y + height > sc.PC_W_Height)
-        height = sc.PC_W_Height - screen_y;
+    width = min(width, sc.PC_W_Width / 8 - screen_x);
+    height = min(height, sc.PC_W_Height / 2 - screen_y);
+    width = min(width, EGA_PLANE_SIZE - offset);
+    height = min(height, 1 + (EGA_PLANE_SIZE - offset - width) /
+        get_offset_per_line());
+    screen_y *= 2;
+    height *= 2;
 
     /* local_height is number of lines in video memory. */
     local_height = height >> 1;
@@ -824,10 +832,6 @@ void nt_vga_hi_graph_std(int offset, int screen_x, int screen_y,
          i,
          bpl,
          max_width = sc.PC_W_Width >> 3;
-    long source_offset;
-    long source_stride;
-    long source_height;
-    long source_capacity = 4L * EGA_PLANE_SIZE;
     SMALL_RECT   rect;
 
     sub_note_trace5(EGA_HOST_VERBOSE,
@@ -845,7 +849,10 @@ void nt_vga_hi_graph_std(int offset, int screen_x, int screen_y,
     }
 
     /* If the image is completely outside the display area do nothing. */
-    if ((screen_x >= max_width) || (screen_y >= sc.PC_W_Height))
+    /* T60: validate in plane groups before any offset multiplication. */
+    if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
+        screen_x >= max_width || screen_y >= sc.PC_W_Height ||
+        offset < 0 || offset >= EGA_PLANE_SIZE || get_offset_per_line() <= 0)
     {
         sub_note_trace2(EGA_HOST_VERBOSE,
                         "VDM: nt_vga_hi_graph_std() x=%d y=%d",
@@ -857,34 +864,11 @@ void nt_vga_hi_graph_std(int offset, int screen_x, int screen_y,
      * If image partially overlaps display area clip it so we don't start
      * overwriting invalid pieces of memory.
      */
-    if (screen_x + width > max_width)
-        width = max_width - screen_x;
-    if (screen_y + height > sc.PC_W_Height)
-        height = sc.PC_W_Height - screen_y;
-
-    /* The NT console path relied on its dirty-region producer never issuing
-       an empty clipped update.  The standalone DIB can receive one while a
-       mode transition is in flight; the original do/while below would then
-       underflow local_height and walk past the VGA planes. */
-    if (screen_x < 0 || screen_y < 0 || width <= 0 || height <= 0)
-        return;
-
-    /* The original NTVDM renderer relied on its shared VGA mapping to make
-       a wrap-edge dirty record harmless.  In the standalone DIB host the
-       planes are a finite linear allocation, so retain the original painter
-       but restrict it to rows whose four interleaved source bytes exist. */
-    if (offset < 0 || get_offset_per_line() <= 0)
-        return;
-    source_offset = (long)offset << 2;
-    source_stride = 4L * get_offset_per_line();
-    if (source_offset < 0 || source_offset > source_capacity - 4L * width)
-        return;
-    source_height = 1L + (source_capacity - source_offset -
-        4L * width) / source_stride;
-    if ((long)height > source_height)
-        height = (int)source_height;
-    if (height <= 0)
-        return;
+    width = min(width, max_width - screen_x);
+    height = min(height, sc.PC_W_Height - screen_y);
+    width = min(width, EGA_PLANE_SIZE - offset);
+    height = min(height, 1 + (EGA_PLANE_SIZE - offset - width) /
+        get_offset_per_line());
 
     /* local_height is number of lines in video memory. */
     local_height = height;
@@ -1379,14 +1363,19 @@ void nt_v7vga_hi_graph_std(int offset, int screen_x, int screen_y,
     ** Tim Septemver 92, sanity check parameters, if they're too big
     ** it can cause a crash.
     */
-    /* The painter's original V7 mode list includes 640x400, 640x480,
-       720x540 and 800x600.  Its old 640x400 guard was a console-surface
-       limitation, not V7 controller semantics. */
-    if( height>600 || width>800 ){
+    /* T60: packed bytes are pixels; bound the actual DIB and source rows. */
+    if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
+        screen_x >= sc.PC_W_Width || screen_y >= sc.PC_W_Height ||
+        offset < 0 || offset >= 4 * EGA_PLANE_SIZE || get_offset_per_line() <= 0){
         assert2( NO, "VDM: nt_v7vga_hi_graph_std() w=%d h=%d", width, height );
         return;
     }
 
+    width = min(width, sc.PC_W_Width - screen_x);
+    height = min(height, sc.PC_W_Height - screen_y);
+    width = min(width, 4 * EGA_PLANE_SIZE - offset);
+    height = min(height, 1 + (4 * EGA_PLANE_SIZE - offset - width) /
+        get_offset_per_line());
     local_height = height;
     bytes_per_line = BYTES_PER_SCANLINE(sc.ConsoleBufInfo.lpBitMapInfo);
     ref_data_ptr = &EGA_plane0123[offset];

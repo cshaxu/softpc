@@ -609,10 +609,17 @@ void nt_ega_lo_graph_std(int offset, int screen_x, int screen_y,
     ** Tim September 92, sanity check parameters, if they're too big
     ** it can cause a crash.
     */
-    if( height>200 || width>40 ){
-	assert2( NO, "VDM: nt_ega_lo_graph_std() w=%d h=%d", width, height );
-	return;
-    }
+    /* T60: x is a PC pixel; each width unit paints 16 host pixels. */
+    if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
+        screen_x >= sc.PC_W_Width / 2 || screen_y >= sc.PC_W_Height / 2 ||
+        offset < 0 || offset >= EGA_PLANE_SIZE || get_offset_per_line() <= 0)
+        return;
+    width = min(width, (sc.PC_W_Width / 2 - screen_x) / 8);
+    height = min(height, sc.PC_W_Height / 2 - screen_y);
+    width = min(width, EGA_PLANE_SIZE - offset);
+    if (width <= 0) return;
+    height = min(height, 1 + (EGA_PLANE_SIZE - offset - width) /
+        get_offset_per_line());
 
 
     /* Get source and destination data pointers. */
@@ -1051,10 +1058,17 @@ void nt_ega_med_graph_std(int offset, int screen_x, int screen_y,
     ** Tim September 92, sanity check parameters, if they're too big
     ** it can cause a crash.
     */
-    if( height>200 || width>80 ){
-	assert2( NO, "VDM: nt_ega_med_graph_std() w=%d h=%d", width, height );
-	return;
-    }
+    /* T60: x is a host pixel; width counts eight-pixel plane groups. */
+    if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
+        screen_x >= sc.PC_W_Width || screen_y >= sc.PC_W_Height / 2 ||
+        offset < 0 || offset >= EGA_PLANE_SIZE || get_offset_per_line() <= 0)
+        return;
+    width = min(width, (sc.PC_W_Width - screen_x) / 8);
+    height = min(height, sc.PC_W_Height / 2 - screen_y);
+    width = min(width, EGA_PLANE_SIZE - offset);
+    if (width <= 0) return;
+    height = min(height, 1 + (EGA_PLANE_SIZE - offset - width) /
+        get_offset_per_line());
 
 
     /*
@@ -1285,10 +1299,17 @@ void nt_ega_hi_graph_std(int offset, int screen_x, int screen_y,
     ** Tim September 92, sanity check parameters, if they're too big
     ** it can cause a crash.
     */
-    if( height>480 || width>80 ){
-	assert2( NO, "VDM: nt_ega_hi_graph_std() w=%d h=%d", width, height );
-	return;
-    }
+    /* T60: x is a host pixel; width counts eight-pixel plane groups. */
+    if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
+        screen_x >= sc.PC_W_Width || screen_y >= sc.PC_W_Height ||
+        offset < 0 || offset >= EGA_PLANE_SIZE || get_offset_per_line() <= 0)
+        return;
+    width = min(width, (sc.PC_W_Width - screen_x) / 8);
+    height = min(height, sc.PC_W_Height - screen_y);
+    width = min(width, EGA_PLANE_SIZE - offset);
+    if (width <= 0) return;
+    height = min(height, 1 + (EGA_PLANE_SIZE - offset - width) /
+        get_offset_per_line());
 
     /* Build up the device independent bitmap. */
     p0 = ( unsigned int *) get_regen_ptr( 0, offset << 2 );
