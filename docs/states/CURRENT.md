@@ -3,32 +3,36 @@
 ## Current Work
 
 T60 is closed after owner manual acceptance and the whole-task audit.
-M9 T61 S1 is closed; S2 is admitted and active: restore proven no-behavior
-differences from the original mirror. The owner selected this task ahead of
+M9 T61 S2 is closed; S3 is admitted and active: restore original unselected
+conditional blocks and declaration formatting. The owner selected this task ahead of
 the existing three queued candidates; their relative order is unchanged.
 
-## M9 T61 S2 Packet
+## M9 T61 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner requested T60 closure and immediate T61 admission from the supplied audit; single-person dual-role execution. |
-| Objective | Restore original formatting and remove proven inactive local code without changing selected program behavior. |
-| Non-goals | No ABI/functionality withdrawal, keyboard/audio branch redesign, S3 conditional restoration, shared-corpus change or new backend. |
-| Reference Baseline | S1 e2e91c1 ledger; production 3df951c; readonly OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61, same-path softpc.new files. |
+| Objective | Restore ios.c original NTVDM blocks and host_cpu.h original non-CCPU declaration formatting without changing selected program behavior. |
+| Non-goals | No selected ABI/functionality withdrawal, keyboard/audio redesign, enabling NTVDM or non-CCPU builds, shared-corpus change or new backend. |
+| Reference Baseline | S2 implementation 6df4104 and S1 ledger; readonly OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61, same-path softpc.new files. |
 | Candidate Proposal | [Mirror diff minimization](../proposals/m9-mvdm-diff-minimization.md). |
-| Files And ABI Surface | src/mvdm formatting and proven inactive DIB branch, evidence; no ABI changes. |
+| Files And ABI Surface | src/mvdm/softpc.new/base/support/ios.c and host/inc/host_cpu.h, evidence and dual EXEs; keep necessary CCPU declarations. |
 | Applicable Rules | Execution, Document, Architecture, Coding and source-research policy; corresponding governance skills. |
-| Verification | Pre/post selected preprocessing token equivalence on both widths, focused existing painter/input/FPU checks, full test-x64/test-x86, documentation gate and protected-path check. |
-| Expected Markers | Original formatting restored without reformatting the original; inactive DIB removal preserves its selected branch and matching directives. |
+| Verification | Actual compile definitions/include consumers; pre/post selected preprocessing token equivalence on both widths; full test-x64/test-x86 and focused I/O/CPU checks; documentation and protected-path gates. |
+| Expected Markers | ios.c original NTVDM branches restored; host_cpu.h non-CCPU original formatting; selected CCPU ABI untouched. |
 | Asset Needs | Rebuild assets/binary/softpc32.exe and softpc64.exe; no media or INI changes. |
 | Reporting Requirements | Per-file original diff reduction, production/test line delta, all F candidates disposed, dual-width results and actual-commit review. |
 | Stop Conditions | Do not remove necessary ABI/fixes, alter D6 BOP, use external trees as build inputs or touch protected shared corpora. |
-| Exit Criteria | All S2 candidates either restored with equivalence proof or explicitly retained with reason; dual builds/full tests, executor commit/push and coordinator review. |
+| Exit Criteria | Both candidate files restored within their approved boundaries with selected-token equivalence; dual builds/full tests, executor commit/push and actual-commit review. Unselected historical branches are not claimed runtime-tested. |
 | Original Owner Request | Audit every MVDM/OpenNT difference and why; remove unnecessary diff without harming behavior; design and admit T61 now. |
-| Similar-Issue Sweep | All 97 S1 divergent files for unrelated EOL/whitespace/indentation and inactive local branches; functional changes remain assigned to their later stages or retained. |
+| Similar-Issue Sweep | S1 conditional/declaration candidates and their real compile consumers; confirm no restored block changes active preprocessing or removes current CCPU fixes. |
 
 ## Current Technical Baseline
+
+- T61 S2 implementation 6df4104 restores eight mirror files, production +17/-34;
+  dual full suites 97/97 and post-commit focused 4/4 each. Fixed EXEs refreshed.
+  [S2 review](../history/M9-T61-S2-mirror-format-cleanup.md).
 
 - T61 S1 inventory complete: 498 retained/401 identical/97 divergent; raw and
   whitespace-ignored totals separately recorded. No production changes.
