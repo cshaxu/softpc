@@ -46,13 +46,8 @@
 #define host_ica_lock()
 #define host_ica_unlock()
 extern void softpc_standalone_audio_set_tone(ULONG frequency, ULONG duration);
-static ULONG GetPerfCounter(VOID)
-{
-    return (ULONG)(GetTickCount() * 10u);
-}
-#else
-IMPORT ULONG GetPerfCounter(VOID);
 #endif
+IMPORT ULONG GetPerfCounter(VOID);
 
 ULONG FreqT2    = 0;
 BOOL  PpiState  = FALSE;

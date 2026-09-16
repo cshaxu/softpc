@@ -6,6 +6,7 @@ static ULONG calls, frequency, duration;
 static unsigned bells;
 static SHORT sound_enabled;
 static DWORD WINAPI clock_tick(void) { return ticks; }
+ULONG GetPerfCounter(VOID) { return (ULONG)(ticks * 10u); }
 static BOOL WINAPI bell(UINT type) { assert(type == MB_OK); ++bells; return TRUE; }
 void softpc_standalone_audio_set_tone(ULONG hz, ULONG ms)
 { ++calls; frequency = hz; duration = ms; }

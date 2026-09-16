@@ -768,3 +768,43 @@ git diff --check 通过。固定 EXE SHA256：
 
 INI/media 未修改；记录后删除本 S 自有日志，保留既有构建树。没有新增原始
 文件或第二套初始化路径；自动测试不替代 owner 手动体验验收。
+
+## S12 实施前审计
+
+基线 d58510f / S11 实现 64a7668。VM driver 有三项图形尺寸缓存，仅用于
+从满高左半幅 dirty 推断可见宽度；镜像 nt_graph 已从原始 V7 表创建正确
+DIB。先在既有 VGA 测试添加 60h–69h、标准 VGA、半幅 dirty 和切换矩阵，
+比较真实 DIB 与 driver 复制帧，再决定删除。预计生产净减 15–25 行，测试
+增加约 80–120 行；无文件搬迁、新对象或公共 ABI 变化。
+
+nt_sound 的四行 GetPerfCounter 函数体移入既有 Compat audio，实现仍为
+GetTickCount()*10，保留原始 ULONG 回绕及单位。镜像恢复唯一 IMPORT 声明，
+预计减少五行新增差异；状态测试改为注入同名原始 host clock。不改变原始
+PPI/Timer2 状态。Lib/Common/shared tests 均保持不变。若图形等价证明失败，
+记录精确模式并保留必要路径，不能用新启发式代替原有推断。
+
+### S12 实施与故障复现
+
+修改前测试先跑完整帧：60h–69h、12h/13h、67h→03h→60h 转换全部通过。
+第二轮只改 dirty 为满高左半幅，60h 立即复现 DIB 752x410、VM frame
+376x410。证明 dirty 推断不只是重复，还可把正确原始几何裁半。删除三个
+缓存字段和全部半幅推断后，相同矩阵检查左右半幅、完整尺寸/像素、无新
+dirty 时不发布；x64 初轮全套中视频测试已通过。原始画家/模式表未修改。
+
+GetPerfCounter 原体四行移入既有 audio.c；镜像恢复 IMPORT，无新转发层。
+原始 nt_sound 差异由 +64/-0 降为 +59/-0。三生产路径 +12/-28，净 -16，
+符合预估；两个测试路径 +70/-0，比预估更小；无构建/共享代码变动。
+
+初轮 x64 全套 97/98（84.45s）：声音测试错误移除了 GetTickCount 替身，
+而原始 PulsePpi 仍直接调用它，导致伪时钟和实时钟混用。恢复旧替身并添加
+原始 host GetPerfCounter 替身后定向 1/1 通过。生产状态机没有改动。
+
+最终双宽度构建成功；完整复测 x64 98/98（56.98s）、x86 98/98（72.78s）。
+同类扫描确认 VM 不再有 graphics_source/visible_width 缓存；生产
+GetPerfCounter 只在 Compat 定义，镜像两处原调用不变。镜像统计相比 S11
+仅少五行新增差异；全部 retained-file 总数由 S13 复算。git diff --check
+和文档治理通过。EXE SHA256：
+- x86 `A8E9B403DC390DF1C7770B1ABF5FAD1ABA8DF59153BB0510CB2999EC52821E3E`
+- x64 `D974CA86034D85ED60BE284EB7B763C6266B619ED93CA1630EA1027644E14610`
+
+不修改用户 INI/media；完成后的自有诊断/构建/测试日志删除，保留既有构建树。

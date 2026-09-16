@@ -12,9 +12,6 @@
 struct vm_driver {
     softpc_machine *machine;
     softpc_debug_state debug;
-    lib_u32 graphics_source_width;
-    lib_u32 graphics_source_height;
-    lib_u32 graphics_visible_width;
 };
 
 /* The recovered core and host endpoints are process-global. This is resource
@@ -180,7 +177,6 @@ static lib_bool vm_driver_copy_graphics(vm_driver *driver,
     lib_i32 top;
     lib_i32 right;
     lib_i32 bottom;
-    lib_u32 visible_width;
     const BITMAPINFO *dib;
     lib_u32 row;
     lib_u32 palette_index;
@@ -192,22 +188,11 @@ static lib_bool vm_driver_copy_graphics(vm_driver *driver,
         width > KVM_GRAPHICS_MAX_WIDTH || height > KVM_GRAPHICS_MAX_HEIGHT)
         return LIB_FALSE;
     row_stride = (width + 3u) & ~3u;
-    if (driver->graphics_source_width != width ||
-        driver->graphics_source_height != height) {
-        driver->graphics_source_width = width;
-        driver->graphics_source_height = height;
-        driver->graphics_visible_width = width;
-    }
-    if (left == 0 && top == 0 && bottom >= (lib_i32)height - 1 && right >= 0 &&
-        (lib_u32)(right + 1) * 2u == width)
-        driver->graphics_visible_width = (lib_u32)(right + 1);
-    visible_width = driver->graphics_visible_width;
-    if (visible_width == 0u || visible_width > width) visible_width = width;
-    if (visible_width * height > KVM_GRAPHICS_MAX_PIXELS) return LIB_FALSE;
+    if (width * height > KVM_GRAPHICS_MAX_PIXELS) return LIB_FALSE;
     memset(frame, 0, sizeof(*frame));
     for (row = 0u; row < height; ++row)
-        memcpy(frame->graphics_pixels + row * visible_width,
-            (const lib_u8 *)bits + row * row_stride, visible_width);
+        memcpy(frame->graphics_pixels + row * width,
+            (const lib_u8 *)bits + row * row_stride, width);
     dib = (const BITMAPINFO *)info;
     for (palette_index = 0u; palette_index < KVM_GRAPHICS_PALETTE_ENTRIES;
             ++palette_index) {
@@ -216,13 +201,12 @@ static lib_bool vm_driver_copy_graphics(vm_driver *driver,
             ((lib_u32)colour->rgbRed << 16u) |
             ((lib_u32)colour->rgbGreen << 8u) | (lib_u32)colour->rgbBlue;
     }
-    frame->graphics_width = visible_width;
+    frame->graphics_width = width;
     frame->graphics_height = height;
-    frame->graphics_stride = visible_width;
+    frame->graphics_stride = width;
     frame->dirty_left = left < 0 ? 0 : left;
     frame->dirty_top = top < 0 ? 0 : top;
-    frame->dirty_right = right >= (lib_i32)visible_width ?
-        (lib_i32)visible_width - 1 : right;
+    frame->dirty_right = right >= (lib_i32)width ? (lib_i32)width - 1 : right;
     frame->dirty_bottom = bottom >= (lib_i32)height ? (lib_i32)height - 1 : bottom;
     frame->graphics = 1u;
     frame->valid = 1u;

@@ -6,6 +6,11 @@
 /* Standalone audio is only a presentation sink.  nt_sound.c owns the
    original PPI/Timer2 state transitions and requests a frequency here. */
 #ifdef _WIN32
+ULONG GetPerfCounter(VOID)
+{
+    return (ULONG)(GetTickCount() * 10u);
+}
+
 #define SOFTPC_SPEAKER_MIN_HZ 10ul
 #define SOFTPC_SPEAKER_MAX_HZ 20000ul
 #define SOFTPC_SPEAKER_SLICE_MS 40u

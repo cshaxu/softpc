@@ -1,4 +1,5 @@
 #include "vm/machine.h"
+#include "vm/driver.h"
 #include "../lib/cleanup.h"
 #include "insignia.h"
 #include "host_def.h"
@@ -393,6 +394,73 @@ static void make_boot_disk(const char *path)
     assert(fclose(file) == 0);
 }
 
+static void verify_driver_geometry(softpc_machine *machine)
+{
+    static const unsigned modes[] = {
+        0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69,
+        0x12, 0x13, 0x67, 0x03, 0x60
+    };
+    static const unsigned widths[] = {
+        752, 720, 800, 1024, 1024, 1024, 640, 640, 720, 800,
+        640, 640, 640, 0, 752
+    };
+    vm_driver *adapter = NULL;
+    common_machine_driver driver;
+    kvm_frame *frame = malloc(sizeof(*frame));
+    unsigned index, pass;
+    assert(frame != NULL);
+    assert(vm_driver_create(&adapter, machine) == LIB_STATUS_OK);
+    vm_driver_describe(adapter, &driver);
+    for (pass = 0; pass < 2; ++pass)
+    for (index = 0; index < sizeof(modes) / sizeof(modes[0]); ++index) {
+        const void *bits;
+        const void *info;
+        uint32_t width, height;
+        int32_t left, top, right, bottom;
+        SMALL_RECT rect;
+        c_setAH(modes[index] >= 0x60 ? 0x6f : 0);
+        c_setAL(modes[index] >= 0x60 ? 5 : (unsigned char)modes[index]);
+        c_setBX((unsigned short)modes[index]);
+        assert(softpc_device_bop_dispatch(0x42u, 0u));
+        host_timer_event();
+        host_timer_event();
+        assert(Currently_emulated_video_mode == modes[index]);
+        if (modes[index] == 3) {
+            assert(driver.copy_frame(driver.context, frame));
+            assert(frame->valid && !frame->graphics);
+            continue;
+        }
+        assert(softpc_machine_presentation_dib(machine, &bits, &info,
+            &width, &height));
+        assert(width == widths[index]);
+        while (softpc_machine_presentation_take_dirty(machine, &left, &top,
+                &right, &bottom)) { }
+        /* A legitimate full-height half repaint must not resize the frame.
+         * Both halves are tested across original mode transitions. */
+        rect.Left = 0; rect.Top = 0;
+        rect.Right = (SHORT)((pass ? width / 2u : width) - 1u);
+        rect.Bottom = (SHORT)(height - 1u);
+        assert(softpc_standalone_invalidate_dibits(NULL, &rect));
+        assert(driver.copy_frame(driver.context, frame));
+        assert(frame->valid && frame->graphics);
+        if (frame->graphics_width != width || frame->graphics_height != height)
+            fprintf(stderr, "mode %02x pass %u: DIB %ux%u, frame %ux%u\n",
+                modes[index], pass, width, height,
+                frame->graphics_width, frame->graphics_height);
+        assert(frame->graphics_width == width && frame->graphics_height == height);
+        assert(frame->graphics_stride == width);
+        assert(frame->dirty_right == rect.Right);
+        rect.Left = (SHORT)(width / 2u); rect.Right = (SHORT)(width - 1u);
+        assert(softpc_standalone_invalidate_dibits(NULL, &rect));
+        assert(driver.copy_frame(driver.context, frame));
+        assert(frame->graphics_width == width && frame->dirty_right == rect.Right);
+        assert(memcmp(frame->graphics_pixels, bits, width * height) == 0);
+        assert(!driver.copy_frame(driver.context, frame));
+    }
+    vm_driver_destroy(adapter);
+    free(frame);
+}
+
 int main(void)
 {
     const char *path = "softpc-original-dib-smoke.img";
@@ -657,6 +725,7 @@ int main(void)
     verify_panning_refresh();
     verify_panning_pixels();
     verify_writer_contract();
+    verify_driver_geometry(machine);
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     return 0;
