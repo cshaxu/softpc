@@ -3,31 +3,31 @@
 ## Current Work
 
 T60 is closed after owner manual acceptance and the whole-task audit.
-M9 T61 S1-S9 are closed; S9 implementation 1b43329 removes 124 production
-lines with dual-width 98/98 and actual-commit 5/5 checks. T61 remains open;
-S10 is admitted under the owner's serial follow-up plan.
+M9 T61 S1-S10 are closed; S10 implementation e730f43 removes 1586 production
+source lines with dual-width 98/98 and actual-commit 5/5 checks. T61 remains open;
+S11 is admitted under the owner's serial follow-up plan.
 The three queued candidates are unchanged.
 
-## M9 T61 S10 Packet
+## M9 T61 S11 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner approves decomposition and implementation; single-person dual-role; permanent push authorization. |
-| Objective | Remove duplicated Compat GDP/SAS declarations by reusing the already retained original headers; prove selected GDP expansion and remove only unused zero SAS extension slots. |
-| Non-goals | No Lib/Common/shared-test change, VM lifecycle relocation, new external source import, generated overlay or guest behavior change. |
-| Reference Baseline | SoftPC 1b43329; S7 header audit and S9 verified dual-width packages. |
+| Objective | Move concrete machine configuration/lifecycle and debug request preflight to VM; keep original host allocation/callbacks and media endpoints in Compat. Remove reversed header ownership and duplicate media-mode translation. |
+| Non-goals | No Lib/Common/shared-test or mirror change, lifecycle rewrite, geometry change or new external source import. |
+| Reference Baseline | SoftPC e730f43; S7 ownership audit and S10 verified dual-width packages. |
 | Candidate Proposal | [Remaining mirror and support ownership audit](../proposals/m9-mirror-support-ownership-audit.md); original requests remain in the retained T61 plan. |
-| Files And ABI Surface | Compat ccpu/legacy GDP/SAS headers; existing mirror cpu4gen.h/ev_glue.c include selection and sascdef.c unused slots; CMake include paths and focused tests. Native-width GDP support remains Compat-owned. |
+| Files And ABI Surface | git mv Compat machine.c/.h to VM; move debugger-specific memory preflight from Compat memory into VM; retained Compat platform/media contracts, VM consumers, product tests and build/include gates. Public Lib/Common ABI unchanged. |
 | Applicable Rules | Execution, Document, Architecture, Coding, source-research policy and their governance skills. |
-| Verification | Header/caller census, preprocessor GDP comparison and SAS slot layout proof; dual-width layout/video/full suites; documentation gate and diff-check. |
-| Expected Markers | No duplicate GDP/SAS corpus or legacy include path; original headers reused, required native-width access unchanged, unused vector slots have no consumers. |
+| Verification | Source/target ownership and include negative gates; reset/restart/input continuation/debug atomicity and media tests; dual-width full builds/suites and documentation/diff checks. |
+| Expected Markers | VM owns its concrete backend and debugger request policy, Compat never imports VM/Common, no forwarding duplicates; moved initialization sequence stays unchanged. |
 | Asset Needs | Refresh both fixed EXEs; preserve user INI/media; use existing ignored build trees. |
 | Reporting Requirements | Before/after paths, moves, independent implementation and original-mirror diff accounting; actual verification and failures. No claim of manual GUI acceptance. |
-| Stop Conditions | A used extension or unproved layout change blocks deletion; any new mirror ABI extension requires presenting the exact alternative before adoption. No ownership/geometry migration in S10. |
+| Stop Conditions | A relocation requires guest/lifecycle changes or reverse dependency; keep the distinct host contract rather than introducing a second implementation. No mirror/shared changes. |
 | Exit Criteria | Dual-width builds/full tests and actual-commit review pass; committed/pushed complete delivery, clean tree; T61 stays open. |
 | Original Owner Request | 请拆解一下S任务 并更新当前proposal记录 然后开始准入执行。 |
-| Similar-Issue Sweep | All selected GDP/SAS header consumers, macro/slot references and duplicated legacy copies; distinguish CCPU-local original layout from shared C-VID layout. S11-S12 remain separate. |
+| Similar-Issue Sweep | Every moved backend/preflight consumer and Compat machine-header reference; remove duplicate media enum/conversions using the existing storage contract. Retain original callbacks, SAS allocation and physical bus access in Compat. |
 
 ## Current Technical Baseline
 
