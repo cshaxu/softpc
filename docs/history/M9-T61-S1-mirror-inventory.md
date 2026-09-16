@@ -5,7 +5,7 @@
 Owner admitted T61 from the supplied MVDM/OpenNT audit: minimize unnecessary
 original-source diff while preserving required ABI, fixes and user experience.
 S1 is read-only production research and evidence governance, not simplification.
-The [proposal](../proposals/m9-mvdm-diff-minimization.md) defines S2–S6.
+The [proposal](M9-T61-mvdm-diff-minimization-proposal.md) defines S2–S6.
 
 ## Executor delivery
 
