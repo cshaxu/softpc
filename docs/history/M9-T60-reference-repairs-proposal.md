@@ -28,6 +28,12 @@ belong to the product test/unit boundary. App/VM/Compat changes require a
 concrete necessity within the active stage; no opportunistic cleanup.
 Preserve INI, guest media, ROMs and existing UI behavior.
 
+Owner clarification during S6: "不批准。类似请求一律不许可。" Existing
+compatibility must not be discarded to adopt reference behavior. D6 BOP is
+retained, SALC substitution is rejected, and equivalent compatibility-breaking
+requests are not to be repeated. S7 remains an assessment of the existing FPU,
+not admission of a replacement backend.
+
 ## Finite ledger and serial stages
 
 | Stage | Scope / retained owner | Proof and exit |
