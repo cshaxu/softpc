@@ -1,6 +1,6 @@
 # M9 T62 S2: embedded Machine input queue
 
-Original request: [serial proposal](../proposals/m9-common-lib-simplification.md).
+Original request: [serial proposal](M9-T62-common-lib-simplification-proposal.md).
 Baseline c7fafb8; implementation db3b6d8 pushed. Owner then required T61 closure
 first; 6741721 completed that closure before this S2 acceptance/next admission.
 

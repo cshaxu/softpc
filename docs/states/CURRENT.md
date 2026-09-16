@@ -4,11 +4,19 @@
 
 T60 is closed after owner manual acceptance and the whole-task audit.
 T61 is closed on owner direction after the [whole-task audit](../history/M9-T61-completion-audit.md).
-M9 T62 S1-S3 are closed; S4 is active: localize Console event ownership.
-No S3 work started before T61 closure (6741721).
+M9 T62 S1-S4 are closed.
+No implementation subtask is active.
+Open task awaiting owner: T62.
+[Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
 The three queued candidates are unchanged.
 
 ## Current Technical Baseline
+
+- T62 final implementation aa1eabd: four bounded Common/Lib simplifications,
+  production +170/-214 = -44 across 12 C/H paths. Final x64/x86 101/101;
+  actual-commit 14/14 each. Both fixed EXEs refreshed; public APIs, App, VM,
+  Compat and MVDM unchanged. S1-S4 implementation and review commits are pushed;
+  owner manual validation remains required before T62 closure.
 
 - T61 S13 audit delivery 891e642 verifies all S7 ownership/reuse candidates.
   S8-S12 production net -1847; mirror 498 retained/404 identical/94 divergent,
@@ -16,27 +24,6 @@ The three queued candidates are unchanged.
   Fixed EXEs remain S12 e2ef91f, hashes in the
   [final ledger](../etc/evidence/softpc/pristine-divergence-current.md#s13-最终归属复核).
   Lib/Common and shared tests unchanged within T61; owner has now closed T61.
-
-## M9 T62 S4 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner admits four serial S tasks, automatic next admission, dual EXEs, tests and permanent push permission. |
-| Objective | Move neutral KVM Console event processing/state to its component root; retain native worker/button decoding in platform. |
-| Non-goals | No public API, input behavior, worker lifecycle, Linux feature, Common, App, VM, Compat or MVDM changes. |
-| Reference Baseline | 0811c31 S3 implementation; full suites 101/101 each, post-commit 11/11 each; T61 closed in 6741721. |
-| Candidate Proposal | [Bounded simplification](../proposals/m9-common-lib-simplification.md). |
-| Files And ABI Surface | lib/kvm-console/console.c/h and platform component.c; README, shared tests/manifests/fixed EXEs; private event/button declarations only. |
-| Applicable Rules | Execution, Documentation, Architecture, Coding rules; design Architecture/Coding/UI; four linked governance skills. |
-| Verification | Input reset, activation/pending frame, keyboard/text equivalence, mouse buttons/baseline, fault/retirement; full dual-width suites, manifests/DAG/governance and post-commit focused tests. |
-| Expected Markers | One root event path; same normalizer/matcher, X8/Y16 mouse scale, native callback retirement barrier; Linux remains UNSUPPORTED. |
-| Asset Needs | Refresh assets/binary/softpc32.exe and softpc64.exe only; preserve INI/media. Existing preset build trees only. |
-| Reporting Requirements | Pre-plan estimate and post-result production/test/build numstat; evidence, pushed P and clean workspace. |
-| Stop Conditions | Changed input/lifecycle behavior, new public API, new state machine or new platform functionality. |
-| Exit Criteria | Both widths build/pass full suite; focused failure proof; manifests/gates pass; implementation pushed and actual-diff coordinator review complete. |
-| Original Owner Request | Original request retained verbatim in linked proposal; each finding becomes its own S, automatically continue after closure, T remains open for owner test. |
-| Similar-Issue Sweep | KVM Console root/platform callbacks, state users and tests; preserve Window-specific decoding and shared kvm-base normalizer. |
 
 - T61 S6 implementation 4f7171d completes the 498-file original-diff audit:
   403 identical, 95 divergent; +23,141/-22,335, 5,132 hunks. Comparable original

@@ -1,6 +1,6 @@
 # M9 T62 S3: shared Storage length measurement
 
-Original request: [serial proposal](../proposals/m9-common-lib-simplification.md).
+Original request: [serial proposal](M9-T62-common-lib-simplification-proposal.md).
 Baseline f4b090b; implementation 0811c31 committed and pushed.
 
 Actual-diff coordinator review confirms one root save/end/tell/restore path,

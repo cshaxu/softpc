@@ -1,7 +1,7 @@
 # M9 T62 S1: Session fault slots
 
 Owner request and four-step scope are retained in the
-[proposal](../proposals/m9-common-lib-simplification.md). Baseline 58d3d75;
+[proposal](M9-T62-common-lib-simplification-proposal.md). Baseline 58d3d75;
 implementation dce462e is pushed. S1 is closed after actual-diff coordinator review.
 
 The sole Session queue retains two fault classes, first-wins within each,
