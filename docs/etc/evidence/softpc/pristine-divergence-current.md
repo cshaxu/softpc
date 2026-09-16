@@ -286,3 +286,37 @@ ios.c 行尾仍受 apply_patch/checkout 影响，不将内容恢复冒称所有�
 
 - x86 `58DEB3A11B297A9A2288B73681478A65403432D79F51E952426C614B2394E32E`
 - x64 `08D3F83AAE6D64BB1FF0BD73115874E6E40D4E03CE7FDE457284928B543700D2`
+
+## S4 实施证据
+
+键盘冻结全集为 nt_keycd.c 的两份 Scan1ToKeynum、Scan1ToKeynumExtended、
+aNullCharScan、aNumPadSCode 以及 KeyMsgToKeyCode；四组表和转换函数逐项
+确认与原始文件相同。删除独立分支的重复 corpus，直接使用原始定义；仅隔离
+NT 头文件与未使用的 BiosKeyToInputRecord，并保留现有 scan1 窄入口。
+原始 BIOS 转换代码没有删除，也没有启用 NT 服务。四组表现在各只有一个定义。
+
+唯一生产调用为 vm/input.c 的 KeyMsgToKeyCode，以及 compat/keyboard.c 的
+softpc_host_scan1_to_key；前者仅在 VM 边界复制扫描码/扩展标志，后者保持
+0x7f 掩码和 make/break 分派。两者均未修改；不存在新的表、队列或转发层。
+选中编译单元的真实 CMake 参数运行 -E -P，词法 token 指纹前后相同：
+
+- x64 `DF06D4FE4669C2F15D4508E277532E0B58B706C2A16CC9667E60020089769122`
+- x86 `ABD73385ECD02FDC5769F1EECA7B6836DAF386D3DA291DB92C21B51A0153A2DA`
+
+原始内容差异由 +449/-0、2 区块降为 +13/-0、3 区块；减少 436 行差异，
+区块增加是从大复制分支改为三个局部编译边界，不代表功能增加。raw checkout
+仍有行尾造成的 +19/-6，最终 S6 单独对账。生产 1 文件 +11/-447，净 -436；
+测试 1 文件 +34/-0：完整 133+84 表项的 FNV-1a 指纹、普通表窄入口一致性、
+每项 8 种修饰组合与 make/break 等价。测试不依赖外部源码或重复映射表。
+
+同类扫描发现原版 KeyMsgToKeyCode 的两个 `> sizeof` 判断允许等长索引越界，
+这是原版和精简前均有的行为，未混入等价精简；已转 TODO，需独立输入安全准入。
+未声称该边界安全或真实 RDP 手测通过。探针的 x86 初次因工具链 PATH 缺失失败，
+补既有 mingw32 路径后重跑成功；指纹计算初版的 PowerShell 整数掩码错误已纠正，
+没有更改生产算法。四组原始表的完整比较也独立通过。
+
+双宽度构建通过，全量 x64 97/97（80.34s）、x86 97/97（69.35s）。
+文档门禁及 diff-check 通过，共享四目录、INI、媒体未改动，外部树干净。
+固定 EXE SHA256：
+- x86 `29FBE2B2C13182D54520388239C4933431BEC8F2E2B3236A7733CDB567FB0133`
+- x64 `CDCAF22C812B26122DB4EC3C24B4A6422F2284B22F8194848BA85AB95F914E14`
