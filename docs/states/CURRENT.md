@@ -3,32 +3,37 @@
 ## Current Work
 
 T60 is closed after owner manual acceptance and the whole-task audit.
-M9 T61 S2 is closed; S3 is admitted and active: restore original unselected
-conditional blocks and declaration formatting. The owner selected this task ahead of
+M9 T61 S3 is closed; S4 is admitted and active: assess and minimize the
+standalone keyboard branch without semantic changes. The owner selected this task ahead of
 the existing three queued candidates; their relative order is unchanged.
 
-## M9 T61 S3 Packet
+## M9 T61 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner requested T60 closure and immediate T61 admission from the supplied audit; single-person dual-role execution. |
-| Objective | Restore ios.c original NTVDM blocks and host_cpu.h original non-CCPU declaration formatting without changing selected program behavior. |
-| Non-goals | No selected ABI/functionality withdrawal, keyboard/audio redesign, enabling NTVDM or non-CCPU builds, shared-corpus change or new backend. |
-| Reference Baseline | S2 implementation 6df4104 and S1 ledger; readonly OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61, same-path softpc.new files. |
+| Objective | Compare every standalone nt_keycd table/function with the original, retain one table/translation owner and minimize equivalent mirror diff. |
+| Non-goals | No key/hotkey semantic changes, new mapper or input queue, audio redesign, shared-corpus change or new backend. |
+| Reference Baseline | S3 implementation dc71195 and S1 ledger; readonly OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61, same-path softpc.new files. |
 | Candidate Proposal | [Mirror diff minimization](../proposals/m9-mvdm-diff-minimization.md). |
-| Files And ABI Surface | src/mvdm/softpc.new/base/support/ios.c and host/inc/host_cpu.h, evidence and dual EXEs; keep necessary CCPU declarations. |
+| Files And ABI Surface | nt_keycd.c; only necessary equivalent existing Compat/build boundary wiring and product test/unit proof; no new public/shared ABI. |
 | Applicable Rules | Execution, Document, Architecture, Coding and source-research policy; corresponding governance skills. |
-| Verification | Actual compile definitions/include consumers; pre/post selected preprocessing token equivalence on both widths; full test-x64/test-x86 and focused I/O/CPU checks; documentation and protected-path gates. |
-| Expected Markers | ios.c original NTVDM branches restored; host_cpu.h non-CCPU original formatting; selected CCPU ABI untouched. |
+| Verification | Complete table/algorithm and caller comparison; all mapped scan codes, extended/modifier distinctions and make/break through existing entry points; full test-x64/test-x86 and focused input/lifecycle checks; documentation and protected-path gates. |
+| Expected Markers | One original table/translation owner; no duplicate standalone table corpus; narrow existing host entry retained or equivalent existing Compat placement, with no second implementation. |
 | Asset Needs | Rebuild assets/binary/softpc32.exe and softpc64.exe; no media or INI changes. |
 | Reporting Requirements | Per-file original diff reduction, production/test line delta, all F candidates disposed, dual-width results and actual-commit review. |
 | Stop Conditions | Do not remove necessary ABI/fixes, alter D6 BOP, use external trees as build inputs or touch protected shared corpora. |
-| Exit Criteria | Both candidate files restored within their approved boundaries with selected-token equivalence; dual builds/full tests, executor commit/push and actual-commit review. Unselected historical branches are not claimed runtime-tested. |
+| Exit Criteria | Every production caller/table entry accounted; selected keyboard behavior equivalent, candidate either safely minimized or explicitly justified as simpler retained; dual builds/full tests, executor commit/push and actual-commit review. |
 | Original Owner Request | Audit every MVDM/OpenNT difference and why; remove unnecessary diff without harming behavior; design and admit T61 now. |
-| Similar-Issue Sweep | S1 conditional/declaration candidates and their real compile consumers; confirm no restored block changes active preprocessing or removes current CCPU fixes. |
+| Similar-Issue Sweep | Whole nt_keycd standalone/original branch, its original NT-only BIOS conversion helpers, Compat scancode and VM key-number callers; no duplicate tables or accidental enablement of unused NT services. |
 
 ## Current Technical Baseline
+
+- T61 S3 implementation dc71195 restores unselected originals with identical
+  selected preprocessing and EXE code/data sections. Final dual full suites
+  97/97; post-commit focused 4/4 each. First x64 package failure and successful
+  repeats are recorded, not erased. [S3 review](../history/M9-T61-S3-original-conditionals.md).
 
 - T61 S2 implementation 6df4104 restores eight mirror files, production +17/-34;
   dual full suites 97/97 and post-commit focused 4/4 each. Fixed EXEs refreshed.
