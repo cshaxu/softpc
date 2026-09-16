@@ -726,3 +726,45 @@ struct SasVector 大小复制 cSasPtrs；不存在外部二进制 ABI 消费者�
 
 测试自有媒体自行清理；本 S 预处理目录/脚本及日志在记录后删除，既有
 build 树保留；INI 未修改。自动验证不等于用户 GUI 验收。
+
+## S11 实施前审计
+
+基线 f1ed16e（S10 实现 e730f43）。git mv machine.c 480 行、machine.h 126 行
+从 Compat 到 VM；约 32 行 debugger-specific 预检从 Compat memory.c 移入
+VM 的私有内存适配实现，避免向普通 debug 命令文件引入原始 CPU 宏。搬迁
+不算代码减少。原始 host_sas 分配、SAS 物理总线读写、媒体端点留在 Compat。
+预计额外生产净减 10–35 行，来自重复媒体枚举和三处等价转换；新私有实现
+所需头/声明应小于删除量。构建/门禁/测试 include 更新另计，镜像 diff 为 0。
+
+现存 storage medium enum 与 softpc_media_mode 数值完全一致（DIRECT=0、
+READONLY=1、OVERLAY=2），因此复用现有类型不改变默认初始化。Compat
+platform.h 改为依赖该 storage 契约，移除所有 machine.h 反向入口。调试
+预检通过原始 c_sas_memory_size 查询与 host_sas_init 相同的 RAM size，
+仍先验证全部 32 字节再访问，保留分页/A20/ROM/C-VID 规则和失败原子性。
+初始化/reset/run/destroy 语句不重写，不借搬迁改变产品流程。预计修复约
+30 个直接头文件消费者并增加退役路径约束，复用既有完整 debug/media/restart
+测试，不修改共享 suite。实际增减与额外发现完成后对照。
+
+### S11 实际交付
+
+machine.c/.h 以 git mv 搬迁 606 行；backend 函数体仅更换 include 路径和
+等值媒体枚举名称，完整文本归一化比较一致。Debugger 30 行预检从 Compat
+移到 VM 私有 debug_memory.c（含必要头共 35 行），复用原始 RAM 大小查询，
+不增加转发入口。Compat 保留内存分配/总线、媒体和原始 host 回调；不引用 VM。
+删除重复 media enum 及三处模式转换，VM 配置直接采用已有 Storage 契约。
+
+相对 f1ed16e，13 个生产路径 +67/-78，净 -11（606 行搬迁不计删除）；
+22 个测试路径 +34/-32，净 +2；CMake +8/-2，净 +6。符合生产净减 10–35
+行的估算。镜像、Lib/Common 和共享测试无差异；镜像统计仍为 498/404/94，
++23137/-22334、5131 区块。架构文档和边界负例使用实际保留路径。
+
+首次构建暴露 platform_failure_smoke 依赖 platform.h 间接带入机器类型，
+补显式 VM include 后两宽度构建成功。初次 x64 测试启动时尚有该旧测试二进制，
+其通过结果不算最终证明。重建后完整重跑：x64 98/98（58.53s），x86 98/98
+（75.29s）；debug 原子性、重启、输入续接、媒体和边界负例均包含在全套内。
+git diff --check 通过。固定 EXE SHA256：
+- x86 `01787C3FA5434BF4AB4DFDA3ADF571DFF6F7067C5BC71A690559A97FCF733B2B`
+- x64 `BC36A93D5EF3698DEC5D600F9B52FD445FC253545DB324ECF85D27CB16F41527`
+
+INI/media 未修改；记录后删除本 S 自有日志，保留既有构建树。没有新增原始
+文件或第二套初始化路径；自动测试不替代 owner 手动体验验收。

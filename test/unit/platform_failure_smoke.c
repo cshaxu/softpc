@@ -1,4 +1,5 @@
 #include <windows.h>
+#include "vm/machine.h"
 #include <assert.h>
 #include <stdio.h>
 #include "../lib/cleanup.h"
@@ -45,7 +46,7 @@ int main(void)
     assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
     assert(fclose(file) == 0);
     options.floppy_path = path;
-    options.media_mode = SOFTPC_MEDIA_OVERLAY;
+    options.media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
 
     fail_event = 1;

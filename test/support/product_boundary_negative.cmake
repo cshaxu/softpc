@@ -6,7 +6,7 @@ file(WRITE "${fixture}/src/vm/vm_interface.h" "#include <common/machine/machine_
 file(WRITE "${fixture}/src/app/composition.c" "#include <vm/vm_interface.h>\n")
 file(WRITE "${fixture}/src/app/legal.c" "#include <lib/storage/file_interface.h>\n")
 file(WRITE "${fixture}/src/common/legal.c" "#include <lib/base/sync_interface.h>\n")
-file(WRITE "${fixture}/src/vm/legal.c" "#include <compat/machine.h>\n")
+file(WRITE "${fixture}/src/vm/legal.c" "#include <compat/platform.h>\n")
 file(WRITE "${fixture}/src/compat/legal.c" "#include <lib/storage/medium_interface.h>\n")
 file(WRITE "${fixture}/src/mvdm/legal.c" "#include <compat/ccpu/lifecycle.h>\n")
 function(check expected)
@@ -23,14 +23,14 @@ function(check expected)
 endfunction()
 check(pass)
 foreach(pair IN ITEMS "app/config.c|../vm/vm_interface.h" "app/main.c|vm/vm_interface.h"
-    "app/composition.h|vm/vm_interface.h" "app/main.c|compat/machine.h"
-    "app/command.h|../compat/machine.h" "vm/vm_interface.h|compat/machine.h"
+    "app/composition.h|vm/vm_interface.h" "app/main.c|compat/platform.h"
+    "app/command.h|../compat/platform.h" "vm/vm_interface.h|compat/platform.h"
     "vm/driver.c|app/config.h" "compat/platform.c|common/machine/machine_interface.h"
     "app/composition.c|vm/driver.h" "compat/platform.c|../vm/driver.h"
-    "common/control.c|../vm/vm_interface.h" "common/control.c|../compat/machine.h"
+    "common/control.c|../vm/vm_interface.h" "common/control.c|../compat/platform.h"
     "common/control.c|mvdm/softpc.new/base/inc/cpu4.h" "common/control.c|app/config.h"
     "lib/boundary.c|../common/machine/machine_interface.h" "lib/boundary.c|../vm/driver.h"
-    "lib/boundary.c|compat/machine.h" "lib/boundary.c|mvdm/softpc.new/base/inc/cpu4.h"
+    "lib/boundary.c|compat/platform.h" "lib/boundary.c|mvdm/softpc.new/base/inc/cpu4.h"
     "mvdm/core.c|vm/driver.h" "mvdm/core.c|common/machine/machine_interface.h")
     string(REPLACE "|" ";" parts "${pair}")
     list(GET parts 0 path)

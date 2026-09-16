@@ -7,10 +7,10 @@ src/
   mvdm/
     softpc.new/
   compat/
-    original host callback C/H files and machine boundary
+    original host callback C/H files and port ABI support
     {ccpu,cvidc,bios,cmos,system,keymouse}/
   vm/
-    driver, input, debug, trace; public vm_interface.h
+    concrete machine backend, driver, input, debug, trace; public vm_interface.h
   common/
     ui/          broker, monitor Console and KVM composition
     session/     neutral control FIFO, reduction and UI dispatch

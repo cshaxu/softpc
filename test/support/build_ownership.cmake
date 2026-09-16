@@ -18,8 +18,8 @@ elseif(CMAKE_SCRIPT_MODE_FILE)
     foreach(sample IN ITEMS "softpc-vm|src/vm/driver.c|0"
         "softpcvm|src/app/composition.c|0" "probe|test/unit/machine_smoke.c|0"
         "softpcvm|src/vm/driver.c|1" "probe|src/vm/debug.c|1"
-        "softpc-machine|src/vm/input.c|1" "softpc-vm|src/compat/machine.c|1"
-        "softpcvm|src/app/../compat/machine.c|1")
+        "softpc-machine|src/vm/input.c|1" "softpc-vm|src/compat/platform.c|1"
+        "softpcvm|src/app/../compat/platform.c|1")
         string(REPLACE "|" ";" parts "${sample}")
         list(GET parts 0 target)
         list(GET parts 1 source)

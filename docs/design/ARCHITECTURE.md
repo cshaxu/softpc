@@ -30,8 +30,8 @@ subset: wholly host-specific NT endpoint files may be absent when a standalone
 host endpoint replaces that contract. Narrow compiler, declaration, calling-ABI
 and pointer-representation corrections may be direct, source-visible diffs at
 the affected point when they remain mechanical and introduce no machine policy.
-`compat/` owns larger host adaptations, including new state, lifecycle,
-capability, ownership, and policy, but does not own guest-visible state.
+`compat/` owns original host callbacks, host resources and port ABI adaptations,
+but no product machine lifecycle/configuration or guest-visible device state.
 `common/session` is the sole owner of the product-neutral control queue,
 desired/actual reduction, prompt scheduling and dispatch order. It receives
 the SoftPC CLI and machine adapter as injected callbacks; it does not parse
@@ -48,8 +48,9 @@ still alive, then destroys UI, session, command/debug, machine and VM in order.
 Machine shutdown and destroy share one stop/join path; shutdown retains storage
 so referenced objects can be released safely before the machine itself.
 Only app/composition.c consumes vm/vm_interface.h; no app source consumes Compat or
-MVDM. `vm/` owns the concrete machine driver, frame/input conversion and debug
-adapter. Its implementation calls Compat and the original machine while its
+MVDM. `vm/` owns the concrete machine backend, initialization/reset/teardown
+sequence, driver, frame/input conversion and debugger request preflight.
+Its implementation calls Compat and the original machine while its
 public interface exposes only copied options and Common/Lib contracts.
 Compat never calls app or Common. `common/machine` owns the
 single generic executor, request/input queues, run generation and copied-frame

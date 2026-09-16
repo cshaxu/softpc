@@ -1,9 +1,9 @@
 #include "machine.h"
-#include "ccpu/lifecycle.h"
-#include "ccpu/abi.h"
-#include "cvidc/gdp_state.h"
-#include "platform.h"
-#include "dib_surface.h"
+#include "compat/ccpu/lifecycle.h"
+#include "compat/ccpu/abi.h"
+#include "compat/cvidc/gdp_state.h"
+#include "compat/platform.h"
+#include "compat/dib_surface.h"
 #include "lib/storage/medium_interface.h"
 
 #include <stdio.h>
@@ -65,7 +65,7 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
     if (machine_out != NULL) *machine_out = NULL;
     if (options == NULL || machine_out == NULL ||
         (options->floppy_path == NULL && options->hard_disk_path == NULL) ||
-        options->media_mode > SOFTPC_MEDIA_OVERLAY ||
+        options->media_mode > LIB_STORAGE_MEDIUM_OVERLAY ||
         !softpc_machine_media_exists(options->floppy_path) ||
         !softpc_machine_media_exists(options->hard_disk_path))
         return SOFTPC_MACHINE_INVALID_ARGUMENT;

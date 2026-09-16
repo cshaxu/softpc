@@ -1,4 +1,4 @@
-#include "compat/machine.h"
+#include "vm/machine.h"
 #include "../lib/cleanup.h"
 
 #include <assert.h>
@@ -32,7 +32,7 @@ int main(void)
 
     /* This probe covers executor exit, not direct-media persistence. Keep its
        fixture host-owned so its deletion has no CRT handle-timing dependency. */
-    options.media_mode = SOFTPC_MEDIA_OVERLAY;
+    options.media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
 
     /* jmp $: execution must leave only through the outer lifecycle request. */
     sector[0] = 0xebu;

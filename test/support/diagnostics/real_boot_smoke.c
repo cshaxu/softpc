@@ -1,4 +1,4 @@
-#include "compat/machine.h"
+#include "vm/machine.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -360,7 +360,7 @@ int main(int argc, char **argv)
             require_prompt = 1;
             slices = SOFTPC_PROMPT_SLICES;
         } else if (strcmp(argv[index], "--overlay") == 0) {
-            options.media_mode = SOFTPC_MEDIA_OVERLAY;
+            options.media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
         } else goto usage;
     }
     if (options.floppy_path == NULL && options.hard_disk_path == NULL) {

@@ -232,7 +232,7 @@ lib_status softpc_machine_debug(softpc_machine *machine, softpc_debug_state *sta
         write = request->operation == COMMON_MACHINE_DEBUG_WRITE_REAL ||
             request->operation == COMMON_MACHINE_DEBUG_WRITE_LINEAR;
         if (write) memcpy(result->data, request->data, request->bytes);
-        if (!softpc_platform_debug_memory(address, result->data, request->bytes, write))
+        if (!softpc_machine_debug_memory(address, result->data, request->bytes, write))
             return LIB_STATUS_INVALID_ARGUMENT;
         result->bytes = request->bytes;
         return LIB_STATUS_OK;

@@ -1,7 +1,7 @@
 #ifndef VM_DEBUG_H
 #define VM_DEBUG_H
 
-#include "compat/machine.h"
+#include "vm/machine.h"
 #include "common/machine/machine_interface.h"
 
 /* Product driver owns this state; only its executor accesses it. */

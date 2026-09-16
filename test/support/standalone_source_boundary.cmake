@@ -102,7 +102,7 @@ set(standalone_sources
     "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/system/idetect.c"
     "${SOFTPC_SOURCE_DIR}/src/compat/device_bop.c"
     "${SOFTPC_SOURCE_DIR}/src/compat/platform.c"
-    "${SOFTPC_SOURCE_DIR}/src/compat/machine.c")
+    "${SOFTPC_SOURCE_DIR}/src/vm/machine.c")
 
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/compat/softpc_compat")
     message(FATAL_ERROR "Standalone host retains the obsolete softpc_compat taxonomy")
@@ -124,6 +124,8 @@ foreach(app_source IN ITEMS
     endif()
 endforeach()
 foreach(retired_machine_source IN ITEMS
+    "src/compat/machine.c"
+    "src/compat/machine.h"
     "src/app/command_binding.c"
     "src/app/command_binding.h"
     "src/app/machine_driver.c"
@@ -479,7 +481,6 @@ file(GLOB_RECURSE standalone_owner_sources
 foreach(source IN LISTS standalone_owner_sources)
     file(READ "${source}" owner_source)
     string(REPLACE "softpc_machine" "" owner_source "${owner_source}")
-    string(REPLACE "softpc_media_mode" "" owner_source "${owner_source}")
     if(owner_source MATCHES "(^|[^[:alnum:]_])softpc_[A-Za-z0-9_]+")
         message(FATAL_ERROR "Standalone application retains an unowned softpc_ symbol: ${source}")
     endif()

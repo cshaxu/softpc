@@ -31,7 +31,6 @@
 #include "virtual.h"
 #include "dib_surface.h"
 #include "nt_graph.h"
-#include "machine.h"
 #include "lifecycle.h"
 #include "input.h"
 #include "hdd_media.h"

@@ -10,7 +10,6 @@
 #include "fla.h"
 #include "gfi.h"
 #include "config.h"
-#include "machine.h"
 #include "lib/storage/medium_interface.h"
 
 /*
@@ -24,7 +23,7 @@
 
 typedef struct {
     lib_storage_medium *medium;
-    softpc_media_mode mode;
+    lib_storage_medium_mode mode;
     unsigned int cylinders;
     unsigned int heads;
     unsigned int sectors;
@@ -147,7 +146,7 @@ static int softpc_gfi_transfer(softpc_gfi_image_drive *drive,
         offset = (((unsigned long)cylinder * drive->heads + head) *
             drive->sectors + (current_sector - 1u)) * sector_bytes;
         if (writing) {
-            if (drive->mode == SOFTPC_MEDIA_READONLY) return 0;
+            if (drive->mode == LIB_STORAGE_MEDIUM_READONLY) return 0;
             (void)dma_request(DMA_DISKETTE_CHANNEL, buffer,
                 (word)sector_bytes);
             if (lib_storage_medium_write_at(drive->medium, offset, buffer,
@@ -184,7 +183,7 @@ static int softpc_gfi_format(softpc_gfi_image_drive *drive,
     char filler[8192];
 
     if (drive->medium == NULL ||
-        drive->mode == SOFTPC_MEDIA_READONLY || get_c3_N(command) > 6u)
+        drive->mode == LIB_STORAGE_MEDIUM_READONLY || get_c3_N(command) > 6u)
         return 0;
     sector_bytes = 128u << get_c3_N(command);
     if (sector_bytes != SOFTPC_GFI_SECTOR_BYTES || count == 0u ||
@@ -245,7 +244,7 @@ static SHORT softpc_gfi_command(FDC_CMD_BLOCK *command,
         return SUCCESS;
     case FDC_SENSE_DRIVE_STATUS:
         put_r2_ST3_fault(result, 0);
-        put_r2_ST3_write_protected(result, drive->mode == SOFTPC_MEDIA_READONLY);
+        put_r2_ST3_write_protected(result, drive->mode == LIB_STORAGE_MEDIUM_READONLY);
         put_r2_ST3_ready(result, (drive->medium != NULL));
         put_r2_ST3_track_0(result, (drive->cylinder == 0u));
         put_r2_ST3_two_sided(result, (drive->heads > 1u));
@@ -262,13 +261,13 @@ static SHORT softpc_gfi_command(FDC_CMD_BLOCK *command,
         okay = softpc_gfi_transfer(drive, command, writing, &cylinder, &head,
             &sector);
         softpc_gfi_result(result, unit, cylinder, head, sector, size, !okay,
-            writing && drive->mode == SOFTPC_MEDIA_READONLY);
+            writing && drive->mode == LIB_STORAGE_MEDIUM_READONLY);
         return SUCCESS;
     case FDC_FORMAT_TRACK:
         okay = softpc_gfi_format(drive, command);
         softpc_gfi_result(result, unit, drive->cylinder, get_c3_head(command),
             get_c3_SC(command), get_c3_N(command), !okay,
-            drive->mode == SOFTPC_MEDIA_READONLY);
+            drive->mode == LIB_STORAGE_MEDIUM_READONLY);
         return SUCCESS;
     default:
         return FAILURE;
@@ -314,18 +313,14 @@ static void softpc_gfi_install(UTINY drive)
     gfi_function_table[drive].change_fn = softpc_gfi_change;
 }
 
-int softpc_platform_floppy_attach(const char *path, softpc_media_mode mode)
+int softpc_platform_floppy_attach(const char *path, lib_storage_medium_mode mode)
 {
     softpc_gfi_image_drive *drive = &softpc_gfi_drives[0];
-    lib_storage_medium_mode storage_mode;
     size_t bytes;
     lib_storage_medium_destroy(&drive->medium);
     memset(drive, 0, sizeof(*drive));
     if (path == NULL) return 1;
-    storage_mode = mode == SOFTPC_MEDIA_DIRECT ? LIB_STORAGE_MEDIUM_DIRECT :
-        mode == SOFTPC_MEDIA_READONLY ? LIB_STORAGE_MEDIUM_READONLY :
-        LIB_STORAGE_MEDIUM_OVERLAY;
-    if (lib_storage_medium_open(path, storage_mode, &drive->medium) !=
+    if (lib_storage_medium_open(path, mode, &drive->medium) !=
             LIB_STATUS_OK ||
         (bytes = lib_storage_medium_byte_count(drive->medium)) > LONG_MAX ||
         !softpc_gfi_geometry((long)bytes, drive)) {

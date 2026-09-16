@@ -2,7 +2,7 @@
 #define VM_DRIVER_H
 
 #include "vm_interface.h"
-#include "compat/machine.h"
+#include "vm/machine.h"
 
 /* Internal non-owning wrapper for serialized low-level tests; production
  * acquires machine/audio ownership only through vm_create. */

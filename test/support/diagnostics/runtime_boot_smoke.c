@@ -594,7 +594,7 @@ static int run_halted_keyboard_probe(void)
         goto done;
     }
     image = NULL;
-    options.media_mode = SOFTPC_MEDIA_OVERLAY;
+    options.media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     if (softpc_machine_create(&options, &machine) != SOFTPC_MACHINE_OK ||
         !app_runtime_create(machine, &runtime) ||
         !app_runtime_start(runtime)) goto done;
@@ -772,7 +772,7 @@ int main(int argc, char **argv)
     options.floppy_path = floppy_path;
     options.hard_disk_path = hard_disk_path;
     if (overlay && direct) return 2;
-    options.media_mode = direct ? SOFTPC_MEDIA_DIRECT : SOFTPC_MEDIA_OVERLAY;
+    options.media_mode = direct ? LIB_STORAGE_MEDIUM_DIRECT : LIB_STORAGE_MEDIUM_OVERLAY;
     if (softpc_machine_create(&options, &machine) != SOFTPC_MACHINE_OK ||
         !app_runtime_create(machine, &runtime) || !app_runtime_start(runtime))
         goto done;

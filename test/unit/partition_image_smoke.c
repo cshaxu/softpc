@@ -1,4 +1,4 @@
-#include "compat/machine.h"
+#include "vm/machine.h"
 #include "../lib/cleanup.h"
 
 #include <assert.h>
@@ -82,7 +82,7 @@ int main(void)
     unsigned int slice;
 
     softpc_partition_write_image(path);
-    options.media_mode = SOFTPC_MEDIA_OVERLAY;
+    options.media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     for (slice = 0u; slice < 16u; ++slice)

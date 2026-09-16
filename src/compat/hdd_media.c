@@ -4,7 +4,6 @@
 
 #include "fdisk.h"
 #include "lib/storage/medium_interface.h"
-#include "machine.h"
 #include "hdd_media.h"
 
 typedef struct softpc_disk_media
@@ -25,19 +24,15 @@ const CHAR *softpc_hdd_media_config_path(unsigned int index)
 }
 
 static int softpc_hdd_attach_media(softpc_disk_media *media, const char *path,
-                                   softpc_media_mode mode)
+                                   lib_storage_medium_mode mode)
 {
-    lib_storage_medium_mode storage_mode;
     size_t bytes;
 
     media->medium = NULL;
     media->total_sectors = 0u;
     if (path == NULL)
         return 1;
-    storage_mode = mode == SOFTPC_MEDIA_DIRECT ? LIB_STORAGE_MEDIUM_DIRECT :
-        mode == SOFTPC_MEDIA_READONLY ? LIB_STORAGE_MEDIUM_READONLY :
-        LIB_STORAGE_MEDIUM_OVERLAY;
-    if (lib_storage_medium_open(path, storage_mode, &media->medium) !=
+    if (lib_storage_medium_open(path, mode, &media->medium) !=
         LIB_STATUS_OK) return 0;
     bytes = lib_storage_medium_byte_count(media->medium);
     if (bytes < SOFTPC_DISK_SECTOR_BYTES) goto attach_failed;
@@ -48,7 +43,7 @@ attach_failed:
     return 0;
 }
 
-int softpc_platform_hdd_attach(const char *hard_disk_path, softpc_media_mode mode)
+int softpc_platform_hdd_attach(const char *hard_disk_path, lib_storage_medium_mode mode)
 {
     unsigned int index;
     for (index = 0u; index < 2u; ++index)

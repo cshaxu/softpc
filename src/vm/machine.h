@@ -2,16 +2,10 @@
 #define SOFTPC_MACHINE_H
 
 #include <stdint.h>
+#include "lib/storage/medium_interface.h"
 
 typedef struct softpc_machine softpc_machine;
 typedef void (*softpc_machine_executor_callback)(void *context);
-
-/* Source image policy selected by the fixed launcher configuration. */
-typedef enum softpc_media_mode {
-    SOFTPC_MEDIA_DIRECT = 0,
-    SOFTPC_MEDIA_READONLY,
-    SOFTPC_MEDIA_OVERLAY
-} softpc_media_mode;
 
 typedef enum softpc_machine_result {
     SOFTPC_MACHINE_OK,
@@ -24,7 +18,7 @@ typedef struct softpc_machine_options {
     const char *floppy_path;
     const char *hard_disk_path;
     uint32_t memory_bytes;
-    softpc_media_mode media_mode;
+    lib_storage_medium_mode media_mode;
     /* Optional standalone host endpoints for the original COM1/LPT1 host
        contracts. NULL retains their bounded virtual sinks. */
     const char *serial_output_path;
@@ -122,5 +116,9 @@ int softpc_machine_presentation_fonts(const softpc_machine *machine,
 void softpc_machine_destroy(softpc_machine *machine);
 
 const char *softpc_machine_result_name(softpc_machine_result result);
+
+/* Paused-executor debugger preflight; no partial write on invalid ranges. */
+int softpc_machine_debug_memory(unsigned long address,
+    unsigned char *data, unsigned long bytes, int write);
 
 #endif

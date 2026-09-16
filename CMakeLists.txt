@@ -42,8 +42,7 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 4)
     set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} --target=pe-i386")
 endif()
 
-add_library(softpc-machine
-    src/compat/machine.c)
+add_library(softpc-machine STATIC)
 target_include_directories(softpc-machine PUBLIC src PRIVATE src/compat)
 target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 
@@ -61,9 +60,11 @@ target_link_libraries(softpc-machine PRIVATE storage base)
 # CCPU calls the driver's debug observers, so include the VM objects directly
 # instead of depending on cyclic static-archive extraction order.
 add_library(softpc-vm OBJECT
+    src/vm/machine.c
     src/vm/driver.c
     src/vm/input.c
     src/vm/debug.c
+    src/vm/debug_memory.c
     src/vm/trace.c)
 target_include_directories(softpc-vm PUBLIC src)
 target_compile_definitions(softpc-vm PRIVATE _CRT_SECURE_NO_WARNINGS
@@ -271,6 +272,11 @@ target_include_directories(softpc-machine-compat PRIVATE
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
     src/mvdm/softpc.new/base/cvidc)
+
+# Original SAS/CCPU macros are confined to the debugger memory translation unit.
+set_source_files_properties(src/vm/debug_memory.c PROPERTIES
+    INCLUDE_DIRECTORIES "$<TARGET_PROPERTY:softpc-machine-compat,INCLUDE_DIRECTORIES>"
+    COMPILE_DEFINITIONS "$<TARGET_PROPERTY:softpc-machine-compat,COMPILE_DEFINITIONS>")
 
 # Keep the executor in the machine library so that every unresolved host edge
 # is visible to the standalone build, rather than being hidden in an unused

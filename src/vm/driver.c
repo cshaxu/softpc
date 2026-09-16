@@ -35,9 +35,7 @@ lib_status vm_create(const vm_options *options, vm_driver **out_driver)
     machine_options.serial_output_path = options->serial_output_path;
     machine_options.printer_output_path = options->printer_output_path;
     machine_options.memory_bytes = options->memory_bytes;
-    machine_options.media_mode = options->media_mode == LIB_STORAGE_MEDIUM_DIRECT ?
-        SOFTPC_MEDIA_DIRECT : options->media_mode == LIB_STORAGE_MEDIUM_READONLY ?
-        SOFTPC_MEDIA_READONLY : SOFTPC_MEDIA_OVERLAY;
+    machine_options.media_mode = options->media_mode;
     if (options->media_mode > LIB_STORAGE_MEDIUM_OVERLAY)
         return LIB_STATUS_INVALID_ARGUMENT;
     if (lib_atomic_flag_test_and_set_explicit(&vm_owned, LIB_MEMORY_ORDER_ACQUIRE))
