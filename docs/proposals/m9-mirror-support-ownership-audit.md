@@ -17,6 +17,12 @@ The completed audit was read-only production research. Findings and finite cover
 ## Owner-approved implementation sequence
 
 Original request: “请拆解一下S任务 并更新当前proposal记录 然后开始准入执行”。
+Owner continuation: “执行到S13完成当前 mvdm/vm/compat 虚拟机核心组件的清理工作，使得每个组件有明确的产权和边界，每个代码文件和符号有正确的归属；vm和compat冗余无用代码应删尽删，能复用mvdm的尽可能复用mvdm。”
+Additional requirement: “每个S任务执行前先审计，预估需要移动的文件/功能/行数，预估可以达成的diff和自主实现的增减情况；结束后也进行同类实际汇报。”
+Before each remaining S, record its audited paths/functions, relocation count,
+estimated original-mirror diff and independently maintained production/test
+delta; after execution compare actual counts against the estimate. Pure moves
+are reported separately from deletion/reimplementation. Estimates are not proof.
 Continue within T61, serial admission only after the previous exit review.
 Lib/Common and their shared tests stay unchanged. No wholesale external source
 import, generated source overlay, guest behavior change or D6 withdrawal.

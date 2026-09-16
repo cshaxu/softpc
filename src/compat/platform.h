@@ -38,7 +38,6 @@ int softpc_platform_presentation_is_graphics(void);
 int softpc_platform_presentation_state(uint32_t *, uint32_t *);
 int softpc_platform_presentation_cursor(long *, long *,
     unsigned long *);
-int softpc_platform_presentation_font(uint8_t *, unsigned long *);
 int softpc_platform_presentation_fonts(uint8_t *, uint8_t *,
     unsigned long *, unsigned long *);
 

@@ -434,17 +434,6 @@ int softpc_machine_presentation_cursor(const softpc_machine *machine,
     return 1;
 }
 
-int softpc_machine_presentation_font(const softpc_machine *machine,
-    uint8_t glyphs[256u * 16u], uint32_t *height_out)
-{
-    unsigned long height;
-    if (machine == NULL || !machine->reset || glyphs == NULL ||
-        height_out == NULL || !softpc_platform_presentation_font(glyphs,
-            &height)) return 0;
-    *height_out = (uint32_t)height;
-    return 1;
-}
-
 int softpc_machine_presentation_fonts(const softpc_machine *machine,
     uint8_t primary[256u * 16u], uint8_t secondary[256u * 16u],
     uint32_t *height_out, uint32_t *attribute_select_out)

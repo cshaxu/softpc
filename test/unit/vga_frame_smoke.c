@@ -396,8 +396,7 @@ static void make_boot_disk(const char *path)
 int main(void)
 {
     const char *path = "softpc-original-dib-smoke.img";
-    softpc_machine_options options = { path, NULL,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     const void *bits = NULL;
     const void *info = NULL;
@@ -435,14 +434,12 @@ int main(void)
         uint32_t attribute_font_select = 0;
         unsigned int row;
         unsigned int populated = 0;
-        assert(softpc_machine_presentation_font(machine, font, &font_height));
+        assert(softpc_machine_presentation_fonts(machine, font,
+            secondary_font, &font_height, &attribute_font_select));
         assert(font_height == 16u);
         for (row = 0u; row < font_height; ++row)
             populated |= font[(unsigned int)'A' * 16u + row];
         assert(populated != 0u);
-        assert(softpc_machine_presentation_fonts(machine, font,
-            secondary_font, &font_height, &attribute_font_select));
-        assert(font_height == 16u);
     }
 
     /* The C-VID mode-transition path can emit an empty text repaint.  The

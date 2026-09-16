@@ -104,8 +104,7 @@ static void fdc_drain_data_result(void)
 int main(void)
 {
     const char *path = "softpc-fdc-smoke.img";
-    softpc_machine_options options = { path, NULL,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     unsigned char byte = 0u;
     unsigned char result;

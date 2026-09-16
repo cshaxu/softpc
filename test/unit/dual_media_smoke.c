@@ -35,8 +35,7 @@ int main(void)
     const char *floppy = "softpc-dual-media-floppy.img";
     const char *hard_disk = "softpc-dual-media-hdd.img";
     const char *empty_disk = "softpc-dual-media-empty-hdd.img";
-    softpc_machine_options options = { floppy, hard_disk,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { floppy, hard_disk };
     softpc_machine *machine = NULL;
     unsigned char marker = 0u;
     unsigned char fixed_disk_count = 0u;
@@ -71,8 +70,7 @@ int main(void)
        that C: exists and leave the original controller with phantom media. */
     {
         FILE *file = fopen(empty_disk, "wb");
-        softpc_machine_options empty_options = { NULL, empty_disk,
-            SOFTPC_PRESENTATION_CONSOLE };
+        softpc_machine_options empty_options = { NULL, empty_disk };
         assert(file != NULL);
         assert(fclose(file) == 0);
         machine = NULL;

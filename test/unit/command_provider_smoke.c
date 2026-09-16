@@ -760,7 +760,6 @@ int main(void)
     unsigned char sector[512] = { 0xeb, 0xfe };
     FILE *file;
     softpc_machine_options options = { .floppy_path = path,
-        .presentation = SOFTPC_PRESENTATION_WINDOW,
         .media_mode = SOFTPC_MEDIA_OVERLAY };
     softpc_machine *product = NULL;
     vm_driver *adapter = NULL;
@@ -794,7 +793,7 @@ int main(void)
     assert(common_machine_create(&machine, &driver) == LIB_STATUS_OK);
     common_machine_set_state_sink(machine, note_state, &events);
     assert(app_composition_initialize(&commands, machine,
-        options.presentation, &provider) == LIB_STATUS_OK);
+        COMMON_SESSION_DISPLAY_WINDOW, &provider) == LIB_STATUS_OK);
     /* Exercise the actual composed provider, not a second hotkey dispatcher. */
     assert(provider.context == &commands && provider.open == app_command_provider_open);
     assert(provider.submit_line == app_command_provider_submit_line);

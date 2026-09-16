@@ -666,8 +666,7 @@ static void run_boot_image(const char *path, int floppy, unsigned char expected,
 {
     softpc_machine_smoke_note(__func__);
     unsigned char marker = 0;
-    softpc_machine_options options = { NULL, NULL,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { NULL, NULL };
     softpc_machine *machine = NULL;
     if (floppy) options.floppy_path = path;
     else options.hard_disk_path = path;
@@ -684,7 +683,7 @@ static void run_keyboard_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char marker = 0;
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -699,7 +698,7 @@ static void run_int16_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char marker = 0;
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -717,7 +716,7 @@ static void run_int1d_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char vector[4] = { 0u };
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -735,7 +734,7 @@ static void run_int75_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char marker = 0u;
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -750,7 +749,7 @@ static void run_int15_memory_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char memory_kib[2] = { 0, 0 };
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -765,7 +764,7 @@ static void run_int15_block_move_boot_image(const char *path)
 {
     unsigned char status[5] = { 0xffu, 0xffu, 0xffu, 0xffu, 0xffu };
     unsigned char copied = 0u;
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     softpc_machine_smoke_note(__func__);
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
@@ -787,7 +786,7 @@ static void run_int15_block_move_boot_image(const char *path)
 static void run_a20_boot_image(const char *path)
 {
     unsigned char values[3] = { 0u, 0u, 0u };
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     softpc_machine_smoke_note(__func__);
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
@@ -803,7 +802,7 @@ static void run_int16_ascii_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char marker = 0;
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -822,7 +821,7 @@ static void run_irq1_int16_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char marker = 0;
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -841,7 +840,7 @@ static void run_int16_check_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char marker = 0;
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -860,7 +859,7 @@ static void run_int13_parameters_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char values[2] = { 0, 0 };
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -874,7 +873,7 @@ static void run_timer_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char marker = 0;
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -890,7 +889,7 @@ static void run_cmos_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char markers[2] = { 0u, 0u };
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -910,7 +909,7 @@ static void run_text_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char cell[2] = { 0, 0 };
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -926,7 +925,7 @@ static void run_int10_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char cell[2] = { 0, 0 };
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -942,7 +941,7 @@ static void run_int10_mode_cursor_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char values[4] = { 0, 0, 0, 0 };
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -958,7 +957,7 @@ static void run_int12_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char memory_kib[2] = { 0, 0 };
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -974,7 +973,7 @@ static void run_int11_boot_image(const char *path, int floppy,
 {
     softpc_machine_smoke_note(__func__);
     unsigned char equipment[2] = { 0, 0 };
-    softpc_machine_options options = { NULL, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { NULL, NULL };
     softpc_machine *machine = NULL;
     if (floppy) options.floppy_path = path;
     else options.hard_disk_path = path;
@@ -994,8 +993,7 @@ static void run_bda_configuration_image(const char *path, int floppy,
     softpc_machine_smoke_note(__func__);
     unsigned char configuration[6] = { 0, 0, 0, 0, 0, 0 };
     unsigned char fixed_disk_count = 0xffu;
-    softpc_machine_options options = { NULL, NULL,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { NULL, NULL };
     softpc_machine *machine = NULL;
     if (floppy) options.floppy_path = path;
     else options.hard_disk_path = path;
@@ -1019,7 +1017,7 @@ static void run_int1a_boot_image(const char *path)
     softpc_machine_smoke_note(__func__);
     unsigned char ticks[4] = { 0xffu, 0xffu, 0xffu, 0xffu };
     unsigned char bda_ticks[4] = { 0xffu, 0xffu, 0xffu, 0xffu };
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -1038,7 +1036,7 @@ static void run_int1a_tick_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char bda_tick_low = 0u;
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -1055,7 +1053,7 @@ static void run_hdd_pio_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char marker = 0;
-    softpc_machine_options options = { NULL, path, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { NULL, path };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -1069,7 +1067,7 @@ static void run_int13_boot_image(const char *path, int floppy, unsigned char exp
 {
     softpc_machine_smoke_note(__func__);
     unsigned char marker = 0;
-    softpc_machine_options options = { NULL, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { NULL, NULL };
     softpc_machine *machine = NULL;
     if (floppy) options.floppy_path = path;
     else options.hard_disk_path = path;
@@ -1085,7 +1083,7 @@ static void run_hdd_pio_write_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char written[2] = { 0, 0 };
-    softpc_machine_options options = { NULL, path, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { NULL, path };
     softpc_machine *machine = NULL;
     FILE *file;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
@@ -1104,7 +1102,7 @@ static void run_hdd_identify_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char identify[4] = { 0, 0, 0, 0 };
-    softpc_machine_options options = { NULL, path, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { NULL, path };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -1121,7 +1119,7 @@ static void run_int13_multi_boot_image(const char *path, int floppy,
 {
     softpc_machine_smoke_note(__func__);
     unsigned char markers[2] = { 0, 0 };
-    softpc_machine_options options = { NULL, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { NULL, NULL };
     softpc_machine *machine = NULL;
     if (floppy) options.floppy_path = path;
     else options.hard_disk_path = path;
@@ -1139,7 +1137,7 @@ static void run_int13_write_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char marker = 0u;
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     FILE *file;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
@@ -1189,8 +1187,7 @@ int main(void)
     const char *int13_reset = "softpc-machine-int13-reset-smoke.img";
     const char *int13_write = "softpc-machine-int13-write-smoke.img";
     const char *int13_parameters = "softpc-machine-int13-parameters-smoke.img";
-    softpc_machine_options dual_media = { floppy, hdd,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options dual_media = { floppy, hdd };
     softpc_machine *dual_machine = NULL;
     write_boot_image(floppy, 0x42u);
     write_boot_image(hdd, 0x77u);

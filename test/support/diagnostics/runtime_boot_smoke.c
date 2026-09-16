@@ -550,8 +550,7 @@ static int run_halted_keyboard_probe(void)
 {
     static const char image_path[] = "softpc-runtime-hlt-keyboard.img";
     unsigned char sector[512] = { 0 };
-    softpc_machine_options options = { image_path, NULL,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { image_path, NULL };
     softpc_machine *machine = NULL;
     app_runtime *runtime = NULL;
     FILE *image;
@@ -653,7 +652,7 @@ done:
 
 int main(int argc, char **argv)
 {
-    softpc_machine_options options = { NULL, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { NULL, NULL };
     softpc_machine *machine = NULL;
     app_runtime *runtime = NULL;
     app_runtime_frame *frame = NULL;

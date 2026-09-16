@@ -65,8 +65,7 @@ int main(void)
     const char *path = "softpc-runtime-smoke.img";
     unsigned char sector[512] = { 0 };
     FILE *file;
-    softpc_machine_options options = { path, NULL,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     app_runtime *runtime = NULL;
     app_runtime_frame *frame;

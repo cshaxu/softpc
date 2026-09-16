@@ -77,7 +77,7 @@ int main(void)
            fixed handler before the following store runs. */
         0xfbu, 0xb8u, 0x5au, 0x00u, 0xa3u, 0x00u, 0x05u, 0xebu, 0xfeu
     };
-    softpc_machine_options options = { path, NULL, SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     FILE *file;
 

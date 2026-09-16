@@ -637,3 +637,41 @@ VGA frame、runtime/restart/input continuation 测试，不删除或弱化旧断
 - x64 `8050D3EFFB37DA892F3634D8CCC9991B4F688781B9094996892317FEE66E8B44`
 
 上述为自动证据，不代替用户 GUI/RDP/声音体验验收。
+
+## S9 实施前审计
+
+基线 52b6ceb。无搬迁；六个生产文件：删除 status.h（18 行）、未选中
+PIG 头（71 行），machine.h 删除 presentation 字段/enum 和单字体声明，
+machine.c/video.c/platform.h 删除单字体包装/声明；预计净减约 120–130 行。
+镜像 diff 预计增减 0；不新增外部实现，不改 Lib/Common。
+约 20 个产品测试/诊断文件仅移除旧 presentation 初始化；VGA 测试直接调用
+已有双字体入口。presentation_shutdown_smoke 改为真实 app_composition_run，
+仅模拟 UI 输入与输出以验证正常退出、Console/KVM 故障返回及 UI 销毁。
+预计测试净增 40–70 行；不再用已无生产调用的 inline _Exit 假装覆盖真实路径。
+读取当前 Common 代码确认故障语义是 session 返回失败，由 App 有序清理，
+不是旧 status helper 的立即终止。共享 KVM join-failure 独立测试保持不变。
+owner 的 console_control=1 INI 改动保留原样并随任务提交，不归入代码统计。
+
+### S9 实际交付
+
+基于 52b6ceb 的 `git diff --numstat -- src test`：六个生产路径 +0/-124，
+净减 124；20 个产品测试/门禁路径 +134/-99，净增 35。无文件搬迁，
+镜像及四个共享 corpus 零改动。生产符合预估，测试低于预估是因为合并了
+VGA 重复调用，并移除了多处不再存在的字段初始化，而不是削弱断言。
+全部旧 status/单字体/presentation 符号消费者扫描归零；PIG 条件未被构建选中。
+退出测试改用真实 App composition/Session/worker，UI fake 仅注入 exit、
+Console failure、KVM delivery failure，核对返回和一次 UI 销毁；最小空盘由
+测试自身创建并删除，不访问用户媒体。VGA 保留字体内容及双字体检查。
+静态门禁同步删除旧 helper 特例，禁止 App/Compat 绕开 Common UI 销毁 KVM。
+
+验证期间修正三处测试接线遗漏：command-provider 仍读取已删字段导致编译
+失败；退出测试缺少 VM 创建必需的最小介质；误用 quit 而非产品 exit 命令。
+均为本次测试迁移问题，修正后两宽度完整测试全部通过。
+tests-x64/tests-x86 构建通过；test-x64 98/98（85.73s），test-x86 98/98
+（70.71s）。原有构建警告未作无关修改。diff-check、文档门禁通过。
+固定 EXE SHA256：
+- x86 `7F0CD58C59C345D669C382B750DE7F098A7C50A9CB6B0127352257709DE1428F`
+- x64 `D0A87CD7B4C25677A54950E7CDEF1FB6DFF84805CAC30457B658A9966BD8B6A4`
+
+自动证据不替代人工 GUI 验收。仅删除本 S 的三份临时构建/测试日志；保留
+已有构建树，owner INI 原样提交。

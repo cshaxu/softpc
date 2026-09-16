@@ -26,8 +26,7 @@ int main(void)
 {
     const char *path = "softpc-printer-smoke.img";
     const char *output_path = "softpc-printer-output.bin";
-    softpc_machine_options options = { path, NULL,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     half_word status = 0u;
 

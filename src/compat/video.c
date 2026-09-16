@@ -92,16 +92,6 @@ int softpc_platform_presentation_fonts(uint8_t *primary, uint8_t *secondary,
     return 1;
 }
 
-int softpc_platform_presentation_font(uint8_t *glyphs,
-                                      unsigned long *height_out)
-{
-    unsigned char secondary[256u * 16u];
-    unsigned long attribute_select;
-
-    return softpc_platform_presentation_fonts(glyphs, secondary, height_out,
-                                              &attribute_select);
-}
-
 int softpc_platform_video_buffers_init(void)
 {
     (void)softpc_standalone_dib_init();

@@ -66,8 +66,7 @@ int main(void)
     };
     uint8_t sector[512] = { 0 };
     FILE *image = NULL;
-    softpc_machine_options options = { image_path, NULL,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { image_path, NULL };
     softpc_machine *machine = NULL;
     app_runtime *runtime = NULL;
     DWORD deadline;

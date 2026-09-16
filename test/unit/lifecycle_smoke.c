@@ -27,8 +27,7 @@ int main(void)
     unsigned char sector[512] = { 0 };
     FILE *file;
     HANDLE worker;
-    softpc_machine_options options = { path, NULL,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
 
     /* This probe covers executor exit, not direct-media persistence. Keep its

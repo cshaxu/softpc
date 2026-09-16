@@ -309,8 +309,7 @@ static int send_windows_setup_command(softpc_machine *machine)
 
 int main(int argc, char **argv)
 {
-    softpc_machine_options options = { NULL, NULL,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { NULL, NULL };
     softpc_machine *machine = NULL;
     unsigned char text[SOFTPC_TEXT_BYTES];
     uint16_t cs = 0u;

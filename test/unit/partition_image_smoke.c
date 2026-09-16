@@ -73,8 +73,7 @@ static void softpc_partition_write_image(const char *path)
 int main(void)
 {
     const char *path = "softpc-partition-image-smoke.img";
-    softpc_machine_options options = { NULL, path,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { NULL, path };
     softpc_machine *machine = NULL;
     unsigned char markers[2] = { 0u, 0u };
     unsigned char mbr_table[32];

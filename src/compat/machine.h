@@ -6,13 +6,6 @@
 typedef struct softpc_machine softpc_machine;
 typedef void (*softpc_machine_executor_callback)(void *context);
 
-typedef enum softpc_presentation {
-    /* The console presenter starts in text mode and follows the original
-       renderer's text/graphics transitions to the native window. */
-    SOFTPC_PRESENTATION_CONSOLE,
-    SOFTPC_PRESENTATION_WINDOW
-} softpc_presentation;
-
 /* Source image policy selected by the fixed launcher configuration. */
 typedef enum softpc_media_mode {
     SOFTPC_MEDIA_DIRECT = 0,
@@ -30,7 +23,6 @@ typedef enum softpc_machine_result {
 typedef struct softpc_machine_options {
     const char *floppy_path;
     const char *hard_disk_path;
-    softpc_presentation presentation;
     uint32_t memory_bytes;
     softpc_media_mode media_mode;
     /* Optional standalone host endpoints for the original COM1/LPT1 host
@@ -120,11 +112,6 @@ int softpc_machine_presentation_text(const softpc_machine *machine,
 int softpc_machine_presentation_cursor(const softpc_machine *machine,
     int32_t *column_out, int32_t *row_out, uint32_t *size_out);
 
-/* Copy the active original EGA/VGA primary font as CP437 glyph rows.  Every
- * glyph has a fixed 16-row slot; rows below the current original font height
- * are zero. */
-int softpc_machine_presentation_font(const softpc_machine *machine,
-    uint8_t glyphs[256u * 16u], uint32_t *height_out);
 /* The original VGA attribute controller may select a second character map
    through attribute bit 3.  Presentation consumers need both loaded maps;
    they must not substitute a host font for either one. */

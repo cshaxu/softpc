@@ -33,8 +33,7 @@ int main(void)
 {
     const char *path = "softpc-serial-smoke.img";
     const char *output_path = "softpc-serial-output.bin";
-    softpc_machine_options options = { path, NULL,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     half_word status = 0u;
     UTINY received = 0xffu;

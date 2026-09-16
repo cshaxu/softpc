@@ -42,8 +42,7 @@ static void make_boot_disk(const char *path)
 int main(void)
 {
     const char *path = "softpc-mouse-smoke.img";
-    softpc_machine_options options = { path, NULL,
-        SOFTPC_PRESENTATION_CONSOLE };
+    softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     half_word value = 0u;
 
