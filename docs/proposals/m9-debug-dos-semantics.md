@@ -112,3 +112,22 @@ Fixed softpc64.exe: 2,847,702 bytes, SHA256
 45CAB2236EB33F8FA39EF2482E6066C4FC0E4F7E931122B08332F97DFD35AEE4.
 All ledger members have focused proof or the approved retained boundary.
 P1 is ready for actual-commit coordinator review; T59 stays open.
+
+## Coordinator actual-commit review
+
+Reviewed pushed b332b94 against f7110d9, the original request and the owner's
+explicit E/environment exclusions. Actual production changes are confined to
+command.c; shared private parsers replace duplicated interpretation rather
+than creating another command engine. Byte-list capacity is bounded by the
+existing 255-byte input limit; expanded strings cannot exceed their input.
+Range arithmetic uses widened counts before any 16-bit offset conversion.
+Short-pattern subtraction and complete-segment termination are guarded.
+Parsing errors survive dispatch rather than being cleared by exec.
+
+Actual tests prove both updated real semantics and retained extended behavior;
+R's changed real-read assertion does not weaken XR's linear-read assertion.
+Repeated focused debugger/threaded/corpus/manifest tests pass 6/6 at each width
+after the pushed commit. Full-suite evidence remains first-run 97/97 at both
+widths. P1 left a clean worktree. This P2 updates review/status only; S22 is
+delivered for owner testing, without claiming DOS environment, interactive E,
+historical decoder instruction-table or complete command-set equivalence.

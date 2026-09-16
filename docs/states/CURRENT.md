@@ -2,10 +2,10 @@
 
 ## Current Work
 
-M9 T59 S22 implemented and verified: DOS DEBUG memory-command semantics,
+M9 T59 S22 delivered and reviewed: DOS DEBUG memory-command semantics,
 preserving line-based interactive E, host-file behavior and the X extension
-namespace. Both builds and full 97/97 suites pass; executor delivery awaits
-actual-commit review. T59 remains open for owner testing.
+namespace. P1 b332b94 pushed; both builds/full 97/97 suites and post-commit
+focused checks pass. Production net -131 lines. T59 remains open for owner testing.
 
 ## M9 T59 S22 Packet
 
