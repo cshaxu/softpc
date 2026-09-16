@@ -30,7 +30,7 @@ actual-commit focused review before S closure. Final suites: x64 101/101
 Lib build passed. Linux platform fakes/placeholder compilation are bounded
 proof, not Linux product-runtime acceptance. No human interaction test is claimed.
 
-Final fixed EXEs from aa1eabd:
+S1-S4 fixed EXEs from aa1eabd (superseded by S8 below):
 
 - softpc32.exe SHA256: 443ECCD4537D54A9F461624F646E0F94BCBB7901CD5E38103CB33DC4B0D5B571
 - softpc64.exe SHA256: 9FC8837224959AE9DBBD6678C203D730AD747BF10929AA7DAB1B042A129908CA
@@ -40,6 +40,37 @@ are disposable after their evidence is recorded; existing build trees remain.
 
 ## Acceptance state
 
-S1-S4 are closed and the owner reports testing passed. T62 remains open.
-The owner admitted four follow-up simplifications as S5-S8, in sequence;
-after their delivery, wait for new manual acceptance before T closure.
+S1-S4 are closed and the owner reports testing passed. S5-S8 below are now
+closed after verification, not yet manually accepted. T62 remains OPEN;
+wait for owner testing and direction, do not admit another task.
+
+## Four admitted follow-ups
+
+Original request, estimates and failed-build disposition are preserved in the
+[follow-up proposal](M9-T62-common-lib-followup-simplification-proposal.md).
+
+| S | Result | Production C/H | Review |
+| --- | --- | --- | --- |
+| S5 | Generation is the only Console binding-validity state | +1/-5 = -4 | [S5](M9-T62-S5-console-binding-state.md), 686dea3 |
+| S6 | Pressed ledger stores events directly, including source identity | +12/-20 = -8 | [S6](M9-T62-S6-pressed-event-ledger.md), db6d534 |
+| S7 | One private selected-platform open; no forwarding wrappers | +6/-25 = -19 | [S7](M9-T62-S7-storage-open-entry.md), 666aa67 |
+| S8 | Session embeds queue; one initialize/dispose resource owner | +38/-50 = -12 | [S8](M9-T62-S8-session-queue-ownership.md), 44e9d0f |
+
+Aggregate git diff --numstat 8e82e85 44e9d0f, C/H only: nine production paths
++56/-99 = -43; nine test paths +141/-38 = +103. No test CMake change.
+Per-step churn is not summed as aggregate additions/deletions because control.c
+is touched twice. Public interfaces, App/VM/Compat/MVDM, user INI/media and
+Queue/TODO are unchanged. Manifests and artifact changes are counted separately.
+
+Every step built both fixed EXEs and passed full 101/101 per width before
+implementation push, then actual-commit review and focused checks before closure.
+Final full suites: x64 59.91s, x86 60.17s; post-commit 8/8 each. Strict Lib
+build passed after its last modification (S7); S8 changes only Common/tests.
+No owner interaction testing is claimed for these four follow-ups.
+
+Final fixed EXEs from 44e9d0f:
+- softpc32.exe SHA256: 596EBCCC4A374E98241E1DFB0914943A680C96D7C5DEB60C0B3626A8E9A25E3C
+- softpc64.exe SHA256: 55EF497A1C2131ABEC24195F5D59DC877CA793F8F34FEB85C4F19B1C55DA39EF
+
+The recorded results replace disposable per-step build/test logs; only explicitly
+owned T62 S5-S8 log files are removed. Build trees and user configuration remain.

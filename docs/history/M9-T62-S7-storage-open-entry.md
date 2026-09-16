@@ -1,6 +1,6 @@
 # M9 T62 S7: one storage open entry
 
-Request: [follow-up proposal](../proposals/m9-common-lib-followup-simplification.md).
+Request: [follow-up proposal](M9-T62-common-lib-followup-simplification-proposal.md).
 Baseline 96fb039; implementation 666aa67 pushed.
 
 Coordinator actual-commit review confirms native open/lock/error bodies are

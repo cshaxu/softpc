@@ -1,6 +1,6 @@
 # M9 T62 S5: Console binding state
 
-Request and estimate: [follow-up proposal](../proposals/m9-common-lib-followup-simplification.md).
+Request and estimate: [follow-up proposal](M9-T62-common-lib-followup-simplification-proposal.md).
 Baseline 8e82e85; complete implementation 686dea3 pushed.
 
 Coordinator reviewed the actual commit: generation remains the sole binding

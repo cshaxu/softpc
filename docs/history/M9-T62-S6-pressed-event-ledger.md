@@ -1,6 +1,6 @@
 # M9 T62 S6: pressed event ledger
 
-Request: [follow-up proposal](../proposals/m9-common-lib-followup-simplification.md).
+Request: [follow-up proposal](M9-T62-common-lib-followup-simplification-proposal.md).
 Baseline 37d4973; implementation db6d534 pushed.
 
 Coordinator inspected actual diff: one source-local copied event replaces the

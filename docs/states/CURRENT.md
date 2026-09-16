@@ -5,39 +5,25 @@
 T60 is closed after owner manual acceptance and the whole-task audit.
 T61 is closed on owner direction after the [whole-task audit](../history/M9-T61-completion-audit.md).
 M9 T62 S1-S4 are closed and owner-tested successfully.
-M9 T62 S5-S7 are closed; S8 is active.
-T62 remains open until owner acceptance after S8.
+M9 T62 S5-S8 are closed.
+No implementation subtask is active.
+Open task awaiting owner: T62.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
 The three queued candidates are unchanged.
 
-## M9 T62 S8 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner approved four follow-ups, sequential automatic admission and commit/push. |
-| Objective | Embed Session queue container; initialize/dispose resources without a second container allocation. |
-| Non-goals | No public ABI, product behavior, App/VM/Compat/MVDM or unrelated cleanup changes. |
-| Reference Baseline | 666aa67; preceding S closed after actual-commit review. |
-| Candidate Proposal | [Four follow-ups](../proposals/m9-common-lib-followup-simplification.md) |
-| Files And ABI Surface | src/common/session/control.h, control.c, session.c; all private queue callers in test/common and test/unit/runtime_smoke.c; manifests/task records and fixed EXEs. Public ABI unchanged. |
-| Applicable Rules | docs/README reading set; execution, architecture, coding, documentation rules and referenced skills. |
-| Verification | Initialization failure at mutex/array/event, FIFO growth/concurrency, fault latch, monitor/lifecycle tests; both fixed EXE builds, full x64/x86 CTest, shared manifest/corpus and documentation gates; actual-commit focused checks. |
-| Expected Markers | No queue create/destroy allocation wrapper; dynamic event storage retained. |
-| Asset Needs | Only refresh assets/binary/softpc32.exe and softpc64.exe; preserve INI/media. |
-| Reporting Requirements | Before/after audit, estimated/actual production and test numstat, tests, commits, EXE links. |
-| Stop Conditions | Public contract or product behavior change, failed proof or ownership expansion. |
-| Exit Criteria | Complete implementation P1 pushed, coordinator actual-diff audit, post-commit focused tests; P2 closure pushed. |
-| Original Owner Request | Four sequential S tasks; audit/estimate before, audit actual diffs/tests/links after; wait only after all four. |
-| Similar-Issue Sweep | All callers/writers of the removed duplicate responsibility, no retained forwarding compatibility path. |
-
 ## Current Technical Baseline
+
+- T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
+  paths: nine production C/H files +56/-99 = -43; nine test C/H files
+  +141/-38 = +103. Final dual full suites 101/101; post-commit 8/8 each.
+  Both fixed EXEs rebuilt, all P commits pushed; public APIs and product
+  source/INI/media unchanged. Await owner testing before T62 closure.
 
 - T62 S1-S4 implementation aa1eabd: four bounded Common/Lib simplifications,
   production +170/-214 = -44 across 12 C/H paths. Final x64/x86 101/101;
   actual-commit 14/14 each. Both fixed EXEs refreshed; public APIs, App, VM,
   Compat and MVDM unchanged. S1-S4 implementation and review commits are pushed;
-  owner manual validation passed; admitted S5-S8 follow-ups remain before T62 closure.
+  owner manual validation passed for S1-S4; S5-S8 await separate acceptance.
 
 - T61 S13 audit delivery 891e642 verifies all S7 ownership/reuse candidates.
   S8-S12 production net -1847; mirror 498 retained/404 identical/94 divergent,
