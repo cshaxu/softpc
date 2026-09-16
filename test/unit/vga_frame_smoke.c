@@ -14,6 +14,7 @@
 #include "vgaports.h"
 #include "compat/dib_surface.h"
 #include "nt_graph.h"
+#include "cpu_vid.h"
 
 /* Original SoftPC headers erase const for pre-ANSI compilers.  Restore it
    for this C17 test's public-machine API calls. */
@@ -72,6 +73,36 @@ extern void ega_wrap_split_graph_update(void);
 extern void vga_graph_update(void);
 extern void vga_split_graph_update(void);
 extern void vga_ac_outb(io_addr port, half_word value);
+
+extern EVID_WRT_POINTERS c_ev_write_ptr;
+extern void write_byte_ev_glue(IU32 offset, IU8 value);
+extern void write_word_ev_glue(IU32 offset, IU16 value);
+static IU32 writer_offset, writer_value;
+
+/* Selected legacy calls use default argument promotions (IPT2 expands to ()). */
+static void capture_byte_write(IU32 offset, IU32 value)
+{
+    writer_offset = offset;
+    writer_value = value;
+}
+
+static void capture_word_write(IU32 offset, IU32 value)
+{
+    writer_offset = offset;
+    writer_value = value;
+}
+
+static void verify_writer_contract(void)
+{
+    EVID_WRT_POINTERS saved = c_ev_write_ptr;
+    c_ev_write_ptr.b_write = capture_byte_write;
+    c_ev_write_ptr.w_write = capture_word_write;
+    write_byte_ev_glue(0xa1234u, 0xa5u);
+    assert(writer_offset == 0xa1234u && writer_value == 0xa5u);
+    write_word_ev_glue(0xb1234u, 0xa55au);
+    assert(writer_offset == 0xb1234u && writer_value == 0xa55au);
+    c_ev_write_ptr = saved;
+}
 
 static void verify_panning_refresh(void)
 {
@@ -628,6 +659,7 @@ int main(void)
     verify_ega_dirty_alignment();
     verify_panning_refresh();
     verify_panning_pixels();
+    verify_writer_contract();
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     return 0;

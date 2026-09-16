@@ -48,8 +48,9 @@ typedef struct
 
 typedef struct
 {
-	void	(*b_write) IPT2(IU8, eaOff, IU32, eaVal);
-	void	(*w_write) IPT2(IU16, eaOff, IU32, eaVal);
+	/* T60: addresses stay 32-bit; only the written value is byte/word-sized. */
+	void	(*b_write) IPT2(IU32, eaOff, IU8, eaVal);
+	void	(*w_write) IPT2(IU32, eaOff, IU16, eaVal);
 	void	(*d_write) IPT2(IU32, eaOff, IU32, eaVal);
 	void	(*b_fill) IPT3(IU32, eaOff, IU8, eaVal, IU32, count);
 	void	(*w_fill) IPT3(IU32, eaOff, IU16, eaVal, IU32, count);
