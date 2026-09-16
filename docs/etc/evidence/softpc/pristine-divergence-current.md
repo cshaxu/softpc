@@ -1,6 +1,6 @@
 # MVDM / OpenNT 当前差异账本
 
-镜像数量结论见 **S6 最终复核**；后续边界/重复审计见文末 **S7**。
+最新镜像数量与全部边界处置见文末 **S13 最终归属复核**。
 S1 数字和待处理标记是冻结基线；S2–S6 的处置记录覆盖其历史状态，
 不把已完成的候选继续算作欠账。
 
@@ -808,3 +808,88 @@ GetPerfCounter 只在 Compat 定义，镜像两处原调用不变。镜像统计
 - x64 `D974CA86034D85ED60BE284EB7B763C6266B619ED93CA1630EA1027644E14610`
 
 不修改用户 INI/media；完成后的自有诊断/构建/测试日志删除，保留既有构建树。
+
+## S13 实施前审计
+
+基线 882c705 / 实现 e2ef91f；覆盖 S7 的 48 个原 VM/Compat 文件、全部 498
+保留镜像文件、A/B/C 所有候选及六个职责方向。预期生产/测试代码零改动、
+无搬迁，文档按实际证据收敛；不得用“没有新发现”替代逐项处置证明。比较
+S7 da32558 到最终提交的净增减，将搬迁和镜像原始 diff 分开计算。最终双宽度
+全套验证后，仍不擅自关闭等待 owner 手测的 T61。
+
+### S13 最终归属复核
+
+复算使用既有 Audit-MirrorDiff.ps1，显式传 RepositoryRoot/OriginalRoot；
+498 个文件逐一哈希及原始 Git diff，404 同字节、94 不同、无无来源文件；
+650 个未选入路径不变。raw 和 ignore-space-at-eol 两口径此时均为
++23132/-22334、5131 区块。34 个 C-VID 规则逆模式比较 34/34、例外 0。
+OpenNT 仍为原冻结版本、工作树干净，无外部写入或新源码导入。
+
+审计脚本初次使用 PowerShell 5 未显式传 RepositoryRoot，默认 PSScriptRoot
+求值为空；补参数后成功。临时计数脚本受 CRLF warning 的 Stop 策略影响，
+改 safecrlf=false 后完成；既有正式脚本作为最终权威。发现 S12 两个 LF 行，
+仅将 nt_sound 工作文件规范回原 CRLF，Git 文本 diff 为零；复算 raw 与辅助
+内容口径一致，未隐藏格式差异。临时脚本/JSON/日志均不进入构建或提交。
+
+S7 后仅四个镜像文件改变：cpu4gen +15/-14（明确原始头选择），ev_glue
++11/-8（恢复本目录原头），sascdef 恢复同字节，nt_sound +59/-0（时钟归
+Compat）。其余 91 个不同文件沿用 S6/S1 已逐 hunk 的原因与处置；本次再次
+计算每个文件 hash/diff，未发现额外变化。必要指针宽度、CPU/debug/HLT、
+BIOS/device/FPU/renderer 修复继续保留，D6 不变。
+
+#### S7 候选闭环
+
+| 冻结项 | 最终处置和实际证明 |
+| --- | --- |
+| A1 GDP/SAS 大副本 | S10 删除 1583 行重复头；252 TU 依赖核对、双宽度预处理及原 SAS vector；native-width GDP support 留 Compat。 |
+| A2 六个无消费者 helper | S8 连同声明删除；全树旧符号无生产/测试命中，媒体/输入/视频回归保留。 |
+| A3 status、presentation 字段、单字体壳、PIG | S9 全删；shutdown 测试改真实 App/Common 生命周期；字体测试走生产双字体；不导入未选中 PIG。 |
+| A4 本地重复 | S8 合并 scan dispatch、floppy path commit、HDD 范围验证；serial/parallel 与 RGB 小片段因不同边界保留，无新工具层。 |
+| B Compat→VM backend/debug | S11 git mv + 私有预检转移，函数体归一化相等，Debug 内存原子性/重启/媒体验证；Compat 无 VM/Common include 或产品函数调用。 |
+| B VM geometry | S12 原模式与局部 dirty 证明后删除缓存/推断；尺寸唯一来源为原 renderer 建立的 DIB。 |
+| B 镜像 host clock | S12 实现移至 audio；GetPerfCounter 唯一生产定义，原调用/单位/回绕不变。 |
+| B 其余双向归属 | 原 CCPU safe-points 是不同执行时机；保持 hook，实际 host 行为在 Compat、debug plan 在 VM。字体/V7 指针为原 host 合同，不搬为产品策略。 |
+| C 十个原文件候选 | 保留 S7 原表逐项拒绝结论；当前 endpoint 不等价 NT raw device/多 VM 服务，整引入净增并改变能力。已有 nt_keycd/nt_sound 状态直接复用，无私有副本。 |
+
+#### 全部文件归属（45 个现存文件，原 48 个的去向全部映射）
+
+| Owner | 现存文件 | 符号/调用边界与保留理由 |
+| --- | --- | --- |
+| VM | machine.c/.h | 原 Compat 两文件迁入；配置、初始化/reset/run/destroy；调用原设备初始化，不再实现设备状态。 |
+| VM | driver.c/.h、vm_interface.h | App 唯一 public 组装入口、Common copied callbacks；non-owning wrapper 仅内部测试；无尺寸推断。 |
+| VM | input.c/.h | KVM→原 keyboard/mouse 协议；原键盘表复用，不含第二 matcher。 |
+| VM | debug.c/.h、debug_memory.c | Common debug 请求/计划及原 CPU 观察回调，32-byte preflight；原 SAS 完成总线访问。 |
+| VM | trace.c/.h | 可选诊断记录，不替代原 CPU trace 或控制流程。 |
+| Compat | platform.c/.h | 原 timer/HLT/wake/ROM/config host 合同；引用配置事实而不持有 VM backend。 |
+| Compat | memory.c | 原 SAS 分配与物理总线访问；无 debugger/XMS 私有服务。 |
+| Compat | keyboard.c、input.h | 原 host_key 与 scan 表出口、stale 8042 清理；无未用 reset。 |
+| Compat | audio.c/.h | 原声音输出与 host clock；无 PPI/Timer2 状态复制。 |
+| Compat | gfi_image.c、hdd_media.c/.h | 原 FLA/GFI/DMA/fdisk 的 Lib media endpoint；不是第二控制器。 |
+| Compat | serial.c、parallel.c | 原 UART/LPT 的独立 host endpoint，资源生命周期不同，不合并为泛型壳。 |
+| Compat | device_bop.c、edl_fast_bop.c | 既有固件服务注册和不支持出口，保留 D6/C4 原语义。 |
+| Compat | mouse_instance.c | 原 NIDDB 单实例 host 合同，非多 VM 虚拟化替代。 |
+| Compat | dib_surface.c/.h、conapi.h、graphics_console_compat.c | 原 NT renderer 的 detached buffer/palette/dirty 合同，不是实际 cooked/raw console owner。 |
+| Compat | video.c、v7_pointer.c | 原字体读取与硬件指针像素 host callback；KVM frame 组装在 VM。 |
+| Compat | ccpu/abi.h、facade.c、lifecycle.c/.h | 原 CCPU 窄 ABI、嵌套模拟退出、interrupt-map 接口；不含产品生命周期策略。 |
+| Compat | cvidc/gdp_state.c/.h、gdp_slots.h、gdp_rule_access.h | native-width 存储与原固定 offset 映射，34 规则证明；不能恢复四字节指针或删除为“wrapper”。 |
+| Compat | bios/host_def.h、cmos/port.h、system/error.h、keymouse/cpu4.h | 原合同的局部选择/声明适配；CMake 单 TU 选择，不扩为通用影子头。 |
+| 已删除 | status.h、ccpu/legacy/{PigReg_c.h,gdpvar.h,sas4gen.h} | 原 48 减四个文件，加 debug_memory.c 得 45；machine 两文件仅换 owner，不计删除。 |
+
+直接 include 和原符号消费者扫描与 product_boundary 相符，实际 CMake 将
+全部六个 VM C 文件只交 softpc-vm；Compat 及原 OBJECT 组保留唯一来源。
+静态负例验证 App 越界、Compat→VM/Common、重复/遗漏 target source；不能
+仅凭文件名后缀通过。未查到旧 helper/enum/geometry cache/debug_memory 名称
+的生产路径。保留合同的原回调表注册和原符号链接由全目标构建与设备测试验证。
+
+相对 S7 da32558：26 生产路径 +102/-1949，净 -1847；24 测试路径
++246/-131，净 +115；CMake +8/-6，净 +2。VM 12 文件/1501 行，Compat
+33 文件/4866 行，合计 6367 行；比 S7 8206 行少 1839，另有镜像净少 8 行。
+606 行 backend 搬迁不算减少。S13 自身生产/测试/构建 Git 内容零变化，符合
+预估；只有审计文档。Lib/Common/test/lib/test/common 相对 S7 零变化，媒体
+零变化。INI 唯一差异是 S9 原样提交的 owner console_control=0→1。
+
+最终重建两宽度，固定 EXE 与 S12 hash 相同；完整 x64 98/98（56.65s）、
+x86 98/98（58.31s）。结果包括真实 restart/BIOS、debug、媒体、VGA、声音、
+源/构建负例和全部 shared gates；不是仅以窄单测替代全套。待实际 P 提交
+后再做 coordinator 审计收口。原 keyboard 越界 TODO 与三个 Queue 项仍是
+独立已记录范围，不声称本次修复；没有将本轮未完成项转移到那里。
