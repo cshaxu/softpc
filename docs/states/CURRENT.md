@@ -6,11 +6,18 @@ T60 is closed after owner manual acceptance and the whole-task audit.
 T61 is closed on owner direction after the [whole-task audit](../history/M9-T61-completion-audit.md).
 T62 is closed on owner direction after the
 [whole-task audit](../history/M9-T62-completion-audit.md).
-No implementation subtask is active.
+M9 T63 S1 is active: snapshot feasibility audit and product/engineering design.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
-The admitted snapshot design is queued for the next task; older candidates remain.
+T62 closure was pushed in 54b2009 before T63 admission. The three older
+candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.md).
 
 ## Current Technical Baseline
+
+- T63 S1 source baseline ea7e982, admission after 54b2009. No snapshot runtime
+  exists yet. Current pause retains a native execution stack; timer producers,
+  device queues, CPU hidden state and media need the proposed capture boundary.
+  Owner requires one binary snapshot, direct/readonly references only, and
+  complete FDD/HDD overlay pages. Existing fixed EXEs remain unchanged.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files
@@ -193,3 +200,24 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
 - **M9 Td S9:** Future-task closure audit, whole-domain convergence, complete
   P discipline, path accounting, and build hygiene now match the relevant
   NXVM governance standard. [Record](../history/M9-Td-S9-execution-closure-quality.md)
+
+## M9 T63 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner requests audit, product/engineering proposal and admission; subsequently authorizes T62 closure, pushed first in 54b2009. |
+| Objective | Audit existing pause/state/media owners; design a consistent single-file save/load contract and bounded S sequence. |
+| Non-goals | No snapshot implementation, MVDM or shared API edit, changed EXE, media mutation or claimed restore success in S1. |
+| Reference Baseline | ea7e982 production; 54b2009 predecessor closure. Existing x86/x64 binaries and evidence remain T62. |
+| Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
+| Files And ABI Surface | This packet, Queue, proposal and S1 history on closure; future source boundaries are audited, not changed. |
+| Applicable Rules | docs/rules/EXECUTION.md and DOCUMENT.md; design/ARCHITECTURE.md, CODING.md, UI.md; referenced execution, architecture and documentation skills. |
+| Verification | Inspect actual Common pause/rendezvous, CCPU entry/HLT/nesting, FPU, SAS/GDP, quick events, Compat timer/media and Lib storage interfaces; documentation gate and git diff check; actual-commit review. |
+| Expected Markers | Explicit safe-boundary gate, fixed state-ledger universe, one binary file, direct/readonly no payload, both overlays included, no second executor, conservative load failure semantics. |
+| Asset Needs | None; no runtime captures or media access. |
+| Reporting Requirements | Explain known blockers versus proven facts, each S boundary and preliminary churn; S1 production/test delta zero. |
+| Stop Conditions | Unknown state remains explicitly S2 work; do not claim field completeness or deploy save/load. Any change of media or original machine semantics beyond proposal needs review. |
+| Exit Criteria | Request-to-design audit, all identified state domains assigned, ordered proof gates, documentation checks and pushed design delivery; no runtime acceptance claimed. |
+| Original Owner Request | Pause must preserve all runtime state consistently; audit/design/admit snapshots for installation reproduction; one binary file, direct/readonly references, FDD/HDD overlay state. Verbatim in proposal. |
+| Similar-Issue Sweep | Inspect CPU/FPU/memory/video/input/controllers/timers/media/host resources, not RAM-only; every unknown retained as an explicit S2 ledger obligation. |
