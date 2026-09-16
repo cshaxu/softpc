@@ -40,5 +40,6 @@ are disposable after their evidence is recorded; existing build trees remain.
 
 ## Acceptance state
 
-S1-S4 are closed. T62 is NOT closed: owner manual validation is still required.
-No further implementation or queued candidate is automatically admitted now.
+S1-S4 are closed and the owner reports testing passed. T62 remains open.
+The owner admitted four follow-up simplifications as S5-S8, in sequence;
+after their delivery, wait for new manual acceptance before T closure.
