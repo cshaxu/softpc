@@ -40,9 +40,10 @@ are disposable after their evidence is recorded; existing build trees remain.
 
 ## Acceptance state
 
-S1-S4 are closed and the owner reports testing passed. S5-S8 below are now
-closed after verification, not yet manually accepted. T62 remains OPEN;
-wait for owner testing and direction, do not admit another task.
+S1-S4 are closed and the owner reports testing passed. S5-S8 are closed after
+verification. Owner subsequently directed: “批准收口T六十二提交推送然后继续进行这个调研。”
+T62 is CLOSED after the [whole-task audit](M9-T62-completion-audit.md).
+This records closure authorization, not an invented additional manual test report.
 
 ## Four admitted follow-ups
 

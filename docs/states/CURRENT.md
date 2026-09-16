@@ -4,12 +4,11 @@
 
 T60 is closed after owner manual acceptance and the whole-task audit.
 T61 is closed on owner direction after the [whole-task audit](../history/M9-T61-completion-audit.md).
-M9 T62 S1-S4 are closed and owner-tested successfully.
-M9 T62 S5-S8 are closed.
+T62 is closed on owner direction after the
+[whole-task audit](../history/M9-T62-completion-audit.md).
 No implementation subtask is active.
-Open task awaiting owner: T62.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
-The three queued candidates are unchanged.
+The admitted snapshot design is queued for the next task; older candidates remain.
 
 ## Current Technical Baseline
 
@@ -17,7 +16,7 @@ The three queued candidates are unchanged.
   paths: nine production C/H files +56/-99 = -43; nine test C/H files
   +141/-38 = +103. Final dual full suites 101/101; post-commit 8/8 each.
   Both fixed EXEs rebuilt, all P commits pushed; public APIs and product
-  source/INI/media unchanged. Await owner testing before T62 closure.
+  source/INI/media unchanged. Owner has now authorized T62 closure.
   Delivery recheck: x64 101/101; x86 first 100/101 with an intermittent BIOS
   tick assertion, then five focused passes and full 101/101 unchanged.
   The unconfirmed timing/test issue is recorded in TODO, not claimed repaired.
@@ -26,7 +25,7 @@ The three queued candidates are unchanged.
   production +170/-214 = -44 across 12 C/H paths. Final x64/x86 101/101;
   actual-commit 14/14 each. Both fixed EXEs refreshed; public APIs, App, VM,
   Compat and MVDM unchanged. S1-S4 implementation and review commits are pushed;
-  owner manual validation passed for S1-S4; S5-S8 await separate acceptance.
+  owner manual validation passed for S1-S4; T62 is now closed on owner direction.
 
 - T61 S13 audit delivery 891e642 verifies all S7 ownership/reuse candidates.
   S8-S12 production net -1847; mirror 498 retained/404 identical/94 divergent,
@@ -135,6 +134,7 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T62 | S1-S8 complete; owner-directed closure; final dual-width 101/101 with separately recorded intermittent tick debt. | [Whole-task audit](../history/M9-T62-completion-audit.md) |
 | T61 | S1-S13 complete; owner-directed closure; 498-file mirror and VM/Compat ownership audit, final dual-width 98/98. | [Whole-task audit](../history/M9-T61-completion-audit.md) |
 | T60 | S1-S7 complete; owner manual acceptance; D6 retained, dual-width 97/97, protected corpora unchanged. | [Whole-task audit](../history/M9-T60-completion-audit.md) |
 | T59 | S1–S22 closed on owner request; TODO cleared by explicit retirement, final dual-width 97/97. | [Whole-task audit](../history/M9-T59-completion-audit.md) |
