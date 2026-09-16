@@ -4,8 +4,8 @@
 
 T60 is closed after owner manual acceptance and the whole-task audit.
 T61 is closed on owner direction after the [whole-task audit](../history/M9-T61-completion-audit.md).
-M9 T62 S1 is closed; S2 is active: embed Machine's private input queue.
-S2 implementation is pushed and verified; no S3 work started before T61 closure.
+M9 T62 S1-S2 are closed; S3 is active: share Storage file-size measurement.
+No S3 work started before T61 closure (6741721).
 The three queued candidates are unchanged.
 
 ## Current Technical Baseline
@@ -17,26 +17,26 @@ The three queued candidates are unchanged.
   [final ledger](../etc/evidence/softpc/pristine-divergence-current.md#s13-最终归属复核).
   Lib/Common and shared tests unchanged within T61; owner has now closed T61.
 
-## M9 T62 S2 Packet
+## M9 T62 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner admits four serial S tasks, automatic next admission, dual EXEs, tests and permanent push permission. |
-| Objective | Embed the Machine-owned fixed input queue; keep mutex and FIFO semantics with no second allocation. |
-| Non-goals | No public API, queue capacity, Session, Lib, App, VM, Compat or MVDM changes. |
-| Reference Baseline | dce462e S1 implementation; full suites 99/99 each, post-commit 6/6 each. |
+| Objective | One Storage save-position/measure/restore algorithm over same-shape platform seek/tell. |
+| Non-goals | No public API, medium mode, locking/open semantics, Common, App, VM, Compat or MVDM changes. |
+| Reference Baseline | db3b6d8 S2 implementation; full suites 100/100 each, post-commit 6/6 each; T61 closed in 6741721. |
 | Candidate Proposal | [Bounded simplification](../proposals/m9-common-lib-simplification.md). |
-| Files And ABI Surface | common/machine/input_queue.c/h, machine.c, shared/product test consumers, manifests and fixed EXEs; only private queue lifecycle changes. |
+| Files And ABI Surface | lib/storage/file.c/h and win32/linux/file.c; shared storage tests/manifests/fixed EXEs; private platform positioning only. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding rules; design Architecture/Coding/UI; four linked governance skills. |
-| Verification | Queue capacity/wrap/FIFO/clear/reuse and lifecycle regressions; full test-x64/test-x86; manifests/corpus/DAG; governance; post-commit focused checks. |
-| Expected Markers | One Machine allocation owns queue storage, mutex disposed on partial create and shutdown, no queue heap allocation, 255 effective capacity unchanged. |
+| Verification | Position preservation, empty/hole/large-count and injected failures; Linux fake contract; full dual-width suites, manifests/DAG/governance and post-commit focused tests. |
+| Expected Markers | One length algorithm, platform calls preserve original seek/tell errors and 64-bit widths, output count published only on success. |
 | Asset Needs | Refresh assets/binary/softpc32.exe and softpc64.exe only; preserve INI/media. Existing preset build trees only. |
 | Reporting Requirements | Pre-plan estimate and post-result production/test/build numstat; evidence, pushed P and clean workspace. |
-| Stop Conditions | Changed ordering/capacity, public ABI, product behavior or added allocation wrapper. |
+| Stop Conditions | Changed file locking/modes/error behavior, extra objects or platform conditionals in common algorithm. |
 | Exit Criteria | Both widths build/pass full suite; focused failure proof; manifests/gates pass; implementation pushed and actual-diff coordinator review complete. |
 | Original Owner Request | Original request retained verbatim in linked proposal; each finding becomes its own S, automatically continue after closure, T remains open for owner test. |
-| Similar-Issue Sweep | All queue create/destroy callers, Machine partial-create/shutdown; retain separately owned frames and platform primitives. |
+| Similar-Issue Sweep | Both storage platform files and all positioning/byte-count consumers; shared read/write/close remain single implementations. |
 
 - T61 S6 implementation 4f7171d completes the 498-file original-diff audit:
   403 identical, 95 divergent; +23,141/-22,335, 5,132 hunks. Comparable original
