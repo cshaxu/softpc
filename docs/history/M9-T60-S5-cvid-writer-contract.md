@@ -83,3 +83,15 @@ Fixed x64 SHA256:
 BBC571741BC7E9592E9F183DAA6E16E1ECE96141E9E60DEF9736863456991C24.
 Executor delivery is verified; coordinator actual-commit review remains
 required before S5 closure. T60 S6/S7 remain outstanding.
+
+## Coordinator actual-commit review
+
+Reviewed pushed executor 3dbaf32, including both declaration edits, the real
+glue probe with restored table, artifact paths and finite signature ledger.
+No generated rule, dispatch, unrelated mirror code or protected corpus changed.
+The callback probe proves transport under the selected erased-prototype build;
+source comparison proves the declaration correction. Neither is misreported as
+a reproduced runtime truncation. Existing READ_POINTERS differences predate T60.
+Post-commit VGA/BOP/package checks pass 3/3 on x64 (7.01 s) and x86 (7.53 s).
+Full suites and hashes are recorded above; worktree was clean after delivery.
+S5 meets its bounded exit criteria and closes. T60 remains open for S6/S7.

@@ -2,35 +2,40 @@
 
 ## Current Work
 
-T60 S1-S4 are closed after actual-commit review. T60 remains open under the
-owner-approved continuing goal; S5 is next in the
+T60 S1-S5 are closed after actual-commit review. T60 remains open under the
+owner-approved continuing goal; S6 is next in the
 [reference-repair plan](../history/M9-T60-reference-repairs-proposal.md).
-T60 S5 is active under that continuing goal.
+T60 S6 is active under that continuing goal.
 Lib/Common and their shared tests/manifests remain protected: changes need
 separate owner approval throughout T60. The other queue candidates retain order.
 
-## M9 T60 S5 Packet
+## M9 T60 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner-admitted T60 serial plan and continuing goal; single-person executor/coordinator. |
-| Objective | Verify and correct C-VID writer declaration widths against actual calling conventions. |
+| Objective | Assess D6/SALC against the selected firmware and retained BOP contract before any decoder change. |
 | Non-goals | No shared-corpus edits, new renderer, global alignment owner or opportunistic MVDM refactor. |
-| Reference Baseline | Closed S4 implementation 8ac53ac; read-only NTVDMx64 84a13d2 and original OpenNT. |
-| Candidate Proposal | [C-VID writer contract](../proposals/m9-cvid-writer-contract.md). |
-| Files And ABI Surface | Original cpu_vid declarations and selected C-VID call/table/bridge sites after inspection; product tests only. |
+| Reference Baseline | Closed S5 implementation 3dbaf32; read-only NTVDMx64 84a13d2 and original OpenNT. |
+| Candidate Proposal | [D6 and BOP contract](../proposals/m9-d6-bop-contract.md). |
+| Files And ABI Surface | Selected CPU decoder, firmware BOP callers, Compat dispatch and product BOP tests; assessment first. |
 | Applicable Rules | Architecture, Coding, Execution, Document; source-research policy and governance skills. |
-| Verification | Actual byte/word address and value-width proof; related signatures accounted; serial full x86/x64 suites and EXEs for changes. |
-| Expected Markers | Declarations agree with actual ABI without truncating addresses or changing dispatch. |
+| Verification | Source-backed opcode/firmware ledger and focused BOP proof; serial full x86/x64 suites and EXEs for code changes. |
+| Expected Markers | Explicit repair, already-correct or owner-decision disposition without silent decoding changes. |
 | Asset Needs | Existing product fixtures; no guest media or INI changes. |
 | Reporting Requirements | Original-source diff necessity, complete finite ledger, exact dual-width proof and actual-commit review. |
-| Stop Conditions | Shared-corpus change, new renderer or ownership requires owner decision. |
+| Stop Conditions | Conflicting SALC/BOP semantics, firmware changes or shared-corpus edits require owner decision. |
 | Exit Criteria | Focused and full proofs, executor commit/push, coordinator actual-diff review and closure commit/push. |
 | Original Owner Request | Execute the admitted ntvdmx64 reference-guided MVDM repairs; preserve minimum original-code diff. |
-| Similar-Issue Sweep | Byte/word/dword writer and fill/move declarations, selected tables, call sites and generated-rule ABI. |
+| Similar-Issue Sweep | D6, C4/C4 BOP, firmware escape/return including FE, and selected versus alternate decoder branches. |
 
 ## Current Technical Baseline
+
+- T60 S5 corrects two C-VID writer declarations without changing the generated
+  register protocol. Both widths pass 97/97 full and 3/3 post-commit checks;
+  fixed EXEs match 3dbaf32. [S5 review](../history/M9-T60-S5-cvid-writer-contract.md).
+  This is a latent declaration repair, not reproduced current-build truncation.
 
 - T60 S4 adds planar pel panning in the original standard EGA painters,
   including split cancellation and preceding dirty dependencies. Both widths
