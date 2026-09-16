@@ -320,3 +320,42 @@ softpc_host_scan1_to_key；前者仅在 VM 边界复制扫描码/扩展标志，
 固定 EXE SHA256：
 - x86 `29FBE2B2C13182D54520388239C4933431BEC8F2E2B3236A7733CDB567FB0133`
 - x64 `CDCAF22C812B26122DB4EC3C24B4A6422F2284B22F8194848BA85AB95F914E14`
+
+## S5 实施证据
+
+有限对照全集为 nt_sound.c 的全部状态/函数、Compat 的 timer gate/heartbeat/
+audio sink 以及原始 ppi/reset 调用者。按职责处置如下：
+
+| 成员 | 唯一所有者、处置及证明 |
+| --- | --- |
+| FreqT2/PpiState/T2State/LastPpi/FreqPpi/ET2TicCount/PpiCounting | 共用原始全局定义；不迁移或复制设备/声音状态 |
+| BeepLastFreq/BeepLastDuration，PulsePpi 两个 static 计数 | 共用原始缓存与局部状态；重复请求、脉冲计数/超时验证 |
+| host_alarm/host_ring_bell | 原版正文，仍为 MessageBeep/config 入口；受控测试覆盖开关 |
+| PlaySound/host_timer2_waveform/HostPpiState/PulsePpi | 原版正文逐函数文本比较相同；音高/PPI/平滑算法未重写 |
+| InitSound/LazyBeep/PlayContinuousTone | 共用原始状态逻辑，仅条件隔离 NT beep handle/create/ioctl/close |
+| GetPerfCounter | standalone 保留原有 GetTickCount()*10 换算，局部函数使用原始调用名；未引入新时钟 |
+| host_enable_timer2_sound/host_disable_timer2_sound/timer2_gate | 现有三个接入口原样保留，只操作上述同一状态；ppi/reset/Compat gate 消费 |
+| OpenBeepDevice/hBeepDevice/BeepCloseCount | 原始 NT 路径完整保留，standalone 不编译；不声称 NT 运行验证 |
+| Compat audio worker 与平台 heartbeat | 完全未改；仍仅呈现声音/调用 PlayContinuousTone，不新增线程或 state owner |
+
+受控 sound-state 测试先在精简前两宽度通过，再验证精简后：真实 nt_sound.c
+包含进独立单元测试，只替换宿主 clock/bell/tone 和配置查询；没有复制算法或
+依赖外部源码。覆盖重复 tone 抑制、短 click 清缓存、200ms 脉冲累积/1008Hz
+平滑结果、连续声音超时、PPI/Timer2 gate、频率边界、InitSound 和配置铃声。
+特意保持原始 equal-tick 分支会清计数的行为，不借精简更改原有时钟语义。
+现有 sound-smoke 继续走原始端口/PIT/reset；audio lifecycle/failure 测试保留。
+
+六个上述原版正文函数逐一比对相同。剩余条件分支只隔离 NT 资源，不删除原始
+实现；没有第二 LazyBeep/PlaySound/PulsePpi。内容差异 +222/-0 降至 +64/-0，
+减少 158 行；生产 nt_sound.c +62/-220，构建测试接线 CMake +9/-0，新增测试
+源码单列统计。Lib/Common 四目录、App/VM/Compat、配置媒体均未改。
+测试接线初版碰到无 include guard 的原始 host_def 重复包含，以及 K&R 原型
+默认提升，已只修正测试接线；未为测试改动原始头文件。首次配置误用了 build
+preset 名称，改用现有 configure preset 后成功，不归为产品失败。
+
+新增测试 77 行，构建接线 9 行；生产净 -158，三者合计净 -72。双宽度构建
+成功，完整 x64 98/98（82.24s）、x86 98/98（71.34s）；文档门禁和 diff-check
+通过。未新增临时源码/媒体，原始外部参考工作区仍干净。
+固定 EXE SHA256：
+- x86 `86F32C392BE284A14DE5025D3BCD34BDB33E1BB0266C9C902432AA7AF4911624`
+- x64 `0D5C7D57412DB0DC89FF7FAC25155480FB084A07E0402819B56AE683C41525EF`

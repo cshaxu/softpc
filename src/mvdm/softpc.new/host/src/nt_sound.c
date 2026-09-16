@@ -1,228 +1,13 @@
-#ifdef SOFTPC_STANDALONE
-#include <windows.h>
-#undef PlaySound
-#include "insignia.h"
-#include "host_def.h"
-#include "xt.h"
-#include "config.h"
-#include "ica.h"
-#include "timer.h"
-
-/* The standalone VM executes one machine slice at a time; the original
- * sound calls retain their ordering but require no NT host critical section. */
-#define host_ica_lock()
-#define host_ica_unlock()
-
-/* The original sound state machine is retained below.  Only the historical
- * NT beep-device request is replaced by this standalone presentation port. */
-extern void softpc_standalone_audio_set_tone(ULONG frequency, ULONG duration);
-
-ULONG FreqT2 = 0;
-BOOL PpiState = FALSE;
-BOOL T2State = FALSE;
-ULONG LastPpi = 0;
-ULONG FreqPpi = 0;
-ULONG ET2TicCount = 0;
-ULONG PpiCounting = 0;
-ULONG BeepLastFreq = 0;
-ULONG BeepLastDuration = 0;
-
-#define AUDIBLE_MIN 10
-#define AUDIBLE_MAX 20000
-#define CLICK 100
-
-void PulsePpi(void);
-
-static ULONG softpc_sound_perf_counter(void)
-{
-    return (ULONG)(GetTickCount() * 10u);
-}
-
-VOID LazyBeep(ULONG Freq, ULONG Duration)
-{
-    if (Freq != BeepLastFreq || Duration != BeepLastDuration) {
-        if (Duration < 10) {
-            BeepLastFreq = 0;
-            BeepLastDuration = 0;
-        } else {
-            BeepLastFreq = Freq;
-            BeepLastDuration = Duration;
-        }
-        softpc_standalone_audio_set_tone(Freq, Duration);
-    }
-}
-
-void host_alarm(long int duration)
-{
-    UNUSED(duration);
-    MessageBeep(MB_OK);
-}
-
-void host_ring_bell(long int duration)
-{
-    if (host_runtime_inquire(C_SOUND_ON)) host_alarm(duration);
-}
-
-VOID InitSound(BOOL bInit)
-{
-    if (!bInit) {
-        host_ica_lock();
-        LazyBeep(0L, 0L);
-        host_ica_unlock();
-    }
-}
-
-void PlaySound(BOOL bPulsedPpi)
-{
-    if (PpiState && T2State && FreqT2) {
-        LazyBeep(FreqT2, INFINITE);
-    } else if (FreqPpi > AUDIBLE_MIN) {
-        LazyBeep(FreqPpi, INFINITE);
-    } else if (bPulsedPpi && PpiCounting) {
-        LazyBeep(CLICK, 1);
-    } else {
-        LazyBeep(0, 0);
-    }
-}
-
-void host_timer2_waveform(int delay, ULONG loclocks, ULONG hiclocks,
-    int lohi, int repeat)
-{
-    ULONG ul;
-    UNUSED(delay);
-    UNUSED(lohi);
-    UNUSED(repeat);
-    if (loclocks == INFINITE || hiclocks == INFINITE) {
-        FreqT2 = 0;
-    } else {
-        ul = loclocks + hiclocks;
-        if (!ul) ul++;
-        FreqT2 = 1193180 / ul;
-        if (FreqT2 >= AUDIBLE_MAX) {
-            hiclocks = INFINITE;
-            FreqT2 = 0;
-        } else if (FreqT2 <= AUDIBLE_MIN) {
-            loclocks = INFINITE;
-            FreqT2 = 0;
-        }
-    }
-    PlaySound(FALSE);
-}
-
-void HostPpiState(BYTE PortValue)
-{
-    BOOL bPpi;
-    host_ica_lock();
-    T2State = PortValue & 1 ? TRUE : FALSE;
-    bPpi = PortValue & 2 ? TRUE : FALSE;
-    if (bPpi != PpiState) {
-        PpiState = bPpi;
-        if (PpiState) PulsePpi();
-        PlaySound(PpiState);
-    }
-    host_ica_unlock();
-}
-
-void PulsePpi(void)
-{
-    static ULONG PpiTicStart = 0;
-    static ULONG PpiCycles = 0;
-    ULONG ul, Elapsed, PrevTicCount;
-
-    PrevTicCount = ET2TicCount;
-    ET2TicCount = GetTickCount();
-    Elapsed = ET2TicCount > PrevTicCount ? ET2TicCount - PrevTicCount :
-        0xFFFFFFFF - ET2TicCount + PrevTicCount;
-    if (Elapsed > 200) {
-        if (PpiCounting) {
-            PpiCounting = 0;
-            LastPpi = 0;
-            FreqPpi = 0;
-        }
-        return;
-    }
-    if (!PpiCounting) {
-        PpiCounting = softpc_sound_perf_counter();
-        PpiCycles = 0;
-        LastPpi = 0;
-        FreqPpi = 0;
-        PpiTicStart = ET2TicCount;
-        return;
-    }
-    if (PpiTicStart + 200 >= ET2TicCount) {
-        PpiCycles++;
-        return;
-    }
-    ul = softpc_sound_perf_counter();
-    Elapsed = ul >= PpiCounting ? ul - PpiCounting :
-        0xFFFFFFFF - PpiCounting + ul;
-    if (!Elapsed) Elapsed++;
-    PpiCounting = ul;
-    PpiTicStart = ET2TicCount;
-    ul = (10000 * PpiCycles) / Elapsed;
-    if ((ul & 0x0f) > 7) ul += 0x10;
-    ul &= ~0x0f;
-    ul += 0x10;
-    if (!LastPpi) LastPpi = ul;
-    if (!FreqPpi) FreqPpi = LastPpi;
-    FreqPpi = ((FreqPpi << 2) + LastPpi + ul) / 6;
-    if ((FreqPpi & 0x0f) > 7) FreqPpi += 0x10;
-    FreqPpi &= ~0x0f;
-    LastPpi = ul;
-    PpiCycles = 0;
-}
-
-void PlayContinuousTone(void)
-{
-    ULONG Elapsed;
-    host_ica_lock();
-    if (PpiCounting) {
-        Elapsed = GetTickCount();
-        Elapsed = Elapsed > ET2TicCount ? Elapsed - ET2TicCount :
-            0xFFFFFFFF - ET2TicCount + Elapsed;
-        if (Elapsed > 200) {
-            PpiCounting = 0;
-            LastPpi = 0;
-            FreqPpi = 0;
-        }
-    }
-    PlaySound(FALSE);
-    host_ica_unlock();
-}
-
-void host_enable_timer2_sound(void)
-{
-    host_ica_lock();
-    if (!PpiState) {
-        PpiState = TRUE;
-        PulsePpi();
-    }
-    PlaySound(PpiState);
-    host_ica_unlock();
-}
-
-void host_disable_timer2_sound(void)
-{
-    host_ica_lock();
-    PpiState = FALSE;
-    PlaySound(FALSE);
-    host_ica_unlock();
-}
-
-void softpc_standalone_sound_timer2_gate(half_word value)
-{
-    host_ica_lock();
-    T2State = value != GATE_SIGNAL_LOW;
-    PlaySound(FALSE);
-    host_ica_unlock();
-}
-
-#else
+#ifndef SOFTPC_STANDALONE
 #include <nt.h>
 #include <ntrtl.h>
 #include <nturtl.h>
 #include <ntddbeep.h>
+#endif
 #include <windows.h>
+#ifdef SOFTPC_STANDALONE
+#undef PlaySound
+#endif
 #include "insignia.h"
 #include "host_def.h"
 /*
@@ -254,7 +39,20 @@ void softpc_standalone_sound_timer2_gate(half_word value)
 #include "debug.h"
 
 
+#ifdef SOFTPC_STANDALONE
+#include "ica.h"
+#include "timer.h"
+/* One executor owns these transitions; only the NT host endpoint differs. */
+#define host_ica_lock()
+#define host_ica_unlock()
+extern void softpc_standalone_audio_set_tone(ULONG frequency, ULONG duration);
+static ULONG GetPerfCounter(VOID)
+{
+    return (ULONG)(GetTickCount() * 10u);
+}
+#else
 IMPORT ULONG GetPerfCounter(VOID);
+#endif
 
 ULONG FreqT2    = 0;
 BOOL  PpiState  = FALSE;
@@ -264,8 +62,10 @@ ULONG FreqPpi   = 0;
 ULONG ET2TicCount=0;
 ULONG PpiCounting  = 0;
 
+#ifndef SOFTPC_STANDALONE
 HANDLE hBeepDevice = 0;
 ULONG BeepCloseCount = 0;
+#endif
 ULONG BeepLastFreq = 0;
 ULONG BeepLastDuration = 0;
 
@@ -315,16 +115,19 @@ VOID InitSound( BOOL bInit)
     if (!bInit) {
         host_ica_lock();
         LazyBeep(0L, 0L);
+#ifndef SOFTPC_STANDALONE
         if (hBeepDevice && hBeepDevice != INVALID_HANDLE_VALUE) {
             CloseHandle(hBeepDevice);
             hBeepDevice = 0;
             }
+#endif
         host_ica_unlock();
         return;
         }
 }
 
 
+#ifndef SOFTPC_STANDALONE
 HANDLE OpenBeepDevice(void)
 {
     OBJECT_ATTRIBUTES ObjectAttributes;
@@ -364,6 +167,7 @@ HANDLE OpenBeepDevice(void)
 
     return hBeep;
 }
+#endif
 
 
 
@@ -382,12 +186,16 @@ HANDLE OpenBeepDevice(void)
  */
 VOID LazyBeep(ULONG Freq, ULONG Duration)
 {
+#ifndef SOFTPC_STANDALONE
   IO_STATUS_BLOCK     IoStatus;
   BEEP_SET_PARAMETERS bps;
+#endif
 
   if (Freq != BeepLastFreq || Duration != BeepLastDuration) {
+#ifndef SOFTPC_STANDALONE
       bps.Frequency = Freq;
       bps.Duration  = Duration;
+#endif
 
          //
          // If the duration is < 10 ms, then we assume sound is being
@@ -403,6 +211,9 @@ VOID LazyBeep(ULONG Freq, ULONG Duration)
          BeepLastDuration  = Duration;
          }
 
+#ifdef SOFTPC_STANDALONE
+      softpc_standalone_audio_set_tone(Freq, Duration);
+#else
       if (!hBeepDevice) {
           hBeepDevice = OpenBeepDevice();
           }
@@ -424,6 +235,7 @@ VOID LazyBeep(ULONG Freq, ULONG Duration)
                              );
 
       BeepCloseCount = 1000;
+#endif
 
       }
 
@@ -627,6 +439,7 @@ void PlayContinuousTone(void)
 
    PlaySound(FALSE);
 
+#ifndef SOFTPC_STANDALONE
    if (!BeepLastFreq && !BeepLastDuration &&
        BeepCloseCount && !--BeepCloseCount)
      {
@@ -635,8 +448,37 @@ void PlayContinuousTone(void)
            hBeepDevice = 0;
            }
        }
+#endif
 
     host_ica_unlock();
 }
 
+#ifdef SOFTPC_STANDALONE
+/* Existing standalone PPI and Timer-2 entry points share the original state. */
+void host_enable_timer2_sound(void)
+{
+    host_ica_lock();
+    if (!PpiState) {
+        PpiState = TRUE;
+        PulsePpi();
+    }
+    PlaySound(PpiState);
+    host_ica_unlock();
+}
+
+void host_disable_timer2_sound(void)
+{
+    host_ica_lock();
+    PpiState = FALSE;
+    PlaySound(FALSE);
+    host_ica_unlock();
+}
+
+void softpc_standalone_sound_timer2_gate(half_word value)
+{
+    host_ica_lock();
+    T2State = value != GATE_SIGNAL_LOW;
+    PlaySound(FALSE);
+    host_ica_unlock();
+}
 #endif /* SOFTPC_STANDALONE */

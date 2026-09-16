@@ -547,6 +547,15 @@ set(SOFTPC_TEST_TARGETS
     softpc-runtime-restart-boot-smoke
     softpc-runtime-input-continuation-smoke
 )
+add_executable(softpc-sound-state-smoke test/unit/sound_state_smoke.c)
+target_include_directories(softpc-sound-state-smoke PRIVATE src
+    $<TARGET_PROPERTY:softpc-machine-devices,INCLUDE_DIRECTORIES>)
+target_compile_definitions(softpc-sound-state-smoke PRIVATE
+    $<TARGET_PROPERTY:softpc-machine-devices,COMPILE_DEFINITIONS>)
+set_target_properties(softpc-sound-state-smoke PROPERTIES C_STANDARD 90 C_EXTENSIONS ON)
+add_test(NAME softpc-sound-state-smoke COMMAND softpc-sound-state-smoke)
+set_tests_properties(softpc-sound-state-smoke PROPERTIES LABELS "unit" TIMEOUT 15)
+list(APPEND SOFTPC_TEST_TARGETS softpc-sound-state-smoke)
 foreach(probe IN ITEMS platform audio)
     set(probe_target softpc-${probe}-failure-smoke)
     add_executable(${probe_target} test/unit/${probe}_failure_smoke.c)
