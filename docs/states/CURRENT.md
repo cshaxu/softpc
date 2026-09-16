@@ -2,13 +2,31 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T60.
+T60 is closed after owner manual acceptance and the whole-task audit.
+M9 T61 S1 is admitted and active: inventory and classify original-mirror
+differences before safe simplification. The owner selected this task ahead of
+the existing three queued candidates; their relative order is unchanged.
 
-S1-S7 are closed after actual-commit review. The delivered dual-width packages
-await owner acceptance; T60 is not closed. S6 retains D6 BOP under the owner's
-explicit rejection of compatibility-breaking substitution. Lib/Common and their
-shared tests/manifests are unchanged. Queue order remains unchanged.
+## M9 T61 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner requested T60 closure and immediate T61 admission from the supplied audit; single-person dual-role execution. |
+| Objective | Recompute the complete retained MVDM/OpenNT diff and establish an evidence-backed per-hunk disposition ledger. |
+| Non-goals | No production edits during S1; no source rebase, compatibility removal, shared-corpus change or new backend. |
+| Reference Baseline | SoftPC 3df951c; readonly OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61, same-path softpc.new files. |
+| Candidate Proposal | [Mirror diff minimization](../proposals/m9-mvdm-diff-minimization.md). |
+| Files And ABI Surface | docs evidence and optional read-only audit tooling; src/mvdm inspected only, no ABI changes. |
+| Applicable Rules | Execution, Document, Architecture, Coding and source-research policy; corresponding governance skills. |
+| Verification | Reproducible file/hash/hunk/line totals, complete reason mapping, evidence links, documentation gate and protected-path check. |
+| Expected Markers | Historical numbers labelled as such; all current differences accounted for; no unknown classified necessary. |
+| Asset Needs | Retain owner-tested T60 x86/x64 EXEs and hashes; no media or INI changes. |
+| Reporting Requirements | Per-file and reason totals, retained/missing/new-peer distinction, proposed cleanup disposition and actual-commit review. |
+| Stop Conditions | Do not remove necessary ABI/fixes, alter D6 BOP, use external trees as build inputs or touch protected shared corpora. |
+| Exit Criteria | Complete bounded inventory and governed current evidence, verified totals, executor commit/push and coordinator review. |
+| Original Owner Request | Audit every MVDM/OpenNT difference and why; remove unnecessary diff without harming behavior; design and admit T61 now. |
+| Similar-Issue Sweep | All retained files/hunks, including formatting, inactive code, ABI, host adaptations and actual fixes; twelve reason families in proposal. |
 
 ## Current Technical Baseline
 
@@ -83,6 +101,7 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T60 | S1-S7 complete; owner manual acceptance; D6 retained, dual-width 97/97, protected corpora unchanged. | [Whole-task audit](../history/M9-T60-completion-audit.md) |
 | T59 | S1–S22 closed on owner request; TODO cleared by explicit retirement, final dual-width 97/97. | [Whole-task audit](../history/M9-T59-completion-audit.md) |
 | T58 | Common test synchronization and owner-admitted App/build follow-ups closed; S1–S5 complete, dual-width 85/85. | [Whole-task audit](../history/M9-T58-completion-audit.md) |
 | T57 | App/config, VM and flat Compat refactor closed on owner approval; protected corpora unchanged, dual-width 85/85. | [S3 closure](../history/M9-T57-S3-completion-audit.md) |
