@@ -3,32 +3,36 @@
 ## Current Work
 
 T60 is closed after owner manual acceptance and the whole-task audit.
-M9 T61 S1 is admitted and active: inventory and classify original-mirror
-differences before safe simplification. The owner selected this task ahead of
+M9 T61 S1 is closed; S2 is admitted and active: restore proven no-behavior
+differences from the original mirror. The owner selected this task ahead of
 the existing three queued candidates; their relative order is unchanged.
 
-## M9 T61 S1 Packet
+## M9 T61 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
+| Identifier Mode | Continuation |
 | Admission And Approval | Owner requested T60 closure and immediate T61 admission from the supplied audit; single-person dual-role execution. |
-| Objective | Recompute the complete retained MVDM/OpenNT diff and establish an evidence-backed per-hunk disposition ledger. |
-| Non-goals | No production edits during S1; no source rebase, compatibility removal, shared-corpus change or new backend. |
-| Reference Baseline | SoftPC 3df951c; readonly OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61, same-path softpc.new files. |
+| Objective | Restore original formatting and remove proven inactive local code without changing selected program behavior. |
+| Non-goals | No ABI/functionality withdrawal, keyboard/audio branch redesign, S3 conditional restoration, shared-corpus change or new backend. |
+| Reference Baseline | S1 e2e91c1 ledger; production 3df951c; readonly OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61, same-path softpc.new files. |
 | Candidate Proposal | [Mirror diff minimization](../proposals/m9-mvdm-diff-minimization.md). |
-| Files And ABI Surface | docs evidence and optional read-only audit tooling; src/mvdm inspected only, no ABI changes. |
+| Files And ABI Surface | src/mvdm formatting and proven inactive DIB branch, evidence; no ABI changes. |
 | Applicable Rules | Execution, Document, Architecture, Coding and source-research policy; corresponding governance skills. |
-| Verification | Reproducible file/hash/hunk/line totals, complete reason mapping, evidence links, documentation gate and protected-path check. |
-| Expected Markers | Historical numbers labelled as such; all current differences accounted for; no unknown classified necessary. |
-| Asset Needs | Retain owner-tested T60 x86/x64 EXEs and hashes; no media or INI changes. |
-| Reporting Requirements | Per-file and reason totals, retained/missing/new-peer distinction, proposed cleanup disposition and actual-commit review. |
+| Verification | Pre/post selected preprocessing token equivalence on both widths, focused existing painter/input/FPU checks, full test-x64/test-x86, documentation gate and protected-path check. |
+| Expected Markers | Original formatting restored without reformatting the original; inactive DIB removal preserves its selected branch and matching directives. |
+| Asset Needs | Rebuild assets/binary/softpc32.exe and softpc64.exe; no media or INI changes. |
+| Reporting Requirements | Per-file original diff reduction, production/test line delta, all F candidates disposed, dual-width results and actual-commit review. |
 | Stop Conditions | Do not remove necessary ABI/fixes, alter D6 BOP, use external trees as build inputs or touch protected shared corpora. |
-| Exit Criteria | Complete bounded inventory and governed current evidence, verified totals, executor commit/push and coordinator review. |
+| Exit Criteria | All S2 candidates either restored with equivalence proof or explicitly retained with reason; dual builds/full tests, executor commit/push and coordinator review. |
 | Original Owner Request | Audit every MVDM/OpenNT difference and why; remove unnecessary diff without harming behavior; design and admit T61 now. |
-| Similar-Issue Sweep | All retained files/hunks, including formatting, inactive code, ABI, host adaptations and actual fixes; twelve reason families in proposal. |
+| Similar-Issue Sweep | All 97 S1 divergent files for unrelated EOL/whitespace/indentation and inactive local branches; functional changes remain assigned to their later stages or retained. |
 
 ## Current Technical Baseline
+
+- T61 S1 inventory complete: 498 retained/401 identical/97 divergent; raw and
+  whitespace-ignored totals separately recorded. No production changes.
+  [S1 review](../history/M9-T61-S1-mirror-inventory.md).
 
 - T60 S7 repairs FIST64 rounding and its representation read, without replacing
   the FPU. Implementation 64d26a0 passed 97/97 on each width, five repeated
