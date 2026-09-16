@@ -104,4 +104,5 @@ Fixed x86 executable SHA256:
 D8C0BEE496EAD154BDECA06288D65616CF0A62A298978D2571B8057A9EDC12C8.
 Fixed x64 executable SHA256:
 6043C1F27A0B4F0CD013D86342E47667F46B9355E9C2B8AE4CA9EA1924803967.
-Executor P1 awaits actual-commit review; T60's remaining stages are not closed.
+Executor P1 fa27786 passed [actual-commit review](M9-T60-S1-pic-rejection.md).
+S1 is closed; T60's remaining stages are not closed.

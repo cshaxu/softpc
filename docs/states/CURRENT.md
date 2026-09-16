@@ -2,33 +2,19 @@
 
 ## Current Work
 
-M9 T60 S1 is active: repair rejected PIC acknowledgement at the original
-CPU interrupt boundary. T59 remains closed. The owner admitted this new
-candidate ahead of the existing queue; its other three candidates retain order.
-
-## M9 T60 S1 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner admits reference-guided MVDM repairs and execution; Lib/Common changes require separate approval. |
-| Objective | Reject the PIC -1 sentinel before CPU interrupt side effects while retaining valid interrupt semantics. |
-| Non-goals | No Lib/Common/shared-test or manifest changes, new FPU backend, SALC change, renderer change, INI/media/ROM edits. |
-| Reference Baseline | SoftPC 549ed44; NTVDMx64 84a13d2 is read-only research, not imported source. |
-| Candidate Proposal | [MVDM reference repairs](../proposals/m9-mvdm-reference-repairs.md). |
-| Files And ABI Surface | Original c_intr.c and product IRQ regression; unchanged public ABI; proposal records the admitted source-mirror correction. |
-| Applicable Rules | Architecture/coding/execution/documentation governance skills and repository rules; source research policy. |
-| Verification | Original PIC rejection and CPU state assertions, valid interrupt regression, dual-width builds/full tests and governance gates. |
-| Expected Markers | One rejection boundary; no interrupt-frame write or CS:IP change for a rejected acknowledgement. |
-| Asset Needs | Existing build trees and fixed EXEs; owned disposable IRQ fixture, no trace or external media. |
-| Reporting Requirements | Red/green proof, same-class ledger, net code counts, executor commit/push and actual-diff review. |
-| Stop Conditions | Shared corpus change, new CPU policy, external code import or unrelated worktree mutation requires owner direction. |
-| Exit Criteria | Both EXEs built; focused/full tests pass; protected paths unchanged; reviewed and pushed clean. |
-| Original Owner Request | 将以上建议修复加入T任务proposal队列并准入执行；Lib/Common修改必须另行批准。 |
-| Similar-Issue Sweep | Every do_intrupt caller, both CCPU hardware acknowledgement paths and original PIC reject exits. |
+No implementation subtask is active. Open task awaiting owner: T60.
+S1 is closed after actual-commit review; S2 is next in the
+[reference-repair plan](../history/M9-T60-reference-repairs-proposal.md).
+T59 remains closed; the other three queue candidates retain order.
+Lib/Common and their shared tests/manifests remain protected: changes need
+separate owner approval throughout T60.
 
 ## Current Technical Baseline
 
+- T60 S1 rejects PIC acknowledgement -1 at the original CPU interrupt entry.
+  Dual-width full suites pass 97/97 and post-commit focused checks pass 3/3
+  at each width. Fixed EXEs are refreshed; shared corpora remain unchanged.
+  [S1 review](../history/M9-T60-S1-pic-rejection.md).
 - T59 final delivery retains dual-width 97/97 full-suite results and 6/6
   post-commit focused checks. [S22](../history/M9-T59-S22-debug-dos-semantics.md)
   records DOS memory-command semantics, retained interactive E/environment
