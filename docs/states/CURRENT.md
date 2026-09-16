@@ -3,31 +3,31 @@
 ## Current Work
 
 T60 is closed after owner manual acceptance and the whole-task audit.
-M9 T61 S1-S8 are closed; S8 implementation 258e1f7 removes 110 net production
+M9 T61 S1-S9 are closed; S9 implementation 1b43329 removes 124 production
 lines with dual-width 98/98 and actual-commit 5/5 checks. T61 remains open;
-S9 is admitted under the owner's serial follow-up plan.
+S10 is admitted under the owner's serial follow-up plan.
 The three queued candidates are unchanged.
 
-## M9 T61 S9 Packet
+## M9 T61 S10 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner approves decomposition and implementation; single-person dual-role; permanent push authorization. |
-| Objective | Retire test-maintained obsolete status/font interfaces, unused presentation field and unselected PIG header while preserving meaningful production-path coverage. |
-| Non-goals | No mirror, Lib/Common/shared-test change, header ABI unification, ownership migration, new source import or behavior change. |
-| Reference Baseline | SoftPC 258e1f7; S7 audit and S8 verified dual-width packages. |
+| Objective | Remove duplicated Compat GDP/SAS declarations by reusing the already retained original headers; prove selected GDP expansion and remove only unused zero SAS extension slots. |
+| Non-goals | No Lib/Common/shared-test change, VM lifecycle relocation, new external source import, generated overlay or guest behavior change. |
+| Reference Baseline | SoftPC 1b43329; S7 header audit and S9 verified dual-width packages. |
 | Candidate Proposal | [Remaining mirror and support ownership audit](../proposals/m9-mirror-support-ownership-audit.md); original requests remain in the retained T61 plan. |
-| Files And ABI Surface | Compat status.h, machine.c/.h, video.c, ccpu/legacy/PigReg_c.h; product tests and CMake references. No public Common/Lib ABI change. |
+| Files And ABI Surface | Compat ccpu/legacy GDP/SAS headers; existing mirror cpu4gen.h/ev_glue.c include selection and sascdef.c unused slots; CMake include paths and focused tests. Native-width GDP support remains Compat-owned. |
 | Applicable Rules | Execution, Document, Architecture, Coding, source-research policy and their governance skills. |
-| Verification | Caller/conditional-build census; replacement shutdown coverage and dual-font VGA checks; build tests-x86/tests-x64 and full test-x86/test-x64; documentation gate and diff-check. |
-| Expected Markers | No obsolete API consumers, no weakened production-path tests, unchanged mirror/shared corpora; retain any independently necessary contract with evidence. |
+| Verification | Header/caller census, preprocessor GDP comparison and SAS slot layout proof; dual-width layout/video/full suites; documentation gate and diff-check. |
+| Expected Markers | No duplicate GDP/SAS corpus or legacy include path; original headers reused, required native-width access unchanged, unused vector slots have no consumers. |
 | Asset Needs | Refresh both fixed EXEs; preserve user INI/media; use existing ignored build trees. |
-| Reporting Requirements | Exact production/test added/deleted/net lines, retained owners, test counts and any failure; no claim of manual GUI acceptance. |
-| Stop Conditions | A required independent contract blocks deletion; do not pull header layout, ownership or geometry changes into this cleanup. |
+| Reporting Requirements | Before/after paths, moves, independent implementation and original-mirror diff accounting; actual verification and failures. No claim of manual GUI acceptance. |
+| Stop Conditions | A used extension or unproved layout change blocks deletion; any new mirror ABI extension requires presenting the exact alternative before adoption. No ownership/geometry migration in S10. |
 | Exit Criteria | Dual-width builds/full tests and actual-commit review pass; committed/pushed complete delivery, clean tree; T61 stays open. |
 | Original Owner Request | 请拆解一下S任务 并更新当前proposal记录 然后开始准入执行。 |
-| Similar-Issue Sweep | S7 A3 candidates, all production/test/build consumers; distinguish useful test seams from obsolete production wrappers. S10-S12 remain separate. |
+| Similar-Issue Sweep | All selected GDP/SAS header consumers, macro/slot references and duplicated legacy copies; distinguish CCPU-local original layout from shared C-VID layout. S11-S12 remain separate. |
 
 ## Current Technical Baseline
 
