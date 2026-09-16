@@ -269,44 +269,41 @@ static	int	dirty_next=0;
 
 /* [5.2.2 INTERNAL PROCEDURE DEFINITIONS]				*/
 
-static	int	search_video_copy IFN3(int, start_line,
-	int, end_line, int, start_offset)
+static	int	search_video_copy IFN4(int, start_line,
+	int, end_line, int, start_offset, int, alignment)
 {
 	register	byte	*ptr,*k;
 	register	int	j;
-	register	int	quarter_opl = get_offset_per_line()>>2;
-	byte	*vcopy = &video_copy[start_offset];
-	byte save,*end_ptr;
+	int offset = (start_offset<<2) + alignment;
+	byte *vcopy,*end_ptr;
 
-	ptr = vcopy;
-	end_ptr = ptr + quarter_opl*(end_line-start_line);
-	save = *end_ptr;
-	*end_ptr = 1;	/* End marker */
-	while(ptr < end_ptr)
+	/* T60: a four-byte mark can intersect both adjacent display rows. */
+	for (; start_line < end_line; start_line++, offset += get_offset_per_line())
 	{
-		if(!*ptr)
-			do {; } while (!(*++ptr));
-		if(ptr >= end_ptr)break;
+		vcopy = &video_copy[offset>>2];
+		ptr = vcopy;
+		end_ptr = &video_copy[(offset+get_bytes_per_line()+3)>>2];
+		while (ptr < end_ptr && !*ptr) ptr++;
+		if(ptr >= end_ptr)continue;
 		/* Work out where in line we've reached */
-		j = (int)((ptr - vcopy)%quarter_opl);
+		j = (int)(ptr-vcopy)*4 - (offset & 3);
+		if (j < 0) j = 0;
 		/*
 		 * Have found a dirty line. Find width
 		 */
-		for ( k= ptr+quarter_opl-j-1; *k == 0 ; k-- ) ; /* We know *ptr != 0, so k will stop at ptr */
+		for ( k= end_ptr-1; *k == 0 ; k-- ) ; /* We know *ptr != 0, so k will stop at ptr */
 #ifdef VGG
-		add_dirty_rec((int)((ptr-vcopy)/quarter_opl)+start_line,
-		              j<<2, (int)(k-ptr+1)<<2, ptr-video_copy-j,0);
+		add_dirty_rec(start_line, j,
+		              (int)(k-vcopy+1)*4-(offset & 3)-j, offset>>2,(offset & 3)-alignment);
 #else
-		add_dirty_rec((int)((ptr-vcopy)/quarter_opl)+start_line,
-		              j<<2, (int)(k-ptr+1)<<2, ptr-video_copy-j);
+		add_dirty_rec(start_line, j,
+		              (int)(k-vcopy+1)*4-(offset & 3)-j, offset>>2);
 #endif /* VGG */
 
-		ptr += quarter_opl - j;
 		/*
 		 * Don't clear out the marked area in case the plane wraps
 		 */
 	}
-	*end_ptr = save;
 	return( get_dirty_rec_total() );
 }
 
@@ -325,67 +322,40 @@ static	int	v7_search_video_copy IFN3(int, start_line,
 	register	byte	*ptr,*k;
 	register	int	j;
 	register	int	half_opl = get_offset_per_line()>>1;
-	register	int	quarter_opl = get_offset_per_line()>>2;
-	byte	*vcopy = &video_copy[start_offset];
-	byte save,*end_ptr;
-	long length;
-	int bodge = 0;
+	byte	*vcopy;
+	byte *end_ptr;
+	int offset, row_offset, first, last;
 
-	if (start_line & 1)
-		bodge = 2;
-	ptr = vcopy;
-
-	/*
-	 * This calculation sets end_ptr slightly too high to
-	 * ensure that all the dirty areas get found.
-	 */
-
-	end_ptr = ptr + (half_opl*(end_line-start_line+1))/2;
-
-	save = *end_ptr;
-	*end_ptr = 1;	/* End marker */
-	while(ptr < end_ptr)
+	/* T60: retain paired-row scanning, including groups shared by pairs. */
+	offset = (start_offset<<2) +
+		((get_screen_start()+start_line*get_offset_per_line()) & 3);
+	for (; start_line < end_line; start_line += 2, offset += half_opl<<2)
 	{
-		if(!*ptr)
-		{
-			while (!(*++ptr));
-		}
-		if(ptr >= end_ptr)break;
-		/* Work out where in line we've reached */
-		j = (int)((ptr - vcopy)%half_opl);
+		vcopy = &video_copy[offset>>2];
+		ptr = vcopy;
+		end_ptr = &video_copy[(offset+get_bytes_per_line()+3+
+			(start_line+1 < end_line ? get_offset_per_line() : 0))>>2];
+		while (ptr < end_ptr && !*ptr) ptr++;
+		if (ptr >= end_ptr) continue;
 		/*
 		 * Have found a dirty line. Find width
 		 */
-		for ( k= ptr+half_opl-j-1; *k == 0 ; k-- ) ; /* We know *ptr != 0, so k will stop at ptr */
-
-		length = k-ptr+1;
-		if (j <= quarter_opl)
-		{	
-			if (length > quarter_opl-j)
-			{
-				add_dirty_rec((int)(2*(ptr-vcopy)/half_opl)+start_line,
-		              	j<<2, (int)(half_opl-2*j)<<1, ptr-video_copy-j,bodge);
-				add_dirty_rec((int)(2*(ptr-vcopy)/half_opl)+start_line+1,
-		              	0, ((int)(j+length-quarter_opl)<<2)-2, ptr-video_copy-j+quarter_opl,2+bodge);
-			}
-			else
-			{
-				add_dirty_rec((int)(2*(ptr-vcopy)/half_opl)+start_line,
-		              	j<<2, (int)(length)<<2, ptr-video_copy-j,bodge);
-			}
-		}
-		else 
+		for ( k= end_ptr-1; *k == 0 ; k-- ) ; /* We know *ptr != 0, so k will stop at ptr */
+		for (j = 0; j < 2 && start_line+j < end_line; j++)
 		{
-			add_dirty_rec((int)(2*(ptr-vcopy)/half_opl)+start_line,
-		             (j-quarter_opl-1)<<2, (int)((length)<<2), ptr-video_copy-j+quarter_opl,2+bodge);
+			row_offset = offset+j*get_offset_per_line();
+			first = (int)(ptr-video_copy)*4-row_offset;
+			last = (int)(k-video_copy+1)*4-row_offset;
+			if (first < 0) first = 0;
+			if (last > get_bytes_per_line()) last = get_bytes_per_line();
+			if (last > first)
+				add_dirty_rec(start_line+j,first,last-first,row_offset>>2,
+					(row_offset & 3)-(get_screen_start() & 3));
 		}
-
-		ptr += half_opl - j;
 		/*
 		 * Don't clear out the marked area in case the plane wraps
 		 */
 	}
-	*end_ptr = save;
 	return( get_dirty_rec_total() );
 }
 #endif /* VGG */
@@ -434,7 +404,7 @@ static	int	search_video_copy_aligned IFN3(int, start_line,
 	return( get_dirty_rec_total() );
 }
 
-static	void	paint_records IFN2(int, start_rec, int, end_rec)
+static	void	paint_records IFN3(int, start_rec, int, end_rec, int, alignment)
 {
 	register	DIRTY_PARTS	*i,*end_ptr;
 #ifdef VGG
@@ -495,12 +465,12 @@ static	void	paint_records IFN2(int, start_rec, int, end_rec)
 			cur_end = get_bytes_per_line();
 #ifdef VGG
 		if (cur_end > cur_start)
-			(*paint_screen)((dirty_vc_offset<<2) + dirty_frig + cur_start,
+			(*paint_screen)((dirty_vc_offset<<2) + dirty_frig + alignment + cur_start,
 			cur_start<<3, first_line, cur_end-cur_start,
 			last_line-first_line+1);
 #else
 		if (cur_end > cur_start)
-			(*paint_screen)((dirty_vc_offset<<2) + cur_start,
+			(*paint_screen)((dirty_vc_offset<<2) + alignment + cur_start,
 			cur_start<<3, first_line, cur_end-cur_start,
 			last_line-first_line+1);
 #endif /* VGG */
@@ -509,11 +479,12 @@ static	void	paint_records IFN2(int, start_rec, int, end_rec)
 	for(i = &dirty[start_rec];i<end_ptr;i++)
 	{
 		register byte *j,*end;
-		end = &video_copy[ i->video_copy_offset+(i->end>>2)];
 #ifdef VGG
-		j =  &video_copy[ i->video_copy_offset+(i->start>>2)+i->v7frig];
+		end = &video_copy[ i->video_copy_offset+((i->end+i->v7frig+alignment+3)>>2)];
+		j =  &video_copy[ i->video_copy_offset+((i->start+i->v7frig+alignment)>>2)];
 #else
-		j =  &video_copy[ i->video_copy_offset+(i->start>>2)];
+		end = &video_copy[ i->video_copy_offset+((i->end+alignment+3)>>2)];
+		j =  &video_copy[ i->video_copy_offset+((i->start+alignment)>>2)];
 #endif /* VGG */
 		do *j++ = 0; while(j<end);
 	}
@@ -1816,48 +1787,65 @@ cga_hi_graph_update IFN0()
 #include "SOFTPC_EGA.seg"
 #endif
 
+/* T60: complete the original wrap+split upper-region placeholder. */
+static void paint_wrapped_split IFN1(int, height)
+{
+	int row, offset, x, width, first, last, mark, pass;
+	for (pass = 0; pass < 2; pass++)
+	for (row = 0; row < height; row++) {
+		offset = (get_screen_start()+row*get_offset_per_line()) % EGA_PLANE_DISP_SIZE;
+		for (x = 0; x < get_bytes_per_line(); x += width) {
+			width = EGA_PLANE_DISP_SIZE-offset;
+			if (width > get_bytes_per_line()-x) width = get_bytes_per_line()-x;
+			first = offset>>2;
+			last = (offset+width+3)>>2;
+			if (pass == 0) {
+				for (mark = first; mark < last && !video_copy[mark]; mark++) ;
+				if (getVideodirty_total() > 20000 || mark < last)
+					(*paint_screen)(offset,x<<3,row,width,1);
+			}
+			else
+				memset(&video_copy[first],0,last-first);
+			offset = 0;
+		}
+	}
+}
+
 void	ega_wrap_split_graph_update IFN0()
 {
 	register	int	bpl; 
-	register	int	quarter_opl;
+	register	int	opl;
 	register	int	screen_split;
 
 	if ( getVideodirty_total() == 0 || get_display_disabled() )
 		return;
 
-	screen_split=get_screen_split();
+	screen_split=get_screen_split()/get_pc_pix_height();
 
 	/*
 	 * make sure don't fall off end of screen
 	 */
 
-	if (screen_split>get_screen_height())
-		screen_split = get_screen_height();
+	if (screen_split>(get_screen_height()/get_pc_pix_height()))
+		screen_split = (get_screen_height()/get_pc_pix_height());
 
 	bpl = get_bytes_per_line();
-	quarter_opl = get_offset_per_line()>>2;
+	opl = get_offset_per_line();
 
 	host_start_update();
 
 	if (getVideodirty_total() > 20000 ) {
-		int split_scanlines = get_screen_height() - screen_split;
+		int split_scanlines = (get_screen_height()/get_pc_pix_height()) - screen_split;
 
 		if ( get_screen_start() + screen_split*get_offset_per_line() > EGA_PLANE_DISP_SIZE ) {
-			assert0(NO,"Panic he wants to do split screens and wrappig!!");
-
-			/*
-			 * Ignore wrapping for now
-			 */
-
-			memset(&video_copy[get_screen_start()>>2],0,screen_split*quarter_opl);
-			(*paint_screen)( get_screen_start(), 0, 0, bpl, screen_split );
+			paint_wrapped_split(screen_split);
 		}
 		else {
-			memset(&video_copy[get_screen_start()>>2],0,screen_split*quarter_opl);
+			memset(&video_copy[get_screen_start()>>2],0,((get_screen_start() & 3)+screen_split*opl+3)>>2);
 			(*paint_screen)( get_screen_start(), 0, 0, bpl, screen_split );
 		}
 		if (split_scanlines>0) {
-			memset(&video_copy[0],0,split_scanlines*quarter_opl);
+			memset(&video_copy[0],0,(split_scanlines*opl+3)>>2);
 			(*paint_screen)( 0, 0, screen_split, bpl, split_scanlines);
 		}
 	}
@@ -1867,16 +1855,17 @@ void	ega_wrap_split_graph_update IFN0()
 		init_dirty_recs();
 
 		if ( get_screen_start() + screen_split*get_offset_per_line() > EGA_PLANE_DISP_SIZE ) {
-			assert0(NO, "Wrapping and spliting, its too much for my head");
-			next = search_video_copy(0,screen_split,get_screen_start()>>2);
+			next = 0;
 		}
 		else {
-			next = search_video_copy(0,screen_split,get_screen_start()>>2);
+			next = search_video_copy(0,screen_split,get_screen_start()>>2,get_screen_start() & 3);
 		}
-		next1 = search_video_copy(screen_split,get_screen_height(),0);
+		next1 = search_video_copy(screen_split,(get_screen_height()/get_pc_pix_height()),0,0);
 
-		paint_records(0,next);
-		paint_records(next,next1);
+		if ( get_screen_start() + screen_split*get_offset_per_line() > EGA_PLANE_DISP_SIZE )
+			paint_wrapped_split(screen_split);
+		paint_records(0,next,get_screen_start() & 3);
+		paint_records(next,next1,0);
 	}
 
 	clear_dirty();
@@ -1887,7 +1876,7 @@ void	ega_wrap_split_graph_update IFN0()
 void	ega_split_graph_update IFN0()
 {
 	register	int	bpl; 
-	register	int	quarter_opl;
+	register	int	opl;
 	register	int	screen_split;
 	register	int	screen_height;
 
@@ -1905,17 +1894,17 @@ void	ega_split_graph_update IFN0()
 		screen_split = screen_height;
 
 	bpl = get_bytes_per_line();
-	quarter_opl = get_offset_per_line()>>2;
+	opl = get_offset_per_line();
 
     	host_start_update();
 
 	if (getVideodirty_total() > 20000 ) {
 		int split_scanlines = screen_height - screen_split;
 
-		memset(&video_copy[get_screen_start()>>2],0,screen_split*quarter_opl);
+		memset(&video_copy[get_screen_start()>>2],0,((get_screen_start() & 3)+screen_split*opl+3)>>2);
 		(*paint_screen)( get_screen_start(), 0, 0, bpl, screen_split );
 		if (split_scanlines>0) {
-			memset(&video_copy[0],0,split_scanlines*quarter_opl);
+			memset(&video_copy[0],0,(split_scanlines*opl+3)>>2);
 			(*paint_screen)( 0, 0, screen_split, bpl, split_scanlines);
 		}
 	}
@@ -1924,11 +1913,11 @@ void	ega_split_graph_update IFN0()
 
 		init_dirty_recs();
 
-		next = search_video_copy(0,screen_split,get_screen_start()>>2);
-		next1 = search_video_copy(screen_split,screen_height,0);
+		next = search_video_copy(0,screen_split,get_screen_start()>>2,get_screen_start() & 3);
+		next1 = search_video_copy(screen_split,screen_height,0,0);
 
-		paint_records(0,next);
-		paint_records(next,next1);
+		paint_records(0,next,get_screen_start() & 3);
+		paint_records(next,next1,0);
 	}
 
 	clear_dirty();
@@ -1938,7 +1927,7 @@ void	ega_split_graph_update IFN0()
 
 #ifdef VGG
 /* again v similar to ega version but works on 1 large plane instead of 4 */
-static	void	vga_paint_records IFN2(int, start_rec, int, end_rec)
+static	void	vga_paint_records IFN3(int, start_rec, int, end_rec, int, alignment)
 {
 	register	DIRTY_PARTS	*i,*end_ptr;
 	int dirty_frig;
@@ -1994,7 +1983,7 @@ static	void	vga_paint_records IFN2(int, start_rec, int, end_rec)
 		if (cur_end > get_bytes_per_line())
 			cur_end = get_bytes_per_line();
 		if (cur_end > cur_start)
-			(*paint_screen)((dirty_vc_offset<<2) + dirty_frig + cur_start,
+			(*paint_screen)((dirty_vc_offset<<2) + dirty_frig + alignment + cur_start,
 			cur_start, first_line, cur_end-cur_start,
 			last_line-first_line+1);
 	}
@@ -2002,8 +1991,8 @@ static	void	vga_paint_records IFN2(int, start_rec, int, end_rec)
 	for(i = &dirty[start_rec];i<end_ptr;i++)
 	{
 		register byte *j,*end;
-		end = &video_copy[ i->video_copy_offset+(i->end>>2)];
-		j =  &video_copy[ i->video_copy_offset+(i->start>>2) + i->v7frig];
+		end = &video_copy[ i->video_copy_offset+((i->end+i->v7frig+alignment+3)>>2)];
+		j =  &video_copy[ i->video_copy_offset+((i->start+i->v7frig+alignment)>>2)];
 		do *j++ = 0; while(j<end);
 	}
 }
@@ -2027,7 +2016,7 @@ void	vga_graph_update IFN0()
 		{
 			register	byte	*vcopy = &video_copy[get_screen_start()>>2];
 	
-			memset(vcopy,0,get_screen_length()>>2);
+			memset(vcopy,0,((get_screen_start() & 3)+get_screen_length()+3)>>2);
 			(*paint_screen)( get_screen_start(), 0, 0, bpl, screen_height );
 	
 #ifdef V7VGA
@@ -2039,8 +2028,9 @@ void	vga_graph_update IFN0()
 			register	int	next;
 			register	int	start_line,end_line;
 	
-			start_line = ((getVideodirty_low()<<2) - get_screen_start())/opl;
-			end_line = ((getVideodirty_high()<<2) - get_screen_start())/opl + 1;  /* changed from +2, but I'm not happy. WJG 24/5/89 */
+			/* T60: a dirty group spans four bytes and may precede screen_start. */
+			start_line = ((int)(getVideodirty_low()<<2) - get_screen_start())/opl;
+			end_line = ((int)(getVideodirty_high()<<2) + 3 - get_screen_start())/opl + 1;
 	
 			if(start_line<0)start_line = 0;
 			if (end_line > screen_height)
@@ -2060,16 +2050,16 @@ void	vga_graph_update IFN0()
 	
 				init_dirty_recs();
 				/* see if we can search the video copy by ints instead of bytes - need opl divisible by 16 */
-				if(opl & 15)
+				if((opl & 15) || (get_screen_start() & 15))
 #ifdef VGG
 					if (opl & 3)
 						next = v7_search_video_copy(start_line,end_line,(get_screen_start()+start_line*opl)>>2);
 					else
 #endif /* VGG */
-						next = search_video_copy(start_line,end_line,(get_screen_start()+start_line*opl)>>2);
+						next = search_video_copy(start_line,end_line,(get_screen_start()+start_line*opl)>>2,get_screen_start() & 3);
 				else
 					next = search_video_copy_aligned(start_line,end_line,(get_screen_start()+start_line*opl)>>2);
-				vga_paint_records(0,next);
+				vga_paint_records(0,next,get_screen_start() & 3);
 	
 #ifdef V7VGA
 		/*
@@ -2097,7 +2087,7 @@ void	vga_graph_update IFN0()
 void	vga_split_graph_update IFN0()
 {
 	register	int	bpl; 
-	register	int	quarter_opl;
+	register	int	opl;
 	register	int	screen_split;
 	register	int	screen_height;
 
@@ -2117,17 +2107,17 @@ void	vga_split_graph_update IFN0()
 		screen_split = screen_height;
 
 	bpl = get_bytes_per_line();
-	quarter_opl = get_offset_per_line()>>2;
+	opl = get_offset_per_line();
 
     	host_start_update();
 
 	if (getVideodirty_total() > 20000 ) {
 		int split_scanlines = screen_height - screen_split;
 
-		memset(&video_copy[get_screen_start()>>2],0,screen_split*quarter_opl);
+		memset(&video_copy[get_screen_start()>>2],0,((get_screen_start() & 3)+screen_split*opl+3)>>2);
 		(*paint_screen)( get_screen_start(), 0, 0, bpl, screen_split );
 		if (split_scanlines>0) {
-			memset(&video_copy[0],0,split_scanlines*quarter_opl);
+			memset(&video_copy[0],0,(split_scanlines*opl+3)>>2);
 			(*paint_screen)( 0, 0, screen_split, bpl, split_scanlines);
 		}
 	}
@@ -2136,11 +2126,11 @@ void	vga_split_graph_update IFN0()
 
 		init_dirty_recs();
 
-		next = search_video_copy(0,screen_split,get_screen_start()>>2);
-		next1 = search_video_copy(screen_split,screen_height,0);
+		next = search_video_copy(0,screen_split,get_screen_start()>>2,get_screen_start() & 3);
+		next1 = search_video_copy(screen_split,screen_height,0,0);
 
-		vga_paint_records(0,next);
-		vga_paint_records(next,next1);
+		vga_paint_records(0,next,get_screen_start() & 3);
+		vga_paint_records(next,next1,0);
 	}
 
 	clear_dirty();
@@ -2165,7 +2155,7 @@ void	ega_graph_update IFN0()
 		{
 			register	byte	*vcopy = &video_copy[get_screen_start()>>2];
 	
-			memset(vcopy,0,get_screen_length()>>2);
+			memset(vcopy,0,((get_screen_start() & 3)+get_screen_length()+3)>>2);
 			(*paint_screen)( get_screen_start(), 0, 0, bpl, get_screen_height()/get_pc_pix_height());
 		}
 		else
@@ -2173,8 +2163,9 @@ void	ega_graph_update IFN0()
 			register	int	next;
 			register	int	start_line,end_line;
 	
-			start_line = ((getVideodirty_low()<<2) - get_screen_start())/opl;
-			end_line = ((getVideodirty_high()<<2) - get_screen_start())/opl + 1;  /* changed from +2, but I'm not happy. WJG 24/5/89 */
+			/* T60: a dirty group spans four bytes and may precede screen_start. */
+			start_line = ((int)(getVideodirty_low()<<2) - get_screen_start())/opl;
+			end_line = ((int)(getVideodirty_high()<<2) + 3 - get_screen_start())/opl + 1;
 			if(start_line<0)start_line = 0;
 			if(end_line>(get_screen_height()/get_pc_pix_height()))end_line = get_screen_height()/get_pc_pix_height();
 			if(start_line < end_line)	/* Sanity check - could be drawing to another page */
@@ -2194,12 +2185,12 @@ void	ega_graph_update IFN0()
 					else
 #endif /* VGG */
 						next = search_video_copy( start_line,
-								end_line, (get_screen_start()+start_line*opl) >> 2 );
+								end_line, (get_screen_start()+start_line*opl) >> 2, get_screen_start() & 3 );
 				else
 					next = search_video_copy_aligned( start_line,
 								end_line, (get_screen_start()+start_line*opl) >> 2 );
 	
-				paint_records(0,next);
+				paint_records(0,next,get_screen_start() & 3);
 			}
 		}
 	}													/* Host updated EGA screen */
@@ -2236,11 +2227,11 @@ void	ega_wrap_graph_update IFN0()
 			register	int	offset = (EGA_PLANE_DISP_SIZE - get_screen_start());
 			register	int	left_over = offset % opl;
 			register	int	ht1 = offset / opl;
-			register	int	ht2 = get_screen_height() - ht1 - 1;
+			register	int	ht2 = (get_screen_height()/get_pc_pix_height()) - ht1 - 1;
 			register	int	quarter_opl = opl>>2;
 
-			memset(vcopy,0,offset>>2);
-			memset(&video_copy[0],0,(get_screen_length()-offset)>>2);
+			memset(vcopy,0,((get_screen_start() & 3)+offset+3)>>2);
+			memset(&video_copy[0],0,(get_screen_length()-offset+3)>>2);
 			(*paint_screen)( get_screen_start(), 0, 0, bpl, ht1 );
 
 			/*
@@ -2248,7 +2239,7 @@ void	ega_wrap_graph_update IFN0()
 			 */
 
 			if ( left_over > bpl ) {
-				(*paint_screen)( ht1*opl, 0, ht1, bpl, 1);
+				(*paint_screen)( get_screen_start()+ht1*opl, 0, ht1, bpl, 1);
 			}
 			else {
 				(*paint_screen)( get_screen_start()+ht1*opl, 0, ht1, left_over, 1);
@@ -2258,8 +2249,8 @@ void	ega_wrap_graph_update IFN0()
 			(*paint_screen)( opl-left_over, 0, ht1+1, bpl, ht2 );
 		}
 		else {
-			memset(vcopy,0,get_screen_length()>>2);
-			(*paint_screen)( get_screen_start(), 0, 0, bpl, get_screen_height() );
+			memset(vcopy,0,((get_screen_start() & 3)+get_screen_length()+3)>>2);
+			(*paint_screen)( get_screen_start(), 0, 0, bpl, (get_screen_height()/get_pc_pix_height()) );
 		}
 	}
 	else {
@@ -2279,10 +2270,10 @@ void	ega_wrap_graph_update IFN0()
 			 * Search video copy
 			 */
 
-			next = search_video_copy(0,ht1,get_screen_start()>>2);
-			next1 = search_video_copy(ht1,get_screen_height(),wrapped_bytes>>2);
+			next = search_video_copy(0,ht1,get_screen_start()>>2,get_screen_start() & 3);
+			next1 = search_video_copy(ht1+1,(get_screen_height()/get_pc_pix_height()),wrapped_bytes>>2,wrapped_bytes & 3);
 
-			paint_records(0,next);
+			paint_records(0,next,get_screen_start() & 3);
 
 			/*
 			 * paint middle line anyway 'cos its too hard to work out whats happened
@@ -2300,11 +2291,16 @@ void	ega_wrap_graph_update IFN0()
 			 * now do wrapped area
 			 */
 
-			paint_records(next,next1);
+			paint_records(next,next1,wrapped_bytes & 3);
+			/* T60: the separately painted boundary row has no dirty record. */
+			memset(&video_copy[(EGA_PLANE_DISP_SIZE-left_over)>>2],0,
+				(((EGA_PLANE_DISP_SIZE-left_over) & 3)+(left_over < bpl ? left_over : bpl)+3)>>2);
+			if (left_over < bpl)
+				memset(video_copy,0,(bpl-left_over+3)>>2);
 		}
 		else {
-			next = search_video_copy(0,get_screen_height(),get_screen_start()>>2);
-			paint_records(0,next);
+			next = search_video_copy(0,(get_screen_height()/get_pc_pix_height()),get_screen_start()>>2,get_screen_start() & 3);
+			paint_records(0,next,get_screen_start() & 3);
 		}
 	}
 

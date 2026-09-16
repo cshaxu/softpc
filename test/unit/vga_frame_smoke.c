@@ -9,6 +9,9 @@
 #include "gvi.h"
 #include "egagraph.h"
 #include "egaports.h"
+#include "egacpu.h"
+#include "config.h"
+#include "vgaports.h"
 #include "compat/dib_surface.h"
 #include "nt_graph.h"
 
@@ -62,6 +65,130 @@ extern unsigned short c_getCX(void);
 extern unsigned char Currently_emulated_video_mode;
 extern void host_timer_event(void);
 extern PC_palette *DAC;
+extern void ega_graph_update(void);
+extern void ega_split_graph_update(void);
+extern void ega_wrap_graph_update(void);
+extern void ega_wrap_split_graph_update(void);
+extern void vga_graph_update(void);
+extern void vga_split_graph_update(void);
+
+static void verify_ega_dirty_alignment(void)
+{
+    DISPLAY_GLOBS saved = PCDisplay;
+    void (*saved_paint)() = paint_screen;
+    unsigned char *surface = sc.ConsoleBufInfo.lpBitMap;
+    size_t size = (size_t)sc.PC_W_Width * sc.PC_W_Height;
+    unsigned char *complete = malloc(size);
+    int offset, i, stride, split, bank, scale;
+    int saved_split = EGA_GRAPH.screen_split.as_word;
+    int saved_bank = extensions_controller.ram_bank_select.as_bfld.counter_bank_enable;
+    assert(complete != NULL);
+    set_pc_pix_height(1);
+    set_char_height(1);
+    set_screen_height(3);
+    set_screen_length(320);
+    set_display_disabled(0);
+    paint_screen = nt_ega_hi_graph_std;
+    for (i = 0; i < 4 * EGA_PLANE_SIZE; ++i)
+        EGA_planes[i] = (unsigned char)(i * 37 + (i >> 3));
+    for (bank = 0; bank < 2; ++bank) {
+    int plane_limit;
+    extensions_controller.ram_bank_select.as_bfld.counter_bank_enable = bank;
+    plane_limit = EGA_PLANE_DISP_SIZE;
+    for (scale = 1; scale <= 2; ++scale)
+    for (stride = 80; stride <= 96; stride += 2)
+    for (split = 0; split < 6; ++split)
+    for (offset = 0; offset < 4; ++offset) {
+        void (*update)(void) = split == 5 ? vga_split_graph_update :
+            split == 4 ? vga_graph_update :
+            split == 3 ? ega_wrap_split_graph_update :
+            split == 2 ? ega_wrap_graph_update :
+            split == 1 ? ega_split_graph_update : ega_graph_update;
+        int origin = split == 2 || split == 3 ?
+            plane_limit - (split == 3 ? 1 : 2) * stride + offset : offset;
+        int columns = stride & 2 ? stride : 80;
+        paint_screen = split >= 4 ? nt_v7vga_hi_graph_std : nt_ega_hi_graph_std;
+        set_pc_pix_height(scale);
+        set_screen_height(4 * scale - 1);
+        set_bytes_per_line(columns);
+        set_offset_per_line(stride);
+        set_screen_length(stride * 4);
+        set_screen_split(2 * scale - 1);
+        set_screen_start(origin);
+        /* Independent row/address oracle, still using the real painter. */
+        memset(surface, 0xa5, size);
+        for (i = 0; i < 4; ++i) {
+            int address = (split % 2 && i >= 2 ? (i - 2) * stride :
+                origin + i * stride) % plane_limit;
+            int first = plane_limit - address;
+            if (first > columns) first = columns;
+            (*paint_screen)(address, 0, i, first, 1);
+            if (first < columns)
+                (*paint_screen)(0, first * 8, i, columns - first, 1);
+        }
+        memcpy(complete, surface, size);
+        memset(surface, 0xa5, size);
+        memset(video_copy, 1, 0x8000);
+        setVideodirty_total(20001);
+        update();
+        if (memcmp(complete, surface, size) != 0)
+            fprintf(stderr, "EGA full/oracle mismatch route %d stride %d residue %d\n", split, stride, offset);
+        assert(memcmp(complete, surface, size) == 0);
+        for (i = 0; i < columns * 4; ++i) {
+            int row = i / columns;
+            int address = ((split % 2 && row >= 2 ? (row - 2) * stride :
+                origin + row * stride) + i % columns) % plane_limit;
+            if (video_copy[address >> 2] != 0)
+                fprintf(stderr, "EGA uncleared full mark route %d stride %d residue %d address %d\n",
+                    split, stride, offset, address);
+            assert(video_copy[address >> 2] == 0);
+        }
+        memset(surface, 0xa5, size);
+        memset(video_copy, 1, 0x8000);
+        setVideodirty_low(0);
+        setVideodirty_high(0x7fff);
+        setVideodirty_total(1);
+        update();
+        if (memcmp(complete, surface, size) != 0) {
+            size_t p = 0;
+            while (complete[p] == surface[p]) ++p;
+            fprintf(stderr, "EGA dirty/full mismatch route %d stride %d residue %d, pixel %zu: %u/%u, height %d\n",
+                split, stride, offset, p, complete[p], surface[p], get_screen_height());
+        }
+        assert(memcmp(complete, surface, size) == 0);
+        /* A lone terminal group must not disappear through floor division;
+           nor may clearing a shared row mark lose its next-row coverage. */
+        for (i = 0; i < 8; ++i) {
+            int row = i / 2;
+            int address = ((split % 2 && row >= 2 ? (row - 2) * stride :
+                origin + row * stride) + (i % 2 ? columns - 1 : 0)) % plane_limit;
+            EGA_planes[address * (split >= 4 ? 1 : 4)] ^= 0xff;
+            memset(video_copy, 0, 0x8000);
+            video_copy[address >> 2] = 1;
+            setVideodirty_low(address >> 2);
+            setVideodirty_high(address >> 2);
+            setVideodirty_total(1);
+            update();
+            if (video_copy[address >> 2] != 0)
+                fprintf(stderr, "EGA uncleared sparse mark route %d stride %d residue %d address %d\n",
+                    split, stride, offset, address);
+            assert(video_copy[address >> 2] == 0);
+            memcpy(complete, surface, size);
+            setVideodirty_total(20001);
+            update();
+            if (memcmp(complete, surface, size) != 0)
+                fprintf(stderr, "EGA sparse/full mismatch route %d stride %d residue %d address %d\n",
+                    split, stride, offset, address);
+            assert(memcmp(complete, surface, size) == 0);
+        }
+    }
+    }
+    paint_screen = saved_paint;
+    PCDisplay = saved;
+    set_screen_split(saved_split);
+    extensions_controller.ram_bank_select.as_bfld.counter_bank_enable = saved_bank;
+    free(complete);
+}
 
 typedef struct {
     void (*paint)(int, int, int, int, int);
@@ -409,6 +536,7 @@ int main(void)
         assert(left == 0 && top == 0 && right == (int32_t)width - 1 &&
             bottom == (int32_t)height - 1);
     }
+    verify_ega_dirty_alignment();
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     return 0;

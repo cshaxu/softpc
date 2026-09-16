@@ -462,13 +462,16 @@ void nt_vga_med_graph_std(int offset, int screen_x, int screen_y,
      * If image partially overlaps display area clip it so we don't start
      * overwriting invalid pieces of memory.
      */
-    width = min(width, sc.PC_W_Width / 8 - screen_x);
-    height = min(height, sc.PC_W_Height / 2 - screen_y);
+    if (width > (sc.PC_W_Width >> 3) - screen_x)
+        width = (sc.PC_W_Width >> 3) - screen_x;
+    if (height > sc.PC_W_Height / 2 - screen_y)
+        height = sc.PC_W_Height / 2 - screen_y;
     width = min(width, EGA_PLANE_SIZE - offset);
     height = min(height, 1 + (EGA_PLANE_SIZE - offset - width) /
         get_offset_per_line());
-    screen_y *= 2;
-    height *= 2;
+    /* This mode doubles vertically so, multiply vertical parameters by 2. */
+    screen_y <<= 1;
+    height <<= 1;
 
     /* local_height is number of lines in video memory. */
     local_height = height >> 1;
@@ -864,8 +867,10 @@ void nt_vga_hi_graph_std(int offset, int screen_x, int screen_y,
      * If image partially overlaps display area clip it so we don't start
      * overwriting invalid pieces of memory.
      */
-    width = min(width, max_width - screen_x);
-    height = min(height, sc.PC_W_Height - screen_y);
+    if (width > max_width - screen_x)
+        width = max_width - screen_x;
+    if (height > sc.PC_W_Height - screen_y)
+        height = sc.PC_W_Height - screen_y;
     width = min(width, EGA_PLANE_SIZE - offset);
     height = min(height, 1 + (EGA_PLANE_SIZE - offset - width) /
         get_offset_per_line());
