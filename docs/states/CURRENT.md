@@ -6,7 +6,8 @@ T60 is closed after owner manual acceptance and the whole-task audit.
 T61 is closed on owner direction after the [whole-task audit](../history/M9-T61-completion-audit.md).
 T62 is closed on owner direction after the
 [whole-task audit](../history/M9-T62-completion-audit.md).
-M9 T63 S1 is active: snapshot feasibility audit and product/engineering design.
+M9 T63 S1 is closed after the [design review](../history/M9-T63-S1-machine-snapshots.md).
+M9 T63 S2 is active: field inventory and recoverable pause boundary audit/proof.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
 T62 closure was pushed in 54b2009 before T63 admission. The three older
 candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.md).
@@ -201,23 +202,23 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
   P discipline, path accounting, and build hygiene now match the relevant
   NXVM governance standard. [Record](../history/M9-Td-S9-execution-closure-quality.md)
 
-## M9 T63 S1 Packet
+## M9 T63 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner requests audit, product/engineering proposal and admission; subsequently authorizes T62 closure, pushed first in 54b2009. |
-| Objective | Audit existing pause/state/media owners; design a consistent single-file save/load contract and bounded S sequence. |
-| Non-goals | No snapshot implementation, MVDM or shared API edit, changed EXE, media mutation or claimed restore success in S1. |
-| Reference Baseline | ea7e982 production; 54b2009 predecessor closure. Existing x86/x64 binaries and evidence remain T62. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner requests snapshot task admission and continued research after T62 closure. S1 design cf2d979 reviewed; begin S2 with source inventory before code. |
+| Objective | Enumerate selected mutable state and all pause entries; prove a recoverable executor and timer boundary before any snapshot payload work. |
+| Non-goals | No save/load CLI or container yet; no second executor, process dump, changed device semantics or user media. No NTVDM-only hook repair. |
+| Reference Baseline | ea7e982 production; cf2d979 design; existing fixed x86/x64 EXEs unchanged by S1. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
-| Files And ABI Surface | This packet, Queue, proposal and S1 history on closure; future source boundaries are audited, not changed. |
+| Files And ABI Surface | First inventory CMake-selected MVDM/Compat/VM and Common boundaries. Candidate narrow pause edits: common/machine, vm/driver, compat/platform and ccpu lifecycle, original c_main safe points. Record exact field/file and original-diff estimate before editing. |
 | Applicable Rules | docs/rules/EXECUTION.md and DOCUMENT.md; design/ARCHITECTURE.md, CODING.md, UI.md; referenced execution, architecture and documentation skills. |
-| Verification | Inspect actual Common pause/rendezvous, CCPU entry/HLT/nesting, FPU, SAS/GDP, quick events, Compat timer/media and Lib storage interfaces; documentation gate and git diff check; actual-commit review. |
-| Expected Markers | Explicit safe-boundary gate, fixed state-ledger universe, one binary file, direct/readonly no payload, both overlays included, no second executor, conservative load failure semantics. |
-| Asset Needs | None; no runtime captures or media access. |
-| Reporting Requirements | Explain known blockers versus proven facts, each S boundary and preliminary churn; S1 production/test delta zero. |
-| Stop Conditions | Unknown state remains explicitly S2 work; do not claim field completeness or deploy save/load. Any change of media or original machine semantics beyond proposal needs review. |
-| Exit Criteria | Request-to-design audit, all identified state domains assigned, ordered proof gates, documentation checks and pushed design delivery; no runtime acceptance claimed. |
+| Verification | Field ledger and caller sweep; controllable timer/entry barriers, normal/HLT/debug/nested pause reentry tests; if code changes, fixed x86/x64 package builds and full CTest plus focused machine/lifecycle tests and manifest/boundary gates. Documentation gate and actual-commit review. |
+| Expected Markers | No unclassified selected state, no persisted C stack, no extra guest execution after paused, no timer accumulation during capture, one executor. |
+| Asset Needs | No user media mutation. Any later runtime probe uses owned disposable build children with declared size/time/cleanup before execution; none created in S1. |
+| Reporting Requirements | Before code report exact files/ABI and estimated churn; after proof report production/test numstat and original mirror diff separately, tests and both EXE links. |
+| Stop Conditions | Unrepresentable native continuation or required wider product change: report and revise before editing; no force-unwind that drops guest work, no repeated polling or guest reset substitute. |
+| Exit Criteria | Complete selected-state ledger and proven recoverable pause/timer boundary; no change to ordinary lifecycle semantics; required dual-width evidence, commit/push and independent actual-change review. |
 | Original Owner Request | Pause must preserve all runtime state consistently; audit/design/admit snapshots for installation reproduction; one binary file, direct/readonly references, FDD/HDD overlay state. Verbatim in proposal. |
-| Similar-Issue Sweep | Inspect CPU/FPU/memory/video/input/controllers/timers/media/host resources, not RAM-only; every unknown retained as an explicit S2 ledger obligation. |
+| Similar-Issue Sweep | Every executor callback caller including nested host_simulate and HLT, timer producer/consumer and queued input; classify CPU/FPU/memory/video/controllers/media/host resources as save, rebuild, external or unselected with evidence. |
