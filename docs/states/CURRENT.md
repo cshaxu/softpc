@@ -3,30 +3,31 @@
 ## Current Work
 
 T60 is closed after owner manual acceptance and the whole-task audit.
-M9 T61 S1-S7 are closed; S7 delivered the reviewed ownership audit da32558.
-T61 remains open; owner admits S8 and the serial follow-up plan.
+M9 T61 S1-S8 are closed; S8 implementation 258e1f7 removes 110 net production
+lines with dual-width 98/98 and actual-commit 5/5 checks. T61 remains open;
+S9 is admitted under the owner's serial follow-up plan.
 The three queued candidates are unchanged.
 
-## M9 T61 S8 Packet
+## M9 T61 S9 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner approves decomposition and implementation; single-person dual-role; permanent push authorization. |
-| Objective | Remove six uncalled host helpers and consolidate local keyboard/floppy/HDD duplication without changing machine semantics. |
+| Objective | Retire test-maintained obsolete status/font interfaces, unused presentation field and unselected PIG header while preserving meaningful production-path coverage. |
 | Non-goals | No mirror, Lib/Common/shared-test change, header ABI unification, ownership migration, new source import or behavior change. |
-| Reference Baseline | SoftPC da32558; S7 audit and S6 verified dual-width packages. |
+| Reference Baseline | SoftPC 258e1f7; S7 audit and S8 verified dual-width packages. |
 | Candidate Proposal | [Remaining mirror and support ownership audit](../proposals/m9-mirror-support-ownership-audit.md); original requests remain in the retained T61 plan. |
-| Files And ABI Surface | Compat dib_surface.c/.h, keyboard.c, memory.c, machine.c and hdd_media.c; focused product tests only as necessary. Remove unused internal declarations, preserve all live host callbacks. |
+| Files And ABI Surface | Compat status.h, machine.c/.h, video.c, ccpu/legacy/PigReg_c.h; product tests and CMake references. No public Common/Lib ABI change. |
 | Applicable Rules | Execution, Document, Architecture, Coding, source-research policy and their governance skills. |
-| Verification | Whole-tree caller census; build tests-x86/tests-x64; full test-x86/test-x64; input, media, palette and restart checks; documentation gate and diff-check. |
-| Expected Markers | No removed live callback, unchanged mirror/shared corpora, one local operation for each deduplicated action. |
+| Verification | Caller/conditional-build census; replacement shutdown coverage and dual-font VGA checks; build tests-x86/tests-x64 and full test-x86/test-x64; documentation gate and diff-check. |
+| Expected Markers | No obsolete API consumers, no weakened production-path tests, unchanged mirror/shared corpora; retain any independently necessary contract with evidence. |
 | Asset Needs | Refresh both fixed EXEs; preserve user INI/media; use existing ignored build trees. |
 | Reporting Requirements | Exact production/test added/deleted/net lines, retained owners, test counts and any failure; no claim of manual GUI acceptance. |
-| Stop Conditions | A live consumer or unequal behavior blocks deletion; do not pull S9-S12 into S8. |
+| Stop Conditions | A required independent contract blocks deletion; do not pull header layout, ownership or geometry changes into this cleanup. |
 | Exit Criteria | Dual-width builds/full tests and actual-commit review pass; committed/pushed complete delivery, clean tree; T61 stays open. |
 | Original Owner Request | 请拆解一下S任务 并更新当前proposal记录 然后开始准入执行。 |
-| Similar-Issue Sweep | S7 A2/A4 candidate set; search all src/test/tools/CMake consumers; test-only shells belong to S9, header duplication to S10, ownership/geometry to S11-S12. |
+| Similar-Issue Sweep | S7 A3 candidates, all production/test/build consumers; distinguish useful test seams from obsolete production wrappers. S10-S12 remain separate. |
 
 ## Current Technical Baseline
 
