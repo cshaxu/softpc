@@ -101,3 +101,22 @@ No D6 decoding, media, INI or protected shared corpus changed. Unattributed
 trailing-blank-line edits in 18 comms/video mirror files remain outside this
 delivery; they are not necessary FPU changes and are not staged or discarded.
 Executor evidence is complete; actual-commit review is required for closure.
+
+## Coordinator actual-commit review
+
+Reviewed pushed 64d26a0, the two FPU hunks, real instruction probes and both
+package hashes. Original conversion shifts, overflow handling, instruction
+dispatch and backend remain; no new production state or alternate path exists.
+The FPU file versus original OpenNT is +12/-6 (line endings ignored), including
+pre-T60 differences; S7 itself is +10/-5. Product test is +90/-7.
+Post-commit command-provider/layout/package checks pass 3/3 at both widths
+(x64 5.51 s, x86 5.64 s). Full results and bounded limitations are above.
+S7 meets its assessment/repair exit criteria and closes.
+
+Owner subsequently requested "请一起提交": the 18 previously unattributed
+comms/video files are included in the closure commit. Their entire difference
+is deletion of 21 trailing blank lines, confirmed by git diff
+--ignore-blank-lines --exit-code. They are owner-approved whitespace changes,
+not necessary correctness fixes or evidence of smaller original-source diff.
+Disposable types-layout test fixtures were removed; build trees, INI and media
+were preserved. T60 remains open for owner acceptance of the delivered builds.

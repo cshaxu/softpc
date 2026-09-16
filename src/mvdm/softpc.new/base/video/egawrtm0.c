@@ -1364,4 +1364,3 @@ ega_mode0_chn_w_write IFN2(ULONG, value, ULONG, offset )
 #endif
 
 #endif	/* !(NTVDM && MONITOR) */
-

@@ -3457,4 +3457,3 @@ void ega_set_line_compare IFN1(int, lcomp_val)
 #endif /* HUNTER */
 #endif /* EGG */
 #endif /* REAL_VGA */
-

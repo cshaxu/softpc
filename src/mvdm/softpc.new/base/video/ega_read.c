@@ -1000,4 +1000,3 @@ ega_read_term IFN0()
 #endif /* EGG */
 
 #endif	/* !(NTVDM && MONITOR) */
-

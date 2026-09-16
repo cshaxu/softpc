@@ -2,36 +2,20 @@
 
 ## Current Work
 
-T60 S1-S6 are closed after actual-commit review. T60 remains open under the
-owner-approved continuing goal; S7 is next in the
-[reference-repair plan](../history/M9-T60-reference-repairs-proposal.md).
-T60 S7 is active under that continuing goal. S6 retains D6 BOP: the owner
-rejected SALC substitution and equivalent compatibility-breaking changes.
-Lib/Common and their shared tests/manifests remain protected: changes need
-separate owner approval throughout T60. The other queue candidates retain order.
+No implementation subtask is active.
+Open task awaiting owner: T60.
 
-## M9 T60 S7 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner-admitted T60 serial plan and continuing goal; single-person executor/coordinator. |
-| Objective | Assess the existing FPU for bounded correctness faults versus retained representation limits. |
-| Non-goals | No shared-corpus edits, new renderer, global alignment owner or opportunistic MVDM refactor. |
-| Reference Baseline | S5 executable baseline 3dbaf32 and S6 decision 2da47d4; read-only NTVDMx64 84a13d2 and original OpenNT. |
-| Candidate Proposal | [FPU assessment](../proposals/m9-fpu-reference-assessment.md). |
-| Files And ABI Surface | Existing fpu/zfrsrvd implementation, retained x87 layouts and product tests; assessment first. |
-| Applicable Rules | Architecture, Coding, Execution, Document; source-research policy and governance skills. |
-| Verification | Finite/rounding/range/special-value/layout evidence; serial full x86/x64 suites and EXEs for code changes. |
-| Expected Markers | Confirmed faults distinguished from representation limits without claiming full x87 equivalence. |
-| Asset Needs | Existing product fixtures; no guest media or INI changes. |
-| Reporting Requirements | Original-source diff necessity, complete finite ledger, exact dual-width proof and actual-commit review. |
-| Stop Conditions | No replacement FPU, x86-only backend, shared-corpus edits or compatibility-breaking substitution. |
-| Exit Criteria | Focused and full proofs, executor commit/push, coordinator actual-diff review and closure commit/push. |
-| Original Owner Request | Execute the admitted ntvdmx64 reference-guided MVDM repairs; preserve minimum original-code diff. |
-| Similar-Issue Sweep | Arithmetic, rounding, integer conversion, range/precision, special values and saved layouts. |
+S1-S7 are closed after actual-commit review. The delivered dual-width packages
+await owner acceptance; T60 is not closed. S6 retains D6 BOP under the owner's
+explicit rejection of compatibility-breaking substitution. Lib/Common and their
+shared tests/manifests are unchanged. Queue order remains unchanged.
 
 ## Current Technical Baseline
+
+- T60 S7 repairs FIST64 rounding and its representation read, without replacing
+  the FPU. Implementation 64d26a0 passed 97/97 on each width, five repeated
+  command-provider runs per width and post-commit 3/3 per width. Both fixed EXEs
+  are refreshed. [S7 evidence](../history/M9-T60-S7-fpu-assessment.md).
 
 - T60 S6 closes as non-adoption: D6 BOP and C4/C4 BOP remain unchanged on owner
   decision. [Assessment](../history/M9-T60-S6-d6-bop-contract.md). No new EXEs.

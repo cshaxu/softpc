@@ -2354,4 +2354,3 @@ int get_scanlines IFN0()
 }
 
 #endif /* EGG */
-

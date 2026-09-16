@@ -1216,4 +1216,3 @@ ega_mode2_chn_w_move IFN4(ULONG, ead, ULONG, eas, ULONG, count,
 #endif
 
 #endif	/* !NTVDM | (NTVDM & !X86GFX) */
-

@@ -240,5 +240,3 @@ void printer_bop_openclose(int func)
 #endif
 }
 #endif
-
-

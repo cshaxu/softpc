@@ -1488,4 +1488,3 @@ GLOBAL void setup_vga_globals IFN0()
 }
 #endif	/* not EGG or C_VID or A_VID */
 #endif	/* !NTVDM | (NTVDM & !X86GFX) */
-

@@ -573,4 +573,3 @@ boolean	choose_vga_display_mode()
 
 #endif /* EGG */
 #endif /* REAL_VGA */
-

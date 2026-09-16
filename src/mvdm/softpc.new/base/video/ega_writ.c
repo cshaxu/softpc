@@ -859,4 +859,3 @@ ega_write_routines_update IFN1(CHANGE_TYPE, reason )
 #endif /* EGG */
 
 #endif	/* !(NTVDM && MONITOR) */
-

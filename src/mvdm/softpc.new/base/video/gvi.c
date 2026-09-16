@@ -339,4 +339,3 @@ void gvi_term IFN0()
     term_gore_update();
 #endif /* GORE */
 }
-

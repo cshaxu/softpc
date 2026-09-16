@@ -45,4 +45,3 @@ def_dummy(int,get_ega_switch_setting,return 0)
 #endif /* EGG */
 
 #endif	/* !NTVDM | (NTVDM & !X86GFX) */
-

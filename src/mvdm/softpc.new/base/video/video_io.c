@@ -68,4 +68,3 @@ void video_io()
 	(*video_func[getAH()])();
     }
 }
-

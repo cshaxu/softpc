@@ -834,5 +834,3 @@ GLOBAL void printer_psflush_change IFN2(
             host_lpt_enable_autoflush(adapter);
 }
 #endif	/* PS_FLUSHING */
-
-
