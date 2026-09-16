@@ -5,8 +5,7 @@
 T60 is closed after owner manual acceptance and the whole-task audit.
 M9 T61 S1-S13 are closed. The [S13 convergence review](../history/M9-T61-S13-ownership-convergence.md)
 completes the admitted ownership cleanup. T61 remains unclosed pending owner acceptance.
-Open task awaiting owner: T61.
-M9 T62 S1 is active: bounded Common/Lib simplification, in four serial steps.
+M9 T62 S1 is closed; S2 is active: embed Machine's private input queue.
 The three queued candidates are unchanged.
 
 ## Current Technical Baseline
@@ -18,26 +17,26 @@ The three queued candidates are unchanged.
   [final ledger](../etc/evidence/softpc/pristine-divergence-current.md#s13-最终归属复核).
   Lib/Common and shared tests unchanged; T61 awaits owner acceptance.
 
-## M9 T62 S1 Packet
+## M9 T62 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
+| Identifier Mode | Continuation |
 | Admission And Approval | Owner admits four serial S tasks, automatic next admission, dual EXEs, tests and permanent push permission. |
-| Objective | Consolidate Session emergency fault storage and delivery without changing class priority or first-failure behavior. |
-| Non-goals | No public ABI, normal FIFO, pressed-key, broker, VM, Compat or MVDM changes. |
-| Reference Baseline | 58d3d75; clean worktree; existing full suites 98/98 each width. |
+| Objective | Embed the Machine-owned fixed input queue; keep mutex and FIFO semantics with no second allocation. |
+| Non-goals | No public API, queue capacity, Session, Lib, App, VM, Compat or MVDM changes. |
+| Reference Baseline | dce462e S1 implementation; full suites 99/99 each, post-commit 6/6 each. |
 | Candidate Proposal | [Bounded simplification](../proposals/m9-common-lib-simplification.md). |
-| Files And ABI Surface | common/session/control.c, focused shared tests, manifests and fixed EXEs; public ABI unchanged. |
+| Files And ABI Surface | common/machine/input_queue.c/h, machine.c, shared/product test consumers, manifests and fixed EXEs; only private queue lifecycle changes. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding rules; design Architecture/Coding/UI; four linked governance skills. |
-| Verification | Allocation-failure deterministic test; full test-x64/test-x86; manifests/corpus/DAG; documentation governance; post-commit focused checks. |
-| Expected Markers | Two reserved fault classes, first failure retained, normal FIFO then KVM fault then control fault, no allocation during latch. |
+| Verification | Queue capacity/wrap/FIFO/clear/reuse and lifecycle regressions; full test-x64/test-x86; manifests/corpus/DAG; governance; post-commit focused checks. |
+| Expected Markers | One Machine allocation owns queue storage, mutex disposed on partial create and shutdown, no queue heap allocation, 255 effective capacity unchanged. |
 | Asset Needs | Refresh assets/binary/softpc32.exe and softpc64.exe only; preserve INI/media. Existing preset build trees only. |
 | Reporting Requirements | Pre-plan estimate and post-result production/test/build numstat; evidence, pushed P and clean workspace. |
-| Stop Conditions | Any lost failure class, changed priority, new abstraction layer or product behavior change. |
+| Stop Conditions | Changed ordering/capacity, public ABI, product behavior or added allocation wrapper. |
 | Exit Criteria | Both widths build/pass full suite; focused failure proof; manifests/gates pass; implementation pushed and actual-diff coordinator review complete. |
 | Original Owner Request | Original request retained verbatim in linked proposal; each finding becomes its own S, automatically continue after closure, T remains open for owner test. |
-| Similar-Issue Sweep | Session queue latch/take/error records; preserve independent Machine bounded queue and KVM mailbox contracts. |
+| Similar-Issue Sweep | All queue create/destroy callers, Machine partial-create/shutdown; retain separately owned frames and platform primitives. |
 
 - T61 S6 implementation 4f7171d completes the 498-file original-diff audit:
   403 identical, 95 divergent; +23,141/-22,335, 5,132 hunks. Comparable original
