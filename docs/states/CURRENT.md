@@ -2,36 +2,19 @@
 
 ## Current Work
 
-T60 S3 is active under the owner-approved continuing goal.
-S1 and S2 are closed after actual-commit review; S3 follows the
+T60 S1-S3 are closed after actual-commit review. T60 remains open under the
+owner-approved continuing goal; S4 is next in the
 [reference-repair plan](../history/M9-T60-reference-repairs-proposal.md).
-T59 remains closed; the other three queue candidates retain order.
+No implementation subtask is active.
 Lib/Common and their shared tests/manifests remain protected: changes need
-separate owner approval throughout T60.
-
-## M9 T60 S3 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner-approved T60 finite plan and continuing execution goal, single-person executor/coordinator roles. |
-| Objective | Preserve exact EGA source addresses through dirty rendering, including split and wrap. |
-| Non-goals | No Lib/Common changes, global alignment state, new renderer, panning or FPU work. Preserve original MVDM structure; minimize original-source diff, not net line count. |
-| Reference Baseline | SoftPC 06b267e; read-only NTVDMx64 84a13d2 and original OpenNT. |
-| Candidate Proposal | [Dirty-address repair](../proposals/m9-ega-dirty-address.md). |
-| Files And ABI Surface | Original gfx_updt.c private address conversion and product VGA regression; no public ABI change. |
-| Applicable Rules | Architecture, Coding, Execution, Document; source/research policy; governance skills. |
-| Verification | Red/green full-versus-dirty pixels and source address checks; dual-width full suites and fixed EXEs; governance and protected-path diff. |
-| Expected Markers | Modulo-four, split-base and wrap-base cases agree with complete source coordinates. |
-| Asset Needs | Existing embedded inputs; disposable existing VGA test image under build; no media/config changes. |
-| Reporting Requirements | Exact defects, bounded same-class ledger, test evidence, production/test line delta and actual-commit review. |
-| Stop Conditions | Shared-corpus change, unapproved source import or new ownership requires owner decision. |
-| Exit Criteria | Focused and full dual-width proof, executor commit/push then coordinator actual-diff review and closure commit/push. |
-| Original Owner Request | 单人双角色模式执行 ntvdmx64 softpc 补丁导入mvdm任务; Lib/Common changes require separate approval. |
-| Similar-Issue Sweep | Every search_video_copy variant, paint_records caller, split/wrap source origin and mark-clearing unit in gfx_updt.c; owner-directed minimum-original-diff review also covers committed T60 S1/S2. |
+separate owner approval throughout T60. The other queue candidates retain order.
 
 ## Current Technical Baseline
 
+- T60 S3 preserves dirty source addresses and corrects split/wrap boundaries
+  within the original update entries. Both widths pass the 864-configuration
+  matrix, 97/97 full suites and 3/3 post-commit checks. Fixed EXEs match
+  6931729; shared corpora are unchanged. [S3 review](../history/M9-T60-S3-dirty-address.md).
 - T60 S2 bounds the seven selected EGA/VGA painters before pointer arithmetic
   and loops. Its 91-case pixel/canary matrix and full 97/97 suites pass at both
   widths; post-commit focused tests pass 3/3 each. Fixed EXEs are refreshed.

@@ -1,6 +1,6 @@
 # EGA dirty source-address preservation
 
-T60 S3 implements the [admitted plan](../history/M9-T60-reference-repairs-proposal.md)
+T60 S3 implements the [admitted plan](M9-T60-reference-repairs-proposal.md)
 against 06b267e. Original request and protected shared-corpus boundary remain
 those recorded there; CURRENT alone owns active state.
 
@@ -194,3 +194,29 @@ command starts x86 only after successful x64 completion. An earlier pair of
 overlapping successful runs was not used as the required serial proof.
 Documentation governance and whitespace checks pass. S3 executor delivery is
 ready; coordinator actual-commit review and closure remain separate.
+
+## Coordinator actual-commit review
+
+Reviewed pushed 6931729 against 06b267e and the owner minimum-original-diff
+correction. Byte and paired-row searches include every intersecting mark;
+paint and clear use matching units. Split lower records are collected before
+upper marks are cleared. The wrap+split helper renders all affected upper
+rows before clearing their shared marks. The aligned implementation, original
+record layout, merge loops and six public update entries remain. Screen
+heights are converted to source rows consistently, including double scanning.
+
+The product fixture uses actual original painters, independently calculates
+row source origins and compares whole surfaces: 864 configurations and 8,640
+full-surface comparisons, plus sparse/full mark-clearing assertions and the
+retained S2 guard matrix. It restores the fixture's original global state.
+The selected even-stride, single/double-scanline contract is proved; this is
+not a claim of arbitrary historical build variants or panning coverage.
+
+Post-commit VGA frame, runtime cursor and package checks pass 3/3 on each
+width (5.95 s / 6.49 s). Final serial full-suite proof is 97/97 each. Shared
+roots and configuration/media have zero diff. S1/S2 minimum-diff review is
+recorded above; no additional unrelated cleanup is admitted. Owned temporary
+types-layout fixtures were removed without touching build trees or user data.
+
+S3 is closed. This governance P changes documentation only. T60 remains open
+for S4-S7; the continuing goal does not treat this closure as whole-task proof.
