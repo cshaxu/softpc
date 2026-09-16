@@ -30,6 +30,7 @@ function(common_test source)
 endfunction()
 
 common_test(sync common-session)
+common_test(session_queue_failure common-session)
 common_test(presentation_plan common-session)
 common_test(reconciler common-session)
 common_test(control_state_matrix common-session)

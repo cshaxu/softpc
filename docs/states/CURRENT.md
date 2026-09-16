@@ -4,9 +4,9 @@
 
 T60 is closed after owner manual acceptance and the whole-task audit.
 M9 T61 S1-S13 are closed. The [S13 convergence review](../history/M9-T61-S13-ownership-convergence.md)
-completes the admitted ownership cleanup. No implementation subtask is active.
-T61 remains open for owner manual testing and explicit task closure.
+completes the admitted ownership cleanup. T61 remains unclosed pending owner acceptance.
 Open task awaiting owner: T61.
+M9 T62 S1 is active: bounded Common/Lib simplification, in four serial steps.
 The three queued candidates are unchanged.
 
 ## Current Technical Baseline
@@ -17,6 +17,27 @@ The three queued candidates are unchanged.
   Fixed EXEs remain S12 e2ef91f, hashes in the
   [final ledger](../etc/evidence/softpc/pristine-divergence-current.md#s13-最终归属复核).
   Lib/Common and shared tests unchanged; T61 awaits owner acceptance.
+
+## M9 T62 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner admits four serial S tasks, automatic next admission, dual EXEs, tests and permanent push permission. |
+| Objective | Consolidate Session emergency fault storage and delivery without changing class priority or first-failure behavior. |
+| Non-goals | No public ABI, normal FIFO, pressed-key, broker, VM, Compat or MVDM changes. |
+| Reference Baseline | 58d3d75; clean worktree; existing full suites 98/98 each width. |
+| Candidate Proposal | [Bounded simplification](../proposals/m9-common-lib-simplification.md). |
+| Files And ABI Surface | common/session/control.c, focused shared tests, manifests and fixed EXEs; public ABI unchanged. |
+| Applicable Rules | Execution, Documentation, Architecture, Coding rules; design Architecture/Coding/UI; four linked governance skills. |
+| Verification | Allocation-failure deterministic test; full test-x64/test-x86; manifests/corpus/DAG; documentation governance; post-commit focused checks. |
+| Expected Markers | Two reserved fault classes, first failure retained, normal FIFO then KVM fault then control fault, no allocation during latch. |
+| Asset Needs | Refresh assets/binary/softpc32.exe and softpc64.exe only; preserve INI/media. Existing preset build trees only. |
+| Reporting Requirements | Pre-plan estimate and post-result production/test/build numstat; evidence, pushed P and clean workspace. |
+| Stop Conditions | Any lost failure class, changed priority, new abstraction layer or product behavior change. |
+| Exit Criteria | Both widths build/pass full suite; focused failure proof; manifests/gates pass; implementation pushed and actual-diff coordinator review complete. |
+| Original Owner Request | Original request retained verbatim in linked proposal; each finding becomes its own S, automatically continue after closure, T remains open for owner test. |
+| Similar-Issue Sweep | Session queue latch/take/error records; preserve independent Machine bounded queue and KVM mailbox contracts. |
 
 - T61 S6 implementation 4f7171d completes the 498-file original-diff audit:
   403 identical, 95 divergent; +23,141/-22,335, 5,132 hunks. Comparable original
