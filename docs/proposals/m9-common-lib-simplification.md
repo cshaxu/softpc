@@ -105,3 +105,26 @@ Both preset builds and fixed EXEs refreshed. Full x64 101/101 (84.96s), x86
 four injected failures, >4 GiB counts on both widths, empty/hole files and
 nonzero position restoration, including controlled Linux platform calls.
 Manifests, corpus/DAG and documentation gates passed. INI/media unchanged.
+
+## S4 executor delivery
+
+Baseline 6a60759. Four production C/H paths +85/-71 = +14, primarily moving
+66 lines of event processing to the component root, not deleting behavior.
+Two test C paths +10/-1 = +9; no build graph changes. Root now owns the same
+keyboard normalizer and mouse baseline; native worker creation/join and button
+mask translation stay in platform. Private declarations connect these owners;
+no new public API, queue, callback path or state machine. Existing worker
+storage remains platform-owned to preserve startup/join failure handling.
+Mouse positions use existing lib_i32 copied fields, preserving native COORD
+values and X8/Y16 scaling. The first compile caught a nonexistent lib_i16 name;
+it was replaced with the existing copied type before final verification.
+
+Both builds and fixed EXEs refreshed. Full x64 101/101 (61.73s), x86 101/101
+(63.32s); strict standalone Lib build and strict Linux placeholder object
+compilation passed. No Linux runtime support is claimed. Existing tests prove
+keyboard/text equivalence, reset before input, activation/pending frame and
+callback retirement barriers; added checks prove button translation/source
+identity and unchanged mouse baseline/scale. Search covers every production
+event receiver and button decoder: one root receiver and one selected platform
+decoder, with no platform event-dispatch duplicate. Public interface hashes,
+Common, App, VM, Compat, MVDM, INI and media are unchanged in S4.
