@@ -249,7 +249,6 @@ target_compile_definitions(softpc-machine-compat PRIVATE
 target_include_directories(softpc-ccpu-core PRIVATE
     src/compat/ccpu
     src/compat/cvidc
-    src/compat/ccpu/legacy
     src/compat
     src/mvdm/softpc.new/host/inc
     src/mvdm/softpc.new/base/inc
@@ -260,7 +259,6 @@ target_include_directories(softpc-machine-devices PRIVATE
     src/compat
     src/compat/ccpu
     src/compat/cvidc
-    src/compat/ccpu/legacy
     src/mvdm/softpc.new/host/inc
     src/mvdm/softpc.new/base/inc
     src/mvdm/softpc.new/base/ccpu386
@@ -268,7 +266,6 @@ target_include_directories(softpc-machine-devices PRIVATE
 target_include_directories(softpc-machine-compat PRIVATE
     src/compat/ccpu
     src/compat/cvidc
-    src/compat/ccpu/legacy
     src/compat
     src/mvdm/softpc.new/host/inc
     src/mvdm/softpc.new/base/inc
@@ -284,7 +281,6 @@ target_sources(softpc-machine PRIVATE $<TARGET_OBJECTS:softpc-machine-compat>)
 target_include_directories(softpc-machine PRIVATE
     src/compat/ccpu
     src/compat/cvidc
-    src/compat/ccpu/legacy
     src/compat
     src/mvdm/softpc.new/host/inc
     src/mvdm/softpc.new/base/inc

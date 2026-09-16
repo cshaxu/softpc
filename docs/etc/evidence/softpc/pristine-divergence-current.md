@@ -675,3 +675,54 @@ tests-x64/tests-x86 构建通过；test-x64 98/98（85.73s），test-x86 98/98
 
 自动证据不替代人工 GUI 验收。仅删除本 S 的三份临时构建/测试日志；保留
 已有构建树，owner INI 原样提交。
+
+## S10 实施前审计
+
+基线 754d226（S9 交付 1b43329）。无文件/功能搬迁；删除 Compat legacy 的
+gdpvar.h 702 行和 sas4gen.h 881 行，复用已保留 C-VID 原头。预计生产净减
+1580–1590 行（另有 CMake 四处 include 路径删除）；测试预计增加小型静态
+约束，不改变共享测试。镜像不增加 ABI 槽：sascdef.c 三个零扩展槽无调用者，
+恢复原始结尾可消除该文件全部 +4/-1 差异；cpu4gen.h/ev_glue.c 只调整已有
+include 的精确选择，不新增替代头或改变全局 include 顺序。
+
+全树 sas_touch/VirtualiseInstruction/IsPageInstanceData 的 C 实现命中仅为
+sascdef 的三个空初始化；不是被其他目标使用的函数表扩展。GDP 两副本仅末尾
+额外 universe/trace/size 宏不同；native-width gdp_slots 覆盖实际访问，必须
+比较两宽度预处理结果后才能认定等价。CCPU vglob 的本目录原头仍保留，
+不能误删不同历史布局。GDP_SIZE/GDP_PTR/SET_GLOBAL_CurrentUniverse 无代码
+调用者；保留现有 gdp_slots 和 gdp_state 的实际宽度转换，不以净减行数撤销。
+临时预处理证据只写本 S 的 build/s10-proof，比较结论入本账后删除该目录。
+
+### S10 实际交付
+
+删除两个重复头（1583 行），CMake 删除四处 legacy include 路径；cpu4gen
+明确选择已保留 C-VID 原头，ev_glue 恢复原始本目录 include；gdp_slots 和
+gdp_state 不变。sascdef 去掉三个空扩展槽，文件 SHA256 与 OpenNT 相同：
+`84EE9572F45AD66AD2A23A9DCA01407E6E0D4FC25FDD2474A1BDE8A53CBE8474`。
+没有新镜像文件、结构槽或 ABI 适配层，没有功能搬迁。
+
+双宽度生产参数预处理 ev_glue/vglob/c_main/sascdef：前两者完整展开文本
+逐字节相同；后两者只删除三组未使用 SAS 类型/字段、两个未使用声明及
+三个零初始化。GLOBAL_* 展开均相同；只有无消费者的 GDP_SIZE/GDP_PTR/
+SET_GLOBAL_CurrentUniverse 定义减少/恢复。vglob 本目录历史 GDP 不变。
+252 个当前机器翻译单元的依赖文件核对：57 个选择 C-VID GDP、1 个选择
+CCPU 本目录 GDP，54 个选择同一个原始 SAS。旧构建目录里的 src/host 残留
+依赖文件不算当前编译输入。SasSetPointers 只有原始 sas_init 调用，按同一个
+struct SasVector 大小复制 cSasPtrs；不存在外部二进制 ABI 消费者。
+
+`git diff 754d226 --numstat -- src CMakeLists.txt test`：五个生产源码路径
++3/-1589，净 -1586；构建 -4，总净 -1590，符合估算；测试门禁 +8/-0。
+新增门禁拒绝 Compat GDP/SAS 副本和 legacy include 路径，既有视频/内存
+测试不减弱。Lib/Common 与共享测试零改动。原始镜像最终复算：498 个保留
+文件，404 一致、94 不同；+23137/-22334、5131 区块。较 S9 减少 5 行
+增删差异、1 个区块、1 个不同文件；不是把副本行数算成镜像 diff 减少。
+
+双宽度构建通过，全套 x86 98/98（78.70s）、x64 98/98（82.30s）。
+预处理诊断脚本初版未识别 CMake UNINITIALIZED compiler cache、参数组合
+有误，修正后完成比较；没有生产测试失败。最终仅恢复原始 include 注释
+后再次构建两宽度，行为 token 不变。固定 EXE SHA256：
+- x86 `8A484AC12F2D2F106D6E87665AE5F0A96E9E7B5F308EC8EEB16C699486736F23`
+- x64 `72FA31AFC1AA420B0417BA11E7026E3A52C174CE99DD1AB45759936BB3BC7AD5`
+
+测试自有媒体自行清理；本 S 预处理目录/脚本及日志在记录后删除，既有
+build 树保留；INI 未修改。自动验证不等于用户 GUI 验收。

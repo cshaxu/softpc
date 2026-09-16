@@ -514,6 +514,14 @@ foreach(source IN LISTS app_shutdown_sources)
     endforeach()
 endforeach()
 
+# GDP/SAS vocabulary comes from the retained original headers, never a copy.
+file(GLOB_RECURSE duplicate_original_headers
+    "${SOFTPC_SOURCE_DIR}/src/compat/gdpvar.h"
+    "${SOFTPC_SOURCE_DIR}/src/compat/sas4gen.h")
+if(duplicate_original_headers OR build_definition MATCHES "compat/ccpu/legacy")
+    message(FATAL_ERROR "Compat duplicates original GDP/SAS declarations")
+endif()
+
 # M8 T1: test tiers are an input boundary, not merely a CTest convention.
 # Unit fixtures may write their tiny disk bytes under build/, but neither their
 # source nor their resource scripts may name product artifacts. Integration is

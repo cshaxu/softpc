@@ -6,7 +6,7 @@
 #ifndef _CPU4GEN_H_
 #define _CPU4GEN_H_
 
-#include <gdpvar.h>	/* For direct access getAX() etc. */
+#include "../cvidc/gdpvar.h"	/* SOFTPC_PORT_ABI: shared C-VID GDP vocabulary. */
 #include <gdp_slots.h>
 
 struct	CpuVector	{
