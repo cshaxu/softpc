@@ -3,31 +3,31 @@
 ## Current Work
 
 T60 is closed after owner manual acceptance and the whole-task audit.
-M9 T61 S1-S11 are closed; S11 implementation 64a7668 moves the concrete backend
-to VM with production net -11, dual-width 98/98 and actual-commit 6/6 checks.
-T61 remains open; S12 is admitted under the owner's serial follow-up plan.
+M9 T61 S1-S12 are closed; S12 implementation e2ef91f removes duplicate geometry
+inference and relocates the clock, production net -16, dual-width 98/98 and
+actual-commit 5/5 checks. T61 remains open; S13 convergence audit is admitted.
 The three queued candidates are unchanged.
 
-## M9 T61 S12 Packet
+## M9 T61 S13 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner approves decomposition and implementation; single-person dual-role; permanent push authorization. |
-| Objective | Prove whether original V7/VGA surface dimensions replace VM dirty-rectangle geometry inference; move the small sound host clock into existing Compat audio. |
-| Non-goals | No Lib/Common/shared-test changes, guest mode/painter or sound timing changes, lifecycle rewrite or new external source import. |
-| Reference Baseline | SoftPC 64a7668; S7 ledger and S11 dual-width packages and actual-commit review. |
+| Objective | Close every S7 finite-ledger ownership/redundancy/reuse item against actual S8-S12 changes; verify remaining mirror differences, VM/Compat file and symbol ownership, final packages and cumulative accounting. |
+| Non-goals | No shared changes, new external imports, unapproved guest behavior repair, or T61 closure without owner acceptance. |
+| Reference Baseline | SoftPC e2ef91f; S7 da32558 frozen ledger and S8-S12 actual commits. |
 | Candidate Proposal | [Remaining mirror and support ownership audit](../proposals/m9-mirror-support-ownership-audit.md); original requests remain in the retained T61 plan. |
-| Files And ABI Surface | VM driver geometry state/copy; existing VGA product tests; mirror nt_sound clock body and Compat audio endpoint. Public Lib/Common ABI unchanged. |
+| Files And ABI Surface | All retained mirror files, all VM/Compat files and their production consumers/build memberships; evidence and current ownership documents. No planned API or code change. |
 | Applicable Rules | Execution, Document, Architecture, Coding, source-research policy and their governance skills. |
-| Verification | V7 60h–69h, standard VGA, partial-dirty and mode-transition evidence before removing inference; original sound state/timing tests; dual-width full builds/suites, documentation/diff checks. |
-| Expected Markers | Original display surface is sole geometry authority if proven; Compat implements host clock, original sound state is unchanged. No replacement heuristic. |
+| Verification | Recompute original hashes/diff and cumulative source/test counts; map each finite-ledger entry to actual owner and proof; whole-tree retired-symbol/include and actual target checks; final dual-width builds/full suites and post-commit audit. |
+| Expected Markers | All candidates implemented or explicitly justified; no redundant production path; correct ownership without hiding duplicate code in a move. |
 | Asset Needs | Refresh both fixed EXEs; preserve user INI/media; use existing ignored build trees. |
 | Reporting Requirements | Before/after paths, moves, independent implementation and original-mirror diff accounting; actual verification and failures. No claim of manual GUI acceptance. |
-| Stop Conditions | If original geometry is insufficient retain justified inference and evidence rather than guessing; no shared changes or unapproved original behavior changes. |
+| Stop Conditions | Missing ledger proof prevents completion; new functional defects stay outside cleanup and require explicit disposition. No claim of zero bugs or owner manual acceptance. |
 | Exit Criteria | Dual-width builds/full tests and actual-commit review pass; committed/pushed complete delivery, clean tree; T61 stays open. |
 | Original Owner Request | 请拆解一下S任务 并更新当前proposal记录 然后开始准入执行。 |
-| Similar-Issue Sweep | All VM geometry caches and dirty-derived dimensions; all GetPerfCounter definitions/consumers and sound fixtures. Preserve original painter/state ownership and clock units/wrap. |
+| Similar-Issue Sweep | All six ownership directions from S7, retired helpers and test-only shells, original declaration reuse and rejected whole-file imports; preserve every distinct host/ABI contract with explicit reason. |
 
 ## Current Technical Baseline
 
