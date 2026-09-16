@@ -1,4 +1,4 @@
-# 整机快照：暂停保存、跨进程加载、继续执行
+# 整机快照：运行中请求保存、停止时加载、暂停后继续执行
 
 ## 原始请求与准入边界
 
@@ -24,30 +24,45 @@ Lib 零修改；Common 仅允许这两个状态读写操作及其在原有 execu
 接线、测试和 manifest 更新。其他 Common 组件不改，不增加 save/load 命令、路径、
 文件格式、媒体接口、快照专用事件或独立状态机。若此边界不足，先报告，不自行扩大。
 
+最新 owner 决策（取代下述初始请求中的暂停保存设想）：
+> init、paused 和 stop，我们都不允许机器保存快照。
+> 写入机器状态，我们只允许在init、stop的状态下执行。
+> 如果机器已经是 paused 或者 running 的话，我们也就不允许机器的状态的写入。
+> 我们可以先设个，比如说一秒钟。
+> 加载完成后是 paused，用户仍可 reset，效果与普通 paused 后 reset 一样。
+
+Owner 已批准更新 proposal 并开始实施。普通 pause、单步、断点的精确停止语义不变；
+只有显式保存请求允许继续执行到快照边界。Common 管生命周期，不理解 CPU 安全条件；
+VM/Compat 管安全条件和单调时钟期限，不增加指令预算或第三个公共准备接口。
+
 ## 产品合同
 
 目标是同一时刻的 CPU、内存、设备与媒体一致恢复，支持退出进程后再次加载。
 不是截图、RAM dump、宿主进程 dump，也不是重新开机后自动重放安装步骤。
 
 ```text
-SoftPC> pause
 SoftPC> save "setup-before-failure.spcs"
+Machine saved and paused.
 ... 可以 resume 继续试验，也可以退出程序 ...
+... 若仍在原进程，先 stop，再 load ...
 SoftPC> load "setup-before-failure.spcs"
 Machine loaded and paused.
 
 SoftPC> resume
 ```
 
-| 命令 | init / stopped | paused | running / lifecycle 转换中 |
-| --- | --- | --- | --- |
-| save <path> | 拒绝：尚无运行状态 | 保存，成功或失败后仍暂停 | 拒绝，提示先 pause，不偷偷执行组合命令 |
-| load <path> | 校验并加载，成功为 paused | 校验并替换，成功为 paused | 拒绝，提示先 pause；转换中不入队 |
+| 命令 | init / stopped | paused | running | lifecycle 转换中 |
+| --- | --- | --- | --- | --- |
+| save <path> | 拒绝：须先运行 | 拒绝：提示 resume 后再保存 | 请求安全停止，再导出，成功为 paused | 拒绝，不排队延期执行 |
+| load <path> | 校验并加载，成功为 paused | 拒绝：提示先 stop | 拒绝：提示先 stop | 拒绝，不排队延期执行 |
 
-- 保存失败不得改变机器语义或留下可误认为成功的目标文件；目标已存在时默认拒绝，
+- 保存的是到达安全点时的状态，不是命令输入瞬间的状态。准入拒绝不推进机器；
+  已开始寻找安全点后，失败不回滚已执行的指令。目标已存在时默认拒绝，
   不隐式覆盖。明确完成后才打印成功，保持现有空行及唯一 prompt 规则。
 - 加载后不自动执行任何客户机指令。用户可先 debug 再 resume；既有 start/reset/stop、
   CAP、X、display 与 console_control 语义不因新增功能改变。
+- 加载后的 paused 是普通暂停状态：resume 继续恢复现场，reset 放弃现场并走原有
+  reset 完成后暂停的路径，stop 走原有退出路径；不新增 loaded-paused 状态。
 - 首版要求相同快照格式、机器实现兼容标识、x86/x64 宿主宽度和硬件配置/ROM。
   不承诺跨构建、跨宽度或跨平台迁移；不兼容在改动当前机器前拒绝。
   不用可变 HEAD 文案代替构建兼容标识，交付测试必须覆盖不匹配。
@@ -108,6 +123,8 @@ App 解析路径、管理文件读写与完成文案；composition 仍是唯一 
 Common 的两个操作为 read_state/write_state（工作名）：只传递不透明状态字节及结果，
 不接收文件路径，不解释格式。字节传递采用有界缓冲或读写回调，具体签名在前审确定；
 不增加 begin/end/size/free 等一组管理接口，不提供通用“任意任务执行”逃逸口。
+读操作仅在 running 准入，写操作仅在 init/stopped 准入；Common 内部目前以 stopped
+  表示尚未启动的执行器，产品 init 区别由现有 App 状态维持，不新增 Common INIT 枚举。
 两个操作映射到注入 driver 的对应能力，实际访问仍由唯一 executor 完成；必要的
 请求参数/结果存储及唤醒复用现有串行 rendezvous，不直接从 control 线程读写原始机器。
 回调不得重入 machine/session。Common machine 仅承担这些操作必要的状态准入、
@@ -121,13 +138,27 @@ MVDM 必要功能性状态出口属于本候选明确提出的 port-ABI 范围�
 构建期转换或全局裸内存登记框架。Common 的两项 ABI 变化须在前审中写清并更新
 其共享测试/manifest；`src/lib` 与 `test/lib` 保持原样，不补页遍历器或文件原语。
 
-### 2. 可恢复的暂停屏障是第一项验收，不是附加条件
+### 2. 保存专用安全停止，不改变普通暂停
 
 现有 PAUSED 只证明 CPU 没继续主循环，不证明所有状态已可迁移。
 S2 必须从所有回调入口（普通指令边界、HLT、debug、嵌套 BOP/模拟）确认安全点。
 目标是在无未表达宿主 continuation 的边界停住，保证恢复通过新 C 栈正常取指。
-不保存 jmp_buf/栈，不靠执行 reset 再覆盖寄存器，不默默执行更多客户机指令凑安全点。
-如果嵌套路径无法用窄接口表达，停止并修订设计，不能交付只支持偶然暂停点的正式 save。
+不保存 jmp_buf/栈，不靠执行 reset 再覆盖寄存器。显式 save 从 running 开始，允许原
+执行器继续执行直到边界；不接受 paused 保存，所以无需从 Common 暂停循环推进旧栈。
+VM 在原执行路径检查内部停止条件，不递归启动第二个 CPU invocation，不占用客户机
+调试寄存器、不写入断点指令，也不修改普通 debugger 的停止位置。
+
+仅使用宿主单调时间：从执行器接受准备请求起，寻找边界期限为 1 秒；不含文件导出
+耗时，不增加指令计数预算。超限后不导出，在下一个可响应检查点普通暂停并返回失败。
+不强杀线程、不强制丢弃嵌套栈，不宣称不可取消的宿主调用也能在 1 秒内返回。
+S2 必须核对阻塞调用、HLT 检查点和取消路径；尚未证明前不得宣称硬实时超时。
+Common 不存 snapshot_safe，不轮询嵌套深度；只接收读写结果，维护现有状态和通知。
+
+源码前审已确认三类入口：c_main 指令退休后但中断处理前、NEXT_INST、HLT 等待。
+不能只用 depth==1 判定安全：前者还有待处理 trap/IRQ；HLT 已推进 EIP，但 halt 状态
+仍由 C 控制流表达。应选择可重入的明确阶段并证明恢复，不能直接统一跳到 NEXT_INST。
+嵌套 BIOS 调用保存局部返回现场；保存请求等待原调用自然完成，超限拒绝，不序列化
+宿主 continuation。设备的未完成硬件命令仍需保存，不能因宿主栈已退出就忽略它们。
 
 屏障完成条件：
 
@@ -186,7 +217,8 @@ DIRECT 重新接原文件，保持直写；READONLY 仍只读；OVERLAY 重建�
 ### 4. 加载：校验/准备与提交分离，不宣称魔法回滚
 
 先解析整个快照、校验所有状态约束和媒体，准备内存及工作文件，不改变当前机器。
-新进程 init/stopped 可加载；running 必须先 pause。当前架构是进程单机器，
+仅 init/stopped 可加载；running/paused 必须先 stop。Common 必须确认旧执行已退出，
+不能仅检查一个提前写入的状态值。当前架构是进程单机器，
 不能启动第二个原始 CCPU 用于 staging；staging 是数据和资源，不是另一台 VM。
 
 进入提交前取得上述屏障，并确保所有会分配/打开/验证的操作已完成。
@@ -194,13 +226,16 @@ DIRECT 重新接原文件，保持直写；READONLY 仍只读；OVERLAY 重建�
 不得重放设备端口写入来“恢复寄存器”，它会有命令/IRQ 副作用。
 若仍存在不可消除的提交失败，必须明确进入 ERROR、禁止 resume、报告未完成恢复；
 不承诺旧机器仍可用，不以 reset 掩盖，也不自动重试。普通文件/校验/准备失败保持旧机
-暂停且可 resume，临时资源清理。S7 的故障注入证明每个边界。
+处于原 init/stopped 状态，临时资源清理。S7 的故障注入证明每个边界。
 
 写入状态成功后，Common machine 在该接口必要接线内更新 run generation，并复用
 现有 PAUSED 与完整帧通知；App 从接口结果产生加载文案，不增加 load completion 类型。
 VM 强制生成完整帧，
 现有控制路径推导 UI，不等待未来 dirty 才看到画面。恢复的 paused Window 不捕获鼠标。
 之后 resume 走原有 Console 交接和 Window 激活顺序，不能添加第二条 focus 路径。
+必须建立真正可继续的唯一 executor 现场，不能仅设置 PAUSED 枚举。首次 resume 不得
+经过 cold-run 的 driver.reset；用户显式 reset 仍必须执行原有 reset，不得在 driver
+中用隐式 loaded 标志吞掉 reset 请求。
 
 ## 全量收敛账本与 S 拆解
 
@@ -216,12 +251,12 @@ VM 强制生成完整帧，
 | S | 目标及边界 | 初步规模 | 退出证据 |
 | --- | --- | --- | --- |
 | S1 | 源码可行性、产品/工程设计；明确限制及全量审计域 | 0 生产行 | 当前报告与请求交叉审计、文档门禁；不声称恢复已实现 |
-| S2 | 逐字段账本及可恢复暂停/计时屏障；限定 Common 两个状态接口的必要接线方案 | 数百行，需先锁定嵌套执行可行性 | 普通/HLT/debug/嵌套路径可重新进入；无保存期间状态漂移；不满足则停止后续；Lib 不改 |
+| S2 | 逐字段账本及运行中保存的安全停止/计时屏障；1 秒 VM 超时；限定两个状态接口的执行接线 | 数百行，须先报告实际文件和原始 diff | 原嵌套自然返回或超时失败；明确 CPU/HLT 恢复阶段；普通 pause/debug 不变；Lib 不改 |
 | S3 | VM 状态容器/媒体差异，App 文件 I/O；使用已有 Storage，验证安全发布缺口 | 数百行 | direct/readonly 无磁盘 payload；overlay 有效字节相等；基底变化拒绝；文件安全未证明不得交付 |
 | S4 | CPU/隐藏缓存/FPU/RAM 状态出口与恢复 | 数百行 | 非平凡 FPU/tag/TOS、分页/A20/段缓存、IRQ/shadow 及内存 roundtrip；不是只比较通用寄存器 |
 | S5 | PIC/PIT/RTC/DMA、q/tic 队列、磁盘控制器待续状态 | 数百至千行级 | 待中断/待事件/半条 I/O 的恢复等价，回调参数和句柄重建；不能遗漏未完成传输 |
 | S6 | 视频/键鼠及剩余启用设备状态；重建宿主绘制/声音资源 | 数百至千行级 | planes/latches/banks/font/palette 与 8042/InPort 保真；恢复即有完整帧；账本无未知设备 |
-| S7 | Common machine 两个状态读写接口及必要执行接线+VM 单一恢复事务 | 数百行 | Common 仅该组件及必要测试/manifest 变化；准备失败保留旧机，提交故障禁止执行，跨进程重建 |
+| S7 | Common machine 两个状态读写接口及必要执行接线+VM 单一恢复事务 | 数百行 | running 读、init/stopped 写；成功为普通 paused；超限读失败暂停；准备失败写保持原状态；跨进程重建 |
 | S8 | App save/load 命令、帮助、既有 provider 结果/prompt 接线 | 百行级 | Session/UI 不改；命令矩阵、失败输出、paused debug/resume 与既有两类 display/console_control 路径 |
 | S9 | 全量账本复核、安装长流程与回归、最终交付 | 测试为主 | 以下验收矩阵全通过，x86/x64 EXE，owner 手测后才关 T |
 
@@ -232,7 +267,8 @@ S1 文档交付无需伪造重编译；已有 EXE 保持不变。
 
 ## 验收矩阵
 
-- 保存前后相同快照语义状态；保存期间等待一段宿主时间后，状态/待事件仍稳定。
+- 安全点到达后导出前后相同快照语义状态；导出期间状态/待事件稳定，不要求与请求瞬间相同。
+- 全状态命令矩阵；嵌套自然返回、1 秒超限、HLT 无退休指令仍检查期限；普通单步不越过断点。
 - 在进程 A 保存，退出；进程 B 加载。改变分配地址/正常 ASLR 下工作，不靠固定地址。
 - DOS 提示符、实/保护/V86 模式、Win3.1 图文转换、Win95 Setup 中间阶段；加载后
   resume 能继续而非重跑 BIOS。安装介质由用户提供，仅用明确拥有的副本测试。
@@ -248,6 +284,7 @@ S1 文档交付无需伪造重编译；已有 EXE 保持不变。
   不 resume 半恢复机。fault injection 和 controllable barrier 不靠 Sleep 猜竞态。
 - `load -> debug -> resume`、`load -> pause/resume -> stop/start/reset`、Window CAP/X
   和 Console 交接均保留现有体验。VM 加载完成前没有 UI 自行启动机器。
+- 单独证明 `load -> reset` 与普通 `paused -> reset` 相同，以及 `load -> resume` 不冷重置。
 - 同一快照不接受跨 x86/x64，分别测试两种构建的独立保存/加载。完整回归测试和
   原始镜像 diff 账本及 Common 必要 manifest 更新；验证 Lib/test-lib 与其基线零差异，
   Common 除机器层两个接口必要接线/证明材料外零差异，既有边界门禁继续通过。
