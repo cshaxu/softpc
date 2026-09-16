@@ -2,6 +2,9 @@
 
 Owner admitted continuation of the open mirror-minimization task. The active
 identifier and boundary are solely in [Current](../states/CURRENT.md).
+The approved S8–S13 sequence is complete; its actual disposition and verification
+are retained in the [S13 review](../history/M9-T61-S13-ownership-convergence.md).
+T61 itself awaits owner manual acceptance; this plan is not new queued work.
 The original request and expanded bilateral ownership scope are retained in
 [the task plan](../history/M9-T61-mvdm-diff-minimization-proposal.md#s7-追加剩余差异及-vmcompat-重复支持审计).
 

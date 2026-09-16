@@ -2,7 +2,7 @@
 
 Owner request: “每个S任务执行前先审计，预估需要移动的文件/功能/行数，预估可以达成的diff和自主实现的增减情况；结束后也进行同类实际汇报。”
 The serial S8–S13 implementation admission remains in the
-[proposal](../proposals/m9-mirror-support-ownership-audit.md).
+[proposal](M9-T61-S7-support-ownership-proposal.md).
 
 ## Delivery and review
 

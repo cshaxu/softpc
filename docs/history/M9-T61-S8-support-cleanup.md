@@ -1,7 +1,7 @@
 # M9 T61 S8: unused support and local duplication
 
 Original owner request: “请拆解一下S任务 并更新当前proposal记录 然后开始准入执行”。
-The approved sequence is retained in the [proposal](../proposals/m9-mirror-support-ownership-audit.md).
+The approved sequence is retained in the [proposal](M9-T61-S7-support-ownership-proposal.md).
 S8 implementation P1 is 258e1f7, pushed to main.
 
 Removed six uncalled helpers and their declarations. Kept the actual DIB bind,

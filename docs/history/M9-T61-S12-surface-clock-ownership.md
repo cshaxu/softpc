@@ -1,7 +1,7 @@
 # M9 T61 S12: original surface and host clock ownership
 
 Owner serial admission and before/after accounting requirements remain in the
-[proposal](../proposals/m9-mirror-support-ownership-audit.md).
+[proposal](M9-T61-S7-support-ownership-proposal.md).
 
 Implementation `e2ef91f` is committed and pushed. Actual-commit review confirms
 the VM no longer infers dimensions from dirty rectangles or owns three geometry

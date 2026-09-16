@@ -3,33 +3,20 @@
 ## Current Work
 
 T60 is closed after owner manual acceptance and the whole-task audit.
-M9 T61 S1-S12 are closed; S12 implementation e2ef91f removes duplicate geometry
-inference and relocates the clock, production net -16, dual-width 98/98 and
-actual-commit 5/5 checks. T61 remains open; S13 convergence audit is admitted.
+M9 T61 S1-S13 are closed. The [S13 convergence review](../history/M9-T61-S13-ownership-convergence.md)
+completes the admitted ownership cleanup. No implementation subtask is active.
+T61 remains open for owner manual testing and explicit task closure.
+Open task awaiting owner: T61.
 The three queued candidates are unchanged.
 
-## M9 T61 S13 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner approves decomposition and implementation; single-person dual-role; permanent push authorization. |
-| Objective | Close every S7 finite-ledger ownership/redundancy/reuse item against actual S8-S12 changes; verify remaining mirror differences, VM/Compat file and symbol ownership, final packages and cumulative accounting. |
-| Non-goals | No shared changes, new external imports, unapproved guest behavior repair, or T61 closure without owner acceptance. |
-| Reference Baseline | SoftPC e2ef91f; S7 da32558 frozen ledger and S8-S12 actual commits. |
-| Candidate Proposal | [Remaining mirror and support ownership audit](../proposals/m9-mirror-support-ownership-audit.md); original requests remain in the retained T61 plan. |
-| Files And ABI Surface | All retained mirror files, all VM/Compat files and their production consumers/build memberships; evidence and current ownership documents. No planned API or code change. |
-| Applicable Rules | Execution, Document, Architecture, Coding, source-research policy and their governance skills. |
-| Verification | Recompute original hashes/diff and cumulative source/test counts; map each finite-ledger entry to actual owner and proof; whole-tree retired-symbol/include and actual target checks; final dual-width builds/full suites and post-commit audit. |
-| Expected Markers | All candidates implemented or explicitly justified; no redundant production path; correct ownership without hiding duplicate code in a move. |
-| Asset Needs | Refresh both fixed EXEs; preserve user INI/media; use existing ignored build trees. |
-| Reporting Requirements | Before/after paths, moves, independent implementation and original-mirror diff accounting; actual verification and failures. No claim of manual GUI acceptance. |
-| Stop Conditions | Missing ledger proof prevents completion; new functional defects stay outside cleanup and require explicit disposition. No claim of zero bugs or owner manual acceptance. |
-| Exit Criteria | Dual-width builds/full tests and actual-commit review pass; committed/pushed complete delivery, clean tree; T61 stays open. |
-| Original Owner Request | 请拆解一下S任务 并更新当前proposal记录 然后开始准入执行。 |
-| Similar-Issue Sweep | All six ownership directions from S7, retired helpers and test-only shells, original declaration reuse and rejected whole-file imports; preserve every distinct host/ABI contract with explicit reason. |
-
 ## Current Technical Baseline
+
+- T61 S13 audit delivery 891e642 verifies all S7 ownership/reuse candidates.
+  S8-S12 production net -1847; mirror 498 retained/404 identical/94 divergent,
+  +23132/-22334, 5131 hunks. Final dual-width 98/98; actual-commit 7/7 each.
+  Fixed EXEs remain S12 e2ef91f, hashes in the
+  [final ledger](../etc/evidence/softpc/pristine-divergence-current.md#s13-最终归属复核).
+  Lib/Common and shared tests unchanged; T61 awaits owner acceptance.
 
 - T61 S6 implementation 4f7171d completes the 498-file original-diff audit:
   403 identical, 95 divergent; +23,141/-22,335, 5,132 hunks. Comparable original
