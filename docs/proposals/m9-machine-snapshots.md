@@ -405,6 +405,16 @@ file, `FILE` pointer, endpoint path or raw controller structure is archived.
 旧体验；不能把仅内部 roundtrip 的 S4 当成用户功能交付。逐阶段避免一次改所有设备。
 S1 文档交付无需伪造重编译；已有 EXE 保持不变。
 
+### S6 closure
+
+S6 closes after the independent receiver review recorded in
+[M9 T63 S6](../history/M9-T63-S6-device-archive.md). The frozen receiver
+ledger has no unknown selected receiver: each is a fixed semantic payload,
+rebuild-only host resource, or explicit external-endpoint rejection. The
+result remains VM/Compat-private; it exposes neither a Common operation nor a
+product save/load command. S7 is the separate, bounded Common/VM execution-
+transaction step.
+
 ## 验收矩阵
 
 - 安全点到达后导出前后相同快照语义状态；导出期间状态/待事件稳定，不要求与请求瞬间相同。

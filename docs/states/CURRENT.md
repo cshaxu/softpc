@@ -12,8 +12,10 @@ and running-save safe-stop boundary proof. M9 T63 S3 is closed after the
 existing-Storage/media-ownership decision: bounded readonly medium reads and
 ordinary truncate publication require no Lib change. M9 T63 S4 is closed after
 the private CPU/SAS/RAM archive proof. M9 T63 S5 is closed after the private
-controller/queue archive and dual-width restore proof. M9 T63 S6 is active
-for the next private video/input and selected-device archive audit.
+controller/queue archive and dual-width restore proof. M9 T63 S6 is closed
+after its independent receiver/archive review. M9 T63 S7 is active for the
+two bounded Common machine-state operations and the VM's single
+executor-owned save/restore transaction.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
 T62 closure was pushed in 54b2009 before T63 admission. The three older
 candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.md).
@@ -267,23 +269,23 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
   P discipline, path accounting, and build hygiene now match the relevant
   NXVM governance standard. [Record](../history/M9-Td-S9-execution-closure-quality.md)
 
-## M9 T63 S6 Packet
+## M9 T63 S7 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approved the T63 staged snapshot plan and directs continued execution. S5 is closed by its independent review; S6 begins with an inventory before any implementation. Lib remains unchanged; Common receives only its later two machine-state operations and necessary executor wiring. |
-| Objective | Audit and implement the next VM/Compat-private archive slice: guest video semantic state, keyboard/mouse controller state, and the remaining selected device/external-endpoint dispositions required for a later snapshot transaction. |
-| Non-goals | No user save/load command, no snapshot file/container, no App path handling, no Lib change, no Common API yet, no generic raw struct dump, no callback-address serialization, no reset substitute, and no change to ordinary pause/debug/KVM behavior. |
-| Reference Baseline | S5 closure review at `c3cba33`; fixed packages contain S5 P2 code and S5 P3/P4 only added tests/evidence. |
+| Admission And Approval | Owner approved the staged T63 design and directs continued implementation. S6 is closed after an independent review of the frozen receiver ledger. Lib remains unchanged. Common may receive only two opaque machine-state operations and executor wiring required to invoke the injected VM driver. |
+| Objective | Add Common's bounded read/write machine-state operations and a VM-owned, single-executor transaction that reaches the approved save-safe boundary, captures/restores the private state image, and leaves a successful operation in ordinary PAUSED state. |
+| Non-goals | No App command or path handling, no snapshot file/container encoding, no Lib change, no Session/UI/debug API, no generic callback/task escape hatch, no second executor, no raw legacy structure dump, and no change to ordinary pause/debug/KVM behavior. |
+| Reference Baseline | S6 closure at `b88c5c0`; fixed packages contain all private S4--S6 archive receivers but no public machine-state operation or product save/load command. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
-| Files And ABI Surface | Before edits, audit selected keyboard/mouse, video/C-VID, PPI, sound and external serial/parallel/printer owners plus narrow VM/Compat rebuild hooks. State remains private fixed-width semantic data; no public ABI changes. |
+| Files And ABI Surface | `src/common/machine/machine_interface.h/.c`, Common driver contract/tests/manifest, `src/vm/{driver,machine,snapshot,snapshot_image}` and narrow existing Compat/MVDM restoration ports only if required by the already admitted image. Common operations carry opaque copied bytes or callbacks only: no path or product format. |
 | Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, `DOCUMENT.md`; `docs/design/ARCHITECTURE.md`, `CODING.md`, `UI.md`; active proposal and source-boundary gates. |
-| Verification | First produce a finite receiver ledger with payload/rebuild/reject disposition. Any implementation must add focused round-trips for admitted state, full sequential x64/x86 CTest, package builds, boundary/manifest gates and actual-commit review. |
-| Expected Markers | No host pointer, callback address, native handle, host pixel/DIB, UI mailbox or raw legacy struct enters payload. Restore rebuilds host presentation/audio resources and publishes a complete frame only through the existing route. |
+| Verification | First freeze exact Common request/result ownership, executor rendezvous and VM safe-boundary call order. Then add focused success, state-rejection, timeout and restore tests, full sequential x64/x86 CTest, package builds, Common manifest/corpus gates and actual-commit review. |
+| Expected Markers | Common does not understand CPU safety, files, paths, media sections or product messages. VM/Compat own safe boundary and image semantics. No host pointer, callback address, native handle, host pixel/DIB, UI mailbox or raw legacy struct enters the image. Successful read/write emits only existing PAUSED/frame facts. |
 | Asset Needs | No user media mutation, no user snapshot file and no raw trace/recording. Tests own/remove fixtures below build only. |
-| Reporting Requirements | Before code report exact files, state ownership, original-mirror diff and estimated churn; after proof report actual production/test numstat, receiver dispositions, tests and both EXE links. |
-| Stop Conditions | A required active receiver cannot be represented without a new Common/Lib API, a selected device needs an unapproved original-machine redesign, or an external endpoint cannot be safely classified; record evidence before expanding scope. |
-| Exit Criteria | Every receiver in the frozen S6 ledger has an explicit payload/rebuild/reject/unselected disposition; admitted implementation has dual-width restoration proof; no partial product snapshot surface exists; required evidence, commit/push and independent actual-change review are complete. |
+| Reporting Requirements | Before code report exact API shape, files, ownership, original-mirror diff and estimated churn; after proof report actual production/test numstat, state matrix, tests and both EXE links. |
+| Stop Conditions | The two-operation boundary cannot express required executor work without a new Common product concept; a required archive receiver lacks a fixed representation; restore needs an unapproved MVDM redesign; or a required file/media operation needs a Lib change. Record evidence before expanding scope. |
+| Exit Criteria | The two Common operations have bounded state admission and one executor rendezvous; VM capture from running reaches safe PAUSED or reports deadline failure as ordinary PAUSED; VM restore only from stopped preserves failure atomicity and on success provides a resumable ordinary PAUSED entry plus complete frame; dual-width proof and required gates are committed/pushed. |
 | Original Owner Request | One binary snapshot eventually, direct/readonly references and FDD/HDD overlays; no Lib edits, Common only two state operations and necessary wiring. Save only running, load only init/stopped, success ordinary paused with working resume/reset; VM safe-stop deadline one second. |
-| Similar-Issue Sweep | All selected keyboard/mouse/video/C-VID/PPI/sound and external serial/parallel/printer mutable owners, queued callbacks, host resource fields and complete-frame reentry paths. |
+| Similar-Issue Sweep | Existing synchronous media/debug rendezvous, lifecycle completion ordering, run-generation invalidation, CCPU restore/reentry, timer capture finish paths and every Common driver callback that can mutate executor-owned state. |
