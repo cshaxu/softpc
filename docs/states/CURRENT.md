@@ -7,8 +7,9 @@ T61 is closed on owner direction after the [whole-task audit](../history/M9-T61-
 T62 is closed on owner direction after the
 [whole-task audit](../history/M9-T62-completion-audit.md).
 M9 T63 S1 is closed after the [design review](../history/M9-T63-S1-machine-snapshots.md).
-M9 T63 S2 is active: final field-inventory and running-save safe-stop closure
-review.
+M9 T63 S2 is closed after the field inventory, cross-width state-owner index
+and running-save safe-stop boundary proof. M9 T63 S3 is active: binary
+container and media-base transaction pre-audit.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
 T62 closure was pushed in 54b2009 before T63 admission. The three older
 candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.md).
@@ -48,9 +49,9 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   receivers; P12 classifies video/input payload versus host resources.
   P13 completes receiver classification for remaining selected host/BIOS/media
   families. P14 then freezes the complete archive-object convergence index and
-  explains the only compiler-shape x86/x64 differences. P15 records final
-  full x64/x86 suites at 103/103; there is still no snapshot container, state
-  API or user command. The S2 closure commit is pending.
+  explains the only compiler-shape x86/x64 differences. P15 closes S2: final
+  full x64/x86 suites pass 103/103; there is still no snapshot container,
+  state API or user command. S3 is now a binary-container/media pre-audit.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files
@@ -234,23 +235,23 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
   P discipline, path accounting, and build hygiene now match the relevant
   NXVM governance standard. [Record](../history/M9-Td-S9-execution-closure-quality.md)
 
-## M9 T63 S2 Packet
+## M9 T63 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner explicitly requests updated proposal and implementation under running-only read, init/stopped-only write; both succeed as ordinary paused. Continue admitted S2, not a new task identifier. |
-| Objective | Enumerate selected mutable state and prove a running-save safe-stop/timer boundary before payload work; VM owns safety and a single 1-second deadline, Common only operation execution/state bookkeeping. |
-| Non-goals | No save/load CLI or container yet; no second executor, process dump, changed device semantics or user media. No Lib changes or Common changes beyond two machine-state operations and necessary wiring. No NTVDM-only hook repair. |
-| Reference Baseline | ea7e982 production; cf2d979 design; existing fixed x86/x64 EXEs unchanged by S1. |
+| Admission And Approval | Owner explicitly requests one binary snapshot under running-only read and init/stopped-only write; S2 is closed and S3 is admitted under that unchanged product contract. |
+| Objective | Pre-audit the versioned binary container and explicit media-base transaction before encoding any CPU/device payload; retain App path/file ownership and VM/Compat format ownership. |
+| Non-goals | No save/load CLI or partial container; no direct storage dump, second overlay implementation, changed device semantics or user media. No Lib changes and no Common changes in this pre-audit. |
+| Reference Baseline | S2 closure d4dda9d; fixed package code unchanged since P5. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
-| Files And ABI Surface | First inventory selected MVDM/Compat/VM and Common boundaries. Candidate pause edits: vm/driver, compat/platform and ccpu lifecycle, original c_main safe points. Common machine changes only if necessary for the two state read/write operations; other Common and all Lib excluded. Record exact field/file and original-diff estimate before editing. |
+| Files And ABI Surface | Audit App command/file seams, VM media adapters and existing Lib storage usage only. Do not add an ABI or encode payload until exact container field limits, media fingerprints and failure transaction are written and reviewed. |
 | Applicable Rules | docs/rules/EXECUTION.md and DOCUMENT.md; design/ARCHITECTURE.md, CODING.md, UI.md; referenced execution, architecture and documentation skills. |
-| Verification | Field ledger and caller sweep; controllable timer/entry barriers, normal/HLT/debug/nested pause reentry tests; if code changes, fixed x86/x64 package builds and full CTest plus focused machine/lifecycle tests and manifest/boundary gates. Documentation gate and actual-commit review. |
-| Expected Markers | No unclassified selected state or persisted C stack; explicit running-save may advance to its boundary; no guest execution during export; ordinary pause/debug unchanged; no timer accumulation during capture; one executor. |
-| Asset Needs | No user media mutation. Checkpoint test owns a 512-byte softpc-checkpoint-smoke.img in each fixed build tree, CTest timeout 15 seconds, removed on success; agent cleans it after any failed run. No raw trace/recording. |
+| Verification | Container parser/writer plan, direct/readonly/overlay media caller sweep and failure-atomicity design. If code changes later, fixed x86/x64 package builds and full CTest plus focused storage/media tests and manifest/boundary gates. Documentation gate and actual-commit review. |
+| Expected Markers | One bounded little-endian format, no pointer/struct dump, direct/readonly reference-only media, full overlay differences, and an explicit failure path that leaves source media/INI untouched. |
+| Asset Needs | No user media mutation, no user snapshot file and no raw trace/recording. Future container tests must own and remove build-local fixtures. |
 | Reporting Requirements | Before code report exact files/ABI and estimated churn; after proof report production/test numstat and original mirror diff separately, tests and both EXE links. |
-| Stop Conditions | Unrepresentable native continuation, missing file-safety capability or required Lib/other Common expansion: report before editing; no force-unwind that drops guest work, no polling or guest reset substitute. |
-| Exit Criteria | Complete selected-state ledger and proven recoverable pause/timer boundary; no change to ordinary lifecycle semantics; required dual-width evidence, commit/push and independent actual-change review. |
+| Stop Conditions | Missing bounded file/media capability, required Lib/other Common expansion, or an unrepresentable media-base transaction: report before editing; no direct raw dump or guest reset substitute. |
+| Exit Criteria | Complete container/media design, exact adapter ownership and failure semantics; no partial command or user-media mutation; required evidence, commit/push and independent actual-change review. |
 | Original Owner Request | One binary file, direct/readonly references and FDD/HDD overlays; no Lib edits, Common only two state operations and necessary wiring. Latest: save only running, load only init/stopped, success ordinary paused with working resume/reset; VM safety timeout 1 second. Verbatim and matrix in proposal. |
 | Similar-Issue Sweep | Every executor callback caller including nested host_simulate and HLT, timer producer/consumer and queued input; classify CPU/FPU/memory/video/controllers/media/host resources as save, rebuild, external or unselected with evidence. |
