@@ -112,7 +112,8 @@ softpc_device_archive *archive;
     softpc_device_snapshot_capture_dma(&archive->dma);
     softpc_device_snapshot_capture_cmos(&archive->cmos);
     softpc_device_snapshot_capture_fdc(&archive->fdc);
-    softpc_device_snapshot_capture_hdd(&archive->hdd);
+    if (!softpc_device_snapshot_capture_hdd(&archive->hdd))
+        return FALSE;
     archive->valid = TRUE;
     return TRUE;
 }

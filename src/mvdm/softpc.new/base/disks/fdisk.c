@@ -1977,14 +1977,14 @@ int command;
 	}
 }
 
-GLOBAL void
+GLOBAL int
 softpc_device_snapshot_capture_hdd(state)
 softpc_device_hdd_state *state;
 {
 	int drive, index;
 
 	if (state == NULL)
-		return;
+		return FALSE;
 	for (drive = 0; drive < 2; ++drive) {
 		state->drive[drive].drive_id = drives[drive].driveid;
 		state->drive[drive].max_head = drives[drive].maxhead;
@@ -2006,6 +2006,7 @@ softpc_device_hdd_state *state;
 	state->selected_drive = pseldrv == NULL ? -1 :
 		(pseldrv == &drives[0] ? 0 : pseldrv == &drives[1] ? 1 : -2);
 	state->active_command = snapshot_encode_active_command(activecmd);
+	return state->selected_drive != -2 && state->active_command >= 0;
 }
 
 GLOBAL int

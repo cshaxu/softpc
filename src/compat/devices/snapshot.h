@@ -130,7 +130,7 @@ typedef struct softpc_device_hdd_state {
     int32_t selected_drive, active_command;
 } softpc_device_hdd_state;
 
-void softpc_device_snapshot_capture_hdd(softpc_device_hdd_state *state);
+int softpc_device_snapshot_capture_hdd(softpc_device_hdd_state *state);
 int softpc_device_snapshot_restore_hdd(const softpc_device_hdd_state *state);
 
 /*
