@@ -96,7 +96,7 @@ S2 必须完成实际构建选中状态的逐字段账本，才能允许后续�
 | `src/compat/ccpu/lifecycle.c`、原始 `host_simulate` | 存在嵌套模拟与宿主栈返回。保留的 C 栈不能搬到新进程；必须证明新执行入口能从明确的机器状态恢复。 |
 | `src/compat/memory.c`、原始 SAS/C-VID | host RAM 只是 SAS 的一部分；现有物理读写走总线，视频映射可能有副作用。不能把 debugger 的 bus read/write 当无副作用的整机导入导出。 |
 | `src/mvdm/softpc.new/base/ccpu386/fpu.c` | 有栈/控制/状态访问入口，但 `setNpxTagwordReg` 本身不恢复 tag；还需检查栈项精度表示、TOS、异常及宿主舍入环境。不能只用现有 setter 拼凑。 |
-| `src/mvdm/softpc.new/base/system/quick_ev.c` | q/tic 队列含函数指针、param、句柄及链表；保存语义事件标识、顺序和相对期限，重建指针/关联句柄。未知回调必须拒绝保存，不能忽略。 |
+| `src/mvdm/softpc.new/base/system/quick_ev.c` | q/tic 队列含函数指针、param、句柄及链表；保存语义事件标识、顺序和相对期限，重建指针，保留关联句柄数值。未知回调必须拒绝保存，不能忽略。 |
 | 原始 `ica.c`、`timer.c`、`at_dma.c`、`fdisk.c` 与 FLA/GFI | PIC 请求/屏蔽/服务状态、PIT 编程、DMA、磁盘命令缓冲和阶段不等于 RAM；需要原所属文件的窄状态出口。 |
 | 原始 video/keymouse 与 `src/compat/cvidc/gdp_state.c` | VGA planes/latches/palette/banks、输入协议状态和 GDP 中标量/指针混合；禁止把 GDP slot storage 直接整体保存。 |
 | `src/compat/hdd_media.c`、`gfi_image.c` | 两类媒体有各自独占 lease 与设备几何/当前 cylinder。要统一取同一快照边界，不改变原始控制器实现。 |
@@ -171,6 +171,13 @@ Common 不存 snapshot_safe，不轮询嵌套深度；只接收读写结果，�
 
 恢复时重建 host clock 基准，不把跨进程/保存耗时补成 guest ticks；RTC/CMOS 的
 客户机可见时间及待触发事件随镜像恢复。pacing、宿主计数器绝对值不入文件。
+q/tic 队列恢复直接重建内部节点，不重新调用 `add_q_event_*` / `add_tic_event`：
+后者会重新分配句柄，且零延迟会立即执行回调。文件保存每个活动节点的回调标识、
+参数、event_type、time_from_last、original_time、原句柄及队列顺序；另存两个句柄
+分配游标和实际剩余 q/tic counter。队头的 time_from_last 不是实时递减计数器，
+不能单独用于恢复期限。同期限节点保持原顺序；free list、hash 链和宿主地址重建。
+设备持有的取消句柄与队列一起恢复，加载期间不触发事件。回调集合和参数逐生产
+调用点核对后编码，不能按函数地址或函数表位置自动编号；未知标识拒绝加载。
 尚未交付的产品输入须在边界前归类为丢弃或完成，不把宿主 source handle 放入镜像；
 已被设备接受的字节/IRQ/按钮状态逐字保存。加载清除旧 run 的宿主排队事件、debug lease
 和执行计划，通过现有 generation 过滤，不让旧输入进入恢复后的机器。

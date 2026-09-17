@@ -370,3 +370,45 @@ name check is only completeness for the declared slice, not serialization
 proof. Documentation gate and diff whitespace checks passed. Both package
 hashes remain exactly P5: no production or firmware change to package.
 Owned 512-byte checkpoint fixtures were removed by both successful tests.
+
+### S2 P7: queued-event restore design audit (documentation only)
+
+Before: continue the admitted S2 state inventory, not S5 serialization. Inspect
+quick_ev.c and all source callers of add_q_event_i/t, add_tic_event and
+add_q_ev_int_action. Estimated production/test churn zero; update the existing
+proposal and this ledger only. No Lib/Common/guest-media changes.
+
+Q_EVENT contains callback, time_from_last, original_time, handle, param,
+event_type and three native links. Save the first six semantic fields with a
+stable callback identifier and list order; rebuild links/hash/free allocation.
+Save next_free_handle, tic_next_free_handle, tic_event_count and the actual CPU
+quick counter separately. add_event copies the current counter into the old
+head only on insertion: the stored head delay alone is not current remaining
+time. Equal deadlines insert after existing nodes; this order must survive.
+
+Do not reconstruct through add_event: zero delay calls the callback immediately,
+and nonzero insertion allocates a new handle. Device fields such as
+refillDelayedHandle, rtc_periodic_event_handle and printer out/outa handles
+would then refer to different events. Preserve their numeric handles together
+with the queue, and perform no dispatch while restoring. The original file's
+dispatch path removes a node before invoking its callback; a snapshot must not
+be taken from inside that callback just because the node is absent.
+
+The raw source call sweep found keyboard do_int/allowRefill; CMOS periodic,
+alarm and host-time synchronization callbacks; timer delay/multiple IRQ;
+floppy and fixed-disk delay; printer out/outa; serial next_batch/recv_char/
+do_wait_on_send. These are candidates, not a claimed selected-build whitelist:
+conditional compilation and callback parameter meanings still require the
+device-by-device S2 ledger. quick_ev.c also owns select_int_action plus an
+associated action queue; no external source caller of add_q_ev_int_action was
+found. Its empty/unused disposition must be proved before excluding it.
+
+Calibration fields and host timestamps are not yet classified by this slice.
+In particular, restarting calibration must not silently alter an already
+pending event deadline. This is outstanding S2 work, not an implicit choice to
+reset all scheduler state. S2 remains active and save/load are not exposed.
+
+After: production/test/build files unchanged; only the two existing task
+documents changed. Source review and documentation/whitespace gates passed.
+No rebuild claimed for this documentation-only refinement; fixed EXEs and the
+P6 dual-width 103/103 test baseline remain unchanged.
