@@ -46,6 +46,10 @@ are one stopped command-policy state, while Common retains its own lifecycle
 representation. P3 fixes the legacy `illegalp.c` error-header overlay for a
 fresh 32-bit MSYS2 build; it selects the original Base error enum after the
 historical shared include guard, without changing App, Common or Lib behavior.
+P6 corrects P9's presentation fallback: only a just-restored graphics
+machine may temporarily publish a text surface while its painter is pending;
+ordinary graphics with no dirty region publishes nothing and retains the
+previous frame. This restores the Window/Console route invariant.
 
 ## Current Technical Baseline
 
