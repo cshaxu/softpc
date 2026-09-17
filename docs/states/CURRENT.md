@@ -11,8 +11,9 @@ M9 T63 S2 is closed after the field inventory, cross-width state-owner index
 and running-save safe-stop boundary proof. M9 T63 S3 is closed after the
 existing-Storage/media-ownership decision: bounded readonly medium reads and
 ordinary truncate publication require no Lib change. M9 T63 S4 is closed after
-the private CPU/SAS/RAM archive proof. M9 T63 S5 is active for the next
-controller/queue state-owner audit and implementation.
+the private CPU/SAS/RAM archive proof. M9 T63 S5 is closed after the private
+controller/queue archive and dual-width restore proof. M9 T63 S6 is active
+for the next private video/input and selected-device archive audit.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
 T62 closure was pushed in 54b2009 before T63 admission. The three older
 candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.md).
@@ -61,8 +62,9 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   proof only; it exposes no user command or incomplete snapshot file. S5 P1
   adds a VM/Compat-private controller/queue archive: semantic q/tic callback
   IDs, transactional queue replacement, and PIC/PIT/RTC/DMA/FDD/HDD state.
-  There is still no product save/load path and no Lib/Common change; S5 remains
-  active for its closure audit.
+  P2 rejects an unrepresentable HDD continuation at capture; P3/P4 prove
+  port-driven PIC pending IRQ, DMA, FDC and HDD restoration. There is still no
+  product save/load path and no Lib/Common change.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files
@@ -246,23 +248,23 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
   P discipline, path accounting, and build hygiene now match the relevant
   NXVM governance standard. [Record](../history/M9-Td-S9-execution-closure-quality.md)
 
-## M9 T63 S5 Packet
+## M9 T63 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner directs continued implementation after S3 and preserves the existing contract: Lib remains unchanged; Common receives only its later two machine-state operations and necessary executor wiring; ordinary truncate publication is accepted. |
-| Objective | Add the next VM/Compat-private state slice for selected scheduler queues and controller/device semantic state: PIC, PIT/RTC, DMA, FDD/HDD controller continuations and their required callback identities. |
-| Non-goals | No user save/load command, no Common API yet, no Lib change, no file-path handling, no media export, no generic raw struct dump, no reset substitute, no callback-address serialization and no change to ordinary pause/debug semantics. |
-| Reference Baseline | S4 archive delivery pending this packet's P commit; fixed package code unchanged. |
+| Admission And Approval | Owner approved the T63 staged snapshot plan and directs continued execution. S5 is closed by its independent review; S6 begins with an inventory before any implementation. Lib remains unchanged; Common receives only its later two machine-state operations and necessary executor wiring. |
+| Objective | Audit and implement the next VM/Compat-private archive slice: guest video semantic state, keyboard/mouse controller state, and the remaining selected device/external-endpoint dispositions required for a later snapshot transaction. |
+| Non-goals | No user save/load command, no snapshot file/container, no App path handling, no Lib change, no Common API yet, no generic raw struct dump, no callback-address serialization, no reset substitute, and no change to ordinary pause/debug/KVM behavior. |
+| Reference Baseline | S5 closure review at `c3cba33`; fixed packages contain S5 P2 code and S5 P3/P4 only added tests/evidence. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
-| Files And ABI Surface | Before edits: `compat/ccpu/archive.*`, `vm/snapshot*`, selected `quick_ev.c`, `timer.c`, `ica.c`, `at_dma.c`, `fdisk.c`, `floppy.c`, `gfi.c`, disk BIOS and their narrow Compat owners. State remains VM/Compat-private and fixed-width; callback IDs, never function addresses, cross the archive boundary. |
-| Applicable Rules | docs/rules/EXECUTION.md, ARCHITECTURE.md, CODING.md and DOCUMENT.md; design/ARCHITECTURE.md, CODING.md and UI.md; referenced execution, architecture and documentation skills. |
-| Verification | First audit exact selected state and all queue callback/handle receivers. New focused round-trips must cover pending IRQ, timer/DMA/controller continuation, queue order/cancel/zero-delay and no callback execution during restore; x64/x86 full CTest, package builds, manifests/boundary gates and actual-commit review. |
-| Expected Markers | No pointer, `jmp_buf`, native stack, function address or raw C struct enters payload; queues restore semantic IDs, arguments, order, remaining time and handles without calling ordinary enqueue APIs; unknown callback/device state refuses the eventual save. |
-| Asset Needs | No user media mutation, no user snapshot file and no raw trace/recording. Tests own/remove any fixtures under build. |
-| Reporting Requirements | Before code report exact files/ABI and estimated churn; after proof report production/test numstat and original mirror diff separately, tests and both EXE links. |
-| Stop Conditions | A required semantic state cannot be represented without a new Common/Lib API, a host continuation cannot be reconstructed through the existing entry phases, or an MVDM change needs broader than the admitted port-ABI state hook: report before expanding scope. |
-| Exit Criteria | Selected controller/queue slice has audited fixed encoding and restoration proof across both widths; no callback executes during restore; no user command or partial file path is exposed; required evidence, commit/push and independent actual-change review. |
-| Original Owner Request | One binary file, direct/readonly references and FDD/HDD overlays; no Lib edits, Common only two state operations and necessary wiring. Latest: save only running, load only init/stopped, success ordinary paused with working resume/reset; VM safety timeout 1 second. Verbatim and matrix in proposal. |
-| Similar-Issue Sweep | Every selected scheduler/controller mutable owner and callback receiver, including pending IRQs, timer time bases, DMA/FDD/HDD transfer state, queue handles and native endpoint exclusions; classify every field as payload, rebuild, host external or unselected. |
+| Files And ABI Surface | Before edits, audit selected keyboard/mouse, video/C-VID, PPI, sound and external serial/parallel/printer owners plus narrow VM/Compat rebuild hooks. State remains private fixed-width semantic data; no public ABI changes. |
+| Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, `DOCUMENT.md`; `docs/design/ARCHITECTURE.md`, `CODING.md`, `UI.md`; active proposal and source-boundary gates. |
+| Verification | First produce a finite receiver ledger with payload/rebuild/reject disposition. Any implementation must add focused round-trips for admitted state, full sequential x64/x86 CTest, package builds, boundary/manifest gates and actual-commit review. |
+| Expected Markers | No host pointer, callback address, native handle, host pixel/DIB, UI mailbox or raw legacy struct enters payload. Restore rebuilds host presentation/audio resources and publishes a complete frame only through the existing route. |
+| Asset Needs | No user media mutation, no user snapshot file and no raw trace/recording. Tests own/remove fixtures below build only. |
+| Reporting Requirements | Before code report exact files, state ownership, original-mirror diff and estimated churn; after proof report actual production/test numstat, receiver dispositions, tests and both EXE links. |
+| Stop Conditions | A required active receiver cannot be represented without a new Common/Lib API, a selected device needs an unapproved original-machine redesign, or an external endpoint cannot be safely classified; record evidence before expanding scope. |
+| Exit Criteria | Every receiver in the frozen S6 ledger has an explicit payload/rebuild/reject/unselected disposition; admitted implementation has dual-width restoration proof; no partial product snapshot surface exists; required evidence, commit/push and independent actual-change review are complete. |
+| Original Owner Request | One binary snapshot eventually, direct/readonly references and FDD/HDD overlays; no Lib edits, Common only two state operations and necessary wiring. Save only running, load only init/stopped, success ordinary paused with working resume/reset; VM safe-stop deadline one second. |
+| Similar-Issue Sweep | All selected keyboard/mouse/video/C-VID/PPI/sound and external serial/parallel/printer mutable owners, queued callbacks, host resource fields and complete-frame reentry paths. |

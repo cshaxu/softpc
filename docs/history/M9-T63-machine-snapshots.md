@@ -834,4 +834,29 @@ captures, deliberately changes live state, restores, then recaptures and
 compares the affected semantic fields.  This proves the selected S5 state
 hooks reinstall live controller state; it does not expose a snapshot command
 or claim coverage of S6 keyboard/mouse/video state or external endpoints.
+
+## S5 closure review
+
+The independent review covered `9f7bcbf..c3cba33`.  The private payload has no
+raw controller struct, host pointer, function address, native handle, stack
+or `jmp_buf`: q/tic callbacks cross the boundary only through the eight fixed
+semantic IDs.  Restore builds both queue replacements before replacing either
+live queue, so a late invalid callback leaves the live queues intact; it never
+uses an ordinary enqueue API, including for zero-delay entries.  PIC active
+callbacks and HDD continuations outside their reviewed identities reject
+capture rather than being silently lost.
+
+The selected S5 receiver set is PIC, PIT/RTC, DMA, FDC, HDD and q/tic.  The
+callback sweep also found keyboard, communications and printer queue producers;
+they have no accepted ID in this slice and therefore make private capture fail.
+Their guest payload or external-endpoint policy remains the explicit S6
+receiver work, not a second archive path.  No App command, file container,
+Common API or Lib code was introduced.
+
+Actual counted production C/H changes are `+1,558/-1` (net `+1,557`): Compat
+private archive `+340/-1`, preserved MVDM port-ABI hooks `+1,218/-0`.
+Focused checkpoint and boundary tests pass on x64/x86; final sequential full
+CTest passes `103/103` on both widths.  The S5 package code is in
+`assets/binary/softpc32.exe` and `assets/binary/softpc64.exe` from P2; P3/P4
+only changed test and historical evidence.  The worktree was clean after P4.
 Lib and Common remain unchanged by this P.
