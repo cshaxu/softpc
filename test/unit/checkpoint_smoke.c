@@ -2,6 +2,7 @@
 #include "compat/ccpu/abi.h"
 #include "compat/ccpu/lifecycle.h"
 #include "vm/snapshot.h"
+#include "compat/platform.h"
 #include "../lib/cleanup.h"
 
 #include <assert.h>
@@ -12,11 +13,17 @@
 #include "ios.h"
 #include "ica.h"
 #include "c_tlb.h"
+#include "quick_ev.h"
 /* base_def.h's non-ANSI compatibility macro must not alter this C17 test. */
 #undef const
 
 extern void (*BIOS[256])(void);
 extern unsigned long c_cpu_q_ev_get_count(void);
+extern void c_cpu_q_ev_set_count(unsigned long count);
+extern void dispatch_tic_event(void);
+extern IU32 calc_q_inst_for_time(IU32 time);
+extern IU32 calc_q_time_for_inst(IU32 count);
+extern IBOOL DisableQuickTickRecal;
 
 typedef struct checkpoint_probe {
     softpc_machine *machine;
@@ -236,6 +243,66 @@ static void verify_translation(void)
     flush_tlb();
 }
 
+static long event_order[8];
+static unsigned event_count;
+
+static void record_event(long param)
+{
+    assert(event_count < sizeof(event_order) / sizeof(event_order[0]));
+    event_order[event_count++] = param;
+}
+
+static void verify_event_queue(void)
+{
+    q_ev_handle quick_cancel, tick_cancel;
+    assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_platform_set_clock_running(0));
+    /* Own these queues for the test; no device callbacks or wall-time sleeps. */
+    q_event_init();
+    tic_event_init();
+    assert(DisableQuickTickRecal);
+    assert(calc_q_inst_for_time(100u) == 10u);
+    assert(calc_q_time_for_inst(3u) == 30u);
+    assert(add_q_event_i(record_event, 100u, 11) == 1);
+    assert(add_q_event_i(record_event, 100u, 12) == 2);
+    quick_cancel = add_q_event_i(record_event, 200u, 13);
+    assert(quick_cancel == 3 && c_cpu_q_ev_get_count() == 10u);
+    /* The live counter may be below the head's original delay. Inserting
+       another event must preserve this progress and the equal-deadline order. */
+    c_cpu_q_ev_set_count(3u);
+    assert(add_q_event_i(record_event, 50u, 14) == 4);
+    assert(c_cpu_q_ev_get_count() == 3u && event_count == 0u);
+    c_cpu_q_ev_set_count(0u);
+    dispatch_q_event();
+    assert(event_count == 2u && event_order[0] == 11 && event_order[1] == 12);
+    assert(c_cpu_q_ev_get_count() == 2u);
+    delete_q_event(quick_cancel);
+    c_cpu_q_ev_set_count(0u);
+    dispatch_q_event();
+    assert(event_count == 3u && event_order[2] == 14);
+    dispatch_q_event();
+    assert(event_count == 3u);
+
+    assert(add_tic_event(record_event, 3u, 21) == 1);
+    assert(add_tic_event(record_event, 3u, 22) == 2);
+    tick_cancel = add_tic_event(record_event, 6u, 23);
+    dispatch_tic_event();
+    dispatch_tic_event();
+    assert(event_count == 3u);
+    dispatch_tic_event();
+    assert(event_count == 5u && event_order[3] == 21 && event_order[4] == 22);
+    delete_tic_event(tick_cancel);
+    dispatch_tic_event();
+    assert(event_count == 5u);
+    /* Replaying the add API during load would execute this immediately. */
+    assert(add_q_event_i(record_event, 0u, 31) == 0);
+    assert(add_tic_event(record_event, 0u, 32) == 0);
+    assert(event_count == 7u && event_order[5] == 31 && event_order[6] == 32);
+    q_event_init();
+    tic_event_init();
+    assert(softpc_platform_set_clock_running(1));
+}
+
 int main(void)
 {
     const char *path = "softpc-checkpoint-smoke.img";
@@ -271,6 +338,7 @@ int main(void)
     verify_reentry();
     verify_timeout();
     verify_translation();
+    verify_event_queue();
     softpc_machine_destroy(probe.machine);
     assert(softpc_test_remove_image(path));
     return 0;

@@ -37,6 +37,10 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   CPU/FPU/RAM symbols and proves TLB flush changes a cached translation after
   a page-table edit; the design now preserves TLB data. S2 stays active for
   the remaining selected-state inventory; save/load are not available.
+  P7/P8 define lossless pending-event reconstruction and classify the 25
+  scheduler data symbols. Real quick/tick tests cover order, remaining count,
+  cancellation and zero-delay behavior; both full suites remain 103/103.
+  Common owns final PAUSED notification; capture does not drain device queues.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files

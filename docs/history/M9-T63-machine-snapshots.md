@@ -412,3 +412,86 @@ After: production/test/build files unchanged; only the two existing task
 documents changed. Source review and documentation/whitespace gates passed.
 No rebuild claimed for this documentation-only refinement; fixed EXEs and the
 P6 dual-width 103/103 test baseline remain unchanged.
+
+### S2 P8: prove quick/tick queue semantics and classify scheduler state
+
+Before: continue S2, production C/H and mirror changes zero; add an estimated
+60-90 lines to the existing checkpoint smoke, no new test target or API.
+Use original queue operations and a stopped host timer, not a fake scheduler.
+The owner's follow-up asks whether state operations participate in lifecycle
+and whether all event queues must be drained. The proposal clarifies existing
+ownership: Common owns operation admission and final PAUSED notification;
+external input is bounded at capture, but internal device events are preserved,
+not forced to execute. Ordinary pause does not replace the safe-point request.
+
+Evidence: selected x64 preprocessing uses the actual devices target defines
+(CCPU, CPU_40_STYLE, CPU_486, C_VID, PROD, SPC386, V7VGA, WDCTRL_BOP,
+SOFTPC_STANDALONE and pointer width), include response and keyba's own quote
+include. The initial diagnostic incorrectly applied that quote include to all
+files and flooded macro warnings; it was discarded and repeated with the
+per-file option only. No generated preprocessed file became a build input.
+The source sweep includes whitespace before the call's opening parenthesis;
+this catches fdisk's disk_int_call_back, missed by the P7 literal-call search.
+
+| Original callback owner | Selected queued callbacks and parameter meaning |
+| --- | --- |
+| keyba.c | do_int: copied scancode; allowRefill: zero; preserve refillDelayedHandle |
+| cmos.c | rtc_periodic_event, rtc_alarm, sync_rtc_to_host_time: zero; preserve periodic handle and alarm handle |
+| timer.c | timer_multiple_ints: remaining interrupt count; timer_no_longer_too_soon: zero, present in selected source although its hack_active path stays false with CPU_40_STYLE |
+| fla.c | fla_int_call_back: zero |
+| fdisk.c | fdisk_pause, disk_int_call_back: zero |
+| printer.c | lpr_state_out_event/outa_event: adapter index; preserve both handle arrays |
+| com.c | recv_char/do_wait_on_send: adapter index; next_batch is absent in selected preprocessing |
+
+These fourteen callback names form the selected source's direct device call
+set, not an instruction to persist native function pointers. The archive's
+undefined-symbol sweep identifies these same seven caller objects (the
+optimized timer object needs only add_q_event_t). select_int_action is defined
+inside quick_ev.c but has no production add_q_ev_int_action caller; its action
+queue remains initial/empty. A future unexpected callback is a capture failure,
+not something silently omitted. Product debug callbacks are not q/tic events.
+
+Scheduler mutable-symbol ledger (25 named B/b/D/d symbols, excluding compiler
+dot sections; counts are a bounded object audit, not a full-device claim):
+
+| Fields | Snapshot disposition |
+| --- | --- |
+| next_free_handle, tic_next_free_handle, tic_event_count | Save values, alongside actual CPU quick counter and ordered active node records |
+| q_list_head, q_list_tail, tic_list_head, tic_list_tail, q_ev_hash_table, tic_ev_hash_table | Rebuild links with new addresses; retain list order and hash-chain order using bounded node indices |
+| q_free_list_head, tic_free_list_head | Empty/rebuild allocator resources; no queued work lives in free nodes |
+| DisableQuickTickRecal, q_ratio_initialised | Reestablish initialized CCPU invariant; init_q_ratio forces disable true and no production assignment reenables it |
+| usecPerIJC, jumpRestart | Remain initial unsigned -1 in this selected path; calc uses time/10 and count*10, not host calibration |
+| ideal_q_rate, real_q_rate | Initialized/equal values, not used by the crude conversion while usecPerIJC is -1; quick_tick_recalibrate takes its disabled early return |
+| firstfew.4, ijc_calib.1, ijc_recount.2, ijc_tstamp.3, previous_tstamp | Unused calibration branch/host sample; no active pending deadline derives from them in selected CCPU |
+| firstcall.0, int_act_qhead, int_act_qident | Initial unused action-queue state: no production registration caller |
+
+q_ratio_history/head source-only averaging state is also unused (AVERAGED is
+not selected), and optimized out of the named data-symbol set. No new saved
+host timestamp protocol is needed for this scheduler. RTC wall-time sampling
+is a separate owner: sync_rtc_to_host_time reschedules itself every 200 ticks
+and calls Compat host_time/host_localtime. Saving CMOS bytes alone will not
+isolate that later host sample; the S5 time-base implementation must preserve
+the approved restored-clock semantics, not treat calibration exclusion as
+permission to lose RTC state. Its host_tm pointee also needs copied fields.
+
+The original allocator wraps handles at 0xffff without checking active
+collisions. Hash-chain order therefore cannot be inferred from deadline order
+for every possible live queue. Retain original hash adjacency as node indices
+in S5, rather than fixing original allocation semantics or inventing a new
+handle namespace. This refines P7's "rebuild hash" into a lossless rule.
+
+The real-queue test proves: initialized CCPU conversion; equal quick/tick
+deadline order; inserting while the CPU counter is partially consumed;
+cancelling a later quick/tick event by its original handle; zero-delay callbacks
+execute immediately and return handle zero. Host timer is joined for this
+bounded queue test and restarted before disposal; no Sleep and no guest media
+changes. This is scheduler contract proof, not a serialization roundtrip.
+
+After: production C/H +0/-0; original mirror +0/-0; one product test C file
++68/-0. No build/shared-corpus edits. Full x64/x86 builds succeeded and full
+suites passed 103/103 (59.58 s / 59.74 s). Both widths have the same 25 named
+scheduler data symbols and every name has a ledger entry. Documentation and
+whitespace checks pass; temporary checkpoint media was removed by both tests.
+Package hashes remain P5 unchanged. S2 remains active: device-local state and
+remaining CPU-adjacent/video state still need complete inventory, then the
+admitted payload stages must implement and prove actual cross-process restore.
