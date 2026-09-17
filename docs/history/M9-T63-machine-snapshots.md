@@ -8,6 +8,20 @@ VM owns safe-stop selection and a single 1-second monotonic deadline. Lib is
 unchanged; Common may add only the two state operations and necessary wiring.
 S2 remains active. This record is partial proof, not snapshot acceptance.
 
+## S3 P3: corrected existing-Storage decision
+
+The initial S3 stop claim was too broad. `lib_storage_medium_open(path,
+LIB_STORAGE_MEDIUM_READONLY)`, `lib_storage_medium_byte_count`, and
+`lib_storage_medium_read_at` already form a bounded, chunked reader for an
+arbitrary snapshot file. The snapshot path must not use `read_owned`.
+
+The owner explicitly accepts ordinary `TRUNCATE` writer publication: a failed
+save may truncate or partially replace a prior same-path snapshot. Consequently
+the initially proposed temporary-file/commit extension is withdrawn. Lib and
+test/lib remain unchanged; App retains file ownership, VM/Compat retain state
+format and media ownership. This only corrects the boundary decision; it does
+not claim that a snapshot container or state serializer exists.
+
 ## P2 pre-audit: producer capture barrier
 
 Baseline cce6fa9. Counted scope: compat/platform.c, compat/platform.h and the

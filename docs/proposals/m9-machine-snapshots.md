@@ -57,8 +57,9 @@ SoftPC> resume
 | load <path> | 校验并加载，成功为 paused | 拒绝：提示先 stop | 拒绝：提示先 stop | 拒绝，不排队延期执行 |
 
 - 保存的是到达安全点时的状态，不是命令输入瞬间的状态。准入拒绝不推进机器；
-  已开始寻找安全点后，失败不回滚已执行的指令。目标已存在时默认拒绝，
-  不隐式覆盖。明确完成后才打印成功，保持现有空行及唯一 prompt 规则。
+  已开始寻找安全点后，失败不回滚已执行的指令。目标以现有二进制 truncate writer
+  直接覆盖；写入失败可以留下截断或部分的新文件，也可以毁掉旧同名快照。明确完成后
+  才打印成功，保持现有空行及唯一 prompt 规则。
 - 加载后不自动执行任何客户机指令。用户可先 debug 再 resume；既有 start/reset/stop、
   CAP、X、display 与 console_control 语义不因新增功能改变。
 - 加载后的 paused 是普通暂停状态：resume 继续恢复现场，reset 放弃现场并走原有
@@ -231,39 +232,25 @@ DIRECT/READONLY 没有磁盘 payload；OVERLAY 逐块比较有效内容与只读
 编排媒体访问及指纹校验。差异扫描需要读全盘，但不建立第二套运行时 overlay 实现。
 DIRECT 校验需在持有同一稳定媒体 lease 时进行；指纹可能需要读全盘，
 但不把全盘写进快照。保存期间不能有另一个写者改变被校验内容。
-文件发布由 App 负责，Common/VM 不拥有用户路径。目标仍是临时文件写完、关闭并校验
-后产生最终路径；原子发布和排他创建需要 S3 单独验证，现有 writer 不提供这些保证，
-不能把“先检查存在再 truncate”称为排他创建。若现有允许能力不足，先提请审阅，
-不改 Lib、不在 Common 偷藏 Win32 调用，也不擅自降低已设计的安全要求。
-磁盘满/写失败不能覆盖
-原有快照。所需空间主要是 RAM、设备和 overlay 修改页，预检不能替代实际写失败处理。
-不把“原子发布”夸大为已实现掉电持久性。
+文件发布由 App 负责，Common/VM 不拥有用户路径。owner 明确接受现有 truncate writer
+的普通覆盖语义：写入失败时，同名旧快照可以已被截断或替换为不完整文件。App 不得把
+它称为原子发布、排他创建或掉电持久性；仍不得在 App/VM/Compat 偷藏 Win32 文件调用。
+所需空间主要是 RAM、设备和 overlay 修改页，预检不能替代实际写失败处理。
 
-#### S3 pre-audit: current Storage boundary
+#### S3 corrected Storage boundary
 
-The current public Storage surface has a binary sequential writer and a
-bounded `read_owned` helper.  It does **not** expose a streaming reader, a
-same-directory temporary writer with commit/abort, or an atomic replacement
-operation.  Opening the final snapshot path with the existing truncate writer
-would destroy the last good snapshot before the new one is fully written;
-loading a RAM-plus-overlay image through `read_owned` would require one
-unbounded whole-file allocation.  Neither is acceptable for this feature.
+The current public Storage surface is sufficient without expansion. Snapshot
+loading opens the file as `LIB_STORAGE_MEDIUM_READONLY`, checks its existing
+`byte_count`, and reads exact bounded chunks through `read_at`; it never uses
+the whole-file `read_owned` helper. Saving uses the existing binary
+`lib_storage_file_writer_open(..., TRUNCATE)`, `write`, and `close` calls.
 
-This is a real S3 stop condition, not permission for App/VM/Compat to call
-Win32 APIs or to create a private file layer.  If the owner approves a small
-shared Storage extension, its minimal contract should be:
-
-1. a binary reader with open, exact bounded read, size query and close; and
-2. an atomic replacement writer: create a private temporary in the destination
-   directory, write/flush/close it, then make it the destination in one
-   explicit commit; an abort or failed commit leaves the prior destination
-   intact.
-
-The API must be neutral and platform-implemented inside Storage, not mention
-snapshot paths or SoftPC state.  A later write-side implementation can then
-stream fixed-size sections without a whole-file allocation.  VM owns the
-fixed little-endian format and a local SHA-256 media fingerprint implementation;
-cryptographic snapshot identity is not a general Lib concern.
+The owner explicitly accepts the resulting ordinary overwrite contract: a
+failed save may leave a partial target and may destroy a prior snapshot at the
+same path. Therefore no temporary file, commit/abort protocol, atomic replace,
+or Lib API is needed. This is not permission for App/VM/Compat to call native
+file APIs or create a private file layer. VM retains the fixed little-endian
+format and local media fingerprinting; Lib remains unaware of snapshots.
 
 No overlay-page enumeration API is needed.  Compat already exclusively owns
 the live FDD/HDD leases.  At the successful S2 barrier it can read each
@@ -320,7 +307,7 @@ VM 强制生成完整帧，
 | --- | --- | --- | --- |
 | S1 | 源码可行性、产品/工程设计；明确限制及全量审计域 | 0 生产行 | 当前报告与请求交叉审计、文档门禁；不声称恢复已实现 |
 | S2 | 逐字段账本及运行中保存的安全停止/计时屏障；1 秒 VM 超时；限定两个状态接口的执行接线 | 数百行，须先报告实际文件和原始 diff | 原嵌套自然返回或超时失败；明确 CPU/HLT 恢复阶段；普通 pause/debug 不变；Lib 不改 |
-| S3 | VM 状态容器/媒体差异，App 文件 I/O；使用已有 Storage，验证安全发布缺口 | 数百行 | direct/readonly 无磁盘 payload；overlay 有效字节相等；基底变化拒绝；文件安全未证明不得交付 |
+| S3 | VM 状态容器/媒体差异，App 文件 I/O；使用已有 Storage | 数百行 | direct/readonly 无磁盘 payload；overlay 有效字节相等；基底变化拒绝；目标文件采用明确的普通 truncate 覆盖语义 |
 | S4 | CPU/隐藏缓存/FPU/RAM 状态出口与恢复 | 数百行 | 非平凡 FPU/tag/TOS、分页/A20/段缓存、IRQ/shadow 及内存 roundtrip；不是只比较通用寄存器 |
 | S5 | PIC/PIT/RTC/DMA、q/tic 队列、磁盘控制器待续状态 | 数百至千行级 | 待中断/待事件/半条 I/O 的恢复等价，回调参数和句柄重建；不能遗漏未完成传输 |
 | S6 | 视频/键鼠及剩余启用设备状态；重建宿主绘制/声音资源 | 数百至千行级 | planes/latches/banks/font/palette 与 8042/InPort 保真；恢复即有完整帧；账本无未知设备 |

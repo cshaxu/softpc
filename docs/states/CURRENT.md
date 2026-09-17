@@ -8,9 +8,10 @@ T62 is closed on owner direction after the
 [whole-task audit](../history/M9-T62-completion-audit.md).
 M9 T63 S1 is closed after the [design review](../history/M9-T63-S1-machine-snapshots.md).
 M9 T63 S2 is closed after the field inventory, cross-width state-owner index
-and running-save safe-stop boundary proof. M9 T63 S3 is active: binary
-container/media pre-audit is complete and awaits the required neutral Storage
-transaction decision.
+and running-save safe-stop boundary proof. M9 T63 S3 is active: the binary
+container/media boundary reuses existing Storage. The owner accepts ordinary
+truncate publication: a failed replacement may destroy the prior same-path
+snapshot, so no Lib transaction extension is required.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
 T62 closure was pushed in 54b2009 before T63 admission. The three older
 candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.md).
@@ -52,8 +53,9 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   families. P14 then freezes the complete archive-object convergence index and
   explains the only compiler-shape x86/x64 differences. P15 closes S2: final
   full x64/x86 suites pass 103/103; there is still no snapshot container,
-  state API or user command. S3 found that public Storage lacks a streaming
-  reader and atomic publication, so no partial container is started.
+  state API or user command. S3 re-audit corrects its initial file-boundary
+  conclusion: existing readonly media supplies bounded chunk reads; ordinary
+  truncate writer publication is owner-approved, so Lib remains unchanged.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files
@@ -242,18 +244,18 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner explicitly requests one binary snapshot under running-only read and init/stopped-only write; S2 is closed and S3 is admitted under that unchanged product contract. |
-| Objective | Obtain the required neutral Storage transaction decision, then implement a versioned binary container and explicit media-base transaction without changing App/VM/Compat ownership. |
-| Non-goals | No save/load CLI or partial container before that decision; no direct storage dump, second overlay implementation, changed device semantics or user media. No Common changes in this S. |
+| Admission And Approval | Owner explicitly requests one binary snapshot under running-only read and init/stopped-only write; S2 is closed and S3 is admitted under that unchanged product contract. The owner further approves reuse of existing readonly-medium reads and truncate writer publication; failed replacement may destroy the old same-path snapshot. |
+| Objective | Define and implement a versioned binary container and explicit media-base transaction using existing Storage without changing App/VM/Compat ownership. |
+| Non-goals | No Lib change, private native file path, direct storage dump, second overlay implementation, changed device semantics or user media. No Common changes in this S. |
 | Reference Baseline | S2 closure d4dda9d; fixed package code unchanged since P5. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
-| Files And ABI Surface | Audit completed over App command/file seams, VM media adapters and existing Storage. A neutral Storage reader/atomic-replace writer is the only proposed Lib expansion; no product API is designed until owner approval. |
+| Files And ABI Surface | Audit completed over App command/file seams, VM media adapters and existing Storage. Existing `lib_storage_medium_open(READONLY)`, `byte_count`, `read_at`, `destroy`, and binary writer open/write/close are the complete file surface; no Lib ABI change is allowed. |
 | Applicable Rules | docs/rules/EXECUTION.md and DOCUMENT.md; design/ARCHITECTURE.md, CODING.md, UI.md; referenced execution, architecture and documentation skills. |
-| Verification | Container parser/writer plan, direct/readonly/overlay media caller sweep and failure-atomicity design. If approved code changes, fixed x86/x64 package builds and full CTest plus focused storage/media tests and manifest/boundary gates. Documentation gate and actual-commit review. |
-| Expected Markers | One bounded little-endian format, no pointer/struct dump, direct/readonly reference-only media, full overlay differences, and an explicit failure path that leaves source media/INI untouched. No private native file path. |
+| Verification | Container parser/writer plan, direct/readonly/overlay media caller sweep and truncate-publication contract. If approved code changes, fixed x86/x64 package builds and full CTest plus focused storage/media tests and manifest/boundary gates. Documentation gate and actual-commit review. |
+| Expected Markers | One bounded little-endian format, no pointer/struct dump, direct/readonly reference-only media, full overlay differences, and an explicit failure path that leaves source media/INI untouched. A failed save may leave the target snapshot truncated or partial. No private native file path. |
 | Asset Needs | No user media mutation, no user snapshot file and no raw trace/recording. Future container tests must own and remove build-local fixtures. |
 | Reporting Requirements | Before code report exact files/ABI and estimated churn; after proof report production/test numstat and original mirror diff separately, tests and both EXE links. |
-| Stop Conditions | Missing bounded file/media capability, required Lib/other Common expansion, or an unrepresentable media-base transaction: report before editing; no direct raw dump or guest reset substitute. Current stop: Storage reader plus atomic replacement publication are absent. |
-| Exit Criteria | Complete container/media design, exact adapter ownership and failure semantics; no partial command or user-media mutation; required evidence, commit/push and independent actual-change review. |
+| Stop Conditions | Required Lib/other Common expansion or an unrepresentable media-base transaction: report before editing; no direct raw dump or guest reset substitute. Existing bounded readonly-medium reads and ordinary truncate writer are sufficient under the owner-approved file-failure contract. |
+| Exit Criteria | Complete container/media design, exact adapter ownership and truncate-publication semantics; no partial command or user-media mutation; required evidence, commit/push and independent actual-change review. |
 | Original Owner Request | One binary file, direct/readonly references and FDD/HDD overlays; no Lib edits, Common only two state operations and necessary wiring. Latest: save only running, load only init/stopped, success ordinary paused with working resume/reset; VM safety timeout 1 second. Verbatim and matrix in proposal. |
 | Similar-Issue Sweep | Every executor callback caller including nested host_simulate and HLT, timer producer/consumer and queued input; classify CPU/FPU/memory/video/controllers/media/host resources as save, rebuild, external or unselected with evidence. |
