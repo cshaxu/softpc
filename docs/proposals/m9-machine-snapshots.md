@@ -313,7 +313,7 @@ VM 强制生成完整帧，
 | S6 | 视频/键鼠及剩余启用设备状态；重建宿主绘制/声音资源 | 数百至千行级 | planes/latches/banks/font/palette 与 8042/InPort 保真；恢复即有完整帧；账本无未知设备 |
 | S7 | Common machine 两个状态读写接口及必要执行接线+VM 单一恢复事务 | 数百行 | running 读、init/stopped 写；成功为普通 paused；超限读失败暂停；准备失败写保持原状态；跨进程重建 |
 | S8 | App `save <file>`/`load <file>` 命令、帮助、既有 provider 结果/prompt 接线 | 百行级 | save 仅 running、load 仅 stopped（包含刚启动的 monitor）；命令矩阵、失败输出、paused debug/resume 与既有两类 display/console_control 路径 |
-| S9 | Canonical width-free stream container and Storage reader | 百行级 | 删除 host/IA-32 位宽字段和 RAM+8 MiB/devices 4 MiB 人为限制；App 流式读取，VM 两遍计数后流式写入/有界 section 读取；Common 不改；x86/x64 新格式互通 |
+| S9 | Canonical width-free stream container and Storage reader | 百行级 | 删除 host/IA-32 位宽字段和 RAM+8 MiB/devices 4 MiB 人为限制；App 流式读取，VM 两遍计数后流式写入/有界 section 读取；恢复到 paused 只保留已有 Window、不因图形 frame 新建 Window；x86/x64 新格式互通 |
 | S10 | 全量账本复核、安装长流程与回归、最终交付 | 测试为主 | 以下验收矩阵全通过，x86/x64 EXE，owner 手测后才关 T |
 
 ### T63 收口前：MVDM / VM / Compat 增量审计
