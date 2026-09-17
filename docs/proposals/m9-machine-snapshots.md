@@ -64,7 +64,7 @@ SoftPC> resume
   CAP、X、display 与 console_control 语义不因新增功能改变。
 - 加载后的 paused 是普通暂停状态：resume 继续恢复现场，reset 放弃现场并走原有
   reset 完成后暂停的路径，stop 走原有退出路径；不新增 loaded-paused 状态。
-- 首版要求相同快照格式、机器实现兼容标识、IA-32 固定 32-bit 机器字契约和硬件配置/ROM。
+- 首版要求相同快照格式、机器实现兼容标识和硬件配置/ROM。
   不承诺跨构建或跨平台迁移；相同机器配置的 x86/x64 包必须互通；不兼容在改动当前机器前拒绝。
   不用可变 HEAD 文案代替构建兼容标识，交付测试必须覆盖不匹配。
 - DIRECT/READONLY 不保存磁盘内容，只保存媒体引用、模式、大小、内容指纹和几何；
@@ -194,7 +194,7 @@ q/tic 队列恢复直接重建内部节点，不重新调用 `add_q_event_*` / `
 
 ### 3. 文件和媒体：单个二进制文件，显式基底依赖
 
-首版 `.spcs` 为一个有版本的容器：header（magic/version/build compatibility/IA-32 machine-word width/
+首版 `.spcs` 为一个有版本的容器：header（magic/version/build compatibility/
 配置/ROM 标识）+ 有界 section（ID/version/length/checksum）+ 完成校验。
 明确小端固定宽度字段；所有尺寸在乘加前检查，重复/缺失 section、非法枚举、超限长度、
 截断与不兼容均拒绝。禁止直接 fwrite struct/pointer/CRT stream。
@@ -312,8 +312,9 @@ VM 强制生成完整帧，
 | S5 | PIC/PIT/RTC/DMA、q/tic 队列、磁盘控制器待续状态 | 数百至千行级 | 待中断/待事件/半条 I/O 的恢复等价，回调参数和句柄重建；不能遗漏未完成传输 |
 | S6 | 视频/键鼠及剩余启用设备状态；重建宿主绘制/声音资源 | 数百至千行级 | planes/latches/banks/font/palette 与 8042/InPort 保真；恢复即有完整帧；账本无未知设备 |
 | S7 | Common machine 两个状态读写接口及必要执行接线+VM 单一恢复事务 | 数百行 | running 读、init/stopped 写；成功为普通 paused；超限读失败暂停；准备失败写保持原状态；跨进程重建 |
-| S8 | App `save <file>`/`load <file>` 命令、帮助、既有 provider 结果/prompt 接线 | 百行级 | Session/UI、Common、Lib 不改；save 仅 running、load 仅 stopped（包含刚启动的 monitor）；App 以配置 RAM + 8 MiB 限制读入并复用现有 Storage/opaque Common callbacks；命令矩阵、失败输出、paused debug/resume 与既有两类 display/console_control 路径 |
-| S9 | 全量账本复核、安装长流程与回归、最终交付 | 测试为主 | 以下验收矩阵全通过，x86/x64 EXE，owner 手测后才关 T |
+| S8 | App `save <file>`/`load <file>` 命令、帮助、既有 provider 结果/prompt 接线 | 百行级 | save 仅 running、load 仅 stopped（包含刚启动的 monitor）；命令矩阵、失败输出、paused debug/resume 与既有两类 display/console_control 路径 |
+| S9 | Canonical width-free stream container and Storage reader | 百行级 | 删除 host/IA-32 位宽字段和 RAM+8 MiB/devices 4 MiB 人为限制；App 流式读取，VM 两遍计数后流式写入/有界 section 读取；Common 不改；x86/x64 新格式互通 |
+| S10 | 全量账本复核、安装长流程与回归、最终交付 | 测试为主 | 以下验收矩阵全通过，x86/x64 EXE，owner 手测后才关 T |
 
 ### T63 收口前：MVDM / VM / Compat 增量审计
 
@@ -452,8 +453,8 @@ No new Session/UI fact is introduced.
 ### S7 canonical byte contract
 
 The byte callbacks carry one VM-owned canonical stream, not any live archive
-object. Its fixed header identifies the stream revision, required IA-32 machine-word width,
-machine configuration and complete section count. Each section has a fixed
+object. Its fixed header identifies the stream revision, machine configuration
+and complete section count. Each section has a fixed
 identifier and bounded byte length. Integers are written little-endian at
 their declared 8/16/32/64-bit width; fixed byte arrays are copied verbatim;
 every variable array is preceded by its element count and validated before
@@ -499,9 +500,9 @@ transaction are still required before any public save/load operation exists.
 #### S7 P7: implemented complete private image container
 
 VM now composes the two private stream slices into one canonical image:
-magic, format revision, IA-32 machine-word width, declared RAM size, exact section
+magic, format revision, declared RAM size, exact section
 count, `core`/`devices` identifiers and bounded lengths, followed by the
-outer CCPU resume entry. Decode rejects a non-IA-32 wire width, unknown order,
+outer CCPU resume entry. Decode rejects an unknown order,
 duplicate/missing section, malformed resume entry or a core section that is
 inconsistent with its declared RAM size before calling either archive reader.
 The complete decoded image is staged and replaces an existing image only on

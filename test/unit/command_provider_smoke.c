@@ -794,7 +794,7 @@ int main(void)
     assert(common_machine_create(&machine, &driver) == LIB_STATUS_OK);
     common_machine_set_state_sink(machine, note_state, &events);
     assert(app_composition_initialize(&commands, machine,
-        COMMON_SESSION_DISPLAY_WINDOW, 24u * 1024u * 1024u,
+        COMMON_SESSION_DISPLAY_WINDOW,
         &provider) == LIB_STATUS_OK);
     /* Exercise the actual composed provider, not a second hotkey dispatcher. */
     assert(provider.context == &commands && provider.open == app_command_provider_open);
@@ -954,12 +954,6 @@ int main(void)
         "load missing-snapshot.spcs", &result);
     assert(strstr(result.text, "Cannot load machine state.") != NULL &&
         !result.arm_prompt);
-    commands.snapshot_maximum = 1u;
-    submit(&provider, COMMON_SESSION_MACHINE_STOPPED,
-        "load debug-commands-smoke.spcs", &result);
-    assert(strstr(result.text, "Cannot load machine state.") != NULL &&
-        !result.arm_prompt);
-    commands.snapshot_maximum = 24u * 1024u * 1024u;
     submit(&provider, COMMON_SESSION_MACHINE_STOPPED,
         "load debug-commands-smoke.spcs", &result);
     assert(result.text[0] == '\0' && !result.arm_prompt);

@@ -15,8 +15,9 @@ the private CPU/SAS/RAM archive proof. M9 T63 S5 is closed after the private
 controller/queue archive and dual-width restore proof. M9 T63 S6 is closed
 after its independent receiver/archive review. M9 T63 S7 is closed after the
 bounded Common machine-state operations and VM's single executor-owned
-save/restore transaction. M9 T63 S8 is active for the App-only snapshot
-command/file boundary.
+save/restore transaction. M9 T63 S8 is closed after the App command/file
+boundary. M9 T63 S9 is active for canonical streaming snapshot I/O without
+host-width or artificial-size contracts.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
 T62 closure was pushed in 54b2009 before T63 admission. The three older
 candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.md).
@@ -49,11 +50,10 @@ historical shared include guard, without changing App, Common or Lib behavior.
 P6 corrects P9's presentation fallback: only a just-restored graphics
 machine may temporarily publish a text surface while its painter is pending;
 ordinary graphics with no dirty region publishes nothing and retains the
-previous frame. This restores the Window/Console route invariant. P7 makes
-the snapshot header canonical: every new image writes the IA-32 `32` word
-marker and every reader requires it, so a newly produced image round-trips
-between x86 and x64 packages. Earlier host-width-marked images are explicitly
-unsupported and must be recreated.
+previous frame. This restores the Window/Console route invariant. P7 briefly
+used a fixed `32` machine-width marker for cross-width images. Owner has
+superseded that format: S9 removes every width field altogether and replaces
+the bounded App buffer/container path with canonical streaming I/O.
 
 ## Current Technical Baseline
 
@@ -305,23 +305,23 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
   P discipline, path accounting, and build hygiene now match the relevant
   NXVM governance standard. [Record](../history/M9-Td-S9-execution-closure-quality.md)
 
-## M9 T63 S8 Packet
+## M9 T63 S9 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admitted S8 after S7 P11 and authorizes the required App/VM/Compat work without a further approval request. Common and Lib remain frozen: S8 uses only the existing opaque Common state-transfer operations and existing Lib Storage file APIs. |
-| Objective | Add monitor `save <file>` and `load <file>` commands. App owns path parsing, bounded whole-file I/O, result wording and prompt behavior; it passes opaque callbacks only to the existing Common machine operations. |
-| Non-goals | No Common/Lib API or implementation change, no new snapshot format or VM/Compat archive receiver, no Session/UI/debug API, no generic callback/task escape hatch, no second executor, no raw legacy structure dump, and no change to ordinary pause/debug/KVM behavior. |
-| Reference Baseline | S7 P11 at `8647824`; fixed packages prove an x86/x64 fresh-process VM snapshot restore but expose no product command or file path. |
+| Admission And Approval | Owner admitted S9 after S8 P7. Owner explicitly rejects retained `32`/`64` header markers and arbitrary RAM+allowance/device limits. A minimal Lib Storage streaming-reader addition is approved; Common remains frozen. |
+| Objective | Replace the bounded whole-file snapshot load and buffered two-section VM container with one width-free, versioned streaming format. Snapshot size follows actual serialized RAM/device/media content and ordinary allocation/I/O failure, not fixed product allowances. |
+| Non-goals | No Common API or implementation change, no Session/UI/debug API, no generic callback/task escape hatch, no second executor, no raw legacy structure dump, and no change to ordinary pause/debug/KVM behavior. This S does not claim the separately planned overlay-page payload is already implemented. |
+| Reference Baseline | S8 P7 at `46baf5c`; it proves a transitional fixed-`32` header cross-width but still buffers reads and imposes RAM+8 MiB/device 4 MiB limits. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
-| Files And ABI Surface | `src/app/{command,composition}.c/.h`, `src/vm/snapshot_image.c`, App/VM snapshot test wiring and this proposal/evidence only. App command retains copied path text and derives a bounded input-file limit from configured RAM plus a documented archive allowance. The VM-private image header is canonical IA-32 fixed-width data, not a public/Common/Lib ABI. App calls only `common_machine_read_state`/`write_state` and `lib_storage_file_*`; it does not include VM, Compat or MVDM headers. |
+| Files And ABI Surface | `src/app/{command,composition}.c/.h`, `src/vm/snapshot_image.c`, `src/lib/storage/file*`, storage/App/VM snapshot tests and this proposal/evidence only. Lib adds one neutral reader handle mirroring its writer; App passes that stream through the existing opaque Common callback. The VM-private header is width-free fixed-endian data, not a public/Common/Lib ABI. |
 | Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, `DOCUMENT.md`; `docs/design/ARCHITECTURE.md`, `CODING.md`, `UI.md`; active proposal and source-boundary gates. |
-| Verification | Parse/help/state-admission tests, a real App-provider save/stop/load/resume transaction with a build-owned fixture, failure/path/oversize tests, full sequential x64/x86 CTest, package builds and actual-commit review. |
-| Expected Markers | Only `save` from running is admitted and succeeds as ordinary PAUSED; only `load` from stopped (including the just-started monitor) is admitted and succeeds as ordinary PAUSED. Direct/readonly media remain referenced by their configured source; existing VM image semantics govern all currently archived state. Snapshots use only the IA-32/fixed-width wire contract and load across x86/x64 packages when machine configuration matches. App produces one explicit result and one prompt, never a false success or an extra lifecycle request. |
+| Verification | Storage streaming-reader tests; VM malformed/short-section proof; a real App-provider save/stop/load/resume transaction; x64→x86 and x86→x64 fresh-process proof; full sequential x64/x86 CTest, package builds and actual-commit review. |
+| Expected Markers | Only `save` from running is admitted and succeeds as ordinary PAUSED; only `load` from stopped (including the just-started monitor) is admitted and succeeds as ordinary PAUSED. Direct/readonly media remain referenced by their configured source; existing VM image semantics govern all currently archived state. New snapshots have no width field and load across x86/x64 packages when machine configuration matches. App produces one explicit result and one prompt, never a false success or an extra lifecycle request. |
 | Asset Needs | No user media, user snapshot file or INI mutation. Tests create/remove snapshot fixtures below their own build working directory only. Packaging refreshes only the two approved EXEs. |
 | Reporting Requirements | Before code report exact App action, callback, file and size-limit flow; after proof report actual production/test numstat, command/state matrix, tests and both EXE links. |
-| Stop Conditions | A necessary user command requires a new Common/Lib API; current canonical image cannot represent a promised medium state; or App cannot provide bounded whole-file I/O through existing Storage. Record evidence before expanding scope. |
-| Exit Criteria | App commands use only the existing Common/Lib contracts; every accepted save/load state/result is correct; errors never claim success; a real command-provider transaction proves save → paused → stop → load → paused → resume; dual-width proof and required gates are committed/pushed. |
-| Original Owner Request | One binary snapshot eventually, direct/readonly references and FDD/HDD overlays; no Lib edits, Common only two state operations and necessary wiring. Save only running, load only from the initial/stopped product state, success ordinary paused with working resume/reset; VM safe-stop deadline one second. |
+| Stop Conditions | A necessary Common API; current canonical image cannot represent a promised medium state; or required streaming cannot be expressed by the approved minimal Storage reader. Record evidence before expanding scope. |
+| Exit Criteria | Common remains unchanged; VM sections stream without width or arbitrary size fields; App never preloads a snapshot; every accepted save/load state/result is correct; errors never claim success; bidirectional cross-width proof and required gates are committed/pushed. |
+| Original Owner Request | One binary snapshot eventually, direct/readonly references and FDD/HDD overlays; Common only two state operations and necessary wiring. Save only running, load only from the initial/stopped product state, success ordinary paused with working resume/reset; VM safe-stop deadline one second. Owner later requires one width-free x86/x64 format and rejects arbitrary snapshot-size allowances. |
 | Similar-Issue Sweep | Existing synchronous media/debug rendezvous, lifecycle completion ordering, run-generation invalidation, CCPU restore/reentry, timer capture finish paths and every Common driver callback that can mutate executor-owned state. |

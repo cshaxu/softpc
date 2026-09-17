@@ -435,24 +435,11 @@ static lib_status app_snapshot_write(void *opaque, const lib_u8 *bytes,
         bytes, byte_count);
 }
 
-typedef struct app_snapshot_reader {
-    const lib_u8 *bytes;
-    lib_size count;
-    lib_size offset;
-} app_snapshot_reader;
-
 static lib_status app_snapshot_read(void *opaque, lib_u8 *bytes,
     lib_size byte_count)
 {
-    app_snapshot_reader *reader = (app_snapshot_reader *)opaque;
-    if (reader == NULL || (bytes == NULL && byte_count != 0u) ||
-        reader->offset > reader->count ||
-        byte_count > reader->count - reader->offset)
-        return LIB_STATUS_INVALID_ARGUMENT;
-    if (byte_count != 0u)
-        lib_memory_copy(bytes, reader->bytes + reader->offset, byte_count);
-    reader->offset += byte_count;
-    return LIB_STATUS_OK;
+    return lib_storage_file_reader_read((lib_storage_file_reader *)opaque,
+        bytes, byte_count);
 }
 
 static void app_command_complete_snapshot(app_command_context *command,
@@ -493,16 +480,14 @@ static void app_command_save_state(app_command_context *command,
 static void app_command_load_state(app_command_context *command,
     const char *path, app_command_effect *effect)
 {
-    void *owned = NULL;
-    lib_size byte_count = 0u;
-    lib_status status = lib_storage_file_read_owned(path,
-        command->snapshot_maximum, &owned, &byte_count);
+    lib_storage_file_reader *reader = NULL;
+    lib_status status = lib_storage_file_reader_open(path, &reader);
     if (status == LIB_STATUS_OK) {
-        app_snapshot_reader reader = { owned, byte_count, 0u };
         status = common_machine_write_state(command->machine,
-            &(common_machine_state_reader) { app_snapshot_read, &reader });
+            &(common_machine_state_reader) { app_snapshot_read, reader });
     }
-    lib_release(owned);
+    if (reader != NULL && lib_storage_file_reader_close(reader) != LIB_STATUS_OK &&
+        status == LIB_STATUS_OK) status = LIB_STATUS_IO_ERROR;
     app_command_complete_snapshot(command, APP_COMMAND_ACTION_LOAD_STATE,
         status, effect);
 }
@@ -651,14 +636,12 @@ void app_command_provider_note_monitor_current(void *opaque,
 }
 
 lib_status app_command_initialize(app_command_context *command,
-    common_machine *machine, common_session_display display,
-    lib_size snapshot_maximum)
+    common_machine *machine, common_session_display display)
 {
-    if (command == NULL || machine == NULL || snapshot_maximum == 0u)
+    if (command == NULL || machine == NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     memset(command, 0, sizeof(*command));
     command->machine = machine;
-    command->snapshot_maximum = snapshot_maximum;
     app_command_session_initialize(&command->session, display);
     return common_debug_create(&command->debug);
 }
