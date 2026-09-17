@@ -312,7 +312,7 @@ VM 强制生成完整帧，
 | S5 | PIC/PIT/RTC/DMA、q/tic 队列、磁盘控制器待续状态 | 数百至千行级 | 待中断/待事件/半条 I/O 的恢复等价，回调参数和句柄重建；不能遗漏未完成传输 |
 | S6 | 视频/键鼠及剩余启用设备状态；重建宿主绘制/声音资源 | 数百至千行级 | planes/latches/banks/font/palette 与 8042/InPort 保真；恢复即有完整帧；账本无未知设备 |
 | S7 | Common machine 两个状态读写接口及必要执行接线+VM 单一恢复事务 | 数百行 | running 读、init/stopped 写；成功为普通 paused；超限读失败暂停；准备失败写保持原状态；跨进程重建 |
-| S8 | App `save <file>`/`load <file>` 命令、帮助、既有 provider 结果/prompt 接线 | 百行级 | Session/UI、Common、Lib 不改；save 仅 running、load 仅 init/stopped；App 以配置 RAM + 8 MiB 限制读入并复用现有 Storage/opaque Common callbacks；命令矩阵、失败输出、paused debug/resume 与既有两类 display/console_control 路径 |
+| S8 | App `save <file>`/`load <file>` 命令、帮助、既有 provider 结果/prompt 接线 | 百行级 | Session/UI、Common、Lib 不改；save 仅 running、load 仅 stopped（包含刚启动的 monitor）；App 以配置 RAM + 8 MiB 限制读入并复用现有 Storage/opaque Common callbacks；命令矩阵、失败输出、paused debug/resume 与既有两类 display/console_control 路径 |
 | S9 | 全量账本复核、安装长流程与回归、最终交付 | 测试为主 | 以下验收矩阵全通过，x86/x64 EXE，owner 手测后才关 T |
 
 ### T63 收口前：MVDM / VM / Compat 增量审计

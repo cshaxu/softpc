@@ -8,7 +8,7 @@
 #define APP_COMMAND_TEXT_CAPACITY 2048u
 #define APP_COMMAND_PATH_CAPACITY 1024u
 
-typedef enum app_monitor_state { APP_MONITOR_INIT, APP_MONITOR_STOPPED, APP_MONITOR_PAUSED, APP_MONITOR_RUNNING } app_monitor_state;
+typedef enum app_monitor_state { APP_MONITOR_STOPPED, APP_MONITOR_PAUSED, APP_MONITOR_RUNNING } app_monitor_state;
 typedef enum app_command_action {
     APP_COMMAND_ACTION_NONE,
     APP_COMMAND_ACTION_EJECT_FLOPPY,

@@ -12,7 +12,7 @@ static app_lifecycle_request expected(app_monitor_state state,
     const char *command)
 {
     if (!strcmp(command, "start"))
-        return state == APP_MONITOR_INIT || state == APP_MONITOR_STOPPED ?
+        return state == APP_MONITOR_STOPPED ?
             APP_LIFECYCLE_REQUEST_START : APP_LIFECYCLE_REQUEST_NONE;
     if (!strcmp(command, "pause"))
         return state == APP_MONITOR_RUNNING ? APP_LIFECYCLE_REQUEST_PAUSE :
@@ -83,7 +83,7 @@ static void complete(app_command_session *session, app_monitor_state *state,
 static void run_matrix(void)
 {
     size_t state_index;
-    for (state_index = APP_MONITOR_INIT; state_index <= APP_MONITOR_RUNNING;
+    for (state_index = APP_MONITOR_STOPPED; state_index <= APP_MONITOR_RUNNING;
          ++state_index) {
         size_t command_index;
         for (command_index = 0u; command_index < sizeof(commands) / sizeof(commands[0]);
@@ -180,9 +180,6 @@ int main(void)
     assert(effect.action == APP_COMMAND_ACTION_SAVE_STATE);
     assert(!strcmp(effect.path, "setup-before-failure.spcs"));
     app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
-        "load setup-before-failure.spcs", &effect);
-    assert(effect.action == APP_COMMAND_ACTION_LOAD_STATE);
-    app_command_session_submit_line(&session, APP_MONITOR_INIT,
         "load setup-before-failure.spcs", &effect);
     assert(effect.action == APP_COMMAND_ACTION_LOAD_STATE);
     app_command_session_submit_line(&session, APP_MONITOR_PAUSED,

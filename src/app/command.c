@@ -91,7 +91,7 @@ static void lifecycle(app_command_session *s, app_monitor_state state,
     }
     if (!strcmp(c, "start"))
     {
-        if (state == APP_MONITOR_INIT || state == APP_MONITOR_STOPPED)
+        if (state == APP_MONITOR_STOPPED)
         {
             accept(s, APP_LIFECYCLE_REQUEST_START);
         }
@@ -103,16 +103,18 @@ static void lifecycle(app_command_session *s, app_monitor_state state,
         if (state == APP_MONITOR_RUNNING)
             accept(s, APP_LIFECYCLE_REQUEST_PAUSE);
         else
-            reject(s, e, state == APP_MONITOR_PAUSED ? "Machine is paused; use resume, reset, or stop." : state == APP_MONITOR_INIT ? "Machine has not started; use start or reset."
-                                                                                                                                    : "Machine is stopped; use start or reset.");
+            reject(s, e, state == APP_MONITOR_PAUSED ?
+                "Machine is paused; use resume, reset, or stop." :
+                "Machine is stopped; use start or reset.");
     }
     else if (!strcmp(c, "resume"))
     {
         if (state == APP_MONITOR_PAUSED)
             accept(s, APP_LIFECYCLE_REQUEST_RESUME);
         else
-            reject(s, e, state == APP_MONITOR_RUNNING ? "Machine is already running; use pause, reset, or stop." : state == APP_MONITOR_INIT ? "Machine has not started; use start or reset."
-                                                                                                                                             : "Machine is stopped; use start or reset.");
+            reject(s, e, state == APP_MONITOR_RUNNING ?
+                "Machine is already running; use pause, reset, or stop." :
+                "Machine is stopped; use start or reset.");
     }
     else if (!strcmp(c, "reset"))
     {
@@ -125,7 +127,7 @@ static void lifecycle(app_command_session *s, app_monitor_state state,
             accept(s, APP_LIFECYCLE_REQUEST_STOP);
         }
         else
-            reject(s, e, state == APP_MONITOR_INIT ? "Machine has not started; use start or reset." : "Machine is stopped; use start or reset.");
+            reject(s, e, "Machine is stopped; use start or reset.");
     }
     else
         reject(s, e, "Unknown command.");
@@ -152,7 +154,7 @@ static void snapshot(app_command_session *s, app_monitor_state state,
         }
         effect->action = APP_COMMAND_ACTION_SAVE_STATE;
     } else {
-        if (state != APP_MONITOR_INIT && state != APP_MONITOR_STOPPED) {
+        if (state != APP_MONITOR_STOPPED) {
             reject(s, effect, state == APP_MONITOR_RUNNING ?
                 "Machine is running; stop it before load." :
                 "Machine is paused; stop it before load.");
@@ -314,7 +316,7 @@ void app_command_session_note_runtime(app_command_session *s,
     else if (state == COMMON_MACHINE_RUNNING)
     {
         s->transition_pending = 0;
-        if (prior == APP_MONITOR_INIT || prior == APP_MONITOR_STOPPED)
+        if (prior == APP_MONITOR_STOPPED)
             outcome(s, "Machine started.");
         else if (prior == APP_MONITOR_PAUSED)
             outcome(s, "Machine resumed.");
@@ -385,7 +387,6 @@ static common_machine_state app_machine_completed_state(
 static app_monitor_state app_command_state(common_session_machine_state state)
 {
     switch (state) {
-    case COMMON_SESSION_MACHINE_INIT: return APP_MONITOR_INIT;
     case COMMON_SESSION_MACHINE_RUNNING: return APP_MONITOR_RUNNING;
     case COMMON_SESSION_MACHINE_PAUSED: return APP_MONITOR_PAUSED;
     default: return APP_MONITOR_STOPPED;

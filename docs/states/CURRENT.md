@@ -38,8 +38,8 @@ page-type length is validated from that declaration before any reset. A real
 two-process save/exit/load/resume CTest proves a fresh stopped target reaches
 ordinary PAUSED without importing live SAS state.
 S8 P1 adds the product boundary only: `save <file>` is admitted from running
-and pauses on successful capture; `load <file>` is admitted from init/stopped
-and reaches ordinary paused.  App owns copied paths, the RAM-plus-allowance
+and pauses on successful capture; `load <file>` is admitted from stopped
+(including the just-started monitor) and reaches ordinary paused.  App owns copied paths, the RAM-plus-allowance
 input bound, wording and prompt flow; Common and Lib remain unchanged.
 
 ## Current Technical Baseline
@@ -52,7 +52,8 @@ input bound, wording and prompt flow; Common and Lib remain unchanged.
   Owner narrowed scope after S1: Lib/test-lib unchanged; Common only the two
   machine-state read/write operations and their necessary executor wiring.
   Snapshot file policy stays in App, state encoding/restoration in VM/Compat/MVDM.
-  Latest owner admission: read only while running, write only init/stopped;
+  Latest owner admission: read only while running, write only from the
+  initial/stopped product state;
   success is ordinary paused (resume/reset/stop retain their meanings).
   VM owns the safe-stop condition and a single 1-second monotonic deadline;
   ordinary pause/debug semantics stay unchanged. S2 adds the isolated Compat
@@ -304,10 +305,10 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
 | Files And ABI Surface | `src/app/{command,composition}.c/.h`, App CMake/test wiring and this proposal/evidence only. App command retains copied path text and derives a bounded input-file limit from configured RAM plus a documented archive allowance. It calls only `common_machine_read_state`/`write_state` and `lib_storage_file_*`; it does not include VM, Compat or MVDM headers. |
 | Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, `DOCUMENT.md`; `docs/design/ARCHITECTURE.md`, `CODING.md`, `UI.md`; active proposal and source-boundary gates. |
 | Verification | Parse/help/state-admission tests, a real App-provider save/stop/load/resume transaction with a build-owned fixture, failure/path/oversize tests, full sequential x64/x86 CTest, package builds and actual-commit review. |
-| Expected Markers | Only `save` from running is admitted and succeeds as ordinary PAUSED; only `load` from init/stopped is admitted and succeeds as ordinary PAUSED. Direct/readonly media remain referenced by their configured source; existing VM image semantics govern all currently archived state. App produces one explicit result and one prompt, never a false success or an extra lifecycle request. |
+| Expected Markers | Only `save` from running is admitted and succeeds as ordinary PAUSED; only `load` from stopped (including the just-started monitor) is admitted and succeeds as ordinary PAUSED. Direct/readonly media remain referenced by their configured source; existing VM image semantics govern all currently archived state. App produces one explicit result and one prompt, never a false success or an extra lifecycle request. |
 | Asset Needs | No user media, user snapshot file or INI mutation. Tests create/remove snapshot fixtures below their own build working directory only. Packaging refreshes only the two approved EXEs. |
 | Reporting Requirements | Before code report exact App action, callback, file and size-limit flow; after proof report actual production/test numstat, command/state matrix, tests and both EXE links. |
 | Stop Conditions | A necessary user command requires a new Common/Lib API; current canonical image cannot represent a promised medium state; or App cannot provide bounded whole-file I/O through existing Storage. Record evidence before expanding scope. |
 | Exit Criteria | App commands use only the existing Common/Lib contracts; every accepted save/load state/result is correct; errors never claim success; a real command-provider transaction proves save → paused → stop → load → paused → resume; dual-width proof and required gates are committed/pushed. |
-| Original Owner Request | One binary snapshot eventually, direct/readonly references and FDD/HDD overlays; no Lib edits, Common only two state operations and necessary wiring. Save only running, load only init/stopped, success ordinary paused with working resume/reset; VM safe-stop deadline one second. |
+| Original Owner Request | One binary snapshot eventually, direct/readonly references and FDD/HDD overlays; no Lib edits, Common only two state operations and necessary wiring. Save only running, load only from the initial/stopped product state, success ordinary paused with working resume/reset; VM safe-stop deadline one second. |
 | Similar-Issue Sweep | Existing synchronous media/debug rendezvous, lifecycle completion ordering, run-generation invalidation, CCPU restore/reentry, timer capture finish paths and every Common driver callback that can mutate executor-owned state. |
