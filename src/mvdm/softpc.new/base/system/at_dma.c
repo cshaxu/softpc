@@ -47,6 +47,7 @@
 #include "trace.h"
 #include "dma.h"
 #include "debug.h"
+#include "compat/devices/snapshot.h"
 
 /*
  * ============================================================================
@@ -922,4 +923,83 @@ GLOBAL	void dma_init	IFN0()
 	/* connect the DMA Page Register chip to the I/O bus */
 	for (port = DMA_PAGE_PORT_START; port <= DMA_PAGE_PORT_END; port++)
 		io_connect_port(port, DMA_PAGE_ADAPTOR, IO_READ_WRITE);
+}
+
+GLOBAL void
+softpc_device_snapshot_capture_dma(state)
+softpc_device_dma_state *state;
+{
+	unsigned int controller, channel, byte_index;
+
+	if (state == NULL)
+		return;
+	for (controller = 0; controller < DMA_ADAPTOR_CONTROLLERS; ++controller) {
+		for (channel = 0; channel < DMA_CONTROLLER_CHANNELS; ++channel) {
+			for (byte_index = 0; byte_index < 2; ++byte_index) {
+				state->base_address[controller][channel][byte_index] =
+					adaptor.controller[controller].base_address[channel][byte_index];
+				state->base_count[controller][channel][byte_index] =
+					adaptor.controller[controller].base_count[channel][byte_index];
+				state->current_address[controller][channel][byte_index] =
+					adaptor.controller[controller].current_address[channel][byte_index];
+				state->current_count[controller][channel][byte_index] =
+					adaptor.controller[controller].current_count[channel][byte_index];
+				state->temporary_address[controller][channel][byte_index] =
+					adaptor.controller[controller].temporary_address[channel][byte_index];
+				state->temporary_count[controller][channel][byte_index] =
+					adaptor.controller[controller].temporary_count[channel][byte_index];
+			}
+			state->mode[controller][channel] =
+				adaptor.controller[controller].mode[channel].all;
+		}
+		state->status[controller] = adaptor.controller[controller].status.all;
+		state->command[controller] = adaptor.controller[controller].command.all;
+		state->temporary[controller] = adaptor.controller[controller].temporary;
+		state->mask[controller] = adaptor.controller[controller].mask;
+		state->request[controller] = adaptor.controller[controller].request;
+		state->first_last[controller] = adaptor.controller[controller].first_last;
+	}
+	for (channel = 0; channel < DMA_PAGE_CHANNELS; ++channel)
+		state->page[channel] = adaptor.pages.page[channel];
+}
+
+GLOBAL int
+softpc_device_snapshot_restore_dma(state)
+const softpc_device_dma_state *state;
+{
+	unsigned int controller, channel, byte_index;
+
+	if (state == NULL)
+		return FALSE;
+	for (controller = 0; controller < DMA_ADAPTOR_CONTROLLERS; ++controller) {
+		if (state->first_last[controller] > 1u)
+			return FALSE;
+		for (channel = 0; channel < DMA_CONTROLLER_CHANNELS; ++channel) {
+			for (byte_index = 0; byte_index < 2; ++byte_index) {
+				adaptor.controller[controller].base_address[channel][byte_index] =
+					state->base_address[controller][channel][byte_index];
+				adaptor.controller[controller].base_count[channel][byte_index] =
+					state->base_count[controller][channel][byte_index];
+				adaptor.controller[controller].current_address[channel][byte_index] =
+					state->current_address[controller][channel][byte_index];
+				adaptor.controller[controller].current_count[channel][byte_index] =
+					state->current_count[controller][channel][byte_index];
+				adaptor.controller[controller].temporary_address[channel][byte_index] =
+					state->temporary_address[controller][channel][byte_index];
+				adaptor.controller[controller].temporary_count[channel][byte_index] =
+					state->temporary_count[controller][channel][byte_index];
+			}
+			adaptor.controller[controller].mode[channel].all =
+				state->mode[controller][channel];
+		}
+		adaptor.controller[controller].status.all = state->status[controller];
+		adaptor.controller[controller].command.all = state->command[controller];
+		adaptor.controller[controller].temporary = state->temporary[controller];
+		adaptor.controller[controller].mask = state->mask[controller];
+		adaptor.controller[controller].request = state->request[controller];
+		adaptor.controller[controller].first_last = state->first_last[controller];
+	}
+	for (channel = 0; channel < DMA_PAGE_CHANNELS; ++channel)
+		adaptor.pages.page[channel] = state->page[channel];
+	return TRUE;
 }

@@ -140,7 +140,8 @@ add_library(softpc-ccpu-core OBJECT
 add_library(softpc-machine-compat OBJECT
     src/compat/cvidc/gdp_state.c
     src/compat/ccpu/lifecycle.c
-    src/compat/ccpu/archive.c)
+    src/compat/ccpu/archive.c
+    src/compat/devices/archive.c)
 
 # Controllers, firmware and the standalone host boundary evolve independently
 # of the CCPU/C-VIDC executor.  Keep them in a separate object target so a

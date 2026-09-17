@@ -12,8 +12,8 @@ foreach(preset_index RANGE 0 1)
 endforeach()
 
 # New host code has one concrete ownership taxonomy.  No compatibility or
-# convenience aggregate may appear beside these six owners.
-set(allowed_host_taxonomies bios ccpu cmos cvidc keymouse system)
+# convenience aggregate may appear beside these seven owners.
+set(allowed_host_taxonomies bios ccpu cmos cvidc devices keymouse system)
 file(GLOB host_entries RELATIVE "${SOFTPC_SOURCE_DIR}/src/compat"
     "${SOFTPC_SOURCE_DIR}/src/compat/*")
 foreach(host_entry IN LISTS host_entries)

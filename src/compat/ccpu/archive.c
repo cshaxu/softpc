@@ -1,4 +1,5 @@
 #include "archive.h"
+#include "../devices/archive.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -25,6 +26,8 @@ static int softpc_ccpu_archive_allocate(softpc_ccpu_archive *archive,
     free(archive->memory);
     free(archive->page_types);
     free(archive->tlb_page_index);
+    softpc_device_archive_dispose(archive->devices);
+    archive->devices = NULL;
     archive->memory = memory;
     archive->page_types = page_types;
     archive->tlb_page_index = tlb_page_index;
@@ -37,6 +40,7 @@ void softpc_ccpu_archive_dispose(softpc_ccpu_archive *archive)
     free(archive->memory);
     free(archive->page_types);
     free(archive->tlb_page_index);
+    softpc_device_archive_dispose(archive->devices);
     *archive = (softpc_ccpu_archive){0};
 }
 
@@ -63,6 +67,10 @@ int softpc_ccpu_archive_capture(softpc_ccpu_archive *archive)
     softpc_ccpu_snapshot_capture_tlb(&archive->tlb, archive->tlb_page_index,
         SOFTPC_CCPU_FAST_TLB_PAGE_COUNT);
     softpc_ccpu_snapshot_capture_fpu(&archive->fpu);
+    if (archive->devices == NULL)
+        archive->devices = softpc_device_archive_create();
+    if (archive->devices == NULL ||
+        !softpc_device_archive_capture(archive->devices)) return 0;
     archive->valid = 1;
     return 1;
 }
@@ -82,5 +90,5 @@ int softpc_ccpu_archive_restore(const softpc_ccpu_archive *archive)
             archive->tlb_page_index, SOFTPC_CCPU_FAST_TLB_PAGE_COUNT))
         return 0;
     softpc_ccpu_snapshot_restore_fpu(&archive->fpu);
-    return 1;
+    return softpc_device_archive_restore(archive->devices);
 }

@@ -162,6 +162,7 @@ LOCAL char SccsID[]="@(#)ica.c	1.38 10/19/95 Copyright Insignia Solutions Ltd.";
 #include "host.h"
 #include "yoda.h"
 #include "debug.h"
+#include "compat/devices/snapshot.h"
 
 #ifdef NOVELL
 extern void host_sigio_event IPT0();
@@ -2150,6 +2151,122 @@ void ica1_init IFN0()
     }
 #endif	/* CPU_40_STYLE */
 
+}
+
+GLOBAL int
+softpc_device_snapshot_capture_pic(state)
+softpc_device_pic_state *state;
+{
+	ADAPTER_STATE *source;
+	softpc_device_pic_adapter_state *target;
+	int adapter, line, depth;
+
+	if (state == NULL)
+		return FALSE;
+	for (adapter = 0; adapter < SOFTPC_DEVICE_PIC_COUNT; ++adapter) {
+		source = &adapter_state[adapter];
+		target = &state->adapter[adapter];
+		target->master = source->ica_master ? 1u : 0u;
+		target->irr = source->ica_irr;
+		target->isr = source->ica_isr;
+		target->imr = source->ica_imr;
+		target->ssr = source->ica_ssr;
+		target->base = source->ica_base;
+		target->hipri = source->ica_hipri;
+		target->mode = source->ica_mode;
+		target->interrupt_line = source->ica_int_line;
+		target->cpu_interrupt = source->ica_cpu_int;
+		for (line = 0; line < SOFTPC_DEVICE_PIC_LINE_COUNT; ++line) {
+			target->count[line] = source->ica_count[line];
+#if defined(CPU_40_STYLE) && !defined(NTVDM)
+			/* No function address may cross the archive boundary.  The
+			   selected standalone configuration has no pending action-IRQ
+			   callback at a safe snapshot boundary; reject rather than lie. */
+			if (source->callback_fn[line] != NO_ICA_CALLBACK)
+				return FALSE;
+			target->callback_parameter[line] = source->callback_parm[line];
+			target->isr_depth[line] = source->isr_depth[line];
+			for (depth = 0; depth <= SOFTPC_DEVICE_PIC_ISR_DEPTH; ++depth)
+				target->isr_progress[line][depth] =
+					source->isr_progress[line][depth];
+			for (depth = 0; depth < SOFTPC_DEVICE_PIC_ISR_DEPTH; ++depth)
+				target->isr_time_decay[line][depth] =
+					source->isr_time_decay[line][depth];
+#else
+			target->callback_parameter[line] = 0u;
+			target->isr_depth[line] = 0;
+			for (depth = 0; depth <= SOFTPC_DEVICE_PIC_ISR_DEPTH; ++depth)
+				target->isr_progress[line][depth] = 0;
+			for (depth = 0; depth < SOFTPC_DEVICE_PIC_ISR_DEPTH; ++depth)
+				target->isr_time_decay[line][depth] = 0;
+#endif
+		}
+	}
+#ifdef HOOKED_IRETS
+	state->iret_hooks_enabled = iretHooksEnabled ? 1u : 0u;
+	state->iret_hook_mask = iretHookMask;
+	state->iret_hook_active = iretHookActive;
+#else
+	state->iret_hooks_enabled = 0u;
+	state->iret_hook_mask = 0u;
+	state->iret_hook_active = 0u;
+#endif
+	return TRUE;
+}
+
+GLOBAL int
+softpc_device_snapshot_restore_pic(state)
+const softpc_device_pic_state *state;
+{
+	ADAPTER_STATE *target;
+	const softpc_device_pic_adapter_state *source;
+	int adapter, line, depth;
+
+	if (state == NULL)
+		return FALSE;
+	for (adapter = 0; adapter < SOFTPC_DEVICE_PIC_COUNT; ++adapter) {
+		source = &state->adapter[adapter];
+		if (source->master > 1u)
+			return FALSE;
+		for (line = 0; line < SOFTPC_DEVICE_PIC_LINE_COUNT; ++line)
+			if (source->isr_depth[line] < 0 ||
+			    source->isr_depth[line] > SOFTPC_DEVICE_PIC_ISR_DEPTH)
+				return FALSE;
+	}
+	for (adapter = 0; adapter < SOFTPC_DEVICE_PIC_COUNT; ++adapter) {
+		source = &state->adapter[adapter];
+		target = &adapter_state[adapter];
+		target->ica_master = source->master ? TRUE : FALSE;
+		target->ica_irr = source->irr;
+		target->ica_isr = source->isr;
+		target->ica_imr = source->imr;
+		target->ica_ssr = source->ssr;
+		target->ica_base = source->base;
+		target->ica_hipri = source->hipri;
+		target->ica_mode = source->mode;
+		target->ica_int_line = source->interrupt_line;
+		target->ica_cpu_int = source->cpu_interrupt;
+		for (line = 0; line < SOFTPC_DEVICE_PIC_LINE_COUNT; ++line) {
+			target->ica_count[line] = source->count[line];
+#if defined(CPU_40_STYLE) && !defined(NTVDM)
+			target->callback_fn[line] = NO_ICA_CALLBACK;
+			target->callback_parm[line] = source->callback_parameter[line];
+			target->isr_depth[line] = source->isr_depth[line];
+			for (depth = 0; depth <= SOFTPC_DEVICE_PIC_ISR_DEPTH; ++depth)
+				target->isr_progress[line][depth] =
+					source->isr_progress[line][depth];
+			for (depth = 0; depth < SOFTPC_DEVICE_PIC_ISR_DEPTH; ++depth)
+				target->isr_time_decay[line][depth] =
+					source->isr_time_decay[line][depth];
+#endif
+		}
+	}
+#ifdef HOOKED_IRETS
+	iretHooksEnabled = state->iret_hooks_enabled ? TRUE : FALSE;
+	iretHookMask = state->iret_hook_mask;
+	iretHookActive = state->iret_hook_active;
+#endif
+	return TRUE;
 }
 
 

@@ -1,6 +1,7 @@
 #include "vm/machine.h"
 #include "compat/ccpu/abi.h"
 #include "compat/ccpu/lifecycle.h"
+#include "compat/devices/snapshot.h"
 #include "vm/snapshot.h"
 #include "compat/platform.h"
 #include "../lib/cleanup.h"
@@ -12,6 +13,7 @@
 #include "host_def.h"
 #include "ios.h"
 #include "ica.h"
+#include "cmos.h"
 #include "c_tlb.h"
 #include "c_debug.h"
 #include "quick_ev.h"
@@ -47,6 +49,8 @@ typedef struct checkpoint_probe {
 } checkpoint_probe;
 
 static checkpoint_probe probe;
+static unsigned event_count;
+static void record_event(long param);
 
 static void nested_bios(void)
 {
@@ -254,7 +258,6 @@ static void verify_translation(void)
 }
 
 static long event_order[8];
-static unsigned event_count;
 
 static void verify_cpu_side_state(void)
 {
@@ -294,6 +297,7 @@ static void verify_snapshot_archive(void)
     softpc_snapshot_image image = {0};
     softpc_ccpu_entry entry = {1, 0u}, restored = {0};
     unsigned char readback[2];
+    half_word cmos_value;
 
     assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_write_physical(probe.machine, 0x1004u, directory,
@@ -311,6 +315,14 @@ static void verify_snapshot_archive(void)
     setup_breakpoints();
     setNpxControlReg(0x027fu);
     setNpxStatusReg(0x2800u);
+    cmos_outb(CMOS_PORT, CMOS_SHUT_DOWN);
+    cmos_outb(CMOS_DATA, 0x5au);
+    /* A callback without a reviewed semantic identifier blocks capture rather
+       than being silently omitted from the pending-work image. */
+    assert(add_q_event_i(record_event, 100u, 61) != 0);
+    assert(softpc_snapshot_image_capture(&image, &entry) == LIB_STATUS_IO_ERROR);
+    assert(event_count == 0u);
+    q_event_init();
     assert(softpc_snapshot_image_capture(&image, &entry) == LIB_STATUS_OK);
 
     c_setEAX(0u);
@@ -319,6 +331,8 @@ static void verify_snapshot_archive(void)
     setup_breakpoints();
     setNpxControlReg(0x037fu);
     setNpxStatusReg(0u);
+    cmos_outb(CMOS_PORT, CMOS_SHUT_DOWN);
+    cmos_outb(CMOS_DATA, 0x42u);
     assert(softpc_machine_write_physical(probe.machine, 0x5000u, altered,
         sizeof(altered)) == SOFTPC_MACHINE_OK);
     flush_tlb();
@@ -327,6 +341,9 @@ static void verify_snapshot_archive(void)
     assert(c_getEAX() == 0x12345678u && c_getEIP() == 0x7654u);
     assert(CCPU_DR[0] == 0x1234u && CCPU_DR[7] == 1u);
     assert(getNpxControlReg() == 0x027fu && getNpxStatusReg() == 0x2800u);
+    cmos_outb(CMOS_PORT, CMOS_SHUT_DOWN);
+    cmos_inb(CMOS_DATA, &cmos_value);
+    assert(cmos_value == 0x5au);
     assert(softpc_machine_read_physical(probe.machine, 0x5000u, readback,
         sizeof(readback)) == SOFTPC_MACHINE_OK);
     assert(readback[0] == marker[0] && readback[1] == marker[1]);
@@ -336,6 +353,30 @@ static void verify_snapshot_archive(void)
         sizeof(new_page)) == SOFTPC_MACHINE_OK);
     assert(lin2phy(0x400123u, 0) == 0x3123u);
     softpc_snapshot_image_dispose(&image);
+}
+
+static void verify_pit_archive(void)
+{
+    softpc_device_pit_state saved, restored;
+
+    assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
+    /* Program channel zero into a non-default active state, then prove that
+       a later incompatible reprogram is replaced by the semantic archive. */
+    outb(0x43u, 0x36u);
+    outb(0x40u, 0x34u);
+    outb(0x40u, 0x12u);
+    assert(softpc_device_snapshot_capture_pit(&saved));
+    outb(0x43u, 0x30u);
+    outb(0x40u, 0x78u);
+    outb(0x40u, 0x56u);
+    assert(softpc_device_snapshot_restore_pit(&saved));
+    assert(softpc_device_snapshot_capture_pit(&restored));
+    assert(restored.counter[0].mode == saved.counter[0].mode);
+    assert(restored.counter[0].read_load == saved.counter[0].read_load);
+    assert(restored.counter[0].initial_count == saved.counter[0].initial_count);
+    assert(restored.counter[0].state == saved.counter[0].state);
+    assert(restored.counter[0].action_on_wait_complete ==
+        saved.counter[0].action_on_wait_complete);
 }
 
 static void record_event(long param)
@@ -395,6 +436,63 @@ static void verify_event_queue(void)
     assert(softpc_platform_set_clock_running(1));
 }
 
+static int snapshot_encode_event(Q_CALLBACK_FN callback,
+    unsigned long *callback_id)
+{
+    if (callback != record_event || callback_id == NULL) return 0;
+    *callback_id = 1u;
+    return 1;
+}
+
+static Q_CALLBACK_FN snapshot_decode_event(unsigned long callback_id)
+{
+    return callback_id == 1u ? record_event : NULL;
+}
+
+static void verify_event_queue_archive(void)
+{
+    Q_EVENT_SNAPSHOT_STATE state;
+    Q_EVENT_SNAPSHOT_ENTRY quick[4], tick[4];
+    unsigned long saved_callback;
+
+    assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_platform_set_clock_running(0));
+    q_event_init();
+    tic_event_init();
+    event_count = 0u;
+    assert(add_q_event_i(record_event, 100u, 41) == 1);
+    assert(add_q_event_i(record_event, 100u, 42) == 2);
+    assert(add_tic_event(record_event, 3u, 51) == 1);
+    c_cpu_q_ev_set_count(4u);
+    assert(q_event_snapshot_capture(&state, quick, 4u, tick, 4u,
+        snapshot_encode_event));
+    assert(state.quick_entries == 2u && state.tick_entries == 1u);
+    assert(state.quick_count == 4u && state.tick_count == 3u);
+    assert(event_count == 0u);
+    /* Rebuild must be all-or-nothing: a bad late tick callback must not
+       discard the still-live quick queue while it validates the archive. */
+    saved_callback = tick[0].callback_id;
+    tick[0].callback_id = 99u;
+    assert(!q_event_snapshot_restore(&state, quick, 4u, tick, 4u,
+        snapshot_decode_event));
+    tick[0].callback_id = saved_callback;
+    assert(event_count == 0u && c_cpu_q_ev_get_count() == 4u);
+    q_event_init();
+    tic_event_init();
+    assert(q_event_snapshot_restore(&state, quick, 4u, tick, 4u,
+        snapshot_decode_event));
+    /* Restore links records only: it must never run an event callback. */
+    assert(event_count == 0u && c_cpu_q_ev_get_count() == 4u);
+    c_cpu_q_ev_set_count(0u);
+    dispatch_q_event();
+    assert(event_count == 2u && event_order[0] == 41 && event_order[1] == 42);
+    dispatch_tic_event(); dispatch_tic_event(); dispatch_tic_event();
+    assert(event_count == 3u && event_order[2] == 51);
+    q_event_init();
+    tic_event_init();
+    assert(softpc_platform_set_clock_running(1));
+}
+
 int main(void)
 {
     const char *path = "softpc-checkpoint-smoke.img";
@@ -432,7 +530,9 @@ int main(void)
     verify_translation();
     verify_cpu_side_state();
     verify_snapshot_archive();
+    verify_pit_archive();
     verify_event_queue();
+    verify_event_queue_archive();
     softpc_machine_destroy(probe.machine);
     assert(softpc_test_remove_image(path));
     return 0;

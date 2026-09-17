@@ -237,6 +237,7 @@ IMPORT	int	soft_reset;
 #include "debug.h"
 #include "sas.h"
 #include "quick_ev.h"
+#include "compat/devices/snapshot.h"
 
 /* [3.1.2 DECLARATIONS]                                                 */
 
@@ -1911,6 +1912,135 @@ GLOBAL VOID hda_init IFN0()
 	fdisk_physattach(1);
 	fdisk_ioattach();
 	fdisk_reset();
+}
+
+GLOBAL int
+softpc_device_snapshot_encode_fdisk_callback(callback, callback_id)
+Q_CALLBACK_FN callback;
+unsigned long *callback_id;
+{
+	if (callback_id == NULL)
+		return FALSE;
+	if (callback == fdisk_pause)
+		*callback_id = SOFTPC_DEVICE_QUEUE_HDD_PAUSE;
+	else if (callback == disk_int_call_back)
+		*callback_id = SOFTPC_DEVICE_QUEUE_HDD_INTERRUPT;
+	else
+		return FALSE;
+	return TRUE;
+}
+
+GLOBAL Q_CALLBACK_FN
+softpc_device_snapshot_decode_fdisk_callback(callback_id)
+unsigned long callback_id;
+{
+	if (callback_id == SOFTPC_DEVICE_QUEUE_HDD_PAUSE)
+		return fdisk_pause;
+	if (callback_id == SOFTPC_DEVICE_QUEUE_HDD_INTERRUPT)
+		return disk_int_call_back;
+	return NULL;
+}
+
+LOCAL int
+snapshot_encode_active_command(command)
+void (*command)();
+{
+	if (command == NULL) return 0;
+	if (command == restore) return 1;
+	if (command == seek) return 2;
+	if (command == rsector) return 3;
+	if (command == wsector) return 4;
+	if (command == format) return 5;
+	if (command == rverify) return 6;
+	if (command == diagnose) return 7;
+	if (command == setparams) return 8;
+	if (command == bad) return 9;
+	return -1;
+}
+
+LOCAL void (*
+snapshot_decode_active_command(command))()
+int command;
+{
+	switch (command) {
+	case 0: return NULL;
+	case 1: return restore;
+	case 2: return seek;
+	case 3: return rsector;
+	case 4: return wsector;
+	case 5: return format;
+	case 6: return rverify;
+	case 7: return diagnose;
+	case 8: return setparams;
+	case 9: return bad;
+	default: return NULL;
+	}
+}
+
+GLOBAL void
+softpc_device_snapshot_capture_hdd(state)
+softpc_device_hdd_state *state;
+{
+	int drive, index;
+
+	if (state == NULL)
+		return;
+	for (drive = 0; drive < 2; ++drive) {
+		state->drive[drive].drive_id = drives[drive].driveid;
+		state->drive[drive].max_head = drives[drive].maxhead;
+		state->drive[drive].max_cylinder = drives[drive].maxcyl;
+		state->drive[drive].max_sector = drives[drive].maxsect;
+		state->drive[drive].sectors_per_track = drives[drive].nsecspertrack;
+		state->drive[drive].bytes_per_cylinder = drives[drive].nbytespercyl;
+		state->drive[drive].bytes_per_track = drives[drive].nbytespertrack;
+		state->drive[drive].wired_up = drives[drive].wiredup;
+		state->drive[drive].current_offset = drives[drive].curoffset;
+	}
+	for (index = 0; index < 10; ++index)
+		state->taskfile[index] = taskfile[index];
+	for (index = 0; index < 256; ++index)
+		state->sector[index] = sectbuffer[index];
+	state->fixed_disk_register = fixeddiskreg;
+	state->digital_input_register = digipreg;
+	state->sector_index = sectindx;
+	state->selected_drive = pseldrv == NULL ? -1 :
+		(pseldrv == &drives[0] ? 0 : pseldrv == &drives[1] ? 1 : -2);
+	state->active_command = snapshot_encode_active_command(activecmd);
+}
+
+GLOBAL int
+softpc_device_snapshot_restore_hdd(state)
+const softpc_device_hdd_state *state;
+{
+	int drive, index;
+	void (*command)();
+
+	if (state == NULL || state->selected_drive < -1 ||
+	    state->selected_drive >= 2 || state->active_command < 0 ||
+	    (command = snapshot_decode_active_command(state->active_command)) == NULL &&
+		state->active_command != 0)
+		return FALSE;
+	for (drive = 0; drive < 2; ++drive) {
+		drives[drive].driveid = state->drive[drive].drive_id;
+		drives[drive].maxhead = state->drive[drive].max_head;
+		drives[drive].maxcyl = state->drive[drive].max_cylinder;
+		drives[drive].maxsect = state->drive[drive].max_sector;
+		drives[drive].nsecspertrack = state->drive[drive].sectors_per_track;
+		drives[drive].nbytespercyl = state->drive[drive].bytes_per_cylinder;
+		drives[drive].nbytespertrack = state->drive[drive].bytes_per_track;
+		drives[drive].wiredup = state->drive[drive].wired_up;
+		drives[drive].curoffset = state->drive[drive].current_offset;
+	}
+	for (index = 0; index < 10; ++index)
+		taskfile[index] = state->taskfile[index];
+	for (index = 0; index < 256; ++index)
+		sectbuffer[index] = state->sector[index];
+	fixeddiskreg = state->fixed_disk_register;
+	digipreg = state->digital_input_register;
+	sectindx = state->sector_index;
+	pseldrv = state->selected_drive < 0 ? NULL : &drives[state->selected_drive];
+	activecmd = command;
+	return TRUE;
 }
 
 

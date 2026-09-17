@@ -77,6 +77,7 @@ static char SccsID[]="@(#)fla.c	1.18 07/06/94 Copyright Insignia Solutions Ltd."
 #include "debug.h"
 #include "fdisk.h"
 #include "quick_ev.h"
+#include "compat/devices/snapshot.h"
 
 /*
  * ============================================================================
@@ -105,6 +106,7 @@ static void fdc_ndma_bufmgr_wt IPT1(half_word, value);
 static void fla_atomicxqt IPT0();
 static void fla_ndmaxqt IPT0();
 static void fla_ndma_bump_sectid IPT0();
+LOCAL void fla_int_call_back IPT1(long, junk);
 
 /*
  * The command and result blocks that are used to communicate to the GFI 
@@ -230,6 +232,102 @@ LOCAL void fla_clear_int IFN0()
 
 	fdc_int_line = 0;
 	fdc_interrupt_pending = FALSE;
+}
+
+GLOBAL int
+softpc_device_snapshot_encode_fla_callback(callback, callback_id)
+Q_CALLBACK_FN callback;
+unsigned long *callback_id;
+{
+	if (callback != fla_int_call_back || callback_id == NULL)
+		return FALSE;
+	*callback_id = SOFTPC_DEVICE_QUEUE_FDC_INTERRUPT;
+	return TRUE;
+}
+
+GLOBAL Q_CALLBACK_FN
+softpc_device_snapshot_decode_fla_callback(callback_id)
+unsigned long callback_id;
+{
+	return callback_id == SOFTPC_DEVICE_QUEUE_FDC_INTERRUPT ?
+		fla_int_call_back : NULL;
+}
+
+GLOBAL void
+softpc_device_snapshot_capture_fdc(state)
+softpc_device_fdc_state *state;
+{
+	int i;
+
+	if (state == NULL)
+		return;
+	for (i = 0; i < MAX_COMMAND_LEN; ++i)
+		state->command[i] = fdc_command_block[i];
+	for (i = 0; i < MAX_RESULT_LEN; ++i)
+		state->result[i] = fdc_result_block[i];
+	for (i = 0; i < 4; ++i) {
+		state->sense[i][0] = fdc_sis_slot[i].full;
+		state->sense[i][1] = fdc_sis_slot[i].res[0];
+		state->sense[i][2] = fdc_sis_slot[i].res[1];
+	}
+	for (i = 0; i < 8192; ++i)
+		state->ndma[i] = (IU8)fla_ndma_buffer[i];
+	state->status = fdc_status;
+	state->current_command = fdc_current_command;
+	state->interrupt_line = fdc_int_line;
+	state->dor = dor.all;
+	state->drive_selected = drive_selected;
+	state->interrupt_pending = fdc_interrupt_pending;
+	state->busy = fla_busy;
+	state->ndma_enabled = fla_ndma;
+	state->command_count = fdc_command_count;
+	state->result_count = fdc_result_count;
+	state->ndma_count = fla_ndma_buffer_count;
+	state->ndma_sector_size = fla_ndma_sector_size;
+}
+
+GLOBAL int
+softpc_device_snapshot_restore_fdc(state)
+const softpc_device_fdc_state *state;
+{
+	int i;
+
+	if (state == NULL ||
+	    state->command_count > MAX_COMMAND_LEN ||
+	    state->result_count > MAX_RESULT_LEN ||
+	    state->drive_selected >= 4 ||
+	    state->sense[0][0] > 1 || state->sense[1][0] > 1 ||
+	    state->sense[2][0] > 1 || state->sense[3][0] > 1 ||
+	    state->interrupt_line > 1 ||
+	    state->interrupt_pending > 1 || state->busy > 1 ||
+	    state->ndma_enabled > 1 || state->ndma_count < 0 ||
+	    state->ndma_count > 8192 || state->ndma_sector_size < 0 ||
+	    state->ndma_sector_size > 8192)
+		return FALSE;
+	for (i = 0; i < MAX_COMMAND_LEN; ++i)
+		fdc_command_block[i] = state->command[i];
+	for (i = 0; i < MAX_RESULT_LEN; ++i)
+		fdc_result_block[i] = state->result[i];
+	for (i = 0; i < 4; ++i) {
+		fdc_sis_slot[i].full = state->sense[i][0];
+		fdc_sis_slot[i].res[0] = state->sense[i][1];
+		fdc_sis_slot[i].res[1] = state->sense[i][2];
+	}
+	for (i = 0; i < 8192; ++i)
+		fla_ndma_buffer[i] = (char)state->ndma[i];
+	fdc_status = state->status;
+	fdc_current_command = state->current_command;
+	fdc_int_line = state->interrupt_line;
+	dor.all = state->dor;
+	drive_selected = state->drive_selected;
+	fdc_interrupt_pending = state->interrupt_pending;
+	fla_busy = state->busy;
+	fla_ndma = state->ndma_enabled;
+	fdc_command_count = (half_word)state->command_count;
+	fdc_result_count = (half_word)state->result_count;
+	fla_ndma_buffer_count = state->ndma_count;
+	fla_ndma_sector_size = state->ndma_sector_size;
+	return TRUE;
 }
 
 LOCAL void fla_hw_interrupt IFN0()

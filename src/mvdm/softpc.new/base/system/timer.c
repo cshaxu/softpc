@@ -68,6 +68,7 @@ static char SccsID[]="@(#)timer.c	1.41 05/31/95 Copyright Insignia Solutions Ltd
 #include "timeval.h"
 #include "idetect.h"
 #include "debug.h"
+#include "compat/devices/snapshot.h"
 #include "quick_ev.h"
 
 #ifndef PROD
@@ -1285,6 +1286,7 @@ LOCAL void outputWaveForm IFN5(unsigned int, delay, unsigned long, lowclocks,
 #ifdef DOCUMENTATION
 	int ch;
 #endif /* DOCUMENTATION */
+
 	pcu->out.startLogicLevel = lohi;
 	pcu->out.repeatWaveForm = repeat;
 	pcu->out.clocksAtLoLogicLevel = lowclocks;
@@ -2884,3 +2886,397 @@ dumpCounter IFN0()
 }
 #endif /* nPROD */
 #endif /* DOCUMENTATION */
+
+GLOBAL int
+softpc_device_snapshot_encode_timer_callback(callback, callback_id)
+Q_CALLBACK_FN callback;
+unsigned long *callback_id;
+{
+#ifndef NTVDM
+	if (callback_id == NULL)
+		return FALSE;
+	if (callback == timer_no_longer_too_soon)
+		*callback_id = SOFTPC_DEVICE_QUEUE_TIMER_CLEAR_TOO_SOON;
+	else if (callback == timer_multiple_ints)
+		*callback_id = SOFTPC_DEVICE_QUEUE_TIMER_MULTIPLE_INTERRUPTS;
+	else
+		return FALSE;
+	return TRUE;
+#else
+	UNUSED(callback);
+	UNUSED(callback_id);
+	return FALSE;
+#endif
+}
+
+#ifndef NTVDM
+/*
+ * The archive boundary is deliberately below the original timer API.  It
+ * names the finite state-machine functions instead of retaining code
+ * addresses, and stores a counter timestamp as an elapsed phase rather than
+ * an absolute host-clock value.
+ */
+enum {
+    SNAPSHOT_TIMER_STATE_UNINIT = 1,
+    SNAPSHOT_TIMER_STATE_AWAITING_GATE,
+    SNAPSHOT_TIMER_STATE_WAITING_FIRST_WRITE,
+    SNAPSHOT_TIMER_STATE_WAITING_SECOND_WRITE,
+    SNAPSHOT_TIMER_STATE_COUNTING_0,
+    SNAPSHOT_TIMER_STATE_COUNTING_1,
+    SNAPSHOT_TIMER_STATE_COUNTING_2_3,
+    SNAPSHOT_TIMER_STATE_COUNTING_4_5
+};
+
+enum {
+    SNAPSHOT_TIMER_ACTION_NONE = 0,
+    SNAPSHOT_TIMER_ACTION_BUFFER_LOADED,
+    SNAPSHOT_TIMER_ACTION_ERROR,
+    SNAPSHOT_TIMER_ACTION_AWAIT_GATE,
+    SNAPSHOT_TIMER_ACTION_COUNTING_0,
+    SNAPSHOT_TIMER_ACTION_COUNTING_0_GATE,
+    SNAPSHOT_TIMER_ACTION_COUNTING_1_5,
+    SNAPSHOT_TIMER_ACTION_COUNTING_2_3_4,
+    SNAPSHOT_TIMER_ACTION_COUNTING_2_3_4_GATE,
+    SNAPSHOT_TIMER_ACTION_START_COUNTING
+};
+
+LOCAL unsigned long
+snapshot_timer_state_id(state)
+void (*state)();
+{
+    if (state == NULL) return 0;
+    if (state == uninit) return SNAPSHOT_TIMER_STATE_UNINIT;
+    if (state == awaitingGate) return SNAPSHOT_TIMER_STATE_AWAITING_GATE;
+    if (state == waitingFor1stWrite) return SNAPSHOT_TIMER_STATE_WAITING_FIRST_WRITE;
+    if (state == waitingFor2ndWrite) return SNAPSHOT_TIMER_STATE_WAITING_SECOND_WRITE;
+    if (state == Counting0) return SNAPSHOT_TIMER_STATE_COUNTING_0;
+    if (state == Counting1) return SNAPSHOT_TIMER_STATE_COUNTING_1;
+    if (state == Counting_2_3) return SNAPSHOT_TIMER_STATE_COUNTING_2_3;
+    if (state == Counting_4_5) return SNAPSHOT_TIMER_STATE_COUNTING_4_5;
+    return 0;
+}
+
+LOCAL unsigned long
+snapshot_timer_action_id(action)
+void (*action)();
+{
+    if (action == NULL) return SNAPSHOT_TIMER_ACTION_NONE;
+    if (action == CounterBufferLoaded) return SNAPSHOT_TIMER_ACTION_BUFFER_LOADED;
+    if (action == timererror) return SNAPSHOT_TIMER_ACTION_ERROR;
+    if (action == resumeAwaitGate) return SNAPSHOT_TIMER_ACTION_AWAIT_GATE;
+    if (action == resumeCounting0) return SNAPSHOT_TIMER_ACTION_COUNTING_0;
+    if (action == resumeCounting0onGate) return SNAPSHOT_TIMER_ACTION_COUNTING_0_GATE;
+    if (action == resumeCounting_1_5) return SNAPSHOT_TIMER_ACTION_COUNTING_1_5;
+    if (action == resumeCounting_2_3_4) return SNAPSHOT_TIMER_ACTION_COUNTING_2_3_4;
+    if (action == resumeCounting_2_3_4_onGate)
+        return SNAPSHOT_TIMER_ACTION_COUNTING_2_3_4_GATE;
+    if (action == startCounting) return SNAPSHOT_TIMER_ACTION_START_COUNTING;
+    return 0;
+}
+
+LOCAL int
+snapshot_restore_timer_state(counter, state_id)
+COUNTER_UNIT *counter;
+unsigned long state_id;
+{
+    switch (state_id) {
+    case SNAPSHOT_TIMER_STATE_UNINIT: counter->state = uninit; return TRUE;
+    case SNAPSHOT_TIMER_STATE_AWAITING_GATE: counter->state = awaitingGate; return TRUE;
+    case SNAPSHOT_TIMER_STATE_WAITING_FIRST_WRITE: counter->state = waitingFor1stWrite; return TRUE;
+    case SNAPSHOT_TIMER_STATE_WAITING_SECOND_WRITE: counter->state = waitingFor2ndWrite; return TRUE;
+    case SNAPSHOT_TIMER_STATE_COUNTING_0: counter->state = Counting0; return TRUE;
+    case SNAPSHOT_TIMER_STATE_COUNTING_1: counter->state = Counting1; return TRUE;
+    case SNAPSHOT_TIMER_STATE_COUNTING_2_3: counter->state = Counting_2_3; return TRUE;
+    case SNAPSHOT_TIMER_STATE_COUNTING_4_5: counter->state = Counting_4_5; return TRUE;
+    }
+    return FALSE;
+}
+
+LOCAL int
+snapshot_restore_timer_prior_state(counter, state_id)
+COUNTER_UNIT *counter;
+unsigned long state_id;
+{
+    COUNTER_UNIT temporary;
+
+    if (state_id == 0) {
+        counter->statePriorWt = NULL;
+        return TRUE;
+    }
+    if (!snapshot_restore_timer_state(&temporary, state_id)) return FALSE;
+    counter->statePriorWt = temporary.state;
+    return TRUE;
+}
+
+LOCAL int
+snapshot_restore_timer_gate_state(counter, state_id)
+COUNTER_UNIT *counter;
+unsigned long state_id;
+{
+    COUNTER_UNIT temporary;
+
+    if (state_id == 0) {
+        counter->stateOnGate = NULL;
+        return TRUE;
+    }
+    if (!snapshot_restore_timer_state(&temporary, state_id)) return FALSE;
+    counter->stateOnGate = temporary.state;
+    return TRUE;
+}
+
+LOCAL int
+snapshot_restore_timer_wait_action(counter, action_id)
+COUNTER_UNIT *counter;
+unsigned long action_id;
+{
+    switch (action_id) {
+    case SNAPSHOT_TIMER_ACTION_NONE: counter->actionOnWtComplete = NULL; return TRUE;
+    case SNAPSHOT_TIMER_ACTION_BUFFER_LOADED: counter->actionOnWtComplete = CounterBufferLoaded; return TRUE;
+    case SNAPSHOT_TIMER_ACTION_ERROR: counter->actionOnWtComplete = timererror; return TRUE;
+    case SNAPSHOT_TIMER_ACTION_AWAIT_GATE: counter->actionOnWtComplete = resumeAwaitGate; return TRUE;
+    case SNAPSHOT_TIMER_ACTION_COUNTING_0: counter->actionOnWtComplete = resumeCounting0; return TRUE;
+    case SNAPSHOT_TIMER_ACTION_COUNTING_1_5: counter->actionOnWtComplete = resumeCounting_1_5; return TRUE;
+    case SNAPSHOT_TIMER_ACTION_COUNTING_2_3_4: counter->actionOnWtComplete = resumeCounting_2_3_4; return TRUE;
+    }
+    return FALSE;
+}
+
+LOCAL int
+snapshot_restore_timer_gate_action(counter, action_id)
+COUNTER_UNIT *counter;
+unsigned long action_id;
+{
+    switch (action_id) {
+    case SNAPSHOT_TIMER_ACTION_NONE: counter->actionOnGateEnabled = NULL; return TRUE;
+    case SNAPSHOT_TIMER_ACTION_BUFFER_LOADED: counter->actionOnGateEnabled = CounterBufferLoaded; return TRUE;
+    case SNAPSHOT_TIMER_ACTION_COUNTING_0_GATE: counter->actionOnGateEnabled = resumeCounting0onGate; return TRUE;
+    case SNAPSHOT_TIMER_ACTION_COUNTING_1_5: counter->actionOnGateEnabled = resumeCounting_1_5; return TRUE;
+    case SNAPSHOT_TIMER_ACTION_COUNTING_2_3_4_GATE: counter->actionOnGateEnabled = resumeCounting_2_3_4_onGate; return TRUE;
+    case SNAPSHOT_TIMER_ACTION_START_COUNTING: counter->actionOnGateEnabled = startCounting; return TRUE;
+    }
+    return FALSE;
+}
+
+LOCAL long long
+snapshot_timer_elapsed_microseconds(now, then)
+struct host_timeval *now;
+struct host_timeval *then;
+{
+    return ((long long)now->tv_sec - (long long)then->tv_sec) * 1000000LL +
+        (long long)now->tv_usec - (long long)then->tv_usec;
+}
+
+LOCAL void
+snapshot_timer_rebase(counter, age)
+COUNTER_UNIT *counter;
+long long age;
+{
+    struct host_timeval now;
+    long long seconds;
+    long long microseconds;
+
+    (*counter->getTime)(&now);
+    if (age < 0) age = 0;
+    seconds = age / 1000000LL;
+    microseconds = age % 1000000LL;
+    counter->activationTime.tv_sec = now.tv_sec - (IS32)seconds;
+    counter->activationTime.tv_usec = now.tv_usec - (IS32)microseconds;
+    if (counter->activationTime.tv_usec < 0) {
+        counter->activationTime.tv_usec += 1000000L;
+        counter->activationTime.tv_sec--;
+    }
+}
+
+LOCAL int
+snapshot_capture_timer_counter(counter, saved)
+COUNTER_UNIT *counter;
+softpc_device_pit_counter_state *saved;
+{
+    struct host_timeval now;
+
+    if (counter->getTime == NULL || counter->state == NULL ||
+        !snapshot_timer_state_id((void (*)())counter->state) ||
+        (counter->statePriorWt != NULL &&
+            !snapshot_timer_state_id((void (*)())counter->statePriorWt)) ||
+        (counter->stateOnGate != NULL &&
+            !snapshot_timer_state_id((void (*)())counter->stateOnGate)) ||
+        (counter->actionOnWtComplete != NULL &&
+            !snapshot_timer_action_id(counter->actionOnWtComplete)) ||
+        (counter->actionOnGateEnabled != NULL &&
+            !snapshot_timer_action_id(counter->actionOnGateEnabled)))
+        return FALSE;
+    (*counter->getTime)(&now);
+    saved->mode = counter->m;
+    saved->bcd = counter->bcd;
+    saved->read_load = counter->rl;
+    saved->state = snapshot_timer_state_id((void (*)())counter->state);
+    saved->state_prior_wait = snapshot_timer_state_id((void (*)())counter->statePriorWt);
+    saved->state_on_gate = snapshot_timer_state_id((void (*)())counter->stateOnGate);
+    saved->action_on_wait_complete = snapshot_timer_action_id(counter->actionOnWtComplete);
+    saved->action_on_gate_enabled = snapshot_timer_action_id(counter->actionOnGateEnabled);
+    saved->output_lsb = counter->outblsb;
+    saved->output_msb = counter->outbmsb;
+    saved->latch_value_lsb = counter->latchvaluelsb;
+    saved->latch_value_msb = counter->latchvaluemsb;
+    saved->latch_status = counter->latchstatus;
+    saved->initial_count = counter->initialCount;
+    saved->read_state = counter->readState;
+    saved->count_latched = counter->countlatched;
+    saved->count = counter->Count;
+    saved->new_count = counter->newCount;
+    saved->tick_adjust = counter->tickadjust;
+    saved->activation_age_microseconds =
+        snapshot_timer_elapsed_microseconds(&now, &counter->activationTime);
+    saved->terminal_count = counter->tc;
+    saved->freeze_counter = counter->freezeCounter;
+    saved->last_ticks = counter->lastTicks;
+    saved->microtick = counter->microtick;
+    saved->time_frig = counter->timeFrig;
+    saved->saved_count = counter->saveCount;
+    saved->guesses_per_host_tick = counter->guessesPerHostTick;
+    saved->guesses_so_far = counter->guessesSoFar;
+    saved->delay = counter->delay;
+    saved->trigger = counter->trigger;
+    saved->gate = counter->gate;
+    saved->clock = counter->clk;
+    saved->waveform_low = counter->out.clocksAtLoLogicLevel;
+    saved->waveform_high = counter->out.clocksAtHiLogicLevel;
+    saved->waveform_period = counter->out.period;
+    saved->waveform_start_level = counter->out.startLogicLevel;
+    saved->waveform_repeats = counter->out.repeatWaveForm;
+    return TRUE;
+}
+
+LOCAL int
+snapshot_restore_timer_counter(counter, saved, index)
+COUNTER_UNIT *counter;
+const softpc_device_pit_counter_state *saved;
+int index;
+{
+    if (saved->mode < INT_ON_TERMINALCOUNT || saved->mode > HW_TRIG_STROBE ||
+        (saved->bcd != BINARY && saved->bcd != BCD) ||
+        saved->read_load < LATCH || saved->read_load > RL_LMSB ||
+        saved->new_count != AVAILABLE && saved->new_count != USED ||
+        saved->trigger != LEVEL && saved->trigger != EDGE)
+        return FALSE;
+    counter->m = saved->mode;
+    counter->bcd = saved->bcd;
+    counter->rl = saved->read_load;
+    counter->outblsb = saved->output_lsb;
+    counter->outbmsb = saved->output_msb;
+    counter->latchvaluelsb = saved->latch_value_lsb;
+    counter->latchvaluemsb = saved->latch_value_msb;
+    counter->latchstatus = saved->latch_status;
+    counter->initialCount = saved->initial_count;
+    counter->readState = saved->read_state;
+    counter->countlatched = saved->count_latched;
+    counter->Count = saved->count;
+    counter->newCount = saved->new_count;
+    counter->tickadjust = saved->tick_adjust;
+    counter->tc = saved->terminal_count;
+    counter->freezeCounter = saved->freeze_counter;
+    counter->lastTicks = saved->last_ticks;
+    counter->microtick = saved->microtick;
+    counter->timeFrig = saved->time_frig;
+    counter->saveCount = saved->saved_count;
+    counter->guessesPerHostTick = saved->guesses_per_host_tick;
+    counter->guessesSoFar = saved->guesses_so_far;
+    counter->delay = saved->delay;
+    counter->trigger = saved->trigger;
+    counter->gate = saved->gate;
+    counter->clk = saved->clock;
+    counter->out.clocksAtLoLogicLevel = saved->waveform_low;
+    counter->out.clocksAtHiLogicLevel = saved->waveform_high;
+    counter->out.period = saved->waveform_period;
+    counter->out.startLogicLevel = saved->waveform_start_level;
+    counter->out.repeatWaveForm = saved->waveform_repeats;
+    counter->getTime = index == 0 ? getIdealTime : getHostSysTime;
+    if (!snapshot_restore_timer_state(counter, saved->state) ||
+        !snapshot_restore_timer_prior_state(counter, saved->state_prior_wait) ||
+        !snapshot_restore_timer_gate_state(counter, saved->state_on_gate) ||
+        !snapshot_restore_timer_wait_action(counter, saved->action_on_wait_complete) ||
+        !snapshot_restore_timer_gate_action(counter, saved->action_on_gate_enabled))
+        return FALSE;
+    snapshot_timer_rebase(counter, saved->activation_age_microseconds);
+    return TRUE;
+}
+
+GLOBAL int
+softpc_device_snapshot_capture_pit(state)
+softpc_device_pit_state *state;
+{
+    int index;
+
+    if (state == NULL || pcu < timers || pcu >= timers + 3) return FALSE;
+    for (index = 0; index < 3; index++)
+        if (!snapshot_capture_timer_counter(&timers[index], &state->counter[index]))
+            return FALSE;
+    state->current_counter = pcu - timers;
+    state->ticks_blocked = ticks_blocked;
+    state->timer_interrupt_enabled = timer_int_enabled;
+    state->time_lock = timelock;
+    state->need_tick = needtick;
+    state->hack_active = hack_active;
+    state->too_soon_after_previous = too_soon_after_previous;
+    state->ticks_lost_this_time = ticks_lost_this_time;
+    state->real_mode_ticks_in_a_row = real_mode_ticks_in_a_row;
+    state->instructions_per_tick = instrs_per_tick;
+    state->adjusted_instructions_per_tick = adj_instrs_per_tick;
+    state->real_mode_instruction_limit = n_rm_instrs_before_full_speed;
+    state->adjusted_real_mode_tick_limit = adj_n_real_mode_ticks_before_full_speed;
+    state->maximum_backlog = max_backlog;
+    state->more_timer_multiple = more_timer_mult;
+    state->timer_multiple_delay = timer_multiple_delay;
+    state->active_interrupt_event = active_int_event;
+    return TRUE;
+}
+
+GLOBAL int
+softpc_device_snapshot_restore_pit(state)
+const softpc_device_pit_state *state;
+{
+    int index;
+
+    if (state == NULL || state->current_counter < 0 || state->current_counter >= 3)
+        return FALSE;
+    for (index = 0; index < 3; index++)
+        if (!snapshot_restore_timer_counter(&timers[index], &state->counter[index], index))
+            return FALSE;
+    pcu = &timers[state->current_counter];
+    ticks_blocked = state->ticks_blocked;
+    timer_int_enabled = state->timer_interrupt_enabled;
+    timelock = state->time_lock;
+    needtick = state->need_tick;
+    hack_active = state->hack_active;
+    too_soon_after_previous = state->too_soon_after_previous;
+    ticks_lost_this_time = state->ticks_lost_this_time;
+    real_mode_ticks_in_a_row = state->real_mode_ticks_in_a_row;
+    instrs_per_tick = state->instructions_per_tick;
+    adj_instrs_per_tick = state->adjusted_instructions_per_tick;
+    n_rm_instrs_before_full_speed = state->real_mode_instruction_limit;
+    adj_n_real_mode_ticks_before_full_speed = state->adjusted_real_mode_tick_limit;
+    max_backlog = state->maximum_backlog;
+    more_timer_mult = state->more_timer_multiple;
+    timer_multiple_delay = state->timer_multiple_delay;
+    active_int_event = state->active_interrupt_event;
+    host_timer2_waveform(timers[2].delay, timers[2].out.clocksAtLoLogicLevel,
+        timers[2].out.clocksAtHiLogicLevel, timers[2].out.startLogicLevel,
+        timers[2].out.repeatWaveForm);
+    return TRUE;
+}
+#endif /* !NTVDM */
+
+GLOBAL Q_CALLBACK_FN
+softpc_device_snapshot_decode_timer_callback(callback_id)
+unsigned long callback_id;
+{
+#ifndef NTVDM
+	if (callback_id == SOFTPC_DEVICE_QUEUE_TIMER_CLEAR_TOO_SOON)
+		return timer_no_longer_too_soon;
+	if (callback_id == SOFTPC_DEVICE_QUEUE_TIMER_MULTIPLE_INTERRUPTS)
+		return timer_multiple_ints;
+#else
+	UNUSED(callback_id);
+#endif
+	return NULL;
+}

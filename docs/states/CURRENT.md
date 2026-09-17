@@ -58,9 +58,11 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   conclusion: existing readonly media supplies bounded chunk reads; ordinary
   truncate writer publication is owner-approved, so Lib remains unchanged.
   S4 adds the private fixed-width CPU/SAS/RAM archive and real round-trip
-  proof only; it exposes no user command or incomplete snapshot file. S5 is
-  limited to the next controller/queue state slice, still without a product
-  save/load path.
+  proof only; it exposes no user command or incomplete snapshot file. S5 P1
+  adds a VM/Compat-private controller/queue archive: semantic q/tic callback
+  IDs, transactional queue replacement, and PIC/PIT/RTC/DMA/FDD/HDD state.
+  There is still no product save/load path and no Lib/Common change; S5 remains
+  active for its closure audit.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files

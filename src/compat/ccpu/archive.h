@@ -3,6 +3,8 @@
 
 #include "snapshot.h"
 
+typedef struct softpc_device_archive softpc_device_archive;
+
 /* Heap ownership is local to the standalone adapter.  The backing pointers
    never cross into the snapshot payload or the Common machine boundary. */
 typedef struct softpc_ccpu_archive {
@@ -15,6 +17,7 @@ typedef struct softpc_ccpu_archive {
     uint8_t *memory;
     uint8_t *page_types;
     uint8_t *tlb_page_index;
+    softpc_device_archive *devices;
     int valid;
 } softpc_ccpu_archive;
 

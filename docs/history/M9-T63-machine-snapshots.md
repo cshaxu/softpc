@@ -783,3 +783,39 @@ S3 therefore stops before container code until the owner decides whether to
 admit the proposal's minimal neutral Storage reader and atomic-replace writer.
 No production, test, Lib, Common, original-mirror, package, configuration or
 media file changed in this audit.
+
+## S5 P1: private controller and queue archive
+
+S5 adds one private `compat/devices` archive owner beneath the existing CCPU
+archive.  It stores fixed-width semantic state only: DMA registers/pages,
+PIC pending/in-service state, PIT counter phase and elapsed age, CMOS/RTC
+register state, FDC command/result/NDMA state, HDD taskfile/sector state, and
+the q/tic queue records required to continue those controllers.  It does not
+expose an App command, Common API, file format, media export, or a public
+pointer to the archive.
+
+Queue callbacks are mapped by a small, audited semantic ID table.  Timer,
+RTC, FDC and HDD callbacks restore by ID; an unrecognised queued callback
+causes capture to fail rather than serializing an address or silently omitting
+work.  Queue restoration constructs both replacement lists first.  Only after
+both validate does it discard the live lists and install the replacements;
+therefore an invalid late callback cannot destroy the current queue.  Restore
+never calls normal enqueue APIs, so a zero-delay record cannot execute while
+being restored.
+
+PIT state uses state/action IDs and elapsed phase, not function pointers or
+absolute host timestamps.  Restore rebinds the original state-machine
+functions and rebases the phase on the current host clock.  CMOS similarly
+copies `host_tm` values rather than its pointer and rebuilds conversion
+functions.  PIC rejects an active unrepresentable callback instead of storing
+it.  New `compat/devices` is a Compat taxonomy owner for these archive-only
+adapters; original controller ownership and normal port behavior remain in
+the mirror.
+
+Focused checkpoint proofs now cover: failed capture on an unknown callback;
+queue ordering, cancellation, handles, zero-delay non-execution and failed
+restore retaining the old queue; CMOS state through the composed archive; and
+a non-default PIT mode/count/state/action round-trip.  This is still not a
+user snapshot: S6 owns the remaining video/input and selected device payload;
+S7 later owns the Common state operations and final recovery transaction.
+Lib and Common remain unchanged by this P.

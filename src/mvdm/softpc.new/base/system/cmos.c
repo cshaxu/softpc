@@ -50,6 +50,7 @@
 #include "sas.h"
 #include "debug.h"
 #include "quick_ev.h"
+#include "compat/devices/snapshot.h"
 
 
 /*
@@ -1314,3 +1315,122 @@ main()
 	cmos_update();
 }
 #endif				/* TEST_HARNESS */
+
+GLOBAL int
+softpc_device_snapshot_encode_cmos_callback(callback, callback_id)
+Q_CALLBACK_FN callback;
+unsigned long *callback_id;
+{
+	if (callback_id == NULL)
+		return FALSE;
+	if (callback == rtc_periodic_event)
+		*callback_id = SOFTPC_DEVICE_QUEUE_RTC_PERIODIC;
+	else if (callback == rtc_alarm)
+		*callback_id = SOFTPC_DEVICE_QUEUE_RTC_ALARM;
+	else if (callback == sync_rtc_to_host_time)
+		*callback_id = SOFTPC_DEVICE_QUEUE_RTC_SYNC;
+	else
+		return FALSE;
+	return TRUE;
+}
+
+GLOBAL Q_CALLBACK_FN
+softpc_device_snapshot_decode_cmos_callback(callback_id)
+unsigned long callback_id;
+{
+	if (callback_id == SOFTPC_DEVICE_QUEUE_RTC_PERIODIC)
+		return rtc_periodic_event;
+	if (callback_id == SOFTPC_DEVICE_QUEUE_RTC_ALARM)
+		return rtc_alarm;
+	if (callback_id == SOFTPC_DEVICE_QUEUE_RTC_SYNC)
+		return sync_rtc_to_host_time;
+	return NULL;
+}
+
+GLOBAL void
+softpc_device_snapshot_capture_cmos(state)
+softpc_device_cmos_state *state;
+{
+	int i;
+
+	if (state == NULL)
+		return;
+	for (i = 0; i < CMOS_SIZE; ++i)
+		state->bytes[i] = (IU8)cmos[i];
+	state->selected_index = cmos_index;
+	state->data_mode_yes = data_mode_yes;
+	state->twenty4_hour_clock = twenty4_hour_clock;
+	state->reset_alarm = reset_alarm;
+	state->rtc_int_enabled = rtc_int_enabled;
+	state->cmos_count = cmos_count;
+	state->host_time_valid = ht != NULL;
+	state->host_time[0] = ht == NULL ? 0 : ht->tm_sec;
+	state->host_time[1] = ht == NULL ? 0 : ht->tm_min;
+	state->host_time[2] = ht == NULL ? 0 : ht->tm_hour;
+	state->host_time[3] = ht == NULL ? 0 : ht->tm_mday;
+	state->host_time[4] = ht == NULL ? 0 : ht->tm_mon;
+	state->host_time[5] = ht == NULL ? 0 : ht->tm_year;
+	state->host_time[6] = ht == NULL ? 0 : ht->tm_wday;
+	state->host_time[7] = ht == NULL ? 0 : ht->tm_yday;
+	state->host_time[8] = ht == NULL ? 0 : ht->tm_isdst;
+	state->user_time = (int64_t)user_time;
+	state->periodic_milliseconds = rtc_period_mSeconds;
+	state->periodic_event_handle = (int64_t)rtc_periodic_event_handle;
+}
+
+GLOBAL int
+softpc_device_snapshot_restore_cmos(state)
+const softpc_device_cmos_state *state;
+{
+	int i;
+
+	if (state == NULL || state->selected_index < 0 ||
+	    state->selected_index >= CMOS_SIZE ||
+	    (state->data_mode_yes != 0 && state->data_mode_yes != 1) ||
+	    (state->twenty4_hour_clock != 0 && state->twenty4_hour_clock != 1) ||
+	    (state->reset_alarm != 0 && state->reset_alarm != 1) ||
+	    (state->host_time_valid != 0 && state->host_time_valid != 1) ||
+	    state->cmos_count < 0 || state->cmos_count >= 18)
+		return FALSE;
+	for (i = 0; i < CMOS_SIZE; ++i)
+		cmos[i] = (half_word)state->bytes[i];
+	cmos_index = state->selected_index;
+	cmos_register = &cmos[cmos_index];
+	data_mode_yes = state->data_mode_yes;
+	if (data_mode_yes) {
+		bin2bcd = yes_bin2bcd;
+		bcd2bin = yes_bcd2bin;
+	} else {
+		bin2bcd = no_bin2bcd;
+		bcd2bin = no_bcd2bin;
+	}
+	twenty4_hour_clock = state->twenty4_hour_clock;
+	if (twenty4_hour_clock) {
+		_24to12 = no_24to12;
+		_12to24 = no_12to24;
+	} else {
+		_24to12 = yes_24to12;
+		_12to24 = yes_12to24;
+	}
+	reset_alarm = state->reset_alarm;
+	rtc_int_enabled = state->rtc_int_enabled;
+	cmos_count = state->cmos_count;
+	user_time = (time_t)state->user_time;
+	rtc_period_mSeconds = state->periodic_milliseconds;
+	rtc_periodic_event_handle = (q_ev_handle)state->periodic_event_handle;
+	if (state->host_time_valid) {
+		if (ht == NULL)
+			return FALSE;
+		ht->tm_sec = state->host_time[0];
+		ht->tm_min = state->host_time[1];
+		ht->tm_hour = state->host_time[2];
+		ht->tm_mday = state->host_time[3];
+		ht->tm_mon = state->host_time[4];
+		ht->tm_year = state->host_time[5];
+		ht->tm_wday = state->host_time[6];
+		ht->tm_yday = state->host_time[7];
+		ht->tm_isdst = state->host_time[8];
+	} else
+		ht = NULL;
+	return TRUE;
+}

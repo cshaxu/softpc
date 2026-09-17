@@ -1025,6 +1025,242 @@ VOID delete_tic_event IFN1(q_ev_handle,  handle )
 		tic_ev_get_count );
 }
 
+/*
+ * Archive only the semantic queue state.  The live links and callbacks remain
+ * process-local; callers provide the small, audited callback-ID translation.
+ * This intentionally does not reuse add_event(): zero-delay records must not
+ * execute while an archive is being restored.
+ */
+LOCAL int
+snapshot_capture_list(head, table, entries, capacity, count, hash_head,
+                      encode)
+t_q_event *head;
+TQ_TABLE table;
+Q_EVENT_SNAPSHOT_ENTRY *entries;
+unsigned long capacity;
+unsigned long *count;
+unsigned long hash_head[];
+Q_SNAPSHOT_ENCODE_CALLBACK encode;
+{
+	t_q_event *ptr, *hash_ptr;
+	unsigned long i, j;
+
+	*count = 0;
+	for (ptr = head; ptr != NULL; ptr = ptr->next)
+		++*count;
+	if (*count > capacity)
+		return FALSE;
+	for (i = 0, ptr = head; ptr != NULL; ++i, ptr = ptr->next) {
+		entries[i].time_from_last = ptr->time_from_last;
+		entries[i].original_time = ptr->original_time;
+		entries[i].handle = ptr->handle;
+		entries[i].param = ptr->param;
+		entries[i].event_type = (unsigned long)ptr->event_type;
+		entries[i].hash_next_index = 0;
+		if (!(*encode)(ptr->func, &entries[i].callback_id))
+			return FALSE;
+	}
+	for (i = 0; i < HASH_SIZE; ++i) {
+		hash_head[i] = 0;
+		for (hash_ptr = table[i]; hash_ptr != NULL;
+		     hash_ptr = hash_ptr->next_free) {
+			for (j = 0, ptr = head; ptr != hash_ptr;
+			     ++j, ptr = ptr->next)
+				;
+			if (ptr == NULL)
+				return FALSE;
+			if (hash_head[i] == 0)
+				hash_head[i] = j + 1;
+			else {
+				unsigned long previous = hash_head[i] - 1;
+				while (entries[previous].hash_next_index != 0)
+					previous = entries[previous].hash_next_index - 1;
+				entries[previous].hash_next_index = j + 1;
+			}
+		}
+	}
+	return TRUE;
+}
+
+GLOBAL int
+q_event_snapshot_capture(state, quick_entries, quick_capacity, tick_entries,
+                         tick_capacity, encode)
+Q_EVENT_SNAPSHOT_STATE *state;
+Q_EVENT_SNAPSHOT_ENTRY *quick_entries;
+unsigned long quick_capacity;
+Q_EVENT_SNAPSHOT_ENTRY *tick_entries;
+unsigned long tick_capacity;
+Q_SNAPSHOT_ENCODE_CALLBACK encode;
+{
+	if (state == NULL || encode == NULL ||
+	    (quick_capacity != 0 && quick_entries == NULL) ||
+	    (tick_capacity != 0 && tick_entries == NULL))
+		return FALSE;
+	memset(state, 0, sizeof(*state));
+	if (!snapshot_capture_list(q_list_head, q_ev_hash_table, quick_entries,
+		quick_capacity, &state->quick_entries, state->quick_hash_head,
+		encode) ||
+	    !snapshot_capture_list(tic_list_head, tic_ev_hash_table, tick_entries,
+		tick_capacity, &state->tick_entries, state->tick_hash_head, encode))
+		return FALSE;
+	state->next_quick_handle = next_free_handle;
+	state->next_tick_handle = tic_next_free_handle;
+	state->quick_count = host_q_ev_get_count();
+	state->tick_count = tic_ev_get_count();
+	return TRUE;
+}
+
+GLOBAL void
+q_event_snapshot_measure(state)
+Q_EVENT_SNAPSHOT_STATE *state;
+{
+	t_q_event *ptr;
+
+	if (state == NULL)
+		return;
+	memset(state, 0, sizeof(*state));
+	for (ptr = q_list_head; ptr != NULL; ptr = ptr->next)
+		++state->quick_entries;
+	for (ptr = tic_list_head; ptr != NULL; ptr = ptr->next)
+		++state->tick_entries;
+	state->next_quick_handle = next_free_handle;
+	state->next_tick_handle = tic_next_free_handle;
+	state->quick_count = host_q_ev_get_count();
+	state->tick_count = tic_ev_get_count();
+}
+
+LOCAL int
+snapshot_restore_list(head, tail, free_list, table, entries, count, hash_head,
+                      decode)
+t_q_event **head;
+t_q_event **tail;
+t_q_event **free_list;
+TQ_TABLE table;
+const Q_EVENT_SNAPSHOT_ENTRY *entries;
+unsigned long count;
+unsigned long hash_head[];
+Q_SNAPSHOT_DECODE_CALLBACK decode;
+{
+	t_q_event **nodes;
+	t_q_event *ptr;
+	Q_CALLBACK_FN callback;
+	unsigned long i, j, link, seen_count;
+
+	if (count == 0)
+		return TRUE;
+	nodes = (t_q_event **)host_malloc(count * sizeof(*nodes));
+	if (nodes == NULL)
+		return FALSE;
+	for (i = 0; i < count; ++i)
+		nodes[i] = NULL;
+	for (i = 0; i < count; ++i) {
+		if (entries[i].event_type > (unsigned long)EVENT_TICK ||
+		    entries[i].handle == 0 ||
+		    (callback = (*decode)(entries[i].callback_id)) == NULL ||
+		    (nodes[i] = (t_q_event *)host_malloc(sizeof(*nodes[i]))) == NULL)
+			goto failed;
+		ptr = nodes[i];
+		ptr->func = callback;
+		ptr->time_from_last = entries[i].time_from_last;
+		ptr->original_time = entries[i].original_time;
+		ptr->handle = entries[i].handle;
+		ptr->param = entries[i].param;
+		ptr->event_type = (EVENTTYPE)entries[i].event_type;
+		ptr->previous = i == 0 ? NULL : nodes[i - 1];
+		ptr->next = i + 1 == count ? NULL : NULL;
+		ptr->next_free = NULL;
+		if (i != 0)
+			nodes[i - 1]->next = ptr;
+	}
+	for (i = 0; i < HASH_SIZE; ++i) {
+		link = hash_head[i];
+		if (link > count)
+			goto failed;
+		table[i] = link == 0 ? NULL : nodes[link - 1];
+		seen_count = 0;
+		while (link != 0) {
+			j = link - 1;
+			if ((nodes[j]->handle & HASH_MASK) != i || ++seen_count > count ||
+			    entries[j].hash_next_index > count)
+				goto failed;
+			link = entries[j].hash_next_index;
+			nodes[j]->next_free = link == 0 ? NULL : nodes[link - 1];
+		}
+	}
+	*head = nodes[0];
+	*tail = nodes[count - 1];
+	*free_list = NULL;
+	host_free(nodes);
+	return TRUE;
+failed:
+	for (j = 0; j < count; ++j)
+		if (nodes[j] != NULL)
+			host_free(nodes[j]);
+	host_free(nodes);
+	return FALSE;
+}
+
+GLOBAL int
+q_event_snapshot_restore(state, quick_entries, quick_capacity, tick_entries,
+                         tick_capacity, decode)
+const Q_EVENT_SNAPSHOT_STATE *state;
+const Q_EVENT_SNAPSHOT_ENTRY *quick_entries;
+unsigned long quick_capacity;
+const Q_EVENT_SNAPSHOT_ENTRY *tick_entries;
+unsigned long tick_capacity;
+Q_SNAPSHOT_DECODE_CALLBACK decode;
+{
+	t_q_event *new_quick_head, *new_quick_tail, *new_quick_free;
+	t_q_event *new_tick_head, *new_tick_tail, *new_tick_free;
+	t_q_event *new_quick_table[HASH_SIZE], *new_tick_table[HASH_SIZE];
+	q_ev_handle unused_handle;
+	int index;
+
+	if (state == NULL || decode == NULL ||
+	    state->quick_entries > quick_capacity ||
+	    state->tick_entries > tick_capacity ||
+	    (state->quick_entries != 0 && quick_entries == NULL) ||
+	    (state->tick_entries != 0 && tick_entries == NULL))
+		return FALSE;
+	new_quick_head = new_quick_tail = new_quick_free = NULL;
+	new_tick_head = new_tick_tail = new_tick_free = NULL;
+	for (index = 0; index < HASH_SIZE; ++index) {
+		new_quick_table[index] = NULL;
+		new_tick_table[index] = NULL;
+	}
+	if (!snapshot_restore_list(&new_quick_head, &new_quick_tail,
+		&new_quick_free, new_quick_table, quick_entries,
+		state->quick_entries, state->quick_hash_head, decode) ||
+	    !snapshot_restore_list(&new_tick_head, &new_tick_tail,
+		&new_tick_free, new_tick_table, tick_entries,
+		state->tick_entries, state->tick_hash_head, decode)) {
+		q_event_init_structs(&new_quick_head, &new_quick_tail,
+			&new_quick_free, new_quick_table, &unused_handle);
+		q_event_init_structs(&new_tick_head, &new_tick_tail,
+			&new_tick_free, new_tick_table, &unused_handle);
+		return FALSE;
+	}
+	q_event_init_structs(&q_list_head, &q_list_tail, &q_free_list_head,
+		q_ev_hash_table, &next_free_handle);
+	q_event_init_structs(&tic_list_head, &tic_list_tail, &tic_free_list_head,
+		tic_ev_hash_table, &tic_next_free_handle);
+	q_list_head = new_quick_head;
+	q_list_tail = new_quick_tail;
+	q_free_list_head = new_quick_free;
+	tic_list_head = new_tick_head;
+	tic_list_tail = new_tick_tail;
+	tic_free_list_head = new_tick_free;
+	for (index = 0; index < HASH_SIZE; ++index) {
+		q_ev_hash_table[index] = new_quick_table[index];
+		tic_ev_hash_table[index] = new_tick_table[index];
+	}
+	next_free_handle = state->next_quick_handle;
+	tic_next_free_handle = state->next_tick_handle;
+	host_q_ev_set_count(state->quick_count);
+	tic_ev_set_count(state->tick_count);
+	return TRUE;
+}
+
 #if defined(CPU_40_STYLE) && !defined(SFELLOW)
 LOCAL void
 init_q_ratio IFN0()
