@@ -415,6 +415,40 @@ result remains VM/Compat-private; it exposes neither a Common operation nor a
 product save/load command. S7 is the separate, bounded Common/VM execution-
 transaction step.
 
+### S7 execution contract
+
+S7 adds exactly two Common operations:
+
+```c
+lib_status common_machine_read_state(common_machine *machine,
+    const common_machine_state_writer *writer);
+lib_status common_machine_write_state(common_machine *machine,
+    const common_machine_state_reader *reader);
+```
+
+`common_machine_state_writer` and `common_machine_state_reader` are copied,
+bounded byte-transfer callbacks with caller-owned opaque contexts. They carry
+no file handle, path, media, CPU, device or presentation type. The injected
+driver receives the matching direction only through its specifically named
+`begin_state_read`/`take_state_read_result`/`write_state` callbacks. This is a state-transfer contract,
+not a generic executor-job interface.
+
+Common admits read only from `RUNNING`, and write only from `STOPPED`. It owns
+one synchronous request slot and one completion event, exactly as it already
+does for paused debug and removable-media rendezvous. The worker/executor is
+the sole driver caller. For read, Common asks the driver to begin its private
+safe-boundary capture, then waits for its one executor completion. For write,
+Common starts the existing executor only after driver preparation succeeds,
+lets the driver restore at that executor boundary, and publishes the existing
+ordinary `PAUSED` fact and complete frame on success. Common never tests CCPU
+depth, pauses a device, interprets a section, or selects an image layout.
+
+VM owns the one-second CCPU checkpoint deadline, clock stop/restart, image
+capture/restore and `softpc_ccpu_entry` resume state. A read deadline/failure
+returns a status after the VM has reached ordinary `PAUSED`; a rejected write
+leaves stopped state unchanged; a successful write reaches ordinary `PAUSED`.
+No new Session/UI fact is introduced.
+
 ## 验收矩阵
 
 - 安全点到达后导出前后相同快照语义状态；导出期间状态/待事件稳定，不要求与请求瞬间相同。
