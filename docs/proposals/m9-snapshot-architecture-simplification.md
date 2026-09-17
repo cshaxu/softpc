@@ -1,0 +1,190 @@
+# 快照增量与全组件架构简化
+
+## 请求、状态与基线
+
+Owner 原始请求：
+
+> 新增加的代码，有多少是可以删除或者精简的？mvdm里面，哪些新增diff是应该挪到 compat或者vm里面，以便减少diff？哪些diff其实不该存在或者简化，可以消除？非mvdm里面，同理？
+>
+> 对，允许你对当前所有组件的架构进行一次深入思考，包括lib和common，不改代码，看看怎样可以更好：优化数据结构、线程结构、组件结构、代码结构。
+>
+> 请你将以上全部写入proposal
+
+本文件记录只读审计与候选设计，不是代码实施准入，不关闭 T63/S9，不分配新 T/S。
+当前任务状态仍以 [CURRENT](../states/CURRENT.md) 为准；本候选挂于
+[QUEUE](../states/QUEUE.md)，不改变前三项顺序。
+Owner 已反馈 S9 P9 手测成功；这不是整个快照任务全部能力完成的声明。
+
+审计基线为 `aa2bc0d`，T63 增量比较起点为 `ea7e982`。以下计数由
+`git diff --numstat ea7e982 aa2bc0d -- src` 中的 `.c/.h` 汇总，排除测试、
+文档、manifest、构建文件与 EXE：
+
+| 范围 | 文件 | 新增 | 删除 | 净增 |
+| --- | ---: | ---: | ---: | ---: |
+| MVDM | 24 | 2626 | 1 | 2625 |
+| 非 MVDM | 34 | 3118 | 50 | 3068 |
+| 合计 | 58 | 5744 | 51 | 5693 |
+
+非 MVDM 分布：App +149/-15；Common +188/-9；Compat +2322/-17；
+Lib +43/-0；VM +416/-9。多数新增是必要状态枚举、编码与恢复，不能视为可删冗余。
+外移减少镜像 diff，不等于全项目净减；测试行数也不得混作生产减量。
+
+## 目标与非目标
+
+减少必须同时维护的状态副本、字段顺序、分派和资源清理路径；保持现有体验、
+单 executor、原始设备状态所有权、跨宽度快照及公共调用边界。
+遵循 [架构](../design/ARCHITECTURE.md)、[源码规范](../design/CODING.md)、
+[架构规则](../rules/ARCHITECTURE.md) 与 [编码规则](../rules/CODING.md)。
+
+不以宏压行、取消错误检查、取消 static、暴露私有指针或增加转发层实现“减代码”。
+不重写原始 CPU/设备，不建立通用序列化框架、任务框架、帧缓存框架。
+Lib/Common 被允许纳入本次审计，不代表其 API 或生产代码已获修改授权。
+实施前必须明确各阶段的共享 corpus 改动边界与兼容影响。
+
+## 候选审计台账
+
+本轮覆盖单位是下列有限结构机会，不声称已证明全树不存在其他缺陷。
+“确认”指源码事实；净减数字均为未实施估算，需准入前复核和实施后 numstat。
+
+### A1：寄存器复制移出镜像
+
+[c_reg.c](../../src/mvdm/softpc.new/base/ccpu386/c_reg.c) 的新增 capture/restore
+仅组合既有 `c_get*`/`c_set*`，不直接访问本文件私有变量。
+应移到 `compat/ccpu`，继续调用原始 accessor，补齐必要的窄 ABI 声明；不归 VM。
+预计消除该文件全部 68 行 T63 diff；总行数基本持平，可能因声明略增。
+保持 CPL、CR、隐藏段状态的恢复次序；禁止用会触发正常段装载语义的不同 setter 替代。
+验收：寄存器/隐藏状态 roundtrip、双宽度恢复与原始文件 diff 对照。
+
+### A2：删掉快照复制的 Graphics Controller 分派
+
+[vga_prts.c](../../src/mvdm/softpc.new/base/video/vga_prts.c) 的
+`snapshot_write_graphics()` 另列九项 switch；原始 `vga_gc_outw()` 已按原表分派。
+候选改为复用该入口，预计净减 15–18 行。必须验证初始化后的 handler 表、
+动态 bit-mask handler 和全部四种写模式，不能仅凭名称宣布等价。
+P9 的 V7 enable latch、真实掩码、零寄存器派生状态初始化是必要修复，保留。
+
+### A3：PIT 同一状态解码只保留一份
+
+[timer.c](../../src/mvdm/softpc.new/base/system/timer.c) 为 current/prior/gate
+状态分别恢复，后两者创建临时 COUNTER_UNIT 只取函数指针。
+候选改为一个有校验的状态 ID 解码，各字段直接赋值，预计净减 15–30 行。
+原函数指针属于原始内部状态，仍留镜像；wait-action 与 gate-action 的合法集合
+不同，不能无条件合并或放宽验证。非法 ID、NULL 规则和 PIT 相位需测试。
+
+### A4：无行为残留清理
+
+[com.c](../../src/mvdm/softpc.new/base/comms/com.c) 的新增重复 recv_char /
+do_wait_on_send 声明、timer.c 新增无关空行，以及
+[Compat video.c](../../src/compat/video.c) 未使用的 Currently_emulated_video_mode
+声明可清理。保留必须早于首次引用的声明；只恢复本次新增差异，不格式化原始周边。
+验收：预处理/双宽度编译、原始 diff；按调用点扫描同类残留。
+
+### A5：不得为了镜像数字外移私有状态访问
+
+c_main 续执行位置、TLB、FPU、quick-event 链表、DOS 鼠标驱动等私有状态，
+不通过取消 static 或几十个新 getter 整体搬出。其窄复制/恢复 hook 保留在状态
+所有者旁；文件编码、宿主资源和产品编排分别归 Compat/VM/App。
+继续保持一套原始状态，禁止第二设备实现。这是保留决定，不是未完成外移。
+
+### B1：快照字段顺序只描述一次
+
+[CCPU archive](../../src/compat/ccpu/archive.c) 的读写分别列寄存器等字段；
+[设备 archive](../../src/compat/devices/archive.c) 的 read_all/write_all
+分别列设备顺序。候选复用现有字段描述机制，使读写消费同一份字段顺序，
+保留各自错误与分配处理，不抽到 Lib、不引入代码生成或通用框架。
+当前格式字节顺序、宽度、section 边界完全不变；不能以 raw struct dump 替代。
+潜在净减几十到一百余行，须先出具体替换草案，不承诺未经验证的总数。
+验收：与基线编码逐字节比较、双向跨宽度、非法/截断输入、完整设备恢复。
+
+### B2：操作临时数据归局部作用域
+
+[VM driver](../../src/vm/driver.c) 的 captured_image 仅在一次 capture callback
+内创建、写出和释放，却作为长期成员并在 destroy 再清理。
+候选移成该操作的局部拥有对象，统一清理出口；staged_image 跨 load/executor，保留。
+[snapshot](../../src/vm/snapshot.c) 的 entry 副本没有生产读取，实际使用 callback
+entry，应删除重复状态并相应修正只验证此冗余字段的测试。
+收益主要是缩短所有权，不宣称大量净减。停在 callback 中等待期间对象仍须有效。
+
+### C1：Common 同步请求收敛及发布顺序
+
+[Machine](../../src/common/machine/machine.c) 为 media/debug/state 使用各自参数、
+请求标志与完成事件；快照另有多个阶段标志。候选统一现有同步操作为一个内部请求槽：
+明确操作类型、参数、结果、完成等待。保留 lifecycle 标志的必要优先级、输入队列、
+debug lease 和 executor-owned 阶段；不将所有命令改成动态任务，不新增公共准备 API。
+先证明单控制调用方下同步操作互斥，再决定哪些字段可合并，不能只换成一个大 enum。
+
+源码确认：read_state/write_state 先发布 requested，再写 payload 和 reset event；
+executor 可在中间观察请求。这是发布顺序风险，尚无故障注入复现，不归因于已修复花屏。
+必须先准备完整参数和完成等待，再以明确同步边界发布；保留重复请求拒绝。
+应对所有同类同步请求扫查，用可控 barrier 验证不会读取旧 payload 或丢失完成通知。
+
+[VM driver](../../src/vm/driver.c) 还忽略 snapshot_finish 的失败返回；应纳入已有
+操作/执行终止路径，明确已发完成与后续时钟恢复失败的关系，不新增旁路通知。
+Common 仍不判断内部安全点；VM 仍负责安全点与一秒期限。
+本项改动规模和净减需独立设计，不以删除必要等待/错误分支达成行数指标。
+
+### D1：按有效内容复制帧
+
+[kvm_frame](../../src/lib/kvm-base/frame_interface.h) 内嵌文本与最大图形数组，
+[mailbox](../../src/lib/kvm-base/mailbox.c) 与 Common 使用整结构复制。
+文本更新因此也搬运近 1 MiB 的图形容量。
+首选保持公开 ABI，在现有 KVM 值工具边界统一有效内容复制：复制元数据及当前文本
+或有效图形内容。必须审计全部读取点，明确非活动字段不可被读取；不能仅少 memcpy。
+特别覆盖 mailbox 目前的 palette 比较、模式切换、stride、帧有效性与 dirty 合并。
+Common staging/published 双缓冲、锁、latest-wins、成功后 acknowledge 均保留。
+只有测量证明额外价值并另获 ABI 批准，才考虑 tagged union。
+不引入引用计数、零拷贝指针、缓冲池；目标是减少拷贝，不保证净减行数。
+
+### D2：Console worker 复用 Base task
+
+[Win32 Console worker](../../src/lib/kvm-console/win32/component.c) 为单个线程
+句柄单独分配对象并手写创建/join/close；多数 worker 循环已使用中性契约。
+候选复用已有 Base task，平台无关循环归组件自身，平台输入解释留平台实现。
+不删除 Console worker，不将工作塞进 broker input callback，不改变 Linux
+UNSUPPORTED 范围。验证 STOP FIFO、故障唤醒、回调 detach、join、一次退休及创建失败。
+平台 worker 签名与任务取消规则必须逐项对齐，不为复用引入新的适配壳。
+
+### D3：Storage overlay 查询保持独立任务
+
+[medium.c](../../src/lib/storage/medium.c) 的 O(n) 页查询是性能机会，但新索引
+会增加结构维护，不属于可承诺的净减代码。沿用已有
+[overlay proposal](m9-overlay-page-index.md)，本候选不重复实现或登记。
+
+## 线程与组件的保留决定
+
+- 保留 Session 与 VM executor：机器执行不能阻塞总控。
+- 保留 Window worker 与 Console reader：原生消息、阻塞读行与取消约束不同。
+- 保留 Console worker：不把绘制搬入 broker 输入回调。
+- 保留 Session 控制输入队列与 Machine 输入队列：前者决策，后者交付机器输入。
+- 保留 logical Console 与 broker：逻辑对象不同于独占原生资源所有者。
+- 保留 Common UI：集中拥有 monitor、KVM、broker 及交接资源，不是空转发层。
+- 保留 App 组装/产品策略、Common 中性协调、VM 具体驱动、Compat 原始宿主边界、
+  MVDM 原始状态所有者的分工。不要按“目录少就是简单”重新合并。
+
+这些保留项需在后续验收再次检查，不能为了候选优化偷偷改成相反设计。
+
+## 建议阶段与准入前要求
+
+下列是候选实施阶段，不是已分配 S 编号；Owner 准入时才写唯一活动 packet。
+
+| 顺序 | 范围 | 退出证明 |
+| --- | --- | --- |
+| A | A1–A4、B2 低风险清理，复核 A5 保留边界 | 原始 diff、双宽度 CPU/视频 roundtrip、原有输入体验；前后逐路径行数 |
+| B | B1 字段顺序去重 | 固定格式字节等价、双向跨宽度、截断/非法字段和设备恢复 |
+| C | C1 同步请求发布与内部状态收敛 | barrier 竞态测试、重复拒绝、失败/取消/stop/reset、原生命周期矩阵 |
+| D | D1 有效帧复制 | 文本/图形切换、dirty 跳帧/ack、stride/palette、实际拷贝量与双宽度 |
+| E | D2 Base task 复用 | 创建失败、STOP 顺序、detach/join/退休与原生 Console 交接 |
+
+阶段 A 保守估计 MVDM diff 减少约 100–125 行，其中 68 行是外移；全项目净减
+约 30–60 行。不是承诺值，也不包含后续中风险项目。每阶段开始前重新审计基线、
+列文件/功能/估算及停止条件；结束报告实际 production/test numstat，分别计算外移
+与真实删除，不用测试增加掩盖生产复杂度。
+
+每个实施阶段独立编译 x86/x64、执行聚焦测试和全套回归、刷新两份正式 EXE、提交
+推送并提供链接；共享改动同步更新 src/lib、src/common、test/lib、test/common 中
+实际受影响的 manifest 和独立验证。此处是候选验收要求，不意味着本次文档变更
+已运行新实现或获得这些结果。
+
+停止条件：需要更改当前用户体验、原始设备行为、快照格式、公开 ABI，或使总复杂度
+显著上升；先报告设计取舍，不悄悄扩大范围。无相关变更时不制造 ABI 修改。
+本文件全部台账项在收口时必须有实现证据或明确的保留/独立任务归属，不能遗漏。
