@@ -7,7 +7,8 @@ T61 is closed on owner direction after the [whole-task audit](../history/M9-T61-
 T62 is closed on owner direction after the
 [whole-task audit](../history/M9-T62-completion-audit.md).
 M9 T63 S1 is closed after the [design review](../history/M9-T63-S1-machine-snapshots.md).
-M9 T63 S2 is active: field inventory and running-save safe-stop boundary audit/proof.
+M9 T63 S2 is active: final field-inventory and running-save safe-stop closure
+review.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
 T62 closure was pushed in 54b2009 before T63 admission. The three older
 candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.md).
@@ -47,8 +48,9 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   receivers; P12 classifies video/input payload versus host resources.
   P13 completes receiver classification for remaining selected host/BIOS/media
   families. P14 then freezes the complete archive-object convergence index and
-  explains the only compiler-shape x86/x64 differences. Production remains
-  unchanged; final focused tests pass on both widths.
+  explains the only compiler-shape x86/x64 differences. P15 records final
+  full x64/x86 suites at 103/103; there is still no snapshot container, state
+  API or user command. The S2 closure commit is pending.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files

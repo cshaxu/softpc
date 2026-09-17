@@ -702,3 +702,40 @@ symbol belongs to one receiver above or to the instruction-leaf rebuild set.
 No production build, package or media changes are claimed.  S2 remains active
 for the already-admitted safe-boundary completion review and the eventual
 payload round-trip work.
+
+## S2 P15: boundary and ledger closure review
+
+The S2 exit review is deliberately narrow: it proves the state **cutoff** that
+later serializers consume; it does not claim that a snapshot file, a public
+Common operation or a restored machine exists.
+
+`softpc_snapshot_begin` records one monotonic deadline.  The original CCPU
+observer sees every selected FETCH and HLT boundary.  A nested simulation only
+continues waiting; a timely outer FETCH/HLT boundary first joins the timer
+producer, copies the phase required for fresh-stack reentry, and reaches
+READY.  It neither serializes a C stack nor calls a second CPU loop.  The
+timeout path does not force an unwind or emit a payload.  The later S7
+transaction, rather than this internal seam, owns the user-visible ordinary
+PAUSED completion and must retain the joined producer while encoding.
+
+The real `checkpoint_smoke` covers natural nested-BOP return, HLT reentry,
+interrupt shadow and preserved quick-event counter; its timeout half proves
+that a permanently nested HLT fails through the monotonic deadline without a
+successful capture.  `snapshot_boundary_smoke` independently proves deadline
+edges, one completion, clock query/frequency failure and timer stop/start
+failure.  P6--P14 provide the finite state-owner/index evidence needed so a
+later S4--S6 implementation cannot silently substitute stack, function
+address, native timer or host resource bytes for a semantic receiver.
+
+Final verification rebuilt both package test trees and passed the complete
+suite: x64 103/103 and x86 103/103.  The x86 `LastTestsFailed.log` retains an
+older machine-smoke entry despite the current run's 103 successful records;
+it is build-local stale CTest metadata, not a current failure.  Both owned
+checkpoint fixture files are absent.  Documentation governance and whitespace
+checks pass.  This closure commit changes only task documents: production
+C/H +0/-0, tests +0/-0, original mirror +0/-0, Lib/Common +0/-0.
+
+P15 supplies S2's closure evidence.  The following committed admission may
+activate S3's independent pre-audit of the fixed binary container and
+media-base transaction; it must not expose a partial command or weaken the
+running-only capture contract.
