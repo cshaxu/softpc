@@ -563,3 +563,31 @@ The caller sweep used `rg` over selected C/H sources for SAS scratch,
 symbols. It found no other selected caller of the six `call_cpu_function`
 segment-setter paths. The unresolved receiver is explicitly S4/S6, not an
 implicit reset/reinitialization during load. S2 remains active.
+
+## S2 P11: controller state inventory
+
+Before: documentation-only selected-object inventory. No code, ABI, build,
+Lib, Common, configuration or media change. The frozen source universe is the
+actual `softpc-machine-devices` target's selected original/Compat C files and
+the x64 archive's B/b/D/d symbols (the x86 names must match before S2 closes).
+
+| Owner / selected mutable state | Receiver and disposition |
+| --- | --- |
+| `ica.c`: two `ADAPTER_STATE` records, `sequence`, `iretHookActive`, `howoften` | S5 saves every semantic PIC register/count/delay/priority/ISR-aging value. Each action callback becomes a fixed callback ID plus parameter; `ica_*_func` and the static async-handler function table rebuild. This preserves pending/in-service IRQ rather than reissuing ports. |
+| `timer.c`: three `COUNTER_UNIT` records, phase/local counters, backlog and timer scalars | S5 saves counter registers and semantic state-machine phase IDs, never host-time/getTime or state-function pointers. It rebases host-time baselines at restore without manufacturing guest ticks. `active_int_event` is reconciled against the saved q/tic nodes, not re-added. |
+| `cmos.c`: CMOS bytes/index/register selection, alarm/period fields and RTC queue handle | S5 saves all guest-visible registers and scheduling fields. BCD/hour conversion pointers and `host_tm *` rebuild. Its periodic host-time sync is a separate virtual-clock issue: loading CMOS bytes alone is insufficient, so S5 must define restored RTC time-base behavior and reconnect exactly the saved queue handle. |
+| `at_dma.c`: full `DMA_ADAPT` and `lim_active` | S5 saves register, address/count/page/mask/flip-flop state; it does not replay DMA port writes. No native pointers occur in the adaptor record. |
+| `fdisk.c`, `fla.c`, `floppy.c`, `gfi*.c`, Compat GFI/media | S5 saves command/result/taskfile/status/sector buffers, selected drive, DMA/NDMA transfer progress and pending queue handles. Function tables, image leases and host paths are rebuilt/validated through the separately saved media section. An incomplete disk command must remain incomplete. |
+| `ppi.c`, `keyba.c`, `keybd_io.c`, `mouse.c`, `mouse_io.c` | S6 owns these input-controller registers/FIFOs/typematic/keyboard state, mouse deltas/buttons/mode and pending action handles. Host input callback pointers and UI source state are rebuilt and never stored. |
+| `audio.c`, `nt_sound.c`, `parallel.c`, `serial.c`, `printer*.c` | Guest-programmed sound/port state is classified with S5; native task/event/handle/audio resources rebuild. Per product contract, attached external serial/parallel/printer endpoints reject save rather than claim rollback of external effects. |
+
+The `COUNTER_UNIT` and `ADAPTER_STATE` fields contain native function pointers;
+the future format therefore needs explicit fixed phase/callback identifiers,
+not structure-byte dumps. The quick/tic P7/P8 ledger remains their only queue
+owner. This table adds no competing scheduler or controller state source.
+
+After: documentation only, production/test/original-mirror +0/-0. The sweep
+enumerated actual selected-device target sources and archive mutable symbols;
+the next proof must repeat the symbol set on x86 and turn each table row into
+narrow owner ports and fault-injected roundtrip tests. S2 remains open for
+video and remaining selected devices.
