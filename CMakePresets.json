@@ -10,6 +10,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG",
+        "CMAKE_EXE_LINKER_FLAGS": "-static -static-libgcc",
         "CMAKE_C_COMPILER": "gcc",
         "SOFTPC_ARTIFACT_ARCHITECTURE": "x64"
       }
@@ -27,6 +28,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG",
+        "CMAKE_EXE_LINKER_FLAGS": "-static -static-libgcc",
         "CMAKE_C_COMPILER": "$env{SOFTPC_I686_GCC}",
         "SOFTPC_ARTIFACT_ARCHITECTURE": "x86"
       }
