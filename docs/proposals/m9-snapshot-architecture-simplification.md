@@ -12,7 +12,7 @@ Owner 原始请求：
 
 本文件记录只读审计与候选设计，不是代码实施准入，不关闭 T63/S9，不分配新 T/S。
 当前任务状态仍以 [CURRENT](../states/CURRENT.md) 为准；本候选挂于
-[QUEUE](../states/QUEUE.md)，不改变前三项顺序。
+[QUEUE](../states/QUEUE.md)。Owner 随后要求提升至队首；候选顺序仅由 Queue 维护。
 Owner 已反馈 S9 P9 手测成功；这不是整个快照任务全部能力完成的声明。
 
 审计基线为 `aa2bc0d`，T63 增量比较起点为 `ea7e982`。以下计数由
