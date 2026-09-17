@@ -24,7 +24,9 @@ S7 P7 is locally verified: VM now composes private CCPU/SAS and device slices
 into a canonical versioned image with dual-width checkpoint proof. S7 P8 binds
 the existing Common state-transfer rendezvous to the VM-owned safe capture and
 stopped restore transaction: running read returns ordinary PAUSED, stopped
-write stages first and restores into ordinary PAUSED. It is not yet an App
+write stages first and restores into ordinary PAUSED. P9 reconstructs host
+video resources only after controller replay and proves that restore publishes
+a complete frame (text fallback while a graphics painter is unavailable). It is not yet an App
 snapshot command and media sections remain in scope.
 
 ## Current Technical Baseline

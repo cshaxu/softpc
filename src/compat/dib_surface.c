@@ -34,6 +34,19 @@ static int softpc_dib_dirty_valid;
 static RGBQUAD softpc_dib_palette_history[SOFTPC_DIB_PALETTE_HISTORY][16];
 static unsigned long softpc_dib_palette_history_count;
 
+static void softpc_standalone_dib_set_default_geometry(void)
+{
+    softpc_dib_info->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    softpc_dib_info->bmiHeader.biWidth = SOFTPC_DIB_MAX_WIDTH;
+    softpc_dib_info->bmiHeader.biHeight = -(LONG)SOFTPC_DIB_MAX_HEIGHT;
+    softpc_dib_info->bmiHeader.biPlanes = 1;
+    softpc_dib_info->bmiHeader.biBitCount = 8;
+    softpc_dib_info->bmiHeader.biCompression = BI_RGB;
+    softpc_dib_info->bmiHeader.biClrUsed = SOFTPC_DIB_COLOURS;
+    softpc_dib_width = SOFTPC_DIB_MAX_WIDTH;
+    softpc_dib_height = SOFTPC_DIB_MAX_HEIGHT;
+}
+
 static void softpc_standalone_dib_record_palette(void)
 {
     unsigned long slot = softpc_dib_palette_history_count %
@@ -72,6 +85,11 @@ static void softpc_standalone_dib_palette_changed(void)
     softpc_dib_dirty_valid = 1;
 }
 
+void softpc_standalone_dib_invalidate_all(void)
+{
+    softpc_standalone_dib_palette_changed();
+}
+
 /* nt_cga.c owns the original text update algorithm.  Its Windows console
    sharing buffer becomes standalone-owned storage; the frontend consumes it
    through the DIB/text presenter instead of a console server. */
@@ -82,7 +100,12 @@ int softpc_standalone_dib_init(void)
     size_t info_bytes;
     size_t bitmap_bytes;
 
-    if (softpc_dib_bits != NULL) return 1;
+    if (softpc_dib_bits != NULL) {
+        if (softpc_dib_info == NULL || textBuffer == NULL) return 0;
+        if (softpc_dib_width == 0u || softpc_dib_height == 0u)
+            softpc_standalone_dib_set_default_geometry();
+        return 1;
+    }
     info_bytes = sizeof(BITMAPINFOHEADER) +
         SOFTPC_DIB_COLOURS * sizeof(RGBQUAD);
     bitmap_bytes = SOFTPC_DIB_MAX_WIDTH * SOFTPC_DIB_MAX_HEIGHT;
@@ -95,13 +118,7 @@ int softpc_standalone_dib_init(void)
         softpc_dib_bits = NULL;
         return 0;
     }
-    softpc_dib_info->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    softpc_dib_info->bmiHeader.biWidth = SOFTPC_DIB_MAX_WIDTH;
-    softpc_dib_info->bmiHeader.biHeight = -(LONG)SOFTPC_DIB_MAX_HEIGHT;
-    softpc_dib_info->bmiHeader.biPlanes = 1;
-    softpc_dib_info->bmiHeader.biBitCount = 8;
-    softpc_dib_info->bmiHeader.biCompression = BI_RGB;
-    softpc_dib_info->bmiHeader.biClrUsed = SOFTPC_DIB_COLOURS;
+    softpc_standalone_dib_set_default_geometry();
     /* The frontend owns softpc_dib_info for its whole lifetime.  Do not
        publish it through the historical console buffer: nt_graph owns and
        frees that slot whenever it rebuilds an indexed painter DIB. */
@@ -122,8 +139,6 @@ int softpc_standalone_dib_init(void)
     CGADIB = softpc_dib_info;
     EGADIB = softpc_dib_info;
     VGADIB = softpc_dib_info;
-    softpc_dib_width = SOFTPC_DIB_MAX_WIDTH;
-    softpc_dib_height = SOFTPC_DIB_MAX_HEIGHT;
     return 1;
 }
 

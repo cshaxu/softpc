@@ -168,8 +168,15 @@ static lib_bool vm_driver_run(void *opaque)
         softpc_ccpu_entry entry;
         result = softpc_machine_reset(driver->machine) == SOFTPC_MACHINE_OK &&
             softpc_snapshot_image_restore(&driver->staged_image, &entry) ==
-                LIB_STATUS_OK &&
-            softpc_ccpu_lifecycle_resume(&entry) != 0;
+                LIB_STATUS_OK;
+        /* Resume through the normal executor entry. Common has already
+           requested pause, so its first ordinary callback publishes the
+           rebuilt frame and reaches the paused rendezvous before the guest
+           advances beyond this restored boundary. */
+        if (result) {
+            result = softpc_ccpu_lifecycle_resume(&entry) != 0;
+            if (result) vm_driver_executor_event(driver);
+        }
         softpc_snapshot_image_dispose(&driver->staged_image);
         driver->restore_pending = LIB_FALSE;
     } else
@@ -239,12 +246,13 @@ static lib_bool vm_driver_copy_graphics(vm_driver *driver,
     lib_u32 row;
     lib_u32 palette_index;
 
-    if (!softpc_machine_presentation_take_dirty(driver->machine, &left, &top,
-            &right, &bottom)) return LIB_FALSE;
     if (!softpc_machine_presentation_dib(driver->machine, &bits, &info, &width,
             &height) || bits == NULL || info == NULL ||
-        width > KVM_GRAPHICS_MAX_WIDTH || height > KVM_GRAPHICS_MAX_HEIGHT)
+        width == 0u || height == 0u || width > KVM_GRAPHICS_MAX_WIDTH ||
+        height > KVM_GRAPHICS_MAX_HEIGHT)
         return LIB_FALSE;
+    if (!softpc_machine_presentation_take_dirty(driver->machine, &left, &top,
+            &right, &bottom)) return LIB_FALSE;
     row_stride = (width + 3u) & ~3u;
     if (width * height > KVM_GRAPHICS_MAX_PIXELS) return LIB_FALSE;
     memset(frame, 0, sizeof(*frame));
@@ -342,9 +350,13 @@ static lib_bool vm_driver_copy_frame(void *opaque, kvm_frame *frame)
 {
     vm_driver *driver = (vm_driver *)opaque;
     if (driver == NULL || frame == NULL) return LIB_FALSE;
-    return softpc_machine_presentation_is_graphics(driver->machine) ?
-        vm_driver_copy_graphics(driver, frame) :
-        vm_driver_copy_text(driver, frame);
+    /* A restored controller may report graphics while its host painter is
+       still rebuilding. Preserve the last complete semantic surface: use the
+       graphics frame when it is ready, otherwise publish the text surface
+       rather than publishing no frame at all. */
+    if (softpc_machine_presentation_is_graphics(driver->machine) &&
+        vm_driver_copy_graphics(driver, frame)) return LIB_TRUE;
+    return vm_driver_copy_text(driver, frame);
 }
 
 static lib_bool vm_driver_set_removable_media(void *opaque,

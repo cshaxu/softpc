@@ -558,4 +558,10 @@ unchanged; no second reset path or persistent loaded-state behavior exists.
 
 `snapshot_transaction_smoke` proves this real-driver contract: running read
 produces bytes and PAUSED; corrupt stopped write rejects and remains STOPPED;
-valid stopped write reaches PAUSED; ordinary resume/stop remain usable.
+valid stopped write reaches PAUSED with a complete published frame; ordinary
+resume/stop remain usable. Restore rebuilds the host video surface only after
+both the video bytes and controller registers are installed. If that painter
+is still unavailable at the restored boundary, the VM publishes the complete
+text surface rather than emitting no frame; a ready graphics painter remains
+the preferred route. No host DIB, pixel allocation or window resource enters
+the image.

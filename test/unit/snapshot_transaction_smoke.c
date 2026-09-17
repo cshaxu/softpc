@@ -115,6 +115,12 @@ int main(void)
         &(common_machine_state_reader) { snapshot_read, &stream }) ==
         LIB_STATUS_OK);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
+    {
+        kvm_frame frame = { 0 };
+        assert(common_machine_copy_published_frame(machine, &frame,
+            common_machine_run_generation(machine)));
+        assert(frame.valid != 0u);
+    }
     assert(common_machine_resume(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
     assert(common_machine_stop(machine));

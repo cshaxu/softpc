@@ -403,6 +403,7 @@ int softpc_device_snapshot_capture_video_memory(
     softpc_device_video_memory_state *state);
 int softpc_device_snapshot_restore_video_memory(
     const softpc_device_video_memory_state *state);
+void softpc_device_snapshot_rebuild_video_presentation(void);
 
 /*
  * Controller state is a register-value map, never a copy of the original

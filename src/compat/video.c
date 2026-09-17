@@ -126,6 +126,7 @@ int softpc_device_snapshot_restore_video_memory(
     unsigned long index;
 
     if (state == NULL || EGA_planes == NULL || DAC == NULL ||
+        !softpc_standalone_dib_init() ||
         sizeof(state->plane) != 4u * EGA_PLANE_SIZE ||
         SOFTPC_DEVICE_VIDEO_DAC_COUNT != VGA_DAC_SIZE)
         return 0;
@@ -136,6 +137,16 @@ int softpc_device_snapshot_restore_video_memory(
         DAC[index].blue = (half_word)state->dac[index][2];
     }
     flag_palette_change_required();
-    host_mark_screen_refresh();
     return 1;
+}
+
+void softpc_device_snapshot_rebuild_video_presentation(void)
+{
+    if (!softpc_standalone_dib_init()) return;
+    host_mark_screen_refresh();
+    host_graphics_tick();
+    /* Controller restoration can replace its paint surface.  Require a
+       complete frame from the final reconstructed host resource. */
+    if (softpc_standalone_dib_init())
+        softpc_standalone_dib_invalidate_all();
 }

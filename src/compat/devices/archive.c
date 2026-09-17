@@ -193,6 +193,7 @@ softpc_device_archive *archive;
             archive->quick_capacity, archive->tick_entries,
             archive->tick_capacity, decode_callback))
         return FALSE;
+    softpc_device_snapshot_rebuild_video_presentation();
     if (!softpc_device_snapshot_restore_serial_controller(
             &archive->serial_controller) ||
         !softpc_device_snapshot_restore_serial_host(&archive->serial_host) ||
