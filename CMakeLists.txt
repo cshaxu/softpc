@@ -455,6 +455,13 @@ target_include_directories(softpc-checkpoint-smoke PRIVATE
     src/mvdm/softpc.new/base/inc)
 add_test(NAME softpc-checkpoint-smoke COMMAND softpc-checkpoint-smoke)
 set_tests_properties(softpc-checkpoint-smoke PROPERTIES TIMEOUT 15)
+add_executable(softpc-snapshot-transaction-smoke
+    test/unit/snapshot_transaction_smoke.c)
+target_link_libraries(softpc-snapshot-transaction-smoke PRIVATE softpc-vm
+    common-machine)
+add_test(NAME softpc-snapshot-transaction-smoke
+    COMMAND softpc-snapshot-transaction-smoke)
+set_tests_properties(softpc-snapshot-transaction-smoke PROPERTIES TIMEOUT 20)
 add_executable(softpc-snapshot-boundary-smoke test/unit/snapshot_boundary_smoke.c)
 target_include_directories(softpc-snapshot-boundary-smoke PRIVATE src)
 add_test(NAME softpc-snapshot-boundary-smoke COMMAND softpc-snapshot-boundary-smoke)
@@ -564,6 +571,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-quick-time-smoke
     softpc-lifecycle-smoke
     softpc-checkpoint-smoke
+    softpc-snapshot-transaction-smoke
     softpc-snapshot-boundary-smoke
     softpc-runtime-smoke
     softpc-runtime-restart-boot-smoke
@@ -642,6 +650,7 @@ set(SOFTPC_UNIT_TESTS
     softpc-quick-time-smoke
     softpc-lifecycle-smoke
     softpc-checkpoint-smoke
+    softpc-snapshot-transaction-smoke
     softpc-snapshot-boundary-smoke
     softpc-runtime-smoke
     softpc-runtime-input-continuation-smoke

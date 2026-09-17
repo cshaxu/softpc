@@ -537,3 +537,25 @@ transaction nor App file commands.
 原子安装的设备态、需要修改 Lib/其他 Common 组件或未解决文件安全原语，先给出证据
 和设计修订，不用绕过检查
 换取“能打开快照”。不需要在线机器状态迁移、第二执行器或改造 KVM。
+
+### S7 P8: executor-owned state transfer
+
+The driver binds the existing Common executor callback through one VM wrapper.
+On a running read, Common calls only `begin_state_read`; VM starts the existing
+one-second checkpoint. At the first outer CCPU boundary VM stops the producer
+clock, captures and writes the canonical image, then invokes that same Common
+executor callback. Common receives only its existing result and enters its
+ordinary PAUSED wait. After the existing resume edge returns, VM disposes the
+temporary image and restarts the clock. Timeout, archive, and writer failures
+use the same result path and likewise leave an ordinary PAUSED machine.
+
+For a stopped write, VM decodes the complete image into private staging before
+Common changes lifecycle. The next executor invocation runs the original reset
+only to rebuild original host resources, installs the validated image before a
+guest instruction, then resumes the saved CCPU entry. Common's existing
+paused-start edge parks it normally. A malformed stream leaves STOPPED
+unchanged; no second reset path or persistent loaded-state behavior exists.
+
+`snapshot_transaction_smoke` proves this real-driver contract: running read
+produces bytes and PAUSED; corrupt stopped write rejects and remains STOPPED;
+valid stopped write reaches PAUSED; ordinary resume/stop remain usable.

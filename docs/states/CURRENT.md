@@ -21,9 +21,11 @@ T62 closure was pushed in 54b2009 before T63 admission. The three older
 candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.md).
 
 S7 P7 is locally verified: VM now composes private CCPU/SAS and device slices
-into a canonical versioned image with dual-width checkpoint proof. It is not
-yet a product snapshot operation; the running VM transaction, media sections
-and App command remain in scope.
+into a canonical versioned image with dual-width checkpoint proof. S7 P8 binds
+the existing Common state-transfer rendezvous to the VM-owned safe capture and
+stopped restore transaction: running read returns ordinary PAUSED, stopped
+write stages first and restores into ordinary PAUSED. It is not yet an App
+snapshot command and media sections remain in scope.
 
 ## Current Technical Baseline
 

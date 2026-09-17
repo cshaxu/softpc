@@ -2,6 +2,8 @@
 #include "input.h"
 #include "vm/trace.h"
 #include "vm/debug.h"
+#include "vm/snapshot.h"
+#include "compat/ccpu/lifecycle.h"
 #include "compat/audio.h"
 #include "lib/types/atomic.h"
 
@@ -12,6 +14,15 @@
 struct vm_driver {
     softpc_machine *machine;
     softpc_debug_state debug;
+    softpc_snapshot capture;
+    softpc_snapshot_image captured_image;
+    common_machine_state_writer state_writer;
+    lib_status state_read_status;
+    lib_bool state_read_ready;
+    softpc_snapshot_image staged_image;
+    lib_bool restore_pending;
+    common_machine_executor_callback executor_callback;
+    void *executor_context;
 };
 
 /* The recovered core and host endpoints are process-global. This is resource
@@ -114,13 +125,56 @@ static lib_bool vm_driver_reset(void *opaque)
         SOFTPC_MACHINE_OK;
 }
 
+static void vm_driver_executor_event(void *opaque)
+{
+    vm_driver *driver = (vm_driver *)opaque;
+    if (driver != NULL && driver->executor_callback != NULL)
+        driver->executor_callback(driver->executor_context);
+}
+
+static void vm_driver_snapshot_observe(void *opaque, unsigned long depth,
+    const softpc_ccpu_entry *entry)
+{
+    vm_driver *driver = (vm_driver *)opaque;
+    lib_status status;
+    if (driver == NULL || entry == NULL ||
+        !softpc_snapshot_checkpoint(&driver->capture, depth, entry))
+        return;
+    status = driver->capture.status;
+    if (status == LIB_STATUS_OK) {
+        softpc_snapshot_image_dispose(&driver->captured_image);
+        status = softpc_snapshot_image_capture(&driver->captured_image, entry);
+        if (status == LIB_STATUS_OK)
+            status = softpc_snapshot_image_write(&driver->captured_image,
+                (softpc_snapshot_bytes_write)driver->state_writer.write,
+                driver->state_writer.context);
+    }
+    driver->state_read_status = status;
+    driver->state_read_ready = LIB_TRUE;
+    vm_driver_executor_event(driver);
+    softpc_snapshot_image_dispose(&driver->captured_image);
+    (void)softpc_snapshot_finish(&driver->capture);
+    driver->state_read_ready = LIB_FALSE;
+}
+
 static lib_bool vm_driver_run(void *opaque)
 {
     vm_driver *driver = (vm_driver *)opaque;
     lib_bool result;
     if (driver == NULL) return LIB_FALSE;
     softpc_debug_bind(&driver->debug);
-    result = softpc_machine_run(driver->machine, UINT64_MAX) == SOFTPC_MACHINE_OK;
+    softpc_ccpu_lifecycle_observe(vm_driver_snapshot_observe, driver);
+    if (driver->restore_pending) {
+        softpc_ccpu_entry entry;
+        result = softpc_machine_reset(driver->machine) == SOFTPC_MACHINE_OK &&
+            softpc_snapshot_image_restore(&driver->staged_image, &entry) ==
+                LIB_STATUS_OK &&
+            softpc_ccpu_lifecycle_resume(&entry) != 0;
+        softpc_snapshot_image_dispose(&driver->staged_image);
+        driver->restore_pending = LIB_FALSE;
+    } else
+        result = softpc_machine_run(driver->machine, UINT64_MAX) == SOFTPC_MACHINE_OK;
+    softpc_ccpu_lifecycle_observe(NULL, NULL);
     softpc_debug_bind(NULL);
     return result;
 }
@@ -147,8 +201,12 @@ static void vm_driver_set_executor_callback(void *opaque,
     common_machine_executor_callback callback, void *callback_context)
 {
     vm_driver *driver = (vm_driver *)opaque;
-    if (driver != NULL) softpc_machine_set_executor_callback(driver->machine,
-        callback, callback_context);
+    if (driver == NULL) return;
+    driver->executor_callback = callback;
+    driver->executor_context = callback_context;
+    softpc_machine_set_executor_callback(driver->machine,
+        callback == NULL ? NULL : vm_driver_executor_event,
+        callback == NULL ? NULL : driver);
 }
 
 static void vm_driver_deliver_input(void *opaque,
@@ -318,6 +376,46 @@ static void vm_driver_cancel_debug(void *opaque)
     driver->debug = (softpc_debug_state) { 0 };
 }
 
+static lib_status vm_driver_begin_state_read(void *opaque,
+    const common_machine_state_writer *writer)
+{
+    vm_driver *driver = (vm_driver *)opaque;
+    if (driver == NULL || writer == NULL || writer->write == NULL ||
+        driver->capture.phase != SOFTPC_SNAPSHOT_IDLE)
+        return LIB_STATUS_INVALID_STATE;
+    driver->state_writer = *writer;
+    driver->state_read_status = LIB_STATUS_INVALID_STATE;
+    driver->state_read_ready = LIB_FALSE;
+    return softpc_snapshot_begin(&driver->capture);
+}
+
+static lib_bool vm_driver_take_state_read_result(void *opaque,
+    lib_status *out_status)
+{
+    vm_driver *driver = (vm_driver *)opaque;
+    if (driver == NULL || out_status == NULL || !driver->state_read_ready)
+        return LIB_FALSE;
+    *out_status = driver->state_read_status;
+    return LIB_TRUE;
+}
+
+static lib_status vm_driver_write_state(void *opaque,
+    const common_machine_state_reader *reader)
+{
+    vm_driver *driver = opaque;
+    softpc_snapshot_image staged = {0};
+    lib_status status;
+    if (driver == NULL || reader == NULL || reader->read == NULL ||
+        driver->restore_pending) return LIB_STATUS_INVALID_STATE;
+    status = softpc_snapshot_image_read(&staged,
+        (softpc_snapshot_bytes_read)reader->read, reader->context);
+    if (status != LIB_STATUS_OK) return status;
+    softpc_snapshot_image_dispose(&driver->staged_image);
+    driver->staged_image = staged;
+    driver->restore_pending = LIB_TRUE;
+    return LIB_STATUS_OK;
+}
+
 lib_status vm_driver_create(vm_driver **out_driver,
     softpc_machine *machine)
 {
@@ -333,6 +431,9 @@ lib_status vm_driver_create(vm_driver **out_driver,
 
 void vm_driver_destroy(vm_driver *driver)
 {
+    if (driver == NULL) return;
+    softpc_snapshot_image_dispose(&driver->captured_image);
+    softpc_snapshot_image_dispose(&driver->staged_image);
     free(driver);
 }
 
@@ -351,8 +452,11 @@ void vm_driver_describe(vm_driver *driver,
     out_driver->deliver_input = vm_driver_deliver_input;
     out_driver->copy_frame = vm_driver_copy_frame;
     out_driver->set_removable_media = vm_driver_set_removable_media;
+    out_driver->begin_state_read = vm_driver_begin_state_read;
+    out_driver->take_state_read_result = vm_driver_take_state_read_result;
     out_driver->execute_debug = vm_driver_debug;
     out_driver->take_debug_stop = vm_driver_take_debug_stop;
     out_driver->cancel_debug = vm_driver_cancel_debug;
+    out_driver->write_state = vm_driver_write_state;
     out_driver->frame_published = vm_driver_trace_frame;
 }

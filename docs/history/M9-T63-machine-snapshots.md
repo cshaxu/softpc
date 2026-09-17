@@ -1,5 +1,13 @@
 # M9 T63: machine snapshot implementation record
 
+## S7 P8: executor-owned state transfer
+
+The VM driver owns the sole safe-boundary capture and stopped restore
+transaction behind Common's two opaque state-transfer callbacks. It does not
+add a Common lifecycle state or alter Lib. A focused real-driver smoke proves
+running-read/paused, corrupt-stopped-write/stopped and
+valid-stopped-write/paused before ordinary resume and stop.
+
 ## Scope and admission
 
 Owner approved the revised [snapshot proposal](../proposals/m9-machine-snapshots.md):
