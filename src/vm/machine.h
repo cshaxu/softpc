@@ -28,6 +28,7 @@ typedef struct softpc_machine_options {
 softpc_machine_result softpc_machine_create(const softpc_machine_options *options,
     softpc_machine **machine_out);
 softpc_machine_result softpc_machine_reset(softpc_machine *machine);
+uint32_t softpc_machine_memory_bytes(const softpc_machine *machine);
 softpc_machine_result softpc_machine_run(softpc_machine *machine,
     uint64_t instruction_budget);
 softpc_machine_result softpc_machine_read_physical(const softpc_machine *machine,

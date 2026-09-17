@@ -576,3 +576,15 @@ re-entry callback is still required to reach Common's requested PAUSED wait,
 publish the completed restored frame, and return from the parked executor.
 This is one VM-local Boolean boundary, not a Common lifecycle state or second
 completion channel.
+
+### S7 P11: fresh-process staged decode
+
+Staged decode must not inspect live SAS state: a stopped target has not yet
+performed reset and therefore has no initialized CCPU RAM to compare. The
+canonical header's declared RAM is first required to equal the target machine
+configuration. The core then requires its SAS RAM and deterministically
+derived page-type length to equal that declaration before allocating or
+starting restore. The existing post-reset SAS restore remains the final live
+state check. A two-process CTest saves, exits, creates a fresh stopped target,
+loads, verifies its complete PAUSED frame, resumes and stops; a mismatched-RAM
+decode is rejected before the restore transaction.

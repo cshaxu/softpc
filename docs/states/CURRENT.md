@@ -31,6 +31,11 @@ snapshot command and media sections remain in scope. P10 suppresses only
 reset/archive-replay executor callbacks; it reopens the existing callback
 before restored CCPU re-entry, so the PAUSED completion cannot precede the
 completed restored surface or deadlock the parked executor.
+P11 makes staged decoding independent of an already initialized CCPU: the
+image's declared RAM must match the target machine configuration, and its SAS
+page-type length is validated from that declaration before any reset. A real
+two-process save/exit/load/resume CTest proves a fresh stopped target reaches
+ordinary PAUSED without importing live SAS state.
 
 ## Current Technical Baseline
 

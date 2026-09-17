@@ -400,13 +400,15 @@ static void verify_snapshot_archive(void)
         checkpoint_write_bytes, &stream) == LIB_STATUS_OK);
     assert(stream.byte_count != 0u);
     stream.bytes[0] ^= 1u;
-    assert(softpc_ccpu_archive_read_core(&decoded, checkpoint_read_bytes,
+    assert(softpc_ccpu_archive_read_core(&decoded, image.ccpu.sas.memory_bytes,
+        checkpoint_read_bytes,
         &stream) == LIB_STATUS_INVALID_ARGUMENT);
     assert(decoded.memory == NULL && decoded.page_types == NULL &&
         decoded.tlb_page_index == NULL);
     stream.bytes[0] ^= 1u;
     stream.offset = 0u;
-    assert(softpc_ccpu_archive_read_core(&decoded, checkpoint_read_bytes,
+    assert(softpc_ccpu_archive_read_core(&decoded, image.ccpu.sas.memory_bytes,
+        checkpoint_read_bytes,
         &stream) == LIB_STATUS_OK);
     assert(stream.offset == stream.byte_count);
     assert(decoded.valid == 0);
@@ -446,11 +448,17 @@ static void verify_snapshot_archive(void)
         &image_stream) == LIB_STATUS_OK);
     assert(image_stream.byte_count != 0u);
     image_stream.bytes[0] ^= 1u;
-    assert(softpc_snapshot_image_read(&decoded_image, checkpoint_read_bytes,
+    assert(softpc_snapshot_image_read(&decoded_image,
+        image.ccpu.sas.memory_bytes, checkpoint_read_bytes,
         &image_stream) == LIB_STATUS_INVALID_ARGUMENT);
     image_stream.bytes[0] ^= 1u;
     image_stream.offset = 0u;
-    assert(softpc_snapshot_image_read(&decoded_image, checkpoint_read_bytes,
+    assert(softpc_snapshot_image_read(&decoded_image,
+        image.ccpu.sas.memory_bytes + 4096u, checkpoint_read_bytes,
+        &image_stream) == LIB_STATUS_INVALID_ARGUMENT);
+    image_stream.offset = 0u;
+    assert(softpc_snapshot_image_read(&decoded_image,
+        image.ccpu.sas.memory_bytes, checkpoint_read_bytes,
         &image_stream) == LIB_STATUS_OK);
     assert(image_stream.offset == image_stream.byte_count);
     assert(decoded_image.ccpu.valid != 0);

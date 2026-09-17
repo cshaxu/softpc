@@ -195,6 +195,12 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     return SOFTPC_MACHINE_OK;
 }
 
+uint32_t softpc_machine_memory_bytes(const softpc_machine *machine)
+{
+    if (machine == NULL || machine->memory_bytes > UINT32_MAX) return 0u;
+    return (uint32_t)machine->memory_bytes;
+}
+
 softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,
     uint8_t scan_code)
 {

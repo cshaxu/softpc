@@ -313,18 +313,23 @@ static lib_status snapshot_write_sas(const softpc_ccpu_archive *archive,
 }
 
 static lib_status snapshot_read_sas(softpc_ccpu_archive *archive,
-    softpc_snapshot_bytes_read read, void *context)
+    lib_u32 expected_memory_bytes, softpc_snapshot_bytes_read read,
+    void *context)
 {
     softpc_ccpu_sas_state sas = {0};
-    softpc_ccpu_sas_state expected = {0};
     lib_status status;
     SNAPSHOT_READ(sas.memory_bytes); SNAPSHOT_READ(sas.page_type_bytes);
     SNAPSHOT_READ(sas.wrap_mask); SNAPSHOT_READ(sas.selectors_set);
     SNAPSHOT_READ(sas.code_selector); SNAPSHOT_READ(sas.data_selector);
-    softpc_ccpu_snapshot_capture_sas(&expected, NULL, 0u, NULL, 0u);
-    if (sas.memory_bytes == 0u || sas.page_type_bytes == 0u ||
-        sas.memory_bytes != expected.memory_bytes ||
-        sas.page_type_bytes != expected.page_type_bytes)
+    /* The decoder can run before the target CCPU has been reset, so it must
+       validate against the image's already checked machine configuration,
+       never against the uninitialized live SAS globals.  This is the same
+       page-type length the original SAS implementation derives. */
+    if (expected_memory_bytes > UINT32_MAX - 0x10020u ||
+        sas.memory_bytes == 0u || sas.page_type_bytes == 0u ||
+        sas.memory_bytes != expected_memory_bytes ||
+        sas.page_type_bytes !=
+            ((expected_memory_bytes + 0x10020u) >> 12))
         return LIB_STATUS_INVALID_ARGUMENT;
     if (!softpc_ccpu_archive_allocate(archive, sas.memory_bytes,
         sas.page_type_bytes)) return LIB_STATUS_NO_MEMORY;
@@ -352,12 +357,14 @@ lib_status softpc_ccpu_archive_write_core(const softpc_ccpu_archive *archive,
 }
 
 lib_status softpc_ccpu_archive_read_core(softpc_ccpu_archive *archive,
-    softpc_snapshot_bytes_read read, void *context)
+    lib_u32 expected_memory_bytes, softpc_snapshot_bytes_read read,
+    void *context)
 {
     lib_status status;
-    if (archive == NULL || read == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    if (archive == NULL || expected_memory_bytes == 0u || read == NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
     archive->valid = 0;
-    status = snapshot_read_sas(archive, read, context);
+    status = snapshot_read_sas(archive, expected_memory_bytes, read, context);
     if (status == LIB_STATUS_OK) status = snapshot_read_registers(&archive->registers, read, context);
     if (status == LIB_STATUS_OK) status = snapshot_read_execution(&archive->execution, read, context);
     if (status == LIB_STATUS_OK) status = snapshot_read_debug(&archive->debug, read, context);

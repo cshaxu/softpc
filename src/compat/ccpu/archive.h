@@ -31,6 +31,7 @@ int softpc_ccpu_archive_restore(const softpc_ccpu_archive *archive);
 lib_status softpc_ccpu_archive_write_core(const softpc_ccpu_archive *archive,
     softpc_snapshot_bytes_write write, void *context);
 lib_status softpc_ccpu_archive_read_core(softpc_ccpu_archive *archive,
-    softpc_snapshot_bytes_read read, void *context);
+    lib_u32 expected_memory_bytes, softpc_snapshot_bytes_read read,
+    void *context);
 
 #endif

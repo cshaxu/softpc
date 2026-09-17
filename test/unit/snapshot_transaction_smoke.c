@@ -57,6 +57,26 @@ static lib_status snapshot_read(void *opaque, lib_u8 *bytes,
     return LIB_STATUS_OK;
 }
 
+static lib_status snapshot_file_write(void *opaque, const lib_u8 *bytes,
+    lib_size byte_count)
+{
+    FILE *file = opaque;
+    if (file == NULL || (bytes == NULL && byte_count != 0u))
+        return LIB_STATUS_INVALID_ARGUMENT;
+    return byte_count == 0u || fwrite(bytes, 1u, byte_count, file) == byte_count ?
+        LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+}
+
+static lib_status snapshot_file_read(void *opaque, lib_u8 *bytes,
+    lib_size byte_count)
+{
+    FILE *file = opaque;
+    if (file == NULL || (bytes == NULL && byte_count != 0u))
+        return LIB_STATUS_INVALID_ARGUMENT;
+    return byte_count == 0u || fread(bytes, 1u, byte_count, file) == byte_count ?
+        LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+}
+
 static lib_bool wait_for_state(common_machine *machine,
     common_machine_state expected)
 {
@@ -68,26 +88,41 @@ static lib_bool wait_for_state(common_machine *machine,
     return LIB_FALSE;
 }
 
-int main(void)
+static lib_bool snapshot_write_media(const char *path)
+{
+    lib_u8 sector[512] = { 0 };
+    FILE *file;
+
+    if (path == NULL) return LIB_FALSE;
+    sector[0] = 0xebu; sector[1] = 0xfeu;
+    sector[510] = 0x55u; sector[511] = 0xaau;
+    file = fopen(path, "wb");
+    if (file == NULL) return LIB_FALSE;
+    if (fwrite(sector, 1u, sizeof(sector), file) != sizeof(sector)) {
+        fclose(file);
+        return LIB_FALSE;
+    }
+    return fclose(file) == 0 ? LIB_TRUE : LIB_FALSE;
+}
+
+static void snapshot_options(softpc_machine_options *options, const char *path)
+{
+    *options = (softpc_machine_options) { 0 };
+    options->floppy_path = path;
+    options->media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+}
+
+static int snapshot_run_transaction(void)
 {
     const char *path = "softpc-snapshot-transaction-smoke.img";
-    lib_u8 sector[512] = { 0 };
     softpc_machine_options options = { 0 };
     common_machine_driver description = { 0 };
     softpc_machine *product = NULL;
     vm_driver *driver = NULL;
     common_machine *machine = NULL;
     snapshot_bytes stream = { 0 };
-    FILE *file;
-
-    sector[0] = 0xebu; sector[1] = 0xfeu;
-    sector[510] = 0x55u; sector[511] = 0xaau;
-    file = fopen(path, "wb");
-    assert(file != NULL);
-    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
-    assert(fclose(file) == 0);
-    options.floppy_path = path;
-    options.media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    assert(snapshot_write_media(path));
+    snapshot_options(&options, path);
     assert(softpc_machine_create(&options, &product) == SOFTPC_MACHINE_OK);
     assert(vm_driver_create(&driver, product) == LIB_STATUS_OK);
     vm_driver_describe(driver, &description);
@@ -133,9 +168,103 @@ int main(void)
     assert(remove(path) == 0);
     return 0;
 }
-#else
-int main(void)
+
+static int snapshot_run_save(const char *media_path, const char *snapshot_path)
 {
+    softpc_machine_options options;
+    common_machine_driver description = { 0 };
+    softpc_machine *product = NULL;
+    vm_driver *driver = NULL;
+    common_machine *machine = NULL;
+    FILE *file;
+
+    assert(snapshot_write_media(media_path));
+    snapshot_options(&options, media_path);
+    assert(softpc_machine_create(&options, &product) == SOFTPC_MACHINE_OK);
+    assert(vm_driver_create(&driver, product) == LIB_STATUS_OK);
+    vm_driver_describe(driver, &description);
+    assert(common_machine_create(&machine, &description) == LIB_STATUS_OK);
+    file = fopen(snapshot_path, "wb");
+    assert(file != NULL);
+    assert(common_machine_start(machine));
+    assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
+    assert(common_machine_read_state(machine,
+        &(common_machine_state_writer) { snapshot_file_write, file }) ==
+        LIB_STATUS_OK);
+    assert(fclose(file) == 0);
+    assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
+    common_machine_destroy(machine);
+    vm_driver_destroy(driver);
+    softpc_machine_destroy(product);
+    return 0;
+}
+
+static int snapshot_run_load(const char *media_path, const char *snapshot_path,
+    lib_bool expect_success)
+{
+    softpc_machine_options options;
+    common_machine_driver description = { 0 };
+    softpc_machine *product = NULL;
+    vm_driver *driver = NULL;
+    common_machine *machine = NULL;
+    FILE *file = fopen(snapshot_path, "rb");
+
+    assert(file != NULL);
+    snapshot_options(&options, media_path);
+    if (!expect_success) options.memory_bytes = 1024u * 1024u;
+    assert(softpc_machine_create(&options, &product) == SOFTPC_MACHINE_OK);
+    assert(vm_driver_create(&driver, product) == LIB_STATUS_OK);
+    vm_driver_describe(driver, &description);
+    assert(common_machine_create(&machine, &description) == LIB_STATUS_OK);
+    if (!expect_success) {
+        assert(common_machine_write_state(machine,
+            &(common_machine_state_reader) { snapshot_file_read, file }) !=
+            LIB_STATUS_OK);
+        assert(common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
+        assert(fclose(file) == 0);
+        common_machine_destroy(machine);
+        vm_driver_destroy(driver);
+        softpc_machine_destroy(product);
+        return 0;
+    }
+    assert(common_machine_write_state(machine,
+        &(common_machine_state_reader) { snapshot_file_read, file }) ==
+        LIB_STATUS_OK);
+    assert(fclose(file) == 0);
+    assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
+    {
+        kvm_frame frame = { 0 };
+        assert(common_machine_copy_published_frame(machine, &frame,
+            common_machine_run_generation(machine)));
+        assert(frame.valid != 0u);
+    }
+    assert(common_machine_resume(machine));
+    assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
+    assert(common_machine_stop(machine));
+    assert(wait_for_state(machine, COMMON_MACHINE_STOPPED));
+    common_machine_destroy(machine);
+    vm_driver_destroy(driver);
+    softpc_machine_destroy(product);
+    return 0;
+}
+
+int main(int argc, char **argv)
+{
+    if (argc == 1) return snapshot_run_transaction();
+    if (argc == 4 && strcmp(argv[1], "save") == 0)
+        return snapshot_run_save(argv[2], argv[3]);
+    if (argc == 4 && strcmp(argv[1], "load") == 0)
+        return snapshot_run_load(argv[2], argv[3], LIB_TRUE);
+    if (argc == 4 && strcmp(argv[1], "load-mismatch") == 0)
+        return snapshot_run_load(argv[2], argv[3], LIB_FALSE);
+    fprintf(stderr, "usage: %s [save|load media snapshot]\n", argv[0]);
+    return 1;
+}
+#else
+int main(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
     return 0;
 }
 #endif

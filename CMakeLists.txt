@@ -461,7 +461,15 @@ target_link_libraries(softpc-snapshot-transaction-smoke PRIVATE softpc-vm
     common-machine)
 add_test(NAME softpc-snapshot-transaction-smoke
     COMMAND softpc-snapshot-transaction-smoke)
-set_tests_properties(softpc-snapshot-transaction-smoke PROPERTIES TIMEOUT 20)
+set_tests_properties(softpc-snapshot-transaction-smoke PROPERTIES
+    TIMEOUT 20 WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+add_test(NAME softpc-snapshot-cross-process
+    COMMAND "${CMAKE_COMMAND}"
+        "-DSNAPSHOT_EXECUTABLE=$<TARGET_FILE:softpc-snapshot-transaction-smoke>"
+        "-DSNAPSHOT_WORKING_DIRECTORY=${CMAKE_CURRENT_BINARY_DIR}"
+        -P "${CMAKE_SOURCE_DIR}/test/support/snapshot_cross_process.cmake")
+set_tests_properties(softpc-snapshot-cross-process PROPERTIES
+    TIMEOUT 30 WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 add_executable(softpc-snapshot-boundary-smoke test/unit/snapshot_boundary_smoke.c)
 target_include_directories(softpc-snapshot-boundary-smoke PRIVATE src)
 add_test(NAME softpc-snapshot-boundary-smoke COMMAND softpc-snapshot-boundary-smoke)

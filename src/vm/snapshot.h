@@ -43,6 +43,7 @@ lib_status softpc_snapshot_image_restore(const softpc_snapshot_image *image,
 lib_status softpc_snapshot_image_write(const softpc_snapshot_image *image,
     softpc_snapshot_bytes_write write, void *context);
 lib_status softpc_snapshot_image_read(softpc_snapshot_image *image,
-    softpc_snapshot_bytes_read read, void *context);
+    lib_u32 expected_memory_bytes, softpc_snapshot_bytes_read read,
+    void *context);
 
 #endif

@@ -428,6 +428,7 @@ static lib_status vm_driver_write_state(void *opaque,
     if (driver == NULL || reader == NULL || reader->read == NULL ||
         driver->restore_pending) return LIB_STATUS_INVALID_STATE;
     status = softpc_snapshot_image_read(&staged,
+        softpc_machine_memory_bytes(driver->machine),
         (softpc_snapshot_bytes_read)reader->read, reader->context);
     if (status != LIB_STATUS_OK) return status;
     softpc_snapshot_image_dispose(&driver->staged_image);

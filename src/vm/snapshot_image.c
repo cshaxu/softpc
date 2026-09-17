@@ -141,13 +141,15 @@ lib_status softpc_snapshot_image_write(const softpc_snapshot_image *image,
 }
 
 lib_status softpc_snapshot_image_read(softpc_snapshot_image *image,
-    softpc_snapshot_bytes_read read, void *context)
+    lib_u32 expected_memory_bytes, softpc_snapshot_bytes_read read,
+    void *context)
 {
     softpc_snapshot_memory_stream core = {0}, devices = {0};
     softpc_snapshot_image decoded = {0};
     lib_u32 magic, version, width, sections, memory_bytes, identifier, length, halted, trap;
     lib_status status;
-    if (image == NULL || read == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    if (image == NULL || expected_memory_bytes == 0u || read == NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
     status = softpc_snapshot_stream_read_u32(read, context, &magic);
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u32(read, context, &version);
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u32(read, context, &width);
@@ -155,13 +157,17 @@ lib_status softpc_snapshot_image_read(softpc_snapshot_image *image,
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u32(read, context, &memory_bytes);
     if (status != LIB_STATUS_OK) return status;
     if (magic != SOFTPC_SNAPSHOT_IMAGE_MAGIC || version != SOFTPC_SNAPSHOT_IMAGE_VERSION ||
-        width != (lib_u32)(sizeof(void *) * CHAR_BIT) || sections != SOFTPC_SNAPSHOT_SECTION_COUNT)
+        width != (lib_u32)(sizeof(void *) * CHAR_BIT) ||
+        sections != SOFTPC_SNAPSHOT_SECTION_COUNT ||
+        memory_bytes != expected_memory_bytes) {
         return LIB_STATUS_INVALID_ARGUMENT;
+    }
     status = softpc_snapshot_stream_read_u32(read, context, &identifier);
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u32(read, context, &length);
     if (status != LIB_STATUS_OK || identifier != SOFTPC_SNAPSHOT_SECTION_CORE || length == 0u)
         return status == LIB_STATUS_OK ? LIB_STATUS_INVALID_ARGUMENT : status;
-    if (length < memory_bytes || length > (lib_u64)memory_bytes + 2u * 1024u * 1024u)
+    if (length < memory_bytes ||
+        length > (lib_u64)memory_bytes + 2u * 1024u * 1024u)
         return LIB_STATUS_INVALID_ARGUMENT;
     core.bytes = malloc(length); core.count = core.capacity = core.limit = length;
     if (core.bytes == NULL) return LIB_STATUS_NO_MEMORY;
@@ -178,14 +184,17 @@ lib_status softpc_snapshot_image_read(softpc_snapshot_image *image,
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u32(read, context, &halted);
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u32(read, context, &trap);
     if (status == LIB_STATUS_OK && (halted > 1u || trap > 1u || (halted == 0u && trap != 0u))) status = LIB_STATUS_INVALID_ARGUMENT;
-    if (status == LIB_STATUS_OK) status = softpc_ccpu_archive_read_core(&decoded.ccpu,
-        softpc_snapshot_memory_read, &core);
+    if (status == LIB_STATUS_OK) status = softpc_ccpu_archive_read_core(
+        &decoded.ccpu, memory_bytes, softpc_snapshot_memory_read, &core);
     if (status == LIB_STATUS_OK && core.offset != core.limit) status = LIB_STATUS_INVALID_ARGUMENT;
     if (status == LIB_STATUS_OK) status = softpc_device_archive_read(&decoded.ccpu.devices,
         softpc_snapshot_memory_read, &devices);
     if (status == LIB_STATUS_OK && devices.offset != devices.limit) status = LIB_STATUS_INVALID_ARGUMENT;
     free(core.bytes); free(devices.bytes);
-    if (status != LIB_STATUS_OK) { softpc_snapshot_image_dispose(&decoded); return status; }
+    if (status != LIB_STATUS_OK) {
+        softpc_snapshot_image_dispose(&decoded);
+        return status;
+    }
     decoded.ccpu.valid = 1;
     decoded.entry.halted = (int)halted; decoded.entry.trap = (unsigned long)trap;
     softpc_snapshot_image_dispose(image); *image = decoded;
