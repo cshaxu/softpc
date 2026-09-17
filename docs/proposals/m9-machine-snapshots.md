@@ -486,6 +486,16 @@ RAM, page-type and fast-TLB-index bytes. The test runs at both host widths.
 
 ## 验收矩阵
 
+#### S7 P6: implemented device canonical slice
+
+The reviewed device archive now uses the same callback stream. A compact
+field-table interpreter writes each fixed-width semantic field explicitly;
+queue records are individually written as bounded `u32` values and reject more
+than 65,536 pending records before allocation. The decoder constructs a new
+private archive and exposes it only after the complete stream succeeds. This
+remains an internal slice: media sections, container framing and the VM
+transaction are still required before any public save/load operation exists.
+
 - 安全点到达后导出前后相同快照语义状态；导出期间状态/待事件稳定，不要求与请求瞬间相同。
 - 全状态命令矩阵；嵌套自然返回、1 秒超限、HLT 无退休指令仍检查期限；普通单步不越过断点。
 - 在进程 A 保存，退出；进程 B 加载。改变分配地址/正常 ASLR 下工作，不靠固定地址。

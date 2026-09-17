@@ -361,8 +361,11 @@ static void verify_snapshot_archive(void)
     const unsigned char altered[] = {0, 0};
     softpc_snapshot_image image = {0};
     softpc_ccpu_archive decoded = {0};
+    softpc_device_archive *decoded_devices = NULL;
     softpc_ccpu_entry entry = {1, 0u}, restored = {0};
     checkpoint_byte_stream stream = {0};
+    checkpoint_byte_stream device_stream = {0};
+    checkpoint_byte_stream device_round_trip = {0};
     unsigned char readback[2];
     half_word cmos_value;
 
@@ -421,6 +424,21 @@ static void verify_snapshot_archive(void)
         SOFTPC_CCPU_FAST_TLB_PAGE_COUNT) == 0);
     softpc_ccpu_archive_dispose(&decoded);
     free(stream.bytes);
+
+    assert(softpc_device_archive_write(image.ccpu.devices,
+        checkpoint_write_bytes, &device_stream) == LIB_STATUS_OK);
+    assert(device_stream.byte_count != 0u);
+    assert(softpc_device_archive_read(&decoded_devices,
+        checkpoint_read_bytes, &device_stream) == LIB_STATUS_OK);
+    assert(device_stream.offset == device_stream.byte_count);
+    assert(softpc_device_archive_write(decoded_devices,
+        checkpoint_write_bytes, &device_round_trip) == LIB_STATUS_OK);
+    assert(device_round_trip.byte_count == device_stream.byte_count);
+    assert(memcmp(device_round_trip.bytes, device_stream.bytes,
+        device_stream.byte_count) == 0);
+    softpc_device_archive_dispose(decoded_devices);
+    free(device_round_trip.bytes);
+    free(device_stream.bytes);
 
     c_setEAX(0u);
     c_setEIP(0u);

@@ -1082,3 +1082,21 @@ and `softpc64.exe`
 `91F61AF4E0BB8C61E40024250444350E0E74396722C19219BCC1D883C108E771`.
 This P is internal only: it adds no App command, snapshot file, media
 serialization, or public product behavior.
+
+## S7 P6: device canonical stream slice
+
+The private device archive now encodes every reviewed semantic device field in
+the common little-endian callback stream. It does not write archive structs,
+padding, callback pointers, queue links or host resources. Pending quick/tick
+records use fixed `u32` fields; their counts are rejected before allocation if
+they exceed the 65,536-record format limit. Decode builds a new archive and
+only marks it valid after the complete stream succeeds.
+
+`checkpoint_smoke` captures a real device archive, decodes it, then demands
+byte-for-byte equality after re-encoding. Focused checkpoint smoke passes at
+both host widths; final full CTest passes 103/103 at x64 and x86. The refreshed
+packages are `softpc32.exe`
+`01EA56DEA53EC1E964317BE79439CFF133D29A7A608800966AC08C7DE2925FA7`
+and `softpc64.exe`
+`609C4C216F4D73951F071B11746B6A04BEADF2B864CDB2739F4DA25E071AA051`.
+This internal P adds no file, media, VM driver or product command.
