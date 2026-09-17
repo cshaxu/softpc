@@ -80,7 +80,10 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   rebuilds GDP-derived bindings, dirty state and host resources; it does not
   copy bitfield carriers, GDP allocations, pointers or vectors. Any live GDP
   slot outside that map remains a future capture blocker, never implicit
-  payload or reset.
+  payload or reset. S6 P9 archives the finite UART/LPT controller and virtual
+  host-carrier state, and gives their delayed callbacks semantic queue IDs.
+  Configured serial/printer output files remain explicit capture rejection:
+  no host file, external output, native handle or path enters the archive.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files

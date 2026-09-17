@@ -17,6 +17,7 @@
 
 #include "xt.h"
 #include "host_lpt.h"
+#include "compat/devices/snapshot.h"
 
 #define KBUFFER_SIZE 1024
 #define HIGH_WATER 1020
@@ -38,6 +39,82 @@ typedef struct {
 } HOST_LPT;
 
 static HOST_LPT host_lpt[NUM_PARALLEL_PORTS];
+
+int softpc_device_snapshot_capture_parallel_host(
+    softpc_device_parallel_host_state *state)
+{
+    int adapter;
+    HOST_LPT *lpt;
+    if (state == NULL) return FALSE;
+    for (adapter = 0; adapter < NUM_PARALLEL_PORTS; ++adapter) {
+        lpt = &host_lpt[adapter];
+        if (lpt->output_path[0] != '\0' || lpt->bytes_in_buffer < 0 ||
+            lpt->bytes_in_buffer > KBUFFER_SIZE ||
+            (lpt->active && lpt->buffer == NULL))
+            return FALSE;
+        if (lpt->bytes_in_buffer != 0)
+            memcpy(state->port[adapter].buffer, lpt->buffer,
+                (size_t)lpt->bytes_in_buffer);
+        if (lpt->bytes_in_buffer < KBUFFER_SIZE)
+            memset(state->port[adapter].buffer + lpt->bytes_in_buffer, 0,
+                KBUFFER_SIZE - (size_t)lpt->bytes_in_buffer);
+        state->port[adapter].port_status = lpt->port_status;
+        state->port[adapter].inactive_counter = lpt->inactive_counter;
+        state->port[adapter].inactive_trigger = lpt->inactive_trigger;
+        state->port[adapter].bytes_in_buffer = lpt->bytes_in_buffer;
+        state->port[adapter].flush_threshold = lpt->flush_threshold;
+        state->port[adapter].active = lpt->active;
+        state->port[adapter].direct_access = lpt->direct_access;
+        state->port[adapter].no_device_attached = lpt->no_device_attached;
+    }
+    return TRUE;
+}
+
+int softpc_device_snapshot_restore_parallel_host(
+    const softpc_device_parallel_host_state *state)
+{
+    int adapter;
+    HOST_LPT *lpt;
+    byte *buffer[NUM_PARALLEL_PORTS];
+    if (state == NULL) return FALSE;
+    for (adapter = 0; adapter < NUM_PARALLEL_PORTS; ++adapter) {
+        lpt = &host_lpt[adapter];
+        if (lpt->output_path[0] != '\0' || state->port[adapter].active < 0 ||
+            state->port[adapter].active > 1 ||
+            state->port[adapter].direct_access < 0 ||
+            state->port[adapter].direct_access > 1 ||
+            state->port[adapter].no_device_attached < 0 ||
+            state->port[adapter].no_device_attached > 1 ||
+            state->port[adapter].bytes_in_buffer < 0 ||
+            state->port[adapter].bytes_in_buffer > KBUFFER_SIZE)
+            return FALSE;
+        buffer[adapter] = NULL;
+        if (state->port[adapter].active) {
+            buffer[adapter] = (byte *)malloc(KBUFFER_SIZE);
+            if (buffer[adapter] == NULL) {
+                while (--adapter >= 0) free(buffer[adapter]);
+                return FALSE;
+            }
+            memcpy(buffer[adapter], state->port[adapter].buffer, KBUFFER_SIZE);
+        }
+    }
+    for (adapter = 0; adapter < NUM_PARALLEL_PORTS; ++adapter) {
+        lpt = &host_lpt[adapter];
+        host_lpt_close(adapter);
+        lpt->no_device_attached = state->port[adapter].no_device_attached;
+        if (state->port[adapter].active) {
+            lpt->buffer = buffer[adapter];
+            lpt->active = TRUE;
+        }
+        lpt->port_status = state->port[adapter].port_status;
+        lpt->inactive_counter = state->port[adapter].inactive_counter;
+        lpt->inactive_trigger = state->port[adapter].inactive_trigger;
+        lpt->bytes_in_buffer = state->port[adapter].bytes_in_buffer;
+        lpt->flush_threshold = state->port[adapter].flush_threshold;
+        lpt->direct_access = state->port[adapter].direct_access;
+    }
+    return TRUE;
+}
 
 int softpc_host_lpt_set_output_path(int adapter, const char *path)
 {

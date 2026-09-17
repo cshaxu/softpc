@@ -41,7 +41,11 @@ enum {
     /* The selected V7 build has four 128 KiB physical EGA/VGA planes. */
     SOFTPC_DEVICE_VIDEO_PLANE_BYTES = 0x80000,
     SOFTPC_DEVICE_VIDEO_DAC_COUNT = 256,
-    SOFTPC_DEVICE_VIDEO_DAC_COMPONENT_COUNT = 3
+    SOFTPC_DEVICE_VIDEO_DAC_COMPONENT_COUNT = 3,
+    SOFTPC_DEVICE_SERIAL_PORT_COUNT = 4,
+    SOFTPC_DEVICE_SERIAL_RX_COUNT = 256,
+    SOFTPC_DEVICE_PARALLEL_PORT_COUNT = 3,
+    SOFTPC_DEVICE_PARALLEL_BUFFER_BYTES = 1024
 };
 
 enum {
@@ -54,8 +58,85 @@ enum {
     SOFTPC_DEVICE_QUEUE_HDD_PAUSE,
     SOFTPC_DEVICE_QUEUE_HDD_INTERRUPT,
     SOFTPC_DEVICE_QUEUE_KEYBOARD_INTERRUPT,
-    SOFTPC_DEVICE_QUEUE_KEYBOARD_REFILL
+    SOFTPC_DEVICE_QUEUE_KEYBOARD_REFILL,
+    SOFTPC_DEVICE_QUEUE_SERIAL_RECEIVE,
+    SOFTPC_DEVICE_QUEUE_SERIAL_SEND,
+    SOFTPC_DEVICE_QUEUE_PRINTER_OUT,
+    SOFTPC_DEVICE_QUEUE_PRINTER_OUT_ACK
 };
+
+/*
+ * The selected standalone COM/LPT host endpoints are finite virtual devices
+ * when no output file is configured.  File-backed endpoints are deliberately
+ * rejected by their capture functions: external output is not snapshot data.
+ */
+typedef struct softpc_device_serial_port_state {
+    uint16_t tx_buffer, rx_buffer, divisor_latch;
+    uint16_t int_enable, int_id, line_control, modem_control;
+    uint16_t line_status, modem_status, scratch;
+    int32_t break_state, loopback_state, dtr_state, rts_state;
+    int32_t out1_state, out2_state;
+    int32_t receiver_line_status_interrupt, data_available_interrupt;
+    int32_t tx_empty_interrupt, modem_status_interrupt;
+    int32_t interrupt_priority, baud_index, had_first_read;
+} softpc_device_serial_port_state;
+
+typedef struct softpc_device_serial_controller_state {
+    softpc_device_serial_port_state port[SOFTPC_DEVICE_SERIAL_PORT_COUNT];
+    int32_t critical[SOFTPC_DEVICE_SERIAL_PORT_COUNT];
+    uint16_t line_control_flush_mask;
+    int32_t transmit_pacing;
+} softpc_device_serial_controller_state;
+
+typedef struct softpc_device_serial_host_port_state {
+    uint8_t rx[SOFTPC_DEVICE_SERIAL_RX_COUNT];
+    uint32_t rx_count, tx_count;
+    int32_t baud, data_bits, stop_bits, parity, break_enabled;
+    int32_t dtr, rts, opened, xon_enabled, modem;
+    uint16_t last_msr;
+} softpc_device_serial_host_port_state;
+
+typedef struct softpc_device_serial_host_state {
+    softpc_device_serial_host_port_state port[SOFTPC_DEVICE_SERIAL_PORT_COUNT];
+} softpc_device_serial_host_state;
+
+typedef struct softpc_device_parallel_controller_state {
+    uint16_t output[SOFTPC_DEVICE_PARALLEL_PORT_COUNT];
+    uint16_t control[SOFTPC_DEVICE_PARALLEL_PORT_COUNT];
+    uint16_t status[SOFTPC_DEVICE_PARALLEL_PORT_COUNT];
+    int32_t state[SOFTPC_DEVICE_PARALLEL_PORT_COUNT];
+    int64_t out_event[SOFTPC_DEVICE_PARALLEL_PORT_COUNT];
+    int64_t out_ack_event[SOFTPC_DEVICE_PARALLEL_PORT_COUNT];
+    uint8_t retry_error_count;
+} softpc_device_parallel_controller_state;
+
+typedef struct softpc_device_parallel_host_port_state {
+    uint8_t buffer[SOFTPC_DEVICE_PARALLEL_BUFFER_BYTES];
+    uint32_t port_status;
+    int32_t inactive_counter, inactive_trigger, bytes_in_buffer;
+    int32_t flush_threshold, active, direct_access, no_device_attached;
+} softpc_device_parallel_host_port_state;
+
+typedef struct softpc_device_parallel_host_state {
+    softpc_device_parallel_host_port_state port[SOFTPC_DEVICE_PARALLEL_PORT_COUNT];
+} softpc_device_parallel_host_state;
+
+int softpc_device_snapshot_capture_serial_controller(
+    softpc_device_serial_controller_state *state);
+int softpc_device_snapshot_restore_serial_controller(
+    const softpc_device_serial_controller_state *state);
+int softpc_device_snapshot_capture_serial_host(
+    softpc_device_serial_host_state *state);
+int softpc_device_snapshot_restore_serial_host(
+    const softpc_device_serial_host_state *state);
+int softpc_device_snapshot_capture_parallel_controller(
+    softpc_device_parallel_controller_state *state);
+int softpc_device_snapshot_restore_parallel_controller(
+    const softpc_device_parallel_controller_state *state);
+int softpc_device_snapshot_capture_parallel_host(
+    softpc_device_parallel_host_state *state);
+int softpc_device_snapshot_restore_parallel_host(
+    const softpc_device_parallel_host_state *state);
 
 typedef struct softpc_device_dma_state {
     uint8_t base_address[SOFTPC_DEVICE_DMA_CONTROLLER_COUNT]

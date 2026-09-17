@@ -25,6 +25,10 @@ struct softpc_device_archive {
     softpc_device_dos_mouse_state dos_mouse;
     softpc_device_video_memory_state video_memory;
     softpc_device_video_controller_state video_controller;
+    softpc_device_serial_controller_state serial_controller;
+    softpc_device_serial_host_state serial_host;
+    softpc_device_parallel_controller_state parallel_controller;
+    softpc_device_parallel_host_state parallel_host;
     int valid;
 };
 
@@ -38,6 +42,10 @@ extern int softpc_device_snapshot_encode_fdisk_callback();
 extern Q_CALLBACK_FN softpc_device_snapshot_decode_fdisk_callback();
 extern int softpc_device_snapshot_encode_keyboard_callback();
 extern Q_CALLBACK_FN softpc_device_snapshot_decode_keyboard_callback();
+extern int softpc_device_snapshot_encode_serial_callback();
+extern Q_CALLBACK_FN softpc_device_snapshot_decode_serial_callback();
+extern int softpc_device_snapshot_encode_parallel_callback();
+extern Q_CALLBACK_FN softpc_device_snapshot_decode_parallel_callback();
 
 LOCAL int
 encode_callback(callback, callback_id)
@@ -48,7 +56,9 @@ unsigned long *callback_id;
         softpc_device_snapshot_encode_cmos_callback(callback, callback_id) ||
         softpc_device_snapshot_encode_fla_callback(callback, callback_id) ||
         softpc_device_snapshot_encode_fdisk_callback(callback, callback_id) ||
-        softpc_device_snapshot_encode_keyboard_callback(callback, callback_id);
+        softpc_device_snapshot_encode_keyboard_callback(callback, callback_id) ||
+        softpc_device_snapshot_encode_serial_callback(callback, callback_id) ||
+        softpc_device_snapshot_encode_parallel_callback(callback, callback_id);
 }
 
 softpc_device_archive *
@@ -71,7 +81,11 @@ unsigned long callback_id;
     if (callback != NULL) return callback;
     callback = softpc_device_snapshot_decode_fdisk_callback(callback_id);
     if (callback != NULL) return callback;
-    return softpc_device_snapshot_decode_keyboard_callback(callback_id);
+    callback = softpc_device_snapshot_decode_keyboard_callback(callback_id);
+    if (callback != NULL) return callback;
+    callback = softpc_device_snapshot_decode_serial_callback(callback_id);
+    if (callback != NULL) return callback;
+    return softpc_device_snapshot_decode_parallel_callback(callback_id);
 }
 
 LOCAL int
@@ -135,6 +149,13 @@ softpc_device_archive *archive;
     if (!softpc_device_snapshot_capture_video_controller(
             &archive->video_controller))
         return FALSE;
+    if (!softpc_device_snapshot_capture_serial_controller(
+            &archive->serial_controller) ||
+        !softpc_device_snapshot_capture_serial_host(&archive->serial_host) ||
+        !softpc_device_snapshot_capture_parallel_controller(
+            &archive->parallel_controller) ||
+        !softpc_device_snapshot_capture_parallel_host(&archive->parallel_host))
+        return FALSE;
     if (!softpc_device_snapshot_capture_hdd(&archive->hdd))
         return FALSE;
     archive->valid = TRUE;
@@ -162,6 +183,13 @@ softpc_device_archive *archive;
         !q_event_snapshot_restore(&archive->events, archive->quick_entries,
             archive->quick_capacity, archive->tick_entries,
             archive->tick_capacity, decode_callback))
+        return FALSE;
+    if (!softpc_device_snapshot_restore_serial_controller(
+            &archive->serial_controller) ||
+        !softpc_device_snapshot_restore_serial_host(&archive->serial_host) ||
+        !softpc_device_snapshot_restore_parallel_controller(
+            &archive->parallel_controller) ||
+        !softpc_device_snapshot_restore_parallel_host(&archive->parallel_host))
         return FALSE;
     return TRUE;
 }

@@ -1037,3 +1037,25 @@ and x86 CTest each pass `103/103`, followed by both package-smoke variants at
 each width.  Lib and Common remain unchanged.  The refreshed packages are
 `softpc32.exe` `3D2AF884E3D623280F50806192AE72216A86ADC53102614B24665CA74300A803`
 and `softpc64.exe` `460919575D43A2C3915B0DECB18D62E2840FA4D935FD02C5863A5B6E5E96FC6F`.
+
+## S6 P9: serial and parallel virtual-endpoint archive
+
+P9 separates two concerns that cannot be conflated: the selected UART/LPT
+controllers and their no-file standalone host carriers are finite machine
+state, while configured output paths and host files are external effects.
+The fixed map saves controller registers, UART interrupt state, virtual serial
+RX/TX state, parallel registers, virtual printer buffer and delayed callback
+handles. Queue callbacks are translated only to semantic receive/send and
+printer OUT/ACK IDs. A configured serial or printer output path makes capture
+fail before a file path, `FILE` pointer, handle or external output can enter
+the archive.
+
+The narrow preserved-source hooks only transfer original state through the
+fixed map; Compat owns the virtual host queues and buffer. No Lib/Common or
+product API changed. `checkpoint_smoke` proves destructive serial/parallel
+round trips, printer delayed-callback archive/restore, and rejection of both
+configured output endpoints. Production changes are `+469/-4` across six
+paths; the focused test is `+62/-1`. Full x64/x86 CTest each pass `103/103`,
+and both package-smoke variants pass at each width. The refreshed packages are
+`softpc32.exe` `07C23E12C8CB3328DB6F54637FCB8273BAB18292CF77E3004685E196E7D1305E`
+and `softpc64.exe` `C013E98E34D442A3F2D90149E1C2FD4A6CB8BD91F9C0E81683BFC416665180E4`.

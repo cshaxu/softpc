@@ -14,6 +14,7 @@
 
 #include "xt.h"
 #include "host_com.h"
+#include "compat/devices/snapshot.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -44,6 +45,72 @@ typedef struct {
 } HOST_COM;
 
 static HOST_COM host_com[SOFTPC_COM_PORTS];
+
+/* The configured FILE endpoint is outside machine state.  The remaining
+ * standalone carrier is finite virtual state and can be copied semantically. */
+int softpc_device_snapshot_capture_serial_host(
+    softpc_device_serial_host_state *state)
+{
+    int adapter, index;
+    HOST_COM *port;
+    if (state == NULL) return FALSE;
+    for (adapter = 0; adapter < SOFTPC_COM_PORTS; ++adapter) {
+        port = &host_com[adapter];
+        if (port->output_path[0] != '\0' || port->rx_count > SOFTPC_COM_QUEUE_SIZE)
+            return FALSE;
+        for (index = 0; index < (int)port->rx_count; ++index)
+            state->port[adapter].rx[index] = port->rx[(port->rx_tail + index) %
+                SOFTPC_COM_QUEUE_SIZE];
+        for (; index < SOFTPC_COM_QUEUE_SIZE; ++index)
+            state->port[adapter].rx[index] = 0;
+        state->port[adapter].rx_count = port->rx_count;
+        state->port[adapter].tx_count = port->tx_count;
+        state->port[adapter].baud = port->baud;
+        state->port[adapter].data_bits = port->data_bits;
+        state->port[adapter].stop_bits = port->stop_bits;
+        state->port[adapter].parity = port->parity;
+        state->port[adapter].break_enabled = port->break_enabled;
+        state->port[adapter].dtr = port->dtr;
+        state->port[adapter].rts = port->rts;
+        state->port[adapter].opened = port->opened;
+        state->port[adapter].xon_enabled = port->xon_enabled;
+        state->port[adapter].modem = port->modem;
+        state->port[adapter].last_msr = port->last_msr;
+    }
+    return TRUE;
+}
+
+int softpc_device_snapshot_restore_serial_host(
+    const softpc_device_serial_host_state *state)
+{
+    int adapter, index;
+    HOST_COM *port;
+    if (state == NULL) return FALSE;
+    for (adapter = 0; adapter < SOFTPC_COM_PORTS; ++adapter) {
+        port = &host_com[adapter];
+        if (port->output_path[0] != '\0' ||
+            state->port[adapter].rx_count > SOFTPC_COM_QUEUE_SIZE)
+            return FALSE;
+        port->rx_head = state->port[adapter].rx_count % SOFTPC_COM_QUEUE_SIZE;
+        port->rx_tail = 0;
+        port->rx_count = state->port[adapter].rx_count;
+        for (index = 0; index < SOFTPC_COM_QUEUE_SIZE; ++index)
+            port->rx[index] = state->port[adapter].rx[index];
+        port->tx_count = state->port[adapter].tx_count;
+        port->baud = state->port[adapter].baud;
+        port->data_bits = state->port[adapter].data_bits;
+        port->stop_bits = state->port[adapter].stop_bits;
+        port->parity = state->port[adapter].parity;
+        port->break_enabled = state->port[adapter].break_enabled;
+        port->dtr = state->port[adapter].dtr;
+        port->rts = state->port[adapter].rts;
+        port->opened = state->port[adapter].opened;
+        port->xon_enabled = state->port[adapter].xon_enabled;
+        port->modem = state->port[adapter].modem;
+        port->last_msr = state->port[adapter].last_msr;
+    }
+    return TRUE;
+}
 
 static HOST_COM *host_com_port(int adapter)
 {

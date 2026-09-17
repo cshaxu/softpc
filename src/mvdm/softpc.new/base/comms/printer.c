@@ -106,6 +106,7 @@ static char SccsID[] = "@(#)printer.c	1.19 11/14/94 Copyright Insignia Solutions
 #include "host_lpt.h"
 #include "ica.h"
 #include "quick_ev.h"
+#include "compat/devices/snapshot.h"
 
 #include "debug.h"
 #ifndef PROD
@@ -213,6 +214,83 @@ sys_addr lp16BitPrtBusy;
 LOCAL IBOOL psFlushEnabled[NUM_PARALLEL_PORTS];	/* TRUE if PostScript flushing
 						is enabled */
 #endif	/* PS_FLUSHING */
+
+static void lpr_state_outa_event IPT1(long, adapter);
+static void lpr_state_out_event IPT1(long, adapter);
+
+/*
+ * DIVERGENCE(MVDM-PARALLEL-SNAPSHOT-001): export the selected parallel
+ * controller's finite register and delayed-event state.  The standalone
+ * virtual printer buffer is owned separately by compat/parallel.c.
+ */
+int
+softpc_device_snapshot_encode_parallel_callback(callback, callback_id)
+Q_CALLBACK_FN callback;
+unsigned long *callback_id;
+{
+	if (callback_id == NULL) return FALSE;
+	if (callback == lpr_state_out_event) {
+		*callback_id = SOFTPC_DEVICE_QUEUE_PRINTER_OUT;
+		return TRUE;
+	}
+	if (callback != lpr_state_outa_event) return FALSE;
+	*callback_id = SOFTPC_DEVICE_QUEUE_PRINTER_OUT_ACK;
+	return TRUE;
+}
+
+Q_CALLBACK_FN
+softpc_device_snapshot_decode_parallel_callback(callback_id)
+unsigned long callback_id;
+{
+	if (callback_id == SOFTPC_DEVICE_QUEUE_PRINTER_OUT)
+		return lpr_state_out_event;
+	return callback_id == SOFTPC_DEVICE_QUEUE_PRINTER_OUT_ACK ?
+		lpr_state_outa_event : NULL;
+}
+
+int
+softpc_device_snapshot_capture_parallel_controller(state_out)
+softpc_device_parallel_controller_state *state_out;
+{
+	int adapter;
+	if (state_out == NULL) return FALSE;
+	for (adapter = 0; adapter < NUM_PARALLEL_PORTS; ++adapter) {
+		state_out->output[adapter] = output_reg[adapter];
+		state_out->control[adapter] = control_reg[adapter];
+		state_out->status[adapter] = status_reg[adapter];
+		state_out->state[adapter] = state[adapter];
+		state_out->out_event[adapter] = handle_for_out_event[adapter];
+		state_out->out_ack_event[adapter] = handle_for_outa_event[adapter];
+	}
+	state_out->retry_error_count = retryErrorCount;
+	return TRUE;
+}
+
+int
+softpc_device_snapshot_restore_parallel_controller(state_in)
+const softpc_device_parallel_controller_state *state_in;
+{
+	int adapter;
+	if (state_in == NULL) return FALSE;
+	for (adapter = 0; adapter < NUM_PARALLEL_PORTS; ++adapter) {
+		if (state_in->state[adapter] < STATE_READY ||
+			state_in->state[adapter] > STATE_OUTA ||
+			state_in->out_event[adapter] < 0 ||
+			state_in->out_ack_event[adapter] < 0)
+			return FALSE;
+	}
+	for (adapter = 0; adapter < NUM_PARALLEL_PORTS; ++adapter) {
+		output_reg[adapter] = state_in->output[adapter];
+		control_reg[adapter] = state_in->control[adapter];
+		status_reg[adapter] = state_in->status[adapter];
+		state[adapter] = state_in->state[adapter];
+		handle_for_out_event[adapter] = (q_ev_handle)state_in->out_event[adapter];
+		handle_for_outa_event[adapter] =
+			(q_ev_handle)state_in->out_ack_event[adapter];
+	}
+	retryErrorCount = state_in->retry_error_count;
+	return TRUE;
+}
 
 
 /*

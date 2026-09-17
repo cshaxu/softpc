@@ -20,6 +20,8 @@
 #include "c_debug.h"
 #include "quick_ev.h"
 #include "mouse.h"
+#include "host_com.h"
+#include "host_lpt.h"
 
 extern void insert_code_into_6805_buf(half_word code);
 extern void host_key_down(int key);
@@ -411,7 +413,11 @@ static void verify_controller_archives(void)
         video_memory_restored;
     softpc_device_video_controller_state video_controller_saved,
         video_controller_restored;
-    softpc_device_archive *keyboard_archive;
+    softpc_device_serial_controller_state serial_saved, serial_restored;
+    softpc_device_serial_host_state serial_host_saved, serial_host_restored;
+    softpc_device_parallel_controller_state parallel_saved, parallel_restored;
+    softpc_device_parallel_host_state parallel_host_saved, parallel_host_restored;
+    softpc_device_archive *keyboard_archive, *parallel_archive;
     half_word value;
 
     assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
@@ -479,6 +485,61 @@ static void verify_controller_archives(void)
     assert(ppi_restored.register_value == ppi_saved.register_value);
     assert(ppi_restored.gate_2_was_low == ppi_saved.gate_2_was_low);
     assert(ppi_restored.speaker_data_was_low == ppi_saved.speaker_data_was_low);
+
+    /* COM and LPT each have a controller plus a finite virtual host carrier.
+       Restore both after destructive port traffic; output-file endpoints are
+       explicitly outside the archive contract and reject capture. */
+    outb(0x3f8u, 0x5au);
+    outb(0x3fbu, 0x1bu);
+    assert(softpc_device_snapshot_capture_serial_controller(&serial_saved));
+    assert(softpc_device_snapshot_capture_serial_host(&serial_host_saved));
+    outb(0x3f8u, 0u);
+    outb(0x3fbu, 0u);
+    assert(softpc_device_snapshot_restore_serial_controller(&serial_saved));
+    assert(softpc_device_snapshot_restore_serial_host(&serial_host_saved));
+    assert(softpc_device_snapshot_capture_serial_controller(&serial_restored));
+    assert(softpc_device_snapshot_capture_serial_host(&serial_host_restored));
+    assert(memcmp(&serial_restored, &serial_saved, sizeof(serial_saved)) == 0);
+    assert(memcmp(&serial_host_restored, &serial_host_saved,
+        sizeof(serial_host_saved)) == 0);
+
+    outb(0x378u, 0x5au);
+    outb(0x37au, 0xedu);
+    outb(0x37au, 0xecu);
+    assert(softpc_device_snapshot_capture_parallel_controller(&parallel_saved));
+    assert(softpc_device_snapshot_capture_parallel_host(&parallel_host_saved));
+    outb(0x378u, 0u);
+    outb(0x37au, 0u);
+    assert(softpc_device_snapshot_restore_parallel_controller(&parallel_saved));
+    assert(softpc_device_snapshot_restore_parallel_host(&parallel_host_saved));
+    assert(softpc_device_snapshot_capture_parallel_controller(&parallel_restored));
+    assert(softpc_device_snapshot_capture_parallel_host(&parallel_host_restored));
+    assert(memcmp(&parallel_restored, &parallel_saved,
+        sizeof(parallel_saved)) == 0);
+    assert(memcmp(&parallel_host_restored, &parallel_host_saved,
+        sizeof(parallel_host_saved)) == 0);
+
+    assert(softpc_host_com_set_output_path(0, "snapshot-external-com.log"));
+    assert(!softpc_device_snapshot_capture_serial_host(&serial_host_saved));
+    assert(softpc_host_com_set_output_path(0, NULL));
+    assert(softpc_host_lpt_set_output_path(0, "snapshot-external-lpt.log"));
+    assert(!softpc_device_snapshot_capture_parallel_host(&parallel_host_saved));
+    assert(softpc_host_lpt_set_output_path(0, NULL));
+
+    /* The delayed printer ACK is scheduler state, not a host artifact.  A
+       full archive must accept its semantic callback ID and restore it. */
+    q_event_init();
+    outb(0x378u, 0x33u);
+    outb(0x37au, 0xecu);
+    outb(0x37au, 0xedu);
+    parallel_archive = softpc_device_archive_create();
+    assert(parallel_archive != NULL);
+    assert(softpc_device_archive_capture(parallel_archive));
+    q_event_init();
+    assert(softpc_device_archive_restore(parallel_archive));
+    c_cpu_q_ev_set_count(0u);
+    dispatch_q_event();
+    softpc_device_archive_dispose(parallel_archive);
 
     /* Preserve the original InPort's unconsumed relative motion, selected
        register and one-shot diagnostic handshake without replaying port I/O.

@@ -903,3 +903,12 @@ x86 98/98（58.31s）。结果包括真实 restart/BIOS、debug、媒体、VGA�
 源/构建负例和全部 shared gates；不是仅以窄单测替代全套。待实际 P 提交
 后再做 coordinator 审计收口。原 keyboard 越界 TODO 与三个 Queue 项仍是
 独立已记录范围，不声称本次修复；没有将本轮未完成项转移到那里。
+
+### T63 S6 P9 镜像增量
+
+`base/comms/com.c` 与 `base/comms/printer.c` 各新增一个局部
+`DIVERGENCE(MVDM-*-SNAPSHOT-001)` port-ABI hook。它们只把既有 UART/LPT
+寄存器及已存在的延迟 callback 映射为 Compat 的固定宽度 archive 值；不改变
+端口协议、队列时序或 host endpoint 策略。虚拟 host buffer 属 Compat，配置的
+输出文件在 Compat capture 处明确拒绝，因此没有路径、`FILE`、native handle 或
+callback 地址跨越 archive 边界。

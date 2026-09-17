@@ -351,7 +351,7 @@ field map and validation before it can enter the private archive.
 | C-VID GDP slots and rule state | Rebuild except audited latches | P8 preserves only the two live scalar latches. GDP allocation, generated rule entry, function vector, pointer, scratch/screen route and dirty bookkeeping rebuild. Any future live slot that cannot be placed in a fixed semantic map blocks capture. |
 | `nt_graph`, `dib_surface`, graphics console, KVM frame resources | Rebuild | Exclude DIB, dirty regions, Window pixels, host cursor backing, UI mailboxes and frame generations. Restore invalidates/recreates host drawing state and emits one ordinary complete frame. |
 | `nt_sound`, `compat/audio` | Rebuild | Preserve only the guest PPI/PIT inputs above. Reopen/recreate host audio resources; no native worker/event/handle or host sound buffer is payload. |
-| `com.c`/`serial.c`, `printer*.c`/`parallel.c` | Reject when externally active | A configured/open host endpoint, buffered irreversible output, or its pending callback blocks capture. No file handle, host queue, output path or external-world state is serialized. Detached/inactive controller state is either later encoded with an audited callback ID or explicitly remains rejected. |
+| `com.c`/`serial.c`, `printer*.c`/`parallel.c` | Payload for virtual endpoints; reject external endpoints (P9 implemented) | UART/LPT registers, virtual host queues/buffers and all selected delayed callbacks are fixed semantic payload. A configured serial/printer output path rejects capture before any host output is serialized. No file handle, output path or external-world state enters the archive. |
 | `quick_ev` callbacks from keyboard/COM/printer | Deferred semantic IDs | S5 already rejects unknown callbacks. S6 adds an ID only when the complete receiver payload and restoration proof exist; it must not blanket-allow the current callback pointer. |
 
 ### S6 P7: video-controller and C-VID reconstruction boundary
@@ -388,6 +388,17 @@ CRTC, graphics and attribute handlers on restore.  It uses the existing C-VID
 `getVideo*`/`setVideo*` accessors for the two latches; it does not dereference
 or copy the GDP carrier.  The hook then issues the normal complete refresh.
 The archive has no product command, file format, Common API or Lib change.
+
+### S6 P9: serial and parallel virtual endpoints
+
+P9 completes the remaining selected COM/LPT receiver family without treating
+the standalone virtual endpoint as an external device. `com.c` exports the
+UART register and interrupt state; `printer.c` exports parallel port
+registers, state and delayed-event handles. Compat separately owns the finite
+virtual RX/TX and printer-buffer state. Queue callback pointers translate only
+to semantic serial-receive/send and printer-out/ACK identifiers. A configured
+output file is irreversible host state, so capture explicitly rejects it. No
+file, `FILE` pointer, endpoint path or raw controller structure is archived.
 
 每一实现 S 都是可构建交付：双宽度编译/全套与针对性测试、固定 EXE、完整 P 提交推送，
 然后切换审计角色核对实际 commit 后收口。S8 前不暴露残缺 save/load，EXE 仍可验证
