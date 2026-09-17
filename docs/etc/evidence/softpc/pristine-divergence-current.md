@@ -912,3 +912,13 @@ x86 98/98（58.31s）。结果包括真实 restart/BIOS、debug、媒体、VGA�
 端口协议、队列时序或 host endpoint 策略。虚拟 host buffer 属 Compat，配置的
 输出文件在 Compat capture 处明确拒绝，因此没有路径、`FILE`、native handle 或
 callback 地址跨越 archive 边界。
+
+### T63 S9 P9 视频快照 receiver 修正
+
+`base/video/vga_prts.c` 的既有 snapshot hook 增量为 +16/-6：保存原始
+INB 路径实际使用的 plane/read/bit mask 和 DAC pixel mask，恢复 V7 扩展
+enable latch（不是 EA/AE 端口命令），并使零值寄存器 replay 前的 C-VID
+派生状态与清零后的寄存器一致。不改变普通端口处理器、鼠标协议或原始
+执行路径；必须在此处访问原始私有寄存器，Compat 仍拥有 archive 编排。
+实际 Win3.1 恢复后输入及四种显存写模式的验证见
+[S9 P9 记录](../../../history/M9-T63-machine-snapshots.md)。

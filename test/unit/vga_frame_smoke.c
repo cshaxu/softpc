@@ -493,12 +493,24 @@ static void verify_snapshot_rebuilds_graphics_surface(softpc_machine *machine)
        complete core-memory archive, so that is covered by snapshot tests. */
     assert(softpc_device_snapshot_capture_video_controller(&saved));
     assert(saved.currently_emulated_video_mode == 0x60u);
+    assert(saved.sequencer[2] == getVideoplane_enable());
+    assert(saved.graphics[4] == getVideoread_mapped_plane());
+    assert(saved.graphics[8] == (getVideobit_prot_mask() & 0xff));
+    assert(saved.dac_mask == get_DAC_mask());
     c_setAH(0x6fu); c_setAL(5u); c_setBX(0x0063u);
     assert(softpc_device_bop_dispatch(0x42u, 0u));
     host_timer_event(); host_timer_event();
     assert(softpc_machine_presentation_dib(machine, &bits, &info, &width, &height));
     assert(width == 1024u && height == 768u);
+    /* A previous low-resolution/packed mode must not retain its flags when
+       the saved register's zero bits skip a change-only handler. */
+    set_double_pix_wid(TRUE);
+    set_graph_shift_reg(TRUE);
+    set_256_colour_mode(TRUE);
     assert(softpc_device_snapshot_restore_video_controller(&saved));
+    assert(!get_double_pix_wid());
+    assert(!get_graph_shift_reg());
+    assert(!get_256_colour_mode());
     assert(Currently_emulated_video_mode == 0x60u);
     assert(softpc_device_snapshot_rebuild_video_presentation());
     assert(get_char_height() == saved_char_height);
@@ -515,6 +527,66 @@ static void verify_snapshot_rebuilds_graphics_surface(softpc_machine *machine)
         ega_seq_reset(0x3c5, (half_word)(reset ^ 3));
         assert(softpc_device_snapshot_restore_video_controller(&captured));
         assert((get_display_disabled() & 3) == ((~reset) & 3));
+    }
+}
+
+static void verify_snapshot_video_writes(softpc_machine *machine)
+{
+    extern void vga_gc_outw(io_addr port, word value);
+    extern void vga_seq_map_mask(io_addr port, half_word value);
+    extern void outb(io_addr port, half_word value);
+    softpc_device_video_controller_state saved;
+    unsigned char expected[4];
+    unsigned mode, mask, plane;
+
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    c_setAH(0x6f); c_setAL(5); c_setBX(0x60);
+    assert(softpc_device_bop_dispatch(0x42, 0));
+    outb(0x3c4, 6); outb(0x3c5, 0xea);
+    for (mode = 0; mode < 4; ++mode) {
+        for (mask = 0; mask < 2; ++mask) {
+            vga_seq_map_mask(0x3c5, mask ? 5 : 15);
+            vga_gc_outw(0x3ce, 0x0000);
+            vga_gc_outw(0x3ce, 0x0001);
+            vga_gc_outw(0x3ce, 0x0003);
+            vga_gc_outw(0x3ce, (word)((mode << 8) | 4));
+            vga_gc_outw(0x3ce, (word)((mode << 8) | 5));
+            vga_gc_outw(0x3ce, (word)(((mask ? 0x55 : 0xff) << 8) | 8));
+            setVideolatches(0x12345678);
+            assert(softpc_device_snapshot_capture_video_controller(&saved));
+            assert(saved.sequencer[2] == (mask ? 5 : 15));
+            assert(saved.graphics[4] == mode);
+            memset(EGA_planes, 0, sizeof(expected));
+            write_byte_ev_glue(0xa0000, 0xa5);
+            memcpy(expected, EGA_planes, sizeof(expected));
+            if (mode == 0 && mask == 0)
+                for (plane = 0; plane < sizeof(expected); ++plane)
+                    assert(expected[plane] == 0xa5);
+
+            /* A different live write state must not survive register replay,
+               including saved zero-valued registers and an all-ones mask. */
+            vga_gc_outw(0x3ce, 0x0f00);
+            vga_gc_outw(0x3ce, 0x0f01);
+            vga_gc_outw(0x3ce, 0x1803);
+            vga_gc_outw(0x3ce, 0x0305);
+            vga_gc_outw(0x3ce, 0x3308);
+            assert(softpc_device_snapshot_restore_video_controller(&saved));
+            assert(EGA_CPU.set_reset == (saved.graphics[0] & 15));
+            assert(EGA_CPU.sr_enable == (saved.graphics[1] & 15));
+            assert(write_state.func == ((saved.graphics[3] >> 3) & 3));
+            assert(getVideoread_mapped_plane() == mode);
+            assert(sequencer.extensions_control.as.abyte ==
+                saved.sequencer_extension_control);
+            memset(EGA_planes, 0, sizeof(expected));
+            write_byte_ev_glue(0xa0000, 0xa5);
+            for (plane = 0; plane < sizeof(expected); ++plane)
+                assert(EGA_planes[plane] == expected[plane]);
+            /* V7 pointer writes must still reach V7, not alias index 4 and
+               switch the VGA memory layout when the pointer moves. */
+            outb(0x3c4, 0x9c); outb(0x3c5, 3);
+            assert(sequencer.memory_mode.as.abyte == saved.sequencer[4]);
+            assert(extensions_controller.ptr_horiz_posn_hi.as.abyte == 3);
+        }
     }
 }
 
@@ -784,6 +856,7 @@ int main(void)
     verify_writer_contract();
     verify_driver_geometry(machine);
     verify_snapshot_rebuilds_graphics_surface(machine);
+    verify_snapshot_video_writes(machine);
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     return 0;

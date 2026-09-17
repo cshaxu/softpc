@@ -1182,3 +1182,60 @@ Final x86 and x64 full suites each pass 105/105; bidirectional cross-width
 complete-frame save/load passes. Both fixed packages were rebuilt. Owner
 acceptance remains pending and S9 stays active. Existing owner deletions of
 obsolete bisect packages are preserved separately from this repair.
+
+## S9 P9: restore executable VGA/V7 state, not only its first picture
+
+Owner reports a correct initial restored frame followed by horizontal
+stretching and corruption on mouse/key input. The actual Win3.1 diagnostic
+reproduced the stretch after a fresh-process load. Before input chain4 was
+enabled with stride 1024; afterward sequencer memory mode had changed from
+0x0e to 0x03, disabling chain4 and reducing stride to 256.
+
+The snapshot saved V7's extension-enable latch but replayed it as a port
+command. The original receiver accepts EA/AE commands, not the latch value 1.
+Consequently the restored extensions remained locked, the selected F6 index
+became 06, and subsequent V7 pointer writes aliased ordinary VGA indexes.
+Restore now assigns that semantic latch before restoring the selected index.
+No ordinary port handler, mouse mapping or KVM scaling behavior is changed.
+
+The same receiver/readback audit found three obsolete shadow fields: sequencer
+map mask, graphics read map and bit mask are actually owned by C-VID getters.
+Capture now uses those getters, matching original INB behavior. The DAC pixel
+mask is likewise not the DAC component-depth mask; capture/restore now use the
+pixel-mask accessors, while V7 DAC control rebuilds component depth. Version 5
+rejects earlier images with lost masks; no guessed defaults or compatibility
+reader are added. The original image/media/INI are not rewritten.
+
+Replay also clears the derived write-state lookup/set-reset/enable/RAM fields
+before VGA initialization, and the zero-clock/shift display flags before
+register replay. Previously zero-register replay skipped change-only handlers
+and left set/reset=15 and XOR enabled despite saved zero values. Tests now
+check the live values, actual post-restore plane writes in all four write
+modes, selected read planes, full/partial masks, and V7 pointer-port routing.
+The boot fixture polls a real keyboard event after resume and repaints every
+pixel, so fresh-process/cross-width checks exercise subsequent CPU video writes.
+
+The bounded disposable diagnostic boots the existing Win3.1 media in overlay,
+waits for DOS, types WIN, saves after graphics startup, then supplies ten
+relative mouse moves and Tab/Right key transitions. A fresh process loads the
+same image and supplies the identical inputs. Both final frames are 640x480;
+their RGB difference bounding box is empty (pixel-identical). Diagnostic code,
+raw frames and snapshot are temporary build-owned evidence, not product/test
+fixtures or dependencies. The shared Lib/Common corpora remain unchanged.
+
+Final-source x64 full regression passes 105/105 (111.49s), and the fresh-process
+keyboard-redraw test passes 30 consecutive final-source runs (22.18s), in
+addition to 15 preceding diagnostic runs. Initial development runs did time
+out waiting for the repaint; this is recorded rather than treating those runs
+as passes. The final fixture disables IRQ1 while polling port 64h/60h so BIOS
+and the fixture do not compete to consume the input. Both cross-width
+save/load directions pass including actual post-resume repaint. Final x86
+full regression passes 105/105 (100.89s); documentation governance and diff
+whitespace checks pass. S9 remains open for the owner's fresh-image test.
+
+Against P8, two production files are +17/-7 (net +10); two test files are
++103/-14 (net +89), excluding documentation and EXEs. No alternative renderer,
+input path, Lib/Common API, or compatibility reader was introduced. The
+temporary Win3.1 diagnostic code and owned image/frame captures were removed;
+only fixed package EXEs are refreshed. Pre-existing owner deletions under
+`assets/binary/t63-bisect/` are left separate from this corrective P.

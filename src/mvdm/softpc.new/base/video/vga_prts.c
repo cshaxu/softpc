@@ -3410,7 +3410,7 @@ softpc_device_video_controller_state *state;
     memset(state, 0, sizeof(*state));
     state->sequencer[0] = ega_snapshot_seq_reset();
     state->sequencer[1] = sequencer.clocking_mode.as.abyte;
-    state->sequencer[2] = sequencer.map_mask.as.abyte;
+    state->sequencer[2] = (uint8_t)getVideoplane_enable();
     state->sequencer[3] = sequencer.character_map_select.as.abyte;
     state->sequencer[4] = sequencer.memory_mode.as.abyte;
     state->sequencer_extension_control = sequencer.extensions_control.as.abyte;
@@ -3428,11 +3428,11 @@ softpc_device_video_controller_state *state;
     state->graphics[1] = graphics_controller.enable_set_or_reset.as.abyte;
     state->graphics[2] = graphics_controller.color_compare.as.abyte;
     state->graphics[3] = graphics_controller.data_rotate.as.abyte;
-    state->graphics[4] = graphics_controller.read_map_select.as.abyte;
+    state->graphics[4] = (uint8_t)getVideoread_mapped_plane();
     state->graphics[5] = graphics_controller.mode.as.abyte;
     state->graphics[6] = graphics_controller.miscellaneous.as.abyte;
     state->graphics[7] = graphics_controller.color_dont_care.as.abyte;
-    state->graphics[8] = graphics_controller.bit_mask_register;
+    state->graphics[8] = (uint8_t)getVideobit_prot_mask();
     for (index = 0; index < 16; ++index)
         state->attribute[index] = attribute_controller.palette[index].as.abyte;
     state->attribute[16] = attribute_controller.mode_control.as.abyte;
@@ -3444,7 +3444,7 @@ softpc_device_video_controller_state *state;
         state->v7[index] = snapshot_v7_value(snapshot_v7_selectors[index]);
     state->miscellaneous_output = miscellaneous_output_register.as.abyte;
     state->feature_control = feature_control_register.as.abyte;
-    state->dac_mask = DAC_data_mask;
+    state->dac_mask = (uint8_t)get_DAC_mask();
     state->dac_read_address = DAC_rd_addr;
     state->dac_write_address = DAC_wr_addr;
     state->dac_component = (uint8_t)DAC_rgb_state;
@@ -3476,6 +3476,12 @@ const softpc_device_video_controller_state *state;
     DAC_rd_addr = DAC_wr_addr = DAC_state = 0;
     DAC_data_mask = 0x3f;
     DAC_data_bits = 6;
+    /* Match the cleared register file before init rebuilds C-VID rules.
+       Zero-valued replay writes deliberately skip change-only handlers. */
+    EGA_CPU.ega_state.mode_0.lookup = 0;
+    EGA_CPU.set_reset = 0;
+    EGA_CPU.sr_enable = 0;
+    EGA_CPU.ram_enabled = 0;
     vga_init();
 
     /* The cleared CRTC maximum-scan-line register describes one scan line.
@@ -3486,13 +3492,17 @@ const softpc_device_video_controller_state *state;
        before the transition-based sequencer handlers replay registers. */
     set_chain4_mode(NO);
     set_memory_chained(NO);
+    set_double_pix_wid(NO);
+    set_graph_shift_reg(NO);
+    set_256_colour_mode(NO);
     ega_seq_reset(EGA_SEQ_DATA, state->sequencer[0]);
     vga_seq_clock(EGA_SEQ_DATA, state->sequencer[1]);
     vga_seq_map_mask(EGA_SEQ_DATA, state->sequencer[2]);
     vga_seq_char_map(EGA_SEQ_DATA, state->sequencer[3]);
     vga_seq_mem_mode(EGA_SEQ_DATA, state->sequencer[4]);
     sequencer.address.as.abyte = 6;
-    vga_seq_extn_control(EGA_SEQ_DATA, state->sequencer_extension_control);
+    /* The saved byte is a latch, not the EA/AE unlock/lock command. */
+    sequencer.extensions_control.as.abyte = state->sequencer_extension_control;
 
     for (index = 0; index < SOFTPC_DEVICE_VIDEO_V7_REGISTER_COUNT; ++index) {
         sequencer.address.as.abyte = snapshot_v7_selectors[index];
@@ -3519,7 +3529,7 @@ const softpc_device_video_controller_state *state;
     }
     vga_misc_outb(EGA_MISC_REG, state->miscellaneous_output);
     vga_feat_outb(EGA_FEAT_REG, state->feature_control);
-    DAC_data_mask = state->dac_mask;
+    set_DAC_mask(state->dac_mask);
     DAC_rd_addr = state->dac_read_address;
     DAC_wr_addr = state->dac_write_address;
     DAC_rgb_state = (RGB)state->dac_component;

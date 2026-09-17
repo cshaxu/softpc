@@ -77,6 +77,15 @@ state starts with character height 1, and display chain flags agree with
 the original unchained CPU initialization. The owner image now renders all
 480 rows instead of 60. Tests check restored height/stride/length and every
 pixel of the complete mode-13h fixture. Revision 4 remains unchanged.
+P9 addresses the owner's continued-input corruption: restore reinstates V7's
+extension-enable latch rather than treating it as an EA/AE command. Capture
+uses live C-VID plane/read/bit masks and the actual DAC pixel mask; replay
+initializes zero-register-derived write and display state consistently.
+Revision 5 rejects older images whose masks were never saved. Real Win3.1
+save/fresh-process load plus mouse/key input now produces identical pixels.
+Final x64/x86 regressions pass 105/105 each, both cross-width restore directions
+pass, and x64 fresh-process redraw passes 30 consecutive runs. S9 remains open
+for owner testing with a newly saved revision-5 image.
 
 ## Current Technical Baseline
 
