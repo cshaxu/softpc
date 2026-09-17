@@ -360,12 +360,14 @@ static void verify_snapshot_archive(void)
     const unsigned char marker[] = {0x5a, 0xa5};
     const unsigned char altered[] = {0, 0};
     softpc_snapshot_image image = {0};
+    softpc_snapshot_image decoded_image = {0};
     softpc_ccpu_archive decoded = {0};
     softpc_device_archive *decoded_devices = NULL;
     softpc_ccpu_entry entry = {1, 0u}, restored = {0};
     checkpoint_byte_stream stream = {0};
     checkpoint_byte_stream device_stream = {0};
     checkpoint_byte_stream device_round_trip = {0};
+    checkpoint_byte_stream image_stream = {0};
     unsigned char readback[2];
     half_word cmos_value;
 
@@ -439,6 +441,25 @@ static void verify_snapshot_archive(void)
     softpc_device_archive_dispose(decoded_devices);
     free(device_round_trip.bytes);
     free(device_stream.bytes);
+
+    assert(softpc_snapshot_image_write(&image, checkpoint_write_bytes,
+        &image_stream) == LIB_STATUS_OK);
+    assert(image_stream.byte_count != 0u);
+    image_stream.bytes[0] ^= 1u;
+    assert(softpc_snapshot_image_read(&decoded_image, checkpoint_read_bytes,
+        &image_stream) == LIB_STATUS_INVALID_ARGUMENT);
+    image_stream.bytes[0] ^= 1u;
+    image_stream.offset = 0u;
+    assert(softpc_snapshot_image_read(&decoded_image, checkpoint_read_bytes,
+        &image_stream) == LIB_STATUS_OK);
+    assert(image_stream.offset == image_stream.byte_count);
+    assert(decoded_image.ccpu.valid != 0);
+    assert(decoded_image.entry.halted == image.entry.halted);
+    assert(decoded_image.entry.trap == image.entry.trap);
+    assert(memcmp(decoded_image.ccpu.memory, image.ccpu.memory,
+        image.ccpu.sas.memory_bytes) == 0);
+    softpc_snapshot_image_dispose(&decoded_image);
+    free(image_stream.bytes);
 
     c_setEAX(0u);
     c_setEIP(0u);

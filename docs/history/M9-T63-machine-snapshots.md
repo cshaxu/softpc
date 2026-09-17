@@ -1100,3 +1100,18 @@ packages are `softpc32.exe`
 and `softpc64.exe`
 `609C4C216F4D73951F071B11746B6A04BEADF2B864CDB2739F4DA25E071AA051`.
 This internal P adds no file, media, VM driver or product command.
+
+## S7 P7: complete private image container
+
+VM now writes one versioned private image around the independently owned core
+and device streams. The header contains magic, revision, host pointer width,
+declared RAM size and exact section count. Each section has a semantic
+identifier and explicit bounded length; the image ends with the outer CCPU
+resume entry. Decode stages both archives and only replaces a supplied image
+when every structural and section check succeeds.
+
+The checkpoint smoke now captures a live image, serializes the full container,
+decodes it and compares complete RAM bytes plus the resume entry. This P stays
+below the Common driver contract and contains no App file command, media
+section or user-visible save/load operation. Focused checkpoint proof passes
+at x64 and x86.

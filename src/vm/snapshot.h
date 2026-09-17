@@ -38,5 +38,11 @@ lib_status softpc_snapshot_image_capture(softpc_snapshot_image *image,
     const softpc_ccpu_entry *entry);
 lib_status softpc_snapshot_image_restore(const softpc_snapshot_image *image,
     softpc_ccpu_entry *entry);
+/* VM-private canonical image container. It composes the independently owned
+   core and device streams; paths/files remain outside this boundary. */
+lib_status softpc_snapshot_image_write(const softpc_snapshot_image *image,
+    softpc_snapshot_bytes_write write, void *context);
+lib_status softpc_snapshot_image_read(softpc_snapshot_image *image,
+    softpc_snapshot_bytes_read read, void *context);
 
 #endif

@@ -496,6 +496,18 @@ private archive and exposes it only after the complete stream succeeds. This
 remains an internal slice: media sections, container framing and the VM
 transaction are still required before any public save/load operation exists.
 
+#### S7 P7: implemented complete private image container
+
+VM now composes the two private stream slices into one canonical image:
+magic, format revision, host pointer width, declared RAM size, exact section
+count, `core`/`devices` identifiers and bounded lengths, followed by the
+outer CCPU resume entry. Decode rejects a foreign width, unknown order,
+duplicate/missing section, malformed resume entry or a core section that is
+inconsistent with its declared RAM size before calling either archive reader.
+The complete decoded image is staged and replaces an existing image only on
+success. It remains VM-private: this P adds neither the running safe-point
+transaction nor App file commands.
+
 - 安全点到达后导出前后相同快照语义状态；导出期间状态/待事件稳定，不要求与请求瞬间相同。
 - 全状态命令矩阵；嵌套自然返回、1 秒超限、HLT 无退休指令仍检查期限；普通单步不越过断点。
 - 在进程 A 保存，退出；进程 B 加载。改变分配地址/正常 ASLR 下工作，不靠固定地址。
