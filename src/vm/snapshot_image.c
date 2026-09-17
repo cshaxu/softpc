@@ -2,13 +2,15 @@
 
 #include "compat/devices/archive.h"
 
-#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
 enum {
     SOFTPC_SNAPSHOT_IMAGE_MAGIC = 0x53435053u,
     SOFTPC_SNAPSHOT_IMAGE_VERSION = 1u,
+    /* The virtual machine contract is IA-32.  This is an image-format word
+       width, not the pointer width of the process that happened to save it. */
+    SOFTPC_SNAPSHOT_MACHINE_WORD_BITS = 32u,
     SOFTPC_SNAPSHOT_SECTION_CORE = 1u,
     SOFTPC_SNAPSHOT_SECTION_DEVICES = 2u,
     SOFTPC_SNAPSHOT_SECTION_COUNT = 2u,
@@ -121,7 +123,7 @@ lib_status softpc_snapshot_image_write(const softpc_snapshot_image *image,
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u32(write,
         context, SOFTPC_SNAPSHOT_IMAGE_VERSION);
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u32(write,
-        context, (uint32_t)(sizeof(void *) * CHAR_BIT));
+        context, SOFTPC_SNAPSHOT_MACHINE_WORD_BITS);
     if (status == LIB_STATUS_OK && image->ccpu.sas.memory_bytes > UINT32_MAX)
         status = LIB_STATUS_LIMIT_EXCEEDED;
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u32(write,
@@ -146,18 +148,20 @@ lib_status softpc_snapshot_image_read(softpc_snapshot_image *image,
 {
     softpc_snapshot_memory_stream core = {0}, devices = {0};
     softpc_snapshot_image decoded = {0};
-    lib_u32 magic, version, width, sections, memory_bytes, identifier, length, halted, trap;
+    lib_u32 magic, version, source_width, sections, memory_bytes, identifier, length, halted, trap;
     lib_status status;
     if (image == NULL || expected_memory_bytes == 0u || read == NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     status = softpc_snapshot_stream_read_u32(read, context, &magic);
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u32(read, context, &version);
-    if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u32(read, context, &width);
+    if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u32(read, context, &source_width);
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u32(read, context, &sections);
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u32(read, context, &memory_bytes);
     if (status != LIB_STATUS_OK) return status;
+    /* This is the virtual machine's IA-32 wire contract, never a host
+       pointer-width compatibility switch. */
     if (magic != SOFTPC_SNAPSHOT_IMAGE_MAGIC || version != SOFTPC_SNAPSHOT_IMAGE_VERSION ||
-        width != (lib_u32)(sizeof(void *) * CHAR_BIT) ||
+        source_width != SOFTPC_SNAPSHOT_MACHINE_WORD_BITS ||
         sections != SOFTPC_SNAPSHOT_SECTION_COUNT ||
         memory_bytes != expected_memory_bytes) {
         return LIB_STATUS_INVALID_ARGUMENT;

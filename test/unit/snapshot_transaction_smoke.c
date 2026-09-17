@@ -57,6 +57,14 @@ static lib_status snapshot_read(void *opaque, lib_u8 *bytes,
     return LIB_STATUS_OK;
 }
 
+static void snapshot_set_u32_le(lib_u8 *bytes, lib_u32 value)
+{
+    bytes[0] = (lib_u8)value;
+    bytes[1] = (lib_u8)(value >> 8u);
+    bytes[2] = (lib_u8)(value >> 16u);
+    bytes[3] = (lib_u8)(value >> 24u);
+}
+
 static lib_status snapshot_file_write(void *opaque, const lib_u8 *bytes,
     lib_size byte_count)
 {
@@ -137,6 +145,27 @@ static int snapshot_run_transaction(void)
     assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
     assert(common_machine_stop(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_STOPPED));
+
+    /* Canonical writers describe the 32-bit machine, never the host process. */
+    assert(stream.count >= 12u);
+    assert(stream.bytes[8] == 32u && stream.bytes[9] == 0u &&
+        stream.bytes[10] == 0u && stream.bytes[11] == 0u);
+    stream.offset = 0u;
+    assert(common_machine_write_state(machine,
+        &(common_machine_state_reader) { snapshot_read, &stream }) ==
+        LIB_STATUS_OK);
+    assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
+    assert(common_machine_stop(machine));
+    assert(wait_for_state(machine, COMMON_MACHINE_STOPPED));
+
+    /* A host-width marker is not a supported image variant. */
+    snapshot_set_u32_le(stream.bytes + 8u, 64u);
+    stream.offset = 0u;
+    assert(common_machine_write_state(machine,
+        &(common_machine_state_reader) { snapshot_read, &stream }) !=
+        LIB_STATUS_OK);
+    assert(common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
+    snapshot_set_u32_le(stream.bytes + 8u, 32u);
 
     stream.bytes[0] ^= 0xffu;
     stream.offset = 0u;

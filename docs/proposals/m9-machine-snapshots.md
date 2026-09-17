@@ -64,8 +64,8 @@ SoftPC> resume
   CAP、X、display 与 console_control 语义不因新增功能改变。
 - 加载后的 paused 是普通暂停状态：resume 继续恢复现场，reset 放弃现场并走原有
   reset 完成后暂停的路径，stop 走原有退出路径；不新增 loaded-paused 状态。
-- 首版要求相同快照格式、机器实现兼容标识、x86/x64 宿主宽度和硬件配置/ROM。
-  不承诺跨构建、跨宽度或跨平台迁移；不兼容在改动当前机器前拒绝。
+- 首版要求相同快照格式、机器实现兼容标识、IA-32 固定 32-bit 机器字契约和硬件配置/ROM。
+  不承诺跨构建或跨平台迁移；相同机器配置的 x86/x64 包必须互通；不兼容在改动当前机器前拒绝。
   不用可变 HEAD 文案代替构建兼容标识，交付测试必须覆盖不匹配。
 - DIRECT/READONLY 不保存磁盘内容，只保存媒体引用、模式、大小、内容指纹和几何；
   OVERLAY 保存基底引用/指纹以及全部有效差异块，软盘、硬盘均包含，空驱动器也记录。
@@ -194,7 +194,7 @@ q/tic 队列恢复直接重建内部节点，不重新调用 `add_q_event_*` / `
 
 ### 3. 文件和媒体：单个二进制文件，显式基底依赖
 
-首版 `.spcs` 为一个有版本的容器：header（magic/version/build compatibility/host width/
+首版 `.spcs` 为一个有版本的容器：header（magic/version/build compatibility/IA-32 machine-word width/
 配置/ROM 标识）+ 有界 section（ID/version/length/checksum）+ 完成校验。
 明确小端固定宽度字段；所有尺寸在乘加前检查，重复/缺失 section、非法枚举、超限长度、
 截断与不兼容均拒绝。禁止直接 fwrite struct/pointer/CRT stream。
@@ -452,7 +452,7 @@ No new Session/UI fact is introduced.
 ### S7 canonical byte contract
 
 The byte callbacks carry one VM-owned canonical stream, not any live archive
-object. Its fixed header identifies the stream revision, required host width,
+object. Its fixed header identifies the stream revision, required IA-32 machine-word width,
 machine configuration and complete section count. Each section has a fixed
 identifier and bounded byte length. Integers are written little-endian at
 their declared 8/16/32/64-bit width; fixed byte arrays are copied verbatim;
@@ -499,9 +499,9 @@ transaction are still required before any public save/load operation exists.
 #### S7 P7: implemented complete private image container
 
 VM now composes the two private stream slices into one canonical image:
-magic, format revision, host pointer width, declared RAM size, exact section
+magic, format revision, IA-32 machine-word width, declared RAM size, exact section
 count, `core`/`devices` identifiers and bounded lengths, followed by the
-outer CCPU resume entry. Decode rejects a foreign width, unknown order,
+outer CCPU resume entry. Decode rejects a non-IA-32 wire width, unknown order,
 duplicate/missing section, malformed resume entry or a core section that is
 inconsistent with its declared RAM size before calling either archive reader.
 The complete decoded image is staged and replaces an existing image only on
@@ -526,7 +526,9 @@ transaction nor App file commands.
 - `load -> debug -> resume`、`load -> pause/resume -> stop/start/reset`、Window CAP/X
   和 Console 交接均保留现有体验。VM 加载完成前没有 UI 自行启动机器。
 - 单独证明 `load -> reset` 与普通 `paused -> reset` 相同，以及 `load -> resume` 不冷重置。
-- 同一快照不接受跨 x86/x64，分别测试两种构建的独立保存/加载。完整回归测试和
+- 同一快照可跨 x86/x64 加载。镜像统一使用 IA-32 的 32-bit machine-word 标记；
+  payload 仅使用固定宽度 wire 字段，宿主指针永不进入镜像。此前错误写出的 host-width
+  镜像不兼容，必须重新保存。分别验证 x64→x86 与 x86→x64。完整回归测试和
   原始镜像 diff 账本及 Common 必要 manifest 更新；验证 Lib/test-lib 与其基线零差异，
   Common 除机器层两个接口必要接线/证明材料外零差异，既有边界门禁继续通过。
 

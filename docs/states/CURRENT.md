@@ -49,7 +49,11 @@ historical shared include guard, without changing App, Common or Lib behavior.
 P6 corrects P9's presentation fallback: only a just-restored graphics
 machine may temporarily publish a text surface while its painter is pending;
 ordinary graphics with no dirty region publishes nothing and retains the
-previous frame. This restores the Window/Console route invariant.
+previous frame. This restores the Window/Console route invariant. P7 makes
+the snapshot header canonical: every new image writes the IA-32 `32` word
+marker and every reader requires it, so a newly produced image round-trips
+between x86 and x64 packages. Earlier host-width-marked images are explicitly
+unsupported and must be recreated.
 
 ## Current Technical Baseline
 
@@ -311,10 +315,10 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
 | Non-goals | No Common/Lib API or implementation change, no new snapshot format or VM/Compat archive receiver, no Session/UI/debug API, no generic callback/task escape hatch, no second executor, no raw legacy structure dump, and no change to ordinary pause/debug/KVM behavior. |
 | Reference Baseline | S7 P11 at `8647824`; fixed packages prove an x86/x64 fresh-process VM snapshot restore but expose no product command or file path. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
-| Files And ABI Surface | `src/app/{command,composition}.c/.h`, App CMake/test wiring and this proposal/evidence only. App command retains copied path text and derives a bounded input-file limit from configured RAM plus a documented archive allowance. It calls only `common_machine_read_state`/`write_state` and `lib_storage_file_*`; it does not include VM, Compat or MVDM headers. |
+| Files And ABI Surface | `src/app/{command,composition}.c/.h`, `src/vm/snapshot_image.c`, App/VM snapshot test wiring and this proposal/evidence only. App command retains copied path text and derives a bounded input-file limit from configured RAM plus a documented archive allowance. The VM-private image header is canonical IA-32 fixed-width data, not a public/Common/Lib ABI. App calls only `common_machine_read_state`/`write_state` and `lib_storage_file_*`; it does not include VM, Compat or MVDM headers. |
 | Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, `DOCUMENT.md`; `docs/design/ARCHITECTURE.md`, `CODING.md`, `UI.md`; active proposal and source-boundary gates. |
 | Verification | Parse/help/state-admission tests, a real App-provider save/stop/load/resume transaction with a build-owned fixture, failure/path/oversize tests, full sequential x64/x86 CTest, package builds and actual-commit review. |
-| Expected Markers | Only `save` from running is admitted and succeeds as ordinary PAUSED; only `load` from stopped (including the just-started monitor) is admitted and succeeds as ordinary PAUSED. Direct/readonly media remain referenced by their configured source; existing VM image semantics govern all currently archived state. App produces one explicit result and one prompt, never a false success or an extra lifecycle request. |
+| Expected Markers | Only `save` from running is admitted and succeeds as ordinary PAUSED; only `load` from stopped (including the just-started monitor) is admitted and succeeds as ordinary PAUSED. Direct/readonly media remain referenced by their configured source; existing VM image semantics govern all currently archived state. Snapshots use only the IA-32/fixed-width wire contract and load across x86/x64 packages when machine configuration matches. App produces one explicit result and one prompt, never a false success or an extra lifecycle request. |
 | Asset Needs | No user media, user snapshot file or INI mutation. Tests create/remove snapshot fixtures below their own build working directory only. Packaging refreshes only the two approved EXEs. |
 | Reporting Requirements | Before code report exact App action, callback, file and size-limit flow; after proof report actual production/test numstat, command/state matrix, tests and both EXE links. |
 | Stop Conditions | A necessary user command requires a new Common/Lib API; current canonical image cannot represent a promised medium state; or App cannot provide bounded whole-file I/O through existing Storage. Record evidence before expanding scope. |
