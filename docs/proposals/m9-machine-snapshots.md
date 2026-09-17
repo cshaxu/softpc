@@ -205,6 +205,9 @@ S2 实测纠正初稿：CCPU 的硬件 TLB 条目和替换位置属于应保存�
 会使尚未刷新 TLB 的页表修改提前生效。其 FAST_TLB 的索引和物理地址表也为固定
 整数/字节数据，首版一起保存；不为省约 1 MiB 另造重建算法或改变 test-register 路径。
 硬件 latches、隐藏段缓存、待 IRQ 同样不是可随意重建的缓存。
+同类实测：保存 `c_debug` 实际断点表和计数，不从 DR7 重新计算；原始任务切换
+清除局部使能后并不重建该表，加载不能偷偷改变原有行为。延迟 NPX 异常还须保存
+`NpxIntrNeeded` 和独立的 `NpxExceptionEIP`，不能只保存当前 `NpxFIP`。
 CPU continuation 明确区分取指准备与 HLT 等待；HLT 已前移 IP，且须保存原指令
 进入时的 pending trap，不能用当前 EFLAGS.TF 重新猜测。恢复复用原循环的相应
 阶段，不重复扣 quick-event 计数或提前接受 STI 阴影中的 IRQ；不序列化宿主栈。

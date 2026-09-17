@@ -495,3 +495,38 @@ whitespace checks pass; temporary checkpoint media was removed by both tests.
 Package hashes remain P5 unchanged. S2 remains active: device-local state and
 remaining CPU-adjacent/video state still need complete inventory, then the
 admitted payload stages must implement and prove actual cross-process restore.
+
+## S2 P9: CPU side-state proof
+
+Before: one product test, approximately 35-45 added lines; no production,
+original mirror, Lib or Common changes. This bounded proof extends S4's state
+requirements; it does not close S2's remaining device/video inventory.
+
+The defect class under audit is treating derived CPU data as safely
+reconstructible. The real CCPU test now demonstrates both cases:
+
+- `c_debug.c`: `nr_inst_break`, `nr_data_break`, `i_brk` and `d_brk` are saved
+  semantic data (addresses, identifiers, ranges and types), not native pointers.
+  `c_tsksw.c` clears local DR7 enables without `setup_breakpoints`; the only
+  production calls rebuilding the table are in `mov.c`. The test uses that
+  same DR7 clear primitive and demonstrates that a cached breakpoint still
+  sets DR6; rebuilding the table removes it. This is not a full TSS-switch
+  test or a CPU bug fix. Load must preserve the actual table, not repair it.
+- `zfrsrvd.c`: `NpxIntrNeeded` and private `NpxExceptionEIP` must be saved.
+  `DoNpxException` copies FIP; later `TakeNpxExceptionInt` restores that older
+  IP even when current FIP differs. The test disables IF to inspect deferred
+  delivery without entering an ISR; the following test resets the machine.
+  FPU register export alone cannot preserve this pending exception.
+
+Similar-issue sweep: searched all selected mirror sources for
+`setup_breakpoints`, inspected the task-switch clear and both NPX functions,
+and retained the earlier real TLB proof. No snapshot encoder or register
+setter is substituted for the original implementation in these tests.
+
+After: one test C file +35/-0; production and original mirror +0/-0.
+Both full builds succeeded, with x64/x86 full suites 103/103 (58.76/60.74 s).
+Final review aligned the test mask with original LOCAL_BRK_ENABLE (0x155,
+including LE); both rebuilt focused suites then passed 2/2. Both fixed package
+hashes remain P5 unchanged. No temporary checkpoint image remains; no Lib,
+Common, configuration or media change. Proposal carries the two additional
+state obligations. S2 remains active; this is not snapshot roundtrip proof.

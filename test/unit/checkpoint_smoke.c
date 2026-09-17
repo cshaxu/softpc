@@ -13,6 +13,7 @@
 #include "ios.h"
 #include "ica.h"
 #include "c_tlb.h"
+#include "c_debug.h"
 #include "quick_ev.h"
 /* base_def.h's non-ANSI compatibility macro must not alter this C17 test. */
 #undef const
@@ -24,6 +25,11 @@ extern void dispatch_tic_event(void);
 extern IU32 calc_q_inst_for_time(IU32 time);
 extern IU32 calc_q_time_for_inst(IU32 count);
 extern IBOOL DisableQuickTickRecal;
+extern IU32 CCPU_DR[8];
+extern IU32 NpxFIP;
+extern IBOOL NpxIntrNeeded;
+extern void DoNpxException(void);
+extern void TakeNpxExceptionInt(void);
 
 typedef struct checkpoint_probe {
     softpc_machine *machine;
@@ -246,6 +252,34 @@ static void verify_translation(void)
 static long event_order[8];
 static unsigned event_count;
 
+static void verify_cpu_side_state(void)
+{
+    assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
+    CCPU_DR[0] = 0x1234u;
+    CCPU_DR[7] = 1u; /* Local instruction breakpoint 0. */
+    setup_breakpoints();
+    assert(nr_inst_break == 1u && nr_data_break == 0u);
+    /* c_tsksw clears the local DR7 enable bits without rebuilding the table.
+       Rebuilding during snapshot load would silently change this behavior. */
+    CCPU_DR[7] &= ~0x155u; /* Original LOCAL_BRK_ENABLE, including LE. */
+    CCPU_DR[6] = 0u;
+    check_for_inst_exception(0x1234u);
+    assert(CCPU_DR[6] == 1u && nr_inst_break == 1u);
+    setup_breakpoints();
+    CCPU_DR[6] = 0u;
+    check_for_inst_exception(0x1234u);
+    assert(CCPU_DR[6] == 0u && nr_inst_break == 0u);
+
+    c_setEFLAGS(2u); /* Observe deferred NPX delivery without entering an ISR. */
+    NpxFIP = 0x12345678u;
+    DoNpxException();
+    assert(NpxIntrNeeded);
+    NpxFIP = 0xabcdefu;
+    TakeNpxExceptionInt();
+    assert(!NpxIntrNeeded && NpxFIP == 0x12345678u);
+    /* The pending exception has its own saved IP, distinct from current FIP. */
+}
+
 static void record_event(long param)
 {
     assert(event_count < sizeof(event_order) / sizeof(event_order[0]));
@@ -338,6 +372,7 @@ int main(void)
     verify_reentry();
     verify_timeout();
     verify_translation();
+    verify_cpu_side_state();
     verify_event_queue();
     softpc_machine_destroy(probe.machine);
     assert(softpc_test_remove_image(path));

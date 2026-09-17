@@ -41,6 +41,9 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   scheduler data symbols. Real quick/tick tests cover order, remaining count,
   cancellation and zero-delay behavior; both full suites remain 103/103.
   Common owns final PAUSED notification; capture does not drain device queues.
+  P9 proves that actual breakpoint tables and deferred NPX exception IP must
+  also survive capture, rather than being rebuilt from visible registers.
+  Production remains unchanged; final focused tests pass on both widths.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files
