@@ -449,6 +449,27 @@ returns a status after the VM has reached ordinary `PAUSED`; a rejected write
 leaves stopped state unchanged; a successful write reaches ordinary `PAUSED`.
 No new Session/UI fact is introduced.
 
+### S7 canonical byte contract
+
+The byte callbacks carry one VM-owned canonical stream, not any live archive
+object. Its fixed header identifies the stream revision, required host width,
+machine configuration and complete section count. Each section has a fixed
+identifier and bounded byte length. Integers are written little-endian at
+their declared 8/16/32/64-bit width; fixed byte arrays are copied verbatim;
+every variable array is preceded by its element count and validated before
+allocation or multiplication. No caller receives a pointer into the archive.
+
+The stream uses one section for each already-reviewed semantic owner: CCPU
+register/execution/debug/TLB/FPU maps, SAS map and its RAM/page-type bytes,
+event records, every device map, video data and the CCPU resume entry. A
+section is encoded by its owner from fields, never by `sizeof` of an existing
+C structure. This excludes compiler padding, host-width values, function
+addresses, CRT streams, native handles and all archive allocation pointers.
+Unknown, duplicate, missing or oversized sections reject the whole incoming
+image before restore. The VM first decodes and validates into a private staged
+image; only then may it replace the stopped machine state. The codec does not
+know a file path or write prompt text.
+
 ## 验收矩阵
 
 - 安全点到达后导出前后相同快照语义状态；导出期间状态/待事件稳定，不要求与请求瞬间相同。
