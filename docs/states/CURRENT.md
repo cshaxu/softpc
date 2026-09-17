@@ -75,7 +75,11 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   cursor resources rebuild on restore. S6 P6 adds only the fixed-size four-
   plane VRAM/font bytes and 256-entry DAC, then invalidates host rendering;
   controller registers, C-VID state and derived bindings remain pending and
-  are not treated as a raw structure image.
+  are not treated as a raw structure image. S6 P7 freezes the next receiver
+  boundary: register/index/attribute-flip-flop/DAC-cursor bytes plus the two
+  live C-VID latch values are payload; GDP pointers, generated vectors,
+  scratch/screen routes, dirty state and host resources rebuild. Any live GDP
+  slot outside that map blocks capture rather than being copied or reset.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files

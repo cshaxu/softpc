@@ -990,3 +990,26 @@ Fixed packages are `softpc32.exe`
 `28DF09513FE461C0A33ACFBC00279C64761BEF1B7E298D269AEAAE268F8E39C1` and
 `softpc64.exe`
 `F1D1C6DD8AFD35596CEBC3AD82C0156F77F5B53B08136BF028D230943BEA39DF`.
+
+## S6 P7: video-controller and C-VID reconstruction audit
+
+The P7 source audit rejects two tempting but invalid shortcuts.  The EGA/VGA
+controller structures in `ega_prts.c` use compiler-dependent bitfield
+layouts, and the C-VID GDP side table contains native pointers, generated rule
+entry addresses and function vectors alongside scalar values.  Neither can be
+copied as a structure or as a GDP allocation image.
+
+The audited value boundary is narrower and reproducible: the EGA/VGA/V7
+register files, selected indices, attribute flip-flop and DAC cursor phase are
+guest-visible scalar bytes; C-VID's ordinary four-byte latch and V7 foreground
+latch affect the next memory operation and are scalar payload.  Plane/scratch/
+screen pointers, string-read routes, mark/read/write vectors, `sr_lookup`,
+dirty bookkeeping, DIBs and host drawing resources are process bindings or
+host presentation state.  They must be rebuilt by the existing controller
+register handlers followed by one full refresh.
+
+This record does not implement a controller receiver and does not claim that
+all GDP slots are serializable.  It instead freezes the required restore
+ordering and retains the task stop condition: any active slot not provably
+payload or rebuild remains a capture rejection, not an implicit reset.  No
+production/test/original-mirror/Lib/Common files changed.

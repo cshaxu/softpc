@@ -334,6 +334,31 @@ field map and validation before it can enter the private archive.
 | `com.c`/`serial.c`, `printer*.c`/`parallel.c` | Reject when externally active | A configured/open host endpoint, buffered irreversible output, or its pending callback blocks capture. No file handle, host queue, output path or external-world state is serialized. Detached/inactive controller state is either later encoded with an audited callback ID or explicitly remains rejected. |
 | `quick_ev` callbacks from keyboard/COM/printer | Deferred semantic IDs | S5 already rejects unknown callbacks. S6 adds an ID only when the complete receiver payload and restoration proof exist; it must not blanket-allow the current callback pointer. |
 
+### S6 P7: video-controller and C-VID reconstruction boundary
+
+P6's plane/font bytes and DAC entries are necessary but do not by themselves
+restore the active video device.  The selected V7 build keeps the EGA/VGA
+register files in legacy bitfield structures and keeps C-VID's working state
+in `GLOBAL_VGAGlobals`, which contains both semantic values and process
+bindings.  Neither carrier is an archive wire format.
+
+The fixed map therefore has three parts:
+
+1. guest-visible EGA/VGA/V7 register bytes, selected register indexes, the
+   attribute flip-flop, and DAC read/write cursor phase are payload;
+2. the C-VID/V7 data latches that affect the next guest memory operation are
+   payload;
+3. C-VID plane/scratch/screen pointers, generated read/write/mark vectors,
+   `sr_lookup`, renderer dirty fields and host drawing resources rebuild.
+
+Restore must begin from a known controller baseline, replay the existing
+register handlers in a documented order so they recreate chain/bank/mode and
+rule routes, then install the saved latches and issue one complete refresh.
+It must not replay guest port I/O, serialize a controller structure, or copy
+GDP slot allocation bytes.  A field that cannot be placed in one of those
+three classes blocks capture until its fixed semantic representation is
+identified; it is not silently reset or treated as a cache.
+
 每一实现 S 都是可构建交付：双宽度编译/全套与针对性测试、固定 EXE、完整 P 提交推送，
 然后切换审计角色核对实际 commit 后收口。S8 前不暴露残缺 save/load，EXE 仍可验证
 旧体验；不能把仅内部 roundtrip 的 S4 当成用户功能交付。逐阶段避免一次改所有设备。
