@@ -403,7 +403,7 @@ int softpc_device_snapshot_capture_video_memory(
     softpc_device_video_memory_state *state);
 int softpc_device_snapshot_restore_video_memory(
     const softpc_device_video_memory_state *state);
-void softpc_device_snapshot_rebuild_video_presentation(void);
+int softpc_device_snapshot_rebuild_video_presentation(void);
 
 /*
  * Controller state is a register-value map, never a copy of the original
@@ -429,6 +429,7 @@ typedef struct softpc_device_video_controller_state {
     uint8_t sequencer_index, crtc_index, graphics_index, attribute_index;
     uint8_t dac_mask, dac_read_address, dac_write_address, dac_component,
         dac_state;
+    uint8_t currently_emulated_video_mode;
     uint32_t cvid_latches, cvid_v7_foreground_latches;
 } softpc_device_video_controller_state;
 

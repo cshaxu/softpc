@@ -28,7 +28,7 @@ the existing Common state-transfer rendezvous to the VM-owned safe capture and
 stopped restore transaction: running read returns ordinary PAUSED, stopped
 write stages first and restores into ordinary PAUSED. P9 reconstructs host
 video resources only after controller replay and proves that restore publishes
-a complete frame (text fallback while a graphics painter is unavailable). It is not yet an App
+only a complete graphics frame when a graphics painter is available. It is not yet an App
 snapshot command and media sections remain in scope. P10 suppresses only
 reset/archive-replay executor callbacks; it reopens the existing callback
 before restored CCPU re-entry, so the PAUSED completion cannot precede the
@@ -55,6 +55,11 @@ invariant. P7 briefly
 used a fixed `32` machine-width marker for cross-width images. Owner has
 superseded that format: S9 removes every width field altogether and replaces
 the bounded App buffer/container path with canonical streaming I/O.
+S9 P4 archives the missing V7 current-mode semantic byte. Restore resets only
+the original host geometry cache before reselecting its painter; standalone
+graphics resize no longer mistakes the retired NTVDM fullscreen state for
+permission to retain a stale DIB. The image revision is now 3, so pre-P4
+images are intentionally rejected and must be re-saved.
 
 ## Current Technical Baseline
 
@@ -316,7 +321,7 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
 | Non-goals | No Common public API change, no Session/UI/debug API, no generic callback/task escape hatch, no second executor, no raw legacy structure dump, and no change to ordinary pause/debug/KVM behavior. This S does not claim the separately planned overlay-page payload is already implemented. |
 | Reference Baseline | S8 P7 at `46baf5c`; it proves a transitional fixed-`32` header cross-width but still buffers reads and imposes RAM+8 MiB/device 4 MiB limits. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
-| Files And ABI Surface | `src/app/{command,composition}.c/.h`, `src/vm/{snapshot_image,driver}.c`, `src/lib/storage/file*`, `src/common/session/control_state.*`, storage/App/VM/Common snapshot tests and this proposal/evidence only. Lib adds one neutral reader handle mirroring its writer; App passes that stream through the existing opaque Common callback. Session's private paused-Window retention bit and VM's restored-graphics publication are corrected without changing public ABI. The VM-private header is width-free fixed-endian data, not a public/Common/Lib ABI. |
+| Files And ABI Surface | `src/app/{command,composition}.c/.h`, `src/vm/{snapshot_image,driver}.c`, `src/compat/{video,devices/*}.c/.h`, necessary original SoftPC video receiver lines, `src/lib/storage/file*`, `src/common/session/control_state.*`, storage/App/VM/Common snapshot tests and this proposal/evidence only. Lib adds one neutral reader handle mirroring its writer; App passes that stream through the existing opaque Common callback. Session's private paused-Window retention bit and VM's restored-graphics publication are corrected without changing public ABI. The VM-private header is width-free fixed-endian data, not a public/Common/Lib ABI. |
 | Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, `DOCUMENT.md`; `docs/design/ARCHITECTURE.md`, `CODING.md`, `UI.md`; active proposal and source-boundary gates. |
 | Verification | Storage streaming-reader tests; VM malformed/short-section proof; a real App-provider save/stop/load/resume transaction; x64→x86 and x86→x64 fresh-process proof; full sequential x64/x86 CTest, package builds and actual-commit review. |
 | Expected Markers | Only `save` from running is admitted and succeeds as ordinary PAUSED; only `load` from stopped (including the just-started monitor) is admitted and succeeds as ordinary PAUSED. A stopped-to-paused load does not create a Window; a paused Window that already exists remains visible, and resume resumes normal presentation routing. A restored graphics route publishes only a complete graphics frame—never a text fallback—so resumed Window geometry/content follows the restored painter. Direct/readonly media remain referenced by their configured source; existing VM image semantics govern all currently archived state. New snapshots have no width field and load across x86/x64 packages when machine configuration matches. App produces one explicit result and one prompt, never a false success or an extra lifecycle request. |

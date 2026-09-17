@@ -364,6 +364,8 @@ ERROR RECOVERY	  :	none.
 #include "compat/devices/snapshot.h"
 #include <string.h>
 
+IMPORT IU8 Currently_emulated_video_mode;
+
 /* [3.1.2 DECLARATIONS]                                                 */
 
 /* [3.2 INTERMODULE EXPORTS]						*/ 
@@ -3446,6 +3448,7 @@ softpc_device_video_controller_state *state;
     state->dac_write_address = DAC_wr_addr;
     state->dac_component = (uint8_t)DAC_rgb_state;
     state->dac_state = DAC_state;
+    state->currently_emulated_video_mode = Currently_emulated_video_mode;
     state->cvid_latches = (uint32_t)getVideolatches();
     state->cvid_v7_foreground_latches = (uint32_t)getVideov7_fg_latches();
     return TRUE;
@@ -3512,6 +3515,7 @@ const softpc_device_video_controller_state *state;
     DAC_wr_addr = state->dac_write_address;
     DAC_rgb_state = (RGB)state->dac_component;
     DAC_state = state->dac_state;
+    Currently_emulated_video_mode = state->currently_emulated_video_mode;
     setVideolatches((IU32)state->cvid_latches);
     setVideov7_fg_latches((IU32)state->cvid_v7_foreground_latches);
     vga_seq_outb_index(EGA_SEQ_INDEX, state->sequencer_index);

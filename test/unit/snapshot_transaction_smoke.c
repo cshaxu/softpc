@@ -164,7 +164,7 @@ static int snapshot_run_transaction(void)
 
     /* The container carries no host or machine word-width field. */
     assert(stream.count >= 16u);
-    assert(stream.bytes[4] == 2u && stream.bytes[5] == 0u &&
+    assert(stream.bytes[4] == 3u && stream.bytes[5] == 0u &&
         stream.bytes[6] == 0u && stream.bytes[7] == 0u);
     assert(stream.bytes[8] == 2u && stream.bytes[9] == 0u &&
         stream.bytes[10] == 0u && stream.bytes[11] == 0u);
@@ -183,7 +183,7 @@ static int snapshot_run_transaction(void)
         &(common_machine_state_reader) { snapshot_read, &stream }) !=
         LIB_STATUS_OK);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
-    snapshot_set_u32_le(stream.bytes + 4u, 2u);
+    snapshot_set_u32_le(stream.bytes + 4u, 3u);
 
     /* A declared section boundary must be consumed exactly, never ignored. */
     {

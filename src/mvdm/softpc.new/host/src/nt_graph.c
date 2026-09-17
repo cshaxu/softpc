@@ -2104,8 +2104,10 @@ void graphicsResize(void)
         DWORD    headerSize;
         LPBITMAPINFO     infoStructPtr;
 
+#ifndef SOFTPC_STANDALONE
         if (sc.ScreenState == FULLSCREEN)
             return;
+#endif
 
         /* Destroy previous data. */
 	closeGraphicsBuffer(); /* Tim Oct 92 */

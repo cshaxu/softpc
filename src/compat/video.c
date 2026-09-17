@@ -18,6 +18,8 @@
 #include "dib_surface.h"
 #include "nt_graph.h"
 
+IMPORT IU8 Currently_emulated_video_mode;
+
 /* The original video core's optional stream-I/O path is a product console
    optimization.  The detached VM presents through its own console/window,
    so it remains disabled while retaining the original controller behavior. */
@@ -140,13 +142,27 @@ int softpc_device_snapshot_restore_video_memory(
     return 1;
 }
 
-void softpc_device_snapshot_rebuild_video_presentation(void)
+int softpc_device_snapshot_rebuild_video_presentation(void)
 {
-    if (!softpc_standalone_dib_init()) return;
+    if (!softpc_standalone_dib_init()) return 0;
+    /* The archive restores controller registers directly.  Unlike normal
+       port writes, that does not select the original painter or recreate its
+       DIB.  Select the restored mode unconditionally: ModeType itself is
+       derived by that original path, so it cannot decide whether to call it.
+       An initial 1280x768 blank allocation is not a restored frame. */
+    /* The original host caches geometry to avoid resize work on ordinary
+       mode changes.  Those caches describe the pre-load surface, so reset
+       them before the original selector derives the restored one. */
+    resetWindowParams();
+    if (choose_display_mode == NULL || !(*choose_display_mode)()) {
+        return 0;
+    }
+    /* This direct selection consumes the pending register-mode change; leave
+       the original painter eligible for the one full repaint below. */
+    set_mode_change_required(FALSE);
     host_mark_screen_refresh();
-    host_graphics_tick();
-    /* Controller restoration can replace its paint surface.  Require a
-       complete frame from the final reconstructed host resource. */
-    if (softpc_standalone_dib_init())
+    host_flush_screen();
+    if (softpc_platform_presentation_is_graphics())
         softpc_standalone_dib_invalidate_all();
+    return 1;
 }

@@ -14,6 +14,7 @@
 #include "config.h"
 #include "vgaports.h"
 #include "compat/dib_surface.h"
+#include "compat/devices/snapshot.h"
 #include "nt_graph.h"
 #include "cpu_vid.h"
 
@@ -464,6 +465,28 @@ static void verify_driver_geometry(softpc_machine *machine)
     free(frame);
 }
 
+static void verify_snapshot_rebuilds_graphics_surface(softpc_machine *machine)
+{
+    softpc_device_video_controller_state saved;
+    const void *bits;
+    const void *info;
+    uint32_t width;
+    uint32_t height;
+
+    /* The controller archive carries the V7 mode identity alongside raw
+       registers.  Full presentation rebuilding additionally depends on the
+       complete core-memory archive, so that is covered by snapshot tests. */
+    assert(softpc_device_snapshot_capture_video_controller(&saved));
+    assert(saved.currently_emulated_video_mode == 0x60u);
+    c_setAH(0x6fu); c_setAL(5u); c_setBX(0x0063u);
+    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    host_timer_event(); host_timer_event();
+    assert(softpc_machine_presentation_dib(machine, &bits, &info, &width, &height));
+    assert(width == 1024u && height == 768u);
+    assert(softpc_device_snapshot_restore_video_controller(&saved));
+    assert(Currently_emulated_video_mode == 0x60u);
+}
+
 int main(void)
 {
     const char *path = "softpc-original-dib-smoke.img";
@@ -729,6 +752,7 @@ int main(void)
     verify_panning_pixels();
     verify_writer_contract();
     verify_driver_geometry(machine);
+    verify_snapshot_rebuilds_graphics_surface(machine);
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     return 0;

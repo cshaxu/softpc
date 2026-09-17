@@ -193,7 +193,7 @@ softpc_device_archive *archive;
             archive->quick_capacity, archive->tick_entries,
             archive->tick_capacity, decode_callback))
         return FALSE;
-    softpc_device_snapshot_rebuild_video_presentation();
+    if (!softpc_device_snapshot_rebuild_video_presentation()) return FALSE;
     if (!softpc_device_snapshot_restore_serial_controller(
             &archive->serial_controller) ||
         !softpc_device_snapshot_restore_serial_host(&archive->serial_host) ||
@@ -533,6 +533,7 @@ static const softpc_device_wire_field video_controller_fields[] = {
     DEVICE_U8(softpc_device_video_controller_state, dac_write_address),
     DEVICE_U8(softpc_device_video_controller_state, dac_component),
     DEVICE_U8(softpc_device_video_controller_state, dac_state),
+    DEVICE_U8(softpc_device_video_controller_state, currently_emulated_video_mode),
     DEVICE_U32(softpc_device_video_controller_state, cvid_latches),
     DEVICE_U32(softpc_device_video_controller_state, cvid_v7_foreground_latches)
 };
