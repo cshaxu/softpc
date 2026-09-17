@@ -324,6 +324,38 @@ int softpc_device_snapshot_restore_video_memory(
     const softpc_device_video_memory_state *state);
 
 /*
+ * Controller state is a register-value map, never a copy of the original
+ * bitfield carriers or C-VID GDP allocation.  The V7 array uses the explicit
+ * selector order owned by the original video hook.
+ */
+enum {
+    SOFTPC_DEVICE_VIDEO_SEQUENCE_REGISTER_COUNT = 5,
+    SOFTPC_DEVICE_VIDEO_CRTC_REGISTER_COUNT = 25,
+    SOFTPC_DEVICE_VIDEO_GRAPHICS_REGISTER_COUNT = 9,
+    SOFTPC_DEVICE_VIDEO_ATTRIBUTE_REGISTER_COUNT = 21,
+    SOFTPC_DEVICE_VIDEO_V7_REGISTER_COUNT = 28
+};
+
+typedef struct softpc_device_video_controller_state {
+    uint8_t sequencer[SOFTPC_DEVICE_VIDEO_SEQUENCE_REGISTER_COUNT];
+    uint8_t crtc[SOFTPC_DEVICE_VIDEO_CRTC_REGISTER_COUNT];
+    uint8_t graphics[SOFTPC_DEVICE_VIDEO_GRAPHICS_REGISTER_COUNT];
+    uint8_t attribute[SOFTPC_DEVICE_VIDEO_ATTRIBUTE_REGISTER_COUNT];
+    uint8_t v7[SOFTPC_DEVICE_VIDEO_V7_REGISTER_COUNT];
+    uint8_t sequencer_extension_control;
+    uint8_t miscellaneous_output, feature_control;
+    uint8_t sequencer_index, crtc_index, graphics_index, attribute_index;
+    uint8_t dac_mask, dac_read_address, dac_write_address, dac_component,
+        dac_state;
+    uint32_t cvid_latches, cvid_v7_foreground_latches;
+} softpc_device_video_controller_state;
+
+int softpc_device_snapshot_capture_video_controller(
+    softpc_device_video_controller_state *state);
+int softpc_device_snapshot_restore_video_controller(
+    const softpc_device_video_controller_state *state);
+
+/*
  * The PIT uses function pointers and host clock timestamps internally.  The
  * archive stores only the finite state-machine identities and elapsed phase;
  * restore rebinds the functions and rebases that phase on the new host clock.

@@ -5,6 +5,12 @@ T63 S2 在原有 c_main.c 新增两个 CPU checkpoint 观察点（取指准备�
 以及回到这两个原始阶段的窄重入接线；保留 HLT 的 pending trap，不重复取指。
 策略与嵌套计数不进入镜像。该增量和双宽度证明见
 [T63 实施记录](../../../history/M9-T63-machine-snapshots.md)，不改写 T61 历史计数。
+T63 S6 P8 在 `base/video/vga_prts.c` 增加 `+197/-0` 的
+`DIVERGENCE(MVDM-VIDEO-SNAPSHOT-001)` 窄 port-ABI hook：它仅导出/恢复
+固定宽度的视频寄存器与 C-VID latch 语义值，并通过既有端口处理器重建派生路由。
+不得复制 bitfield carrier、GDP allocation、生成规则地址或 host resource；其余
+snapshot 编排和 archive 所有权在 Compat。双宽度 checkpoint/full-suite 证明和完整
+receiver 边界见同一 T63 实施记录。该增量同样不改写 T61 冻结计数。
 S1 数字和待处理标记是冻结基线；S2–S6 的处置记录覆盖其历史状态，
 不把已完成的候选继续算作欠账。
 

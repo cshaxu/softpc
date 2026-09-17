@@ -409,6 +409,8 @@ static void verify_controller_archives(void)
         dos_mouse_restored;
     static softpc_device_video_memory_state video_memory_saved,
         video_memory_restored;
+    softpc_device_video_controller_state video_controller_saved,
+        video_controller_restored;
     softpc_device_archive *keyboard_archive;
     half_word value;
 
@@ -538,6 +540,37 @@ static void verify_controller_archives(void)
     assert(softpc_device_snapshot_capture_video_memory(&video_memory_restored));
     assert(memcmp(&video_memory_restored, &video_memory_saved,
         sizeof(video_memory_saved)) == 0);
+
+    /* Controller bytes and the C-VID latches must be replayed through the
+       original ports so the semantic capture survives a destructive change. */
+    outb(EGA_SEQ_INDEX, 0x04u);
+    outb(EGA_SEQ_DATA, 0x0eu);
+    outb(EGA_GC_INDEX, 0x03u);
+    outb(EGA_GC_DATA, 0x18u);
+    outb(EGA_CRTC_INDEX, 0x0eu);
+    outb(EGA_CRTC_DATA, 0x12u);
+    inb(EGA_IPSTAT1_REG, &value);
+    outb(EGA_AC_INDEX_DATA, 0x10u);
+    outb(EGA_AC_INDEX_DATA, 0x01u);
+    inb(EGA_IPSTAT1_REG, &value);
+    outb(EGA_AC_INDEX_DATA, 0x13u);
+    assert(softpc_device_snapshot_capture_video_controller(
+        &video_controller_saved));
+    outb(EGA_SEQ_INDEX, 0x04u);
+    outb(EGA_SEQ_DATA, 0x00u);
+    outb(EGA_GC_INDEX, 0x03u);
+    outb(EGA_GC_DATA, 0x00u);
+    outb(EGA_CRTC_INDEX, 0x0eu);
+    outb(EGA_CRTC_DATA, 0x00u);
+    assert(softpc_device_snapshot_restore_video_controller(
+        &video_controller_saved));
+    assert(softpc_device_snapshot_capture_video_controller(
+        &video_controller_restored));
+    assert(memcmp(&video_controller_restored, &video_controller_saved,
+        sizeof(video_controller_saved)) == 0);
+    video_controller_restored.dac_component = 3u;
+    assert(!softpc_device_snapshot_restore_video_controller(
+        &video_controller_restored));
 
     /* The 8042's pending FIFO and command latch are device state, not a
        frontend queue.  Capture through its real port path, mutate it, then

@@ -315,6 +315,26 @@ VM 强制生成完整帧，
 | S8 | App save/load 命令、帮助、既有 provider 结果/prompt 接线 | 百行级 | Session/UI 不改；命令矩阵、失败输出、paused debug/resume 与既有两类 display/console_control 路径 |
 | S9 | 全量账本复核、安装长流程与回归、最终交付 | 测试为主 | 以下验收矩阵全通过，x86/x64 EXE，owner 手测后才关 T |
 
+### T63 收口前：MVDM / VM / Compat 增量审计
+
+在所有快照实现 S 完成、T63 收口前，必须对**本任务相对 T63 基线**的
+`src/mvdm/softpc.new`、`src/vm` 与 `src/compat` 进行独立的实际 diff 审计。
+这不是历史 OpenNT 镜像总差异统计，也不能以“x64 移植已有大量 diff”掩盖本任务新增量。
+
+- 按文件报告新增/删除行、职责、对应 snapshot receiver 或事务阶段，以及是否为
+  preserved-mirror 的 port-ABI hook；
+- 每一个新增 MVDM hook 必须证明：所需状态不能由既有 Compat/VM 边界取得，且 hook
+  仅导出或恢复原有机器状态，不另建 standalone 行为分支；
+- 对本任务新增的 MVDM 逻辑，凡是本质属于 snapshot 编排、宿主资源重建、文件/状态
+  格式、平台适配或产品事务，而非原始机器语义，必须优先归属 VM 或 Compat，并从镜像
+  移出。目标是以正确职责边界自然减少镜像 diff；不得为了降低 diff 而搬走原始机器
+  状态、复制机器逻辑，或引入第二条恢复路径；
+- 审计 VM/Compat 是否重复实现了镜像已有逻辑；能回收至原始实现或已存在 Compat
+  适配层的重复代码必须在收口前处理，不能仅记录为后续债务；
+- 报告累计与各 S 的实际 numstat，并区分生产、测试、文档和固定 EXE；
+- 未能证明必要性的 MVDM 增量、或无法归属到 VM/Compat 单一所有者的实现，阻止 T63
+  收口。仅在该审计、验收矩阵及 owner 手测均完成后，才可关闭 T63。
+
 ### S6 receiver ledger
 
 This ledger freezes the S6 receiver universe before implementation.  It does
@@ -327,8 +347,8 @@ field map and validation before it can enter the private archive.
 | `mouse.c` InPort hardware | Payload (P3 implemented) | P3 encodes physical deltas/buttons, data/status/mode/address registers, edge baselines, the ID/diagnostic handshake and the finite startup-interrupt count in a fixed-width map. It restores fields directly without replaying port I/O or IRQ effects. |
 | `mouse_io.c` DOS driver | Payload (P5 implemented) | P5 encodes the fixed-width semantic field map for cursor, motion, callbacks, handler segment:offset values, cursor backing bytes, saved callback registers, EGA register values and installed-state. `mm_handle`, EGA derived addresses and host cursor callbacks rebuild; no pointer or historical `MOUSE_CONTEXT` byte image enters the archive. |
 | `ppi.c` speaker/PPI latches | Payload + rebuild (P2 implemented) | Preserve guest-programmed PPI gate/data state. PIT state is already S5 payload. P2 archives the port latch and both edge baselines in fixed width, restoring the host speaker on/off state without replaying a Timer gate transition. It does not preserve an audio task, event, phase buffer or native audio handle. |
-| EGA/CGA/VGA/V7 registers, planes, latches, fonts and palette | Payload (P6 memory/DAC implemented) | P6 encodes all four plane/font byte banks and the 256-entry programmable DAC as fixed-width data, then invalidates host rendering. Controller registers, latches, bank/chain/mode, cursor and split/scroll remain a separate fixed map; no raw controller struct or renderer state is copied. |
-| C-VID GDP slots and rule state | Payload only after fixed map | Encode audited scalar/offset/semantic-ID slots. Reject capture for a live unknown slot use. Never copy GDP allocation, generated rule entry, function vector or host address. |
+| EGA/CGA/VGA/V7 registers, planes, latches, fonts and palette | Payload (P6/P8 implemented) | P6 encodes all four plane/font byte banks and the 256-entry programmable DAC. P8 adds the fixed register/index/attribute flip-flop/DAC cursor map and the two live C-VID latches. Restore replays original handlers then invalidates host rendering; no raw controller structure or renderer state is copied. |
+| C-VID GDP slots and rule state | Rebuild except audited latches | P8 preserves only the two live scalar latches. GDP allocation, generated rule entry, function vector, pointer, scratch/screen route and dirty bookkeeping rebuild. Any future live slot that cannot be placed in a fixed semantic map blocks capture. |
 | `nt_graph`, `dib_surface`, graphics console, KVM frame resources | Rebuild | Exclude DIB, dirty regions, Window pixels, host cursor backing, UI mailboxes and frame generations. Restore invalidates/recreates host drawing state and emits one ordinary complete frame. |
 | `nt_sound`, `compat/audio` | Rebuild | Preserve only the guest PPI/PIT inputs above. Reopen/recreate host audio resources; no native worker/event/handle or host sound buffer is payload. |
 | `com.c`/`serial.c`, `printer*.c`/`parallel.c` | Reject when externally active | A configured/open host endpoint, buffered irreversible output, or its pending callback blocks capture. No file handle, host queue, output path or external-world state is serialized. Detached/inactive controller state is either later encoded with an audited callback ID or explicitly remains rejected. |
@@ -358,6 +378,16 @@ It must not replay guest port I/O, serialize a controller structure, or copy
 GDP slot allocation bytes.  A field that cannot be placed in one of those
 three classes blocks capture until its fixed semantic representation is
 identified; it is not silently reset or treated as a cache.
+
+### S6 P8: controller register replay
+
+P8 implements this fixed receiver in the existing private device archive.
+The preserved mirror hook converts the selected controller's semantic bytes
+to and from the fixed map and deliberately calls the original sequencer, V7,
+CRTC, graphics and attribute handlers on restore.  It uses the existing C-VID
+`getVideo*`/`setVideo*` accessors for the two latches; it does not dereference
+or copy the GDP carrier.  The hook then issues the normal complete refresh.
+The archive has no product command, file format, Common API or Lib change.
 
 每一实现 S 都是可构建交付：双宽度编译/全套与针对性测试、固定 EXE、完整 P 提交推送，
 然后切换审计角色核对实际 commit 后收口。S8 前不暴露残缺 save/load，EXE 仍可验证

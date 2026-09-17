@@ -361,6 +361,8 @@ ERROR RECOVERY	  :	none.
 #include	"config.h"
 
 #include	"host_gfx.h"
+#include "compat/devices/snapshot.h"
+#include <string.h>
 
 /* [3.1.2 DECLARATIONS]                                                 */
 
@@ -3325,5 +3327,200 @@ VOID vga_set_line_compare  IFN1(LONG,lcomp_val)
     }
 
 #endif /* HUNTER */
+
+/*
+ * DIVERGENCE(MVDM-VIDEO-SNAPSHOT-001): standalone snapshot port ABI.  This
+ * deliberately maps guest register bytes
+ * and the two live C-VID latches; it never copies the legacy bitfield
+ * carriers, GDP allocation, generated vectors or host pointers.  Restore
+ * recreates the derived C-VID bindings through the original port handlers.
+ */
+LOCAL byte snapshot_v7_selectors[SOFTPC_DEVICE_VIDEO_V7_REGISTER_COUNT] = {
+    0x83, 0x94, 0x9c, 0x9d, 0x9e, 0x9f, 0xa4, 0xa5, 0xc1, 0xeb,
+    0xec, 0xed, 0xee, 0xef, 0xf1, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7,
+    0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
+};
+
+LOCAL byte
+snapshot_v7_value(selector)
+byte selector;
+{
+    switch (selector) {
+    case 0x83: return attribute_controller.address.as.abyte;
+    case 0x94: return extensions_controller.pointer_pattern;
+    case 0x9c: return extensions_controller.ptr_horiz_posn_hi.as.abyte;
+    case 0x9d: return extensions_controller.ptr_horiz_posn_lo;
+    case 0x9e: return extensions_controller.ptr_vert_posn_hi.as.abyte;
+    case 0x9f: return extensions_controller.ptr_vert_posn_lo;
+    case 0xa4: return extensions_controller.clock_select.as.abyte;
+    case 0xa5: return extensions_controller.cursor_attrs.as.abyte;
+    case 0xc1: return extensions_controller.dac_control.as.abyte;
+    case 0xeb: return extensions_controller.emulation_control.as.abyte;
+    case 0xec: return extensions_controller.foreground_latch_0;
+    case 0xed: return extensions_controller.foreground_latch_1;
+    case 0xee: return extensions_controller.foreground_latch_2;
+    case 0xef: return extensions_controller.foreground_latch_3;
+    case 0xf1: return extensions_controller.fast_latch_load_state.as.abyte;
+    case 0xf3: return extensions_controller.masked_write_control.as.abyte;
+    case 0xf4: return extensions_controller.masked_write_mask;
+    case 0xf5: return extensions_controller.fg_bg_pattern;
+    case 0xf6: return extensions_controller.ram_bank_select.as.abyte;
+    case 0xf7: return extensions_controller.switch_readback;
+    case 0xf8: return extensions_controller.clock_control.as.abyte;
+    case 0xf9: return extensions_controller.page_select.as.abyte;
+    case 0xfa: return extensions_controller.foreground_color.as.abyte;
+    case 0xfb: return extensions_controller.background_color.as.abyte;
+    case 0xfc: return extensions_controller.compatibility_control.as.abyte;
+    case 0xfd: return extensions_controller.timing_select.as.abyte;
+    case 0xfe: return extensions_controller.fg_bg_control.as.abyte;
+    case 0xff: return extensions_controller.interface_control.as.abyte;
+    }
+    return 0;
+}
+
+LOCAL void
+snapshot_write_graphics(index, value)
+byte index, value;
+{
+    vga_gc_outb_index(EGA_GC_INDEX, index);
+    switch (index) {
+    case 0: vga_gc_set_reset(EGA_GC_DATA, value); break;
+    case 1: vga_gc_enable_set(EGA_GC_DATA, value); break;
+    case 2: vga_gc_compare(EGA_GC_DATA, value); break;
+    case 3: vga_gc_rotate(EGA_GC_DATA, value); break;
+    case 4: vga_gc_read_map(EGA_GC_DATA, value); break;
+    case 5: vga_gc_mode(EGA_GC_DATA, value); break;
+    case 6: vga_gc_misc(EGA_GC_DATA, value); break;
+    case 7: vga_gc_dont_care(EGA_GC_DATA, value); break;
+    case 8: vga_gc_mask_ff(EGA_GC_DATA, value); break;
+    }
+}
+
+GLOBAL int
+softpc_device_snapshot_capture_video_controller(state)
+softpc_device_video_controller_state *state;
+{
+    half_word value;
+    int index;
+
+    if (state == NULL || EGA_CPU.globals == NULL) return FALSE;
+    memset(state, 0, sizeof(*state));
+    state->sequencer[0] = sequencer.reset.as.abyte;
+    state->sequencer[1] = sequencer.clocking_mode.as.abyte;
+    state->sequencer[2] = sequencer.map_mask.as.abyte;
+    state->sequencer[3] = sequencer.character_map_select.as.abyte;
+    state->sequencer[4] = sequencer.memory_mode.as.abyte;
+    state->sequencer_extension_control = sequencer.extensions_control.as.abyte;
+    state->sequencer_index = sequencer.address.as.abyte;
+    state->crtc_index = crt_controller.address.as.abyte;
+    state->graphics_index = graphics_controller.address.as.abyte;
+    state->attribute_index = attribute_controller.address.as.abyte;
+    for (index = 0; index < SOFTPC_DEVICE_VIDEO_CRTC_REGISTER_COUNT; ++index) {
+        crt_controller.address.as.abyte = (byte)index;
+        vga_crtc_inb(EGA_CRTC_DATA, &value);
+        state->crtc[index] = (uint8_t)value;
+    }
+    crt_controller.address.as.abyte = state->crtc_index;
+    state->graphics[0] = graphics_controller.set_or_reset.as.abyte;
+    state->graphics[1] = graphics_controller.enable_set_or_reset.as.abyte;
+    state->graphics[2] = graphics_controller.color_compare.as.abyte;
+    state->graphics[3] = graphics_controller.data_rotate.as.abyte;
+    state->graphics[4] = graphics_controller.read_map_select.as.abyte;
+    state->graphics[5] = graphics_controller.mode.as.abyte;
+    state->graphics[6] = graphics_controller.miscellaneous.as.abyte;
+    state->graphics[7] = graphics_controller.color_dont_care.as.abyte;
+    state->graphics[8] = graphics_controller.bit_mask_register;
+    for (index = 0; index < 16; ++index)
+        state->attribute[index] = attribute_controller.palette[index].as.abyte;
+    state->attribute[16] = attribute_controller.mode_control.as.abyte;
+    state->attribute[17] = attribute_controller.overscan_color.as.abyte;
+    state->attribute[18] = attribute_controller.color_plane_enable.as.abyte;
+    state->attribute[19] = attribute_controller.horizontal_pel_panning.as.abyte;
+    state->attribute[20] = attribute_controller.pixel_padding.as.abyte;
+    for (index = 0; index < SOFTPC_DEVICE_VIDEO_V7_REGISTER_COUNT; ++index)
+        state->v7[index] = snapshot_v7_value(snapshot_v7_selectors[index]);
+    state->miscellaneous_output = miscellaneous_output_register.as.abyte;
+    state->feature_control = feature_control_register.as.abyte;
+    state->dac_mask = DAC_data_mask;
+    state->dac_read_address = DAC_rd_addr;
+    state->dac_write_address = DAC_wr_addr;
+    state->dac_component = (uint8_t)DAC_rgb_state;
+    state->dac_state = DAC_state;
+    state->cvid_latches = (uint32_t)getVideolatches();
+    state->cvid_v7_foreground_latches = (uint32_t)getVideov7_fg_latches();
+    return TRUE;
+}
+
+GLOBAL int
+softpc_device_snapshot_restore_video_controller(state)
+const softpc_device_video_controller_state *state;
+{
+    half_word unused;
+    int index;
+
+    if (state == NULL || state->dac_component > DAC_BLUE) return FALSE;
+    memset(&sequencer, 0, sizeof(sequencer));
+    memset(&crt_controller, 0, sizeof(crt_controller));
+    memset(&graphics_controller, 0, sizeof(graphics_controller));
+    memset(&attribute_controller, 0, sizeof(attribute_controller));
+    memset(&extensions_controller, 0, sizeof(extensions_controller));
+    crtc_0_7_protect = FALSE;
+    crtc_0_8_protect = FALSE;
+    crtc_9_b_protect = FALSE;
+    crtc_c_protect = FALSE;
+    DAC_rgb_state = DAC_RED;
+    DAC_rd_addr = DAC_wr_addr = DAC_state = 0;
+    DAC_data_mask = 0x3f;
+    DAC_data_bits = 6;
+    vga_init();
+
+    ega_seq_reset(EGA_SEQ_DATA, state->sequencer[0]);
+    vga_seq_clock(EGA_SEQ_DATA, state->sequencer[1]);
+    vga_seq_map_mask(EGA_SEQ_DATA, state->sequencer[2]);
+    vga_seq_char_map(EGA_SEQ_DATA, state->sequencer[3]);
+    vga_seq_mem_mode(EGA_SEQ_DATA, state->sequencer[4]);
+    sequencer.address.as.abyte = 6;
+    vga_seq_extn_control(EGA_SEQ_DATA, state->sequencer_extension_control);
+
+    for (index = 0; index < SOFTPC_DEVICE_VIDEO_V7_REGISTER_COUNT; ++index) {
+        sequencer.address.as.abyte = snapshot_v7_selectors[index];
+        vga_extn_outb(EGA_SEQ_DATA, state->v7[index]);
+    }
+
+    vga_crtc_outb(EGA_CRTC_INDEX, 0x11);
+    vga_crtc_outb(EGA_CRTC_DATA, state->crtc[0x11] & 0x7f);
+    for (index = 0; index < SOFTPC_DEVICE_VIDEO_CRTC_REGISTER_COUNT; ++index) {
+        if (index == 0x11) continue;
+        vga_crtc_outb(EGA_CRTC_INDEX, (half_word)index);
+        vga_crtc_outb(EGA_CRTC_DATA, state->crtc[index]);
+    }
+    vga_crtc_outb(EGA_CRTC_INDEX, 0x11);
+    vga_crtc_outb(EGA_CRTC_DATA, state->crtc[0x11]);
+    for (index = 0; index < SOFTPC_DEVICE_VIDEO_GRAPHICS_REGISTER_COUNT; ++index)
+        snapshot_write_graphics((byte)index, state->graphics[index]);
+
+    vga_ipstat1_inb(EGA_IPSTAT1_REG, &unused);
+    for (index = 0; index < SOFTPC_DEVICE_VIDEO_ATTRIBUTE_REGISTER_COUNT; ++index) {
+        vga_ac_outb(EGA_AC_INDEX_DATA, (half_word)(index |
+            (state->attribute_index & 0x20)));
+        vga_ac_outb(EGA_AC_INDEX_DATA, state->attribute[index]);
+    }
+    vga_misc_outb(EGA_MISC_REG, state->miscellaneous_output);
+    vga_feat_outb(EGA_FEAT_REG, state->feature_control);
+    DAC_data_mask = state->dac_mask;
+    DAC_rd_addr = state->dac_read_address;
+    DAC_wr_addr = state->dac_write_address;
+    DAC_rgb_state = (RGB)state->dac_component;
+    DAC_state = state->dac_state;
+    setVideolatches((IU32)state->cvid_latches);
+    setVideov7_fg_latches((IU32)state->cvid_v7_foreground_latches);
+    vga_seq_outb_index(EGA_SEQ_INDEX, state->sequencer_index);
+    vga_gc_outb_index(EGA_GC_INDEX, state->graphics_index);
+    crt_controller.address.as.abyte = state->crtc_index;
+    attribute_controller.address.as.abyte = state->attribute_index;
+    screen_refresh_required();
+    return TRUE;
+}
+
 #endif /* VGG */
 #endif /* REAL_VGA */

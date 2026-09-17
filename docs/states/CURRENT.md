@@ -73,13 +73,14 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   inactive/installed distinction, cursor backing, handler segment:offset data
   and saved callback registers; instance allocation, EGA addresses and host
   cursor resources rebuild on restore. S6 P6 adds only the fixed-size four-
-  plane VRAM/font bytes and 256-entry DAC, then invalidates host rendering;
-  controller registers, C-VID state and derived bindings remain pending and
-  are not treated as a raw structure image. S6 P7 freezes the next receiver
-  boundary: register/index/attribute-flip-flop/DAC-cursor bytes plus the two
-  live C-VID latch values are payload; GDP pointers, generated vectors,
-  scratch/screen routes, dirty state and host resources rebuild. Any live GDP
-  slot outside that map blocks capture rather than being copied or reset.
+  plane VRAM/font bytes and 256-entry DAC, then invalidates host rendering.
+  P7 freezes the remaining controller boundary; P8 implements it as a
+  fixed-width register/index/attribute-flip-flop/DAC-cursor map plus the two
+  live C-VID latch values. Restore replays original controller handlers and
+  rebuilds GDP-derived bindings, dirty state and host resources; it does not
+  copy bitfield carriers, GDP allocations, pointers or vectors. Any live GDP
+  slot outside that map remains a future capture blocker, never implicit
+  payload or reset.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files

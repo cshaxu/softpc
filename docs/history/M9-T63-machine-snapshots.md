@@ -1013,3 +1013,27 @@ all GDP slots are serializable.  It instead freezes the required restore
 ordering and retains the task stop condition: any active slot not provably
 payload or rebuild remains a capture rejection, not an implicit reset.  No
 production/test/original-mirror/Lib/Common files changed.
+
+## S6 P8: video-controller register replay
+
+P8 turns the P7 map into a private archive receiver.  The fixed-width state
+contains sequencer, CRTC, graphics, attribute and selected V7 register bytes;
+their selected indexes; attribute flip-flop/source byte; DAC cursor phase; and
+the C-VID ordinary/V7 foreground latches.  It excludes every legacy bitfield
+carrier, GDP allocation, generated C-VID vector, pointer, host DIB and dirty
+record.
+
+The narrow `vga_prts.c` port-ABI hook starts from the original controller
+baseline, replays the original register handlers in dependency order, restores
+the two latch scalars through existing `getVideo*`/`setVideo*` accessors and
+requests one normal refresh.  No guest port I/O is replayed and no second video
+state owner is introduced.  `checkpoint_smoke` alters real VGA ports, captures,
+destructively changes the controller, restores, recaptures the complete fixed
+map and compares it byte-for-byte; it also proves an invalid DAC phase rejects.
+
+Actual code changes are production `+235/-0` across the private archive/state
+contract and the preserved-mirror hook, and focused test `+33/-0`.  Full x64
+and x86 CTest each pass `103/103`, followed by both package-smoke variants at
+each width.  Lib and Common remain unchanged.  The refreshed packages are
+`softpc32.exe` `3D2AF884E3D623280F50806192AE72216A86ADC53102614B24665CA74300A803`
+and `softpc64.exe` `460919575D43A2C3915B0DECB18D62E2840FA4D935FD02C5863A5B6E5E96FC6F`.
