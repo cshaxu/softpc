@@ -63,6 +63,9 @@ images are intentionally rejected and must be re-saved.
 P5 completes that synchronous restored-graphics rebuild by applying the
 restored indexed DAC before the original full repaint; a newly rebuilt DIB
 therefore cannot publish valid indices through its zeroed default palette.
+P6 clears the old DIB's deferred host-presentation state as part of that same
+rebuild. A pre-save graphics tick can no longer re-run a stale mode change or
+flush after restore and overwrite the synchronously rebuilt surface.
 
 ## Current Technical Baseline
 

@@ -581,13 +581,19 @@ GLOBAL VOID closeGraphicsBuffer IFN0()
 GLOBAL void resetWindowParams()
 {
 	/*
-	 * Reset saved video params
+	 * Reset host-only presentation caches.  They describe deferred painting
+	 * work for the old DIB and must never survive an archive restore: the
+	 * restored controller is rebuilt and painted synchronously by its caller.
 	 */
 	current_height = current_width = 0;
 	current_char_height = 0;
 	current_mode_type = TEXT;
 	current_bits_per_pixel = 0;
 	current_scale = 0;
+	flush_count = 0;
+	update_vlt = FALSE;
+	mode_change_now = ega_tick_delay = 0;
+	CursorResizeNeeded = FALSE;
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
