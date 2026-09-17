@@ -2130,6 +2130,12 @@ LOCAL void	ega_seq_outb_index IFN2(io_addr, port, half_word, value)
 	io_redefine_outb(EGA_SEQ_ADAP_DATA,ega_seq_regs[value & 7]);
 }
 
+/* Snapshot port ABI: this receiver owns reset even when VGA ports are used. */
+GLOBAL half_word ega_snapshot_seq_reset IFN0()
+{
+	return sequencer.reset.as.abyte;
+}
+
 void	ega_seq_reset IFN2(io_addr, port, half_word, value)
 {
 #ifdef PROD

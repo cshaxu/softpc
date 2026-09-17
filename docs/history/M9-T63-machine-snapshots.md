@@ -1123,3 +1123,34 @@ decodes it and compares complete RAM bytes plus the resume entry. This P stays
 below the Common driver contract and contains no App file command, media
 section or user-visible save/load operation. Focused checkpoint proof passes
 at x64 and x86.
+
+## S9 P7: actual VGA sequencer reset owner
+
+Owner reported that correct restored geometry still produced a black Window.
+The supplied image reproduced a 640x480 all-zero output with 294736 nonzero
+VRAM bytes and 255 nonzero palette entries. The original painter returned
+early because `display_disabled` was 3 (both sequencer reset bits asserted).
+VGA delegates register-zero writes to `ega_seq_reset`, whose private EGA
+sequencer is separate from the VGA structure. The archive incorrectly read
+VGA's unused zero field. A diagnostic correction to the saved reset value
+produced 37343 nonzero pixels from the same image; that forced value was
+removed, not shipped.
+
+Capture now obtains the real register through one read-only mirror hook.
+Restore still calls the original reset receiver. Revision 4 rejects prior
+images because their true reset value was not captured; no guessed repair or
+legacy reader is retained. The mirror change is six hook lines, one import
+and one corrected read. No Lib/Common change is required.
+
+The similar-issue sweep checked VGA's imported EGA sequencer and graphics
+handlers: selected VGA initialization replaces sequencer entries 1-4 and
+graphics entries 0-8 with VGA receivers; reset alone retains the EGA owner.
+Tests round-trip all four reset combinations, require display enabled after
+ordinary restored VGA state, and boot a tiny real mode-13h colored framebuffer
+before save. Fresh-process restore must retain nonzero pixels. This closes the
+previous test gap where only a valid frame and PAUSED state were asserted.
+The diagnostic ran with overlay media and did not alter owner media or image.
+Final verification: x64 and x86 each pass 105/105 CTests; bidirectional
+cross-width graphics save/load also passes. Production (three C paths) is
++9/-2, tests (two C paths) +60/-2, excluding documentation and packages.
+Owner Win3.1 acceptance remains pending; S9 is not closed.

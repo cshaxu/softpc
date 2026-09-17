@@ -115,10 +115,16 @@ static lib_bool wait_for_state(common_machine *machine,
 static lib_bool snapshot_write_media(const char *path)
 {
     lib_u8 sector[512] = { 0 };
+    static const lib_u8 program[] = {
+        0xb8, 0x13, 0x00, 0xcd, 0x10, /* BIOS mode 13h */
+        0xb8, 0x00, 0xa0, 0x8e, 0xc0, /* ES = video memory */
+        0x31, 0xff, 0xb9, 0x00, 0xfa, /* 64000 pixels */
+        0xb0, 0x0c, 0xfc, 0xf3, 0xaa, 0xeb, 0xfe
+    };
     FILE *file;
 
     if (path == NULL) return LIB_FALSE;
-    sector[0] = 0xebu; sector[1] = 0xfeu;
+    memcpy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     if (file == NULL) return LIB_FALSE;
@@ -134,6 +140,31 @@ static void snapshot_options(softpc_machine_options *options, const char *path)
     *options = (softpc_machine_options) { 0 };
     options->floppy_path = path;
     options->media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+}
+
+static lib_bool snapshot_has_pixels(common_machine *machine)
+{
+    kvm_frame *frame = calloc(1, sizeof(*frame));
+    lib_bool found = LIB_FALSE;
+    if (frame == NULL) return LIB_FALSE;
+    if (common_machine_copy_published_frame(machine, frame,
+            common_machine_run_generation(machine)) && frame->graphics) {
+        lib_size i;
+        for (i = 0; i < frame->graphics_height * frame->graphics_stride; ++i)
+            if (frame->graphics_pixels[i] != 0) { found = LIB_TRUE; break; }
+    }
+    free(frame);
+    return found;
+}
+
+static lib_bool snapshot_wait_for_pixels(common_machine *machine)
+{
+    DWORD deadline = GetTickCount() + 10000u;
+    do {
+        if (snapshot_has_pixels(machine)) return LIB_TRUE;
+        Sleep(10u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    return LIB_FALSE;
 }
 
 static int snapshot_run_transaction(void)
@@ -154,17 +185,19 @@ static int snapshot_run_transaction(void)
 
     assert(common_machine_start(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
+    assert(snapshot_wait_for_pixels(machine));
     assert(common_machine_read_state(machine,
         &(common_machine_state_writer) { snapshot_write, &stream }) ==
         LIB_STATUS_OK);
     assert(stream.count != 0u);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
+    assert(snapshot_has_pixels(machine));
     assert(common_machine_stop(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_STOPPED));
 
     /* The container carries no host or machine word-width field. */
     assert(stream.count >= 16u);
-    assert(stream.bytes[4] == 3u && stream.bytes[5] == 0u &&
+    assert(stream.bytes[4] == 4u && stream.bytes[5] == 0u &&
         stream.bytes[6] == 0u && stream.bytes[7] == 0u);
     assert(stream.bytes[8] == 2u && stream.bytes[9] == 0u &&
         stream.bytes[10] == 0u && stream.bytes[11] == 0u);
@@ -183,7 +216,16 @@ static int snapshot_run_transaction(void)
         &(common_machine_state_reader) { snapshot_read, &stream }) !=
         LIB_STATUS_OK);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
+    snapshot_set_u32_le(stream.bytes + 4u, 4u);
+
+    /* v3 captured VGA's unused reset field and cannot restore its true value. */
     snapshot_set_u32_le(stream.bytes + 4u, 3u);
+    stream.offset = 0u;
+    assert(common_machine_write_state(machine,
+        &(common_machine_state_reader) { snapshot_read, &stream }) !=
+        LIB_STATUS_OK);
+    assert(common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
+    snapshot_set_u32_le(stream.bytes + 4u, 4u);
 
     /* A declared section boundary must be consumed exactly, never ignored. */
     {
@@ -249,6 +291,7 @@ static int snapshot_run_save(const char *media_path, const char *snapshot_path)
     assert(file != NULL);
     assert(common_machine_start(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
+    assert(snapshot_wait_for_pixels(machine));
     assert(common_machine_read_state(machine,
         &(common_machine_state_writer) { snapshot_file_write, file }) ==
         LIB_STATUS_OK);
@@ -299,6 +342,7 @@ static int snapshot_run_load(const char *media_path, const char *snapshot_path,
             common_machine_run_generation(machine)));
         assert(frame.valid != 0u);
     }
+    assert(snapshot_has_pixels(machine));
     assert(common_machine_resume(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
     assert(common_machine_stop(machine));

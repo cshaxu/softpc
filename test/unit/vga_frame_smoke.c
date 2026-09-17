@@ -468,10 +468,12 @@ static void verify_driver_geometry(softpc_machine *machine)
 static void verify_snapshot_rebuilds_graphics_surface(softpc_machine *machine)
 {
     softpc_device_video_controller_state saved;
+    softpc_device_video_controller_state captured;
     const void *bits;
     const void *info;
     uint32_t width;
     uint32_t height;
+    unsigned reset;
 
     /* The controller archive carries the V7 mode identity alongside raw
        registers.  Full presentation rebuilding additionally depends on the
@@ -485,6 +487,18 @@ static void verify_snapshot_rebuilds_graphics_surface(softpc_machine *machine)
     assert(width == 1024u && height == 768u);
     assert(softpc_device_snapshot_restore_video_controller(&saved));
     assert(Currently_emulated_video_mode == 0x60u);
+    assert(get_display_disabled() == 0);
+    /* VGA routes reset writes to the EGA receiver, whose register storage is
+       distinct from VGA's unused reset field. Preserve all four reset states. */
+    for (reset = 0; reset < 4; ++reset) {
+        extern void ega_seq_reset(io_addr port, half_word value);
+        ega_seq_reset(0x3c5, (half_word)reset);
+        assert(softpc_device_snapshot_capture_video_controller(&captured));
+        assert(captured.sequencer[0] == reset);
+        ega_seq_reset(0x3c5, (half_word)(reset ^ 3));
+        assert(softpc_device_snapshot_restore_video_controller(&captured));
+        assert((get_display_disabled() & 3) == ((~reset) & 3));
+    }
 }
 
 int main(void)

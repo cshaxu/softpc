@@ -66,6 +66,12 @@ therefore cannot publish valid indices through its zeroed default palette.
 P6 clears the old DIB's deferred host-presentation state as part of that same
 rebuild. A pre-save graphics tick can no longer re-run a stale mode change or
 flush after restore and overwrite the synchronously rebuilt surface.
+P7 identifies the reproduced black-frame cause: VGA reset writes are owned by
+EGA's receiver, while capture read VGA's unused reset member as zero. Capture
+now reads the actual receiver register. Image revision 4 rejects earlier
+images whose reset value was lost. Tests preserve all four reset states and
+save/load real VGA pixels, including a fresh process. S9 remains open for
+owner graphics acceptance; earlier P5/P6 passing smokes did not prove pixels.
 
 ## Current Technical Baseline
 

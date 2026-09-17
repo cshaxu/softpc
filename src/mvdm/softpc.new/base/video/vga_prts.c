@@ -455,6 +455,7 @@ VOID vga_seq_map_mask IPT2(io_addr,port,half_word,value);
 
 IMPORT VOID (*ega_seq_regs[]) IPT2(io_addr, port, half_word, value);
 IMPORT VOID ega_seq_reset IPT2(io_addr,port,half_word,value);
+IMPORT half_word ega_snapshot_seq_reset IPT0();
 IMPORT VOID ega_seq_clock IPT2(io_addr,port,half_word,value);
 IMPORT VOID ega_seq_map_mask IPT2(io_addr,port,half_word,value);
 IMPORT VOID ega_seq_char_map IPT2(io_addr,port,half_word,value);
@@ -3407,7 +3408,7 @@ softpc_device_video_controller_state *state;
 
     if (state == NULL || EGA_CPU.globals == NULL) return FALSE;
     memset(state, 0, sizeof(*state));
-    state->sequencer[0] = sequencer.reset.as.abyte;
+    state->sequencer[0] = ega_snapshot_seq_reset();
     state->sequencer[1] = sequencer.clocking_mode.as.abyte;
     state->sequencer[2] = sequencer.map_mask.as.abyte;
     state->sequencer[3] = sequencer.character_map_select.as.abyte;
