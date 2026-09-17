@@ -161,6 +161,11 @@ int softpc_device_snapshot_rebuild_video_presentation(void)
        the original painter eligible for the one full repaint below. */
     set_mode_change_required(FALSE);
     host_mark_screen_refresh();
+    /* The normal graphics tick applies the restored indexed DAC before it
+       paints.  Snapshot rebuilding paints synchronously instead, so perform
+       that one required palette step here rather than publishing pixels
+       through the still-zero default palette. */
+    set_the_vlt();
     host_flush_screen();
     if (softpc_platform_presentation_is_graphics())
         softpc_standalone_dib_invalidate_all();

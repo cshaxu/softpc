@@ -60,6 +60,9 @@ the original host geometry cache before reselecting its painter; standalone
 graphics resize no longer mistakes the retired NTVDM fullscreen state for
 permission to retain a stale DIB. The image revision is now 3, so pre-P4
 images are intentionally rejected and must be re-saved.
+P5 completes that synchronous restored-graphics rebuild by applying the
+restored indexed DAC before the original full repaint; a newly rebuilt DIB
+therefore cannot publish valid indices through its zeroed default palette.
 
 ## Current Technical Baseline
 
