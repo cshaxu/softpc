@@ -30,9 +30,11 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   implemented. [Implementation record](../history/M9-T63-machine-snapshots.md).
   P3/P4 add executor-bound CPU observation and copied FETCH/HLT reentry. Real
   nested-BOP, HLT counter/trap and STI/PIC shadow tests pass. The product does
-  not bind snapshot operations yet. Both fixed packages rebuilt; full x64/x86
-  suites each pass 102/102. S2 stays active for VM deadline, full selected-state
-  inventory and the combined capture barrier; save/load are not available.
+  not bind snapshot operations yet. P5 adds the executor-owned one-second VM
+  deadline and combines CPU observation with the timer capture barrier; real
+  nested return/HLT timeout and deterministic failure tests pass. Both fixed
+  packages rebuilt; full x64/x86 suites each pass 103/103. S2 stays active for
+  full selected-state inventory; save/load are not available.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files

@@ -205,3 +205,70 @@ the complete S2 all-file mutable-state ledger or its closure claim.
 - x64 SHA256: `A7F23DAA4EFCA0658F4E1EEE274A580FF9DDA76C5FB4B5E71B37D1CFE32AFAE8`.
 - S2 remains active for deadline/combined barrier and the full selected-state
   inventory. There is still no public save/load or complete state serializer.
+
+## P5 pre-audit: VM capture deadline and producer barrier
+
+Baseline a19b890. New vm/snapshot.c/.h owns only the pending capture operation,
+its one-second monotonic deadline, copied CPU entry and joined clock barrier.
+Estimate 80-110 production lines, 100-140 test lines plus CMake wiring. Lib and
+Common are unchanged; no additional MVDM hook is required. The later state
+encoder and driver read slot will consume this same VM implementation, not a
+second capture state machine or additional Common preparation API.
+
+Checkpoints come from the original CPU observation, not a polling thread. While
+waiting, the original 50 ms producer continues to wake a halted CPU; only a
+successful depth-one capture stops it. Timeout/failure does not force nested
+unwind or export data. The operation's caller must use ordinary pause for a
+failed request; P5 proves the boundary result, S7 wires Common's pause fact.
+Finalization restarts only a successfully joined producer. Failure remains
+explicit; it cannot be treated as permission to run without a clock.
+
+A deterministic standalone test includes the actual VM implementation with
+clock/timer test functions, as existing failure probes do; it has no product
+or media dependency. Checkpoint_smoke also uses this operation against the real
+timer, requesting from inside a nested BIOS callback and completing after its
+natural return. Existing 15-second owned-fixture limits apply.
+
+## P5 implementation and proof scope
+
+VM snapshot owns IDLE/WAITING/READY/FAILED for this one operation, not machine
+state. begin records counter/frequency only on success; a second begin fails.
+checkpoint completes once: elapsed >= one frequency unit is timeout even at
+depth one; nested entries keep waiting; only a timely outer entry joins the
+clock and copies the CPU phase. No stack return or lifecycle event occurs here.
+finish enables a joined clock before clearing state; failed activation retains
+ownership and returns IO_ERROR. There is no automatic retry loop.
+
+The fake test proves 999/1000 ms, nested HLT timeout, clock query/frequency
+failure, producer stop/start failure, one completion and idempotent finish.
+Time spent after READY is not the boundary deadline. The real checkpoint test
+requests while inside a nested BOP, completes only after natural return, and
+joins/restarts the actual producer. Its second program never returns from
+nested HLT: the real monotonic deadline reports failure and the test itself
+issues stop for cleanup. No successful snapshot is claimed on that forced exit.
+An initial test-only iteration cap fired before one second on the original
+HLT busy path; it was removed in favor of the agreed time-only criterion.
+The failed test's owned image was removed and the rebuilt test then passed.
+
+The P2 HLT wait concern is resolved without another wait API: while WAITING the
+existing 50 ms producer remains active; it is joined only after a depth-one
+boundary succeeds. The real nested-HLT test covers this deadline delivery.
+OS scheduling and synchronous external I/O still have the previously stated
+limits; this does not claim a hard real-time preemption guarantee.
+
+Actual production +81/-0 in vm/snapshot.c/.h. Tests +142/-1 = +141 across the
+extended checkpoint test and new snapshot_boundary_smoke; CMake +7/-0.
+MVDM, Lib and Common unchanged in this P. Driver/Common operation wiring and
+ordinary-paused completion on timeout remain S7 work, not an extra public API.
+The combined CPU/timer boundary is now exercised, but the full selected-state
+ledger and serialized device state remain incomplete; S2 cannot yet close.
+
+P5 verification: both test/package builds completed; full x64 and x86 suites
+each passed 103/103. The previous failed checkpoint entry in LastTestsFailed
+was stale: the completed x64 LastTest contains 103 passes and zero failures.
+Both owned checkpoint media files are absent after the successful runs.
+No changes to Lib/Common/shared tests, user INI or original mirror in P5.
+Package SHA-256:
+
+- x86: `9DE0913E287AB619C68F15FF4B0AB8928628F32C1F7BBA9B33DB282852B88999`
+- x64: `4026853D69925AB4E856C364E3ABDC45C33713F4D019C856E504F86BD31C7EC9`

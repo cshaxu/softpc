@@ -1,6 +1,7 @@
 #include "vm/machine.h"
 #include "compat/ccpu/abi.h"
 #include "compat/ccpu/lifecycle.h"
+#include "vm/snapshot.h"
 #include "../lib/cleanup.h"
 
 #include <assert.h>
@@ -22,6 +23,9 @@ typedef struct checkpoint_probe {
     int nested_returned;
     softpc_ccpu_entry entry;
     unsigned long counter;
+    softpc_snapshot snapshot;
+    unsigned captures;
+    unsigned timeouts;
 } checkpoint_probe;
 
 static checkpoint_probe probe;
@@ -31,6 +35,7 @@ static void nested_bios(void)
     /* Deliberately keep return state on a real C stack, exactly like the
        original keyboard/video BIOS callbacks. BOP FE must return here. */
     unsigned long saved_ip = c_getEIP();
+    assert(softpc_snapshot_begin(&probe.snapshot) == LIB_STATUS_OK);
     c_setEIP(0x600u);
     c_cpu_simulate();
     assert(c_getEIP() == 0x604u);
@@ -46,10 +51,17 @@ static void observe(void *context, unsigned long depth,
     assert(state == &probe);
     assert(++state->calls < 100u);
     assert(depth == 1u || depth == 2u);
+    if (softpc_snapshot_checkpoint(&state->snapshot, depth, entry)) {
+        assert(depth == 1u && state->nested_returned);
+        assert(state->snapshot.phase == SOFTPC_SNAPSHOT_READY);
+        ++state->captures;
+        assert(softpc_snapshot_finish(&state->snapshot) == LIB_STATUS_OK);
+    }
     if (depth == 2u) {
         assert(!state->nested_returned && !entry->halted);
         assert(ip >= 0x600u && ip < 0x604u);
         ++state->nested;
+        assert(state->snapshot.phase == SOFTPC_SNAPSHOT_WAITING);
         return; /* An inner CPU entry is not an outer capture boundary. */
     }
     if (entry->halted) {
@@ -161,6 +173,45 @@ static void verify_reentry(void)
     softpc_ccpu_lifecycle_observe(NULL, NULL);
 }
 
+static void observe_timeout(void *context, unsigned long depth,
+    const softpc_ccpu_entry *entry)
+{
+    checkpoint_probe *state = context;
+    ++state->calls; /* No instruction/iteration budget: only the host deadline. */
+    if (!softpc_snapshot_checkpoint(&state->snapshot, depth, entry)) return;
+    assert(depth == 2u && entry->halted && !state->nested_returned);
+    assert(state->snapshot.phase == SOFTPC_SNAPSHOT_FAILED);
+    assert(state->snapshot.status == LIB_STATUS_LIMIT_EXCEEDED);
+    ++state->timeouts;
+    /* The failed capture does not unwind. The test explicitly stops the CPU
+       for cleanup; no saved continuation is claimed for this inner stack. */
+    softpc_machine_request_stop(state->machine);
+}
+
+static void verify_timeout(void)
+{
+    const unsigned char outer[] = { 0xc4, 0xc4, 0xf0, 0xf4 };
+    const unsigned char inner[] = { 0xfa, 0xf4 };
+    void (*prior_bop)(void);
+    assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(probe.machine, 0x500u, outer,
+        sizeof(outer)) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(probe.machine, 0x600u, inner,
+        sizeof(inner)) == SOFTPC_MACHINE_OK);
+    assert(c_setCS(0u) == 0);
+    c_setEIP(0x500u);
+    probe.calls = probe.timeouts = 0u;
+    probe.nested_returned = 0;
+    prior_bop = BIOS[0xf0];
+    BIOS[0xf0] = nested_bios;
+    softpc_ccpu_lifecycle_observe(observe_timeout, &probe);
+    assert(softpc_machine_run(probe.machine, UINT64_MAX) == SOFTPC_MACHINE_OK);
+    softpc_ccpu_lifecycle_observe(NULL, NULL);
+    BIOS[0xf0] = prior_bop;
+    assert(probe.timeouts == 1u && !probe.nested_returned);
+    assert(softpc_snapshot_finish(&probe.snapshot) == LIB_STATUS_OK);
+}
+
 int main(void)
 {
     const char *path = "softpc-checkpoint-smoke.img";
@@ -191,9 +242,10 @@ int main(void)
     assert(softpc_machine_run(probe.machine, UINT64_MAX) == SOFTPC_MACHINE_OK);
     softpc_ccpu_lifecycle_observe(NULL, NULL);
     BIOS[0xf0] = prior_bop;
-    assert(probe.halted == 1u && probe.nested_returned);
+    assert(probe.halted == 1u && probe.nested_returned && probe.captures == 1u);
     assert(c_getEAX() == 0x1234u && c_getEIP() == 0x505u);
     verify_reentry();
+    verify_timeout();
     softpc_machine_destroy(probe.machine);
     assert(softpc_test_remove_image(path));
     return 0;

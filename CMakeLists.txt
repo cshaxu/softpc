@@ -65,6 +65,7 @@ add_library(softpc-vm OBJECT
     src/vm/input.c
     src/vm/debug.c
     src/vm/debug_memory.c
+    src/vm/snapshot.c
     src/vm/trace.c)
 target_include_directories(softpc-vm PUBLIC src)
 target_compile_definitions(softpc-vm PRIVATE _CRT_SECURE_NO_WARNINGS
@@ -448,6 +449,10 @@ target_include_directories(softpc-checkpoint-smoke PRIVATE
     src/mvdm/softpc.new/base/inc)
 add_test(NAME softpc-checkpoint-smoke COMMAND softpc-checkpoint-smoke)
 set_tests_properties(softpc-checkpoint-smoke PROPERTIES TIMEOUT 15)
+add_executable(softpc-snapshot-boundary-smoke test/unit/snapshot_boundary_smoke.c)
+target_include_directories(softpc-snapshot-boundary-smoke PRIVATE src)
+add_test(NAME softpc-snapshot-boundary-smoke COMMAND softpc-snapshot-boundary-smoke)
+set_tests_properties(softpc-snapshot-boundary-smoke PROPERTIES TIMEOUT 15)
 add_executable(softpc-runtime-smoke
     test/unit/runtime_smoke.c
     test/support/common_machine_test.c
@@ -553,6 +558,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-quick-time-smoke
     softpc-lifecycle-smoke
     softpc-checkpoint-smoke
+    softpc-snapshot-boundary-smoke
     softpc-runtime-smoke
     softpc-runtime-restart-boot-smoke
     softpc-runtime-input-continuation-smoke
@@ -630,6 +636,7 @@ set(SOFTPC_UNIT_TESTS
     softpc-quick-time-smoke
     softpc-lifecycle-smoke
     softpc-checkpoint-smoke
+    softpc-snapshot-boundary-smoke
     softpc-runtime-smoke
     softpc-runtime-input-continuation-smoke
     softpc-command-smoke
