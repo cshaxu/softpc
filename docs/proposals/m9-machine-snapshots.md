@@ -239,6 +239,41 @@ DIRECT 校验需在持有同一稳定媒体 lease 时进行；指纹可能需要
 原有快照。所需空间主要是 RAM、设备和 overlay 修改页，预检不能替代实际写失败处理。
 不把“原子发布”夸大为已实现掉电持久性。
 
+#### S3 pre-audit: current Storage boundary
+
+The current public Storage surface has a binary sequential writer and a
+bounded `read_owned` helper.  It does **not** expose a streaming reader, a
+same-directory temporary writer with commit/abort, or an atomic replacement
+operation.  Opening the final snapshot path with the existing truncate writer
+would destroy the last good snapshot before the new one is fully written;
+loading a RAM-plus-overlay image through `read_owned` would require one
+unbounded whole-file allocation.  Neither is acceptable for this feature.
+
+This is a real S3 stop condition, not permission for App/VM/Compat to call
+Win32 APIs or to create a private file layer.  If the owner approves a small
+shared Storage extension, its minimal contract should be:
+
+1. a binary reader with open, exact bounded read, size query and close; and
+2. an atomic replacement writer: create a private temporary in the destination
+   directory, write/flush/close it, then make it the destination in one
+   explicit commit; an abort or failed commit leaves the prior destination
+   intact.
+
+The API must be neutral and platform-implemented inside Storage, not mention
+snapshot paths or SoftPC state.  A later write-side implementation can then
+stream fixed-size sections without a whole-file allocation.  VM owns the
+fixed little-endian format and a local SHA-256 media fingerprint implementation;
+cryptographic snapshot identity is not a general Lib concern.
+
+No overlay-page enumeration API is needed.  Compat already exclusively owns
+the live FDD/HDD leases.  At the successful S2 barrier it can read each
+effective 4-KiB page through the existing medium interface and compare it to a
+separate readonly lease opened from the attached base path.  It writes only
+different pages; direct/readonly record only path, mode, byte count and the
+fingerprint.  On load Compat prepares replacement leases from the validated
+base and page records, then commits them through its existing owner-local
+lease replacement path.  This preserves the single runtime overlay model.
+
 加载首先验证所有外部基底，缺失/改变则在修改机器前失败，不静默使用另一磁盘。
 DIRECT 重新接原文件，保持直写；READONLY 仍只读；OVERLAY 重建内存 dirty pages，
 不修改原文件也不修改快照文件。恢复到较旧 overlay 时替换整套页集合，不与当前页合并。

@@ -739,3 +739,33 @@ P15 supplies S2's closure evidence.  The following committed admission may
 activate S3's independent pre-audit of the fixed binary container and
 media-base transaction; it must not expose a partial command or weaken the
 running-only capture contract.
+
+## S3 P2: container and media transaction pre-audit
+
+No implementation is admitted by this record.  The audit fixes the required
+ownership and identifies one blocking shared capability before a partial file
+format can escape.
+
+The existing binary writer and `lib_storage_medium_read_at` are useful: Compat
+owns the FDD/HDD leases and can scan an overlay's effective pages after S2 has
+stopped new guest media writes.  Direct/readonly media can therefore record
+only path, mode, size and a VM-local SHA-256 fingerprint.  Overlay media can
+open a separate readonly base lease at the same path, compare every 4-KiB
+effective page, and write only unequal page indexes plus bytes.  This requires
+no Lib page-enumeration API and does not create a second runtime overlay.
+
+Loading still validates all bases before changing the init/stopped machine;
+Compat will later prepare and owner-commit replacement leases.  Existing live
+serial/parallel/printer rejection remains the correct external-world rule.
+
+The blocker is public Storage file I/O.  It supplies only whole-file
+`read_owned` and a writer that truncates its destination.  It has no streaming
+reader and no same-directory temporary/atomic replacement publication.  Thus
+a large RAM-plus-overlay image would require one unbounded allocation, and a
+disk-full or write failure can destroy the prior snapshot.  App, VM and Compat
+must not bypass that boundary with Win32 calls or a private file layer.
+
+S3 therefore stops before container code until the owner decides whether to
+admit the proposal's minimal neutral Storage reader and atomic-replace writer.
+No production, test, Lib, Common, original-mirror, package, configuration or
+media file changed in this audit.
