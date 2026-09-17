@@ -617,3 +617,33 @@ tests are S6 implementation work; no partial generic encoder is admitted.
 After: documentation only, +0/-0 production/test/original-mirror lines. This
 completes the selected video/input *receiver classification* but not S2's full
 device ledger or S6 payload proof. S2 remains active.
+
+## S2 P13: remaining selected host/BIOS/media inventory
+
+Before: documentation-only audit of all remaining B/b/D/d records in the
+selected device archive, plus their ownership source. No production/test/ABI
+change.
+
+| Owner / state | Snapshot disposition |
+| --- | --- |
+| `reset.c`: `soft_reset`, reset buffer and working function vectors | Only stable reset-in-progress data can reach capture; normal save admission rejects control transitions. Save a genuinely live semantic reset field if one exists at the safe boundary; rebuild all function vectors. Do not serialize reset's temporary buffer or make an implicit reset part of load. |
+| `diskbios.c`, `gfi.c`, Compat `gfi_image.c`, `hdd_media.c` | Save guest disk BIOS/controller semantic state under S5 and validate/recreate media leases/paths from S3's media section. GFI and IOS function tables are host bindings and rebuild; no descriptor, `FILE*`, lease pointer or path buffer enters the state payload. |
+| `com.c`, `printer*.c`, `rs232_io.c`, Compat serial/parallel | Save only any guest UART/LPT register state explicitly covered by S5. A configured live external endpoint rejects capture; native COM/LPT handles, retry tasks and callbacks are excluded. This preserves the approved no-external-world-rollback contract. |
+| `ios.c`, `nt_keycd.c` | Rebuild I/O dispatch tables and static scan-code mappings from normal selected bootstrap. They are function/table wiring, not device registers. |
+| `time_day.c`, `cmos.c`, `timer.c` | Save BIOS timer-vector/timestamp and RTC/CMOS semantics; rebase host time only through a single documented restored virtual time base. Current code samples host wall time, so S5 cannot call the ordinary initialization path after RAM restore without changing guest time. |
+| `idetect.c` | Rebuild idle/poll counters as host responsiveness policy. They neither represent a guest peripheral nor a scheduled guest event; the original machine resumes from the saved device/CPU state. |
+| `rom.c`, BIOS bootstrap/equipment helpers | Rebuild ROM loader cursors and fixed ROM metadata after container ROM fingerprint validation. ROM bytes/guest RAM state are already separately represented; no resource-reading continuation may remain at capture. |
+| Compat `dib_surface`, `graphics_console_compat`, `video`, `v7_pointer`, original `nt_graph`/`nt_sound` | Rebuild host pixels, dirty/cursor background, painting/audio state and task handles. Guest video and PPI/timer state are saved elsewhere; complete-frame publication gives presentation one clean reentry point. |
+| Compat `platform.c` | P2/P5 owns timer producer, safe-boundary deadline and copied CPU entry. Executor callback/event, native timer handle, errors, tracing, pacing origin and product strings remain host-local/rebound. No snapshot work adds a second executor. |
+
+The only selected caller family that may retain a host-visible irreversible
+effect is serial/parallel/printer; it is therefore a deliberate capture
+rejection, not missing serialization. The current original `time_day.c` and
+`cmos.c` both consume host time, so their restored time-base needs one S5
+design/roundtrip proof; this ledger explicitly prevents an accidental
+post-load host-clock jump.
+
+After: documentation only, production/test/original-mirror +0/-0. This sweep
+now classifies every selected archive object family by receiver, but S2 remains
+open: the frozen named-symbol table has not yet been written as a single
+per-object convergence ledger, and no S4-S6 serializer exists.
