@@ -393,11 +393,13 @@ static void verify_controller_archives(void)
        the archive.  The subsequent capture proves restore reinstalled the
        semantic registers rather than merely retaining the saved C object. */
     outb(0x21u, 0x5au);
+    ica_hw_interrupt(ICA_MASTER, 1u, 1);
     assert(softpc_device_snapshot_capture_pic(&pic_saved));
     outb(0x21u, 0xffu);
     assert(softpc_device_snapshot_restore_pic(&pic_saved));
     assert(softpc_device_snapshot_capture_pic(&pic_restored));
     assert(pic_restored.adapter[0].imr == pic_saved.adapter[0].imr);
+    assert(pic_restored.adapter[0].irr == pic_saved.adapter[0].irr);
 
     outb(DMA_CLEAR_FLIP_FLOP, 0u);
     outb(DMA_CH2_ADDRESS, 0x34u);

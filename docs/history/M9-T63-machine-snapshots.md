@@ -827,8 +827,9 @@ an active command without a fixed command ID, rejects capture before the
 archive becomes valid.  It cannot report a successful private capture that a
 later restore must reject.
 
-The checkpoint smoke also drives PIC, DMA channel 2/page state, FDC `SPECIFY`,
-and HDD taskfile registers through their existing port paths.  For each it
+The checkpoint smoke also drives a pending PIC IRQ/mask, DMA channel 2/page
+state, FDC `SPECIFY`, and HDD taskfile registers through their existing port
+paths.  For each it
 captures, deliberately changes live state, restores, then recaptures and
 compares the affected semantic fields.  This proves the selected S5 state
 hooks reinstall live controller state; it does not expose a snapshot command
