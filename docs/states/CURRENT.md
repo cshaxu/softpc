@@ -10,8 +10,9 @@ M9 T63 S1 is closed after the [design review](../history/M9-T63-S1-machine-snaps
 M9 T63 S2 is closed after the field inventory, cross-width state-owner index
 and running-save safe-stop boundary proof. M9 T63 S3 is closed after the
 existing-Storage/media-ownership decision: bounded readonly medium reads and
-ordinary truncate publication require no Lib change. M9 T63 S4 is active for
-the first real CPU/SAS/RAM state export/import slice.
+ordinary truncate publication require no Lib change. M9 T63 S4 is closed after
+the private CPU/SAS/RAM archive proof. M9 T63 S5 is active for the next
+controller/queue state-owner audit and implementation.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
 T62 closure was pushed in 54b2009 before T63 admission. The three older
 candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.md).
@@ -56,8 +57,10 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   state API or user command. S3 re-audit corrects its initial file-boundary
   conclusion: existing readonly media supplies bounded chunk reads; ordinary
   truncate writer publication is owner-approved, so Lib remains unchanged.
-  S4 is admitted for CPU/SAS/RAM state serialization only; it exposes no user
-  command or incomplete snapshot file.
+  S4 adds the private fixed-width CPU/SAS/RAM archive and real round-trip
+  proof only; it exposes no user command or incomplete snapshot file. S5 is
+  limited to the next controller/queue state slice, still without a product
+  save/load path.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files
@@ -241,23 +244,23 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
   P discipline, path accounting, and build hygiene now match the relevant
   NXVM governance standard. [Record](../history/M9-Td-S9-execution-closure-quality.md)
 
-## M9 T63 S4 Packet
+## M9 T63 S5 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner directs continued implementation after S3 and preserves the existing contract: Lib remains unchanged; Common receives only its later two machine-state operations and necessary executor wiring; ordinary truncate publication is accepted. |
-| Objective | Add the first real, fixed-width CPU/SAS/RAM state export/import slice behind VM/Compat ownership, including the already-audited CPU reentry phase and hidden translation state. |
-| Non-goals | No user save/load command, no Common API yet, no Lib change, no file-path handling, no media export, no generic struct dump, no reset substitute, and no change to ordinary pause/debug semantics. |
-| Reference Baseline | S3 decision 65eec13; fixed package code unchanged. |
+| Objective | Add the next VM/Compat-private state slice for selected scheduler queues and controller/device semantic state: PIC, PIT/RTC, DMA, FDD/HDD controller continuations and their required callback identities. |
+| Non-goals | No user save/load command, no Common API yet, no Lib change, no file-path handling, no media export, no generic raw struct dump, no reset substitute, no callback-address serialization and no change to ordinary pause/debug semantics. |
+| Reference Baseline | S4 archive delivery pending this packet's P commit; fixed package code unchanged. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
-| Files And ABI Surface | Before editing: `src/vm/snapshot.c/.h`, `src/vm/machine.c/.h`, `src/compat/ccpu/lifecycle.c/.h`, selected `src/mvdm/softpc.new/base/ccpu386/*` and SAS sources. New state hooks remain VM/Compat-private until the later Common driver operation; all payload fields are fixed-width copied values or bounded byte ranges. |
+| Files And ABI Surface | Before edits: `compat/ccpu/archive.*`, `vm/snapshot*`, selected `quick_ev.c`, `timer.c`, `ica.c`, `at_dma.c`, `fdisk.c`, `floppy.c`, `gfi.c`, disk BIOS and their narrow Compat owners. State remains VM/Compat-private and fixed-width; callback IDs, never function addresses, cross the archive boundary. |
 | Applicable Rules | docs/rules/EXECUTION.md, ARCHITECTURE.md, CODING.md and DOCUMENT.md; design/ARCHITECTURE.md, CODING.md and UI.md; referenced execution, architecture and documentation skills. |
-| Verification | New focused CPU/SAS state roundtrip tests: general/hidden register state, TLB, RAM, FETCH/HLT reentry and no ordinary pause/debug regression; x64/x86 full CTest, package builds, manifests/boundary gates and actual-commit review. |
-| Expected Markers | No pointer, `jmp_buf`, native stack, function address or raw C struct enters payload; restored execution begins through the existing fresh CCPU entry; TLB and delayed CPU/FPU state are copied, not guessed from visible registers. |
+| Verification | First audit exact selected state and all queue callback/handle receivers. New focused round-trips must cover pending IRQ, timer/DMA/controller continuation, queue order/cancel/zero-delay and no callback execution during restore; x64/x86 full CTest, package builds, manifests/boundary gates and actual-commit review. |
+| Expected Markers | No pointer, `jmp_buf`, native stack, function address or raw C struct enters payload; queues restore semantic IDs, arguments, order, remaining time and handles without calling ordinary enqueue APIs; unknown callback/device state refuses the eventual save. |
 | Asset Needs | No user media mutation, no user snapshot file and no raw trace/recording. Tests own/remove any fixtures under build. |
 | Reporting Requirements | Before code report exact files/ABI and estimated churn; after proof report production/test numstat and original mirror diff separately, tests and both EXE links. |
 | Stop Conditions | A required semantic state cannot be represented without a new Common/Lib API, a host continuation cannot be reconstructed through the existing entry phases, or an MVDM change needs broader than the admitted port-ABI state hook: report before expanding scope. |
-| Exit Criteria | CPU/SAS/RAM slice has audited fixed encoding and restoration proof across both widths; no user command or partial file path is exposed; required evidence, commit/push and independent actual-change review. |
+| Exit Criteria | Selected controller/queue slice has audited fixed encoding and restoration proof across both widths; no callback executes during restore; no user command or partial file path is exposed; required evidence, commit/push and independent actual-change review. |
 | Original Owner Request | One binary file, direct/readonly references and FDD/HDD overlays; no Lib edits, Common only two state operations and necessary wiring. Latest: save only running, load only init/stopped, success ordinary paused with working resume/reset; VM safety timeout 1 second. Verbatim and matrix in proposal. |
-| Similar-Issue Sweep | Every selected CPU/SAS mutable owner, including CCPU hidden caches, delayed FPU state, A20/wrap, RAM aliases and all executor reentry phases; classify every field as payload, rebuild, host external or unselected. |
+| Similar-Issue Sweep | Every selected scheduler/controller mutable owner and callback receiver, including pending IRQs, timer time bases, DMA/FDD/HDD transfer state, queue handles and native endpoint exclusions; classify every field as payload, rebuild, host external or unselected. |

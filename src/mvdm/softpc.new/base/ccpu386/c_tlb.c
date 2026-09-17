@@ -35,6 +35,7 @@ Translation Lookaside Buffer Emulation.
 #include <ccpusas4.h>
 #include <ccpupig.h>
 #include <fault.h>
+#include "snapshot.h"
 
 
 /*
@@ -121,6 +122,75 @@ LOCAL IU8 page_index[NR_PAGES];
 LOCAL IU32 page_address[NR_TLB_SETS * NR_TLB_ENTRIES * NR_ACCESS_MODES];
 
 #endif /* FAST_TLB */
+
+GLOBAL VOID
+softpc_ccpu_snapshot_capture_tlb
+IFN3(
+   softpc_ccpu_tlb_state *, state,
+   IU8 *, snapshot_page_index,
+   uint32_t, snapshot_page_index_bytes
+)
+{
+   IU32 set, entry;
+
+   if (snapshot_page_index_bytes != SOFTPC_CCPU_FAST_TLB_PAGE_COUNT ||
+       snapshot_page_index == NULL)
+      return;
+   for (set = 0; set < NR_TLB_SETS; set++) {
+      for (entry = 0; entry < NR_TLB_ENTRIES; entry++) {
+         TLB_ENTRY *source = &tlb[set][entry];
+         softpc_ccpu_tlb_entry_state *target = &state->entries[set][entry];
+         target->linear_page = source->la;
+         target->physical_page = source->pa;
+         target->mode = source->mode;
+         target->valid = source->v;
+         target->dirty = source->d;
+      }
+   }
+   memcpy(state->next_set, next_set, sizeof(next_set));
+#ifdef FAST_TLB
+   memcpy(snapshot_page_index, page_index, sizeof(page_index));
+   memcpy(state->page_address, page_address, sizeof(page_address));
+#endif
+}
+
+GLOBAL IBOOL
+softpc_ccpu_snapshot_restore_tlb
+IFN3(
+   const softpc_ccpu_tlb_state *, state,
+   const IU8 *, snapshot_page_index,
+   uint32_t, snapshot_page_index_bytes
+)
+{
+   IU32 set, entry;
+
+   if (snapshot_page_index_bytes != SOFTPC_CCPU_FAST_TLB_PAGE_COUNT ||
+       snapshot_page_index == NULL)
+      return FALSE;
+   for (set = 0; set < NR_TLB_SETS; set++) {
+      for (entry = 0; entry < NR_TLB_ENTRIES; entry++) {
+         const softpc_ccpu_tlb_entry_state *source = &state->entries[set][entry];
+         TLB_ENTRY *target = &tlb[set][entry];
+         if (source->valid > 1 || source->dirty > 1)
+            return FALSE;
+         target->la = source->linear_page;
+         target->pa = source->physical_page;
+         target->mode = source->mode;
+         target->v = source->valid;
+         target->d = source->dirty;
+      }
+   }
+   for (entry = 0; entry < NR_TLB_ENTRIES; entry++) {
+      if (state->next_set[entry] >= NR_TLB_SETS)
+         return FALSE;
+   }
+   memcpy(next_set, state->next_set, sizeof(next_set));
+#ifdef FAST_TLB
+   memcpy(page_index, snapshot_page_index, sizeof(page_index));
+   memcpy(page_address, state->page_address, sizeof(page_address));
+#endif
+   return TRUE;
+}
 
 /*
    Linear Addresses are composed as follows:-

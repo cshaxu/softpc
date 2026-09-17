@@ -28,6 +28,7 @@ Reserved Floating Point CPU Functions.
 #include <intx.h>       /* Original INTx contract */
 #include <c_xcptn.h>	/* Definition of Int16() */
 #include <fault.h>
+#include "snapshot.h"
 #ifdef SFELLOW
 #include <CpuInt_c.h>
 #endif	/* SFELLOW */
@@ -4828,6 +4829,23 @@ LOCAL BOOL DoNpxPrologue() {
 
 GLOBAL IBOOL NpxIntrNeeded = FALSE;
 LOCAL IU32 NpxExceptionEIP = 0;
+
+GLOBAL IU32
+softpc_ccpu_snapshot_delayed_npx_eip IFN0()
+{
+	return NpxExceptionEIP;
+}
+
+GLOBAL VOID
+softpc_ccpu_snapshot_set_delayed_npx
+IFN2(
+	IBOOL, pending,
+	IU32, eip
+)
+{
+	NpxIntrNeeded = pending;
+	NpxExceptionEIP = eip;
+}
 
 VOID DoNpxException() {
 

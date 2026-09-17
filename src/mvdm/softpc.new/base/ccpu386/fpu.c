@@ -21,6 +21,7 @@
 #include <math.h>
 #include "cfpu_def.h"
 #include "ckmalloc.h"
+#include "snapshot.h"
 
 typedef enum {
 FPSTACK,
@@ -5940,6 +5941,77 @@ GLOBAL void getNpxStackRegs IFN1(FPSTACKENTRY *, dumpPtr)
 GLOBAL void setNpxStackRegs IFN1(FPSTACKENTRY *, loadPtr)
 {
 	memcpy((char *)FPUStackBase, (char *)loadPtr, 8 * sizeof(FPSTACKENTRY));
+}
+
+extern IU32 softpc_ccpu_snapshot_delayed_npx_eip IPT0();
+extern VOID softpc_ccpu_snapshot_set_delayed_npx IPT2(IBOOL, pending,
+   IU32, eip);
+extern IBOOL NpxIntrNeeded;
+
+GLOBAL VOID
+softpc_ccpu_snapshot_capture_fpu
+IFN1(
+   softpc_ccpu_fpu_state *, state
+)
+{
+   IU32 index;
+
+   state->control = getNpxControlReg();
+   state->status = getNpxStatusReg();
+   state->last_selector = NpxLastSel;
+   state->last_offset = NpxLastOff;
+   state->fea = NpxFEA;
+   state->fds = NpxFDS;
+   state->fip = NpxFIP;
+   state->fop = NpxFOP;
+   state->fcs = NpxFCS;
+   state->pop_stack = POPST;
+   state->double_pop = DOUBLEPOP;
+   state->unordered = UNORDERED;
+   state->reverse = REVERSE;
+   state->address_size_32 = NPX_ADDRESS_SIZE_32;
+   state->protected_mode = NPX_PROT_MODE;
+   state->exception_pending = NpxException;
+   state->delayed_interrupt = NpxIntrNeeded;
+   state->delayed_exception_eip = softpc_ccpu_snapshot_delayed_npx_eip();
+   for (index = 0; index < 8; index++) {
+      memcpy(&state->stack[index].value_bits, &FPUStackBase[index].fpvalue,
+         sizeof(state->stack[index].value_bits));
+      state->stack[index].tag = FPUStackBase[index].tagvalue;
+   }
+}
+
+GLOBAL VOID
+softpc_ccpu_snapshot_restore_fpu
+IFN1(
+   const softpc_ccpu_fpu_state *, state
+)
+{
+   IU32 index;
+
+   for (index = 0; index < 8; index++) {
+      memcpy(&FPUStackBase[index].fpvalue, &state->stack[index].value_bits,
+         sizeof(state->stack[index].value_bits));
+      FPUStackBase[index].tagvalue = state->stack[index].tag;
+   }
+   setNpxControlReg(state->control);
+   setNpxStatusReg(state->status);
+   NpxLastSel = state->last_selector;
+   NpxLastOff = state->last_offset;
+   NpxFEA = state->fea;
+   NpxFDS = state->fds;
+   NpxFIP = state->fip;
+   NpxFOP = state->fop;
+   NpxFCS = state->fcs;
+   POPST = state->pop_stack != 0;
+   DOUBLEPOP = state->double_pop != 0;
+   UNORDERED = state->unordered != 0;
+   REVERSE = state->reverse != 0;
+   NPX_ADDRESS_SIZE_32 = state->address_size_32 != 0;
+   NPX_PROT_MODE = state->protected_mode != 0;
+   NpxException = state->exception_pending != 0;
+   softpc_ccpu_snapshot_set_delayed_npx(state->delayed_interrupt != 0,
+      state->delayed_exception_eip);
 }
 
 

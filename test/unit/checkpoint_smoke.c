@@ -30,6 +30,10 @@ extern IU32 NpxFIP;
 extern IBOOL NpxIntrNeeded;
 extern void DoNpxException(void);
 extern void TakeNpxExceptionInt(void);
+extern IU32 getNpxControlReg(void);
+extern void setNpxControlReg(IU32 value);
+extern IU32 getNpxStatusReg(void);
+extern void setNpxStatusReg(IU32 value);
 
 typedef struct checkpoint_probe {
     softpc_machine *machine;
@@ -280,6 +284,60 @@ static void verify_cpu_side_state(void)
     /* The pending exception has its own saved IP, distinct from current FIP. */
 }
 
+static void verify_snapshot_archive(void)
+{
+    const unsigned char directory[] = {0x03, 0x20, 0, 0};
+    const unsigned char old_page[] = {0x03, 0x30, 0, 0};
+    const unsigned char new_page[] = {0x03, 0x40, 0, 0};
+    const unsigned char marker[] = {0x5a, 0xa5};
+    const unsigned char altered[] = {0, 0};
+    softpc_snapshot_image image = {0};
+    softpc_ccpu_entry entry = {1, 0u}, restored = {0};
+    unsigned char readback[2];
+
+    assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(probe.machine, 0x1004u, directory,
+        sizeof(directory)) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(probe.machine, 0x2000u, old_page,
+        sizeof(old_page)) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(probe.machine, 0x5000u, marker,
+        sizeof(marker)) == SOFTPC_MACHINE_OK);
+    c_setEAX(0x12345678u);
+    c_setEIP(0x7654u);
+    c_setCR3(0x1000u);
+    assert(lin2phy(0x400123u, 0) == 0x3123u);
+    CCPU_DR[0] = 0x1234u;
+    CCPU_DR[7] = 1u;
+    setup_breakpoints();
+    setNpxControlReg(0x027fu);
+    setNpxStatusReg(0x2800u);
+    assert(softpc_snapshot_image_capture(&image, &entry) == LIB_STATUS_OK);
+
+    c_setEAX(0u);
+    c_setEIP(0u);
+    CCPU_DR[0] = CCPU_DR[7] = 0u;
+    setup_breakpoints();
+    setNpxControlReg(0x037fu);
+    setNpxStatusReg(0u);
+    assert(softpc_machine_write_physical(probe.machine, 0x5000u, altered,
+        sizeof(altered)) == SOFTPC_MACHINE_OK);
+    flush_tlb();
+    assert(softpc_snapshot_image_restore(&image, &restored) == LIB_STATUS_OK);
+    assert(restored.halted && restored.trap == 0u);
+    assert(c_getEAX() == 0x12345678u && c_getEIP() == 0x7654u);
+    assert(CCPU_DR[0] == 0x1234u && CCPU_DR[7] == 1u);
+    assert(getNpxControlReg() == 0x027fu && getNpxStatusReg() == 0x2800u);
+    assert(softpc_machine_read_physical(probe.machine, 0x5000u, readback,
+        sizeof(readback)) == SOFTPC_MACHINE_OK);
+    assert(readback[0] == marker[0] && readback[1] == marker[1]);
+    /* The restored TLB must remain live even after the restored page table is
+       changed; rebuilding or flushing it would instead produce 0x4123. */
+    assert(softpc_machine_write_physical(probe.machine, 0x2000u, new_page,
+        sizeof(new_page)) == SOFTPC_MACHINE_OK);
+    assert(lin2phy(0x400123u, 0) == 0x3123u);
+    softpc_snapshot_image_dispose(&image);
+}
+
 static void record_event(long param)
 {
     assert(event_count < sizeof(event_order) / sizeof(event_order[0]));
@@ -373,6 +431,7 @@ int main(void)
     verify_timeout();
     verify_translation();
     verify_cpu_side_state();
+    verify_snapshot_archive();
     verify_event_queue();
     softpc_machine_destroy(probe.machine);
     assert(softpc_test_remove_image(path));

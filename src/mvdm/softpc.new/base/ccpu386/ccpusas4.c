@@ -63,6 +63,7 @@
 #include <yoda.h>
 #include <emm.h>
 #include <host.h>
+#include "snapshot.h"
 extern UTINY *host_sas_init IPT1(sys_addr, size);
 extern UTINY *host_sas_term IPT0();
 
@@ -142,6 +143,61 @@ GLOBAL IU8 *end_of_M = NULL;
 #endif
 
 void	    (*temp_func) ();
+
+GLOBAL VOID
+softpc_ccpu_snapshot_capture_sas
+IFN5(
+   softpc_ccpu_sas_state *, state,
+   IU8 *, snapshot_memory,
+   uint32_t, snapshot_memory_bytes,
+   IU8 *, snapshot_page_types,
+   uint32_t, snapshot_page_type_bytes
+)
+{
+   IU32 required_page_type_bytes;
+
+   required_page_type_bytes = (IU32)((Length_of_M_area + NOWRAP_PROTECTION) >> 12);
+   state->memory_bytes = (IU32)Length_of_M_area;
+   state->page_type_bytes = required_page_type_bytes;
+   state->wrap_mask = SasWrapMask;
+   state->selectors_set = selectors_set;
+   state->code_selector = code_sel;
+   state->data_selector = data_sel;
+   if (snapshot_memory == NULL || snapshot_page_types == NULL ||
+       snapshot_memory_bytes != state->memory_bytes ||
+       snapshot_page_type_bytes != required_page_type_bytes)
+      return;
+   memcpy(snapshot_memory, Start_of_M_area, state->memory_bytes);
+   memcpy(snapshot_page_types, memory_type, required_page_type_bytes);
+}
+
+GLOBAL IBOOL
+softpc_ccpu_snapshot_restore_sas
+IFN5(
+   const softpc_ccpu_sas_state *, state,
+   const IU8 *, snapshot_memory,
+   uint32_t, snapshot_memory_bytes,
+   const IU8 *, snapshot_page_types,
+   uint32_t, snapshot_page_type_bytes
+)
+{
+   IU32 required_page_type_bytes;
+
+   required_page_type_bytes = (IU32)((Length_of_M_area + NOWRAP_PROTECTION) >> 12);
+   if (state->memory_bytes != (IU32)Length_of_M_area ||
+       state->page_type_bytes != required_page_type_bytes ||
+       snapshot_memory == NULL || snapshot_page_types == NULL ||
+       snapshot_memory_bytes != state->memory_bytes ||
+       snapshot_page_type_bytes != required_page_type_bytes)
+      return FALSE;
+   memcpy(Start_of_M_area, snapshot_memory, state->memory_bytes);
+   memcpy(memory_type, snapshot_page_types, required_page_type_bytes);
+   SasWrapMask = state->wrap_mask;
+   selectors_set = state->selectors_set != 0;
+   code_sel = (IU16)state->code_selector;
+   data_sel = (IU16)state->data_selector;
+   return TRUE;
+}
 
 #ifndef EGATEST
 #define READ_SELF_MOD(addr)	   (SAS_MEM_TYPE)( memory_type[(addr)>>12] )

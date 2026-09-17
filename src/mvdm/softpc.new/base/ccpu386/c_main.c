@@ -54,6 +54,7 @@ Actual worker routines are spun off elsewhere.
 #include <fault.h>
 #include <ica.h>
 #include <timer.h>
+#include "snapshot.h"
 
 extern void force_yoda(void);
 extern void TakeNpxExceptionInt(void);
@@ -443,6 +444,42 @@ GLOBAL IU32 CCPU_MODE[3];	/* Current Operating Mode */
    at the end of the INT.
  */
 LOCAL IU32 start_trap;
+
+/* Standalone snapshot port ABI.  These are the CCPU execution values that
+   are not architectural register state and cannot be reconstructed by a
+   future c_cpu_simulate invocation. */
+GLOBAL VOID
+softpc_ccpu_snapshot_capture_execution
+IFN1(
+    softpc_ccpu_execution_state *, state
+)
+{
+    IU32 index;
+
+    for (index = 0; index < 8; index++) {
+        state->debug_registers[index] = CCPU_DR[index];
+        state->test_registers[index] = CCPU_TR[index];
+    }
+    state->interrupt_map = cpu_interrupt_map;
+    state->start_trap = start_trap;
+}
+
+GLOBAL VOID
+softpc_ccpu_snapshot_restore_execution
+IFN1(
+    const softpc_ccpu_execution_state *, state
+)
+{
+    IU32 index;
+
+    for (index = 0; index < 8; index++) {
+        CCPU_DR[index] = state->debug_registers[index];
+        CCPU_TR[index] = state->test_registers[index];
+    }
+    cpu_interrupt_map = state->interrupt_map;
+    start_trap = state->start_trap;
+    quick_mode = FALSE;
+}
 
 /*
    Host Pointer to Instruction Start.

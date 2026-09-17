@@ -66,6 +66,7 @@ add_library(softpc-vm OBJECT
     src/vm/debug.c
     src/vm/debug_memory.c
     src/vm/snapshot.c
+    src/vm/snapshot_image.c
     src/vm/trace.c)
 target_include_directories(softpc-vm PUBLIC src)
 target_compile_definitions(softpc-vm PRIVATE _CRT_SECURE_NO_WARNINGS
@@ -138,7 +139,8 @@ add_library(softpc-ccpu-core OBJECT
     src/mvdm/softpc.new/base/cvidc/sascdef.c)
 add_library(softpc-machine-compat OBJECT
     src/compat/cvidc/gdp_state.c
-    src/compat/ccpu/lifecycle.c)
+    src/compat/ccpu/lifecycle.c
+    src/compat/ccpu/archive.c)
 
 # Controllers, firmware and the standalone host boundary evolve independently
 # of the CCPU/C-VIDC executor.  Keep them in a separate object target so a

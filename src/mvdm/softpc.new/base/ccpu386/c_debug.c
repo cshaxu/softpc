@@ -23,6 +23,7 @@ Debugging Register and Breakpoint Support
 #include <c_xcptn.h>
 #include	<c_reg.h>
 #include <c_debug.h>
+#include "snapshot.h"
 
 
 /*
@@ -74,6 +75,50 @@ GLOBAL IU32 nr_data_break = 0;	/* number of data breakpoints active */
 
 LOCAL INST_BREAK i_brk[NR_BRKS];
 LOCAL DATA_BREAK d_brk[NR_BRKS];
+
+GLOBAL VOID
+softpc_ccpu_snapshot_capture_debug
+IFN1(
+   softpc_ccpu_debug_state *, state
+)
+{
+   IU32 index;
+
+   state->instruction_break_count = nr_inst_break;
+   state->data_break_count = nr_data_break;
+   for (index = 0; index < NR_BRKS; index++) {
+      state->instruction_breaks[index].linear_address = i_brk[index].addr;
+      state->instruction_breaks[index].register_index = i_brk[index].id;
+      state->data_breaks[index].start_address = d_brk[index].start_addr;
+      state->data_breaks[index].end_address = d_brk[index].end_addr;
+      state->data_breaks[index].type = d_brk[index].type;
+      state->data_breaks[index].register_index = d_brk[index].id;
+   }
+}
+
+GLOBAL IBOOL
+softpc_ccpu_snapshot_restore_debug
+IFN1(
+   const softpc_ccpu_debug_state *, state
+)
+{
+   IU32 index;
+
+   if (state->instruction_break_count > NR_BRKS ||
+       state->data_break_count > NR_BRKS)
+      return FALSE;
+   nr_inst_break = state->instruction_break_count;
+   nr_data_break = state->data_break_count;
+   for (index = 0; index < NR_BRKS; index++) {
+      i_brk[index].addr = state->instruction_breaks[index].linear_address;
+      i_brk[index].id = state->instruction_breaks[index].register_index;
+      d_brk[index].start_addr = state->data_breaks[index].start_address;
+      d_brk[index].end_addr = state->data_breaks[index].end_address;
+      d_brk[index].type = state->data_breaks[index].type;
+      d_brk[index].id = state->data_breaks[index].register_index;
+   }
+   return TRUE;
+}
 
 /*
    Define masks and shifts for components of Debug Control Register.

@@ -37,6 +37,7 @@ Provide External Interface to CPU Registers.
 #include <Fpu_c.h>
 #include <Pigger_c.h>
 #include <stdio.h>
+#include "snapshot.h"
 #ifdef PIG
 #include <gdpvar.h>
 #define AR_FIXUP				\
@@ -1877,4 +1878,71 @@ IFN1(
    {
    SET_CPL(val);
    }
+
+/*
+ * Standalone snapshot port ABI.  The original debugger accessors expose the
+ * same architectural and hidden segment state, so keep the copy at this
+ * owner instead of rebuilding it in the standalone adapter.
+ */
+GLOBAL VOID
+softpc_ccpu_snapshot_capture_registers
+IFN1(
+	softpc_ccpu_register_state *, state
+    )
+{
+   state->eax = c_getEAX(); state->ecx = c_getECX();
+   state->edx = c_getEDX(); state->ebx = c_getEBX();
+   state->esp = c_getESP(); state->ebp = c_getEBP();
+   state->esi = c_getESI(); state->edi = c_getEDI();
+   state->eip = c_getEIP(); state->eflags = c_getEFLAGS();
+   state->cr0 = c_getCR0(); state->cr2 = c_getCR2(); state->cr3 = c_getCR3();
+   state->cpl = c_getCPL();
+   state->gdt_base = c_getGDT_BASE(); state->gdt_limit = c_getGDT_LIMIT();
+   state->idt_base = c_getIDT_BASE(); state->idt_limit = c_getIDT_LIMIT();
+   state->ldt_selector = c_getLDT_SELECTOR();
+   state->ldt_base = c_getLDT_BASE(); state->ldt_limit = c_getLDT_LIMIT();
+   state->tr_selector = c_getTR_SELECTOR();
+   state->tr_base = c_getTR_BASE(); state->tr_limit = c_getTR_LIMIT();
+   state->tr_access_rights = c_getTR_AR();
+#define SNAPSHOT_SEGMENT(slot, name) \
+   state->segments[slot].selector = c_get##name##_SELECTOR(); \
+   state->segments[slot].base = c_get##name##_BASE(); \
+   state->segments[slot].limit = c_get##name##_LIMIT(); \
+   state->segments[slot].access_rights = c_get##name##_AR()
+   SNAPSHOT_SEGMENT(0, ES); SNAPSHOT_SEGMENT(1, CS);
+   SNAPSHOT_SEGMENT(2, SS); SNAPSHOT_SEGMENT(3, DS);
+   SNAPSHOT_SEGMENT(4, FS); SNAPSHOT_SEGMENT(5, GS);
+#undef SNAPSHOT_SEGMENT
+}
+
+GLOBAL VOID
+softpc_ccpu_snapshot_restore_registers
+IFN1(
+	const softpc_ccpu_register_state *, state
+    )
+{
+   c_setCPL(0);
+   c_setCR0(state->cr0); c_setCR2(state->cr2); c_setCR3(state->cr3);
+   c_setEAX(state->eax); c_setECX(state->ecx);
+   c_setEDX(state->edx); c_setEBX(state->ebx);
+   c_setESP(state->esp); c_setEBP(state->ebp);
+   c_setESI(state->esi); c_setEDI(state->edi);
+   c_setEIP(state->eip); c_setEFLAGS(state->eflags);
+   c_setGDT_BASE_LIMIT(state->gdt_base, state->gdt_limit);
+   c_setIDT_BASE_LIMIT(state->idt_base, state->idt_limit);
+   c_setLDT_SELECTOR(state->ldt_selector);
+   c_setLDT_BASE_LIMIT(state->ldt_base, state->ldt_limit);
+   c_setTR_SELECTOR(state->tr_selector);
+   c_setTR_BASE_LIMIT_AR(state->tr_base, state->tr_limit,
+      state->tr_access_rights);
+#define RESTORE_SNAPSHOT_SEGMENT(slot, name) \
+   c_set##name##_SELECTOR(state->segments[slot].selector); \
+   c_set##name##_BASE_LIMIT_AR(state->segments[slot].base, \
+      state->segments[slot].limit, state->segments[slot].access_rights)
+   RESTORE_SNAPSHOT_SEGMENT(0, ES); RESTORE_SNAPSHOT_SEGMENT(1, CS);
+   RESTORE_SNAPSHOT_SEGMENT(2, SS); RESTORE_SNAPSHOT_SEGMENT(3, DS);
+   RESTORE_SNAPSHOT_SEGMENT(4, FS); RESTORE_SNAPSHOT_SEGMENT(5, GS);
+#undef RESTORE_SNAPSHOT_SEGMENT
+   c_setCPL(state->cpl);
+}
 
