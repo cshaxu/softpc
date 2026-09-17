@@ -1,10 +1,14 @@
 #ifndef SOFTPC_CCPU_ARCHIVE_H
 #define SOFTPC_CCPU_ARCHIVE_H
 
+#include "../snapshot_stream.h"
 #include "snapshot.h"
 
 typedef struct softpc_device_archive softpc_device_archive;
 
+/* Internal canonical-stream callbacks. The eventual VM image composes this
+ * core section with the separately owned device section; neither callback
+ * carries a file, path, handle, pointer into guest state or product policy. */
 /* Heap ownership is local to the standalone adapter.  The backing pointers
    never cross into the snapshot payload or the Common machine boundary. */
 typedef struct softpc_ccpu_archive {
@@ -24,5 +28,9 @@ typedef struct softpc_ccpu_archive {
 void softpc_ccpu_archive_dispose(softpc_ccpu_archive *archive);
 int softpc_ccpu_archive_capture(softpc_ccpu_archive *archive);
 int softpc_ccpu_archive_restore(const softpc_ccpu_archive *archive);
+lib_status softpc_ccpu_archive_write_core(const softpc_ccpu_archive *archive,
+    softpc_snapshot_bytes_write write, void *context);
+lib_status softpc_ccpu_archive_read_core(softpc_ccpu_archive *archive,
+    softpc_snapshot_bytes_read read, void *context);
 
 #endif

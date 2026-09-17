@@ -138,6 +138,7 @@ add_library(softpc-ccpu-core OBJECT
     src/mvdm/softpc.new/base/cvidc/vglfunc.c
     src/mvdm/softpc.new/base/cvidc/sascdef.c)
 add_library(softpc-machine-compat OBJECT
+    src/compat/snapshot_stream.c
     src/compat/cvidc/gdp_state.c
     src/compat/ccpu/lifecycle.c
     src/compat/ccpu/archive.c
@@ -269,6 +270,7 @@ target_include_directories(softpc-machine-devices PRIVATE
     src/mvdm/softpc.new/base/ccpu386
     src/mvdm/softpc.new/base/cvidc)
 target_include_directories(softpc-machine-compat PRIVATE
+    src
     src/compat/ccpu
     src/compat/cvidc
     src/compat

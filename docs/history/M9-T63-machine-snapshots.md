@@ -1059,3 +1059,26 @@ paths; the focused test is `+62/-1`. Full x64/x86 CTest each pass `103/103`,
 and both package-smoke variants pass at each width. The refreshed packages are
 `softpc32.exe` `07C23E12C8CB3328DB6F54637FCB8273BAB18292CF77E3004685E196E7D1305E`
 and `softpc64.exe` `C013E98E34D442A3F2D90149E1C2FD4A6CB8BD91F9C0E81683BFC416665180E4`.
+
+## S7 P5: CCPU/SAS canonical stream slice
+
+S7 begins its VM-owned stream implementation without exposing a partial
+snapshot operation. The private CCPU archive now encodes and decodes the
+already-reviewed CCPU register, execution, debug, TLB and FPU maps together
+with SAS scalar state, RAM, page-type bytes and the fast-TLB index. Integers
+are explicit little-endian values; only byte arrays are copied verbatim. No
+legacy structure image, padding, pointer, callback or native handle crosses
+the stream boundary.
+
+Decode leaves the archive invalid until the separately owned device section
+exists, so this cannot accidentally restore a core-only machine. The existing
+checkpoint smoke captures a real archive, round-trips the new byte slice, and
+checks the affected semantic maps and complete dynamic byte arrays. It also
+rejects a mismatched declared SAS size before allocating archive backing.
+Focused checkpoint tests and final full CTest each pass `103/103` at x64 and
+x86. The refreshed packages are `softpc32.exe`
+`8BEDA6DF9D689E8F1755E8DA6FB87AC4685CB868555C5F055EA2F44DD6A8EC9D`
+and `softpc64.exe`
+`91F61AF4E0BB8C61E40024250444350E0E74396722C19219BCC1D883C108E771`.
+This P is internal only: it adds no App command, snapshot file, media
+serialization, or public product behavior.

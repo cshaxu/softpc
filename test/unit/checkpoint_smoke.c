@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "insignia.h"
@@ -70,6 +71,51 @@ typedef struct checkpoint_probe {
 static checkpoint_probe probe;
 static unsigned event_count;
 static void record_event(long param);
+
+typedef struct checkpoint_byte_stream {
+    unsigned char *bytes;
+    size_t byte_count;
+    size_t capacity;
+    size_t offset;
+} checkpoint_byte_stream;
+
+static lib_status checkpoint_write_bytes(void *context,
+    const lib_u8 *bytes, lib_size byte_count)
+{
+    checkpoint_byte_stream *stream = context;
+    size_t required;
+    unsigned char *replacement;
+
+    if (stream == NULL || (byte_count != 0u && bytes == NULL) ||
+        byte_count > (size_t)-1 - stream->byte_count)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    required = stream->byte_count + byte_count;
+    if (required > stream->capacity) {
+        replacement = realloc(stream->bytes, required);
+        if (replacement == NULL) return LIB_STATUS_NO_MEMORY;
+        stream->bytes = replacement;
+        stream->capacity = required;
+    }
+    if (byte_count != 0u)
+        memcpy(stream->bytes + stream->byte_count, bytes, byte_count);
+    stream->byte_count = required;
+    return LIB_STATUS_OK;
+}
+
+static lib_status checkpoint_read_bytes(void *context, lib_u8 *bytes,
+    lib_size byte_count)
+{
+    checkpoint_byte_stream *stream = context;
+
+    if (stream == NULL || (byte_count != 0u && bytes == NULL) ||
+        stream->offset > stream->byte_count ||
+        byte_count > stream->byte_count - stream->offset)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    if (byte_count != 0u)
+        memcpy(bytes, stream->bytes + stream->offset, byte_count);
+    stream->offset += byte_count;
+    return LIB_STATUS_OK;
+}
 
 static void nested_bios(void)
 {
@@ -314,7 +360,9 @@ static void verify_snapshot_archive(void)
     const unsigned char marker[] = {0x5a, 0xa5};
     const unsigned char altered[] = {0, 0};
     softpc_snapshot_image image = {0};
+    softpc_ccpu_archive decoded = {0};
     softpc_ccpu_entry entry = {1, 0u}, restored = {0};
+    checkpoint_byte_stream stream = {0};
     unsigned char readback[2];
     half_word cmos_value;
 
@@ -343,6 +391,36 @@ static void verify_snapshot_archive(void)
     assert(event_count == 0u);
     q_event_init();
     assert(softpc_snapshot_image_capture(&image, &entry) == LIB_STATUS_OK);
+    assert(softpc_ccpu_archive_write_core(&image.ccpu,
+        checkpoint_write_bytes, &stream) == LIB_STATUS_OK);
+    assert(stream.byte_count != 0u);
+    stream.bytes[0] ^= 1u;
+    assert(softpc_ccpu_archive_read_core(&decoded, checkpoint_read_bytes,
+        &stream) == LIB_STATUS_INVALID_ARGUMENT);
+    assert(decoded.memory == NULL && decoded.page_types == NULL &&
+        decoded.tlb_page_index == NULL);
+    stream.bytes[0] ^= 1u;
+    stream.offset = 0u;
+    assert(softpc_ccpu_archive_read_core(&decoded, checkpoint_read_bytes,
+        &stream) == LIB_STATUS_OK);
+    assert(stream.offset == stream.byte_count);
+    assert(decoded.valid == 0);
+    assert(decoded.registers.eax == image.ccpu.registers.eax);
+    assert(decoded.execution.interrupt_map == image.ccpu.execution.interrupt_map);
+    assert(decoded.debug.instruction_break_count ==
+        image.ccpu.debug.instruction_break_count);
+    assert(decoded.tlb.entries[0][0].linear_page ==
+        image.ccpu.tlb.entries[0][0].linear_page);
+    assert(decoded.fpu.control == image.ccpu.fpu.control);
+    assert(decoded.sas.memory_bytes == image.ccpu.sas.memory_bytes);
+    assert(memcmp(decoded.memory, image.ccpu.memory,
+        image.ccpu.sas.memory_bytes) == 0);
+    assert(memcmp(decoded.page_types, image.ccpu.page_types,
+        image.ccpu.sas.page_type_bytes) == 0);
+    assert(memcmp(decoded.tlb_page_index, image.ccpu.tlb_page_index,
+        SOFTPC_CCPU_FAST_TLB_PAGE_COUNT) == 0);
+    softpc_ccpu_archive_dispose(&decoded);
+    free(stream.bytes);
 
     c_setEAX(0u);
     c_setEIP(0u);

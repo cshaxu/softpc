@@ -470,6 +470,20 @@ image before restore. The VM first decodes and validates into a private staged
 image; only then may it replace the stopped machine state. The codec does not
 know a file path or write prompt text.
 
+#### S7 P5: implemented CCPU/SAS canonical slice
+
+The CCPU archive now has a private, callback-driven canonical slice for the
+already-reviewed register, execution, debug, TLB, FPU and SAS owners. It
+writes each scalar little-endian, writes only fixed byte arrays verbatim, and
+allocates decoded RAM/page-type/TLB-index backing only after reading the
+declared sizes. The slice deliberately leaves `valid` clear after decode: a
+device section is still mandatory before an archive can be restored. It is not
+an App-facing save format or a partial machine-state operation.
+
+`checkpoint_smoke` captures a real private image, serializes and decodes this
+slice, then verifies register/execution/debug/TLB/FPU metadata plus complete
+RAM, page-type and fast-TLB-index bytes. The test runs at both host widths.
+
 ## 验收矩阵
 
 - 安全点到达后导出前后相同快照语义状态；导出期间状态/待事件稳定，不要求与请求瞬间相同。

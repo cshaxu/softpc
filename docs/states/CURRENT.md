@@ -20,6 +20,11 @@ executor-owned save/restore transaction.
 T62 closure was pushed in 54b2009 before T63 admission. The three older
 candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.md).
 
+S7 P5 is locally verified: Compat now has the private canonical CCPU/SAS byte
+slice and its dual-width checkpoint/full-suite proof. It is not yet a product
+snapshot operation; the device section, VM transaction and App command remain
+in scope.
+
 ## Current Technical Baseline
 
 - T63 S1 source baseline ea7e982, admission after 54b2009. No snapshot runtime
