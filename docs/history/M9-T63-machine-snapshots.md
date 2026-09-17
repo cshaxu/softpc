@@ -591,3 +591,29 @@ enumerated actual selected-device target sources and archive mutable symbols;
 the next proof must repeat the symbol set on x86 and turn each table row into
 narrow owner ports and fault-injected roundtrip tests. S2 remains open for
 video and remaining selected devices.
+
+## S2 P12: video and input-state receiver audit
+
+Before: documentation-only inspection of the selected video objects,
+`compat/cvidc/gdp_state.c`, and P11's keyboard/mouse object inventory. No
+production/test/ABI change.
+
+| State family | Receiver and strict rule |
+| --- | --- |
+| VGA/CGA/EGA registers and planes | S6 saves EGA/CGA controller registers, DAC/palette/index/latches, bank/chain/mode scalar state, text/font and plane bytes, cursor/scroll/split state, plus exact C-VID scalar state needed by future writes. It does not infer these by replaying port writes. |
+| `EGA_CPU`, `EGA_GRAPH`, `CGA_GLOBALS`, C-VID GDP slots | Encode semantic scalar fields and RAM-relative offsets only. `plane_offset`, mapped-plane addresses, screen/regen pointers and all generated function pointers are rebuilt against the newly allocated plane/RAM/GDP storage. No host pointer or `struct` byte dump is legal. |
+| C-VID GDP storage | `compat/cvidc/gdp_state.c` deliberately mixes slot widths and contains direct host pointers. S6 requires a fixed audited field list: per-slot scalar/offset/semantic-ID encoding, with unknown slot use rejecting capture. It must not serialize the slot table wholesale merely because it is separately allocated. |
+| Dirty and presentation resources | DIBs, `PCDisplay`, native paint functions, host drawing buffers, dirty queues, and frame-generation resources rebuild. Restore marks a complete redraw rather than depending on saved dirty rects; Window/KVM receives the existing complete-frame publication after Common's normal paused fact. |
+| Handler tables and geometry helpers | EGA/CGA/VGA read/write/mode/copy/mark function tables and host drawing LUTs rebuild from restored semantic mode/register state. `gmi_define_mem` then installs the corresponding SAS handler once; neither C-VID nor video may retain an old process address. |
+| Keyboard/mouse | P11's complete controller/FIFO/delta/button/typematic state is the guest payload. KVM/host input sources, logical Console state, mouse capture, source identity, host cursor and UI mailboxes remain excluded; they re-enter by the existing post-load UI route. |
+
+The source sweep found two independent plane/RAM representations: guest plane
+bytes and controller semantics must both travel, while DIB/Window pixels must
+not. It also found `gdp_state`'s slot allocation is an ABI adaptation, not a
+snapshot format; a generic memory image would include pointers and make
+cross-process restore invalid. The exact fixed GDP field map and video-port
+tests are S6 implementation work; no partial generic encoder is admitted.
+
+After: documentation only, +0/-0 production/test/original-mirror lines. This
+completes the selected video/input *receiver classification* but not S2's full
+device ledger or S6 payload proof. S2 remains active.

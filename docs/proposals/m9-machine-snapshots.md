@@ -213,6 +213,9 @@ SAS 的页类型数组、20 位回绕、虚拟化 selector 标量和 CPU/SAS 共
 只作临时搬运，恢复时重新分配并让 Video 指向它，绝不编码指针或未初始化的 scratch
 字节。惰性读取的 `SHIFTROT_OF_UNDEF` / `BEYOND_MEMORY_VALUE` 配置会影响客户机
 结果，须保留已解析值及是否已解析，或在容器兼容性中拒绝不同配置。
+视频保存的是 guest plane/font/register/latch/DAC 等语义数据以及 C-VID 的固定字段，
+不是 DIB/Window 像素、dirty rect、函数表、GDP 内部指针或宿主地址。恢复后重建绑定并
+发布完整帧；未知 GDP slot 用法拒绝 capture，不把兼容载体内存当作可移植的结构体镜像。
 CPU continuation 明确区分取指准备与 HLT 等待；HLT 已前移 IP，且须保存原指令
 进入时的 pending trap，不能用当前 EFLAGS.TF 重新猜测。恢复复用原循环的相应
 阶段，不重复扣 quick-event 计数或提前接受 STI 阴影中的 IRQ；不序列化宿主栈。

@@ -44,7 +44,8 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   P9 proves that actual breakpoint tables and deferred NPX exception IP must
   also survive capture, rather than being rebuilt from visible registers.
   P10 classifies SAS/native CPU state; P11 records the selected controller
-  receivers. Production remains unchanged; final focused tests pass on both widths.
+  receivers; P12 classifies video/input payload versus host resources.
+  Production remains unchanged; final focused tests pass on both widths.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files
