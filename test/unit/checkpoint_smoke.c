@@ -28,6 +28,15 @@ extern void mouse_driver_termination(void);
 /* base_def.h's non-ANSI compatibility macro must not alter this C17 test. */
 #undef const
 
+/* The production boundary maps PC_palette explicitly to three IU8 values.
+   Keep this test probe narrow rather than importing the whole video header
+   graph merely to alter one DAC entry. */
+typedef struct checkpoint_dac_entry {
+    unsigned char red, green, blue;
+} checkpoint_dac_entry;
+extern unsigned char *EGA_planes;
+extern checkpoint_dac_entry *DAC;
+
 extern void (*BIOS[256])(void);
 extern unsigned long c_cpu_q_ev_get_count(void);
 extern void c_cpu_q_ev_set_count(unsigned long count);
@@ -398,6 +407,8 @@ static void verify_controller_archives(void)
     softpc_device_keyboard_state keyboard_saved, keyboard_restored;
     softpc_device_dos_mouse_state dos_mouse_inactive, dos_mouse_saved,
         dos_mouse_restored;
+    static softpc_device_video_memory_state video_memory_saved,
+        video_memory_restored;
     softpc_device_archive *keyboard_archive;
     half_word value;
 
@@ -511,6 +522,22 @@ static void verify_controller_archives(void)
     memset(&dos_mouse_restored, 0, sizeof(dos_mouse_restored));
     assert(softpc_device_snapshot_capture_dos_mouse(&dos_mouse_restored));
     assert(!dos_mouse_restored.initialized);
+
+    /* Plane bytes and programmable DAC entries are guest state.  This does
+       not claim controller-register restore; that is a later receiver. */
+    EGA_planes[0] = 0x12u;
+    EGA_planes[SOFTPC_DEVICE_VIDEO_PLANE_BYTES - 1u] = 0x34u;
+    DAC[7].red = 0x11u;
+    DAC[7].green = 0x22u;
+    DAC[7].blue = 0x33u;
+    assert(softpc_device_snapshot_capture_video_memory(&video_memory_saved));
+    EGA_planes[0] = 0u;
+    EGA_planes[SOFTPC_DEVICE_VIDEO_PLANE_BYTES - 1u] = 0u;
+    DAC[7].red = DAC[7].green = DAC[7].blue = 0u;
+    assert(softpc_device_snapshot_restore_video_memory(&video_memory_saved));
+    assert(softpc_device_snapshot_capture_video_memory(&video_memory_restored));
+    assert(memcmp(&video_memory_restored, &video_memory_saved,
+        sizeof(video_memory_saved)) == 0);
 
     /* The 8042's pending FIFO and command latch are device state, not a
        frontend queue.  Capture through its real port path, mutate it, then

@@ -37,7 +37,11 @@ enum {
     SOFTPC_DEVICE_DOS_MOUSE_EGA_CRTC_COUNT = 25,
     SOFTPC_DEVICE_DOS_MOUSE_EGA_GRAPH_COUNT = 9,
     SOFTPC_DEVICE_DOS_MOUSE_EGA_SEQ_COUNT = 4,
-    SOFTPC_DEVICE_DOS_MOUSE_EGA_ATTR_COUNT = 20
+    SOFTPC_DEVICE_DOS_MOUSE_EGA_ATTR_COUNT = 20,
+    /* The selected V7 build has four 128 KiB physical EGA/VGA planes. */
+    SOFTPC_DEVICE_VIDEO_PLANE_BYTES = 0x80000,
+    SOFTPC_DEVICE_VIDEO_DAC_COUNT = 256,
+    SOFTPC_DEVICE_VIDEO_DAC_COMPONENT_COUNT = 3
 };
 
 enum {
@@ -302,6 +306,22 @@ int softpc_device_snapshot_capture_dos_mouse(
     softpc_device_dos_mouse_state *state);
 int softpc_device_snapshot_restore_dos_mouse(
     const softpc_device_dos_mouse_state *state);
+
+/*
+ * Guest video memory and the programmable DAC are fixed-size semantic data.
+ * Controller registers, C-VID state and renderer resources deliberately have
+ * separate receivers: they contain a mixture of values and process bindings.
+ */
+typedef struct softpc_device_video_memory_state {
+    uint8_t plane[SOFTPC_DEVICE_VIDEO_PLANE_BYTES];
+    uint8_t dac[SOFTPC_DEVICE_VIDEO_DAC_COUNT]
+        [SOFTPC_DEVICE_VIDEO_DAC_COMPONENT_COUNT];
+} softpc_device_video_memory_state;
+
+int softpc_device_snapshot_capture_video_memory(
+    softpc_device_video_memory_state *state);
+int softpc_device_snapshot_restore_video_memory(
+    const softpc_device_video_memory_state *state);
 
 /*
  * The PIT uses function pointers and host clock timestamps internally.  The

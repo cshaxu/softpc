@@ -72,7 +72,10 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   the DOS INT 33h driver through a fixed-width semantic map, including its
   inactive/installed distinction, cursor backing, handler segment:offset data
   and saved callback registers; instance allocation, EGA addresses and host
-  cursor resources rebuild on restore.
+  cursor resources rebuild on restore. S6 P6 adds only the fixed-size four-
+  plane VRAM/font bytes and 256-entry DAC, then invalidates host rendering;
+  controller registers, C-VID state and derived bindings remain pending and
+  are not treated as a raw structure image.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files

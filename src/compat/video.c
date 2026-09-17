@@ -1,6 +1,7 @@
 #include "insignia.h"
 #include "host_def.h"
 #include "platform.h"
+#include "devices/snapshot.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -100,3 +101,41 @@ int softpc_platform_video_buffers_init(void)
 }
 
 void stream_io_update(void) {}
+
+int softpc_device_snapshot_capture_video_memory(
+    softpc_device_video_memory_state *state)
+{
+    unsigned long index;
+
+    if (state == NULL || EGA_planes == NULL || DAC == NULL ||
+        sizeof(state->plane) != 4u * EGA_PLANE_SIZE ||
+        SOFTPC_DEVICE_VIDEO_DAC_COUNT != VGA_DAC_SIZE)
+        return 0;
+    memcpy(state->plane, EGA_planes, sizeof(state->plane));
+    for (index = 0u; index < SOFTPC_DEVICE_VIDEO_DAC_COUNT; ++index) {
+        state->dac[index][0] = (uint8_t)DAC[index].red;
+        state->dac[index][1] = (uint8_t)DAC[index].green;
+        state->dac[index][2] = (uint8_t)DAC[index].blue;
+    }
+    return 1;
+}
+
+int softpc_device_snapshot_restore_video_memory(
+    const softpc_device_video_memory_state *state)
+{
+    unsigned long index;
+
+    if (state == NULL || EGA_planes == NULL || DAC == NULL ||
+        sizeof(state->plane) != 4u * EGA_PLANE_SIZE ||
+        SOFTPC_DEVICE_VIDEO_DAC_COUNT != VGA_DAC_SIZE)
+        return 0;
+    memcpy(EGA_planes, state->plane, sizeof(state->plane));
+    for (index = 0u; index < SOFTPC_DEVICE_VIDEO_DAC_COUNT; ++index) {
+        DAC[index].red = (half_word)state->dac[index][0];
+        DAC[index].green = (half_word)state->dac[index][1];
+        DAC[index].blue = (half_word)state->dac[index][2];
+    }
+    flag_palette_change_required();
+    host_mark_screen_refresh();
+    return 1;
+}

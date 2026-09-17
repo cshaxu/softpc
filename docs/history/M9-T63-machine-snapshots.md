@@ -957,3 +957,36 @@ CTest passes `103/103` on x64 and x86.  Fixed packages are `softpc32.exe`
 `4E93AC27F4B0A4D000C44452FDD5DDF6F405E36286A0D6581C3F290F49CF6409` and
 `softpc64.exe`
 `658543D40F2D84AB933C9B7116D2CAA88379B9A5D24E18237EE86AE6632C91C0`.
+
+## S6 P6: video plane and DAC archive
+
+P6 adds the first safe video receiver: all four selected V7 EGA/VGA plane
+banks (including programmable fonts) and the 256 three-component DAC entries.
+They are fixed-width guest data, not a legacy controller-structure image.
+Restore copies those bytes back and requests a normal complete renderer
+refresh; it does not serialize a DIB, a Window surface, dirty bookkeeping,
+function vectors, or host pointers.
+
+The controller registers, latches, bank/chain/mode values, cursor and
+split/scroll state remain deliberately pending. They cannot be folded into
+this receiver because their legacy structures contain bitfield layout and
+derived process addresses. C-VID GDP remains separately pending because its
+slot carrier mixes scalar fields with pointers and generated vectors.
+
+`checkpoint_smoke` changes both endpoints of the plane allocation and a DAC
+entry, captures, mutates, restores, and compares a fresh fixed-width capture.
+The production archive also includes the receiver, so later whole-archive
+tests exercise its placement. This is still private VM/Compat proof only: no
+snapshot file, command, Common API, or Lib code is added.
+
+Actual production change is `+64/-1` across the private archive/state
+contract and Compat video boundary; focused checkpoint proof is `+27/-0`.
+The final x64 and x86 full suites each pass `103/103`. The first x86 full run
+had one timing-sensitive `softpc-package-smoke` failure at its monitor
+pause-stop-start stage; its immediately repeated package, checkpoint and
+documentation set passed `4/4`, and the final complete repeat passed. P6 does
+not claim an unrelated package timing repair.
+Fixed packages are `softpc32.exe`
+`28DF09513FE461C0A33ACFBC00279C64761BEF1B7E298D269AEAAE268F8E39C1` and
+`softpc64.exe`
+`F1D1C6DD8AFD35596CEBC3AD82C0156F77F5B53B08136BF028D230943BEA39DF`.
