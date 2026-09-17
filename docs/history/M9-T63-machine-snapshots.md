@@ -73,3 +73,60 @@ restore, file safety, or complete device capture follows from these tests.
 - x64 SHA256: `FC43874F81FE5BE17AA95893496D15E400E754290F598BB1BED03803C2F0F711`.
 - S2 is not closed: the isolated timer barrier is only one required piece of
   the safe-stop and recovery proof; no save/load command is available yet.
+
+## P3 pre-audit: precise CPU checkpoint observation
+
+Baseline 1f9e6e5. Scope: compat/ccpu/lifecycle.c/.h, original c_main.c,
+test/unit/checkpoint_smoke.c and its root CMake wiring. Estimate 40-60 production
+lines and 100-140 test lines; original diff only two observation calls/comments,
+no new branch interpreting product state. Common/Lib are not changed.
+
+The existing TLS recursion count is authoritative. An executor-bound observer
+receives that count and the original CPU's fetch-versus-halted phase. There is
+no second CPU or guest breakpoint. No observer means no product behavior change.
+If stop is requested during observation, the existing outer-exit mechanism
+runs before another instruction; it is not used to claim a nested save succeeded.
+
+The test runs real CCPU bytes with a disposable 512-byte image in the selected
+build tree (15-second CTest timeout; test removes it on success). A test-owned
+BOP calls the nested original CPU, retains a local return IP, and completes
+only after BOP FE returns normally. Observation must distinguish depth two from
+depth one; outer HLT must expose already-advanced IP. Stop there must not run
+the following INC AX. The injected BOP and observer are removed before teardown.
+This establishes observation, not complete saved-state restoration or timeout.
+
+## P3 implementation review
+
+Actual counted production C/H paths: lifecycle.c +19/-0, lifecycle.h +8/-0,
+original c_main.c +4/-0: total +31/-0. The original-source delta is only two
+calls and their reason comments. One new unit test is +87/-0; root CMake wiring
+is +6/-0, counted separately. This is below the pre-audit estimate because the
+existing recursion ledger and outer-stop mechanism were reused.
+
+Similar-path sweep (`rg` for lifecycle enter/leave/checkpoint/observe,
+host_simulate, NEXT_INST, DO_INST and quick_mode across Compat/VM/c_main):
+the original c_cpu_simulate remains the only recursion ledger entry/exit;
+host_simulate and its function slot both call it. The new observer is TLS and
+executor-bound. No observer is installed by the product yet. Quick execution
+still uses the existing pending-executor-event escape to NEXT_INST; this is
+not a claim that the observer runs on every quick instruction. HLT has its own
+observation because its wait does not retire another instruction. Stop uses
+the existing outer exit, while the successful nested test requires natural
+BOP FE return. Debug begin/retired hooks and their callbacks are unchanged.
+
+Canonical restore still needs separate proof: c_cpu_simulate performs
+SYNCH_TICK, and NEXT_INST initializes RF/TF and operand/address modes. Those
+effects must not be accidentally duplicated when installing saved state.
+The new test does not claim to prove that remaining restoration contract.
+
+## P3 delivery verification
+
+- Both fixed package builds completed. Full x64 suite: 102/102; full x86:
+  102/102. Focused x64 checkpoint/platform-failure/lifecycle: 3/3.
+- Documentation governance and diff checks pass. Both owned checkpoint images
+  were removed by the tests. No configuration or user media was changed.
+- Lib/Common and their shared tests remain byte-for-byte unchanged from P2.
+- x86 SHA256: `B6D279A508B69D15B19C76A6A294D180653842E9E41EC7BFA8DCEA2AC1B79F11`.
+- x64 SHA256: `94E37355B8293C715293ED37146DEBF6DDD224F81CAB7ECF4F2F4975BB15A7A6`.
+- S2 remains active; this P completes checkpoint observation only. The selected
+  state ledger, restore-entry and VM deadline proof remain before S2 closure.

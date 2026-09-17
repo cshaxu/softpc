@@ -4011,6 +4011,8 @@ TYPEE8:
 
        while ( TRUE )
 	 {
+	 /* T63 port ABI: observe halt with IP already advanced. */
+	 softpc_ccpu_lifecycle_checkpoint(TRUE);
 	 /* RESET ends the halt state. */
 	 if ( cpu_interrupt_map & CPU_RESET_EXCEPTION_MASK )
 	    break;
@@ -4574,6 +4576,8 @@ NEXT_INST:
       softpc_platform_executor_event();
       }
 
+   /* T63 port ABI: capture policy stays outside the original CPU. */
+   softpc_ccpu_lifecycle_checkpoint(FALSE);
    CCPU_save_EIP = GET_EIP();   /* to reflect IP change */
 
 #if defined(SFELLOW) && !defined(PROD)

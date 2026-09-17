@@ -28,7 +28,10 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   ordinary pause/debug semantics stay unchanged. S2 adds the isolated Compat
   timer producer capture barrier; save/load and CPU restoration are not yet
   implemented. [Implementation record](../history/M9-T63-machine-snapshots.md).
-  Both fixed packages rebuilt; full x64/x86 suites each pass 101/101. S2 stays
+  P3 adds executor-bound CPU phase/depth observation with real nested-BOP and
+  HLT proof; the original mirror changes by four lines. No product observer
+  is bound yet. Both fixed packages rebuilt; full x64/x86 suites each pass
+  102/102. S2 stays
   active for canonical CPU entry, timeout and selected-state inventory work.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
@@ -227,7 +230,7 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
 | Applicable Rules | docs/rules/EXECUTION.md and DOCUMENT.md; design/ARCHITECTURE.md, CODING.md, UI.md; referenced execution, architecture and documentation skills. |
 | Verification | Field ledger and caller sweep; controllable timer/entry barriers, normal/HLT/debug/nested pause reentry tests; if code changes, fixed x86/x64 package builds and full CTest plus focused machine/lifecycle tests and manifest/boundary gates. Documentation gate and actual-commit review. |
 | Expected Markers | No unclassified selected state or persisted C stack; explicit running-save may advance to its boundary; no guest execution during export; ordinary pause/debug unchanged; no timer accumulation during capture; one executor. |
-| Asset Needs | No user media mutation. Any later runtime probe uses owned disposable build children with declared size/time/cleanup before execution; none created in S1. |
+| Asset Needs | No user media mutation. P3 checkpoint test owns a 512-byte softpc-checkpoint-smoke.img in each fixed build tree, CTest timeout 15 seconds, removed on success; agent cleans it after any failed run. No raw trace/recording. |
 | Reporting Requirements | Before code report exact files/ABI and estimated churn; after proof report production/test numstat and original mirror diff separately, tests and both EXE links. |
 | Stop Conditions | Unrepresentable native continuation, missing file-safety capability or required Lib/other Common expansion: report before editing; no force-unwind that drops guest work, no polling or guest reset substitute. |
 | Exit Criteria | Complete selected-state ledger and proven recoverable pause/timer boundary; no change to ordinary lifecycle semantics; required dual-width evidence, commit/push and independent actual-change review. |

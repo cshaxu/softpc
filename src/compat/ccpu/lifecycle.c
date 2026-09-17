@@ -10,6 +10,8 @@
 #endif
 
 static SOFTPC_CCPU_THREAD_LOCAL unsigned long softpc_ccpu_frame_depth;
+static SOFTPC_CCPU_THREAD_LOCAL softpc_ccpu_checkpoint_observer checkpoint_observer;
+static SOFTPC_CCPU_THREAD_LOCAL void *checkpoint_context;
 static volatile LONG softpc_ccpu_exit_requested;
 
 
@@ -22,6 +24,23 @@ void softpc_ccpu_lifecycle_leave(void)
 {
     if (softpc_ccpu_frame_depth != 0ul)
         --softpc_ccpu_frame_depth;
+}
+
+void softpc_ccpu_lifecycle_observe(softpc_ccpu_checkpoint_observer observer,
+    void *context)
+{
+    checkpoint_observer = observer;
+    checkpoint_context = context;
+}
+
+void softpc_ccpu_lifecycle_checkpoint(int halted)
+{
+    if (checkpoint_observer == NULL) return;
+    checkpoint_observer(checkpoint_context, softpc_ccpu_frame_depth, halted);
+    /* A stop issued while the observer was parked must unwind before another
+     * guest instruction, just like the existing executor callback exit. */
+    if (softpc_ccpu_lifecycle_exit_requested())
+        softpc_ccpu_lifecycle_return_outer();
 }
 
 void softpc_ccpu_lifecycle_request_exit(void)

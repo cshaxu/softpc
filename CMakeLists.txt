@@ -441,6 +441,10 @@ target_link_libraries(softpc-lifecycle-smoke PRIVATE softpc-vm)
 add_test(NAME softpc-lifecycle-smoke COMMAND softpc-lifecycle-smoke)
 set_tests_properties(softpc-lifecycle-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-checkpoint-smoke test/unit/checkpoint_smoke.c)
+target_link_libraries(softpc-checkpoint-smoke PRIVATE softpc-vm)
+add_test(NAME softpc-checkpoint-smoke COMMAND softpc-checkpoint-smoke)
+set_tests_properties(softpc-checkpoint-smoke PROPERTIES TIMEOUT 15)
 add_executable(softpc-runtime-smoke
     test/unit/runtime_smoke.c
     test/support/common_machine_test.c
@@ -545,6 +549,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-bop-smoke
     softpc-quick-time-smoke
     softpc-lifecycle-smoke
+    softpc-checkpoint-smoke
     softpc-runtime-smoke
     softpc-runtime-restart-boot-smoke
     softpc-runtime-input-continuation-smoke
@@ -621,6 +626,7 @@ set(SOFTPC_UNIT_TESTS
     softpc-bop-smoke
     softpc-quick-time-smoke
     softpc-lifecycle-smoke
+    softpc-checkpoint-smoke
     softpc-runtime-smoke
     softpc-runtime-input-continuation-smoke
     softpc-command-smoke
