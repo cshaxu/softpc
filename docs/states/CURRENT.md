@@ -8,10 +8,10 @@ T62 is closed on owner direction after the
 [whole-task audit](../history/M9-T62-completion-audit.md).
 M9 T63 S1 is closed after the [design review](../history/M9-T63-S1-machine-snapshots.md).
 M9 T63 S2 is closed after the field inventory, cross-width state-owner index
-and running-save safe-stop boundary proof. M9 T63 S3 is active: the binary
-container/media boundary reuses existing Storage. The owner accepts ordinary
-truncate publication: a failed replacement may destroy the prior same-path
-snapshot, so no Lib transaction extension is required.
+and running-save safe-stop boundary proof. M9 T63 S3 is closed after the
+existing-Storage/media-ownership decision: bounded readonly medium reads and
+ordinary truncate publication require no Lib change. M9 T63 S4 is active for
+the first real CPU/SAS/RAM state export/import slice.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
 T62 closure was pushed in 54b2009 before T63 admission. The three older
 candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.md).
@@ -56,6 +56,8 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   state API or user command. S3 re-audit corrects its initial file-boundary
   conclusion: existing readonly media supplies bounded chunk reads; ordinary
   truncate writer publication is owner-approved, so Lib remains unchanged.
+  S4 is admitted for CPU/SAS/RAM state serialization only; it exposes no user
+  command or incomplete snapshot file.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files
@@ -239,23 +241,23 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
   P discipline, path accounting, and build hygiene now match the relevant
   NXVM governance standard. [Record](../history/M9-Td-S9-execution-closure-quality.md)
 
-## M9 T63 S3 Packet
+## M9 T63 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner explicitly requests one binary snapshot under running-only read and init/stopped-only write; S2 is closed and S3 is admitted under that unchanged product contract. The owner further approves reuse of existing readonly-medium reads and truncate writer publication; failed replacement may destroy the old same-path snapshot. |
-| Objective | Define and implement a versioned binary container and explicit media-base transaction using existing Storage without changing App/VM/Compat ownership. |
-| Non-goals | No Lib change, private native file path, direct storage dump, second overlay implementation, changed device semantics or user media. No Common changes in this S. |
-| Reference Baseline | S2 closure d4dda9d; fixed package code unchanged since P5. |
+| Admission And Approval | Owner directs continued implementation after S3 and preserves the existing contract: Lib remains unchanged; Common receives only its later two machine-state operations and necessary executor wiring; ordinary truncate publication is accepted. |
+| Objective | Add the first real, fixed-width CPU/SAS/RAM state export/import slice behind VM/Compat ownership, including the already-audited CPU reentry phase and hidden translation state. |
+| Non-goals | No user save/load command, no Common API yet, no Lib change, no file-path handling, no media export, no generic struct dump, no reset substitute, and no change to ordinary pause/debug semantics. |
+| Reference Baseline | S3 decision 65eec13; fixed package code unchanged. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
-| Files And ABI Surface | Audit completed over App command/file seams, VM media adapters and existing Storage. Existing `lib_storage_medium_open(READONLY)`, `byte_count`, `read_at`, `destroy`, and binary writer open/write/close are the complete file surface; no Lib ABI change is allowed. |
-| Applicable Rules | docs/rules/EXECUTION.md and DOCUMENT.md; design/ARCHITECTURE.md, CODING.md, UI.md; referenced execution, architecture and documentation skills. |
-| Verification | Container parser/writer plan, direct/readonly/overlay media caller sweep and truncate-publication contract. If approved code changes, fixed x86/x64 package builds and full CTest plus focused storage/media tests and manifest/boundary gates. Documentation gate and actual-commit review. |
-| Expected Markers | One bounded little-endian format, no pointer/struct dump, direct/readonly reference-only media, full overlay differences, and an explicit failure path that leaves source media/INI untouched. A failed save may leave the target snapshot truncated or partial. No private native file path. |
-| Asset Needs | No user media mutation, no user snapshot file and no raw trace/recording. Future container tests must own and remove build-local fixtures. |
+| Files And ABI Surface | Before editing: `src/vm/snapshot.c/.h`, `src/vm/machine.c/.h`, `src/compat/ccpu/lifecycle.c/.h`, selected `src/mvdm/softpc.new/base/ccpu386/*` and SAS sources. New state hooks remain VM/Compat-private until the later Common driver operation; all payload fields are fixed-width copied values or bounded byte ranges. |
+| Applicable Rules | docs/rules/EXECUTION.md, ARCHITECTURE.md, CODING.md and DOCUMENT.md; design/ARCHITECTURE.md, CODING.md and UI.md; referenced execution, architecture and documentation skills. |
+| Verification | New focused CPU/SAS state roundtrip tests: general/hidden register state, TLB, RAM, FETCH/HLT reentry and no ordinary pause/debug regression; x64/x86 full CTest, package builds, manifests/boundary gates and actual-commit review. |
+| Expected Markers | No pointer, `jmp_buf`, native stack, function address or raw C struct enters payload; restored execution begins through the existing fresh CCPU entry; TLB and delayed CPU/FPU state are copied, not guessed from visible registers. |
+| Asset Needs | No user media mutation, no user snapshot file and no raw trace/recording. Tests own/remove any fixtures under build. |
 | Reporting Requirements | Before code report exact files/ABI and estimated churn; after proof report production/test numstat and original mirror diff separately, tests and both EXE links. |
-| Stop Conditions | Required Lib/other Common expansion or an unrepresentable media-base transaction: report before editing; no direct raw dump or guest reset substitute. Existing bounded readonly-medium reads and ordinary truncate writer are sufficient under the owner-approved file-failure contract. |
-| Exit Criteria | Complete container/media design, exact adapter ownership and truncate-publication semantics; no partial command or user-media mutation; required evidence, commit/push and independent actual-change review. |
+| Stop Conditions | A required semantic state cannot be represented without a new Common/Lib API, a host continuation cannot be reconstructed through the existing entry phases, or an MVDM change needs broader than the admitted port-ABI state hook: report before expanding scope. |
+| Exit Criteria | CPU/SAS/RAM slice has audited fixed encoding and restoration proof across both widths; no user command or partial file path is exposed; required evidence, commit/push and independent actual-change review. |
 | Original Owner Request | One binary file, direct/readonly references and FDD/HDD overlays; no Lib edits, Common only two state operations and necessary wiring. Latest: save only running, load only init/stopped, success ordinary paused with working resume/reset; VM safety timeout 1 second. Verbatim and matrix in proposal. |
-| Similar-Issue Sweep | Every executor callback caller including nested host_simulate and HLT, timer producer/consumer and queued input; classify CPU/FPU/memory/video/controllers/media/host resources as save, rebuild, external or unselected with evidence. |
+| Similar-Issue Sweep | Every selected CPU/SAS mutable owner, including CCPU hidden caches, delayed FPU state, A20/wrap, RAM aliases and all executor reentry phases; classify every field as payload, rebuild, host external or unselected. |
