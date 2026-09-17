@@ -860,3 +860,18 @@ CTest passes `103/103` on both widths.  The S5 package code is in
 `assets/binary/softpc32.exe` and `assets/binary/softpc64.exe` from P2; P3/P4
 only changed test and historical evidence.  The worktree was clean after P4.
 Lib and Common remain unchanged by this P.
+
+## S6 P2: PPI latch and speaker reconstruction
+
+PPI is the first implemented S6 receiver. Its fixed-width archive contains
+only the guest port latch, the Timer 2 gate edge baseline, and the speaker-data
+edge baseline. It deliberately does not save the PIT state a second time,
+replay `timer_gate()`, or copy audio task/event/buffer/native-handle state.
+PIT remains the S5 receiver. On restore PPI reinstalls the two edge baselines
+and asks the existing host sound implementation to enable or disable speaker
+output, rebuilding that host resource from restored guest state.
+
+`checkpoint_smoke` drives PPI port `61h`, captures it, changes it, restores it,
+and recaptures the three semantic values. This is a private archive proof only:
+there is no snapshot command, container, App path, Common API, or Lib change.
+The next S6 receivers remain keyboard, mouse and video.

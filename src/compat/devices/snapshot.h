@@ -133,6 +133,15 @@ typedef struct softpc_device_hdd_state {
 int softpc_device_snapshot_capture_hdd(softpc_device_hdd_state *state);
 int softpc_device_snapshot_restore_hdd(const softpc_device_hdd_state *state);
 
+typedef struct softpc_device_ppi_state {
+    uint8_t register_value;
+    uint8_t gate_2_was_low;
+    uint8_t speaker_data_was_low;
+} softpc_device_ppi_state;
+
+void softpc_device_snapshot_capture_ppi(softpc_device_ppi_state *state);
+int softpc_device_snapshot_restore_ppi(const softpc_device_ppi_state *state);
+
 /*
  * The PIT uses function pointers and host clock timestamps internally.  The
  * archive stores only the finite state-machine identities and elapsed phase;

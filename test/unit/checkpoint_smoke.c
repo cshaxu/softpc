@@ -386,6 +386,7 @@ static void verify_controller_archives(void)
     softpc_device_pic_state pic_saved, pic_restored;
     softpc_device_fdc_state fdc_saved, fdc_restored;
     softpc_device_hdd_state hdd_saved, hdd_restored;
+    softpc_device_ppi_state ppi_saved, ppi_restored;
 
     assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
 
@@ -443,6 +444,15 @@ static void verify_controller_archives(void)
     assert(softpc_device_snapshot_capture_hdd(&hdd_restored));
     assert(memcmp(hdd_restored.taskfile, hdd_saved.taskfile,
         sizeof(hdd_saved.taskfile)) == 0);
+
+    outb(0x61u, 0x01u);
+    softpc_device_snapshot_capture_ppi(&ppi_saved);
+    outb(0x61u, 0u);
+    assert(softpc_device_snapshot_restore_ppi(&ppi_saved));
+    softpc_device_snapshot_capture_ppi(&ppi_restored);
+    assert(ppi_restored.register_value == ppi_saved.register_value);
+    assert(ppi_restored.gate_2_was_low == ppi_saved.gate_2_was_low);
+    assert(ppi_restored.speaker_data_was_low == ppi_saved.speaker_data_was_low);
 }
 
 static void record_event(long param)

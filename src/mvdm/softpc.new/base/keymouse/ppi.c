@@ -44,6 +44,7 @@ static char SccsID[]="@(#)ppi.c	1.9 08/10/92 Copyright Insignia Solutions Ltd.";
 #include "trace.h"
 #endif
 #include "debug.h"
+#include "compat/devices/snapshot.h"
 
 /*
  * ============================================================================
@@ -197,4 +198,38 @@ void ppi_init IFN0()
 		io_connect_port(i, PPI_ADAPTOR, IO_READ_WRITE);
 
     ppi_register = 0x00;
+}
+
+GLOBAL void
+softpc_device_snapshot_capture_ppi(state)
+softpc_device_ppi_state *state;
+{
+	if (state == NULL)
+		return;
+	state->register_value = ppi_register;
+	state->gate_2_was_low = gate_2_was_low ? 1u : 0u;
+#ifndef NTVDM
+	state->speaker_data_was_low = SPKRDATA_was_low ? 1u : 0u;
+#else
+	state->speaker_data_was_low = 1u;
+#endif
+}
+
+GLOBAL int
+softpc_device_snapshot_restore_ppi(state)
+const softpc_device_ppi_state *state;
+{
+	if (state == NULL || state->gate_2_was_low > 1u ||
+		state->speaker_data_was_low > 1u)
+		return FALSE;
+	ppi_register = state->register_value;
+	gate_2_was_low = state->gate_2_was_low ? TRUE : FALSE;
+#ifndef NTVDM
+	if (state->speaker_data_was_low)
+		host_disable_timer2_sound();
+	else
+		host_enable_timer2_sound();
+	SPKRDATA_was_low = state->speaker_data_was_low ? TRUE : FALSE;
+#endif
+	return TRUE;
 }

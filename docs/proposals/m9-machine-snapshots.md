@@ -315,7 +315,7 @@ VM 强制生成完整帧，
 | S8 | App save/load 命令、帮助、既有 provider 结果/prompt 接线 | 百行级 | Session/UI 不改；命令矩阵、失败输出、paused debug/resume 与既有两类 display/console_control 路径 |
 | S9 | 全量账本复核、安装长流程与回归、最终交付 | 测试为主 | 以下验收矩阵全通过，x86/x64 EXE，owner 手测后才关 T |
 
-### S6 preimplementation receiver ledger
+### S6 receiver ledger
 
 This ledger freezes the S6 receiver universe before implementation.  It does
 not authorize a raw-structure copy: every `payload` row requires a fixed-width
@@ -325,7 +325,7 @@ field map and validation before it can enter the private archive.
 | --- | --- | --- |
 | `keyba.c`, `keybd_io.c` 8042/keyboard controller | Payload | FIFO bytes and indices, translation/scan-set state, typematic/key-down state, keyboard command latches and delayed-event handles. Rebuild host keyboard callbacks and scan-code table addresses; encode `do_int`/`allowRefill` only after their parameters and cancellation handles are audited. |
 | `mouse.c` InPort hardware and `mouse_io.c` DOS driver | Payload | Encode physical deltas/buttons plus each `MOUSE_CONTEXT` field in fixed width. Guest segment:offset callback values are data; `mm_handle`, cursor backing pixels, guest-memory scratch address and host cursor callbacks rebuild. The historical mouse save block is evidence of the field set, not a portable wire image. |
-| `ppi.c` speaker/PPI latches | Payload + rebuild | Preserve guest-programmed PPI gate/data state. PIT state is already S5 payload. Recreate the host speaker waveform after restore; do not preserve an audio task, event, phase buffer or native audio handle. |
+| `ppi.c` speaker/PPI latches | Payload + rebuild (P2 implemented) | Preserve guest-programmed PPI gate/data state. PIT state is already S5 payload. P2 archives the port latch and both edge baselines in fixed width, restoring the host speaker on/off state without replaying a Timer gate transition. It does not preserve an audio task, event, phase buffer or native audio handle. |
 | EGA/CGA/VGA/V7 registers, planes, latches, fonts and palette | Payload | Encode semantic registers, planes/font bytes, bank/chain/mode values, DAC/palette, cursor and split/scroll state. Rebind generated read/write/mode vectors and RAM-relative pointers from restored semantics. |
 | C-VID GDP slots and rule state | Payload only after fixed map | Encode audited scalar/offset/semantic-ID slots. Reject capture for a live unknown slot use. Never copy GDP allocation, generated rule entry, function vector or host address. |
 | `nt_graph`, `dib_surface`, graphics console, KVM frame resources | Rebuild | Exclude DIB, dirty regions, Window pixels, host cursor backing, UI mailboxes and frame generations. Restore invalidates/recreates host drawing state and emits one ordinary complete frame. |
