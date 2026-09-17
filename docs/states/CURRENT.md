@@ -41,6 +41,11 @@ S8 P1 adds the product boundary only: `save <file>` is admitted from running
 and pauses on successful capture; `load <file>` is admitted from stopped
 (including the just-started monitor) and reaches ordinary paused.  App owns copied paths, the RAM-plus-allowance
 input bound, wording and prompt flow; Common and Lib remain unchanged.
+P2 removes the redundant App-only `INIT` monitor state: initial and stopped
+are one stopped command-policy state, while Common retains its own lifecycle
+representation. P3 fixes the legacy `illegalp.c` error-header overlay for a
+fresh 32-bit MSYS2 build; it selects the original Base error enum after the
+historical shared include guard, without changing App, Common or Lib behavior.
 
 ## Current Technical Baseline
 
