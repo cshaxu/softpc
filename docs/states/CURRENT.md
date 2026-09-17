@@ -27,7 +27,10 @@ stopped restore transaction: running read returns ordinary PAUSED, stopped
 write stages first and restores into ordinary PAUSED. P9 reconstructs host
 video resources only after controller replay and proves that restore publishes
 a complete frame (text fallback while a graphics painter is unavailable). It is not yet an App
-snapshot command and media sections remain in scope.
+snapshot command and media sections remain in scope. P10 suppresses only
+reset/archive-replay executor callbacks; it reopens the existing callback
+before restored CCPU re-entry, so the PAUSED completion cannot precede the
+completed restored surface or deadlock the parked executor.
 
 ## Current Technical Baseline
 

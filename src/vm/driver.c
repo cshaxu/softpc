@@ -21,6 +21,7 @@ struct vm_driver {
     lib_bool state_read_ready;
     softpc_snapshot_image staged_image;
     lib_bool restore_pending;
+    lib_bool restore_active;
     common_machine_executor_callback executor_callback;
     void *executor_context;
 };
@@ -128,7 +129,8 @@ static lib_bool vm_driver_reset(void *opaque)
 static void vm_driver_executor_event(void *opaque)
 {
     vm_driver *driver = (vm_driver *)opaque;
-    if (driver != NULL && driver->executor_callback != NULL)
+    if (driver != NULL && !driver->restore_active &&
+        driver->executor_callback != NULL)
         driver->executor_callback(driver->executor_context);
 }
 
@@ -166,6 +168,7 @@ static lib_bool vm_driver_run(void *opaque)
     softpc_ccpu_lifecycle_observe(vm_driver_snapshot_observe, driver);
     if (driver->restore_pending) {
         softpc_ccpu_entry entry;
+        driver->restore_active = LIB_TRUE;
         result = softpc_machine_reset(driver->machine) == SOFTPC_MACHINE_OK &&
             softpc_snapshot_image_restore(&driver->staged_image, &entry) ==
                 LIB_STATUS_OK;
@@ -174,11 +177,16 @@ static lib_bool vm_driver_run(void *opaque)
            rebuilt frame and reaches the paused rendezvous before the guest
            advances beyond this restored boundary. */
         if (result) {
+            /* Reset and archive replay can signal the old executor boundary.
+               The restored entry itself must use the ordinary callback to
+               reach Common's requested PAUSED rendezvous. */
+            driver->restore_active = LIB_FALSE;
             result = softpc_ccpu_lifecycle_resume(&entry) != 0;
-            if (result) vm_driver_executor_event(driver);
         }
+        driver->restore_active = LIB_FALSE;
         softpc_snapshot_image_dispose(&driver->staged_image);
         driver->restore_pending = LIB_FALSE;
+        if (result) vm_driver_executor_event(driver);
     } else
         result = softpc_machine_run(driver->machine, UINT64_MAX) == SOFTPC_MACHINE_OK;
     softpc_ccpu_lifecycle_observe(NULL, NULL);

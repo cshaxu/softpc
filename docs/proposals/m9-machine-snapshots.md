@@ -565,3 +565,14 @@ is still unavailable at the restored boundary, the VM publishes the complete
 text surface rather than emitting no frame; a ready graphics painter remains
 the preferred route. No host DIB, pixel allocation or window resource enters
 the image.
+
+### S7 P10: restore-completion callback boundary
+
+The original reset and archive replay can invoke the driver's existing executor
+callback before the restored CCPU entry has begun. VM suppresses only those
+callbacks while its private restore transaction is active. It reopens the same
+callback immediately before `softpc_ccpu_lifecycle_resume()`: that ordinary
+re-entry callback is still required to reach Common's requested PAUSED wait,
+publish the completed restored frame, and return from the parked executor.
+This is one VM-local Boolean boundary, not a Common lifecycle state or second
+completion channel.
