@@ -592,3 +592,26 @@ starting restore. The existing post-reset SAS restore remains the final live
 state check. A two-process CTest saves, exits, creates a fresh stopped target,
 loads, verifies its complete PAUSED frame, resumes and stops; a mismatched-RAM
 decode is rejected before the restore transaction.
+
+
+## S10: 软硬盘 overlay 完整交付（已准入）
+
+Owner 明确指出：没有 overlay 内容的快照不满足原始整机恢复目标，因此
+T63 不得收口；撤回尚未提交的收口及 T64 准入。S9 的显示恢复验收不替代
+磁盘一致性验收。当前唯一实施任务见 [CURRENT](../states/CURRENT.md)。
+
+先审计所有 FDD/HDD 媒体所有者、模式、lease、源身份以及容器读写入口，
+报告文件/行数估算，再实现。复用已有 Storage 读写/替换能力；不另造 overlay，
+不修改用户源镜像，不新增 Common API。
+
+| 收敛单元 | 完成标准 |
+| --- | --- |
+| 所有软盘/硬盘槽位 | 每个槽位的媒体模式、配置身份、容量及 overlay 内容均有明确记录与恢复负责人 |
+| OVERLAY 保存 | 与 CPU/设备同一安全暂停边界，修改内容进入同一个 binary，无 sidecar |
+| OVERLAY 恢复 | 恢复保存时的完整有效视图，替换而非叠加后来修改；空 overlay 同样正确 |
+| DIRECT/READONLY | 保持外部源引用语义，验证匹配条件；不声称 DIRECT 外部写入会回滚 |
+| 容器与失败 | 长度/范围/源不匹配及截断明确失败，不把缺少媒体内容当完整成功 |
+| 验证 | FDD/HDD 均有变更、无变更、跨进程和跨宽度测试，恢复后 resume/reset 正常 |
+
+完成后双宽度完整构建、测试、提交推送并供 owner 手测。T63 整体收口必须
+重新核对原始请求，不能把此项再以设计证明或延期记录替代实现。

@@ -12,7 +12,8 @@ Owner 原始请求：
 
 本文件记录只读审计与候选设计，不是代码实施准入，不关闭 T63/S9，不分配新 T/S。
 当前任务状态仍以 [CURRENT](../states/CURRENT.md) 为准；本候选挂于
-[QUEUE](../states/QUEUE.md)。Owner 随后要求提升至队首；候选顺序仅由 Queue 维护。
+[QUEUE](../states/QUEUE.md)。Owner 随后将 D1/D2 与 C1 的 Common 部分分别拆成
+独立 Lib/Common 候选，均排在本候选之前；候选顺序仅由 Queue 维护。
 Owner 已反馈 S9 P9 手测成功；这不是整个快照任务全部能力完成的声明。
 
 审计基线为 `aa2bc0d`，T63 增量比较起点为 `ea7e982`。以下计数由
@@ -107,42 +108,26 @@ entry，应删除重复状态并相应修正只验证此冗余字段的测试。
 
 ### C1：Common 同步请求收敛及发布顺序
 
-[Machine](../../src/common/machine/machine.c) 为 media/debug/state 使用各自参数、
-请求标志与完成事件；快照另有多个阶段标志。候选统一现有同步操作为一个内部请求槽：
-明确操作类型、参数、结果、完成等待。保留 lifecycle 标志的必要优先级、输入队列、
-debug lease 和 executor-owned 阶段；不将所有命令改成动态任务，不新增公共准备 API。
-先证明单控制调用方下同步操作互斥，再决定哪些字段可合并，不能只换成一个大 enum。
+Owner 已将本项转入独立 [Common 同步请求任务](m9-common-machine-request-simplification.md)。
+本候选不再实施该 Common 改动；发布、请求槽及验收由该 proposal 唯一维护。
 
-源码确认：read_state/write_state 先发布 requested，再写 payload 和 reset event；
-executor 可在中间观察请求。这是发布顺序风险，尚无故障注入复现，不归因于已修复花屏。
-必须先准备完整参数和完成等待，再以明确同步边界发布；保留重复请求拒绝。
-应对所有同类同步请求扫查，用可控 barrier 验证不会读取旧 payload 或丢失完成通知。
+### C2：VM 快照收尾失败处理
 
 [VM driver](../../src/vm/driver.c) 还忽略 snapshot_finish 的失败返回；应纳入已有
 操作/执行终止路径，明确已发完成与后续时钟恢复失败的关系，不新增旁路通知。
-Common 仍不判断内部安全点；VM 仍负责安全点与一秒期限。
-本项改动规模和净减需独立设计，不以删除必要等待/错误分支达成行数指标。
+本项仍由本候选负责，不属于独立 Common 任务。Common 不判断内部安全点，
+VM 仍负责安全点与一秒期限。改动规模和净减需独立设计，不以删除必要等待/
+错误分支达成行数指标；验证时钟恢复失败与原有完成/执行终止语义。
 
 ### D1：按有效内容复制帧
 
-[kvm_frame](../../src/lib/kvm-base/frame_interface.h) 内嵌文本与最大图形数组，
-[mailbox](../../src/lib/kvm-base/mailbox.c) 与 Common 使用整结构复制。
-文本更新因此也搬运近 1 MiB 的图形容量。
-首选保持公开 ABI，在现有 KVM 值工具边界统一有效内容复制：复制元数据及当前文本
-或有效图形内容。必须审计全部读取点，明确非活动字段不可被读取；不能仅少 memcpy。
-特别覆盖 mailbox 目前的 palette 比较、模式切换、stride、帧有效性与 dirty 合并。
-Common staging/published 双缓冲、锁、latest-wins、成功后 acknowledge 均保留。
-只有测量证明额外价值并另获 ABI 批准，才考虑 tagged union。
-不引入引用计数、零拷贝指针、缓冲池；目标是减少拷贝，不保证净减行数。
+Owner 已将本项转入独立 [Lib 简化任务的 S1](m9-lib-frame-copy-console-task.md)。
+本候选不再实施；复制契约、范围与验收以该 proposal 为准。
 
 ### D2：Console worker 复用 Base task
 
-[Win32 Console worker](../../src/lib/kvm-console/win32/component.c) 为单个线程
-句柄单独分配对象并手写创建/join/close；多数 worker 循环已使用中性契约。
-候选复用已有 Base task，平台无关循环归组件自身，平台输入解释留平台实现。
-不删除 Console worker，不将工作塞进 broker input callback，不改变 Linux
-UNSUPPORTED 范围。验证 STOP FIFO、故障唤醒、回调 detach、join、一次退休及创建失败。
-平台 worker 签名与任务取消规则必须逐项对齐，不为复用引入新的适配壳。
+Owner 已将本项转入独立 [Lib 简化任务的 S2](m9-lib-frame-copy-console-task.md)。
+本候选不再实施；线程生命周期与验收以该 proposal 为准。
 
 ### D3：Storage overlay 查询保持独立任务
 
@@ -171,9 +156,7 @@ UNSUPPORTED 范围。验证 STOP FIFO、故障唤醒、回调 detach、join、�
 | --- | --- | --- |
 | A | A1–A4、B2 低风险清理，复核 A5 保留边界 | 原始 diff、双宽度 CPU/视频 roundtrip、原有输入体验；前后逐路径行数 |
 | B | B1 字段顺序去重 | 固定格式字节等价、双向跨宽度、截断/非法字段和设备恢复 |
-| C | C1 同步请求发布与内部状态收敛 | barrier 竞态测试、重复拒绝、失败/取消/stop/reset、原生命周期矩阵 |
-| D | D1 有效帧复制 | 文本/图形切换、dirty 跳帧/ack、stride/palette、实际拷贝量与双宽度 |
-| E | D2 Base task 复用 | 创建失败、STOP 顺序、detach/join/退休与原生 Console 交接 |
+| C | C2 VM 快照收尾失败处理 | 时钟恢复失败注入、完成顺序与既有执行终止路径 |
 
 阶段 A 保守估计 MVDM diff 减少约 100–125 行，其中 68 行是外移；全项目净减
 约 30–60 行。不是承诺值，也不包含后续中风险项目。每阶段开始前重新审计基线、

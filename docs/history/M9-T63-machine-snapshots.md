@@ -1239,3 +1239,17 @@ input path, Lib/Common API, or compatibility reader was introduced. The
 temporary Win3.1 diagnostic code and owned image/frame captures were removed;
 only fixed package EXEs are refreshed. Pre-existing owner deletions under
 `assets/binary/t63-bisect/` are left separate from this corrective P.
+
+
+## S10 admission: complete FDD/HDD overlay snapshots
+
+Owner explicitly rejects T63 closure while overlay content is absent.
+The attempted closure and T64 admission were documentation-only and never
+committed; they are withdrawn. Lib optimization remains queued.
+
+S9 display/input fixes are manually accepted. T63 remains open because
+the original one-binary media requirement is not delivered. S10 must audit
+all media owners, implement overlay archive/restore through existing Storage,
+and prove fresh-process restoration of both disk content and machine state.
+No new Common API or Lib change is pre-approved. See the active packet and
+the proposal's S10 ledger.
