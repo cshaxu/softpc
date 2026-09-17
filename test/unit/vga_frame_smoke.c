@@ -455,6 +455,9 @@ static void verify_driver_geometry(softpc_machine *machine)
         assert(driver.copy_frame(driver.context, frame));
         assert(frame->graphics_width == width && frame->dirty_right == rect.Right);
         assert(memcmp(frame->graphics_pixels, bits, width * height) == 0);
+        /* A graphics route with no complete dirty frame must publish nothing.
+           It must never substitute the text surface: restoration relies on
+           this same rule while the indexed painter is being rebuilt. */
         assert(!driver.copy_frame(driver.context, frame));
     }
     vm_driver_destroy(adapter);

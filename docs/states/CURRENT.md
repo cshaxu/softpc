@@ -47,10 +47,11 @@ are one stopped command-policy state, while Common retains its own lifecycle
 representation. P3 fixes the legacy `illegalp.c` error-header overlay for a
 fresh 32-bit MSYS2 build; it selects the original Base error enum after the
 historical shared include guard, without changing App, Common or Lib behavior.
-P6 corrects P9's presentation fallback: only a just-restored graphics
-machine may temporarily publish a text surface while its painter is pending;
-ordinary graphics with no dirty region publishes nothing and retains the
-previous frame. This restores the Window/Console route invariant. P7 briefly
+P6 attempted to preserve P9's presentation route with a restored-graphics
+text fallback; S9 P3 supersedes it: graphics has no text fallback. Until its
+rebuilt painter supplies a complete dirty frame, it publishes nothing and
+retains no false 80x25 presentation. This restores the Window/Console route
+invariant. P7 briefly
 used a fixed `32` machine-width marker for cross-width images. Owner has
 superseded that format: S9 removes every width field altogether and replaces
 the bounded App buffer/container path with canonical streaming I/O.
@@ -310,15 +311,15 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admitted S9 after S8 P7. Owner explicitly rejects retained `32`/`64` header markers and arbitrary RAM+allowance/device limits. A minimal Lib Storage streaming-reader addition is approved. P2 is owner-reported corrective scope: a stopped-to-paused restore must not create a Window solely from a restored graphics frame. |
+| Admission And Approval | Owner admitted S9 after S8 P7. Owner explicitly rejects retained `32`/`64` header markers and arbitrary RAM+allowance/device limits. A minimal Lib Storage streaming-reader addition is approved. P2 is owner-reported corrective scope: a stopped-to-paused restore must not create a Window solely from a restored graphics frame. P3 is owner-reported corrective scope: after `load` then `resume`, Window must wait for a complete restored graphics frame rather than display a text fallback as a black, wrongly sized Window. |
 | Objective | Replace the bounded whole-file snapshot load and buffered two-section VM container with one width-free, versioned streaming format. Snapshot size follows actual serialized RAM/device/media content and ordinary allocation/I/O failure, not fixed product allowances. |
 | Non-goals | No Common public API change, no Session/UI/debug API, no generic callback/task escape hatch, no second executor, no raw legacy structure dump, and no change to ordinary pause/debug/KVM behavior. This S does not claim the separately planned overlay-page payload is already implemented. |
 | Reference Baseline | S8 P7 at `46baf5c`; it proves a transitional fixed-`32` header cross-width but still buffers reads and imposes RAM+8 MiB/device 4 MiB limits. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
-| Files And ABI Surface | `src/app/{command,composition}.c/.h`, `src/vm/snapshot_image.c`, `src/lib/storage/file*`, `src/common/session/control_state.*`, storage/App/VM/Common snapshot tests and this proposal/evidence only. Lib adds one neutral reader handle mirroring its writer; App passes that stream through the existing opaque Common callback. Session's private paused-Window retention bit is corrected without changing its public ABI. The VM-private header is width-free fixed-endian data, not a public/Common/Lib ABI. |
+| Files And ABI Surface | `src/app/{command,composition}.c/.h`, `src/vm/{snapshot_image,driver}.c`, `src/lib/storage/file*`, `src/common/session/control_state.*`, storage/App/VM/Common snapshot tests and this proposal/evidence only. Lib adds one neutral reader handle mirroring its writer; App passes that stream through the existing opaque Common callback. Session's private paused-Window retention bit and VM's restored-graphics publication are corrected without changing public ABI. The VM-private header is width-free fixed-endian data, not a public/Common/Lib ABI. |
 | Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, `DOCUMENT.md`; `docs/design/ARCHITECTURE.md`, `CODING.md`, `UI.md`; active proposal and source-boundary gates. |
 | Verification | Storage streaming-reader tests; VM malformed/short-section proof; a real App-provider save/stop/load/resume transaction; x64→x86 and x86→x64 fresh-process proof; full sequential x64/x86 CTest, package builds and actual-commit review. |
-| Expected Markers | Only `save` from running is admitted and succeeds as ordinary PAUSED; only `load` from stopped (including the just-started monitor) is admitted and succeeds as ordinary PAUSED. A stopped-to-paused load does not create a Window; a paused Window that already exists remains visible, and resume resumes normal presentation routing. Direct/readonly media remain referenced by their configured source; existing VM image semantics govern all currently archived state. New snapshots have no width field and load across x86/x64 packages when machine configuration matches. App produces one explicit result and one prompt, never a false success or an extra lifecycle request. |
+| Expected Markers | Only `save` from running is admitted and succeeds as ordinary PAUSED; only `load` from stopped (including the just-started monitor) is admitted and succeeds as ordinary PAUSED. A stopped-to-paused load does not create a Window; a paused Window that already exists remains visible, and resume resumes normal presentation routing. A restored graphics route publishes only a complete graphics frame—never a text fallback—so resumed Window geometry/content follows the restored painter. Direct/readonly media remain referenced by their configured source; existing VM image semantics govern all currently archived state. New snapshots have no width field and load across x86/x64 packages when machine configuration matches. App produces one explicit result and one prompt, never a false success or an extra lifecycle request. |
 | Asset Needs | No user media, user snapshot file or INI mutation. Tests create/remove snapshot fixtures below their own build working directory only. Packaging refreshes only the two approved EXEs. |
 | Reporting Requirements | Before code report exact App action, callback, file and size-limit flow; after proof report actual production/test numstat, command/state matrix, tests and both EXE links. |
 | Stop Conditions | A necessary Common API; current canonical image cannot represent a promised medium state; or required streaming cannot be expressed by the approved minimal Storage reader. Record evidence before expanding scope. |

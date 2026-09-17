@@ -22,7 +22,6 @@ struct vm_driver {
     softpc_snapshot_image staged_image;
     lib_bool restore_pending;
     lib_bool restore_active;
-    lib_bool restore_presentation_pending;
     common_machine_executor_callback executor_callback;
     void *executor_context;
 };
@@ -170,7 +169,6 @@ static lib_bool vm_driver_run(void *opaque)
     if (driver->restore_pending) {
         softpc_ccpu_entry entry;
         driver->restore_active = LIB_TRUE;
-        driver->restore_presentation_pending = LIB_FALSE;
         result = softpc_machine_reset(driver->machine) == SOFTPC_MACHINE_OK &&
             softpc_snapshot_image_restore(&driver->staged_image, &entry) ==
             LIB_STATUS_OK;
@@ -179,8 +177,6 @@ static lib_bool vm_driver_run(void *opaque)
            rebuilt frame and reaches the paused rendezvous before the guest
            advances beyond this restored boundary. */
         if (result) {
-            driver->restore_presentation_pending =
-                softpc_machine_presentation_is_graphics(driver->machine);
             /* Reset and archive replay can signal the old executor boundary.
                The restored entry itself must use the ordinary callback to
                reach Common's requested PAUSED rendezvous. */
@@ -362,14 +358,12 @@ static lib_bool vm_driver_copy_frame(void *opaque, kvm_frame *frame)
 {
     vm_driver *driver = (vm_driver *)opaque;
     if (driver == NULL || frame == NULL) return LIB_FALSE;
-    if (softpc_machine_presentation_is_graphics(driver->machine)) {
-        if (vm_driver_copy_graphics(driver, frame)) {
-            driver->restore_presentation_pending = LIB_FALSE;
-            return LIB_TRUE;
-        }
-        if (!driver->restore_presentation_pending) return LIB_FALSE;
-    } else
-        driver->restore_presentation_pending = LIB_FALSE;
+    /* A graphics route has one valid representation: a complete graphics
+       frame.  In particular, restoration must wait for the rebuilt painter
+       rather than publishing an 80x25 text fallback as a false graphics
+       result; that fallback would create a wrongly sized black Window. */
+    if (softpc_machine_presentation_is_graphics(driver->machine))
+        return vm_driver_copy_graphics(driver, frame);
     return vm_driver_copy_text(driver, frame);
 }
 
