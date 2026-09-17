@@ -46,7 +46,9 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   P10 classifies SAS/native CPU state; P11 records the selected controller
   receivers; P12 classifies video/input payload versus host resources.
   P13 completes receiver classification for remaining selected host/BIOS/media
-  families. Production remains unchanged; final focused tests pass on both widths.
+  families. P14 then freezes the complete archive-object convergence index and
+  explains the only compiler-shape x86/x64 differences. Production remains
+  unchanged; final focused tests pass on both widths.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files
