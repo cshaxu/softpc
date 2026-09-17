@@ -9,11 +9,19 @@ void softpc_ccpu_lifecycle_leave(void);
 /* Bound and invoked only on the executor. The observer sees a precise CPU
  * phase and recursion depth; it decides whether a pending capture may stop.
  * Neither native stack addresses nor product state cross this port. */
+typedef struct softpc_ccpu_entry {
+    int halted;
+    unsigned long trap;
+} softpc_ccpu_entry;
 typedef void (*softpc_ccpu_checkpoint_observer)(void *context,
-    unsigned long depth, int halted);
+    unsigned long depth, const softpc_ccpu_entry *entry);
 void softpc_ccpu_lifecycle_observe(softpc_ccpu_checkpoint_observer observer,
     void *context);
-void softpc_ccpu_lifecycle_checkpoint(int halted);
+void softpc_ccpu_lifecycle_checkpoint(int halted, unsigned long trap);
+/* Resume only at an outer, previously captured entry on the executor.
+ * CPU/device state must already be installed. No reset or new executor. */
+int softpc_ccpu_lifecycle_resume(const softpc_ccpu_entry *entry);
+int softpc_ccpu_lifecycle_take_entry(softpc_ccpu_entry *entry);
 void softpc_ccpu_lifecycle_request_exit(void);
 void softpc_ccpu_lifecycle_clear_exit(void);
 /* Clear asynchronous CCPU event bits only at the completed-run -> new-cold-run

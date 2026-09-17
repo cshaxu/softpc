@@ -443,6 +443,9 @@ set_tests_properties(softpc-lifecycle-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-checkpoint-smoke test/unit/checkpoint_smoke.c)
 target_link_libraries(softpc-checkpoint-smoke PRIVATE softpc-vm)
+target_include_directories(softpc-checkpoint-smoke PRIVATE
+    src/mvdm/softpc.new/host/inc
+    src/mvdm/softpc.new/base/inc)
 add_test(NAME softpc-checkpoint-smoke COMMAND softpc-checkpoint-smoke)
 set_tests_properties(softpc-checkpoint-smoke PROPERTIES TIMEOUT 15)
 add_executable(softpc-runtime-smoke

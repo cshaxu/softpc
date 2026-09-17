@@ -776,6 +776,7 @@ IFN1(
    IU32 immed;			/* For immediate generation. */
 
    ISM32 i;
+   softpc_ccpu_entry entry; /* T63 port ABI: copied CPU continuation. */
    /*
       Initialise.   ----------------------------------------------------
     */
@@ -809,6 +810,17 @@ IFN1(
    quick_mode = FALSE;
 #endif /* SYNCH_TIMERS */
 
+   /* T63 port ABI: resume the original phase, not the completed instruction. */
+   if (softpc_ccpu_lifecycle_take_entry(&entry))
+      {
+      if (entry.halted)
+         {
+         start_trap = entry.trap;
+         p = p_start = NULL;
+         goto RESUME_HALT;
+         }
+      goto RESUME_FETCH;
+      }
    goto NEXT_INST;
 
 DO_INST:
@@ -4007,12 +4019,13 @@ TYPEE8:
       UPDATE_INTEL_IP(p);
       PIG_SYNCH(CHECK_ALL);
 
+RESUME_HALT:
 #ifndef PIG
 
        while ( TRUE )
 	 {
 	 /* T63 port ABI: observe halt with IP already advanced. */
-	 softpc_ccpu_lifecycle_checkpoint(TRUE);
+	 softpc_ccpu_lifecycle_checkpoint(TRUE, start_trap);
 	 /* RESET ends the halt state. */
 	 if ( cpu_interrupt_map & CPU_RESET_EXCEPTION_MASK )
 	    break;
@@ -4577,7 +4590,8 @@ NEXT_INST:
       }
 
    /* T63 port ABI: capture policy stays outside the original CPU. */
-   softpc_ccpu_lifecycle_checkpoint(FALSE);
+RESUME_FETCH:
+   softpc_ccpu_lifecycle_checkpoint(FALSE, 0);
    CCPU_save_EIP = GET_EIP();   /* to reflect IP change */
 
 #if defined(SFELLOW) && !defined(PROD)

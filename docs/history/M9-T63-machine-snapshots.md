@@ -130,3 +130,78 @@ The new test does not claim to prove that remaining restoration contract.
 - x64 SHA256: `94E37355B8293C715293ED37146DEBF6DDD224F81CAB7ECF4F2F4975BB15A7A6`.
 - S2 remains active; this P completes checkpoint observation only. The selected
   state ledger, restore-entry and VM deadline proof remain before S2 closure.
+
+## P4 pre-audit: reconstruct the CPU continuation
+
+Baseline d52a901. Estimated production churn 60-90 lines in the same lifecycle
+C/H and c_main.c; extend checkpoint_smoke by about 100-150 lines. No Common/Lib
+change. Reuse the real CPU loop, exception frame and HLT loop, not a new decoder.
+
+The selected CCPU has PROD and no PIG/SFELLOW/SYNCH_TIMERS (root target definitions
+and source define sweep). SYNCH_TICK on simulate entry is therefore empty.
+FETCH capture precedes RF/TF and host-IP preparation, so resume must enter there
+without first consuming another host tick/pacing step. HLT capture follows IP
+advancement and must resume the original wait, retaining start_trap separately
+from current EFLAGS (a paused debugger may previously have edited flags).
+Decoder pointers are rebuilt, never persisted. HLT continuation sets equal null
+decode pointers so the original post-instruction IP adjustment does not repeat.
+
+The internal copied continuation is phase plus pending trap. An executor-only
+resume call validates it at depth zero, establishes the usual original CPU
+entry, and consumes it once before dispatch; nested/exception entries cannot
+reuse it. Ordinary run, debug and reset do not select this entry. Tests will
+prove unchanged IP/quick counter on reentry, no second HLT execution, and the
+STI shadow using a real pending PIC IRQ whose handler observes the next INC.
+This proves continuation reconstruction using existing machine state, not yet
+cross-process restoration of the rest of the machine or a complete snapshot.
+
+## P4 implementation and path review
+
+The observer now copies `{halted, trap}`. FETCH always supplies zero trap;
+HLT supplies the original `start_trap`, not an interpretation of current TF.
+Compat validates this finite representation before entering at depth zero.
+The borrowed resume descriptor is consumed exactly once; normal nested entries
+and exception reentries cannot replay it. c_main reuses its original two labels:
+FETCH immediately before phase observation/setup; HLT immediately before wait.
+No guest instruction, interrupt dispatch, port behavior or ordinary pause was
+reimplemented. Caller still owns the existing run-exit cleanup and clock.
+
+Focused real-CCPU proof covers natural nested BOP return; unchanged HLT IP and
+quick count after two separate reentries; pending trap surviving an intervening
+TF edit; rejected invalid/recursive entry; then an ordinary run (no leftover
+entry), saving immediately after STI, injecting real PIC IRQ0, and reentering.
+The IRQ handler stores AX and must see the INC following STI. A premature IRQ
+would store 0x10 instead of the required 0x11. The final CLI/HLT stops normally.
+The fixture remains the same disposable 512-byte image; no external media.
+
+The first test rebuild exposed missing legacy include paths, then base_def.h's
+non-ANSI `const` macro. The test takes the same include paths as irq_smoke and
+undefines that macro after legacy headers. No mirror header was changed; an
+old executable's early test pass was discarded. Fresh rebuilt proof passes.
+
+Actual P4 production C/H: +49/-6 = +43 across three paths; mirror alone +16/-2
+= +14 in c_main.c. Test +116/-3 = +113 in checkpoint_smoke.c; CMake +3/-0.
+Counts exclude documents/packages. The estimated production churn was larger
+than required because no new CPU simulation wrapper or execution loop was added.
+
+Continuation-state inventory for the selected c_main object was cross-checked
+with `nm --defined-only` B/D symbols and source declarations. GR/SR/CR/DR/TR,
+IP/CPL/FLAGS/SAR/STAR, SasWrapMask, cpu_interrupt_map and cpu_heartbeat belong in
+the S4 state payload; start_trap belongs to the HLT continuation proved here.
+CCPU_WR/BR alias GR and CCPU_M aliases owned RAM; these are rebound, not saved
+addresses. p/p_start/pg_end and operand decode scratch are regenerated at FETCH
+or unused until HLT retires. The source's PIG-only single_instruction_delay is
+absent from the selected object. This is a CPU-entry inventory checkpoint, not
+the complete S2 all-file mutable-state ledger or its closure claim.
+
+## P4 delivery verification
+
+- Fresh fixed x86/x64 builds completed, both full suites 102/102; original
+  source compiler warnings remain outside this proof. Fresh focused x64
+  checkpoint test passed before full regression.
+- Lib/Common/shared tests and user INI/media unchanged. Disposable checkpoint
+  fixtures removed on success. Documentation governance and diff checks pass.
+- x86 SHA256: `91BA0F02331162EFB18A9F3E6FF905499032188FAF379E0337F2776667155307`.
+- x64 SHA256: `A7F23DAA4EFCA0658F4E1EEE274A580FF9DDA76C5FB4B5E71B37D1CFE32AFAE8`.
+- S2 remains active for deadline/combined barrier and the full selected-state
+  inventory. There is still no public save/load or complete state serializer.

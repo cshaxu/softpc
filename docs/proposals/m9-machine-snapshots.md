@@ -186,6 +186,9 @@ Common 不存 snapshot_safe，不轮询嵌套深度；只接收读写结果，�
 CPU/RAM/设备分别编码；callback 用本构建的固定语义 ID 与已审核参数，关联指针用
 对象 ID/偏移重建。可重建缓存（TLB、解码缓存、函数表、宿主绘制资源）不保存，
 恢复后失效并重新建立；硬件 latches、隐藏段缓存、待 IRQ 不是可随意重建的缓存。
+CPU continuation 明确区分取指准备与 HLT 等待；HLT 已前移 IP，且须保存原指令
+进入时的 pending trap，不能用当前 EFLAGS.TF 重新猜测。恢复复用原循环的相应
+阶段，不重复扣 quick-event 计数或提前接受 STI 阴影中的 IRQ；不序列化宿主栈。
 
 每个媒体 section 记录插槽、插入状态、模式、尺寸、几何和基底内容指纹。
 DIRECT/READONLY 没有磁盘 payload；OVERLAY 逐块比较有效内容与只读基底，保存差异块

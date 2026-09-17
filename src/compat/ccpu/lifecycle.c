@@ -12,6 +12,7 @@
 static SOFTPC_CCPU_THREAD_LOCAL unsigned long softpc_ccpu_frame_depth;
 static SOFTPC_CCPU_THREAD_LOCAL softpc_ccpu_checkpoint_observer checkpoint_observer;
 static SOFTPC_CCPU_THREAD_LOCAL void *checkpoint_context;
+static SOFTPC_CCPU_THREAD_LOCAL const softpc_ccpu_entry *resume_entry;
 static volatile LONG softpc_ccpu_exit_requested;
 
 
@@ -33,14 +34,34 @@ void softpc_ccpu_lifecycle_observe(softpc_ccpu_checkpoint_observer observer,
     checkpoint_context = context;
 }
 
-void softpc_ccpu_lifecycle_checkpoint(int halted)
+void softpc_ccpu_lifecycle_checkpoint(int halted, unsigned long trap)
 {
+    const softpc_ccpu_entry entry = { halted, trap };
     if (checkpoint_observer == NULL) return;
-    checkpoint_observer(checkpoint_context, softpc_ccpu_frame_depth, halted);
+    checkpoint_observer(checkpoint_context, softpc_ccpu_frame_depth, &entry);
     /* A stop issued while the observer was parked must unwind before another
      * guest instruction, just like the existing executor callback exit. */
     if (softpc_ccpu_lifecycle_exit_requested())
         softpc_ccpu_lifecycle_return_outer();
+}
+
+int softpc_ccpu_lifecycle_resume(const softpc_ccpu_entry *entry)
+{
+    if (softpc_ccpu_frame_depth != 0ul || entry == NULL ||
+        (entry->halted != 0 && entry->halted != 1) || entry->trap > 1ul ||
+        (!entry->halted && entry->trap != 0ul)) return 0;
+    resume_entry = entry;
+    c_cpu_simulate();
+    resume_entry = NULL;
+    return 1;
+}
+
+int softpc_ccpu_lifecycle_take_entry(softpc_ccpu_entry *entry)
+{
+    if (resume_entry == NULL) return 0;
+    *entry = *resume_entry;
+    resume_entry = NULL;
+    return 1;
 }
 
 void softpc_ccpu_lifecycle_request_exit(void)

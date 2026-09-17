@@ -6,12 +6,22 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include "insignia.h"
+#include "host_def.h"
+#include "ios.h"
+#include "ica.h"
+/* base_def.h's non-ANSI compatibility macro must not alter this C17 test. */
+#undef const
+
 extern void (*BIOS[256])(void);
+extern unsigned long c_cpu_q_ev_get_count(void);
 
 typedef struct checkpoint_probe {
     softpc_machine *machine;
     unsigned calls, nested, halted;
     int nested_returned;
+    softpc_ccpu_entry entry;
+    unsigned long counter;
 } checkpoint_probe;
 
 static checkpoint_probe probe;
@@ -28,7 +38,8 @@ static void nested_bios(void)
     probe.nested_returned = 1;
 }
 
-static void observe(void *context, unsigned long depth, int halted)
+static void observe(void *context, unsigned long depth,
+    const softpc_ccpu_entry *entry)
 {
     checkpoint_probe *state = context;
     unsigned long ip = c_getEIP();
@@ -36,17 +47,118 @@ static void observe(void *context, unsigned long depth, int halted)
     assert(++state->calls < 100u);
     assert(depth == 1u || depth == 2u);
     if (depth == 2u) {
-        assert(!state->nested_returned && !halted);
+        assert(!state->nested_returned && !entry->halted);
         assert(ip >= 0x600u && ip < 0x604u);
         ++state->nested;
         return; /* An inner CPU entry is not an outer capture boundary. */
     }
-    if (halted) {
+    if (entry->halted) {
         assert(state->nested_returned && state->nested != 0u);
         assert(ip == 0x505u); /* HLT has already advanced IP. */
         ++state->halted;
+        state->entry = *entry;
+        state->counter = c_cpu_q_ev_get_count();
         softpc_machine_request_stop(state->machine);
     }
+}
+
+static void reentered_halt(void *context, unsigned long depth,
+    const softpc_ccpu_entry *entry)
+{
+    checkpoint_probe *state = context;
+    assert(depth == 1u && entry->halted && entry->trap == state->entry.trap);
+    assert(c_getEIP() == 0x505u && c_getEAX() == 0x1234u);
+    assert(c_cpu_q_ev_get_count() == state->counter);
+    assert(++state->calls == 1u);
+    /* Resume while an existing invocation is live must not nest the CPU. */
+    assert(!softpc_ccpu_lifecycle_resume(entry));
+    softpc_machine_request_stop(state->machine);
+}
+
+static void capture_shadow(void *context, unsigned long depth,
+    const softpc_ccpu_entry *entry)
+{
+    checkpoint_probe *state = context;
+    assert(depth == 1u && !entry->halted && ++state->calls < 10u);
+    if (c_getEIP() != 0x702u) return;
+    assert((c_getEFLAGS() & 0x200u) != 0u && c_getEAX() == 0x10u);
+    state->entry = *entry;
+    state->counter = c_cpu_q_ev_get_count();
+    softpc_machine_request_stop(state->machine);
+}
+
+static void finish_shadow(void *context, unsigned long depth,
+    const softpc_ccpu_entry *entry)
+{
+    checkpoint_probe *state = context;
+    assert(depth == 1u && ++state->calls < 100u);
+    if (state->calls == 1u) {
+        assert(c_getEIP() == 0x702u && !entry->halted);
+        assert(c_cpu_q_ev_get_count() == state->counter);
+    }
+    if (entry->halted) {
+        unsigned char marker[2];
+        assert(c_getEIP() == 0x705u && c_getEAX() == 0x11u);
+        assert(softpc_machine_read_physical(state->machine, 0xa00u,
+            marker, sizeof(marker)) == SOFTPC_MACHINE_OK);
+        /* IRQ handler must observe the INC after STI, never the prior AX. */
+        assert(marker[0] == 0x11u && marker[1] == 0u);
+        ++state->halted;
+        softpc_machine_request_stop(state->machine);
+    }
+}
+
+static void verify_reentry(void)
+{
+    const unsigned char program[] = { 0xfa, 0xfb, 0x40, 0xfa, 0xf4 };
+    const unsigned char handler[] = { 0xa3, 0x00, 0x0a, 0xcf };
+    const unsigned char vector[] = { 0x00, 0x09, 0x00, 0x00 };
+    softpc_ccpu_entry invalid = { 2, 0u };
+    unsigned long flags = c_getEFLAGS();
+    unsigned repeat;
+    assert(!softpc_ccpu_lifecycle_resume(NULL));
+    assert(!softpc_ccpu_lifecycle_resume(&invalid));
+    invalid = (softpc_ccpu_entry){ 0, 1u };
+    assert(!softpc_ccpu_lifecycle_resume(&invalid));
+    invalid = (softpc_ccpu_entry){ 1, 2u };
+    assert(!softpc_ccpu_lifecycle_resume(&invalid));
+    softpc_ccpu_lifecycle_observe(reentered_halt, &probe);
+    /* Debug may have changed TF while a previous HLT was paused. Its pending
+       trap remains the one captured on instruction entry, not the new TF. */
+    c_setEFLAGS(flags | 0x100u);
+    for (repeat = 0; repeat < 2u; ++repeat) {
+        probe.calls = 0u;
+        assert(softpc_ccpu_lifecycle_resume(&probe.entry));
+        softpc_ccpu_lifecycle_clear_exit();
+        assert(probe.calls == 1u);
+        assert((c_getEFLAGS() & 0x100u) != 0u);
+    }
+    c_setEFLAGS(2u);
+    assert(softpc_machine_write_physical(probe.machine, 0x700u,
+        program, sizeof(program)) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(probe.machine, 0x900u,
+        handler, sizeof(handler)) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(probe.machine, 0x20u,
+        vector, sizeof(vector)) == SOFTPC_MACHINE_OK);
+    assert(c_setSS(0u) == 0 && c_setDS(0u) == 0);
+    c_setESP(0x2000u);
+    c_setEIP(0x700u);
+    c_setEAX(0x10u);
+    /* Configure the real master PIC for IRQ0 -> vector 8. */
+    outb(0x20u, 0x11u); outb(0x21u, 0x08u);
+    outb(0x21u, 0x04u); outb(0x21u, 0x01u);
+    outb(0x21u, 0xfeu); outb(0xa1u, 0xffu);
+    probe.calls = 0u;
+    softpc_ccpu_lifecycle_observe(capture_shadow, &probe);
+    assert(softpc_machine_run(probe.machine, UINT64_MAX) == SOFTPC_MACHINE_OK);
+    assert(c_getEIP() == 0x702u && !probe.entry.halted);
+    ica_hw_interrupt(ICA_MASTER, 0u, 1);
+    probe.calls = probe.halted = 0u;
+    softpc_ccpu_lifecycle_observe(finish_shadow, &probe);
+    assert(softpc_ccpu_lifecycle_resume(&probe.entry));
+    softpc_ccpu_lifecycle_clear_exit();
+    assert(probe.halted == 1u);
+    softpc_ccpu_lifecycle_observe(NULL, NULL);
 }
 
 int main(void)
@@ -81,6 +193,7 @@ int main(void)
     BIOS[0xf0] = prior_bop;
     assert(probe.halted == 1u && probe.nested_returned);
     assert(c_getEAX() == 0x1234u && c_getEIP() == 0x505u);
+    verify_reentry();
     softpc_machine_destroy(probe.machine);
     assert(softpc_test_remove_image(path));
     return 0;
