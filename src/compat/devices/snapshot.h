@@ -25,7 +25,19 @@ enum {
     SOFTPC_DEVICE_PIT_COUNTER_COUNT = 3,
     SOFTPC_DEVICE_KEYBOARD_FIFO_COUNT = 48,
     SOFTPC_DEVICE_KEYBOARD_KEY_COUNT = 127,
-    SOFTPC_DEVICE_KEYBOARD_HELD_EVENT_COUNT = 16
+    SOFTPC_DEVICE_KEYBOARD_HELD_EVENT_COUNT = 16,
+    SOFTPC_DEVICE_DOS_MOUSE_BUTTON_COUNT = 2,
+    SOFTPC_DEVICE_DOS_MOUSE_ALT_HANDLER_COUNT = 3,
+    SOFTPC_DEVICE_DOS_MOUSE_CURSOR_DEPTH = 16,
+    SOFTPC_DEVICE_DOS_MOUSE_CURSOR_WIDTH = 16,
+    SOFTPC_DEVICE_DOS_MOUSE_ACCELERATION_CURVE_COUNT = 4,
+    SOFTPC_DEVICE_DOS_MOUSE_ACCELERATION_MICKEY_COUNT = 32,
+    SOFTPC_DEVICE_DOS_MOUSE_ACCELERATION_SCALE_COUNT = 32,
+    SOFTPC_DEVICE_DOS_MOUSE_ACCELERATION_NAME_COUNT = 16,
+    SOFTPC_DEVICE_DOS_MOUSE_EGA_CRTC_COUNT = 25,
+    SOFTPC_DEVICE_DOS_MOUSE_EGA_GRAPH_COUNT = 9,
+    SOFTPC_DEVICE_DOS_MOUSE_EGA_SEQ_COUNT = 4,
+    SOFTPC_DEVICE_DOS_MOUSE_EGA_ATTR_COUNT = 20
 };
 
 enum {
@@ -194,6 +206,102 @@ typedef struct softpc_device_keyboard_state {
 int softpc_device_snapshot_capture_keyboard(softpc_device_keyboard_state *state);
 int softpc_device_snapshot_restore_keyboard(
     const softpc_device_keyboard_state *state);
+
+/*
+ * DOS INT 33h driver state.  This is deliberately a field map, rather than
+ * the historical MOUSE_CONTEXT/MM_INSTANCE_DATA layout: the latter contains
+ * host-width fields, derived addresses and host drawing resources.  Cursor
+ * backing bytes are guest-visible data because the driver needs them to
+ * remove an already drawn cursor after restore.
+ */
+typedef struct softpc_device_dos_mouse_state {
+    uint32_t initialized;
+    uint16_t interrupt_rate;
+    uint16_t com_revision;
+    int16_t button_press_x[SOFTPC_DEVICE_DOS_MOUSE_BUTTON_COUNT];
+    int16_t button_press_y[SOFTPC_DEVICE_DOS_MOUSE_BUTTON_COUNT];
+    int16_t button_release_x[SOFTPC_DEVICE_DOS_MOUSE_BUTTON_COUNT];
+    int16_t button_release_y[SOFTPC_DEVICE_DOS_MOUSE_BUTTON_COUNT];
+    int16_t button_press_count[SOFTPC_DEVICE_DOS_MOUSE_BUTTON_COUNT];
+    int16_t button_release_count[SOFTPC_DEVICE_DOS_MOUSE_BUTTON_COUNT];
+    int16_t mouse_gear_x, mouse_gear_y, mouse_sensitivity_x,
+        mouse_sensitivity_y, mouse_sensitivity_value_x,
+        mouse_sensitivity_value_y;
+    uint16_t mouse_double_threshold, archive_text_cursor_type;
+    uint16_t text_cursor_screen, text_cursor_cursor;
+    int16_t graphics_hot_spot_x, graphics_hot_spot_y;
+    int16_t graphics_size_x, graphics_size_y;
+    uint16_t graphics_screen[SOFTPC_DEVICE_DOS_MOUSE_CURSOR_DEPTH];
+    uint16_t graphics_cursor_words[SOFTPC_DEVICE_DOS_MOUSE_CURSOR_DEPTH];
+    uint32_t graphics_screen_lo[SOFTPC_DEVICE_DOS_MOUSE_CURSOR_DEPTH];
+    uint32_t graphics_screen_hi[SOFTPC_DEVICE_DOS_MOUSE_CURSOR_DEPTH];
+    uint32_t graphics_cursor_lo[SOFTPC_DEVICE_DOS_MOUSE_CURSOR_DEPTH];
+    uint32_t graphics_cursor_hi[SOFTPC_DEVICE_DOS_MOUSE_CURSOR_DEPTH];
+    uint16_t user_handler_segment, user_handler_offset, user_handler_mask;
+    uint32_t alternate_handlers_active;
+    uint16_t alternate_handler_segment
+        [SOFTPC_DEVICE_DOS_MOUSE_ALT_HANDLER_COUNT];
+    uint16_t alternate_handler_offset
+        [SOFTPC_DEVICE_DOS_MOUSE_ALT_HANDLER_COUNT];
+    uint16_t alternate_handler_mask
+        [SOFTPC_DEVICE_DOS_MOUSE_ALT_HANDLER_COUNT];
+    int16_t black_hole_left, black_hole_top, black_hole_right,
+        black_hole_bottom;
+    int16_t archive_double_speed_threshold;
+    int32_t archive_cursor_flag;
+    int16_t cursor_x, cursor_y, button_status;
+    int16_t cursor_window_left, cursor_window_top, cursor_window_right,
+        cursor_window_bottom;
+    uint32_t archive_light_pen_mode;
+    int16_t motion_x, motion_y, raw_motion_x, raw_motion_y;
+    int16_t default_cursor_x, default_cursor_y, cursor_position_x,
+        cursor_position_y, fractional_cursor_x, fractional_cursor_y;
+    int32_t archive_cursor_page, archive_active_acceleration_curve,
+        archive_next_video_mode;
+    uint16_t acceleration_length[SOFTPC_DEVICE_DOS_MOUSE_ACCELERATION_CURVE_COUNT];
+    uint16_t acceleration_count[SOFTPC_DEVICE_DOS_MOUSE_ACCELERATION_CURVE_COUNT]
+        [SOFTPC_DEVICE_DOS_MOUSE_ACCELERATION_MICKEY_COUNT];
+    uint16_t acceleration_scale[SOFTPC_DEVICE_DOS_MOUSE_ACCELERATION_CURVE_COUNT]
+        [SOFTPC_DEVICE_DOS_MOUSE_ACCELERATION_SCALE_COUNT];
+    uint16_t acceleration_name[SOFTPC_DEVICE_DOS_MOUSE_ACCELERATION_CURVE_COUNT]
+        [SOFTPC_DEVICE_DOS_MOUSE_ACCELERATION_NAME_COUNT];
+    uint16_t driver_disabled;
+    int16_t archive_current_video_mode;
+    uint16_t archive_text_cursor_background;
+    uint16_t archive_graphics_cursor_background[SOFTPC_DEVICE_DOS_MOUSE_CURSOR_DEPTH];
+    uint32_t archive_save_area_in_use;
+    int16_t save_position_x, save_position_y;
+    int16_t save_area_left, save_area_top, save_area_right, save_area_bottom;
+    uint32_t archive_user_subroutine_critical;
+    uint16_t archive_last_condition_mask;
+    uint16_t saved_ax, saved_bx, saved_cx, saved_dx, saved_si, saved_di,
+        saved_es, saved_bp, saved_ds;
+    int16_t virtual_screen_left, virtual_screen_top, virtual_screen_right,
+        virtual_screen_bottom;
+    int16_t cursor_grid_x, cursor_grid_y, text_grid_x, text_grid_y;
+    int16_t default_black_hole_left, default_black_hole_top,
+        default_black_hole_right, default_black_hole_bottom;
+    uint16_t archive_saved_int33_segment, archive_saved_int33_offset,
+        archive_saved_int10_segment, archive_saved_int10_offset,
+        archive_saved_int0a_segment, archive_saved_int0a_offset;
+    uint32_t archive_int10_chained;
+    uint8_t archive_vga_background[SOFTPC_DEVICE_DOS_MOUSE_CURSOR_DEPTH]
+        [SOFTPC_DEVICE_DOS_MOUSE_CURSOR_WIDTH];
+    uint32_t ega_background_lo[SOFTPC_DEVICE_DOS_MOUSE_CURSOR_DEPTH];
+    uint32_t ega_background_mid[SOFTPC_DEVICE_DOS_MOUSE_CURSOR_DEPTH];
+    uint32_t ega_background_hi[SOFTPC_DEVICE_DOS_MOUSE_CURSOR_DEPTH];
+    uint16_t archive_ega_current_crtc[SOFTPC_DEVICE_DOS_MOUSE_EGA_CRTC_COUNT];
+    uint16_t archive_ega_current_graph[SOFTPC_DEVICE_DOS_MOUSE_EGA_GRAPH_COUNT];
+    uint16_t archive_ega_current_seq[SOFTPC_DEVICE_DOS_MOUSE_EGA_SEQ_COUNT];
+    uint16_t archive_ega_current_attr[SOFTPC_DEVICE_DOS_MOUSE_EGA_ATTR_COUNT];
+    uint16_t archive_ega_current_misc;
+    uint32_t cursor_em_disabled;
+} softpc_device_dos_mouse_state;
+
+int softpc_device_snapshot_capture_dos_mouse(
+    softpc_device_dos_mouse_state *state);
+int softpc_device_snapshot_restore_dos_mouse(
+    const softpc_device_dos_mouse_state *state);
 
 /*
  * The PIT uses function pointers and host clock timestamps internally.  The

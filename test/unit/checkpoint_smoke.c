@@ -23,6 +23,8 @@
 
 extern void insert_code_into_6805_buf(half_word code);
 extern void host_key_down(int key);
+extern void mouse_driver_initialisation(void);
+extern void mouse_driver_termination(void);
 /* base_def.h's non-ANSI compatibility macro must not alter this C17 test. */
 #undef const
 
@@ -394,6 +396,8 @@ static void verify_controller_archives(void)
     softpc_device_ppi_state ppi_saved, ppi_restored;
     softpc_device_inport_mouse_state mouse_saved, mouse_restored;
     softpc_device_keyboard_state keyboard_saved, keyboard_restored;
+    softpc_device_dos_mouse_state dos_mouse_inactive, dos_mouse_saved,
+        dos_mouse_restored;
     softpc_device_archive *keyboard_archive;
     half_word value;
 
@@ -484,6 +488,29 @@ static void verify_controller_archives(void)
     assert(!softpc_device_snapshot_restore_inport_mouse(&mouse_restored));
     inb(MOUSE_PORT_1, &value);
     assert(value == 0xa5u);
+
+    /* The DOS INT 33h driver has state distinct from the InPort adapter.
+       Prove both its absent state and a restored installed state. */
+    /* The driver is normally absent until guest MOUSE.COM installs it. */
+    memset(&dos_mouse_inactive, 0, sizeof(dos_mouse_inactive));
+    assert(softpc_device_snapshot_capture_dos_mouse(&dos_mouse_inactive));
+    assert(!dos_mouse_inactive.initialized);
+
+    mouse_driver_initialisation();
+    memset(&dos_mouse_saved, 0, sizeof(dos_mouse_saved));
+    assert(softpc_device_snapshot_capture_dos_mouse(&dos_mouse_saved));
+    assert(dos_mouse_saved.initialized);
+    mouse_driver_termination();
+    /* Restore owns reconstruction of the archived driver instance. */
+    assert(softpc_device_snapshot_restore_dos_mouse(&dos_mouse_saved));
+    memset(&dos_mouse_restored, 0, sizeof(dos_mouse_restored));
+    assert(softpc_device_snapshot_capture_dos_mouse(&dos_mouse_restored));
+    assert(memcmp(&dos_mouse_restored, &dos_mouse_saved,
+        sizeof(dos_mouse_saved)) == 0);
+    assert(softpc_device_snapshot_restore_dos_mouse(&dos_mouse_inactive));
+    memset(&dos_mouse_restored, 0, sizeof(dos_mouse_restored));
+    assert(softpc_device_snapshot_capture_dos_mouse(&dos_mouse_restored));
+    assert(!dos_mouse_restored.initialized);
 
     /* The 8042's pending FIFO and command latch are device state, not a
        frontend queue.  Capture through its real port path, mutate it, then

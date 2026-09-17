@@ -93,6 +93,7 @@
 #endif
 #include "error.h"
 #include "config.h"
+#include "compat/devices/snapshot.h"
 #include "mouse_io.h"
 #include "ica.h"
 #include "video.h"
@@ -952,6 +953,371 @@ GLOBAL void mouse_driver_termination IFN0()
    /* Just free up instance memory */
    NIDDB_Deallocate_Instance_Data((IHP *)mm_handle);
    }
+
+LOCAL int mouse_driver_is_initialised IFN0()
+   {
+   return mm_handle != (MM_INSTANCE_DATA_HANDLE)0 && *mm_handle != (IHP)0;
+   }
+
+/*
+ * The machine archive is intentionally separate from INT 33h's historical
+ * in-guest save image.  It maps only fixed-width guest semantics; the mouse
+ * instance allocation, EGA default addresses and host cursor callbacks are
+ * rebuilt when a process restores an archive.
+ */
+LOCAL void
+capture_dos_mouse_point(state_x, state_y, point)
+int16_t *state_x;
+int16_t *state_y;
+MOUSE_POINT point;
+{
+    *state_x = point.x;
+    *state_y = point.y;
+}
+
+LOCAL void
+restore_dos_mouse_point(point, state_x, state_y)
+MOUSE_POINT *point;
+int16_t state_x;
+int16_t state_y;
+{
+    point->x = state_x;
+    point->y = state_y;
+}
+
+LOCAL void
+capture_dos_mouse_vector(state_x, state_y, vector)
+int16_t *state_x;
+int16_t *state_y;
+MOUSE_VECTOR vector;
+{
+    *state_x = vector.x;
+    *state_y = vector.y;
+}
+
+LOCAL void
+restore_dos_mouse_vector(vector, state_x, state_y)
+MOUSE_VECTOR *vector;
+int16_t state_x;
+int16_t state_y;
+{
+    vector->x = state_x;
+    vector->y = state_y;
+}
+
+LOCAL void
+capture_dos_mouse_area(left, top, right, bottom, area)
+int16_t *left;
+int16_t *top;
+int16_t *right;
+int16_t *bottom;
+MOUSE_AREA area;
+{
+    capture_dos_mouse_point(left, top, area.top_left);
+    capture_dos_mouse_point(right, bottom, area.bottom_right);
+}
+
+LOCAL void
+restore_dos_mouse_area(area, left, top, right, bottom)
+MOUSE_AREA *area;
+int16_t left;
+int16_t top;
+int16_t right;
+int16_t bottom;
+{
+    restore_dos_mouse_point(&area->top_left, left, top);
+    restore_dos_mouse_point(&area->bottom_right, right, bottom);
+}
+
+int
+softpc_device_snapshot_capture_dos_mouse(state)
+softpc_device_dos_mouse_state *state;
+{
+    int i;
+
+    if (state == NULL) return FALSE;
+    state->initialized = mouse_driver_is_initialised();
+    if (!state->initialized) return TRUE;
+    state->interrupt_rate = mouse_interrupt_rate;
+    state->com_revision = mouse_com_rev;
+    for (i = 0; i < MOUSE_BUTTON_MAXIMUM; ++i) {
+        capture_dos_mouse_point(&state->button_press_x[i],
+            &state->button_press_y[i], button_transitions[i].press_position);
+        capture_dos_mouse_point(&state->button_release_x[i],
+            &state->button_release_y[i], button_transitions[i].release_position);
+        state->button_press_count[i] = button_transitions[i].press_count;
+        state->button_release_count[i] = button_transitions[i].release_count;
+    }
+    capture_dos_mouse_vector(&state->mouse_gear_x, &state->mouse_gear_y,
+        mouse_gear);
+    capture_dos_mouse_vector(&state->mouse_sensitivity_x,
+        &state->mouse_sensitivity_y, mouse_sens);
+    capture_dos_mouse_vector(&state->mouse_sensitivity_value_x,
+        &state->mouse_sensitivity_value_y, mouse_sens_val);
+    state->mouse_double_threshold = mouse_double_thresh;
+    state->archive_text_cursor_type = text_cursor_type;
+    state->text_cursor_screen = software_text_cursor.screen;
+    state->text_cursor_cursor = software_text_cursor.cursor;
+    capture_dos_mouse_point(&state->graphics_hot_spot_x,
+        &state->graphics_hot_spot_y, graphics_cursor.hot_spot);
+    capture_dos_mouse_vector(&state->graphics_size_x, &state->graphics_size_y,
+        graphics_cursor.size);
+    memcpy(state->graphics_screen, graphics_cursor.screen,
+        sizeof(state->graphics_screen));
+    memcpy(state->graphics_cursor_words, graphics_cursor.cursor,
+        sizeof(state->graphics_cursor_words));
+    memcpy(state->graphics_screen_lo, graphics_cursor.screen_lo,
+        sizeof(state->graphics_screen_lo));
+    memcpy(state->graphics_screen_hi, graphics_cursor.screen_hi,
+        sizeof(state->graphics_screen_hi));
+    memcpy(state->graphics_cursor_lo, graphics_cursor.cursor_lo,
+        sizeof(state->graphics_cursor_lo));
+    memcpy(state->graphics_cursor_hi, graphics_cursor.cursor_hi,
+        sizeof(state->graphics_cursor_hi));
+    state->user_handler_segment = user_subroutine_segment;
+    state->user_handler_offset = user_subroutine_offset;
+    state->user_handler_mask = user_subroutine_call_mask;
+    state->alternate_handlers_active = alt_user_subroutines_active;
+    memcpy(state->alternate_handler_segment, alt_user_subroutine_segment,
+        sizeof(state->alternate_handler_segment));
+    memcpy(state->alternate_handler_offset, alt_user_subroutine_offset,
+        sizeof(state->alternate_handler_offset));
+    memcpy(state->alternate_handler_mask, alt_user_subroutine_call_mask,
+        sizeof(state->alternate_handler_mask));
+    capture_dos_mouse_area(&state->black_hole_left, &state->black_hole_top,
+        &state->black_hole_right, &state->black_hole_bottom, black_hole);
+    state->archive_double_speed_threshold = double_speed_threshold;
+    state->archive_cursor_flag = cursor_flag;
+    capture_dos_mouse_point(&state->cursor_x, &state->cursor_y,
+        cursor_status.position);
+    state->button_status = cursor_status.button_status;
+    capture_dos_mouse_area(&state->cursor_window_left,
+        &state->cursor_window_top, &state->cursor_window_right,
+        &state->cursor_window_bottom, cursor_window);
+    state->archive_light_pen_mode = light_pen_mode;
+    capture_dos_mouse_vector(&state->motion_x, &state->motion_y, mouse_motion);
+    capture_dos_mouse_vector(&state->raw_motion_x, &state->raw_motion_y,
+        mouse_raw_motion);
+    capture_dos_mouse_point(&state->default_cursor_x, &state->default_cursor_y,
+        cursor_position_default);
+    capture_dos_mouse_point(&state->cursor_position_x, &state->cursor_position_y,
+        cursor_position);
+    capture_dos_mouse_point(&state->fractional_cursor_x,
+        &state->fractional_cursor_y, cursor_fractional_position);
+    state->archive_cursor_page = cursor_page;
+    state->archive_active_acceleration_curve = active_acceleration_curve;
+    state->archive_next_video_mode = next_video_mode;
+    memcpy(state->acceleration_length, acceleration_curve_data.ac_length,
+        sizeof(state->acceleration_length));
+    memcpy(state->acceleration_count, acceleration_curve_data.ac_count,
+        sizeof(state->acceleration_count));
+    memcpy(state->acceleration_scale, acceleration_curve_data.ac_scale,
+        sizeof(state->acceleration_scale));
+    memcpy(state->acceleration_name, acceleration_curve_data.ac_name,
+        sizeof(state->acceleration_name));
+    state->driver_disabled = mouse_driver_disabled;
+    state->archive_current_video_mode = current_video_mode;
+    state->archive_text_cursor_background = text_cursor_background;
+    memcpy(state->archive_graphics_cursor_background, graphics_cursor_background,
+        sizeof(state->archive_graphics_cursor_background));
+    state->archive_save_area_in_use = save_area_in_use;
+    capture_dos_mouse_point(&state->save_position_x, &state->save_position_y,
+        save_position);
+    capture_dos_mouse_area(&state->save_area_left, &state->save_area_top,
+        &state->save_area_right, &state->save_area_bottom, save_area);
+    state->archive_user_subroutine_critical = user_subroutine_critical;
+    state->archive_last_condition_mask = last_condition_mask;
+    state->saved_ax = saved_AX; state->saved_bx = saved_BX;
+    state->saved_cx = saved_CX; state->saved_dx = saved_DX;
+    state->saved_si = saved_SI; state->saved_di = saved_DI;
+    state->saved_es = saved_ES; state->saved_bp = saved_BP;
+    state->saved_ds = saved_DS;
+    capture_dos_mouse_area(&state->virtual_screen_left,
+        &state->virtual_screen_top, &state->virtual_screen_right,
+        &state->virtual_screen_bottom, virtual_screen);
+    capture_dos_mouse_vector(&state->cursor_grid_x, &state->cursor_grid_y,
+        cursor_grid);
+    capture_dos_mouse_vector(&state->text_grid_x, &state->text_grid_y,
+        text_grid);
+    capture_dos_mouse_area(&state->default_black_hole_left,
+        &state->default_black_hole_top, &state->default_black_hole_right,
+        &state->default_black_hole_bottom, black_hole_default);
+    state->archive_saved_int33_segment = saved_int33_segment;
+    state->archive_saved_int33_offset = saved_int33_offset;
+    state->archive_saved_int10_segment = saved_int10_segment;
+    state->archive_saved_int10_offset = saved_int10_offset;
+    state->archive_saved_int0a_segment = saved_int0A_segment;
+    state->archive_saved_int0a_offset = saved_int0A_offset;
+    state->archive_int10_chained = int10_chained;
+    memcpy(state->archive_vga_background, vga_background,
+        sizeof(state->archive_vga_background));
+    memcpy(state->ega_background_lo, ega_backgrnd_lo,
+        sizeof(state->ega_background_lo));
+    memcpy(state->ega_background_mid, ega_backgrnd_mid,
+        sizeof(state->ega_background_mid));
+    memcpy(state->ega_background_hi, ega_backgrnd_hi,
+        sizeof(state->ega_background_hi));
+    memcpy(state->archive_ega_current_crtc, ega_current_crtc,
+        sizeof(state->archive_ega_current_crtc));
+    memcpy(state->archive_ega_current_graph, ega_current_graph,
+        sizeof(state->archive_ega_current_graph));
+    memcpy(state->archive_ega_current_seq, ega_current_seq,
+        sizeof(state->archive_ega_current_seq));
+    memcpy(state->archive_ega_current_attr, ega_current_attr,
+        sizeof(state->archive_ega_current_attr));
+    state->archive_ega_current_misc = ega_current_misc;
+    state->cursor_em_disabled = cursor_EM_disabled;
+    return TRUE;
+}
+
+int
+softpc_device_snapshot_restore_dos_mouse(state)
+const softpc_device_dos_mouse_state *state;
+{
+    int i;
+
+    if (state == NULL) return FALSE;
+    /* An uninstalled DOS driver has no process state to restore. */
+    if (!state->initialized) {
+        if (mouse_driver_is_initialised()) mouse_driver_termination();
+        return TRUE;
+    }
+    if (!mouse_driver_is_initialised()) mouse_driver_initialisation();
+    /* Recreate derived EGA pointers before restoring their saved values. */
+    current_video_mode = state->archive_current_video_mode;
+    mouse_ega_mode(current_video_mode);
+    mouse_interrupt_rate = state->interrupt_rate;
+    mouse_com_rev = state->com_revision;
+    for (i = 0; i < MOUSE_BUTTON_MAXIMUM; ++i) {
+        restore_dos_mouse_point(&button_transitions[i].press_position,
+            state->button_press_x[i], state->button_press_y[i]);
+        restore_dos_mouse_point(&button_transitions[i].release_position,
+            state->button_release_x[i], state->button_release_y[i]);
+        button_transitions[i].press_count = state->button_press_count[i];
+        button_transitions[i].release_count = state->button_release_count[i];
+    }
+    restore_dos_mouse_vector(&mouse_gear, state->mouse_gear_x,
+        state->mouse_gear_y);
+    restore_dos_mouse_vector(&mouse_sens, state->mouse_sensitivity_x,
+        state->mouse_sensitivity_y);
+    restore_dos_mouse_vector(&mouse_sens_val, state->mouse_sensitivity_value_x,
+        state->mouse_sensitivity_value_y);
+    mouse_double_thresh = state->mouse_double_threshold;
+    text_cursor_type = state->archive_text_cursor_type;
+    software_text_cursor.screen = state->text_cursor_screen;
+    software_text_cursor.cursor = state->text_cursor_cursor;
+    restore_dos_mouse_point(&graphics_cursor.hot_spot,
+        state->graphics_hot_spot_x, state->graphics_hot_spot_y);
+    restore_dos_mouse_vector(&graphics_cursor.size, state->graphics_size_x,
+        state->graphics_size_y);
+    memcpy(graphics_cursor.screen, state->graphics_screen,
+        sizeof(state->graphics_screen));
+    memcpy(graphics_cursor.cursor, state->graphics_cursor_words,
+        sizeof(state->graphics_cursor_words));
+    memcpy(graphics_cursor.screen_lo, state->graphics_screen_lo,
+        sizeof(state->graphics_screen_lo));
+    memcpy(graphics_cursor.screen_hi, state->graphics_screen_hi,
+        sizeof(state->graphics_screen_hi));
+    memcpy(graphics_cursor.cursor_lo, state->graphics_cursor_lo,
+        sizeof(state->graphics_cursor_lo));
+    memcpy(graphics_cursor.cursor_hi, state->graphics_cursor_hi,
+        sizeof(state->graphics_cursor_hi));
+    user_subroutine_segment = state->user_handler_segment;
+    user_subroutine_offset = state->user_handler_offset;
+    user_subroutine_call_mask = state->user_handler_mask;
+    alt_user_subroutines_active = state->alternate_handlers_active;
+    memcpy(alt_user_subroutine_segment, state->alternate_handler_segment,
+        sizeof(state->alternate_handler_segment));
+    memcpy(alt_user_subroutine_offset, state->alternate_handler_offset,
+        sizeof(state->alternate_handler_offset));
+    memcpy(alt_user_subroutine_call_mask, state->alternate_handler_mask,
+        sizeof(state->alternate_handler_mask));
+    restore_dos_mouse_area(&black_hole, state->black_hole_left,
+        state->black_hole_top, state->black_hole_right,
+        state->black_hole_bottom);
+    double_speed_threshold = state->archive_double_speed_threshold;
+    cursor_flag = state->archive_cursor_flag;
+    restore_dos_mouse_point(&cursor_status.position, state->cursor_x,
+        state->cursor_y);
+    cursor_status.button_status = state->button_status;
+    restore_dos_mouse_area(&cursor_window, state->cursor_window_left,
+        state->cursor_window_top, state->cursor_window_right,
+        state->cursor_window_bottom);
+    light_pen_mode = state->archive_light_pen_mode;
+    restore_dos_mouse_vector(&mouse_motion, state->motion_x, state->motion_y);
+    restore_dos_mouse_vector(&mouse_raw_motion, state->raw_motion_x,
+        state->raw_motion_y);
+    restore_dos_mouse_point(&cursor_position_default, state->default_cursor_x,
+        state->default_cursor_y);
+    restore_dos_mouse_point(&cursor_position, state->cursor_position_x,
+        state->cursor_position_y);
+    restore_dos_mouse_point(&cursor_fractional_position,
+        state->fractional_cursor_x, state->fractional_cursor_y);
+    cursor_page = state->archive_cursor_page;
+    active_acceleration_curve = state->archive_active_acceleration_curve;
+    next_video_mode = state->archive_next_video_mode;
+    memcpy(acceleration_curve_data.ac_length, state->acceleration_length,
+        sizeof(state->acceleration_length));
+    memcpy(acceleration_curve_data.ac_count, state->acceleration_count,
+        sizeof(state->acceleration_count));
+    memcpy(acceleration_curve_data.ac_scale, state->acceleration_scale,
+        sizeof(state->acceleration_scale));
+    memcpy(acceleration_curve_data.ac_name, state->acceleration_name,
+        sizeof(state->acceleration_name));
+    mouse_driver_disabled = state->driver_disabled;
+    current_video_mode = state->archive_current_video_mode;
+    text_cursor_background = state->archive_text_cursor_background;
+    memcpy(graphics_cursor_background, state->archive_graphics_cursor_background,
+        sizeof(state->archive_graphics_cursor_background));
+    save_area_in_use = state->archive_save_area_in_use;
+    restore_dos_mouse_point(&save_position, state->save_position_x,
+        state->save_position_y);
+    restore_dos_mouse_area(&save_area, state->save_area_left,
+        state->save_area_top, state->save_area_right, state->save_area_bottom);
+    user_subroutine_critical = state->archive_user_subroutine_critical;
+    last_condition_mask = state->archive_last_condition_mask;
+    saved_AX = state->saved_ax; saved_BX = state->saved_bx;
+    saved_CX = state->saved_cx; saved_DX = state->saved_dx;
+    saved_SI = state->saved_si; saved_DI = state->saved_di;
+    saved_ES = state->saved_es; saved_BP = state->saved_bp;
+    saved_DS = state->saved_ds;
+    restore_dos_mouse_area(&virtual_screen, state->virtual_screen_left,
+        state->virtual_screen_top, state->virtual_screen_right,
+        state->virtual_screen_bottom);
+    restore_dos_mouse_vector(&cursor_grid, state->cursor_grid_x,
+        state->cursor_grid_y);
+    restore_dos_mouse_vector(&text_grid, state->text_grid_x,
+        state->text_grid_y);
+    restore_dos_mouse_area(&black_hole_default,
+        state->default_black_hole_left, state->default_black_hole_top,
+        state->default_black_hole_right, state->default_black_hole_bottom);
+    saved_int33_segment = state->archive_saved_int33_segment;
+    saved_int33_offset = state->archive_saved_int33_offset;
+    saved_int10_segment = state->archive_saved_int10_segment;
+    saved_int10_offset = state->archive_saved_int10_offset;
+    saved_int0A_segment = state->archive_saved_int0a_segment;
+    saved_int0A_offset = state->archive_saved_int0a_offset;
+    int10_chained = state->archive_int10_chained;
+    memcpy(vga_background, state->archive_vga_background,
+        sizeof(state->archive_vga_background));
+    memcpy(ega_backgrnd_lo, state->ega_background_lo,
+        sizeof(state->ega_background_lo));
+    memcpy(ega_backgrnd_mid, state->ega_background_mid,
+        sizeof(state->ega_background_mid));
+    memcpy(ega_backgrnd_hi, state->ega_background_hi,
+        sizeof(state->ega_background_hi));
+    memcpy(ega_current_crtc, state->archive_ega_current_crtc,
+        sizeof(state->archive_ega_current_crtc));
+    memcpy(ega_current_graph, state->archive_ega_current_graph,
+        sizeof(state->archive_ega_current_graph));
+    memcpy(ega_current_seq, state->archive_ega_current_seq,
+        sizeof(state->archive_ega_current_seq));
+    memcpy(ega_current_attr, state->archive_ega_current_attr,
+        sizeof(state->archive_ega_current_attr));
+    ega_current_misc = state->archive_ega_current_misc;
+    cursor_EM_disabled = state->cursor_em_disabled;
+    return TRUE;
+}
 
 /*
  *	MOUSE DRIVER EXTERNAL FUNCTIONS

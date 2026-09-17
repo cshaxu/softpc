@@ -22,6 +22,7 @@ struct softpc_device_archive {
     softpc_device_ppi_state ppi;
     softpc_device_inport_mouse_state inport_mouse;
     softpc_device_keyboard_state keyboard;
+    softpc_device_dos_mouse_state dos_mouse;
     int valid;
 };
 
@@ -125,6 +126,8 @@ softpc_device_archive *archive;
         return FALSE;
     if (!softpc_device_snapshot_capture_keyboard(&archive->keyboard))
         return FALSE;
+    if (!softpc_device_snapshot_capture_dos_mouse(&archive->dos_mouse))
+        return FALSE;
     if (!softpc_device_snapshot_capture_hdd(&archive->hdd))
         return FALSE;
     archive->valid = TRUE;
@@ -144,6 +147,7 @@ softpc_device_archive *archive;
         !softpc_device_snapshot_restore_ppi(&archive->ppi) ||
         !softpc_device_snapshot_restore_inport_mouse(&archive->inport_mouse) ||
         !softpc_device_snapshot_restore_keyboard(&archive->keyboard) ||
+        !softpc_device_snapshot_restore_dos_mouse(&archive->dos_mouse) ||
         !softpc_device_snapshot_restore_hdd(&archive->hdd) ||
         !q_event_snapshot_restore(&archive->events, archive->quick_entries,
             archive->quick_capacity, archive->tick_entries,

@@ -61,8 +61,8 @@ static char SccsID[]="@(#)mouse.c	1.17+ 07/10/95 Copyright Insignia Solutions Lt
 #include "trace.h"
 #include "video.h"
 #include "mouse.h"
-#include "mouse_io.h"
 #include "compat/devices/snapshot.h"
+#include "mouse_io.h"
 
 
 /*

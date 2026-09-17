@@ -927,3 +927,33 @@ the focused test adds `+38/-0`. Both full x64 and x86 CTest runs pass
 `CEBE79236A96DB0C50CABBB72D1135DAA9AC06B79A7498C2902E8AFBEC22B538` and
 `softpc64.exe`
 `B7B058DB87AB3FD59063124019A10CADAB0A47CC8AE2488F3DC995B9B330F027`.
+
+## S6 P5: DOS INT 33h driver archive
+
+P5 adds the missing DOS mouse-driver receiver without using the historical
+`MOUSE_CONTEXT` or `MM_INSTANCE_DATA` memory layouts as a wire image.  The
+private fixed-width map records installed state, cursor/motion/sensitivity,
+graphics and text cursor backing, guest handler segment:offset and masks,
+saved callback registers, video semantics and the driver-visible interrupt
+rate/revision.  It deliberately excludes the instance handle, all host-width
+or derived EGA addresses, guest scratch pointers and host cursor callbacks.
+
+An inactive driver is a valid archive state: restoring it terminates an
+installed live instance.  Restoring an installed archive creates the normal
+driver instance when required, rebuilds EGA-derived bindings from the saved
+video mode, and only then restores the semantic field map.  This keeps guest
+cursor erase and callback continuation data intact without retaining a
+process-local address.
+
+`checkpoint_smoke` proves absent-state capture, installed-state capture,
+automatic instance reconstruction on restore, byte-for-byte semantic
+recapture, and restoration back to the absent state.  It remains a private
+VM/Compat proof: no snapshot file, command, Common API or Lib code is added.
+
+Actual production C/H change is `+480/-2`: Compat-private archive/state map
+is `+113/-1`; the preserved original mirror receives the narrow `+367/-1`
+port-ABI hook.  The focused checkpoint proof is `+27/-0`.  Sequential full
+CTest passes `103/103` on x64 and x86.  Fixed packages are `softpc32.exe`
+`4E93AC27F4B0A4D000C44452FDD5DDF6F405E36286A0D6581C3F290F49CF6409` and
+`softpc64.exe`
+`658543D40F2D84AB933C9B7116D2CAA88379B9A5D24E18237EE86AE6632C91C0`.

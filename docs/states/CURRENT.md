@@ -68,8 +68,11 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   latch and speaker edge baselines; S6 P3 archives only finite InPort mouse
   hardware state (deltas, latches, registers and diagnostic handshake). S6 P4
   archives the finite 8042 keyboard-controller state and both reviewed delayed
-  callbacks (`do_int` and `allowRefill`) as semantic queue IDs.
-  The DOS INT 33h mouse driver remains an explicit deferred receiver.
+  callbacks (`do_int` and `allowRefill`) as semantic queue IDs. S6 P5 archives
+  the DOS INT 33h driver through a fixed-width semantic map, including its
+  inactive/installed distinction, cursor backing, handler segment:offset data
+  and saved callback registers; instance allocation, EGA addresses and host
+  cursor resources rebuild on restore.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files
