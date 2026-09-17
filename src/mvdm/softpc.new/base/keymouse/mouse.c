@@ -62,6 +62,7 @@ static char SccsID[]="@(#)mouse.c	1.17+ 07/10/95 Copyright Insignia Solutions Lt
 #include "video.h"
 #include "mouse.h"
 #include "mouse_io.h"
+#include "compat/devices/snapshot.h"
 
 
 /*
@@ -102,6 +103,62 @@ static int mouse_inb_toggle = 0;
  * normal data/mode port into a permanent loopback device. */
 static int mouse_test_state = 0;
 static half_word mouse_test_data = 0;
+
+int
+softpc_device_snapshot_capture_inport_mouse(state)
+softpc_device_inport_mouse_state *state;
+{
+    if (state == NULL) return FALSE;
+    state->button_left = button_left;
+    state->button_right = button_right;
+    state->delta_x = delta_x;
+    state->delta_y = delta_y;
+    state->data_1 = data1_reg;
+    state->data_2 = data2_reg;
+    state->status = mouse_status_reg;
+    state->last_button_left = last_button_left;
+    state->last_button_right = last_button_right;
+    state->mode = mouse_mode_reg;
+    state->address = address_reg;
+    state->test_data = mouse_test_data;
+    state->startup_interrupt_bursts = loadsainterrupts;
+    state->id_toggle = mouse_inb_toggle;
+    state->test_state = mouse_test_state;
+    return TRUE;
+}
+
+int
+softpc_device_snapshot_restore_inport_mouse(state)
+const softpc_device_inport_mouse_state *state;
+{
+    if (state == NULL ||
+        (state->button_left != 0 && state->button_left != 1) ||
+        (state->button_right != 0 && state->button_right != 1) ||
+        (state->last_button_left != 0 && state->last_button_left != 1) ||
+        (state->last_button_right != 0 && state->last_button_right != 1) ||
+        state->delta_x < -128 || state->delta_x > 127 ||
+        state->delta_y < -128 || state->delta_y > 127 ||
+        state->startup_interrupt_bursts < 0 ||
+        (state->id_toggle != 0 && state->id_toggle != 1) ||
+        state->test_state < 0 || state->test_state > 3)
+        return FALSE;
+    button_left = state->button_left;
+    button_right = state->button_right;
+    delta_x = state->delta_x;
+    delta_y = state->delta_y;
+    data1_reg = state->data_1;
+    data2_reg = state->data_2;
+    mouse_status_reg = state->status;
+    last_button_left = state->last_button_left;
+    last_button_right = state->last_button_right;
+    mouse_mode_reg = state->mode;
+    address_reg = state->address;
+    mouse_test_data = state->test_data;
+    loadsainterrupts = state->startup_interrupt_bursts;
+    mouse_inb_toggle = state->id_toggle;
+    mouse_test_state = state->test_state;
+    return TRUE;
+}
 
 void mouse_inb IFN2(io_addr, port, half_word *, value)
 {

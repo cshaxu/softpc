@@ -64,7 +64,10 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   IDs, transactional queue replacement, and PIC/PIT/RTC/DMA/FDD/HDD state.
   P2 rejects an unrepresentable HDD continuation at capture; P3/P4 prove
   port-driven PIC pending IRQ, DMA, FDC and HDD restoration. There is still no
-  product save/load path and no Lib/Common change.
+  product save/load path and no Lib/Common change. S6 P2 archives PPI's guest
+  latch and speaker edge baselines; S6 P3 archives only finite InPort mouse
+  hardware state (deltas, latches, registers and diagnostic handshake).
+  The DOS INT 33h mouse driver remains an explicit deferred receiver.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership
   paths: nine production C/H files +56/-99 = -43; nine test C/H files

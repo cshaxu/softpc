@@ -143,6 +143,25 @@ void softpc_device_snapshot_capture_ppi(softpc_device_ppi_state *state);
 int softpc_device_snapshot_restore_ppi(const softpc_device_ppi_state *state);
 
 /*
+ * Microsoft InPort hardware state only.  The DOS INT 33h driver has a
+ * separate continuation and remains outside this receiver until its guest
+ * callback and cursor backing state have their own fixed-width map.
+ */
+typedef struct softpc_device_inport_mouse_state {
+    int32_t button_left, button_right;
+    int32_t delta_x, delta_y;
+    uint16_t data_1, data_2, status;
+    uint16_t last_button_left, last_button_right;
+    uint16_t mode, address, test_data;
+    int32_t startup_interrupt_bursts, id_toggle, test_state;
+} softpc_device_inport_mouse_state;
+
+int softpc_device_snapshot_capture_inport_mouse(
+    softpc_device_inport_mouse_state *state);
+int softpc_device_snapshot_restore_inport_mouse(
+    const softpc_device_inport_mouse_state *state);
+
+/*
  * The PIT uses function pointers and host clock timestamps internally.  The
  * archive stores only the finite state-machine identities and elapsed phase;
  * restore rebinds the functions and rebases that phase on the new host clock.

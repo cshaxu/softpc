@@ -18,6 +18,7 @@
 #include "c_tlb.h"
 #include "c_debug.h"
 #include "quick_ev.h"
+#include "mouse.h"
 /* base_def.h's non-ANSI compatibility macro must not alter this C17 test. */
 #undef const
 
@@ -387,6 +388,8 @@ static void verify_controller_archives(void)
     softpc_device_fdc_state fdc_saved, fdc_restored;
     softpc_device_hdd_state hdd_saved, hdd_restored;
     softpc_device_ppi_state ppi_saved, ppi_restored;
+    softpc_device_inport_mouse_state mouse_saved, mouse_restored;
+    half_word value;
 
     assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
 
@@ -453,6 +456,28 @@ static void verify_controller_archives(void)
     assert(ppi_restored.register_value == ppi_saved.register_value);
     assert(ppi_restored.gate_2_was_low == ppi_saved.gate_2_was_low);
     assert(ppi_restored.speaker_data_was_low == ppi_saved.speaker_data_was_low);
+
+    /* Preserve the original InPort's unconsumed relative motion, selected
+       register and one-shot diagnostic handshake without replaying port I/O.
+       The DOS INT 33h driver is deliberately a separate future receiver. */
+    mouse_send(11, -7, 1, 0);
+    outb(MOUSE_PORT_0, 0x87u);
+    outb(MOUSE_PORT_1, 0x30u);
+    outb(MOUSE_PORT_3, 0x91u);
+    outb(MOUSE_PORT_1, 0xa5u);
+    outb(MOUSE_PORT_2, 0x10u);
+    memset(&mouse_saved, 0, sizeof(mouse_saved));
+    assert(softpc_device_snapshot_capture_inport_mouse(&mouse_saved));
+    outb(MOUSE_PORT_0, 0x80u);
+    mouse_send(-1, 1, 0, 1);
+    assert(softpc_device_snapshot_restore_inport_mouse(&mouse_saved));
+    memset(&mouse_restored, 0, sizeof(mouse_restored));
+    assert(softpc_device_snapshot_capture_inport_mouse(&mouse_restored));
+    assert(memcmp(&mouse_restored, &mouse_saved, sizeof(mouse_saved)) == 0);
+    mouse_restored.test_state = 4;
+    assert(!softpc_device_snapshot_restore_inport_mouse(&mouse_restored));
+    inb(MOUSE_PORT_1, &value);
+    assert(value == 0xa5u);
 }
 
 static void record_event(long param)

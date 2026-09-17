@@ -875,3 +875,24 @@ output, rebuilding that host resource from restored guest state.
 and recaptures the three semantic values. This is a private archive proof only:
 there is no snapshot command, container, App path, Common API, or Lib change.
 The next S6 receivers remain keyboard, mouse and video.
+
+## S6 P3: InPort hardware mouse archive
+
+P3 admits only the finite Microsoft InPort hardware receiver in `mouse.c`.
+The fixed-width private state contains the unconsumed relative deltas and
+button state, latched data/status registers, last-button edge baselines,
+mode/address selection, finite startup-interrupt count, alternating ID state
+and diagnostic-transfer state. Restore assigns these values directly. It does
+not replay port writes, send an IRQ, retain an input source, serialize a
+callback or preserve any host cursor resource.
+
+`checkpoint_smoke` drives the original InPort through its normal hold and
+diagnostic protocol, captures it, changes/reset the live hardware state,
+restores it and compares every archived field. It then consumes the restored
+one-shot diagnostic byte. This proves both latent movement/register state and
+the diagnostic continuation survive without an I/O side effect.
+
+The DOS INT 33h driver in `mouse_io.c` remains explicitly deferred: its guest
+callback, cursor backing and `MOUSE_CONTEXT` need a separate fixed-width map;
+P3 does not claim a complete mouse-driver snapshot. No App command, snapshot
+container, Common API or Lib code is added.
