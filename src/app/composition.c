@@ -21,6 +21,7 @@ static lib_bool app_composition_hotkey(void *opaque,
 
 lib_status app_composition_initialize(app_command_context *command,
     common_machine *machine, common_session_display display,
+    lib_size snapshot_maximum,
     common_session_command_provider *provider)
 {
     if (command == NULL || machine == NULL || provider == NULL)
@@ -36,7 +37,21 @@ lib_status app_composition_initialize(app_command_context *command,
         .note_monitor_current = app_command_provider_note_monitor_current,
         .handle_hotkey = app_composition_hotkey
     };
-    return app_command_initialize(command, machine, display);
+    return app_command_initialize(command, machine, display, snapshot_maximum);
+}
+
+/* The canonical image contains configured RAM plus bounded controller/video
+ * sections. Keep the product read limit tied to configured RAM; the decoder
+ * still validates every declared section before restoring anything. */
+static lib_status app_composition_snapshot_maximum(lib_u32 memory_bytes,
+    lib_size *out_maximum)
+{
+    const lib_size overhead = 8u * 1024u * 1024u;
+    if (out_maximum == NULL || memory_bytes == 0u ||
+        (lib_size)memory_bytes > (lib_size)-1 - overhead)
+        return LIB_STATUS_LIMIT_EXCEEDED;
+    *out_maximum = (lib_size)memory_bytes + overhead;
+    return LIB_STATUS_OK;
 }
 
 static common_session_machine_state app_session_state(common_machine_state state)
@@ -81,6 +96,7 @@ lib_status app_composition_run(const app_startup_config *config)
     kvm_hotkey_registry hotkeys;
     char graphics_console_status[APP_COMMAND_TEXT_CAPACITY];
     common_session *session = NULL;
+    lib_size snapshot_maximum = 0u;
     lib_status result;
 
     vm_trace_reset();
@@ -92,6 +108,9 @@ lib_status app_composition_run(const app_startup_config *config)
         config->serial_output_path;
     options.printer_output_path = config->printer_output_path[0] == '\0' ? NULL :
         config->printer_output_path;
+    result = app_composition_snapshot_maximum(config->memory_bytes,
+        &snapshot_maximum);
+    if (result != LIB_STATUS_OK) goto done;
     result = vm_create(&options, &machine_driver);
     if (result != LIB_STATUS_OK) goto done;
     vm_driver_describe(machine_driver, &driver);
@@ -107,7 +126,8 @@ lib_status app_composition_run(const app_startup_config *config)
     session_options.console_control = config->console_control != 0;
     session_options.machine = machine_runtime;
     if (app_composition_initialize(&commands, machine_runtime,
-            config->presentation, &session_options.command) != LIB_STATUS_OK) {
+            config->presentation, snapshot_maximum,
+            &session_options.command) != LIB_STATUS_OK) {
         result = LIB_STATUS_IO_ERROR;
         goto done;
     }

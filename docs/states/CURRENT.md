@@ -13,9 +13,10 @@ existing-Storage/media-ownership decision: bounded readonly medium reads and
 ordinary truncate publication require no Lib change. M9 T63 S4 is closed after
 the private CPU/SAS/RAM archive proof. M9 T63 S5 is closed after the private
 controller/queue archive and dual-width restore proof. M9 T63 S6 is closed
-after its independent receiver/archive review. M9 T63 S7 is active for the
-two bounded Common machine-state operations and the VM's single
-executor-owned save/restore transaction.
+after its independent receiver/archive review. M9 T63 S7 is closed after the
+bounded Common machine-state operations and VM's single executor-owned
+save/restore transaction. M9 T63 S8 is active for the App-only snapshot
+command/file boundary.
 [Delivery and acceptance ledger](../history/M9-T62-common-lib-simplification.md).
 T62 closure was pushed in 54b2009 before T63 admission. The three older
 candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.md).
@@ -36,6 +37,10 @@ image's declared RAM must match the target machine configuration, and its SAS
 page-type length is validated from that declaration before any reset. A real
 two-process save/exit/load/resume CTest proves a fresh stopped target reaches
 ordinary PAUSED without importing live SAS state.
+S8 P1 adds the product boundary only: `save <file>` is admitted from running
+and pauses on successful capture; `load <file>` is admitted from init/stopped
+and reaches ordinary paused.  App owns copied paths, the RAM-plus-allowance
+input bound, wording and prompt flow; Common and Lib remain unchanged.
 
 ## Current Technical Baseline
 
@@ -286,23 +291,23 @@ Known TODOs and external NXVM acceptance remain separate, not claimed fixed.
   P discipline, path accounting, and build hygiene now match the relevant
   NXVM governance standard. [Record](../history/M9-Td-S9-execution-closure-quality.md)
 
-## M9 T63 S7 Packet
+## M9 T63 S8 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approved the staged T63 design and directs continued implementation. S6 is closed after an independent review of the frozen receiver ledger. Lib remains unchanged. Common may receive only two opaque machine-state operations and executor wiring required to invoke the injected VM driver. |
-| Objective | Add Common's bounded read/write machine-state operations and a VM-owned, single-executor transaction that reaches the approved save-safe boundary, captures/restores the private state image, and leaves a successful operation in ordinary PAUSED state. |
-| Non-goals | No App command or path handling, no snapshot file/container encoding, no Lib change, no Session/UI/debug API, no generic callback/task escape hatch, no second executor, no raw legacy structure dump, and no change to ordinary pause/debug/KVM behavior. |
-| Reference Baseline | S6 closure at `b88c5c0`; fixed packages contain all private S4--S6 archive receivers but no public machine-state operation or product save/load command. |
+| Admission And Approval | Owner admitted S8 after S7 P11 and authorizes the required App/VM/Compat work without a further approval request. Common and Lib remain frozen: S8 uses only the existing opaque Common state-transfer operations and existing Lib Storage file APIs. |
+| Objective | Add monitor `save <file>` and `load <file>` commands. App owns path parsing, bounded whole-file I/O, result wording and prompt behavior; it passes opaque callbacks only to the existing Common machine operations. |
+| Non-goals | No Common/Lib API or implementation change, no new snapshot format or VM/Compat archive receiver, no Session/UI/debug API, no generic callback/task escape hatch, no second executor, no raw legacy structure dump, and no change to ordinary pause/debug/KVM behavior. |
+| Reference Baseline | S7 P11 at `8647824`; fixed packages prove an x86/x64 fresh-process VM snapshot restore but expose no product command or file path. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
-| Files And ABI Surface | `src/common/machine/machine_interface.h/.c`, Common driver contract/tests/manifest, `src/vm/{driver,machine,snapshot,snapshot_image}` and narrow existing Compat/MVDM restoration ports only if required by the already admitted image. Common operations carry opaque copied bytes or callbacks only: no path or product format. |
+| Files And ABI Surface | `src/app/{command,composition}.c/.h`, App CMake/test wiring and this proposal/evidence only. App command retains copied path text and derives a bounded input-file limit from configured RAM plus a documented archive allowance. It calls only `common_machine_read_state`/`write_state` and `lib_storage_file_*`; it does not include VM, Compat or MVDM headers. |
 | Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, `DOCUMENT.md`; `docs/design/ARCHITECTURE.md`, `CODING.md`, `UI.md`; active proposal and source-boundary gates. |
-| Verification | First freeze exact Common request/result ownership, executor rendezvous and VM safe-boundary call order. Then add focused success, state-rejection, timeout and restore tests, full sequential x64/x86 CTest, package builds, Common manifest/corpus gates and actual-commit review. |
-| Expected Markers | Common does not understand CPU safety, files, paths, media sections or product messages. VM/Compat own safe boundary and image semantics. No host pointer, callback address, native handle, host pixel/DIB, UI mailbox or raw legacy struct enters the image. Successful read/write emits only existing PAUSED/frame facts. |
-| Asset Needs | No user media mutation, no user snapshot file and no raw trace/recording. Tests own/remove fixtures below build only. |
-| Reporting Requirements | Before code report exact API shape, files, ownership, original-mirror diff and estimated churn; after proof report actual production/test numstat, state matrix, tests and both EXE links. |
-| Stop Conditions | The two-operation boundary cannot express required executor work without a new Common product concept; a required archive receiver lacks a fixed representation; restore needs an unapproved MVDM redesign; or a required file/media operation needs a Lib change. Record evidence before expanding scope. |
-| Exit Criteria | The two Common operations have bounded state admission and one executor rendezvous; VM capture from running reaches safe PAUSED or reports deadline failure as ordinary PAUSED; VM restore only from stopped preserves failure atomicity and on success provides a resumable ordinary PAUSED entry plus complete frame; dual-width proof and required gates are committed/pushed. |
+| Verification | Parse/help/state-admission tests, a real App-provider save/stop/load/resume transaction with a build-owned fixture, failure/path/oversize tests, full sequential x64/x86 CTest, package builds and actual-commit review. |
+| Expected Markers | Only `save` from running is admitted and succeeds as ordinary PAUSED; only `load` from init/stopped is admitted and succeeds as ordinary PAUSED. Direct/readonly media remain referenced by their configured source; existing VM image semantics govern all currently archived state. App produces one explicit result and one prompt, never a false success or an extra lifecycle request. |
+| Asset Needs | No user media, user snapshot file or INI mutation. Tests create/remove snapshot fixtures below their own build working directory only. Packaging refreshes only the two approved EXEs. |
+| Reporting Requirements | Before code report exact App action, callback, file and size-limit flow; after proof report actual production/test numstat, command/state matrix, tests and both EXE links. |
+| Stop Conditions | A necessary user command requires a new Common/Lib API; current canonical image cannot represent a promised medium state; or App cannot provide bounded whole-file I/O through existing Storage. Record evidence before expanding scope. |
+| Exit Criteria | App commands use only the existing Common/Lib contracts; every accepted save/load state/result is correct; errors never claim success; a real command-provider transaction proves save → paused → stop → load → paused → resume; dual-width proof and required gates are committed/pushed. |
 | Original Owner Request | One binary snapshot eventually, direct/readonly references and FDD/HDD overlays; no Lib edits, Common only two state operations and necessary wiring. Save only running, load only init/stopped, success ordinary paused with working resume/reset; VM safe-stop deadline one second. |
 | Similar-Issue Sweep | Existing synchronous media/debug rendezvous, lifecycle completion ordering, run-generation invalidation, CCPU restore/reentry, timer capture finish paths and every Common driver callback that can mutate executor-owned state. |

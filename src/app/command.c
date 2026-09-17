@@ -1,4 +1,5 @@
 #include "command.h"
+#include "lib/storage/file_interface.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -14,6 +15,8 @@ static const char HELP_COMMANDS[] =
     "  reset                 cold-reset and pause at firmware entry\r\n"
     "  floppy insert <image> insert drive A media while stopped/paused\r\n"
     "  floppy eject          eject drive A media while stopped/paused\r\n"
+    "  save <file>           save a running machine and pause\r\n"
+    "  load <file>           load a snapshot while stopped\r\n"
     "  help                  show this help\r\n"
     "  debug                 enter debugger (q returns to monitor)\r\n"
     "  exit                  quit\r\n";
@@ -128,6 +131,38 @@ static void lifecycle(app_command_session *s, app_monitor_state state,
         reject(s, e, "Unknown command.");
 }
 
+static void snapshot(app_command_session *s, app_monitor_state state,
+    const char *command, const char *path, app_command_effect *effect)
+{
+    if (s->transition_pending || s->dispatch_pending) {
+        reject(s, effect, "Machine state transition is in progress.");
+        return;
+    }
+    if (*path == '\0' || strlen(path) >= sizeof(effect->path)) {
+        reject(s, effect, !strcmp(command, "save") ?
+            "Usage: save <file>" : "Usage: load <file>");
+        return;
+    }
+    if (!strcmp(command, "save")) {
+        if (state != APP_MONITOR_RUNNING) {
+            reject(s, effect, state == APP_MONITOR_PAUSED ?
+                "Machine is paused; use resume before save." :
+                "Machine is stopped; use start before save.");
+            return;
+        }
+        effect->action = APP_COMMAND_ACTION_SAVE_STATE;
+    } else {
+        if (state != APP_MONITOR_INIT && state != APP_MONITOR_STOPPED) {
+            reject(s, effect, state == APP_MONITOR_RUNNING ?
+                "Machine is running; stop it before load." :
+                "Machine is paused; stop it before load.");
+            return;
+        }
+        effect->action = APP_COMMAND_ACTION_LOAD_STATE;
+    }
+    memcpy(effect->path, path, strlen(path) + 1u);
+}
+
 void app_command_session_initialize(app_command_session *s, common_session_display display)
 {
     memset(s, 0, sizeof(*s));
@@ -189,6 +224,10 @@ void app_command_session_submit_line(app_command_session *s, app_monitor_state s
     }
     /* The parser does not own machine state.  It receives control's current
        stable fact for the one command validation below. */
+    if (!strcmp(c, "save") || !strcmp(c, "load")) {
+        snapshot(s, state, c, a, e);
+        return;
+    }
     if (strcmp(c, "floppy"))
     {
         lifecycle(s, state, c, e);
@@ -262,7 +301,15 @@ void app_command_session_note_runtime(app_command_session *s,
     if (state == COMMON_MACHINE_PAUSED && prior != APP_MONITOR_PAUSED)
     {
         s->transition_pending = 0;
-        outcome(s, "Machine paused.");
+        if (s->pending_snapshot == APP_SNAPSHOT_RESULT_SAVED)
+            outcome(s, "Machine saved and paused.");
+        else if (s->pending_snapshot == APP_SNAPSHOT_RESULT_LOADED)
+            outcome(s, "Machine loaded and paused.");
+        else if (s->pending_snapshot == APP_SNAPSHOT_RESULT_SAVE_FAILED)
+            outcome(s, "Cannot save machine state.");
+        else
+            outcome(s, "Machine paused.");
+        s->pending_snapshot = APP_SNAPSHOT_RESULT_NONE;
     }
     else if (state == COMMON_MACHINE_RUNNING)
     {
@@ -380,6 +427,85 @@ static void app_command_copy_effect(common_session_command_result *out,
     out->arm_prompt = effect->arm_prompt != 0;
 }
 
+static lib_status app_snapshot_write(void *opaque, const lib_u8 *bytes,
+    lib_size byte_count)
+{
+    return lib_storage_file_writer_write((lib_storage_file_writer *)opaque,
+        bytes, byte_count);
+}
+
+typedef struct app_snapshot_reader {
+    const lib_u8 *bytes;
+    lib_size count;
+    lib_size offset;
+} app_snapshot_reader;
+
+static lib_status app_snapshot_read(void *opaque, lib_u8 *bytes,
+    lib_size byte_count)
+{
+    app_snapshot_reader *reader = (app_snapshot_reader *)opaque;
+    if (reader == NULL || (bytes == NULL && byte_count != 0u) ||
+        reader->offset > reader->count ||
+        byte_count > reader->count - reader->offset)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    if (byte_count != 0u)
+        lib_memory_copy(bytes, reader->bytes + reader->offset, byte_count);
+    reader->offset += byte_count;
+    return LIB_STATUS_OK;
+}
+
+static void app_command_complete_snapshot(app_command_context *command,
+    app_command_action action, lib_status status, app_command_effect *effect)
+{
+    app_snapshot_result pending = action == APP_COMMAND_ACTION_SAVE_STATE ?
+        (status == LIB_STATUS_OK ? APP_SNAPSHOT_RESULT_SAVED :
+            APP_SNAPSHOT_RESULT_SAVE_FAILED) : APP_SNAPSHOT_RESULT_LOADED;
+    if (status == LIB_STATUS_OK ||
+        (action == APP_COMMAND_ACTION_SAVE_STATE &&
+            common_machine_state_get(command->machine) == COMMON_MACHINE_PAUSED)) {
+        command->session.pending_snapshot = pending;
+        command->session.transition_pending = 1;
+        command->session.prompt_due = 0;
+        clear(effect);
+        return;
+    }
+    reject(&command->session, effect, action == APP_COMMAND_ACTION_SAVE_STATE ?
+        "Cannot save machine state." : "Cannot load machine state.");
+}
+
+static void app_command_save_state(app_command_context *command,
+    const char *path, app_command_effect *effect)
+{
+    lib_storage_file_writer *writer = NULL;
+    lib_status status = lib_storage_file_writer_open(path,
+        LIB_STORAGE_FILE_WRITER_TRUNCATE, &writer);
+    if (status == LIB_STATUS_OK)
+        status = common_machine_read_state(command->machine,
+            &(common_machine_state_writer) { app_snapshot_write, writer });
+    if (writer != NULL && lib_storage_file_writer_close(writer) != LIB_STATUS_OK &&
+        status == LIB_STATUS_OK)
+        status = LIB_STATUS_IO_ERROR;
+    app_command_complete_snapshot(command, APP_COMMAND_ACTION_SAVE_STATE,
+        status, effect);
+}
+
+static void app_command_load_state(app_command_context *command,
+    const char *path, app_command_effect *effect)
+{
+    void *owned = NULL;
+    lib_size byte_count = 0u;
+    lib_status status = lib_storage_file_read_owned(path,
+        command->snapshot_maximum, &owned, &byte_count);
+    if (status == LIB_STATUS_OK) {
+        app_snapshot_reader reader = { owned, byte_count, 0u };
+        status = common_machine_write_state(command->machine,
+            &(common_machine_state_reader) { app_snapshot_read, &reader });
+    }
+    lib_release(owned);
+    app_command_complete_snapshot(command, APP_COMMAND_ACTION_LOAD_STATE,
+        status, effect);
+}
+
 void app_command_provider_open(void *opaque,
     common_session_command_result *out)
 {
@@ -446,6 +572,10 @@ void app_command_provider_submit_line(void *opaque,
             (void)snprintf(command->debug_prompt, sizeof(command->debug_prompt), "-");
             effect.text[0] = '\0';
         } else (void)snprintf(effect.text, sizeof(effect.text), "Cannot open debugger.\r\n\r\n");
+    } else if (effect.action == APP_COMMAND_ACTION_SAVE_STATE) {
+        app_command_save_state(command, effect.path, &effect);
+    } else if (effect.action == APP_COMMAND_ACTION_LOAD_STATE) {
+        app_command_load_state(command, effect.path, &effect);
     } else if (effect.action != APP_COMMAND_ACTION_NONE) {
         int succeeded = effect.action == APP_COMMAND_ACTION_EJECT_FLOPPY ?
             common_machine_set_removable_media(command->machine, NULL) :
@@ -520,11 +650,14 @@ void app_command_provider_note_monitor_current(void *opaque,
 }
 
 lib_status app_command_initialize(app_command_context *command,
-    common_machine *machine, common_session_display display)
+    common_machine *machine, common_session_display display,
+    lib_size snapshot_maximum)
 {
-    if (command == NULL || machine == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    if (command == NULL || machine == NULL || snapshot_maximum == 0u)
+        return LIB_STATUS_INVALID_ARGUMENT;
     memset(command, 0, sizeof(*command));
     command->machine = machine;
+    command->snapshot_maximum = snapshot_maximum;
     app_command_session_initialize(&command->session, display);
     return common_debug_create(&command->debug);
 }

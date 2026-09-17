@@ -166,6 +166,8 @@ int main(void)
         "Ctrl+Alt+T            send Alt+Tab to the guest\r\n") != NULL);
     app_command_session_open(&session, &effect);
     assert(strstr(effect.text, "cold-reset and run the machine") != NULL);
+    assert(strstr(effect.text, "save <file>") != NULL);
+    assert(strstr(effect.text, "load <file>") != NULL);
     assert(strstr(effect.text, app_command_hotkey_help()) != NULL);
     app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
         "floppy eject", &effect);
@@ -173,6 +175,26 @@ int main(void)
     app_command_session_complete_floppy(&session, effect.action, 1, &effect);
     assert(strstr(effect.text, "Floppy ejected") != NULL);
     assert_blank_line(effect.text);
+    app_command_session_submit_line(&session, APP_MONITOR_RUNNING,
+        "save setup-before-failure.spcs", &effect);
+    assert(effect.action == APP_COMMAND_ACTION_SAVE_STATE);
+    assert(!strcmp(effect.path, "setup-before-failure.spcs"));
+    app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
+        "load setup-before-failure.spcs", &effect);
+    assert(effect.action == APP_COMMAND_ACTION_LOAD_STATE);
+    app_command_session_submit_line(&session, APP_MONITOR_INIT,
+        "load setup-before-failure.spcs", &effect);
+    assert(effect.action == APP_COMMAND_ACTION_LOAD_STATE);
+    app_command_session_submit_line(&session, APP_MONITOR_PAUSED,
+        "save state.spcs", &effect);
+    assert(strstr(effect.text, "use resume before save") != NULL);
+    assert_blank_line(effect.text);
+    arm(&session, NULL);
+    app_command_session_submit_line(&session, APP_MONITOR_RUNNING,
+        "load state.spcs", &effect);
+    assert(strstr(effect.text, "stop it before load") != NULL);
+    assert_blank_line(effect.text);
+    arm(&session, NULL);
     app_command_session_reject_line(&session, &effect);
     assert(strstr(effect.text, "Command is too long.") != NULL);
     assert_blank_line(effect.text);

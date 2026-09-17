@@ -757,6 +757,7 @@ static void check_vm_owner(const char *path)
 int main(void)
 {
     const char *path = "debug-commands-smoke.img";
+    const char *snapshot_path = "debug-commands-smoke.spcs";
     unsigned char sector[512] = { 0xeb, 0xfe };
     FILE *file;
     softpc_machine_options options = { .floppy_path = path,
@@ -793,7 +794,8 @@ int main(void)
     assert(common_machine_create(&machine, &driver) == LIB_STATUS_OK);
     common_machine_set_state_sink(machine, note_state, &events);
     assert(app_composition_initialize(&commands, machine,
-        COMMON_SESSION_DISPLAY_WINDOW, &provider) == LIB_STATUS_OK);
+        COMMON_SESSION_DISPLAY_WINDOW, 24u * 1024u * 1024u,
+        &provider) == LIB_STATUS_OK);
     /* Exercise the actual composed provider, not a second hotkey dispatcher. */
     assert(provider.context == &commands && provider.open == app_command_provider_open);
     assert(provider.submit_line == app_command_provider_submit_line);
@@ -932,11 +934,54 @@ int main(void)
     submit(&provider, COMMON_SESSION_MACHINE_STOPPED, "q", &result);
     provider.note_monitor_current(&commands, LIB_TRUE, &result);
     assert(result.arm_prompt && strcmp(result.prompt, "SoftPC> ") == 0);
+    /* Product commands use the actual provider, Common rendezvous and VM
+       archive; only the test owns these two disposable files. */
+    assert(common_machine_start(machine));
+    wait_for(events.running);
+    submit(&provider, COMMON_SESSION_MACHINE_RUNNING,
+        "save debug-commands-smoke.spcs", &result);
+    assert(result.text[0] == '\0' && !result.arm_prompt);
+    wait_for(events.paused);
+    provider.note_runtime(&commands, COMMON_SESSION_MACHINE_RUNNING,
+        COMMON_SESSION_MACHINE_PAUSED, &result);
+    provider.note_monitor_current(&commands, LIB_TRUE, &result);
+    assert(result.arm_prompt && strstr(result.text, "Machine saved and paused.") != NULL);
+    assert(common_machine_stop(machine));
+    wait_for(events.stopped);
+    provider.note_runtime(&commands, COMMON_SESSION_MACHINE_PAUSED,
+        COMMON_SESSION_MACHINE_STOPPED, &result);
+    submit(&provider, COMMON_SESSION_MACHINE_STOPPED,
+        "load missing-snapshot.spcs", &result);
+    assert(strstr(result.text, "Cannot load machine state.") != NULL &&
+        !result.arm_prompt);
+    commands.snapshot_maximum = 1u;
+    submit(&provider, COMMON_SESSION_MACHINE_STOPPED,
+        "load debug-commands-smoke.spcs", &result);
+    assert(strstr(result.text, "Cannot load machine state.") != NULL &&
+        !result.arm_prompt);
+    commands.snapshot_maximum = 24u * 1024u * 1024u;
+    submit(&provider, COMMON_SESSION_MACHINE_STOPPED,
+        "load debug-commands-smoke.spcs", &result);
+    assert(result.text[0] == '\0' && !result.arm_prompt);
+    wait_for(events.paused);
+    provider.note_runtime(&commands, COMMON_SESSION_MACHINE_STOPPED,
+        COMMON_SESSION_MACHINE_PAUSED, &result);
+    provider.note_monitor_current(&commands, LIB_TRUE, &result);
+    assert(result.arm_prompt && strstr(result.text, "Machine loaded and paused.") != NULL);
+    assert(common_machine_resume(machine));
+    wait_for(events.running);
+    provider.note_runtime(&commands, COMMON_SESSION_MACHINE_PAUSED,
+        COMMON_SESSION_MACHINE_RUNNING, &result);
+    assert(common_machine_stop(machine));
+    wait_for(events.stopped);
+    provider.note_runtime(&commands, COMMON_SESSION_MACHINE_RUNNING,
+        COMMON_SESSION_MACHINE_STOPPED, &result);
     app_command_dispose(&commands);
     common_machine_destroy(machine);
     vm_driver_destroy(adapter);
     softpc_machine_destroy(product);
     check_vm_owner(path);
+    assert(remove(snapshot_path) == 0);
     assert(remove(path) == 0);
     CloseHandle(events.paused); CloseHandle(events.running); CloseHandle(events.stopped);
     CloseHandle(program_completed);

@@ -9,7 +9,20 @@
 #define APP_COMMAND_PATH_CAPACITY 1024u
 
 typedef enum app_monitor_state { APP_MONITOR_INIT, APP_MONITOR_STOPPED, APP_MONITOR_PAUSED, APP_MONITOR_RUNNING } app_monitor_state;
-typedef enum app_command_action { APP_COMMAND_ACTION_NONE, APP_COMMAND_ACTION_EJECT_FLOPPY, APP_COMMAND_ACTION_INSERT_FLOPPY, APP_COMMAND_ACTION_DEBUG } app_command_action;
+typedef enum app_command_action {
+    APP_COMMAND_ACTION_NONE,
+    APP_COMMAND_ACTION_EJECT_FLOPPY,
+    APP_COMMAND_ACTION_INSERT_FLOPPY,
+    APP_COMMAND_ACTION_DEBUG,
+    APP_COMMAND_ACTION_SAVE_STATE,
+    APP_COMMAND_ACTION_LOAD_STATE
+} app_command_action;
+typedef enum app_snapshot_result {
+    APP_SNAPSHOT_RESULT_NONE,
+    APP_SNAPSHOT_RESULT_SAVED,
+    APP_SNAPSHOT_RESULT_LOADED,
+    APP_SNAPSHOT_RESULT_SAVE_FAILED
+} app_snapshot_result;
 /* A parsed lifecycle request is control input, not a presentation intent.
  * Only the control loop may consume it and submit it to runtime. */
 typedef enum app_lifecycle_request {
@@ -28,6 +41,7 @@ typedef struct app_command_session {
     int dispatch_pending;
     int transition_pending;
     int prompt_due;
+    app_snapshot_result pending_snapshot;
     char pending_monitor_text[APP_COMMAND_TEXT_CAPACITY];
 } app_command_session;
 
@@ -66,6 +80,7 @@ void app_command_session_note_monitor_current(app_command_session *, int, app_co
 typedef struct app_command_context {
     app_command_session session;
     common_machine *machine;
+    lib_size snapshot_maximum;
     common_debug *debug;
     lib_bool debug_active;
     common_debug_result debug_completed;
@@ -73,7 +88,8 @@ typedef struct app_command_context {
     char debug_prompt[COMMON_DEBUG_PROMPT_CAPACITY];
 } app_command_context;
 
-lib_status app_command_initialize(app_command_context *, common_machine *, common_session_display);
+lib_status app_command_initialize(app_command_context *, common_machine *,
+    common_session_display, lib_size snapshot_maximum);
 void app_command_dispose(app_command_context *);
 void app_command_provider_open(void *, common_session_command_result *);
 void app_command_provider_reject_line(void *, common_session_command_result *);
