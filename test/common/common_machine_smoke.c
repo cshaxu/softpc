@@ -512,8 +512,10 @@ int main(void)
     assert(common_machine_read_state(machine,
         &(common_machine_state_writer) { state_write, &transfer }) ==
         LIB_STATUS_INVALID_STATE);
+    ResetEvent(fake.running);
     assert(common_machine_resume(machine));
     assert(WaitForSingleObject(fake.running, 5000u) == WAIT_OBJECT_0);
+    assert(common_machine_state_get(machine) == COMMON_MACHINE_RUNNING);
     assert(common_debug_submit_line(debug, "d", &debug_command_result) == LIB_STATUS_OK);
     assert(strstr(debug_command_result.text, "must be paused") != NULL);
     assert(common_debug_submit_line(debug, "q", &debug_command_result) == LIB_STATUS_OK);
