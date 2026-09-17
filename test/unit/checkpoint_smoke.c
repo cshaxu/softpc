@@ -1,6 +1,7 @@
 #include "vm/machine.h"
 #include "compat/ccpu/abi.h"
 #include "compat/ccpu/lifecycle.h"
+#include "compat/devices/archive.h"
 #include "compat/devices/snapshot.h"
 #include "vm/snapshot.h"
 #include "compat/platform.h"
@@ -19,6 +20,9 @@
 #include "c_debug.h"
 #include "quick_ev.h"
 #include "mouse.h"
+
+extern void insert_code_into_6805_buf(half_word code);
+extern void host_key_down(int key);
 /* base_def.h's non-ANSI compatibility macro must not alter this C17 test. */
 #undef const
 
@@ -389,6 +393,8 @@ static void verify_controller_archives(void)
     softpc_device_hdd_state hdd_saved, hdd_restored;
     softpc_device_ppi_state ppi_saved, ppi_restored;
     softpc_device_inport_mouse_state mouse_saved, mouse_restored;
+    softpc_device_keyboard_state keyboard_saved, keyboard_restored;
+    softpc_device_archive *keyboard_archive;
     half_word value;
 
     assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
@@ -478,6 +484,38 @@ static void verify_controller_archives(void)
     assert(!softpc_device_snapshot_restore_inport_mouse(&mouse_restored));
     inb(MOUSE_PORT_1, &value);
     assert(value == 0xa5u);
+
+    /* The 8042's pending FIFO and command latch are device state, not a
+       frontend queue.  Capture through its real port path, mutate it, then
+       compare a fresh semantic capture after restore. */
+    insert_code_into_6805_buf(0x1eu);
+    outb(0x64u, 0x60u);
+    outb(0x60u, 0x25u);
+    memset(&keyboard_saved, 0, sizeof(keyboard_saved));
+    assert(softpc_device_snapshot_capture_keyboard(&keyboard_saved));
+    outb(0x64u, 0xadu);
+    insert_code_into_6805_buf(0x30u);
+    assert(softpc_device_snapshot_restore_keyboard(&keyboard_saved));
+    memset(&keyboard_restored, 0, sizeof(keyboard_restored));
+    assert(softpc_device_snapshot_capture_keyboard(&keyboard_restored));
+    assert(memcmp(&keyboard_restored, &keyboard_saved,
+        sizeof(keyboard_saved)) == 0);
+    keyboard_restored.fifo_count = 49;
+    assert(!softpc_device_snapshot_restore_keyboard(&keyboard_restored));
+
+    /* The archive must preserve the delayed 8042 interrupt as semantic work,
+       rather than accepting the controller state while rejecting its pending
+       callback.  The fresh queue makes this a keyboard-only callback proof. */
+    q_event_init();
+    host_key_down(30);
+    keyboard_archive = softpc_device_archive_create();
+    assert(keyboard_archive != NULL);
+    assert(softpc_device_archive_capture(keyboard_archive));
+    q_event_init();
+    assert(softpc_device_archive_restore(keyboard_archive));
+    c_cpu_q_ev_set_count(0u);
+    dispatch_q_event();
+    softpc_device_archive_dispose(keyboard_archive);
 }
 
 static void record_event(long param)

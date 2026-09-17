@@ -22,7 +22,10 @@ enum {
     SOFTPC_DEVICE_FDC_NDMA_BYTES = 8192,
     SOFTPC_DEVICE_HDD_DRIVE_COUNT = 2,
     SOFTPC_DEVICE_HDD_SECTOR_WORDS = 256,
-    SOFTPC_DEVICE_PIT_COUNTER_COUNT = 3
+    SOFTPC_DEVICE_PIT_COUNTER_COUNT = 3,
+    SOFTPC_DEVICE_KEYBOARD_FIFO_COUNT = 48,
+    SOFTPC_DEVICE_KEYBOARD_KEY_COUNT = 127,
+    SOFTPC_DEVICE_KEYBOARD_HELD_EVENT_COUNT = 16
 };
 
 enum {
@@ -33,7 +36,9 @@ enum {
     SOFTPC_DEVICE_QUEUE_RTC_SYNC,
     SOFTPC_DEVICE_QUEUE_FDC_INTERRUPT,
     SOFTPC_DEVICE_QUEUE_HDD_PAUSE,
-    SOFTPC_DEVICE_QUEUE_HDD_INTERRUPT
+    SOFTPC_DEVICE_QUEUE_HDD_INTERRUPT,
+    SOFTPC_DEVICE_QUEUE_KEYBOARD_INTERRUPT,
+    SOFTPC_DEVICE_QUEUE_KEYBOARD_REFILL
 };
 
 typedef struct softpc_device_dma_state {
@@ -160,6 +165,35 @@ int softpc_device_snapshot_capture_inport_mouse(
     softpc_device_inport_mouse_state *state);
 int softpc_device_snapshot_restore_inport_mouse(
     const softpc_device_inport_mouse_state *state);
+
+typedef struct softpc_device_keyboard_state {
+    uint16_t fifo[SOFTPC_DEVICE_KEYBOARD_FIFO_COUNT];
+    uint16_t set_3_key_state[SOFTPC_DEVICE_KEYBOARD_KEY_COUNT];
+    int32_t key_down_count[SOFTPC_DEVICE_KEYBOARD_KEY_COUNT];
+    int32_t held_key[SOFTPC_DEVICE_KEYBOARD_HELD_EVENT_COUNT];
+    int32_t held_type[SOFTPC_DEVICE_KEYBOARD_HELD_EVENT_COUNT];
+    int32_t fifo_count, sent_overrun;
+    int32_t anomalous_index, anomalous_size, anomalous_key, anomalous_active;
+    int32_t held_count, scan_set;
+    int32_t repeat_delay_target, repeat_target, repeat_delay_count, repeat_count;
+    int32_t typematic_key, input_port_value, typematic_key_valid;
+    int32_t waiting_for_next_code, waiting_for_next_8042_code, num_lock_on;
+    int32_t shift_on, left_shift_on, right_shift_on;
+    int32_t ctrl_on, left_ctrl_on, right_ctrl_on;
+    int32_t alt_on, left_alt_on, right_alt_on;
+    int32_t waiting_for_upcode, next_code_sequence, next_8042_sequence;
+    int32_t set_3_key_type_change_destination;
+    int32_t translating, keyboard_disabled, interrupt_enabled, output_full;
+    int32_t pending_8042, interface_disabled, scanning_discontinued;
+    int32_t gate_a20_status, reset_was_by_keyboard;
+    uint16_t output_contents, pending_8042_value, status;
+    uint16_t output_port_bits, command_byte, light_pattern;
+    uint32_t refill_event_handle;
+} softpc_device_keyboard_state;
+
+int softpc_device_snapshot_capture_keyboard(softpc_device_keyboard_state *state);
+int softpc_device_snapshot_restore_keyboard(
+    const softpc_device_keyboard_state *state);
 
 /*
  * The PIT uses function pointers and host clock timestamps internally.  The

@@ -66,7 +66,9 @@ candidates remain queued. [Snapshot proposal](../proposals/m9-machine-snapshots.
   port-driven PIC pending IRQ, DMA, FDC and HDD restoration. There is still no
   product save/load path and no Lib/Common change. S6 P2 archives PPI's guest
   latch and speaker edge baselines; S6 P3 archives only finite InPort mouse
-  hardware state (deltas, latches, registers and diagnostic handshake).
+  hardware state (deltas, latches, registers and diagnostic handshake). S6 P4
+  archives the finite 8042 keyboard-controller state and both reviewed delayed
+  callbacks (`do_int` and `allowRefill`) as semantic queue IDs.
   The DOS INT 33h mouse driver remains an explicit deferred receiver.
 
 - T62 S5-S8 implementation 44e9d0f removes four duplicate state/ownership

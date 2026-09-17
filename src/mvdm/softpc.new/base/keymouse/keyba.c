@@ -80,6 +80,7 @@ static char SccsID[]="@(#)keyba.c	1.57 06/22/95 Copyright Insignia Solutions Ltd
 #include "ica.h"
 #include "keyba.h"
 #include "quick_ev.h"
+#include "compat/devices/snapshot.h"
 #ifdef macintosh
 #include "ckmalloc.h"
 #endif /* macintosh */
@@ -2813,6 +2814,124 @@ LOCAL VOID allowRefill IFN1(long, unusedParam)
 
 	/* continue with filling the buffer... */
 	continue_output();
+}
+
+int
+softpc_device_snapshot_encode_keyboard_callback(callback, callback_id)
+Q_CALLBACK_FN callback;
+unsigned long *callback_id;
+{
+	if (callback_id == NULL) return FALSE;
+	if (callback == do_int) {
+		*callback_id = SOFTPC_DEVICE_QUEUE_KEYBOARD_INTERRUPT;
+		return TRUE;
+	}
+	if (callback != allowRefill) return FALSE;
+	*callback_id = SOFTPC_DEVICE_QUEUE_KEYBOARD_REFILL;
+	return TRUE;
+}
+
+Q_CALLBACK_FN
+softpc_device_snapshot_decode_keyboard_callback(callback_id)
+unsigned long callback_id;
+{
+	if (callback_id == SOFTPC_DEVICE_QUEUE_KEYBOARD_INTERRUPT) return do_int;
+	return callback_id == SOFTPC_DEVICE_QUEUE_KEYBOARD_REFILL ? allowRefill : NULL;
+}
+
+LOCAL int
+keyboard_anomalous_index IFN0()
+{
+	int index;
+	for (index = 0; index < 134; ++index)
+		if (anomalous_array == break_arrays[index]) return index;
+	return -1;
+}
+
+int
+softpc_device_snapshot_capture_keyboard(state)
+softpc_device_keyboard_state *state;
+{
+	int index, count;
+	if (state == NULL) return FALSE;
+	count = (buff_6805_in_ptr - buff_6805_out_ptr) & BUFF_6805_PMASK;
+	if (count > BUFF_6805_VMAX || held_event_count < 0 || held_event_count > HELD_EVENT_MAX)
+		return FALSE;
+	state->anomalous_index = in_anomalous_state ? keyboard_anomalous_index() : -1;
+	if (state->anomalous_index < -1) return FALSE;
+	for (index = 0; index < count; ++index)
+		state->fifo[index] = buff_6805[(buff_6805_out_ptr + index) & BUFF_6805_PMASK];
+	for (; index < BUFF_6805_VMAX; ++index) state->fifo[index] = 0;
+	for (index = 0; index < 127; ++index) {
+		state->set_3_key_state[index] = set_3_key_state[index];
+		state->key_down_count[index] = key_down_count[index];
+	}
+	for (index = 0; index < HELD_EVENT_MAX; ++index) {
+		state->held_key[index] = held_event_key[index]; state->held_type[index] = held_event_type[index];
+	}
+	state->fifo_count=count; state->sent_overrun=sent_overrun; state->anomalous_size=anomalous_size;
+	state->anomalous_key=anom_key; state->anomalous_active=in_anomalous_state;
+	state->held_count=held_event_count; state->scan_set=key_set;
+	state->repeat_delay_target=repeat_delay_target; state->repeat_target=repeat_target;
+	state->repeat_delay_count=repeat_delay_count; state->repeat_count=repeat_count;
+	state->typematic_key=typematic_key; state->input_port_value=input_port_val;
+	state->typematic_key_valid=typematic_key_valid; state->waiting_for_next_code=waiting_for_next_code;
+	state->waiting_for_next_8042_code=waiting_for_next_8042_code; state->num_lock_on=num_lock_on;
+	state->shift_on=shift_on; state->left_shift_on=l_shift_on; state->right_shift_on=r_shift_on;
+	state->ctrl_on=ctrl_on; state->left_ctrl_on=l_ctrl_on; state->right_ctrl_on=r_ctrl_on;
+	state->alt_on=alt_on; state->left_alt_on=l_alt_on; state->right_alt_on=r_alt_on;
+	state->waiting_for_upcode=waiting_for_upcode; state->next_code_sequence=next_code_sequence_number;
+	state->next_8042_sequence=next_8042_code_sequence_number;
+	state->set_3_key_type_change_destination=set_3_key_type_change_dest;
+	state->translating=translating; state->keyboard_disabled=keyboard_disabled;
+	state->interrupt_enabled=int_enabled; state->output_full=output_full;
+	state->pending_8042=pending_8042; state->interface_disabled=keyboard_interface_disabled;
+	state->scanning_discontinued=scanning_discontinued; state->gate_a20_status=gate_a20_status;
+	state->reset_was_by_keyboard=reset_was_by_kbd; state->output_contents=output_contents;
+	state->pending_8042_value=pending_8042_value; state->status=kbd_status;
+	state->output_port_bits=op_port_remembered_bits; state->command_byte=cmd_byte_8042;
+	state->light_pattern=current_light_pattern; state->refill_event_handle=refillDelayedHandle;
+	return TRUE;
+}
+
+int
+softpc_device_snapshot_restore_keyboard(state)
+const softpc_device_keyboard_state *state;
+{
+	int index;
+	if (state == NULL || state->fifo_count < 0 || state->fifo_count > BUFF_6805_VMAX ||
+		state->held_count < 0 || state->held_count > HELD_EVENT_MAX || state->scan_set < 1 ||
+		state->scan_set > 3 || (state->sent_overrun != 0 && state->sent_overrun != 1) ||
+		(state->anomalous_active != 0 && state->anomalous_active != 1) ||
+		(state->anomalous_active && (state->anomalous_index < 0 || state->anomalous_index >= 134 ||
+		state->anomalous_key < 0 || state->anomalous_key >= 127))) return FALSE;
+	key_set=state->scan_set; init_key_arrays();
+	if (state->anomalous_active && state->anomalous_size != break_sizes[state->anomalous_index]) return FALSE;
+	buff_6805_out_ptr=0; buff_6805_in_ptr=state->fifo_count;
+	for (index=0; index<state->fifo_count; ++index) buff_6805[index]=state->fifo[index];
+	free_6805_buff_size=BUFF_6805_VMAX-state->fifo_count;
+	for (index=0; index<127; ++index) { set_3_key_state[index]=state->set_3_key_state[index]; key_down_count[index]=state->key_down_count[index]; }
+	for (index=0; index<HELD_EVENT_MAX; ++index) { held_event_key[index]=state->held_key[index]; held_event_type[index]=state->held_type[index]; }
+	sent_overrun=state->sent_overrun; anomalous_size=state->anomalous_size; anom_key=state->anomalous_key;
+	in_anomalous_state=state->anomalous_active; anomalous_array=in_anomalous_state ? break_arrays[state->anomalous_index] : NULL;
+	held_event_count=state->held_count; repeat_delay_target=state->repeat_delay_target; repeat_target=state->repeat_target;
+	repeat_delay_count=state->repeat_delay_count; repeat_count=state->repeat_count; typematic_key=state->typematic_key;
+	input_port_val=state->input_port_value; typematic_key_valid=state->typematic_key_valid;
+	waiting_for_next_code=state->waiting_for_next_code; waiting_for_next_8042_code=state->waiting_for_next_8042_code;
+	num_lock_on=state->num_lock_on; shift_on=state->shift_on; l_shift_on=state->left_shift_on; r_shift_on=state->right_shift_on;
+	ctrl_on=state->ctrl_on; l_ctrl_on=state->left_ctrl_on; r_ctrl_on=state->right_ctrl_on;
+	alt_on=state->alt_on; l_alt_on=state->left_alt_on; r_alt_on=state->right_alt_on;
+	waiting_for_upcode=state->waiting_for_upcode; next_code_sequence_number=state->next_code_sequence;
+	next_8042_code_sequence_number=state->next_8042_sequence; set_3_key_type_change_dest=state->set_3_key_type_change_destination;
+	translating=state->translating; keyboard_disabled=state->keyboard_disabled; int_enabled=state->interrupt_enabled;
+	output_full=state->output_full; pending_8042=state->pending_8042; keyboard_interface_disabled=state->interface_disabled;
+	scanning_discontinued=state->scanning_discontinued; gate_a20_status=state->gate_a20_status;
+	reset_was_by_kbd=state->reset_was_by_keyboard; output_contents=state->output_contents;
+	pending_8042_value=state->pending_8042_value; kbd_status=state->status;
+	op_port_remembered_bits=state->output_port_bits; cmd_byte_8042=state->command_byte;
+	current_light_pattern=state->light_pattern; refillDelayedHandle=state->refill_event_handle;
+	scan_code_6805_size=0; scan_code_6805_array=NULL;
+	return TRUE;
 }
 #endif
 

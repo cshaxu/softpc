@@ -21,6 +21,7 @@ struct softpc_device_archive {
     softpc_device_hdd_state hdd;
     softpc_device_ppi_state ppi;
     softpc_device_inport_mouse_state inport_mouse;
+    softpc_device_keyboard_state keyboard;
     int valid;
 };
 
@@ -32,6 +33,8 @@ extern int softpc_device_snapshot_encode_fla_callback();
 extern Q_CALLBACK_FN softpc_device_snapshot_decode_fla_callback();
 extern int softpc_device_snapshot_encode_fdisk_callback();
 extern Q_CALLBACK_FN softpc_device_snapshot_decode_fdisk_callback();
+extern int softpc_device_snapshot_encode_keyboard_callback();
+extern Q_CALLBACK_FN softpc_device_snapshot_decode_keyboard_callback();
 
 LOCAL int
 encode_callback(callback, callback_id)
@@ -41,7 +44,8 @@ unsigned long *callback_id;
     return softpc_device_snapshot_encode_timer_callback(callback, callback_id) ||
         softpc_device_snapshot_encode_cmos_callback(callback, callback_id) ||
         softpc_device_snapshot_encode_fla_callback(callback, callback_id) ||
-        softpc_device_snapshot_encode_fdisk_callback(callback, callback_id);
+        softpc_device_snapshot_encode_fdisk_callback(callback, callback_id) ||
+        softpc_device_snapshot_encode_keyboard_callback(callback, callback_id);
 }
 
 softpc_device_archive *
@@ -62,7 +66,9 @@ unsigned long callback_id;
     if (callback != NULL) return callback;
     callback = softpc_device_snapshot_decode_fla_callback(callback_id);
     if (callback != NULL) return callback;
-    return softpc_device_snapshot_decode_fdisk_callback(callback_id);
+    callback = softpc_device_snapshot_decode_fdisk_callback(callback_id);
+    if (callback != NULL) return callback;
+    return softpc_device_snapshot_decode_keyboard_callback(callback_id);
 }
 
 LOCAL int
@@ -117,6 +123,8 @@ softpc_device_archive *archive;
     softpc_device_snapshot_capture_ppi(&archive->ppi);
     if (!softpc_device_snapshot_capture_inport_mouse(&archive->inport_mouse))
         return FALSE;
+    if (!softpc_device_snapshot_capture_keyboard(&archive->keyboard))
+        return FALSE;
     if (!softpc_device_snapshot_capture_hdd(&archive->hdd))
         return FALSE;
     archive->valid = TRUE;
@@ -135,6 +143,7 @@ softpc_device_archive *archive;
         !softpc_device_snapshot_restore_fdc(&archive->fdc) ||
         !softpc_device_snapshot_restore_ppi(&archive->ppi) ||
         !softpc_device_snapshot_restore_inport_mouse(&archive->inport_mouse) ||
+        !softpc_device_snapshot_restore_keyboard(&archive->keyboard) ||
         !softpc_device_snapshot_restore_hdd(&archive->hdd) ||
         !q_event_snapshot_restore(&archive->events, archive->quick_entries,
             archive->quick_capacity, archive->tick_entries,

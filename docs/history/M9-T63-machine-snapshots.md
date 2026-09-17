@@ -896,3 +896,34 @@ The DOS INT 33h driver in `mouse_io.c` remains explicitly deferred: its guest
 callback, cursor backing and `MOUSE_CONTEXT` need a separate fixed-width map;
 P3 does not claim a complete mouse-driver snapshot. No App command, snapshot
 container, Common API or Lib code is added.
+
+## S6 P4: 8042 keyboard-controller archive
+
+P4 archives the finite 8042 controller rather than host keyboard ownership.
+Its fixed-width state records the logical unread FIFO order, scan-set and
+translation state, typematic/key-down and held-key state, controller command
+latches/status/output, and the finite anomalous key sequence by an index into
+the scan-set-derived break table.  Restore rebuilds those tables from the
+saved scan set and deliberately clears transient host-call scratch pointers.
+
+The two reviewed delayed keyboard callbacks are now semantic queue IDs:
+`do_int(scancode)` preserves its copied scancode parameter through the generic
+queue archive, while `allowRefill()` also retains its cancellation handle in
+the controller state.  No callback address, host input source, native reader,
+or host keyboard focus is serialized. `keybd_io.c`'s C-stack re-entry depth is
+not snapshot state: the VM safe boundary requires it to be zero before archive
+capture.
+
+`checkpoint_smoke` proves direct state capture/mutation/restore and invalid
+FIFO rejection, then creates a real delayed keyboard interrupt through
+`host_key_down`, archives it through `softpc_device_archive`, restores the
+queue, and dispatches it. This is still private restoration proof only: no
+snapshot command, file format, Common API, or Lib code has been introduced.
+
+Actual production changes are `+166/-4` across the private archive, its
+fixed-width state contract, and the narrow original keyboard-controller hook;
+the focused test adds `+38/-0`. Both full x64 and x86 CTest runs pass
+`103/103`. Fixed packages are `softpc32.exe`
+`CEBE79236A96DB0C50CABBB72D1135DAA9AC06B79A7498C2902E8AFBEC22B538` and
+`softpc64.exe`
+`B7B058DB87AB3FD59063124019A10CADAB0A47CC8AE2488F3DC995B9B330F027`.
