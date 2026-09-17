@@ -272,3 +272,101 @@ Package SHA-256:
 
 - x86: `9DE0913E287AB619C68F15FF4B0AB8928628F32C1F7BBA9B33DB282852B88999`
 - x64: `4026853D69925AB4E856C364E3ABDC45C33713F4D019C856E504F86BD31C7EC9`
+
+## S2 P6 CPU/FPU/RAM inventory and translation proof
+
+Before: no production edit. Extend checkpoint_smoke by approximately 30 lines,
+using the original c_tlb interface, and add its private include directory.
+This refines the admitted state inventory; it does not implement S4 early.
+P5 actual-commit review passed five focused tests on each width, HEAD equaled
+origin/main and the worktree was clean before P6.
+
+### Frozen inventory slice
+
+At 3373006 both built machine archives have the same 88 named B/b/D/d symbols
+in these five objects: c_main=41, c_tlb=4, c_xcptn=9, fpu=32, memory=2.
+Reproduce with `nm -A --defined-only` on each fixed build's
+libsoftpc-machine.a, selecting those object names and symbol classes, excluding
+dot-prefixed compiler sections; strip the x86 external leading underscore for
+name comparison. Object symbols are a cross-check, not a heap/field inventory
+or proof that every D symbol is mutable. This slice does not cover the other
+selected device, SAS, C-VID, VM and Compat objects; S2 remains open for them.
+
+The receiver for all saved fields below is S4's fixed CPU/FPU/RAM section;
+each original file retains ownership and needs only its narrow state port.
+Validation/roundtrip proof belongs there, not in Common/Lib. Save means copied
+fixed-width values, not structure padding or address bytes.
+
+| Owner / exact symbols | Disposition and fields |
+| --- | --- |
+| c_main: CCPU_GR[8], CCPU_CR[4], CCPU_DR[8], CCPU_TR[8], CCPU_IP, CCPU_CPL, CCPU_FLAGS[32] | Save exact original scalar register state, including the per-bit flag representation. Do not use register setters that execute MOV_CR and flush translation state during commit. |
+| c_main: CCPU_SR[6] | Save selector, ar_dpl, ar_e, ar_r, ar_w, ar_c, ar_x, base and limit for each hidden segment. Loading selectors through debug would reread possibly changed descriptors and is not a restore. |
+| c_main: CCPU_SAR[2], CCPU_STAR[2] | Save LDTR/TR selector, ar_super, base, limit; GDTR/IDTR base and limit. No descriptor-memory lookup during installation. |
+| c_main: CCPU_MODE[3] | Save operand/address mode and POP displacement. FETCH recomputes the first two; retaining the three small values also covers HLT before original retirement. |
+| c_main: cpu_heartbeat, cpu_interrupt_map, SasWrapMask, PigSynchCount | Save scalar counter/pending bits/wrap mask. Host wall-clock absolute values are separate. PigSynchCount's selected SYNCH_TICK is inactive but its scalar need not become a special serialization case. |
+| c_main: start_trap | Save through the already-proven HLT continuation, not current TF; FETCH uses zero. |
+| c_main: CCPU_BR, CCPU_WR, CCPU_M | Rebuild aliases to this process's CCPU_GR and SAS allocation. Never serialize these addresses. |
+| c_main: m_isreg, m_la, m_la2, m_off, m_pa, m_pa2, m_seg, modRM, ops, p, p_start, pg_end, save_id, segment_override | Instruction operand/decode scratch; no active instruction at FETCH or inside the HLT wait. Original FETCH/DO_INST creates the next operands. P4 HLT reentry sets p=p_start=NULL so completion cannot advance IP again; FETCH remaps host pointers. |
+| c_main: in_C, took_absolute_toc, took_relative_jump, quick_mode | Execution bookkeeping, not another guest CPU. Rebuild at the existing entry/phase; original FETCH clears branch hints, and entry starts outside quick mode. Selected SYNCH_TIMERS is absent. Preserve the P4 interrupt-shadow/HLT proof when wiring restore. |
+| c_main: simulate_level | Rebuild through fresh original simulation entry. The source TLS jump buffers are also rebuilt; they are not heap/serialized state even though optimized object enumeration may omit them. |
+| c_main: pf_table, first.2, want_yoda.1 | Fixed parity table and host initialization/debug request state. Keep native initialization; no Yoda request imported. Environment-controlled CPU policy must be checked as compatibility, not copied as host pointers. |
+| c_tlb: tlb[4][8], next_set[8] | Save each la, pa, v, d, mode and the eight replacement positions. Even invalid entries can be observed through original test_tlb validity matching; do not silently drop them. |
+| c_tlb: page_index[1048576], page_address[128] | Save copied byte/u32 tables. They contain physical addresses, not host addresses. Original test_tlb writes do not build the same fast mapping as lin2phy, so simply regenerating all valid entries is not established as equivalent. Fixed data avoids inventing a cache rebuild protocol. |
+| c_xcptn: CCPU_save_EIP, doing_contributory, doing_double_fault, doing_fault, doing_page_fault, EXT | Save scalar exception bookkeeping. No exception handler C stack is active at the admitted outer boundary. Do not assume all these persistent flags are zero merely because execution reached FETCH. |
+| c_xcptn: first_exception, show_exceptions, trap_exceptions | Host diagnostics/environment state, not guest payload. Current host diagnostic setup remains in force. |
+| fpu: NpxControl, NpxStatus, NpxFCS, NpxFDS, NpxFEA, NpxFIP, NpxFOP, NpxLastOff, NpxLastSel, NpxException | Save exact scalar control/status/last-operation state. NpxException is not inferred from status. |
+| fpu: FPtype, NPX_ADDRESS_SIZE_32, NPX_PROT_MODE, POPST, DOUBLEPOP, UNORDERED, REVERSE, DoAPop, tag_or, tag_xor | Retain these bounded decoder/FPU scalar values in the fixed state port rather than infer which last-operation flags happen to be dead. No function/pointer or second owner is required. |
+| fpu: FPTemp, IntelSpecial, FPRes | Save their scalar payload/tag representation alongside the stack; do not convert via guest FSAVE, which executes FINIT and can normalize unevaluated values. |
+| fpu: FPUStackBase, TOSPtr | Allocate/reuse the original eight-entry stack, save its eight values/tags and TOS as index 0..7, then rebind TOSPtr. FPSTACKENTRY contains an 8-byte FPH plus space used for a 10-byte unevaluated BCD/R80 representation and a tag. Encode the meaningful representation, not host IUH padding/struct size. |
+| fpu: npxRounding | Rebuild from saved NpxControl using the existing rounding operation on the executor thread. Host sticky flags require separate capture/restore review below. |
+| fpu: NpxDisabled | Configuration compatibility value. Loading must not silently change the configured FPU availability. |
+| fpu: BCDHighNibble, BCDLowNibble, FPConstants | Fixed conversion/constant tables, not modified machine state. Keep compiled values. |
+| fpu: FpatanTable, first.0 | Rebuild original initialized pointer table/allocation guard. Source FPUpload and constant pointers optimized away in this build remain fixed aliases, not missing payload. |
+| compat/memory: softpc_ram, softpc_ram_size | Save allocation size and actual backing bytes through a narrow owner port, then rebind the address. Account for the original extra 0x2000 protection allocation separately from visible size. Physical debug bus reads/writes are not suitable: they dispatch SAS_VIDEO and can change latches/dirty state. |
+
+Source-only and heap cross-checks: c_reg.h defines all nine segment fields and
+the system-register fields above; cfpu_def.h defines the variable-width host
+FPSTACKENTRY. getNpxStackRegs copies physical slots, setNpxTagwordReg does
+nothing, and getNpxStatusReg updates the cached TOS field. Consequently the
+existing debugger accessors do not constitute a complete, non-mutating snapshot
+port. The current fenv mapping uses ISO C rounding/sticky flags; S4 must capture
+the needed flag values before encoder/helper work can change the executor's
+floating-point environment, not serialize a native fenv_t blob.
+
+### New evidence changes the restoration plan
+
+The real-core test builds a PDE/PTE mapping to physical 0x3000, resolves it,
+changes only the PTE to 0x4000, and resolves again. It still resolves to 0x3000;
+only explicit flush_tlb changes it to 0x4000. This passes on x64 and x86.
+The proposal's blanket permission to discard TLB was therefore incorrect and
+has been narrowed. This is a refinement of exact state fidelity, not a new
+feature or shared API. Later S4 must preserve this test's pre-flush behavior
+across an actual save/load, including dirty/access modes and replacement order.
+
+Additional discovered state belongs to the remaining S2 ledger: SAS page-type
+map and BIOS-virtualization selectors, and environment policy such as
+SHIFTROT_OF_UNDEF and SAS out-of-range junk_value. They cannot be waved away as
+ordinary RAM or guessed solely from current hardware config. This P does not
+claim they are audited/restored; the next inventory slice owns them.
+
+The first x86 direct build invocation omitted the preset's compiler runtime
+PATH and failed to preprocess without a C diagnostic. Repeating with the
+existing tests-x86 build preset succeeded unchanged; both new focused tests
+passed. No toolchain/source workaround was added.
+
+The adjoining zfrsrvd.c also owns NpxIntrNeeded and NpxExceptionEIP: its
+DoNpxException delays delivery until a following NPX instruction, so those two
+fields must travel with FPU state, not be cleared as host notifications.
+Ax_regptr/NpxInstr are copied scalar decode context to classify with that
+owner. c_debug's d_brk/i_brk and counts implement guest DR breakpoints, whereas
+c_xtrn's interface_abort is a native exception-return stack. Neither is the
+product debugger's plan. Their complete disposition is retained for the next
+CPU-adjacent slice, not hidden by the five-object count above.
+
+After: production C/H +0/-0, original mirror +0/-0; checkpoint test +25/-0;
+CMake +1/-0. Both full builds succeeded and both full suites passed 103/103
+(x64 58.78 s; x86 57.97 s). All 88 symbol names have ledger entries; that
+name check is only completeness for the declared slice, not serialization
+proof. Documentation gate and diff whitespace checks passed. Both package
+hashes remain exactly P5: no production or firmware change to package.
+Owned 512-byte checkpoint fixtures were removed by both successful tests.

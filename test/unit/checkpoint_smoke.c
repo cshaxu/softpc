@@ -11,6 +11,7 @@
 #include "host_def.h"
 #include "ios.h"
 #include "ica.h"
+#include "c_tlb.h"
 /* base_def.h's non-ANSI compatibility macro must not alter this C17 test. */
 #undef const
 
@@ -212,6 +213,29 @@ static void verify_timeout(void)
     assert(softpc_snapshot_finish(&probe.snapshot) == LIB_STATUS_OK);
 }
 
+static void verify_translation(void)
+{
+    const unsigned char directory[] = {0x03, 0x20, 0, 0};
+    const unsigned char old_page[] = {0x03, 0x30, 0, 0};
+    const unsigned char new_page[] = {0x03, 0x40, 0, 0};
+    assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(probe.machine, 0x1004u, directory,
+        sizeof(directory)) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(probe.machine, 0x2000u, old_page,
+        sizeof(old_page)) == SOFTPC_MACHINE_OK);
+    c_setCR3(0x1000u);
+    /* The original translation entry point is intentionally exercised without
+       running instructions: page-table writes do not invalidate its TLB. */
+    assert(lin2phy(0x400123u, 0) == 0x3123u);
+    assert(softpc_machine_write_physical(probe.machine, 0x2000u, new_page,
+        sizeof(new_page)) == SOFTPC_MACHINE_OK);
+    assert(lin2phy(0x400123u, 0) == 0x3123u);
+    flush_tlb();
+    assert(lin2phy(0x400123u, 0) == 0x4123u);
+    /* A load that merely flushed TLB would therefore not restore this state. */
+    flush_tlb();
+}
+
 int main(void)
 {
     const char *path = "softpc-checkpoint-smoke.img";
@@ -246,6 +270,7 @@ int main(void)
     assert(c_getEAX() == 0x1234u && c_getEIP() == 0x505u);
     verify_reentry();
     verify_timeout();
+    verify_translation();
     softpc_machine_destroy(probe.machine);
     assert(softpc_test_remove_image(path));
     return 0;
