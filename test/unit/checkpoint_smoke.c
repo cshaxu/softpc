@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "insignia.h"
 #include "host_def.h"
@@ -379,6 +380,69 @@ static void verify_pit_archive(void)
         saved.counter[0].action_on_wait_complete);
 }
 
+static void verify_controller_archives(void)
+{
+    softpc_device_dma_state dma_saved, dma_restored;
+    softpc_device_pic_state pic_saved, pic_restored;
+    softpc_device_fdc_state fdc_saved, fdc_restored;
+    softpc_device_hdd_state hdd_saved, hdd_restored;
+
+    assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
+
+    /* Drive each controller through its normal port interface before taking
+       the archive.  The subsequent capture proves restore reinstalled the
+       semantic registers rather than merely retaining the saved C object. */
+    outb(0x21u, 0x5au);
+    assert(softpc_device_snapshot_capture_pic(&pic_saved));
+    outb(0x21u, 0xffu);
+    assert(softpc_device_snapshot_restore_pic(&pic_saved));
+    assert(softpc_device_snapshot_capture_pic(&pic_restored));
+    assert(pic_restored.adapter[0].imr == pic_saved.adapter[0].imr);
+
+    outb(DMA_CLEAR_FLIP_FLOP, 0u);
+    outb(DMA_CH2_ADDRESS, 0x34u);
+    outb(DMA_CH2_ADDRESS, 0x12u);
+    outb(DMA_CLEAR_FLIP_FLOP, 0u);
+    outb(DMA_CH2_COUNT, 0x78u);
+    outb(DMA_CH2_COUNT, 0x56u);
+    outb(DMA_FLA_PAGE_REG, 0x9au);
+    softpc_device_snapshot_capture_dma(&dma_saved);
+    outb(DMA_CLEAR_FLIP_FLOP, 0u);
+    outb(DMA_CH2_ADDRESS, 0u);
+    outb(DMA_CH2_ADDRESS, 0u);
+    outb(DMA_FLA_PAGE_REG, 0u);
+    assert(softpc_device_snapshot_restore_dma(&dma_saved));
+    softpc_device_snapshot_capture_dma(&dma_restored);
+    assert(memcmp(dma_restored.base_address[0][2],
+        dma_saved.base_address[0][2], 2u) == 0);
+    assert(memcmp(dma_restored.base_count[0][2],
+        dma_saved.base_count[0][2], 2u) == 0);
+    assert(dma_restored.page[1] == dma_saved.page[1]);
+
+    outb(DISKETTE_DOR_REG, 0x1cu);
+    outb(DISKETTE_DATA_REG, 0x03u); /* FDC SPECIFY */
+    outb(DISKETTE_DATA_REG, 0xdfu);
+    outb(DISKETTE_DATA_REG, 0x02u);
+    softpc_device_snapshot_capture_fdc(&fdc_saved);
+    outb(DISKETTE_DOR_REG, 0u);
+    assert(softpc_device_snapshot_restore_fdc(&fdc_saved));
+    softpc_device_snapshot_capture_fdc(&fdc_restored);
+    assert(fdc_restored.dor == fdc_saved.dor);
+    assert(fdc_restored.current_command == fdc_saved.current_command);
+    assert(fdc_restored.command_count == fdc_saved.command_count);
+
+    outb(0x1f2u, 0x03u);
+    outb(0x1f3u, 0x05u);
+    outb(0x1f4u, 0x07u);
+    assert(softpc_device_snapshot_capture_hdd(&hdd_saved));
+    outb(0x1f2u, 0u);
+    outb(0x1f3u, 0u);
+    assert(softpc_device_snapshot_restore_hdd(&hdd_saved));
+    assert(softpc_device_snapshot_capture_hdd(&hdd_restored));
+    assert(memcmp(hdd_restored.taskfile, hdd_saved.taskfile,
+        sizeof(hdd_saved.taskfile)) == 0);
+}
+
 static void record_event(long param)
 {
     assert(event_count < sizeof(event_order) / sizeof(event_order[0]));
@@ -531,6 +595,7 @@ int main(void)
     verify_cpu_side_state();
     verify_snapshot_archive();
     verify_pit_archive();
+    verify_controller_archives();
     verify_event_queue();
     verify_event_queue_archive();
     softpc_machine_destroy(probe.machine);

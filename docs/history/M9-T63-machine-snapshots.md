@@ -818,4 +818,19 @@ restore retaining the old queue; CMOS state through the composed archive; and
 a non-default PIT mode/count/state/action round-trip.  This is still not a
 user snapshot: S6 owns the remaining video/input and selected device payload;
 S7 later owns the Common state operations and final recovery transaction.
+
+## S5 P2--P3: unrepresentable continuations and controller proof
+
+HDD capture now has the same representability contract as the other archive
+receivers.  A selected-drive pointer outside the two semantic drive slots, or
+an active command without a fixed command ID, rejects capture before the
+archive becomes valid.  It cannot report a successful private capture that a
+later restore must reject.
+
+The checkpoint smoke also drives PIC, DMA channel 2/page state, FDC `SPECIFY`,
+and HDD taskfile registers through their existing port paths.  For each it
+captures, deliberately changes live state, restores, then recaptures and
+compares the affected semantic fields.  This proves the selected S5 state
+hooks reinstall live controller state; it does not expose a snapshot command
+or claim coverage of S6 keyboard/mouse/video state or external endpoints.
 Lib and Common remain unchanged by this P.
