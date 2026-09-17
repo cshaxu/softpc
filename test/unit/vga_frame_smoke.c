@@ -474,6 +474,19 @@ static void verify_snapshot_rebuilds_graphics_surface(softpc_machine *machine)
     uint32_t width;
     uint32_t height;
     unsigned reset;
+    unsigned saved_char_height;
+    unsigned saved_offset;
+    unsigned saved_length;
+
+    /* Earlier painter probes intentionally override derived geometry. Start
+       this round trip from an actual BIOS-programmed controller instead. */
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    c_setAH(0x6fu); c_setAL(5u); c_setBX(0x0060u);
+    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    host_timer_event(); host_timer_event();
+    saved_char_height = get_char_height();
+    saved_offset = get_offset_per_line();
+    saved_length = get_screen_length();
 
     /* The controller archive carries the V7 mode identity alongside raw
        registers.  Full presentation rebuilding additionally depends on the
@@ -487,6 +500,10 @@ static void verify_snapshot_rebuilds_graphics_surface(softpc_machine *machine)
     assert(width == 1024u && height == 768u);
     assert(softpc_device_snapshot_restore_video_controller(&saved));
     assert(Currently_emulated_video_mode == 0x60u);
+    assert(softpc_device_snapshot_rebuild_video_presentation());
+    assert(get_char_height() == saved_char_height);
+    assert(get_offset_per_line() == saved_offset);
+    assert(get_screen_length() == saved_length);
     assert(get_display_disabled() == 0);
     /* VGA routes reset writes to the EGA receiver, whose register storage is
        distinct from VGA's unused reset field. Preserve all four reset states. */

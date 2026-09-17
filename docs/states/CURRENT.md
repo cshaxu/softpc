@@ -72,6 +72,11 @@ now reads the actual receiver register. Image revision 4 rejects earlier
 images whose reset value was lost. Tests preserve all four reset states and
 save/load real VGA pixels, including a fresh process. S9 remains open for
 owner graphics acceptance; earlier P5/P6 passing smokes did not prove pixels.
+P8 repairs controller-replay baseline consistency: cleared CRTC scan-line
+state starts with character height 1, and display chain flags agree with
+the original unchained CPU initialization. The owner image now renders all
+480 rows instead of 60. Tests check restored height/stride/length and every
+pixel of the complete mode-13h fixture. Revision 4 remains unchanged.
 
 ## Current Technical Baseline
 

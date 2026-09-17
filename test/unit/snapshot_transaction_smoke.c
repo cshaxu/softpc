@@ -150,8 +150,9 @@ static lib_bool snapshot_has_pixels(common_machine *machine)
     if (common_machine_copy_published_frame(machine, frame,
             common_machine_run_generation(machine)) && frame->graphics) {
         lib_size i;
+        found = LIB_TRUE;
         for (i = 0; i < frame->graphics_height * frame->graphics_stride; ++i)
-            if (frame->graphics_pixels[i] != 0) { found = LIB_TRUE; break; }
+            if (frame->graphics_pixels[i] != 0x0c) { found = LIB_FALSE; break; }
     }
     free(frame);
     return found;

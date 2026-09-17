@@ -3478,6 +3478,14 @@ const softpc_device_video_controller_state *state;
     DAC_data_bits = 6;
     vga_init();
 
+    /* The cleared CRTC maximum-scan-line register describes one scan line.
+       vga_init's boot-time eight-line default is not that register's state;
+       a replay of zero otherwise skips its change-only recalculation. */
+    set_char_height(1);
+    /* ega_write_init starts unchained; its display-side flags must agree
+       before the transition-based sequencer handlers replay registers. */
+    set_chain4_mode(NO);
+    set_memory_chained(NO);
     ega_seq_reset(EGA_SEQ_DATA, state->sequencer[0]);
     vga_seq_clock(EGA_SEQ_DATA, state->sequencer[1]);
     vga_seq_map_mask(EGA_SEQ_DATA, state->sequencer[2]);

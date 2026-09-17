@@ -1154,3 +1154,31 @@ Final verification: x64 and x86 each pass 105/105 CTests; bidirectional
 cross-width graphics save/load also passes. Production (three C paths) is
 +9/-2, tests (two C paths) +60/-2, excluding documentation and packages.
 Owner Win3.1 acceptance remains pending; S9 is not closed.
+
+## S9 P8: complete restored scan lines
+
+Owner reported a thin strip at the top followed by black after mouse movement.
+The supplied revision-4 image reproduced height 480, line stride 1024, but
+screen length 61440: exactly 60 rows. The restore cleared CRTC state, then
+`vga_init` installed its boot-time character height 8. Replaying a saved
+maximum-scan-line value of zero took the original unchanged-register path,
+leaving 8 instead of 1. Restore now starts that derived value consistently
+with its cleared register before the original handlers execute.
+
+The same baseline audit found `ega_write_init` reset the CPU to unchained
+while display chain flags could retain their prior values. That doubled the
+restored line stride in the V7 round-trip probe. The same restore boundary
+now resets those two flags to match the initialized CPU. No normal register
+write logic or public API changes. The owner image then reports length
+491520 and pixels in all 480 rows. Revision 4 and owner files are unchanged.
+
+The V7 regression starts from BIOS-programmed state and compares character
+height, line stride and full screen length after restoration. The full
+transaction fixture now requires every pixel to equal its boot program's
+color, rather than accepting a single nonzero pixel. Temporary probes and
+owner file paths were removed from production/tests. Production is +8/-0 in
+one mirror C file; tests are +19/-1 in two C files.
+Final x86 and x64 full suites each pass 105/105; bidirectional cross-width
+complete-frame save/load passes. Both fixed packages were rebuilt. Owner
+acceptance remains pending and S9 stays active. Existing owner deletions of
+obsolete bisect packages are preserved separately from this repair.
