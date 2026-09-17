@@ -530,3 +530,36 @@ including LE); both rebuilt focused suites then passed 2/2. Both fixed package
 hashes remain P5 unchanged. No temporary checkpoint image remains; no Lib,
 Common, configuration or media change. Proposal carries the two additional
 state obligations. S2 remains active; this is not snapshot roundtrip proof.
+
+## S2 P10: SAS and CPU-adjacent ownership audit
+
+Before: production/test churn zero. This is the next finite CPU-adjacent
+inventory slice after P9, covering the selected CCPU SAS, lazy compatibility
+values, external-interface unwinds and per-thread simulation backing. It does
+not claim any device/video payload implementation.
+
+| Owner / exact state | Snapshot disposition |
+| --- | --- |
+| `c_bsic.c`: `cold`, `shiftrot_of_undef` | Save the two lazy-policy fields, or reject a container whose recorded `SHIFTROT_OF_UNDEF` policy differs. The value changes guest OF behavior; do not silently reevaluate a changed host environment after restore. |
+| `c_debug.c`: counts plus `i_brk` / `d_brk` | Save semantic entries; P9 proves these cannot be rebuilt from DR7. |
+| `zfrsrvd.c`: `NpxIntrNeeded`, `NpxExceptionEIP` | Save with FPU state; P9 proves deferred delivery needs the copied older FIP. `Ax_regptr` and `NpxInstr` are per-instruction temporaries and do not survive the admitted boundary. |
+| `c_xtrn.c`: `interface_abort`, `interface_active`, `interface_error` | Rebuild inactive. They are a native `setjmp`/`longjmp` scope used only by six synchronous segment setters. The admitted FETCH/HLT boundary is outside that call; no native continuation can enter a file. |
+| `ccpusas4.c`: RAM allocation/length, `memory_type`, `SasWrapMask`, selectors and `selectors_set` | Save visible RAM, allocation size and the complete page-type map, wrap mask and virtual-selector scalars. Recreate the original guard allocation but do not encode its unobservable padding bytes; rebind RAM aliases on restore. Do not call `c_SasRegisterVirtualSelectors`: it writes LDT bytes and would mutate captured RAM; its small local state port installs the saved values directly. |
+| `ccpusas4.c`: `Sas`, `cSasPtrs`, read/write/fill/move tables, `temp_func`, `Start_of_M_area` | Rebuild native pointers/vectors from the selected implementation and restored video binding; never serialize function or process addresses. The video owner must re-install the semantic memory handler before execution resumes. |
+| `ccpusas4.c`: `scratch`, `currentLength`, Video scratch pointer | Rebuild a fresh 64 KiB scratch allocation and reconnect Video. All selected uses are temporary ROM/font/string transfer storage; contents are not guest state. A request above the initialized size is already an original fatal “VGA will be broken” path, not a normal persistent buffer. |
+| `ccpusas4.c`: `phyR` lazy `first` / `junk_value`; `biosDoInst` lazy `first` / `bodgeAdjustment` | Preserve parsed out-of-range-read policy (or reject a differing compatibility profile). `bodgeAdjustment` is deterministically recomputed only after validating identical ROM bytes; tracing is host diagnostics and remains host-local. `biosDoInst`'s C locals are excluded because nested simulation must naturally return before capture. |
+| `ntthread.c`: TLS id, jmp buffers, thread list and level | Recreate for the new executor thread. P4 proves resumption starts with a fresh original simulation entry; host thread/TLS addresses and jmp buffers are not machine payload. |
+| `ntstubs.c`: CPU/Video/SAS function vectors and diagnostics | Reinstall normal selected bootstrap vectors. No selected caller establishes an independent persistent payload here; do not serialize addresses or diagnostic pointers. |
+
+`gmi_define_mem` has five selected video callers (`cga.c`, `ega_trcr.c`,
+`ega_writ.c`). Its tables are not a second video-state owner; S6 must restore
+the video owner's selected handler exactly once after all scalar/video state
+is installed. This avoids saving function addresses while preserving the
+subsequent SAS dispatch.
+
+After: documentation only, +0/-0 production/test/original-mirror lines.
+The caller sweep used `rg` over selected C/H sources for SAS scratch,
+`gmi_define_mem`, `c_SasRegisterVirtualSelectors`, and the native-interface
+symbols. It found no other selected caller of the six `call_cpu_function`
+segment-setter paths. The unresolved receiver is explicitly S4/S6, not an
+implicit reset/reinitialization during load. S2 remains active.
