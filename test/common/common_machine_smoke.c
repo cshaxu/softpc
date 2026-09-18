@@ -32,6 +32,12 @@ typedef struct machine_fake {
     lib_u8 state_byte;
     LONG state_reads;
     LONG state_writes;
+    LONG defer_state_read;
+    LONG state_read_waiting;
+    LONG state_read_ready;
+    common_machine_state_writer deferred_state_writer;
+    LONG running_notifications;
+    LONG paused_notifications;
 } machine_fake;
 
 static lib_bool fake_reset(void *opaque)
@@ -62,7 +68,18 @@ static lib_bool fake_run(void *opaque)
 static void fake_request_stop(void *opaque)
 { SetEvent(((machine_fake *)opaque)->stopped); }
 static void fake_request_wake(void *opaque)
-{ SetEvent(((machine_fake *)opaque)->wake); }
+{
+    machine_fake *fake = (machine_fake *)opaque;
+    if (InterlockedCompareExchange(&fake->state_read_waiting, 0, 0) != 0) {
+        assert(fake->deferred_state_writer.write(
+            fake->deferred_state_writer.context, &fake->state_byte, 1u) ==
+            LIB_STATUS_OK);
+        InterlockedIncrement(&fake->state_reads);
+        InterlockedExchange(&fake->state_read_waiting, 0);
+        InterlockedExchange(&fake->state_read_ready, 1);
+    }
+    SetEvent(fake->wake);
+}
 static lib_bool fake_set_media(void *opaque, const char *path)
 { (void)opaque; (void)path; return LIB_TRUE; }
 static void fake_heartbeat(void *opaque, lib_bool enabled)
@@ -100,16 +117,23 @@ static lib_status fake_begin_state_read(void *opaque,
     machine_fake *fake = (machine_fake *)opaque;
     assert(GetCurrentThreadId() == fake->executor_thread);
     if (writer == NULL || writer->write == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    if (InterlockedExchange(&fake->defer_state_read, 0) != 0) {
+        fake->deferred_state_writer = *writer;
+        InterlockedExchange(&fake->state_read_waiting, 1);
+        return LIB_STATUS_OK;
+    }
     if (writer->write(writer->context, &fake->state_byte, 1u) != LIB_STATUS_OK)
         return LIB_STATUS_IO_ERROR;
     InterlockedIncrement(&fake->state_reads);
+    InterlockedExchange(&fake->state_read_ready, 1);
     return LIB_STATUS_OK;
 }
 
 static lib_bool fake_take_state_read_result(void *opaque, lib_status *status)
 {
-    (void)opaque;
+    machine_fake *fake = (machine_fake *)opaque;
     if (status == NULL) return LIB_FALSE;
+    if (InterlockedExchange(&fake->state_read_ready, 0) == 0) return LIB_FALSE;
     *status = LIB_STATUS_OK;
     return LIB_TRUE;
 }
@@ -379,11 +403,16 @@ static void note_state(void *opaque, common_machine_state state,
     machine_fake *fake = (machine_fake *)opaque;
     (void)generation;
     InterlockedIncrement(&fake->notifications);
+    if (state == COMMON_MACHINE_RUNNING) {
+        InterlockedIncrement(&fake->running_notifications);
+        SetEvent(fake->running);
+    }
+    if (state == COMMON_MACHINE_PAUSED)
+        InterlockedIncrement(&fake->paused_notifications);
     if (state == COMMON_MACHINE_STOPPED && fake->callback_entered != NULL) {
         SetEvent(fake->callback_entered);
         assert(WaitForSingleObject(fake->callback_release, 5000u) == WAIT_OBJECT_0);
     }
-    if (state == COMMON_MACHINE_RUNNING) SetEvent(fake->running);
     if (state == COMMON_MACHINE_STOPPED) SetEvent(fake->state_stopped);
     if (state == COMMON_MACHINE_RESET_COMPLETED) SetEvent(fake->reset_completed);
 }
@@ -509,9 +538,20 @@ int main(void)
         &transfer.calls, 0, 0) == 1 && InterlockedCompareExchange(
         &fake.state_reads, 0, 0) == 1);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
-    assert(common_machine_read_state(machine,
-        &(common_machine_state_writer) { state_write, &transfer }) ==
-        LIB_STATUS_INVALID_STATE);
+    fake.defer_state_read = 1;
+    {
+        LONG running = fake.running_notifications;
+        LONG paused = fake.paused_notifications;
+        assert(common_machine_read_state(machine,
+            &(common_machine_state_writer) { state_write, &transfer }) ==
+            LIB_STATUS_OK);
+        assert(transfer.byte == 0x5au && InterlockedCompareExchange(
+            &transfer.calls, 0, 0) == 2 && InterlockedCompareExchange(
+            &fake.state_reads, 0, 0) == 2);
+        assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
+        assert(fake.running_notifications == running);
+        assert(fake.paused_notifications == paused);
+    }
     ResetEvent(fake.running);
     assert(common_machine_resume(machine));
     assert(WaitForSingleObject(fake.running, 5000u) == WAIT_OBJECT_0);

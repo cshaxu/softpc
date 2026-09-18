@@ -400,8 +400,19 @@ static lib_status vm_driver_begin_state_read(void *opaque,
     const common_machine_state_writer *writer)
 {
     vm_driver *driver = (vm_driver *)opaque;
-    if (driver == NULL || writer == NULL || writer->write == NULL ||
-        driver->capture.phase != SOFTPC_SNAPSHOT_IDLE)
+    if (driver == NULL || writer == NULL || writer->write == NULL)
+        return LIB_STATUS_INVALID_STATE;
+    /* A prior save has already stopped at the VM-owned checkpoint. Its image
+       remains stable until that paused executor is resumed, so another save
+       may write it without running another guest instruction. */
+    if (driver->capture.phase == SOFTPC_SNAPSHOT_READY) {
+        driver->state_read_status = softpc_snapshot_image_write(
+            &driver->captured_image, (softpc_snapshot_bytes_write)writer->write,
+            writer->context);
+        driver->state_read_ready = LIB_TRUE;
+        return LIB_STATUS_OK;
+    }
+    if (driver->capture.phase != SOFTPC_SNAPSHOT_IDLE)
         return LIB_STATUS_INVALID_STATE;
     driver->state_writer = *writer;
     driver->state_read_status = LIB_STATUS_INVALID_STATE;

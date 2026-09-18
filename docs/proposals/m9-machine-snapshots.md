@@ -24,7 +24,7 @@ Lib 零修改；Common 仅允许这两个状态读写操作及其在原有 execu
 接线、测试和 manifest 更新。其他 Common 组件不改，不增加 save/load 命令、路径、
 文件格式、媒体接口、快照专用事件或独立状态机。若此边界不足，先报告，不自行扩大。
 
-最新 owner 决策（取代下述初始请求中的暂停保存设想）：
+早期 owner 决策（S12 已取代其中的暂停保存条款）：
 > init、paused 和 stop，我们都不允许机器保存快照。
 > 写入机器状态，我们只允许在init、stop的状态下执行。
 > 如果机器已经是 paused 或者 running 的话，我们也就不允许机器的状态的写入。
@@ -34,6 +34,14 @@ Lib 零修改；Common 仅允许这两个状态读写操作及其在原有 execu
 Owner 已批准更新 proposal 并开始实施。普通 pause、单步、断点的精确停止语义不变；
 只有显式保存请求允许继续执行到快照边界。Common 管生命周期，不理解 CPU 安全条件；
 VM/Compat 管安全条件和单调时钟期限，不增加指令预算或第三个公共准备接口。
+
+S12 owner decision supersedes only the former paused-save rejection: `save`
+accepts RUNNING and PAUSED. A PAUSED machine that is already held at the VM's
+snapshot checkpoint writes its retained image directly. Any other PAUSED
+machine remains product-paused and rejects guest input while Common privately
+lets the existing executor run until VM's existing one-second checkpoint is
+reached. No public Common API is added: the existing state-read operation is
+the entire request boundary. Load remains stopped-only.
 
 ## 产品合同
 
@@ -53,7 +61,7 @@ SoftPC> resume
 
 | 命令 | init / stopped | paused | running | lifecycle 转换中 |
 | --- | --- | --- | --- | --- |
-| save <path> | 拒绝：须先运行 | 拒绝：提示 resume 后再保存 | 请求安全停止，再导出，成功为 paused | 拒绝，不排队延期执行 |
+| save <path> | 拒绝：须先运行 | 若已在快照检查点直接导出；否则私下推进至检查点，再导出，成功为 paused | 请求安全停止，再导出，成功为 paused | 拒绝，不排队延期执行 |
 | load <path> | 校验并加载，成功为 paused | 拒绝：提示先 stop | 拒绝：提示先 stop | 拒绝，不排队延期执行 |
 
 - 保存的是到达安全点时的状态，不是命令输入瞬间的状态。准入拒绝不推进机器；
@@ -124,7 +132,7 @@ App 解析路径、管理文件读写与完成文案；composition 仍是唯一 
 Common 的两个操作为 read_state/write_state（工作名）：只传递不透明状态字节及结果，
 不接收文件路径，不解释格式。字节传递采用有界缓冲或读写回调，具体签名在前审确定；
 不增加 begin/end/size/free 等一组管理接口，不提供通用“任意任务执行”逃逸口。
-读操作仅在 running 准入，写操作仅在 init/stopped 准入；Common 内部目前以 stopped
+读操作在 running 或 paused 准入，写操作仅在 init/stopped 准入；Common 内部目前以 stopped
   表示尚未启动的执行器，产品 init 区别由现有 App 状态维持，不新增 Common INIT 枚举。
 两个操作映射到注入 driver 的对应能力，实际访问仍由唯一 executor 完成；必要的
 请求参数/结果存储及唤醒复用现有串行 rendezvous，不直接从 control 线程读写原始机器。
@@ -147,7 +155,8 @@ MVDM 必要功能性状态出口属于本候选明确提出的 port-ABI 范围�
 S2 必须从所有回调入口（普通指令边界、HLT、debug、嵌套 BOP/模拟）确认安全点。
 目标是在无未表达宿主 continuation 的边界停住，保证恢复通过新 C 栈正常取指。
 不保存 jmp_buf/栈，不靠执行 reset 再覆盖寄存器。显式 save 从 running 开始，允许原
-执行器继续执行直到边界；不接受 paused 保存，所以无需从 Common 暂停循环推进旧栈。
+执行器继续执行直到边界；paused 保存若尚未持有可复用检查点，Common 保持产品 paused 与输入门禁，
+仅让既有 executor 私下推进到 VM 的安全边界。
 VM 在原执行路径检查内部停止条件，不递归启动第二个 CPU invocation，不占用客户机
 调试寄存器、不写入断点指令，也不修改普通 debugger 的停止位置。
 
@@ -676,3 +685,19 @@ Console 的鼠标可移动同一客户机鼠标、并在 Window 像素帧中可�
 这不读取 KVM 私有对象布局、不扩展事件 ABI，也不让 Session/VM 认识 surface
 策略。组合测试覆盖 Window/Console 鼠标、Console 键/热键及销毁 Window 后的
 恢复。x86/x64 全量测试各 106/106 通过；package 交付等待 owner 测试。
+
+### S12：暂停状态保存
+
+`common_machine_read_state()` 继续使用既有 state-read writer 与 executor
+回调，不增公共 ABI。它接受 RUNNING 或 PAUSED：RUNNING 沿用原有“到检查点后
+发布 paused”的路径；PAUSED 首先让 VM 检查保留的 snapshot checkpoint。若该
+checkpoint 已就绪，VM 直接写入，不执行客户机指令。否则 Common 保持公开状态
+PAUSED、继续拒绝客户机输入，并只让既有 executor 运行至 VM 的一秒安全边界。
+该内部推进完成后，不发布伪 RUNNING 或重复 PAUSED fact。
+
+VM 仍是唯一知道其 checkpoint 是否安全的所有者；它既不向 Common 暴露 CPU
+深度，也不改变 MVDM/Compat/Lib。App 仅将 paused `save` 接为合法命令，并在
+没有生命周期 fact 的直接保存路径输出结果及重置 monitor prompt。测试分别证明：
+暂停后的首次保存会内部推进；保持 checkpoint 的第二次保存不运行客户机；两者都
+结束在 PAUSED，且没有额外 RUNNING/PAUSED 通知。x86/x64 均完成完整 106/106
+回归；package 等待 owner 手测。

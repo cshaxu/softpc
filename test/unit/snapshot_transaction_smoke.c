@@ -215,6 +215,7 @@ static int snapshot_run_transaction(void)
     vm_driver *driver = NULL;
     common_machine *machine = NULL;
     snapshot_bytes stream = { 0 };
+    snapshot_bytes retained = { 0 };
     assert(snapshot_write_media(path));
     snapshot_options(&options, path);
     assert(softpc_machine_create(&options, &product) == SOFTPC_MACHINE_OK);
@@ -228,14 +229,21 @@ static int snapshot_run_transaction(void)
     assert(common_machine_pause(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_PAUSED));
     assert(snapshot_media_bytes(LIB_TRUE, LIB_FALSE));
-    assert(common_machine_resume(machine));
-    assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
+    /* Ordinary pause is not assumed to be a CCPU archive boundary. The
+       existing state-read request privately advances to VM's checkpoint. */
     assert(common_machine_read_state(machine,
         &(common_machine_state_writer) { snapshot_write, &stream }) ==
         LIB_STATUS_OK);
     assert(stream.count != 0u);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
     assert(snapshot_has_pixels(machine, 0x0c));
+    /* The just-completed archive keeps its VM-owned checkpoint image alive
+       until resume, so this second paused save must not run the guest again. */
+    assert(common_machine_read_state(machine,
+        &(common_machine_state_writer) { snapshot_write, &retained }) ==
+        LIB_STATUS_OK);
+    assert(retained.count == stream.count && common_machine_state_get(machine) ==
+        COMMON_MACHINE_PAUSED);
     assert(snapshot_media_bytes(LIB_TRUE, LIB_TRUE));
     assert(common_machine_stop(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_STOPPED));
@@ -292,6 +300,7 @@ static int snapshot_run_transaction(void)
     vm_driver_destroy(driver);
     softpc_machine_destroy(product);
     free(stream.bytes);
+    free(retained.bytes);
     assert(remove(path) == 0);
     return 0;
 }

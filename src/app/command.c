@@ -15,7 +15,7 @@ static const char HELP_COMMANDS[] =
     "  reset                 cold-reset and pause at firmware entry\r\n"
     "  floppy insert <image> insert drive A media while stopped/paused\r\n"
     "  floppy eject          eject drive A media while stopped/paused\r\n"
-    "  save <file>           save a running machine and pause\r\n"
+    "  save <file>           save a running or paused machine\r\n"
     "  load <file>           load a snapshot while stopped\r\n"
     "  help                  show this help\r\n"
     "  debug                 enter debugger (q returns to monitor)\r\n"
@@ -146,10 +146,8 @@ static void snapshot(app_command_session *s, app_monitor_state state,
         return;
     }
     if (!strcmp(command, "save")) {
-        if (state != APP_MONITOR_RUNNING) {
-            reject(s, effect, state == APP_MONITOR_PAUSED ?
-                "Machine is paused; use resume before save." :
-                "Machine is stopped; use start before save.");
+        if (state != APP_MONITOR_RUNNING && state != APP_MONITOR_PAUSED) {
+            reject(s, effect, "Machine is stopped; use start before save.");
             return;
         }
         effect->action = APP_COMMAND_ACTION_SAVE_STATE;
@@ -443,11 +441,24 @@ static lib_status app_snapshot_read(void *opaque, lib_u8 *bytes,
 }
 
 static void app_command_complete_snapshot(app_command_context *command,
-    app_command_action action, lib_status status, app_command_effect *effect)
+    app_command_action action, lib_status status, lib_bool was_paused,
+    app_command_effect *effect)
 {
     app_snapshot_result pending = action == APP_COMMAND_ACTION_SAVE_STATE ?
         (status == LIB_STATUS_OK ? APP_SNAPSHOT_RESULT_SAVED :
             APP_SNAPSHOT_RESULT_SAVE_FAILED) : APP_SNAPSHOT_RESULT_LOADED;
+    if (action == APP_COMMAND_ACTION_SAVE_STATE && was_paused) {
+        clear(effect);
+        if (status == LIB_STATUS_OK)
+            message(effect->text, sizeof(effect->text),
+                "Machine saved and paused.");
+        else
+            message(effect->text, sizeof(effect->text),
+                "Cannot save machine state.");
+        prompt(&command->session);
+        effect->arm_prompt = 1;
+        return;
+    }
     if (status == LIB_STATUS_OK ||
         (action == APP_COMMAND_ACTION_SAVE_STATE &&
             common_machine_state_get(command->machine) == COMMON_MACHINE_PAUSED)) {
@@ -465,6 +476,8 @@ static void app_command_save_state(app_command_context *command,
     const char *path, app_command_effect *effect)
 {
     lib_storage_file_writer *writer = NULL;
+    lib_bool was_paused = common_machine_state_get(command->machine) ==
+        COMMON_MACHINE_PAUSED;
     lib_status status = lib_storage_file_writer_open(path,
         LIB_STORAGE_FILE_WRITER_TRUNCATE, &writer);
     if (status == LIB_STATUS_OK)
@@ -474,7 +487,7 @@ static void app_command_save_state(app_command_context *command,
         status == LIB_STATUS_OK)
         status = LIB_STATUS_IO_ERROR;
     app_command_complete_snapshot(command, APP_COMMAND_ACTION_SAVE_STATE,
-        status, effect);
+        status, was_paused, effect);
 }
 
 static void app_command_load_state(app_command_context *command,
@@ -489,7 +502,7 @@ static void app_command_load_state(app_command_context *command,
     if (reader != NULL && lib_storage_file_reader_close(reader) != LIB_STATUS_OK &&
         status == LIB_STATUS_OK) status = LIB_STATUS_IO_ERROR;
     app_command_complete_snapshot(command, APP_COMMAND_ACTION_LOAD_STATE,
-        status, effect);
+        status, LIB_FALSE, effect);
 }
 
 void app_command_provider_open(void *opaque,

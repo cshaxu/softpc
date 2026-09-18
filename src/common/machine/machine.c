@@ -41,6 +41,7 @@ struct common_machine {
     lib_atomic_i32 state_write_requested;
     lib_atomic_i32 state_write_waiting;
     lib_atomic_i32 restored_start_requested;
+    lib_bool state_read_continuing;
     common_machine_state_writer state_writer;
     common_machine_state_reader state_reader;
     lib_status state_status;
@@ -232,6 +233,7 @@ static void common_machine_complete_state_read(common_machine *machine)
 static void common_machine_executor_event(void *opaque)
 {
     common_machine *machine = (common_machine *)opaque;
+    lib_bool suppress_paused_fact = LIB_FALSE;
     lib_bool debug_stop = machine->driver.take_debug_stop != NULL &&
         machine->driver.take_debug_stop(machine->driver.context);
     if ((lib_atomic_i32_exchange_explicit(&machine->debug_cancel_requested, 0, LIB_MEMORY_ORDER_SEQ_CST) != 0 ||
@@ -244,12 +246,17 @@ static void common_machine_executor_event(void *opaque)
     common_machine_drain_input(machine);
     common_machine_publish(machine);
     common_machine_service_state_read(machine);
+    if (machine->state_read_continuing && lib_atomic_i32_load_explicit(
+            &machine->state_read_ready, LIB_MEMORY_ORDER_SEQ_CST) != 0) {
+        suppress_paused_fact = LIB_TRUE;
+        machine->state_read_continuing = LIB_FALSE;
+    }
     if (lib_atomic_i32_load_explicit(&machine->pause_requested, LIB_MEMORY_ORDER_SEQ_CST) != 0 &&
         lib_atomic_i32_load_explicit(&machine->stop_requested, LIB_MEMORY_ORDER_SEQ_CST) == 0) {
         lib_atomic_i32_exchange_explicit(&machine->state, COMMON_MACHINE_PAUSED, LIB_MEMORY_ORDER_SEQ_CST);
         if (lib_atomic_i32_exchange_explicit(&machine->reset_active, 0, LIB_MEMORY_ORDER_SEQ_CST) != 0)
             common_machine_notify_state(machine, COMMON_MACHINE_RESET_COMPLETED);
-        else
+        else if (!suppress_paused_fact)
             common_machine_notify_state(machine, COMMON_MACHINE_PAUSED);
         common_machine_complete_state_read(machine);
         if (lib_atomic_i32_exchange_explicit(&machine->state_write_waiting, 0,
@@ -276,12 +283,27 @@ static void common_machine_executor_event(void *opaque)
                 base_sync_event_reset(machine->command_event);
                 common_machine_service_media(machine);
                 common_machine_service_debug(machine);
+                common_machine_service_state_read(machine);
+                if (lib_atomic_i32_load_explicit(&machine->state_read_requested,
+                        LIB_MEMORY_ORDER_SEQ_CST) != 0) {
+                    if (lib_atomic_i32_load_explicit(&machine->state_read_ready,
+                            LIB_MEMORY_ORDER_SEQ_CST) != 0)
+                        common_machine_complete_state_read(machine);
+                    else {
+                        machine->state_read_continuing = LIB_TRUE;
+                        lib_atomic_i32_exchange_explicit(&machine->pause_requested,
+                            0, LIB_MEMORY_ORDER_SEQ_CST);
+                        machine->driver.request_wake(machine->driver.context);
+                    }
+                }
             } else {
                 base_sync_event_reset(machine->input_event);
                 common_machine_drain_input(machine);
             }
         }
-        if (lib_atomic_i32_load_explicit(&machine->stop_requested, LIB_MEMORY_ORDER_SEQ_CST) == 0) {
+        if (lib_atomic_i32_load_explicit(&machine->stop_requested,
+                LIB_MEMORY_ORDER_SEQ_CST) == 0 &&
+            !machine->state_read_continuing) {
             lib_atomic_i32_exchange_explicit(&machine->state, COMMON_MACHINE_RUNNING, LIB_MEMORY_ORDER_SEQ_CST);
             common_machine_notify_state(machine, COMMON_MACHINE_RUNNING);
         }
@@ -591,12 +613,16 @@ lib_bool common_machine_set_removable_media(common_machine *machine,
 lib_status common_machine_read_state(common_machine *machine,
     const common_machine_state_writer *writer)
 {
-    if (machine == NULL || writer == NULL || writer->write == NULL ||
-        common_machine_state_get(machine) != COMMON_MACHINE_RUNNING ||
-        lib_atomic_i32_exchange_explicit(&machine->state_read_requested, 1,
-            LIB_MEMORY_ORDER_SEQ_CST) != 0)
+    common_machine_state state;
+    if (machine == NULL || writer == NULL || writer->write == NULL)
+        return LIB_STATUS_INVALID_STATE;
+    state = common_machine_state_get(machine);
+    if (state != COMMON_MACHINE_RUNNING && state != COMMON_MACHINE_PAUSED)
         return LIB_STATUS_INVALID_STATE;
     machine->state_writer = *writer;
+    if (lib_atomic_i32_exchange_explicit(&machine->state_read_requested, 1,
+            LIB_MEMORY_ORDER_SEQ_CST) != 0)
+        return LIB_STATUS_INVALID_STATE;
     base_sync_event_reset(machine->state_event);
     base_sync_event_signal(machine->command_event);
     machine->driver.request_wake(machine->driver.context);
@@ -608,11 +634,12 @@ lib_status common_machine_write_state(common_machine *machine,
     const common_machine_state_reader *reader)
 {
     if (machine == NULL || reader == NULL || reader->read == NULL ||
-        common_machine_state_get(machine) != COMMON_MACHINE_STOPPED ||
-        lib_atomic_i32_exchange_explicit(&machine->state_write_requested, 1,
-            LIB_MEMORY_ORDER_SEQ_CST) != 0)
+        common_machine_state_get(machine) != COMMON_MACHINE_STOPPED)
         return LIB_STATUS_INVALID_STATE;
     machine->state_reader = *reader;
+    if (lib_atomic_i32_exchange_explicit(&machine->state_write_requested, 1,
+            LIB_MEMORY_ORDER_SEQ_CST) != 0)
+        return LIB_STATUS_INVALID_STATE;
     base_sync_event_reset(machine->state_event);
     base_sync_event_signal(machine->command_event);
     return base_sync_event_wait(machine->state_event, UINT32_MAX) ==

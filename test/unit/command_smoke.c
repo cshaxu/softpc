@@ -184,8 +184,8 @@ int main(void)
     assert(effect.action == APP_COMMAND_ACTION_LOAD_STATE);
     app_command_session_submit_line(&session, APP_MONITOR_PAUSED,
         "save state.spcs", &effect);
-    assert(strstr(effect.text, "use resume before save") != NULL);
-    assert_blank_line(effect.text);
+    assert(effect.action == APP_COMMAND_ACTION_SAVE_STATE);
+    assert(!strcmp(effect.path, "state.spcs"));
     arm(&session, NULL);
     app_command_session_submit_line(&session, APP_MONITOR_RUNNING,
         "load state.spcs", &effect);

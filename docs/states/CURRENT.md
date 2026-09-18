@@ -6,15 +6,14 @@ T63 remains open pending owner acceptance of complete snapshot media state.
 The prior attempted closure and T64 admission were withdrawn; T64 is not
 allocated.
 
-S10's implementation is pushed and awaits owner Overlay acceptance. M9 T63 S11
-is active: stop raw VM-Console mouse records from controlling the guest while a
-Window is actually displayed. Lib optimization remains the first queued
-candidate.
+S10's implementation awaits owner Overlay acceptance; S11 is accepted and
+pushed. M9 T63 S12 is active: allow `save` from PAUSED by reusing an already
+safe snapshot checkpoint or advancing privately to one. Lib optimization
+remains the first queued candidate.
 
 ## Current Technical Baseline
 
-- Source: T63 S10 P14 (`df0eda4`), with S11 input routing awaiting owner
-  test.
+- Source: T63 S11 P15 (`678cb2b`).
 - Snapshots are host-width-independent, fixed-order streams with no format
   version, magic or section identifier. Save is running-to-paused; load is
   initial/stopped-to-paused and does not create a Window until resume.
@@ -41,23 +40,23 @@ candidate.
 The attempted T63 closure/admission was withdrawn before commit on owner
 correction. No code, package or rule changed.
 
-## M9 T63 S11 Packet
+## M9 T63 S12 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner reports that `display=console, console_control=0` raw Console mouse movement moves the guest pointer visible in its concurrently displayed Window. Owner directs that Common UI discard raw-Console mouse records whenever a Window is displayed. |
-| Objective | Keep only Window-origin mouse input while a Window instance is live; retain raw Console keyboard/hotkeys and all existing behavior when no Window exists. |
-| Non-goals | No Lib, VM, Compat, MVDM or Common Session API change. Do not change Window mouse input, keyboard input, hotkeys, guest mouse protocol, Console ownership or presentation derivation. |
-| Reference Baseline | T63 S10 P14 versionless Overlay snapshot layout (`df0eda4`); full x86/x64 106/106. |
-| Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md), S11 ledger. |
-| Files And ABI Surface | Common UI private input routing and its existing composition test; UI behavior documentation and task records. No public ABI changes. |
-| Applicable Rules | docs/rules/EXECUTION.md, ARCHITECTURE.md, CODING.md, DOCUMENT.md; docs/design/ARCHITECTURE.md, CODING.md and UI.md. |
-| Verification | Fake Window + VM Console prove Console mouse is acknowledged but not forwarded while Window exists, then passes once Window is destroyed; Window mouse always forwards; Console key/hotkey always forwards. Build and run complete x86/x64 suites. |
-| Expected Markers | One source-local Common UI routing point owns the exception. Session and VM receive no surface-policy branch. |
-| Asset Needs | Preserve owner media and INI; refresh only the two package EXEs. |
-| Reporting Requirements | Record root cause, changed-path accounting, source-route sweep, focused proof, full regression, commit/push and both EXE links. |
-| Stop Conditions | Any need to expose KVM private layout, change KVM event ABI, or add another event queue; report before implementation. |
-| Exit Criteria | The four stated input combinations are covered; no source-policy branch is added outside Common UI; both build widths and full suites pass; pushed package binaries await owner test. |
-| Original Owner Request | When a Window is displayed, discard raw Console mouse events in Common UI. |
-| Similar-Issue Sweep | Every Common UI KVM input callback, raw Console path, Window path and source-retirement/failure path; document retained routing. |
+| Admission And Approval | Owner accepts S11 and directs the next S: `save` must work from PAUSED. If VM is already at a snapshot-safe checkpoint, write it directly; otherwise arm its safe checkpoint and resume only until it is reached. |
+| Objective | Permit `save <file>` from RUNNING or PAUSED while preserving the existing result: a successful save leaves the machine PAUSED. |
+| Non-goals | No Lib change, new public Common API, Session/UI state, MVDM change, debug semantic change, new executor, product-visible Running transition, or input acceptance while an internally continued paused save runs. Load remains stopped-only. |
+| Reference Baseline | T63 S11 P15 (`678cb2b`); snapshots are versionless, cross-width fixed-order streams with Overlay media state. |
+| Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md), S12 ledger. |
+| Files And ABI Surface | App command validation/help, Common Machine's existing state-read internals, VM snapshot driver state and focused Common/VM/App tests. The existing `common_machine_read_state` signature and driver callbacks remain unchanged. |
+| Applicable Rules | docs/rules/EXECUTION.md, ARCHITECTURE.md, CODING.md, DOCUMENT.md; docs/design/ARCHITECTURE.md and CODING.md; snapshot design. |
+| Verification | Prove running save stays as-is; normal paused save internally advances to a safe point without a Running fact or guest-input admission; checkpoint-paused save writes immediately without running; timeout/failure remains PAUSED; command matrix/help and x86/x64 full suites pass. |
+| Expected Markers | Common owns only generic request rendezvous and paused-loop continuation. VM alone decides whether its checkpoint is already reusable and owns the one-second safe-boundary search. |
+| Asset Needs | Preserve owner media and INI; use disposable test snapshots and refresh only the two package EXEs. |
+| Reporting Requirements | Before code, record paused-safe evidence and exact state/control flow; after code, give changed-path/net-line accounting, focused proof, full regressions, commit/push and both EXE links. |
+| Stop Conditions | A required public Common API, Lib change, MVDM source change, inability to suppress an internal Running fact, or proof that ordinary paused state cannot safely advance through the existing executor; report before expanding scope. |
+| Exit Criteria | RUNNING and PAUSED save contracts are separately proven, no guest input/lifecycle drift occurs during internal advance, save outcomes stay PAUSED, full dual-width proof passes and pushed packages await owner test. |
+| Original Owner Request | Save should also run from PAUSED: write immediately if already safe; otherwise set the safe breakpoint and resume only to that point. |
+| Similar-Issue Sweep | Running and paused read admission, existing snapshot-ready/failed states, state-read completion, paused command loop, input gating, lifecycle notifications, writer failure, timeout, repeated save and all command/help matrix entries. |
