@@ -273,6 +273,7 @@ extern	void	screen_refresh_required IPT0();
 
 extern	void	host_ega_cursor_has_moved IPT2(int,arg1, int,arg2);
 extern	void	flag_mode_change_required IPT0();
+extern  unsigned long mode_change_generation IPT0();
 extern  void    reset_graphics_routines IPT0();
 extern	void	reset_paint_routines IPT0();
 

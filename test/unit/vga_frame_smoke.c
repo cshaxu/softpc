@@ -701,6 +701,19 @@ int main(void)
     verify_fullscreen_text_clear();
     verify_fullscreen_cursor_metadata();
 
+    /* A VGA/CRTC programming sequence can span host ticks.  A second
+       controller write before the normal two-tick settle point must restart
+       that same core transaction; publishing between the writes exposes a
+       transient width as a completed guest frame. */
+    flag_mode_change_required();
+    host_timer_event();
+    assert(get_mode_change_required());
+    flag_mode_change_required();
+    host_timer_event();
+    assert(get_mode_change_required());
+    host_timer_event();
+    assert(!get_mode_change_required());
+
     /* This fixed V7 model is the original 512 KiB card: INT 10h/6Fh/07h
        reports two 256 KiB blocks.  Do not infer a 1 MiB virtual adapter from
        any host-side surface allocation. */

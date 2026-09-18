@@ -46,5 +46,11 @@ rebuilt with these source commits; the owner INI was not touched.
 - The owner reported the restored display route works after the final package
   update.
 
-T69 is closed. The remaining candidates are listed in
-[Queue](../states/QUEUE.md).
+This closure record was superseded by the owner's later reproduction of the
+initial-windowed Win3.1 width alternation. T69 is therefore owner-reopened as
+S2; its active contract is in `states/CURRENT.md`. S2 traced the alternating
+completed DIBs to the original renderer's one-bit EGA/VGA settle gate: a later
+register write could not restart the already-running interval. The repair adds
+one private core generation and makes the existing gate wait from the final
+controller update; its focused x86/x64 proof is recorded in the active packet.
+Manual Win3.1 verification remains required before another task-level closure.

@@ -192,3 +192,29 @@ VGA smoke 将 Compat text surface 置满、设置 guest `FULLSCREEN` 后调用�
 同样只更新 Compat cursor metadata，故采用相同规则：不因客户机 fullscreen 跳过它。测试先把
 原 cursor cache 驱动到 hidden，再在 FULLSCREEN 下恢复可见 cursor，验证 metadata 更新；不新增
 任何 cursor state、callback 或 UI 行为。
+
+## S2 owner reopen: completed geometry still alternates
+
+The owner has now reproduced the initial-windowed Win3.1 MS-DOS Prompt width
+alternation after the S2 package. The former closure is therefore incomplete:
+the V7 historical-BIOS/current-controller mismatch was real but was not the
+only periodic geometry source.
+
+The audit began at the original renderer, not at KVM Window. The completed
+frame trace proved that KVM was faithfully receiving `1280x480` followed by
+`640x480`; the former is the original `80 * 8 * 2` generic 256-colour width.
+The existing two-tick EGA/VGA mode-settle gate used one Boolean and therefore
+did not restart when another controller write arrived during the wait. It could
+publish that intermediate controller combination as a completed DIB.
+
+S2 repairs the unique owner rather than filtering a consumer: the video core
+keeps one private monotonic mode-change generation, and the existing host
+settle gate restarts only when that generation changes. It selects geometry
+only after the final controller update has remained stable for the original
+settle interval. This is not a new timer, retry loop or timing policy: it
+corrects the original controller transaction boundary. The focused VGA smoke
+proves that a second controller invalidation between ticks keeps the gate
+closed until two ticks after that second invalidation. No PIF, Win3.1,
+application, mode-number, dirty-shape or downstream width condition exists.
+Fullscreen roundtrip, initial Window and the Win95 Setup transition remain
+manual evidence cases, not branches in production code.

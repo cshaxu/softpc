@@ -649,6 +649,10 @@ UPDATE_ALG update_alg =
 	dummy_scroll,
 };
 
+/* The paint gate alone cannot distinguish successive controller writes. The
+ * host uses this sequence to commit only a state that has settled. */
+static unsigned long video_mode_change_generation;
+
 #ifndef REAL_VGA
 
 /*
@@ -670,6 +674,7 @@ RETURN PARAMS   :       None
 
 void    flag_mode_change_required IFN0()
 {
+    video_mode_change_generation++;
     set_mode_change_required(YES);
 
     update_alg.mark_byte = (T_mark_byte)simple_update;
@@ -680,6 +685,11 @@ void    flag_mode_change_required IFN0()
 
     update_alg.scroll_up = dummy_scroll;
     update_alg.scroll_down = dummy_scroll;
+}
+
+unsigned long mode_change_generation IFN0()
+{
+    return video_mode_change_generation;
 }
 
 
@@ -698,6 +708,7 @@ RETURN PARAMS   :	None
 
 void	reset_paint_routines IFN0()
 {
+    video_mode_change_generation++;
     set_mode_change_required(YES);
 
     update_alg.calc_update = dummy_calc;
