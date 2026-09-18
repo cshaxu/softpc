@@ -519,8 +519,12 @@ int main(void)
     assert(WaitForSingleObject(fake.frame, 5000u) == WAIT_OBJECT_0);
     assert(InterlockedCompareExchange(&fake.resets, 0, 0) == 1);
     generation = common_machine_run_generation(machine);
+    memset(frame.graphics_pixels, 0xa5, sizeof(frame.graphics_pixels));
     assert(common_machine_copy_published_frame(machine, &frame, generation));
     assert(frame.valid == 1u && generation == common_machine_run_generation(machine));
+    assert(!frame.graphics);
+    for (lib_size i = 0u; i < sizeof(frame.graphics_pixels); ++i)
+        assert(frame.graphics_pixels[i] == 0xa5);
     {
         lib_u32 sequence = frame.sequence;
         assert(!common_machine_copy_published_frame(machine, &frame, generation + 1u));

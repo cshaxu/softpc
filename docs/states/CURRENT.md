@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 T64 S2 is active: narrowed frame copying. S1 audit is complete; owner
+M9 T64 S2 is verified: narrowed frame copying. S1 audit is complete; owner
 cancelled thread unification and approved the prefix-plus-active-pixels copy.
 
 ## M9 T64 S2 Packet
@@ -19,7 +19,7 @@ cancelled thread unification and approved the prefix-plus-active-pixels copy.
 | Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT and their governance skills. |
 | Verification | Prefix/tail/stride/mode tests, existing dirty/ack tests, shared manifests/boundaries, dual-width full regression and documentation gate. |
 | Expected Markers | Text copies skip 983040 bytes; graphics copies exactly stride*height pixels; locks/sequence remain unchanged. |
-| Asset Needs | Refresh only assets/binary/softpc32.exe and softpc64.exe; no INI/media/snapshot changes or commits. |
+| Asset Needs | Refresh only package EXEs. Disposable build/t64-s2-package uses copied EXEs and existing Win3.1 disk in overlay mode; 90s per check, no trace, remove afterwards. Owner later approved INI restoration; no INI/media/snapshot commit. |
 | Reporting Requirements | Estimate production +15–30/-4–8; report actual production/test diff and copy-byte accounting. |
 | Stop Conditions | Need for new state, ownership, layout or unrelated semantic change requires review. |
 | Exit Criteria | Focused and full tests pass, actual diff reviewed, packaged and pushed; T64 awaits owner testing. |

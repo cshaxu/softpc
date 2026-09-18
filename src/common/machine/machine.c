@@ -673,8 +673,8 @@ lib_bool common_machine_copy_published_frame(common_machine *machine,
     copied = machine->published_frame_run_generation == run_generation &&
         machine->frame_buffers[machine->published_frame_index]->valid != 0u;
     if (copied)
-        lib_memory_copy(destination, machine->frame_buffers[machine->published_frame_index],
-            sizeof(*destination));
+        copied = kvm_frame_copy(destination,
+            machine->frame_buffers[machine->published_frame_index]);
     base_sync_mutex_unlock(machine->frame_lock);
     return copied;
 }
