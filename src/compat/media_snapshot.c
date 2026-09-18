@@ -224,10 +224,7 @@ lib_status softpc_media_archive_write(const softpc_media_archive *archive,
     lib_status status;
     unsigned i;
     if (archive == NULL || write == NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    status = softpc_snapshot_stream_write_u32(write, context, MEDIA_SLOTS);
-    if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u32(write,
-        context, MEDIA_BLOCK_BYTES);
-    for (i=0; i<MEDIA_SLOTS && status == LIB_STATUS_OK; ++i) {
+    for (i=0, status=LIB_STATUS_OK; i<MEDIA_SLOTS && status == LIB_STATUS_OK; ++i) {
         const media_slot *slot = &archive->slots[i];
         const media_page *page;
         status = softpc_snapshot_stream_write_u32(write, context, slot->present);
@@ -251,15 +248,9 @@ lib_status softpc_media_archive_read(softpc_media_archive **archive,
 {
     softpc_media_archive *result;
     lib_status status;
-    lib_u32 count, block_bytes;
     unsigned i;
     if (archive == NULL || read == NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    status = softpc_snapshot_stream_read_u32(read, context, &count);
-    if (status == LIB_STATUS_OK)
-        status = softpc_snapshot_stream_read_u32(read, context, &block_bytes);
-    if (status != LIB_STATUS_OK) return status;
-    if (count != MEDIA_SLOTS || block_bytes != MEDIA_BLOCK_BYTES)
-        return LIB_STATUS_INVALID_ARGUMENT;
+    status = LIB_STATUS_OK;
     result = calloc(1, sizeof(*result));
     if (result == NULL) return LIB_STATUS_NO_MEMORY;
     for (i=0; i<MEDIA_SLOTS && status == LIB_STATUS_OK; ++i) {

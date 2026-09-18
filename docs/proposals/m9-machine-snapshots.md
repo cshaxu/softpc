@@ -194,11 +194,10 @@ q/tic 队列恢复直接重建内部节点，不重新调用 `add_q_event_*` / `
 
 ### 3. 文件和媒体：单个二进制文件，显式基底依赖
 
-首版 `.spcs` 为一个有版本的容器：header（magic/version/build compatibility/
-配置/ROM 标识）+ 有界 section（ID/version/length/checksum）+ 完成校验。
-明确小端固定宽度字段；所有尺寸在乘加前检查，重复/缺失 section、非法枚举、超限长度、
-截断与不兼容均拒绝。禁止直接 fwrite struct/pointer/CRT stream。
-只采用固定、可审核 section 清单，不引入动态注册或反射。
+`.spcs` 是固定顺序、无版本号的内部容器：RAM 大小、core 长度与内容、device
+长度与内容、media 长度与内容、外层 resume entry。明确小端固定宽度字段；所有
+长度在消费前检查，非法枚举、超限长度与截断均拒绝。禁止直接 fwrite
+struct/pointer/CRT stream。不引入动态 section、反射或兼容协商。
 
 CPU/RAM/设备分别编码；callback 用本构建的固定语义 ID 与已审核参数，关联指针用
 对象 ID/偏移重建。可重建的宿主解码指针、函数表、绘制资源不保存，恢复后重新建立。
@@ -499,15 +498,12 @@ transaction are still required before any public save/load operation exists.
 
 #### S7 P7: implemented complete private image container
 
-VM now composes the two private stream slices into one canonical image:
-magic, format revision, declared RAM size, exact section
-count, `core`/`devices` identifiers and bounded lengths, followed by the
-outer CCPU resume entry. Decode rejects an unknown order,
-duplicate/missing section, malformed resume entry or a core section that is
-inconsistent with its declared RAM size before calling either archive reader.
-The complete decoded image is staged and replaces an existing image only on
-success. It remains VM-private: this P adds neither the running safe-point
-transaction nor App file commands.
+VM composes the private slices into one fixed-order image: declared RAM size,
+bounded core, device and media payloads, then the outer CCPU resume entry.
+There is no version, magic, section count or section identifier. Decode stages
+all payloads and rejects an invalid RAM size, any malformed bounded payload or
+resume entry before replacing an existing image. It remains VM-private: this P
+adds neither the running safe-point transaction nor App file commands.
 
 - 安全点到达后导出前后相同快照语义状态；导出期间状态/待事件稳定，不要求与请求瞬间相同。
 - 全状态命令矩阵；嵌套自然返回、1 秒超限、HLT 无退休指令仍检查期限；普通单步不越过断点。
@@ -645,8 +641,8 @@ overlay 配置没有写入后核对媒体内容，故原 105/105 不能证明此
 
 ### S10 实施结果（待 owner 手测）
 
-实现新增第三个 MEDIA section，格式版本升为 6；旧版 5 缺少媒体 section，
-因此明确拒绝，不猜测或混合旧 overlay。四个固定后端槽位（FDD 0–1、HDD
+实现将 MEDIA payload 置于固定 container 顺序；没有版本字段或旧格式协商，
+因此不猜测或混合缺少媒体内容的旧 snapshot。四个固定后端槽位（FDD 0–1、HDD
 0–1）有统一 archive；当前产品只配置 FDD 0、HDD 0，其余必须显式为空。
 每个非空槽位记录存在性、模式、长度、基底 SHA-256、FDD 当前柱面和按 4 KiB
 排列的不同块；4 KiB 块大小也写进媒体段并校验。几何由原后端从已记录的长度

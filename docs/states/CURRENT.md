@@ -2,9 +2,9 @@
 
 ## Current Work
 
-T63 remains open. The owner explicitly rejected closure because snapshots
-do not yet include modified FDD/HDD overlay contents. The uncommitted T63
-closure and T64 admission have been withdrawn; T64 is not allocated.
+T63 remains open pending owner acceptance of complete snapshot media state.
+The prior attempted closure and T64 admission were withdrawn; T64 is not
+allocated.
 
 M9 T63 S10 is active: complete snapshot media state. S9's accepted CPU/device/
 display repairs remain the baseline, not proof of complete snapshot coverage.
@@ -12,16 +12,19 @@ Lib optimization remains the first queued candidate.
 
 ## Current Technical Baseline
 
-- Source: T63 S9 P9 (`aa2bc0d`); subsequent P10/P11 are documentation only.
-- Version-5 snapshots have one host-width-independent streaming format.
-  Save is running-to-paused; load is initial/stopped-to-paused and does not
-  create a Window until resume. Ordinary pause/debug behavior is retained.
-- Final recorded x64 and x86 suites each pass 105/105; both cross-width
-  save/load directions include post-resume keyboard repaint. The owner
-  accepted restored Win3.1 display and input.
-- Existing x86/x64 package EXEs remain the accepted S9 binaries until a
-  verified S10 code delivery. This admission does not claim a fresh build.
-- FDD/HDD overlay payload is the active S10 requirement, not deferred debt.
+- Source: T63 S10 P13 (`8074517`), with an uncommitted versionless-layout
+  simplification in review.
+- Snapshots are host-width-independent, fixed-order streams with no format
+  version, magic or section identifier. Save is running-to-paused; load is
+  initial/stopped-to-paused and does not create a Window until resume.
+  Ordinary pause/debug behavior is retained.
+- Final recorded x64 and x86 suites each pass 106/106; both cross-width
+  save/load directions include post-resume keyboard repaint and Overlay media
+  replacement. Owner accepted restored Win3.1 display and input; the new
+  media-state behavior still needs owner acceptance.
+- Current x86/x64 package EXEs include the S10 media implementation and
+  versionless-layout simplification.
+- FDD/HDD Overlay payload is implemented, awaiting manual verification.
 - Existing owner deletions of obsolete bisect assets remain untouched.
 
 ## Recent M9 Closures
@@ -45,7 +48,7 @@ correction. No code, package or rule changed.
 | Admission And Approval | Owner rejects T63 closure and explicitly requires an additional S for floppy/hard-disk overlay snapshot support. T63 remains open; no T64 admission. |
 | Objective | Save all modified FDD/HDD overlay content in the same snapshot binary, then restore media and machine state to the same checkpoint. |
 | Non-goals | No Lib optimization, second overlay implementation, guest image mutation, sidecar files or implicit copying of entire DIRECT/READONLY media. No new Common APIs. |
-| Reference Baseline | Accepted T63 S9 P9 aa2bc0d; S10 worktree upgrades the previous version-5 CPU/device snapshot to version 6 with media state. |
+| Reference Baseline | Accepted T63 S9 P9 aa2bc0d; S10 adds media state to the fixed, versionless snapshot layout. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
 | Files And ABI Surface | VM snapshot container/driver and Compat FDD/HDD media owners, relevant snapshot/media tests and docs. Reuse existing Lib Storage and two Common state operations; report any necessary shared API change before implementation. |
 | Applicable Rules | docs/rules/EXECUTION.md, ARCHITECTURE.md, CODING.md, DOCUMENT.md; docs/design/ARCHITECTURE.md, CODING.md and UI.md; original snapshot media contract. |

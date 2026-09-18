@@ -127,18 +127,13 @@ int main(void)
         }
         stream.count=full;
     }
-    /* 4 slot count + 4 block bytes, then slot 0: 4 present + 4 mode +
-       4 cylinder + 8 size + 32 digest + 8 page count. First offset is 68. */
-    stream.bytes[68]=1; stream.position=0;
+    /* Slot 0: 4 present + 4 mode + 4 cylinder + 8 size + 32 digest +
+       8 page count. Its first page offset starts at byte 60. */
+    stream.bytes[60]=1; stream.position=0;
     assert(softpc_media_archive_read(&decoded,read_bytes,&stream)!=LIB_STATUS_OK);
-    stream.bytes[68]=0;
-    /* The serialized block geometry is part of the codec contract. */
-    stream.bytes[5]=0; stream.position=0;
-    assert(softpc_media_archive_read(&decoded,read_bytes,&stream)!=LIB_STATUS_OK);
-    stream.bytes[4]=0x00; stream.bytes[5]=0x10;
-    stream.bytes[6]=0x00; stream.bytes[7]=0x00;
+    stream.bytes[60]=0;
     {
-        lib_size second=68+12+4096;
+        lib_size second=60+12+4096;
         lib_u8 old=stream.bytes[second+1];
         stream.bytes[second+1]=0; stream.position=0;
         assert(softpc_media_archive_read(&decoded,read_bytes,&stream)!=LIB_STATUS_OK);

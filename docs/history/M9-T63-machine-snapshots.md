@@ -1111,12 +1111,11 @@ This internal P adds no file, media, VM driver or product command.
 
 ## S7 P7: complete private image container
 
-VM now writes one versioned private image around the independently owned core
-and device streams. The header contains magic, revision, host pointer width,
-declared RAM size and exact section count. Each section has a semantic
-identifier and explicit bounded length; the image ends with the outer CCPU
-resume entry. Decode stages both archives and only replaces a supplied image
-when every structural and section check succeeds.
+The initial private image container wrote independently owned core and device
+streams with bounded lengths and the outer CCPU resume entry. The current S10
+layout is deliberately simpler: it uses fixed stream order rather than a
+version, magic, count or semantic identifiers, while retaining the bounded
+length checks required to reject malformed input.
 
 The checkpoint smoke now captures a live image, serializes the full container,
 decodes it and compares complete RAM bytes plus the resume entry. This P stays
@@ -1264,7 +1263,7 @@ No production code or new successful snapshot proof is claimed at this point.
 ## S10 implementation: FDD/HDD overlay payload
 
 The original media gap is now implemented in Compat plus the VM-private image
-container. A version-6 MEDIA section archives the complete effective overlay
+container. A fixed MEDIA payload archives the complete effective overlay
 delta for every fixed owner slot. It never copies DIRECT/READONLY disk bytes.
 VM stages/validates media before reset and Compat installs prepared overlay
 leases after reset but before device/CPU restoration. The real post-reset

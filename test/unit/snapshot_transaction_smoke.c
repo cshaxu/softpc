@@ -58,14 +58,6 @@ static lib_status snapshot_read(void *opaque, lib_u8 *bytes,
     return LIB_STATUS_OK;
 }
 
-static void snapshot_set_u32_le(lib_u8 *bytes, lib_u32 value)
-{
-    bytes[0] = (lib_u8)value;
-    bytes[1] = (lib_u8)(value >> 8u);
-    bytes[2] = (lib_u8)(value >> 16u);
-    bytes[3] = (lib_u8)(value >> 24u);
-}
-
 static void snapshot_set_u64_le(lib_u8 *bytes, lib_u64 value)
 {
     lib_size index;
@@ -248,12 +240,8 @@ static int snapshot_run_transaction(void)
     assert(common_machine_stop(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_STOPPED));
 
-    /* The container carries no host or machine word-width field. */
-    assert(stream.count >= 16u);
-    assert(stream.bytes[4] == 6u && stream.bytes[5] == 0u &&
-        stream.bytes[6] == 0u && stream.bytes[7] == 0u);
-    assert(stream.bytes[8] == 3u && stream.bytes[9] == 0u &&
-        stream.bytes[10] == 0u && stream.bytes[11] == 0u);
+    /* The fixed layout begins with guest RAM size, not a host-width/version tag. */
+    assert(stream.count >= 12u);
     stream.offset = 0u;
     assert(common_machine_write_state(machine,
         &(common_machine_state_reader) { snapshot_read, &stream }) ==
@@ -263,37 +251,19 @@ static int snapshot_run_transaction(void)
     assert(common_machine_stop(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_STOPPED));
 
-    /* The retired v1 host-width header is not a supported image variant. */
-    snapshot_set_u32_le(stream.bytes + 4u, 1u);
-    stream.offset = 0u;
-    assert(common_machine_write_state(machine,
-        &(common_machine_state_reader) { snapshot_read, &stream }) !=
-        LIB_STATUS_OK);
-    assert(common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
-    snapshot_set_u32_le(stream.bytes + 4u, 6u);
-
-    /* v4 lost the live map/read/bit masks; do not guess missing registers. */
-    snapshot_set_u32_le(stream.bytes + 4u, 4u);
-    stream.offset = 0u;
-    assert(common_machine_write_state(machine,
-        &(common_machine_state_reader) { snapshot_read, &stream }) !=
-        LIB_STATUS_OK);
-    assert(common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
-    snapshot_set_u32_le(stream.bytes + 4u, 6u);
-
-    /* A declared section boundary must be consumed exactly, never ignored. */
+    /* A declared payload boundary must be consumed exactly, never ignored. */
     {
-        lib_u64 core_bytes = snapshot_get_u64_le(stream.bytes + 20u);
+        lib_u64 core_bytes = snapshot_get_u64_le(stream.bytes + 4u);
         assert(core_bytes != UINT64_MAX);
-        snapshot_set_u64_le(stream.bytes + 20u, core_bytes + 1u);
+        snapshot_set_u64_le(stream.bytes + 4u, core_bytes + 1u);
     }
     stream.offset = 0u;
     assert(common_machine_write_state(machine,
         &(common_machine_state_reader) { snapshot_read, &stream }) !=
         LIB_STATUS_OK);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
-    snapshot_set_u64_le(stream.bytes + 20u,
-        snapshot_get_u64_le(stream.bytes + 20u) - 1u);
+    snapshot_set_u64_le(stream.bytes + 4u,
+        snapshot_get_u64_le(stream.bytes + 4u) - 1u);
 
     stream.bytes[0] ^= 0xffu;
     stream.offset = 0u;
