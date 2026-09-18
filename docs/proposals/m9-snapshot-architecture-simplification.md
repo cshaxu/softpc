@@ -191,3 +191,11 @@ manifest 和独立验证；当前 T66 不预设会修改 shared corpus。
 停止条件：需要更改当前用户体验、原始设备行为、快照格式、公开 ABI，或使总复杂度
 显著上升；先报告设计取舍，不悄悄扩大范围。无相关变更时不制造 ABI 修改。
 本文件全部台账项在收口时必须有实现证据或明确的保留/独立任务归属，不能遗漏。
+
+## S1 delivery
+
+S1 delivery is recorded in [snapshot finish result ordering](../history/M9-T66-S1-snapshot-finish.md).
+The actual VM production delta is +9/-1 (net +8); no test, Common, Lib or
+OpenNT MVDM mirror path changed. The retained snapshot READY phase is the
+single failure fact; no new driver latch or error channel was added. Both
+widths passed their 107-test full suites and package builds.

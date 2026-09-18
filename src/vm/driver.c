@@ -139,6 +139,7 @@ static void vm_driver_snapshot_observe(void *opaque, unsigned long depth,
 {
     vm_driver *driver = (vm_driver *)opaque;
     lib_status status;
+    lib_status finish_status;
     if (driver == NULL || entry == NULL ||
         !softpc_snapshot_checkpoint(&driver->capture, depth, entry))
         return;
@@ -151,11 +152,15 @@ static void vm_driver_snapshot_observe(void *opaque, unsigned long depth,
                 (softpc_snapshot_bytes_write)driver->state_writer.write,
                 driver->state_writer.context);
     }
+    finish_status = softpc_snapshot_finish(&driver->capture);
+    if (finish_status != LIB_STATUS_OK)
+        status = finish_status;
     driver->state_read_status = status;
     driver->state_read_ready = LIB_TRUE;
     vm_driver_executor_event(driver);
     softpc_snapshot_image_dispose(&driver->captured_image);
-    (void)softpc_snapshot_finish(&driver->capture);
+    if (finish_status != LIB_STATUS_OK)
+        softpc_ccpu_lifecycle_request_exit();
     driver->state_read_ready = LIB_FALSE;
 }
 
@@ -189,6 +194,9 @@ static lib_bool vm_driver_run(void *opaque)
         if (result) vm_driver_executor_event(driver);
     } else
         result = softpc_machine_run(driver->machine, UINT64_MAX) == SOFTPC_MACHINE_OK;
+    /* finish retains READY only when clock restart fails. Do not resume CCPU
+       after that terminal capture failure. */
+    result = result && driver->capture.phase != SOFTPC_SNAPSHOT_READY;
     softpc_ccpu_lifecycle_observe(NULL, NULL);
     softpc_debug_bind(NULL);
     return result;

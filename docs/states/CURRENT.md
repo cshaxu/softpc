@@ -2,29 +2,29 @@
 
 ## Current Work
 
-M9 T66 S1 is admitted: repair the VM `snapshot_finish()` failure path before
-any code-reduction candidate.
+M9 T66 S2 is admitted: reuse original VGA/PIT mechanisms and remove only
+verified no-behavior residues after S1's snapshot-finish repair.
 
-## M9 T66 S1 Packet
+## M9 T66 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner: 下一个t任务准入; standing commit/push approval. |
-| Objective | Attach `snapshot_finish()` failure to the existing VM operation termination/result path, preserving the snapshot format and completed state semantics. |
-| Non-goals | No public ABI, Lib/Common, thread, UI, lifecycle, CPU/device semantic, archive-order refactor, VM-local ownership simplification, or mirror-diff cleanup. |
-| Reference Baseline | T65 closure `8e6bcd6`; clean worktree; historical T63 diff evidence is candidate context only. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner: 开始吧 做完架构整理任务; standing commit/push approval. |
+| Objective | Reuse the original VGA graphics-controller write path and one validated PIT state decoder; remove only audited declarations/whitespace residues that have no behavior. |
+| Non-goals | No public ABI, Lib/Common, thread, UI, snapshot format, CPU/device behavior, archive-order refactor, VM-local ownership simplification, or externalized original state owner. |
+| Reference Baseline | T66 S1 delivery pending coordinator closure; current clean committed baseline after its P; historical T63/T61 evidence is candidate context only. |
 | Candidate Proposal | [Snapshot and component architecture simplification](../proposals/m9-snapshot-architecture-simplification.md) |
-| Files And ABI Surface | Initially audit `src/vm` snapshot/driver completion paths and product tests; precise changed paths follow the required pre-implementation audit. Public ABI unchanged. |
+| Files And ABI Surface | Initially audit `src/mvdm/softpc.new/base/video/vga_prts.c`, `src/mvdm/softpc.new/base/system/timer.c`, `src/mvdm/softpc.new/base/comms/com.c`, `src/compat/video.c` and focused tests. Precise paths follow the required pre-implementation audit. Public ABI unchanged. |
 | Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT and selected governance skills; original-mirror and VM/Compat ownership boundaries. |
-| Verification | Deterministic `snapshot_finish()` failure injection, result/clock/operation-order proof, x86/x64 full regression and shared gates. |
-| Expected Markers | A finish failure cannot report successful completion or leave the VM operation/clock path inconsistent; no second completion or error route exists. |
+| Verification | Original VGA handler/mask/write-mode proof, PIT legal/illegal state-ID proof, original-diff inspection, x86/x64 full regression and shared gates. |
+| Expected Markers | Graphics snapshot uses the original controller dispatch; PIT state decoding has one validated owner; removed residues have no call or behavior. |
 | Asset Needs | Existing test media/fakes; refresh both EXEs only after implementation; never modify owner INI/media. |
-| Reporting Requirements | Before code: exact ignored-result call path, current failure behavior, component/file ownership, production/test and MVDM mirror-diff estimates, boundary rationale and stop condition. After: actual production/test/component/mirror numstat, retained/moved/deleted disposition, deterministic failure evidence, x86/x64 build/full-test results, commit hash and both EXE links. |
-| Stop Conditions | Need for new public ABI, snapshot-format, Lib/Common, thread, product state semantic or unproven post-failure recovery change requires owner review. |
-| Exit Criteria | Finish-failure path has one terminal result/cleanup owner; deterministic proof, dual-width builds/tests, manifests, commit/push and S1 closure. |
-| Original Owner Request | 下一个t任务准入 |
-| Similar-Issue Sweep | All `snapshot_finish()` call sites and result/clock restoration paths; no unbounded whole-tree claim. |
+| Reporting Requirements | Before code: exact old/new dispatch and decoder call paths, component/file ownership, production/test and MVDM mirror-diff estimates, boundary rationale and stop condition. After: actual production/test/component/mirror numstat, retained/moved/deleted disposition, focused evidence, x86/x64 build/full-test results, commit hash and both EXE links. |
+| Stop Conditions | Need for a new public ABI, altered original device behavior, changed snapshot format, Lib/Common/thread/UI change, or unproven original-handler equivalence requires owner review. |
+| Exit Criteria | One original VGA controller dispatch and one validated PIT decoder remain; residue sweep is evidenced; dual-width builds/tests, manifests, commit/push and S2 closure. |
+| Original Owner Request | 开始吧 做完架构整理任务 |
+| Similar-Issue Sweep | Graphics-controller write hand dispatches, PIT temporary state-ID decoders, newly added duplicate declarations/whitespace and Compat video residue; no unbounded whole-tree claim. |
 
 ## Current Technical Baseline
 
