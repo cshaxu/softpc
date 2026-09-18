@@ -8,26 +8,26 @@
 static const char HELP_COMMANDS[] =
     "Insignia SoftPC\r\n"
     "===============\r\n"
-    "  start                 cold-reset and run the machine\r\n"
-    "  resume                continue a paused machine\r\n"
-    "  pause                 request machine pause\r\n"
-    "  stop                  stop execution\r\n"
-    "  reset                 cold-reset and pause at firmware entry\r\n"
+    "  start          cold-reset and run the machine\r\n"
+    "  resume         continue a paused machine\r\n"
+    "  pause          request machine pause\r\n"
+    "  stop           stop execution\r\n"
+    "  reset          cold-reset and pause at firmware entry\r\n"
     "  floppy insert <mode> <image>\r\n"
     "                 insert drive A media while stopped/paused\r\n"
-    "  floppy eject          eject drive A media while stopped/paused\r\n"
-    "  save <file>           save a running or paused machine\r\n"
-    "  load <file>           load a snapshot while stopped\r\n"
-    "  help                  show this help\r\n"
-    "  debug                 enter debugger (q returns to monitor)\r\n"
-    "  exit                  quit\r\n";
+    "  floppy eject   eject drive A media while stopped/paused\r\n"
+    "  save <file>    save a running or paused machine\r\n"
+    "  load <file>    load a snapshot while stopped\r\n"
+    "  help           show this help\r\n"
+    "  debug          enter debugger (q returns to monitor)\r\n"
+    "  exit           quit\r\n";
 static const char HELP_HOTKEYS[] =
     "While the guest is running:\r\n"
-    "  Ctrl+Alt+P            pause or resume\r\n"
-    "  Ctrl+Alt+D            send Ctrl+Alt+Del to the guest\r\n"
-    "  Ctrl+Alt+F            send Alt+Enter to the guest\r\n"
-    "  Ctrl+Alt+T            send Alt+Tab to the guest\r\n"
-    "  Ctrl+Alt+M            release captured mouse\r\n";
+    "  Ctrl+Alt+P     pause or resume\r\n"
+    "  Ctrl+Alt+D     send Ctrl+Alt+Del to the guest\r\n"
+    "  Ctrl+Alt+F     send Alt+Enter to the guest\r\n"
+    "  Ctrl+Alt+T     send Alt+Tab to the guest\r\n"
+    "  Ctrl+Alt+M     release captured mouse\r\n";
 
 static void clear(app_command_effect *e) { memset(e, 0, sizeof(*e)); }
 static void text(app_command_effect *e, const char *s) { (void)snprintf(e->text, sizeof(e->text), "%s", s); }
@@ -74,10 +74,14 @@ static void lower(char *s)
 }
 static int floppy_mode(const char *text, lib_storage_medium_mode *out)
 {
-    if (!strcmp(text, "readonly")) *out = LIB_STORAGE_MEDIUM_READONLY;
-    else if (!strcmp(text, "direct")) *out = LIB_STORAGE_MEDIUM_DIRECT;
-    else if (!strcmp(text, "overlay")) *out = LIB_STORAGE_MEDIUM_OVERLAY;
-    else return 0;
+    if (!strcmp(text, "readonly"))
+        *out = LIB_STORAGE_MEDIUM_READONLY;
+    else if (!strcmp(text, "direct"))
+        *out = LIB_STORAGE_MEDIUM_DIRECT;
+    else if (!strcmp(text, "overlay"))
+        *out = LIB_STORAGE_MEDIUM_OVERLAY;
+    else
+        return 0;
     return 1;
 }
 
@@ -112,18 +116,14 @@ static void lifecycle(app_command_session *s, app_monitor_state state,
         if (state == APP_MONITOR_RUNNING)
             accept(s, APP_LIFECYCLE_REQUEST_PAUSE);
         else
-            reject(s, e, state == APP_MONITOR_PAUSED ?
-                "Machine is paused; use resume, reset, or stop." :
-                "Machine is stopped; use start or reset.");
+            reject(s, e, state == APP_MONITOR_PAUSED ? "Machine is paused; use resume, reset, or stop." : "Machine is stopped; use start or reset.");
     }
     else if (!strcmp(c, "resume"))
     {
         if (state == APP_MONITOR_PAUSED)
             accept(s, APP_LIFECYCLE_REQUEST_RESUME);
         else
-            reject(s, e, state == APP_MONITOR_RUNNING ?
-                "Machine is already running; use pause, reset, or stop." :
-                "Machine is stopped; use start or reset.");
+            reject(s, e, state == APP_MONITOR_RUNNING ? "Machine is already running; use pause, reset, or stop." : "Machine is stopped; use start or reset.");
     }
     else if (!strcmp(c, "reset"))
     {
@@ -143,28 +143,32 @@ static void lifecycle(app_command_session *s, app_monitor_state state,
 }
 
 static void snapshot(app_command_session *s, app_monitor_state state,
-    const char *command, const char *path, app_command_effect *effect)
+                     const char *command, const char *path, app_command_effect *effect)
 {
-    if (s->transition_pending || s->dispatch_pending) {
+    if (s->transition_pending || s->dispatch_pending)
+    {
         reject(s, effect, "Machine state transition is in progress.");
         return;
     }
-    if (*path == '\0' || strlen(path) >= sizeof(effect->path)) {
-        reject(s, effect, !strcmp(command, "save") ?
-            "Usage: save <file>" : "Usage: load <file>");
+    if (*path == '\0' || strlen(path) >= sizeof(effect->path))
+    {
+        reject(s, effect, !strcmp(command, "save") ? "Usage: save <file>" : "Usage: load <file>");
         return;
     }
-    if (!strcmp(command, "save")) {
-        if (state != APP_MONITOR_RUNNING && state != APP_MONITOR_PAUSED) {
+    if (!strcmp(command, "save"))
+    {
+        if (state != APP_MONITOR_RUNNING && state != APP_MONITOR_PAUSED)
+        {
             reject(s, effect, "Machine is stopped; use start before save.");
             return;
         }
         effect->action = APP_COMMAND_ACTION_SAVE_STATE;
-    } else {
-        if (state != APP_MONITOR_STOPPED) {
-            reject(s, effect, state == APP_MONITOR_RUNNING ?
-                "Machine is running; stop it before load." :
-                "Machine is paused; stop it before load.");
+    }
+    else
+    {
+        if (state != APP_MONITOR_STOPPED)
+        {
+            reject(s, effect, state == APP_MONITOR_RUNNING ? "Machine is running; stop it before load." : "Machine is paused; stop it before load.");
             return;
         }
         effect->action = APP_COMMAND_ACTION_LOAD_STATE;
@@ -233,7 +237,8 @@ void app_command_session_submit_line(app_command_session *s, app_monitor_state s
     }
     /* The parser does not own machine state.  It receives control's current
        stable fact for the one command validation below. */
-    if (!strcmp(c, "save") || !strcmp(c, "load")) {
+    if (!strcmp(c, "save") || !strcmp(c, "load"))
+    {
         snapshot(s, state, c, a, e);
         return;
     }
@@ -254,16 +259,22 @@ void app_command_session_submit_line(app_command_session *s, app_monitor_state s
         e->action = APP_COMMAND_ACTION_EJECT_FLOPPY;
         e->media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     }
-    else if (!strcmp(a, "insert") && *p) {
+    else if (!strcmp(a, "insert") && *p)
+    {
         mode = p;
-        while (*p && !isspace((unsigned char)*p)) ++p;
-        if (*p) *p++ = '\0';
+        while (*p && !isspace((unsigned char)*p))
+            ++p;
+        if (*p)
+            *p++ = '\0';
         p = trim(p);
         lower(mode);
-        if (*p && strlen(p) < sizeof(e->path) && floppy_mode(mode, &e->media_mode)) {
+        if (*p && strlen(p) < sizeof(e->path) && floppy_mode(mode, &e->media_mode))
+        {
             e->action = APP_COMMAND_ACTION_INSERT_FLOPPY;
             memcpy(e->path, p, strlen(p) + 1u);
-        } else reject(s, e, "Usage: floppy insert <readonly|direct|overlay> <image> | eject");
+        }
+        else
+            reject(s, e, "Usage: floppy insert <readonly|direct|overlay> <image> | eject");
     }
     else
         reject(s, e, "Usage: floppy insert <readonly|direct|overlay> <image> | eject");
@@ -299,9 +310,7 @@ void app_command_session_complete_floppy(app_command_session *s, app_command_act
 {
     clear(e);
     message(e->text, sizeof(e->text),
-        a == APP_COMMAND_ACTION_EJECT_FLOPPY ?
-            (ok ? "Floppy ejected." : "Cannot eject floppy.") :
-            (ok ? "Floppy inserted." : "Cannot insert floppy."));
+            a == APP_COMMAND_ACTION_EJECT_FLOPPY ? (ok ? "Floppy ejected." : "Cannot eject floppy.") : (ok ? "Floppy inserted." : "Cannot insert floppy."));
     prompt(s);
 }
 void app_command_session_note_runtime(app_command_session *s,
@@ -382,7 +391,7 @@ void app_command_session_note_monitor_current(app_command_session *s,
 }
 
 _Static_assert(COMMON_SESSION_PROMPT_CAPACITY >= COMMON_DEBUG_PROMPT_CAPACITY,
-    "Session prompt must hold debugger continuation prompts");
+               "Session prompt must hold debugger continuation prompts");
 
 /* app/ owns product command policy. common/session owns its neutral copied
  * completion facts; convert explicitly at this one composition boundary.
@@ -390,63 +399,88 @@ _Static_assert(COMMON_SESSION_PROMPT_CAPACITY >= COMMON_DEBUG_PROMPT_CAPACITY,
 static common_machine_state app_machine_completed_state(
     common_session_machine_state state)
 {
-    switch (state) {
-    case COMMON_SESSION_MACHINE_RUNNING: return COMMON_MACHINE_RUNNING;
-    case COMMON_SESSION_MACHINE_PAUSED: return COMMON_MACHINE_PAUSED;
-    case COMMON_SESSION_MACHINE_ERROR: return COMMON_MACHINE_ERROR;
+    switch (state)
+    {
+    case COMMON_SESSION_MACHINE_RUNNING:
+        return COMMON_MACHINE_RUNNING;
+    case COMMON_SESSION_MACHINE_PAUSED:
+        return COMMON_MACHINE_PAUSED;
+    case COMMON_SESSION_MACHINE_ERROR:
+        return COMMON_MACHINE_ERROR;
     case COMMON_SESSION_MACHINE_RESET_COMPLETED:
         return COMMON_MACHINE_RESET_COMPLETED;
-    default: return COMMON_MACHINE_STOPPED;
+    default:
+        return COMMON_MACHINE_STOPPED;
     }
 }
 
 static app_monitor_state app_command_state(common_session_machine_state state)
 {
-    switch (state) {
-    case COMMON_SESSION_MACHINE_RUNNING: return APP_MONITOR_RUNNING;
-    case COMMON_SESSION_MACHINE_PAUSED: return APP_MONITOR_PAUSED;
-    default: return APP_MONITOR_STOPPED;
+    switch (state)
+    {
+    case COMMON_SESSION_MACHINE_RUNNING:
+        return APP_MONITOR_RUNNING;
+    case COMMON_SESSION_MACHINE_PAUSED:
+        return APP_MONITOR_PAUSED;
+    default:
+        return APP_MONITOR_STOPPED;
     }
 }
 
 static common_session_request app_session_request(app_lifecycle_request request)
 {
-    switch (request) {
-    case APP_LIFECYCLE_REQUEST_START: return COMMON_SESSION_REQUEST_START;
-    case APP_LIFECYCLE_REQUEST_RESUME: return COMMON_SESSION_REQUEST_RESUME;
-    case APP_LIFECYCLE_REQUEST_PAUSE: return COMMON_SESSION_REQUEST_PAUSE;
-    case APP_LIFECYCLE_REQUEST_STOP: return COMMON_SESSION_REQUEST_STOP;
-    case APP_LIFECYCLE_REQUEST_RESET: return COMMON_SESSION_REQUEST_RESET;
-    default: return COMMON_SESSION_REQUEST_NONE;
+    switch (request)
+    {
+    case APP_LIFECYCLE_REQUEST_START:
+        return COMMON_SESSION_REQUEST_START;
+    case APP_LIFECYCLE_REQUEST_RESUME:
+        return COMMON_SESSION_REQUEST_RESUME;
+    case APP_LIFECYCLE_REQUEST_PAUSE:
+        return COMMON_SESSION_REQUEST_PAUSE;
+    case APP_LIFECYCLE_REQUEST_STOP:
+        return COMMON_SESSION_REQUEST_STOP;
+    case APP_LIFECYCLE_REQUEST_RESET:
+        return COMMON_SESSION_REQUEST_RESET;
+    default:
+        return COMMON_SESSION_REQUEST_NONE;
     }
 }
 
 static app_lifecycle_request app_lifecycle_request_from_session(
     common_session_request request)
 {
-    switch (request) {
-    case COMMON_SESSION_REQUEST_START: return APP_LIFECYCLE_REQUEST_START;
-    case COMMON_SESSION_REQUEST_RESUME: return APP_LIFECYCLE_REQUEST_RESUME;
-    case COMMON_SESSION_REQUEST_PAUSE: return APP_LIFECYCLE_REQUEST_PAUSE;
-    case COMMON_SESSION_REQUEST_STOP: return APP_LIFECYCLE_REQUEST_STOP;
-    case COMMON_SESSION_REQUEST_RESET: return APP_LIFECYCLE_REQUEST_RESET;
-    default: return APP_LIFECYCLE_REQUEST_NONE;
+    switch (request)
+    {
+    case COMMON_SESSION_REQUEST_START:
+        return APP_LIFECYCLE_REQUEST_START;
+    case COMMON_SESSION_REQUEST_RESUME:
+        return APP_LIFECYCLE_REQUEST_RESUME;
+    case COMMON_SESSION_REQUEST_PAUSE:
+        return APP_LIFECYCLE_REQUEST_PAUSE;
+    case COMMON_SESSION_REQUEST_STOP:
+        return APP_LIFECYCLE_REQUEST_STOP;
+    case COMMON_SESSION_REQUEST_RESET:
+        return APP_LIFECYCLE_REQUEST_RESET;
+    default:
+        return APP_LIFECYCLE_REQUEST_NONE;
     }
 }
 
 static void app_command_set_prompt(const app_command_context *command,
-    common_session_command_result *out)
+                                   common_session_command_result *out)
 {
-    if (command == NULL || out == NULL) return;
+    if (command == NULL || out == NULL)
+        return;
     (void)snprintf(out->prompt, sizeof(out->prompt), "%s",
-        command->debug_active ? command->debug_prompt : "SoftPC> ");
+                   command->debug_active ? command->debug_prompt : "SoftPC> ");
 }
 
 static void app_command_copy_effect(app_command_context *command,
-    common_session_command_result *out, const app_command_effect *effect)
+                                    common_session_command_result *out, const app_command_effect *effect)
 {
-    if (command == NULL || out == NULL || effect == NULL) return;
-    *out = (common_session_command_result) { 0 };
+    if (command == NULL || out == NULL || effect == NULL)
+        return;
+    *out = (common_session_command_result){0};
     (void)snprintf(out->text, sizeof(out->text), "%s", effect->text);
     out->exit_requested = effect->exit_requested != 0;
     out->arm_prompt = effect->arm_prompt != 0;
@@ -454,137 +488,143 @@ static void app_command_copy_effect(app_command_context *command,
 }
 
 static lib_status app_snapshot_write(void *opaque, const lib_u8 *bytes,
-    lib_size byte_count)
+                                     lib_size byte_count)
 {
     return lib_storage_file_writer_write((lib_storage_file_writer *)opaque,
-        bytes, byte_count);
+                                         bytes, byte_count);
 }
 
 static lib_status app_snapshot_read(void *opaque, lib_u8 *bytes,
-    lib_size byte_count)
+                                    lib_size byte_count)
 {
     return lib_storage_file_reader_read((lib_storage_file_reader *)opaque,
-        bytes, byte_count);
+                                        bytes, byte_count);
 }
 
 static void app_command_complete_snapshot(app_command_context *command,
-    app_command_action action, lib_status status, lib_bool was_paused,
-    app_command_effect *effect)
+                                          app_command_action action, lib_status status, lib_bool was_paused,
+                                          app_command_effect *effect)
 {
-    app_snapshot_result pending = action == APP_COMMAND_ACTION_SAVE_STATE ?
-        (status == LIB_STATUS_OK ? APP_SNAPSHOT_RESULT_SAVED :
-            APP_SNAPSHOT_RESULT_SAVE_FAILED) : APP_SNAPSHOT_RESULT_LOADED;
-    if (action == APP_COMMAND_ACTION_SAVE_STATE && was_paused) {
+    app_snapshot_result pending = action == APP_COMMAND_ACTION_SAVE_STATE ? (status == LIB_STATUS_OK ? APP_SNAPSHOT_RESULT_SAVED : APP_SNAPSHOT_RESULT_SAVE_FAILED) : APP_SNAPSHOT_RESULT_LOADED;
+    if (action == APP_COMMAND_ACTION_SAVE_STATE && was_paused)
+    {
         clear(effect);
         if (status == LIB_STATUS_OK)
             message(effect->text, sizeof(effect->text),
-                "Machine saved and paused.");
+                    "Machine saved and paused.");
         else
             message(effect->text, sizeof(effect->text),
-                "Cannot save machine state.");
+                    "Cannot save machine state.");
         prompt(&command->session);
         effect->arm_prompt = 1;
         return;
     }
     if (status == LIB_STATUS_OK ||
         (action == APP_COMMAND_ACTION_SAVE_STATE &&
-            common_machine_state_get(command->machine) == COMMON_MACHINE_PAUSED)) {
+         common_machine_state_get(command->machine) == COMMON_MACHINE_PAUSED))
+    {
         command->session.pending_snapshot = pending;
         command->session.transition_pending = 1;
         command->session.prompt_due = 0;
         clear(effect);
         return;
     }
-    reject(&command->session, effect, action == APP_COMMAND_ACTION_SAVE_STATE ?
-        "Cannot save machine state." : "Cannot load machine state.");
+    reject(&command->session, effect, action == APP_COMMAND_ACTION_SAVE_STATE ? "Cannot save machine state." : "Cannot load machine state.");
 }
 
 static void app_command_save_state(app_command_context *command,
-    const char *path, app_command_effect *effect)
+                                   const char *path, app_command_effect *effect)
 {
     lib_storage_file_writer *writer = NULL;
     lib_bool was_paused = common_machine_state_get(command->machine) ==
-        COMMON_MACHINE_PAUSED;
+                          COMMON_MACHINE_PAUSED;
     lib_status status = lib_storage_file_writer_open(path,
-        LIB_STORAGE_FILE_WRITER_TRUNCATE, &writer);
+                                                     LIB_STORAGE_FILE_WRITER_TRUNCATE, &writer);
     if (status == LIB_STATUS_OK)
         status = common_machine_read_state(command->machine,
-            &(common_machine_state_writer) { app_snapshot_write, writer });
+                                           &(common_machine_state_writer){app_snapshot_write, writer});
     if (writer != NULL && lib_storage_file_writer_close(writer) != LIB_STATUS_OK &&
         status == LIB_STATUS_OK)
         status = LIB_STATUS_IO_ERROR;
     app_command_complete_snapshot(command, APP_COMMAND_ACTION_SAVE_STATE,
-        status, was_paused, effect);
+                                  status, was_paused, effect);
 }
 
 static void app_command_load_state(app_command_context *command,
-    const char *path, app_command_effect *effect)
+                                   const char *path, app_command_effect *effect)
 {
     lib_storage_file_reader *reader = NULL;
     lib_status status = lib_storage_file_reader_open(path, &reader);
-    if (status == LIB_STATUS_OK) {
+    if (status == LIB_STATUS_OK)
+    {
         status = common_machine_write_state(command->machine,
-            &(common_machine_state_reader) { app_snapshot_read, reader });
+                                            &(common_machine_state_reader){app_snapshot_read, reader});
     }
     if (reader != NULL && lib_storage_file_reader_close(reader) != LIB_STATUS_OK &&
-        status == LIB_STATUS_OK) status = LIB_STATUS_IO_ERROR;
+        status == LIB_STATUS_OK)
+        status = LIB_STATUS_IO_ERROR;
     app_command_complete_snapshot(command, APP_COMMAND_ACTION_LOAD_STATE,
-        status, LIB_FALSE, effect);
+                                  status, LIB_FALSE, effect);
 }
 
 void app_command_provider_open(void *opaque,
-    common_session_command_result *out)
+                               common_session_command_result *out)
 {
     app_command_context *command = (app_command_context *)opaque;
-    app_command_effect effect = { 0 };
+    app_command_effect effect = {0};
     app_command_session_open(&command->session, &effect);
     app_command_copy_effect(command, out, &effect);
 }
 
 void app_command_provider_reject_line(void *opaque,
-    common_session_command_result *out)
+                                      common_session_command_result *out)
 {
     app_command_context *command = (app_command_context *)opaque;
-    app_command_effect effect = { 0 };
+    app_command_effect effect = {0};
     app_command_session_reject_line(&command->session, &effect);
     app_command_copy_effect(command, out, &effect);
 }
 
 static void app_command_copy_debug(app_command_context *command,
-    common_session_machine_state state, const common_debug_result *result,
-    common_session_command_result *out)
+                                   common_session_machine_state state, const common_debug_result *result,
+                                   common_session_command_result *out)
 {
     out->detail = result->text;
     (void)snprintf(command->debug_prompt, sizeof(command->debug_prompt), "%s", result->prompt);
-    if (!result->keep_active) {
+    if (!result->keep_active)
+    {
         common_debug_close(command->debug);
         command->debug_active = LIB_FALSE;
         command->debug_completed_pending = LIB_FALSE;
     }
     if (result->lifecycle_request == COMMON_DEBUG_LIFECYCLE_RESUME &&
         app_command_session_begin_external(&command->session,
-            app_command_state(state), APP_LIFECYCLE_REQUEST_RESUME))
+                                           app_command_state(state), APP_LIFECYCLE_REQUEST_RESUME))
         out->request = COMMON_SESSION_REQUEST_RESUME;
     else if (result->lifecycle_request != COMMON_DEBUG_LIFECYCLE_NONE)
         (void)snprintf(out->text, sizeof(out->text), "Debug lifecycle request is not applicable.\r\n\r\n");
 }
 
 void app_command_provider_submit_line(void *opaque,
-    common_session_machine_state state, const char *line,
-    common_session_command_result *out)
+                                      common_session_machine_state state, const char *line,
+                                      common_session_command_result *out)
 {
     app_command_context *command = (app_command_context *)opaque;
-    app_command_effect effect = { 0 };
-    if (command->debug_active) {
-        common_debug_result result = { 0 };
+    app_command_effect effect = {0};
+    if (command->debug_active)
+    {
+        common_debug_result result = {0};
         command->debug_completed_pending = LIB_FALSE;
         lib_status status = common_debug_submit_line(command->debug, line, &result);
-        *out = (common_session_command_result) { 0 };
-        if (status != LIB_STATUS_OK) {
+        *out = (common_session_command_result){0};
+        if (status != LIB_STATUS_OK)
+        {
             (void)snprintf(out->text, sizeof(out->text), "Debug command failed.\r\n\r\n");
             common_machine_debug_cancel(command->machine);
             (void)snprintf(command->debug_prompt, sizeof(command->debug_prompt), "-");
-        } else {
+        }
+        else
+        {
             app_command_copy_debug(command, state, &result, out);
         }
         command->session.prompt_due = out->request == COMMON_SESSION_REQUEST_NONE;
@@ -592,25 +632,34 @@ void app_command_provider_submit_line(void *opaque,
         return;
     }
     app_command_session_submit_line(&command->session, app_command_state(state), line,
-        &effect);
-    if (effect.action == APP_COMMAND_ACTION_DEBUG) {
-        if (common_debug_open(command->debug, command->machine) == LIB_STATUS_OK) {
+                                    &effect);
+    if (effect.action == APP_COMMAND_ACTION_DEBUG)
+    {
+        if (common_debug_open(command->debug, command->machine) == LIB_STATUS_OK)
+        {
             command->debug_active = LIB_TRUE;
             (void)snprintf(command->debug_prompt, sizeof(command->debug_prompt), "-");
             effect.text[0] = '\0';
-        } else (void)snprintf(effect.text, sizeof(effect.text), "Cannot open debugger.\r\n\r\n");
-    } else if (effect.action == APP_COMMAND_ACTION_SAVE_STATE) {
+        }
+        else
+            (void)snprintf(effect.text, sizeof(effect.text), "Cannot open debugger.\r\n\r\n");
+    }
+    else if (effect.action == APP_COMMAND_ACTION_SAVE_STATE)
+    {
         app_command_save_state(command, effect.path, &effect);
-    } else if (effect.action == APP_COMMAND_ACTION_LOAD_STATE) {
+    }
+    else if (effect.action == APP_COMMAND_ACTION_LOAD_STATE)
+    {
         app_command_load_state(command, effect.path, &effect);
-    } else if (effect.action != APP_COMMAND_ACTION_NONE) {
-        int succeeded = effect.action == APP_COMMAND_ACTION_EJECT_FLOPPY ?
-            common_machine_set_removable_media(command->machine, NULL,
-                effect.media_mode) :
-            common_machine_set_removable_media(command->machine, effect.path,
-                effect.media_mode);
+    }
+    else if (effect.action != APP_COMMAND_ACTION_NONE)
+    {
+        int succeeded = effect.action == APP_COMMAND_ACTION_EJECT_FLOPPY ? common_machine_set_removable_media(command->machine, NULL,
+                                                                                                              effect.media_mode)
+                                                                         : common_machine_set_removable_media(command->machine, effect.path,
+                                                                                                              effect.media_mode);
         app_command_session_complete_floppy(&command->session, effect.action,
-            succeeded, &effect);
+                                            succeeded, &effect);
     }
     app_command_copy_effect(command, out, &effect);
     out->request = app_session_request(
@@ -618,33 +667,36 @@ void app_command_provider_submit_line(void *opaque,
 }
 
 lib_bool app_command_provider_begin_external(void *opaque,
-    common_session_machine_state state, common_session_request request)
+                                             common_session_machine_state state, common_session_request request)
 {
     app_command_context *command = (app_command_context *)opaque;
     return app_command_session_begin_external(&command->session,
-        app_command_state(state), app_lifecycle_request_from_session(request)) != 0;
+                                              app_command_state(state), app_lifecycle_request_from_session(request)) != 0;
 }
 
 void app_command_provider_note_runtime(void *opaque,
-    common_session_machine_state prior, common_session_machine_state completed,
-    common_session_command_result *out)
+                                       common_session_machine_state prior, common_session_machine_state completed,
+                                       common_session_command_result *out)
 {
     app_command_context *command = (app_command_context *)opaque;
-    app_command_effect effect = { 0 };
+    app_command_effect effect = {0};
     app_command_session_note_runtime(&command->session, app_command_state(prior),
-        app_machine_completed_state(completed), &effect);
+                                     app_machine_completed_state(completed), &effect);
     app_command_copy_effect(command, out, &effect);
-    if (command->debug_active) {
+    if (command->debug_active)
+    {
         command->debug_completed_pending = LIB_FALSE;
-        common_debug_machine_state state = completed == COMMON_SESSION_MACHINE_PAUSED ?
-            COMMON_DEBUG_MACHINE_PAUSED : completed == COMMON_SESSION_MACHINE_RUNNING ?
-            COMMON_DEBUG_MACHINE_RUNNING : COMMON_DEBUG_MACHINE_STOPPED;
-        common_debug_result result = { 0 };
-        if (common_debug_observe_machine(command->debug, state, LIB_STATUS_OK, &result) != LIB_STATUS_OK) {
+        common_debug_machine_state state = completed == COMMON_SESSION_MACHINE_PAUSED ? COMMON_DEBUG_MACHINE_PAUSED : completed == COMMON_SESSION_MACHINE_RUNNING ? COMMON_DEBUG_MACHINE_RUNNING
+                                                                                                                                                                  : COMMON_DEBUG_MACHINE_STOPPED;
+        common_debug_result result = {0};
+        if (common_debug_observe_machine(command->debug, state, LIB_STATUS_OK, &result) != LIB_STATUS_OK)
+        {
             (void)snprintf(out->text, sizeof(out->text), "Debug command failed.\r\n\r\n");
             common_machine_debug_cancel(command->machine);
             (void)snprintf(command->debug_prompt, sizeof(command->debug_prompt), "-");
-        } else if (result.prompt_ready) {
+        }
+        else if (result.prompt_ready)
+        {
             command->debug_completed = result;
             command->debug_completed_pending = LIB_TRUE;
         }
@@ -652,33 +704,34 @@ void app_command_provider_note_runtime(void *opaque,
 }
 
 void app_command_provider_note_broker(void *opaque,
-    common_session_machine_state state, lib_bool vm_console_current,
-    lib_bool monitor_running_surface)
+                                      common_session_machine_state state, lib_bool vm_console_current,
+                                      lib_bool monitor_running_surface)
 {
     app_command_context *command = (app_command_context *)opaque;
     app_command_session_note_broker(&command->session, app_command_state(state),
-        vm_console_current != 0, monitor_running_surface != 0);
+                                    vm_console_current != 0, monitor_running_surface != 0);
 }
 
 void app_command_provider_note_monitor_current(void *opaque,
-    lib_bool current, common_session_command_result *out)
+                                               lib_bool current, common_session_command_result *out)
 {
     app_command_context *command = (app_command_context *)opaque;
-    app_command_effect effect = { 0 };
+    app_command_effect effect = {0};
     app_command_session_note_monitor_current(&command->session, current != 0,
-        &effect);
+                                             &effect);
     app_command_copy_effect(command, out, &effect);
-    if (current && command->debug_completed_pending) {
+    if (current && command->debug_completed_pending)
+    {
         command->debug_completed_pending = LIB_FALSE;
         app_command_copy_debug(command, COMMON_SESSION_MACHINE_PAUSED,
-            &command->debug_completed, out);
+                               &command->debug_completed, out);
         out->arm_prompt = out->request == COMMON_SESSION_REQUEST_NONE;
     }
     app_command_set_prompt(command, out);
 }
 
 lib_status app_command_initialize(app_command_context *command,
-    common_machine *machine, common_session_display display)
+                                  common_machine *machine, common_session_display display)
 {
     if (command == NULL || machine == NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
@@ -690,5 +743,6 @@ lib_status app_command_initialize(app_command_context *command,
 
 void app_command_dispose(app_command_context *command)
 {
-    if (command != NULL) common_debug_destroy(command->debug);
+    if (command != NULL)
+        common_debug_destroy(command->debug);
 }
