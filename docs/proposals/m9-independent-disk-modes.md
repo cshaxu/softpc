@@ -126,6 +126,14 @@ removable-media and the monitor grammar remain excluded until S2. `media_mode`
 is removed rather than retained as a parser alias; test-only legacy literals
 prove rejection and cannot conceal a production shared mode.
 
+#### S1 delivery
+
+Delivered by `b88aa2b`: App, VM and Compat now carry independent fixed-media
+modes; the snapshot archive validates its existing per-slot mode against the
+matching policy; `media_mode` is rejected. Production is +53/-29, tests are
++69/-28, and Lib/Common/OpenNT mirror are unchanged. Both widths passed all
+107 tests and packages. See [S1 record](../history/M9-T67-S1-startup-media-modes.md).
+
 ### S2 — explicit transactional floppy insertion
 
 Add the one explicit mode argument to the existing Common removable-media

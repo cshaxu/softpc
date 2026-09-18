@@ -2,29 +2,29 @@
 
 ## Current Work
 
-M9 T67 S1 is admitted: split fixed floppy/hard-disk mode plumbing and
-per-slot snapshot validation before changing the interactive floppy command.
+M9 T67 S2 is admitted: make the one removable-media request explicitly modeful
+and transactional, then require that mode in the monitor grammar.
 
-## M9 T67 S1 Packet
+## M9 T67 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner: “可以，准入实现。每个S任务开始前都要介绍如何实现的，以及代码变更估计；结束后要统计代码变更和为什么这样做是最干净的。” Standing commit/push approval applies. |
-| Objective | Replace the one startup media mode with independent floppy/hard-disk modes, reject the removed `media_mode` key, and validate snapshot slots against their own mode without changing archive bytes. |
-| Non-goals | No interactive insert grammar, Common removable-media API, GFI replacement transaction, Lib, MVDM, snapshot format, display, input or lifecycle change. |
-| Reference Baseline | T66 closed at `46d6ba3`; mode currently flows as one `media_mode` through App, VM, Compat and archive preparation. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner admitted the two-mode design and required `floppy insert [readonly | direct | overlay] [image_file_path]`; automatic serial S admission and standing commit/push approval apply. |
+| Objective | Give the existing removable-media request one explicit lib-defined mode, replace floppy media transactionally, and require mode plus exact path in the monitor command. |
+| Non-goals | No new request queue, generic media manager, Lib, MVDM, fixed-media startup, snapshot format, display, input or lifecycle semantic change. |
+| Reference Baseline | T67 S1 (`b88aa2b`) separates fixed-media startup policies and rejects `media_mode`; the live removable-media request is still path-only and GFI attach is destructive on open failure. |
 | Candidate Proposal | [Independent floppy and hard-disk media modes](../proposals/m9-independent-disk-modes.md) |
-| Files And ABI Surface | App startup configuration; VM copied options/machine state; Compat media archive private contract; product tests. No public Common or Lib ABI in S1. |
-| Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT; one executor; Compat owns host media; MVDM and Lib remain unchanged. |
-| Verification | Config parser independent/rejected-key cases; independent startup modes; media archive matching/mismatch proof; focused and full x64/x86 tests; both packages. |
-| Expected Markers | No production startup path reads a global `media_mode`; the removed key is rejected; archive receives separate floppy/hard-disk modes. |
-| Asset Needs | Existing disposable test images/fakes and package EXEs. Owner explicitly authorizes replacing the removed package INI key with the two equivalent overlay keys; no other INI setting or media changes. |
+| Files And ABI Surface | App command parser/effect/provider and documentation; Common machine's one existing copied request; VM driver/machine; Compat GFI host-media boundary; product/Common tests. No Lib or MVDM API/source. |
+| Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT; Common serializes one request but owns no media policy; VM owns live floppy policy; Compat owns candidate preparation and commit; MVDM and Lib remain unchanged. |
+| Verification | Parser accepts every valid mode and preserves exact path case; missing/unknown forms reject; Common forwards mode on its existing executor route; failed GFI insertion retains old medium; eject, stopped/paused admission, running rejection; focused and full x64/x86 tests; both packages. |
+| Expected Markers | No path-only production removable-media call; no destructive old-medium teardown before candidate validation; no lowercase transformation of image path; command/help/UI/README use one required-mode grammar. |
+| Asset Needs | Existing disposable media/fakes and package EXEs only. Preserve the owner-approved S1 INI values and all guest media. |
 | Reporting Requirements | Before code: file/ownership and estimated production/test/mirror delta. After: actual numstat, retained boundary reasons, focused/full dual-width evidence and package links. |
-| Stop Conditions | A need for Common API, interactive command, staged GFI replacement, archive-format or Lib/MVDM change moves to S2 or requires owner revision. |
-| Exit Criteria | Independent startup/archive tests and dual-width packages pass; one complete pushed P; coordinator reviews the actual diff. |
-| Original Owner Request | “磁盘访问模式有点不妙，应该是 floppy_mode 和 hard_disk_mode 分开，各自有 readonly / direct / overlay。” |
-| Similar-Issue Sweep | Search every startup/options/archive `media_mode` consumer; classify test-only legacy literals versus production paths and leave no shared production mode. |
+| Stop Conditions | Any need for a second media command route, a public Lib change, MVDM/controller policy or snapshot-format change stops the task for owner revision. |
+| Exit Criteria | One serialized modeful request, transactional candidate replacement, and exact required-mode grammar are proven by focused/full dual-width suites and packages; one complete pushed P; coordinator reviews actual diff. |
+| Original Owner Request | “floppy insert [readonly | direct | overlay] [image_file_path]，必须指定模式才能insert floppy”。 |
+| Similar-Issue Sweep | Search all `set_removable_media`, `set_floppy`, `floppy_attach`, and `floppy insert` paths; leave no path-only live insertion route, lowercased path, or destructive replacement-before-validation path. |
 
 ## Current Technical Baseline
 
@@ -58,5 +58,6 @@ per-slot snapshot validation before changing the interactive floppy command.
 
 ## Recent Governance
 
-T66 closes the admitted snapshot/component simplification ledger. T67 S1 now
-owns fixed-media mode separation; its interactive replacement work remains S2.
+T66 closes the admitted snapshot/component simplification ledger. T67 S1 is
+closed at `b88aa2b`; T67 S2 owns the one explicit, transactional removable-media
+route.
