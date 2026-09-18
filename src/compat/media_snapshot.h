@@ -34,6 +34,11 @@ lib_status softpc_media_archive_read(softpc_media_archive **archive,
    but maps its saved mode through the current product hard-disk policy. */
 lib_status softpc_media_archive_prepare(softpc_media_archive *archive,
     lib_storage_medium_mode hard_disk_mode);
+/* Returns the selected snapshot attachment after successful preparation.
+   The returned path is borrowed from the archive and is copied by the VM
+   before its first hardware reset. */
+lib_status softpc_media_archive_attachment(const softpc_media_archive *archive,
+    unsigned slot, const char **path, lib_storage_medium_mode *mode);
 lib_status softpc_media_archive_restore(softpc_media_archive *archive);
 
 #endif

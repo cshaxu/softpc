@@ -62,6 +62,11 @@ int main(void)
     cmos_post();
     assert(cmos_read_byte(CMOS_DISK, &cmos_disk) == SUCCESS);
     assert(cmos_disk == 0x30u);
+    /* Direct media owns an exclusive native lease. Repeating the same
+       attachment must reach GFI's idempotent route instead of first trying a
+       redundant readonly probe that the live direct attachment rejects. */
+    assert(softpc_machine_set_floppy(machine, floppy,
+        LIB_STORAGE_MEDIUM_DIRECT) == SOFTPC_MACHINE_OK);
     /* The mounted floppy is live machine state.  A later cold reset must not
        reopen startup configuration or discard this accepted replacement. */
     write_boot_image(replacement_floppy, 0x63u);

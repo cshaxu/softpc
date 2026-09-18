@@ -18,8 +18,6 @@ typedef struct media_slot {
     lib_u8 digest[32];
     char path[SOFTPC_MEDIA_ARCHIVE_PATH_MAX];
     media_page *pages;
-    lib_storage_medium *prepared;
-    lib_bool deferred;
 } media_slot;
 
 struct softpc_media_archive {
@@ -147,7 +145,6 @@ void softpc_media_archive_dispose(softpc_media_archive **archive)
             media_page *next = page->next;
             free(page); page = next;
         }
-        lib_storage_medium_destroy(&slot->prepared);
     }
     free(*archive); *archive = NULL;
 }
@@ -359,13 +356,10 @@ static lib_status media_prepare_slot(media_slot *slot, unsigned index,
 {
     softpc_media_view view;
     lib_storage_medium *base_opened = NULL;
-    lib_storage_medium *candidate = NULL;
     lib_storage_medium *base;
     lib_status status;
 
     slot->target_mode = target_mode;
-    slot->deferred = LIB_FALSE;
-    (void)lib_storage_medium_destroy(&slot->prepared);
     if (!slot->present) return LIB_STATUS_OK;
     media_view(index, &view);
     if (media_same_path(slot, &view) &&
@@ -378,30 +372,10 @@ static lib_status media_prepare_slot(media_slot *slot, unsigned index,
         base = base_opened;
     }
     status = verify_base(slot, base);
-    /* An overlay carries state beyond its verified base, so it must always be
-       reconstructed. Readonly/direct can retain the verified live medium. */
-    if (status == LIB_STATUS_OK && !(slot->mode != LIB_STORAGE_MEDIUM_OVERLAY &&
-        media_same_path(slot, &view) && view.mode == target_mode)) {
-        status = lib_storage_medium_open(slot->path, target_mode, &candidate);
-        if (status != LIB_STATUS_OK && media_same_path(slot, &view)) {
-            /* A current same-path lease can exclude replacement staging. The
-               already-verified base is reopened only after that lease ends. */
-            slot->deferred = LIB_TRUE;
-            status = LIB_STATUS_OK;
-        }
-    }
-    if (status == LIB_STATUS_OK && candidate != NULL &&
-        slot->mode == LIB_STORAGE_MEDIUM_OVERLAY)
-        status = media_apply_pages(slot, candidate);
-    if (status == LIB_STATUS_OK) {
-        slot->prepared = candidate;
-        candidate = NULL;
-    }
     {
         lib_status closed = lib_storage_medium_destroy(&base_opened);
         if (status == LIB_STATUS_OK) status = closed;
     }
-    (void)lib_storage_medium_destroy(&candidate);
     return status;
 }
 
@@ -414,6 +388,10 @@ lib_status softpc_media_archive_prepare(softpc_media_archive *archive,
     if (archive == NULL || hard_disk_mode > LIB_STORAGE_MEDIUM_OVERLAY)
         return LIB_STATUS_INVALID_ARGUMENT;
     archive->prepared = LIB_FALSE;
+    /* This product exposes only floppy A: and fixed disk C:.  Rejecting a
+       populated unsupported slot avoids silently claiming to restore it. */
+    if (archive->slots[1].present || archive->slots[3].present)
+        return LIB_STATUS_INVALID_ARGUMENT;
     for (i = 0; i < MEDIA_SLOTS && status == LIB_STATUS_OK; ++i) {
         media_slot *slot = &archive->slots[i];
         lib_storage_medium_mode target_mode;
@@ -421,24 +399,22 @@ lib_status softpc_media_archive_prepare(softpc_media_archive *archive,
         if (status == LIB_STATUS_OK)
             status = media_prepare_slot(slot, i, target_mode);
     }
-    if (status != LIB_STATUS_OK) {
-        for (i = 0; i < MEDIA_SLOTS; ++i)
-            (void)lib_storage_medium_destroy(&archive->slots[i].prepared);
-        return status;
-    }
+    if (status != LIB_STATUS_OK) return status;
     archive->prepared = LIB_TRUE;
     return LIB_STATUS_OK;
 }
 
-static lib_status media_open_deferred(media_slot *slot)
+lib_status softpc_media_archive_attachment(const softpc_media_archive *archive,
+    unsigned slot, const char **path, lib_storage_medium_mode *mode)
 {
-    lib_status status = lib_storage_medium_open(slot->path,
-        (lib_storage_medium_mode)slot->target_mode, &slot->prepared);
-    if (status == LIB_STATUS_OK && slot->mode == LIB_STORAGE_MEDIUM_OVERLAY)
-        status = media_apply_pages(slot, slot->prepared);
-    if (status != LIB_STATUS_OK)
-        (void)lib_storage_medium_destroy(&slot->prepared);
-    return status;
+    const media_slot *source;
+    if (archive == NULL || path == NULL || mode == NULL || !archive->prepared ||
+        slot >= MEDIA_SLOTS)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    source = &archive->slots[slot];
+    *path = source->present ? source->path : NULL;
+    *mode = (lib_storage_medium_mode)source->target_mode;
+    return LIB_STATUS_OK;
 }
 
 lib_status softpc_media_archive_restore(softpc_media_archive *archive)
@@ -447,32 +423,62 @@ lib_status softpc_media_archive_restore(softpc_media_archive *archive)
     lib_status status;
 
     if (archive == NULL || !archive->prepared) return LIB_STATUS_INVALID_STATE;
-    /* Release only a same-path lease that prevented candidate staging. */
-    for (i = 0; i < MEDIA_SLOTS; ++i) {
-        media_slot *slot = &archive->slots[i];
-        if (!slot->deferred) continue;
-        if (i < 2u)
-            status = softpc_floppy_media_restore(i, NULL,
-                (lib_storage_medium_mode)slot->target_mode, &slot->prepared, 0u);
-        else
-            status = softpc_hdd_media_restore(i - 2u, NULL,
-                (lib_storage_medium_mode)slot->target_mode, &slot->prepared);
-        if (status != LIB_STATUS_OK) return status;
-        status = media_open_deferred(slot);
-        if (status != LIB_STATUS_OK) return status;
-    }
-    for (i = 0; i < MEDIA_SLOTS; ++i) {
-        media_slot *slot = &archive->slots[i];
-        const char *path = slot->present ? slot->path : NULL;
-        if (i < 2u)
-            status = softpc_floppy_media_restore(i, path,
-                (lib_storage_medium_mode)slot->target_mode, &slot->prepared,
-                slot->cylinder);
-        else
-            status = softpc_hdd_media_restore(i - 2u, path,
-                (lib_storage_medium_mode)slot->target_mode, &slot->prepared);
-        if (status != LIB_STATUS_OK) return status;
-    }
+    /* Restore is the sole mutation phase.  A failure after detaching a live
+       attachment deliberately leaves that slot detached: preparation is the
+       no-side-effect validation boundary, not a rollback transaction. */
     archive->prepared = LIB_FALSE;
+    for (i = 0; i < MEDIA_SLOTS; ++i) {
+        media_slot *slot = &archive->slots[i];
+        softpc_media_view view;
+        lib_storage_medium *replacement = NULL;
+        lib_storage_medium_mode target = (lib_storage_medium_mode)slot->target_mode;
+        lib_bool retain;
+        media_view(i, &view);
+        if (!slot->present) {
+            if (i < 2u)
+                status = softpc_floppy_media_restore(i, NULL, target,
+                    &replacement, 0u);
+            else
+                status = softpc_hdd_media_restore(i - 2u, NULL, target,
+                    &replacement);
+            if (status != LIB_STATUS_OK) return status;
+            continue;
+        }
+        /* An overlay always carries mutable pages beyond its verified base.
+           It therefore never qualifies as a retained attachment, including
+           when the saved source itself was readonly or direct. */
+        retain = target != LIB_STORAGE_MEDIUM_OVERLAY &&
+            slot->mode != LIB_STORAGE_MEDIUM_OVERLAY &&
+            media_same_path(slot, &view) && view.mode == target;
+        if (retain) {
+            status = verify_base(slot, view.medium);
+        } else {
+            if (i < 2u)
+                status = softpc_floppy_media_restore(i, NULL, target,
+                    &replacement, 0u);
+            else
+                status = softpc_hdd_media_restore(i - 2u, NULL, target,
+                    &replacement);
+            if (status != LIB_STATUS_OK) return status;
+            status = lib_storage_medium_open(slot->path, target, &replacement);
+            if (status == LIB_STATUS_OK) status = verify_base(slot, replacement);
+            if (status == LIB_STATUS_OK && slot->mode == LIB_STORAGE_MEDIUM_OVERLAY)
+                status = media_apply_pages(slot, replacement);
+            if (status != LIB_STATUS_OK) {
+                (void)lib_storage_medium_destroy(&replacement);
+                return status;
+            }
+        }
+        if (i < 2u)
+            status = softpc_floppy_media_restore(i, slot->path, target,
+                &replacement, slot->cylinder);
+        else
+            status = softpc_hdd_media_restore(i - 2u, slot->path, target,
+                &replacement);
+        if (status != LIB_STATUS_OK) {
+            (void)lib_storage_medium_destroy(&replacement);
+            return status;
+        }
+    }
     return LIB_STATUS_OK;
 }

@@ -343,7 +343,7 @@ static int snapshot_run_save(const char *media_path, const char *snapshot_path)
     return 0;
 }
 
-static int snapshot_run_load(const char *media_path, const char *snapshot_path,
+static int snapshot_run_load(const char *startup_media_path, const char *snapshot_path,
     lib_bool expect_success)
 {
     softpc_machine_options options;
@@ -354,7 +354,11 @@ static int snapshot_run_load(const char *media_path, const char *snapshot_path,
     FILE *file = fopen(snapshot_path, "rb");
 
     assert(file != NULL);
-    snapshot_options(&options, media_path);
+    /* A new process starts with deliberately different INI media. Preparation
+       must replace those private VM attachments before the first reset, not
+       let startup configuration leak into the restored image. */
+    assert(snapshot_write_media(startup_media_path));
+    snapshot_options(&options, startup_media_path);
     if (!expect_success) options.memory_bytes = 1024u * 1024u;
     assert(softpc_machine_create(&options, &product) == SOFTPC_MACHINE_OK);
     assert(vm_driver_create(&driver, product) == LIB_STATUS_OK);
@@ -369,6 +373,7 @@ static int snapshot_run_load(const char *media_path, const char *snapshot_path,
         common_machine_destroy(machine);
         vm_driver_destroy(driver);
         softpc_machine_destroy(product);
+        assert(remove(startup_media_path) == 0);
         return 0;
     }
     assert(common_machine_write_state(machine,
@@ -404,6 +409,7 @@ static int snapshot_run_load(const char *media_path, const char *snapshot_path,
     common_machine_destroy(machine);
     vm_driver_destroy(driver);
     softpc_machine_destroy(product);
+    assert(remove(startup_media_path) == 0);
     return 0;
 }
 

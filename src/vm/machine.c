@@ -44,6 +44,7 @@ struct softpc_machine {
     int hardware_initialized;
     int cpu_initialized;
     char floppy_path[SOFTPC_MEDIA_PATH_MAX];
+    char hard_disk_path[SOFTPC_MEDIA_PATH_MAX];
     char serial_output_path[SOFTPC_MEDIA_PATH_MAX];
     char printer_output_path[SOFTPC_MEDIA_PATH_MAX];
 };
@@ -82,6 +83,15 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
         }
         memcpy(machine->floppy_path, options->floppy_path, length + 1u);
         machine->options.floppy_path = machine->floppy_path;
+    }
+    if (options->hard_disk_path != NULL) {
+        size_t length = strlen(options->hard_disk_path);
+        if (length >= sizeof(machine->hard_disk_path)) {
+            free(machine);
+            return SOFTPC_MACHINE_INVALID_ARGUMENT;
+        }
+        memcpy(machine->hard_disk_path, options->hard_disk_path, length + 1u);
+        machine->options.hard_disk_path = machine->hard_disk_path;
     }
     if (options->serial_output_path != NULL) {
         size_t length = strlen(options->serial_output_path);
@@ -206,12 +216,37 @@ uint32_t softpc_machine_memory_bytes(const softpc_machine *machine)
     return (uint32_t)machine->memory_bytes;
 }
 
-lib_status softpc_machine_prepare_media(const softpc_machine *machine,
+lib_status softpc_machine_prepare_media(softpc_machine *machine,
     softpc_media_archive *archive)
 {
+    const char *floppy_path;
+    const char *hard_disk_path;
+    lib_storage_medium_mode floppy_mode;
+    lib_storage_medium_mode hard_disk_mode;
+    lib_status status;
     if (machine == NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    return softpc_media_archive_prepare(archive,
-        machine->options.hard_disk_mode);
+    status = softpc_media_archive_prepare(archive, machine->options.hard_disk_mode);
+    if (status != LIB_STATUS_OK) return status;
+    status = softpc_media_archive_attachment(archive, 0u, &floppy_path,
+        &floppy_mode);
+    if (status == LIB_STATUS_OK)
+        status = softpc_media_archive_attachment(archive, 2u, &hard_disk_path,
+            &hard_disk_mode);
+    if (status != LIB_STATUS_OK ||
+        (floppy_path != NULL && strlen(floppy_path) >= sizeof(machine->floppy_path)) ||
+        (hard_disk_path != NULL && strlen(hard_disk_path) >= sizeof(machine->hard_disk_path)))
+        return status == LIB_STATUS_OK ? LIB_STATUS_LIMIT_EXCEEDED : status;
+    if (floppy_path == NULL) machine->floppy_path[0] = '\0';
+    else memcpy(machine->floppy_path, floppy_path, strlen(floppy_path) + 1u);
+    if (hard_disk_path == NULL) machine->hard_disk_path[0] = '\0';
+    else memcpy(machine->hard_disk_path, hard_disk_path, strlen(hard_disk_path) + 1u);
+    machine->options.floppy_path = machine->floppy_path[0] == '\0' ? NULL :
+        machine->floppy_path;
+    machine->options.hard_disk_path = machine->hard_disk_path[0] == '\0' ? NULL :
+        machine->hard_disk_path;
+    machine->options.floppy_mode = floppy_mode;
+    machine->options.hard_disk_mode = hard_disk_mode;
+    return LIB_STATUS_OK;
 }
 
 softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,
@@ -254,7 +289,7 @@ softpc_machine_result softpc_machine_set_floppy(softpc_machine *machine,
     if (path != NULL) {
         length = strlen(path);
         if (length >= sizeof(machine->floppy_path) ||
-            !softpc_machine_media_exists(path))
+            (!machine->hardware_initialized && !softpc_machine_media_exists(path)))
             return SOFTPC_MACHINE_INVALID_ARGUMENT;
     }
     if (machine->hardware_initialized &&

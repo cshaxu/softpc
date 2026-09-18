@@ -178,6 +178,27 @@ Exit proof: the matrix covers every target outcome, floppy restoration ignores
 INI path/mode, failed preparation retains the existing media, and dual-width
 focused/full tests plus both packages pass.
 
+### S4 — pure snapshot-media preparation and clean restoration
+
+S3 preflight must derive target modes and verify the saved base without keeping
+an open candidate medium. The verifier closes before any direct target open.
+The archive exposes the selected copied floppy/fixed attachment only to the VM,
+which copies it into its private current-machine configuration before the first
+reset. Ordinary first boot still uses INI configuration; a snapshot first boot
+uses the snapshot attachment from the outset.
+
+Restore owns every media mutation. A target overlay is always rebuilt from a
+clean base before saved overlay pages are applied, so an existing overlay can
+never leak post-snapshot dirty pages. Matching readonly/direct media may be
+verified and retained. A replacement that requires a new target medium detaches
+the old one before opening the new one. If that new mount fails, the slot may
+remain detached; the owner explicitly accepts this contract. No rollback state
+or second candidate transaction is retained.
+
+Exit proof: fresh direct loads no longer conflict with a verifier, clean overlay
+restores discard later dirty data, an uninitialized snapshot load mounts saved
+paths/modes before reset, and every conversion cell passes in both widths.
+
 
 ## Constraints and acceptance
 

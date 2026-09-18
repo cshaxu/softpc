@@ -212,6 +212,51 @@ int main(void)
     assert(views[2].mode==LIB_STORAGE_MEDIUM_OVERLAY);
     softpc_media_archive_dispose(&saved);
 
+    /* Preparation has no retained verifier: a fresh direct target can open
+       after the readonly base check closes. */
+    attach(0,path,LIB_STORAGE_MEDIUM_DIRECT);
+    assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
+    assert(lib_storage_medium_destroy(&views[0].medium)==LIB_STATUS_OK);
+    views[0].path=NULL;
+    assert(softpc_media_archive_prepare(saved,
+        LIB_STORAGE_MEDIUM_DIRECT)==LIB_STATUS_OK);
+    {
+        const char *attachment;
+        lib_storage_medium_mode mode;
+        assert(softpc_media_archive_attachment(saved,0u,&attachment,&mode)==LIB_STATUS_OK);
+        assert(strcmp(attachment,path)==0 && mode==LIB_STORAGE_MEDIUM_DIRECT);
+    }
+    assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
+    assert(views[0].mode==LIB_STORAGE_MEDIUM_DIRECT);
+    softpc_media_archive_dispose(&saved);
+
+    /* A readonly snapshot restored to an overlay never retains pages dirtied
+       after capture in the previously live overlay. */
+    attach(2,second_path,LIB_STORAGE_MEDIUM_READONLY);
+    assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
+    attach(2,second_path,LIB_STORAGE_MEDIUM_OVERLAY);
+    assert(lib_storage_medium_fill_at(views[2].medium,1024,1,0x99)==LIB_STATUS_OK);
+    assert(softpc_media_archive_prepare(saved,
+        LIB_STORAGE_MEDIUM_OVERLAY)==LIB_STATUS_OK);
+    assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
+    assert(lib_storage_medium_read_at(views[2].medium,1024,data,1)==LIB_STATUS_OK);
+    assert(data[0]==0u);
+    softpc_media_archive_dispose(&saved);
+
+    /* Once restore begins, it owns the destructive handoff. A vanished
+       replacement is reported and the prior attachment is not resurrected. */
+    attach(2,third_path,LIB_STORAGE_MEDIUM_READONLY);
+    assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
+    attach(2,second_path,LIB_STORAGE_MEDIUM_READONLY);
+    assert(softpc_media_archive_prepare(saved,
+        LIB_STORAGE_MEDIUM_READONLY)==LIB_STATUS_OK);
+    assert(remove(third_path)==0);
+    assert(softpc_media_archive_restore(saved)!=LIB_STATUS_OK);
+    assert(views[2].medium==NULL);
+    file=fopen(third_path,"wb"); assert(file!=NULL);
+    assert(fwrite(base,1,sizeof(base),file)==sizeof(base)); assert(fclose(file)==0);
+    softpc_media_archive_dispose(&saved);
+
     /* Overlay pages reject a readonly fixed-disk policy, but a direct policy
        materializes them into the saved base before attaching that base direct. */
     attach(2,second_path,LIB_STORAGE_MEDIUM_OVERLAY);
