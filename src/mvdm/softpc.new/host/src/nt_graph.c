@@ -1608,15 +1608,11 @@ static void check_win_size(register int height)
 
 #ifdef SOFTPC_STANDALONE
 #ifdef V7VGA
-    /* The V7 painter's proprietary byte modes define their display width in
-       the controller table.  Resolve the current controller mode, rather
-       than consulting the last BIOS request, because a windowed guest may
-       reprogram the controller while retaining that historical request. */
-    {
-        half_word video_mode = v7vga_current_mode();
-        if (!alpha_num_mode() && video_mode >= 0x60 && video_mode <= 0x69)
-            width = vd_ext_graph_table[video_mode - 0x60].mode_screen_cols << 3;
-    }
+    /* The selected packed painter emits one pixel per source byte, unlike
+       the standard VGA painter's doubled pixels.  Use its row contract,
+       not BIOS bookkeeping which need not describe the active display. */
+    if (paint_screen == nt_paint_funcs->v7vga_hi_graph)
+        width = get_bytes_per_line();
 #endif
 #endif
 

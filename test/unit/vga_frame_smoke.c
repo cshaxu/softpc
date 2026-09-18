@@ -517,6 +517,23 @@ static void verify_driver_geometry(softpc_machine *machine)
         assert(softpc_machine_presentation_dib(machine, &bits, &info,
             &width, &height));
         assert(width == widths[index]);
+        if (get_256_colour_mode() && get_seq_chain4_mode() && get_chain4_mode()) {
+            extern IU8 c_sas_hw_at(IU32 addr);
+            extern void c_sas_store(IU32 addr, IU8 val);
+            IU8 saved_mode = c_sas_hw_at(0x449u);
+            unsigned bda_mode;
+            for (bda_mode = 0; bda_mode <= 0x1du; ++bda_mode) {
+                /* BIOS bookkeeping alone cannot change the active packed
+                   painter's geometry; no display register is written here. */
+                c_sas_store(0x449u, (IU8)bda_mode);
+                choose_display_mode();
+                assert(softpc_machine_presentation_dib(machine, &bits, &info,
+                    &width, &height));
+                assert(width == widths[index]);
+            }
+            c_sas_store(0x449u, saved_mode);
+            choose_display_mode();
+        }
         while (softpc_machine_presentation_take_dirty(machine, &left, &top,
                 &right, &bottom)) { }
         softpc_standalone_dib_invalidate_all();

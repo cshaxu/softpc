@@ -6,6 +6,14 @@ M9 T69 S2 is closed at the owner's direction with remaining defects transferred
 to S3. T69 stays open. S3 investigates occasional doubled width, fullscreen
 corruption and broken windowed text after the fullscreen roundtrip.
 
+S3 P1 has reproduced BIOS-record-dependent width with unchanged registers.
+The bounded correction replaces the host packed-mode table override with the
+existing painter's one-byte/one-pixel row contract. Both packages build and the
+VGA smoke passes on x86/x64. Each full run is 106/108: the two package monitor
+tests fail at stage 16; no controlled baseline comparison establishes cause.
+The previous label "current-controller geometry" was inaccurate: the helper
+reads BIOS bookkeeping. Actual Win3.1 roundtrip acceptance remains outstanding.
+
 ## M9 T69 S3 Packet
 
 | Field | Required record |

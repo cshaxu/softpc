@@ -154,7 +154,7 @@ S2 将先记录首次窗口化与全屏往返两条路径的 completed surface g
 顺序与 copied frame geometry；只在最早发生差异的 owner 修复。不得以保留最后宽度、
 Window debounce、模式编号或 Prompt/PIF 名称判断来掩盖该差异。
 
-### S2 证据与收敛方向
+### S2 当时的解释（S3 已纠正，见下文）
 
 审计确认 Compat、VM copied-frame extraction 与 KVM Window 都不推导几何：Compat 仅绑定
 原始 DIB，VM 逐字节复制其 width/height/stride，KVM Window 只绘制 frame。完整 surface 的
@@ -238,3 +238,53 @@ with original source, following register writes through cached C-VID state.
 Then distinguish incorrect video RAM from incorrect painter interpretation
 and stale host publication. Retain the initial-windowed versus fullscreen-first
 discriminator. Actual code estimates follow identification of the owner.
+
+### S3 P1: packed painter geometry, not BIOS mode identity
+
+The S2 description of `v7vga_current_mode()` as register-derived geometry was
+incorrect. It reads the BIOS data byte at physical 0x449 (with a V7 latch for
+extended text). It is suitable for the existing BIOS services, not for deciding
+the physical painter's width. Changing only that byte in a 640x400 packed
+display produced widths 1280, 752, 720, 800 and 1024 without any display-register
+write. This is a deterministic host geometry defect; it does not yet establish
+which bytes/registers Win3.1 changes during each reported excursion.
+
+The existing painter selection already distinguishes standard VGA doubled
+pixels from V7 sequential-chain4 packed pixels. `vga_graph_update()` passes
+`get_bytes_per_line()` to that painter; `nt_v7vga_hi_graph_std()` emits exactly
+one destination pixel per byte. The host therefore uses this same row width
+when that packed painter is selected, deleting its BIOS mode-table override.
+It checks the selected painter directly rather than duplicating register-based
+selection; standard EGA/CGA/VGA painters retain their distinct pixel contracts.
+No new mode identity, guest test, retry or downstream filter is added. Other
+painters and the prior settle gate are unchanged in this bounded correction.
+
+Estimated scope: one host bridge and one existing test; production net decrease.
+Actual code: `nt_graph.c` +5/-9; `vga_frame_smoke.c` +17/-0. The regression varies
+BIOS records 00h..1dh across the four packed modes, twice, without changing
+registers, and verifies unchanged width; existing geometry and pixel tests stay.
+The earlier x64 isolated probe returned 1280 for BIOS 12h/13h at the same
+80 characters, 8-bit character width, 256-colour, seq-chain4/chain4 state.
+
+This does not close S3: fullscreen corruption, windowed text corruption,
+actual Win3.1 width excursions and sustained mode-write starvation still need
+their own causal evidence. In particular, the earlier generation-delay test
+proves rearming, not that two quiet ticks are a hardware transaction boundary.
+
+Similar-issue sweep: `check_win_size()` remains the DIB-size owner; Compat bind
+and VM copying are unchanged. The original non-packed BIOS-dependent fallback
+is retained for now because CGA/EGA/text host scaling differs; this P does not
+claim it valid for arbitrary direct register programming. BIOS-service callers
+of `v7vga_current_mode()` retain their separate mode-reporting responsibility.
+The exact current `nt_graph.c` versus OpenNT diff is +75/-20 (Git no-index),
+four fewer added mirror lines than the previous bridge. No new source file,
+state field, interface or timer was introduced.
+
+Verification: both `tests-x64` and `tests-x86` builds succeeded, refreshing the
+two package EXEs. Final VGA smoke passed independently on both. Final full
+CTest runs each passed 106/108; `softpc-package-smoke` and
+`softpc-package-compact-console` failed at Window lifecycle stage 16. No
+controlled baseline comparison was made, so they are not dismissed as
+unrelated. Documentation governance and whitespace checks passed. Owner INI
+and HDD image were unchanged. S3 stays open; this is P1, not acceptance of
+the remaining display-roundtrip symptoms.

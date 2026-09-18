@@ -24,7 +24,7 @@ Compat 在 outer end 才把累计 damage 交给 VM copied-frame 路径。此窄�
 P2/P3 的来源分类逻辑，x86/x64 transaction 与 V7 frame smoke 覆盖 bind、嵌套、palette、
 pointer 及连续未消费 damage；不新增原始机器行为分支。
 
-### T69 S2 V7 当前控制器几何
+### T69 S2 V7 BIOS 模式查询（S3 纠正宿主用途）
 
 `base/video/v7_video.c` 增加 `v7vga_current_mode()`，只把原已散落在
 `ega_vide.c` 的 V7 register/latch 解码集中为一个事实查询；三处既有调用以它替代重复
@@ -34,6 +34,14 @@ pointer 及连续未消费 damage；不新增原始机器行为分支。
 register、painter、dirty transaction 或 Compat/VM/KVM API。`egavideo.h` 的声明是这项
 原有 V7 controller 事实的内部可见性配套。测试故意使历史 mode 与仍有效的 V7 controller
 编码不一致，仍断言 640x400 DIB；双宽度 `softpc-vga-frame-smoke` 通过。
+
+以上 S2 的“controller 当前模式”解释不准确：该查询读取 BIOS 0x449，
+并非物理几何。S3 P1 保留其原有 BIOS 服务用途，但移除 host 宽度查询：
+在既有 packed painter 选择条件下，DIB 宽度直接采用该 painter 的源行字节数，
+一字节对应一像素。直接检查已选画笔，不复制选择逻辑。
+`nt_graph.c` 相对上次提交 +5/-9；不改控制器或原始 painter。
+模式记录单独变化会导致旧实现 640→1280 的探针，以及四种 packed 模式的
+00h..1dh BIOS 记录矩阵，限定证明这一个 host-surface port-ABI 缺口。
 
 ### T69 S3 detached text-surface clear
 
