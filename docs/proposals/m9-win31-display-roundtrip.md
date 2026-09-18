@@ -70,8 +70,9 @@ Window 打开、全屏后恢复 Window、Win3.1 `edit` 往返、普通 DOS `cls`
 完成后编译双 EXE、执行 x86/x64 全量测试，记录真实模式往返验证结果，
 提交推送供用户复核。无法复现时记录环境与观察，不声称修复完成。
 
-当前 S1 已完成文本 surface 修复，正按下述第二轮结论修复图形帧发布边界；在
-所有者复核前不关闭该任务。
+S1 已完成并保留文本 surface 修复。其后图形发布的两个提交曾试图通过来源
+分类压住症状；所有者已拒绝该方向。它们不是完成方案；仍未收口的 T69 S1 将删除
+并以统一事务取代。
 
 ## S1 第二轮结论：临时 DIB 被错误发布为完成图形帧
 
@@ -86,18 +87,33 @@ MS-DOS 提示符设为窗口启动时，KVM Window 在正常宽度和约两倍�
 于把尚未由原始 painter 写入的零化临时 DIB 发布为真实画面。KVM Window 正确地
 按这些源帧调整，所以不能在 Window 侧加过滤或尺寸特判。
 
-最小正确修复的第一步已完成：DIB bind 只分配/替换原始 painter 的 destination，
-并清除上一 destination 遗留 dirty。所有者的后续复现证明这还不是完整边界：
-V7 hardware pointer 是 Compat 内的独立 overlay，移动鼠标会直接以 32×32 dirty
-发布 DIB；palette 更新也可发布整幅 dirty。若它们发生在 bind 后、原始 painter
-完成新 surface 前，仍会把临时 640/1280 DIB 当成完成帧。
+S1 P2/P3 的错误在于，把“谁写入了 surface”变成发布决策：原始 painter、V7
+pointer 与 palette 被拆成不同入口，`painter_ready` 又把首个 dirty 当成完成信号。
+这既是来源特判，也解释了用户看到的残余跳宽和卡顿；它必须整体移除，而不是继续
+补条件。
 
-最终合同是每次 bind 开启一个 private painter generation：原始 painter 的首个 dirty
-区域（可以是合理的局部更新）才打开它；此前 V7 overlay 和 palette 只能更新其本地
-状态，不能发布。dirty 矩形覆盖面积不是“绘制完成”的信号：用全幅矩形作门槛会压住
-正常局部刷新并让机器严重卡顿。bind 的 generation 改变还必须使旧 pointer
-background cache 失效，避免把旧 DIB 像素恢复到同尺寸的新 DIB。快照重建已在完整
-原始刷新之后显式 `invalidate_all`，保留它作为强制提交路径。这不改变 MVDM、Lib、
-Common 或 VM，也不把 1280 宽度武断视为错误；它只保证 overlay 不会把未完成的
-geometry 对外发布。测试须证明 bind/原始 painter/overlay/palette 的准入、pointer
-generation 失效及显式全帧发布。
+## S1 修订方案：唯一 display-update transaction
+
+原始图形更新已有通用边界：`host_start_update()` 和 `host_end_update()`。所有正常
+文本/图形更新在原始 `gfx_updt.c` 中以这对 callback 包围绘制；原始 NT host 的
+`nt_end_update()` 恰为空，因此 standalone Compat 可以在不解释任何客户机模式的前提
+下接上它。
+
+唯一模型如下：
+
+```text
+host_start_update  -> 开始未公开的 staging transaction
+bind / painter / palette / pointer mutation -> 更新同一 staging surface，合并 damage
+host_end_update    -> 唯一提交点：发布当前 geometry + pixels + palette + damage
+```
+
+bind 从不发布，任何写入者也不能直接发布；没有 `overlay` API、没有
+`painter_ready`、没有按 dirty 面积/来源/V7 模式决定可见性的条件。未发生 update 的
+bind 保持私有。`host_flush_screen()` 已走原始 update 算法，因而仍由同一结束边界提交。
+必要的镜像改动只能是原有 `nt_start_update()` / `nt_end_update()` 各调用一次 Compat
+bridge；这是一项机械 host-ABI 接线，不变更客户机控制器、绘制排序或产品 API。
+
+本轮同时审计目前 `check_win_size()` 中的 standalone V7 宽度分支。若它只是为掩盖
+错误的输入几何，须删除并由统一 transaction/正确的原始几何得到答案；若原始模型
+确实缺少该 host geometry，则必须以可证明的一般 host geometry contract 取代，不能
+保留 mode-number 条件。
