@@ -410,3 +410,14 @@ recorded above. All four diagnostic processes exited, with small bounded logs;
 their disposable captures/logs/target artifacts are removed after recording
 these findings. S3 remains open for the transient non-packed publication audit
 and the separately reported text/fullscreen corruption.
+
+The follow-up real-PIF trace observes the transient 1280 DIB with
+display-disabled=0 and mode-change-required=1. Instrumenting both DIB damage
+and the dirty-consumption boundary produces no damage or take record for
+that transient allocation; the ordinary original mode-selection scheduling
+returns to 640 before painting it. This rules out consumer sampling as the
+reason that this run missed a wide frame, but does not establish a hardware
+blanking guarantee: display was enabled. Original update routines check
+display-disabled and the host countdown delays painting during mode selection;
+neither is a general CPU-addressing/scanout separation. Temporary instrumentation
+and build wiring are removed. No production change follows from this trace.
