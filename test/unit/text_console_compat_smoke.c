@@ -18,6 +18,40 @@ static unsigned char attribute_at(const unsigned char *cells,
     return cells[(row * stride + column) * cell_bytes + 1u];
 }
 
+static void verify_dib_bind_does_not_publish(void)
+{
+    BITMAPINFO info;
+    SMALL_RECT rect;
+    long left;
+    long top;
+    long right;
+    long bottom;
+
+    ZeroMemory(&info, sizeof(info));
+    info.bmiHeader.biSize = sizeof(info.bmiHeader);
+    info.bmiHeader.biWidth = 640;
+    info.bmiHeader.biHeight = -480;
+    info.bmiHeader.biPlanes = 1;
+    info.bmiHeader.biBitCount = 8;
+    assert(softpc_standalone_dib_bind(&info));
+    assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+
+    rect.Left = 3;
+    rect.Top = 4;
+    rect.Right = 5;
+    rect.Bottom = 6;
+    assert(softpc_standalone_invalidate_dibits(NULL, &rect));
+    assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    assert(left == 3 && top == 4 && right == 5 && bottom == 6);
+
+    info.bmiHeader.biWidth = 1280;
+    assert(softpc_standalone_dib_bind(&info));
+    assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    softpc_standalone_dib_invalidate_all();
+    assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    assert(left == 0 && top == 0 && right == 1279 && bottom == 479);
+}
+
 int main(void)
 {
     const void *surface;
@@ -34,6 +68,7 @@ int main(void)
     unsigned long index;
 
     assert(softpc_standalone_dib_init());
+    verify_dib_bind_does_not_publish();
     assert(softpc_standalone_text_surface(&surface, &columns, &rows, &stride,
         &cell_bytes));
     assert(surface != NULL && columns == 80u && rows == 50u &&

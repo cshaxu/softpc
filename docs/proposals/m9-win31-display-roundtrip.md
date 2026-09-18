@@ -19,7 +19,7 @@
 路由与 Edit 触发的显示状态变化之间的失配。这里的全屏是客户机显示状态，
 不是要求新增宿主无边框全屏功能。
 
-## S1 调研结论：Compat 文本 Console 模型缺口
+## S1 第一轮结论：Compat 文本 Console 模型缺口
 
 最早的已证实失配在 `src/compat/graphics_console_compat.c`，不在 Lib、
 Common 或 presenter：
@@ -68,4 +68,25 @@ Console 的旁路。`ScrollConsoleScreenBuffer()` 与 `WriteConsoleA()` 同样�
 完成后编译双 EXE、执行 x86/x64 全量测试，记录真实模式往返验证结果，
 提交推送供用户复核。无法复现时记录环境与观察，不声称修复完成。
 
-当前 Td 只完成提案与队列迁移；不产生代码、构建或运行验证结论。
+当前 S1 已完成文本 surface 修复，正按下述第二轮结论修复图形帧发布边界；在
+所有者复核前不关闭该任务。
+
+## S1 第二轮结论：临时 DIB 被错误发布为完成图形帧
+
+文本 surface 修复后，所有者在纯 Window 模式复现了更深一层问题：Win3.1
+MS-DOS 提示符设为窗口启动时，KVM Window 在正常宽度和约两倍宽度之间反复
+跳动；提示符窗口切到客户机全屏以及 Win95 Setup 的加载阶段也会花屏或跳宽。
+追踪已证明这不是 KVM Window 的尺寸计算：在同一 graphics 模式内，VM 上游
+交替发布 640x480 与 1280x480 帧。
+
+责任边界在 Compat：原始 `graphicsResize()` 为绘制器准备 DIB destination 时会
+短暂重绑几何。`softpc_standalone_dib_bind()` 把每次绑定都标成全幅 dirty，等价
+于把尚未由原始 painter 写入的零化临时 DIB 发布为真实画面。KVM Window 正确地
+按这些源帧调整，所以不能在 Window 侧加过滤或尺寸特判。
+
+最小正确修复是：DIB bind 只分配/替换原始 painter 的 destination，并清除上一
+destination 遗留 dirty；只有原始 `InvalidateConsoleDIBits()` 才发布实际绘制的
+dirty frame。快照恢复在完成重建后已有显式 `invalidate_all`，该路径必须保留。
+这不改变 MVDM、Lib、Common 或 VM，也不假定 1280 宽度永远错误；它只消除错误
+的第二发布入口。测试须证明 bind 不发布、painter dirty 发布、显式全帧发布仍
+有效。

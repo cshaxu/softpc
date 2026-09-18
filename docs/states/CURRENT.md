@@ -2,23 +2,23 @@
 
 ## Current Work
 
-M9 T69 S1 is admitted: restore the standalone Compat text-Console operations
-that update the shared presentation surface.
+M9 T69 S1 is admitted: restore the standalone Compat presentation publication
+contract for Win3.1 prompt display-mode transitions.
 
 ## M9 T69 S1 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | New |
-| Admission And Approval | This packet's read-only investigation proved that Compat reports text Console fills successful without mutating `textBuffer`. Owner then approved a correct repair, build, test, commit and push within the same bounded defect task. Standing commit/push approval applies. |
-| Objective | Restore the original text-Console clear contract in the standalone Compat host so Win3.1 prompt and client-fullscreen-to-raw-Console presentation consume a correctly cleared shared text surface. |
+| Admission And Approval | S1 first proved and repaired missing Compat text-surface fills. Owner's subsequent Window-only reproduction proved that repair insufficient: the source trace alternates completed-looking 640x480 and 1280x480 graphics frames during guest mode setup. Owner requested a correct repair, build, test, commit and push within the same bounded defect task. Standing commit/push approval applies. |
+| Objective | Restore the standalone Compat publication contract so only a real original painter update makes a graphics frame observable; transient DIB destination bindings must never resize or corrupt the KVM Window. |
 | Non-goals | No forced repaint, CLS special case, customer image/configuration change, focus/input repair, Lib/Common/VM API change, or MVDM mirror change. Do not implement an unused generalized terminal/scroll system. |
-| Reference Baseline | S1 proved `nt_clear_screen()` and `prepare_surface()` call original fill APIs while `softpc_compat_fill_console_character/attribute()` return success without writing the text surface. `GetConsoleScreenBufferInfo()` incorrectly returns pixel geometry as cell geometry. |
+| Reference Baseline | The first repair established that text fills mutate `textBuffer` and report character-grid geometry. The new source trace proves the VM publishes alternating 640x480/1280x480 graphics frames before KVM Window. `softpc_standalone_dib_bind()` currently marks each temporary destination as a full dirty frame even before original paint. |
 | Candidate Proposal | [Win3.1 MS-DOS prompt display roundtrip repair](../proposals/m9-win31-display-roundtrip.md) |
-| Files And ABI Surface | `src/compat/dib_surface.[ch]` owns the text-surface mutation primitive; `src/compat/graphics_console_compat.c` maps original Console fill calls to it; one Compat-focused test and its CMake registration. No public product ABI changes. |
+| Files And ABI Surface | `src/compat/dib_surface.[ch]` owns text-surface mutation and DIB publication; `src/compat/graphics_console_compat.c` maps original Console fill calls to it; one Compat-focused test proves binding versus actual publication. No public product ABI changes. |
 | Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT and PRODUCT UI. One shared text-surface owner remains required; no presenter or native Console bypass is introduced. |
-| Verification | Prove characters and attributes fill independently, zero-origin full surface fill clears all exposed cells, coordinates/counts clamp at the cell-grid boundary, and reported count equals actual writes. Run x86/x64 focused test and full suite; build both package EXEs. |
-| Expected Markers | Compat reports character-grid geometry, both original fill operations mutate the shared `textBuffer`, and VM's normal copied frame can observe the update. |
+| Verification | Prove characters and attributes fill independently, zero-origin full surface fill clears all exposed cells, coordinates/counts clamp at the cell-grid boundary, and reported count equals actual writes. Prove DIB bind emits no dirty frame, a painter dirty rectangle does, and explicit full invalidation still does. Run x86/x64 focused test and full suite; build both package EXEs. |
+| Expected Markers | Compat reports character-grid geometry, both original fill operations mutate the shared `textBuffer`; DIB binding clears only stale pending dirtiness; original dirty calls and explicit snapshot invalidation remain observable. |
 | Asset Needs | Existing owner package/media only; no image writes. Refresh only package EXEs, preserving the owner INI. |
 | Reporting Requirements | Record changed-path line accounting, all original Console-operation call sites/disposition, focused proof, full regression and manual Win3.1 route checklist. |
 | Stop Conditions | Any evidence requiring a Lib/Common/VM API or MVDM mirror change stops S1 for owner approval. Any unrelated Console operation found reachable becomes a separately proposed S. |

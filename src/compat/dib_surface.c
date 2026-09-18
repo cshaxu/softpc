@@ -181,15 +181,12 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info)
     CGADIB = painter_info;
     EGADIB = painter_info;
     VGADIB = painter_info;
-    /* The original renderer creates a new Console graphics buffer on a
-       text-to-graphics transition.  A standalone frontend must receive one
-       frame for that new buffer even before the first guest dirty rectangle;
-       otherwise it continues presenting the stale text surface forever. */
-    softpc_dib_dirty.Left = 0;
-    softpc_dib_dirty.Top = 0;
-    softpc_dib_dirty.Right = (SHORT)(width - 1);
-    softpc_dib_dirty.Bottom = (SHORT)(height - 1);
-    softpc_dib_dirty_valid = 1;
+    /* Binding only gives the original painter a destination.  It is not a
+       completed guest frame: graphics setup can bind transient geometries
+       before the painter emits its first dirty rectangle.  Discard any dirty
+       rectangle belonging to the previous destination; real pixels become
+       visible exclusively through InvalidateConsoleDIBits. */
+    softpc_dib_dirty_valid = 0;
     if (getenv("SOFTPC_DIB_TRACE") != NULL) {
         fprintf(stderr, "softpc dib bind %dx%dx%d\n", width, height,
             bits_per_pixel);
