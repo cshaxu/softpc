@@ -29,8 +29,8 @@ lib_status softpc_media_archive_read(softpc_media_archive **archive,
 /* Validates configured bases before reset, and stages fresh overlay leases.
    Only slot A and disk 0 are currently configured by the product. */
 lib_status softpc_media_archive_prepare(softpc_media_archive *archive,
-    const char *floppy_path, const char *hard_disk_path,
-    lib_storage_medium_mode mode);
+    const char *floppy_path, lib_storage_medium_mode floppy_mode,
+    const char *hard_disk_path, lib_storage_medium_mode hard_disk_mode);
 lib_status softpc_media_archive_restore(softpc_media_archive *archive);
 
 #endif

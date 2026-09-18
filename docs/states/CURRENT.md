@@ -2,7 +2,29 @@
 
 ## Current Work
 
-No implementation subtask is active. T66 is closed after owner validation.
+M9 T67 S1 is admitted: split fixed floppy/hard-disk mode plumbing and
+per-slot snapshot validation before changing the interactive floppy command.
+
+## M9 T67 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner: “可以，准入实现。每个S任务开始前都要介绍如何实现的，以及代码变更估计；结束后要统计代码变更和为什么这样做是最干净的。” Standing commit/push approval applies. |
+| Objective | Replace the one startup media mode with independent floppy/hard-disk modes, reject the removed `media_mode` key, and validate snapshot slots against their own mode without changing archive bytes. |
+| Non-goals | No interactive insert grammar, Common removable-media API, GFI replacement transaction, Lib, MVDM, snapshot format, display, input or lifecycle change. |
+| Reference Baseline | T66 closed at `46d6ba3`; mode currently flows as one `media_mode` through App, VM, Compat and archive preparation. |
+| Candidate Proposal | [Independent floppy and hard-disk media modes](../proposals/m9-independent-disk-modes.md) |
+| Files And ABI Surface | App startup configuration; VM copied options/machine state; Compat media archive private contract; product tests. No public Common or Lib ABI in S1. |
+| Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT; one executor; Compat owns host media; MVDM and Lib remain unchanged. |
+| Verification | Config parser independent/rejected-key cases; independent startup modes; media archive matching/mismatch proof; focused and full x64/x86 tests; both packages. |
+| Expected Markers | No production startup path reads a global `media_mode`; the removed key is rejected; archive receives separate floppy/hard-disk modes. |
+| Asset Needs | Existing disposable test images/fakes and package EXEs. Owner explicitly authorizes replacing the removed package INI key with the two equivalent overlay keys; no other INI setting or media changes. |
+| Reporting Requirements | Before code: file/ownership and estimated production/test/mirror delta. After: actual numstat, retained boundary reasons, focused/full dual-width evidence and package links. |
+| Stop Conditions | A need for Common API, interactive command, staged GFI replacement, archive-format or Lib/MVDM change moves to S2 or requires owner revision. |
+| Exit Criteria | Independent startup/archive tests and dual-width packages pass; one complete pushed P; coordinator reviews the actual diff. |
+| Original Owner Request | “磁盘访问模式有点不妙，应该是 floppy_mode 和 hard_disk_mode 分开，各自有 readonly / direct / overlay。” |
+| Similar-Issue Sweep | Search every startup/options/archive `media_mode` consumer; classify test-only legacy literals versus production paths and leave no shared production mode. |
 
 ## Current Technical Baseline
 
@@ -36,4 +58,5 @@ No implementation subtask is active. T66 is closed after owner validation.
 
 ## Recent Governance
 
-T66 closes the admitted snapshot/component simplification ledger. Queue ordering is unchanged.
+T66 closes the admitted snapshot/component simplification ledger. T67 S1 now
+owns fixed-media mode separation; its interactive replacement work remains S2.

@@ -32,7 +32,8 @@ int main(void)
 
     /* This probe covers executor exit, not direct-media persistence. Keep its
        fixture host-owned so its deletion has no CRT handle-timing dependency. */
-    options.media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    options.floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    options.hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY;
 
     /* jmp $: execution must leave only through the outer lifecycle request. */
     sector[0] = 0xebu;

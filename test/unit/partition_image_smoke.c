@@ -82,7 +82,8 @@ int main(void)
     unsigned int slice;
 
     softpc_partition_write_image(path);
-    options.media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    options.floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    options.hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     for (slice = 0u; slice < 16u; ++slice)

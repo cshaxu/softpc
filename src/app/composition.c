@@ -87,7 +87,8 @@ lib_status app_composition_run(const app_startup_config *config)
     options.floppy_path = config->floppy_path[0] == '\0' ? NULL : config->floppy_path;
     options.hard_disk_path = config->hard_disk_path[0] == '\0' ? NULL : config->hard_disk_path;
     options.memory_bytes = config->memory_bytes;
-    options.media_mode = config->media_mode;
+    options.floppy_mode = config->floppy_mode;
+    options.hard_disk_mode = config->hard_disk_mode;
     options.serial_output_path = config->serial_output_path[0] == '\0' ? NULL :
         config->serial_output_path;
     options.printer_output_path = config->printer_output_path[0] == '\0' ? NULL :

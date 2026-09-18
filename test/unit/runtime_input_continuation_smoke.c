@@ -82,7 +82,8 @@ int main(void)
     assert(fclose(image) == 0);
     image = NULL;
 
-    options.media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    options.floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    options.hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(app_runtime_create(machine, &runtime));
     assert(app_runtime_start(runtime));

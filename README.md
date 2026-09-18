@@ -60,8 +60,8 @@ Run a width's complete regression with `cmake --build --preset tests-x64` then
 the two x86 toolchain variables. The presets validate that the selected
 compiler pointer width and package architecture agree.
 
-`softpc.ini` has five `key=value` keys: `memory_mb`, `floppy`, `hard_disk`,
-`display` (`console` or `window`), and `media_mode`. Both media keys may be
+`softpc.ini` has seven `key=value` keys: `memory_mb`, `floppy`, `hard_disk`,
+`display` (`console` or `window`), `floppy_mode`, and `hard_disk_mode`. Both media keys may be
 set together, creating fixed `A:` and `C:` slots; the machine boots `A:`
 first, then `C:`. The launchers accept no command-line parameters and always
 load the `softpc.ini` beside themselves; relative image paths are relative to
@@ -75,7 +75,7 @@ BOP instruction table; it has no NTVDM, DOS/WOW, VDD or product-service
 dispatcher.  Fixed firmware, raw-media storage and console/Win32
 presentation are supplied by the standalone VM, not a product host.
 
-Set `media_mode` to choose how both configured images are attached:
+Set `floppy_mode` and `hard_disk_mode` independently to choose how each configured image is attached:
 `readonly` passes writes back to the original controller as write-protected,
 `direct` writes the source image files directly, and `overlay` loads both
 images into RAM at startup and directs all guest writes to those volatile

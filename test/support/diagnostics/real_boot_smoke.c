@@ -360,7 +360,8 @@ int main(int argc, char **argv)
             require_prompt = 1;
             slices = SOFTPC_PROMPT_SLICES;
         } else if (strcmp(argv[index], "--overlay") == 0) {
-            options.media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+            options.floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+            options.hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY;
         } else goto usage;
     }
     if (options.floppy_path == NULL && options.hard_disk_path == NULL) {

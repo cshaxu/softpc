@@ -11,7 +11,8 @@ typedef struct vm_options {
     const char *serial_output_path;
     const char *printer_output_path;
     lib_u32 memory_bytes;
-    lib_storage_medium_mode media_mode;
+    lib_storage_medium_mode floppy_mode;
+    lib_storage_medium_mode hard_disk_mode;
 } vm_options;
 
 /* Composition creates the process's one concrete backend and injects its driver.

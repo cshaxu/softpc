@@ -18,13 +18,9 @@ hard_disk=...               ; optional
 hard_disk_mode=direct       ; readonly | direct | overlay
 ```
 
-Absent mode keys retain the safe `overlay` default independently. For source
-configuration compatibility only, a legacy `media_mode` with neither dedicated
-mode key remains accepted and initializes both modes to its value. Mixing
-`media_mode` with either dedicated key is a configuration error: key order must
-not silently select a policy. New documentation and generated examples use only
-the two dedicated keys. This is parser compatibility, not a second runtime
-media model.
+Absent mode keys retain the safe `overlay` default independently. `media_mode`
+is removed and rejected as an unknown configuration key. There is one canonical
+representation and no order-dependent compatibility policy.
 
 Drive A replacement is explicit:
 
@@ -97,7 +93,7 @@ Consequences remain direct and auditable:
 
 | Candidate | Disposition required for completion |
 | --- | --- |
-| Global `media_mode` in app/vm/machine startup | Replace with independent values; retain only order-independent parser compatibility for legacy configuration. |
+| Global `media_mode` in app/vm/machine startup | Replace with independent values and reject the removed key. |
 | Path-only removable-media Common/VM call | Extend its one existing request with explicit mode; do not create a second insertion path. |
 | Destructive GFI replacement | Commit only after candidate preparation; preserve old medium on failure. |
 | Snapshot global-mode validation | Split by floppy and hard-disk mode without changing archive bytes/order. |
@@ -112,12 +108,23 @@ Replace the single App/VM/Machine startup mode with `floppy_mode` and
 `hard_disk_mode`; attach each original backend with its own mode. Change media
 archive preparation to validate the two modes by slot. Update startup, archive,
 config and package parsing tests for mixed pairs, including floppy-overlay plus
-hard-disk-direct and the legacy parser rule. No Common API or interactive
-command grammar changes in this step.
+hard-disk-direct and rejection of the removed shared key. No Common API or
+interactive command grammar changes in this step.
 
 Exit proof: mixed startup media opens correctly; snapshot capture/restore
 accepts matching independent modes and rejects mismatches; both widths pass
 focused and full regression and package builds.
+
+#### S1 admission
+
+T67 S1 is admitted. Its frozen production search universe is startup-config
+parsing, `vm_options`/`softpc_machine_options`, startup attachment and
+`softpc_media_archive_prepare()`. The initial inspection identifies App
+configuration/composition, VM driver/machine, and Compat archive preparation;
+test-only option initializers follow the copied options contract. Common
+removable-media and the monitor grammar remain excluded until S2. `media_mode`
+is removed rather than retained as a parser alias; test-only legacy literals
+prove rejection and cannot conceal a production shared mode.
 
 ### S2 — explicit transactional floppy insertion
 
@@ -137,8 +144,10 @@ focused tests, then x86/x64 full regression and package builds.
 - No Lib or preserved MVDM source changes.
 - No change to snapshot binary layout, CPU/device timing, display, input or
   lifecycle semantics.
-- `assets/binary/softpc.ini` remains owner-owned and is never edited by this
-  task; its legacy key remains runnable through the explicit parser rule.
+- Owner explicitly authorizes replacing `media_mode` in `assets/binary/softpc.ini`
+  with equivalent `floppy_mode=overlay` and `hard_disk_mode=overlay` entries.
+  No other INI setting or media changes; package refresh otherwise changes only
+  EXEs.
 - Each admitted S reports actual production/test and protected-mirror numstat,
   runs both widths, refreshes only package EXEs, commits and pushes before the
   next S.

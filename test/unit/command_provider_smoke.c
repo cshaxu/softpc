@@ -733,8 +733,10 @@ static void trace_cli(common_machine *machine, common_machine_debug_lease *lease
 static void check_vm_owner(const char *path)
 {
     vm_options options = { .floppy_path = path,
-        .media_mode = LIB_STORAGE_MEDIUM_OVERLAY };
-    vm_options invalid = { .media_mode = LIB_STORAGE_MEDIUM_OVERLAY };
+        .floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY,
+        .hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY };
+    vm_options invalid = { .floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY,
+        .hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY };
     vm_driver *first = NULL, *second = NULL;
     common_machine_driver driver;
     unsigned int index;
@@ -761,7 +763,8 @@ int main(void)
     unsigned char sector[512] = { 0xeb, 0xfe };
     FILE *file;
     softpc_machine_options options = { .floppy_path = path,
-        .media_mode = LIB_STORAGE_MEDIUM_OVERLAY };
+        .floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY,
+        .hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY };
     softpc_machine *product = NULL;
     vm_driver *adapter = NULL;
     common_machine_driver driver = { 0 };

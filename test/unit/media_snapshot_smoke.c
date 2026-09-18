@@ -81,6 +81,7 @@ static void check_sha256(void)
 int main(void)
 {
     const char *path = "media-snapshot-base.img";
+    const char *second_path = "media-snapshot-second-base.img";
     softpc_media_archive *saved=NULL, *decoded=NULL;
     bytes_stream stream={0};
     lib_u8 base[8704]={0}, data[8704];
@@ -88,6 +89,8 @@ int main(void)
     unsigned slot;
     check_sha256();
     file=fopen(path,"wb"); assert(file!=NULL);
+    assert(fwrite(base,1,sizeof(base),file)==sizeof(base)); assert(fclose(file)==0);
+    file=fopen(second_path,"wb"); assert(file!=NULL);
     assert(fwrite(base,1,sizeof(base),file)==sizeof(base)); assert(fclose(file)==0);
     attach(0,path,LIB_STORAGE_MEDIUM_OVERLAY);
     attach(2,path,LIB_STORAGE_MEDIUM_OVERLAY);
@@ -102,9 +105,12 @@ int main(void)
     assert(softpc_media_archive_write(saved,write_bytes,&stream)==LIB_STATUS_OK);
     assert(softpc_media_archive_read(&decoded,read_bytes,&stream)==LIB_STATUS_OK);
     assert(stream.position==stream.count);
-    assert(softpc_media_archive_prepare(decoded,path,path,LIB_STORAGE_MEDIUM_READONLY)!=LIB_STATUS_OK);
-    assert(softpc_media_archive_prepare(decoded,NULL,path,LIB_STORAGE_MEDIUM_OVERLAY)!=LIB_STATUS_OK);
-    assert(softpc_media_archive_prepare(decoded,path,path,LIB_STORAGE_MEDIUM_OVERLAY)==LIB_STATUS_OK);
+    assert(softpc_media_archive_prepare(decoded,path,LIB_STORAGE_MEDIUM_READONLY,
+        path,LIB_STORAGE_MEDIUM_OVERLAY)!=LIB_STATUS_OK);
+    assert(softpc_media_archive_prepare(decoded,NULL,LIB_STORAGE_MEDIUM_OVERLAY,
+        path,LIB_STORAGE_MEDIUM_OVERLAY)!=LIB_STATUS_OK);
+    assert(softpc_media_archive_prepare(decoded,path,LIB_STORAGE_MEDIUM_OVERLAY,
+        path,LIB_STORAGE_MEDIUM_OVERLAY)==LIB_STATUS_OK);
     /* A later write must not survive replacement, including an old dirty page. */
     assert(lib_storage_medium_fill_at(views[0].medium,1024,512,0xee)==LIB_STATUS_OK);
     views[0].cylinder=0;
@@ -150,18 +156,34 @@ int main(void)
         attach(0,path,(lib_storage_medium_mode)mode);
         assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
         assert(saved->slots[0].page_count==0);
-        assert(softpc_media_archive_prepare(saved,path,NULL,(lib_storage_medium_mode)mode)==LIB_STATUS_OK);
+        assert(softpc_media_archive_prepare(saved,path,(lib_storage_medium_mode)mode,
+            NULL,LIB_STORAGE_MEDIUM_OVERLAY)==LIB_STATUS_OK);
         assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
         assert(lib_storage_medium_destroy(&views[0].medium)==LIB_STATUS_OK);
         /* The saved external base must not silently change after capture. */
         file=fopen(path,"r+b"); assert(file!=NULL);
         assert(fputc(0x77,file)==0x77); assert(fclose(file)==0);
-        assert(softpc_media_archive_prepare(saved,path,NULL,(lib_storage_medium_mode)mode)!=LIB_STATUS_OK);
+        assert(softpc_media_archive_prepare(saved,path,(lib_storage_medium_mode)mode,
+            NULL,LIB_STORAGE_MEDIUM_OVERLAY)!=LIB_STATUS_OK);
         file=fopen(path,"r+b"); assert(file!=NULL);
         assert(fputc(0,file)==0); assert(fclose(file)==0);
         softpc_media_archive_dispose(&saved);
     }
+    /* Each configured device has its own policy; archive preparation must not
+       accidentally validate both present slots against one shared mode. */
+    attach(0,path,LIB_STORAGE_MEDIUM_OVERLAY);
+    attach(2,second_path,LIB_STORAGE_MEDIUM_DIRECT);
+    assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
+    assert(softpc_media_archive_prepare(saved,path,LIB_STORAGE_MEDIUM_OVERLAY,
+        second_path,LIB_STORAGE_MEDIUM_DIRECT)==LIB_STATUS_OK);
+    assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
+    assert(softpc_media_archive_prepare(saved,path,LIB_STORAGE_MEDIUM_DIRECT,
+        second_path,LIB_STORAGE_MEDIUM_OVERLAY)!=LIB_STATUS_OK);
+    softpc_media_archive_dispose(&saved);
+    assert(lib_storage_medium_destroy(&views[0].medium)==LIB_STATUS_OK);
+    assert(lib_storage_medium_destroy(&views[2].medium)==LIB_STATUS_OK);
     assert(remove(path)==0);
+    assert(remove(second_path)==0);
     puts("media archive: overlay replacement, modes, SHA-256 and malformed streams passed");
     return 0;
 }

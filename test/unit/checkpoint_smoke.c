@@ -924,7 +924,8 @@ int main(void)
     assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
     assert(fclose(file) == 0);
     options.floppy_path = path;
-    options.media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    options.floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    options.hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     assert(softpc_machine_create(&options, &probe.machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_write_physical(probe.machine, 0x500u, outer,

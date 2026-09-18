@@ -152,7 +152,8 @@ int main(void)
 
     options.hard_disk_path = "assets/media/win31_en_installed.img";
     options.memory_bytes = 16u * 1024u * 1024u;
-    options.media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    options.floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    options.hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     REQUIRE(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     REQUIRE(app_runtime_create(machine, &runtime));
     app_runtime_set_frame_sink(runtime, receive_frame, &frame_probe);

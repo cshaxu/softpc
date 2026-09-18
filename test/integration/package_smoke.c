@@ -94,8 +94,10 @@ static int verify_fixed_ini(void)
             if (!resolve_package_value(value, floppy, sizeof(floppy))) valid = 0;
         } else if (strcmp(key, "hard_disk") == 0) {
             if (!resolve_package_value(value, hard_disk, sizeof(hard_disk))) valid = 0;
-        } else if (strcmp(key, "media_mode") == 0 &&
-            strcmp(value, "overlay") != 0 && strcmp(value, "readonly") != 0) {
+        } else if ((strcmp(key, "floppy_mode") == 0 ||
+            strcmp(key, "hard_disk_mode") == 0) &&
+            strcmp(value, "overlay") != 0 && strcmp(value, "readonly") != 0 &&
+            strcmp(value, "direct") != 0) {
             valid = 0;
         } else if (strcmp(key, "display") == 0) {
             package_window_display = strcmp(value, "window") == 0;

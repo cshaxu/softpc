@@ -66,7 +66,8 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
     if (machine_out != NULL) *machine_out = NULL;
     if (options == NULL || machine_out == NULL ||
         (options->floppy_path == NULL && options->hard_disk_path == NULL) ||
-        options->media_mode > LIB_STORAGE_MEDIUM_OVERLAY ||
+        options->floppy_mode > LIB_STORAGE_MEDIUM_OVERLAY ||
+        options->hard_disk_mode > LIB_STORAGE_MEDIUM_OVERLAY ||
         !softpc_machine_media_exists(options->floppy_path) ||
         !softpc_machine_media_exists(options->hard_disk_path))
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
@@ -164,10 +165,10 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     /* The media has to exist before original CMOS, FDC and fixed-disk POST
        query their respective configuration and host controller hooks. */
     if (!softpc_platform_hdd_attach(machine->options.hard_disk_path,
-        machine->options.media_mode))
+        machine->options.hard_disk_mode))
         return SOFTPC_MACHINE_IO_ERROR;
     if (!softpc_platform_floppy_attach(machine->options.floppy_path,
-        machine->options.media_mode))
+        machine->options.floppy_mode))
         return SOFTPC_MACHINE_IO_ERROR;
     /* This public standalone operation is the monitor's cold-start boundary,
        not the guest's hardware warm-reset line.  Reusing `machine` after a
@@ -207,7 +208,8 @@ lib_status softpc_machine_prepare_media(const softpc_machine *machine,
 {
     if (machine == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     return softpc_media_archive_prepare(archive, machine->options.floppy_path,
-        machine->options.hard_disk_path, machine->options.media_mode);
+        machine->options.floppy_mode, machine->options.hard_disk_path,
+        machine->options.hard_disk_mode);
 }
 
 softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,
@@ -253,7 +255,7 @@ softpc_machine_result softpc_machine_set_floppy(softpc_machine *machine,
             return SOFTPC_MACHINE_INVALID_ARGUMENT;
     }
     if (machine->hardware_initialized &&
-        !softpc_platform_floppy_attach(path, machine->options.media_mode))
+        !softpc_platform_floppy_attach(path, machine->options.floppy_mode))
         return SOFTPC_MACHINE_IO_ERROR;
     if (path == NULL) machine->floppy_path[0] = '\0';
     else {

@@ -22,7 +22,8 @@ typedef struct softpc_machine_options {
     const char *floppy_path;
     const char *hard_disk_path;
     uint32_t memory_bytes;
-    lib_storage_medium_mode media_mode;
+    lib_storage_medium_mode floppy_mode;
+    lib_storage_medium_mode hard_disk_mode;
     /* Optional standalone host endpoints for the original COM1/LPT1 host
        contracts. NULL retains their bounded virtual sinks. */
     const char *serial_output_path;

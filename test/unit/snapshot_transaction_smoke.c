@@ -141,7 +141,8 @@ static void snapshot_options(softpc_machine_options *options, const char *path)
     *options = (softpc_machine_options) { 0 };
     options->floppy_path = path;
     options->hard_disk_path = path;
-    options->media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    options->floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    options->hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY;
 }
 
 /* The executor is parked for these direct host-media fixture operations. */

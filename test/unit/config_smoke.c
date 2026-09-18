@@ -23,24 +23,27 @@ lib_status lib_storage_file_read_owned(const char *path, lib_size limit,
 int main(void)
 {
     app_startup_config config = { {0}, {0}, {0}, {0}, 16u * 1024u * 1024u,
-        COMMON_SESSION_DISPLAY_CONSOLE, 1, LIB_STORAGE_MEDIUM_OVERLAY };
+        COMMON_SESSION_DISPLAY_CONSOLE, 1, LIB_STORAGE_MEDIUM_OVERLAY,
+        LIB_STORAGE_MEDIUM_OVERLAY };
     char path[SOFTPC_CONFIG_PATH_MAX] = "disk.img";
     input = "# comment\r\n; comment\r\nfloppy = \"disk.img\"\r\n"
-        "memory_mb=32\ndisplay=window\nconsole_control=0\nmedia_mode=readonly\n";
+        "memory_mb=32\ndisplay=window\nconsole_control=0\n"
+        "floppy_mode=readonly\nhard_disk_mode=readonly\n";
     assert(app_load_startup_config("unused", &config));
     assert(strcmp(config.floppy_path, "disk.img") == 0);
     assert(config.memory_bytes == 32u * 1024u * 1024u);
     assert(config.presentation == COMMON_SESSION_DISPLAY_WINDOW);
     assert(config.console_control == 0);
-    assert(config.media_mode == LIB_STORAGE_MEDIUM_READONLY);
-    input = "media_mode=direct\ndisplay=console\nconsole_control=1\n";
+    assert(config.floppy_mode == LIB_STORAGE_MEDIUM_READONLY);
+    assert(config.hard_disk_mode == LIB_STORAGE_MEDIUM_READONLY);
+    input = "floppy_mode=direct\nhard_disk_mode=readonly\ndisplay=console\nconsole_control=1\n";
     assert(app_load_startup_config("unused", &config));
-    assert(config.media_mode == LIB_STORAGE_MEDIUM_DIRECT);
+    assert(config.floppy_mode == LIB_STORAGE_MEDIUM_DIRECT);
+    assert(config.hard_disk_mode == LIB_STORAGE_MEDIUM_READONLY);
     assert(config.presentation == COMMON_SESSION_DISPLAY_CONSOLE);
     assert(config.console_control == 1);
     input = "media_mode=overlay\n";
-    assert(app_load_startup_config("unused", &config));
-    assert(config.media_mode == LIB_STORAGE_MEDIUM_OVERLAY);
+    assert(!app_load_startup_config("unused", &config));
     input = "memory_mb=0";
     assert(!app_load_startup_config("unused", &config));
     input = "display=invalid";

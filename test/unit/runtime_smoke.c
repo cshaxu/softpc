@@ -72,7 +72,8 @@ int main(void)
     uint32_t first_run;
     runtime_completion_probe completion_probe = { 0 };
 
-    options.media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    options.floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    options.hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     sector[0] = 0xebu;
     sector[1] = 0xfeu;
     sector[510] = 0x55u;

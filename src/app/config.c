@@ -29,6 +29,18 @@ static int app_copy_value(char *target, const char *value)
     return 1;
 }
 
+static int app_parse_media_mode(const char *value, lib_storage_medium_mode *out)
+{
+    if (strcmp(value, "readonly") == 0)
+        *out = LIB_STORAGE_MEDIUM_READONLY;
+    else if (strcmp(value, "direct") == 0)
+        *out = LIB_STORAGE_MEDIUM_DIRECT;
+    else if (strcmp(value, "overlay") == 0)
+        *out = LIB_STORAGE_MEDIUM_OVERLAY;
+    else return 0;
+    return 1;
+}
+
 int app_get_config_path(char *path)
 {
     DWORD length = GetModuleFileNameA(NULL, path, SOFTPC_CONFIG_PATH_MAX);
@@ -151,14 +163,12 @@ int app_load_startup_config(const char *path,
             if (strcmp(value, "0") == 0) config->console_control = 0;
             else if (strcmp(value, "1") == 0) config->console_control = 1;
             else goto invalid;
-        } else if (strcmp(key, "media_mode") == 0) {
-            if (strcmp(value, "readonly") == 0)
-                config->media_mode = LIB_STORAGE_MEDIUM_READONLY;
-            else if (strcmp(value, "direct") == 0)
-                config->media_mode = LIB_STORAGE_MEDIUM_DIRECT;
-            else if (strcmp(value, "overlay") == 0)
-                config->media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
-            else goto invalid;
+        } else if (strcmp(key, "floppy_mode") == 0) {
+            if (!app_parse_media_mode(value, &config->floppy_mode))
+                goto invalid;
+        } else if (strcmp(key, "hard_disk_mode") == 0) {
+            if (!app_parse_media_mode(value, &config->hard_disk_mode))
+                goto invalid;
         } else goto invalid;
         line = next;
     }

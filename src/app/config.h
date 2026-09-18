@@ -14,7 +14,8 @@ typedef struct app_startup_config {
     lib_u32 memory_bytes;
     common_session_display presentation;
     int console_control;
-    lib_storage_medium_mode media_mode;
+    lib_storage_medium_mode floppy_mode;
+    lib_storage_medium_mode hard_disk_mode;
 } app_startup_config;
 
 int app_get_config_path(char *path);
