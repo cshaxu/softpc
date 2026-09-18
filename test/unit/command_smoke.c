@@ -175,6 +175,17 @@ int main(void)
     app_command_session_complete_floppy(&session, effect.action, 1, &effect);
     assert(strstr(effect.text, "Floppy ejected") != NULL);
     assert_blank_line(effect.text);
+    arm(&session, NULL);
+    app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
+        "floppy insert direct Mixed-Case.img", &effect);
+    assert(effect.action == APP_COMMAND_ACTION_INSERT_FLOPPY);
+    assert(effect.media_mode == LIB_STORAGE_MEDIUM_DIRECT);
+    assert(!strcmp(effect.path, "Mixed-Case.img"));
+    arm(&session, NULL);
+    app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
+        "floppy insert Mixed-Case.img", &effect);
+    assert(strstr(effect.text, "Usage: floppy insert <readonly|direct|overlay> <image> | eject") != NULL);
+    assert_blank_line(effect.text);
     app_command_session_submit_line(&session, APP_MONITOR_RUNNING,
         "save setup-before-failure.spcs", &effect);
     assert(effect.action == APP_COMMAND_ACTION_SAVE_STATE);

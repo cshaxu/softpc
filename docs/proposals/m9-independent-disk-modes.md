@@ -147,6 +147,7 @@ Exit proof: no path-only insertion symbol or documentation remains; the Common
 request has one route; old-medium retention and all mode combinations pass
 focused tests, then x86/x64 full regression and package builds.
 
+
 ## Constraints and acceptance
 
 - No Lib or preserved MVDM source changes.

@@ -142,6 +142,17 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
            have to exist before the renderer host is initialized. */
         if (!softpc_platform_video_buffers_init())
             return SOFTPC_MACHINE_IO_ERROR;
+        /* Startup media is mounted once with the hardware.  A cold reset
+           resets guest devices only; it retains the live media objects and
+           their overlays, including a later monitor-driven floppy swap. */
+        if (!softpc_platform_hdd_attach(machine->options.hard_disk_path,
+            machine->options.hard_disk_mode))
+            return SOFTPC_MACHINE_IO_ERROR;
+        if (!softpc_platform_floppy_attach(machine->floppy_path[0] == '\0' ? NULL :
+            machine->floppy_path, machine->options.floppy_mode)) {
+            softpc_platform_hdd_detach();
+            return SOFTPC_MACHINE_IO_ERROR;
+        }
         machine->hardware_initialized = 1;
     }
     /* c_cpu_init creates the CCPU's per-thread simulation-stack facility.
@@ -162,14 +173,6 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
        A standalone first boot needs them before its original FDC POST. */
     q_event_init();
     tic_event_init();
-    /* The media has to exist before original CMOS, FDC and fixed-disk POST
-       query their respective configuration and host controller hooks. */
-    if (!softpc_platform_hdd_attach(machine->options.hard_disk_path,
-        machine->options.hard_disk_mode))
-        return SOFTPC_MACHINE_IO_ERROR;
-    if (!softpc_platform_floppy_attach(machine->options.floppy_path,
-        machine->options.floppy_mode))
-        return SOFTPC_MACHINE_IO_ERROR;
     /* This public standalone operation is the monitor's cold-start boundary,
        not the guest's hardware warm-reset line.  Reusing `machine` after a
        stopped run must therefore repeat the original cold initialisation
@@ -244,10 +247,11 @@ softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,
 }
 
 softpc_machine_result softpc_machine_set_floppy(softpc_machine *machine,
-    const char *path)
+    const char *path, lib_storage_medium_mode mode)
 {
     size_t length;
-    if (machine == NULL) return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    if (machine == NULL || mode > LIB_STORAGE_MEDIUM_OVERLAY)
+        return SOFTPC_MACHINE_INVALID_ARGUMENT;
     if (path != NULL) {
         length = strlen(path);
         if (length >= sizeof(machine->floppy_path) ||
@@ -255,7 +259,7 @@ softpc_machine_result softpc_machine_set_floppy(softpc_machine *machine,
             return SOFTPC_MACHINE_INVALID_ARGUMENT;
     }
     if (machine->hardware_initialized &&
-        !softpc_platform_floppy_attach(path, machine->options.floppy_mode))
+        !softpc_platform_floppy_attach(path, mode))
         return SOFTPC_MACHINE_IO_ERROR;
     if (path == NULL) machine->floppy_path[0] = '\0';
     else {
@@ -263,6 +267,7 @@ softpc_machine_result softpc_machine_set_floppy(softpc_machine *machine,
     }
     machine->options.floppy_path = machine->floppy_path[0] == '\0' ?
         NULL : machine->floppy_path;
+    if (path != NULL) machine->options.floppy_mode = mode;
     return SOFTPC_MACHINE_OK;
 }
 

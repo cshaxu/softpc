@@ -80,6 +80,8 @@ Set `floppy_mode` and `hard_disk_mode` independently to choose how each configur
 `direct` writes the source image files directly, and `overlay` loads both
 images into RAM at startup and directs all guest writes to those volatile
 copies. The distributed configuration uses `overlay` for safe experimentation.
+While stopped or paused, `floppy insert <readonly|direct|overlay> <image>`
+replaces drive A using the chosen policy; `floppy eject` removes it.
 
 The fixed machine has 16 MiB RAM by default (configurable through
 `memory_mb`), master and slave 8259 PICs, PIT channel 0, the original

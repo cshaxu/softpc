@@ -12,7 +12,7 @@ The monitor owns human-facing commands, not machine state. It presents a
 small fixed command set:
 
 - `start`, `resume`, `pause`, `reset`, and `stop` request lifecycle changes;
-- `floppy insert <image>` and `floppy eject` swap configured drive-A media
+- `floppy insert <readonly|direct|overlay> <image>` and `floppy eject` swap configured drive-A media
   while stopped or paused; and
 - `help` and `exit` are local monitor commands.
 - `debug` enters the debugger CLI without changing machine state.

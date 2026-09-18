@@ -33,6 +33,8 @@ static void write_boot_image(const char *path, unsigned char marker)
 int main(void)
 {
     const char *floppy = "softpc-dual-media-floppy.img";
+    const char *replacement_floppy = "softpc-dual-media-replacement.img";
+    const char *invalid_floppy = "softpc-dual-media-invalid.img";
     const char *hard_disk = "softpc-dual-media-hdd.img";
     const char *empty_disk = "softpc-dual-media-empty-hdd.img";
     softpc_machine_options options = { floppy, hard_disk };
@@ -60,8 +62,28 @@ int main(void)
     cmos_post();
     assert(cmos_read_byte(CMOS_DISK, &cmos_disk) == SUCCESS);
     assert(cmos_disk == 0x30u);
+    /* The mounted floppy is live machine state.  A later cold reset must not
+       reopen startup configuration or discard this accepted replacement. */
+    write_boot_image(replacement_floppy, 0x63u);
+    assert(softpc_machine_set_floppy(machine, replacement_floppy,
+        LIB_STORAGE_MEDIUM_OVERLAY) == SOFTPC_MACHINE_OK);
+    {
+        FILE *file = fopen(invalid_floppy, "wb");
+        assert(file != NULL);
+        assert(fclose(file) == 0);
+    }
+    assert(softpc_machine_set_floppy(machine, invalid_floppy,
+        LIB_STORAGE_MEDIUM_READONLY) == SOFTPC_MACHINE_IO_ERROR);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    for (slice = 0u; slice < 16u; ++slice)
+        assert(softpc_machine_run(machine, 6000u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) ==
+        SOFTPC_MACHINE_OK);
+    assert(marker == 0x63u);
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(floppy));
+    assert(softpc_test_remove_image(replacement_floppy));
+    assert(softpc_test_remove_image(invalid_floppy));
     assert(softpc_test_remove_image(hard_disk));
 
     /* Original nt_fdisk activation fails when the selected fixed medium

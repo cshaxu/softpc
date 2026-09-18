@@ -13,7 +13,7 @@ static const char HELP_COMMANDS[] =
     "  pause                 request machine pause\r\n"
     "  stop                  stop execution\r\n"
     "  reset                 cold-reset and pause at firmware entry\r\n"
-    "  floppy insert <image> insert drive A media while stopped/paused\r\n"
+    "  floppy insert <mode> <image> insert drive A media while stopped/paused\r\n"
     "  floppy eject          eject drive A media while stopped/paused\r\n"
     "  save <file>           save a running or paused machine\r\n"
     "  load <file>           load a snapshot while stopped\r\n"
@@ -70,6 +70,14 @@ static void lower(char *s)
         *s = (char)tolower((unsigned char)*s);
         ++s;
     }
+}
+static int floppy_mode(const char *text, lib_storage_medium_mode *out)
+{
+    if (!strcmp(text, "readonly")) *out = LIB_STORAGE_MEDIUM_READONLY;
+    else if (!strcmp(text, "direct")) *out = LIB_STORAGE_MEDIUM_DIRECT;
+    else if (!strcmp(text, "overlay")) *out = LIB_STORAGE_MEDIUM_OVERLAY;
+    else return 0;
+    return 1;
 }
 
 static void accept(app_command_session *session,
@@ -183,7 +191,7 @@ void app_command_session_reject_line(app_command_session *s, app_command_effect 
 void app_command_session_submit_line(app_command_session *s, app_monitor_state state,
                                      const char *line, app_command_effect *e)
 {
-    char b[APP_COMMAND_TEXT_CAPACITY], *c, *a, *p;
+    char b[APP_COMMAND_TEXT_CAPACITY], *c, *a, *p, *mode;
     size_t n;
     clear(e);
     if (!line || (n = strlen(line)) >= sizeof(b))
@@ -241,14 +249,23 @@ void app_command_session_submit_line(app_command_session *s, app_monitor_state s
     p = trim(p);
     lower(a);
     if (!strcmp(a, "eject") && !*p)
-        e->action = APP_COMMAND_ACTION_EJECT_FLOPPY;
-    else if (!strcmp(a, "insert") && *p && strlen(p) < sizeof(e->path))
     {
-        e->action = APP_COMMAND_ACTION_INSERT_FLOPPY;
-        memcpy(e->path, p, strlen(p) + 1);
+        e->action = APP_COMMAND_ACTION_EJECT_FLOPPY;
+        e->media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    }
+    else if (!strcmp(a, "insert") && *p) {
+        mode = p;
+        while (*p && !isspace((unsigned char)*p)) ++p;
+        if (*p) *p++ = '\0';
+        p = trim(p);
+        lower(mode);
+        if (*p && strlen(p) < sizeof(e->path) && floppy_mode(mode, &e->media_mode)) {
+            e->action = APP_COMMAND_ACTION_INSERT_FLOPPY;
+            memcpy(e->path, p, strlen(p) + 1u);
+        } else reject(s, e, "Usage: floppy insert <readonly|direct|overlay> <image> | eject");
     }
     else
-        reject(s, e, "Usage: floppy insert <image> | eject");
+        reject(s, e, "Usage: floppy insert <readonly|direct|overlay> <image> | eject");
 }
 app_lifecycle_request app_command_session_take_request(app_command_session *s)
 {
@@ -587,8 +604,10 @@ void app_command_provider_submit_line(void *opaque,
         app_command_load_state(command, effect.path, &effect);
     } else if (effect.action != APP_COMMAND_ACTION_NONE) {
         int succeeded = effect.action == APP_COMMAND_ACTION_EJECT_FLOPPY ?
-            common_machine_set_removable_media(command->machine, NULL) :
-            common_machine_set_removable_media(command->machine, effect.path);
+            common_machine_set_removable_media(command->machine, NULL,
+                effect.media_mode) :
+            common_machine_set_removable_media(command->machine, effect.path,
+                effect.media_mode);
         app_command_session_complete_floppy(&command->session, effect.action,
             succeeded, &effect);
     }

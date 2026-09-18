@@ -318,32 +318,42 @@ static void softpc_gfi_install(UTINY drive)
 int softpc_platform_floppy_attach(const char *path, lib_storage_medium_mode mode)
 {
     softpc_gfi_image_drive *drive = &softpc_gfi_drives[0];
+    softpc_gfi_image_drive candidate = {0};
+    softpc_gfi_image_drive retired;
     size_t bytes;
-    lib_storage_medium_destroy(&drive->medium);
-    memset(drive, 0, sizeof(*drive));
-    if (path == NULL) return 1;
-    if (strlen(path) >= sizeof(drive->path)) return 0;
-    if (lib_storage_medium_open(path, mode, &drive->medium) !=
+    if (mode > LIB_STORAGE_MEDIUM_OVERLAY) return 0;
+    /* A request can name the current attachment.  Keep it in place: Windows
+       need not permit a second open of the same file, and there is no
+       replacement to commit.  The original GFI vectors still need their
+       normal installation. */
+    if (path != NULL && drive->medium != NULL && drive->mode == mode &&
+        strcmp(drive->path, path) == 0) {
+        softpc_gfi_install(0);
+        return 1;
+    }
+    if (path != NULL && strlen(path) >= sizeof(candidate.path)) return 0;
+    if (path != NULL && (lib_storage_medium_open(path, mode, &candidate.medium) !=
             LIB_STATUS_OK ||
-        (bytes = lib_storage_medium_byte_count(drive->medium)) > LONG_MAX ||
-        !softpc_gfi_geometry((long)bytes, drive)) {
-        lib_storage_medium_destroy(&drive->medium);
-        memset(drive, 0, sizeof(*drive));
-        softpc_gfi_activate_empty();
+        (bytes = lib_storage_medium_byte_count(candidate.medium)) > LONG_MAX ||
+        !softpc_gfi_geometry((long)bytes, &candidate))) {
+        lib_storage_medium_destroy(&candidate.medium);
         return 0;
     }
-    drive->mode = mode;
-    memcpy(drive->path, path, strlen(path) + 1u);
-    softpc_gfi_install(0);
+    if (path != NULL) {
+        candidate.mode = mode;
+        memcpy(candidate.path, path, strlen(path) + 1u);
+    }
+    retired = *drive;
+    *drive = candidate;
+    if (path == NULL) softpc_gfi_activate_empty();
+    else softpc_gfi_install(0);
+    (void)lib_storage_medium_destroy(&retired.medium);
     return 1;
 }
 
 void softpc_platform_floppy_detach(void)
 {
-    softpc_gfi_image_drive *drive = &softpc_gfi_drives[0];
-    lib_storage_medium_destroy(&drive->medium);
-    memset(drive, 0, sizeof(*drive));
-    softpc_gfi_activate_empty();
+    (void)softpc_platform_floppy_attach(NULL, LIB_STORAGE_MEDIUM_OVERLAY);
 }
 
 /* The original CMOS POST asks the product configuration layer whether drive

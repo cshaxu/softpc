@@ -82,7 +82,7 @@ softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,
  * boundary. Passing NULL ejects it. Callers must stop or pause execution
  * before changing media. */
 softpc_machine_result softpc_machine_set_floppy(softpc_machine *machine,
-    const char *path);
+    const char *path, lib_storage_medium_mode mode);
 int softpc_machine_presentation_is_graphics(const softpc_machine *machine);
 /* Read-only original renderer state for opt-in standalone diagnostics. */
 int softpc_machine_presentation_state(const softpc_machine *machine,

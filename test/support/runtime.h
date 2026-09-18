@@ -55,7 +55,8 @@ static inline int app_runtime_stop(app_runtime *runtime)
 static inline int app_runtime_reset(app_runtime *runtime)
 { return runtime != NULL && common_machine_reset(runtime->machine); }
 static inline int app_runtime_set_floppy(app_runtime *runtime, const char *path)
-{ return runtime != NULL && common_machine_set_removable_media(runtime->machine, path); }
+{ return runtime != NULL && common_machine_set_removable_media(runtime->machine,
+    path, LIB_STORAGE_MEDIUM_OVERLAY); }
 static inline app_runtime_state app_runtime_get_state(const app_runtime *runtime)
 { return runtime == NULL ? COMMON_MACHINE_ERROR : common_machine_state_get(runtime->machine); }
 static inline int app_runtime_enqueue_input_event(app_runtime *runtime,

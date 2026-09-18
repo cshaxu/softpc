@@ -48,6 +48,7 @@ typedef struct app_command_session {
 typedef struct app_command_effect {
     app_command_action action;
     int exit_requested, arm_prompt;
+    lib_storage_medium_mode media_mode;
     char text[APP_COMMAND_TEXT_CAPACITY];
     char path[APP_COMMAND_PATH_CAPACITY];
 } app_command_effect;

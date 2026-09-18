@@ -378,11 +378,11 @@ static lib_bool vm_driver_copy_frame(void *opaque, kvm_frame *frame)
 }
 
 static lib_bool vm_driver_set_removable_media(void *opaque,
-    const char *path)
+    const char *path, lib_storage_medium_mode mode)
 {
     vm_driver *driver = (vm_driver *)opaque;
-    return driver != NULL && softpc_machine_set_floppy(driver->machine, path) ==
-        SOFTPC_MACHINE_OK;
+    return driver != NULL && softpc_machine_set_floppy(driver->machine, path,
+        mode) == SOFTPC_MACHINE_OK;
 }
 
 static lib_status vm_driver_debug(void *opaque,
