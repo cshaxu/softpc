@@ -79,7 +79,7 @@ word y;
         dirty.Top = (SHORT)softpc_v7_pointer_top;
         dirty.Right = (SHORT)softpc_v7_pointer_right;
         dirty.Bottom = (SHORT)softpc_v7_pointer_bottom;
-        (void)softpc_standalone_invalidate_dibits(NULL, &dirty);
+        (void)softpc_standalone_dib_invalidate_overlay(&dirty);
     }
     softpc_v7_pointer_visible = 0;
 }
@@ -174,7 +174,7 @@ word y;
         dirty.Top = (SHORT)softpc_v7_pointer_top;
         dirty.Right = (SHORT)softpc_v7_pointer_right;
         dirty.Bottom = (SHORT)softpc_v7_pointer_bottom;
-        (void)softpc_standalone_invalidate_dibits(NULL, &dirty);
+        (void)softpc_standalone_dib_invalidate_overlay(&dirty);
     }
 }
 

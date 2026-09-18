@@ -33,10 +33,10 @@ Common 或 presenter：
 - 因而清屏操作被静默吞掉；VM、Common、KVM Window 与 raw Console 只会忠实
   复制同一份残留 surface。这解释了两条 presenter 路径都出现花屏/残字。
   `edit` 的完整文本重绘随后覆写该 surface，故能掩盖缺口。
-- 同一 Compat 的 `GetConsoleScreenBufferInfo()` 错把 `sc.PC_W_Width/Height`
-  （像素几何）报告为字符格尺寸。现有 fill 为 no-op 时这个错误被遮蔽；修复
-  fill 前必须将它改为 text surface 的可见字符格合同，不能把像素数当作
-  80xN 文本 cell 数。
+- 同一 Compat 还吞掉了原始 `SetConsoleScreenBufferSize()` 与
+  `SetConsoleWindowInfo()`，并把后续 `GetConsoleScreenBufferInfo()` 固定伪装成
+  `80x50`。原始 `textResize()` 在 Win3.1 全屏/窗口往返时正是借这组 Console
+  操作改变逻辑文本 buffer；固定几何会让 fill 以错误行跨度写入共享 surface。
 
 这是一项独立宿主 Compat 修复，不修改保存的 MVDM 镜像，也不引入对真实宿主
 Console 的旁路。`ScrollConsoleScreenBuffer()` 与 `WriteConsoleA()` 同样是
@@ -52,18 +52,20 @@ Console 的旁路。`ScrollConsoleScreenBuffer()` 与 `WriteConsoleA()` 同样�
   Lib Console/Window 实际绘制，定位最早出现失配的边界。
 - 区分源画面错误、已发布帧错误、显示模式路由错误及宿主缓存/绘制错误。
   在证实的责任层做最小修复，保留单一画面状态所有者，不增加刷新旁路。
-- 修复仅可在 Compat 的 standalone text surface 模型内完成：以 text surface
-  的字符格边界裁剪 fill，分别修改字符与属性，准确报告实际写入数量；错误
-  参数或不可用 surface 必须失败，不能假成功。原始 MVDM、Lib、Common、VM
-  不改。
+- 修复仅可在 Compat 的 standalone text surface 模型内完成：维护原始 renderer
+  请求的逻辑 Console buffer 与 viewport；fill 以该逻辑几何裁剪、计数和走行，
+  再映射到固定 `80x50` 共享 text surface 的可见交集。字符与属性分别修改，
+  报告实际逻辑写入数量；错误参数或不可用 surface 必须失败，不能假成功。
+  原始 MVDM、Lib、Common、VM 不改。
 - 不特判 CLS，不修改客户机镜像，不直接写宿主 Console，不引入强制 repaint。
 - 与本缺陷无证据关联的焦点、输入时序、横向滚动视口等 TODO 不合并处理。
 
 ## 未来实施验收
 
-冻结的验证范围包括：对 Compat 文本 surface 的字符/属性整面 fill、起始坐标
-与边界裁剪、字符格 geometry；直接 Window 打开、全屏后恢复 Window、Win3.1
-`edit` 往返、普通 DOS `cls` 对照及重复模式往返。验证画面、光标及输入
+冻结的验证范围包括：对 Compat 逻辑 Console buffer 的字符/属性整面 fill、起始
+坐标与边界裁剪、buffer/viewport geometry 以及映射到共享 surface 的行跨度；直接
+Window 打开、全屏后恢复 Window、Win3.1 `edit` 往返、普通 DOS `cls` 对照及重复
+模式往返。验证画面、光标及输入
 可用性没有因修复退化。
 完成后编译双 EXE、执行 x86/x64 全量测试，记录真实模式往返验证结果，
 提交推送供用户复核。无法复现时记录环境与观察，不声称修复完成。
@@ -90,11 +92,12 @@ V7 hardware pointer 是 Compat 内的独立 overlay，移动鼠标会直接以 3
 发布 DIB；palette 更新也可发布整幅 dirty。若它们发生在 bind 后、原始 painter
 完成新 surface 前，仍会把临时 640/1280 DIB 当成完成帧。
 
-最终合同是每次 bind 开启一个 private painter generation：只有覆盖整张 surface 的
-原始 painter dirty 才打开它；此前 V7 overlay 和 palette 只能更新其本地状态，不能
-发布。bind 的 generation 改变还必须使旧 pointer background cache 失效，避免把旧
-DIB 像素恢复到同尺寸的新 DIB。快照重建已在完整原始刷新之后显式 `invalidate_all`，
-保留它作为强制提交路径。这不改变 MVDM、Lib、Common 或 VM，也不把 1280 宽度武断
-视为错误；它只保证 overlay 或半幅原始画笔不会把未完成的 geometry 对外发布。测试
-须证明 bind/partial-painter/overlay/palette 的准入、pointer generation 失效及显式
-全帧发布。
+最终合同是每次 bind 开启一个 private painter generation：原始 painter 的首个 dirty
+区域（可以是合理的局部更新）才打开它；此前 V7 overlay 和 palette 只能更新其本地
+状态，不能发布。dirty 矩形覆盖面积不是“绘制完成”的信号：用全幅矩形作门槛会压住
+正常局部刷新并让机器严重卡顿。bind 的 generation 改变还必须使旧 pointer
+background cache 失效，避免把旧 DIB 像素恢复到同尺寸的新 DIB。快照重建已在完整
+原始刷新之后显式 `invalidate_all`，保留它作为强制提交路径。这不改变 MVDM、Lib、
+Common 或 VM，也不把 1280 宽度武断视为错误；它只保证 overlay 不会把未完成的
+geometry 对外发布。测试须证明 bind/原始 painter/overlay/palette 的准入、pointer
+generation 失效及显式全帧发布。

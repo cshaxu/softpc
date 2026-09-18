@@ -42,18 +42,23 @@ static void verify_dib_bind_does_not_publish(void)
     rect.Top = 4;
     rect.Right = 5;
     rect.Bottom = 6;
-    assert(softpc_standalone_invalidate_dibits(NULL, &rect));
+    assert(softpc_standalone_dib_invalidate_overlay(&rect));
     assert(!softpc_standalone_dib_ready());
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     softpc_standalone_dib_set_palette_entries(&palette, 1);
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
-    rect.Top = 0;
-    rect.Right = 639;
-    rect.Bottom = 479;
     assert(softpc_standalone_invalidate_dibits(NULL, &rect));
     assert(softpc_standalone_dib_ready());
     assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
-    assert(left == 0 && top == 0 && right == 639 && bottom == 479);
+    assert(left == 0 && top == 4 && right == 5 && bottom == 6);
+
+    rect.Left = 7;
+    rect.Top = 8;
+    rect.Right = 9;
+    rect.Bottom = 10;
+    assert(softpc_standalone_dib_invalidate_overlay(&rect));
+    assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    assert(left == 7 && top == 8 && right == 9 && bottom == 10);
 
     softpc_standalone_dib_set_palette_entries(&palette, 1);
     assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
@@ -92,22 +97,61 @@ int main(void)
     cells = (const unsigned char *)surface;
 
     assert(softpc_compat_get_console_buffer_info(NULL, &info));
-    assert(info.dwSize.X == 80 && info.dwSize.Y == 50);
+    assert(info.dwSize.X == 80 && info.dwSize.Y == 25);
     assert(info.srWindow.Left == 0 && info.srWindow.Top == 0 &&
-        info.srWindow.Right == 79 && info.srWindow.Bottom == 49);
+        info.srWindow.Right == 79 && info.srWindow.Bottom == 24);
 
     origin.X = 0;
     origin.Y = 0;
-    assert(softpc_compat_fill_console_character(NULL, 'X',
-        (DWORD)(columns * rows), origin, &written));
-    assert(written == columns * rows);
+    assert(softpc_compat_fill_console_character(NULL, 'X', 80u * 25u,
+        origin, &written));
+    assert(written == 80u * 25u);
     assert(softpc_compat_fill_console_attribute(NULL, 0x1eu,
-        (DWORD)(columns * rows), origin, &written));
-    assert(written == columns * rows);
-    for (index = 0u; index < columns * rows; ++index) {
+        80u * 25u, origin, &written));
+    assert(written == 80u * 25u);
+    for (index = 0u; index < 80u * 25u; ++index) {
         assert(cells[index * cell_bytes] == 'X');
         assert(cells[index * cell_bytes + 1u] == 0x1eu);
     }
+
+    final_cell.X = 0;
+    final_cell.Y = 25;
+    assert(!softpc_compat_fill_console_character(NULL, 'Z', 1u, final_cell,
+        &written));
+    assert(written == 0u);
+
+    final_cell.X = 132;
+    final_cell.Y = 25;
+    assert(softpc_compat_set_console_buffer_size(NULL, final_cell));
+    assert(softpc_compat_get_console_buffer_info(NULL, &info));
+    assert(info.dwSize.X == 132 && info.dwSize.Y == 25);
+    assert(info.dwMaximumWindowSize.X == 132 && info.dwMaximumWindowSize.Y == 25);
+    final_cell.X = 0;
+    final_cell.Y = 0;
+    invalid.X = 131;
+    invalid.Y = 24;
+    {
+        SMALL_RECT viewport;
+        viewport.Left = final_cell.X;
+        viewport.Top = final_cell.Y;
+        viewport.Right = invalid.X;
+        viewport.Bottom = invalid.Y;
+        assert(softpc_compat_set_console_window_info(NULL, TRUE, &viewport));
+        assert(softpc_compat_get_console_buffer_info(NULL, &info));
+        assert(info.srWindow.Right == 131 && info.srWindow.Bottom == 24);
+    }
+
+    origin.X = 0;
+    origin.Y = 0;
+    assert(softpc_compat_fill_console_character(NULL, ' ', 132u * 25u,
+        origin, &written));
+    assert(written == 132u * 25u);
+    for (index = 0u; index < 80u * 25u; ++index)
+        assert(cells[index * cell_bytes] == ' ');
+
+    final_cell.X = 80;
+    final_cell.Y = 50;
+    assert(softpc_compat_set_console_buffer_size(NULL, final_cell));
 
     final_cell.X = 78;
     final_cell.Y = 49;
@@ -116,7 +160,7 @@ int main(void)
     assert(written == 2u);
     assert(character_at(cells, 78u, 49u, stride, cell_bytes) == ' ');
     assert(character_at(cells, 79u, 49u, stride, cell_bytes) == ' ');
-    assert(attribute_at(cells, 78u, 49u, stride, cell_bytes) == 0x1eu);
+    assert(attribute_at(cells, 78u, 49u, stride, cell_bytes) == 0u);
 
     assert(softpc_compat_fill_console_attribute(NULL, 0x07u, 5u, final_cell,
         &written));
@@ -130,7 +174,7 @@ int main(void)
     assert(!softpc_compat_fill_console_character(NULL, 'Z', 1u, invalid,
         &written));
     assert(written == 0u);
-    assert(character_at(cells, 0u, 0u, stride, cell_bytes) == 'X');
+    assert(character_at(cells, 0u, 0u, stride, cell_bytes) == ' ');
 
     return 0;
 }

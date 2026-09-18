@@ -20,6 +20,11 @@ static LONG softpc_compat_cursor_row;
 static DWORD softpc_compat_cursor_size = 20u;
 static int softpc_compat_cursor_position_valid;
 static int softpc_compat_cursor_visible = 1;
+/* This is the original renderer's logical Console buffer, not the 80x50
+   shared text surface copied by nt_cga.  Mode transitions resize this buffer
+   before repainting it. */
+static COORD softpc_compat_console_size = { 80, 25 };
+static SMALL_RECT softpc_compat_console_window = { 0, 0, 79, 24 };
 
 BOOL CreateDisplayPalette(void)
 {
@@ -87,30 +92,53 @@ UINT softpc_compat_set_palette_entries(HPALETTE palette, UINT start,
 BOOL softpc_compat_get_console_buffer_info(HANDLE output,
     PCONSOLE_SCREEN_BUFFER_INFO info)
 {
-    unsigned long columns;
-    unsigned long rows;
-
     UNUSED(output);
-    if (info == NULL || !softpc_standalone_text_surface_geometry(&columns,
-            &rows)) return FALSE;
+    if (info == NULL) return FALSE;
     memset(info, 0, sizeof(*info));
-    info->dwSize.X = (SHORT)columns;
-    info->dwSize.Y = (SHORT)rows;
-    info->srWindow.Right = (SHORT)(info->dwSize.X - 1);
-    info->srWindow.Bottom = (SHORT)(info->dwSize.Y - 1);
+    info->dwSize = softpc_compat_console_size;
+    info->dwMaximumWindowSize = softpc_compat_console_size;
+    info->srWindow = softpc_compat_console_window;
+    if (softpc_compat_cursor_position_valid) {
+        info->dwCursorPosition.X = (SHORT)softpc_compat_cursor_column;
+        info->dwCursorPosition.Y = (SHORT)softpc_compat_cursor_row;
+    }
     return TRUE;
 }
 
 BOOL softpc_compat_set_console_window_info(HANDLE output, BOOL absolute,
     const SMALL_RECT *window)
 {
-    UNUSED(output); UNUSED(absolute); UNUSED(window);
+    SMALL_RECT next;
+
+    UNUSED(output);
+    if (window == NULL) return FALSE;
+    next = *window;
+    if (!absolute) {
+        next.Left = (SHORT)(next.Left + softpc_compat_console_window.Left);
+        next.Right = (SHORT)(next.Right + softpc_compat_console_window.Right);
+        next.Top = (SHORT)(next.Top + softpc_compat_console_window.Top);
+        next.Bottom = (SHORT)(next.Bottom + softpc_compat_console_window.Bottom);
+    }
+    if (next.Left < 0 || next.Top < 0 || next.Right < next.Left ||
+        next.Bottom < next.Top || next.Right >= softpc_compat_console_size.X ||
+        next.Bottom >= softpc_compat_console_size.Y) return FALSE;
+    softpc_compat_console_window = next;
     return TRUE;
 }
 
 BOOL softpc_compat_set_console_buffer_size(HANDLE output, COORD size)
 {
-    UNUSED(output); UNUSED(size);
+    UNUSED(output);
+    if (size.X <= 0 || size.Y <= 0) return FALSE;
+    softpc_compat_console_size = size;
+    if (softpc_compat_console_window.Right >= size.X)
+        softpc_compat_console_window.Right = (SHORT)(size.X - 1);
+    if (softpc_compat_console_window.Bottom >= size.Y)
+        softpc_compat_console_window.Bottom = (SHORT)(size.Y - 1);
+    if (softpc_compat_console_window.Left > softpc_compat_console_window.Right)
+        softpc_compat_console_window.Left = 0;
+    if (softpc_compat_console_window.Top > softpc_compat_console_window.Bottom)
+        softpc_compat_console_window.Top = 0;
     return TRUE;
 }
 
@@ -121,19 +149,36 @@ static BOOL softpc_compat_fill_console_cell(HANDLE output, unsigned char value,
     unsigned long rows;
     unsigned long actual;
     unsigned long start;
+    unsigned long index;
+    unsigned long surface_columns;
+    unsigned long surface_rows;
 
     UNUSED(output);
     if (written != NULL) *written = 0u;
     if (coordinate.X < 0 || coordinate.Y < 0 ||
-        !softpc_standalone_text_surface_geometry(&columns, &rows) ||
-        (unsigned long)coordinate.X >= columns ||
-        (unsigned long)coordinate.Y >= rows) return FALSE;
+        softpc_compat_console_size.X <= 0 || softpc_compat_console_size.Y <= 0 ||
+        coordinate.X >= softpc_compat_console_size.X ||
+        coordinate.Y >= softpc_compat_console_size.Y) return FALSE;
+    columns = (unsigned long)softpc_compat_console_size.X;
+    rows = (unsigned long)softpc_compat_console_size.Y;
+    if (!softpc_standalone_text_surface_geometry(&surface_columns, &surface_rows))
+        return FALSE;
     start = (unsigned long)coordinate.Y * columns + (unsigned long)coordinate.X;
-    if (attribute) {
-        if (!softpc_standalone_text_surface_fill_attribute(start,
-                (unsigned long)count, value, &actual)) return FALSE;
-    } else if (!softpc_standalone_text_surface_fill_character(start,
-            (unsigned long)count, value, &actual)) return FALSE;
+    actual = (unsigned long)count;
+    if (actual > columns * rows - start) actual = columns * rows - start;
+    for (index = 0u; index < actual; ++index) {
+        unsigned long cell = start + index;
+        unsigned long column = cell % columns;
+        unsigned long row = cell / columns;
+
+        /* The original Console buffer can temporarily be wider/taller than
+           the 80x50 shared surface.  Only its visible intersection has a
+           presentation slot. */
+        if (!softpc_standalone_text_surface_write_cell(column, row,
+                attribute ? 1u : 0u, value) &&
+            (column < surface_columns && row < surface_rows))
+            return FALSE;
+    }
     if (written != NULL) *written = (DWORD)actual;
     return TRUE;
 }
