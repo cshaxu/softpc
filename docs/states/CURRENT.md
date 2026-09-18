@@ -2,8 +2,8 @@
 
 ## Current Work
 
-M9 T66 S1 is admitted: revalidate and simplify the finite A1–A4 original-mirror
-and compatibility candidates without changing machine behavior.
+M9 T66 S1 is admitted: repair the VM `snapshot_finish()` failure path before
+any code-reduction candidate.
 
 ## M9 T66 S1 Packet
 
@@ -11,20 +11,20 @@ and compatibility candidates without changing machine behavior.
 | --- | --- |
 | Identifier Mode | New |
 | Admission And Approval | Owner: 下一个t任务准入; standing commit/push approval. |
-| Objective | Re-audit and implement only the proven A1–A4 CCPU/VGA/PIT/no-behavior simplifications from the snapshot/component proposal. |
-| Non-goals | No snapshot format, public ABI, Lib/Common, thread, UI, lifecycle, CPU/device semantic, B1 archive-order, B2 VM-local ownership, or C2 finish-failure changes. |
+| Objective | Attach `snapshot_finish()` failure to the existing VM operation termination/result path, preserving the snapshot format and completed state semantics. |
+| Non-goals | No public ABI, Lib/Common, thread, UI, lifecycle, CPU/device semantic, archive-order refactor, VM-local ownership simplification, or mirror-diff cleanup. |
 | Reference Baseline | T65 closure `8e6bcd6`; clean worktree; historical T63 diff evidence is candidate context only. |
 | Candidate Proposal | [Snapshot and component architecture simplification](../proposals/m9-snapshot-architecture-simplification.md) |
-| Files And ABI Surface | Initially audit `src/mvdm/softpc.new`, `src/compat`, `src/vm` and product tests; precise changed paths follow the required pre-implementation audit. Public ABI unchanged. |
+| Files And ABI Surface | Initially audit `src/vm` snapshot/driver completion paths and product tests; precise changed paths follow the required pre-implementation audit. Public ABI unchanged. |
 | Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT and selected governance skills; original-mirror and VM/Compat ownership boundaries. |
-| Verification | Per-candidate original diff/call-path proof; focused CPU/video/PIT tests; x86/x64 full regression and shared gates. |
-| Expected Markers | Any moved capture code uses existing narrow Compat ABI only; handler/validation semantics remain identical; no dead declaration/format-only residue remains in scope. |
+| Verification | Deterministic `snapshot_finish()` failure injection, result/clock/operation-order proof, x86/x64 full regression and shared gates. |
+| Expected Markers | A finish failure cannot report successful completion or leave the VM operation/clock path inconsistent; no second completion or error route exists. |
 | Asset Needs | Existing test media/fakes; refresh both EXEs only after implementation; never modify owner INI/media. |
-| Reporting Requirements | Before code: per-candidate retained/moved/deleted disposition, files and numstat estimate. After: actual production/test numstat, original-diff impact, verification and EXE links. |
-| Stop Conditions | Unproven original-handler equivalence, need for new public ABI, mirror policy, CPU/device behavior, snapshot format, Lib/Common or thread change requires owner review. |
-| Exit Criteria | Finite A1–A5 ledger complete with proof or explicit retention; dual-width builds/tests, manifests, commit/push and S1 closure. |
+| Reporting Requirements | Before code: exact ignored-result call path, current failure behavior, files and numstat estimate. After: actual production/test numstat, deterministic failure evidence, verification and EXE links. |
+| Stop Conditions | Need for new public ABI, snapshot-format, Lib/Common, thread, product state semantic or unproven post-failure recovery change requires owner review. |
+| Exit Criteria | Finish-failure path has one terminal result/cleanup owner; deterministic proof, dual-width builds/tests, manifests, commit/push and S1 closure. |
 | Original Owner Request | 下一个t任务准入 |
-| Similar-Issue Sweep | A1–A5 plus VM/Compat ownership evidence; scan only the finite candidate class, not an unbounded whole-tree simplification claim. |
+| Similar-Issue Sweep | All `snapshot_finish()` call sites and result/clock restoration paths; no unbounded whole-tree claim. |
 
 ## Current Technical Baseline
 
