@@ -478,3 +478,118 @@ prior-windowed-PIF precondition for a future reproduction. This is not a claim
 of repairing an unconfirmed cause or accepting all fullscreen text behavior.
 Temporary probe wiring and owned artifacts are removed; media/configuration and
 the owner-tested package are unchanged.
+
+## S4 admitted audit: retained T69 changes and mirror reduction
+
+Owner request: record the intermittent fullscreen native-height issue in TODO,
+close S3, then audit all T69 investigation/repair code for simplification and
+opportunities to eliminate or reduce original-MVDM diff. This stage is read-only;
+recommendations below are not implemented or newly verified runtime changes.
+
+### Frozen universe and accounting
+
+Task comparison: `git diff --numstat 86de8eb 662f7d4 -- src test`, with root
+CMake counted separately. Original comparator: OpenNT commit
+`5e4619ab61c2aa76151e03973cce340be2933e61`, using `git diff --no-index` for each
+retained changed mirror file. These are two different measurements: a task
+delta must not be represented as the total pristine divergence.
+
+| Component | Files | Added | Removed | Net |
+| --- | ---: | ---: | ---: | ---: |
+| Compat production | 5 | 245 | 48 | +197 |
+| MVDM production | 4 | 38 | 31 | +7 |
+| VM, Common, Lib production | 0 | 0 | 0 | 0 |
+| Product tests | 2 | 349 | 2 | +347 |
+| Root CMake test registration | 1 | 10 | 0 | +10 |
+
+Total production: +283/-79, net +204. Test/build: +359/-2, net +357.
+Documentation, EXEs, owner INI and owner HDD are excluded from code counts.
+The INI and media are owner changes, not candidates for code simplification.
+The package artifacts remain the owner-tested P2 binaries.
+
+Coverage unit is every retained changed production/test/build file, plus every
+formerly changed production file now restored. Permitted dispositions are keep,
+remove candidate, or investigate before change. Completion means every member
+has an owner, reason and evidence; it does not mean all suggested edits are made.
+
+| File | Task delta | Disposition / proof |
+| --- | --- | --- |
+| compat/conapi.h | +9/-0 | Keep macro undef guards: the adapter replaces generic Console spellings, avoiding competing A/W macro definitions. |
+| compat/dib_surface.c | +130/-29 | Keep bind-not-publish, nested damage commit and same-size rebind identity. Remove unused linear-fill family candidate below. |
+| compat/dib_surface.h | +16/-4 | Keep transaction/cell-write contracts; remove declarations with the unused fill family. |
+| compat/graphics_console_compat.c | +83/-12 | Keep logical buffer/window metadata and coordinate-aware fill: they replace successful no-ops. Text smoke covers clipping, character/attribute separation and 132-column logical versus 80-column copied surface. |
+| compat/v7_pointer.c | +7/-3 | Keep generation check and shared damage entry. Equal-sized rebind can reuse the address but invalidate saved pointer background; width/height alone cannot replace identity. |
+| mvdm/base/inc/egavideo.h | +1/-0 | Remove candidate: exported helper was introduced for the superseded width formula. |
+| mvdm/base/video/ega_vide.c | +3/-17 | Restore original three local BIOS conversions with helper removal. They are the same half_word arithmetic and VGA/latch conditions, not a needed machine repair. |
+| mvdm/base/video/v7_video.c | +19/-0 | Remove helper with the preceding restorations; its comment incorrectly calls BIOS bookkeeping a current controller fact. |
+| mvdm/host/src/nt_graph.c | +15/-14 | Keep selected-packed-painter width, detached clear/cursor behavior and original update boundary wiring. Remove the now-unneeded egavideo.h include candidate. |
+| test/unit/text_console_compat_smoke.c | +210/-0 | Keep: exercises real Compat fill and transaction contract rather than new mocks. It does not call the dead linear-fill APIs. |
+| test/unit/vga_frame_smoke.c | +139/-2 | Keep BDA sweep, original bounded mode ticks, fullscreen clear/cursor and complete-frame geometry assertions. Correct the stale current-controller comment when cleaning up the old helper. |
+| CMakeLists.txt | +10/-0 | Keep the new smoke target, test registration and test compile/label lists. |
+
+Superseded-path sweep: `git log --format= --name-only 86de8eb..662f7d4 -- src`
+also names gfx_upd.h and gfx_updt.c. Both have zero final task diff after S3 P2.
+The generation-rearmed mode wait is gone; the original countdown is restored.
+No production `painter_ready`, producer-specific DIB overlay publication or
+mode-change-generation path remains in the scoped search. Surface generation
+is distinct: it protects pointer-background lifetime, not scheduling.
+
+### Recommended bounded cleanup
+
+1. Restore three MVDM files byte-for-byte/textually to their original source
+   as appropriate: egavideo.h, ega_vide.c and v7_video.c. The only remaining
+   calls to v7vga_current_mode are the three mechanically replaced sites in
+   ega_vide.c; no width path uses it now. Remove nt_graph.c's obsolete include
+   too. Original video.h still declares vd_video_mode. This removes 41 lines
+   of pristine diff (+23/-17 across three files plus one added include), while
+   net source shrinks by only seven lines. Restoring original duplicated
+   expressions is intentional: minimum mirror diff outranks deduplicating the
+   preserved machine source. Build both widths after an approved edit.
+2. Remove softpc_standalone_text_surface_fill plus its character/attribute
+   wrappers and their declarations. Whole src/test and build-support caller
+   search finds definitions/declarations only. The actual production fill
+   uses graphics_console_compat's logical-coordinate mapper and write_cell;
+   the smoke tests exercise that same route. Estimated deletion: 38 lines.
+   This is dead-code removal, not moving the real fill or changing row stride.
+3. Correct stale helper/controller wording in tests and proposal chronology;
+   retain causal evidence that supersedes the earlier mistaken claims. Do not
+   count comments as functional fixes or silently rewrite historical results.
+
+The first two candidates total approximately -45 net production lines without
+new state or interfaces. Their implemented counts and builds remain pending
+approval; no actual reduction is claimed by this audit.
+
+### Keep rather than relocate
+
+The remaining nt_graph changes sit at decisions which a later Compat sink
+cannot recover: an early fullscreen return prevents the clear/cursor call
+entirely, and the selected painter determines the byte-to-pixel width contract.
+Moving these into another wrapper or duplicating painter selection merely to
+reduce mirror lines would create a second decision path. Keep the narrow
+changes and existing host_start/end_update callbacks. The original renderer,
+Compat surface and VM copied-frame ownership remain unchanged.
+
+Logical Console geometry and the fixed copied surface are distinct contracts,
+not duplicate state to collapse. The fill must map the logical row stride and
+report logical count even where only its visible intersection is stored.
+Clipping iteration to visible spans could improve unusually large fills, but
+is not needed for this cleanup and is not admitted without equivalent tests.
+
+### Evidence gaps and non-claims
+
+- The inspected T69 tests do not directly prove same-size DIB rebind followed
+  by pointer-background clear. Retain the generation guard; add that focused
+  regression with any approved simplification touching its lifetime.
+- The transaction is a single executor-owned surface with deferred dirty
+  publication, not a second immutable pixel buffer. Its safety depends on the
+  existing serialized executor/copy path; do not claim arbitrary concurrent
+  readers or complete hardware scanout isolation.
+- The non-packed BIOS dependency remains an investigation finding, not a
+  reason to replace every painter's different pixel multiplier with one formula.
+- Earlier fullscreen corruption/typing reports have only the limited P7
+  evidence, not whole-product acceptance. Height oscillation has its explicit
+  TODO receiver; known full-suite failures remain recorded in S3 closure.
+
+S4 audit result: concrete dead/obsolete code can be removed without inventing
+new abstractions; the functioning width fix should stay. No production, build,
+test, package, configuration or media file is changed by the audit.
