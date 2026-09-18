@@ -2,9 +2,10 @@
 
 ## Current Work
 
-M9 T69 S2 is closed at the owner's direction with remaining defects transferred
-to S3. T69 stays open. S3 investigates occasional doubled width, fullscreen
-corruption and broken windowed text after the fullscreen roundtrip.
+M9 T69 S3 is closed at the owner's direction; T69 remains open. S4 is active:
+read-only accounting and simplification audit of every retained T69 production
+and test change against the pre-task commit and the original OpenNT mirror.
+No production optimization is admitted by this audit packet.
 
 S3 P1 has reproduced BIOS-record-dependent width with unchanged registers.
 The bounded correction replaces the host packed-mode table override with the
@@ -35,27 +36,27 @@ without a speculative repair. Prior windowed-PIF use is a possible precondition;
 the reported change affected the actual outer Window, not just its contents.
 See S3 P8 in the proposal. This disposition does not close T69's other defects.
 
-## M9 T69 S3 Packet
+## M9 T69 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: “你先收口这个S任务，提交推送，然后准入下一个S继续调研”. The owner reports reduced but persistent width flicker, working CLS, fullscreen corruption, and broken windowed text/visible typing after return. |
-| Objective | Investigate VGA memory read/write mapping, planes/latches, register-derived geometry and renderer publication across initial windowed and fullscreen roundtrips; distinguish measured causes from hypotheses before choosing a repair. |
+| Admission And Approval | Owner: record the intermittent height problem in TODO, close S3, and admit the next S to account for and audit all T69 repair changes and opportunities to reduce original-MVDM diff. |
+| Objective | Freeze the complete T69 changed-file universe; account for retained, superseded and unnecessary changes; identify behavior-preserving simplifications and original-mirror restorations with exact evidence. |
 | Non-goals | No KVM Window debounce/filter, PIF/application/mode-specific branch, timer retry, forced repaint, guest-media/configuration change, Lib/Common API change, second renderer or silent geometry coercion. |
-| Reference Baseline | T69 S1 completed-frame transaction, S2 V7 current-controller geometry and S3 detached text/cursor guards remain the baseline. Owner reports width alternation still occurs; therefore none may be represented as the sole root cause. |
+| Reference Baseline | Pre-T69 86de8eb versus S4 admission 662f7d4. Read-only OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61 is the pristine comparator. Owner-tested package remains 19533be. |
 | Candidate Proposal | [Win3.1 MS-DOS prompt display roundtrip repair](../proposals/m9-win31-display-roundtrip.md) |
-| Files And ABI Surface | Read-only tracing begins at original `nt_graph.c`, `nt_vga.c`, `nt_ega.c`, `nt_cga.c`, controller state and Compat DIB/text surface metadata, then follows VM copied-frame extraction. A source edit is limited to the proven owner. Any MVDM edit needs a narrow port-ABI reason and pristine-ledger disposition. No public ABI change. |
+| Files And ABI Surface | Nine changed production files in Compat/MVDM, two changed tests and their root CMake registration; inspect removed intermediate paths too. Only task/status/evidence documents may change. No source, API, package, INI or media edits. |
 | Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT and PRODUCT UI. The original renderer/Compat surface remains the only display state owner; KVM consumes copied complete frames only. |
-| Verification | Inspect both read and write handlers, cached versus register state and original OpenNT differences. Require a focused failing reproduction at the selected owner before a repair. S2's gate test proves re-arming only; actual register values causing 1280-wide frames remain unmeasured. Record broad-suite failures without declaring them unrelated absent baseline comparison. |
+| Verification | git diff --numstat 86de8eb 662f7d4 for task accounting; no-index Git comparisons for each changed mirror file; full caller search for deletion candidates; inspect focused test assertions and retain previous full-suite failures. Documentation governance and diff checks apply to this read-only delivery; no rebuild needed for unchanged code. |
 | Expected Markers | No completed frame combines pixels/stride/geometry from different renderer states. No geometry is inferred downstream from dirty bounds or a previous frame. The selected correction has no customer/source/mode identity condition. |
-| Asset Needs | Existing owner package/media only; no image writes. Refresh only package EXEs, preserving owner INI. |
-| Diagnostic Budget | S3 may run the existing runtime-boot diagnostic against the owner HDD with in-memory overlay only. Temporary target/output lives under `build/`; at most 90 seconds per run, 4 MiB text and two 2 MiB frame captures. The executor owns process termination and removal of temporary build wiring; retain only summarized findings. No guest-media/configuration writes or package replacement. |
+| Asset Needs | None. Preserve existing dual-width packages, owner INI and guest media. |
+| Diagnostic Budget | Read-only Git/source analysis only. No raw runtime tracing or new media fixtures are required for this accounting audit. |
 | Reporting Requirements | Record each geometry source and disposition, the exact pre/post mirror diff, tracked code accounting, focused/full evidence and a manual checklist for initial windowed Prompt, fullscreen roundtrip and Win95 Setup transition. |
 | Stop Conditions | A downstream filter, mode/PIF/application branch, timing workaround, unproven MVDM behavior change, second rendering route or Lib/Common scope expansion stops work for owner direction. |
-| Exit Criteria | Produce a source-backed causal investigation and bounded repair plan covering all remaining symptoms; leave unresolved hypotheses explicit. Implementation closure additionally requires focused and proportional x86/x64 verification and manual evidence. |
-| Original Owner Request | “窗口的msdos变成全屏依然花屏，而从全屏变成窗口，窗口显示的字符依旧不正常（打的字也不显示）”; “你先收口这个S任务，提交推送，然后准入下一个S继续调研”. |
-| Similar-Issue Sweep | Every standalone-reachable graphics geometry calculation, DIB bind/reset and completed-frame copy route receives a recorded disposition. |
+| Exit Criteria | Every file in the frozen change universe has rationale, owner, proof and keep/remove/investigate disposition; quantify mirror-diff opportunities separately from net code size; report recommendations without implementing unapproved optimizations. |
+| Original Owner Request | “你先把这个问题记录到TODO里面。然后收口当前S任务，准入下一个S任务对本次T任务整个调查和修复的代码改动进行一次统计、梳理、审计，看看这个修复是否有值得优化的地方、相对原始mvdm产生的diff是否有可以消灭或者减少的机会。” |
+| Similar-Issue Sweep | Inspect all T69 retained production/test hunks and superseded implementation commits; search the entire src/test trees for callers of helpers proposed for deletion. |
 
 ## Current Technical Baseline
 
@@ -93,5 +94,5 @@ See S3 P8 in the proposal. This disposition does not close T69's other defects.
 
 ## Recent Governance
 
-T69 remains open. S2 is closed with explicit transfers in its
-[bounded closure](../history/M9-T69-S2-video-settle.md); S3 is active.
+T69 remains open. S3 has an owner-directed
+[bounded closure](../history/M9-T69-S3-width-investigation.md); S4 is active.
