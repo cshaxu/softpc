@@ -2,9 +2,29 @@
 
 ## Current Work
 
-No implementation subtask is active. T64 is closed after owner acceptance.
-Thread unification was cancelled by owner decision; the narrowed frame-copy
-delivery is accepted. T65 admission follows as a separate governance step.
+M9 T65 S1 is admitted: Common Machine synchronous-request publication order.
+T64 is closed. T65 implementation has not started; existing EXEs remain T64.
+
+## M9 T65 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner: 可以，批准收口提交推送T64，接下来准入T65; standing commit/push approval. |
+| Objective | Prepare complete parameters and completion wait before publishing an executor-consumable synchronous request. |
+| Non-goals | No Lib/VM/Compat/MVDM changes, public API changes, thread changes, safe-point policy, UI/session rewrite or S2 request-slot refactor. |
+| Reference Baseline | T64 closure df5df14; code delivery 21e0fe0; clean worktree. |
+| Candidate Proposal | [Common request simplification](../proposals/m9-common-machine-request-simplification.md) |
+| Files And ABI Surface | common/machine implementation/private declarations and test/common; README/manifests; public ABI unchanged. |
+| Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT and selected governance skills; existing Common single-executor ownership. |
+| Verification | Deterministic fake/barrier tests for preparation/publication, immediate completion, rejection and shutdown; shared gates and full x86/x64 regression after implementation. |
+| Expected Markers | No consume-before-prepare or reset-after-completion; no rejected request overwrites active payload; no second request path. |
+| Asset Needs | Existing test fakes and media; refresh two package EXEs after implementation, never owner INI/media. |
+| Reporting Requirements | Before code: actual call-path audit and production/test diff estimate; after: numstat, focused/full evidence and EXE links. No invented estimate at admission. |
+| Stop Conditions | Need for new public contract, Lib/VM change, product semantic change or unproven request mutual exclusion requires review. |
+| Exit Criteria | Actual-change review, deterministic proof, dual-width EXEs/tests, manifests, commit/push; S2 separately follows after S1 closure. |
+| Original Owner Request | 可以，批准收口提交推送T64，接下来准入T65 |
+| Similar-Issue Sweep | State read/write, removable media, debug and their executor completion/cancellation paths; finite ledger in proposal. |
 
 ## Current Technical Baseline
 
@@ -33,5 +53,5 @@ delivery is accepted. T65 admission follows as a separate governance step.
 
 ## Recent Governance
 
-T64 closure maps all admitted scope and owner-cancelled scope in its completion
-audit. The remaining Queue order is unchanged.
+T64 closure is pushed as df5df14. T65 takes the former Queue head; the other
+candidates retain their relative order. Admission changes documents only.

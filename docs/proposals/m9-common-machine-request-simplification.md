@@ -6,10 +6,10 @@ Owner 确认本任务只有两项改动：修正同步请求发布顺序；收�
 参数、状态和完成机制。原讨论的生命周期/输入分离、VM 安全点所有权、Session/UI
 结构均为保持不变的约束，不是改造项。
 
-本文件独立为未编号 T 候选，接续 [Lib 优化](../history/M9-T64-lib-frame-copy-proposal.md)
-之后、[快照与全组件架构简化](m9-snapshot-architecture-simplification.md) 之前。
-顺序由 [Queue](../states/QUEUE.md) 唯一维护；正式准入才分配递增 T 编号。
-不改变 [当前活动任务](../states/CURRENT.md)，本次仅编写候选设计。
+Owner 已批准 T64 收口并准入本项为 T65；当前唯一准入 S 是 S1，状态由
+[CURRENT](../states/CURRENT.md) 维护。本项已移出 Queue；S2 待 S1 完成后继续。
+原始准入请求：“可以，批准收口提交推送T64，接下来准入T65”。
+本次仅完成任务准入，不声称已经修改生产代码或生成 T65 EXE。
 
 ## 范围与不变边界
 
@@ -31,6 +31,26 @@ Owner 确认本任务只有两项改动：修正同步请求发布顺序；收�
 `common_machine_write_state()` 先设置 requested，再写 payload、重置完成事件。
 executor 可能提前观察请求，或完成信号被调用方随后重置。这是源码顺序风险，
 尚未以故障注入复现，不将其归因于已经修复的显示问题。
+
+准入复核 `df5df14`：当前 state read/write 的 payload 已在 requested 之前
+赋值，但完成事件仍在 requested 之后 reset；重复请求的 payload 也在占用
+检查之前写入。因此不沿用旧基线“payload 也在 requested 之后”的描述。
+media/debug 当前是 payload → reset → requested，仍须核对准入和退出交错。
+
+### S1 有限收敛台账
+
+单位是四类同步请求的调用方准备、executor 消费、完成与中止路径。
+每项必须有修复加测试，或带源码依据的保留决定；未完成项不能静默漏过。
+
+| 类别 | 准入观察 | 后续证据要求 |
+| --- | --- | --- |
+| state read | payload → requested → reset | 安全发布、即时完成、重复拒绝及 paused/running 路径 |
+| state write | payload → requested → reset | 安全发布、即时完成、错误状态与 load 完成 |
+| removable media | payload → reset → requested | 独占准入、执行失败、stop/shutdown |
+| debug | payload/lease → reset → requested | lease 失效、重复请求、取消/退出 |
+
+实施前先完成调用线程契约审计并报告最小方案及行数估算；本次准入不预设
+新增锁、字段或 request union。共享槽属于 S2，不为 S1 提前建立通用框架。
 
 实施前扫描所有同类同步请求。正确顺序为：确认独占准入，准备完整参数与完成
 等待，再通过明确同步边界发布请求，唤醒 executor，等待结果。保留重复请求
