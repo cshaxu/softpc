@@ -84,9 +84,17 @@ MS-DOS 提示符设为窗口启动时，KVM Window 在正常宽度和约两倍�
 于把尚未由原始 painter 写入的零化临时 DIB 发布为真实画面。KVM Window 正确地
 按这些源帧调整，所以不能在 Window 侧加过滤或尺寸特判。
 
-最小正确修复是：DIB bind 只分配/替换原始 painter 的 destination，并清除上一
-destination 遗留 dirty；只有原始 `InvalidateConsoleDIBits()` 才发布实际绘制的
-dirty frame。快照恢复在完成重建后已有显式 `invalidate_all`，该路径必须保留。
-这不改变 MVDM、Lib、Common 或 VM，也不假定 1280 宽度永远错误；它只消除错误
-的第二发布入口。测试须证明 bind 不发布、painter dirty 发布、显式全帧发布仍
-有效。
+最小正确修复的第一步已完成：DIB bind 只分配/替换原始 painter 的 destination，
+并清除上一 destination 遗留 dirty。所有者的后续复现证明这还不是完整边界：
+V7 hardware pointer 是 Compat 内的独立 overlay，移动鼠标会直接以 32×32 dirty
+发布 DIB；palette 更新也可发布整幅 dirty。若它们发生在 bind 后、原始 painter
+完成新 surface 前，仍会把临时 640/1280 DIB 当成完成帧。
+
+最终合同是每次 bind 开启一个 private painter generation：只有覆盖整张 surface 的
+原始 painter dirty 才打开它；此前 V7 overlay 和 palette 只能更新其本地状态，不能
+发布。bind 的 generation 改变还必须使旧 pointer background cache 失效，避免把旧
+DIB 像素恢复到同尺寸的新 DIB。快照重建已在完整原始刷新之后显式 `invalidate_all`，
+保留它作为强制提交路径。这不改变 MVDM、Lib、Common 或 VM，也不把 1280 宽度武断
+视为错误；它只保证 overlay 或半幅原始画笔不会把未完成的 geometry 对外发布。测试
+须证明 bind/partial-painter/overlay/palette 的准入、pointer generation 失效及显式
+全帧发布。

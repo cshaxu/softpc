@@ -22,6 +22,11 @@ int softpc_standalone_dib_surface(const void **bits_out, const void **info_out,
  * pixel storage.  The original header remains the painter contract; a
  * separate RGB header is published to the frontend. */
 int softpc_standalone_dib_bind(PBITMAPINFO painter_info);
+/* A newly bound painter target becomes usable after a full original paint.
+ * Compat-only overlays query this before touching pixels, and tag cached
+ * pixels with the binding generation. */
+int softpc_standalone_dib_ready(void);
+unsigned long softpc_standalone_dib_generation(void);
 int softpc_standalone_text_surface(const void **cells_out,
     unsigned long *columns_out, unsigned long *rows_out,
     unsigned long *stride_out, unsigned long *cell_bytes_out);

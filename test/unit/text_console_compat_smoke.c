@@ -21,6 +21,7 @@ static unsigned char attribute_at(const unsigned char *cells,
 static void verify_dib_bind_does_not_publish(void)
 {
     BITMAPINFO info;
+    PALETTEENTRY palette;
     SMALL_RECT rect;
     long left;
     long top;
@@ -36,16 +37,31 @@ static void verify_dib_bind_does_not_publish(void)
     assert(softpc_standalone_dib_bind(&info));
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
 
-    rect.Left = 3;
+    ZeroMemory(&palette, sizeof(palette));
+    rect.Left = 0;
     rect.Top = 4;
     rect.Right = 5;
     rect.Bottom = 6;
     assert(softpc_standalone_invalidate_dibits(NULL, &rect));
+    assert(!softpc_standalone_dib_ready());
+    assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    softpc_standalone_dib_set_palette_entries(&palette, 1);
+    assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    rect.Top = 0;
+    rect.Right = 639;
+    rect.Bottom = 479;
+    assert(softpc_standalone_invalidate_dibits(NULL, &rect));
+    assert(softpc_standalone_dib_ready());
     assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
-    assert(left == 3 && top == 4 && right == 5 && bottom == 6);
+    assert(left == 0 && top == 0 && right == 639 && bottom == 479);
+
+    softpc_standalone_dib_set_palette_entries(&palette, 1);
+    assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    assert(left == 0 && top == 0 && right == 639 && bottom == 479);
 
     info.bmiHeader.biWidth = 1280;
     assert(softpc_standalone_dib_bind(&info));
+    assert(!softpc_standalone_dib_ready());
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     softpc_standalone_dib_invalidate_all();
     assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));

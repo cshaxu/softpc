@@ -30,6 +30,8 @@ static unsigned long softpc_dib_width;
 static unsigned long softpc_dib_height;
 static SMALL_RECT softpc_dib_dirty;
 static int softpc_dib_dirty_valid;
+static int softpc_dib_painter_ready;
+static unsigned long softpc_dib_generation;
 #define SOFTPC_DIB_PALETTE_HISTORY 8u
 static RGBQUAD softpc_dib_palette_history[SOFTPC_DIB_PALETTE_HISTORY][16];
 static unsigned long softpc_dib_palette_history_count;
@@ -77,7 +79,8 @@ static void softpc_standalone_dib_record_palette(void)
    make that snapshot observable. */
 static void softpc_standalone_dib_palette_changed(void)
 {
-    if (softpc_dib_width == 0u || softpc_dib_height == 0u) return;
+    if (!softpc_dib_painter_ready || softpc_dib_width == 0u ||
+        softpc_dib_height == 0u) return;
     softpc_dib_dirty.Left = 0;
     softpc_dib_dirty.Top = 0;
     softpc_dib_dirty.Right = (SHORT)(softpc_dib_width - 1u);
@@ -87,6 +90,8 @@ static void softpc_standalone_dib_palette_changed(void)
 
 void softpc_standalone_dib_invalidate_all(void)
 {
+    if (softpc_dib_width == 0u || softpc_dib_height == 0u) return;
+    softpc_dib_painter_ready = 1;
     softpc_standalone_dib_palette_changed();
 }
 
@@ -181,12 +186,14 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info)
     CGADIB = painter_info;
     EGADIB = painter_info;
     VGADIB = painter_info;
-    /* Binding only gives the original painter a destination.  It is not a
+    /* Binding only gives the original painter a destination. It is not a
        completed guest frame: graphics setup can bind transient geometries
-       before the painter emits its first dirty rectangle.  Discard any dirty
-       rectangle belonging to the previous destination; real pixels become
-       visible exclusively through InvalidateConsoleDIBits. */
+       before the painter completes it. Discard any prior publication and
+       begin a new painter generation. Compat overlays stay out until that
+       full original paint has arrived. */
     softpc_dib_dirty_valid = 0;
+    softpc_dib_painter_ready = 0;
+    ++softpc_dib_generation;
     if (getenv("SOFTPC_DIB_TRACE") != NULL) {
         fprintf(stderr, "softpc dib bind %dx%dx%d\n", width, height,
             bits_per_pixel);
@@ -195,11 +202,30 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info)
     return 1;
 }
 
+int softpc_standalone_dib_ready(void)
+{
+    return softpc_dib_painter_ready;
+}
+
+unsigned long softpc_standalone_dib_generation(void)
+{
+    return softpc_dib_generation;
+}
+
 BOOL softpc_standalone_invalidate_dibits(HANDLE ignored,
     const SMALL_RECT *rect)
 {
     UNUSED(ignored);
     if (rect == NULL) return FALSE;
+    /* A graphics setup may bind transient DIB geometries while filling only
+       a small region. Do not let that region change the KVM surface. The
+       original painter opens a new generation only by completing its whole
+       canvas; V7 and palette overlays remain held back until then. */
+    if (!softpc_dib_painter_ready &&
+        (rect->Left != 0 || rect->Top != 0 ||
+         rect->Right != (SHORT)(softpc_dib_width - 1u) ||
+         rect->Bottom != (SHORT)(softpc_dib_height - 1u))) return TRUE;
+    softpc_dib_painter_ready = 1;
     if (!softpc_dib_dirty_valid) {
         softpc_dib_dirty = *rect;
         softpc_dib_dirty_valid = 1;

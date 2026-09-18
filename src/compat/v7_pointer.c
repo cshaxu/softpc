@@ -26,6 +26,7 @@ static unsigned char softpc_v7_pointer_background[
     SOFTPC_V7_POINTER_WIDTH * SOFTPC_V7_POINTER_HEIGHT];
 static unsigned long softpc_v7_pointer_background_width;
 static unsigned long softpc_v7_pointer_background_height;
+static unsigned long softpc_v7_pointer_background_generation;
 static long softpc_v7_pointer_left;
 static long softpc_v7_pointer_top;
 static long softpc_v7_pointer_right;
@@ -47,7 +48,9 @@ word y;
 
     UNUSED(x);
     UNUSED(y);
-    if (!softpc_v7_pointer_visible ||
+    if (!softpc_v7_pointer_visible || !softpc_standalone_dib_ready() ||
+        softpc_v7_pointer_background_generation !=
+            softpc_standalone_dib_generation() ||
         !softpc_standalone_dib_surface(&surface, &info, &width, &height) ||
         width != softpc_v7_pointer_background_width ||
         height != softpc_v7_pointer_background_height)
@@ -100,7 +103,8 @@ word y;
     /* A V7 pattern occupies 256 physical bytes.  EGA_planes contains all
        four interleaved VGA planes, so this check also covers the one-MiB
        compatibility allocation retained by the original V7 controller. */
-    if (EGA_planes == NULL || pattern > (4u * EGA_PLANE_SIZE) -
+    if (EGA_planes == NULL || !softpc_standalone_dib_ready() ||
+        pattern > (4u * EGA_PLANE_SIZE) -
         (2u * SOFTPC_V7_POINTER_MASK_SIZE) ||
         !softpc_standalone_dib_surface(&surface, &info, &width, &height) ||
         width == 0u || height == 0u)
@@ -122,6 +126,8 @@ word y;
         softpc_v7_pointer_bottom = (long)height - 1;
     softpc_v7_pointer_background_width = width;
     softpc_v7_pointer_background_height = height;
+    softpc_v7_pointer_background_generation =
+        softpc_standalone_dib_generation();
     pixels = (unsigned char *)surface;
     cursor = EGA_planes + pattern;
     stride = (width + 3u) & ~3u;

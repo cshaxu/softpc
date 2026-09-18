@@ -436,6 +436,10 @@ static void verify_driver_geometry(softpc_machine *machine)
         assert(width == widths[index]);
         while (softpc_machine_presentation_take_dirty(machine, &left, &top,
                 &right, &bottom)) { }
+        softpc_standalone_dib_invalidate_all();
+        assert(driver.copy_frame(driver.context, frame));
+        assert(frame->valid && frame->graphics);
+        assert(frame->graphics_width == width && frame->graphics_height == height);
         /* A legitimate full-height half repaint must not resize the frame.
          * Both halves are tested across original mode transitions. */
         rect.Left = 0; rect.Top = 0;
@@ -718,6 +722,9 @@ int main(void)
         while (softpc_machine_presentation_take_dirty(machine, &left, &top,
             &right, &bottom)) {
         }
+        softpc_standalone_dib_invalidate_all();
+        assert(softpc_machine_presentation_take_dirty(machine, &left, &top,
+            &right, &bottom));
         EGA_planes[0] = 0x80u;
         EGA_planes[1] = 0x00u;
         EGA_planes[2] = 0x00u;
@@ -761,6 +768,9 @@ int main(void)
         while (softpc_machine_presentation_take_dirty(machine, &left, &top,
             &right, &bottom)) {
         }
+        softpc_standalone_dib_invalidate_all();
+        assert(softpc_machine_presentation_take_dirty(machine, &left, &top,
+            &right, &bottom));
         EGA_planes[0] = 0x2au;
         EGA_planes[1] = 0x7eu;
         nt_v7vga_hi_graph_std(0, 0, 0, 2, 1);
@@ -805,6 +815,9 @@ int main(void)
         while (softpc_machine_presentation_take_dirty(machine, &left, &top,
             &right, &bottom)) {
         }
+        softpc_standalone_dib_invalidate_all();
+        assert(softpc_machine_presentation_take_dirty(machine, &left, &top,
+            &right, &bottom));
         EGA_planes[0] = 0x33u;
         EGA_planes[1] = 0x66u;
         nt_v7vga_hi_graph_std(0, 0, 0, 2, 1);
