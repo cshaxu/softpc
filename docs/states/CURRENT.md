@@ -20,7 +20,7 @@ any code-reduction candidate.
 | Verification | Deterministic `snapshot_finish()` failure injection, result/clock/operation-order proof, x86/x64 full regression and shared gates. |
 | Expected Markers | A finish failure cannot report successful completion or leave the VM operation/clock path inconsistent; no second completion or error route exists. |
 | Asset Needs | Existing test media/fakes; refresh both EXEs only after implementation; never modify owner INI/media. |
-| Reporting Requirements | Before code: exact ignored-result call path, current failure behavior, files and numstat estimate. After: actual production/test numstat, deterministic failure evidence, verification and EXE links. |
+| Reporting Requirements | Before code: exact ignored-result call path, current failure behavior, component/file ownership, production/test and MVDM mirror-diff estimates, boundary rationale and stop condition. After: actual production/test/component/mirror numstat, retained/moved/deleted disposition, deterministic failure evidence, x86/x64 build/full-test results, commit hash and both EXE links. |
 | Stop Conditions | Need for new public ABI, snapshot-format, Lib/Common, thread, product state semantic or unproven post-failure recovery change requires owner review. |
 | Exit Criteria | Finish-failure path has one terminal result/cleanup owner; deterministic proof, dual-width builds/tests, manifests, commit/push and S1 closure. |
 | Original Owner Request | 下一个t任务准入 |
