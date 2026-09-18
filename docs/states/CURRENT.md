@@ -2,9 +2,29 @@
 
 ## Current Work
 
-No implementation subtask is active. M9 T63 is closed after owner acceptance
-of its snapshot, Overlay-media and paused-save behavior. The first queued
-candidate remains Lib frame-copy and Console task simplification.
+M9 T64 S2 is active: narrowed frame copying. S1 audit is complete; owner
+cancelled thread unification and approved the prefix-plus-active-pixels copy.
+
+## M9 T64 S2 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approved narrowed implementation and standing commit/push; explicitly exclude INI this delivery. |
+| Objective | One frame-copy helper copies the complete prefix and only active graphic pixels. |
+| Non-goals | No worker/Base changes, field-by-field copy, layout changes, VM/Compat/MVDM or snapshot changes. |
+| Reference Baseline | T63 closure `3f1c961`; S1 source audit and owner decisions recorded in history. |
+| Candidate Proposal | [Lib simplification](../proposals/m9-lib-frame-copy-console-task.md) |
+| Files And ABI Surface | KVM frame helper/mailbox; Common published-frame copy; tests/manifests; layout unchanged. |
+| Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT and their governance skills. |
+| Verification | Prefix/tail/stride/mode tests, existing dirty/ack tests, shared manifests/boundaries, dual-width full regression and documentation gate. |
+| Expected Markers | Text copies skip 983040 bytes; graphics copies exactly stride*height pixels; locks/sequence remain unchanged. |
+| Asset Needs | Refresh only assets/binary/softpc32.exe and softpc64.exe; no INI/media/snapshot changes or commits. |
+| Reporting Requirements | Estimate production +15–30/-4–8; report actual production/test diff and copy-byte accounting. |
+| Stop Conditions | Need for new state, ownership, layout or unrelated semantic change requires review. |
+| Exit Criteria | Focused and full tests pass, actual diff reviewed, packaged and pushed; T64 awaits owner testing. |
+| Original Owner Request | 批准做这个收窄版修复。 |
+| Similar-Issue Sweep | Inspect Lib/Common full-frame copies and pixel readers; initialization and VM producers retained outside scope. |
 
 ## Current Technical Baseline
 
@@ -33,5 +53,5 @@ candidate remains Lib frame-copy and Console task simplification.
 
 ## Recent Governance
 
-T63's completed proposal is retained in history; its closure does not admit or
-reorder a Queue candidate. No active packet exists.
+T64 is admitted from the former Queue head. S1 source audit is recorded in
+[history](../history/M9-T64-S1-lib-simplification.md). No production code changed.
