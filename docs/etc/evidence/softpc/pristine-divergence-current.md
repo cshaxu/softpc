@@ -35,6 +35,14 @@ register、painter、dirty transaction 或 Compat/VM/KVM API。`egavideo.h` 的�
 原有 V7 controller 事实的内部可见性配套。测试故意使历史 mode 与仍有效的 V7 controller
 编码不一致，仍断言 640x400 DIB；双宽度 `softpc-vga-frame-smoke` 通过。
 
+### T69 S3 detached text-surface clear
+
+`host/src/nt_graph.c::nt_clear_screen()` 的原始 `FULLSCREEN` early return 只服务原
+native Console host。Standalone 中这些 API 已由 Compat 转入唯一 text surface，因此该 return
+会让客户机全屏后的 `cls` 根本不写入实际输出表面。只在 `SOFTPC_STANDALONE` 排除该 native
+policy；所有状态仍走原有 Compat clear 函数。非-standalone 代码逐字保留。VGA smoke 覆盖
+将 text surface 置满、把客户机 state 设为 FULLSCREEN 再调用原 clear，验证 80x25 全清。
+
 ## 冻结范围与复算
 
 T61 S1，2026-09-16，SoftPC `893db1ef790548de4d391dc71a9e5df9cb4e05c6`

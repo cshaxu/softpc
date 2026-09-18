@@ -172,5 +172,18 @@ V7 的 `0x60..0x69` 专有 byte-painter 宽度必须取 `vd_video_mode` 与 V7 e
 Prompt/fullscreen/PIF 的分支，也不改变寄存器、BIOS、painter、dirty 或 KVM 发布路径。
 `vga_frame_smoke` 将历史 BIOS mode 故意改为无关值后仍验证当前 V7 controller 的 640x400
 surface，直接证明 geometry 不再从历史请求取得。后续人工路线仍须覆盖“首次窗口化”和
-“fullscreen → windowed”两种 Win3.1 Prompt 路径；文字 clear/roundtrip 问题不以这个
-几何修复宣称完成。
+“fullscreen → windowed”两种 Win3.1 Prompt 路径。
+
+### S3 文本 clear/roundtrip 的独立 host-state 缺口
+
+审计证明 Standalone 的原始 Console API 调用已全部转接到 Compat 的一个 text surface；它不
+存在第二个 native Console 文本副本。然而 `nt_clear_screen()` 仍保留原 NT host 的
+`sc.ScreenState == FULLSCREEN` 早退。对 detached DIB/text host 来说，客户机的
+fullscreen/windowed 只是客户机显示状态，不能决定是否把清屏写入唯一 text surface。
+
+因此 standalone 仅移除该 native-host early return：所有状态继续调用同一 Compat
+`GetConsoleScreenBufferInfo` / `FillConsoleOutput*` 转接；非-standalone 保留原行为。这不
+改变客户机模式、清屏算法或 Console presenter，且不以 Win3.1、PIF 或任一模式编号判断。
+VGA smoke 将 Compat text surface 置满、设置 guest `FULLSCREEN` 后调用原
+`nt_clear_screen()`，断言 80x25 全部恢复为空格。它覆盖 Window/Console 两种 presenter
+共用的机器文本输出事实。

@@ -771,9 +771,11 @@ void nt_clear_screen(void)
 
     if(sc.ScreenBufHandle) return;
 
+#ifndef SOFTPC_STANDALONE
 #ifndef X86GFX
     if (sc.ScreenState == FULLSCREEN)   // don't want sudden screen clears
         return;
+#endif
 #endif
 
     /*::::::::::::::::::::::::::::: Get information on current screen size */

@@ -14,8 +14,10 @@
 #include "config.h"
 #include "vgaports.h"
 #include "compat/dib_surface.h"
+#include "compat/conapi.h"
 #include "compat/devices/snapshot.h"
 #include "nt_graph.h"
+#include "nt_fulsc.h"
 #include "cpu_vid.h"
 
 /* Original SoftPC headers erase const for pre-ANSI compilers.  Restore it
@@ -52,6 +54,7 @@ extern void nt_vga_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
 extern void nt_vga_med_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
+extern void nt_clear_screen(void);
 extern void nt_init_ega_lo_graph(void);
 extern void nt_v7vga_hi_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
@@ -66,6 +69,7 @@ extern unsigned short c_getAX(void);
 extern unsigned short c_getBX(void);
 extern unsigned short c_getCX(void);
 extern unsigned char Currently_emulated_video_mode;
+extern int soft_reset;
 extern void host_timer_event(void);
 extern PC_palette *DAC;
 extern void ega_graph_update(void);
@@ -104,6 +108,50 @@ static void verify_writer_contract(void)
     write_word_ev_glue(0xb1234u, 0xa55au);
     assert(writer_offset == 0xb1234u && writer_value == 0xa55au);
     c_ev_write_ptr = saved;
+}
+
+static void verify_fullscreen_text_clear(void)
+{
+    void *cells;
+    unsigned long columns;
+    unsigned long rows;
+    unsigned long stride;
+    unsigned long cell_bytes;
+    HANDLE saved_screen_buffer = sc.ScreenBufHandle;
+    int saved_screen_state = sc.ScreenState;
+    int saved_soft_reset = soft_reset;
+    BOOL saved_console_initialised = ConsoleInitialised;
+    BOOL saved_console_no_updates = ConsoleNoUpdates;
+    COORD origin;
+    DWORD written;
+    unsigned long cell;
+
+    assert(softpc_standalone_text_surface(&cells, &columns, &rows, &stride,
+        &cell_bytes));
+    assert(columns >= 80u && rows >= 25u && stride >= 80u && cell_bytes >= 2u);
+    origin.X = 0;
+    origin.Y = 0;
+    assert(softpc_compat_fill_console_character(NULL, 'X', 80u * 25u,
+        origin, &written));
+    assert(written == 80u * 25u);
+
+    /* A detached renderer has one text surface for every guest display
+       state. The original native Console fullscreen policy must not suppress
+       a guest clear before it reaches that surface. */
+    sc.ScreenBufHandle = NULL;
+    sc.ScreenState = FULLSCREEN;
+    soft_reset = 1;
+    ConsoleInitialised = TRUE;
+    ConsoleNoUpdates = FALSE;
+    nt_clear_screen();
+    for (cell = 0u; cell < 80u * 25u; ++cell)
+        assert(((const unsigned char *)cells)[cell * cell_bytes] == ' ');
+
+    sc.ScreenBufHandle = saved_screen_buffer;
+    sc.ScreenState = saved_screen_state;
+    soft_reset = saved_soft_reset;
+    ConsoleInitialised = saved_console_initialised;
+    ConsoleNoUpdates = saved_console_no_updates;
 }
 
 static void verify_panning_refresh(void)
@@ -615,6 +663,7 @@ int main(void)
         &height));
     assert(bits != NULL && info != NULL);
     assert(width == 1280u && height == 768u);
+    verify_fullscreen_text_clear();
 
     /* This fixed V7 model is the original 512 KiB card: INT 10h/6Fh/07h
        reports two 256 KiB blocks.  Do not infer a 1 MiB virtual adapter from
