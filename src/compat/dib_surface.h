@@ -30,10 +30,6 @@ int softpc_standalone_text_surface(const void **cells_out,
     unsigned long *stride_out, unsigned long *cell_bytes_out);
 int softpc_standalone_text_surface_geometry(unsigned long *columns_out,
     unsigned long *rows_out);
-int softpc_standalone_text_surface_fill_character(unsigned long start,
-    unsigned long count, unsigned char value, unsigned long *written_out);
-int softpc_standalone_text_surface_fill_attribute(unsigned long start,
-    unsigned long count, unsigned char value, unsigned long *written_out);
 int softpc_standalone_text_surface_write_cell(unsigned long column,
     unsigned long row, unsigned long byte_offset, unsigned char value);
 void softpc_standalone_dib_set_palette_entries(const PALETTEENTRY *entries,

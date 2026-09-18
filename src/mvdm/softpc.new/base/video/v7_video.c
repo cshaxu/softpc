@@ -73,25 +73,6 @@ FORWARD	void	v7vga_extended_set_mode();
 FORWARD	void	v7vga_select_autoswitch_mode();
 FORWARD	void	v7vga_get_memory_configuration();
 
-/* Return the V7 mode represented by the controller's BIOS-visible state.
- * Extended graphics modes are stored as mode - 4ch, while extended text
- * modes occupy foreground latch 1.  Callers must not use the last BIOS
- * request as a substitute for this current controller fact. */
-GLOBAL half_word
-v7vga_current_mode()
-{
-	half_word video_mode = sas_hw_at_no_check(vd_video_mode);
-
-	if (video_adapter == VGA)
-	{
-		if (video_mode > 0x13)
-			video_mode += 0x4c;
-		else if ((video_mode == 1) && extensions_controller.foreground_latch_1)
-			video_mode = extensions_controller.foreground_latch_1;
-	}
-	return video_mode;
-}
-
 GLOBAL	void		(*v7vga_video_func[]) () =
 {
 	v7vga_inquire,

@@ -594,7 +594,13 @@ void low_set_mode IFN1(int, mode)
 /* Get the video_.. variables from the mode table */
 	video_mode = sas_hw_at_no_check(vd_video_mode);
 #ifdef V7VGA
-	video_mode = v7vga_current_mode();
+	if (video_adapter == VGA)
+	{
+		if (video_mode > 0x13)
+			video_mode += 0x4c;
+		else if ((video_mode == 1) && extensions_controller.foreground_latch_1)
+			video_mode = extensions_controller.foreground_latch_1;
+	}
 
 	if (video_mode >= 0x60)
 	{
@@ -700,7 +706,11 @@ void load_font IFN5
 /* Finally switch back to the BIOS mode */
 	video_mode = sas_hw_at_no_check(vd_video_mode);
 #ifdef V7VGA
-	video_mode = v7vga_current_mode();
+	if (video_adapter == VGA)
+		if (video_mode > 0x13)
+			video_mode += 0x4c;
+		else if ((video_mode == 1) && extensions_controller.foreground_latch_1)
+			video_mode = extensions_controller.foreground_latch_1;
 #endif /* V7VGA */
 
 	low_set_mode(video_mode);
@@ -721,7 +731,11 @@ void recalc_text IFN1(int, height)
 
 	video_mode = sas_hw_at_no_check(vd_video_mode);
 #ifdef V7VGA
-	video_mode = v7vga_current_mode();
+	if (video_adapter == VGA)
+		if (video_mode > 0x13)
+			video_mode += 0x4c;
+		else if ((video_mode == 1) && extensions_controller.foreground_latch_1)
+			video_mode = extensions_controller.foreground_latch_1;
 #endif /* V7VGA */
 
 	if(video_adapter == EGA && !(get_EGA_switches() & 1) && (video_mode < 4))

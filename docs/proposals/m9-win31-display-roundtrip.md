@@ -593,3 +593,48 @@ is not needed for this cleanup and is not admitted without equivalent tests.
 S4 audit result: concrete dead/obsolete code can be removed without inventing
 new abstractions; the functioning width fix should stay. No production, build,
 test, package, configuration or media file is changed by the audit.
+
+## S4 owner reopen: complete T69's own cleanup
+
+The owner directs that the two S4-proven cleanup candidates remain inside T69,
+not deferred debt. S4 has one bounded purpose:
+
+1. delete `v7vga_current_mode()` and restore the original local BIOS conversion
+   expressions in `egavideo.h`, `ega_vide.c` and `v7_video.c`, also removing
+   the obsolete `nt_graph.c` include; and
+2. delete the uncalled `softpc_standalone_text_surface_fill` wrappers and their
+   declarations, while retaining the live logical-coordinate mapper and
+   `write_cell` implementation.
+
+This is a deletion/restoration task. It must not alter the retained packed
+painter width rule, transaction publication boundary or detached text/cursor
+policy, and it must not replace the deleted helper with another abstraction.
+Before deletion, all source, test and build callers are searched. Completion
+requires original-mirror comparison, focused x86/x64 VGA/text/snapshot proof,
+full regression proportional to the renderer/Compat paths, and no remaining
+T69 cleanup TODO.
+
+### S4 actual delivery
+
+The caller sweep found no production, test, CMake or build-support consumer of
+either deleted family. `egavideo.h`, `ega_vide.c` and `v7_video.c` now match
+the selected OpenNT originals byte-for-byte; `nt_graph.c` retains only the
+accepted standalone transaction, packed-painter width and detached text/cursor
+diffs. No replacement helper, state or interface was introduced. The live
+logical-coordinate fill remains in `graphics_console_compat.c`, which calls
+the retained `softpc_standalone_text_surface_write_cell` endpoint.
+
+Against `505001b`, the six production paths are `+17/-62`, net `-45`:
+the restored original MVDM expressions account for net `-7`, and removal of
+the uncalled Compat wrapper/declarations accounts for `-38`. The complete
+T69 production delta from `86de8eb` is now `+221/-62`, net `+159`; existing
+test/build coverage remains `+359/-2`, net `+357`. No media, INI or package
+file changed.
+
+Fresh x86/x64 test-target builds succeeded. On each width, the focused VGA,
+text-Compat and four snapshot tests pass 6/6. The x86 full suite passes every
+test except the pre-existing two package monitor stage-16 failures (106/108).
+The x64 full suite had the same two package failures plus the documentation
+gate before its Owner-Reopen history row was corrected; that gate then passed
+on direct x64 replay. No failure is attributed to the removal. `git diff
+--check` and documentation governance pass.

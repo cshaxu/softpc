@@ -18,13 +18,3 @@
   of the fixed run-budget assertion versus timer delivery before changing
   machine semantics; root cause is not established. See the
   [S8 recheck](../history/M9-T62-S8-session-queue-ownership.md#delivery-recheck).
-
-- [ ] TODO(Medium) T69 display-repair cleanup: restore the obsolete
-  `v7vga_current_mode()` refactor in the preserved MVDM files
-  (`egavideo.h`, `ega_vide.c`, `v7_video.c`) now that host geometry derives
-  directly from the selected packed painter; remove the uncalled Compat
-  `softpc_standalone_text_surface_fill` wrapper family. Admission requires a
-  bounded mirror-diff/dead-caller audit and x86/x64 VGA/text/snapshot
-  regression. This is simplification debt only; it must not reintroduce a
-  BIOS-mode geometry decision, source-specific publication, or a second text
-  surface.

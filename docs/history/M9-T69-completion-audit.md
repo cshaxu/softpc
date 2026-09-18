@@ -87,3 +87,10 @@ Verification retained for this closure:
   closure; and
 - the owner manually accepted the final package behavior. No package rebuild
   is claimed for this documentation-only closure.
+
+## Owner reopen for S4
+
+The owner correctly rejected deferring S4's two proven T69-introduced cleanup
+candidates. T69 is reopened as S4 to complete those deletions before a new
+task-level closure. The active packet and proposal are restored under their
+current authorities; this section remains historical context only.

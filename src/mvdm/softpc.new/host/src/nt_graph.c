@@ -44,7 +44,6 @@
 #include "egacpu.h"
 #include "egaports.h"
 #include "egamode.h"
-#include "egavideo.h"
 #include "host.h"
 #include "host_rrr.h"
 #include "error.h"
