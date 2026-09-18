@@ -363,3 +363,50 @@ clamp or additional mode exception was added. A general replacement must
 first account for the distinct original EGA low/medium/high and VGA painter
 pixel multipliers and byte/plane row contracts; a universal bytes-per-line
 formula is not valid for all of them.
+
+### S3 P5: real Win3.1 windowed-PIF A/B evidence
+
+Reuse the existing runtime-boot diagnostic with the installed owner HDD in
+in-memory overlay, no floppy, 16 MiB RAM, ordinary keyboard command input and
+the windowed PIF. Each run has a 60-second deadline and observes 15 seconds
+after graphics begins. Its existing username-input probe also types an
+unsubmitted string; both comparisons use that same sequence. The final copied
+frame was inspected and shows the actual windowed MS-DOS Prompt, not merely
+the Windows loading screen. The diagnostic does not create a KVM Window.
+
+The first temporary target omitted embedded firmware and failed before DOS;
+that run is invalid for display evidence. Adding the same firmware resource as
+the existing integration targets allows the real boot. Stale diagnostic-only
+macro/get-result references were adjusted temporarily. Neither those edits nor
+the temporary CMake target remains in the delivery.
+
+For the A/B comparison, only the P1 packed-width override was replaced with
+its preceding mode-table calculation; P2 countdown and all other runtime
+code stay current. Temporary selection logging reports BDA, chars, row bytes,
+seq-chain4, chain4 and packed-painter selection. The old calculation repeatedly
+selects 1280 at BDA E0h and returns to 640 at 1Bh/03h, with chars=80,
+bytes-per-line=640, seq-chain4=1, chain4=1 and the packed painter throughout.
+The copied VM frames actually alternate 640x480 and 1280x480. Thus the bad
+geometry crosses the publication boundary; it is not merely a staging DIB.
+
+Restoring P1 repeats real BDA E0h selections at width 640 with the same packed
+state; observed published graphics dimensions remain 640x480. However, that
+run also briefly selects a non-packed painter while chain4=0 (seq-chain4=1,
+BDA=1Bh), creating a 1280 DIB and then restoring 640 at chain4=1. No 1280 frame
+was observed at the copied-frame consumer in this run. This is a real-driver
+occurrence of transient painter selection, not yet evidence of a remaining
+visible resize or a warrant to suppress legitimate mode changes.
+
+Permanent coverage expands the existing packed-width BDA sweep from 00h..1Dh
+to all 256 byte values, including the observed E0h. No special case is added
+to production code. Production diff is zero; test +3/-2 (net +1). The owner
+HDD SHA256 is unchanged. Temporary trace/build wiring and the comparison
+override are removed; package EXEs remain the owner-tested P2 binaries.
+
+Verification after removing instrumentation: expanded VGA smoke builds and
+passes on x64 and x86; documentation governance and diff checks pass. No full
+suite is claimed for this test-only change; the P2 full-suite failures remain
+recorded above. All four diagnostic processes exited, with small bounded logs;
+their disposable captures/logs/target artifacts are removed after recording
+these findings. S3 remains open for the transient non-packed publication audit
+and the separately reported text/fullscreen corruption.

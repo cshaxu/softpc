@@ -522,9 +522,10 @@ static void verify_driver_geometry(softpc_machine *machine)
             extern void c_sas_store(IU32 addr, IU8 val);
             IU8 saved_mode = c_sas_hw_at(0x449u);
             unsigned bda_mode;
-            for (bda_mode = 0; bda_mode <= 0x1du; ++bda_mode) {
+            for (bda_mode = 0; bda_mode <= 0xffu; ++bda_mode) {
                 /* BIOS bookkeeping alone cannot change the active packed
-                   painter's geometry; no display register is written here. */
+                   painter's geometry, including Win3.1's observed E0h;
+                   no display register is written here. */
                 c_sas_store(0x449u, (IU8)bda_mode);
                 choose_display_mode();
                 assert(softpc_machine_presentation_dib(machine, &bits, &info,

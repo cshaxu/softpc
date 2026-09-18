@@ -21,11 +21,12 @@ The x64 BIOS-tick assertion passed on isolated rerun; both package stage-16
 failures remain unresolved. This is not a new timing workaround or S closure.
 
 The owner reports that P2 no longer jumps width for either initially windowed
-Prompt or fullscreen-to-windowed return. The remaining audit distinguishes
-normal ERFC writes from forced painter reselection; the latter can still
-produce doubled width in a synthetic register sequence. No actual Win3.1
-sequence proving that residual trigger has been captured. See the proposal's
-post-P2 audit; this is not acceptance of text/fullscreen corruption.
+Prompt or fullscreen-to-windowed return. A real Win3.1 windowed-PIF A/B run
+now reproduces old 1280-wide published frames at BDA E0h with an unchanged
+packed painter; current code keeps those selections at 640. A transient
+chain4-off 1280 DIB was also observed on current code, but not as a published
+frame in that run. See the proposal's S3 P5 evidence; this is not acceptance
+of text/fullscreen corruption or proof that all transient geometry is safe.
 
 ## M9 T69 S3 Packet
 
@@ -42,6 +43,7 @@ post-P2 audit; this is not acceptance of text/fullscreen corruption.
 | Verification | Inspect both read and write handlers, cached versus register state and original OpenNT differences. Require a focused failing reproduction at the selected owner before a repair. S2's gate test proves re-arming only; actual register values causing 1280-wide frames remain unmeasured. Record broad-suite failures without declaring them unrelated absent baseline comparison. |
 | Expected Markers | No completed frame combines pixels/stride/geometry from different renderer states. No geometry is inferred downstream from dirty bounds or a previous frame. The selected correction has no customer/source/mode identity condition. |
 | Asset Needs | Existing owner package/media only; no image writes. Refresh only package EXEs, preserving owner INI. |
+| Diagnostic Budget | S3 may run the existing runtime-boot diagnostic against the owner HDD with in-memory overlay only. Temporary target/output lives under `build/`; at most 90 seconds per run, 4 MiB text and two 2 MiB frame captures. The executor owns process termination and removal of temporary build wiring; retain only summarized findings. No guest-media/configuration writes or package replacement. |
 | Reporting Requirements | Record each geometry source and disposition, the exact pre/post mirror diff, tracked code accounting, focused/full evidence and a manual checklist for initial windowed Prompt, fullscreen roundtrip and Win95 Setup transition. |
 | Stop Conditions | A downstream filter, mode/PIF/application branch, timing workaround, unproven MVDM behavior change, second rendering route or Lib/Common scope expansion stops work for owner direction. |
 | Exit Criteria | Produce a source-backed causal investigation and bounded repair plan covering all remaining symptoms; leave unresolved hypotheses explicit. Implementation closure additionally requires focused and proportional x86/x64 verification and manual evidence. |
