@@ -350,3 +350,16 @@ No production repair follows from this probe. Remaining proof is a real driver
 register sequence reaching that selection boundary, plus its CPU-access and
 scanout interpretation. No PIF/mode exception, debounce, new renderer or
 Lib/Common change is justified by the current evidence.
+
+The same fixed-register BDA probe was expanded temporarily to all existing
+graphics-mode rows in `verify_driver_geometry`. With BDA 00h..10h the retained
+non-packed branch changes mode 60h's 752 to 640, 61h's 720 to 640, 62h's 800
+to 640, and 63h..65h's 1024 to 640. No register write is made by that probe;
+the original BIOS mode is restored and the painter reselected after each row.
+Packed rows remain stable. The temporary diagnostic was removed and rebuilt.
+This is a confirmed same-class geometry dependency, not evidence that Win3.1
+uses those planar modes or that it causes the reported doubling. No width
+clamp or additional mode exception was added. A general replacement must
+first account for the distinct original EGA low/medium/high and VGA painter
+pixel multipliers and byte/plane row contracts; a universal bytes-per-line
+formula is not valid for all of them.
