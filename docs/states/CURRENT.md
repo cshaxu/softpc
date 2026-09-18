@@ -20,6 +20,13 @@ packages build. VGA tests pass; full runs are x64 105/108 and x86 106/108.
 The x64 BIOS-tick assertion passed on isolated rerun; both package stage-16
 failures remain unresolved. This is not a new timing workaround or S closure.
 
+The owner reports that P2 no longer jumps width for either initially windowed
+Prompt or fullscreen-to-windowed return. The remaining audit distinguishes
+normal ERFC writes from forced painter reselection; the latter can still
+produce doubled width in a synthetic register sequence. No actual Win3.1
+sequence proving that residual trigger has been captured. See the proposal's
+post-P2 audit; this is not acceptance of text/fullscreen corruption.
+
 ## M9 T69 S3 Packet
 
 | Field | Required record |

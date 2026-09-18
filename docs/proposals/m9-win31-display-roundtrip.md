@@ -319,3 +319,34 @@ the two package stage-16 failures. x64 additionally failed
 and VGA rerun passed. This does not erase the failed full run or establish
 its cause. Documentation gate and diff checks passed. No owner media/INI,
 Lib or Common changes; S3 remains open for runtime display evidence.
+
+### S3 post-P2 width audit
+
+Owner feedback for `19533be`: neither initially windowed MS-DOS Prompt nor
+the window restored after fullscreen now jumps width. This accepts those
+observed width paths, not every display corruption symptom.
+
+The bounded audit covers width selection, painter selection, invalidation
+scheduling, Compat DIB binding and VM frame copying. P1 removes packed-width
+dependence on BIOS bookkeeping; P2 restores the original bounded countdown.
+Compat copies painter DIB geometry, and VM copies that geometry rather than
+deriving it from damage rectangles. Existing x86/x64 VGA tests pass.
+
+A temporary x64 probe refined the remaining chain4 hypothesis. Starting from
+original mode 66h, unlock extensions through ports 3c4/3c5, select ERFC and
+clear bit 5 (6ch to 4ch). Four normal host ticks each report seq-chain4=0,
+pending-mode-change=0, width=640 and the existing packed painter. Only after
+an explicit mode invalidation and the original two ticks does width become
+1280 with the doubled VGA painter. Restore ERFC and reselect before continuing
+the test. The probe was removed and the test target rebuilt afterwards.
+
+This distinguishes a register write from a subsequent painter-selection
+boundary: the earlier direct `choose_display_mode()` probe did not prove
+that ERFC alone causes a visible resize. Source confirms ERFC updates CPU
+read/write banking without requesting mode selection. `choose_vga_display_mode`
+also accounts for the emulator's interleaved backing layout; therefore simply
+removing chain4 from painter selection would be an unproven functional change.
+No production repair follows from this probe. Remaining proof is a real driver
+register sequence reaching that selection boundary, plus its CPU-access and
+scanout interpretation. No PIF/mode exception, debounce, new renderer or
+Lib/Common change is justified by the current evidence.
