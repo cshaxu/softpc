@@ -12,9 +12,6 @@ typedef struct _CONSOLE_GRAPHICS_BUFFER_INFO {
     void *lpBitMap;
 } CONSOLE_GRAPHICS_BUFFER_INFO, *PCONSOLE_GRAPHICS_BUFFER_INFO;
 
-BOOL softpc_standalone_invalidate_dibits(HANDLE ignored,
-    const SMALL_RECT *rect);
-
 int softpc_standalone_dib_init(void);
 int softpc_standalone_dib_surface(const void **bits_out, const void **info_out,
     unsigned long *width_out, unsigned long *height_out);
@@ -22,14 +19,12 @@ int softpc_standalone_dib_surface(const void **bits_out, const void **info_out,
  * pixel storage.  The original header remains the painter contract; a
  * separate RGB header is published to the frontend. */
 int softpc_standalone_dib_bind(PBITMAPINFO painter_info);
-/* A newly bound painter target becomes observable after the original painter
- * submits its first dirty region. Compat-only overlays query this before
- * touching pixels, and tag cached pixels with the binding generation. */
-int softpc_standalone_dib_ready(void);
+/* Every host display update uses this one transaction boundary. A bind or
+ * damage update remains private until the matching outer end. */
+void softpc_standalone_dib_begin_update(void);
+void softpc_standalone_dib_end_update(void);
+BOOL softpc_standalone_dib_damage(const SMALL_RECT *rect);
 unsigned long softpc_standalone_dib_generation(void);
-/* Palette and hardware-pointer updates are overlays, rather than original
- * painter output. They may update an observable DIB only. */
-BOOL softpc_standalone_dib_invalidate_overlay(const SMALL_RECT *rect);
 int softpc_standalone_text_surface(const void **cells_out,
     unsigned long *columns_out, unsigned long *rows_out,
     unsigned long *stride_out, unsigned long *cell_bytes_out);
@@ -49,6 +44,6 @@ int softpc_standalone_dib_take_dirty(long *left, long *top, long *right,
 void softpc_standalone_dib_invalidate_all(void);
 
 #define InvalidateConsoleDIBits(handle, rect) \
-    softpc_standalone_invalidate_dibits((handle), (rect))
+    ((void)(handle), softpc_standalone_dib_damage((rect)))
 
 #endif

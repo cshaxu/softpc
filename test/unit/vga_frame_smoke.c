@@ -445,7 +445,7 @@ static void verify_driver_geometry(softpc_machine *machine)
         rect.Left = 0; rect.Top = 0;
         rect.Right = (SHORT)((pass ? width / 2u : width) - 1u);
         rect.Bottom = (SHORT)(height - 1u);
-        assert(softpc_standalone_invalidate_dibits(NULL, &rect));
+        assert(softpc_standalone_dib_damage(&rect));
         assert(driver.copy_frame(driver.context, frame));
         assert(frame->valid && frame->graphics);
         if (frame->graphics_width != width || frame->graphics_height != height)
@@ -456,7 +456,7 @@ static void verify_driver_geometry(softpc_machine *machine)
         assert(frame->graphics_stride == width);
         assert(frame->dirty_right == rect.Right);
         rect.Left = (SHORT)(width / 2u); rect.Right = (SHORT)(width - 1u);
-        assert(softpc_standalone_invalidate_dibits(NULL, &rect));
+        assert(softpc_standalone_dib_damage(&rect));
         assert(driver.copy_frame(driver.context, frame));
         assert(frame->graphics_width == width && frame->dirty_right == rect.Right);
         assert(memcmp(frame->graphics_pixels, bits, width * height) == 0);

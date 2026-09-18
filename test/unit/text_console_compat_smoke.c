@@ -18,7 +18,7 @@ static unsigned char attribute_at(const unsigned char *cells,
     return cells[(row * stride + column) * cell_bytes + 1u];
 }
 
-static void verify_dib_bind_does_not_publish(void)
+static void verify_dib_update_transaction(void)
 {
     BITMAPINFO info;
     PALETTEENTRY palette;
@@ -42,31 +42,61 @@ static void verify_dib_bind_does_not_publish(void)
     rect.Top = 4;
     rect.Right = 5;
     rect.Bottom = 6;
-    assert(softpc_standalone_dib_invalidate_overlay(&rect));
-    assert(!softpc_standalone_dib_ready());
+    /* A host callback without an enclosing original display update is still
+       one complete transaction; no producer-specific outlet is needed. */
+    assert(softpc_standalone_dib_damage(&rect));
+    assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    assert(left == 0 && top == 4 && right == 5 && bottom == 6);
+
+    softpc_standalone_dib_begin_update();
+    assert(softpc_standalone_dib_damage(&rect));
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     softpc_standalone_dib_set_palette_entries(&palette, 1);
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
-    assert(softpc_standalone_invalidate_dibits(NULL, &rect));
-    assert(softpc_standalone_dib_ready());
+    softpc_standalone_dib_end_update();
     assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
-    assert(left == 0 && top == 4 && right == 5 && bottom == 6);
+    assert(left == 0 && top == 0 && right == 639 && bottom == 479);
 
     rect.Left = 7;
     rect.Top = 8;
     rect.Right = 9;
     rect.Bottom = 10;
-    assert(softpc_standalone_dib_invalidate_overlay(&rect));
+    softpc_standalone_dib_begin_update();
+    softpc_standalone_dib_begin_update();
+    assert(softpc_standalone_dib_damage(&rect));
+    softpc_standalone_dib_end_update();
+    assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    softpc_standalone_dib_end_update();
     assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     assert(left == 7 && top == 8 && right == 9 && bottom == 10);
 
+    /* Consecutive complete updates before a frame copy retain both damage
+       regions.  The presentation side will copy only the newest surface. */
+    rect.Left = 11;
+    rect.Top = 12;
+    rect.Right = 13;
+    rect.Bottom = 14;
+    softpc_standalone_dib_begin_update();
+    assert(softpc_standalone_dib_damage(&rect));
+    softpc_standalone_dib_end_update();
+    rect.Left = 15;
+    rect.Top = 16;
+    rect.Right = 17;
+    rect.Bottom = 18;
+    softpc_standalone_dib_begin_update();
+    assert(softpc_standalone_dib_damage(&rect));
+    softpc_standalone_dib_end_update();
+    assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    assert(left == 11 && top == 12 && right == 17 && bottom == 18);
+
+    softpc_standalone_dib_begin_update();
     softpc_standalone_dib_set_palette_entries(&palette, 1);
+    softpc_standalone_dib_end_update();
     assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     assert(left == 0 && top == 0 && right == 639 && bottom == 479);
 
     info.bmiHeader.biWidth = 1280;
     assert(softpc_standalone_dib_bind(&info));
-    assert(!softpc_standalone_dib_ready());
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     softpc_standalone_dib_invalidate_all();
     assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
@@ -89,7 +119,7 @@ int main(void)
     unsigned long index;
 
     assert(softpc_standalone_dib_init());
-    verify_dib_bind_does_not_publish();
+    verify_dib_update_transaction();
     assert(softpc_standalone_text_surface(&surface, &columns, &rows, &stride,
         &cell_bytes));
     assert(surface != NULL && columns == 80u && rows == 50u &&

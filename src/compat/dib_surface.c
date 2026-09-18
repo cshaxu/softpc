@@ -30,7 +30,9 @@ static unsigned long softpc_dib_width;
 static unsigned long softpc_dib_height;
 static SMALL_RECT softpc_dib_dirty;
 static int softpc_dib_dirty_valid;
-static int softpc_dib_painter_ready;
+static SMALL_RECT softpc_dib_pending_dirty;
+static int softpc_dib_pending_dirty_valid;
+static unsigned long softpc_dib_update_depth;
 static unsigned long softpc_dib_generation;
 #define SOFTPC_DIB_PALETTE_HISTORY 8u
 static RGBQUAD softpc_dib_palette_history[SOFTPC_DIB_PALETTE_HISTORY][16];
@@ -72,17 +74,18 @@ static void softpc_standalone_dib_record_palette(void)
     }
 }
 
-static BOOL softpc_standalone_dib_publish(const SMALL_RECT *rect)
+static BOOL softpc_standalone_dib_merge(SMALL_RECT *target, int *valid,
+    const SMALL_RECT *rect)
 {
     if (rect == NULL) return FALSE;
-    if (!softpc_dib_dirty_valid) {
-        softpc_dib_dirty = *rect;
-        softpc_dib_dirty_valid = 1;
+    if (!*valid) {
+        *target = *rect;
+        *valid = 1;
     } else {
-        if (rect->Left < softpc_dib_dirty.Left) softpc_dib_dirty.Left = rect->Left;
-        if (rect->Top < softpc_dib_dirty.Top) softpc_dib_dirty.Top = rect->Top;
-        if (rect->Right > softpc_dib_dirty.Right) softpc_dib_dirty.Right = rect->Right;
-        if (rect->Bottom > softpc_dib_dirty.Bottom) softpc_dib_dirty.Bottom = rect->Bottom;
+        if (rect->Left < target->Left) target->Left = rect->Left;
+        if (rect->Top < target->Top) target->Top = rect->Top;
+        if (rect->Right > target->Right) target->Right = rect->Right;
+        if (rect->Bottom > target->Bottom) target->Bottom = rect->Bottom;
     }
     return TRUE;
 }
@@ -92,25 +95,24 @@ static BOOL softpc_standalone_dib_publish(const SMALL_RECT *rect)
    bytes have not changed.  The standalone frontend instead publishes a
    self-contained RGB DIB snapshot, so a palette-only update must explicitly
    make that snapshot observable. */
-static void softpc_standalone_dib_palette_changed(void)
+static void softpc_standalone_dib_damage_all(void)
 {
-    if (!softpc_dib_painter_ready || softpc_dib_width == 0u ||
-        softpc_dib_height == 0u) return;
+    if (softpc_dib_width == 0u || softpc_dib_height == 0u) return;
     {
         SMALL_RECT rect;
         rect.Left = 0;
         rect.Top = 0;
         rect.Right = (SHORT)(softpc_dib_width - 1u);
         rect.Bottom = (SHORT)(softpc_dib_height - 1u);
-        (void)softpc_standalone_dib_publish(&rect);
+        (void)softpc_standalone_dib_damage(&rect);
     }
 }
 
 void softpc_standalone_dib_invalidate_all(void)
 {
-    if (softpc_dib_width == 0u || softpc_dib_height == 0u) return;
-    softpc_dib_painter_ready = 1;
-    softpc_standalone_dib_palette_changed();
+    softpc_standalone_dib_begin_update();
+    softpc_standalone_dib_damage_all();
+    softpc_standalone_dib_end_update();
 }
 
 /* nt_cga.c owns the original text update algorithm.  Its Windows console
@@ -204,13 +206,10 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info)
     CGADIB = painter_info;
     EGADIB = painter_info;
     VGADIB = painter_info;
-    /* Binding only gives the original painter a destination. It is not an
-       observable guest frame: graphics setup can bind transient geometries
-       before the painter writes any pixels. Discard prior publication and
-       begin a new painter generation. Compat overlays stay out until original
-       painter output arrives. */
+    /* Binding only replaces the staging destination. It cannot publish a
+       frame; the enclosing display-update transaction does that at its end. */
     softpc_dib_dirty_valid = 0;
-    softpc_dib_painter_ready = 0;
+    softpc_dib_pending_dirty_valid = 0;
     ++softpc_dib_generation;
     if (getenv("SOFTPC_DIB_TRACE") != NULL) {
         fprintf(stderr, "softpc dib bind %dx%dx%d\n", width, height,
@@ -220,9 +219,9 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info)
     return 1;
 }
 
-int softpc_standalone_dib_ready(void)
+void softpc_standalone_dib_begin_update(void)
 {
-    return softpc_dib_painter_ready;
+    ++softpc_dib_update_depth;
 }
 
 unsigned long softpc_standalone_dib_generation(void)
@@ -230,29 +229,41 @@ unsigned long softpc_standalone_dib_generation(void)
     return softpc_dib_generation;
 }
 
-BOOL softpc_standalone_invalidate_dibits(HANDLE ignored,
-    const SMALL_RECT *rect)
+void softpc_standalone_dib_end_update(void)
 {
-    UNUSED(ignored);
+    if (softpc_dib_update_depth == 0u) return;
+    --softpc_dib_update_depth;
+    if (softpc_dib_update_depth != 0u || !softpc_dib_pending_dirty_valid)
+        return;
+    /* The frame consumer may not have observed the preceding completed
+       update yet.  Keep its damage too: the DIB contains the latest pixels,
+       while this rectangle describes every changed part of that latest
+       surface since the consumer last copied it. */
+    (void)softpc_standalone_dib_merge(&softpc_dib_dirty,
+        &softpc_dib_dirty_valid, &softpc_dib_pending_dirty);
+    softpc_dib_pending_dirty_valid = 0;
+}
+
+BOOL softpc_standalone_dib_damage(const SMALL_RECT *rect)
+{
+    int own_update;
+
     if (rect == NULL) return FALSE;
-    /* This is the original nt_cga/nt_ega/nt_vga painter endpoint. Its first
-       dirty region, including a legitimate local update, makes this DIB
-       observable. Overlay producers use the separate entry below. */
-    softpc_dib_painter_ready = 1;
-    if (!softpc_standalone_dib_publish(rect)) return FALSE;
+    /* Normal original drawing is enclosed by host_start/end_update.  Some
+       original host callbacks (for example a hardware-pointer port update)
+       are legitimately standalone.  Give every such mutation the same
+       one-record transaction rather than identifying its producer. */
+    own_update = softpc_dib_update_depth == 0u;
+    if (own_update) softpc_standalone_dib_begin_update();
+    (void)softpc_standalone_dib_merge(&softpc_dib_pending_dirty,
+        &softpc_dib_pending_dirty_valid, rect);
     if (getenv("SOFTPC_DIB_TRACE") != NULL) {
         fprintf(stderr, "softpc dib dirty %d,%d-%d,%d\n", (int)rect->Left,
             (int)rect->Top, (int)rect->Right, (int)rect->Bottom);
         fflush(stderr);
     }
+    if (own_update) softpc_standalone_dib_end_update();
     return TRUE;
-}
-
-BOOL softpc_standalone_dib_invalidate_overlay(const SMALL_RECT *rect)
-{
-    if (rect == NULL) return FALSE;
-    if (!softpc_dib_painter_ready) return TRUE;
-    return softpc_standalone_dib_publish(rect);
 }
 
 int softpc_standalone_dib_surface(const void **bits_out, const void **info_out,
@@ -350,7 +361,7 @@ void softpc_standalone_dib_set_palette_entries(const PALETTEENTRY *entries,
         softpc_dib_info->bmiColors[index].rgbReserved = 0;
     }
     softpc_standalone_dib_record_palette();
-    softpc_standalone_dib_palette_changed();
+    softpc_standalone_dib_damage_all();
 }
 
 unsigned long softpc_standalone_dib_palette_history(const RGBQUAD **entries)

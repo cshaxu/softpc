@@ -928,6 +928,7 @@ void nt_graphics_tick(void)
 
 void nt_start_update(void)
 {
+   softpc_standalone_dib_begin_update();
    IDLE_video();
 }
 
@@ -935,7 +936,10 @@ void nt_start_update(void)
 /*::::::::::::::::::::::::: End screen update ::::::::::::::::::::::::::::::*/
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 
-void nt_end_update(void) {   }
+void nt_end_update(void)
+{
+    softpc_standalone_dib_end_update();
+}
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 /*::::::::::::::::::::::::::: Scroll screen up :::::::::::::::::::::::::::::*/

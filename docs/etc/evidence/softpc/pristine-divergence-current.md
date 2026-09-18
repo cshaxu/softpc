@@ -14,6 +14,16 @@ receiver 边界见同一 T63 实施记录。该增量同样不改写 T61 冻结�
 S1 数字和待处理标记是冻结基线；S2–S6 的处置记录覆盖其历史状态，
 不把已完成的候选继续算作欠账。
 
+### T69 S1 显示更新边界
+
+`host/src/nt_graph.c` 的原 `nt_start_update()`/`nt_end_update()` 各增加一条
+`DIVERGENCE(MVDM-DISPLAY-TRANSACTION-001)` mechanical bridge，分别进入与结束
+Compat 的 standalone DIB transaction。原始 `gfx_updt.c` 仍是唯一决定 update 范围、
+调用顺序及 painter 的代码；bridge 不读取客户机模式、DIB 尺寸、dirty 来源或产品状态。
+Compat 在 outer end 才把累计 damage 交给 VM copied-frame 路径。此窄改动替代 T69 S1
+P2/P3 的来源分类逻辑，x86/x64 transaction 与 V7 frame smoke 覆盖 bind、嵌套、palette、
+pointer 及连续未消费 damage；不新增原始机器行为分支。
+
 ## 冻结范围与复算
 
 T61 S1，2026-09-16，SoftPC `893db1ef790548de4d391dc71a9e5df9cb4e05c6`

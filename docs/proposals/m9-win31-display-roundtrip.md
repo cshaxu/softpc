@@ -113,7 +113,31 @@ bind 保持私有。`host_flush_screen()` 已走原始 update 算法，因而仍
 必要的镜像改动只能是原有 `nt_start_update()` / `nt_end_update()` 各调用一次 Compat
 bridge；这是一项机械 host-ABI 接线，不变更客户机控制器、绘制排序或产品 API。
 
+少数原始 host callback 可以在这对边界之外直接改变 surface，例如硬件 pointer 的
+port write。`damage()` 对所有调用者一律采用同一规则：若已有 transaction，只累计；
+若没有，则自己创建并结束一个单次 transaction。它不检查调用者、模式、尺寸或 dirty
+形状，因此不是 pointer/palette 的发布特判；每次可见发布仍都由同一个 end 逻辑完成。
+
 本轮同时审计目前 `check_win_size()` 中的 standalone V7 宽度分支。若它只是为掩盖
 错误的输入几何，须删除并由统一 transaction/正确的原始几何得到答案；若原始模型
 确实缺少该 host geometry，则必须以可证明的一般 host geometry contract 取代，不能
 保留 mode-number 条件。
+
+## S1 第三轮实施核对
+
+实现收敛为一个 Compat transaction record：`pending dirty` 只在嵌套深度归零时并入
+可消费 dirty；若前一完成事务尚未被 VM 复制，两个 damage 的外接矩形继续合并。这使
+frame consumer 始终读取最新 surface，并覆盖自上次复制以来的全部变动区域。bind、
+palette、V7 pointer 与 original painter 都只调用同一 `damage` 入口；不存在来源标签、
+`ready` 位或 overlay 入口。
+
+静态调用审计发现原始 `gfx_updt.c` 的 19 个 `host_start_update` 与 20 个
+`host_end_update` 调用仍使用既有 callback table；其中 cursor 分支的额外 end 是在其
+外层已开始的 transaction 内提前返回。Compat bridge 因而只接到原已有的一对
+`nt_start_update`/`nt_end_update`，不复制或重新排序原始调用。所有 standalone DIB
+mutation 的生产路径均归入该 transaction；测试中绕过 original callback 的 painter
+直接调用则验证同一 `damage()` 的通用单次 transaction 规则。
+
+`check_win_size()` 的 V7 `0x60..0x69` width 计算未作为本轮发布条件使用，也未新增。
+现有 `vga_frame_smoke` 覆盖这些原始 controller mode 的 DIB 尺寸；它是已证明的 host
+geometry 适配，暂不与本次 publication repair 混合改动。

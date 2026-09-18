@@ -48,8 +48,7 @@ word y;
 
     UNUSED(x);
     UNUSED(y);
-    if (!softpc_v7_pointer_visible || !softpc_standalone_dib_ready() ||
-        softpc_v7_pointer_background_generation !=
+    if (!softpc_v7_pointer_visible || softpc_v7_pointer_background_generation !=
             softpc_standalone_dib_generation() ||
         !softpc_standalone_dib_surface(&surface, &info, &width, &height) ||
         width != softpc_v7_pointer_background_width ||
@@ -79,7 +78,7 @@ word y;
         dirty.Top = (SHORT)softpc_v7_pointer_top;
         dirty.Right = (SHORT)softpc_v7_pointer_right;
         dirty.Bottom = (SHORT)softpc_v7_pointer_bottom;
-        (void)softpc_standalone_dib_invalidate_overlay(&dirty);
+        (void)softpc_standalone_dib_damage(&dirty);
     }
     softpc_v7_pointer_visible = 0;
 }
@@ -103,8 +102,7 @@ word y;
     /* A V7 pattern occupies 256 physical bytes.  EGA_planes contains all
        four interleaved VGA planes, so this check also covers the one-MiB
        compatibility allocation retained by the original V7 controller. */
-    if (EGA_planes == NULL || !softpc_standalone_dib_ready() ||
-        pattern > (4u * EGA_PLANE_SIZE) -
+    if (EGA_planes == NULL || pattern > (4u * EGA_PLANE_SIZE) -
         (2u * SOFTPC_V7_POINTER_MASK_SIZE) ||
         !softpc_standalone_dib_surface(&surface, &info, &width, &height) ||
         width == 0u || height == 0u)
@@ -174,7 +172,7 @@ word y;
         dirty.Top = (SHORT)softpc_v7_pointer_top;
         dirty.Right = (SHORT)softpc_v7_pointer_right;
         dirty.Bottom = (SHORT)softpc_v7_pointer_bottom;
-        (void)softpc_standalone_dib_invalidate_overlay(&dirty);
+        (void)softpc_standalone_dib_damage(&dirty);
     }
 }
 
