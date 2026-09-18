@@ -218,3 +218,23 @@ closed until two ticks after that second invalidation. No PIF, Win3.1,
 application, mode-number, dirty-shape or downstream width condition exists.
 Fullscreen roundtrip, initial Window and the Win95 Setup transition remain
 manual evidence cases, not branches in production code.
+
+## S3 admitted investigation after owner feedback
+
+The owner closes S2 as an incremental improvement and admits S3. CLS now
+clears correctly. Doubled-width excursions are less frequent but persist;
+window-to-fullscreen remains corrupt, and return to window leaves malformed
+text and newly typed characters invisible. See the
+[S2 closure](../history/M9-T69-S2-video-settle.md) for the exact evidence limits.
+
+The preceding explanation of the 1280-wide frame as a particular transient
+256-colour combination is a hypothesis, not captured register evidence. The
+settle change must also be reviewed for display starvation under sustained
+register activity. No extra delay is authorized as a substitute for diagnosis.
+
+S3 starts with a read-only audit, estimated production/test delta zero. Compare
+VGA read/write mode, odd/even and chain addressing, latches and planar stride
+with original source, following register writes through cached C-VID state.
+Then distinguish incorrect video RAM from incorrect painter interpretation
+and stale host publication. Retain the initial-windowed versus fullscreen-first
+discriminator. Actual code estimates follow identification of the owner.

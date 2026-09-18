@@ -2,30 +2,29 @@
 
 ## Current Work
 
-M9 T69 S2 is owner-reopened after the latest package still reproduced periodic
-KVM Window width alternation when Win3.1 initially launches a windowed MS-DOS
-Prompt. The previous V7 correction is retained, but its earlier closure claim
-was incomplete.
+M9 T69 S2 is closed at the owner's direction with remaining defects transferred
+to S3. T69 stays open. S3 investigates occasional doubled width, fullscreen
+corruption and broken windowed text after the fullscreen roundtrip.
 
-## M9 T69 S2 Packet
+## M9 T69 S3 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | Owner-Reopen |
-| Admission And Approval | The owner reported: “初始是窗口状态的msdos提示符程序确实还是隔一会就引发kvm-window窗口宽度闪烁 感觉是我们的显示模拟无法很好的支持win31的显示驱动”. Standing commit/push approval applies. |
-| Objective | Trace the first periodic completed geometry change in the standalone Win3.1 display-driver route, then repair the unique upstream display-model owner with a source-neutral invariant. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner: “你先收口这个S任务，提交推送，然后准入下一个S继续调研”. The owner reports reduced but persistent width flicker, working CLS, fullscreen corruption, and broken windowed text/visible typing after return. |
+| Objective | Investigate VGA memory read/write mapping, planes/latches, register-derived geometry and renderer publication across initial windowed and fullscreen roundtrips; distinguish measured causes from hypotheses before choosing a repair. |
 | Non-goals | No KVM Window debounce/filter, PIF/application/mode-specific branch, timer retry, forced repaint, guest-media/configuration change, Lib/Common API change, second renderer or silent geometry coercion. |
 | Reference Baseline | T69 S1 completed-frame transaction, S2 V7 current-controller geometry and S3 detached text/cursor guards remain the baseline. Owner reports width alternation still occurs; therefore none may be represented as the sole root cause. |
 | Candidate Proposal | [Win3.1 MS-DOS prompt display roundtrip repair](../proposals/m9-win31-display-roundtrip.md) |
 | Files And ABI Surface | Read-only tracing begins at original `nt_graph.c`, `nt_vga.c`, `nt_ega.c`, `nt_cga.c`, controller state and Compat DIB/text surface metadata, then follows VM copied-frame extraction. A source edit is limited to the proven owner. Any MVDM edit needs a narrow port-ABI reason and pristine-ledger disposition. No public ABI change. |
 | Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT and PRODUCT UI. The original renderer/Compat surface remains the only display state owner; KVM consumes copied complete frames only. |
-| Verification | Trace confirms completed upstream `1280x480 -> 640x480` source frames; `1280` is the original generic 256-colour calculation. Focused x86/x64 VGA smoke now proves a second controller invalidation re-arms the existing settle gate. Run proportional full suites and both package builds before manual Win3.1 verification. |
+| Verification | Inspect both read and write handlers, cached versus register state and original OpenNT differences. Require a focused failing reproduction at the selected owner before a repair. S2's gate test proves re-arming only; actual register values causing 1280-wide frames remain unmeasured. Record broad-suite failures without declaring them unrelated absent baseline comparison. |
 | Expected Markers | No completed frame combines pixels/stride/geometry from different renderer states. No geometry is inferred downstream from dirty bounds or a previous frame. The selected correction has no customer/source/mode identity condition. |
 | Asset Needs | Existing owner package/media only; no image writes. Refresh only package EXEs, preserving owner INI. |
 | Reporting Requirements | Record each geometry source and disposition, the exact pre/post mirror diff, tracked code accounting, focused/full evidence and a manual checklist for initial windowed Prompt, fullscreen roundtrip and Win95 Setup transition. |
 | Stop Conditions | A downstream filter, mode/PIF/application branch, timing workaround, unproven MVDM behavior change, second rendering route or Lib/Common scope expansion stops work for owner direction. |
-| Exit Criteria | The periodic source geometry transition is traced to one owner and corrected or disproven by deterministic evidence; no downstream workaround exists; both widths build/test; the owner confirms the initial-windowed Win3.1 route. |
-| Original Owner Request | “初始是窗口状态的msdos提示符程序确实还是隔一会就引发kvm-window窗口宽度闪烁”. |
+| Exit Criteria | Produce a source-backed causal investigation and bounded repair plan covering all remaining symptoms; leave unresolved hypotheses explicit. Implementation closure additionally requires focused and proportional x86/x64 verification and manual evidence. |
+| Original Owner Request | “窗口的msdos变成全屏依然花屏，而从全屏变成窗口，窗口显示的字符依旧不正常（打的字也不显示）”; “你先收口这个S任务，提交推送，然后准入下一个S继续调研”. |
 | Similar-Issue Sweep | Every standalone-reachable graphics geometry calculation, DIB bind/reset and completed-frame copy route receives a recorded disposition. |
 
 ## Current Technical Baseline
@@ -53,7 +52,6 @@ was incomplete.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
-| T69 | S1--S3 previously closed; owner-reopened as S2 after a later manual reproduction. | [Prior audit](../history/M9-T69-completion-audit.md) |
 | T68 | S1 complete; owner-directed safety repair; final dual-width 107/107. | [Audit](../history/M9-T68-completion-audit.md) |
 | T67 | S1--S4 complete; owner accepted; final dual-width 107/107. | [Audit](../history/M9-T67-completion-audit.md) |
 | T66 | S1--S4 complete; owner-validated dual-width package. | [Audit](../history/M9-T66-completion-audit.md) |
@@ -65,5 +63,5 @@ was incomplete.
 
 ## Recent Governance
 
-T69 closes the standalone display-route repair. The remaining candidates stay
-in [Queue](QUEUE.md).
+T69 remains open. S2 is closed with explicit transfers in its
+[bounded closure](../history/M9-T69-S2-video-settle.md); S3 is active.
