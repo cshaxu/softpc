@@ -24,6 +24,17 @@ Compat 在 outer end 才把累计 damage 交给 VM copied-frame 路径。此窄�
 P2/P3 的来源分类逻辑，x86/x64 transaction 与 V7 frame smoke 覆盖 bind、嵌套、palette、
 pointer 及连续未消费 damage；不新增原始机器行为分支。
 
+### T69 S2 V7 当前控制器几何
+
+`base/video/v7_video.c` 增加 `v7vga_current_mode()`，只把原已散落在
+`ega_vide.c` 的 V7 register/latch 解码集中为一个事实查询；三处既有调用以它替代重复
+代码。`host/src/nt_graph.c` 的 standalone DIB 宽度选择改为同一查询，避免把
+`Currently_emulated_video_mode`（最后 BIOS 请求）误当作 controller 当前模式。该差异是
+窄的 V7 host-surface port-ABI 修正：它不新增 standalone-only 产品分支，不动 BIOS、V7
+register、painter、dirty transaction 或 Compat/VM/KVM API。`egavideo.h` 的声明是这项
+原有 V7 controller 事实的内部可见性配套。测试故意使历史 mode 与仍有效的 V7 controller
+编码不一致，仍断言 640x400 DIB；双宽度 `softpc-vga-frame-smoke` 通过。
+
 ## 冻结范围与复算
 
 T61 S1，2026-09-16，SoftPC `893db1ef790548de4d391dc71a9e5df9cb4e05c6`

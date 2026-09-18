@@ -153,3 +153,24 @@ display-mode 初始化时建立的原始几何/cache/DIB metadata，而非 KVM W
 S2 将先记录首次窗口化与全屏往返两条路径的 completed surface geometry、stride、bind
 顺序与 copied frame geometry；只在最早发生差异的 owner 修复。不得以保留最后宽度、
 Window debounce、模式编号或 Prompt/PIF 名称判断来掩盖该差异。
+
+### S2 证据与收敛方向
+
+审计确认 Compat、VM copied-frame extraction 与 KVM Window 都不推导几何：Compat 仅绑定
+原始 DIB，VM 逐字节复制其 width/height/stride，KVM Window 只绘制 frame。完整 surface 的
+唯一宽高写者是镜像 `host/src/nt_graph.c::check_win_size()`；因此下游不存在应当保留的
+“第二宽度事实”。
+
+V7 的 `0x60..0x69` 专有 byte-painter 宽度必须取 `vd_video_mode` 与 V7 extension latch
+所表达的**当前控制器模式**。此前 standalone DIB bridge 却以
+`Currently_emulated_video_mode`（最后一次 BIOS 请求）选择该表。该变量在 Win3.1 首次
+窗口化 Prompt 所采用的直接 controller 重编程期间可以与当前 controller 分离；于是同一
+完成 surface 会交替经过标准 VGA 公式和 V7 table，产生 640/1280 两种错误 geometry。
+
+修复把这份 V7 controller 解码收为 `v7vga_current_mode()`，由 V7 实现拥有；`ega_vide.c`
+原有三份相同转换共同复用它，`check_win_size()` 也使用同一当前模式。它不是针对
+Prompt/fullscreen/PIF 的分支，也不改变寄存器、BIOS、painter、dirty 或 KVM 发布路径。
+`vga_frame_smoke` 将历史 BIOS mode 故意改为无关值后仍验证当前 V7 controller 的 640x400
+surface，直接证明 geometry 不再从历史请求取得。后续人工路线仍须覆盖“首次窗口化”和
+“fullscreen → windowed”两种 Win3.1 Prompt 路径；文字 clear/roundtrip 问题不以这个
+几何修复宣称完成。

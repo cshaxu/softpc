@@ -748,6 +748,16 @@ int main(void)
         &height));
     assert(width == 640u && height == 400u);
 
+    /* Surface geometry follows the current V7 controller encoding, not the
+       historical last-BIOS-request field.  This is the first-windowed-mode
+       regression boundary: a controller reprogram must not alternate the
+       detached DIB between its packed width and the generic CRTC width. */
+    Currently_emulated_video_mode = 0u;
+    assert(softpc_device_snapshot_rebuild_video_presentation());
+    assert(softpc_machine_presentation_dib(machine, &bits, &info, &width,
+        &height));
+    assert(width == 640u && height == 400u);
+
     c_setAH(0x6fu);
     c_setAL(5u);
     c_setBX(0x0067u);

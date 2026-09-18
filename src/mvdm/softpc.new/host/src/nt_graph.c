@@ -44,6 +44,7 @@
 #include "egacpu.h"
 #include "egaports.h"
 #include "egamode.h"
+#include "egavideo.h"
 #include "host.h"
 #include "host_rrr.h"
 #include "error.h"
@@ -1570,11 +1571,6 @@ static void check_win_size(register int height)
 {
     register int width;
     extern int soft_reset;
-#ifdef SOFTPC_STANDALONE
-#ifdef V7VGA
-    extern IU8 Currently_emulated_video_mode;
-#endif
-#endif
 
 #ifndef SOFTPC_STANDALONE
     if (! soft_reset)	// we want top get the chance to integrate with
@@ -1602,14 +1598,15 @@ static void check_win_size(register int height)
 
 #ifdef SOFTPC_STANDALONE
 #ifdef V7VGA
-    /* V7's proprietary 256-colour byte-mode is described by the original
-       controller table.  The generic NT console formula above mistakes its
-       CRTC width for character cells, producing a 1280-pixel DIB for modes
-       66h/67h although the original painter emits 640 guest pixels.  Adapt
-       only the detached host surface geometry from that original table. */
-    if (!alpha_num_mode() && Currently_emulated_video_mode >= 0x60 &&
-        Currently_emulated_video_mode <= 0x69)
-        width = vd_ext_graph_table[Currently_emulated_video_mode - 0x60].mode_screen_cols << 3;
+    /* The V7 painter's proprietary byte modes define their display width in
+       the controller table.  Resolve the current controller mode, rather
+       than consulting the last BIOS request, because a windowed guest may
+       reprogram the controller while retaining that historical request. */
+    {
+        half_word video_mode = v7vga_current_mode();
+        if (!alpha_num_mode() && video_mode >= 0x60 && video_mode <= 0x69)
+            width = vd_ext_graph_table[video_mode - 0x60].mode_screen_cols << 3;
+    }
 #endif
 #endif
 

@@ -111,6 +111,7 @@ IMPORT VOID host_mswin_disable IPT0();
 #ifdef V7VGA
 IMPORT VOID v7vga_extended_set_mode IPT0();
 IMPORT VOID v7vga_func_6f IPT0();
+IMPORT half_word v7vga_current_mode IPT0();
 #endif
 
 #ifdef VGG
