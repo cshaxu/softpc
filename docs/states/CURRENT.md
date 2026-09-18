@@ -28,6 +28,13 @@ chain4-off 1280 DIB was also observed on current code, but not as a published
 frame in that run. See the proposal's S3 P5 evidence; this is not acceptance
 of text/fullscreen corruption or proof that all transient geometry is safe.
 
+The owner subsequently reports that width jumping is gone. A separate report
+of fullscreen-PIF native Window height oscillation is currently not reproducible
+by the owner or bounded probes. The owner directs ending that investigation
+without a speculative repair. Prior windowed-PIF use is a possible precondition;
+the reported change affected the actual outer Window, not just its contents.
+See S3 P8 in the proposal. This disposition does not close T69's other defects.
+
 ## M9 T69 S3 Packet
 
 | Field | Required record |

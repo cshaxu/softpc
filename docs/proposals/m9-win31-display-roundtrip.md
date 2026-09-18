@@ -447,3 +447,34 @@ audit findings, not reasons to introduce a width clamp or application exception.
 Production, permanent test and package changes: zero. Temporary harness,
 target, logs and capture are removed after evidence recording. The HDD hash
 is verified unchanged. Package binaries remain P2/19533be; S3 remains open.
+
+### S3 P8: bounded fullscreen height investigation
+
+Owner report: with display=window, boot Windows normally and launch the
+fullscreen MS-DOS Prompt PIF from Program Manager. The actual native Window
+height repeatedly shrank and recovered; this was not merely content flashing.
+The owner later could not reproduce it, recalled testing the windowed Prompt
+first, and directed ending this investigation without speculative changes.
+Width jumping remains owner-accepted as resolved.
+
+Temporary probes used the existing VM/Common driver and installed HDD through
+in-memory overlay. Direct PIF startup and Program Manager File/Run startup
+both produced a stable fullscreen text frame: 80x25, font height 16. A further
+probe delivered those frames through the actual KVM Window and sampled its
+client rectangle: the graphics-to-text change was 640x480 to 640x400, without
+repeated collapse. These probes do not reproduce the precise mouse-double-click
+sequence after a prior windowed Prompt. They do not disprove the owner's report.
+
+Source review: Window text height is rows times copied font height; zero or
+out-of-range font height uses the existing 16-pixel default. The adapter always
+supplies 25 text rows here. Compat still reads BIOS character-height bookkeeping
+for the font copy, which is a candidate to correlate with controller state if
+the fault recurs, not an established cause of this report. No height-zero frame
+or repeated native resize was observed. No clamp, debounce or special case was
+introduced. Production, permanent tests and package changes are zero.
+
+Disposition: end this bounded investigation at owner direction, retaining the
+prior-windowed-PIF precondition for a future reproduction. This is not a claim
+of repairing an unconfirmed cause or accepting all fullscreen text behavior.
+Temporary probe wiring and owned artifacts are removed; media/configuration and
+the owner-tested package are unchanged.
