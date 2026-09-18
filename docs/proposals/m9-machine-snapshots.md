@@ -701,3 +701,9 @@ VM 仍是唯一知道其 checkpoint 是否安全的所有者；它既不向 Comm
 暂停后的首次保存会内部推进；保持 checkpoint 的第二次保存不运行客户机；两者都
 结束在 PAUSED，且没有额外 RUNNING/PAUSED 通知。x86/x64 均完成完整 106/106
 回归；package 等待 owner 手测。
+
+随后发现直接完成结果未携带实际 prompt，导致 native reader 已重臂但没有可见
+`SoftPC> `，直到下一行提交才重绘。修复把当前 prompt 收敛为 App 唯一的
+`effect → common_session_command_result` 转换职责；open、拒绝、媒体、load/save
+与非 debug 命令都走该出口，debug 的直接结果也通过同一 prompt helper。双宽度
+command/provider/package focused tests 覆盖 paused save 的文字、arm 与 prompt。

@@ -416,14 +416,23 @@ static app_lifecycle_request app_lifecycle_request_from_session(
     }
 }
 
-static void app_command_copy_effect(common_session_command_result *out,
-    const app_command_effect *effect)
+static void app_command_set_prompt(const app_command_context *command,
+    common_session_command_result *out)
 {
-    if (out == NULL || effect == NULL) return;
+    if (command == NULL || out == NULL) return;
+    (void)snprintf(out->prompt, sizeof(out->prompt), "%s",
+        command->debug_active ? command->debug_prompt : "SoftPC> ");
+}
+
+static void app_command_copy_effect(app_command_context *command,
+    common_session_command_result *out, const app_command_effect *effect)
+{
+    if (command == NULL || out == NULL || effect == NULL) return;
     *out = (common_session_command_result) { 0 };
     (void)snprintf(out->text, sizeof(out->text), "%s", effect->text);
     out->exit_requested = effect->exit_requested != 0;
     out->arm_prompt = effect->arm_prompt != 0;
+    app_command_set_prompt(command, out);
 }
 
 static lib_status app_snapshot_write(void *opaque, const lib_u8 *bytes,
@@ -511,7 +520,7 @@ void app_command_provider_open(void *opaque,
     app_command_context *command = (app_command_context *)opaque;
     app_command_effect effect = { 0 };
     app_command_session_open(&command->session, &effect);
-    app_command_copy_effect(out, &effect);
+    app_command_copy_effect(command, out, &effect);
 }
 
 void app_command_provider_reject_line(void *opaque,
@@ -520,7 +529,7 @@ void app_command_provider_reject_line(void *opaque,
     app_command_context *command = (app_command_context *)opaque;
     app_command_effect effect = { 0 };
     app_command_session_reject_line(&command->session, &effect);
-    app_command_copy_effect(out, &effect);
+    app_command_copy_effect(command, out, &effect);
 }
 
 static void app_command_copy_debug(app_command_context *command,
@@ -561,6 +570,7 @@ void app_command_provider_submit_line(void *opaque,
             app_command_copy_debug(command, state, &result, out);
         }
         command->session.prompt_due = out->request == COMMON_SESSION_REQUEST_NONE;
+        app_command_set_prompt(command, out);
         return;
     }
     app_command_session_submit_line(&command->session, app_command_state(state), line,
@@ -582,7 +592,7 @@ void app_command_provider_submit_line(void *opaque,
         app_command_session_complete_floppy(&command->session, effect.action,
             succeeded, &effect);
     }
-    app_command_copy_effect(out, &effect);
+    app_command_copy_effect(command, out, &effect);
     out->request = app_session_request(
         app_command_session_take_request(&command->session));
 }
@@ -603,7 +613,7 @@ void app_command_provider_note_runtime(void *opaque,
     app_command_effect effect = { 0 };
     app_command_session_note_runtime(&command->session, app_command_state(prior),
         app_machine_completed_state(completed), &effect);
-    app_command_copy_effect(out, &effect);
+    app_command_copy_effect(command, out, &effect);
     if (command->debug_active) {
         command->debug_completed_pending = LIB_FALSE;
         common_debug_machine_state state = completed == COMMON_SESSION_MACHINE_PAUSED ?
@@ -637,15 +647,14 @@ void app_command_provider_note_monitor_current(void *opaque,
     app_command_effect effect = { 0 };
     app_command_session_note_monitor_current(&command->session, current != 0,
         &effect);
-    app_command_copy_effect(out, &effect);
+    app_command_copy_effect(command, out, &effect);
     if (current && command->debug_completed_pending) {
         command->debug_completed_pending = LIB_FALSE;
         app_command_copy_debug(command, COMMON_SESSION_MACHINE_PAUSED,
             &command->debug_completed, out);
         out->arm_prompt = out->request == COMMON_SESSION_REQUEST_NONE;
     }
-    (void)snprintf(out->prompt, sizeof(out->prompt), "%s",
-        command->debug_active ? command->debug_prompt : "SoftPC> ");
+    app_command_set_prompt(command, out);
 }
 
 lib_status app_command_initialize(app_command_context *command,

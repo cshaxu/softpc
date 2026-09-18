@@ -948,7 +948,8 @@ int main(void)
     assert(result.arm_prompt && strstr(result.text, "Machine saved and paused.") != NULL);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED,
         "save debug-commands-smoke.spcs", &result);
-    assert(result.arm_prompt && strstr(result.text, "Machine saved and paused.") != NULL);
+    assert(result.arm_prompt && strcmp(result.prompt, "SoftPC> ") == 0 &&
+        strstr(result.text, "Machine saved and paused.") != NULL);
     assert(common_machine_stop(machine));
     wait_for(events.stopped);
     provider.note_runtime(&commands, COMMON_SESSION_MACHINE_PAUSED,

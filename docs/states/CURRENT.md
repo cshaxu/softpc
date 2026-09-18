@@ -13,7 +13,7 @@ remains the first queued candidate.
 
 ## Current Technical Baseline
 
-- Source: T63 S11 P15 (`678cb2b`).
+- Source: T63 S12 P16 (`a7278d9`).
 - Snapshots are host-width-independent, fixed-order streams with no format
   version, magic or section identifier. Save is running-to-paused; load is
   initial/stopped-to-paused and does not create a Window until resume.
@@ -48,7 +48,7 @@ correction. No code, package or rule changed.
 | Admission And Approval | Owner accepts S11 and directs the next S: `save` must work from PAUSED. If VM is already at a snapshot-safe checkpoint, write it directly; otherwise arm its safe checkpoint and resume only until it is reached. |
 | Objective | Permit `save <file>` from RUNNING or PAUSED while preserving the existing result: a successful save leaves the machine PAUSED. |
 | Non-goals | No Lib change, new public Common API, Session/UI state, MVDM change, debug semantic change, new executor, product-visible Running transition, or input acceptance while an internally continued paused save runs. Load remains stopped-only. |
-| Reference Baseline | T63 S11 P15 (`678cb2b`); snapshots are versionless, cross-width fixed-order streams with Overlay media state. |
+| Reference Baseline | T63 S12 P16 (`a7278d9`); snapshots are versionless, cross-width fixed-order streams with Overlay media state. |
 | Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md), S12 ledger. |
 | Files And ABI Surface | App command validation/help, Common Machine's existing state-read internals, VM snapshot driver state and focused Common/VM/App tests. The existing `common_machine_read_state` signature and driver callbacks remain unchanged. |
 | Applicable Rules | docs/rules/EXECUTION.md, ARCHITECTURE.md, CODING.md, DOCUMENT.md; docs/design/ARCHITECTURE.md and CODING.md; snapshot design. |
