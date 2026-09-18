@@ -1,5 +1,9 @@
 # M9 T69 completion audit
 
+> The initial closure below is retained as historical evidence. It was
+> superseded by the owner-reopened S2/S3 investigation. The authoritative final
+> closure is recorded at the end of this document.
+
 Owner request: fix the Win3.1 MS-DOS Prompt display route without any
 mode-/application-specific workaround: initial windowed Prompt width must not
 alternate; guest fullscreen must retain a correct frame; and `cls` must keep
@@ -54,3 +58,32 @@ register write could not restart the already-running interval. The repair adds
 one private core generation and makes the existing gate wait from the final
 controller update; its focused x86/x64 proof is recorded in the active packet.
 Manual Win3.1 verification remains required before another task-level closure.
+
+## Final T69 closure
+
+The owner has accepted the final repaired Win3.1 display route and approved
+T69 closure after S4's finite accounting audit.
+
+| Required outcome | Final disposition | Evidence |
+| --- | --- | --- |
+| Complete-frame publication | Kept | Compat commits deferred damage only at the original outer update boundary; no producer, PIF, mode or timing filter remains. |
+| Packed display width | Kept | The selected packed painter's one-byte/one-pixel row contract supplies width; the old BIOS bookkeeping override cannot publish a 1280-wide frame for the same packed state. |
+| Fullscreen/windowed text state | Kept | Detached text clear and cursor metadata continue through the single Compat text surface. |
+| Scope boundary | Kept | Lib, Common and public product interfaces remain unchanged; KVM consumes copied complete frames only. |
+| Further work | Deferred explicitly | The intermittent outer Window-height observation and two verified simplification candidates are recorded in `TODO.md` with admission conditions. |
+
+The S4 ledger compares `86de8eb..662f7d4`: production is `+283/-79` (net
+`+204`), tests/build `+359/-2` (net `+357`); owner media, INI and package
+artifacts are excluded. The candidate cleanup is deliberately not folded into
+this closure: it would restore obsolete preserved-MVDM helper churn and remove
+dead Compat wrappers in a separately bounded task.
+
+Verification retained for this closure:
+
+- focused VGA/text smoke passed on both x64 and x86 during the accepted repair;
+- the snapshot regressions were rerun after the final audit: all four focused
+  snapshot tests passed on x64 and all four passed on x86;
+- `git diff --check` and the documentation-governance gate pass for this
+  closure; and
+- the owner manually accepted the final package behavior. No package rebuild
+  is claimed for this documentation-only closure.
