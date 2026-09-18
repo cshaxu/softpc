@@ -413,13 +413,14 @@ WORD aNumPadSCode[] = // index by VK_NUMPAD0 as zero offset
 BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
 {
     /*:::::::::::::::::::::::::::::::::::: do we need the enhanced key set ? */
+    /* Correct original one-past-end guards: byte count is exclusive. */
 
     if(!(KeyEvent->dwControlKeyState & ENHANCED_KEY))
     {
 
 	/*............................... the regular keyset is what we need */
 
-        return  KeyEvent->wVirtualScanCode > sizeof(Scan1ToKeynum)
+        return  KeyEvent->wVirtualScanCode >= sizeof(Scan1ToKeynum)
 		   ? 0
                    : Scan1ToKeynum[KeyEvent->wVirtualScanCode];
     }
@@ -428,7 +429,7 @@ BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
         /*.................................. we do need the extended key set */
 
 
-        return  KeyEvent->wVirtualScanCode > sizeof(Scan1ToKeynumExtended)
+        return  KeyEvent->wVirtualScanCode >= sizeof(Scan1ToKeynumExtended)
 		   ? 0
                    : Scan1ToKeynumExtended[KeyEvent->wVirtualScanCode];
     }

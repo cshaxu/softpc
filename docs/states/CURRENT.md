@@ -7,10 +7,9 @@ No implementation subtask is active. The ordered candidate queue is in
 
 ## Current Technical Baseline
 
-- Source: T67 is closed. Floppy and hard-disk startup policies are independent;
-  snapshot restore uses copied media attachments and the approved fixed-disk
-  conversion matrix. No Lib, Common, MVDM, snapshot container, thread or input
-  behavior changed.
+- Source: T68 is closed. The preserved Scan-1 table mapper rejects both first
+  out-of-range input values without changing valid key mappings. No Lib,
+  Common, App, VM, Compat interface or input behavior changed.
 - Both widths have 107 passing test cases; package EXEs were refreshed without
   changing owner INI/media. See [T65 audit](../history/M9-T65-completion-audit.md).
 - Snapshots are width-independent fixed-order binary streams with no magic,
@@ -28,6 +27,7 @@ No implementation subtask is active. The ordered candidate queue is in
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T68 | S1 complete; owner-directed safety repair; final dual-width 107/107. | [Audit](../history/M9-T68-completion-audit.md) |
 | T67 | S1--S4 complete; owner accepted; final dual-width 107/107. | [Audit](../history/M9-T67-completion-audit.md) |
 | T66 | S1--S4 complete; owner-validated dual-width package. | [Audit](../history/M9-T66-completion-audit.md) |
 | T65 | S1 complete; request-slot refactor cancelled after contract audit; dual-width 107/107. | [Audit](../history/M9-T65-completion-audit.md) |
@@ -38,6 +38,5 @@ No implementation subtask is active. The ordered candidate queue is in
 
 ## Recent Governance
 
-T67 closes the independent floppy/hard-disk policy ledger. Its S1--S3 records
-remain in history and S4's owner-approved detached-slot failure policy is
-recorded in the T-level audit.
+T68 closes the bounded original keyboard-table safety repair. T67's independent
+media-policy ledger remains recorded in its T-level audit.

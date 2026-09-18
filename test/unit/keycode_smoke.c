@@ -61,5 +61,7 @@ int main(void)
     assert(app_keycode(0x1du, 0u) == 58u);       /* left Ctrl */
     assert(app_keycode(0x1du, ENHANCED_KEY) == 64u); /* right Ctrl */
     assert(app_keycode(0x54u, 0u) == 0u);        /* unmapped */
+    assert(app_keycode(133u, 0u) == 0u);         /* first regular OOB */
+    assert(app_keycode(84u, ENHANCED_KEY) == 0u); /* first enhanced OOB */
     return 0;
 }
