@@ -183,6 +183,18 @@ int main(void)
     assert(!strcmp(effect.path, "Mixed-Case.img"));
     arm(&session, NULL);
     app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
+        "floppy insert readonly ReadOnly.img", &effect);
+    assert(effect.action == APP_COMMAND_ACTION_INSERT_FLOPPY);
+    assert(effect.media_mode == LIB_STORAGE_MEDIUM_READONLY);
+    assert(!strcmp(effect.path, "ReadOnly.img"));
+    arm(&session, NULL);
+    app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
+        "floppy insert overlay Overlay.img", &effect);
+    assert(effect.action == APP_COMMAND_ACTION_INSERT_FLOPPY);
+    assert(effect.media_mode == LIB_STORAGE_MEDIUM_OVERLAY);
+    assert(!strcmp(effect.path, "Overlay.img"));
+    arm(&session, NULL);
+    app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
         "floppy insert Mixed-Case.img", &effect);
     assert(strstr(effect.text, "Usage: floppy insert <readonly|direct|overlay> <image> | eject") != NULL);
     assert_blank_line(effect.text);

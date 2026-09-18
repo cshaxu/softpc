@@ -562,9 +562,17 @@ int main(void)
         LIB_STORAGE_MEDIUM_DIRECT));
     assert(fake.media_calls == 1 && fake.media_mode == LIB_STORAGE_MEDIUM_DIRECT &&
         !strcmp(fake.media_path, "Mixed-Case.img"));
+    assert(common_machine_set_removable_media(machine, "ReadOnly.img",
+        LIB_STORAGE_MEDIUM_READONLY));
+    assert(fake.media_calls == 2 && fake.media_mode == LIB_STORAGE_MEDIUM_READONLY &&
+        !strcmp(fake.media_path, "ReadOnly.img"));
+    assert(common_machine_set_removable_media(machine, "Overlay.img",
+        LIB_STORAGE_MEDIUM_OVERLAY));
+    assert(fake.media_calls == 3 && fake.media_mode == LIB_STORAGE_MEDIUM_OVERLAY &&
+        !strcmp(fake.media_path, "Overlay.img"));
     assert(common_machine_set_removable_media(machine, NULL,
         LIB_STORAGE_MEDIUM_OVERLAY));
-    assert(fake.media_calls == 2 && fake.media_mode == LIB_STORAGE_MEDIUM_OVERLAY &&
+    assert(fake.media_calls == 4 && fake.media_mode == LIB_STORAGE_MEDIUM_OVERLAY &&
         fake.media_path[0] == '\0');
     fake.defer_state_read = 1;
     {
