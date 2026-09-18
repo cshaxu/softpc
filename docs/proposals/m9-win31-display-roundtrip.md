@@ -141,3 +141,15 @@ mutation 的生产路径均归入该 transaction；测试中绕过 original call
 `check_win_size()` 的 V7 `0x60..0x69` width 计算未作为本轮发布条件使用，也未新增。
 现有 `vga_frame_smoke` 覆盖这些原始 controller mode 的 DIB 尺寸；它是已证明的 host
 geometry 适配，暂不与本次 publication repair 混合改动。
+
+## S2 新复现对照：首次窗口化初始化
+
+S1 关闭后，所有者确认宽度跳变仍存在，但边界已显著收窄：只有 Win3.1 内 MS-DOS
+提示符**首次以窗口化方式启动**时发生。把同一提示符切入客户机全屏、再恢复窗口后，
+宽度稳定。这个对照排除“Window 只要收到 Prompt 帧就会跳”的解释，并优先指向首次
+display-mode 初始化时建立的原始几何/cache/DIB metadata，而非 KVM Window resize、鼠标、
+普通 dirty 更新或后续模式切换。
+
+S2 将先记录首次窗口化与全屏往返两条路径的 completed surface geometry、stride、bind
+顺序与 copied frame geometry；只在最早发生差异的 owner 修复。不得以保留最后宽度、
+Window debounce、模式编号或 Prompt/PIF 名称判断来掩盖该差异。

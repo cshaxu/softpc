@@ -2,30 +2,30 @@
 
 ## Current Work
 
-M9 T69 S1 is admitted with an owner-revised scope: replace the rejected
-source-specific DIB publication workaround with one standalone Compat
-display-update transaction.
+M9 T69 S2 is admitted after owner closure of S1. It investigates the remaining
+Win3.1 windowed MS-DOS Prompt width alternation without reviving any
+source-/mode-specific publication filter.
 
-## M9 T69 S1 Packet
+## M9 T69 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | S1 repaired the independently proven logical Console fill/geometry gap. Its later P2/P3 DIB publication changes reduced severe flicker but owner testing still reports stutter and a two-width Window. Owner explicitly rejected all source-specific branches: “禁止特判，禁止添油战术，找出最合理的干净的方案处理视频问题”, and revised this still-open S1 to replace that path. Standing commit/push approval applies. |
-| Objective | Make one source-neutral display-update transaction the sole publication boundary. A DIB bind creates staging state; every display mutation only records damage; the original display update's completion publishes the current geometry, palette and pixels together. No producer identity, DIB size, mode family, palette, pointer, or dirty shape may decide whether a frame is publishable. Retain S1's logical Console buffer/viewport repair. |
-| Non-goals | No CLS, guest-application, V7, palette, pointer, Window-size, timing-delay, or fullscreen special case; no forced repaint; no customer image/configuration change; no Lib/Common/VM API change; no duplicate rendering path. Do not add a generalized terminal/scroll system. |
-| Reference Baseline | `nt_graph.c` exposes original host update delimiters `nt_start_update()`/`nt_end_update()` through `host_start_update()`/`host_end_update()`, called around normal text and graphics paints. Today `nt_end_update()` is empty. S1 P2/P3 instead classified input sources through `painter_ready`/`invalidate_overlay`, which is explicitly rejected and must be removed. The existing standalone-only V7 geometry branch in `check_win_size()` is also in scope for an evidence-based disposition; it may not remain as an unexamined workaround. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner accepted S1's source-neutral transaction architecture and explicitly instructed: “先收口S1吧，然后S2继续做。现在窗口的msdos提示符的时候，kvm-window窗口宽度还是会不断跳跃”. Standing commit/push approval applies. |
+| Objective | Find the earliest producer of the still-completed alternating Window geometry in the Win3.1 windowed MS-DOS Prompt route, then repair that producer with one general geometry/publication invariant. A copied graphics frame must carry only the original renderer's completed current surface geometry; KVM Window remains a passive consumer. |
+| Non-goals | No KVM Window resize debounce/filter, no mode-number/PIF/application/palette/pointer/dirty-shape condition, no timing retry or forced repaint, no customer image/configuration change, no Lib/Common API change and no second renderer. Do not reopen S1's source-specific publication paths. |
+| Reference Baseline | S1 P4 (`10d6c0f`) made Compat publication source-neutral. Owner observes normal-width/two-width alternation only when a Win3.1 MS-DOS Prompt initially starts windowed. If that same Prompt first enters guest fullscreen and returns windowed, it stabilizes. Thus a first-mode initialization/cache fact differs from a later display-mode transition; candidate ownership is limited to original `nt_graph.c` geometry selection/cache setup, Compat DIB bind/surface metadata, and VM copied-frame extraction. No conclusion is assumed. |
 | Candidate Proposal | [Win3.1 MS-DOS prompt display roundtrip repair](../proposals/m9-win31-display-roundtrip.md) |
-| Files And ABI Surface | `src/compat/dib_surface.[ch]` owns staging damage and the one completed-update publication record; `src/compat/v7_pointer.c` may only mutate the current staging surface and report ordinary damage; `src/compat/graphics_console_compat.c` retains the logical Console model. A minimal mechanical host-callback bridge in `src/mvdm/softpc.new/host/src/nt_graph.c` may call Compat begin/end functions from its already-existing host update delimiters; it must not alter guest policy, controller state or original update ordering. Compat-focused tests prove the transaction. No public product ABI changes. |
+| Files And ABI Surface | Initial audit is read-only across `src/mvdm/softpc.new/host/src/nt_graph.c`, `src/compat/dib_surface.[ch]`, `src/compat/graphics_console_compat.c`, `src/compat/video.c`, and VM frame extraction. Any implementation is limited to the proven owner; an MVDM change requires an explicit port-ABI reason and pristine-ledger disposition. No public product ABI change. |
 | Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT and PRODUCT UI. One shared text-surface owner remains required; no presenter or native Console bypass is introduced. |
-| Verification | Preserve the existing logical Console fill/geometry proofs. Prove a bind and every mutation type leave no externally consumable dirty frame before the matching end-update; prove one end-update publishes the final bound geometry and accumulated damage once; prove a nested or empty transaction does not create a false frame; prove pointer/palette/render writes obey the same rule without a source tag. Audit all original `host_start_update`/`host_end_update` call sites and every standalone DIB mutation. Run x86/x64 focused tests and full suite; build both package EXEs. |
-| Expected Markers | Compat reports the original renderer's current logical Console geometry while retaining its fixed shared text surface. A single transaction record, not producer kind, is the only way for VM frame copying to observe graphics damage. The MVDM mirror diff is limited to calling the standalone host boundary at existing start/end callbacks, with x86/x64 proof and an explicit pristine-ledger disposition. |
+| Verification | Produce an evidence ledger for every completed geometry setter/bind/copy route. Reproduce or deterministically emulate consecutive 640/1280 completed candidates and prove the chosen owner publishes one coherent geometry. Distinguish Win3.1 Prompt initially windowed (fails) from fullscreen → windowed (stable), then cover ordinary DOS and a Win95 Setup graphical transition when available. Run x86/x64 focused proof and full regression proportionate to the changed path; build both package EXEs. |
+| Expected Markers | No frame geometry is inferred from dirty bounds or suppressed by KVM. Each accepted graphics frame's pixels, stride and geometry derive from one completed DIB surface. The original geometry formula is either retained with evidence or corrected at its actual owner, never patched downstream. |
 | Asset Needs | Existing owner package/media only; no image writes. Refresh only package EXEs, preserving the owner INI. |
-| Reporting Requirements | Record removed source-specific branches, changed-path line accounting, every `host_start_update`/`host_end_update` and DIB-mutation call-site disposition, focused proof, full regression and manual Win3.1 route checklist. |
-| Stop Conditions | Any need for a Lib/Common/VM API, a second rendering transaction, an MVDM change beyond the two existing host callbacks, or a guest/mode-specific workaround stops S1 for owner direction. Any unrelated Console operation found reachable becomes a separately proposed S. |
-| Exit Criteria | Source-specific S1 P2/P3 publication paths are removed; one transaction contract is proven at every admitted mutation path; both widths build/test; only intended Compat/minimal-host-callback/test/docs/package-EXE paths change; owner package INI is preserved. |
-| Original Owner Request | “禁止特判，禁止添油战术，找出最合理的干净的方案处理视频问题” |
-| Similar-Issue Sweep | Audit all redirected original Console operations plus all original host update delimiters and standalone DIB/palette/pointer mutations. Every hit either participates in the one transaction or has a recorded non-display disposition. |
+| Reporting Requirements | Record the completed-geometry sequence, all setter/bind/copy-route dispositions, pre/post MVDM mirror diff and tracked code accounting, focused/full regression and manual route checklist. |
+| Stop Conditions | Any proposed KVM filter, producer/mode-specific condition, timer/retry workaround, second rendering path, Lib/Common API change, or MVDM behavior branch without a narrow port-ABI reason stops S2 for owner direction. |
+| Exit Criteria | The alternating completed geometry is traced to one owner and either repaired with a source-neutral invariant or disproven with deterministic evidence; no downstream KVM workaround exists; both widths build/test; only intended paths change; owner INI is preserved. |
+| Original Owner Request | “现在窗口的msdos提示符的时候，kvm-window窗口宽度还是会不断跳跃” |
+| Similar-Issue Sweep | Audit all graphics geometry setters, DIB binds, surface readers and copied-frame geometry derivations, including V7 and standard VGA paths. Each hit receives an evidence-based owner/disposition. |
 
 ## Current Technical Baseline
 
