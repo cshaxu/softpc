@@ -226,6 +226,28 @@ static int package_wait_for_text(HANDLE output, const char *needle,
     return 0;
 }
 
+static int package_wait_for_dos_prompt(HANDLE output, DWORD timeout_ms)
+{
+    DWORD deadline = GetTickCount() + timeout_ms;
+    do {
+        if (package_screen_contains(output, "A:\\>") ||
+            package_screen_contains(output, "C:\\>")) return 1;
+        Sleep(20u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    return 0;
+}
+
+static int package_wait_for_absent_dos_prompt(HANDLE output, DWORD timeout_ms)
+{
+    DWORD deadline = GetTickCount() + timeout_ms;
+    do {
+        if (!package_screen_contains(output, "A:\\>") &&
+            !package_screen_contains(output, "C:\\>")) return 1;
+        Sleep(20u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    return 0;
+}
+
 static int package_wait_debug_prompt(HANDLE output)
 {
     DWORD deadline = GetTickCount() + 5000u;
@@ -399,7 +421,7 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
         stage = 16;
         goto done;
     }
-    if (!package_wait_for_text(output, "C:\\>", 10000u)) { stage = 5; goto done; }
+    if (!package_wait_for_dos_prompt(output, 10000u)) { stage = 5; goto done; }
     if (IsWindowVisible(GetConsoleWindow())) { stage = 20; goto done; }
     if (!package_send_text(input, "ver\r") ||
         !package_wait_for_text(output, "Version", 5000u)) { stage = 14; goto done; }
@@ -424,14 +446,14 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
     /* The Console screen retains its last cells until the new raw renderer
        writes.  Require the former DOS prompt to disappear, then observe the
        fresh boot banner and a newly rendered prompt in that order: otherwise
-       a stale first-run C:\\> would be a false green result. */
-    if (!package_wait_for_absent_text(output, "C:\\>", 5000u)) {
+       a stale first-run prompt would be a false green result. */
+    if (!package_wait_for_absent_dos_prompt(output, 5000u)) {
         stage = 11; goto done;
     }
     if (!package_wait_for_text(output, "Starting MS-DOS", 10000u)) {
         stage = 12; goto done;
     }
-    if (!package_wait_for_text(output, "C:\\>", 10000u)) { stage = 13; goto done; }
+    if (!package_wait_for_dos_prompt(output, 10000u)) { stage = 13; goto done; }
     success = 1;
 done:
     if (!success && out_stage != NULL) *out_stage = stage;
