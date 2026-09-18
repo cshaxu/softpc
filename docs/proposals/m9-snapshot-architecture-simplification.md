@@ -104,12 +104,14 @@ serializer，会添加格式解释层和方向相关的失败路径，优先级 
 
 ### B2：操作临时数据归局部作用域
 
-[VM driver](../../src/vm/driver.c) 的 captured_image 仅在一次 capture callback
-内创建、写出和释放，却作为长期成员并在 destroy 再清理。
-候选移成该操作的局部拥有对象，统一清理出口；staged_image 跨 load/executor，保留。
-[snapshot](../../src/vm/snapshot.c) 的 entry 副本没有生产读取，实际使用 callback
-entry，应删除重复状态并相应修正只验证此冗余字段的测试。
-收益主要是缩短所有权，不宣称大量净减。停在 callback 中等待期间对象仍须有效。
+[VM driver](../../src/vm/driver.c) 的 `captured_image` 初审后确认必须保留：首次
+save 之后，它是 PAUSED VM 可再次写出的稳定 checkpoint；`staged_image` 同样跨越
+load 请求与 executor 恢复。两者都不是可安全局部化的数据，不能为减字段破坏
+已验收的 paused-save/load 语义。
+
+[snapshot](../../src/vm/snapshot.c) 的 entry 副本则没有生产读取，运行路径始终使用
+callback entry 和 snapshot image 内的 entry。S3 只删除这一份无用副本，并修正只验证
+该副本的测试。收益很小但所有权事实更直接；不改 transaction、等待或 image lifetime。
 
 ### C1：Common 同步请求收敛及发布顺序
 
@@ -179,6 +181,7 @@ T66 只按下列顺序执行；每一个 S 开始前均须以当时 HEAD 复核�
 | S1 | C2：将 `snapshot_finish()` 失败接入既有 VM 操作终止路径 | 时钟恢复失败注入、完成顺序、双宽度回归 |
 | S2 | A2–A4：仅复用既有 VGA/PIT 原始机制并清理无行为残留；A1/A5 保留边界复核 | 原始 diff、双宽度 CPU/视频 roundtrip、handler/非法-ID 证明；前后逐路径行数 |
 | S3 | B2：将仅一次 capture callback 使用的 VM 临时所有权收回局部，删除未读取 snapshot entry 副本 | snapshot roundtrip、失败清理、双宽度与所有权审计 |
+| S4 | T66 全阶段收口审计与 owner package validation | S1--S3 实际账目、镜像保护边界、双宽度 EXE 与 owner 验证；不再改生产代码 |
 
 此前把 A1 外移算入的“镜像减少约 100–125 行”估计已作废；A1 依正确边界保留。
 S1 的正确性修复可能净增代码，允许发生；S2/S3 才追求在不伤害前两项前提下的净
@@ -209,3 +212,19 @@ and PIT state IDs have one validated private decoder rather than two temporary
 before the snapshot helpers' first reference; moving code merely to erase that
 textual duplication would enlarge the protected mirror diff. No public ABI,
 Common, Lib, thread or snapshot-format path changed.
+
+## S3 delivery
+
+S3 delivery is recorded in [snapshot ownership correction](../history/M9-T66-S3-snapshot-ownership.md).
+The initial candidate to localize `captured_image` was rejected by source audit:
+the existing PAUSED re-save path deliberately writes that retained image without
+advancing the machine. `staged_image` likewise spans load acceptance and the
+executor. S3 therefore keeps both real owners and removes only the unread
+checkpoint entry copy. No MVDM, Compat, Common, Lib, public ABI, format or
+thread path changed.
+
+## S4 admission
+
+S3 审计已证明 `captured_image` 和 `staged_image` 的长生命周期是产品语义而非冗余，
+因此 T66 不再有可安全实施的代码候选。S4 只核对 S1--S3 的实际账目、保护镜像边界与
+双宽度 package，等待 owner 对最后 package 进行验证；不得为了制造一个实现步骤新增代码。

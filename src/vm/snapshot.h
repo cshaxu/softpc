@@ -18,7 +18,6 @@ typedef struct softpc_snapshot {
     softpc_snapshot_phase phase;
     lib_status status;
     lib_u64 started, frequency;
-    softpc_ccpu_entry entry;
 } softpc_snapshot;
 
 /* VM-private state image for S4 roundtrip proof.  Later sections encode these

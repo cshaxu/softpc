@@ -33,7 +33,6 @@ lib_bool softpc_snapshot_checkpoint(softpc_snapshot *snapshot,
         else if (!softpc_platform_set_clock_running(0))
             snapshot->status = LIB_STATUS_IO_ERROR;
         else {
-            snapshot->entry = *entry;
             snapshot->phase = SOFTPC_SNAPSHOT_READY;
             return LIB_TRUE;
         }

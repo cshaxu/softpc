@@ -2,29 +2,29 @@
 
 ## Current Work
 
-M9 T66 S3 is admitted: narrow VM snapshot temporary ownership to its actual
-callback lifetime and remove a confirmed unused snapshot-entry copy.
+M9 T66 S4 is admitted: close the finite architecture ledger after owner package
+validation; no further production change is admitted.
 
-## M9 T66 S3 Packet
+## M9 T66 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner: 开始吧 做完架构整理任务; standing commit/push approval. |
-| Objective | Return one-shot VM snapshot capture data to the callback that owns its lifetime and remove an unused snapshot-entry copy, without changing snapshot transaction behavior. |
-| Non-goals | No public ABI, Lib/Common, thread, UI, snapshot format, CPU/device behavior, archive-order refactor, original-mirror behavior, or externalized original state owner. |
-| Reference Baseline | T66 S2 delivery pending coordinator closure; current clean committed baseline after its P; historical T63/T61 evidence is candidate context only. |
+| Objective | Audit the delivered T66 ledger, retain only proven simplifications, and await owner validation of both package widths before T closure. |
+| Non-goals | No production, Lib/Common, thread, UI, snapshot format, CPU/device behavior, archive-order, original-mirror or ABI change. |
+| Reference Baseline | T66 S3 delivery pending owner validation; current committed baseline after its P. |
 | Candidate Proposal | [Snapshot and component architecture simplification](../proposals/m9-snapshot-architecture-simplification.md) |
-| Files And ABI Surface | Initially audit `src/vm/driver.c`, `src/vm/snapshot.c` and their focused tests. Precise paths follow the required pre-implementation audit. Public ABI unchanged. |
+| Files And ABI Surface | Documentation/history and package artifacts only. Public ABI unchanged. |
 | Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT and selected governance skills; original-mirror and VM/Compat ownership boundaries. |
-| Verification | Snapshot roundtrip, failure cleanup and ownership inspection, x86/x64 full regression and shared gates. |
-| Expected Markers | Capture image ownership has one callback-local lifetime; no unread snapshot-entry copy remains. |
+| Verification | S1--S3 accounting audit, protected mirror diff review, owner package validation. |
+| Expected Markers | No unimplemented candidate remains; user accepts both package widths. |
 | Asset Needs | Existing test media/fakes; refresh both EXEs only after implementation; never modify owner INI/media. |
-| Reporting Requirements | Before code: exact ownership/callback paths, component/file ownership, production/test and MVDM mirror-diff estimates, boundary rationale and stop condition. After: actual production/test/component/mirror numstat, retained/moved/deleted disposition, focused evidence, x86/x64 build/full-test results, commit hash and both EXE links. |
-| Stop Conditions | Need for a new public ABI, altered snapshot behavior/format, Lib/Common/thread/UI change, original-mirror change, or a capture object whose lifetime crosses callback completion requires owner review. |
-| Exit Criteria | One-shot capture data has one local owner, unused entry copy is removed, dual-width builds/tests, manifests, commit/push and S3 closure. |
+| Reporting Requirements | Report final actual S1--S3 production/test/mirror accounting and owner test result. |
+| Stop Conditions | Any new product defect or proposal change starts a separate admitted task; do not append it to T66. |
+| Exit Criteria | Owner validates both EXEs and approves closure. |
 | Original Owner Request | 开始吧 做完架构整理任务 |
-| Similar-Issue Sweep | VM snapshot images/entries with long-lived members despite single-callback use; no unbounded whole-tree claim. |
+| Similar-Issue Sweep | Final audit confirms S1 finish ordering, S2 original mechanism reuse and S3 real ownership retention. |
 
 ## Current Technical Baseline
 
