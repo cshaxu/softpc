@@ -211,6 +211,9 @@ transaction, not by focusing a window.
 When a running view needs both surfaces, control completes Console ownership
 work before creating Window or unfreezing an existing Window. This orders the
 foreground requests without retries, timers or platform calls in SoftPC.
+While that Window exists, Common UI consumes raw VM-Console mouse events;
+Window is the sole guest-mouse surface. Raw Console keyboard, text and hotkey
+events continue normally, and raw Console mouse resumes when Window is gone.
 
 ## KVM Components And Registered Hotkeys
 

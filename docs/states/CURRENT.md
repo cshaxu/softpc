@@ -6,14 +6,15 @@ T63 remains open pending owner acceptance of complete snapshot media state.
 The prior attempted closure and T64 admission were withdrawn; T64 is not
 allocated.
 
-M9 T63 S10 is active: complete snapshot media state. S9's accepted CPU/device/
-display repairs remain the baseline, not proof of complete snapshot coverage.
-Lib optimization remains the first queued candidate.
+S10's implementation is pushed and awaits owner Overlay acceptance. M9 T63 S11
+is active: stop raw VM-Console mouse records from controlling the guest while a
+Window is actually displayed. Lib optimization remains the first queued
+candidate.
 
 ## Current Technical Baseline
 
-- Source: T63 S10 P13 (`8074517`), with an uncommitted versionless-layout
-  simplification in review.
+- Source: T63 S10 P14 (`df0eda4`), with S11 input routing awaiting owner
+  test.
 - Snapshots are host-width-independent, fixed-order streams with no format
   version, magic or section identifier. Save is running-to-paused; load is
   initial/stopped-to-paused and does not create a Window until resume.
@@ -40,23 +41,23 @@ Lib optimization remains the first queued candidate.
 The attempted T63 closure/admission was withdrawn before commit on owner
 correction. No code, package or rule changed.
 
-## M9 T63 S10 Packet
+## M9 T63 S11 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner rejects T63 closure and explicitly requires an additional S for floppy/hard-disk overlay snapshot support. T63 remains open; no T64 admission. |
-| Objective | Save all modified FDD/HDD overlay content in the same snapshot binary, then restore media and machine state to the same checkpoint. |
-| Non-goals | No Lib optimization, second overlay implementation, guest image mutation, sidecar files or implicit copying of entire DIRECT/READONLY media. No new Common APIs. |
-| Reference Baseline | Accepted T63 S9 P9 aa2bc0d; S10 adds media state to the fixed, versionless snapshot layout. |
-| Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md) |
-| Files And ABI Surface | VM snapshot container/driver and Compat FDD/HDD media owners, relevant snapshot/media tests and docs. Reuse existing Lib Storage and two Common state operations; report any necessary shared API change before implementation. |
-| Applicable Rules | docs/rules/EXECUTION.md, ARCHITECTURE.md, CODING.md, DOCUMENT.md; docs/design/ARCHITECTURE.md, CODING.md and UI.md; original snapshot media contract. |
-| Verification | Implemented: tests cover modified FDD/HDD bytes, no-change overlays, replacement rather than merge, base mismatch, malformed/truncated media sections, and fresh-process cross-width save/load/resume. Final x86/x64 complete suites each pass 106/106; owner manual acceptance remains required. |
-| Expected Markers | One binary contains CPU/RAM/devices plus overlay state for each medium. DIRECT/READONLY retain external source semantics. Restore never silently combines old machine state with missing overlay writes. |
-| Asset Needs | Preserve owner media and INI. Use disposable test media; refresh only the two approved package EXEs. |
-| Reporting Requirements | Before implementation explain media inventory, base identity and restore ownership, estimate changed files/lines; after implementation give actual diff, full tests, commit/push and both EXE links. |
-| Stop Conditions | Necessary Lib/Common API expansion, unrepresentable device state, or source media mutation beyond the original contract; report before proceeding. |
-| Exit Criteria | All FDD/HDD media owners accounted for, overlay bytes archived and restored with tested replacement semantics, two-width cross-process proof, full regressions and pushed delivery. T63 stays open until owner acceptance and a complete original-request audit. |
-| Original Owner Request | DIRECT/READONLY snapshots need not contain the whole disk; FDD/HDD overlays must be included. The complete snapshot is one binary. Owner explicitly says T63 cannot close with this gap. |
-| Similar-Issue Sweep | All floppy slots, hard-disk slots, media modes, lease replacement, base identity, writable media state and error/cleanup paths; enumerate each owner and proof. |
+| Admission And Approval | Owner reports that `display=console, console_control=0` raw Console mouse movement moves the guest pointer visible in its concurrently displayed Window. Owner directs that Common UI discard raw-Console mouse records whenever a Window is displayed. |
+| Objective | Keep only Window-origin mouse input while a Window instance is live; retain raw Console keyboard/hotkeys and all existing behavior when no Window exists. |
+| Non-goals | No Lib, VM, Compat, MVDM or Common Session API change. Do not change Window mouse input, keyboard input, hotkeys, guest mouse protocol, Console ownership or presentation derivation. |
+| Reference Baseline | T63 S10 P14 versionless Overlay snapshot layout (`df0eda4`); full x86/x64 106/106. |
+| Candidate Proposal | [Snapshot design](../proposals/m9-machine-snapshots.md), S11 ledger. |
+| Files And ABI Surface | Common UI private input routing and its existing composition test; UI behavior documentation and task records. No public ABI changes. |
+| Applicable Rules | docs/rules/EXECUTION.md, ARCHITECTURE.md, CODING.md, DOCUMENT.md; docs/design/ARCHITECTURE.md, CODING.md and UI.md. |
+| Verification | Fake Window + VM Console prove Console mouse is acknowledged but not forwarded while Window exists, then passes once Window is destroyed; Window mouse always forwards; Console key/hotkey always forwards. Build and run complete x86/x64 suites. |
+| Expected Markers | One source-local Common UI routing point owns the exception. Session and VM receive no surface-policy branch. |
+| Asset Needs | Preserve owner media and INI; refresh only the two package EXEs. |
+| Reporting Requirements | Record root cause, changed-path accounting, source-route sweep, focused proof, full regression, commit/push and both EXE links. |
+| Stop Conditions | Any need to expose KVM private layout, change KVM event ABI, or add another event queue; report before implementation. |
+| Exit Criteria | The four stated input combinations are covered; no source-policy branch is added outside Common UI; both build widths and full suites pass; pushed package binaries await owner test. |
+| Original Owner Request | When a Window is displayed, discard raw Console mouse events in Common UI. |
+| Similar-Issue Sweep | Every Common UI KVM input callback, raw Console path, Window path and source-retirement/failure path; document retained routing. |

@@ -644,8 +644,8 @@ overlay 配置没有写入后核对媒体内容，故原 105/105 不能证明此
 实现将 MEDIA payload 置于固定 container 顺序；没有版本字段或旧格式协商，
 因此不猜测或混合缺少媒体内容的旧 snapshot。四个固定后端槽位（FDD 0–1、HDD
 0–1）有统一 archive；当前产品只配置 FDD 0、HDD 0，其余必须显式为空。
-每个非空槽位记录存在性、模式、长度、基底 SHA-256、FDD 当前柱面和按 4 KiB
-排列的不同块；4 KiB 块大小也写进媒体段并校验。几何由原后端从已记录的长度
+每个非空槽位记录存在性、模式、长度、基底 SHA-256、FDD 当前柱面和按固定 4 KiB
+排列的不同块；块大小不写入镜像。几何由原后端从已记录的长度
 按既有规则重建，避免存两份可漂移的几何真相。最后一块写实际长度；读取拒绝
 乱序、重复、越界、错误末块和截断。
 
@@ -661,3 +661,18 @@ VM 事务和跨进程测试均向实际已挂载的 FDD/HDD overlay 写入不同
 错误页，load 后证明保存页恢复、追加页消失，并检查 FDD 柱面。最终 x86/x64
 各 106/106 通过；正式 package 已在提交前重建。Owner 手测接受前，S10 与
 T63 均不得收口。
+
+### S11：Window 存在时屏蔽 raw Console 鼠标
+
+`display=console, console_control=0` 的图形路由会同时保留 raw VM Console
+与 Window。当前两者都把 `KVM_EVENT_MOUSE` 交给 Common Session，因此 raw
+Console 的鼠标可移动同一客户机鼠标、并在 Window 像素帧中可见。Owner 要求此
+路由在 Window 显示时只接受 Window 鼠标。
+
+唯一策略点是 `common/ui` 的输入转接：它在创建各 KVM leaf 时保存私有的输入
+来源标签。Window 存在时，来自 VM Console 的鼠标事件直接以成功状态消费，不
+进入 Session；Console 键、文本、热键、关闭与退休事件和 Window 全部输入仍走
+既有 copied event sink。Window 销毁后，raw Console 鼠标立即恢复原路径。
+这不读取 KVM 私有对象布局、不扩展事件 ABI，也不让 Session/VM 认识 surface
+策略。组合测试覆盖 Window/Console 鼠标、Console 键/热键及销毁 Window 后的
+恢复。x86/x64 全量测试各 106/106 通过；package 交付等待 owner 测试。

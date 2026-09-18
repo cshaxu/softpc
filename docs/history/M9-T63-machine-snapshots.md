@@ -1240,7 +1240,7 @@ only fixed package EXEs are refreshed. Pre-existing owner deletions under
 `assets/binary/t63-bisect/` are left separate from this corrective P.
 
 
-## S10 admission: complete FDD/HDD overlay snapshots
+## M9 T63 S10: complete FDD/HDD overlay snapshots
 
 Owner explicitly rejects T63 closure while overlay content is absent.
 The attempted closure and T64 admission were documentation-only and never
@@ -1260,7 +1260,7 @@ not disk contents. The proposal now enumerates the media owners, DIRECT
 sharing constraint, installation order and estimated implementation/test scope.
 No production code or new successful snapshot proof is claimed at this point.
 
-## S10 implementation: FDD/HDD overlay payload
+### S10 implementation: FDD/HDD overlay payload
 
 The original media gap is now implemented in Compat plus the VM-private image
 container. A fixed MEDIA payload archives the complete effective overlay
@@ -1273,3 +1273,15 @@ included. No Lib/Common/MVDM change was made.
 Focused x86/x64 media and snapshot tests passed, followed by full x86 106/106
 (121.24 s) and x64 106/106 (133.11 s). Owner manual acceptance remains
 required; this record does not close S10 or T63.
+
+### S11 implementation: raw Console mouse exclusion beside Window
+
+`display=console, console_control=0` can keep a raw VM Console and a Window
+at once. Common UI now gives each leaf a private input context and consumes
+only raw-Console mouse records while its Window is live. Console keyboard,
+text and registered-hotkey records retain their existing path; Window mouse is
+unaffected; Console mouse resumes after Window destruction. The liveness bit
+is atomic because Console input and Window destruction are separate workers.
+
+The composition test proves all four routes. Full x86 and x64 CTest suites
+pass 106/106. No Lib, VM, Compat, MVDM, Session or public ABI change occurred.
