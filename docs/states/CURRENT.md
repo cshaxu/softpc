@@ -14,6 +14,12 @@ tests fail at stage 16; no controlled baseline comparison establishes cause.
 The previous label "current-controller geometry" was inaccurate: the helper
 reads BIOS bookkeeping. Actual Win3.1 roundtrip acceptance remains outstanding.
 
+S3 P2 removes S2's generation-rearmed delay after a failing continuous-
+invalidation regression. The original bounded countdown is restored and both
+packages build. VGA tests pass; full runs are x64 105/108 and x86 106/108.
+The x64 BIOS-tick assertion passed on isolated rerun; both package stage-16
+failures remain unresolved. This is not a new timing workaround or S closure.
+
 ## M9 T69 S3 Packet
 
 | Field | Required record |

@@ -193,7 +193,7 @@ VGA smoke 将 Compat text surface 置满、设置 guest `FULLSCREEN` 后调用�
 原 cursor cache 驱动到 hidden，再在 FULLSCREEN 下恢复可见 cursor，验证 metadata 更新；不新增
 任何 cursor state、callback 或 UI 行为。
 
-## S2 owner reopen: completed geometry still alternates
+## S2 owner reopen: completed geometry still alternates (gate superseded by S3 P2)
 
 The owner has now reproduced the initial-windowed Win3.1 MS-DOS Prompt width
 alternation after the S2 package. The former closure is therefore incomplete:
@@ -288,3 +288,34 @@ controlled baseline comparison was made, so they are not dismissed as
 unrelated. Documentation governance and whitespace checks passed. Owner INI
 and HDD image were unchanged. S3 stays open; this is P1, not acceptance of
 the remaining display-roundtrip symptoms.
+
+### S3 P2: remove unbounded settle rearming
+
+Source audit found that the generation-based restart added in S2 postpones
+`choose_display_mode()` indefinitely when invalidation arrives on every tick.
+Its test only asserted the new delay policy, not correct hardware behaviour.
+A replacement regression issues 20 consecutive invalidations and requires the
+original bounded two-tick selection. It failed on P1 at the second tick.
+
+Restore the exact original OpenNT `nt_graphics_tick()` countdown branch and
+remove the now-unused generation field, getter and declaration. No replacement
+timer, retry, queue or state is introduced. P1's BIOS-independent packed width
+remains. This proves bounded painter selection, not uninterrupted painting
+under all register activity, nor that every reported Win3.1 pause is explained.
+
+Estimated change: delete the S2-only generation mechanism in three production
+files and replace its one test, net decrease. Actual production +7/-25 (net
+-18); test +10/-12 (net -2). `gfx_upd.h` again has no textual OpenNT diff.
+Similar-issue search found no remaining `mode_change_generation` reference in
+src/test; the only retained mode-change gate is the original host countdown.
+
+Verification: normalize CRLF only and compare the complete
+`nt_graphics_tick()` against OpenNT: both 2457 characters, exactly equal.
+Current mirror diffs are `nt_graph.c` +62/-13, `gfx_updt.c` +189/-145 and
+`gfx_upd.h` unchanged. Both complete builds refreshed package EXEs. The new
+VGA test passes on x86/x64. Full runs: x64 105/108, x86 106/108. Both retain
+the two package stage-16 failures. x64 additionally failed
+`machine_smoke.c:1048` (`bda_tick_low != 0`); the immediate isolated machine
+and VGA rerun passed. This does not erase the failed full run or establish
+its cause. Documentation gate and diff checks passed. No owner media/INI,
+Lib or Common changes; S3 remains open for runtime display evidence.

@@ -45,6 +45,11 @@ register、painter、dirty transaction 或 Compat/VM/KVM API。`egavideo.h` 的�
 
 ### T69 S3 detached text-surface clear
 
+S3 P2 另外撤回 S2 添加的 mode-change generation：它会使持续失效通知无限推迟
+画笔选择。恢复 OpenNT 原始两 tick 倒数分支，删除两个额外字段及查询声明/实现。
+生产 +7/-25；`gfx_upd.h` 恢复无文本差异。20 次持续失效通知测试修复前失败，
+用于验证原版有界选择，不宣称已证明全部 Win3.1 交互故障的原因。
+
 `host/src/nt_graph.c::nt_clear_screen()` 的原始 `FULLSCREEN` early return 只服务原
 native Console host。Standalone 中这些 API 已由 Compat 转入唯一 text surface，因此该 return
 会让客户机全屏后的 `cls` 根本不写入实际输出表面。只在 `SOFTPC_STANDALONE` 排除该 native

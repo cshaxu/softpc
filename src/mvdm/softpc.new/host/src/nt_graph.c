@@ -490,7 +490,6 @@ GLOBAL COLOURTAB monoColours =
 
 static int      mode_change_now;
 static int      ega_tick_delay;
-static unsigned long pending_mode_change_generation;
 static BOOL     CursorResizeNeeded = FALSE;
 
 /*:::::::::::: Definition of local functions declared later in file ????????*/
@@ -595,7 +594,6 @@ GLOBAL void resetWindowParams()
 	flush_count = 0;
 	update_vlt = FALSE;
 	mode_change_now = ega_tick_delay = 0;
-	pending_mode_change_generation = mode_change_generation();
 	CursorResizeNeeded = FALSE;
 }
 
@@ -864,17 +862,8 @@ void nt_graphics_tick(void)
 	** of doing it more than once per mode change. Tim Jan 93.
 	*/
 
-        /* A write that arrives while another write is settling restarts the
-           existing hardware interval.  Geometry is selected only after the
-           final VGA/CRTC state has remained stable for that interval. */
-	if (get_mode_change_required()) {
-	    if (mode_change_now == 0 ||
-		pending_mode_change_generation != mode_change_generation()) {
-		pending_mode_change_generation = mode_change_generation();
-		mode_change_now = EGA_TICK_DELAY;
-		/* Delay mouse input and flush all pending mouse events. */
-		DelayMouseEvents(MOUSE_DELAY);
-	    }
+        /*Has mode_change_required been set (implying EGA regs have changed)*/
+	if (mode_change_now) {
 	    if (--mode_change_now == 0) {
 		(void)(*choose_display_mode)();
 		// must do this after video mode has been selected
@@ -882,6 +871,11 @@ void nt_graphics_tick(void)
 		// screen. See nt_flush_screen
 		set_mode_change_required(FALSE);
 	    }
+	}
+	else if (get_mode_change_required()) {
+	    mode_change_now = EGA_TICK_DELAY - 1;
+	    /* Delay mouse input and flush all pending mouse events. */
+	    DelayMouseEvents(MOUSE_DELAY);
 	}
 	else
         {
