@@ -421,3 +421,29 @@ blanking guarantee: display was enabled. Original update routines check
 display-disabled and the host countdown delays painting during mode selection;
 neither is a general CPU-addressing/scanout separation. Temporary instrumentation
 and build wiring are removed. No production change follows from this trace.
+
+### S3 P7: completed-frame roundtrip audit
+
+A bounded temporary VM-driver harness boots the same HDD with in-memory
+overlay and launches `win c:\windows\dospmptw.pif` through ordinary keyboard
+input. It then sends Alt+Enter to reach text fullscreen and again to return
+to the windowed Prompt. The harness observes the driver's frame-publication
+callback, rather than periodically sampling the frontend, and captures the
+final complete graphics frame. It creates no native KVM Window.
+
+The run completes successfully: initial graphics is 640x480, fullscreen is
+80x25 text, return briefly publishes 640x350 before 640x480. No published
+graphics frame is wider than 640. The final image was visually inspected:
+the windowed Prompt's instructions, DOS version and C:\WINDOWS> prompt are
+legible and intact. The text dump was taken immediately at the transition
+and was blank; it does not establish final fullscreen text correctness.
+
+This independently exercises the actual guest roundtrip and strengthens the
+owner's width acceptance. It does not prove all timings, fullscreen content,
+later typing or the native Window focus/capture path. The retained non-packed
+BIOS dependency and transient painter selection remain explicitly bounded
+audit findings, not reasons to introduce a width clamp or application exception.
+
+Production, permanent test and package changes: zero. Temporary harness,
+target, logs and capture are removed after evidence recording. The HDD hash
+is verified unchanged. Package binaries remain P2/19533be; S3 remains open.
