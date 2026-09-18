@@ -1,7 +1,7 @@
 # M9 T63: machine snapshots; S1 design review
 
 Original owner requests and the nine-stage plan are preserved in the
-[proposal](../proposals/m9-machine-snapshots.md). T62 closed and pushed in
+[proposal](M9-T63-machine-snapshots-proposal.md). T62 closed and pushed in
 54b2009 before T63 was admitted. Design delivery cf2d979 is pushed.
 
 ## S1 request-to-evidence review

@@ -10,7 +10,7 @@ valid-stopped-write/paused before ordinary resume and stop.
 
 ## Scope and admission
 
-Owner approved the revised [snapshot proposal](../proposals/m9-machine-snapshots.md):
+Owner approved the revised [snapshot proposal](M9-T63-machine-snapshots-proposal.md):
 read only while running, write only init/stopped, success ordinary paused;
 VM owns safe-stop selection and a single 1-second monotonic deadline. Lib is
 unchanged; Common may add only the two state operations and necessary wiring.
