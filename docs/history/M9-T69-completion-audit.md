@@ -94,3 +94,25 @@ The owner correctly rejected deferring S4's two proven T69-introduced cleanup
 candidates. T69 is reopened as S4 to complete those deletions before a new
 task-level closure. The active packet and proposal are restored under their
 current authorities; this section remains historical context only.
+
+## Final closure after S4 cleanup
+
+S4 completed the omitted cleanup within T69 itself.
+
+| Cleanup | Result |
+| --- | --- |
+| Obsolete V7 helper refactor | `egavideo.h`, `ega_vide.c` and `v7_video.c` exactly match the selected OpenNT originals; the obsolete `nt_graph.c` include is gone. |
+| Dead Compat fill family | `softpc_standalone_text_surface_fill` and both public wrappers/declarations are deleted after an all-source/test/build caller sweep found no consumer. |
+| Retained behavior | The logical-coordinate mapper and `write_cell` remain the unique live fill route; accepted transaction/painter/text-cursor repairs are unchanged. |
+
+Relative to reopening baseline `505001b`, production is `+17/-62`, net
+`-45`: `-7` from restoring the obsolete MVDM refactor and `-38` from deleting
+the Compat dead family. The complete T69 production result against `86de8eb`
+is `+221/-62`, net `+159`; test/build additions remain `+359/-2`, net `+357`.
+No configuration or guest media changed. Both test-target builds succeeded;
+focused VGA/text/snapshot coverage passed 6/6 on both widths. The x86 full
+suite completed 106/108 and the x64 full suite's only post-fix behavior
+failures were the same two pre-existing package monitor stage-16 cases; the
+x64 documentation gate was rerun after its packet-record correction and
+passed. Documentation governance and `git diff --check` pass. This completes
+the owner's requirement that no T69-introduced cleanup be left in TODO.
