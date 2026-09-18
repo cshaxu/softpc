@@ -620,10 +620,9 @@ lib_status common_machine_read_state(common_machine *machine,
     if (state != COMMON_MACHINE_RUNNING && state != COMMON_MACHINE_PAUSED)
         return LIB_STATUS_INVALID_STATE;
     machine->state_writer = *writer;
-    if (lib_atomic_i32_exchange_explicit(&machine->state_read_requested, 1,
-            LIB_MEMORY_ORDER_SEQ_CST) != 0)
-        return LIB_STATUS_INVALID_STATE;
     base_sync_event_reset(machine->state_event);
+    lib_atomic_i32_store_explicit(&machine->state_read_requested, 1,
+        LIB_MEMORY_ORDER_SEQ_CST);
     base_sync_event_signal(machine->command_event);
     machine->driver.request_wake(machine->driver.context);
     return base_sync_event_wait(machine->state_event, UINT32_MAX) ==
@@ -637,10 +636,9 @@ lib_status common_machine_write_state(common_machine *machine,
         common_machine_state_get(machine) != COMMON_MACHINE_STOPPED)
         return LIB_STATUS_INVALID_STATE;
     machine->state_reader = *reader;
-    if (lib_atomic_i32_exchange_explicit(&machine->state_write_requested, 1,
-            LIB_MEMORY_ORDER_SEQ_CST) != 0)
-        return LIB_STATUS_INVALID_STATE;
     base_sync_event_reset(machine->state_event);
+    lib_atomic_i32_store_explicit(&machine->state_write_requested, 1,
+        LIB_MEMORY_ORDER_SEQ_CST);
     base_sync_event_signal(machine->command_event);
     return base_sync_event_wait(machine->state_event, UINT32_MAX) ==
         BASE_SYNC_WAIT_SIGNALED ? machine->state_status : LIB_STATUS_IO_ERROR;
