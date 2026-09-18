@@ -2,29 +2,29 @@
 
 ## Current Work
 
-M9 T67 S2 is admitted: make the one removable-media request explicitly modeful
-and transactional, then require that mode in the monitor grammar.
+M9 T67 S3 is admitted: restore snapshot media independently of startup INI
+paths, while converting fixed-disk access according to the current INI mode.
 
-## M9 T67 S2 Packet
+## M9 T67 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admitted the two-mode design and required `floppy insert [readonly | direct | overlay] [image_file_path]`; automatic serial S admission and standing commit/push approval apply. |
-| Objective | Give the existing removable-media request one explicit lib-defined mode, replace floppy media transactionally, and require mode plus exact path in the monitor command. |
-| Non-goals | No new request queue, generic media manager, Lib, MVDM, fixed-media startup, snapshot format, display, input or lifecycle semantic change. |
-| Reference Baseline | T67 S1 (`b88aa2b`) separates fixed-media startup policies and rejects `media_mode`; the live removable-media request is still path-only and GFI attach is destructive on open failure. |
+| Admission And Approval | Owner requires snapshot media to remain compatible with different INI settings: floppy uses the snapshot image and mode; hard disk uses the snapshot image while mapping its mode to the current `hard_disk_mode`. Standing commit/push approval applies. |
+| Objective | Persist media image paths in the existing snapshot media section and restore each live medium through one Compat preparation/commit path, preserving the owner-approved floppy and hard-disk conversion matrix. |
+| Non-goals | No Lib, Common, MVDM, lifecycle, input, display, snapshot magic/version, or new command-route change. No compatibility reader for pre-S3 snapshots, because the format deliberately has no discriminator. |
+| Reference Baseline | T67 S2 (`7f81853`) has independent startup modes and modeful transactional floppy insertion; snapshot media still validates both paths and modes against the startup INI and does not serialize paths. |
 | Candidate Proposal | [Independent floppy and hard-disk media modes](../proposals/m9-independent-disk-modes.md) |
-| Files And ABI Surface | App command parser/effect/provider and documentation; Common machine's one existing copied request; VM driver/machine; Compat GFI host-media boundary; product/Common tests. No Lib or MVDM API/source. |
-| Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT; Common serializes one request but owns no media policy; VM owns live floppy policy; Compat owns candidate preparation and commit; MVDM and Lib remain unchanged. |
-| Verification | Parser accepts every valid mode and preserves exact path case; missing/unknown forms reject; Common forwards mode on its existing executor route; failed GFI insertion retains old medium; eject, stopped/paused admission, running rejection; focused and full x64/x86 tests; both packages. |
-| Expected Markers | No path-only production removable-media call; no destructive old-medium teardown before candidate validation; no lowercase transformation of image path; command/help/UI/README use one required-mode grammar. |
-| Asset Needs | Existing disposable media/fakes and package EXEs only. Preserve the owner-approved S1 INI values and all guest media. |
+| Files And ABI Surface | Compat media archive and GFI/HDD restore contracts; VM media preparation; snapshot tests and disposable test images. No public Common or Lib ABI, no App command grammar, and no preserved MVDM source. |
+| Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT; VM owns the current fixed-disk policy; Compat owns copied archive paths, validation, candidate construction and native media commit; Lib remains the unmodified medium primitive owner. |
+| Verification | Matrix proof: floppy ignores INI path/mode; hard disk readonly/direct interconvert; snapshot overlay to INI readonly rejects; readonly/direct to INI overlay opens overlay; overlay to INI direct materializes pages to the snapshot base. Verify failed preparation retains live media, snapshot bytes stay width-independent and untagged, and no test image enters `assets/`. Run focused/full x64/x86 suites and both packages. |
+| Expected Markers | One persisted path per present snapshot slot; no snapshot path comparison against INI; no floppy INI mode/path input to restore; hard-disk target mode is derived only in one matrix function; no `media_mode`, magic, version, or Lib/Common modification. |
+| Asset Needs | Test creates and removes small images under its working directory; no asset-media mutation. Preserve owner INI and guest media. |
 | Reporting Requirements | Before code: file/ownership and estimated production/test/mirror delta. After: actual numstat, retained boundary reasons, focused/full dual-width evidence and package links. |
-| Stop Conditions | Any need for a second media command route, a public Lib change, MVDM/controller policy or snapshot-format change stops the task for owner revision. |
-| Exit Criteria | One serialized modeful request, transactional candidate replacement, and exact required-mode grammar are proven by focused/full dual-width suites and packages; one complete pushed P; coordinator reviews actual diff. |
-| Original Owner Request | “floppy insert [readonly | direct | overlay] [image_file_path]，必须指定模式才能insert floppy”。 |
-| Similar-Issue Sweep | Search all `set_removable_media`, `set_floppy`, `floppy_attach`, and `floppy insert` paths; leave no path-only live insertion route, lowercased path, or destructive replacement-before-validation path. |
+| Stop Conditions | Any needed Lib/Common/MVDM change, second snapshot reader/version discriminator, or a request to recover pre-S3 snapshots requires owner revision. |
+| Exit Criteria | The complete matrix, no stale INI-path validation, disposable-image coverage, x86/x64 full proof and refreshed packages are pushed in one complete P; coordinator reviews actual paths and byte layout. |
+| Original Owner Request | “软驱完全采用 snapshot 里的 image 和访问模式；硬盘模式转换为 INI 规定的模式：readonly/direct 互转、overlay→readonly 拒绝、readonly/direct→overlay 按 overlay 打开、overlay→direct 直接写入镜像。” |
+| Similar-Issue Sweep | Search every `softpc_media_archive_prepare`, `*_media_restore`, snapshot path/mode comparison, and mode open/write call. Retain one preparation path and one commit path per native medium family. |
 
 ## Current Technical Baseline
 

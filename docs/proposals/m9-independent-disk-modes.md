@@ -147,12 +147,43 @@ Exit proof: no path-only insertion symbol or documentation remains; the Common
 request has one route; old-medium retention and all mode combinations pass
 focused tests, then x86/x64 full regression and package builds.
 
+### S3 — snapshot media independent of startup attachment
+
+The media subsection records the exact copied path of every present slot in
+addition to its existing mode, base digest, overlay pages and floppy cylinder.
+It remains one untagged, width-independent binary stream: this is a new
+canonical layout, not a versioned container and not a second reader for older
+layouts.
+
+On load, floppy ignores both `floppy` and `floppy_mode` from the current INI:
+the saved path and saved mode are the target attachment. Fixed disk likewise
+uses the saved path, but its target mode is derived exactly once from the
+saved mode and current `hard_disk_mode`:
+
+| Saved mode | INI hard-disk mode | Target / outcome |
+| --- | --- | --- |
+| readonly or direct | readonly or direct | Open the saved base with the INI mode. |
+| readonly or direct | overlay | Open the saved base as overlay. |
+| overlay | overlay | Restore saved overlay pages into a fresh overlay. |
+| overlay | direct | Materialize saved overlay pages into the saved base, then attach direct. |
+| overlay | readonly | Reject before native attachment. |
+
+Compat owns the archive's copied paths and the candidate/commit mechanics.
+VM passes only its configured hard-disk policy into that one preparation call.
+The archive verifies every saved base before commit. Test-only small images are
+created beneath the test working directory and removed; no supplied asset is
+written. Lib, Common and the preserved MVDM mirror are unchanged.
+
+Exit proof: the matrix covers every target outcome, floppy restoration ignores
+INI path/mode, failed preparation retains the existing media, and dual-width
+focused/full tests plus both packages pass.
+
 
 ## Constraints and acceptance
 
 - No Lib or preserved MVDM source changes.
-- No change to snapshot binary layout, CPU/device timing, display, input or
-  lifecycle semantics.
+- S3 changes only the media subsection's canonical, untagged path payload;
+  CPU/device timing, display, input and lifecycle semantics remain unchanged.
 - Owner explicitly authorizes replacing `media_mode` in `assets/binary/softpc.ini`
   with equivalent `floppy_mode=overlay` and `hard_disk_mode=overlay` entries.
   No other INI setting or media changes; package refresh otherwise changes only

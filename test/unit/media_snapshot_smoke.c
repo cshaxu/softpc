@@ -4,30 +4,46 @@
 #include <stdio.h>
 
 static softpc_media_view views[4];
+static char view_paths[4][SOFTPC_MEDIA_ARCHIVE_PATH_MAX];
 
 void softpc_floppy_media_view(unsigned slot, softpc_media_view *view)
 { *view = views[slot]; }
 void softpc_hdd_media_view(unsigned slot, softpc_media_view *view)
 { *view = views[slot+2]; }
 
-static lib_status replace(unsigned slot, lib_storage_medium **replacement)
+static lib_status replace(unsigned slot, const char *path,
+    lib_storage_medium_mode mode, lib_storage_medium **replacement)
 {
     lib_storage_medium *retired = NULL;
     lib_status status;
-    if (*replacement == NULL) return LIB_STATUS_OK;
+    if (path == NULL) {
+        if (*replacement != NULL) return LIB_STATUS_INVALID_ARGUMENT;
+        return lib_storage_medium_destroy(&views[slot].medium);
+    }
+    if (*replacement == NULL)
+        return views[slot].medium != NULL && views[slot].mode == mode &&
+            strcmp(views[slot].path, path) == 0 ? LIB_STATUS_OK :
+            LIB_STATUS_INVALID_ARGUMENT;
     status = lib_storage_medium_replace(&views[slot].medium, *replacement, &retired);
     if (status != LIB_STATUS_OK) return status;
     *replacement = NULL;
-    return lib_storage_medium_destroy(&retired);
+    status = lib_storage_medium_destroy(&retired);
+    if (status != LIB_STATUS_OK) return status;
+    views[slot].mode = mode;
+    memcpy(view_paths[slot], path, strlen(path) + 1u);
+    views[slot].path = view_paths[slot];
+    return LIB_STATUS_OK;
 }
 lib_status softpc_floppy_media_restore(unsigned slot,
+    const char *path, lib_storage_medium_mode mode,
     lib_storage_medium **replacement, lib_u32 cylinder)
 {
     views[slot].cylinder = cylinder;
-    return replace(slot, replacement);
+    return replace(slot, path, mode, replacement);
 }
-lib_status softpc_hdd_media_restore(unsigned slot, lib_storage_medium **replacement)
-{ return replace(slot+2, replacement); }
+lib_status softpc_hdd_media_restore(unsigned slot, const char *path,
+    lib_storage_medium_mode mode, lib_storage_medium **replacement)
+{ return replace(slot+2, path, mode, replacement); }
 
 typedef struct bytes_stream {
     lib_u8 bytes[32768];
@@ -52,7 +68,9 @@ static lib_status read_bytes(void *context, lib_u8 *bytes, lib_size count)
 static void attach(unsigned slot, const char *path, lib_storage_medium_mode mode)
 {
     assert(lib_storage_medium_destroy(&views[slot].medium) == LIB_STATUS_OK);
-    views[slot] = (softpc_media_view){NULL,path,mode,0};
+    views[slot] = (softpc_media_view){NULL,NULL,mode,0};
+    memcpy(view_paths[slot], path, strlen(path) + 1u);
+    views[slot].path = view_paths[slot];
     assert(lib_storage_medium_open(path, mode, &views[slot].medium) == LIB_STATUS_OK);
 }
 
@@ -82,6 +100,7 @@ int main(void)
 {
     const char *path = "media-snapshot-base.img";
     const char *second_path = "media-snapshot-second-base.img";
+    const char *third_path = "media-snapshot-third-base.img";
     softpc_media_archive *saved=NULL, *decoded=NULL;
     bytes_stream stream={0};
     lib_u8 base[8704]={0}, data[8704];
@@ -91,6 +110,8 @@ int main(void)
     file=fopen(path,"wb"); assert(file!=NULL);
     assert(fwrite(base,1,sizeof(base),file)==sizeof(base)); assert(fclose(file)==0);
     file=fopen(second_path,"wb"); assert(file!=NULL);
+    assert(fwrite(base,1,sizeof(base),file)==sizeof(base)); assert(fclose(file)==0);
+    file=fopen(third_path,"wb"); assert(file!=NULL);
     assert(fwrite(base,1,sizeof(base),file)==sizeof(base)); assert(fclose(file)==0);
     attach(0,path,LIB_STORAGE_MEDIUM_OVERLAY);
     attach(2,path,LIB_STORAGE_MEDIUM_OVERLAY);
@@ -105,12 +126,10 @@ int main(void)
     assert(softpc_media_archive_write(saved,write_bytes,&stream)==LIB_STATUS_OK);
     assert(softpc_media_archive_read(&decoded,read_bytes,&stream)==LIB_STATUS_OK);
     assert(stream.position==stream.count);
-    assert(softpc_media_archive_prepare(decoded,path,LIB_STORAGE_MEDIUM_READONLY,
-        path,LIB_STORAGE_MEDIUM_OVERLAY)!=LIB_STATUS_OK);
-    assert(softpc_media_archive_prepare(decoded,NULL,LIB_STORAGE_MEDIUM_OVERLAY,
-        path,LIB_STORAGE_MEDIUM_OVERLAY)!=LIB_STATUS_OK);
-    assert(softpc_media_archive_prepare(decoded,path,LIB_STORAGE_MEDIUM_OVERLAY,
-        path,LIB_STORAGE_MEDIUM_OVERLAY)==LIB_STATUS_OK);
+    assert(softpc_media_archive_prepare(decoded,
+        LIB_STORAGE_MEDIUM_READONLY) != LIB_STATUS_OK);
+    assert(softpc_media_archive_prepare(decoded,
+        LIB_STORAGE_MEDIUM_OVERLAY) == LIB_STATUS_OK);
     /* A later write must not survive replacement, including an old dirty page. */
     assert(lib_storage_medium_fill_at(views[0].medium,1024,512,0xee)==LIB_STATUS_OK);
     views[0].cylinder=0;
@@ -133,17 +152,19 @@ int main(void)
         }
         stream.count=full;
     }
-    /* Slot 0: 4 present + 4 mode + 4 cylinder + 8 size + 32 digest +
-       8 page count. Its first page offset starts at byte 60. */
-    stream.bytes[60]=1; stream.position=0;
-    assert(softpc_media_archive_read(&decoded,read_bytes,&stream)!=LIB_STATUS_OK);
-    stream.bytes[60]=0;
+    /* Slot 0's first page follows its fixed fields, copied path and count. */
     {
-        lib_size second=60+12+4096;
-        lib_u8 old=stream.bytes[second+1];
-        stream.bytes[second+1]=0; stream.position=0;
+        lib_size first = 4u + 4u + 4u + 8u + 32u + 4u + strlen(path) + 8u;
+        stream.bytes[first]=1; stream.position=0;
         assert(softpc_media_archive_read(&decoded,read_bytes,&stream)!=LIB_STATUS_OK);
-        stream.bytes[second+1]=old;
+        stream.bytes[first]=0;
+        {
+            lib_size second=first+12u+4096u;
+            lib_u8 old=stream.bytes[second+1u];
+            stream.bytes[second+1u]=0; stream.position=0;
+            assert(softpc_media_archive_read(&decoded,read_bytes,&stream)!=LIB_STATUS_OK);
+            stream.bytes[second+1u]=old;
+        }
     }
     softpc_media_archive_dispose(&saved);
     for(slot=0;slot<4;slot+=2) assert(lib_storage_medium_destroy(&views[slot].medium)==LIB_STATUS_OK);
@@ -156,34 +177,61 @@ int main(void)
         attach(0,path,(lib_storage_medium_mode)mode);
         assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
         assert(saved->slots[0].page_count==0);
-        assert(softpc_media_archive_prepare(saved,path,(lib_storage_medium_mode)mode,
-            NULL,LIB_STORAGE_MEDIUM_OVERLAY)==LIB_STATUS_OK);
+        assert(softpc_media_archive_prepare(saved,
+            LIB_STORAGE_MEDIUM_OVERLAY)==LIB_STATUS_OK);
         assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
         assert(lib_storage_medium_destroy(&views[0].medium)==LIB_STATUS_OK);
         /* The saved external base must not silently change after capture. */
         file=fopen(path,"r+b"); assert(file!=NULL);
         assert(fputc(0x77,file)==0x77); assert(fclose(file)==0);
-        assert(softpc_media_archive_prepare(saved,path,(lib_storage_medium_mode)mode,
-            NULL,LIB_STORAGE_MEDIUM_OVERLAY)!=LIB_STATUS_OK);
+        assert(softpc_media_archive_prepare(saved,
+            LIB_STORAGE_MEDIUM_OVERLAY)!=LIB_STATUS_OK);
         file=fopen(path,"r+b"); assert(file!=NULL);
         assert(fputc(0,file)==0); assert(fclose(file)==0);
         softpc_media_archive_dispose(&saved);
     }
-    /* Each configured device has its own policy; archive preparation must not
-       accidentally validate both present slots against one shared mode. */
-    attach(0,path,LIB_STORAGE_MEDIUM_OVERLAY);
-    attach(2,second_path,LIB_STORAGE_MEDIUM_DIRECT);
+    /* Floppy always returns to its saved path and mode, independently of the
+       current startup setting. Fixed disk readonly/direct maps to the current
+       fixed-disk policy. */
+    attach(0,path,LIB_STORAGE_MEDIUM_READONLY);
+    attach(2,second_path,LIB_STORAGE_MEDIUM_READONLY);
     assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
-    assert(softpc_media_archive_prepare(saved,path,LIB_STORAGE_MEDIUM_OVERLAY,
-        second_path,LIB_STORAGE_MEDIUM_DIRECT)==LIB_STATUS_OK);
+    attach(0,third_path,LIB_STORAGE_MEDIUM_DIRECT);
+    assert(softpc_media_archive_prepare(saved,
+        LIB_STORAGE_MEDIUM_DIRECT)==LIB_STATUS_OK);
     assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
-    assert(softpc_media_archive_prepare(saved,path,LIB_STORAGE_MEDIUM_DIRECT,
-        second_path,LIB_STORAGE_MEDIUM_OVERLAY)!=LIB_STATUS_OK);
+    assert(strcmp(views[0].path,path)==0 &&
+        views[0].mode==LIB_STORAGE_MEDIUM_READONLY);
+    assert(strcmp(views[2].path,second_path)==0 &&
+        views[2].mode==LIB_STORAGE_MEDIUM_DIRECT);
+
+    /* A readonly/direct snapshot may instead open as an overlay. */
+    assert(softpc_media_archive_prepare(saved,
+        LIB_STORAGE_MEDIUM_OVERLAY)==LIB_STATUS_OK);
+    assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
+    assert(views[2].mode==LIB_STORAGE_MEDIUM_OVERLAY);
+    softpc_media_archive_dispose(&saved);
+
+    /* Overlay pages reject a readonly fixed-disk policy, but a direct policy
+       materializes them into the saved base before attaching that base direct. */
+    attach(2,second_path,LIB_STORAGE_MEDIUM_OVERLAY);
+    assert(lib_storage_medium_fill_at(views[2].medium,4096,512,0x9c)==LIB_STATUS_OK);
+    assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
+    assert(softpc_media_archive_prepare(saved,
+        LIB_STORAGE_MEDIUM_READONLY)!=LIB_STATUS_OK);
+    assert(softpc_media_archive_prepare(saved,
+        LIB_STORAGE_MEDIUM_DIRECT)==LIB_STATUS_OK);
+    assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
+    assert(strcmp(views[2].path,second_path)==0 &&
+        views[2].mode==LIB_STORAGE_MEDIUM_DIRECT);
+    assert(lib_storage_medium_read_at(views[2].medium,4096,data,512)==LIB_STATUS_OK);
+    memset(base,0x9c,512); assert(memcmp(base,data,512)==0);
     softpc_media_archive_dispose(&saved);
     assert(lib_storage_medium_destroy(&views[0].medium)==LIB_STATUS_OK);
     assert(lib_storage_medium_destroy(&views[2].medium)==LIB_STATUS_OK);
     assert(remove(path)==0);
     assert(remove(second_path)==0);
+    assert(remove(third_path)==0);
     puts("media archive: overlay replacement, modes, SHA-256 and malformed streams passed");
     return 0;
 }

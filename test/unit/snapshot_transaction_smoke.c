@@ -159,8 +159,9 @@ static lib_bool snapshot_media_bytes(lib_bool write, lib_bool later)
         if (i == 0) {
             lib_storage_medium *no_replacement = NULL;
             if (write) {
-                if (softpc_floppy_media_restore(0, &no_replacement,
-                        later ? 1u : 37u) != LIB_STATUS_OK) return LIB_FALSE;
+                if (softpc_floppy_media_restore(0, view.path, view.mode,
+                        &no_replacement, later ? 1u : 37u) != LIB_STATUS_OK)
+                    return LIB_FALSE;
             } else if (view.cylinder != 37u) return LIB_FALSE;
         }
         memset(bytes, later ? 0x99 : value, sizeof(bytes));

@@ -375,23 +375,43 @@ void softpc_floppy_media_view(unsigned slot, softpc_media_view *view)
     view->cylinder = softpc_gfi_drives[slot].cylinder;
 }
 
-lib_status softpc_floppy_media_restore(unsigned slot,
-    lib_storage_medium **replacement, lib_u32 cylinder)
+lib_status softpc_floppy_media_restore(unsigned slot, const char *path,
+    lib_storage_medium_mode mode, lib_storage_medium **replacement,
+    lib_u32 cylinder)
 {
     softpc_gfi_image_drive *drive;
     lib_storage_medium *retired = NULL;
     lib_status status;
-    if (slot >= MAX_DISKETTES || replacement == NULL || cylinder > 255u)
+    if (slot >= MAX_DISKETTES || replacement == NULL || cylinder > 255u ||
+        mode > LIB_STORAGE_MEDIUM_OVERLAY ||
+        (path != NULL && strlen(path) >= sizeof(softpc_gfi_drives[slot].path)))
         return LIB_STATUS_INVALID_ARGUMENT;
+    /* This product exposes only drive A through the GFI attach route. An
+       absent archive slot for any other controller position is a no-op; it
+       must not detach drive A while replaying the fixed four-slot archive. */
+    if (slot != 0u)
+        return path == NULL && *replacement == NULL ? LIB_STATUS_OK :
+            LIB_STATUS_INVALID_ARGUMENT;
     drive = &softpc_gfi_drives[slot];
+    if (path == NULL) {
+        if (*replacement != NULL) return LIB_STATUS_INVALID_ARGUMENT;
+        (void)softpc_platform_floppy_attach(NULL, mode);
+        return LIB_STATUS_OK;
+    }
     if (*replacement != NULL) {
-        if (lib_storage_medium_byte_count(*replacement) !=
-            lib_storage_medium_byte_count(drive->medium))
-            return LIB_STATUS_INVALID_ARGUMENT;
         status = lib_storage_medium_replace(&drive->medium, *replacement, &retired);
         if (status != LIB_STATUS_OK) return status;
         *replacement = NULL;
         (void)lib_storage_medium_destroy(&retired);
+        drive->mode = mode;
+        memcpy(drive->path, path, strlen(path) + 1u);
+        if (drive->medium == NULL || !softpc_gfi_geometry(
+            (long)lib_storage_medium_byte_count(drive->medium), drive))
+            return LIB_STATUS_INVALID_ARGUMENT;
+        softpc_gfi_install((UTINY)slot);
+    } else if (drive->medium == NULL || drive->mode != mode ||
+        strcmp(drive->path, path) != 0) {
+        return LIB_STATUS_INVALID_ARGUMENT;
     }
     drive->cylinder = cylinder;
     return LIB_STATUS_OK;

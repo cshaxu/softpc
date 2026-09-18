@@ -210,8 +210,7 @@ lib_status softpc_machine_prepare_media(const softpc_machine *machine,
     softpc_media_archive *archive)
 {
     if (machine == NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    return softpc_media_archive_prepare(archive, machine->options.floppy_path,
-        machine->options.floppy_mode, machine->options.hard_disk_path,
+    return softpc_media_archive_prepare(archive,
         machine->options.hard_disk_mode);
 }
 

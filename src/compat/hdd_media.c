@@ -12,17 +12,18 @@ typedef struct softpc_disk_media
     lib_storage_medium *medium;
     lib_storage_medium_mode mode;
     IU32 total_sectors;
+    char path[SOFTPC_MEDIA_ARCHIVE_PATH_MAX];
 } softpc_disk_media;
 
 static softpc_disk_media softpc_hdd_media[2];
-static const CHAR *softpc_hdd_config_paths[2];
 #define SOFTPC_DISK_SECTOR_BYTES 512u
 
 const CHAR *softpc_hdd_media_config_path(unsigned int index)
 {
     if (index >= 2u)
         return NULL;
-    return softpc_hdd_config_paths[index];
+    return softpc_hdd_media[index].path[0] == '\0' ? NULL :
+        softpc_hdd_media[index].path;
 }
 
 static int softpc_hdd_attach_media(softpc_disk_media *media, const char *path,
@@ -33,13 +34,16 @@ static int softpc_hdd_attach_media(softpc_disk_media *media, const char *path,
     media->medium = NULL;
     media->mode = mode;
     media->total_sectors = 0u;
+    media->path[0] = '\0';
     if (path == NULL)
         return 1;
+    if (strlen(path) >= sizeof(media->path)) return 0;
     if (lib_storage_medium_open(path, mode, &media->medium) !=
         LIB_STATUS_OK) return 0;
     bytes = lib_storage_medium_byte_count(media->medium);
     if (bytes < SOFTPC_DISK_SECTOR_BYTES) goto attach_failed;
     media->total_sectors = (IU32)(bytes / SOFTPC_DISK_SECTOR_BYTES);
+    memcpy(media->path, path, strlen(path) + 1u);
     return 1;
 attach_failed:
     lib_storage_medium_destroy(&media->medium);
@@ -53,18 +57,16 @@ int softpc_platform_hdd_attach(const char *hard_disk_path, lib_storage_medium_mo
     {
         lib_storage_medium_destroy(&softpc_hdd_media[index].medium);
         softpc_hdd_media[index].total_sectors = 0u;
+        softpc_hdd_media[index].path[0] = '\0';
     }
     /* Fixed disks belong solely to the original fixed-disk controller.
        Removable media is attached separately through original FLA/GFI/FDC. */
-    softpc_hdd_config_paths[0] = hard_disk_path;
-    softpc_hdd_config_paths[1] = NULL;
-    if (!softpc_hdd_attach_media(&softpc_hdd_media[0], softpc_hdd_config_paths[0], mode))
+    if (!softpc_hdd_attach_media(&softpc_hdd_media[0], hard_disk_path, mode))
         return 0;
-    if (!softpc_hdd_attach_media(&softpc_hdd_media[1], softpc_hdd_config_paths[1], mode))
+    if (!softpc_hdd_attach_media(&softpc_hdd_media[1], NULL, mode))
     {
         lib_storage_medium_destroy(&softpc_hdd_media[0].medium);
-        softpc_hdd_config_paths[0] = NULL;
-        softpc_hdd_config_paths[1] = NULL;
+        softpc_hdd_media[0].path[0] = '\0';
         return 0;
     }
     return 1;
@@ -78,9 +80,8 @@ void softpc_platform_hdd_detach(void)
     {
         lib_storage_medium_destroy(&softpc_hdd_media[index].medium);
         softpc_hdd_media[index].total_sectors = 0u;
+        softpc_hdd_media[index].path[0] = '\0';
     }
-    softpc_hdd_config_paths[0] = NULL;
-    softpc_hdd_config_paths[1] = NULL;
 }
 
 void host_fdisk_get_params(driveid, cylinders, heads, sectors) int driveid;
@@ -153,23 +154,40 @@ void softpc_hdd_media_view(unsigned slot, softpc_media_view *view)
     *view = (softpc_media_view){0};
     if (slot >= 2u) return;
     view->medium = softpc_hdd_media[slot].medium;
-    view->path = softpc_hdd_config_paths[slot];
+    view->path = softpc_hdd_media[slot].path;
     view->mode = softpc_hdd_media[slot].mode;
 }
 
-lib_status softpc_hdd_media_restore(unsigned slot,
-    lib_storage_medium **replacement)
+lib_status softpc_hdd_media_restore(unsigned slot, const char *path,
+    lib_storage_medium_mode mode, lib_storage_medium **replacement)
 {
     lib_storage_medium *retired = NULL;
     lib_status status;
-    if (slot >= 2u || replacement == NULL || *replacement == NULL ||
-        lib_storage_medium_byte_count(*replacement) !=
-        lib_storage_medium_byte_count(softpc_hdd_media[slot].medium))
+    softpc_disk_media *media;
+    if (slot >= 2u || replacement == NULL || mode > LIB_STORAGE_MEDIUM_OVERLAY ||
+        (path != NULL && strlen(path) >= sizeof(softpc_hdd_media[slot].path)))
         return LIB_STATUS_INVALID_ARGUMENT;
-    status = lib_storage_medium_replace(&softpc_hdd_media[slot].medium,
-        *replacement, &retired);
-    if (status != LIB_STATUS_OK) return status;
-    *replacement = NULL;
-    (void)lib_storage_medium_destroy(&retired);
+    media = &softpc_hdd_media[slot];
+    if (path == NULL) {
+        if (*replacement != NULL) return LIB_STATUS_INVALID_ARGUMENT;
+        (void)lib_storage_medium_destroy(&media->medium);
+        *media = (softpc_disk_media){0};
+        return LIB_STATUS_OK;
+    }
+    if (*replacement != NULL) {
+        if (lib_storage_medium_byte_count(*replacement) < SOFTPC_DISK_SECTOR_BYTES)
+            return LIB_STATUS_INVALID_ARGUMENT;
+        status = lib_storage_medium_replace(&media->medium, *replacement, &retired);
+        if (status != LIB_STATUS_OK) return status;
+        *replacement = NULL;
+        (void)lib_storage_medium_destroy(&retired);
+        media->mode = mode;
+        media->total_sectors = (IU32)(lib_storage_medium_byte_count(media->medium) /
+            SOFTPC_DISK_SECTOR_BYTES);
+        memcpy(media->path, path, strlen(path) + 1u);
+        return LIB_STATUS_OK;
+    }
+    if (media->medium == NULL || media->mode != mode || strcmp(media->path, path) != 0)
+        return LIB_STATUS_INVALID_ARGUMENT;
     return LIB_STATUS_OK;
 }

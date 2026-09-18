@@ -13,11 +13,13 @@ typedef struct media_page {
 } media_page;
 
 typedef struct media_slot {
-    lib_u32 present, mode, cylinder;
+    lib_u32 present, mode, target_mode, cylinder;
     lib_u64 size, page_count;
     lib_u8 digest[32];
+    char path[SOFTPC_MEDIA_ARCHIVE_PATH_MAX];
     media_page *pages;
     lib_storage_medium *prepared;
+    lib_bool deferred;
 } media_slot;
 
 struct softpc_media_archive {
@@ -161,7 +163,10 @@ static lib_status capture_slot(media_slot *slot, const softpc_media_view *view)
     lib_status status = LIB_STATUS_OK;
 
     if (source == NULL) return LIB_STATUS_OK;
+    if (view->path == NULL || strlen(view->path) >= sizeof(slot->path))
+        return LIB_STATUS_INVALID_ARGUMENT;
     slot->present = 1; slot->mode = view->mode; slot->cylinder = view->cylinder;
+    memcpy(slot->path, view->path, strlen(view->path) + 1u);
     size = lib_storage_medium_byte_count(source); slot->size = size;
     if (view->mode == LIB_STORAGE_MEDIUM_OVERLAY) {
         if (view->path == NULL) return LIB_STATUS_INVALID_ARGUMENT;
@@ -233,6 +238,10 @@ lib_status softpc_media_archive_write(const softpc_media_archive *archive,
         if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u32(write, context, slot->cylinder);
         if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u64(write, context, slot->size);
         if (status == LIB_STATUS_OK) status = write(context, slot->digest, sizeof(slot->digest));
+        if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u32(write,
+            context, (lib_u32)strlen(slot->path));
+        if (status == LIB_STATUS_OK) status = write(context,
+            (const lib_u8 *)slot->path, strlen(slot->path));
         if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u64(write, context, slot->page_count);
         for (page=slot->pages; page != NULL && status == LIB_STATUS_OK; page=page->next) {
             status = softpc_snapshot_stream_write_u64(write, context, page->offset);
@@ -257,6 +266,7 @@ lib_status softpc_media_archive_read(softpc_media_archive **archive,
         media_slot *slot = &result->slots[i];
         media_page **tail = &slot->pages;
         lib_u64 p, previous = 0;
+        lib_u32 path_length;
         status = softpc_snapshot_stream_read_u32(read, context, &slot->present);
         if (status != LIB_STATUS_OK) break;
         if (slot->present > 1) { status = LIB_STATUS_INVALID_ARGUMENT; break; }
@@ -265,6 +275,14 @@ lib_status softpc_media_archive_read(softpc_media_archive **archive,
         if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u32(read, context, &slot->cylinder);
         if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u64(read, context, &slot->size);
         if (status == LIB_STATUS_OK) status = read(context, slot->digest, sizeof(slot->digest));
+        if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u32(read,
+            context, &path_length);
+        if (status == LIB_STATUS_OK && (path_length == 0u ||
+            path_length >= sizeof(slot->path)))
+            status = LIB_STATUS_INVALID_ARGUMENT;
+        if (status == LIB_STATUS_OK)
+            status = read(context, (lib_u8 *)slot->path, path_length);
+        if (status == LIB_STATUS_OK) slot->path[path_length] = '\0';
         if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_read_u64(read, context, &slot->page_count);
         if (status != LIB_STATUS_OK) break;
         if (slot->mode > LIB_STORAGE_MEDIUM_OVERLAY || slot->size == 0 ||
@@ -300,90 +318,159 @@ lib_status softpc_media_archive_read(softpc_media_archive **archive,
     return LIB_STATUS_OK;
 }
 
-lib_status softpc_media_archive_prepare(softpc_media_archive *archive,
-    const char *floppy_path, lib_storage_medium_mode floppy_mode,
-    const char *hard_disk_path, lib_storage_medium_mode hard_disk_mode)
+static lib_status media_target_mode(const media_slot *slot, unsigned index,
+    lib_storage_medium_mode hard_disk_mode, lib_storage_medium_mode *out_mode)
 {
-    const char *paths[MEDIA_SLOTS] = {floppy_path, NULL, hard_disk_path, NULL};
-    const lib_storage_medium_mode modes[MEDIA_SLOTS] = {
-        floppy_mode, floppy_mode, hard_disk_mode, hard_disk_mode };
+    if (slot == NULL || out_mode == NULL || hard_disk_mode > LIB_STORAGE_MEDIUM_OVERLAY)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    if (index < 2u) {
+        *out_mode = (lib_storage_medium_mode)slot->mode;
+        return LIB_STATUS_OK;
+    }
+    if (slot->mode == LIB_STORAGE_MEDIUM_OVERLAY &&
+        hard_disk_mode == LIB_STORAGE_MEDIUM_READONLY)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    *out_mode = hard_disk_mode == LIB_STORAGE_MEDIUM_OVERLAY ?
+        LIB_STORAGE_MEDIUM_OVERLAY : hard_disk_mode;
+    return LIB_STATUS_OK;
+}
+
+static lib_bool media_same_path(const media_slot *slot,
+    const softpc_media_view *view)
+{
+    return view->medium != NULL && view->path != NULL &&
+        strcmp(slot->path, view->path) == 0;
+}
+
+static lib_status media_apply_pages(const media_slot *slot,
+    lib_storage_medium *medium)
+{
+    const media_page *page;
+    lib_status status = LIB_STATUS_OK;
+    for (page = slot->pages; page != NULL && status == LIB_STATUS_OK;
+        page = page->next)
+        status = lib_storage_medium_write_at(medium, (lib_size)page->offset,
+            page->bytes, page->count);
+    return status;
+}
+
+static lib_status media_prepare_slot(media_slot *slot, unsigned index,
+    lib_storage_medium_mode target_mode)
+{
+    softpc_media_view view;
+    lib_storage_medium *base_opened = NULL;
+    lib_storage_medium *candidate = NULL;
+    lib_storage_medium *base;
+    lib_status status;
+
+    slot->target_mode = target_mode;
+    slot->deferred = LIB_FALSE;
+    (void)lib_storage_medium_destroy(&slot->prepared);
+    if (!slot->present) return LIB_STATUS_OK;
+    media_view(index, &view);
+    if (media_same_path(slot, &view) &&
+        view.mode != LIB_STORAGE_MEDIUM_OVERLAY)
+        base = view.medium;
+    else {
+        status = lib_storage_medium_open(slot->path, LIB_STORAGE_MEDIUM_READONLY,
+            &base_opened);
+        if (status != LIB_STATUS_OK) return status;
+        base = base_opened;
+    }
+    status = verify_base(slot, base);
+    /* An overlay carries state beyond its verified base, so it must always be
+       reconstructed. Readonly/direct can retain the verified live medium. */
+    if (status == LIB_STATUS_OK && !(slot->mode != LIB_STORAGE_MEDIUM_OVERLAY &&
+        media_same_path(slot, &view) && view.mode == target_mode)) {
+        status = lib_storage_medium_open(slot->path, target_mode, &candidate);
+        if (status != LIB_STATUS_OK && media_same_path(slot, &view)) {
+            /* A current same-path lease can exclude replacement staging. The
+               already-verified base is reopened only after that lease ends. */
+            slot->deferred = LIB_TRUE;
+            status = LIB_STATUS_OK;
+        }
+    }
+    if (status == LIB_STATUS_OK && candidate != NULL &&
+        slot->mode == LIB_STORAGE_MEDIUM_OVERLAY)
+        status = media_apply_pages(slot, candidate);
+    if (status == LIB_STATUS_OK) {
+        slot->prepared = candidate;
+        candidate = NULL;
+    }
+    {
+        lib_status closed = lib_storage_medium_destroy(&base_opened);
+        if (status == LIB_STATUS_OK) status = closed;
+    }
+    (void)lib_storage_medium_destroy(&candidate);
+    return status;
+}
+
+lib_status softpc_media_archive_prepare(softpc_media_archive *archive,
+    lib_storage_medium_mode hard_disk_mode)
+{
     lib_status status = LIB_STATUS_OK;
     unsigned i;
-    if (archive == NULL || floppy_mode > LIB_STORAGE_MEDIUM_OVERLAY ||
-        hard_disk_mode > LIB_STORAGE_MEDIUM_OVERLAY)
+
+    if (archive == NULL || hard_disk_mode > LIB_STORAGE_MEDIUM_OVERLAY)
         return LIB_STATUS_INVALID_ARGUMENT;
     archive->prepared = LIB_FALSE;
-    for (i=0; i<MEDIA_SLOTS; ++i) {
+    for (i = 0; i < MEDIA_SLOTS && status == LIB_STATUS_OK; ++i) {
         media_slot *slot = &archive->slots[i];
-        softpc_media_view view;
-        lib_storage_medium *opened = NULL, *base;
-        media_page *page;
-        lib_storage_medium_destroy(&slot->prepared);
-        if (slot->present != (paths[i] != NULL) ||
-            (slot->present && slot->mode != (lib_u32)modes[i])) {
-            status = LIB_STATUS_INVALID_ARGUMENT; break;
-        }
-        if (!slot->present) continue;
-        media_view(i, &view);
-        /* DIRECT holds a non-sharing lease: do not reopen that same file. */
-        if (modes[i] == LIB_STORAGE_MEDIUM_DIRECT && view.medium != NULL &&
-            view.mode == modes[i] && view.path != NULL && strcmp(view.path, paths[i]) == 0)
-            base = view.medium;
-        else {
-            status = lib_storage_medium_open(paths[i],
-                modes[i] == LIB_STORAGE_MEDIUM_OVERLAY ? modes[i] : LIB_STORAGE_MEDIUM_READONLY,
-                &opened);
-            base = opened;
-        }
-        if (status == LIB_STATUS_OK) status = verify_base(slot, base);
-        for (page=slot->pages; status == LIB_STATUS_OK && page != NULL; page=page->next)
-            status = lib_storage_medium_write_at(opened, (lib_size)page->offset, page->bytes, page->count);
-        if (status == LIB_STATUS_OK && modes[i] == LIB_STORAGE_MEDIUM_OVERLAY) {
-            slot->prepared = opened; opened = NULL;
-        }
-        {
-            lib_status closed = lib_storage_medium_destroy(&opened);
-            if (status == LIB_STATUS_OK) status = closed;
-        }
-        if (status != LIB_STATUS_OK) break;
+        lib_storage_medium_mode target_mode;
+        status = media_target_mode(slot, i, hard_disk_mode, &target_mode);
+        if (status == LIB_STATUS_OK)
+            status = media_prepare_slot(slot, i, target_mode);
     }
     if (status != LIB_STATUS_OK) {
-        for (i=0; i<MEDIA_SLOTS; ++i) lib_storage_medium_destroy(&archive->slots[i].prepared);
+        for (i = 0; i < MEDIA_SLOTS; ++i)
+            (void)lib_storage_medium_destroy(&archive->slots[i].prepared);
         return status;
     }
     archive->prepared = LIB_TRUE;
     return LIB_STATUS_OK;
 }
 
+static lib_status media_open_deferred(media_slot *slot)
+{
+    lib_status status = lib_storage_medium_open(slot->path,
+        (lib_storage_medium_mode)slot->target_mode, &slot->prepared);
+    if (status == LIB_STATUS_OK && slot->mode == LIB_STORAGE_MEDIUM_OVERLAY)
+        status = media_apply_pages(slot, slot->prepared);
+    if (status != LIB_STATUS_OK)
+        (void)lib_storage_medium_destroy(&slot->prepared);
+    return status;
+}
+
 lib_status softpc_media_archive_restore(softpc_media_archive *archive)
 {
     unsigned i;
     lib_status status;
+
     if (archive == NULL || !archive->prepared) return LIB_STATUS_INVALID_STATE;
-    /* Validate every post-reset receiver before transferring any lease. */
-    for (i=0; i<MEDIA_SLOTS; ++i) {
-        softpc_media_view view;
+    /* Release only a same-path lease that prevented candidate staging. */
+    for (i = 0; i < MEDIA_SLOTS; ++i) {
         media_slot *slot = &archive->slots[i];
-        media_view(i, &view);
-        if (slot->present != (view.medium != NULL) ||
-            (slot->present && (slot->mode != (lib_u32)view.mode ||
-             slot->size != lib_storage_medium_byte_count(view.medium))))
-            return LIB_STATUS_INVALID_ARGUMENT;
-        /* Reset reopened external non-overlay media. Verify the acquired
-           lease too: the preflight's temporary read lease may have closed. */
-        if (slot->present && slot->mode != LIB_STORAGE_MEDIUM_OVERLAY) {
-            status = verify_base(slot, view.medium);
-            if (status != LIB_STATUS_OK) return status;
-        }
+        if (!slot->deferred) continue;
+        if (i < 2u)
+            status = softpc_floppy_media_restore(i, NULL,
+                (lib_storage_medium_mode)slot->target_mode, &slot->prepared, 0u);
+        else
+            status = softpc_hdd_media_restore(i - 2u, NULL,
+                (lib_storage_medium_mode)slot->target_mode, &slot->prepared);
+        if (status != LIB_STATUS_OK) return status;
+        status = media_open_deferred(slot);
+        if (status != LIB_STATUS_OK) return status;
     }
-    for (i=0; i<MEDIA_SLOTS; ++i) {
+    for (i = 0; i < MEDIA_SLOTS; ++i) {
         media_slot *slot = &archive->slots[i];
-        if (!slot->present) continue;
-        if (i < 2)
-            status = softpc_floppy_media_restore(i, &slot->prepared, slot->cylinder);
-        else if (slot->prepared != NULL)
-            status = softpc_hdd_media_restore(i-2, &slot->prepared);
-        else status = LIB_STATUS_OK;
+        const char *path = slot->present ? slot->path : NULL;
+        if (i < 2u)
+            status = softpc_floppy_media_restore(i, path,
+                (lib_storage_medium_mode)slot->target_mode, &slot->prepared,
+                slot->cylinder);
+        else
+            status = softpc_hdd_media_restore(i - 2u, path,
+                (lib_storage_medium_mode)slot->target_mode, &slot->prepared);
         if (status != LIB_STATUS_OK) return status;
     }
     archive->prepared = LIB_FALSE;
