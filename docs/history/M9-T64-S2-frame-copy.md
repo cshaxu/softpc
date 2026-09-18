@@ -72,4 +72,8 @@ Reproduce with git diff --numstat cd56b7b on the named paths after staging.
 Review confirms no changed thread, layout, lock or dirty/ack route. The helper
 is the sole rule; component copies ignore its return only after their existing
 validated-publication invariant. Common propagates invalid-source rejection.
-No unrelated cleanup was included. T64 remains open for owner testing.
+No unrelated cleanup was included. Implementation `21e0fe0` was pushed before
+coordinator review. Review of the committed path list and +20/-4 production
+diff confirms the approved narrowed scope; no INI/media entered the commit.
+S2 is closed. T64 remains open for owner testing. Owned temporary package and
+build/test logs were removed; original build trees and user artifacts retained.

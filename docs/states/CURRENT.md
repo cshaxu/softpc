@@ -2,34 +2,16 @@
 
 ## Current Work
 
-M9 T64 S2 is verified: narrowed frame copying. S1 audit is complete; owner
-cancelled thread unification and approved the prefix-plus-active-pixels copy.
-
-## M9 T64 S2 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner approved narrowed implementation and standing commit/push; explicitly exclude INI this delivery. |
-| Objective | One frame-copy helper copies the complete prefix and only active graphic pixels. |
-| Non-goals | No worker/Base changes, field-by-field copy, layout changes, VM/Compat/MVDM or snapshot changes. |
-| Reference Baseline | T63 closure `3f1c961`; S1 source audit and owner decisions recorded in history. |
-| Candidate Proposal | [Lib simplification](../proposals/m9-lib-frame-copy-console-task.md) |
-| Files And ABI Surface | KVM frame helper/mailbox; Common published-frame copy; tests/manifests; layout unchanged. |
-| Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT and their governance skills. |
-| Verification | Prefix/tail/stride/mode tests, existing dirty/ack tests, shared manifests/boundaries, dual-width full regression and documentation gate. |
-| Expected Markers | Text copies skip 983040 bytes; graphics copies exactly stride*height pixels; locks/sequence remain unchanged. |
-| Asset Needs | Refresh only package EXEs. Disposable build/t64-s2-package uses copied EXEs and existing Win3.1 disk in overlay mode; 90s per check, no trace, remove afterwards. Owner later approved INI restoration; no INI/media/snapshot commit. |
-| Reporting Requirements | Estimate production +15–30/-4–8; report actual production/test diff and copy-byte accounting. |
-| Stop Conditions | Need for new state, ownership, layout or unrelated semantic change requires review. |
-| Exit Criteria | Focused and full tests pass, actual diff reviewed, packaged and pushed; T64 awaits owner testing. |
-| Original Owner Request | 批准做这个收窄版修复。 |
-| Similar-Issue Sweep | Inspect Lib/Common full-frame copies and pixel readers; initialization and VM producers retained outside scope. |
+No implementation subtask is active.
+Open task awaiting owner: T64.
+S2 is closed after dual-width verification and pushed delivery; T64 remains open
+for owner testing. Thread unification was cancelled by owner decision.
 
 ## Current Technical Baseline
 
-- Source: M9 T63 terminal P18 (`08f82ea`); the final code delivery is P17
-  (`82f6a50`).
+- Source: T64 S2 delivery `21e0fe0`; narrowed frame copying, layout and workers unchanged.
+- Both widths have 107 passing test cases after owner-authorized INI restoration
+  and package recheck. See [S2 evidence](../history/M9-T64-S2-frame-copy.md).
 - Snapshots are width-independent fixed-order binary streams with no magic,
   version or section identifier. They restore CPU/device/media state into a
   normal PAUSED machine; Window creation remains deferred until resume.
@@ -38,9 +20,8 @@ cancelled thread unification and approved the prefix-plus-active-pixels copy.
   while the product remains PAUSED and guest input stays gated.
 - DIRECT/READONLY media retain and verify their external references; FDD/HDD
   OVERLAY effective differences and cylinder state are in the same binary.
-- Final x86 and x64 suites each pass 106/106. Owner accepted restored display,
-  input, Overlay media and paused-save behavior. The fixed package EXEs are
-  current; owner configuration remains in `assets/binary/softpc.ini`.
+- T63 snapshot behavior remains the owner-accepted baseline. Current package
+  EXEs include T64 S2; INI is restored to its tracked configuration and was not committed.
 
 ## Recent M9 Closures
 
@@ -54,4 +35,5 @@ cancelled thread unification and approved the prefix-plus-active-pixels copy.
 ## Recent Governance
 
 T64 is admitted from the former Queue head. S1 source audit is recorded in
-[history](../history/M9-T64-S1-lib-simplification.md). No production code changed.
+[history](../history/M9-T64-S1-lib-simplification.md). S2 implementation and actual
+change review are complete; this does not close T64.

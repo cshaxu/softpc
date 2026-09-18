@@ -121,12 +121,13 @@ VM 仍负责安全点与一秒期限。改动规模和净减需独立设计，�
 
 ### D1：按有效内容复制帧
 
-Owner 已将本项转入独立 [Lib 简化任务的 S1](m9-lib-frame-copy-console-task.md)。
+本项已由 [T64 S2](../history/M9-T64-S2-frame-copy.md) 按收窄复制方案完成。
 本候选不再实施；复制契约、范围与验收以该 proposal 为准。
 
 ### D2：Console worker 复用 Base task
 
-Owner 已将本项转入独立 [Lib 简化任务的 S2](m9-lib-frame-copy-console-task.md)。
+本项经 [T64 S1](../history/M9-T64-S1-lib-simplification.md) 审计后由 owner 取消，
+保留各自 worker，不再安排统一 task 实施。
 本候选不再实施；线程生命周期与验收以该 proposal 为准。
 
 ### D3：Storage overlay 查询保持独立任务

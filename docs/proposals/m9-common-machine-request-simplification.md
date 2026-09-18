@@ -6,7 +6,7 @@ Owner 确认本任务只有两项改动：修正同步请求发布顺序；收�
 参数、状态和完成机制。原讨论的生命周期/输入分离、VM 安全点所有权、Session/UI
 结构均为保持不变的约束，不是改造项。
 
-本文件独立为未编号 T 候选，排在 [Lib 优化](m9-lib-frame-copy-console-task.md)
+本文件独立为未编号 T 候选，接续 [Lib 优化](../history/M9-T64-lib-frame-copy-proposal.md)
 之后、[快照与全组件架构简化](m9-snapshot-architecture-simplification.md) 之前。
 顺序由 [Queue](../states/QUEUE.md) 唯一维护；正式准入才分配递增 T 编号。
 不改变 [当前活动任务](../states/CURRENT.md)，本次仅编写候选设计。
