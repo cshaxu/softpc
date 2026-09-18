@@ -4,6 +4,7 @@
 #include "compat/cvidc/gdp_state.h"
 #include "compat/platform.h"
 #include "compat/dib_surface.h"
+#include "compat/media_snapshot.h"
 #include "lib/storage/medium_interface.h"
 
 #include <stdio.h>
@@ -199,6 +200,14 @@ uint32_t softpc_machine_memory_bytes(const softpc_machine *machine)
 {
     if (machine == NULL || machine->memory_bytes > UINT32_MAX) return 0u;
     return (uint32_t)machine->memory_bytes;
+}
+
+lib_status softpc_machine_prepare_media(const softpc_machine *machine,
+    softpc_media_archive *archive)
+{
+    if (machine == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    return softpc_media_archive_prepare(archive, machine->options.floppy_path,
+        machine->options.hard_disk_path, machine->options.media_mode);
 }
 
 softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,

@@ -4,6 +4,7 @@
 #include "lib/types/types_interface.h"
 #include "compat/ccpu/lifecycle.h"
 #include "compat/ccpu/archive.h"
+#include "compat/media_snapshot.h"
 
 /* Executor-owned operation state, not a second machine lifecycle. */
 typedef enum softpc_snapshot_phase {
@@ -24,6 +25,7 @@ typedef struct softpc_snapshot {
    copied values; this type is deliberately not a public Common payload. */
 typedef struct softpc_snapshot_image {
     softpc_ccpu_archive ccpu;
+    softpc_media_archive *media;
     softpc_ccpu_entry entry;
 } softpc_snapshot_image;
 
@@ -36,7 +38,7 @@ lib_status softpc_snapshot_finish(softpc_snapshot *snapshot);
 void softpc_snapshot_image_dispose(softpc_snapshot_image *image);
 lib_status softpc_snapshot_image_capture(softpc_snapshot_image *image,
     const softpc_ccpu_entry *entry);
-lib_status softpc_snapshot_image_restore(const softpc_snapshot_image *image,
+lib_status softpc_snapshot_image_restore(softpc_snapshot_image *image,
     softpc_ccpu_entry *entry);
 /* VM-private canonical image container. It composes the independently owned
    core and device streams; paths/files remain outside this boundary. */

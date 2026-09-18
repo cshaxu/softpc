@@ -139,6 +139,7 @@ add_library(softpc-ccpu-core OBJECT
     src/mvdm/softpc.new/base/cvidc/sascdef.c)
 add_library(softpc-machine-compat OBJECT
     src/compat/snapshot_stream.c
+    src/compat/media_snapshot.c
     src/compat/cvidc/gdp_state.c
     src/compat/ccpu/lifecycle.c
     src/compat/ccpu/archive.c
@@ -457,6 +458,13 @@ add_test(NAME softpc-checkpoint-smoke COMMAND softpc-checkpoint-smoke)
 set_tests_properties(softpc-checkpoint-smoke PROPERTIES TIMEOUT 15)
 add_executable(softpc-snapshot-transaction-smoke
     test/unit/snapshot_transaction_smoke.c)
+add_executable(softpc-media-snapshot-smoke test/unit/media_snapshot_smoke.c
+    src/compat/snapshot_stream.c)
+target_include_directories(softpc-media-snapshot-smoke PRIVATE src)
+target_link_libraries(softpc-media-snapshot-smoke PRIVATE storage)
+add_test(NAME softpc-media-snapshot-smoke COMMAND softpc-media-snapshot-smoke)
+set_tests_properties(softpc-media-snapshot-smoke PROPERTIES TIMEOUT 20
+    LABELS "unit" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 target_link_libraries(softpc-snapshot-transaction-smoke PRIVATE softpc-vm
     common-machine)
 add_test(NAME softpc-snapshot-transaction-smoke
@@ -564,6 +572,7 @@ add_test(NAME softpc-win32-presentation-manifest
 # postcondition.  Keep those checks live even when validating an optimized
 # machine library; production targets retain their normal Release NDEBUG.
 set(SOFTPC_TEST_TARGETS
+    softpc-media-snapshot-smoke
     softpc-machine-smoke
     softpc-dual-media-smoke
     softpc-partition-image-smoke

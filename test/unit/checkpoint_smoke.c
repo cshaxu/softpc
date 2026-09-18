@@ -480,6 +480,7 @@ static void verify_snapshot_archive(void)
     assert(softpc_machine_write_physical(probe.machine, 0x5000u, altered,
         sizeof(altered)) == SOFTPC_MACHINE_OK);
     flush_tlb();
+    assert(softpc_machine_prepare_media(probe.machine, image.media) == LIB_STATUS_OK);
     assert(softpc_snapshot_image_restore(&image, &restored) == LIB_STATUS_OK);
     assert(restored.halted && restored.trap == 0u);
     assert(c_getEAX() == 0x12345678u && c_getEIP() == 0x7654u);

@@ -5,10 +5,12 @@
 #include "fdisk.h"
 #include "lib/storage/medium_interface.h"
 #include "hdd_media.h"
+#include "media_snapshot.h"
 
 typedef struct softpc_disk_media
 {
     lib_storage_medium *medium;
+    lib_storage_medium_mode mode;
     IU32 total_sectors;
 } softpc_disk_media;
 
@@ -29,6 +31,7 @@ static int softpc_hdd_attach_media(softpc_disk_media *media, const char *path,
     size_t bytes;
 
     media->medium = NULL;
+    media->mode = mode;
     media->total_sectors = 0u;
     if (path == NULL)
         return 1;
@@ -143,4 +146,30 @@ char *buffer;
 void host_fdisk_seek0(driveid) int driveid;
 {
     UNUSED(driveid);
+}
+
+void softpc_hdd_media_view(unsigned slot, softpc_media_view *view)
+{
+    *view = (softpc_media_view){0};
+    if (slot >= 2u) return;
+    view->medium = softpc_hdd_media[slot].medium;
+    view->path = softpc_hdd_config_paths[slot];
+    view->mode = softpc_hdd_media[slot].mode;
+}
+
+lib_status softpc_hdd_media_restore(unsigned slot,
+    lib_storage_medium **replacement)
+{
+    lib_storage_medium *retired = NULL;
+    lib_status status;
+    if (slot >= 2u || replacement == NULL || *replacement == NULL ||
+        lib_storage_medium_byte_count(*replacement) !=
+        lib_storage_medium_byte_count(softpc_hdd_media[slot].medium))
+        return LIB_STATUS_INVALID_ARGUMENT;
+    status = lib_storage_medium_replace(&softpc_hdd_media[slot].medium,
+        *replacement, &retired);
+    if (status != LIB_STATUS_OK) return status;
+    *replacement = NULL;
+    (void)lib_storage_medium_destroy(&retired);
+    return LIB_STATUS_OK;
 }

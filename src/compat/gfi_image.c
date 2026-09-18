@@ -11,6 +11,7 @@
 #include "gfi.h"
 #include "config.h"
 #include "lib/storage/medium_interface.h"
+#include "media_snapshot.h"
 
 /*
  * This is a host media port, not an FDC implementation.  The original FLA,
@@ -23,6 +24,7 @@
 
 typedef struct {
     lib_storage_medium *medium;
+    char path[1024];
     lib_storage_medium_mode mode;
     unsigned int cylinders;
     unsigned int heads;
@@ -320,6 +322,7 @@ int softpc_platform_floppy_attach(const char *path, lib_storage_medium_mode mode
     lib_storage_medium_destroy(&drive->medium);
     memset(drive, 0, sizeof(*drive));
     if (path == NULL) return 1;
+    if (strlen(path) >= sizeof(drive->path)) return 0;
     if (lib_storage_medium_open(path, mode, &drive->medium) !=
             LIB_STATUS_OK ||
         (bytes = lib_storage_medium_byte_count(drive->medium)) > LONG_MAX ||
@@ -330,6 +333,7 @@ int softpc_platform_floppy_attach(const char *path, lib_storage_medium_mode mode
         return 0;
     }
     drive->mode = mode;
+    memcpy(drive->path, path, strlen(path) + 1u);
     softpc_gfi_install(0);
     return 1;
 }
@@ -349,4 +353,36 @@ char *softpc_platform_floppy_config_value(void)
 {
     return softpc_gfi_drives[0].medium != NULL ?
         softpc_gfi_attached_config_value : softpc_gfi_empty_config_value;
+}
+
+void softpc_floppy_media_view(unsigned slot, softpc_media_view *view)
+{
+    *view = (softpc_media_view){0};
+    if (slot >= MAX_DISKETTES) return;
+    view->medium = softpc_gfi_drives[slot].medium;
+    view->path = softpc_gfi_drives[slot].path;
+    view->mode = softpc_gfi_drives[slot].mode;
+    view->cylinder = softpc_gfi_drives[slot].cylinder;
+}
+
+lib_status softpc_floppy_media_restore(unsigned slot,
+    lib_storage_medium **replacement, lib_u32 cylinder)
+{
+    softpc_gfi_image_drive *drive;
+    lib_storage_medium *retired = NULL;
+    lib_status status;
+    if (slot >= MAX_DISKETTES || replacement == NULL || cylinder > 255u)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    drive = &softpc_gfi_drives[slot];
+    if (*replacement != NULL) {
+        if (lib_storage_medium_byte_count(*replacement) !=
+            lib_storage_medium_byte_count(drive->medium))
+            return LIB_STATUS_INVALID_ARGUMENT;
+        status = lib_storage_medium_replace(&drive->medium, *replacement, &retired);
+        if (status != LIB_STATUS_OK) return status;
+        *replacement = NULL;
+        (void)lib_storage_medium_destroy(&retired);
+    }
+    drive->cylinder = cylinder;
+    return LIB_STATUS_OK;
 }

@@ -5,6 +5,10 @@
 #include "lib/storage/medium_interface.h"
 
 typedef struct softpc_machine softpc_machine;
+typedef struct softpc_media_archive softpc_media_archive;
+
+lib_status softpc_machine_prepare_media(const softpc_machine *machine,
+    softpc_media_archive *archive);
 typedef void (*softpc_machine_executor_callback)(void *context);
 
 typedef enum softpc_machine_result {

@@ -1253,3 +1253,24 @@ all media owners, implement overlay archive/restore through existing Storage,
 and prove fresh-process restoration of both disk content and machine state.
 No new Common API or Lib change is pre-approved. See the active packet and
 the proposal's S10 ledger.
+
+S10 pre-implementation audit confirms the missing media section and reset's
+destructive reattachment of overlay leases. The additional omitted host state
+is GFI's current cylinder. Existing controller capture covers HDD registers,
+not disk contents. The proposal now enumerates the media owners, DIRECT
+sharing constraint, installation order and estimated implementation/test scope.
+No production code or new successful snapshot proof is claimed at this point.
+
+## S10 implementation: FDD/HDD overlay payload
+
+The original media gap is now implemented in Compat plus the VM-private image
+container. A version-6 MEDIA section archives the complete effective overlay
+delta for every fixed owner slot. It never copies DIRECT/READONLY disk bytes.
+VM stages/validates media before reset and Compat installs prepared overlay
+leases after reset but before device/CPU restoration. The real post-reset
+external lease is revalidated for DIRECT/READONLY. FDD current cylinder is
+included. No Lib/Common/MVDM change was made.
+
+Focused x86/x64 media and snapshot tests passed, followed by full x86 106/106
+(121.24 s) and x64 106/106 (133.11 s). Owner manual acceptance remains
+required; this record does not close S10 or T63.

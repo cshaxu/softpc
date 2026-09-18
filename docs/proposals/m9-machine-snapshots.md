@@ -615,3 +615,53 @@ T63 不得收口；撤回尚未提交的收口及 T64 准入。S9 的显示恢�
 
 完成后双宽度完整构建、测试、提交推送并供 owner 手测。T63 整体收口必须
 重新核对原始请求，不能把此项再以设计证明或延期记录替代实现。
+
+### S10 实施前源码审计
+
+已确认 `vm/snapshot_image.c` 只有 CORE、DEVICES 两段。`vm/driver.c`
+在加载时先调用 `softpc_machine_reset()`；后者重新 attach 两类媒体，销毁
+此前 overlay。因此即使 CPU/画面恢复正确，当前格式也不具备磁盘检查点能力。
+
+| 所有者 | 当前事实 | S10 处理 |
+| --- | --- | --- |
+| Compat `hdd_media.c` | 两个槽位，产品只配置第一个；保存 medium/sector count，未保留 mode | 保存各槽位存在性和配置模式，复用原读写路径，禁止创建第二磁盘运行时 |
+| Compat `gfi_image.c` | MAX_DISKETTES 槽位，产品只 attach A；保存 mode、几何、当前 cylinder | 归档插入状态与当前柱面；空槽明确记录，恢复不遗漏后端柱面 |
+| VM `machine.c` | 冷 reset 重建媒体；换盘更新自身 floppy_path | 校验当前配置，恢复在 reset 后安装新 lease、设备/CPU 恢复前完成 |
+| Lib Storage | OVERLAY 保留只读基底和稀疏页；已可 read/open/write/replace | 不改 Lib，不读取私有 page 链；差异比较和快照编码归 Compat |
+| Win32 Storage | OVERLAY/READONLY 允许共享只读；DIRECT 不共享 | overlay 可另开只读基底；DIRECT 校验复用已有 live lease，不能重新打开导致共享冲突 |
+| 原 device archive | 包含 HDD 控制器，但没有 Compat GFI cylinder 或任何媒体数据 | 保留控制器所有权，只补媒体后端状态，不能把寄存器归档当磁盘数据归档 |
+
+实现采用一份 Compat 媒体归档算法。媒体对象不暴露给 Common/App；VM 把
+媒体归档与现有 core/device image 组合。保存扫描发生在现有 CPU/timer 安全
+屏障之后，一秒期限仍仅限制到达安全点，不拿磁盘扫描时间当执行超时。
+文件只保存相对基底的有效差异块及完整基底内容指纹。读取对块索引/顺序/
+长度/重复、媒体模式和基底匹配进行验证，构造新的 overlay 而非合并旧页。
+DIRECT/READONLY 无磁盘 payload。不得以旧的仅两段格式返回完整加载成功。
+
+预计生产涉及 8–12 个 VM/Compat/构建文件，新增约 450–750 行；测试约
+250–400 行。这是实施前估算，不是最终 diff。不计划修改 Lib/Common/MVDM。
+验证必须同时包含 FDD 与 HDD 实际字节；现有 snapshot transaction 的
+overlay 配置没有写入后核对媒体内容，故原 105/105 不能证明此项已实现。
+
+### S10 实施结果（待 owner 手测）
+
+实现新增第三个 MEDIA section，格式版本升为 6；旧版 5 缺少媒体 section，
+因此明确拒绝，不猜测或混合旧 overlay。四个固定后端槽位（FDD 0–1、HDD
+0–1）有统一 archive；当前产品只配置 FDD 0、HDD 0，其余必须显式为空。
+每个非空槽位记录存在性、模式、长度、基底 SHA-256、FDD 当前柱面和按 4 KiB
+排列的不同块；4 KiB 块大小也写进媒体段并校验。几何由原后端从已记录的长度
+按既有规则重建，避免存两份可漂移的几何真相。最后一块写实际长度；读取拒绝
+乱序、重复、越界、错误末块和截断。
+
+OVERLAY 读取其有效视图并与新开的 readonly 基底逐块比较，只编码差异；恢复
+先校验基底、构造新 overlay，再在 reset 后经原 FDD/HDD owner 置换 lease，故
+后来写入不会与恢复页合并。DIRECT/READONLY 仅记录并校验外部内容，不复制整盘；
+DIRECT 在运行期使用现有独占 lease，reset 后再验证实际重新挂载 lease。没有改动
+用户镜像、Lib、Common 或 MVDM。
+
+新增独立 `media_snapshot_smoke`：SHA-256 标准向量、跨 4 KiB 边界、末块、
+FDD/HDD 替换、空 overlay、三种模式、基底变化、所有截断前缀及重复索引。真实
+VM 事务和跨进程测试均向实际已挂载的 FDD/HDD overlay 写入不同内容，保存后追加
+错误页，load 后证明保存页恢复、追加页消失，并检查 FDD 柱面。最终 x86/x64
+各 106/106 通过；正式 package 已在提交前重建。Owner 手测接受前，S10 与
+T63 均不得收口。

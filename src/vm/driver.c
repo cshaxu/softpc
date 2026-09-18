@@ -430,7 +430,12 @@ static lib_status vm_driver_write_state(void *opaque,
     status = softpc_snapshot_image_read(&staged,
         softpc_machine_memory_bytes(driver->machine),
         (softpc_snapshot_bytes_read)reader->read, reader->context);
-    if (status != LIB_STATUS_OK) return status;
+    if (status == LIB_STATUS_OK)
+        status = softpc_machine_prepare_media(driver->machine, staged.media);
+    if (status != LIB_STATUS_OK) {
+        softpc_snapshot_image_dispose(&staged);
+        return status;
+    }
     softpc_snapshot_image_dispose(&driver->staged_image);
     driver->staged_image = staged;
     driver->restore_pending = LIB_TRUE;

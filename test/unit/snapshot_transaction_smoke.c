@@ -1,4 +1,5 @@
 #include "vm/driver.h"
+#include "compat/media_snapshot.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -135,6 +136,11 @@ static lib_bool snapshot_write_media(const char *path)
         fclose(file);
         return LIB_FALSE;
     }
+    memset(sector, 0, sizeof(sector));
+    for (unsigned i = 1; i < 17; ++i)
+        if (fwrite(sector, 1u, sizeof(sector), file) != sizeof(sector)) {
+            fclose(file); return LIB_FALSE;
+        }
     return fclose(file) == 0 ? LIB_TRUE : LIB_FALSE;
 }
 
@@ -142,7 +148,44 @@ static void snapshot_options(softpc_machine_options *options, const char *path)
 {
     *options = (softpc_machine_options) { 0 };
     options->floppy_path = path;
+    options->hard_disk_path = path;
     options->media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
+}
+
+/* The executor is parked for these direct host-media fixture operations. */
+static lib_bool snapshot_media_bytes(lib_bool write, lib_bool later)
+{
+    unsigned i;
+    for (i = 0; i < 2; ++i) {
+        softpc_media_view view;
+        lib_u8 bytes[512];
+        lib_u8 value = (lib_u8)(0x41u + i);
+        if (i == 0) softpc_floppy_media_view(0, &view);
+        else softpc_hdd_media_view(0, &view);
+        if (view.medium == NULL) return LIB_FALSE;
+        if (i == 0) {
+            lib_storage_medium *no_replacement = NULL;
+            if (write) {
+                if (softpc_floppy_media_restore(0, &no_replacement,
+                        later ? 1u : 37u) != LIB_STATUS_OK) return LIB_FALSE;
+            } else if (view.cylinder != 37u) return LIB_FALSE;
+        }
+        memset(bytes, later ? 0x99 : value, sizeof(bytes));
+        if (write) {
+            if (lib_storage_medium_write_at(view.medium, later ? 4096 : 8192,
+                    bytes, sizeof(bytes)) != LIB_STATUS_OK) return LIB_FALSE;
+        } else {
+            if (lib_storage_medium_read_at(view.medium, 8192, bytes,
+                    sizeof(bytes)) != LIB_STATUS_OK) return LIB_FALSE;
+            for (unsigned n = 0; n < sizeof(bytes); ++n)
+                if (bytes[n] != value) return LIB_FALSE;
+            if (lib_storage_medium_read_at(view.medium, 4096, bytes,
+                    sizeof(bytes)) != LIB_STATUS_OK) return LIB_FALSE;
+            for (unsigned n = 0; n < sizeof(bytes); ++n)
+                if (bytes[n] != 0) return LIB_FALSE;
+        }
+    }
+    return LIB_TRUE;
 }
 
 static lib_bool snapshot_has_pixels(common_machine *machine, lib_u8 colour)
@@ -190,26 +233,33 @@ static int snapshot_run_transaction(void)
     assert(common_machine_start(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
     assert(snapshot_wait_for_pixels(machine, 0x0c));
+    assert(common_machine_pause(machine));
+    assert(wait_for_state(machine, COMMON_MACHINE_PAUSED));
+    assert(snapshot_media_bytes(LIB_TRUE, LIB_FALSE));
+    assert(common_machine_resume(machine));
+    assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
     assert(common_machine_read_state(machine,
         &(common_machine_state_writer) { snapshot_write, &stream }) ==
         LIB_STATUS_OK);
     assert(stream.count != 0u);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
     assert(snapshot_has_pixels(machine, 0x0c));
+    assert(snapshot_media_bytes(LIB_TRUE, LIB_TRUE));
     assert(common_machine_stop(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_STOPPED));
 
     /* The container carries no host or machine word-width field. */
     assert(stream.count >= 16u);
-    assert(stream.bytes[4] == 5u && stream.bytes[5] == 0u &&
+    assert(stream.bytes[4] == 6u && stream.bytes[5] == 0u &&
         stream.bytes[6] == 0u && stream.bytes[7] == 0u);
-    assert(stream.bytes[8] == 2u && stream.bytes[9] == 0u &&
+    assert(stream.bytes[8] == 3u && stream.bytes[9] == 0u &&
         stream.bytes[10] == 0u && stream.bytes[11] == 0u);
     stream.offset = 0u;
     assert(common_machine_write_state(machine,
         &(common_machine_state_reader) { snapshot_read, &stream }) ==
         LIB_STATUS_OK);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
+    assert(snapshot_media_bytes(LIB_FALSE, LIB_FALSE));
     assert(common_machine_stop(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_STOPPED));
 
@@ -220,7 +270,7 @@ static int snapshot_run_transaction(void)
         &(common_machine_state_reader) { snapshot_read, &stream }) !=
         LIB_STATUS_OK);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
-    snapshot_set_u32_le(stream.bytes + 4u, 5u);
+    snapshot_set_u32_le(stream.bytes + 4u, 6u);
 
     /* v4 lost the live map/read/bit masks; do not guess missing registers. */
     snapshot_set_u32_le(stream.bytes + 4u, 4u);
@@ -229,7 +279,7 @@ static int snapshot_run_transaction(void)
         &(common_machine_state_reader) { snapshot_read, &stream }) !=
         LIB_STATUS_OK);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
-    snapshot_set_u32_le(stream.bytes + 4u, 5u);
+    snapshot_set_u32_le(stream.bytes + 4u, 6u);
 
     /* A declared section boundary must be consumed exactly, never ignored. */
     {
@@ -296,6 +346,11 @@ static int snapshot_run_save(const char *media_path, const char *snapshot_path)
     assert(common_machine_start(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
     assert(snapshot_wait_for_pixels(machine, 0x0c));
+    assert(common_machine_pause(machine));
+    assert(wait_for_state(machine, COMMON_MACHINE_PAUSED));
+    assert(snapshot_media_bytes(LIB_TRUE, LIB_FALSE));
+    assert(common_machine_resume(machine));
+    assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
     assert(common_machine_read_state(machine,
         &(common_machine_state_writer) { snapshot_file_write, file }) ==
         LIB_STATUS_OK);
@@ -347,6 +402,7 @@ static int snapshot_run_load(const char *media_path, const char *snapshot_path,
         assert(frame.valid != 0u);
     }
     assert(snapshot_has_pixels(machine, 0x0c));
+    assert(snapshot_media_bytes(LIB_FALSE, LIB_FALSE));
     assert(common_machine_resume(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
     {
