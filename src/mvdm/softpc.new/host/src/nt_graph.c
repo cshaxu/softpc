@@ -1136,7 +1136,9 @@ void make_cursor_change(void)
     SAVED DWORD CurrentCursorSize = (DWORD)-1;
     SAVED BOOL CurNowOff = FALSE;
 
+#ifndef SOFTPC_STANDALONE
     if(sc.ScreenState == FULLSCREEN) return;
+#endif
 
     CursorResizeNeeded = FALSE;
 

@@ -42,6 +42,8 @@ native Console host。Standalone 中这些 API 已由 Compat 转入唯一 text s
 会让客户机全屏后的 `cls` 根本不写入实际输出表面。只在 `SOFTPC_STANDALONE` 排除该 native
 policy；所有状态仍走原有 Compat clear 函数。非-standalone 代码逐字保留。VGA smoke 覆盖
 将 text surface 置满、把客户机 state 设为 FULLSCREEN 再调用原 clear，验证 80x25 全清。
+同一 host-only guard 也在 standalone 下不再抑制 cursor-size metadata 更新；测试以原有
+visible/hidden cursor state 验证 FULLSCREEN 仍更新 Compat metadata。不增加产品 cursor 状态。
 
 ## 冻结范围与复算
 

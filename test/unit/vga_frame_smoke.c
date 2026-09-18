@@ -55,6 +55,7 @@ extern void nt_vga_graph_std(int offset, int screen_x, int screen_y,
 extern void nt_vga_med_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
 extern void nt_clear_screen(void);
+extern void make_cursor_change(void);
 extern void nt_init_ega_lo_graph(void);
 extern void nt_v7vga_hi_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
@@ -152,6 +153,40 @@ static void verify_fullscreen_text_clear(void)
     soft_reset = saved_soft_reset;
     ConsoleInitialised = saved_console_initialised;
     ConsoleNoUpdates = saved_console_no_updates;
+}
+
+static void verify_fullscreen_cursor_metadata(void)
+{
+    DISPLAY_GLOBS saved_display = PCDisplay;
+    int saved_screen_state = sc.ScreenState;
+    CONSOLE_CURSOR_INFO hidden;
+    COORD position;
+    long column;
+    long row;
+    unsigned long size;
+
+    position.X = 7;
+    position.Y = 8;
+    assert(softpc_compat_set_console_cursor_position(NULL, position));
+    hidden.dwSize = 1u;
+    hidden.bVisible = FALSE;
+    assert(softpc_compat_set_console_cursor_info(NULL, &hidden));
+
+    /* First drive the original size cache to its hidden state.  Then a
+       visible guest cursor in fullscreen must still update the detached
+       presenter's only cursor metadata. */
+    sc.ScreenState = WINDOWED;
+    set_cursor_visible(FALSE);
+    make_cursor_change();
+    set_cursor_visible(TRUE);
+    set_cursor_height(1);
+    sc.ScreenState = FULLSCREEN;
+    make_cursor_change();
+    assert(softpc_compat_presentation_cursor(&column, &row, &size));
+    assert(column == 7 && row == 8 && size != 0u);
+
+    PCDisplay = saved_display;
+    sc.ScreenState = saved_screen_state;
 }
 
 static void verify_panning_refresh(void)
@@ -664,6 +699,7 @@ int main(void)
     assert(bits != NULL && info != NULL);
     assert(width == 1280u && height == 768u);
     verify_fullscreen_text_clear();
+    verify_fullscreen_cursor_metadata();
 
     /* This fixed V7 model is the original 512 KiB card: INT 10h/6Fh/07h
        reports two 256 KiB blocks.  Do not infer a 1 MiB virtual adapter from

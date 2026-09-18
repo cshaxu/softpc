@@ -187,3 +187,8 @@ fullscreen/windowed 只是客户机显示状态，不能决定是否把清屏写
 VGA smoke 将 Compat text surface 置满、设置 guest `FULLSCREEN` 后调用原
 `nt_clear_screen()`，断言 80x25 全部恢复为空格。它覆盖 Window/Console 两种 presenter
 共用的机器文本输出事实。
+
+同一 native-only `FULLSCREEN` guard 也包住原 Console cursor-size 更新。Standalone 的该调用
+同样只更新 Compat cursor metadata，故采用相同规则：不因客户机 fullscreen 跳过它。测试先把
+原 cursor cache 驱动到 hidden，再在 FULLSCREEN 下恢复可见 cursor，验证 metadata 更新；不新增
+任何 cursor state、callback 或 UI 行为。
