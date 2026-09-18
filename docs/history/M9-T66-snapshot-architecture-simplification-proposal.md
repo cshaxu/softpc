@@ -228,3 +228,13 @@ thread path changed.
 S3 审计已证明 `captured_image` 和 `staged_image` 的长生命周期是产品语义而非冗余，
 因此 T66 不再有可安全实施的代码候选。S4 只核对 S1--S3 的实际账目、保护镜像边界与
 双宽度 package，等待 owner 对最后 package 进行验证；不得为了制造一个实现步骤新增代码。
+
+## T66 completion
+
+Owner validated the final package. The finite ledger is closed in the
+[T66 completion audit](../history/M9-T66-completion-audit.md): S1 retains the
+existing snapshot phase as the single failure fact, S2 removes duplicated
+device restore mechanisms, and S3 keeps real PAUSED-save ownership while
+deleting only an unread cache. No candidate remains in this task; later
+product defects or new simplification evidence require a separately admitted
+task.

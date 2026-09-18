@@ -2,7 +2,7 @@
 
 Owner admitted the former Queue head as T64, with S1 auditing similar Lib
 simplification opportunities. CURRENT is the sole active packet authority.
-Source candidate: [architecture review](../proposals/m9-snapshot-architecture-simplification.md).
+Source candidate: [architecture review](M9-T66-snapshot-architecture-simplification-proposal.md).
 
 ## S1 decision
 

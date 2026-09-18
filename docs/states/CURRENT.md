@@ -2,35 +2,14 @@
 
 ## Current Work
 
-M9 T66 S4 is admitted: close the finite architecture ledger after owner package
-validation; no further production change is admitted.
-
-## M9 T66 S4 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner: 开始吧 做完架构整理任务; standing commit/push approval. |
-| Objective | Audit the delivered T66 ledger, retain only proven simplifications, and await owner validation of both package widths before T closure. |
-| Non-goals | No production, Lib/Common, thread, UI, snapshot format, CPU/device behavior, archive-order, original-mirror or ABI change. |
-| Reference Baseline | T66 S3 delivery pending owner validation; current committed baseline after its P. |
-| Candidate Proposal | [Snapshot and component architecture simplification](../proposals/m9-snapshot-architecture-simplification.md) |
-| Files And ABI Surface | Documentation/history and package artifacts only. Public ABI unchanged. |
-| Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT and selected governance skills; original-mirror and VM/Compat ownership boundaries. |
-| Verification | S1--S3 accounting audit, protected mirror diff review, owner package validation. |
-| Expected Markers | No unimplemented candidate remains; user accepts both package widths. |
-| Asset Needs | Existing test media/fakes; refresh both EXEs only after implementation; never modify owner INI/media. |
-| Reporting Requirements | Report final actual S1--S3 production/test/mirror accounting and owner test result. |
-| Stop Conditions | Any new product defect or proposal change starts a separate admitted task; do not append it to T66. |
-| Exit Criteria | Owner validates both EXEs and approves closure. |
-| Original Owner Request | 开始吧 做完架构整理任务 |
-| Similar-Issue Sweep | Final audit confirms S1 finish ordering, S2 original mechanism reuse and S3 real ownership retention. |
+No implementation subtask is active. T66 is closed after owner validation.
 
 ## Current Technical Baseline
 
-- Source: T65 S1 delivery pending this closure commit; state read/write reset
-  their completion event before publishing executor-visible work. No public ABI,
-  new synchronization state or request-slot abstraction was added.
+- Source: T66 is closed. Snapshot finish errors publish their real result before
+  Common completion; VGA/PIT restore reuse original device mechanisms; the VM
+  no longer stores an unread checkpoint-entry copy. No public ABI, format,
+  thread, Common or Lib behavior changed.
 - Both widths have 107 passing test cases; package EXEs were refreshed without
   changing owner INI/media. See [T65 audit](../history/M9-T65-completion-audit.md).
 - Snapshots are width-independent fixed-order binary streams with no magic,
@@ -48,6 +27,7 @@ validation; no further production change is admitted.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T66 | S1--S4 complete; owner-validated dual-width package. | [Audit](../history/M9-T66-completion-audit.md) |
 | T65 | S1 complete; request-slot refactor cancelled after contract audit; dual-width 107/107. | [Audit](../history/M9-T65-completion-audit.md) |
 | T64 | S1 audit accepted; S2 narrowed frame copy verified; owner accepted. | [Audit](../history/M9-T64-completion-audit.md) |
 | T63 | S1–S12 complete; owner acceptance; final dual-width 106/106. | [Audit](../history/M9-T63-completion-audit.md) |
@@ -56,4 +36,4 @@ validation; no further production change is admitted.
 
 ## Recent Governance
 
-T65 closes the admitted Common request-order repair. Queue ordering is unchanged.
+T66 closes the admitted snapshot/component simplification ledger. Queue ordering is unchanged.
