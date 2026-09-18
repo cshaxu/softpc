@@ -3381,24 +3381,6 @@ byte selector;
     return 0;
 }
 
-LOCAL void
-snapshot_write_graphics(index, value)
-byte index, value;
-{
-    vga_gc_outb_index(EGA_GC_INDEX, index);
-    switch (index) {
-    case 0: vga_gc_set_reset(EGA_GC_DATA, value); break;
-    case 1: vga_gc_enable_set(EGA_GC_DATA, value); break;
-    case 2: vga_gc_compare(EGA_GC_DATA, value); break;
-    case 3: vga_gc_rotate(EGA_GC_DATA, value); break;
-    case 4: vga_gc_read_map(EGA_GC_DATA, value); break;
-    case 5: vga_gc_mode(EGA_GC_DATA, value); break;
-    case 6: vga_gc_misc(EGA_GC_DATA, value); break;
-    case 7: vga_gc_dont_care(EGA_GC_DATA, value); break;
-    case 8: vga_gc_mask_ff(EGA_GC_DATA, value); break;
-    }
-}
-
 GLOBAL int
 softpc_device_snapshot_capture_video_controller(state)
 softpc_device_video_controller_state *state;
@@ -3519,7 +3501,8 @@ const softpc_device_video_controller_state *state;
     vga_crtc_outb(EGA_CRTC_INDEX, 0x11);
     vga_crtc_outb(EGA_CRTC_DATA, state->crtc[0x11]);
     for (index = 0; index < SOFTPC_DEVICE_VIDEO_GRAPHICS_REGISTER_COUNT; ++index)
-        snapshot_write_graphics((byte)index, state->graphics[index]);
+        vga_gc_outw(EGA_GC_INDEX, (word)(((word)state->graphics[index] << 8) |
+            (word)index));
 
     vga_ipstat1_inb(EGA_IPSTAT1_REG, &unused);
     for (index = 0; index < SOFTPC_DEVICE_VIDEO_ATTRIBUTE_REGISTER_COUNT; ++index) {

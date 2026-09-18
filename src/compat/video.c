@@ -18,7 +18,6 @@
 #include "dib_surface.h"
 #include "nt_graph.h"
 
-IMPORT IU8 Currently_emulated_video_mode;
 
 /* The original video core's optional stream-I/O path is a product console
    optimization.  The detached VM presents through its own console/window,

@@ -2974,54 +2974,24 @@ void (*action)();
     return 0;
 }
 
-LOCAL int
-snapshot_restore_timer_state(counter, state_id)
-COUNTER_UNIT *counter;
+typedef STATE_FUNCTION (*SNAPSHOT_TIMER_STATE_FUNCTION) IPT2(int, signal,
+    half_word, value);
+
+LOCAL SNAPSHOT_TIMER_STATE_FUNCTION
+snapshot_timer_state_function(state_id)
 unsigned long state_id;
 {
     switch (state_id) {
-    case SNAPSHOT_TIMER_STATE_UNINIT: counter->state = uninit; return TRUE;
-    case SNAPSHOT_TIMER_STATE_AWAITING_GATE: counter->state = awaitingGate; return TRUE;
-    case SNAPSHOT_TIMER_STATE_WAITING_FIRST_WRITE: counter->state = waitingFor1stWrite; return TRUE;
-    case SNAPSHOT_TIMER_STATE_WAITING_SECOND_WRITE: counter->state = waitingFor2ndWrite; return TRUE;
-    case SNAPSHOT_TIMER_STATE_COUNTING_0: counter->state = Counting0; return TRUE;
-    case SNAPSHOT_TIMER_STATE_COUNTING_1: counter->state = Counting1; return TRUE;
-    case SNAPSHOT_TIMER_STATE_COUNTING_2_3: counter->state = Counting_2_3; return TRUE;
-    case SNAPSHOT_TIMER_STATE_COUNTING_4_5: counter->state = Counting_4_5; return TRUE;
+    case SNAPSHOT_TIMER_STATE_UNINIT: return uninit;
+    case SNAPSHOT_TIMER_STATE_AWAITING_GATE: return awaitingGate;
+    case SNAPSHOT_TIMER_STATE_WAITING_FIRST_WRITE: return waitingFor1stWrite;
+    case SNAPSHOT_TIMER_STATE_WAITING_SECOND_WRITE: return waitingFor2ndWrite;
+    case SNAPSHOT_TIMER_STATE_COUNTING_0: return Counting0;
+    case SNAPSHOT_TIMER_STATE_COUNTING_1: return Counting1;
+    case SNAPSHOT_TIMER_STATE_COUNTING_2_3: return Counting_2_3;
+    case SNAPSHOT_TIMER_STATE_COUNTING_4_5: return Counting_4_5;
     }
-    return FALSE;
-}
-
-LOCAL int
-snapshot_restore_timer_prior_state(counter, state_id)
-COUNTER_UNIT *counter;
-unsigned long state_id;
-{
-    COUNTER_UNIT temporary;
-
-    if (state_id == 0) {
-        counter->statePriorWt = NULL;
-        return TRUE;
-    }
-    if (!snapshot_restore_timer_state(&temporary, state_id)) return FALSE;
-    counter->statePriorWt = temporary.state;
-    return TRUE;
-}
-
-LOCAL int
-snapshot_restore_timer_gate_state(counter, state_id)
-COUNTER_UNIT *counter;
-unsigned long state_id;
-{
-    COUNTER_UNIT temporary;
-
-    if (state_id == 0) {
-        counter->stateOnGate = NULL;
-        return TRUE;
-    }
-    if (!snapshot_restore_timer_state(&temporary, state_id)) return FALSE;
-    counter->stateOnGate = temporary.state;
-    return TRUE;
+    return NULL;
 }
 
 LOCAL int
@@ -3153,11 +3123,24 @@ COUNTER_UNIT *counter;
 const softpc_device_pit_counter_state *saved;
 int index;
 {
+    SNAPSHOT_TIMER_STATE_FUNCTION state;
+    SNAPSHOT_TIMER_STATE_FUNCTION prior_state;
+    SNAPSHOT_TIMER_STATE_FUNCTION gate_state;
+
     if (saved->mode < INT_ON_TERMINALCOUNT || saved->mode > HW_TRIG_STROBE ||
         (saved->bcd != BINARY && saved->bcd != BCD) ||
         saved->read_load < LATCH || saved->read_load > RL_LMSB ||
         saved->new_count != AVAILABLE && saved->new_count != USED ||
         saved->trigger != LEVEL && saved->trigger != EDGE)
+        return FALSE;
+    state = snapshot_timer_state_function(saved->state);
+    prior_state = saved->state_prior_wait == 0 ? NULL :
+        snapshot_timer_state_function(saved->state_prior_wait);
+    gate_state = saved->state_on_gate == 0 ? NULL :
+        snapshot_timer_state_function(saved->state_on_gate);
+    if (state == NULL ||
+        (saved->state_prior_wait != 0 && prior_state == NULL) ||
+        (saved->state_on_gate != 0 && gate_state == NULL))
         return FALSE;
     counter->m = saved->mode;
     counter->bcd = saved->bcd;
@@ -3191,10 +3174,10 @@ int index;
     counter->out.startLogicLevel = saved->waveform_start_level;
     counter->out.repeatWaveForm = saved->waveform_repeats;
     counter->getTime = index == 0 ? getIdealTime : getHostSysTime;
-    if (!snapshot_restore_timer_state(counter, saved->state) ||
-        !snapshot_restore_timer_prior_state(counter, saved->state_prior_wait) ||
-        !snapshot_restore_timer_gate_state(counter, saved->state_on_gate) ||
-        !snapshot_restore_timer_wait_action(counter, saved->action_on_wait_complete) ||
+    counter->state = state;
+    counter->statePriorWt = prior_state;
+    counter->stateOnGate = gate_state;
+    if (!snapshot_restore_timer_wait_action(counter, saved->action_on_wait_complete) ||
         !snapshot_restore_timer_gate_action(counter, saved->action_on_gate_enabled))
         return FALSE;
     snapshot_timer_rebase(counter, saved->activation_age_microseconds);

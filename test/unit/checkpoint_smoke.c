@@ -522,6 +522,10 @@ static void verify_pit_archive(void)
     assert(restored.counter[0].state == saved.counter[0].state);
     assert(restored.counter[0].action_on_wait_complete ==
         saved.counter[0].action_on_wait_complete);
+    restored = saved;
+    restored.counter[0].state = 0xffffffffu;
+    assert(!softpc_device_snapshot_restore_pit(&restored));
+    assert(softpc_device_snapshot_restore_pit(&saved));
 }
 
 static void verify_controller_archives(void)

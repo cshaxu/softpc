@@ -199,3 +199,13 @@ The actual VM production delta is +9/-1 (net +8); no test, Common, Lib or
 OpenNT MVDM mirror path changed. The retained snapshot READY phase is the
 single failure fact; no new driver latch or error channel was added. Both
 widths passed their 107-test full suites and package builds.
+
+## S2 delivery
+
+S2 delivery is recorded in [original mechanism reuse](../history/M9-T66-S2-original-mechanism-reuse.md).
+The snapshot video restore now enters the original `vga_gc_outw()` dispatcher,
+and PIT state IDs have one validated private decoder rather than two temporary
+`COUNTER_UNIT` wrappers. `com.c` declarations remain because they are required
+before the snapshot helpers' first reference; moving code merely to erase that
+textual duplication would enlarge the protected mirror diff. No public ABI,
+Common, Lib, thread or snapshot-format path changed.
