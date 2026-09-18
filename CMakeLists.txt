@@ -427,6 +427,14 @@ target_compile_definitions(softpc-vga-frame-smoke PRIVATE
 add_test(NAME softpc-vga-frame-smoke COMMAND softpc-vga-frame-smoke)
 set_tests_properties(softpc-vga-frame-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-text-console-compat-smoke
+    test/unit/text_console_compat_smoke.c)
+target_link_libraries(softpc-text-console-compat-smoke PRIVATE softpc-vm)
+target_include_directories(softpc-text-console-compat-smoke PRIVATE src)
+add_test(NAME softpc-text-console-compat-smoke
+    COMMAND softpc-text-console-compat-smoke)
+set_tests_properties(softpc-text-console-compat-smoke PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" LABELS "unit")
 add_executable(softpc-bop-smoke test/unit/bop_smoke.c)
 target_link_libraries(softpc-bop-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-bop-smoke PRIVATE
@@ -584,6 +592,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-mouse-smoke
     softpc-keycode-smoke
     softpc-vga-frame-smoke
+    softpc-text-console-compat-smoke
     softpc-bop-smoke
     softpc-quick-time-smoke
     softpc-lifecycle-smoke
@@ -663,6 +672,7 @@ set(SOFTPC_UNIT_TESTS
     softpc-mouse-smoke
     softpc-keycode-smoke
     softpc-vga-frame-smoke
+    softpc-text-console-compat-smoke
     softpc-bop-smoke
     softpc-quick-time-smoke
     softpc-lifecycle-smoke

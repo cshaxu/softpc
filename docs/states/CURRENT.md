@@ -2,29 +2,29 @@
 
 ## Current Work
 
-M9 T69 S1 is admitted: investigate the Win3.1 MS-DOS prompt display roundtrip
-failure before choosing a repair owner.
+M9 T69 S1 is admitted: restore the standalone Compat text-Console operations
+that update the shared presentation surface.
 
 ## M9 T69 S1 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | New |
-| Admission And Approval | Owner supplied the direct Window/fullscreen-return symptom and `edit` counterexample, requested proposal update, queue priority and an admitted investigation. Standing commit/push approval applies. |
-| Objective | Reproduce or bound the Win3.1 MS-DOS prompt residual-character failure and identify the first owner whose state diverges from the correctly displayed `edit` path. |
-| Non-goals | No speculative CLS workaround, forced repaint, customer image modification, focus/input repair, broad display refactor or MVDM source change. No implementation repair is admitted in S1. |
-| Reference Baseline | T68 (`86de8eb`) is closed. In Window display mode, or after returning from client fullscreen, a Win3.1 MS-DOS prompt leaves residual characters; running and exiting `edit` makes subsequent prompt output clean. Ordinary DOS CLS is known good. |
+| Admission And Approval | This packet's read-only investigation proved that Compat reports text Console fills successful without mutating `textBuffer`. Owner then approved a correct repair, build, test, commit and push within the same bounded defect task. Standing commit/push approval applies. |
+| Objective | Restore the original text-Console clear contract in the standalone Compat host so Win3.1 prompt and client-fullscreen-to-raw-Console presentation consume a correctly cleared shared text surface. |
+| Non-goals | No forced repaint, CLS special case, customer image/configuration change, focus/input repair, Lib/Common/VM API change, or MVDM mirror change. Do not implement an unused generalized terminal/scroll system. |
+| Reference Baseline | S1 proved `nt_clear_screen()` and `prepare_surface()` call original fill APIs while `softpc_compat_fill_console_character/attribute()` return success without writing the text surface. `GetConsoleScreenBufferInfo()` incorrectly returns pixel geometry as cell geometry. |
 | Candidate Proposal | [Win3.1 MS-DOS prompt display roundtrip repair](../proposals/m9-win31-display-roundtrip.md) |
-| Files And ABI Surface | Read-only investigation spans original text/video output, Compat frame capture, VM frame adaptation, Common UI routing and Lib Window/Console drawing. No source or ABI change is authorized. |
-| Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT and PRODUCT UI. One frame/state owner remains required; no display bypass is introduced. |
-| Verification | Establish a reproducible observation matrix for direct Window prompt, fullscreen-to-Window prompt, `edit` enter/exit and ordinary DOS CLS. Trace copied facts only far enough to locate the earliest divergence. |
-| Expected Markers | A finite state/route comparison with an explicit first divergent layer or a documented non-reproduction boundary; no behavior change. |
-| Asset Needs | Existing owner package and media only; no image writes, artifact refresh or trace fixture. Temporary ignored diagnostics require a bounded build path and cleanup. |
-| Reporting Requirements | Record exact paths inspected, each candidate disposition, evidence separating source/frame/route/draw layers, and a narrowly proposed next S if repair is justified. |
-| Stop Conditions | Any need to modify source, guest image or package configuration requires a separately approved implementation S. If the observation cannot be reproduced, report the environment and do not claim a repair. |
-| Exit Criteria | Root cause is proven or the current reproducibility boundary is recorded; all candidate layers have a disposition and any fix is split into a new approved S. |
-| Original Owner Request | “Win3.1 MS-DOS prompt display roundtrip repair…将现象写入proposal，把这项提升到队首，然后准入调研任务” |
-| Similar-Issue Sweep | Examine all text-frame dirty/complete publication, frame mode route, Window surface invalidation and Console output-cache transitions reached by Window/fullscreen/`edit`; classify each as source fact, copied frame, route or draw state. |
+| Files And ABI Surface | `src/compat/dib_surface.[ch]` owns the text-surface mutation primitive; `src/compat/graphics_console_compat.c` maps original Console fill calls to it; one Compat-focused test and its CMake registration. No public product ABI changes. |
+| Applicable Rules | EXECUTION, ARCHITECTURE, CODING, DOCUMENT and PRODUCT UI. One shared text-surface owner remains required; no presenter or native Console bypass is introduced. |
+| Verification | Prove characters and attributes fill independently, zero-origin full surface fill clears all exposed cells, coordinates/counts clamp at the cell-grid boundary, and reported count equals actual writes. Run x86/x64 focused test and full suite; build both package EXEs. |
+| Expected Markers | Compat reports character-grid geometry, both original fill operations mutate the shared `textBuffer`, and VM's normal copied frame can observe the update. |
+| Asset Needs | Existing owner package/media only; no image writes. Refresh only package EXEs, preserving the owner INI. |
+| Reporting Requirements | Record changed-path line accounting, all original Console-operation call sites/disposition, focused proof, full regression and manual Win3.1 route checklist. |
+| Stop Conditions | Any evidence requiring a Lib/Common/VM API or MVDM mirror change stops S1 for owner approval. Any unrelated Console operation found reachable becomes a separately proposed S. |
+| Exit Criteria | Bounded fill model and geometry are implemented with focused proof; both widths build/test; only intended Compat/test/CMake/docs/package-EXE paths change; owner package INI is preserved. |
+| Original Owner Request | “好，你帮我正确修复一下，编译测试提交推送后供我检查” |
+| Similar-Issue Sweep | Audit all redirected original Console operations: fill character, fill attribute, buffer geometry, scroll and WriteConsole. Implement only the reachable clear contract; classify all others with code evidence. |
 
 ## Current Technical Baseline
 

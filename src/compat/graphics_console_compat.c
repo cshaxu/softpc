@@ -87,11 +87,15 @@ UINT softpc_compat_set_palette_entries(HPALETTE palette, UINT start,
 BOOL softpc_compat_get_console_buffer_info(HANDLE output,
     PCONSOLE_SCREEN_BUFFER_INFO info)
 {
+    unsigned long columns;
+    unsigned long rows;
+
     UNUSED(output);
-    if (info == NULL) return FALSE;
+    if (info == NULL || !softpc_standalone_text_surface_geometry(&columns,
+            &rows)) return FALSE;
     memset(info, 0, sizeof(*info));
-    info->dwSize.X = (SHORT)(sc.PC_W_Width > 0 ? sc.PC_W_Width : 80);
-    info->dwSize.Y = (SHORT)(sc.PC_W_Height > 0 ? sc.PC_W_Height : 25);
+    info->dwSize.X = (SHORT)columns;
+    info->dwSize.Y = (SHORT)rows;
     info->srWindow.Right = (SHORT)(info->dwSize.X - 1);
     info->srWindow.Bottom = (SHORT)(info->dwSize.Y - 1);
     return TRUE;
@@ -110,20 +114,42 @@ BOOL softpc_compat_set_console_buffer_size(HANDLE output, COORD size)
     return TRUE;
 }
 
+static BOOL softpc_compat_fill_console_cell(HANDLE output, unsigned char value,
+    DWORD count, COORD coordinate, LPDWORD written, int attribute)
+{
+    unsigned long columns;
+    unsigned long rows;
+    unsigned long actual;
+    unsigned long start;
+
+    UNUSED(output);
+    if (written != NULL) *written = 0u;
+    if (coordinate.X < 0 || coordinate.Y < 0 ||
+        !softpc_standalone_text_surface_geometry(&columns, &rows) ||
+        (unsigned long)coordinate.X >= columns ||
+        (unsigned long)coordinate.Y >= rows) return FALSE;
+    start = (unsigned long)coordinate.Y * columns + (unsigned long)coordinate.X;
+    if (attribute) {
+        if (!softpc_standalone_text_surface_fill_attribute(start,
+                (unsigned long)count, value, &actual)) return FALSE;
+    } else if (!softpc_standalone_text_surface_fill_character(start,
+            (unsigned long)count, value, &actual)) return FALSE;
+    if (written != NULL) *written = (DWORD)actual;
+    return TRUE;
+}
+
 BOOL softpc_compat_fill_console_character(HANDLE output, CHAR value,
     DWORD count, COORD coordinate, LPDWORD written)
 {
-    UNUSED(output); UNUSED(value); UNUSED(coordinate);
-    if (written != NULL) *written = count;
-    return TRUE;
+    return softpc_compat_fill_console_cell(output, (unsigned char)value, count,
+        coordinate, written, 0);
 }
 
 BOOL softpc_compat_fill_console_attribute(HANDLE output, WORD value,
     DWORD count, COORD coordinate, LPDWORD written)
 {
-    UNUSED(output); UNUSED(value); UNUSED(coordinate);
-    if (written != NULL) *written = count;
-    return TRUE;
+    return softpc_compat_fill_console_cell(output, (unsigned char)value, count,
+        coordinate, written, 1);
 }
 
 BOOL softpc_compat_scroll_console_buffer(HANDLE output,

@@ -247,6 +247,50 @@ int softpc_standalone_text_surface(const void **cells_out,
     *cell_bytes_out = SOFTPC_TEXT_CELL_BYTES;
     return 1;
 }
+
+int softpc_standalone_text_surface_geometry(unsigned long *columns_out,
+    unsigned long *rows_out)
+{
+    if (columns_out == NULL || rows_out == NULL || textBuffer == NULL)
+        return 0;
+    *columns_out = SOFTPC_TEXT_COLUMNS;
+    *rows_out = SOFTPC_TEXT_ROWS;
+    return 1;
+}
+
+static int softpc_standalone_text_surface_fill(unsigned long start,
+    unsigned long count, unsigned long byte_offset, unsigned char value,
+    unsigned long *written_out)
+{
+    unsigned long cells;
+    unsigned long written;
+    unsigned long index;
+
+    if (written_out != NULL) *written_out = 0u;
+    if (textBuffer == NULL || byte_offset >= SOFTPC_TEXT_CELL_BYTES) return 0;
+    cells = SOFTPC_TEXT_COLUMNS * SOFTPC_TEXT_ROWS;
+    if (start >= cells) return 0;
+    written = count;
+    if (written > cells - start) written = cells - start;
+    for (index = 0u; index < written; ++index)
+        textBuffer[(start + index) * SOFTPC_TEXT_CELL_BYTES + byte_offset] = value;
+    if (written_out != NULL) *written_out = written;
+    return 1;
+}
+
+int softpc_standalone_text_surface_fill_character(unsigned long start,
+    unsigned long count, unsigned char value, unsigned long *written_out)
+{
+    return softpc_standalone_text_surface_fill(start, count, 0u, value,
+        written_out);
+}
+
+int softpc_standalone_text_surface_fill_attribute(unsigned long start,
+    unsigned long count, unsigned char value, unsigned long *written_out)
+{
+    return softpc_standalone_text_surface_fill(start, count, 1u, value,
+        written_out);
+}
 void softpc_standalone_dib_set_palette_entries(const PALETTEENTRY *entries,
     int count)
 {

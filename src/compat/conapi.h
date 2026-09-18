@@ -10,6 +10,15 @@
 #define CONSOLE_GRAPHICS_BUFFER 2
 #define SYSPAL_STATIC 1
 
+/* MinGW exposes generic Console spellings as A/W selection macros.  This
+ * standalone adapter intentionally replaces those generic spellings below. */
+#ifdef FillConsoleOutputCharacter
+#undef FillConsoleOutputCharacter
+#endif
+#ifdef ScrollConsoleScreenBuffer
+#undef ScrollConsoleScreenBuffer
+#endif
+
 HANDLE softpc_compat_create_graphics_buffer(
     PCONSOLE_GRAPHICS_BUFFER_INFO info);
 BOOL softpc_compat_set_console_palette(HANDLE output, HPALETTE palette,

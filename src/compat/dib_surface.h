@@ -15,6 +15,7 @@ typedef struct _CONSOLE_GRAPHICS_BUFFER_INFO {
 BOOL softpc_standalone_invalidate_dibits(HANDLE ignored,
     const SMALL_RECT *rect);
 
+int softpc_standalone_dib_init(void);
 int softpc_standalone_dib_surface(const void **bits_out, const void **info_out,
     unsigned long *width_out, unsigned long *height_out);
 /* Bind the DIB allocated by original nt_graph::CreateSpcDIB to standalone
@@ -24,6 +25,12 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info);
 int softpc_standalone_text_surface(const void **cells_out,
     unsigned long *columns_out, unsigned long *rows_out,
     unsigned long *stride_out, unsigned long *cell_bytes_out);
+int softpc_standalone_text_surface_geometry(unsigned long *columns_out,
+    unsigned long *rows_out);
+int softpc_standalone_text_surface_fill_character(unsigned long start,
+    unsigned long count, unsigned char value, unsigned long *written_out);
+int softpc_standalone_text_surface_fill_attribute(unsigned long start,
+    unsigned long count, unsigned char value, unsigned long *written_out);
 void softpc_standalone_dib_set_palette_entries(const PALETTEENTRY *entries,
     int count);
 unsigned long softpc_standalone_dib_palette_history(const RGBQUAD **entries);
