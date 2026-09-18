@@ -2,10 +2,9 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T64.
-S2 is closed after dual-width verification and pushed delivery; T64 remains open
-for owner testing. Thread unification was cancelled by owner decision.
+No implementation subtask is active. T64 is closed after owner acceptance.
+Thread unification was cancelled by owner decision; the narrowed frame-copy
+delivery is accepted. T65 admission follows as a separate governance step.
 
 ## Current Technical Baseline
 
@@ -27,13 +26,12 @@ for owner testing. Thread unification was cancelled by owner decision.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T64 | S1 audit accepted; S2 narrowed frame copy verified; owner accepted. | [Audit](../history/M9-T64-completion-audit.md) |
 | T63 | S1–S12 complete; owner acceptance; final dual-width 106/106. | [Audit](../history/M9-T63-completion-audit.md) |
 | T62 | S1–S8 complete; owner acceptance; dual-width 101/101 with recorded intermittent tick debt. | [Audit](../history/M9-T62-completion-audit.md) |
 | T61 | S1–S13 complete; mirror and VM/Compat ownership audit; dual-width 98/98. | [Audit](../history/M9-T61-completion-audit.md) |
-| T60 | S1–S7 complete; owner acceptance; D6 retained, dual-width 97/97. | [Audit](../history/M9-T60-completion-audit.md) |
 
 ## Recent Governance
 
-T64 is admitted from the former Queue head. S1 source audit is recorded in
-[history](../history/M9-T64-S1-lib-simplification.md). S2 implementation and actual
-change review are complete; this does not close T64.
+T64 closure maps all admitted scope and owner-cancelled scope in its completion
+audit. The remaining Queue order is unchanged.
