@@ -1,5 +1,14 @@
 # MVDM / OpenNT 当前差异账本
 
+### T70 S9 在验增量
+
+`base/system/timer.c` 的 `updateCount` 区分真实时钟推进与读数估算；估算
+仍生成可见计数，但不得产生 wrap 通知或推进 activationTime。相对 S8
+新增 8 行、删除 1 行，无客户机识别或 standalone 分支。固定时钟重复
+读取九组回归通过双宽度；全量各 107/109，保留原有两项 package 失败。
+冷启动已进入图形化设备配置；完整安装仍在验，不表示任务收口。
+见[调查与验证记录](../../../proposals/m9-win95-first-boot-investigation.md)。
+
 ### T70 S7 交付增量
 
 相对 T69 交付 `95c467a`，镜像五个文件 +23/-24，净减一行：

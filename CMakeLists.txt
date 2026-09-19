@@ -355,6 +355,12 @@ add_test(NAME softpc-partition-image-smoke COMMAND softpc-partition-image-smoke)
 set_tests_properties(softpc-partition-image-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-irq-smoke test/unit/irq_smoke.c)
+add_executable(softpc-pit-smoke test/unit/pit_smoke.c)
+target_link_libraries(softpc-pit-smoke PRIVATE softpc-vm)
+target_include_directories(softpc-pit-smoke PRIVATE
+    src/mvdm/softpc.new/host/inc
+    src/mvdm/softpc.new/base/inc)
+add_test(NAME softpc-pit-smoke COMMAND softpc-pit-smoke)
 target_link_libraries(softpc-irq-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-irq-smoke PRIVATE
     src/mvdm/softpc.new/host/inc
@@ -580,6 +586,7 @@ add_test(NAME softpc-win32-presentation-manifest
 # postcondition.  Keep those checks live even when validating an optimized
 # machine library; production targets retain their normal Release NDEBUG.
 set(SOFTPC_TEST_TARGETS
+    softpc-pit-smoke
     softpc-media-snapshot-smoke
     softpc-machine-smoke
     softpc-dual-media-smoke
@@ -661,6 +668,7 @@ foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
 endforeach()
 
 set(SOFTPC_UNIT_TESTS
+    softpc-pit-smoke
     softpc-machine-smoke
     softpc-dual-media-smoke
     softpc-partition-image-smoke

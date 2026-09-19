@@ -23,10 +23,11 @@ progress. Classify the earliest confirmed divergence before proposing repair.
 | Restore dependency | Record whether the case requires snapshot load; compare a normal boot only when matching disposable input is available. |
 | Root and repair boundary | Evidence-backed fault owner and minimal proposed fix, or explicit unresolved hypotheses and next discriminating observation. |
 
-Initial production/test diff estimate is zero: this admission is research.
+Initial production/test diff estimate is zero until a repair owner is evidenced.
 Do not alter Lib/Common, patch guest binaries, add Setup-specific behavior,
-or change snapshot/media semantics. Any implementation scope requires an
-evidenced brief and estimate before proceeding under owner approval.
+or change snapshot/media semantics. The owner has now admitted root-cause
+repair and next graphical installation-stage verification. Record an
+evidenced brief and estimate before the corresponding production change.
 
 Use owner media read-only or disposable copies as required by the reproduction
 recipe. Diagnostic output belongs only under ignored `build/t70-s9`, capped
@@ -36,6 +37,12 @@ owner's observed minutes-long initial boot; observations remain sparse.
 The agent owns process termination and deletion of its exhausted diagnostic
 outputs; retain only the minimal checkpoint needed to support conclusions.
 No external fixture content enters source control. T70 remains open.
+
+Owner additionally authorizes using the existing snapshot feature to shorten
+repeated observation. Keep one local checkpoint (including overlays), with a
+128 MiB checkpoint limit in addition to the 64 MiB diagnostic-output limit.
+Use public machine state read/write APIs, never reconstruct an ad hoc state
+from RAM dumps. Original media remains unmodified.
 
 ## Cold-start observation
 
@@ -82,3 +89,86 @@ package was modified. No repair or S closure is claimed.
 | Display | Published black frames agree with almost-empty emulated video memory; trace first intended display writes and their physical destination. |
 | Restore dependency | Reproduced without load; snapshot restoration is not a necessary trigger. |
 | Root and repair boundary | Not established; retain research scope, with no speculative Lib/Common or guest-specific fix. |
+
+### Checkpoint follow-up
+
+A checkpoint taken through the public machine-state API reproduces the black
+frame with the same continuing kernel/cursor activity. Diagnostic disk reads
+use the restored medium, including its overlay, not the untouched backing
+file. The current IOS log reports fallback to real-mode disk drivers. The
+controller's last command is rejected and completed, with BUSY and command-in-
+progress cleared; the observed PIC has no pending/in-service disk interrupt.
+This does not prove the disk path correct, but does not support a controller
+stuck BUSY as the immediate explanation.
+
+The repeated invalid-opcode address initially noticed in ROM is explicitly
+recognized by the guest kernel as a V86 callback return sentinel. It is not
+evidence of accidental execution of ROM font data. Likewise, the dominant
+non-kernel drawing loop matches a VGA-driver cursor path, not installation
+dialog rendering. Next observation must identify the blocked or unfinished
+startup task rather than patching these expected paths. Root cause remains
+unproven; production code and package are unchanged.
+
+A subsequent read-only checkpoint observation finds a stronger timing lead:
+PIT channel 0 remains in rate-generator mode with initial count 16384, while
+the diagnostic IRQ0-entry counter advances about 4000 requests/second and the
+BIOS tick value about 950/second. Counting wraps the existing PIC callback
+without suppressing or changing requests. This is not yet a root-cause claim:
+the next check must distinguish a sustained timer-generation defect from a
+restored backlog, and reproduce the discrepancy on cold start before repair.
+
+Cold-start timing observation reproduces the IRQ excess after channel 0 is
+programmed to 16384; the host heartbeat remains about 20/second. A separate
+fixed-clock device probe programs rate-generator channel 0 and performs 1000
+latched reads without advancing any timer heartbeat or CPU execution. It
+produces two immediate IRQ requests, an active deferred interrupt event and
+3552 additional queued requests. Thus register reads alone create interrupt
+work. The read-time guess reaches `updateCount`'s wrap handling and advances
+the activation timestamp, allowing subsequent reads to repeat the effect.
+
+Repair brief: distinguish estimated read progress from actual clock progress
+inside the existing PIT count update. Preserve estimated visible count, but
+do not issue terminal/wrap notifications or advance the actual activation
+timestamp from a guess. No new stored state, host timer, OS predicate or
+shared API. Estimate roughly 10 production lines in original timer.c and a
+focused device regression test/build registration. Verify repeated reads at
+several divisors and modes, then real elapsed ticks, dual-width regression,
+and cold-start installation progress. The deterministic PIT defect is proven;
+its sufficiency to explain and fix the installation stall is not yet proven.
+
+The candidate production patch is +8/-1 in timer.c. The new device test
+programs modes 0, 2 and 3 with divisors 1, 16384 and 65536, performs 1000 latched
+reads without executor/heartbeat advancement, verifies no IRQ or deferred
+interrupt work and an unchanged activation timestamp, then verifies that two
+actual heartbeats still produce interrupts. Both x86 and x64 pass the final
+nine-case focused test. The only production guess-to-wrap path is this shared
+counter updater; callers include heartbeat, reads/latches and state transitions.
+The fix is not a special treatment of any guest, divisor or read caller.
+
+Candidate cold start now produces roughly 80 IRQ0 requests/second and 20 BIOS
+ticks/second at divisor 16384, rather than thousands. At about 60 seconds it
+renders the installation background; at 90 seconds it renders the hardware/
+Plug and Play configuration dialog. Reads and writes continue beyond 220
+seconds. This directly contrasts with the baseline black/cursor-only state.
+It proves entry into the next graphical installation stage at the copied-
+frame boundary, not yet full desktop interaction or completed installation.
+Both complete builds pass. Full CTest is 107/109 on each width, with only the
+previously disclosed package-smoke and compact-console tests failing at stage
+16. These test failures remain unexplained, not waived or claimed fixed.
+The final test expansion to mode 0 was rebuilt and rerun on both widths after
+the full suite. Further installation observation remains in progress.
+
+Delivery accounting against `bbfa863`: one production file +8/-1 (net +7),
+one new 80-line test, and CMake +8/-0; total code/build net +95. No new
+production allocation, persistent state, ABI, clock source or component edge.
+The local `estimated` value distinguishes provenance within the existing
+calculation. Source sweep: `rg -n 'guess\(|updateCount\(|setLastWrap\('`
+over timer.c finds one read-time estimate producer and the shared count/wrap
+consumer; all non-NTVDM counter modes use that corrected boundary. NTVDM's
+separate real-time implementation does not call guess and is unchanged.
+
+Package SHA-256: x86 `037D38F51F112C11210221931E2D3A9BEF24834FF12A2D1CAF505B0C6074953C`;
+x64 `36F21B0B2C8BA68376355BF9FF98C494D4EEBD31E1FEC87BE87C785DEAA05CEB`.
+The x64 package is also copied to the owner-designated reproduction directory.
+No owner configuration, original disk, shared Lib/Common corpus or snapshot
+format is changed. This delivery does not close S9 or prove full installation.

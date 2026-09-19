@@ -2355,6 +2355,7 @@ LOCAL void updateCount IFN3(unsigned long, ticks, unsigned long *, wrap,
 	struct host_timeval *, now)
 {
 	unsigned long modulo = pcu->initialCount;
+	IBOOL estimated;
 
 	/*
 	 * PCLABS version 4.2 uses counter 2 (the sound channel) to
@@ -2383,7 +2384,8 @@ LOCAL void updateCount IFN3(unsigned long, ticks, unsigned long *, wrap,
 	 * number of elapsed ticks.
 	 */
 
-	if ((long)(ticks - pcu->lastTicks) <= 0){
+	estimated = (long)(ticks - pcu->lastTicks) <= 0;
+	if (estimated){
 		ticks = guess();
 	}else{
 		throwaway();
@@ -2420,6 +2422,11 @@ LOCAL void updateCount IFN3(unsigned long, ticks, unsigned long *, wrap,
 
 	/* calculate new counter value */
 	pcu->Count = (word)(modulo-ticks);
+
+	/* Read-time interpolation must not generate interrupts or advance the
+	 * real clock baseline. Repeated reads otherwise manufacture wraps. */
+	if (estimated)
+		*wrap = 0;
 
 	/* calculate time at which last wrap point occurred, and
  	 * use this to stamp the counter
