@@ -4,30 +4,30 @@
 
 M9 T70 S9 is closed after the package-test root cause was repaired and both
 widths passed 109/109. Implementation deliveries are `5d6fe18` and `7c0c786`.
-M9 T70 S10 repairs startup-logo half-height output and the installed Win95
-desktop display-settings warning. Implementation and dual-width verification
-are complete; owner validation is pending. T70 remains open.
+M9 T70 S10 is owner-accepted after delivery 62eec11 and dual-width 109/109.
+M9 T70 S11 investigates and repairs captured-pointer escape, jitter and motion
+boundaries. T70 remains open.
 
-## M9 T70 S10 Packet
+## M9 T70 S11 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admitted research, then approved implementing the proven repairs: “批准啊，这种不需要问我”. |
-| Objective | Repair the proven VGA stride and Video Seven preserve-mode validation defects, retaining original device semantics. |
-| Non-goals | No speculative fix, guest configuration/media mutation, Lib/Common change or snapshot contract change. |
-| Reference Baseline | S9 deliveries 5d6fe18, 7c0c786 and closure 75aa224; both widths 109/109; owner confirms installed desktop works. |
-| Candidate Proposal | [Startup display investigation](../proposals/m9-win95-display-startup.md). |
-| Files And ABI Surface | Narrow vga_mode.c and v7_video.c repairs, existing VGA regression test and mirror ledger; no production ABI changes. |
+| Admission And Approval | Owner accepted S10 and explicitly admitted S11 investigation and repair; Win3.1 also affected, more apparent at higher resolution. |
+| Objective | Establish and repair the capture/motion contract causing escape, jitter and invisible motion boundaries. |
+| Non-goals | No guest-specific sensitivity adjustment, guest media mutation or snapshot-format change; previous Lib/Common modification approval boundary remains. |
+| Reference Baseline | 62eec11; both widths 109/109; owner confirms display repairs. |
+| Candidate Proposal | [S11 mouse investigation](../proposals/m9-window-mouse-capture.md). |
+| Files And ABI Surface | Audit KVM Window native capture and motion, Common routing and VM/InPort input; name proven repair owner before editing shared corpus. |
 | Applicable Rules | Execution, documentation, architecture, coding, source/research and product UI authorities. |
-| Verification | Dual-width VGA regression and full suites; bounded overlay boot verifies complete logo and successful installed-driver initialization. |
-| Expected Markers | Complete logo and successful installed-driver initialization without guest configuration changes; original VGA/V7 owners retained. |
-| Asset Needs | Owner's installed image/INI/EXE; preserve originals; build/t70-s10 bounded to 600 seconds and 64 MiB per run plus one optional 128 MiB checkpoint. |
+| Verification | Deterministic capture/edge/motion probes; owner snapshot where useful; dual-width focused and full tests for implementation. |
+| Expected Markers | No ordinary input while uncaptured; captured relative movement does not exhaust a finite host-coordinate range; capture and clip agree across release/geometry changes. |
+| Asset Needs | Owner snapshot and media, unchanged; build/t70-s11 diagnostics bounded to 300 seconds and 32 MiB per run; terminate owned probes. |
 | Reporting Requirements | Actual mirror/test diff, dual-width results and executable links; distinguish observation from inference. |
 | Stop Conditions | Need for guest-media mutation, unapproved shared-corpus change, or missing reproduction evidence. |
-| Exit Criteria | Both proven defects repaired and covered; dual-width build/test evidence, rebuilt EXEs and pushed delivery; await owner validation. |
-| Original Owner Request | Startup picture only fills the upper half; desktop reports incorrect display configuration; “准入S10调研”. |
-| Similar-Issue Sweep | Compare related packed/planar painter height and scanline paths once the failing contract is established. |
+| Exit Criteria | Each reported symptom explained and verified repaired, or explicit blocker; dual-width tested delivery before owner validation. |
+| Original Owner Request | Captured mouse can escape to host yet controls content on reentry; jitter and invisible boundaries require reverse movement to escape. |
+| Similar-Issue Sweep | Capture loss, clipping replacement, focus, resize, coordinate rebasing, scaling and duplicate motion routes. |
 
 ## Current Technical Baseline
 
@@ -37,7 +37,7 @@ are complete; owner validation is pending. T70 remains open.
   pass 109/109, including snapshot and package tests. Overlay cold boot shows
   the complete logo and normal desktop without the former warning; a restored
   checkpoint reaches the same desktop. Both EXEs are rebuilt; source media
-  and INI are unchanged. See [S10 evidence](../proposals/m9-win95-display-startup.md#implementation-evidence).
+  and INI are unchanged. See [S10 evidence](../history/M9-T70-S10-win95-display-startup.md#implementation-evidence).
 - S9 isolates read-time PIT guesses generating spurious IRQ0 work. The
   candidate timer.c repair and fixed-clock test are present; both package
   EXEs are rebuilt. Cold start reaches Win95's hardware/PnP dialog.
@@ -85,4 +85,4 @@ are complete; owner validation is pending. T70 remains open.
 
 ## Recent Governance
 
-T70 S9 is accepted; S10 is the sole active implementation task. Queue order is unchanged.
+T70 S10 is accepted; S11 is the sole active task. Queue order is unchanged.

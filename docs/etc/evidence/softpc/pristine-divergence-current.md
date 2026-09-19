@@ -9,7 +9,7 @@
 后者先从 BL 提取模式号，再验证合法性；原 BL 的显存保留位继续供
 原清屏逻辑使用。两处均留在原设备实现，没有 standalone/客户机分支，
 不移动到 Compat 形成第二实现。T69 恢复原文件的历史记录不改写。
-测试与运行证据见 [S10 记录](../../../proposals/m9-win95-display-startup.md)。
+测试与运行证据见 [S10 记录](../../../history/M9-T70-S10-win95-display-startup.md)。
 
 ### T70 S9 在验增量
 

@@ -146,4 +146,7 @@ is unchanged; x64 shrinks by 512 bytes. Executable SHA-256 values:
 
 Coordinator review confirms only the two original device calculations changed;
 no diagnostic hooks, guest configuration or media are included in the delivery.
-The implementation is ready for owner testing, not automatic T70 closure.
+Delivery 62eec11 was pushed and the owner confirmed “非常好，修复了！” before
+admitting S11. S10 is closed; T70 remains open. Review confirms both reported
+symptoms have runtime proof, no guest configuration change, dual-width full
+regression and rebuilt packages. No unresolved S10 item is transferred.
