@@ -3,6 +3,9 @@
 `kvm-console` depends on `types`, `base`, `console`, and `kvm-base` only. It owns one raw Console lifecycle,
 creates its logical Console object, and publishes copied text frames through
 that object. It never opens, registers, or renders native Console I/O.
+Publication accepts valid text frames only. Valid graphics return UNSUPPORTED;
+malformed arguments return INVALID_ARGUMENT. Both reject before changing pending
+output or notifying the worker. Valid text after STOP returns INVALID_STATE.
 The public component contract is cross-platform. This corpus currently has a
 supported Win32 implementation only; the Linux leaf is an intentional
 `LIB_STATUS_UNSUPPORTED` placeholder, not a claimed Linux presenter.

@@ -2,15 +2,41 @@
 
 ## Current Work
 
-M9 T70 is closed by owner approval after S1--S12 and the
-[T-level completion audit](../history/M9-T70-completion-audit.md).
-No implementation subtask is active. The queue head remains unadmitted.
+M9 T71 S1 is implemented and verified, awaiting owner testing: text-only Console
+frame admission. Owner: "准入T71".
+T70 remains closed. Later text-schema/capacity batches await concrete design review.
+
+## M9 T71 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner admits T71 from the queue head; start bounded batch A. |
+| Objective | Reject graphical Console publications synchronously without replacing pending text or waking the worker. |
+| Non-goals | No character/layout ABI, mouse, routing policy, MVDM, VM, INI or guest-media change. |
+| Reference Baseline | 7557ca5; T70 closed; shared implementation 8cb23e9; dual-width 109/109. |
+| Candidate Proposal | [T71 design and S1 brief](../proposals/m9-kvm-text-frame-contract.md). |
+| Files And ABI Surface | kvm-console console.c/public documentation; existing Lib retirement test and Common composition proof; manifests. No signature change. |
+| Applicable Rules | Execution, Documentation, Architecture, Coding and Product UI; linked governance skills. |
+| Verification | Deterministic invalid/unsupported/publication/activation/STOP matrix, Common text-status route; dual-width full builds/tests, manifests/DAG/documentation checks. |
+| Expected Markers | Valid graphics returns UNSUPPORTED; malformed input INVALID_ARGUMENT; pending text and generation unchanged; no rejection wake/failure; stopped text INVALID_STATE. |
+| Asset Needs | Existing package fixtures only; no media edits; bounded logs under ignored build/t71-s1, no raw tracing. |
+| Reporting Requirements | Before/after production/test counts, both EXE links and actual validation limits. |
+| Stop Conditions | Need for new frame ABI, fallback policy, ownership or unrelated repair. |
+| Exit Criteria | All S1 ledger cases verified, actual-diff coordinator review, x86/x64 EXEs and tests, complete P committed/pushed for owner testing. |
+| Original Owner Request | 准入T71 |
+| Similar-Issue Sweep | All Console frame public callers, worker conversion paths, Common status routing and independent Window/mailbox admission. |
 
 ## Current Technical Baseline
 
+- T71 S1 rejects graphical Console publications before mailbox mutation/wake;
+  malformed frames reject separately. Existing text/status/STOP semantics remain.
+  Production C/H +7/-3 (net +4); tests +37/-6 (net +31). Both EXEs rebuilt;
+  serial x86/x64 full regression 109/109 each. Common/VM/Compat/MVDM production,
+  INI and guest media are unchanged. See the active proposal for evidence.
 - Latest implementation: `8cb23e9`; S12 closure: `f6ab0dc`.
-  Both package EXEs are unchanged from that delivery; final x86/x64 full
-  regression passes 109/109 each, including package and snapshot checks.
+  This is T71's predecessor baseline; its final x86/x64 regression passed
+  109/109 each, including package and snapshot checks.
 - Owner accepted Win95 hardware detection, installation/desktop, display and
   Window mouse repairs. Snapshot restore uses saved media paths/modes and
   reopens all attached slots. Detailed evidence is in the T70 audit above.
@@ -34,7 +60,7 @@ No implementation subtask is active. The queue head remains unadmitted.
 
 ## Recent Governance
 
-T70 is closed by owner approval; no next implementation task is admitted.
+T70 is closed; T71 S1 is the sole active implementation task.
 
 - **M9 Td S17:** Owner requested a concrete KVM text/frame correction proposal
   at queue head. Recorded capability rejection, explicit character/glyph

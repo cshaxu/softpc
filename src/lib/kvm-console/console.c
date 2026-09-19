@@ -113,8 +113,10 @@ lib_status kvm_console_create(kvm_console **out_console,
 
 lib_status kvm_console_publish_frame(kvm_console *console, const kvm_frame *frame)
 {
-    return console == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT :
-        kvm_component_publish_frame(&console->base, frame);
+    if (console == LIB_NULL || !kvm_frame_is_valid(frame))
+        return LIB_STATUS_INVALID_ARGUMENT;
+    if (frame->graphics != 0u) return LIB_STATUS_UNSUPPORTED;
+    return kvm_component_publish_frame(&console->base, frame);
 }
 
 lib_status kvm_console_destroy(kvm_console *console)
@@ -133,7 +135,6 @@ lib_status kvm_console_publish_text_frame(kvm_console *console,
     lib_console_text_frame text_frame = { 0 };
 
     if (console == LIB_NULL || frame == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    if (frame->graphics != 0u) return LIB_STATUS_OK;
     text_frame.columns = frame->text_columns;
     text_frame.rows = frame->text_rows;
     lib_memory_copy(text_frame.text, frame->text, sizeof(text_frame.text));

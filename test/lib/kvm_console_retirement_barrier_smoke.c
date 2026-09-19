@@ -254,6 +254,28 @@ static void check_activation_frame(void)
     assert(kvm_console_publish_frame(c,&next_frame)==0); idle_frame();
     assert(frame_writes==1 && kvm_component_mailboxes_capture_frame(
         &c->base.mailboxes,&generation,&copied));
+    {
+        static kvm_frame rejected;
+        lib_u32 pending_generation = generation;
+        assert(kvm_console_publish_frame(NULL,&next_frame)==LIB_STATUS_INVALID_ARGUMENT);
+        assert(kvm_console_publish_frame(c,NULL)==LIB_STATUS_INVALID_ARGUMENT);
+        assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
+        rejected.valid=1; rejected.text_columns=81; rejected.text_rows=25;
+        assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
+        rejected.graphics=1;
+        assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
+        rejected.graphics_width=1; rejected.graphics_height=1;
+        rejected.graphics_stride=1;
+        assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_UNSUPPORTED);
+        assert(kvm_component_mailboxes_capture_frame(&c->base.mailboxes,
+            &generation,&copied));
+        assert(generation==pending_generation && !copied.graphics && copied.text[0]=='X');
+        assert(frame_writes==1 && probe.failures==0);
+        assert(WaitForSingleObject(frame_idle,0)==WAIT_TIMEOUT);
+        /* The worker is parked after its previous write; no rejected request
+         * may signal the existing auto-reset wake event. */
+        assert(base_sync_event_wait(c->base.mailboxes.wake,0)==BASE_SYNC_WAIT_TIMED_OUT);
+    }
     write_result=LIB_STATUS_OK;
     assert(lib_console_deliver_event(logical,&activated)==0); idle_frame();
     assert(frame_writes==2 && !kvm_component_mailboxes_capture_frame(
@@ -269,6 +291,11 @@ static void check_activation_frame(void)
     next_frame.text[0]='A'; stop_after_publication=1;
     assert(kvm_console_publish_frame(c,&next_frame)==0);
     assert(WaitForSingleObject(probe.retired,5000)==WAIT_OBJECT_0);
+    assert(kvm_console_publish_frame(c,&next_frame)==LIB_STATUS_INVALID_STATE);
+    next_frame.graphics=1; next_frame.graphics_width=1;
+    next_frame.graphics_height=1; next_frame.graphics_stride=1;
+    assert(kvm_console_publish_frame(c,&next_frame)==LIB_STATUS_UNSUPPORTED);
+    next_frame.graphics=0;
     assert(kvm_console_destroy(c) == LIB_STATUS_OK);
     assert(probe.event_count==1 && probe.failures==0 && frame_writes==5);
     CloseHandle(probe.retired); CloseHandle(frame_idle); frame_idle=NULL;

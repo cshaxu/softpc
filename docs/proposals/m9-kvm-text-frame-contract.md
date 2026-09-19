@@ -3,9 +3,9 @@
 ## Request And Status
 
 Original owner request: "你对这个制作一个更具体的修正意见稿 写入proposal 队列首位".
-This is the first unnumbered candidate, not implementation admission. T70
-is now closed; no implementation S is active. Baseline: f6ab0dc / shared source
-8cb23e9. This proposal is grounded in SoftPC, not in hypothetical NES needs.
+Owner subsequently admitted "准入T71". T70 is closed; T71 S1 implements
+batch A under Current. Baseline: 7557ca5 / shared source 8cb23e9.
+This proposal is grounded in SoftPC, not in hypothetical NES needs.
 
 ## Observed Problems
 
@@ -153,3 +153,75 @@ requires revisiting cursor blink/freeze and duplicates work; not selected here.
 Renaming fields alone cannot remove implicit encoding. Merging Console and KVM
 frame owners would violate the existing dependency boundary. An arbitrary-size
 Unicode terminal or universal font engine is unnecessary for this bounded repair.
+
+## T71 S1 Preflight And Finite Ledger
+
+Search: `rg -n 'kvm_console_publish_frame|publish_text_frame' src test`.
+Common UI is the single external production publisher; its graphics status
+route already constructs text. Console root is the admission owner; the selected
+Win32 worker is the sole conversion caller. Linux presenter remains unsupported.
+Window and the common mailbox legitimately support graphics and stay unchanged.
+
+Reuse kvm_frame_is_valid at Console admission, then reject graphics before the
+shared publication/notification path. Malformed arguments take precedence over
+unsupported representation; unsupported remains unsupported after STOP. Valid
+text still reaches the existing locked STOP admission boundary. Do not add a
+separate unlocked stopped check or change shared mailbox semantics.
+
+Estimated production C/H: 8--15 changed lines, net +3--8; existing tests about
+35--60 added lines. Documentation/manifests/artifacts counted separately.
+Finite ledger: null/malformed rejection; valid graphics rejection; unchanged
+pending text/generation and no wake/failure; subsequent activation draws old
+text; normal text/latest-wins; stopped text rejection; Common graphics-status
+publication stays text. Existing tests cover retirement and NOT_CURRENT replay.
+Use event/semaphore barriers, not sleeps. Full suites run serially to avoid
+concurrent native Console fixtures. No external guest installation exercise is
+needed for this admission-only batch; final task integration remains in batch D.
+
+### S1 Implementation And Similar-Issue Review
+
+Production C/H: two existing paths +7/-3, net +4 (three added lines are the
+public contract comment). Tests: two existing paths +37/-6, net +31. Counts
+use `git diff --numstat 7557ca5 -- src test`, excluding README/manifests/EXEs.
+No new object, state, thread, signature or runtime option. Common/VM/Compat/
+MVDM production and user INI/media are unchanged.
+
+Public Console admission now reuses kvm_frame_is_valid, rejects valid graphics
+with UNSUPPORTED and delegates accepted text to the original mailbox boundary.
+The worker no longer silently acknowledges graphics. Shared validation remains
+unchanged, as required for later schema work. There is no second public path.
+
+Call-site dispositions: common/ui's only production Console call submits text
+or its existing status text; session selects that status surface for the running
+graphics/raw route. Window supports graphics legitimately and is unchanged.
+The Linux Console worker cannot start and remains explicitly unsupported.
+The sole private text-conversion caller is the Win32 worker. Existing retirement,
+NOT_CURRENT, activation and latest-wins checks remain active.
+
+The Common composition fake previously accepted direct graphics and counted it
+as delivered. It now matches the real admission rule, verifies UNSUPPORTED
+propagation and unchanged completion cache, and uses valid fixture dimensions.
+This changes an obsolete test expectation, not a production routing policy.
+The Lib test preserves a pending text frame across null/invalid/graphics
+rejections and verifies generation, output/failure counts, wake state, activation
+replay and stopped-publication results without sleeps.
+
+### S1 Delivery Verification
+
+Both complete Release builds succeed. Serial full CTest: x64 109/109 in
+74.85 seconds; x86 109/109 in 74.79 seconds. These include all 33 Lib and
+18 Common tests, package interaction and snapshot regressions, four corpus
+manifests and dependency checks. Focused x64 Console retirement/activation and
+Common composition tests also pass 2/2. Documentation governance and whitespace
+checks pass. Logs are bounded in ignored build/t71-s1; no guest trace/media
+was created. No fresh Win3.1/Win95 manual interaction is claimed by this S.
+
+Both assets/binary EXEs were rebuilt without touching the adjacent INI:
+
+- x86 SHA-256: 6D2F2684858E00C688C90CB095E980507C9A12BDB5E3699A50C1B47448CD5594
+- x64 SHA-256: F75530F92A236EEF041A660FFE2A82B77BBBB95599AA71781D4F26C2A443075E
+
+Executor review compared every changed production/test path with the S1 ledger;
+no schema, capacity, worker lifecycle or product policy changes were introduced.
+This is S1 P1 delivery for owner testing, not task-wide completion. Later batches
+remain pending and must start with their concrete contract/consumer review.
