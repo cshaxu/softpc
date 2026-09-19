@@ -1,4 +1,43 @@
-# Windows 95 first-boot investigation
+# M9 T70 S9: Windows 95 first-boot repair
+
+## Owner-directed closure
+
+Implementation delivery: `5d6fe18` (S9 P2). The owner subsequently instructed:
+“等等 先不用 你就把最新修复的binary编译好 测试提交推送 收口这个s任务给我”.
+This stops further interactive installation verification and closes this S at
+the repair-delivery boundary; it does not assert that installation completed.
+T70 remains open.
+
+The final 580-second cold-start observation reaches the date/time properties
+dialog during installation configuration. Its frame remains stable awaiting
+interaction. Public snapshot save succeeds and leaves the machine paused;
+the observation process exits normally. Original backing-disk SHA-256 remains
+unchanged. A subsequent desktop diagnostic was stopped on the owner's request
+before installation interaction; it contributes no additional acceptance proof.
+
+Coordinator review inspected the actual P2 production, test and CMake diff:
+one existing PIT calculation distinguishes estimated and actual time; no new
+persistent state, lifecycle, library boundary or guest predicate is added.
+The nine focused combinations cover modes 0/2/3 and divisors 1/16384/65536,
+read-only interpolation and subsequent real heartbeats. Dual-width builds
+pass; full regression remains 107/109 on each width, including the two
+previously disclosed stage-16 package failures. They are not claimed fixed.
+The final focused test expansion also passes on both widths.
+At closure both complete builds were rechecked successfully and the focused
+PIT, IRQ, snapshot transaction and snapshot boundary tests passed 4/4 on each
+width. Package hashes remain identical to P2. The unchanged full-suite result
+above is the earlier P2 run, not a newly repeated full suite.
+
+| Closure requirement | Evidence / disposition |
+| --- | --- |
+| Establish cause, not infer from black pixels | Cold-start IRQ excess and fixed-clock reads independently reproduce manufactured PIT interrupts. |
+| Minimal repair and similar paths | P2 corrects the common non-NTVDM count updater; sweep and accounting below. |
+| Reach subsequent graphical setup | Cold start reaches hardware/PnP and then date/time configuration, with copied-frame evidence. |
+| Dual-width artifact and regression | Both release builds and PIT tests pass; aggregate 107/109 each, known failures disclosed. |
+| Complete interactive installation | Owner explicitly stopped this verification; not claimed complete. |
+| Preserve assets/shared boundaries | No Lib/Common or INI change; original disk hash unchanged; writes used overlay. |
+
+## Retained investigation record
 
 Owner reports abnormal display on the first system startup after Setup has
 finished copying files. It is not yet established whether the machine boots
