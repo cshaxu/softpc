@@ -73,3 +73,12 @@ closure after the two Window-test failures were disclosed. This is bounded
 acceptance, not proof that those tests passed or that the later memory warning
 is resolved. S7 is closed; T70 awaits owner instructions. The proposal is
 [retained here](M9-T70-hardware-detection-proposal.md).
+
+## Owner baseline reconfirmation
+
+The owner requested withdrawal of all subsequent uncommitted work and then
+reconfirmed S7 closure. Git verified a clean worktree at `5074c28`; no later
+source, test, package or snapshot-format change survives that withdrawal.
+The abandoned local S8/S9 labels produced no committed delivery or accepted
+closure. The owner's next explicit admission is T70 S8, snapshot media
+remounting. S7's existing verification limits remain as recorded above.
