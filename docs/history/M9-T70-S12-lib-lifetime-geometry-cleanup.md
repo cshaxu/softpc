@@ -120,5 +120,19 @@ Final executable SHA-256:
 
 Executor review compared the production/test diff with all four admitted units:
 no extra lifetime manager or compatibility branch, no mirror/VM/INI/media
-change, and no disabled tests. Delivery awaits the owner's Windows validation;
-T70 remains open. Native Linux lock execution remains the disclosed limit above.
+change, and no disabled tests. Implementation delivery is `8cb23e9`.
+Native Linux lock execution remains the disclosed limit above.
+
+## Owner closure and coordinator review
+
+Original closure request: "好 收口当前s任务 保持t任务开放".
+After the dual-width results and Linux-native verification limit were disclosed,
+the owner approved S12 closure. This records closure approval, not an additional
+manual-test result. All four admitted repairs are mapped to the implementation,
+similar-issue dispositions and verification above; actual production changes
+were reviewed against that ledger. No further implementation is admitted.
+
+P2 archives this record and removes the active S12 packet. It changes no source,
+tests, EXEs, INI or media; the P1 builds and test evidence remain applicable.
+Documentation governance and diff checks are the closure verification.
+T70 remains open awaiting owner direction; no implementation subtask is active.

@@ -6,29 +6,10 @@ M9 T70 S9 is closed after the package-test root cause was repaired and both
 widths passed 109/109. Implementation deliveries are `5d6fe18` and `7c0c786`.
 M9 T70 S10 is owner-accepted after delivery 62eec11 and dual-width 109/109.
 M9 T70 S11 is owner-accepted after P2 delivery 58ac394.
-M9 T70 S12 implements the four approved Lib audit repairs; dual-width tests
-pass and delivery awaits owner validation. T70 remains open.
-
-## M9 T70 S12 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner accepted S11 and admitted all four subsequent Lib audit findings for repair through push. |
-| Objective | Preserve task resources on failed join, make aspect fitting idempotent, correct Linux file-lock ownership and consolidate Window startup cleanup. |
-| Non-goals | No new lifecycle manager, retry policy, guest workaround, MVDM/VM change, user INI or media mutation. |
-| Reference Baseline | 58ac394; both widths 109/109; S11 owner accepted. |
-| Candidate Proposal | [S12 bounded repair](../proposals/m9-lib-lifetime-geometry-cleanup.md). |
-| Files And ABI Surface | Base task status returns, Storage Linux/Types lock declarations, Window geometry/startup; minimal Common/App/audio shutdown consumers, tests and manifests. |
-| Applicable Rules | Execution, documentation, architecture, coding, source/research and product UI authorities. |
-| Verification | Injected native task failures, repeated geometry matrix, startup failure cleanup, controlled/Linux-native lock test; dual-width builds/full CTest and shared/documentation gates. |
-| Expected Markers | Failed join cannot dispose a live task; repeated fit stable; locks follow opened file objects; one startup failure cleanup. |
-| Asset Needs | No guest assets needed; ignored build/t70-s12 bounded logs/tests, no raw trace; no Linux OS installation. |
-| Reporting Requirements | Actual mirror/test diff, dual-width results and executable links; distinguish observation from inference. |
-| Stop Conditions | Need for new architecture/lifecycle policy or changes beyond the four admitted repairs and necessary call-site adaptation. |
-| Exit Criteria | Four-unit coverage ledger and actual-diff review, passing dual-width verification, commit/push with both EXEs; disclose unavailable Linux-native execution. |
-| Original Owner Request | 以上四处 准入一个s任务开始修复到推送 |
-| Similar-Issue Sweep | Base task consumers/platform joins, aspect fit callers, Storage lock lifetime and acquired Window startup exits. |
+M9 T70 S12 is owner-approved for closure after delivery `8cb23e9` and
+dual-width 109/109 verification. T70 remains open awaiting owner direction.
+No implementation subtask is active.
+Open task awaiting owner: T70.
 
 ## Current Technical Baseline
 
@@ -38,7 +19,7 @@ pass and delivery awaits owner validation. T70 remains open.
   +93/-81, net +12 (Lib alone net -3); tests +177/-29. Both package EXEs rebuilt;
   x86 and x64 full regression 109/109 each. Linux-native locking has a new
   test but could not run here because WSL is absent; controlled Linux tests pass.
-  See [S12 evidence and scope](../proposals/m9-lib-lifetime-geometry-cleanup.md).
+  See [S12 evidence and scope](../history/M9-T70-S12-lib-lifetime-geometry-cleanup.md).
 - S11 P2 retains a single Window mouse path, samples and recenters the hidden
   host pointer, rebases on geometry changes and releases on ownership/clip
   loss. Four production files +68/-26; two tests +76/-16. Public events and
@@ -102,4 +83,5 @@ pass and delivery awaits owner validation. T70 remains open.
 
 ## Recent Governance
 
-T70 S11 is accepted; S12 is the sole active task. Queue order is unchanged.
+T70 S12 is closed by owner approval. T70 remains open; no next S task is
+admitted. Queue order is unchanged.
