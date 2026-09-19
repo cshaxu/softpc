@@ -1,5 +1,23 @@
 # M9 T70 S9: Windows 95 first-boot repair
 
+## Final closure after resolving package failures
+
+P5 `7c0c786` resolves the previously unexplained failure in the test fixture,
+not the application. Final x64 and x86 full suites each pass 109/109. Both
+normal and compact Console-display supplemental cases also pass on each
+width. Existing window visibility, responsiveness, debug and restart checks
+remain enforced; no timeout increase or skipped assertion is used.
+
+Coordinator reviewed P5's actual diff and the P2 PIT repair together. P5 is
+test-only +14/-7; P2 production remains +8/-1 in timer.c. Lib/Common and user
+configuration remain unchanged. Both rebuilt package hashes match those
+recorded below. The original root cause, installation-stage evidence and
+regression requirements now have affirmative evidence. This closes S9 under
+the owner's delivery request; their instruction to stop subsequent interactive
+installation verification still applies. Complete installation is not claimed.
+T70 remains open for feedback. Earlier failed results and withdrawn closure
+are retained below as history, not current unresolved test failures.
+
 ## Rejected closure and resumed investigation
 
 The owner rejected S9 closure because the two failed integration tests remain
