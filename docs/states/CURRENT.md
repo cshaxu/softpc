@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 T71 S2 is active, design only: explicit text-cell and glyph contracts.
+M9 T71 S2 is active, design only: explicit Console character mapping.
 Owner: "准入s2 开始设计". S1 leaves the active slot at its verified delivery
 boundary; no new manual acceptance is inferred. T70 remains closed.
 
@@ -12,19 +12,19 @@ boundary; no new manual acceptance is inferred. T70 remains closed.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner explicitly admits S2 design after S1 delivery 04d76945. |
-| Objective | Specify character/glyph/colour data and all producer/consumer migrations without adding a display path. |
+| Objective | Specify explicit copied Console character mapping; broader text-cell/colour/glyph restructuring is split into a queued candidate at owner request. |
 | Non-goals | No code/build/EXE/INI/media change; no code-page detection, font recognition, dynamic frame, capacity expansion or MVDM edit. |
 | Reference Baseline | 04d76945; S1 dual-width full suites 109/109 and pushed packages. |
 | Candidate Proposal | [T71 S2 concrete design](../proposals/m9-kvm-text-frame-contract.md#t71-s2-concrete-design-for-owner-review). |
-| Files And ABI Surface | Proposal, Current and S1 delivery review only. Proposed ABI affects KVM/Console text cells; not implemented. |
+| Files And ABI Surface | Current, Queue and both proposals only; no source or artifact changes. Mapping ABI remains design work. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and linked governance skills. |
 | Verification | Source producer/consumer/codec inventory, S1 actual-diff review, documentation/whitespace gates. |
-| Expected Markers | Explicit cells, independent raster glyph/Console character, VM-owned PC mapping, no new ownership, bounded memory estimate. |
+| Expected Markers | Explicit mapping, unchanged Window raster/attribute layout, no new ownership; broader candidate queued independently. |
 | Asset Needs | None; read-only source inspection; no runtime process or trace. |
 | Reporting Requirements | Proposed structs, migration owners, preserved UX, memory/code estimates, open decisions and no implementation claims. |
 | Stop Conditions | Scope needs runtime edits or new product fallback before owner design review. |
 | Exit Criteria | Concrete design and ledger committed/pushed for owner review; implementation remains pending. |
-| Original Owner Request | 准入s2 开始设计 |
+| Original Owner Request | 准入s2 开始设计; 第二项请你拆分到新的t任务proposal加入队列 |
 | Similar-Issue Sweep | All text/frame publishers, copying/comparison/render/cache sites and snapshot entry points; confirm archive internals before implementation. |
 
 ## Current Technical Baseline
