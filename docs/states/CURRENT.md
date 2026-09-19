@@ -84,4 +84,11 @@ Open task awaiting owner: T70.
 ## Recent Governance
 
 T70 S12 is closed by owner approval. T70 remains open; no next S task is
-admitted. Queue order is unchanged.
+admitted.
+
+- **M9 Td S17:** Owner requested a concrete KVM text/frame correction proposal
+  at queue head. Recorded capability rejection, explicit character/glyph
+  semantics, bounded layout, migration batches and verification; no source or
+  artifact changes. [Proposal](../proposals/m9-kvm-text-frame-contract.md).
+  Documentation checks and actual-change review pass. T70 remains open; the
+  candidate is not implementation admission.
