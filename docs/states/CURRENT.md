@@ -5,20 +5,20 @@
 M9 T70 S9 is closed after the package-test root cause was repaired and both
 widths passed 109/109. Implementation deliveries are `5d6fe18` and `7c0c786`.
 M9 T70 S10 is owner-accepted after delivery 62eec11 and dual-width 109/109.
-M9 T70 S11 investigates and repairs captured-pointer escape, jitter and motion
-boundaries. T70 remains open.
+M9 T70 S11 implements the approved captured-pointer recentering repair and
+awaits owner testing after P2 delivery. T70 remains open.
 
 ## M9 T70 S11 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepted S10 and explicitly admitted S11 investigation and repair; Win3.1 also affected, more apparent at higher resolution. |
+| Admission And Approval | Owner accepted S10, admitted S11, then approved the presented Window-local recentering repair and P delivery with dual-width builds/tests. |
 | Objective | Establish and repair the capture/motion contract causing escape, jitter and invisible motion boundaries. |
-| Non-goals | No guest-specific sensitivity adjustment, guest media mutation or snapshot-format change; previous Lib/Common modification approval boundary remains. |
+| Non-goals | No guest-specific sensitivity adjustment, guest media mutation, snapshot-format change, Common/VM modification or public input ABI change. |
 | Reference Baseline | 62eec11; both widths 109/109; owner confirms display repairs. |
 | Candidate Proposal | [S11 mouse investigation](../proposals/m9-window-mouse-capture.md). |
-| Files And ABI Surface | Audit KVM Window native capture and motion, Common routing and VM/InPort input; name proven repair owner before editing shared corpus. |
+| Files And ABI Surface | Existing KVM Window native mouse/component, Types Win32 aliases, shared tests and manifests; public API/event schema unchanged. |
 | Applicable Rules | Execution, documentation, architecture, coding, source/research and product UI authorities. |
 | Verification | Deterministic capture/edge/motion probes; owner snapshot where useful; dual-width focused and full tests for implementation. |
 | Expected Markers | No ordinary input while uncaptured; captured relative movement does not exhaust a finite host-coordinate range; capture and clip agree across release/geometry changes. |
@@ -31,6 +31,15 @@ boundaries. T70 remains open.
 
 ## Current Technical Baseline
 
+- S11 P2 retains a single Window mouse path, samples and recenters the hidden
+  host pointer, rebases on geometry changes and releases on ownership/clip
+  loss. Four production files +68/-26; two tests +76/-16. Public events and
+  APIs, Common/VM/Compat/MVDM, INI and media are unchanged. Both EXEs rebuild;
+  x86 full regression passes 109/109, x64 serial full regression passes
+  109/109. The initial x64 parallel run had two package failures with unexpected
+  monitor input; these are disclosed, not claimed repaired by rerunning.
+  See [S11 review and limits](../proposals/m9-window-mouse-capture.md#p2-implementation-and-bounded-review).
+  Manual confirmation of intermittent escape/jitter/boundary symptoms is pending.
 - S10 repairs the planar 256-colour stride/wrap units and masks the V7
   preserve-memory flag before validating the mode number. Two mirror files
   +6/-5, existing VGA test +76/-0; Lib/Common/VM/Compat unchanged. Both widths

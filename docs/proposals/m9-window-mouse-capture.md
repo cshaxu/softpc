@@ -47,6 +47,65 @@ implementation and necessary Types API aliases, approximately 40--100 changed
 lines plus tests; refine after native proof. Prior owner restriction requires
 explicit Lib modification approval; none is assumed from research alone.
 
+## Implementation admission
+
+The owner approved the explained recentering design, dual-width build/test,
+P commit/push and subsequent manual validation. Implement in the existing
+Window native mouse owner: retain clipping bounds as the screen-coordinate
+anchor; sample current pointer position (not stale queued message coordinates),
+calculate motion with the existing remainder helper, then recenter. Geometry
+refresh rebases without input. Capture/clip loss releases through the existing
+cleanup; no automatic reacquisition. Shared Types gains only API aliases.
+Expected production diff: approximately 40--100 changed lines across four
+existing files, plus focused tests and manifest updates; no new state machine,
+thread, registration owner or public interface.
+
 References: [ClipCursor](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-clipcursor),
 [WM_MOUSEMOVE](https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-mousemove),
 [Raw Input registration ownership](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerrawinputdevices).
+
+## P2 implementation and bounded review
+
+The existing Window mouse owner now samples the current screen position,
+calculates the existing integer scaled delta and recenters the hidden pointer.
+It retains its clipping rectangle, not a second input queue. Move/resize rebases
+the anchor; native capture/clip loss or failed positioning uses the existing
+release path. Application deactivation also releases. Capture clicks remain
+consumed, uncaptured motion remains discarded, and no automatic recapture is
+introduced. Public events and APIs are unchanged.
+
+The owner's symptom is intermittent blocked movement, not reverse movement.
+Suppressing self-generated recenter motion is a prevention requirement of this
+new implementation, not a claim that the owner reported reverse movement.
+The finite-coordinate defect is proven; reproduction of every intermittent
+escape/jitter trigger remains subject to manual validation. Legacy coordinate
+sampling retains host sensitivity and may coalesce motion; it is not a claim
+of lossless raw hardware counts.
+
+Changed-path accounting against S11 P1, using `git diff --numstat`: four
+production files (Window mouse.c, mouse.h, component.c, Types win32/window.h)
++68/-26, net +42. Two existing tests +76/-16, net +60. Documentation, manifests
+and EXEs excluded. No Common, VM, Compat, MVDM, INI or media changes.
+
+Similar-issue sweep (`rg` over Window capture, mouse_move, refresh_bounds,
+WM_MOVE/SIZE/CAPTURECHANGED/KILLFOCUS/ACTIVATEAPP and event call sites):
+
+| Path | Disposition and proof |
+| --- | --- |
+| Finite edge exhaustion | Recenter after sampled motion; 100 movements accumulate beyond client width. |
+| Synthetic recenter | Repeated center sample emits zero; no second motion route. |
+| Scale and geometry | Existing signed remainder helper retained; 2x scale, moved/resized bounds and zero-motion rebase tested. |
+| Native ownership/clip | Motion validates both; foreign clipping releases without clearing the foreign rectangle; reentry emits nothing. |
+| Focus, freeze and capture loss | Existing cleanup retained; application deactivation added and tested. |
+| Native pointer failures | Position query/warp failure releases; existing sink/retirement tests remain passing. |
+| Routing and hardware conversion | Common source filter and original VM/InPort path unchanged; no sensitivity workaround. |
+
+Both package binaries build. Deterministic capture and frame/motion tests pass
+on both widths. The first x64 parallel regression run passed 107/109; two
+package tests failed at stage 16. Their captured monitor showed `hpause` and
+`ia`, not the strings sent by the test. This establishes unexpected input in
+that run, not its source or a repaired test defect. The two package tests
+subsequently pass in isolation; no assertion, timeout or product command path
+was changed to obtain a pass. Full regression results are recorded in Current.
+The native user snapshot interaction is not claimed as manually verified.
+S11 and T70 remain open for owner testing.

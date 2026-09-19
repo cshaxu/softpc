@@ -6,6 +6,13 @@
 static HWND owner, focused;
 static RECT client = {0,0,640,480}, clipped;
 static POINT origin = {100,200};
+static POINT pointer;
+static int pointer_ok=1, warp_ok=1;
+static unsigned warps;
+static BOOL WINAPI get_pointer(POINT *p) { *p=pointer; return pointer_ok; }
+static BOOL WINAPI warp(int x,int y)
+{ ++warps; if(!warp_ok)return FALSE; pointer.x=x;pointer.y=y;return TRUE; }
+static BOOL WINAPI get_clip(RECT *r) { *r=clipped; return TRUE; }
 static unsigned releases, clips, events;
 static int reject_input;
 static int release_ok=1;
@@ -77,6 +84,12 @@ static BOOL WINAPI title(HWND w,LPCSTR text)
 #define lib_win32_set_foreground_window foreground
 #define lib_win32_get_focus get_focus
 #define lib_win32_clip_cursor clip
+#undef lib_win32_get_clip_cursor
+#undef lib_win32_get_cursor_pos
+#undef lib_win32_set_cursor_pos
+#define lib_win32_get_clip_cursor get_clip
+#define lib_win32_get_cursor_pos get_pointer
+#define lib_win32_set_cursor_pos warp
 #define lib_win32_get_client_rect get_client
 #define lib_win32_client_to_screen to_screen
 #define lib_win32_set_cursor cursor
@@ -146,7 +159,7 @@ int main(void)
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     c.component=&window; context=&c;
     assert(kvm_win32_mouse_refresh_bounds(&c.mouse) && clips==0);
-    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1,0) == LIB_STATUS_OK);
+    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1) == LIB_STATUS_OK);
     assert(clipped.left==100 && clipped.top==200 && clipped.right==740 && clipped.bottom==680);
     origin.x=-300; origin.y=50;
     win32_window_proc((HWND)1,WM_MOVE,0,0);
@@ -159,10 +172,10 @@ int main(void)
     assert(!c.mouse.captured && !c.left_button && !c.mouse.motion.valid);
     assert(!c.mouse.motion.remainder_x && releases==0 && events==1 && owner==(HWND)2);
     notify_loss(); assert(events==1 && releases==0);
-    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1,0) == LIB_STATUS_OK);
+    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1) == LIB_STATUS_OK);
     c.right_button=1; win32_window_release_mouse(&c);
     assert(releases==1 && events==2 && !c.mouse.captured && !c.right_button);
-    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1,0) == LIB_STATUS_OK);
+    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1) == LIB_STATUS_OK);
     clip_ok=0; win32_window_proc((HWND)1,WM_MOVE,0,0);
     assert(!c.mouse.captured && releases==2);
     unsigned previous=clips;
@@ -182,7 +195,7 @@ int main(void)
     assert(win32_window_consume_mailboxes((HWND)1,&c));
     assert(focus_requests==0 && foreground_requests==0);
     clip_ok=1;
-    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1,0)==LIB_STATUS_OK);
+    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==LIB_STATUS_OK);
     focus_requests=foreground_requests=0;
     unsigned releases_before_freeze=releases;
     assert(kvm_window_freeze(&window)==LIB_STATUS_OK);
@@ -288,5 +301,53 @@ int main(void)
         assert((edge==KVM_WINDOW_EDGE_LEFT || edge==KVM_WINDOW_EDGE_TOPLEFT || edge==KVM_WINDOW_EDGE_BOTTOMLEFT) ? r.right==826 : r.left==10);
         assert((edge==KVM_WINDOW_EDGE_TOP || edge==KVM_WINDOW_EDGE_TOPLEFT || edge==KVM_WINDOW_EDGE_TOPRIGHT) ? r.bottom==749 : r.top==20);
     }
+    /* Native pointer recentering must outlive the finite client range and
+       must not turn stale messages, geometry or our own warp into input. */
+    release_ok=1; clip_ok=1;
+    client.right=640; client.bottom=480; origin.x=-900; origin.y=80;
+    assert(kvm_component_initialize(&window.base,&options,join,dispose)==0);
+    c.component=&window; c.frozen=0; c.left_button=c.right_button=0;
+    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==0);
+    int dx,dy, total=0;
+    for(unsigned i=0;i<100;++i) {
+        pointer.x+=20; pointer.y-=10;
+        assert(kvm_win32_mouse_move(&c.mouse,640,480,640,480,&dx,&dy));
+        assert(dx==20 && dy==-10); total+=dx;
+        unsigned before=warps;
+        assert(kvm_win32_mouse_move(&c.mouse,640,480,640,480,&dx,&dy));
+        assert(dx==0 && dy==0 && warps==before);
+    }
+    assert(total==2000);
+    for(unsigned i=0;i<2;++i) {
+        pointer.x+=1;
+        assert(kvm_win32_mouse_move(&c.mouse,1280,960,640,480,&dx,&dy));
+        assert(dx==(int)i && dy==0);
+    }
+    client.right=320; origin.x=100;
+    assert(kvm_win32_mouse_refresh_bounds(&c.mouse));
+    assert(kvm_win32_mouse_move(&c.mouse,320,480,640,480,&dx,&dy));
+    assert(dx==0 && dy==0);
+    pointer.x-=20;
+    assert(kvm_win32_mouse_move(&c.mouse,320,480,640,480,&dx,&dy));
+    assert(dx==-40 && dy==0);
+    /* Clipping can be replaced independently of native capture. */
+    clipped.right+=100;
+    win32_window_proc((HWND)1,WM_MOUSEMOVE,0,MAKELPARAM(1,1));
+    assert(!c.mouse.captured);
+    unsigned before=events;
+    win32_window_proc((HWND)1,WM_MOUSEMOVE,0,MAKELPARAM(20,20));
+    assert(events==before);
+    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==0);
+    win32_window_proc((HWND)1,WM_ACTIVATEAPP,FALSE,0);
+    assert(!c.mouse.captured);
+    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==0);
+    pointer.x+=1; warp_ok=0;
+    win32_window_proc((HWND)1,WM_MOUSEMOVE,0,0);
+    assert(!c.mouse.captured && events==before);
+    warp_ok=1;
+    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==0);
+    pointer_ok=0; win32_window_proc((HWND)1,WM_MOUSEMOVE,0,0);
+    assert(!c.mouse.captured && events==before);
+    assert(kvm_component_destroy(&window.base)==0);
     return 0;
 }

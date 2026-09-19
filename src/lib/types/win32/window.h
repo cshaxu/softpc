@@ -39,6 +39,7 @@ typedef BITMAPINFO lib_win32_bitmapinfo;
 #define lib_win32_dispatch_message_w DispatchMessageW
 #define lib_win32_end_paint EndPaint
 #define lib_win32_get_capture GetCapture
+#define lib_win32_get_clip_cursor GetClipCursor
 #define lib_win32_get_client_rect GetClientRect
 #define lib_win32_get_cursor_pos GetCursorPos
 #define lib_win32_get_dc GetDC
@@ -68,10 +69,12 @@ typedef BITMAPINFO lib_win32_bitmapinfo;
 #define lib_win32_send_message_a SendMessageA
 #define lib_win32_send_notify_message_w SendNotifyMessageW
 #define LIB_WIN32_WM_CANCELMODE WM_CANCELMODE
+#define LIB_WIN32_WM_ACTIVATEAPP WM_ACTIVATEAPP
 #define LIB_WIN32_WAIT_FAILED WAIT_FAILED
 #define lib_win32_set_active_window SetActiveWindow
 #define lib_win32_set_capture SetCapture
 #define lib_win32_set_cursor SetCursor
+#define lib_win32_set_cursor_pos SetCursorPos
 #define lib_win32_set_focus SetFocus
 #define lib_win32_set_foreground_window SetForegroundWindow
 #define lib_win32_set_rect SetRect

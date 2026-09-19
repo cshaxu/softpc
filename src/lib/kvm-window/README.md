@@ -39,7 +39,13 @@ unfreeze. The Window does not interpret a hotkey identifier.
 
 Relative mouse scaling retains signed integer remainders per axis. Capture,
 release and scale changes reset those remainders; copied event deltas remain
-integers. All post-start worker exits stop input, release capture, close the
+integers. While captured, Win32 samples the current pointer position and
+recenters it inside the client bounds after consuming motion. Queued coordinates
+from the recenter are not another input stream. Move/resize rebases without
+content motion. Capture/clip loss, deactivation or failed pointer positioning
+releases capture; reentry never captures without another click. It does not
+register process-wide Raw Input or alter application mouse settings.
+All post-start worker exits stop input, release capture, close the
 Window and retire the source once quiescent, before releasing storage. First
 failure is reported on the detecting thread, not delayed until this cleanup.
 Failed native disposal retains ownership and returns failure from join/destroy.

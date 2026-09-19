@@ -399,16 +399,21 @@ static void win32_window_queue_mouse(lib_win32_hwnd window,
         win32_window_flush_mouse(context);
 }
 
+static void win32_window_release_mouse(kvm_win32_window_context *context);
+
 static void win32_window_mouse(lib_win32_hwnd window, kvm_win32_window_context *context,
-    lib_win32_lparam position, int immediate)
+    int immediate)
 {
     int dx = 0;
     int dy = 0;
 
-    if (!win32_window_accepting_content_input(context) ||
-        !kvm_win32_mouse_move(&context->mouse, position, context->client_width,
+    if (!win32_window_accepting_content_input(context)) return;
+    if (!kvm_win32_mouse_move(&context->mouse, context->client_width,
             context->client_height, context->surface_width, context->surface_height,
-            &dx, &dy)) return;
+            &dx, &dy)) {
+        win32_window_release_mouse(context);
+        return;
+    }
     if (immediate) {
         win32_window_emit_mouse(context, dx, dy,
             (context->left_button ? KVM_MOUSE_BUTTON_LEFT : 0u) |
@@ -438,12 +443,12 @@ static void win32_window_release_mouse(kvm_win32_window_context *context)
 }
 
 static void win32_window_capture_mouse(lib_win32_hwnd window,
-    kvm_win32_window_context *context, lib_win32_lparam position)
+    kvm_win32_window_context *context)
 {
     lib_status status;
     if (!win32_window_accepting_content_input(context))
         return;
-    status = kvm_win32_mouse_capture(&context->mouse, window, position);
+    status = kvm_win32_mouse_capture(&context->mouse, window);
     /* Focus/capture can legitimately be declined by the desktop. */
     if (status == LIB_STATUS_INVALID_STATE) return;
     if (status != LIB_STATUS_OK) {
@@ -676,7 +681,7 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
         return 0;
     case LIB_WIN32_WM_MOUSEMOVE:
         if (kvm_win32_mouse_captured(&context->mouse))
-            win32_window_mouse(window, context, lparam, 0);
+            win32_window_mouse(window, context, 0);
         return 0;
     case LIB_WIN32_WM_SETCURSOR:
         if (lib_win32_loword(lparam) == LIB_WIN32_HTCLIENT) {
@@ -690,12 +695,12 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
         /* The first client click is the host-only capture gesture. Content
          * button state starts only with a later click while already captured. */
         if (!kvm_win32_mouse_captured(&context->mouse)) {
-            win32_window_capture_mouse(window, context, lparam);
+            win32_window_capture_mouse(window, context);
             return 0;
         }
         win32_window_flush_mouse(context);
         context->left_button = 1;
-        win32_window_mouse(window, context, lparam, 1);
+        win32_window_mouse(window, context, 1);
         return 0;
     case LIB_WIN32_WM_LBUTTONUP:
         if (!win32_window_accepting_content_input(context)) return 0;
@@ -705,17 +710,17 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
             return 0;
         win32_window_flush_mouse(context);
         context->left_button = 0;
-        win32_window_mouse(window, context, lparam, 1);
+        win32_window_mouse(window, context, 1);
         return 0;
     case LIB_WIN32_WM_RBUTTONDOWN:
         if (!win32_window_accepting_content_input(context)) return 0;
         if (!kvm_win32_mouse_captured(&context->mouse)) {
-            win32_window_capture_mouse(window, context, lparam);
+            win32_window_capture_mouse(window, context);
             return 0;
         }
         win32_window_flush_mouse(context);
         context->right_button = 1;
-        win32_window_mouse(window, context, lparam, 1);
+        win32_window_mouse(window, context, 1);
         return 0;
     case LIB_WIN32_WM_RBUTTONUP:
         if (!win32_window_accepting_content_input(context)) return 0;
@@ -723,11 +728,14 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
             return 0;
         win32_window_flush_mouse(context);
         context->right_button = 0;
-        win32_window_mouse(window, context, lparam, 1);
+        win32_window_mouse(window, context, 1);
         return 0;
     case LIB_WIN32_WM_KILLFOCUS:
         win32_window_release_mouse(context);
         return 0;
+    case LIB_WIN32_WM_ACTIVATEAPP:
+        if (!wparam) win32_window_release_mouse(context);
+        break;
     case LIB_WIN32_WM_CLOSE:
         { kvm_input_event close_event = { 0 };
         win32_window_release_mouse(context);

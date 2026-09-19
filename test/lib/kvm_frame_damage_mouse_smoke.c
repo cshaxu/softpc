@@ -1,5 +1,5 @@
 #include "lib/kvm-base/mailbox_interface.h"
-#include "lib/kvm-window/win32/mouse.h"
+#include "lib/kvm-window/motion.h"
 #include "lib/kvm-window/geometry.h"
 #include "lib/kvm-window/render.h"
 #include <assert.h>
@@ -62,27 +62,26 @@ static void damage(void)
 
 static void motion(void)
 {
-    kvm_win32_mouse mouse;
+    kvm_window_motion mouse = {0};
     int dx, dy, total_x = 0, total_y = 0;
-    kvm_win32_mouse_reset(&mouse);
-    assert(kvm_win32_mouse_move(&mouse, 0, 200, 200, 100, 100, &dx, &dy));
+    assert(kvm_window_motion_move(&mouse, 0, 0, 200, 200, 100, 100, &dx, &dy));
     for (int i = 1; i <= 10; ++i) {
-        assert(kvm_win32_mouse_move(&mouse, (i << 16) | i, 200, 200, 100, 100, &dx, &dy));
+        assert(kvm_window_motion_move(&mouse, i, i, 200, 200, 100, 100, &dx, &dy));
         total_x += dx; total_y += dy;
     }
     assert(total_x == 5 && total_y == 5);
     for (int i = 9; i >= 0; --i) {
-        assert(kvm_win32_mouse_move(&mouse, (i << 16) | i, 200, 200, 100, 100, &dx, &dy));
+        assert(kvm_window_motion_move(&mouse, i, i, 200, 200, 100, 100, &dx, &dy));
         total_x += dx; total_y += dy;
     }
     assert(total_x == 0 && total_y == 0);
-    assert(kvm_win32_mouse_move(&mouse, 0x10001, 200, 200, 100, 100, &dx, &dy));
+    assert(kvm_window_motion_move(&mouse, 1, 1, 200, 200, 100, 100, &dx, &dy));
     assert(dx == 0 && dy == 0);
-    assert(kvm_win32_mouse_move(&mouse, 0, 200, 200, 100, 100, &dx, &dy));
-    assert(dx == 0 && dy == 0 && mouse.motion.remainder_x == 0 && mouse.motion.remainder_y == 0);
-    assert(kvm_win32_mouse_move(&mouse, 0x10001, 200, 200, 100, 100, &dx, &dy));
-    assert(kvm_win32_mouse_move(&mouse, 0x20002, 100, 100, 100, 100, &dx, &dy));
-    assert(dx == 1 && dy == 1 && mouse.motion.remainder_x == 0 && mouse.motion.remainder_y == 0);
+    assert(kvm_window_motion_move(&mouse, 0, 0, 200, 200, 100, 100, &dx, &dy));
+    assert(dx == 0 && dy == 0 && mouse.remainder_x == 0 && mouse.remainder_y == 0);
+    assert(kvm_window_motion_move(&mouse, 1, 1, 200, 200, 100, 100, &dx, &dy));
+    assert(kvm_window_motion_move(&mouse, 2, 2, 100, 100, 100, 100, &dx, &dy));
+    assert(dx == 1 && dy == 1 && mouse.remainder_x == 0 && mouse.remainder_y == 0);
 }
 
 static void rendering(void)
