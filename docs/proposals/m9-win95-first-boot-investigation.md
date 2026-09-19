@@ -9,6 +9,37 @@ package-smoke run fails after 10.60 seconds with Machine started printed but
 without reaching pause. The next proof must distinguish a missing/invisible
 Window from a failed test observation before any repair or closure.
 
+Package-test follow-up: added timeout observation finds the Running Window
+exists with its correct title but is not visible. The fixture launches the
+whole process with STARTF_USESHOWWINDOW/SW_HIDE; Win32 applies that startup
+value to the child's first ShowWindow, including the KVM Window. Repair the
+fixture to hide only its dedicated Console after attaching, without a process
+show override. Keep visibility and responsiveness assertions. Estimated change
+is approximately fifteen test lines, no product or shared-corpus change.
+Verify both package routes, both widths, and full regression before closure.
+
+The fixture fault dates to `2c05238` (T59 S1), when the checked-in INI selected
+Console display. `40f3936` later changed it to Window display, exposing the
+contradiction between hidden-process startup and required Window visibility.
+The first failing observation was exists=1, visible=0, title=Insignia SoftPC
+(Running). With identical product binaries and unchanged assertions/timeouts,
+the corrected fixture passes both package cases on both widths. Full CTest
+now passes 109/109 on x64 and 109/109 on x86, replacing the earlier unresolved
+107/109 result. Both release builds succeed; package hashes are unchanged.
+Separately compiled fixture instances using a disposable Console-display INI
+and the same overlay backing image pass normal and compact modes on both
+widths. The user-owned package INI is untouched. This verifies the original
+Console branch as well as the configured Window branch.
+
+Similar-issue sweep: `rg -n 'STARTF_USESHOWWINDOW|wShowWindow|IsWindowVisible|ShowWindow'`
+over test/tools finds this one process-wide hidden launch. The Console display
+test hides only its own allocated Console; the KVM retirement test deliberately
+hides its window while testing lifecycle, not visibility. Neither has the
+contradictory acceptance condition. Keep the package visibility assertion as
+the regression check and report existence/visibility/title on timeout instead
+of only the coarse stage=16. This follow-up changes one test file +14/-7
+(net +7), with no production or shared-corpus edits.
+
 ### Superseded P3 decision
 
 Implementation delivery: `5d6fe18` (S9 P2). The owner subsequently instructed:

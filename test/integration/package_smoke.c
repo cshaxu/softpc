@@ -293,17 +293,24 @@ static BOOL CALLBACK package_find_window(HWND window, LPARAM opaque)
 static int package_wait_window(DWORD process, const char *state)
 {
     DWORD deadline = GetTickCount() + 10000u;
+    HWND observed = NULL;
+    int visible = 0;
+    char title[128] = { 0 };
     do {
         package_window_probe probe = { process, NULL };
-        char title[128];
         EnumWindows(package_find_window, (LPARAM)&probe);
+        observed = probe.window;
+        visible = observed != NULL && IsWindowVisible(observed);
+        title[0] = '\0';
+        if (observed != NULL) GetWindowTextA(observed, title, sizeof(title));
         if (state == NULL && probe.window == NULL) return 1;
-        if (state != NULL && probe.window != NULL && IsWindowVisible(probe.window) &&
-            GetWindowTextA(probe.window, title, sizeof(title)) && strstr(title, state))
+        if (state != NULL && visible && strstr(title, state))
             return SendMessageTimeoutA(probe.window, WM_NULL, 0, 0,
                 SMTO_ABORTIFHUNG, 1000u, NULL) != 0;
         Sleep(20u);
     } while ((LONG)(GetTickCount() - deadline) < 0);
+    fprintf(stderr, "package Window timeout: expected=%s exists=%d visible=%d title=%s\n",
+        state == NULL ? "absent" : state, observed != NULL, visible, title);
     return 0;
 }
 
@@ -371,6 +378,8 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
         Sleep(20u);
     } while ((LONG)(GetTickCount() - deadline) < 0);
     if (GetConsoleCP() == 0u) { stage = 1; goto done; }
+    /* Hide only our Console, not the child's first KVM ShowWindow call. */
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
     if (!package_window_display && IsWindowVisible(GetConsoleWindow())) {
         stage = 20; goto done;
     }
@@ -480,10 +489,8 @@ int main(int argc, char **argv)
         return 1;
     }
     /* NULL command line is intentional: the package has no CLI surface. */
-    /* Observe the test-owned Console through handles, not a foreground window
-       that can receive the developer's keyboard input during this test. */
-    startup.dwFlags = STARTF_USESHOWWINDOW;
-    startup.wShowWindow = SW_HIDE;
+    /* STARTF_USESHOWWINDOW/SW_HIDE would also hide the first KVM Window.
+       The attached test hides only its own Console instead. */
     if (!CreateProcessA(SOFTPC_PACKAGE_EXECUTABLE, NULL, NULL, NULL, FALSE,
             CREATE_NEW_CONSOLE, NULL, SOFTPC_PACKAGE_DIRECTORY, &startup,
             &process)) {

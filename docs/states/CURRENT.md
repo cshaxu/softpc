@@ -8,8 +8,9 @@ Win95 graphical installation stage; dual-width regression and further
 installation verification remain in progress.
 T70 remains open.
 
-The owner rejected S9's premature P3 closure. Its closure is withdrawn;
-the two failing package tests must be diagnosed and resolved before closure.
+The owner rejected S9's premature P3 closure. The two failed package tests
+are now traced to the fixture's process-wide hidden-window startup flag;
+correcting only the fixture yields dual-width 109/109. Delivery review remains.
 
 ## M9 T70 S9 Packet
 
@@ -39,8 +40,9 @@ Owner's follow-up objective: “找出win95安装程序第一次启动系统的�
 - S9 isolates read-time PIT guesses generating spurious IRQ0 work. The
   candidate timer.c repair and fixed-clock test are present; both package
   EXEs are rebuilt. Cold start reaches Win95's hardware/PnP dialog.
-  Both widths pass the nine-case PIT test and 107/109 full regression tests;
-  both retain the previously disclosed stage-16 package-test failures.
+  Both widths pass the nine-case PIT test and 109/109 full regression tests.
+  The stage-16 failures were a test-launch visibility conflict, now repaired
+  without changing the product binaries or weakening assertions.
   Longer installation observation and final delivery review remain pending.
   See [bounded observations](../proposals/m9-win95-first-boot-investigation.md#cold-start-observation).
 - S8 removes INI mode conversion and same-path attachment retention. Snapshot
