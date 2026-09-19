@@ -1,6 +1,15 @@
 # M9 T70 S9: Windows 95 first-boot repair
 
-## Owner-directed closure
+## Rejected closure and resumed investigation
+
+The owner rejected S9 closure because the two failed integration tests remain
+unexplained. The P3 closure decision is withdrawn, not treated as permission
+to waive failures. S9 is active again; P2's repair remains intact. A fresh x64
+package-smoke run fails after 10.60 seconds with Machine started printed but
+without reaching pause. The next proof must distinguish a missing/invisible
+Window from a failed test observation before any repair or closure.
+
+### Superseded P3 decision
 
 Implementation delivery: `5d6fe18` (S9 P2). The owner subsequently instructed:
 “等等 先不用 你就把最新修复的binary编译好 测试提交推送 收口这个s任务给我”.

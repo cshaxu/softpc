@@ -7,7 +7,7 @@
 新增 8 行、删除 1 行，无客户机识别或 standalone 分支。固定时钟重复
 读取九组回归通过双宽度；全量各 107/109，保留原有两项 package 失败。
 冷启动已进入图形化设备配置；完整安装仍在验，不表示任务收口。
-见[调查与验证记录](../../../history/M9-T70-S9-win95-first-boot.md)。
+见[调查与验证记录](../../../proposals/m9-win95-first-boot-investigation.md)。
 
 ### T70 S7 交付增量
 

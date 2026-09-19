@@ -2,10 +2,37 @@
 
 ## Current Work
 
-M9 T70 S9 is closed at the owner's requested delivery boundary. The PIT
-repair is pushed as `5d6fe18`; both package widths are rebuilt and tested.
-No implementation subtask is active. T70 remains open for owner feedback.
-Open task awaiting owner: T70.
+M9 T70 S8 is closed with owner acceptance; delivery is `f54e19f`.
+M9 T70 S9's candidate PIT read-time interpolation repair reaches the next
+Win95 graphical installation stage; dual-width regression and further
+installation verification remain in progress.
+T70 remains open.
+
+The owner rejected S9's premature P3 closure. Its closure is withdrawn;
+the two failing package tests must be diagnosed and resolved before closure.
+
+## M9 T70 S9 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approved S8 closure and S9 research, supplied cold-start steps, then explicitly requested root-cause repair and verification of the next graphical installation stage. |
+| Objective | Determine whether Win95's first boot after Setup file copying is stalled or waiting; find and repair the evidenced cause so installation reaches its next graphical stage and can complete. |
+| Non-goals | No speculative repair, guest-specific workaround, guest-media mutation, Lib/Common change, or snapshot/media contract change. |
+| Reference Baseline | S8 delivery `f54e19f`, accepted by owner; dual-width package hashes and limitations in the S8 closure. |
+| Candidate Proposal | [Win95 first boot](../proposals/m9-win95-first-boot-investigation.md). |
+| Files And ABI Surface | Investigate VM/Compat/MVDM and display pipeline; evidence-backed minimal repair plus focused tests, with pre-change estimate when the responsible path is established. Lib/Common unchanged. |
+| Applicable Rules | Execution, documentation, architecture, coding and source/research authorities. |
+| Verification | Reproduce owner steps; correlate CPU/interrupt/disk progress with video state, published frames and visible output; record unresolved alternatives. |
+| Expected Markers | A repeatable failure stage and evidence distinguishing broken rendering from stalled or failed boot; no inference from a screenshot alone. |
+| Asset Needs | Owner supplied installed disk and cold-start recipe; confirmed overlay configuration and accepted x64 package identity. Preserve originals. Ignored build/t70-s9 diagnostics capped at 600 seconds and 64 MiB per run to accommodate the minutes-long initial boot. |
+| Reporting Requirements | Reproduction result, observed boot progress, display evidence, component attribution, minimal repair plan and estimated diff if a repair is justified. |
+| Stop Conditions | Missing reproduction input; required alteration of original owner media; need for shared-corpus change or unrelated behavioral change. |
+| Exit Criteria | Root cause proven, minimal repair reviewed, dual-width build/regression and next graphical installation-stage evidence recorded; unresolved completion evidence keeps task open. |
+| Original Owner Request | “批准收口当前S8，提交推送，然后准入一个S9：调研win95安装程序文件复制完成后第一次启动系统的显示异常故障（不确定是不是只是显示异常，还是系统其实根本无法启动，需要观测）。我会给你截图和如何复现的指令。” |
+| Similar-Issue Sweep | Once the failing contract is identified, enumerate matching production paths in its owning component; do not presume an emulator or rendering cause before observation. |
+
+Owner's follow-up objective: “找出win95安装程序第一次启动系统的显示异常问题原因并修复，并确定系统是卡死还是正常等待；目标是让win95安装程序正常进入下一阶段的图形界面安装状态，用户可以正常完成系统安装”。
 
 ## Current Technical Baseline
 
@@ -14,10 +41,8 @@ Open task awaiting owner: T70.
   EXEs are rebuilt. Cold start reaches Win95's hardware/PnP dialog.
   Both widths pass the nine-case PIT test and 107/109 full regression tests;
   both retain the previously disclosed stage-16 package-test failures.
-  Longer observation reaches the installation date/time dialog. The owner
-  stopped further interactive installation and requested S9 delivery/closure;
-  full installation and desktop interaction are not claimed verified.
-  See [closure and observations](../history/M9-T70-S9-win95-first-boot.md).
+  Longer installation observation and final delivery review remain pending.
+  See [bounded observations](../proposals/m9-win95-first-boot-investigation.md#cold-start-observation).
 - S8 removes INI mode conversion and same-path attachment retention. Snapshot
   restore first detaches all slots, then reopens saved paths/modes and applies
   saved overlay pages. Codec and SHA/size checks are unchanged. See the
@@ -56,5 +81,5 @@ Open task awaiting owner: T70.
 
 ## Recent Governance
 
-T70 S9 closes after actual-change review and owner-directed termination of
-further installation testing. Queue order is unchanged; T70 is not closed.
+T70 S8 closes after owner acceptance of pushed delivery `f54e19f` and actual
+change review. S9 is the sole active investigation; queue order is unchanged.
