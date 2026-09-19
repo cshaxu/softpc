@@ -1,4 +1,6 @@
 #include "vm/driver.h"
+#include "vm/snapshot.h"
+#include "compat/ccpu/archive.h"
 #include "compat/media_snapshot.h"
 
 #include <assert.h>
@@ -218,6 +220,7 @@ static int snapshot_run_transaction(void)
     common_machine *machine = NULL;
     snapshot_bytes stream = { 0 };
     snapshot_bytes retained = { 0 };
+    softpc_snapshot_image expected = { 0 };
     assert(snapshot_write_media(path));
     snapshot_options(&options, path);
     assert(softpc_machine_create(&options, &product) == SOFTPC_MACHINE_OK);
@@ -253,10 +256,29 @@ static int snapshot_run_transaction(void)
     /* The fixed layout begins with guest RAM size, not a host-width/version tag. */
     assert(stream.count >= 12u);
     stream.offset = 0u;
+    assert(softpc_snapshot_image_read(&expected,
+        softpc_machine_memory_bytes(product), snapshot_read, &stream) ==
+        LIB_STATUS_OK);
+    stream.offset = 0u;
     assert(common_machine_write_state(machine,
         &(common_machine_state_reader) { snapshot_read, &stream }) ==
         LIB_STATUS_OK);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
+    {
+        softpc_ccpu_archive observed = { 0 };
+        assert(softpc_ccpu_archive_capture(&observed));
+        /* A restored image must reach Common's pause rendezvous before an
+           executor tick can advance guest state. */
+        assert(memcmp(&expected.ccpu.registers, &observed.registers,
+            sizeof(observed.registers)) == 0);
+        assert(memcmp(&expected.ccpu.execution, &observed.execution,
+            sizeof(observed.execution)) == 0);
+        assert(memcmp(expected.ccpu.memory, observed.memory,
+            observed.sas.memory_bytes) == 0);
+        assert(memcmp(expected.ccpu.page_types, observed.page_types,
+            observed.sas.page_type_bytes) == 0);
+        softpc_ccpu_archive_dispose(&observed);
+    }
     assert(snapshot_media_bytes(LIB_FALSE, LIB_FALSE));
     assert(common_machine_stop(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_STOPPED));
@@ -301,6 +323,7 @@ static int snapshot_run_transaction(void)
     common_machine_destroy(machine);
     vm_driver_destroy(driver);
     softpc_machine_destroy(product);
+    softpc_snapshot_image_dispose(&expected);
     free(stream.bytes);
     free(retained.bytes);
     assert(remove(path) == 0);

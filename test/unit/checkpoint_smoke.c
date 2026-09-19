@@ -23,6 +23,7 @@
 #include "mouse.h"
 #include "host_com.h"
 #include "host_lpt.h"
+#include "c_stack.h"
 
 extern void insert_code_into_6805_buf(half_word code);
 extern void host_key_down(int key);
@@ -41,6 +42,7 @@ extern unsigned char *EGA_planes;
 extern checkpoint_dac_entry *DAC;
 
 extern void (*BIOS[256])(void);
+extern void c_setSS_BASE_LIMIT_AR(IU32 base, IU32 limit, IU16 ar);
 extern unsigned long c_cpu_q_ev_get_count(void);
 extern void c_cpu_q_ev_set_count(unsigned long count);
 extern void dispatch_tic_event(void);
@@ -323,6 +325,16 @@ static void verify_translation(void)
 }
 
 static long event_order[8];
+
+static void verify_stack_address_width(void)
+{
+    /* A call gate's item width does not change the address width of its new
+       stack. The latter is the B bit in the newly loaded SS descriptor. */
+    c_setSS_BASE_LIMIT_AR(0u, 0xffffffffu, 0x4093u);
+    c_setESP(0x80010df0u);
+    set_current_SP(0x80010e00u);
+    assert(c_getESP() == 0x80010e00u);
+}
 
 static void verify_cpu_side_state(void)
 {
@@ -946,6 +958,7 @@ int main(void)
     verify_reentry();
     verify_timeout();
     verify_translation();
+    verify_stack_address_width();
     verify_cpu_side_state();
     verify_snapshot_archive();
     verify_pit_archive();

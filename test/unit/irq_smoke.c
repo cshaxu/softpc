@@ -10,6 +10,7 @@
 #include "ios.h"
 #include "ica.h"
 #include "compat/ccpu/abi.h"
+#include "compat/ccpu/lifecycle.h"
 #include "../../src/mvdm/softpc.new/base/ccpu386/c_intr.h"
 
 extern void reboot(void);
@@ -47,10 +48,29 @@ static void verify_rejected_interrupt(softpc_machine *machine)
     assert((flags & 0x200u) != 0u);
     host_set_hw_int();
     assert(softpc_machine_run(machine, 32u) == SOFTPC_MACHINE_OK);
+    assert((*softpc_ccpu_interrupt_map_address() & 1u) == 0u);
     assert(c_getCS() == cs && c_getEIP() == ip);
     assert(c_getESP() == sp && c_getEFLAGS() == flags);
     outb(0xa1u, slave_mask);
     outb(0x21u, master_mask);
+}
+
+static void verify_keyboard_read_releases_irq(void)
+{
+    half_word irr = 0;
+    half_word response = 0;
+
+    /* A keyboard-device response raises IRQ1.  Reading its one-byte output
+       buffer must lower the same line even if the guest polls the PIC while
+       IRQ1 is masked instead of accepting the interrupt. */
+    outb(0x20u, 0x0au);
+    outb(0x60u, 0xf2u);
+    inb(0x20u, &irr);
+    assert((irr & 0x02u) != 0u);
+    inb(0x60u, &response);
+    assert(response == 0xfau);
+    inb(0x20u, &irr);
+    assert((irr & 0x02u) == 0u);
 }
 
 int main(void)
@@ -100,6 +120,7 @@ int main(void)
         sizeof(ticks)) == SOFTPC_MACHINE_OK);
     assert(ticks[0] != 0u || ticks[1] != 0u || ticks[2] != 0u || ticks[3] != 0u);
     verify_rejected_interrupt(machine);
+    verify_keyboard_read_releases_irq();
 
     /* The original 8042 output-port pulse requests a CPU reset through the
        original keyboard controller; it is not a standalone reset shortcut. */

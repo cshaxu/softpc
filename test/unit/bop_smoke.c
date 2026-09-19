@@ -78,6 +78,17 @@ int main(void)
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
 
+    /* The 8042 Read Input Port command is a synchronous controller query.
+       Hardware detection uses it before ordinary keyboard input, so it must
+       return the initialized modeled input-port byte rather than a host-local
+       temporary value.  The default VGA profile is the ordinary AT value. */
+    {
+        half_word input_port;
+        outb(KEYBA_STATUS_CMD, 0xc0u);
+        inb(KEYBA_IO_BUFFERS, &input_port);
+        assert(input_port == 0xbfu);
+    }
+
     /* These are the original ROM's machine-service slots.  They must remain
        direct entries into restored SoftPC controller/firmware code, rather
        than silently falling back to a new VM service layer. */

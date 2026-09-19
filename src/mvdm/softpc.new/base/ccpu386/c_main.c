@@ -830,7 +830,7 @@ IFN1(
 
    /* somewhere for exceptions to return to */
 #if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
-   setjmp(ccpu386ThrdExptnPtr());
+   setjmp(*ccpu386ThrdExptnPtr());
 #else
    setjmp(next_inst[simulate_level-1]);
 #endif
@@ -4528,13 +4528,21 @@ TYPEFF_3:
  */
 
 	 IU32 hook_address;	
+	 IS32 acknowledged_interrupt;
 
-	 cpu_hw_interrupt_number = ica_intack(&hook_address);
+	 acknowledged_interrupt = ica_intack(&hook_address);
 	 cpu_interrupt_map &= ~CPU_HW_INT_MASK;
-	 EXT = EXTERNAL;
-	 SYNCH_TICK();
-	 do_intrupt(cpu_hw_interrupt_number, FALSE, FALSE, (IU16)0);
-	 CCPU_save_EIP = GET_EIP();   /* to reflect IP change */
+	 /* A modern host wake can outlive the original PIC request.
+	    The original PIC rejects that stale acknowledgement with -1; it is not
+	    an IU16 vector and must not enter the external-delivery path. */
+	 if (acknowledged_interrupt != -1)
+	 {
+	    cpu_hw_interrupt_number = (IU16)acknowledged_interrupt;
+	    EXT = EXTERNAL;
+	    SYNCH_TICK();
+	    do_intrupt(cpu_hw_interrupt_number, FALSE, FALSE, (IU16)0);
+	    CCPU_save_EIP = GET_EIP();   /* to reflect IP change */
+	 }
       }
 #else	/* SFELLOW */
    if (GET_IF() && (cpu_interrupt_map & (CPU_HW_INT_MASK | CPU_HW_NPX_INT_MASK)))
@@ -4989,7 +4997,7 @@ LOCAL VOID
 
       /* Save current context and invoke a new CPU level */
 #if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
-      if ( setjmp(ccpu386SimulatePtr()) == 0)
+      if ( setjmp(*ccpu386SimulatePtr()) == 0)
 #else
       if ( setjmp(longjmp_env_stack[simulate_level++]) == 0 )
 #endif
@@ -5057,7 +5065,7 @@ LOCAL VOID
 
       /* Save current context and invoke a new CPU level */
 #if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
-      if ( setjmp(ccpu386SimulatePtr()) == 0)
+      if ( setjmp(*ccpu386SimulatePtr()) == 0)
 #else
       if ( setjmp(longjmp_env_stack[simulate_level++]) == 0 )
 #endif

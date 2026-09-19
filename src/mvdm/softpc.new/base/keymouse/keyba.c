@@ -2509,6 +2509,7 @@ if (!waiting_for_next_8042_code)
 		case 0xc0:
 			/* Read Input Port */
 			/* But don't cause an interrupt */
+			code_to_send=input_port_val;
 			code_to_send_valid=TRUE;
 			break;
 		case 0xd0:
@@ -2990,11 +2991,10 @@ GLOBAL VOID kbd_inb IFN2(io_addr,port,half_word *,val)
 
 		kbd_status &= 0xfe;		/* Mask out "char avail" bit */
 
-		/* Other ports should really clear this IRQ as well, but... */
-
-#ifdef JOKER
+		/* The output buffer is now empty, so deassert its IRQ1 request.
+		 * Normal interrupt delivery may already have acknowledged it; this
+		 * also covers a guest which temporarily masks IRQ1 and polls the PIC. */
 		ica_clear_int(KEYBOARD_INT_ADAPTER, KEYBOARD_INT_LINE);
-#endif	/* JOKER */
 
 		/* <tur 06-Jul-93> BCN 2040 Replace previous horrible hack with a better one!
 		**

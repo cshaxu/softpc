@@ -22,6 +22,7 @@ struct vm_driver {
     softpc_snapshot_image staged_image;
     lib_bool restore_pending;
     lib_bool restore_active;
+    lib_bool restore_rendezvous_pending;
     common_machine_executor_callback executor_callback;
     void *executor_context;
 };
@@ -142,9 +143,13 @@ static void vm_driver_snapshot_observe(void *opaque, unsigned long depth,
     vm_driver *driver = (vm_driver *)opaque;
     lib_status status;
     lib_status finish_status;
-    if (driver == NULL || entry == NULL ||
-        !softpc_snapshot_checkpoint(&driver->capture, depth, entry))
+    if (driver == NULL || entry == NULL) return;
+    if (driver->restore_rendezvous_pending) {
+        driver->restore_rendezvous_pending = LIB_FALSE;
+        vm_driver_executor_event(driver);
         return;
+    }
+    if (!softpc_snapshot_checkpoint(&driver->capture, depth, entry)) return;
     status = driver->capture.status;
     if (status == LIB_STATUS_OK) {
         softpc_snapshot_image_dispose(&driver->captured_image);
@@ -179,18 +184,16 @@ static lib_bool vm_driver_run(void *opaque)
         result = softpc_machine_reset(driver->machine) == SOFTPC_MACHINE_OK &&
             softpc_snapshot_image_restore(&driver->staged_image, &entry) ==
             LIB_STATUS_OK;
-        /* Resume through the normal executor entry. Common has already
-           requested pause, so its first ordinary callback publishes the
-           rebuilt frame and reaches the paused rendezvous before the guest
-           advances beyond this restored boundary. */
+        /* The restored CPU has an exact continuation boundary.  Let its first
+           checkpoint enter Common's already-requested pause rendezvous before
+           decoding another guest instruction. */
         if (result) {
-            /* Reset and archive replay can signal the old executor boundary.
-               The restored entry itself must use the ordinary callback to
-               reach Common's requested PAUSED rendezvous. */
             driver->restore_active = LIB_FALSE;
+            driver->restore_rendezvous_pending = LIB_TRUE;
             result = softpc_ccpu_lifecycle_resume(&entry) != 0;
         }
         driver->restore_active = LIB_FALSE;
+        driver->restore_rendezvous_pending = LIB_FALSE;
         softpc_snapshot_image_dispose(&driver->staged_image);
         driver->restore_pending = LIB_FALSE;
         if (result) vm_driver_executor_event(driver);

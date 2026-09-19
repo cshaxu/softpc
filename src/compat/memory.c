@@ -1,5 +1,6 @@
 #include "insignia.h"
 #include "host_def.h"
+#include "host_gen.h"
 #include "platform.h"
 
 #include <stdlib.h>
@@ -15,7 +16,7 @@ static sys_addr softpc_ram_size;
 
 UTINY *host_sas_init(sys_addr size)
 {
-    softpc_ram = (UTINY *)calloc((size_t)size + 0x2000u, 1u);
+    softpc_ram = (UTINY *)calloc((size_t)size + NOWRAP_PROTECTION, 1u);
     softpc_ram_size = softpc_ram == NULL ? 0 : size;
     return softpc_ram;
 }

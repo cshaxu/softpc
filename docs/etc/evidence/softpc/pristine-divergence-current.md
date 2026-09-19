@@ -1,5 +1,20 @@
 # MVDM / OpenNT 当前差异账本
 
+### T70 S7 交付增量
+
+相对 T69 交付 `95c467a`，镜像五个文件 +23/-24，净减一行：
+`call.c`、`iret.c`、`ret.c` 各用既有 `set_current_SP(new_sp)` 替换
+operand-size 分支（合计 +3/-12），按新 SS 的 B 属性加载栈指针。
+CALL 已由硬件检测现场确认；IRET/RETF 为同类源码修复，未声称各有完整
+客户机复现。`c_intr.c` 已使用相同 helper，不增加差异。
+`c_main.c` +16/-8 保留有符号 PIC 拒绝结果，并正确解引用 TLS `jmp_buf *`；
+`keyba.c` +4/-4 补全 8042 C0 返回值及读空输出缓冲区后的 IRQ1 撤销。
+这些是原设备/CPU 合同修复，无 Setup 条件或新 standalone 行为分支。
+Compat 的 SAS allocation 与 VM restore rendezvous 保留在各自组件。
+计数使用 `git diff 95c467a --numstat -- src/mvdm/softpc.new`，不改写下文
+T61 的冻结原始差异总数。验证及局限见
+[T70 S7 交付记录](../../../history/M9-T70-stack-width-repair.md)。
+
 T61 冻结镜像数量与全部边界处置见文末 **S13 最终归属复核**。
 T63 S2 在原有 c_main.c 新增两个 CPU checkpoint 观察点（取指准备和 HLT），
 以及回到这两个原始阶段的窄重入接线；保留 HLT 的 pending trap，不重复取指。
