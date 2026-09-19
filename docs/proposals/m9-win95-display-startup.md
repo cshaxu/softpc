@@ -32,3 +32,34 @@ and 64 MiB per run; at most one 128 MiB checkpoint if required. Remove exhausted
 outputs and terminate owned probes. External comparison trees remain read-only.
 Exit with an evidence-backed report or a precise unresolved question and the
 next discriminating observation; do not report an unimplemented repair as done.
+
+## S10 observations (research, not a delivered repair)
+
+- An overlay cold boot reproduces both symptoms in copied machine frames,
+  before a KVM presenter consumes them. The logo frame is 640 by 400; the
+  later desktop frame contains the display-settings warning. The source
+  medium's SHA-256 remains unchanged after the run.
+- A link-time observation of `nt_vga_hi_graph_std` records start 32768,
+  width 80 plane groups, height 400, display stride 160, actual plane stride
+  80, and unit character/pixel heights. The renderer receives all 400 rows;
+  neither frame clipping nor Window scaling explains the half-height logo.
+- Offline decoding of the same captured video memory/palette reproduces the
+  half-height result with stride 160 and the complete image with stride 80,
+  retaining the same start address. A diagnostic-only override of the
+  derived stride after mode selection also produces a complete logo during
+  a real cold boot. No tracked production source was changed for this test.
+- `choose_vga_display_mode` doubles the plane stride for odd/even chained
+  memory; the unchained 256-colour painter then multiplies that stride by
+  four to address interleaved planes. The repair candidate is the shared
+  display-address calculation, not image stretching or a logo-specific
+  painter branch. Dirty-range, split and wrap users of the derived stride
+  must be covered before an implementation is accepted.
+- Read-only installed configuration and installer INF inspection agree on
+  the Video Seven driver family. Boot logging shows frame-buffer and VGA
+  drivers; registry bytes also contain display-fallback notification text.
+  This does not yet prove whether the current initialization fails or a
+  previously scheduled notification remains. Driver failure attribution is
+  still open; changing the configured adapter is not an established fix.
+
+Research changes so far: zero tracked production/test lines. Diagnostic
+programs and captured frames remain in the packet's ignored bounded directory.
