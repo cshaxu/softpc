@@ -13,7 +13,7 @@ typedef struct media_page {
 } media_page;
 
 typedef struct media_slot {
-    lib_u32 present, mode, target_mode, cylinder;
+    lib_u32 present, mode, cylinder;
     lib_u64 size, page_count;
     lib_u8 digest[32];
     char path[SOFTPC_MEDIA_ARCHIVE_PATH_MAX];
@@ -315,23 +315,6 @@ lib_status softpc_media_archive_read(softpc_media_archive **archive,
     return LIB_STATUS_OK;
 }
 
-static lib_status media_target_mode(const media_slot *slot, unsigned index,
-    lib_storage_medium_mode hard_disk_mode, lib_storage_medium_mode *out_mode)
-{
-    if (slot == NULL || out_mode == NULL || hard_disk_mode > LIB_STORAGE_MEDIUM_OVERLAY)
-        return LIB_STATUS_INVALID_ARGUMENT;
-    if (index < 2u) {
-        *out_mode = (lib_storage_medium_mode)slot->mode;
-        return LIB_STATUS_OK;
-    }
-    if (slot->mode == LIB_STORAGE_MEDIUM_OVERLAY &&
-        hard_disk_mode == LIB_STORAGE_MEDIUM_READONLY)
-        return LIB_STATUS_INVALID_ARGUMENT;
-    *out_mode = hard_disk_mode == LIB_STORAGE_MEDIUM_OVERLAY ?
-        LIB_STORAGE_MEDIUM_OVERLAY : hard_disk_mode;
-    return LIB_STATUS_OK;
-}
-
 static lib_bool media_same_path(const media_slot *slot,
     const softpc_media_view *view)
 {
@@ -351,21 +334,22 @@ static lib_status media_apply_pages(const media_slot *slot,
     return status;
 }
 
-static lib_status media_prepare_slot(media_slot *slot, unsigned index,
-    lib_storage_medium_mode target_mode)
+static lib_status media_prepare_slot(const media_slot *slot)
 {
     softpc_media_view view;
     lib_storage_medium *base_opened = NULL;
-    lib_storage_medium *base;
+    lib_storage_medium *base = NULL;
     lib_status status;
+    unsigned i;
 
-    slot->target_mode = target_mode;
     if (!slot->present) return LIB_STATUS_OK;
-    media_view(index, &view);
-    if (media_same_path(slot, &view) &&
-        view.mode != LIB_STORAGE_MEDIUM_OVERLAY)
-        base = view.medium;
-    else {
+    for (i = 0; i < MEDIA_SLOTS && base == NULL; ++i) {
+        media_view(i, &view);
+        if (media_same_path(slot, &view) &&
+            view.mode != LIB_STORAGE_MEDIUM_OVERLAY)
+            base = view.medium;
+    }
+    if (base == NULL) {
         status = lib_storage_medium_open(slot->path, LIB_STORAGE_MEDIUM_READONLY,
             &base_opened);
         if (status != LIB_STATUS_OK) return status;
@@ -379,13 +363,12 @@ static lib_status media_prepare_slot(media_slot *slot, unsigned index,
     return status;
 }
 
-lib_status softpc_media_archive_prepare(softpc_media_archive *archive,
-    lib_storage_medium_mode hard_disk_mode)
+lib_status softpc_media_archive_prepare(softpc_media_archive *archive)
 {
     lib_status status = LIB_STATUS_OK;
     unsigned i;
 
-    if (archive == NULL || hard_disk_mode > LIB_STORAGE_MEDIUM_OVERLAY)
+    if (archive == NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     archive->prepared = LIB_FALSE;
     /* This product exposes only floppy A: and fixed disk C:.  Rejecting a
@@ -394,10 +377,7 @@ lib_status softpc_media_archive_prepare(softpc_media_archive *archive,
         return LIB_STATUS_INVALID_ARGUMENT;
     for (i = 0; i < MEDIA_SLOTS && status == LIB_STATUS_OK; ++i) {
         media_slot *slot = &archive->slots[i];
-        lib_storage_medium_mode target_mode;
-        status = media_target_mode(slot, i, hard_disk_mode, &target_mode);
-        if (status == LIB_STATUS_OK)
-            status = media_prepare_slot(slot, i, target_mode);
+        status = media_prepare_slot(slot);
     }
     if (status != LIB_STATUS_OK) return status;
     archive->prepared = LIB_TRUE;
@@ -413,7 +393,7 @@ lib_status softpc_media_archive_attachment(const softpc_media_archive *archive,
         return LIB_STATUS_INVALID_ARGUMENT;
     source = &archive->slots[slot];
     *path = source->present ? source->path : NULL;
-    *mode = (lib_storage_medium_mode)source->target_mode;
+    *mode = (lib_storage_medium_mode)source->mode;
     return LIB_STATUS_OK;
 }
 
@@ -427,54 +407,34 @@ lib_status softpc_media_archive_restore(softpc_media_archive *archive)
        attachment deliberately leaves that slot detached: preparation is the
        no-side-effect validation boundary, not a rollback transaction. */
     archive->prepared = LIB_FALSE;
+    /* Retire every old slot before opening any saved path: another slot may
+       currently hold that path with exclusive direct access. */
+    for (i = 0; i < MEDIA_SLOTS; ++i) {
+        lib_storage_medium *replacement = NULL;
+        lib_storage_medium_mode mode = (lib_storage_medium_mode)archive->slots[i].mode;
+        if (i < 2u)
+            status = softpc_floppy_media_restore(i, NULL, mode, &replacement, 0u);
+        else
+            status = softpc_hdd_media_restore(i - 2u, NULL, mode, &replacement);
+        if (status != LIB_STATUS_OK) return status;
+    }
     for (i = 0; i < MEDIA_SLOTS; ++i) {
         media_slot *slot = &archive->slots[i];
-        softpc_media_view view;
         lib_storage_medium *replacement = NULL;
-        lib_storage_medium_mode target = (lib_storage_medium_mode)slot->target_mode;
-        lib_bool retain;
-        media_view(i, &view);
-        if (!slot->present) {
+        lib_storage_medium_mode mode = (lib_storage_medium_mode)slot->mode;
+        if (!slot->present) continue;
+        status = lib_storage_medium_open(slot->path, mode, &replacement);
+        if (status == LIB_STATUS_OK) status = verify_base(slot, replacement);
+        if (status == LIB_STATUS_OK && mode == LIB_STORAGE_MEDIUM_OVERLAY)
+            status = media_apply_pages(slot, replacement);
+        if (status == LIB_STATUS_OK) {
             if (i < 2u)
-                status = softpc_floppy_media_restore(i, NULL, target,
-                    &replacement, 0u);
+                status = softpc_floppy_media_restore(i, slot->path, mode,
+                    &replacement, slot->cylinder);
             else
-                status = softpc_hdd_media_restore(i - 2u, NULL, target,
+                status = softpc_hdd_media_restore(i - 2u, slot->path, mode,
                     &replacement);
-            if (status != LIB_STATUS_OK) return status;
-            continue;
         }
-        /* An overlay always carries mutable pages beyond its verified base.
-           It therefore never qualifies as a retained attachment, including
-           when the saved source itself was readonly or direct. */
-        retain = target != LIB_STORAGE_MEDIUM_OVERLAY &&
-            slot->mode != LIB_STORAGE_MEDIUM_OVERLAY &&
-            media_same_path(slot, &view) && view.mode == target;
-        if (retain) {
-            status = verify_base(slot, view.medium);
-        } else {
-            if (i < 2u)
-                status = softpc_floppy_media_restore(i, NULL, target,
-                    &replacement, 0u);
-            else
-                status = softpc_hdd_media_restore(i - 2u, NULL, target,
-                    &replacement);
-            if (status != LIB_STATUS_OK) return status;
-            status = lib_storage_medium_open(slot->path, target, &replacement);
-            if (status == LIB_STATUS_OK) status = verify_base(slot, replacement);
-            if (status == LIB_STATUS_OK && slot->mode == LIB_STORAGE_MEDIUM_OVERLAY)
-                status = media_apply_pages(slot, replacement);
-            if (status != LIB_STATUS_OK) {
-                (void)lib_storage_medium_destroy(&replacement);
-                return status;
-            }
-        }
-        if (i < 2u)
-            status = softpc_floppy_media_restore(i, slot->path, target,
-                &replacement, slot->cylinder);
-        else
-            status = softpc_hdd_media_restore(i - 2u, slot->path, target,
-                &replacement);
         if (status != LIB_STATUS_OK) {
             (void)lib_storage_medium_destroy(&replacement);
             return status;

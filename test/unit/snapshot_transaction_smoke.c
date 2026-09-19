@@ -157,7 +157,8 @@ static lib_bool snapshot_media_bytes(lib_bool write, lib_bool later)
         lib_u8 value = (lib_u8)(0x41u + i);
         if (i == 0) softpc_floppy_media_view(0, &view);
         else softpc_hdd_media_view(0, &view);
-        if (view.medium == NULL) return LIB_FALSE;
+        if (view.medium == NULL || view.mode != LIB_STORAGE_MEDIUM_OVERLAY)
+            return LIB_FALSE;
         if (i == 0) {
             lib_storage_medium *no_replacement = NULL;
             if (write) {
@@ -382,6 +383,8 @@ static int snapshot_run_load(const char *startup_media_path, const char *snapsho
        let startup configuration leak into the restored image. */
     assert(snapshot_write_media(startup_media_path));
     snapshot_options(&options, startup_media_path);
+    options.floppy_mode = LIB_STORAGE_MEDIUM_READONLY;
+    options.hard_disk_mode = LIB_STORAGE_MEDIUM_DIRECT;
     if (!expect_success) options.memory_bytes = 1024u * 1024u;
     assert(softpc_machine_create(&options, &product) == SOFTPC_MACHINE_OK);
     assert(vm_driver_create(&driver, product) == LIB_STATUS_OK);

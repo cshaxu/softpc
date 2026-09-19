@@ -225,7 +225,7 @@ lib_status softpc_machine_prepare_media(softpc_machine *machine,
     lib_storage_medium_mode hard_disk_mode;
     lib_status status;
     if (machine == NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    status = softpc_media_archive_prepare(archive, machine->options.hard_disk_mode);
+    status = softpc_media_archive_prepare(archive);
     if (status != LIB_STATUS_OK) return status;
     status = softpc_media_archive_attachment(archive, 0u, &floppy_path,
         &floppy_mode);

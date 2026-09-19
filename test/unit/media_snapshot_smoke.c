@@ -5,6 +5,7 @@
 
 static softpc_media_view views[4];
 static char view_paths[4][SOFTPC_MEDIA_ARCHIVE_PATH_MAX];
+static unsigned detach_count[4], install_count[4];
 
 void softpc_floppy_media_view(unsigned slot, softpc_media_view *view)
 { *view = views[slot]; }
@@ -18,12 +19,15 @@ static lib_status replace(unsigned slot, const char *path,
     lib_status status;
     if (path == NULL) {
         if (*replacement != NULL) return LIB_STATUS_INVALID_ARGUMENT;
+        ++detach_count[slot];
         return lib_storage_medium_destroy(&views[slot].medium);
     }
     if (*replacement == NULL)
         return views[slot].medium != NULL && views[slot].mode == mode &&
             strcmp(views[slot].path, path) == 0 ? LIB_STATUS_OK :
             LIB_STATUS_INVALID_ARGUMENT;
+    assert(views[slot].medium == NULL);
+    ++install_count[slot];
     status = lib_storage_medium_replace(&views[slot].medium, *replacement, &retired);
     if (status != LIB_STATUS_OK) return status;
     *replacement = NULL;
@@ -126,10 +130,7 @@ int main(void)
     assert(softpc_media_archive_write(saved,write_bytes,&stream)==LIB_STATUS_OK);
     assert(softpc_media_archive_read(&decoded,read_bytes,&stream)==LIB_STATUS_OK);
     assert(stream.position==stream.count);
-    assert(softpc_media_archive_prepare(decoded,
-        LIB_STORAGE_MEDIUM_READONLY) != LIB_STATUS_OK);
-    assert(softpc_media_archive_prepare(decoded,
-        LIB_STORAGE_MEDIUM_OVERLAY) == LIB_STATUS_OK);
+    assert(softpc_media_archive_prepare(decoded) == LIB_STATUS_OK);
     /* A later write must not survive replacement, including an old dirty page. */
     assert(lib_storage_medium_fill_at(views[0].medium,1024,512,0xee)==LIB_STATUS_OK);
     views[0].cylinder=0;
@@ -177,39 +178,51 @@ int main(void)
         attach(0,path,(lib_storage_medium_mode)mode);
         assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
         assert(saved->slots[0].page_count==0);
-        assert(softpc_media_archive_prepare(saved,
-            LIB_STORAGE_MEDIUM_OVERLAY)==LIB_STATUS_OK);
+        assert(softpc_media_archive_prepare(saved)==LIB_STATUS_OK);
         assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
         assert(lib_storage_medium_destroy(&views[0].medium)==LIB_STATUS_OK);
         /* The saved external base must not silently change after capture. */
         file=fopen(path,"r+b"); assert(file!=NULL);
         assert(fputc(0x77,file)==0x77); assert(fclose(file)==0);
-        assert(softpc_media_archive_prepare(saved,
-            LIB_STORAGE_MEDIUM_OVERLAY)!=LIB_STATUS_OK);
+        assert(softpc_media_archive_prepare(saved)!=LIB_STATUS_OK);
         file=fopen(path,"r+b"); assert(file!=NULL);
         assert(fputc(0,file)==0); assert(fclose(file)==0);
         softpc_media_archive_dispose(&saved);
     }
-    /* Floppy always returns to its saved path and mode, independently of the
-       current startup setting. Fixed disk readonly/direct maps to the current
-       fixed-disk policy. */
-    attach(0,path,LIB_STORAGE_MEDIUM_READONLY);
-    attach(2,second_path,LIB_STORAGE_MEDIUM_READONLY);
+    /* Each saved mode overrides every current mode, for both drive kinds.
+       Same-path restore must detach/install once, not retain an old handle. */
+    for (unsigned saved_mode=0;saved_mode<=LIB_STORAGE_MEDIUM_OVERLAY;++saved_mode) {
+        for (unsigned live_mode=0;live_mode<=LIB_STORAGE_MEDIUM_OVERLAY;++live_mode) {
+            attach(0,path,(lib_storage_medium_mode)saved_mode);
+            attach(2,second_path,(lib_storage_medium_mode)saved_mode);
+            assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
+            attach(0,path,(lib_storage_medium_mode)live_mode);
+            attach(2,second_path,(lib_storage_medium_mode)live_mode);
+            memset(detach_count,0,sizeof(detach_count));
+            memset(install_count,0,sizeof(install_count));
+            assert(softpc_media_archive_prepare(saved)==LIB_STATUS_OK);
+            assert(detach_count[0]==0 && detach_count[2]==0);
+            assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
+            for (slot=0;slot<4;slot+=2) {
+                assert(detach_count[slot]==1 && install_count[slot]==1);
+                assert(views[slot].mode==(lib_storage_medium_mode)saved_mode);
+            }
+            softpc_media_archive_dispose(&saved);
+        }
+    }
+    /* Swapped live direct paths must both close before either saved path opens. */
+    assert(lib_storage_medium_destroy(&views[0].medium)==LIB_STATUS_OK);
+    assert(lib_storage_medium_destroy(&views[2].medium)==LIB_STATUS_OK);
+    attach(0,path,LIB_STORAGE_MEDIUM_DIRECT);
+    attach(2,second_path,LIB_STORAGE_MEDIUM_DIRECT);
     assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
-    attach(0,third_path,LIB_STORAGE_MEDIUM_DIRECT);
-    assert(softpc_media_archive_prepare(saved,
-        LIB_STORAGE_MEDIUM_DIRECT)==LIB_STATUS_OK);
+    assert(lib_storage_medium_destroy(&views[0].medium)==LIB_STATUS_OK);
+    assert(lib_storage_medium_destroy(&views[2].medium)==LIB_STATUS_OK);
+    attach(0,second_path,LIB_STORAGE_MEDIUM_DIRECT);
+    attach(2,path,LIB_STORAGE_MEDIUM_DIRECT);
+    assert(softpc_media_archive_prepare(saved)==LIB_STATUS_OK);
     assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
-    assert(strcmp(views[0].path,path)==0 &&
-        views[0].mode==LIB_STORAGE_MEDIUM_READONLY);
-    assert(strcmp(views[2].path,second_path)==0 &&
-        views[2].mode==LIB_STORAGE_MEDIUM_DIRECT);
-
-    /* A readonly/direct snapshot may instead open as an overlay. */
-    assert(softpc_media_archive_prepare(saved,
-        LIB_STORAGE_MEDIUM_OVERLAY)==LIB_STATUS_OK);
-    assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
-    assert(views[2].mode==LIB_STORAGE_MEDIUM_OVERLAY);
+    assert(strcmp(views[0].path,path)==0 && strcmp(views[2].path,second_path)==0);
     softpc_media_archive_dispose(&saved);
 
     /* Preparation has no retained verifier: a fresh direct target can open
@@ -218,8 +231,20 @@ int main(void)
     assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
     assert(lib_storage_medium_destroy(&views[0].medium)==LIB_STATUS_OK);
     views[0].path=NULL;
-    assert(softpc_media_archive_prepare(saved,
-        LIB_STORAGE_MEDIUM_DIRECT)==LIB_STATUS_OK);
+    /* Identical live content at another path cannot replace a missing saved
+       source; failed validation must not detach the existing HDD. */
+    {
+        char first = saved->slots[0].path[0];
+        unsigned detached = detach_count[2];
+        saved->slots[0].path[0] = '!';
+        assert(softpc_media_archive_prepare(saved)!=LIB_STATUS_OK);
+        saved->slots[0].path[0] = first;
+        ++saved->slots[0].size;
+        assert(softpc_media_archive_prepare(saved)!=LIB_STATUS_OK);
+        --saved->slots[0].size;
+        assert(detach_count[2]==detached);
+    }
+    assert(softpc_media_archive_prepare(saved)==LIB_STATUS_OK);
     {
         const char *attachment;
         lib_storage_medium_mode mode;
@@ -230,14 +255,12 @@ int main(void)
     assert(views[0].mode==LIB_STORAGE_MEDIUM_DIRECT);
     softpc_media_archive_dispose(&saved);
 
-    /* A readonly snapshot restored to an overlay never retains pages dirtied
-       after capture in the previously live overlay. */
+    /* A readonly snapshot replaces a live overlay and discards its later dirt. */
     attach(2,second_path,LIB_STORAGE_MEDIUM_READONLY);
     assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
     attach(2,second_path,LIB_STORAGE_MEDIUM_OVERLAY);
     assert(lib_storage_medium_fill_at(views[2].medium,1024,1,0x99)==LIB_STATUS_OK);
-    assert(softpc_media_archive_prepare(saved,
-        LIB_STORAGE_MEDIUM_OVERLAY)==LIB_STATUS_OK);
+    assert(softpc_media_archive_prepare(saved)==LIB_STATUS_OK);
     assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
     assert(lib_storage_medium_read_at(views[2].medium,1024,data,1)==LIB_STATUS_OK);
     assert(data[0]==0u);
@@ -248,8 +271,7 @@ int main(void)
     attach(2,third_path,LIB_STORAGE_MEDIUM_READONLY);
     assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
     attach(2,second_path,LIB_STORAGE_MEDIUM_READONLY);
-    assert(softpc_media_archive_prepare(saved,
-        LIB_STORAGE_MEDIUM_READONLY)==LIB_STATUS_OK);
+    assert(softpc_media_archive_prepare(saved)==LIB_STATUS_OK);
     assert(remove(third_path)==0);
     assert(softpc_media_archive_restore(saved)!=LIB_STATUS_OK);
     assert(views[2].medium==NULL);
@@ -257,23 +279,30 @@ int main(void)
     assert(fwrite(base,1,sizeof(base),file)==sizeof(base)); assert(fclose(file)==0);
     softpc_media_archive_dispose(&saved);
 
-    /* Overlay pages reject a readonly fixed-disk policy, but a direct policy
-       materializes them into the saved base before attaching that base direct. */
+    /* Saved overlay pages remain overlay data and do not modify the base. */
     attach(2,second_path,LIB_STORAGE_MEDIUM_OVERLAY);
     assert(lib_storage_medium_fill_at(views[2].medium,4096,512,0x9c)==LIB_STATUS_OK);
     assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
-    assert(softpc_media_archive_prepare(saved,
-        LIB_STORAGE_MEDIUM_READONLY)!=LIB_STATUS_OK);
-    assert(softpc_media_archive_prepare(saved,
-        LIB_STORAGE_MEDIUM_DIRECT)==LIB_STATUS_OK);
+    assert(softpc_media_archive_prepare(saved)==LIB_STATUS_OK);
     assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
     assert(strcmp(views[2].path,second_path)==0 &&
-        views[2].mode==LIB_STORAGE_MEDIUM_DIRECT);
+        views[2].mode==LIB_STORAGE_MEDIUM_OVERLAY);
     assert(lib_storage_medium_read_at(views[2].medium,4096,data,512)==LIB_STATUS_OK);
     memset(base,0x9c,512); assert(memcmp(base,data,512)==0);
     softpc_media_archive_dispose(&saved);
     assert(lib_storage_medium_destroy(&views[0].medium)==LIB_STATUS_OK);
     assert(lib_storage_medium_destroy(&views[2].medium)==LIB_STATUS_OK);
+    file=fopen(second_path,"rb"); assert(file!=NULL);
+    assert(fseek(file,4096,SEEK_SET)==0);
+    assert(fgetc(file)==0); assert(fclose(file)==0);
+    /* Absent saved slots detach subsequently mounted media. */
+    assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
+    attach(0,path,LIB_STORAGE_MEDIUM_READONLY);
+    attach(2,second_path,LIB_STORAGE_MEDIUM_READONLY);
+    assert(softpc_media_archive_prepare(saved)==LIB_STATUS_OK);
+    assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
+    assert(views[0].medium==NULL && views[2].medium==NULL);
+    softpc_media_archive_dispose(&saved);
     assert(remove(path)==0);
     assert(remove(second_path)==0);
     assert(remove(third_path)==0);

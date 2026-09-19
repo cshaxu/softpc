@@ -30,10 +30,8 @@ lib_status softpc_media_archive_write(const softpc_media_archive *archive,
     softpc_snapshot_bytes_write write, void *context);
 lib_status softpc_media_archive_read(softpc_media_archive **archive,
     softpc_snapshot_bytes_read read, void *context);
-/* Floppy restores its copied path/mode. Fixed disk restores its copied path,
-   but maps its saved mode through the current product hard-disk policy. */
-lib_status softpc_media_archive_prepare(softpc_media_archive *archive,
-    lib_storage_medium_mode hard_disk_mode);
+/* Verify the saved paths and return their saved modes, independent of INI. */
+lib_status softpc_media_archive_prepare(softpc_media_archive *archive);
 /* Returns the selected snapshot attachment after successful preparation.
    The returned path is borrowed from the archive and is copied by the VM
    before its first hardware reset. */
