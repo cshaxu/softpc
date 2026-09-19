@@ -4,8 +4,29 @@
 
 M9 T70 S9 is closed after the package-test root cause was repaired and both
 widths passed 109/109. Implementation deliveries are `5d6fe18` and `7c0c786`.
-No implementation subtask is active.
-Open task awaiting owner: T70.
+M9 T70 S10 is admitted for research into startup-logo half-height output and
+the installed Win95 desktop display-settings warning. T70 remains open.
+
+## M9 T70 S10 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner confirmed successful Win95 installation, supplied two screenshots and fixture, then explicitly admitted S10 research. |
+| Objective | Explain the startup image's black lower half and desktop display-settings warning using code and runtime evidence. |
+| Non-goals | No speculative fix, guest configuration/media mutation, Lib/Common change or snapshot contract change. |
+| Reference Baseline | S9 deliveries 5d6fe18, 7c0c786 and closure 75aa224; both widths 109/109; owner confirms installed desktop works. |
+| Candidate Proposal | [Startup display investigation](../proposals/m9-win95-display-startup.md). |
+| Files And ABI Surface | Read VM/Compat/MVDM display paths and guest configuration; no production ABI changes. |
+| Applicable Rules | Execution, documentation, architecture, coding, source/research and product UI authorities. |
+| Verification | Read-only fixture inspection; bounded overlay boot; correlate frame geometry, video registers and display-driver initialization. |
+| Expected Markers | Separate evidence for logo row mapping and desktop warning, with justified repair owner or explicit unresolved alternatives. |
+| Asset Needs | Owner's installed image/INI/EXE; preserve originals; build/t70-s10 bounded to 600 seconds and 64 MiB per run plus one optional 128 MiB checkpoint. |
+| Reporting Requirements | Reproduction, component attribution, candidate minimal fix and estimated diff; distinguish observation from inference. |
+| Stop Conditions | Need for guest-media mutation, unapproved shared-corpus change, or missing reproduction evidence. |
+| Exit Criteria | Research report accounts for both symptoms and states proven cause or next discriminating observation; implementation requires separate approval. |
+| Original Owner Request | Startup picture only fills the upper half; desktop reports incorrect display configuration; “准入S10调研”. |
+| Similar-Issue Sweep | Compare related packed/planar painter height and scanline paths once the failing contract is established. |
 
 ## Current Technical Baseline
 
@@ -16,7 +37,7 @@ Open task awaiting owner: T70.
   The stage-16 failures were a test-launch visibility conflict, now repaired
   without changing the product binaries or weakening assertions.
   Cold-start observation also reaches the date/time installation dialog.
-  Further interactive installation was stopped by the owner, not claimed complete.
+  Owner subsequently confirms successful installation and normal desktop operation.
   See [bounded observations](../history/M9-T70-S9-win95-first-boot.md#cold-start-observation).
 - S8 removes INI mode conversion and same-path attachment retention. Snapshot
   restore first detaches all slots, then reopens saved paths/modes and applies
@@ -56,5 +77,4 @@ Open task awaiting owner: T70.
 
 ## Recent Governance
 
-T70 S9 closes after P5 actual-change review, dual-width full regression and
-both display-route checks. T70 remains open; queue order is unchanged.
+T70 S9 is accepted; S10 is the sole active research task. Queue order is unchanged.
