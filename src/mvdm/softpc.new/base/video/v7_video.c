@@ -282,10 +282,10 @@ v7vga_extended_set_mode()
 	set_host_pix_height(1);
 	set_banking( 0, 0 );
 
-	if (is_bad_vid_mode(getBL()) && !is_v7vga_mode(getBL()))
-		return;
-
+	/* T70 S10: validate the mode, not its preserve-memory flag. */
 	video_mode = getBL() & 0x7F; /* get rid of top bit - indicates clear or not */
+	if (is_bad_vid_mode(video_mode) && !is_v7vga_mode(video_mode))
+		return;
 
 	/*
 	 * The method of storing an extended video mode according to a real BIOS is

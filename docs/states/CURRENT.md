@@ -4,32 +4,40 @@
 
 M9 T70 S9 is closed after the package-test root cause was repaired and both
 widths passed 109/109. Implementation deliveries are `5d6fe18` and `7c0c786`.
-M9 T70 S10 is admitted for research into startup-logo half-height output and
-the installed Win95 desktop display-settings warning. T70 remains open.
+M9 T70 S10 repairs startup-logo half-height output and the installed Win95
+desktop display-settings warning. Implementation and dual-width verification
+are complete; owner validation is pending. T70 remains open.
 
 ## M9 T70 S10 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner confirmed successful Win95 installation, supplied two screenshots and fixture, then explicitly admitted S10 research. |
-| Objective | Explain the startup image's black lower half and desktop display-settings warning using code and runtime evidence. |
+| Admission And Approval | Owner admitted research, then approved implementing the proven repairs: “批准啊，这种不需要问我”. |
+| Objective | Repair the proven VGA stride and Video Seven preserve-mode validation defects, retaining original device semantics. |
 | Non-goals | No speculative fix, guest configuration/media mutation, Lib/Common change or snapshot contract change. |
 | Reference Baseline | S9 deliveries 5d6fe18, 7c0c786 and closure 75aa224; both widths 109/109; owner confirms installed desktop works. |
 | Candidate Proposal | [Startup display investigation](../proposals/m9-win95-display-startup.md). |
-| Files And ABI Surface | Read VM/Compat/MVDM display paths and guest configuration; no production ABI changes. |
+| Files And ABI Surface | Narrow vga_mode.c and v7_video.c repairs, existing VGA regression test and mirror ledger; no production ABI changes. |
 | Applicable Rules | Execution, documentation, architecture, coding, source/research and product UI authorities. |
-| Verification | Read-only fixture inspection; bounded overlay boot; correlate frame geometry, video registers and display-driver initialization. |
-| Expected Markers | Separate evidence for logo row mapping and desktop warning, with justified repair owner or explicit unresolved alternatives. |
+| Verification | Dual-width VGA regression and full suites; bounded overlay boot verifies complete logo and successful installed-driver initialization. |
+| Expected Markers | Complete logo and successful installed-driver initialization without guest configuration changes; original VGA/V7 owners retained. |
 | Asset Needs | Owner's installed image/INI/EXE; preserve originals; build/t70-s10 bounded to 600 seconds and 64 MiB per run plus one optional 128 MiB checkpoint. |
-| Reporting Requirements | Reproduction, component attribution, candidate minimal fix and estimated diff; distinguish observation from inference. |
+| Reporting Requirements | Actual mirror/test diff, dual-width results and executable links; distinguish observation from inference. |
 | Stop Conditions | Need for guest-media mutation, unapproved shared-corpus change, or missing reproduction evidence. |
-| Exit Criteria | Research report accounts for both symptoms and states proven cause or next discriminating observation; implementation requires separate approval. |
+| Exit Criteria | Both proven defects repaired and covered; dual-width build/test evidence, rebuilt EXEs and pushed delivery; await owner validation. |
 | Original Owner Request | Startup picture only fills the upper half; desktop reports incorrect display configuration; “准入S10调研”. |
 | Similar-Issue Sweep | Compare related packed/planar painter height and scanline paths once the failing contract is established. |
 
 ## Current Technical Baseline
 
+- S10 repairs the planar 256-colour stride/wrap units and masks the V7
+  preserve-memory flag before validating the mode number. Two mirror files
+  +6/-5, existing VGA test +76/-0; Lib/Common/VM/Compat unchanged. Both widths
+  pass 109/109, including snapshot and package tests. Overlay cold boot shows
+  the complete logo and normal desktop without the former warning; a restored
+  checkpoint reaches the same desktop. Both EXEs are rebuilt; source media
+  and INI are unchanged. See [S10 evidence](../proposals/m9-win95-display-startup.md#implementation-evidence).
 - S9 isolates read-time PIT guesses generating spurious IRQ0 work. The
   candidate timer.c repair and fixed-clock test are present; both package
   EXEs are rebuilt. Cold start reaches Win95's hardware/PnP dialog.
@@ -77,4 +85,4 @@ the installed Win95 desktop display-settings warning. T70 remains open.
 
 ## Recent Governance
 
-T70 S9 is accepted; S10 is the sole active research task. Queue order is unchanged.
+T70 S9 is accepted; S10 is the sole active implementation task. Queue order is unchanged.

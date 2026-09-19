@@ -468,6 +468,7 @@ boolean	choose_vga_display_mode()
 	 * offset_per_line depends upon whether chained addressing is being
 	 * used. This is because we interleave the planes, rather than
 	 * anything the EGA does.
+	 * T70 S10: planar 256-colour scanout is independent of odd/even CPU addressing.
 	 */
 
 	if( get_chain4_mode() )
@@ -475,7 +476,7 @@ boolean	choose_vga_display_mode()
 		set_offset_per_line_recal(get_actual_offset_per_line() << 2);
 	}
 	else
-		if( get_memory_chained() )
+		if( get_memory_chained() && !get_256_colour_mode() )
 		{
 			set_offset_per_line_recal(get_actual_offset_per_line() << 1);
 		}
@@ -502,7 +503,7 @@ boolean	choose_vga_display_mode()
 						+ get_screen_length() > 4*EGA_PLANE_DISP_SIZE );
 		}
 		else
-			if ( get_memory_chained() )
+			if ( get_memory_chained() && !get_256_colour_mode() )
 			{
 				set_screen_can_wrap( (get_screen_start()<<1)
 							+ get_screen_length() > 2*EGA_PLANE_DISP_SIZE );

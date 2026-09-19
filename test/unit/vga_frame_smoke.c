@@ -635,6 +635,80 @@ static void verify_snapshot_rebuilds_graphics_surface(softpc_machine *machine)
     }
 }
 
+static void verify_display_stride(void)
+{
+    extern boolean choose_vga_display_mode(void);
+    unsigned colour, chained, chain4, edge;
+    /* Exercise the original mode selector, not a painter with a manually
+       corrected stride. The same derived units govern length and wrap. */
+    set_actual_offset_per_line(80);
+    set_seq_chain_mode(FALSE);
+    set_seq_chain4_mode(FALSE);
+    for (colour = 0; colour < 2; ++colour)
+    for (chained = 0; chained < 2; ++chained)
+    for (chain4 = 0; chain4 < 2; ++chain4)
+    for (edge = 0; edge < 2; ++edge) {
+        unsigned scale = chain4 ? 4 : chained && !colour ? 2 : 1;
+        set_screen_height(399);
+        set_char_height(1);
+        set_256_colour_mode(colour);
+        set_memory_chained(chained);
+        set_chain4_mode(chain4);
+        set_screen_start(EGA_PLANE_DISP_SIZE - 80 * 400 + edge);
+        choose_vga_display_mode();
+        assert(get_offset_per_line() == 80 * scale);
+        assert(get_screen_length() == 80 * scale * 400);
+        assert(!!get_screen_can_wrap() == edge);
+    }
+}
+
+static void verify_preserved_v7_modes(void)
+{
+    extern void outb(io_addr port, half_word value);
+    extern IU8 c_sas_hw_at(IU32 addr);
+    extern void c_sas_store(IU32 addr, IU8 val);
+    unsigned mode;
+    for (mode = 0x40; mode <= 0x69; ++mode) {
+        if (mode == 0x46)
+            mode = 0x60;
+        c_setAH(0x6f); c_setAL(5); c_setBX((unsigned short)mode);
+        assert(softpc_device_bop_dispatch(0x42, 0));
+        assert(Currently_emulated_video_mode == mode);
+        EGA_planes[0] = 0x5a;
+        c_setAH(0x6f); c_setAL(5); c_setBX((unsigned short)(mode | 0x80));
+        assert(softpc_device_bop_dispatch(0x42, 0));
+        assert(Currently_emulated_video_mode == mode);
+        if (mode >= 0x60)
+            assert(EGA_planes[0] == 0x5a);
+        /* Query the mode through the BIOS, not just its cached variable. */
+        c_setAH(0x6f); c_setAL(4);
+        assert(softpc_device_bop_dispatch(0x42, 0));
+        assert((c_getAX() & 0xff) == mode);
+        if (mode >= 0x60) {
+            c_setAH(0x6f); c_setAL(5); c_setBX((unsigned short)mode);
+            assert(softpc_device_bop_dispatch(0x42, 0));
+            assert(EGA_planes[0] != 0x5a);
+        }
+    }
+    /* A different preserved mode must actually activate, not silently retain
+       the previous valid mode. This is the driver initialization failure. */
+    c_setAH(0x6f); c_setAL(5); c_setBX(0xe7);
+    assert(softpc_device_bop_dispatch(0x42, 0));
+    assert(Currently_emulated_video_mode == 0x67);
+    /* The requested packed mode must establish independent CPU banks too. */
+    outb(0x3c4, 6); outb(0x3c5, 0xea);
+    outb(0x3c4, 0xf9); outb(0x3c5, 0);
+    c_sas_store(0xa0000, 0x5a);
+    outb(0x3c4, 0xf9); outb(0x3c5, 1);
+    c_sas_store(0xa0000, 0xa5);
+    assert(c_sas_hw_at(0xa0000) == 0xa5);
+    outb(0x3c4, 0xf9); outb(0x3c5, 0);
+    assert(c_sas_hw_at(0xa0000) == 0x5a);
+    c_setAH(0x6f); c_setAL(5); c_setBX(0xff);
+    assert(softpc_device_bop_dispatch(0x42, 0));
+    assert(Currently_emulated_video_mode == 0x67);
+}
+
 static void verify_snapshot_video_writes(softpc_machine *machine)
 {
     extern void vga_gc_outw(io_addr port, word value);
@@ -994,6 +1068,8 @@ int main(void)
     verify_driver_geometry(machine);
     verify_snapshot_rebuilds_graphics_surface(machine);
     verify_snapshot_video_writes(machine);
+    verify_preserved_v7_modes();
+    verify_display_stride();
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     return 0;

@@ -92,5 +92,58 @@ the source diagnosis alone does not establish successful repaired operation.
 Estimated production surface for the two candidates is `vga_mode.c` (display
 stride condition) and `v7_video.c` (mode validation ordering), roughly 5--15
 changed lines before reason markers, plus focused regression tests. This is
-an estimate, not an implementation admission or acceptance. S10 remains open
-pending the repair-boundary decision; no product fix has been delivered.
+an estimate, not an acceptance claim.
+
+## Approved implementation
+
+The owner approved the two proven repairs. Retain the original device owners
+and interfaces; do not change Lib/Common, guest settings, media or snapshot
+format. Estimated production change remains 5--15 lines in two mirror files;
+focused tests extend the existing VGA smoke rather than add a framework.
+
+The finite verification universe is: (1) planar 256-colour stride versus
+odd/even and chain-four addressing, including downstream row/wrap units;
+(2) extended BIOS mode numbers with/without preserve bit, clear/preserve
+semantics and invalid requests; (3) real installed-driver initialization and
+complete boot-logo output; (4) both-width full regression and package builds.
+Each requires passed evidence or an explicit unresolved result, never a
+guest-specific workaround. Completion requires all four and a mirror-diff
+review. S10 remains open pending implementation and owner validation.
+
+## Implementation evidence
+
+Production changes are +6/-5 in the two named mirror files (net +1), measured
+with `git diff 6541e43 --numstat -- src`. No Lib/Common/VM/Compat production
+changes, interfaces, state or guest-detection branches were added. The existing
+VGA smoke gains 76 lines; it covers sixteen stride/wrap combinations, all
+sixteen legal V7 extended modes with/without bit 7, graphics clear/preserve,
+invalid-mode rejection and independent packed-memory banks. The pre-fix
+preserved-mode transition failed; the repaired smoke passes on both widths.
+Existing dirty/split/panning/painter-boundary cases remain in that same test.
+
+A bounded checkpoint boot now records successful E7 activation and the BIOS
+query returning mode 67. The installed driver reaches the normal desktop and
+welcome window without the prior display warning. A separate overlay cold
+boot produces the complete 640-by-400 logo and the same normal desktop.
+Neither run uses the diagnostic stride override; both link the repaired
+production objects. The source medium's SHA-256 is unchanged.
+
+Similar-issue sweep: `is_v7vga_mode` callers in `ega_vide.c` and `mouse_io.c`
+consume decoded current/next mode values rather than a set-mode flag-bearing
+BL, so their predicate remains unchanged. The native-host macro override
+does not validate a BIOS request. In `vga_mode.c`, stride and wrap calculations
+are corrected together; screen-pointer selection is retained because it
+selects the original memory-plane receiver rather than a scanline increment.
+The planar VGA painters consume the corrected stride directly; no compensating
+scale is added to painters or presentation.
+
+Both Release builds pass 109/109 full CTest cases, including snapshot and
+package integration, and documentation governance passes. Package x86 size
+is unchanged; x64 shrinks by 512 bytes. Executable SHA-256 values:
+
+- x86: `1A3BE8FC4EB4BAE846B647133072C7FEEED1D1CE4590D9EE8DED7A77823446AD`
+- x64: `1E3BEA1CAD9FDB5FE9C02619FCD44547440E88C33F97DF8653E81826841E5EE7`
+
+Coordinator review confirms only the two original device calculations changed;
+no diagnostic hooks, guest configuration or media are included in the delivery.
+The implementation is ready for owner testing, not automatic T70 closure.

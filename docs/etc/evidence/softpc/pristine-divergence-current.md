@@ -1,5 +1,16 @@
 # MVDM / OpenNT 当前差异账本
 
+### T70 S10 显示初始化修复
+
+相对 S10 调研提交 `6541e43`，`base/video/vga_mode.c` +3/-2，
+`base/video/v7_video.c` +3/-3，生产合计 +6/-5。前者使 planar
+256-colour 的显示步长及 wrap 判定使用同一 plane 地址单位，不再
+套用 CPU odd/even 的双倍单位；chain-four 和非 256-colour 不变。
+后者先从 BL 提取模式号，再验证合法性；原 BL 的显存保留位继续供
+原清屏逻辑使用。两处均留在原设备实现，没有 standalone/客户机分支，
+不移动到 Compat 形成第二实现。T69 恢复原文件的历史记录不改写。
+测试与运行证据见 [S10 记录](../../../proposals/m9-win95-display-startup.md)。
+
 ### T70 S9 在验增量
 
 `base/system/timer.c` 的 `updateCount` 区分真实时钟推进与读数估算；估算
