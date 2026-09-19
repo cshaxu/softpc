@@ -809,31 +809,17 @@ static lib_win32_dword LIB_WIN32_WINAPI kvm_window_worker(void *opaque)
         state->startup_status = LIB_STATUS_INVALID_STATE;
         return 0u; /* Creator also observes worker exit. */
     }
-    if (!lib_win32_set_window_text_a(window, component->initial_title)) {
-        (void)win32_window_destroy(context, window);
-        state->startup_status = LIB_STATUS_IO_ERROR;
-        return 0u; /* Creator also observes worker exit. */
-    }
+    state->startup_status = LIB_STATUS_IO_ERROR;
+    if (!lib_win32_set_window_text_a(window, component->initial_title)) goto startup_failed;
     context->transparent_cursor = win32_window_create_transparent_cursor();
-    if (context->transparent_cursor == LIB_NULL) {
-        (void)win32_window_destroy(context, window);
-        state->startup_status = LIB_STATUS_IO_ERROR;
-        return 0u; /* Creator also observes worker exit. */
-    }
+    if (context->transparent_cursor == LIB_NULL) goto startup_failed;
     if (!context->frozen && !lib_win32_set_timer(window,
-            WIN32_WINDOW_CURSOR_TIMER, WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS, LIB_NULL)) {
-        (void)win32_window_destroy(context, window);
-        state->startup_status = LIB_STATUS_IO_ERROR;
-        return 0u; /* Creator also observes worker exit. */
-    }
-    state->startup_status = LIB_STATUS_OK;
+            WIN32_WINDOW_CURSOR_TIMER, WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS, LIB_NULL))
+        goto startup_failed;
     context->window = window;
     state->startup_status = kvm_component_mailboxes_select_notify(&component->base.mailboxes,
         win32_window_notify, context);
-    if (state->startup_status != LIB_STATUS_OK) {
-        (void)win32_window_destroy(context, window);
-        return 0u;
-    }
+    if (state->startup_status != LIB_STATUS_OK) goto startup_failed;
     kvm_win32_mouse_reset(&context->mouse);
     lib_win32_send_message_a(window, WIN32_WINDOW_MAILBOX_READY, 0, 0);
     lib_win32_show_window(window, LIB_WIN32_SW_SHOW);
@@ -866,6 +852,10 @@ static lib_win32_dword LIB_WIN32_WINAPI kvm_window_worker(void *opaque)
         kvm_component_fail(&component->base, LIB_STATUS_IO_ERROR);
     kvm_component_retire(&component->base, LIB_STATUS_OK);
     return 0u;
+
+startup_failed:
+    (void)win32_window_destroy(context, window);
+    return 0u; /* Creator observes worker exit and the original startup status. */
 }
 
 lib_status kvm_window_worker_start(kvm_window *component)

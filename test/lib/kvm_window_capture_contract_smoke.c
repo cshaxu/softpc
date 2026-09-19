@@ -297,7 +297,10 @@ int main(void)
         kvm_window_constrain_sizing(&r,(kvm_window_edge)edge,16,29,640,480);
         int w=r.right-r.left-16,h=r.bottom-r.top-29;
         assert((edge==KVM_WINDOW_EDGE_LEFT || edge==KVM_WINDOW_EDGE_RIGHT) ?
-            (w==800 && h==600) : (w==933 && h==700));
+            (w==800 && h==600) : (w==934 && h==700));
+        int fitted_w,fitted_h;
+        assert(kvm_window_fit_aspect_size(w,h,640,480,&fitted_w,&fitted_h));
+        assert(fitted_w==w && fitted_h==h);
         assert((edge==KVM_WINDOW_EDGE_LEFT || edge==KVM_WINDOW_EDGE_TOPLEFT || edge==KVM_WINDOW_EDGE_BOTTOMLEFT) ? r.right==826 : r.left==10);
         assert((edge==KVM_WINDOW_EDGE_TOP || edge==KVM_WINDOW_EDGE_TOPLEFT || edge==KVM_WINDOW_EDGE_TOPRIGHT) ? r.bottom==749 : r.top==20);
     }

@@ -11,6 +11,12 @@ static lib_bool heartbeat;
 static common_machine_executor_callback executor;
 static void *executor_context;
 static common_machine_state observed[8];
+static lib_bool reject_destroy;
+static lib_status destroy_task(base_sync_task *task)
+{
+    if (reject_destroy) return LIB_STATUS_IO_ERROR;
+    return task == (base_sync_task *)1 ? LIB_STATUS_OK : base_sync_task_destroy(task);
+}
 static base_sync_wait_result paused_wait(base_sync_event *const *events,
     lib_u32 count, const base_sync_task *task, lib_u32 timeout, lib_u32 *index);
 static base_sync_wait_result idle_wait(base_sync_event *event, lib_u32 timeout);
@@ -20,6 +26,7 @@ static lib_status no_thread(base_sync_task_entry entry, void *context,
 static lib_bool not_cancelled(const base_sync_task *task)
 { (void)task; return LIB_FALSE; }
 #define base_sync_task_create no_thread
+#define base_sync_task_destroy destroy_task
 #define base_sync_task_cancelled not_cancelled
 #define base_sync_event_wait idle_wait
 #define base_sync_wait_any paused_wait
@@ -28,6 +35,7 @@ static lib_bool not_cancelled(const base_sync_task *task)
 #undef base_sync_event_wait
 #undef base_sync_task_cancelled
 #undef base_sync_task_create
+#undef base_sync_task_destroy
 
 static base_sync_wait_result idle_wait(base_sync_event *event, lib_u32 timeout)
 {
@@ -120,7 +128,16 @@ static void check(base_sync_wait_result result, unsigned requested_action)
         assert(observed[2] == COMMON_MACHINE_RESET_COMPLETED);
         assert(observed[3] == COMMON_MACHINE_STOPPED);
     } else assert(facts == 3u && observed[2] == COMMON_MACHINE_STOPPED);
-    common_machine_destroy(active);
+    /* A failed join must retain the worker and every referenced machine field. */
+    active->worker = (base_sync_task *)1;
+    reject_destroy = LIB_TRUE;
+    assert(common_machine_shutdown(active) == LIB_STATUS_IO_ERROR);
+    assert(common_machine_destroy(active) == LIB_STATUS_IO_ERROR);
+    assert(active->worker == (base_sync_task *)1 && active->frame_buffers[0]);
+    assert(base_sync_event_signal(active->command_event) == LIB_STATUS_OK);
+    reject_destroy = LIB_FALSE;
+    assert(common_machine_shutdown(active) == LIB_STATUS_OK && !active->worker);
+    assert(common_machine_destroy(active) == LIB_STATUS_OK);
 }
 
 int main(void)

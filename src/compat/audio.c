@@ -2,6 +2,7 @@
 #include "host_def.h"
 #include "audio.h"
 #include "lib/base/sync_interface.h"
+#include <stdio.h>
 
 /* Standalone audio is only a presentation sink.  nt_sound.c owns the
    original PPI/Timer2 state transitions and requests a frequency here. */
@@ -82,7 +83,10 @@ void softpc_platform_audio_shutdown(void)
     {
         base_sync_event_signal(softpc_speaker_stop);
         base_sync_event_signal(softpc_speaker_wake);
-        base_sync_task_destroy(softpc_speaker_task);
+        if (base_sync_task_destroy(softpc_speaker_task) != LIB_STATUS_OK) {
+            fputs("softpcvm: cannot join audio worker\n", stderr);
+            return; /* Retain its global events until a successful join. */
+        }
         softpc_speaker_task = NULL;
     }
     base_sync_event_destroy(softpc_speaker_wake);

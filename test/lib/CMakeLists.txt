@@ -37,6 +37,9 @@ lib_test(win32_presentation kvm-base)
 lib_test(win32_window_bounds kvm-window)
 lib_test(linux_wait_contract types)
 lib_test(linux_storage_contract types)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    lib_test(linux_storage_lock storage)
+endif()
 lib_test(linux_input_contract types)
 target_sources(lib-test-linux_input_contract PRIVATE
     "${LIB_ROOT}/kvm-base/input.c" "${LIB_ROOT}/kvm-base/linux/input.c"

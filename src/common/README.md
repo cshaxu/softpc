@@ -72,6 +72,8 @@ count separately from text length; callers must not use text length as a PC step
 Machine shutdown synchronously joins its worker and all callbacks without
 freeing the machine object. The serialized owner may then release callback
 targets and finally destroy the machine/driver; destroy reuses shutdown.
+Both return status. Failed shutdown/destroy retains ownership; callback targets
+and the driver must remain alive until shutdown succeeds.
 Shutdown is permanent and idempotent, unlike the restartable product stop.
 
 ## Independent verification

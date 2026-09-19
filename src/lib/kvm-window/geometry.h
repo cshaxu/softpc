@@ -16,6 +16,7 @@ int kvm_window_fit_outer_rect(const kvm_window_rect *work, int width, int height
     kvm_window_rect *out);
 int kvm_window_fit_client_size(const kvm_window_rect *work, int decoration_width,
     int decoration_height, int width, int height, int *out_width, int *out_height);
+/* Fit within bounds with upward pixel rounding; refitting the result is stable. */
 int kvm_window_fit_aspect_size(int width, int height, lib_u32 source_width,
     lib_u32 source_height, int *out_width, int *out_height);
 int kvm_window_cursor_rect(const kvm_frame *frame, const kvm_window_rect *display,

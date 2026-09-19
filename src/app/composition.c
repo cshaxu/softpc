@@ -4,6 +4,7 @@
 #include "common/ui/ui_interface.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 /* Adapt the provider's one context and reserve the same command admission
  * boundary for keyboard-derived requests. Product meaning stays in keyboard. */
@@ -142,7 +143,10 @@ done:
     if (result != LIB_STATUS_OK)
         fprintf(stderr, "softpcvm: %s\n", result == LIB_STATUS_INVALID_ARGUMENT ?
             "invalid argument or media" : "host I/O error");
-    common_machine_shutdown(machine_runtime);
+    if (common_machine_shutdown(machine_runtime) != LIB_STATUS_OK) {
+        fputs("softpcvm: cannot join machine worker\n", stderr);
+        exit(EXIT_FAILURE); /* Callback targets must outlive an unjoined worker. */
+    }
     (void)common_ui_destroy(ui);
     (void)common_session_destroy(session);
     app_command_dispose(&commands);

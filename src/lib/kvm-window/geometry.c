@@ -1,5 +1,11 @@
 #include "lib/kvm-window/geometry.h"
 
+/* Ceiling preserves the limiting axis when integer bounds are fitted again. */
+static int kvm_window_scale_extent(int extent, lib_u32 numerator, lib_u32 denominator)
+{
+    return (int)(((lib_u64)extent * numerator + denominator - 1u) / denominator);
+}
+
 void kvm_window_map_dirty_rect(const kvm_window_rect *source, const kvm_window_rect *display,
     lib_u32 source_width, lib_u32 source_height, kvm_window_rect *target)
 {
@@ -36,17 +42,8 @@ int kvm_window_fit_outer_rect(const kvm_window_rect *work_area, int desired_widt
     width = desired_width;
     height = desired_height;
     if (width > available_width || height > available_height) {
-        if ((lib_u64)available_width * (lib_u64)desired_height <=
-            (lib_u64)available_height * (lib_u64)desired_width) {
-            width = available_width;
-            height = (int)((lib_u64)width * (lib_u64)desired_height /
-                (lib_u64)desired_width);
-        } else {
-            height = available_height;
-            width = (int)((lib_u64)height * (lib_u64)desired_width /
-                (lib_u64)desired_height);
-        }
-        if (width <= 0 || height <= 0) return 0;
+        if (!kvm_window_fit_aspect_size(available_width, available_height,
+                (lib_u32)desired_width, (lib_u32)desired_height, &width, &height)) return 0;
     }
     fitted->left = work_area->left + (available_width - width) / 2;
     fitted->top = work_area->top + (available_height - height) / 2;
@@ -91,10 +88,10 @@ int kvm_window_fit_aspect_size(int available_width, int available_height,
     if ((lib_u64)available_width * source_height <=
         (lib_u64)available_height * source_width) {
         width = available_width;
-        height = (int)((lib_u64)width * source_height / source_width);
+        height = kvm_window_scale_extent(width, source_height, source_width);
     } else {
         height = available_height;
-        width = (int)((lib_u64)height * source_width / source_height);
+        width = kvm_window_scale_extent(height, source_width, source_height);
     }
     if (width <= 0 || height <= 0) return 0;
     *fitted_width = width;
@@ -146,18 +143,14 @@ void kvm_window_constrain_sizing(kvm_window_rect *outer, kvm_window_edge edge,
     client_height = target_height - frame_height;
     if (client_width <= 0 || client_height <= 0) return;
     if (edge == KVM_WINDOW_EDGE_LEFT || edge == KVM_WINDOW_EDGE_RIGHT) {
-        client_height = (int)((lib_u64)client_width * source_height /
-            source_width);
+        client_height = kvm_window_scale_extent(client_width, source_height, source_width);
     } else if (edge == KVM_WINDOW_EDGE_TOP || edge == KVM_WINDOW_EDGE_BOTTOM) {
-        client_width = (int)((lib_u64)client_height * source_width /
-            source_height);
+        client_width = kvm_window_scale_extent(client_height, source_width, source_height);
     } else if ((lib_u64)client_width * source_height >=
         (lib_u64)client_height * source_width) {
-        client_height = (int)((lib_u64)client_width * source_height /
-            source_width);
+        client_height = kvm_window_scale_extent(client_width, source_height, source_width);
     } else {
-        client_width = (int)((lib_u64)client_height * source_width /
-            source_height);
+        client_width = kvm_window_scale_extent(client_height, source_width, source_height);
     }
     target_width = client_width + frame_width;
     target_height = client_height + frame_height;

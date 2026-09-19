@@ -748,22 +748,27 @@ lib_status common_machine_debug_execute_with_lease(common_machine *machine,
     return machine->debug_status;
 }
 
-void common_machine_shutdown(common_machine *machine)
+lib_status common_machine_shutdown(common_machine *machine)
 {
-    if (machine == NULL || machine->worker == NULL) return;
+    lib_status status;
+    if (machine == NULL || machine->worker == NULL) return LIB_STATUS_OK;
     common_machine_debug_invalidate(machine);
     (void)common_machine_stop(machine);
     lib_atomic_i32_exchange_explicit(&machine->terminate_requested, 1, LIB_MEMORY_ORDER_SEQ_CST);
     if (machine->resume_event != NULL) base_sync_event_signal(machine->resume_event);
     if (machine->command_event != NULL) base_sync_event_signal(machine->command_event);
-    base_sync_task_destroy(machine->worker);
+    status = base_sync_task_destroy(machine->worker);
+    if (status != LIB_STATUS_OK) return status;
     machine->worker = NULL;
+    return LIB_STATUS_OK;
 }
 
-void common_machine_destroy(common_machine *machine)
+lib_status common_machine_destroy(common_machine *machine)
 {
-    if (machine == NULL) return;
-    common_machine_shutdown(machine);
+    lib_status status;
+    if (machine == NULL) return LIB_STATUS_OK;
+    status = common_machine_shutdown(machine);
+    if (status != LIB_STATUS_OK) return status;
     base_sync_event_destroy(machine->ready_event);
     base_sync_event_destroy(machine->resume_event);
     base_sync_event_destroy(machine->input_event);
@@ -776,4 +781,5 @@ void common_machine_destroy(common_machine *machine)
     lib_release(machine->frame_buffers[1]);
     base_sync_event_destroy(machine->command_event);
     lib_release(machine);
+    return LIB_STATUS_OK;
 }

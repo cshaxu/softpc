@@ -229,9 +229,10 @@ void common_machine_debug_cancel(common_machine *machine);
 /* Permanently stop/join the worker, including all in-flight callbacks, but
  * retain the object. NULL/repeated calls are harmless. The owner serializes
  * this with other API calls; never call from a worker callback. Callback
- * contexts and the driver must remain alive until this returns. Destroy uses
+ * contexts and the driver must remain alive until this succeeds. Failure
+ * retains the machine and worker; destroy also retains them on failure. It uses
  * this same path; product stop remains a separate restartable operation. */
-void common_machine_shutdown(common_machine *machine);
-void common_machine_destroy(common_machine *machine);
+lib_status common_machine_shutdown(common_machine *machine);
+lib_status common_machine_destroy(common_machine *machine);
 
 #endif

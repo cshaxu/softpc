@@ -5,32 +5,40 @@
 M9 T70 S9 is closed after the package-test root cause was repaired and both
 widths passed 109/109. Implementation deliveries are `5d6fe18` and `7c0c786`.
 M9 T70 S10 is owner-accepted after delivery 62eec11 and dual-width 109/109.
-M9 T70 S11 implements the approved captured-pointer recentering repair and
-awaits owner testing after P2 delivery. T70 remains open.
+M9 T70 S11 is owner-accepted after P2 delivery 58ac394.
+M9 T70 S12 implements the four approved Lib audit repairs; dual-width tests
+pass and delivery awaits owner validation. T70 remains open.
 
-## M9 T70 S11 Packet
+## M9 T70 S12 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepted S10, admitted S11, then approved the presented Window-local recentering repair and P delivery with dual-width builds/tests. |
-| Objective | Establish and repair the capture/motion contract causing escape, jitter and invisible motion boundaries. |
-| Non-goals | No guest-specific sensitivity adjustment, guest media mutation, snapshot-format change, Common/VM modification or public input ABI change. |
-| Reference Baseline | 62eec11; both widths 109/109; owner confirms display repairs. |
-| Candidate Proposal | [S11 mouse investigation](../proposals/m9-window-mouse-capture.md). |
-| Files And ABI Surface | Existing KVM Window native mouse/component, Types Win32 aliases, shared tests and manifests; public API/event schema unchanged. |
+| Admission And Approval | Owner accepted S11 and admitted all four subsequent Lib audit findings for repair through push. |
+| Objective | Preserve task resources on failed join, make aspect fitting idempotent, correct Linux file-lock ownership and consolidate Window startup cleanup. |
+| Non-goals | No new lifecycle manager, retry policy, guest workaround, MVDM/VM change, user INI or media mutation. |
+| Reference Baseline | 58ac394; both widths 109/109; S11 owner accepted. |
+| Candidate Proposal | [S12 bounded repair](../proposals/m9-lib-lifetime-geometry-cleanup.md). |
+| Files And ABI Surface | Base task status returns, Storage Linux/Types lock declarations, Window geometry/startup; minimal Common/App/audio shutdown consumers, tests and manifests. |
 | Applicable Rules | Execution, documentation, architecture, coding, source/research and product UI authorities. |
-| Verification | Deterministic capture/edge/motion probes; owner snapshot where useful; dual-width focused and full tests for implementation. |
-| Expected Markers | No ordinary input while uncaptured; captured relative movement does not exhaust a finite host-coordinate range; capture and clip agree across release/geometry changes. |
-| Asset Needs | Owner snapshot and media, unchanged; build/t70-s11 diagnostics bounded to 300 seconds and 32 MiB per run; terminate owned probes. |
+| Verification | Injected native task failures, repeated geometry matrix, startup failure cleanup, controlled/Linux-native lock test; dual-width builds/full CTest and shared/documentation gates. |
+| Expected Markers | Failed join cannot dispose a live task; repeated fit stable; locks follow opened file objects; one startup failure cleanup. |
+| Asset Needs | No guest assets needed; ignored build/t70-s12 bounded logs/tests, no raw trace; no Linux OS installation. |
 | Reporting Requirements | Actual mirror/test diff, dual-width results and executable links; distinguish observation from inference. |
-| Stop Conditions | Need for guest-media mutation, unapproved shared-corpus change, or missing reproduction evidence. |
-| Exit Criteria | Each reported symptom explained and verified repaired, or explicit blocker; dual-width tested delivery before owner validation. |
-| Original Owner Request | Captured mouse can escape to host yet controls content on reentry; jitter and invisible boundaries require reverse movement to escape. |
-| Similar-Issue Sweep | Capture loss, clipping replacement, focus, resize, coordinate rebasing, scaling and duplicate motion routes. |
+| Stop Conditions | Need for new architecture/lifecycle policy or changes beyond the four admitted repairs and necessary call-site adaptation. |
+| Exit Criteria | Four-unit coverage ledger and actual-diff review, passing dual-width verification, commit/push with both EXEs; disclose unavailable Linux-native execution. |
+| Original Owner Request | 以上四处 准入一个s任务开始修复到推送 |
+| Similar-Issue Sweep | Base task consumers/platform joins, aspect fit callers, Storage lock lifetime and acquired Window startup exits. |
 
 ## Current Technical Baseline
 
+- S12 preserves Base task ownership on failed cancel/join, propagates shutdown
+  failure through existing consumers, makes integer Window fitting idempotent,
+  uses per-open Linux file locks and consolidates startup cleanup. Production
+  +93/-81, net +12 (Lib alone net -3); tests +177/-29. Both package EXEs rebuilt;
+  x86 and x64 full regression 109/109 each. Linux-native locking has a new
+  test but could not run here because WSL is absent; controlled Linux tests pass.
+  See [S12 evidence and scope](../proposals/m9-lib-lifetime-geometry-cleanup.md).
 - S11 P2 retains a single Window mouse path, samples and recenters the hidden
   host pointer, rebases on geometry changes and releases on ownership/clip
   loss. Four production files +68/-26; two tests +76/-16. Public events and
@@ -38,8 +46,8 @@ awaits owner testing after P2 delivery. T70 remains open.
   x86 full regression passes 109/109, x64 serial full regression passes
   109/109. The initial x64 parallel run had two package failures with unexpected
   monitor input; these are disclosed, not claimed repaired by rerunning.
-  See [S11 review and limits](../proposals/m9-window-mouse-capture.md#p2-implementation-and-bounded-review).
-  Manual confirmation of intermittent escape/jitter/boundary symptoms is pending.
+  See [S11 review and limits](../history/M9-T70-S11-window-mouse-capture.md#p2-implementation-and-bounded-review).
+  Owner confirms the mouse problem is resolved.
 - S10 repairs the planar 256-colour stride/wrap units and masks the V7
   preserve-memory flag before validating the mode number. Two mirror files
   +6/-5, existing VGA test +76/-0; Lib/Common/VM/Compat unchanged. Both widths
@@ -94,4 +102,4 @@ awaits owner testing after P2 delivery. T70 remains open.
 
 ## Recent Governance
 
-T70 S10 is accepted; S11 is the sole active task. Queue order is unchanged.
+T70 S11 is accepted; S12 is the sole active task. Queue order is unchanged.

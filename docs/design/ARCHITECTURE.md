@@ -318,7 +318,9 @@ one native timer message path, including native modal loops, not outer-loop
 timeout scheduling.
 Task owns cancellation and entry/context, embedded in one platform allocation.
 The native thread directly invokes that entry; root task destroy joins before
-releasing cancellation and disposing the allocation.
+releasing cancellation and disposing the allocation. Cancellation/join/destroy
+return status; failure retains ownership. Common machine propagates shutdown
+failure so its owner cannot release live callback targets or the driver.
 
 Synchronous request rejection returns `lib_status`, with normal wait outcomes
 separated into output values. Ordinary synchronization and local cleanup stay

@@ -113,10 +113,11 @@ lib_status base_sync_platform_task_create(base_sync_task_entry entry,
     return LIB_STATUS_OK;
 }
 
-void base_sync_platform_task_join(base_sync_task *task)
+lib_status base_sync_platform_task_join(base_sync_task *task)
 {
     struct base_sync_win32_task *state = (struct base_sync_win32_task *)task;
-    if (state != LIB_NULL) (void)lib_win32_wait_for_single_object(state->thread, LIB_WIN32_INFINITE);
+    return lib_win32_wait_for_single_object(state->thread, LIB_WIN32_INFINITE) ==
+        LIB_WIN32_WAIT_OBJECT_0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 void base_sync_platform_task_destroy(base_sync_task *task)
 {

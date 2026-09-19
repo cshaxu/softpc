@@ -108,4 +108,5 @@ that run, not its source or a repaired test defect. The two package tests
 subsequently pass in isolation; no assertion, timeout or product command path
 was changed to obtain a pass. Full regression results are recorded in Current.
 The native user snapshot interaction is not claimed as manually verified.
-S11 and T70 remain open for owner testing.
+Owner subsequently confirmed the repair works and requested the next Lib audit.
+S11 is closed with that acceptance; T70 remains open.
