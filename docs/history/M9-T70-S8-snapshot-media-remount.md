@@ -1,4 +1,4 @@
-# Snapshot media remount
+# M9 T70 S8: snapshot media remount
 
 ## Request and baseline
 
@@ -114,3 +114,18 @@ and confirmed every ledger member has the proof above. Test media was created
 only under the build working directories and removed by successful tests.
 This is a P delivery for manual testing, not S8 closure. Owner acceptance and
 post-push coordinator review remain required before closure.
+
+## Coordinator closure
+
+Owner explicitly approved S8 closure after delivery `f54e19f` was pushed.
+Coordinator reviewed that commit's actual Compat/VM changes against the
+original request and the verification ledger: paths/modes come from the
+snapshot; all live slots retire before any saved path reopens; SHA/size and
+overlay restoration remain intact. Production/test accounting above matches
+the commit. No shared-corpus, MVDM, INI or guest-media changes were included.
+
+S8 is closed with owner acceptance and the disclosed two package-test failures;
+neither their cause nor a full-suite pass is claimed. The EXEs remain those of
+P1. T70 stays open. The owner admits S9 solely to investigate Win95's first
+system boot after Setup file copying, awaiting screenshots and reproduction
+instructions; no display-versus-boot diagnosis is presumed.

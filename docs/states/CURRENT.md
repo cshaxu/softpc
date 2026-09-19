@@ -2,37 +2,37 @@
 
 ## Current Work
 
-M9 T70 S8 is implemented for owner testing: snapshot-owned floppy and
-fixed-disk remounting. S7 is closed and reconfirmed in `596f36e`.
-S8 and T70 remain open until owner acceptance.
+M9 T70 S8 is closed with owner acceptance; delivery is `f54e19f`.
+M9 T70 S9 is admitted for investigation, awaiting owner screenshots and
+reproduction instructions. T70 remains open.
 
-## M9 T70 S8 Packet
+## M9 T70 S9 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner explicitly admits S8 after withdrawing all uncommitted work and reconfirming S7 closure. |
-| Objective | Load both floppy and HDD exclusively from snapshot paths and saved modes, verifying size/SHA and restoring overlay pages; detach and reopen every existing attachment even when its path is identical. |
-| Non-goals | No Lib/Common/MVDM change, new snapshot format/version, fallback path search, user INI edit, or unrelated Setup investigation. |
-| Reference Baseline | `596f36e` reconfirms `5074c28`; all abandoned uncommitted implementation was withdrawn. |
-| Candidate Proposal | [Snapshot media remount](../proposals/m9-snapshot-media-remount.md). |
-| Files And ABI Surface | Compat media archive/header, private VM call site and focused media/transaction tests; no public ABI change. |
-| Applicable Rules | Execution, documentation, architecture and coding authorities; owner constraints on shared corpus and guest media. |
-| Verification | x86/x64 focused media archive, snapshot transaction and cross-process tests, full CTest with failures disclosed, documentation gate; rebuild both fixed EXEs. |
-| Expected Markers | No retained-attachment bypass; saved mode is independent of INI; both drive kinds demonstrably detach/reopen on same-path load; SHA rejection and overlay bytes remain correct. |
-| Asset Needs | Disposable small test images under build only; refresh package EXEs; preserve user INI and guest images. |
-| Reporting Requirements | Before/after production and test path/line counts; ownership, verification results, commit/push and EXE links. |
-| Stop Conditions | Required Lib/Common change, changed snapshot codec, unrelated emulation defect, or need to modify user media. |
-| Exit Criteria | Requested remount semantics verified for both drives, dual-width delivery complete and pushed, coordinator review and owner manual acceptance recorded; S8 stays open pending that acceptance and T70 remains open. |
-| Original Owner Request | “将S7正确收口，提交推送，然后准入S8：当 load snapshot的时候，仅使用snapshot里提供的磁盘文件路径加载磁盘文件（floppy和hard_disk都是）。如果当前floppy和/或hdd已经有加载（即使是相同路径的同一个文件），也要将他们卸载后重新加载。” |
-| Similar-Issue Sweep | All media archive preparation/restore/attachment consumers, same-path retention, INI mode selection, empty slots and overlay restoration; record disposition for each. |
+| Admission And Approval | Owner approved S8 closure and explicitly admitted S9 research; screenshots and reproduction instructions are forthcoming. |
+| Objective | Determine whether Win95's first boot after Setup file copying has a display defect, a boot failure, or both; identify the earliest evidenced fault and responsible component. |
+| Non-goals | No speculative repair, guest-specific workaround, guest-media mutation, Lib/Common change, or snapshot/media contract change. |
+| Reference Baseline | S8 delivery `f54e19f`, accepted by owner; dual-width package hashes and limitations in the S8 closure. |
+| Candidate Proposal | [Win95 first boot](../proposals/m9-win95-first-boot-investigation.md). |
+| Files And ABI Surface | Read-only investigation of VM/Compat/MVDM and display pipeline as evidence requires; initial production/test changes zero. |
+| Applicable Rules | Execution, documentation, architecture, coding and source/research authorities. |
+| Verification | Reproduce owner steps; correlate CPU/interrupt/disk progress with video state, published frames and visible output; record unresolved alternatives. |
+| Expected Markers | A repeatable failure stage and evidence distinguishing broken rendering from stalled or failed boot; no inference from a screenshot alone. |
+| Asset Needs | Await owner screenshots and recipe; preserve supplied originals, use disposable copies where needed. Ignored build/t70-s9 diagnostics capped at 120 seconds and 64 MiB per run. |
+| Reporting Requirements | Reproduction result, observed boot progress, display evidence, component attribution, minimal repair plan and estimated diff if a repair is justified. |
+| Stop Conditions | Missing reproduction input; required alteration of owner media; need for shared-corpus change or a repair outside admitted research. |
+| Exit Criteria | Bounded evidence ledger complete with proven or explicitly unresolved dispositions and a reviewed next step; owner controls closure and implementation admission. |
+| Original Owner Request | “批准收口当前S8，提交推送，然后准入一个S9：调研win95安装程序文件复制完成后第一次启动系统的显示异常故障（不确定是不是只是显示异常，还是系统其实根本无法启动，需要观测）。我会给你截图和如何复现的指令。” |
+| Similar-Issue Sweep | Once the failing contract is identified, enumerate matching production paths in its owning component; do not presume an emulator or rendering cause before observation. |
 
 ## Current Technical Baseline
 
 - S8 removes INI mode conversion and same-path attachment retention. Snapshot
   restore first detaches all slots, then reopens saved paths/modes and applies
   saved overlay pages. Codec and SHA/size checks are unchanged. See the
-  [S8 delivery evidence](../proposals/m9-snapshot-media-remount.md#delivery-evidence).
+  [S8 delivery evidence](../history/M9-T70-S8-snapshot-media-remount.md#delivery-evidence).
 - S8 x86/x64 builds and focused snapshot tests pass. Both widths pass 106/108
   aggregate regression cases; the two package Window checks fail at stage 16,
   before any snapshot load. Root cause is unestablished; no full pass is claimed.
@@ -67,5 +67,5 @@ S8 and T70 remain open until owner acceptance.
 
 ## Recent Governance
 
-T70 S7 closure was reconfirmed and pushed in `596f36e`. S8 is the sole admitted
-continuation under the owner's explicit numbering; queue order is unchanged.
+T70 S8 closes after owner acceptance of pushed delivery `f54e19f` and actual
+change review. S9 is the sole active investigation; queue order is unchanged.
