@@ -3,15 +3,16 @@
 ## Current Work
 
 M9 T70 S8 is closed with owner acceptance; delivery is `f54e19f`.
-M9 T70 S9 is admitted for investigation, awaiting owner screenshots and
-reproduction instructions. T70 remains open.
+M9 T70 S9 reproduced the owner-supplied cold-start black-output symptom at
+the core boundary; root cause remains under investigation.
+T70 remains open.
 
 ## M9 T70 S9 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approved S8 closure and explicitly admitted S9 research; screenshots and reproduction instructions are forthcoming. |
+| Admission And Approval | Owner approved S8 closure and explicitly admitted S9 research; cold-start steps have now been supplied. |
 | Objective | Determine whether Win95's first boot after Setup file copying has a display defect, a boot failure, or both; identify the earliest evidenced fault and responsible component. |
 | Non-goals | No speculative repair, guest-specific workaround, guest-media mutation, Lib/Common change, or snapshot/media contract change. |
 | Reference Baseline | S8 delivery `f54e19f`, accepted by owner; dual-width package hashes and limitations in the S8 closure. |
@@ -20,7 +21,7 @@ reproduction instructions. T70 remains open.
 | Applicable Rules | Execution, documentation, architecture, coding and source/research authorities. |
 | Verification | Reproduce owner steps; correlate CPU/interrupt/disk progress with video state, published frames and visible output; record unresolved alternatives. |
 | Expected Markers | A repeatable failure stage and evidence distinguishing broken rendering from stalled or failed boot; no inference from a screenshot alone. |
-| Asset Needs | Await owner screenshots and recipe; preserve supplied originals, use disposable copies where needed. Ignored build/t70-s9 diagnostics capped at 120 seconds and 64 MiB per run. |
+| Asset Needs | Owner supplied installed disk and cold-start recipe; confirmed overlay configuration and accepted x64 package identity. Preserve originals. Ignored build/t70-s9 diagnostics capped at 600 seconds and 64 MiB per run to accommodate the minutes-long initial boot. |
 | Reporting Requirements | Reproduction result, observed boot progress, display evidence, component attribution, minimal repair plan and estimated diff if a repair is justified. |
 | Stop Conditions | Missing reproduction input; required alteration of owner media; need for shared-corpus change or a repair outside admitted research. |
 | Exit Criteria | Bounded evidence ledger complete with proven or explicitly unresolved dispositions and a reviewed next step; owner controls closure and implementation admission. |
@@ -29,6 +30,10 @@ reproduction instructions. T70 remains open.
 
 ## Current Technical Baseline
 
+- S9 diagnostic-only cold starts reproduce black 640x480 frames while CPU
+  execution continues; emulated video memory is almost empty and late storage
+  activity stabilizes. No production/package change or root-cause claim.
+  See [bounded observations](../proposals/m9-win95-first-boot-investigation.md#cold-start-observation).
 - S8 removes INI mode conversion and same-path attachment retention. Snapshot
   restore first detaches all slots, then reopens saved paths/modes and applies
   saved overlay pages. Codec and SHA/size checks are unchanged. See the
