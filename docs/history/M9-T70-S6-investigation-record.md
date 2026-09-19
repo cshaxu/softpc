@@ -2,7 +2,8 @@
 
 This is the completed-step record required to continue the still-open M9 T70
 investigation. It records bounded findings only; it is not a T-level closure.
-The active repair is M9 T70 S7 in `docs/states/CURRENT.md`.
+The subsequent repair is recorded in
+[S7 closure](M9-T70-S7-stack-width-repair.md); T70 remains open.
 
 | Step | Completed bounded result | Disposition |
 | --- | --- | --- |

@@ -13,7 +13,7 @@ CALL 已由硬件检测现场确认；IRET/RETF 为同类源码修复，未声�
 Compat 的 SAS allocation 与 VM restore rendezvous 保留在各自组件。
 计数使用 `git diff 95c467a --numstat -- src/mvdm/softpc.new`，不改写下文
 T61 的冻结原始差异总数。验证及局限见
-[T70 S7 交付记录](../../../history/M9-T70-stack-width-repair.md)。
+[T70 S7 交付记录](../../../history/M9-T70-S7-stack-width-repair.md)。
 
 T61 冻结镜像数量与全部边界处置见文末 **S13 最终归属复核**。
 T63 S2 在原有 c_main.c 新增两个 CPU checkpoint 观察点（取指准备和 HLT），

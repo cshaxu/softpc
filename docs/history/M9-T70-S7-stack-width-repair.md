@@ -59,3 +59,17 @@ Package SHA-256:
 
 T70 remains open. The later Setup memory warning has no diagnosis or repair
 claim in S7 and no new S is admitted by this closure.
+
+## Coordinator closure
+
+Implementation P1 `ce5f535` was committed and pushed to origin/main before
+this closure review. The actual staged production/test paths match the
+accounting above; no diagnostic-only mirror paths survived staging and no
+shared corpus or user configuration/media change was included. The three CPU
+changes each replace four lines with the existing one-line helper.
+
+The owner accepted hardware-detection success and explicitly requested S-only
+closure after the two Window-test failures were disclosed. This is bounded
+acceptance, not proof that those tests passed or that the later memory warning
+is resolved. S7 is closed; T70 awaits owner instructions. The proposal is
+[retained here](M9-T70-hardware-detection-proposal.md).
