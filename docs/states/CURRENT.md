@@ -2,30 +2,30 @@
 
 ## Current Work
 
-M9 T71 S1 is implemented and verified, awaiting owner testing: text-only Console
-frame admission. Owner: "准入T71".
-T70 remains closed. Later text-schema/capacity batches await concrete design review.
+M9 T71 S2 is active, design only: explicit text-cell and glyph contracts.
+Owner: "准入s2 开始设计". S1 leaves the active slot at its verified delivery
+boundary; no new manual acceptance is inferred. T70 remains closed.
 
-## M9 T71 S1 Packet
+## M9 T71 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner admits T71 from the queue head; start bounded batch A. |
-| Objective | Reject graphical Console publications synchronously without replacing pending text or waking the worker. |
-| Non-goals | No character/layout ABI, mouse, routing policy, MVDM, VM, INI or guest-media change. |
-| Reference Baseline | 7557ca5; T70 closed; shared implementation 8cb23e9; dual-width 109/109. |
-| Candidate Proposal | [T71 design and S1 brief](../proposals/m9-kvm-text-frame-contract.md). |
-| Files And ABI Surface | kvm-console console.c/public documentation; existing Lib retirement test and Common composition proof; manifests. No signature change. |
-| Applicable Rules | Execution, Documentation, Architecture, Coding and Product UI; linked governance skills. |
-| Verification | Deterministic invalid/unsupported/publication/activation/STOP matrix, Common text-status route; dual-width full builds/tests, manifests/DAG/documentation checks. |
-| Expected Markers | Valid graphics returns UNSUPPORTED; malformed input INVALID_ARGUMENT; pending text and generation unchanged; no rejection wake/failure; stopped text INVALID_STATE. |
-| Asset Needs | Existing package fixtures only; no media edits; bounded logs under ignored build/t71-s1, no raw tracing. |
-| Reporting Requirements | Before/after production/test counts, both EXE links and actual validation limits. |
-| Stop Conditions | Need for new frame ABI, fallback policy, ownership or unrelated repair. |
-| Exit Criteria | All S1 ledger cases verified, actual-diff coordinator review, x86/x64 EXEs and tests, complete P committed/pushed for owner testing. |
-| Original Owner Request | 准入T71 |
-| Similar-Issue Sweep | All Console frame public callers, worker conversion paths, Common status routing and independent Window/mailbox admission. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner explicitly admits S2 design after S1 delivery 04d76945. |
+| Objective | Specify character/glyph/colour data and all producer/consumer migrations without adding a display path. |
+| Non-goals | No code/build/EXE/INI/media change; no code-page detection, font recognition, dynamic frame, capacity expansion or MVDM edit. |
+| Reference Baseline | 04d76945; S1 dual-width full suites 109/109 and pushed packages. |
+| Candidate Proposal | [T71 S2 concrete design](../proposals/m9-kvm-text-frame-contract.md#t71-s2-concrete-design-for-owner-review). |
+| Files And ABI Surface | Proposal, Current and S1 delivery review only. Proposed ABI affects KVM/Console text cells; not implemented. |
+| Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and linked governance skills. |
+| Verification | Source producer/consumer/codec inventory, S1 actual-diff review, documentation/whitespace gates. |
+| Expected Markers | Explicit cells, independent raster glyph/Console character, VM-owned PC mapping, no new ownership, bounded memory estimate. |
+| Asset Needs | None; read-only source inspection; no runtime process or trace. |
+| Reporting Requirements | Proposed structs, migration owners, preserved UX, memory/code estimates, open decisions and no implementation claims. |
+| Stop Conditions | Scope needs runtime edits or new product fallback before owner design review. |
+| Exit Criteria | Concrete design and ledger committed/pushed for owner review; implementation remains pending. |
+| Original Owner Request | 准入s2 开始设计 |
+| Similar-Issue Sweep | All text/frame publishers, copying/comparison/render/cache sites and snapshot entry points; confirm archive internals before implementation. |
 
 ## Current Technical Baseline
 
@@ -60,7 +60,7 @@ T70 remains closed. Later text-schema/capacity batches await concrete design rev
 
 ## Recent Governance
 
-T70 is closed; T71 S1 is the sole active implementation task.
+T70 is closed; T71 S2 is the sole active task, limited to design.
 
 - **M9 Td S17:** Owner requested a concrete KVM text/frame correction proposal
   at queue head. Recorded capability rejection, explicit character/glyph
