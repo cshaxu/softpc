@@ -57,9 +57,40 @@ next discriminating observation; do not report an unimplemented repair as done.
 - Read-only installed configuration and installer INF inspection agree on
   the Video Seven driver family. Boot logging shows frame-buffer and VGA
   drivers; registry bytes also contain display-fallback notification text.
-  This does not yet prove whether the current initialization fails or a
-  previously scheduled notification remains. Driver failure attribution is
-  still open; changing the configured adapter is not an established fix.
+  Subsequent instruction-boundary observation proves a current initialization
+  failure, rather than merely a retained notification (details below).
 
 Research changes so far: zero tracked production/test lines. Diagnostic
 programs and captured frames remain in the packet's ignored bounded directory.
+
+### Display-driver failure chain
+
+The installed frame-buffer driver's exported Enable path reaches its failure
+return. Adapter identification succeeds; its requested mode is 640 by 480 at
+eight bits per pixel. The mode lookup rejects the detected video-memory size
+of 65536 bytes. This is not evidence that the allocated emulated VRAM is that
+small: bank 1 reads back bank 0's probe value while the VGA registers still
+describe text mode.
+
+A BIOS-boundary observation explains that state: function 6F05 receives
+BL=E7 (mode 67 plus the preserve-memory bit), returns without setting graphics
+mode, and the following 6F04 query reports text mode 03. In
+`v7vga_extended_set_mode`, the extended-mode validation uses the unmasked BL;
+only after that guard does it extract the low seven mode bits. The original
+OpenNT implementation has the same ordering. The caller's preserve flag is
+mistaken for part of the mode number, so banking never enters the requested
+graphics configuration.
+
+Candidate repair: extract `video_mode` before validation and validate that
+value, while retaining the original BL for the existing clear/preserve flag
+handling. Do not change driver code, lie about VRAM capacity, or force VGA.
+Focused proof must exercise valid extended modes with and without bit 7,
+invalid modes, preservation versus clearing, and actual bank separation.
+Then verify the installed driver finishes initialization during a real boot;
+the source diagnosis alone does not establish successful repaired operation.
+
+Estimated production surface for the two candidates is `vga_mode.c` (display
+stride condition) and `v7_video.c` (mode validation ordering), roughly 5--15
+changed lines before reason markers, plus focused regression tests. This is
+an estimate, not an implementation admission or acceptance. S10 remains open
+pending the repair-boundary decision; no product fix has been delivered.
