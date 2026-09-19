@@ -4,7 +4,7 @@
 
 Original owner request: "你对这个制作一个更具体的修正意见稿 写入proposal 队列首位".
 This is the first unnumbered candidate, not implementation admission. T70
-remains open with no active implementation S. Baseline: f6ab0dc / shared source
+is now closed; no implementation S is active. Baseline: f6ab0dc / shared source
 8cb23e9. This proposal is grounded in SoftPC, not in hypothetical NES needs.
 
 ## Observed Problems
