@@ -8,6 +8,8 @@ Owner confirmed S5 testing passed and approved S5 closure. S1--S5 are closed;
 T72 remains open. A read-only Lib/Common quality audit is requested, not a new
 implementation admission. See [S5 closure](../history/M9-T72-S5-text-cell-acceptance.md)
 and [T72 proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md).
+The requested [Lib/Common quality audit](../etc/evidence/softpc/m9-t72-post-s5-quality-audit.md)
+is complete as a bounded review; findings await owner decision, not implementation.
 
 ## Current Technical Baseline
 

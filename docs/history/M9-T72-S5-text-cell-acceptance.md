@@ -26,3 +26,8 @@ governance and diff checks required before push. No repeat runtime build needed.
 S5 is closed. The following quality audit must distinguish confirmed defects,
 simplification opportunities and unverified risks; it does not silently admit
 fixes or retroactively claim every Lib/Common path proven correct.
+
+The requested [post-S5 quality audit](../etc/evidence/softpc/m9-t72-post-s5-quality-audit.md)
+records four confirmed contract gaps and two optional simplifications. These
+are not S5 regressions or admitted fixes. Shared background tests reran 63/63
+per width; deterministic probes distinguish coverage gaps from passing tests.
