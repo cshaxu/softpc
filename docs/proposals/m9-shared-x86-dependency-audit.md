@@ -579,6 +579,11 @@ trees remain reusable. No guest media or trace was created. No current source,
 target or symbol uses the former names; the negative probe intentionally keeps
 one retired include to prove rejection. All original user requirements map to
 the revised S4/S5 ledger; S5 work is explicitly planned, not silently omitted.
-S4 is implemented and automatically verified; executor delivery and post-push
-actual-change review follow. Manual acceptance is still required. T73 remains
-open, S5 remains planned.
+Executor delivery 0ef82055 was pushed to origin/main. The coordinator role then
+reviewed dc06671d..0ef82055 changed paths, paired all eleven relocations, checked
+App/VM endpoint diffs, ownership/DAG and complete original-request ledger, and
+confirmed protected-path equality. Common/x86/test manifests and both source
+gates passed again after push. No runtime semantics, duplicate implementation
+or retired public alias was introduced. The only temporary boundary is the
+explicit S5-owned mixed test directory. S4 is verified and awaiting owner manual
+acceptance, not closed. T73 remains open and S5 remains planned.

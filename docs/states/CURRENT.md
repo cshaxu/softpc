@@ -13,8 +13,10 @@ S4 implementation and verification are complete: both Release builds and full
 background suites passed (x64 108/108, 163.08s; x86 108/108, 148.73s).
 Five desktop tests per width were excluded. Standalone x86 source build passed.
 Production C/H +363/-363, tests C/H +401/-401 (both net zero); build/gates
-+200/-41 (net +159). No Lib or neutral runtime changes. Delivery awaits push,
-actual-change review and owner testing; S4 is not closed.
++200/-41 (net +159). No Lib or neutral runtime changes. Delivery 0ef82055 is
+pushed. Coordinator actual-change review checked relocation/consumer diffs,
+the original request, unchanged protected paths and manifest/DAG proof again.
+S4 is verified and awaiting owner testing, not closed; S5 remains unadmitted.
 
 ## M9 T73 S4 Packet
 
