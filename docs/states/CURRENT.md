@@ -2,32 +2,11 @@
 
 ## Current Work
 
-T74 S1 pure Core directory relocation is implemented, verified and pushed in
-8b76baf5. Actual-change review passed; waiting for owner testing before S/T
-closure. T73 remains closed. The worktree is intended to be clean after this
-review record is committed and pushed.
+No implementation subtask is active. Owner testing passed; T74 S1 and T74
+are closed by the [completion audit](../history/M9-T74-completion-audit.md).
+The owner requested a new Lib/Common audit after this closure; its admission
+will follow the closure push, with the owner's report still pending.
 The four existing Queue candidates retain their order and are not admitted.
-
-## M9 T74 S1 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner explicitly admitted this relocation; permanent commit/push authorization. |
-| Objective | Move mvdm to core, vm to core/machine and compat to core/compat without behavior changes. |
-| Non-goals | No symbol/API rename, runtime redesign, guest/media/config change, shared-corpus edit or queued defect repair. |
-| Reference Baseline | d7c6931f, clean origin/main; T73 accepted. |
-| Candidate Proposal | [Core layout relocation](../proposals/m9-core-layout-rename.md). |
-| Files And ABI Surface | 556 moved files; App includes/firmware, CMake, product gates, live tools/docs. ABI unchanged. |
-| Applicable Rules | Execution, Architecture, Coding, Document; four referenced governance skills. |
-| Verification | Mirror blob identity and path-only C/H proof; source/build negative gates; x86/x64 Release builds and background presets; documentation gate and diff check. |
-| Expected Markers | Old live roots absent; only App composition reaches Machine public header; shared corpora unchanged; all background tests pass. |
-| Asset Needs | Existing embedded ROM/media read-only; refresh only two package EXEs. Preserve INI. Standard ignored build trees/logs only; no new trace or guest media. |
-| Reporting Requirements | Pre-estimate and post rename-aware added/removed/net counts, mirror identity, tests, artifact links, commit/push and clean status. |
-| Stop Conditions | Non-path production change, mirror byte difference, dependency boundary weakening or unresolved regression. |
-| Exit Criteria | All proposal ledger rows proven; implementation P pushed and actual-change reviewed; owner tests before S/T closure. |
-| Original Owner Request | Pure rename: mvdm -> core; vm -> core/machine; compat -> core/compat; retain core/softpc.new. |
-| Similar-Issue Sweep | All tracked build/include/resource/live-tool paths, relative includes and ownership-gate negative cases; historical paths retained with explicit disposition. |
 
 ## Current Technical Baseline
 
@@ -36,7 +15,7 @@ The four existing Queue candidates retain their order and are not admitted.
   comparison. Runtime symbols and behavior remain unchanged. Both Release
   builds and background suites pass: x64 110/110 (165.45s), x86 110/110
   (157.47s); five desktop cases excluded per width. Shared corpora, INI and
-  guest media are untouched. [T74 proposal](../proposals/m9-core-layout-rename.md)
+  guest media are untouched. [T74 proposal](../history/M9-T74-core-layout-rename-proposal.md)
   holds the +421/-409 (net +12) source/test/build/tool ledger and EXE hashes.
 - Accepted T73 implementation 879c30ac, actual-change review ad665a86.
   Owner manual S5 testing passed. Closure changes documents only.
@@ -72,6 +51,7 @@ The four existing Queue candidates retain their order and are not admitted.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T74 | S1 complete; owner accepted; dual-width 110/110 background; pure Core relocation. | [Audit](../history/M9-T74-completion-audit.md) |
 | T73 | S1--S5 complete; owner accepted; final dual-width 110/110 background. | [Audit](../history/M9-T73-completion-audit.md) |
 | T72 | S1--S8 complete; owner approved; final dual-width 105/105 background. | [Audit](../history/M9-T72-completion-audit.md) |
 | T71 | S1--S10 complete; owner approved; final dual-width 105/105 background. | [Audit](../history/M9-T71-completion-audit.md) |
@@ -80,6 +60,8 @@ The four existing Queue candidates retain their order and are not admitted.
 
 ## Recent Governance
 
+- T74 closure archives the proposal and records S1/T-level requirement coverage,
+  actual-change review and owner acceptance. Sources and tested EXEs unchanged.
 - T73 closure records S5 acceptance, all-S requirement/changed-path audit and
   the separate queued wake-race receiver, and archives its proposal. No new
   implementation task or T number is allocated.

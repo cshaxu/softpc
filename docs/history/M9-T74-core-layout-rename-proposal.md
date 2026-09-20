@@ -103,8 +103,8 @@ their historical source paths and all archived evidence remain unchanged.
   SHA256 097C8D2654EB96DC41A3A0B9B953F23A26D8FF49768C7CB3B0CA96ED899EC7B9.
 
 EXE sizes equal the accepted baseline. Both are refreshed T74 packages, not a
-claim of byte-identical binaries. S1 is verified and awaits owner testing;
-T74 is not closed.
+claim of byte-identical binaries. The owner subsequently accepted testing;
+S1 and T74 are closed by the [completion audit](M9-T74-completion-audit.md).
 
 ## Actual-Change Review
 
