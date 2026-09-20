@@ -3,27 +3,27 @@
 ## Current Work
 
 T75 is closed and pushed in eacf1a5e after owner authorization and completion audit.
-T76 S1 is active: Storage overlay lookup baseline and design qualification.
+T76 S2 is active: replace Storage overlay linked-list lookup with a direct page index.
 [T75 audit](../history/M9-T75-completion-audit.md).
 
-## M9 T76 S1 Packet
+## M9 T76 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner: close T75 and admit the next T for lib/storage overlay lookup performance. |
-| Objective | Freeze existing behavior/snapshot baseline and quantify linked-list cost versus direct-index memory before implementation. |
-| Non-goals | No production algorithm change in S1, public API change, Core/Common/x86 change, guest media edits, or desktop interaction. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner explicitly skips measurement and directs immediate S2 implementation; finish S2/S3 serially then await acceptance. |
+| Objective | Replace overlay page list with one owning direct page-pointer index; preserve public data and failure contracts. |
+| Non-goals | No benchmark, public API change, Core/Common/x86 change, guest media edits, or desktop interaction. |
 | Reference Baseline | eacf1a5e; accepted strict C11 shared corpus and dual-width 110/110 background suites. |
 | Candidate Proposal | [Overlay page lookup optimization](../proposals/m9-overlay-page-index.md). |
-| Files And ABI Surface | Read storage medium/file and callers; existing storage/snapshot tests and bounded measurement fixtures if needed. ABI unchanged. |
+| Files And ABI Surface | src/lib/storage/medium.c; existing test/lib/storage_file_writer_binary_smoke.c; two manifests and task records. ABI unchanged. |
 | Applicable Rules | Execution/Document/Architecture/Coding and referenced governance skills; strict C11 and existing ownership boundaries. |
-| Verification | Existing public behavior/failure tests, repeatable small/dense/sparse workloads, snapshot media-byte baseline; dual-width Release and applicable background suites before S1 delivery. |
-| Expected Markers | Measured lookup costs, size-safe pointer-array estimates for both widths, explicit decision on sparse capacity tradeoff, no changed production behavior. |
-| Asset Needs | Only task-owned ignored build/t76-s1-* fixtures/logs; bounded workloads, stop any probe beyond 60 seconds; preserve checkpoints, remove owned temporary data when no longer needed. No assets media edits. |
-| Reporting Requirements | Production estimate +0/-0; refine test/tool file and line estimates before edits; report actual counts and both EXEs at completed S delivery. |
-| Stop Conditions | Direct indexing materially narrows usable capacity or sparse behavior: report evidence and review revised design before S2; no silent algorithm expansion. |
-| Exit Criteria | Baseline evidence and finite ledger, reviewed design decision, relevant dual-width verification, complete pushed delivery and actual-change review. |
+| Verification | Zero/file bases, capacities, tail/cross-page writes, repeat lookup, allocation/read failure cleanup, direct/readonly exclusion; dual-width strict Release and background tests. |
+| Expected Markers | Indexed O(1) lookup; no page index/next node fields or linked-list walk; only complete pages installed. |
+| Asset Needs | Task-owned ignored build/t76-* test outputs only, no assets media edits; preserve old snapshot fixtures for S3 then clean. |
+| Reporting Requirements | Production estimate +35/-20 net +15; existing tests about +100/-3; actual counts and dual EXEs on delivery. |
+| Stop Conditions | Do not invent artificial capacity limits or additional index strategies; allocation failure remains explicit. New contract requirements need review. |
+| Exit Criteria | Source/test sweep, dual-width builds/background regression, complete pushed P and actual-change review; then S3 snapshot acceptance. |
 | Original Owner Request | 收口T75，准入下一个T任务：优化 lib/storage overlay查找表现 |
 | Similar-Issue Sweep | All medium creation/read/write/destroy paths, file versus zero bases, direct/readonly exclusion, failure ownership and snapshot API consumers. |
 
