@@ -140,8 +140,32 @@ static void failure(void *p,lib_u64 id,lib_status status)
 static lib_status join(kvm_component *p, lib_u32 timeout_ms)
 { (void)p; (void)timeout_ms; return LIB_STATUS_OK; }
 static void dispose(kvm_component *p) { kvm_component_mailboxes_destroy(&p->mailboxes); }
+static unsigned control_failures;
+static void invalid_control_failure(void *p, lib_u64 id, lib_status status)
+{ (void)p; assert(id && status==LIB_STATUS_INVALID_ARGUMENT); ++control_failures; }
+static void check_invalid_controls(void)
+{
+    static kvm_window window;
+    static kvm_win32_window_context c;
+    kvm_component_options options={.input_sink=input,.failure_sink=invalid_control_failure};
+    for(unsigned i=0;i<3;++i) {
+        kvm_component_control command={.kind=LIB_UINT32_MAX};
+        assert(kvm_component_initialize(&window.base,&options,join,dispose)==0);
+        assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes,NULL,NULL)==0);
+        lib_memory_set(&c,0,sizeof(c)); c.component=&window;
+        if(i==1) { command.kind=KVM_WINDOW_CONTROL_SET_TITLE;
+            lib_memory_set(command.payload,'x',sizeof(command.payload)); }
+        if(i==2) { command.kind=KVM_WINDOW_CONTROL_SET_FROZEN; command.payload[0]=2; }
+        assert(kvm_component_enqueue_control(&window.base,&command)==0);
+        assert(!win32_window_consume_mailboxes((HWND)1,&c));
+        assert(window.base.stopping && window.base.mailboxes.closed);
+        assert(control_failures==i+1);
+        assert(kvm_component_destroy(&window.base)==0);
+    }
+}
 int main(void)
 {
+    check_invalid_controls();
     static kvm_win32_window_context surface;
     assert(!win32_window_ensure_surface((HWND)1,&surface,8,8));
     assert(!surface.surface_width && !surface.surface_height && !surface.surface_dc && !surface.surface_pixels);
@@ -250,7 +274,7 @@ int main(void)
     assert(win32_window_consume_mailboxes((HWND)1,&c));
     assert(focus_requests==1 && foreground_requests==1 && !c.mouse.captured);
     title_ok=0;
-    kvm_component_control command={.kind=KVM_COMPONENT_CONTROL_SET_WINDOW_TITLE};
+    kvm_component_control command={.kind=KVM_WINDOW_CONTROL_SET_TITLE};
     assert(kvm_component_mailboxes_enqueue_control(&window.base.mailboxes,&command)==0);
     assert(!win32_window_consume_mailboxes((HWND)1,&c) && window.base.stopping);
     assert(kvm_component_destroy(&window.base) == LIB_STATUS_OK);

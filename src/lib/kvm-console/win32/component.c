@@ -40,8 +40,10 @@ static lib_win32_dword LIB_WIN32_WINAPI kvm_console_worker(void *opaque)
             if (control.kind == KVM_COMPONENT_CONTROL_STOP) {
                 goto retired;
             }
-            /* kvm-console has no title or mouse surface. Unsupported Window
-             * control entries are intentionally consumed as no-ops. */
+            /* This consumer has no ordinary controls. The transport accepts
+             * opaque kinds, but only the consumer can validate their meaning. */
+            kvm_component_fail(&console->base, LIB_STATUS_INVALID_ARGUMENT);
+            goto retired;
         }
         if (kvm_component_mailboxes_capture_frame(&console->base.mailboxes,
                 &generation, &frame)) {

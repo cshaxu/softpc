@@ -95,6 +95,12 @@ add_test(NAME library.types-layout
     add_test(NAME library.kvm-naming
         COMMAND "${CMAKE_COMMAND}" -DKVM_NAMING_ROOT:PATH=${LIB_ROOT}
             -P "${LIB_ROOT}/verify_kvm_naming.cmake")
+    add_test(NAME library.component-control-ownership
+        COMMAND "${CMAKE_COMMAND}"
+            -DLIBRARY_ROOT:PATH=${CMAKE_CURRENT_SOURCE_DIR}/fixtures/lib-control-ownership
+            -DLIBRARY_VERIFIER:FILEPATH=${LIB_ROOT}/verify_component_dependencies.cmake
+            "-DLIBRARY_EXPECTED_ERROR:STRING=Window controls belong to kvm-window"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/component_dag_forbidden_include_smoke.cmake")
     add_test(NAME library.kvm-naming-forbidden
         COMMAND "${CMAKE_COMMAND}"
             -DKVM_NAMING_ROOT:PATH=${CMAKE_CURRENT_SOURCE_DIR}/fixtures/kvm-naming

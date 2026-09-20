@@ -16,6 +16,13 @@ STOP has a reserved slot, closes admission and is idempotent. The worker consume
 controls in order through STOP, then ignores later control/frame work. There is
 no batch admission; frame publication remains independently locked, latest-wins.
 
+The control envelope has an opaque nonzero consumer kind and 128 copied payload
+bytes; only kind zero (STOP) is interpreted here. Window owns title/freeze/release
+encoding and validation. Console currently has no ordinary controls. Consumers
+reject invalid records through their existing fault path, rather than silently
+accepting another component's commands. No native or application API exposes
+the envelope; no per-control allocation or extra dispatch registry is involved.
+
 Frame and control each use an independent Base blocking mutex.
 The control lock only protects the short FIFO operation. STOP/fault acquires frame
 then control; ordinary control remains independent of a contended frame copy.

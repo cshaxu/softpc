@@ -61,7 +61,7 @@ int main(void)
     static kvm_component third;
     kvm_component_options options = { 0 };
     kvm_input_event event = { 0 };
-    kvm_component_control control = { KVM_COMPONENT_CONTROL_SET_WINDOW_FROZEN,
+    kvm_component_control control = { 0xabcdef01u,
         { 0 } };
     kvm_component_control taken;
     atomic_uint_fast64_t identity_next;
@@ -94,6 +94,19 @@ int main(void)
     assert(first.source_identity != 0u);
     assert(second.source_identity != 0u);
     assert(first.source_identity != second.source_identity);
+
+    /* The transport cannot restrict consumer opcodes or interpret payloads.
+       Copy every byte (including embedded zeroes) before the caller mutates it. */
+    control.kind = LIB_UINT32_MAX;
+    for (index = 0u; index < sizeof(control.payload); ++index)
+        control.payload[index] = (lib_u8)index;
+    assert(kvm_component_enqueue_control(&second, &control) == LIB_STATUS_OK);
+    memset(control.payload, 0xff, sizeof(control.payload));
+    assert(kvm_component_mailboxes_take_control(&second.mailboxes, &taken));
+    assert(taken.kind == LIB_UINT32_MAX);
+    for (index = 0u; index < sizeof(taken.payload); ++index)
+        assert(taken.payload[index] == (lib_u8)index);
+    control = (kvm_component_control){ 0xabcdef01u, { 0 } };
 
     /* Source identity is a single non-repeating epoch: issuing the final
        representable value permanently exhausts it instead of wrapping. */
@@ -168,9 +181,11 @@ int main(void)
     /* STOP has one reserved FIFO slot.  A full normal queue cannot make
        destroy wait forever for a stop record it could not enqueue. */
     assert(kvm_component_request_stop(&second) == LIB_STATUS_OK);
+    assert(kvm_component_request_stop(&second) == LIB_STATUS_OK);
+    assert(kvm_component_enqueue_control(&second, &control) == LIB_STATUS_INVALID_STATE);
     for (index = 0u; index < KVM_COMPONENT_CONTROL_CAPACITY; ++index) {
         assert(kvm_component_mailboxes_take_control(&second.mailboxes, &taken));
-        assert(taken.kind == KVM_COMPONENT_CONTROL_SET_WINDOW_FROZEN);
+        assert(taken.kind == 0xabcdef01u);
     }
     assert(kvm_component_mailboxes_take_control(&second.mailboxes, &taken));
     assert(taken.kind == KVM_COMPONENT_CONTROL_STOP);
@@ -180,18 +195,18 @@ int main(void)
     for (index = 0u; index + 1u < KVM_COMPONENT_CONTROL_CAPACITY; ++index)
         assert(kvm_component_enqueue_control(&third, &control) ==
             LIB_STATUS_OK);
-    control.value.window_frozen = LIB_TRUE;
+    control.payload[0] = LIB_TRUE;
     assert(kvm_component_enqueue_control(&third, &control) == LIB_STATUS_OK);
     assert(kvm_component_enqueue_control(&third, &control) ==
         LIB_STATUS_LIMIT_EXCEEDED);
     assert(probe.failure_count == 1u);
     for (index = 0u; index + 1u < KVM_COMPONENT_CONTROL_CAPACITY; ++index) {
         assert(kvm_component_mailboxes_take_control(&third.mailboxes, &taken));
-        assert(taken.kind == KVM_COMPONENT_CONTROL_SET_WINDOW_FROZEN);
-        assert(taken.value.window_frozen == LIB_FALSE);
+        assert(taken.kind == 0xabcdef01u);
+        assert(taken.payload[0] == LIB_FALSE);
     }
     assert(kvm_component_mailboxes_take_control(&third.mailboxes, &taken));
-    assert(taken.value.window_frozen == LIB_TRUE);
+    assert(taken.payload[0] == LIB_TRUE);
     assert(!kvm_component_mailboxes_take_control(&third.mailboxes, &taken));
 
     assert(kvm_component_destroy(&first) == LIB_STATUS_OK);

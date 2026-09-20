@@ -45,7 +45,7 @@ int main(void)
     for (operation = 0; operation < 4; ++operation) {
         HANDLE thread;
         kvm_component_control taken;
-        const kvm_component_control title = { .kind = KVM_COMPONENT_CONTROL_SET_WINDOW_TITLE };
+        const kvm_component_control title = { .kind = 42u };
         assert(kvm_component_mailboxes_create(&mailbox) == LIB_STATUS_OK);
         assert(kvm_component_mailboxes_publish_frame(&mailbox, &frame) == LIB_STATUS_OK);
         contended = CreateEventA(NULL, TRUE, FALSE, NULL);
@@ -62,7 +62,7 @@ int main(void)
         } else {
             assert(kvm_component_mailboxes_enqueue_control(&mailbox, &title) == LIB_STATUS_OK);
             assert(kvm_component_mailboxes_take_control(&mailbox, &taken));
-            assert(taken.kind == KVM_COMPONENT_CONTROL_SET_WINDOW_TITLE);
+            assert(taken.kind == 42u);
         }
         base_sync_mutex_unlock(held);
         assert(WaitForSingleObject(thread, 5000) == WAIT_OBJECT_0);

@@ -7,21 +7,14 @@
 
 #define KVM_COMPONENT_CONTROL_CAPACITY 32u
 #define KVM_COMPONENT_CONTROL_STORAGE_CAPACITY (KVM_COMPONENT_CONTROL_CAPACITY + 1u)
-#define KVM_COMPONENT_WINDOW_TITLE_CAPACITY 128u
+#define KVM_COMPONENT_CONTROL_PAYLOAD_CAPACITY 128u
+#define KVM_COMPONENT_CONTROL_STOP 0u
 
-typedef enum kvm_component_control_kind {
-    KVM_COMPONENT_CONTROL_STOP,
-    KVM_COMPONENT_CONTROL_SET_WINDOW_TITLE,
-    KVM_COMPONENT_CONTROL_SET_WINDOW_FROZEN,
-    KVM_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE
-} kvm_component_control_kind;
-
+/* Zero is the terminal transport marker. All other kinds and payload bytes
+ * belong to the consumer; initialize unused bytes before enqueueing. */
 typedef struct kvm_component_control {
-    kvm_component_control_kind kind;
-    union {
-        char title[KVM_COMPONENT_WINDOW_TITLE_CAPACITY];
-        lib_bool window_frozen;
-    } value;
+    lib_u32 kind;
+    lib_u8 payload[KVM_COMPONENT_CONTROL_PAYLOAD_CAPACITY];
 } kvm_component_control;
 
 typedef lib_status (*kvm_mailbox_notify_fn)(void *context);

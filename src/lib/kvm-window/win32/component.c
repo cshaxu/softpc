@@ -511,21 +511,28 @@ static int win32_window_consume_mailboxes(lib_win32_hwnd window,
                 LIB_MEMORY_ORDER_RELEASE);
             return 0;
         }
-        if (control.kind == KVM_COMPONENT_CONTROL_SET_WINDOW_TITLE) {
-            if (!lib_win32_set_window_text_a(window, control.value.title)) {
+        if (control.kind > KVM_WINDOW_CONTROL_RELEASE_MOUSE ||
+            (control.kind == KVM_WINDOW_CONTROL_SET_TITLE &&
+                lib_memory_find(control.payload, '\0', KVM_WINDOW_TITLE_CAPACITY) == LIB_NULL) ||
+            (control.kind == KVM_WINDOW_CONTROL_SET_FROZEN && control.payload[0] > 1u)) {
+            kvm_component_fail(&context->component->base, LIB_STATUS_INVALID_ARGUMENT);
+            return 0;
+        }
+        if (control.kind == KVM_WINDOW_CONTROL_SET_TITLE) {
+            if (!lib_win32_set_window_text_a(window, (char *)control.payload)) {
                 kvm_component_fail(&context->component->base, LIB_STATUS_IO_ERROR);
                 return 0;
             }
         }
-        else if (control.kind == KVM_COMPONENT_CONTROL_SET_WINDOW_FROZEN) {
-            if (context->frozen == control.value.window_frozen) continue;
-            if (context->frozen && !control.value.window_frozen) {
+        else if (control.kind == KVM_WINDOW_CONTROL_SET_FROZEN) {
+            if (context->frozen == control.payload[0]) continue;
+            if (context->frozen && !control.payload[0]) {
                 (void)lib_win32_set_foreground_window(window);
                 if (!win32_window_accepting_input(context)) return 0;
                 (void)lib_win32_set_focus(window);
                 if (!win32_window_accepting_input(context)) return 0;
             }
-            context->frozen = control.value.window_frozen;
+            context->frozen = control.payload[0];
             if (context->frozen) {
                 win32_window_release_mouse(context);
                 if (!win32_window_accepting_input(context)) return 0;
@@ -542,7 +549,7 @@ static int win32_window_consume_mailboxes(lib_win32_hwnd window,
                 return 0;
             }
             if (!win32_window_invalidate(window, context, LIB_NULL)) return 0;
-        } else if (control.kind == KVM_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE)
+        } else if (control.kind == KVM_WINDOW_CONTROL_RELEASE_MOUSE)
             win32_window_release_mouse(context);
     }
     return win32_window_accepting_input(context);

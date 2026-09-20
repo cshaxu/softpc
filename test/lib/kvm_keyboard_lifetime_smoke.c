@@ -2,6 +2,7 @@
 #include "lib/kvm-window/window.h"
 #include "lib/kvm-console/console.h"
 #include "lib/types/win32/window.h"
+#include "lib/kvm-window/win32/input.h"
 #include <assert.h>
 
 static int allocation_failure;
@@ -12,6 +13,9 @@ static void *test_reallocate(void *memory, lib_size size)
 #undef lib_reallocate
 
 /* Execute both production message adapters without owning desktop focus. */
+/* Match the Console fixture's zero modifiers, not the user's live keyboard. */
+static lib_u8 fixture_modifiers(void) { return 0u; }
+#define kvm_window_modifiers_from_key_state fixture_modifiers
 static void *window_context;
 static unsigned translations;
 static BOOL WINAPI translate_unmapped(const MSG *message)

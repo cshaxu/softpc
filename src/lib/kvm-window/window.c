@@ -65,37 +65,37 @@ lib_status kvm_window_destroy(kvm_window *window)
 lib_status kvm_window_set_title(kvm_window *window, const char *title)
 {
     kvm_component_control control = {
-        .kind = KVM_COMPONENT_CONTROL_SET_WINDOW_TITLE
+        .kind = KVM_WINDOW_CONTROL_SET_TITLE
     };
     if (title == LIB_NULL || lib_memory_find(title, '\0',
-            KVM_COMPONENT_WINDOW_TITLE_CAPACITY) == LIB_NULL)
+            KVM_WINDOW_TITLE_CAPACITY) == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
-    lib_memory_copy(control.value.title, title, lib_text_length(title) + 1u);
+    lib_memory_copy(control.payload, title, lib_text_length(title) + 1u);
     return kvm_window_enqueue(window, control);
 }
 
 lib_status kvm_window_unfreeze(kvm_window *window)
 {
     kvm_component_control control = {
-        .kind = KVM_COMPONENT_CONTROL_SET_WINDOW_FROZEN
+        .kind = KVM_WINDOW_CONTROL_SET_FROZEN
     };
-    control.value.window_frozen = LIB_FALSE;
+    control.payload[0] = LIB_FALSE;
     return kvm_window_enqueue(window, control);
 }
 
 lib_status kvm_window_freeze(kvm_window *window)
 {
     kvm_component_control control = {
-        .kind = KVM_COMPONENT_CONTROL_SET_WINDOW_FROZEN
+        .kind = KVM_WINDOW_CONTROL_SET_FROZEN
     };
-    control.value.window_frozen = LIB_TRUE;
+    control.payload[0] = LIB_TRUE;
     return kvm_window_enqueue(window, control);
 }
 
 lib_status kvm_window_release_mouse(kvm_window *window)
 {
     kvm_component_control control = {
-        .kind = KVM_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE
+        .kind = KVM_WINDOW_CONTROL_RELEASE_MOUSE
     };
     return kvm_window_enqueue(window, control);
 }

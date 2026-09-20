@@ -2,33 +2,37 @@
 
 ## Current Work
 
-M9 T71 S2 is active, design only: leaf-owned frames and transparent mailboxes.
-Owner: "准入s2 开始设计". S1 leaves the active slot at its verified delivery
-boundary; no new manual acceptance is inferred. T70 remains closed.
+M9 T71 S3 is active: opaque control FIFO. Owner: "好的，接下来准入修复，开始执行。"
+S2 design is accepted after actual documentation review; T71 remains open.
+S3 executor verification passed: x64 and x86 110/110; P1 delivery/review follows.
 
-## M9 T71 S2 Packet
+## M9 T71 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits S2 design after S1 delivery 04d76945 and approves shared text base, leaf frame extensions, Window-owned graphics and opaque FIFO/latest-wins; latest request is to record the plan and S split. |
-| Objective | Record the approved frame/mailbox ownership and S3--S6 plan, including owner-approved S5 fixed-capacity validation and explicit copy_frame failure results; retain CP437 ownership in VM and no duplicated production paths. |
-| Non-goals | No code/build/EXE/INI/media change; no code-page detection, font recognition, dynamic frame, capacity expansion or MVDM edit. |
-| Reference Baseline | 04d76945; S1 dual-width full suites 109/109 and pushed packages. |
-| Candidate Proposal | [T71 S2 concrete design](../proposals/m9-kvm-text-frame-contract.md#t71-s2-concrete-design-for-owner-review). |
-| Files And ABI Surface | Current and both proposals only. Planned leaf frame/mailbox/Common driver ABI migration is not yet implemented. |
-| Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and linked governance skills. |
-| Verification | Source producer/consumer/codec inventory, S1 actual-diff review, documentation/whitespace gates. |
-| Expected Markers | Shared text fields; leaf-owned bitmap/map/graphics; opaque FIFO/latest-wins; base STOP admission; finite migration ledger and per-S estimates. |
-| Asset Needs | None; read-only source inspection; no runtime process or trace. |
-| Reporting Requirements | Proposed structs, migration owners, preserved UX, memory/code estimates, open decisions and no implementation claims. |
-| Stop Conditions | This documentation turn needs runtime edits; future preflights must settle exact storage/API shapes before code changes, and escalate new fallback or lifecycle semantics. |
-| Exit Criteria | Revised proposal and S split reviewed, documentation gate passed, committed/pushed; later S packets not active yet. |
-| Original Owner Request | 准入s2 开始设计; 第二项请你拆分到新的t任务proposal加入队列; 写入本T任务的proposal并进行S任务拆分。 S5: 保留现有容量，不扩容、不动态分配；统一做完整校验，超限明确失败，禁止静默裁剪。 |
-| Similar-Issue Sweep | All text/frame publishers, copying/comparison/render/cache sites and snapshot entry points; confirm archive internals before implementation. |
+| Admission And Approval | Owner authorizes implementation of the approved T71 plan; S2 design review is recorded in history. |
+| Objective | Base transports opaque bounded control records; Window owns ordinary commands and interpretation; preserve STOP/FIFO and wake semantics. |
+| Non-goals | No frame ABI/dirty/mapping changes (S4), capacity redesign (S5), Common/VM/MVDM/INI/media changes, new allocation, worker or callback. |
+| Reference Baseline | 85940465; runtime baseline 04d76945 with dual-width 109/109. |
+| Candidate Proposal | [T71 plan](../proposals/m9-kvm-text-frame-contract.md). |
+| Files And ABI Surface | kvm-base control envelope/admission; Window command definitions and producer/worker; Console worker validation; shared tests/manifests/design and both EXEs. Public leaf APIs unchanged. |
+| Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and their shared governance skills. |
+| Verification | FIFO/full/copy/STOP/fault/wake/unknown-opcode focused tests; serial complete x86/x64 build/tests; manifest/DAG/documentation gates. |
+| Expected Markers | Base knows only STOP; opaque opcode and 128-byte payload preserve existing record footprint; no Window commands in base; one FIFO. |
+| Asset Needs | Existing builds and test fixtures only; bounded build/t71-s3 logs; refresh both EXEs, never INI/media. |
+| Reporting Requirements | Preflight 70--130 production and 90--170 test changed lines; actual added/deleted/net, test evidence and EXE links. |
+| Stop Conditions | New lifecycle, frame changes, additional threads/allocations or unbounded transport design required. |
+| Exit Criteria | All control call sites migrated, no legacy Window envelope in base, focused/full tests pass, both EXEs and complete P committed/pushed; coordinator review before closure. |
+| Original Owner Request | 好的，接下来准入修复，开始执行。 |
+| Similar-Issue Sweep | rg control kinds/enqueue/take under src/test; migrate Window producer/worker, Console consumer and eight direct test consumers; Linux unsupported workers have no control loop. |
 
 ## Current Technical Baseline
 
+- S3 control ownership: production C/H +44/-32 (net +12), verifier +4/-0;
+  test C/H +102/-28 (net +74), test registration +6/-0. Both EXEs rebuilt;
+  final serial suites 110/110 each. No Common/VM/Compat/MVDM/INI/media changes.
+  Detailed evidence and the isolated test-input correction are in the proposal.
 - T71 S1 rejects graphical Console publications before mailbox mutation/wake;
   malformed frames reject separately. Existing text/status/STOP semantics remain.
   Production C/H +7/-3 (net +4); tests +37/-6 (net +31). Both EXEs rebuilt;
@@ -60,7 +64,7 @@ boundary; no new manual acceptance is inferred. T70 remains closed.
 
 ## Recent Governance
 
-T70 is closed; T71 S2 is the sole active task, limited to design.
+T70 is closed; T71 S3 is the sole active implementation task.
 
 - **M9 Td S17:** Owner requested a concrete KVM text/frame correction proposal
   at queue head. Recorded capability rejection, explicit character/glyph

@@ -370,6 +370,31 @@ static void check_input_reset(void)
     assert(reset_event_count==6 && reset_events[5].type==KVM_EVENT_SOURCE_RETIRED);
 }
 
+static void invalid_control_failure(void *opaque, lib_u64 identity, lib_status status)
+{
+    retirement_probe *probe = opaque;
+    assert(identity && status == LIB_STATUS_INVALID_ARGUMENT);
+    InterlockedIncrement(&probe->failures);
+}
+
+static void check_invalid_control(void)
+{
+    retirement_probe probe = { 0 };
+    kvm_console_options options = { .input_sink=retirement_input,
+        .input_context=&probe, .failure_sink=invalid_control_failure,
+        .failure_context=&probe };
+    kvm_component_control control = { .kind=LIB_UINT32_MAX };
+    kvm_console *console;
+    probe.retired = CreateEventA(NULL, TRUE, FALSE, NULL);
+    assert(probe.retired && kvm_console_create(&console, &options) == LIB_STATUS_OK);
+    assert(kvm_component_enqueue_control(&console->base, &control) == LIB_STATUS_OK);
+    assert(WaitForSingleObject(probe.retired, 5000u) == WAIT_OBJECT_0);
+    assert(kvm_component_enqueue_control(&console->base, &control) == LIB_STATUS_INVALID_STATE);
+    assert(kvm_console_destroy(console) == LIB_STATUS_OK);
+    assert(probe.failures == 1 && probe.event_count == 1);
+    CloseHandle(probe.retired);
+}
+
 int main(void)
 {
     check_retirement(0);
@@ -379,6 +404,7 @@ int main(void)
     check_io_failure(0, LIB_STATUS_NOT_CURRENT);
     check_activation_frame();
     check_input_reset();
+    check_invalid_control();
     return 0;
 }
 #else

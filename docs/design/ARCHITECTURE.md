@@ -234,6 +234,12 @@ never public handles or shared KVM infrastructure. SoftPC invokes the specific
 component API it has chosen; components communicate back only through the
 copied input-queue entry supplied at creation.
 
+The common control FIFO transports a consumer-owned nonzero kind and bounded
+opaque payload. Only STOP is a shared terminal transport marker; Window owns
+its title/freeze/release encoding and worker validation. Console has no ordinary
+control commands and rejects unknown records. Native leaf APIs remain typed;
+there is no application-facing raw control mailbox.
+
 Shared frame mailboxes accumulate unconsumed dirty bounds with the latest
 complete image under one lock. Capture does not consume; a successful-output
 acknowledgement clears only that still-current publication. The broker reports logical

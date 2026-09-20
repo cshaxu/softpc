@@ -57,8 +57,8 @@ static int key(kvm_key key, lib_u16 scan, int down, lib_u8 modifiers)
 }
 static void set_frozen(lib_bool frozen)
 {
-    kvm_component_control control = { .kind = KVM_COMPONENT_CONTROL_SET_WINDOW_FROZEN };
-    control.value.window_frozen = frozen;
+    kvm_component_control control = { .kind = KVM_WINDOW_CONTROL_SET_FROZEN };
+    control.payload[0] = frozen;
     assert(kvm_component_enqueue_control(&window.base, &control) == LIB_STATUS_OK);
     assert(win32_window_consume_mailboxes(NULL, &context));
     assert(context.frozen == frozen);
@@ -195,10 +195,10 @@ int main(void)
     assert(kvm_component_request_stop(&window.base) == LIB_STATUS_OK);
     assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_INVALID_STATE);
     /* Call mailbox API so ordinary rejected control does not add a failure report. */
-    kvm_component_control title = { .kind = KVM_COMPONENT_CONTROL_SET_WINDOW_TITLE };
+    kvm_component_control title = { .kind = KVM_WINDOW_CONTROL_SET_TITLE };
     assert(kvm_component_mailboxes_enqueue_control(&window.base.mailboxes, &title) == LIB_STATUS_INVALID_STATE);
     assert(kvm_component_mailboxes_take_control(&window.base.mailboxes, &taken));
-    assert(taken.kind == KVM_COMPONENT_CONTROL_SET_WINDOW_TITLE);
+    assert(taken.kind == KVM_WINDOW_CONTROL_SET_TITLE);
     assert(kvm_component_mailboxes_take_control(&window.base.mailboxes, &taken));
     assert(taken.kind == KVM_COMPONENT_CONTROL_STOP);
     assert(!kvm_component_mailboxes_take_control(&window.base.mailboxes, &taken));
@@ -210,7 +210,7 @@ int main(void)
     assert(control_thread);
     assert(WaitForSingleObject(control_thread, 5000) == WAIT_OBJECT_0);
     assert(kvm_component_mailboxes_take_control(&window.base.mailboxes, &taken));
-    assert(taken.kind == KVM_COMPONENT_CONTROL_SET_WINDOW_TITLE);
+    assert(taken.kind == KVM_WINDOW_CONTROL_SET_TITLE);
     base_sync_mutex_unlock(window.base.mailboxes.frame_lock);
     CloseHandle(control_thread);
     assert(kvm_component_destroy(&window.base) == LIB_STATUS_OK);

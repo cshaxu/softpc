@@ -96,8 +96,7 @@ lib_status kvm_component_mailboxes_enqueue_control(
     lib_u32 index;
     lib_bool stop;
 
-    if (mailboxes == LIB_NULL || control == LIB_NULL ||
-        control->kind > KVM_COMPONENT_CONTROL_RELEASE_WINDOW_MOUSE)
+    if (mailboxes == LIB_NULL || control == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     stop = control->kind == KVM_COMPONENT_CONTROL_STOP;
     if (stop) base_sync_mutex_lock(mailboxes->frame_lock);
