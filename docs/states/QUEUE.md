@@ -7,6 +7,6 @@ allocates a numeric task identifier.
 2. [XP SP1 SoftPC mirror rebase](../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
 3. [Overlay page lookup optimization](../proposals/m9-overlay-page-index.md)
 
-Existing open T72 has completed S1--S4; owner admitted S5 cell-array cleanup
+Existing open T72 has completed S1--S5 and awaits formal T closure
 (not a queued candidate):
 [neutral KVM text attributes](../proposals/m9-kvm-text-cell-glyph-refactor.md).
