@@ -252,7 +252,7 @@ payload migration is expressly outside the rename step.
   preserved in this step; neutral-only selection belongs to S2's audit plan.
   Produce both EXEs, build/test, commit/push and stop for owner review.
   Delivered in 03a954dd; [actual record](../history/M9-T73-S1-x86-component-rename.md).
-- **S2 (admitted; audit delivered for review):** audit common/machine APIs, implementation and build
+- **S2 (closed by owner):** audit common/machine APIs, implementation and build
   closure against the agreed neutral transport direction; define bounded later
   migration S tasks and acceptance tests. Do not pre-admit those migrations.
 
@@ -338,7 +338,7 @@ No new ISA interpretation was found in the neutral state/request machinery.
 This audit does not establish that all concurrency/platform failure cases are
 bug-free or that a receiving emulator is already integrated.
 
-### Proposed Follow-up Tasks (Not Admitted)
+### Follow-up Tasks (S3 Admitted; S4 Not Admitted)
 
 **S3: one complete protocol/transport migration.** Move existing x86 vocabulary
 to the protocol header, rename its prefixes to common_x86_debug/COMMON_X86_DEBUG,
@@ -384,7 +384,10 @@ four shared directories, and full x86-enabled dual-width regression/package.
 Do not claim Linux presenter support or NEC runtime validation from fake drivers.
 
 Session/UI runtime, Lib, Compat, MVDM, snapshot format and guest media are outside
-both follow-up scopes. T73 remains open; owner reviews this design before S3.
+both follow-up scopes. Owner accepted the design and admitted S3 after S2 closure.
+T73 remains open; S3 delivery waits for manual verification. To avoid a collision
+with the CLI's existing common_x86_debug_result, the moved protocol reply is
+named common_x86_debug_response; this is a naming distinction, not a new layer.
 
 ### S2 Verification
 

@@ -2,38 +2,36 @@
 
 ## Current Work
 
-Active task: M9 T73 S2, Machine x86 API/internal audit and migration planning.
-Owner accepted S1 testing and admitted S2. No Machine migration is admitted.
-S2 audit delivery 471b089c is pushed and actual-change reviewed: only the
-proposal and this packet changed; production/test/assets +0/-0. Existing Common
-background tests passed x64 22/22 (7.46s), x86 22/22 (8.02s); documentation gate
-passed. Audit is verified, awaiting owner review; S3/S4 are proposals only.
+Active task: M9 T73 S3, neutral Machine debug transport and x86 protocol migration.
+Owner accepted and closed [S2](../history/M9-T73-S2-machine-x86-audit.md), then
+admitted S3. S4 build-selection work remains unadmitted. Stop for manual testing
+after S3's complete dual-width delivery; do not close T73.
 Owner directly admitted T73 outside the queue. T72 is closed.
 See the [T73 proposal](../proposals/m9-shared-x86-dependency-audit.md).
 Existing queued candidates remain unadmitted.
 See the [S1 record](../history/M9-T73-S1-x86-component-rename.md) for scope,
 verification, changed-line accounting and package hashes.
 
-## M9 T73 S2 Packet
+## M9 T73 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: 通过测试，准入S2，开始审计machine的x86 api和内部实现问题。 |
-| Objective | Audit every Machine API/internal path and direct debug adapter consumer; separate x86 payload ownership from neutral rendezvous, then split later migrations. |
-| Non-goals | No source/test/ABI change, Lib patch, new executor, binary/media/config refresh, or implementation of later S tasks. |
-| Reference Baseline | feee0fb1; clean, S1 manually accepted, both widths previously 105/105 background. |
+| Admission And Approval | Owner approved the explained copied-byte transport, requested S2 closure then S3 implementation/build/test/commit/push and manual verification. |
+| Objective | Move x86 protocol ownership to x86-debug; make Machine request/result transport opaque while preserving the sole executor, paused lease and completion/cancellation paths. |
+| Non-goals | No Lib/Session/UI/Compat/MVDM changes, new executor/queue, dynamic message framework, command semantics change, S4 build selection, INI/media or snapshot changes. |
+| Reference Baseline | 2c724e10; clean; S2 Common tests x64/x86 22/22, S1 full background 105/105 each. |
 | Candidate Proposal | [T73 proposal](../proposals/m9-shared-x86-dependency-audit.md). |
-| Files And ABI Surface | Six Machine files; x86-debug public/runtime consumers, VM adapter, App cancellation callers; Common build/DAG and related tests. Write docs only. |
+| Files And ABI Surface | Machine header/request slot, new x86 protocol header, existing x86-debug command adapter, VM debug/driver and every direct test consumer; manifests and design evidence. |
 | Applicable Rules | Architecture, coding, execution and documentation governance; local source/design authorities. |
-| Verification | Full bounded source/API inventory with per-hit disposition; existing focused Machine/debug/build-boundary tests; documentation gate. No new full-runtime qualification claimed. |
-| Expected Markers | Every API/callback and internal owner classified; payload, capacity, completion/cancellation and build coupling explained with concrete migration boundaries. |
-| Asset Needs | None; preserve accepted EXEs, Lib, INI, snapshots and media. |
-| Reporting Requirements | Audit findings versus confirmed defects separated; production/test +0/-0; later-S added/deleted estimates identified as estimates. |
-| Stop Conditions | A proposed implementation or guest-visible semantics change requires owner review/admission. |
-| Exit Criteria | Evidence-backed audit and bounded follow-up S plan delivered and committed; no migration silently starts. |
-| Original Owner Request | 通过测试，准入S2，开始审计machine的x86 api和内部实现问题。 |
-| Similar-Issue Sweep | Public x86 types/constants, all driver hooks, request/wait/failure/lease paths, frame/input/media/state paths, production callers and shared-test dependencies. |
+| Verification | Copied payload/thread identity, bounds/length/error/stale-lease/cancel/terminal tests; original CLI/product debugger integration; dual-width Release builds and full background presets; corpus/DAG/document gates and Lib equality. |
+| Expected Markers | No x86 payload in Machine; one existing request path; exact x86 typed adapter validation; initialized failure outputs; preserved lifecycle/CLI and both EXEs. |
+| Asset Needs | Refresh only assets/binary/softpc32.exe and softpc64.exe; preserve INI/media. Existing ignored build trees hold bounded test output; no guest trace acquisition. |
+| Reporting Requirements | Before estimate and after actual added/deleted/net C/H and test counts, separate relocation and artifact costs; disclose excluded desktop tests. |
+| Stop Conditions | New runtime framework, Lib changes or guest-visible behavior change require review; S4 is not included. |
+| Exit Criteria | Implemented, actual-change reviewed, both widths built/tested and pushed clean; await owner's manual verification before S3 closure. |
+| Original Owner Request | 批准照此实现S3.请你收口S2先，然后准入S3，执行完成后编译测试提交推送等我验证。 |
+| Similar-Issue Sweep | All typed debug requests/results/constants and execute callbacks/callers/tests; exact copy bounds/alignment/failure lengths; no old aliases or Machine-to-x86 include edge. |
 
 ## Current Technical Baseline
 
