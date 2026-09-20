@@ -5,8 +5,9 @@ copied frame/input values, source-local hotkey matching, and private mailbox
 mechanics to `kvm-window` and `kvm-console`.
 
 `kvm_text_frame` contains the common text fields with a fixed 80-cell row stride.
-Parallel byte arrays carry glyph indices, foreground/background palette indices
-(0..15) and glyph bank (0 primary, 1 secondary). Colours and bank are independent;
+One `kvm_text_cell` array carries glyph index, glyph bank (0 primary, 1 secondary)
+and foreground/background palette indices (0..15) together in each four-byte cell.
+Cells have no padding; whole-array copying/comparison is valid. Colours and bank are independent;
 visible cells are validated before publication. No packed device attribute is
 interpreted here. Producers initialize the complete fixed-capacity value.
 Fonts, character maps and graphics belong to the receiving leaf, not this base.

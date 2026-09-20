@@ -213,7 +213,7 @@ static lib_status activation_frame(void *opaque, const lib_console_text_frame *f
     ++frame_writes;
     last_frame_text=(char)frame->text[0];
     if (frame->text[0]=='A') {
-        next_frame.base.text[0]='B';
+        next_frame.base.cells[0].glyph_index='B';
         assert(kvm_console_publish_frame(publishing_console,&next_frame)==0);
         if (stop_after_publication) {
             lib_console_event activation={0};
@@ -254,7 +254,7 @@ static void check_activation_frame(void)
         next_frame.characters.primary[i]=(lib_u16)i;
         next_frame.characters.secondary[i]=(lib_u16)i;
     }
-    next_frame.base.text[0]='X'; write_result=LIB_STATUS_NOT_CURRENT;
+    next_frame.base.cells[0].glyph_index='X'; write_result=LIB_STATUS_NOT_CURRENT;
     assert(kvm_console_publish_frame(c,&next_frame)==0); idle_frame();
     assert(frame_writes==1 && kvm_component_mailboxes_capture_frame(
         &c->base.mailboxes,&generation,&copied,sizeof(copied)));
@@ -272,15 +272,15 @@ static void check_activation_frame(void)
         assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
         rejected.characters.secondary[255]=0;
         for (unsigned field=0;field<3;++field) {
-            lib_u8 *value=field==0 ? &rejected.base.foreground[1999] :
-                field==1 ? &rejected.base.background[1999] : &rejected.base.glyph_bank[1999];
+            lib_u8 *value=field==0 ? &rejected.base.cells[1999].foreground :
+                field==1 ? &rejected.base.cells[1999].background : &rejected.base.cells[1999].glyph_bank;
             *value=field==2 ? 2 : 16;
             assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
             *value=0;
         }
         assert(kvm_component_mailboxes_capture_frame(&c->base.mailboxes,
             &generation,&copied,sizeof(copied)));
-        assert(generation==pending_generation && copied.base.text[0]=='X');
+        assert(generation==pending_generation && copied.base.cells[0].glyph_index=='X');
         assert(frame_writes==1 && probe.failures==0);
         assert(WaitForSingleObject(frame_idle,0)==WAIT_TIMEOUT);
         /* The worker is parked after its previous write; no rejected request
@@ -293,13 +293,13 @@ static void check_activation_frame(void)
         &c->base.mailboxes,&generation,&copied,sizeof(copied)));
     assert(lib_console_deliver_event(logical,&activated)==0); idle_frame();
     assert(frame_writes==2);
-    publishing_console=c; next_frame.base.text[0]='A';
+    publishing_console=c; next_frame.base.cells[0].glyph_index='A';
     assert(kvm_console_publish_frame(c,&next_frame)==0);
     idle_frame(); idle_frame();
     assert(frame_writes==4 && last_frame_text=='B' && !kvm_component_mailboxes_capture_frame(
         &c->base.mailboxes,&generation,&copied,sizeof(copied)));
-    assert(copied.base.text[0]=='X'); /* An empty capture does not change output. */
-    next_frame.base.text[0]='A'; stop_after_publication=1;
+    assert(copied.base.cells[0].glyph_index=='X'); /* An empty capture does not change output. */
+    next_frame.base.cells[0].glyph_index='A'; stop_after_publication=1;
     assert(kvm_console_publish_frame(c,&next_frame)==0);
     assert(WaitForSingleObject(probe.retired,5000)==WAIT_OBJECT_0);
     assert(kvm_console_publish_frame(c,&next_frame)==LIB_STATUS_INVALID_STATE);
@@ -417,13 +417,13 @@ static void check_character_banks(void)
     lib_console_output_binding binding = { NULL, capture_characters, &captured };
     assert(lib_console_create(&console.logical_console) == LIB_STATUS_OK);
     assert(lib_console_set_output_binding(console.logical_console, &binding) == LIB_STATUS_OK);
-    frame.base.text[0] = frame.base.text[1] = 65;
-    frame.base.foreground[1] = 8;
+    frame.base.cells[0].glyph_index = frame.base.cells[1].glyph_index = 65;
+    frame.base.cells[1].foreground = 8;
     frame.characters.primary[65] = 0x263a;
     frame.characters.secondary[65] = 0x2665;
     assert(kvm_console_publish_text_frame(&console, &frame) == LIB_STATUS_OK);
     assert(captured.text[0] == 0x263a && captured.text[1] == 0x263a);
-    frame.base.glyph_bank[1] = 1;
+    frame.base.cells[1].glyph_bank = 1;
     assert(kvm_console_publish_text_frame(&console, &frame) == LIB_STATUS_OK);
     assert(captured.text[0] == 0x263a && captured.text[1] == 0x2665);
     frame.characters.secondary[65] = 0x03a9;
@@ -431,18 +431,26 @@ static void check_character_banks(void)
     assert(captured.text[1] == 0x03a9);
     for (unsigned enabled=0;enabled<2;++enabled) {
         for (unsigned attribute=0;attribute<256;++attribute) {
-            frame.base.foreground[1]=attribute & 15u;
-            frame.base.background[1]=attribute >> 4;
-            frame.base.glyph_bank[1]=enabled && (attribute & 8u);
+            frame.base.cells[1].foreground=attribute & 15u;
+            frame.base.cells[1].background=attribute >> 4;
+            frame.base.cells[1].glyph_bank=enabled && (attribute & 8u);
             assert(kvm_console_publish_text_frame(&console,&frame)==LIB_STATUS_OK);
             assert(captured.text[1]==(enabled && (attribute & 8u) ? 0x03a9 : 0x263a));
             assert(captured.foreground[1]==(attribute & 15u));
             assert(captured.background[1]==(attribute >> 4));
         }
     }
-    frame.base.foreground[1]=1; frame.base.glyph_bank[1]=1;
+    frame.base.cells[1].foreground=1; frame.base.cells[1].glyph_bank=1;
     assert(kvm_console_publish_text_frame(&console,&frame)==LIB_STATUS_OK);
     assert(captured.text[1]==0x03a9 && captured.foreground[1]==1);
+    frame.base.text_rows = 2;
+    frame.base.cells[KVM_TEXT_COLUMNS] = (kvm_text_cell){ 66, 0, 3, 4 };
+    frame.base.cells[KVM_TEXT_COLUMNS + 1u] = (kvm_text_cell){ 67, 1, 5, 6 };
+    frame.characters.primary[66] = 0x2500;
+    frame.characters.secondary[67] = 0x2588;
+    assert(kvm_console_publish_text_frame(&console, &frame) == LIB_STATUS_OK);
+    assert(captured.text[80] == 0x2500 && captured.foreground[80] == 3 && captured.background[80] == 4);
+    assert(captured.text[81] == 0x2588 && captured.foreground[81] == 5 && captured.background[81] == 6);
     /* KVM scanlines are normalized before the independent Console boundary. */
     const struct { unsigned height, top, bottom, visible, out_bottom; } cases[] = {
         {0,14,15,1,15}, {16,20,21,0,15}, {16,14,31,1,15},

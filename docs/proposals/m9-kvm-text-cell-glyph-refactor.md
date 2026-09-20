@@ -9,6 +9,8 @@ S1 设计已由 owner 批准，保留平行数组；随后授权“批准执行�
 然后等我审核后再正式收口”。S2 实施、S3 审计准入，正式 T 收口仍待审。
 下文估算是 S1 基线；实际交付另行记录。不修改 INI、介质或快照格式。
 当前状态唯一来源是 [CURRENT](../states/CURRENT.md)。
+S1--S4 的设计/结果保留为历史；后续 owner 准入的 S5（第十二节）将
+平行数组换成单一字符格数组，其余中性语义和组件边界不变。
 
 ## 一、建议：只搬走“解释属性位”的职责
 
@@ -299,3 +301,43 @@ Raw mouse 注册是进程级资源：捕获只接受无现有注册的情况，�
 Owner 已确认 desktop/RDP 测试均通过，批准 S4 收口；
 [S4 收口与 T72 就绪汇总](../history/M9-T72-S4-native-mouse-acceptance.md)
 核对原始目标及追加范围。T72 正式收口仍待明确批准。
+
+## 十二、S5：单一字符格数组（owner 追加准入）
+
+Owner 原始请求：“我希望是代码更干净，更易懂。看起来我们应该合并。
+准入一个新的S任务做这个。”此决定只替换 S1 的平行数组布局选择，
+不撤销四项中性事实、leaf 资源所有权或原有输出语义。
+
+在原 frame_interface.h 定义 kvm_text_cell，按 glyph_index、glyph_bank、
+foreground、background 四个 lib_u8 排列。基础帧使用固定 cells[80*25]。
+用编译期 sizeof/offset 断言保证恰好四字节且无 padding；不使用 packing。
+每帧调色板、位图和字符映射仍位于现有位置。所有帧大小必须保持不变。
+VM 和 Common 原有循环写 cell，Common 四次比较合为一次，两个 presenter
+在原循环直接取 cell。底层 lib_console_text_frame 是独立 Unicode 契约，
+不依赖 KVM、不迁移其数组、不新增类型转换对象。
+
+有限范围：六个生产文件、九个测试文件的现存 KVM 文本消费者；每个
+成员只能是已迁移并证明，或因属于独立 Unicode Console 而明确保留。
+
+| 边界 | 修改及证明 |
+| --- | --- |
+| Base frame_interface.h | cell 定义、无 padding 断言、逐格验证；frame-copy 测试保证全部原 sizeof、可见格/隐藏尾格、拒绝不覆盖 |
+| VM driver.c | 原数据源和读取次序不变，完整初始化和一次 cell 赋值；vga-frame 512 组和 runtime-cursor |
+| Common ui.c | 状态文字按 cell 初始化和写字形；composition 校验每格及两行内容 |
+| Common machine.c | 一个 cells 比较，其他元数据/资源比较保留；machine-wait 单独改变四个字段 |
+| Window render.c | 原逐格渲染直接读 cell；512 组像素及独立 bank/颜色测试不变 |
+| Console console.c | 同一转换循环取 glyph/map 和两种颜色；原 512 组、失败拒绝/退休测试不变 |
+| 测试其他消费者 | win32-presentation 和真实 restart-boot 文本扫描改为取 glyph_index，不把 cell 内存当连续字符串 |
+
+实现前估算：生产六文件 +45--70/-40--70，净接近零；测试九文件
++80--130/-60--100。此迁移不承诺明显加速；字节容量不变，主要收益是
+每格责任聚合、减少关联四数组的心智负担。不为净减行数压缩排版。
+不改鼠标、输入、图形、线程、mailbox、MVDM、Compat、INI、介质或快照。
+双宽度后台验证后交付 EXE、提交推送和实际变更复审，等 owner 测试。
+
+S5 实际生产六文件 +31/-33，净 -2；测试九文件 +94/-57，净 +37。
+没有靠重排格式压行数：一次 cells 比较替代四次比较，原两个生产循环
+直接构造完整 cell，原两个消费循环直接读取。低于估算来自复用原循环，
+不是省略验证或增加兼容转发。尺寸断言保留，另验证 cell 各字段偏移、
+相邻格/固定80跨度、四字段独立改变和完整复制。完整记录见
+[S5 证据](../etc/evidence/softpc/m9-t72-s5-text-cells.md)。

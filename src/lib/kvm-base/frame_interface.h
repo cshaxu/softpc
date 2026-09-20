@@ -14,6 +14,15 @@
 #define KVM_TEXT_COLUMNS 80u
 #define KVM_TEXT_ROWS 25u
 
+typedef struct kvm_text_cell {
+    lib_u8 glyph_index;
+    lib_u8 glyph_bank; /* 0 primary, 1 secondary */
+    lib_u8 foreground; /* palette index 0..15 */
+    lib_u8 background; /* palette index 0..15 */
+} kvm_text_cell;
+
+_Static_assert(sizeof(kvm_text_cell) == 4u, "Text cells must have no padding");
+
 typedef struct kvm_text_frame {
     lib_u16 text_columns;
     lib_u16 text_rows;
@@ -23,10 +32,7 @@ typedef struct kvm_text_frame {
     lib_u8 cursor_bottom;
     lib_u8 cursor_visible;
     lib_u8 cursor_phase;
-    lib_u8 text[KVM_TEXT_COLUMNS * KVM_TEXT_ROWS];
-    lib_u8 foreground[KVM_TEXT_COLUMNS * KVM_TEXT_ROWS]; /* palette index 0..15 */
-    lib_u8 background[KVM_TEXT_COLUMNS * KVM_TEXT_ROWS]; /* palette index 0..15 */
-    lib_u8 glyph_bank[KVM_TEXT_COLUMNS * KVM_TEXT_ROWS]; /* 0 primary, 1 secondary */
+    kvm_text_cell cells[KVM_TEXT_COLUMNS * KVM_TEXT_ROWS];
     lib_u32 text_palette[16u]; /* 0x00RRGGBB */
     lib_u32 font_height;
 } kvm_text_frame;
@@ -39,9 +45,9 @@ static inline lib_status kvm_text_frame_validate(const kvm_text_frame *frame)
         return LIB_STATUS_UNSUPPORTED;
     for (lib_size row = 0u; row < frame->text_rows; ++row) {
         for (lib_size column = 0u; column < frame->text_columns; ++column) {
-            lib_size index = row * KVM_TEXT_COLUMNS + column;
-            if (frame->foreground[index] > 15u || frame->background[index] > 15u ||
-                frame->glyph_bank[index] > 1u) return LIB_STATUS_INVALID_ARGUMENT;
+            const kvm_text_cell *cell = &frame->cells[row * KVM_TEXT_COLUMNS + column];
+            if (cell->foreground > 15u || cell->background > 15u ||
+                cell->glyph_bank > 1u) return LIB_STATUS_INVALID_ARGUMENT;
         }
     }
     return LIB_STATUS_OK;

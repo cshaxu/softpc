@@ -21,8 +21,8 @@ int main(void)
         lib_u32 width, height;
         assert(kvm_window_frame_size(&frame, &width, &height));
         assert(width == 640 && height == 25 * heights[h]);
-        frame.text.base.text[7 * KVM_TEXT_COLUMNS + 3] = 'A';
-        frame.text.base.foreground[7 * KVM_TEXT_COLUMNS + 3] = 1;
+        frame.text.base.cells[7 * KVM_TEXT_COLUMNS + 3].glyph_index = 'A';
+        frame.text.base.cells[7 * KVM_TEXT_COLUMNS + 3].foreground = 1;
         frame.text.base.text_palette[1] = 0xffffff;
         frame.text.font['A' * 16 + heights[h] - 1] = 0xff;
         kvm_window_render_text(&frame, pixels, width, height);

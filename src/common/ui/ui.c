@@ -288,10 +288,8 @@ static void common_ui_status_frame(kvm_console_text_frame *frame,
     frame->base.text_rows = KVM_TEXT_ROWS;
     frame->base.cursor_column = -1;
     frame->base.cursor_row = -1;
-    for (index = 0u; index < sizeof(frame->base.text); ++index) {
-        frame->base.text[index] = ' ';
-        frame->base.foreground[index] = 7u;
-    }
+    for (index = 0u; index < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++index)
+        frame->base.cells[index] = (kvm_text_cell){ ' ', 0u, 7u, 0u };
     for (index = 0u; index < 256u; ++index) {
         lib_u16 character = index >= 32u && index < 127u ? (lib_u16)index : ' ';
         frame->characters.primary[index] = character;
@@ -301,7 +299,7 @@ static void common_ui_status_frame(kvm_console_text_frame *frame,
         if (text[index] == '\r') continue;
         if (text[index] == '\n') { ++row; column = 0u; continue; }
         if (row < KVM_TEXT_ROWS && column < KVM_TEXT_COLUMNS)
-            frame->base.text[row * KVM_TEXT_COLUMNS + column] = (lib_u8)text[index];
+            frame->base.cells[row * KVM_TEXT_COLUMNS + column].glyph_index = (lib_u8)text[index];
         ++column;
     }
 }

@@ -247,8 +247,8 @@ surface; it updates changed pixels and invalidates their enclosing rectangle.
 First graphics, recreated surfaces and text-to-graphics invalidate fully;
 native invalidations accumulate until paint. No previous-frame cache is added.
 Console stores common text fields and caller-supplied character maps only.
-Shared text uses parallel glyph, foreground, background and glyph-bank byte
-arrays. VM alone decodes device colour/bank bits; KVM leaves select resources
+Shared text uses one array of four-byte cells, each holding a glyph index,
+glyph bank, foreground and background palette indices. VM alone decodes device colour/bank bits; KVM leaves select resources
 from explicit independent values. Logical Console also carries separate colour
 indices; only its native broker packs them for the host API. This changes no
 mailbox, readiness, graphics or lifecycle policy.

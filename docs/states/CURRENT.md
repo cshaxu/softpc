@@ -2,17 +2,43 @@
 
 ## Current Work
 
-No implementation subtask is active. T72 S1--S4 are closed; T72 remains open
-pending the owner's explicit T-level closure approval. No next candidate admitted.
-Open task awaiting owner: T72.
+Active: T72 S5, aggregate KVM text fields into one cell array.
+Implementation and dual-width background verification complete; awaiting delivery
+review and owner testing before closure.
+T72 S1--S4 are closed. T72 remains open; no next queued candidate admitted.
 
 Owner confirmed desktop and RDP tests passed and approved S4 closure.
 See [S4 closure and T72 readiness](../history/M9-T72-S4-native-mouse-acceptance.md),
 [original readiness audit](../history/M9-T72-S3-completion-readiness-audit.md) and
 [T72 proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md).
 
+## M9 T72 S5 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner: "我希望是代码更干净，更易懂。看起来我们应该合并。准入一个新的S任务做这个。" |
+| Objective | Replace four KVM text arrays with one array of four-byte cells; keep glyph/bank/foreground/background meaning and all product behavior. |
+| Non-goals | No logical Unicode Console ABI change, new layer/cache/thread, renderer policy, mouse/input, MVDM/Compat, INI/media or snapshot change. |
+| Reference Baseline | e118f058; clean at admission. |
+| Candidate Proposal | [T72 proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md), S5 addition supersedes the earlier layout choice only. |
+| Files And ABI Surface | Six production paths: kvm-base/frame_interface.h, kvm-window/render.c, kvm-console/console.c, common/machine/machine.c, common/ui/ui.c, vm/driver.c; nine current test consumers. KVM source ABI changes atomically, without old aliases. |
+| Applicable Rules | Execution, architecture, coding and documentation governance; current architecture/source layout/UI. |
+| Verification | Cell sizeof/offset assertions, existing 512-case output matrix, each-field change detection, hidden-tail/bounds/copy/publication tests, dual Release strict Lib builds and both full background suites, manifests/DAG/docs. |
+| Expected Markers | cells[index] owns all four bytes; one comparison, no residual KVM parallel arrays; identical frame sizes and outputs; no unchecked adapter. |
+| Asset Needs | Existing package EXEs only; preserve INI/media. Background presets exclude desktop automation; no diagnostic capture needed. |
+| Reporting Requirements | Estimate six production C/H +45--70/-40--70, near-zero net; nine test C +80--130/-60--100. Report actual additions/deletions/net separately from docs/manifests/binaries. |
+| Stop Conditions | No padding-dependent comparison, capacity/validation/behavior change, new interface bridge or unrelated cleanup. |
+| Exit Criteria | Complete atomic migration and finite ledger proof, x86/x64 packages, commit/push and actual-change review; await owner testing before S/T closure. |
+| Original Owner Request | "将文本帧平行数组改为单一单元格数组"; prioritize clean and understandable code. |
+| Similar-Issue Sweep | All KVM field consumers including test text scanning, bulk initialization, comparison and copy; logical Console Unicode arrays intentionally retained at their independent boundary. |
+
 ## Current Technical Baseline
 
+- S5 production +31/-33 (net -2); tests +94/-57 (net +37). Both Release builds
+  pass; background x64 105/105 (159.37s), x86 105/105 (146.32s). Frame sizes
+  unchanged; five desktop tests per width excluded. See
+  [S5 evidence](../etc/evidence/softpc/m9-t72-s5-text-cells.md).
 - S4 repair replaces pointer recentering with native motion; public input ABI
   unchanged. Source +148/-44 (net +104), test +142/-34 (net +108). Package hashes
   and exact verification results are in the
@@ -33,10 +59,10 @@ See [S4 closure and T72 readiness](../history/M9-T72-S4-native-mouse-acceptance.
 - Renderer readiness, required fonts, terminal request completion, fixed-80 text
   layout and cursor normalization are recorded in the
   [T71 completion audit](../history/M9-T71-completion-audit.md).
-- T72 uses neutral parallel text arrays, with device decoding only in VM and
-  native Console colour encoding only in Broker. No frame transport change.
-- TODO tracking is retired by owner decision, not proof of repair. No technical
-  blocker remains within T72's admitted scope; formal T72 closure awaits approval.
+- S5 aggregates the four neutral KVM fields into four-byte cells. Device decoding
+  stays in VM, native Console colour encoding in Broker. No frame transport change.
+- TODO tracking is retired by owner decision, not proof of repair. S5 delivery
+  and owner acceptance now precede formal T72 closure.
 
 ## Recent M9 Closures
 

@@ -361,8 +361,8 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
     if (stride < columns) return LIB_STATUS_INVALID_ARGUMENT;
     memset(&frame->window, 0, lib_offsetof(kvm_window_frame, text) +
         sizeof(frame->window.text));
-    memset(frame->window.text.base.text, ' ', sizeof(frame->window.text.base.text));
-    memset(frame->window.text.base.foreground, 7, sizeof(frame->window.text.base.foreground));
+    for (lib_size index = 0u; index < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++index)
+        frame->window.text.base.cells[index] = (kvm_text_cell){ ' ', 0u, 7u, 0u };
     if (!softpc_machine_presentation_fonts(driver->machine, frame->window.text.font,
         frame->window.text.secondary_font, &frame->window.text.base.font_height,
         &attribute_select))
@@ -373,12 +373,10 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
         for (text_column = 0u; text_column < columns; ++text_column) {
             size_t source = ((size_t)text_row * stride + text_column) * cell_bytes;
             size_t destination = (size_t)text_row * KVM_TEXT_COLUMNS + text_column;
-            frame->window.text.base.text[destination] = cells[source];
             lib_u8 attribute = cell_bytes >= 2u ? cells[source + 1u] : 7u;
-            frame->window.text.base.foreground[destination] = attribute & 0x0fu;
-            frame->window.text.base.background[destination] = (attribute >> 4u) & 0x0fu;
-            frame->window.text.base.glyph_bank[destination] =
-                attribute_select && (attribute & 0x08u) ? 1u : 0u;
+            frame->window.text.base.cells[destination] = (kvm_text_cell){
+                cells[source], attribute_select && (attribute & 0x08u) ? 1u : 0u,
+                attribute & 0x0fu, (attribute >> 4u) & 0x0fu };
         }
     }
     {

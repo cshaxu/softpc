@@ -22,21 +22,19 @@ void kvm_window_render_text(const kvm_window_frame *frame, lib_u32 *pixels, lib_
     for (row = 0u; row < frame->text.base.text_rows; ++row) {
         lib_u32 column;
         for (column = 0u; column < frame->text.base.text_columns; ++column) {
-            lib_size index = (lib_size)row * KVM_TEXT_COLUMNS + column;
-            lib_u8 character = frame->text.base.text[index];
-            const lib_u8 *font = frame->text.base.glyph_bank[index] != 0u ?
+            const kvm_text_cell *cell = &frame->text.base.cells[(lib_size)row * KVM_TEXT_COLUMNS + column];
+            const lib_u8 *font = cell->glyph_bank != 0u ?
                 frame->text.secondary_font : frame->text.font;
             lib_u32 scan;
             for (scan = 0u; scan < cell_height; ++scan) {
-                lib_u8 bits = font[(lib_size)character * 16u + scan];
+                lib_u8 bits = font[(lib_size)cell->glyph_index * 16u + scan];
                 lib_u32 *row_pixels = pixels +
                     ((lib_size)row * cell_height + scan) *
                     width + column * 8u;
                 lib_u32 bit;
                 for (bit = 0u; bit < 8u; ++bit)
                     row_pixels[bit] = frame->text.base.text_palette[
-                        (bits & (0x80u >> bit)) != 0u ? frame->text.base.foreground[index] :
-                            frame->text.base.background[index]];
+                        (bits & (0x80u >> bit)) != 0u ? cell->foreground : cell->background];
             }
         }
     }

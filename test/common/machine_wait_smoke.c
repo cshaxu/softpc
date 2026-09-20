@@ -287,11 +287,12 @@ static void check_publication(void)
     candidate.window.text.base.cursor_column = 1;
     assert(common_machine_publish(active) == LIB_STATUS_OK);
     assert(common_machine_published_frame_sequence(active) == 5);
-    for (unsigned field = 0; field < 4; ++field) {
-        if (field == 0) candidate.window.text.base.foreground[0] = 1;
-        if (field == 1) candidate.window.text.base.background[0] = 2;
-        if (field == 2) candidate.window.text.base.glyph_bank[0] = 1;
+    for (unsigned field = 0; field < 5; ++field) {
+        if (field == 0) candidate.window.text.base.cells[0].foreground = 1;
+        if (field == 1) candidate.window.text.base.cells[0].background = 2;
+        if (field == 2) candidate.window.text.base.cells[0].glyph_bank = 1;
         if (field == 3) candidate.window.text.base.text_palette[1] = 0x123456;
+        if (field == 4) candidate.window.text.base.cells[0].glyph_index = 'X';
         assert(common_machine_publish(active) == LIB_STATUS_OK);
         assert(common_machine_published_frame_sequence(active) == 6 + field);
         assert(common_machine_publish(active) == LIB_STATUS_OK);

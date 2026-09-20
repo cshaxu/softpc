@@ -143,12 +143,13 @@ lib_status kvm_console_publish_text_frame(kvm_console *console,
     text_frame.columns = text->text_columns;
     text_frame.rows = text->text_rows;
     for (index = 0u; index < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++index) {
-        const lib_u16 *map = text->glyph_bank[index] != 0u ?
+        const kvm_text_cell *cell = &text->cells[index];
+        const lib_u16 *map = cell->glyph_bank != 0u ?
             frame->characters.secondary : frame->characters.primary;
-        text_frame.text[index] = map[text->text[index]];
+        text_frame.text[index] = map[cell->glyph_index];
+        text_frame.foreground[index] = cell->foreground;
+        text_frame.background[index] = cell->background;
     }
-    lib_memory_copy(text_frame.foreground, text->foreground, sizeof(text_frame.foreground));
-    lib_memory_copy(text_frame.background, text->background, sizeof(text_frame.background));
     lib_memory_copy(text_frame.palette, text->text_palette, sizeof(text_frame.palette));
     text_frame.cursor_column = text->cursor_column;
     text_frame.cursor_row = text->cursor_row;

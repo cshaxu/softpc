@@ -33,7 +33,7 @@ static void damage(void)
         assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_UNSUPPORTED);
         frame.image.height = 4u; frame.image.stride = 3u;
         assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_INVALID_ARGUMENT);
-        frame.graphics = 0u;
+        frame = (kvm_window_frame){ .valid = 1u }; /* No graphics bytes in a text fixture. */
         frame.text.base.text_columns = 80u; frame.text.base.text_rows = 25u;
         frame.text.base.font_height = KVM_WINDOW_FONT_HEIGHT + 1u;
         assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_UNSUPPORTED);
@@ -155,15 +155,15 @@ static void rendering(void)
     text.text.base.font_height=0;
     assert(kvm_window_cursor_rect(&text,&display,&cursor) && cursor.top==20 && cursor.bottom==52);
     text.text.font[0] = 0x80;
-    text.text.base.foreground[0] = 1; text.text.base.background[0] = 2;
+    text.text.base.cells[0].foreground = 1; text.text.base.cells[0].background = 2;
     text.text.base.text_palette[1] = 0x112233; text.text.base.text_palette[2] = 0x445566;
     kvm_window_render_text(&text, pixels, 8, 16);
     assert(pixels[0] == 0x112233 && pixels[1] == 0x445566 && pixels[127] == 0x445566);
     text.text.font[0] = 0x40;
     kvm_window_render_text(&text, pixels, 8, 16);
     assert(pixels[0] == 0x445566 && pixels[1] == 0x112233);
-    text.text.base.glyph_bank[0] = 1u;
-    text.text.base.foreground[0] = 9u;
+    text.text.base.cells[0].glyph_bank = 1u;
+    text.text.base.cells[0].foreground = 9u;
     text.text.base.text_palette[9] = 0x112233;
     text.text.secondary_font[0] = 0x20;
     kvm_window_render_text(&text, pixels, 8, 16);
@@ -174,9 +174,9 @@ static void rendering(void)
     for (unsigned enabled = 0; enabled < 2; ++enabled) {
         for (unsigned attribute = 0; attribute < 256; ++attribute) {
             unsigned bits = enabled && (attribute & 8u) ? 0x20u : 0x40u;
-            text.text.base.foreground[0] = attribute & 15u;
-            text.text.base.background[0] = attribute >> 4;
-            text.text.base.glyph_bank[0] = enabled && (attribute & 8u);
+            text.text.base.cells[0].foreground = attribute & 15u;
+            text.text.base.cells[0].background = attribute >> 4;
+            text.text.base.cells[0].glyph_bank = enabled && (attribute & 8u);
             kvm_window_render_text(&text, pixels, 8, 16);
             for (unsigned x = 0; x < 8; ++x)
                 assert(pixels[x] == ((bits & (0x80u >> x)) ?
@@ -184,9 +184,29 @@ static void rendering(void)
         }
     }
     /* Neutral producers may select bank 1 without colour bit 3. */
-    text.text.base.foreground[0] = 1u;
-    text.text.base.glyph_bank[0] = 1u;
+    text.text.base.cells[0].foreground = 1u;
+    text.text.base.cells[0].glyph_bank = 1u;
     kvm_window_render_text(&text, pixels, 8, 16);
     assert(pixels[2] == 0x010101u);
+    /* A short visible row still has an 80-cell storage stride. */
+    lib_u32 grid[16u * 32u];
+    text.text.base.text_columns = text.text.base.text_rows = 2;
+    text.text.font[3u * 16u] = 0x80;
+    text.text.secondary_font[5u * 16u] = 0x40;
+    for (unsigned row = 0; row < 2; ++row) {
+        for (unsigned column = 0; column < 2; ++column) {
+            lib_u8 fg = (lib_u8)(1u + row * 4u + column * 2u);
+            text.text.base.cells[row * KVM_TEXT_COLUMNS + column] =
+                (kvm_text_cell){ column ? 5u : 3u, (lib_u8)column, fg, (lib_u8)(fg + 1u) };
+        }
+    }
+    kvm_window_render_text(&text, grid, 16, 32);
+    for (unsigned row = 0; row < 2; ++row)
+        for (unsigned column = 0; column < 2; ++column)
+            for (unsigned x = 0; x < 8; ++x) {
+                unsigned fg = 1u + row * 4u + column * 2u;
+                assert(grid[row * 16u * 16u + column * 8u + x] ==
+                    (x == column ? fg : fg + 1u) * 0x010101u);
+            }
 }
 int main(void) { damage(); motion(); rendering(); return 0; }

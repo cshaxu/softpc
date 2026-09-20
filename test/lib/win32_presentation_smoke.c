@@ -31,7 +31,7 @@ int main(void)
     frame->graphics = 0u;
     frame->text.base.text_columns = 80u;
     frame->text.base.text_rows = 25u;
-    frame->text.base.text[0] = 'X';
+    frame->text.base.cells[0].glyph_index = 'X';
     assert(kvm_window_frame_validate(frame) == LIB_STATUS_OK);
 
     kvm_hotkey_registry_initialize(&registry);

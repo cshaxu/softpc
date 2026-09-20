@@ -133,12 +133,14 @@ int main(void)
         COMMON_UI_STATE_RUNNING) == LIB_STATUS_OK);
     assert(common_ui_publish_frame(ui, &frame, &characters, sequence, 1, 1, 1) == LIB_STATUS_OK);
     assert(status_builds == 1u && console_frames == 1u && window_frames == 1u);
-    assert(last_console.base.text_columns == 80u &&
-        memcmp(last_console.base.text, "Window active", 13u) == 0 &&
-        memcmp(last_console.base.text + KVM_TEXT_COLUMNS * 2u, "Hotkeys", 7u) == 0);
+    assert(last_console.base.text_columns == 80u);
+    for (unsigned i = 0; i < 13u; ++i)
+        assert(last_console.base.cells[i].glyph_index == "Window active"[i]);
+    for (unsigned i = 0; i < 7u; ++i)
+        assert(last_console.base.cells[KVM_TEXT_COLUMNS * 2u + i].glyph_index == "Hotkeys"[i]);
     for (unsigned i = 0; i < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++i) {
-        assert(last_console.base.foreground[i] == 7u);
-        assert(last_console.base.background[i] == 0u && last_console.base.glyph_bank[i] == 0u);
+        assert(last_console.base.cells[i].foreground == 7u);
+        assert(last_console.base.cells[i].background == 0u && last_console.base.cells[i].glyph_bank == 0u);
     }
     assert(common_ui_publish_frame(ui, &frame, &characters, sequence, 1, 1, 1) == LIB_STATUS_OK);
     assert(status_builds == 1u && console_frames == 1u && window_frames == 1u);
@@ -152,20 +154,20 @@ int main(void)
     frame.text.base.text_columns = 80u; frame.text.base.text_rows = 25u;
     characters.primary['T'] = 0x263au;
     characters.secondary['T'] = 0x2665u;
-    frame.text.base.text[0] = 'T';
+    frame.text.base.cells[0].glyph_index = 'T';
     publish_status = LIB_STATUS_IO_ERROR;
     assert(common_ui_publish_frame(ui, &frame, &characters, sequence, 1, 1, 1) == LIB_STATUS_IO_ERROR);
     assert(ui->console_status_delivered);
     publish_status = LIB_STATUS_OK;
     assert(common_ui_publish_frame(ui, &frame, &characters, sequence, 1, 1, 1) == LIB_STATUS_OK);
-    assert(!ui->console_status_delivered && last_console.base.text[0] == 'T');
+    assert(!ui->console_status_delivered && last_console.base.cells[0].glyph_index == 'T');
     assert(last_console.characters.primary['T'] == 0x263au &&
         last_console.characters.secondary['T'] == 0x2665u);
     assert(status_builds == 1u && console_frames == 3u && window_frames == 3u);
     sequence = 4u;
-    frame.text.base.text[0] = 'U';
+    frame.text.base.cells[0].glyph_index = 'U';
     assert(common_ui_publish_frame(ui, &frame, &characters, sequence, 1, 1, 0) == LIB_STATUS_OK);
-    assert(console_frames == 4u && last_console.base.text[0] == 'U');
+    assert(console_frames == 4u && last_console.base.cells[0].glyph_index == 'U');
     sequence = 5u;
     frame.graphics = 1u;
     publish_status = LIB_STATUS_IO_ERROR;
