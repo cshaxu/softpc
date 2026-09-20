@@ -1,8 +1,8 @@
 #include <assert.h>
 #include <windows.h>
 
-#include "compat/conapi.h"
-#include "compat/dib_surface.h"
+#include "core/compat/conapi.h"
+#include "core/compat/dib_surface.h"
 
 static unsigned char character_at(const unsigned char *cells,
     unsigned long column, unsigned long row, unsigned long stride,

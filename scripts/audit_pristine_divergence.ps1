@@ -4,7 +4,7 @@ param(
     [ValidateNotNullOrEmpty()]
     [string]$OriginalRoot,
 
-    [string]$CurrentRoot = (Join-Path $PSScriptRoot '..\src\mvdm\softpc.new')
+    [string]$CurrentRoot = (Join-Path $PSScriptRoot '..\src\core\softpc.new')
 )
 
 $ErrorActionPreference = 'Stop'

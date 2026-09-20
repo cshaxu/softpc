@@ -1,10 +1,10 @@
-#include "vm/driver.h"
+#include "core/machine/driver.h"
 #include "input.h"
-#include "vm/trace.h"
-#include "vm/debug.h"
-#include "vm/snapshot.h"
-#include "compat/ccpu/lifecycle.h"
-#include "compat/audio.h"
+#include "core/machine/trace.h"
+#include "core/machine/debug.h"
+#include "core/machine/snapshot.h"
+#include "core/compat/ccpu/lifecycle.h"
+#include "core/compat/audio.h"
 #include "lib/types/atomic.h"
 
 #include <windows.h>

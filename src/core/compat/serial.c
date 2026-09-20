@@ -14,7 +14,7 @@
 
 #include "xt.h"
 #include "host_com.h"
-#include "compat/devices/snapshot.h"
+#include "core/compat/devices/snapshot.h"
 
 #include <stdio.h>
 #include <string.h>

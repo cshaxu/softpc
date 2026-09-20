@@ -29,7 +29,7 @@ directory.  This includes CMake/Ninja metadata, generated sources, test
 executables, diagnostics, and temporary test media. The user-facing package is
 only `assets/binary/`; reusable boot media is in `assets/media/`. The
 selected original ROMs are embedded from
-`src/mvdm/softpc.new/roms/`; `assets/roms/` does not exist. Do not
+`src/core/softpc.new/roms/`; `assets/roms/` does not exist. Do not
 create sibling `build-*` directories or place generated executables at the
 repository root. Build the VM, then set the fixed machine defaults in the
 adjacent `assets/binary/softpc.ini`:
@@ -115,12 +115,12 @@ presets; see [test execution](docs/design/CODING.md#build-output-layout).
 
 - `assets/readme/` — owner-provided current product screenshots used by this
   README; they are documentation assets, not guest media or runtime inputs.
-- `src/mvdm/softpc.new/` — recovered original SoftPC machine, including the
+- `src/core/softpc.new/` — recovered original SoftPC machine, including the
   embedded selected BIOS/VGA/CMOS ROM inputs, retained in its historical tree.
-- `src/mvdm/softpc.new/` may contain narrow, reviewable compiler/host-ABI
+- `src/core/softpc.new/` may contain narrow, reviewable compiler/host-ABI
   source diffs at the affected point; it contains no new machine policy.
-- `src/compat/` — original SoftPC host callbacks, media/video surfaces and ABI support.
-- `src/vm/` — SoftPC backend adaptation to the existing Common machine contract.
+- `src/core/compat/` — original SoftPC host callbacks, media/video surfaces and ABI support.
+- `src/core/machine/` — SoftPC backend adaptation to the existing Common machine contract.
 - `src/app/` — configuration, product CLI/hotkey policy and entity assembly;
   only main consumes the VM public interface.
 - `src/common/` — shared machine executor, session control, UI composition and debug/xasm32.

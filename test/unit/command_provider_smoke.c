@@ -1,5 +1,5 @@
 #include "app/composition.h"
-#include "vm/driver.h"
+#include "core/machine/driver.h"
 
 #include <windows.h>
 #include <assert.h>

@@ -5,8 +5,8 @@ function(softpc_check_build_source target source)
     endif()
     get_filename_component(path "${source}" ABSOLUTE BASE_DIR "${SOFTPC_SOURCE_DIR}")
     file(RELATIVE_PATH path "${SOFTPC_SOURCE_DIR}" "${path}")
-    if((path MATCHES "^src/vm/" AND NOT target STREQUAL "softpc-vm") OR
-       (target STREQUAL "softpc-vm" AND NOT path MATCHES "^src/vm/") OR
+    if((path MATCHES "^src/core/machine/" AND NOT target STREQUAL "softpc-vm") OR
+       (target STREQUAL "softpc-vm" AND NOT path MATCHES "^src/core/machine/") OR
        (target STREQUAL "softpcvm" AND NOT path MATCHES "^src/app/"))
         message(FATAL_ERROR "Build ownership: ${target} compiles ${path}")
     endif()
@@ -15,11 +15,11 @@ endfunction()
 if(DEFINED CASE_TARGET)
     softpc_check_build_source("${CASE_TARGET}" "${CASE_SOURCE}")
 elseif(CMAKE_SCRIPT_MODE_FILE)
-    foreach(sample IN ITEMS "softpc-vm|src/vm/driver.c|0"
+    foreach(sample IN ITEMS "softpc-vm|src/core/machine/driver.c|0"
         "softpcvm|src/app/composition.c|0" "probe|test/unit/machine_smoke.c|0"
-        "softpcvm|src/vm/driver.c|1" "probe|src/vm/debug.c|1"
-        "softpc-machine|src/vm/input.c|1" "softpc-vm|src/compat/platform.c|1"
-        "softpcvm|src/app/../compat/platform.c|1")
+        "softpcvm|src/core/machine/driver.c|1" "probe|src/core/machine/debug.c|1"
+        "softpc-machine|src/core/machine/input.c|1" "softpc-vm|src/core/compat/platform.c|1"
+        "softpcvm|src/app/../core/compat/platform.c|1")
         string(REPLACE "|" ";" parts "${sample}")
         list(GET parts 0 target)
         list(GET parts 1 source)
@@ -40,7 +40,7 @@ else()
             softpc_check_build_source("${target}" "${source}")
         endforeach()
     endforeach()
-    file(GLOB expected RELATIVE "${SOFTPC_SOURCE_DIR}" "${SOFTPC_SOURCE_DIR}/src/vm/*.c")
+    file(GLOB expected RELATIVE "${SOFTPC_SOURCE_DIR}" "${SOFTPC_SOURCE_DIR}/src/core/machine/*.c")
     get_target_property(actual softpc-vm SOURCES)
     list(SORT expected)
     list(SORT actual)

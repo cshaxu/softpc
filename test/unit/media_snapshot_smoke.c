@@ -1,5 +1,5 @@
 /* Test the private archive and real Storage without a CPU or media emulator. */
-#include "../../src/compat/media_snapshot.c"
+#include "../../src/core/compat/media_snapshot.c"
 #include <assert.h>
 #include <stdio.h>
 

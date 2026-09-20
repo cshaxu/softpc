@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "vm/machine.h"
+#include "core/machine/machine.h"
 #include <assert.h>
 #include <stdio.h>
 #include "../lib/cleanup.h"
@@ -51,7 +51,7 @@ static DWORD WINAPI wait_event(HANDLE event, DWORD timeout)
 #define CreateTimerQueueTimer create_timer
 #define DeleteTimerQueueTimer delete_timer
 #define WaitForSingleObject wait_event
-#include "compat/platform.c"
+#include "core/compat/platform.c"
 #undef WaitForSingleObject
 #undef CreateTimerQueueTimer
 #undef DeleteTimerQueueTimer

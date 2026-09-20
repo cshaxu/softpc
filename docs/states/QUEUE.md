@@ -9,6 +9,7 @@ allocates a numeric task identifier.
 4. [Common Machine terminal wake ownership](../proposals/m9-common-machine-shutdown-wake.md)
 
 T73 is closed: [completion audit](../history/M9-T73-completion-audit.md).
-No next task is admitted.
+[T74 Core layout relocation](../proposals/m9-core-layout-rename.md) is separately
+owner-admitted and active; it does not reorder these four candidates.
 The first three candidates retain their order. T73 S5 discovered the fourth
 candidate while splitting tests; it is recorded for approval, not admitted.

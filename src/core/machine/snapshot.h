@@ -2,9 +2,9 @@
 #define SOFTPC_SNAPSHOT_H
 
 #include "lib/types/types_interface.h"
-#include "compat/ccpu/lifecycle.h"
-#include "compat/ccpu/archive.h"
-#include "compat/media_snapshot.h"
+#include "core/compat/ccpu/lifecycle.h"
+#include "core/compat/ccpu/archive.h"
+#include "core/compat/media_snapshot.h"
 
 /* Executor-owned operation state, not a second machine lifecycle. */
 typedef enum softpc_snapshot_phase {

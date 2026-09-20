@@ -1,6 +1,6 @@
 # Product ownership, including relative include paths. Shared corpora are inputs,
 # never modified by this product-specific check.
-foreach(owner IN ITEMS app vm compat common lib x86 mvdm)
+foreach(owner IN ITEMS app core/machine core/compat common lib x86 core/softpc.new)
     file(GLOB_RECURSE sources "${SOFTPC_SOURCE_DIR}/src/${owner}/*.[ch]")
     foreach(source IN LISTS sources)
         file(RELATIVE_PATH relative "${SOFTPC_SOURCE_DIR}/src" "${source}")
@@ -9,7 +9,7 @@ foreach(owner IN ITEMS app vm compat common lib x86 mvdm)
         if(owner STREQUAL "app" AND contents MATCHES "softpc_machine_[A-Za-z0-9_]+[ \t]*\\(")
             message(FATAL_ERROR "Product boundary: raw machine call in ${relative}")
         endif()
-        if(NOT owner STREQUAL "vm" AND contents MATCHES "vm_driver_(create|destroy)[ \t]*\\(")
+        if(NOT owner STREQUAL "core/machine" AND contents MATCHES "vm_driver_(create|destroy)[ \t]*\\(")
             message(FATAL_ERROR "Product boundary: non-owning VM wrapper in ${relative}")
         endif()
         string(REGEX MATCHALL "#[ \t]*include[ \t]*[<\"][^>\"]+[>\"]" includes "${contents}")
@@ -19,31 +19,34 @@ foreach(owner IN ITEMS app vm compat common lib x86 mvdm)
                 get_filename_component(target "${header}" ABSOLUTE)
             elseif(header MATCHES "^\\.\\.?/" OR EXISTS "${directory}/${header}")
                 get_filename_component(target "${directory}/${header}" ABSOLUTE)
+            elseif(owner STREQUAL "core/softpc.new" AND header MATCHES "^compat/")
+                # Original controller includes resolve against their private Core root.
+                get_filename_component(target "${SOFTPC_SOURCE_DIR}/src/core/${header}" ABSOLUTE)
             else()
                 get_filename_component(target "${SOFTPC_SOURCE_DIR}/src/${header}" ABSOLUTE)
             endif()
             file(RELATIVE_PATH dependency "${SOFTPC_SOURCE_DIR}/src" "${target}")
             if(owner STREQUAL "app")
-                if(dependency MATCHES "^(compat|mvdm|host)/" OR
-                   (dependency MATCHES "^vm/" AND NOT
-                    (relative STREQUAL "app/composition.c" AND dependency STREQUAL "vm/vm_interface.h")))
+                if(dependency MATCHES "^host/" OR
+                   (dependency MATCHES "^core/" AND NOT
+                    (relative STREQUAL "app/composition.c" AND dependency STREQUAL "core/machine/vm_interface.h")))
                     message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
                 endif()
-            elseif(owner STREQUAL "vm")
+            elseif(owner STREQUAL "core/machine")
                 if(dependency MATCHES "^app/" OR
-                   (relative MATCHES "_interface\\.h$" AND dependency MATCHES "^(compat|mvdm|vm)/"))
+                   (relative MATCHES "_interface\\.h$" AND dependency MATCHES "^core/"))
                     message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
                 endif()
-            elseif(owner STREQUAL "compat")
-                if(dependency MATCHES "^(app|vm|common|x86)/")
+            elseif(owner STREQUAL "core/compat")
+                if(dependency MATCHES "^(app|core/machine|common|x86)/")
                     message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
                 endif()
-            elseif(dependency MATCHES "^(app|vm|compat|mvdm)/" AND
-                   NOT (owner STREQUAL "mvdm" AND dependency MATCHES "^(mvdm|compat)/"))
+            elseif(dependency MATCHES "^(app|core)/" AND
+                   NOT (owner STREQUAL "core/softpc.new" AND dependency MATCHES "^core/(softpc[.]new|compat)/"))
                 message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
             elseif((owner STREQUAL "lib" AND dependency MATCHES "^(common|x86)/") OR
                    (owner STREQUAL "common" AND dependency MATCHES "^x86/") OR
-                   (owner STREQUAL "mvdm" AND dependency MATCHES "^(common|lib|x86)/"))
+                   (owner STREQUAL "core/softpc.new" AND dependency MATCHES "^(common|lib|x86)/"))
                 message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
             endif()
         endforeach()

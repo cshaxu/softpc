@@ -1,7 +1,7 @@
 #ifndef COMMON_MACHINE_TEST_H
 #define COMMON_MACHINE_TEST_H
 
-#include "vm/driver.h"
+#include "core/machine/driver.h"
 
 typedef struct common_machine_test {
     common_machine *machine;

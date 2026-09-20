@@ -1,7 +1,7 @@
 #ifndef SOFTPC_SNAPSHOT_STREAM_H
 #define SOFTPC_SNAPSHOT_STREAM_H
 
-#include "../lib/types/types_interface.h"
+#include "../../lib/types/types_interface.h"
 
 typedef lib_status (*softpc_snapshot_bytes_write)(void *context,
     const lib_u8 *bytes, lib_size byte_count);

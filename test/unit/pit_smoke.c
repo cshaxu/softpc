@@ -1,5 +1,5 @@
-#include "vm/machine.h"
-#include "compat/devices/snapshot.h"
+#include "core/machine/machine.h"
+#include "core/compat/devices/snapshot.h"
 #include "../lib/cleanup.h"
 
 #include <assert.h>

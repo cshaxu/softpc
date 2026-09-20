@@ -9,12 +9,13 @@ distribution promise, or create a runtime dependency.
 
 ## Repository Source Categories
 
-- `src/mvdm/softpc.new/` is the preserved selected SoftPC source mirror. Its
+- `src/core/softpc.new/` is the preserved selected SoftPC source mirror. Its
   historic provenance and retained-diff evidence live in the M8 history and
   indexed evidence records. It is not a place for standalone behavior or an
   unreviewed external copy; changes require an admitted mirror, port-ABI, or
   equivalent owner-approved boundary task.
-- `src/{app,host,lib}/` is repository-maintained standalone code. `src/lib/`
+- `src/app`, `src/core/{machine,compat}` and the shared components are
+  repository-maintained standalone code. `src/lib/`
   is the canonical shared corpus and is imported/adopted only through a task
   that records the reviewed upstream revision, source/destination surface,
   semantic changes, and verification.

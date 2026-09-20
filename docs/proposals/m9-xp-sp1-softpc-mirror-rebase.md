@@ -5,7 +5,7 @@
 Make `winxpscodes/Source/XPSP1/NT/base/mvdm/softpc.new`, frozen at
 `a2f6d7c93`, the comparison baseline for the repository-owned selected
 SoftPC mirror.  The result is an auditable ported mirror whose ordinary review
-diff is `XP SP1 -> src/mvdm/softpc.new`; OpenNT remains a historical lineage
+diff is `XP SP1 -> src/core/softpc.new`; OpenNT remains a historical lineage
 reference only.
 
 This is not an import of the XP NTVDM product.  The selected machine remains
@@ -20,7 +20,7 @@ The audited roots are:
 ```text
 OpenNT: O:/repos.external/opennt-src-2/nt/private/mvdm/softpc.new @ 5e4619ab6
 XP SP1: O:/repos.external/winxpscodes/Source/XPSP1/NT/base/mvdm/softpc.new @ a2f6d7c93
-Local:  src/mvdm/softpc.new
+Local:  src/core/softpc.new
 ```
 
 The frozen pre-T40 comparison normalizes CRLF/LF and terminal blank lines for

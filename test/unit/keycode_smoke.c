@@ -4,7 +4,7 @@
 #include <windows.h>
 
 #include "nt_uis.h"
-#include "../../src/compat/input.h"
+#include "../../src/core/compat/input.h"
 
 static void check_original_table(unsigned count, DWORD flags, DWORD expected)
 {

@@ -4,13 +4,13 @@ The current source tree is:
 
 ```text
 src/
-  mvdm/
+  core/
     softpc.new/
-  compat/
-    original host callback C/H files and port ABI support
-    {ccpu,cvidc,bios,cmos,system,keymouse}/
-  vm/
-    concrete machine backend, driver, input, debug, trace; public vm_interface.h
+    compat/
+      original host callback C/H files and port ABI support
+      {ccpu,cvidc,bios,cmos,system,keymouse}/
+    machine/
+      concrete machine backend, driver, input, debug, trace; public vm_interface.h
   common/
     ui/          broker, monitor Console and KVM composition
     session/     neutral control FIFO, reduction and UI dispatch
@@ -43,7 +43,7 @@ platform headers. Compiler selection for atomic primitives remains permitted.
 Other components' `win32/` and `linux/` directories are implementation-only.
 Cross-component declarations belong in root `*_interface.h` files, never in
 platform directories or root headers forwarding to platform implementation.
-`mvdm/softpc.new` contains the selected repository-owned recovered-source
+`core/softpc.new` contains the selected repository-owned recovered-source
 subset moved from the former baseline tree. Every retained path and name
 permits a direct T14-ledger comparison with the selected read-only OpenNT
 reference. Wholly host-specific original endpoint files may be intentionally
@@ -53,8 +53,8 @@ firmware only. Historical object,
 library, and other compiler intermediate files are forbidden. Narrow,
 mechanical compiler, declaration, calling-ABI, and pointer-representation
 corrections live as reviewable source diffs at their affected points. Generated
-transformed C/H files are not build inputs. `compat` owns original host
-callbacks and larger functional adaptations. `vm` owns the injected SoftPC
+transformed C/H files are not build inputs. `core/compat` owns original host
+callbacks and larger functional adaptations. `core/machine` owns the injected SoftPC
 driver, guest-input/frame conversion, debug adaptation and diagnostic trace.
 `app` owns configuration, entity assembly and product CLI/hotkey policy.
 `command` owns monitor/debug state and command callbacks; `keyboard` owns
@@ -62,7 +62,7 @@ hotkey interpretation and input sequences. `composition` installs their one
 Common provider and coordinates request admission without interpreting input.
 It owns entity assembly, event wiring, the blocking session run and teardown,
 without a separate state machine, command table or debugger. Main loads config.
-Only app/composition.c may include vm/vm_interface.h; no app file may include Compat
+Only app/composition.c may include core/machine/vm_interface.h; no app file may include Compat
 or MVDM, and no other app file may include VM. VM's public header exposes only
 copied options, opaque identity and existing Common/Lib contracts. Compat
 does not depend on app, VM or Common. Historical same-name replacement headers
@@ -79,12 +79,13 @@ mapping, lifecycle, or hotkey meaning.
 
 ## Build Output Layout
 
-Root CMake assigns all `src/vm/*.c` to `softpc-vm`; other targets link it
+Root CMake assigns all `src/core/machine/*.c` to `softpc-vm`; other targets link it
 instead of copying its implementation list. The original machine OBJECT
 groups remain intact. The build-ownership gate checks actual target source
 membership and VM completeness at configure time; its negative tests reject
 duplicate/foreign source ownership. Product include gates check reverse
-dependencies across the seven roots, including relative paths. Tests may use
+dependencies across the seven owners (including the three Core children),
+including relative paths. Tests may use
 private implementation contracts for focused proof; production consumers may
 not bypass the VM public boundary.
 
@@ -96,7 +97,7 @@ children of it (for example `build/x86/`). The only user-facing package is
 `softpc.ini`. That INI may use absolute paths or paths relative to
 `assets/binary/`; the supplied default uses `../media/`. Reusable guest media
 belongs in `assets/media/`. The fixed original ROM set remains embedded from
-its source-mirror location `src/mvdm/softpc.new/roms/`; no external-ROM asset
+its source-mirror location `src/core/softpc.new/roms/`; no external-ROM asset
 contract exists.
 Repository-root executables and sibling `build-*` directories are forbidden.
 

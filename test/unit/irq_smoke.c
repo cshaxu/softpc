@@ -1,4 +1,4 @@
-#include "vm/machine.h"
+#include "core/machine/machine.h"
 #include "../lib/cleanup.h"
 
 #include <assert.h>
@@ -9,9 +9,9 @@
 #include "host_def.h"
 #include "ios.h"
 #include "ica.h"
-#include "compat/ccpu/abi.h"
-#include "compat/ccpu/lifecycle.h"
-#include "../../src/mvdm/softpc.new/base/ccpu386/c_intr.h"
+#include "core/compat/ccpu/abi.h"
+#include "core/compat/ccpu/lifecycle.h"
+#include "../../src/core/softpc.new/base/ccpu386/c_intr.h"
 
 extern void reboot(void);
 extern void host_set_hw_int(void);

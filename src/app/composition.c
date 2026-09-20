@@ -1,6 +1,6 @@
 #include "composition.h"
 #include "keyboard.h"
-#include "vm/vm_interface.h"
+#include "core/machine/vm_interface.h"
 #include "common/ui/ui_interface.h"
 
 #include <stdio.h>

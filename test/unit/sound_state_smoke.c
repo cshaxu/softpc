@@ -13,7 +13,7 @@ void softpc_standalone_audio_set_tone(ULONG hz, ULONG ms)
 
 #define GetTickCount clock_tick
 #define MessageBeep bell
-#include "mvdm/softpc.new/host/src/nt_sound.c"
+#include "core/softpc.new/host/src/nt_sound.c"
 #undef MessageBeep
 #undef GetTickCount
 

@@ -2,14 +2,40 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Owner accepted S5 manual testing and requested T-level acceptance if no S remains.
-T73 S1--S5 are complete; [T73 is closed](../history/M9-T73-completion-audit.md).
-No next task is admitted. The four [Queue](QUEUE.md) candidates retain their order.
-The independently queued Machine shutdown-wake issue is not claimed fixed.
+T74 S1 pure Core directory relocation is implemented and verified, pending
+implementation push, actual-change review and owner testing. T73 remains closed.
+The four existing Queue candidates retain their order and are not admitted.
+
+## M9 T74 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner explicitly admitted this relocation; permanent commit/push authorization. |
+| Objective | Move mvdm to core, vm to core/machine and compat to core/compat without behavior changes. |
+| Non-goals | No symbol/API rename, runtime redesign, guest/media/config change, shared-corpus edit or queued defect repair. |
+| Reference Baseline | d7c6931f, clean origin/main; T73 accepted. |
+| Candidate Proposal | [Core layout relocation](../proposals/m9-core-layout-rename.md). |
+| Files And ABI Surface | 556 moved files; App includes/firmware, CMake, product gates, live tools/docs. ABI unchanged. |
+| Applicable Rules | Execution, Architecture, Coding, Document; four referenced governance skills. |
+| Verification | Mirror blob identity and path-only C/H proof; source/build negative gates; x86/x64 Release builds and background presets; documentation gate and diff check. |
+| Expected Markers | Old live roots absent; only App composition reaches Machine public header; shared corpora unchanged; all background tests pass. |
+| Asset Needs | Existing embedded ROM/media read-only; refresh only two package EXEs. Preserve INI. Standard ignored build trees/logs only; no new trace or guest media. |
+| Reporting Requirements | Pre-estimate and post rename-aware added/removed/net counts, mirror identity, tests, artifact links, commit/push and clean status. |
+| Stop Conditions | Non-path production change, mirror byte difference, dependency boundary weakening or unresolved regression. |
+| Exit Criteria | All proposal ledger rows proven; implementation P pushed and actual-change reviewed; owner tests before S/T closure. |
+| Original Owner Request | Pure rename: mvdm -> core; vm -> core/machine; compat -> core/compat; retain core/softpc.new. |
+| Similar-Issue Sweep | All tracked build/include/resource/live-tool paths, relative includes and ownership-gate negative cases; historical paths retained with explicit disposition. |
 
 ## Current Technical Baseline
 
+- T74 S1 moves 556 files into src/core/{machine,compat,softpc.new}.
+  498 mirror blobs are identical; 107 product/test C/H/RC files pass path-only
+  comparison. Runtime symbols and behavior remain unchanged. Both Release
+  builds and background suites pass: x64 110/110 (165.45s), x86 110/110
+  (157.47s); five desktop cases excluded per width. Shared corpora, INI and
+  guest media are untouched. [T74 proposal](../proposals/m9-core-layout-rename.md)
+  holds the +421/-409 (net +12) source/test/build/tool ledger and EXE hashes.
 - Accepted T73 implementation 879c30ac, actual-change review ad665a86.
   Owner manual S5 testing passed. Closure changes documents only.
 - Shared source corpora are src/lib, src/common, src/x86; matching suites are

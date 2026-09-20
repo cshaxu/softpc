@@ -17,7 +17,7 @@
 
 #include "xt.h"
 #include "host_lpt.h"
-#include "compat/devices/snapshot.h"
+#include "core/compat/devices/snapshot.h"
 
 #define KBUFFER_SIZE 1024
 #define HIGH_WATER 1020

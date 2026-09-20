@@ -1,6 +1,6 @@
-#include "vm/debug.h"
-#include "compat/ccpu/abi.h"
-#include "compat/platform.h"
+#include "core/machine/debug.h"
+#include "core/compat/ccpu/abi.h"
+#include "core/compat/platform.h"
 #include "x86/debug/protocol_interface.h"
 
 #include <string.h>

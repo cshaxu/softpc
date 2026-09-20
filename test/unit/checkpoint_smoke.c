@@ -1,10 +1,10 @@
-#include "vm/machine.h"
-#include "compat/ccpu/abi.h"
-#include "compat/ccpu/lifecycle.h"
-#include "compat/devices/archive.h"
-#include "compat/devices/snapshot.h"
-#include "vm/snapshot.h"
-#include "compat/platform.h"
+#include "core/machine/machine.h"
+#include "core/compat/ccpu/abi.h"
+#include "core/compat/ccpu/lifecycle.h"
+#include "core/compat/devices/archive.h"
+#include "core/compat/devices/snapshot.h"
+#include "core/machine/snapshot.h"
+#include "core/compat/platform.h"
 #include "../lib/cleanup.h"
 
 #include <assert.h>

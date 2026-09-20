@@ -1,7 +1,7 @@
 #include "input.h"
 #include <windows.h>
 
-#include "../mvdm/softpc.new/host/inc/nt_uis.h"
+#include "../softpc.new/host/inc/nt_uis.h"
 
 /* This is SoftPC's private guest-protocol adapter. Shared KVM values never
  * expose these Win32 constants; they reach KeyMsgToKeyCode only here. */

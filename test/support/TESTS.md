@@ -27,6 +27,6 @@ stays alive. It never writes supplied media; the configuration must use
 `overlay` or `readonly` mode.
 
 The selected BIOS and V7 ROMs are compiled into the executable from their
-original source-mirror path `src/mvdm/softpc.new/roms/`. Therefore this package
+original source-mirror path `src/core/softpc.new/roms/`. Therefore this package
 has no runtime external-ROM lookup. The selected ROMs remain embedded from
-`src/mvdm/softpc.new/roms/`; no `assets/roms/` directory exists.
+`src/core/softpc.new/roms/`; no `assets/roms/` directory exists.

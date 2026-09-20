@@ -1,4 +1,4 @@
-#include "vm/machine.h"
+#include "core/machine/machine.h"
 
 #include <stdio.h>
 #include <string.h>

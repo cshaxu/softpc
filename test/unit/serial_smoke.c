@@ -1,4 +1,4 @@
-#include "vm/machine.h"
+#include "core/machine/machine.h"
 #include "../lib/cleanup.h"
 
 #include <assert.h>

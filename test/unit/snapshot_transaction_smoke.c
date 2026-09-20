@@ -1,7 +1,7 @@
-#include "vm/driver.h"
-#include "vm/snapshot.h"
-#include "compat/ccpu/archive.h"
-#include "compat/media_snapshot.h"
+#include "core/machine/driver.h"
+#include "core/machine/snapshot.h"
+#include "core/compat/ccpu/archive.h"
+#include "core/compat/media_snapshot.h"
 
 #include <assert.h>
 #include <stdio.h>

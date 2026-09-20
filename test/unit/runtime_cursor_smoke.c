@@ -1,5 +1,5 @@
 /* Exercise the copied cursor conversion contract and lib geometry together. */
-#include "vm/driver.h"
+#include "core/machine/driver.h"
 #include "lib/kvm-window/geometry.h"
 #include "lib/kvm-window/render.h"
 #include <assert.h>

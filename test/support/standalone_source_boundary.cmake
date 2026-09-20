@@ -14,10 +14,10 @@ endforeach()
 # New host code has one concrete ownership taxonomy.  No compatibility or
 # convenience aggregate may appear beside these seven owners.
 set(allowed_host_taxonomies bios ccpu cmos cvidc devices keymouse system)
-file(GLOB host_entries RELATIVE "${SOFTPC_SOURCE_DIR}/src/compat"
-    "${SOFTPC_SOURCE_DIR}/src/compat/*")
+file(GLOB host_entries RELATIVE "${SOFTPC_SOURCE_DIR}/src/core/compat"
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/*")
 foreach(host_entry IN LISTS host_entries)
-    if(IS_DIRECTORY "${SOFTPC_SOURCE_DIR}/src/compat/${host_entry}")
+    if(IS_DIRECTORY "${SOFTPC_SOURCE_DIR}/src/core/compat/${host_entry}")
         list(FIND allowed_host_taxonomies "${host_entry}" host_taxonomy_index)
         if(host_taxonomy_index EQUAL -1)
             message(FATAL_ERROR "Standalone host has no taxonomy owner: ${host_entry}")
@@ -86,25 +86,25 @@ foreach(component_platform_source IN ITEMS
 endforeach()
 
 set(standalone_sources
-    "${SOFTPC_SOURCE_DIR}/src/compat/ccpu/facade.c"
-    "${SOFTPC_SOURCE_DIR}/src/compat/cvidc/gdp_state.c"
-    "${SOFTPC_SOURCE_DIR}/src/compat/cvidc/gdp_state.h"
-    "${SOFTPC_SOURCE_DIR}/src/compat/cvidc/gdp_slots.h"
-    "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/cvidc/sascdef.c"
-    "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/support/ios.c"
-    "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/disks/fdisk.c"
-    "${SOFTPC_SOURCE_DIR}/src/compat/gfi_image.c"
-    "${SOFTPC_SOURCE_DIR}/src/compat/hdd_media.c"
-    "${SOFTPC_SOURCE_DIR}/src/compat/video.c"
-    "${SOFTPC_SOURCE_DIR}/src/compat/v7_pointer.c"
-    "${SOFTPC_SOURCE_DIR}/src/compat/memory.c"
-    "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/keymouse/keybd_io.c"
-    "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/system/idetect.c"
-    "${SOFTPC_SOURCE_DIR}/src/compat/device_bop.c"
-    "${SOFTPC_SOURCE_DIR}/src/compat/platform.c"
-    "${SOFTPC_SOURCE_DIR}/src/vm/machine.c")
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/ccpu/facade.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/cvidc/gdp_state.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/cvidc/gdp_state.h"
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/cvidc/gdp_slots.h"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc.new/base/cvidc/sascdef.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc.new/base/support/ios.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc.new/base/disks/fdisk.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/gfi_image.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/hdd_media.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/video.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/v7_pointer.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/memory.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc.new/base/keymouse/keybd_io.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/softpc.new/base/system/idetect.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/device_bop.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/platform.c"
+    "${SOFTPC_SOURCE_DIR}/src/core/machine/machine.c")
 
-if(EXISTS "${SOFTPC_SOURCE_DIR}/src/compat/softpc_compat")
+if(EXISTS "${SOFTPC_SOURCE_DIR}/src/core/compat/softpc_compat")
     message(FATAL_ERROR "Standalone host retains the obsolete softpc_compat taxonomy")
 endif()
 
@@ -112,20 +112,27 @@ endif()
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/host")
     message(FATAL_ERROR "Standalone retains the retired src/host layout")
 endif()
-if(EXISTS "${SOFTPC_SOURCE_DIR}/src/core")
-    message(FATAL_ERROR "Standalone source retains the obsolete src/core layout")
+foreach(retired_root IN ITEMS mvdm vm compat)
+    if(EXISTS "${SOFTPC_SOURCE_DIR}/src/${retired_root}")
+        message(FATAL_ERROR "Standalone retains retired source root: ${retired_root}")
+    endif()
+endforeach()
+file(GLOB core_entries RELATIVE "${SOFTPC_SOURCE_DIR}/src/core"
+    "${SOFTPC_SOURCE_DIR}/src/core/*")
+if(NOT core_entries STREQUAL "compat;machine;softpc.new")
+    message(FATAL_ERROR "Core must contain only Compat, Machine and the original mirror")
 endif()
 foreach(app_source IN ITEMS
     "src/app/main.c"
-    "src/vm/driver.c"
+    "src/core/machine/driver.c"
     "src/app/keyboard.c")
     if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/${app_source}")
         message(FATAL_ERROR "Standalone application source is missing: ${app_source}")
     endif()
 endforeach()
 foreach(retired_machine_source IN ITEMS
-    "src/compat/machine.c"
-    "src/compat/machine.h"
+    "src/core/compat/machine.c"
+    "src/core/compat/machine.h"
     "src/app/command_binding.c"
     "src/app/command_binding.h"
     "src/app/machine_driver.c"
@@ -180,8 +187,8 @@ set(allowed_common_product_contracts
     "x86/xasm32/xasm32_interface.h")
 file(GLOB_RECURSE product_common_consumers
     "${SOFTPC_SOURCE_DIR}/src/app/*.[ch]"
-    "${SOFTPC_SOURCE_DIR}/src/vm/*.[ch]"
-    "${SOFTPC_SOURCE_DIR}/src/compat/*.[ch]")
+    "${SOFTPC_SOURCE_DIR}/src/core/machine/*.[ch]"
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/*.[ch]")
 foreach(source IN LISTS product_common_consumers)
     file(STRINGS "${source}" common_include_lines REGEX
         "#[ \t]*include[ \t]+[<\"](common|x86)/[^>\"]+[>\"]")
@@ -255,7 +262,7 @@ endforeach()
 # to compile; that transitive implementation detail is not a product include.
 file(GLOB_RECURSE product_lib_consumers
     "${SOFTPC_SOURCE_DIR}/src/app/*.[ch]"
-    "${SOFTPC_SOURCE_DIR}/src/compat/*.[ch]")
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/*.[ch]")
 foreach(source IN LISTS product_lib_consumers)
     file(STRINGS "${source}" include_lines REGEX
         "#[ \t]*include[ \t]+\"lib/[^\"]+\.h\"")
@@ -324,12 +331,12 @@ endif()
 # The library's verify_types_layout above owns the complete source/build DAG.
 # Do not keep a second hardcoded subset here.
 
-file(STRINGS "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/c-files"
+file(STRINGS "${SOFTPC_SOURCE_DIR}/src/core/softpc.new/base/ccpu386/c-files"
     ccpu_source_names)
 foreach(name IN LISTS ccpu_source_names)
     if(NOT name MATCHES "^p\\.")
         list(APPEND standalone_sources
-            "${SOFTPC_SOURCE_DIR}/src/mvdm/softpc.new/base/ccpu386/${name}")
+            "${SOFTPC_SOURCE_DIR}/src/core/softpc.new/base/ccpu386/${name}")
     endif()
 endforeach()
 
@@ -362,70 +369,70 @@ endif()
 # dropping one of these source files is a regression toward a replacement
 # controller even if the new implementation happens to build.
 set(required_original_controller_sources
-    "src/mvdm/softpc.new/base/support/ios.c"
-    "src/mvdm/softpc.new/base/system/ica.c"
-    "src/mvdm/softpc.new/base/system/quick_ev.c"
-    "src/mvdm/softpc.new/base/system/at_dma.c"
-    "src/mvdm/softpc.new/base/system/cmos.c"
-    "src/mvdm/softpc.new/base/system/dummy_nt.c"
-    "src/mvdm/softpc.new/base/system/idetect.c"
-    "src/mvdm/softpc.new/base/system/illegalp.c"
-    "src/mvdm/softpc.new/base/system/rom.c"
-    "src/mvdm/softpc.new/base/system/timer.c"
-    "src/mvdm/softpc.new/base/system/timestrb.c"
-    "src/mvdm/softpc.new/base/system/unexp_nt.c"
-    "src/mvdm/softpc.new/base/support/time_day.c"
-    "src/mvdm/softpc.new/base/bios/cmos_bis.c"
-    "src/mvdm/softpc.new/base/bios/build_id.c"
-    "src/mvdm/softpc.new/base/bios/reset.c"
-    "src/mvdm/softpc.new/base/bios/bootstra.c"
-    "src/mvdm/softpc.new/base/bios/slave_bs.c"
-    "src/mvdm/softpc.new/base/bios/tape_io.c"
-    "src/mvdm/softpc.new/base/bios/equipmnt.c"
-    "src/mvdm/softpc.new/base/bios/mem_size.c"
-    "src/mvdm/softpc.new/base/bios/rom_basc.c"
-    "src/mvdm/softpc.new/base/keymouse/ppi.c"
-    "src/mvdm/softpc.new/base/keymouse/keyba.c"
-    "src/mvdm/softpc.new/base/keymouse/keybd_io.c"
-    "src/mvdm/softpc.new/base/keymouse/mouse.c"
-    "src/mvdm/softpc.new/base/keymouse/mouse_io.c"
-    "src/mvdm/softpc.new/base/disks/fla.c"
-    "src/mvdm/softpc.new/base/disks/gfi.c"
-    "src/mvdm/softpc.new/base/disks/gfi_mpty.c"
-    "src/mvdm/softpc.new/base/disks/floppy.c"
-    "src/mvdm/softpc.new/base/disks/floppy_i.c"
-    "src/mvdm/softpc.new/base/disks/fdisk.c"
-    "src/mvdm/softpc.new/base/disks/diskbios.c"
-    "src/mvdm/softpc.new/base/comms/com.c"
-    "src/mvdm/softpc.new/base/comms/printer.c"
-    "src/mvdm/softpc.new/base/comms/printer_.c"
-    "src/mvdm/softpc.new/base/comms/rs232_io.c"
-    "src/mvdm/softpc.new/base/video/ega_mode.c"
-    "src/mvdm/softpc.new/base/video/ega_prts.c"
-    "src/mvdm/softpc.new/base/video/ega_vide.c"
-    "src/mvdm/softpc.new/base/video/gfx_updt.c"
-    "src/mvdm/softpc.new/base/video/video.c"
-    "src/mvdm/softpc.new/base/video/gvi.c"
-    "src/mvdm/softpc.new/base/video/video_io.c"
-    "src/mvdm/softpc.new/base/video/v7_ports.c"
-    "src/mvdm/softpc.new/base/video/v7_video.c"
-    "src/mvdm/softpc.new/base/video/vga_mode.c"
-    "src/mvdm/softpc.new/base/video/vga_prts.c"
-    "src/mvdm/softpc.new/base/video/vga_vide.c"
-    "src/mvdm/softpc.new/base/video/ega_read.c"
-    "src/mvdm/softpc.new/base/video/ega_writ.c"
-    "src/mvdm/softpc.new/base/video/ega_dmmy.c"
-    "src/mvdm/softpc.new/base/video/ega_trcr.c"
-    "src/mvdm/softpc.new/base/video/egawrtm0.c"
-    "src/mvdm/softpc.new/base/video/egwrtm12.c"
-    "src/mvdm/softpc.new/base/video/cga.c"
-    "src/mvdm/softpc.new/host/src/nt_cga.c"
-    "src/mvdm/softpc.new/host/src/nt_ega.c"
-    "src/mvdm/softpc.new/host/src/nt_vga.c"
-    "src/mvdm/softpc.new/host/src/nt_munge.c"
-    "src/mvdm/softpc.new/host/src/nt_graph.c"
-    "src/mvdm/softpc.new/host/src/nt_keycd.c"
-    "src/mvdm/softpc.new/host/src/nt_sound.c")
+    "src/core/softpc.new/base/support/ios.c"
+    "src/core/softpc.new/base/system/ica.c"
+    "src/core/softpc.new/base/system/quick_ev.c"
+    "src/core/softpc.new/base/system/at_dma.c"
+    "src/core/softpc.new/base/system/cmos.c"
+    "src/core/softpc.new/base/system/dummy_nt.c"
+    "src/core/softpc.new/base/system/idetect.c"
+    "src/core/softpc.new/base/system/illegalp.c"
+    "src/core/softpc.new/base/system/rom.c"
+    "src/core/softpc.new/base/system/timer.c"
+    "src/core/softpc.new/base/system/timestrb.c"
+    "src/core/softpc.new/base/system/unexp_nt.c"
+    "src/core/softpc.new/base/support/time_day.c"
+    "src/core/softpc.new/base/bios/cmos_bis.c"
+    "src/core/softpc.new/base/bios/build_id.c"
+    "src/core/softpc.new/base/bios/reset.c"
+    "src/core/softpc.new/base/bios/bootstra.c"
+    "src/core/softpc.new/base/bios/slave_bs.c"
+    "src/core/softpc.new/base/bios/tape_io.c"
+    "src/core/softpc.new/base/bios/equipmnt.c"
+    "src/core/softpc.new/base/bios/mem_size.c"
+    "src/core/softpc.new/base/bios/rom_basc.c"
+    "src/core/softpc.new/base/keymouse/ppi.c"
+    "src/core/softpc.new/base/keymouse/keyba.c"
+    "src/core/softpc.new/base/keymouse/keybd_io.c"
+    "src/core/softpc.new/base/keymouse/mouse.c"
+    "src/core/softpc.new/base/keymouse/mouse_io.c"
+    "src/core/softpc.new/base/disks/fla.c"
+    "src/core/softpc.new/base/disks/gfi.c"
+    "src/core/softpc.new/base/disks/gfi_mpty.c"
+    "src/core/softpc.new/base/disks/floppy.c"
+    "src/core/softpc.new/base/disks/floppy_i.c"
+    "src/core/softpc.new/base/disks/fdisk.c"
+    "src/core/softpc.new/base/disks/diskbios.c"
+    "src/core/softpc.new/base/comms/com.c"
+    "src/core/softpc.new/base/comms/printer.c"
+    "src/core/softpc.new/base/comms/printer_.c"
+    "src/core/softpc.new/base/comms/rs232_io.c"
+    "src/core/softpc.new/base/video/ega_mode.c"
+    "src/core/softpc.new/base/video/ega_prts.c"
+    "src/core/softpc.new/base/video/ega_vide.c"
+    "src/core/softpc.new/base/video/gfx_updt.c"
+    "src/core/softpc.new/base/video/video.c"
+    "src/core/softpc.new/base/video/gvi.c"
+    "src/core/softpc.new/base/video/video_io.c"
+    "src/core/softpc.new/base/video/v7_ports.c"
+    "src/core/softpc.new/base/video/v7_video.c"
+    "src/core/softpc.new/base/video/vga_mode.c"
+    "src/core/softpc.new/base/video/vga_prts.c"
+    "src/core/softpc.new/base/video/vga_vide.c"
+    "src/core/softpc.new/base/video/ega_read.c"
+    "src/core/softpc.new/base/video/ega_writ.c"
+    "src/core/softpc.new/base/video/ega_dmmy.c"
+    "src/core/softpc.new/base/video/ega_trcr.c"
+    "src/core/softpc.new/base/video/egawrtm0.c"
+    "src/core/softpc.new/base/video/egwrtm12.c"
+    "src/core/softpc.new/base/video/cga.c"
+    "src/core/softpc.new/host/src/nt_cga.c"
+    "src/core/softpc.new/host/src/nt_ega.c"
+    "src/core/softpc.new/host/src/nt_vga.c"
+    "src/core/softpc.new/host/src/nt_munge.c"
+    "src/core/softpc.new/host/src/nt_graph.c"
+    "src/core/softpc.new/host/src/nt_keycd.c"
+    "src/core/softpc.new/host/src/nt_sound.c")
 foreach(source IN LISTS required_original_controller_sources)
     string(FIND "${build_definition}" "${source}" source_location)
     if(source_location EQUAL -1)
@@ -441,7 +448,7 @@ foreach(source IN LISTS standalone_sources)
     endif()
 endforeach()
 
-file(READ "${SOFTPC_SOURCE_DIR}/src/compat/platform.c"
+file(READ "${SOFTPC_SOURCE_DIR}/src/core/compat/platform.c"
     standalone_platform)
 string(TOLOWER "${standalone_platform}" normalized_platform)
 if(normalized_platform MATCHES "host_ata")
@@ -507,7 +514,7 @@ endforeach()
 
 # Common UI owns KVM/broker teardown; App/Compat must not add a second owner.
 file(GLOB app_shutdown_sources "${SOFTPC_SOURCE_DIR}/src/app/*.c"
-    "${SOFTPC_SOURCE_DIR}/src/compat/*.c")
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/*.c")
 set(checked_shutdown "kvm_(window|console)_destroy|console_broker_destroy")
 foreach(source IN LISTS app_shutdown_sources)
     file(STRINGS "${source}" shutdown_lines REGEX "(${checked_shutdown})[ \t]*\\(")
@@ -518,8 +525,8 @@ endforeach()
 
 # GDP/SAS vocabulary comes from the retained original headers, never a copy.
 file(GLOB_RECURSE duplicate_original_headers
-    "${SOFTPC_SOURCE_DIR}/src/compat/gdpvar.h"
-    "${SOFTPC_SOURCE_DIR}/src/compat/sas4gen.h")
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/gdpvar.h"
+    "${SOFTPC_SOURCE_DIR}/src/core/compat/sas4gen.h")
 if(duplicate_original_headers OR build_definition MATCHES "compat/ccpu/legacy")
     message(FATAL_ERROR "Compat duplicates original GDP/SAS declarations")
 endif()

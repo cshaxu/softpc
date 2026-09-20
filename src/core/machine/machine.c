@@ -1,10 +1,10 @@
 #include "machine.h"
-#include "compat/ccpu/lifecycle.h"
-#include "compat/ccpu/abi.h"
-#include "compat/cvidc/gdp_state.h"
-#include "compat/platform.h"
-#include "compat/dib_surface.h"
-#include "compat/media_snapshot.h"
+#include "core/compat/ccpu/lifecycle.h"
+#include "core/compat/ccpu/abi.h"
+#include "core/compat/cvidc/gdp_state.h"
+#include "core/compat/platform.h"
+#include "core/compat/dib_surface.h"
+#include "core/compat/media_snapshot.h"
 #include "lib/storage/medium_interface.h"
 
 #include <stdio.h>

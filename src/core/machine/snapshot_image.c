@@ -1,6 +1,6 @@
 #include "snapshot.h"
 
-#include "compat/devices/archive.h"
+#include "core/compat/devices/archive.h"
 
 typedef struct softpc_snapshot_count_stream {
     lib_u64 count;

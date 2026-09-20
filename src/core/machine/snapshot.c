@@ -1,5 +1,5 @@
 #include "snapshot.h"
-#include "compat/platform.h"
+#include "core/compat/platform.h"
 #include "lib/base/clock_interface.h"
 
 lib_status softpc_snapshot_begin(softpc_snapshot *snapshot)

@@ -48,7 +48,7 @@ static BOOL WINAPI beep(DWORD frequency, DWORD duration)
 #define base_sync_wait_any wait_audio
 #define base_sync_event_reset reset_audio
 #define base_sync_task_destroy destroy_audio
-#include "compat/audio.c"
+#include "core/compat/audio.c"
 #undef base_sync_event_reset
 #undef base_sync_task_destroy
 #undef base_sync_wait_any

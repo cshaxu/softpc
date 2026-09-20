@@ -7,7 +7,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $RepositoryRoot = (Resolve-Path -LiteralPath $RepositoryRoot).Path
 $OriginalRoot = (Resolve-Path -LiteralPath $OriginalRoot).Path
-$prefix = 'src/mvdm/softpc.new/'
+$prefix = 'src/core/softpc.new/'
 # Research-only inverse comparison in memory: proves the enumerated rule edits,
 # not behavioral equivalence. It never writes transformed source files.
 function Test-RulePatterns([string]$original, [string]$current, [string]$path) {

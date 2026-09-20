@@ -2,7 +2,7 @@
 
 #define base_clock_monotonic_counter snapshot_test_counter
 #define softpc_platform_set_clock_running snapshot_test_timer
-#include "../../src/vm/snapshot.c"
+#include "../../src/core/machine/snapshot.c"
 
 static lib_u64 now, frequency = 1000u;
 static lib_status clock_status;
