@@ -12,6 +12,7 @@ Owner additionally requires immediate background-test configuration ("不是，�
 现在就配置清楚，不是等到以后"). S9 verification follow-up separates real-desktop
 tests from default presets; x64 and x86 background suites each pass 105/105.
 Five desktop tests remain explicit-only; no product/binary change or S10 admission.
+Configuration delivery b5cc140a is pushed and coordinator-reviewed.
 
 ## M9 T71 S9 Packet
 

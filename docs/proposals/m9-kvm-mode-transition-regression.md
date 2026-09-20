@@ -607,3 +607,12 @@ Package hashes remain exactly those recorded for P1; no rebuild is necessary
 for test selection only. No diagnostic artifacts or processes remain owned
 by this follow-up. README and Source Layout document the now-active defaults
 and warn that unfiltered CTest still runs both groups.
+
+P4 coordinator review inspected pushed b5cc140a and confirmed label ownership
+at the original registrations, default exclude/explicit include preset filters,
+serial desktop execution and no removed test. The 105/5 partition and dual-width
+background results meet the owner's immediate configuration request. Product
+sources/artifacts are unchanged. P3 total including records/manifests/docs is
++72/-12 across nine files; configuration-only count remains +8/-3. HEAD matched
+origin/main with a clean worktree after delivery. Follow-up is accepted; S9
+product acceptance still awaits the owner and T71/S10 state is unchanged.
