@@ -12,7 +12,7 @@ boundary; no new manual acceptance is inferred. T70 remains closed.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner admits S2 design after S1 delivery 04d76945 and approves shared text base, leaf frame extensions, Window-owned graphics and opaque FIFO/latest-wins; latest request is to record the plan and S split. |
-| Objective | Record the approved frame/mailbox ownership and S3--S6 implementation/verification plan; retain CP437 ownership in VM and no duplicated production paths. |
+| Objective | Record the approved frame/mailbox ownership and S3--S6 plan, including owner-approved S5 fixed-capacity validation and explicit copy_frame failure results; retain CP437 ownership in VM and no duplicated production paths. |
 | Non-goals | No code/build/EXE/INI/media change; no code-page detection, font recognition, dynamic frame, capacity expansion or MVDM edit. |
 | Reference Baseline | 04d76945; S1 dual-width full suites 109/109 and pushed packages. |
 | Candidate Proposal | [T71 S2 concrete design](../proposals/m9-kvm-text-frame-contract.md#t71-s2-concrete-design-for-owner-review). |
@@ -24,7 +24,7 @@ boundary; no new manual acceptance is inferred. T70 remains closed.
 | Reporting Requirements | Proposed structs, migration owners, preserved UX, memory/code estimates, open decisions and no implementation claims. |
 | Stop Conditions | This documentation turn needs runtime edits; future preflights must settle exact storage/API shapes before code changes, and escalate new fallback or lifecycle semantics. |
 | Exit Criteria | Revised proposal and S split reviewed, documentation gate passed, committed/pushed; later S packets not active yet. |
-| Original Owner Request | 准入s2 开始设计; 第二项请你拆分到新的t任务proposal加入队列; 写入本T任务的proposal并进行S任务拆分。 |
+| Original Owner Request | 准入s2 开始设计; 第二项请你拆分到新的t任务proposal加入队列; 写入本T任务的proposal并进行S任务拆分。 S5: 保留现有容量，不扩容、不动态分配；统一做完整校验，超限明确失败，禁止静默裁剪。 |
 | Similar-Issue Sweep | All text/frame publishers, copying/comparison/render/cache sites and snapshot entry points; confirm archive internals before implementation. |
 
 ## Current Technical Baseline

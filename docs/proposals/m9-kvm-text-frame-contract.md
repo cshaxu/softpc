@@ -14,6 +14,7 @@ Original request ledger:
 - "图形帧，只归属 kvm-window所有"
 - "kvm-base 只管两个不同mailbox的实现和传输机制 (fifo and latest-wins)，实际命令处理都交给消费者 (kvm-console kvm-window)"
 - "写入本T任务的proposal并进行S任务拆分。"
+- S5 owner refinement: "保留现有容量，不扩容、不动态分配；统一做完整校验，超限明确失败，禁止静默裁剪。" The owner explicitly authorizes the necessary copy_frame result-contract change, without side-channel error flags, automatic presenter switching or guest-mode changes.
 
 The independent [cell/colour cleanup candidate](m9-kvm-text-cell-glyph-refactor.md)
 remains queued only for per-cell struct/attribute normalization. It must not
@@ -111,6 +112,47 @@ pipeline. Common-generated graphics status remains a Console text frame.
 Graphic traffic must never enter the Console mailbox. S1 runtime graphics
 rejection is superseded by the typed interface, not retained as a legacy API.
 
+### S5 Fixed Capacity And Explicit Failure (Owner Approved)
+
+This defines current supported output, not new display modes. Keep bounded
+storage; do not expand capacity or dynamically allocate to accommodate oversized
+content. The approved behavior change is that a mode previously silently cropped
+to 80x25 now reports unsupported display content rather than false success.
+
+| Boundary | Required rule | Validation owner |
+| --- | --- | --- |
+| Text dimensions | 1--80 columns and 1--25 rows; nonzero over-capacity dimensions return UNSUPPORTED. Zero rows/columns and malformed arguments return INVALID_ARGUMENT. | kvm-base shared text validator, reused by both leaves |
+| Text row stride | Fixed 80 cells in storage; document it, with no configurable stride field. | kvm-base |
+| Raster font height | Preserve the supported default-value convention; reject heights outside bitmap storage, never clamp or access out of bounds. | kvm-window |
+| Cursor | Hidden or off-surface cursor is not drawn; it does not invalidate the complete frame. | Shared text meaning, leaf drawing |
+| Character maps | Validate the Console-owned character representation at its boundary; do not require maps in Window or bitmap knowledge in Console. | kvm-console; logical Console checks its own independent output value |
+| Graphics | Retain existing 1280x768 upper limits; validate dimensions, stride and effective pixel extent with overflow-safe arithmetic before copying. | kvm-window only |
+| Rejection | No replacement/merge of the pending frame, generation advance, drawing wake or successful-output cache update. | Leaf admission before mailbox publication |
+
+There is no all-knowing frame validator. Base validates only common text fields;
+Window owns fonts and graphics; Console owns character maps. Reuse each owner's
+validator at the appropriate entry instead of maintaining divergent copies.
+The opaque mailbox still checks transport capacity, not frame meaning.
+
+Remove producer min(actual, capacity) and equivalent silent truncation in VM.
+Unsupported source output must propagate through the existing completion/error
+path as a display failure, not as no new frame. If the current boolean copy_frame
+callback cannot distinguish those results, change its public result contract
+and migrate all callers/fakes together. This necessary boundary change is already
+authorized for S5; do not seek approval again merely because it changes that
+signature. Settle the exact status/no-frame representation in preflight. Do not
+add an out-of-band error flag, second notification route or next-frame inference.
+
+Do not switch presenters automatically, alter guest video mode, or expand limits
+for unknown modes. Other lifecycle or fallback changes remain outside approval.
+Test zero/minimum/exact-limit/over-limit dimensions, default/max/invalid font
+height, hidden/off-screen cursor, graphics stride/extent bounds and rejection
+without mutation/wake/cache changes. Through the actual Common/VM result path,
+prove that no-new-frame is benign but unsupported output produces failure.
+Re-audit all producers, callers and test doubles, including clipping written
+without min(). Refresh S5 diff estimates after that inventory; the earlier range
+is provisional and must not justify skipping the result-contract migration.
+
 ## Planned S Tasks And Delivery Boundaries
 
 Only S2 is active now. S3--S6 are planned successors; each receives the sole
@@ -122,7 +164,7 @@ and evidence are unchanged.
 | S2: design and finite inventory | Record ownership, old/new API migration, upstream layout checkpoints, staged plan and queue boundary. Documentation only. | Reviewed plan, links/gates, commit/push; no new EXE or runtime claim. | 0 / 0 |
 | S3: opaque control FIFO | Move leaf command kinds/payloads and validation to leaves; base transports bounded control data and owns STOP envelope/admission. Migrate both workers and every internal caller; frame type temporarily remains the existing single implementation. | FIFO order/full rejection, copied payload, repeated STOP/reserved slot, fault closure, title/freeze/release behavior; no base Window-specific commands. | 120--220 / 60--110 |
 | S4: typed leaf frames and opaque latest-wins | In one coherent migration split text extensions/Window graphics, migrate frame mailbox and dirty operations, move CP437 to VM, update logical Console, all Common/VM producers/consumers and tests. Delete old monolithic ABI; do not stage a second pipeline. | Both map/font banks, mapping-only/font-only repaint, pending dirty/late ack, mode/size/palette transitions, activation/NOT_CURRENT, typed Console admission, exact native output and snapshot regressions. | 420--700 / 150--250 |
-| S5: capacity and failure contract | Audit all active extents, strides, source clipping and caller statuses using the new owning types. Keep existing limits unless evidence/approval supports change. | At/below/above-limit matrix, no out-of-bounds copy or false success; distinguish no new frame from unsupported source. Any required public status or fallback policy first receives owner review. | 40--90 / 40--90 |
+| S5: capacity and failure contract | Apply the owner-approved fixed limits and component-owned validation above; remove producer clipping and migrate copy_frame result/callers if needed. No expansion or dynamic capacity. | At/below/above-limit and rejection-atomicity matrix; explicit display failure distinct from no new frame; no automatic fallback. Necessary result-contract change already approved. | 40--90 / 40--90, provisional pending full callback inventory |
 | S6: integration and simplification audit | Close every finite-ledger entry, remove task-introduced obsolete wrappers/fields, update current design/manifests and review measured storage/copy costs. No unrelated cleanup. | Serial full x86/x64, four corpus/DAG gates, package/snapshot and bounded product checks; owner receives both EXEs. T stays open for owner acceptance. | 0 planned; material new repairs require scope revision |
 
 Aggregate provisional production estimate: 580--1,010 changed lines across
