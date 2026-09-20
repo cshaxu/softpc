@@ -1,5 +1,8 @@
 # KVM Frame Ownership And Transparent Mailboxes
 
+Archived at owner-approved T71 closure. Status statements below are historical;
+see the [final audit](M9-T71-completion-audit.md) for current disposition.
+
 ## Request And Status
 
 Owner admitted T71 and S2 design. S1 delivered text-only admission at 04d76945;

@@ -3,114 +3,44 @@
 ## Current Work
 
 No implementation subtask is active.
-Open task awaiting owner: T71.
-
-Owner confirms S10 manual testing passed and approves closure after P1 delivery
-and coordinator review; see [S10 closure](../history/M9-T71-S10-text-contract-cleanup.md).
-T71 remains open. The separately queued neutral-text redesign is not admitted.
-Default tests remain background-only; native desktop tests require explicit execution.
+T71 is closed by owner approval following S10 manual acceptance.
+No S11 or new numeric T is admitted; see [Queue](QUEUE.md).
 
 ## Current Technical Baseline
 
-- S10 four-item repair: original nt_text fixed-80 destination layout (+3/-2),
-  KVM Console cursor normalization, Machine request/context documentation and
-  removed Console destroy alias. Production C/H +24/-14 (net +10); tests
-  +80/-7 (net +73). Dual Release builds and background suites pass:
-  x64 105/105 (163.44s), x86 105/105 (145.85s). Five desktop tests per width
-  not rerun; earlier unexplained modal-test exit retained explicitly in TODO.
-  Both EXEs refreshed; no Compat/VM/INI/media or snapshot-format change.
-  See the regression brief for finite proof, shared manifests and hashes.
-
-- S9: Base only copies latest complete bytes; Window compares its existing RGB
-  surface and invalidates changed bounds. No additional buffer/thread, input or
-  snapshot-format change. Production +41/-89 (net -48); tests +174/-44 (net +130).
-  Final x64 110/110 (173.66s), x86 110/110 (163.13s); both EXEs rebuilt.
-  Compat/MVDM, INI and media unchanged. Exact hashes and bounded performance
-  measurements are in the regression brief. Owner approved S9 closure.
-  Background-test follow-up: both widths 105/105, five desktop tests explicit-only;
-  configuration +8/-3 (net +5), no additional product code or binary change.
-
-- S8: synchronous request admission and terminal completion share a short
-  Machine-owned lock; pending ordinary pause cannot prematurely complete save.
-  The unused ready event is removed. Production +85/-39 (net +46), tests
-  +161/-9 (net +152). Final x64 110/110 (169.85s), x86 110/110 (124.72s).
-  Both packages rebuilt. No public ABI, Lib/VM/Compat/MVDM, INI, media or
-  snapshot-format change. Earlier modal-test failures and their S10 audit
-  receiver are disclosed in the active proposal; no modal repair is claimed.
-
-- S7 continued repair: controller-font/readiness source and required-font result
-  are corrected. Relative to 83e185c7, production +5/-3 (net +2), tests +117/-2
-  (net +115). Final x64 110/110 (124.22s), x86 110/110 (142.06s), including
-  both Win3.1 PIF initial modes and six roundtrips each. Both packages rebuilt
-  with unchanged byte sizes. No Lib/Common/MVDM/INI/media change in this repair.
-  Owner accepted S7/S8/S9; S10's bounded four-item follow-up is closed.
-
-- S7: selected-renderer text dimensions replace live-register sampling;
-  ERROR reaches App unchanged and rejects machine commands without exiting.
-  Production +16/-7 (net +9), tests +72/-5 (net +67). Both Release packages
-  built; full serial x64 110/110 (123.75s), x86 110/110 (108.17s), including
-  real overlay DOS win and subsequent stop/start to DOS. No Lib/MVDM/INI/media
-  changes. See the active brief for reproduction, accounting and package hashes.
-
-- S6 audit found default-height cursor geometry inconsistent with Window glyph
-  rendering. The bounded repair resolves zero to the existing 16-row default;
-  production +7/-6 (net +1), test +4/-0. The added x64 regression failed before
-  and passes after the change on both widths. Both Release builds and serial
-  full tests pass: x64 110/110 (113.24s), x86 110/110 (98.52s). Packages rebuilt
-  with unchanged byte sizes. Delivery 03fe7627 and coordinator review are complete;
-  the proposal records the finite-ledger audit and exact accounting.
-
-- S5 delivery 193ff7f0: production C/H +137/-59 (net +78), test C/H +139/-17
-  (net +122); four manifests +23/-23. Release builds succeed on both widths;
-  final x64 110/110 (71.06 seconds), x86 110/110 (100.87 seconds). Both package
-  EXEs rebuilt. No MVDM, INI, media or snapshot-format changes.
-  [S5 review](../history/M9-T71-S5-frame-capacity.md) closes its finite boundary.
-
-- S4 typed frames/opaque transport: 17c9da90; production +469/-345 (net +124),
-  test C/H +406/-312 (net +94). Both EXEs rebuilt; final serial x64/x86 110/110.
-  Console frame 7112 bytes; CP437 resides only in VM; no Compat/MVDM or media change.
-  [S4 review](../history/M9-T71-S4-frame-ownership.md) records ledger and exact accounting.
-
-- S3 control ownership: production C/H +44/-32 (net +12), verifier +4/-0;
-  test C/H +102/-28 (net +74), test registration +6/-0. Both EXEs rebuilt;
-  final serial suites 110/110 each. No Common/VM/Compat/MVDM/INI/media changes.
-  [S3 review](../history/M9-T71-S3-control-transport.md) records actual diff and test-input correction.
-- T71 S1 rejects graphical Console publications before mailbox mutation/wake;
-  malformed frames reject separately. Existing text/status/STOP semantics remain.
-  Production C/H +7/-3 (net +4); tests +37/-6 (net +31). Both EXEs rebuilt;
-  serial x86/x64 full regression 109/109 each. Common/VM/Compat/MVDM production,
-  INI and guest media are unchanged. See the active proposal for evidence.
-- Latest implementation: `8cb23e9`; S12 closure: `f6ab0dc`.
-  This is T71's predecessor baseline; its final x86/x64 regression passed
-  109/109 each, including package and snapshot checks.
-- Owner accepted Win95 hardware detection, installation/desktop, display and
-  Window mouse repairs. Snapshot restore uses saved media paths/modes and
-  reopens all attached slots. Detailed evidence is in the T70 audit above.
-- S12 retains failed-join resources, stabilizes integer geometry, uses Linux
-  per-open locks and consolidates startup cleanup. Linux-native lock tests
-  remain unexecuted; controlled tests do not establish native Linux behavior.
-- Existing TODOs and the new queued text/frame contract proposal remain
-  separately scoped; no whole-emulator or whole-Lib correctness claim.
+- Code delivery f3ff1b11; review 449dad66; owner acceptance 5bfceb36.
+  Both Release packages are unchanged by this governance closure.
+- Final background suites: x64 105/105 (163.44s), x86 105/105 (145.85s),
+  including headless Win3.1 PIF roundtrips, snapshots and restart.
+  Five native desktop tests per width were not rerun in S10; no native Linux
+  execution or whole-emulator correctness claim.
+- VM owns character mapping. KVM Base transports opaque control FIFO and
+  latest-wins complete frames; leaf presenters interpret their own frames.
+  Window compares frames with its existing surface, not upstream dirty history.
+- Renderer readiness, required fonts, terminal request completion, fixed-80 text
+  layout and cursor normalization are recorded in the
+  [T71 completion audit](../history/M9-T71-completion-audit.md).
+- TODO tracking is retired by owner decision, not proof of repair.
+  Neutral text attributes remain separately queued.
 
 ## Recent M9 Closures
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
-| T70 | S1--S12 complete; owner approved T closure; final dual-width 109/109, disclosed Linux limit. | [Audit](../history/M9-T70-completion-audit.md) |
-| T69 | S1--S4 complete; owner-reopened cleanup removed its own obsolete code. | [Audit](../history/M9-T69-completion-audit.md) |
-| T68 | S1 complete; owner-directed safety repair; final dual-width 107/107. | [Audit](../history/M9-T68-completion-audit.md) |
-| T67 | S1--S4 complete; owner accepted; final dual-width 107/107. | [Audit](../history/M9-T67-completion-audit.md) |
-| T66 | S1--S4 complete; owner-validated dual-width package. | [Audit](../history/M9-T66-completion-audit.md) |
-| T65 | S1 complete; request-slot refactor cancelled after contract audit; dual-width 107/107. | [Audit](../history/M9-T65-completion-audit.md) |
-| T64 | S1 audit accepted; S2 narrowed frame copy verified; owner accepted. | [Audit](../history/M9-T64-completion-audit.md) |
+| T71 | S1--S10 complete; owner approved; final dual-width 105/105 background. | [Audit](../history/M9-T71-completion-audit.md) |
+| T70 | S1--S12 complete; owner approved; disclosed Linux limit. | [Audit](../history/M9-T70-completion-audit.md) |
+| T69 | S1--S4 complete; reopened cleanup accepted. | [Audit](../history/M9-T69-completion-audit.md) |
+| T68 | S1 complete; owner approved. | [Audit](../history/M9-T68-completion-audit.md) |
+| T67 | S1--S4 complete; owner accepted. | [Audit](../history/M9-T67-completion-audit.md) |
+| T66 | S1--S4 complete; owner accepted. | [Audit](../history/M9-T66-completion-audit.md) |
+| T65 | S1 complete; narrowed after audit. | [Audit](../history/M9-T65-completion-audit.md) |
+| T64 | S1 audit and narrowed S2 accepted. | [Audit](../history/M9-T64-completion-audit.md) |
 
 ## Recent Governance
 
-T70 is closed; T71 S10 is verified and closed. T71 remains open.
-
-- **M9 Td S17:** Owner requested a concrete KVM text/frame correction proposal
-  at queue head. Recorded capability rejection, explicit character/glyph
-  semantics, bounded layout, migration batches and verification; no source or
-  artifact changes. [Proposal](../history/M9-T71-kvm-text-frame-contract-proposal.md).
-  Documentation checks and actual-change review pass. At that delivery T70 remained open; the
-  candidate is not implementation admission.
+- **M9 Td S18:** T71 closure audit, TODO retirement and new floppy-identification
+  candidate second in queue; documentation only. P1 delivery prepared;
+  coordinator review follows push.
+  [Record](../history/M9-Td-S18-t71-closure-and-floppy-queue.md).
+- **M9 Td S17:** Earlier text/frame proposal subsequently admitted as T71;
+  [retained proposal](../history/M9-T71-kvm-text-frame-contract-proposal.md).

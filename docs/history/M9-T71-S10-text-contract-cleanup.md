@@ -48,7 +48,7 @@ Counts use git diff --numstat a1e7b945 f3ff1b11, C/H paths only:
 
 Package x86 is 3655192 bytes (-57), x64 3058735 bytes (-56); exact hashes and
 the finite similar-issue ledger are in the
-[implementation brief](../proposals/m9-kvm-mode-transition-regression.md#s10-changed-path-accounting).
+[implementation brief](../history/M9-T71-mode-transition-regression-proposal.md#s10-changed-path-accounting).
 No new diagnostic files/processes are retained. Test-created media is disposable;
 the initial failed fixture's disk was removed by the subsequent successful run.
 

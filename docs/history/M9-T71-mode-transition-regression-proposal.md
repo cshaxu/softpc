@@ -1,5 +1,8 @@
 # KVM Mode Transition And Error Restart Regression
 
+Archived at owner-approved T71 closure. Status statements below are historical;
+see the [final audit](M9-T71-completion-audit.md) for current disposition.
+
 ## S10 Bounded Admission
 
 Owner: "准入修复，S10完成上述4个项目收口。" Baseline a1e7b945.

@@ -24,6 +24,6 @@ passed, followed by owner acceptance. Mouse symptoms were not reproduced and
 received no speculative production patch. INI/media stayed unchanged.
 
 The finite before/after ledger and detailed evidence remain in the active
-[T71 regression proposal](../proposals/m9-kvm-mode-transition-regression.md).
+[T71 regression proposal](../history/M9-T71-mode-transition-regression-proposal.md).
 Outstanding request completion belongs to S8, frame FIFO to S9, and the
 retained nonstandard-stride audit to S10; none is claimed solved by S7.

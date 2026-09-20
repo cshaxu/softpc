@@ -11,7 +11,7 @@ Baseline: 65ad144a. P1 838b076c delivers frame changes; P2 949b71f1 reviews
 them. P3 b5cc140a delivers test selection; P4 61fc333a reviews it. All were
 pushed before this closure review. The original scope, finite coverage ledger,
 performance measurements and failure disclosures remain in the
-[regression brief](../proposals/m9-kvm-mode-transition-regression.md).
+[regression brief](../history/M9-T71-mode-transition-regression-proposal.md).
 
 | Request | Retained implementation and evidence |
 | --- | --- |

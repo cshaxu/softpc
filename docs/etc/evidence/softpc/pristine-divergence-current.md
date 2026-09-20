@@ -997,7 +997,7 @@ Owner 明确批准原始 host/src/nt_cga.c 的通用复制布局修正：整体�
 不增加条件编译、Compat 补偿、设备状态或产品特判。原始 VGA 更新器逐行
 计算源地址；可见列数与显存跨度独立。实际 nt_text 内存矩阵覆盖两种列数、
 源跨度、部分更新、非零目标行及多行；不宣称这是某次 Win3.1 花屏的根因。
-证据归属 [S10 简报](../../../proposals/m9-kvm-mode-transition-regression.md)。
+证据归属 [S10 简报](../../../history/M9-T71-mode-transition-regression-proposal.md)。
 
 ### T63 S9 P9 视频快照 receiver 修正
 
