@@ -4,8 +4,8 @@
 
 Owner accepted T76 and requested "测试通过 收口提交t任务 准入下一个".
 Admitted as T77, beginning with S1. CURRENT.md owns the executable packet;
-this proposal retains the bounded plan and evidence ledger. S2/S3 are planned,
-not simultaneously active. Owner now explicitly authorizes serial completion
+this proposal retains the bounded plan and evidence ledger. S1/S2 are closed;
+S3 performs final acceptance. Owner explicitly authorizes serial completion
 and self-reviewed S/T closure: "继续啊 做完自行审计收口s和t任务".
 
 Original owner requests:
@@ -311,3 +311,42 @@ Complete all 48 original file dispositions, preserved targets/CTest definitions,
 body/call-equivalence review and exact endpoint counts. No new TODO or queue
 work is needed for this bounded layout cleanup. Owner explicitly authorizes
 self-reviewed S/T closure, superseding the earlier wait-for-manual-test step.
+
+### S3 acceptance results
+
+All 48 original product files have a disposition: 41 relocations (33 test C
+files and eight helpers/checks), two existing Integration files retained,
+four obsolete C/H files deleted, and the old inventory replaced by the new
+test README. The resulting product tree has 44 files: App 3, Core 24,
+Integration 11, checks 5 and README 1. Thirty-one relocated test bodies remain
+byte-identical; the other two and the pre-existing boot test use canonical
+Common calls as reviewed in S2. All 115 CTest definitions match on both widths
+after only relocated script paths and architecture are normalized.
+
+Fresh isolated Release builds use only the copied packages, without App/Core
+or product fixtures. Lib/Common use the four-directory copy; x86 uses the
+six-directory copy. All copied files match the originals after testing:
+180/180 and 204/204 respectively. Both widths pass all three package suites:
+
+| Width | Lib | Common | x86 |
+| --- | --- | --- | --- |
+| x64 | 41/41, 55.89s | 18/18, 13.63s | 9/9, 6.41s |
+| x86 | 41/41, 57.33s | 18/18, 17.31s | 9/9, 9.60s |
+
+S3 code/build +0/-0. Whole-task endpoint, computed with
+`git diff 1fe946a2 --find-renames=20% --numstat -- CMakeLists.txt test ':!*.md'`,
+is +229/-2129, net -1900. This differs from adding individual-S additions and
+deletions because two intermediate path edits cancel; net change agrees.
+All production sources, six shared corpora and assets remain unchanged.
+Source/build gates retain coverage of all relocated product tests; the shared
+checker's historical path list is not a runtime dependency and remains intact.
+No production state owner, executor, ABI or user-visible behavior changed.
+
+Final product Release builds pass. Background x64 110/110 (155.50s), x86
+110/110 (151.26s), including native worker restart/Win31 prompt roundtrips,
+device/media/snapshot cases, shared manifests/DAG and documentation checks.
+Five desktop cases remain excluded per width; no fresh desktop, Linux runtime
+or downstream NNES integration acceptance is claimed. Both rebuilt EXEs retain
+the S1 SHA256 values. No INI or media was modified. Task-owned isolated copies,
+builds, inventory dumps and logs are removed after recording these results;
+normal build configurations and user-owned build/output are preserved.
