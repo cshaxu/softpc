@@ -163,6 +163,66 @@ All six manifests, DAG/negative gates and documentation/diff checks pass.
 EXE SHA256: x86 6CF44CB6C5F74EC003237BDB6687D918458757018279C95B9831114EFEC99A40;
 x64 A37641357713B3225BCDE8D4649F4BDF1B137F026E8B0CF016949E69BB7101E7.
 
+## S4 Independent Reuse Evidence
+
+Baseline 1e77343e; estimate and actual production/test/build +0/-0, net 0.
+The four-directory copy contains 180 files and no x86 directory; the six-directory
+copy contains 204 files. Each file was SHA256-compared to its original before
+and after verification on each width. Neither copy required source edits.
+
+All sixteen independent Release builds passed with MinGW Makefiles and static
+executable linking. Each test entry was configured from the copied test directory;
+each source entry from the copied src directory. The existing Common standalone
+entry received COMMON_LIB_ROOT pointing into the same copy. No new configuration
+API or permanent runner was added. Initial Ninja compiler-ABI probes stalled
+before project compilation and were terminated; they are not passing evidence.
+
+| Copy / entry | C11 compile entries per width | x64 background tests / seconds | x86 background tests / seconds |
+| --- | --- | --- | --- |
+| Four / test/lib | 62 | 41/41, 61.11s | 41/41, 60.35s |
+| Four / test/common | 47 | 18/18, 12.28s | 18/18, 14.47s |
+| Six / test/lib | 62 | 41/41, 52.91s | 41/41, 54.43s |
+| Six / test/common | 47 | 18/18, 12.54s | 18/18, 14.74s |
+| Six / test/x86 | 42 | 9/9, 4.83s | 9/9, 6.99s |
+| Six / src/lib | 25 | manifest target passed | manifest target passed |
+| Six / src/common | 32 | manifest/DAG target passed | manifest/DAG target passed |
+| Six / src/x86 | 36 | manifest/DAG target passed | manifest/DAG target passed |
+
+Every compile_commands.json entry selects -std=c11 and all four strict warning
+flags. All compiled sources resolve inside their respective copy; command and
+include-path searches find no original product source, App/Core, NXVM or external
+mirror dependency. Existing standalone suites verify source/test manifests and
+boundary/negative fixtures. This disproves the reported layout obstacle under
+the owner's confirmed root test/ layout; no flexible-path framework is needed.
+
+Both product Release rebuilds passed; final background x64 110/110 (127.19s),
+x86 110/110 (182.23s). Five desktop cases per product width, and three per
+standalone Lib run, are excluded explicitly. EXEs are byte-identical to S3;
+its hashes above remain current. These Windows tests do not certify native Linux
+execution or a completed NNES integration. Owned disposable copies, logs and
+matrix script are removed after recording this evidence; INI/media are untouched.
+
+## All-S Coverage For Owner Acceptance
+
+The frozen ledger is covered: S1 resolves the false test-layout premise and
+establishes baseline; S2 repairs and deterministically tests terminal wake;
+S3 fixes strict initialization diagnostics and qualifies six C11 packages;
+S4 proves independent exact-copy reuse in the agreed layout. No unresolved
+item in that finite ledger is transferred to TODO or a new queue candidate.
+T75 does not change the preexisting three queue candidates. A separately authored
+product-test-layout proposal appeared during S4 final recording; it is not part
+of this delivery or its code/coverage claims.
+
+Endpoint accounting uses git diff --numstat 188d2bfd against the delivered tree,
+restricted to shared C/H and CMake files: production seven files +34/-33 (net +1),
+tests five files +56/-11 (net +45), six build entries +36/-35 (net +1).
+Total eighteen code/build/test files +126/-79, net +47. Documentation, readmes,
+manifests and two EXEs are accounted separately, not presented as code growth.
+There is still one executor, the existing cancellation object and the existing
+test harnesses; no public API, product source or Core mirror change.
+After S4 delivery and actual-change review, stop for owner acceptance. This
+coverage report is not authorization to close T75 or certify all possible bugs.
+
 ## Delivery Conditions
 
 One S active at a time. No desktop interaction: background presets and
