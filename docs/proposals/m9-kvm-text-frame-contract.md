@@ -3,7 +3,7 @@
 ## Request And Status
 
 Owner admitted T71 and S2 design. S1 delivered text-only admission at 04d76945;
-its evidence is retained below. S2/S3 are reviewed; Current owns S4 execution.
+its evidence is retained below. S2--S4 are reviewed; Current owns S5 execution.
 The latest owner-approved direction supersedes the earlier monolithic-frame
 mapping-only and per-cell proposals. S3 implements control ownership first;
 the frame/mapping migration remains S4 work.
@@ -335,7 +335,8 @@ Package sizes: x86 3654118 bytes (was 3652604, +1514); x64 3058686 bytes
 - x86: 66BAA0C96DEC3E8DF57D08289AC33232FAE901FF181C77E28CB096DE376B9921
 - x64: 58A5E4B67FB74D3F7092E09E8CD68E0CE3BB4129EB9D87F61C226F9E0F1DBDF5
 
-S4 executor verification is complete; coordinator review follows its P1 push.
+S4 executor verification and coordinator review are complete at 17c9da90;
+[the S4 closure](../history/M9-T71-S4-frame-ownership.md) records acceptance.
 S5 retains fixed-capacity validation and producer error/no-frame distinction;
 S6 retains final integration/simplification review and owner T acceptance.
 
