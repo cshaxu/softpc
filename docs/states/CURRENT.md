@@ -2,8 +2,8 @@
 
 ## Current Work
 
-Owner accepted T71 S7. S8 implementation and dual-width verification are
-complete; preparing its reviewed delivery for owner testing. T71 remains open;
+Owner accepted T71 S7. S8 implementation 81d52730 is pushed and reviewed;
+dual-width verification is complete and S8 awaits owner testing. T71 remains open;
 S9 FIFO and S10 semantic audit remain inactive.
 
 ## M9 T71 S8 Packet
@@ -105,7 +105,7 @@ S9 FIFO and S10 semantic audit remain inactive.
 
 ## Recent Governance
 
-T70 is closed; T71 S7 is owner-accepted and S8 is active.
+T70 is closed; T71 S7 is owner-accepted and S8 awaits owner testing.
 
 - **M9 Td S17:** Owner requested a concrete KVM text/frame correction proposal
   at queue head. Recorded capability rejection, explicit character/glyph

@@ -384,3 +384,20 @@ The finite S8 request/exit ledger is implemented and verified. S7 owner
 acceptance is recorded in its history. S8 still requires post-push review and
 owner testing; S9/S10 and T71 remain open. No completion claim covers arbitrary
 native synchronization failure or the separate modal-loop observation.
+
+### S8 Post-Push Coordinator Review
+
+Reviewed pushed implementation 81d52730 against baseline 92be0e6a, including
+the actual production and test diffs, request admission/unwind ordering,
+manifest changes, package hashes and verification records. The finite ledger
+above is satisfied: pending work completes after driver unwind, completed
+results are preserved, and admission cannot cross terminal cleanup. No public
+API or out-of-scope production component changed. Actual production +85/-39
+(net +46) and tests +161/-9 (net +152) match the executor report; both delivered
+package hashes match the recorded final builds. Final dual-width suites pass
+110/110 each; earlier modal-test failures remain assigned to S10, not claimed
+fixed. The implementation push leaves HEAD equal to origin/main and the
+worktree clean before this review-only record.
+
+S8 delivery is reviewed and awaits owner testing. This is not owner acceptance
+or S8 closure. S9/S10 are not started, and T71 remains open.
