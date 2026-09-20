@@ -450,3 +450,10 @@ Package SHA-256:
 
 - softpc32.exe: 90C69067124A830BF3FBC59B879893F1A046B0661C935A349DED6798F0A53E0C
 - softpc64.exe: 78375916A8C4695F177A6AD94648B17CBD458B61D91D86A74FD6A868BF6F23FC
+
+After pushed executor delivery 006ecf32, the coordinator role reviewed actual
+56261c63..006ecf32 paths/counts, transport/driver/caller ownership, original
+owner request, failure-output/lease/completion proof and protected-path equality.
+Both shared manifests and the Common DAG passed again. No duplicate execution
+path, old x86 Machine alias or unrelated implementation change remains in scope.
+S3 is verified and delivered, not closed: await the owner's manual acceptance.

@@ -11,6 +11,10 @@ owner testing, not S closure. Both Release builds passed; background x64 105/105
 (162.58s), x86 105/105 (125.26s); five desktop tests per width excluded. Actual
 production C/H +327/-268 (net +59), test C/H +405/-222 (net +183), gates +2/-0.
 The proposal records the finite sweep, first-run gate correction and EXE hashes.
+Implementation 006ecf32 is pushed. Coordinator actual-change review confirmed
+the admitted scope, copied-slot ownership, protocol-only relocation, all consumer
+repairs and protected-path equality; shared manifests/DAG were rechecked after
+push. S3 remains verified and open for owner testing; no S4 admission.
 Owner directly admitted T73 outside the queue. T72 is closed.
 See the [T73 proposal](../proposals/m9-shared-x86-dependency-audit.md).
 Existing queued candidates remain unadmitted.
