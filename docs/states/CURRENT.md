@@ -3,8 +3,8 @@
 ## Current Work
 
 Active: T72 S5, aggregate KVM text fields into one cell array.
-Implementation and dual-width background verification complete; awaiting delivery
-review and owner testing before closure.
+Implementation, dual-width background verification and actual-change review
+complete. P1 da26717b pushed; awaiting owner testing before closure.
 T72 S1--S4 are closed. T72 remains open; no next queued candidate admitted.
 
 Owner confirmed desktop and RDP tests passed and approved S4 closure.

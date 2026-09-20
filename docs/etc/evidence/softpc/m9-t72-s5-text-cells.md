@@ -79,3 +79,16 @@ layout task; strict Lib compile passes.
 Packages decrease by 2048/3072 bytes from S4 respectively; not a speed claim.
 No custom diagnostic outputs created. Build trees retained for incremental proof.
 S5 and T72 remain open for owner testing after delivery and actual-change review.
+
+## Actual-Change Coordinator Review
+
+Reviewed committed P1 da26717b against e118f058 after pushing to origin/main.
+The six production paths match the admitted boundary ledger; actual C/H counts
+remain +31/-33 and tests +94/-57. Default initialization covers every cell,
+comparison covers all four bytes without padding, and both leaf consumers keep
+their original font/map interpretation. No legacy field references remain in
+src/test C/H. Protected MVDM, Compat, logical Console/Broker, native mouse,
+motion, mailbox and INI paths have zero diff. Package hashes match the table.
+Documentation governance and diff whitespace checks pass. No unresolved scope
+expansion found; this review does not replace pending owner visual acceptance.
+P2 records this review only; S5 and T72 are not closed.
