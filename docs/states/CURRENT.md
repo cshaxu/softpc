@@ -39,8 +39,8 @@ No S11 or new numeric T is admitted; see [Queue](QUEUE.md).
 ## Recent Governance
 
 - **M9 Td S18:** T71 closure audit, TODO retirement and new floppy-identification
-  candidate second in queue; documentation only. P1 delivery prepared;
-  coordinator review follows push.
+  candidate second in queue; documentation only. P1 957c809d pushed;
+  actual-change coordinator review and documentation checks passed; Td closed.
   [Record](../history/M9-Td-S18-t71-closure-and-floppy-queue.md).
 - **M9 Td S17:** Earlier text/frame proposal subsequently admitted as T71;
   [retained proposal](../history/M9-T71-kvm-text-frame-contract-proposal.md).

@@ -51,3 +51,13 @@ in current states/proposals. Both EXE SHA256 values match the accepted S10 value
 Endpoint production counts are +716/-477 (net +239), tests +1220/-358 (net +862);
 these are historical T71 totals, not code added by this Td. This delivery changes
 only documentation and archives one completed proposal without rewriting it.
+
+## P2 Coordinator Closure
+
+Reviewed actual pushed P1 957c809d against the original request and finite ledger:
+13 documentation paths, +244/-136, including a 99-percent rename; no source,
+test, build configuration, asset or media diff from 5bfceb36. Queue has four
+unnumbered candidates in the requested order, TODO has no entries, and T71 has
+its separate closure audit. Documentation gate passes again. No S11 or T72 was
+silently admitted. The preceding request to investigate question five remains
+superseded, not a hidden unfinished S. Td S18 is closed; no further work active.
