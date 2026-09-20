@@ -2,37 +2,23 @@
 
 ## Current Work
 
-Active task: M9 T73 S1, Lib/Common x86 dependency audit and reuse design.
-Owner directly admitted this task outside the queue. T72 is closed.
+No implementation subtask is active.
+Open task awaiting owner: T73.
+S1 rename and dual-width verification are complete; pushed-P actual-change
+review follows before S1 closure. S2 requires explicit owner admission.
+Owner directly admitted T73 outside the queue. T72 is closed.
 See the [T73 proposal](../proposals/m9-shared-x86-dependency-audit.md).
 Existing queued candidates remain unadmitted.
-S1 audit/design is delivered for owner review; no S2 implementation is admitted.
-Production/test changes are +0/-0. Thirteen targeted static gates passed;
-Lib and Common source, shared tests and accepted EXEs are unchanged.
-
-## M9 T73 S1 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner explicitly admits a new Lib/Common x86 dependency audit, referencing NNES design. |
-| Objective | Verify unchanged Lib reuse and inventory every public/internal x86 dependency in Common session/ui/machine; design x86-debug/x86-xasm32 ownership. |
-| Non-goals | No production rename/API implementation, Lib patch, new emulator, sibling change, binary/config/media edit or runtime behavior change. |
-| Reference Baseline | ad66b615, clean, accepted T72. NNES read-only design reference; not assumed implemented. |
-| Candidate Proposal | [T73 design](../proposals/m9-shared-x86-dependency-audit.md). |
-| Files And ABI Surface | Read src/lib and src/common, shared tests/build verifiers and current App/VM callers; write task documentation only. |
-| Applicable Rules | Architecture/coding/execution/documentation rules and shared governance skills; source research policy. |
-| Verification | Finite source/API/build inventory; targeted searches plus call-chain inspection; existing corpus/DAG gates; documentation governance. No build/GUI claim from audit alone. |
-| Expected Markers | Evidence separates guest ISA coupling, host dependencies and capability limits; each binding has one proposed owner. |
-| Asset Needs | None; preserve both EXEs, snapshot, INI and media. |
-| Reporting Requirements | Production/test +0/-0; concrete findings and later implementation estimates clearly distinguished. |
-| Stop Conditions | Any source change or assumption about target hardware requiring new semantics returns to owner design review. |
-| Exit Criteria | Evidence-backed report, proposal and scoped follow-up design delivered for owner review; Lib untouched. |
-| Original Owner Request | 对 lib 和common做一次x86依赖审计，给nec模拟器使用，参考隔壁nnes设计；确认lib原样移植；common/debug改common/x86-debug，common/xasm32改common/x86-xasm32；审计session/ui/machine所有api和内部逻辑。 |
-| Similar-Issue Sweep | Public types, callback payloads, dispatch/switches, lifecycle/media/input/frame policies, build targets, test dependency and verifier allowlists across the frozen corpus. |
+See the [S1 record](../history/M9-T73-S1-x86-component-rename.md) for scope,
+verification, changed-line accounting and package hashes.
 
 ## Current Technical Baseline
 
+- T73 S1 renames x86 debug/assembly paths, public symbols and targets only.
+  Both Release builds passed; background x64 105/105 (168.90s), x86 105/105
+  (156.37s); five desktop tests per width excluded. Production +168/-168,
+  tests C/H +181/-181, build/gates +26/-24. Lib/Machine/Session/UI and INI/media
+  are unchanged; package hashes are in the S1 record. No S2 work is admitted.
 - Accepted code delivery 95850780, actual-change review ae1dc6e0.
   Both Release builds passed; final background x64 105/105 (134.41s),
   x86 105/105 (135.13s). Five desktop tests per width excluded; owner manual

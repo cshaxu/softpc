@@ -8,8 +8,8 @@ reference. Confirm whether Lib can transfer unchanged; identify Common bindings.
 Requested names are common/x86-debug and common/x86-xasm32. Audit every API and
 internal path of common/session, common/ui and common/machine and propose owners.
 
-S1 is source/design audit only. Production/test changes +0/-0; no rename,
-new runtime API, emulator launch, artifact refresh or sibling edit in this S.
+The preliminary S1 audit was delivered in f13c2780 with production/test +0/-0.
+The owner subsequently revised this still-open S1; see the approved plan below.
 Baseline ad66b615. NNES is read-only design evidence, not a build dependency or
 proof of implemented neutrality. Its optional components outside Common are
 not silently substituted for the owner's requested Common subdirectories.
@@ -27,9 +27,9 @@ finding is conditional on supported host/toolchain/capacities; it is not proof
 of a new emulator or ARM/Linux runtime. Compare NNES design to current code,
 never assume its target contracts already exist.
 
-S1 delivers evidence-backed API/internal inventory, minimal design and later-S
-boundaries for review; implementation requires the reviewed plan. Lib bytes,
-tests, manifests, INI/media and accepted EXEs remain unchanged. No new universal
+The preliminary audit delivered API/internal inventory and a proposed design.
+Lib bytes and INI/media remain unchanged throughout the approved rename.
+No new universal
 CPU schema, second executor, debugger frontend or negotiation framework.
 
 ## S1 Findings
@@ -202,11 +202,10 @@ shutdown completion and caller-context lifetime. Specify result initialization
 and valid response length on failure explicitly; moving to byte transport must
 not expose stale bytes or accidentally change existing x86 CLI output.
 
-## Proposed S Boundaries And Estimates
+## Superseded Preliminary S Breakdown
 
-Only S1 is active. The following are design estimates, not implementation
-admission or measured changes. Before each implementation S, freeze actual
-paths and report additions/deletions separately with rename-aware accounting.
+The following preliminary breakdown is superseded by the owner's two-stage
+plan below; it is retained only to explain the preliminary audit's estimates.
 
 | S | Scope and acceptance | Preliminary footprint |
 | --- | --- | --- |
@@ -234,3 +233,37 @@ passed (7/7); Lib types-layout/DAG/negative-include/naming/control-ownership
 checks passed (6/6). These are static audit gates, not a new full regression
 or Linux/native-NEC runtime test. Documentation governance and diff whitespace
 checks also passed. S1 has no runnable-path change and produces no new EXE.
+
+## Approved Plan After Preliminary Audit
+
+This project's finalized design is authoritative. NNES is only the initial
+reference. Lib remains unchanged, including host keyboard normalization and
+current display capacities. The receiving product maps host input in its own
+adapter. x86 debug/assembly remain optional product capabilities, not a new
+generic debugger. Machine owns the future neutral execution transport; its
+payload migration is expressly outside the rename step.
+
+- **S1 (active, revised scope):** rename common/debug to common/x86-debug and
+  common/xasm32 to common/x86-xasm32; rename their public prefixes/targets and
+  corresponding test ownership, repair every current consumer and verifier,
+  preserve command text and behavior. Do not introduce protocol headers,
+  transport changes or a compatibility alias. Existing build selection is
+  preserved in this step; neutral-only selection belongs to S2's audit plan.
+  Produce both EXEs, build/test, commit/push and stop for owner review.
+- **S2 (not admitted):** audit common/machine APIs, implementation and build
+  closure against the agreed neutral transport direction; define bounded later
+  migration S tasks and acceptance tests. Do not pre-admit those migrations.
+
+S1 baseline f13c2780. Frozen rename ledger: both component trees, App command
+and VM register consumers, Common/product debugger and xasm tests, root/shared
+CMake, component/source gates, both Common manifests and current design/docs.
+Historical task/source references remain unchanged. No Lib, Machine, Session,
+UI, Compat, MVDM or guest-media implementation changes are expected.
+Estimate: about 25-35 code/build/test paths plus documentation/manifests;
+production C/H approximately +150..300/-150..300 (net zero mechanical lines),
+tests approximately +100..250/-100..250 (net zero mechanical lines). Rename-aware
+counts distinguish relocation from changed lines. No new runtime structure.
+Proof: reverse the exact name substitutions and compare each C/H byte stream
+with its baseline; both Release builds and full background presets, plus
+debugger/xasm integration tests and static corpus gates. Desktop tests remain
+explicitly excluded; no new guest installation or snapshot format is involved.

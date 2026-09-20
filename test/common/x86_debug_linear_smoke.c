@@ -1,4 +1,4 @@
-#include "common/debug/debug_interface.h"
+#include "common/x86-debug/debug_interface.h"
 #include <assert.h>
 #include <string.h>
 
@@ -15,8 +15,8 @@ static lib_status execute(common_machine *m, const common_machine_debug_lease *l
     (void)m; (void)lease;
     *result = (common_machine_debug_result){0};
     if (request->operation == COMMON_MACHINE_DEBUG_READ_REGISTER) {
-        if (request->register_id == COMMON_DEBUG_CS) result->value = code_segment;
-        if (request->register_id == COMMON_DEBUG_DS) result->value = data_segment;
+        if (request->register_id == COMMON_X86_DEBUG_CS) result->value = code_segment;
+        if (request->register_id == COMMON_X86_DEBUG_DS) result->value = data_segment;
     } else if (request->operation == COMMON_MACHINE_DEBUG_GET_CODE_DEFAULT_SIZE) {
         result->value = 1u;
     } else if (request->operation == COMMON_MACHINE_DEBUG_READ_LINEAR ||
@@ -43,14 +43,14 @@ static lib_status execute(common_machine *m, const common_machine_debug_lease *l
 #define common_machine_debug_acquire acquire
 #define common_machine_debug_execute_with_lease execute
 #define common_machine_debug_cancel cancel
-#include "common/debug/command.c"
+#include "common/x86-debug/command.c"
 
-static common_debug *debug;
-static common_debug_result result;
+static common_x86_debug *debug;
+static common_x86_debug_result result;
 static const char *submit(const char *line)
 {
     reads = writes = 0u;
-    assert(common_debug_submit_line(debug, line, &result) == LIB_STATUS_OK);
+    assert(common_x86_debug_submit_line(debug, line, &result) == LIB_STATUS_OK);
     return result.text;
 }
 
@@ -61,8 +61,8 @@ int main(void)
         "xc 0 ffffffff 2", "xd ffffffff 2", "xe ffffffff 11 22",
         "xf ffffffff 2 11", "xs ffffffff 2 11"
     };
-    assert(common_debug_create(&debug) == LIB_STATUS_OK);
-    assert(common_debug_open(debug, (common_machine *)debug) == LIB_STATUS_OK);
+    assert(common_x86_debug_create(&debug) == LIB_STATUS_OK);
+    assert(common_x86_debug_open(debug, (common_machine *)debug) == LIB_STATUS_OK);
 
     memcpy(memory, "ABCDE", 5);
     assert(strcmp(submit("xm 0 1 4"), "") == 0);
@@ -175,6 +175,6 @@ int main(void)
     assert(strstr(submit("s ffff l1 41"), "0000:FFFF"));
     assert(reads == 1);
     assert(strcmp(submit(""), "") == 0 && reads == 0 && writes == 0);
-    common_debug_destroy(debug);
+    common_x86_debug_destroy(debug);
     return 0;
 }

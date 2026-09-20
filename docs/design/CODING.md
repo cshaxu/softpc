@@ -15,8 +15,8 @@ src/
     ui/          broker, monitor Console and KVM composition
     session/     neutral control FIFO, reduction and UI dispatch
     machine/     generic executor, lifecycle/input queues and frame publication
-    xasm32/      imported generic assembly/disassembly corpus
-    debug/       imported generic debug corpus over the optional machine adapter
+    x86-xasm32/  imported x86 assembly/disassembly corpus
+    x86-debug/   imported x86 debug corpus over the optional machine adapter
   lib/{types,base,console,console-broker,storage,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
   app/

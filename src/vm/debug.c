@@ -1,7 +1,7 @@
 #include "vm/debug.h"
 #include "compat/ccpu/abi.h"
 #include "compat/platform.h"
-#include "common/debug/debug_interface.h"
+#include "common/x86-debug/debug_interface.h"
 
 #include <string.h>
 
@@ -13,7 +13,7 @@ static lib_status softpc_debug_register(const common_machine_debug_request *requ
 {
     lib_bool write = request->operation == COMMON_MACHINE_DEBUG_WRITE_REGISTER;
     switch (request->register_id) {
-#define GENERAL_REGISTER(name) case COMMON_DEBUG_##name: \
+#define GENERAL_REGISTER(name) case COMMON_X86_DEBUG_##name: \
         if (write) c_set##name(request->address); \
         else result->value = c_get##name(); \
         return LIB_STATUS_OK
@@ -29,7 +29,7 @@ static lib_status softpc_debug_register(const common_machine_debug_request *requ
     GENERAL_REGISTER(EFLAGS);
     GENERAL_REGISTER(CR2);
     GENERAL_REGISTER(CR3);
-    case COMMON_DEBUG_CR0:
+    case COMMON_X86_DEBUG_CR0:
         /* MOV_CR raises #GP for PG without PE. Reject before calling the
          * setter so a debugger typo cannot escape into the guest exception. */
         if (write && (request->address & 0x80000001u) == 0x80000000u)
@@ -38,7 +38,7 @@ static lib_status softpc_debug_register(const common_machine_debug_request *requ
         else result->value = c_getCR0();
         return LIB_STATUS_OK;
 #undef GENERAL_REGISTER
-#define SEGMENT_REGISTER(name) case COMMON_DEBUG_##name: \
+#define SEGMENT_REGISTER(name) case COMMON_X86_DEBUG_##name: \
         if (write) return request->address <= 0xffffu && \
             c_set##name((unsigned short)request->address) == 0 ? \
                 LIB_STATUS_OK : LIB_STATUS_INVALID_ARGUMENT; \

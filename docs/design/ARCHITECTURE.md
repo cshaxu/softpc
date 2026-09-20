@@ -9,7 +9,7 @@ app/config, command, keyboard  configuration and CLI/hotkey policy -> Common/Lib
 
 common/session -> common/ui       control and monitor/KVM composition
 common/session -> common/machine  sole generic executor and copied facts
-common/debug + common/xasm32      shared debugger/assembly contracts
+common/x86-debug + common/x86-xasm32      shared debugger/assembly contracts
                          |
                  injected existing driver callbacks
                          v
@@ -99,11 +99,11 @@ and hotkey policy to Common session. SoftPC publishes each admitted shared-libra
 canonical corpus for NXVM to adopt exactly; the projects do not maintain
 parallel variants.
 
-`common/xasm32` is an imported copied byte/text assembly capability and
-`common/debug` is an imported generic debug command capability. SoftPC exposes
+`common/x86-xasm32` is an imported x86 copied byte/text assembly capability and
+`common/x86-debug` is an imported x86 debug command capability. SoftPC exposes
 it through its injected app command binding, not through a second input loop.
-`common/debug` depends on `common/machine`'s optional paused-state adapter and
-on `common/xasm32`; neither component may create an executor, own a Console,
+`common/x86-debug` depends on `common/machine`'s optional paused-state adapter and
+on `common/x86-xasm32`; neither component may create an executor, own a Console,
 or add a product command path. Import hashes remain provenance evidence; the
 S9 integration changes to these components form the updated downstream corpus.
 The control thread serializes lifecycle, media and synchronous debug requests.

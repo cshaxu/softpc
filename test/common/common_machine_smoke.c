@@ -1,5 +1,5 @@
 #include "common/machine/machine_interface.h"
-#include "common/debug/debug_interface.h"
+#include "common/x86-debug/debug_interface.h"
 
 #include <windows.h>
 #include <assert.h>
@@ -25,7 +25,7 @@ typedef struct machine_fake {
     HANDLE callback_release;
     LONG notifications;
     lib_bool register_fixture;
-    lib_u32 registers[COMMON_DEBUG_REGISTER_COUNT];
+    lib_u32 registers[COMMON_X86_DEBUG_REGISTER_COUNT];
     unsigned real_reads, linear_reads;
     lib_bool memory_fixture;
     lib_u8 memory[8192];
@@ -260,9 +260,9 @@ static lib_status fake_execute_debug(void *opaque,
     return LIB_STATUS_OK;
 }
 
-static void extended_registers(common_debug *debug, machine_fake *fake)
+static void extended_registers(common_x86_debug *debug, machine_fake *fake)
 {
-    common_debug_result result;
+    common_x86_debug_result result;
     const char *names[] = { "eax", "ecx", "edx", "ebx", "esp", "ebp",
         "esi", "edi", "eip", "eflags" };
     const char *commands[] = { "xr", "xreg", "x r", "x reg", "xt", "xg 12345678" };
@@ -274,25 +274,25 @@ static void extended_registers(common_debug *debug, machine_fake *fake)
     fake->register_fixture = LIB_TRUE;
     for (index = 0; index < 10u; ++index)
         fake->registers[index] = 0x12340000u + index;
-    fake->registers[COMMON_DEBUG_EFLAGS] = 0x37fd7u;
+    fake->registers[COMMON_X86_DEBUG_EFLAGS] = 0x37fd7u;
     for (index = 0; index < sizeof(commands) / sizeof(commands[0]); ++index) {
         fake->real_reads = fake->linear_reads = 0u;
-        assert(common_debug_submit_line(debug, commands[index], &result) == LIB_STATUS_OK);
+        assert(common_x86_debug_submit_line(debug, commands[index], &result) == LIB_STATUS_OK);
         if (index >= 4u) {
-            assert(result.lifecycle_request == COMMON_DEBUG_LIFECYCLE_RESUME);
-            assert(common_debug_observe_machine(debug, COMMON_DEBUG_MACHINE_PAUSED,
+            assert(result.lifecycle_request == COMMON_X86_DEBUG_LIFECYCLE_RESUME);
+            assert(common_x86_debug_observe_machine(debug, COMMON_X86_DEBUG_MACHINE_PAUSED,
                 LIB_STATUS_OK, &result) == LIB_STATUS_OK);
         }
         assert(strstr(result.text, expected) != NULL);
         assert(strstr(result.text, "L22340008 90") != NULL);
         assert(fake->real_reads == 0u && fake->linear_reads == 1u);
     }
-    fake->registers[COMMON_DEBUG_EFLAGS] = 2u;
-    assert(common_debug_submit_line(debug, "xr", &result) == LIB_STATUS_OK);
+    fake->registers[COMMON_X86_DEBUG_EFLAGS] = 2u;
+    assert(common_x86_debug_submit_line(debug, "xr", &result) == LIB_STATUS_OK);
     assert(strstr(result.text,
         "EFL=00000002: vm rf nt IOPL=0 of df if tf sf zf af pf cf \n") != NULL);
     fake->real_reads = fake->linear_reads = 0u;
-    assert(common_debug_submit_line(debug, "r", &result) == LIB_STATUS_OK);
+    assert(common_x86_debug_submit_line(debug, "r", &result) == LIB_STATUS_OK);
     assert(strncmp(result.text, "AX=0000  BX=0003", 15u) == 0);
     assert(strstr(result.text, "EAX=") == NULL && fake->linear_reads == 0u &&
         fake->real_reads == 1u);
@@ -303,28 +303,28 @@ static void extended_registers(common_debug *debug, machine_fake *fake)
         char value[16];
         snprintf(line, sizeof(line), "xr %s", names[index]);
         snprintf(value, sizeof(value), "%08X", fake->registers[index]);
-        assert(common_debug_submit_line(debug, line, &result) == LIB_STATUS_OK);
+        assert(common_x86_debug_submit_line(debug, line, &result) == LIB_STATUS_OK);
         assert(strstr(result.text, value) != NULL);
-        assert(common_debug_submit_line(debug, "89abcdef", &result) == LIB_STATUS_OK);
+        assert(common_x86_debug_submit_line(debug, "89abcdef", &result) == LIB_STATUS_OK);
         assert(fake->registers[index] == 0x89abcdefu);
     }
-    assert(common_debug_submit_line(debug, "xsreg", &result) == LIB_STATUS_OK);
+    assert(common_x86_debug_submit_line(debug, "xsreg", &result) == LIB_STATUS_OK);
     assert(strstr(result.text, "Data, e, rw, big") != NULL);
     fake->register_fixture = LIB_FALSE;
 }
-static void transcript(common_debug *debug, const char *line,
+static void transcript(common_x86_debug *debug, const char *line,
     const char *text, const char *prompt)
 {
-    common_debug_result result;
-    assert(common_debug_submit_line(debug, line, &result) == LIB_STATUS_OK);
+    common_x86_debug_result result;
+    assert(common_x86_debug_submit_line(debug, line, &result) == LIB_STATUS_OK);
     assert(strcmp(result.text, text) == 0);
     assert(result.prompt_ready && strcmp(result.prompt, prompt) == 0);
-    assert(result.lifecycle_request == COMMON_DEBUG_LIFECYCLE_NONE);
+    assert(result.lifecycle_request == COMMON_X86_DEBUG_LIFECYCLE_NONE);
 }
 
-static void original_cli(common_debug *debug, machine_fake *fake)
+static void original_cli(common_x86_debug *debug, machine_fake *fake)
 {
-    common_debug_result result;
+    common_x86_debug_result result;
     const char *names[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di", "ip" };
     fake->register_fixture = fake->memory_fixture = LIB_TRUE;
     memset(fake->registers, 0, sizeof(fake->registers));
@@ -348,10 +348,10 @@ static void original_cli(common_debug *debug, machine_fake *fake)
     }
     transcript(debug, "xr eax", "EAX 89AB1234\n", ":");
     transcript(debug, "12345678", "", "-");
-    assert(fake->registers[COMMON_DEBUG_EAX] == 0x12345678u);
+    assert(fake->registers[COMMON_X86_DEBUG_EAX] == 0x12345678u);
     transcript(debug, "rf", "", "NV UP DI PL NZ NA PO NC  -");
     transcript(debug, "cy", "", "-");
-    assert((fake->registers[COMMON_DEBUG_EFLAGS] & 1u) != 0u);
+    assert((fake->registers[COMMON_X86_DEBUG_EFLAGS] & 1u) != 0u);
     transcript(debug, "e0:500", "", "0000:0500  00.");
     transcript(debug, "ab", "", "-");
     assert(fake->memory[0x500] == 0xab);
@@ -371,7 +371,7 @@ static void original_cli(common_debug *debug, machine_fake *fake)
     assert(fake->memory[0x510] == 0x90 && fake->memory[0x511] == 0xf8);
     transcript(debug, "xa 520", "", "L00000520 ");
     transcript(debug, "nop", "", "L00000521 ");
-    assert(common_debug_submit_line(debug, "not_an_instruction", &result) == LIB_STATUS_OK);
+    assert(common_x86_debug_submit_line(debug, "not_an_instruction", &result) == LIB_STATUS_OK);
     assert(strstr(result.text, "^ Error\n") && strcmp(result.prompt, "L00000521 ") == 0);
     transcript(debug, "clc", "", "L00000522 ");
     transcript(debug, "", "", "-");
@@ -380,11 +380,11 @@ static void original_cli(common_debug *debug, machine_fake *fake)
     assert(fake->memory[0x520] == 0x90 && fake->memory[0x521] == 0xf8);
     memset(fake->memory + 0x540, 0x66, 14u);
     fake->memory[0x54e] = 0x90;
-    assert(common_debug_submit_line(debug, "xu 540 1", &result) == LIB_STATUS_OK);
+    assert(common_x86_debug_submit_line(debug, "xu 540 1", &result) == LIB_STATUS_OK);
     assert(strstr(result.text, "<ERROR>") == NULL);
-    assert(common_debug_submit_line(debug, "xu", &result) == LIB_STATUS_OK);
+    assert(common_x86_debug_submit_line(debug, "xu", &result) == LIB_STATUS_OK);
     assert(strncmp(result.text, "L0000054F", 9) == 0);
-    assert(common_debug_submit_line(debug, "u 0:540 54e", &result) == LIB_STATUS_OK);
+    assert(common_x86_debug_submit_line(debug, "u 0:540 54e", &result) == LIB_STATUS_OK);
     assert(strstr(result.text, "<ERROR>") == NULL);
     transcript(debug, "r zz", "br Error\n", "-");
     transcript(debug, "t 0", "", "-");
@@ -393,7 +393,7 @@ static void original_cli(common_debug *debug, machine_fake *fake)
     /* Original dump formatting, all 256 rows, including its backspace dash.
      * This exceeds both old copied buffers; no prefix/tail may disappear. */
     memset(fake->memory, 'A', sizeof(fake->memory));
-    assert(common_debug_submit_line(debug, "xd 0 1000", &result) == LIB_STATUS_OK);
+    assert(common_x86_debug_submit_line(debug, "xd 0 1000", &result) == LIB_STATUS_OK);
     const char *cursor = result.text;
     for (unsigned address = 0; address < 0x1000; address += 16) {
         char row[128];
@@ -402,24 +402,24 @@ static void original_cli(common_debug *debug, machine_fake *fake)
         cursor += strlen(row);
     }
     assert(*cursor == '\0' && strlen(result.text) > 16384u);
-    assert(common_debug_submit_line(debug, "xd", &result) == LIB_STATUS_OK);
+    assert(common_x86_debug_submit_line(debug, "xd", &result) == LIB_STATUS_OK);
     assert(strncmp(result.text, "L00001000", 9) == 0);
     fake->memory_fixture = LIB_FALSE;
-    assert(common_debug_submit_line(debug, "g", &result) == LIB_STATUS_OK);
-    assert(result.lifecycle_request == COMMON_DEBUG_LIFECYCLE_RESUME);
-    assert(common_debug_observe_machine(debug, COMMON_DEBUG_MACHINE_PAUSED,
+    assert(common_x86_debug_submit_line(debug, "g", &result) == LIB_STATUS_OK);
+    assert(result.lifecycle_request == COMMON_X86_DEBUG_LIFECYCLE_RESUME);
+    assert(common_x86_debug_observe_machine(debug, COMMON_X86_DEBUG_MACHINE_PAUSED,
         LIB_STATUS_OK, &result) == LIB_STATUS_OK);
     assert(strstr(result.text, "AX=") && !strstr(result.text, "EAX="));
     for (unsigned linear = 0; linear < 2u; ++linear) {
-        assert(common_debug_submit_line(debug, linear ? "xt 2" : "t 2", &result) == LIB_STATUS_OK);
+        assert(common_x86_debug_submit_line(debug, linear ? "xt 2" : "t 2", &result) == LIB_STATUS_OK);
         for (unsigned step = 0; step < 2u; ++step) {
-            assert(common_debug_observe_machine(debug, COMMON_DEBUG_MACHINE_PAUSED,
+            assert(common_x86_debug_observe_machine(debug, COMMON_X86_DEBUG_MACHINE_PAUSED,
                 LIB_STATUS_OK, &result) == LIB_STATUS_OK);
             lib_size length = strlen(result.text);
             assert(length >= 2u && result.text[length - 1u] == '\n');
             assert((result.text[length - 2u] == '\n') == (step == 0u));
             assert(result.lifecycle_request == (step == 0u ?
-                COMMON_DEBUG_LIFECYCLE_RESUME : COMMON_DEBUG_LIFECYCLE_NONE));
+                COMMON_X86_DEBUG_LIFECYCLE_RESUME : COMMON_X86_DEBUG_LIFECYCLE_NONE));
         }
     }
     fake->register_fixture = fake->memory_fixture = LIB_FALSE;
@@ -498,8 +498,8 @@ int main(void)
     lib_u32 generation = 0u;
     common_machine_debug_lease lease = { 0 };
     common_machine_debug_result debug_result = { 0 };
-    common_debug *debug = NULL;
-    common_debug_result debug_command_result = { 0 };
+    common_x86_debug *debug = NULL;
+    common_x86_debug_result debug_command_result = { 0 };
     state_transfer transfer = { 0 };
 
     fake.stopped = CreateEventA(NULL, TRUE, FALSE, NULL);
@@ -534,14 +534,14 @@ int main(void)
     assert(frame.window.valid == 1u && frame.sequence == 77u);
     common_machine_set_state_sink(machine, note_state, &fake);
     common_machine_set_frame_sink(machine, note_frame, &fake);
-    assert(common_debug_create(&debug) == LIB_STATUS_OK);
-    assert(common_debug_open(debug, machine) == LIB_STATUS_OK);
+    assert(common_x86_debug_create(&debug) == LIB_STATUS_OK);
+    assert(common_x86_debug_open(debug, machine) == LIB_STATUS_OK);
     assert(fake.debug_calls == 0);
-    assert(common_debug_submit_line(debug, "?", &debug_command_result) == LIB_STATUS_OK);
+    assert(common_x86_debug_submit_line(debug, "?", &debug_command_result) == LIB_STATUS_OK);
     assert(debug_command_result.keep_active && fake.debug_calls == 0);
-    assert(common_debug_submit_line(debug, "h 1 2", &debug_command_result) == LIB_STATUS_OK);
+    assert(common_x86_debug_submit_line(debug, "h 1 2", &debug_command_result) == LIB_STATUS_OK);
     assert(strstr(debug_command_result.text, "0003") != NULL && fake.debug_calls == 0);
-    assert(common_debug_submit_line(debug, "r", &debug_command_result) == LIB_STATUS_OK);
+    assert(common_x86_debug_submit_line(debug, "r", &debug_command_result) == LIB_STATUS_OK);
     assert(strstr(debug_command_result.text, "must be paused") != NULL && fake.debug_calls == 0);
     assert(common_machine_start(machine));
     assert(WaitForSingleObject(fake.running, 5000u) == WAIT_OBJECT_0);
@@ -609,12 +609,12 @@ int main(void)
     assert(common_machine_resume(machine));
     assert(WaitForSingleObject(fake.running, 5000u) == WAIT_OBJECT_0);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_RUNNING);
-    assert(common_debug_submit_line(debug, "d", &debug_command_result) == LIB_STATUS_OK);
+    assert(common_x86_debug_submit_line(debug, "d", &debug_command_result) == LIB_STATUS_OK);
     assert(strstr(debug_command_result.text, "must be paused") != NULL);
-    assert(common_debug_submit_line(debug, "q", &debug_command_result) == LIB_STATUS_OK);
+    assert(common_x86_debug_submit_line(debug, "q", &debug_command_result) == LIB_STATUS_OK);
     assert(!debug_command_result.keep_active);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_RUNNING);
-    assert(common_debug_open(debug, machine) == LIB_STATUS_OK);
+    assert(common_x86_debug_open(debug, machine) == LIB_STATUS_OK);
     assert(fake.debug_calls == 0);
     ResetEvent(fake.running);
     assert(common_machine_reset(machine));
@@ -628,15 +628,15 @@ int main(void)
             .address = 0x1234u }, &debug_result) == LIB_STATUS_OK);
     assert(debug_result.value == 0x1234u &&
         InterlockedCompareExchange(&fake.debug_calls, 0, 0) == 1);
-    assert(common_debug_open(debug, machine) == LIB_STATUS_OK);
+    assert(common_x86_debug_open(debug, machine) == LIB_STATUS_OK);
     assert(fake.debug_calls == 1);
-    assert(common_debug_submit_line(debug, "?", &debug_command_result) ==
+    assert(common_x86_debug_submit_line(debug, "?", &debug_command_result) ==
         LIB_STATUS_OK);
     assert(strstr(debug_command_result.text, "assemble") != NULL);
     extended_registers(debug, &fake);
     original_cli(debug, &fake);
-    common_debug_close(debug);
-    common_debug_destroy(debug);
+    common_x86_debug_close(debug);
+    common_x86_debug_destroy(debug);
     assert(common_machine_resume(machine));
     assert(common_machine_debug_execute_with_lease(machine, &lease,
         &(common_machine_debug_request) { 0 }, &debug_result) ==

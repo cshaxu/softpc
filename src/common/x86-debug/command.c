@@ -1,9 +1,9 @@
 /* DEBUG is the debug console for users to break, trace, lookup,
  * and print virtual machine devices. */
 
-#include "common/debug/debug_interface.h"
-#include "common/debug/command_runtime.h"
-#include "common/xasm32/xasm32_interface.h"
+#include "common/x86-debug/debug_interface.h"
+#include "common/x86-debug/command_runtime.h"
+#include "common/x86-xasm32/xasm32_interface.h"
 #include "lib/storage/file_interface.h"
 #include "lib/storage/medium_interface.h"
 
@@ -29,18 +29,18 @@ typedef enum command_run_kind {
     COMMAND_RUN_BREAK_LINEAR
 } command_run_kind;
 
-struct common_debug {
+struct common_x86_debug {
     common_machine *machine;
     lib_status access_status;
     lib_bool defaults_ready;
     type_unsigned_32 assemble_linear;
     type_unsigned_32 dump_linear;
     type_unsigned_32 unassemble_linear;
-    common_debug_result *result;
+    common_x86_debug_result *result;
     C_CHAR *output;
     lib_size output_length, output_capacity;
     lib_status output_status;
-    C_CHAR input_prompt[COMMON_DEBUG_PROMPT_CAPACITY];
+    C_CHAR input_prompt[COMMON_X86_DEBUG_PROMPT_CAPACITY];
     STD_SIZE_T error_position;
     STD_SIZE_T argument_count;
     C_CHAR *arguments[DEBUG_MAXNARG];
@@ -56,7 +56,7 @@ struct common_debug {
     type_unsigned_16 unassemble_offset;
     type_unsigned_16 parsed_segment;
     type_unsigned_16 parsed_offset;
-    C_CHAR pending_line[COMMON_DEBUG_LINE_CAPACITY];
+    C_CHAR pending_line[COMMON_X86_DEBUG_LINE_CAPACITY];
     C_INT pending_line_available;
     command_continuation continuation;
     type_unsigned_32 breakpoint_linear;
@@ -66,34 +66,34 @@ struct common_debug {
     common_machine_debug_observation observation;
 };
 
-typedef common_debug command_context;
-typedef common_debug_register command_register;
+typedef common_x86_debug command_context;
+typedef common_x86_debug_register command_register;
 typedef common_machine_debug_watch_kind command_machine_watch_kind;
 
 static C_INT command_copy_text_checked(C_CHAR *destination,
     STD_SIZE_T destination_capacity, const C_CHAR *source);
 
-#define COMMAND_REGISTER_EAX COMMON_DEBUG_EAX
-#define COMMAND_REGISTER_ECX COMMON_DEBUG_ECX
-#define COMMAND_REGISTER_EDX COMMON_DEBUG_EDX
-#define COMMAND_REGISTER_EBX COMMON_DEBUG_EBX
-#define COMMAND_REGISTER_ESP COMMON_DEBUG_ESP
-#define COMMAND_REGISTER_EBP COMMON_DEBUG_EBP
-#define COMMAND_REGISTER_ESI COMMON_DEBUG_ESI
-#define COMMAND_REGISTER_EDI COMMON_DEBUG_EDI
-#define COMMAND_REGISTER_EIP COMMON_DEBUG_EIP
-#define COMMAND_REGISTER_EFLAGS COMMON_DEBUG_EFLAGS
-#define COMMAND_REGISTER_ES COMMON_DEBUG_ES
-#define COMMAND_REGISTER_CS COMMON_DEBUG_CS
-#define COMMAND_REGISTER_SS COMMON_DEBUG_SS
-#define COMMAND_REGISTER_DS COMMON_DEBUG_DS
-#define COMMAND_REGISTER_FS COMMON_DEBUG_FS
-#define COMMAND_REGISTER_GS COMMON_DEBUG_GS
-#define COMMAND_REGISTER_CR0 COMMON_DEBUG_CR0
-#define COMMAND_REGISTER_CR1 COMMON_DEBUG_CR1
-#define COMMAND_REGISTER_CR2 COMMON_DEBUG_CR2
-#define COMMAND_REGISTER_CR3 COMMON_DEBUG_CR3
-#define COMMAND_REGISTER_CR4 COMMON_DEBUG_CR4
+#define COMMAND_REGISTER_EAX COMMON_X86_DEBUG_EAX
+#define COMMAND_REGISTER_ECX COMMON_X86_DEBUG_ECX
+#define COMMAND_REGISTER_EDX COMMON_X86_DEBUG_EDX
+#define COMMAND_REGISTER_EBX COMMON_X86_DEBUG_EBX
+#define COMMAND_REGISTER_ESP COMMON_X86_DEBUG_ESP
+#define COMMAND_REGISTER_EBP COMMON_X86_DEBUG_EBP
+#define COMMAND_REGISTER_ESI COMMON_X86_DEBUG_ESI
+#define COMMAND_REGISTER_EDI COMMON_X86_DEBUG_EDI
+#define COMMAND_REGISTER_EIP COMMON_X86_DEBUG_EIP
+#define COMMAND_REGISTER_EFLAGS COMMON_X86_DEBUG_EFLAGS
+#define COMMAND_REGISTER_ES COMMON_X86_DEBUG_ES
+#define COMMAND_REGISTER_CS COMMON_X86_DEBUG_CS
+#define COMMAND_REGISTER_SS COMMON_X86_DEBUG_SS
+#define COMMAND_REGISTER_DS COMMON_X86_DEBUG_DS
+#define COMMAND_REGISTER_FS COMMON_X86_DEBUG_FS
+#define COMMAND_REGISTER_GS COMMON_X86_DEBUG_GS
+#define COMMAND_REGISTER_CR0 COMMON_X86_DEBUG_CR0
+#define COMMAND_REGISTER_CR1 COMMON_X86_DEBUG_CR1
+#define COMMAND_REGISTER_CR2 COMMON_X86_DEBUG_CR2
+#define COMMAND_REGISTER_CR3 COMMON_X86_DEBUG_CR3
+#define COMMAND_REGISTER_CR4 COMMON_X86_DEBUG_CR4
 #define COMMAND_REGISTER_WATCH_READ COMMON_MACHINE_DEBUG_WATCH_READ
 #define COMMAND_REGISTER_WATCH_WRITE COMMON_MACHINE_DEBUG_WATCH_WRITE
 #define COMMAND_REGISTER_WATCH_EXECUTE COMMON_MACHINE_DEBUG_WATCH_EXECUTE
@@ -137,9 +137,9 @@ static C_INT command_printf(command_context *command, const char *format, ...)
     return command->output_status == LIB_STATUS_OK ? count : -1;
 }
 
-static void command_begin_output(command_context *command, common_debug_result *result)
+static void command_begin_output(command_context *command, common_x86_debug_result *result)
 {
-    *result = (common_debug_result) { .text = "", .keep_active = LIB_TRUE };
+    *result = (common_x86_debug_result) { .text = "", .keep_active = LIB_TRUE };
     command->result = result;
     command->output_length = 0u;
     command->output_status = LIB_STATUS_OK;
@@ -152,7 +152,7 @@ static lib_status command_end_output(command_context *command)
         command->continuation = COMMAND_CONTINUATION_NONE;
         command->pending_line_available = 0;
         command->run_kind = COMMAND_RUN_NONE;
-        command->result->lifecycle_request = COMMON_DEBUG_LIFECYCLE_NONE;
+        command->result->lifecycle_request = COMMON_X86_DEBUG_LIFECYCLE_NONE;
         command->result->prompt[0] = '-';
         command->result->prompt[1] = '\0';
     }
@@ -332,7 +332,7 @@ static C_INT command_is_paused(command_context *debugContext)
 static C_VOID command_resume(command_context *debugContext)
 {
     if (debugContext != STD_NULL && debugContext->result != STD_NULL)
-        debugContext->result->lifecycle_request = COMMON_DEBUG_LIFECYCLE_RESUME;
+        debugContext->result->lifecycle_request = COMMON_X86_DEBUG_LIFECYCLE_RESUME;
 }
 
 static C_INT command_set_break(command_context *debugContext,
@@ -862,7 +862,7 @@ static C_VOID aconsole(command_context *debugContext)
             continue;
         }
         errAsmPos = 0;
-        if (common_xasm32_assemble(cmdAsmBuff, STD_STRLEN(cmdAsmBuff),
+        if (common_x86_xasm32_assemble(cmdAsmBuff, STD_STRLEN(cmdAsmBuff),
                 acode, sizeof(acode), &len,
                 command_machine_get_code_default_size()) != TYPE_STATUS_OK) {
             len = 0u;
@@ -1039,7 +1039,7 @@ static C_VOID e(command_context *debugContext)
     }
     else
     {
-        type_unsigned_8 bytes[COMMON_DEBUG_LINE_CAPACITY];
+        type_unsigned_8 bytes[COMMON_X86_DEBUG_LINE_CAPACITY];
         STD_SIZE_T count;
         addrparse(debugContext, _ds, arg[1]);
         count = scanlist(debugContext, 2u, bytes);
@@ -1054,7 +1054,7 @@ static C_VOID f(command_context *debugContext)
 {
     STD_SIZE_T next, length;
     type_unsigned_32 i, count = scanrange(debugContext, _ds, 128u, &next);
-    type_unsigned_8 bytes[COMMON_DEBUG_LINE_CAPACITY];
+    type_unsigned_8 bytes[COMMON_X86_DEBUG_LINE_CAPACITY];
     if (nErrPos) return;
     length = scanlist(debugContext, next, bytes);
     if (nErrPos) return;
@@ -1262,7 +1262,7 @@ static type_unsigned_8 uprintins(command_context *debugContext, type_unsigned_16
     else
     {
         lib_size instruction_bytes = 0u;
-        if (common_xasm32_disassemble(ucode, sizeof(ucode), stmt,
+        if (common_x86_xasm32_disassemble(ucode, sizeof(ucode), stmt,
                 sizeof(stmt), &i, &instruction_bytes,
                 0) != TYPE_STATUS_OK) {
             len = 0u;
@@ -1610,7 +1610,7 @@ static C_VOID s(command_context *debugContext)
 {
     STD_SIZE_T next, length, j;
     type_unsigned_32 i, count = scanrange(debugContext, _ds, 128u, &next);
-    type_unsigned_8 bytes[COMMON_DEBUG_LINE_CAPACITY], val;
+    type_unsigned_8 bytes[COMMON_X86_DEBUG_LINE_CAPACITY], val;
     if (nErrPos) return;
     length = scanlist(debugContext, next, bytes);
     if (nErrPos || count < length) return;
@@ -1822,7 +1822,7 @@ static type_unsigned_8 xuprintins(command_context *debugContext, type_unsigned_3
     else
     {
         lib_size instruction_bytes = 0u;
-        if (common_xasm32_disassemble(ucode, sizeof(ucode), stmt,
+        if (common_x86_xasm32_disassemble(ucode, sizeof(ucode), stmt,
                 sizeof(stmt), &i, &instruction_bytes,
                 command_machine_get_code_default_size()) != TYPE_STATUS_OK ||
             instruction_bytes > available) {
@@ -1914,7 +1914,7 @@ static C_VOID xaconsole(command_context *debugContext)
             continue;
         }
         errAsmPos = 0;
-        if (common_xasm32_assemble(astmt, STD_STRLEN(astmt), acode,
+        if (common_x86_xasm32_assemble(astmt, STD_STRLEN(astmt), acode,
                 sizeof(acode), &len,
                 command_machine_get_code_default_size()) != TYPE_STATUS_OK) {
             len = 0u;
@@ -2144,7 +2144,7 @@ static C_VOID xe(command_context *debugContext)
     }
     else
     {
-        type_unsigned_8 bytes[COMMON_DEBUG_LINE_CAPACITY];
+        type_unsigned_8 bytes[COMMON_X86_DEBUG_LINE_CAPACITY];
         STD_SIZE_T count;
         linear = scannubit32(debugContext, arg[1]);
         count = scanlist(debugContext, 2u, bytes);
@@ -2159,7 +2159,7 @@ static C_VOID xf(command_context *debugContext)
 {
     STD_SIZE_T i, count, length;
     type_unsigned_32 linear;
-    type_unsigned_8 bytes[COMMON_DEBUG_LINE_CAPACITY];
+    type_unsigned_8 bytes[COMMON_X86_DEBUG_LINE_CAPACITY];
     if (narg < 4u) { seterr(debugContext, narg - 1u); return; }
     linear = scannubit32(debugContext, arg[1]);
     count = scannubit32(debugContext, arg[2]);
@@ -2961,7 +2961,7 @@ static C_VOID exec(command_context *debugContext)
     }
 }
 
-static C_VOID command_initialize(common_debug *command,
+static C_VOID command_initialize(common_x86_debug *command,
     common_machine *machine)
 {
     lib_release(command->output);
@@ -2969,36 +2969,36 @@ static C_VOID command_initialize(common_debug *command,
     command->machine = machine;
 }
 
-lib_status common_debug_create(common_debug **out_command)
+lib_status common_x86_debug_create(common_x86_debug **out_command)
 {
-    common_debug *command;
+    common_x86_debug *command;
 
     if (out_command == STD_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_command = STD_NULL;
-    command = (common_debug *)STD_CALLOC(1u, sizeof(*command));
+    command = (common_x86_debug *)STD_CALLOC(1u, sizeof(*command));
     if (command == STD_NULL) return LIB_STATUS_NO_MEMORY;
     *out_command = command;
     return LIB_STATUS_OK;
 }
 
-void common_debug_destroy(common_debug *command)
+void common_x86_debug_destroy(common_x86_debug *command)
 {
     if (command == STD_NULL) return;
-    common_debug_close(command);
+    common_x86_debug_close(command);
     lib_release(command->output);
     STD_FREE(command);
 }
 
-lib_status common_debug_open(common_debug *command,
+lib_status common_x86_debug_open(common_x86_debug *command,
     common_machine *machine)
 {
     if (command == STD_NULL || machine == STD_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    common_debug_close(command);
+    common_x86_debug_close(command);
     command_initialize(command, machine);
     return LIB_STATUS_OK;
 }
 
-void common_debug_close(common_debug *command)
+void common_x86_debug_close(common_x86_debug *command)
 {
     if (command == STD_NULL) return;
     common_machine_debug_cancel(command->machine);
@@ -3006,7 +3006,7 @@ void common_debug_close(common_debug *command)
     command->continuation = COMMAND_CONTINUATION_NONE;
 }
 
-static void command_prompt(common_debug *command)
+static void command_prompt(common_x86_debug *command)
 {
     const char *prompt = command->continuation == COMMAND_CONTINUATION_NONE ?
         "-" : command->input_prompt;
@@ -3017,7 +3017,7 @@ static void command_prompt(common_debug *command)
     }
 }
 
-static void command_prepare_continuation(common_debug *command)
+static void command_prepare_continuation(common_x86_debug *command)
 {
     if (command->argument_count == 0u || command->arguments[0] == STD_NULL)
         return;
@@ -3046,7 +3046,7 @@ static void command_prepare_continuation(common_debug *command)
 
 /* CLI lifetime is independent of machine access. Help, arithmetic, filename
  * selection and exit do not acquire a machine lease or initialize addresses. */
-static lib_bool command_needs_machine(common_debug *command)
+static lib_bool command_needs_machine(common_x86_debug *command)
 {
     const char *name;
     if (command->continuation != COMMAND_CONTINUATION_NONE)
@@ -3060,7 +3060,7 @@ static lib_bool command_needs_machine(common_debug *command)
             lib_c_strcmp(command->arguments[1], "?") == 0);
 }
 
-static lib_bool command_prepare_machine(common_debug *debugContext)
+static lib_bool command_prepare_machine(common_x86_debug *debugContext)
 {
     common_machine_debug_lease lease;
     debugContext->access_status = common_machine_debug_acquire(debugContext->machine, &lease);
@@ -3076,13 +3076,13 @@ static lib_bool command_prepare_machine(common_debug *debugContext)
     return debugContext->access_status == LIB_STATUS_OK;
 }
 
-static void command_report_access(common_debug *command)
+static void command_report_access(common_x86_debug *command)
 {
     if (command->access_status == LIB_STATUS_OK) return;
     command->continuation = COMMAND_CONTINUATION_NONE;
     command->pending_line_available = 0;
     command->run_kind = COMMAND_RUN_NONE;
-    command->result->lifecycle_request = COMMON_DEBUG_LIFECYCLE_NONE;
+    command->result->lifecycle_request = COMMON_X86_DEBUG_LIFECYCLE_NONE;
     command->output_length = 0u;
     command_printf(command, "%s\r\n\r\n",
         command->access_status == LIB_STATUS_INVALID_STATE ?
@@ -3092,8 +3092,8 @@ static void command_report_access(common_debug *command)
             "Debug machine access failed.");
 }
 
-lib_status common_debug_submit_line(common_debug *command,
-    const char *line, common_debug_result *out_result)
+lib_status common_x86_debug_submit_line(common_x86_debug *command,
+    const char *line, common_x86_debug_result *out_result)
 {
     command_context *debugContext = command;
     STD_SIZE_T i;
@@ -3150,21 +3150,21 @@ finished:
     return command_end_output(command);
 }
 
-lib_status common_debug_observe_machine(common_debug *command,
-    common_debug_machine_state state, lib_status status,
-    common_debug_result *out_result)
+lib_status common_x86_debug_observe_machine(common_x86_debug *command,
+    common_x86_debug_machine_state state, lib_status status,
+    common_x86_debug_result *out_result)
 {
     type_unsigned_32 executed;
 
     if (command == STD_NULL || out_result == STD_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     command_begin_output(command, out_result);
-    if (state == COMMON_DEBUG_MACHINE_STOPPED || state == COMMON_DEBUG_MACHINE_RESET ||
-        state == COMMON_DEBUG_MACHINE_FAULT) {
+    if (state == COMMON_X86_DEBUG_MACHINE_STOPPED || state == COMMON_X86_DEBUG_MACHINE_RESET ||
+        state == COMMON_X86_DEBUG_MACHINE_FAULT) {
         command->run_kind = COMMAND_RUN_NONE;
         return command_end_output(command);
     }
-    if (state != COMMON_DEBUG_MACHINE_PAUSED || status != LIB_STATUS_OK)
+    if (state != COMMON_X86_DEBUG_MACHINE_PAUSED || status != LIB_STATUS_OK)
         return command_end_output(command);
     command->access_status = LIB_STATUS_OK;
     if (command_get_execution_result(command, &executed)) {
@@ -3216,7 +3216,7 @@ lib_status common_debug_observe_machine(common_debug *command,
             command_prompt(command);
             return command_end_output(command);
         }
-        out_result->lifecycle_request = COMMON_DEBUG_LIFECYCLE_RESUME;
+        out_result->lifecycle_request = COMMON_X86_DEBUG_LIFECYCLE_RESUME;
     } else if (command->run_kind == COMMAND_RUN_BREAK_LINEAR &&
         command->breakpoint_remaining != 0u) {
         if (command_set_break(command, command->breakpoint_linear)) {
@@ -3225,7 +3225,7 @@ lib_status common_debug_observe_machine(common_debug *command,
             command_prompt(command);
             return command_end_output(command);
         }
-        out_result->lifecycle_request = COMMON_DEBUG_LIFECYCLE_RESUME;
+        out_result->lifecycle_request = COMMON_X86_DEBUG_LIFECYCLE_RESUME;
     } else {
         command->run_kind = COMMAND_RUN_NONE;
         command_clear_break(command);
