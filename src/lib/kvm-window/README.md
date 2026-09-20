@@ -12,8 +12,8 @@ or Window-owned complete indexed graphics and palette. It contains no
 Console character map. Copies include only the active text or graphics extent.
 Window compares resolved colours with its existing RGB surface on consumption,
 updates changed pixels and invalidates their enclosing rectangle. Skipped frames
-need no damage history. Both text and graphics decode one RGB row and use the
-same pixel comparison; no full-frame scratch allocation is needed. First frames
+need no damage history. Both text and graphics decode colours directly into the
+same pixel comparison helper, without an intermediate buffer. First frames
 and recreated surfaces require full invalidation; same-size mode transitions
 compare actual pixels. Cursor position/shape/visibility changes invalidate the
 old/new overlay rectangles separately. Stride and palette come from each frame.

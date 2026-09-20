@@ -9,32 +9,23 @@ int kvm_window_frame_size(const kvm_window_frame *frame, lib_u32 *width, lib_u32
     return 1;
 }
 
-static void kvm_window_text_row(const kvm_window_text_frame *text,
-    lib_u32 y, lib_u32 cell_height, lib_u32 *pixels)
+static inline void kvm_window_update_pixel(lib_u32 *destination, lib_u32 colour,
+    lib_u32 x, lib_u32 y, int valid, kvm_window_rect *damage)
 {
-    lib_u32 column;
-    const kvm_text_cell *cells = text->base.cells + (y / cell_height) * KVM_TEXT_COLUMNS;
-    for (column = 0u; column < text->base.text_columns; ++column) {
-        const kvm_text_cell *cell = &cells[column];
-        const lib_u8 *font = cell->glyph_bank ? text->secondary_font : text->font;
-        lib_u8 bits = font[(lib_size)cell->glyph_index * KVM_WINDOW_FONT_HEIGHT + y % cell_height];
-        lib_u32 bit;
-        for (bit = 0u; bit < 8u; ++bit)
-            pixels[column * 8u + bit] = text->base.text_palette[
-                (bits & (0x80u >> bit)) ? cell->foreground : cell->background];
-    }
+    if (valid && *destination == colour) return;
+    *destination = colour;
+    if ((lib_i32)x < damage->left) damage->left = (lib_i32)x;
+    if ((lib_i32)y < damage->top) damage->top = (lib_i32)y;
+    if ((lib_i32)x + 1 > damage->right) damage->right = (lib_i32)x + 1;
+    if ((lib_i32)y + 1 > damage->bottom) damage->bottom = (lib_i32)y + 1;
 }
 
 int kvm_window_render_frame(const kvm_window_frame *frame, lib_u32 *pixels,
     lib_u32 width, lib_u32 height, int *valid, kvm_window_rect *changed)
 {
-    lib_i32 left = (lib_i32)width;
-    lib_i32 top = (lib_i32)height;
-    lib_i32 right = 0;
-    lib_i32 bottom = 0;
+    kvm_window_rect damage = {(lib_i32)width, (lib_i32)height, 0, 0};
     lib_u32 row;
     lib_u32 frame_width, frame_height, cell_height = KVM_WINDOW_FONT_HEIGHT;
-    lib_u32 colours[KVM_WINDOW_GRAPHICS_MAX_WIDTH];
 
     if (!pixels || !valid || !changed ||
         !kvm_window_frame_size(frame, &frame_width, &frame_height) ||
@@ -49,26 +40,27 @@ int kvm_window_render_frame(const kvm_window_frame *frame, lib_u32 *pixels,
         if (frame->graphics) {
             const lib_u8 *source = frame->image.pixels + row * frame->image.stride;
             for (column = 0u; column < width; ++column)
-                colours[column] = frame->image.palette[source[column]];
+                kvm_window_update_pixel(&destination[column], frame->image.palette[source[column]],
+                    column, row, *valid, &damage);
         } else {
-            kvm_window_text_row(&frame->text, row, cell_height, colours);
-        }
-        for (column = 0u; column < width; ++column) {
-            lib_u32 colour = colours[column];
-            if (!*valid || destination[column] != colour) {
-                destination[column] = colour;
-                if ((lib_i32)column < left) left = (lib_i32)column;
-                if ((lib_i32)row < top) top = (lib_i32)row;
-                if ((lib_i32)column + 1 > right) right = (lib_i32)column + 1;
-                bottom = (lib_i32)row + 1;
+            const kvm_window_text_frame *text = &frame->text;
+            const kvm_text_cell *cells = text->base.cells + (row / cell_height) * KVM_TEXT_COLUMNS;
+            for (column = 0u; column < text->base.text_columns; ++column) {
+                const kvm_text_cell *cell = &cells[column];
+                const lib_u8 *font = cell->glyph_bank ? text->secondary_font : text->font;
+                lib_u8 bits = font[(lib_size)cell->glyph_index * KVM_WINDOW_FONT_HEIGHT + row % cell_height];
+                lib_u32 bit;
+                for (bit = 0u; bit < 8u; ++bit) {
+                    lib_u32 x = column * 8u + bit;
+                    lib_u32 colour = text->base.text_palette[
+                        (bits & (0x80u >> bit)) ? cell->foreground : cell->background];
+                    kvm_window_update_pixel(&destination[x], colour, x, row, *valid, &damage);
+                }
             }
         }
     }
     *valid = 1;
-    if (right == 0) return 0;
-    changed->left = left;
-    changed->top = top;
-    changed->right = right;
-    changed->bottom = bottom;
+    if (damage.right == 0) return 0;
+    *changed = damage;
     return 1;
 }

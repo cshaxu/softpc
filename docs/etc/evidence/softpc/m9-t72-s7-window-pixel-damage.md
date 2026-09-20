@@ -8,9 +8,9 @@ draw only dirty regions to reduce possible flicker. Baseline 2cf87250.
 The proposal section fourteen is the finite design; no Common/VM/Compat/MVDM,
 public API/schema, mailbox, input, mouse, INI, media or snapshot changes.
 
-Both formats decode one RGB scanline before one comparison loop against the
-existing surface. A 5120-byte automatic row array replaces neither the surface
-nor frame mailbox and has no heap lifecycle. Existing graphics_valid becomes
+Both formats decode colours directly into one inline comparison/write/damage
+helper against the existing surface. Owner requested removing P1's intermediate
+5120-byte row array; no replacement buffer is introduced. Existing graphics_valid becomes
 surface_valid, with no extra persistent state. First/recreated surfaces fully
 invalidate; mode names alone do not force repaint at identical dimensions.
 Native paint retains its original stretch and clipping; native dirty regions
@@ -31,8 +31,8 @@ the same blink phase; changed old/new overlay rectangles also invalidate.
 | Deferred Common | Original audit A/B/C/D/F are S8, unchanged and not silently dropped. |
 
 No extra full-frame cache or previous-frame copy. Text adds comparisons but
-avoids unchanged surface writes/full native invalidation; graphics adds row
-scratch traffic. Both remain O(pixels). No benchmark or visual flicker elimination
+avoids unchanged surface writes/full native invalidation; graphics no longer adds
+row scratch traffic. Both remain O(pixels). No benchmark or visual flicker elimination
 claim. Cursor overlay cannot be omitted merely because bitmap pixels match.
 
 ## Change Accounting
@@ -66,3 +66,33 @@ retained. Five desktop tests per width remain excluded.
 
 Compared with S6, package sizes change -63/+450 bytes; this is not a runtime
 memory or performance measurement. S7 owner acceptance pending after delivery.
+
+## P2: Remove Intermediate Row Buffer
+
+Owner request: 各自解码直接调用共同比较更新，去掉不必要的行缓冲；
+保留当前语义、文本/图形同一 dirty 逻辑及光标旧、新区域补刷。
+Baseline 035d2845. One static inline pixel helper owns comparison, surface write
+and damage bounds; both decoders call it directly. Text still selects each
+cell/font row once before its eight pixels. No intermediate colour array,
+allocation, new state, API or native-worker change. The 5120-byte source-level
+scratch array is removed; compiler stack/code-size effects are not a benchmark.
+
+Actual production render.c +26/-34 (net -8), tests unchanged. Cumulative S7
+production relative to 2cf87250 is +58/-62 (net -4); tests stay +97/-27 (net +70).
+Existing pixel coverage, palette/stride, latest-wins, repeated-frame and cursor
+tests are retained rather than rewritten around the new implementation.
+Similar-issue search in kvm-window confirms no colours array or text-row staging
+helper remains; exactly two decoder call sites use the one update helper.
+Cursor invalidation and native rendering are byte-for-byte unchanged from P1.
+
+Both Release builds passed. Full background regression passed x64 105/105
+(169.98s), x86 105/105 (160.76s), including the existing pixel/cursor cases,
+restart/PIF roundtrips, snapshots, shared manifests, DAG and governance checks.
+Five desktop tests per width excluded; no native Linux/RDP visual claim.
+No new probes or disposable build children were created. Existing incremental
+build trees retained; user INI/media unchanged.
+
+| P2 package | Bytes | SHA256 |
+| --- | ---: | --- |
+| softpc32.exe | 3659580 | 2E51DFDDA6131310B6A7FD568A75F407BE7996F05F468D5D67F0890AA1A49A4C |
+| softpc64.exe | 3062073 | BD1438F5CAF1D732853B1A80DB8A72C41F097E9E140ADE785A90BB5ADB3CE841 |

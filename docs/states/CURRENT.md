@@ -2,7 +2,7 @@
 
 ## Current Work
 
-Active task: M9 T72 S7, verified unified Window pixel damage awaiting delivery/review and owner testing.
+Active task: M9 T72 S7, direct pixel comparison verified, awaiting delivery review and owner testing.
 S1--S6 are closed. Owner admitted new S7 and postponed Common work to S8.
 See [proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md) and
 [audit](../etc/evidence/softpc/m9-t72-post-s5-quality-audit.md).
@@ -16,16 +16,16 @@ S7 details: [unified damage evidence](../etc/evidence/softpc/m9-t72-s7-window-pi
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner admits unified text/graphics Window damage as S7, Common deferred to S8. |
-| Objective | Decode both frame kinds to RGB rows, share pixel comparison against existing surface; invalidate changed bounds and cursor transitions. |
+| Objective | Decode colours directly into one inline compare/write/damage helper without a row buffer; retain surface and cursor-transition semantics. |
 | Non-goals | No Common/VM/Compat/MVDM, public ABI, input/mouse, mailbox or native paint algorithm changes; no full-frame cache. |
-| Reference Baseline | 2cf87250, clean; S6 accepted. |
+| Reference Baseline | 035d2845, clean; S7 P1 delivered, owner requests removing row scratch. |
 | Candidate Proposal | [T72 proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md), section fourteen. |
 | Files And ABI Surface | render.c/h and win32/component.c; two existing Lib tests, product runtime-cursor test and manifests; internal render API only. |
 | Applicable Rules | Execution, architecture, coding, documentation rules; current architecture/layout/UI; shared governance skills. |
 | Verification | Preserve S6 51 coverage cases; text/graphics identical and changed pixels, skipped frames, font/palette changes, mode switch, cursor move/hide/blink and recreated surface; both Release builds/full background presets, corpus/DAG/docs. |
 | Expected Markers | One pixel comparison/dirty path, repeated content no invalidation; old/new cursor invalidation without trails; first/recreated surface full dirty. |
 | Asset Needs | Refresh only assets/binary EXEs; no INI/media changes; existing build trees, no raw traces. |
-| Reporting Requirements | Before: three production files +60--90/-65--90; two tests +90--140/-25--45. Actual counts and EXE links after verification. |
+| Reporting Requirements | Follow-up estimate: render.c about +30/-35, existing tests unchanged; actual counts and EXE links after verification. |
 | Stop Conditions | New full-frame allocation, public ABI expansion, output drift or missing cursor cleanup requires reassessment. |
 | Exit Criteria | Verified delivery pushed, clean tree, actual-change review, wait for owner test; S8 not started. |
 | Original Owner Request | 把S7推迟到S8，准入一个新的S7，用于统一 kvm-window的dirty处理；图像帧和文本帧转换成位图，与当前位图对比找到dirty区域再绘制，减少可能的闪烁。 |
@@ -33,9 +33,10 @@ S7 details: [unified damage evidence](../etc/evidence/softpc/m9-t72-s7-window-pi
 
 ## Current Technical Baseline
 
-- S7 production three C/H +49/-45 (net +4); three tests +97/-27 (net +70).
-  Both Release builds pass; background x64 105/105 (163.33s), x86 105/105
-  (152.46s). Five desktop tests per width excluded; owner visual test pending.
+- S7 production three C/H +58/-62 (net -4); three tests +97/-27 (net +70).
+  P2 removes row scratch in render.c, +26/-34 (net -8) relative to P1.
+  Both Release builds pass; background x64 105/105 (169.98s), x86 105/105
+  (160.76s). Five desktop tests per width excluded; owner visual test pending.
   No public ABI, Common, VM, Compat, MVDM, input, INI or media change.
 - S6 production +0/-2 (net -2), test +46/-1 (net +45), no ABI/Common changes.
   Both Release builds pass. Background x86 105/105 (147.31s); x64 104/105

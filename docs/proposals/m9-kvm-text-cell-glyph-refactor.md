@@ -381,8 +381,8 @@ Owner：把 S7 推迟到 S8，准入新的 S7，统一文本/图形帧转成位�
 dirty 比较和绘制，减少可能的闪烁。S6 随 owner 认可和后续准入收口。
 
 保留 latest-wins 及现有 RGB surface。一个内部 render_frame 替代原
-render_text/render_graphics；两种解码只负责生成一行 RGB，随后同一个
-比较循环更新 surface 和变化包围矩形。固定临时行数组 1280*4=5120字节，
+render_text/render_graphics；两种解码直接生成颜色，调用同一个可内联的
+比较/写入/扩大 dirty 辅助函数。按 owner 后续要求删除中间行缓冲，
 不分配整帧、不增加堆对象、线程、资源生命周期或公共接口。
 surface_valid 替代 graphics_valid：首次和 surface 重建全量失效；同尺寸
 模式切换按真实 RGB 差分，不因为模式名不同强制全屏刷新。
@@ -392,7 +392,7 @@ surface_valid 替代 graphics_valid：首次和 surface 重建全量失效；同
 原 blink 定时、resize/freeze/OS paint 和统一失败出口不改。失效矩形仍由
 原 dirty 映射转换至客户区，系统累计到 WM_PAINT 后以其 clip 绘制。
 
-代价：文本新增 RGB 比较；图形多一次小型行缓冲写读，均保持 O(像素数)。
+代价：文本新增 RGB 比较；两种解码都直接比较，均保持 O(像素数)。
 收益：相同文本零帧重绘，局部文字/字体/颜色变化只失效实际像素区域。
 不声称普遍加速或消灭所有闪烁；不把 CPU/设备或窗口几何故障混作 dirty。
 
@@ -402,7 +402,11 @@ palette-only、最新完整帧跳帧、同尺寸文本图形互换、光标移�
 S6 完整像素覆盖；所有边界必须由真实 renderer/native mock 证明。
 双宽度构建和后台全回归后提交推送，等待 owner 测试；不开始 S8。
 
-S7 实际生产三文件 +49/-45（净 +4），测试三文件 +97/-27（净 +70）；
+S7 P1 实际生产三文件 +49/-45（净 +4），测试三文件 +97/-27（净 +70）；
 多出的测试文件是产品 runtime-cursor 对内部渲染入口的必要迁移（+3/-1）。
 双宽度后台各105/105通过。实际证据和首次构建修正见
 [S7 记录](../etc/evidence/softpc/m9-t72-s7-window-pixel-damage.md)。
+
+Owner 要求去掉行缓冲后，P2 仅 render.c +26/-34（净 -8），测试不变。
+S7 累计生产 +58/-62（净 -4）；双宽度后台重新各105/105通过。
+光标旧、新区域补刷不变；等待 owner 测试，不开始 S8。
