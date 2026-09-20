@@ -1,159 +1,172 @@
-# KVM Text And Frame Contract Clarification
+# KVM Frame Ownership And Transparent Mailboxes
 
 ## Request And Status
 
-Original owner request: "你对这个制作一个更具体的修正意见稿 写入proposal 队列首位".
-Owner subsequently admitted "准入T71" and then "准入s2 开始设计".
-T70 is closed; S1 delivered batch A; T71 S2 is the concrete schema design stage
-under Current, with no implementation yet. Baseline: 04d76945.
-This proposal is grounded in SoftPC, not in hypothetical NES needs.
+Owner admitted T71 and S2 design. S1 delivered text-only admission at 04d76945;
+its evidence is retained below. S2 remains the sole active design packet.
+The latest owner-approved direction supersedes the earlier monolithic-frame
+mapping-only and per-cell proposals; no implementation of this revision exists.
 
-## Observed Problems
+Original request ledger:
 
-- kvm-console/console.c accepts graphics frames and later returns OK without
-  displaying them; its worker acknowledges that publication as consumed.
-- kvm-base/frame_interface.h carries byte glyph indices and raster fonts;
-  kvm-window/render.c uses the supplied font, but console-broker/win32/console.c
-  unconditionally interprets the same bytes through lib_console_pc_glyph().
-  This fixed CP437 display mapping cannot reproduce arbitrary downloaded fonts
-  or infer the active customer code page. Existing tests verify the fixed map,
-  not equivalence with arbitrary raster fonts.
-- KVM and logical Console text arrays have fixed 80x25 capacity and fixed
-  80-cell row stride. vm/driver.c silently clips larger source dimensions.
-- Window text rendering interprets attribute nibbles and bit 3 for secondary
-  font selection. These device-like rules are implicit in the copied contract.
+- "1-迁移映射表，映射表归vm，这个所有权必须清理干净；2-kvm-console和kvm-window的文本帧格式和接口要对称"
+- "在 kvm-base 里面，定义文本帧相同需要的字段结构；然后kvm-console和kvm-window各自所需的实际文本帧是扩展了kvm-base的基础文本帧加上各自所需的内容，比如字符映射表和字体位图表"
+- "图形帧，只归属 kvm-window所有"
+- "kvm-base 只管两个不同mailbox的实现和传输机制 (fifo and latest-wins)，实际命令处理都交给消费者 (kvm-console kvm-window)"
+- "写入本T任务的proposal并进行S任务拆分。"
 
-These are source observations, not claims of newly reproduced guest failures.
-The previously accepted CP437 improvement remains useful; the problem is its
-implicit application to every frame, not the existence of the mapping table.
+The independent [cell/colour cleanup candidate](m9-kvm-text-cell-glyph-refactor.md)
+remains queued only for per-cell struct/attribute normalization. It must not
+repeat this task's frame ownership, mapping relocation or mailbox work.
 
-## Goals And Non-goals
+## Observed Baseline
 
-Keep current DOS/Win3.1/Win95 display, cursor, handoff, snapshot and input behavior
-while making accepted output and representation limits explicit. Preserve one
-publication path, complete copied frames, latest-wins/dirty accumulation, worker
-ownership and broker serialization. Do not add a renderer framework, dynamic
-frame ownership, reference counting, encoding registry, font recognition,
-automatic code-page detection or product-specific branches in Lib.
+The current kvm-base frame contains text, both raster fonts and graphics pixels.
+Its mailbox embeds that entire value even for Console and implements graphics
+validation, copying and dirty accumulation. Console reserves unused graphics
+capacity, but text copies skip pixel storage; S1 rejects graphical publications
+before mailbox mutation. Do not describe this as copying every graphic frame
+into Console. Text publications still copy unused font data.
 
-Keep indexed 256-colour graphics and its existing capacity. Do not change mouse
-8x16 conversion, keyboard normalization, timing or MVDM. Logical Console and KVM
-retain distinct contracts: broker must not depend on KVM. Common routes copied
-output; it neither discovers DOS code pages nor interprets VGA attributes.
+Control FIFO currently defines Window title/freeze/release commands and payloads.
+Base validates the kind and handles STOP admission; leaf workers execute the
+Window actions. Console broker implicitly maps text bytes through Lib's CP437
+table. These are the ownership boundaries being changed, not newly reproduced
+hardware faults.
 
-## Proposed Contract
+## T71 S2 Concrete Design (For Owner Review)
 
-### Capability And Admission
+### Data And Dependency Ownership
 
-Check text-only capability at kvm_console_publish_frame(), before mailbox
-mutation or notification. Valid graphics input returns the existing unsupported
-status; malformed frames return invalid argument. Rejection preserves pending
-text. Remove the downstream graphics-success branch; do not add asynchronous
-failure for a request that can be rejected synchronously. Common's existing
-graphics-status text remains text and must continue to work.
+- kvm-base owns the shared text value: dimensions, fixed-stride glyph-index and
+  attribute arrays, palette, common cursor/font-selection metadata. Keep the
+  current parallel arrays and observable attribute interpretation in this task.
+- kvm-window owns its text extension with primary/secondary raster bitmaps.
+  It also owns graphics dimensions, stride, palette, pixels, dirty bounds,
+  graphics validation/copy ranges and dirty accumulation.
+- kvm-console owns its text extension with primary/secondary character maps.
+  It has no graphics publication type, font bitmap or reserved pixel capacity.
+- Use C struct embedding and fully copied, bounded values. No borrowed resource
+  pointers, font registry, reference counting, separate font-update messages,
+  additional workers or per-frame allocations.
+- Both leaf public APIs are typed; their signatures are analogous, not forced
+  to accept the same oversized union. Window may use its own tagged text/graphics
+  value; Console accepts text only. Freeze exact names/layout in S4 preflight.
+- Generic mailbox metadata owns publication generation; base must not reach
+  inside a leaf frame to set its sequence.
+- Logical Console remains independent of KVM. Console leaf converts to explicit
+  16-bit character output; broker marshals/cache-compares that output without
+  CP437 interpretation. Preserve existing attributes and output barriers.
+- VM owns the existing CP437 constant table and supplies both Console maps,
+  preserving today's approximation. Remove Lib's table/query API, without
+  duplicating it. Common status text supplies its own known mapping and never
+  depends on VM. No code-page detection or bitmap-to-Unicode inference.
 
-Use one shared validation policy per frame representation. State which dimensions,
-stride, palette indices, font ranges and cursor fields are valid. A hidden or
-off-surface cursor need not invalidate otherwise valid content; distinguish this
-from impossible buffer/font extents. Scan all publishers before tightening rules.
+Graphical content is unchanged semantically. Do not move drawing into VM,
+alter cursor blink/freeze, input/mouse scaling, device timing, MVDM, media or
+snapshot format. Existing unsupported Linux presenters remain unsupported.
 
-### Character Meaning Versus Raster Glyph
+### Mailbox Mechanics And Leaf Behavior
 
-Preferred direction: a logical Console text cell contains an explicit Unicode
-character plus defined colours, not an implicitly encoded PC byte. Start with
-an explicit single-cell repertoire and rejection/replacement rules; do not
-promise surrogate pairs, combining sequences or terminal-width correctness
-without implementation and tests. Scalar validity alone does not imply one cell.
+Base owns separate blocking locks for latest-wins frames and FIFO controls,
+bounded copied storage, capacity checks, notification, generation/capture/
+acknowledgement and terminal admission. Storage capacity is selected once by
+the owner; bytes/length are internal support contracts, never application APIs.
+Check lengths/alignment and retain storage until worker join. Prefer caller-owned
+or existing component allocations; do not add pointer-only allocation shells.
 
-KVM text retains the raster representation needed by Window, and carries explicit
-Console character meaning supplied by the producer. The first implementation
-brief must choose per-cell characters versus a copied glyph-to-character table
-after inventorying both fonts, Common status text and all other producers. A
-single 256-entry table must not silently conflate two distinct font banks.
-Prefer the smallest representation that meets these actual consumers; no borrowed
-deferred pointers. Colour and raster glyph selection restructuring is deferred to the independent
-[queued proposal](m9-kvm-text-cell-glyph-refactor.md), not required for T71.
+Each leaf defines and validates its own control payload and frame types.
+Base neither enumerates Window commands nor interprets graphics/text fields.
+A narrow leaf operation may update/copy the opaque pending frame under the
+existing frame lock. It must not call sinks, notify, allocate, reenter mailbox
+operations or take uncontrolled locks. No plugin registry or callback cascade.
 
-SoftPC preserves its current CP437 approximation explicitly where no better
-mapping is known. A bitmap has no reliable reverse Unicode mapping. The adapter
-must not claim to know a DOS code page merely from glyph bytes. Common-generated
-status text supplies its own known characters. The existing fixed mapping may
-remain an explicitly named utility; broker must not invoke it implicitly.
+Window's operation accumulates unacknowledged dirty bounds against the latest
+complete pixels, including a captured frame still awaiting output completion.
+Size/mode/stride/palette changes retain existing full-dirty behavior. Capture
+does not consume; only a successful acknowledgement for the current generation
+clears pending state. NOT_CURRENT and output failure must not silently consume
+content. Console text replaces the complete value without graphical processing.
 
-On the broker side, compare/cache the actual submitted character/colour values
-and commit cache validity only after complete successful native output. A mapping
-change with unchanged byte indices must repaint. On Window, changing raster
-fonts must continue to repaint independently of Console character meaning.
+STOP remains a transport-level terminal operation: close frame/control admission
+under the established lock order, reserve its FIFO position, retain repeat-STOP
+idempotence and earlier accepted control ordering. Consumer performs shutdown.
+Fault closure shares admission mechanics but does not masquerade as normal FIFO
+STOP. Ordinary control remains independent of frame copy. Preserve notification
+failure's accepted-work semantics; do not retry already accepted work.
 
-### Capacity And Layout
+### Upstream Composition
 
-Fixed capacity is acceptable; silently clipping the source is not. Inventory
-actual text surfaces and supported hardware modes before selecting capacity.
-Do not automatically replace 80x25 with arbitrary dynamic allocation or merely
-increase a constant in one component. Explicitly distinguish active columns/rows
-from storage row stride; validate both ends of each copy.
+Common retains its existing executor, frame completion and UI routing ownership;
+VM remains the single product conversion owner. Migrate the driver output,
+Common storage/comparison and UI forwarding coherently in S4. An upper-level
+copied output can compose the leaf-owned types without teaching base their
+layout. Avoid embedding independent maximum-sized graphics storage for every
+text destination; no shared-corpus dependency on VM.
 
-For a mode exceeding the admitted contract, either extend the bounded contract
-end-to-end with demonstrated need, or report a checked unsupported result before
-publishing. Do not retain a stale screen indefinitely, silently crop, or claim a
-false successful frame. The current boolean copy_frame path cannot by itself
-distinguish unsupported content from no new frame: audit the existing error path
-and obtain approval for any additional status contract needed before proceeding.
-No automatic presenter switch or other UX change is authorized by this proposal.
+S4 preflight must settle the exact upper-level value layout, actual live-buffer
+count, text/graphics copy lengths and all driver consumers before code changes.
+This is a required design checkpoint, not permission to create another frame
+pipeline. Common-generated graphics status remains a Console text frame.
+Graphic traffic must never enter the Console mailbox. S1 runtime graphics
+rejection is superseded by the typed interface, not retained as a legacy API.
 
-## Candidate Work Batches (Assign S Identifiers Only At Admission)
+## Planned S Tasks And Delivery Boundaries
 
-| Batch | Implementation boundary | Required result |
+Only S2 is active now. S3--S6 are planned successors; each receives the sole
+Current packet before execution, following predecessor review. S1 identifiers
+and evidence are unchanged.
+
+| S | Scope and implementation | Exit proof | Estimated production / test changed lines |
+| --- | --- | --- | --- |
+| S2: design and finite inventory | Record ownership, old/new API migration, upstream layout checkpoints, staged plan and queue boundary. Documentation only. | Reviewed plan, links/gates, commit/push; no new EXE or runtime claim. | 0 / 0 |
+| S3: opaque control FIFO | Move leaf command kinds/payloads and validation to leaves; base transports bounded control data and owns STOP envelope/admission. Migrate both workers and every internal caller; frame type temporarily remains the existing single implementation. | FIFO order/full rejection, copied payload, repeated STOP/reserved slot, fault closure, title/freeze/release behavior; no base Window-specific commands. | 120--220 / 60--110 |
+| S4: typed leaf frames and opaque latest-wins | In one coherent migration split text extensions/Window graphics, migrate frame mailbox and dirty operations, move CP437 to VM, update logical Console, all Common/VM producers/consumers and tests. Delete old monolithic ABI; do not stage a second pipeline. | Both map/font banks, mapping-only/font-only repaint, pending dirty/late ack, mode/size/palette transitions, activation/NOT_CURRENT, typed Console admission, exact native output and snapshot regressions. | 420--700 / 150--250 |
+| S5: capacity and failure contract | Audit all active extents, strides, source clipping and caller statuses using the new owning types. Keep existing limits unless evidence/approval supports change. | At/below/above-limit matrix, no out-of-bounds copy or false success; distinguish no new frame from unsupported source. Any required public status or fallback policy first receives owner review. | 40--90 / 40--90 |
+| S6: integration and simplification audit | Close every finite-ledger entry, remove task-introduced obsolete wrappers/fields, update current design/manifests and review measured storage/copy costs. No unrelated cleanup. | Serial full x86/x64, four corpus/DAG gates, package/snapshot and bounded product checks; owner receives both EXEs. T stays open for owner acceptance. | 0 planned; material new repairs require scope revision |
+
+Aggregate provisional production estimate: 580--1,010 changed lines across
+roughly 16--27 unique C/H paths; tests 250--450 across roughly 12--20 paths.
+Changed means additions plus deletions, excluding docs/manifests/binaries.
+These are not a net-growth promise or an exact API specification. Recount
+unique paths and added/deleted/net lines per S against its preflight baseline;
+table relocation counts as edits, not new functionality. S6 discoveries are
+not hidden in this estimate. Report exact sizeof, aggregate allocations and
+copied bytes for text/graphics; Console must lose unused bitmap/pixel storage.
+
+Every code-changing S delivers focused proof, dual-width full builds/tests,
+updated affected manifests, both assets/binary EXEs, commit/push and a
+coordinator actual-diff review. Do not claim a design-only S rebuilt packages.
+No owner INI or media edit; use bounded ignored build fixtures for testing.
+Whole T closure requires a separate original-request audit and owner decision.
+
+## Finite Convergence Ledger
+
+Freeze the exact path list at each preflight using references to kvm_frame,
+lib_console_text_frame, publish/capture/acknowledge, graphics/dirty/font/map,
+control kinds and copy_frame callbacks under src and test. Each hit receives
+migrated / unchanged-with-reason / owner-approved-transfer, with proof.
+
+| Coverage unit | Owner / planned S | Required disposition |
 | --- | --- | --- |
-| A: text-only admission | kvm-console public admission, focused Lib tests, Common callers | Graphics rejected synchronously; pending text retained; normal status text unchanged. |
-| B: explicit Console character mapping | Copied mapping, Console values, VM/Common producers, comparison and broker | Remove implicit encoding; preserve Window raster/attribute layout; no second publication path. |
-| C: dimensions and capacity | Frame validation, VM copying, both output boundaries and existing failure propagation | No silent clipping; chosen bounds justified by actual modes; no unsupported-content success. |
-| D: integration and simplification audit | Changed source/tests/manifests and product verification | No duplicate conversions or obsolete fields/helpers; unchanged accepted UX and snapshot behavior. |
+| Base frame/control/support headers and implementations | S3/S4 | No leaf command, graphics, font or encoding interpretation; no reverse leaf dependency. |
+| Window public types, root helpers and both platform workers | S3/S4 | Typed values, owned graphics/dirty, unchanged native lifecycle/render behavior. |
+| Console public types, workers, logical output and broker cache | S3/S4 | Text-only storage; supplied map; full-write acknowledgement and binding barriers retained. |
+| Common UI, machine, session and driver contracts | S4 | One copied output route, correct status text/comparison; no product encoding dependency. |
+| VM driver and every alternate production frame producer | S4 | Single CP437 owner, explicit data generation, no old ABI bypass. |
+| Source dimensions and no-frame/error callers | S5 | Extents validated by owner; clipping and unsupported results explicitly resolved. |
+| Snapshot codec/device archives, input/cursor and hardware | S4/S6 | Inspect dependency; demonstrate unchanged behavior and archive compatibility, not assumption. |
+| Shared/product tests, manifests and DAG checks | S3--S6 | Migrate fixtures; retain behavioral coverage; prevent dependency back-edges and obsolete interfaces. |
 
-Batch B starts with a reviewed concrete schema and consumer migration table,
-not an open-ended implementation. B/C may be combined if their ABI edits would
-otherwise create a temporary contract. Stop for owner review if the design
-requires new ownership, MVDM changes or a product-visible fallback policy.
+No claims of whole-Lib/hardware correctness. Stop for review on MVDM changes,
+new runtime ownership/threads, a second frame path, unsupported Linux feature
+implementation, guest-visible fallback, or unexplained scope/complexity growth.
 
-Likely affected components: Lib console, console-broker, kvm-base, kvm-console,
-kvm-window; Common UI/Machine frame comparison; VM driver. Audit Compat and
-snapshot serialization for dependencies before declaring them unchanged.
-Initial planning ranges, not measured promises: A 10--40 production changed
-lines; B requires a refreshed narrowed estimate; C 40--160 depending on the admitted capacity/status decision;
-D no predetermined production changes. Count added/deleted/net production and
-tests separately at each batch's preflight and completion; exclude docs,
-manifests and EXEs. Refresh estimates from the actual call-site inventory.
+## Historical S1 Delivery
 
-## Finite Coverage And Verification
-
-At admission enumerate every frame producer, copy/comparison/serialization site,
-mailbox, renderer and cache in the affected components. Each receives a disposition
-of migrated, unchanged with evidence, or owner-approved scope decision. Completion
-requires all admitted entries verified; no whole-Lib correctness claim.
-
-- Admission: text success, graphics rejection, malformed input, STOP rejection,
-  pending frame unchanged on rejection, latest-wins and activation redraw.
-- Text: ASCII, CP437 control-picture and box glyphs, high bytes, both font banks,
-  palette changes, changed mapping with unchanged indices, custom raster font
-  with explicit Console approximation, invalid character/colour handling.
-- Layout: active size below capacity, exact limit, over-limit, row-stride bounds,
-  invalid font extent, hidden/clipped cursor and producer failure propagation.
-- Output: native write failure/clipping cannot update completed-frame cache;
-  raw/cooked handoff and notification/prompt behavior remain unchanged.
-- Product: both EXEs, full x86/x64 regression and snapshot tests; bounded DOS text,
-  Win3.1 roundtrip and Win95 checks using owner media without modifying it.
-  No extra guest assets or generated images in assets/; use owned build fixtures.
-- Run all four corpus manifest and dependency gates and documentation governance.
-  Publish both assets/binary EXEs per implemented S and await owner acceptance
-  before any final T closure. No builds are claimed for this planning-only change.
-
-## Alternatives Rejected
-
-Moving all Window rasterization into VM would reduce Lib's text semantics but
-requires revisiting cursor blink/freeze and duplicates work; not selected here.
-Renaming fields alone cannot remove implicit encoding. Merging Console and KVM
-frame owners would violate the existing dependency boundary. An arbitrary-size
-Unicode terminal or universal font engine is unnecessary for this bounded repair.
+The following records the old-ABI admission repair truthfully. S4 may remove
+its runtime graphics check only when the replacement typed API and tests prove
+that graphical content cannot reach Console.
 
 ## T71 S1 Preflight And Finite Ledger
 
@@ -226,26 +239,3 @@ Executor review compared every changed production/test path with the S1 ledger;
 no schema, capacity, worker lifecycle or product policy changes were introduced.
 This is S1 P1 delivery for owner testing, not task-wide completion. Later batches
 remain pending and must start with their concrete contract/consumer review.
-
-## T71 S2 Concrete Design (For Owner Review)
-
-Owner split request: "第二项请你拆分到新的t任务proposal加入队列".
-The broad per-cell/colour/raster-atlas design has moved to the independent
-[queued proposal](m9-kvm-text-cell-glyph-refactor.md). It is no longer T71 scope.
-
-S2 is narrowed to explicit copied Console character mapping. Preserve existing
-KVM byte indices, attributes, colours, primary/secondary raster fonts and Window
-rendering. Preserve SoftPC's current CP437 approximation, but make it producer
-supplied instead of an implicit broker interpretation. Keep one copied frame
-and one publication path, without borrowed pointers or an encoding registry.
-
-Before implementation, specify the copied mapping's placement/count, its two
-font-bank semantics, logical Console character values, producer ownership and
-all copy/comparison/cache updates. A mapping change with unchanged text indices
-must repaint. Common status text must remain correct. Do not claim a bitmap
-identifies a code page. The exact reduced schema and refreshed diff estimates
-remain design work; the earlier 250--450-line broad migration estimate no
-longer describes this S.
-
-S3 retains capacity/layout review and S4 integration review. This split does
-not mark any implementation complete. No code, tests, binaries or media changed.

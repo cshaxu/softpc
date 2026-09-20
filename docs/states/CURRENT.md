@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 T71 S2 is active, design only: explicit Console character mapping.
+M9 T71 S2 is active, design only: leaf-owned frames and transparent mailboxes.
 Owner: "准入s2 开始设计". S1 leaves the active slot at its verified delivery
 boundary; no new manual acceptance is inferred. T70 remains closed.
 
@@ -11,20 +11,20 @@ boundary; no new manual acceptance is inferred. T70 remains closed.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner explicitly admits S2 design after S1 delivery 04d76945. |
-| Objective | Specify explicit copied Console character mapping; broader text-cell/colour/glyph restructuring is split into a queued candidate at owner request. |
+| Admission And Approval | Owner admits S2 design after S1 delivery 04d76945 and approves shared text base, leaf frame extensions, Window-owned graphics and opaque FIFO/latest-wins; latest request is to record the plan and S split. |
+| Objective | Record the approved frame/mailbox ownership and S3--S6 implementation/verification plan; retain CP437 ownership in VM and no duplicated production paths. |
 | Non-goals | No code/build/EXE/INI/media change; no code-page detection, font recognition, dynamic frame, capacity expansion or MVDM edit. |
 | Reference Baseline | 04d76945; S1 dual-width full suites 109/109 and pushed packages. |
 | Candidate Proposal | [T71 S2 concrete design](../proposals/m9-kvm-text-frame-contract.md#t71-s2-concrete-design-for-owner-review). |
-| Files And ABI Surface | Current, Queue and both proposals only; no source or artifact changes. Mapping ABI remains design work. |
+| Files And ABI Surface | Current and both proposals only. Planned leaf frame/mailbox/Common driver ABI migration is not yet implemented. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and linked governance skills. |
 | Verification | Source producer/consumer/codec inventory, S1 actual-diff review, documentation/whitespace gates. |
-| Expected Markers | Explicit mapping, unchanged Window raster/attribute layout, no new ownership; broader candidate queued independently. |
+| Expected Markers | Shared text fields; leaf-owned bitmap/map/graphics; opaque FIFO/latest-wins; base STOP admission; finite migration ledger and per-S estimates. |
 | Asset Needs | None; read-only source inspection; no runtime process or trace. |
 | Reporting Requirements | Proposed structs, migration owners, preserved UX, memory/code estimates, open decisions and no implementation claims. |
-| Stop Conditions | Scope needs runtime edits or new product fallback before owner design review. |
-| Exit Criteria | Concrete design and ledger committed/pushed for owner review; implementation remains pending. |
-| Original Owner Request | 准入s2 开始设计; 第二项请你拆分到新的t任务proposal加入队列 |
+| Stop Conditions | This documentation turn needs runtime edits; future preflights must settle exact storage/API shapes before code changes, and escalate new fallback or lifecycle semantics. |
+| Exit Criteria | Revised proposal and S split reviewed, documentation gate passed, committed/pushed; later S packets not active yet. |
+| Original Owner Request | 准入s2 开始设计; 第二项请你拆分到新的t任务proposal加入队列; 写入本T任务的proposal并进行S任务拆分。 |
 | Similar-Issue Sweep | All text/frame publishers, copying/comparison/render/cache sites and snapshot entry points; confirm archive internals before implementation. |
 
 ## Current Technical Baseline
