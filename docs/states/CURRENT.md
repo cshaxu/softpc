@@ -2,8 +2,10 @@
 
 ## Current Work
 
-T74 S1 pure Core directory relocation is implemented and verified, pending
-implementation push, actual-change review and owner testing. T73 remains closed.
+T74 S1 pure Core directory relocation is implemented, verified and pushed in
+8b76baf5. Actual-change review passed; waiting for owner testing before S/T
+closure. T73 remains closed. The worktree is intended to be clean after this
+review record is committed and pushed.
 The four existing Queue candidates retain their order and are not admitted.
 
 ## M9 T74 S1 Packet

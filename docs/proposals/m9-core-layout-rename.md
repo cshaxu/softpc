@@ -103,5 +103,22 @@ their historical source paths and all archived evidence remain unchanged.
   SHA256 097C8D2654EB96DC41A3A0B9B953F23A26D8FF49768C7CB3B0CA96ED899EC7B9.
 
 EXE sizes equal the accepted baseline. Both are refreshed T74 packages, not a
-claim of byte-identical binaries. S1 is verified, awaiting P push/review and
-owner testing; T74 is not closed.
+claim of byte-identical binaries. S1 is verified and awaits owner testing;
+T74 is not closed.
+
+## Actual-Change Review
+
+Executor P1 8b76baf5 was pushed before switching to the review role. Review
+compared its actual diff with d7c6931f, the original request and packet:
+540 exact renames plus 16 include-only renames; all 498 mirror files exact;
+App/resources only change paths; CMake keeps target/source order and adds only
+the device-private include root; dependency fixtures keep all original illegal
+edges and add the unchanged original compat-include case. No shared corpus,
+rules, user configuration or guest medium changed. Counts and artifact hashes
+match this record. Documentation gate and diff check passed after the commit.
+
+No out-of-scope runtime repair was mixed in. The four queued candidates remain
+unadmitted; in particular this task does not fix the Machine shutdown-wake race.
+Review accepts delivery for owner testing, not S1/T74 closure. Ignored temporary
+T74 build/test/commit logs may be removed after these results are recorded;
+the existing incremental build trees and their CTest records remain reusable.
