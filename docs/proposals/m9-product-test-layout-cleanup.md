@@ -228,3 +228,35 @@ D61305E116367F8CBD5B885351D81A7FA26FD74B5981AD66F3F7FFEF02206516;
 x64 4DF851DB91A4559AE7C3E6CEB35753040355FE53CC4A8C2417C6E79EC9A5C8A0.
 No assets/INI changes. Remaining support files have explicit S2 ownership in
 the ledger; no other live build/tool reference to test/unit remains.
+
+### S2 brief and diagnostic disposition
+
+Owner authorizes continuing through self-reviewed T closure. Production +0/-0;
+estimate code/build +140/-2080, net about -1940. Move five checks (764 lines at
+S1), snapshot script (37) and fixture C/H (41); remove runtime.h (85) and
+input_queue.h (22), converting three compiled runtime consumers to actual
+Common types/calls and caller-owned fixture storage. No extra fixture allocation
+or per-operation forwarding remains. Frame copies explicitly pass current run
+generation; removable-media calls retain OVERLAY mode; queue init explicitly
+compares LIB_STATUS_OK. Fixtures still assemble/tear down the same VM driver
+and Common machine, in the same order.
+
+`git grep` across build/tools/current docs and test callers finds neither
+diagnostic registered or invoked; only their historical descriptions survive.
+real_boot_smoke.c (482 lines) uses the direct-slice runner already rejected as
+invalid for continuous execution in m4-runtime-media-input.md; its extra thread
+can concurrently inject/read the old machine. runtime_boot_smoke.c (1356 lines)
+uses removed frame fields text/attributes/graphics_width and undefined
+SOFTPC_RUNTIME_DIB_MAX_* values. Its old Setup automation and dump switches
+are not a currently runnable test contract. Delete both obsolete programs,
+not port their alternate execution/observation paths. Current boot/prompt/Win31
+roundtrip proof remains runtime_restart_boot_smoke; IRQ1 input proof remains
+runtime_input_continuation_smoke; frame/device and snapshot proofs retain their
+existing registered tests. Historical one-off Setup automation is retired,
+not falsely claimed as equivalent automated coverage. Git retains both programs.
+
+Shared verify_kvm_naming.cmake deliberately remains byte-identical, including
+its legacy product path list; the existing product gate compensates by invoking
+that checker for all new product roots. No runtime or shared-package dependency
+on retired directories exists. S2 removes test/support/TESTS.md in favor of the
+owned test README; S3 audits that inventory and current design together.
