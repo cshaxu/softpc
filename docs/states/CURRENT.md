@@ -2,37 +2,37 @@
 
 ## Current Work
 
-M9 T72 S2 is active: migrate neutral text attributes end to end.
+M9 T72 S3 is active: audit the completed neutral text migration.
 Owner approved execution through T-level audit; formal T closure awaits review.
 
-## M9 T72 S2 Packet
+## M9 T72 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner: 批准执行到t收口标准 然后等我审核后再正式收口 |
-| Objective | One migration of VM/status producers, shared text values, both leaves and native Console output; preserve display semantics. |
+| Objective | Map the owner's whole T request and every S to actual delivery evidence; prepare for owner review without closing T72. |
 | Non-goals | No cell struct, second interface, new state/cache/thread, graphics/input/lifecycle/media/snapshot change; MVDM and Compat untouched. |
-| Reference Baseline | e0ad4e8f; accepted T71 behavior. |
+| Reference Baseline | Implementation 12bf7c96; original task baseline e0ad4e8f. |
 | Candidate Proposal | [Approved design](../proposals/m9-kvm-text-cell-glyph-refactor.md). |
-| Files And ABI Surface | Ten planned production C/H paths and fixtures; source ABI migrated atomically. |
+| Files And ABI Surface | Documentation audit only; inspect ten changed production C/H paths, tests and unchanged boundaries. No new ABI. |
 | Applicable Rules | Execution, Coding, Architecture, Documentation, UI and source layout; corresponding governance skills. |
-| Verification | 512-case equivalence, neutral bank/boundary/resource cases, dual-width sizeof, manifest/DAG; both Release builds and serial background presets including Win3.1 roundtrips/snapshots. Desktop tests require reserved access. |
+| Verification | Recheck actual commit, evidence ledger, hashes, sizeof/cost accounting, manifests/DAG, documentation governance and clean synchronized Git. S2 full dual-width proof remains the runtime baseline. |
 | Expected Markers | PC decoding only VM; native encoding only Broker; rejected publication does not mutate mailbox. |
-| Asset Needs | Existing test disposable media; owned build/t72-proof logs/probes limited to 10 MiB and 5 minutes each, removed after recording. Never alter user INI/media. |
-| Reporting Requirements | Actual additions/removals/net, layouts, finite proof and package hashes/links; P1 then coordinator P2 review and S3 audit. |
+| Asset Needs | None; do not launch native UI or alter user configuration/media. |
+| Reporting Requirements | Expected production/test +0/-0; confirm actual counts, finite T ledger and pending owner acceptance. P1 push then actual-change P2 review. |
 | Stop Conditions | Unexpected device/behavior change, broad architecture or unexplained significant growth. |
-| Exit Criteria | Verified complete P1 push and actual-change review; proceed S3, not formal T closure. |
+| Exit Criteria | Complete audit committed/pushed and reviewed; clean worktree; wait for owner, do not formally close T72. |
 | Original Owner Request | 行 那就维持现在设计; 批准执行到t收口标准 然后等我审核后再正式收口 |
 | Similar-Issue Sweep | Old fields/decoding, producers, comparisons, native output and shared/product fixtures. |
 
 ## Current Technical Baseline
 
-- Code delivery f3ff1b11; review 449dad66; owner acceptance 5bfceb36.
-  Both Release packages are unchanged by this governance closure.
-- Final background suites: x64 105/105 (163.44s), x86 105/105 (145.85s),
+- Code delivery 12bf7c96; S2 actual-change review recorded in
+  [S2 history](../history/M9-T72-S2-neutral-text-migration.md).
+- Final background suites: x64 105/105 (164.85s), x86 105/105 (147.06s),
   including headless Win3.1 PIF roundtrips, snapshots and restart.
-  Five native desktop tests per width were not rerun in S10; no native Linux
+  Five native desktop tests per width were not rerun in S2; no native Linux
   execution or whole-emulator correctness claim.
 - VM owns character mapping. KVM Base transports opaque control FIFO and
   latest-wins complete frames; leaf presenters interpret their own frames.
@@ -40,8 +40,10 @@ Owner approved execution through T-level audit; formal T closure awaits review.
 - Renderer readiness, required fonts, terminal request completion, fixed-80 text
   layout and cursor normalization are recorded in the
   [T71 completion audit](../history/M9-T71-completion-audit.md).
-- TODO tracking is retired by owner decision, not proof of repair.
-  Neutral text attributes are under T72 design review, not implemented.
+- T72 uses neutral parallel text arrays, with device decoding only in VM and
+  native Console colour encoding only in Broker. No frame transport change.
+- TODO tracking is retired by owner decision, not proof of repair. Owner visual
+  acceptance and formal T72 closure remain pending.
 
 ## Recent M9 Closures
 
