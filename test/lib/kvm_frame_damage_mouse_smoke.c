@@ -24,7 +24,7 @@ static void damage(void)
     assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
     /* First all-black frame still invalidates the entire surface. */
-    assert(kvm_window_render_graphics(&received, surface, 4, 4, &valid, &changed));
+    assert(kvm_window_render_frame(&received, surface, 4, 4, &valid, &changed));
     assert(changed.left == 0 && changed.top == 0 && changed.right == 4 && changed.bottom == 4);
     {
         lib_u32 pending_generation = generation;
@@ -49,10 +49,10 @@ static void damage(void)
     frame.image.pixels[10] = 2u;
     assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
-    assert(kvm_window_render_graphics(&received, surface, 4, 4, &valid, &changed));
+    assert(kvm_window_render_frame(&received, surface, 4, 4, &valid, &changed));
     assert(changed.left == 1 && changed.top == 1 && changed.right == 3 && changed.bottom == 3);
     assert(surface[5] == 0x112233u && surface[10] == 0x445566u);
-    assert(!kvm_window_render_graphics(&received, surface, 4, 4, &valid, &changed));
+    assert(!kvm_window_render_frame(&received, surface, 4, 4, &valid, &changed));
     /* Failed output keeps its capture; old acknowledgement cannot erase new data. */
     old = generation;
     frame.image.pixels[0] = 2u;
@@ -60,31 +60,31 @@ static void damage(void)
     kvm_component_mailboxes_acknowledge_frame(&window.base.mailboxes, old);
     assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
     assert(generation != old);
-    assert(kvm_window_render_graphics(&received, surface, 4, 4, &valid, &changed));
+    assert(kvm_window_render_frame(&received, surface, 4, 4, &valid, &changed));
     assert(changed.left == 0 && changed.top == 0 && changed.right == 1 && changed.bottom == 1);
     kvm_component_mailboxes_acknowledge_frame(&window.base.mailboxes, generation);
     assert(!kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
     /* Palette-only changes affect exactly the pixels using that entry. */
     frame.image.palette[1] = 0xffu;
-    assert(kvm_window_render_graphics(&frame, surface, 4, 4, &valid, &changed));
+    assert(kvm_window_render_frame(&frame, surface, 4, 4, &valid, &changed));
     assert(surface[5] == 0xffu && changed.left == 1 && changed.top == 1 &&
         changed.right == 2 && changed.bottom == 2);
     frame.image.palette[255] = 0xffffffu;
-    assert(!kvm_window_render_graphics(&frame, surface, 4, 4, &valid, &changed));
+    assert(!kvm_window_render_frame(&frame, surface, 4, 4, &valid, &changed));
     /* Different indices with the same resolved colour do not damage the surface. */
     frame.image.palette[3] = frame.image.palette[2];
     frame.image.pixels[0] = 3;
-    assert(!kvm_window_render_graphics(&frame, surface, 4, 4, &valid, &changed));
+    assert(!kvm_window_render_frame(&frame, surface, 4, 4, &valid, &changed));
     /* Row padding is not part of the displayed pixels. */
     frame.image.width = 3;
     valid = 0;
-    assert(kvm_window_render_graphics(&frame, surface, 3, 4, &valid, &changed));
+    assert(kvm_window_render_frame(&frame, surface, 3, 4, &valid, &changed));
     assert(changed.right == 3 && changed.bottom == 4);
     frame.image.pixels[3] = 255;
-    assert(!kvm_window_render_graphics(&frame, surface, 3, 4, &valid, &changed));
-    /* Recreated or text-overwritten surfaces require full invalidation. */
+    assert(!kvm_window_render_frame(&frame, surface, 3, 4, &valid, &changed));
+    /* Recreated surfaces require full invalidation even for unchanged pixels. */
     valid = 0;
-    assert(kvm_window_render_graphics(&frame, surface, 3, 4, &valid, &changed));
+    assert(kvm_window_render_frame(&frame, surface, 3, 4, &valid, &changed));
     assert(changed.left == 0 && changed.top == 0 && changed.right == 3 && changed.bottom == 4);
     kvm_component_mailboxes_destroy(&window.base.mailboxes);
 }
@@ -118,6 +118,8 @@ static void rendering(void)
     kvm_window_frame text = { 0 };
     kvm_window_rect display = { 0, 0, 640, 410 }, cursor;
     lib_u32 pixels[8 * 16];
+    int valid = 0;
+    kvm_window_rect changed;
     text.valid = 1; text.text.base.text_columns = 80; text.text.base.text_rows = 25;
     text.text.base.cursor_visible = 1; text.text.base.cursor_column = 0; text.text.base.cursor_row = 24;
     text.text.base.font_height = 16; text.text.base.cursor_top = 14; text.text.base.cursor_bottom = 15;
@@ -157,16 +159,16 @@ static void rendering(void)
     text.text.font[0] = 0x80;
     text.text.base.cells[0].foreground = 1; text.text.base.cells[0].background = 2;
     text.text.base.text_palette[1] = 0x112233; text.text.base.text_palette[2] = 0x445566;
-    kvm_window_render_text(&text, pixels, 8, 16);
+    kvm_window_render_frame(&text, pixels, 8, 16, &valid, &changed);
     assert(pixels[0] == 0x112233 && pixels[1] == 0x445566 && pixels[127] == 0x445566);
     text.text.font[0] = 0x40;
-    kvm_window_render_text(&text, pixels, 8, 16);
+    kvm_window_render_frame(&text, pixels, 8, 16, &valid, &changed);
     assert(pixels[0] == 0x445566 && pixels[1] == 0x112233);
     text.text.base.cells[0].glyph_bank = 1u;
     text.text.base.cells[0].foreground = 9u;
     text.text.base.text_palette[9] = 0x112233;
     text.text.secondary_font[0] = 0x20;
-    kvm_window_render_text(&text, pixels, 8, 16);
+    kvm_window_render_frame(&text, pixels, 8, 16, &valid, &changed);
     assert(pixels[0] == 0x445566 && pixels[2] == 0x112233);
     /* Compare all original byte attributes, including intensity and bank coupling. */
     for (unsigned colour = 0; colour < 16; ++colour)
@@ -177,7 +179,7 @@ static void rendering(void)
             text.text.base.cells[0].foreground = attribute & 15u;
             text.text.base.cells[0].background = attribute >> 4;
             text.text.base.cells[0].glyph_bank = enabled && (attribute & 8u);
-            kvm_window_render_text(&text, pixels, 8, 16);
+            kvm_window_render_frame(&text, pixels, 8, 16, &valid, &changed);
             for (unsigned x = 0; x < 8; ++x)
                 assert(pixels[x] == ((bits & (0x80u >> x)) ?
                     (attribute & 15u) : (attribute >> 4)) * 0x010101u);
@@ -186,7 +188,7 @@ static void rendering(void)
     /* Neutral producers may select bank 1 without colour bit 3. */
     text.text.base.cells[0].foreground = 1u;
     text.text.base.cells[0].glyph_bank = 1u;
-    kvm_window_render_text(&text, pixels, 8, 16);
+    kvm_window_render_frame(&text, pixels, 8, 16, &valid, &changed);
     assert(pixels[2] == 0x010101u);
     /* A short visible row still has an 80-cell storage stride. */
     lib_u32 grid[16u * 32u];
@@ -200,7 +202,8 @@ static void rendering(void)
                 (kvm_text_cell){ column ? 5u : 3u, (lib_u8)column, fg, (lib_u8)(fg + 1u) };
         }
     }
-    kvm_window_render_text(&text, grid, 16, 32);
+    valid = 0;
+    kvm_window_render_frame(&text, grid, 16, 32, &valid, &changed);
     for (unsigned row = 0; row < 2; ++row)
         for (unsigned column = 0; column < 2; ++column)
             for (unsigned x = 0; x < 8; ++x) {
@@ -215,6 +218,8 @@ static void text_coverage(void)
     const lib_u32 columns[] = {1u, 3u, KVM_TEXT_COLUMNS};
     const lib_u32 rows[] = {1u, 2u, KVM_TEXT_ROWS};
     const lib_u32 sentinel = 0xdeadbeefu;
+    int valid = 0;
+    kvm_window_rect changed;
     frame = (kvm_window_frame){ .valid = 1u };
     frame.text.base.text_palette[1] = 0x123456u;
     frame.text.base.text_palette[2] = 0xabcdefu;
@@ -235,7 +240,11 @@ static void text_coverage(void)
             lib_size count = (lib_size)width * height;
             frame.text.base.font_height = font_height;
             for (lib_size i = 0; i < count + 2u; ++i) guarded[i] = sentinel;
-            kvm_window_render_text(&frame, guarded + 1, width, height);
+            valid = 0;
+            assert(kvm_window_render_frame(&frame, guarded + 1, width, height, &valid, &changed));
+            assert(changed.left == 0 && changed.top == 0 &&
+                changed.right == (lib_i32)width && changed.bottom == (lib_i32)height);
+            assert(!kvm_window_render_frame(&frame, guarded + 1, width, height, &valid, &changed));
             assert(guarded[0] == sentinel && guarded[count + 1u] == sentinel);
             for (lib_size i = 0; i < count; ++i) {
                 lib_size cell_index = (i / width / cell_height) * KVM_TEXT_COLUMNS + (i % width) / 8u;
@@ -247,11 +256,11 @@ static void text_coverage(void)
     }
     /* Rejected geometry and invalid frames must not touch even the first pixel. */
     guarded[1] = sentinel;
-    kvm_window_render_text(&frame, guarded + 1, 1u, 1u);
+    assert(!kvm_window_render_frame(&frame, guarded + 1, 1u, 1u, &valid, &changed));
     assert(guarded[1] == sentinel);
     frame.valid = 0u;
-    kvm_window_render_text(&frame, guarded + 1, KVM_TEXT_COLUMNS * 8u,
-        KVM_TEXT_ROWS * KVM_WINDOW_FONT_HEIGHT);
+    assert(!kvm_window_render_frame(&frame, guarded + 1, KVM_TEXT_COLUMNS * 8u,
+        KVM_TEXT_ROWS * KVM_WINDOW_FONT_HEIGHT, &valid, &changed));
     assert(guarded[1] == sentinel);
 }
 int main(void) { damage(); motion(); rendering(); text_coverage(); return 0; }

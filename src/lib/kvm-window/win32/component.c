@@ -28,7 +28,7 @@ typedef struct kvm_win32_window_context {
     lib_u32 *surface_pixels;
     lib_u32 surface_width;
     lib_u32 surface_height;
-    int graphics_valid;
+    int surface_valid;
     lib_u32 displayed_sequence;
     kvm_keyboard_normalizer keyboard_normalizer;
     int left_button;
@@ -174,7 +174,7 @@ static lib_status win32_window_destroy_surface(kvm_win32_window_context *context
     context->surface_pixels = LIB_NULL;
     context->surface_width = 0u;
     context->surface_height = 0u;
-    context->graphics_valid = 0;
+    context->surface_valid = 0;
     return LIB_STATUS_OK;
 }
 
@@ -216,7 +216,7 @@ static int win32_window_ensure_surface(lib_win32_hwnd window,
     }
     context->surface_width = width;
     context->surface_height = height;
-    context->graphics_valid = 0;
+    context->surface_valid = 0;
     lib_memory_set(context->surface_pixels, 0,
         (lib_size)width * height * sizeof(*context->surface_pixels));
     return 1;
@@ -465,6 +465,10 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
 {
     lib_u32 width;
     lib_u32 height;
+    lib_win32_rect old_cursor = {0}, new_cursor = {0};
+    int old_visible = context->cursor_blink_visible &&
+        win32_window_cursor_rect(window, context, &old_cursor);
+    int new_visible;
 
     if (!win32_window_accepting_input(context) ||
         !kvm_component_mailboxes_capture_frame(&context->component->base.mailboxes,
@@ -477,24 +481,27 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
     }
     win32_window_resize_client(window, context, width, height);
     if (!win32_window_accepting_input(context)) return;
-    if (context->frame.graphics != 0u) {
+    {
         kvm_window_rect changed;
         kvm_window_rect changed_target;
         kvm_window_rect display;
         lib_win32_rect target;
-        if (kvm_window_render_graphics(&context->frame, context->surface_pixels,
+        if (kvm_window_render_frame(&context->frame, context->surface_pixels,
                 context->surface_width, context->surface_height,
-                &context->graphics_valid, &changed) &&
+                &context->surface_valid, &changed) &&
             win32_window_display_rect(context, width, height, &display)) {
             kvm_window_map_dirty_rect(&changed, &display, width, height, &changed_target);
             kvm_win32_rect_store(&target, &changed_target);
             if (!win32_window_invalidate(window, context, &target)) return;
         }
-    } else {
-        context->graphics_valid = 0;
-        kvm_window_render_text(&context->frame, context->surface_pixels,
-            context->surface_width, context->surface_height);
-        if (!win32_window_invalidate(window, context, LIB_NULL)) return;
+    }
+    new_visible = context->cursor_blink_visible &&
+        win32_window_cursor_rect(window, context, &new_cursor);
+    if (old_visible != new_visible ||
+        (old_visible && (old_cursor.left != new_cursor.left || old_cursor.top != new_cursor.top ||
+            old_cursor.right != new_cursor.right || old_cursor.bottom != new_cursor.bottom))) {
+        if (old_visible && !win32_window_invalidate(window, context, &old_cursor)) return;
+        if (new_visible && !win32_window_invalidate(window, context, &new_cursor)) return;
     }
     kvm_component_mailboxes_acknowledge_frame(&context->component->base.mailboxes,
         context->displayed_sequence);

@@ -2,41 +2,45 @@
 
 ## Current Work
 
-Active task: M9 T72 S6, delivered/reviewed Lib text-render simplification awaiting owner testing.
-S1--S5 are closed. Owner split the quality-audit follow-up into S6 (Lib) and
-S7 (Common), in that order. S7 implementation waits for S6 owner testing.
+Active task: M9 T72 S7, verified unified Window pixel damage awaiting delivery/review and owner testing.
+S1--S6 are closed. Owner admitted new S7 and postponed Common work to S8.
 See [proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md) and
 [audit](../etc/evidence/softpc/m9-t72-post-s5-quality-audit.md).
 S6 delivery details: [evidence](../etc/evidence/softpc/m9-t72-s6-text-render-simplification.md).
-P1 01a737b2 is pushed and actual-change reviewed; S6 remains open, S7 not started.
+P1 01a737b2 / review 2cf87250 accepted; [S6 closure](../history/M9-T72-S6-text-render-simplification.md).
+S7 details: [unified damage evidence](../etc/evidence/softpc/m9-t72-s7-window-pixel-damage.md).
 
-## M9 T72 S6 Packet
+## M9 T72 S7 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: split into two S tasks, Lib first, Common second. |
-| Objective | Remove the redundant full-surface clear before complete text rendering; prove output coverage. |
-| Non-goals | No Common fixes, ABI changes, input/mouse changes, graphics policy, new cache or state. |
-| Reference Baseline | c635988a, clean; S5 owner accepted. |
-| Candidate Proposal | [T72 proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md), section thirteen. |
-| Files And ABI Surface | lib/kvm-window/render.c, existing frame-damage test, two manifests; public ABI unchanged. |
+| Admission And Approval | Owner admits unified text/graphics Window damage as S7, Common deferred to S8. |
+| Objective | Decode both frame kinds to RGB rows, share pixel comparison against existing surface; invalidate changed bounds and cursor transitions. |
+| Non-goals | No Common/VM/Compat/MVDM, public ABI, input/mouse, mailbox or native paint algorithm changes; no full-frame cache. |
+| Reference Baseline | 2cf87250, clean; S6 accepted. |
+| Candidate Proposal | [T72 proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md), section fourteen. |
+| Files And ABI Surface | render.c/h and win32/component.c; two existing Lib tests, product runtime-cursor test and manifests; internal render API only. |
 | Applicable Rules | Execution, architecture, coding, documentation rules; current architecture/layout/UI; shared governance skills. |
-| Verification | Poisoned surface full-pixel proof for small/max grids, heights 0..16, both banks, blank glyphs; x86/x64 Release builds and full background test presets, corpus/DAG/docs gates. |
-| Expected Markers | No untouched sentinel pixels, no guard writes, invalid input leaves output unchanged; all background tests pass. |
+| Verification | Preserve S6 51 coverage cases; text/graphics identical and changed pixels, skipped frames, font/palette changes, mode switch, cursor move/hide/blink and recreated surface; both Release builds/full background presets, corpus/DAG/docs. |
+| Expected Markers | One pixel comparison/dirty path, repeated content no invalidation; old/new cursor invalidation without trails; first/recreated surface full dirty. |
 | Asset Needs | Refresh only assets/binary EXEs; no INI/media changes; existing build trees, no raw traces. |
-| Reporting Requirements | Before: production +0/-2, tests about +40--60; after: tracked C/H counts, test evidence, EXE links and actual-change review. |
-| Stop Conditions | Incomplete pixel coverage, ABI/output change, or need for new state requires reassessment. |
-| Exit Criteria | Verified delivery committed/pushed, clean workspace, actual-change review; then wait for owner test before closure/S7. |
-| Original Owner Request | 分成两个s任务 第一个先优化lib 第二个处理common |
-| Similar-Issue Sweep | Inspect explicit clears in both KVM leaves; remove only proven overwritten text clear; retain native surface initialization and input resets for distinct responsibilities. |
+| Reporting Requirements | Before: three production files +60--90/-65--90; two tests +90--140/-25--45. Actual counts and EXE links after verification. |
+| Stop Conditions | New full-frame allocation, public ABI expansion, output drift or missing cursor cleanup requires reassessment. |
+| Exit Criteria | Verified delivery pushed, clean tree, actual-change review, wait for owner test; S8 not started. |
+| Original Owner Request | 把S7推迟到S8，准入一个新的S7，用于统一 kvm-window的dirty处理；图像帧和文本帧转换成位图，与当前位图对比找到dirty区域再绘制，减少可能的闪烁。 |
+| Similar-Issue Sweep | All render calls, text/full invalidations, cursor overlay/blink, surface recreate and mode switches; retain resize/freeze/OS repaint responsibilities. |
 
 ## Current Technical Baseline
 
+- S7 production three C/H +49/-45 (net +4); three tests +97/-27 (net +70).
+  Both Release builds pass; background x64 105/105 (163.33s), x86 105/105
+  (152.46s). Five desktop tests per width excluded; owner visual test pending.
+  No public ABI, Common, VM, Compat, MVDM, input, INI or media change.
 - S6 production +0/-2 (net -2), test +46/-1 (net +45), no ABI/Common changes.
   Both Release builds pass. Background x86 105/105 (147.31s); x64 104/105
   (161.37s), documentation-only failure corrected and rerun 1/1. Runtime tests
-  all pass; five desktop tests per width excluded. S6 remains open for owner test.
+  all pass; five desktop tests per width excluded. S6 owner accepted.
 - S5 production +31/-33 (net -2); tests +94/-57 (net +37). Both Release builds
   pass; background x64 105/105 (159.37s), x86 105/105 (146.32s). Frame sizes
   unchanged; five desktop tests per width excluded. See

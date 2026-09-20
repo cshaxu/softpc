@@ -25,7 +25,9 @@ int main(void)
         frame.text.base.cells[7 * KVM_TEXT_COLUMNS + 3].foreground = 1;
         frame.text.base.text_palette[1] = 0xffffff;
         frame.text.font['A' * 16 + heights[h] - 1] = 0xff;
-        kvm_window_render_text(&frame, pixels, width, height);
+        int valid = 0;
+        kvm_window_rect changed;
+        assert(kvm_window_render_frame(&frame, pixels, width, height, &valid, &changed));
         assert(pixels[((7 + 1) * heights[h] - 1) * width + 3 * 8] == 0xffffff);
         vm_driver_cursor_shape(&frame.text.base,sizes[s]);
         assert(frame.text.base.cursor_top==heights[h]-lines);

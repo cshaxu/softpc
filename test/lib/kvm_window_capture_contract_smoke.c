@@ -76,9 +76,9 @@ static BOOL WINAPI delete_bitmap(HGDIOBJ o) { assert(o==(HGDIOBJ)3);++deleted_bi
 static BOOL WINAPI delete_dc(HDC d) { assert(d==(HDC)2);++deleted_dcs;return TRUE; }
 static DWORD WINAPI clock_tick(void) { return ticks; }
 static unsigned invalidations;
-static RECT invalidated;
+static RECT invalidated, previous_invalidated;
 static BOOL WINAPI invalidate(HWND w,const RECT *r,BOOL erase)
-{ (void)w;(void)erase;++invalidations;if(r)invalidated=*r;return TRUE; }
+{ (void)w;assert(!erase);++invalidations;previous_invalidated=invalidated;if(r)invalidated=*r;return TRUE; }
 static void *context;
 static void notify_loss(void);
 static int reenter_title;
@@ -225,7 +225,7 @@ static void check_surface_damage(void)
     frame.image.palette[1]=0x123456;
     assert(kvm_window_publish_frame(&window,&frame)==0);
     win32_window_consume_frame((HWND)1,&c);
-    assert(c.graphics_valid && invalidated.right==8 && invalidated.bottom==8);
+    assert(c.surface_valid && invalidated.right==8 && invalidated.bottom==8);
     unsigned before=invalidations;
     /* Two updates before WM_PAINT must each invalidate, not replace the first. */
     frame.image.pixels[0]=1;
@@ -245,13 +245,72 @@ static void check_surface_damage(void)
     frame.text.base.font_height=8; /* Same pixel dimensions as graphics. */
     assert(kvm_window_publish_frame(&window,&frame)==0);
     win32_window_consume_frame((HWND)1,&c);
-    assert(!c.graphics_valid);
+    assert(c.surface_valid && invalidations==before+3);
     frame=(kvm_window_frame){.valid=1,.graphics=1};
     frame.image.width=frame.image.stride=frame.image.height=8;
     assert(kvm_window_publish_frame(&window,&frame)==0);
     win32_window_consume_frame((HWND)1,&c);
-    assert(c.graphics_valid && invalidations==before+4);
+    assert(c.surface_valid && invalidations==before+3);
     assert(invalidated.left==0 && invalidated.top==0 && invalidated.right==8 && invalidated.bottom==8);
+    /* Same black bitmap, but a new cursor overlay must still invalidate. */
+    frame=(kvm_window_frame){.valid=1};
+    frame.text.base.text_columns=1; frame.text.base.text_rows=2;
+    frame.text.base.font_height=4;
+    frame.text.base.cursor_visible=1;
+    frame.text.base.cursor_top=frame.text.base.cursor_bottom=3;
+    c.cursor_blink_visible=1;
+    before=invalidations;
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(invalidations==before+1 && invalidated.top==3 && invalidated.bottom==4);
+    frame.text.base.cursor_row=1;
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(invalidations==before+3 && previous_invalidated.top==3 && previous_invalidated.bottom==4);
+    assert(invalidated.top==7 && invalidated.bottom==8);
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(invalidations==before+3); /* Identical bitmap and cursor. */
+    c.cursor_blink_due=ticks+250;
+    ticks+=250;
+    win32_window_advance_cursor_blink((HWND)1,&c);
+    assert(!c.cursor_blink_visible && invalidations==before+4 && invalidated.top==7);
+    ticks+=250;
+    win32_window_advance_cursor_blink((HWND)1,&c);
+    assert(c.cursor_blink_visible && invalidations==before+5);
+    frame.text.base.cursor_visible=0;
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(invalidations==before+6 && invalidated.top==7);
+    /* Font-only and palette-only changes go through the same pixel damage. */
+    frame.text.base.cells[0].foreground=1;
+    frame.text.base.text_palette[1]=0x123456;
+    frame.text.font[0]=0x80;
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(invalidations==before+7 && invalidated.left==0 && invalidated.top==0 &&
+        invalidated.right==1 && invalidated.bottom==1 && surface_bits[0]==0x123456);
+    frame.text.base.text_palette[1]=0x654321;
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(invalidations==before+8 && surface_bits[0]==0x654321);
+    frame.text.font[0]=0;
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(invalidations==before+9 && surface_bits[0]==0);
+    /* Text A is skipped by latest-wins; B's full bitmap contains both edits. */
+    frame.text.font[0]=0x80;
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    frame.text.base.cells[KVM_TEXT_COLUMNS].foreground=1;
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(invalidations==before+10 && invalidated.left==0 && invalidated.top==0 &&
+        invalidated.right==1 && invalidated.bottom==5);
+    assert(surface_bits[0]==0x654321 && surface_bits[32]==0x654321);
+    c.surface_valid=0; /* Recreated surface must invalidate fully, even same RGB. */
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(invalidations==before+11 && invalidated.right==8 && invalidated.bottom==8);
     assert(kvm_component_destroy(&window.base)==0);
 }
 int main(void)
