@@ -4,6 +4,10 @@
 
 Active task: M9 T73 S2, Machine x86 API/internal audit and migration planning.
 Owner accepted S1 testing and admitted S2. No Machine migration is admitted.
+S2 audit delivery 471b089c is pushed and actual-change reviewed: only the
+proposal and this packet changed; production/test/assets +0/-0. Existing Common
+background tests passed x64 22/22 (7.46s), x86 22/22 (8.02s); documentation gate
+passed. Audit is verified, awaiting owner review; S3/S4 are proposals only.
 Owner directly admitted T73 outside the queue. T72 is closed.
 See the [T73 proposal](../proposals/m9-shared-x86-dependency-audit.md).
 Existing queued candidates remain unadmitted.
