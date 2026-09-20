@@ -338,7 +338,7 @@ add_test(NAME softpc-config-smoke COMMAND softpc-config-smoke)
 set_tests_properties(softpc-config-smoke PROPERTIES LABELS "unit")
 add_test(NAME softpc-product-boundary-negative COMMAND ${CMAKE_COMMAND}
     -DSOFTPC_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
-    -P ${CMAKE_CURRENT_SOURCE_DIR}/test/support/product_boundary_negative.cmake)
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/test/checks/product_boundary_negative.cmake)
 set_tests_properties(softpc-product-boundary-negative PROPERTIES LABELS "unit")
 target_link_libraries(softpc-machine-smoke PRIVATE softpc-vm)
 add_test(NAME softpc-machine-smoke COMMAND softpc-machine-smoke)
@@ -492,7 +492,7 @@ add_test(NAME softpc-snapshot-cross-process
     COMMAND "${CMAKE_COMMAND}"
         "-DSNAPSHOT_EXECUTABLE=$<TARGET_FILE:softpc-snapshot-transaction-smoke>"
         "-DSNAPSHOT_WORKING_DIRECTORY=${CMAKE_CURRENT_BINARY_DIR}"
-        -P "${CMAKE_SOURCE_DIR}/test/support/snapshot_cross_process.cmake")
+        -P "${CMAKE_SOURCE_DIR}/test/integration/snapshot_cross_process.cmake")
 set_tests_properties(softpc-snapshot-cross-process PROPERTIES
     TIMEOUT 30 WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 add_executable(softpc-snapshot-boundary-smoke test/core/snapshot_boundary_smoke.c)
@@ -501,24 +501,24 @@ add_test(NAME softpc-snapshot-boundary-smoke COMMAND softpc-snapshot-boundary-sm
 set_tests_properties(softpc-snapshot-boundary-smoke PROPERTIES TIMEOUT 15)
 add_executable(softpc-runtime-smoke
     test/integration/runtime_smoke.c
-    test/support/common_machine_test.c
+    test/integration/machine_fixture.c
     src/common/session/control.c
     src/app/keyboard.c
     src/common/session/presentation_plan.c
     src/common/session/control_state.c)
 target_link_libraries(softpc-runtime-smoke PRIVATE softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console)
-target_include_directories(softpc-runtime-smoke PRIVATE test/support src/app)
+target_include_directories(softpc-runtime-smoke PRIVATE test/integration src/app)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
 set_tests_properties(softpc-runtime-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-runtime-restart-boot-smoke
     test/integration/runtime_restart_boot_smoke.c
-    test/support/common_machine_test.c
+    test/integration/machine_fixture.c
     src/common/session/control.c
     src/app/keyboard.c)
 target_link_libraries(softpc-runtime-restart-boot-smoke PRIVATE
     softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console)
-target_include_directories(softpc-runtime-restart-boot-smoke PRIVATE test/support src/app)
+target_include_directories(softpc-runtime-restart-boot-smoke PRIVATE test/integration src/app)
 add_test(NAME softpc-runtime-restart-boot-smoke
     COMMAND softpc-runtime-restart-boot-smoke)
 set_tests_properties(softpc-runtime-restart-boot-smoke PROPERTIES
@@ -526,13 +526,13 @@ set_tests_properties(softpc-runtime-restart-boot-smoke PROPERTIES
     LABELS "integration")
 add_executable(softpc-runtime-input-continuation-smoke
     test/integration/runtime_input_continuation_smoke.c
-    test/support/common_machine_test.c
+    test/integration/machine_fixture.c
     src/common/session/control.c
     src/app/keyboard.c)
 target_link_libraries(softpc-runtime-input-continuation-smoke PRIVATE
     softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console)
 target_include_directories(softpc-runtime-input-continuation-smoke PRIVATE
-    test/support src/app)
+    test/integration src/app)
 add_test(NAME softpc-runtime-input-continuation-smoke
     COMMAND softpc-runtime-input-continuation-smoke)
 set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
@@ -570,7 +570,7 @@ add_test(NAME softpc-keyboard-smoke COMMAND softpc-keyboard-smoke)
 set_tests_properties(softpc-keyboard-smoke PROPERTIES LABELS "unit")
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
-        "${CMAKE_SOURCE_DIR}/test/support/standalone_source_boundary.cmake")
+        "${CMAKE_SOURCE_DIR}/test/checks/standalone_source_boundary.cmake")
 add_test(NAME softpc-kvm-naming
     COMMAND "${CMAKE_COMMAND}" "-DKVM_NAMING_ROOT=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/src/lib/verify_kvm_naming.cmake")
@@ -583,7 +583,7 @@ add_test(NAME softpc-documentation-governance-selftest
         "${CMAKE_SOURCE_DIR}/tools/Verify-DocumentationGovernance.cmake")
 add_test(NAME softpc-win32-presentation-manifest
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
-        "${CMAKE_SOURCE_DIR}/test/support/win32_presentation_manifest.cmake")
+        "${CMAKE_SOURCE_DIR}/test/checks/win32_presentation_manifest.cmake")
 
 # Smoke tests intentionally use assert() for both the operation and its
 # postcondition.  Keep those checks live even when validating an optimized
@@ -727,8 +727,8 @@ set_tests_properties(softpc-package-smoke softpc-package-compact-console PROPERT
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
 set(SOFTPC_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-include(test/support/build_ownership.cmake)
+include(test/checks/build_ownership.cmake)
 add_test(NAME softpc-build-ownership-negative COMMAND "${CMAKE_COMMAND}"
     "-DSOFTPC_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
-    -P "${CMAKE_CURRENT_SOURCE_DIR}/test/support/build_ownership.cmake")
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/test/checks/build_ownership.cmake")
 set_tests_properties(softpc-build-ownership-negative PROPERTIES LABELS "unit")

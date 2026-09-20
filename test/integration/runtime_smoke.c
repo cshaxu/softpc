@@ -1,6 +1,6 @@
-#include "runtime.h"
+#include "machine_fixture.h"
 #include "common/session/control.h"
-#include "input_queue.h"
+#include "common/machine/input_queue.h"
 #include "../lib/cleanup.h"
 
 #include <assert.h>
@@ -28,7 +28,7 @@ typedef struct runtime_completion_probe {
     volatile LONG frame_facts;
 } runtime_completion_probe;
 
-static void runtime_state_probe_receive(void *opaque, app_runtime_state state,
+static void runtime_state_probe_receive(void *opaque, common_machine_state state,
     uint32_t run_generation)
 {
     runtime_completion_probe *probe = (runtime_completion_probe *)opaque;
@@ -49,12 +49,12 @@ static void runtime_frame_probe_receive(void *opaque, uint32_t sequence,
     (void)InterlockedIncrement(&probe->frame_facts);
 }
 
-static int app_runtime_wait(app_runtime *runtime,
-    app_runtime_state expected)
+static int runtime_wait(common_machine *runtime,
+    common_machine_state expected)
 {
     DWORD deadline = GetTickCount() + 5000u;
     do {
-        if (app_runtime_get_state(runtime) == expected) return 1;
+        if (common_machine_state_get(runtime) == expected) return 1;
         Sleep(10u);
     } while ((LONG)(GetTickCount() - deadline) < 0);
     return 0;
@@ -67,8 +67,9 @@ int main(void)
     FILE *file;
     softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
-    app_runtime *runtime = NULL;
-    app_runtime_frame *frame;
+    softpc_machine_fixture fixture = { 0 };
+    common_machine *runtime;
+    common_machine_frame *frame;
     uint32_t first_run;
     runtime_completion_probe completion_probe = { 0 };
 
@@ -84,10 +85,11 @@ int main(void)
     assert(fclose(file) == 0);
 
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
-    assert(app_runtime_create(machine, &runtime));
-    app_runtime_set_state_sink(runtime, runtime_state_probe_receive,
+    assert(softpc_machine_fixture_create(machine, &fixture));
+    runtime = fixture.machine;
+    common_machine_set_state_sink(runtime, runtime_state_probe_receive,
         &completion_probe);
-    app_runtime_set_frame_sink(runtime, runtime_frame_probe_receive,
+    common_machine_set_frame_sink(runtime, runtime_frame_probe_receive,
         &completion_probe);
     /* The product control FIFO must not turn a short input burst into a
        silently dropped make/break sequence at its old fixed-64 boundary. */
@@ -110,24 +112,24 @@ int main(void)
         common_session_queue_dispose(queue);
     }
     {
-        app_input_queue storage = { 0 }, *queue = &storage;
+        common_machine_input_queue storage = { 0 }, *queue = &storage;
         kvm_input_event event = { 0 };
 
-        assert(app_input_queue_initialize(queue));
+        assert(common_machine_input_queue_initialize(queue) == LIB_STATUS_OK);
         event.type = KVM_EVENT_KEY;
         event.data.key.scan_code = 0x1eu;
         event.data.key.pressed = 1u;
-        assert(app_input_queue_push(queue, &event));
-        assert(app_input_queue_pending(queue));
-        app_input_queue_clear(queue);
-        assert(!app_input_queue_pending(queue));
-        app_input_queue_dispose(queue);
+        assert(common_machine_input_queue_push(queue, &event));
+        assert(common_machine_input_queue_pending(queue));
+        common_machine_input_queue_clear(queue);
+        assert(!common_machine_input_queue_pending(queue));
+        common_machine_input_queue_dispose(queue);
     }
-    assert(app_runtime_start(runtime));
-    first_run = app_runtime_run_generation(runtime);
+    assert(common_machine_start(runtime));
+    first_run = common_machine_run_generation(runtime);
     assert(first_run != 0u);
     Sleep(150u);
-    frame = (app_runtime_frame *)calloc(1u, sizeof(*frame));
+    frame = (common_machine_frame *)calloc(1u, sizeof(*frame));
     assert(frame != NULL);
     {
         DWORD deadline = GetTickCount() + 5000u;
@@ -137,11 +139,12 @@ int main(void)
                The executor may own its frame lock while publishing the first
                original renderer update, so retry rather than turning that
                defined snapshot miss into a timing-dependent test failure. */
-            if (app_runtime_copy_frame(runtime, frame) &&
+            if (common_machine_copy_published_frame(runtime, frame,
+                    common_machine_run_generation(runtime)) &&
                 frame->window.graphics == 0u && frame->window.text.base.cursor_column >= 0 &&
-                frame->window.text.base.cursor_column < SOFTPC_RUNTIME_TEXT_COLUMNS &&
+                frame->window.text.base.cursor_column < KVM_TEXT_COLUMNS &&
                 frame->window.text.base.cursor_row >= 0 &&
-                frame->window.text.base.cursor_row < SOFTPC_RUNTIME_TEXT_ROWS &&
+                frame->window.text.base.cursor_row < KVM_TEXT_ROWS &&
                 frame->window.text.base.cursor_visible != 0u && frame->window.text.base.cursor_phase != 0u) {
                 cursor_seen = 1;
                 break;
@@ -156,8 +159,8 @@ int main(void)
         assert(frame->window.text.base.cursor_bottom == frame->window.text.base.font_height - 1u);
         assert(frame->window.text.base.cursor_top <= frame->window.text.base.cursor_bottom);
     }
-    assert(app_runtime_published_frame_sequence(runtime) == frame->sequence);
-    assert(app_runtime_published_frame_run_generation(runtime) == first_run);
+    assert(common_machine_published_frame_sequence(runtime) == frame->sequence);
+    assert(common_machine_published_frame_run_generation(runtime) == first_run);
     assert(frame->sequence != 0u);
     {
         uint32_t stable_sequence = frame->sequence;
@@ -166,7 +169,8 @@ int main(void)
            publication would flood the app control FIFO and starve Console
            raw input behind redundant frame completions. */
         Sleep(150u);
-        assert(app_runtime_copy_frame(runtime, frame));
+        assert(common_machine_copy_published_frame(runtime, frame,
+            common_machine_run_generation(runtime)));
         assert(frame->sequence == stable_sequence);
         /* Executor paint callbacks are frame facts only. They must not create
            additional lifecycle completions while the machine stays running. */
@@ -177,34 +181,34 @@ int main(void)
             stable_state_facts);
     }
     /* Runtime owns copied frame production only.  Component existence and
-       Console/Window selection belong to the app presentation reconciler,
+       Console/Window selection belong to Common Session/UI,
        not a shared KVM target router. */
-    /* Lifecycle intent is interpreted by the SoftPC control/reconciler;
+    /* Lifecycle policy is interpreted by the injected product control;
        this runtime unit directly proves the executor request/completion ABI. */
-    assert(app_runtime_pause(runtime));
-    assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_PAUSED));
-    assert(app_runtime_set_floppy(runtime, NULL));
-    assert(app_runtime_resume(runtime));
-    assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_RUNNING));
-    assert(app_runtime_stop(runtime));
-    assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_STOPPED));
+    assert(common_machine_pause(runtime));
+    assert(runtime_wait(runtime, COMMON_MACHINE_PAUSED));
+    assert(common_machine_set_removable_media(runtime, NULL, LIB_STORAGE_MEDIUM_OVERLAY));
+    assert(common_machine_resume(runtime));
+    assert(runtime_wait(runtime, COMMON_MACHINE_RUNNING));
+    assert(common_machine_stop(runtime));
+    assert(runtime_wait(runtime, COMMON_MACHINE_STOPPED));
     /* A monitor `start` after `stop` is a new cold run, not merely an
        accepted request.  Waiting for RUNNING catches a restart that reaches
        BIOS setup but never re-enters the executor. */
-    assert(app_runtime_start(runtime));
-    assert(app_runtime_run_generation(runtime) != first_run);
-    assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_RUNNING));
+    assert(common_machine_start(runtime));
+    assert(common_machine_run_generation(runtime) != first_run);
+    assert(runtime_wait(runtime, COMMON_MACHINE_RUNNING));
     /* Reset is now one runtime command.  It hides its stop/start sequence
        and returns only once the new run has reached its public paused state. */
-    assert(app_runtime_reset(runtime));
-    assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_PAUSED));
-    assert(app_runtime_resume(runtime));
-    assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_RUNNING));
-    assert(app_runtime_stop(runtime));
-    assert(app_runtime_wait(runtime, SOFTPC_RUNTIME_STOPPED));
-    assert(app_runtime_set_floppy(runtime, NULL));
+    assert(common_machine_reset(runtime));
+    assert(runtime_wait(runtime, COMMON_MACHINE_PAUSED));
+    assert(common_machine_resume(runtime));
+    assert(runtime_wait(runtime, COMMON_MACHINE_RUNNING));
+    assert(common_machine_stop(runtime));
+    assert(runtime_wait(runtime, COMMON_MACHINE_STOPPED));
+    assert(common_machine_set_removable_media(runtime, NULL, LIB_STORAGE_MEDIUM_OVERLAY));
     free(frame);
-    app_runtime_destroy(runtime);
+    softpc_machine_fixture_destroy(&fixture);
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     return 0;

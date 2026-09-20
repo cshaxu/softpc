@@ -90,7 +90,10 @@ commands and key policy; test/core covers the concrete machine, compatibility
 host and devices; test/integration covers composed worker, command, snapshot,
 frame and package flows. Historical CTest labels remain execution selectors,
 not a claim that every test labelled unit is isolated. Product fixtures and
-checks are being relocated from test/support under the active T77 task.
+checks live beside their owner: test/integration/machine_fixture.c/h is the
+single product driver/Common assembly fixture, snapshot orchestration is in
+test/integration, and product static gates are in test/checks. No test/unit or
+test/support directory remains. Test execution is summarized in test/README.md.
 The reusable test/lib, test/common and test/x86 packages are not destinations
 for product-owned fixtures.
 

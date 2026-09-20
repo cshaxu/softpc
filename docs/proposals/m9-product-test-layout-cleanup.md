@@ -232,7 +232,7 @@ the ledger; no other live build/tool reference to test/unit remains.
 ### S2 brief and diagnostic disposition
 
 Owner authorizes continuing through self-reviewed T closure. Production +0/-0;
-estimate code/build +140/-2080, net about -1940. Move five checks (764 lines at
+estimate code/build +140/-2080, net about -1940. Move five checks (864 lines at
 S1), snapshot script (37) and fixture C/H (41); remove runtime.h (85) and
 input_queue.h (22), converting three compiled runtime consumers to actual
 Common types/calls and caller-owned fixture storage. No extra fixture allocation
@@ -260,3 +260,38 @@ its legacy product path list; the existing product gate compensates by invoking
 that checker for all new product roots. No runtime or shared-package dependency
 on retired directories exists. S2 removes test/support/TESTS.md in favor of the
 owned test README; S3 audits that inventory and current design together.
+
+### S2 delivery
+
+All 13 support entries resolved: eight relocated (five checks, snapshot script,
+fixture C/H), two wrapper headers and two obsolete diagnostics deleted, stale
+inventory replaced by test/README.md. Empty support/diagnostics, support and
+unit directories removed. Git retains deleted historical material. Three
+consumers use common_machine directly and stack-owned fixture storage; state,
+frame generation, media mode and init status match the removed wrappers.
+Their assert/REQUIRE counts remain 46/27/22; actual expressions and call order
+were reviewed, not inferred equivalent solely from those counts. The other 31
+relocated C files remain byte-identical. No second fixture or executor exists.
+
+Rename-aware `git diff --find-renames=20% --numstat` over CMakeLists.txt and
+test excluding Markdown: +181/-2096, net -1915; production +0/-0. The lower
+rename threshold identifies the short renamed fixture header. Of the reduction,
+1838 lines are obsolete diagnostics and 107 are alias headers; direct-call
+sites and necessary ownership checks account for the offset. Added lines exceed
+estimate because explicit call arguments/wrapping and a 13-line registration
+check replace implicit aliases. No syntax compression or lost assertion.
+
+Existing build-ownership gate now compares all product test C files with actual
+root target inputs. A temporary unregistered C file made configure fail with
+the expected error; after removing it both configure/builds pass. Existing
+source gate rejects retired directories and reuses the Lib naming checker for
+App/Core/checks. All 115 CTest definitions match after normalizing only moved
+script paths and architecture, with labels/timeouts unchanged.
+
+Both Release builds pass; full background x64 110/110 (155.22s), x86 110/110
+(155.38s), five desktop cases excluded per width. EXE hashes unchanged from S1;
+source and all six shared corpora untouched. Documentation gate/diff check pass.
+No remaining alias callers: the product gate's forbidden app_runtime pattern
+is intentionally retained, and shared naming script's legacy roots remain
+immutable with new roots checked by the product gate. Historical evidence
+retains historical paths; it is not a live build reference.

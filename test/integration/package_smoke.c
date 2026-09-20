@@ -356,7 +356,7 @@ static int package_window_restart(PROCESS_INFORMATION *process, HANDLE input, HA
 }
 
 /* This drives the shipping executable through the same native Console route
- * as the reported failure.  It intentionally does not call app_runtime_*
+ * as the reported failure.  It intentionally does not call the machine API
  * directly: monitor lines, raw CAP recognition, reconciler actions, broker
  * replacement, and the new cold run must all occur in the child package. */
 static int verify_package_monitor_restart(PROCESS_INFORMATION *process,

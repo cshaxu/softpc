@@ -1,4 +1,4 @@
-#include "runtime.h"
+#include "machine_fixture.h"
 #include "../lib/cleanup.h"
 
 #include <assert.h>
@@ -23,17 +23,17 @@ static int runtime_input_wait_for_byte(softpc_machine *machine,
     return 0;
 }
 
-static int runtime_input_wait_for_state(app_runtime *runtime,
-    app_runtime_state expected, DWORD deadline)
+static int runtime_input_wait_for_state(common_machine *runtime,
+    common_machine_state expected, DWORD deadline)
 {
     do {
-        if (app_runtime_get_state(runtime) == expected) return 1;
+        if (common_machine_state_get(runtime) == expected) return 1;
         Sleep(1u);
     } while ((LONG)(GetTickCount() - deadline) < 0);
     return 0;
 }
 
-static int runtime_input_enqueue_key(app_runtime *runtime, uint16_t scan,
+static int runtime_input_enqueue_key(common_machine *runtime, uint16_t scan,
     lib_u32 key, uint8_t pressed)
 {
     kvm_input_event event = { 0 };
@@ -42,7 +42,7 @@ static int runtime_input_enqueue_key(app_runtime *runtime, uint16_t scan,
     event.data.key.scan_code = scan;
     event.data.key.key = key;
     event.data.key.pressed = pressed;
-    return app_runtime_enqueue_input_event(runtime, &event);
+    return common_machine_enqueue_input(runtime, &event);
 }
 
 int main(void)
@@ -68,7 +68,8 @@ int main(void)
     FILE *image = NULL;
     softpc_machine_options options = { image_path, NULL };
     softpc_machine *machine = NULL;
-    app_runtime *runtime = NULL;
+    softpc_machine_fixture fixture = { 0 };
+    common_machine *runtime;
     DWORD deadline;
     uint8_t delivered = 0u;
     uint8_t stale_input = 0u;
@@ -85,8 +86,9 @@ int main(void)
     options.floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     options.hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
-    assert(app_runtime_create(machine, &runtime));
-    assert(app_runtime_start(runtime));
+    assert(softpc_machine_fixture_create(machine, &fixture));
+    runtime = fixture.machine;
+    assert(common_machine_start(runtime));
     assert(runtime_input_wait_for_byte(machine, 0x501u, 0x55u,
         GetTickCount() + 5000u, NULL));
     Sleep(250u);
@@ -101,19 +103,19 @@ int main(void)
     deadline = GetTickCount() + 1000u;
     assert(runtime_input_wait_for_byte(machine, 0x502u, 0x01u, deadline,
         &delivered));
-    assert(app_runtime_get_state(runtime) == SOFTPC_RUNTIME_RUNNING);
+    assert(common_machine_state_get(runtime) == COMMON_MACHINE_RUNNING);
 
     /* Paused is a monitor/control state, not a second guest-input mode.  A
        release is as much a guest record as a make: it must be rejected here.
        Clear the exact-scan marker while stopped; after the next cold run, it
        must remain clear. Unlike a total IRQ count, ordinary boot-controller
        records cannot make this assertion flaky. */
-    assert(app_runtime_pause(runtime));
-    assert(runtime_input_wait_for_state(runtime, SOFTPC_RUNTIME_PAUSED,
+    assert(common_machine_pause(runtime));
+    assert(runtime_input_wait_for_state(runtime, COMMON_MACHINE_PAUSED,
         GetTickCount() + 5000u));
     assert(!runtime_input_enqueue_key(runtime, 0x1du, KVM_KEY_CONTROL, 0u));
-    assert(app_runtime_stop(runtime));
-    assert(runtime_input_wait_for_state(runtime, SOFTPC_RUNTIME_STOPPED,
+    assert(common_machine_stop(runtime));
+    assert(runtime_input_wait_for_state(runtime, COMMON_MACHINE_STOPPED,
         GetTickCount() + 5000u));
     /* Guest RAM survives a reset. Clear the boot marker while stopped, so
        the next wait proves that the next cold run reached this boot sector
@@ -123,7 +125,7 @@ int main(void)
         sizeof(delivered)) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_write_physical(machine, 0x502u, &stale_input,
         sizeof(stale_input)) == SOFTPC_MACHINE_OK);
-    assert(app_runtime_start(runtime));
+    assert(common_machine_start(runtime));
     assert(runtime_input_wait_for_byte(machine, 0x501u, 0x55u,
         GetTickCount() + 5000u, NULL));
     Sleep(250u);
@@ -131,8 +133,8 @@ int main(void)
         sizeof(stale_input)) == SOFTPC_MACHINE_OK);
     assert(stale_input == 0u);
 
-    assert(app_runtime_stop(runtime));
-    app_runtime_destroy(runtime);
+    assert(common_machine_stop(runtime));
+    softpc_machine_fixture_destroy(&fixture);
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(image_path));
     return 0;

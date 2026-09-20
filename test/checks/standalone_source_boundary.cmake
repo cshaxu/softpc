@@ -209,7 +209,7 @@ foreach(source IN LISTS product_common_consumers)
     endif()
 endforeach()
 
-include("${SOFTPC_SOURCE_DIR}/test/support/product_boundary.cmake")
+include("${SOFTPC_SOURCE_DIR}/test/checks/product_boundary.cmake")
 
 # The imported KVM component consumes copied values only.
 # It cannot acquire SoftPC's runtime, machine, renderer, or original key-map
@@ -531,7 +531,7 @@ if(duplicate_original_headers OR build_definition MATCHES "compat/ccpu/legacy")
     message(FATAL_ERROR "Compat duplicates original GDP/SAS declarations")
 endif()
 
-foreach(product_test_root IN ITEMS app core)
+foreach(product_test_root IN ITEMS app core checks)
     execute_process(COMMAND "${CMAKE_COMMAND}"
         "-DKVM_NAMING_ROOT=${SOFTPC_SOURCE_DIR}/test/${product_test_root}"
         -P "${SOFTPC_SOURCE_DIR}/src/lib/verify_kvm_naming.cmake"
@@ -545,14 +545,15 @@ endforeach()
 # Unit fixtures may write their tiny disk bytes under build/, but neither their
 # source nor their resource scripts may name product artifacts. Integration is
 # deliberately separate because it exercises that package.
-if(EXISTS "${SOFTPC_SOURCE_DIR}/tests")
-    message(FATAL_ERROR "Legacy tests/ directory remains; use the owned test/ directories")
+if(EXISTS "${SOFTPC_SOURCE_DIR}/tests" OR
+   EXISTS "${SOFTPC_SOURCE_DIR}/test/unit" OR EXISTS "${SOFTPC_SOURCE_DIR}/test/support")
+    message(FATAL_ERROR "Legacy test directory remains; use the owned test/ directories")
 endif()
 file(GLOB_RECURSE unit_test_sources
     "${SOFTPC_SOURCE_DIR}/test/app/*"
     "${SOFTPC_SOURCE_DIR}/test/core/*"
     "${SOFTPC_SOURCE_DIR}/test/integration/*"
-    "${SOFTPC_SOURCE_DIR}/test/support/*.cmake")
+    "${SOFTPC_SOURCE_DIR}/test/checks/*.cmake")
 list(REMOVE_ITEM unit_test_sources
     "${SOFTPC_SOURCE_DIR}/test/integration/package_smoke.c"
     "${SOFTPC_SOURCE_DIR}/test/integration/runtime_restart_boot_smoke.c")

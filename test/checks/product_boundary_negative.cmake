@@ -13,7 +13,7 @@ file(WRITE "${fixture}/src/core/softpc.new/legal.c" "#include <core/compat/ccpu/
 file(WRITE "${fixture}/src/core/softpc.new/original.c" "#include <compat/devices/snapshot.h>\n")
 function(check expected)
     execute_process(COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${fixture}"
-        -P "${SOFTPC_SOURCE_DIR}/test/support/product_boundary.cmake"
+        -P "${SOFTPC_SOURCE_DIR}/test/checks/product_boundary.cmake"
         RESULT_VARIABLE result OUTPUT_QUIET ERROR_VARIABLE error)
     if(expected STREQUAL "pass")
         if(NOT result EQUAL 0)
