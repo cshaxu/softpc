@@ -92,6 +92,9 @@ static base_sync_wait_result idle_wait(base_sync_event *event, lib_u32 timeout)
         return base_sync_event_wait(event, 0u);
     }
     assert(event == active->command_event && timeout == LIB_UINT32_MAX);
+    /* This event was consumed by the paused callback after shutdown signaled it.
+     * An uncancellable infinite wait here would hang instead of returning. */
+    assert(action != 5u || idle_waits == 0u);
     ++idle_waits;
     assert(idle_waits <= 3u);
     if (action == 4u) {
@@ -106,10 +109,29 @@ static base_sync_wait_result idle_wait(base_sync_event *event, lib_u32 timeout)
 static base_sync_wait_result paused_wait(base_sync_event *const *events,
     lib_u32 count, const base_sync_task *task, lib_u32 timeout, lib_u32 *index)
 {
-    (void)task;
+    if (count == 1u) {
+        assert(events[0] == active->command_event && timeout == LIB_UINT32_MAX);
+        if (action == 5u && idle_waits != 0u) {
+            assert(task == active->worker);
+            assert(base_sync_event_wait(events[0], 0u) == BASE_SYNC_WAIT_TIMED_OUT);
+            ++idle_waits;
+            return base_sync_wait_any(events, count, task, 0u, index);
+        }
+        return idle_wait(events[0], timeout);
+    }
     assert(count == 3u && events[0] == active->resume_event);
     assert(timeout == LIB_UINT32_MAX);
     ++paused_waits;
+    if (action == 5u) {
+        /* Debug woke the inner wait; shutdown then signals before its reset. */
+        common_machine_debug_cancel(active);
+        assert(common_machine_stop(active));
+        lib_atomic_i32_store_explicit(&active->terminate_requested, 1, LIB_MEMORY_ORDER_SEQ_CST);
+        assert(base_sync_event_signal(active->command_event) == LIB_STATUS_OK);
+        assert(base_sync_task_request_cancel(active->worker) == LIB_STATUS_OK);
+        *index = 1u;
+        return BASE_SYNC_WAIT_SIGNALED;
+    }
     register_pending();
     assert(paused_waits <= (action == 2u ? 2u : 1u));
     if (action == 3u) assert(common_machine_reset(active));
@@ -183,6 +205,9 @@ static void state(void *context, common_machine_state value, lib_u32 generation)
     observed[facts++] = value;
 }
 
+static void completed_task(void *context, const base_sync_task *task)
+{ (void)context; (void)task; }
+
 static void check(base_sync_wait_result result, unsigned requested_action)
 {
     common_machine_driver driver = {0};
@@ -193,11 +218,18 @@ static void check(base_sync_wait_result result, unsigned requested_action)
     driver.set_executor_callback = callback; driver.deliver_input = input;
     driver.copy_frame = frame;
     assert(common_machine_create(&active, &driver) == LIB_STATUS_OK);
+    if (action == 5u)
+        assert(base_sync_task_create(completed_task, NULL, &active->worker) == LIB_STATUS_OK);
     active->state_status = active->debug_status = LIB_STATUS_UNSUPPORTED;
     active->media_succeeded = LIB_TRUE;
     common_machine_set_state_sink(active, state, NULL);
     common_machine_begin_cold_run(active, LIB_FALSE);
-    common_machine_worker(active, NULL);
+    common_machine_worker(active, active->worker);
+    if (action == 5u) {
+        assert(idle_waits == 2u && paused_waits == 1u);
+        assert(base_sync_task_destroy(active->worker) == LIB_STATUS_OK);
+        active->worker = NULL;
+    }
     if (action == 4u) {
         assert(facts == 1u && observed[0] == COMMON_MACHINE_ERROR);
         assert(resets == 0u && cleanups == 0u && paused_waits == 0u);
@@ -444,6 +476,7 @@ int main(void)
     check(BASE_SYNC_WAIT_SIGNALED, 0u); /* Resume. */
     check(BASE_SYNC_WAIT_SIGNALED, 1u); /* Stop. */
     check(BASE_SYNC_WAIT_SIGNALED, 2u); /* Reset, then stop. */
+    check(BASE_SYNC_WAIT_SIGNALED, 5u); /* Debug-close/shutdown loses command wake. */
     frame_status = LIB_STATUS_UNSUPPORTED;
     check(BASE_SYNC_WAIT_SIGNALED, 0u);
     frame_status = LIB_STATUS_INVALID_ARGUMENT;

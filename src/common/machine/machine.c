@@ -446,13 +446,15 @@ static void common_machine_worker(void *opaque, const base_sync_task *task)
     common_machine *machine = (common_machine *)opaque;
     for (;;) {
         lib_bool succeeded;
-        if (base_sync_event_wait(machine->command_event, UINT32_MAX) !=
-                BASE_SYNC_WAIT_SIGNALED) {
+        /* The paused callback may have consumed the terminal command wake. */
+        base_sync_wait_result result = base_sync_wait_any(&machine->command_event,
+            1u, task, UINT32_MAX, NULL);
+        if (result == BASE_SYNC_WAIT_CANCELLED) break;
+        if (result != BASE_SYNC_WAIT_SIGNALED) {
             common_machine_finish_requests(machine, COMMON_MACHINE_ERROR);
             common_machine_notify_state(machine, COMMON_MACHINE_ERROR);
             break;
         }
-        if (base_sync_task_cancelled(task)) break;
         base_sync_event_reset(machine->command_event);
         if (lib_atomic_i32_load_explicit(&machine->terminate_requested, LIB_MEMORY_ORDER_SEQ_CST) != 0)
             break;

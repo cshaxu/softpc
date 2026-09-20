@@ -79,7 +79,40 @@ x64 110/110 (191.93s), x86 110/110 (186.10s). Five desktop tests per width
 were excluded. Documentation gate and diff check pass. Source/test/build/tool
 actual +0/-0, net 0, matching estimate. No new runtime correctness claim.
 
-## Delivery Rules
+## S2 Implementation And Sweep
+
+Admission estimate: production +5/-3, tests +45/-3, net +44 total, plus three
+manifests and records. Actual source scope is the same three C files.
+The deterministic existing machine_wait harness scripts debug wake, stop and
+task cancellation before the paused callback resets command_event. The old
+worker fails its bounded assertion (x64, 0.68s); the new worker uses the real
+Base cancellation object after proving the command event is now unsignaled.
+Focused machine_wait/common_machine/x86.debug_machine pass (3/3).
+No production hook, task field, allocation or Lib change is introduced.
+The native x86 test now destroys immediately after debugger close; it no longer
+uses STOP completion as a workaround.
+
+Sweep command: rg base_sync_event_wait/wait_any/task_cancelled in src/common.
+Both executor waits now observe task cancellation. Four synchronous caller
+waits (media, state read/write, debug) wait for request completion, not executor
+work; existing finish_requests completes their owned slots before disposal.
+Session queue_take is a caller-supplied bounded/infinite queue wait, not a task
+join loop; its existing control event owns termination. No second matching
+uncancellable worker wait remains in Common. Existing tests cover fault versus
+cancel, reset/resume/stop, all five pending-slot forms, join failure retention,
+never-started shutdown and blocked-final-callback ownership.
+
+Actual C diff: machine.c +5/-3; machine_wait_smoke.c +35/-2;
+debug_machine_smoke.c +1/-3. Production net +2, tests net +31; total
++41/-8, net +33 (estimate net +44). Manifest hashes refreshed for those
+three files. Each focused test passed 50 repetitions on x64 (18.00s) and
+x86 (19.31s). The extra cancellation task exists only in the scheduling test.
+Both Release builds and background suites pass: x64 110/110 (185.64s),
+x86 110/110 (168.37s); five desktop tests per width excluded. EXE SHA256:
+x86 E6D738B78BB07F1B9F25F98AE07A6E6AEFAB3655B1DB9F88D990C399E0F6F46F;
+x64 E483BF53CE7D694B0AA0F3343704FF09079CE80E17152AE5C343260737735BFF.
+
+## Delivery Discipline
 
 One S active at a time. No desktop interaction: background presets and
 standalone -LE desktop. Preserve INI, media, snapshots and Core.

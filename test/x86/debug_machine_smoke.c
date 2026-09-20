@@ -312,9 +312,7 @@ int main(void)
     original_cli(debug, &protocol);
     x86_debug_close(debug);
     x86_debug_destroy(debug);
-    /* Match the original mixed test: stop completes before object disposal. */
-    assert(common_machine_stop(machine));
-    assert(WaitForSingleObject(fake.state_stopped, 5000u) == WAIT_OBJECT_0);
+    /* Immediate paused destruction must not need a caller-side STOP barrier. */
     assert(common_machine_destroy(machine) == LIB_STATUS_OK);
     machine_fake_dispose(&fake);
     return 0;
