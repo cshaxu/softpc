@@ -94,10 +94,10 @@ static lib_bool common_machine_text_frame_changed(const common_machine_frame *pr
         old_text->cursor_visible != new_text->cursor_visible ||
         old_text->cursor_phase != new_text->cursor_phase ||
         old_text->font_height != new_text->font_height ||
-        old_text->attribute_font_select != new_text->attribute_font_select ||
         lib_memory_compare(old_text->text, new_text->text, sizeof(new_text->text)) != 0 ||
-        lib_memory_compare(old_text->attributes, new_text->attributes,
-            sizeof(new_text->attributes)) != 0 ||
+        lib_memory_compare(old_text->foreground, new_text->foreground, sizeof(new_text->foreground)) != 0 ||
+        lib_memory_compare(old_text->background, new_text->background, sizeof(new_text->background)) != 0 ||
+        lib_memory_compare(old_text->glyph_bank, new_text->glyph_bank, sizeof(new_text->glyph_bank)) != 0 ||
         lib_memory_compare(old_text->text_palette, new_text->text_palette,
             sizeof(new_text->text_palette)) != 0 ||
         lib_memory_compare(previous->window.text.font, candidate->window.text.font, sizeof(candidate->window.text.font)) != 0 ||

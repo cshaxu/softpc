@@ -154,18 +154,39 @@ static void rendering(void)
     assert(kvm_window_cursor_rect(&text,&display,&cursor) && cursor.top==20 && cursor.bottom==52);
     text.text.base.font_height=0;
     assert(kvm_window_cursor_rect(&text,&display,&cursor) && cursor.top==20 && cursor.bottom==52);
-    text.text.font[0] = 0x80; text.text.base.attributes[0] = 0x21;
+    text.text.font[0] = 0x80;
+    text.text.base.foreground[0] = 1; text.text.base.background[0] = 2;
     text.text.base.text_palette[1] = 0x112233; text.text.base.text_palette[2] = 0x445566;
     kvm_window_render_text(&text, pixels, 8, 16);
     assert(pixels[0] == 0x112233 && pixels[1] == 0x445566 && pixels[127] == 0x445566);
     text.text.font[0] = 0x40;
     kvm_window_render_text(&text, pixels, 8, 16);
     assert(pixels[0] == 0x445566 && pixels[1] == 0x112233);
-    text.text.base.attribute_font_select = 1u;
-    text.text.base.attributes[0] = 0x29;
+    text.text.base.glyph_bank[0] = 1u;
+    text.text.base.foreground[0] = 9u;
     text.text.base.text_palette[9] = 0x112233;
     text.text.secondary_font[0] = 0x20;
     kvm_window_render_text(&text, pixels, 8, 16);
     assert(pixels[0] == 0x445566 && pixels[2] == 0x112233);
+    /* Compare all original byte attributes, including intensity and bank coupling. */
+    for (unsigned colour = 0; colour < 16; ++colour)
+        text.text.base.text_palette[colour] = colour * 0x010101u;
+    for (unsigned enabled = 0; enabled < 2; ++enabled) {
+        for (unsigned attribute = 0; attribute < 256; ++attribute) {
+            unsigned bits = enabled && (attribute & 8u) ? 0x20u : 0x40u;
+            text.text.base.foreground[0] = attribute & 15u;
+            text.text.base.background[0] = attribute >> 4;
+            text.text.base.glyph_bank[0] = enabled && (attribute & 8u);
+            kvm_window_render_text(&text, pixels, 8, 16);
+            for (unsigned x = 0; x < 8; ++x)
+                assert(pixels[x] == ((bits & (0x80u >> x)) ?
+                    (attribute & 15u) : (attribute >> 4)) * 0x010101u);
+        }
+    }
+    /* Neutral producers may select bank 1 without colour bit 3. */
+    text.text.base.foreground[0] = 1u;
+    text.text.base.glyph_bank[0] = 1u;
+    kvm_window_render_text(&text, pixels, 8, 16);
+    assert(pixels[2] == 0x010101u);
 }
 int main(void) { damage(); motion(); rendering(); return 0; }

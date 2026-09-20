@@ -350,6 +350,7 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
     lib_i32 row = -1;
     lib_u32 cursor_size = 0u;
     lib_u32 text_row;
+    lib_u32 attribute_select;
 
     if (!softpc_machine_presentation_text(driver->machine, &surface, &columns,
             &rows, &stride, &cell_bytes)) return LIB_STATUS_OK;
@@ -361,7 +362,11 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
     memset(&frame->window, 0, lib_offsetof(kvm_window_frame, text) +
         sizeof(frame->window.text));
     memset(frame->window.text.base.text, ' ', sizeof(frame->window.text.base.text));
-    memset(frame->window.text.base.attributes, 0x07, sizeof(frame->window.text.base.attributes));
+    memset(frame->window.text.base.foreground, 7, sizeof(frame->window.text.base.foreground));
+    if (!softpc_machine_presentation_fonts(driver->machine, frame->window.text.font,
+        frame->window.text.secondary_font, &frame->window.text.base.font_height,
+        &attribute_select))
+        return LIB_STATUS_IO_ERROR;
     cells = (const lib_u8 *)surface;
     for (text_row = 0u; text_row < rows; ++text_row) {
         lib_u32 text_column;
@@ -369,7 +374,11 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
             size_t source = ((size_t)text_row * stride + text_column) * cell_bytes;
             size_t destination = (size_t)text_row * KVM_TEXT_COLUMNS + text_column;
             frame->window.text.base.text[destination] = cells[source];
-            if (cell_bytes >= 2u) frame->window.text.base.attributes[destination] = cells[source + 1u];
+            lib_u8 attribute = cell_bytes >= 2u ? cells[source + 1u] : 7u;
+            frame->window.text.base.foreground[destination] = attribute & 0x0fu;
+            frame->window.text.base.background[destination] = (attribute >> 4u) & 0x0fu;
+            frame->window.text.base.glyph_bank[destination] =
+                attribute_select && (attribute & 0x08u) ? 1u : 0u;
         }
     }
     {
@@ -391,10 +400,6 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
         &cursor_size);
     frame->window.text.base.cursor_column = column;
     frame->window.text.base.cursor_row = row;
-    if (!softpc_machine_presentation_fonts(driver->machine, frame->window.text.font,
-        frame->window.text.secondary_font, &frame->window.text.base.font_height,
-        &frame->window.text.base.attribute_font_select))
-        return LIB_STATUS_IO_ERROR;
     frame->window.text.base.text_columns = (lib_u16)columns;
     frame->window.text.base.text_rows = (lib_u16)rows;
     frame->window.valid = 1u;

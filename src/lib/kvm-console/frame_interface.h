@@ -4,7 +4,7 @@
 #include "lib/kvm-base/frame_interface.h"
 
 /* One BMP character (excluding surrogate code units) per glyph index. Both banks are copied frame data, not
- * resources retained from a caller. Attribute selection has the base meaning. */
+ * resources retained from a caller. Each cell's glyph_bank selects the map. */
 typedef struct kvm_console_character_map {
     lib_u16 primary[256u];
     lib_u16 secondary[256u];

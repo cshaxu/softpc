@@ -1,5 +1,8 @@
 # kvm-window
 
+Text cells select primary/secondary bitmaps through explicit glyph-bank values;
+foreground/background palette indices are independent, with no device bit layout.
+
 `kvm-window` depends on `types` and `kvm-base` only. It owns one Window lifecycle and sends
 copied KVM events to the application queue entry. It never includes `console-broker` or
 makes product decisions.

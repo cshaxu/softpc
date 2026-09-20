@@ -27,6 +27,7 @@ static BOOL WINAPI text_write(HANDLE h,LPCVOID text,DWORD n,LPDWORD written,LPVO
 { (void)h;(void)text;(void)r;*written=n==0 ? 0 : text_written;return text_result; }
 static int palette_query_ok, palette_set_ok, cursor_ok = 1;
 static WCHAR first_cell;
+static WORD first_attribute;
 static COORD buffer_size={80,25};
 static SMALL_RECT viewport={0,0,79,24};
 static BOOL WINAPI screen_info(HANDLE h, PCONSOLE_SCREEN_BUFFER_INFO p)
@@ -42,6 +43,7 @@ static BOOL WINAPI palette_set(HANDLE h, PCONSOLE_SCREEN_BUFFER_INFOEX p)
 static BOOL WINAPI write_cells(HANDLE h, const CHAR_INFO *p, COORD a, COORD b, PSMALL_RECT r)
 {
     (void)h; (void)a; (void)b; ++writes; first_cell=p[0].Char.UnicodeChar;
+    first_attribute=p[0].Attributes;
     if (r->Bottom>=buffer_size.Y) r->Bottom=buffer_size.Y-1;
     if (partial_write==1) r->Right=39;
     if (partial_write==2) r->Bottom=11;
@@ -213,6 +215,14 @@ int main(void)
         partial_write=0; f.text[0]=0x2588;
         assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
         assert(writes==attempted+1 && b.previous_columns==80);
+    }
+    for (unsigned attribute=0;attribute<256;++attribute) {
+        f.foreground[0]=attribute & 15u; f.background[0]=attribute >> 4;
+        assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+        assert(first_attribute==attribute);
+        unsigned completed=writes;
+        assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+        assert(writes==completed);
     }
     base_sync_mutex_destroy(b.transaction_lock);base_sync_mutex_destroy(b.output_lock);CloseHandle(stop);lib_console_release(b.console);
     cooked_restore();

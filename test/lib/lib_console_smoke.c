@@ -41,6 +41,7 @@ static lib_status console_probe_frame(void *context,
 
 int main(void)
 {
+    assert(sizeof(lib_console_text_frame) == 8084);
     lib_console *console = LIB_NULL;
     console_probe probe = { 0 };
     lib_console_event event = { 0 };
@@ -99,6 +100,13 @@ int main(void)
     assert(lib_console_write_text_frame(console, &frame) == LIB_STATUS_INVALID_ARGUMENT);
     assert(probe.frames == 1u);
     frame.text[1999] = 0u;
+    for (unsigned field = 0; field < 2; ++field) {
+        lib_u8 *value = field == 0 ? &frame.foreground[1999] : &frame.background[1999];
+        *value = 16;
+        assert(lib_console_write_text_frame(console, &frame) == LIB_STATUS_INVALID_ARGUMENT);
+        assert(probe.frames == 1u);
+        *value = 0;
+    }
     assert(probe.output_length == 5u);
     assert(strcmp(probe.output, "hello") == 0);
     assert(lib_console_set_output_binding(console, &binding) == LIB_STATUS_OK);

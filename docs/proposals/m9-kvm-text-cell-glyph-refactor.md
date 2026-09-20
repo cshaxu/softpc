@@ -5,8 +5,9 @@
 原始请求：“好嘞。准入队列第一条，KVM文本属性中性化，先来个设计稿，我审一审”。
 
 基线 bea66d3f，生产基线为已验收 T71。T72 S1 只调研和交付设计；
-以下结构、接口和 S2/S3 是待审方案，不是已批准的代码变更。
-不修改生产、测试、版本号、EXE、INI、客户机介质或快照格式。
+S1 设计已由 owner 批准，保留平行数组；随后授权“批准执行到t收口标准
+然后等我审核后再正式收口”。S2 实施、S3 审计准入，正式 T 收口仍待审。
+下文估算是 S1 基线；实际交付另行记录。不修改 INI、介质或快照格式。
 当前状态唯一来源是 [CURRENT](../states/CURRENT.md)。
 
 ## 一、建议：只搬走“解释属性位”的职责
@@ -127,7 +128,7 @@ sizeof/offset 测量核对。4 个字节数组无需 packing 或 bitfield。
 | kvm_console_text_frame | 7112 | 9108 | +1996 |
 | kvm_window_frame（图形 union 主导） | 984084 | 984084 | 0 |
 | common_machine_frame | 985112 | 985112 | 0 |
-| lib_console_text_frame | 8080 | 8080 | 0 |
+| lib_console_text_frame | 8084 | 8084 | 0 |
 
 每个文本副本多约 2 KiB；Window/Common 最大分配和图形传输不变。
 Console 待处理帧及 worker 文本副本相应增大，不声称全程序只多 2 KiB。
@@ -170,13 +171,13 @@ common machine_wait/composition 及必要 diagnostics fixture。
 无属性的 text[] 消费者保持原样。实际范围以新字段边界矩阵为准，
 不能为了兑现估算漏测。manifest、说明、静态门禁增量另列。
 
-- **S1（本次）设计审计**：冻结上述有限调用链和前后合同，交付供 owner
-  审阅；代码/测试增删均 0，不重编译。等待设计批准。
-- **S2（待批）一次性迁移**：同一个交付迁移这条链所有生产者、消费者、
+- **S1（已接受）设计审计**：冻结上述有限调用链和前后合同，交付供 owner
+  审阅；代码/测试增删均 0，不重编译。Owner 已批准平行数组设计。
+- **S2（已准入）一次性迁移**：同一个交付迁移这条链所有生产者、消费者、
   验证、缓存、比较和测试；不分成能编译但语义混合的多个过渡版本。
   双宽度构建、后台回归、真实 Win3.1 往返及 snapshot 覆盖后，交付两份
-  EXE 和实际增删统计，等待 owner 手测。
-- **S3（待批）收口审计**：核对全部旧属性解码去向、实际大小/成本、
+  EXE 和实际增删统计，继续已批准的 S3，再等待 owner 手测。
+- **S3（已授权，顺序准入）收口审计**：核对全部旧属性解码去向、实际大小/成本、
   Shared corpus/DAG 和用户测试结果；无新功能，无无限“顺手重构”。
   T 关闭另需 owner 批准。
 
@@ -199,3 +200,70 @@ latest-wins 跳帧及非法帧不覆盖已接受内容。新测试使用真实�
 不能用笼统禁位运算检查误删。
 
 本 S1 仅源码审阅与设计推算，没有动态效果/性能通过声明。
+
+## 八、S2 有限收敛账本
+
+冻结范围为第二节 10 个生产 C/H 路径及其现有调用者，不扩大为全树无缺陷声明。
+单位为生产／比较／验证／输出边界；处置只允许迁移并验证，或明确保留及原因。
+完成条件为下面各行证据通过、双位后台回归及 corpus 门禁通过、实际提交复审；
+T 正式收口另待 owner 审核。以下测试名称对应现有 CTest 项，不新建测试框架。
+
+| 边界 | 处置与证据 |
+| --- | --- |
+| VM 属性和字体选择 | vga-frame-smoke 经真实 driver.copy_frame 检查 512 组；设备、Compat 不动 |
+| Common 状态文字 | composition 检查全容量 fg7/bg0/bank0 |
+| Common 比较 | machine_wait 检查 fg/bg/bank/palette-only 发布与重复抑制，既有字体/map-only 保留 |
+| Base 字段及尺寸 | kvm_frame_copy 检查合法上界、越界、隐藏尾格、小尺寸、两种帧互换和 sizeof |
+| Window 消费 | kvm_frame_damage_mouse 检查 512 组像素、独立 fg1/bank1，既有光标/dirty 测试不变 |
+| Console 消费及准入 | kvm_console_retirement_barrier 检查 512 组 map/颜色、独立 bank，非法值不更改 generation、不唤醒、不输出 |
+| 逻辑 Console | lib_console 检查颜色越界不调用 sink；容量 sizeof 保持 8084 |
+| Win32 输出和缓存 | lib_console_io_contract 检查 256 个原生颜色字及重复帧不重复写；既有失败/裁剪缓存测试保留 |
+| 其余调用者 | runtime_cursor、console_broker_display fixture 迁移；无属性的 text[] 消费者不改 |
+| 保留项 | 字形 bitmap 位运算、Broker 原生颜色编码、VM/Compat 设备事实各有唯一职责 |
+| 历史诊断 | test/support/diagnostics/runtime_boot_smoke.c 已在 TESTS.md 标为不编译的历史程序；旧帧字段早于本 T 已失效，不作为当前 ABI 消费者或通过证据，也不扩大本任务重写它 |
+
+S2 编译实测更正 S1 的逻辑 Console 算术笔误：8084 而非 8080；前后大小不变。
+其他五项布局推算由双位测试断言核验。最终通过结果和实际 diff 记入 S2 历史。
+
+## 九、S2 实施差额与成本审阅
+
+生产 C/H 实际 10 文件 +50/-32，净 +18；测试 C/H 10 文件 +132/-7，净 +125。
+复算方式为 git diff --numstat e0ad4e8f，并按 src/test 下 C/H 分组。
+未扩大预估的生产路径；比预估少的行来自原循环、初始化、比较与失败出口复用，
+没有省略任何规定验证。四份 manifest +25/-25；文档、两份 EXE 单列。
+历史诊断没有作为一个可用程序迁移，因此实际测试文件为 10 个，而非上限 12 个。
+
+有界性能探针采用 O3、真实 kvm_text_frame_validate 函数、volatile 函数指针，
+100 万次 80x25 校验，每轮改变一格 fg 但保持合法，QPC 计时：
+x64 1.931 us/次，x86 1.709 us/次；两次均返回 100 万次 OK。
+这是单机瞬时校验成本，不是新旧整机 benchmark，不证明整机加速。
+探针只存在于 build/t72-proof，记录后删除，不引入产品接口或测试依赖。
+
+现有调用次数按具体输出路径而非“每帧恒定”计：VM 产文本时一次；
+Common 交付复制一次；Window 发布、消费尺寸、文本渲染各一次；
+原生 paint 一次，显示光标时 cursor geometry 再一次，通常合计 6--7 次。
+额外重绘／光标定时独立发生，不能把 7 声称为全局上界。
+Console 路径为 VM、Common 复制、Console 发布三次 Base 检查，之后逻辑
+Console 原有 BMP 循环顺便验证两个颜色值。Common 状态文字无 VM 检查。
+不缓存验证结果，不新增 unchecked 接口；图形帧不进入新增逐格循环。
+
+失败及估算修正均已公开：初次 x64 严格编译发现原生颜色三目表达式的
+整数提升符号警告，改为同型零值；首次尺寸测试发现 S1 算术少算 4 字节，
+改正的是断言/估算，不是改变布局来迎合测试。不得把初次失败记成通过。
+
+## 十、S2 P1 交付验证
+
+两宽度均 Release 全构建通过；Lib 均启用 -Wall -Wextra -Wpedantic -Werror。
+serial background presets: x64 105/105 (164.85s)，x86 105/105 (147.06s)。
+其中 runtime-restart-boot 真实无桌面 Win3.1 PIF 往返通过（57.95s / 56.96s），
+snapshot transaction/cross-process/media/boundary、restart、cursor、组件门禁通过。
+每宽度 5 项 desktop 测试未运行；不宣称本次原生桌面视觉或 Linux runtime 验收。
+文档治理及 diff --check 通过。无 MVDM/Compat、INI、media、snapshot 格式变更。
+
+| 交付 | bytes | 对 S1 基线变化 | SHA256 |
+| --- | ---: | ---: | --- |
+| assets/binary/softpc32.exe | 3659288 | +4096 | 6CF6D5CCC83794B5AAFA62093DDF34BA42A1CFCA4727855CBE3105020B757977 |
+| assets/binary/softpc64.exe | 3063343 | +4608 | 30C8FA052F3EDAF2B15B2BD3E82B2467D4D1ECE9335AA5910C25A189FA3E0A75 |
+
+测试及有界测量证据已在本节和有限账本中保留；自建探针和临时日志清除，
+既有构建树保留供增量验证。P1 推送后按实际提交复审 S2，再准入已批准的 S3。

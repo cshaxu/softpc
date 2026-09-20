@@ -136,6 +136,10 @@ int main(void)
     assert(last_console.base.text_columns == 80u &&
         memcmp(last_console.base.text, "Window active", 13u) == 0 &&
         memcmp(last_console.base.text + KVM_TEXT_COLUMNS * 2u, "Hotkeys", 7u) == 0);
+    for (unsigned i = 0; i < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++i) {
+        assert(last_console.base.foreground[i] == 7u);
+        assert(last_console.base.background[i] == 0u && last_console.base.glyph_bank[i] == 0u);
+    }
     assert(common_ui_publish_frame(ui, &frame, &characters, sequence, 1, 1, 1) == LIB_STATUS_OK);
     assert(status_builds == 1u && console_frames == 1u && window_frames == 1u);
     sequence = 2u;

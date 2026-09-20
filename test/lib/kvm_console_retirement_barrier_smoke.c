@@ -270,6 +270,14 @@ static void check_activation_frame(void)
         assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_UNSUPPORTED);
         rejected.base.text_rows=25; rejected.characters.secondary[255]=0xd800;
         assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
+        rejected.characters.secondary[255]=0;
+        for (unsigned field=0;field<3;++field) {
+            lib_u8 *value=field==0 ? &rejected.base.foreground[1999] :
+                field==1 ? &rejected.base.background[1999] : &rejected.base.glyph_bank[1999];
+            *value=field==2 ? 2 : 16;
+            assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
+            *value=0;
+        }
         assert(kvm_component_mailboxes_capture_frame(&c->base.mailboxes,
             &generation,&copied,sizeof(copied)));
         assert(generation==pending_generation && copied.base.text[0]=='X');
@@ -410,17 +418,31 @@ static void check_character_banks(void)
     assert(lib_console_create(&console.logical_console) == LIB_STATUS_OK);
     assert(lib_console_set_output_binding(console.logical_console, &binding) == LIB_STATUS_OK);
     frame.base.text[0] = frame.base.text[1] = 65;
-    frame.base.attributes[1] = 8;
+    frame.base.foreground[1] = 8;
     frame.characters.primary[65] = 0x263a;
     frame.characters.secondary[65] = 0x2665;
     assert(kvm_console_publish_text_frame(&console, &frame) == LIB_STATUS_OK);
     assert(captured.text[0] == 0x263a && captured.text[1] == 0x263a);
-    frame.base.attribute_font_select = 1;
+    frame.base.glyph_bank[1] = 1;
     assert(kvm_console_publish_text_frame(&console, &frame) == LIB_STATUS_OK);
     assert(captured.text[0] == 0x263a && captured.text[1] == 0x2665);
     frame.characters.secondary[65] = 0x03a9;
     assert(kvm_console_publish_text_frame(&console, &frame) == LIB_STATUS_OK);
     assert(captured.text[1] == 0x03a9);
+    for (unsigned enabled=0;enabled<2;++enabled) {
+        for (unsigned attribute=0;attribute<256;++attribute) {
+            frame.base.foreground[1]=attribute & 15u;
+            frame.base.background[1]=attribute >> 4;
+            frame.base.glyph_bank[1]=enabled && (attribute & 8u);
+            assert(kvm_console_publish_text_frame(&console,&frame)==LIB_STATUS_OK);
+            assert(captured.text[1]==(enabled && (attribute & 8u) ? 0x03a9 : 0x263a));
+            assert(captured.foreground[1]==(attribute & 15u));
+            assert(captured.background[1]==(attribute >> 4));
+        }
+    }
+    frame.base.foreground[1]=1; frame.base.glyph_bank[1]=1;
+    assert(kvm_console_publish_text_frame(&console,&frame)==LIB_STATUS_OK);
+    assert(captured.text[1]==0x03a9 && captured.foreground[1]==1);
     /* KVM scanlines are normalized before the independent Console boundary. */
     const struct { unsigned height, top, bottom, visible, out_bottom; } cases[] = {
         {0,14,15,1,15}, {16,20,21,0,15}, {16,14,31,1,15},

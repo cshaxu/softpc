@@ -2,12 +2,29 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T72.
+M9 T72 S2 is active: migrate neutral text attributes end to end.
+Owner approved execution through T-level audit; formal T closure awaits review.
 
-T72 S1 design draft is delivered for owner review; implementation is not approved.
-See the [design draft](../proposals/m9-kvm-text-cell-glyph-refactor.md) and
-[S1 audit](../history/M9-T72-S1-neutral-text-design.md). T71 remains closed.
+## M9 T72 S2 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner: 批准执行到t收口标准 然后等我审核后再正式收口 |
+| Objective | One migration of VM/status producers, shared text values, both leaves and native Console output; preserve display semantics. |
+| Non-goals | No cell struct, second interface, new state/cache/thread, graphics/input/lifecycle/media/snapshot change; MVDM and Compat untouched. |
+| Reference Baseline | e0ad4e8f; accepted T71 behavior. |
+| Candidate Proposal | [Approved design](../proposals/m9-kvm-text-cell-glyph-refactor.md). |
+| Files And ABI Surface | Ten planned production C/H paths and fixtures; source ABI migrated atomically. |
+| Applicable Rules | Execution, Coding, Architecture, Documentation, UI and source layout; corresponding governance skills. |
+| Verification | 512-case equivalence, neutral bank/boundary/resource cases, dual-width sizeof, manifest/DAG; both Release builds and serial background presets including Win3.1 roundtrips/snapshots. Desktop tests require reserved access. |
+| Expected Markers | PC decoding only VM; native encoding only Broker; rejected publication does not mutate mailbox. |
+| Asset Needs | Existing test disposable media; owned build/t72-proof logs/probes limited to 10 MiB and 5 minutes each, removed after recording. Never alter user INI/media. |
+| Reporting Requirements | Actual additions/removals/net, layouts, finite proof and package hashes/links; P1 then coordinator P2 review and S3 audit. |
+| Stop Conditions | Unexpected device/behavior change, broad architecture or unexplained significant growth. |
+| Exit Criteria | Verified complete P1 push and actual-change review; proceed S3, not formal T closure. |
+| Original Owner Request | 行 那就维持现在设计; 批准执行到t收口标准 然后等我审核后再正式收口 |
+| Similar-Issue Sweep | Old fields/decoding, producers, comparisons, native output and shared/product fixtures. |
 
 ## Current Technical Baseline
 

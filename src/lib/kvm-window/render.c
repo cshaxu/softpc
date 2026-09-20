@@ -24,11 +24,10 @@ void kvm_window_render_text(const kvm_window_frame *frame, lib_u32 *pixels, lib_
         for (column = 0u; column < frame->text.base.text_columns; ++column) {
             lib_size index = (lib_size)row * KVM_TEXT_COLUMNS + column;
             lib_u8 character = frame->text.base.text[index];
-            lib_u16 attribute = frame->text.base.attributes[index];
+            const lib_u8 *font = frame->text.base.glyph_bank[index] != 0u ?
+                frame->text.secondary_font : frame->text.font;
             lib_u32 scan;
             for (scan = 0u; scan < cell_height; ++scan) {
-                const lib_u8 *font = frame->text.base.attribute_font_select != 0u &&
-                    (attribute & 0x08u) != 0u ? frame->text.secondary_font : frame->text.font;
                 lib_u8 bits = font[(lib_size)character * 16u + scan];
                 lib_u32 *row_pixels = pixels +
                     ((lib_size)row * cell_height + scan) *
@@ -36,8 +35,8 @@ void kvm_window_render_text(const kvm_window_frame *frame, lib_u32 *pixels, lib_
                 lib_u32 bit;
                 for (bit = 0u; bit < 8u; ++bit)
                     row_pixels[bit] = frame->text.base.text_palette[
-                        (bits & (0x80u >> bit)) != 0u ? attribute & 0x0fu :
-                            (attribute >> 4) & 0x0fu];
+                        (bits & (0x80u >> bit)) != 0u ? frame->text.base.foreground[index] :
+                            frame->text.base.background[index]];
             }
         }
     }

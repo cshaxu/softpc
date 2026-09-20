@@ -16,6 +16,8 @@ object always accepts replacement; an absent callback makes its write return
 NOT_CURRENT. Input generation and its separate event gate are unchanged.
 
 Text-frame cells contain copied BMP Unicode values, not encoded byte indices.
+Separate foreground/background arrays contain palette indices 0..15, not native
+attribute words. Invalid visible colours are rejected before calling the sink.
 The native renderer forwards them without code-page interpretation. Character
 mapping belongs to the producer; this component stores no encoding table or
 bitmap font and cannot reproduce arbitrary uploaded fonts.

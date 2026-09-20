@@ -28,6 +28,18 @@ static void check_validation(void)
     text.base = source.text.base; /* Console does not own bitmap bounds. */
     assert(kvm_console_text_frame_validate(&text) == LIB_STATUS_OK);
     source.text.base.font_height = 0u;
+    for (unsigned field = 0; field < 3; ++field) {
+        lib_u8 *value = field == 0 ? &source.text.base.foreground[1999] :
+            field == 1 ? &source.text.base.background[1999] : &source.text.base.glyph_bank[1999];
+        *value = field == 2 ? 1 : 15;
+        assert(kvm_window_frame_validate(&source) == LIB_STATUS_OK);
+        ++*value;
+        assert(kvm_window_frame_validate(&source) == LIB_STATUS_INVALID_ARGUMENT);
+        source.text.base.text_rows = 1;
+        assert(kvm_window_frame_validate(&source) == LIB_STATUS_OK); /* Invisible tail. */
+        source.text.base.text_rows = 25;
+        *value = 0;
+    }
     source.text.base.text_rows++;
     assert(kvm_window_frame_validate(&source) == LIB_STATUS_UNSUPPORTED);
     text.base.text_columns++;
@@ -71,6 +83,10 @@ static void check_copy(void)
 int main(void)
 {
     lib_u32 generation, old;
+    assert(sizeof(kvm_text_frame) == 8084);
+    assert(sizeof(kvm_window_text_frame) == 16276);
+    assert(sizeof(kvm_console_text_frame) == 9108);
+    assert(sizeof(kvm_window_frame) == 984084);
     check_validation();
     lib_memory_set(&source, 0x3c, sizeof(source));
     source.valid = 1u;
@@ -78,6 +94,9 @@ int main(void)
     source.text.base.text_columns = 80u;
     source.text.base.text_rows = 25u;
     source.text.base.font_height = 0u;
+    lib_memory_set(source.text.base.foreground, 15, sizeof(source.text.base.foreground));
+    lib_memory_set(source.text.base.background, 2, sizeof(source.text.base.background));
+    lib_memory_set(source.text.base.glyph_bank, 1, sizeof(source.text.base.glyph_bank));
     check_copy(); /* No inactive graphics payload is copied. */
     assert(kvm_component_mailboxes_create(&mailbox, &storage, sizeof(storage)) == LIB_STATUS_OK);
     lib_memory_set(&storage, 0x96, sizeof(storage));
@@ -111,6 +130,9 @@ int main(void)
     source.graphics = 0u;
     source.text.base.text_columns = 80u; source.text.base.text_rows = 25u;
     source.text.base.font_height = 0u;
+    lib_memory_set(source.text.base.foreground, 15, sizeof(source.text.base.foreground));
+    lib_memory_set(source.text.base.background, 2, sizeof(source.text.base.background));
+    lib_memory_set(source.text.base.glyph_bank, 1, sizeof(source.text.base.glyph_bank));
     check_copy(); /* Graphics -> text never exposes the old pixels. */
     assert(kvm_component_mailboxes_publish_frame(&mailbox, &source,
         kvm_window_frame_size_bytes(&source)) == LIB_STATUS_OK);

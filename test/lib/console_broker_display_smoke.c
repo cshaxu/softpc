@@ -263,7 +263,10 @@ int main(void)
     frame.cursor_row = 23; frame.cursor_column = 7;
     frame.cursor_bottom = 15; /* intentionally hidden */
     for (unsigned i=0; i<80u*25u; ++i) frame.text[i]='#';
-    for (unsigned i = 0; i < 80 * 25; ++i) frame.attributes[i] = 0x1e;
+    for (unsigned i = 0; i < 80 * 25; ++i) {
+        frame.foreground[i] = 14;
+        frame.background[i] = 1;
+    }
     frame.palette[1] = 0x123456;
     for (int round = 0; round < 3; ++round) {
         assert(console_broker_replace(broker, cooked, raw, CONSOLE_BROKER_RAW_EVENTS) == 0);

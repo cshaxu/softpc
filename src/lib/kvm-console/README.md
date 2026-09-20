@@ -6,6 +6,8 @@ that object. It never opens, registers, or renders native Console I/O.
 Publication takes a `kvm_console_text_frame`: common text fields plus two copied
 256-entry BMP character maps. It has no graphics or bitmap-font storage.
 The caller supplies character meaning; this component has no built-in encoding.
+Each cell's explicit glyph bank selects its character map independently of colour.
+Foreground/background indices pass unchanged to the logical Console boundary.
 Malformed text returns INVALID_ARGUMENT before changing pending output or
 notifying the worker. Valid text after STOP returns INVALID_STATE.
 The public component contract is cross-platform. This corpus currently has a

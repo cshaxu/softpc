@@ -89,7 +89,8 @@ typedef struct lib_console_text_frame {
     lib_u16 columns;
     lib_u16 rows;
     lib_u16 text[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS]; /* BMP characters */
-    lib_u16 attributes[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
+    lib_u8 foreground[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS]; /* palette index 0..15 */
+    lib_u8 background[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS]; /* palette index 0..15 */
     lib_u32 palette[16u];
     lib_i32 cursor_column;
     lib_i32 cursor_row;

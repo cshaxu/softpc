@@ -24,10 +24,11 @@ typedef struct kvm_text_frame {
     lib_u8 cursor_visible;
     lib_u8 cursor_phase;
     lib_u8 text[KVM_TEXT_COLUMNS * KVM_TEXT_ROWS];
-    lib_u16 attributes[KVM_TEXT_COLUMNS * KVM_TEXT_ROWS];
+    lib_u8 foreground[KVM_TEXT_COLUMNS * KVM_TEXT_ROWS]; /* palette index 0..15 */
+    lib_u8 background[KVM_TEXT_COLUMNS * KVM_TEXT_ROWS]; /* palette index 0..15 */
+    lib_u8 glyph_bank[KVM_TEXT_COLUMNS * KVM_TEXT_ROWS]; /* 0 primary, 1 secondary */
     lib_u32 text_palette[16u]; /* 0x00RRGGBB */
     lib_u32 font_height;
-    lib_u32 attribute_font_select;
 } kvm_text_frame;
 
 static inline lib_status kvm_text_frame_validate(const kvm_text_frame *frame)
@@ -36,6 +37,13 @@ static inline lib_status kvm_text_frame_validate(const kvm_text_frame *frame)
         return LIB_STATUS_INVALID_ARGUMENT;
     if (frame->text_columns > KVM_TEXT_COLUMNS || frame->text_rows > KVM_TEXT_ROWS)
         return LIB_STATUS_UNSUPPORTED;
+    for (lib_size row = 0u; row < frame->text_rows; ++row) {
+        for (lib_size column = 0u; column < frame->text_columns; ++column) {
+            lib_size index = row * KVM_TEXT_COLUMNS + column;
+            if (frame->foreground[index] > 15u || frame->background[index] > 15u ||
+                frame->glyph_bank[index] > 1u) return LIB_STATUS_INVALID_ARGUMENT;
+        }
+    }
     return LIB_STATUS_OK;
 }
 

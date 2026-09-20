@@ -619,6 +619,30 @@ static void verify_driver_geometry(softpc_machine *machine)
                 }
                 assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
             }
+            {
+                const void *surface;
+                uint32_t columns, rows, stride, cell_bytes;
+                unsigned saved_select = get_attrib_font_select();
+                assert(softpc_machine_presentation_text(machine, &surface,
+                    &columns, &rows, &stride, &cell_bytes));
+                assert(surface && cell_bytes >= 2);
+                unsigned char *cells = (unsigned char *)surface;
+                unsigned char saved_attribute = cells[1];
+                for (unsigned enabled = 0; enabled < 2; ++enabled) {
+                    set_attrib_font_select(enabled);
+                    for (unsigned attribute = 0; attribute < 256; ++attribute) {
+                        cells[1] = (unsigned char)attribute;
+                        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK);
+                        assert(frame->window.valid && !frame->window.graphics);
+                        assert(frame->window.text.base.foreground[0] == (attribute & 15u));
+                        assert(frame->window.text.base.background[0] == (attribute >> 4));
+                        assert(frame->window.text.base.glyph_bank[0] ==
+                            (unsigned)(enabled && (attribute & 8u)));
+                    }
+                }
+                cells[1] = saved_attribute;
+                set_attrib_font_select(saved_select);
+            }
             const lib_u16 *map = frame->characters.primary;
             assert(map[0]==' ' && map['A']=='A');
             assert(map[1]==0x263a && map[0x7f]==0x2302);

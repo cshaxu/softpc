@@ -175,8 +175,10 @@ lib_status lib_console_write_text_frame(lib_console *console,
         return LIB_STATUS_UNSUPPORTED;
     for (lib_size row = 0u; row < frame->rows; ++row) {
         for (lib_size column = 0u; column < frame->columns; ++column) {
-            lib_u16 character = frame->text[row * LIB_CONSOLE_TEXT_COLUMNS + column];
-            if (character >= 0xd800u && character <= 0xdfffu)
+            lib_size index = row * LIB_CONSOLE_TEXT_COLUMNS + column;
+            lib_u16 character = frame->text[index];
+            if ((character >= 0xd800u && character <= 0xdfffu) ||
+                frame->foreground[index] > 15u || frame->background[index] > 15u)
                 return LIB_STATUS_INVALID_ARGUMENT;
         }
     }

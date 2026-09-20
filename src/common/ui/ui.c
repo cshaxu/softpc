@@ -290,7 +290,7 @@ static void common_ui_status_frame(kvm_console_text_frame *frame,
     frame->base.cursor_row = -1;
     for (index = 0u; index < sizeof(frame->base.text); ++index) {
         frame->base.text[index] = ' ';
-        frame->base.attributes[index] = 0x07u;
+        frame->base.foreground[index] = 7u;
     }
     for (index = 0u; index < 256u; ++index) {
         lib_u16 character = index >= 32u && index < 127u ? (lib_u16)index : ' ';

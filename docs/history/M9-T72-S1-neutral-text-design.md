@@ -58,3 +58,7 @@ between historical evidence and future tests. Console's native output boundary
 is explicitly proposed, not already changed. Documentation governance passes.
 S1 draft delivery is reviewed; this does not accept the design on the owner's
 behalf or authorize S2. Wait for owner feedback with T72 open.
+
+Owner subsequently approved the parallel-array design and execution through
+S2/S3 audit readiness, explicitly reserving formal T closure for review. S1 is
+accepted; S2 admission is in CURRENT, not inferred from the earlier draft.
