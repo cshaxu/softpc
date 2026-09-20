@@ -626,16 +626,31 @@ static void verify_driver_geometry(softpc_machine *machine)
                 frame->window.image.width, frame->window.image.height);
         assert(frame->window.image.width == width && frame->window.image.height == height);
         assert(frame->window.image.stride == width);
-        assert(frame->window.image.dirty_right == rect.Right);
+        assert(memcmp(frame->window.image.pixels, bits, width * height) == 0);
         rect.Left = (SHORT)(width / 2u); rect.Right = (SHORT)(width - 1u);
         assert(softpc_standalone_dib_damage(&rect));
         assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
-        assert(frame->window.image.width == width && frame->window.image.dirty_right == rect.Right);
+        assert(frame->window.image.width == width);
         assert(memcmp(frame->window.image.pixels, bits, width * height) == 0);
         /* A graphics route with no complete dirty frame must publish nothing.
            It must never substitute the text surface: restoration relies on
            this same rule while the indexed painter is being rebuilt. */
         assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
+        {
+            const BITMAPINFO *dib = (const BITMAPINFO *)info;
+            PALETTEENTRY colour = { dib->bmiColors[0].rgbRed,
+                dib->bmiColors[0].rgbGreen, dib->bmiColors[0].rgbBlue, 0 };
+            colour.peRed ^= 0xffu;
+            softpc_standalone_dib_set_palette_entries(&colour, 1u);
+            assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
+            assert(frame->window.image.palette[0] == ((lib_u32)colour.peRed << 16u |
+                (lib_u32)colour.peGreen << 8u | colour.peBlue));
+            assert(memcmp(frame->window.image.pixels, bits, width * height) == 0);
+            assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
+            colour.peRed ^= 0xffu;
+            softpc_standalone_dib_set_palette_entries(&colour, 1u);
+            assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
+        }
     }
     vm_driver_destroy(adapter);
     free(frame);

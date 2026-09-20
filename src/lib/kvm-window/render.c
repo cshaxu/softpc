@@ -44,42 +44,39 @@ void kvm_window_render_text(const kvm_window_frame *frame, lib_u32 *pixels, lib_
 }
 
 int kvm_window_render_graphics(const kvm_window_frame *frame, lib_u32 *pixels,
-    lib_u32 width, lib_u32 height, lib_u32 *palette, int *valid, kvm_window_rect *changed)
+    lib_u32 width, lib_u32 height, int *valid, kvm_window_rect *changed)
 {
-    int full_refresh;
-    lib_i32 left;
-    lib_i32 top;
-    lib_i32 right;
-    lib_i32 bottom;
+    lib_i32 left = (lib_i32)width;
+    lib_i32 top = (lib_i32)height;
+    lib_i32 right = 0;
+    lib_i32 bottom = 0;
     lib_u32 row;
 
-    if (!frame || !pixels || !changed || frame->graphics == 0u ||
+    if (!frame || !pixels || !valid || !changed || frame->graphics == 0u ||
         width != frame->image.width ||
         height != frame->image.height) return 0;
-    full_refresh = !*valid || lib_memory_compare(palette,
-        frame->image.palette, KVM_WINDOW_GRAPHICS_PALETTE_ENTRIES * sizeof(*palette)) != 0;
-    left = full_refresh ? 0 : frame->image.dirty_left;
-    top = full_refresh ? 0 : frame->image.dirty_top;
-    right = full_refresh ? (lib_i32)frame->image.width - 1 : frame->image.dirty_right;
-    bottom = full_refresh ? (lib_i32)frame->image.height - 1 : frame->image.dirty_bottom;
-    if (left < 0) left = 0;
-    if (top < 0) top = 0;
-    if (right >= (lib_i32)frame->image.width) right = (lib_i32)frame->image.width - 1;
-    if (bottom >= (lib_i32)frame->image.height) bottom = (lib_i32)frame->image.height - 1;
-    if (right < left || bottom < top) return 0;
-    for (row = (lib_u32)top; row <= (lib_u32)bottom; ++row) {
+    /* The surface is the rendered baseline, independent of skipped publications.
+     * Compare resolved colours so palette changes need no separate cache. */
+    for (row = 0u; row < height; ++row) {
         const lib_u8 *source = frame->image.pixels + row * frame->image.stride;
         lib_u32 *destination = pixels + row * width;
         lib_u32 column;
-        for (column = (lib_u32)left; column <= (lib_u32)right; ++column)
-            destination[column] = frame->image.palette[source[column]];
+        for (column = 0u; column < width; ++column) {
+            lib_u32 colour = frame->image.palette[source[column]];
+            if (!*valid || destination[column] != colour) {
+                destination[column] = colour;
+                if ((lib_i32)column < left) left = (lib_i32)column;
+                if ((lib_i32)row < top) top = (lib_i32)row;
+                if ((lib_i32)column + 1 > right) right = (lib_i32)column + 1;
+                bottom = (lib_i32)row + 1;
+            }
+        }
     }
-    lib_memory_copy(palette, frame->image.palette,
-        KVM_WINDOW_GRAPHICS_PALETTE_ENTRIES * sizeof(*palette));
     *valid = 1;
+    if (right == 0) return 0;
     changed->left = left;
     changed->top = top;
-    changed->right = right + 1;
-    changed->bottom = bottom + 1;
+    changed->right = right;
+    changed->bottom = bottom;
     return 1;
 }

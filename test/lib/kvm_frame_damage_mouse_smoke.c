@@ -9,16 +9,23 @@ static kvm_window_frame frame, received;
 
 static void damage(void)
 {
-    lib_u32 generation = 0u;
+    lib_u32 generation = 0u, old;
+    lib_u32 surface[16] = {0};
+    kvm_window_rect changed;
+    int valid = 0;
     assert(kvm_component_mailboxes_create(&window.base.mailboxes, &window.pending_frame,
         sizeof(window.pending_frame)) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes, NULL, NULL) == LIB_STATUS_OK);
     frame.valid = frame.graphics = 1u;
     frame.image.width = frame.image.stride = 4u;
     frame.image.height = 4u;
+    frame.image.palette[1] = 0x112233u;
+    frame.image.palette[2] = 0x445566u;
     assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
-    assert(received.image.dirty_right == 3 && received.image.dirty_bottom == 3);
+    /* First all-black frame still invalidates the entire surface. */
+    assert(kvm_window_render_graphics(&received, surface, 4, 4, &valid, &changed));
+    assert(changed.left == 0 && changed.top == 0 && changed.right == 4 && changed.bottom == 4);
     {
         lib_u32 pending_generation = generation;
         assert(base_sync_event_wait(window.base.mailboxes.wake, 0u) == BASE_SYNC_WAIT_SIGNALED);
@@ -36,48 +43,49 @@ static void damage(void)
         frame = received;
     }
     kvm_component_mailboxes_acknowledge_frame(&window.base.mailboxes, generation);
-    frame.image.dirty_left = frame.image.dirty_top = frame.image.dirty_right = frame.image.dirty_bottom = 1;
+    /* A is overwritten by B before consumption; B contains both changes. */
     frame.image.pixels[5] = 1u;
     assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
-    frame.image.dirty_left = frame.image.dirty_top = frame.image.dirty_right = frame.image.dirty_bottom = 2;
     frame.image.pixels[10] = 2u;
     assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
-    assert(received.image.dirty_left == 1 && received.image.dirty_top == 1 &&
-        received.image.dirty_right == 2 && received.image.dirty_bottom == 2);
-    assert(received.image.pixels[5] == 1u && received.image.pixels[10] == 2u);
-    kvm_component_mailboxes_acknowledge_frame(&window.base.mailboxes, generation);
-    assert(!kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
-    assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
-    assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
-    assert(received.image.dirty_left == 2 && received.image.dirty_top == 2);
-    /* Failed output has no acknowledgement; capture remains available.
-     * A newer publication cannot be erased by the older write's success. */
-    lib_u32 old = generation;
-    assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
-    assert(generation == old);
+    assert(kvm_window_render_graphics(&received, surface, 4, 4, &valid, &changed));
+    assert(changed.left == 1 && changed.top == 1 && changed.right == 3 && changed.bottom == 3);
+    assert(surface[5] == 0x112233u && surface[10] == 0x445566u);
+    assert(!kvm_window_render_graphics(&received, surface, 4, 4, &valid, &changed));
+    /* Failed output keeps its capture; old acknowledgement cannot erase new data. */
+    old = generation;
+    frame.image.pixels[0] = 2u;
     assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
     kvm_component_mailboxes_acknowledge_frame(&window.base.mailboxes, old);
     assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
     assert(generation != old);
+    assert(kvm_window_render_graphics(&received, surface, 4, 4, &valid, &changed));
+    assert(changed.left == 0 && changed.top == 0 && changed.right == 1 && changed.bottom == 1);
     kvm_component_mailboxes_acknowledge_frame(&window.base.mailboxes, generation);
+    assert(!kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
+    /* Palette-only changes affect exactly the pixels using that entry. */
     frame.image.palette[1] = 0xffu;
-    assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
-    assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
-    assert(received.image.dirty_left == 0 && received.image.dirty_right == 3);
-    frame.image.width = frame.image.stride = 3u;
-    assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
-    assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
-    assert(received.image.dirty_left == 0 && received.image.dirty_right == 2);
-    frame.graphics = 0u; frame.text.base.text_columns = 80u; frame.text.base.text_rows = 25u;
-    frame.text.base.font_height = 0u;
-    assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
-    frame.graphics = 1u;
-    frame.image.width = frame.image.stride = 3u;
-    frame.image.height = 4u;
-    assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
-    assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
-    assert(received.image.dirty_left == 0 && received.image.dirty_bottom == 3);
+    assert(kvm_window_render_graphics(&frame, surface, 4, 4, &valid, &changed));
+    assert(surface[5] == 0xffu && changed.left == 1 && changed.top == 1 &&
+        changed.right == 2 && changed.bottom == 2);
+    frame.image.palette[255] = 0xffffffu;
+    assert(!kvm_window_render_graphics(&frame, surface, 4, 4, &valid, &changed));
+    /* Different indices with the same resolved colour do not damage the surface. */
+    frame.image.palette[3] = frame.image.palette[2];
+    frame.image.pixels[0] = 3;
+    assert(!kvm_window_render_graphics(&frame, surface, 4, 4, &valid, &changed));
+    /* Row padding is not part of the displayed pixels. */
+    frame.image.width = 3;
+    valid = 0;
+    assert(kvm_window_render_graphics(&frame, surface, 3, 4, &valid, &changed));
+    assert(changed.right == 3 && changed.bottom == 4);
+    frame.image.pixels[3] = 255;
+    assert(!kvm_window_render_graphics(&frame, surface, 3, 4, &valid, &changed));
+    /* Recreated or text-overwritten surfaces require full invalidation. */
+    valid = 0;
+    assert(kvm_window_render_graphics(&frame, surface, 3, 4, &valid, &changed));
+    assert(changed.left == 0 && changed.top == 0 && changed.right == 3 && changed.bottom == 4);
     kvm_component_mailboxes_destroy(&window.base.mailboxes);
 }
 

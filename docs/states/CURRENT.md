@@ -2,33 +2,40 @@
 
 ## Current Work
 
-Owner accepted T71 S8: "测试通过。下一个S". S8 closes; S9 is admitted
-for bounded frame FIFO and consumer-owned coalescing, beginning with storage
-and full-queue scheduling design. Production is unchanged. T71 remains open;
-S10 semantic audit remains inactive.
+Owner accepted T71 S8: "测试通过。下一个S". S8 is closed. S9 implements
+the revised complete-frame/latest-wins design and Window-local surface
+comparison; dual-width full suites pass. Delivery is pending commit/review and
+owner testing. T71 remains open; S10 semantic audit remains inactive.
 
 ## M9 T71 S9 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves S7 display repair, S8 request completion, S9 FIFO and S10 semantic audit. Each S must build/test, commit/push and leave a clean worktree, then wait for owner testing. |
-| Objective | Preserve accepted frame order through Common and opaque Base transport; coalesce at the owning Window/Console consumer without losing dirty updates. |
-| Non-goals | No input, snapshot format, display capacity, VM/Compat/MVDM or media change; no unbounded storage or second VM-to-presenter route. |
-| Reference Baseline | 81dacb61; owner accepted S8 dual-width packages. |
+| Admission And Approval | Owner accepted S8 and replaced the S9 FIFO plan with complete-frame/latest-wins transport and Window-local comparison. Each S builds/tests, commits/pushes and leaves a clean worktree, then waits for owner testing. |
+| Objective | Publish complete snapshots on machine display change; keep Base opaque/latest-wins; Window derives damage by comparing its RGB surface with the latest complete frame. |
+| Non-goals | No FIFO, new queue/thread/cache, input, snapshot format, display capacity, Compat/MVDM or media change; no second VM-to-presenter route. |
+| Reference Baseline | 65ad144a; owner accepted S8 dual-width packages. |
 | Candidate Proposal | [Regression brief](../proposals/m9-kvm-mode-transition-regression.md). |
-| Files And ABI Surface | Lib kvm-base mailbox/component support, Window/Console consumers; Common machine/session publication and consumption; related tests/manifests. Typed leaf frame/input schemas stay intact. |
+| Files And ABI Surface | Base mailbox/component support, Window render/frame and Console call site; VM removes transported dirty coordinates; Common complete-frame contract and tests. Input ABI unchanged; graphics frame no longer carries producer dirty. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and shared governance skills. |
-| Verification | Delayed upstream A/B dirty and leaf consumers; FIFO order, mode/size/palette, full queues, STOP/failure and save/load progress; serial full x86/x64 suites and real Win3.1 PIF roundtrips. |
-| Expected Markers | No accepted dirty update disappears before consumption; Base has no frame merge callback; synchronous requests cannot deadlock behind frame drainage. |
-| Asset Needs | Existing overlay-only fixtures; no new media or trace admitted. Preserve owner INI edit verbatim. |
-| Reporting Requirements | Audit storage/full behavior and estimate before production edits; afterward production/test added/deleted/net, allocated footprint and both EXEs. |
-| Stop Conditions | Cannot reconcile bounded FIFO with synchronous progress and existing UX; need for unbounded allocation, silent accepted-frame loss, new worker/side channel or product-specific workaround. |
+| Verification | Delayed upstream A/B and leaf latest-wins; compare actual pixels, no-change/palette/stride/size/mode, cumulative native invalidation, STOP/failure, save/load; serial full dual-width suites and PIF roundtrips. |
+| Expected Markers | Latest full frame repairs all differences from surface even after skipped frames; Base has no merge callback; no new queue wait. |
+| Asset Needs | Existing overlay-only fixtures; owned build/t71-s9/render-bench.c and two EXEs, 30-second runs and exact-file cleanup after results; no media or trace. Preserve owner INI verbatim. |
+| Reporting Requirements | Report source sweep and estimate before edits; afterward actual production/test additions/deletions/net, render performance and storage footprint plus both EXEs. |
+| Stop Conditions | Need for new frame cache/thread, product-specific workaround or a change to readiness, input or snapshot semantics. |
 | Exit Criteria | Focused fault matrix and full dual-width suites pass; reviewed P pushed, clean worktree, both binaries supplied; wait for owner testing. |
-| Original Owner Request | 测试通过。下一个S。Prior direction: kvm-base的 frame mailbox也必须是FIFO的，然后kvm-console和kvm-window收到以后自行转成正确的latest-win再消费。 |
+| Original Owner Request | 我觉得可以用这个方案重构，准入修复S9，现在开始。Revised scheme: complete frames on machine dirty; Base opaque latest-wins; Window compares latest frame with its own rendered surface. |
 | Similar-Issue Sweep | Every frame publication/notification/capture/ack path from Machine through Session/UI to both leaves; closure, inactive Console, notification failure and run replacement. |
 
 ## Current Technical Baseline
+
+- S9: Base only copies latest complete bytes; Window compares its existing RGB
+  surface and invalidates changed bounds. No additional buffer/thread, input or
+  snapshot-format change. Production +41/-89 (net -48); tests +174/-44 (net +130).
+  Final x64 110/110 (173.66s), x86 110/110 (163.13s); both EXEs rebuilt.
+  Compat/MVDM, INI and media unchanged. Exact hashes and bounded performance
+  measurements are in the active proposal. Owner acceptance remains pending.
 
 - S8: synchronous request admission and terminal completion share a short
   Machine-owned lock; pending ordinary pause cannot prematurely complete save.

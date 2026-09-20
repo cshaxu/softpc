@@ -48,6 +48,12 @@ lib_status common_ui_publish_frame(common_ui *ui, const kvm_window_frame *frame,
     /* An old Window can remain actual until its queued destruction completion;
      * graphics, however, must never publish before Window creation completes. */
     assert(console && (!frame->graphics || window));
+    if (frame->graphics) {
+        /* Delayed notification A receives full B, including A's earlier pixels. */
+        assert(frame->image.width == 4 && frame->image.height == 4);
+        assert(frame->image.pixels[0] == 1 && frame->image.pixels[15] == 2);
+        assert(frame->image.palette[1] == 0x123456);
+    }
     ++deliveries;
     delivered_sequence = sequence;
     (void)characters;
@@ -84,6 +90,11 @@ int main(void)
     published.window.valid = 1u;
     published.sequence = 3u;
     published.window.graphics = 1u;
+    published.window.image.width = published.window.image.stride = 4;
+    published.window.image.height = 4;
+    published.window.image.pixels[0] = 1; /* A changed the first corner. */
+    published.window.image.pixels[15] = 2; /* B changed the opposite corner. */
+    published.window.image.palette[1] = 0x123456;
     event.kind = COMMON_SESSION_EVENT_FRAME_COMPLETED;
     event.run_generation = 7u;
     event.value.frame.sequence = 2u;

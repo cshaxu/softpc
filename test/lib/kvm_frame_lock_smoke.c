@@ -26,7 +26,7 @@ static DWORD WINAPI compete(void *unused)
     (void)unused;
     InterlockedExchange(&contender, (LONG)GetCurrentThreadId());
     if (operation == 0)
-        assert(kvm_component_mailboxes_publish_frame(&mailbox, &frame, sizeof(frame), NULL) == LIB_STATUS_OK);
+        assert(kvm_component_mailboxes_publish_frame(&mailbox, &frame, sizeof(frame)) == LIB_STATUS_OK);
     else if (operation == 1) {
         assert(kvm_component_mailboxes_capture_frame(&mailbox, &generation, &copy, sizeof(copy)));
         assert(copy == 80 && generation == 1);
@@ -46,7 +46,7 @@ int main(void)
         kvm_component_control taken;
         const kvm_component_control title = { .kind = 42u };
         assert(kvm_component_mailboxes_create(&mailbox, &storage, sizeof(storage)) == LIB_STATUS_OK);
-        assert(kvm_component_mailboxes_publish_frame(&mailbox, &frame, sizeof(frame), NULL) == LIB_STATUS_OK);
+        assert(kvm_component_mailboxes_publish_frame(&mailbox, &frame, sizeof(frame)) == LIB_STATUS_OK);
         contended = CreateEventA(NULL, TRUE, FALSE, NULL);
         assert(contended);
         base_sync_mutex *held = operation == 3 ? mailbox.control_lock : mailbox.frame_lock;
@@ -68,7 +68,7 @@ int main(void)
         if (operation == 2) {
             assert(kvm_component_mailboxes_take_control(&mailbox, &taken));
             assert(taken.kind == KVM_COMPONENT_CONTROL_STOP);
-            assert(kvm_component_mailboxes_publish_frame(&mailbox, &frame, sizeof(frame), NULL) == LIB_STATUS_INVALID_STATE);
+            assert(kvm_component_mailboxes_publish_frame(&mailbox, &frame, sizeof(frame)) == LIB_STATUS_INVALID_STATE);
         }
         InterlockedExchange(&contender, 0);
         CloseHandle(thread);

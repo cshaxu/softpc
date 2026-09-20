@@ -28,7 +28,6 @@ typedef struct kvm_win32_window_context {
     lib_u32 *surface_pixels;
     lib_u32 surface_width;
     lib_u32 surface_height;
-    lib_u32 graphics_palette[KVM_WINDOW_GRAPHICS_PALETTE_ENTRIES];
     int graphics_valid;
     lib_u32 displayed_sequence;
     kvm_keyboard_normalizer keyboard_normalizer;
@@ -481,7 +480,7 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
         kvm_window_rect display;
         lib_win32_rect target;
         if (kvm_window_render_graphics(&context->frame, context->surface_pixels,
-                context->surface_width, context->surface_height, context->graphics_palette,
+                context->surface_width, context->surface_height,
                 &context->graphics_valid, &changed) &&
             win32_window_display_rect(context, width, height, &display)) {
             kvm_window_map_dirty_rect(&changed, &display, width, height, &changed_target);
@@ -489,6 +488,7 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
             if (!win32_window_invalidate(window, context, &target)) return;
         }
     } else {
+        context->graphics_valid = 0;
         kvm_window_render_text(&context->frame, context->surface_pixels,
             context->surface_width, context->surface_height);
         if (!win32_window_invalidate(window, context, LIB_NULL)) return;

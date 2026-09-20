@@ -245,6 +245,51 @@ static void check(base_sync_wait_result result, unsigned requested_action)
     assert(common_machine_destroy(active) == LIB_STATUS_OK);
 }
 
+static common_machine_frame candidate, captured;
+static lib_status copied_frame(void *context, common_machine_frame *out)
+{
+    (void)context;
+    *out = candidate;
+    return LIB_STATUS_OK;
+}
+
+static void check_publication(void)
+{
+    common_machine_driver driver = {0};
+    driver.reset = reset; driver.run = run; driver.request_stop = stop;
+    driver.set_heartbeat = set_heartbeat; driver.set_executor_callback = callback;
+    driver.deliver_input = input; driver.copy_frame = copied_frame;
+    driver.request_wake = stop;
+    assert(common_machine_create(&active, &driver) == LIB_STATUS_OK);
+    common_machine_begin_cold_run(active, LIB_FALSE);
+    assert(common_machine_publish(active) == LIB_STATUS_OK); /* Not ready. */
+    assert(common_machine_published_frame_sequence(active) == 0);
+    candidate.window.valid = candidate.window.graphics = 1;
+    candidate.window.image.width = candidate.window.image.stride = 4;
+    candidate.window.image.height = 4;
+    assert(common_machine_publish(active) == LIB_STATUS_OK); /* First complete frame. */
+    candidate.window.image.pixels[0] = 1;
+    assert(common_machine_publish(active) == LIB_STATUS_OK); /* A, not consumed. */
+    candidate.window.image.pixels[15] = 2;
+    assert(common_machine_publish(active) == LIB_STATUS_OK); /* B retains A. */
+    assert(common_machine_copy_published_frame(active, &captured, common_machine_run_generation(active)));
+    assert(captured.sequence == 3 && captured.window.image.pixels[0] == 1 &&
+        captured.window.image.pixels[15] == 2);
+    candidate.window.valid = 0; /* Driver reports no subsequent display change. */
+    assert(common_machine_publish(active) == LIB_STATUS_OK);
+    assert(common_machine_published_frame_sequence(active) == 3);
+    candidate = (common_machine_frame){0};
+    candidate.window.valid = 1;
+    candidate.window.text.base.text_columns = candidate.window.text.base.text_rows = 1;
+    assert(common_machine_publish(active) == LIB_STATUS_OK);
+    assert(common_machine_publish(active) == LIB_STATUS_OK); /* Unchanged text suppressed. */
+    assert(common_machine_published_frame_sequence(active) == 4);
+    candidate.window.text.base.cursor_column = 1;
+    assert(common_machine_publish(active) == LIB_STATUS_OK);
+    assert(common_machine_published_frame_sequence(active) == 5);
+    assert(common_machine_destroy(active) == LIB_STATUS_OK);
+}
+
 int main(void)
 {
     /* Resource-only changes are publications, not just character changes. */
@@ -286,5 +331,6 @@ int main(void)
         check(BASE_SYNC_WAIT_CANCELLED, 0u);
         check(BASE_SYNC_WAIT_FAULT, 4u);
     }
+    check_publication();
     return 0;
 }

@@ -107,8 +107,8 @@ mailboxes. Callers never share or address a mailbox directly.
 
 - The frame mailbox holds one copied frame. Publishing replaces that value:
   frames are **latest-wins** opaque payloads in leaf-owned fixed storage.
-  Window unions unconsumed graphics dirty rectangles under the frame lock;
-  dimensions, mode, stride or palette changes invalidate its full image.
+  Window derives changed regions by comparing complete frames with its RGB
+  surface on consumption; no producer damage or merge callback crosses Base.
   Console stores text fields and character maps only, never graphics or fonts.
 - The control mailbox is FIFO. It accepts up to 32 ordinary control records;
   enqueue beyond that limit returns `LIB_STATUS_LIMIT_EXCEEDED` without

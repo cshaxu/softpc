@@ -184,7 +184,11 @@ without Machine ERROR. This is neither native-window acceptance nor proof of
 the owner's process-exit cause. No rebuilt release or full-suite pass is claimed
 for this candidate.
 
-## Revised FIFO Direction And Unresolved Implementation Boundaries
+## Superseded FIFO Direction And Implementation Concerns
+
+Historical design discussion: the later owner-approved S9 complete-frame /
+surface-difference brief replaces this FIFO direction. No FIFO implementation
+was retained or introduced.
 
 Owner requires: "kvm-base的 frame mailbox也必须是FIFO的，然后kvm-console和kvm-window收到以后自行转成正确的latest-win再消费。产品语义必须和以前一样，如果多个dirty需要合并dirty区域，等等。"
 
@@ -224,8 +228,8 @@ Owner: "准入，开始。每个S任务完成都要提交推送保持工作区�
   +8--20/-4--12 and tests +80--140; investigate stride before changing the mirror.
 - S8 will finish outstanding synchronous requests on executor termination,
   with fault injection and no second cancellation mechanism.
-- S9 will implement the owner-required opaque FIFO and leaf coalescing,
-  including upstream frame/notification ownership and bounded full behavior.
+- S9 implements the revised opaque latest-wins complete-frame transport and
+  Window-local surface comparison, replacing the earlier unimplemented FIFO plan.
 - S10 will compare the complete admitted behavior with pre-T71, remove obsolete
   repairs and audit actual component/mirror diffs and real dual-width workflows.
 
@@ -404,6 +408,9 @@ or S8 closure. S9/S10 are not started, and T71 remains open.
 
 ## S9 Admission And Initial Audit
 
+The FIFO planning section below is superseded by the owner-approved revision
+at the end of this document; no FIFO production change was implemented.
+
 Owner accepted S8 and requested "测试通过。下一个S". Baseline 81dacb61;
 S8 closure records its accepted evidence. S9 alone is active.
 
@@ -437,3 +444,113 @@ stride/palette changes, full/STOP/failure, Console activation, save/load progres
 and run replacement. Build both EXEs, run serial full suites and real Win3.1 PIF
 roundtrips, report actual diff/footprint, commit/push and review, then wait for
 owner testing. S10 and T71 stay open.
+
+## S9 Revised Complete-Frame / Surface-Difference Brief
+
+Owner: "我觉得可以用这个方案重构，准入修复S9，现在开始。" This replaces
+FIFO with independent complete-frame/latest-wins transports. Machine-side dirty
+means publish a complete snapshot, not transport a partial patch. Window owns
+damage relative to its own RGB surface. Base only copies opaque latest bytes;
+Console keeps its existing latest-text/NOT_CURRENT behavior. Session/UI remains
+the only route; no direct Machine-to-Base dependency or new queue is introduced.
+
+Remove Base's update callback, Window's producer-thread merge, public graphics
+dirty coordinates and redundant palette cache. Window scans the latest indexed
+pixels through its supplied palette, compares/writes the existing RGB surface,
+and invalidates the enclosing changed rectangle. First render/recreated surface
+and representation transitions invalidate fully. Native pending invalidation
+must accumulate until paint; exposure paints the surface without a new frame.
+No additional full-frame cache is needed. Pure comparison belongs to Window
+root render code, native invalidation to its platform implementation.
+
+VM already copies full pixels for a completed dirty update. Keep readiness,
+no-dirty suppression and Common text comparison; verify palette-only changes,
+first completed frame and geometry changes still publish. Remove the obsolete
+dirty fields from its exported frame and diagnostic formatting, not the
+original renderer's local dirty/update transaction. No Compat/MVDM edit planned.
+
+Estimate production +40--80/-100--160 (net -120 to -20); tests net +100--200.
+Count documentation/manifests/artifacts separately. Frozen coverage: opaque
+overwrite/ack/rejection, upstream A/B skip, leaf A/B skip, first/no-change,
+pixel/used-palette/unused-palette/stride/size/mode, accumulated invalidation,
+producer readiness/no-change/palette, STOP/failure and snapshot progress.
+Verify through existing shared and product tests, bounded render timing, dual
+Release builds and serial full suites with real PIF roundtrips. Update shared
+manifests and actual architecture contract; push/review and wait for owner.
+
+Owned performance probe: build/t71-s9/render-bench.c and its two executables,
+no media or trace; at most 30 seconds per run. The executor removes these exact
+owned files after recording results. It measures current render-only work,
+not overall emulation speed or proof of improvement over a prior T.
+
+### S9 Finite Implementation Ledger
+
+The revised scheme is implemented without FIFO or a new surface cache. Search
+of dirty_left/top/right/bottom, kvm_mailbox_frame_update_fn and
+kvm_window_update_frame in Lib/Common/VM and active tests finds no retained
+cross-boundary damage path. Original Compat dirty transactions remain unchanged.
+Common Machine/Session algorithms need no replacement: latest copied snapshots
+are self-contained once Window stops depending on producer-relative damage.
+
+| Member | Disposition and proof |
+| --- | --- |
+| Base overwrite, capture, old ack, rejection and STOP | Callback removed; byte count, separate locks, wake/fault and generation-bound ack retained. frame_copy/frame_lock/input_admission/retirement tests cover the unchanged mechanics. |
+| Machine first ready/no-change and upstream A/B | machine_wait publishes not-ready, first frame, unconsumed A then full B, checks both corners; no-change does not increment sequence. Text/cursor comparison remains. |
+| Session older notice selects latest B | session_frame checks full B pixel/palette payload reaches UI, retains run-generation and component-readiness checks. |
+| Leaf A/B and colour comparison | frame_damage_mouse overwrites A before consumption, checks both changed pixels/bounds, identical output, used/unused palette and colour-equivalent indices. |
+| Geometry/stride | Frame validation remains; padded rows do not create damage; recreated surface forces full redraw. Existing geometry tests and native surface tests cover resize. |
+| Text/graphics with identical pixel size | Native capture_contract consumes both modes and verifies text invalidates the graphics baseline, then full graphics invalidation. |
+| Two updates before native paint | Native consumer test observes both InvalidateRect calls and both pixels in surface; production never validates/clears the native update region between them. Native exposure/paint contract stays unchanged. |
+| Producer dirty/readiness/palette | VM still consumes only completed original dirty updates, copies all pixels and omits cross-layer rectangles. vga_frame checks both half updates, no-change suppression and palette-only complete publication across modes. |
+| Console | Only support-call signature changes; no character/font/input/output semantic change. Existing NOT_CURRENT/activation/output failure tests retained. |
+| Snapshot/lifecycle/input | No format, queue, request or input change; existing full regression remains required. |
+
+Production C/H against 65ad144a: 12 files, +41/-89 (net -48). Test C/H:
+8 files, +174/-44 (net +130). Documentation, manifests and EXEs are separate.
+Common production change is a contract comment only. MVDM/Compat and INI/media
+are unchanged. Each graphical frame loses 16 bytes of producer damage fields;
+Window loses its 1024-byte palette cache, with no new buffers or workers.
+
+The new Common publication test first omitted the mandatory fake request_wake
+callback and failed creation; completing the fixture fixes that failure without
+production changes. Focused x64 frame/native-consumer/Session tests and the
+corrected Common publication test pass. Changed Lib C sources pass strict C17
+-Wall -Wextra -Wpedantic -Werror syntax checks. Full suites remain required.
+
+Render-only measurement, 1000 iterations each, milliseconds per consumed frame:
+
+| Width | Pixels | Unchanged | One pixel changed | Palette-wide change |
+| --- | --- | --- | --- | --- |
+| x64 | 640x480 | 0.262 | 0.323 | 0.605 |
+| x64 | 1280x768 | 0.849 | 0.958 | 1.871 |
+| x86 | 640x480 | 0.456 | 0.500 | 0.751 |
+| x86 | 1280x768 | 1.530 | 1.755 | 3.307 |
+
+These bounded clock measurements include comparison and surface writes, not
+native painting or emulation. They are not a prior-T speedup claim; x86 ran
+alongside a build, so the numbers are indicative rather than isolated benchmarks.
+
+### S9 P1 Delivery Evidence
+
+Final serial full suites: x64 110/110 in 173.66 seconds; x86 110/110 in
+163.13 seconds. Both include real Win3.1 initial window/fullscreen PIFs and
+roundtrips, package, lifecycle, snapshot and shared manifest checks. This is
+not pixel-by-pixel visual acceptance; the owner still tests the packages.
+Strict changed-Lib syntax checks pass on both toolchains. Documentation
+governance and diff whitespace checks pass. All four shared manifests use
+shared-t71-s9-p1. The exact three owned performance-probe files and empty
+build/t71-s9 directory were removed after runs; no owned probe remains.
+
+| Package | Bytes | Delta from S8 | SHA256 |
+| --- | --- | --- | --- |
+| assets/binary/softpc32.exe | 3655249 | -1085 | F7A7508332A992E3697A88CB71F8672B7D47381F4831F94A9056AE53FA0D4C78 |
+| assets/binary/softpc64.exe | 3058791 | -572 | 3665A3D3FBE516A900AAD7A11DC62045AD286F6DA758B0FE2C6DC32C32433CD1 |
+
+Final executor review confirms no leftover frame-update callback or transported
+dirty coordinates in the active paths. Native surface invalidity resets on
+recreation and text transition; repeated identical RGB pixels need no drawing.
+STOP, separate mailbox locks and generation-bound acknowledgements are unchanged.
+Graphics-frame ABI drops its dirty fields and support publication APIs drop the
+callback parameter; all consumers and tests migrate together. No extra public
+input API or snapshot change. P1 is ready for commit/push and coordinator review;
+S9/T71 remain open and S10 is not admitted.

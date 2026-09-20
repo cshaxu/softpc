@@ -171,8 +171,11 @@ typedef struct common_machine_driver {
     void (*set_executor_callback)(void *context,
         common_machine_executor_callback callback, void *callback_context);
     void (*deliver_input)(void *context, const kvm_input_event *event);
-    /* OK with window.valid == 0 means no frame. Failure does not publish the
-     * staging value and terminates execution through the existing ERROR fact. */
+    /* Return a complete frame on display change (including palette/geometry).
+     * First ready output must be published. OK with window.valid == 0 means
+     * no new ready frame. Publications may be skipped by latest-wins consumers;
+     * no incremental damage contract crosses this boundary. Failure does not
+     * publish staging and terminates through the existing ERROR fact. */
     lib_status (*copy_frame)(void *context, common_machine_frame *out_frame);
     lib_bool (*set_removable_media)(void *context, const char *path,
         lib_storage_medium_mode mode);

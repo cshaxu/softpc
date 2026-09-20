@@ -141,13 +141,11 @@ static void vm_driver_trace_frame(void *opaque, const common_machine_frame *fram
         prior_columns == columns && prior_rows == rows &&
         prior_width == width && prior_height == height)
         return;
-    vm_trace("softpc prompt frame=%lu mode=%lu state=%lu graphics=%lu text=%ux%u dib=%ux%u dirty=%ld,%ld,%ld,%ld",
+    vm_trace("softpc prompt frame=%lu mode=%lu state=%lu graphics=%lu text=%ux%u dib=%ux%u",
         (unsigned long)frame->sequence, (unsigned long)mode,
         (unsigned long)screen, (unsigned long)window->graphics,
         (unsigned)columns, (unsigned)rows,
-        (unsigned)width, (unsigned)height,
-        (long)(window->graphics ? window->image.dirty_left : 0), (long)(window->graphics ? window->image.dirty_top : 0),
-        (long)(window->graphics ? window->image.dirty_right : -1), (long)(window->graphics ? window->image.dirty_bottom : -1));
+        (unsigned)width, (unsigned)height);
     prior_mode = mode; prior_screen = screen; prior_graphics = window->graphics;
     prior_columns = columns; prior_rows = rows;
     prior_width = width; prior_height = height;
@@ -334,10 +332,6 @@ static lib_status vm_driver_copy_graphics(vm_driver *driver,
     frame->window.image.width = width;
     frame->window.image.height = height;
     frame->window.image.stride = width;
-    frame->window.image.dirty_left = left < 0 ? 0 : left;
-    frame->window.image.dirty_top = top < 0 ? 0 : top;
-    frame->window.image.dirty_right = right >= (lib_i32)width ? (lib_i32)width - 1 : right;
-    frame->window.image.dirty_bottom = bottom >= (lib_i32)height ? (lib_i32)height - 1 : bottom;
     frame->window.graphics = 1u;
     frame->window.valid = 1u;
     return LIB_STATUS_OK;

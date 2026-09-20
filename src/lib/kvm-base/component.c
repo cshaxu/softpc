@@ -117,11 +117,11 @@ void kvm_component_retire(kvm_component *component, lib_status status)
 }
 
 lib_status kvm_component_publish_frame(kvm_component *component, const void *frame,
-    lib_size bytes, kvm_mailbox_frame_update_fn update)
+    lib_size bytes)
 {
     lib_status status;
     if (component == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    status = kvm_component_mailboxes_publish_frame(&component->mailboxes, frame, bytes, update);
+    status = kvm_component_mailboxes_publish_frame(&component->mailboxes, frame, bytes);
     if (status != LIB_STATUS_OK) return status;
     status = kvm_component_mailboxes_notify(&component->mailboxes);
     if (status != LIB_STATUS_OK) kvm_component_fail(component, status);

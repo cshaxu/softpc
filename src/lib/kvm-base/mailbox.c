@@ -56,7 +56,7 @@ void kvm_component_mailboxes_destroy(kvm_component_mailboxes *mailboxes)
 }
 
 lib_status kvm_component_mailboxes_publish_frame(kvm_component_mailboxes *mailboxes,
-    const void *frame, lib_size bytes, kvm_mailbox_frame_update_fn update)
+    const void *frame, lib_size bytes)
 {
     if (mailboxes == LIB_NULL || frame == LIB_NULL || bytes == 0u)
         return LIB_STATUS_INVALID_ARGUMENT;
@@ -66,11 +66,7 @@ lib_status kvm_component_mailboxes_publish_frame(kvm_component_mailboxes *mailbo
         base_sync_mutex_unlock(mailboxes->frame_lock);
         return LIB_STATUS_INVALID_STATE;
     }
-    if (update != LIB_NULL)
-        update(mailboxes->frame, frame, bytes, mailboxes->frame_size == 0u,
-            mailboxes->frame_pending);
-    else
-        lib_memory_copy(mailboxes->frame, frame, bytes);
+    lib_memory_copy(mailboxes->frame, frame, bytes);
     mailboxes->frame_size = bytes;
     mailboxes->frame_pending = LIB_TRUE;
     ++mailboxes->frame_generation;

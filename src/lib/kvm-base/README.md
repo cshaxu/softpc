@@ -7,9 +7,8 @@ mechanics to `kvm-window` and `kvm-console`.
 `kvm_text_frame` contains the common text fields with a fixed 80-cell row stride.
 Fonts, character maps and graphics belong to the receiving leaf, not this base.
 The frame mailbox copies opaque bytes into leaf-provided fixed storage. The
-leaf validates its typed value and supplies its active byte count. Window may
-merge pending damage through its update function under the frame lock; that
-function must not allocate, notify, call a sink or reenter the mailbox.
+leaf validates its typed value and supplies its active byte count. Publication
+only replaces bytes; there is no content callback or damage interpretation.
 
 Control admission copies one record per call into the 32-slot ordinary FIFO.
 Capacity rejection returns LIMIT_EXCEEDED without replacing any queued record.

@@ -241,10 +241,18 @@ control commands and rejects unknown records. Native leaf APIs remain typed;
 there is no application-facing raw control mailbox.
 
 Shared frame mailboxes copy opaque values into fixed leaf-owned storage.
-Window accumulates unconsumed dirty bounds with its latest complete image
-under the frame lock; Console stores common text fields and caller-supplied
-character maps only. Common machine composes the upstream publication, while
-VM alone supplies SoftPC character meaning. Capture does not consume; a successful-output
+Base replaces opaque latest bytes, with no frame update callback. Window derives
+damage on consumption by comparing resolved colours with its existing RGB
+surface; it updates changed pixels and invalidates their enclosing rectangle.
+First graphics, recreated surfaces and text-to-graphics invalidate fully;
+native invalidations accumulate until paint. No previous-frame cache is added.
+Console stores common text fields and caller-supplied character maps only.
+Common machine publishes complete snapshots on driver display change (including
+palette/geometry), preserving no-frame readiness and text comparison. Upstream
+latest-wins is independent of leaf transport: an older notice may select the
+latest complete frame without losing damage. VM alone supplies SoftPC character
+meaning; original producer dirty does not cross the KVM frame ABI.
+Capture does not consume; a successful-output
 acknowledgement clears only that still-current publication. The broker reports logical
 Console activation through its neutral event sink after binding succeeds;
 kvm-console only wakes its existing worker to draw pending content. Empty means

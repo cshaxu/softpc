@@ -125,7 +125,7 @@ static void checked_fail(kvm_component *component, lib_status status)
     static kvm_window_frame rejected = { .valid = 1, .text.base = { .text_columns = 80, .text_rows = 25 } };
     kvm_component_fail(component, status);
     assert(kvm_component_mailboxes_publish_frame(&component->mailboxes, &rejected,
-        kvm_window_frame_size_bytes(&rejected), NULL) ==
+        kvm_window_frame_size_bytes(&rejected)) ==
         LIB_STATUS_INVALID_STATE);
     kvm_component_control title = { .kind = KVM_WINDOW_CONTROL_SET_TITLE };
     assert(kvm_component_mailboxes_enqueue_control(&component->mailboxes, &title) ==

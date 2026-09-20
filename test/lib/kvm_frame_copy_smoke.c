@@ -82,7 +82,7 @@ int main(void)
     assert(kvm_component_mailboxes_create(&mailbox, &storage, sizeof(storage)) == LIB_STATUS_OK);
     lib_memory_set(&storage, 0x96, sizeof(storage));
     assert(kvm_component_mailboxes_publish_frame(&mailbox, &source,
-        kvm_window_frame_size_bytes(&source), NULL) == LIB_STATUS_OK);
+        kvm_window_frame_size_bytes(&source)) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_capture_frame(&mailbox, &generation, &destination, sizeof(destination)));
     assert(destination.text.base.text[1999] == source.text.base.text[1999]);
     for (lib_size i = kvm_window_frame_size_bytes(&source); i < sizeof(source); ++i) {
@@ -90,7 +90,7 @@ int main(void)
         assert(((const lib_u8 *)&destination)[i] == 0xa5);
     }
     old = generation;
-    assert(kvm_component_mailboxes_publish_frame(&mailbox, &source, sizeof(storage) + 1u, NULL) == LIB_STATUS_LIMIT_EXCEEDED);
+    assert(kvm_component_mailboxes_publish_frame(&mailbox, &source, sizeof(storage) + 1u) == LIB_STATUS_LIMIT_EXCEEDED);
     assert(mailbox.frame_generation == old);
     assert(!kvm_component_mailboxes_capture_frame(&mailbox, &generation, &destination, 1u));
     source.graphics = 1u;
@@ -99,7 +99,7 @@ int main(void)
     source.image.height = 5u;
     check_copy(); /* Copy row padding, not just width*height. */
     assert(kvm_component_mailboxes_publish_frame(&mailbox, &source,
-        kvm_window_frame_size_bytes(&source), NULL) == LIB_STATUS_OK);
+        kvm_window_frame_size_bytes(&source)) == LIB_STATUS_OK);
     kvm_component_mailboxes_acknowledge_frame(&mailbox, old);
     assert(kvm_component_mailboxes_capture_frame(&mailbox, &generation, &destination, sizeof(destination)));
     assert(generation != old);
@@ -113,7 +113,7 @@ int main(void)
     source.text.base.font_height = 0u;
     check_copy(); /* Graphics -> text never exposes the old pixels. */
     assert(kvm_component_mailboxes_publish_frame(&mailbox, &source,
-        kvm_window_frame_size_bytes(&source), NULL) == LIB_STATUS_OK);
+        kvm_window_frame_size_bytes(&source)) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_capture_frame(&mailbox, &generation, &destination, sizeof(destination)));
     assert(!destination.graphics && ((const lib_u8 *)&destination)[kvm_window_frame_size_bytes(&source)] == 0xa5);
     kvm_component_mailboxes_acknowledge_frame(&mailbox, generation);

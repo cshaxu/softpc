@@ -16,10 +16,6 @@ typedef struct kvm_component_control {
 } kvm_component_control;
 
 typedef lib_status (*kvm_mailbox_notify_fn)(void *context);
-/* Optional consumer-owned update, called under the frame lock after admission.
- * Must copy the accepted bytes; no allocation, notification, sink or reentry. */
-typedef void (*kvm_mailbox_frame_update_fn)(void *destination, const void *source,
-    lib_size bytes, lib_bool first, lib_bool pending);
 
 /* Each KVM leaf owns exactly one of these. It contains two independent
  * mailboxes: a latest-wins copied frame and a FIFO control queue. The native
@@ -60,7 +56,7 @@ lib_status kvm_component_mailboxes_notify(kvm_component_mailboxes *mailboxes);
 void kvm_component_mailboxes_close(kvm_component_mailboxes *mailboxes);
 void kvm_component_mailboxes_destroy(kvm_component_mailboxes *mailboxes);
 lib_status kvm_component_mailboxes_publish_frame(kvm_component_mailboxes *mailboxes,
-    const void *frame, lib_size bytes, kvm_mailbox_frame_update_fn update);
+    const void *frame, lib_size bytes);
 /* Appends one copied control. Capacity failure leaves the FIFO unchanged.
  * STOP is terminal, idempotent and has one reserved slot. */
 lib_status kvm_component_mailboxes_enqueue_control(

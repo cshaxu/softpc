@@ -21,11 +21,8 @@ typedef struct kvm_window_graphics_frame {
     lib_u32 width;
     lib_u32 height;
     lib_u32 stride;
-    lib_i32 dirty_left;
-    lib_i32 dirty_top;
-    lib_i32 dirty_right;
-    lib_i32 dirty_bottom;
     lib_u32 palette[KVM_WINDOW_GRAPHICS_PALETTE_ENTRIES]; /* 0x00RRGGBB */
+    /* Complete image; damage is derived by the receiving Window. */
     lib_u8 pixels[KVM_WINDOW_GRAPHICS_MAX_PIXELS];
 } kvm_window_graphics_frame;
 

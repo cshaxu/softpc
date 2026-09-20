@@ -38,8 +38,10 @@ static HGDIOBJ WINAPI select_bitmap(HDC d,HGDIOBJ o)
 static BOOL WINAPI delete_bitmap(HGDIOBJ o) { assert(o==(HGDIOBJ)3);++deleted_bitmaps;return TRUE; }
 static BOOL WINAPI delete_dc(HDC d) { assert(d==(HDC)2);++deleted_dcs;return TRUE; }
 static DWORD WINAPI clock_tick(void) { return ticks; }
+static unsigned invalidations;
+static RECT invalidated;
 static BOOL WINAPI invalidate(HWND w,const RECT *r,BOOL erase)
-{ (void)w;(void)r;(void)erase;return TRUE; }
+{ (void)w;(void)erase;++invalidations;if(r)invalidated=*r;return TRUE; }
 static void *context;
 static void notify_loss(void);
 static int reenter_title;
@@ -163,6 +165,53 @@ static void check_invalid_controls(void)
         assert(control_failures==i+1);
         assert(kvm_component_destroy(&window.base)==0);
     }
+}
+static void check_surface_damage(void)
+{
+    static kvm_window window;
+    static kvm_win32_window_context c;
+    static kvm_window_frame frame;
+    kvm_component_options options={.input_sink=input,.failure_sink=failure};
+    assert(kvm_component_initialize(&window.base,&options,join,dispose,
+        &window.pending_frame,sizeof(window.pending_frame))==0);
+    assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes,NULL,NULL)==0);
+    c.component=&window;
+    c.surface_dc=(HDC)2; c.surface_pixels=surface_bits;
+    c.surface_width=c.surface_height=c.client_surface_width=c.client_surface_height=8;
+    c.client_width=c.client_height=8;
+    frame.valid=frame.graphics=1;
+    frame.image.width=frame.image.stride=frame.image.height=8;
+    frame.image.palette[1]=0x123456;
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(c.graphics_valid && invalidated.right==8 && invalidated.bottom==8);
+    unsigned before=invalidations;
+    /* Two updates before WM_PAINT must each invalidate, not replace the first. */
+    frame.image.pixels[0]=1;
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(invalidated.left==0 && invalidated.top==0 && invalidated.right==1 && invalidated.bottom==1);
+    frame.image.pixels[63]=1;
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(invalidations==before+2 && invalidated.left==7 && invalidated.top==7);
+    assert(surface_bits[0]==0x123456 && surface_bits[63]==0x123456);
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(invalidations==before+2);
+    frame=(kvm_window_frame){.valid=1};
+    frame.text.base.text_columns=frame.text.base.text_rows=1;
+    frame.text.base.font_height=8; /* Same pixel dimensions as graphics. */
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(!c.graphics_valid);
+    frame=(kvm_window_frame){.valid=1,.graphics=1};
+    frame.image.width=frame.image.stride=frame.image.height=8;
+    assert(kvm_window_publish_frame(&window,&frame)==0);
+    win32_window_consume_frame((HWND)1,&c);
+    assert(c.graphics_valid && invalidations==before+4);
+    assert(invalidated.left==0 && invalidated.top==0 && invalidated.right==8 && invalidated.bottom==8);
+    assert(kvm_component_destroy(&window.base)==0);
 }
 int main(void)
 {
@@ -384,5 +433,6 @@ int main(void)
     pointer_ok=0; win32_window_proc((HWND)1,WM_MOUSEMOVE,0,0);
     assert(!c.mouse.captured && events==before);
     assert(kvm_component_destroy(&window.base)==0);
+    check_surface_damage();
     return 0;
 }

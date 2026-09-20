@@ -52,37 +52,6 @@ lib_status kvm_window_create(kvm_window **out_window,
     return LIB_STATUS_OK;
 }
 
-static void kvm_window_update_frame(void *destination, const void *source,
-    lib_size bytes, lib_bool first, lib_bool pending)
-{
-    kvm_window_frame *previous = destination;
-    const kvm_window_frame *next = source;
-    lib_i32 left, top, right, bottom;
-    if (!next->graphics) {
-        lib_memory_copy(previous, next, bytes);
-        return;
-    }
-    left = next->image.dirty_left; top = next->image.dirty_top;
-    right = next->image.dirty_right; bottom = next->image.dirty_bottom;
-    if (first || !previous->graphics || previous->image.width != next->image.width ||
-        previous->image.height != next->image.height ||
-        previous->image.stride != next->image.stride ||
-        lib_memory_compare(previous->image.palette, next->image.palette,
-            sizeof(next->image.palette)) != 0) {
-        left = top = 0;
-        right = (lib_i32)next->image.width - 1;
-        bottom = (lib_i32)next->image.height - 1;
-    } else if (pending) {
-        if (previous->image.dirty_left < left) left = previous->image.dirty_left;
-        if (previous->image.dirty_top < top) top = previous->image.dirty_top;
-        if (previous->image.dirty_right > right) right = previous->image.dirty_right;
-        if (previous->image.dirty_bottom > bottom) bottom = previous->image.dirty_bottom;
-    }
-    lib_memory_copy(previous, next, bytes);
-    previous->image.dirty_left = left; previous->image.dirty_top = top;
-    previous->image.dirty_right = right; previous->image.dirty_bottom = bottom;
-}
-
 lib_status kvm_window_publish_frame(kvm_window *window, const kvm_window_frame *frame)
 {
     lib_status status;
@@ -90,7 +59,7 @@ lib_status kvm_window_publish_frame(kvm_window *window, const kvm_window_frame *
     status = kvm_window_frame_validate(frame);
     if (status != LIB_STATUS_OK) return status;
     return kvm_component_publish_frame(&window->base, frame,
-        kvm_window_frame_size_bytes(frame), kvm_window_update_frame);
+        kvm_window_frame_size_bytes(frame));
 }
 
 lib_status kvm_window_destroy(kvm_window *window)

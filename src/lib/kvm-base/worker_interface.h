@@ -30,7 +30,7 @@ lib_status kvm_component_initialize(kvm_component *component,
 /* Copied opaque payload. The leaf validates its value before this entry.
  * STOP or terminal fault rejects later publications with INVALID_STATE. */
 lib_status kvm_component_publish_frame(kvm_component *component,
-    const void *frame, lib_size bytes, kvm_mailbox_frame_update_fn update);
+    const void *frame, lib_size bytes);
 /* A source identity is never recycled.  Zero is the permanent exhausted
  * sentinel, rather than the beginning of a second allocation epoch. */
 lib_status kvm_component_allocate_source_identity(lib_atomic_u64 *next,
