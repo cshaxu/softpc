@@ -19,8 +19,8 @@ Owner requested including the existing snapshot unchanged with all outstanding
 content: 18395778 bytes, SHA256
 F62B12D479471B6E6DCC2D85BE76879E95C321083552D5C35F3702852EE00393.
 It is not a new test dependency, generated trace or claimed validation fixture.
-Automatic safety review blocked exporting this guest-state file without explicit
-destination-specific approval. It remains untracked and unchanged locally;
-only closure documentation is committed pending that approval.
+Automatic safety review initially blocked exporting this guest-state file.
+Owner subsequently confirmed pushing it to origin/main; it is included unchanged
+in the S7 follow-up delivery before admitting S8.
 No source or EXE change at closure; prior build/test evidence remains applicable.
 Documentation governance and diff checks are rerun for closure.
