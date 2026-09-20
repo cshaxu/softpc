@@ -33,6 +33,11 @@ immediately returns to the prompt, and does not enqueue an intent.
 | `reset` | cold reset → paused | cold reset → paused | cold reset → paused | cold reset → paused |
 | `stop` | not started | already stopped | stop → stopped | stop → stopped |
 
+Machine ERROR is terminal, not stopped. The monitor retains its prompt and
+rejects lifecycle, media and snapshot commands with an instruction to exit and
+restart SoftPC. Local help, debugger selection and exit remain available;
+ERROR does not authorize another machine request or terminate the monitor.
+
 The monitor does not arm a second cooked line during an accepted lifecycle
 transition. `reset` is one runtime command: the VM owns every internal
 cold-reset stage and reports one reset-completed fact with its final paused

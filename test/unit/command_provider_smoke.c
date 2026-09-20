@@ -799,6 +799,19 @@ int main(void)
     assert(app_composition_initialize(&commands, machine,
         COMMON_SESSION_DISPLAY_WINDOW,
         &provider) == LIB_STATUS_OK);
+    {
+        const char *rejected[] = { "start", "pause", "resume", "reset", "stop",
+            "save state", "load state", "floppy eject" };
+        for (unsigned index = 0; index < sizeof(rejected) / sizeof(rejected[0]); ++index) {
+            submit(&provider, COMMON_SESSION_MACHINE_ERROR, rejected[index], &result);
+            assert(result.request == COMMON_SESSION_REQUEST_NONE);
+            assert(strstr(result.text, "Machine has failed;") != NULL);
+            provider.note_monitor_current(&commands, LIB_TRUE, &result);
+            assert(result.arm_prompt && strcmp(result.prompt, "SoftPC> ") == 0);
+        }
+        submit(&provider, COMMON_SESSION_MACHINE_ERROR, "help", &result);
+        assert(strstr(result.text, "Insignia SoftPC") != NULL);
+    }
     /* Exercise the actual composed provider, not a second hotkey dispatcher. */
     assert(provider.context == &commands && provider.open == app_command_provider_open);
     assert(provider.submit_line == app_command_provider_submit_line);

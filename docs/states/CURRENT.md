@@ -2,13 +2,39 @@
 
 ## Current Work
 
-No implementation subtask is active. T71 S1--S6 are complete; T71 remains
-open for owner manual acceptance. S6 delivery 03fe7627 is reviewed and pushed.
-Open task awaiting owner: T71.
-See [S6 closure](../history/M9-T71-S6-integration-audit.md).
-The open task retains its [T71 plan](../history/M9-T71-kvm-text-frame-contract-proposal.md).
+M9 T71 S7 is implemented and verified, awaiting delivery review and owner retest.
+Owner manual acceptance failed after a044fa36; T71 remains open. S7 adds the
+missing real Win3.1 startup coverage; prior S6 evidence was insufficient.
+
+## M9 T71 S7 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner reports T71 startup/error-restart regression; continue the admitted architecture goal without widening its boundaries. |
+| Objective | Reproduce and resolve win causing Machine error and subsequent start process crash. |
+| Non-goals | No clipping, capacity expansion, guest-specific exception, new frame path, media/INI changes or unrelated queue work. |
+| Reference Baseline | a044fa36; S6 dual-width 110/110 did not exercise Win3.1 entry. |
+| Candidate Proposal | [Regression brief](../proposals/m9-kvm-mode-transition-regression.md). |
+| Files And ABI Surface | Compat video extent uses original selected-renderer dimensions; Common Session preserves ERROR; App rejects machine commands in ERROR. Public Machine/KVM APIs, Lib and MVDM unchanged. |
+| Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and shared governance skills. |
+| Verification | Real overlay DOS win rejects 80x480 while selected renderer is 80x25; shipping baseline start after ERROR exits code 1, not an exception. Focused transition/ERROR matrix, real win entry and serial full x86/x64 plus package builds. |
+| Expected Markers | Valid transition reaches Windows; genuine unsupported output remains explicit; start in terminal ERROR is rejected with a prompt rather than exiting, preserving Machine's existing contract. |
+| Asset Needs | Existing Win3.1 image read via overlay; bounded owned build/t71-s7 probes, 120 seconds/4 MiB per run. |
+| Reporting Requirements | Root cause and concrete diff estimate before production edits; afterward added/deleted/net and both EXEs. |
+| Stop Conditions | Need for new public state/ownership, MVDM changes, guest-specific workaround or media mutation. |
+| Exit Criteria | Both owner scenarios reproduced and repaired with focused and full evidence; reviewed P pushed, owner receives binaries. |
+| Original Owner Request | 启动后输入win直接machine error；再次start程序崩溃退出。 |
+| Similar-Issue Sweep | All frame-result/no-frame branches and all error-to-cold-start cleanup paths affected by T71. |
 
 ## Current Technical Baseline
+
+- S7: selected-renderer text dimensions replace live-register sampling;
+  ERROR reaches App unchanged and rejects machine commands without exiting.
+  Production +16/-7 (net +9), tests +72/-5 (net +67). Both Release packages
+  built; full serial x64 110/110 (123.75s), x86 110/110 (108.17s), including
+  real overlay DOS win and subsequent stop/start to DOS. No Lib/MVDM/INI/media
+  changes. See the active brief for reproduction, accounting and package hashes.
 
 - S6 audit found default-height cursor geometry inconsistent with Window glyph
   rendering. The bounded repair resolves zero to the existing 16-row default;
@@ -64,7 +90,7 @@ The open task retains its [T71 plan](../history/M9-T71-kvm-text-frame-contract-p
 
 ## Recent Governance
 
-T70 is closed; T71 awaits owner acceptance with no active implementation task.
+T70 is closed; T71 S7 investigates failed owner acceptance.
 
 - **M9 Td S17:** Owner requested a concrete KVM text/frame correction proposal
   at queue head. Recorded capability rejection, explicit character/glyph

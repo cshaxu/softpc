@@ -521,19 +521,30 @@ static void verify_driver_geometry(softpc_machine *machine)
             {
                 unsigned saved_columns = get_chars_per_line();
                 unsigned saved_height = get_char_height();
+                extern int now_width, now_height;
+                int saved_width = now_width, saved_rows = now_height;
                 extern IU8 c_sas_hw_at(IU32 addr);
                 extern void c_sas_store(IU32 addr, IU8 value);
                 IU8 saved_font_height = c_sas_hw_at(0x485u);
                 set_chars_per_line(81u);
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
+                set_char_height(1u);
+                /* Registers can describe the next graphics mode while the
+                   selected text painter still owns the completed 80x25. */
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
+                assert(frame->window.text.base.text_columns == 80u &&
+                    frame->window.text.base.text_rows == 25u);
                 set_chars_per_line(0u);
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_INVALID_ARGUMENT);
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
                 set_chars_per_line(saved_columns);
-                set_char_height(8u); /* Same display height now means 50 rows. */
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
-                set_char_height(0u); /* Controller geometry not initialized. */
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
                 set_char_height(saved_height);
+                now_width = 81;
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
+                now_width = saved_width;
+                now_height = 50;
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
+                now_height = 0;
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
+                now_height = saved_rows;
                 c_sas_store(0x485u, 17u);
                 assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
                 assert(frame->window.text.base.font_height == 17u);

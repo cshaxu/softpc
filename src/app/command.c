@@ -237,6 +237,11 @@ void app_command_session_submit_line(app_command_session *s, app_monitor_state s
     }
     /* The parser does not own machine state.  It receives control's current
        stable fact for the one command validation below. */
+    if (state == APP_MONITOR_ERROR)
+    {
+        reject(s, e, "Machine has failed; exit and restart SoftPC.");
+        return;
+    }
     if (!strcmp(c, "save") || !strcmp(c, "load"))
     {
         snapshot(s, state, c, a, e);
@@ -422,6 +427,8 @@ static app_monitor_state app_command_state(common_session_machine_state state)
         return APP_MONITOR_RUNNING;
     case COMMON_SESSION_MACHINE_PAUSED:
         return APP_MONITOR_PAUSED;
+    case COMMON_SESSION_MACHINE_ERROR:
+        return APP_MONITOR_ERROR;
     default:
         return APP_MONITOR_STOPPED;
     }

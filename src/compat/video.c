@@ -59,13 +59,15 @@ int softpc_platform_presentation_cursor(long *column_out, long *row_out,
 int softpc_platform_presentation_text_extent(unsigned long *columns_out,
     unsigned long *rows_out)
 {
+    extern int now_width, now_height;
     if (columns_out == NULL || rows_out == NULL ||
-        get_char_height() == 0 || get_pc_pix_height() == 0)
+        now_width <= 0 || now_height <= 0)
         return 0;
-    /* Use the original controller's text geometry (also used by its V7
-       query), not the host backing-store capacity or native viewport. */
-    *columns_out = get_chars_per_line();
-    *rows_out = get_screen_height() / get_pc_pix_height() / get_char_height();
+    /* textResize commits these dimensions for the selected text painter.
+       Live controller registers may already describe the next graphics mode
+       while the renderer still presents the preceding text surface. */
+    *columns_out = (unsigned long)now_width;
+    *rows_out = (unsigned long)now_height;
     return 1;
 }
 

@@ -140,6 +140,40 @@ failed:
     return 0;
 }
 
+static int enter_windows(app_runtime *runtime)
+{
+    const uint32_t keys[] = { 'W', 'I', 'N', KVM_KEY_ENTER };
+    const uint32_t scans[] = { 0x11u, 0x17u, 0x31u, 0x1cu };
+    app_runtime_frame *frame = calloc(1u, sizeof(*frame));
+    DWORD deadline;
+    int graphics = 0, running = 1;
+    if (frame == NULL) return 0;
+    for (unsigned index = 0; index < 4u; ++index) {
+        kvm_input_event event = { 0 };
+        event.type = KVM_EVENT_KEY;
+        event.data.key.key = keys[index];
+        event.data.key.scan_code = scans[index];
+        event.data.key.pressed = 1u;
+        if (!app_runtime_enqueue_input_event(runtime, &event)) { free(frame); return 0; }
+        event.data.key.pressed = 0u;
+        if (!app_runtime_enqueue_input_event(runtime, &event)) { free(frame); return 0; }
+    }
+    /* Observe through startup, not merely its first splash frame. The fixed
+       installed image remains overlay-only and the normal executor owns time. */
+    deadline = GetTickCount() + 15000u;
+    do {
+        if (app_runtime_get_state(runtime) != SOFTPC_RUNTIME_RUNNING) {
+            running = 0;
+            break;
+        }
+        if (app_runtime_copy_frame(runtime, frame) && frame->window.graphics)
+            graphics = frame->window.image.width == 640u && frame->window.image.height == 480u;
+        Sleep(10u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    free(frame);
+    return running && graphics;
+}
+
 int main(void)
 {
     softpc_machine_options options = { 0 };
@@ -183,6 +217,12 @@ int main(void)
             &frame_probe.last_sequence, 0, 0);
     }
 
+    REQUIRE(enter_windows(runtime));
+    REQUIRE(app_runtime_stop(runtime));
+    REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_STOPPED));
+    REQUIRE(app_runtime_start(runtime));
+    REQUIRE(run_reaches_post_bios(runtime, &frame_probe,
+        app_runtime_run_generation(runtime), sequence));
     REQUIRE(app_runtime_stop(runtime));
     REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_STOPPED));
     app_runtime_destroy(runtime);
