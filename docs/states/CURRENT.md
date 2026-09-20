@@ -3,30 +3,30 @@
 ## Current Work
 
 T74 S1 and T74 are closed and pushed in bffbf413 after owner testing passed.
-T75 S1 is closed after pushed delivery 47de48b1 and actual-change review.
-T75 S2 is active: repair outer executor cancellation using existing Base wait.
-S3/S4 are serially authorized; T75 stays open for final owner acceptance.
+T75 S1/S2 are closed after delivery/review; S2 executor is 9b314372.
+T75 S3 is active: six shared source/test packages use strict C11.
+S4 is serially authorized; T75 remains open for final owner acceptance.
 
-## M9 T75 S2 Packet
+## M9 T75 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner supplied report, corrected layout, required six C11 packages and admitted all four S deliveries without intermediate manual gates. |
-| Objective | Repair terminal wake ownership with a deterministic old-fails/new-passes test and existing cancellable outer wait. |
-| Non-goals | No Lib API/state/thread additions, polling, timeouts as recovery, Core or user-media/config edits. |
-| Reference Baseline | 47de48b1; S1 passing dual-width baseline. |
+| Objective | Select C11 for all six shared package scopes and fix strict compiler diagnostics without semantic changes. |
+| Non-goals | No App/Core language migration, ABI/CLI changes, warning suppression, new platform implementation or user data edits. |
+| Reference Baseline | 9b314372; S2 verified dual-width delivery. |
 | Candidate Proposal | [Lib/Common code quality audit](../proposals/m9-lib-common-quality-audit.md). |
-| Files And ABI Surface | src/common/machine/machine.c, test/common/machine_wait_smoke.c, test/x86/debug_machine_smoke.c and affected manifests; ABI unchanged. |
-| Applicable Rules | Execution and Document now; Architecture/Coding and their referenced skills before source audit. |
-| Verification | Deterministic lost-command schedule before/after; repeated native Machine/x86 tests; both Release builds and full background presets; manifests/DAG and documentation gate. |
-| Expected Markers | Cancellation exits despite consumed command wake; faults remain errors; pending requests complete once; callback targets survive join. |
+| Files And ABI Surface | Six CMake entries, Session control.c, xasm32 warnings, affected tests/readmes/manifests and source-layout design. No public ABI changes. |
+| Applicable Rules | Architecture/Coding/Execution/Document and referenced skills; owner explicitly overrides C17 for the six shared packages only. |
+| Verification | Actual compile flags C11/no extensions and strict GNU warnings; dual-width builds and background tests; manifests/DAG and documentation gates. |
+| Expected Markers | Every compiled shared source/test target uses C11 and passes strict warnings; Core/App compile settings remain unchanged. |
 | Asset Needs | Refresh both EXEs only; preserve INI, media and snapshots. |
-| Reporting Requirements | Estimate production +5/-3, test +45/-3 (net +44 total), three C files plus manifests/docs; record actual counts and dual EXEs at delivery. |
-| Stop Conditions | No new cancellation framework or unapproved semantic/ABI expansion; no desktop interaction. |
-| Exit Criteria | Focused old-fails/new-passes proof, full background regression, pushed complete P, actual-change review and closure; then S3. |
+| Reporting Requirements | Estimate 12--16 code/build/test files, production C/H +20/-10, build/test +55/-65, aggregate net near zero; report actual deviations and both EXEs. |
+| Stop Conditions | Stop if diagnostic repair needs behavior or public ABI changes; do not suppress warnings or alter imported instruction semantics. |
+| Exit Criteria | Six-package strict C11 compilation, focused/full background regression, pushed complete P and review/closure; then S4. |
 | Original Owner Request | Close T74 after successful tests; admit a new T to audit Lib/Common quality; owner will paste an existing audit report after closure. |
-| Similar-Issue Sweep | All Common event/wait_any sites: worker waits versus synchronous caller completion versus Session queue wait; classify each owner and cancellation need. |
+| Similar-Issue Sweep | All six CMake entries and actual compile flags; strict compiler output across all configured production/test sources; explicit disposition for platform-only tests and negative fixtures. |
 
 ## Current Technical Baseline
 
