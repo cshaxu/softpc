@@ -100,3 +100,19 @@ Package footprint: x86 3,655,242 bytes (+29), x64 3,058,784 bytes (+28).
 SHA256 x86: 416D4E24C48A8CEF7C83B9C407037ECCF6EE91088F01C4076F0474AFD0B3398A.
 SHA256 x64: 9412FC72D5A5AE5DDB7FE9DE0C9DECD4893B50551F2369A5A6270FA2B11A9D65.
 Preexisting neutral-text Queue/proposal edits remain outside this delivery.
+
+## Coordinator Delivery Review
+
+Reviewed actual commit 1785787c against the original two-part failure report,
+the packet, ownership rules and the finite ledger, rather than accepting the
+executor summary alone. The only production changes are the selected extent
+source and lossless ERROR admission; original renderer, lifecycle and failure
+cleanup owners remain intact. The error-path repair intentionally does not
+make terminal ERROR restartable. Tests prove prompt-preserving rejection,
+not recovery from a failed machine.
+
+Both real overlay startup observations and full suites pass on x86/x64. The
+15-second graphics integration check covers the reported immediate failure,
+not arbitrary long-running Windows behavior or visual desktop acceptance.
+P1 is pushed. Original INI/media and unrelated Queue/proposal edits are retained.
+S7 and T71 remain open pending owner retest; no whole-emulator closure claim.
