@@ -2,7 +2,7 @@
 
 ## Current Work
 
-Active task: M9 T72 S8, implemented and verified; preparing delivery review.
+Active task: M9 T72 S8, delivered and reviewed; awaiting owner test.
 T72 remains open; S1--S7 are closed. Owner explicitly admitted S8 after snapshot push.
 See [proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md) and
 [audit](../etc/evidence/softpc/m9-t72-post-s5-quality-audit.md).
@@ -37,6 +37,8 @@ Owner-approved snapshot delivery c0355b2f pushed; clean baseline verified.
 ## Current Technical Baseline
 
 - S8 production seven C/H +33/-36 (net -3); six C tests +149/-5 (net +144).
+  Implementation 95850780 pushed; coordinator actual-change review accepted
+  the bounded A/B/C/D/F delivery, not owner acceptance or whole-tree closure.
   Test build/gate +2/-2 (net0). Both Release builds pass; final background
   x64 105/105 (134.41s), x86 105/105 (135.13s). Five desktop tests per width
   excluded. Lib/VM/Compat/MVDM, INI/media/snapshot unchanged. See
