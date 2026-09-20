@@ -63,12 +63,12 @@ struct common_x86_debug {
     STD_SIZE_T breakpoint_remaining;
     STD_SIZE_T trace_remaining;
     command_run_kind run_kind;
-    common_machine_debug_observation observation;
+    common_x86_debug_observation observation;
 };
 
 typedef common_x86_debug command_context;
 typedef common_x86_debug_register command_register;
-typedef common_machine_debug_watch_kind command_machine_watch_kind;
+typedef common_x86_debug_watch_kind command_machine_watch_kind;
 
 static C_INT command_copy_text_checked(C_CHAR *destination,
     STD_SIZE_T destination_capacity, const C_CHAR *source);
@@ -94,9 +94,9 @@ static C_INT command_copy_text_checked(C_CHAR *destination,
 #define COMMAND_REGISTER_CR2 COMMON_X86_DEBUG_CR2
 #define COMMAND_REGISTER_CR3 COMMON_X86_DEBUG_CR3
 #define COMMAND_REGISTER_CR4 COMMON_X86_DEBUG_CR4
-#define COMMAND_REGISTER_WATCH_READ COMMON_MACHINE_DEBUG_WATCH_READ
-#define COMMAND_REGISTER_WATCH_WRITE COMMON_MACHINE_DEBUG_WATCH_WRITE
-#define COMMAND_REGISTER_WATCH_EXECUTE COMMON_MACHINE_DEBUG_WATCH_EXECUTE
+#define COMMAND_REGISTER_WATCH_READ COMMON_X86_DEBUG_WATCH_READ
+#define COMMAND_REGISTER_WATCH_WRITE COMMON_X86_DEBUG_WATCH_WRITE
+#define COMMAND_REGISTER_WATCH_EXECUTE COMMON_X86_DEBUG_WATCH_EXECUTE
 
 static C_INT command_printf(command_context *command, const char *format, ...)
 {
@@ -184,10 +184,16 @@ static C_INT command_read_line(command_context *debugContext,
 }
 
 static C_INT command_execute(command_context *debugContext,
-    const common_machine_debug_request *request,
-    common_machine_debug_result *result)
+    const common_x86_debug_request *request,
+    common_x86_debug_response *result)
 {
     common_machine_debug_lease lease;
+    lib_size response_size;
+
+    _Static_assert(sizeof(*request) <= COMMON_MACHINE_DEBUG_REQUEST_CAPACITY,
+        "x86 request must fit Machine transport");
+    _Static_assert(sizeof(*result) <= COMMON_MACHINE_DEBUG_RESPONSE_CAPACITY,
+        "x86 response must fit Machine transport");
 
     if (debugContext == STD_NULL || request == STD_NULL || result == STD_NULL) return 1;
     STD_MEMSET(result, 0, sizeof(*result));
@@ -195,7 +201,12 @@ static C_INT command_execute(command_context *debugContext,
     debugContext->access_status = common_machine_debug_acquire(debugContext->machine, &lease);
     if (debugContext->access_status == LIB_STATUS_OK)
         debugContext->access_status = common_machine_debug_execute_with_lease(
-            debugContext->machine, &lease, request, result);
+            debugContext->machine, &lease, request, sizeof(*request),
+            result, sizeof(*result), &response_size);
+    if (debugContext->access_status == LIB_STATUS_OK && response_size != sizeof(*result)) {
+        STD_MEMSET(result, 0, sizeof(*result));
+        debugContext->access_status = LIB_STATUS_IO_ERROR;
+    }
     if (debugContext->access_status != LIB_STATUS_OK) debugContext->error_position = 1u;
     return debugContext->access_status != LIB_STATUS_OK;
 }
@@ -203,10 +214,10 @@ static C_INT command_execute(command_context *debugContext,
 static C_INT command_read_register(command_context *debugContext,
     command_register register_id, type_unsigned_32 *value)
 {
-    common_machine_debug_result result;
+    common_x86_debug_response result;
     if (value == STD_NULL || command_execute(debugContext,
-            &(common_machine_debug_request){
-                .operation = COMMON_MACHINE_DEBUG_READ_REGISTER,
+            &(common_x86_debug_request){
+                .operation = COMMON_X86_DEBUG_READ_REGISTER,
                 .register_id = (lib_u32)register_id },
             &result)) return 1;
     *value = result.value;
@@ -216,19 +227,19 @@ static C_INT command_read_register(command_context *debugContext,
 static C_INT command_write_register(command_context *debugContext,
     command_register register_id, type_unsigned_32 value)
 {
-    common_machine_debug_result result;
-    return command_execute(debugContext, &(common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_REGISTER,
+    common_x86_debug_response result;
+    return command_execute(debugContext, &(common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_REGISTER,
         .register_id = (lib_u32)register_id, .address = value }, &result);
 }
 
 static C_INT command_access_memory(command_context *debugContext,
-    common_machine_debug_operation operation, type_unsigned_32 address,
+    common_x86_debug_operation operation, type_unsigned_32 address,
     type_unsigned_16 segment, type_unsigned_16 offset, C_VOID *data,
     type_unsigned_8 bytes)
 {
-    common_machine_debug_request request = {0};
-    common_machine_debug_result result;
+    common_x86_debug_request request = {0};
+    common_x86_debug_response result;
     if (data == STD_NULL || bytes > sizeof(request.data)) {
         debugContext->access_status = LIB_STATUS_INVALID_ARGUMENT;
         debugContext->error_position = 1u;
@@ -239,16 +250,16 @@ static C_INT command_access_memory(command_context *debugContext,
     request.segment = segment;
     request.offset = offset;
     request.bytes = bytes;
-    if (operation == COMMON_MACHINE_DEBUG_WRITE_LINEAR ||
-        operation == COMMON_MACHINE_DEBUG_WRITE_REAL)
+    if (operation == COMMON_X86_DEBUG_WRITE_LINEAR ||
+        operation == COMMON_X86_DEBUG_WRITE_REAL)
         STD_MEMCPY(request.data, data, bytes);
     if (command_execute(debugContext, &request, &result)) {
-        if (operation == COMMON_MACHINE_DEBUG_READ_LINEAR ||
-            operation == COMMON_MACHINE_DEBUG_READ_REAL) STD_MEMSET(data, 0, bytes);
+        if (operation == COMMON_X86_DEBUG_READ_LINEAR ||
+            operation == COMMON_X86_DEBUG_READ_REAL) STD_MEMSET(data, 0, bytes);
         return 1;
     }
-    if (operation == COMMON_MACHINE_DEBUG_READ_LINEAR ||
-        operation == COMMON_MACHINE_DEBUG_READ_REAL)
+    if (operation == COMMON_X86_DEBUG_READ_LINEAR ||
+        operation == COMMON_X86_DEBUG_READ_REAL)
         STD_MEMCPY(data, result.data, bytes);
     return 0;
 }
@@ -256,9 +267,9 @@ static C_INT command_access_memory(command_context *debugContext,
 static C_INT command_read_port(command_context *debugContext,
     type_unsigned_16 port, type_unsigned_32 *value)
 {
-    common_machine_debug_result result;
-    if (command_execute(debugContext, &(common_machine_debug_request){
-            .operation = COMMON_MACHINE_DEBUG_READ_PORT, .port = port, .bytes = 1u }, &result))
+    common_x86_debug_response result;
+    if (command_execute(debugContext, &(common_x86_debug_request){
+            .operation = COMMON_X86_DEBUG_READ_PORT, .port = port, .bytes = 1u }, &result))
         return 1;
     *value = result.value;
     return 0;
@@ -275,9 +286,9 @@ static type_unsigned_32 command_read_port_value(command_context *debugContext,
 static C_INT command_write_port(command_context *debugContext,
     type_unsigned_16 port, type_unsigned_32 value)
 {
-    common_machine_debug_request request = {0};
-    common_machine_debug_result result;
-    request.operation = COMMON_MACHINE_DEBUG_WRITE_PORT;
+    common_x86_debug_request request = {0};
+    common_x86_debug_response result;
+    request.operation = COMMON_X86_DEBUG_WRITE_PORT;
     request.bytes = 1u;
     request.port = port;
     request.address = value;
@@ -285,38 +296,38 @@ static C_INT command_write_port(command_context *debugContext,
 }
 
 static type_unsigned_32 command_code_property(command_context *debugContext,
-    common_machine_debug_operation operation)
+    common_x86_debug_operation operation)
 {
-    common_machine_debug_result result;
+    common_x86_debug_response result;
     return command_execute(debugContext,
-        &(common_machine_debug_request){ .operation = operation }, &result) ? 0u : result.value;
+        &(common_x86_debug_request){ .operation = operation }, &result) ? 0u : result.value;
 }
 
 static C_INT command_set_watch(command_context *debugContext,
     command_machine_watch_kind kind, type_unsigned_32 address)
 {
-    common_machine_debug_result result;
-    return command_execute(debugContext, &(common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_SET_WATCH, .address = address,
+    common_x86_debug_response result;
+    return command_execute(debugContext, &(common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_SET_WATCH, .address = address,
         .watch_kind = kind }, &result);
 }
 
 static C_INT command_clear_watch(command_context *debugContext,
     command_machine_watch_kind kind)
 {
-    common_machine_debug_result result;
-    return command_execute(debugContext, &(common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_CLEAR_WATCH, .watch_kind = kind }, &result);
+    common_x86_debug_response result;
+    return command_execute(debugContext, &(common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_CLEAR_WATCH, .watch_kind = kind }, &result);
 }
 
 static C_INT command_get_watch(command_context *debugContext,
     command_machine_watch_kind kind, type_unsigned_32 *out_address)
 {
-    common_machine_debug_result result;
+    common_x86_debug_response result;
 
     if (out_address == STD_NULL || command_execute(debugContext,
-            &(common_machine_debug_request){
-                .operation = COMMON_MACHINE_DEBUG_GET_WATCH,
+            &(common_x86_debug_request){
+                .operation = COMMON_X86_DEBUG_GET_WATCH,
                 .watch_kind = kind }, &result)) return -1;
     *out_address = result.value;
     return result.enabled ? 1 : 0;
@@ -338,12 +349,12 @@ static C_VOID command_resume(command_context *debugContext)
 static C_INT command_set_break(command_context *debugContext,
     type_unsigned_32 linear)
 {
-    common_machine_debug_request request = {0};
-    common_machine_debug_result result;
+    common_x86_debug_request request = {0};
+    common_x86_debug_response result;
 
     if (debugContext == STD_NULL) return 1;
-    request.operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN;
-    request.execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_BREAK_LINEAR;
+    request.operation = COMMON_X86_DEBUG_SET_EXECUTION_PLAN;
+    request.execution_kind = COMMON_X86_DEBUG_EXECUTION_BREAK_LINEAR;
     request.address = linear;
     if (command_execute(debugContext, &request, &result)) {
         command_printf(debugContext,
@@ -356,23 +367,23 @@ static C_INT command_set_break(command_context *debugContext,
 
 static C_VOID command_clear_break(command_context *debugContext)
 {
-    common_machine_debug_result result;
+    common_x86_debug_response result;
 
     if (debugContext == STD_NULL) return;
-    (C_VOID)command_execute(debugContext, &(common_machine_debug_request) {
-        .operation = COMMON_MACHINE_DEBUG_CLEAR_EXECUTION_PLAN }, &result);
+    (C_VOID)command_execute(debugContext, &(common_x86_debug_request) {
+        .operation = COMMON_X86_DEBUG_CLEAR_EXECUTION_PLAN }, &result);
     debugContext->breakpoint_linear = 0u;
     debugContext->breakpoint_remaining = 0u;
 }
 
 static C_INT command_set_trace(command_context *debugContext, STD_SIZE_T count)
 {
-    common_machine_debug_request request = {0};
-    common_machine_debug_result result;
+    common_x86_debug_request request = {0};
+    common_x86_debug_response result;
 
     if (debugContext == STD_NULL) return 1;
-    request.operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN;
-    request.execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_TRACE;
+    request.operation = COMMON_X86_DEBUG_SET_EXECUTION_PLAN;
+    request.execution_kind = COMMON_X86_DEBUG_EXECUTION_TRACE;
     request.instruction_count = count;
     if (command_execute(debugContext, &request, &result)) {
         command_printf(debugContext, "debug: fail to install trace plan.\n");
@@ -384,11 +395,11 @@ static C_INT command_set_trace(command_context *debugContext, STD_SIZE_T count)
 static C_INT command_get_execution_result(command_context *debugContext,
     type_unsigned_32 *out_executed)
 {
-    common_machine_debug_result result;
+    common_x86_debug_response result;
 
     if (out_executed == STD_NULL || command_execute(debugContext,
-            &(common_machine_debug_request) {
-                .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT },
+            &(common_x86_debug_request) {
+                .operation = COMMON_X86_DEBUG_GET_EXECUTION_RESULT },
             &result) || !result.enabled) return 1;
     *out_executed = result.value;
     debugContext->observation = result.observation;
@@ -463,12 +474,12 @@ static C_VOID command_print_watches(command_context *debugContext);
 #define command_machine_is_paused() command_is_paused(debugContext)
 #define command_machine_read_register(reg, value) command_read_register(debugContext, reg, value)
 #define command_machine_write_register(reg, value) command_write_register(debugContext, reg, value)
-#define command_machine_get_code_default_size() command_code_property(debugContext, COMMON_MACHINE_DEBUG_GET_CODE_DEFAULT_SIZE)
-#define command_machine_get_code_base() command_code_property(debugContext, COMMON_MACHINE_DEBUG_GET_CODE_BASE)
-#define command_machine_read_linear(address, out, size) command_access_memory(debugContext, COMMON_MACHINE_DEBUG_READ_LINEAR, address, 0u, 0u, out, size)
-#define command_machine_write_linear(address, in, size) command_access_memory(debugContext, COMMON_MACHINE_DEBUG_WRITE_LINEAR, address, 0u, 0u, in, size)
-#define command_machine_read_real(segment, offset, out, size) command_access_memory(debugContext, COMMON_MACHINE_DEBUG_READ_REAL, 0u, segment, offset, out, size)
-#define command_machine_write_real(segment, offset, in, size) command_access_memory(debugContext, COMMON_MACHINE_DEBUG_WRITE_REAL, 0u, segment, offset, in, size)
+#define command_machine_get_code_default_size() command_code_property(debugContext, COMMON_X86_DEBUG_GET_CODE_DEFAULT_SIZE)
+#define command_machine_get_code_base() command_code_property(debugContext, COMMON_X86_DEBUG_GET_CODE_BASE)
+#define command_machine_read_linear(address, out, size) command_access_memory(debugContext, COMMON_X86_DEBUG_READ_LINEAR, address, 0u, 0u, out, size)
+#define command_machine_write_linear(address, in, size) command_access_memory(debugContext, COMMON_X86_DEBUG_WRITE_LINEAR, address, 0u, 0u, in, size)
+#define command_machine_read_real(segment, offset, out, size) command_access_memory(debugContext, COMMON_X86_DEBUG_READ_REAL, 0u, segment, offset, out, size)
+#define command_machine_write_real(segment, offset, in, size) command_access_memory(debugContext, COMMON_X86_DEBUG_WRITE_REAL, 0u, segment, offset, in, size)
 #define command_machine_read_port(port) command_read_port_value(debugContext, port)
 #define command_machine_write_port(port, value) command_write_port(debugContext, port, value)
 #define command_machine_set_break_real(segment, offset) command_set_break(debugContext, ((type_unsigned_32)(segment) << 4u) + (offset))
@@ -507,20 +518,20 @@ static C_VOID debug_set_flag(command_context *debugContext, type_unsigned_32 mas
 }
 
 static C_INT command_capture_cpu(command_context *debugContext,
-    common_machine_debug_cpu_snapshot *out_snapshot)
+    common_x86_debug_cpu_snapshot *out_snapshot)
 {
-    common_machine_debug_result result;
+    common_x86_debug_response result;
 
     if (out_snapshot == STD_NULL || command_execute(debugContext,
-            &(common_machine_debug_request){
-                .operation = COMMON_MACHINE_DEBUG_GET_CPU_SNAPSHOT },
+            &(common_x86_debug_request){
+                .operation = COMMON_X86_DEBUG_GET_CPU_SNAPSHOT },
             &result)) return 1;
     *out_snapshot = result.cpu;
     return 0;
 }
 
 static C_VOID command_print_segment(command_context *debugContext,
-    const common_machine_debug_segment_snapshot *segment, const C_CHAR *label)
+    const common_x86_debug_segment_snapshot *segment, const C_CHAR *label)
 {
     command_printf(debugContext, "%s=%04X, Base=%08X, Limit=%08X, DPL=%01X, %s, ",
         label, segment->selector, segment->base, segment->limit, segment->dpl,
@@ -539,7 +550,7 @@ static C_VOID command_print_segment(command_context *debugContext,
 }
 
 static C_VOID command_print_system_segment(command_context *debugContext,
-    const common_machine_debug_segment_snapshot *segment, const C_CHAR *label)
+    const common_x86_debug_segment_snapshot *segment, const C_CHAR *label)
 {
     command_printf(debugContext, "%s=%04X, Base=%08X, Limit=%08X, DPL=%01X, Type=%04X\n",
         label, segment->selector, segment->base, segment->limit, segment->dpl,
@@ -548,7 +559,7 @@ static C_VOID command_print_system_segment(command_context *debugContext,
 
 static C_VOID command_print_segments(command_context *debugContext)
 {
-    common_machine_debug_cpu_snapshot snapshot;
+    common_x86_debug_cpu_snapshot snapshot;
 
     if (command_capture_cpu(debugContext, &snapshot)) return;
     command_print_segment(debugContext, &snapshot.es, "ES");
@@ -568,7 +579,7 @@ static C_VOID command_print_segments(command_context *debugContext)
 
 static C_VOID command_print_controls(command_context *debugContext)
 {
-    common_machine_debug_cpu_snapshot snapshot;
+    common_x86_debug_cpu_snapshot snapshot;
 
     if (command_capture_cpu(debugContext, &snapshot)) return;
     command_printf(debugContext, "CR0=%08X: %s %s %s %s %s %s\n", snapshot.cr0,
@@ -602,7 +613,7 @@ static C_VOID command_print_memory_accesses(command_context *debugContext)
     type_unsigned_8 index;
 
     for (index = 0u; index < debugContext->observation.count; ++index) {
-        const common_machine_debug_memory_access *access =
+        const common_x86_debug_memory_access *access =
             &debugContext->observation.accesses[index];
         command_printf(debugContext, "%s: Lin=%08x, Data=%08x%08x, Bytes=%x\n",
             access->write ? "Write" : "Read", access->linear,
@@ -1155,7 +1166,7 @@ static C_VOID l(command_context *debugContext)
     lib_size bytes;
     lib_size total;
     lib_status status;
-    type_unsigned_8 data[COMMON_MACHINE_DEBUG_BYTES];
+    type_unsigned_8 data[COMMON_X86_DEBUG_BYTES];
 
     if (!STD_STRLEN(strFileName)) {
         STD_PRINTF("File not found\n");
@@ -1743,7 +1754,7 @@ static C_VOID w(command_context *debugContext)
 {
     STD_SIZE_T i = 0;
     type_unsigned_32 len = (_bx << 16) + _cx;
-    type_unsigned_8 data[COMMON_MACHINE_DEBUG_BYTES];
+    type_unsigned_8 data[COMMON_X86_DEBUG_BYTES];
     lib_storage_file_writer *writer = LIB_NULL;
     lib_status status;
     if (!STD_STRLEN(strFileName))

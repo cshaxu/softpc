@@ -112,6 +112,14 @@ executed by the parked executor, never by the calling frontend. The machine
 checks paused state and the lease again there; callbacks must not synchronously
 reenter this control-thread API. `app/command` owns debugger selection
 and copied prompts; machine state changes do not select or exit the CLI.
+Machine copies opaque, pointer-free debug requests/results through one fixed slot
+(128-byte request, 1536-byte response), with explicit sizes and no per-request
+allocation. It knows no register, address or operation schema. The independent
+`x86-debug/protocol_interface.h` owns x86 vocabulary; frontend and VM adapt at
+their existing boundaries using aligned local values. Driver validation owns
+protocol sizes and operation limits. Failure returns zero response length and
+does not change caller output bytes; a failed wait requires shutdown before
+reusing the slot. Plan cancellation remains distinct from request completion.
 
 Debug owns growable command output; its public result borrows that text until
 the next producing call/open/destroy. The App binding forwards it as Session's
@@ -141,8 +149,9 @@ translate native records before the event reaches the shared contract; only
 the VM guest binding may translate that neutral value to a product's
 guest-input protocol.
 
-The common-machine executor is the sole caller of the injected machine driver
-and compatibility host. Input producers enqueue records and signal it. The
+The common-machine executor alone invokes state-access/execution driver hooks
+and compatibility work. Control callers may also invoke the driver's thread-safe
+stop/wake signals. Input producers enqueue records and signal it. The
 executor publishes complete text or graphic frame snapshots; frontends consume
 only those snapshots.
 

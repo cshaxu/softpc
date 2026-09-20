@@ -2,22 +2,22 @@
 #define VM_DEBUG_H
 
 #include "vm/machine.h"
-#include "common/machine/machine_interface.h"
+#include "common/x86-debug/protocol_interface.h"
 
 /* Product driver owns this state; only its executor accesses it. */
 typedef struct softpc_debug_state {
-    common_machine_debug_execution_plan_kind kind;
+    common_x86_debug_execution_plan_kind kind;
     lib_u64 target_count;
     lib_u32 address, executed, stopped_address;
     lib_bool stop_pending, result_ready, skip_first;
     lib_bool in_instruction;
     struct { lib_bool enabled; lib_u32 address; } watches[3];
-    common_machine_debug_observation observation;
+    common_x86_debug_observation observation;
 } softpc_debug_state;
 
 void softpc_debug_bind(softpc_debug_state *state);
 lib_status softpc_machine_debug(softpc_machine *machine, softpc_debug_state *state,
-    const common_machine_debug_request *request,
-    common_machine_debug_result *result);
+    const common_x86_debug_request *request,
+    common_x86_debug_response *result);
 
 #endif

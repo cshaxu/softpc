@@ -18,8 +18,9 @@ struct common_machine {
     base_sync_event *media_event;
     base_sync_event *debug_event;
     base_sync_event *state_event;
-    common_machine_debug_request debug_request;
-    common_machine_debug_result debug_result;
+    lib_u8 debug_request[COMMON_MACHINE_DEBUG_REQUEST_CAPACITY];
+    lib_u8 debug_response[COMMON_MACHINE_DEBUG_RESPONSE_CAPACITY];
+    lib_size debug_request_size, debug_response_capacity, debug_response_size;
     common_machine_debug_lease debug_lease;
     lib_status debug_status;
     lib_atomic_i32 debug_requested;
@@ -184,13 +185,19 @@ static void common_machine_service_debug(common_machine *machine)
         machine->driver.cancel_debug(machine->driver.context);
     if (lib_atomic_i32_exchange_explicit(&machine->debug_requested, 0, LIB_MEMORY_ORDER_SEQ_CST) == 0) return;
     machine->debug_status = LIB_STATUS_INVALID_STATE;
-    lib_memory_set(&machine->debug_result, 0, sizeof(machine->debug_result));
+    machine->debug_response_size = 0u;
+    lib_memory_set(machine->debug_response, 0, machine->debug_response_capacity);
     if (common_machine_state_get(machine) == COMMON_MACHINE_PAUSED &&
         lib_atomic_i32_load_explicit(&machine->pause_requested, LIB_MEMORY_ORDER_SEQ_CST) != 0 &&
         machine->debug_lease.generation == (lib_u64)(lib_u32)
             lib_atomic_i32_load_explicit(&machine->debug_generation, LIB_MEMORY_ORDER_SEQ_CST))
         machine->debug_status = machine->driver.execute_debug(
-            machine->driver.context, &machine->debug_request, &machine->debug_result);
+            machine->driver.context, machine->debug_request, machine->debug_request_size,
+            machine->debug_response, machine->debug_response_capacity,
+            &machine->debug_response_size);
+    if (machine->debug_response_size > machine->debug_response_capacity)
+        machine->debug_status = LIB_STATUS_IO_ERROR;
+    if (machine->debug_status != LIB_STATUS_OK) machine->debug_response_size = 0u;
     base_sync_event_signal(machine->debug_event);
 }
 
@@ -279,7 +286,7 @@ static void common_machine_finish_requests(common_machine *machine,
     if (lib_atomic_i32_exchange_explicit(&machine->debug_requested, 0,
             LIB_MEMORY_ORDER_SEQ_CST) != 0) {
         machine->debug_status = LIB_STATUS_IO_ERROR;
-        lib_memory_set(&machine->debug_result, 0, sizeof(machine->debug_result));
+        machine->debug_response_size = 0u;
         base_sync_event_signal(machine->debug_event);
     }
     if (lib_atomic_i32_exchange_explicit(&machine->media_requested, 0,
@@ -782,27 +789,37 @@ lib_status common_machine_debug_acquire(common_machine *machine,
 
 lib_status common_machine_debug_execute_with_lease(common_machine *machine,
     const common_machine_debug_lease *lease,
-    const common_machine_debug_request *request,
-    common_machine_debug_result *out_result)
+    const void *request, lib_size request_size,
+    void *response, lib_size response_capacity, lib_size *response_size)
 {
     lib_i32 generation;
 
-    if (machine == NULL || lease == NULL || request == NULL || out_result == NULL ||
-        request->bytes > COMMON_MACHINE_DEBUG_BYTES) return LIB_STATUS_INVALID_ARGUMENT;
+    if (response_size == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *response_size = 0u;
+    if (machine == NULL || lease == NULL || (request == NULL && request_size != 0u) ||
+        (response == NULL && response_capacity != 0u)) return LIB_STATUS_INVALID_ARGUMENT;
+    if (request_size > sizeof(machine->debug_request) ||
+        response_capacity > sizeof(machine->debug_response)) return LIB_STATUS_UNSUPPORTED;
     if (common_machine_state_get(machine) != COMMON_MACHINE_PAUSED)
         return LIB_STATUS_INVALID_STATE;
     generation = lib_atomic_i32_load_explicit(&machine->debug_generation, LIB_MEMORY_ORDER_SEQ_CST);
     if (lease->generation == 0u || lease->generation != (lib_u64)(lib_u32)generation)
         return LIB_STATUS_INVALID_STATE;
     if (machine->driver.execute_debug == NULL) return LIB_STATUS_UNSUPPORTED;
-    machine->debug_request = *request;
+    if (request_size != 0u) lib_memory_copy(machine->debug_request, request, request_size);
+    machine->debug_request_size = request_size;
+    machine->debug_response_capacity = response_capacity;
     machine->debug_lease = *lease;
     if (!common_machine_submit_request(machine, &machine->debug_requested,
             machine->debug_event, 1u << COMMON_MACHINE_PAUSED))
         return LIB_STATUS_INVALID_STATE;
     if (base_sync_event_wait(machine->debug_event, UINT32_MAX) !=
         BASE_SYNC_WAIT_SIGNALED) return LIB_STATUS_IO_ERROR;
-    *out_result = machine->debug_result;
+    if (machine->debug_status == LIB_STATUS_OK) {
+        if (machine->debug_response_size != 0u)
+            lib_memory_copy(response, machine->debug_response, machine->debug_response_size);
+        *response_size = machine->debug_response_size;
+    }
     return machine->debug_status;
 }
 

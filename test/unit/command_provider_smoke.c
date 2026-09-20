@@ -6,6 +6,17 @@
 #include <stdio.h>
 #include <string.h>
 
+static lib_status execute_x86(common_machine *machine,
+    const common_machine_debug_lease *lease, const common_x86_debug_request *request,
+    common_x86_debug_response *response)
+{
+    lib_size size;
+    lib_status status = common_machine_debug_execute_with_lease(machine, lease,
+        request, sizeof(*request), response, sizeof(*response), &size);
+    assert(size == (status == LIB_STATUS_OK ? sizeof(*response) : 0u));
+    return status;
+}
+
 typedef struct completions {
     HANDLE paused;
     HANDLE running;
@@ -57,81 +68,97 @@ static void submit(common_session_command_provider *provider,
 static const char *debug_text(const common_session_command_result *result)
 { return result->detail != NULL ? result->detail : result->text; }
 
-static common_machine_debug_result access(common_machine *machine,
-    const common_machine_debug_lease *lease, common_machine_debug_request request)
+static common_x86_debug_response access(common_machine *machine,
+    const common_machine_debug_lease *lease, common_x86_debug_request request)
 {
-    common_machine_debug_result result;
-    assert(common_machine_debug_execute_with_lease(machine, lease, &request, &result) == LIB_STATUS_OK);
+    common_x86_debug_response result;
+    assert(execute_x86(machine, lease, &request, &result) == LIB_STATUS_OK);
     return result;
 }
 
 static lib_u32 reg(common_machine *machine, const common_machine_debug_lease *lease,
     lib_u32 id)
 {
-    return access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_READ_REGISTER, .register_id = id }).value;
+    return access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_READ_REGISTER, .register_id = id }).value;
 }
 
 static void setreg(common_machine *machine, const common_machine_debug_lease *lease,
     lib_u32 id, lib_u32 value)
 {
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_REGISTER, .register_id = id, .address = value });
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_REGISTER, .register_id = id, .address = value });
 }
 
 static void memory_word(common_machine *machine, const common_machine_debug_lease *lease,
     lib_u32 address, lib_u32 value)
 {
-    common_machine_debug_request request = {
-        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = address, .bytes = 4u };
+    common_x86_debug_request request = {
+        .operation = COMMON_X86_DEBUG_WRITE_LINEAR, .address = address, .bytes = 4u };
     memcpy(request.data, &value, 4u);
     (void)access(machine, lease, request);
 }
 
 static void synchronous_access(common_machine *machine, const common_machine_debug_lease *lease)
 {
-    common_machine_debug_result before = access(machine, lease,
-        (common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_GET_CPU_SNAPSHOT });
-    common_machine_debug_result after;
+    common_x86_debug_response before = access(machine, lease,
+        (common_x86_debug_request){ .operation = COMMON_X86_DEBUG_GET_CPU_SNAPSHOT });
+    common_x86_debug_response after;
     const lib_u32 ids[] = { COMMON_X86_DEBUG_EIP, COMMON_X86_DEBUG_EFLAGS, COMMON_X86_DEBUG_CS, COMMON_X86_DEBUG_SS, COMMON_X86_DEBUG_DS,
         COMMON_X86_DEBUG_ES, COMMON_X86_DEBUG_FS, COMMON_X86_DEBUG_GS, COMMON_X86_DEBUG_CR2, COMMON_X86_DEBUG_CR3 };
     size_t index;
     lib_u32 old, cr0 = before.cpu.cr0, cr3 = before.cpu.cr3;
+    common_x86_debug_request request = { .operation = COMMON_X86_DEBUG_READ_REGISTER };
+    const struct { lib_size request_size, capacity; } invalid_shapes[] = {
+        {0, sizeof(after)}, {sizeof(request) - 1u, sizeof(after)},
+        {sizeof(request), 0}, {sizeof(request), sizeof(after) - 1u}
+    };
+    for (index = 0; index < sizeof(invalid_shapes) / sizeof(invalid_shapes[0]); ++index) {
+        lib_size response_size = 99u;
+        after.value = 0x55u;
+        assert(common_machine_debug_execute_with_lease(machine, lease,
+            &request, invalid_shapes[index].request_size, &after,
+            invalid_shapes[index].capacity, &response_size) == LIB_STATUS_INVALID_ARGUMENT);
+        assert(response_size == 0u && after.value == 0x55u);
+    }
+    request.bytes = COMMON_X86_DEBUG_BYTES + 1u;
+    assert(execute_x86(machine, lease, &request, &after) == LIB_STATUS_INVALID_ARGUMENT);
+    assert(after.value == 0x55u);
     for (index = 0; index < sizeof(ids) / sizeof(ids[0]); ++index) {
         old = reg(machine, lease, ids[index]);
         setreg(machine, lease, ids[index], old);
         assert(reg(machine, lease, ids[index]) == old);
     }
     after = access(machine, lease,
-        (common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_GET_CPU_SNAPSHOT });
+        (common_x86_debug_request){ .operation = COMMON_X86_DEBUG_GET_CPU_SNAPSHOT });
     assert(memcmp(&before.cpu, &after.cpu, sizeof(before.cpu)) == 0);
     old = reg(machine, lease, COMMON_X86_DEBUG_DS);
     setreg(machine, lease, COMMON_X86_DEBUG_DS, 0x1234u);
     after = access(machine, lease,
-        (common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_GET_CPU_SNAPSHOT });
+        (common_x86_debug_request){ .operation = COMMON_X86_DEBUG_GET_CPU_SNAPSHOT });
     assert(after.cpu.ds.selector == 0x1234u && after.cpu.ds.base == 0x12340u);
     setreg(machine, lease, COMMON_X86_DEBUG_DS, old);
-    assert(common_machine_debug_execute_with_lease(machine, lease,
-        &(common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_WRITE_REGISTER,
+    assert(execute_x86(machine, lease,
+        &(common_x86_debug_request){ .operation = COMMON_X86_DEBUG_WRITE_REGISTER,
             .register_id = COMMON_X86_DEBUG_CR0, .address = 0x80000000u }, &after) == LIB_STATUS_INVALID_ARGUMENT);
     assert(reg(machine, lease, COMMON_X86_DEBUG_CR0) == cr0);
     old = reg(machine, lease, COMMON_X86_DEBUG_DS);
     setreg(machine, lease, COMMON_X86_DEBUG_CR0, cr0 | 1u);
-    assert(common_machine_debug_execute_with_lease(machine, lease,
-        &(common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_WRITE_REGISTER,
+    assert(execute_x86(machine, lease,
+        &(common_x86_debug_request){ .operation = COMMON_X86_DEBUG_WRITE_REGISTER,
             .register_id = COMMON_X86_DEBUG_DS, .address = 0xfff8u }, &after) == LIB_STATUS_INVALID_ARGUMENT);
     assert(reg(machine, lease, COMMON_X86_DEBUG_DS) == old);
     setreg(machine, lease, COMMON_X86_DEBUG_CR0, cr0);
-    old = access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_READ_PORT, .port = 0x21u, .bytes = 1u }).value;
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_PORT, .port = 0x21u, .bytes = 1u, .address = 0x5au });
-    assert(access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_READ_PORT, .port = 0x21u, .bytes = 1u }).value == 0x5au);
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_PORT, .port = 0x21u, .bytes = 1u, .address = old });
-    assert(common_machine_debug_execute_with_lease(machine, lease,
-        &(common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_READ_PORT,
+    old = access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_READ_PORT, .port = 0x21u, .bytes = 1u }).value;
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_PORT, .port = 0x21u, .bytes = 1u, .address = 0x5au });
+    assert(access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_READ_PORT, .port = 0x21u, .bytes = 1u }).value == 0x5au);
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_PORT, .port = 0x21u, .bytes = 1u, .address = old });
+    assert(execute_x86(machine, lease,
+        &(common_x86_debug_request){ .operation = COMMON_X86_DEBUG_READ_PORT,
             .port = 0x21u, .bytes = 2u }, &after) == LIB_STATUS_INVALID_ARGUMENT);
     /* Disposable page directory/table; all accesses remain on the paused executor. */
     memory_word(machine, lease, 0x10000u, 0x11003u);
@@ -143,45 +170,45 @@ static void synchronous_access(common_machine *machine, const common_machine_deb
     memory_word(machine, lease, 0x32ffcu, 0x12345678u);
     setreg(machine, lease, COMMON_X86_DEBUG_CR3, 0x10000u);
     setreg(machine, lease, COMMON_X86_DEBUG_CR0, cr0 | 0x80000001u);
-    after = access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0x2ffcu, .bytes = 8u });
+    after = access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_READ_LINEAR, .address = 0x2ffcu, .bytes = 8u });
     assert(after.data[0] == 0x44u && after.data[4] == 0x88u);
     memory_word(machine, lease, 0x3000u, 0xaabbccddu);
-    assert(common_machine_debug_execute_with_lease(machine, lease,
-        &(common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_READ_LINEAR,
+    assert(execute_x86(machine, lease,
+        &(common_x86_debug_request){ .operation = COMMON_X86_DEBUG_READ_LINEAR,
             .address = 0x4000u, .bytes = 1u }, &after) == LIB_STATUS_INVALID_ARGUMENT);
     assert(reg(machine, lease, COMMON_X86_DEBUG_CR2) == before.cpu.cr2);
-    assert(common_machine_debug_execute_with_lease(machine, lease,
-        &(common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR,
+    assert(execute_x86(machine, lease,
+        &(common_x86_debug_request){ .operation = COMMON_X86_DEBUG_WRITE_LINEAR,
             .address = 0x3ffcu, .bytes = 8u }, &after) == LIB_STATUS_INVALID_ARGUMENT);
     setreg(machine, lease, COMMON_X86_DEBUG_CR0, cr0);
     setreg(machine, lease, COMMON_X86_DEBUG_CR3, cr3);
-    after = access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0x32000u, .bytes = 4u });
+    after = access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_READ_LINEAR, .address = 0x32000u, .bytes = 4u });
     assert(after.data[0] == 0xddu && after.data[3] == 0xaau);
-    after = access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0x32ffcu, .bytes = 4u });
+    after = access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_READ_LINEAR, .address = 0x32ffcu, .bytes = 4u });
     assert(after.data[0] == 0x78u && after.data[3] == 0x12u); /* No partial write. */
-    after = access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0x10000u, .bytes = 4u });
+    after = access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_READ_LINEAR, .address = 0x10000u, .bytes = 4u });
     assert(after.data[0] == 3u); /* No accessed/dirty mutation by inspection. */
-    assert(common_machine_debug_execute_with_lease(machine, lease,
-        &(common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_WRITE_REAL,
+    assert(execute_x86(machine, lease,
+        &(common_x86_debug_request){ .operation = COMMON_X86_DEBUG_WRITE_REAL,
             .segment = 0xf000u, .offset = 0xfff0u, .bytes = 1u }, &after) == LIB_STATUS_INVALID_ARGUMENT);
 }
 
 static void run_plan(common_machine *machine, common_machine_debug_lease *lease,
-    completions *events, common_machine_debug_request request, lib_u32 expected_ip,
+    completions *events, common_x86_debug_request request, lib_u32 expected_ip,
     lib_u32 expected_count)
 {
-    common_machine_debug_result result;
+    common_x86_debug_response result;
     (void)access(machine, lease, request);
     assert(common_machine_resume(machine));
     wait_for(events->running);
     wait_for(events->paused);
     assert(common_machine_debug_acquire(machine, lease) == LIB_STATUS_OK);
-    result = access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT });
+    result = access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_GET_EXECUTION_RESULT });
     fprintf(stderr, "plan completed IP=%lx count=%lu ready=%d\n",
         (unsigned long)reg(machine, lease, COMMON_X86_DEBUG_EIP),
         (unsigned long)result.value, result.enabled);
@@ -192,8 +219,8 @@ static void run_plan(common_machine *machine, common_machine_debug_lease *lease,
 static void execution_plans(common_machine *machine, common_machine_debug_lease *lease,
     completions *events)
 {
-    common_machine_debug_request trace = { .operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
-        .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_TRACE, .instruction_count = 1u };
+    common_x86_debug_request trace = { .operation = COMMON_X86_DEBUG_SET_EXECUTION_PLAN,
+        .execution_kind = COMMON_X86_DEBUG_EXECUTION_TRACE, .instruction_count = 1u };
     lib_u32 flags = reg(machine, lease, COMMON_X86_DEBUG_EFLAGS);
     lib_u32 index;
     setreg(machine, lease, COMMON_X86_DEBUG_EFLAGS, 2u);
@@ -201,8 +228,8 @@ static void execution_plans(common_machine *machine, common_machine_debug_lease 
     setreg(machine, lease, COMMON_X86_DEBUG_SS, 0u);
     setreg(machine, lease, COMMON_X86_DEBUG_ESP, 0x900u);
     setreg(machine, lease, COMMON_X86_DEBUG_EIP, 0x500u);
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x500u, .bytes = 7u,
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_LINEAR, .address = 0x500u, .bytes = 7u,
         .data = { 0xb8,1,0,0x40,0x40,0xeb,0xfe } });
     trace.instruction_count = 3u;
     run_plan(machine, lease, events, trace, 0x505u, 3u);
@@ -210,8 +237,8 @@ static void execution_plans(common_machine *machine, common_machine_debug_lease 
     /* Every interrupt-shadow bypass is one retirement, not zero or two. */
     setreg(machine, lease, COMMON_X86_DEBUG_EAX, 0u);
     setreg(machine, lease, COMMON_X86_DEBUG_EIP, 0x500u);
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x500u, .bytes = 7u,
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_LINEAR, .address = 0x500u, .bytes = 7u,
         .data = { 0x8e,0xd0,0xfb,0xfa,0x16,0x17,0x90 } });
     trace.instruction_count = 1u;
     for (index = 0x502u; index <= 0x507u; ++index)
@@ -220,16 +247,16 @@ static void execution_plans(common_machine *machine, common_machine_debug_lease 
     memory_word(machine, lease, 0x900u, 0x580u);
     memory_word(machine, lease, 0x904u, 2u);
     setreg(machine, lease, COMMON_X86_DEBUG_EIP, 0x570u);
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x570u, .bytes = 1u,
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_LINEAR, .address = 0x570u, .bytes = 1u,
         .data = { 0xcf } });
     run_plan(machine, lease, events, trace, 0x580u, 1u);
     /* REP is one completed instruction even when it writes four bytes. */
     setreg(machine, lease, COMMON_X86_DEBUG_ECX, 4u);
     setreg(machine, lease, COMMON_X86_DEBUG_EDI, 0xa00u);
     setreg(machine, lease, COMMON_X86_DEBUG_ES, 0u);
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x580u, .bytes = 2u,
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_LINEAR, .address = 0x580u, .bytes = 2u,
         .data = { 0xf3,0xaa } });
     run_plan(machine, lease, events, trace, 0x582u, 1u);
     assert(reg(machine, lease, COMMON_X86_DEBUG_ECX) == 0u);
@@ -237,11 +264,11 @@ static void execution_plans(common_machine *machine, common_machine_debug_lease 
     memory_word(machine, lease, 6u * 4u, 0x700u);
     setreg(machine, lease, COMMON_X86_DEBUG_ESP, 0x900u);
     setreg(machine, lease, COMMON_X86_DEBUG_EIP, 0x580u);
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x580u, .bytes = 2u,
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_LINEAR, .address = 0x580u, .bytes = 2u,
         .data = { 0x0f,0xff } });
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x700u, .bytes = 2u,
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_LINEAR, .address = 0x700u, .bytes = 2u,
         .data = { 0x90,0x90 } });
     run_plan(machine, lease, events, trace, 0x701u, 1u);
     /* Guest TF still delivers its own INT 1 before the next instruction. */
@@ -253,19 +280,19 @@ static void execution_plans(common_machine *machine, common_machine_debug_lease 
     /* A breakpoint stops before its instruction; rearming progresses first. */
     setreg(machine, lease, COMMON_X86_DEBUG_EIP, 0x500u);
     setreg(machine, lease, COMMON_X86_DEBUG_EAX, 0u);
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x500u, .bytes = 3u,
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_LINEAR, .address = 0x500u, .bytes = 3u,
         .data = { 0x40,0xeb,0xfd } });
-    trace.execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_BREAK_LINEAR;
+    trace.execution_kind = COMMON_X86_DEBUG_EXECUTION_BREAK_LINEAR;
     trace.address = 0x501u;
     run_plan(machine, lease, events, trace, 0x501u, 1u);
-    trace.execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_BREAK_REAL;
+    trace.execution_kind = COMMON_X86_DEBUG_EXECUTION_BREAK_REAL;
     trace.segment = 0u;
     trace.offset = 0x501u;
     run_plan(machine, lease, events, trace, 0x501u, 2u);
     assert(reg(machine, lease, COMMON_X86_DEBUG_EAX) == 2u);
     /* User cancellation cannot later turn an ordinary pause into a debug hit. */
-    trace.execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_BREAK_LINEAR;
+    trace.execution_kind = COMMON_X86_DEBUG_EXECUTION_BREAK_LINEAR;
     trace.address = 0x800u;
     (void)access(machine, lease, trace);
     assert(common_machine_resume(machine));
@@ -274,10 +301,10 @@ static void execution_plans(common_machine *machine, common_machine_debug_lease 
     assert(common_machine_pause(machine));
     wait_for(events->paused);
     assert(common_machine_debug_acquire(machine, lease) == LIB_STATUS_OK);
-    assert(!access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT }).enabled);
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_CLEAR_EXECUTION_PLAN });
+    assert(!access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_GET_EXECUTION_RESULT }).enabled);
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_CLEAR_EXECUTION_PLAN });
     setreg(machine, lease, COMMON_X86_DEBUG_EFLAGS, flags);
 }
 
@@ -285,7 +312,7 @@ static void command_matrix(common_machine *machine, common_machine_debug_lease *
     common_session_command_provider *provider)
 {
     common_session_command_result result;
-    common_machine_debug_result bytes;
+    common_x86_debug_response bytes;
     const struct { const char *line, *contains; } commands[] = {
         {"e 0:b00 12 34", ""}, {"f 0:b02 b03 56", ""},
         {"m 0:b00 b03 0:b10", ""}, {"c 0:b00 b03 0:b10", ""},
@@ -312,12 +339,12 @@ static void command_matrix(common_machine *machine, common_machine_debug_lease *
         assert(strstr(debug_text(&result), commands[i].contains));
         assert(result.request == COMMON_SESSION_REQUEST_NONE);
     }
-    bytes = access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0xb50u, .bytes = 4u });
+    bytes = access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_READ_LINEAR, .address = 0xb50u, .bytes = 4u });
     assert(memcmp(bytes.data, "\x12\x34\x56\x56", 4u) == 0);
     assert(remove("debug-cli-transfer.bin") == 0);
-    bytes = access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0xb40u, .bytes = 2u });
+    bytes = access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_READ_LINEAR, .address = 0xb40u, .bytes = 2u });
     assert(bytes.data[0] == 0x90 && bytes.data[1] == 0xf8);
     submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xd 0 1000", &result);
     assert(result.detail != NULL && strlen(result.detail) > 16384u);
@@ -325,8 +352,8 @@ static void command_matrix(common_machine *machine, common_machine_debug_lease *
     /* Invalid watch/register/plan requests cannot dispatch execution. */
     submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xw w nonsense", &result);
     assert(result.request == COMMON_SESSION_REQUEST_NONE);
-    assert(!access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_GET_WATCH, .watch_kind = COMMON_MACHINE_DEBUG_WATCH_WRITE }).enabled);
+    assert(!access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_GET_WATCH, .watch_kind = COMMON_X86_DEBUG_WATCH_WRITE }).enabled);
     {
         lib_u32 ip = reg(machine, lease, COMMON_X86_DEBUG_EIP);
         submit(provider, COMMON_SESSION_MACHINE_PAUSED, "g 0:800 nonsense", &result);
@@ -340,41 +367,41 @@ static void command_matrix(common_machine *machine, common_machine_debug_lease *
         assert(reg(machine, lease, COMMON_X86_DEBUG_EIP) == ((ip & 0xffff0000u) | 0x800u));
         setreg(machine, lease, COMMON_X86_DEBUG_EIP, ip);
     }
-    assert(common_machine_debug_execute_with_lease(machine, lease,
-        &(common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_SET_WATCH,
-            .watch_kind = (common_machine_debug_watch_kind)3 }, &bytes) == LIB_STATUS_INVALID_ARGUMENT);
+    assert(execute_x86(machine, lease,
+        &(common_x86_debug_request){ .operation = COMMON_X86_DEBUG_SET_WATCH,
+            .watch_kind = (common_x86_debug_watch_kind)3 }, &bytes) == LIB_STATUS_INVALID_ARGUMENT);
 }
 
 static void watchpoints(common_machine *machine, common_machine_debug_lease *lease,
     completions *events, common_session_command_provider *provider)
 {
-    common_machine_debug_result value;
+    common_x86_debug_response value;
     common_session_command_result output;
     unsigned kind;
     setreg(machine, lease, COMMON_X86_DEBUG_CS, 0u);
     setreg(machine, lease, COMMON_X86_DEBUG_DS, 0u);
     setreg(machine, lease, COMMON_X86_DEBUG_EFLAGS, 2u);
     /* word store, word load, loop. Watch the SECOND byte to prove overlap. */
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x800u, .bytes = 11u,
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_LINEAR, .address = 0x800u, .bytes = 11u,
         .data = { 0xc7,0x06,0x00,0x0a,0x34,0x12,0xa1,0x00,0x0a,0xeb,0xf5 } });
     for (kind = 0u; kind < 3u; ++kind) {
-        lib_u32 target = kind == COMMON_MACHINE_DEBUG_WATCH_EXECUTE ? 0x806u : 0xa01u;
+        lib_u32 target = kind == COMMON_X86_DEBUG_WATCH_EXECUTE ? 0x806u : 0xa01u;
         setreg(machine, lease, COMMON_X86_DEBUG_EIP, 0x800u);
-        (void)access(machine, lease, (common_machine_debug_request){
-            .operation = COMMON_MACHINE_DEBUG_CLEAR_EXECUTION_PLAN });
-        value = access(machine, lease, (common_machine_debug_request){
-            .operation = COMMON_MACHINE_DEBUG_SET_WATCH, .watch_kind = kind, .address = target });
+        (void)access(machine, lease, (common_x86_debug_request){
+            .operation = COMMON_X86_DEBUG_CLEAR_EXECUTION_PLAN });
+        value = access(machine, lease, (common_x86_debug_request){
+            .operation = COMMON_X86_DEBUG_SET_WATCH, .watch_kind = kind, .address = target });
         assert(value.enabled && value.value == target);
-        value = access(machine, lease, (common_machine_debug_request){
-            .operation = COMMON_MACHINE_DEBUG_GET_WATCH, .watch_kind = kind });
+        value = access(machine, lease, (common_x86_debug_request){
+            .operation = COMMON_X86_DEBUG_GET_WATCH, .watch_kind = kind });
         assert(value.enabled && value.value == target);
         /* Inspection and debugger writes cannot self-trigger the watch. */
         memory_word(machine, lease, 0xa00u, 0u);
-        (void)access(machine, lease, (common_machine_debug_request){
-            .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0xa00u, .bytes = 2u });
-        assert(!access(machine, lease, (common_machine_debug_request){
-            .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT }).enabled);
+        (void)access(machine, lease, (common_x86_debug_request){
+            .operation = COMMON_X86_DEBUG_READ_LINEAR, .address = 0xa00u, .bytes = 2u });
+        assert(!access(machine, lease, (common_x86_debug_request){
+            .operation = COMMON_X86_DEBUG_GET_EXECUTION_RESULT }).enabled);
         submit(provider, COMMON_SESSION_MACHINE_PAUSED, "g", &output);
         assert(output.request == COMMON_SESSION_REQUEST_RESUME);
         assert(common_machine_resume(machine));
@@ -383,8 +410,8 @@ static void watchpoints(common_machine *machine, common_machine_debug_lease *lea
             COMMON_SESSION_MACHINE_RUNNING, &output);
         wait_for(events->paused);
         assert(common_machine_debug_acquire(machine, lease) == LIB_STATUS_OK);
-        value = access(machine, lease, (common_machine_debug_request){
-            .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT });
+        value = access(machine, lease, (common_x86_debug_request){
+            .operation = COMMON_X86_DEBUG_GET_EXECUTION_RESULT });
         assert(value.enabled && value.observation.watch_hit);
         assert(value.observation.watch_kind == kind && value.observation.watch_address == target);
         assert(reg(machine, lease, COMMON_X86_DEBUG_EIP) == (kind == 0u ? 0x809u : 0x806u));
@@ -398,30 +425,30 @@ static void watchpoints(common_machine *machine, common_machine_debug_lease *lea
         provider->note_monitor_current(provider->context, LIB_TRUE, &output);
         assert(strstr(debug_text(&output), "Watch-") && strstr(debug_text(&output), " hit:"));
         assert(output.request == COMMON_SESSION_REQUEST_NONE);
-        if (kind == COMMON_MACHINE_DEBUG_WATCH_EXECUTE) {
+        if (kind == COMMON_X86_DEBUG_WATCH_EXECUTE) {
             /* T from the just-hit execute watch must execute, not re-hit. */
-            run_plan(machine, lease, events, (common_machine_debug_request){
-                .operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
-                .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_TRACE,
+            run_plan(machine, lease, events, (common_x86_debug_request){
+                .operation = COMMON_X86_DEBUG_SET_EXECUTION_PLAN,
+                .execution_kind = COMMON_X86_DEBUG_EXECUTION_TRACE,
                 .instruction_count = 1u }, 0x809u, 1u);
-            assert(!access(machine, lease, (common_machine_debug_request){
-                .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT }).observation.watch_hit);
+            assert(!access(machine, lease, (common_x86_debug_request){
+                .operation = COMMON_X86_DEBUG_GET_EXECUTION_RESULT }).observation.watch_hit);
         }
-        (void)access(machine, lease, (common_machine_debug_request){
-            .operation = COMMON_MACHINE_DEBUG_CLEAR_WATCH, .watch_kind = kind });
-        assert(!access(machine, lease, (common_machine_debug_request){
-            .operation = COMMON_MACHINE_DEBUG_GET_WATCH, .watch_kind = kind }).enabled);
+        (void)access(machine, lease, (common_x86_debug_request){
+            .operation = COMMON_X86_DEBUG_CLEAR_WATCH, .watch_kind = kind });
+        assert(!access(machine, lease, (common_x86_debug_request){
+            .operation = COMMON_X86_DEBUG_GET_WATCH, .watch_kind = kind }).enabled);
     }
     /* A non-overlapping watch must not stop the first store; trace does. */
     setreg(machine, lease, COMMON_X86_DEBUG_EIP, 0x800u);
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_SET_WATCH, .watch_kind = COMMON_MACHINE_DEBUG_WATCH_WRITE,
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_SET_WATCH, .watch_kind = COMMON_X86_DEBUG_WATCH_WRITE,
         .address = 0xa02u });
-    run_plan(machine, lease, events, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
-        .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_TRACE, .instruction_count = 1u }, 0x806u, 1u);
-    value = access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT });
+    run_plan(machine, lease, events, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_SET_EXECUTION_PLAN,
+        .execution_kind = COMMON_X86_DEBUG_EXECUTION_TRACE, .instruction_count = 1u }, 0x806u, 1u);
+    value = access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_GET_EXECUTION_RESULT });
     assert(!value.observation.watch_hit && value.observation.count == 1u);
     submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xw u", &output);
     assert(strstr(debug_text(&output), "All watch points removed"));
@@ -440,10 +467,10 @@ static void watchpoints(common_machine *machine, common_machine_debug_lease *lea
 static void access_boundaries(common_machine *machine, common_machine_debug_lease *lease,
     completions *events)
 {
-    common_machine_debug_request trace = {
-        .operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
-        .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_TRACE, .instruction_count = 1u };
-    common_machine_debug_result value;
+    common_x86_debug_request trace = {
+        .operation = COMMON_X86_DEBUG_SET_EXECUTION_PLAN,
+        .execution_kind = COMMON_X86_DEBUG_EXECUTION_TRACE, .instruction_count = 1u };
+    common_x86_debug_response value;
     /* Byte and dword operands; implicit stack; reverse-buffer x87 qword. */
     const unsigned char program[] = {
         0xa0,0x00,0x0a, 0x66,0xa1,0x00,0x0a, 0xa2,0x04,0x0a,
@@ -452,7 +479,7 @@ static void access_boundaries(common_machine *machine, common_machine_debug_leas
     const unsigned ends[] = {3,7,10,14,15,16,18,22,26};
     const unsigned widths[] = {1,4,1,4,2,2,0,8,8};
     unsigned i;
-    common_machine_debug_request write = { .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR,
+    common_x86_debug_request write = { .operation = COMMON_X86_DEBUG_WRITE_LINEAR,
         .address = 0x800u, .bytes = sizeof(program) };
     memcpy(write.data, program, sizeof(program));
     (void)access(machine, lease, write);
@@ -464,8 +491,8 @@ static void access_boundaries(common_machine *machine, common_machine_debug_leas
     setreg(machine, lease, COMMON_X86_DEBUG_ESP, 0x900u);
     for (i = 0; i < sizeof(ends)/sizeof(ends[0]); ++i) {
         run_plan(machine, lease, events, trace, 0x800u + ends[i], 1u);
-        value = access(machine, lease, (common_machine_debug_request){
-            .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT });
+        value = access(machine, lease, (common_x86_debug_request){
+            .operation = COMMON_X86_DEBUG_GET_EXECUTION_RESULT });
         assert(value.observation.count == (widths[i] ? 1u : 0u));
         if (!widths[i]) continue;
         assert(value.observation.accesses[0].bytes == widths[i]);
@@ -473,8 +500,8 @@ static void access_boundaries(common_machine *machine, common_machine_debug_leas
             assert(value.observation.accesses[0].data == 0x0000123400001234ull);
         if (i == 8u) {
             lib_u64 stored;
-            common_machine_debug_result bytes = access(machine, lease,
-                (common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_READ_LINEAR,
+            common_x86_debug_response bytes = access(machine, lease,
+                (common_x86_debug_request){ .operation = COMMON_X86_DEBUG_READ_LINEAR,
                     .address = 0xa10u, .bytes = 8u });
             memcpy(&stored, bytes.data, sizeof(stored));
             /* Both the observation and arithmetic must preserve this exact integer. */
@@ -483,42 +510,42 @@ static void access_boundaries(common_machine *machine, common_machine_debug_leas
         }
     }
     /* Observation capacity never limits watch matching: hit byte 39. */
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x800u,
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_LINEAR, .address = 0x800u,
         .bytes = 2u, .data = {0xf3,0xaa} });
     setreg(machine, lease, COMMON_X86_DEBUG_EIP, 0x800u);
     setreg(machine, lease, COMMON_X86_DEBUG_ES, 0u);
     setreg(machine, lease, COMMON_X86_DEBUG_EDI, 0xa00u);
     setreg(machine, lease, COMMON_X86_DEBUG_ECX, 40u);
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_SET_WATCH,
-        .watch_kind = COMMON_MACHINE_DEBUG_WATCH_WRITE, .address = 0xa27u });
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_SET_WATCH,
+        .watch_kind = COMMON_X86_DEBUG_WATCH_WRITE, .address = 0xa27u });
     run_plan(machine, lease, events, trace, 0x802u, 1u);
-    value = access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT });
+    value = access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_GET_EXECUTION_RESULT });
     assert(value.observation.truncated && value.observation.count == 32u);
     assert(value.observation.watch_hit && value.observation.watch_address == 0xa27u);
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_CLEAR_WATCH, .watch_kind = COMMON_MACHINE_DEBUG_WATCH_WRITE });
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_CLEAR_WATCH, .watch_kind = COMMON_X86_DEBUG_WATCH_WRITE });
     /* #UD's internal exception stack writes are not a completed instruction. */
     memory_word(machine, lease, 24u, 0x700u);
     setreg(machine, lease, COMMON_X86_DEBUG_ESP, 0x900u);
     setreg(machine, lease, COMMON_X86_DEBUG_EIP, 0x800u);
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x800u,
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_LINEAR, .address = 0x800u,
         .bytes = 2u, .data = {0x0f,0xff} });
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_SET_WATCH,
-        .watch_kind = COMMON_MACHINE_DEBUG_WATCH_WRITE, .address = 0x8ffu });
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_SET_WATCH,
+        .watch_kind = COMMON_X86_DEBUG_WATCH_WRITE, .address = 0x8ffu });
     run_plan(machine, lease, events, trace, 0x701u, 1u);
-    value = access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT });
+    value = access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_GET_EXECUTION_RESULT });
     assert(!value.observation.watch_hit && value.observation.count == 0u);
     common_machine_debug_cancel(machine);
     /* Synchronous query is ordered after cancel on the same executor. */
-    assert(!access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_GET_WATCH,
-        .watch_kind = COMMON_MACHINE_DEBUG_WATCH_WRITE }).enabled);
+    assert(!access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_GET_WATCH,
+        .watch_kind = COMMON_X86_DEBUG_WATCH_WRITE }).enabled);
 }
 
 static void x87_values(common_machine *machine, common_machine_debug_lease *lease,
@@ -553,10 +580,10 @@ static void x87_values(common_machine *machine, common_machine_debug_lease *leas
         /* Characterize the retained double arithmetic limit, not x87 equivalence. */
         {0x06,9007199254740992.0,1.0,0.0}
     };
-    common_machine_debug_request trace = {
-        .operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
-        .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_TRACE, .instruction_count = 3u };
-    common_machine_debug_request write = { .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR };
+    common_x86_debug_request trace = {
+        .operation = COMMON_X86_DEBUG_SET_EXECUTION_PLAN,
+        .execution_kind = COMMON_X86_DEBUG_EXECUTION_TRACE, .instruction_count = 3u };
+    common_x86_debug_request write = { .operation = COMMON_X86_DEBUG_WRITE_LINEAR };
     unsigned i;
     setreg(machine, lease, COMMON_X86_DEBUG_CS, 0u);
     setreg(machine, lease, COMMON_X86_DEBUG_DS, 0u);
@@ -564,7 +591,7 @@ static void x87_values(common_machine *machine, common_machine_debug_lease *leas
     for (i = 0; i < sizeof(formats) / sizeof(formats[0]); ++i) {
         unsigned char program[] = {0xdb,0xe3, formats[i].opcode,formats[i].load,0,0x0a,
             formats[i].opcode,formats[i].store,0x20,0x0a};
-        common_machine_debug_result result;
+        common_x86_debug_response result;
         write.address = 0xa00u; write.bytes = formats[i].bytes;
         memcpy(write.data, formats[i].value, write.bytes);
         (void)access(machine, lease, write);
@@ -573,8 +600,8 @@ static void x87_values(common_machine *machine, common_machine_debug_lease *leas
         (void)access(machine, lease, write);
         setreg(machine, lease, COMMON_X86_DEBUG_EIP, 0x800u);
         run_plan(machine, lease, events, trace, 0x800u + sizeof(program), 3u);
-        result = access(machine, lease, (common_machine_debug_request){
-            .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0xa20u,
+        result = access(machine, lease, (common_x86_debug_request){
+            .operation = COMMON_X86_DEBUG_READ_LINEAR, .address = 0xa20u,
             .bytes = formats[i].bytes });
         assert(memcmp(result.data, formats[i].value, formats[i].bytes) == 0);
     }
@@ -585,7 +612,7 @@ static void x87_values(common_machine *machine, common_machine_debug_lease *leas
             0xdd,0x1e,0x20,0x0a};
         unsigned length = 14u, instructions = 4u;
         const double operands[] = {arithmetic[i].left,arithmetic[i].right};
-        common_machine_debug_result result;
+        common_x86_debug_response result;
         double actual;
         if (i == 4u) {
             /* (2^53 + 1) - 2^53 exposes intermediate precision before store. */
@@ -605,8 +632,8 @@ static void x87_values(common_machine *machine, common_machine_debug_lease *leas
         setreg(machine, lease, COMMON_X86_DEBUG_EIP, 0x800u);
         trace.instruction_count = instructions;
         run_plan(machine, lease, events, trace, 0x800u + length, instructions);
-        result = access(machine, lease, (common_machine_debug_request){
-            .operation = COMMON_MACHINE_DEBUG_READ_LINEAR, .address = 0xa20u, .bytes = 8u });
+        result = access(machine, lease, (common_x86_debug_request){
+            .operation = COMMON_X86_DEBUG_READ_LINEAR, .address = 0xa20u, .bytes = 8u });
         memcpy(&actual, result.data, sizeof(actual));
         assert(actual == arithmetic[i].expected);
     }
@@ -624,10 +651,10 @@ static void x87_rounding(common_machine *machine, common_machine_debug_lease *le
         {2,4,-2,-4,0,0,0,0}, {2,3,-3,-4,0,-1,0,-1},
         {3,4,-2,-3,1,0,1,0}, {2,3,-2,-3,0,0,0,0}
     };
-    common_machine_debug_request trace = {
-        .operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
-        .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_TRACE, .instruction_count = 4u };
-    common_machine_debug_request write = { .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR };
+    common_x86_debug_request trace = {
+        .operation = COMMON_X86_DEBUG_SET_EXECUTION_PLAN,
+        .execution_kind = COMMON_X86_DEBUG_EXECUTION_TRACE, .instruction_count = 4u };
+    common_x86_debug_request write = { .operation = COMMON_X86_DEBUG_WRITE_LINEAR };
     unsigned mode, index, width;
     setreg(machine, lease, COMMON_X86_DEBUG_CS, 0u);
     setreg(machine, lease, COMMON_X86_DEBUG_DS, 0u);
@@ -639,7 +666,7 @@ static void x87_rounding(common_machine *machine, common_machine_debug_lease *le
                 unsigned char program[] = {0xdb,0xe3,0xd9,0x2e,0x10,0x0a,
                     0xdd,0x06,0,0x0a,0xdf,0x1e,0x20,0x0a,0xdd,0x3e,0x30,0x0a};
                 unsigned bytes = 2u << width, b;
-                common_machine_debug_result result;
+                common_x86_debug_response result;
                 double rounded = index < 8u ? expected[mode][index] : input[index];
                 int overflow = rounded < -limit[width] || rounded >= limit[width];
                 lib_u64 bits = overflow
@@ -656,8 +683,8 @@ static void x87_rounding(common_machine *machine, common_machine_debug_lease *le
                 setreg(machine, lease, COMMON_X86_DEBUG_EIP, 0x800u);
                 trace.instruction_count = 5u;
                 run_plan(machine, lease, events, trace, 0x800u + sizeof(program), 5u);
-                result = access(machine, lease, (common_machine_debug_request){
-                    .operation = COMMON_MACHINE_DEBUG_READ_LINEAR,
+                result = access(machine, lease, (common_x86_debug_request){
+                    .operation = COMMON_X86_DEBUG_READ_LINEAR,
                     .address = 0xa20u, .bytes = bytes });
                 for (b = 0; b < bytes; ++b) {
                     if (result.data[b] != (unsigned char)(bits >> (8u * b)))
@@ -666,8 +693,8 @@ static void x87_rounding(common_machine *machine, common_machine_debug_lease *le
                             (unsigned char)(bits >> (8u * b)));
                     assert(result.data[b] == (unsigned char)(bits >> (8u * b)));
                 }
-                result = access(machine, lease, (common_machine_debug_request){
-                    .operation = COMMON_MACHINE_DEBUG_READ_LINEAR,
+                result = access(machine, lease, (common_x86_debug_request){
+                    .operation = COMMON_X86_DEBUG_READ_LINEAR,
                     .address = 0xa30u, .bytes = 2u });
                 assert((result.data[0] & 1u) == (unsigned)overflow);
             }
@@ -704,8 +731,8 @@ static void trace_cli(common_machine *machine, common_machine_debug_lease *lease
         assert(common_machine_debug_acquire(machine, lease) == LIB_STATUS_OK);
         assert(reg(machine, lease, COMMON_X86_DEBUG_EIP) == 0x702u);
     }
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x700u,
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_LINEAR, .address = 0x700u,
         .bytes = 3u, .data = {0x40,0xeb,0xfd} });
     setreg(machine, lease, COMMON_X86_DEBUG_EIP, 0x700u);
     submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xg 701 2", &result);
@@ -725,8 +752,8 @@ static void trace_cli(common_machine *machine, common_machine_debug_lease *lease
     }
     assert(common_machine_debug_acquire(machine, lease) == LIB_STATUS_OK);
     /* Restore the fault-handler fixture used by the operand tests. */
-    (void)access(machine, lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_LINEAR, .address = 0x700u,
+    (void)access(machine, lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_LINEAR, .address = 0x700u,
         .bytes = 2u, .data = {0x90,0x90} });
 }
 
@@ -773,7 +800,7 @@ int main(void)
     common_session_command_provider provider = { 0 };
     common_session_command_result result = { 0 };
     common_machine_debug_lease lease;
-    common_machine_debug_result value;
+    common_x86_debug_response value;
     completions events = { CreateEventA(NULL, FALSE, FALSE, NULL),
         CreateEventA(NULL, FALSE, FALSE, NULL), CreateEventA(NULL, FALSE, FALSE, NULL) };
     lib_u32 saved_eax;
@@ -847,20 +874,20 @@ int main(void)
     assert(strstr(debug_text(&result), "AX=") != NULL && strstr(debug_text(&result), "failed") == NULL);
     assert(common_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
     synchronous_access(machine, &lease);
-    assert(common_machine_debug_execute_with_lease(machine, &lease,
-        &(common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_READ_REGISTER,
+    assert(execute_x86(machine, &lease,
+        &(common_x86_debug_request){ .operation = COMMON_X86_DEBUG_READ_REGISTER,
             .register_id = COMMON_X86_DEBUG_EAX }, &value) == LIB_STATUS_OK);
     saved_eax = value.value;
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "r ax", &result);
     provider.note_monitor_current(&commands, LIB_TRUE, &result);
     assert(result.arm_prompt && strcmp(result.prompt, ":") == 0);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "1234", &result);
-    assert(common_machine_debug_execute_with_lease(machine, &lease,
-        &(common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_READ_REGISTER,
+    assert(execute_x86(machine, &lease,
+        &(common_x86_debug_request){ .operation = COMMON_X86_DEBUG_READ_REGISTER,
             .register_id = COMMON_X86_DEBUG_EAX }, &value) == LIB_STATUS_OK);
     assert((value.value & 0xffffu) == 0x1234u);
-    assert(common_machine_debug_execute_with_lease(machine, &lease,
-        &(common_machine_debug_request){ .operation = COMMON_MACHINE_DEBUG_WRITE_REGISTER,
+    assert(execute_x86(machine, &lease,
+        &(common_x86_debug_request){ .operation = COMMON_X86_DEBUG_WRITE_REGISTER,
             .register_id = COMMON_X86_DEBUG_EAX, .address = saved_eax }, &value) == LIB_STATUS_OK);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "e 0:500 12 34", &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "d 0:500", &result);
@@ -903,8 +930,8 @@ int main(void)
     wait_for(events.paused);
     provider.note_runtime(&commands, COMMON_SESSION_MACHINE_RUNNING,
         COMMON_SESSION_MACHINE_PAUSED, &result);
-    assert(common_machine_debug_execute_with_lease(machine, &lease,
-        &(common_machine_debug_request){0}, &value) == LIB_STATUS_INVALID_STATE);
+    assert(execute_x86(machine, &lease,
+        &(common_x86_debug_request){0}, &value) == LIB_STATUS_INVALID_STATE);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "r", &result);
     assert(strstr(debug_text(&result), "AX=") != NULL);
     assert(common_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
@@ -916,23 +943,23 @@ int main(void)
     access_boundaries(machine, &lease, &events);
     x87_values(machine, &lease, &events);
     x87_rounding(machine, &lease, &events);
-    (void)access(machine, &lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_SET_WATCH, .watch_kind = COMMON_MACHINE_DEBUG_WATCH_READ,
+    (void)access(machine, &lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_SET_WATCH, .watch_kind = COMMON_X86_DEBUG_WATCH_READ,
         .address = 0xa00u });
-    (void)access(machine, &lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
-        .execution_kind = COMMON_MACHINE_DEBUG_EXECUTION_BREAK_LINEAR, .address = 0x12345678u });
+    (void)access(machine, &lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_SET_EXECUTION_PLAN,
+        .execution_kind = COMMON_X86_DEBUG_EXECUTION_BREAK_LINEAR, .address = 0x12345678u });
     assert(common_machine_reset(machine));
     wait_for(events.paused);
     provider.note_runtime(&commands, COMMON_SESSION_MACHINE_PAUSED,
         COMMON_SESSION_MACHINE_RESET_COMPLETED, &result);
     assert(common_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
-    assert(!access(machine, &lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT }).enabled);
-    assert(!access(machine, &lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_GET_WATCH, .watch_kind = COMMON_MACHINE_DEBUG_WATCH_READ }).enabled);
-    (void)access(machine, &lease, (common_machine_debug_request){
-        .operation = COMMON_MACHINE_DEBUG_WRITE_REAL, .offset = 0x520u, .bytes = 14u,
+    assert(!access(machine, &lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_GET_EXECUTION_RESULT }).enabled);
+    assert(!access(machine, &lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_GET_WATCH, .watch_kind = COMMON_X86_DEBUG_WATCH_READ }).enabled);
+    (void)access(machine, &lease, (common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_WRITE_REAL, .offset = 0x520u, .bytes = 14u,
         .data = { 0xc7,0x06,0x00,0x06,0x34,0x12,0xc7,0x06,0x02,0x06,0x78,0x56,0xeb,0xfe } });
     memory_word(machine, &lease, 0x600u, 0u);
     setreg(machine, &lease, COMMON_X86_DEBUG_DS, 0u);

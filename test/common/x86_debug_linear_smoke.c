@@ -6,31 +6,32 @@ static lib_u8 memory[0x110000];
 static lib_u32 memory_base;
 static lib_u16 code_segment, data_segment;
 static unsigned reads, writes;
+static lib_bool short_response;
 static lib_status acquire(common_machine *m, common_machine_debug_lease *lease)
 { (void)m; *lease = (common_machine_debug_lease){0}; return LIB_STATUS_OK; }
 static void cancel(common_machine *m) { (void)m; }
-static lib_status execute(common_machine *m, const common_machine_debug_lease *lease,
-    const common_machine_debug_request *request, common_machine_debug_result *result)
+static lib_status execute_x86(common_machine *m, const common_machine_debug_lease *lease,
+    const common_x86_debug_request *request, common_x86_debug_response *result)
 {
     (void)m; (void)lease;
-    *result = (common_machine_debug_result){0};
-    if (request->operation == COMMON_MACHINE_DEBUG_READ_REGISTER) {
+    *result = (common_x86_debug_response){0};
+    if (request->operation == COMMON_X86_DEBUG_READ_REGISTER) {
         if (request->register_id == COMMON_X86_DEBUG_CS) result->value = code_segment;
         if (request->register_id == COMMON_X86_DEBUG_DS) result->value = data_segment;
-    } else if (request->operation == COMMON_MACHINE_DEBUG_GET_CODE_DEFAULT_SIZE) {
+    } else if (request->operation == COMMON_X86_DEBUG_GET_CODE_DEFAULT_SIZE) {
         result->value = 1u;
-    } else if (request->operation == COMMON_MACHINE_DEBUG_READ_LINEAR ||
-               request->operation == COMMON_MACHINE_DEBUG_WRITE_LINEAR ||
-               request->operation == COMMON_MACHINE_DEBUG_READ_REAL ||
-               request->operation == COMMON_MACHINE_DEBUG_WRITE_REAL) {
-        lib_u32 address = request->operation == COMMON_MACHINE_DEBUG_READ_REAL ||
-            request->operation == COMMON_MACHINE_DEBUG_WRITE_REAL ?
+    } else if (request->operation == COMMON_X86_DEBUG_READ_LINEAR ||
+               request->operation == COMMON_X86_DEBUG_WRITE_LINEAR ||
+               request->operation == COMMON_X86_DEBUG_READ_REAL ||
+               request->operation == COMMON_X86_DEBUG_WRITE_REAL) {
+        lib_u32 address = request->operation == COMMON_X86_DEBUG_READ_REAL ||
+            request->operation == COMMON_X86_DEBUG_WRITE_REAL ?
             ((lib_u32)request->segment << 4) + request->offset : request->address;
         assert(request->bytes != 0u && request->bytes - 1u <= LIB_UINT32_MAX - address);
         assert(address >= memory_base && address - memory_base < sizeof(memory));
         assert(request->bytes <= sizeof(memory) - (address - memory_base));
-        if (request->operation == COMMON_MACHINE_DEBUG_WRITE_LINEAR ||
-            request->operation == COMMON_MACHINE_DEBUG_WRITE_REAL) {
+        if (request->operation == COMMON_X86_DEBUG_WRITE_LINEAR ||
+            request->operation == COMMON_X86_DEBUG_WRITE_REAL) {
             assert(++writes <= sizeof(memory));
             memcpy(memory + address - memory_base, request->data, request->bytes);
         } else {
@@ -39,6 +40,18 @@ static lib_status execute(common_machine *m, const common_machine_debug_lease *l
         }
     }
     return LIB_STATUS_OK;
+}
+static lib_status execute(common_machine *m, const common_machine_debug_lease *lease,
+    const void *bytes, lib_size size, void *response, lib_size capacity, lib_size *response_size)
+{
+    common_x86_debug_request request;
+    common_x86_debug_response result;
+    assert(size == sizeof(request) && capacity == sizeof(result));
+    memcpy(&request, bytes, size);
+    lib_status status = execute_x86(m, lease, &request, &result);
+    memcpy(response, &result, sizeof(result));
+    *response_size = short_response ? sizeof(result) - 1u : sizeof(result);
+    return status;
 }
 #define common_machine_debug_acquire acquire
 #define common_machine_debug_execute_with_lease execute
@@ -62,6 +75,14 @@ int main(void)
         "xf ffffffff 2 11", "xs ffffffff 2 11"
     };
     assert(common_x86_debug_create(&debug) == LIB_STATUS_OK);
+    assert(common_x86_debug_open(debug, (common_machine *)debug) == LIB_STATUS_OK);
+
+    common_x86_debug_response response;
+    short_response = LIB_TRUE;
+    assert(command_execute(debug, &(common_x86_debug_request){
+        .operation = COMMON_X86_DEBUG_GET_CODE_DEFAULT_SIZE }, &response) != 0);
+    assert(debug->access_status == LIB_STATUS_IO_ERROR && response.value == 0u);
+    short_response = LIB_FALSE;
     assert(common_x86_debug_open(debug, (common_machine *)debug) == LIB_STATUS_OK);
 
     memcpy(memory, "ABCDE", 5);

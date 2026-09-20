@@ -69,7 +69,7 @@ incremental validation: an invalid later byte does not undo earlier writes.
 | `session` | one control queue, completed-fact reduction and dispatch | `session_interface.h` |
 | interaction owner | monitor logical Console, broker and KVM composition | its root public contract |
 | `x86-xasm32` | x86 copied byte/text assembly and disassembly | `xasm32_interface.h` |
-| `x86-debug` | x86 debug command engine using the optional machine adapter | `debug_interface.h` |
+| `x86-debug` | x86 debug commands and copied CPU protocol | `debug_interface.h`, `protocol_interface.h` |
 
 `session` calls `machine` and `ui`. `x86-debug` calls `machine` and `x86-xasm32`.
 No other common component edge is permitted.  Application and host code may
@@ -80,8 +80,16 @@ binding; neither component creates a product execution or Console path.
 The machine debug contract is synchronous to the control-thread caller and
 serviced by the existing paused executor. Disassembly reports instruction byte
 count separately from text length; callers must not use text length as a PC step.
-The Machine debug payload still contains x86 values; the component rename does
-not claim that this public contract is already ISA-neutral.
+Machine copies opaque pointer-free request/response bytes with explicit lengths,
+bounded by 128/1536 bytes in its single request slot. It does not interpret CPU
+operations. x86-debug's independent protocol header owns the register/address/
+operation vocabulary; frontend and product adapter use aligned typed copies.
+Driver execution validates protocol-specific sizes and access constraints.
+Failures return zero response length without changing caller output bytes.
+An unsuccessful completion wait is not proof of quiescence: shut down before
+reusing the slot. Existing cancellation clears product plans, not in-flight
+requests. The current build still includes x86 components; optional build/test
+selection is separate from this neutral Machine ABI.
 
 Machine shutdown synchronously joins its worker and all callbacks without
 freeing the machine object. The serialized owner may then release callback

@@ -6,6 +6,11 @@ Active task: M9 T73 S3, neutral Machine debug transport and x86 protocol migrati
 Owner accepted and closed [S2](../history/M9-T73-S2-machine-x86-audit.md), then
 admitted S3. S4 build-selection work remains unadmitted. Stop for manual testing
 after S3's complete dual-width delivery; do not close T73.
+S3 implementation and automated verification are complete; delivery is awaiting
+owner testing, not S closure. Both Release builds passed; background x64 105/105
+(162.58s), x86 105/105 (125.26s); five desktop tests per width excluded. Actual
+production C/H +327/-268 (net +59), test C/H +405/-222 (net +183), gates +2/-0.
+The proposal records the finite sweep, first-run gate correction and EXE hashes.
 Owner directly admitted T73 outside the queue. T72 is closed.
 See the [T73 proposal](../proposals/m9-shared-x86-dependency-audit.md).
 Existing queued candidates remain unadmitted.
@@ -35,6 +40,10 @@ verification, changed-line accounting and package hashes.
 
 ## Current Technical Baseline
 
+- T73 S3 moves x86 protocol values to x86-debug, retaining one Machine executor
+  and copied opaque 128/1536-byte request/response slot. VM alone validates x86
+  access semantics; no CLI rewrite, Lib/Session/UI/Compat/MVDM or INI/media change.
+  Build and verification evidence is in the proposal; manual acceptance pending.
 - T73 S1 renames x86 debug/assembly paths, public symbols and targets only.
   Both Release builds passed; background x64 105/105 (168.90s), x86 105/105
   (156.37s); five desktop tests per width excluded. Production +168/-168,

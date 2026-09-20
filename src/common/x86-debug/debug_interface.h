@@ -3,20 +3,10 @@
 
 #include "lib/types/types_interface.h"
 #include "common/machine/machine_interface.h"
+#include "common/x86-debug/protocol_interface.h"
 
 typedef struct common_x86_debug common_x86_debug;
 
-/* This is the copied x86 register vocabulary exposed by common/machine.  It
- * intentionally follows the machine contract rather than Core's private
- * enum, so a second product can map its own CPU implementation to it. */
-typedef enum common_x86_debug_register {
-    COMMON_X86_DEBUG_EAX, COMMON_X86_DEBUG_ECX, COMMON_X86_DEBUG_EDX, COMMON_X86_DEBUG_EBX,
-    COMMON_X86_DEBUG_ESP, COMMON_X86_DEBUG_EBP, COMMON_X86_DEBUG_ESI, COMMON_X86_DEBUG_EDI,
-    COMMON_X86_DEBUG_EIP, COMMON_X86_DEBUG_EFLAGS, COMMON_X86_DEBUG_ES, COMMON_X86_DEBUG_CS,
-    COMMON_X86_DEBUG_SS, COMMON_X86_DEBUG_DS, COMMON_X86_DEBUG_FS, COMMON_X86_DEBUG_GS,
-    COMMON_X86_DEBUG_CR0, COMMON_X86_DEBUG_CR1, COMMON_X86_DEBUG_CR2, COMMON_X86_DEBUG_CR3,
-    COMMON_X86_DEBUG_CR4, COMMON_X86_DEBUG_REGISTER_COUNT
-} common_x86_debug_register;
 
 #define COMMON_X86_DEBUG_LINE_CAPACITY 256u
 #define COMMON_X86_DEBUG_PROMPT_CAPACITY 64u

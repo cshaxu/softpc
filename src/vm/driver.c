@@ -436,10 +436,23 @@ static lib_bool vm_driver_set_removable_media(void *opaque,
 }
 
 static lib_status vm_driver_debug(void *opaque,
-    const common_machine_debug_request *request, common_machine_debug_result *result)
+    const void *request, lib_size request_size,
+    void *response, lib_size response_capacity, lib_size *response_size)
 {
     vm_driver *driver = opaque;
-    return softpc_machine_debug(driver->machine, &driver->debug, request, result);
+    common_x86_debug_request operation;
+    common_x86_debug_response result;
+    lib_status status;
+    *response_size = 0u;
+    if (request_size != sizeof(operation) || response_capacity < sizeof(result))
+        return LIB_STATUS_INVALID_ARGUMENT;
+    lib_memory_copy(&operation, request, sizeof(operation));
+    status = softpc_machine_debug(driver->machine, &driver->debug, &operation, &result);
+    if (status == LIB_STATUS_OK) {
+        lib_memory_copy(response, &result, sizeof(result));
+        *response_size = sizeof(result);
+    }
+    return status;
 }
 
 static lib_bool vm_driver_take_debug_stop(void *opaque)

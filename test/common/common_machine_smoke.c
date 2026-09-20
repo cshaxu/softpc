@@ -204,52 +204,52 @@ static lib_status state_read(void *opaque, lib_u8 *bytes, lib_size byte_count)
     InterlockedIncrement(&transfer->calls);
     return LIB_STATUS_OK;
 }
-static lib_status fake_execute_debug(void *opaque,
-    const common_machine_debug_request *request,
-    common_machine_debug_result *result)
+static lib_status fake_execute_x86(void *opaque,
+    const common_x86_debug_request *request,
+    common_x86_debug_response *result)
 {
     machine_fake *fake = (machine_fake *)opaque;
     if (request == NULL || result == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     assert(GetCurrentThreadId() == fake->executor_thread);
     InterlockedIncrement(&fake->debug_calls);
-    *result = (common_machine_debug_result) { .value = request->address };
-    if (fake->memory_fixture && (request->operation == COMMON_MACHINE_DEBUG_READ_REAL ||
-        request->operation == COMMON_MACHINE_DEBUG_WRITE_REAL ||
-        request->operation == COMMON_MACHINE_DEBUG_READ_LINEAR ||
-        request->operation == COMMON_MACHINE_DEBUG_WRITE_LINEAR)) {
-        lib_u32 address = request->operation == COMMON_MACHINE_DEBUG_READ_REAL ||
-            request->operation == COMMON_MACHINE_DEBUG_WRITE_REAL ?
+    *result = (common_x86_debug_response) { .value = request->address };
+    if (fake->memory_fixture && (request->operation == COMMON_X86_DEBUG_READ_REAL ||
+        request->operation == COMMON_X86_DEBUG_WRITE_REAL ||
+        request->operation == COMMON_X86_DEBUG_READ_LINEAR ||
+        request->operation == COMMON_X86_DEBUG_WRITE_LINEAR)) {
+        lib_u32 address = request->operation == COMMON_X86_DEBUG_READ_REAL ||
+            request->operation == COMMON_X86_DEBUG_WRITE_REAL ?
             ((lib_u32)request->segment << 4) + request->offset : request->address;
         assert(address + request->bytes <= sizeof(fake->memory));
-        if (request->operation == COMMON_MACHINE_DEBUG_WRITE_REAL ||
-            request->operation == COMMON_MACHINE_DEBUG_WRITE_LINEAR)
+        if (request->operation == COMMON_X86_DEBUG_WRITE_REAL ||
+            request->operation == COMMON_X86_DEBUG_WRITE_LINEAR)
             memcpy(fake->memory + address, request->data, request->bytes);
         else memcpy(result->data, fake->memory + address, request->bytes);
         return LIB_STATUS_OK;
     }
     if (fake->register_fixture) {
         switch (request->operation) {
-        case COMMON_MACHINE_DEBUG_READ_REGISTER:
+        case COMMON_X86_DEBUG_READ_REGISTER:
             result->value = fake->registers[request->register_id];
             break;
-        case COMMON_MACHINE_DEBUG_WRITE_REGISTER:
+        case COMMON_X86_DEBUG_WRITE_REGISTER:
             fake->registers[request->register_id] = request->address;
             break;
-        case COMMON_MACHINE_DEBUG_READ_REAL:
+        case COMMON_X86_DEBUG_READ_REAL:
             ++fake->real_reads;
             memset(result->data, 0x90, sizeof(result->data));
             break;
-        case COMMON_MACHINE_DEBUG_READ_LINEAR:
+        case COMMON_X86_DEBUG_READ_LINEAR:
             ++fake->linear_reads;
             memset(result->data, 0x90, sizeof(result->data));
             break;
-        case COMMON_MACHINE_DEBUG_GET_CODE_BASE:
+        case COMMON_X86_DEBUG_GET_CODE_BASE:
             result->value = 0x10000000u;
             break;
-        case COMMON_MACHINE_DEBUG_GET_CODE_DEFAULT_SIZE:
+        case COMMON_X86_DEBUG_GET_CODE_DEFAULT_SIZE:
             result->value = 1u;
             break;
-        case COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT:
+        case COMMON_X86_DEBUG_GET_EXECUTION_RESULT:
             result->enabled = LIB_TRUE;
             result->value = 1u;
             break;
@@ -258,6 +258,33 @@ static lib_status fake_execute_debug(void *opaque,
         }
     }
     return LIB_STATUS_OK;
+}
+
+static lib_status fake_execute_debug(void *opaque, const void *bytes, lib_size size,
+    void *response, lib_size capacity, lib_size *response_size)
+{
+    common_x86_debug_request request;
+    common_x86_debug_response result;
+    lib_status status;
+    assert(size == sizeof(request) && capacity == sizeof(result));
+    memcpy(&request, bytes, size);
+    status = fake_execute_x86(opaque, &request, &result);
+    if (status == LIB_STATUS_OK) {
+        memcpy(response, &result, sizeof(result));
+        *response_size = sizeof(result);
+    }
+    return status;
+}
+
+static lib_status execute_x86(common_machine *machine,
+    const common_machine_debug_lease *lease, const common_x86_debug_request *request,
+    common_x86_debug_response *response)
+{
+    lib_size size;
+    lib_status status = common_machine_debug_execute_with_lease(machine, lease,
+        request, sizeof(*request), response, sizeof(*response), &size);
+    assert(size == (status == LIB_STATUS_OK ? sizeof(*response) : 0u));
+    return status;
 }
 
 static void extended_registers(common_x86_debug *debug, machine_fake *fake)
@@ -497,7 +524,7 @@ int main(void)
     common_machine_frame frame = { 0 };
     lib_u32 generation = 0u;
     common_machine_debug_lease lease = { 0 };
-    common_machine_debug_result debug_result = { 0 };
+    common_x86_debug_response debug_result = { 0 };
     common_x86_debug *debug = NULL;
     common_x86_debug_result debug_command_result = { 0 };
     state_transfer transfer = { 0 };
@@ -622,9 +649,9 @@ int main(void)
     assert(InterlockedCompareExchange(&fake.resets, 0, 0) == 2);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
     assert(common_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
-    assert(common_machine_debug_execute_with_lease(machine, &lease,
-        &(common_machine_debug_request) {
-            .operation = COMMON_MACHINE_DEBUG_READ_REGISTER,
+    assert(execute_x86(machine, &lease,
+        &(common_x86_debug_request) {
+            .operation = COMMON_X86_DEBUG_READ_REGISTER,
             .address = 0x1234u }, &debug_result) == LIB_STATUS_OK);
     assert(debug_result.value == 0x1234u &&
         InterlockedCompareExchange(&fake.debug_calls, 0, 0) == 1);
@@ -638,8 +665,8 @@ int main(void)
     common_x86_debug_close(debug);
     common_x86_debug_destroy(debug);
     assert(common_machine_resume(machine));
-    assert(common_machine_debug_execute_with_lease(machine, &lease,
-        &(common_machine_debug_request) { 0 }, &debug_result) ==
+    assert(execute_x86(machine, &lease,
+        &(common_x86_debug_request) { 0 }, &debug_result) ==
         LIB_STATUS_INVALID_STATE);
     assert(WaitForSingleObject(fake.running, 5000u) == WAIT_OBJECT_0);
     assert(common_machine_stop(machine));

@@ -176,6 +176,7 @@ set(allowed_common_product_contracts
     "common/session/session_interface.h"
     "common/ui/ui_interface.h"
     "common/x86-debug/debug_interface.h"
+    "common/x86-debug/protocol_interface.h"
     "common/x86-xasm32/xasm32_interface.h")
 file(GLOB_RECURSE product_common_consumers
     "${SOFTPC_SOURCE_DIR}/src/app/*.[ch]"

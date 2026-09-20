@@ -7,7 +7,8 @@
 #include "lib/types/types_interface.h"
 
 #define COMMON_MACHINE_PATH_CAPACITY 1024u
-#define COMMON_MACHINE_DEBUG_BYTES 32u
+#define COMMON_MACHINE_DEBUG_REQUEST_CAPACITY 128u
+#define COMMON_MACHINE_DEBUG_RESPONSE_CAPACITY 1536u
 
 typedef struct common_machine common_machine;
 typedef void (*common_machine_executor_callback)(void *context);
@@ -26,118 +27,14 @@ typedef enum common_machine_state {
  * requests must be serialized by that caller, never issued from a driver/sink
  * callback. Internal admission locking does not serialize caller payloads.
  * Common owns lease validity and rendezvous; the product owns CPU access. */
-typedef enum common_machine_debug_operation {
-    COMMON_MACHINE_DEBUG_READ_REGISTER,
-    COMMON_MACHINE_DEBUG_WRITE_REGISTER,
-    COMMON_MACHINE_DEBUG_READ_LINEAR,
-    COMMON_MACHINE_DEBUG_WRITE_LINEAR,
-    COMMON_MACHINE_DEBUG_READ_REAL,
-    COMMON_MACHINE_DEBUG_WRITE_REAL,
-    COMMON_MACHINE_DEBUG_READ_PORT,
-    COMMON_MACHINE_DEBUG_WRITE_PORT,
-    COMMON_MACHINE_DEBUG_GET_CODE_DEFAULT_SIZE,
-    COMMON_MACHINE_DEBUG_GET_CODE_BASE,
-    COMMON_MACHINE_DEBUG_GET_CPU_SNAPSHOT,
-    COMMON_MACHINE_DEBUG_SET_WATCH,
-    COMMON_MACHINE_DEBUG_CLEAR_WATCH,
-    COMMON_MACHINE_DEBUG_GET_WATCH,
-    COMMON_MACHINE_DEBUG_SET_EXECUTION_PLAN,
-    COMMON_MACHINE_DEBUG_CLEAR_EXECUTION_PLAN,
-    COMMON_MACHINE_DEBUG_GET_EXECUTION_RESULT
-} common_machine_debug_operation;
-
-typedef enum common_machine_debug_watch_kind {
-    COMMON_MACHINE_DEBUG_WATCH_READ,
-    COMMON_MACHINE_DEBUG_WATCH_WRITE,
-    COMMON_MACHINE_DEBUG_WATCH_EXECUTE
-} common_machine_debug_watch_kind;
-
-typedef enum common_machine_debug_execution_plan_kind {
-    COMMON_MACHINE_DEBUG_EXECUTION_NONE,
-    COMMON_MACHINE_DEBUG_EXECUTION_TRACE,
-    COMMON_MACHINE_DEBUG_EXECUTION_BREAK_REAL,
-    COMMON_MACHINE_DEBUG_EXECUTION_BREAK_LINEAR
-} common_machine_debug_execution_plan_kind;
-
-typedef struct common_machine_debug_segment_snapshot {
-    lib_u16 selector;
-    lib_u32 base;
-    lib_u32 limit;
-    lib_u8 dpl;
-    lib_u8 type;
-    lib_bool accessed;
-    lib_bool executable;
-    lib_bool conform;
-    lib_bool readable;
-    lib_bool defsize;
-    lib_bool big;
-    lib_bool expdown;
-    lib_bool writable;
-} common_machine_debug_segment_snapshot;
-
-typedef struct common_machine_debug_cpu_snapshot {
-    common_machine_debug_segment_snapshot es;
-    common_machine_debug_segment_snapshot cs;
-    common_machine_debug_segment_snapshot ss;
-    common_machine_debug_segment_snapshot ds;
-    common_machine_debug_segment_snapshot fs;
-    common_machine_debug_segment_snapshot gs;
-    common_machine_debug_segment_snapshot tr;
-    common_machine_debug_segment_snapshot ldtr;
-    common_machine_debug_segment_snapshot gdtr;
-    common_machine_debug_segment_snapshot idtr;
-    lib_u32 cr0;
-    lib_u32 cr2;
-    lib_u32 cr3;
-} common_machine_debug_cpu_snapshot;
-
-typedef struct common_machine_debug_request {
-    common_machine_debug_operation operation;
-    lib_u32 register_id;
-    lib_u32 address;
-    lib_u16 segment;
-    lib_u16 offset;
-    lib_u16 port;
-    common_machine_debug_watch_kind watch_kind;
-    common_machine_debug_execution_plan_kind execution_kind;
-    lib_u64 instruction_count;
-    lib_u8 bytes; /* Memory payload size; port I/O explicitly requires 1 (byte). */
-    lib_u8 data[COMMON_MACHINE_DEBUG_BYTES];
-} common_machine_debug_request;
-
-#define COMMON_MACHINE_DEBUG_ACCESS_CAPACITY 32u
-typedef struct common_machine_debug_memory_access {
-    lib_bool write;
-    lib_u32 linear;
-    lib_u32 bytes;
-    lib_u64 data; /* Lowest-addressed up to eight bytes, little endian. */
-} common_machine_debug_memory_access;
-
-typedef struct common_machine_debug_observation {
-    common_machine_debug_memory_access accesses[COMMON_MACHINE_DEBUG_ACCESS_CAPACITY];
-    lib_u8 count;
-    lib_bool truncated;
-    lib_bool watch_hit;
-    common_machine_debug_watch_kind watch_kind;
-    lib_u32 watch_address;
-} common_machine_debug_observation;
-
-typedef struct common_machine_debug_result {
-    lib_u32 value;
-    lib_bool enabled;
-    lib_u8 bytes;
-    lib_u8 data[COMMON_MACHINE_DEBUG_BYTES];
-    common_machine_debug_cpu_snapshot cpu;
-    common_machine_debug_observation observation;
-} common_machine_debug_result;
 
 typedef struct common_machine_debug_lease {
     lib_u64 generation;
 } common_machine_debug_lease;
 
 typedef lib_status (*common_machine_debug_execute)(void *context,
-    const common_machine_debug_request *request,
-    common_machine_debug_result *out_result);
+    const void *request, lib_size request_size,
+    void *response, lib_size response_capacity, lib_size *response_size);
 
 typedef lib_status (*common_machine_state_write_callback)(void *context,
     const lib_u8 *bytes, lib_size byte_count);
@@ -233,10 +130,18 @@ lib_u32 common_machine_published_frame_run_generation(const common_machine *mach
 lib_u32 common_machine_run_generation(const common_machine *machine);
 lib_status common_machine_debug_acquire(common_machine *machine,
     common_machine_debug_lease *out_lease);
+/* Opaque, pointer-free in-process values; the driver owns their protocol.
+ * Request bytes are copied before dispatch. NULL is valid only for zero size
+ * or capacity; response_size is required and is zero on failure. Output bytes
+ * are unchanged on failure. No caller buffer is retained by the executor.
+ * The driver receives at most the caller's capacity and must report the bytes
+ * it actually initialized, never write beyond capacity or retain these buffers.
+ * After a failed completion wait, shut down successfully before further calls:
+ * wait failure does not prove that the internal request slot is no longer used. */
 lib_status common_machine_debug_execute_with_lease(common_machine *machine,
     const common_machine_debug_lease *lease,
-    const common_machine_debug_request *request,
-    common_machine_debug_result *out_result);
+    const void *request, lib_size request_size,
+    void *response, lib_size response_capacity, lib_size *response_size);
 /* Asynchronous cancellation, allowed in every state; uses the existing queue. */
 void common_machine_debug_cancel(common_machine *machine);
 /* Permanently stop/join the worker, including all in-flight callbacks, but

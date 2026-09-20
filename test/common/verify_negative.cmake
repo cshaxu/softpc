@@ -24,6 +24,7 @@ foreach(symbol IN ITEMS memset memcpy memmove memcmp memchr strlen strcmp
 endforeach()
 reject("#include \"lib/types/win32/sync.h\"\n" "" "Noncanonical Common header path")
 reject("#include \"common/session/session_interface.h\"\n" "" "Forbidden Common edge")
+reject("#include \"common/x86-debug/protocol_interface.h\"\n" "" "Forbidden Common edge")
 reject("#include \"common/debug/debug_interface.h\"\n" "" "Unknown Common dependency")
 reject("#include \"common/xasm32/xasm32_interface.h\"\n" "" "Unknown Common dependency")
 reject("#include \"lib/base/sync.h\"\n" "" "Private dependency")

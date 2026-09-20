@@ -15,6 +15,10 @@ static lib_bool reject_destroy;
 static lib_status frame_status;
 static unsigned pending_kind;
 static lib_bool terminate_before_submit;
+static unsigned debug_wait_action, debug_calls, debug_cancels;
+static lib_u8 *debug_source;
+static lib_status debug_status;
+static lib_bool debug_oversize;
 static void request_lock(base_sync_mutex *mutex);
 static void register_pending(void);
 static lib_status destroy_task(base_sync_task *task)
@@ -78,6 +82,15 @@ static void register_pending(void)
 
 static base_sync_wait_result idle_wait(base_sync_event *event, lib_u32 timeout)
 {
+    if (event == active->debug_event) {
+        assert(timeout == LIB_UINT32_MAX);
+        if (debug_source != NULL) *debug_source = 0xffu; /* Already copied. */
+        if (debug_wait_action == 1u) common_machine_debug_invalidate(active);
+        if (debug_wait_action == 2u) common_machine_finish_requests(active, COMMON_MACHINE_ERROR);
+        else if (debug_wait_action == 3u) return BASE_SYNC_WAIT_FAULT;
+        else common_machine_service_debug(active);
+        return base_sync_event_wait(event, 0u);
+    }
     assert(event == active->command_event && timeout == LIB_UINT32_MAX);
     ++idle_waits;
     assert(idle_waits <= 3u);
@@ -301,6 +314,100 @@ static void check_publication(void)
     assert(common_machine_destroy(active) == LIB_STATUS_OK);
 }
 
+/* A byte-reversal protocol unrelated to registers, segments or instruction sets.
+ * Scheduling is deterministic here; common_machine_smoke proves native thread
+ * identity and the x86 protocol through the same public rendezvous. */
+static lib_status debug_bytes(void *context, const void *request, lib_size size,
+    void *response, lib_size capacity, lib_size *response_size)
+{
+    const lib_u8 *source = request;
+    lib_u8 *destination = response;
+    (void)context;
+    ++debug_calls;
+    assert(request == active->debug_request && response == active->debug_response);
+    assert(debug_source == NULL || source[0] != *debug_source);
+    if (size > capacity) return LIB_STATUS_INVALID_ARGUMENT;
+    for (lib_size i = 0; i < size; ++i) destination[i] = source[size - 1u - i];
+    *response_size = debug_oversize ? capacity + 1u : size;
+    return debug_status;
+}
+
+static void cancel_debug(void *context)
+{ (void)context; ++debug_cancels; }
+
+static void check_debug(void)
+{
+    common_machine_driver driver = { .reset = reset, .run = run,
+        .request_stop = stop, .request_wake = stop, .set_heartbeat = set_heartbeat,
+        .set_executor_callback = callback, .deliver_input = input, .copy_frame = frame,
+        .execute_debug = debug_bytes, .cancel_debug = cancel_debug };
+    common_machine_debug_lease lease;
+    lib_u8 request[COMMON_MACHINE_DEBUG_REQUEST_CAPACITY] = { 1, 2, 3 };
+    lib_u8 response[COMMON_MACHINE_DEBUG_RESPONSE_CAPACITY];
+    lib_size size;
+    assert(common_machine_create(&active, &driver) == LIB_STATUS_OK);
+    common_machine_begin_cold_run(active, LIB_FALSE);
+    lib_atomic_i32_store_explicit(&active->state, COMMON_MACHINE_PAUSED, LIB_MEMORY_ORDER_SEQ_CST);
+    lib_atomic_i32_store_explicit(&active->pause_requested, 1, LIB_MEMORY_ORDER_SEQ_CST);
+    assert(common_machine_debug_acquire(active, &lease) == LIB_STATUS_OK);
+    debug_source = request;
+    assert(common_machine_debug_execute_with_lease(active, &lease, request, 3,
+        response, sizeof(response), &size) == LIB_STATUS_OK);
+    assert(size == 3 && response[0] == 3 && response[2] == 1 && request[0] == 0xff);
+    debug_source = NULL;
+    assert(common_machine_debug_execute_with_lease(active, &lease, request, sizeof(request),
+        response, sizeof(response), &size) == LIB_STATUS_OK && size == sizeof(request));
+    common_machine_debug_cancel(active);
+    assert(common_machine_debug_execute_with_lease(active, &lease, NULL, 0,
+        NULL, 0, &size) == LIB_STATUS_OK && size == 0 && debug_cancels == 1);
+    unsigned calls = debug_calls;
+    const struct { const void *request; lib_size size; void *response; lib_size capacity;
+        lib_status expected; } invalid[] = {
+        {NULL, 1, response, 1, LIB_STATUS_INVALID_ARGUMENT},
+        {request, 1, NULL, 1, LIB_STATUS_INVALID_ARGUMENT},
+        {request, sizeof(request) + 1u, response, 1, LIB_STATUS_UNSUPPORTED},
+        {request, 1, response, sizeof(response) + 1u, LIB_STATUS_UNSUPPORTED}
+    };
+    for (unsigned i = 0; i < sizeof(invalid) / sizeof(invalid[0]); ++i) {
+        size = 99; response[0] = 0x55;
+        assert(common_machine_debug_execute_with_lease(active, &lease,
+            invalid[i].request, invalid[i].size, invalid[i].response, invalid[i].capacity,
+            &size) == invalid[i].expected);
+        assert(size == 0 && response[0] == 0x55 && debug_calls == calls);
+    }
+    assert(common_machine_debug_execute_with_lease(active, &lease, request, 1,
+        response, 1, NULL) == LIB_STATUS_INVALID_ARGUMENT && debug_calls == calls);
+    for (unsigned scenario = 0; scenario < 6; ++scenario) {
+        debug_status = scenario == 0 ? LIB_STATUS_UNSUPPORTED : LIB_STATUS_OK;
+        debug_oversize = scenario == 1;
+        debug_wait_action = scenario >= 3 ? scenario - 2u : 0u;
+        response[0] = 0x55; size = 99;
+        lib_status expected = scenario == 0 ? LIB_STATUS_UNSUPPORTED :
+            (scenario == 2 ? LIB_STATUS_INVALID_ARGUMENT :
+            (scenario == 3 ? LIB_STATUS_INVALID_STATE : LIB_STATUS_IO_ERROR));
+        assert(common_machine_debug_execute_with_lease(active, &lease, request, 3,
+            response, scenario == 2 ? 2 : sizeof(response), &size) == expected);
+        assert(size == 0 && response[0] == 0x55);
+        if (scenario == 3) {
+            calls = debug_calls;
+            assert(common_machine_debug_execute_with_lease(active, &lease, request, 3,
+                response, sizeof(response), &size) == LIB_STATUS_INVALID_STATE);
+            assert(debug_calls == calls);
+            assert(common_machine_debug_acquire(active, &lease) == LIB_STATUS_OK);
+        }
+        if (scenario == 4) {
+            assert(active->debug_response_size == 0);
+            lib_atomic_i32_store_explicit(&active->state, COMMON_MACHINE_PAUSED, LIB_MEMORY_ORDER_SEQ_CST);
+        }
+    }
+    /* Failed wait retains the copied request, never a borrowed caller buffer.
+     * Script executor unwind before freeing resources; no retry is attempted. */
+    assert(lib_atomic_i32_load_explicit(&active->debug_requested, LIB_MEMORY_ORDER_SEQ_CST));
+    common_machine_finish_requests(active, COMMON_MACHINE_STOPPED);
+    assert(active->debug_response_size == 0);
+    assert(common_machine_destroy(active) == LIB_STATUS_OK);
+}
+
 int main(void)
 {
     common_machine_driver invalid_driver = { 0 };
@@ -350,5 +457,6 @@ int main(void)
         check(BASE_SYNC_WAIT_FAULT, 4u);
     }
     check_publication();
+    check_debug();
     return 0;
 }

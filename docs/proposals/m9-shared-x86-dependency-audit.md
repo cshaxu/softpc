@@ -395,3 +395,58 @@ Existing background Common suite: x64 22/22 and x86 22/22, including Machine,
 wait, input FIFO, x86-debug output/linear, xasm and manifest/corpus/negative gates.
 No desktop test or new non-x86 runtime was run. Source was not rebuilt because
 only this proposal and CURRENT changed. S1 accepted packages remain untouched.
+
+## S3 Implementation And Review Ledger
+
+Owner request: 批准照此实现S3.请你收口S2先，然后准入S3，执行完成后编译测试提交推送等我验证。
+S2 closure/admission commit: 56261c63. No S4 implementation is included.
+
+| Admitted boundary | Implemented path and proof |
+| --- | --- |
+| Protocol ownership | x86-debug/protocol_interface.h owns unchanged operation values, fields and register IDs; Machine no longer includes or defines them. Existing DAG negative test now also rejects Machine including this header. |
+| Neutral request slot | machine.c owns fixed 128/1536-byte buffers and their lengths; no operation field, extra queue, thread, allocation or callback registry. Empty values are permitted, invalid pointers/oversize rejected before dispatch. |
+| Existing completion path | Paused state/lease recheck, cancellation and terminal completion remain in the same functions; zero failure length, no failed output copy. Wait failure cannot authorize slot reuse. |
+| Frontend | Only command_execute changes executable logic: supplies sizes and rejects malformed reply length. Protocol response is distinct from existing CLI text result. |
+| SoftPC VM | Existing driver callback copies exact-size opaque request into aligned local x86 values, calls unchanged dispatcher, copies successful result. Original 32-byte operation validation remains in vm/debug.c. |
+| Shared tests | Existing native fake proves executor thread identity and x86 CLI; deterministic machine_wait adds unrelated byte-reversal protocol, source-copy proof, empty/max/oversize/pointer/capacity/error/stale-lease/cancel/terminal/wait-failure cases. Frontend test rejects a short successful response. |
+| Product integration | Existing command_provider uses the new transport; adds malformed x86 shape/capacity and over-limit memory-payload rejection without mutating response. Existing register, memory, port, trace/watch and DOS/X behavior assertions remain. |
+| Protected components | Git diff confirms Lib, Session/UI, Compat/MVDM, INI and media unchanged. App cancellation and all non-debug Machine operations retain their code. |
+
+Counts relative to 56261c63 (`git diff --numstat`, including the new protocol
+header, excluding docs/manifests/artifacts): production C/H nine paths +327/-268,
+net **+59**; test C/H four paths +405/-222, net **+183**; boundary-gate scripts
+two paths +2/-0. New protocol header has 124 lines, predominantly relocated
+definitions. Most VM/CLI/test churn is the exact vocabulary substitution.
+Production is just below the estimated net +60..100; tests exceed estimated
++80..130 because failure, terminal, malformed-reply and real-adapter shape proof
+were kept together rather than deferred. No new production state machine.
+
+Review evidence: reverse exact vocabulary/include substitutions in vm/debug.c
+and it equals the baseline; reverse vocabulary in command.c and remove only
+the command_execute function, and all remaining code equals the baseline.
+This protects original CLI style/semantics beyond passing example commands.
+Search of src/test finds no old Machine x86 type/operation aliases. Both actual
+production transport endpoints are migrated; all direct test callbacks/callers
+are in the finite ledger above. Constants and struct fields were moved intact.
+
+Package sizes: x86 3,659,685 bytes (+637), x64 3,061,665 bytes (+635).
+Two fixed buffers replace typed storage; aligned protocol conversion uses local
+values. No per-operation heap allocation was introduced.
+Both Release build presets and final full background regressions passed;
+five desktop tests per width remain excluded and owner testing is
+still pending. S3 does not claim neutral-only optional-build qualification (S4).
+
+During full regression, x86 initially passed 104/105: the product public-header
+allowlist had not included the newly extracted protocol header. Added that one
+explicit public path (no wildcard/private-interface relaxation); focused retest
+passed. The Common forbidden reverse-edge probe still rejects Machine consuming
+the same protocol header. Final x64 background suite passed 105/105 (162.58s).
+Final x86 background suite passed 105/105 (125.26s). Machine's changed C source
+also passed GCC C17 -Wall -Wextra -Wpedantic -Werror syntax checking. Common and
+test manifests, DAG, documentation and diff checks passed. Existing build trees
+remain reusable; no disposable media or traces were created for this task.
+
+Package SHA-256:
+
+- softpc32.exe: 90C69067124A830BF3FBC59B879893F1A046B0661C935A349DED6798F0A53E0C
+- softpc64.exe: 78375916A8C4695F177A6AD94648B17CBD458B61D91D86A74FD6A868BF6F23FC
