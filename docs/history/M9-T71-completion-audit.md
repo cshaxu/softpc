@@ -25,7 +25,7 @@ not assert correctness of the entire emulator. No S11 is admitted.
 | Terminal completion of synchronous requests | [S8](M9-T71-S8-request-completion.md): admission and executor terminal cleanup synchronized, no new cancellation path; save not completed by ordinary pause; dual-width 110/110. |
 | Final owner-approved frame transport | [S9](M9-T71-S9-latest-frame-delivery.md): complete frame, opaque latest-wins Base, leaf surface comparison; replaces the intermediate FIFO/dirty-chain proposal. No extra framebuffer/thread. Dual-width 110/110; subsequent background defaults 105/105 with five desktop tests explicit-only. |
 | Four bounded interface/layout corrections | [S10](M9-T71-S10-text-contract-cleanup.md): original fixed-80 destination copy, cursor normalization, request/context documentation, delete destroy alias. Final background 105/105 each; owner manual pass. |
-| Neutral text attributes | Separate [queued proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md); not unfinished T71 implementation. No S11 started. |
+| Neutral text attributes | Separate [proposal, subsequently completed as T72](M9-T72-kvm-text-cell-glyph-refactor-proposal.md); not unfinished T71 implementation. No S11 started. |
 | Three former TODO observations | Owner explicitly retires tracking; [Td disposition](M9-Td-S18-t71-closure-and-floppy-queue.md). No false repair claim. |
 | New Win95 A: classification issue | New second-position [candidate](../proposals/m9-win95-floppy-drive-identification.md), not T71 regression proof or an admitted numeric task. |
 

@@ -4,7 +4,7 @@
 
 Owner: "好嘞。准入队列第一条，KVM文本属性中性化，先来个设计稿，我审一审".
 Baseline bea66d3f; T71 is closed. T72 is newly admitted for design only.
-The [design draft](../proposals/m9-kvm-text-cell-glyph-refactor.md) owns proposed
+The [design draft](M9-T72-kvm-text-cell-glyph-refactor-proposal.md) owns proposed
 schema, finite call-site ledger, semantics, costs and estimates. It is not yet
 an approved replacement for current architecture or API.
 

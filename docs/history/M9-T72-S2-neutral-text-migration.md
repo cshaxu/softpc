@@ -5,7 +5,7 @@
 Owner approved the parallel-array design and execution to T-level audit readiness,
 reserving formal T closure. Baseline e0ad4e8f; complete implementation delivery
 12bf7c96 was pushed to origin/main. The ten-path finite ledger and test mapping
-are in the [proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md#八s2-有限收敛账本).
+are in the [proposal](M9-T72-kvm-text-cell-glyph-refactor-proposal.md#八s2-有限收敛账本).
 
 VM decodes device attributes once, Common status text writes neutral values,
 and Window/Console consume independent foreground/background/bank arrays.

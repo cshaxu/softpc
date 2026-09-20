@@ -20,7 +20,7 @@ Original request ledger:
 - "写入本T任务的proposal并进行S任务拆分。"
 - S5 owner refinement: "保留现有容量，不扩容、不动态分配；统一做完整校验，超限明确失败，禁止静默裁剪。" The owner explicitly authorizes the necessary copy_frame result-contract change, without side-channel error flags, automatic presenter switching or guest-mode changes.
 
-The independent [cell/colour cleanup candidate](../proposals/m9-kvm-text-cell-glyph-refactor.md)
+The independent [cell/colour cleanup candidate](M9-T72-kvm-text-cell-glyph-refactor-proposal.md)
 remains queued only for per-cell struct/attribute normalization. It must not
 repeat this task's frame ownership, mapping relocation or mailbox work.
 
