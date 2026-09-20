@@ -2,19 +2,46 @@
 
 ## Current Work
 
-No implementation subtask is active. T72 remains open; S1--S7 are closed.
-Open task awaiting owner: T72.
-Owner reports S7 tests passed and approves closure. Common work remains S8, not started.
+Active task: M9 T72 S8, implemented and verified; preparing delivery review.
+T72 remains open; S1--S7 are closed. Owner explicitly admitted S8 after snapshot push.
 See [proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md) and
 [audit](../etc/evidence/softpc/m9-t72-post-s5-quality-audit.md).
 S6 delivery details: [evidence](../etc/evidence/softpc/m9-t72-s6-text-render-simplification.md).
 P1 01a737b2 / review 2cf87250 accepted; [S6 closure](../history/M9-T72-S6-text-render-simplification.md).
 S7 details: [unified damage evidence](../etc/evidence/softpc/m9-t72-s7-window-pixel-damage.md).
 P2 c813f698 / review 6fa729a1 accepted; [S7 closure](../history/M9-T72-S7-window-pixel-damage.md).
+Owner-approved snapshot delivery c0355b2f pushed; clean baseline verified.
+
+## M9 T72 S8 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner: 确认推送。完成后准入下一个S8。 Snapshot pushed before admission. |
+| Objective | Resolve Common audit A/B/C/D/F without new state machines, queues or Lib changes. |
+| Non-goals | No Lib, VM, Compat, MVDM, frame schema, debug command semantics, INI or media changes. |
+| Reference Baseline | c0355b2f, clean; accepted S7. |
+| Candidate Proposal | [T72 proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md), section fifteen. |
+| Files And ABI Surface | common/ui/ui.c and common/ui/ui_interface.h, session/control.c/session.c, machine/machine.c, debug/command.c; App composition.c terminal teardown receiver; existing tests, root CMake test-only source selection and manifests. No API shape changes. |
+| Applicable Rules | Execution, architecture, coding, documentation; project design/layout/UI and shared governance skills. |
+| Verification | Destroy failure at each child and callback dependency retention; status RGB contrast; running/paused TEXT and sink rejection; dirty out create failures; debug close/reopen/continuations/argument limits; x86/x64 builds and background regression. |
+| Expected Markers | Failed teardown preserves live dependencies; one input route; constructors clear outputs; no heap lifecycle for fixed debug argument table. |
+| Asset Needs | Refresh both EXEs only; preserve INI/media and owner snapshot. No desktop tests without reserved time. |
+| Reporting Requirements | Estimate production seven files +35--55/-30--50; tests +110--180/-10--25. Report actual added/removed/net, verified scope and EXE links. |
+| Stop Conditions | Lib change, new recovery machinery, altered debug semantics or unsafe callback lifetime requires reassessment. |
+| Exit Criteria | Finite A/B/C/D/F proof, dual-width verification, actual-change review, pushed clean delivery, then wait for owner test. |
+| Original Owner Request | 分成两个s任务 第一个先优化lib 第二个处理common；Common 顺延 S8；确认推送。完成后准入下一个S8。 |
+| Similar-Issue Sweep | UI destroy/action/create cleanup, all Common constructors and input variants, argument table references, final App teardown consumer; each hit gets proof or retained-role disposition. |
 
 
 ## Current Technical Baseline
 
+- S8 production seven C/H +33/-36 (net -3); six C tests +149/-5 (net +144).
+  Test build/gate +2/-2 (net0). Both Release builds pass; final background
+  x64 105/105 (134.41s), x86 105/105 (135.13s). Five desktop tests per width
+  excluded. Lib/VM/Compat/MVDM, INI/media/snapshot unchanged. See
+  [S8 evidence](../etc/evidence/softpc/m9-t72-s8-common-cleanup.md).
+  S8 and T72 remain open pending owner test, not automatically closed.
 - S7 production three C/H +58/-62 (net -4); three tests +97/-27 (net +70).
   P2 removes row scratch in render.c, +26/-34 (net -8) relative to P1.
   Both Release builds pass; background x64 105/105 (169.98s), x86 105/105

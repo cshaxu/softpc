@@ -75,6 +75,12 @@ int main(void)
 {
     static common_session session;
     common_session_event event = { 0 };
+    common_session *output = &session;
+    common_session_options options = { 0 };
+    assert(common_session_create(NULL, NULL) == LIB_STATUS_INVALID_ARGUMENT);
+    assert(common_session_create(&output, NULL) == LIB_STATUS_INVALID_ARGUMENT && output == NULL);
+    output = &session;
+    assert(common_session_create(&output, &options) == LIB_STATUS_INVALID_ARGUMENT && output == NULL);
     /* Opaque handles are never dereferenced by the fakes. */
     session.machine = (common_machine *)&current_run;
     session.ui = (common_ui *)&current_run;

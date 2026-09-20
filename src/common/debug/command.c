@@ -43,7 +43,7 @@ struct common_debug {
     C_CHAR input_prompt[COMMON_DEBUG_PROMPT_CAPACITY];
     STD_SIZE_T error_position;
     STD_SIZE_T argument_count;
-    C_CHAR **arguments;
+    C_CHAR *arguments[DEBUG_MAXNARG];
     C_INT exit_requested;
     C_CHAR command_buffer[0x100];
     C_CHAR command_copy[0x100];
@@ -639,12 +639,6 @@ static C_VOID command_print_memory_accesses(command_context *debugContext)
 #define _ds ((type_unsigned_16)debug_register(debugContext, COMMAND_REGISTER_DS))
 #define _fs ((type_unsigned_16)debug_register(debugContext, COMMAND_REGISTER_FS))
 #define _gs ((type_unsigned_16)debug_register(debugContext, COMMAND_REGISTER_GS))
-
-static C_VOID command_machine_finalize_arguments(command_context *context)
-{
-    STD_FREE((C_VOID *)context->arguments);
-    context->arguments = STD_NULL;
-}
 
 static C_VOID seterr(command_context *debugContext, STD_SIZE_T pos)
 {
@@ -2973,8 +2967,6 @@ static C_VOID command_initialize(common_debug *command,
     lib_release(command->output);
     STD_MEMSET(command, 0, sizeof(*command));
     command->machine = machine;
-    command->arguments = (C_CHAR **)STD_CALLOC(DEBUG_MAXNARG,
-        sizeof(*command->arguments));
 }
 
 lib_status common_debug_create(common_debug **out_command)
@@ -3003,7 +2995,6 @@ lib_status common_debug_open(common_debug *command,
     if (command == STD_NULL || machine == STD_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     common_debug_close(command);
     command_initialize(command, machine);
-    if (command->arguments == STD_NULL) return LIB_STATUS_NO_MEMORY;
     return LIB_STATUS_OK;
 }
 
@@ -3011,7 +3002,6 @@ void common_debug_close(common_debug *command)
 {
     if (command == STD_NULL) return;
     common_machine_debug_cancel(command->machine);
-    command_machine_finalize_arguments(command);
     command->machine = STD_NULL;
     command->continuation = COMMAND_CONTINUATION_NONE;
 }
@@ -3109,7 +3099,7 @@ lib_status common_debug_submit_line(common_debug *command,
     STD_SIZE_T i;
 
     if (command == STD_NULL || line == STD_NULL || out_result == STD_NULL ||
-        command->machine == STD_NULL || command->arguments == STD_NULL)
+        command->machine == STD_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     command_begin_output(command, out_result);
     command->access_status = LIB_STATUS_OK;

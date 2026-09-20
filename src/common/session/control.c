@@ -279,7 +279,7 @@ int common_session_dispatch_input(common_session_queue *queue, const kvm_input_e
         return runtime_state != COMMON_SESSION_MACHINE_RUNNING ||
             sink(sink_context, event);
     }
-    if (event->type == KVM_EVENT_MOUSE)
+    if (event->type == KVM_EVENT_MOUSE || event->type == KVM_EVENT_TEXT)
         return runtime_state != COMMON_SESSION_MACHINE_RUNNING ||
             sink(sink_context, event);
     if (event->type == KVM_EVENT_SOURCE_RETIRED)

@@ -222,11 +222,12 @@ lib_status common_session_create(common_session **out_session,
     const common_session_options *options)
 {
     common_session *session;
-    if (out_session == NULL || options == NULL || options->machine == NULL ||
+    if (out_session == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *out_session = NULL;
+    if (options == NULL || options->machine == NULL ||
         options->command.open == NULL ||
         options->command.submit_line == NULL || options->command.note_runtime == NULL ||
         options->command.note_monitor_current == NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    *out_session = NULL;
     session = lib_allocate_zero(1u, sizeof(*session));
     if (session == NULL) return LIB_STATUS_NO_MEMORY;
     if (!common_session_queue_initialize(&session->queue)) {

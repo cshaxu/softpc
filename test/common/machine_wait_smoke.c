@@ -303,6 +303,12 @@ static void check_publication(void)
 
 int main(void)
 {
+    common_machine_driver invalid_driver = { 0 };
+    common_machine *output = (common_machine *)&invalid_driver;
+    assert(common_machine_create(NULL, NULL) == LIB_STATUS_INVALID_ARGUMENT);
+    assert(common_machine_create(&output, NULL) == LIB_STATUS_INVALID_ARGUMENT && output == NULL);
+    output = (common_machine *)&invalid_driver;
+    assert(common_machine_create(&output, &invalid_driver) == LIB_STATUS_INVALID_ARGUMENT && output == NULL);
     assert(sizeof(common_machine_frame) == 985112);
     /* Resource-only changes are publications, not just character changes. */
     static common_machine_frame before, after;

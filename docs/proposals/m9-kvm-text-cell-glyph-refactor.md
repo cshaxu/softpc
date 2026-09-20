@@ -411,3 +411,38 @@ Owner 要求去掉行缓冲后，P2 仅 render.c +26/-34（净 -8），测试不
 S7 累计生产 +58/-62（净 -4）；双宽度后台重新各105/105通过。
 光标旧、新区域补刷不变；owner 已报告测试通过并批准 S7 收口，不开始 S8。
 见 [S7 收口](../history/M9-T72-S7-window-pixel-damage.md)。
+
+## 十五、S8 准入简报：Common 质量收口
+
+Owner 在确认 snapshot 推送后准入 S8；基线 c0355b2f，工作区干净。
+继承第十三节 A/B/C/D/F，E 已由 S6 完成；S7 不再扩大。
+
+| 项目 | 唯一修改路径及验收 |
+| --- | --- |
+| A | common_ui_destroy 先由 broker 销毁路径停止 reader/解绑输出，再销毁 Window/Console；每步失败立即返回，成功才清空指针，保留 live worker 的 UI/Session 依赖。App composition 检查结果并沿现有最终进程失败退出模式结束。故障注入覆盖三个销毁边界、raw/cooked 当前对象和 App 终止出口。 |
+| B | status_frame 设置实际使用的前景 RGB，背景保持黑色；测试最终 palette 对比，不只检查索引。 |
+| C | TEXT 与 MOUSE 共用 running 准入及现有 sink，不进入 held-key ledger；测试 running/paused、sink 拒绝与原事件内容。VM 字符支持不在此任务内。 |
+| D | 三个 create 先判断 out 地址并清空，再检查其他参数；脏 out、缺失 options/driver/callback 和成功路径回归。 |
+| F | Debug 内嵌256项指针表，删除独立分配/释放与相应空指针判定；保留原解析/输出风格，验证 close/reopen、续行和参数边界。 |
+
+A 必须同时处理最终 App 接收方：当前 composition 忽略 UI destroy 状态，
+会继续释放 Session；仅修 Common 并不能保证回调生命周期。App 只改这个
+终止性清理出口，不新增重试、恢复对象或状态机。公共函数形状不变，
+common/ui/ui_interface.h 补齐失败保留所有权的契约。Lib 不改。
+
+预计生产七文件 +35--55/-30--50，测试 +110--180/-10--25，具体测试文件
+随现有 fixture 复用确定；manifest、文档和 EXE 单列。Debug 对象未 open
+时多占固定1/2KiB，但 open 时不再另分配，减少生命周期而非承诺省内存。
+实施前核对发现最终销毁不应先 raw→monitor 换绑：monitor 已 current 时会
+失败，而且销毁前不需要启动另一 reader。直接销毁 broker 使用其既有停读/
+输出屏障，因此不增加 current 镜像字段或错误豁免。测试 App 终止出口需
+现有 fixture 直接包含 composition.c 拦截 exit，根 CMake 仅移除该 fixture
+的重复编译项；生产目标不变。这是新增的测试构建文件，不隐藏在七个生产文件中。
+有限账本是上表五项，每项必须有实际路径检查和测试；双宽度构建、后台
+回归、实际增删审计和提交推送后等待 owner 验收。
+
+S8 实际生产七个 C/H +33/-36（净 -3）；六个 C 测试 +149/-5（净 +144），
+测试构建和既有静态门禁 +2/-2（净0）。双宽度 Release 构建通过，最终后台
+各105/105通过；每个宽度五项桌面测试未运行。初次两项静态检查失败及修正、
+五项有限账本和产物散列见 [S8 证据](../etc/evidence/softpc/m9-t72-s8-common-cleanup.md)。
+Lib、VM、Compat、MVDM 和用户配置/介质不变；等待 owner 测试，不收口 S8/T72。

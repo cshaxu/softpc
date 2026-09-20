@@ -67,6 +67,8 @@ typedef struct common_ui_options {
 } common_ui_options;
 
 lib_status common_ui_create(common_ui **out_ui, const common_ui_options *options);
+/* Failure retains ui and remaining resources; callback dependencies must stay
+ * alive. Treat unjoined workers as terminal, not as a completed destruction. */
 lib_status common_ui_destroy(common_ui *ui);
 void common_ui_set_run_generation(common_ui *ui, lib_u32 run_generation);
 lib_status common_ui_apply_action(common_ui *ui, common_ui_action action,

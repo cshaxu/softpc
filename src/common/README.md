@@ -22,10 +22,17 @@ UI APIs have one control-thread caller. Immutable creation options are shared
 with input callbacks; their run-generation tag uses a Types atomic. Frame
 deduplication and object ownership remain control-thread-local. Native producers
 must be destroyed before the event sink/context is released.
+UI destruction first stops the broker reader and removes its output binding,
+then joins the KVM producers. Any failure retains UI and remaining callback
+dependencies; the application must not continue freeing them. Constructors
+clear a valid output pointer before validating other arguments.
 
 The debug command state is the public opaque debug object itself, with no
 separately allocated forwarding owner. Session uses one internal control state
 for completed facts and presentation actions; pure derivation stays separate.
+Debug's fixed argument pointer table is embedded, with no open/close allocation.
+Session forwards TEXT through the same running-only input sink as MOUSE,
+without a held-key entry; character support belongs to the machine adapter.
 UI submits the fixed graphical Console explanation only when entering that
 content kind or creating a fresh Console. Text still follows frame sequences;
 only successful submissions update these control-thread-local markers.

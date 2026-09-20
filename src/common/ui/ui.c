@@ -152,10 +152,11 @@ lib_status common_ui_create(common_ui **out_ui, const common_ui_options *options
 {
     common_ui *ui;
     lib_status status;
-    if (out_ui == NULL || options == NULL || options->event_sink == NULL ||
+    if (out_ui == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *out_ui = NULL;
+    if (options == NULL || options->event_sink == NULL ||
         options->running_window_title == NULL || options->paused_window_title == NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
-    *out_ui = NULL;
     ui = lib_allocate_zero(1u, sizeof(*ui));
     if (ui == NULL) return LIB_STATUS_NO_MEMORY;
     lib_atomic_i32_initialize(&ui->run_generation, 0);
@@ -184,34 +185,32 @@ lib_status common_ui_create(common_ui **out_ui, const common_ui_options *options
 
 lib_status common_ui_destroy(common_ui *ui)
 {
-    lib_status status = LIB_STATUS_OK;
+    lib_status status;
     if (ui == NULL) return LIB_STATUS_OK;
-    if (ui->console != NULL) {
-        lib_status replace = console_broker_replace(ui->broker,
-            kvm_console_get_console(ui->console), ui->monitor,
-            CONSOLE_BROKER_COOKED_LINES);
-        if (replace != LIB_STATUS_OK) status = replace;
+    /* Stop native input and detach output before releasing its consumers. */
+    if (ui->broker != NULL) {
+        status = console_broker_destroy(ui->broker);
+        if (status != LIB_STATUS_OK) return status;
+        ui->broker = NULL;
     }
     if (ui->window != NULL) {
-        lib_status destroy = kvm_window_destroy(ui->window);
-        if (destroy == LIB_STATUS_OK) lib_atomic_i32_store_explicit(
+        status = kvm_window_destroy(ui->window);
+        if (status != LIB_STATUS_OK) return status;
+        ui->window = NULL;
+        lib_atomic_i32_store_explicit(
             &ui->window_live, 0, LIB_MEMORY_ORDER_SEQ_CST);
-        if (status == LIB_STATUS_OK) status = destroy;
     }
     if (ui->console != NULL) {
-        lib_status destroy = kvm_console_destroy(ui->console);
-        if (status == LIB_STATUS_OK) status = destroy;
-    }
-    if (ui->broker != NULL) {
-        lib_status destroy = console_broker_destroy(ui->broker);
-        if (status == LIB_STATUS_OK) status = destroy;
+        status = kvm_console_destroy(ui->console);
+        if (status != LIB_STATUS_OK) return status;
+        ui->console = NULL;
     }
     if (ui->monitor != NULL) {
         (void)lib_console_set_event_sink(ui->monitor, NULL, NULL);
         lib_console_release(ui->monitor);
     }
     lib_release(ui);
-    return status;
+    return LIB_STATUS_OK;
 }
 
 void common_ui_set_run_generation(common_ui *ui, lib_u32 run_generation)
@@ -288,6 +287,7 @@ static void common_ui_status_frame(kvm_console_text_frame *frame,
     frame->base.text_rows = KVM_TEXT_ROWS;
     frame->base.cursor_column = -1;
     frame->base.cursor_row = -1;
+    frame->base.text_palette[7] = 0xc0c0c0u;
     for (index = 0u; index < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++index)
         frame->base.cells[index] = (kvm_text_cell){ ' ', 0u, 7u, 0u };
     for (index = 0u; index < 256u; ++index) {

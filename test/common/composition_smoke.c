@@ -10,14 +10,23 @@ static lib_u32 status_builds, unfreezes, freezes, console_frames, window_frames;
 static lib_u32 received, received_run;
 static lib_status publish_status = LIB_STATUS_OK;
 static kvm_console_text_frame last_console;
+static common_ui *tracked_ui;
+static unsigned released_ui, destroy_failure, broker_destroys, window_destroys, console_destroys;
+static void counted_release(void *memory)
+{
+    if (memory == tracked_ui) ++released_ui;
+    lib_release(memory);
+}
 static void *counted_set(void *destination, int value, lib_size size)
 {
     if (size == sizeof(kvm_console_text_frame)) ++status_builds;
     return memset(destination, value, size);
 }
 #define lib_memory_set counted_set
+#define lib_release counted_release
 #include "common/ui/ui.c"
 #undef lib_memory_set
+#undef lib_release
 
 struct kvm_window { kvm_window_options options; };
 struct kvm_console { lib_console *object; kvm_console_options options; };
@@ -29,7 +38,8 @@ static struct console_broker broker_fake;
 lib_status kvm_window_create(kvm_window **out, const kvm_window_options *options)
 { window_fake.options = *options; *out = &window_fake; return LIB_STATUS_OK; }
 lib_status kvm_window_destroy(kvm_window *window)
-{ assert(window == &window_fake); return LIB_STATUS_OK; }
+{ assert(window == &window_fake); ++window_destroys;
+  return destroy_failure == 2u ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK; }
 lib_status kvm_window_set_title(kvm_window *window, const char *title)
 { assert(window == &window_fake && title != NULL); return LIB_STATUS_OK; }
 lib_status kvm_window_freeze(kvm_window *window)
@@ -48,7 +58,9 @@ lib_status kvm_console_create(kvm_console **out, const kvm_console_options *opti
     return LIB_STATUS_OK;
 }
 lib_status kvm_console_destroy(kvm_console *console)
-{ assert(console == &console_fake); lib_console_release(console->object); return LIB_STATUS_OK; }
+{ assert(console == &console_fake); ++console_destroys;
+  if (destroy_failure == 3u) return LIB_STATUS_IO_ERROR;
+  lib_console_release(console->object); return LIB_STATUS_OK; }
 lib_console *kvm_console_get_console(const kvm_console *console)
 { return console->object; }
 lib_status kvm_console_publish_frame(kvm_console *console, const kvm_console_text_frame *frame)
@@ -71,7 +83,8 @@ lib_status console_broker_request_cooked_line(console_broker *broker,
     lib_console *expected)
 { assert(broker->current == expected); return LIB_STATUS_OK; }
 lib_status console_broker_destroy(console_broker *broker)
-{ assert(broker == &broker_fake); return LIB_STATUS_OK; }
+{ assert(broker == &broker_fake); ++broker_destroys;
+  return destroy_failure == 1u ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK; }
 lib_status console_broker_cancel_cooked_line(console_broker *broker,
     lib_console *expected, lib_bool *out_completed)
 { assert(broker->current == expected); *out_completed = LIB_FALSE; return LIB_STATUS_OK; }
@@ -95,6 +108,38 @@ static void input_worker(void *context, const base_sync_task *task)
     options->failure_sink(options->failure_context, 1u, LIB_STATUS_IO_ERROR);
 }
 
+static void check_destroy(const common_ui_options *options, unsigned failure, int raw)
+{
+    common_ui *ui;
+    assert(common_ui_create(&ui, options) == LIB_STATUS_OK);
+    common_ui_set_run_generation(ui, 11u);
+    assert(common_ui_apply_action(ui, COMMON_UI_ACTION_CREATE_WINDOW,
+        COMMON_UI_STATE_RUNNING) == LIB_STATUS_OK);
+    assert(common_ui_apply_action(ui, COMMON_UI_ACTION_CREATE_VM_CONSOLE,
+        COMMON_UI_STATE_RUNNING) == LIB_STATUS_OK);
+    if (raw) assert(common_ui_apply_action(ui, COMMON_UI_ACTION_BIND_VM_CONSOLE,
+        COMMON_UI_STATE_RUNNING) == LIB_STATUS_OK);
+    tracked_ui = ui;
+    released_ui = broker_destroys = window_destroys = console_destroys = 0u;
+    destroy_failure = failure;
+    assert(common_ui_destroy(ui) == LIB_STATUS_IO_ERROR);
+    assert(released_ui == 0u && ui->monitor != NULL && ui->console != NULL);
+    assert(broker_destroys == 1u && window_destroys == (failure >= 2u) &&
+        console_destroys == (failure == 3u));
+    assert((ui->broker != NULL) == (failure == 1u));
+    assert((ui->window != NULL) == (failure != 3u));
+    /* A retained source can still safely call its retained UI/event context. */
+    input_worker(&console_fake.options, NULL);
+    if (ui->window) input_worker(&window_fake.options.component, NULL);
+    /* End the scripted failure for fixture cleanup, not a product retry policy. */
+    destroy_failure = 0u;
+    assert(common_ui_destroy(ui) == LIB_STATUS_OK && released_ui == 1u);
+    assert(broker_destroys == (failure == 1u ? 2u : 1u));
+    assert(window_destroys == (failure == 2u ? 2u : 1u));
+    assert(console_destroys == (failure == 3u ? 2u : 1u));
+    tracked_ui = NULL;
+}
+
 int main(void)
 {
     common_ui *ui = NULL;
@@ -103,6 +148,11 @@ int main(void)
     static kvm_window_frame frame;
     kvm_console_character_map characters = { 0 };
     lib_u32 sequence;
+    assert(common_ui_create(NULL, NULL) == LIB_STATUS_INVALID_ARGUMENT);
+    ui = (common_ui *)&options;
+    assert(common_ui_create(&ui, NULL) == LIB_STATUS_INVALID_ARGUMENT && ui == NULL);
+    ui = (common_ui *)&options;
+    assert(common_ui_create(&ui, &options) == LIB_STATUS_INVALID_ARGUMENT && ui == NULL);
     options.event_sink = receive;
     options.running_window_title = "running";
     options.paused_window_title = "paused";
@@ -134,6 +184,8 @@ int main(void)
     assert(common_ui_publish_frame(ui, &frame, &characters, sequence, 1, 1, 1) == LIB_STATUS_OK);
     assert(status_builds == 1u && console_frames == 1u && window_frames == 1u);
     assert(last_console.base.text_columns == 80u);
+    assert(last_console.base.text_palette[7] == 0xc0c0c0u &&
+        last_console.base.text_palette[0] == 0u);
     for (unsigned i = 0; i < 13u; ++i)
         assert(last_console.base.cells[i].glyph_index == "Window active"[i]);
     for (unsigned i = 0; i < 7u; ++i)
@@ -239,5 +291,8 @@ int main(void)
         assert(received == prior + 5u);
     }
     assert(common_ui_destroy(ui) == LIB_STATUS_OK);
+    for (unsigned failure = 1u; failure <= 3u; ++failure)
+        for (int raw = 0; raw <= 1; ++raw) check_destroy(&options, failure, raw);
+    assert(common_ui_destroy(NULL) == LIB_STATUS_OK);
     return 0;
 }

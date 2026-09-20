@@ -47,6 +47,9 @@ At exit it synchronously shuts down the machine worker with callback targets
 still alive, then destroys UI, session, command/debug, machine and VM in order.
 Machine shutdown and destroy share one stop/join path; shutdown retains storage
 so referenced objects can be released safely before the machine itself.
+UI teardown stops the broker and unbinds output before joining KVM producers;
+failure preserves UI and remaining callback dependencies. App treats that failure
+as terminal rather than releasing Session beneath a live producer.
 Only app/composition.c consumes vm/vm_interface.h; no app source consumes Compat or
 MVDM. `vm/` owns the concrete machine backend, initialization/reset/teardown
 sequence, driver, frame/input conversion and debugger request preflight.

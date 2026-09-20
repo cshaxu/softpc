@@ -6,10 +6,31 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <setjmp.h>
 
 struct common_ui { common_ui_options options; };
 static common_ui surface;
 static unsigned scenario, requests, destroyed, reported;
+static jmp_buf terminal_exit;
+static void checked_exit(int status)
+{
+    common_ui_event event = { 0 };
+    assert(scenario == 3u && status == EXIT_FAILURE && destroyed == 1u);
+    event.kind = COMMON_UI_EVENT_CONSOLE_FAILED;
+    assert(surface.options.event_sink(surface.options.event_context, &event));
+    longjmp(terminal_exit, 1);
+}
+static lib_status checked_session_destroy(common_session *session)
+{
+    assert(scenario != 3u); /* Failed UI destroy must not release its receiver. */
+    return common_session_destroy(session);
+}
+#define exit checked_exit
+#define common_session_destroy checked_session_destroy
+#include "app/composition.c"
+#undef common_session_destroy
+#undef exit
 
 lib_status common_ui_create(common_ui **out, const common_ui_options *options)
 {
@@ -22,14 +43,14 @@ lib_status common_ui_destroy(common_ui *ui)
 {
     assert(ui == &surface && requests == 1u);
     ++destroyed;
-    return LIB_STATUS_OK;
+    return scenario == 3u ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
 
 lib_status common_ui_request_monitor_line(common_ui *ui)
 {
     common_ui_event event = { 0 };
     assert(ui == &surface && ++requests == 1u);
-    if (scenario == 0u) {
+    if (scenario == 0u || scenario == 3u) {
         event.kind = COMMON_UI_EVENT_MONITOR_LINE;
         memcpy(event.value.line.text, "exit", 5u);
         event.value.line.length = 4u;
@@ -84,6 +105,13 @@ int main(void)
         assert(app_composition_run(&config) ==
             (scenario == 0u ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR));
         assert(destroyed == 1u && reported == (scenario != 0u));
+    }
+    /* Last case is terminal: process exit owns the retained dependency graph. */
+    scenario = 3u;
+    requests = destroyed = reported = 0u;
+    if (setjmp(terminal_exit) == 0) {
+        (void)app_composition_run(&config);
+        assert(0);
     }
     assert(softpc_test_remove_image(path));
     return 0;

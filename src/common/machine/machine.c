@@ -519,13 +519,14 @@ lib_status common_machine_create(common_machine **out_machine,
 {
     common_machine *machine;
     lib_status status;
-    if (out_machine == NULL || driver == NULL || driver->reset == NULL ||
+    if (out_machine == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *out_machine = NULL;
+    if (driver == NULL || driver->reset == NULL ||
         driver->run == NULL || driver->request_stop == NULL ||
         driver->request_wake == NULL ||
         driver->set_heartbeat == NULL || driver->set_executor_callback == NULL ||
         driver->deliver_input == NULL || driver->copy_frame == NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
-    *out_machine = NULL;
     machine = lib_allocate_zero(1u, sizeof(*machine));
     if (machine == NULL) return LIB_STATUS_NO_MEMORY;
     lib_atomic_i32_initialize(&machine->debug_requested, 0);

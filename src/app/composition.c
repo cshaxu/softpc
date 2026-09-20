@@ -147,7 +147,10 @@ done:
         fputs("softpcvm: cannot join machine worker\n", stderr);
         exit(EXIT_FAILURE); /* Callback targets must outlive an unjoined worker. */
     }
-    (void)common_ui_destroy(ui);
+    if (common_ui_destroy(ui) != LIB_STATUS_OK) {
+        fputs("softpcvm: cannot destroy UI workers\n", stderr);
+        exit(EXIT_FAILURE); /* Retain Session and all live callback dependencies. */
+    }
     (void)common_session_destroy(session);
     app_command_dispose(&commands);
     common_machine_destroy(machine_runtime);
