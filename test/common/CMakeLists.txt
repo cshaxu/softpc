@@ -14,11 +14,6 @@ endif()
 if(NOT TARGET common-session)
     add_subdirectory("${COMMON_ROOT}" "${CMAKE_CURRENT_BINARY_DIR}/common")
 endif()
-# T73 S5 separates the existing x86 tests into test/x86.
-get_filename_component(X86_ROOT "${COMMON_ROOT}/../x86" ABSOLUTE)
-if(NOT TARGET x86-debug)
-    add_subdirectory("${X86_ROOT}" "${CMAKE_CURRENT_BINARY_DIR}/x86")
-endif()
 
 function(common_test source)
     get_filename_component(name "${source}" NAME)
@@ -46,15 +41,11 @@ common_test(machine_wait common-machine)
 common_test(physical_key_identity common-session)
 common_test(session_frame common-session)
 common_test(session_monitor common-session)
-common_test(x86_debug_output x86-debug)
-common_test(x86_debug_linear x86-debug)
 common_test(composition common-ui console-broker base)
 if(WIN32)
-    # Existing native-thread fake verifies the generic machine/debug protocol.
-    common_test(common_machine common-machine x86-debug)
+    common_test(common_machine common-machine)
+    target_sources(common-test-common_machine PRIVATE machine_fixture.c)
 endif()
-common_test(x86-xasm32/xasm32 x86-xasm32)
-common_test(x86-xasm32/xasm32_contract x86-xasm32)
 
 foreach(check IN ITEMS manifest corpus)
     add_test(NAME common.${check} COMMAND "${CMAKE_COMMAND}"
@@ -66,10 +57,3 @@ add_test(NAME common.verifier-negative COMMAND "${CMAKE_COMMAND}"
     -P "${CMAKE_CURRENT_SOURCE_DIR}/verify_negative.cmake")
 add_test(NAME common.test-manifest COMMAND "${CMAKE_COMMAND}"
     "-DCOMMON_ROOT=${CMAKE_CURRENT_SOURCE_DIR}" -P "${COMMON_ROOT}/verify_manifest.cmake")
-add_test(NAME x86.manifest COMMAND "${CMAKE_COMMAND}"
-    "-DCOMMON_ROOT=${X86_ROOT}" -P "${COMMON_ROOT}/verify_manifest.cmake")
-add_test(NAME x86.corpus COMMAND "${CMAKE_COMMAND}"
-    "-DX86_ROOT=${X86_ROOT}" -P "${X86_ROOT}/verify_corpus.cmake")
-add_test(NAME x86.verifier-negative COMMAND "${CMAKE_COMMAND}"
-    "-DX86_ROOT=${X86_ROOT}" "-DPROBE_ROOT=${CMAKE_CURRENT_BINARY_DIR}/x86-verifier-probe"
-    -P "${CMAKE_CURRENT_SOURCE_DIR}/x86_verify_negative.cmake")

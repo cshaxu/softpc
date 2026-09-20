@@ -2,48 +2,46 @@
 
 ## Current Work
 
-Active task: M9 T73 S4, establish the separate x86 source corpus.
-Owner accepted S3 manual testing; [S3 is closed](../history/M9-T73-S3-neutral-machine-debug.md).
-Owner moved neutral build qualification to S5 and admitted S4's source relocation.
-S5 will establish test/x86 and qualify the six-directory and neutral four-directory
-transfer sets; it is not admitted. Stop after S4 delivery for owner testing.
-See the [T73 proposal](../proposals/m9-shared-x86-dependency-audit.md).
-T73 remains open; Queue candidates remain unchanged and unadmitted.
-S4 implementation and verification are complete: both Release builds and full
-background suites passed (x64 108/108, 163.08s; x86 108/108, 148.73s).
-Five desktop tests per width were excluded. Standalone x86 source build passed.
-Production C/H +363/-363, tests C/H +401/-401 (both net zero); build/gates
-+200/-41 (net +159). No Lib or neutral runtime changes. Delivery 0ef82055 is
-pushed. Coordinator actual-change review checked relocation/consumer diffs,
-the original request, unchanged protected paths and manifest/DAG proof again.
-S4 is verified and awaiting owner testing, not closed; S5 remains unadmitted.
+Active task: M9 T73 S5, independent Lib/Common/x86 test corpora.
+Owner accepted S4; [S4 is closed](../history/M9-T73-S4-x86-source-corpus.md).
+S5 implementation and automated qualification are complete: three independent
+test suites, six-directory x86 and four-directory neutral copies pass. Awaiting
+executor push/review and owner testing; S5/T73 are not closed. Existing Queue order is
+retained; a shutdown-wake follow-up found during S5 is appended, not admitted.
+See the [proposal](../proposals/m9-shared-x86-dependency-audit.md).
 
-## M9 T73 S4 Packet
+## M9 T73 S5 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepted S3, moved old S4 to S5 and explicitly admitted the new S4 establishing top-level x86. |
-| Objective | Move debugger/assembler to src/x86/debug and src/x86/xasm32; make Common source/build neutral and repair all consumers without changing behavior. |
-| Non-goals | No Lib or neutral runtime changes, command/protocol semantic changes, new executor/queue, test/x86 split before S5, INI/media/snapshot changes. |
-| Reference Baseline | dc06671d; clean; S3 dual-width Release and background 105/105 each; owner manual test passed. |
+| Admission And Approval | Owner reported S4 testing passed and explicitly admitted S5 to build the three test component packages. |
+| Objective | Establish test/lib, test/common, test/x86 ownership and standalone build/test closure; neutral four-directory set must not need x86. |
+| Non-goals | No production C/H/API, Lib, guest behavior, new runtime abstraction, INI/media or snapshot changes; no desktop interference. |
+| Reference Baseline | fb07a0b7 clean; S4 both Release builds, background 108/108 each and owner manual acceptance. |
 | Candidate Proposal | [T73 proposal](../proposals/m9-shared-x86-dependency-audit.md). |
-| Files And ABI Surface | Both relocated trees and x86 public names/targets; App/VM/test includes and symbols; root/shared CMake, manifests, DAG/product gates and current design. |
-| Applicable Rules | Architecture, coding, execution and documentation governance and local authorities. |
-| Verification | Reverse mechanical comparison, all direct references, manifests/DAG and negative probes; both Release builds and full background presets, two packaged EXEs. |
-| Expected Markers | One x86 implementation outside Common; no Common reverse edge, aliases or protocol/CLI behavior change. |
-| Asset Needs | Refresh only assets/binary/softpc32.exe and softpc64.exe; preserve INI/media. Existing ignored build trees; no desktop interaction or guest traces. |
-| Reporting Requirements | Before estimate and actual added/deleted/net counts for production C/H, tests and build/gates; distinguish moved lines and binaries. |
-| Stop Conditions | Runtime semantic change or Lib modification requires review; S5 test separation remains unadmitted. |
-| Exit Criteria | Implementation, actual-change review, dual-width build/test, clean commit/push and owner manual acceptance; keep T73 open. |
-| Original Owner Request | 把S4推迟到S5；新S4把common/x86-debug、common/x86-xasm32迁至x86/debug、x86/xasm32；S5建立test/lib、test/common、test/x86；六目录供NXVM/SoftPC，Common/Lib四目录供NNEC；更新proposal和退出标准并准入S4。 |
-| Similar-Issue Sweep | Both trees, every include/symbol/target and App/VM/test consumer, Common/x86 forward/reverse/private edges, complete manifests and current docs; historical references preserved. |
+| Files And ABI Surface | Test/Common mixed smoke and neutral fixture; relocated x86 tests/verifier, suite/root CMake, manifests and current documentation. No production ABI. |
+| Applicable Rules | Architecture, coding, execution, documentation governance and local source/build authorities. |
+| Verification | Preserved assertion/case inventory; isolated four-/six-directory configure/build/background tests; dual-width Release/full background presets, manifests/DAG/docs and protected-path equality. |
+| Expected Markers | Common tests contain no x86 includes/link dependencies; x86 tests own CLI/assembler; one shared neutral fake runner, three independently buildable suites. |
+| Asset Needs | Existing main build trees and bounded disposable transfer trees under build; no guest traces/media or INI changes; both EXEs supplied. |
+| Reporting Requirements | Before estimate, actual added/deleted/net production/test/build counts and separate relocation evidence; exact suite results and desktop exclusions. |
+| Stop Conditions | Production behavior/ABI change or Lib modification requires review; receiving emulator implementation is not included. |
+| Exit Criteria | Complete finite ledger, builds/tests, executor commit/push and actual-change review with clean workspace; wait for owner testing before S5/T73 closure. |
+| Original Owner Request | 测试通过 准入s5 构建test的三组件包。 |
+| Similar-Issue Sweep | All shared tests, local/product includes, build/fixture dependencies, manifests, old paths/targets, mixed machine/CLI assertions; no neutral-to-x86 reverse edge. |
 
 ## Current Technical Baseline
 
+- T73 S5 separates test/lib, test/common and test/x86; Common tests have no x86
+  dependency. Both standalone transfer sets passed, and final full background
+  x64 110/110 (181.72s), x86 110/110 (165.87s); five desktop cases excluded.
+  Test C/H +621/-519 (net +102); CMake +50/-18 (net +32); runtime C/H unchanged.
+  Native Common/x86 tests each passed 50 repetitions per width. Both EXEs retain
+  S4 hashes. A separately recorded shutdown-wake race is not fixed by S5.
 - T73 S4 places debugger/assembler in src/x86/debug and src/x86/xasm32 with
   x86_ public names and x86- targets. Common has only machine/session/ui and
-  cannot depend on x86. Tests remain temporarily mixed in test/common until S5.
+  cannot depend on x86. S5 removes its transitional mixed test dependency.
   Reverse mechanical comparison proves all 22 changed C/H files retain behavior;
   package hashes and complete accounting are in the proposal.
 - T73 S3 moves x86 protocol values to x86-debug, retaining one Machine executor

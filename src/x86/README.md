@@ -45,7 +45,8 @@ cmake --build build/x86-corpus --target x86-verify
 MANIFEST.sha256 covers every file with exact LF-normalized SHA-256 values.
 x86-verify reuses Common's manifest checker with this corpus root; the x86-owned
 source/build gate checks allowed edges and private/platform boundaries. It needs
-no importing-product paths. During T73 S4, tests remain in test/common with
-explicit x86 linkage; S5 moves them and their negative probes to test/x86.
-The final shared sets are six directories for x86 products and four for neutral
-products, as specified in the T73 plan. No receiving emulator is implemented here.
+no importing-product paths. Tests and x86 negative probes live in test/x86.
+The shared set is src/lib, src/common, src/x86, test/lib, test/common, test/x86.
+The four-directory neutral subset omits both x86 directories entirely. Each
+test suite builds independently; test/x86 reuses the neutral machine fixture
+from test/common. No receiving emulator is implemented here.

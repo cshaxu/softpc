@@ -56,6 +56,7 @@ add_subdirectory(src/common)
 add_subdirectory(src/x86)
 add_subdirectory(test/lib)
 add_subdirectory(test/common)
+add_subdirectory(test/x86)
 target_link_libraries(softpc-machine PRIVATE storage base)
 
 # CCPU calls the driver's debug observers, so include the VM objects directly

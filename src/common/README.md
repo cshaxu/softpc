@@ -81,9 +81,9 @@ Shutdown is permanent and idempotent, unlike the restartable product stop.
 
 ## Independent verification
 
-Source-only Common needs just src/common and src/lib. During T73 S4 the existing
-test/common suite still contains x86 tests and additionally requires src/x86;
-S5 owns their move to test/x86 and the four-/six-directory qualification.
+Source-only Common needs just src/common and src/lib. The neutral test suites
+need only src/common, src/lib, test/common and test/lib. x86 CLI/protocol and
+assembly tests are owned by test/x86, not the neutral Common suite.
 No importing-product sources, configuration or resources are needed:
 
 ```text

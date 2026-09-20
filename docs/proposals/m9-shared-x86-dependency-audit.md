@@ -475,7 +475,7 @@ This revision supersedes the earlier optional-Common-x86 build plan. Common
 does not need an x86 option: its source/build closure is simply neutral. Products
 choose whether to add the separate x86 corpus. No aliases or compatibility tree.
 
-### S4: Establish The x86 Source Corpus (Admitted)
+### S4: Establish The x86 Source Corpus (Closed)
 
 Baseline dc06671d, clean. Move both component trees with Git to src/x86/debug
 and src/x86/xasm32. Rename common_x86_* / COMMON_X86_* to x86_* / X86_*, and
@@ -502,7 +502,7 @@ Verify x86 and Common manifests/DAG, forbidden reverse/private edges, all origin
 debug/xasm tests, both Release builds and full background suites; deliver two
 EXEs, commit/push clean and await owner acceptance. Desktop exclusions explicit.
 
-### S5: Separate And Qualify Shared Test Corpora (Planned, Not Admitted)
+### S5: Separate And Qualify Shared Test Corpora (Admitted)
 
 Move x86 tests to test/x86; keep test/common neutral and test/lib unchanged.
 Separate the mixed Machine mechanism/CLI test without duplicating a runner or
@@ -586,4 +586,125 @@ confirmed protected-path equality. Common/x86/test manifests and both source
 gates passed again after push. No runtime semantics, duplicate implementation
 or retired public alias was introduced. The only temporary boundary is the
 explicit S5-owned mixed test directory. S4 is verified and awaiting owner manual
-acceptance, not closed. T73 remains open and S5 remains planned.
+acceptance at that checkpoint. Owner subsequently accepted S4 and admitted S5;
+the S4 closure record and S5 ledger below supersede that status.
+
+## S5 Admission And Finite Qualification Ledger
+
+Owner request: 测试通过 准入s5 构建test的三组件包。
+Baseline fb07a0b7, clean. Owner accepted S4; its closure is recorded separately.
+No production C/H or ABI changes are planned. test/lib is already independently
+buildable and stays unchanged. Use Git moves for the x86 tests and verifier.
+
+| Frozen boundary | Implementation and required evidence |
+| --- | --- |
+| test/lib | Preserve byte identity; independent Release build/background tests in copied neutral set. |
+| test/common | Remove x86 targets/includes/tests; preserve all lifecycle/input/frame/snapshot/lease/wait/error checks. Keep deterministic byte protocol and a real-thread neutral protocol. |
+| Mixed Machine/CLI smoke | Extract one neutral fake-driver fixture (C/H), reused by Common mechanism and x86 real-executor CLI tests. No copied thread runner or production helper. Original command assertions remain in x86. |
+| test/x86 | Own debug output/linear/real-executor CLI, xasm32, source and test manifests, DAG negative checks, standalone CMake and README. |
+| Build closure | Product adds all three test directories. Suites require only their declared sibling source/test corpora, never product roots, media or firmware. |
+| Four-directory proof | Copy only src/lib, src/common, test/lib, test/common; configure/build/test both suites with no x86 files or targets available. |
+| Six-directory proof | Copy the same four plus src/x86 and test/x86; configure/build/test each suite without importing-product CMake or test/support. |
+| Existing product | Both Release builds/full background regressions and EXEs; desktop tests explicitly excluded. No runtime or Lib modifications. |
+
+Estimate: production C/H +0/-0; test C/H +450..650/-350..500, expected net
++100..180 due to fixture extraction and separate executable setup; build/check
+net +60..100. Report moves separately from actual changed lines. Independent
+qualification uses bounded disposable trees under build, no guest inputs or
+desktop interaction; delete owned trees after evidence is summarized. A failed
+standalone dependency is fixed at its suite owner, not with a product path leak.
+
+Retain all source/test manifest and negative-edge gates; review exact original
+CLI assertions and mechanism cases after splitting. Completion requires all
+ledger rows proven, no x86 dependency in the neutral test target closure,
+clean push and actual-change review. Stop for owner verification; T73 remains
+open until its separate final audit/owner closure.
+
+## S5 Implementation And Qualification Results
+
+Baseline fb07a0b7. Runtime C/H and public ABI are unchanged. The test relocation
+uses Git moves; four C tests and the x86 negative verifier are byte-identical
+to their original files. There is no alias, compatibility test target, copied
+executor loop, or importing-product dependency in a shared test entry.
+
+| Ledger unit | Actual disposition and proof |
+| --- | --- |
+| test/lib | Entire tree and src/lib unchanged. Existing standalone entry and strict build preserved. |
+| test/common | No x86 C/H includes or linked targets. Original lifecycle, input, snapshot, shutdown, failure and lease assertions remain here. A token+1 callback replaces the typed register request; scripted byte-reversal tests remain separate. |
+| Shared test fixture | Original driver functions and native thread loop extracted once to machine_fixture.c/h; x86 data and decoding remain outside. A test-only run_waiting event deterministically finishes the initial callback before arming read-wake failure. All eight handles are disposed. |
+| test/x86 | Own CMake entry, manifest, CLI/linear/xasm tests and source negative verifier. debug_machine reuses the neutral fixture and owns its typed protocol, register memory and transcripts. |
+| Assertion preservation | All 161 original mixed-test assertions retain their checks: 160 retained or strengthened (the allocation assertion also checks the new event); the stale typed lease request is replaced with the same INVALID_STATE check using a neutral token and zero-response-length assertion. extended_registers/transcript/original_cli bodies are byte-identical except fixture type. |
+| Four-directory proof | Isolated copy has only src/lib, src/common, test/lib, test/common; no x86 source/test directory. Both suites independently configure, build and pass on the x64 host. |
+| Six-directory proof | Separate isolated copy adds src/x86 and test/x86. All three standalone suite entries independently configure/build/test, without product CMake, test/support, INI, firmware, media or repository neighbors. 384 copied-file hashes across both sets matched their source files. |
+| Package and boundary proof | Both Release builds and full background presets pass. Manifests, Common/x86 source DAG and negative-edge tests, Lib gates and documentation gate pass. Source C/H, assets, INI/media, Lib/tests remain unchanged. |
+
+Independent commands used MinGW Makefiles and Release under the owned
+build/t73-s5-transfer/{neutral,x86} trees. Each suite used `cmake -S test/<suite>`,
+its own binary directory, `cmake --build ... -j 6`, and
+`ctest --test-dir ... -LE desktop --output-on-failure`. Final results:
+
+| Copy set | Lib | Common | x86 |
+| --- | --- | --- | --- |
+| Neutral four directories | 41/41, 45.68s | 18/18, 7.61s | Absent |
+| x86 six directories | 41/41, 55.92s | 18/18, 9.83s | 9/9, 3.12s |
+
+Three native desktop Lib cases are excluded in each standalone Lib run.
+The existing native-thread fixture runs only on Windows; these x64-host copied
+builds are not Linux integration evidence. The full SoftPC regressions also
+cover the relocated suites on x86.
+
+Both `cmake --build --preset tests-x64 -j 6` and `tests-x86` pass.
+Final `ctest --preset test-x64`: **110/110, 181.72s**;
+`test-x86`: **110/110, 165.87s**. Each excludes the same five desktop cases.
+The extra two cases versus S4 are the separated debug_machine test and x86's
+test-manifest, not deleted/replaced failure coverage. Common/native and
+x86/native tests each also pass 50 consecutive repetitions on each width
+(100 executions per width, 10.52s / 8.98s).
+
+### Failures Investigated, Not Hidden
+
+The first full runs exposed a newly exercised immediate debugger-close/paused
+Machine destruction hang. Attached x64 stacks show the caller joining while
+the worker waits at its outer command event. S5 retains the original mixed
+test's stop-completion barrier before disposal; it does not fix that runtime
+interleaving. The unadmitted
+[terminal-wake candidate](m9-common-machine-shutdown-wake.md) owns the evidence
+and proposed deterministic proof. Existing neutral active/paused shutdown
+assertions were not removed. Initial x86 also reported a manifest mismatch
+because temporary diagnostic logging was inserted while that run was finishing;
+all diagnostics were removed before the final builds, copies and full runs.
+
+Repeated native tests also exposed an old fault-injection race: frame notification
+precedes state-request service, so a read could complete before its wake-based
+frame failure was armed. The fixture now exposes callback completion with an
+event; the test waits on it before injecting failure. No production wait, retry,
+sleep, expected-status relaxation or error suppression was introduced. All final
+50-run checks pass with the original IO_ERROR/ERROR assertions intact.
+
+### Actual Change Accounting
+
+Reproduce with `git diff --numstat -M10% fb07a0b7 <S5 implementation>` and group
+tracked paths, excluding documentation, manifests, generated/build artifacts.
+
+- Production C/H: **+0/-0, net 0**; public APIs and runtime footprint unchanged.
+- Test C/H: **+621/-519, net +102**, nine paths including four exact moves.
+  common_machine_smoke +33/-518; fixture C +213, fixture H +53;
+  machine_wait comment +1/-1; debug_machine +321. The majority is extraction,
+  not new scenarios or production behavior. Added setup owns the new independent
+  x86 entry and deterministic fixture barrier; no second fake thread loop.
+- Build CMake: **+50/-18, net +32**, three paths. The x86 negative verifier is
+  an additional exact move with +0/-0; `.gitattributes` adds one LF rule.
+- Compared with estimates, test net +102 is within +100..180; build net +32
+  is below +60..100 because existing manifest/source verifiers are reused.
+
+Both package executables were built/verified and remain byte-identical to S4;
+there is no artificial artifact churn or product version bump:
+
+| Artifact | Bytes | SHA-256 |
+| --- | --- | --- |
+| assets/binary/softpc32.exe | 3659622 | 5ACA0FD034D59D37B576867435D60419EF4ED31A8CCD6BBAC2BC9C0C330327A0 |
+| assets/binary/softpc64.exe | 3061602 | AE59961C7BEDC9EFD0F5FCFF813824EBC4D4AC2D12117E6A0DE7948766467B09 |
+
+Implementation qualification is complete. Executor commit/push and subsequent
+actual-change review are recorded in the next checkpoint; S5 and T73 await owner
+acceptance and are not closed by these automated results.

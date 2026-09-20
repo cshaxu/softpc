@@ -316,7 +316,7 @@ static void check_publication(void)
 
 /* A byte-reversal protocol unrelated to registers, segments or instruction sets.
  * Scheduling is deterministic here; common_machine_smoke proves native thread
- * identity and the x86 protocol through the same public rendezvous. */
+ * identity through the same public rendezvous with a neutral token protocol. */
 static lib_status debug_bytes(void *context, const void *request, lib_size size,
     void *response, lib_size capacity, lib_size *response_size)
 {

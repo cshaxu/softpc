@@ -162,13 +162,13 @@ native API/types or OS-selected implementation branches. It owns its queues
 and state machines through public Lib Base mutex/event/task/wait contracts and
 Types atomics. Its complete manifest and source/build dependency gate travel
 with the corpus and run independently of the importing product.
-Shared unit suites currently live in test/common and test/lib; S4 source
-relocation leaves x86 tests explicitly linked from test/common until S5 moves
-them to test/x86. The final six-directory set is src/lib, src/common, src/x86,
+Shared unit suites live in test/lib, test/common and test/x86. The reusable
+six-directory set is src/lib, src/common, src/x86,
 test/lib, test/common, test/x86. The neutral four-directory subset excludes x86
 entirely. Each corpus/suite owns its build and manifest; none may require an
-importing product's adapters or firmware. Common source already builds without
-x86; independent neutral test qualification is the remaining S5 boundary.
+importing product's adapters or firmware. Common source and tests build without
+x86. The x86 test package may reuse Common's neutral fake-machine fixture;
+architecture protocols and CLI assertions remain in test/x86.
 
 SoftPC's checked-in `lib/` corpus is the shared-library source of truth. NXVM
 adopts it exactly; no runtime or build dependency crosses repositories.

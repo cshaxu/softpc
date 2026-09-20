@@ -29,10 +29,11 @@ Common never contains win32/linux directories or platform-selected source.
 Its independent source verification lives with the Common corpus; unit tests
 live in test/common, never src/common/test. Lib tests and their fixtures live
 in test/lib. x86 source owns its own manifest/build/DAG and never becomes a
-Common dependency. T73 S5 will separate test/x86 from the current mixed
-test/common suite: the final six directories serve x86 products; src/common,
-src/lib, test/common and test/lib alone serve neutral products. Product tests
-remain outside the shared suites.
+Common dependency. test/x86 owns architecture protocols and CLI/assembly tests;
+it reuses the neutral test/common fake-machine fixture, not another runner.
+The six source/test directories serve x86 products; src/common, src/lib,
+test/common and test/lib alone serve neutral products. Each suite has its own
+CMake entry and manifest. Product tests remain outside the shared suites.
 Only Lib provides the underlying platform implementation.
 Shared `lib/types` is header-only. Its top level contains common C/compiler
 vocabulary; explicit `win32/` and `linux/` headers group external platform
