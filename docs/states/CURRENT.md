@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 T71 S7 continued repair is verified and preparing delivery for owner retest.
+M9 T71 S7 delivery ff499749 is pushed and reviewed; waiting for owner retest.
 Owner manual acceptance failed after a044fa36; T71 remains open. S7 adds the
 missing real Win3.1 startup coverage; prior S6 evidence was insufficient.
 

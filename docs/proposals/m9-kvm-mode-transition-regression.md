@@ -285,3 +285,11 @@ x64 505C719077FFC9CDFFB5DA53603B8946C6A35BB736A7493D79F54432814D4AE2.
 The preexisting owner-requested neutral-text proposal/Queue priority edits
 are included intact in this delivery rather than reverted or hidden in stash.
 Native visual acceptance remains the owner's next gate; no S8 work starts now.
+
+Coordinator reviewed pushed P3 ff499749 against the admitted S7 boundary:
+two production files, no public API or mirror change, strict genuine-capacity
+rejection retained, no-frame readiness distinct from font failure. The tests
+exercise both existing PIFs and repeated transitions on the actual executor;
+they do not claim native visual acceptance. Full dual-width results and package
+hashes above match the delivered artifacts. Preexisting Queue edits are intact.
+S7 waits for owner feedback; S8--S10 and the T-level audit remain open work.
