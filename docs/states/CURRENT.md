@@ -3,30 +3,30 @@
 ## Current Work
 
 T74 S1 and T74 are closed and pushed in bffbf413 after owner testing passed.
-T75 S1/S2 are closed after delivery/review; S2 executor is 9b314372.
-T75 S3 is active: six shared source/test packages use strict C11.
-S4 is serially authorized; T75 remains open for final owner acceptance.
+T75 S1--S3 are closed after delivery/review; S3 executor is e078dcc6.
+T75 S4 is active: independent exact-copy four/six-package acceptance.
+After S4 stop for owner testing; T75 remains open.
 
-## M9 T75 S3 Packet
+## M9 T75 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner supplied report, corrected layout, required six C11 packages and admitted all four S deliveries without intermediate manual gates. |
-| Objective | Select C11 for all six shared package scopes and fix strict compiler diagnostics without semantic changes. |
-| Non-goals | No App/Core language migration, ABI/CLI changes, warning suppression, new platform implementation or user data edits. |
-| Reference Baseline | 9b314372; S2 verified dual-width delivery. |
+| Objective | Prove exact-copy four-package neutral and six-package x86 builds/tests independently of product sources. |
+| Non-goals | No new runtime/source changes, flexible layout framework, NNES import, desktop interaction, or user-data edits. |
+| Reference Baseline | e078dcc6; S3 verified strict C11 dual-width packages. |
 | Candidate Proposal | [Lib/Common code quality audit](../proposals/m9-lib-common-quality-audit.md). |
-| Files And ABI Surface | Six CMake entries, Session control.c, xasm32 warnings, affected tests/readmes/manifests and source-layout design. No public ABI changes. |
+| Files And ABI Surface | Task records only; exact copies of six shared directories in owned ignored build/t75-s4-* directories. ABI unchanged. |
 | Applicable Rules | Architecture/Coding/Execution/Document and referenced skills; owner explicitly overrides C17 for the six shared packages only. |
-| Verification | Actual compile flags C11/no extensions and strict GNU warnings; dual-width builds and background tests; manifests/DAG and documentation gates. |
-| Expected Markers | Every compiled shared source/test target uses C11 and passes strict warnings; Core/App compile settings remain unchanged. |
-| Asset Needs | Refresh both EXEs only; preserve INI, media and snapshots. |
-| Reporting Requirements | Estimate 12--16 code/build/test files, production C/H +20/-10, build/test +55/-65, aggregate net near zero; report actual deviations and both EXEs. |
-| Stop Conditions | Stop if diagnostic repair needs behavior or public ABI changes; do not suppress warnings or alter imported instruction semantics. |
-| Exit Criteria | Six-package strict C11 compilation, focused/full background regression, pushed complete P and review/closure; then S4. |
+| Verification | Both widths, four/six-directory source hashes and independent CMake builds, standalone background tests, actual flags/source paths, manifests/DAG; final product Release/background suites. |
+| Expected Markers | Neutral copy lacks x86; all copied targets use C11; source inputs resolve inside each copy; all required builds/tests pass. |
+| Asset Needs | Refresh both EXEs only. Disposable isolated corpora/build logs under build/t75-s4-*; no guest media; clean after recording evidence. |
+| Reporting Requirements | Estimate production/test/build +0/-0, net 0; record isolated matrix counts, final full regression, hashes and dual EXE links. |
+| Stop Conditions | Stop on actual portability gap needing out-of-scope semantics; no external project writes or hidden desktop tests. |
+| Exit Criteria | Independent four/six-package and product evidence, pushed P/review/closure, clean workspace; stop and await owner acceptance of T75. |
 | Original Owner Request | Close T74 after successful tests; admit a new T to audit Lib/Common quality; owner will paste an existing audit report after closure. |
-| Similar-Issue Sweep | All six CMake entries and actual compile flags; strict compiler output across all configured production/test sources; explicit disposition for platform-only tests and negative fixtures. |
+| Similar-Issue Sweep | Six manifests and compiled source roots: no App/Core/external repository paths, no inherited C17/extension flags; all three standalone source entry points also build. |
 
 ## Current Technical Baseline
 
