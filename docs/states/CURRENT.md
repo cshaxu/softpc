@@ -2,34 +2,22 @@
 
 ## Current Work
 
-T75 is closed and pushed in eacf1a5e after owner authorization and completion audit.
-T76 S2 is closed after delivery 4d0ea2f1 and actual-change review.
-T76 S3 is active: snapshot compatibility and final delivery acceptance.
-[T75 audit](../history/M9-T75-completion-audit.md).
-
-## M9 T76 S3 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner explicitly skips measurement and directs immediate S2 implementation; finish S2/S3 serially then await acceptance. |
-| Objective | Prove old snapshot compatibility, media-codec byte equivalence and both-width final regression after direct indexing. |
-| Non-goals | No benchmark, public API change, Core/Common/x86 change, guest media edits, or desktop interaction. |
-| Reference Baseline | 4d0ea2f1; S2 direct index and both-width 110/110 background regression. |
-| Candidate Proposal | [Overlay page lookup optimization](../proposals/m9-overlay-page-index.md). |
-| Files And ABI Surface | Existing product media_snapshot test and task records; no production or public ABI change expected. |
-| Applicable Rules | Execution/Document/Architecture/Coding and referenced governance skills; strict C11 and existing ownership boundaries. |
-| Verification | Baseline linked-list codec versus current direct-index bytes; old save/new load and new save opposite-width load using existing test executables; final both-width Release/background tests. |
-| Expected Markers | Identical media payload; old snapshots restore overlay bytes and resume correctly; no snapshot version/schema changes. |
-| Asset Needs | Task-owned ignored build/t76-* test outputs only, no assets media edits; preserve old snapshot fixtures for S3 then clean. |
-| Reporting Requirements | Production +0/-0 estimate; one existing product test about +12/-0 for golden codec assertion; report actual counts, evidence and dual EXEs. |
-| Stop Conditions | Do not invent artificial capacity limits or additional index strategies; allocation failure remains explicit. New contract requirements need review. |
-| Exit Criteria | Snapshot and final test proof, pushed P and actual-change review, owned output cleanup and clean workspace; stop awaiting owner T76 acceptance. |
-| Original Owner Request | 收口T75，准入下一个T任务：优化 lib/storage overlay查找表现 |
-| Similar-Issue Sweep | All medium creation/read/write/destroy paths, file versus zero bases, direct/readonly exclusion, failure ownership and snapshot API consumers. |
+No implementation subtask is active.
+Open task awaiting owner: T76.
+S1 measurement was cancelled by the owner; S2 and S3 are delivered and closed
+after actual-change review. S3 executor: 8999c446. Stop for owner acceptance.
+[Overlay proposal/evidence](../proposals/m9-overlay-page-index.md);
+[S3 review](../history/M9-T76-S3-snapshot-acceptance.md).
 
 ## Current Technical Baseline
 
+- T76 uses one direct page-pointer array for Storage overlay lookup; no public
+  API or snapshot format change. Production +39/-30 (net +9); tests +89/-2
+  (net +87). No benchmark per owner direction; array memory scales with capacity.
+  Final Release/background x64 110/110 (146.29s), x86 110/110 (146.52s), five
+  desktop cases excluded per width. Old/new x86/x64 snapshot matrix 16/16 passes;
+  golden media payload matches old linked-list codec on both widths. Artifacts
+  and hashes are recorded in the active proposal; INI/media unchanged.
 - T75 uses the existing task cancellation object for the outer Machine wait;
   deterministic lost-command-wake coverage and repeated native shutdown pass.
   All six shared packages select strict C11 in standalone and embedded builds.
