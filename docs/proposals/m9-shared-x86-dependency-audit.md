@@ -243,13 +243,14 @@ adapter. x86 debug/assembly remain optional product capabilities, not a new
 generic debugger. Machine owns the future neutral execution transport; its
 payload migration is expressly outside the rename step.
 
-- **S1 (active, revised scope):** rename common/debug to common/x86-debug and
+- **S1 (closed, revised scope):** rename common/debug to common/x86-debug and
   common/xasm32 to common/x86-xasm32; rename their public prefixes/targets and
   corresponding test ownership, repair every current consumer and verifier,
   preserve command text and behavior. Do not introduce protocol headers,
   transport changes or a compatibility alias. Existing build selection is
   preserved in this step; neutral-only selection belongs to S2's audit plan.
   Produce both EXEs, build/test, commit/push and stop for owner review.
+  Delivered in 03a954dd; [actual record](../history/M9-T73-S1-x86-component-rename.md).
 - **S2 (not admitted):** audit common/machine APIs, implementation and build
   closure against the agreed neutral transport direction; define bounded later
   migration S tasks and acceptance tests. Do not pre-admit those migrations.

@@ -4,8 +4,8 @@
 
 No implementation subtask is active.
 Open task awaiting owner: T73.
-S1 rename and dual-width verification are complete; pushed-P actual-change
-review follows before S1 closure. S2 requires explicit owner admission.
+S1 rename is closed after pushed delivery 03a954dd and actual-change review.
+S2 requires explicit owner admission; no Machine migration has started.
 Owner directly admitted T73 outside the queue. T72 is closed.
 See the [T73 proposal](../proposals/m9-shared-x86-dependency-audit.md).
 Existing queued candidates remain unadmitted.
