@@ -5,7 +5,7 @@
 Owner required fixed capacity, complete validation, explicit unsupported output,
 no silent producer crop, and component-owned validators. Owner then approved
 the necessary Compat query changes: "批准修改compat". The
-[proposal](../proposals/m9-kvm-text-frame-contract.md) retains preflight,
+[proposal](../history/M9-T71-kvm-text-frame-contract-proposal.md) retains preflight,
 finite coverage and focused evidence. Baseline 0623dc5e; delivery 193ff7f0 is
 pushed. This record closes S5, not T71.
 

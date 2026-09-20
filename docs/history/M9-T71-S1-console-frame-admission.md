@@ -15,5 +15,5 @@ dependency checks and documentation checks pass. No fresh guest interaction is
 claimed. INI/media unchanged, implementation pushed; T71 remains open.
 
 Detailed finite ledger, estimates, test timings and package hashes remain in
-the [task proposal](../proposals/m9-kvm-text-frame-contract.md#t71-s1-preflight-and-finite-ledger).
+the [task proposal](../history/M9-T71-kvm-text-frame-contract-proposal.md#t71-s1-preflight-and-finite-ledger).
 The next S is design-only until its concrete schema is reviewed by the owner.

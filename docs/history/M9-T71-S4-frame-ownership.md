@@ -3,7 +3,7 @@
 ## Request And Scope
 
 Owner: "好的，接下来准入修复，开始执行。" Report additions, removals and net
-change separately. This closes S4 of the [approved design](../proposals/m9-kvm-text-frame-contract.md),
+change separately. This closes S4 of the [approved design](../history/M9-T71-kvm-text-frame-contract-proposal.md),
 not T71. Preflight baseline b30cc0da; executor delivery 17c9da90 is pushed.
 Inventory-adjusted estimate was production +650/-550, tests +650/-500.
 

@@ -5,7 +5,7 @@
 Owner: "好的，接下来准入修复，开始执行。" Reporting refinement:
 "你汇报的时候，要汇报增加多少减少多少，净增加还是净减少".
 Baseline: 85940465. Scope is the approved control part of the
-[T71 design](../proposals/m9-kvm-text-frame-contract.md), not frame migration.
+[T71 design](../history/M9-T71-kvm-text-frame-contract-proposal.md), not frame migration.
 Preflight estimated 70--130 changed production lines and 90--170 test lines.
 Keep the existing fixed record, 32 ordinary entries plus reserved STOP slot,
 independent frame/control locks, wake path and typed leaf APIs. Move command

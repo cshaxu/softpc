@@ -3,7 +3,7 @@
 ## Request And Status
 
 Owner admitted T71 and S2 design. S1 delivered text-only admission at 04d76945;
-its evidence is retained below. S2--S5 are reviewed; Current owns S6 execution.
+its evidence is retained below. S2--S6 are reviewed; T71 awaits owner acceptance.
 The latest owner-approved direction supersedes the earlier monolithic-frame
 mapping-only and per-cell proposals. S3 implements control ownership first;
 the frame/mapping migration remains S4 work.
@@ -17,7 +17,7 @@ Original request ledger:
 - "写入本T任务的proposal并进行S任务拆分。"
 - S5 owner refinement: "保留现有容量，不扩容、不动态分配；统一做完整校验，超限明确失败，禁止静默裁剪。" The owner explicitly authorizes the necessary copy_frame result-contract change, without side-channel error flags, automatic presenter switching or guest-mode changes.
 
-The independent [cell/colour cleanup candidate](m9-kvm-text-cell-glyph-refactor.md)
+The independent [cell/colour cleanup candidate](../proposals/m9-kvm-text-cell-glyph-refactor.md)
 remains queued only for per-cell struct/attribute normalization. It must not
 repeat this task's frame ownership, mapping relocation or mailbox work.
 
@@ -579,8 +579,9 @@ Both refreshed package sizes are unchanged from S5:
 - x64: 3058756 bytes, delta 0; SHA-256 90949A63700FAB618EA37E17ADDFBD6181DB4027484BB1BE2D781DECE084E684.
 
 No fresh manual Win3.1/Win95 acceptance or native Linux presenter execution is
-claimed. T71 stays open for owner testing. Coordinator actual-P review follows
-the implementation push; unrelated queued-proposal edits remain untouched.
+claimed. T71 stays open for owner testing. Coordinator actual-P review passed
+after the implementation push; see the [S6 closure](../history/M9-T71-S6-integration-audit.md).
+Unrelated queued-proposal edits remain untouched.
 
 ## Historical S1 Delivery
 

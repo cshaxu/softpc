@@ -2,30 +2,11 @@
 
 ## Current Work
 
-M9 T71 S6 is active: integration and simplification audit.
-Owner: "好的，接下来准入修复，开始执行。" S5 delivery 193ff7f0 is reviewed,
-closed and pushed; T71 remains open through S6 and owner acceptance.
-
-## M9 T71 S6 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner-approved serial T71 S3--S6 plan; coordinator S5 actual-change review passed. |
-| Objective | Close the T71 finite coverage ledger, verify final ownership and removed legacy paths, audit storage/copy costs and task-introduced simplification opportunities. |
-| Non-goals | No unrelated cleanup, capacity expansion, new state/threads, guest fallback, MVDM/snapshot/INI/media changes or new platform support. |
-| Reference Baseline | 193ff7f0 S5 delivery; dual-width Release and final 110/110 per width. |
-| Candidate Proposal | [T71 plan](../proposals/m9-kvm-text-frame-contract.md), S6 integration audit. |
-| Files And ABI Surface | All T71 changed frame/control contracts and producers/consumers under Lib/Common/VM/Compat and direct tests; current design, manifests and finite ledger. |
-| Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and shared governance skills. |
-| Verification | Requirement-to-source/test mapping, old-symbol and dependency sweep, exact storage/copy accounting; serial dual-width full suites and four corpus/DAG/package/snapshot gates. |
-| Expected Markers | Base transports opaque payloads, leaf-owned interpretation, VM-owned mapping, no legacy alias or second frame path; bounded validation and explicit errors. |
-| Asset Needs | Existing builds and both EXEs; bounded synthetic tests only, no user media/configuration changes. |
-| Reporting Requirements | Initial production estimate +0/-0; explain any necessary revision before code changes. Report actual additions/removals/net and artifacts; no whole-hardware correctness claim. |
-| Stop Conditions | Material repair beyond the approved ownership migration, new state owner/thread/frame path, guest behavior workaround or unrelated scope growth. |
-| Exit Criteria | Every T71 ledger member has inspected evidence; obsolete task paths removed or justified; required verification passes, P pushed and coordinator review complete; T remains open for owner acceptance. |
-| Original Owner Request | kvm-base 只管两个不同mailbox的实现和传输机制 (fifo and latest-wins)，实际命令处理都交给消费者；写入本T任务的proposal并进行S任务拆分；好的，接下来准入修复，开始执行。 |
-| Similar-Issue Sweep | Task-wide frame/control type ownership, mapping constants, mailbox interpretation, validation/copying and stale interfaces across all production/test callers. |
+No implementation subtask is active. T71 S1--S6 are complete; T71 remains
+open for owner manual acceptance. S6 delivery 03fe7627 is reviewed and pushed.
+Open task awaiting owner: T71.
+See [S6 closure](../history/M9-T71-S6-integration-audit.md).
+The open task retains its [T71 plan](../history/M9-T71-kvm-text-frame-contract-proposal.md).
 
 ## Current Technical Baseline
 
@@ -34,8 +15,8 @@ closed and pushed; T71 remains open through S6 and owner acceptance.
   production +7/-6 (net +1), test +4/-0. The added x64 regression failed before
   and passes after the change on both widths. Both Release builds and serial
   full tests pass: x64 110/110 (113.24s), x86 110/110 (98.52s). Packages rebuilt
-  with unchanged byte sizes. Executor P and coordinator review remain pending;
-  the proposal records the completed finite-ledger audit and exact accounting.
+  with unchanged byte sizes. Delivery 03fe7627 and coordinator review are complete;
+  the proposal records the finite-ledger audit and exact accounting.
 
 - S5 delivery 193ff7f0: production C/H +137/-59 (net +78), test C/H +139/-17
   (net +122); four manifests +23/-23. Release builds succeed on both widths;
@@ -83,11 +64,11 @@ closed and pushed; T71 remains open through S6 and owner acceptance.
 
 ## Recent Governance
 
-T70 is closed; T71 S6 is the sole active implementation task.
+T70 is closed; T71 awaits owner acceptance with no active implementation task.
 
 - **M9 Td S17:** Owner requested a concrete KVM text/frame correction proposal
   at queue head. Recorded capability rejection, explicit character/glyph
   semantics, bounded layout, migration batches and verification; no source or
-  artifact changes. [Proposal](../proposals/m9-kvm-text-frame-contract.md).
+  artifact changes. [Proposal](../history/M9-T71-kvm-text-frame-contract-proposal.md).
   Documentation checks and actual-change review pass. At that delivery T70 remained open; the
   candidate is not implementation admission.

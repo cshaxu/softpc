@@ -4,7 +4,7 @@
 
 Original owner request: "第二项请你拆分到新的t任务proposal加入队列".
 This remains an unnumbered, queued candidate; no implementation is admitted.
-The subsequent owner-approved [T71 plan](m9-kvm-text-frame-contract.md) now owns
+The subsequent owner-approved [T71 plan](../history/M9-T71-kvm-text-frame-contract-proposal.md) now owns
 frame resource separation, transparent mailboxes and CP437 relocation.
 Those are not repeated here. The earlier combined per-cell Unicode/atlas draft
 is superseded; its provenance is T71 S2 P1 d1afdbd5, not a current design.
