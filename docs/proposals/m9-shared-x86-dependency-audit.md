@@ -180,8 +180,9 @@ prove a debugger-free neutral build or test corpus.
    protocol header owned by x86-debug. Both VM adapter and frontend include it;
    including the values must not require linking the debugger command parser.
 3. Machine keeps its current serialized paused request slot and lease. Replace
-   the CPU-shaped payload with a bounded copied operation identifier, request
-   bytes/length and response bytes/length/capacity. Common validates bounds,
+   the CPU-shaped payload with bounded copied request bytes/length and response
+   bytes/length/capacity. The operation identifier stays inside the adapter's
+   payload, not duplicated in a Common envelope. Common validates bounds,
    admission, lease, completion and cancellation, not registers or addresses.
    Driver validates its protocol and returns status. No arbitrary callback
    supplied by a requester and no borrowed deferred payload. Use aligned local
@@ -251,7 +252,7 @@ payload migration is expressly outside the rename step.
   preserved in this step; neutral-only selection belongs to S2's audit plan.
   Produce both EXEs, build/test, commit/push and stop for owner review.
   Delivered in 03a954dd; [actual record](../history/M9-T73-S1-x86-component-rename.md).
-- **S2 (not admitted):** audit common/machine APIs, implementation and build
+- **S2 (admitted; audit delivered for review):** audit common/machine APIs, implementation and build
   closure against the agreed neutral transport direction; define bounded later
   migration S tasks and acceptance tests. Do not pre-admit those migrations.
 
@@ -268,3 +269,126 @@ Proof: reverse the exact name substitutions and compare each C/H byte stream
 with its baseline; both Release builds and full background presets, plus
 debugger/xasm integration tests and static corpus gates. Desktop tests remain
 explicitly excluded; no new guest installation or snapshot format is involved.
+
+## S2 Machine Audit (Baseline feee0fb1)
+
+Owner accepted S1 and admitted this audit, not the migrations below. Frozen
+universe: Machine's six C/H/CMake files, all 22 public functions and 16 driver
+callbacks inventoried above, plus their x86-debug/VM/App consumers and shared
+test/build closure. Findings below refine the preliminary inventory against the
+renamed baseline. Production and tests remain +0/-0; no EXE refresh is needed.
+
+### Confirmed Coupling, Not A New Execution Bug
+
+| Source boundary | Actual finding and disposition |
+| --- | --- |
+| machine_interface.h | Seventeen debug operations, real/linear/port fields, segment/CR snapshot, execution plans and little-endian observations belong to x86-debug's protocol. Move values, not CPU state ownership. Keep the neutral lease and lifecycle declarations in Machine. |
+| machine.c | Owns one copied request/result slot. `service_debug` does not interpret operation values. The `request->bytes > COMMON_MACHINE_DEBUG_BYTES` check does interpret the x86 memory-transfer limit; replace it with transport-length checks, retaining protocol validation in VM. |
+| input_queue.c/.h | Fixed copied KVM FIFO and wake; no scan-code-to-PC conversion. Retain implementation; remove the SoftPC-specific comment when documenting the neutral contract. |
+| frame_interface.h | Complete KVM presentation values and run/sequence facts, not CPU/video-controller registers. Retain current capacities and publication behavior. |
+| Machine CMake | No link to x86 frontend or assembler. Header payload coupling, not runtime linkage, is the defect. |
+| x86-debug command.c/debug_interface.h | One `command_execute` boundary issues typed requests; register IDs reside in the frontend interface. Move IDs and protocol values to `x86-debug/protocol_interface.h`, use it from the frontend and VM; no parser dependency for VM. |
+| vm/debug.c/.h and driver.c | Actual register/segment/address/port/trace/watch interpretation already lives here. Retain it. Adapt one driver callback using aligned local typed copies; do not cast an opaque byte buffer to a struct. |
+| App cancellation callers | Cancel the current debug plan; no register payload interpretation. Preserve calls and CLI selection semantics. |
+| Common root/shared-test CMake | x86 targets/tests are unconditional, and common_machine_smoke also runs x86 CLI transcripts. Build and test selection needs isolation to prove neutral-only reuse. |
+
+The seventeenth-operation inventory is complete: register read/write, linear
+read/write, real read/write, port read/write, code default-size/base, CPU snapshot,
+watch set/clear/get, execution-plan set/clear and execution-result get. Common
+must not reinterpret any of them. This does not require a generic register
+catalogue, decoder, debugger CLI, device bus or protocol registry.
+
+The two current host compilers, using stdin-only `sizeof` assembly probes,
+both measure request **80 bytes**, result **1328 bytes**. The existing 32-byte
+constant limits one memory payload, not the complete transport. These native
+struct sizes are evidence for sizing the replacement, not a serialized ABI.
+
+### Internal Contracts To Preserve
+
+1. One control caller serializes requests. Machine owns their copied slot and
+   executor rendezvous. Acquire checks PAUSED; executor rechecks the paused
+   flag and lease generation before invoking the driver. Resume, stop, reset,
+   restored/cold runs and terminal exit invalidate stale access. Do not add
+   another executor, request queue or arbitrary caller-supplied execution hook.
+2. `debug_cancel` wakes the executor to cancel the driver's pending execution
+   plan. It is **not** cancellation/join of an in-flight synchronous request.
+   Retain `take_debug_stop` as a Boolean stop fact; driver owns watchpoints,
+   instruction counts, result capture and the exact stopping boundary.
+3. Worker termination completes pending synchronous requests through the existing
+   failure path. A failed wait does not prove quiescence: caller contexts and
+   driver resources cannot be released or their request slot reused on that
+   assumption. Preserve shutdown/join ownership; do not invent retry/recovery.
+4. Current early request rejection leaves caller output untouched; accepted
+   requests zero Machine's result before driver execution. The x86 frontend
+   also initializes its typed result. The byte contract must explicitly return
+   a valid length (zero on failure), reject oversized driver replies and keep
+   the frontend's initialized-output/error behavior. Do not expose stale bytes.
+5. Lifecycle/input/frame/media/state-stream paths need no ISA rewrite. Snapshot
+   safe points and file format remain adapter-owned. An executor callback is
+   not automatically a snapshot-safe boundary. Keep single removable endpoint,
+   copied input and full-frame publication rather than broadening device models.
+6. Driver run/debug work executes on the executor; thread-safe stop/wake signals
+   also originate on the control thread. Existing architecture prose saying
+   *all* driver calls belong to the executor is too broad; correct that wording
+   with the implementation contract. Heartbeat remains mandatory: a new adapter
+   must honor cooperative callback/wake responsiveness, not use an empty stub
+   without proving pause/stop progress.
+
+No new ISA interpretation was found in the neutral state/request machinery.
+This audit does not establish that all concurrency/platform failure cases are
+bug-free or that a receiving emulator is already integrated.
+
+### Proposed Follow-up Tasks (Not Admitted)
+
+**S3: one complete protocol/transport migration.** Move existing x86 vocabulary
+to the protocol header, rename its prefixes to common_x86_debug/COMMON_X86_DEBUG,
+and repair frontend, VM and tests in the same delivery. Machine retains the
+three debug operations (acquire/execute/cancel) and fixed driver callback, but
+execute accepts copied bytes with explicit lengths/capacity. The operation ID
+exists only inside the protocol payload. Proposed fixed bounds: 128-byte
+request, 1536-byte response, covering the measured 80/1328 and a non-x86 fixture;
+compile-time assertions prove fit. No per-request allocation or extra object.
+These are bounded capabilities, not universal maximum CPU-state sizes.
+
+The x86 adapter checks exact protocol sizes and its existing operation-specific
+limits, copies into aligned local values, then calls the original dispatcher.
+Its result is copied back only within the declared capacity. Frontend packing
+is concentrated in existing command_execute, not every DOS command. Keep all
+command text, empty-line repeat behavior, 16/X semantics and debug CLI lifetime.
+Do not split vocabulary extraction into a separate step that temporarily makes
+Machine depend on x86-debug or creates compatibility aliases.
+
+Estimate: 8-12 production/test C/H paths plus manifests/docs. Production roughly
++280..420/-220..330, expected net +60..100 after matching relocation pairs;
+tests roughly +120..220/-40..90, expected net +80..130. These are planning
+ranges, not measurements or a promise of net deletion. Protocol relocation
+accounts for much of the gross churn; admission rechecks the exact ledger.
+Required proof: executor-thread execution, copied payload, empty/oversized/
+malformed requests, capacity and reply-length errors, stale lease, driver failure,
+plan cancellation and terminal completion; existing x86 CLI and SoftPC debug
+integration; x86/x64 build and background suite, both EXEs for owner testing.
+
+**S4: neutral-only build/test qualification.** A single default-on Common x86
+build option leaves SoftPC's existing targets enabled. Off selects only the
+neutral three components; no x86 header or link dependency may remain. Separate
+Machine mechanism proof from x86 CLI transcripts without copying the test runner
+or creating a plugin framework. Exercise two unrelated fake protocol shapes
+through the same rendezvous, and separately preserve x86 frontend integration.
+Update independent test selection, manifests and forbidden-dependency proof;
+corpus verification still checks all shipped source, including optional code.
+
+Estimate: 5-9 build/test paths plus manifests/docs; runtime C/H +0/-0 unless a
+specific gap returns for review. Build/tests approximately +100..200/-70..140,
+expected net +30..60. Require neutral-only configure/build/tests using only the
+four shared directories, and full x86-enabled dual-width regression/package.
+Do not claim Linux presenter support or NEC runtime validation from fake drivers.
+
+Session/UI runtime, Lib, Compat, MVDM, snapshot format and guest media are outside
+both follow-up scopes. T73 remains open; owner reviews this design before S3.
+
+### S2 Verification
+
+Existing background Common suite: x64 22/22 and x86 22/22, including Machine,
+wait, input FIFO, x86-debug output/linear, xasm and manifest/corpus/negative gates.
+No desktop test or new non-x86 runtime was run. Source was not rebuilt because
+only this proposal and CURRENT changed. S1 accepted packages remain untouched.

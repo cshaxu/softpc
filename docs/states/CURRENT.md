@@ -2,15 +2,34 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T73.
-S1 rename is closed after pushed delivery 03a954dd and actual-change review.
-S2 requires explicit owner admission; no Machine migration has started.
+Active task: M9 T73 S2, Machine x86 API/internal audit and migration planning.
+Owner accepted S1 testing and admitted S2. No Machine migration is admitted.
 Owner directly admitted T73 outside the queue. T72 is closed.
 See the [T73 proposal](../proposals/m9-shared-x86-dependency-audit.md).
 Existing queued candidates remain unadmitted.
 See the [S1 record](../history/M9-T73-S1-x86-component-rename.md) for scope,
 verification, changed-line accounting and package hashes.
+
+## M9 T73 S2 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner: 通过测试，准入S2，开始审计machine的x86 api和内部实现问题。 |
+| Objective | Audit every Machine API/internal path and direct debug adapter consumer; separate x86 payload ownership from neutral rendezvous, then split later migrations. |
+| Non-goals | No source/test/ABI change, Lib patch, new executor, binary/media/config refresh, or implementation of later S tasks. |
+| Reference Baseline | feee0fb1; clean, S1 manually accepted, both widths previously 105/105 background. |
+| Candidate Proposal | [T73 proposal](../proposals/m9-shared-x86-dependency-audit.md). |
+| Files And ABI Surface | Six Machine files; x86-debug public/runtime consumers, VM adapter, App cancellation callers; Common build/DAG and related tests. Write docs only. |
+| Applicable Rules | Architecture, coding, execution and documentation governance; local source/design authorities. |
+| Verification | Full bounded source/API inventory with per-hit disposition; existing focused Machine/debug/build-boundary tests; documentation gate. No new full-runtime qualification claimed. |
+| Expected Markers | Every API/callback and internal owner classified; payload, capacity, completion/cancellation and build coupling explained with concrete migration boundaries. |
+| Asset Needs | None; preserve accepted EXEs, Lib, INI, snapshots and media. |
+| Reporting Requirements | Audit findings versus confirmed defects separated; production/test +0/-0; later-S added/deleted estimates identified as estimates. |
+| Stop Conditions | A proposed implementation or guest-visible semantics change requires owner review/admission. |
+| Exit Criteria | Evidence-backed audit and bounded follow-up S plan delivered and committed; no migration silently starts. |
+| Original Owner Request | 通过测试，准入S2，开始审计machine的x86 api和内部实现问题。 |
+| Similar-Issue Sweep | Public x86 types/constants, all driver hooks, request/wait/failure/lease paths, frame/input/media/state paths, production callers and shared-test dependencies. |
 
 ## Current Technical Baseline
 
@@ -18,7 +37,7 @@ verification, changed-line accounting and package hashes.
   Both Release builds passed; background x64 105/105 (168.90s), x86 105/105
   (156.37s); five desktop tests per width excluded. Production +168/-168,
   tests C/H +181/-181, build/gates +26/-24. Lib/Machine/Session/UI and INI/media
-  are unchanged; package hashes are in the S1 record. No S2 work is admitted.
+  are unchanged; package hashes are in the S1 record. Owner accepted S1 tests.
 - Accepted code delivery 95850780, actual-change review ae1dc6e0.
   Both Release builds passed; final background x64 105/105 (134.41s),
   x86 105/105 (135.13s). Five desktop tests per width excluded; owner manual
