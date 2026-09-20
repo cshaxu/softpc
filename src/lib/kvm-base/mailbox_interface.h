@@ -1,8 +1,6 @@
 #ifndef KVM_BASE_MAILBOX_INTERFACE_H
 #define KVM_BASE_MAILBOX_INTERFACE_H
 
-#include "lib/kvm-base/frame_interface.h"
-
 #include "lib/base/sync_interface.h"
 
 #define KVM_COMPONENT_CONTROL_CAPACITY 32u
@@ -18,6 +16,10 @@ typedef struct kvm_component_control {
 } kvm_component_control;
 
 typedef lib_status (*kvm_mailbox_notify_fn)(void *context);
+/* Optional consumer-owned update, called under the frame lock after admission.
+ * Must copy the accepted bytes; no allocation, notification, sink or reentry. */
+typedef void (*kvm_mailbox_frame_update_fn)(void *destination, const void *source,
+    lib_size bytes, lib_bool first, lib_bool pending);
 
 /* Each KVM leaf owns exactly one of these. It contains two independent
  * mailboxes: a latest-wins copied frame and a FIFO control queue. The native
@@ -27,7 +29,9 @@ typedef lib_status (*kvm_mailbox_notify_fn)(void *context);
 typedef struct kvm_component_mailboxes {
     base_sync_mutex *frame_lock;
     base_sync_mutex *control_lock;
-    kvm_frame frame;
+    void *frame;
+    lib_size frame_capacity;
+    lib_size frame_size;
     lib_u32 frame_generation;
     lib_bool frame_pending;
     kvm_component_control controls[KVM_COMPONENT_CONTROL_STORAGE_CAPACITY];
@@ -42,7 +46,10 @@ typedef struct kvm_component_mailboxes {
 
 /* Creates independent blocking frame/control locks, without a wake object.
  * Failure leaves an empty, destroyable mailbox; no operation is then valid. */
-lib_status kvm_component_mailboxes_create(kvm_component_mailboxes *mailboxes);
+/* Nonempty storage is consumer-owned, correctly aligned for its own type,
+ * and remains alive through worker join. */
+lib_status kvm_component_mailboxes_create(kvm_component_mailboxes *mailboxes,
+    void *frame_storage, lib_size frame_capacity);
 /* One-time startup selection, before publishing the component to any caller.
  * NULL notify creates the default wait primitive; otherwise no wake is allocated.
  * Failure leaves selection unset. Context lives until worker join and caller
@@ -53,7 +60,7 @@ lib_status kvm_component_mailboxes_notify(kvm_component_mailboxes *mailboxes);
 void kvm_component_mailboxes_close(kvm_component_mailboxes *mailboxes);
 void kvm_component_mailboxes_destroy(kvm_component_mailboxes *mailboxes);
 lib_status kvm_component_mailboxes_publish_frame(kvm_component_mailboxes *mailboxes,
-    const kvm_frame *frame);
+    const void *frame, lib_size bytes, kvm_mailbox_frame_update_fn update);
 /* Appends one copied control. Capacity failure leaves the FIFO unchanged.
  * STOP is terminal, idempotent and has one reserved slot. */
 lib_status kvm_component_mailboxes_enqueue_control(
@@ -61,7 +68,7 @@ lib_status kvm_component_mailboxes_enqueue_control(
 lib_bool kvm_component_mailboxes_take_control(kvm_component_mailboxes *mailboxes,
     kvm_component_control *out_control);
 lib_bool kvm_component_mailboxes_capture_frame(kvm_component_mailboxes *mailboxes,
-    lib_u32 *out_generation, kvm_frame *out_frame);
+    lib_u32 *out_generation, void *out_frame, lib_size capacity);
 /* Capture leaves the latest frame pending. Acknowledge only after success;
  * acknowledging an older capture never clears a newer publication. */
 void kvm_component_mailboxes_acknowledge_frame(kvm_component_mailboxes *mailboxes,

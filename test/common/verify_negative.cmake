@@ -26,6 +26,8 @@ reject("#include \"lib/types/win32/sync.h\"\n" "" "Noncanonical Common header pa
 reject("#include \"common/session/session_interface.h\"\n" "" "Forbidden Common edge")
 reject("#include \"lib/base/sync.h\"\n" "" "Private dependency")
 reject("#include \"lib/kvm-base/component_interface.h\"\n" "" "Private KVM support")
+reject("#include \"lib/kvm-window/window_interface.h\"\n" "" "only KVM frame values")
+reject("#include \"lib/kvm-console/console_interface.h\"\n" "" "only KVM frame values")
 reject("#include \"../session/control.h\"\n" "" "Noncanonical")
 reject("#include \"common/machine/../../host/machine.h\"\n" "" "Noncanonical")
 reject("" "target_link_libraries(common-machine PRIVATE user32)\n" "Forbidden Common edge")

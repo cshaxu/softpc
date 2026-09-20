@@ -138,11 +138,11 @@ int main(void)
                original renderer update, so retry rather than turning that
                defined snapshot miss into a timing-dependent test failure. */
             if (app_runtime_copy_frame(runtime, frame) &&
-                frame->graphics == 0u && frame->cursor_column >= 0 &&
-                frame->cursor_column < SOFTPC_RUNTIME_TEXT_COLUMNS &&
-                frame->cursor_row >= 0 &&
-                frame->cursor_row < SOFTPC_RUNTIME_TEXT_ROWS &&
-                frame->cursor_visible != 0u && frame->cursor_phase != 0u) {
+                frame->window.graphics == 0u && frame->window.text.base.cursor_column >= 0 &&
+                frame->window.text.base.cursor_column < SOFTPC_RUNTIME_TEXT_COLUMNS &&
+                frame->window.text.base.cursor_row >= 0 &&
+                frame->window.text.base.cursor_row < SOFTPC_RUNTIME_TEXT_ROWS &&
+                frame->window.text.base.cursor_visible != 0u && frame->window.text.base.cursor_phase != 0u) {
                 cursor_seen = 1;
                 break;
             }
@@ -152,9 +152,9 @@ int main(void)
            frame.  Both outer frontends consume this value without reading a
            controller register or a guest-memory pointer. */
         assert(cursor_seen);
-        assert(frame->font_height > 0u && frame->font_height <= 16u);
-        assert(frame->cursor_bottom == frame->font_height - 1u);
-        assert(frame->cursor_top <= frame->cursor_bottom);
+        assert(frame->window.text.base.font_height > 0u && frame->window.text.base.font_height <= 16u);
+        assert(frame->window.text.base.cursor_bottom == frame->window.text.base.font_height - 1u);
+        assert(frame->window.text.base.cursor_top <= frame->window.text.base.cursor_bottom);
     }
     assert(app_runtime_published_frame_sequence(runtime) == frame->sequence);
     assert(app_runtime_published_frame_run_generation(runtime) == first_run);

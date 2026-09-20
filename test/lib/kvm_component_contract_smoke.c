@@ -54,8 +54,7 @@ static void component_probe_dispose(kvm_component *component)
 int main(void)
 {
     component_probe probe = { 0 };
-    /* Each private mailbox owns a complete kvm_frame.  Keep both test
-       components out of the small default 32-bit thread stack. */
+    lib_u8 storage[3];
     static kvm_component first;
     static kvm_component second;
     static kvm_component third;
@@ -80,15 +79,15 @@ int main(void)
     options.failure_sink = component_probe_failure;
     options.hotkeys = hotkeys;
     assert(kvm_component_initialize(&first, &options, component_probe_stop,
-        component_probe_dispose) == LIB_STATUS_OK);
+        component_probe_dispose, &storage[0], 1u) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_select_notify(&first.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     assert(kvm_component_initialize(&second, &options, component_probe_stop,
-        component_probe_dispose) == LIB_STATUS_OK);
+        component_probe_dispose, &storage[1], 1u) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_select_notify(&second.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     assert(kvm_component_initialize(&third, &options, component_probe_stop,
-        component_probe_dispose) == LIB_STATUS_OK);
+        component_probe_dispose, &storage[2], 1u) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_select_notify(&third.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     assert(first.source_identity != 0u);
@@ -134,7 +133,7 @@ int main(void)
     assert(probe.last_failure == LIB_STATUS_IO_ERROR);
     kvm_component_mailboxes_destroy(&first.mailboxes);
     assert(kvm_component_initialize(&first, &options, component_probe_stop,
-        component_probe_dispose) == LIB_STATUS_OK);
+        component_probe_dispose, &storage[0], 1u) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_select_notify(&first.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
 

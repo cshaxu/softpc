@@ -278,58 +278,65 @@ lib_status common_ui_set_state(common_ui *ui, common_ui_state state)
     return LIB_STATUS_OK;
 }
 
-static void common_ui_status_frame(kvm_frame *frame, const kvm_frame *source,
+static void common_ui_status_frame(kvm_console_text_frame *frame,
     const char *text)
 {
     lib_size index;
     lib_size row = 0u, column = 0u;
     lib_memory_set(frame, 0, sizeof(*frame));
-    frame->valid = 1u;
-    frame->sequence = source->sequence;
-    frame->text_columns = KVM_TEXT_COLUMNS;
-    frame->text_rows = KVM_TEXT_ROWS;
-    frame->cursor_column = -1;
-    frame->cursor_row = -1;
-    for (index = 0u; index < sizeof(frame->text); ++index) {
-        frame->text[index] = ' ';
-        frame->attributes[index] = 0x07u;
+    frame->base.text_columns = KVM_TEXT_COLUMNS;
+    frame->base.text_rows = KVM_TEXT_ROWS;
+    frame->base.cursor_column = -1;
+    frame->base.cursor_row = -1;
+    for (index = 0u; index < sizeof(frame->base.text); ++index) {
+        frame->base.text[index] = ' ';
+        frame->base.attributes[index] = 0x07u;
+    }
+    for (index = 0u; index < 256u; ++index) {
+        lib_u16 character = index >= 32u && index < 127u ? (lib_u16)index : ' ';
+        frame->characters.primary[index] = character;
+        frame->characters.secondary[index] = character;
     }
     for (index = 0u; text != NULL && text[index] != '\0'; ++index) {
         if (text[index] == '\r') continue;
         if (text[index] == '\n') { ++row; column = 0u; continue; }
         if (row < KVM_TEXT_ROWS && column < KVM_TEXT_COLUMNS)
-            frame->text[row * KVM_TEXT_COLUMNS + column] = (lib_u8)text[index];
+            frame->base.text[row * KVM_TEXT_COLUMNS + column] = (lib_u8)text[index];
         ++column;
     }
 }
 
-lib_status common_ui_publish_frame(common_ui *ui, const kvm_frame *frame,
+lib_status common_ui_publish_frame(common_ui *ui, const kvm_window_frame *frame,
+    const kvm_console_character_map *characters, lib_u32 sequence,
     lib_bool window_actual, lib_bool vm_console_current,
     lib_bool console_status_surface)
 {
-    kvm_frame status_frame;
-    const kvm_frame *console_frame = frame;
+    kvm_console_text_frame console_frame;
     lib_status status;
     lib_bool show_status;
     if (ui == NULL || frame == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     show_status = frame->graphics != 0u && console_status_surface;
     if (vm_console_current && ui->console != NULL &&
         (show_status != ui->console_status_delivered ||
-         (!show_status && ui->console_delivered_frame_sequence != frame->sequence))) {
+         (!show_status && ui->console_delivered_frame_sequence != sequence))) {
         if (show_status) {
-            common_ui_status_frame(&status_frame, frame, ui->options.graphics_console_status_text);
-            console_frame = &status_frame;
+            common_ui_status_frame(&console_frame, ui->options.graphics_console_status_text);
+        } else {
+            if (frame->graphics != 0u) return LIB_STATUS_UNSUPPORTED;
+            if (characters == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+            console_frame.base = frame->text.base;
+            console_frame.characters = *characters;
         }
-        status = kvm_console_publish_frame(ui->console, console_frame);
+        status = kvm_console_publish_frame(ui->console, &console_frame);
         if (status != LIB_STATUS_OK) return status;
-        ui->console_delivered_frame_sequence = frame->sequence;
+        ui->console_delivered_frame_sequence = sequence;
         ui->console_status_delivered = show_status;
     }
     if (window_actual && ui->window != NULL &&
-        ui->window_delivered_frame_sequence != frame->sequence) {
+        ui->window_delivered_frame_sequence != sequence) {
         status = kvm_window_publish_frame(ui->window, frame);
         if (status != LIB_STATUS_OK) return status;
-        ui->window_delivered_frame_sequence = frame->sequence;
+        ui->window_delivered_frame_sequence = sequence;
     }
     return LIB_STATUS_OK;
 }

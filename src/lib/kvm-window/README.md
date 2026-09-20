@@ -4,6 +4,13 @@
 copied KVM events to the application queue entry. It never includes `console-broker` or
 makes product decisions.
 
+`kvm_window_frame` contains either common text fields with two bitmap-font banks,
+or Window-owned indexed graphics, palette and dirty bounds. It contains no
+Console character map. Copies include only the active text or graphics extent.
+Window merges unconsumed dirty bounds with the latest complete pixels under
+the opaque mailbox's frame lock. First graphics, mode/size/stride or palette
+changes mark the whole image dirty; successful acknowledgement is generation-bound.
+
 Win32 mailbox notifications use SendNotifyMessage to the owned Window, not an
 Event-to-message bridge. Notifications coalesce; requests stay in the private
 control FIFO/latest-frame mailbox. Native move/size/menu loops dispatch the

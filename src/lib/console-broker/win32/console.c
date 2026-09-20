@@ -35,7 +35,7 @@ struct console_broker_backend {
     lib_console *console;
     console_broker_mode mode;
     lib_u32 generation;
-    lib_u8 previous[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
+    lib_u16 previous[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
     lib_u16 previous_attributes[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
     lib_u32 previous_palette[16u];
     lib_u16 previous_columns;
@@ -627,7 +627,7 @@ lib_status console_broker_backend_write_text_frame_bound(console_broker_backend 
             for (column = 0u; column < LIB_CONSOLE_TEXT_COLUMNS; ++column) {
                 lib_size offset = (lib_size)row * LIB_CONSOLE_TEXT_COLUMNS + column;
                 cells[offset].Char.UnicodeChar = row < frame->rows &&
-                    column < frame->columns ? lib_console_pc_glyph(frame->text[offset]) : ' ';
+                    column < frame->columns ? frame->text[offset] : ' ';
                 cells[offset].Attributes = (lib_win32_word)(row < frame->rows &&
                     column < frame->columns ? frame->attributes[offset] : 0u);
             }

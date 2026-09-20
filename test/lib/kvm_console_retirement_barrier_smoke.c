@@ -173,7 +173,7 @@ static void check_io_failure(int reader, lib_status output_status)
     retirement_probe probe = { 0 };
     kvm_console_options options = { 0 };
     kvm_console *console;
-    static kvm_frame frame;
+    static kvm_console_text_frame frame;
     InterlockedExchange(&fail_wake, 0);
     probe.retired = CreateEventA(NULL, TRUE, FALSE, NULL);
     write_called = CreateEventA(NULL, TRUE, FALSE, NULL);
@@ -190,7 +190,7 @@ static void check_io_failure(int reader, lib_status output_status)
         write_result = output_status;
         const lib_console_output_binding output = { NULL, failing_frame, NULL };
         assert(lib_console_set_output_binding(logical, &output) == LIB_STATUS_OK);
-        frame.valid = 1u; frame.text_columns = 80u; frame.text_rows = 25u;
+        frame.base.text_columns = 80u; frame.base.text_rows = 25u;
         assert(kvm_console_publish_frame(console, &frame) == LIB_STATUS_OK);
         assert(WaitForSingleObject(write_called, 5000u) == WAIT_OBJECT_0);
     }
@@ -206,14 +206,14 @@ static unsigned frame_writes;
 static char last_frame_text;
 static int stop_after_publication;
 static kvm_console *publishing_console;
-static kvm_frame next_frame;
+static kvm_console_text_frame next_frame;
 static lib_status activation_frame(void *opaque, const lib_console_text_frame *frame)
 {
     (void)opaque;
     ++frame_writes;
     last_frame_text=(char)frame->text[0];
     if (frame->text[0]=='A') {
-        next_frame.text[0]='B';
+        next_frame.base.text[0]='B';
         assert(kvm_console_publish_frame(publishing_console,&next_frame)==0);
         if (stop_after_publication) {
             lib_console_event activation={0};
@@ -235,7 +235,7 @@ static void check_activation_frame(void)
     lib_console_event activated={0};
     kvm_console *c;
     lib_u32 generation=0;
-    static kvm_frame copied;
+    static kvm_console_text_frame copied;
     InterlockedExchange(&fail_wake,0);
     frame_idle=CreateSemaphoreA(NULL,0,32,NULL); assert(frame_idle);
     probe.retired=CreateEventA(NULL,TRUE,FALSE,NULL);
@@ -249,27 +249,26 @@ static void check_activation_frame(void)
     activated.kind=LIB_CONSOLE_EVENT_ACTIVATED; activated.binding_generation=1;
     assert(lib_console_deliver_event(logical,&activated)==0); idle_frame();
     assert(frame_writes==0); /* Empty activation never invents output. */
-    next_frame.valid=1; next_frame.text_columns=80; next_frame.text_rows=25;
-    next_frame.text[0]='X'; write_result=LIB_STATUS_NOT_CURRENT;
+    next_frame.base.text_columns=80; next_frame.base.text_rows=25;
+    for (lib_u32 i=0;i<256;++i) {
+        next_frame.characters.primary[i]=(lib_u16)i;
+        next_frame.characters.secondary[i]=(lib_u16)i;
+    }
+    next_frame.base.text[0]='X'; write_result=LIB_STATUS_NOT_CURRENT;
     assert(kvm_console_publish_frame(c,&next_frame)==0); idle_frame();
     assert(frame_writes==1 && kvm_component_mailboxes_capture_frame(
-        &c->base.mailboxes,&generation,&copied));
+        &c->base.mailboxes,&generation,&copied,sizeof(copied)));
     {
-        static kvm_frame rejected;
+        static kvm_console_text_frame rejected;
         lib_u32 pending_generation = generation;
         assert(kvm_console_publish_frame(NULL,&next_frame)==LIB_STATUS_INVALID_ARGUMENT);
         assert(kvm_console_publish_frame(c,NULL)==LIB_STATUS_INVALID_ARGUMENT);
         assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
-        rejected.valid=1; rejected.text_columns=81; rejected.text_rows=25;
+        rejected.base.text_columns=81; rejected.base.text_rows=25;
         assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
-        rejected.graphics=1;
-        assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
-        rejected.graphics_width=1; rejected.graphics_height=1;
-        rejected.graphics_stride=1;
-        assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_UNSUPPORTED);
         assert(kvm_component_mailboxes_capture_frame(&c->base.mailboxes,
-            &generation,&copied));
-        assert(generation==pending_generation && !copied.graphics && copied.text[0]=='X');
+            &generation,&copied,sizeof(copied)));
+        assert(generation==pending_generation && copied.base.text[0]=='X');
         assert(frame_writes==1 && probe.failures==0);
         assert(WaitForSingleObject(frame_idle,0)==WAIT_TIMEOUT);
         /* The worker is parked after its previous write; no rejected request
@@ -279,23 +278,19 @@ static void check_activation_frame(void)
     write_result=LIB_STATUS_OK;
     assert(lib_console_deliver_event(logical,&activated)==0); idle_frame();
     assert(frame_writes==2 && !kvm_component_mailboxes_capture_frame(
-        &c->base.mailboxes,&generation,&copied));
+        &c->base.mailboxes,&generation,&copied,sizeof(copied)));
     assert(lib_console_deliver_event(logical,&activated)==0); idle_frame();
     assert(frame_writes==2);
-    publishing_console=c; next_frame.text[0]='A';
+    publishing_console=c; next_frame.base.text[0]='A';
     assert(kvm_console_publish_frame(c,&next_frame)==0);
     idle_frame(); idle_frame();
     assert(frame_writes==4 && last_frame_text=='B' && !kvm_component_mailboxes_capture_frame(
-        &c->base.mailboxes,&generation,&copied));
-    assert(copied.text[0]=='X'); /* An empty capture does not change output. */
-    next_frame.text[0]='A'; stop_after_publication=1;
+        &c->base.mailboxes,&generation,&copied,sizeof(copied)));
+    assert(copied.base.text[0]=='X'); /* An empty capture does not change output. */
+    next_frame.base.text[0]='A'; stop_after_publication=1;
     assert(kvm_console_publish_frame(c,&next_frame)==0);
     assert(WaitForSingleObject(probe.retired,5000)==WAIT_OBJECT_0);
     assert(kvm_console_publish_frame(c,&next_frame)==LIB_STATUS_INVALID_STATE);
-    next_frame.graphics=1; next_frame.graphics_width=1;
-    next_frame.graphics_height=1; next_frame.graphics_stride=1;
-    assert(kvm_console_publish_frame(c,&next_frame)==LIB_STATUS_UNSUPPORTED);
-    next_frame.graphics=0;
     assert(kvm_console_destroy(c) == LIB_STATUS_OK);
     assert(probe.event_count==1 && probe.failures==0 && frame_writes==5);
     CloseHandle(probe.retired); CloseHandle(frame_idle); frame_idle=NULL;
@@ -317,7 +312,7 @@ static void check_input_reset(void)
     kvm_console *c;
     kvm_console_options options = { .input_sink=reset_input, .failure_sink=reset_failure };
     lib_console_event e = { .kind=LIB_CONSOLE_EVENT_RAW_KEY, .binding_generation=1 };
-    static kvm_frame frame = { .valid=1, .text_columns=80, .text_rows=25 }, copied;
+    static kvm_console_text_frame frame = { .base = { .text_columns=80, .text_rows=25 } }, copied;
     lib_u32 generation;
     assert(kvm_hotkey_registry_register(&options.hotkeys,'P',3,"CAP")==0);
     assert(kvm_console_create(&c,&options)==0);
@@ -338,8 +333,8 @@ static void check_input_reset(void)
     e.binding_generation=2;
     assert(lib_console_deliver_event(logical,&e)==0);
     assert(!c->base.hotkey_matcher.held_count && c->base.hotkey_matcher.registry.count==1);
-    assert(kvm_component_mailboxes_capture_frame(&c->base.mailboxes,&generation,&copied));
-    assert(copied.text_columns==80);
+    assert(kvm_component_mailboxes_capture_frame(&c->base.mailboxes,&generation,&copied,sizeof(copied)));
+    assert(copied.base.text_columns==80);
     e.kind=LIB_CONSOLE_EVENT_RAW_KEY;
     e.value.raw_key=(lib_console_raw_key){ .unicode=0xde00, .pressed=1 };
     assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==1);
@@ -395,6 +390,36 @@ static void check_invalid_control(void)
     CloseHandle(probe.retired);
 }
 
+static lib_status capture_characters(void *opaque, const lib_console_text_frame *frame)
+{
+    lib_console_text_frame *captured = opaque;
+    *captured = *frame;
+    return LIB_STATUS_OK;
+}
+
+static void check_character_banks(void)
+{
+    kvm_console console = { 0 };
+    kvm_console_text_frame frame = { .base = { .text_columns=2, .text_rows=1 } };
+    lib_console_text_frame captured = { 0 };
+    lib_console_output_binding binding = { NULL, capture_characters, &captured };
+    assert(lib_console_create(&console.logical_console) == LIB_STATUS_OK);
+    assert(lib_console_set_output_binding(console.logical_console, &binding) == LIB_STATUS_OK);
+    frame.base.text[0] = frame.base.text[1] = 65;
+    frame.base.attributes[1] = 8;
+    frame.characters.primary[65] = 0x263a;
+    frame.characters.secondary[65] = 0x2665;
+    assert(kvm_console_publish_text_frame(&console, &frame) == LIB_STATUS_OK);
+    assert(captured.text[0] == 0x263a && captured.text[1] == 0x263a);
+    frame.base.attribute_font_select = 1;
+    assert(kvm_console_publish_text_frame(&console, &frame) == LIB_STATUS_OK);
+    assert(captured.text[0] == 0x263a && captured.text[1] == 0x2665);
+    frame.characters.secondary[65] = 0x03a9;
+    assert(kvm_console_publish_text_frame(&console, &frame) == LIB_STATUS_OK);
+    assert(captured.text[1] == 0x03a9);
+    lib_console_release(console.logical_console);
+}
+
 int main(void)
 {
     check_retirement(0);
@@ -405,6 +430,7 @@ int main(void)
     check_activation_frame();
     check_input_reset();
     check_invalid_control();
+    check_character_banks();
     return 0;
 }
 #else

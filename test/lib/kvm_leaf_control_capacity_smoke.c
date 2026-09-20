@@ -54,8 +54,8 @@ int main(void)
     options.input_sink = leaf_input;
     options.failure_sink = leaf_failure;
     options.failure_context = &window_probe;
-    assert(kvm_component_initialize(&window.base, &options, leaf_stop,
-        leaf_dispose) == LIB_STATUS_OK);
+    assert(kvm_component_initialize(&window.base, &options, leaf_stop, leaf_dispose,
+        &window.pending_frame, sizeof(window.pending_frame)) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     for (index = 0u; index < KVM_COMPONENT_CONTROL_CAPACITY; ++index)
@@ -91,8 +91,8 @@ int main(void)
     }
 
     options.failure_context = &console_probe;
-    assert(kvm_component_initialize(&console.base, &options, leaf_stop,
-        leaf_dispose) == LIB_STATUS_OK);
+    assert(kvm_component_initialize(&console.base, &options, leaf_stop, leaf_dispose,
+        &console.pending_frame, sizeof(console.pending_frame)) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_select_notify(&console.base.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     /* Synthetic storage proof, not a Console command: the native Console

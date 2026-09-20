@@ -240,8 +240,11 @@ its title/freeze/release encoding and worker validation. Console has no ordinary
 control commands and rejects unknown records. Native leaf APIs remain typed;
 there is no application-facing raw control mailbox.
 
-Shared frame mailboxes accumulate unconsumed dirty bounds with the latest
-complete image under one lock. Capture does not consume; a successful-output
+Shared frame mailboxes copy opaque values into fixed leaf-owned storage.
+Window accumulates unconsumed dirty bounds with its latest complete image
+under the frame lock; Console stores common text fields and caller-supplied
+character maps only. Common machine composes the upstream publication, while
+VM alone supplies SoftPC character meaning. Capture does not consume; a successful-output
 acknowledgement clears only that still-current publication. The broker reports logical
 Console activation through its neutral event sink after binding succeeds;
 kvm-console only wakes its existing worker to draw pending content. Empty means

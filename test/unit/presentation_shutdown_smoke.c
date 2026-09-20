@@ -58,9 +58,10 @@ lib_status common_ui_apply_action(common_ui *ui, common_ui_action a, common_ui_s
 { (void)ui; (void)a; (void)s; assert(0); return LIB_STATUS_IO_ERROR; }
 lib_status common_ui_set_state(common_ui *ui, common_ui_state s)
 { (void)ui; (void)s; assert(0); return LIB_STATUS_IO_ERROR; }
-lib_status common_ui_publish_frame(common_ui *ui, const kvm_frame *frame,
+lib_status common_ui_publish_frame(common_ui *ui, const kvm_window_frame *frame,
+    const kvm_console_character_map *characters, lib_u32 sequence,
     lib_bool window, lib_bool console, lib_bool status)
-{ (void)ui; (void)frame; (void)window; (void)console; (void)status;
+{ (void)characters; (void)sequence; (void)ui; (void)frame; (void)window; (void)console; (void)status;
   assert(0); return LIB_STATUS_IO_ERROR; }
 lib_status common_ui_release_window_mouse(common_ui *ui)
 { (void)ui; assert(0); return LIB_STATUS_IO_ERROR; }

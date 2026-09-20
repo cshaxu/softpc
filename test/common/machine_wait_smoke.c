@@ -88,7 +88,7 @@ static lib_bool run(void *context)
 }
 static void input(void *context, const kvm_input_event *event)
 { (void)context; (void)event; }
-static lib_bool frame(void *context, kvm_frame *value)
+static lib_bool frame(void *context, common_machine_frame *value)
 { (void)context; (void)value; return LIB_FALSE; }
 static void state(void *context, common_machine_state value, lib_u32 generation)
 {
@@ -142,6 +142,24 @@ static void check(base_sync_wait_result result, unsigned requested_action)
 
 int main(void)
 {
+    /* Resource-only changes are publications, not just character changes. */
+    static common_machine_frame before, after;
+    before.window.valid = 1u;
+    before.window.text.base.text_columns = 80u;
+    before.window.text.base.text_rows = 25u;
+    after = before;
+    assert(!common_machine_text_frame_changed(&before, &after));
+    after.characters.primary[65] = 0x263au;
+    assert(common_machine_text_frame_changed(&before, &after));
+    before = after;
+    after.characters.secondary[65] = 0x2665u;
+    assert(common_machine_text_frame_changed(&before, &after));
+    before = after;
+    after.window.text.font[65 * 16] = 0xffu;
+    assert(common_machine_text_frame_changed(&before, &after));
+    before = after;
+    after.window.text.secondary_font[65 * 16] = 0x81u;
+    assert(common_machine_text_frame_changed(&before, &after));
     check(BASE_SYNC_WAIT_FAULT, 0u);
     check(BASE_SYNC_WAIT_INVALID_ARGUMENT, 0u);
     check(BASE_SYNC_WAIT_TIMED_OUT, 0u);

@@ -6,7 +6,7 @@
 
 typedef common_machine_test app_runtime;
 typedef common_machine_state app_runtime_state;
-typedef kvm_frame app_runtime_frame;
+typedef common_machine_frame app_runtime_frame;
 typedef common_machine_state_sink app_runtime_state_sink;
 typedef common_machine_frame_sink app_runtime_frame_sink;
 

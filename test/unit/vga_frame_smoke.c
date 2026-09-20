@@ -490,7 +490,7 @@ static void verify_driver_geometry(softpc_machine *machine)
     };
     vm_driver *adapter = NULL;
     common_machine_driver driver;
-    kvm_frame *frame = malloc(sizeof(*frame));
+    common_machine_frame *frame = malloc(sizeof(*frame));
     unsigned index, pass;
     assert(frame != NULL);
     assert(vm_driver_create(&adapter, machine) == LIB_STATUS_OK);
@@ -510,8 +510,20 @@ static void verify_driver_geometry(softpc_machine *machine)
         host_timer_event();
         assert(Currently_emulated_video_mode == modes[index]);
         if (modes[index] == 3) {
+            memset(frame, 0xa5, sizeof(*frame));
             assert(driver.copy_frame(driver.context, frame));
-            assert(frame->valid && !frame->graphics);
+            assert(frame->window.valid && !frame->window.graphics);
+            for (lib_size byte = kvm_window_frame_size_bytes(&frame->window);
+                    byte < sizeof(frame->window); ++byte)
+                assert(((const lib_u8 *)&frame->window)[byte] == 0xa5);
+            const lib_u16 *map = frame->characters.primary;
+            assert(map[0]==' ' && map['A']=='A');
+            assert(map[1]==0x263a && map[0x7f]==0x2302);
+            assert(map[0xb3]==0x2502 && map[0xc4]==0x2500);
+            assert(map[0xda]==0x250c && map[0xdb]==0x2588);
+            assert(map[0x82]==0xe9 && map[0xff]==0xa0);
+            assert(memcmp(map, frame->characters.secondary,
+                sizeof(frame->characters.primary)) == 0);
             continue;
         }
         assert(softpc_machine_presentation_dib(machine, &bits, &info,
@@ -539,8 +551,8 @@ static void verify_driver_geometry(softpc_machine *machine)
                 &right, &bottom)) { }
         softpc_standalone_dib_invalidate_all();
         assert(driver.copy_frame(driver.context, frame));
-        assert(frame->valid && frame->graphics);
-        assert(frame->graphics_width == width && frame->graphics_height == height);
+        assert(frame->window.valid && frame->window.graphics);
+        assert(frame->window.image.width == width && frame->window.image.height == height);
         /* A legitimate full-height half repaint must not resize the frame.
          * Both halves are tested across original mode transitions. */
         rect.Left = 0; rect.Top = 0;
@@ -548,19 +560,19 @@ static void verify_driver_geometry(softpc_machine *machine)
         rect.Bottom = (SHORT)(height - 1u);
         assert(softpc_standalone_dib_damage(&rect));
         assert(driver.copy_frame(driver.context, frame));
-        assert(frame->valid && frame->graphics);
-        if (frame->graphics_width != width || frame->graphics_height != height)
+        assert(frame->window.valid && frame->window.graphics);
+        if (frame->window.image.width != width || frame->window.image.height != height)
             fprintf(stderr, "mode %02x pass %u: DIB %ux%u, frame %ux%u\n",
                 modes[index], pass, width, height,
-                frame->graphics_width, frame->graphics_height);
-        assert(frame->graphics_width == width && frame->graphics_height == height);
-        assert(frame->graphics_stride == width);
-        assert(frame->dirty_right == rect.Right);
+                frame->window.image.width, frame->window.image.height);
+        assert(frame->window.image.width == width && frame->window.image.height == height);
+        assert(frame->window.image.stride == width);
+        assert(frame->window.image.dirty_right == rect.Right);
         rect.Left = (SHORT)(width / 2u); rect.Right = (SHORT)(width - 1u);
         assert(softpc_standalone_dib_damage(&rect));
         assert(driver.copy_frame(driver.context, frame));
-        assert(frame->graphics_width == width && frame->dirty_right == rect.Right);
-        assert(memcmp(frame->graphics_pixels, bits, width * height) == 0);
+        assert(frame->window.image.width == width && frame->window.image.dirty_right == rect.Right);
+        assert(memcmp(frame->window.image.pixels, bits, width * height) == 0);
         /* A graphics route with no complete dirty frame must publish nothing.
            It must never substitute the text surface: restoration relies on
            this same rule while the indexed painter is being rebuilt. */

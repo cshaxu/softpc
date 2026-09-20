@@ -14,14 +14,14 @@ closed and pushed; T71 remains open through S4--S6 and owner acceptance.
 | Admission And Approval | Owner-approved serial T71 plan; coordinator S3 review passed. |
 | Objective | Shared text base with leaf-owned maps/fonts, Window-owned graphics/dirty, opaque latest-wins mailbox; one coherent Common/VM migration and VM-owned CP437. |
 | Non-goals | No per-cell attribute redesign, capacity expansion, MVDM/Compat/snapshot format/INI/media or input/lifecycle changes; no new thread, registry, per-frame allocation or parallel ABI. |
-| Reference Baseline | c1782fcc; dual-width Release and 110/110 per width. |
+| Reference Baseline | b30cc0da (production c1782fcc); dual-width Release and 110/110 per width. |
 | Candidate Proposal | [T71 plan](../proposals/m9-kvm-text-frame-contract.md). |
-| Files And ABI Surface | Lib frame/mailbox and logical Console contracts; Common machine/UI/session frame composition; VM producer; every direct test consumer and corpus/DAG manifests. Exact layout preflight required before code. |
+| Files And ABI Surface | Lib frame/mailbox and logical Console contracts; Common machine/UI/session frame composition; VM producer; every direct test consumer and corpus/DAG manifests. Concrete layout and x86/x64 prototype sizes recorded in proposal S4 preflight. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and their shared governance skills. |
 | Verification | Text resource-only repaint, both banks, typed Console output, graphic dirty/late acknowledge/mode changes, NOT_CURRENT replay, shared/product/snapshot full serial x86/x64, manifests/DAG/docs. |
 | Expected Markers | No monolithic kvm_frame, CP437 in VM only, no graphics/font/map interpretation in mailbox, no graphics/bitmap capacity in Console; one copied frame route. |
 | Asset Needs | Existing builds and bounded build/t71-s4 probes; both EXEs; no INI/media changes or external runtime dependencies. |
-| Reporting Requirements | Recount original provisional 420--700 production/150--250 test changed-line estimate after exact API and consumer inventory; report added/deleted/net and actual sizeof/copy bytes separately. |
+| Reporting Requirements | Inventory-adjusted estimate production +650/-550 (net +100), tests +650/-500 (net +150); report actual added/deleted/net separately from docs/build/EXEs, plus sizeof/copy bytes. |
 | Stop Conditions | New worker/lifecycle, second frame path, unexplained scope growth, MVDM change or unsupported Linux feature implementation. |
 | Exit Criteria | Frozen ownership ledger fully migrated without legacy aliases, typed leaf buffers and maps proven, dual-width tests pass, both EXEs/P committed/pushed then coordinator review. |
 | Original Owner Request | 好的，接下来准入修复，开始执行。 |

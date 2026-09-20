@@ -7,9 +7,13 @@ Common has no platform directories, platform types, native calls or OS-selected
 implementations. Base owns blocking mutex/event/task/wait; Types owns the atomic
 vocabulary. Common retains queue, lifecycle and frame-publication ownership.
 
-Machine frame snapshot reads use `kvm_frame_copy`: the complete prefix and
-active graphics extent are copied, not inactive pixel capacity. They specify
-the expected run and leave the destination unchanged on rejection.
+Machine frame snapshots combine a publication sequence, a typed Window frame
+and text-only Console character maps. Copying transfers the active Window
+extent and, for text only, both character maps. They specify the expected run
+and leave the destination unchanged on rejection. UI publishes the Window
+value and builds the small Console text value; it owns neither character
+encoding nor a duplicate graphics buffer. Machine compares both maps and
+font banks when detecting text changes.
 Session treats frame events as publication hints and
 derives content, sequence and graphics/text routing from that one snapshot,
 which may be newer than the notification. UI owns the shared action vocabulary;

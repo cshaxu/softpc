@@ -63,13 +63,13 @@ static int frame_has_dos_prompt(const app_runtime_frame *frame)
 {
     uint32_t row;
 
-    if (frame == NULL || frame->valid == 0u || frame->graphics != 0u)
+    if (frame == NULL || frame->window.valid == 0u || frame->window.graphics != 0u)
         return 0;
-    for (row = 0u; row < frame->text_rows; ++row) {
-        const uint8_t *line = &frame->text[row * SOFTPC_RUNTIME_TEXT_COLUMNS];
+    for (row = 0u; row < frame->window.text.base.text_rows; ++row) {
+        const uint8_t *line = &frame->window.text.base.text[row * SOFTPC_RUNTIME_TEXT_COLUMNS];
         uint32_t column;
 
-        for (column = 0u; column + 3u < frame->text_columns; ++column) {
+        for (column = 0u; column + 3u < frame->window.text.base.text_columns; ++column) {
             if ((line[column] == 'C' || line[column] == 'c') &&
                 line[column + 1u] == ':' && line[column + 2u] == '\\' &&
                 line[column + 3u] == '>')
@@ -86,21 +86,21 @@ static void report_last_frame(app_runtime *runtime)
 
     if (!app_runtime_copy_frame(runtime, &frame)) return;
     fprintf(stderr, "last frame: valid=%u graphics=%u text=%ux%u sequence=%lu\n",
-        (unsigned int)frame.valid, (unsigned int)frame.graphics,
-        (unsigned int)frame.text_columns, (unsigned int)frame.text_rows,
+        (unsigned int)frame.window.valid, (unsigned int)frame.window.graphics,
+        (unsigned int)frame.window.text.base.text_columns, (unsigned int)frame.window.text.base.text_rows,
         (unsigned long)frame.sequence);
-    if (frame.graphics != 0u) return;
-    for (row = 0u; row < frame.text_rows; ++row) {
+    if (frame.window.graphics != 0u) return;
+    for (row = 0u; row < frame.window.text.base.text_rows; ++row) {
         char line[SOFTPC_RUNTIME_TEXT_COLUMNS + 1u];
         uint32_t column;
         int nonblank = 0;
 
-        for (column = 0u; column < frame.text_columns; ++column) {
-            uint8_t c = frame.text[row * SOFTPC_RUNTIME_TEXT_COLUMNS + column];
+        for (column = 0u; column < frame.window.text.base.text_columns; ++column) {
+            uint8_t c = frame.window.text.base.text[row * SOFTPC_RUNTIME_TEXT_COLUMNS + column];
             line[column] = c >= 0x20u && c < 0x7fu ? (char)c : ' ';
             if (line[column] != ' ') nonblank = 1;
         }
-        line[frame.text_columns] = '\0';
+        line[frame.window.text.base.text_columns] = '\0';
         if (nonblank) fprintf(stderr, "%s\n", line);
     }
 }

@@ -2,7 +2,7 @@
 #define COMMON_MACHINE_INTERFACE_H
 
 #include "lib/kvm-base/event_interface.h"
-#include "lib/kvm-base/frame_interface.h"
+#include "common/machine/frame_interface.h"
 #include "lib/storage/medium_interface.h"
 #include "lib/types/types_interface.h"
 
@@ -171,7 +171,7 @@ typedef struct common_machine_driver {
     void (*set_executor_callback)(void *context,
         common_machine_executor_callback callback, void *callback_context);
     void (*deliver_input)(void *context, const kvm_input_event *event);
-    lib_bool (*copy_frame)(void *context, kvm_frame *out_frame);
+    lib_bool (*copy_frame)(void *context, common_machine_frame *out_frame);
     lib_bool (*set_removable_media)(void *context, const char *path,
         lib_storage_medium_mode mode);
     /* Common invokes only these state-specific driver hooks on its existing
@@ -188,7 +188,7 @@ typedef struct common_machine_driver {
     void (*cancel_debug)(void *context);
     /* Optional product-owned observation after a complete frame has been
      * published. It must not call machine lifecycle APIs. */
-    void (*frame_published)(void *context, const kvm_frame *frame);
+    void (*frame_published)(void *context, const common_machine_frame *frame);
 } common_machine_driver;
 
 lib_status common_machine_create(common_machine **out_machine,
@@ -214,7 +214,7 @@ lib_bool common_machine_enqueue_input(common_machine *machine,
 /* Copy one complete frame only from the requested run. On rejection the
  * destination is unchanged; content, sequence and route are one snapshot. */
 lib_bool common_machine_copy_published_frame(common_machine *machine,
-    kvm_frame *destination, lib_u32 run_generation);
+    common_machine_frame *destination, lib_u32 run_generation);
 lib_u32 common_machine_published_frame_sequence(const common_machine *machine);
 lib_u32 common_machine_published_frame_run_generation(const common_machine *machine);
 lib_u32 common_machine_run_generation(const common_machine *machine);

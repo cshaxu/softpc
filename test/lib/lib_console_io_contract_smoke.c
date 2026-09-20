@@ -150,14 +150,9 @@ int main(void)
     memset(line,'x',2048);strcpy(line+2048,"\r\n");input=line;
     reads=0;cancel_at=2;chunk=7;delivered=0;
     console_broker_reader(&b);assert(delivered==0);ResetEvent(stop);cancel_at=0;
-    assert(lib_console_pc_glyph(0)==' ' && lib_console_pc_glyph('A')=='A');
-    assert(lib_console_pc_glyph(1)==0x263a && lib_console_pc_glyph(0x7f)==0x2302);
-    assert(lib_console_pc_glyph(0xb3)==0x2502 && lib_console_pc_glyph(0xc4)==0x2500);
-    assert(lib_console_pc_glyph(0xda)==0x250c && lib_console_pc_glyph(0xdb)==0x2588);
-    assert(lib_console_pc_glyph(0x82)==0xe9 && lib_console_pc_glyph(0xff)==0xa0);
     assert(base_sync_mutex_create(&b.output_lock)==LIB_STATUS_OK);
     assert(base_sync_mutex_create(&b.transaction_lock)==LIB_STATUS_OK);b.output=(HANDLE)1;
-    f.columns=80;f.rows=25;f.text[0]=0xdb;f.palette[0]=1;
+    f.columns=80;f.rows=25;f.text[0]=0x2588;f.palette[0]=1;
     for(int i=0;i<2;++i) assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
     assert(first_cell==0x2588 && writes==1 && palette_attempts==2);
     palette_query_ok=1;
@@ -203,7 +198,7 @@ int main(void)
         assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_IO_ERROR);
         assert(!b.previous_columns && !b.previous_rows);
         unsigned attempted=writes;
-        partial_write=0; f.text[0]=0xdb;
+        partial_write=0; f.text[0]=0x2588;
         assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
         assert(writes==attempted+1 && b.previous_columns==80);
     }

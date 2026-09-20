@@ -47,7 +47,7 @@ int main(void)
             assert(kvm_component_enqueue_control(&c->base,&title)==LIB_STATUS_OK);
         }
         if(mode==2) {
-            static kvm_frame frame={.valid=1,.text_columns=80,.text_rows=25};
+            static kvm_console_text_frame frame={.base = { .text_columns=80, .text_rows=25 }};
             assert(kvm_console_publish_frame(c,&frame)==LIB_STATUS_OK);
         }
         if(mode==3) {

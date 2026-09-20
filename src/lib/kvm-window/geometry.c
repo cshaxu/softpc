@@ -99,33 +99,33 @@ int kvm_window_fit_aspect_size(int available_width, int available_height,
     return 1;
 }
 
-int kvm_window_cursor_rect(const kvm_frame *frame, const kvm_window_rect *display,
+int kvm_window_cursor_rect(const kvm_window_frame *frame, const kvm_window_rect *display,
     kvm_window_rect *cursor)
 {
     int width, height, cell_top, cell_bottom;
     lib_u32 top, bottom;
-    if (!kvm_frame_is_valid(frame) || !display || !cursor || frame->graphics ||
-        !frame->cursor_visible || frame->cursor_column < 0 || frame->cursor_row < 0 ||
-        frame->cursor_column >= frame->text_columns || frame->cursor_row >= frame->text_rows)
+    if (!kvm_window_frame_is_valid(frame) || !display || !cursor || frame->graphics ||
+        !frame->text.base.cursor_visible || frame->text.base.cursor_column < 0 || frame->text.base.cursor_row < 0 ||
+        frame->text.base.cursor_column >= frame->text.base.text_columns || frame->text.base.cursor_row >= frame->text.base.text_rows)
         return 0;
     width = display->right - display->left;
     height = display->bottom - display->top;
     if (width <= 0 || height <= 0) return 0;
-    cell_top = (int)((lib_i64)frame->cursor_row*height/frame->text_rows);
-    cell_bottom = (int)((lib_i64)(frame->cursor_row+1)*height/frame->text_rows);
-    cursor->left = display->left+(lib_i32)((lib_i64)frame->cursor_column*width/frame->text_columns);
-    cursor->right = display->left+(lib_i32)((lib_i64)(frame->cursor_column+1)*width/frame->text_columns);
+    cell_top = (int)((lib_i64)frame->text.base.cursor_row*height/frame->text.base.text_rows);
+    cell_bottom = (int)((lib_i64)(frame->text.base.cursor_row+1)*height/frame->text.base.text_rows);
+    cursor->left = display->left+(lib_i32)((lib_i64)frame->text.base.cursor_column*width/frame->text.base.text_columns);
+    cursor->right = display->left+(lib_i32)((lib_i64)(frame->text.base.cursor_column+1)*width/frame->text.base.text_columns);
     cursor->top = display->top+cell_top;
     cursor->bottom = display->top+cell_bottom;
-    if (frame->font_height && frame->cursor_bottom >= frame->cursor_top) {
-        top = frame->cursor_top;
-        if (top >= frame->font_height) return 0;
-        bottom = (lib_u32)frame->cursor_bottom + 1u;
-        if (bottom > frame->font_height) bottom = frame->font_height;
+    if (frame->text.base.font_height && frame->text.base.cursor_bottom >= frame->text.base.cursor_top) {
+        top = frame->text.base.cursor_top;
+        if (top >= frame->text.base.font_height) return 0;
+        bottom = (lib_u32)frame->text.base.cursor_bottom + 1u;
+        if (bottom > frame->text.base.font_height) bottom = frame->text.base.font_height;
         cursor->top = display->top+cell_top+(lib_i32)(
-            (lib_i64)(cell_bottom-cell_top)*top/frame->font_height);
+            (lib_i64)(cell_bottom-cell_top)*top/frame->text.base.font_height);
         cursor->bottom = display->top+cell_top+(lib_i32)(
-            ((lib_i64)(cell_bottom-cell_top)*bottom+frame->font_height-1u)/frame->font_height);
+            ((lib_i64)(cell_bottom-cell_top)*bottom+frame->text.base.font_height-1u)/frame->text.base.font_height);
     }
     return cursor->right > cursor->left && cursor->bottom > cursor->top;
 }

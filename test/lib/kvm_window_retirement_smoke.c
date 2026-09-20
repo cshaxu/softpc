@@ -122,9 +122,10 @@ static DWORD WINAPI controlled_wait(DWORD count, const HANDLE *handles,
 #define kvm_component_mailboxes_select_notify select_notify
 static void checked_fail(kvm_component *component, lib_status status)
 {
-    static kvm_frame rejected = { .valid = 1, .text_columns = 80, .text_rows = 25 };
+    static kvm_window_frame rejected = { .valid = 1, .text.base = { .text_columns = 80, .text_rows = 25 } };
     kvm_component_fail(component, status);
-    assert(kvm_component_mailboxes_publish_frame(&component->mailboxes, &rejected) ==
+    assert(kvm_component_mailboxes_publish_frame(&component->mailboxes, &rejected,
+        kvm_window_frame_size_bytes(&rejected), NULL) ==
         LIB_STATUS_INVALID_STATE);
     kvm_component_control title = { .kind = KVM_WINDOW_CONTROL_SET_TITLE };
     assert(kvm_component_mailboxes_enqueue_control(&component->mailboxes, &title) ==
@@ -175,7 +176,7 @@ static void paint_scenario(void)
 }
 int main(void)
 {
-    static kvm_frame frame;
+    static kvm_window_frame frame;
     for (scenario = 0; scenario != 24; ++scenario) {
         kvm_window_options options = { 0 };
         kvm_window *window = NULL;
@@ -202,8 +203,8 @@ int main(void)
         }
         assert(kvm_window_create(&window, &options) == LIB_STATUS_OK);
         assert(WaitForSingleObject(waiting, INFINITE) == WAIT_OBJECT_0);
-        frame.valid = 1u; frame.text_columns = 80u; frame.text_rows = 25u;
-        frame.cursor_visible=1; frame.font_height=16; frame.cursor_top=14; frame.cursor_bottom=15;
+        frame.valid = 1u; frame.text.base.text_columns = 80u; frame.text.base.text_rows = 25u;
+        frame.text.base.cursor_visible=1; frame.text.base.font_height=16; frame.text.base.cursor_top=14; frame.text.base.cursor_bottom=15;
         assert(kvm_window_publish_frame(window, &frame) == LIB_STATUS_OK);
         if(scenario==18) {
             void *retained=window->worker_state;

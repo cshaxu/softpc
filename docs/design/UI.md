@@ -52,7 +52,7 @@ are printed and a new line is requested. A complete command already in the queue
 is preserved and consumed before another read. This uses native line editing;
 partial input is neither saved nor redrawn.
 
-Raw text cells use lib\'s fixed PC-display byte-to-Unicode mapping, including
+Raw text cells use VM's fixed PC-display byte-to-Unicode mapping, including
 box/block glyphs. It is an approximation for the traditional character set,
 not detection of a DOS code page or an uploaded font. Window retains the copied
 bitmap font and therefore remains the exact custom-font renderer.

@@ -150,7 +150,8 @@ static void check_invalid_controls(void)
     kvm_component_options options={.input_sink=input,.failure_sink=invalid_control_failure};
     for(unsigned i=0;i<3;++i) {
         kvm_component_control command={.kind=LIB_UINT32_MAX};
-        assert(kvm_component_initialize(&window.base,&options,join,dispose)==0);
+        assert(kvm_component_initialize(&window.base, &options, join, dispose,
+        &window.pending_frame, sizeof(window.pending_frame))==0);
         assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes,NULL,NULL)==0);
         lib_memory_set(&c,0,sizeof(c)); c.component=&window;
         if(i==1) { command.kind=KVM_WINDOW_CONTROL_SET_TITLE;
@@ -178,7 +179,8 @@ int main(void)
     static kvm_window window;
     static kvm_win32_window_context c;
     kvm_component_options options={.input_sink=input,.failure_sink=failure};
-    assert(kvm_component_initialize(&window.base,&options,join,dispose)==LIB_STATUS_OK);
+    assert(kvm_component_initialize(&window.base, &options, join, dispose,
+        &window.pending_frame, sizeof(window.pending_frame))==LIB_STATUS_OK);
     assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     c.component=&window; context=&c;
@@ -208,7 +210,8 @@ int main(void)
     win32_window_resize_client((HWND)1,&c,640,480);
     assert(c.client_surface_width==0 && window.base.stopping);
     assert(kvm_component_destroy(&window.base)==LIB_STATUS_OK);
-    assert(kvm_component_initialize(&window.base,&options,join,dispose)==LIB_STATUS_OK);
+    assert(kvm_component_initialize(&window.base, &options, join, dispose,
+        &window.pending_frame, sizeof(window.pending_frame))==LIB_STATUS_OK);
     assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     resize_ok=1;
@@ -234,12 +237,13 @@ int main(void)
     win32_window_capture_client_size((HWND)1,&c);
     assert(c.client_width==320 && c.client_height==240 && window.base.stopping);
     assert(kvm_component_destroy(&window.base)==LIB_STATUS_OK);
-    assert(kvm_component_initialize(&window.base,&options,join,dispose)==LIB_STATUS_OK);
+    assert(kvm_component_initialize(&window.base, &options, join, dispose,
+        &window.pending_frame, sizeof(window.pending_frame))==LIB_STATUS_OK);
     assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     client_ok=1;
-    c.frame.valid=1; c.frame.text_columns=80; c.frame.text_rows=25;
-    c.frame.cursor_visible=1; c.frame.font_height=16;
+    c.frame.valid=1; c.frame.text.base.text_columns=80; c.frame.text.base.text_rows=25;
+    c.frame.text.base.cursor_visible=1; c.frame.text.base.font_height=16;
     c.cursor_blink_due=250; c.cursor_blink_visible=1;
     for (ticks=0;ticks<250;++ticks) win32_window_proc((HWND)1,WM_TIMER,WIN32_WINDOW_CURSOR_TIMER,0);
     assert(c.cursor_blink_visible);
@@ -268,7 +272,7 @@ int main(void)
     c.frozen=0; c.cursor_blink_due=10; ticks=0xfffffff0u;
     win32_window_proc((HWND)1,WM_TIMER,WIN32_WINDOW_CURSOR_TIMER,0); assert(!c.cursor_blink_visible);
     ticks=10; win32_window_proc((HWND)1,WM_TIMER,WIN32_WINDOW_CURSOR_TIMER,0); assert(c.cursor_blink_visible);
-    c.frame.cursor_visible=0; ticks=1000;
+    c.frame.text.base.cursor_visible=0; ticks=1000;
     win32_window_proc((HWND)1,WM_TIMER,WIN32_WINDOW_CURSOR_TIMER,0); assert(c.cursor_blink_visible);
     assert(kvm_window_unfreeze(&window)==LIB_STATUS_OK);
     assert(win32_window_consume_mailboxes((HWND)1,&c));
@@ -278,7 +282,8 @@ int main(void)
     assert(kvm_component_mailboxes_enqueue_control(&window.base.mailboxes,&command)==0);
     assert(!win32_window_consume_mailboxes((HWND)1,&c) && window.base.stopping);
     assert(kvm_component_destroy(&window.base) == LIB_STATUS_OK);
-    assert(kvm_component_initialize(&window.base,&options,join,dispose)==0);
+    assert(kvm_component_initialize(&window.base, &options, join, dispose,
+        &window.pending_frame, sizeof(window.pending_frame))==0);
     c.component=&window; c.frozen=1; title_ok=1; reenter_title=1;
     assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes,
         immediate_notification,&c) == LIB_STATUS_OK);
@@ -289,7 +294,8 @@ int main(void)
     assert(!c.frozen && !c.consuming && !window.base.mailboxes.control_count);
     assert(kvm_component_destroy(&window.base) == LIB_STATUS_OK);
     /* A release callback faults mid-FIFO: later controls and frame stay untouched. */
-    assert(kvm_component_initialize(&window.base,&options,join,dispose)==0);
+    assert(kvm_component_initialize(&window.base, &options, join, dispose,
+        &window.pending_frame, sizeof(window.pending_frame))==0);
     assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     c.component=&window; c.frozen=0; c.left_button=1;
@@ -303,7 +309,8 @@ int main(void)
     assert(window.base.mailboxes.control_count==2);
     assert(window.base.mailboxes.frame_pending);
     assert(kvm_component_destroy(&window.base) == LIB_STATUS_OK);
-    assert(kvm_component_initialize(&window.base,&options,join,dispose)==LIB_STATUS_OK);
+    assert(kvm_component_initialize(&window.base, &options, join, dispose,
+        &window.pending_frame, sizeof(window.pending_frame))==LIB_STATUS_OK);
     assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     c.component=&window; c.left_button=c.right_button=0; reject_input=0;
@@ -332,7 +339,8 @@ int main(void)
        must not turn stale messages, geometry or our own warp into input. */
     release_ok=1; clip_ok=1;
     client.right=640; client.bottom=480; origin.x=-900; origin.y=80;
-    assert(kvm_component_initialize(&window.base,&options,join,dispose)==0);
+    assert(kvm_component_initialize(&window.base, &options, join, dispose,
+        &window.pending_frame, sizeof(window.pending_frame))==0);
     c.component=&window; c.frozen=0; c.left_button=c.right_button=0;
     assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==0);
     int dx,dy, total=0;

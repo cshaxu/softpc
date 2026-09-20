@@ -21,14 +21,14 @@
 
 typedef struct kvm_win32_window_context {
     kvm_window *component;
-    kvm_frame frame;
+    kvm_window_frame frame;
     lib_win32_hdc surface_dc;
     lib_win32_hbitmap surface_bitmap;
     lib_win32_hgdiobj surface_previous_bitmap;
     lib_u32 *surface_pixels;
     lib_u32 surface_width;
     lib_u32 surface_height;
-    lib_u32 graphics_palette[KVM_GRAPHICS_PALETTE_ENTRIES];
+    lib_u32 graphics_palette[KVM_WINDOW_GRAPHICS_PALETTE_ENTRIES];
     int graphics_valid;
     lib_u32 displayed_sequence;
     kvm_keyboard_normalizer keyboard_normalizer;
@@ -296,7 +296,7 @@ static int win32_window_paint(lib_win32_hwnd window, kvm_win32_window_context *c
     kvm_window_rect display;
 
     if (context == LIB_NULL || context->surface_dc == LIB_NULL ||
-        !kvm_frame_is_valid(&context->frame) ||
+        !kvm_window_frame_is_valid(&context->frame) ||
         !win32_window_display_rect(context, context->surface_width,
             context->surface_height, &display)) return 1;
     if (!lib_win32_stretch_blt(dc, display.left, display.top, display.right - display.left,
@@ -328,8 +328,8 @@ static void win32_window_advance_cursor_blink(lib_win32_hwnd window,
     /* KillTimer does not remove an already queued tick. The frozen/due guards
      * also prevent an old tick from advancing a newly unfrozen phase early. */
     if (!win32_window_accepting_input(context) || context->frozen ||
-        !kvm_frame_is_valid(&context->frame) || context->frame.graphics ||
-        !context->frame.cursor_visible ||
+        !kvm_window_frame_is_valid(&context->frame) || context->frame.graphics ||
+        !context->frame.text.base.cursor_visible ||
         (lib_win32_long)(now - context->cursor_blink_due) < 0)
         return;
     periods = (now - context->cursor_blink_due) / WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS + 1u;
@@ -466,7 +466,7 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
 
     if (!win32_window_accepting_input(context) ||
         !kvm_component_mailboxes_capture_frame(&context->component->base.mailboxes,
-            &context->displayed_sequence, &context->frame))
+            &context->displayed_sequence, &context->frame, sizeof(context->frame)))
         return;
     if (!kvm_window_frame_size(&context->frame, &width, &height) ||
         !win32_window_ensure_surface(window, context, width, height)) {

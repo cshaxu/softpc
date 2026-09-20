@@ -16,7 +16,7 @@ static BOOL WINAPI test_kill_timer(HWND window, UINT_PTR id)
 
 static kvm_window window;
 static kvm_win32_window_context context;
-static kvm_frame frame;
+static kvm_window_frame frame;
 static kvm_input_event delivered[32];
 static unsigned count, attempts, reject_at, failures;
 static int sink(void *opaque, const kvm_input_event *event)
@@ -39,13 +39,14 @@ static void initialize(void)
     options.input_sink = sink; options.failure_sink = failure;
     assert(kvm_hotkey_registry_register(&options.hotkeys, 'P',
         KVM_HOTKEY_MODIFIER_CONTROL | KVM_HOTKEY_MODIFIER_ALT, "toggle") == LIB_STATUS_OK);
-    assert(kvm_component_initialize(&window.base, &options, join, dispose) == LIB_STATUS_OK);
+    assert(kvm_component_initialize(&window.base, &options, join, dispose,
+        &window.pending_frame, sizeof(window.pending_frame)) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     lib_memory_set(&context, 0, sizeof(context));
     context.component = &window;
     count = attempts = reject_at = failures = 0;
-    frame.valid = 1; frame.text_columns = 80; frame.text_rows = 25;
+    frame.valid = 1; frame.text.base.text_columns = 80; frame.text.base.text_rows = 25;
 }
 static int key(kvm_key key, lib_u16 scan, int down, lib_u8 modifiers)
 {

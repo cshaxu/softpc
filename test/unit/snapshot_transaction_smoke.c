@@ -187,15 +187,15 @@ static lib_bool snapshot_media_bytes(lib_bool write, lib_bool later)
 
 static lib_bool snapshot_has_pixels(common_machine *machine, lib_u8 colour)
 {
-    kvm_frame *frame = calloc(1, sizeof(*frame));
+    common_machine_frame *frame = calloc(1, sizeof(*frame));
     lib_bool found = LIB_FALSE;
     if (frame == NULL) return LIB_FALSE;
     if (common_machine_copy_published_frame(machine, frame,
-            common_machine_run_generation(machine)) && frame->graphics) {
+            common_machine_run_generation(machine)) && frame->window.graphics) {
         lib_size i;
         found = LIB_TRUE;
-        for (i = 0; i < frame->graphics_height * frame->graphics_stride; ++i)
-            if (frame->graphics_pixels[i] != colour) { found = LIB_FALSE; break; }
+        for (i = 0; i < frame->window.image.height * frame->window.image.stride; ++i)
+            if (frame->window.image.pixels[i] != colour) { found = LIB_FALSE; break; }
     }
     free(frame);
     return found;
@@ -311,10 +311,10 @@ static int snapshot_run_transaction(void)
         LIB_STATUS_OK);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
     {
-        kvm_frame frame = { 0 };
+        common_machine_frame frame = { 0 };
         assert(common_machine_copy_published_frame(machine, &frame,
             common_machine_run_generation(machine)));
-        assert(frame.valid != 0u);
+        assert(frame.window.valid != 0u);
     }
     assert(common_machine_resume(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
@@ -408,10 +408,10 @@ static int snapshot_run_load(const char *startup_media_path, const char *snapsho
     assert(fclose(file) == 0);
     assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
     {
-        kvm_frame frame = { 0 };
+        common_machine_frame frame = { 0 };
         assert(common_machine_copy_published_frame(machine, &frame,
             common_machine_run_generation(machine)));
-        assert(frame.valid != 0u);
+        assert(frame.window.valid != 0u);
     }
     assert(snapshot_has_pixels(machine, 0x0c));
     assert(snapshot_media_bytes(LIB_FALSE, LIB_FALSE));

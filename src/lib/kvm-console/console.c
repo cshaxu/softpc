@@ -95,7 +95,8 @@ lib_status kvm_console_create(kvm_console **out_console,
     console = lib_allocate_zero(1u, sizeof(*console));
     if (console == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     status = kvm_component_initialize(&console->base, options,
-        kvm_console_component_stop, kvm_console_component_dispose);
+        kvm_console_component_stop, kvm_console_component_dispose,
+        &console->pending_frame, sizeof(console->pending_frame));
     if (status == LIB_STATUS_OK)
         status = kvm_component_mailboxes_select_notify(&console->base.mailboxes,
             LIB_NULL, LIB_NULL);
@@ -111,12 +112,11 @@ lib_status kvm_console_create(kvm_console **out_console,
     return LIB_STATUS_OK;
 }
 
-lib_status kvm_console_publish_frame(kvm_console *console, const kvm_frame *frame)
+lib_status kvm_console_publish_frame(kvm_console *console, const kvm_console_text_frame *frame)
 {
-    if (console == LIB_NULL || !kvm_frame_is_valid(frame))
+    if (console == LIB_NULL || frame == LIB_NULL || !kvm_text_frame_is_valid(&frame->base))
         return LIB_STATUS_INVALID_ARGUMENT;
-    if (frame->graphics != 0u) return LIB_STATUS_UNSUPPORTED;
-    return kvm_component_publish_frame(&console->base, frame);
+    return kvm_component_publish_frame(&console->base, frame, sizeof(*frame), LIB_NULL);
 }
 
 lib_status kvm_console_destroy(kvm_console *console)
@@ -130,22 +130,29 @@ lib_console *kvm_console_get_console(const kvm_console *console)
 }
 
 lib_status kvm_console_publish_text_frame(kvm_console *console,
-    const kvm_frame *frame)
+    const kvm_console_text_frame *frame)
 {
     lib_console_text_frame text_frame = { 0 };
+    const kvm_text_frame *text;
+    lib_size index;
 
     if (console == LIB_NULL || frame == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    text_frame.columns = frame->text_columns;
-    text_frame.rows = frame->text_rows;
-    lib_memory_copy(text_frame.text, frame->text, sizeof(text_frame.text));
-    lib_memory_copy(text_frame.attributes, frame->attributes, sizeof(text_frame.attributes));
-    lib_memory_copy(text_frame.palette, frame->text_palette, sizeof(text_frame.palette));
-    text_frame.cursor_column = frame->cursor_column;
-    text_frame.cursor_row = frame->cursor_row;
-    text_frame.cursor_top = frame->cursor_top;
-    text_frame.cursor_bottom = frame->cursor_bottom;
-    text_frame.cursor_visible = frame->cursor_visible;
-    text_frame.cursor_phase = frame->cursor_phase;
-    text_frame.font_height = frame->font_height;
+    text = &frame->base;
+    text_frame.columns = text->text_columns;
+    text_frame.rows = text->text_rows;
+    for (index = 0u; index < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++index) {
+        const lib_u16 *map = text->attribute_font_select &&
+            (text->attributes[index] & 0x08u) ? frame->characters.secondary : frame->characters.primary;
+        text_frame.text[index] = map[text->text[index]];
+    }
+    lib_memory_copy(text_frame.attributes, text->attributes, sizeof(text_frame.attributes));
+    lib_memory_copy(text_frame.palette, text->text_palette, sizeof(text_frame.palette));
+    text_frame.cursor_column = text->cursor_column;
+    text_frame.cursor_row = text->cursor_row;
+    text_frame.cursor_top = text->cursor_top;
+    text_frame.cursor_bottom = text->cursor_bottom;
+    text_frame.cursor_visible = text->cursor_visible;
+    text_frame.cursor_phase = text->cursor_phase;
+    text_frame.font_height = text->font_height;
     return lib_console_write_text_frame(console->logical_console, &text_frame);
 }

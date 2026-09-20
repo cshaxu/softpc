@@ -2,6 +2,7 @@
 #define KVM_WINDOW_INTERFACE_H
 
 #include "lib/kvm-base/component_interface.h"
+#include "lib/kvm-window/frame_interface.h"
 
 #define KVM_WINDOW_TITLE_CAPACITY 128u
 
@@ -21,7 +22,7 @@ typedef struct kvm_window_options {
  * a terminal application infrastructure fault, not a caller-owned half object. */
 lib_status kvm_window_create(kvm_window **out_window,
     const kvm_window_options *options);
-lib_status kvm_window_publish_frame(kvm_window *window, const kvm_frame *frame);
+lib_status kvm_window_publish_frame(kvm_window *window, const kvm_window_frame *frame);
 /* Same checked destruction contract as kvm_component_destroy. */
 lib_status kvm_window_destroy(kvm_window *window);
 lib_status kvm_window_set_title(kvm_window *window, const char *title);

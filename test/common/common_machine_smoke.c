@@ -113,13 +113,13 @@ static void fake_deliver_input(void *opaque, const kvm_input_event *event)
     InterlockedIncrement(&fake->inputs);
     SetEvent(fake->input);
 }
-static lib_bool fake_copy_frame(void *opaque, kvm_frame *frame)
+static lib_bool fake_copy_frame(void *opaque, common_machine_frame *frame)
 {
     (void)opaque;
     memset(frame, 0, sizeof(*frame));
-    frame->valid = 1u;
-    frame->text_columns = KVM_TEXT_COLUMNS;
-    frame->text_rows = KVM_TEXT_ROWS;
+    frame->window.valid = 1u;
+    frame->window.text.base.text_columns = KVM_TEXT_COLUMNS;
+    frame->window.text.base.text_rows = KVM_TEXT_ROWS;
     return LIB_TRUE;
 }
 
@@ -481,7 +481,7 @@ int main(void)
     common_machine_driver driver = { 0 };
     common_machine *machine = NULL;
     kvm_input_event input = { 0 };
-    kvm_frame frame = { 0 };
+    common_machine_frame frame = { 0 };
     lib_u32 generation = 0u;
     common_machine_debug_lease lease = { 0 };
     common_machine_debug_result debug_result = { 0 };
@@ -514,11 +514,11 @@ int main(void)
     driver.write_state = fake_write_state;
     driver.execute_debug = fake_execute_debug;
     assert(common_machine_create(&machine, &driver) == LIB_STATUS_OK);
-    frame.valid = 1u;
+    frame.window.valid = 1u;
     frame.sequence = 77u;
     assert(!common_machine_copy_published_frame(machine, &frame,
         common_machine_run_generation(machine)));
-    assert(frame.valid == 1u && frame.sequence == 77u);
+    assert(frame.window.valid == 1u && frame.sequence == 77u);
     common_machine_set_state_sink(machine, note_state, &fake);
     common_machine_set_frame_sink(machine, note_frame, &fake);
     assert(common_debug_create(&debug) == LIB_STATUS_OK);
@@ -535,16 +535,17 @@ int main(void)
     assert(WaitForSingleObject(fake.frame, 5000u) == WAIT_OBJECT_0);
     assert(InterlockedCompareExchange(&fake.resets, 0, 0) == 1);
     generation = common_machine_run_generation(machine);
-    memset(frame.graphics_pixels, 0xa5, sizeof(frame.graphics_pixels));
+    memset(&frame.window, 0xa5, sizeof(frame.window));
     assert(common_machine_copy_published_frame(machine, &frame, generation));
-    assert(frame.valid == 1u && generation == common_machine_run_generation(machine));
-    assert(!frame.graphics);
-    for (lib_size i = 0u; i < sizeof(frame.graphics_pixels); ++i)
-        assert(frame.graphics_pixels[i] == 0xa5);
+    assert(frame.window.valid == 1u && generation == common_machine_run_generation(machine));
+    assert(!frame.window.graphics);
+    for (lib_size i = kvm_window_frame_size_bytes(&frame.window);
+            i < sizeof(frame.window); ++i)
+        assert(((const unsigned char *)&frame.window)[i] == 0xa5);
     {
         lib_u32 sequence = frame.sequence;
         assert(!common_machine_copy_published_frame(machine, &frame, generation + 1u));
-        assert(frame.valid == 1u && frame.sequence == sequence);
+        assert(frame.window.valid == 1u && frame.sequence == sequence);
     }
     input.type = KVM_EVENT_KEY;
     input.data.key.pressed = 1u;
@@ -641,7 +642,7 @@ int main(void)
     {
         lib_u32 sequence = frame.sequence;
         assert(!common_machine_copy_published_frame(machine, &frame, generation));
-        assert(frame.valid == 1u && frame.sequence == sequence);
+        assert(frame.window.valid == 1u && frame.sequence == sequence);
     }
     common_machine_shutdown(machine);
     common_machine_shutdown(machine);

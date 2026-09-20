@@ -11,6 +11,42 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Traditional PC glyph approximation belongs to this machine adapter, not Lib. */
+static const lib_u16 vm_driver_pc_glyphs[256] = {
+    0x0020u, 0x263au, 0x263bu, 0x2665u, 0x2666u, 0x2663u, 0x2660u, 0x2022u,
+    0x25d8u, 0x25cbu, 0x25d9u, 0x2642u, 0x2640u, 0x266au, 0x266bu, 0x263cu,
+    0x25bau, 0x25c4u, 0x2195u, 0x203cu, 0x00b6u, 0x00a7u, 0x25acu, 0x21a8u,
+    0x2191u, 0x2193u, 0x2192u, 0x2190u, 0x221fu, 0x2194u, 0x25b2u, 0x25bcu,
+    0x0020u, 0x0021u, 0x0022u, 0x0023u, 0x0024u, 0x0025u, 0x0026u, 0x0027u,
+    0x0028u, 0x0029u, 0x002au, 0x002bu, 0x002cu, 0x002du, 0x002eu, 0x002fu,
+    0x0030u, 0x0031u, 0x0032u, 0x0033u, 0x0034u, 0x0035u, 0x0036u, 0x0037u,
+    0x0038u, 0x0039u, 0x003au, 0x003bu, 0x003cu, 0x003du, 0x003eu, 0x003fu,
+    0x0040u, 0x0041u, 0x0042u, 0x0043u, 0x0044u, 0x0045u, 0x0046u, 0x0047u,
+    0x0048u, 0x0049u, 0x004au, 0x004bu, 0x004cu, 0x004du, 0x004eu, 0x004fu,
+    0x0050u, 0x0051u, 0x0052u, 0x0053u, 0x0054u, 0x0055u, 0x0056u, 0x0057u,
+    0x0058u, 0x0059u, 0x005au, 0x005bu, 0x005cu, 0x005du, 0x005eu, 0x005fu,
+    0x0060u, 0x0061u, 0x0062u, 0x0063u, 0x0064u, 0x0065u, 0x0066u, 0x0067u,
+    0x0068u, 0x0069u, 0x006au, 0x006bu, 0x006cu, 0x006du, 0x006eu, 0x006fu,
+    0x0070u, 0x0071u, 0x0072u, 0x0073u, 0x0074u, 0x0075u, 0x0076u, 0x0077u,
+    0x0078u, 0x0079u, 0x007au, 0x007bu, 0x007cu, 0x007du, 0x007eu, 0x2302u,
+    0x00c7u, 0x00fcu, 0x00e9u, 0x00e2u, 0x00e4u, 0x00e0u, 0x00e5u, 0x00e7u,
+    0x00eau, 0x00ebu, 0x00e8u, 0x00efu, 0x00eeu, 0x00ecu, 0x00c4u, 0x00c5u,
+    0x00c9u, 0x00e6u, 0x00c6u, 0x00f4u, 0x00f6u, 0x00f2u, 0x00fbu, 0x00f9u,
+    0x00ffu, 0x00d6u, 0x00dcu, 0x00a2u, 0x00a3u, 0x00a5u, 0x20a7u, 0x0192u,
+    0x00e1u, 0x00edu, 0x00f3u, 0x00fau, 0x00f1u, 0x00d1u, 0x00aau, 0x00bau,
+    0x00bfu, 0x2310u, 0x00acu, 0x00bdu, 0x00bcu, 0x00a1u, 0x00abu, 0x00bbu,
+    0x2591u, 0x2592u, 0x2593u, 0x2502u, 0x2524u, 0x2561u, 0x2562u, 0x2556u,
+    0x2555u, 0x2563u, 0x2551u, 0x2557u, 0x255du, 0x255cu, 0x255bu, 0x2510u,
+    0x2514u, 0x2534u, 0x252cu, 0x251cu, 0x2500u, 0x253cu, 0x255eu, 0x255fu,
+    0x255au, 0x2554u, 0x2569u, 0x2566u, 0x2560u, 0x2550u, 0x256cu, 0x2567u,
+    0x2568u, 0x2564u, 0x2565u, 0x2559u, 0x2558u, 0x2552u, 0x2553u, 0x256bu,
+    0x256au, 0x2518u, 0x250cu, 0x2588u, 0x2584u, 0x258cu, 0x2590u, 0x2580u,
+    0x03b1u, 0x00dfu, 0x0393u, 0x03c0u, 0x03a3u, 0x03c3u, 0x00b5u, 0x03c4u,
+    0x03a6u, 0x0398u, 0x03a9u, 0x03b4u, 0x221eu, 0x03c6u, 0x03b5u, 0x2229u,
+    0x2261u, 0x00b1u, 0x2265u, 0x2264u, 0x2320u, 0x2321u, 0x00f7u, 0x2248u,
+    0x00b0u, 0x2219u, 0x00b7u, 0x221au, 0x207fu, 0x00b2u, 0x25a0u, 0x00a0u,
+};
+
 struct vm_driver {
     softpc_machine *machine;
     softpc_debug_state debug;
@@ -78,7 +114,7 @@ void vm_destroy(vm_driver *driver)
     lib_atomic_flag_clear_explicit(&vm_owned, LIB_MEMORY_ORDER_RELEASE);
 }
 
-static void vm_driver_trace_frame(void *opaque, const kvm_frame *frame)
+static void vm_driver_trace_frame(void *opaque, const common_machine_frame *frame)
 {
     vm_driver *driver = (vm_driver *)opaque;
     static lib_u32 prior_mode = UINT32_MAX;
@@ -90,27 +126,34 @@ static void vm_driver_trace_frame(void *opaque, const kvm_frame *frame)
     static lib_u32 prior_height = UINT32_MAX;
     lib_u32 mode = 0u;
     lib_u32 screen = 0u;
+    lib_u32 columns, rows, width, height;
+    const kvm_window_frame *window;
 
     if (driver == NULL || frame == NULL || !vm_trace_enabled()) return;
+    window = &frame->window;
+    columns = window->graphics ? 0u : window->text.base.text_columns;
+    rows = window->graphics ? 0u : window->text.base.text_rows;
+    width = window->graphics ? window->image.width : 0u;
+    height = window->graphics ? window->image.height : 0u;
     (void)softpc_machine_presentation_state(driver->machine, &mode, &screen);
     if (prior_mode == mode && prior_screen == screen &&
-        prior_graphics == frame->graphics &&
-        prior_columns == frame->text_columns && prior_rows == frame->text_rows &&
-        prior_width == frame->graphics_width && prior_height == frame->graphics_height)
+        prior_graphics == window->graphics &&
+        prior_columns == columns && prior_rows == rows &&
+        prior_width == width && prior_height == height)
         return;
     vm_trace("softpc prompt frame=%lu mode=%lu state=%lu graphics=%lu text=%ux%u dib=%ux%u dirty=%ld,%ld,%ld,%ld",
         (unsigned long)frame->sequence, (unsigned long)mode,
-        (unsigned long)screen, (unsigned long)frame->graphics,
-        (unsigned)frame->text_columns, (unsigned)frame->text_rows,
-        (unsigned)frame->graphics_width, (unsigned)frame->graphics_height,
-        (long)frame->dirty_left, (long)frame->dirty_top,
-        (long)frame->dirty_right, (long)frame->dirty_bottom);
-    prior_mode = mode; prior_screen = screen; prior_graphics = frame->graphics;
-    prior_columns = frame->text_columns; prior_rows = frame->text_rows;
-    prior_width = frame->graphics_width; prior_height = frame->graphics_height;
+        (unsigned long)screen, (unsigned long)window->graphics,
+        (unsigned)columns, (unsigned)rows,
+        (unsigned)width, (unsigned)height,
+        (long)(window->graphics ? window->image.dirty_left : 0), (long)(window->graphics ? window->image.dirty_top : 0),
+        (long)(window->graphics ? window->image.dirty_right : -1), (long)(window->graphics ? window->image.dirty_bottom : -1));
+    prior_mode = mode; prior_screen = screen; prior_graphics = window->graphics;
+    prior_columns = columns; prior_rows = rows;
+    prior_width = width; prior_height = height;
 }
 
-void vm_driver_cursor_shape(kvm_frame *frame, lib_u32 percent)
+void vm_driver_cursor_shape(kvm_text_frame *frame, lib_u32 percent)
 {
     lib_u32 height = frame->font_height;
     lib_u32 lines;
@@ -252,7 +295,7 @@ static void vm_driver_deliver_input(void *opaque,
 }
 
 static lib_bool vm_driver_copy_graphics(vm_driver *driver,
-    kvm_frame *frame)
+    common_machine_frame *frame)
 {
     const void *bits;
     const void *info;
@@ -269,39 +312,39 @@ static lib_bool vm_driver_copy_graphics(vm_driver *driver,
 
     if (!softpc_machine_presentation_dib(driver->machine, &bits, &info, &width,
             &height) || bits == NULL || info == NULL ||
-        width == 0u || height == 0u || width > KVM_GRAPHICS_MAX_WIDTH ||
-        height > KVM_GRAPHICS_MAX_HEIGHT)
+        width == 0u || height == 0u || width > KVM_WINDOW_GRAPHICS_MAX_WIDTH ||
+        height > KVM_WINDOW_GRAPHICS_MAX_HEIGHT)
         return LIB_FALSE;
     if (!softpc_machine_presentation_take_dirty(driver->machine, &left, &top,
             &right, &bottom)) return LIB_FALSE;
     row_stride = (width + 3u) & ~3u;
-    if (width * height > KVM_GRAPHICS_MAX_PIXELS) return LIB_FALSE;
-    memset(frame, 0, sizeof(*frame));
+    if (width * height > KVM_WINDOW_GRAPHICS_MAX_PIXELS) return LIB_FALSE;
+    memset(&frame->window, 0, lib_offsetof(kvm_window_frame, image.pixels));
     for (row = 0u; row < height; ++row)
-        memcpy(frame->graphics_pixels + row * width,
+        memcpy(frame->window.image.pixels + row * width,
             (const lib_u8 *)bits + row * row_stride, width);
     dib = (const BITMAPINFO *)info;
-    for (palette_index = 0u; palette_index < KVM_GRAPHICS_PALETTE_ENTRIES;
+    for (palette_index = 0u; palette_index < KVM_WINDOW_GRAPHICS_PALETTE_ENTRIES;
             ++palette_index) {
         const RGBQUAD *colour = &dib->bmiColors[palette_index];
-        frame->graphics_palette[palette_index] =
+        frame->window.image.palette[palette_index] =
             ((lib_u32)colour->rgbRed << 16u) |
             ((lib_u32)colour->rgbGreen << 8u) | (lib_u32)colour->rgbBlue;
     }
-    frame->graphics_width = width;
-    frame->graphics_height = height;
-    frame->graphics_stride = width;
-    frame->dirty_left = left < 0 ? 0 : left;
-    frame->dirty_top = top < 0 ? 0 : top;
-    frame->dirty_right = right >= (lib_i32)width ? (lib_i32)width - 1 : right;
-    frame->dirty_bottom = bottom >= (lib_i32)height ? (lib_i32)height - 1 : bottom;
-    frame->graphics = 1u;
-    frame->valid = 1u;
+    frame->window.image.width = width;
+    frame->window.image.height = height;
+    frame->window.image.stride = width;
+    frame->window.image.dirty_left = left < 0 ? 0 : left;
+    frame->window.image.dirty_top = top < 0 ? 0 : top;
+    frame->window.image.dirty_right = right >= (lib_i32)width ? (lib_i32)width - 1 : right;
+    frame->window.image.dirty_bottom = bottom >= (lib_i32)height ? (lib_i32)height - 1 : bottom;
+    frame->window.graphics = 1u;
+    frame->window.valid = 1u;
     return LIB_TRUE;
 }
 
 static lib_bool vm_driver_copy_text(vm_driver *driver,
-    kvm_frame *frame)
+    common_machine_frame *frame)
 {
     const void *surface;
     lib_u32 columns;
@@ -317,9 +360,10 @@ static lib_bool vm_driver_copy_text(vm_driver *driver,
     if (!softpc_machine_presentation_text(driver->machine, &surface, &columns,
             &rows, &stride, &cell_bytes) || surface == NULL || cell_bytes == 0u ||
         stride < columns) return LIB_FALSE;
-    memset(frame, 0, sizeof(*frame));
-    memset(frame->text, ' ', sizeof(frame->text));
-    memset(frame->attributes, 0x07, sizeof(frame->attributes));
+    memset(&frame->window, 0, lib_offsetof(kvm_window_frame, text) +
+        sizeof(frame->window.text));
+    memset(frame->window.text.base.text, ' ', sizeof(frame->window.text.base.text));
+    memset(frame->window.text.base.attributes, 0x07, sizeof(frame->window.text.base.attributes));
     if (columns > KVM_TEXT_COLUMNS) columns = KVM_TEXT_COLUMNS;
     if (rows > KVM_TEXT_ROWS) rows = KVM_TEXT_ROWS;
     cells = (const lib_u8 *)surface;
@@ -328,8 +372,8 @@ static lib_bool vm_driver_copy_text(vm_driver *driver,
         for (text_column = 0u; text_column < columns; ++text_column) {
             size_t source = ((size_t)text_row * stride + text_column) * cell_bytes;
             size_t destination = (size_t)text_row * KVM_TEXT_COLUMNS + text_column;
-            frame->text[destination] = cells[source];
-            if (cell_bytes >= 2u) frame->attributes[destination] = cells[source + 1u];
+            frame->window.text.base.text[destination] = cells[source];
+            if (cell_bytes >= 2u) frame->window.text.base.attributes[destination] = cells[source + 1u];
         }
     }
     {
@@ -342,32 +386,30 @@ static lib_bool vm_driver_copy_text(vm_driver *driver,
             const BITMAPINFO *dib = (const BITMAPINFO *)info;
             lib_u32 index;
             for (index = 0u; index < 16u; ++index)
-                frame->text_palette[index] = ((lib_u32)dib->bmiColors[index].rgbRed << 16u) |
+                frame->window.text.base.text_palette[index] = ((lib_u32)dib->bmiColors[index].rgbRed << 16u) |
                     ((lib_u32)dib->bmiColors[index].rgbGreen << 8u) |
                     (lib_u32)dib->bmiColors[index].rgbBlue;
         }
     }
     (void)softpc_machine_presentation_cursor(driver->machine, &column, &row,
         &cursor_size);
-    frame->cursor_column = column;
-    frame->cursor_row = row;
-    (void)softpc_machine_presentation_fonts(driver->machine, frame->font,
-        frame->secondary_font, &frame->font_height,
-        &frame->attribute_font_select);
-    frame->text_columns = (lib_u16)columns;
-    frame->text_rows = (lib_u16)rows;
-    vm_driver_cursor_shape(frame, cursor_size);
-    frame->cursor_visible = column >= 0 && row >= 0;
-    frame->cursor_phase = 1u;
-    frame->dirty_left = 0;
-    frame->dirty_top = 0;
-    frame->dirty_right = -1;
-    frame->dirty_bottom = -1;
-    frame->valid = 1u;
+    frame->window.text.base.cursor_column = column;
+    frame->window.text.base.cursor_row = row;
+    (void)softpc_machine_presentation_fonts(driver->machine, frame->window.text.font,
+        frame->window.text.secondary_font, &frame->window.text.base.font_height,
+        &frame->window.text.base.attribute_font_select);
+    frame->window.text.base.text_columns = (lib_u16)columns;
+    frame->window.text.base.text_rows = (lib_u16)rows;
+    vm_driver_cursor_shape(&frame->window.text.base, cursor_size);
+    frame->window.text.base.cursor_visible = column >= 0 && row >= 0;
+    frame->window.text.base.cursor_phase = 1u;
+    memcpy(frame->characters.primary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
+    memcpy(frame->characters.secondary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
+    frame->window.valid = 1u;
     return LIB_TRUE;
 }
 
-static lib_bool vm_driver_copy_frame(void *opaque, kvm_frame *frame)
+static lib_bool vm_driver_copy_frame(void *opaque, common_machine_frame *frame)
 {
     vm_driver *driver = (vm_driver *)opaque;
     if (driver == NULL || frame == NULL) return LIB_FALSE;

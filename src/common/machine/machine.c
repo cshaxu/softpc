@@ -6,7 +6,7 @@
 struct common_machine {
     common_machine_driver driver;
     common_machine_input_queue input_queue;
-    kvm_frame *frame_buffers[2];
+    common_machine_frame *frame_buffers[2];
     base_sync_mutex *frame_lock;
     int published_frame_index;
     lib_u32 published_frame_sequence;
@@ -78,41 +78,45 @@ static void common_machine_invalidate_published_frame(common_machine *machine)
     base_sync_mutex_unlock(machine->frame_lock);
 }
 
-static lib_bool common_machine_text_frame_changed(const kvm_frame *previous,
-    const kvm_frame *candidate)
+static lib_bool common_machine_text_frame_changed(const common_machine_frame *previous,
+    const common_machine_frame *candidate)
 {
-    if (previous == NULL || previous->valid == 0u || previous->graphics != 0u)
+    const kvm_text_frame *old_text = &previous->window.text.base;
+    const kvm_text_frame *new_text = &candidate->window.text.base;
+    if (previous->window.valid == 0u || previous->window.graphics != 0u)
         return LIB_TRUE;
-    return previous->text_columns != candidate->text_columns ||
-        previous->text_rows != candidate->text_rows ||
-        previous->cursor_column != candidate->cursor_column ||
-        previous->cursor_row != candidate->cursor_row ||
-        previous->cursor_top != candidate->cursor_top ||
-        previous->cursor_bottom != candidate->cursor_bottom ||
-        previous->cursor_visible != candidate->cursor_visible ||
-        previous->cursor_phase != candidate->cursor_phase ||
-        previous->font_height != candidate->font_height ||
-        previous->attribute_font_select != candidate->attribute_font_select ||
-        lib_memory_compare(previous->text, candidate->text, sizeof(candidate->text)) != 0 ||
-        lib_memory_compare(previous->attributes, candidate->attributes,
-            sizeof(candidate->attributes)) != 0 ||
-        lib_memory_compare(previous->text_palette, candidate->text_palette,
-            sizeof(candidate->text_palette)) != 0 ||
-        lib_memory_compare(previous->font, candidate->font, sizeof(candidate->font)) != 0 ||
-        lib_memory_compare(previous->secondary_font, candidate->secondary_font,
-            sizeof(candidate->secondary_font)) != 0;
+    return old_text->text_columns != new_text->text_columns ||
+        old_text->text_rows != new_text->text_rows ||
+        old_text->cursor_column != new_text->cursor_column ||
+        old_text->cursor_row != new_text->cursor_row ||
+        old_text->cursor_top != new_text->cursor_top ||
+        old_text->cursor_bottom != new_text->cursor_bottom ||
+        old_text->cursor_visible != new_text->cursor_visible ||
+        old_text->cursor_phase != new_text->cursor_phase ||
+        old_text->font_height != new_text->font_height ||
+        old_text->attribute_font_select != new_text->attribute_font_select ||
+        lib_memory_compare(old_text->text, new_text->text, sizeof(new_text->text)) != 0 ||
+        lib_memory_compare(old_text->attributes, new_text->attributes,
+            sizeof(new_text->attributes)) != 0 ||
+        lib_memory_compare(old_text->text_palette, new_text->text_palette,
+            sizeof(new_text->text_palette)) != 0 ||
+        lib_memory_compare(previous->window.text.font, candidate->window.text.font, sizeof(candidate->window.text.font)) != 0 ||
+        lib_memory_compare(previous->window.text.secondary_font, candidate->window.text.secondary_font,
+            sizeof(candidate->window.text.secondary_font)) != 0 ||
+        lib_memory_compare(&previous->characters, &candidate->characters,
+            sizeof(candidate->characters)) != 0;
 }
 
 static void common_machine_publish(common_machine *machine)
 {
-    kvm_frame *frame;
+    common_machine_frame *frame;
     int staging_index;
     common_machine_frame_sink sink = NULL;
     void *sink_context = NULL;
     lib_u32 sequence = 0u;
     lib_u32 generation = 0u;
     lib_bool graphics = LIB_FALSE;
-    kvm_frame *published_frame = NULL;
+    common_machine_frame *published_frame = NULL;
 
     if (machine == NULL || machine->driver.copy_frame == NULL) return;
     base_sync_mutex_lock(machine->frame_lock);
@@ -122,7 +126,7 @@ static void common_machine_publish(common_machine *machine)
         base_sync_mutex_unlock(machine->frame_lock);
         return;
     }
-    if (frame->valid == 0u || (frame->graphics == 0u &&
+    if (frame->window.valid == 0u || (frame->window.graphics == 0u &&
         !common_machine_text_frame_changed(
             machine->frame_buffers[machine->published_frame_index], frame))) {
         base_sync_mutex_unlock(machine->frame_lock);
@@ -135,7 +139,7 @@ static void common_machine_publish(common_machine *machine)
     sink = machine->frame_sink;
     sink_context = machine->frame_context;
     sequence = frame->sequence;
-    graphics = frame->graphics != 0u;
+    graphics = frame->window.graphics != 0u;
     published_frame = frame;
     base_sync_mutex_unlock(machine->frame_lock);
     if (machine->driver.frame_published != NULL)
@@ -668,15 +672,15 @@ lib_bool common_machine_enqueue_input(common_machine *machine,
 }
 
 lib_bool common_machine_copy_published_frame(common_machine *machine,
-    kvm_frame *destination, lib_u32 run_generation)
+    common_machine_frame *destination, lib_u32 run_generation)
 {
     lib_bool copied;
     if (machine == NULL || destination == NULL) return LIB_FALSE;
     base_sync_mutex_lock(machine->frame_lock);
     copied = machine->published_frame_run_generation == run_generation &&
-        machine->frame_buffers[machine->published_frame_index]->valid != 0u;
+        machine->frame_buffers[machine->published_frame_index]->window.valid != 0u;
     if (copied)
-        copied = kvm_frame_copy(destination,
+        copied = common_machine_frame_copy(destination,
             machine->frame_buffers[machine->published_frame_index]);
     base_sync_mutex_unlock(machine->frame_lock);
     return copied;

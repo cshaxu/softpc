@@ -187,6 +187,158 @@ Whole T closure requires a separate original-request audit and owner decision.
 Opaque control ownership is implemented and reviewed at c1782fcc; see
 [S3 accounting, evidence and closure](../history/M9-T71-S3-control-transport.md).
 
+## S4 Preflight: Concrete Layout And Migration
+
+Baseline b30cc0da (production c1782fcc). The existing frame-related C/H inventory
+is 30 production paths and 25 test/support paths using kvm_frame or logical
+Console text frames; mailbox initialization adds the direct component fixtures.
+Not every logical Console binding caller needs an edit: its sink shape stays
+the same while the owned character element becomes u16. Each unchanged caller
+must still compile and be reviewed. No snapshot codec contains kvm_frame: the
+codec owns device state, not presenter buffers; transaction tests still migrate
+their runtime assertions and must pass. MVDM/Compat stay untouched.
+
+Freeze the following layout before implementation:
+
+- Base frame_interface.h defines kvm_text_frame: current fixed-stride parallel
+  cell arrays, text dimensions/palette, cursor and font-selection metadata only.
+  It has no graphics limit, pixels, bitmap, mapping, sequence or whole-frame union.
+- Window frame_interface.h defines kvm_window_text_frame (base + both bitmaps),
+  kvm_window_graphics_frame (dimensions/stride/dirty/palette/pixels), and a tagged
+  kvm_window_frame (valid/graphics + text/image union). Preserve current fields
+  and algorithms inside their new owner, including default font-height behavior.
+- Console frame_interface.h defines kvm_console_character_map (two 256-entry
+  u16 banks), kvm_console_text_frame (base + character maps). No graphic tag or
+  bitmap storage. Typed publish accepts only that text value.
+- Common machine frame_interface.h composes sequence + Window frame + Console
+  maps. The maps are meaningful/copied/compared only for text. This costs 1 KiB
+  of inactive reserved storage on a graphics value, but avoids duplicating the
+  common text arrays or constructing a second graphics frame for Window output.
+  It is the sole upstream copied value, not a second publication path.
+- Common UI accepts the Window value, Console maps and upstream sequence as
+  typed arguments; session passes the machine output fields. UI does not import
+  machine or vice versa. Machine's type dependency on the leaf frame contracts
+  is explicit in its DAG; it does not create a Window/Console or call leaf workers.
+  UI constructs one small Console text value for either content or status.
+- Logical Console text[] becomes explicit u16 output characters. Broker copies
+  them without interpreting an encoding and widens its successful-output cache.
+  Existing CP437 constant moves unchanged to VM's one producer; remove Lib query.
+  UI status uses its own ASCII/blank map, not the VM table or a new table registry.
+
+The frame mailbox stores a pointer to leaf-embedded typed pending storage,
+capacity, active byte length, generation and pending flag. Initialize the storage
+once before exposure, retain it through join, and allocate no per-frame object.
+Publish checks byte capacity then, under the existing lock, either copies bytes
+or invokes Window's single private update operation. That operation performs the
+existing dirty union and copied-frame update without callbacks, allocation or
+reentry. Capture copies only active bytes to caller-owned storage after checking
+its capacity; generation is returned separately, never written into opaque bytes.
+Only matching successful acknowledgement clears pending. STOP/control are unchanged.
+Move the generic component publication declaration to leaf-support worker header;
+applications continue to use typed leaf publication. No compatibility aliases.
+
+Measured prototype sizeof is identical on x86/x64 (bounded build/t71-s4 probe):
+
+| Value/copy | Old bytes | Planned bytes |
+| --- | ---: | ---: |
+| Complete frame / Window value | 998384 | 984100 |
+| Upstream Common value | 998384 | 985128 |
+| Console pending/captured value | 998384 | 7112 |
+| Common text base | embedded | 6088 |
+| Window text copied payload including tag | 15344 | 14288 |
+| Console text copied payload | 15344 | 7112 |
+| Graphics copied prefix before active pixels | 15344 | 1060 |
+
+Existing live storage remains two machine buffers, one session value, one pending
+and one captured value per active leaf, plus UI's temporary status/content value.
+No additional maximum-pixel buffer. With both leaves, those seven main frame
+values shrink by 2050880 bytes before small mailbox metadata/alignment changes;
+UI temporary shrinks by 991272 bytes. These are layout-prototype measurements,
+not a claim about final whole-process footprint; verify compiled production types
+and aggregate storage again after migration.
+
+The earlier 420--700 production / 150--250 test changed-line range underestimated
+field/type and initialization migrations across upstream callers. Revised working
+estimate: production +650/-550 (net +100; roughly 900--1500 changed), tests
++650/-500 (net +150; roughly 850--1450 changed), excluding docs/manifests/build
+registration. Most is relocation or mechanical field access, not added behavior.
+Actual accounting must separate that movement from new mailbox metadata and proofs.
+Keep a single coherent implementation P after full verification, not intermediate
+public aliases or a partial-build commit. S5 retains the explicit failure/capacity
+matrix and producer clipping cleanup; do not silently fold capacity expansion in.
+
+### S4 Implementation And Delivery
+
+Production producers/consumers now use the split frame contracts; the first
+x64 product build succeeds. Common machine compares both supplied character
+banks as well as text/font content. UI constructs the small Console value and
+does not copy Window graphics into it. VM owns the unchanged PC glyph table;
+its diagnostic reads only the active Window union arm. No Compat/MVDM, media,
+snapshot serialization or user configuration change was needed.
+
+The migrated focused common-machine, product VGA-frame, snapshot-transaction,
+runtime and runtime-cursor smokes pass. Both package binaries now contain S4;
+no partial implementation commit or whole-T closure is claimed.
+
+Shared test migration now compiles on both widths. The first x64 full run
+passed 110/110 (109.97 seconds). An earlier library-only run passed 41/42:
+the Console display fixture still filled the now-u16 cells with byte memset.
+Its two fills were converted to per-cell assignment; rebuilt Console display
+and I/O tests pass. Other intermediate build failures were unmigrated test
+signatures/fields, not runtime failures. Old CP-display mapping assertions moved
+to the VM frame producer test rather than being deleted with the Lib API.
+
+New focused proof covers resource-only changes to both map/font banks, actual
+Console bank selection and Unicode output, Window font selection, opaque
+mailbox capacity/short destination rejection, dirty merging through Window's
+real publication entry, and independent lock/STOP behavior. All pass on x64.
+Final review also narrowed VM initialization to the active Window payload;
+the text producer test checks the inactive tail remains untouched.
+
+Final Release builds succeeded for both widths. With source/tests/manifests
+held unchanged during each run, full serial x64 passed 110/110 (71.78 seconds)
+and x86 passed 110/110 (97.91 seconds). These include package interaction,
+restart, snapshot transaction/cross-process and all four corpus manifests.
+One intervening x64 run passed 109/110: its test-manifest check overlapped an
+edit to the negative-gate fixture and its manifest. The complete reruns above
+replace that contaminated verification; no product workaround was introduced.
+Native Linux presentation and fresh manual Win3.1/Win95 interaction are not
+claimed. Existing unsupported platform workers retain their explicit status.
+
+Compiled actual types match the preflight sizes on x86 and x64. Mailbox sizes
+are 4408/4440; Window objects 989864/989936; Console objects 12760/12840 bytes.
+These are type sizes, not a process-memory claim. Final production C/H is
++469/-345 (net +124), tests +406/-312 (net +94), including new headers and
+excluding manifests, documentation and build files. Counts use
+git diff --numstat b30cc0da plus the three newly added headers: 31 production
+and 28 test C/H paths. Build/dependency/test gates add 9 and remove 3 (net +6,
+four files); manifests add 65 and remove 62 (net +3, four files). Documentation
+is counted separately in the review record. Unrelated Queue/cell-attribute
+proposal edits are excluded. No INI, media, Compat or MVDM edits occur.
+
+The 256 moved CP437 values compare identical, in order, to the original Lib
+table. Searches for the old kvm_frame and lib_console_pc_glyph in src/test C/H
+return no hits. Mailbox code has no text/font/map/graphics interpretation.
+Window alone merges dirty bounds; Console uses one complete small text value.
+Common machine may include leaf frame-value headers, not leaf instance APIs;
+the dependency gate and two negative fixtures enforce that distinction.
+Unchanged logical output bindings forward the same typed object pointer, and
+the Linux backend remains unsupported; neither needs a duplicate conversion.
+All active union reads, byte lengths, capture/acknowledge and producer paths
+were reviewed. Snapshot codecs serialize device state, not these frame values.
+The existing seven main frame values shrink by 2050880 bytes before metadata;
+UI's temporary shrinks by 991272 bytes, without another allocation or worker.
+
+Package sizes: x86 3654118 bytes (was 3652604, +1514); x64 3058686 bytes
+(was 3057163, +1523). SHA-256:
+
+- x86: 66BAA0C96DEC3E8DF57D08289AC33232FAE901FF181C77E28CB096DE376B9921
+- x64: 58A5E4B67FB74D3F7092E09E8CD68E0CE3BB4129EB9D87F61C226F9E0F1DBDF5
+
+S4 executor verification is complete; coordinator review follows its P1 push.
+S5 retains fixed-capacity validation and producer error/no-frame distinction;
+S6 retains final integration/simplification review and owner T acceptance.
+
 ## Finite Convergence Ledger
 
 Freeze the exact path list at each preflight using references to kvm_frame,
