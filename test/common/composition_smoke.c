@@ -92,7 +92,8 @@ lib_status console_broker_cancel_cooked_line(console_broker *broker,
 static int receive(void *context, const common_ui_event *event)
 {
     (void)context;
-    assert(event->run_generation == 11u || event->run_generation == 12u);
+    assert(event->run_generation == 11u || event->run_generation == 12u ||
+        event->run_generation == LIB_UINT32_MAX);
     received_run = event->run_generation;
     ++received;
     return 1;
@@ -264,6 +265,9 @@ int main(void)
     common_ui_set_run_generation(ui, 12u);
     input_worker(&window_fake.options.component, NULL);
     assert(received_run == 12u);
+    common_ui_set_run_generation(ui, LIB_UINT32_MAX);
+    input_worker(&window_fake.options.component, NULL);
+    assert(received_run == LIB_UINT32_MAX);
     {
         kvm_input_event input = { 0 };
         lib_u32 prior = received;

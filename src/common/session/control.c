@@ -1,7 +1,5 @@
 #include "common/session/control.h"
 
-#include <limits.h>
-
 #define COMMON_SESSION_EVENT_QUEUE_INITIAL_CAPACITY 64u
 
 static int common_session_queue_push(common_session_queue *queue,
@@ -44,7 +42,7 @@ static int common_session_queue_push(common_session_queue *queue,
     if (queue->count == queue->capacity) {
         unsigned int next_capacity = queue->capacity * 2u;
         if (next_capacity <= queue->capacity ||
-            next_capacity > UINT_MAX / sizeof(*expanded)) {
+            next_capacity > LIB_UINT_MAX / sizeof(*expanded)) {
             base_sync_mutex_unlock(queue->lock);
             return 0;
         }

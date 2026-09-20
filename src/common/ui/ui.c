@@ -16,7 +16,7 @@ struct common_ui {
     kvm_window *window;
     kvm_console *console;
     common_ui_options options;
-    lib_atomic_i32 run_generation;
+    lib_atomic_u32 run_generation;
     lib_atomic_i32 window_live;
     lib_u32 window_delivered_frame_sequence;
     lib_u32 console_delivered_frame_sequence;
@@ -37,7 +37,7 @@ static void common_ui_delivery_failed(void *opaque, lib_u64 source_identity,
     common_ui *ui = (common_ui *)opaque;
     common_ui_event event = { 0 };
     event.kind = COMMON_UI_EVENT_KVM_DELIVERY_FAILED;
-    event.run_generation = ui == NULL ? 0u : (lib_u32)lib_atomic_i32_load_explicit(
+    event.run_generation = ui == NULL ? 0u : lib_atomic_u32_load_explicit(
         &ui->run_generation, LIB_MEMORY_ORDER_SEQ_CST);
     event.value.delivery_failure.source_identity = source_identity;
     event.value.delivery_failure.status = status;
@@ -56,7 +56,7 @@ static int common_ui_input(void *opaque, const kvm_input_event *input)
         lib_atomic_i32_load_explicit(&ui->window_live,
             LIB_MEMORY_ORDER_SEQ_CST) != 0) return 1;
     event.kind = COMMON_UI_EVENT_KVM_INPUT;
-    event.run_generation = (lib_u32)lib_atomic_i32_load_explicit(
+    event.run_generation = lib_atomic_u32_load_explicit(
         &ui->run_generation, LIB_MEMORY_ORDER_SEQ_CST);
     event.value.kvm = *input;
     return common_ui_emit(ui, &event);
@@ -85,7 +85,7 @@ static lib_status common_ui_emit_component(common_ui *ui,
 {
     common_ui_event event = { 0 };
     event.kind = COMMON_UI_EVENT_COMPONENT_COMPLETED;
-    event.run_generation = (lib_u32)lib_atomic_i32_load_explicit(
+    event.run_generation = lib_atomic_u32_load_explicit(
         &ui->run_generation, LIB_MEMORY_ORDER_SEQ_CST);
     event.value.component.component = component;
     event.value.component.exists = exists;
@@ -96,7 +96,7 @@ static lib_status common_ui_emit_broker(common_ui *ui, lib_bool vm_current)
 {
     common_ui_event event = { 0 };
     event.kind = COMMON_UI_EVENT_BROKER_COMPLETED;
-    event.run_generation = (lib_u32)lib_atomic_i32_load_explicit(
+    event.run_generation = lib_atomic_u32_load_explicit(
         &ui->run_generation, LIB_MEMORY_ORDER_SEQ_CST);
     event.value.broker_vm_console_current = vm_current;
     return common_ui_emit(ui, &event) ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
@@ -159,7 +159,7 @@ lib_status common_ui_create(common_ui **out_ui, const common_ui_options *options
         return LIB_STATUS_INVALID_ARGUMENT;
     ui = lib_allocate_zero(1u, sizeof(*ui));
     if (ui == NULL) return LIB_STATUS_NO_MEMORY;
-    lib_atomic_i32_initialize(&ui->run_generation, 0);
+    lib_atomic_u32_initialize(&ui->run_generation, 0u);
     lib_atomic_i32_initialize(&ui->window_live, 0);
     ui->window_input.ui = ui;
     ui->console_input.ui = ui;
@@ -215,8 +215,8 @@ lib_status common_ui_destroy(common_ui *ui)
 
 void common_ui_set_run_generation(common_ui *ui, lib_u32 run_generation)
 {
-    if (ui != NULL) lib_atomic_i32_store_explicit(&ui->run_generation,
-        (lib_i32)run_generation, LIB_MEMORY_ORDER_SEQ_CST);
+    if (ui != NULL) lib_atomic_u32_store_explicit(&ui->run_generation,
+        run_generation, LIB_MEMORY_ORDER_SEQ_CST);
 }
 
 lib_status common_ui_apply_action(common_ui *ui, common_ui_action action,

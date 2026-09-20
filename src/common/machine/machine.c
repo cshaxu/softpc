@@ -27,7 +27,7 @@ struct common_machine {
     lib_atomic_i32 debug_cancel_requested;
     base_sync_task *worker;
     lib_atomic_i32 state;
-    lib_atomic_i32 run_generation;
+    lib_atomic_u32 run_generation;
     lib_atomic_i32 debug_generation;
     lib_atomic_i32 pause_requested;
     lib_atomic_i32 stop_requested;
@@ -394,7 +394,8 @@ static void common_machine_begin_cold_run(common_machine *machine,
     lib_atomic_i32_exchange_explicit(&machine->pause_requested, pause_after_start != 0, LIB_MEMORY_ORDER_SEQ_CST);
     lib_atomic_i32_exchange_explicit(&machine->stop_requested, 0, LIB_MEMORY_ORDER_SEQ_CST);
     lib_atomic_i32_exchange_explicit(&machine->state, COMMON_MACHINE_STARTING, LIB_MEMORY_ORDER_SEQ_CST);
-    (void)lib_atomic_i32_fetch_add_explicit(&machine->run_generation, 1, LIB_MEMORY_ORDER_SEQ_CST);
+    (void)lib_atomic_u32_fetch_add_explicit(&machine->run_generation, 1u,
+        LIB_MEMORY_ORDER_SEQ_CST);
     lib_atomic_i32_exchange_explicit(&machine->start_requested, 1, LIB_MEMORY_ORDER_SEQ_CST);
 }
 
@@ -428,7 +429,7 @@ static void common_machine_service_state_write(common_machine *machine)
             LIB_MEMORY_ORDER_SEQ_CST);
         lib_atomic_i32_exchange_explicit(&machine->state,
             COMMON_MACHINE_STARTING, LIB_MEMORY_ORDER_SEQ_CST);
-        (void)lib_atomic_i32_fetch_add_explicit(&machine->run_generation, 1,
+        (void)lib_atomic_u32_fetch_add_explicit(&machine->run_generation, 1u,
             LIB_MEMORY_ORDER_SEQ_CST);
         lib_atomic_i32_exchange_explicit(&machine->restored_start_requested, 1,
             LIB_MEMORY_ORDER_SEQ_CST);
@@ -541,7 +542,7 @@ lib_status common_machine_create(common_machine **out_machine,
     lib_atomic_i32_initialize(&machine->debug_requested, 0);
     lib_atomic_i32_initialize(&machine->debug_cancel_requested, 0);
     lib_atomic_i32_initialize(&machine->state, COMMON_MACHINE_STOPPED);
-    lib_atomic_i32_initialize(&machine->run_generation, 0);
+    lib_atomic_u32_initialize(&machine->run_generation, 0u);
     lib_atomic_i32_initialize(&machine->debug_generation, 1);
     lib_atomic_i32_initialize(&machine->pause_requested, 0);
     lib_atomic_i32_initialize(&machine->stop_requested, 0);
@@ -771,7 +772,8 @@ lib_u32 common_machine_published_frame_run_generation(const common_machine *mach
 
 lib_u32 common_machine_run_generation(const common_machine *machine)
 {
-    return machine == NULL ? 0u : (lib_u32)lib_atomic_i32_load_explicit(&machine->run_generation, LIB_MEMORY_ORDER_SEQ_CST);
+    return machine == NULL ? 0u : lib_atomic_u32_load_explicit(
+        &machine->run_generation, LIB_MEMORY_ORDER_SEQ_CST);
 }
 
 lib_status common_machine_debug_acquire(common_machine *machine,
