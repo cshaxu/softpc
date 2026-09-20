@@ -3,30 +3,30 @@
 ## Current Work
 
 T74 S1 and T74 are closed and pushed in bffbf413 after owner testing passed.
-T75 S1 finalizes the supplied report and baseline. Owner admits S1--S4 serial
-delivery, building/testing/committing/pushing each, then waits for final manual
-acceptance. Production repairs remain in their later designated S packets.
+T75 S1 is closed after pushed delivery 47de48b1 and actual-change review.
+T75 S2 is active: repair outer executor cancellation using existing Base wait.
+S3/S4 are serially authorized; T75 stays open for final owner acceptance.
 
-## M9 T75 S1 Packet
+## M9 T75 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
+| Identifier Mode | Continuation |
 | Admission And Approval | Owner supplied report, corrected layout, required six C11 packages and admitted all four S deliveries without intermediate manual gates. |
-| Objective | Receive the report, verify its items against source and document evidence-backed dispositions and minimal recommendations. |
-| Non-goals | No production/test edits, ABI redesign, automatic repair, external import, media/config changes or unsolicited desktop tests. |
-| Reference Baseline | 188d2bfd; owner-accepted production 8b76baf5. |
+| Objective | Repair terminal wake ownership with a deterministic old-fails/new-passes test and existing cancellable outer wait. |
+| Non-goals | No Lib API/state/thread additions, polling, timeouts as recovery, Core or user-media/config edits. |
+| Reference Baseline | 47de48b1; S1 passing dual-width baseline. |
 | Candidate Proposal | [Lib/Common code quality audit](../proposals/m9-lib-common-quality-audit.md). |
-| Files And ABI Surface | Read-only src/lib, src/common and relevant test/lib, test/common; callers only for evidence. ABI unchanged. |
+| Files And ABI Surface | src/common/machine/machine.c, test/common/machine_wait_smoke.c, test/x86/debug_machine_smoke.c and affected manifests; ABI unchanged. |
 | Applicable Rules | Execution and Document now; Architecture/Coding and their referenced skills before source audit. |
-| Verification | Frozen report ledger; dual-width Release builds/background regression; documentation gate and diff check. |
-| Expected Markers | Every supplied item has a disposition, evidence and bounded recommendation; no unsupported whole-tree cleanliness claim. |
+| Verification | Deterministic lost-command schedule before/after; repeated native Machine/x86 tests; both Release builds and full background presets; manifests/DAG and documentation gate. |
+| Expected Markers | Cancellation exits despite consumed command wake; faults remain errors; pending requests complete once; callback targets survive join. |
 | Asset Needs | Refresh both EXEs only; preserve INI, media and snapshots. |
-| Reporting Requirements | Findings and uncertainty, component ownership, proposed scope, added/removed/net estimates and verification plan before any repair admission. |
-| Stop Conditions | No S1 production/test edits or desktop tests; stop on material scope expansion. |
-| Exit Criteria | Evidence-backed report and baseline gates, pushed delivery and actual-change review; continue to approved S2. |
+| Reporting Requirements | Estimate production +5/-3, test +45/-3 (net +44 total), three C files plus manifests/docs; record actual counts and dual EXEs at delivery. |
+| Stop Conditions | No new cancellation framework or unapproved semantic/ABI expansion; no desktop interaction. |
+| Exit Criteria | Focused old-fails/new-passes proof, full background regression, pushed complete P, actual-change review and closure; then S3. |
 | Original Owner Request | Close T74 after successful tests; admit a new T to audit Lib/Common quality; owner will paste an existing audit report after closure. |
-| Similar-Issue Sweep | After report intake, trace each confirmed defect class through relevant Lib/Common producers, consumers and tests; record every hit and disposition. |
+| Similar-Issue Sweep | All Common event/wait_any sites: worker waits versus synchronous caller completion versus Session queue wait; classify each owner and cancellation need. |
 
 ## Current Technical Baseline
 
@@ -63,7 +63,7 @@ acceptance. Production repairs remain in their later designated S packets.
   against its own surface; native relative/absolute mouse records remain.
 - Common Session/UI, Compat, MVDM, snapshot format, user INI and media were not
   changed by T73. The existing debug-close/paused-destroy wake race is recorded
-  in Queue; T73 closure does not certify all runtime interleavings.
+  by T75 S2; T73 closure does not certify all runtime interleavings.
 - TODO remains empty under the owner's tracking policy, not proof of universal
   correctness. Queue candidates are unadmitted.
 

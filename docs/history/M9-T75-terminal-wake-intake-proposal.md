@@ -1,6 +1,9 @@
 # Common Machine terminal wake ownership
 
-## Candidate, not admitted
+## Absorbed By T75 S2
+
+Owner admitted this repair through the [T75 plan](../proposals/m9-lib-common-quality-audit.md).
+The evidence below is historical intake, not a second active task or queue item.
 
 Found while separating T73 S5 tests. No production change is authorized by the
 test-corpus packet. This candidate owns investigation and a minimal fix for
