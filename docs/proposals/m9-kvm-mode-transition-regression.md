@@ -233,7 +233,7 @@ Owner: "准入，开始。每个S任务完成都要提交推送保持工作区�
 - S10 will compare the complete admitted behavior with pre-T71, remove obsolete
   repairs and audit actual component/mirror diffs and real dual-width workflows.
 
-S7/S8 are now owner-accepted and S9 is active. Every delivery builds both EXEs, runs focused/full evidence,
+S7/S8/S9 are now owner-accepted and closed; S10 is inactive. Every delivery builds both EXEs, runs focused/full evidence,
 reports additions/deletions/net, commits/pushes and waits for owner testing.
 Do not automatically activate the next S after pushing.
 
@@ -616,3 +616,12 @@ sources/artifacts are unchanged. P3 total including records/manifests/docs is
 +72/-12 across nine files; configuration-only count remains +8/-3. HEAD matched
 origin/main with a clean worktree after delivery. Follow-up is accepted; S9
 product acceptance still awaits the owner and T71/S10 state is unchanged.
+
+### S9 Owner Closure
+
+Owner: "收口当前S9". P1--P4 delivery and reviews are complete; S9 closes.
+The [closure record](../history/M9-T71-S9-latest-frame-delivery.md) maps the
+approved requests to actual changes, verification and retained limits. This is
+documentation-only closure; no new build or desktop test was run. T71 remains
+open, and S10 has not been activated. Historical pending statements above record
+their earlier delivery stage, not the current status.

@@ -2,38 +2,14 @@
 
 ## Current Work
 
-Owner accepted T71 S8: "测试通过。下一个S". S8 is closed. S9 implements
-the revised complete-frame/latest-wins design and Window-local surface
-comparison; dual-width full suites pass. P1 838b076c is committed/pushed and
-coordinator-reviewed; S9 awaits owner testing. T71 remains open; S10 semantic
-audit remains inactive.
+No implementation subtask is active.
+Open task awaiting owner: T71.
 
-Owner additionally requires immediate background-test configuration ("不是，我要你
-现在就配置清楚，不是等到以后"). S9 verification follow-up separates real-desktop
-tests from default presets; x64 and x86 background suites each pass 105/105.
-Five desktop tests remain explicit-only; no product/binary change or S10 admission.
-Configuration delivery b5cc140a is pushed and coordinator-reviewed.
-
-## M9 T71 S9 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner accepted S8 and replaced the S9 FIFO plan with complete-frame/latest-wins transport and Window-local comparison. Each S builds/tests, commits/pushes and leaves a clean worktree, then waits for owner testing. Owner now requires default background-test configuration immediately, as a verification follow-up. |
-| Objective | Publish complete snapshots on machine display change; keep Base opaque/latest-wins; Window derives damage by comparing its RGB surface with the latest complete frame. |
-| Non-goals | No FIFO, new queue/thread/cache, input, snapshot format, display capacity, Compat/MVDM or media change; no second VM-to-presenter route. |
-| Reference Baseline | 65ad144a; owner accepted S8 dual-width packages. |
-| Candidate Proposal | [Regression brief](../proposals/m9-kvm-mode-transition-regression.md). |
-| Files And ABI Surface | Base mailbox/component support, Window render/frame and Console call site; VM removes transported dirty coordinates; Common complete-frame contract and tests. Input ABI unchanged; graphics frame no longer carries producer dirty. |
-| Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and shared governance skills. |
-| Verification | Frame implementation: delayed A/B, actual pixels, palette/stride/mode, invalidation, STOP/failure, save/load and dual-width full suites. Configuration follow-up: dry-run background/desktop partitions, both default background suites, manifests/documentation; no desktop rerun without a reserved test period. |
-| Expected Markers | Latest full frame repairs all differences from surface even after skipped frames; Base has no merge callback; no new queue wait. |
-| Asset Needs | Existing overlay-only fixtures; owned build/t71-s9/render-bench.c and two EXEs, 30-second runs and exact-file cleanup after results; no media or trace. Preserve owner INI verbatim. |
-| Reporting Requirements | Report source sweep and estimate before edits; afterward actual production/test additions/deletions/net, render performance and storage footprint plus both EXEs. |
-| Stop Conditions | Need for new frame cache/thread, product-specific workaround or a change to readiness, input or snapshot semantics. |
-| Exit Criteria | Focused fault matrix and full dual-width suites pass; reviewed P pushed, clean worktree, both binaries supplied; wait for owner testing. |
-| Original Owner Request | 我觉得可以用这个方案重构，准入修复S9，现在开始。Revised scheme: complete frames on machine dirty; Base opaque latest-wins; Window compares latest frame with its own rendered surface. |
-| Similar-Issue Sweep | Every frame publication/notification/capture/ack path from Machine through Session/UI to both leaves; closure, inactive Console, notification failure and run replacement. |
+Owner requested "收口当前S9". S9 is accepted and closed; see its
+[closure review](../history/M9-T71-S9-latest-frame-delivery.md).
+S10 remains inactive; its semantic/stride and modal-test audit is retained in
+the [regression brief](../proposals/m9-kvm-mode-transition-regression.md).
+Default tests remain background-only; desktop tests require explicit execution.
 
 ## Current Technical Baseline
 
@@ -42,7 +18,9 @@ Configuration delivery b5cc140a is pushed and coordinator-reviewed.
   snapshot-format change. Production +41/-89 (net -48); tests +174/-44 (net +130).
   Final x64 110/110 (173.66s), x86 110/110 (163.13s); both EXEs rebuilt.
   Compat/MVDM, INI and media unchanged. Exact hashes and bounded performance
-  measurements are in the active proposal. Owner acceptance remains pending.
+  measurements are in the regression brief. Owner approved S9 closure.
+  Background-test follow-up: both widths 105/105, five desktop tests explicit-only;
+  configuration +8/-3 (net +5), no additional product code or binary change.
 
 - S8: synchronous request admission and terminal completion share a short
   Machine-owned lock; pending ordinary pause cannot prematurely complete save.
@@ -57,7 +35,7 @@ Configuration delivery b5cc140a is pushed and coordinator-reviewed.
   (net +115). Final x64 110/110 (124.22s), x86 110/110 (142.06s), including
   both Win3.1 PIF initial modes and six roundtrips each. Both packages rebuilt
   with unchanged byte sizes. No Lib/Common/MVDM/INI/media change in this repair.
-  Owner accepted S7/S8; S9 is active and S10 remains inactive.
+  Owner accepted S7/S8/S9; S10 remains inactive.
 
 - S7: selected-renderer text dimensions replace live-register sampling;
   ERROR reaches App unchanged and rejects machine commands without exiting.
@@ -120,7 +98,7 @@ Configuration delivery b5cc140a is pushed and coordinator-reviewed.
 
 ## Recent Governance
 
-T70 is closed; T71 S8 is owner-accepted and S9 is active.
+T70 is closed; T71 S9 is owner-accepted and closed. T71 remains open.
 
 - **M9 Td S17:** Owner requested a concrete KVM text/frame correction proposal
   at queue head. Recorded capability rejection, explicit character/glyph
