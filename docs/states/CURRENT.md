@@ -2,34 +2,25 @@
 
 ## Current Work
 
-T74 S1 and T74 are closed and pushed in bffbf413 after owner testing passed.
-T75 S1--S3 are closed after delivery/review; S3 executor is e078dcc6.
-T75 S4 is active: independent exact-copy four/six-package acceptance.
-After S4 stop for owner testing; T75 remains open.
-
-## M9 T75 S4 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner supplied report, corrected layout, required six C11 packages and admitted all four S deliveries without intermediate manual gates. |
-| Objective | Prove exact-copy four-package neutral and six-package x86 builds/tests independently of product sources. |
-| Non-goals | No new runtime/source changes, flexible layout framework, NNES import, desktop interaction, or user-data edits. |
-| Reference Baseline | e078dcc6; S3 verified strict C11 dual-width packages. |
-| Candidate Proposal | [Lib/Common code quality audit](../proposals/m9-lib-common-quality-audit.md). |
-| Files And ABI Surface | Task records only; exact copies of six shared directories in owned ignored build/t75-s4-* directories. ABI unchanged. |
-| Applicable Rules | Architecture/Coding/Execution/Document and referenced skills; owner explicitly overrides C17 for the six shared packages only. |
-| Verification | Both widths, four/six-directory source hashes and independent CMake builds, standalone background tests, actual flags/source paths, manifests/DAG; final product Release/background suites. |
-| Expected Markers | Neutral copy lacks x86; all copied targets use C11; source inputs resolve inside each copy; all required builds/tests pass. |
-| Asset Needs | Refresh both EXEs only. Disposable isolated corpora/build logs under build/t75-s4-*; no guest media; clean after recording evidence. |
-| Reporting Requirements | Estimate production/test/build +0/-0, net 0; record isolated matrix counts, final full regression, hashes and dual EXE links. |
-| Stop Conditions | Stop on actual portability gap needing out-of-scope semantics; no external project writes or hidden desktop tests. |
-| Exit Criteria | Independent four/six-package and product evidence, pushed P/review/closure, clean workspace; stop and await owner acceptance of T75. |
-| Original Owner Request | Close T74 after successful tests; admit a new T to audit Lib/Common quality; owner will paste an existing audit report after closure. |
-| Similar-Issue Sweep | Six manifests and compiled source roots: no App/Core/external repository paths, no inherited C17/extension flags; all three standalone source entry points also build. |
+No implementation subtask is active.
+Open task awaiting owner: T75.
+T75 S1--S4 are closed after delivery and actual-change review; S4 executor
+is c950a1c8. Stop for owner acceptance of the dual EXEs, not automatic T closure.
+[Proposal and coverage](../proposals/m9-lib-common-quality-audit.md);
+[S4 review](../history/M9-T75-S4-independent-reuse.md).
 
 ## Current Technical Baseline
 
+- T75 uses the existing task cancellation object for the outer Machine wait;
+  deterministic lost-command-wake coverage and repeated native shutdown pass.
+  All six shared packages select strict C11 in standalone and embedded builds.
+  Public API, App/Core, INI and media remain unchanged. Endpoint source/test/build
+  +126/-79 (net +47), of which production C/H is +34/-33 (net +1).
+- T75 S4 verifies sixteen independent four/six-package builds on both widths;
+  each width passes isolated Lib 41/41, Common 18/18, and optional x86 9/9.
+  All 180/204 copied files remain identical. Final product background x64
+  110/110 (127.19s), x86 110/110 (182.23s); both Release EXEs rebuilt and match
+  S3 hashes. Desktop cases excluded; no Linux runtime or NNES integration claim.
 - T74 S1 moves 556 files into src/core/{machine,compat,softpc.new}.
   498 mirror blobs are identical; 107 product/test C/H/RC files pass path-only
   comparison. Runtime symbols and behavior remain unchanged. Both Release
@@ -62,8 +53,8 @@ After S4 stop for owner testing; T75 remains open.
   opaque control FIFO and latest-wins frames. Window compares decoded pixels
   against its own surface; native relative/absolute mouse records remain.
 - Common Session/UI, Compat, MVDM, snapshot format, user INI and media were not
-  changed by T73. The existing debug-close/paused-destroy wake race is recorded
-  by T75 S2; T73 closure does not certify all runtime interleavings.
+  changed by T73. T75 S2 subsequently repairs the debug-close/paused-destroy
+  wake race; its bounded schedule proof does not certify all interleavings.
 - TODO remains empty under the owner's tracking policy, not proof of universal
   correctness. Queue candidates are unadmitted.
 
