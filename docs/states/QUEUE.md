@@ -9,8 +9,8 @@ allocates a numeric task identifier.
 4. [Common Machine terminal wake ownership](../proposals/m9-common-machine-shutdown-wake.md)
 
 T74 is closed: [completion audit](../history/M9-T74-completion-audit.md).
-[T75 Lib/Common quality audit](../proposals/m9-lib-common-quality-audit.md) is
-separately admitted and awaiting the owner's report; these four candidates
-retain their order and remain unadmitted.
+[T75 Lib/Common quality audit](../proposals/m9-lib-common-quality-audit.md) has
+received the report. Its S2 will absorb the fourth candidate on activation;
+the first three remain unadmitted and retain their order.
 The first three candidates retain their order. T73 S5 discovered the fourth
 candidate while splitting tests; it is recorded for approval, not admitted.
