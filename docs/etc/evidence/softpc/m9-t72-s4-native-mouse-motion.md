@@ -61,3 +61,15 @@ local sensitivity as well as RDP direction/stability. Absolute input has finite
 device coordinates; unlimited absolute-device movement is not claimed. Raw mouse
 registration is exclusive during capture; external registrants must coordinate.
 S4 and T72 remain open pending owner testing after delivery.
+
+## Post-Push Actual-Change Review
+
+Reviewed delivered aba5022c against 7e080236 after switching from executor to
+coordinator. All 17 changed paths belong to the admitted source/test/docs/package
+set. Recomputed C/H counts match +148/-44 and +142/-34. Reviewed native ownership,
+packet bounds, scale extraction, release/failure calls, button ordering and
+DefWindowProc cleanup against the finite ledger; no parallel motion sender or
+recenter remains. Public signatures are unchanged. Protected component and INI
+diffs are empty. Both package hashes match this record; HEAD and origin/main
+matched with a clean worktree after P1 push. This is a technical delivery review,
+not owner desktop/RDP acceptance and not S4 closure.

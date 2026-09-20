@@ -31,7 +31,7 @@ See [readiness audit](../history/M9-T72-S3-completion-readiness-audit.md).
 | Original Owner Request | "实测：在本机desktop上测试没问题，只有rdp出问题了"; "可以，开始，你说，我做". |
 | Similar-Issue Sweep | All capture/resize/move recenter sites removed; check release/recapture, device/type/desktop geometry switches, raw registration failure/conflict, message cleanup and single motion source. |
 
-Repair implemented; both full Release builds and focused motion/capture tests
+Repair delivered/pushed as aba5022c; actual-change review complete. Both full Release builds and focused motion/capture tests
 pass. x86 background 105/105; x64 104/105 then corrected documentation gate 1/1.
 No runtime test failure; five desktop tests per width not run. Diagnostics removed.
 See [S4 evidence and boundaries](../etc/evidence/softpc/m9-t72-s4-native-mouse-motion.md).
