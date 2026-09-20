@@ -3,7 +3,7 @@
 Owner requested moving common/x86-debug and common/x86-xasm32 to x86/debug
 and x86/xasm32, moving test qualification to S5, and defining six-/four-directory
 shared transfer sets. Full request and finite ledger remain in the
-[proposal](../proposals/m9-shared-x86-dependency-audit.md).
+[proposal](M9-T73-shared-x86-dependency-audit-proposal.md).
 
 Baseline dc06671d; implementation 0ef82055; actual-change review fb07a0b7.
 Owner reported 测试通过 and admitted S5. S4 closes; T73 remains open.

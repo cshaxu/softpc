@@ -9,7 +9,7 @@ S2负责审计common/machine并切分后续的S迁移任务。准入S1并编译�
 S1 was still open after preliminary audit f13c2780. Its scope was revised by
 the owner, not assigned a reused closed identifier. This project's finalized
 design is authoritative; NNES is only initial research. S2 is not admitted.
-The [proposal](../proposals/m9-shared-x86-dependency-audit.md) retains that
+The [proposal](M9-T73-shared-x86-dependency-audit-proposal.md) retains that
 preliminary evidence and the revised two-stage plan.
 
 ## Implementation And Ownership

@@ -8,7 +8,7 @@ allocates a numeric task identifier.
 3. [Overlay page lookup optimization](../proposals/m9-overlay-page-index.md)
 4. [Common Machine terminal wake ownership](../proposals/m9-common-machine-shutdown-wake.md)
 
-T72 is closed. Owner directly admitted T73 outside this candidate queue:
-[Lib/Common x86 dependency audit](../proposals/m9-shared-x86-dependency-audit.md).
+T73 is closed: [completion audit](../history/M9-T73-completion-audit.md).
+No next task is admitted.
 The first three candidates retain their order. T73 S5 discovered the fourth
 candidate while splitting tests; it is recorded for approval, not admitted.

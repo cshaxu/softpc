@@ -4,7 +4,7 @@ Owner request: 通过测试，准入S2，开始审计machine的x86 api和内部�
 Owner accepted the design and requested S2 closure before S3 implementation.
 
 Baseline feee0fb1; audit delivery 471b089c, actual-change review 2c724e10.
-The [proposal](../proposals/m9-shared-x86-dependency-audit.md#s2-machine-audit-baseline-feee0fb1)
+The [proposal](M9-T73-shared-x86-dependency-audit-proposal.md#s2-machine-audit-baseline-feee0fb1)
 records the finite six-file, 22-API, 16-driver-callback ledger and consumer audit.
 Machine's x86 coupling is in debug payload definitions and memory-size validation,
 not its executor/lifecycle machinery. Move the protocol to x86-debug and retain

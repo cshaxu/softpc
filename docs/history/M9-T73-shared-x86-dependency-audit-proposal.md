@@ -1,5 +1,9 @@
 # T73: Lib/Common x86 Dependency Audit
 
+Archived after owner acceptance of S5 and T73. All admitted S1--S5 are closed;
+see the [completion audit](M9-T73-completion-audit.md). Earlier checkpoints and
+superseded plans below remain historical evidence, not current task status.
+
 ## Owner Request And Scope
 
 Owner admits a new task outside the existing queue: audit Lib/Common x86
@@ -502,7 +506,7 @@ Verify x86 and Common manifests/DAG, forbidden reverse/private edges, all origin
 debug/xasm tests, both Release builds and full background suites; deliver two
 EXEs, commit/push clean and await owner acceptance. Desktop exclusions explicit.
 
-### S5: Separate And Qualify Shared Test Corpora (Admitted)
+### S5: Separate And Qualify Shared Test Corpora (Closed)
 
 Move x86 tests to test/x86; keep test/common neutral and test/lib unchanged.
 Separate the mixed Machine mechanism/CLI test without duplicating a runner or
@@ -668,7 +672,7 @@ Machine destruction hang. Attached x64 stacks show the caller joining while
 the worker waits at its outer command event. S5 retains the original mixed
 test's stop-completion barrier before disposal; it does not fix that runtime
 interleaving. The unadmitted
-[terminal-wake candidate](m9-common-machine-shutdown-wake.md) owns the evidence
+[terminal-wake candidate](../proposals/m9-common-machine-shutdown-wake.md) owns the evidence
 and proposed deterministic proof. Existing neutral active/paused shutdown
 assertions were not removed. Initial x86 also reported a manifest mismatch
 because temporary diagnostic logging was inserted while that run was finishing;

@@ -4,7 +4,7 @@ Owner request: 批准照此实现S3.请你收口S2先，然后准入S3，执行�
 
 Owner subsequently reported 测试通过 and admitted the next migration.
 S3 is closed; T73 remains open. Baseline 56261c63, implementation 006ecf32,
-actual-change review dc06671d. The [proposal](../proposals/m9-shared-x86-dependency-audit.md)
+actual-change review dc06671d. The [proposal](M9-T73-shared-x86-dependency-audit-proposal.md)
 retains the finite coverage ledger, failures, disposition and package hashes.
 
 Machine retains its sole executor/lease/completion path and copies bounded opaque
