@@ -96,3 +96,15 @@ build trees retained; user INI/media unchanged.
 | --- | ---: | --- |
 | softpc32.exe | 3659580 | 2E51DFDDA6131310B6A7FD568A75F407BE7996F05F468D5D67F0890AA1A49A4C |
 | softpc64.exe | 3062073 | BD1438F5CAF1D732853B1A80DB8A72C41F097E9E140ADE785A90BB5ADB3CE841 |
+
+## Coordinator Actual-Change Review
+
+After P2 c813f698 was pushed, reviewed its actual diff against P1 035d2845
+and the owner request. Both decoders call one comparison/write/bounds helper;
+there is no intermediate buffer or duplicate comparison loop. Validation occurs
+before surface mutation, full-first-frame and no-damage results are retained,
+and text traversal preserves fixed stride, both banks and font-height handling.
+Native cursor, paint, mouse, all tests, Common/VM/Compat/MVDM and INI/media
+have no P2 changes. Package hashes match the verification record. Counts and
+scope match the packet; no further code correction found. Documentation gate
+and diff check pass. S7/T72 await owner testing, not closed; S8 remains deferred.

@@ -2,13 +2,14 @@
 
 ## Current Work
 
-Active task: M9 T72 S7, direct pixel comparison verified, awaiting delivery review and owner testing.
+Active task: M9 T72 S7, direct pixel comparison delivered and reviewed, awaiting owner testing.
 S1--S6 are closed. Owner admitted new S7 and postponed Common work to S8.
 See [proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md) and
 [audit](../etc/evidence/softpc/m9-t72-post-s5-quality-audit.md).
 S6 delivery details: [evidence](../etc/evidence/softpc/m9-t72-s6-text-render-simplification.md).
 P1 01a737b2 / review 2cf87250 accepted; [S6 closure](../history/M9-T72-S6-text-render-simplification.md).
 S7 details: [unified damage evidence](../etc/evidence/softpc/m9-t72-s7-window-pixel-damage.md).
+P2 c813f698 pushed; actual-change review passed. S7/T72 remain open; S8 not started.
 
 ## M9 T72 S7 Packet
 
