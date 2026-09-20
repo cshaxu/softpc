@@ -421,6 +421,22 @@ static void check_character_banks(void)
     frame.characters.secondary[65] = 0x03a9;
     assert(kvm_console_publish_text_frame(&console, &frame) == LIB_STATUS_OK);
     assert(captured.text[1] == 0x03a9);
+    /* KVM scanlines are normalized before the independent Console boundary. */
+    const struct { unsigned height, top, bottom, visible, out_bottom; } cases[] = {
+        {0,14,15,1,15}, {16,20,21,0,15}, {16,14,31,1,15},
+        {16,4,7,1,7}, {8,7,255,1,7}, {16,9,8,1,8}
+    };
+    for (unsigned i = 0; i < sizeof(cases)/sizeof(cases[0]); ++i) {
+        frame.base.font_height = cases[i].height;
+        frame.base.cursor_top = cases[i].top;
+        frame.base.cursor_bottom = cases[i].bottom;
+        frame.base.cursor_visible = frame.base.cursor_phase = 1;
+        assert(kvm_console_publish_text_frame(&console, &frame) == LIB_STATUS_OK);
+        assert(captured.font_height == (cases[i].height ? cases[i].height : 16));
+        assert(captured.cursor_visible == cases[i].visible);
+        assert(captured.cursor_top == cases[i].top && captured.cursor_bottom == cases[i].out_bottom);
+        assert(captured.cursor_phase == 1);
+    }
     lib_console_release(console.logical_console);
 }
 

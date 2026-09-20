@@ -49,8 +49,9 @@ static BOOL WINAPI write_cells(HANDLE h, const CHAR_INFO *p, COORD a, COORD b, P
     if (partial_write==4) r->Top=1;
     return partial_write!=5;
 }
+static CONSOLE_CURSOR_INFO last_cursor;
 static BOOL WINAPI cursor_info(HANDLE h, const CONSOLE_CURSOR_INFO *p)
-{ (void)h; (void)p; return cursor_ok; }
+{ (void)h; last_cursor=*p; return cursor_ok; }
 static BOOL WINAPI cursor_position(HANDLE h, COORD p)
 { (void)h; (void)p; return cursor_ok; }
 static unsigned readers_started, mode_sets;
@@ -164,6 +165,17 @@ int main(void)
     assert(buffer_size.Y==25); /* Palette must precede surface preparation. */
     assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
     assert(palette_sets==2);
+    /* Native approximation consumes the already normalized scanline range. */
+    f.font_height=16; f.cursor_top=14; f.cursor_bottom=15;
+    f.cursor_visible=f.cursor_phase=1;
+    assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
+    assert(last_cursor.dwSize==12 && last_cursor.bVisible);
+    f.cursor_visible=0;
+    assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
+    assert(!last_cursor.bVisible);
+    f.cursor_visible=1; f.cursor_top=9; f.cursor_bottom=8;
+    assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
+    assert(last_cursor.dwSize==100 && last_cursor.bVisible);
     for (int axis=0;axis<2;++axis) {
         unsigned before=writes;
         if (axis==0) buffer_size.Y=24;

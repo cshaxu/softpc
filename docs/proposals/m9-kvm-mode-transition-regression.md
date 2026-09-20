@@ -1,5 +1,100 @@
 # KVM Mode Transition And Error Restart Regression
 
+## S10 Bounded Admission
+
+Owner: "准入修复，S10完成上述4个项目收口。" Baseline a1e7b945.
+The current scope is four items, not the separately queued neutral attributes.
+The owner explicitly approves correcting original host nt_cga.c: bulk copy only
+when source and fixed-80 destination strides match; the existing row loop advances
+by source offset_per_line/2. No Compat compensation or backing-store change.
+This is a host buffer-layout defect, not a new device behavior or Win3.1 special case.
+
+Finite ledger: (1) actual nt_text standard/nonstandard stride, partial columns,
+nonzero row and multiple rows; (2) KVM zero-height default, clipped/hidden cursor
+and existing inverted-range block fallback, with native Console approximation;
+(3) lifecycle/media/debug/snapshot sole-caller and borrowed-context documentation;
+(4) remove destroy alias and all six test calls. Existing modal-test evidence
+receives a static audit; desktop coverage is not claimed without a reserved run.
+
+Estimate mirror logic +2/-2 plus a short reason; other production/header changes
+about +20--40/-10--20; test additions about 100--180 lines. Preserve independent
+Console-broker and KVM boundaries: normalize KVM cursor fields at its existing
+Console conversion, never add a reverse dependency. No object or helper layer.
+Both Release builds and default background suites are required, including real
+headless Win3.1 PIF roundtrips and snapshots. Refresh changed shared manifests,
+record actual counts, deliver P1, then review actual commit for S10 closure.
+T71 remains open. Native desktop tests remain explicit-only.
+
+### S10 Finite Sweep And Focused Evidence
+
+| Member | Actual disposition |
+| --- | --- |
+| Text destination writers | Search textBuffer[] in Compat and original host finds nt_text bulk/row branches and Compat write_cell. All now index fixed 80-cell destination rows; bulk only runs with matching source stride. No extra capacity or reordering layer. |
+| Text regression | Actual linked nt_text covers visible 40/80, source pitch from visible width through 90, full/partial columns, nonzero destination row and one/three rows. Standard multi-row bulk intentionally retains its existing inter-row copy; partial multi-row mismatched-stride cases use exact row writes. |
+| Cursor ownership | KVM Console normalizes zero height to 16, clips scanlines and hides out-of-font starts before passing its independent Console value. Window geometry already implements these rules; inverted ranges still mean full cell. No Broker production change or dependency on KVM. |
+| Cursor proof | Console retirement/conversion matrix observes normalized output; native I/O mock records the actual 12-percent underline, hidden cursor and inverted-range block; existing Window geometry covers default/clipped/out-of-range/inverted shapes. |
+| Machine requests | Header explicitly includes snapshots in sole-control serialization, copied descriptor/borrowed context and executor-only callback rules. Failed native wait is not proof of completion; existing shutdown lifetime rule remains. No new mutex or behavior. |
+| Console lifecycle | Pure destroy-to-release alias removed; all six test calls migrated. rg lib_console_destroy src test returns no hits; production already used retain/release. Public source alias removal is intentional. |
+| Earlier modal test | Native timer and mailbox dispatch operate inside the window procedure; STOP sends WM_CANCELMODE only after admission closes. No speculative product fix. The unexplained pre-STOP early exit is now explicitly retained in TODO for reserved desktop evidence, not counted as repaired by this four-item S. |
+| Earlier T71 repairs | S7 selected dimensions/readiness and checked font source, S8 terminal request completion, S9 complete-frame/latest-wins remain unchanged. No old dirty merge, Compat compensation or parallel paint path reintroduced. Neutral text attributes stay in their separate queued proposal. |
+
+Both new regressions fail against unchanged production after rebuilding the tests:
+nt_text destination-memory mismatch and Console zero-font-height mismatch.
+An initial fixture build used nt_cga's file-private TEXT_INCVAL macro; replaced
+it with the independently checked four-byte CCPU fixture contract. A test run
+before that corrected build exercised stale binaries and is not regression proof.
+After repair, focused x64 VGA, Console conversion, native I/O and Window geometry
+all pass (4/4). Build/test completion and actual accounting follow below.
+
+### S10 Changed-Path Accounting
+
+Reproducible method: git diff --numstat a1e7b945 -- src test, counting only
+tracked C/H files. Seven production paths: +24/-14, net +10. Seven test paths:
++80/-7, net +73. Three shared manifests are separate (+15/-15); documentation
+and two EXE replacements are not counted as code.
+
+| Component | Added / removed / net | Ownership result |
+| --- | --- | --- |
+| MVDM host nt_cga.c | +3 / -2 / +1 | Two copy corrections plus reason; bulk and row paths retained. |
+| Lib, five C/H files | +11 / -10 / +1 | KVM Console conversion owns normalization; shared header owns semantics; Console retains only retain/release. |
+| Common Machine header | +10 / -2 / +8 | Contract comments only; no executor or request implementation change. |
+| Shared tests, six C files | +35 / -7 / +28 | Conversion/native cursor assertions and six alias call migrations. |
+| Product VGA test | +45 / -0 / +45 | Actual original painter matrix, not copied implementation. |
+
+nt_cga.c versus the read-only OpenNT counterpart is +21/-3 total; this S adds
+only +3/-2 against the accepted product baseline. All other mirror files and
+Compat/VM remain unchanged. No allocation, data-layout size, thread, queue,
+timeout, frame cache or product-specific branch was added. The alias removal
+is a public source-interface deletion, not binary-layout or lifetime redesign.
+
+Release builds for both widths succeed; changed Lib C sources pass strict C17
+-Wall -Wextra -Wpedantic -Werror syntax checks on both compilers. The x86 compiler
+requires its bin directory first in PATH; the isolated check passes with the
+same environment as its build preset. Existing original TEXT macro warnings
+remain outside this repair. Shared manifest/DAG and documentation gates pass.
+
+| Package | Bytes | Delta from S9 | SHA256 |
+| --- | --- | --- | --- |
+| assets/binary/softpc32.exe | 3655192 | -57 | F3A891A9FE4274A0DB441380BAEC4DA9C132A6E4E3E9636F0039D75F5BC03CD3 |
+| assets/binary/softpc64.exe | 3058735 | -56 | 8C4CEC14C777AA5FE9355046275AFF8A4581890BDED43D2FADB3DBD388C044F0 |
+
+### S10 P1 Executor Verification
+
+Serial default background suites pass: x64 105/105 in 163.44 seconds and
+x86 105/105 in 145.85 seconds. Both include the real headless Win3.1 initial
+fullscreen/windowed PIF and six roundtrips per mode, snapshot/restore, restart,
+native-API mocks and shared boundary/manifest gates. All final tests pass on
+their first post-repair full background run. Five desktop-only tests per width
+were not run; prior full-suite evidence is not presented as current desktop
+verification or pixel-by-pixel visual acceptance. No native Linux run is claimed.
+
+Final executor self-review covers all four finite items and confirms no
+Compat/VM/INI/media change, no generated source and no new diagnostic files or
+processes to retain. The failed focused fixture's disposable disk is consumed
+and removed by the subsequent passing test. Documentation and diff whitespace
+gates pass. P1 is complete for commit/push; coordinator must inspect its actual
+committed changes before the owner's authorized S10 closure. T71 remains open.
+
 ## Owner Failure Report
 
 "启动后，输入win，没能如愿进入windows 3.1，直接machine error；再次尝试start机器，程序直接崩溃退出。"

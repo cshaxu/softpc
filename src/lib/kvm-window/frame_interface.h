@@ -11,7 +11,6 @@
 #define KVM_WINDOW_FONT_GLYPHS 256u
 
 typedef struct kvm_window_text_frame {
-    /* font_height == 0 selects the existing 16-row default. */
     kvm_text_frame base;
     lib_u8 font[KVM_WINDOW_FONT_GLYPHS * KVM_WINDOW_FONT_HEIGHT];
     lib_u8 secondary_font[KVM_WINDOW_FONT_GLYPHS * KVM_WINDOW_FONT_HEIGHT];

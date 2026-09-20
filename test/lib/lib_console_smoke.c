@@ -120,6 +120,6 @@ int main(void)
     assert(lib_console_write_text_frame(console, &frame) == LIB_STATUS_NOT_CURRENT);
     assert(lib_console_set_event_sink(console, LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     assert(lib_console_deliver_event(console, &probe.event) == LIB_STATUS_INVALID_STATE);
-    lib_console_destroy(console);
+    lib_console_release(console);
     return 0;
 }

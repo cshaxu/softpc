@@ -1,5 +1,14 @@
 # Long-Term Review Ledger
 
+- [ ] TODO(Medium) Native Window modal-test early exit: S8 observed occasional
+  failure before STOP at the assertion that the native move loop remains open.
+  Isolated repetitions and final suites passed unchanged; desktop interference
+  is unproved. Owner: Lib native test/Window dispatch boundary. Re-admit on a
+  reserved desktop with message/input evidence identifying who ends the loop.
+  S10 statically confirmed one FIFO STOP -> WM_CANCELMODE path, but does not
+  claim this observation repaired or bypass the assertion. See the
+  [T71 investigation](../proposals/m9-kvm-mode-transition-regression.md).
+
 - [ ] TODO(High) Win3.1 fullscreen MS-DOS Prompt native Window height
   oscillation: owner observed the actual outer Window repeatedly shrinking
   and recovering with display=window after launching the fullscreen PIF from

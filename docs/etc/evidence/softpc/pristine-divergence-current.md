@@ -989,6 +989,16 @@ x86 98/98（58.31s）。结果包括真实 restart/BIOS、debug、媒体、VGA�
 输出文件在 Compat capture 处明确拒绝，因此没有路径、`FILE`、native handle 或
 callback 地址跨越 archive 边界。
 
+### T71 S10 文本目标跨度修正
+
+Owner 明确批准原始 host/src/nt_cga.c 的通用复制布局修正：整体复制要求
+可见 80 列且源跨度也是 80 格；原有逐行路径按 offset_per_line/2 推进源，
+目标仍固定 80 格。新增/删除为 +3/-2（两行逻辑替换及一行原因注释）。
+不增加条件编译、Compat 补偿、设备状态或产品特判。原始 VGA 更新器逐行
+计算源地址；可见列数与显存跨度独立。实际 nt_text 内存矩阵覆盖两种列数、
+源跨度、部分更新、非零目标行及多行；不宣称这是某次 Win3.1 花屏的根因。
+证据归属 [S10 简报](../../../proposals/m9-kvm-mode-transition-regression.md)。
+
 ### T63 S9 P9 视频快照 receiver 修正
 
 `base/video/vga_prts.c` 的既有 snapshot hook 增量为 +16/-6：保存原始

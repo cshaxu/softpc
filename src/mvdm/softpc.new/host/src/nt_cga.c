@@ -329,7 +329,8 @@ void nt_text(int ScreenOffset, int ScreenX, int ScreenY,
 		org_height,clen);
     }
 
-    if (get_chars_per_line() == 80)
+    /* Bulk copying requires matching source and fixed shared-buffer strides. */
+    if (get_chars_per_line() == 80 && get_offset_per_line()/2 == 80)
     {
 	//
 	// Slam Dunk Screen text buffer into shared buffer
@@ -373,7 +374,7 @@ void nt_text(int ScreenOffset, int ScreenX, int ScreenY,
 	for(lines = height; lines; lines--)
 	{
 	    RtlCopyMemory(to, pScreenText, clen * TEXT_INCVAL);	// copy this line
-	    pScreenText += get_chars_per_line() * TEXT_INCVAL;	// update src ptr
+	    pScreenText += (get_offset_per_line()/2) * TEXT_INCVAL;	// update src ptr
 	    to += 80 * TEXT_INCVAL;				// update dst ptr
 	}
     }

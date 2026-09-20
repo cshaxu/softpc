@@ -71,11 +71,6 @@ void lib_console_release(lib_console *console)
     }
 }
 
-void lib_console_destroy(lib_console *console)
-{
-    lib_console_release(console);
-}
-
 lib_status lib_console_set_event_sink(lib_console *console,
     lib_console_event_sink sink, void *context)
 {

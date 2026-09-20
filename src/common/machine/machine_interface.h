@@ -22,8 +22,9 @@ typedef enum common_machine_state {
 } common_machine_state;
 
 /* Debug is synchronous to the sole control-thread caller; execution occurs
- * on the existing paused executor. Lifecycle, media and debug requests must
- * be serialized by that caller, never issued from a driver/sink callback.
+ * on the existing paused executor. Lifecycle, media, debug and state read/write
+ * requests must be serialized by that caller, never issued from a driver/sink
+ * callback. Internal admission locking does not serialize caller payloads.
  * Common owns lease validity and rendezvous; the product owns CPU access. */
 typedef enum common_machine_debug_operation {
     COMMON_MACHINE_DEBUG_READ_REGISTER,
@@ -209,6 +210,13 @@ lib_bool common_machine_stop(common_machine *machine);
 lib_bool common_machine_reset(common_machine *machine);
 lib_bool common_machine_set_removable_media(common_machine *machine,
     const char *path, lib_storage_medium_mode mode);
+/* Synchronous state I/O uses the same sole control caller as other requests.
+ * Writer/reader descriptors are copied; their contexts remain caller-owned
+ * and valid through completion. On failure, retain contexts until successful
+ * shutdown unless completion is independently established: a failed native
+ * wait alone does not establish executor quiescence.
+ * Callbacks run on the existing executor and must not reenter request APIs.
+ * This restriction does not apply to input enqueue or published-frame reads. */
 lib_status common_machine_read_state(common_machine *machine,
     const common_machine_state_writer *writer);
 lib_status common_machine_write_state(common_machine *machine,

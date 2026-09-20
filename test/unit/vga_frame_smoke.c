@@ -111,6 +111,50 @@ static void verify_writer_contract(void)
     c_ev_write_ptr = saved;
 }
 
+static void verify_text_stride(void)
+{
+    extern int now_width, now_height;
+    enum { cell_size = 4 }; /* Original interleaved CCPU text cells. */
+    unsigned char source[4u * 90u * cell_size];
+    unsigned char expected[5u * 80u * cell_size];
+    unsigned char *saved_source = get_screen_ptr(0);
+    int saved_columns = get_chars_per_line(), saved_offset = get_offset_per_line();
+    int saved_width = now_width, saved_height = now_height;
+    void *cells;
+    unsigned long columns, rows, stride, cell_bytes;
+    assert(softpc_standalone_text_surface(&cells, &columns, &rows, &stride, &cell_bytes));
+    assert(stride == 80 && cell_bytes == cell_size && rows >= 5);
+    assert(get_pix_char_width() > 0 && get_host_char_height() > 0);
+    for (unsigned i = 0; i < sizeof(source); ++i) source[i] = (unsigned char)(i * 37u + i / 11u);
+    set_screen_ptr(source);
+    now_height = 5;
+    for (int visible = 40; visible <= 80; visible += 40)
+    for (int pitch = visible; pitch <= 90; pitch += 10)
+    for (int partial = 0; partial < 2; ++partial)
+    for (int count = 1; count <= 3; count += 2) {
+        int x = partial ? 3 : 0, width = partial ? 7 : visible;
+        /* Preserve the standard bulk path's intentional inter-row copying. */
+        if (visible == 80 && pitch == 80 && partial && count > 1) continue;
+        now_width = visible;
+        set_chars_per_line(visible);
+        set_offset_per_line(pitch * 2);
+        memset(cells, 0xcc, sizeof(expected));
+        memset(expected, 0xcc, sizeof(expected));
+        for (int row = 0; row < count; ++row)
+            memcpy(expected + ((row + 1) * 80 + x) * cell_size,
+                source + (row * pitch + x) * cell_size, width * cell_size);
+        /* The real painter receives pixels; destination row deliberately != 0. */
+        nt_text(x * cell_size, x * get_pix_char_width(),
+            get_host_char_height(), width * 2, count);
+        assert(memcmp(cells, expected, sizeof(expected)) == 0);
+    }
+    set_screen_ptr(saved_source);
+    set_chars_per_line(saved_columns);
+    set_offset_per_line(saved_offset);
+    now_width = saved_width;
+    now_height = saved_height;
+}
+
 static void verify_fullscreen_text_clear(void)
 {
     void *cells;
@@ -876,6 +920,7 @@ int main(void)
         &height));
     assert(bits != NULL && info != NULL);
     assert(width == 1280u && height == 768u);
+    verify_text_stride();
     verify_fullscreen_text_clear();
     verify_fullscreen_cursor_metadata();
 

@@ -155,6 +155,12 @@ lib_status kvm_console_publish_text_frame(kvm_console *console,
     text_frame.cursor_bottom = text->cursor_bottom;
     text_frame.cursor_visible = text->cursor_visible;
     text_frame.cursor_phase = text->cursor_phase;
-    text_frame.font_height = text->font_height;
+    text_frame.font_height = text->font_height ? text->font_height : 16u;
+    if (text->cursor_bottom >= text->cursor_top) {
+        if (text->cursor_top >= text_frame.font_height)
+            text_frame.cursor_visible = 0u;
+        if (text->cursor_bottom >= text_frame.font_height)
+            text_frame.cursor_bottom = (lib_u8)(text_frame.font_height - 1u);
+    }
     return lib_console_write_text_frame(console->logical_console, &text_frame);
 }

@@ -7,7 +7,10 @@
  * even when fewer columns are visible. Palette entries are 0x00RRGGBB.
  * Glyph indices select resources supplied by the receiving leaf's frame.
  * Zero dimensions are invalid; nonzero extents beyond this fixed capacity
- * are unsupported. Off-surface/hidden cursors do not invalidate a frame. */
+ * are unsupported. Off-surface/hidden cursors do not invalidate a frame.
+ * font_height == 0 means 16 scanlines. Inclusive cursor_top/bottom are clipped
+ * to that height; a start beyond it is hidden. bottom < top retains the full
+ * cell fallback. Console approximates the visible height, not its position. */
 #define KVM_TEXT_COLUMNS 80u
 #define KVM_TEXT_ROWS 25u
 
