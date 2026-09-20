@@ -128,6 +128,17 @@ int main(void)
     assert(saved->slots[0].page_count==3 && saved->slots[2].page_count==3);
     assert(saved->slots[0].pages->next->next->count==512);
     assert(softpc_media_archive_write(saved,write_bytes,&stream)==LIB_STATUS_OK);
+    { /* Golden media payload from the pre-index linked-list implementation. */
+        static const lib_u8 expected[32]={
+            0x93,0xd1,0x5a,0x71,0x7c,0x8a,0xb7,0xf3,0xf7,0x8d,0xb3,0x1f,0x6d,0x66,0x65,0x09,
+            0xa0,0x84,0x5f,0x2e,0x21,0x10,0xc8,0xef,0x07,0xd0,0xd0,0xa1,0x5d,0xf5,0x11,0xf4
+        };
+        media_hash hash=hash_begin();
+        lib_u8 digest[32];
+        assert(stream.count==17662u);
+        hash_add(&hash,stream.bytes,stream.count); hash_end(&hash,digest);
+        assert(memcmp(digest,expected,sizeof(digest))==0);
+    }
     assert(softpc_media_archive_read(&decoded,read_bytes,&stream)==LIB_STATUS_OK);
     assert(stream.position==stream.count);
     assert(softpc_media_archive_prepare(decoded) == LIB_STATUS_OK);
