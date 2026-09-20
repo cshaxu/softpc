@@ -8,19 +8,24 @@ comparison; dual-width full suites pass. P1 838b076c is committed/pushed and
 coordinator-reviewed; S9 awaits owner testing. T71 remains open; S10 semantic
 audit remains inactive.
 
+Owner additionally requires immediate background-test configuration ("不是，我要你
+现在就配置清楚，不是等到以后"). S9 verification follow-up separates real-desktop
+tests from default presets; x64 and x86 background suites each pass 105/105.
+Five desktop tests remain explicit-only; no product/binary change or S10 admission.
+
 ## M9 T71 S9 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepted S8 and replaced the S9 FIFO plan with complete-frame/latest-wins transport and Window-local comparison. Each S builds/tests, commits/pushes and leaves a clean worktree, then waits for owner testing. |
+| Admission And Approval | Owner accepted S8 and replaced the S9 FIFO plan with complete-frame/latest-wins transport and Window-local comparison. Each S builds/tests, commits/pushes and leaves a clean worktree, then waits for owner testing. Owner now requires default background-test configuration immediately, as a verification follow-up. |
 | Objective | Publish complete snapshots on machine display change; keep Base opaque/latest-wins; Window derives damage by comparing its RGB surface with the latest complete frame. |
 | Non-goals | No FIFO, new queue/thread/cache, input, snapshot format, display capacity, Compat/MVDM or media change; no second VM-to-presenter route. |
 | Reference Baseline | 65ad144a; owner accepted S8 dual-width packages. |
 | Candidate Proposal | [Regression brief](../proposals/m9-kvm-mode-transition-regression.md). |
 | Files And ABI Surface | Base mailbox/component support, Window render/frame and Console call site; VM removes transported dirty coordinates; Common complete-frame contract and tests. Input ABI unchanged; graphics frame no longer carries producer dirty. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and shared governance skills. |
-| Verification | Delayed upstream A/B and leaf latest-wins; compare actual pixels, no-change/palette/stride/size/mode, cumulative native invalidation, STOP/failure, save/load; serial full dual-width suites and PIF roundtrips. |
+| Verification | Frame implementation: delayed A/B, actual pixels, palette/stride/mode, invalidation, STOP/failure, save/load and dual-width full suites. Configuration follow-up: dry-run background/desktop partitions, both default background suites, manifests/documentation; no desktop rerun without a reserved test period. |
 | Expected Markers | Latest full frame repairs all differences from surface even after skipped frames; Base has no merge callback; no new queue wait. |
 | Asset Needs | Existing overlay-only fixtures; owned build/t71-s9/render-bench.c and two EXEs, 30-second runs and exact-file cleanup after results; no media or trace. Preserve owner INI verbatim. |
 | Reporting Requirements | Report source sweep and estimate before edits; afterward actual production/test additions/deletions/net, render performance and storage footprint plus both EXEs. |

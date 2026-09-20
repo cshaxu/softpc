@@ -41,7 +41,9 @@
     { "name": "tests-x86", "configurePreset": "mingw-gcc-x86-release" }
   ],
   "testPresets": [
-    { "name": "test-x64", "configurePreset": "mingw-gcc-x64-release", "output": { "outputOnFailure": true } },
-    { "name": "test-x86", "configurePreset": "mingw-gcc-x86-release", "output": { "outputOnFailure": true } }
+    { "name": "test-x64", "configurePreset": "mingw-gcc-x64-release", "output": { "outputOnFailure": true }, "filter": { "exclude": { "label": "desktop" } } },
+    { "name": "test-x86", "configurePreset": "mingw-gcc-x86-release", "output": { "outputOnFailure": true }, "filter": { "exclude": { "label": "desktop" } } },
+    { "name": "test-desktop-x64", "configurePreset": "mingw-gcc-x64-release", "output": { "outputOnFailure": true }, "filter": { "include": { "label": "desktop" } }, "execution": { "jobs": 1 } },
+    { "name": "test-desktop-x86", "configurePreset": "mingw-gcc-x86-release", "output": { "outputOnFailure": true }, "filter": { "include": { "label": "desktop" } }, "execution": { "jobs": 1 } }
   ]
 }

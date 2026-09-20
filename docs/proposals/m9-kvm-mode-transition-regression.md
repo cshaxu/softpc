@@ -572,3 +572,38 @@ Coordinator accepts the bounded implementation; this record is documentation
 only and does not assert native Linux or exhaustive visual acceptance. The
 earlier S8 modal-test audit remains assigned to inactive S10. S9 waits for owner
 testing of both delivered EXEs; neither S9 nor T71 is closed by this review.
+
+### S9 Background-Test Configuration Follow-up
+
+Owner request: "不是，我要你现在就配置清楚，不是等到以后". Baseline 949b71f1.
+Change test configuration now, not a future promise. Default test-x86/x64
+presets exclude desktop-labelled tests; explicit test-desktop-x86/x64 presets
+run only that group serially. Do not hide production Windows or claim desktop
+coverage from background runs. No C source, binary, INI or media changes.
+Estimate about 30 configuration/documentation lines, plus manifest update.
+
+Finite sweep: package_smoke creates a real Console and KVM Window (both package
+cases); kvm_window_modal shows a real Window; console_broker_display allocates
+then hides a Console; kvm_window_retirement uses a real hidden native Window
+and runs its input/cleanup paths. All five are desktop-only. Mocked capture,
+composition, invalid-create and broker tests remain background. Runtime restart
+boots Win3.1 and injects input directly into Common Machine, without creating
+presenters, so it remains background. Verify dry-run partition on both widths
+(disjoint, complete, no lost tests), run both default suites without desktop
+tests, check manifest/documentation and push complete follow-up. Desktop tests
+are deliberately not rerun while the owner is using the desktop.
+
+P3 executor evidence: both configure presets regenerated successfully. CTest
+JSON dry runs on each width prove 105 background + 5 desktop = 110 total,
+disjoint and complete. An early x86 partition check ran before its regeneration
+finished and rejected the old count; rerunning after generation passes. Final
+background x64 105/105 (124.87s), x86 105/105 (121.36s). Desktop tests were not
+executed in this follow-up; prior S9 full-suite evidence remains historical.
+Manifest, documentation and whitespace checks pass. Configuration diff across
+root CMakeLists, CMakePresets and test/lib/CMakeLists is +8/-3 (net +5); C/H
+production and test changes are zero. Test registration remains single-source;
+presets select labels, without duplicating test lists or adding a runner.
+Package hashes remain exactly those recorded for P1; no rebuild is necessary
+for test selection only. No diagnostic artifacts or processes remain owned
+by this follow-up. README and Source Layout document the now-active defaults
+and warn that unfiltered CTest still runs both groups.

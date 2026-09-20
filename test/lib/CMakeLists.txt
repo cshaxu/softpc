@@ -66,6 +66,9 @@ if(WIN32)
     target_link_libraries(lib-test-base_sync_ownership PRIVATE base)
     target_link_libraries(lib-test-kvm_keyboard_lifetime PRIVATE kvm-console)
     target_link_libraries(lib-test-kvm_shutdown_failure PRIVATE kvm-console)
+    # Real native windows/consoles can affect the user's desktop even when hidden.
+    set_property(TEST library.kvm_window_modal library.kvm_window_retirement
+        library.console_broker_display APPEND PROPERTY LABELS desktop)
 endif()
 
 add_test(NAME library.types-layout

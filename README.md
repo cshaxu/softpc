@@ -107,9 +107,9 @@ now drives a bounded asynchronous Win32 beep sink; it is stopped with the
 machine on reset or teardown. Graphical presentation remains host-front-end
 work, not a reason to substitute the original VGA controller.
 
-CTest is tiered under `test/`: `ctest -L unit` uses only source and test
-fixtures, while `ctest -L integration` launches the packaged no-argument
-launcher and validates its adjacent configuration and declared media roots.
+CTest's default `test-x64`/`test-x86` presets run background tests. Real native
+Window/Console and package tests have separate `test-desktop-x64`/`test-desktop-x86`
+presets; see [test execution](docs/design/CODING.md#build-output-layout).
 
 ## Source layout
 
