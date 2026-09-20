@@ -95,6 +95,16 @@ and removed by the subsequent passing test. Documentation and diff whitespace
 gates pass. P1 is complete for commit/push; coordinator must inspect its actual
 committed changes before the owner's authorized S10 closure. T71 remains open.
 
+### S10 P2 Coordinator Closure
+
+Reviewed actual pushed f3ff1b11 against the four-item owner request, shared and
+mirror boundaries, production/test diffs and verification. The changes retain
+the original ownership paths and standard bulk copy; no compensation layer or
+new state was added. Production +24/-14 and tests +80/-7 match delivery; both
+105-test background suites and package hashes match. The native modal-test
+observation remains an explicit TODO, not a claimed fix. S10 closes as requested;
+see [closure](../history/M9-T71-S10-text-contract-cleanup.md). T71 remains open.
+
 ## Owner Failure Report
 
 "启动后，输入win，没能如愿进入windows 3.1，直接machine error；再次尝试start机器，程序直接崩溃退出。"

@@ -2,34 +2,13 @@
 
 ## Current Work
 
-T71 S10 is implemented and verified, awaiting P1 delivery/coordinator review.
+No implementation subtask is active.
+Open task awaiting owner: T71.
 
-Owner requested "收口当前S9". S9 is accepted and closed; see its
-[closure review](../history/M9-T71-S9-latest-frame-delivery.md).
-S10's semantic/stride and modal-test audit is retained in
-the [regression brief](../proposals/m9-kvm-mode-transition-regression.md).
-Default tests remain background-only; desktop tests require explicit execution.
-
-## M9 T71 S10 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner admits the four reviewed items and S10 closure after verification. Explicitly approves the two-line original nt_cga host-layout correction. |
-| Objective | Correct fixed-80 destination layout; align KVM cursor interpretation; document Machine request/context ownership; remove Console destroy alias. |
-| Non-goals | No neutral attribute redesign, Compat compensation, capacity change, new state/thread/cache, input or snapshot-format change. |
-| Reference Baseline | a1e7b945; clean main. |
-| Candidate Proposal | [Regression brief](../proposals/m9-kvm-mode-transition-regression.md). |
-| Files And ABI Surface | Original nt_cga.c host copy; KVM text contract/Console conversion; Machine header comments; Console release-only public lifetime; shared/product tests and manifests. |
-| Applicable Rules | Execution, Coding, Architecture, Document; Source Layout, System Architecture, UI; linked governance skills. Owner-approved original-host layout defect is the sole mirror correction. |
-| Verification | Real nt_text memory matrix; KVM cursor conversion and Window geometry; six alias consumers; dual Release builds and default background suites; static modal-path audit, no unreserved desktop execution. |
-| Expected Markers | Correct destination rows with distinct source stride; matching effective cursor extent; no lib_console_destroy; all background tests pass. |
-| Asset Needs | Existing test-generated disposable media only; no INI/media edits. Refresh both package EXEs. |
-| Reporting Requirements | Before/after added/deleted/net production/test lines, mirror diff, test coverage and limits, artifact links; commit/push then actual-change coordinator review. |
-| Stop Conditions | Any additional production architecture/semantic change or failed unexplained regression; do not claim desktop verification from background tests. |
-| Exit Criteria | Four-item finite ledger verified, gates and builds pass, artifacts pushed, coordinator actual-change review and S10 closure; T71 stays open. |
-| Original Owner Request | 准入修复，S10完成上述4个项目收口。 |
-| Similar-Issue Sweep | TextBuffer writer strides, both leaf cursor conversions, synchronous request callbacks, all alias consumers; retained modal-test observation audited without speculative repair. |
+S10's four admitted items are verified and closed after P1 delivery and actual
+coordinator review; see [S10 closure](../history/M9-T71-S10-text-contract-cleanup.md).
+T71 remains open. The separately queued neutral-text redesign is not admitted.
+Default tests remain background-only; native desktop tests require explicit execution.
 
 ## Current Technical Baseline
 
@@ -64,7 +43,7 @@ Default tests remain background-only; desktop tests require explicit execution.
   (net +115). Final x64 110/110 (124.22s), x86 110/110 (142.06s), including
   both Win3.1 PIF initial modes and six roundtrips each. Both packages rebuilt
   with unchanged byte sizes. No Lib/Common/MVDM/INI/media change in this repair.
-  Owner accepted S7/S8/S9; S10 is the current bounded follow-up.
+  Owner accepted S7/S8/S9; S10's bounded four-item follow-up is closed.
 
 - S7: selected-renderer text dimensions replace live-register sampling;
   ERROR reaches App unchanged and rejects machine commands without exiting.
@@ -127,7 +106,7 @@ Default tests remain background-only; desktop tests require explicit execution.
 
 ## Recent Governance
 
-T70 is closed; T71 S9 is owner-accepted and closed. S10 is active; T71 remains open.
+T70 is closed; T71 S10 is verified and closed. T71 remains open.
 
 - **M9 Td S17:** Owner requested a concrete KVM text/frame correction proposal
   at queue head. Recorded capability rejection, explicit character/glyph
