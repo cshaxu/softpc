@@ -16,7 +16,7 @@ if(DEFINED CASE_TARGET)
     softpc_check_build_source("${CASE_TARGET}" "${CASE_SOURCE}")
 elseif(CMAKE_SCRIPT_MODE_FILE)
     foreach(sample IN ITEMS "softpc-vm|src/core/machine/driver.c|0"
-        "softpcvm|src/app/composition.c|0" "probe|test/unit/machine_smoke.c|0"
+        "softpcvm|src/app/composition.c|0" "probe|test/core/machine_smoke.c|0"
         "softpcvm|src/core/machine/driver.c|1" "probe|src/core/machine/debug.c|1"
         "softpc-machine|src/core/machine/input.c|1" "softpc-vm|src/core/compat/platform.c|1"
         "softpcvm|src/app/../core/compat/platform.c|1")

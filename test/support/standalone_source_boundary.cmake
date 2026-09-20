@@ -531,16 +531,31 @@ if(duplicate_original_headers OR build_definition MATCHES "compat/ccpu/legacy")
     message(FATAL_ERROR "Compat duplicates original GDP/SAS declarations")
 endif()
 
+foreach(product_test_root IN ITEMS app core)
+    execute_process(COMMAND "${CMAKE_COMMAND}"
+        "-DKVM_NAMING_ROOT=${SOFTPC_SOURCE_DIR}/test/${product_test_root}"
+        -P "${SOFTPC_SOURCE_DIR}/src/lib/verify_kvm_naming.cmake"
+        RESULT_VARIABLE naming_result)
+    if(NOT naming_result EQUAL 0)
+        message(FATAL_ERROR "Product test KVM naming failed: ${product_test_root}")
+    endif()
+endforeach()
+
 # M8 T1: test tiers are an input boundary, not merely a CTest convention.
 # Unit fixtures may write their tiny disk bytes under build/, but neither their
 # source nor their resource scripts may name product artifacts. Integration is
 # deliberately separate because it exercises that package.
 if(EXISTS "${SOFTPC_SOURCE_DIR}/tests")
-    message(FATAL_ERROR "Legacy tests/ directory remains; use test/{unit,integration,support}")
+    message(FATAL_ERROR "Legacy tests/ directory remains; use the owned test/ directories")
 endif()
 file(GLOB_RECURSE unit_test_sources
-    "${SOFTPC_SOURCE_DIR}/test/unit/*"
+    "${SOFTPC_SOURCE_DIR}/test/app/*"
+    "${SOFTPC_SOURCE_DIR}/test/core/*"
+    "${SOFTPC_SOURCE_DIR}/test/integration/*"
     "${SOFTPC_SOURCE_DIR}/test/support/*.cmake")
+list(REMOVE_ITEM unit_test_sources
+    "${SOFTPC_SOURCE_DIR}/test/integration/package_smoke.c"
+    "${SOFTPC_SOURCE_DIR}/test/integration/runtime_restart_boot_smoke.c")
 foreach(source IN LISTS unit_test_sources)
     if(IS_DIRECTORY "${source}")
         continue()

@@ -93,7 +93,7 @@ queued task. T76 is closed; implementation baseline remains 7ebb435f.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | New |
-| Admission And Approval | Owner: "测试通过 收口提交t任务 准入下一个"; next queued product-test cleanup admitted after T76 closure. |
+| Admission And Approval | Owner admitted the queue head after T76; now authorizes "继续啊 做完自行审计收口s和t任务": serial S1--S3 delivery and self-reviewed S/T closure. |
 | Objective | Freeze product test inventory and relocate by App/Core/integration ownership without changing assertions or execution paths. |
 | Non-goals | No production edits, shared six-directory corpus edits, runtime fixes, new fixture framework, weakened tests or guest data changes. |
 | Reference Baseline | 7ebb435f accepted T76; x86/x64 background 110/110, five desktop exclusions per width. |

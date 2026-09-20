@@ -85,6 +85,15 @@ mapping, lifecycle, or hotkey meaning.
 
 ## Build Output Layout
 
+Product tests are classified by ownership: test/app covers configuration,
+commands and key policy; test/core covers the concrete machine, compatibility
+host and devices; test/integration covers composed worker, command, snapshot,
+frame and package flows. Historical CTest labels remain execution selectors,
+not a claim that every test labelled unit is isolated. Product fixtures and
+checks are being relocated from test/support under the active T77 task.
+The reusable test/lib, test/common and test/x86 packages are not destinations
+for product-owned fixtures.
+
 Root CMake assigns all `src/core/machine/*.c` to `softpc-vm`; other targets link it
 instead of copying its implementation list. The original machine OBJECT
 groups remain intact. The build-ownership gate checks actual target source

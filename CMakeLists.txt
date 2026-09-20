@@ -330,8 +330,8 @@ set_target_properties(softpcvm PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${SOFTPC_OUTPUT_DIRECTORY}")
 
 enable_testing()
-add_executable(softpc-machine-smoke test/unit/machine_smoke.c)
-add_executable(softpc-config-smoke test/unit/config_smoke.c src/app/config.c)
+add_executable(softpc-machine-smoke test/core/machine_smoke.c)
+add_executable(softpc-config-smoke test/app/config_smoke.c src/app/config.c)
 target_include_directories(softpc-config-smoke PRIVATE src)
 target_link_libraries(softpc-config-smoke PRIVATE types)
 add_test(NAME softpc-config-smoke COMMAND softpc-config-smoke)
@@ -344,7 +344,7 @@ target_link_libraries(softpc-machine-smoke PRIVATE softpc-vm)
 add_test(NAME softpc-machine-smoke COMMAND softpc-machine-smoke)
 set_tests_properties(softpc-machine-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-dual-media-smoke test/unit/dual_media_smoke.c)
+add_executable(softpc-dual-media-smoke test/core/dual_media_smoke.c)
 target_link_libraries(softpc-dual-media-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-dual-media-smoke PRIVATE
     src/core/softpc.new/host/inc
@@ -352,13 +352,13 @@ target_include_directories(softpc-dual-media-smoke PRIVATE
 add_test(NAME softpc-dual-media-smoke COMMAND softpc-dual-media-smoke)
 set_tests_properties(softpc-dual-media-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-partition-image-smoke test/unit/partition_image_smoke.c)
+add_executable(softpc-partition-image-smoke test/core/partition_image_smoke.c)
 target_link_libraries(softpc-partition-image-smoke PRIVATE softpc-vm)
 add_test(NAME softpc-partition-image-smoke COMMAND softpc-partition-image-smoke)
 set_tests_properties(softpc-partition-image-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-irq-smoke test/unit/irq_smoke.c)
-add_executable(softpc-pit-smoke test/unit/pit_smoke.c)
+add_executable(softpc-irq-smoke test/core/irq_smoke.c)
+add_executable(softpc-pit-smoke test/core/pit_smoke.c)
 target_link_libraries(softpc-pit-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-pit-smoke PRIVATE
     src/core/softpc.new/host/inc
@@ -371,7 +371,7 @@ target_include_directories(softpc-irq-smoke PRIVATE
 add_test(NAME softpc-irq-smoke COMMAND softpc-irq-smoke)
 set_tests_properties(softpc-irq-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-fdc-smoke test/unit/fdc_smoke.c)
+add_executable(softpc-fdc-smoke test/core/fdc_smoke.c)
 target_link_libraries(softpc-fdc-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-fdc-smoke PRIVATE
     src/core/softpc.new/host/inc
@@ -379,7 +379,7 @@ target_include_directories(softpc-fdc-smoke PRIVATE
 add_test(NAME softpc-fdc-smoke COMMAND softpc-fdc-smoke)
 set_tests_properties(softpc-fdc-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-printer-smoke test/unit/printer_smoke.c)
+add_executable(softpc-printer-smoke test/core/printer_smoke.c)
 target_link_libraries(softpc-printer-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-printer-smoke PRIVATE
     src/core/softpc.new/host/inc
@@ -387,7 +387,7 @@ target_include_directories(softpc-printer-smoke PRIVATE
 add_test(NAME softpc-printer-smoke COMMAND softpc-printer-smoke)
 set_tests_properties(softpc-printer-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-sound-smoke test/unit/sound_smoke.c)
+add_executable(softpc-sound-smoke test/core/sound_smoke.c)
 target_link_libraries(softpc-sound-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-sound-smoke PRIVATE
     src/core/softpc.new/host/inc
@@ -395,13 +395,13 @@ target_include_directories(softpc-sound-smoke PRIVATE
 add_test(NAME softpc-sound-smoke COMMAND softpc-sound-smoke)
 set_tests_properties(softpc-sound-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-audio-lifecycle-smoke test/unit/audio_lifecycle_smoke.c)
+add_executable(softpc-audio-lifecycle-smoke test/core/audio_lifecycle_smoke.c)
 target_link_libraries(softpc-audio-lifecycle-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-audio-lifecycle-smoke PRIVATE src src/core/compat)
 add_test(NAME softpc-audio-lifecycle-smoke COMMAND softpc-audio-lifecycle-smoke)
 set_tests_properties(softpc-audio-lifecycle-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-serial-smoke test/unit/serial_smoke.c)
+add_executable(softpc-serial-smoke test/core/serial_smoke.c)
 target_link_libraries(softpc-serial-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-serial-smoke PRIVATE
     src/core/softpc.new/host/inc
@@ -409,7 +409,7 @@ target_include_directories(softpc-serial-smoke PRIVATE
 add_test(NAME softpc-serial-smoke COMMAND softpc-serial-smoke)
 set_tests_properties(softpc-serial-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-mouse-smoke test/unit/mouse_smoke.c)
+add_executable(softpc-mouse-smoke test/core/mouse_smoke.c)
 target_link_libraries(softpc-mouse-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-mouse-smoke PRIVATE
     src/core/softpc.new/host/inc
@@ -417,7 +417,7 @@ target_include_directories(softpc-mouse-smoke PRIVATE
 add_test(NAME softpc-mouse-smoke COMMAND softpc-mouse-smoke)
 set_tests_properties(softpc-mouse-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-keycode-smoke test/unit/keycode_smoke.c)
+add_executable(softpc-keycode-smoke test/core/keycode_smoke.c)
 target_link_libraries(softpc-keycode-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-keycode-smoke PRIVATE
     src/core/softpc.new/host/inc
@@ -425,7 +425,7 @@ target_include_directories(softpc-keycode-smoke PRIVATE
 add_test(NAME softpc-keycode-smoke COMMAND softpc-keycode-smoke)
 set_tests_properties(softpc-keycode-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-vga-frame-smoke test/unit/vga_frame_smoke.c)
+add_executable(softpc-vga-frame-smoke test/core/vga_frame_smoke.c)
 target_link_libraries(softpc-vga-frame-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-vga-frame-smoke PRIVATE
     src/core/softpc.new/host/inc
@@ -437,14 +437,14 @@ add_test(NAME softpc-vga-frame-smoke COMMAND softpc-vga-frame-smoke)
 set_tests_properties(softpc-vga-frame-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-text-console-compat-smoke
-    test/unit/text_console_compat_smoke.c)
+    test/core/text_console_compat_smoke.c)
 target_link_libraries(softpc-text-console-compat-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-text-console-compat-smoke PRIVATE src)
 add_test(NAME softpc-text-console-compat-smoke
     COMMAND softpc-text-console-compat-smoke)
 set_tests_properties(softpc-text-console-compat-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" LABELS "unit")
-add_executable(softpc-bop-smoke test/unit/bop_smoke.c)
+add_executable(softpc-bop-smoke test/core/bop_smoke.c)
 target_link_libraries(softpc-bop-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-bop-smoke PRIVATE
     src/core/softpc.new/host/inc
@@ -452,7 +452,7 @@ target_include_directories(softpc-bop-smoke PRIVATE
 add_test(NAME softpc-bop-smoke COMMAND softpc-bop-smoke)
 set_tests_properties(softpc-bop-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-quick-time-smoke test/unit/quick_time_smoke.c)
+add_executable(softpc-quick-time-smoke test/core/quick_time_smoke.c)
 target_link_libraries(softpc-quick-time-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-quick-time-smoke PRIVATE
     src/core/softpc.new/host/inc
@@ -460,12 +460,12 @@ target_include_directories(softpc-quick-time-smoke PRIVATE
 add_test(NAME softpc-quick-time-smoke COMMAND softpc-quick-time-smoke)
 set_tests_properties(softpc-quick-time-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-lifecycle-smoke test/unit/lifecycle_smoke.c)
+add_executable(softpc-lifecycle-smoke test/core/lifecycle_smoke.c)
 target_link_libraries(softpc-lifecycle-smoke PRIVATE softpc-vm)
 add_test(NAME softpc-lifecycle-smoke COMMAND softpc-lifecycle-smoke)
 set_tests_properties(softpc-lifecycle-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-checkpoint-smoke test/unit/checkpoint_smoke.c)
+add_executable(softpc-checkpoint-smoke test/core/checkpoint_smoke.c)
 target_link_libraries(softpc-checkpoint-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-checkpoint-smoke PRIVATE
     src/core/softpc.new/host/inc
@@ -474,8 +474,8 @@ target_include_directories(softpc-checkpoint-smoke PRIVATE
 add_test(NAME softpc-checkpoint-smoke COMMAND softpc-checkpoint-smoke)
 set_tests_properties(softpc-checkpoint-smoke PROPERTIES TIMEOUT 15)
 add_executable(softpc-snapshot-transaction-smoke
-    test/unit/snapshot_transaction_smoke.c)
-add_executable(softpc-media-snapshot-smoke test/unit/media_snapshot_smoke.c
+    test/integration/snapshot_transaction_smoke.c)
+add_executable(softpc-media-snapshot-smoke test/core/media_snapshot_smoke.c
     src/core/compat/snapshot_stream.c)
 target_include_directories(softpc-media-snapshot-smoke PRIVATE src)
 target_link_libraries(softpc-media-snapshot-smoke PRIVATE storage)
@@ -495,12 +495,12 @@ add_test(NAME softpc-snapshot-cross-process
         -P "${CMAKE_SOURCE_DIR}/test/support/snapshot_cross_process.cmake")
 set_tests_properties(softpc-snapshot-cross-process PROPERTIES
     TIMEOUT 30 WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
-add_executable(softpc-snapshot-boundary-smoke test/unit/snapshot_boundary_smoke.c)
+add_executable(softpc-snapshot-boundary-smoke test/core/snapshot_boundary_smoke.c)
 target_include_directories(softpc-snapshot-boundary-smoke PRIVATE src)
 add_test(NAME softpc-snapshot-boundary-smoke COMMAND softpc-snapshot-boundary-smoke)
 set_tests_properties(softpc-snapshot-boundary-smoke PROPERTIES TIMEOUT 15)
 add_executable(softpc-runtime-smoke
-    test/unit/runtime_smoke.c
+    test/integration/runtime_smoke.c
     test/support/common_machine_test.c
     src/common/session/control.c
     src/app/keyboard.c
@@ -525,7 +525,7 @@ set_tests_properties(softpc-runtime-restart-boot-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     LABELS "integration")
 add_executable(softpc-runtime-input-continuation-smoke
-    test/unit/runtime_input_continuation_smoke.c
+    test/integration/runtime_input_continuation_smoke.c
     test/support/common_machine_test.c
     src/common/session/control.c
     src/app/keyboard.c)
@@ -537,19 +537,19 @@ add_test(NAME softpc-runtime-input-continuation-smoke
     COMMAND softpc-runtime-input-continuation-smoke)
 set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-command-provider-smoke test/unit/command_provider_smoke.c
+add_executable(softpc-command-provider-smoke test/integration/command_provider_smoke.c
     src/app/composition.c src/app/command.c src/app/keyboard.c)
 target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-vm x86-debug common-session common-machine)
 add_test(NAME softpc-command-provider-smoke COMMAND softpc-command-provider-smoke)
 set_tests_properties(softpc-command-provider-smoke PROPERTIES LABELS "unit" TIMEOUT 45
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
-add_executable(softpc-x87-layout-smoke test/unit/x87_layout_smoke.c)
+add_executable(softpc-x87-layout-smoke test/core/x87_layout_smoke.c)
 target_include_directories(softpc-x87-layout-smoke PRIVATE
     src/core/softpc.new/host/inc src/core/softpc.new/base/inc)
 target_compile_definitions(softpc-x87-layout-smoke PRIVATE LITTLEND SOFTPC_STANDALONE)
 add_test(NAME softpc-x87-layout-smoke COMMAND softpc-x87-layout-smoke)
 set_tests_properties(softpc-x87-layout-smoke PROPERTIES LABELS "unit")
-add_executable(softpc-command-smoke test/unit/command_smoke.c
+add_executable(softpc-command-smoke test/app/command_smoke.c
     src/app/command.c
     src/common/session/control_state.c
     src/common/session/presentation_plan.c)
@@ -558,7 +558,7 @@ target_include_directories(softpc-command-smoke PRIVATE src/app src/core/compat 
 add_test(NAME softpc-command-smoke COMMAND softpc-command-smoke)
 set_tests_properties(softpc-command-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-keyboard-smoke test/unit/keyboard_smoke.c src/app/keyboard.c)
+add_executable(softpc-keyboard-smoke test/app/keyboard_smoke.c src/app/keyboard.c)
 target_include_directories(softpc-keyboard-smoke PRIVATE src)
 target_link_libraries(softpc-keyboard-smoke PRIVATE kvm-base)
 if(MSVC)
@@ -613,7 +613,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-runtime-restart-boot-smoke
     softpc-runtime-input-continuation-smoke
 )
-add_executable(softpc-sound-state-smoke test/unit/sound_state_smoke.c)
+add_executable(softpc-sound-state-smoke test/core/sound_state_smoke.c)
 target_include_directories(softpc-sound-state-smoke PRIVATE src
     $<TARGET_PROPERTY:softpc-machine-devices,INCLUDE_DIRECTORIES>)
 target_compile_definitions(softpc-sound-state-smoke PRIVATE
@@ -624,7 +624,7 @@ set_tests_properties(softpc-sound-state-smoke PROPERTIES LABELS "unit" TIMEOUT 1
 list(APPEND SOFTPC_TEST_TARGETS softpc-sound-state-smoke)
 foreach(probe IN ITEMS platform audio)
     set(probe_target softpc-${probe}-failure-smoke)
-    add_executable(${probe_target} test/unit/${probe}_failure_smoke.c)
+    add_executable(${probe_target} test/core/${probe}_failure_smoke.c)
     target_link_libraries(${probe_target} PRIVATE softpc-vm)
     target_include_directories(${probe_target} PRIVATE src
         $<TARGET_PROPERTY:softpc-machine-compat,INCLUDE_DIRECTORIES>)
@@ -637,7 +637,7 @@ foreach(probe IN ITEMS platform audio)
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
     list(APPEND SOFTPC_TEST_TARGETS ${probe_target})
 endforeach()
-add_executable(softpc-presentation-shutdown-smoke test/unit/presentation_shutdown_smoke.c)
+add_executable(softpc-presentation-shutdown-smoke test/integration/presentation_shutdown_smoke.c)
 target_include_directories(softpc-presentation-shutdown-smoke PRIVATE src src/core/compat src/app)
 get_target_property(shutdown_test_sources softpcvm SOURCES)
 list(REMOVE_ITEM shutdown_test_sources src/app/main.c src/app/firmware.rc src/app/composition.c)
@@ -647,7 +647,7 @@ target_link_libraries(softpc-presentation-shutdown-smoke PRIVATE ${shutdown_test
 add_test(NAME softpc-presentation-shutdown-smoke COMMAND softpc-presentation-shutdown-smoke)
 set_tests_properties(softpc-presentation-shutdown-smoke PROPERTIES LABELS "unit" TIMEOUT 10)
 list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-shutdown-smoke)
-add_executable(softpc-runtime-cursor-smoke test/unit/runtime_cursor_smoke.c)
+add_executable(softpc-runtime-cursor-smoke test/integration/runtime_cursor_smoke.c)
 target_include_directories(softpc-runtime-cursor-smoke PRIVATE src src/core/compat src/app)
 get_target_property(cursor_test_sources softpcvm SOURCES)
 list(REMOVE_ITEM cursor_test_sources src/app/main.c src/app/firmware.rc)

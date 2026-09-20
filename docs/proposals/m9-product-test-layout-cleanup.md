@@ -5,7 +5,8 @@
 Owner accepted T76 and requested "测试通过 收口提交t任务 准入下一个".
 Admitted as T77, beginning with S1. CURRENT.md owns the executable packet;
 this proposal retains the bounded plan and evidence ledger. S2/S3 are planned,
-not simultaneously active. T closure requires owner acceptance.
+not simultaneously active. Owner now explicitly authorizes serial completion
+and self-reviewed S/T closure: "继续啊 做完自行审计收口s和t任务".
 
 Original owner requests:
 
@@ -93,7 +94,7 @@ documentation rather than creating a second layout authority.
 - Run applicable x86/x64 full tests and package acceptance, using the established
   background test configuration. Publish both EXEs for owner verification.
 - Exit: complete per-file ledger, no lost coverage, all gates passing, and no
-  unfinished cleanup hidden in TODO. Owner acceptance precedes T closure.
+  unfinished cleanup hidden in TODO. Owner has authorized self-reviewed T closure.
 
 ## Change estimate and reporting
 
@@ -139,3 +140,91 @@ results and both executable links; commit and push the completed scoped work.
 - [Current source layout](../design/CODING.md)
 - [Current architecture](../design/ARCHITECTURE.md)
 - [Ordered candidate queue](../states/QUEUE.md)
+
+## T77 S1 frozen relocation ledger
+
+Baseline 1fe946a2: 115 CTest entries including five desktop cases; background
+execution retains 110. Names, labels, commands, working directories and timeout
+properties are compared before/after (only relocated script paths may differ).
+Each row below retains its exact test body and existing target/assertions.
+
+| Existing test/unit file | Destination under test/ | Lines moved |
+| --- | --- | --- |
+| audio_failure_smoke.c | core | 78 |
+| audio_lifecycle_smoke.c | core | 13 |
+| bop_smoke.c | core | 287 |
+| checkpoint_smoke.c | core | 971 |
+| command_provider_smoke.c | integration | 1031 |
+| command_smoke.c | app | 232 |
+| config_smoke.c | app | 62 |
+| dual_media_smoke.c | core | 111 |
+| fdc_smoke.c | core | 231 |
+| irq_smoke.c | core | 148 |
+| keyboard_smoke.c | app | 104 |
+| keycode_smoke.c | core | 67 |
+| lifecycle_smoke.c | core | 69 |
+| machine_smoke.c | core | 1282 |
+| media_snapshot_smoke.c | core | 322 |
+| mouse_smoke.c | core | 150 |
+| partition_image_smoke.c | core | 111 |
+| pit_smoke.c | core | 80 |
+| platform_failure_smoke.c | core | 139 |
+| presentation_shutdown_smoke.c | integration | 118 |
+| printer_smoke.c | core | 56 |
+| quick_time_smoke.c | core | 25 |
+| runtime_cursor_smoke.c | integration | 40 |
+| runtime_input_continuation_smoke.c | integration | 145 |
+| runtime_smoke.c | integration | 217 |
+| serial_smoke.c | core | 92 |
+| snapshot_boundary_smoke.c | core | 89 |
+| snapshot_transaction_smoke.c | integration | 461 |
+| sound_smoke.c | core | 79 |
+| sound_state_smoke.c | core | 78 |
+| text_console_compat_smoke.c | core | 210 |
+| vga_frame_smoke.c | core | 1231 |
+| x87_layout_smoke.c | core | 44 |
+
+App owns configuration, command parsing and key-binding assertions. Core owns
+device/host ABI, renderer, media and its machine implementation. Integration
+owns actual command-to-machine, worker input/frame, snapshot rendezvous and App
+shutdown chains. Directory ownership does not redefine legacy CTest labels.
+Existing integration/package_smoke.c and runtime_restart_boot_smoke.c stay.
+
+The remaining 13 support files are deliberately retained until S2:
+build_ownership.cmake, product_boundary.cmake, product_boundary_negative.cmake,
+standalone_source_boundary.cmake, win32_presentation_manifest.cmake -> checks;
+snapshot_cross_process.cmake -> integration; common_machine_test.c/h -> one
+integration fixture; runtime.h and input_queue.h -> remove aliases after caller
+conversion; TESTS.md -> replace with test/README.md; diagnostics/real_boot_smoke.c
+and diagnostics/runtime_boot_smoke.c -> inspect obsolete APIs and unique utility,
+record deletion or supported invocation before disposal. These are the entire
+48-file ledger; no unclassified catch-all is introduced.
+
+Before S1 movement: three App, 24 Core and six Integration C files; source
+bodies byte-identical. CMake has 32 path-bearing lines (one expands two probes),
+plus the existing boundary gate scan and sample path need relocation updates.
+Expected code/build roughly +42/-40, with production +0/-0. Existing support
+gate must continue scanning every self-contained relocated test; the two
+pre-existing package consumers alone retain their media boundary exceptions.
+
+### S1 delivery
+
+33 files / 8373 lines relocated with identical Git blobs: App 3, Core 24,
+Integration 6. All 115 CTest command/properties definitions are identical to
+the pre-move JSON inventory. No target, label, timeout or assertion was lost.
+Root CMake +32/-32, build-ownership sample +1/-1, source boundary +17/-2:
+code/build +50/-35, net +15. Production and shared six corpora +0/-0.
+The extra naming scan reuses Lib's checker for the new App/Core roots without
+editing its shared script's legacy product-root list. This is why actual +15
+exceeds the initial near-zero estimate; no copied naming implementation.
+
+Both Release builds pass; full background x64 110/110 (184.63s), x86 110/110
+(169.86s), five desktop cases excluded per width. The final extended source
+gate was additionally rerun on both widths (2.32s/2.39s), passing. A manual
+gate invocation with a relative PowerShell -D argument failed to locate the
+source root; explicit absolute root and both CTest invocations pass.
+EXEs rebuilt, unchanged SHA256 from T76: x86
+D61305E116367F8CBD5B885351D81A7FA26FD74B5981AD66F3F7FFEF02206516;
+x64 4DF851DB91A4559AE7C3E6CEB35753040355FE53CC4A8C2417C6E79EC9A5C8A0.
+No assets/INI changes. Remaining support files have explicit S2 ownership in
+the ledger; no other live build/tool reference to test/unit remains.
