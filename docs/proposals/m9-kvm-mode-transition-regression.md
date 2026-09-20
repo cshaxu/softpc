@@ -229,7 +229,7 @@ Owner: "准入，开始。每个S任务完成都要提交推送保持工作区�
 - S10 will compare the complete admitted behavior with pre-T71, remove obsolete
   repairs and audit actual component/mirror diffs and real dual-width workflows.
 
-S7 is now owner-accepted and S8 is active. Every delivery builds both EXEs, runs focused/full evidence,
+S7/S8 are now owner-accepted and S9 is active. Every delivery builds both EXEs, runs focused/full evidence,
 reports additions/deletions/net, commits/pushes and waits for owner testing.
 Do not automatically activate the next S after pushing.
 
@@ -401,3 +401,39 @@ worktree clean before this review-only record.
 
 S8 delivery is reviewed and awaits owner testing. This is not owner acceptance
 or S8 closure. S9/S10 are not started, and T71 remains open.
+
+## S9 Admission And Initial Audit
+
+Owner accepted S8 and requested "测试通过。下一个S". Baseline 81dacb61;
+S8 closure records its accepted evidence. S9 alone is active.
+
+Source audit confirms two boundaries to replace together: Machine overwrites
+its double buffer while Session handles sequence notifications by copying the
+latest frame; Base publication invokes Window's merge on the producer thread.
+Changing Base alone cannot recover dirty lost before Session. Searches cover
+publish_frame, capture_frame, acknowledge_frame, published_frame, copy_frame
+and FRAME_COMPLETED in Common and both leaves, plus Base mailbox support.
+
+Base transports bounded opaque copied FIFO, without a merge callback. Window
+consumes in order into latest complete pixels and accumulated dirty; relevant
+representation changes require full refresh. Console retains latest text and
+pending output while NOT_CURRENT. Common preserves frame/notification identity;
+no driver-to-leaf bypass. Input, capacities and snapshot format stay unchanged.
+
+Before production edits, complete the storage/scheduling ledger: owner, slot
+and byte bounds, full behavior, notification failure, STOP, inactive Console
+and run replacement. The executor must not wait for a Session synchronously
+waiting for it. No silent accepted-frame loss, unbounded allocation, or turning
+routine consumer delay into an unreviewed product failure. These are design
+obligations still to prove, not completed implementation claims.
+
+Initial planning range pending that ledger: 12--18 production C/H files,
++250--450/-150--250 (net 0--300); tests +250--500/-40--100 (net +150--460).
+Documentation, manifests and EXEs are separate. Refine the estimate and report
+queue memory footprint before production edits; this is not a naming-only edit.
+
+Finite proof covers delayed upstream A/B and leaves, disjoint dirty, mode/size/
+stride/palette changes, full/STOP/failure, Console activation, save/load progress
+and run replacement. Build both EXEs, run serial full suites and real Win3.1 PIF
+roundtrips, report actual diff/footprint, commit/push and review, then wait for
+owner testing. S10 and T71 stay open.

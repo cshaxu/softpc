@@ -2,30 +2,31 @@
 
 ## Current Work
 
-Owner accepted T71 S7. S8 implementation 81d52730 is pushed and reviewed;
-dual-width verification is complete and S8 awaits owner testing. T71 remains open;
-S9 FIFO and S10 semantic audit remain inactive.
+Owner accepted T71 S8: "测试通过。下一个S". S8 closes; S9 is admitted
+for bounded frame FIFO and consumer-owned coalescing, beginning with storage
+and full-queue scheduling design. Production is unchanged. T71 remains open;
+S10 semantic audit remains inactive.
 
-## M9 T71 S8 Packet
+## M9 T71 S9 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner approves S7 display repair, S8 request completion, S9 FIFO and S10 semantic audit. Each S must build/test, commit/push and leave a clean worktree, then wait for owner testing. |
-| Objective | Finish outstanding synchronous requests exactly once after executor unwind; serialize admission with terminal cleanup. |
-| Non-goals | No FIFO work, new public API, cancellation framework, timeout/retry, Lib/VM/Compat/MVDM or media/INI change. |
-| Reference Baseline | 92be0e6a; owner accepted S7 dual-width packages. |
+| Objective | Preserve accepted frame order through Common and opaque Base transport; coalesce at the owning Window/Console consumer without losing dirty updates. |
+| Non-goals | No input, snapshot format, display capacity, VM/Compat/MVDM or media change; no unbounded storage or second VM-to-presenter route. |
+| Reference Baseline | 81dacb61; owner accepted S8 dual-width packages. |
 | Candidate Proposal | [Regression brief](../proposals/m9-kvm-mode-transition-regression.md). |
-| Files And ABI Surface | common/machine/machine.c, test/common regression tests and manifests; existing public contracts unchanged. |
+| Files And ABI Surface | Lib kvm-base mailbox/component support, Window/Console consumers; Common machine/session publication and consumption; related tests/manifests. Typed leaf frame/input schemas stay intact. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and shared governance skills. |
-| Verification | Inject frame/run/wait failures around pending save/load/debug/media; verify admission/termination order, completed-result preservation and normal lifecycle. Serial full x86/x64 suites and package builds. |
-| Expected Markers | No outstanding request remains blocked after terminal unwind; no false PAUSED, duplicate completion or successful-result overwrite. |
-| Asset Needs | Existing non-mutating fixtures. Owned build/t71-s8 baseline negative-test binary/source, 10-second run budget, removed after retaining the result; no media or trace. |
-| Reporting Requirements | Root cause and concrete diff estimate before production edits; afterward added/deleted/net and both EXEs. |
-| Stop Conditions | Need for a new driver cancellation contract, public state/ownership, platform or product-specific workaround. |
+| Verification | Delayed upstream A/B dirty and leaf consumers; FIFO order, mode/size/palette, full queues, STOP/failure and save/load progress; serial full x86/x64 suites and real Win3.1 PIF roundtrips. |
+| Expected Markers | No accepted dirty update disappears before consumption; Base has no frame merge callback; synchronous requests cannot deadlock behind frame drainage. |
+| Asset Needs | Existing overlay-only fixtures; no new media or trace admitted. Preserve owner INI edit verbatim. |
+| Reporting Requirements | Audit storage/full behavior and estimate before production edits; afterward production/test added/deleted/net, allocated footprint and both EXEs. |
+| Stop Conditions | Cannot reconcile bounded FIFO with synchronous progress and existing UX; need for unbounded allocation, silent accepted-frame loss, new worker/side channel or product-specific workaround. |
 | Exit Criteria | Focused fault matrix and full dual-width suites pass; reviewed P pushed, clean worktree, both binaries supplied; wait for owner testing. |
-| Original Owner Request | 测试通过。准入下一个S任务，先告诉我这个S任务简报。批准，开始。 |
-| Similar-Issue Sweep | Snapshot read/write, debug, media and worker readiness/shutdown rendezvous; all run and permanent-worker exits. |
+| Original Owner Request | 测试通过。下一个S。Prior direction: kvm-base的 frame mailbox也必须是FIFO的，然后kvm-console和kvm-window收到以后自行转成正确的latest-win再消费。 |
+| Similar-Issue Sweep | Every frame publication/notification/capture/ack path from Machine through Session/UI to both leaves; closure, inactive Console, notification failure and run replacement. |
 
 ## Current Technical Baseline
 
@@ -42,7 +43,7 @@ S9 FIFO and S10 semantic audit remain inactive.
   (net +115). Final x64 110/110 (124.22s), x86 110/110 (142.06s), including
   both Win3.1 PIF initial modes and six roundtrips each. Both packages rebuilt
   with unchanged byte sizes. No Lib/Common/MVDM/INI/media change in this repair.
-  Owner accepted S7; S8 is active, S9--S10 remain inactive.
+  Owner accepted S7/S8; S9 is active and S10 remains inactive.
 
 - S7: selected-renderer text dimensions replace live-register sampling;
   ERROR reaches App unchanged and rejects machine commands without exiting.
@@ -105,7 +106,7 @@ S9 FIFO and S10 semantic audit remain inactive.
 
 ## Recent Governance
 
-T70 is closed; T71 S7 is owner-accepted and S8 awaits owner testing.
+T70 is closed; T71 S8 is owner-accepted and S9 is active.
 
 - **M9 Td S17:** Owner requested a concrete KVM text/frame correction proposal
   at queue head. Recorded capability rejection, explicit character/glyph
