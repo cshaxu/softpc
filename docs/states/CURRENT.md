@@ -2,17 +2,40 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T72.
-Owner confirmed S5 testing passed and approved S5 closure. S1--S5 are closed;
-T72 remains open. A read-only Lib/Common quality audit is requested, not a new
-implementation admission. See [S5 closure](../history/M9-T72-S5-text-cell-acceptance.md)
-and [T72 proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md).
-The requested [Lib/Common quality audit](../etc/evidence/softpc/m9-t72-post-s5-quality-audit.md)
-is complete as a bounded review; findings await owner decision, not implementation.
+Active task: M9 T72 S6, verified Lib text-render simplification awaiting delivery/review and owner testing.
+S1--S5 are closed. Owner split the quality-audit follow-up into S6 (Lib) and
+S7 (Common), in that order. S7 implementation waits for S6 owner testing.
+See [proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md) and
+[audit](../etc/evidence/softpc/m9-t72-post-s5-quality-audit.md).
+S6 delivery details: [evidence](../etc/evidence/softpc/m9-t72-s6-text-render-simplification.md).
+
+## M9 T72 S6 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner: split into two S tasks, Lib first, Common second. |
+| Objective | Remove the redundant full-surface clear before complete text rendering; prove output coverage. |
+| Non-goals | No Common fixes, ABI changes, input/mouse changes, graphics policy, new cache or state. |
+| Reference Baseline | c635988a, clean; S5 owner accepted. |
+| Candidate Proposal | [T72 proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md), section thirteen. |
+| Files And ABI Surface | lib/kvm-window/render.c, existing frame-damage test, two manifests; public ABI unchanged. |
+| Applicable Rules | Execution, architecture, coding, documentation rules; current architecture/layout/UI; shared governance skills. |
+| Verification | Poisoned surface full-pixel proof for small/max grids, heights 0..16, both banks, blank glyphs; x86/x64 Release builds and full background test presets, corpus/DAG/docs gates. |
+| Expected Markers | No untouched sentinel pixels, no guard writes, invalid input leaves output unchanged; all background tests pass. |
+| Asset Needs | Refresh only assets/binary EXEs; no INI/media changes; existing build trees, no raw traces. |
+| Reporting Requirements | Before: production +0/-2, tests about +40--60; after: tracked C/H counts, test evidence, EXE links and actual-change review. |
+| Stop Conditions | Incomplete pixel coverage, ABI/output change, or need for new state requires reassessment. |
+| Exit Criteria | Verified delivery committed/pushed, clean workspace, actual-change review; then wait for owner test before closure/S7. |
+| Original Owner Request | 分成两个s任务 第一个先优化lib 第二个处理common |
+| Similar-Issue Sweep | Inspect explicit clears in both KVM leaves; remove only proven overwritten text clear; retain native surface initialization and input resets for distinct responsibilities. |
 
 ## Current Technical Baseline
 
+- S6 production +0/-2 (net -2), test +46/-1 (net +45), no ABI/Common changes.
+  Both Release builds pass. Background x86 105/105 (147.31s); x64 104/105
+  (161.37s), documentation-only failure corrected and rerun 1/1. Runtime tests
+  all pass; five desktop tests per width excluded. S6 remains open for owner test.
 - S5 production +31/-33 (net -2); tests +94/-57 (net +37). Both Release builds
   pass; background x64 105/105 (159.37s), x86 105/105 (146.32s). Frame sizes
   unchanged; five desktop tests per width excluded. See

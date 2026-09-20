@@ -209,4 +209,49 @@ static void rendering(void)
                     (x == column ? fg : fg + 1u) * 0x010101u);
             }
 }
-int main(void) { damage(); motion(); rendering(); return 0; }
+static void text_coverage(void)
+{
+    static lib_u32 guarded[KVM_TEXT_COLUMNS * 8u * KVM_TEXT_ROWS * KVM_WINDOW_FONT_HEIGHT + 2u];
+    const lib_u32 columns[] = {1u, 3u, KVM_TEXT_COLUMNS};
+    const lib_u32 rows[] = {1u, 2u, KVM_TEXT_ROWS};
+    const lib_u32 sentinel = 0xdeadbeefu;
+    frame = (kvm_window_frame){ .valid = 1u };
+    frame.text.base.text_palette[1] = 0x123456u;
+    frame.text.base.text_palette[2] = 0xabcdefu;
+    for (unsigned scan = 0; scan < KVM_WINDOW_FONT_HEIGHT; ++scan) {
+        frame.text.font[16u + scan] = 0x55u;
+        frame.text.secondary_font[16u + scan] = 0xaau;
+    }
+    for (unsigned i = 0; i < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++i)
+        frame.text.base.cells[i] = (kvm_text_cell){ (lib_u8)(i % 2u),
+            (lib_u8)((i / 2u) % 2u), 1u, 2u };
+    for (unsigned grid = 0; grid < 3; ++grid) {
+        frame.text.base.text_columns = columns[grid];
+        frame.text.base.text_rows = rows[grid];
+        for (unsigned font_height = 0; font_height <= KVM_WINDOW_FONT_HEIGHT; ++font_height) {
+            lib_u32 width = columns[grid] * 8u;
+            lib_u32 cell_height = font_height ? font_height : KVM_WINDOW_FONT_HEIGHT;
+            lib_u32 height = rows[grid] * cell_height;
+            lib_size count = (lib_size)width * height;
+            frame.text.base.font_height = font_height;
+            for (lib_size i = 0; i < count + 2u; ++i) guarded[i] = sentinel;
+            kvm_window_render_text(&frame, guarded + 1, width, height);
+            assert(guarded[0] == sentinel && guarded[count + 1u] == sentinel);
+            for (lib_size i = 0; i < count; ++i) {
+                lib_size cell_index = (i / width / cell_height) * KVM_TEXT_COLUMNS + (i % width) / 8u;
+                const kvm_text_cell *cell = &frame.text.base.cells[cell_index];
+                int foreground = cell->glyph_index && ((i % 2u) != cell->glyph_bank);
+                assert(guarded[i + 1u] == (foreground ? 0x123456u : 0xabcdefu));
+            }
+        }
+    }
+    /* Rejected geometry and invalid frames must not touch even the first pixel. */
+    guarded[1] = sentinel;
+    kvm_window_render_text(&frame, guarded + 1, 1u, 1u);
+    assert(guarded[1] == sentinel);
+    frame.valid = 0u;
+    kvm_window_render_text(&frame, guarded + 1, KVM_TEXT_COLUMNS * 8u,
+        KVM_TEXT_ROWS * KVM_WINDOW_FONT_HEIGHT);
+    assert(guarded[1] == sentinel);
+}
+int main(void) { damage(); motion(); rendering(); text_coverage(); return 0; }
