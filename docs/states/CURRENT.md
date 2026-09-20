@@ -4,8 +4,9 @@
 
 Owner accepted T71 S8: "测试通过。下一个S". S8 is closed. S9 implements
 the revised complete-frame/latest-wins design and Window-local surface
-comparison; dual-width full suites pass. Delivery is pending commit/review and
-owner testing. T71 remains open; S10 semantic audit remains inactive.
+comparison; dual-width full suites pass. P1 838b076c is committed/pushed and
+coordinator-reviewed; S9 awaits owner testing. T71 remains open; S10 semantic
+audit remains inactive.
 
 ## M9 T71 S9 Packet
 
