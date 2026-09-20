@@ -397,9 +397,10 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
         &cursor_size);
     frame->window.text.base.cursor_column = column;
     frame->window.text.base.cursor_row = row;
-    (void)softpc_machine_presentation_fonts(driver->machine, frame->window.text.font,
+    if (!softpc_machine_presentation_fonts(driver->machine, frame->window.text.font,
         frame->window.text.secondary_font, &frame->window.text.base.font_height,
-        &frame->window.text.base.attribute_font_select);
+        &frame->window.text.base.attribute_font_select))
+        return LIB_STATUS_IO_ERROR;
     frame->window.text.base.text_columns = (lib_u16)columns;
     frame->window.text.base.text_rows = (lib_u16)rows;
     frame->window.valid = 1u;

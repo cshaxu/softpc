@@ -116,3 +116,172 @@ Both real overlay startup observations and full suites pass on x86/x64. The
 not arbitrary long-running Windows behavior or visual desktop acceptance.
 P1 is pushed. Original INI/media and unrelated Queue/proposal edits are retained.
 S7 and T71 remain open pending owner retest; no whole-emulator closure claim.
+
+## Continued Owner Retest: Captured Input Stall
+
+Owner confirms Win3.1 entry now works, but reports: 捕捉了鼠标以后，guest内指针
+不移动，宿主鼠标指针也没有隐藏，但是宿主鼠标又跑不出窗体；快捷键CAP,
+CAM均无法释放被捕获的鼠标。Owner requests continued root-cause investigation.
+S7 remains open; do not infer a root cause from the refactor's timing alone.
+Compare native capture/message dispatch and Common input delivery with the
+pre-T71 baseline. First use an owned native Window probe, then the installed
+Win3.1 overlay path. Existing mocked capture tests are not native responsiveness
+proof. Reuse build/t71-s7, 120 seconds and 4 MiB per run, with executor-owned
+process cleanup. No user INI/media modification. Report concrete evidence and
+repair estimate before production edits; retain original public input semantics.
+
+Owner subsequently reports mouse did not fail and redirects investigation:
+在win3.1里面切换msdos全屏模式和窗口模式，出现程序崩溃直接退出。
+No mouse production repair was made. Native synthetic flood can starve posted
+keys, but its relation to the owner scenario is unproved; normal-rate native
+probe and real Win3.1 CAP pause/resume passed. Do not mislabel that stress result
+as the product root cause. Continue S7 at the reported display transition:
+distinguish native exception, explicit frame failure and terminal UI failure,
+capture the offending stack/geometry, then compare the pre-T71 behavior.
+
+The headless installed-image probe reproduces ERROR while launching COMMAND
+from Program Manager: selected text is 80x25, but font height is 843047920.
+Strict syntax checking confirms video.c calls sas_hw_at_no_check without its
+declaration. The original byte return is incorrectly treated as implicit int;
+the former >16 clamp concealed the ABI error. Including original sas.h was
+a diagnostic correction, not a sufficient final repair: the correctly read
+BIOS height also disagrees with the current renderer, as recorded below.
+Investigate the reported process exit separately before claiming full repair.
+
+After the declaration repair, the same probe exposes a second rejected
+intermediate: 80x50, font 0, display_disabled=1, mode_change_required=0.
+The original text update algorithms explicitly skip disabled display, while
+our independent text snapshot bypasses that readiness boundary. Reuse the
+existing disabled/pending-mode flags in text extent admission (+1 condition
+line); retain strict validation for an enabled, selected unsupported mode.
+No timer, debounce, capacity expansion or additional lifecycle state.
+
+## Owner-Requested Before/After Semantic Audit
+
+Owner requests comparison with pre-T71 code before further implementation:
+"按道理我们只是架构调整，把cp437字符映射表挪走，然后 kvm-base的文本帧做一些结构调整，怎么会出现这么多的异常！"
+Comparison baseline is 7557ca5; relevant changes are S4 17c9da90, S5 193ff7f0
+and S7 1785787c. This ledger supersedes any implication above that startup
+coverage proves arbitrary mode-transition correctness. The owner subsequently
+admitted the serial repair plan below; the comparison remains its baseline.
+
+| Boundary | Before T71 | Changed or retained behavior; required disposition |
+| --- | --- | --- |
+| Text extent | Fixed 80x25 surface plus VM capacity clipping. | S5 additionally replaced the extent source with live registers. S7 selects renderer dimensions; disabled/pending-mode readiness still needs verification. Do not classify an intermediate mode as a completed unsupported frame. |
+| Font height | BIOS byte read without its declaration; zero or >16 became 16. | S5 removed the >16 fallback. Correctly declared BIOS reading still yields 32 while the current controller character height is 16. Candidate uses current character height; validate its association with selected text rendering, not just its numerical range. |
+| No frame | Boolean false skipped publication. | Missing surface/DIB and absent dirty still skip publication. S5 turns invalid/unsupported acquired data into terminal Machine ERROR. Preserve no-frame versus genuine failure without treating mode transitions as faults. |
+| ERROR admission | Session mapped ERROR to STOPPED. | Existing mismatch exposed by the new failure path; S7 preserves ERROR and prompt-preserving rejection. No new error-recovery protocol. |
+| Snapshot completion | Read/write callers wait for state_event; completion occurs at the pause boundary. | Existing cleanup gap is reachable through the new pre-pause publication failure. Executor unwind must finish outstanding synchronous requests with failure; source-confirmed, fault-injection proof remains required. |
+| Required font acquisition | Return value ignored; cleared data can become a valid blank frame. | Retained defect, not introduced by type splitting. Establish readiness/failure at the resource owner; do not substitute zero initialization for successful acquisition. |
+| Text layout | Exported stride is 80; original nt_text fast path can address by offset_per_line/2. | Retained discrepancy; nonstandard-offset runtime reproduction remains outstanding. Do not claim it caused the reported exit. |
+| Dirty delivery | Common publishes latest data; FIFO notifications carry only sequence/mode. | Retained loss opportunity: consuming notice A can copy latest B and skip A's dirty. Leaf merging cannot recover an update never delivered. |
+| Captured input | Native message/input paths require actual responsiveness evidence. | Owner no longer reproduces the mouse symptom. Synthetic flood starvation is not proof of a product regression and does not authorize a speculative mouse repair. |
+
+The current uncommitted Compat candidate rejects disabled/pending-mode text
+exports and uses controller character height instead of BIOS bookkeeping.
+A headless installed-image probe reached COMMAND and six Alt+Enter transitions
+without Machine ERROR. This is neither native-window acceptance nor proof of
+the owner's process-exit cause. No rebuilt release or full-suite pass is claimed
+for this candidate.
+
+## Revised FIFO Direction And Unresolved Implementation Boundaries
+
+Owner requires: "kvm-base的 frame mailbox也必须是FIFO的，然后kvm-console和kvm-window收到以后自行转成正确的latest-win再消费。产品语义必须和以前一样，如果多个dirty需要合并dirty区域，等等。"
+
+This replaces the prior latest-wins Base design; it is not a claim that the
+pre-T71 implementation was FIFO. Base must transport opaque frames in order.
+Console owns text coalescing; Window owns latest complete pixels and accumulated
+dirty, including full invalidation on relevant representation changes. The
+current Window update callback executes during Base publication on the producer
+thread; moving its definition alone does not satisfy consumer-owned coalescing.
+
+Common must also preserve the relationship between accepted frame data and its
+notification until delivery. Currently machine.c overwrites its published pair
+and session.c copies the latest frame when handling an older notification.
+Changing only the Lib mailbox leaves this earlier loss intact. Do not introduce
+a second direct VM-to-presenter path to bypass Session ownership.
+
+Before implementation, specify bounded storage ownership, full-queue behavior,
+stop/failure disposal and fair consumption. In particular a machine producer
+must not wait indefinitely for Session to drain frames while Session is blocked
+waiting for that machine's synchronous snapshot completion. Silent dropping,
+unbounded allocation and accidental command starvation are not acceptable
+substitutes for the requested FIFO contract. No new S is allocated by this audit.
+
+Required proof remains: distinct A/B dirty updates delayed before Session;
+multiple frames delayed before each leaf; mode/size/palette changes; queue-full
+and STOP behavior; publication failure during save and restored-load pause;
+both initial PIF modes and repeated Win3.1 fullscreen/window transitions on both
+widths. Tests must distinguish readiness from a genuine unsupported completed
+frame. Original INI/media, public input behavior and snapshot format stay intact.
+
+## Admitted Serial Delivery Plan
+
+Owner: "准入，开始。每个S任务完成都要提交推送保持工作区干净；每个S任务推送后要等我测试。"
+
+- S7 continues with coherent ready text/font production, required-resource
+  checking and real Win3.1 prompt roundtrip coverage. Estimate production
+  +8--20/-4--12 and tests +80--140; investigate stride before changing the mirror.
+- S8 will finish outstanding synchronous requests on executor termination,
+  with fault injection and no second cancellation mechanism.
+- S9 will implement the owner-required opaque FIFO and leaf coalescing,
+  including upstream frame/notification ownership and bounded full behavior.
+- S10 will compare the complete admitted behavior with pre-T71, remove obsolete
+  repairs and audit actual component/mirror diffs and real dual-width workflows.
+
+Only S7 is active. Every delivery builds both EXEs, runs focused/full evidence,
+reports additions/deletions/net, commits/pushes and waits for owner testing.
+Do not automatically activate the next S after pushing.
+
+## S7 Continued Repair Evidence
+
+The retained production repair is two existing boundaries: Compat refuses text
+export while the original controller disables display or has pending mode
+selection, and reads the same controller's character height as its font bank
+selection. VM checks required font acquisition instead of publishing cleared
+glyphs after failure. No clamp, retry, mode identifier, new state or allocation
+is introduced. Relative to 83e185c7, production C/H is +5/-3 (net +2), all in
+compat/video.c and vm/driver.c. Lib/Common/MVDM and snapshot format are unchanged.
+
+vga_frame_smoke now separates BIOS bookkeeping from actual character height,
+retains zero/default and genuine height-17 rejection, checks disabled and
+pending-mode 80x50 as no-frame, and injects missing font planes to require an
+explicit failure rather than a valid blank frame. The installed-image restart
+test launches each existing fullscreen/windowed PIF, performs six Alt+Enter
+roundtrips with CLS input for each, exits the prompt and then cold-restarts to
+DOS. Media stays overlay-only. This proves actual execution/frame acceptance,
+not visual correctness of every pixel or native Window interaction.
+Test C additions/deletions are +117/-2 (net +115).
+
+The prior implicit-declaration cause is removed, not masked: syntax-only
+compilation of the modified Compat file with
+-Werror=implicit-function-declaration passes on x64. Existing TEXT macro
+redefinition warnings are unrelated and are not claimed fixed.
+
+Two earlier x64 package runs failed with extra monitor text ("mpause", "you")
+not emitted by the fixture. Input interference is a hypothesis, not a proved
+product root cause. An unchanged three-repeat isolated package run passes;
+the final full-suite result must also be recorded before delivery.
+
+The stride discrepancy is not declared fixed. Original nt_text's fast path
+uses offset_per_line/2 while the exported surface declares 80. The supported
+PIF roundtrips pass; nonstandard-offset behavioral proof and disposition remain
+in the admitted S10 whole-T audit. Do not introduce a speculative mirror change
+or confuse this retained pre-T71 issue with the reproduced font/readiness fault.
+S8 request completion and S9 upstream/leaf FIFO remain explicitly unfinished.
+
+Final verification: x64 110/110 in 124.22 seconds and x86 110/110 in 142.06
+seconds, each serial full suite including both PIF initial modes and six
+roundtrips per mode, snapshot suites and native package tests. After the owner
+agreed to leave input idle, the x64 native package test also passed three
+consecutive times unchanged. Earlier failures remain disclosed above; no
+product-input fix is inferred from successful reruns. Documentation gate and
+diff --check pass. Owned temporary probes were removed after recording their
+evidence; no user data or configuration was removed.
+
+Package bytes remain x86 3,655,242 and x64 3,058,784. New SHA256 values:
+x86 14F276CD400D445CEBBE2461AC4D5166F754B2F5D23579E92210EFC74011AF14;
+x64 505C719077FFC9CDFFB5DA53603B8946C6A35BB736A7493D79F54432814D4AE2.
+The preexisting owner-requested neutral-text proposal/Queue priority edits
+are included intact in this delivery rather than reverted or hidden in stash.
+Native visual acceptance remains the owner's next gate; no S8 work starts now.

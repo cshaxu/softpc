@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 T71 S7 delivery 1785787c is reviewed and awaiting owner retest.
+M9 T71 S7 continued repair is verified and preparing delivery for owner retest.
 Owner manual acceptance failed after a044fa36; T71 remains open. S7 adds the
 missing real Win3.1 startup coverage; prior S6 evidence was insufficient.
 
@@ -11,12 +11,12 @@ missing real Win3.1 startup coverage; prior S6 evidence was insufficient.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner reports T71 startup/error-restart regression; continue the admitted architecture goal without widening its boundaries. |
-| Objective | Reproduce and resolve win causing Machine error and subsequent start process crash. |
+| Admission And Approval | Owner approves S7 display repair, S8 request completion, S9 FIFO and S10 semantic audit. Each S must build/test, commit/push and leave a clean worktree, then wait for owner testing. |
+| Objective | Repair Win3.1 MS-DOS fullscreen/window regression at the completed-frame boundary; verify font readiness and text layout without mode-specific exceptions. |
 | Non-goals | No clipping, capacity expansion, guest-specific exception, new frame path, media/INI changes or unrelated queue work. |
 | Reference Baseline | a044fa36; S6 dual-width 110/110 did not exercise Win3.1 entry. |
 | Candidate Proposal | [Regression brief](../proposals/m9-kvm-mode-transition-regression.md). |
-| Files And ABI Surface | Compat video extent uses original selected-renderer dimensions; Common Session preserves ERROR; App rejects machine commands in ERROR. Public Machine/KVM APIs, Lib and MVDM unchanged. |
+| Files And ABI Surface | Compat text readiness/font source, VM required-font result and product tests. No Lib/Common API change in S7; request completion and FIFO belong to subsequent steps. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and shared governance skills. |
 | Verification | Real overlay DOS win rejects 80x480 while selected renderer is 80x25; shipping baseline start after ERROR exits code 1, not an exception. Focused transition/ERROR matrix, real win entry and serial full x86/x64 plus package builds. |
 | Expected Markers | Valid transition reaches Windows; genuine unsupported output remains explicit; start in terminal ERROR is rejected with a prompt rather than exiting, preserving Machine's existing contract. |
@@ -28,6 +28,13 @@ missing real Win3.1 startup coverage; prior S6 evidence was insufficient.
 | Similar-Issue Sweep | All frame-result/no-frame branches and all error-to-cold-start cleanup paths affected by T71. |
 
 ## Current Technical Baseline
+
+- S7 continued repair: controller-font/readiness source and required-font result
+  are corrected. Relative to 83e185c7, production +5/-3 (net +2), tests +117/-2
+  (net +115). Final x64 110/110 (124.22s), x86 110/110 (142.06s), including
+  both Win3.1 PIF initial modes and six roundtrips each. Both packages rebuilt
+  with unchanged byte sizes. No Lib/Common/MVDM/INI/media change in this repair.
+  S8--S10 are planned but inactive; wait for owner testing after this delivery.
 
 - S7: selected-renderer text dimensions replace live-register sampling;
   ERROR reaches App unchanged and rejects machine commands without exiting.

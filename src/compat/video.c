@@ -61,6 +61,7 @@ int softpc_platform_presentation_text_extent(unsigned long *columns_out,
 {
     extern int now_width, now_height;
     if (columns_out == NULL || rows_out == NULL ||
+        get_display_disabled() || get_mode_change_required() ||
         now_width <= 0 || now_height <= 0)
         return 0;
     /* textResize commits these dimensions for the selected text painter.
@@ -85,7 +86,7 @@ int softpc_platform_presentation_fonts(uint8_t *primary, uint8_t *secondary,
     if (primary == NULL || secondary == NULL || height_out == NULL ||
         attribute_select_out == NULL || EGA_planes == NULL)
         return 0;
-    height = sas_hw_at_no_check(ega_char_height);
+    height = get_char_height();
     font = (unsigned long)get_prim_font_index() & 7u;
     secondary_font = (unsigned long)get_sec_font_index() & 7u;
     memset(primary, 0, 256u * 16u);

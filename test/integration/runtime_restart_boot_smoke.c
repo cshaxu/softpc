@@ -174,6 +174,97 @@ static int enter_windows(app_runtime *runtime)
     return running && graphics;
 }
 
+static int send_key(app_runtime *runtime, lib_u32 key, lib_u32 scan, int down)
+{
+    kvm_input_event event = { 0 };
+    event.type = KVM_EVENT_KEY;
+    event.data.key.key = key;
+    event.data.key.scan_code = scan;
+    event.data.key.pressed = down != 0;
+    return app_runtime_enqueue_input_event(runtime, &event);
+}
+
+static int tap_key(app_runtime *runtime, lib_u32 key, lib_u32 scan)
+{
+    if (!send_key(runtime, key, scan, 1) || !send_key(runtime, key, scan, 0))
+        return 0;
+    Sleep(50u);
+    return 1;
+}
+
+static int wait_for_mode(app_runtime *runtime, int graphics, lib_u32 after)
+{
+    app_runtime_frame *frame = calloc(1u, sizeof(*frame));
+    DWORD deadline = GetTickCount() + 10000u;
+    int matched = 0;
+    if (frame == NULL) return 0;
+    do {
+        if (app_runtime_get_state(runtime) != SOFTPC_RUNTIME_RUNNING) break;
+        if (app_runtime_copy_frame(runtime, frame) && frame->sequence > after &&
+            frame->window.valid && (frame->window.graphics != 0u) == graphics) {
+            matched = 1;
+            break;
+        }
+        Sleep(10u);
+    } while ((LONG)(GetTickCount() - deadline) < 0);
+    free(frame);
+    return matched;
+}
+
+static int type_command(app_runtime *runtime, const char *text)
+{
+    static const lib_u32 scans[] = {
+        0x1e, 0x30, 0x2e, 0x20, 0x12, 0x21, 0x22, 0x23, 0x17,
+        0x24, 0x25, 0x26, 0x32, 0x31, 0x18, 0x19, 0x10, 0x13,
+        0x1f, 0x14, 0x16, 0x2f, 0x11, 0x2d, 0x15, 0x2c
+    };
+    for (; *text; ++text) {
+        lib_u32 key = (lib_u32)*text;
+        if (*text != '.' && (*text < 'A' || *text > 'Z')) return 0;
+        lib_u32 scan = *text == '.' ? 0x34u : scans[*text - 'A'];
+        if (!tap_key(runtime, key, scan)) return 0;
+    }
+    return tap_key(runtime, KVM_KEY_ENTER, 0x1c);
+}
+
+static int prompt_roundtrip(app_runtime *runtime, int windowed)
+{
+    app_runtime_frame *frame = calloc(1u, sizeof(*frame));
+    int succeeded = 0;
+    if (frame == NULL) return 0;
+    /* Program Manager File/Run, through the ordinary machine input queue. */
+    if (!send_key(runtime, KVM_KEY_ALT, 0x38, 1) ||
+        !tap_key(runtime, 'F', 0x21) ||
+        !send_key(runtime, KVM_KEY_ALT, 0x38, 0) ||
+        !tap_key(runtime, 'R', 0x13)) goto done;
+    Sleep(300u);
+    if (!app_runtime_copy_frame(runtime, frame) ||
+        !type_command(runtime, windowed ? "DOSPMPTW.PIF" : "DOSPRMPT.PIF")) goto done;
+    Sleep(2000u);
+    if (!wait_for_mode(runtime, windowed, frame->sequence)) goto done;
+    for (unsigned i = 0; i < 6u; ++i) {
+        if (!app_runtime_copy_frame(runtime, frame)) goto done;
+        lib_u32 prior = frame->sequence;
+        if (!send_key(runtime, KVM_KEY_ALT, 0x38, 1) ||
+            !tap_key(runtime, KVM_KEY_ENTER, 0x1c) ||
+            !send_key(runtime, KVM_KEY_ALT, 0x38, 0) ||
+            !wait_for_mode(runtime, windowed ^ ((i & 1u) == 0u), prior)) goto done;
+        /* Let rendering/input continue after the first mode notification. */
+        Sleep(1000u);
+        if (app_runtime_get_state(runtime) != SOFTPC_RUNTIME_RUNNING) goto done;
+        if (!type_command(runtime, "CLS")) goto done;
+    }
+    if (!app_runtime_copy_frame(runtime, frame) ||
+        !type_command(runtime, "EXIT")) goto done;
+    Sleep(2000u);
+    if (!wait_for_mode(runtime, 1, frame->sequence)) goto done;
+    succeeded = 1;
+done:
+    if (!succeeded) report_last_frame(runtime);
+    free(frame);
+    return succeeded;
+}
+
 int main(void)
 {
     softpc_machine_options options = { 0 };
@@ -218,6 +309,8 @@ int main(void)
     }
 
     REQUIRE(enter_windows(runtime));
+    REQUIRE(prompt_roundtrip(runtime, 0));
+    REQUIRE(prompt_roundtrip(runtime, 1));
     REQUIRE(app_runtime_stop(runtime));
     REQUIRE(wait_for_state(runtime, SOFTPC_RUNTIME_STOPPED));
     REQUIRE(app_runtime_start(runtime));

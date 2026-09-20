@@ -545,13 +545,35 @@ static void verify_driver_geometry(softpc_machine *machine)
                 now_height = 0;
                 assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
                 now_height = saved_rows;
-                c_sas_store(0x485u, 17u);
+                c_sas_store(0x485u, 32u);
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
+                assert(frame->window.text.base.font_height == saved_height);
+                set_char_height(17u);
                 assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
                 assert(frame->window.text.base.font_height == 17u);
-                c_sas_store(0x485u, 0u);
+                set_char_height(0u);
                 assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
                 assert(frame->window.text.base.font_height == 0u);
+                set_char_height(saved_height);
                 c_sas_store(0x485u, saved_font_height);
+                /* Intermediate geometry is not a completed unsupported mode. */
+                now_height = 50;
+                set_display_disabled(1);
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
+                set_display_disabled(0);
+                set_mode_change_required(TRUE);
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
+                set_mode_change_required(FALSE);
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
+                now_height = saved_rows;
+                {
+                    byte *saved_planes = EGA_planes;
+                    EGA_planes = NULL;
+                    assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_IO_ERROR);
+                    assert(!frame->window.valid);
+                    EGA_planes = saved_planes;
+                }
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
             }
             const lib_u16 *map = frame->characters.primary;
             assert(map[0]==' ' && map['A']=='A');
