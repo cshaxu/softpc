@@ -2,40 +2,38 @@
 
 ## Current Work
 
-M9 T71 S5 is active: fixed capacity and explicit frame failures.
-Owner: "好的，接下来准入修复，开始执行。" S4 delivery 17c9da90 is reviewed,
-closed and pushed; T71 remains open through S5--S6 and owner acceptance.
-S5 preflight found backing-capacity and font-clamping prerequisites in Compat;
-owner approved the narrow Compat changes ("批准修改compat"). S5 implementation
-and dual-width verification are complete; executor P delivery/review is next.
+M9 T71 S6 is active: integration and simplification audit.
+Owner: "好的，接下来准入修复，开始执行。" S5 delivery 193ff7f0 is reviewed,
+closed and pushed; T71 remains open through S6 and owner acceptance.
 
-## M9 T71 S5 Packet
+## M9 T71 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner-approved serial T71 plan and explicit S5 capacity/result-contract refinement; coordinator S4 review passed; owner additionally approved narrow Compat edits. |
-| Objective | Validate fixed text/font/map/graphics limits at their owning boundaries; remove producer clipping and distinguish no new frame from failure through the existing Common completion path. |
-| Non-goals | No capacity expansion, dynamic frame allocation, auto presenter fallback, guest-mode change, new side-channel error flag, MVDM/snapshot/INI/media changes or input/lifecycle redesign. Compat changes are limited to truthful presentation extent/font metadata. |
-| Reference Baseline | 17c9da90 S4 delivery; dual-width Release and final 110/110 per width. |
-| Candidate Proposal | [T71 plan](../proposals/m9-kvm-text-frame-contract.md), S5 fixed-capacity contract. |
-| Files And ABI Surface | Base common-text validator; Window font/graphics and Console map admission; logical Console output; Common driver copy_frame result/caller and VM producer; Compat text extent/font queries; direct fakes/tests, manifests and relevant contracts. |
+| Admission And Approval | Owner-approved serial T71 S3--S6 plan; coordinator S5 actual-change review passed. |
+| Objective | Close the T71 finite coverage ledger, verify final ownership and removed legacy paths, audit storage/copy costs and task-introduced simplification opportunities. |
+| Non-goals | No unrelated cleanup, capacity expansion, new state/threads, guest fallback, MVDM/snapshot/INI/media changes or new platform support. |
+| Reference Baseline | 193ff7f0 S5 delivery; dual-width Release and final 110/110 per width. |
+| Candidate Proposal | [T71 plan](../proposals/m9-kvm-text-frame-contract.md), S6 integration audit. |
+| Files And ABI Surface | All T71 changed frame/control contracts and producers/consumers under Lib/Common/VM/Compat and direct tests; current design, manifests and finite ledger. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and shared governance skills. |
-| Verification | Zero/min/max/over-limit, font default/range, map representation, hidden/offscreen cursor, graphics stride/extent, no mutation/wake/cache on rejection; no-frame versus failure through real Common/VM path; full serial dual-width and package/snapshot gates. |
-| Expected Markers | No silent producer clipping or boolean conflation; validators owned by the responsible component, one error path, no frame fallback. |
+| Verification | Requirement-to-source/test mapping, old-symbol and dependency sweep, exact storage/copy accounting; serial dual-width full suites and four corpus/DAG/package/snapshot gates. |
+| Expected Markers | Base transports opaque payloads, leaf-owned interpretation, VM-owned mapping, no legacy alias or second frame path; bounded validation and explicit errors. |
 | Asset Needs | Existing builds and both EXEs; bounded synthetic tests only, no user media/configuration changes. |
-| Reporting Requirements | Refresh preflight estimate after direct callback inventory before editing code; report additions/removals/net for production, tests, gates/docs separately and EXE sizes. |
-| Stop Conditions | Additional executor/state owner, out-of-band error flags, unrelated scope growth, capacity expansion, MVDM changes, Compat changes beyond presentation queries or guest fallback. |
-| Exit Criteria | Fixed-capacity matrix and actual failure propagation verified; clipping removed; all callers migrated, both builds/full tests pass; implementation P pushed then coordinator review. |
-| Original Owner Request | 保留现有容量，不扩容、不动态分配；统一做完整校验，超限明确失败，禁止静默裁剪。好的，接下来准入修复，开始执行。 |
-| Similar-Issue Sweep | All validation/copy_frame producers, callers and fakes under src/test; include implicit clipping and bool failure conflation, not only min() patterns. |
+| Reporting Requirements | Initial production estimate +0/-0; explain any necessary revision before code changes. Report actual additions/removals/net and artifacts; no whole-hardware correctness claim. |
+| Stop Conditions | Material repair beyond the approved ownership migration, new state owner/thread/frame path, guest behavior workaround or unrelated scope growth. |
+| Exit Criteria | Every T71 ledger member has inspected evidence; obsolete task paths removed or justified; required verification passes, P pushed and coordinator review complete; T remains open for owner acceptance. |
+| Original Owner Request | kvm-base 只管两个不同mailbox的实现和传输机制 (fifo and latest-wins)，实际命令处理都交给消费者；写入本T任务的proposal并进行S任务拆分；好的，接下来准入修复，开始执行。 |
+| Similar-Issue Sweep | Task-wide frame/control type ownership, mapping constants, mailbox interpretation, validation/copying and stale interfaces across all production/test callers. |
 
 ## Current Technical Baseline
 
-- S5 working delivery: production C/H +137/-59 (net +78), test C/H +139/-17
+- S5 delivery 193ff7f0: production C/H +137/-59 (net +78), test C/H +139/-17
   (net +122); four manifests +23/-23. Release builds succeed on both widths;
   final x64 110/110 (71.06 seconds), x86 110/110 (100.87 seconds). Both package
   EXEs rebuilt. No MVDM, INI, media or snapshot-format changes.
+  [S5 review](../history/M9-T71-S5-frame-capacity.md) closes its finite boundary.
 
 - S4 typed frames/opaque transport: 17c9da90; production +469/-345 (net +124),
   test C/H +406/-312 (net +94). Both EXEs rebuilt; final serial x64/x86 110/110.
@@ -77,7 +75,7 @@ and dual-width verification are complete; executor P delivery/review is next.
 
 ## Recent Governance
 
-T70 is closed; T71 S5 is the sole active implementation task.
+T70 is closed; T71 S6 is the sole active implementation task.
 
 - **M9 Td S17:** Owner requested a concrete KVM text/frame correction proposal
   at queue head. Recorded capability rejection, explicit character/glyph
