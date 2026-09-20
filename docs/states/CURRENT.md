@@ -6,7 +6,7 @@ No implementation subtask is active.
 Open task awaiting owner: T72.
 
 S1 design accepted; S2 implementation and review complete; S3 technical audit
-is delivered for review. T72 is not formally closed. Both Release packages are
+and actual-change review complete. T72 is not formally closed. Both Release packages are
 ready for owner testing; no next queued task is admitted.
 See [readiness audit](../history/M9-T72-S3-completion-readiness-audit.md).
 
