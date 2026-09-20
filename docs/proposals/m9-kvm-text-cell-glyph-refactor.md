@@ -295,5 +295,7 @@ Raw mouse 注册是进程级资源：捕获只接受无现有注册的情况，�
 净 +108。增加量主要是原生 packet 解码及注册资源边界，非新的业务状态机。
 没有改 Common、VM、Compat、MVDM、Console、INI 或介质。
 构建、测试、交付及验收边界记录在
-[S4 交付记录](../etc/evidence/softpc/m9-t72-s4-native-mouse-motion.md)。推送后等 owner
-本机/RDP 测试，不自动收口 S4 或 T72。
+[S4 交付记录](../etc/evidence/softpc/m9-t72-s4-native-mouse-motion.md)。
+Owner 已确认 desktop/RDP 测试均通过，批准 S4 收口；
+[S4 收口与 T72 就绪汇总](../history/M9-T72-S4-native-mouse-acceptance.md)
+核对原始目标及追加范围。T72 正式收口仍待明确批准。
