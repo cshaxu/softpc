@@ -3,8 +3,11 @@
 ## Current Work
 
 No implementation subtask is active.
-T71 is closed by owner approval following S10 manual acceptance.
-No S11 or new numeric T is admitted; see [Queue](QUEUE.md).
+Open task awaiting owner: T72.
+
+T72 S1 design draft is delivered for owner review; implementation is not approved.
+See the [design draft](../proposals/m9-kvm-text-cell-glyph-refactor.md) and
+[S1 audit](../history/M9-T72-S1-neutral-text-design.md). T71 remains closed.
 
 ## Current Technical Baseline
 
@@ -21,7 +24,7 @@ No S11 or new numeric T is admitted; see [Queue](QUEUE.md).
   layout and cursor normalization are recorded in the
   [T71 completion audit](../history/M9-T71-completion-audit.md).
 - TODO tracking is retired by owner decision, not proof of repair.
-  Neutral text attributes remain separately queued.
+  Neutral text attributes are under T72 design review, not implemented.
 
 ## Recent M9 Closures
 

@@ -5,7 +5,8 @@
 Owner: "队列第二位追加一个T任务，用于修复win95把软驱A盘识别为
 “可移动磁盘”而不是软驱的故障，Td治理。"
 
-Unnumbered candidate, second in Queue. No numeric T, implementation or runtime
+Unnumbered candidate, originally inserted second; current order is in Queue.
+No numeric T, implementation or runtime
 investigation is admitted by this document. The reported symptom is not yet
 independently reproduced; root cause remains unknown.
 
