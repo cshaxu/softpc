@@ -3,7 +3,7 @@
 ## Request And Status
 
 Owner admitted T71 and S2 design. S1 delivered text-only admission at 04d76945;
-its evidence is retained below. S2--S4 are reviewed; Current owns S5 execution.
+its evidence is retained below. S2--S5 are reviewed; Current owns S6 execution.
 The latest owner-approved direction supersedes the earlier monolithic-frame
 mapping-only and per-cell proposals. S3 implements control ownership first;
 the frame/mapping migration remains S4 work.
@@ -21,9 +21,9 @@ The independent [cell/colour cleanup candidate](m9-kvm-text-cell-glyph-refactor.
 remains queued only for per-cell struct/attribute normalization. It must not
 repeat this task's frame ownership, mapping relocation or mailbox work.
 
-## Observed Baseline
+## Observed Pre-migration Baseline
 
-The current kvm-base frame contains text, both raster fonts and graphics pixels.
+At admission the kvm-base frame contained text, both raster fonts and graphics pixels.
 Its mailbox embeds that entire value even for Console and implements graphics
 validation, copying and dirty accumulation. Console reserves unused graphics
 capacity, but text copies skip pixel storage; S1 rejects graphical publications
@@ -457,6 +457,130 @@ migrated / unchanged-with-reason / owner-approved-transfer, with proof.
 No claims of whole-Lib/hardware correctness. Stop for review on MVDM changes,
 new runtime ownership/threads, a second frame path, unsupported Linux feature
 implementation, guest-visible fallback, or unexplained scope/complexity growth.
+
+## S6 Integration Audit Checkpoint
+
+Baseline 910ecdcc. The original production estimate was +0/-0. Source review
+found a bounded default-font inconsistency: Window render treats height zero as
+16, but cursor geometry skipped scanline bounds when height was zero. S5 now
+preserves that metadata from Compat, so this must be resolved before acceptance.
+Pre-change estimate: about +8/-7 in the existing Window geometry function and
+one default-height regression. No public API, state, allocation or producer change.
+
+The existing damage/motion/render smoke was extended with a visible underline
+at the last text row using height zero. It failed on the baseline (expected
+407..410 but received the full cell), then passed after resolving zero to the
+same existing Window default before cursor arithmetic. Actual production C/H
+is +7/-6 (net +1); test C/H +4/-0. Existing inverted-shape fallback is unchanged.
+Both focused widths pass; full delivery evidence follows below. Coordinator
+acceptance and owner T acceptance remain separate from implementation evidence.
+
+## S6 Detailed Integration Audit
+
+## Request And Scope
+
+Owner requested common text fields in KVM Base, leaf-owned fonts/maps and
+Window-only graphics, with opaque FIFO/latest-wins transport. S5 additionally
+requires fixed-capacity validation and explicit producer errors, not clipping.
+S6 audits the complete T71 migration against that request. T remains open for
+owner acceptance. Baseline: 910ecdcc, production delivery 193ff7f0.
+
+## Finite Audit Ledger
+
+The frozen universe is the changed src/test paths from 7557ca5 through this
+delivery, plus their direct frame/control callers and both selected platform
+workers. Reproduce with `git diff 7557ca5 --name-only -- src test` and searches
+for publish/capture/acknowledge, copy_frame, graphics/dirty/font/map and control
+kinds. Dispositions below are migrated, unchanged with reason, or separately
+queued. They do not claim an audit of unrelated hardware or all Lib behavior.
+
+| Unit | Inspected result | Proof |
+| --- | --- | --- |
+| Base contracts/mailbox | Common text fields only; opaque bytes, independent locks, generation and STOP envelope. No leaf command or graphics interpretation. | mailbox.c/frame_interface.h; mailbox selection, frame lock, leaf control capacity and negative ownership gate |
+| Window control/frames | Typed private commands, consumer validation, tagged text/graphics, private dirty union under the existing frame lock. | window.c and Win32 worker; damage/motion, modal, retirement and capture tests |
+| Console/broker | Typed text plus two map banks; worker converts once to logical Unicode cells. Capture survives NOT_CURRENT and only successful current-generation output acknowledges. | console.c, worker and broker Unicode output; retirement, display and I/O tests |
+| Common machine/session/UI | One composed upstream value; both maps/fonts participate in text change detection; session forwards fields; UI constructs only a small text/status Console value. Success caches advance only after accepted output. | machine.c/session.c/ui.c; common_machine, session_frame, composition and machine_wait tests |
+| VM/Compat | VM owns the sole PC glyph table. Compat reports display extent separately from backing capacity and preserves unsupported font metadata. VM rejects rather than crops. | driver.c/video.c; VGA producer dimensions/font/error tests |
+| Failure boundary | Driver lib_status plus existing valid bit distinguishes failure from no frame. Existing executor unwind reports ERROR; no side-channel flag or fallback. | machine_wait real-worker tests and VGA producer tests |
+| Input/lifecycle/snapshot | Input owners and native capture paths are unchanged by the frame migration. Snapshot stores device state, not presentation structures. | Diff against 7557ca5; keyboard/capture/retirement, restart, snapshot transaction and cross-process tests |
+| Linux workers | Still explicitly UNSUPPORTED; no fake implementation or new runtime dependency. | Both leaf linux/component.c; build-contract checks, not native Linux execution |
+| Shared boundaries | Four corpora retain manifests; DAG rejects Base reverse edges and Common machine imports of leaf instance APIs while permitting frame values. | Source verifiers and negative fixtures, not filename checks alone |
+
+Searches of src/test C/H find no old `kvm_frame` or `lib_console_pc_glyph`
+API. `vm_driver_pc_glyphs` has one definition and two bank copies. Base mailbox
+has no dirty/font/map/graphics fields or Window action constants. Window alone
+merges graphics damage. No extra frame worker, per-frame allocation, alias or
+parallel publication path is retained.
+
+## Bounded Repair And Similar-Issue Sweep
+
+Initial production estimate was +0/-0. Review found the default font-height
+path: glyph rendering interprets zero as 16 rows, while cursor geometry skipped
+scanline bounds and drew a full cell. S5 now preserves zero metadata from Compat.
+The announced revision estimated about +8/-7 production lines and one test.
+
+The added last-row underline assertion fails on the unmodified geometry and
+passes after resolving the default locally before existing arithmetic. Actual
+production change is +7/-6, net +1; test +4/-0. No new helper/API/state. Explicit
+heights, inverted-shape fallback and off-surface behavior are unchanged.
+
+Sweep: search font_height/cursor_top/cursor_bottom in Window, Console and broker.
+Window render/size already use the same default. VM cursor percentages also use
+16 for zero. Logical Console's zero-height native percentage fallback remains its
+independent existing contract; it owns no raster-font default. This repair does
+not assign Window bitmap rules to Console. The focused regression passes on both
+widths; full delivery verification is recorded below when complete.
+
+## Storage And Simplification
+
+The S4 measured layouts remain unchanged: S5/S6 change validators/arithmetic,
+not frame structs. Base text is 6088 bytes; Window value 984100; Console 7112;
+Common upstream 985128. Window text copies 14288 bytes, Console 7112, graphics
+1060 plus stride times height. Compared with the old 998384-byte common value,
+seven main frame values save 2050880 bytes; UI temporary saves 991272 bytes.
+These are object/copy sizes, not whole-process memory claims.
+
+Allocation review confirms two machine buffers, one session value, pending and
+captured storage per leaf and one small UI temporary. No second maximum-pixel
+buffer was introduced. Common's 1 KiB map storage is inactive for graphics but
+keeps one upstream publication; it is not copied down to Console as graphics.
+The private Window update operation is necessary to merge dirty bounds while
+the mailbox lock is held; removing it would relocate leaf policy back into Base.
+Console's conversion helper is the worker-to-logical-Console boundary, not a
+second public publication API. No speculative wrapper elimination is warranted.
+
+UI status text intentionally wraps/truncates its fixed help surface; this is not
+clipping an actual machine mode. Per-cell/neutral attribute redesign remains the
+separate queued proposal and is not silently implemented by T71.
+
+## Verification And Accounting
+
+Both complete Release builds succeed. Final serial full CTest passes x64
+110/110 in 113.24 seconds and x86 110/110 in 98.52 seconds. Source/tests remained
+unchanged during these runs. The source/test manifest revision comment was
+advanced between runs; hashes were unchanged and both manifest gates were
+rechecked on x64 afterward. Package, snapshot transaction/cross-process, restart,
+four manifests and source/DAG negative gates pass. Documentation and diff checks
+pass after retaining unfinished audit records here rather than prematurely in
+history. No new disposable diagnostic directory or guest-media changes.
+
+S6 production C/H: +7/-6, net +1 (geometry.c); test C/H: +4/-0, net +4
+(kvm_frame_damage_mouse_smoke.c). Two manifests: +4/-4; build/gates: +0/-0.
+Documentation is counted separately at commit. Whole T71 final C/H difference
+from 7557ca5: production +626/-407, net +219 in 34 paths (Lib 23, Common 6,
+VM 3, Compat 2); tests +661/-336, net +325 in 30 paths. This is final-tree
+difference, not a sum that counts repeatedly edited lines multiple times.
+The 256 relocated PC glyph values compare exactly with the original Lib table.
+No MVDM or snapshot codec source differs from the T71 baseline.
+
+Both refreshed package sizes are unchanged from S5:
+
+- x86: 3655213 bytes, delta 0; SHA-256 E5229A2176F8E83E960B0C9C430E6C5246B2CFFEDEC3370D6D3CC1F7E4AB6182.
+- x64: 3058756 bytes, delta 0; SHA-256 90949A63700FAB618EA37E17ADDFBD6181DB4027484BB1BE2D781DECE084E684.
+
+No fresh manual Win3.1/Win95 acceptance or native Linux presenter execution is
+claimed. T71 stays open for owner testing. Coordinator actual-P review follows
+the implementation push; unrelated queued-proposal edits remain untouched.
 
 ## Historical S1 Delivery
 

@@ -115,6 +115,10 @@ static void rendering(void)
     text.text.base.font_height = 16; text.text.base.cursor_top = 14; text.text.base.cursor_bottom = 15;
     assert(kvm_window_cursor_rect(&text, &display, &cursor));
     assert(cursor.bottom == 410 && cursor.top == 407);
+    text.text.base.font_height = 0;
+    assert(kvm_window_cursor_rect(&text, &display, &cursor));
+    assert(cursor.bottom == 410 && cursor.top == 407);
+    text.text.base.font_height = 16;
     for (int row = 0; row < 25; ++row) {
         text.text.base.cursor_row = row;
         assert(kvm_window_cursor_rect(&text, &display, &cursor));

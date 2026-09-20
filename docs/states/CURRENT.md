@@ -29,6 +29,14 @@ closed and pushed; T71 remains open through S6 and owner acceptance.
 
 ## Current Technical Baseline
 
+- S6 audit found default-height cursor geometry inconsistent with Window glyph
+  rendering. The bounded repair resolves zero to the existing 16-row default;
+  production +7/-6 (net +1), test +4/-0. The added x64 regression failed before
+  and passes after the change on both widths. Both Release builds and serial
+  full tests pass: x64 110/110 (113.24s), x86 110/110 (98.52s). Packages rebuilt
+  with unchanged byte sizes. Executor P and coordinator review remain pending;
+  the proposal records the completed finite-ledger audit and exact accounting.
+
 - S5 delivery 193ff7f0: production C/H +137/-59 (net +78), test C/H +139/-17
   (net +122); four manifests +23/-23. Release builds succeed on both widths;
   final x64 110/110 (71.06 seconds), x86 110/110 (100.87 seconds). Both package

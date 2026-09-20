@@ -103,7 +103,7 @@ int kvm_window_cursor_rect(const kvm_window_frame *frame, const kvm_window_rect 
     kvm_window_rect *cursor)
 {
     int width, height, cell_top, cell_bottom;
-    lib_u32 top, bottom;
+    lib_u32 top, bottom, font_height;
     if (kvm_window_frame_validate(frame) != LIB_STATUS_OK || !display || !cursor || frame->graphics ||
         !frame->text.base.cursor_visible || frame->text.base.cursor_column < 0 || frame->text.base.cursor_row < 0 ||
         frame->text.base.cursor_column >= frame->text.base.text_columns || frame->text.base.cursor_row >= frame->text.base.text_rows)
@@ -117,15 +117,16 @@ int kvm_window_cursor_rect(const kvm_window_frame *frame, const kvm_window_rect 
     cursor->right = display->left+(lib_i32)((lib_i64)(frame->text.base.cursor_column+1)*width/frame->text.base.text_columns);
     cursor->top = display->top+cell_top;
     cursor->bottom = display->top+cell_bottom;
-    if (frame->text.base.font_height && frame->text.base.cursor_bottom >= frame->text.base.cursor_top) {
+    font_height = frame->text.base.font_height ? frame->text.base.font_height : KVM_WINDOW_FONT_HEIGHT;
+    if (frame->text.base.cursor_bottom >= frame->text.base.cursor_top) {
         top = frame->text.base.cursor_top;
-        if (top >= frame->text.base.font_height) return 0;
+        if (top >= font_height) return 0;
         bottom = (lib_u32)frame->text.base.cursor_bottom + 1u;
-        if (bottom > frame->text.base.font_height) bottom = frame->text.base.font_height;
+        if (bottom > font_height) bottom = font_height;
         cursor->top = display->top+cell_top+(lib_i32)(
-            (lib_i64)(cell_bottom-cell_top)*top/frame->text.base.font_height);
+            (lib_i64)(cell_bottom-cell_top)*top/font_height);
         cursor->bottom = display->top+cell_top+(lib_i32)(
-            ((lib_i64)(cell_bottom-cell_top)*bottom+frame->text.base.font_height-1u)/frame->text.base.font_height);
+            ((lib_i64)(cell_bottom-cell_top)*bottom+font_height-1u)/font_height);
     }
     return cursor->right > cursor->left && cursor->bottom > cursor->top;
 }
