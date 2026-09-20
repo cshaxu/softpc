@@ -1,5 +1,8 @@
 # x86 corpus
 
+This package selects C11 without extensions in standalone and embedded builds.
+GNU/Clang builds enable -Wall -Wextra -Wpedantic -Werror in this package only.
+
 Architecture-specific copied protocols and DOS-style debug/assembly tools.
 Products explicitly add this corpus; Common and Lib never depend on it.
 There is no executor, Console, input loop or product state machine here.

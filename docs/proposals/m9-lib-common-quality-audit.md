@@ -112,7 +112,58 @@ x86 110/110 (168.37s); five desktop tests per width excluded. EXE SHA256:
 x86 E6D738B78BB07F1B9F25F98AE07A6E6AEFAB3655B1DB9F88D990C399E0F6F46F;
 x64 E483BF53CE7D694B0AA0F3343704FF09079CE80E17152AE5C343260737735BFF.
 
-## Delivery Discipline
+## S3 Design And Estimate
+
+Baseline 48454ba9. Estimate 12--16 code/build/test files: C/H production
++20/-10, build/tests +55/-65, net near zero, excluding manifests/docs/artifacts.
+Each package sets its own C11/no-extension directory scope after standalone
+project initialization, independent of the parent C17 setting. GNU/Clang
+strict warnings apply in those scopes only; replace Lib's optional per-target
+warning loop with the same direct policy. No new configuration knobs/framework.
+Design/CODING records the owner's explicit six-package C11 override; rules and
+App/Core settings remain unchanged. Partial event/keyboard initializers become
+designated; unused legacy parameters retain call shapes with explicit void use;
+trace-break keeps breaking the caller loop, never a new do/while loop.
+
+The preliminary raw-file sweep also encounters the intentionally broken include
+fixture and Linux-only hard-link test under a Windows compiler. Neither is a
+configured Windows translation unit; do not alter these tests to make that
+diagnostic invocation pass. Actual configured compile commands define the
+strict-build universe. Linux platform runtime coverage remains separate.
+
+Code-generation diagnostics refine that universe: retain five intentional
+fallthroughs with comments; remove only unreferenced static assembler INT3 and
+disassembler POP_CS helpers (no table/dispatcher edits). SIB initialization
+cannot affect a decoded operand: all uses require mod != 3 and rm == 4, whose
+earlier path reads SIB or fails. Add complete MOV ModRM/SIB length coverage.
+An optimized included-source Base test exposes a handles initialization false
+positive: the existing count guard already rejects zero. A do/while states
+that existing nonempty-copy invariant without clearing unused array slots or
+adding validation/allocations. These are strict build fixes, not new behavior.
+The same optimized sweep flags t/xt count after invalid argument counts: return
+immediately after the existing seterr, rather than relying on the subsequent
+error-position test to prove count is assigned. Valid trace behavior is unchanged.
+The x86 compiler additionally requires an initial false value for the cooked
+restore test's pending output. Its first assertion still requires true, then
+later assertions require false; no assertion is removed or relaxed.
+The now-unused not_cancelled stub left by S2 is deleted, not annotated unused.
+
+Actual compile-command audit: each width has 94 shared-target C entries:
+Lib 25, Common 7, x86 4, test/lib 37, test/common 15, test/x86 6.
+All select -std=c11 and all four strict warning flags. Product/Core settings
+are unchanged. The MOV test covers 6376 ModRM/SIB combinations.
+Current tracked C/H/build accounting (16 files): production +29/-30 (net -1),
+six CMake entries +36/-35 (net +1), tests +20/-6 (net +14); total +85/-71,
+net +14. This exceeds the near-zero estimate only through additional targeted
+test coverage, not new runtime state or API. Readmes/manifests/docs are separate.
+Final post-build background runs: x64 110/110 (135.03s), x86 110/110
+(158.30s), five desktop cases excluded per width. Both strict Release builds
+pass. Earlier in-progress regressions are not used as final evidence.
+All six manifests, DAG/negative gates and documentation/diff checks pass.
+EXE SHA256: x86 6CF44CB6C5F74EC003237BDB6687D918458757018279C95B9831114EFEC99A40;
+x64 A37641357713B3225BCDE8D4649F4BDF1B137F026E8B0CF016949E69BB7101E7.
+
+## Delivery Conditions
 
 One S active at a time. No desktop interaction: background presets and
 standalone -LE desktop. Preserve INI, media, snapshots and Core.

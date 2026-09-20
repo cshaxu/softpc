@@ -1666,7 +1666,7 @@ static C_VOID t(command_context *debugContext)
         break;
     default:
         seterr(debugContext, narg - 1);
-        break;
+        return;
     }
     if (nErrPos)
     {
@@ -2320,7 +2320,7 @@ static C_VOID xt(command_context *debugContext)
         break;
     default:
         seterr(debugContext, narg - 1);
-        break;
+        return;
     }
     if (nErrPos)
     {

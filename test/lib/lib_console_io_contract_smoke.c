@@ -102,7 +102,7 @@ static void cooked_restore(void)
 {
     console_broker_backend b={0};
     lib_console *c;
-    lib_bool pending;
+    lib_bool pending = LIB_FALSE;
     assert(lib_console_create(&c)==LIB_STATUS_OK);
     assert(lib_console_bind_generation(c,1)==LIB_STATUS_OK);
     assert(lib_console_set_event_sink(c,receive,NULL)==LIB_STATUS_OK);

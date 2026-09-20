@@ -32,11 +32,8 @@ static base_sync_wait_result idle_wait(base_sync_event *event, lib_u32 timeout);
 static lib_status no_thread(base_sync_task_entry entry, void *context,
     base_sync_task **out)
 { (void)entry; (void)context; *out = NULL; return LIB_STATUS_OK; }
-static lib_bool not_cancelled(const base_sync_task *task)
-{ (void)task; return LIB_FALSE; }
 #define base_sync_task_create no_thread
 #define base_sync_task_destroy destroy_task
-#define base_sync_task_cancelled not_cancelled
 #define base_sync_event_wait idle_wait
 #define base_sync_wait_any paused_wait
 #define base_sync_mutex_lock request_lock
@@ -44,7 +41,6 @@ static lib_bool not_cancelled(const base_sync_task *task)
 #undef base_sync_mutex_lock
 #undef base_sync_wait_any
 #undef base_sync_event_wait
-#undef base_sync_task_cancelled
 #undef base_sync_task_create
 #undef base_sync_task_destroy
 

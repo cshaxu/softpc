@@ -1,5 +1,8 @@
 # Shared Common tests
 
+This package selects C11 without extensions in standalone and embedded builds.
+GNU/Clang builds enable -Wall -Wextra -Wpedantic -Werror in this package only.
+
 This neutral suite needs only sibling `src/common` and `src/lib` corpora.
 The four-directory set `src/lib`, `src/common`, `test/lib`, `test/common`
 builds and tests without any x86 or importing-product files.

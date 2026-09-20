@@ -1,5 +1,8 @@
 # Common corpus
 
+This package selects C11 without extensions in standalone and embedded builds.
+GNU/Clang builds enable -Wall -Wextra -Wpedantic -Werror in this package only.
+
 `src/common` contains shared, ISA-neutral virtual-machine coordination. It
 uses public `lib` contracts and accepts product behavior only through copied
 options and injected callbacks.  It never includes app, host, or MVDM source.

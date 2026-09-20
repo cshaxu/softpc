@@ -34,6 +34,12 @@ it reuses the neutral test/common fake-machine fixture, not another runner.
 The six source/test directories serve x86 products; src/common, src/lib,
 test/common and test/lib alone serve neutral products. Each suite has its own
 CMake entry and manifest. Product tests remain outside the shared suites.
+All six shared source/test packages select C11 with extensions disabled, in
+both standalone and embedded builds. GNU/Clang shared builds use
+-Wall -Wextra -Wpedantic -Werror. This owner-approved shared-corpus baseline
+supersedes the general standalone C17 rule only for these six directories;
+App/Core retain their existing language settings. Package-local build settings
+do not propagate warning policy or a new language requirement into the product.
 Only Lib provides the underlying platform implementation.
 Shared `lib/types` is header-only. Its top level contains common C/compiler
 vocabulary; explicit `win32/` and `linux/` headers group external platform

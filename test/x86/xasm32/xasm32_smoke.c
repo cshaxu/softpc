@@ -35,5 +35,23 @@ int main(void)
             LIB_TRUE) != LIB_STATUS_OK || length != 4u || code[0] != 0x67u ||
         code[1] != 0x0fu || code[2] != 0x24u || code[3] != 0xf0u) return 17;
 
+    /* Cover every ModRM/SIB path; non-SIB addressing must not use SIB state. */
+    code[0] = 0x8bu; /* MOV r32,r/m32 */
+    for (unsigned modrm = 0; modrm < 256; ++modrm) {
+        unsigned mod = modrm >> 6, rm = modrm & 7;
+        int has_sib = mod != 3 && rm == 4;
+        code[1] = (lib_u8)modrm;
+        for (unsigned sib = 0; sib < (has_sib ? 256u : 1u); ++sib) {
+            lib_size expected = 2u + has_sib;
+            lib_memory_set(code + 2, 0, sizeof(code) - 2);
+            code[2] = (lib_u8)sib;
+            if (mod == 1) ++expected;
+            if (mod == 2 || (mod == 0 && (rm == 5 ||
+                    (has_sib && (sib & 7) == 5)))) expected += 4;
+            if (x86_xasm32_disassemble(code, sizeof(code), statement,
+                    sizeof(statement), &statement_length, &length, LIB_TRUE) !=
+                    LIB_STATUS_OK || length != expected) return 18;
+        }
+    }
     return 0;
 }

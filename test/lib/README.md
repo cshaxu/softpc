@@ -1,7 +1,7 @@
 # Shared Lib tests
 
 Transfer `src/lib`, `src/common`, `test/lib`, and `test/common` unchanged.
-This suite requires only `src/lib` and `test/lib`, a C17 compiler and system
+This suite requires only `src/lib` and `test/lib`, a C11 compiler and system
 libraries. No product target, firmware, INI or media is required.
 
 ```text

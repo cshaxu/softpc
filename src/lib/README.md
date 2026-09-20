@@ -1,5 +1,8 @@
 # Shared Library
 
+This package selects C11 without extensions in standalone and embedded builds.
+GNU/Clang builds enable -Wall -Wextra -Wpedantic -Werror in this package only.
+
 Unit tests and fixtures live in `test/lib`, not in the production corpus.
 Configure `cmake -S test/lib -B build/lib-tests`, build that directory, then
 run CTest there. The source-only CMake entry retains its manifest target;
