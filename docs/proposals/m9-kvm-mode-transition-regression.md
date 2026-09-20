@@ -229,7 +229,7 @@ Owner: "准入，开始。每个S任务完成都要提交推送保持工作区�
 - S10 will compare the complete admitted behavior with pre-T71, remove obsolete
   repairs and audit actual component/mirror diffs and real dual-width workflows.
 
-Only S7 is active. Every delivery builds both EXEs, runs focused/full evidence,
+S7 is now owner-accepted and S8 is active. Every delivery builds both EXEs, runs focused/full evidence,
 reports additions/deletions/net, commits/pushes and waits for owner testing.
 Do not automatically activate the next S after pushing.
 
@@ -293,3 +293,94 @@ exercise both existing PIFs and repeated transitions on the actual executor;
 they do not claim native visual acceptance. Full dual-width results and package
 hashes above match the delivered artifacts. Preexisting Queue edits are intact.
 S7 waits for owner feedback; S8--S10 and the T-level audit remain open work.
+
+## S8 Admission And Implementation Brief
+
+Owner accepted S7 and approved the S8 brief. Baseline is 92be0e6a. Common
+Machine alone owns request admission/results/completion. Four public synchronous
+entries (read_state, write_state, set_removable_media, debug_execute_with_lease)
+retain their control-thread serialization and existing driver/event routes.
+A short request mutex makes admission atomic with terminal state/cleanup; it
+never spans a driver callback, frame copy or wait. Normal request completion
+remains unchanged. After run unwind, pending requests fail once through their
+existing result/event, while completed results remain untouched. Permanent
+worker exit closes admission; a caller cannot register work after cleanup.
+
+Frozen coverage: all four requests, pending read before/after arm, restored
+load before pause, driver run failure, frame failure, parked/idle wait failure,
+normal stop/reset/shutdown, no-frame success and already-completed results.
+Every member needs a focused proof or explicit existing-test disposition.
+No new public API, cancel protocol, timeout, retry, queue or product change.
+Initial estimate was production +30--60/-10--25; admission race review revises
+it to +80--110/-20--35. Tests may require +180--280 to cover both admission
+orders and all failure phases. Exact diff and footprint follow verification.
+
+### S8 Finite Exit/Request Review
+
+The bounded sweep searched request flags, base_sync_event_wait/wait_any and
+task_destroy throughout common/machine, then every registration and terminal
+worker path. The four public synchronous operations use one admission helper;
+the sole control caller still serializes payload/result ownership. The request
+mutex is separate from frame_lock; no driver callback or wait holds it. Cleanup
+occurs after run/driver unwind, before the terminal fact. The internal reset
+handoff also fails old pending work before starting the new run. Permanent
+worker exit sets the existing terminate flag so no later request can register.
+
+| Member | Disposition and focused proof |
+| --- | --- |
+| Save before driver arm | Public read_state with frame failure returns IO_ERROR, without PAUSED; common_machine_smoke. |
+| Save after arm | Driver run fails before returning a save result; public read_state returns IO_ERROR only after callback removal; common_machine_smoke. |
+| Load before restored pause | Public write_state succeeds at the reader hook but fails first frame; returns IO_ERROR, no PAUSED; common_machine_smoke. |
+| Pending read / load-request / load-wait / debug / media | Five pending forms crossed with frame failure, paused wait fault, cancellation and idle wait fault; machine_wait_smoke checks event/result, cleared flags and no duplicate completion. |
+| Registration versus termination | Deterministic mutex seam ends execution immediately before registration; request rejects. The converse is covered by registered pending cleanup. A dead worker rejects registration even if state otherwise allows it. |
+| Reset internal unwind | A pending read fails and signals before the second reset callback; it cannot silently move into the next run. |
+| Completed outcomes | Cleared flags preserve result sentinels; normal public save, paused save, load, debug and media remain in common_machine_smoke. |
+| Ordinary pause already pending | A save cannot complete merely because PAUSED was reached; the existing read-ready flag must be set. Public fake defers the result across the ordinary pause and proves exactly one payload write. |
+| No frame / lifecycle | Existing scripted no-frame, resume/stop/reset and fault/cancel matrix remains; zero valid frame is not an error. |
+| Shutdown ownership | Existing failed-join retention and real active/paused/never-started shutdown tests remain; no early object/context release. |
+| ready_event | Search finds no reader at all; obsolete allocation/reset/signal/destroy path removed, not replaced by another event. |
+
+The new public-call regression linked against baseline 92be0e6a Machine failed
+to finish within its 10-second budget; the owned process was terminated. Current
+focused tests pass, including five consecutive repetitions before the final
+reset-boundary extension. The baseline probe changes no product or media.
+Strict C17 syntax compilation of machine.c with -Wall -Wextra -Wpedantic -Werror
+passes. Common and test/common manifests are refreshed independently.
+
+Actual production C diff versus 92be0e6a: machine/machine.c +85/-39, net +46.
+Test C diff: common_machine_smoke.c +47/-3, machine_wait_smoke.c +114/-6;
+total +161/-9, net +152. No public header, Lib, VM, Compat, MVDM, INI, media or
+snapshot-format change. One private mutex replaces the unused ready event;
+no new thread, queue, lifecycle state or cancellation protocol is introduced.
+
+The first full x64 run was 108/110: the deferred-save fake could execute one
+callback twice because both caller/executor wake paths loaded its waiting flag
+before either cleared it. Its single simulated result is now claimed by atomic
+exchange, matching the intended exactly-once fixture. Both focused Common tests
+then passed 30 consecutive x64 runs and 10 consecutive x86 runs. The unchanged
+native modal test failed once per width at its move-loop-still-open assertion,
+then passed three isolated runs on each width. The first x86 full run was
+109/110, with only that modal test failing. No Lib repair or environmental root
+cause is claimed; final full suites remain required. S10's whole-T test-evidence
+audit owns this modal-test observation.
+
+### S8 Final Executor Verification
+
+Final Release builds succeeded on both widths. Serial full suites pass:
+x64 110/110 in 169.85 seconds; x86 110/110 in 124.72 seconds. Both include
+the real Win3.1 PIF roundtrips, snapshot and native package tests. The unchanged
+modal test passes in both final suites; preceding failures remain disclosed,
+not erased or claimed fixed. Strict C17 warning checks, both Common manifests,
+documentation governance and diff --check pass. Owned baseline probe files and
+its timed-out process were removed; original media/INI were not touched.
+
+Package footprint versus 92be0e6a: x86 3,656,334 bytes (+1,092),
+x64 3,059,363 bytes (+579). SHA256:
+
+- x86: 9BB65EE85A85AD540404BF9A4C0BDF10FEE3376430C1BEA815BE2A5950179ACF
+- x64: 58BCD5F45980184B331E692A2E43702EF84F2C81EDA14314139546B10B9B5AAC
+
+The finite S8 request/exit ledger is implemented and verified. S7 owner
+acceptance is recorded in its history. S8 still requires post-push review and
+owner testing; S9/S10 and T71 remain open. No completion claim covers arbitrary
+native synchronization failure or the separate modal-loop observation.

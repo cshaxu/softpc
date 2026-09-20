@@ -41,6 +41,10 @@ typedef struct machine_fake {
     LONG media_calls;
     lib_storage_medium_mode media_mode;
     char media_path[COMMON_MACHINE_PATH_CAPACITY];
+    LONG fail_frame;
+    LONG fail_on_read_wake;
+    LONG fail_after_read_arm;
+    LONG fail_run;
 } machine_fake;
 
 static lib_bool fake_reset(void *opaque)
@@ -64,6 +68,7 @@ static lib_bool fake_run(void *opaque)
         if (result == WAIT_OBJECT_0) return LIB_TRUE;
         if (result != WAIT_OBJECT_0 + 1u) return LIB_FALSE;
         ResetEvent(fake->wake);
+        if (InterlockedCompareExchange(&fake->fail_run, 0, 0)) return LIB_FALSE;
         if (fake->callback != NULL) fake->callback(fake->callback_context);
     }
 }
@@ -73,12 +78,13 @@ static void fake_request_stop(void *opaque)
 static void fake_request_wake(void *opaque)
 {
     machine_fake *fake = (machine_fake *)opaque;
-    if (InterlockedCompareExchange(&fake->state_read_waiting, 0, 0) != 0) {
+    if (InterlockedExchange(&fake->fail_on_read_wake, 0))
+        InterlockedExchange(&fake->fail_frame, 1);
+    if (InterlockedExchange(&fake->state_read_waiting, 0) != 0) {
         assert(fake->deferred_state_writer.write(
             fake->deferred_state_writer.context, &fake->state_byte, 1u) ==
             LIB_STATUS_OK);
         InterlockedIncrement(&fake->state_reads);
-        InterlockedExchange(&fake->state_read_waiting, 0);
         InterlockedExchange(&fake->state_read_ready, 1);
     }
     SetEvent(fake->wake);
@@ -115,7 +121,9 @@ static void fake_deliver_input(void *opaque, const kvm_input_event *event)
 }
 static lib_status fake_copy_frame(void *opaque, common_machine_frame *frame)
 {
-    (void)opaque;
+    machine_fake *fake = opaque;
+    if (InterlockedCompareExchange(&fake->fail_frame, 0, 0))
+        return LIB_STATUS_IO_ERROR;
     memset(frame, 0, sizeof(*frame));
     frame->window.valid = 1u;
     frame->window.text.base.text_columns = KVM_TEXT_COLUMNS;
@@ -132,6 +140,11 @@ static lib_status fake_begin_state_read(void *opaque,
     machine_fake *fake = (machine_fake *)opaque;
     assert(GetCurrentThreadId() == fake->executor_thread);
     if (writer == NULL || writer->write == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    if (InterlockedExchange(&fake->fail_after_read_arm, 0)) {
+        InterlockedExchange(&fake->fail_run, 1);
+        SetEvent(fake->wake);
+        return LIB_STATUS_OK;
+    }
     if (InterlockedExchange(&fake->defer_state_read, 0) != 0) {
         fake->deferred_state_writer = *writer;
         InterlockedExchange(&fake->state_read_waiting, 1);
@@ -553,6 +566,9 @@ int main(void)
     assert(WaitForSingleObject(fake.input, 5000u) == WAIT_OBJECT_0);
     assert(InterlockedCompareExchange(&fake.inputs, 0, 0) == 1);
     fake.state_byte = 0x5au;
+    /* A pending ordinary pause must not complete a save before its result. */
+    fake.defer_state_read = 1;
+    assert(common_machine_pause(machine));
     assert(common_machine_read_state(machine,
         &(common_machine_state_writer) { state_write, &transfer }) == LIB_STATUS_OK);
     assert(transfer.byte == 0x5au && InterlockedCompareExchange(
@@ -663,6 +679,34 @@ int main(void)
         shutdown_active(machine, &fake);
     }
     common_machine_shutdown(NULL);
+    /* Public synchronous calls must return after frame failure (before save
+     * admission or restored pause) and after an armed save loses its executor. */
+    for (unsigned scenario = 0; scenario < 3u; ++scenario) {
+        ResetEvent(fake.running); ResetEvent(fake.frame);
+        fake.fail_frame = fake.fail_run = fake.state_read_ready = 0;
+        assert(common_machine_create(&machine, &driver) == LIB_STATUS_OK);
+        common_machine_set_state_sink(machine, note_state, &fake);
+        common_machine_set_frame_sink(machine, note_frame, &fake);
+        LONG paused = fake.paused_notifications;
+        if (scenario < 2u) {
+            assert(common_machine_start(machine));
+            assert(WaitForSingleObject(fake.running, 5000u) == WAIT_OBJECT_0);
+            assert(WaitForSingleObject(fake.frame, 5000u) == WAIT_OBJECT_0);
+            if (scenario == 0u) fake.fail_on_read_wake = 1;
+            else fake.fail_after_read_arm = 1;
+            assert(common_machine_read_state(machine,
+                &(common_machine_state_writer) { state_write, &transfer }) ==
+                LIB_STATUS_IO_ERROR);
+        } else {
+            fake.fail_frame = 1;
+            assert(common_machine_write_state(machine,
+                &(common_machine_state_reader) { state_read, &transfer }) ==
+                LIB_STATUS_IO_ERROR);
+        }
+        assert(common_machine_state_get(machine) == COMMON_MACHINE_ERROR);
+        assert(fake.callback == NULL && fake.paused_notifications == paused);
+        assert(common_machine_destroy(machine) == LIB_STATUS_OK);
+    }
     CloseHandle(fake.input); CloseHandle(fake.frame); CloseHandle(fake.running);
     CloseHandle(fake.wake); CloseHandle(fake.reset_completed);
     CloseHandle(fake.state_stopped); CloseHandle(fake.stopped);

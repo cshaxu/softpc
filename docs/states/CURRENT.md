@@ -2,39 +2,47 @@
 
 ## Current Work
 
-M9 T71 S7 delivery ff499749 is pushed and reviewed; waiting for owner retest.
-Owner manual acceptance failed after a044fa36; T71 remains open. S7 adds the
-missing real Win3.1 startup coverage; prior S6 evidence was insufficient.
+Owner accepted T71 S7. S8 implementation and dual-width verification are
+complete; preparing its reviewed delivery for owner testing. T71 remains open;
+S9 FIFO and S10 semantic audit remain inactive.
 
-## M9 T71 S7 Packet
+## M9 T71 S8 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner approves S7 display repair, S8 request completion, S9 FIFO and S10 semantic audit. Each S must build/test, commit/push and leave a clean worktree, then wait for owner testing. |
-| Objective | Repair Win3.1 MS-DOS fullscreen/window regression at the completed-frame boundary; verify font readiness and text layout without mode-specific exceptions. |
-| Non-goals | No clipping, capacity expansion, guest-specific exception, new frame path, media/INI changes or unrelated queue work. |
-| Reference Baseline | a044fa36; S6 dual-width 110/110 did not exercise Win3.1 entry. |
+| Objective | Finish outstanding synchronous requests exactly once after executor unwind; serialize admission with terminal cleanup. |
+| Non-goals | No FIFO work, new public API, cancellation framework, timeout/retry, Lib/VM/Compat/MVDM or media/INI change. |
+| Reference Baseline | 92be0e6a; owner accepted S7 dual-width packages. |
 | Candidate Proposal | [Regression brief](../proposals/m9-kvm-mode-transition-regression.md). |
-| Files And ABI Surface | Compat text readiness/font source, VM required-font result and product tests. No Lib/Common API change in S7; request completion and FIFO belong to subsequent steps. |
+| Files And ABI Surface | common/machine/machine.c, test/common regression tests and manifests; existing public contracts unchanged. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and shared governance skills. |
-| Verification | Real overlay DOS win rejects 80x480 while selected renderer is 80x25; shipping baseline start after ERROR exits code 1, not an exception. Focused transition/ERROR matrix, real win entry and serial full x86/x64 plus package builds. |
-| Expected Markers | Valid transition reaches Windows; genuine unsupported output remains explicit; start in terminal ERROR is rejected with a prompt rather than exiting, preserving Machine's existing contract. |
-| Asset Needs | Existing Win3.1 image read via overlay; bounded owned build/t71-s7 probes, 120 seconds/4 MiB per run. |
+| Verification | Inject frame/run/wait failures around pending save/load/debug/media; verify admission/termination order, completed-result preservation and normal lifecycle. Serial full x86/x64 suites and package builds. |
+| Expected Markers | No outstanding request remains blocked after terminal unwind; no false PAUSED, duplicate completion or successful-result overwrite. |
+| Asset Needs | Existing non-mutating fixtures. Owned build/t71-s8 baseline negative-test binary/source, 10-second run budget, removed after retaining the result; no media or trace. |
 | Reporting Requirements | Root cause and concrete diff estimate before production edits; afterward added/deleted/net and both EXEs. |
-| Stop Conditions | Need for new public state/ownership, MVDM changes, guest-specific workaround or media mutation. |
-| Exit Criteria | Both owner scenarios reproduced and repaired with focused and full evidence; reviewed P pushed, owner receives binaries. |
-| Original Owner Request | 启动后输入win直接machine error；再次start程序崩溃退出。 |
-| Similar-Issue Sweep | All frame-result/no-frame branches and all error-to-cold-start cleanup paths affected by T71. |
+| Stop Conditions | Need for a new driver cancellation contract, public state/ownership, platform or product-specific workaround. |
+| Exit Criteria | Focused fault matrix and full dual-width suites pass; reviewed P pushed, clean worktree, both binaries supplied; wait for owner testing. |
+| Original Owner Request | 测试通过。准入下一个S任务，先告诉我这个S任务简报。批准，开始。 |
+| Similar-Issue Sweep | Snapshot read/write, debug, media and worker readiness/shutdown rendezvous; all run and permanent-worker exits. |
 
 ## Current Technical Baseline
+
+- S8: synchronous request admission and terminal completion share a short
+  Machine-owned lock; pending ordinary pause cannot prematurely complete save.
+  The unused ready event is removed. Production +85/-39 (net +46), tests
+  +161/-9 (net +152). Final x64 110/110 (169.85s), x86 110/110 (124.72s).
+  Both packages rebuilt. No public ABI, Lib/VM/Compat/MVDM, INI, media or
+  snapshot-format change. Earlier modal-test failures and their S10 audit
+  receiver are disclosed in the active proposal; no modal repair is claimed.
 
 - S7 continued repair: controller-font/readiness source and required-font result
   are corrected. Relative to 83e185c7, production +5/-3 (net +2), tests +117/-2
   (net +115). Final x64 110/110 (124.22s), x86 110/110 (142.06s), including
   both Win3.1 PIF initial modes and six roundtrips each. Both packages rebuilt
   with unchanged byte sizes. No Lib/Common/MVDM/INI/media change in this repair.
-  S8--S10 are planned but inactive; wait for owner testing after this delivery.
+  Owner accepted S7; S8 is active, S9--S10 remain inactive.
 
 - S7: selected-renderer text dimensions replace live-register sampling;
   ERROR reaches App unchanged and rejects machine commands without exiting.
@@ -97,7 +105,7 @@ missing real Win3.1 startup coverage; prior S6 evidence was insufficient.
 
 ## Recent Governance
 
-T70 is closed; T71 S7 investigates failed owner acceptance.
+T70 is closed; T71 S7 is owner-accepted and S8 is active.
 
 - **M9 Td S17:** Owner requested a concrete KVM text/frame correction proposal
   at queue head. Recorded capability rejection, explicit character/glyph

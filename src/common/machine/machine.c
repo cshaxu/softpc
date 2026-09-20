@@ -8,11 +8,11 @@ struct common_machine {
     common_machine_input_queue input_queue;
     common_machine_frame *frame_buffers[2];
     base_sync_mutex *frame_lock;
+    base_sync_mutex *request_lock;
     int published_frame_index;
     lib_u32 published_frame_sequence;
     lib_u32 published_frame_run_generation;
     base_sync_event *command_event;
-    base_sync_event *ready_event;
     base_sync_event *resume_event;
     base_sync_event *input_event;
     base_sync_event *media_event;
@@ -240,6 +240,59 @@ static void common_machine_complete_state_read(common_machine *machine)
     base_sync_event_signal(machine->state_event);
 }
 
+/* The sole control caller copies the payload before publishing its request.
+ * Serialize registration with terminal cleanup, never driver execution. */
+static lib_bool common_machine_submit_request(common_machine *machine,
+    lib_atomic_i32 *requested, base_sync_event *completed, lib_u32 allowed_states)
+{
+    lib_bool accepted;
+    base_sync_mutex_lock(machine->request_lock);
+    accepted = lib_atomic_i32_load_explicit(&machine->terminate_requested,
+        LIB_MEMORY_ORDER_SEQ_CST) == 0 &&
+        (allowed_states & (1u << common_machine_state_get(machine))) != 0u;
+    if (accepted) {
+        base_sync_event_reset(completed);
+        lib_atomic_i32_store_explicit(requested, 1, LIB_MEMORY_ORDER_SEQ_CST);
+        base_sync_event_signal(machine->command_event);
+    }
+    base_sync_mutex_unlock(machine->request_lock);
+    return accepted;
+}
+
+/* Only after the driver has unwound: borrowed request data is no longer in use.
+ * Requests already completed have cleared their flag and keep their result. */
+static void common_machine_finish_requests(common_machine *machine,
+    common_machine_state terminal)
+{
+    base_sync_mutex_lock(machine->request_lock);
+    lib_atomic_i32_store_explicit(&machine->state, terminal, LIB_MEMORY_ORDER_SEQ_CST);
+    if (lib_atomic_i32_load_explicit(&machine->state_read_requested,
+            LIB_MEMORY_ORDER_SEQ_CST) != 0) {
+        machine->state_status = LIB_STATUS_IO_ERROR;
+        machine->state_read_continuing = LIB_FALSE;
+        common_machine_complete_state_read(machine);
+    }
+    if (lib_atomic_i32_exchange_explicit(&machine->state_write_requested, 0,
+            LIB_MEMORY_ORDER_SEQ_CST) |
+        lib_atomic_i32_exchange_explicit(&machine->state_write_waiting, 0,
+            LIB_MEMORY_ORDER_SEQ_CST)) {
+        machine->state_status = LIB_STATUS_IO_ERROR;
+        base_sync_event_signal(machine->state_event);
+    }
+    if (lib_atomic_i32_exchange_explicit(&machine->debug_requested, 0,
+            LIB_MEMORY_ORDER_SEQ_CST) != 0) {
+        machine->debug_status = LIB_STATUS_IO_ERROR;
+        lib_memory_set(&machine->debug_result, 0, sizeof(machine->debug_result));
+        base_sync_event_signal(machine->debug_event);
+    }
+    if (lib_atomic_i32_exchange_explicit(&machine->media_requested, 0,
+            LIB_MEMORY_ORDER_SEQ_CST) != 0) {
+        machine->media_succeeded = LIB_FALSE;
+        base_sync_event_signal(machine->media_event);
+    }
+    base_sync_mutex_unlock(machine->request_lock);
+}
+
 static void common_machine_executor_event(void *opaque)
 {
     common_machine *machine = (common_machine *)opaque;
@@ -274,7 +327,9 @@ static void common_machine_executor_event(void *opaque)
             common_machine_notify_state(machine, COMMON_MACHINE_RESET_COMPLETED);
         else if (!suppress_paused_fact)
             common_machine_notify_state(machine, COMMON_MACHINE_PAUSED);
-        common_machine_complete_state_read(machine);
+        if (lib_atomic_i32_load_explicit(&machine->state_read_ready,
+                LIB_MEMORY_ORDER_SEQ_CST) != 0)
+            common_machine_complete_state_read(machine);
         if (lib_atomic_i32_exchange_explicit(&machine->state_write_waiting, 0,
                 LIB_MEMORY_ORDER_SEQ_CST) != 0)
             base_sync_event_signal(machine->state_event);
@@ -344,7 +399,6 @@ static lib_bool common_machine_schedule_cold_run(common_machine *machine,
 {
     if (machine == NULL || machine->worker == NULL || lib_atomic_i32_load_explicit(&machine->state, LIB_MEMORY_ORDER_SEQ_CST) !=
         COMMON_MACHINE_STOPPED) return LIB_FALSE;
-    base_sync_event_reset(machine->ready_event);
     common_machine_begin_cold_run(machine, pause_after_start);
     base_sync_event_signal(machine->command_event);
     return LIB_TRUE;
@@ -389,7 +443,12 @@ static void common_machine_worker(void *opaque, const base_sync_task *task)
     for (;;) {
         lib_bool succeeded;
         if (base_sync_event_wait(machine->command_event, UINT32_MAX) !=
-            BASE_SYNC_WAIT_SIGNALED || base_sync_task_cancelled(task)) break;
+                BASE_SYNC_WAIT_SIGNALED) {
+            common_machine_finish_requests(machine, COMMON_MACHINE_ERROR);
+            common_machine_notify_state(machine, COMMON_MACHINE_ERROR);
+            break;
+        }
+        if (base_sync_task_cancelled(task)) break;
         base_sync_event_reset(machine->command_event);
         if (lib_atomic_i32_load_explicit(&machine->terminate_requested, LIB_MEMORY_ORDER_SEQ_CST) != 0)
             break;
@@ -413,15 +472,13 @@ static void common_machine_worker(void *opaque, const base_sync_task *task)
             if (restored) machine->state_status = LIB_STATUS_OK;
         }
         if (!succeeded) {
-            lib_atomic_i32_exchange_explicit(&machine->state, COMMON_MACHINE_ERROR, LIB_MEMORY_ORDER_SEQ_CST);
+            common_machine_finish_requests(machine, COMMON_MACHINE_ERROR);
             common_machine_notify_state(machine, COMMON_MACHINE_ERROR);
-            base_sync_event_signal(machine->ready_event);
             continue;
         }
         if (lib_atomic_i32_load_explicit(&machine->stop_requested, LIB_MEMORY_ORDER_SEQ_CST) != 0) {
-            lib_atomic_i32_exchange_explicit(&machine->state, COMMON_MACHINE_STOPPED, LIB_MEMORY_ORDER_SEQ_CST);
+            common_machine_finish_requests(machine, COMMON_MACHINE_STOPPED);
             common_machine_notify_state(machine, COMMON_MACHINE_STOPPED);
-            base_sync_event_signal(machine->ready_event);
             continue;
         }
         machine->driver.set_executor_callback(machine->driver.context,
@@ -432,7 +489,6 @@ static void common_machine_worker(void *opaque, const base_sync_task *task)
             lib_atomic_i32_load_explicit(&machine->pause_requested,
                 LIB_MEMORY_ORDER_SEQ_CST) == 0)
             common_machine_notify_state(machine, COMMON_MACHINE_RUNNING);
-        base_sync_event_signal(machine->ready_event);
         do {
             succeeded = machine->driver.run(machine->driver.context);
         } while (succeeded &&
@@ -446,17 +502,19 @@ static void common_machine_worker(void *opaque, const base_sync_task *task)
         /* A successful driver unwind must not erase a failed executor wait. */
         succeeded = succeeded && common_machine_state_get(machine) != COMMON_MACHINE_ERROR;
         if (succeeded && lib_atomic_i32_exchange_explicit(&machine->reset_requested, 0, LIB_MEMORY_ORDER_SEQ_CST) != 0) {
+            common_machine_finish_requests(machine, COMMON_MACHINE_STARTING);
             lib_atomic_i32_exchange_explicit(&machine->stop_requested, 0, LIB_MEMORY_ORDER_SEQ_CST);
             common_machine_begin_cold_run(machine, LIB_TRUE);
             base_sync_event_signal(machine->command_event);
             continue;
         }
-        lib_atomic_i32_exchange_explicit(&machine->state, succeeded ? COMMON_MACHINE_STOPPED :
-            COMMON_MACHINE_ERROR, LIB_MEMORY_ORDER_SEQ_CST);
+        common_machine_finish_requests(machine, succeeded ? COMMON_MACHINE_STOPPED :
+            COMMON_MACHINE_ERROR);
         common_machine_notify_state(machine, succeeded ? COMMON_MACHINE_STOPPED :
             COMMON_MACHINE_ERROR);
-        base_sync_event_signal(machine->ready_event);
     }
+    lib_atomic_i32_store_explicit(&machine->terminate_requested, 1, LIB_MEMORY_ORDER_SEQ_CST);
+    common_machine_finish_requests(machine, common_machine_state_get(machine));
 }
 
 lib_status common_machine_create(common_machine **out_machine,
@@ -493,8 +551,8 @@ lib_status common_machine_create(common_machine **out_machine,
     lib_atomic_i32_initialize(&machine->restored_start_requested, 0);
     machine->driver = *driver;
     status = base_sync_mutex_create(&machine->frame_lock);
+    if (status == LIB_STATUS_OK) status = base_sync_mutex_create(&machine->request_lock);
     if (status == LIB_STATUS_OK) status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &machine->command_event);
-    if (status == LIB_STATUS_OK) status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &machine->ready_event);
     if (status == LIB_STATUS_OK) status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &machine->resume_event);
     if (status == LIB_STATUS_OK) status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &machine->input_event);
     if (status == LIB_STATUS_OK) status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &machine->media_event);
@@ -572,7 +630,6 @@ lib_bool common_machine_stop(common_machine *machine)
     if (state == COMMON_MACHINE_STOPPED) return LIB_TRUE;
     if (state == COMMON_MACHINE_ERROR) return LIB_FALSE;
     common_machine_debug_invalidate(machine);
-    base_sync_event_reset(machine->ready_event);
     lib_atomic_i32_exchange_explicit(&machine->stop_requested, 1, LIB_MEMORY_ORDER_SEQ_CST);
     lib_atomic_i32_exchange_explicit(&machine->pause_requested, 0, LIB_MEMORY_ORDER_SEQ_CST);
     base_sync_event_signal(machine->resume_event);
@@ -607,13 +664,9 @@ lib_bool common_machine_set_removable_media(common_machine *machine,
     const char *path, lib_storage_medium_mode mode)
 {
     lib_size length;
-    lib_i32 state;
     if (machine == NULL || machine->worker == NULL ||
         machine->driver.set_removable_media == NULL ||
         mode > LIB_STORAGE_MEDIUM_OVERLAY)
-        return LIB_FALSE;
-    state = lib_atomic_i32_load_explicit(&machine->state, LIB_MEMORY_ORDER_SEQ_CST);
-    if (state != COMMON_MACHINE_STOPPED && state != COMMON_MACHINE_PAUSED)
         return LIB_FALSE;
     if (path == NULL) machine->media_path[0] = '\0';
     else {
@@ -622,9 +675,9 @@ lib_bool common_machine_set_removable_media(common_machine *machine,
         lib_memory_copy(machine->media_path, path, length + 1u);
     }
     machine->media_mode = mode;
-    base_sync_event_reset(machine->media_event);
-    lib_atomic_i32_exchange_explicit(&machine->media_requested, 1, LIB_MEMORY_ORDER_SEQ_CST);
-    base_sync_event_signal(machine->command_event);
+    if (!common_machine_submit_request(machine, &machine->media_requested,
+            machine->media_event, (1u << COMMON_MACHINE_STOPPED) |
+                (1u << COMMON_MACHINE_PAUSED))) return LIB_FALSE;
     return base_sync_event_wait(machine->media_event, UINT32_MAX) ==
         BASE_SYNC_WAIT_SIGNALED && machine->media_succeeded;
 }
@@ -632,17 +685,12 @@ lib_bool common_machine_set_removable_media(common_machine *machine,
 lib_status common_machine_read_state(common_machine *machine,
     const common_machine_state_writer *writer)
 {
-    common_machine_state state;
     if (machine == NULL || writer == NULL || writer->write == NULL)
         return LIB_STATUS_INVALID_STATE;
-    state = common_machine_state_get(machine);
-    if (state != COMMON_MACHINE_RUNNING && state != COMMON_MACHINE_PAUSED)
-        return LIB_STATUS_INVALID_STATE;
     machine->state_writer = *writer;
-    base_sync_event_reset(machine->state_event);
-    lib_atomic_i32_store_explicit(&machine->state_read_requested, 1,
-        LIB_MEMORY_ORDER_SEQ_CST);
-    base_sync_event_signal(machine->command_event);
+    if (!common_machine_submit_request(machine, &machine->state_read_requested,
+            machine->state_event, (1u << COMMON_MACHINE_RUNNING) |
+                (1u << COMMON_MACHINE_PAUSED))) return LIB_STATUS_INVALID_STATE;
     machine->driver.request_wake(machine->driver.context);
     return base_sync_event_wait(machine->state_event, UINT32_MAX) ==
         BASE_SYNC_WAIT_SIGNALED ? machine->state_status : LIB_STATUS_IO_ERROR;
@@ -651,14 +699,12 @@ lib_status common_machine_read_state(common_machine *machine,
 lib_status common_machine_write_state(common_machine *machine,
     const common_machine_state_reader *reader)
 {
-    if (machine == NULL || reader == NULL || reader->read == NULL ||
-        common_machine_state_get(machine) != COMMON_MACHINE_STOPPED)
+    if (machine == NULL || reader == NULL || reader->read == NULL)
         return LIB_STATUS_INVALID_STATE;
     machine->state_reader = *reader;
-    base_sync_event_reset(machine->state_event);
-    lib_atomic_i32_store_explicit(&machine->state_write_requested, 1,
-        LIB_MEMORY_ORDER_SEQ_CST);
-    base_sync_event_signal(machine->command_event);
+    if (!common_machine_submit_request(machine, &machine->state_write_requested,
+            machine->state_event, 1u << COMMON_MACHINE_STOPPED))
+        return LIB_STATUS_INVALID_STATE;
     return base_sync_event_wait(machine->state_event, UINT32_MAX) ==
         BASE_SYNC_WAIT_SIGNALED ? machine->state_status : LIB_STATUS_IO_ERROR;
 }
@@ -753,9 +799,9 @@ lib_status common_machine_debug_execute_with_lease(common_machine *machine,
     if (machine->driver.execute_debug == NULL) return LIB_STATUS_UNSUPPORTED;
     machine->debug_request = *request;
     machine->debug_lease = *lease;
-    base_sync_event_reset(machine->debug_event);
-    lib_atomic_i32_exchange_explicit(&machine->debug_requested, 1, LIB_MEMORY_ORDER_SEQ_CST);
-    base_sync_event_signal(machine->command_event);
+    if (!common_machine_submit_request(machine, &machine->debug_requested,
+            machine->debug_event, 1u << COMMON_MACHINE_PAUSED))
+        return LIB_STATUS_INVALID_STATE;
     if (base_sync_event_wait(machine->debug_event, UINT32_MAX) !=
         BASE_SYNC_WAIT_SIGNALED) return LIB_STATUS_IO_ERROR;
     *out_result = machine->debug_result;
@@ -783,7 +829,6 @@ lib_status common_machine_destroy(common_machine *machine)
     if (machine == NULL) return LIB_STATUS_OK;
     status = common_machine_shutdown(machine);
     if (status != LIB_STATUS_OK) return status;
-    base_sync_event_destroy(machine->ready_event);
     base_sync_event_destroy(machine->resume_event);
     base_sync_event_destroy(machine->input_event);
     base_sync_event_destroy(machine->media_event);
@@ -791,6 +836,7 @@ lib_status common_machine_destroy(common_machine *machine)
     base_sync_event_destroy(machine->state_event);
     common_machine_input_queue_dispose(&machine->input_queue);
     base_sync_mutex_destroy(machine->frame_lock);
+    base_sync_mutex_destroy(machine->request_lock);
     lib_release(machine->frame_buffers[0]);
     lib_release(machine->frame_buffers[1]);
     base_sync_event_destroy(machine->command_event);
