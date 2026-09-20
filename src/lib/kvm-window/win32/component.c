@@ -401,24 +401,27 @@ static void win32_window_queue_mouse(lib_win32_hwnd window,
 static void win32_window_release_mouse(kvm_win32_window_context *context);
 
 static void win32_window_mouse(lib_win32_hwnd window, kvm_win32_window_context *context,
-    int immediate)
+    lib_win32_lparam record)
 {
     int dx = 0;
     int dy = 0;
 
     if (!win32_window_accepting_content_input(context)) return;
-    if (!kvm_win32_mouse_move(&context->mouse, context->client_width,
+    if (!kvm_win32_mouse_move(&context->mouse, record, context->client_width,
             context->client_height, context->surface_width, context->surface_height,
             &dx, &dy)) {
         win32_window_release_mouse(context);
         return;
     }
-    if (immediate) {
-        win32_window_emit_mouse(context, dx, dy,
-            (context->left_button ? KVM_MOUSE_BUTTON_LEFT : 0u) |
-            (context->right_button ? KVM_MOUSE_BUTTON_RIGHT : 0u));
-    } else if (dx != 0 || dy != 0)
+    if (dx != 0 || dy != 0)
         win32_window_queue_mouse(window, context, dx, dy);
+}
+
+static void win32_window_mouse_buttons(kvm_win32_window_context *context)
+{
+    win32_window_emit_mouse(context, 0, 0,
+        (context->left_button ? KVM_MOUSE_BUTTON_LEFT : 0u) |
+        (context->right_button ? KVM_MOUSE_BUTTON_RIGHT : 0u));
 }
 
 static void win32_window_release_mouse(kvm_win32_window_context *context)
@@ -686,9 +689,13 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
                 win32_window_emit_normalized, &record);
         }
         return 0;
-    case LIB_WIN32_WM_MOUSEMOVE:
+    case LIB_WIN32_WM_INPUT:
         if (kvm_win32_mouse_captured(&context->mouse))
-            win32_window_mouse(window, context, 0);
+            win32_window_mouse(window, context, lparam);
+        /* Foreground raw input requires default processing for OS cleanup. */
+        return lib_win32_def_window_proc_w(window, message, wparam, lparam);
+    case LIB_WIN32_WM_MOUSEMOVE:
+        /* Legacy positions are not a second captured-motion stream. */
         return 0;
     case LIB_WIN32_WM_SETCURSOR:
         if (lib_win32_loword(lparam) == LIB_WIN32_HTCLIENT) {
@@ -707,7 +714,7 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
         }
         win32_window_flush_mouse(context);
         context->left_button = 1;
-        win32_window_mouse(window, context, 1);
+        win32_window_mouse_buttons(context);
         return 0;
     case LIB_WIN32_WM_LBUTTONUP:
         if (!win32_window_accepting_content_input(context)) return 0;
@@ -717,7 +724,7 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
             return 0;
         win32_window_flush_mouse(context);
         context->left_button = 0;
-        win32_window_mouse(window, context, 1);
+        win32_window_mouse_buttons(context);
         return 0;
     case LIB_WIN32_WM_RBUTTONDOWN:
         if (!win32_window_accepting_content_input(context)) return 0;
@@ -727,7 +734,7 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
         }
         win32_window_flush_mouse(context);
         context->right_button = 1;
-        win32_window_mouse(window, context, 1);
+        win32_window_mouse_buttons(context);
         return 0;
     case LIB_WIN32_WM_RBUTTONUP:
         if (!win32_window_accepting_content_input(context)) return 0;
@@ -735,7 +742,7 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
             return 0;
         win32_window_flush_mouse(context);
         context->right_button = 0;
-        win32_window_mouse(window, context, 1);
+        win32_window_mouse_buttons(context);
         return 0;
     case LIB_WIN32_WM_KILLFOCUS:
         win32_window_release_mouse(context);

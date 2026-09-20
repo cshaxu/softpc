@@ -18,7 +18,10 @@ typedef struct kvm_window_options {
     lib_bool initial_frozen;
 } kvm_window_options;
 
-/* On failure *out_window remains NULL. A live worker that cannot be joined is
+/* Win32 capture requires exclusive raw mouse registration while captured.
+ * An existing registration prevents capture. Applications must not concurrently
+ * change that process-wide registration during capture/release.
+ * On failure *out_window remains NULL. A live worker that cannot be joined is
  * a terminal application infrastructure fault, not a caller-owned half object. */
 lib_status kvm_window_create(kvm_window **out_window,
     const kvm_window_options *options);

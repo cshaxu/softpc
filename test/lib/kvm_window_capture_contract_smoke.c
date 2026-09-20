@@ -6,12 +6,49 @@
 static HWND owner, focused;
 static RECT client = {0,0,640,480}, clipped;
 static POINT origin = {100,200};
-static POINT pointer;
-static int pointer_ok=1, warp_ok=1;
-static unsigned warps;
-static BOOL WINAPI get_pointer(POINT *p) { *p=pointer; return pointer_ok; }
-static BOOL WINAPI warp(int x,int y)
-{ ++warps; if(!warp_ok)return FALSE; pointer.x=x;pointer.y=y;return TRUE; }
+static RAWINPUT raw_record;
+static RAWINPUTDEVICE raw_binding;
+static unsigned raw_reads, raw_registrations, raw_removals;
+static int raw_read_ok=1, raw_register_ok=1, raw_query_ok=1, raw_remove_ok=1;
+static UINT raw_size=sizeof(RAWINPUT);
+static int desktop_width=65535, desktop_height=65535;
+static UINT WINAPI query_raw(PRAWINPUTDEVICE d,PUINT count,UINT size)
+{
+    assert(size==sizeof(*d));
+    if (!raw_query_ok) return (UINT)-1;
+    UINT needed=raw_binding.usUsage ? 1u : 0u;
+    if (!d) { *count=needed; return 0; }
+    assert(*count>=needed);
+    if (needed) *d=raw_binding;
+    return needed;
+}
+static BOOL WINAPI register_raw(PCRAWINPUTDEVICE d,UINT count,UINT size)
+{
+    assert(count==1 && size==sizeof(*d) && d->usUsagePage==1 && d->usUsage==2);
+    if (d->dwFlags==RIDEV_REMOVE) {
+        assert(!d->hwndTarget); ++raw_removals;
+        if (!raw_remove_ok) return FALSE;
+        raw_binding=(RAWINPUTDEVICE){0};
+    } else {
+        assert(d->dwFlags==0 && d->hwndTarget==(HWND)1); ++raw_registrations;
+        if (!raw_register_ok) return FALSE;
+        raw_binding=*d;
+    }
+    return TRUE;
+}
+static UINT WINAPI read_raw(HRAWINPUT h,UINT command,LPVOID data,PUINT size,UINT header)
+{
+    assert(h==(HRAWINPUT)1 && command==RID_INPUT && *size==sizeof(RAWINPUT));
+    assert(header==sizeof(RAWINPUTHEADER)); ++raw_reads;
+    if (!raw_read_ok) return (UINT)-1;
+    *(RAWINPUT *)data=raw_record; return raw_size;
+}
+static int WINAPI metrics(int index)
+{
+    assert(index==SM_CXSCREEN || index==SM_CYSCREEN ||
+        index==SM_CXVIRTUALSCREEN || index==SM_CYVIRTUALSCREEN);
+    return index==SM_CXSCREEN || index==SM_CXVIRTUALSCREEN ? desktop_width : desktop_height;
+}
 static BOOL WINAPI get_clip(RECT *r) { *r=clipped; return TRUE; }
 static unsigned releases, clips, events;
 static int reject_input;
@@ -87,11 +124,7 @@ static BOOL WINAPI title(HWND w,LPCSTR text)
 #define lib_win32_get_focus get_focus
 #define lib_win32_clip_cursor clip
 #undef lib_win32_get_clip_cursor
-#undef lib_win32_get_cursor_pos
-#undef lib_win32_set_cursor_pos
 #define lib_win32_get_clip_cursor get_clip
-#define lib_win32_get_cursor_pos get_pointer
-#define lib_win32_set_cursor_pos warp
 #define lib_win32_get_client_rect get_client
 #define lib_win32_client_to_screen to_screen
 #define lib_win32_set_cursor cursor
@@ -120,6 +153,14 @@ static BOOL WINAPI title(HWND w,LPCSTR text)
 #define lib_win32_select_object select_bitmap
 #define lib_win32_delete_object delete_bitmap
 #define lib_win32_delete_dc delete_dc
+#undef lib_win32_register_raw_input_devices
+#undef lib_win32_get_raw_input_data
+#define lib_win32_register_raw_input_devices register_raw
+#define lib_win32_get_raw_input_data read_raw
+#undef lib_win32_get_registered_raw_input_devices
+#define lib_win32_get_registered_raw_input_devices query_raw
+#undef lib_win32_get_system_metrics
+#define lib_win32_get_system_metrics metrics
 #include "lib/kvm-window/win32/mouse.c"
 #include "lib/kvm-window/win32/geometry.c"
 #include "lib/kvm-window/win32/component.c"
@@ -384,54 +425,121 @@ int main(void)
         assert((edge==KVM_WINDOW_EDGE_LEFT || edge==KVM_WINDOW_EDGE_TOPLEFT || edge==KVM_WINDOW_EDGE_BOTTOMLEFT) ? r.right==826 : r.left==10);
         assert((edge==KVM_WINDOW_EDGE_TOP || edge==KVM_WINDOW_EDGE_TOPLEFT || edge==KVM_WINDOW_EDGE_TOPRIGHT) ? r.bottom==749 : r.top==20);
     }
-    /* Native pointer recentering must outlive the finite client range and
-       must not turn stale messages, geometry or our own warp into input. */
+    /* Relative packets continue even at a clipped pointer edge, without warps. */
     release_ok=1; clip_ok=1;
     client.right=640; client.bottom=480; origin.x=-900; origin.y=80;
     assert(kvm_component_initialize(&window.base, &options, join, dispose,
         &window.pending_frame, sizeof(window.pending_frame))==0);
     c.component=&window; c.frozen=0; c.left_button=c.right_button=0;
+    c.client_width=c.surface_width=640; c.client_height=c.surface_height=480;
+    raw_record.header.dwType=RIM_TYPEMOUSE;
+    raw_record.header.hDevice=(HANDLE)1;
     assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==0);
+    assert(raw_registrations>0 && raw_binding.hwndTarget==(HWND)1);
     int dx,dy, total=0;
     for(unsigned i=0;i<100;++i) {
-        pointer.x+=20; pointer.y-=10;
-        assert(kvm_win32_mouse_move(&c.mouse,640,480,640,480,&dx,&dy));
+        raw_record.data.mouse.lLastX=20; raw_record.data.mouse.lLastY=-10;
+        assert(kvm_win32_mouse_move(&c.mouse,1,640,480,640,480,&dx,&dy));
         assert(dx==20 && dy==-10); total+=dx;
-        unsigned before=warps;
-        assert(kvm_win32_mouse_move(&c.mouse,640,480,640,480,&dx,&dy));
-        assert(dx==0 && dy==0 && warps==before);
     }
     assert(total==2000);
+    raw_record.data.mouse.lLastX=1; raw_record.data.mouse.lLastY=0;
     for(unsigned i=0;i<2;++i) {
-        pointer.x+=1;
-        assert(kvm_win32_mouse_move(&c.mouse,1280,960,640,480,&dx,&dy));
+        assert(kvm_win32_mouse_move(&c.mouse,1,1280,960,640,480,&dx,&dy));
         assert(dx==(int)i && dy==0);
     }
+    raw_record.data.mouse.lLastX=-1;
+    assert(kvm_win32_mouse_move(&c.mouse,1,1280,960,640,480,&dx,&dy) && dx==0);
+    assert(kvm_win32_mouse_move(&c.mouse,1,1280,960,640,480,&dx,&dy) && dx==-1);
+    /* Absolute samples: first anchors, repeated positions are zero, left stays left. */
+    raw_record.data.mouse.usFlags=MOUSE_MOVE_ABSOLUTE | MOUSE_VIRTUAL_DESKTOP;
+    raw_record.data.mouse.lLastX=40209; raw_record.data.mouse.lLastY=30969;
+    assert(kvm_win32_mouse_move(&c.mouse,1,640,480,640,480,&dx,&dy) && dx==0 && dy==0);
+    assert(kvm_win32_mouse_move(&c.mouse,1,640,480,640,480,&dx,&dy) && dx==0 && dy==0);
+    raw_record.data.mouse.lLastX=40072;
+    assert(kvm_win32_mouse_move(&c.mouse,1,640,480,640,480,&dx,&dy) && dx==-137 && dy==0);
+    raw_record.data.mouse.lLastX=39936;
+    assert(kvm_win32_mouse_move(&c.mouse,1,640,480,640,480,&dx,&dy) && dx==-136 && dy==0);
+    assert(kvm_win32_mouse_move(&c.mouse,1,640,480,640,480,&dx,&dy) && dx==0 && dy==0);
+    raw_record.data.mouse.lLastX+=10; raw_record.data.mouse.lLastY-=10;
+    assert(kvm_win32_mouse_move(&c.mouse,1,320,240,640,480,&dx,&dy) && dx==20 && dy==-20);
+    /* Device, absolute coordinate space and desktop size changes cannot jump. */
+    raw_record.header.hDevice=(HANDLE)2; raw_record.data.mouse.lLastX=100;
+    assert(kvm_win32_mouse_move(&c.mouse,1,640,480,640,480,&dx,&dy) && dx==0 && dy==0);
+    raw_record.data.mouse.usFlags=MOUSE_MOVE_ABSOLUTE;
+    raw_record.data.mouse.lLastX=500;
+    assert(kvm_win32_mouse_move(&c.mouse,1,640,480,640,480,&dx,&dy) && dx==0 && dy==0);
+    desktop_width=1920; desktop_height=1080;
+    raw_record.data.mouse.lLastX=32768; raw_record.data.mouse.lLastY=32768;
+    assert(kvm_win32_mouse_move(&c.mouse,1,640,480,640,480,&dx,&dy) && dx==0 && dy==0);
+    raw_record.data.mouse.lLastX=65535; raw_record.data.mouse.lLastY=65535;
+    assert(kvm_win32_mouse_move(&c.mouse,1,640,480,640,480,&dx,&dy) && dx==960 && dy==540);
+    raw_record.data.mouse.lLastX=65536;
+    assert(!kvm_win32_mouse_move(&c.mouse,1,640,480,640,480,&dx,&dy));
+    raw_record.data.mouse.lLastX=100;
     client.right=320; origin.x=100;
     assert(kvm_win32_mouse_refresh_bounds(&c.mouse));
-    assert(kvm_win32_mouse_move(&c.mouse,320,480,640,480,&dx,&dy));
-    assert(dx==0 && dy==0);
-    pointer.x-=20;
-    assert(kvm_win32_mouse_move(&c.mouse,320,480,640,480,&dx,&dy));
-    assert(dx==-40 && dy==0);
-    /* Clipping can be replaced independently of native capture. */
+    assert(kvm_win32_mouse_move(&c.mouse,1,320,480,640,480,&dx,&dy) && dx==0 && dy==0);
+    assert(kvm_win32_mouse_release(&c.mouse)==0 && raw_binding.usUsage==0);
+    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==0);
+    raw_record.data.mouse.lLastX=30000;
+    assert(kvm_win32_mouse_move(&c.mouse,1,320,480,640,480,&dx,&dy) && dx==0 && dy==0);
+    raw_record.data.mouse.usFlags=0; raw_record.data.mouse.lLastX=4; raw_record.data.mouse.lLastY=-2;
+    assert(kvm_win32_mouse_move(&c.mouse,1,640,480,640,480,&dx,&dy) && dx==4 && dy==-2);
+    /* Legacy coordinates never deliver motion; WM_INPUT is the one entry. */
+    unsigned before=events, reads_before=raw_reads;
+    win32_window_proc((HWND)1,WM_MOUSEMOVE,0,MAKELPARAM(32767,32767));
+    assert(events==before && raw_reads==reads_before);
+    win32_window_proc((HWND)1,WM_INPUT,0,1);
+    win32_window_flush_mouse(&c);
+    assert(events==before+1 && raw_reads==reads_before+1);
+    /* Buttons retain their legacy route and do not re-read/double motion. */
+    reads_before=raw_reads; before=events;
+    win32_window_proc((HWND)1,WM_LBUTTONDOWN,0,0);
+    win32_window_proc((HWND)1,WM_LBUTTONUP,0,0);
+    assert(events==before+2 && raw_reads==reads_before);
+    /* Clipping loss is detected on the next raw packet; no later content. */
     clipped.right+=100;
-    win32_window_proc((HWND)1,WM_MOUSEMOVE,0,MAKELPARAM(1,1));
-    assert(!c.mouse.captured);
-    unsigned before=events;
-    win32_window_proc((HWND)1,WM_MOUSEMOVE,0,MAKELPARAM(20,20));
+    win32_window_proc((HWND)1,WM_INPUT,0,1);
+    assert(!c.mouse.captured && raw_binding.usUsage==0);
+    before=events;
+    win32_window_proc((HWND)1,WM_INPUT,0,1);
     assert(events==before);
     assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==0);
     win32_window_proc((HWND)1,WM_ACTIVATEAPP,FALSE,0);
     assert(!c.mouse.captured);
     assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==0);
-    pointer.x+=1; warp_ok=0;
-    win32_window_proc((HWND)1,WM_MOUSEMOVE,0,0);
+    raw_read_ok=0;
+    win32_window_proc((HWND)1,WM_INPUT,0,1);
     assert(!c.mouse.captured && events==before);
-    warp_ok=1;
+    raw_read_ok=1;
     assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==0);
-    pointer_ok=0; win32_window_proc((HWND)1,WM_MOUSEMOVE,0,0);
-    assert(!c.mouse.captured && events==before);
+    raw_size=sizeof(RAWINPUTHEADER);
+    assert(!kvm_win32_mouse_move(&c.mouse,1,640,480,640,480,&dx,&dy));
+    raw_size=sizeof(RAWINPUT);
+    assert(kvm_win32_mouse_release(&c.mouse)==0);
+    /* Registration failures/foreign consumers are never stolen or hidden. */
+    raw_query_ok=0;
+    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==LIB_STATUS_IO_ERROR && !c.mouse.captured);
+    raw_query_ok=1;
+    raw_binding=(RAWINPUTDEVICE){1,2,0,(HWND)2};
+    unsigned registrations_before=raw_registrations;
+    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==LIB_STATUS_INVALID_STATE);
+    assert(raw_binding.hwndTarget==(HWND)2 && raw_registrations==registrations_before);
+    raw_binding=(RAWINPUTDEVICE){0};
+    raw_register_ok=0;
+    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==LIB_STATUS_IO_ERROR && !c.mouse.captured);
+    raw_register_ok=1;
+    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==0);
+    raw_binding.hwndTarget=(HWND)2;
+    unsigned removals_before=raw_removals;
+    assert(kvm_win32_mouse_release(&c.mouse)==0);
+    assert(raw_binding.hwndTarget==(HWND)2 && raw_removals==removals_before);
+    raw_binding=(RAWINPUTDEVICE){0};
+    assert(kvm_win32_mouse_capture(&c.mouse,(HWND)1)==0);
+    raw_remove_ok=0;
+    assert(kvm_win32_mouse_release(&c.mouse)==LIB_STATUS_IO_ERROR && !c.mouse.captured);
+    raw_remove_ok=1; raw_binding=(RAWINPUTDEVICE){0};
     assert(kvm_component_destroy(&window.base)==0);
     check_surface_damage();
     return 0;

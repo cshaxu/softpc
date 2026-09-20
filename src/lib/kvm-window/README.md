@@ -52,12 +52,19 @@ unfreeze. The Window does not interpret a hotkey identifier.
 
 Relative mouse scaling retains signed integer remainders per axis. Capture,
 release and scale changes reset those remainders; copied event deltas remain
-integers. While captured, Win32 samples the current pointer position and
-recenters it inside the client bounds after consuming motion. Queued coordinates
-from the recenter are not another input stream. Move/resize rebases without
-content motion. Capture/clip loss, deactivation or failed pointer positioning
-releases capture; reentry never captures without another click. It does not
-register process-wide Raw Input or alter application mouse settings.
+integers. While captured, only WM_INPUT produces motion: relative records supply
+deltas directly; absolute records are mapped from 0..65535 to desktop units and
+differenced, with the first sample establishing a baseline. Repeated absolute
+positions produce no motion. Device, coordinate-space and geometry changes
+reset the baseline. No pointer recentering or edge thresholds are used.
+Legacy messages still supply buttons, but never duplicate motion. Native relative
+motion bypasses system pointer acceleration; absolute input is still limited by
+the positions supplied by its device. Neither path changes system mouse settings.
+Capture acquires process-wide raw mouse registration only when none exists;
+release removes only its own registration. Applications must serialize other
+raw mouse registration changes with capture/release; an existing registration
+causes capture to be declined, never stolen. Capture/clip loss, deactivation or
+input failure releases capture; reentry requires another click.
 All post-start worker exits stop input, release capture, close the
 Window and retire the source once quiescent, before releasing storage. First
 failure is reported on the detecting thread, not delayed until this cleanup.

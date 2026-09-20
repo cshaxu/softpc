@@ -254,6 +254,15 @@ On the actual frozen-to-unfrozen transition, the Window requests activation
 once; repeated unfreeze calls do not refocus it, restart blink timing or capture
 the mouse.
 
+Captured Win32 Window motion comes only from native raw records, without pointer
+warping: relative deltas are scaled directly; absolute positions are differenced
+after desktop-unit conversion. First absolute samples establish a baseline.
+Legacy buttons remain separate, but legacy motion never duplicates raw motion.
+Capture requires unoccupied process-wide raw mouse registration and releases
+only its own binding. Native relative input bypasses pointer acceleration;
+absolute input retains the device's coordinate-range limitation. Public copied
+integer delta events and product hotkey policy do not change.
+
 Freezing a Window is a guest-input boundary, not a registered-hotkey boundary:
 its native key transitions still pass through the source-local matcher. A
 matched `kvm_HOTKEY` reaches SoftPC; all ordinary key/text/mouse output is

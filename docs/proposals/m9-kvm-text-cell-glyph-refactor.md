@@ -271,3 +271,29 @@ snapshot transaction/cross-process/media/boundary、restart、cursor、组件门
 S2 已交付 12bf7c96、复审 ee720d96 并收口。
 [S3 技术收口准备审计](../history/M9-T72-S3-completion-readiness-audit.md)
 覆盖整个 T 请求与 S1--S3；不代替 owner 的手测和正式 T72 收口批准。
+
+## 十一、S4：原生鼠标位移修复（owner 扩展准入）
+
+Owner 在文本迁移验收时发现 RDP 捕获位移异常，明确批准修改 Lib 内部输入。
+此项与文本 schema 无关：T72 前后输入代码相同，问题来自 T70 引入的居中采样。
+本机探针 514 个 raw 包全部 relative；RDP 341 个全部 absolute/virtual-desktop。
+RDP 原生 X 连续减小，但旧中心差分输出正 X，证明旧路径不能正确解释该输入。
+
+批准方案：删除所有 SetCursorPos，WM_INPUT 是唯一位移来源。relative 直接
+按既有比例/余数换算；absolute 从 0..65535 转成桌面单位后做相邻差分，
+首包只定位，设备/坐标空间/桌面或窗口几何变化后重新定位。WM_MOUSEMOVE
+不发送位移，原有按钮、捕获/释放、冻结、热键和退休路径不变。
+
+Raw mouse 注册是进程级资源：捕获只接受无现有注册的情况，拒绝抢占其他
+消费者；释放只移除自身目标。调用者必须串行协调其他 raw 注册操作。
+不新增 RDP 分支、边缘阈值、重试循环或第二条输入流。相对 raw 位移绕过
+宿主指针加速，手感可能改变；绝对设备的有限坐标范围仍需 owner 验证，
+不宣称拥有相对设备的无限移动能力。公共签名和 copied delta ABI 不变。
+
+实施前估算：生产六 C/H +140--200/-45--80，测试 +130--200/-60--100。
+实际生产七 C/H（含公共头注释）+148/-44，净 +104；测试一文件 +142/-34，
+净 +108。增加量主要是原生 packet 解码及注册资源边界，非新的业务状态机。
+没有改 Common、VM、Compat、MVDM、Console、INI 或介质。
+构建、测试、交付及验收边界记录在
+[S4 交付记录](../etc/evidence/softpc/m9-t72-s4-native-mouse-motion.md)。推送后等 owner
+本机/RDP 测试，不自动收口 S4 或 T72。

@@ -2,16 +2,48 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T72.
+Active: T72 S4, native mouse motion repair after owner-assisted diagnosis.
+T72 and S4 remain open pending owner acceptance after delivery.
 
 S1 design accepted; S2 implementation and review complete; S3 technical audit
 and actual-change review complete. T72 is not formally closed. Both Release packages are
 ready for owner testing; no next queued task is admitted.
 See [readiness audit](../history/M9-T72-S3-completion-readiness-audit.md).
 
+## M9 T72 S4 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approved diagnosis, then "批准照此修复，完成后编译测试提交推送，等我测试再收口S". |
+| Objective | Replace pointer/recenter-derived motion with native relative motion or successive absolute positions. Remove all recentering and diagnostic logging; preserve capture, buttons, hotkeys and existing copied delta ABI. |
+| Non-goals | No edge thresholds, RDP detection branches, second input path, Common/VM/Compat/media/config change; no claim of unlimited absolute-device motion or native desktop acceptance before owner testing. |
+| Reference Baseline | 7e080236; clean worktree at admission. |
+| Candidate Proposal | [T72 proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md) |
+| Files And ABI Surface | Window native mouse.c/h, component.c, root motion.c/h, Types Windows declarations, Window contract documentation and existing focused tests. Public event/API signatures unchanged. Capture exclusively acquires mouse raw registration only if none exists; release removes only its own binding. |
+| Applicable Rules | Execution, architecture, coding and documentation rules; design architecture/source layout/UI; linked governance skills. |
+| Verification | Both Release builds, strict Lib compile, both full background test presets, focused relative/absolute/capture/failure/duplicate-path tests, shared manifests/DAG/docs gates. Owner runs desktop and RDP after push; no desktop automation while owner works. |
+| Expected Markers | WM_INPUT alone produces motion; legacy buttons remain, WM_MOUSEMOVE never produces motion. First absolute sample is baseline; repeated sample zero; relative input continues at clip edge. No SetCursorPos, trace paths or remote-session policy. |
+| Asset Needs | Existing owner setup unchanged. Bounded probes used ignored build/t72-rdp, each below 512 KiB, single instance and owner-assisted short runs. Findings retained in S4 record; traces/instrumentation removed. Only packaged x86/x64 EXEs refreshed. |
+| Reporting Requirements | Repair estimate six production C/H files +140--200/-45--80, tests +130--200/-60--100 versus 7e080236; report actual counts and reason for necessary ownership/error handling. Documentation/artifacts separate. |
+| Stop Conditions | No arbitrary thresholds, undocumented fallback, stealing process registration, desktop interference or media/configuration change. Missing native capability must not silently switch to old broken path. |
+| Exit Criteria | Implementation and dual-width proof committed/pushed, worktree clean, diagnostics removed; S4 and T72 stay open until owner accepts desktop/RDP behavior. |
+| Original Owner Request | "实测：在本机desktop上测试没问题，只有rdp出问题了"; "可以，开始，你说，我做". |
+| Similar-Issue Sweep | All capture/resize/move recenter sites removed; check release/recapture, device/type/desktop geometry switches, raw registration failure/conflict, message cleanup and single motion source. |
+
+Repair implemented; both full Release builds and focused motion/capture tests
+pass. x86 background 105/105; x64 104/105 then corrected documentation gate 1/1.
+No runtime test failure; five desktop tests per width not run. Diagnostics removed.
+See [S4 evidence and boundaries](../etc/evidence/softpc/m9-t72-s4-native-mouse-motion.md).
+Native relative input bypasses host pointer acceleration; absolute-device range
+remains finite. Owner will validate desktop/RDP after delivery; S4 remains open.
+
 ## Current Technical Baseline
 
+- S4 repair replaces pointer recentering with native motion; public input ABI
+  unchanged. Source +148/-44 (net +104), test +142/-34 (net +108). Package hashes
+  and exact verification results are in the linked S4 evidence. Await owner
+  desktop/RDP testing before closing S4 or T72.
 - Code delivery 12bf7c96; S2 actual-change review recorded in
   [S2 history](../history/M9-T72-S2-neutral-text-migration.md).
 - Final background suites: x64 105/105 (164.85s), x86 105/105 (147.06s),
