@@ -2,10 +2,10 @@
 
 int kvm_window_frame_size(const kvm_window_frame *frame, lib_u32 *width, lib_u32 *height)
 {
-    if (!kvm_window_frame_is_valid(frame) || !width || !height) return 0;
+    if (kvm_window_frame_validate(frame) != LIB_STATUS_OK || !width || !height) return 0;
     *width = frame->graphics ? frame->image.width : frame->text.base.text_columns * 8u;
     *height = frame->graphics ? frame->image.height : frame->text.base.text_rows *
-        (frame->text.base.font_height != 0u && frame->text.base.font_height <= 16u ? frame->text.base.font_height : 16u);
+        (frame->text.base.font_height != 0u ? frame->text.base.font_height : KVM_WINDOW_FONT_HEIGHT);
     return 1;
 }
 
@@ -14,8 +14,8 @@ void kvm_window_render_text(const kvm_window_frame *frame, lib_u32 *pixels, lib_
     lib_u32 row;
     lib_u32 cell_height;
 
-    if (!frame || !pixels || frame->graphics) return;
-    cell_height = frame->text.base.font_height != 0u && frame->text.base.font_height <= 16u ? frame->text.base.font_height : 16u;
+    if (kvm_window_frame_validate(frame) != LIB_STATUS_OK || !pixels || frame->graphics) return;
+    cell_height = frame->text.base.font_height != 0u ? frame->text.base.font_height : KVM_WINDOW_FONT_HEIGHT;
     if (width != frame->text.base.text_columns * 8u || height != frame->text.base.text_rows * cell_height) return;
     lib_memory_set(pixels, 0, (lib_size)width *
         height * sizeof(*pixels));

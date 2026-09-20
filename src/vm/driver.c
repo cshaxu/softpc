@@ -157,7 +157,7 @@ void vm_driver_cursor_shape(kvm_text_frame *frame, lib_u32 percent)
 {
     lib_u32 height = frame->font_height;
     lib_u32 lines;
-    if (height == 0u || height > 16u) height = 16u;
+    if (height == 0u) height = KVM_WINDOW_FONT_HEIGHT;
     if (percent == 0u || percent > 100u) percent = 100u;
     lines = (height * percent + 99u) / 100u;
     frame->cursor_top = (lib_u8)(height - lines);
@@ -294,7 +294,7 @@ static void vm_driver_deliver_input(void *opaque,
             (event->data.mouse.buttons & KVM_MOUSE_BUTTON_RIGHT) != 0u);
 }
 
-static lib_bool vm_driver_copy_graphics(vm_driver *driver,
+static lib_status vm_driver_copy_graphics(vm_driver *driver,
     common_machine_frame *frame)
 {
     const void *bits;
@@ -311,14 +311,14 @@ static lib_bool vm_driver_copy_graphics(vm_driver *driver,
     lib_u32 palette_index;
 
     if (!softpc_machine_presentation_dib(driver->machine, &bits, &info, &width,
-            &height) || bits == NULL || info == NULL ||
-        width == 0u || height == 0u || width > KVM_WINDOW_GRAPHICS_MAX_WIDTH ||
-        height > KVM_WINDOW_GRAPHICS_MAX_HEIGHT)
-        return LIB_FALSE;
+            &height)) return LIB_STATUS_OK;
+    if (bits == NULL || info == NULL || width == 0u || height == 0u)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    if (width > KVM_WINDOW_GRAPHICS_MAX_WIDTH || height > KVM_WINDOW_GRAPHICS_MAX_HEIGHT)
+        return LIB_STATUS_UNSUPPORTED;
     if (!softpc_machine_presentation_take_dirty(driver->machine, &left, &top,
-            &right, &bottom)) return LIB_FALSE;
+            &right, &bottom)) return LIB_STATUS_OK;
     row_stride = (width + 3u) & ~3u;
-    if (width * height > KVM_WINDOW_GRAPHICS_MAX_PIXELS) return LIB_FALSE;
     memset(&frame->window, 0, lib_offsetof(kvm_window_frame, image.pixels));
     for (row = 0u; row < height; ++row)
         memcpy(frame->window.image.pixels + row * width,
@@ -340,10 +340,10 @@ static lib_bool vm_driver_copy_graphics(vm_driver *driver,
     frame->window.image.dirty_bottom = bottom >= (lib_i32)height ? (lib_i32)height - 1 : bottom;
     frame->window.graphics = 1u;
     frame->window.valid = 1u;
-    return LIB_TRUE;
+    return LIB_STATUS_OK;
 }
 
-static lib_bool vm_driver_copy_text(vm_driver *driver,
+static lib_status vm_driver_copy_text(vm_driver *driver,
     common_machine_frame *frame)
 {
     const void *surface;
@@ -358,14 +358,16 @@ static lib_bool vm_driver_copy_text(vm_driver *driver,
     lib_u32 text_row;
 
     if (!softpc_machine_presentation_text(driver->machine, &surface, &columns,
-            &rows, &stride, &cell_bytes) || surface == NULL || cell_bytes == 0u ||
-        stride < columns) return LIB_FALSE;
+            &rows, &stride, &cell_bytes)) return LIB_STATUS_OK;
+    if (surface == NULL || cell_bytes == 0u || columns == 0u || rows == 0u)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    if (columns > KVM_TEXT_COLUMNS || rows > KVM_TEXT_ROWS)
+        return LIB_STATUS_UNSUPPORTED;
+    if (stride < columns) return LIB_STATUS_INVALID_ARGUMENT;
     memset(&frame->window, 0, lib_offsetof(kvm_window_frame, text) +
         sizeof(frame->window.text));
     memset(frame->window.text.base.text, ' ', sizeof(frame->window.text.base.text));
     memset(frame->window.text.base.attributes, 0x07, sizeof(frame->window.text.base.attributes));
-    if (columns > KVM_TEXT_COLUMNS) columns = KVM_TEXT_COLUMNS;
-    if (rows > KVM_TEXT_ROWS) rows = KVM_TEXT_ROWS;
     cells = (const lib_u8 *)surface;
     for (text_row = 0u; text_row < rows; ++text_row) {
         lib_u32 text_column;
@@ -400,19 +402,24 @@ static lib_bool vm_driver_copy_text(vm_driver *driver,
         &frame->window.text.base.attribute_font_select);
     frame->window.text.base.text_columns = (lib_u16)columns;
     frame->window.text.base.text_rows = (lib_u16)rows;
+    frame->window.valid = 1u;
+    {
+        lib_status status = kvm_window_frame_validate(&frame->window);
+        if (status != LIB_STATUS_OK) return status;
+    }
     vm_driver_cursor_shape(&frame->window.text.base, cursor_size);
     frame->window.text.base.cursor_visible = column >= 0 && row >= 0;
     frame->window.text.base.cursor_phase = 1u;
     memcpy(frame->characters.primary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
     memcpy(frame->characters.secondary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
-    frame->window.valid = 1u;
-    return LIB_TRUE;
+    return LIB_STATUS_OK;
 }
 
-static lib_bool vm_driver_copy_frame(void *opaque, common_machine_frame *frame)
+static lib_status vm_driver_copy_frame(void *opaque, common_machine_frame *frame)
 {
     vm_driver *driver = (vm_driver *)opaque;
-    if (driver == NULL || frame == NULL) return LIB_FALSE;
+    if (driver == NULL || frame == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    frame->window.valid = 0u;
     /* A graphics route has one valid representation: a complete graphics
        frame.  In particular, restoration must wait for the rebuilt painter
        rather than publishing an 80x25 text fallback as a false graphics

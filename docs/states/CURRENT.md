@@ -5,29 +5,37 @@
 M9 T71 S5 is active: fixed capacity and explicit frame failures.
 Owner: "好的，接下来准入修复，开始执行。" S4 delivery 17c9da90 is reviewed,
 closed and pushed; T71 remains open through S5--S6 and owner acceptance.
+S5 preflight found backing-capacity and font-clamping prerequisites in Compat;
+owner approved the narrow Compat changes ("批准修改compat"). S5 implementation
+and dual-width verification are complete; executor P delivery/review is next.
 
 ## M9 T71 S5 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner-approved serial T71 plan and explicit S5 capacity/result-contract refinement; coordinator S4 review passed. |
+| Admission And Approval | Owner-approved serial T71 plan and explicit S5 capacity/result-contract refinement; coordinator S4 review passed; owner additionally approved narrow Compat edits. |
 | Objective | Validate fixed text/font/map/graphics limits at their owning boundaries; remove producer clipping and distinguish no new frame from failure through the existing Common completion path. |
-| Non-goals | No capacity expansion, dynamic frame allocation, auto presenter fallback, guest-mode change, new side-channel error flag, MVDM/Compat/snapshot/INI/media changes or input/lifecycle redesign. |
+| Non-goals | No capacity expansion, dynamic frame allocation, auto presenter fallback, guest-mode change, new side-channel error flag, MVDM/snapshot/INI/media changes or input/lifecycle redesign. Compat changes are limited to truthful presentation extent/font metadata. |
 | Reference Baseline | 17c9da90 S4 delivery; dual-width Release and final 110/110 per width. |
 | Candidate Proposal | [T71 plan](../proposals/m9-kvm-text-frame-contract.md), S5 fixed-capacity contract. |
-| Files And ABI Surface | Base common-text validator; Window font/graphics and Console map admission; logical Console output; Common driver copy_frame result/caller and VM producer; direct fakes/tests, manifests and relevant contracts. |
+| Files And ABI Surface | Base common-text validator; Window font/graphics and Console map admission; logical Console output; Common driver copy_frame result/caller and VM producer; Compat text extent/font queries; direct fakes/tests, manifests and relevant contracts. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and shared governance skills. |
 | Verification | Zero/min/max/over-limit, font default/range, map representation, hidden/offscreen cursor, graphics stride/extent, no mutation/wake/cache on rejection; no-frame versus failure through real Common/VM path; full serial dual-width and package/snapshot gates. |
 | Expected Markers | No silent producer clipping or boolean conflation; validators owned by the responsible component, one error path, no frame fallback. |
 | Asset Needs | Existing builds and both EXEs; bounded synthetic tests only, no user media/configuration changes. |
 | Reporting Requirements | Refresh preflight estimate after direct callback inventory before editing code; report additions/removals/net for production, tests, gates/docs separately and EXE sizes. |
-| Stop Conditions | Additional executor/state owner, out-of-band error flags, unrelated scope growth, capacity expansion, MVDM/Compat changes or guest fallback. |
+| Stop Conditions | Additional executor/state owner, out-of-band error flags, unrelated scope growth, capacity expansion, MVDM changes, Compat changes beyond presentation queries or guest fallback. |
 | Exit Criteria | Fixed-capacity matrix and actual failure propagation verified; clipping removed; all callers migrated, both builds/full tests pass; implementation P pushed then coordinator review. |
 | Original Owner Request | 保留现有容量，不扩容、不动态分配；统一做完整校验，超限明确失败，禁止静默裁剪。好的，接下来准入修复，开始执行。 |
 | Similar-Issue Sweep | All validation/copy_frame producers, callers and fakes under src/test; include implicit clipping and bool failure conflation, not only min() patterns. |
 
 ## Current Technical Baseline
+
+- S5 working delivery: production C/H +137/-59 (net +78), test C/H +139/-17
+  (net +122); four manifests +23/-23. Release builds succeed on both widths;
+  final x64 110/110 (71.06 seconds), x86 110/110 (100.87 seconds). Both package
+  EXEs rebuilt. No MVDM, INI, media or snapshot-format changes.
 
 - S4 typed frames/opaque transport: 17c9da90; production +469/-345 (net +124),
   test C/H +406/-312 (net +94). Both EXEs rebuilt; final serial x64/x86 110/110.

@@ -14,14 +14,14 @@ typedef struct completions {
 
 static softpc_machine *observed_product;
 static HANDLE program_completed;
-static lib_bool (*copy_product_frame)(void *, common_machine_frame *);
+static lib_status (*copy_product_frame)(void *, common_machine_frame *);
 
 /* Observe a disposable program's result on the executor, never race a host
  * RAM read against execution. This barrier proves changed CS:EIP was used. */
-static lib_bool observe_program(void *context, common_machine_frame *frame)
+static lib_status observe_program(void *context, common_machine_frame *frame)
 {
     lib_u32 marker = 0u;
-    lib_bool copied = copy_product_frame(context, frame);
+    lib_status copied = copy_product_frame(context, frame);
     if (softpc_machine_read_physical(observed_product, 0x600u, &marker, sizeof(marker)) ==
             SOFTPC_MACHINE_OK && marker == 0x56781234u)
         SetEvent(program_completed);

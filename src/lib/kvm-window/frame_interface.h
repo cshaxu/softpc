@@ -11,6 +11,7 @@
 #define KVM_WINDOW_FONT_GLYPHS 256u
 
 typedef struct kvm_window_text_frame {
+    /* font_height == 0 selects the existing 16-row default. */
     kvm_text_frame base;
     lib_u8 font[KVM_WINDOW_FONT_GLYPHS * KVM_WINDOW_FONT_HEIGHT];
     lib_u8 secondary_font[KVM_WINDOW_FONT_GLYPHS * KVM_WINDOW_FONT_HEIGHT];
@@ -37,18 +38,25 @@ typedef struct kvm_window_frame {
     };
 } kvm_window_frame;
 
-static inline lib_bool kvm_window_frame_is_valid(const kvm_window_frame *frame)
+static inline lib_status kvm_window_frame_validate(const kvm_window_frame *frame)
 {
-    if (frame == LIB_NULL || frame->valid == 0u) return LIB_FALSE;
+    lib_status status;
+    if (frame == LIB_NULL || frame->valid == 0u) return LIB_STATUS_INVALID_ARGUMENT;
     if (frame->graphics != 0u) {
-        return frame->image.width != 0u &&
-            frame->image.width <= KVM_WINDOW_GRAPHICS_MAX_WIDTH &&
-            frame->image.height != 0u &&
-            frame->image.height <= KVM_WINDOW_GRAPHICS_MAX_HEIGHT &&
-            frame->image.stride >= frame->image.width &&
-            frame->image.stride <= KVM_WINDOW_GRAPHICS_MAX_WIDTH;
+        if (frame->image.width == 0u || frame->image.height == 0u ||
+            frame->image.stride < frame->image.width)
+            return LIB_STATUS_INVALID_ARGUMENT;
+        if (frame->image.width > KVM_WINDOW_GRAPHICS_MAX_WIDTH ||
+            frame->image.height > KVM_WINDOW_GRAPHICS_MAX_HEIGHT ||
+            frame->image.stride > KVM_WINDOW_GRAPHICS_MAX_WIDTH ||
+            frame->image.height > KVM_WINDOW_GRAPHICS_MAX_PIXELS / frame->image.stride)
+            return LIB_STATUS_UNSUPPORTED;
+        return LIB_STATUS_OK;
     }
-    return kvm_text_frame_is_valid(&frame->text.base);
+    status = kvm_text_frame_validate(&frame->text.base);
+    if (status != LIB_STATUS_OK) return status;
+    return frame->text.base.font_height > KVM_WINDOW_FONT_HEIGHT ?
+        LIB_STATUS_UNSUPPORTED : LIB_STATUS_OK;
 }
 
 /* Call only after validation. No inactive union arm or pixel tail is copied. */
@@ -62,7 +70,7 @@ static inline lib_size kvm_window_frame_size_bytes(const kvm_window_frame *frame
 static inline lib_bool kvm_window_frame_copy(kvm_window_frame *destination,
     const kvm_window_frame *source)
 {
-    if (destination == LIB_NULL || !kvm_window_frame_is_valid(source)) return LIB_FALSE;
+    if (destination == LIB_NULL || kvm_window_frame_validate(source) != LIB_STATUS_OK) return LIB_FALSE;
     if (destination != source)
         lib_memory_copy(destination, source, kvm_window_frame_size_bytes(source));
     return LIB_TRUE;

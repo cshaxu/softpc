@@ -171,7 +171,9 @@ typedef struct common_machine_driver {
     void (*set_executor_callback)(void *context,
         common_machine_executor_callback callback, void *callback_context);
     void (*deliver_input)(void *context, const kvm_input_event *event);
-    lib_bool (*copy_frame)(void *context, common_machine_frame *out_frame);
+    /* OK with window.valid == 0 means no frame. Failure does not publish the
+     * staging value and terminates execution through the existing ERROR fact. */
+    lib_status (*copy_frame)(void *context, common_machine_frame *out_frame);
     lib_bool (*set_removable_media)(void *context, const char *path,
         lib_storage_medium_mode mode);
     /* Common invokes only these state-specific driver hooks on its existing

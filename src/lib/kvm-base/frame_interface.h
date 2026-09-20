@@ -5,7 +5,9 @@
 
 /* Shared text fields only. Each stored row occupies KVM_TEXT_COLUMNS cells,
  * even when fewer columns are visible. Palette entries are 0x00RRGGBB.
- * Glyph indices select resources supplied by the receiving leaf's frame. */
+ * Glyph indices select resources supplied by the receiving leaf's frame.
+ * Zero dimensions are invalid; nonzero extents beyond this fixed capacity
+ * are unsupported. Off-surface/hidden cursors do not invalidate a frame. */
 #define KVM_TEXT_COLUMNS 80u
 #define KVM_TEXT_ROWS 25u
 
@@ -25,10 +27,13 @@ typedef struct kvm_text_frame {
     lib_u32 attribute_font_select;
 } kvm_text_frame;
 
-static inline lib_bool kvm_text_frame_is_valid(const kvm_text_frame *frame)
+static inline lib_status kvm_text_frame_validate(const kvm_text_frame *frame)
 {
-    return frame != LIB_NULL && frame->text_columns != 0u && frame->text_columns <= KVM_TEXT_COLUMNS &&
-        frame->text_rows != 0u && frame->text_rows <= KVM_TEXT_ROWS;
+    if (frame == LIB_NULL || frame->text_columns == 0u || frame->text_rows == 0u)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    if (frame->text_columns > KVM_TEXT_COLUMNS || frame->text_rows > KVM_TEXT_ROWS)
+        return LIB_STATUS_UNSUPPORTED;
+    return LIB_STATUS_OK;
 }
 
 #endif

@@ -104,7 +104,7 @@ int kvm_window_cursor_rect(const kvm_window_frame *frame, const kvm_window_rect 
 {
     int width, height, cell_top, cell_bottom;
     lib_u32 top, bottom;
-    if (!kvm_window_frame_is_valid(frame) || !display || !cursor || frame->graphics ||
+    if (kvm_window_frame_validate(frame) != LIB_STATUS_OK || !display || !cursor || frame->graphics ||
         !frame->text.base.cursor_visible || frame->text.base.cursor_column < 0 || frame->text.base.cursor_row < 0 ||
         frame->text.base.cursor_column >= frame->text.base.text_columns || frame->text.base.cursor_row >= frame->text.base.text_rows)
         return 0;

@@ -467,7 +467,8 @@ int softpc_machine_presentation_text(const softpc_machine *machine,
     if (machine == NULL || !machine->reset || cells_out == NULL ||
         columns_out == NULL || rows_out == NULL || stride_out == NULL ||
         cell_bytes_out == NULL || !softpc_standalone_text_surface(cells_out,
-            &columns, &rows, &stride, &cell_bytes)) return 0;
+            &columns, &rows, &stride, &cell_bytes) ||
+        !softpc_platform_presentation_text_extent(&columns, &rows)) return 0;
     *columns_out = (uint32_t)columns;
     *rows_out = (uint32_t)rows;
     *stride_out = (uint32_t)stride;

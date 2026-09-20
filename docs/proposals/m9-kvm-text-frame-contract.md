@@ -342,6 +342,102 @@ S6 retains final integration/simplification review and owner T acceptance.
 
 ## Finite Convergence Ledger
 
+### S5 Preflight Finding And Approved Scope Refinement
+
+Preflight baseline 0623dc5e. The direct driver
+copy_frame consumers are Common machine, VM driver, two Common fakes, product
+command-provider observation and VGA-frame tests; published-frame readers keep
+their independent run-qualified copy contract. A status-returning driver copy
+with an explicit no-frame result can use the existing worker error/unwind path;
+there is no need for a second event queue or persistent error flag.
+
+Source audit found a prerequisite outside the current no-Compat packet:
+
+- compat/dib_surface.c::softpc_standalone_text_surface always reports 80x50
+  backing storage. Its separate geometry helper and compatibility fill code
+  intentionally use that storage capacity; test/unit/text_console_compat_smoke.c
+  asserts it. VM driver then clips rows to 25. Removing that clip without first
+  distinguishing current display extent from storage would reject ordinary DOS.
+- compat/video.c::softpc_platform_presentation_fonts replaces height >16 with
+  16 before VM sees it. Window validation cannot detect that lost information.
+- Original nt_graph.c::textResize derives current text dimensions from the
+  original display state and retains now_width/now_height; these are not the
+  fixed backing capacity. Publication must use the correctly established mode
+  extent, not a guessed 25 or a host Window size. Audit initialization/transition
+  availability before selecting the exact existing boundary.
+
+Recommended scope refinement: allow narrowly bounded Compat presentation-query
+adjustments to report current text extent separately from storage stride/capacity
+and preserve unsupported font metadata without copying beyond storage. Keep
+original device code, snapshot format, storage capacity and console fill semantics
+unchanged. VM then rejects unsupported output, rather than silently clipping it.
+Do not add device state, mode-specific exceptions, timers or fallback presenters.
+Owner subsequently approved: "批准修改compat". Current now permits these narrow
+presentation-query changes. Do not add original device interpretation to
+Common/Lib or hardcode 80x25 in VM. No speculative implementation is claimed
+as verified.
+
+Revised S5 preflight estimate: production +160--230/-90--140 (net about
++70--90), tests +160--240/-25--45. Documentation, manifests and artifacts are
+counted separately. Replace existing validators rather than add boolean aliases;
+retain each component's single admission path. No-frame and failure must migrate
+together through the driver and executor before delivery.
+
+S5 implementation checkpoint: validators now return explicit status; no boolean
+compatibility alias remains. Common copy_frame uses status plus the existing
+window.valid field (OK/invalid means no new frame), and errors request the existing
+executor unwind before its ERROR completion. Compat uses original PCDisplay
+text geometry, with the same row calculation as the original V7 query; backing
+capacity remains a separate unchanged contract. Zero character/pixel height is
+not-yet-available geometry. Font metadata is preserved and oversized glyphs are
+not copied. VM clipping is removed. x64 build and focused VGA/Common/Lib checks
+pass, including actual producer 80x25, oversized rows/columns and font/default
+cases. Delivery verification follows below.
+
+### S5 Delivery Verification And Sweep
+
+Both Release builds succeeded. Final full runs: x86 110/110 in 100.87 seconds,
+then x64 110/110 in 71.06 seconds with no build or source modification active.
+An earlier x64 run also passed 110/110 in 124.71 seconds, but overlapped the
+tail of a build and subsequent x86 activity; the final isolated x64 run replaces
+that timing evidence. Intermediate compile failures were missing original-header
+prerequisites for the controller geometry macro and a missing test declaration;
+the original headers/declaration were used, not a replacement hardware constant.
+
+Finite S5 proof:
+
+- Base/Window/map matrix: kvm_frame_copy exercises null/zero/min/max/over-limit,
+  default/max/unsupported fonts, off-surface cursor acceptance, both map banks,
+  surrogate rejection and stride/extent overflow bounds.
+- Window admission: kvm_frame_damage_mouse preserves pending data/generation
+  and an unsignalled wake across invalid stride/font/height publications. Existing
+  dirty and cursor/motion checks remain. Console retirement does the same across
+  dimensions and invalid maps; logical Console checks no output callback on error.
+- VM: vga_frame verifies actual 80x25 rather than the 80x50 backing capacity,
+  unsupported columns/rows/fonts, zero/default font preservation and no-frame
+  before character geometry exists. Existing original mode and snapshot rebuild
+  tests remain. No fixed 25-row substitute was introduced.
+- Common: machine_wait executes the real worker with unsupported/invalid frame
+  statuses, proving one stop, no paused wait/publication and ERROR only after
+  cleanup. Normal no-frame cases retain pause/resume/reset/wait behavior.
+- Search scope: all src/test C/H copy_frame, old is_valid names, text limit clamps
+  and font-height fallbacks. Every driver callback/fake migrated; published-frame
+  readers retain their separate run-qualified boolean contract. Hidden cursor
+  geometry and dirty intersection are intentional clipping, not truncated frames.
+  Compat fill/storage bounds and original device painters are unchanged owners.
+
+Accounting from 0623dc5e, C/H only: production +137/-59, net +78; tests +139/-17,
+net +122. Four manifests +23/-23; no build-target/gate edits. No new frame storage,
+thread, queue, state owner or compatibility alias. Header comments are included
+in C/H counts. Documentation is counted separately at commit review.
+
+Package x86 is 3655213 bytes (+1095), SHA-256
+E454171E2DE2444B605D7F00724189C058F6598DCDB5351EB3F5B6E21293036B.
+Package x64 is 3058756 bytes (+70), SHA-256
+4F44D805DBA1C320029B76623CF7536FBEC695C02D4D8D203A0ABA786CEE6581.
+No fresh manual Windows guest acceptance or native Linux presenter execution is
+claimed. S6 integration/simplification audit and T-level owner acceptance remain.
+
 Freeze the exact path list at each preflight using references to kvm_frame,
 lib_console_text_frame, publish/capture/acknowledge, graphics/dirty/font/map,
 control kinds and copy_frame callbacks under src and test. Each hit receives

@@ -32,7 +32,7 @@ int main(void)
     frame->text.base.text_columns = 80u;
     frame->text.base.text_rows = 25u;
     frame->text.base.text[0] = 'X';
-    assert(kvm_window_frame_is_valid(frame));
+    assert(kvm_window_frame_validate(frame) == LIB_STATUS_OK);
 
     kvm_hotkey_registry_initialize(&registry);
     assert(kvm_hotkey_registry_register(&registry, 'P',

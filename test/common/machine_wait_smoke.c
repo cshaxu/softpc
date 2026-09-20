@@ -12,6 +12,7 @@ static common_machine_executor_callback executor;
 static void *executor_context;
 static common_machine_state observed[8];
 static lib_bool reject_destroy;
+static lib_status frame_status;
 static lib_status destroy_task(base_sync_task *task)
 {
     if (reject_destroy) return LIB_STATUS_IO_ERROR;
@@ -81,15 +82,15 @@ static lib_bool run(void *context)
     assert(heartbeat && executor != NULL);
     assert(common_machine_pause(active));
     executor(executor_context);
-    if (wait_result == BASE_SYNC_WAIT_SIGNALED && action == 0u)
+    if (frame_status == LIB_STATUS_OK && wait_result == BASE_SYNC_WAIT_SIGNALED && action == 0u)
         assert(common_machine_stop(active));
     assert(stops != 0u);
     return LIB_TRUE; /* Unwinding the driver itself succeeds, even after fault. */
 }
 static void input(void *context, const kvm_input_event *event)
 { (void)context; (void)event; }
-static lib_bool frame(void *context, common_machine_frame *value)
-{ (void)context; (void)value; return LIB_FALSE; }
+static lib_status frame(void *context, common_machine_frame *value)
+{ (void)context; value->window.valid = 0u; return frame_status; }
 static void state(void *context, common_machine_state value, lib_u32 generation)
 {
     (void)context;
@@ -113,8 +114,12 @@ static void check(base_sync_wait_result result, unsigned requested_action)
     common_machine_begin_cold_run(active, LIB_FALSE);
     common_machine_worker(active, NULL);
     assert(observed[0] == COMMON_MACHINE_RUNNING);
-    assert(observed[1] == COMMON_MACHINE_PAUSED);
-    if (result != BASE_SYNC_WAIT_SIGNALED) {
+    if (frame_status != LIB_STATUS_OK) {
+        assert(facts == 2u && observed[1] == COMMON_MACHINE_ERROR);
+        assert(paused_waits == 0u && stops == 1u && cleanups == 1u);
+        assert(active->published_frame_sequence == 0u);
+    } else if (result != BASE_SYNC_WAIT_SIGNALED) {
+        assert(observed[1] == COMMON_MACHINE_PAUSED);
         common_machine_state terminal = result == BASE_SYNC_WAIT_CANCELLED ?
             COMMON_MACHINE_STOPPED : COMMON_MACHINE_ERROR;
         assert(paused_waits == 1u && resets == 1u && cleanups == 1u);
@@ -169,5 +174,9 @@ int main(void)
     check(BASE_SYNC_WAIT_SIGNALED, 0u); /* Resume. */
     check(BASE_SYNC_WAIT_SIGNALED, 1u); /* Stop. */
     check(BASE_SYNC_WAIT_SIGNALED, 2u); /* Reset, then stop. */
+    frame_status = LIB_STATUS_UNSUPPORTED;
+    check(BASE_SYNC_WAIT_SIGNALED, 0u);
+    frame_status = LIB_STATUS_INVALID_ARGUMENT;
+    check(BASE_SYNC_WAIT_SIGNALED, 0u);
     return 0;
 }

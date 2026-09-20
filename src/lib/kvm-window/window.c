@@ -85,8 +85,10 @@ static void kvm_window_update_frame(void *destination, const void *source,
 
 lib_status kvm_window_publish_frame(kvm_window *window, const kvm_window_frame *frame)
 {
-    if (window == LIB_NULL || !kvm_window_frame_is_valid(frame))
-        return LIB_STATUS_INVALID_ARGUMENT;
+    lib_status status;
+    if (window == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    status = kvm_window_frame_validate(frame);
+    if (status != LIB_STATUS_OK) return status;
     return kvm_component_publish_frame(&window->base, frame,
         kvm_window_frame_size_bytes(frame), kvm_window_update_frame);
 }

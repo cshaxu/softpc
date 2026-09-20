@@ -113,14 +113,14 @@ static void fake_deliver_input(void *opaque, const kvm_input_event *event)
     InterlockedIncrement(&fake->inputs);
     SetEvent(fake->input);
 }
-static lib_bool fake_copy_frame(void *opaque, common_machine_frame *frame)
+static lib_status fake_copy_frame(void *opaque, common_machine_frame *frame)
 {
     (void)opaque;
     memset(frame, 0, sizeof(*frame));
     frame->window.valid = 1u;
     frame->window.text.base.text_columns = KVM_TEXT_COLUMNS;
     frame->window.text.base.text_rows = KVM_TEXT_ROWS;
-    return LIB_TRUE;
+    return LIB_STATUS_OK;
 }
 
 /* State transfer is deliberately exercised through the injected driver, on

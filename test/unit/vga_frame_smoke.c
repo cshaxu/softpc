@@ -511,11 +511,37 @@ static void verify_driver_geometry(softpc_machine *machine)
         assert(Currently_emulated_video_mode == modes[index]);
         if (modes[index] == 3) {
             memset(frame, 0xa5, sizeof(*frame));
-            assert(driver.copy_frame(driver.context, frame));
+            assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
             assert(frame->window.valid && !frame->window.graphics);
+            assert(frame->window.text.base.text_columns == 80u &&
+                frame->window.text.base.text_rows == 25u);
             for (lib_size byte = kvm_window_frame_size_bytes(&frame->window);
                     byte < sizeof(frame->window); ++byte)
                 assert(((const lib_u8 *)&frame->window)[byte] == 0xa5);
+            {
+                unsigned saved_columns = get_chars_per_line();
+                unsigned saved_height = get_char_height();
+                extern IU8 c_sas_hw_at(IU32 addr);
+                extern void c_sas_store(IU32 addr, IU8 value);
+                IU8 saved_font_height = c_sas_hw_at(0x485u);
+                set_chars_per_line(81u);
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
+                set_chars_per_line(0u);
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_INVALID_ARGUMENT);
+                set_chars_per_line(saved_columns);
+                set_char_height(8u); /* Same display height now means 50 rows. */
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
+                set_char_height(0u); /* Controller geometry not initialized. */
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
+                set_char_height(saved_height);
+                c_sas_store(0x485u, 17u);
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
+                assert(frame->window.text.base.font_height == 17u);
+                c_sas_store(0x485u, 0u);
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
+                assert(frame->window.text.base.font_height == 0u);
+                c_sas_store(0x485u, saved_font_height);
+            }
             const lib_u16 *map = frame->characters.primary;
             assert(map[0]==' ' && map['A']=='A');
             assert(map[1]==0x263a && map[0x7f]==0x2302);
@@ -550,7 +576,7 @@ static void verify_driver_geometry(softpc_machine *machine)
         while (softpc_machine_presentation_take_dirty(machine, &left, &top,
                 &right, &bottom)) { }
         softpc_standalone_dib_invalidate_all();
-        assert(driver.copy_frame(driver.context, frame));
+        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
         assert(frame->window.valid && frame->window.graphics);
         assert(frame->window.image.width == width && frame->window.image.height == height);
         /* A legitimate full-height half repaint must not resize the frame.
@@ -559,7 +585,7 @@ static void verify_driver_geometry(softpc_machine *machine)
         rect.Right = (SHORT)((pass ? width / 2u : width) - 1u);
         rect.Bottom = (SHORT)(height - 1u);
         assert(softpc_standalone_dib_damage(&rect));
-        assert(driver.copy_frame(driver.context, frame));
+        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
         assert(frame->window.valid && frame->window.graphics);
         if (frame->window.image.width != width || frame->window.image.height != height)
             fprintf(stderr, "mode %02x pass %u: DIB %ux%u, frame %ux%u\n",
@@ -570,13 +596,13 @@ static void verify_driver_geometry(softpc_machine *machine)
         assert(frame->window.image.dirty_right == rect.Right);
         rect.Left = (SHORT)(width / 2u); rect.Right = (SHORT)(width - 1u);
         assert(softpc_standalone_dib_damage(&rect));
-        assert(driver.copy_frame(driver.context, frame));
+        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
         assert(frame->window.image.width == width && frame->window.image.dirty_right == rect.Right);
         assert(memcmp(frame->window.image.pixels, bits, width * height) == 0);
         /* A graphics route with no complete dirty frame must publish nothing.
            It must never substitute the text surface: restoration relies on
            this same rule while the indexed painter is being rebuilt. */
-        assert(!driver.copy_frame(driver.context, frame));
+        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
     }
     vm_driver_destroy(adapter);
     free(frame);

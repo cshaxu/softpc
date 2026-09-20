@@ -174,9 +174,17 @@ lib_status lib_console_write_text_frame(lib_console *console,
     void *context;
     lib_status status;
 
-    if (console == LIB_NULL || frame == LIB_NULL || frame->columns == 0u ||
-        frame->columns > LIB_CONSOLE_TEXT_COLUMNS || frame->rows == 0u ||
-        frame->rows > LIB_CONSOLE_TEXT_ROWS) return LIB_STATUS_INVALID_ARGUMENT;
+    if (console == LIB_NULL || frame == LIB_NULL || frame->columns == 0u || frame->rows == 0u)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    if (frame->columns > LIB_CONSOLE_TEXT_COLUMNS || frame->rows > LIB_CONSOLE_TEXT_ROWS)
+        return LIB_STATUS_UNSUPPORTED;
+    for (lib_size row = 0u; row < frame->rows; ++row) {
+        for (lib_size column = 0u; column < frame->columns; ++column) {
+            lib_u16 character = frame->text[row * LIB_CONSOLE_TEXT_COLUMNS + column];
+            if (character >= 0xd800u && character <= 0xdfffu)
+                return LIB_STATUS_INVALID_ARGUMENT;
+        }
+    }
     base_sync_mutex_lock(console->output_lock);
     sink = console->output.frame;
     context = console->output.context;

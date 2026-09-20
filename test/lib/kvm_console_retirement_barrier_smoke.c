@@ -265,6 +265,10 @@ static void check_activation_frame(void)
         assert(kvm_console_publish_frame(c,NULL)==LIB_STATUS_INVALID_ARGUMENT);
         assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
         rejected.base.text_columns=81; rejected.base.text_rows=25;
+        assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_UNSUPPORTED);
+        rejected.base.text_columns=80; rejected.base.text_rows=26;
+        assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_UNSUPPORTED);
+        rejected.base.text_rows=25; rejected.characters.secondary[255]=0xd800;
         assert(kvm_console_publish_frame(c,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
         assert(kvm_component_mailboxes_capture_frame(&c->base.mailboxes,
             &generation,&copied,sizeof(copied)));

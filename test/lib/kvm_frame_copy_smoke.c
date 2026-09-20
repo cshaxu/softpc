@@ -1,9 +1,61 @@
 #include "lib/kvm-base/mailbox_interface.h"
 #include "lib/kvm-window/frame_interface.h"
+#include "lib/kvm-console/frame_interface.h"
 #include <assert.h>
 
 static kvm_window_frame source, destination, storage;
 static kvm_component_mailboxes mailbox;
+
+static void check_validation(void)
+{
+    kvm_console_text_frame text = {0};
+    source = (kvm_window_frame){0};
+    assert(kvm_window_frame_validate(NULL) == LIB_STATUS_INVALID_ARGUMENT);
+    assert(kvm_window_frame_validate(&source) == LIB_STATUS_INVALID_ARGUMENT);
+    source.valid = 1u;
+    assert(kvm_window_frame_validate(&source) == LIB_STATUS_INVALID_ARGUMENT);
+    source.text.base.text_columns = source.text.base.text_rows = 1u;
+    assert(kvm_window_frame_validate(&source) == LIB_STATUS_OK);
+    source.text.base.font_height = KVM_WINDOW_FONT_HEIGHT;
+    source.text.base.text_columns = KVM_TEXT_COLUMNS;
+    source.text.base.text_rows = KVM_TEXT_ROWS;
+    source.text.base.cursor_visible = 1u;
+    source.text.base.cursor_column = -1;
+    source.text.base.cursor_row = 500;
+    assert(kvm_window_frame_validate(&source) == LIB_STATUS_OK);
+    source.text.base.font_height++;
+    assert(kvm_window_frame_validate(&source) == LIB_STATUS_UNSUPPORTED);
+    text.base = source.text.base; /* Console does not own bitmap bounds. */
+    assert(kvm_console_text_frame_validate(&text) == LIB_STATUS_OK);
+    source.text.base.font_height = 0u;
+    source.text.base.text_rows++;
+    assert(kvm_window_frame_validate(&source) == LIB_STATUS_UNSUPPORTED);
+    text.base.text_columns++;
+    assert(kvm_console_text_frame_validate(&text) == LIB_STATUS_UNSUPPORTED);
+    text.base.text_columns = 0u;
+    assert(kvm_console_text_frame_validate(&text) == LIB_STATUS_INVALID_ARGUMENT);
+    text.base.text_columns = 1u;
+    text.characters.primary[255] = 0xd800u;
+    assert(kvm_console_text_frame_validate(&text) == LIB_STATUS_INVALID_ARGUMENT);
+    text.characters.primary[255] = 0xd7ffu;
+    text.characters.secondary[0] = 0xdfffu;
+    assert(kvm_console_text_frame_validate(&text) == LIB_STATUS_INVALID_ARGUMENT);
+    text.characters.secondary[0] = 0xe000u;
+    assert(kvm_console_text_frame_validate(&text) == LIB_STATUS_OK);
+    source.graphics = 1u;
+    source.image.width = source.image.height = source.image.stride = 1u;
+    assert(kvm_window_frame_validate(&source) == LIB_STATUS_OK);
+    source.image.stride = 0u;
+    assert(kvm_window_frame_validate(&source) == LIB_STATUS_INVALID_ARGUMENT);
+    source.image.width = source.image.stride = KVM_WINDOW_GRAPHICS_MAX_WIDTH;
+    source.image.height = KVM_WINDOW_GRAPHICS_MAX_HEIGHT;
+    assert(kvm_window_frame_validate(&source) == LIB_STATUS_OK);
+    source.image.height++;
+    assert(kvm_window_frame_validate(&source) == LIB_STATUS_UNSUPPORTED);
+    source.image.height = 1u;
+    source.image.stride = (lib_u32)-1;
+    assert(kvm_window_frame_validate(&source) == LIB_STATUS_UNSUPPORTED);
+}
 
 static void check_copy(void)
 {
@@ -19,11 +71,13 @@ static void check_copy(void)
 int main(void)
 {
     lib_u32 generation, old;
+    check_validation();
     lib_memory_set(&source, 0x3c, sizeof(source));
     source.valid = 1u;
     source.graphics = 0u;
     source.text.base.text_columns = 80u;
     source.text.base.text_rows = 25u;
+    source.text.base.font_height = 0u;
     check_copy(); /* No inactive graphics payload is copied. */
     assert(kvm_component_mailboxes_create(&mailbox, &storage, sizeof(storage)) == LIB_STATUS_OK);
     lib_memory_set(&storage, 0x96, sizeof(storage));
@@ -56,6 +110,7 @@ int main(void)
     check_copy();
     source.graphics = 0u;
     source.text.base.text_columns = 80u; source.text.base.text_rows = 25u;
+    source.text.base.font_height = 0u;
     check_copy(); /* Graphics -> text never exposes the old pixels. */
     assert(kvm_component_mailboxes_publish_frame(&mailbox, &source,
         kvm_window_frame_size_bytes(&source), NULL) == LIB_STATUS_OK);

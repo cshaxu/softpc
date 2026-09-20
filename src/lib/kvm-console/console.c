@@ -114,8 +114,10 @@ lib_status kvm_console_create(kvm_console **out_console,
 
 lib_status kvm_console_publish_frame(kvm_console *console, const kvm_console_text_frame *frame)
 {
-    if (console == LIB_NULL || frame == LIB_NULL || !kvm_text_frame_is_valid(&frame->base))
-        return LIB_STATUS_INVALID_ARGUMENT;
+    lib_status status;
+    if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    status = kvm_console_text_frame_validate(frame);
+    if (status != LIB_STATUS_OK) return status;
     return kvm_component_publish_frame(&console->base, frame, sizeof(*frame), LIB_NULL);
 }
 

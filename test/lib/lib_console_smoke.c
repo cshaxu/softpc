@@ -89,6 +89,16 @@ int main(void)
     assert(lib_console_write_text(console, "hello", 5u) == LIB_STATUS_OK);
     assert(lib_console_write_text_frame(console, &frame) == LIB_STATUS_OK);
     assert(probe.frames == 1u && next.frames == 0u);
+    frame.columns = 81u;
+    assert(lib_console_write_text_frame(console, &frame) == LIB_STATUS_UNSUPPORTED);
+    frame.columns = 80u; frame.rows = 26u;
+    assert(lib_console_write_text_frame(console, &frame) == LIB_STATUS_UNSUPPORTED);
+    frame.rows = 0u;
+    assert(lib_console_write_text_frame(console, &frame) == LIB_STATUS_INVALID_ARGUMENT);
+    frame.rows = 25u; frame.text[1999] = 0xd800u;
+    assert(lib_console_write_text_frame(console, &frame) == LIB_STATUS_INVALID_ARGUMENT);
+    assert(probe.frames == 1u);
+    frame.text[1999] = 0u;
     assert(probe.output_length == 5u);
     assert(strcmp(probe.output, "hello") == 0);
     assert(lib_console_set_output_binding(console, &binding) == LIB_STATUS_OK);

@@ -7,6 +7,8 @@
 #include <string.h>
 
 #include "gmi.h"
+#include "xt.h"
+#include "config.h"
 #include "gfx_upd.h"
 #include "gvi.h"
 #include "egaports.h"
@@ -54,6 +56,19 @@ int softpc_platform_presentation_cursor(long *column_out, long *row_out,
     return softpc_compat_presentation_cursor(column_out, row_out, size_out);
 }
 
+int softpc_platform_presentation_text_extent(unsigned long *columns_out,
+    unsigned long *rows_out)
+{
+    if (columns_out == NULL || rows_out == NULL ||
+        get_char_height() == 0 || get_pc_pix_height() == 0)
+        return 0;
+    /* Use the original controller's text geometry (also used by its V7
+       query), not the host backing-store capacity or native viewport. */
+    *columns_out = get_chars_per_line();
+    *rows_out = get_screen_height() / get_pc_pix_height() / get_char_height();
+    return 1;
+}
+
 int softpc_platform_presentation_fonts(uint8_t *primary, uint8_t *secondary,
                                        unsigned long *height_out, unsigned long *attribute_select_out)
 {
@@ -69,12 +84,17 @@ int softpc_platform_presentation_fonts(uint8_t *primary, uint8_t *secondary,
         attribute_select_out == NULL || EGA_planes == NULL)
         return 0;
     height = sas_hw_at_no_check(ega_char_height);
-    if (height == 0u || height > 16u)
-        height = 16u;
     font = (unsigned long)get_prim_font_index() & 7u;
     secondary_font = (unsigned long)get_sec_font_index() & 7u;
     memset(primary, 0, 256u * 16u);
     memset(secondary, 0, 256u * 16u);
+    *height_out = height;
+    *attribute_select_out = get_attrib_font_select() ? 1u : 0u;
+    /* Preserve unsupported metadata for the receiving frame validator. No
+       glyph may be copied beyond the fixed destination bank. Zero means the
+       existing default height, not an unsupported font. */
+    if (height > 16u) return 1;
+    if (height == 0u) height = 16u;
     for (character = 0u; character < 256u; ++character)
     {
         unsigned long row;
@@ -89,8 +109,6 @@ int softpc_platform_presentation_fonts(uint8_t *primary, uint8_t *secondary,
             secondary[character * 16u + row] = secondary_source[row << 2];
         }
     }
-    *height_out = height;
-    *attribute_select_out = get_attrib_font_select() ? 1u : 0u;
     return 1;
 }
 

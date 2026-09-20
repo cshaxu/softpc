@@ -39,6 +39,7 @@ void softpc_platform_executor_event(void);
 char *softpc_platform_floppy_config_value(void);
 int softpc_platform_presentation_is_graphics(void);
 int softpc_platform_presentation_state(uint32_t *, uint32_t *);
+int softpc_platform_presentation_text_extent(unsigned long *, unsigned long *);
 int softpc_platform_presentation_cursor(long *, long *,
     unsigned long *);
 int softpc_platform_presentation_fonts(uint8_t *, uint8_t *,

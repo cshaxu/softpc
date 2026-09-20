@@ -19,6 +19,22 @@ static void damage(void)
     assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
     assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
     assert(received.image.dirty_right == 3 && received.image.dirty_bottom == 3);
+    {
+        lib_u32 pending_generation = generation;
+        assert(base_sync_event_wait(window.base.mailboxes.wake, 0u) == BASE_SYNC_WAIT_SIGNALED);
+        frame.image.height = KVM_WINDOW_GRAPHICS_MAX_HEIGHT + 1u;
+        assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_UNSUPPORTED);
+        frame.image.height = 4u; frame.image.stride = 3u;
+        assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_INVALID_ARGUMENT);
+        frame.graphics = 0u;
+        frame.text.base.text_columns = 80u; frame.text.base.text_rows = 25u;
+        frame.text.base.font_height = KVM_WINDOW_FONT_HEIGHT + 1u;
+        assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_UNSUPPORTED);
+        assert(base_sync_event_wait(window.base.mailboxes.wake, 0u) == BASE_SYNC_WAIT_TIMED_OUT);
+        assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
+        assert(generation == pending_generation && received.graphics && received.image.height == 4u);
+        frame = received;
+    }
     kvm_component_mailboxes_acknowledge_frame(&window.base.mailboxes, generation);
     frame.image.dirty_left = frame.image.dirty_top = frame.image.dirty_right = frame.image.dirty_bottom = 1;
     frame.image.pixels[5] = 1u;
@@ -54,6 +70,7 @@ static void damage(void)
     assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
     assert(received.image.dirty_left == 0 && received.image.dirty_right == 2);
     frame.graphics = 0u; frame.text.base.text_columns = 80u; frame.text.base.text_rows = 25u;
+    frame.text.base.font_height = 0u;
     assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
     frame.graphics = 1u;
     frame.image.width = frame.image.stride = 3u;

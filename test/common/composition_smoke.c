@@ -54,7 +54,8 @@ lib_console *kvm_console_get_console(const kvm_console *console)
 lib_status kvm_console_publish_frame(kvm_console *console, const kvm_console_text_frame *frame)
 {
     assert(console == &console_fake);
-    if (!kvm_text_frame_is_valid(&frame->base)) return LIB_STATUS_INVALID_ARGUMENT;
+    lib_status status = kvm_console_text_frame_validate(frame);
+    if (status != LIB_STATUS_OK) return status;
     last_console = *frame;
     ++console_frames;
     return publish_status;

@@ -107,8 +107,9 @@ static lib_bool common_machine_text_frame_changed(const common_machine_frame *pr
             sizeof(candidate->characters)) != 0;
 }
 
-static void common_machine_publish(common_machine *machine)
+static lib_status common_machine_publish(common_machine *machine)
 {
+    lib_status status;
     common_machine_frame *frame;
     int staging_index;
     common_machine_frame_sink sink = NULL;
@@ -118,19 +119,21 @@ static void common_machine_publish(common_machine *machine)
     lib_bool graphics = LIB_FALSE;
     common_machine_frame *published_frame = NULL;
 
-    if (machine == NULL || machine->driver.copy_frame == NULL) return;
+    if (machine == NULL || machine->driver.copy_frame == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     base_sync_mutex_lock(machine->frame_lock);
     staging_index = machine->published_frame_index == 0 ? 1 : 0;
     frame = machine->frame_buffers[staging_index];
-    if (frame == NULL || !machine->driver.copy_frame(machine->driver.context, frame)) {
+    frame->window.valid = 0u;
+    status = machine->driver.copy_frame(machine->driver.context, frame);
+    if (status != LIB_STATUS_OK) {
         base_sync_mutex_unlock(machine->frame_lock);
-        return;
+        return status;
     }
     if (frame->window.valid == 0u || (frame->window.graphics == 0u &&
         !common_machine_text_frame_changed(
             machine->frame_buffers[machine->published_frame_index], frame))) {
         base_sync_mutex_unlock(machine->frame_lock);
-        return;
+        return LIB_STATUS_OK;
     }
     frame->sequence = ++machine->published_frame_sequence;
     generation = common_machine_run_generation(machine);
@@ -146,6 +149,7 @@ static void common_machine_publish(common_machine *machine)
         machine->driver.frame_published(machine->driver.context, published_frame);
     if (sink != NULL)
         sink(sink_context, sequence, graphics, generation);
+    return LIB_STATUS_OK;
 }
 
 static void common_machine_drain_input(common_machine *machine)
@@ -250,7 +254,13 @@ static void common_machine_executor_event(void *opaque)
     }
     if (debug_stop) lib_atomic_i32_exchange_explicit(&machine->pause_requested, 1, LIB_MEMORY_ORDER_SEQ_CST);
     common_machine_drain_input(machine);
-    common_machine_publish(machine);
+    if (common_machine_publish(machine) != LIB_STATUS_OK) {
+        lib_atomic_i32_exchange_explicit(&machine->state, COMMON_MACHINE_ERROR, LIB_MEMORY_ORDER_SEQ_CST);
+        lib_atomic_i32_exchange_explicit(&machine->reset_requested, 0, LIB_MEMORY_ORDER_SEQ_CST);
+        lib_atomic_i32_exchange_explicit(&machine->stop_requested, 1, LIB_MEMORY_ORDER_SEQ_CST);
+        machine->driver.request_stop(machine->driver.context);
+        return;
+    }
     common_machine_service_state_read(machine);
     if (machine->state_read_continuing && lib_atomic_i32_load_explicit(
             &machine->state_read_ready, LIB_MEMORY_ORDER_SEQ_CST) != 0) {
