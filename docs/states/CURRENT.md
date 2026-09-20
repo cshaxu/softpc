@@ -6,7 +6,7 @@ Active task: M9 T73 S5, independent Lib/Common/x86 test corpora.
 Owner accepted S4; [S4 is closed](../history/M9-T73-S4-x86-source-corpus.md).
 S5 implementation and automated qualification are complete: three independent
 test suites, six-directory x86 and four-directory neutral copies pass. Awaiting
-executor push/review and owner testing; S5/T73 are not closed. Existing Queue order is
+owner testing after implementation/review; S5/T73 are not closed. Existing Queue order is
 retained; a shutdown-wake follow-up found during S5 is appended, not admitted.
 See the [proposal](../proposals/m9-shared-x86-dependency-audit.md).
 
@@ -33,6 +33,9 @@ See the [proposal](../proposals/m9-shared-x86-dependency-audit.md).
 
 ## Current Technical Baseline
 
+- T73 S5 implementation 879c30ac is pushed; the subsequent actual-change review
+  accepts the bounded test split, not T closure or a fix for the queued runtime
+  shutdown issue. S4 is owner-accepted/closed; S5 awaits manual acceptance.
 - T73 S5 separates test/lib, test/common and test/x86; Common tests have no x86
   dependency. Both standalone transfer sets passed, and final full background
   x64 110/110 (181.72s), x86 110/110 (165.87s); five desktop cases excluded.

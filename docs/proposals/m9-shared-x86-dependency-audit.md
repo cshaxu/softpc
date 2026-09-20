@@ -705,6 +705,26 @@ there is no artificial artifact churn or product version bump:
 | assets/binary/softpc32.exe | 3659622 | 5ACA0FD034D59D37B576867435D60419EF4ED31A8CCD6BBAC2BC9C0C330327A0 |
 | assets/binary/softpc64.exe | 3061602 | AE59961C7BEDC9EFD0F5FCFF813824EBC4D4AC2D12117E6A0DE7948766467B09 |
 
-Implementation qualification is complete. Executor commit/push and subsequent
-actual-change review are recorded in the next checkpoint; S5 and T73 await owner
-acceptance and are not closed by these automated results.
+Implementation qualification is complete and pushed as 879c30ac. S5 and T73
+await owner acceptance and are not closed by these automated results.
+
+### S5 Actual-Change Review
+
+After executor push, the single agent switched to coordinator review and audited
+fb07a0b7..879c30ac against the active packet: all 29 changed paths, exact moves,
+neutral fixture ownership, byte-transport/CLI assertion split, CMake closure,
+manifest membership, protected paths and artifact hashes. Production C/H/API and
+src/lib/test/lib are unchanged; Common tests have no x86 C/H or target dependency.
+Common/x86 source manifests and DAGs plus both changed test manifests were rerun
+successfully against the committed tree. Package hashes still match the table.
+
+The runtime shutdown finding has an explicit unadmitted Queue receiver, not a
+claim of repair or a covert expansion of S5. The test-only injection barrier
+retains the original failure assertions. Owned copied build/test trees and
+temporary logs/probes were removed after their bounded results were retained
+above; main build/output configuration and user media were not touched.
+
+Review accepts S5's implementation and test-package boundary; manual acceptance
+and the separate T73 closure decision remain outstanding. At this checkpoint
+implementation HEAD equals origin/main and the worktree was clean before this
+documentation-only review record.
