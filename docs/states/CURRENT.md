@@ -2,29 +2,13 @@
 
 ## Current Work
 
-M9 T72 S3 is active: audit the completed neutral text migration.
-Owner approved execution through T-level audit; formal T closure awaits review.
+No implementation subtask is active.
+Open task awaiting owner: T72.
 
-## M9 T72 S3 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner: 批准执行到t收口标准 然后等我审核后再正式收口 |
-| Objective | Map the owner's whole T request and every S to actual delivery evidence; prepare for owner review without closing T72. |
-| Non-goals | No cell struct, second interface, new state/cache/thread, graphics/input/lifecycle/media/snapshot change; MVDM and Compat untouched. |
-| Reference Baseline | Implementation 12bf7c96; original task baseline e0ad4e8f. |
-| Candidate Proposal | [Approved design](../proposals/m9-kvm-text-cell-glyph-refactor.md). |
-| Files And ABI Surface | Documentation audit only; inspect ten changed production C/H paths, tests and unchanged boundaries. No new ABI. |
-| Applicable Rules | Execution, Coding, Architecture, Documentation, UI and source layout; corresponding governance skills. |
-| Verification | Recheck actual commit, evidence ledger, hashes, sizeof/cost accounting, manifests/DAG, documentation governance and clean synchronized Git. S2 full dual-width proof remains the runtime baseline. |
-| Expected Markers | PC decoding only VM; native encoding only Broker; rejected publication does not mutate mailbox. |
-| Asset Needs | None; do not launch native UI or alter user configuration/media. |
-| Reporting Requirements | Expected production/test +0/-0; confirm actual counts, finite T ledger and pending owner acceptance. P1 push then actual-change P2 review. |
-| Stop Conditions | Unexpected device/behavior change, broad architecture or unexplained significant growth. |
-| Exit Criteria | Complete audit committed/pushed and reviewed; clean worktree; wait for owner, do not formally close T72. |
-| Original Owner Request | 行 那就维持现在设计; 批准执行到t收口标准 然后等我审核后再正式收口 |
-| Similar-Issue Sweep | Old fields/decoding, producers, comparisons, native output and shared/product fixtures. |
+S1 design accepted; S2 implementation and review complete; S3 technical audit
+is delivered for review. T72 is not formally closed. Both Release packages are
+ready for owner testing; no next queued task is admitted.
+See [readiness audit](../history/M9-T72-S3-completion-readiness-audit.md).
 
 ## Current Technical Baseline
 
