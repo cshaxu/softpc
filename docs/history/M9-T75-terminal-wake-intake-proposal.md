@@ -2,7 +2,7 @@
 
 ## Absorbed By T75 S2
 
-Owner admitted this repair through the [T75 plan](../proposals/m9-lib-common-quality-audit.md).
+Owner admitted this repair through the [T75 plan](M9-T75-shared-corpus-quality-proposal.md).
 The evidence below is historical intake, not a second active task or queue item.
 
 Found while separating T73 S5 tests. No production change is authorized by the

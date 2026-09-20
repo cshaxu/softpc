@@ -8,8 +8,6 @@ allocates a numeric task identifier.
 3. [Win95 A: floppy drive identification repair](../proposals/m9-win95-floppy-drive-identification.md)
 4. [XP SP1 SoftPC mirror rebase](../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
 
-T74 is closed: [completion audit](../history/M9-T74-completion-audit.md).
-[T75 Lib/Common quality audit](../proposals/m9-lib-common-quality-audit.md) has
-received the report. T75 S2 absorbs the former terminal-wake candidate;
-the four candidates above remain unadmitted. Overlay optimization is the new
-queue head; the other three candidates retain their relative order.
+T75 is closed: [completion audit](../history/M9-T75-completion-audit.md).
+The owner selected Overlay optimization next; its active packet will remove
+that candidate from this queue. The other three retain their relative order.

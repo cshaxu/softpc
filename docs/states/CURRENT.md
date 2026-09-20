@@ -3,11 +3,10 @@
 ## Current Work
 
 No implementation subtask is active.
-Open task awaiting owner: T75.
-T75 S1--S4 are closed after delivery and actual-change review; S4 executor
-is c950a1c8. Stop for owner acceptance of the dual EXEs, not automatic T closure.
-[Proposal and coverage](../proposals/m9-lib-common-quality-audit.md);
-[S4 review](../history/M9-T75-S4-independent-reuse.md).
+T75 is closed after owner authorization and its separate completion audit.
+Owner admitted Overlay lookup optimization next; its T76 S1 packet follows
+after this closure delivery.
+[T75 audit](../history/M9-T75-completion-audit.md).
 
 ## Current Technical Baseline
 
@@ -62,6 +61,7 @@ is c950a1c8. Stop for owner acceptance of the dual EXEs, not automatic T closure
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T75 | S1--S4 complete; owner approved closure; strict C11 six-package and dual-width acceptance. | [Audit](../history/M9-T75-completion-audit.md) |
 | T74 | S1 complete; owner accepted; dual-width 110/110 background; pure Core relocation. | [Audit](../history/M9-T74-completion-audit.md) |
 | T73 | S1--S5 complete; owner accepted; final dual-width 110/110 background. | [Audit](../history/M9-T73-completion-audit.md) |
 | T72 | S1--S8 complete; owner approved; final dual-width 105/105 background. | [Audit](../history/M9-T72-completion-audit.md) |
