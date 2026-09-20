@@ -2,12 +2,13 @@
 
 ## Current Work
 
-Active task: M9 T72 S6, verified Lib text-render simplification awaiting delivery/review and owner testing.
+Active task: M9 T72 S6, delivered/reviewed Lib text-render simplification awaiting owner testing.
 S1--S5 are closed. Owner split the quality-audit follow-up into S6 (Lib) and
 S7 (Common), in that order. S7 implementation waits for S6 owner testing.
 See [proposal](../proposals/m9-kvm-text-cell-glyph-refactor.md) and
 [audit](../etc/evidence/softpc/m9-t72-post-s5-quality-audit.md).
 S6 delivery details: [evidence](../etc/evidence/softpc/m9-t72-s6-text-render-simplification.md).
+P1 01a737b2 is pushed and actual-change reviewed; S6 remains open, S7 not started.
 
 ## M9 T72 S6 Packet
 

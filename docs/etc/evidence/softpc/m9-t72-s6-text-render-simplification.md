@@ -64,3 +64,16 @@ while S6 is active; history is reserved for its later owner-approved closure.
 x86 package is 512 bytes smaller than S5; x64 size is unchanged. These are PE
 file sizes, not a claim about runtime memory or timing. P1 carries delivery;
 post-push actual-change review follows separately. S6 remains open for testing.
+
+## Coordinator Actual-Change Review
+
+After P1 01a737b2 was pushed, reviewed its actual diff against c635988a and
+the original request. Production is exactly the admitted two-line deletion;
+test expected colours are checked independently using alternating-pixel patterns,
+with nonzero backgrounds, poisoned prior pixels and boundary guards. Existing
+cursor, graphics, mouse and attribute cases remain. No ABI or producer changes.
+Protected Common/VM/Compat/MVDM/INI paths have zero diff. Corpus entries and
+package hashes match, accounting remains +0/-2 production and +46/-1 test.
+No code correction was needed. Documentation gate and diff checks pass.
+S6 technical delivery/review is complete; wait for owner testing, not S7 execution
+or T72 closure. P2 records this review only.
