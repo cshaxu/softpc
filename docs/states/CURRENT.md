@@ -2,12 +2,10 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T76.
-S1 measurement was cancelled by the owner; S2 and S3 are delivered and closed
-after actual-change review. S3 executor: 8999c446. Stop for owner acceptance.
-[Overlay proposal/evidence](../proposals/m9-overlay-page-index.md);
-[S3 review](../history/M9-T76-S3-snapshot-acceptance.md).
+M9 T77 S1 is active: product test inventory and ownership relocation.
+Owner accepted T76 testing and requested closure and admission of the next
+queued task. T76 is closed; implementation baseline remains 7ebb435f.
+[T77 brief and plan](../proposals/m9-product-test-layout-cleanup.md).
 
 ## Current Technical Baseline
 
@@ -17,7 +15,7 @@ after actual-change review. S3 executor: 8999c446. Stop for owner acceptance.
   Final Release/background x64 110/110 (146.29s), x86 110/110 (146.52s), five
   desktop cases excluded per width. Old/new x86/x64 snapshot matrix 16/16 passes;
   golden media payload matches old linked-list codec on both widths. Artifacts
-  and hashes are recorded in the active proposal; INI/media unchanged.
+  and hashes are recorded in the archived T76 proposal; INI/media unchanged.
 - T75 uses the existing task cancellation object for the outer Machine wait;
   deterministic lost-command-wake coverage and repeated native shutdown pass.
   All six shared packages select strict C11 in standalone and embedded builds.
@@ -69,6 +67,7 @@ after actual-change review. S3 executor: 8999c446. Stop for owner acceptance.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T76 | Owner testing passed; S1 measurement cancelled by owner, S2/S3 complete; overlay index and snapshot compatibility accepted. | [Audit](../history/M9-T76-completion-audit.md) |
 | T75 | S1--S4 complete; owner approved closure; strict C11 six-package and dual-width acceptance. | [Audit](../history/M9-T75-completion-audit.md) |
 | T74 | S1 complete; owner accepted; dual-width 110/110 background; pure Core relocation. | [Audit](../history/M9-T74-completion-audit.md) |
 | T73 | S1--S5 complete; owner accepted; final dual-width 110/110 background. | [Audit](../history/M9-T73-completion-audit.md) |
@@ -79,6 +78,8 @@ after actual-change review. S3 executor: 8999c446. Stop for owner acceptance.
 
 ## Recent Governance
 
+- T76 closure archives its proposal and verifies scope, hashes and full-task
+  coverage. Owner admits queue head as T77 S1; this handoff changes docs only.
 - T74 closure archives the proposal and records S1/T-level requirement coverage,
   actual-change review and owner acceptance. Sources and tested EXEs unchanged.
 - T73 closure records S5 acceptance, all-S requirement/changed-path audit and
@@ -86,3 +87,24 @@ after actual-change review. S3 executor: 8999c446. Stop for owner acceptance.
   implementation task or T number is allocated.
 - M9 Td S18: T71 closure, TODO retirement and floppy-identification candidate;
   [record](../history/M9-Td-S18-t71-closure-and-floppy-queue.md).
+
+## M9 T77 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner: "测试通过 收口提交t任务 准入下一个"; next queued product-test cleanup admitted after T76 closure. |
+| Objective | Freeze product test inventory and relocate by App/Core/integration ownership without changing assertions or execution paths. |
+| Non-goals | No production edits, shared six-directory corpus edits, runtime fixes, new fixture framework, weakened tests or guest data changes. |
+| Reference Baseline | 7ebb435f accepted T76; x86/x64 background 110/110, five desktop exclusions per width. |
+| Candidate Proposal | [Product test ownership plan](../proposals/m9-product-test-layout-cleanup.md) |
+| Files And ABI Surface | test/unit, test/support and existing test/integration inventory; relocation destinations test/app, test/core, test/integration; root CMake and live path references. No production ABI. |
+| Applicable Rules | docs/README.md reading set; EXECUTION and DOCUMENT; design ARCHITECTURE/CODING and rules ARCHITECTURE/CODING before build/code changes. |
+| Verification | Freeze file/target/CTest-name and label ledger; rename-aware assertion/body comparison; live-path scan; documentation and boundary gates; x86/x64 Release builds and full background suites. |
+| Expected Markers | No lost tests or changed assertion behavior; unchanged shared corpora; both background suites pass; five desktop exclusions retained. |
+| Asset Needs | No guest data changes; only refresh two package EXEs at delivery. Disposable test outputs remain under owned build children, excluding build/output. |
+| Reporting Requirements | Before movement report classified files/moved lines and estimated additions/deletions; after report actual rename-aware counts, test inventory, builds/tests, dual EXE links and pushed P. |
+| Stop Conditions | Production/shared changes needed, unique coverage would be lost, or an unexplained test failure; diagnose without widening scope or dropping assertions. |
+| Exit Criteria | Complete per-file S1 disposition; relocated tests verified with equivalent coverage, no duplicate/stale S1 paths; pushed complete delivery and actual-change review. S2/S3 remain later stages. |
+| Original Owner Request | "测试通过 收口提交t任务 准入下一个"; queued request: organize confusing product test/unit and test/support ownership. |
+| Similar-Issue Sweep | Enumerate all product test source, fixture includes, CMake registrations and live documentation/tool paths; assign every hit an owner and S1/S2/S3 disposition in the proposal ledger. |

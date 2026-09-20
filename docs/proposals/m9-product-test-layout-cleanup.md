@@ -2,8 +2,10 @@
 
 ## Status and owner request
 
-Unnumbered candidate; the ordered Queue owns its current priority. This proposal does not admit implementation,
-allocate a T number, or interrupt the active T75 task.
+Owner accepted T76 and requested "测试通过 收口提交t任务 准入下一个".
+Admitted as T77, beginning with S1. CURRENT.md owns the executable packet;
+this proposal retains the bounded plan and evidence ledger. S2/S3 are planned,
+not simultaneously active. T closure requires owner acceptance.
 
 Original owner requests:
 
@@ -94,6 +96,19 @@ documentation rather than creating a second layout authority.
   unfinished cleanup hidden in TODO. Owner acceptance precedes T closure.
 
 ## Change estimate and reporting
+
+Admission baseline: 7ebb435f. Read-only enumeration still finds 33 C files in
+test/unit, 13 files in test/support (including two diagnostics), and two existing
+integration C files. This 48-file product inventory is the frozen file universe;
+S1 must add the exact registered-target/CTest and caller mapping before moves.
+Disposition is relocation without body changes, justified retention for S2, or
+evidenced removal in S2; no entry can disappear without its proof. S3 verifies
+the complete before/after inventory, operational labels and six shared corpora.
+
+Initial S1 estimate: production +0/-0; up to 33 test C files relocated, test
+assertion changes +0/-0, build/include reference edits roughly +60--120/-60--120
+(net near zero). Exact moved lines and destination counts follow caller audit,
+before relocation. No throughput or runtime improvement is claimed.
 
 Production source change budget: **+0/-0**. The initial relocation inventory is
 33 product test C files plus the contents of `test/support`; the exact movement

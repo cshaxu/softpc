@@ -141,7 +141,7 @@ VM 仍负责安全点与一秒期限。改动规模和净减需独立设计，�
 
 [medium.c](../../src/lib/storage/medium.c) 的 O(n) 页查询是性能机会，但新索引
 会增加结构维护，不属于可承诺的净减代码。沿用已有
-[overlay proposal](m9-overlay-page-index.md)，本候选不重复实现或登记。
+[overlay proposal](M9-T76-overlay-page-index-proposal.md)，本候选不重复实现或登记。
 
 ## 线程与组件的保留决定
 
