@@ -295,3 +295,19 @@ No remaining alias callers: the product gate's forbidden app_runtime pattern
 is intentionally retained, and shared naming script's legacy roots remain
 immutable with new roots checked by the product gate. Historical evidence
 retains historical paths; it is not a live build reference.
+
+### S3 admission brief
+
+Baseline 217ec7a5. Expected production/test/build +0/-0; only concise document
+completion and acceptance evidence. Freeze six shared directories at T baseline:
+src/lib 91, src/common 23, src/x86 15, test/lib 46, test/common 20, test/x86 9
+tracked files. Verify copied neutral four-directory set (180 files) and full
+six-directory set (204 files) without App/Core/product fixtures. Independently
+configure/build/test Lib and Common from the neutral copy and x86 from the full
+copy on both widths. Do not modify any copied corpus to make its build pass.
+Final product background suites and package builds remain required; desktop
+tests stay excluded under the standing no-desktop-interference constraint.
+Complete all 48 original file dispositions, preserved targets/CTest definitions,
+body/call-equivalence review and exact endpoint counts. No new TODO or queue
+work is needed for this bounded layout cleanup. Owner explicitly authorizes
+self-reviewed S/T closure, superseding the earlier wait-for-manual-test step.

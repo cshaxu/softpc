@@ -2,13 +2,16 @@
 
 ## Current Work
 
-M9 T77 S2 is active: product fixtures, wrappers and checks.
+M9 T77 S3 is active: complete test-layout and independent-corpus acceptance.
 Owner accepted T76 testing and requested closure and admission of the next
 queued task. T76 is closed; implementation baseline remains 7ebb435f.
 [T77 brief and plan](../proposals/m9-product-test-layout-cleanup.md).
 
 ## Current Technical Baseline
 
+- T77 S2 executor 217ec7a5 removes obsolete test wrappers/diagnostics and keeps
+  one Integration fixture; code/build +181/-2096 net -1915. Release and background
+  x64/x86 110/110 pass; production/shared corpora and EXE hashes unchanged.
 - T77 S1 executor be23165f relocated 33 unchanged test blobs (8373 lines).
   All 115 CTest definitions identical; both Release/background 110/110 pass.
   Code/build +50/-35 net +15; production/shared corpora unchanged.
@@ -91,23 +94,23 @@ queued task. T76 is closed; implementation baseline remains 7ebb435f.
 - M9 Td S18: T71 closure, TODO retirement and floppy-identification candidate;
   [record](../history/M9-Td-S18-t71-closure-and-floppy-queue.md).
 
-## M9 T77 S2 Packet
+## M9 T77 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner admitted the queue head after T76; now authorizes "继续啊 做完自行审计收口s和t任务": serial S1--S3 delivery and self-reviewed S/T closure. |
-| Objective | Remove naming-only test aliases; retain one integration machine fixture; relocate checks and snapshot orchestration; retire evidenced obsolete diagnostics and empty support layout. |
+| Objective | Verify the complete 48-file disposition ledger, unchanged coverage and shared independence; finish layout documents and dual-width delivery, then self-review S and T closure under owner authorization. |
 | Non-goals | No production edits, shared six-directory corpus edits, runtime fixes, new fixture framework, weakened tests or guest data changes. |
-| Reference Baseline | be23165f S1; reviewed 33 identical relocations, 115 CTest definitions, dual background 110/110. |
+| Reference Baseline | 217ec7a5 reviewed S2; original T baseline 1fe946a2, 115 CTest definitions, five desktop exclusions per width. |
 | Candidate Proposal | [Product test ownership plan](../proposals/m9-product-test-layout-cleanup.md) |
-| Files And ABI Surface | Remaining 13 support files, three runtime fixture consumers, root CMake, product checks and test README/current layout. No production or shared ABI. |
+| Files And ABI Surface | test/README.md, design/CODING.md, proposal/history/status; ignored isolated copies/builds of unchanged shared packages. Code/build estimate +0/-0; no ABI. |
 | Applicable Rules | docs/README.md reading set; EXECUTION and DOCUMENT; design ARCHITECTURE/CODING and rules ARCHITECTURE/CODING before build/code changes. |
-| Verification | Direct-call equivalence and failure/status comparison; all old aliases/callers disposition; 115 CTest definitions normalized only for relocated script paths; product boundary and documentation gates; x86/x64 Release and background full regression. |
+| Verification | T endpoint rename-aware/body/target/CTest comparison; exact four/six corpus copies without App/Core; independent Lib/Common/x86 builds and non-desktop tests both widths; final product Release/background suites; all manifests/DAG/doc gates. |
 | Expected Markers | No lost tests or changed assertion behavior; unchanged shared corpora; both background suites pass; five desktop exclusions retained. |
 | Asset Needs | No guest data changes; only refresh two package EXEs at delivery. Disposable test outputs remain under owned build children, excluding build/output. |
 | Reporting Requirements | Before movement report classified files/moved lines and estimated additions/deletions; after report actual rename-aware counts, test inventory, builds/tests, dual EXE links and pushed P. |
 | Stop Conditions | Production/shared changes needed, unique coverage would be lost, or an unexplained test failure; diagnose without widening scope or dropping assertions. |
-| Exit Criteria | All 13 support files disposition complete, no alias/duplicate assembly path, no lost registered tests, no live retired paths outside immutable shared checker; successful gates/build/tests and pushed actual-change-reviewed delivery. S3 verifies whole task. |
+| Exit Criteria | All 48 original files accounted, coverage preserved, shared independence proven, all required verification passes and artifacts match; cleanup owned disposable outputs; pushed executor then actual-change S review and separate full-T coverage audit. |
 | Original Owner Request | "测试通过 收口提交t任务 准入下一个"; queued request: organize confusing product test/unit and test/support ownership. |
 | Similar-Issue Sweep | Enumerate all product test source, fixture includes, CMake registrations and live documentation/tool paths; assign every hit an owner and S1/S2/S3 disposition in the proposal ledger. |
