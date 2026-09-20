@@ -2,11 +2,32 @@
 
 ## Current Work
 
-No implementation subtask is active. Owner testing passed; T74 S1 and T74
-are closed by the [completion audit](../history/M9-T74-completion-audit.md).
-The owner requested a new Lib/Common audit after this closure; its admission
-will follow the closure push, with the owner's report still pending.
+T74 S1 and T74 are closed and pushed in bffbf413 after owner testing passed.
+T75 S1 is admitted for Lib/Common audit-report intake and source verification.
+Waiting for the owner to paste the existing report; no code audit or repair
+has begun, and no production/test changes are authorized by this packet.
 The four existing Queue candidates retain their order and are not admitted.
+
+## M9 T75 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner explicitly requested a new Lib/Common quality-audit T after T74 closure; report to follow. |
+| Objective | Receive the report, verify its items against source and document evidence-backed dispositions and minimal recommendations. |
+| Non-goals | No production/test edits, ABI redesign, automatic repair, external import, media/config changes or unsolicited desktop tests. |
+| Reference Baseline | bffbf413, owner-accepted T74 closure; tested production delivery 8b76baf5. |
+| Candidate Proposal | [Lib/Common code quality audit](../proposals/m9-lib-common-quality-audit.md). |
+| Files And ABI Surface | Read-only src/lib, src/common and relevant test/lib, test/common; callers only for evidence. ABI unchanged. |
+| Applicable Rules | Execution and Document now; Architecture/Coding and their referenced skills before source audit. |
+| Verification | On intake: enumerate report items, source/test evidence and same-cause sweep; documentation gate and diff check for records. No dynamic verification claimed yet. |
+| Expected Markers | Every supplied item has a disposition, evidence and bounded recommendation; no unsupported whole-tree cleanliness claim. |
+| Asset Needs | None; preserve EXEs, INI, media and snapshots. |
+| Reporting Requirements | Findings and uncertainty, component ownership, proposed scope, added/removed/net estimates and verification plan before any repair admission. |
+| Stop Conditions | Await report; do not invent its contents or begin repairs. Ask before materially expanding scope. |
+| Exit Criteria | Complete item-by-item audit report and owner review; later repairs require their own admission. |
+| Original Owner Request | Close T74 after successful tests; admit a new T to audit Lib/Common quality; owner will paste an existing audit report after closure. |
+| Similar-Issue Sweep | After report intake, trace each confirmed defect class through relevant Lib/Common producers, consumers and tests; record every hit and disposition. |
 
 ## Current Technical Baseline
 
