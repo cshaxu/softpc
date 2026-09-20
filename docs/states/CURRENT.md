@@ -2,37 +2,37 @@
 
 ## Current Work
 
-M9 T71 S3 is active: opaque control FIFO. Owner: "好的，接下来准入修复，开始执行。"
-S2 design is accepted after actual documentation review; T71 remains open.
-S3 executor verification passed: x64 and x86 110/110; P1 delivery/review follows.
+M9 T71 S4 is active: typed leaf frames and opaque latest-wins transport.
+Owner: "好的，接下来准入修复，开始执行。" S3 delivery c1782fcc is reviewed,
+closed and pushed; T71 remains open through S4--S6 and owner acceptance.
 
-## M9 T71 S3 Packet
+## M9 T71 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner authorizes implementation of the approved T71 plan; S2 design review is recorded in history. |
-| Objective | Base transports opaque bounded control records; Window owns ordinary commands and interpretation; preserve STOP/FIFO and wake semantics. |
-| Non-goals | No frame ABI/dirty/mapping changes (S4), capacity redesign (S5), Common/VM/MVDM/INI/media changes, new allocation, worker or callback. |
-| Reference Baseline | 85940465; runtime baseline 04d76945 with dual-width 109/109. |
+| Admission And Approval | Owner-approved serial T71 plan; coordinator S3 review passed. |
+| Objective | Shared text base with leaf-owned maps/fonts, Window-owned graphics/dirty, opaque latest-wins mailbox; one coherent Common/VM migration and VM-owned CP437. |
+| Non-goals | No per-cell attribute redesign, capacity expansion, MVDM/Compat/snapshot format/INI/media or input/lifecycle changes; no new thread, registry, per-frame allocation or parallel ABI. |
+| Reference Baseline | c1782fcc; dual-width Release and 110/110 per width. |
 | Candidate Proposal | [T71 plan](../proposals/m9-kvm-text-frame-contract.md). |
-| Files And ABI Surface | kvm-base control envelope/admission; Window command definitions and producer/worker; Console worker validation; shared tests/manifests/design and both EXEs. Public leaf APIs unchanged. |
+| Files And ABI Surface | Lib frame/mailbox and logical Console contracts; Common machine/UI/session frame composition; VM producer; every direct test consumer and corpus/DAG manifests. Exact layout preflight required before code. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding, Product UI and their shared governance skills. |
-| Verification | FIFO/full/copy/STOP/fault/wake/unknown-opcode focused tests; serial complete x86/x64 build/tests; manifest/DAG/documentation gates. |
-| Expected Markers | Base knows only STOP; opaque opcode and 128-byte payload preserve existing record footprint; no Window commands in base; one FIFO. |
-| Asset Needs | Existing builds and test fixtures only; bounded build/t71-s3 logs; refresh both EXEs, never INI/media. |
-| Reporting Requirements | Preflight 70--130 production and 90--170 test changed lines; actual added/deleted/net, test evidence and EXE links. |
-| Stop Conditions | New lifecycle, frame changes, additional threads/allocations or unbounded transport design required. |
-| Exit Criteria | All control call sites migrated, no legacy Window envelope in base, focused/full tests pass, both EXEs and complete P committed/pushed; coordinator review before closure. |
+| Verification | Text resource-only repaint, both banks, typed Console output, graphic dirty/late acknowledge/mode changes, NOT_CURRENT replay, shared/product/snapshot full serial x86/x64, manifests/DAG/docs. |
+| Expected Markers | No monolithic kvm_frame, CP437 in VM only, no graphics/font/map interpretation in mailbox, no graphics/bitmap capacity in Console; one copied frame route. |
+| Asset Needs | Existing builds and bounded build/t71-s4 probes; both EXEs; no INI/media changes or external runtime dependencies. |
+| Reporting Requirements | Recount original provisional 420--700 production/150--250 test changed-line estimate after exact API and consumer inventory; report added/deleted/net and actual sizeof/copy bytes separately. |
+| Stop Conditions | New worker/lifecycle, second frame path, unexplained scope growth, MVDM change or unsupported Linux feature implementation. |
+| Exit Criteria | Frozen ownership ledger fully migrated without legacy aliases, typed leaf buffers and maps proven, dual-width tests pass, both EXEs/P committed/pushed then coordinator review. |
 | Original Owner Request | 好的，接下来准入修复，开始执行。 |
-| Similar-Issue Sweep | rg control kinds/enqueue/take under src/test; migrate Window producer/worker, Console consumer and eight direct test consumers; Linux unsupported workers have no control loop. |
+| Similar-Issue Sweep | Inventory kvm_frame, copy/validate/publish/capture/acknowledge, fonts/maps/dirty and logical Console callers under src/test; inspect snapshot dependence explicitly. |
 
 ## Current Technical Baseline
 
 - S3 control ownership: production C/H +44/-32 (net +12), verifier +4/-0;
   test C/H +102/-28 (net +74), test registration +6/-0. Both EXEs rebuilt;
   final serial suites 110/110 each. No Common/VM/Compat/MVDM/INI/media changes.
-  Detailed evidence and the isolated test-input correction are in the proposal.
+  [S3 review](../history/M9-T71-S3-control-transport.md) records actual diff and test-input correction.
 - T71 S1 rejects graphical Console publications before mailbox mutation/wake;
   malformed frames reject separately. Existing text/status/STOP semantics remain.
   Production C/H +7/-3 (net +4); tests +37/-6 (net +31). Both EXEs rebuilt;
@@ -64,7 +64,7 @@ S3 executor verification passed: x64 and x86 110/110; P1 delivery/review follows
 
 ## Recent Governance
 
-T70 is closed; T71 S3 is the sole active implementation task.
+T70 is closed; T71 S4 is the sole active implementation task.
 
 - **M9 Td S17:** Owner requested a concrete KVM text/frame correction proposal
   at queue head. Recorded capability rejection, explicit character/glyph
