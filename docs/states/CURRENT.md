@@ -2,52 +2,53 @@
 
 ## Current Work
 
-Active task: M9 T73 S3, neutral Machine debug transport and x86 protocol migration.
-Owner accepted and closed [S2](../history/M9-T73-S2-machine-x86-audit.md), then
-admitted S3. S4 build-selection work remains unadmitted. Stop for manual testing
-after S3's complete dual-width delivery; do not close T73.
-S3 implementation and automated verification are complete; delivery is awaiting
-owner testing, not S closure. Both Release builds passed; background x64 105/105
-(162.58s), x86 105/105 (125.26s); five desktop tests per width excluded. Actual
-production C/H +327/-268 (net +59), test C/H +405/-222 (net +183), gates +2/-0.
-The proposal records the finite sweep, first-run gate correction and EXE hashes.
-Implementation 006ecf32 is pushed. Coordinator actual-change review confirmed
-the admitted scope, copied-slot ownership, protocol-only relocation, all consumer
-repairs and protected-path equality; shared manifests/DAG were rechecked after
-push. S3 remains verified and open for owner testing; no S4 admission.
-Owner directly admitted T73 outside the queue. T72 is closed.
+Active task: M9 T73 S4, establish the separate x86 source corpus.
+Owner accepted S3 manual testing; [S3 is closed](../history/M9-T73-S3-neutral-machine-debug.md).
+Owner moved neutral build qualification to S5 and admitted S4's source relocation.
+S5 will establish test/x86 and qualify the six-directory and neutral four-directory
+transfer sets; it is not admitted. Stop after S4 delivery for owner testing.
 See the [T73 proposal](../proposals/m9-shared-x86-dependency-audit.md).
-Existing queued candidates remain unadmitted.
-See the [S1 record](../history/M9-T73-S1-x86-component-rename.md) for scope,
-verification, changed-line accounting and package hashes.
+T73 remains open; Queue candidates remain unchanged and unadmitted.
+S4 implementation and verification are complete: both Release builds and full
+background suites passed (x64 108/108, 163.08s; x86 108/108, 148.73s).
+Five desktop tests per width were excluded. Standalone x86 source build passed.
+Production C/H +363/-363, tests C/H +401/-401 (both net zero); build/gates
++200/-41 (net +159). No Lib or neutral runtime changes. Delivery awaits push,
+actual-change review and owner testing; S4 is not closed.
 
-## M9 T73 S3 Packet
+## M9 T73 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approved the explained copied-byte transport, requested S2 closure then S3 implementation/build/test/commit/push and manual verification. |
-| Objective | Move x86 protocol ownership to x86-debug; make Machine request/result transport opaque while preserving the sole executor, paused lease and completion/cancellation paths. |
-| Non-goals | No Lib/Session/UI/Compat/MVDM changes, new executor/queue, dynamic message framework, command semantics change, S4 build selection, INI/media or snapshot changes. |
-| Reference Baseline | 2c724e10; clean; S2 Common tests x64/x86 22/22, S1 full background 105/105 each. |
+| Admission And Approval | Owner accepted S3, moved old S4 to S5 and explicitly admitted the new S4 establishing top-level x86. |
+| Objective | Move debugger/assembler to src/x86/debug and src/x86/xasm32; make Common source/build neutral and repair all consumers without changing behavior. |
+| Non-goals | No Lib or neutral runtime changes, command/protocol semantic changes, new executor/queue, test/x86 split before S5, INI/media/snapshot changes. |
+| Reference Baseline | dc06671d; clean; S3 dual-width Release and background 105/105 each; owner manual test passed. |
 | Candidate Proposal | [T73 proposal](../proposals/m9-shared-x86-dependency-audit.md). |
-| Files And ABI Surface | Machine header/request slot, new x86 protocol header, existing x86-debug command adapter, VM debug/driver and every direct test consumer; manifests and design evidence. |
-| Applicable Rules | Architecture, coding, execution and documentation governance; local source/design authorities. |
-| Verification | Copied payload/thread identity, bounds/length/error/stale-lease/cancel/terminal tests; original CLI/product debugger integration; dual-width Release builds and full background presets; corpus/DAG/document gates and Lib equality. |
-| Expected Markers | No x86 payload in Machine; one existing request path; exact x86 typed adapter validation; initialized failure outputs; preserved lifecycle/CLI and both EXEs. |
-| Asset Needs | Refresh only assets/binary/softpc32.exe and softpc64.exe; preserve INI/media. Existing ignored build trees hold bounded test output; no guest trace acquisition. |
-| Reporting Requirements | Before estimate and after actual added/deleted/net C/H and test counts, separate relocation and artifact costs; disclose excluded desktop tests. |
-| Stop Conditions | New runtime framework, Lib changes or guest-visible behavior change require review; S4 is not included. |
-| Exit Criteria | Implemented, actual-change reviewed, both widths built/tested and pushed clean; await owner's manual verification before S3 closure. |
-| Original Owner Request | 批准照此实现S3.请你收口S2先，然后准入S3，执行完成后编译测试提交推送等我验证。 |
-| Similar-Issue Sweep | All typed debug requests/results/constants and execute callbacks/callers/tests; exact copy bounds/alignment/failure lengths; no old aliases or Machine-to-x86 include edge. |
+| Files And ABI Surface | Both relocated trees and x86 public names/targets; App/VM/test includes and symbols; root/shared CMake, manifests, DAG/product gates and current design. |
+| Applicable Rules | Architecture, coding, execution and documentation governance and local authorities. |
+| Verification | Reverse mechanical comparison, all direct references, manifests/DAG and negative probes; both Release builds and full background presets, two packaged EXEs. |
+| Expected Markers | One x86 implementation outside Common; no Common reverse edge, aliases or protocol/CLI behavior change. |
+| Asset Needs | Refresh only assets/binary/softpc32.exe and softpc64.exe; preserve INI/media. Existing ignored build trees; no desktop interaction or guest traces. |
+| Reporting Requirements | Before estimate and actual added/deleted/net counts for production C/H, tests and build/gates; distinguish moved lines and binaries. |
+| Stop Conditions | Runtime semantic change or Lib modification requires review; S5 test separation remains unadmitted. |
+| Exit Criteria | Implementation, actual-change review, dual-width build/test, clean commit/push and owner manual acceptance; keep T73 open. |
+| Original Owner Request | 把S4推迟到S5；新S4把common/x86-debug、common/x86-xasm32迁至x86/debug、x86/xasm32；S5建立test/lib、test/common、test/x86；六目录供NXVM/SoftPC，Common/Lib四目录供NNEC；更新proposal和退出标准并准入S4。 |
+| Similar-Issue Sweep | Both trees, every include/symbol/target and App/VM/test consumer, Common/x86 forward/reverse/private edges, complete manifests and current docs; historical references preserved. |
 
 ## Current Technical Baseline
 
+- T73 S4 places debugger/assembler in src/x86/debug and src/x86/xasm32 with
+  x86_ public names and x86- targets. Common has only machine/session/ui and
+  cannot depend on x86. Tests remain temporarily mixed in test/common until S5.
+  Reverse mechanical comparison proves all 22 changed C/H files retain behavior;
+  package hashes and complete accounting are in the proposal.
 - T73 S3 moves x86 protocol values to x86-debug, retaining one Machine executor
   and copied opaque 128/1536-byte request/response slot. VM alone validates x86
   access semantics; no CLI rewrite, Lib/Session/UI/Compat/MVDM or INI/media change.
-  Build and verification evidence is in the proposal; manual acceptance pending.
+  Build and verification evidence is in the proposal; owner manual test passed
+  and S3 is closed. S4 relocates its protocol owner to src/x86/debug.
 - T73 S1 renames x86 debug/assembly paths, public symbols and targets only.
   Both Release builds passed; background x64 105/105 (168.90s), x86 105/105
   (156.37s); five desktop tests per width excluded. Production +168/-168,

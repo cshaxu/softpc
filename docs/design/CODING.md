@@ -15,8 +15,9 @@ src/
     ui/          broker, monitor Console and KVM composition
     session/     neutral control FIFO, reduction and UI dispatch
     machine/     generic executor, lifecycle/input queues and frame publication
-    x86-xasm32/  imported x86 assembly/disassembly corpus
-    x86-debug/   imported x86 debug corpus over the optional machine adapter
+  x86/
+    xasm32/      imported x86 assembly/disassembly corpus
+    debug/       imported x86 debug corpus over the optional machine adapter
   lib/{types,base,console,console-broker,storage,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
   app/
@@ -27,8 +28,11 @@ Directories appear only in their admitted migration task.
 Common never contains win32/linux directories or platform-selected source.
 Its independent source verification lives with the Common corpus; unit tests
 live in test/common, never src/common/test. Lib tests and their fixtures live
-in test/lib. These two suites and src/common + src/lib form the unchanged
-four-directory transfer set. Product tests remain outside the shared suites.
+in test/lib. x86 source owns its own manifest/build/DAG and never becomes a
+Common dependency. T73 S5 will separate test/x86 from the current mixed
+test/common suite: the final six directories serve x86 products; src/common,
+src/lib, test/common and test/lib alone serve neutral products. Product tests
+remain outside the shared suites.
 Only Lib provides the underlying platform implementation.
 Shared `lib/types` is header-only. Its top level contains common C/compiler
 vocabulary; explicit `win32/` and `linux/` headers group external platform
@@ -79,7 +83,7 @@ instead of copying its implementation list. The original machine OBJECT
 groups remain intact. The build-ownership gate checks actual target source
 membership and VM completeness at configure time; its negative tests reject
 duplicate/foreign source ownership. Product include gates check reverse
-dependencies across the six roots, including relative paths. Tests may use
+dependencies across the seven roots, including relative paths. Tests may use
 private implementation contracts for focused proof; production consumers may
 not bypass the VM public boundary.
 

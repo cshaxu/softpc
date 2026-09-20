@@ -1,6 +1,6 @@
-#include "common/x86-xasm32/xasm32.h"
+#include "x86/xasm32/xasm32.h"
 
-#include "common/x86-xasm32/aasm32.h"
+#include "x86/xasm32/aasm32.h"
 
 #define _chrf(n)              \
     do                        \

@@ -1,11 +1,12 @@
 set(fixture "${CMAKE_CURRENT_BINARY_DIR}/product-boundary-fixture")
 file(REMOVE_RECURSE "${fixture}")
 file(MAKE_DIRECTORY "${fixture}/src/app" "${fixture}/src/vm" "${fixture}/src/compat"
-    "${fixture}/src/common" "${fixture}/src/lib" "${fixture}/src/mvdm")
+    "${fixture}/src/common" "${fixture}/src/lib" "${fixture}/src/x86" "${fixture}/src/mvdm")
 file(WRITE "${fixture}/src/vm/vm_interface.h" "#include <common/machine/machine_interface.h>\n")
 file(WRITE "${fixture}/src/app/composition.c" "#include <vm/vm_interface.h>\n")
 file(WRITE "${fixture}/src/app/legal.c" "#include <lib/storage/file_interface.h>\n")
 file(WRITE "${fixture}/src/common/legal.c" "#include <lib/base/sync_interface.h>\n")
+file(WRITE "${fixture}/src/x86/legal.c" "#include <common/machine/machine_interface.h>\n")
 file(WRITE "${fixture}/src/vm/legal.c" "#include <compat/platform.h>\n")
 file(WRITE "${fixture}/src/compat/legal.c" "#include <lib/storage/medium_interface.h>\n")
 file(WRITE "${fixture}/src/mvdm/legal.c" "#include <compat/ccpu/lifecycle.h>\n")
@@ -31,7 +32,11 @@ foreach(pair IN ITEMS "app/config.c|../vm/vm_interface.h" "app/main.c|vm/vm_inte
     "common/control.c|mvdm/softpc.new/base/inc/cpu4.h" "common/control.c|app/config.h"
     "lib/boundary.c|../common/machine/machine_interface.h" "lib/boundary.c|../vm/driver.h"
     "lib/boundary.c|compat/platform.h" "lib/boundary.c|mvdm/softpc.new/base/inc/cpu4.h"
-    "mvdm/core.c|vm/driver.h" "mvdm/core.c|common/machine/machine_interface.h")
+    "mvdm/core.c|vm/driver.h" "mvdm/core.c|common/machine/machine_interface.h"
+    "common/control.c|../x86/debug/protocol_interface.h"
+    "lib/boundary.c|x86/debug/protocol_interface.h"
+    "compat/platform.c|x86/debug/protocol_interface.h"
+    "mvdm/core.c|x86/debug/protocol_interface.h" "x86/probe.c|../vm/driver.h")
     string(REPLACE "|" ";" parts "${pair}")
     list(GET parts 0 path)
     list(GET parts 1 header)

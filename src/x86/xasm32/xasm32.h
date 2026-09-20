@@ -1,5 +1,5 @@
-#ifndef COMMON_X86_XASM32_INTERNAL_H
-#define COMMON_X86_XASM32_INTERNAL_H
+#ifndef X86_XASM32_INTERNAL_H
+#define X86_XASM32_INTERNAL_H
 
 #include "lib/types/types_interface.h"
 #include "lib/types/file.h"

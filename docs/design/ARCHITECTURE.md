@@ -9,7 +9,7 @@ app/config, command, keyboard  configuration and CLI/hotkey policy -> Common/Lib
 
 common/session -> common/ui       control and monitor/KVM composition
 common/session -> common/machine  sole generic executor and copied facts
-common/x86-debug + common/x86-xasm32      shared debugger/assembly contracts
+x86/debug + x86/xasm32      shared debugger/assembly contracts
                          |
                  injected existing driver callbacks
                          v
@@ -84,7 +84,7 @@ Compat's narrow CCPU ABI and host support declarations are internal contracts.
 Existing original declarations are reused where applicable; the narrow CPU
 contract avoids leaking original CPU macros into the VM adapter. Declaration
 consolidation does not add forwarding functions, duplicate state or change the
-original device ABI. Lib and Common remain product-independent; neither may
+original device ABI. Lib, Common and x86 remain product-independent; none may
 import App, VM, Compat or MVDM.
 
 `lib/` is the canonical checked-in shared-library corpus, not a runtime or
@@ -99,11 +99,11 @@ and hotkey policy to Common session. SoftPC publishes each admitted shared-libra
 canonical corpus for NXVM to adopt exactly; the projects do not maintain
 parallel variants.
 
-`common/x86-xasm32` is an imported x86 copied byte/text assembly capability and
-`common/x86-debug` is an imported x86 debug command capability. SoftPC exposes
+`x86/xasm32` is an imported x86 copied byte/text assembly capability and
+`x86/debug` is an imported x86 debug command capability. SoftPC exposes
 it through its injected app command binding, not through a second input loop.
-`common/x86-debug` depends on `common/machine`'s optional paused-state adapter and
-on `common/x86-xasm32`; neither component may create an executor, own a Console,
+`x86/debug` depends on `common/machine`'s optional paused-state adapter and
+on `x86/xasm32`; neither component may create an executor, own a Console,
 or add a product command path. Import hashes remain provenance evidence; the
 S9 integration changes to these components form the updated downstream corpus.
 The control thread serializes lifecycle, media and synchronous debug requests.
@@ -115,7 +115,7 @@ and copied prompts; machine state changes do not select or exit the CLI.
 Machine copies opaque, pointer-free debug requests/results through one fixed slot
 (128-byte request, 1536-byte response), with explicit sizes and no per-request
 allocation. It knows no register, address or operation schema. The independent
-`x86-debug/protocol_interface.h` owns x86 vocabulary; frontend and VM adapt at
+`x86/debug/protocol_interface.h` owns x86 vocabulary; frontend and VM adapt at
 their existing boundaries using aligned local values. Driver validation owns
 protocol sizes and operation limits. Failure returns zero response length and
 does not change caller output bytes; a failed wait requires shutdown before
@@ -162,9 +162,13 @@ native API/types or OS-selected implementation branches. It owns its queues
 and state machines through public Lib Base mutex/event/task/wait contracts and
 Types atomics. Its complete manifest and source/build dependency gate travel
 with the corpus and run independently of the importing product.
-Shared unit suites live in test/common and test/lib, each with its own CMake
-entry and manifest. They require only the four-directory transfer set and
-the toolchain/system libraries, never importing-product adapters or firmware.
+Shared unit suites currently live in test/common and test/lib; S4 source
+relocation leaves x86 tests explicitly linked from test/common until S5 moves
+them to test/x86. The final six-directory set is src/lib, src/common, src/x86,
+test/lib, test/common, test/x86. The neutral four-directory subset excludes x86
+entirely. Each corpus/suite owns its build and manifest; none may require an
+importing product's adapters or firmware. Common source already builds without
+x86; independent neutral test qualification is the remaining S5 boundary.
 
 SoftPC's checked-in `lib/` corpus is the shared-library source of truth. NXVM
 adopts it exactly; no runtime or build dependency crosses repositories.

@@ -440,8 +440,8 @@ static lib_status vm_driver_debug(void *opaque,
     void *response, lib_size response_capacity, lib_size *response_size)
 {
     vm_driver *driver = opaque;
-    common_x86_debug_request operation;
-    common_x86_debug_response result;
+    x86_debug_request operation;
+    x86_debug_response result;
     lib_status status;
     *response_size = 0u;
     if (request_size != sizeof(operation) || response_capacity < sizeof(result))

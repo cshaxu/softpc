@@ -1,7 +1,6 @@
 # Common corpus
 
-`src/common` contains shared virtual-machine coordination and explicitly named
-x86 debugger/assembler components. It
+`src/common` contains shared, ISA-neutral virtual-machine coordination. It
 uses public `lib` contracts and accepts product behavior only through copied
 options and injected callbacks.  It never includes app, host, or MVDM source.
 Common has no platform directories, platform types, native calls or OS-selected
@@ -28,10 +27,8 @@ then joins the KVM producers. Any failure retains UI and remaining callback
 dependencies; the application must not continue freeing them. Constructors
 clear a valid output pointer before validating other arguments.
 
-The debug command state is the public opaque debug object itself, with no
-separately allocated forwarding owner. Session uses one internal control state
+Session uses one internal control state
 for completed facts and presentation actions; pure derivation stays separate.
-Debug's fixed argument pointer table is embedded, with no open/close allocation.
 Session forwards TEXT through the same running-only input sink as MOUSE,
 without a held-key entry; character support belongs to the machine adapter.
 UI submits the fixed graphical Console explanation only when entering that
@@ -46,50 +43,34 @@ notification text first cancels and joins the reader, discarding the partial lin
 A completed queued line remains pending and is still consumed. UI only forwards
 that cancellation to its broker; it owns no second reader state or editor.
 
-Debugger output is a growable, object-owned string, borrowed until the next
-submit/observe/open/destroy. Its result prompt carries the original input suffix
-(address, byte value, flags or colon), not an additional generic continuation
-label. Session command results may borrow additional text until the next provider
+Session command results may borrow additional text until the next provider
 call. Session consumes it synchronously through its existing monitor transaction,
 normalizing LF/CRLF in bounded chunks. No large result is silently truncated;
-allocation/formatting and native write failures remain explicit. Providers must
-not retain a debug result across a producing call without copying its text.
-
-Linear debug byte ranges must fit the 32-bit address space before access.
-XM copies in address-safe direction for overlapping ranges. XS reports only
-patterns wholly inside its byte count and accepts linear addresses only.
-XU retains its full 32-bit instruction count and stops on decode failure or
-address exhaustion, without wrapping the saved next address. XA likewise ends
-its input continuation when the last address is consumed. XE/XF retain original
-incremental validation: an invalid later byte does not undo earlier writes.
+allocation/formatting and native write failures remain explicit.
 
 | Component | One responsibility | Public contract |
 | --- | --- | --- |
 | `machine` | executor, lifecycle/input queues, frame publication, optional paused debug adapter | `machine_interface.h` |
 | `session` | one control queue, completed-fact reduction and dispatch | `session_interface.h` |
-| interaction owner | monitor logical Console, broker and KVM composition | its root public contract |
-| `x86-xasm32` | x86 copied byte/text assembly and disassembly | `xasm32_interface.h` |
-| `x86-debug` | x86 debug commands and copied CPU protocol | `debug_interface.h`, `protocol_interface.h` |
+| `ui` | monitor logical Console, broker and KVM composition | `ui_interface.h` |
 
-`session` calls `machine` and `ui`. `x86-debug` calls `machine` and `x86-xasm32`.
+`session` calls `machine` and `ui`.
 No other common component edge is permitted.  Application and host code may
 compose only the root `*_interface.h` contracts; implementation headers and
 source files remain component-local. Importing products decide whether to inject
-an adapter or expose a command. SoftPC now selects debug through its app CLI
-binding; neither component creates a product execution or Console path.
+an adapter or expose a command. Common never depends on the optional x86 corpus.
 The machine debug contract is synchronous to the control-thread caller and
-serviced by the existing paused executor. Disassembly reports instruction byte
-count separately from text length; callers must not use text length as a PC step.
+serviced by the existing paused executor.
 Machine copies opaque pointer-free request/response bytes with explicit lengths,
 bounded by 128/1536 bytes in its single request slot. It does not interpret CPU
-operations. x86-debug's independent protocol header owns the register/address/
-operation vocabulary; frontend and product adapter use aligned typed copies.
+operations. Protocol vocabulary belongs to the requesting frontend and product
+adapter, which use aligned typed copies.
 Driver execution validates protocol-specific sizes and access constraints.
 Failures return zero response length without changing caller output bytes.
 An unsuccessful completion wait is not proof of quiescence: shut down before
 reusing the slot. Existing cancellation clears product plans, not in-flight
-requests. The current build still includes x86 components; optional build/test
-selection is separate from this neutral Machine ABI.
+requests. Common builds only its three neutral components; products separately
+select any architecture-specific frontend.
 
 Machine shutdown synchronously joins its worker and all callbacks without
 freeing the machine object. The serialized owner may then release callback
@@ -100,8 +81,10 @@ Shutdown is permanent and idempotent, unlike the restartable product stop.
 
 ## Independent verification
 
-Transfer src/common, src/lib, test/common and test/lib unchanged. No importing
-product sources, configuration or resources are needed:
+Source-only Common needs just src/common and src/lib. During T73 S4 the existing
+test/common suite still contains x86 tests and additionally requires src/x86;
+S5 owns their move to test/x86 and the four-/six-directory qualification.
+No importing-product sources, configuration or resources are needed:
 
 ```text
 cmake -S test/common -B build/common

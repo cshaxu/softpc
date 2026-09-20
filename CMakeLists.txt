@@ -53,6 +53,7 @@ add_subdirectory(src/lib)
 enable_testing()
 
 add_subdirectory(src/common)
+add_subdirectory(src/x86)
 add_subdirectory(test/lib)
 add_subdirectory(test/common)
 target_link_libraries(softpc-machine PRIVATE storage base)
@@ -310,7 +311,7 @@ add_executable(softpcvm
     src/app/command.c
     src/app/firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-vm)
-target_link_libraries(softpcvm PRIVATE types storage kvm-base common-ui common-session common-machine common-x86-debug)
+target_link_libraries(softpcvm PRIVATE types storage kvm-base common-ui common-session common-machine x86-debug)
 
 # The standalone distribution keeps its two host-width launchers together.
 # The adjacent softpc.ini is deliberately user-owned configuration, never a
@@ -536,7 +537,7 @@ set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-command-provider-smoke test/unit/command_provider_smoke.c
     src/app/composition.c src/app/command.c src/app/keyboard.c)
-target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-vm common-x86-debug common-session common-machine)
+target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-vm x86-debug common-session common-machine)
 add_test(NAME softpc-command-provider-smoke COMMAND softpc-command-provider-smoke)
 set_tests_properties(softpc-command-provider-smoke PROPERTIES LABELS "unit" TIMEOUT 45
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
@@ -550,7 +551,7 @@ add_executable(softpc-command-smoke test/unit/command_smoke.c
     src/app/command.c
     src/common/session/control_state.c
     src/common/session/presentation_plan.c)
-target_link_libraries(softpc-command-smoke PRIVATE common-x86-debug common-machine)
+target_link_libraries(softpc-command-smoke PRIVATE x86-debug common-machine)
 target_include_directories(softpc-command-smoke PRIVATE src/app src/compat src)
 add_test(NAME softpc-command-smoke COMMAND softpc-command-smoke)
 set_tests_properties(softpc-command-smoke PROPERTIES

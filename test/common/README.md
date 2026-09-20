@@ -1,7 +1,9 @@
 # Shared Common tests
 
-This suite travels with `src/common`, `src/lib`, and `test/lib` in the same
-four-directory layout. It has no importing product source/build dependency.
+During T73 S4 this suite also requires `src/x86`: its existing x86 tests are
+wired to the relocated source corpus. S5 will move those tests to `test/x86`
+and qualify `src/common`, `src/lib`, `test/common`, `test/lib` alone. There is
+no importing-product source/build dependency.
 
 ```text
 cmake -S test/common -B build/common-tests -DCMAKE_BUILD_TYPE=Release

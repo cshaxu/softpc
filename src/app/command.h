@@ -2,7 +2,7 @@
 #define APP_COMMAND_H
 
 #include "common/machine/machine_interface.h"
-#include "common/x86-debug/debug_interface.h"
+#include "x86/debug/debug_interface.h"
 #include "common/session/session_interface.h"
 
 #define APP_COMMAND_TEXT_CAPACITY 2048u
@@ -81,11 +81,11 @@ void app_command_session_note_monitor_current(app_command_session *, int, app_co
 typedef struct app_command_context {
     app_command_session session;
     common_machine *machine;
-    common_x86_debug *debug;
+    x86_debug *debug;
     lib_bool debug_active;
-    common_x86_debug_result debug_completed;
+    x86_debug_result debug_completed;
     lib_bool debug_completed_pending;
-    char debug_prompt[COMMON_X86_DEBUG_PROMPT_CAPACITY];
+    char debug_prompt[X86_DEBUG_PROMPT_CAPACITY];
 } app_command_context;
 
 lib_status app_command_initialize(app_command_context *, common_machine *,

@@ -5,7 +5,9 @@
 Owner admits a new task outside the existing queue: audit Lib/Common x86
 dependencies for reuse by a NEC emulator, using neighboring NNES design as
 reference. Confirm whether Lib can transfer unchanged; identify Common bindings.
-Requested names are common/x86-debug and common/x86-xasm32. Audit every API and
+Initially requested names were common/x86-debug and common/x86-xasm32; the
+approved S4/S5 revision below moves them into the separate x86 corpus.
+Audit every API and
 internal path of common/session, common/ui and common/machine and propose owners.
 
 The preliminary S1 audit was delivered in f13c2780 with production/test +0/-0.
@@ -171,7 +173,7 @@ test/common builds debug_output/debug_linear/xasm tests unconditionally and
 common_machine_smoke links common-debug. A directory rename alone cannot
 prove a debugger-free neutral build or test corpus.
 
-## Proposed Minimal Implementation
+## Preliminary Minimal Implementation (See Approved S4/S5 Revision)
 
 1. Rename the two components to the owner-requested Common directories and
    explicitly x86 target/API names, repairing consumers/tests/manifests/DAG
@@ -338,7 +340,7 @@ No new ISA interpretation was found in the neutral state/request machinery.
 This audit does not establish that all concurrency/platform failure cases are
 bug-free or that a receiving emulator is already integrated.
 
-### Follow-up Tasks (S3 Admitted; S4 Not Admitted)
+### Original Follow-up Plan (Superseded By The S4/S5 Revision Below)
 
 **S3: one complete protocol/transport migration.** Move existing x86 vocabulary
 to the protocol header, rename its prefixes to common_x86_debug/COMMON_X86_DEBUG,
@@ -456,4 +458,127 @@ After pushed executor delivery 006ecf32, the coordinator role reviewed actual
 owner request, failure-output/lease/completion proof and protected-path equality.
 Both shared manifests and the Common DAG passed again. No duplicate execution
 path, old x86 Machine alias or unrelated implementation change remains in scope.
-S3 is verified and delivered, not closed: await the owner's manual acceptance.
+At dc06671d S3 was verified and awaiting manual acceptance; the owner subsequently
+accepted it and its closure is recorded in the S4/S5 revision below.
+
+## Owner Revision: Three Source Corpora And Three Test Corpora
+
+Original request: 把S4推迟到S5.增加一个新的S4：把 common/x86-debug,
+common/x86-xasm32 移到：x86/debug, x86/xasm32。相当于我们的顶级组件从
+lib+common变成 lib+common+x86. S5则要求拆分和建立 test/lib, test/common,
+test/x86 三个。这样总共有6个可公用组件供nxvm和softpc使用；而common+lib
+的4个组件也供 nnec使用。写入本t任务proposal和退出标准，然后准入S4进行
+x86顶级组件的建立。
+
+Owner accepted S3 manual testing; [S3 closes](../history/M9-T73-S3-neutral-machine-debug.md).
+This revision supersedes the earlier optional-Common-x86 build plan. Common
+does not need an x86 option: its source/build closure is simply neutral. Products
+choose whether to add the separate x86 corpus. No aliases or compatibility tree.
+
+### S4: Establish The x86 Source Corpus (Admitted)
+
+Baseline dc06671d, clean. Move both component trees with Git to src/x86/debug
+and src/x86/xasm32. Rename common_x86_* / COMMON_X86_* to x86_* / X86_*, and
+common-x86-* targets to x86-*. Update every App/VM/test consumer mechanically.
+Keep opcode/register values, struct layout, DOS/X CLI text and execution logic
+unchanged. Common contains only machine/session/ui and cannot depend on x86.
+x86/debug depends on Common Machine, x86/xasm32, Lib Storage/Types; xasm32 uses
+Types. x86 owns its build entry, complete manifest and component boundary gate.
+Reuse the existing manifest checker rather than duplicate its algorithm.
+
+Finite migration ledger: both moved trees; App command and VM debug/driver;
+all direct shared/product test consumers; root/Common/x86 CMake and product
+include gate; source boundary negative probes; manifests and current docs.
+Historical records remain historical. Test directory separation is S5, so S4
+temporarily wires the existing test/common suite to the separate x86 target.
+This transitional test dependency has one owner and ends in S5; no production
+compatibility layer is permitted. Lib and neutral runtime C/H stay unchanged.
+
+Estimate: 25--35 production/build/test paths plus manifests/docs; production
+C/H +250..400/-250..400, net zero mechanical lines; build/gate net +120..200.
+No runtime objects, threads, states or new dispatch. Review rename-aware counts
+and reverse substitutions against baseline; report actual additions/deletions/net.
+Verify x86 and Common manifests/DAG, forbidden reverse/private edges, all original
+debug/xasm tests, both Release builds and full background suites; deliver two
+EXEs, commit/push clean and await owner acceptance. Desktop exclusions explicit.
+
+### S5: Separate And Qualify Shared Test Corpora (Planned, Not Admitted)
+
+Move x86 tests to test/x86; keep test/common neutral and test/lib unchanged.
+Separate the mixed Machine mechanism/CLI test without duplicating a runner or
+introducing a framework. Each suite owns its build entry, manifest and focused
+proof. Test x86 protocol/frontend together separately from neutral byte transport.
+Independent configure/build/test must work from exactly these copy sets:
+
+- NXVM/SoftPC: src/lib, src/common, src/x86, test/lib, test/common, test/x86.
+- NNEC: src/lib, src/common, test/lib, test/common, with no x86 files/targets.
+
+Neither set may depend on importing-product CMake, adapters, ROMs, tests or sibling
+repositories. A product includes x86 explicitly; do not add an x86 selector to
+Common. Runtime C/H expected +0/-0; re-audit mixed-test ownership and estimate
+build/test churn before admission. Preserve full dual-width SoftPC regression.
+
+### Revised T73 Exit Criteria
+
+All five S steps accepted; Lib unchanged; Common source/header/build closure
+neutral; x86 owns all debugger/assembly/protocol symbols and no old paths/aliases;
+the six-directory and four-directory standalone proofs pass with self-contained
+manifests and boundary-negative tests. SoftPC DOS/X CLI, lifecycle, presentation,
+snapshot and input semantics remain unchanged with both packaged EXEs and
+dual-width regression evidence. Final actual-change audit, clean push and owner
+acceptance are required. No claimed NNEC integration or Linux presenter support.
+
+## S4 Implementation Ledger
+
+Baseline dc06671d. All eleven debugger/assembler C/H files moved with Git into
+src/x86. Public names and targets now use x86_ / X86_ / x86-; no aliases or old
+source trees remain. Common's CMake and DAG now contain only machine/session/ui.
+New x86 CMake owns both targets and uses the adjacent Common/Lib corpora; its
+manifest uses Common's existing checker, not a second hashing implementation.
+The x86-owned DAG checks source and target edges, public/private boundaries,
+platform leakage and Lib Types vocabulary. Products explicitly add x86; there
+is no Common x86 option or runtime dispatch layer.
+
+| Frozen unit | Disposition and proof |
+| --- | --- |
+| Eleven moved C/H files | Reverse path/prefix substitutions equal dc06671d; original protocol values, layouts, commands and parser retained. |
+| App command and VM debug/driver (five C/H) | Every call/type/include mechanically updated; reverse substitutions equal baseline. |
+| Six test C/H consumers | Same mechanical equality; no assertions removed or behavior weakened. Existing transcripts and real executor tests retained. |
+| Root/Common/x86 build | Root explicitly adds x86; Common cannot link x86. Standalone x86 source build and x86-verify pass using only source corpora. |
+| Source/build/product gates | Common rejects new x86 protocol include and target; x86 rejects reverse/private/platform edges. Product gate covers the seventh source root, including relative reverse edges. |
+| Transitional shared tests | Existing test/common links x86 explicitly and runs three new manifest/corpus/negative checks. S5 owns removal of this dependency and creation of test/x86. |
+| Protected scope | Lib, neutral Common C/H, Compat, MVDM, INI/media and snapshot format have no diff. |
+
+Measured with git diff --numstat -M10% against dc06671d: production C/H
+16 paths **+363/-363, net 0**; test C/H six paths **+401/-401, net 0**;
+build/verifier scripts eleven paths **+200/-41, net +159**. Attribute rule +1/-0
+and docs/manifests/binaries are separate. Low rename similarity on three public
+headers reflects pervasive prefix replacement; explicit old/new path pairing
+and reverse byte comparison prove relocation. Default Git rename threshold
+would count those headers as removal/addition, not new runtime implementation.
+Counts meet the production and build/gate planning ranges; no runtime state,
+thread, object, request API behavior or allocation was introduced.
+
+Both Release builds pass. x64 full background 108/108 (163.08s), x86 full
+background 108/108 (148.73s). Five desktop tests per width are excluded, not
+claimed as passed. The three additional tests check the new source corpus.
+An extra standalone Ninja configure stalled at compiler ABI detection and was
+cancelled; repeating with the repository's MinGW Makefiles generator completed
+the standalone x86-debug build and x86-verify successfully. No source workaround
+was introduced for that auxiliary toolchain run.
+
+Package bytes: x86 3,659,622, x64 3,061,602 (both -63 versus S3).
+SHA-256:
+
+- softpc32.exe: 5ACA0FD034D59D37B576867435D60419EF4ED31A8CCD6BBAC2BC9C0C330327A0
+- softpc64.exe: AE59961C7BEDC9EFD0F5FCFF813824EBC4D4AC2D12117E6A0DE7948766467B09
+
+Manifest/DAG, documentation governance and diff checks pass. Both auxiliary
+standalone build trees were removed after their processes stopped; main build
+trees remain reusable. No guest media or trace was created. No current source,
+target or symbol uses the former names; the negative probe intentionally keeps
+one retired include to prove rejection. All original user requirements map to
+the revised S4/S5 ledger; S5 work is explicitly planned, not silently omitted.
+S4 is implemented and automatically verified; executor delivery and post-push
+actual-change review follow. Manual acceptance is still required. T73 remains
+open, S5 remains planned.

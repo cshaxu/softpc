@@ -168,37 +168,37 @@ if(NOT app_session_composition MATCHES "common_session_create" OR
     message(FATAL_ERROR "Application must compose, not implement, common session control")
 endif()
 
-# Product code may compose common through its root contracts, but it must never
-# reach a common implementation, private helper, or source file.  Keeping this
+# Product code may compose Common/x86 through root contracts, but never reach
+# their implementation, private helper, or source file. Keeping this
 # allow-list small makes the post-extraction ownership boundary executable.
 set(allowed_common_product_contracts
     "common/machine/machine_interface.h"
     "common/session/session_interface.h"
     "common/ui/ui_interface.h"
-    "common/x86-debug/debug_interface.h"
-    "common/x86-debug/protocol_interface.h"
-    "common/x86-xasm32/xasm32_interface.h")
+    "x86/debug/debug_interface.h"
+    "x86/debug/protocol_interface.h"
+    "x86/xasm32/xasm32_interface.h")
 file(GLOB_RECURSE product_common_consumers
     "${SOFTPC_SOURCE_DIR}/src/app/*.[ch]"
     "${SOFTPC_SOURCE_DIR}/src/vm/*.[ch]"
     "${SOFTPC_SOURCE_DIR}/src/compat/*.[ch]")
 foreach(source IN LISTS product_common_consumers)
     file(STRINGS "${source}" common_include_lines REGEX
-        "#[ \t]*include[ \t]+\"common/[^\"]+\"")
+        "#[ \t]*include[ \t]+[<\"](common|x86)/[^>\"]+[>\"]")
     foreach(include_line IN LISTS common_include_lines)
         string(REGEX REPLACE
-            ".*\"(common/[^\"]+)\".*" "\\1" common_contract
+            ".*[<\"]((common|x86)/[^>\"]+)[>\"].*" "\\1" common_contract
             "${include_line}")
         list(FIND allowed_common_product_contracts "${common_contract}"
             common_contract_index)
         if(common_contract_index EQUAL -1)
             message(FATAL_ERROR
-                "Product reaches a non-public common boundary: ${source}: ${include_line}")
+                "Product reaches a non-public Common/x86 boundary: ${source}: ${include_line}")
         endif()
     endforeach()
     file(READ "${source}" common_product_source)
-    if(common_product_source MATCHES "common/[A-Za-z0-9_/-]+\\.c")
-        message(FATAL_ERROR "Product includes a common implementation: ${source}")
+    if(common_product_source MATCHES "(common|x86)/[A-Za-z0-9_/-]+\\.c")
+        message(FATAL_ERROR "Product includes a Common/x86 implementation: ${source}")
     endif()
 endforeach()
 
@@ -492,7 +492,7 @@ file(READ "${SOFTPC_SOURCE_DIR}/src/app/composition.c" composition_source)
 if(NOT composition_source MATCHES "if \\(common_machine_shutdown\\(machine_runtime\\) != LIB_STATUS_OK\\) \\{[^}]*exit\\(EXIT_FAILURE\\);[^}]*\\}[ \t\r\n]+if \\(common_ui_destroy\\(ui\\) != LIB_STATUS_OK\\) \\{[^}]*exit\\(EXIT_FAILURE\\);[^}]*\\}[ \t\r\n]+\\(void\\)common_session_destroy\\(session\\);[ \t\r\n]+app_command_dispose\\(&commands\\);[ \t\r\n]+common_machine_destroy\\(machine_runtime\\);[ \t\r\n]+vm_destroy\\(machine_driver\\);")
     message(FATAL_ERROR "Composition must quiesce callbacks before ordered consumer teardown")
 endif()
-if(composition_source MATCHES "strcmp|common_x86_debug_|pause-toggle|send-ctrl-alt-del|send-alt-enter")
+if(composition_source MATCHES "strcmp|x86_debug_|pause-toggle|send-ctrl-alt-del|send-alt-enter")
     message(FATAL_ERROR "Composition must not interpret commands, hotkeys or debugger policy")
 endif()
 file(GLOB app_provider_sources "${SOFTPC_SOURCE_DIR}/src/app/*.c")

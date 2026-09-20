@@ -1,5 +1,6 @@
 # The shared corpus manifest hashes its exact source bytes and requires LF.
 src/lib/** text eol=lf
 src/common/** text eol=lf
+src/x86/** text eol=lf
 test/lib/** text eol=lf
 test/common/** text eol=lf

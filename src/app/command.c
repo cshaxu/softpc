@@ -395,7 +395,7 @@ void app_command_session_note_monitor_current(app_command_session *s,
     e->arm_prompt = 1;
 }
 
-_Static_assert(COMMON_SESSION_PROMPT_CAPACITY >= COMMON_X86_DEBUG_PROMPT_CAPACITY,
+_Static_assert(COMMON_SESSION_PROMPT_CAPACITY >= X86_DEBUG_PROMPT_CAPACITY,
                "Session prompt must hold debugger continuation prompts");
 
 /* app/ owns product command policy. common/session owns its neutral copied
@@ -593,22 +593,22 @@ void app_command_provider_reject_line(void *opaque,
 }
 
 static void app_command_copy_debug(app_command_context *command,
-                                   common_session_machine_state state, const common_x86_debug_result *result,
+                                   common_session_machine_state state, const x86_debug_result *result,
                                    common_session_command_result *out)
 {
     out->detail = result->text;
     (void)snprintf(command->debug_prompt, sizeof(command->debug_prompt), "%s", result->prompt);
     if (!result->keep_active)
     {
-        common_x86_debug_close(command->debug);
+        x86_debug_close(command->debug);
         command->debug_active = LIB_FALSE;
         command->debug_completed_pending = LIB_FALSE;
     }
-    if (result->lifecycle_request == COMMON_X86_DEBUG_LIFECYCLE_RESUME &&
+    if (result->lifecycle_request == X86_DEBUG_LIFECYCLE_RESUME &&
         app_command_session_begin_external(&command->session,
                                            app_command_state(state), APP_LIFECYCLE_REQUEST_RESUME))
         out->request = COMMON_SESSION_REQUEST_RESUME;
-    else if (result->lifecycle_request != COMMON_X86_DEBUG_LIFECYCLE_NONE)
+    else if (result->lifecycle_request != X86_DEBUG_LIFECYCLE_NONE)
         (void)snprintf(out->text, sizeof(out->text), "Debug lifecycle request is not applicable.\r\n\r\n");
 }
 
@@ -620,9 +620,9 @@ void app_command_provider_submit_line(void *opaque,
     app_command_effect effect = {0};
     if (command->debug_active)
     {
-        common_x86_debug_result result = {0};
+        x86_debug_result result = {0};
         command->debug_completed_pending = LIB_FALSE;
-        lib_status status = common_x86_debug_submit_line(command->debug, line, &result);
+        lib_status status = x86_debug_submit_line(command->debug, line, &result);
         *out = (common_session_command_result){0};
         if (status != LIB_STATUS_OK)
         {
@@ -642,7 +642,7 @@ void app_command_provider_submit_line(void *opaque,
                                     &effect);
     if (effect.action == APP_COMMAND_ACTION_DEBUG)
     {
-        if (common_x86_debug_open(command->debug, command->machine) == LIB_STATUS_OK)
+        if (x86_debug_open(command->debug, command->machine) == LIB_STATUS_OK)
         {
             command->debug_active = LIB_TRUE;
             (void)snprintf(command->debug_prompt, sizeof(command->debug_prompt), "-");
@@ -693,10 +693,10 @@ void app_command_provider_note_runtime(void *opaque,
     if (command->debug_active)
     {
         command->debug_completed_pending = LIB_FALSE;
-        common_x86_debug_machine_state state = completed == COMMON_SESSION_MACHINE_PAUSED ? COMMON_X86_DEBUG_MACHINE_PAUSED : completed == COMMON_SESSION_MACHINE_RUNNING ? COMMON_X86_DEBUG_MACHINE_RUNNING
-                                                                                                                                                                  : COMMON_X86_DEBUG_MACHINE_STOPPED;
-        common_x86_debug_result result = {0};
-        if (common_x86_debug_observe_machine(command->debug, state, LIB_STATUS_OK, &result) != LIB_STATUS_OK)
+        x86_debug_machine_state state = completed == COMMON_SESSION_MACHINE_PAUSED ? X86_DEBUG_MACHINE_PAUSED : completed == COMMON_SESSION_MACHINE_RUNNING ? X86_DEBUG_MACHINE_RUNNING
+                                                                                                                                                                  : X86_DEBUG_MACHINE_STOPPED;
+        x86_debug_result result = {0};
+        if (x86_debug_observe_machine(command->debug, state, LIB_STATUS_OK, &result) != LIB_STATUS_OK)
         {
             (void)snprintf(out->text, sizeof(out->text), "Debug command failed.\r\n\r\n");
             common_machine_debug_cancel(command->machine);
@@ -745,11 +745,11 @@ lib_status app_command_initialize(app_command_context *command,
     memset(command, 0, sizeof(*command));
     command->machine = machine;
     app_command_session_initialize(&command->session, display);
-    return common_x86_debug_create(&command->debug);
+    return x86_debug_create(&command->debug);
 }
 
 void app_command_dispose(app_command_context *command)
 {
     if (command != NULL)
-        common_x86_debug_destroy(command->debug);
+        x86_debug_destroy(command->debug);
 }

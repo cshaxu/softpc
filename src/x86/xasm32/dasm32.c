@@ -1,6 +1,6 @@
-#include "common/x86-xasm32/xasm32.h"
+#include "x86/xasm32/xasm32.h"
 
-#include "common/x86-xasm32/dasm32.h"
+#include "x86/xasm32/dasm32.h"
 
 typedef lib_u8 t_dasm_prefix;
 
