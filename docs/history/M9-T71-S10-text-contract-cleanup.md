@@ -64,3 +64,12 @@ match. P1 HEAD equalled origin/main with a clean worktree before this review.
 The finite four-item ledger meets its declared exit criteria. S10 closes under
 the owner's explicit admission/closure instruction. This is not a whole-T or
 all-video correctness claim. T71 remains open pending the owner's next direction.
+
+## Owner Acceptance
+
+Owner subsequently confirms: "测试通过，准许收口S10". Manual acceptance is now
+recorded in addition to P1 verification and P2 coordinator closure. This P3
+updates records only; source, tests, EXEs, configuration and media are unchanged.
+Documentation governance and whitespace checks pass. No build or automated
+desktop test is rerun or inferred from this owner report. T71 stays open with
+no active S; no next task is admitted by this confirmation.

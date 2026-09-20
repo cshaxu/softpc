@@ -5,8 +5,8 @@
 No implementation subtask is active.
 Open task awaiting owner: T71.
 
-S10's four admitted items are verified and closed after P1 delivery and actual
-coordinator review; see [S10 closure](../history/M9-T71-S10-text-contract-cleanup.md).
+Owner confirms S10 manual testing passed and approves closure after P1 delivery
+and coordinator review; see [S10 closure](../history/M9-T71-S10-text-contract-cleanup.md).
 T71 remains open. The separately queued neutral-text redesign is not admitted.
 Default tests remain background-only; native desktop tests require explicit execution.
 
