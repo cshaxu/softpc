@@ -2,13 +2,19 @@
 
 ## Current Work
 
-M9 T77 S3 is active: complete test-layout and independent-corpus acceptance.
-Owner accepted T76 testing and requested closure and admission of the next
-queued task. T76 is closed; implementation baseline remains 7ebb435f.
-[T77 brief and plan](../proposals/m9-product-test-layout-cleanup.md).
+No implementation subtask is active. T77 S1--S3 and T77 are closed under the
+owner's explicit self-review/closure authorization. No next task is admitted.
+[T77 completion audit](../history/M9-T77-completion-audit.md).
 
 ## Current Technical Baseline
 
+- T77 S3 executor 7a6ac879 completes final acceptance. Product tests now have
+  App/Core/Integration/checks ownership and one Integration machine fixture.
+  Whole-task code/build +229/-2129 (net -1900); production/shared corpora unchanged.
+  Final Release/background x64 110/110 (155.50s), x86 110/110 (151.26s).
+  Isolated Lib 41/41, Common 18/18 and x86 9/9 pass on both widths;
+  180/204 copied files identical. Both EXEs retain T76 hashes. Five desktop
+  cases excluded per width; no new Linux or downstream integration claim.
 - T77 S2 executor 217ec7a5 removes obsolete test wrappers/diagnostics and keeps
   one Integration fixture; code/build +181/-2096 net -1915. Release and background
   x64/x86 110/110 pass; production/shared corpora and EXE hashes unchanged.
@@ -73,6 +79,7 @@ queued task. T76 is closed; implementation baseline remains 7ebb435f.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T77 | S1--S3 complete; owner-authorized self-review closure; test ownership cleanup, isolated packages and dual-width acceptance. | [Audit](../history/M9-T77-completion-audit.md) |
 | T76 | Owner testing passed; S1 measurement cancelled by owner, S2/S3 complete; overlay index and snapshot compatibility accepted. | [Audit](../history/M9-T76-completion-audit.md) |
 | T75 | S1--S4 complete; owner approved closure; strict C11 six-package and dual-width acceptance. | [Audit](../history/M9-T75-completion-audit.md) |
 | T74 | S1 complete; owner accepted; dual-width 110/110 background; pure Core relocation. | [Audit](../history/M9-T74-completion-audit.md) |
@@ -84,6 +91,9 @@ queued task. T76 is closed; implementation baseline remains 7ebb435f.
 
 ## Recent Governance
 
+- T77 closure archives its proposal and accounts for all 48 original product
+  files and 115 CTest definitions. Task-owned disposable outputs removed;
+  TODO remains empty and the two unrelated queue candidates remain unadmitted.
 - T76 closure archives its proposal and verifies scope, hashes and full-task
   coverage. Owner admits queue head as T77 S1; this handoff changes docs only.
 - T74 closure archives the proposal and records S1/T-level requirement coverage,
@@ -93,24 +103,3 @@ queued task. T76 is closed; implementation baseline remains 7ebb435f.
   implementation task or T number is allocated.
 - M9 Td S18: T71 closure, TODO retirement and floppy-identification candidate;
   [record](../history/M9-Td-S18-t71-closure-and-floppy-queue.md).
-
-## M9 T77 S3 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner admitted the queue head after T76; now authorizes "继续啊 做完自行审计收口s和t任务": serial S1--S3 delivery and self-reviewed S/T closure. |
-| Objective | Verify the complete 48-file disposition ledger, unchanged coverage and shared independence; finish layout documents and dual-width delivery, then self-review S and T closure under owner authorization. |
-| Non-goals | No production edits, shared six-directory corpus edits, runtime fixes, new fixture framework, weakened tests or guest data changes. |
-| Reference Baseline | 217ec7a5 reviewed S2; original T baseline 1fe946a2, 115 CTest definitions, five desktop exclusions per width. |
-| Candidate Proposal | [Product test ownership plan](../proposals/m9-product-test-layout-cleanup.md) |
-| Files And ABI Surface | test/README.md, design/CODING.md, proposal/history/status; ignored isolated copies/builds of unchanged shared packages. Code/build estimate +0/-0; no ABI. |
-| Applicable Rules | docs/README.md reading set; EXECUTION and DOCUMENT; design ARCHITECTURE/CODING and rules ARCHITECTURE/CODING before build/code changes. |
-| Verification | T endpoint rename-aware/body/target/CTest comparison; exact four/six corpus copies without App/Core; independent Lib/Common/x86 builds and non-desktop tests both widths; final product Release/background suites; all manifests/DAG/doc gates. |
-| Expected Markers | No lost tests or changed assertion behavior; unchanged shared corpora; both background suites pass; five desktop exclusions retained. |
-| Asset Needs | No guest data changes; only refresh two package EXEs at delivery. Disposable test outputs remain under owned build children, excluding build/output. |
-| Reporting Requirements | Before movement report classified files/moved lines and estimated additions/deletions; after report actual rename-aware counts, test inventory, builds/tests, dual EXE links and pushed P. |
-| Stop Conditions | Production/shared changes needed, unique coverage would be lost, or an unexplained test failure; diagnose without widening scope or dropping assertions. |
-| Exit Criteria | All 48 original files accounted, coverage preserved, shared independence proven, all required verification passes and artifacts match; cleanup owned disposable outputs; pushed executor then actual-change S review and separate full-T coverage audit. |
-| Original Owner Request | "测试通过 收口提交t任务 准入下一个"; queued request: organize confusing product test/unit and test/support ownership. |
-| Similar-Issue Sweep | Enumerate all product test source, fixture includes, CMake registrations and live documentation/tool paths; assign every hit an owner and S1/S2/S3 disposition in the proposal ledger. |

@@ -3,9 +3,10 @@
 ## Status and owner request
 
 Owner accepted T76 and requested "测试通过 收口提交t任务 准入下一个".
-Admitted as T77, beginning with S1. CURRENT.md owns the executable packet;
-this proposal retains the bounded plan and evidence ledger. S1/S2 are closed;
-S3 performs final acceptance. Owner explicitly authorizes serial completion
+Admitted as T77, beginning with S1; S1--S3 and T77 are now closed.
+This archived proposal retains the bounded plan and evidence ledger;
+[completion audit](M9-T77-completion-audit.md) records final acceptance.
+Owner explicitly authorizes serial completion
 and self-reviewed S/T closure: "继续啊 做完自行审计收口s和t任务".
 
 Original owner requests:
