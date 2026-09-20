@@ -2,11 +2,30 @@
 
 ## Current Work
 
-No implementation subtask is active.
-T75 is closed after owner authorization and its separate completion audit.
-Owner admitted Overlay lookup optimization next; its T76 S1 packet follows
-after this closure delivery.
+T75 is closed and pushed in eacf1a5e after owner authorization and completion audit.
+T76 S1 is active: Storage overlay lookup baseline and design qualification.
 [T75 audit](../history/M9-T75-completion-audit.md).
+
+## M9 T76 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner: close T75 and admit the next T for lib/storage overlay lookup performance. |
+| Objective | Freeze existing behavior/snapshot baseline and quantify linked-list cost versus direct-index memory before implementation. |
+| Non-goals | No production algorithm change in S1, public API change, Core/Common/x86 change, guest media edits, or desktop interaction. |
+| Reference Baseline | eacf1a5e; accepted strict C11 shared corpus and dual-width 110/110 background suites. |
+| Candidate Proposal | [Overlay page lookup optimization](../proposals/m9-overlay-page-index.md). |
+| Files And ABI Surface | Read storage medium/file and callers; existing storage/snapshot tests and bounded measurement fixtures if needed. ABI unchanged. |
+| Applicable Rules | Execution/Document/Architecture/Coding and referenced governance skills; strict C11 and existing ownership boundaries. |
+| Verification | Existing public behavior/failure tests, repeatable small/dense/sparse workloads, snapshot media-byte baseline; dual-width Release and applicable background suites before S1 delivery. |
+| Expected Markers | Measured lookup costs, size-safe pointer-array estimates for both widths, explicit decision on sparse capacity tradeoff, no changed production behavior. |
+| Asset Needs | Only task-owned ignored build/t76-s1-* fixtures/logs; bounded workloads, stop any probe beyond 60 seconds; preserve checkpoints, remove owned temporary data when no longer needed. No assets media edits. |
+| Reporting Requirements | Production estimate +0/-0; refine test/tool file and line estimates before edits; report actual counts and both EXEs at completed S delivery. |
+| Stop Conditions | Direct indexing materially narrows usable capacity or sparse behavior: report evidence and review revised design before S2; no silent algorithm expansion. |
+| Exit Criteria | Baseline evidence and finite ledger, reviewed design decision, relevant dual-width verification, complete pushed delivery and actual-change review. |
+| Original Owner Request | 收口T75，准入下一个T任务：优化 lib/storage overlay查找表现 |
+| Similar-Issue Sweep | All medium creation/read/write/destroy paths, file versus zero bases, direct/readonly exclusion, failure ownership and snapshot API consumers. |
 
 ## Current Technical Baseline
 
