@@ -2,29 +2,17 @@
 
 ## Current Work
 
-## M9 T78 S1 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner requested: “准入一个新的T任务，收口上述common的问题。” The two audit findings are admitted together as one bounded S. |
-| Objective | Remove Common's direct integer-limit vocabulary and make `run_generation` storage match its `lib_u32` public contract. |
-| Non-goals | No App/Core/x86/KVM behavior change; no ABI/signature, queue-layout, snapshot, media, frame, locking, or lifecycle redesign. |
-| Reference Baseline | `b406be81`, clean worktree; T77 closed. [T78 proposal](../proposals/m9-t78-common-types-boundary.md). |
-| Candidate Proposal | [Common 类型边界收口](../proposals/m9-t78-common-types-boundary.md). |
-| Files And ABI Surface | `src/lib/types/{types_interface.h,atomic.h}`, `src/common/{session/control.c,machine/machine.c,ui/ui.c}`, focused Lib/Common tests and manifests. No Common public function signature changes. |
-| Applicable Rules | `docs/rules/EXECUTION.md`, `docs/rules/ARCHITECTURE.md`, `docs/rules/CODING.md`, C11 shared-corpus and Lib Types ownership in `docs/design/ARCHITECTURE.md`/`CODING.md`. |
-| Verification | Focused Types/Lib and Common tests, manifests/DAG/corpus gates, strict x64/x86 builds and background regression excluding existing desktop cases; rebuild both package EXEs. |
-| Expected Markers | No `<limits.h>`/`UINT_MAX` consumer in Common; `lib_atomic_u32` load/store/exchange exist on both implementations; no signed storage/casts for run generation. |
-| Asset Needs | None. Preserve user INI, snapshots and guest media. |
-| Reporting Requirements | Before implementation report file/line estimate; after delivery report production/test added/removed/net lines, similar-issue sweep, builds/tests, commit, push and EXE paths/hashes. |
-| Stop Conditions | Stop for a public ABI need, any behavior change, a required new queue/lock/state, a failed focused or dual-width test, or scope outside the listed components. |
-| Exit Criteria | One complete pushed implementation P; actual-change review proves both findings and sweep dispositions; worktree clean; wait for owner test before T closure. |
-| Original Owner Request | “准入一个新的T任务，收口上述common的问题。” |
-| Similar-Issue Sweep | Scan all Common raw standard integer-limit imports and all Common/UI generation atomics/casts; record every production hit and disposition in the delivery evidence. |
+No implementation subtask is active. T78 is closed following owner manual acceptance:
+[completion audit](../history/M9-T78-completion-audit.md).
 
 ## Current Technical Baseline
 
+- T78 S1 commit `0fb40f48` removes Common's direct integer-limit import and
+  aligns the unsigned run-generation storage with its public `lib_u32`
+  contract. Production/test C/H +52/-17 (net +35); no behavior or public ABI
+  change. Lib/Common 44/44 and background regression 109/109 plus the direct
+  long case pass on x64/x86. Owner manually accepted the package EXEs; closure
+  evidence is in [the audit](../history/M9-T78-completion-audit.md).
 - T77 S3 executor 7a6ac879 completes final acceptance. Product tests now have
   App/Core/Integration/checks ownership and one Integration machine fixture.
   Whole-task code/build +229/-2129 (net -1900); production/shared corpora unchanged.
@@ -96,6 +84,7 @@
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T78 | S1 complete; owner manual test accepted; Common type boundary closure. | [Audit](../history/M9-T78-completion-audit.md) |
 | T77 | S1--S3 complete; owner-authorized self-review closure; test ownership cleanup, isolated packages and dual-width acceptance. | [Audit](../history/M9-T77-completion-audit.md) |
 | T76 | Owner testing passed; S1 measurement cancelled by owner, S2/S3 complete; overlay index and snapshot compatibility accepted. | [Audit](../history/M9-T76-completion-audit.md) |
 | T75 | S1--S4 complete; owner approved closure; strict C11 six-package and dual-width acceptance. | [Audit](../history/M9-T75-completion-audit.md) |
@@ -108,6 +97,9 @@
 
 ## Recent Governance
 
+- T78 closure archives its proposal after owner manual acceptance. No active
+  packet remains; queue candidates retain their original order until separately
+  admitted.
 - T77 closure archives its proposal and accounts for all 48 original product
   files and 115 CTest definitions. Task-owned disposable outputs removed;
   TODO remains empty and the two unrelated queue candidates remain unadmitted.
