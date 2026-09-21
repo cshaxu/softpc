@@ -4,7 +4,7 @@
 
 所有者请求：“测试通过 可以收口t任务 准入下一个t”。T79 已通过手测并收口，
 本队首提案正式分配 T80；基线 `b9413d65`。以下七项沿用为 S1--S7。
-S1--S3 已经所有者批准收口；T80 保持开放，S4 实现后等待手测，S5--S7 尚未准入。实际状态以 CURRENT 为准。
+S1--S4 已经所有者批准收口；T80 保持开放，S5 实现后等待手测，S6--S7 尚未准入。实际状态以 CURRENT 为准。
 本次交接只修改文档，生产/测试代码 +0/-0，EXE 不变。S1 在动代码前先
 复核取码、跳过和调用者路径，报告具体文件与增删估算，再执行实现与双宽度验证。
 
@@ -265,9 +265,16 @@ Lib/Core/x86、公共字段、用户 INI 与介质均未改变。
 
 标准 package EXE 大小相对 S3 均不变，不代表运行内存或机器码大小完全不变。
 [S4 记录](../history/M9-T80-S4-frame-sequence-wrap.md)承接 executor 后的
-实际变更复核；S4 等待所有者手测，不准入 S5、不关闭 T80。
+实际变更复核。交付后所有者批准收口 S4 并准入 S5；T80 保持开放。
 
 ### S5：Common Types 边界门禁（P2）
+
+所有者请求“批准收口S4，准入S5开始修复”，执行基线 `0be6a12c`。
+预审发现 machine.c 七处 UINT32_MAX 依赖 Types 传递包含，改用现有
+LIB_UINT32_MAX 即可，数值/行为不变。不引入新 parser、公共 API 或门禁框架。
+预计运行时 +7/-7，门禁 +4--8/-4--8，测试 +25--40/-0，manifest/文档另计。
+冻结检查范围为 Common C/H 的字面 include 与整数上限宏、Lib/x86 对应门禁；
+各命中记录修复或保留理由，不宣称实现完整 C 预处理器验证。
 
 - 源码：`src/common/verify_corpus.cmake`；测试
   `test/common/verify_negative.cmake`。
@@ -278,6 +285,50 @@ Lib/Core/x86、公共字段、用户 INI 与介质均未改变。
   保留各自允许的边界，不建立第二套依赖权威。
 - 验证：直接标准头和旧整数限制依赖被拒绝，规范引用通过；六份 manifest、
   依赖门禁及独立四/六目录构建继续通过。
+
+#### S5 有限命中台账与实际变更
+
+| 检查单元 | 命中与处置 |
+| --- | --- |
+| Common 字面 include | 生产 C/H 已全部使用 common/lib 规范路径；删除门禁中十二种标准头的旧白名单。相同规则覆盖 C、私有 H 和公共 H，不再另留 stdint 公共头特判。 |
+| Common 原始整数上限宏 | machine.c 七处 UINT32_MAX：暂停等待两处、外层等待一处、media/state/debug 等待四处。全部等值替换为现成 LIB_UINT32_MAX；等待时间与失败路径不变。 |
+| 新门禁验证 | 十二种头各验证尖括号/引号写法，共24负例；八种上限宏各验证表达式/宏别名，共16负例；公共头1负例；Types、合法链接及注释/字符串1正例。复用既有 probe，不新增框架。 |
+| Lib 门禁 | verify_types_layout 已从 Types alias 和独立整数家族检查原始词汇，非 Types 外部 include 被拒绝；已有负例。保持不变。 |
+| x86 门禁 | verify_corpus 已拒绝标准头；生产无所扫描的裸整数上限宏，现有 LIB 宏与导入实现的 STD_SIZE_MAX 不混同。保持本次 Common 范围，不扩写 x86 检查器。 |
+| 测试自身 | 共享测试仍可使用标准 C 库；新限制只检查 Common 生产 corpus。 |
+
+搜索为 Common C/H include 枚举，以及三套源码的完整 token
+`UINT_MAX|INT32_MAX|INT32_MIN|UINT32_MAX|UINT64_MAX|SIZE_MAX`；复核 Lib 的
+types-layout 与 x86 corpus gate。此为有界字面源检查，不宣称宏展开/任意
+预处理写法均有编译器级证明。无本次生产命中延期。
+
+实际三文件：machine.c **+7/-7**；verify_corpus.cmake **+4/-4**；
+verify_negative.cmake **+24/-0**。运行时和门禁各净零，合计 **+35/-11，
+净 +24**，全部净增来自测试。比测试预估少一行，复用原 fixture 即可。
+两份 manifest、治理文档和 EXE 另计。Lib/Core/x86 和公开 ABI 均不变。
+新增负例先在旧门禁上失败（assert.h 被放行），修复后 Common corpus 与
+verifier-negative 两项通过。最终双宽度 Release 构建均通过；产品后台
+x64 111/111（273.67s），x86 111/111（178.46s），各排除五个 desktop 项。
+
+独立复制四目录（无 x86）与六目录，四个严格 C11 构建均通过；复制目录不含
+App/Core、产品构建目标或介质。两套套件通过各自原有 CMake 入口组装：
+
+| 复制组合 | x64 后台 | x86 后台 |
+| --- | --- | --- |
+| 四目录 Lib/Common | 59/59，95.24s | 59/59，98.94s |
+| 六目录 Lib/Common/x86 | 69/69，90.14s | 69/69，96.77s |
+
+每套隔离测试排除三项 desktop。六份 manifest 与组件门禁通过；无 Linux
+运行验收或下游项目集成声明。四/六目录分别180/205文件在构建前后逐字节
+相同；证据记录后删除本次 build/t80-s5 隔离副本/构建目录，可从仓库重建。
+
+| S5 产物 | 字节 | SHA256 |
+| --- | ---: | --- |
+| softpc32.exe | 3695688 | 2F51A972247D074F9B13277E1B4306AA3218C8C1452D767A219AA29D85623ED1 |
+| softpc64.exe | 3080555 | AA70762F182682B42F26B94D53CD7A0BD062BE91F85315C47EC6AA78ADB7844E |
+
+两份 EXE 大小相对 S4 不变，INI/media 不变。交付及实际变更复核见
+[S5记录](../history/M9-T80-S5-common-types-gate.md)。待所有者手测后才收口 S5。
 
 ### S6：xasm32 固定分派表精简
 

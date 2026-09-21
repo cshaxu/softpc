@@ -3,15 +3,21 @@
 ## Current Work
 
 No implementation subtask is active.
-Open task awaiting owner: T80. S4 implementation and verification are complete;
-delivery evidence is recorded in the proposal. S4 remains open
-for owner testing, and S5--S7 are not admitted.
-
-[Proposal and S4 ledger](../proposals/m9-shared-corpus-boundary-and-simplification.md)
-retain the admitted scope, pre-change estimate, bounded modular-order contract
-and per-path evidence. No T-level closure is implied.
+Open task awaiting owner: T80. S4 is owner-accepted and closed. S5 implementation
+and verification are complete; S5 awaits owner testing, S6/S7 are not admitted.
+The [proposal](../proposals/m9-shared-corpus-boundary-and-simplification.md)
+records S5 scope, estimates, finite sweep and artifact evidence. T80 stays open.
 
 ## Current Technical Baseline
+
+- S5 removes Common's stale standard-header allowlist and rejects raw integer
+  limits. Seven Machine constants use equivalent existing Types aliases.
+  Runtime +7/-7, checker +4/-4, tests +24/-0: total net +24, no ABI change.
+  Both Release/background builds pass: x64 111/111 (273.67s), x86 111/111
+  (178.46s). Copied four-directory tests 59/59 and six-directory tests 69/69
+  pass on both widths, strict C11; all 180/205 copied files remain identical.
+  Desktop tests excluded; no Linux runtime claim. Isolated task outputs removed;
+  package EXEs refreshed; Lib/Core/x86, INI/media unchanged. S5 awaits owner.
 
 - S4: frame publication skips 0 on u32 wrap; Session's two ordering sites share
   one private modular comparator. Production +16/-4 (net +12), tests +69/-0;
@@ -22,7 +28,7 @@ and per-path evidence. No T-level closure is implied.
   no Linux execution. Manifests/DAG and final documentation gate pass.
   Standard EXEs refreshed; hashes in the proposal, INI/media unchanged.
   Executor `478d04ec` pushed; actual-change review recorded in
-  [S4 evidence](../history/M9-T80-S4-frame-sequence-wrap.md). Await owner test.
+  [S4 evidence](../history/M9-T80-S4-frame-sequence-wrap.md). Owner accepts S4 closure.
 
 - S3: production +6/-4 net +2, tests +56/-0; reject an unrecordable new key
   before machine delivery, retaining original repeat/identity/retirement logic.
@@ -143,8 +149,8 @@ and per-path evidence. No T-level closure is implied.
 
 ## Recent Governance
 
-- Owner approved T80 S4 repair. Implementation delivery awaits owner manual
-  acceptance; S4 and T80 are not closed and S5 is not started.
+- Owner approves T80 S4 closure and admits S5's Common Types boundary repair.
+  T80 remains open; S6/S7 are not started.
 
 - Owner closes T80 S3 and admits S4. Document-only handoff preserves tested
   package EXEs; T80 remains open.

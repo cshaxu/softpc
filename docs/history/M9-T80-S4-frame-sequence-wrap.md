@@ -4,8 +4,8 @@
 
 The owner accepted S3, admitted S4, then approved the narrowed repair.
 Execution baseline: `3284fd89`. The proposal's S4 section records the initial
-estimate, finite sequence-use ledger and exact changed-path counts. S4 remains
-open for owner testing; this record does not close S4 or T80.
+estimate, finite sequence-use ledger and exact changed-path counts. S4 was
+delivered for owner testing and is now owner-accepted; T80 remains open.
 
 Machine keeps the existing u32 publication counter and skips reserved zero.
 The notification gate and copied-frame reducer use one private inline modular
@@ -48,4 +48,5 @@ Focused 3/3 per width and full background x64 111/111 (173.24s), x86 111/111
 six manifests, component checks and documentation governance pass. Binary
 hashes match the proposal and sizes match S3; INI/media remain untouched.
 No admitted implementation gap found in this bounded review. Owner testing
-remains the closure gate; S4/T80 are open and S5 is not admitted.
+was the remaining closure gate. The owner subsequently requests
+“批准收口S4，准入S5开始修复”: S4 is accepted and closed; T80 remains open.
