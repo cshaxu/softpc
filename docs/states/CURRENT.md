@@ -2,26 +2,14 @@
 
 ## Current Work
 
-## M9 T80 S1 Packet
+No implementation subtask is active.
 
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner reports T79 testing passed, approves its closure and admission of the next queued task. T80 adopts the shared-corpus proposal; S1 is the sole active subtask. |
-| Objective | Bound xasm32 instruction fetch and position advance before memory access; preserve valid disassembly and existing failure/output contracts. |
-| Non-goals | No Core, media, snapshot, guest behavior, debugger syntax redesign, capacity expansion, new decoder or mutable global parsing state. S2--S7 are planned, not active. |
-| Reference Baseline | `b9413d65`, owner-accepted T79 artifacts. Queued shared-corpus proposal was previously uncommitted and is incorporated by this admission. |
-| Candidate Proposal | [Shared corpus boundary and simplification](../proposals/m9-shared-corpus-boundary-and-simplification.md). |
-| Files And ABI Surface | src/x86/xasm32/{aasm32.c,dasm32.c}; test/x86/{CMakeLists.txt,debug_linear_smoke.c,xasm32/xasm32_contract_smoke.c,xasm32/xasm32_bounds_smoke.c}, matching manifests and both package EXEs. Public API and debugger production callers unchanged. |
-| Applicable Rules | `docs/rules/{EXECUTION,ARCHITECTURE,CODING,DOCUMENT}.md`, `docs/design/{ARCHITECTURE,CODING,UI}.md`, and the Core mirror boundary in `AGENTS.md`. |
-| Verification | Guard-page or memory-check proof for 15-prefix/truncated immediate/ModRM/SIB/displacement; valid 14-prefix plus NOP; public API and U/XU behavior; strict C11 x86/x64, manifests/DAG, independent x86 tests and full background CTest, both package EXEs. |
-| Expected Markers | No byte-16 access or unbounded prefix loop; failure before access, valid original output unchanged; all direct fetch/skip paths accounted for. |
-| Asset Needs | No guest assets. Any S1 diagnostic lives under build/t80-s1, bounded to 120 seconds/run and 10 MiB output with agent cleanup. Desktop tests require a reserved window. |
-| Reporting Requirements | Before implementation audit report expected paths, additions/deletions/net; after execution actual counts, focused/background evidence, dual EXE links and uncovered-platform limits. |
-| Stop Conditions | Stop for public API redesign, altered valid instruction semantics, Core changes or an unrelated issue requiring expansion. S2 notification-failure design needs its own concrete review before implementation. |
-| Exit Criteria | S1 bounded repair, regression and similar-issue sweep complete; manifest/gates, x86/x64 packages, pushed complete P and actual-change review. T closure additionally requires all seven proposal rows and owner acceptance. |
-| Original Owner Request | “测试通过 可以收口t任务 准入下一个t”, followed by “开始执行”; queue proposal records “审计一下，lib/common/x86六组件代码质量” and “将上述置于队列首位，写入proposal”。 |
-| Similar-Issue Sweep | Enumerate fetch, skip, prefix and direct memory access paths plus assembly output bounds in existing xasm32; map public and debugger consumers, disposition each hit without duplicating decoders. |
+Open task awaiting owner: T80.
+
+S1 executor `73a5a889` is pushed and actual-change reviewed. Both Release EXEs,
+independent x86 10/10 per width, and background x64/x86 111/111 pass.
+Await owner testing before closing S1 or admitting S2; T80 remains open.
+Evidence: [S1 review](../history/M9-T80-S1-xasm32-boundary.md).
 
 ## Current Technical Baseline
 
