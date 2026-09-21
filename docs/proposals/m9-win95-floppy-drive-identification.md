@@ -1,14 +1,19 @@
 # Win95 A: Floppy Drive Identification Repair
 
-## Request And Admission Boundary
+## T79 Admission And Request Boundary
 
 Owner: "队列第二位追加一个T任务，用于修复win95把软驱A盘识别为
 “可移动磁盘”而不是软驱的故障，Td治理。"
 
-Unnumbered candidate, originally inserted second; current order is in Queue.
-No numeric T, implementation or runtime
-investigation is admitted by this document. The reported symptom is not yet
-independently reproduced; root cause remains unknown.
+Owner admitted this queue head as T79 after accepting T78. The reported
+symptom is not yet independently reproduced; root cause remains unknown.
+
+T79 S1 is an evidence-first investigation. It may inspect the source tree and
+map the guest-visible drive classification contract, but it may not modify
+production code, user configuration, guest media, Lib/Common, or the preserved
+Core mirror. Reproduction uses only a declared disposable overlay after the
+evidence plan identifies it. A repair requires a separately admitted S with
+the first incorrect contract, exact owner and dual-width proof recorded first.
 
 ## Product Goal
 
@@ -38,8 +43,8 @@ direct and overlay policies, reset retention and snapshot media restoration.
    Build both EXEs, run full background regressions, then obtain owner Win95
    verification. Reserve desktop interaction explicitly when required.
 
-These are proposed S boundaries (investigation, evidenced repair, acceptance),
-not allocated S identifiers. Before each admitted S, report affected files,
+These are the T79 S boundaries: S1 investigation, then separately admitted
+evidenced repair and acceptance as required. Before each admitted S, report affected files,
 estimated additions/removals, original-mirror diff and acceptance evidence;
 afterward report actual counts and package links.
 

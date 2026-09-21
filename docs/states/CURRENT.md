@@ -2,11 +2,32 @@
 
 ## Current Work
 
-No implementation subtask is active. T78 is closed following owner manual acceptance:
-[completion audit](../history/M9-T78-completion-audit.md).
+## M9 T79 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner approved T78 closure and directed admission of the next queued T task. Queue head `Win95 A: floppy drive identification repair` is admitted as T79 S1. |
+| Objective | Establish a reproducible, evidence-backed cause for Win95 identifying emulated A: as a generic removable disk rather than the configured floppy drive; identify the first incorrect device contract and its owner. |
+| Non-goals | No repair, guest-label workaround, Win95-version branch, Lib/Common change, Core mirror edit, user INI/media write, or snapshot/config redesign in S1. No inference that wording alone proves a hardware fault. |
+| Reference Baseline | `8f59c184`, clean worktree; T78 closed. [T79 proposal](../proposals/m9-win95-floppy-drive-identification.md). |
+| Candidate Proposal | [Win95 A: floppy drive identification repair](../proposals/m9-win95-floppy-drive-identification.md). |
+| Files And ABI Surface | Read-only mapping of `src/core/{machine,compat,softpc.new}`, `src/vm`, media configuration and existing tests. S1 changes only T79 governance/evidence documentation if required; no ABI surface is admitted. |
+| Applicable Rules | `docs/rules/{EXECUTION,ARCHITECTURE,CODING,DOCUMENT}.md`, `docs/design/{ARCHITECTURE,CODING,UI}.md`, and the Core mirror boundary in `AGENTS.md`. |
+| Verification | Static trace from configuration through VM/Compat/Core/BIOS/controller contracts; classify present/absent-media and cold-boot/snapshot paths. Any dynamic reproduction first uses an explicitly declared disposable overlay and must preserve owner assets. |
+| Expected Markers | A finite path ledger distinguishes physical floppy type, CMOS/equipment metadata, BIOS/disk service identity, controller behavior and shell-only wording; each path receives evidence or a stated next receiver. |
+| Asset Needs | None for source mapping. Dynamic proof is stopped until a disposable test input and non-mutating output location are declared in a later packet update. |
+| Reporting Requirements | Report source paths, expected vs actual contract, reproduction evidence status, possible owners, and exact repair scope/line estimate. Do not claim a fix or broad hardware conformance from S1. |
+| Stop Conditions | Stop before runtime interaction without a disposable-media plan; stop for an observed guest-only label/configuration issue, a Lib/Common/API need, or no reproducible contract discrepancy. |
+| Exit Criteria | Evidence packet names the first incorrect or still-unproven contract, bounded repair candidates and verification matrix; it has no code P and waits for owner approval of any repair S. |
+| Original Owner Request | “队列第二位追加一个T任务，用于修复win95把软驱A盘识别为‘可移动磁盘’而不是软驱的故障，Td治理。” |
+| Similar-Issue Sweep | Map both floppy drives, all readonly/direct/overlay media modes, cold-reset and snapshot restoration routing; distinguish shared contract defects from Win95-only presentation. |
 
 ## Current Technical Baseline
 
+- T79 S1 is active as a read-only evidence investigation of Win95 A: floppy
+  classification. No runtime input, media write, Core-mirror or product change
+  is admitted until its first-contract ledger identifies an owner.
 - T78 S1 commit `0fb40f48` removes Common's direct integer-limit import and
   aligns the unsigned run-generation storage with its public `lib_u32`
   contract. Production/test C/H +52/-17 (net +35); no behavior or public ABI
