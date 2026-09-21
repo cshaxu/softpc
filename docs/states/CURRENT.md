@@ -2,26 +2,26 @@
 
 ## Current Work
 
-## M9 T79 S2 Packet
+## M9 T80 S1 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner approved the S1 repair design and requested S admission, implementation, dual-width build/test, commit/push and a wait for manual validation. S1 is complete; S2 is admitted. |
-| Objective | Separate physical floppy identity from inserted media in the existing GFI host adapter; retain empty A:, absent B:, stable hardware type across insert/eject/reset and snapshots. |
-| Non-goals | No guest-label workaround, Win95-specific branch, shared-corpus or Core mirror edit, user INI/media write, new controller or snapshot compatibility layer. |
-| Reference Baseline | `f6dadddd`; unrelated queue/proposal edits are preserved and excluded. [S1 record](../history/M9-T79-S1-investigation.md). |
-| Candidate Proposal | [Win95 A: floppy drive identification repair](../proposals/m9-win95-floppy-drive-identification.md). |
-| Files And ABI Surface | Core compat GFI lifecycle and device archive, existing Core tests and snapshot integration tests. Private physical-identity snapshot fields; no shared API change. |
+| Identifier Mode | New |
+| Admission And Approval | Owner reports T79 testing passed, approves its closure and admission of the next queued task. T80 adopts the shared-corpus proposal; S1 is the sole active subtask. |
+| Objective | Bound xasm32 instruction fetch and position advance before memory access; preserve valid disassembly and existing failure/output contracts. |
+| Non-goals | No Core, media, snapshot, guest behavior, debugger syntax redesign, capacity expansion, new decoder or mutable global parsing state. S2--S7 are planned, not active. |
+| Reference Baseline | `b9413d65`, owner-accepted T79 artifacts. Queued shared-corpus proposal was previously uncommitted and is incorporated by this admission. |
+| Candidate Proposal | [Shared corpus boundary and simplification](../proposals/m9-shared-corpus-boundary-and-simplification.md). |
+| Files And ABI Surface | src/x86/xasm32/{xasm32.c,dasm32.c}, existing x86/debug callers, test/x86 and matching manifests; exact changed paths/count estimate after pre-implementation audit. Public API shape remains unchanged. |
 | Applicable Rules | `docs/rules/{EXECUTION,ARCHITECTURE,CODING,DOCUMENT}.md`, `docs/design/{ARCHITECTURE,CODING,UI}.md`, and the Core mirror boundary in `AGENTS.md`. |
-| Verification | Both-width empty/present BIOS identity, media modes/profiles, insert/eject/reset/destroy, no-media FDC response and snapshot roundtrip; full background CTest and Release x86/x64 packages. Owner cold-boots Win95 for GUI acceptance. |
-| Expected Markers | Empty boot and eject/reset retain A: type and equipment presence. B stays absent. Media access modes remain unchanged. Snapshot retains hardware type independently of media. |
-| Asset Needs | Test-generated small images/snapshots under build only; no owner media/config writes. Background tests avoid desktop interaction. Refresh only the two package EXEs. Task-owned build/t79-s2 diagnostics are bounded to 120 seconds/run and 10 MiB logs, with agent cleanup. |
-| Reporting Requirements | Before: plan and line estimate. After: counted production/test additions/deletions/net, focused/background results and both EXE links. Disclose snapshot layout change and manual acceptance remaining. |
-| Stop Conditions | Stop for a shared API, mirror behavior edit, new controller or user-media mutation need. Do not claim Win95 acceptance from BIOS-only tests. |
-| Exit Criteria | Approved bounded repair and tests complete; both Release packages and background suites pass; actual-change review, complete P committed/pushed; wait owner manual validation before closure. |
-| Original Owner Request | “队列第二位追加一个T任务，用于修复win95把软驱A盘识别为‘可移动磁盘’而不是软驱的故障，Td治理。” |
-| Similar-Issue Sweep | Map both floppy drives, all readonly/direct/overlay media modes, cold-reset and snapshot restoration routing; distinguish shared contract defects from Win95-only presentation. |
+| Verification | Guard-page or memory-check proof for 15-prefix/truncated immediate/ModRM/SIB/displacement; valid 14-prefix plus NOP; public API and U/XU behavior; strict C11 x86/x64, manifests/DAG, independent x86 tests and full background CTest, both package EXEs. |
+| Expected Markers | No byte-16 access or unbounded prefix loop; failure before access, valid original output unchanged; all direct fetch/skip paths accounted for. |
+| Asset Needs | No guest assets. Any S1 diagnostic lives under build/t80-s1, bounded to 120 seconds/run and 10 MiB output with agent cleanup. Desktop tests require a reserved window. |
+| Reporting Requirements | Before implementation audit report expected paths, additions/deletions/net; after execution actual counts, focused/background evidence, dual EXE links and uncovered-platform limits. |
+| Stop Conditions | Stop for public API redesign, altered valid instruction semantics, Core changes or an unrelated issue requiring expansion. S2 notification-failure design needs its own concrete review before implementation. |
+| Exit Criteria | S1 bounded repair, regression and similar-issue sweep complete; manifest/gates, x86/x64 packages, pushed complete P and actual-change review. T closure additionally requires all seven proposal rows and owner acceptance. |
+| Original Owner Request | “测试通过 可以收口t任务 准入下一个t”; queue proposal records “审计一下，lib/common/x86六组件代码质量” and “将上述置于队列首位，写入proposal”。 |
+| Similar-Issue Sweep | Enumerate fetch, skip, prefix and direct memory access paths plus assembly output bounds in existing xasm32; map public and debugger consumers, disposition each hit without duplicating decoders. |
 
 ## Current Technical Baseline
 
@@ -31,10 +31,9 @@
   packages, focused 7/7 per width, background x64 110/110 (178.87s) and x86
   110/110 (163.39s) pass; five desktop cases excluded. Empty/present snapshots
   pass both cross-width routes. The device stream adds eight identity bytes;
-  old-format snapshots are not accepted. Owner cold-boot Win95 validation
-  remains outstanding; S2/T79 stay open. Executor P1 `cba189b5` is pushed;
-  actual-change review accepts delivery for manual testing. Full ledger/hashes
-  and review are in the proposal. Unrelated queue/proposal edits are preserved.
+  old-format snapshots are not accepted. Owner reports testing passed and
+  approves S2/T79 closure. Executor `cba189b5`, review `b9413d65`; unchanged
+  artifact hashes and coverage are in [the closure audit](../history/M9-T79-completion-audit.md).
 - T78 S1 commit `0fb40f48` removes Common's direct integer-limit import and
   aligns the unsigned run-generation storage with its public `lib_u32`
   contract. Production/test C/H +52/-17 (net +35); no behavior or public ABI
@@ -112,6 +111,7 @@
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T79 | S1 investigation and S2 repair complete; owner testing passed and closure approved. | [Audit](../history/M9-T79-completion-audit.md) |
 | T78 | S1 complete; owner manual test accepted; Common type boundary closure. | [Audit](../history/M9-T78-completion-audit.md) |
 | T77 | S1--S3 complete; owner-authorized self-review closure; test ownership cleanup, isolated packages and dual-width acceptance. | [Audit](../history/M9-T77-completion-audit.md) |
 | T76 | Owner testing passed; S1 measurement cancelled by owner, S2/S3 complete; overlay index and snapshot compatibility accepted. | [Audit](../history/M9-T76-completion-audit.md) |
@@ -124,6 +124,10 @@
 | T69 | S1--S4 complete; reopened cleanup accepted. | [Audit](../history/M9-T69-completion-audit.md) |
 
 ## Recent Governance
+
+- T79 closes after owner manual acceptance; its proposal is archived. Queue
+  head is admitted as T80 S1; seven-step plan retained, XP rebase stays queued.
+  This handoff changes documentation only; accepted EXEs are unchanged.
 
 - T78 closure archives its proposal after owner manual acceptance. No active
   packet remains; queue candidates retain their original order until separately

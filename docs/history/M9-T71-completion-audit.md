@@ -27,7 +27,7 @@ not assert correctness of the entire emulator. No S11 is admitted.
 | Four bounded interface/layout corrections | [S10](M9-T71-S10-text-contract-cleanup.md): original fixed-80 destination copy, cursor normalization, request/context documentation, delete destroy alias. Final background 105/105 each; owner manual pass. |
 | Neutral text attributes | Separate [proposal, subsequently completed as T72](M9-T72-kvm-text-cell-glyph-refactor-proposal.md); not unfinished T71 implementation. No S11 started. |
 | Three former TODO observations | Owner explicitly retires tracking; [Td disposition](M9-Td-S18-t71-closure-and-floppy-queue.md). No false repair claim. |
-| New Win95 A: classification issue | New second-position [candidate](../proposals/m9-win95-floppy-drive-identification.md), not T71 regression proof or an admitted numeric task. |
+| New Win95 A: classification issue | New second-position [candidate](M9-T79-floppy-drive-identification-proposal.md), not T71 regression proof or an admitted numeric task at that time. |
 
 ## Final Changed-Path Accounting
 

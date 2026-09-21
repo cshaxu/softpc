@@ -3,7 +3,7 @@
 ## S1 — investigation complete
 
 Owner approved the repair after the S1 investigation and design in the
-[proposal](../proposals/m9-win95-floppy-drive-identification.md).
+[proposal](M9-T79-floppy-drive-identification-proposal.md).
 Commits f33d49c2 and f6dadddd contain the evidence and design. Both-width
 probes establish that empty media incorrectly removes physical A: identity;
 the original BIOS consumes those wrong host facts. Production/test +0/-0.

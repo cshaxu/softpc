@@ -5,6 +5,6 @@ allocates a numeric task identifier.
 
 1. [XP SP1 SoftPC mirror rebase](../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
 
-T79 S1 has admitted the former queue head for evidence-first investigation:
-[floppy drive identification proposal](../proposals/m9-win95-floppy-drive-identification.md).
-The remaining candidate retains its order; no other candidate is active.
+T79 is closed after owner acceptance. The former head is admitted as T80 S1:
+[shared-corpus proposal](../proposals/m9-shared-corpus-boundary-and-simplification.md).
+Only CURRENT owns active work; the remaining candidate is not admitted.

@@ -14,7 +14,7 @@ Execution/documentation governance skills and repository rules apply.
 | --- | --- |
 | Clear every TODO | Three entries retired as owner decision; no repair or non-reproducibility claim. |
 | Close T71 | Separate [T-level audit](M9-T71-completion-audit.md) maps S1--S10, owner acceptance, changed paths and final evidence. |
-| New issue second in queue | [Floppy proposal](../proposals/m9-win95-floppy-drive-identification.md); unnumbered and not admitted. Existing head unchanged, later candidates shift down. |
+| New issue second in queue | [Floppy proposal](M9-T79-floppy-drive-identification-proposal.md); unnumbered and not admitted at that time. Existing head unchanged, later candidates shift down. |
 | Td governance | Archive completed regression brief with git mv, repair direct references, update sole current authority; no source/artifact change. |
 
 ## Retired Tracking, Not Repairs

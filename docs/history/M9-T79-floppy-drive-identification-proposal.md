@@ -1,5 +1,9 @@
 # Win95 A: Floppy Drive Identification Repair
 
+Archived on owner acceptance: S1/S2 and T79 are closed. Historical pending
+statements below describe their original recording time; the final disposition
+is in [the completion audit](M9-T79-completion-audit.md).
+
 ## T79 Admission And Request Boundary
 
 Owner: "队列第二位追加一个T任务，用于修复win95把软驱A盘识别为
