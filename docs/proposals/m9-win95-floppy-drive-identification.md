@@ -276,6 +276,19 @@ pre-existing unrelated Queue/shared-audit-proposal edits are preserved and
 excluded from this P. Disposable cross-width images/snapshots are removed by
 the matrix runner; only normal ignored build/test outputs remain.
 
-Documentation governance and `git diff --check` pass. The complete executor
-delivery is ready for commit/push and subsequent actual-change review;
-S2/T79 stay open for owner validation, not closed by these background results.
+Documentation governance and `git diff --check` pass. Executor P1 `cba189b5`
+is pushed to origin/main. S2/T79 stay open for owner validation, not closed
+by these background results.
+
+### Coordinator actual-change review
+
+After P1 push, reviewed `git show cba189b5` and the actual source changes,
+the original request, packet, matrix evidence and EXE hashes. All 14 paths
+are accounted for: three production, five test/script, two binaries and four
+design/governance documents. No shared source/test, original mirror, INI or
+guest-media edits are present. The physical identity has one owner; archive
+hooks reuse that owner and add no second controller or media path. The old
+snapshot limitation and unperformed GUI acceptance remain explicit.
+
+Implementation delivery is accepted for manual testing, not S/T closure.
+Only the previously existing unrelated queue/proposal edits remain unstaged.

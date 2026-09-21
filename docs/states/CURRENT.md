@@ -32,7 +32,9 @@
   110/110 (163.39s) pass; five desktop cases excluded. Empty/present snapshots
   pass both cross-width routes. The device stream adds eight identity bytes;
   old-format snapshots are not accepted. Owner cold-boot Win95 validation
-  remains outstanding; S2/T79 stay open. Full ledger/hashes are in the proposal.
+  remains outstanding; S2/T79 stay open. Executor P1 `cba189b5` is pushed;
+  actual-change review accepts delivery for manual testing. Full ledger/hashes
+  and review are in the proposal. Unrelated queue/proposal edits are preserved.
 - T78 S1 commit `0fb40f48` removes Common's direct integer-limit import and
   aligns the unsigned run-generation storage with its public `lib_u32`
   contract. Production/test C/H +52/-17 (net +35); no behavior or public ABI
