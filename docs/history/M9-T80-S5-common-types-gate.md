@@ -40,5 +40,13 @@ No native Linux or downstream integration claim. INI and media untouched.
 
 ## Actual-change review
 
-Record coordinator review of the pushed executor diff before acceptance.
-Owner manual testing remains the S5 closure gate.
+Executor `c7c42ea5` is pushed. The same session switched to coordinator and
+reviewed `git diff 0be6a12c..c7c42ea5`: one runtime source, one existing checker,
+one existing test script, two manifests, five task documents and two package
+EXEs, twelve paths total. The seven runtime edits are direct macro aliases,
+not changed timeouts; source/build edge checks remain in the existing checker.
+Negative and positive cases exercise the removed allowlist and raw-limit gate.
+No unrelated source, public ABI, INI or media changed. Counts and package
+hashes match the proposal, isolated outputs are removed, final documentation
+governance passes. No remaining implementation gap found within the frozen
+S5 boundary. Owner manual testing remains the S5 closure gate; T80 stays open.

@@ -18,6 +18,8 @@ records S5 scope, estimates, finite sweep and artifact evidence. T80 stays open.
   pass on both widths, strict C11; all 180/205 copied files remain identical.
   Desktop tests excluded; no Linux runtime claim. Isolated task outputs removed;
   package EXEs refreshed; Lib/Core/x86, INI/media unchanged. S5 awaits owner.
+  Executor `c7c42ea5` pushed; actual-change review retained in
+  [S5 evidence](../history/M9-T80-S5-common-types-gate.md).
 
 - S4: frame publication skips 0 on u32 wrap; Session's two ordering sites share
   one private modular comparator. Production +16/-4 (net +12), tests +69/-0;
