@@ -5,9 +5,9 @@
 Owner: “测试通过 可以收口t任务 准入下一个t”, then “开始执行”.
 The admitted [proposal](../proposals/m9-shared-corpus-boundary-and-simplification.md)
 owns the seven-row plan and S1 pre-change estimate, finite sweep and evidence.
-Baseline `295c6963`; executor `73a5a889` is pushed. S1 is implemented and verified,
-awaiting owner testing; neither S1 nor T80 is declared owner-accepted here.
-S2--S7 have not started.
+Baseline `295c6963`; executor `73a5a889` and review `f4941481` are pushed.
+Owner subsequently requests “收口s1 准入s2”. S1 is accepted and closed;
+T80 remains open, and S2 is admitted through CURRENT.
 
 ## Actual-change review
 
@@ -47,6 +47,7 @@ the additional confirmed F1 hole and write-boundary sweep.
   Task-owned diagnostic/independent-build children were removed after process
   completion; only normal build trees and package EXEs remain.
 
-No remaining in-scope implementation gap found by this review. Wait for the
-owner's manual result before the next S; do not infer whole-library correctness
-from the bounded S1 proof.
+No remaining in-scope implementation gap found by this review. Owner closure
+approval completes S1 acceptance; this does not infer whole-library correctness
+from the bounded S1 proof. Closure/admission changes documents only, preserving
+the accepted EXEs and their hashes.

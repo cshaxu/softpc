@@ -2,16 +2,34 @@
 
 ## Current Work
 
-No implementation subtask is active.
+## M9 T80 S2 Packet
 
-Open task awaiting owner: T80.
-
-S1 executor `73a5a889` is pushed and actual-change reviewed. Both Release EXEs,
-independent x86 10/10 per width, and background x64/x86 111/111 pass.
-Await owner testing before closing S1 or admitting S2; T80 remains open.
-Evidence: [S1 review](../history/M9-T80-S1-xasm32-boundary.md).
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approves S1 closure and S2 admission. Begin with notification-failure design audit; preserve the proposal's interface-review checkpoint. |
+| Objective | Handle Common request/queue reset, signal and completion failures without false acceptance, replay, indefinite waiting or premature release of borrowed caller data. |
+| Non-goals | No second executor, queue, event channel, polling retry or duplicated cleanup; no Core/x86/media/snapshot-format changes. S3--S7 remain unstarted. |
+| Reference Baseline | `f4941481`, owner-accepted S1; executor `73a5a889`. |
+| Candidate Proposal | [Shared corpus boundary and simplification](../proposals/m9-shared-corpus-boundary-and-simplification.md), S2. |
+| Files And ABI Surface | Audit src/common/session/control.c and src/common/machine/machine.c, their private/public contracts, existing Lib Base wait/cancel contracts and test/common. Freeze exact changed paths and added/removed/net estimate after audit, before implementation. |
+| Applicable Rules | docs/rules/{EXECUTION,ARCHITECTURE,CODING,DOCUMENT}.md and docs/design/{ARCHITECTURE,CODING,UI}.md; shared governance skills and AGENTS.md. |
+| Verification | Deterministic reset/submission-signal/completion-signal faults; rejected work never executes, accepted work never replays, borrowed data survives worker quiescence. Retain paused/debug-close shutdown regression; strict C11 independent Common and product x86/x64 background tests, manifests/DAG, dual EXEs. |
+| Expected Markers | Enumerated submission/wake/completion/exit paths each have an explicit failure and ownership disposition; normal behavior unchanged. |
+| Asset Needs | No guest assets or desktop interaction for design audit. If needed, task diagnostics under build/t80-s2 only, 120 seconds/run and 10 MiB output; agent owns process cleanup. Preserve INI and media. |
+| Reporting Requirements | Report concrete design and per-path estimate before code; after code report actual additions/deletions/net, focused/full coverage, limits and dual EXE links. This admission changes no production code. |
+| Stop Conditions | If existing wait/cancel contracts cannot safely express notification failure, report the minimal public-interface change and obtain owner approval before implementing it. Stop for unrelated scope or added parallel state/protocol. |
+| Exit Criteria | Complete finite path ledger, required tests, pushed executor P and actual-change review; then wait for owner testing before next S. T80 stays open. |
+| Original Owner Request | “收口s1 准入s2”; original proposal requests audit and repair of shared-corpus quality issues. |
+| Similar-Issue Sweep | Enumerate all Common event reset/signal/wait/cancel call sites, including lifecycle, media, debug, snapshot and terminal cleanup; distinguish not-yet-accepted work from executor-owned or completed work. |
 
 ## Current Technical Baseline
+
+- T80 S1 is owner-accepted and closed: production +11/-2 (net +9), tests/build
+  +149/-0; public API and debugger callers unchanged. Executor `73a5a889`,
+  review `f4941481`; strict C11 isolated x86 10/10 and background 111/111 on
+  each width. Five desktop cases excluded each; no Linux runtime claim.
+  [S1 review](../history/M9-T80-S1-xasm32-boundary.md) and proposal retain hashes.
 
 - T79 S2 implements independent GFI physical identity and media lifetime.
   Production +56/-23 (net +33), tests/scripts +187/-37 (net +150); three
@@ -112,6 +130,9 @@ Evidence: [S1 review](../history/M9-T80-S1-xasm32-boundary.md).
 | T69 | S1--S4 complete; reopened cleanup accepted. | [Audit](../history/M9-T69-completion-audit.md) |
 
 ## Recent Governance
+
+- Owner closes T80 S1 and admits S2's notification-failure design audit.
+  Handoff is document-only; accepted EXEs unchanged; T80 remains open.
 
 - T79 closes after owner manual acceptance; its proposal is archived. Queue
   head is admitted as T80 S1; seven-step plan retained, XP rebase stays queued.
