@@ -2,28 +2,19 @@
 
 ## Current Work
 
-## M9 T80 S3 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner approves S2 closure, then requests next S admission. S2 is an accepted narrowed audit, not a native-fault recovery implementation. |
-| Objective | Reject a new physical key before downstream delivery when the fixed Session pressed-key ledger is full; repeated make of an existing key remains admissible. |
-| Non-goals | No capacity growth, dynamic ledger, new state machine or public API. No Lib/Core/x86 changes; S4--S7 remain unstarted. |
-| Reference Baseline | Production remains at 1b5d0fd7; S2 changes documentation only. |
-| Candidate Proposal | [Shared corpus boundary and simplification](../proposals/m9-shared-corpus-boundary-and-simplification.md), S3. |
-| Files And ABI Surface | src/common/session/control.c; test/common/physical_key_identity_smoke.c; corresponding manifests and task evidence. Public ABI unchanged. |
-| Applicable Rules | docs/rules/{EXECUTION,ARCHITECTURE,CODING,DOCUMENT}.md; docs/design/{ARCHITECTURE,CODING,UI}.md; shared governance skills and AGENTS.md. |
-| Verification | Fixed-capacity boundary, existing-key repeats at capacity, new key/source rejection without downstream make, release/reuse and source-retirement cleanup; strict C11 and background x86/x64 tests, manifests/DAG and dual EXEs. |
-| Expected Markers | A failed remember operation returns failure before sink invocation; rejected keys never require synthetic release; existing identity semantics unchanged. |
-| Asset Needs | No guest media mutation or desktop interaction for focused tests. Preserve user INI and media; standard background test presets. |
-| Reporting Requirements | Estimate production +5/-3 net +2; tests +60--90/-0. Report actual added/deleted/net source and test counts, verification and dual EXE links. |
-| Stop Conditions | Stop for changed physical-key identity, capacity, threading/public ABI or unrelated fault-recovery requirements. |
-| Exit Criteria | Implementation, focused and dual-width regression, complete executor P push and actual-change review; wait for owner testing before closure/next S. T80 remains open. |
-| Original Owner Request | “批准收口” S2, then “下一个s任务准入”. |
-| Similar-Issue Sweep | Review remember/forget/dispatch/source retirement and existing Session failure consumer; distinguish new keys, repeats and releases across sources. |
+No implementation subtask is active.
+Open task awaiting owner: T80.
+S3 is implemented and verified, awaiting owner testing, not closed. S4--S7
+remain unstarted. See the [proposal](../proposals/m9-shared-corpus-boundary-and-simplification.md)
+and [S3 record](../history/M9-T80-S3-pressed-key-capacity.md).
 
 ## Current Technical Baseline
+
+- S3: production +6/-4 net +2, tests +56/-0; reject an unrecordable new key
+  before machine delivery, retaining original repeat/identity/retirement logic.
+  Both Release builds and background suites pass: x64 111/111 (141.46 s),
+  x86 111/111 (140.30 s). Five desktop tests excluded per width; no Linux run.
+  Package EXEs refreshed; hashes and finite sweep are in the proposal.
 
 - S2 audit baseline `1b5d0fd7`: production/tests +0/-0, existing EXEs unchanged.
   Existing Common suites pass 18/18 per width; three focused cases pass twenty
