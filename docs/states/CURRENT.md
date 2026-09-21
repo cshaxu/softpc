@@ -21,6 +21,8 @@ and per-path evidence. No T-level closure is implied.
   (173.24s), x86 111/111 (160.81s); five desktop tests excluded per width,
   no Linux execution. Manifests/DAG and final documentation gate pass.
   Standard EXEs refreshed; hashes in the proposal, INI/media unchanged.
+  Executor `478d04ec` pushed; actual-change review recorded in
+  [S4 evidence](../history/M9-T80-S4-frame-sequence-wrap.md). Await owner test.
 
 - S3: production +6/-4 net +2, tests +56/-0; reject an unrecordable new key
   before machine delivery, retaining original repeat/identity/retirement logic.

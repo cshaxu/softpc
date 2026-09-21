@@ -35,5 +35,17 @@ Desktop interaction and Linux execution are not claimed.
 
 ## Actual-change review
 
-The executor delivery must be pushed before the coordinator's actual Git
-diff review is recorded here. Owner testing remains the closure gate.
+Executor `478d04ec` is pushed. The same session then switched to coordinator
+and reviewed `git diff 3284fd89..478d04ec`: four production files, three tests,
+two manifests, four task documents and two package EXEs, fifteen paths total.
+The sole publisher retains its lock and state ownership; both ordering sites
+share one private helper. Run filtering and UI equality remain intact; no
+unapproved public interface or other component changed. The half-range limit
+is explicit in code and proposal, not hidden behind an unlimited-wrap claim.
+
+Focused 3/3 per width and full background x64 111/111 (173.24s), x86 111/111
+(160.81s) pass. Five desktop tests per width were excluded. Strict Common C11,
+six manifests, component checks and documentation governance pass. Binary
+hashes match the proposal and sizes match S3; INI/media remain untouched.
+No admitted implementation gap found in this bounded review. Owner testing
+remains the closure gate; S4/T80 are open and S5 is not admitted.
