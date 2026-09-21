@@ -2,11 +2,26 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T80.
-S3 is implemented and verified, awaiting owner testing, not closed. S4--S7
-remain unstarted. See the [proposal](../proposals/m9-shared-corpus-boundary-and-simplification.md)
-and [S3 record](../history/M9-T80-S3-pressed-key-capacity.md).
+## M9 T80 S4 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner requests “收口s3准入s4”; S3 accepted, S4 admitted for sequence-contract audit and repair. |
+| Objective | Keep complete-frame delivery working across u32 sequence wrap, retaining stale/duplicate filtering and run separation. |
+| Non-goals | No widened public fields, new frame cache, queue or presenter route; no Lib/Core/x86 or snapshot-format changes. S5--S7 remain unstarted. |
+| Reference Baseline | 2cd9e889; accepted S3 executor aea41c16. |
+| Candidate Proposal | [Shared corpus boundary and simplification](../proposals/m9-shared-corpus-boundary-and-simplification.md), S4. |
+| Files And ABI Surface | Audit common/machine/{machine.c,frame_interface.h}, common/session/{session.c,control_state.c}, common/ui/ui.c and existing frame/reducer tests. Freeze exact changed paths after sequence audit; preserve public field widths. |
+| Applicable Rules | docs/rules/{EXECUTION,ARCHITECTURE,CODING,DOCUMENT}.md and docs/design/{ARCHITECTURE,CODING,UI}.md; shared governance skills and AGENTS.md. |
+| Verification | Deterministic wrap, zero/initial sequence, duplicate/stale notice, latest-wins skips, restart/run mismatch and new presenter cases; strict C11, background x86/x64 regression, manifests/DAG and dual EXEs. |
+| Expected Markers | One consistent sequence-order contract at publication and acceptance; no reset-all workaround and no dependence on upstream dirty history. |
+| Asset Needs | No guest asset changes; background tests only unless separately arranged. Preserve user INI and media. |
+| Reporting Requirements | Preliminary production about four files +20--30/-5--10, net +10--25; tests +80--140/-0. Confirm algorithm assumptions and estimate before code; report actual changes and test links after delivery. |
+| Stop Conditions | Stop if bounded modular ordering cannot preserve the actual delivery contract, or wider ABI/new state is required; present the alternative before implementation. |
+| Exit Criteria | Finite sequence-use ledger, implementation and required tests, pushed complete executor P, actual-change review; await owner testing before closing S4 or starting S5. |
+| Original Owner Request | “收口s3准入s4”. |
+| Similar-Issue Sweep | Enumerate sequence generation, zero sentinels, ordering/equality, run generation and presenter recreation across Machine/Session/UI; record each disposition. |
 
 ## Current Technical Baseline
 
@@ -15,7 +30,7 @@ and [S3 record](../history/M9-T80-S3-pressed-key-capacity.md).
   Both Release builds and background suites pass: x64 111/111 (141.46 s),
   x86 111/111 (140.30 s). Five desktop tests excluded per width; no Linux run.
   Package EXEs refreshed; hashes and finite sweep are in the proposal.
-  Executor `aea41c16` pushed and actual changed paths reviewed; awaiting owner.
+  Executor `aea41c16`, review `2cd9e889`; owner accepts and closes S3.
 
 - S2 audit baseline `1b5d0fd7`: production/tests +0/-0, existing EXEs unchanged.
   Existing Common suites pass 18/18 per width; three focused cases pass twenty
@@ -128,6 +143,9 @@ and [S3 record](../history/M9-T80-S3-pressed-key-capacity.md).
 | T69 | S1--S4 complete; reopened cleanup accepted. | [Audit](../history/M9-T69-completion-audit.md) |
 
 ## Recent Governance
+
+- Owner closes T80 S3 and admits S4. Document-only handoff preserves tested
+  package EXEs; T80 remains open.
 
 - Owner approves T80 S2 closure after the narrowed audit, then admits S3.
   Document-only handoff preserves the accepted binaries; T80 stays open.

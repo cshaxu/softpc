@@ -4,8 +4,9 @@
 
 Owner admitted the next S after S2 closure, then said “批准修复”. Baseline
 `df7d8704`; the [proposal](../proposals/m9-shared-corpus-boundary-and-simplification.md)
-contains the pre-change estimate and finite similar-issue ledger. S3 remains
-open for owner testing; S4 is not admitted.
+contains the pre-change estimate and finite similar-issue ledger. After delivery,
+the owner requests “收口s3准入s4”: S3 is accepted and closed, S4 separately
+admitted through CURRENT. T80 remains open.
 
 The Session ledger still owns exactly 256 physical-key entries. The existing
 remember function now returns success/failure, and the existing dispatcher
@@ -46,4 +47,4 @@ failure reaches existing cleanup. No public ABI or out-of-scope source changed.
 Background x64 111/111 (141.46 s), x86 111/111 (140.30 s), manifests and final
 documentation governance pass. Package hashes match the proposal; INI/media
 remain unchanged. No remaining admitted implementation gap found in this
-bounded review. S3 awaits owner test; no automatic S/T closure is authorized.
+bounded review. Owner acceptance now closes S3; no T-level closure is inferred.
