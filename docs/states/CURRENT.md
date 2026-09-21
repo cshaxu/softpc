@@ -3,13 +3,23 @@
 ## Current Work
 
 No implementation subtask is active.
-Open task awaiting owner: T80. S5 is accepted for continuation by the owner's
-S6 admission, without a separate manual-test claim. S6 implementation and
-verification are complete; S6 awaits owner testing, S7 is not admitted.
+Open task awaiting owner: T80. S6 is owner-closed. S7 implementation and
+verification are complete; S7 awaits owner acceptance. T80 remains open.
 The [proposal](../proposals/m9-shared-corpus-boundary-and-simplification.md)
-records scope, finite sweep, footprint and artifact evidence. T80 stays open.
+records the approved minimal design, finite sweep, counts and test evidence.
 
 ## Current Technical Baseline
+
+- S7 shares one internal write algorithm; ordinary write flushes on success,
+  nonempty DIRECT fill flushes once even after partial failure, preserving the
+  first error. No public signature, platform, cache or rollback change.
+  Production +23/-7 (net +16; three added comment lines), tests +88/-0;
+  combined +111/-7 (net +104). Strict shared C11 dual Release builds pass.
+  Background x64 111/111 (214.52s), x86 111/111 (194.39s); standalone Lib
+  41/41 per width (60.92/63.05s). Desktop excluded; no Linux runtime claim.
+  Six manifests/DAG pass; task scratch removed, EXEs refreshed; INI/media and
+  Common/x86/Core unchanged. [S7 evidence](../history/M9-T80-S7-storage-fill.md)
+  records actual-change review; S7 awaits owner acceptance.
 
 - S6 moves 512 fixed disassembler handlers to file-local const tables; parsing
   context remains per-call. Production +520/-521 (net -1), tests +42/-0;
@@ -17,7 +27,7 @@ records scope, finite sweep, footprint and artifact evidence. T80 stays open.
   Strict C11 Release builds and background x64 111/111 (177.48s), x86 111/111
   (169.15s) pass; standalone x86 suites 10/10 per width. Five desktop tests
   excluded per product width; no Linux run. Temporary task outputs removed.
-  EXEs refreshed, INI/media and Lib/Common/Core unchanged. S6 awaits owner;
+  EXEs refreshed, INI/media and Lib/Common/Core unchanged. Owner closes S6;
   Executor `5d0515fd` pushed;
   [S6 evidence](../history/M9-T80-S6-xasm32-dispatch.md) records actual review.
 
@@ -161,6 +171,9 @@ records scope, finite sweep, footprint and artifact evidence. T80 stays open.
 | T69 | S1--S4 complete; reopened cleanup accepted. | [Audit](../history/M9-T69-completion-audit.md) |
 
 ## Recent Governance
+
+- Owner closes T80 S6, admits S7 and approves its narrowed one-write-algorithm
+  design. S7 delivered for acceptance; T80 not closed automatically.
 
 - Owner admits T80 S6 after S5 delivery. S6 delivered for testing; S7 remains
   unadmitted. No separate S5 manual-test result is inferred.

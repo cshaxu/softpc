@@ -89,4 +89,6 @@ new output. Counts, strict builds, complete background/standalone results
 and package hashes match the recorded evidence. Public headers, Lib/Common/
 Core, INI and media untouched; temporary outputs removed. Final documentation
 gate passes. No remaining implementation gap found in the frozen S6 scope.
-Owner S6 testing remains pending; S6/T80 are not closed and S7 is not admitted.
+At delivery S6 testing remained pending. The owner subsequently requests
+“收口S6，准入S7，预估diff规模，完成后编译测试提交推送。”
+S6 is now owner-closed; T80 remains open and S7 proceeds.
