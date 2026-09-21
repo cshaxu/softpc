@@ -2,6 +2,7 @@
 #include "core/machine/snapshot.h"
 #include "core/compat/ccpu/archive.h"
 #include "core/compat/media_snapshot.h"
+#include "core/compat/devices/snapshot.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -331,7 +332,8 @@ static int snapshot_run_transaction(void)
     return 0;
 }
 
-static int snapshot_run_save(const char *media_path, const char *snapshot_path)
+static int snapshot_run_save(const char *media_path, const char *snapshot_path,
+    lib_bool empty)
 {
     softpc_machine_options options;
     common_machine_driver description = { 0 };
@@ -354,6 +356,13 @@ static int snapshot_run_save(const char *media_path, const char *snapshot_path)
     assert(common_machine_pause(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_PAUSED));
     assert(snapshot_media_bytes(LIB_TRUE, LIB_FALSE));
+    if (empty)
+        assert(softpc_machine_set_floppy(product, NULL,
+            LIB_STORAGE_MEDIUM_OVERLAY) == SOFTPC_MACHINE_OK);
+    /* A non-default hardware profile must survive both a different media
+       format and an empty media slot, including cross-process/width load. */
+    assert(softpc_device_snapshot_restore_floppy_host(
+        &(softpc_device_floppy_host_state){{3u, 0u}}));
     assert(common_machine_resume(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
     assert(common_machine_read_state(machine,
@@ -368,7 +377,7 @@ static int snapshot_run_save(const char *media_path, const char *snapshot_path)
 }
 
 static int snapshot_run_load(const char *startup_media_path, const char *snapshot_path,
-    lib_bool expect_success)
+    lib_bool expect_success, lib_bool empty)
 {
     softpc_machine_options options;
     common_machine_driver description = { 0 };
@@ -414,7 +423,15 @@ static int snapshot_run_load(const char *startup_media_path, const char *snapsho
         assert(frame.window.valid != 0u);
     }
     assert(snapshot_has_pixels(machine, 0x0c));
-    assert(snapshot_media_bytes(LIB_FALSE, LIB_FALSE));
+    {
+        softpc_device_floppy_host_state floppy;
+        softpc_media_view media;
+        softpc_device_snapshot_capture_floppy_host(&floppy);
+        assert(floppy.drive_type[0] == 3u && floppy.drive_type[1] == 0u);
+        softpc_floppy_media_view(0, &media);
+        if (empty) assert(media.medium == NULL);
+        else assert(snapshot_media_bytes(LIB_FALSE, LIB_FALSE));
+    }
     assert(common_machine_resume(machine));
     assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
     {
@@ -443,11 +460,15 @@ int main(int argc, char **argv)
 {
     if (argc == 1) return snapshot_run_transaction();
     if (argc == 4 && strcmp(argv[1], "save") == 0)
-        return snapshot_run_save(argv[2], argv[3]);
+        return snapshot_run_save(argv[2], argv[3], LIB_FALSE);
+    if (argc == 4 && strcmp(argv[1], "save-empty") == 0)
+        return snapshot_run_save(argv[2], argv[3], LIB_TRUE);
     if (argc == 4 && strcmp(argv[1], "load") == 0)
-        return snapshot_run_load(argv[2], argv[3], LIB_TRUE);
+        return snapshot_run_load(argv[2], argv[3], LIB_TRUE, LIB_FALSE);
+    if (argc == 4 && strcmp(argv[1], "load-empty") == 0)
+        return snapshot_run_load(argv[2], argv[3], LIB_TRUE, LIB_TRUE);
     if (argc == 4 && strcmp(argv[1], "load-mismatch") == 0)
-        return snapshot_run_load(argv[2], argv[3], LIB_FALSE);
+        return snapshot_run_load(argv[2], argv[3], LIB_FALSE, LIB_FALSE);
     fprintf(stderr, "usage: %s [save|load media snapshot]\n", argv[0]);
     return 1;
 }

@@ -2,35 +2,37 @@
 
 ## Current Work
 
-## M9 T79 S1 Packet
+## M9 T79 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner approved T78 closure and directed admission of the next queued T task. Queue head `Win95 A: floppy drive identification repair` is admitted as T79 S1. |
-| Objective | Establish a reproducible, evidence-backed cause for Win95 identifying emulated A: as a generic removable disk rather than the configured floppy drive; identify the first incorrect device contract and its owner. |
-| Non-goals | No repair, guest-label workaround, Win95-version branch, Lib/Common change, Core mirror edit, user INI/media write, or snapshot/config redesign in S1. No inference that wording alone proves a hardware fault. |
-| Reference Baseline | `8f59c184`, clean worktree; T78 closed. [T79 proposal](../proposals/m9-win95-floppy-drive-identification.md). |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approved the S1 repair design and requested S admission, implementation, dual-width build/test, commit/push and a wait for manual validation. S1 is complete; S2 is admitted. |
+| Objective | Separate physical floppy identity from inserted media in the existing GFI host adapter; retain empty A:, absent B:, stable hardware type across insert/eject/reset and snapshots. |
+| Non-goals | No guest-label workaround, Win95-specific branch, shared-corpus or Core mirror edit, user INI/media write, new controller or snapshot compatibility layer. |
+| Reference Baseline | `f6dadddd`; unrelated queue/proposal edits are preserved and excluded. [S1 record](../history/M9-T79-S1-investigation.md). |
 | Candidate Proposal | [Win95 A: floppy drive identification repair](../proposals/m9-win95-floppy-drive-identification.md). |
-| Files And ABI Surface | Read-only mapping of `src/core/{machine,compat,softpc.new}`, media configuration and existing tests. Disposable diagnostic harnesses may call the existing Core interfaces; no tracked production/test or ABI changes. |
+| Files And ABI Surface | Core compat GFI lifecycle and device archive, existing Core tests and snapshot integration tests. Private physical-identity snapshot fields; no shared API change. |
 | Applicable Rules | `docs/rules/{EXECUTION,ARCHITECTURE,CODING,DOCUMENT}.md`, `docs/design/{ARCHITECTURE,CODING,UI}.md`, and the Core mirror boundary in `AGENTS.md`. |
-| Verification | Static trace from configuration through VM/Compat/Core/BIOS/controller contracts; classify present/absent-media and cold-boot/snapshot paths. Any dynamic reproduction first uses an explicitly declared disposable overlay and must preserve owner assets. |
-| Expected Markers | A finite path ledger distinguishes physical floppy type, CMOS/equipment metadata, BIOS/disk service identity, controller behavior and shell-only wording; each path receives evidence or a stated next receiver. |
-| Asset Needs | Owner supplied Win95 snapshot/image for diagnosis. Use read-only inspection and overlay-backed test instances only. Task-owned `build/t79-s1/` holds diagnostic harnesses, executables and disposable fixtures; no original-image/config changes. Bound each run to 120 seconds and diagnostic output to 10 MiB; the current agent owns process cleanup and records retained results in the task evidence before removing disposable files. |
-| Reporting Requirements | Report source paths, expected vs actual contract, reproduction evidence status, possible owners, and exact repair scope/line estimate. Do not claim a fix or broad hardware conformance from S1. |
-| Stop Conditions | Stop before runtime interaction without a disposable-media plan; stop for an observed guest-only label/configuration issue, a Lib/Common/API need, or no reproducible contract discrepancy. |
-| Exit Criteria | Evidence packet names the first incorrect or still-unproven contract, bounded repair candidates and verification matrix; it has no code P and waits for owner approval of any repair S. |
+| Verification | Both-width empty/present BIOS identity, media modes/profiles, insert/eject/reset/destroy, no-media FDC response and snapshot roundtrip; full background CTest and Release x86/x64 packages. Owner cold-boots Win95 for GUI acceptance. |
+| Expected Markers | Empty boot and eject/reset retain A: type and equipment presence. B stays absent. Media access modes remain unchanged. Snapshot retains hardware type independently of media. |
+| Asset Needs | Test-generated small images/snapshots under build only; no owner media/config writes. Background tests avoid desktop interaction. Refresh only the two package EXEs. Task-owned build/t79-s2 diagnostics are bounded to 120 seconds/run and 10 MiB logs, with agent cleanup. |
+| Reporting Requirements | Before: plan and line estimate. After: counted production/test additions/deletions/net, focused/background results and both EXE links. Disclose snapshot layout change and manual acceptance remaining. |
+| Stop Conditions | Stop for a shared API, mirror behavior edit, new controller or user-media mutation need. Do not claim Win95 acceptance from BIOS-only tests. |
+| Exit Criteria | Approved bounded repair and tests complete; both Release packages and background suites pass; actual-change review, complete P committed/pushed; wait owner manual validation before closure. |
 | Original Owner Request | “队列第二位追加一个T任务，用于修复win95把软驱A盘识别为‘可移动磁盘’而不是软驱的故障，Td治理。” |
 | Similar-Issue Sweep | Map both floppy drives, all readonly/direct/overlay media modes, cold-reset and snapshot restoration routing; distinguish shared contract defects from Win95-only presentation. |
 
 ## Current Technical Baseline
 
-- T79 S1 identifies the Core GFI host adapter's conflation of physical drive
-  existence and media presence. Both-width probes reproduce zero BIOS drive
-  identity at empty boot, stale identity after insertion, and reset-dependent
-  correction. The supplied snapshot has diskette-present=0. The proposal
-  records the repair and snapshot-format consequence; no production code was
-  changed and Win95 repaired cold-boot acceptance remains outstanding.
+- T79 S2 implements independent GFI physical identity and media lifetime.
+  Production +56/-23 (net +33), tests/scripts +187/-37 (net +150); three
+  production files, no shared-corpus or Core mirror changes. Both Release
+  packages, focused 7/7 per width, background x64 110/110 (178.87s) and x86
+  110/110 (163.39s) pass; five desktop cases excluded. Empty/present snapshots
+  pass both cross-width routes. The device stream adds eight identity bytes;
+  old-format snapshots are not accepted. Owner cold-boot Win95 validation
+  remains outstanding; S2/T79 stay open. Full ledger/hashes are in the proposal.
 - T78 S1 commit `0fb40f48` removes Common's direct integer-limit import and
   aligns the unsigned run-generation storage with its public `lib_u32`
   contract. Production/test C/H +52/-17 (net +35); no behavior or public ABI

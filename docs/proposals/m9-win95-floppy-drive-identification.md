@@ -165,3 +165,117 @@ Disposable probes only read original media and decode the supplied snapshot;
 no guest installation, package INI, original image or snapshot was altered.
 Tracked production/test diff is +0/-0. Temporary probe code/binaries are
 removed after recording the results. No GUI test or repair is claimed.
+
+## S2 admitted repair ledger
+
+Owner approved the above repair. Estimate: production +70..110/-25..45
+(net approximately +45..65), tests +90..160/-5..20. Counts exclude docs/EXEs.
+Use the existing GFI object and device-archive codec, not a new owner or API.
+
+| Frozen path | Required disposition/proof |
+| --- | --- |
+| First hardware init | Default empty A: type 4; initial image profiles retained; B absent. |
+| Insert/replace/eject | Medium geometry/mode may change; physical type remains stable. |
+| Empty commands | Ready false, no-data errors; seek/recalibrate remain drive operations. |
+| Reset/destroy | Reset preserves hardware/media; destroy alone removes GFI identity. |
+| Snapshot | Canonical fixed-width physical identity independent of media-present flags; new-format cross-width and empty/non-default roundtrip. |
+| BIOS consumer | Correct empty equipment/CMOS/INT13 identity without modifying BIOS. |
+| Integration | Existing DOS/device/snapshot regression both widths; owner cold-boot Win95 validation remains required. |
+
+Completion requires every row evidenced, no shared/mirror edits and a pushed
+dual-width P. S2 waits for owner testing; T79 remains open.
+
+## S2 implementation and verification record
+
+The existing attach call initializes physical A once and thereafter replaces
+only its medium/geometry. Only hardware teardown removes the GFI callbacks.
+The geometry helper no longer writes drive_type, including during snapshot
+media restoration. Existing Machine callers need no changes. The device
+archive stores two canonical u32 drive types (eight wire bytes), independently
+of its media archive. No version tag or old-format fallback was added.
+
+### Changed-path accounting
+
+Measured with `git diff --numstat f6dadddd -- src test`, excluding docs/EXEs:
+
+| Path | Added | Removed | Net | Retained responsibility |
+| --- | ---: | ---: | ---: | --- |
+| core/compat/gfi_image.c | 40 | 23 | +17 | Existing GFI host drive/media lifecycle and callbacks. |
+| core/compat/devices/snapshot.h | 7 | 0 | +7 | Private fixed-width physical type record. |
+| core/compat/devices/archive.c | 9 | 0 | +9 | Existing capture/restore and canonical codec. |
+| test/core/fdc_smoke.c | 112 | 2 | +110 | Empty/insert/eject/reset/destroy, modes and physical profiles. |
+| test/core/machine_smoke.c | 2 | 2 | 0 | Correct HDD-only equipment expectation; real INT11 boot path. |
+| test/core/checkpoint_smoke.c | 24 | 0 | +24 | Empty non-default identity, invalid types and missing fields. |
+| test/integration/snapshot_transaction_smoke.c | 27 | 6 | +21 | New-process empty/present physical identity restoration. |
+| test/integration/snapshot_cross_process.cmake | 22 | 27 | -5 | One matrix runner, optional different-width reader. |
+| Production total | 56 | 23 | +33 | Three existing files; no new runtime object/thread/lock. |
+| Test total | 187 | 37 | +150 | Includes CMake matrix orchestration. |
+| Code/script total | 243 | 60 | +183 | No shared-corpus or original-mirror change. |
+
+Production is below the estimate because existing init/eject/destroy callers
+already provide distinct boundaries. Tests exceed the addition estimate to
+cover five profiles, all three modes and cross-process empty-media identity;
+the matrix runner removes duplicated orchestration.
+
+### Similar-issue sweep and finite-ledger disposition
+
+Search: `softpc_platform_floppy_(attach|detach)`, `softpc_floppy_media_restore`,
+`gfi_empty_active`, `drive_type =`, and conditional `put_*` arguments in GFI.
+
+- Initial attach, runtime media replacement and media restore all use the
+  same GFI object. Initial type selection is the only media-derived hardware
+  assignment; restoring physical snapshot state is the other deliberate writer.
+- Existing machine reset does not remount media. Its destroy call is the sole
+  hardware teardown caller; only teardown installs gfi_mpty. B/C/D remain
+  uninstalled. Snapshot describes the product's physical A/B pair only.
+- Sense-drive ready/write-protect, read-ID, read/write and format now
+  distinguish empty media from hardware absence. All empty operations receive
+  focused proof; seek/recalibrate retain the original successful host response.
+- The original put-bit macros do not parenthesize their value parameter.
+  Parenthesizing the write-protection expression fixes the same-path old
+  precedence defect; the other conditional macro calls were checked.
+- Disk-change response retains the existing image-server policy: clear with
+  an attached medium, asserted with no medium. No new latch/controller behavior
+  or Win95 branch is introduced.
+- GFI and CMOS identity are checked for all five existing profiles. INT13
+  type=4 is asserted for the product default and drive count=1 throughout.
+  Low-density BIOS type selection also depends on its guest detection status;
+  the direct host test does not claim to run that sequence or repair it.
+- Snapshot media reconstruction finishes before the existing device archive
+  restores hardware type. Empty and differently formatted media cannot redefine
+  saved hardware. Missing identity bytes fail decoding; unsupported topology
+  fails restoration. Existing media overlays/access-mode paths remain intact.
+
+### Evidence and limitations
+
+Release x64/x86 builds succeeded. Focused `fdc|checkpoint|machine-smoke|snapshot`
+passes 7/7 per width (9.43s / 7.30s). Empty/present cross-process cases pass
+with x64 writer/x86 reader and x86 writer/x64 reader; same-width cases are in
+CTest. Each also checks rejected RAM mismatch, restored pixels, resume/input
+and stop. Initial new-test failures were corrected: use the original byte
+type and BIOS_DISKETTE_IO endpoint; do not assume low-density guest detection
+was performed by a host-only test. The macro precedence failure led to the
+in-scope production correction above; no failed run is reported as a pass.
+
+Full background regression passes x64 110/110 (178.87s) and x86 110/110
+(163.39s), including the restart/boot integration. The final refactored matrix
+runner additionally passes x64 standalone (1.90s) and both cross-width routes;
+x86's full run includes it. Five desktop tests per width are excluded. No
+interactive Win95 acceptance, Linux runtime acceptance or
+old-snapshot compatibility is claimed. Owner must cold boot the corrected
+machine, then create new snapshots; the supplied old snapshot preserves the
+old DOS device tables and lacks the new host-identity fields.
+
+Package SHA256:
+
+- softpc32.exe (3,660,332 bytes): `A0C1B40B05897F2C14E555808134F1CA1733320693D89618CA912C91019AA829`.
+- softpc64.exe (3,062,821 bytes): `23B2DA9CF6BA9F8C1904B4F329F9AA76E388079ED373470A938F747B559394CF`.
+
+Owner INI/media and all six shared source/test corpora are unchanged. The
+pre-existing unrelated Queue/shared-audit-proposal edits are preserved and
+excluded from this P. Disposable cross-width images/snapshots are removed by
+the matrix runner; only normal ignored build/test outputs remain.
+
+Documentation governance and `git diff --check` pass. The complete executor
+delivery is ready for commit/push and subsequent actual-change review;
+S2/T79 stay open for owner validation, not closed by these background results.

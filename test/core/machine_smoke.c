@@ -1248,9 +1248,9 @@ int main(void)
     run_int10_mode_cursor_boot_image(int10_mode_cursor);
     run_int12_boot_image(int12);
     run_int11_boot_image(int11, 1, 0xc821u);
-    run_int11_boot_image(int11, 0, 0xc820u);
+    run_int11_boot_image(int11, 0, 0xc821u);
     run_bda_configuration_image(floppy, 1, 0xc821u);
-    run_bda_configuration_image(hdd, 0, 0xc820u);
+    run_bda_configuration_image(hdd, 0, 0xc821u);
     run_int1a_boot_image(int1a);
     run_int1a_tick_boot_image(int1a_tick);
     run_hdd_pio_boot_image(hdd_pio);

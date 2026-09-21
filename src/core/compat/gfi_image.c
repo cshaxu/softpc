@@ -12,6 +12,7 @@
 #include "config.h"
 #include "lib/storage/medium_interface.h"
 #include "media_snapshot.h"
+#include "devices/snapshot.h"
 
 /*
  * This is a host media port, not an FDC implementation.  The original FLA,
@@ -37,39 +38,25 @@ static softpc_gfi_image_drive softpc_gfi_drives[MAX_DISKETTES];
 static char softpc_gfi_attached_config_value[] = "floppy";
 static char softpc_gfi_empty_config_value[] = "";
 
-/* Keep the original GFI lifecycle: a detached host medium yields control
- * back to the original empty-drive server rather than leaving this adapter's
- * vectors installed against a closed image handle. */
-static void softpc_gfi_activate_empty(void)
-{
-    (void)gfi_empty_active(C_FLOPPY_A_DEVICE, TRUE, NULL);
-}
-
 static int softpc_gfi_geometry(long bytes, softpc_gfi_image_drive *drive)
 {
     unsigned long sectors = (unsigned long)bytes / SOFTPC_GFI_SECTOR_BYTES;
     if ((unsigned long)bytes % SOFTPC_GFI_SECTOR_BYTES != 0u) return 0;
     if (sectors == 720ul) {
         drive->cylinders = 40u; drive->heads = 2u; drive->sectors = 9u;
-        drive->drive_type = GFI_DRIVE_TYPE_360;
     } else if (sectors == 1440ul) {
         drive->cylinders = 80u; drive->heads = 2u; drive->sectors = 9u;
-        drive->drive_type = GFI_DRIVE_TYPE_720;
     } else if (sectors == 2400ul) {
         drive->cylinders = 80u; drive->heads = 2u; drive->sectors = 15u;
-        drive->drive_type = GFI_DRIVE_TYPE_12;
     } else if (sectors == 2880ul) {
         drive->cylinders = 80u; drive->heads = 2u; drive->sectors = 18u;
-        drive->drive_type = GFI_DRIVE_TYPE_144;
     } else if (sectors == 5760ul) {
         drive->cylinders = 80u; drive->heads = 2u; drive->sectors = 36u;
-        drive->drive_type = GFI_DRIVE_TYPE_288;
     } else if (sectors >= 1ul) {
         /* Preserve the VM's long-standing permissive image contract for
            small boot fixtures; physical sector access beyond EOF still
            reports the original FDC no-data result. */
         drive->cylinders = 80u; drive->heads = 2u; drive->sectors = 18u;
-        drive->drive_type = GFI_DRIVE_TYPE_144;
     } else return 0;
     return 1;
 }
@@ -246,10 +233,11 @@ static SHORT softpc_gfi_command(FDC_CMD_BLOCK *command,
         return SUCCESS;
     case FDC_SENSE_DRIVE_STATUS:
         put_r2_ST3_fault(result, 0);
-        put_r2_ST3_write_protected(result, drive->mode == LIB_STORAGE_MEDIUM_READONLY);
+        put_r2_ST3_write_protected(result, (drive->medium != NULL &&
+            drive->mode == LIB_STORAGE_MEDIUM_READONLY));
         put_r2_ST3_ready(result, (drive->medium != NULL));
         put_r2_ST3_track_0(result, (drive->cylinder == 0u));
-        put_r2_ST3_two_sided(result, (drive->heads > 1u));
+        put_r2_ST3_two_sided(result, (drive->drive_type != GFI_DRIVE_TYPE_NULL));
         put_r2_ST3_head_address(result, get_c7_head(command));
         put_r2_ST3_unit(result, unit);
         return SUCCESS;
@@ -263,13 +251,14 @@ static SHORT softpc_gfi_command(FDC_CMD_BLOCK *command,
         okay = softpc_gfi_transfer(drive, command, writing, &cylinder, &head,
             &sector);
         softpc_gfi_result(result, unit, cylinder, head, sector, size, !okay,
-            writing && drive->mode == LIB_STORAGE_MEDIUM_READONLY);
+            writing && drive->medium != NULL &&
+                drive->mode == LIB_STORAGE_MEDIUM_READONLY);
         return SUCCESS;
     case FDC_FORMAT_TRACK:
         okay = softpc_gfi_format(drive, command);
         softpc_gfi_result(result, unit, drive->cylinder, get_c3_head(command),
             get_c3_SC(command), get_c3_N(command), !okay,
-            drive->mode == LIB_STORAGE_MEDIUM_READONLY);
+            drive->medium != NULL && drive->mode == LIB_STORAGE_MEDIUM_READONLY);
         return SUCCESS;
     default:
         return FAILURE;
@@ -288,7 +277,7 @@ static SHORT softpc_gfi_change IFN1(UTINY, drive)
 {
     /* GFI returns SUCCESS while the disk-change line is clear.  A mounted
      * image is immediately stable from the fixed VM's point of view; return
-     * FAILURE only for an absent drive, otherwise the original rd_wr_vf()
+     * FAILURE for absent media, otherwise the original rd_wr_vf()
      * treats every boot read as an open-drive condition and never issues its
      * FDC READ DATA command. */
     return drive < MAX_DISKETTES &&
@@ -343,17 +332,28 @@ int softpc_platform_floppy_attach(const char *path, lib_storage_medium_mode mode
         candidate.mode = mode;
         memcpy(candidate.path, path, strlen(path) + 1u);
     }
+    /* Initial media selects the physical profile once. Eject and later
+       images change media geometry, never the installed drive capability. */
+    candidate.drive_type = drive->drive_type;
+    if (candidate.drive_type == GFI_DRIVE_TYPE_NULL) {
+        if (candidate.cylinders == 40u) candidate.drive_type = GFI_DRIVE_TYPE_360;
+        else if (candidate.sectors == 9u) candidate.drive_type = GFI_DRIVE_TYPE_720;
+        else if (candidate.sectors == 15u) candidate.drive_type = GFI_DRIVE_TYPE_12;
+        else if (candidate.sectors == 36u) candidate.drive_type = GFI_DRIVE_TYPE_288;
+        else candidate.drive_type = GFI_DRIVE_TYPE_144;
+    }
     retired = *drive;
     *drive = candidate;
-    if (path == NULL) softpc_gfi_activate_empty();
-    else softpc_gfi_install(0);
+    softpc_gfi_install(0);
     (void)lib_storage_medium_destroy(&retired.medium);
     return 1;
 }
 
 void softpc_platform_floppy_detach(void)
 {
-    (void)softpc_platform_floppy_attach(NULL, LIB_STORAGE_MEDIUM_OVERLAY);
+    lib_storage_medium_destroy(&softpc_gfi_drives[0].medium);
+    memset(softpc_gfi_drives, 0, sizeof(softpc_gfi_drives));
+    (void)gfi_empty_active(C_FLOPPY_A_DEVICE, TRUE, NULL);
 }
 
 /* The original CMOS POST asks the product configuration layer whether drive
@@ -361,8 +361,25 @@ void softpc_platform_floppy_detach(void)
  * to this host media backend. */
 char *softpc_platform_floppy_config_value(void)
 {
-    return softpc_gfi_drives[0].medium != NULL ?
+    return softpc_gfi_drives[0].drive_type != GFI_DRIVE_TYPE_NULL ?
         softpc_gfi_attached_config_value : softpc_gfi_empty_config_value;
+}
+
+void softpc_device_snapshot_capture_floppy_host(softpc_device_floppy_host_state *state)
+{
+    state->drive_type[0] = softpc_gfi_drives[0].drive_type;
+    state->drive_type[1] = softpc_gfi_drives[1].drive_type;
+}
+
+int softpc_device_snapshot_restore_floppy_host(const softpc_device_floppy_host_state *state)
+{
+    /* The fixed machine has A only. Reject unsupported physical topology. */
+    if (state->drive_type[0] < GFI_DRIVE_TYPE_360 ||
+        state->drive_type[0] > GFI_DRIVE_TYPE_288 ||
+        state->drive_type[1] != GFI_DRIVE_TYPE_NULL) return 0;
+    softpc_gfi_drives[0].drive_type = state->drive_type[0];
+    softpc_gfi_install(0);
+    return 1;
 }
 
 void softpc_floppy_media_view(unsigned slot, softpc_media_view *view)

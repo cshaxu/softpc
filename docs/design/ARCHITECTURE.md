@@ -59,6 +59,14 @@ Compat never calls app or Common. `common/machine` owns the
 single generic executor, request/input queues, run generation and copied-frame
 publication; its injected VM driver calls the SoftPC machine boundary.
 
+The GFI host adapter distinguishes the physical drive from its inserted image.
+First hardware initialization installs A: (default 1.44 MB when empty, or the
+existing initial-image profile); B: remains absent. Insert/eject changes media,
+not physical identity; reset preserves both and teardown removes the drive.
+The Core device archive carries physical A/B types independently of media
+presence. Original FDC/BIOS logic consumes these host capabilities; no frontend
+or guest-version-specific identity correction is involved.
+
 ### Product Build And ABI Boundaries
 
 Core is only a source grouping of Machine, Compat and softpc.new, not a new

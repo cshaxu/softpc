@@ -1,4 +1,5 @@
 #include "core/machine/machine.h"
+#include "core/compat/ccpu/abi.h"
 #include "../lib/cleanup.h"
 
 #include <assert.h>
@@ -8,10 +9,118 @@
 #include "insignia.h"
 #include "host_def.h"
 #include "xt.h"
+#include "bios.h"
 #include "ios.h"
 #include "fla.h"
 #include "gfi.h"
 #include "cmos.h"
+
+extern void (*BIOS[256])(void);
+static void write_floppy(const char *path);
+
+static void check_identity(softpc_machine *machine, unsigned int type)
+{
+    half_word value = 0;
+    unsigned char equipment[2];
+    assert(gfi_drive_type(0) == type);
+    assert(gfi_drive_type(1) == GFI_DRIVE_TYPE_NULL);
+    assert(cmos_read_byte(CMOS_DISKETTE, &value) == SUCCESS);
+    if (value != (type << 4))
+        fprintf(stderr, "floppy type=%u CMOS=%02x\n", type, value);
+    assert(value == (type << 4));
+    assert(softpc_machine_read_physical(machine, 0x410u, equipment, 2u) ==
+        SOFTPC_MACHINE_OK);
+    assert((equipment[0] & 0xc1u) == 1u);
+    c_setEAX(0x0800u); c_setEDX(0u); c_setEBX(0u);
+    BIOS[BIOS_DISKETTE_IO]();
+    if (type == GFI_DRIVE_TYPE_144 && (c_getEBX() & 0xffu) != type)
+        fprintf(stderr, "floppy type=%u BIOS AX=%04lx BX=%04lx CX=%04lx DX=%04lx\n",
+            type, c_getEAX(), c_getEBX(), c_getECX(), c_getEDX());
+    assert((c_getEFLAGS() & 1u) == 0u);
+    /* Low-density BIOS identification also uses its media-detection status;
+       this host-lifecycle test does not run that guest detection sequence. */
+    if (type == GFI_DRIVE_TYPE_144) assert((c_getEBX() & 0xffu) == type);
+    assert((c_getEDX() & 0xffu) == 1u);
+}
+
+static void check_empty(void)
+{
+    FDC_CMD_BLOCK command[MAX_COMMAND_LEN] = {0};
+    FDC_RESULT_BLOCK result[MAX_RESULT_LEN] = {0};
+    put_c7_cmd(command, FDC_SENSE_DRIVE_STATUS);
+    assert(gfi_fdc_command(command, result) == SUCCESS);
+    assert(!get_r2_ST3_ready(result));
+    assert(get_r2_ST3_two_sided(result));
+    assert(!get_r2_ST3_write_protected(result));
+    assert(gfi_function_table[0].change_fn(0) == FAILURE);
+    put_c8_cmd(command, FDC_SEEK); put_c8_new_cyl(command, 2u);
+    assert(gfi_fdc_command(command, result) == SUCCESS);
+    assert(get_r3_PCN(result) == 2u);
+    put_c6_cmd(command, FDC_RECALIBRATE);
+    assert(gfi_fdc_command(command, result) == SUCCESS);
+    assert(get_r3_PCN(result) == 0u);
+    put_c4_cmd(command, FDC_READ_ID);
+    assert(gfi_fdc_command(command, result) == SUCCESS);
+    assert(get_r1_ST1_no_data(result));
+    put_c0_cmd(command, FDC_READ_DATA); put_c0_N(command, 2u);
+    assert(gfi_fdc_command(command, result) == SUCCESS);
+    assert(get_r1_ST1_no_data(result));
+    put_c0_cmd(command, FDC_WRITE_DATA);
+    assert(gfi_fdc_command(command, result) == SUCCESS);
+    assert(get_r1_ST1_no_data(result) && !get_r1_ST1_write_protected(result));
+    put_c3_cmd(command, FDC_FORMAT_TRACK);
+    assert(gfi_fdc_command(command, result) == SUCCESS);
+    assert(get_r1_ST1_no_data(result) && !get_r1_ST1_write_protected(result));
+}
+
+static void check_lifecycle(const char *path)
+{
+    static const long sizes[] = {368640L, 1228800L, 737280L, 1474560L, 2949120L};
+    softpc_machine_options options = {0};
+    softpc_machine *machine = NULL;
+    unsigned int mode, profile;
+    for (profile = 0; profile <= 5u; ++profile) {
+        unsigned int type = profile == 0u ? GFI_DRIVE_TYPE_144 : profile;
+        if (profile != 0u) {
+            FILE *file = fopen(path, "wb");
+            assert(file != NULL);
+            assert(fseek(file, sizes[profile - 1u] - 1L, SEEK_SET) == 0);
+            assert(fputc(0, file) == 0);
+            assert(fclose(file) == 0);
+        }
+        options.floppy_path = path;
+        assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+        if (profile == 0u)
+            assert(softpc_machine_set_floppy(machine, NULL,
+                LIB_STORAGE_MEDIUM_OVERLAY) == SOFTPC_MACHINE_OK);
+        assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+        check_identity(machine, type);
+        /* Replacing any startup profile with a 1.44M image must not change
+           hardware. All media access modes keep the same empty-drive facts. */
+        assert(softpc_machine_set_floppy(machine, NULL, LIB_STORAGE_MEDIUM_OVERLAY) == SOFTPC_MACHINE_OK);
+        write_floppy(path);
+        for (mode = 0; mode <= LIB_STORAGE_MEDIUM_OVERLAY; ++mode) {
+            FDC_CMD_BLOCK command[MAX_COMMAND_LEN] = {0};
+            FDC_RESULT_BLOCK result[MAX_RESULT_LEN] = {0};
+            assert(softpc_machine_set_floppy(machine, path, mode) == SOFTPC_MACHINE_OK);
+            check_identity(machine, type);
+            assert(gfi_function_table[0].change_fn(0) == SUCCESS);
+            put_c7_cmd(command, FDC_SENSE_DRIVE_STATUS);
+            assert(gfi_fdc_command(command, result) == SUCCESS);
+            assert(get_r2_ST3_ready(result));
+            assert(get_r2_ST3_write_protected(result) ==
+                (mode == LIB_STORAGE_MEDIUM_READONLY));
+            assert(softpc_machine_set_floppy(machine, NULL, mode) == SOFTPC_MACHINE_OK);
+            check_identity(machine, type);
+            check_empty();
+            assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+            check_identity(machine, type);
+            check_empty();
+        }
+        softpc_machine_destroy(machine);
+        assert(gfi_drive_type(0) == GFI_DRIVE_TYPE_NULL);
+    }
+}
 
 static void write_floppy(const char *path)
 {
@@ -108,8 +217,8 @@ int main(void)
     softpc_machine *machine = NULL;
     unsigned char byte = 0u;
     unsigned char result;
-    unsigned short cmos_disk = 0u;
-    unsigned short cmos_diskette = 0u;
+    unsigned char cmos_disk = 0u;
+    unsigned char cmos_diskette = 0u;
     unsigned int attempts;
     FDC_CMD_BLOCK format_command[MAX_COMMAND_LEN] = { 0 };
     FDC_RESULT_BLOCK format_result[MAX_RESULT_LEN] = { 0 };
@@ -226,6 +335,7 @@ int main(void)
     /* Detaching the raw-image port must restore the original gfi_mpty
        empty-drive server, just as the original real-floppy backend does. */
     assert(gfi_drive_type(0) == GFI_DRIVE_TYPE_NULL);
+    check_lifecycle(path);
     assert(softpc_test_remove_image(path));
     return 0;
 }

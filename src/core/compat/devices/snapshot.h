@@ -162,6 +162,13 @@ typedef struct softpc_device_dma_state {
     uint8_t page[SOFTPC_DEVICE_DMA_PAGE_COUNT];
 } softpc_device_dma_state;
 
+typedef struct softpc_device_floppy_host_state {
+    uint32_t drive_type[2];
+} softpc_device_floppy_host_state;
+
+void softpc_device_snapshot_capture_floppy_host(softpc_device_floppy_host_state *state);
+int softpc_device_snapshot_restore_floppy_host(const softpc_device_floppy_host_state *state);
+
 void softpc_device_snapshot_capture_dma(softpc_device_dma_state *state);
 int softpc_device_snapshot_restore_dma(const softpc_device_dma_state *state);
 

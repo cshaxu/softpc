@@ -1,37 +1,32 @@
 if(NOT DEFINED SNAPSHOT_EXECUTABLE OR NOT DEFINED SNAPSHOT_WORKING_DIRECTORY)
     message(FATAL_ERROR "Snapshot cross-process test requires its executable and build directory")
 endif()
+if(NOT DEFINED SNAPSHOT_READER_EXECUTABLE)
+    set(SNAPSHOT_READER_EXECUTABLE "${SNAPSHOT_EXECUTABLE}")
+endif()
 
 set(snapshot_media "${SNAPSHOT_WORKING_DIRECTORY}/snapshot-cross-process.img")
 set(snapshot_file "${SNAPSHOT_WORKING_DIRECTORY}/snapshot-cross-process.spcs")
 set(snapshot_startup_media "${SNAPSHOT_WORKING_DIRECTORY}/snapshot-cross-process-startup.img")
 file(REMOVE "${snapshot_media}" "${snapshot_file}" "${snapshot_startup_media}")
 
-execute_process(
-    COMMAND "${SNAPSHOT_EXECUTABLE}" save "${snapshot_media}" "${snapshot_file}"
-    WORKING_DIRECTORY "${SNAPSHOT_WORKING_DIRECTORY}"
-    RESULT_VARIABLE save_result)
-if(NOT save_result EQUAL 0)
+foreach(suffix IN ITEMS "" "-empty")
+    foreach(operation IN ITEMS "save${suffix}" "load-mismatch" "load${suffix}")
+        if(operation STREQUAL "save${suffix}")
+            set(executable "${SNAPSHOT_EXECUTABLE}")
+            set(media "${snapshot_media}")
+        else()
+            set(executable "${SNAPSHOT_READER_EXECUTABLE}")
+            set(media "${snapshot_startup_media}")
+        endif()
+        execute_process(
+            COMMAND "${executable}" "${operation}" "${media}" "${snapshot_file}"
+            WORKING_DIRECTORY "${SNAPSHOT_WORKING_DIRECTORY}"
+            RESULT_VARIABLE result)
+        if(NOT result EQUAL 0)
+            file(REMOVE "${snapshot_media}" "${snapshot_file}" "${snapshot_startup_media}")
+            message(FATAL_ERROR "Snapshot ${operation} process failed: ${result}")
+        endif()
+    endforeach()
     file(REMOVE "${snapshot_media}" "${snapshot_file}" "${snapshot_startup_media}")
-    message(FATAL_ERROR "Snapshot writer process failed: ${save_result}")
-endif()
-
-execute_process(
-    COMMAND "${SNAPSHOT_EXECUTABLE}" load-mismatch "${snapshot_startup_media}" "${snapshot_file}"
-    WORKING_DIRECTORY "${SNAPSHOT_WORKING_DIRECTORY}"
-    RESULT_VARIABLE mismatch_result)
-if(NOT mismatch_result EQUAL 0)
-    file(REMOVE "${snapshot_media}" "${snapshot_file}" "${snapshot_startup_media}")
-    message(FATAL_ERROR "Snapshot mismatch reader process failed: ${mismatch_result}")
-endif()
-
-execute_process(
-    COMMAND "${SNAPSHOT_EXECUTABLE}" load "${snapshot_startup_media}" "${snapshot_file}"
-    WORKING_DIRECTORY "${SNAPSHOT_WORKING_DIRECTORY}"
-    RESULT_VARIABLE load_result)
-if(NOT load_result EQUAL 0)
-    file(REMOVE "${snapshot_media}" "${snapshot_file}" "${snapshot_startup_media}")
-    message(FATAL_ERROR "Snapshot reader process failed: ${load_result}")
-endif()
-
-file(REMOVE "${snapshot_media}" "${snapshot_file}" "${snapshot_startup_media}")
+endforeach()

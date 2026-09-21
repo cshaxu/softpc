@@ -27,6 +27,7 @@ struct softpc_device_archive {
     softpc_device_pit_state pit;
     softpc_device_cmos_state cmos;
     softpc_device_fdc_state fdc;
+    softpc_device_floppy_host_state floppy_host;
     softpc_device_hdd_state hdd;
     softpc_device_ppi_state ppi;
     softpc_device_inport_mouse_state inport_mouse;
@@ -146,6 +147,7 @@ softpc_device_archive *archive;
     softpc_device_snapshot_capture_dma(&archive->dma);
     softpc_device_snapshot_capture_cmos(&archive->cmos);
     softpc_device_snapshot_capture_fdc(&archive->fdc);
+    softpc_device_snapshot_capture_floppy_host(&archive->floppy_host);
     softpc_device_snapshot_capture_ppi(&archive->ppi);
     if (!softpc_device_snapshot_capture_inport_mouse(&archive->inport_mouse))
         return FALSE;
@@ -181,6 +183,7 @@ softpc_device_archive *archive;
         !softpc_device_snapshot_restore_pit(&archive->pit) ||
         !softpc_device_snapshot_restore_cmos(&archive->cmos) ||
         !softpc_device_snapshot_restore_fdc(&archive->fdc) ||
+        !softpc_device_snapshot_restore_floppy_host(&archive->floppy_host) ||
         !softpc_device_snapshot_restore_ppi(&archive->ppi) ||
         !softpc_device_snapshot_restore_inport_mouse(&archive->inport_mouse) ||
         !softpc_device_snapshot_restore_keyboard(&archive->keyboard) ||
@@ -388,6 +391,10 @@ static const softpc_device_wire_field cmos_fields[] = {
     DEVICE_U64(softpc_device_cmos_state, user_time),
     DEVICE_U32(softpc_device_cmos_state, periodic_milliseconds),
     DEVICE_U64(softpc_device_cmos_state, periodic_event_handle)
+};
+
+static const softpc_device_wire_field floppy_host_fields[] = {
+    DEVICE_U32(softpc_device_floppy_host_state, drive_type)
 };
 
 static const softpc_device_wire_field fdc_fields[] = {
@@ -749,6 +756,7 @@ device_write_all(const softpc_device_archive *archive,
     for (index = 0u; index < SOFTPC_DEVICE_SERIAL_PORT_COUNT; ++index) WRITE_MAP(&archive->serial_host.port[index], serial_host_port_fields);
     WRITE_MAP(&archive->parallel_controller, parallel_controller_fields);
     for (index = 0u; index < SOFTPC_DEVICE_PARALLEL_PORT_COUNT; ++index) WRITE_MAP(&archive->parallel_host.port[index], parallel_host_port_fields);
+    WRITE_MAP(&archive->floppy_host, floppy_host_fields);
 #undef WRITE_MAP
     return LIB_STATUS_OK;
 }
@@ -772,6 +780,7 @@ device_read_all(softpc_device_archive *archive, softpc_snapshot_bytes_read read,
     for (index = 0u; index < SOFTPC_DEVICE_SERIAL_PORT_COUNT; ++index) READ_MAP(&archive->serial_host.port[index], serial_host_port_fields);
     READ_MAP(&archive->parallel_controller, parallel_controller_fields);
     for (index = 0u; index < SOFTPC_DEVICE_PARALLEL_PORT_COUNT; ++index) READ_MAP(&archive->parallel_host.port[index], parallel_host_port_fields);
+    READ_MAP(&archive->floppy_host, floppy_host_fields);
 #undef READ_MAP
     return LIB_STATUS_OK;
 }

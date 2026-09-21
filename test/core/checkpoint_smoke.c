@@ -407,6 +407,11 @@ static void verify_snapshot_archive(void)
     assert(softpc_snapshot_image_capture(&image, &entry) == LIB_STATUS_IO_ERROR);
     assert(event_count == 0u);
     q_event_init();
+    /* Host drive identity is independent of the empty media archive. CMOS
+       is intentionally not its source: this simulates a non-default empty A. */
+    assert(softpc_machine_set_floppy(probe.machine, NULL, LIB_STORAGE_MEDIUM_OVERLAY) == SOFTPC_MACHINE_OK);
+    assert(softpc_device_snapshot_restore_floppy_host(
+        &(softpc_device_floppy_host_state){{3u, 0u}}));
     assert(softpc_snapshot_image_capture(&image, &entry) == LIB_STATUS_OK);
     assert(softpc_ccpu_archive_write_core(&image.ccpu,
         checkpoint_write_bytes, &stream) == LIB_STATUS_OK);
@@ -444,6 +449,14 @@ static void verify_snapshot_archive(void)
     assert(softpc_device_archive_write(image.ccpu.devices,
         checkpoint_write_bytes, &device_stream) == LIB_STATUS_OK);
     assert(device_stream.byte_count != 0u);
+    /* The eight canonical identity bytes are mandatory, not a guessed old
+       format default; a stream without them must fail cleanly. */
+    device_stream.byte_count -= 8u;
+    assert(softpc_device_archive_read(&decoded_devices,
+        checkpoint_read_bytes, &device_stream) != LIB_STATUS_OK);
+    assert(decoded_devices == NULL);
+    device_stream.byte_count += 8u;
+    device_stream.offset = 0u;
     assert(softpc_device_archive_read(&decoded_devices,
         checkpoint_read_bytes, &device_stream) == LIB_STATUS_OK);
     assert(device_stream.offset == device_stream.byte_count);
@@ -493,7 +506,18 @@ static void verify_snapshot_archive(void)
         sizeof(altered)) == SOFTPC_MACHINE_OK);
     flush_tlb();
     assert(softpc_machine_prepare_media(probe.machine, image.media) == LIB_STATUS_OK);
+    assert(softpc_device_snapshot_restore_floppy_host(
+        &(softpc_device_floppy_host_state){{4u, 0u}}));
     assert(softpc_snapshot_image_restore(&image, &restored) == LIB_STATUS_OK);
+    {
+        softpc_device_floppy_host_state floppy;
+        softpc_device_snapshot_capture_floppy_host(&floppy);
+        assert(floppy.drive_type[0] == 3u && floppy.drive_type[1] == 0u);
+        assert(!softpc_device_snapshot_restore_floppy_host(
+            &(softpc_device_floppy_host_state){{6u, 0u}}));
+        assert(!softpc_device_snapshot_restore_floppy_host(
+            &(softpc_device_floppy_host_state){{4u, 4u}}));
+    }
     assert(restored.halted && restored.trap == 0u);
     assert(c_getEAX() == 0x12345678u && c_getEIP() == 0x7654u);
     assert(CCPU_DR[0] == 0x1234u && CCPU_DR[7] == 1u);
