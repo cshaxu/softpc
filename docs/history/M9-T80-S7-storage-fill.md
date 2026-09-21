@@ -80,5 +80,6 @@ flush with first-error precedence. No second write algorithm or public option
 was introduced. Fault/counter assertions, manifests, counts and package hashes
 match evidence; no unrelated source/config/media changed. Owned scratch is
 removed and final documentation governance passes. The admitted narrow scope
-has no unresolved implementation item. S7 awaits owner acceptance; T80 stays
-open for the separately required T-level acceptance/closure audit.
+has no unresolved implementation item. At delivery S7 awaited owner acceptance.
+The owner now reports “验收通过！可以收口T了？”; S7 is accepted and closed.
+The separate [T80 audit](M9-T80-completion-audit.md) closes the whole task.

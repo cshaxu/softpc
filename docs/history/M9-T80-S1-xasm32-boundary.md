@@ -3,7 +3,7 @@
 ## Admission and scope
 
 Owner: “测试通过 可以收口t任务 准入下一个t”, then “开始执行”.
-The admitted [proposal](../proposals/m9-shared-corpus-boundary-and-simplification.md)
+The admitted [proposal](M9-T80-shared-corpus-boundary-and-simplification-proposal.md)
 owns the seven-row plan and S1 pre-change estimate, finite sweep and evidence.
 Baseline `295c6963`; executor `73a5a889` and review `f4941481` are pushed.
 Owner subsequently requests “收口s1 准入s2”. S1 is accepted and closed;

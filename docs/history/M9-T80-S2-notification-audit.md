@@ -5,7 +5,7 @@
 Original request: “收口s1 准入s2”; the owner subsequently requested a concrete
 scheme, questioned its complexity, approved a narrowed read-only audit with
 “可以 开始审计”, and accepted its report with “批准收口”.
-The [proposal](../proposals/m9-shared-corpus-boundary-and-simplification.md)
+The [proposal](M9-T80-shared-corpus-boundary-and-simplification-proposal.md)
 retains the original objectives and their explicit supersession. No new fatal
 callback, alternate event, polling, request state machine or Lib change is
 admitted. S2 closes as an audit, not as comprehensive notification-fault recovery.

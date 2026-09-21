@@ -3,7 +3,7 @@
 ## Request and implementation
 
 Owner admitted the next S after S2 closure, then said “批准修复”. Baseline
-`df7d8704`; the [proposal](../proposals/m9-shared-corpus-boundary-and-simplification.md)
+`df7d8704`; the [proposal](M9-T80-shared-corpus-boundary-and-simplification-proposal.md)
 contains the pre-change estimate and finite similar-issue ledger. After delivery,
 the owner requests “收口s3准入s4”: S3 is accepted and closed, S4 separately
 admitted through CURRENT. T80 remains open.

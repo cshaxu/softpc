@@ -3,10 +3,10 @@
 ## Current Work
 
 No implementation subtask is active.
-Open task awaiting owner: T80. S6 is owner-closed. S7 implementation and
-verification are complete; S7 awaits owner acceptance. T80 remains open.
-The [proposal](../proposals/m9-shared-corpus-boundary-and-simplification.md)
-records the approved minimal design, finite sweep, counts and test evidence.
+T80 is closed after owner acceptance of S7 and the separate whole-task audit.
+No numeric task is open. The remaining Queue candidate is not admitted.
+The [closure audit](../history/M9-T80-completion-audit.md) records all seven
+dispositions, endpoint counts, verification limits and unchanged accepted EXEs.
 
 ## Current Technical Baseline
 
@@ -20,7 +20,7 @@ records the approved minimal design, finite sweep, counts and test evidence.
   Six manifests/DAG pass; task scratch removed, EXEs refreshed; INI/media and
   Common/x86/Core unchanged. [S7 evidence](../history/M9-T80-S7-storage-fill.md)
   records actual-change review of pushed executor `75dfd5a6`;
-  S7 awaits owner acceptance.
+  S7 is owner-accepted and closed with T80.
 
 - S6 moves 512 fixed disassembler handlers to file-local const tables; parsing
   context remains per-call. Production +520/-521 (net -1), tests +42/-0;
@@ -159,6 +159,7 @@ records the approved minimal design, finite sweep, counts and test evidence.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T80 | S1--S7 complete under approved scopes; owner acceptance and separate whole-task audit close the task. | [Audit](../history/M9-T80-completion-audit.md) |
 | T79 | S1 investigation and S2 repair complete; owner testing passed and closure approved. | [Audit](../history/M9-T79-completion-audit.md) |
 | T78 | S1 complete; owner manual test accepted; Common type boundary closure. | [Audit](../history/M9-T78-completion-audit.md) |
 | T77 | S1--S3 complete; owner-authorized self-review closure; test ownership cleanup, isolated packages and dual-width acceptance. | [Audit](../history/M9-T77-completion-audit.md) |
@@ -172,6 +173,10 @@ records the approved minimal design, finite sweep, counts and test evidence.
 | T69 | S1--S4 complete; reopened cleanup accepted. | [Audit](../history/M9-T69-completion-audit.md) |
 
 ## Recent Governance
+
+- Owner reports acceptance and approves T80 closure. S7 closes, the proposal
+  is archived, and no next task is admitted. This closure changes documents
+  only; accepted EXEs, configuration and media remain unchanged.
 
 - Owner closes T80 S6, admits S7 and approves its narrowed one-write-algorithm
   design. S7 delivered for acceptance; T80 not closed automatically.
