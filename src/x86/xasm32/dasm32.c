@@ -1,6 +1,7 @@
 #include "x86/xasm32/xasm32.h"
 
 #include "x86/xasm32/dasm32.h"
+#include "x86/xasm32/xasm32_interface.h"
 
 typedef lib_u8 t_dasm_prefix;
 
@@ -195,6 +196,8 @@ static lib_u8 _kdf_check_prefix(dasm32_context *dasmContext, lib_u8 opcode)
 static void _kdf_skip(dasm32_context *dasmContext, lib_u8 byte)
 {
     XASM32_TRACE_CALL_BEGIN("_kdf_skip");
+    if (byte > X86_XASM32_MAX_CODE_BYTES - iop)
+        XASM32_TRACE_IMPOSSIBLE_RETURN;
     XASM32_TRACE_CHECK_RETURN(iop += byte);
     XASM32_TRACE_CALL_END;
 }
@@ -202,9 +205,9 @@ static void _kdf_code(dasm32_context *dasmContext, lib_u8 *rdata, lib_u8 byte)
 {
     lib_size i;
     XASM32_TRACE_CALL_BEGIN("_kdf_code");
-    for (i = 0; i < byte; ++i)
-        *(rdata + i) = *(drcode + iop + i);
     XASM32_TRACE_CHECK_RETURN(_kdf_skip(dasmContext, byte));
+    for (i = 0; i < byte; ++i)
+        *(rdata + i) = *(drcode + iop - byte + i);
     XASM32_TRACE_CALL_END;
 }
 static void _kdf_modrm(dasm32_context *dasmContext, lib_u8 regbyte, lib_u8 rmbyte)
@@ -6499,6 +6502,7 @@ static lib_u8 dasm32_execute(dasm32_context *dasmContext, char *stmt, lib_u8 *rc
         dtable[0xee] = OUT_DX_AL;
         dtable[0xef] = OUT_DX_EAX;
         dtable[0xf0] = PREFIX_LOCK;
+        dtable[0xf1] = UndefinedOpcode;
         dtable[0xf2] = PREFIX_REPNZ;
         dtable[0xf3] = PREFIX_REPZ;
         dtable[0xf4] = HLT;
