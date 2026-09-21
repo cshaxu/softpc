@@ -49,4 +49,6 @@ Negative and positive cases exercise the removed allowlist and raw-limit gate.
 No unrelated source, public ABI, INI or media changed. Counts and package
 hashes match the proposal, isolated outputs are removed, final documentation
 governance passes. No remaining implementation gap found within the frozen
-S5 boundary. Owner manual testing remains the S5 closure gate; T80 stays open.
+S5 boundary. At delivery, owner manual testing remained the S5 closure gate.
+Subsequently the owner admitted S6: S5 is accepted for continuation, without
+claiming a separately reported manual-test result. T80 stays open.

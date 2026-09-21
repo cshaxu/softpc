@@ -3,12 +3,22 @@
 ## Current Work
 
 No implementation subtask is active.
-Open task awaiting owner: T80. S4 is owner-accepted and closed. S5 implementation
-and verification are complete; S5 awaits owner testing, S6/S7 are not admitted.
+Open task awaiting owner: T80. S5 is accepted for continuation by the owner's
+S6 admission, without a separate manual-test claim. S6 implementation and
+verification are complete; S6 awaits owner testing, S7 is not admitted.
 The [proposal](../proposals/m9-shared-corpus-boundary-and-simplification.md)
-records S5 scope, estimates, finite sweep and artifact evidence. T80 stays open.
+records scope, finite sweep, footprint and artifact evidence. T80 stays open.
 
 ## Current Technical Baseline
+
+- S6 moves 512 fixed disassembler handlers to file-local const tables; parsing
+  context remains per-call. Production +520/-521 (net -1), tests +42/-0;
+  total code +562/-521 (net +41). No handler/output/public API change.
+  Strict C11 Release builds and background x64 111/111 (177.48s), x86 111/111
+  (169.15s) pass; standalone x86 suites 10/10 per width. Five desktop tests
+  excluded per product width; no Linux run. Temporary task outputs removed.
+  EXEs refreshed, INI/media and Lib/Common/Core unchanged. S6 awaits owner;
+  [S6 evidence](../history/M9-T80-S6-xasm32-dispatch.md) records actual review.
 
 - S5 removes Common's stale standard-header allowlist and rejects raw integer
   limits. Seven Machine constants use equivalent existing Types aliases.
@@ -17,7 +27,7 @@ records S5 scope, estimates, finite sweep and artifact evidence. T80 stays open.
   (178.46s). Copied four-directory tests 59/59 and six-directory tests 69/69
   pass on both widths, strict C11; all 180/205 copied files remain identical.
   Desktop tests excluded; no Linux runtime claim. Isolated task outputs removed;
-  package EXEs refreshed; Lib/Core/x86, INI/media unchanged. S5 awaits owner.
+  package EXEs refreshed; Lib/Core/x86, INI/media unchanged. S5 accepted for continuation.
   Executor `c7c42ea5` pushed; actual-change review retained in
   [S5 evidence](../history/M9-T80-S5-common-types-gate.md).
 
@@ -150,6 +160,9 @@ records S5 scope, estimates, finite sweep and artifact evidence. T80 stays open.
 | T69 | S1--S4 complete; reopened cleanup accepted. | [Audit](../history/M9-T69-completion-audit.md) |
 
 ## Recent Governance
+
+- Owner admits T80 S6 after S5 delivery. S6 delivered for testing; S7 remains
+  unadmitted. No separate S5 manual-test result is inferred.
 
 - Owner approves T80 S4 closure and admits S5's Common Types boundary repair.
   T80 remains open; S6/S7 are not started.
