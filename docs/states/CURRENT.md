@@ -2,28 +2,34 @@
 
 ## Current Work
 
-## M9 T80 S2 Packet
+## M9 T80 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves S1 closure and S2 admission. Begin with notification-failure design audit; preserve the proposal's interface-review checkpoint. |
-| Objective | Handle Common request/queue reset, signal and completion failures without false acceptance, replay, indefinite waiting or premature release of borrowed caller data. |
-| Non-goals | No second executor, queue, event channel, polling retry or duplicated cleanup; no Core/x86/media/snapshot-format changes. S3--S7 remain unstarted. |
-| Reference Baseline | `f4941481`, owner-accepted S1; executor `73a5a889`. |
-| Candidate Proposal | [Shared corpus boundary and simplification](../proposals/m9-shared-corpus-boundary-and-simplification.md), S2. |
-| Files And ABI Surface | Audit src/common/session/control.c and src/common/machine/machine.c, their private/public contracts, existing Lib Base wait/cancel contracts and test/common. Freeze exact changed paths and added/removed/net estimate after audit, before implementation. |
-| Applicable Rules | docs/rules/{EXECUTION,ARCHITECTURE,CODING,DOCUMENT}.md and docs/design/{ARCHITECTURE,CODING,UI}.md; shared governance skills and AGENTS.md. |
-| Verification | Deterministic reset/submission-signal/completion-signal faults; rejected work never executes, accepted work never replays, borrowed data survives worker quiescence. Retain paused/debug-close shutdown regression; strict C11 independent Common and product x86/x64 background tests, manifests/DAG, dual EXEs. |
-| Expected Markers | Enumerated submission/wake/completion/exit paths each have an explicit failure and ownership disposition; normal behavior unchanged. |
-| Asset Needs | No guest assets or desktop interaction for design audit. If needed, task diagnostics under build/t80-s2 only, 120 seconds/run and 10 MiB output; agent owns process cleanup. Preserve INI and media. |
-| Reporting Requirements | Report concrete design and per-path estimate before code; after code report actual additions/deletions/net, focused/full coverage, limits and dual EXE links. This admission changes no production code. |
-| Stop Conditions | If existing wait/cancel contracts cannot safely express notification failure, report the minimal public-interface change and obtain owner approval before implementing it. Stop for unrelated scope or added parallel state/protocol. |
-| Exit Criteria | Complete finite path ledger, required tests, pushed executor P and actual-change review; then wait for owner testing before next S. T80 stays open. |
-| Original Owner Request | “收口s1 准入s2”; original proposal requests audit and repair of shared-corpus quality issues. |
-| Similar-Issue Sweep | Enumerate all Common event reset/signal/wait/cancel call sites, including lifecycle, media, debug, snapshot and terminal cleanup; distinguish not-yet-accepted work from executor-owned or completed work. |
+| Admission And Approval | Owner approves S2 closure, then requests next S admission. S2 is an accepted narrowed audit, not a native-fault recovery implementation. |
+| Objective | Reject a new physical key before downstream delivery when the fixed Session pressed-key ledger is full; repeated make of an existing key remains admissible. |
+| Non-goals | No capacity growth, dynamic ledger, new state machine or public API. No Lib/Core/x86 changes; S4--S7 remain unstarted. |
+| Reference Baseline | Production remains at 1b5d0fd7; S2 changes documentation only. |
+| Candidate Proposal | [Shared corpus boundary and simplification](../proposals/m9-shared-corpus-boundary-and-simplification.md), S3. |
+| Files And ABI Surface | src/common/session/control.c; test/common/physical_key_identity_smoke.c; corresponding manifests and task evidence. Public ABI unchanged. |
+| Applicable Rules | docs/rules/{EXECUTION,ARCHITECTURE,CODING,DOCUMENT}.md; docs/design/{ARCHITECTURE,CODING,UI}.md; shared governance skills and AGENTS.md. |
+| Verification | Fixed-capacity boundary, existing-key repeats at capacity, new key/source rejection without downstream make, release/reuse and source-retirement cleanup; strict C11 and background x86/x64 tests, manifests/DAG and dual EXEs. |
+| Expected Markers | A failed remember operation returns failure before sink invocation; rejected keys never require synthetic release; existing identity semantics unchanged. |
+| Asset Needs | No guest media mutation or desktop interaction for focused tests. Preserve user INI and media; standard background test presets. |
+| Reporting Requirements | Estimate production +5/-3 net +2; tests +60--90/-0. Report actual added/deleted/net source and test counts, verification and dual EXE links. |
+| Stop Conditions | Stop for changed physical-key identity, capacity, threading/public ABI or unrelated fault-recovery requirements. |
+| Exit Criteria | Implementation, focused and dual-width regression, complete executor P push and actual-change review; wait for owner testing before closure/next S. T80 remains open. |
+| Original Owner Request | “批准收口” S2, then “下一个s任务准入”. |
+| Similar-Issue Sweep | Review remember/forget/dispatch/source retirement and existing Session failure consumer; distinguish new keys, repeats and releases across sources. |
 
 ## Current Technical Baseline
+
+- S2 audit baseline `1b5d0fd7`: production/tests +0/-0, existing EXEs unchanged.
+  Existing Common suites pass 18/18 per width; three focused cases pass twenty
+  repetitions each per width. No rebuild, new fault injection, full-product,
+  desktop or Linux run. The owner accepts the documented native-failure limit;
+  no new fatal callback, queue or synchronization recovery mechanism is added.
 
 - T80 S1 is owner-accepted and closed: production +11/-2 (net +9), tests/build
   +149/-0; public API and debugger callers unchanged. Executor `73a5a889`,
@@ -130,6 +136,9 @@
 | T69 | S1--S4 complete; reopened cleanup accepted. | [Audit](../history/M9-T69-completion-audit.md) |
 
 ## Recent Governance
+
+- Owner approves T80 S2 closure after the narrowed audit, then admits S3.
+  Document-only handoff preserves the accepted binaries; T80 stays open.
 
 - Owner closes T80 S1 and admits S2's notification-failure design audit.
   Handoff is document-only; accepted EXEs unchanged; T80 remains open.
