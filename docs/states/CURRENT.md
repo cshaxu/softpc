@@ -18,6 +18,7 @@ records scope, finite sweep, footprint and artifact evidence. T80 stays open.
   (169.15s) pass; standalone x86 suites 10/10 per width. Five desktop tests
   excluded per product width; no Linux run. Temporary task outputs removed.
   EXEs refreshed, INI/media and Lib/Common/Core unchanged. S6 awaits owner;
+  Executor `5d0515fd` pushed;
   [S6 evidence](../history/M9-T80-S6-xasm32-dispatch.md) records actual review.
 
 - S5 removes Common's stale standard-header allowlist and rejects raw integer
