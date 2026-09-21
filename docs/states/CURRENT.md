@@ -19,7 +19,8 @@ records the approved minimal design, finite sweep, counts and test evidence.
   41/41 per width (60.92/63.05s). Desktop excluded; no Linux runtime claim.
   Six manifests/DAG pass; task scratch removed, EXEs refreshed; INI/media and
   Common/x86/Core unchanged. [S7 evidence](../history/M9-T80-S7-storage-fill.md)
-  records actual-change review; S7 awaits owner acceptance.
+  records actual-change review of pushed executor `75dfd5a6`;
+  S7 awaits owner acceptance.
 
 - S6 moves 512 fixed disassembler handlers to file-local const tables; parsing
   context remains per-call. Production +520/-521 (net -1), tests +42/-0;
