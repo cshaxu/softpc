@@ -15,6 +15,7 @@ and [S3 record](../history/M9-T80-S3-pressed-key-capacity.md).
   Both Release builds and background suites pass: x64 111/111 (141.46 s),
   x86 111/111 (140.30 s). Five desktop tests excluded per width; no Linux run.
   Package EXEs refreshed; hashes and finite sweep are in the proposal.
+  Executor `aea41c16` pushed and actual changed paths reviewed; awaiting owner.
 
 - S2 audit baseline `1b5d0fd7`: production/tests +0/-0, existing EXEs unchanged.
   Existing Common suites pass 18/18 per width; three focused cases pass twenty
