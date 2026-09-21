@@ -2,28 +2,25 @@
 
 ## Current Work
 
-## M9 T80 S4 Packet
+No implementation subtask is active.
+Open task awaiting owner: T80. S4 implementation and verification are complete;
+delivery evidence is recorded in the proposal. S4 remains open
+for owner testing, and S5--S7 are not admitted.
 
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner requests “收口s3准入s4”; S3 accepted, S4 admitted for sequence-contract audit and repair. |
-| Objective | Keep complete-frame delivery working across u32 sequence wrap, retaining stale/duplicate filtering and run separation. |
-| Non-goals | No widened public fields, new frame cache, queue or presenter route; no Lib/Core/x86 or snapshot-format changes. S5--S7 remain unstarted. |
-| Reference Baseline | 2cd9e889; accepted S3 executor aea41c16. |
-| Candidate Proposal | [Shared corpus boundary and simplification](../proposals/m9-shared-corpus-boundary-and-simplification.md), S4. |
-| Files And ABI Surface | Audit common/machine/{machine.c,frame_interface.h}, common/session/{session.c,control_state.c}, common/ui/ui.c and existing frame/reducer tests. Freeze exact changed paths after sequence audit; preserve public field widths. |
-| Applicable Rules | docs/rules/{EXECUTION,ARCHITECTURE,CODING,DOCUMENT}.md and docs/design/{ARCHITECTURE,CODING,UI}.md; shared governance skills and AGENTS.md. |
-| Verification | Deterministic wrap, zero/initial sequence, duplicate/stale notice, latest-wins skips, restart/run mismatch and new presenter cases; strict C11, background x86/x64 regression, manifests/DAG and dual EXEs. |
-| Expected Markers | One consistent sequence-order contract at publication and acceptance; no reset-all workaround and no dependence on upstream dirty history. |
-| Asset Needs | No guest asset changes; background tests only unless separately arranged. Preserve user INI and media. |
-| Reporting Requirements | Preliminary production about four files +20--30/-5--10, net +10--25; tests +80--140/-0. Confirm algorithm assumptions and estimate before code; report actual changes and test links after delivery. |
-| Stop Conditions | Stop if bounded modular ordering cannot preserve the actual delivery contract, or wider ABI/new state is required; present the alternative before implementation. |
-| Exit Criteria | Finite sequence-use ledger, implementation and required tests, pushed complete executor P, actual-change review; await owner testing before closing S4 or starting S5. |
-| Original Owner Request | “收口s3准入s4”. |
-| Similar-Issue Sweep | Enumerate sequence generation, zero sentinels, ordering/equality, run generation and presenter recreation across Machine/Session/UI; record each disposition. |
+[Proposal and S4 ledger](../proposals/m9-shared-corpus-boundary-and-simplification.md)
+retain the admitted scope, pre-change estimate, bounded modular-order contract
+and per-path evidence. No T-level closure is implied.
 
 ## Current Technical Baseline
+
+- S4: frame publication skips 0 on u32 wrap; Session's two ordering sites share
+  one private modular comparator. Production +16/-4 (net +12), tests +69/-0;
+  public widths and UI equality deduplication unchanged. Compared serials must
+  be less than 2^31 apart. No new state, queue or cache; Lib/Core/x86 unchanged.
+  Both Release builds and focused 3/3 pass per width. Background x64 111/111
+  (173.24s), x86 111/111 (160.81s); five desktop tests excluded per width,
+  no Linux execution. Manifests/DAG and final documentation gate pass.
+  Standard EXEs refreshed; hashes in the proposal, INI/media unchanged.
 
 - S3: production +6/-4 net +2, tests +56/-0; reject an unrecordable new key
   before machine delivery, retaining original repeat/identity/retirement logic.
@@ -143,6 +140,9 @@
 | T69 | S1--S4 complete; reopened cleanup accepted. | [Audit](../history/M9-T69-completion-audit.md) |
 
 ## Recent Governance
+
+- Owner approved T80 S4 repair. Implementation delivery awaits owner manual
+  acceptance; S4 and T80 are not closed and S5 is not started.
 
 - Owner closes T80 S3 and admits S4. Document-only handoff preserves tested
   package EXEs; T80 remains open.

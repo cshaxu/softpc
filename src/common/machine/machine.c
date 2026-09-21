@@ -133,7 +133,10 @@ static lib_status common_machine_publish(common_machine *machine)
         base_sync_mutex_unlock(machine->frame_lock);
         return LIB_STATUS_OK;
     }
-    frame->sequence = ++machine->published_frame_sequence;
+    /* Zero is reserved for consumers without a published frame. */
+    if (++machine->published_frame_sequence == 0u)
+        ++machine->published_frame_sequence;
+    frame->sequence = machine->published_frame_sequence;
     generation = common_machine_run_generation(machine);
     machine->published_frame_run_generation = generation;
     machine->published_frame_index = staging_index;
