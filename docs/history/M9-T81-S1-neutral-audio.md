@@ -3,7 +3,7 @@
 ## Request And Admission
 
 The original owner request is retained verbatim in the
-[proposal](M9-T81-neutral-audio-proposal.md). Owner admits design, task split,
+[proposal](../proposals/m9-neutral-audio-stream.md). Owner admits design, task split,
 commit/push and S1 closure only; later implementation awaits owner review.
 Baseline: clean `2b17749a`. The S1 executable packet is preserved in executor
 commit `c13630a5`, whose push to origin/main succeeded before this review.

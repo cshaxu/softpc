@@ -2,37 +2,39 @@
 
 ## Current Work
 
-T81 S2 is active: establish the neutral Audio component contract, its shared
-tests and independent build/DAG integration. Owner approved automatic S2--S5
-admission; each completed S still receives its own build/test/push/EXE report.
+T81 S3 is active: add the Win32 fixed-slot PCM endpoint behind the completed
+neutral Audio contract. Owner approved automatic S2--S5 admission; each
+completed S still receives its own build/test/push/EXE report.
 
-## M9 T81 S2 Packet
+## M9 T81 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner closes S1, adds PC Speaker S5, and approves automatic sequential S2--S5 execution, with per-S push and x86/x64 EXEs. |
-| Objective | Add neutral Lib Audio contract, shared validation and deterministic fake-backend tests without real playback or product hookup. |
-| Non-goals | No waveOut implementation, audio worker/ring, Core/Common/App/x86 change, speaker change, guest sound card or artifact behavior change. |
-| Reference Baseline | T81 S1 review `f317acad`; clean worktree before this packet. |
+| Objective | Implement the completed Audio contract's Windows fixed-slot waveOut endpoint, Types SDK vocabulary and failure/lifecycle proof without a Lib worker or product hookup. |
+| Non-goals | No Common/Core/App/x86 change, speaker change, guest sound card, synthesis, resampling, software ring, polling thread or Linux playback. |
+| Reference Baseline | T81 S2 executor `fbfa9437`; clean worktree after the S2 coordinator review. |
 | Candidate Proposal | [Neutral audio](../proposals/m9-neutral-audio-stream.md) |
-| Files And ABI Surface | New src/lib/audio and test/lib/audio contracts, Lib CMake/manifest/DAG/test integration; public opaque stream and copied PCM options only. |
+| Files And ABI Surface | Audio Win32 platform implementation and explicit Types WinMM vocabulary, Audio linkage/manifest/docs and test/lib native/failure proof. Public stream API from S2 stays unchanged. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation and source research policy; shared Lib strict C11/package rules. |
-| Verification | Deterministic fake backend contract cases on x64/x86, strict isolated Lib build/test, product background builds/tests and all manifest/DAG gates. |
-| Expected Markers | No native header outside Types; no Lib thread/ring; S2 platform backend returns UNSUPPORTED; no Core linkage. |
+| Verification | Injected slot/open/write/reset/cleanup failures, native silence/slot reuse smoke, strict isolated Lib x64/x86, product background x64/x86 and all manifest/DAG gates. |
+| Expected Markers | No SDK header outside Types; exactly one direct native-slot owner; no Lib thread/ring/callback/product linkage; Linux retains explicit UNSUPPORTED. |
 | Asset Needs | Refresh package EXEs after product builds only; do not modify INI/media. |
-| Reporting Requirements | Estimated production +140..240/-0..10, tests/build +180..300/-0..15; actual added/removed/net and artifact links after push. |
-| Stop Conditions | Any need for a Lib worker, software queue, product audio hookup or unreviewed external source stops S2 for revised design. |
-| Exit Criteria | Contract/ledger cases and package gates pass in both widths; implementation P is pushed, actual diff reviewed, S2 record closed and S3 automatically admitted. |
+| Reporting Requirements | Estimated production +180..300/-0..30, tests/build +150..250/-0..15; actual added/removed/net and artifact links after push. |
+| Stop Conditions | Any need for a Lib worker, software queue, product audio hookup or unreviewed external source stops S3 for revised design. |
+| Exit Criteria | Native ownership/failure cases and package gates pass in both widths; implementation P is pushed, actual diff reviewed, S3 record closed and S4 automatically admitted. |
 | Original Owner Request | Build neutral src/lib/audio and test/lib/audio first, then later connect SoftPC speaker and eventually separately study XP sound-card support. |
-| Similar-Issue Sweep | Search all Lib components for accidental native headers, silent unsupported fallbacks, unbounded queues and raw allocation/type violations; repair only directly related S2 hits or record a receiver. |
+| Similar-Issue Sweep | Search Audio/Types and existing native leaves for direct SDK exposure, success-on-discard fallbacks, duplicate buffering and unsafe native buffer cleanup; repair only directly related S3 hits or record a receiver. |
 
 ## Current Technical Baseline
 
-- T81 S1 is documentation-only: executor c13630a5, no source/test/artifact
-  changes or runtime claims. Neutral PCM design uses fixed native slots,
-  no Lib audio worker/software ring, and explicit Linux UNSUPPORTED.
-  Owner design review is required before any construction begins.
+- T81 S2 executor `fbfa9437` adds only the neutral Audio root contract,
+  deterministic fake backend and C11/DAG/manifest integration: production C/H
+  +259/-0, test C +121/-0. The two S2 platform leaves explicitly return
+  UNSUPPORTED; no SDK header, real playback, worker/ring or product hookup is
+  present. Isolated Lib passes 42/42 on x64/x86; product background x64 112/112
+  and x86's same 112-item route pass. S3 owns native Win32 playback.
 
 - Owner approved S1 amendment: S5 will adapt the existing SoftPC PC Speaker to
   finished Lib PCM after S2--S4, leaving `nt_sound.c` and guest device semantics
