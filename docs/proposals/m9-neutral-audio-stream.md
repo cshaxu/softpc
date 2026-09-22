@@ -121,6 +121,7 @@ deletions and net separately for production, tests/build and docs at each S.
 | S3 | Win32 fixed-slot playback, Types declarations, Linux placeholder and native/failure tests | 6-10 files; production +180..300/-0..30; tests/build +150..250/-0..15 | Actual PCM playback, capacity/reuse/reset/cleanup proofs; native failures observable; no polling worker |
 | S4 | Four-package isolated copy acceptance, remaining lifecycle tests, docs and release artifacts | 4-8 files; production +0..30/-0..30; tests/build +60..140/-0..20 | Strict dual C11, isolated Lib/Common and full background regressions, unchanged copy hashes |
 | S5 | Use the finished stream at the existing SoftPC PC-speaker presentation boundary | 3-6 Core Compat/test/build files; production +100..180/-40..90; tests/build +80..160/-0..20 | Win3.1/DOS PC-speaker handoff, state/clear/shutdown proof and audible owner test |
+| S6 | Close the Common Session Window-creation admission gap: a missing Window may be created only after a RUNNING completion; paused state may retain but never synthesize a Window | 2-3 Common/test/docs files; production +2..8/-0..4; tests +20..50/-0..10 | State matrix proves INIT, STOPPED, RESET_COMPLETED/PAUSED and ERROR never create a missing Window for either display mode; existing paused Window retention remains unchanged |
 
 The owner has approved automatic sequential admission of S2--S5. Each
 code-changing S builds x86/x64 EXEs, runs focused and
@@ -154,6 +155,7 @@ Each row must have a passing test/evidence or an owner-approved scope revision.
 | Existing SoftPC behavior retained, both deliverable EXEs | Each implementation S background regression and artifact hashes |
 | Audible PCM, caller reuse instructions, known platform limits | S4 bounded native tone test and owner acceptance |
 | SoftPC PC Speaker through the completed Lib stream | S5 Core state proof plus Win3.1/DOS owner acceptance |
+| Non-running presentation never synthesizes a missing Window | S6 Common Session state matrix on both display modes |
 
 All six shared manifests and dependency gates must remain valid. Use the
 existing background presets (exclude desktop); do not pop windows or request

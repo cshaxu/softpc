@@ -2,31 +2,31 @@
 
 ## Current Work
 
-T81 S5 is active: adapt the existing SoftPC PC-speaker presentation endpoint
-to the completed Lib Audio stream while preserving the original device state
-machine and mirror. Owner approved automatic S2--S5 admission; each completed
-S still receives its own build/test/push/EXE report.
+T81 S6 is active: close the Common Session rule that a missing Window can be
+created only for a running machine. S5's implementation is pushed and still
+awaits the owner's bounded audible PC-speaker acceptance; this narrow Session
+repair neither changes nor closes that pending evidence.
 
-## M9 T81 S5 Packet
+## M9 T81 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner closes S1, adds PC Speaker S5, and approves automatic sequential S2--S5 execution, with per-S push and x86/x64 EXEs. |
-| Objective | Replace Compat's direct Win32 Beep presentation endpoint with the completed bounded Lib PCM stream, retaining exactly one Compat tone-generation worker and the original SoftPC PPI/Timer2 request behavior. |
-| Non-goals | No change under core/softpc.new, guest sound-card/DMA/IRQ/OPL/MIDI, Common/App/x86 change, Lib API change, resampling/mixing, new configuration, snapshot format or Linux playback claim. |
-| Reference Baseline | T81 S4 executor `d5dc2245`; clean worktree after the S4 coordinator review. |
+| Admission And Approval | Owner explicitly admits this repair after the Common audit: whenever the machine is not RUNNING and no Window exists, no display mode may open one. |
+| Objective | Enforce the single Session action-admission invariant: a missing Window is created only while the actual runtime state is RUNNING. Preserve paused retention and freezing of a Window that already exists. |
+| Non-goals | No Lib, Common UI, App, Core, x86, public ABI, frame-plan, Console, mouse, title, or audio change. Do not remove the separate `window_suppressed` close semantics. |
+| Reference Baseline | T81 S5 executor `a2fbf548`; clean worktree after its implementation push. |
 | Candidate Proposal | [Neutral audio](../proposals/m9-neutral-audio-stream.md) |
-| Files And ABI Surface | Core Compat audio endpoint/header and existing Core audio lifecycle/failure tests, plus the narrow machine-to-Audio link ownership and manifests/docs. Original `nt_sound.c` remains byte-identical; no public Lib/Common ABI change. |
+| Files And ABI Surface | Common Session private control-state action derivation and its state-matrix smoke, plus proposal/current/history evidence. No public ABI changes. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation and source research policy; shared Lib strict C11/package rules. |
-| Verification | Deterministic Compat waveform/admission/clear/shutdown failure injection, original host sound-state tests, Lib Audio native smoke, strict dual builds and full background x64/x86 regression; owner performs bounded audible Win3.x/DOS speaker test. |
-| Expected Markers | One Compat worker remains the sustained-tone time source; Lib owns native buffers/output only; no direct Beep/WinMM in Compat, no mirror change, no second queue/worker or guest semantic branch. |
+| Verification | Add direct state-matrix coverage for both display modes and every non-RUNNING state with no Window; preserve existing paused-retention coverage. Run focused Common tests, strict dual-width shared Common build/test, product background x64/x86 tests, governance/manifest/DAG checks. |
+| Expected Markers | `presentation_plan` may continue to describe paused retention; the sole `CREATE_WINDOW` action gate rejects a missing Window unless `runtime_actual == RUNNING`. No new state, callback, queue, flag or helper. |
 | Asset Needs | Refresh package EXEs after product builds only; do not modify INI/media. |
-| Reporting Requirements | Expected production +100..180/-40..90, tests/build +80..160/-0..20; actual added/removed/net and artifact links after push. |
-| Stop Conditions | Any need to modify original SoftPC mirror, add another producer/worker/queue, change guest Timer2/PPI rules, make Lib poll or add a guest sound-card route stops S5 for revised design. |
-| Exit Criteria | Compat-only endpoint preserves request/clear/shutdown behavior, all deterministic/native/dual-width gates pass, implementation P is pushed and reviewed, both EXEs are linked to Audio and S5 awaits owner audible acceptance. |
-| Original Owner Request | Build neutral src/lib/audio and test/lib/audio first, then later connect SoftPC speaker and eventually separately study XP sound-card support. |
-| Similar-Issue Sweep | Search current Core Compat speaker endpoint/tests and all original sound callback sites for direct host Beep/output, duplicated tone timing and lifecycle ownership; retain original device requests, replace only presentation endpoint and record every direct hit. |
+| Reporting Requirements | Expected production +2..8/-0..4, tests +20..50/-0..10; actual added/removed/net and artifact links after push. |
+| Stop Conditions | Any need to alter a public interface, change existing-Window paused retention, add another desired-state flag, or touch Lib/Core/App/x86 stops S6 for revised owner approval. |
+| Exit Criteria | The state matrix proves that INIT, STOPPED, RESET_COMPLETED/PAUSED and ERROR cannot create a missing Window under either display mode; an existing paused Window remains retained; dual-width gates and review pass; implementation P is pushed with refreshed EXEs. |
+| Original Owner Request | Audit whether any non-running machine without a Window may open it, then admit the smallest correction if the invariant is violated. |
+| Similar-Issue Sweep | Search all `COMMON_UI_ACTION_CREATE_WINDOW` production emitters and Common state-matrix cases. The only production emitter must be `common_session_state_next_action`; each non-running state receives an explicit test disposition. |
 
 ## Current Technical Baseline
 
