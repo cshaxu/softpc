@@ -99,7 +99,7 @@ else()
     target_sources(audio PRIVATE audio/linux/stream.c)
 endif()
 library_root(audio)
-target_link_libraries(audio PUBLIC types)
+target_link_libraries(audio PUBLIC types base)
 
 if(WIN32)
     target_link_libraries(audio PRIVATE winmm)

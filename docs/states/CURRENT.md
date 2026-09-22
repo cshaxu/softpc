@@ -2,32 +2,44 @@
 
 ## Current Work
 
-T81 S7 is active solely for the owner's bounded audible PC-speaker acceptance
-and the subsequent whole-task audit. S6 is independently closed; it does not
-alter the audio boundary or substitute for S5's required audible proof.
+T81 S7 adopts the owner-approved MyNES Audio corpus as the sole canonical
+implementation, then reconnects the existing SoftPC PC-speaker producer to
+that contract. The earlier uncommitted S7 implementation is superseded by
+this explicit owner-directed corpus replacement.
 
 ## M9 T81 S7 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approved automatic sequential implementation and instructed the agent to stop after all S tasks for owner acceptance. S7 records that remaining acceptance and audit boundary. |
-| Objective | Obtain the bounded audible DOS/Win3.x PC-speaker result for the already-pushed S5 implementation, then perform the required T81 ledger, source-boundary and evidence audit. |
-| Non-goals | No implementation, Lib/Common/App/Core/x86 API change, new sound-card route, configuration, snapshot or Linux playback claim without a separately admitted defect repair. |
-| Reference Baseline | T81 S6 coordinator closure following executor `37562abb`; clean worktree after the S6 closure push. |
+| Admission And Approval | Owner approved adoption of the audited MyNES `b48e57f` Audio corpus after its dead platform query was removed, scheduling constants were made private, and finite PCM-tail delivery acquired an explicit flush contract. The owner directs this revised S7 to finish through build, test, push and manual acceptance. |
+| Objective | Replace SoftPC's uncommitted earlier S7 Audio implementation with the exact MyNES `b48e57f` shared Audio source/test corpus, then adapt the sole Compat PC-speaker producer to its neutral FIFO/flush contract without platform knowledge. |
+| Non-goals | No Common/App/x86/snapshot/configuration change; no guest sound card, DMA, IRQ, OPL/MIDI, volume policy, original-mirror change, second audio producer or platform-specific Compat API. Linux remains unsupported. |
+| Reference Baseline | SoftPC executor `ae76ecbf` plus its uncommitted T81 S7 worktree; MyNES read-only source commit `b48e57f` is the canonical Audio source baseline. |
 | Candidate Proposal | [Neutral audio](../proposals/m9-neutral-audio-stream.md) |
-| Files And ABI Surface | T81 history/proposal/current-status documents only unless the owner reports a reproducible defect requiring a new admitted corrective packet. |
+| Files And ABI Surface | Exact MyNES copies of Audio public/private/platform source, Types WinMM declarations and Lib Audio tests/manifests; public `lib_audio_stream_flush` joins existing enqueue/query/wait/clear/lifecycle API. `core/compat/audio.c` remains the only SoftPC PCM producer and retains its existing clear-on-tone-stop policy; an ignored `AUDIO.COM` may remain in owner-selected test media and is never tracked. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation and source research policy; shared Lib strict C11/package rules. |
-| Verification | Owner hears an intentional bounded PC-speaker tone in DOS or Win3.x using the supplied x64/x86 packages. Audit every S1--S6 ledger row, committed changed path, manifest/DAG and dual-width evidence before closure. |
-| Expected Markers | No fresh code is needed for acceptance; one Compat worker remains the tone time source, Lib owns PCM/native output, and original `nt_sound.c` remains unchanged. |
-| Asset Needs | Existing package EXEs only; do not modify INI/media. |
-| Reporting Requirements | No expected code delta. Report the owner result and, on approval, the complete T-level audit mapping. |
-| Stop Conditions | No T81 closure without an explicit audible owner result. A reported defect stops the audit and requires a separately admitted repair packet. |
-| Exit Criteria | Owner audible acceptance is recorded; S5 is closed with its implementation proof; a separate T81 audit maps all admitted S work and frozen ledger requirements before task closure. |
+| Verification | Exact source/test hash comparison against MyNES `b48e57f`; focused fake/native Audio and Compat failure tests; strict C11 and background product regression on x64/x86; manifests/DAG/governance; owner runs `C:\AUDIO.COM` and hears one continuous five-second tone. |
+| Expected Markers | One Audio FIFO/worker and one selected platform leaf exist; no platform query residue or public batch/capacity policy exists; `flush` delivers a finite tail; one Compat worker remains the tone source, never polls for slot readiness and never imports platform Audio types; original `nt_sound.c` remains unchanged. |
+| Asset Needs | Refresh the two package EXEs. The owner permits a test-only `AUDIO.COM` inside the selected hard-disk image; it is not committed. Preserve all other INI/media edits. |
+| Reporting Requirements | Report production/test additions, deletions and net; callback/event ownership; exact test results and artifact hashes; separate ignored-media disposition. |
+| Stop Conditions | Native completion cannot be represented without product-visible platform types; callback can outlive Audio-owned state; any change requires an original-mirror edit; or test media selection is ambiguous. |
+| Exit Criteria | Audio source/test code paths match MyNES `b48e57f` byte-for-byte except a documented upstream-stale README and derived manifests; only necessary Compat producer adaptation remains; focused and full required gates pass on both widths; owner reports a continuous direct PIT/PPI tone. T81 still requires its separate ledger audit before T closure. |
 | Original Owner Request | Build neutral src/lib/audio and test/lib/audio first, then later connect SoftPC speaker and eventually separately study XP sound-card support. |
-| Similar-Issue Sweep | The implementation sweeps are recorded in S2--S6 evidence. S7 has no code surface; it verifies that no unreviewed changed path remains before T closure. |
+| Similar-Issue Sweep | Search every `lib_audio_stream_*` production caller and all PC-speaker tone-stop/shutdown paths. Retain only the single Compat producer and the single Audio worker; record every prior S7-path disposition in S7 evidence. |
 
 ## Current Technical Baseline
+
+- T81 S7 replaces the Compat PC-speaker producer's timed readiness poll with
+  `lib_audio_stream_wait_writable()`: Windows Audio owns one private WinMM
+  completion callback/event and Linux remains unsupported. The callback never
+  enters product code; one Compat worker still produces the sustained square
+  wave and opens native output only on demand. `cancel_wait` is the only
+  concurrent stream operation and releases shutdown without changing PCM.
+  Focused suites pass and the presentation shutdown case passes 20 consecutive
+  times on each width; full background regressions pass x64 114/114 (195.50 s)
+  and x86 114/114 (179.50 s). The active proposal retains scope, accounting and
+  the required owner `C:\AUDIO.COM` observation until S7 is closed.
 
 - T81 S6 executor `37562abb` closes the missing-Window admission gap with one
   Session condition: only actual RUNNING can emit `CREATE_WINDOW`. Paused

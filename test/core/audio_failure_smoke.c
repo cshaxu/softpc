@@ -8,7 +8,9 @@
 static unsigned clears;
 static unsigned enqueues;
 static unsigned waits;
+static unsigned writable_waits;
 static int scenario;
+static lib_i16 first_sample[2];
 
 static lib_status fake_enqueue(lib_audio_stream *stream, const lib_i16 *samples,
     lib_u32 frames, lib_u32 *accepted)
@@ -16,14 +18,37 @@ static lib_status fake_enqueue(lib_audio_stream *stream, const lib_i16 *samples,
     (void)stream;
     assert(samples != NULL && frames == 512u);
     ++enqueues;
-    *accepted = scenario == 1 ? 0u : frames;
-    return scenario == 1 ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
+    if (enqueues <= 2u) first_sample[enqueues - 1u] = samples[0];
+    if (scenario == 1) {
+        *accepted = 0u;
+        return LIB_STATUS_IO_ERROR;
+    }
+    if (scenario == 2) {
+        *accepted = enqueues == 1u ? 60u : 0u;
+        return enqueues == 1u ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+    }
+    *accepted = enqueues > 4u ? 0u : frames;
+    return enqueues > 4u ? LIB_STATUS_LIMIT_EXCEEDED : LIB_STATUS_OK;
 }
 
 static lib_status fake_clear(lib_audio_stream *stream)
 {
     assert(stream == (lib_audio_stream *)1);
     ++clears;
+    return LIB_STATUS_OK;
+}
+
+static lib_status fake_wait_writable(lib_audio_stream *stream)
+{
+    assert(stream == (lib_audio_stream *)1);
+    ++writable_waits;
+    if (scenario == 2 && writable_waits == 1u) return LIB_STATUS_OK;
+    return LIB_STATUS_IO_ERROR;
+}
+
+static lib_status fake_cancel_wait(lib_audio_stream *stream)
+{
+    assert(stream == (lib_audio_stream *)1);
     return LIB_STATUS_OK;
 }
 
@@ -39,11 +64,6 @@ static base_sync_wait_result fake_wait(base_sync_event *const *events,
         *index = 1u;
         return BASE_SYNC_WAIT_SIGNALED;
     }
-    if (scenario == 0) {
-        assert(timeout == 5u);
-        *index = 0u;
-        return BASE_SYNC_WAIT_SIGNALED;
-    }
     assert(timeout == LIB_UINT32_MAX);
     return BASE_SYNC_WAIT_CANCELLED;
 }
@@ -56,12 +76,16 @@ static lib_status fake_reset(base_sync_event *event)
 
 #define lib_audio_stream_enqueue fake_enqueue
 #define lib_audio_stream_clear fake_clear
+#define lib_audio_stream_wait_writable fake_wait_writable
+#define lib_audio_stream_cancel_wait fake_cancel_wait
 #define base_sync_wait_any fake_wait
 #define base_sync_event_reset fake_reset
 #include "core/compat/audio.c"
 #undef base_sync_event_reset
 #undef base_sync_wait_any
 #undef lib_audio_stream_clear
+#undef lib_audio_stream_wait_writable
+#undef lib_audio_stream_cancel_wait
 #undef lib_audio_stream_enqueue
 
 int main(void)
@@ -72,14 +96,21 @@ int main(void)
     softpc_speaker_frequency = 440;
 
     scenario = 0;
-    clears = enqueues = waits = 0u;
+    clears = enqueues = waits = writable_waits = 0u;
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 1u && clears == 0u && waits == 2u);
+    assert(enqueues == 5u && clears == 1u && waits == 2u);
 
     scenario = 1;
-    clears = enqueues = waits = 0u;
+    clears = enqueues = waits = writable_waits = 0u;
     softpc_speaker_frequency = 440;
     softpc_speaker_worker(NULL, NULL);
     assert(enqueues == 1u && clears == 1u && waits == 2u);
+
+    scenario = 2;
+    clears = enqueues = waits = writable_waits = 0u;
+    softpc_speaker_frequency = 440;
+    softpc_speaker_worker(NULL, NULL);
+    assert(enqueues == 2u && clears == 1u && waits == 2u &&
+        first_sample[0] == 12000 && first_sample[1] == -12000);
     return 0;
 }

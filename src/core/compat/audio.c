@@ -17,14 +17,44 @@ ULONG GetPerfCounter(VOID)
 #define SOFTPC_SPEAKER_MAX_HZ 20000ul
 #define SOFTPC_SPEAKER_SAMPLE_RATE 48000u
 #define SOFTPC_SPEAKER_BLOCK_FRAMES 512u
-#define SOFTPC_SPEAKER_WAIT_MS 5u
 static base_sync_event *softpc_speaker_wake;
 static base_sync_event *softpc_speaker_stop;
 static base_sync_task *softpc_speaker_task;
+static base_sync_mutex *softpc_speaker_stream_gate;
 static lib_audio_stream *softpc_speaker_stream;
 static volatile LONG softpc_speaker_frequency;
 
-static lib_status softpc_speaker_submit(ULONG frequency, lib_u32 *phase)
+static lib_audio_stream *softpc_speaker_current_stream(void)
+{
+    lib_audio_stream *stream;
+
+    if (softpc_speaker_stream_gate == NULL) return softpc_speaker_stream;
+    base_sync_mutex_lock(softpc_speaker_stream_gate);
+    stream = softpc_speaker_stream;
+    base_sync_mutex_unlock(softpc_speaker_stream_gate);
+    return stream;
+}
+
+static void softpc_speaker_set_stream(lib_audio_stream *stream)
+{
+    if (softpc_speaker_stream_gate != NULL)
+        base_sync_mutex_lock(softpc_speaker_stream_gate);
+    softpc_speaker_stream = stream;
+    if (softpc_speaker_stream_gate != NULL)
+        base_sync_mutex_unlock(softpc_speaker_stream_gate);
+}
+
+static lib_status softpc_speaker_create_stream(lib_audio_stream **out_stream)
+{
+    lib_audio_stream_options options;
+
+    options.sample_rate = SOFTPC_SPEAKER_SAMPLE_RATE;
+    options.channel_count = 1u;
+    return lib_audio_stream_create(&options, out_stream);
+}
+
+static lib_status softpc_speaker_submit(lib_audio_stream *stream,
+    ULONG frequency, lib_u32 *phase)
 {
     lib_i16 samples[SOFTPC_SPEAKER_BLOCK_FRAMES];
     lib_u32 next_phase;
@@ -42,10 +72,18 @@ static lib_status softpc_speaker_submit(ULONG frequency, lib_u32 *phase)
             next_phase -= SOFTPC_SPEAKER_SAMPLE_RATE;
     }
     accepted = 0u;
-    status = lib_audio_stream_enqueue(softpc_speaker_stream, samples,
+    status = lib_audio_stream_enqueue(stream, samples,
         SOFTPC_SPEAKER_BLOCK_FRAMES, &accepted);
-    if (accepted != SOFTPC_SPEAKER_BLOCK_FRAMES)
-        return status == LIB_STATUS_LIMIT_EXCEEDED ? status : LIB_STATUS_IO_ERROR;
+    if (accepted != SOFTPC_SPEAKER_BLOCK_FRAMES) {
+        next_phase = *phase;
+        for (index = 0u; index < accepted; ++index) {
+            next_phase += (lib_u32)frequency;
+            if (next_phase >= SOFTPC_SPEAKER_SAMPLE_RATE)
+                next_phase -= SOFTPC_SPEAKER_SAMPLE_RATE;
+        }
+        *phase = next_phase;
+        return status == LIB_STATUS_OK ? LIB_STATUS_LIMIT_EXCEEDED : status;
+    }
     *phase = next_phase;
     return status;
 }
@@ -55,10 +93,12 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
     base_sync_event *waits[2];
     lib_u32 event_index;
     lib_u32 phase;
+    lib_audio_stream *stream;
     UNUSED(unused);
     waits[0] = softpc_speaker_stop;
     waits[1] = softpc_speaker_wake;
     phase = 0u;
+    stream = softpc_speaker_current_stream();
     for (;;)
     {
         if (base_sync_wait_any(waits, 2u, task, UINT32_MAX, &event_index) !=
@@ -66,57 +106,66 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
         if (base_sync_event_reset(softpc_speaker_wake) != LIB_STATUS_OK) break;
         while (InterlockedCompareExchange(&softpc_speaker_frequency, 0, 0) != 0)
         {
-            base_sync_wait_result result;
             ULONG frequency = (ULONG)InterlockedCompareExchange(
                 &softpc_speaker_frequency, 0, 0);
             lib_status status;
-            status = softpc_speaker_submit(frequency, &phase);
+            if (stream == NULL) {
+                status = softpc_speaker_create_stream(&stream);
+                if (status != LIB_STATUS_OK) {
+                    InterlockedExchange(&softpc_speaker_frequency, 0);
+                    break;
+                }
+                softpc_speaker_set_stream(stream);
+            }
+            status = softpc_speaker_submit(stream, frequency, &phase);
             if (status != LIB_STATUS_OK && status != LIB_STATUS_LIMIT_EXCEEDED)
             {
                 InterlockedExchange(&softpc_speaker_frequency, 0);
                 break;
             }
-            result = base_sync_wait_any(waits, 2u, task, SOFTPC_SPEAKER_WAIT_MS,
-                &event_index);
-            if (result == BASE_SYNC_WAIT_TIMED_OUT) continue;
-            if (result != BASE_SYNC_WAIT_SIGNALED || event_index == 0u) return;
-            if (base_sync_event_reset(softpc_speaker_wake) != LIB_STATUS_OK) return;
+            if (status == LIB_STATUS_LIMIT_EXCEEDED &&
+                lib_audio_stream_wait_writable(stream) !=
+                    LIB_STATUS_OK) {
+                InterlockedExchange(&softpc_speaker_frequency, 0);
+                break;
+            }
         }
-        (void)lib_audio_stream_clear(softpc_speaker_stream);
+        if (stream != NULL) (void)lib_audio_stream_clear(stream);
     }
 }
 
 lib_status softpc_platform_audio_start(void)
 {
-    lib_audio_stream_options options;
     lib_status status;
     if (softpc_speaker_task != NULL) return LIB_STATUS_OK;
     if (softpc_speaker_stream != NULL) return LIB_STATUS_IO_ERROR;
-    options.sample_rate = SOFTPC_SPEAKER_SAMPLE_RATE;
-    options.channel_count = 1u;
-    status = lib_audio_stream_create(&options, &softpc_speaker_stream);
-    if (status != LIB_STATUS_OK) return status;
     status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &softpc_speaker_wake);
-    if (status != LIB_STATUS_OK) goto fail_stream;
+    if (status != LIB_STATUS_OK) return status;
     status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &softpc_speaker_stop);
     if (status != LIB_STATUS_OK) {
         base_sync_event_destroy(softpc_speaker_wake);
         softpc_speaker_wake = NULL;
-        goto fail_stream;
+        return status;
+    }
+    status = base_sync_mutex_create(&softpc_speaker_stream_gate);
+    if (status != LIB_STATUS_OK) {
+        base_sync_event_destroy(softpc_speaker_wake);
+        base_sync_event_destroy(softpc_speaker_stop);
+        softpc_speaker_wake = NULL;
+        softpc_speaker_stop = NULL;
+        return status;
     }
     status = base_sync_task_create(softpc_speaker_worker, NULL,
         &softpc_speaker_task);
     if (status != LIB_STATUS_OK) {
         base_sync_event_destroy(softpc_speaker_wake);
         base_sync_event_destroy(softpc_speaker_stop);
+        base_sync_mutex_destroy(softpc_speaker_stream_gate);
         softpc_speaker_wake = NULL;
         softpc_speaker_stop = NULL;
-        goto fail_stream;
+        softpc_speaker_stream_gate = NULL;
+        return status;
     }
-    return status;
-
-fail_stream:
-    (void)lib_audio_stream_destroy(&softpc_speaker_stream);
     return status;
 }
 
@@ -132,6 +181,11 @@ void softpc_platform_audio_shutdown(void)
 {
     if (softpc_speaker_task != NULL)
     {
+        /* wait_writable blocks on native completion, not the task cancel
+           event; clear the producer request before joining it. */
+        InterlockedExchange(&softpc_speaker_frequency, 0);
+        lib_audio_stream *stream = softpc_speaker_current_stream();
+        if (stream != NULL) (void)lib_audio_stream_cancel_wait(stream);
         base_sync_event_signal(softpc_speaker_stop);
         base_sync_event_signal(softpc_speaker_wake);
         if (base_sync_task_destroy(softpc_speaker_task) != LIB_STATUS_OK) {
@@ -145,9 +199,16 @@ void softpc_platform_audio_shutdown(void)
     softpc_speaker_wake = NULL;
     softpc_speaker_stop = NULL;
     InterlockedExchange(&softpc_speaker_frequency, 0);
-    if (softpc_speaker_stream != NULL &&
-        lib_audio_stream_destroy(&softpc_speaker_stream) != LIB_STATUS_OK)
-        fputs("softpcvm: cannot close audio stream\n", stderr);
+    {
+        lib_audio_stream *stream = softpc_speaker_current_stream();
+        softpc_speaker_set_stream(NULL);
+        if (stream != NULL && lib_audio_stream_destroy(&stream) != LIB_STATUS_OK) {
+            softpc_speaker_set_stream(stream);
+            fputs("softpcvm: cannot close audio stream\n", stderr);
+        }
+    }
+    base_sync_mutex_destroy(softpc_speaker_stream_gate);
+    softpc_speaker_stream_gate = NULL;
 }
 #else
 void softpc_standalone_audio_set_tone(ULONG frequency, ULONG duration)

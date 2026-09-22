@@ -21,16 +21,13 @@ lib_status audio_stream_platform_enqueue(audio_stream_platform *platform,
     return LIB_STATUS_UNSUPPORTED;
 }
 
-lib_status audio_stream_platform_query(audio_stream_platform *platform,
-    lib_u32 *out_queued_frames, lib_u32 *out_writable_frames)
+lib_status audio_stream_platform_wait_writable(audio_stream_platform *platform)
 {
-    (void)platform;
-    if (out_queued_frames == LIB_NULL || out_writable_frames == LIB_NULL)
-        return LIB_STATUS_INVALID_ARGUMENT;
-    *out_queued_frames = 0u;
-    *out_writable_frames = 0u;
-    return LIB_STATUS_UNSUPPORTED;
+    return platform == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_UNSUPPORTED;
 }
+
+lib_status audio_stream_platform_cancel_wait(audio_stream_platform *platform)
+{ return platform == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_UNSUPPORTED; }
 
 lib_status audio_stream_platform_clear(audio_stream_platform *platform)
 { return platform == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_UNSUPPORTED; }

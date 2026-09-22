@@ -16,12 +16,12 @@ It has no general PCM stream or attached Sound Blaster implementation.
 XP's nt_sb/nt_sbdsp/nt_sbfm/nt_sbmid are research references only: they
 depend on NTVDM/WinMM and do not establish standalone device compatibility.
 
-NNES `1c6a63c` audio is a requirements reference, not an admitted source import.
-Its 48 kHz mono path demonstrates a consumer need. Its software ring plus
-native buffers, full-batch-only consumption, ignored output errors, software-only
-flush and successful silent Linux stub are not the target design.
-Implement repository-owned code; copying external source requires the separate
-provenance review in the repository source policy. No sibling build dependency.
+MyNES `b48e57f` is the owner-approved canonical source import for revised S7. It has
+the same shared-corpus provenance and no runtime/build dependency is created:
+SoftPC copies the checked-in source and tests, then proves their hashes. Its
+private FIFO, worker and explicit finite-tail flush replace SoftPC's uncommitted
+S7 implementation; platform failure remains terminal and Linux remains an
+honest unsupported leaf.
 
 ## Product Result And Non-goals
 
@@ -54,11 +54,15 @@ Win3.x/Win95 sound-card playback is explicitly not this T's exit criterion.
   Platform implementations in `audio/win32` and `audio/linux` expose the same
   private function shapes. No native/private/internal suffix or wrapper object
   whose only purpose is owning another pointer.
-- A native stream allocation owns buffers directly. No second software ring,
-  Lib worker, command mailbox, retry loop or callback into a product is needed.
-  Completion is obtained from native buffer completion metadata at public calls;
-  no periodic Lib thread polls. Host playback proceeds independently.
-- Caller serializes all operations on one stream, including destruction.
+- Audio owns one bounded copied PCM FIFO and one output worker per stream. The
+  worker is the only caller of the selected platform leaf; this is the one
+  Audio delivery path, not a product mailbox or a second producer. The native
+  completion callback only signals Audio-private readiness; it never invokes
+  product code. `wait_writable` exposes FIFO admission as a neutral blocking
+  operation, so callers need not poll. `cancel_wait` is the sole concurrent
+  operation and only interrupts that wait. Host playback proceeds independently.
+- Caller serializes all operations on one stream, including destruction, except
+  `cancel_wait` may wake one concurrent `wait_writable`.
   Separate streams are independent. Producer/control synchronization belongs
   to the caller; native completion does not invoke caller code.
 
@@ -71,7 +75,9 @@ below are finalized in S2 without adding redundant aliases.
 | --- | --- |
 | create(options, out_stream) | Validate format, open native output and prepare fixed storage; success means ready, failure leaves output null. Initially active. |
 | enqueue(stream, samples, frame_count, out_accepted_frames) | Copy an ordered prefix without waiting for playback; accepted count is authoritative. Never retain caller memory. |
-| query(stream, out_queued_frames, out_writable_frames) | Reclaim completed slots and report queued submitted frames plus currently writable capacity; not a hardware sample-position or latency clock. |
+| query(stream, out_queued_frames, out_writable_frames) | Report copied FIFO occupancy and immediately writable FIFO capacity; not a hardware sample-position or latency clock. |
+| wait_writable(stream) | Block until the copied FIFO accepts at least one frame; a successful `cancel_wait` wakes it with INVALID_STATE rather than modifying PCM. |
+| cancel_wait(stream) | The sole operation permitted concurrently with `wait_writable`; it wakes that wait without changing queued PCM. |
 | set_active(stream, active) | False discards queued audio using the same reset path as clear; true enables new submissions. Inactive enqueue returns INVALID_STATE. Repeated calls are idempotent. |
 | clear(stream) | Discard all pending native blocks, retaining active/inactive state. No old queued block can be submitted after successful return. |
 | destroy(inout_stream) | Reset, unprepare, close and release; success nulls pointer, null is idempotent. Failure retains owned resources for safe cleanup, never frees buffers still owned by the OS. |
@@ -82,12 +88,12 @@ sample per channel. Mono and stereo; initial supported rates 22050, 44100 and
 invalid counts/pointers and size multiplication overflow are rejected before
 modification. Mono 48 kHz serves NES without imposing NES concepts on Lib.
 
-Start with four fixed slots of at most 512 frames each (2048-frame ceiling).
-Any nonempty prefix, including one frame, is submitted without waiting to fill
-a slot. A short submission occupies a slot until completion: writable capacity
-is free-slot capacity, not 2048 minus queued frames. This explicit tradeoff
-avoids a staging queue; NES should enqueue practical batches. No dynamic growth.
-At 48 kHz the maximum queued duration is about 42.7 ms, excluding host latency.
+Audio accepts copied ordered prefixes into one fixed private FIFO. Its worker
+submits practical private batches to the four-slot WinMM leaf; the producer sees
+FIFO admission, never slot accounting. `flush` is the explicit finite-sound
+boundary: it delivers a remaining sub-batch tail in order before returning.
+`clear` is the explicit discard boundary. No dynamic growth or caller-memory
+retention exists.
 
 Full capacity returns LIMIT_EXCEEDED with zero accepted. Partial capacity
 accepts a prefix and returns OK. If native submission fails after earlier
@@ -106,7 +112,7 @@ Win32 uses waveOut with fixed prepared buffers and no application callback.
 Native completion flags govern reuse. Reset/close ordering and partial prepare
 failure must be proven with an injected backend and a real native smoke.
 No unchecked reuse/unprepare/free while a block is still submitted.
-If this bounded no-worker design cannot meet those contracts, stop and revise
+If the bounded FIFO/worker design cannot meet those contracts, stop and revise
 the design with the owner rather than adding a second queue or hidden thread.
 
 ## Ordered S Tasks And Estimated Diffs
@@ -122,7 +128,7 @@ deletions and net separately for production, tests/build and docs at each S.
 | S4 | Four-package isolated copy acceptance, remaining lifecycle tests, docs and release artifacts | 4-8 files; production +0..30/-0..30; tests/build +60..140/-0..20 | Strict dual C11, isolated Lib/Common and full background regressions, unchanged copy hashes |
 | S5 | Use the finished stream at the existing SoftPC PC-speaker presentation boundary | 3-6 Core Compat/test/build files; production +100..180/-40..90; tests/build +80..160/-0..20 | Win3.1/DOS PC-speaker handoff, state/clear/shutdown proof and audible owner test |
 | S6 | Close the Common Session Window-creation admission gap: a missing Window may be created only after a RUNNING completion; paused state may retain but never synthesize a Window | 2-3 Common/test/docs files; production +2..8/-0..4; tests +20..50/-0..10 | State matrix proves INIT, STOPPED, RESET_COMPLETED/PAUSED and ERROR never create a missing Window for either display mode; existing paused Window retention remains unchanged |
-| S7 | Owner audible PC-speaker acceptance and T81 completion audit; no implementation unless owner reports a reproducible sound defect | docs only unless a new defect is admitted | Owner confirms bounded DOS/Win3.x PC Speaker sound, then audit S1--S6 against the acceptance ledger and close T81 |
+| S7 | Owner-revised before an executor commit: adopt the MyNES `b48e57f` Audio source/test corpus and reconnect the one SoftPC Compat PC-speaker producer through its FIFO/flush contract | 10-14 Lib/Core/test/build/docs files; production +20..140/-80..220; tests +20..120/-20..140 | Exact shared-corpus code hash comparison except the documented upstream-stale README and derived manifests, finite-tail/failure proof, dual-width strict C11/background regression and audible `AUDIO.COM` acceptance |
 
 The owner has approved automatic sequential admission of S2--S5. Each
 code-changing S builds x86/x64 EXEs, runs focused and
@@ -133,7 +139,8 @@ S5 is the only task that alters product code. It replaces neither guest PIT/PPI
 nor the original `nt_sound.c` state machine: that code continues to issue the
 existing frequency/stop request, and Core Compat synthesizes a bounded PCM
 square-wave block. It retains one Compat worker because a sustained speaker
-tone needs a product-time source to generate future samples; Lib has no worker.
+tone needs a product-time source to generate future samples; Audio's separate
+worker owns only host PCM delivery.
 Frequency zero, gate-off and shutdown clear unsounded native PCM. No sound card,
 DMA, IRQ, OPL/MIDI or guest multimedia route is added. An audible test must be
 explicit, bounded and separate from silent CI tests.
@@ -150,13 +157,14 @@ Each row must have a passing test/evidence or an owner-approved scope revision.
 | Bounded capacity, prefix acceptance, order, copied lifetime, completion reuse | S2/S3 fake plus native tests |
 | Inactive rejection, idempotence, clear of native pending data | S3 deterministic submission/reset ordering and native smoke |
 | Open/prepare/write/reset/unprepare/close failure and partial ownership | S3 injected failures; no successful silent fallback |
-| No extra worker/ring, no audio-driven machine pacing | S3 changed-path ownership audit |
+| One Audio FIFO/worker, no product-side platform path or audio-driven machine pacing | S7 changed-path ownership audit |
 | Linux honest placeholder with identical private ABI | S3 compile/check and explicit UNSUPPORTED test where runnable |
 | Independent four-directory import, strict C11 on both widths | S4 isolated copy/build/test; no sibling or product paths |
 | Existing SoftPC behavior retained, both deliverable EXEs | Each implementation S background regression and artifact hashes |
 | Audible PCM, caller reuse instructions, known platform limits | S4 bounded native tone test and owner acceptance |
 | SoftPC PC Speaker through the completed Lib stream | S5 Core state proof plus Win3.1/DOS owner acceptance |
 | Non-running presentation never synthesizes a missing Window | S6 Common Session state matrix on both display modes |
+| No periodic PCM readiness polling; completion wakes a bounded PC Speaker producer | S7 native completion and Compat worker proofs plus owner audible test |
 
 All six shared manifests and dependency gates must remain valid. Use the
 existing background presets (exclude desktop); do not pop windows or request
@@ -165,6 +173,26 @@ guest media or copyrighted music. Do not alter user INI or assets/media.
 Linux compile/runtime and downstream NES integration are reported separately;
 Windows tests alone cannot establish either. S4 copy proof means importability,
 not a claim of already running the downstream application.
+
+## S7 Revised Canonical-Import Record
+
+The canonical comparison baseline is MyNES `b48e57f`. Audio C/H/platform/build
+paths and Audio C tests are copied verbatim; only each corpus manifest is
+derived for this repository. SoftPC deliberately retains its accurate Audio
+README rather than importing MyNES's stale calls-based completed-slot wording:
+the canonical implementation has one copied FIFO and one delivery worker.
+
+Compat remains the sole SoftPC producer and uses only the neutral stream API:
+enqueue, FIFO-writable wait/cancellation, clear and lifecycle. It neither sees
+WinMM vocabulary nor owns delivery. Tone gate-off clears unsounded PCM rather
+than flushing it, preserving the existing immediate-stop product semantics;
+`flush` remains available to finite PCM producers. Original `nt_sound.c` is
+unchanged.
+
+Verification is dual-width strict C11/package builds, focused fake/native Audio
+and Compat failure suites, full background regression, component DAG, manifest
+and documentation gates. The remaining acceptance is the owner's audible
+`AUDIO.COM` check; no user INI or media is tracked by this task.
 
 T closure requires separate original-request/ledger/changed-path audit and
 owner acceptance. XP sound-card implementation remains future separately
