@@ -2,33 +2,40 @@
 
 ## Current Work
 
-T81 S6 is active: close the Common Session rule that a missing Window can be
-created only for a running machine. S5's implementation is pushed and still
-awaits the owner's bounded audible PC-speaker acceptance; this narrow Session
-repair neither changes nor closes that pending evidence.
+T81 S7 is active solely for the owner's bounded audible PC-speaker acceptance
+and the subsequent whole-task audit. S6 is independently closed; it does not
+alter the audio boundary or substitute for S5's required audible proof.
 
-## M9 T81 S6 Packet
+## M9 T81 S7 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner explicitly admits this repair after the Common audit: whenever the machine is not RUNNING and no Window exists, no display mode may open one. |
-| Objective | Enforce the single Session action-admission invariant: a missing Window is created only while the actual runtime state is RUNNING. Preserve paused retention and freezing of a Window that already exists. |
-| Non-goals | No Lib, Common UI, App, Core, x86, public ABI, frame-plan, Console, mouse, title, or audio change. Do not remove the separate `window_suppressed` close semantics. |
-| Reference Baseline | T81 S5 executor `a2fbf548`; clean worktree after its implementation push. |
+| Admission And Approval | Owner approved automatic sequential implementation and instructed the agent to stop after all S tasks for owner acceptance. S7 records that remaining acceptance and audit boundary. |
+| Objective | Obtain the bounded audible DOS/Win3.x PC-speaker result for the already-pushed S5 implementation, then perform the required T81 ledger, source-boundary and evidence audit. |
+| Non-goals | No implementation, Lib/Common/App/Core/x86 API change, new sound-card route, configuration, snapshot or Linux playback claim without a separately admitted defect repair. |
+| Reference Baseline | T81 S6 coordinator closure following executor `37562abb`; clean worktree after the S6 closure push. |
 | Candidate Proposal | [Neutral audio](../proposals/m9-neutral-audio-stream.md) |
-| Files And ABI Surface | Common Session private control-state action derivation and its state-matrix smoke, plus proposal/current/history evidence. No public ABI changes. |
+| Files And ABI Surface | T81 history/proposal/current-status documents only unless the owner reports a reproducible defect requiring a new admitted corrective packet. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation and source research policy; shared Lib strict C11/package rules. |
-| Verification | Add direct state-matrix coverage for both display modes and every non-RUNNING state with no Window; preserve existing paused-retention coverage. Run focused Common tests, strict dual-width shared Common build/test, product background x64/x86 tests, governance/manifest/DAG checks. |
-| Expected Markers | `presentation_plan` may continue to describe paused retention; the sole `CREATE_WINDOW` action gate rejects a missing Window unless `runtime_actual == RUNNING`. No new state, callback, queue, flag or helper. |
-| Asset Needs | Refresh package EXEs after product builds only; do not modify INI/media. |
-| Reporting Requirements | Expected production +2..8/-0..4, tests +20..50/-0..10; actual added/removed/net and artifact links after push. |
-| Stop Conditions | Any need to alter a public interface, change existing-Window paused retention, add another desired-state flag, or touch Lib/Core/App/x86 stops S6 for revised owner approval. |
-| Exit Criteria | The state matrix proves that INIT, STOPPED, RESET_COMPLETED/PAUSED and ERROR cannot create a missing Window under either display mode; an existing paused Window remains retained; dual-width gates and review pass; implementation P is pushed with refreshed EXEs. |
-| Original Owner Request | Audit whether any non-running machine without a Window may open it, then admit the smallest correction if the invariant is violated. |
-| Similar-Issue Sweep | Search all `COMMON_UI_ACTION_CREATE_WINDOW` production emitters and Common state-matrix cases. The only production emitter must be `common_session_state_next_action`; each non-running state receives an explicit test disposition. |
+| Verification | Owner hears an intentional bounded PC-speaker tone in DOS or Win3.x using the supplied x64/x86 packages. Audit every S1--S6 ledger row, committed changed path, manifest/DAG and dual-width evidence before closure. |
+| Expected Markers | No fresh code is needed for acceptance; one Compat worker remains the tone time source, Lib owns PCM/native output, and original `nt_sound.c` remains unchanged. |
+| Asset Needs | Existing package EXEs only; do not modify INI/media. |
+| Reporting Requirements | No expected code delta. Report the owner result and, on approval, the complete T-level audit mapping. |
+| Stop Conditions | No T81 closure without an explicit audible owner result. A reported defect stops the audit and requires a separately admitted repair packet. |
+| Exit Criteria | Owner audible acceptance is recorded; S5 is closed with its implementation proof; a separate T81 audit maps all admitted S work and frozen ledger requirements before task closure. |
+| Original Owner Request | Build neutral src/lib/audio and test/lib/audio first, then later connect SoftPC speaker and eventually separately study XP sound-card support. |
+| Similar-Issue Sweep | The implementation sweeps are recorded in S2--S6 evidence. S7 has no code surface; it verifies that no unreviewed changed path remains before T closure. |
 
 ## Current Technical Baseline
+
+- T81 S6 executor `37562abb` closes the missing-Window admission gap with one
+  Session condition: only actual RUNNING can emit `CREATE_WINDOW`. Paused
+  Window retention and `window_suppressed` close reconciliation are unchanged.
+  Production C +4/-1 (net +3), test C +32/-0; the source/test manifest hashes
+  are refreshed. Direct state matrix, manifests/governance and background
+  product x64/x86 119/119 pass; desktop tests excluded. [S6 evidence](../history/M9-T81-S6-window-creation-admission.md)
+  records the finite non-running-state sweep and EXE hashes.
 
 - T81 S4 executor `d5dc2245` changes no code: a fresh exact 189-file copy of
   `src/lib`, `src/common`, `test/lib`, `test/common` has 0 hash mismatches and

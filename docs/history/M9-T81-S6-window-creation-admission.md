@@ -47,7 +47,8 @@ helper, state flag, callback or plan variant was needed.
 | [softpc32.exe](/O:/repos.hobby/softpc/assets/binary/softpc32.exe) | EF3110FCEBA20F7A267E1712324CCB517A87410A9810D414C1994D9B999A5D5F |
 | [softpc64.exe](/O:/repos.hobby/softpc/assets/binary/softpc64.exe) | 40B8C3D964442773B0BB491EA78A780834CE4FC22FC41FD88A15BB0B9E8CA8D9 |
 
-This is the S6 executor delivery. Coordinator review closes S6 only after the
-actual committed paths and evidence are rechecked. T81 remains open: S5 still
-needs the independent audible PC-speaker acceptance, followed by the required
-whole-task closure audit.
+Coordinator review of `37562abb` confirms that the one production condition is
+the sole `CREATE_WINDOW` emitter, matches the admitted invariant, preserves
+paused retention, and contains no out-of-bound path. S6 is closed. T81 remains
+open: S5 still needs the independent audible PC-speaker acceptance, followed
+by the required whole-task closure audit.

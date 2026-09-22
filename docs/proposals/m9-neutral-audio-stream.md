@@ -122,6 +122,7 @@ deletions and net separately for production, tests/build and docs at each S.
 | S4 | Four-package isolated copy acceptance, remaining lifecycle tests, docs and release artifacts | 4-8 files; production +0..30/-0..30; tests/build +60..140/-0..20 | Strict dual C11, isolated Lib/Common and full background regressions, unchanged copy hashes |
 | S5 | Use the finished stream at the existing SoftPC PC-speaker presentation boundary | 3-6 Core Compat/test/build files; production +100..180/-40..90; tests/build +80..160/-0..20 | Win3.1/DOS PC-speaker handoff, state/clear/shutdown proof and audible owner test |
 | S6 | Close the Common Session Window-creation admission gap: a missing Window may be created only after a RUNNING completion; paused state may retain but never synthesize a Window | 2-3 Common/test/docs files; production +2..8/-0..4; tests +20..50/-0..10 | State matrix proves INIT, STOPPED, RESET_COMPLETED/PAUSED and ERROR never create a missing Window for either display mode; existing paused Window retention remains unchanged |
+| S7 | Owner audible PC-speaker acceptance and T81 completion audit; no implementation unless owner reports a reproducible sound defect | docs only unless a new defect is admitted | Owner confirms bounded DOS/Win3.x PC Speaker sound, then audit S1--S6 against the acceptance ledger and close T81 |
 
 The owner has approved automatic sequential admission of S2--S5. Each
 code-changing S builds x86/x64 EXEs, runs focused and
