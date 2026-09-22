@@ -2,33 +2,41 @@
 
 ## Current Work
 
-T81 S4 is active: prove the completed neutral Audio package can be imported
-as the shared four-directory Lib/Common corpus, under strict C11 on both
-widths. Owner approved automatic S2--S5 admission; each completed S still
-receives its own build/test/push/EXE report.
+T81 S5 is active: adapt the existing SoftPC PC-speaker presentation endpoint
+to the completed Lib Audio stream while preserving the original device state
+machine and mirror. Owner approved automatic S2--S5 admission; each completed
+S still receives its own build/test/push/EXE report.
 
-## M9 T81 S4 Packet
+## M9 T81 S5 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner closes S1, adds PC Speaker S5, and approves automatic sequential S2--S5 execution, with per-S push and x86/x64 EXEs. |
-| Objective | Prove the shared Lib/Common source and test packages, now including Audio, build independently under strict C11 on both widths; record bounded Windows playback use and artifact evidence. |
-| Non-goals | No Core/App/Common/x86 behavior change, speaker hookup, guest sound card, resampling, audio worker, Linux playback claim or downstream NES integration. |
-| Reference Baseline | T81 S3 executor `d8830b53`; clean worktree after the S3 coordinator review. |
+| Objective | Replace Compat's direct Win32 Beep presentation endpoint with the completed bounded Lib PCM stream, retaining exactly one Compat tone-generation worker and the original SoftPC PPI/Timer2 request behavior. |
+| Non-goals | No change under core/softpc.new, guest sound-card/DMA/IRQ/OPL/MIDI, Common/App/x86 change, Lib API change, resampling/mixing, new configuration, snapshot format or Linux playback claim. |
+| Reference Baseline | T81 S4 executor `d5dc2245`; clean worktree after the S4 coordinator review. |
 | Candidate Proposal | [Neutral audio](../proposals/m9-neutral-audio-stream.md) |
-| Files And ABI Surface | Test/package CMake and documentation/evidence only unless a proven package-path defect requires the smallest shared build correction. S3 public Audio ABI remains frozen. |
+| Files And ABI Surface | Core Compat audio endpoint/header and existing Core audio lifecycle/failure tests, plus the narrow machine-to-Audio link ownership and manifests/docs. Original `nt_sound.c` remains byte-identical; no public Lib/Common ABI change. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation and source research policy; shared Lib strict C11/package rules. |
-| Verification | Fresh independent Lib/Common copies on x64/x86 with strict C11, Audio native smoke and full product background gates; manifest/DAG/documentation checks. |
-| Expected Markers | No sibling/product source path in copied packages; no Audio product linkage; no SDK exposure outside Types; no Linux runtime claim. |
+| Verification | Deterministic Compat waveform/admission/clear/shutdown failure injection, original host sound-state tests, Lib Audio native smoke, strict dual builds and full background x64/x86 regression; owner performs bounded audible Win3.x/DOS speaker test. |
+| Expected Markers | One Compat worker remains the sustained-tone time source; Lib owns native buffers/output only; no direct Beep/WinMM in Compat, no mirror change, no second queue/worker or guest semantic branch. |
 | Asset Needs | Refresh package EXEs after product builds only; do not modify INI/media. |
-| Reporting Requirements | Expected production +0/-0, tests/build/docs +60..140/-0..20; actual added/removed/net and artifact links after push. |
-| Stop Conditions | Any need to change product behavior, add a downstream dependency, claim Linux playback or expand Audio ABI stops S4 for revised design. |
-| Exit Criteria | Fresh strict C11 four-package copies and product background gates pass in both widths; P is pushed, actual diff reviewed, S4 record closed and S5 automatically admitted. |
+| Reporting Requirements | Expected production +100..180/-40..90, tests/build +80..160/-0..20; actual added/removed/net and artifact links after push. |
+| Stop Conditions | Any need to modify original SoftPC mirror, add another producer/worker/queue, change guest Timer2/PPI rules, make Lib poll or add a guest sound-card route stops S5 for revised design. |
+| Exit Criteria | Compat-only endpoint preserves request/clear/shutdown behavior, all deterministic/native/dual-width gates pass, implementation P is pushed and reviewed, both EXEs are linked to Audio and S5 awaits owner audible acceptance. |
 | Original Owner Request | Build neutral src/lib/audio and test/lib/audio first, then later connect SoftPC speaker and eventually separately study XP sound-card support. |
-| Similar-Issue Sweep | Search standalone shared-package CMake/test paths for sibling/repository assumptions, language-level drift and Audio dependency leaks; repair only direct importability gaps or record a receiver. |
+| Similar-Issue Sweep | Search current Core Compat speaker endpoint/tests and all original sound callback sites for direct host Beep/output, duplicated tone timing and lifecycle ownership; retain original device requests, replace only presentation endpoint and record every direct hit. |
 
 ## Current Technical Baseline
+
+- T81 S4 executor `d5dc2245` changes no code: a fresh exact 189-file copy of
+  `src/lib`, `src/common`, `test/lib`, `test/common` has 0 hash mismatches and
+  independently passes strict C11 Lib 44/44 and Common 18/18 on both widths.
+  Hidden product background regression passes x64 114/114 (210.77s), x86
+  114/114 (176.91s), desktop excluded. Package launchers remain intentionally
+  byte-identical to S3 because no code input changed. S4 review/closure is
+  recorded in [S4 evidence](../history/M9-T81-S4-four-package-acceptance.md).
 
 - T81 S3 executor `d8830b53` replaces the Win32 Audio placeholder with one
   direct four-slot `waveOut` owner. It adds only Types-owned WinMM vocabulary,

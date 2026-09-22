@@ -47,6 +47,7 @@ No source change is the smallest correct result: adding plumbing merely to
 repeat what the existing self-contained CMake entries already prove would make
 the reusable corpus less simple.
 
-The executor evidence is recorded here for coordinator review. S4 remains
-awaiting that review; the owner has authorized automatic admission of S5 after
-S4 is closed.
+Coordinator review confirms the one changed path is evidence only, the copied
+files/hash counts match the command results, and no needless import wrapper or
+source change was introduced. S4 exit criteria are met and it is closed. The
+owner's prior automatic authorization admits S5; T81 remains open.
