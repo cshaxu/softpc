@@ -18,7 +18,7 @@ src/
   x86/
     xasm32/      imported x86 assembly/disassembly corpus
     debug/       imported x86 debug corpus over the optional machine adapter
-  lib/{types,base,console,console-broker,storage,kvm-base,kvm-window,kvm-console}/
+  lib/{types,base,console,console-broker,storage,audio,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
   app/
     main.c, config.c, command.c, composition.c, keyboard.c, firmware.rc

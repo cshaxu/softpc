@@ -34,7 +34,9 @@ audio API; its adapter may need a narrow call-site/sample-type adjustment.
 No guest instruction timing, APU, sound-card registers, DMA, IRQ, OPL/MIDI
 synthesis, decoding, mixing, volume UI, resampling or device enumeration.
 No Common/Machine audio transport, KVM audio frame or audio executor.
-No changes to App, Core, x86, snapshots, configuration or existing speaker.
+No changes to App, Common, x86, snapshots or configuration. S2--S4 do not
+change Core or the existing speaker; S5 alone changes the Compat presentation
+endpoint while preserving the original speaker state machine and mirror.
 Windows playback is required. Linux is an honest UNSUPPORTED placeholder,
 not a sleep-and-discard success path; real Linux playback is a separate task.
 Win3.x/Win95 sound-card playback is explicitly not this T's exit criterion.
@@ -117,14 +119,22 @@ deletions and net separately for production, tests/build and docs at each S.
 | S1 | This design, task split, admission and design review only | 3-4 docs; code +0/-0; docs about +150..220/-5..15 | Governance gate, original-request and actual-diff review, push; stop for owner |
 | S2 | Public/private stream contract, shared validation, fake backend tests, C11 build/DAG/manifest integration | 8-12 source/build/test files; production +140..240/-0..10; tests/build +180..300/-0..15 | All contract cases below deterministic on x86/x64; incomplete native implementation explicitly unsupported; no product hookup |
 | S3 | Win32 fixed-slot playback, Types declarations, Linux placeholder and native/failure tests | 6-10 files; production +180..300/-0..30; tests/build +150..250/-0..15 | Actual PCM playback, capacity/reuse/reset/cleanup proofs; native failures observable; no polling worker |
-| S4 | Four-package isolated copy acceptance, remaining lifecycle tests, docs and release artifacts | 4-8 files; production +0..30/-0..30; tests/build +60..140/-0..20 | Strict dual C11, isolated Lib/Common and full background regressions, unchanged copy hashes, audible manual test handoff |
+| S4 | Four-package isolated copy acceptance, remaining lifecycle tests, docs and release artifacts | 4-8 files; production +0..30/-0..30; tests/build +60..140/-0..20 | Strict dual C11, isolated Lib/Common and full background regressions, unchanged copy hashes |
+| S5 | Use the finished stream at the existing SoftPC PC-speaker presentation boundary | 3-6 Core Compat/test/build files; production +100..180/-40..90; tests/build +80..160/-0..20 | Win3.1/DOS PC-speaker handoff, state/clear/shutdown proof and audible owner test |
 
-S2/S3/S4 each require separate owner admission. S1 closure is not permission
-to implement them. Each code-changing S builds x86/x64 EXEs, runs focused and
+The owner has approved automatic sequential admission of S2--S5. Each
+code-changing S builds x86/x64 EXEs, runs focused and
 background regressions, refreshes only the two package EXEs, commits/pushes
 and waits for the owner. The EXEs do not gain a new guest sound card; a small
 standalone audio test executable under ignored build space demonstrates PCM.
-An audible test must be explicit, bounded and separate from silent CI tests.
+S5 is the only task that alters product code. It replaces neither guest PIT/PPI
+nor the original `nt_sound.c` state machine: that code continues to issue the
+existing frequency/stop request, and Core Compat synthesizes a bounded PCM
+square-wave block. It retains one Compat worker because a sustained speaker
+tone needs a product-time source to generate future samples; Lib has no worker.
+Frequency zero, gate-off and shutdown clear unsounded native PCM. No sound card,
+DMA, IRQ, OPL/MIDI or guest multimedia route is added. An audible test must be
+explicit, bounded and separate from silent CI tests.
 
 ## Finite Acceptance Ledger
 
@@ -143,6 +153,7 @@ Each row must have a passing test/evidence or an owner-approved scope revision.
 | Independent four-directory import, strict C11 on both widths | S4 isolated copy/build/test; no sibling or product paths |
 | Existing SoftPC behavior retained, both deliverable EXEs | Each implementation S background regression and artifact hashes |
 | Audible PCM, caller reuse instructions, known platform limits | S4 bounded native tone test and owner acceptance |
+| SoftPC PC Speaker through the completed Lib stream | S5 Core state proof plus Win3.1/DOS owner acceptance |
 
 All six shared manifests and dependency gates must remain valid. Use the
 existing background presets (exclude desktop); do not pop windows or request

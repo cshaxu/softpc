@@ -108,7 +108,7 @@ consumes and produces copied host values only. It owns
 the generic mailbox mechanics, independent console/window message loops,
 host-input normalization, registered-chord matching, mouse capture, clock,
 synchronization,
-and storage primitives. Common machine owns its executor queue; VM converts
+storage primitives and bounded PCM playback. Common machine owns its executor queue; VM converts
 copied input to the original machine protocol; app supplies product command
 and hotkey policy to Common session. SoftPC publishes each admitted shared-library change as the
 canonical corpus for NXVM to adopt exactly; the projects do not maintain
@@ -190,7 +190,8 @@ adopts it exactly; no runtime or build dependency crosses repositories.
 
 `types` defines universal copied scalar/status values and header-only external
 C/compiler/platform vocabulary. Platform declaration headers contain no
-component policy; base owns synchronization/clock composition, and kvm-base owns input
+component policy; base owns synchronization/clock composition, audio owns PCM
+output, and kvm-base owns input
 interpretation. Component platform implementations are selected by the build,
 not by a generic types dispatcher. `console` defines
 copied logical Console objects. `console-broker` owns native Console
@@ -208,7 +209,7 @@ actions; common/ui does not interpret their product meaning.
 The library's only direct component edges are:
 
 ```text
-types    -> base + console + console-broker + storage + kvm-base + kvm-window + kvm-console
+types    -> base + console + console-broker + storage + audio + kvm-base + kvm-window + kvm-console
 base     -> console + console-broker + kvm-base + kvm-console
 console  -> console-broker + kvm-console
 kvm-base  -> kvm-window + kvm-console
@@ -221,6 +222,12 @@ the application may consume its public copied-value interfaces where the
 control/input ABI requires them, never its leaf-support worker/mailbox or
 input support interfaces. Cross-component support contracts use the same
 `_interface.h` naming rule but have an explicitly narrower consumer set.
+
+`audio` owns bounded copied PCM submission and native-output lifecycle. It has
+no producer worker, synthesis, emulator clock or guest-device protocol: a
+consumer supplies PCM blocks and retains all timing policy. A native-output
+failure is observable to that consumer; no platform silently discards samples
+as successful playback.
 
 All cross-component contracts are declared at the owning component root.
 Each component's `win32/` and `linux/` files are exclusively its own platform
