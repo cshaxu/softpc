@@ -129,6 +129,7 @@ deletions and net separately for production, tests/build and docs at each S.
 | S5 | Use the finished stream at the existing SoftPC PC-speaker presentation boundary | 3-6 Core Compat/test/build files; production +100..180/-40..90; tests/build +80..160/-0..20 | Win3.1/DOS PC-speaker handoff, state/clear/shutdown proof and audible owner test |
 | S6 | Close the Common Session Window-creation admission gap: a missing Window may be created only after a RUNNING completion; paused state may retain but never synthesize a Window | 2-3 Common/test/docs files; production +2..8/-0..4; tests +20..50/-0..10 | State matrix proves INIT, STOPPED, RESET_COMPLETED/PAUSED and ERROR never create a missing Window for either display mode; existing paused Window retention remains unchanged |
 | S7 | Owner-revised before an executor commit: adopt the MyNES `b48e57f` Audio source/test corpus and reconnect the one SoftPC Compat PC-speaker producer through its FIFO/flush contract | 10-14 Lib/Core/test/build/docs files; production +20..140/-80..220; tests +20..120/-20..140 | Exact shared-corpus code hash comparison except the documented upstream-stale README and derived manifests, finite-tail/failure proof, dual-width strict C11/background regression and audible `AUDIO.COM` acceptance |
+| S8 | Investigate and repair owner-observed first-use PC-speaker silence/discontinuity after S7; retain one Compat producer and one Audio worker | 2-5 Core/test/docs files; production +5..50/-0..30; tests +30..120/-0..20 | Deterministic fresh/repeated/reset tone handoff proof, dual-width strict C11/background regression and package artifacts |
 
 The owner has approved automatic sequential admission of S2--S5. Each
 code-changing S builds x86/x64 EXEs, runs focused and
@@ -193,6 +194,23 @@ Verification is dual-width strict C11/package builds, focused fake/native Audio
 and Compat failure suites, full background regression, component DAG, manifest
 and documentation gates. The remaining acceptance is the owner's audible
 `AUDIO.COM` check; no user INI or media is tracked by this task.
+
+## S8 First-Tone Lifecycle Repair
+
+S7 changed the established PC-speaker lifecycle by moving neutral stream
+creation from `softpc_platform_audio_start()` into the first tone request. The
+first request could therefore be cleared before the new native stream had a
+block to play. S8 restores the prior ownership boundary: create the stream,
+then create the producer task; after that point the stream pointer is stable
+until the task has joined during shutdown.
+
+This removes the lazy-create mutex, three forwarding helpers and the worker's
+conditional creation branch. It does not add a prewarm state, retry loop,
+timer, public API or second worker. Compat production changes +18/-63 (net
+-45); its focused failure test changes +47/-0. The test replaces real Audio
+creation/task startup with deterministic fakes and proves stream creation
+precedes task creation. x64 and x86 focused suites pass; both package builds
+and both 114-item background regressions pass. User media stays untracked.
 
 T closure requires separate original-request/ledger/changed-path audit and
 owner acceptance. XP sound-card implementation remains future separately

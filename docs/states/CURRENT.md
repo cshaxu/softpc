@@ -2,44 +2,43 @@
 
 ## Current Work
 
-T81 S7 adopts the owner-approved MyNES Audio corpus as the sole canonical
-implementation, then reconnects the existing SoftPC PC-speaker producer to
-that contract. The earlier uncommitted S7 implementation is superseded by
-this explicit owner-directed corpus replacement.
+T81 S8 investigates and repairs the observed first-use PC-speaker playback
+instability after the owner accepted S7's canonical Audio import: the first
+`AUDIO.COM` run is silent, the second is discontinuous, and later runs are
+continuous until a hot guest reboot repeats the sequence.
 
-## M9 T81 S7 Packet
+## M9 T81 S8 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approved adoption of the audited MyNES `b48e57f` Audio corpus after its dead platform query was removed, scheduling constants were made private, and finite PCM-tail delivery acquired an explicit flush contract. The owner directs this revised S7 to finish through build, test, push and manual acceptance. |
-| Objective | Replace SoftPC's uncommitted earlier S7 Audio implementation with the exact MyNES `b48e57f` shared Audio source/test corpus, then adapt the sole Compat PC-speaker producer to its neutral FIFO/flush contract without platform knowledge. |
-| Non-goals | No Common/App/x86/snapshot/configuration change; no guest sound card, DMA, IRQ, OPL/MIDI, volume policy, original-mirror change, second audio producer or platform-specific Compat API. Linux remains unsupported. |
-| Reference Baseline | SoftPC executor `ae76ecbf` plus its uncommitted T81 S7 worktree; MyNES read-only source commit `b48e57f` is the canonical Audio source baseline. |
+| Admission And Approval | Owner accepted S7's original product behavior and its canonical Audio corpus import, then reported the repeatable first-use symptom. Owner admits S8, delegates investigation and repair authority, and does not require a manual test gate before an executor delivery. |
+| Objective | Establish one deterministic PC-speaker start/stop handoff so the first eligible guest tone is submitted and rendered like later tones, without product polling or a second producer/delivery path. |
+| Non-goals | No Common/App/x86/snapshot/configuration change; no guest sound card, DMA, IRQ, OPL/MIDI, volume policy, original-mirror change, guest timing change, or platform-specific Compat API. Linux remains unsupported. |
+| Reference Baseline | SoftPC executor `4157e918` after owner-accepted T81 S7. MyNES `b48e57f` remains the unchanged shared Audio baseline. |
 | Candidate Proposal | [Neutral audio](../proposals/m9-neutral-audio-stream.md) |
-| Files And ABI Surface | Exact MyNES copies of Audio public/private/platform source, Types WinMM declarations and Lib Audio tests/manifests; public `lib_audio_stream_flush` joins existing enqueue/query/wait/clear/lifecycle API. `core/compat/audio.c` remains the only SoftPC PCM producer and retains its existing clear-on-tone-stop policy; an ignored `AUDIO.COM` may remain in owner-selected test media and is never tracked. |
+| Files And ABI Surface | Primarily `core/compat/audio.c` and its focused tests; touch Lib only if a demonstrable Audio contract defect, rather than a PC-speaker ownership defect, is the root cause. Public Audio ABI and MyNES-shared code remain unchanged unless the same test proves a general defect. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation and source research policy; shared Lib strict C11/package rules. |
-| Verification | Exact source/test hash comparison against MyNES `b48e57f`; focused fake/native Audio and Compat failure tests; strict C11 and background product regression on x64/x86; manifests/DAG/governance; owner runs `C:\AUDIO.COM` and hears one continuous five-second tone. |
-| Expected Markers | One Audio FIFO/worker and one selected platform leaf exist; no platform query residue or public batch/capacity policy exists; `flush` delivers a finite tail; one Compat worker remains the tone source, never polls for slot readiness and never imports platform Audio types; original `nt_sound.c` remains unchanged. |
-| Asset Needs | Refresh the two package EXEs. The owner permits a test-only `AUDIO.COM` inside the selected hard-disk image; it is not committed. Preserve all other INI/media edits. |
-| Reporting Requirements | Report production/test additions, deletions and net; callback/event ownership; exact test results and artifact hashes; separate ignored-media disposition. |
-| Stop Conditions | Native completion cannot be represented without product-visible platform types; callback can outlive Audio-owned state; any change requires an original-mirror edit; or test media selection is ambiguous. |
-| Exit Criteria | Audio source/test code paths match MyNES `b48e57f` byte-for-byte except a documented upstream-stale README and derived manifests; only necessary Compat producer adaptation remains; focused and full required gates pass on both widths; owner reports a continuous direct PIT/PPI tone. T81 still requires its separate ledger audit before T closure. |
+| Verification | Trace all original `LazyBeep` transitions, Compat tone requests, Audio FIFO submissions, native waveOut completion/reset operations and guest-reset state. Add a deterministic start/stop sequence test at the owning boundary; then run focused Audio/Compat tests, strict C11/package builds, background regression, manifests/DAG/governance on x64/x86. |
+| Expected Markers | Exactly one Compat square-wave producer and one Audio delivery worker remain; the first request cannot be discarded merely because output initialization or a queued-control transition races it; no periodic readiness polling, product WinMM vocabulary or original-mirror change appears. |
+| Asset Needs | Refresh the two package EXEs. Existing owner media may be read for diagnosis but is never modified, staged or committed. |
+| Reporting Requirements | Report the observed causal chain, why it reproduces after hot reset, production/test additions, deletions and net, all similar-path dispositions, exact automated results and artifact hashes. |
+| Stop Conditions | The only reproducible correction requires a guest-timing/original-mirror change; a native output callback must enter product code; a platform-specific Compat API would be needed; or the symptom cannot be isolated from user media. |
+| Exit Criteria | A deterministic focused proof covers a fresh first tone, stop, repeated tone and guest reset boundary; the repair preserves one producer/worker topology and public Audio ABI; dual-width required gates pass. T81 remains open for its separate ledger audit. |
 | Original Owner Request | Build neutral src/lib/audio and test/lib/audio first, then later connect SoftPC speaker and eventually separately study XP sound-card support. |
-| Similar-Issue Sweep | Search every `lib_audio_stream_*` production caller and all PC-speaker tone-stop/shutdown paths. Retain only the single Compat producer and the single Audio worker; record every prior S7-path disposition in S7 evidence. |
+| Similar-Issue Sweep | Search all `softpc_standalone_audio_set_tone`, Audio create/clear/cancel/shutdown calls, original `LazyBeep` init/reset paths and all potential first-use output paths. Retain only the single Compat producer and the single Audio worker; record every hit's disposition. |
 
 ## Current Technical Baseline
 
-- T81 S7 replaces the Compat PC-speaker producer's timed readiness poll with
-  `lib_audio_stream_wait_writable()`: Windows Audio owns one private WinMM
-  completion callback/event and Linux remains unsupported. The callback never
-  enters product code; one Compat worker still produces the sustained square
-  wave and opens native output only on demand. `cancel_wait` is the only
-  concurrent stream operation and releases shutdown without changing PCM.
-  Focused suites pass and the presentation shutdown case passes 20 consecutive
-  times on each width; full background regressions pass x64 114/114 (195.50 s)
-  and x86 114/114 (179.50 s). The active proposal retains scope, accounting and
-  the required owner `C:\AUDIO.COM` observation until S7 is closed.
+- T81 S8 restores the PC-speaker's established startup ownership: Compat opens
+  its neutral Audio stream before creating the speaker producer task, so the
+  first guest tone cannot race native output initialization. This removes the
+  lazy-create mutex wrapper rather than adding a readiness state or retry loop.
+  One Compat producer and one Audio worker remain; public Audio ABI and the
+  MyNES-shared Audio corpus are unchanged. The focused lifecycle/failure proof,
+  20 repeated native stream initializations, package builds, x64 background
+  114/114 (174.02 s) and x86 background 114/114 (171.76 s) pass. S8 is
+  delivered for owner-visible package testing; T81 remains open.
 
 - T81 S6 executor `37562abb` closes the missing-Window admission gap with one
   Session condition: only actual RUNNING can emit `CREATE_WINDOW`. Paused
