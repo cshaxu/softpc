@@ -1,78 +1,85 @@
 #include "insignia.h"
-#include <assert.h>
-#include "lib/base/sync_interface.h"
 
-static unsigned plays, waits, resets;
+#include <assert.h>
+
+#include "lib/base/sync_interface.h"
+#include "lib/audio/stream_interface.h"
+
+static unsigned clears;
+static unsigned enqueues;
+static unsigned waits;
 static int scenario;
-static int reject_destroy;
-static lib_status destroy_audio(base_sync_task *task)
+
+static lib_status fake_enqueue(lib_audio_stream *stream, const lib_i16 *samples,
+    lib_u32 frames, lib_u32 *accepted)
 {
-    assert(task == (base_sync_task *)1);
-    return reject_destroy ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
+    (void)stream;
+    assert(samples != NULL && frames == 512u);
+    ++enqueues;
+    *accepted = scenario == 1 ? 0u : frames;
+    return scenario == 1 ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
-static base_sync_wait_result wait_audio(base_sync_event *const *events,
+
+static lib_status fake_clear(lib_audio_stream *stream)
+{
+    assert(stream == (lib_audio_stream *)1);
+    ++clears;
+    return LIB_STATUS_OK;
+}
+
+static base_sync_wait_result fake_wait(base_sync_event *const *events,
     lib_u32 count, const base_sync_task *task, lib_u32 timeout, lib_u32 *index)
 {
-    (void)events; (void)task;
-    assert(count == 2u && ++waits <= 4u);
-    *index = 1u;
+    (void)events;
+    (void)task;
+    assert(count == 2u);
+    ++waits;
     if (waits == 1u) {
         assert(timeout == LIB_UINT32_MAX);
+        *index = 1u;
         return BASE_SYNC_WAIT_SIGNALED;
     }
     if (scenario == 0) {
-        assert(timeout == LIB_UINT32_MAX && plays == 1u);
-        return BASE_SYNC_WAIT_CANCELLED; /* Failed Beep returns to blocking wait. */
+        assert(timeout == 5u);
+        *index = 0u;
+        return BASE_SYNC_WAIT_SIGNALED;
     }
-    assert(timeout == 0u);
-    if (scenario == 1) return BASE_SYNC_WAIT_FAULT;
-    if (scenario == 2) return BASE_SYNC_WAIT_CANCELLED;
-    if (scenario == 3) *index = 0u; /* Stop. */
-    if (scenario == 4 && waits == 2u) return BASE_SYNC_WAIT_TIMED_OUT;
-    if (scenario == 4) return BASE_SYNC_WAIT_CANCELLED;
-    return BASE_SYNC_WAIT_SIGNALED;
+    assert(timeout == LIB_UINT32_MAX);
+    return BASE_SYNC_WAIT_CANCELLED;
 }
-static lib_status reset_audio(base_sync_event *event)
+
+static lib_status fake_reset(base_sync_event *event)
 {
-    (void)event; ++resets;
-    return (scenario == 5 && resets == 2u) || scenario == 6 ?
-        LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
+    assert(event == (base_sync_event *)2);
+    return LIB_STATUS_OK;
 }
-static BOOL WINAPI beep(DWORD frequency, DWORD duration)
-{
-    assert(frequency == 440u && duration == 40u);
-    assert(++plays <= 2u);
-    return scenario != 0;
-}
-#define Beep beep
-#define base_sync_wait_any wait_audio
-#define base_sync_event_reset reset_audio
-#define base_sync_task_destroy destroy_audio
+
+#define lib_audio_stream_enqueue fake_enqueue
+#define lib_audio_stream_clear fake_clear
+#define base_sync_wait_any fake_wait
+#define base_sync_event_reset fake_reset
 #include "core/compat/audio.c"
 #undef base_sync_event_reset
-#undef base_sync_task_destroy
 #undef base_sync_wait_any
-#undef Beep
+#undef lib_audio_stream_clear
+#undef lib_audio_stream_enqueue
 
 int main(void)
 {
-    for (scenario = 0; scenario <= 6; ++scenario) {
-        plays = waits = resets = 0u;
-        softpc_speaker_frequency = 440;
-        softpc_speaker_worker(NULL, NULL);
-        assert(plays == (scenario == 6 ? 0u : scenario == 4 ? 2u : 1u));
-        assert(waits == (scenario == 6 ? 1u : scenario == 4 ? 3u : 2u));
-    }
-    assert(base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &softpc_speaker_wake) == LIB_STATUS_OK);
-    assert(base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &softpc_speaker_stop) == LIB_STATUS_OK);
-    softpc_speaker_task = (base_sync_task *)1;
-    reject_destroy = 1;
-    softpc_platform_audio_shutdown();
-    assert(softpc_speaker_task == (base_sync_task *)1);
-    assert(base_sync_event_signal(softpc_speaker_wake) == LIB_STATUS_OK);
-    assert(base_sync_event_signal(softpc_speaker_stop) == LIB_STATUS_OK);
-    reject_destroy = 0;
-    softpc_platform_audio_shutdown();
-    assert(!softpc_speaker_task && !softpc_speaker_wake && !softpc_speaker_stop);
+    softpc_speaker_stop = (base_sync_event *)1;
+    softpc_speaker_wake = (base_sync_event *)2;
+    softpc_speaker_stream = (lib_audio_stream *)1;
+    softpc_speaker_frequency = 440;
+
+    scenario = 0;
+    clears = enqueues = waits = 0u;
+    softpc_speaker_worker(NULL, NULL);
+    assert(enqueues == 1u && clears == 0u && waits == 2u);
+
+    scenario = 1;
+    clears = enqueues = waits = 0u;
+    softpc_speaker_frequency = 440;
+    softpc_speaker_worker(NULL, NULL);
+    assert(enqueues == 1u && clears == 1u && waits == 2u);
     return 0;
 }
