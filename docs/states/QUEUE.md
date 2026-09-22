@@ -5,6 +5,5 @@ allocates a numeric task identifier.
 
 1. [XP SP1 SoftPC mirror rebase](../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
 
-T80 is closed after owner acceptance; see its
-[closure audit](../history/M9-T80-completion-audit.md).
-Only CURRENT owns active work; the remaining candidate is not admitted.
+T81 neutral Audio is separately owner-admitted; CURRENT owns its active work.
+The XP candidate remains unadmitted and its scope is unchanged.

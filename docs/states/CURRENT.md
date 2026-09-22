@@ -2,11 +2,29 @@
 
 ## Current Work
 
-No implementation subtask is active.
-T80 is closed after owner acceptance of S7 and the separate whole-task audit.
-No numeric task is open. The remaining Queue candidate is not admitted.
-The [closure audit](../history/M9-T80-completion-audit.md) records all seven
-dispositions, endpoint counts, verification limits and unchanged accepted EXEs.
+T81 S1 is active: design the neutral Audio component and split implementation
+tasks, with no source or artifact changes. T80 remains closed.
+
+## M9 T81 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner admits T81 and design-only S1, including commit/push and S1 closure; later S tasks await owner approval. |
+| Objective | Specify neutral src/lib/audio and test/lib/audio, bounded playback contracts and later S tasks. |
+| Non-goals | No code, builds, new EXEs, guest sound card, Common/Core changes or downstream edits. |
+| Reference Baseline | Clean 2b17749a; accepted T80 artifacts retained. |
+| Candidate Proposal | [Neutral audio](../proposals/m9-neutral-audio-stream.md) |
+| Files And ABI Surface | Proposal and task-state/history docs only; no current ABI changes. |
+| Applicable Rules | Execution, Documentation, Architecture and their shared governance skills; source research policy. |
+| Verification | Documentation governance, diff check, finite requirement ledger and separate actual-change review after executor push; no runtime tests warranted. |
+| Expected Markers | Design-only S1; S2-S4 unadmitted; Windows PCM and honest Linux placeholder; no sound-card claim. |
+| Asset Needs | None; INI, media and accepted EXEs unchanged. |
+| Reporting Requirements | Estimate docs +150..220/-5..15; code +0/-0; report actual counts, commits and verification limits. |
+| Stop Conditions | No implementation before owner design review; source import or extra audio worker requires revised scope. |
+| Exit Criteria | Proposal/ledger/task split verified, executor pushed, actual-change review recorded, S1 closed and T81 waiting for owner. |
+| Original Owner Request | Preserved verbatim in proposal: establish neutral Audio source/tests, design S1 first, commit/push/close then wait. |
+| Similar-Issue Sweep | Reference audit covers duplicate buffering, short-block starvation, silent failures, incomplete flush and platform boundary leaks; each has a ledger receiver. |
 
 ## Current Technical Baseline
 
