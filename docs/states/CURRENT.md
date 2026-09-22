@@ -2,31 +2,19 @@
 
 ## Current Work
 
-T81 S1 is active: design the neutral Audio component and split implementation
-tasks, with no source or artifact changes. T80 remains closed.
-
-## M9 T81 S1 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner admits T81 and design-only S1, including commit/push and S1 closure; later S tasks await owner approval. |
-| Objective | Specify neutral src/lib/audio and test/lib/audio, bounded playback contracts and later S tasks. |
-| Non-goals | No code, builds, new EXEs, guest sound card, Common/Core changes or downstream edits. |
-| Reference Baseline | Clean 2b17749a; accepted T80 artifacts retained. |
-| Candidate Proposal | [Neutral audio](../proposals/m9-neutral-audio-stream.md) |
-| Files And ABI Surface | Proposal and task-state/history docs only; no current ABI changes. |
-| Applicable Rules | Execution, Documentation, Architecture and their shared governance skills; source research policy. |
-| Verification | Documentation governance, diff check, finite requirement ledger and separate actual-change review after executor push; no runtime tests warranted. |
-| Expected Markers | Design-only S1; S2-S4 unadmitted; Windows PCM and honest Linux placeholder; no sound-card claim. |
-| Asset Needs | None; INI, media and accepted EXEs unchanged. |
-| Reporting Requirements | Estimate docs +150..220/-5..15; code +0/-0; report actual counts, commits and verification limits. |
-| Stop Conditions | No implementation before owner design review; source import or extra audio worker requires revised scope. |
-| Exit Criteria | Proposal/ledger/task split verified, executor pushed, actual-change review recorded, S1 closed and T81 waiting for owner. |
-| Original Owner Request | Preserved verbatim in proposal: establish neutral Audio source/tests, design S1 first, commit/push/close then wait. |
-| Similar-Issue Sweep | Reference audit covers duplicate buffering, short-block starvation, silent failures, incomplete flush and platform boundary leaks; each has a ledger receiver. |
+No implementation subtask is active.
+Open task awaiting owner: T81.
+S1 design is closed after pushed delivery and actual-change review.
+The [design proposal](../history/M9-T81-neutral-audio-proposal.md) and
+[S1 review](../history/M9-T81-S1-neutral-audio.md) define the next steps.
+S2-S4 remain unadmitted. T80 remains closed; accepted binaries are unchanged.
 
 ## Current Technical Baseline
+
+- T81 S1 is documentation-only: executor c13630a5, no source/test/artifact
+  changes or runtime claims. Neutral PCM design uses fixed native slots,
+  no Lib audio worker/software ring, and explicit Linux UNSUPPORTED.
+  Owner design review is required before any construction begins.
 
 - S7 shares one internal write algorithm; ordinary write flushes on success,
   nonempty DIRECT fill flushes once even after partial failure, preserving the
