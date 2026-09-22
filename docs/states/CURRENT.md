@@ -30,15 +30,19 @@ continuous until a hot guest reboot repeats the sequence.
 
 ## Current Technical Baseline
 
-- T81 S8 restores the PC-speaker's established startup ownership: Compat opens
-  its neutral Audio stream before creating the speaker producer task, so the
-  first guest tone cannot race native output initialization. This removes the
-  lazy-create mutex wrapper rather than adding a readiness state or retry loop.
-  One Compat producer and one Audio worker remain; public Audio ABI and the
-  MyNES-shared Audio corpus are unchanged. The focused lifecycle/failure proof,
-  20 repeated native stream initializations, package builds, x64 background
-  114/114 (174.02 s) and x86 background 114/114 (171.76 s) pass. S8 is
-  delivered for owner-visible package testing; T81 remains open.
+- T81 S8 P1 restored eager neutral-stream creation before the Compat speaker
+  task and removed the lazy-create wrapper. Its lifecycle tests passed, but the
+  owner reproduced the first-run silence afterward, so P1 is not the causal
+  repair and S8 remains active. The original `LazyBeep(CLICK, 1)` path reaches
+  its native Beep device even though it resets its cached state; Compat had
+  instead discarded every sub-10ms request. P2 transfers one coherent
+  frequency/duration request to the existing speaker producer, renders finite
+  PCM requests through the existing Audio flush operation, and leaves the
+  original mirror, public Audio ABI, native worker and product polling topology
+  unchanged. Focused x64/x86 proofs cover the delivered 48-frame 1ms tail;
+  background regression passes x64 114/114 (151.94 s) and x86 114/114
+  (154.18 s). Both package EXEs are refreshed for owner-visible testing; S8
+  remains active pending that acceptance.
 
 - T81 S6 executor `37562abb` closes the missing-Window admission gap with one
   Session condition: only actual RUNNING can emit `CREATE_WINDOW`. Paused

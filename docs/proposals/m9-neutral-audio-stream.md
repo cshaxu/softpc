@@ -197,20 +197,28 @@ and documentation gates. The remaining acceptance is the owner's audible
 
 ## S8 First-Tone Lifecycle Repair
 
-S7 changed the established PC-speaker lifecycle by moving neutral stream
-creation from `softpc_platform_audio_start()` into the first tone request. The
-first request could therefore be cleared before the new native stream had a
-block to play. S8 restores the prior ownership boundary: create the stream,
-then create the producer task; after that point the stream pointer is stable
-until the task has joined during shutdown.
+P1 restored eager neutral-stream creation before the speaker task and removed
+the lazy-create mutex wrapper. Its lifecycle proof passed, but owner testing
+reproduced the first-run silence unchanged; that initialization race was not
+the causal defect and P1 is retained only as a tested baseline.
 
-This removes the lazy-create mutex, three forwarding helpers and the worker's
-conditional creation branch. It does not add a prewarm state, retry loop,
-timer, public API or second worker. Compat production changes +18/-63 (net
--45); its focused failure test changes +47/-0. The test replaces real Audio
-creation/task startup with deterministic fakes and proves stream creation
-precedes task creation. x64 and x86 focused suites pass; both package builds
-and both 114-item background regressions pass. User media stays untracked.
+P2 follows the unmodified original sound contract instead. `LazyBeep(CLICK,
+1)` deliberately invokes its native Beep endpoint before resetting its cache;
+the original PPI calibration uses these short requests until it derives a
+stable continuous frequency. Compat incorrectly converted every sub-10ms
+request to silence. It now transfers one coherent frequency/duration request
+to its sole speaker producer. Infinite requests retain bounded PCM generation;
+finite requests generate their exact PCM duration and use the existing neutral
+Audio `flush` to deliver an otherwise sub-batch tail. A short mutex protects
+only the two-field cross-thread handoff; it is not an output gate, retry state
+or second producer. The original mirror, public Audio ABI, MyNES-shared Audio
+corpus and native worker stay unchanged.
+
+The focused fake proof covers a 100Hz, 1ms request becoming one 48-frame PCM
+submission followed by one flush. Background regression passes x64 114/114
+(151.94 s) and x86 114/114 (154.18 s); both package EXEs are refreshed.
+Owner-visible audible confirmation remains required. User media stays
+untracked.
 
 T closure requires separate original-request/ledger/changed-path audit and
 owner acceptance. XP sound-card implementation remains future separately
