@@ -10,7 +10,7 @@ static lib_bool audio_stream_options_supported(const lib_audio_stream_options *o
 static lib_status audio_stream_record_status(lib_audio_stream *stream,
     lib_status status)
 {
-    if (status != LIB_STATUS_OK) stream->failure = status;
+    if (status == LIB_STATUS_IO_ERROR) stream->failure = status;
     return status;
 }
 

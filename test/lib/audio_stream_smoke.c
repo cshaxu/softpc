@@ -35,7 +35,7 @@ lib_status audio_stream_platform_enqueue(audio_stream_platform *platform,
     lib_memory_copy(platform->copied, samples,
         (lib_size)accepted * 2u * sizeof(*samples));
     *out_accepted_frames = accepted;
-    return enqueue_status;
+    return accepted == 0u && frame_count != 0u ? LIB_STATUS_LIMIT_EXCEEDED : enqueue_status;
 }
 
 lib_status audio_stream_platform_query(audio_stream_platform *platform,
@@ -96,6 +96,10 @@ int main(void)
     assert(lib_audio_stream_enqueue(stream, samples, 3u, &accepted) == LIB_STATUS_OK);
     assert(accepted == 2u && enqueue_calls == 1u);
     assert(fake_platform.copied[0] == -1 && fake_platform.copied[3] == 2);
+    accepted_limit = 0u;
+    assert(lib_audio_stream_enqueue(stream, samples, 1u, &accepted) == LIB_STATUS_LIMIT_EXCEEDED);
+    assert(accepted == 0u);
+    assert(lib_audio_stream_query(stream, &queued, &writable) == LIB_STATUS_OK);
 
     assert(lib_audio_stream_set_active(stream, LIB_FALSE) == LIB_STATUS_OK);
     assert(clear_calls == 1u);

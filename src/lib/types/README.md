@@ -18,7 +18,7 @@ The layout has one rule:
 - Top-level headers contain only common scalar/status, ISO C library, or
   compiler atomic vocabulary. They never select an operating system.
 - `win32/` contains the used Windows file, clock, input, sync, Console, Window and
-  Window declaration groups. `linux/` contains the used POSIX file, clock and
+  audio declaration groups. `linux/` contains the used POSIX file, clock and
   sync declaration groups. Platform sources explicitly include the matching
   group; no common header selects one and no platform header dispatches again.
 - `atomic.h` may select MSVC intrinsics versus C atomics by `_MSC_VER`.

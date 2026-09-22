@@ -223,11 +223,12 @@ control/input ABI requires them, never its leaf-support worker/mailbox or
 input support interfaces. Cross-component support contracts use the same
 `_interface.h` naming rule but have an explicitly narrower consumer set.
 
-`audio` owns bounded copied PCM submission and native-output lifecycle. It has
-no producer worker, synthesis, emulator clock or guest-device protocol: a
-consumer supplies PCM blocks and retains all timing policy. A native-output
-failure is observable to that consumer; no platform silently discards samples
-as successful playback.
+`audio` owns bounded copied PCM submission and native-output lifecycle. Its
+Windows endpoint has four prepared waveOut slots and reclaims completion only
+at stream calls; it has no producer worker, synthesis, emulator clock or
+guest-device protocol. A consumer supplies PCM blocks and retains all timing
+policy. A native-output failure is observable to that consumer; no platform
+silently discards samples as successful playback.
 
 All cross-component contracts are declared at the owning component root.
 Each component's `win32/` and `linux/` files are exclusively its own platform

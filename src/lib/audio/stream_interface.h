@@ -13,8 +13,9 @@ typedef struct lib_audio_stream_options {
 enum { LIB_AUDIO_STREAM_MAX_FRAMES_PER_SUBMISSION = 512u };
 
 /* PCM frames are interleaved signed 16-bit samples. A stream accepts mono or
- * stereo 22050, 44100 or 48000 Hz PCM without conversion. The caller owns the
- * sample storage and serializes operations on a stream. */
+ * stereo 22050, 44100 or 48000 Hz PCM without conversion. Windows supplies
+ * four fixed native slots; other platforms may report UNSUPPORTED at create.
+ * The caller owns sample storage and serializes operations on a stream. */
 lib_status lib_audio_stream_create(const lib_audio_stream_options *options,
     lib_audio_stream **out_stream);
 /* Copies an ordered prefix without waiting. accepted_frames is authoritative:

@@ -85,9 +85,10 @@ lifecycle controller, or public unified presenter API.
 - `storage` provides file and byte-medium primitives. Medium and writer own
   embedded file storage; owned-byte reads use a stack file. Closing consumes
   the stream, not its enclosing allocation; failed opens leave it empty.
-- `audio` provides bounded copied PCM playback. It owns native output slots
-  and their completion/cleanup; producers own synthesis, pacing and guest-device
-  semantics.
+- `audio` provides bounded copied PCM playback. Windows owns four prepared
+  `waveOut` slots and reclaims completed slots only at stream calls; Linux
+  explicitly reports unsupported. Producers own synthesis, pacing and
+  guest-device semantics.
 - `kvm-base` provides copied frame/input values, source-local registered-hotkey
   matching, source identities, and private mailbox mechanics.
 - `kvm-window` owns one Window lifecycle; `kvm-console` owns one raw-Console
