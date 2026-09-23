@@ -632,6 +632,16 @@ set_target_properties(softpc-audio-first-tone-smoke PROPERTIES C_STANDARD 90 C_E
 add_test(NAME softpc-audio-first-tone-smoke COMMAND softpc-audio-first-tone-smoke)
 set_tests_properties(softpc-audio-first-tone-smoke PROPERTIES LABELS "unit" TIMEOUT 15)
 list(APPEND SOFTPC_TEST_TARGETS softpc-audio-first-tone-smoke)
+add_executable(softpc-audio-first-delivery-smoke test/core/audio_first_delivery_smoke.c)
+target_link_libraries(softpc-audio-first-delivery-smoke PRIVATE base types)
+target_include_directories(softpc-audio-first-delivery-smoke PRIVATE src
+    $<TARGET_PROPERTY:softpc-machine-compat,INCLUDE_DIRECTORIES>)
+target_compile_definitions(softpc-audio-first-delivery-smoke PRIVATE
+    $<TARGET_PROPERTY:softpc-machine-compat,COMPILE_DEFINITIONS>)
+set_target_properties(softpc-audio-first-delivery-smoke PROPERTIES C_STANDARD 90 C_EXTENSIONS ON)
+add_test(NAME softpc-audio-first-delivery-smoke COMMAND softpc-audio-first-delivery-smoke)
+set_tests_properties(softpc-audio-first-delivery-smoke PROPERTIES LABELS "unit" TIMEOUT 15)
+list(APPEND SOFTPC_TEST_TARGETS softpc-audio-first-delivery-smoke)
 foreach(probe IN ITEMS platform audio)
     set(probe_target softpc-${probe}-failure-smoke)
     add_executable(${probe_target} test/core/${probe}_failure_smoke.c)

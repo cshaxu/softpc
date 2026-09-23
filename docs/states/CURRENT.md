@@ -43,9 +43,12 @@ continuous until a hot guest reboot repeats the sequence.
   exception.  Public Audio ABI, topology and original mirror remain unchanged;
   focused fake/native-thread proofs pass on x64/x86. The native Audio smoke
   now queues two valid 512-frame submissions then flushes their full 1024-frame
-  batch, so an available WaveOut endpoint must accept a real native write; the
-  first-tone proof also verifies nonzero PCM. The local x64 native endpoint
-  completed that full path; owner desktop audibility remains the pending
+  batch, so an available WaveOut endpoint must accept a real native write. A
+  Core-to-Lib delivery proof starts a cold Compat speaker, issues one 439Hz
+  infinite request, and observes one 1024-frame platform delivery containing
+  both positive and negative PCM samples. Together with the owner-run cold
+  trace where the first `waveOutWrite` succeeds, this rules out a missing first
+  producer or Lib-output event. Owner desktop audibility remains the pending
   criterion.
 
 - T81 S8 P1 restored eager neutral-stream creation before the Compat speaker
