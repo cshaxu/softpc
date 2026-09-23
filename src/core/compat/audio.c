@@ -18,11 +18,14 @@ ULONG GetPerfCounter(VOID)
     return (ULONG)(GetTickCount() * 10u);
 }
 
+static void softpc_speaker_cancel_onset(void);
+
 /* reset.c retains the original host stop call.  PPI writes themselves use the
    original complete post-gate HostPpiState transition in ppi.c. */
 void host_disable_timer2_sound(void)
 {
     HostPpiState(0u);
+    softpc_speaker_cancel_onset();
 }
 
 void softpc_standalone_sound_timer2_gate(unsigned char value)
@@ -48,6 +51,29 @@ typedef struct softpc_speaker_tone {
 } softpc_speaker_tone;
 
 static softpc_speaker_tone softpc_speaker_request;
+static softpc_speaker_tone softpc_speaker_onset;
+static lib_bool softpc_speaker_onset_pending;
+
+/* The original host submits a synchronous PPI level transition.  Preserve one
+   silent-to-tone onset across the asynchronous worker handoff so a following
+   gate-off cannot erase it before one PCM submission. */
+static lib_bool softpc_speaker_take_request(softpc_speaker_tone *request)
+{
+    lib_bool onset_pending;
+
+    if (softpc_speaker_request_lock != NULL)
+        base_sync_mutex_lock(softpc_speaker_request_lock);
+    onset_pending = softpc_speaker_onset_pending;
+    if (onset_pending != LIB_FALSE) {
+        *request = softpc_speaker_onset;
+        softpc_speaker_onset_pending = LIB_FALSE;
+    } else {
+        *request = softpc_speaker_request;
+    }
+    if (softpc_speaker_request_lock != NULL)
+        base_sync_mutex_unlock(softpc_speaker_request_lock);
+    return onset_pending;
+}
 
 static void softpc_speaker_read_request(softpc_speaker_tone *request)
 {
@@ -62,9 +88,25 @@ static void softpc_speaker_write_request(ULONG frequency, ULONG duration)
 {
     if (softpc_speaker_request_lock != NULL)
         base_sync_mutex_lock(softpc_speaker_request_lock);
+    if (frequency != 0u && softpc_speaker_request.frequency == 0u &&
+        softpc_speaker_onset_pending == LIB_FALSE) {
+        softpc_speaker_onset.frequency = frequency;
+        softpc_speaker_onset.duration = duration;
+        softpc_speaker_onset.generation = softpc_speaker_request.generation + 1u;
+        softpc_speaker_onset_pending = LIB_TRUE;
+    }
     softpc_speaker_request.frequency = frequency;
     softpc_speaker_request.duration = duration;
     ++softpc_speaker_request.generation;
+    if (softpc_speaker_request_lock != NULL)
+        base_sync_mutex_unlock(softpc_speaker_request_lock);
+}
+
+static void softpc_speaker_cancel_onset(void)
+{
+    if (softpc_speaker_request_lock != NULL)
+        base_sync_mutex_lock(softpc_speaker_request_lock);
+    softpc_speaker_onset_pending = LIB_FALSE;
     if (softpc_speaker_request_lock != NULL)
         base_sync_mutex_unlock(softpc_speaker_request_lock);
 }
@@ -108,7 +150,8 @@ static lib_status softpc_speaker_submit(lib_audio_stream *stream,
 }
 
 static lib_status softpc_speaker_submit_finite(lib_audio_stream *stream,
-    const softpc_speaker_tone *request, lib_u32 *phase)
+    const softpc_speaker_tone *request, lib_bool require_current,
+    lib_u32 *phase)
 {
     lib_u64 frames_remaining = (lib_u64)request->duration *
         SOFTPC_SPEAKER_SAMPLE_RATE / 1000u;
@@ -120,8 +163,10 @@ static lib_status softpc_speaker_submit_finite(lib_audio_stream *stream,
         lib_u32 accepted;
         lib_status status;
 
-        softpc_speaker_read_request(&current);
-        if (current.generation != request->generation) return LIB_STATUS_OK;
+        if (require_current != LIB_FALSE) {
+            softpc_speaker_read_request(&current);
+            if (current.generation != request->generation) return LIB_STATUS_OK;
+        }
         status = softpc_speaker_submit(stream, request->frequency, frame_count,
             phase, &accepted);
         if (status != LIB_STATUS_OK && status != LIB_STATUS_LIMIT_EXCEEDED)
@@ -152,10 +197,12 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
         if (base_sync_event_reset(softpc_speaker_wake) != LIB_STATUS_OK) break;
         for (;;) {
             softpc_speaker_tone request;
+            softpc_speaker_tone current;
+            lib_bool onset_pending;
             lib_status status;
             lib_u32 accepted;
 
-            softpc_speaker_read_request(&request);
+            onset_pending = softpc_speaker_take_request(&request);
             if (request.frequency == 0u) {
                 /* A normal gate-off ends synthesis; it must not reset the
                    native queue and discard PCM that was already accepted. */
@@ -163,12 +210,16 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
                 break;
             }
             if (request.duration != INFINITE) {
-                status = softpc_speaker_submit_finite(stream, &request, &phase);
+                status = softpc_speaker_submit_finite(stream, &request,
+                    onset_pending == LIB_FALSE, &phase);
                 if (status != LIB_STATUS_OK) {
                     softpc_speaker_write_request(0u, 0u);
                     (void)lib_audio_stream_clear(stream);
                 }
-                break;
+                if (onset_pending == LIB_FALSE) break;
+                softpc_speaker_read_request(&current);
+                if (current.generation == request.generation) break;
+                continue;
             }
             status = softpc_speaker_submit(stream, request.frequency,
                 SOFTPC_SPEAKER_BLOCK_FRAMES, &phase, &accepted);
@@ -196,6 +247,8 @@ lib_status softpc_platform_audio_start(void)
 
     if (softpc_speaker_task != NULL) return LIB_STATUS_OK;
     if (softpc_speaker_stream != NULL) return LIB_STATUS_IO_ERROR;
+    softpc_speaker_write_request(0u, 0u);
+    softpc_speaker_cancel_onset();
     options.sample_rate = SOFTPC_SPEAKER_SAMPLE_RATE;
     options.channel_count = 1u;
     status = lib_audio_stream_create(&options, &softpc_speaker_stream);
@@ -246,6 +299,7 @@ void softpc_platform_audio_shutdown(void)
         /* wait_writable blocks on native completion, not the task cancel
            event; clear the producer request before joining it. */
         softpc_speaker_write_request(0u, 0u);
+        softpc_speaker_cancel_onset();
         lib_audio_stream *stream = softpc_speaker_stream;
         if (stream != NULL) (void)lib_audio_stream_cancel_wait(stream);
         base_sync_event_signal(softpc_speaker_stop);

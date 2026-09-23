@@ -246,5 +246,17 @@ int main(void)
     ++softpc_speaker_request.generation;
     softpc_speaker_worker(NULL, NULL);
     assert(enqueues == 1u && clears == 0u && flushes == 1u && waits == 2u);
+
+    /* A PPI start and its following gate-off can occur before a new worker
+       has run.  The onset must still reach the existing PCM producer once. */
+    scenario = 0;
+    clears = flushes = enqueues = waits = writable_waits = 0u;
+    softpc_speaker_request.frequency = 0u;
+    softpc_speaker_request.duration = 0u;
+    softpc_speaker_onset_pending = LIB_FALSE;
+    softpc_standalone_audio_set_tone(440u, INFINITE);
+    softpc_standalone_audio_set_tone(0u, 0u);
+    softpc_speaker_worker(NULL, NULL);
+    assert(enqueues == 1u && clears == 0u && flushes == 1u && waits == 2u);
     return 0;
 }

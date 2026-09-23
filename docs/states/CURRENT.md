@@ -46,6 +46,16 @@ continuous until a hot guest reboot repeats the sequence.
   and `test/lib` are restored exactly to their S7/MyNES baseline; the P11
   Compat repair is the only retained behavior change.
 
+- P13 corrects the remaining Compat handoff defect.  A copied latest tone
+  state could turn `start -> stop` into stop-only when both PPI transitions
+  preceded the worker's first read.  Compat now retains one unobserved
+  silent-to-tone onset, submits it through the existing PCM producer once,
+  then immediately reconciles the latest state.  This is not a second queue,
+  worker or Lib contract: repeated active-tone updates remain latest-state
+  updates, while reset and shutdown explicitly discard an unobserved onset.
+  The focused Core proof covers the formerly lost start/stop sequence as well
+  as finite tones, delivery failure and lifecycle reuse on x64/x86.
+
 - S8 P4 correctly converged the cold-reset Timer2 gate to original PPI state,
   but owner reproduction disproved it as the first-use playback cause.  An
   owner-run trace proves the first `AUDIO.COM` handoff reaches 439Hz,

@@ -31,7 +31,8 @@ lib_status audio_stream_platform_enqueue(audio_stream_platform *platform,
     lib_u32 index;
 
     assert(platform == &first_platform && samples != LIB_NULL);
-    assert(frame_count == AUDIO_STREAM_PLAY_BATCH && out_accepted_frames != LIB_NULL);
+    assert(frame_count != 0u && frame_count <= AUDIO_STREAM_PLAY_BATCH &&
+        out_accepted_frames != LIB_NULL);
     for (index = 0u; index < frame_count; ++index) {
         if (samples[index] > 0) saw_positive = LIB_TRUE;
         if (samples[index] < 0) saw_negative = LIB_TRUE;
