@@ -48,8 +48,13 @@ continuous until a hot guest reboot repeats the sequence.
   infinite request, and observes one 1024-frame platform delivery containing
   both positive and negative PCM samples. Together with the owner-run cold
   trace where the first `waveOutWrite` succeeds, this rules out a missing first
-  producer or Lib-output event. Owner desktop audibility remains the pending
-  criterion.
+  producer or Lib-output event. The remaining generic endpoint gap is that a
+  successful `waveOutWrite` only accepts a header; it does not prove one buffer
+  has reached a completion callback. The admitted correction is a silent
+  endpoint readiness cycle during Win32 Audio creation: fill the four owned
+  slots, wait for one `WOM_DONE`, then reset back to idle before publication.
+  That establishes one reusable ready-stream contract without a SoftPC first-
+  tone branch. Owner desktop audibility remains the pending criterion.
 
 - T81 S8 P1 restored eager neutral-stream creation before the Compat speaker
   task and removed the lazy-create wrapper. Its lifecycle tests passed, but the
