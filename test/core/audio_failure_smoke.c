@@ -191,8 +191,11 @@ static void test_request_stop(void)
 int main(void)
 {
     initialization_step = stream_create_step = task_create_step = 0u;
+    scenario = 0;
+    clears = flushes = enqueues = waits = writable_waits = 0u;
     assert(softpc_platform_audio_start() == LIB_STATUS_OK);
     assert(stream_create_step != 0u && stream_create_step < task_create_step);
+    assert(enqueues == 1u && last_frame_count == 512u && flushes == 1u);
     softpc_speaker_task = NULL;
     softpc_speaker_stop = NULL;
     softpc_speaker_wake = NULL;
@@ -240,7 +243,7 @@ int main(void)
     assert(softpc_speaker_request.frequency == 100u &&
         softpc_speaker_request.duration == 1u && signals == 1u);
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 1u && last_frame_count == 48u && clears == 1u &&
+    assert(enqueues == 1u && last_frame_count == 48u && clears == 0u &&
         flushes == 1u && waits == 2u);
 
     scenario = 3;
@@ -264,7 +267,7 @@ int main(void)
     assert(softpc_speaker_onset.frequency == 440u);
     softpc_standalone_audio_set_tone(0u, 0u);
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 1u && clears == 1u && flushes == 1u && waits == 2u);
+    assert(enqueues == 1u && clears == 0u && flushes == 1u && waits == 2u);
 
     /* A PPI gate-off can arrive while the producer is waiting for an Audio
        FIFO slot.  It must end the current continuous tone rather than let

@@ -254,15 +254,22 @@ real threaded Compat proof covers a fresh first request reaching its first PCM
 submission on both widths.  Physical audibility remains an owner desktop
 check because managed automation has no usable `waveOut` device.
 
-P14 keeps the remaining repair entirely in the SoftPC speaker adapter.  A real
-zero-to-nonzero speaker transition replaces any unplayed PCM made while the
-speaker was silent.  The existing sole producer observes that transition,
-clears the existing stream before its first block, starts the waveform at
-phase zero, and reconciles the newest request after each accepted block.  This
-is a state replacement rule for every PC-speaker onset, not a first-run
-exception, timer change, endpoint retry loop, extra queue, or Lib/Common API
-change.  Focused and full dual-width tests pass; cold-boot audible acceptance
-remains required before S8 may close.
+P14 retains the current onset and reconciles the newest request after every
+accepted block, so an old continuous request cannot obscure a later stop or
+frequency change.  An onset-time stream reset was rejected before delivery:
+it would undo an endpoint's cold-start readiness.
+
+P15 addresses the remaining SoftPC-versus-MyNES lifecycle difference at the
+product adapter boundary.  MyNES naturally submits its core sample stream
+before any audible programme event; SoftPC otherwise leaves the endpoint idle
+until the first PC-speaker command.  After stream creation, Compat submits one
+fixed silent block to the existing FIFO and uses the public flush contract to
+wait only until the backend accepts it, not until it finishes playing.  This
+does not rely on Lib's private delivery batch size.  The guest speaker still
+has exactly one Compat PCM producer and one Lib worker; there is no guest-time
+change, polling loop, second output path, Lib/Common change, or
+preserved-mirror modification.  Dual-width focused Audio and restart-boot
+tests pass; cold-boot audible acceptance remains required before S8 may close.
 
 T closure requires separate original-request/ledger/changed-path audit and
 owner acceptance. XP sound-card implementation remains future separately

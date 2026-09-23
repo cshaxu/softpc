@@ -44,6 +44,22 @@ static base_sync_task *softpc_speaker_task;
 static base_sync_mutex *softpc_speaker_request_lock;
 static lib_audio_stream *softpc_speaker_stream;
 
+/* A newly opened WaveOut endpoint has not accepted PCM yet.  Prime that
+   endpoint once before the guest can request a speaker tone; MyNES reaches
+   this same state naturally through its continuous core sample stream. */
+static lib_status softpc_speaker_prime(lib_audio_stream *stream)
+{
+    lib_i16 silence[SOFTPC_SPEAKER_BLOCK_FRAMES] = { 0 };
+    lib_u32 accepted;
+    lib_status status;
+
+    status = lib_audio_stream_enqueue(stream, silence,
+        SOFTPC_SPEAKER_BLOCK_FRAMES, &accepted);
+    if (status != LIB_STATUS_OK || accepted != SOFTPC_SPEAKER_BLOCK_FRAMES)
+        return LIB_STATUS_IO_ERROR;
+    return lib_audio_stream_flush(stream);
+}
+
 typedef struct softpc_speaker_tone {
     ULONG frequency;
     ULONG duration;
@@ -208,16 +224,6 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
                 if (stream != NULL) (void)lib_audio_stream_flush(stream);
                 break;
             }
-            if (onset_pending != LIB_FALSE) {
-                /* A new physical speaker tone supersedes any unsounded PCM
-                   left by its preceding silent state.  Perform this only in
-                   the sole Audio caller before synthesizing its first block. */
-                if (lib_audio_stream_clear(stream) != LIB_STATUS_OK) {
-                    softpc_speaker_write_request(0u, 0u);
-                    break;
-                }
-                phase = 0u;
-            }
             if (request.duration != INFINITE) {
                 status = softpc_speaker_submit_finite(stream, &request,
                     onset_pending == LIB_FALSE, &phase);
@@ -275,6 +281,8 @@ lib_status softpc_platform_audio_start(void)
     options.channel_count = 1u;
     status = lib_audio_stream_create(&options, &softpc_speaker_stream);
     if (status != LIB_STATUS_OK) return status;
+    status = softpc_speaker_prime(softpc_speaker_stream);
+    if (status != LIB_STATUS_OK) goto fail_stream;
     status = base_sync_mutex_create(&softpc_speaker_request_lock);
     if (status != LIB_STATUS_OK) goto fail_stream;
     status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &softpc_speaker_wake);
