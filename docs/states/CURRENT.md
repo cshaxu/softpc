@@ -41,8 +41,12 @@ continuous until a hot guest reboot repeats the sequence.
   matching the completed-stream reset used by MyNES. Later tones already had such a
   reset, explaining the first-versus-later distinction without a SoftPC
   exception.  Public Audio ABI, topology and original mirror remain unchanged;
-  focused fake/native-thread proofs pass on x64/x86.  Owner desktop audibility
-  remains the pending criterion because managed automation has no `waveOut`.
+  focused fake/native-thread proofs pass on x64/x86. The native Audio smoke
+  now queues two valid 512-frame submissions then flushes their full 1024-frame
+  batch, so an available WaveOut endpoint must accept a real native write; the
+  first-tone proof also verifies nonzero PCM. The local x64 native endpoint
+  completed that full path; owner desktop audibility remains the pending
+  criterion.
 
 - T81 S8 P1 restored eager neutral-stream creation before the Compat speaker
   task and removed the lazy-create wrapper. Its lifecycle tests passed, but the

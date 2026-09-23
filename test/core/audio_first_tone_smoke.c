@@ -19,8 +19,17 @@ static lib_status fake_audio_create(const lib_audio_stream_options *options,
 static lib_status fake_audio_enqueue(lib_audio_stream *stream,
     const lib_i16 *samples, lib_u32 frame_count, lib_u32 *out_accepted)
 {
+    lib_u32 index;
+    lib_bool saw_positive = LIB_FALSE;
+    lib_bool saw_negative = LIB_FALSE;
+
     assert(stream == (lib_audio_stream *)1 && samples != LIB_NULL);
     assert(frame_count == 512u && out_accepted != LIB_NULL);
+    for (index = 0u; index < frame_count; ++index) {
+        if (samples[index] > 0) saw_positive = LIB_TRUE;
+        if (samples[index] < 0) saw_negative = LIB_TRUE;
+    }
+    assert(saw_positive != LIB_FALSE && saw_negative != LIB_FALSE);
     ++enqueue_count;
     if (enqueue_count == 1u) {
         *out_accepted = frame_count;
