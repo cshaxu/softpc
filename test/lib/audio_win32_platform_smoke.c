@@ -11,11 +11,10 @@ static lib_win32_mmresult reset_result = LIB_WIN32_MMSYSERR_NOERROR;
 static lib_win32_mmresult unprepare_result = LIB_WIN32_MMSYSERR_NOERROR;
 static lib_win32_mmresult close_result = LIB_WIN32_MMSYSERR_NOERROR;
 static unsigned open_calls, prepare_calls, write_calls, reset_calls;
-static unsigned unprepare_calls, close_calls, wait_calls;
+static unsigned unprepare_calls, close_calls;
 static unsigned create_event_calls, set_event_calls, reset_event_calls, close_handle_calls;
 static lib_win32_dword_ptr open_callback, open_instance;
 static lib_win32_dword wait_result = LIB_WIN32_WAIT_OBJECT_0;
-static lib_win32_wave_header *first_submitted_header;
 
 static lib_win32_mmresult fake_open(lib_win32_wave_output *out_output,
     lib_win32_uint mapper, const lib_win32_wave_format *format,
@@ -46,13 +45,11 @@ static lib_win32_mmresult fake_write(lib_win32_wave_output output,
 {
     ++write_calls;
     assert(output != LIB_NULL && header != LIB_NULL && header_size == sizeof(*header));
-    if (first_submitted_header == LIB_NULL) first_submitted_header = header;
     return write_result;
 }
 
 static lib_win32_mmresult fake_reset(lib_win32_wave_output output)
 {
-    if (reset_calls == 0u) assert(prepare_calls == 4u);
     ++reset_calls;
     assert(output != LIB_NULL);
     return reset_result;
@@ -91,12 +88,9 @@ static lib_bool fake_reset_event(lib_win32_handle event)
 static lib_win32_dword fake_wait_for_multiple_objects(lib_win32_dword count,
     const lib_win32_handle *events, lib_bool wait_all, lib_win32_dword timeout)
 {
-    ++wait_calls;
     assert(count == 2u && events[0] == (lib_win32_handle)(lib_iptr)2 &&
         events[1] == (lib_win32_handle)(lib_iptr)3 && wait_all == LIB_WIN32_FALSE &&
         timeout == LIB_WIN32_INFINITE);
-    if (wait_result == LIB_WIN32_WAIT_OBJECT_0)
-        first_submitted_header->dwFlags |= LIB_WIN32_WAVE_HEADER_DONE;
     return wait_result;
 }
 
@@ -136,11 +130,10 @@ static void reset_fake(void)
     unprepare_result = LIB_WIN32_MMSYSERR_NOERROR;
     close_result = LIB_WIN32_MMSYSERR_NOERROR;
     open_calls = prepare_calls = write_calls = reset_calls = 0u;
-    unprepare_calls = close_calls = wait_calls = 0u;
+    unprepare_calls = close_calls = 0u;
     create_event_calls = set_event_calls = reset_event_calls = close_handle_calls = 0u;
     open_callback = open_instance = 0u;
     wait_result = LIB_WIN32_WAIT_OBJECT_0;
-    first_submitted_header = LIB_NULL;
 }
 
 int main(void)
@@ -152,14 +145,12 @@ int main(void)
 
     reset_fake();
     assert(audio_stream_platform_create(&options, &platform) == LIB_STATUS_OK);
-    assert(open_calls == 1u && prepare_calls == 4u && write_calls == 4u &&
-        wait_calls == 1u && reset_calls == 1u &&
-        create_event_calls == 2u);
+    assert(open_calls == 1u && prepare_calls == 4u && create_event_calls == 2u);
     ((lib_win32_wave_callback)(lib_iptr)open_callback)(platform->output,
         LIB_WIN32_WOM_DONE, open_instance, 0u, 0u);
     assert(set_event_calls == 1u);
     assert(audio_stream_platform_enqueue(platform, samples, 1u, &accepted) == LIB_STATUS_OK);
-    assert(accepted == 1u && write_calls == 5u);
+    assert(accepted == 1u && write_calls == 1u);
     platform->slots[0].header.dwFlags |= LIB_WIN32_WAVE_HEADER_DONE;
     assert(audio_stream_platform_wait_writable(platform) == LIB_STATUS_OK);
     platform->slots[0].submitted = platform->slots[1].submitted = LIB_TRUE;
@@ -190,13 +181,7 @@ int main(void)
     reset_fake();
     prepare_result = 1u;
     assert(audio_stream_platform_create(&options, &platform) == LIB_STATUS_IO_ERROR);
-    assert(platform == LIB_NULL && reset_calls == 0u && close_calls == 1u);
-    reset_fake();
-    reset_result = 1u;
-    assert(audio_stream_platform_create(&options, &platform) == LIB_STATUS_IO_ERROR);
-    assert(platform == LIB_NULL && reset_calls == 1u && prepare_calls == 4u &&
-        write_calls == 4u && wait_calls == 1u &&
-        unprepare_calls == 4u && close_calls == 1u && close_handle_calls == 2u);
+    assert(platform == LIB_NULL && reset_calls == 1u && close_calls == 1u);
     reset_fake();
     assert(audio_stream_platform_create(&options, &platform) == LIB_STATUS_OK);
     write_result = 1u;

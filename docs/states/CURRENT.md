@@ -40,31 +40,19 @@ continuous until a hot guest reboot repeats the sequence.
   the first accepted block and proves flush, not clear.  Lib/Common and the
   preserved mirror remain unchanged.
 
+- P12 retires the unproven P6--P10 shared Audio deviations.  Owner reproduction
+  showed the WinMM constructor pre-roll/reset did not repair cold first-use
+  playback, while MyNES demonstrates the common corpus without it.  `src/lib`
+  and `test/lib` are restored exactly to their S7/MyNES baseline; the P11
+  Compat repair is the only retained behavior change.
+
 - S8 P4 correctly converged the cold-reset Timer2 gate to original PPI state,
-  but owner reproduction afterward disproves it as the first-use playback
-  cause.  An owner-run trace now proves the entire first `AUDIO.COM` handoff:
-  Timer2/PPI produces 439Hz, Compat's sole worker produces PCM, Audio accepts
-  it, and the first `waveOutWrite` succeeds.  P6 established the need for a
-  general Win32 Audio constructor reset, but its pre-header placement was not
-  equivalent to a later `clear`: the owner still reproduced cold-boot silence.
-  P7 moves that same reset after headers are prepared and before publication,
-  matching the completed-stream reset used by MyNES. Later tones already had such a
-  reset, explaining the first-versus-later distinction without a SoftPC
-  exception.  Public Audio ABI, topology and original mirror remain unchanged;
-  focused fake/native-thread proofs pass on x64/x86. The native Audio smoke
-  now queues two valid 512-frame submissions then flushes their full 1024-frame
-  batch, so an available WaveOut endpoint must accept a real native write. A
-  Core-to-Lib delivery proof starts a cold Compat speaker, issues one 439Hz
-  infinite request, and observes one 1024-frame platform delivery containing
-  both positive and negative PCM samples. Together with the owner-run cold
-  trace where the first `waveOutWrite` succeeds, this rules out a missing first
-  producer or Lib-output event. The remaining generic endpoint gap is that a
-  successful `waveOutWrite` only accepts a header; it does not prove one buffer
-  has reached a completion callback. The admitted correction is a silent
-  endpoint readiness cycle during Win32 Audio creation: fill the four owned
-  slots, wait for one `WOM_DONE`, then reset back to idle before publication.
-  That establishes one reusable ready-stream contract without a SoftPC first-
-  tone branch. Owner desktop audibility remains the pending criterion.
+  but owner reproduction disproved it as the first-use playback cause.  An
+  owner-run trace proves the first `AUDIO.COM` handoff reaches 439Hz,
+  non-silent PCM and successful `waveOutWrite`; it rules out a missing producer
+  or Lib output event.  The former P6--P10 endpoint-readiness theory was then
+  disproved by the same cold-boot symptom and is retired by P12.  The remaining
+  correction is P11's SoftPC-only queue-drain behavior.
 
 - T81 S8 P1 restored eager neutral-stream creation before the Compat speaker
   task and removed the lazy-create wrapper. Its lifecycle tests passed, but the

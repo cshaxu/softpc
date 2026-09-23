@@ -71,45 +71,6 @@ static lib_status audio_stream_prepare(audio_stream_platform *platform)
     return LIB_STATUS_OK;
 }
 
-/* A successful waveOutWrite only transfers ownership of a header.  Complete
- * one silent slot before publishing a new stream so its first caller receives
- * an endpoint that has actually run, rather than an unopened driver queue. */
-static lib_status audio_stream_platform_prime(audio_stream_platform *platform)
-{
-    lib_i16 silence[AUDIO_STREAM_PLAY_BATCH * 2u] = { 0 };
-    lib_u32 index;
-
-    for (index = 0u; index < AUDIO_STREAM_SLOT_COUNT; ++index) {
-        lib_u32 accepted = 0u;
-        lib_status status = audio_stream_platform_enqueue(platform, silence,
-            AUDIO_STREAM_PLAY_BATCH, &accepted);
-
-        if (status != LIB_STATUS_OK || accepted != AUDIO_STREAM_PLAY_BATCH)
-            return status == LIB_STATUS_OK ? LIB_STATUS_IO_ERROR : status;
-    }
-    if (audio_stream_platform_wait_writable(platform) != LIB_STATUS_OK)
-        return LIB_STATUS_IO_ERROR;
-    return audio_stream_platform_clear(platform);
-}
-
-/* Create failure has no published owner, so release every acquired resource. */
-static void audio_stream_discard(audio_stream_platform *platform)
-{
-    lib_u32 index;
-
-    for (index = 0u; index < AUDIO_STREAM_SLOT_COUNT; ++index) {
-        audio_stream_slot *slot = &platform->slots[index];
-
-        if (slot->prepared != LIB_FALSE)
-            (void)lib_win32_wave_out_unprepare_header(platform->output,
-                &slot->header, (lib_win32_uint)sizeof(slot->header));
-    }
-    (void)lib_win32_wave_out_close(platform->output);
-    (void)lib_win32_close_handle(platform->interruption);
-    (void)lib_win32_close_handle(platform->completion);
-    lib_release(platform);
-}
-
 lib_status audio_stream_platform_create(const lib_audio_stream_options *options,
     audio_stream_platform **out_platform)
 {
@@ -156,12 +117,7 @@ lib_status audio_stream_platform_create(const lib_audio_stream_options *options,
     }
     status = audio_stream_prepare(platform);
     if (status != LIB_STATUS_OK) {
-        audio_stream_discard(platform);
-        return status;
-    }
-    status = audio_stream_platform_prime(platform);
-    if (status != LIB_STATUS_OK) {
-        audio_stream_discard(platform);
+        (void)audio_stream_platform_destroy(&platform);
         return status;
     }
     *out_platform = platform;
