@@ -242,10 +242,11 @@ The Standalone Compat installation boundary now invokes its existing
 the actual PIT gate and existing host sink to the same PPI-reset state without
 altering preserved source, guest timing, Lib Audio, or any public interface.
 
-The focused integration proof captures the real PIT state after a cold reset
-and after the first PPI `0x03` write, asserting low then rising gate state;
-the existing test continues through waveform, stop and reset behavior. The old
-installation sequence fails this assertion deterministically. Focused
+The focused integration proof captures the real PIT state after a cold reset,
+then issues `AUDIO.COM`'s exact Timer2 mode/divisor and PPI `0x03` writes. It
+asserts low then rising gate state and verifies the resulting first tone,
+before continuing through stop and reset behavior. The old installation
+sequence fails the initial-gate assertion deterministically. Focused
 PIT/sound/checkpoint tests and the non-desktop product regression pass on
 x64/x86. Physical audibility remains an owner desktop check because managed
 automation has no `waveOut` device.

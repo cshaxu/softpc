@@ -44,16 +44,17 @@ int main(void)
     assert(softpc_device_snapshot_capture_pit(&pit));
     assert(pit.counter[2].gate == GATE_SIGNAL_LOW);
 
-    /* The original PPI port controls timer-2 gate and speaker data.
-       Software enables the speaker through original ppi.c.  The original
-       PIT callback then presents its waveform through the standalone host
-       contract; no standalone device state is synthesized here. */
+    /* These are AUDIO.COM's PIT writes: channel 2, square wave, divisor
+       0x0a98. The later PPI write is therefore its first guest-visible gate
+       transition, not a test-only direct host callback. */
+    outb(TIMER_MODE_REG, 0xb6u);
+    outb(TIMER2_REG, 0x98u);
+    outb(TIMER2_REG, 0x0au);
     outb(PPI_GENERAL, 0x03u);
     assert(softpc_device_snapshot_capture_pit(&pit));
     assert(pit.counter[2].gate == GATE_SIGNAL_RISE);
     assert(PpiState == TRUE);
     assert(T2State == TRUE);
-    host_timer2_waveform(0, 596u, 597u, 0, 1);
     assert(FreqT2 > 10u && FreqT2 < 20000u);
     assert(BeepLastFreq == FreqT2);
     assert(BeepLastDuration == INFINITE);

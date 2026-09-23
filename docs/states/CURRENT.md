@@ -38,8 +38,9 @@ continuous until a hot guest reboot repeats the sequence.
   contract to converge PIT channel 2 and the host sink to low.  This is a
   one-line Compat replacement, leaves the OpenNT mirror and public Audio ABI
   unchanged, and preserves one original PPI/PIT state owner plus one Compat
-  producer/Audio worker.  The focused first-tone/PIT/PPI/checkpoint proofs
-  and the 114-test non-desktop regression pass on x64 and x86.
+  producer/Audio worker. The focused proof now issues `AUDIO.COM`'s actual
+  Timer2 mode/divisor and PPI writes; it, the PIT/PPI/checkpoint proofs and
+  the 114-test non-desktop regression pass on x64 and x86.
 
 - T81 S8 P1 restored eager neutral-stream creation before the Compat speaker
   task and removed the lazy-create wrapper. Its lifecycle tests passed, but the
