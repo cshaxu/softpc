@@ -67,7 +67,7 @@ static half_word ppi_register;
 #define PPI_BIT_MASK	0x3F1
 
 static boolean gate_2_was_low = TRUE;	/* state of timer 2 gate */
-#ifndef NTVDM
+#if !defined(NTVDM) && !defined(SOFTPC_STANDALONE)
 static boolean SPKRDATA_was_low = TRUE;	/* speaker data for sound */
 #endif
 
@@ -134,7 +134,7 @@ void ppi_outb IFN2(io_addr, port, half_word, value)
 	 * Tell sound logic whether sound is enabled or not
 	 */
 
-#ifndef NTVDM
+#if !defined(NTVDM) && !defined(SOFTPC_STANDALONE)
 		if ( (value & 0x02) && SPKRDATA_was_low)
 		{
 			host_enable_timer2_sound();
@@ -165,7 +165,7 @@ void ppi_outb IFN2(io_addr, port, half_word, value)
 		    timer_gate(TIMER2_REG, GATE_SIGNAL_LOW); 
 		    gate_2_was_low = TRUE;
 		}
-#ifdef NTVDM
+#if defined(NTVDM) || defined(SOFTPC_STANDALONE)
                 /*
                  *  Tell the host the full PpiState because this effects
                  *  whether we are playing Timer 2 Freq, Ppi Freq or both.
@@ -208,10 +208,10 @@ softpc_device_ppi_state *state;
 		return;
 	state->register_value = ppi_register;
 	state->gate_2_was_low = gate_2_was_low ? 1u : 0u;
-#ifndef NTVDM
+#if !defined(NTVDM) && !defined(SOFTPC_STANDALONE)
 	state->speaker_data_was_low = SPKRDATA_was_low ? 1u : 0u;
 #else
-	state->speaker_data_was_low = 1u;
+	state->speaker_data_was_low = (ppi_register & 0x02u) == 0u ? 1u : 0u;
 #endif
 }
 
@@ -224,12 +224,14 @@ const softpc_device_ppi_state *state;
 		return FALSE;
 	ppi_register = state->register_value;
 	gate_2_was_low = state->gate_2_was_low ? TRUE : FALSE;
-#ifndef NTVDM
+#if !defined(NTVDM) && !defined(SOFTPC_STANDALONE)
 	if (state->speaker_data_was_low)
 		host_disable_timer2_sound();
 	else
 		host_enable_timer2_sound();
 	SPKRDATA_was_low = state->speaker_data_was_low ? TRUE : FALSE;
+#elif defined(SOFTPC_STANDALONE)
+	HostPpiState(ppi_register);
 #endif
 	return TRUE;
 }

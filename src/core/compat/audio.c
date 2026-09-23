@@ -1,6 +1,7 @@
 #include "insignia.h"
 #include "host_def.h"
 #include "audio.h"
+#include "timer.h"
 #include "lib/base/sync_interface.h"
 #include "lib/audio/stream_interface.h"
 #include <stdio.h>
@@ -8,9 +9,26 @@
 /* Standalone audio is only a presentation sink.  nt_sound.c owns the
    original PPI/Timer2 state transitions and requests a frequency here. */
 #ifdef _WIN32
+#undef PlaySound
+extern BOOL T2State;
+extern void PlaySound(BOOL pulsed_ppi);
+
 ULONG GetPerfCounter(VOID)
 {
     return (ULONG)(GetTickCount() * 10u);
+}
+
+/* reset.c retains the original host stop call.  PPI writes themselves use the
+   original complete post-gate HostPpiState transition in ppi.c. */
+void host_disable_timer2_sound(void)
+{
+    HostPpiState(0u);
+}
+
+void softpc_standalone_sound_timer2_gate(unsigned char value)
+{
+    T2State = value != GATE_SIGNAL_LOW;
+    PlaySound(FALSE);
 }
 
 #define SOFTPC_SPEAKER_MIN_HZ 10ul

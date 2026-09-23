@@ -220,6 +220,17 @@ submission followed by one flush. Background regression passes x64 114/114
 Owner-visible audible confirmation remains required. User media stays
 untracked.
 
+P3 removes the standalone-only PPI speaker-data helpers from the preserved
+`nt_sound.c`.  Standalone PPI writes now select the original NTVDM complete
+`HostPpiState(value)` transition after the existing timer-gate operation.  The
+immediate gate-only update remains necessary for an unchanged PPI speaker-data
+bit and is retained as Compat host support; it is no longer a mirror-local
+implementation.  The reset stop callback likewise lives in Compat.  This is a
+net OpenNT mirror reduction: the PPI selection/snapshot adjustment is `+8/-6`,
+while `nt_sound.c` is `+0/-30` relative to the preceding accepted baseline.
+Focused state, machine/PPI and Audio failure tests pass on both widths.  The
+owner still performs the audible fresh-run confirmation before S8 closes.
+
 T closure requires separate original-request/ledger/changed-path audit and
 owner acceptance. XP sound-card implementation remains future separately
 admitted work; it is not silently folded into the existing mirror-rebase queue.

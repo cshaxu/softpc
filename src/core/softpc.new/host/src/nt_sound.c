@@ -447,33 +447,3 @@ void PlayContinuousTone(void)
 
     host_ica_unlock();
 }
-
-#ifdef SOFTPC_STANDALONE
-/* Existing standalone PPI and Timer-2 entry points share the original state. */
-void host_enable_timer2_sound(void)
-{
-    host_ica_lock();
-    if (!PpiState) {
-        PpiState = TRUE;
-        PulsePpi();
-    }
-    PlaySound(PpiState);
-    host_ica_unlock();
-}
-
-void host_disable_timer2_sound(void)
-{
-    host_ica_lock();
-    PpiState = FALSE;
-    PlaySound(FALSE);
-    host_ica_unlock();
-}
-
-void softpc_standalone_sound_timer2_gate(half_word value)
-{
-    host_ica_lock();
-    T2State = value != GATE_SIGNAL_LOW;
-    PlaySound(FALSE);
-    host_ica_unlock();
-}
-#endif /* SOFTPC_STANDALONE */

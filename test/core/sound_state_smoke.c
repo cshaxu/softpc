@@ -53,13 +53,13 @@ int main(void)
     i = calls;
     host_timer2_waveform(0, 596, 597, 0, 1);
     assert(calls == i);
-    softpc_standalone_sound_timer2_gate(GATE_SIGNAL_LOW);
-    assert(!T2State && BeepLastFreq == 0);
-    softpc_standalone_sound_timer2_gate(GATE_SIGNAL_RISE);
+    HostPpiState(2);
+    assert(!T2State);
+    HostPpiState(3);
     assert(T2State && BeepLastFreq == 1000);
-    host_disable_timer2_sound();
+    HostPpiState(0);
     assert(!PpiState && BeepLastFreq == 0);
-    ++ticks; host_enable_timer2_sound();
+    ++ticks; HostPpiState(3);
     assert(PpiState && BeepLastFreq == 1000);
     host_timer2_waveform(0, INFINITE, 1, 0, 0);
     assert(FreqT2 == 0);
@@ -74,5 +74,15 @@ int main(void)
     sound_enabled = 0; host_ring_bell(1); assert(bells == 0);
     sound_enabled = 1; host_ring_bell(1); assert(bells == 1);
     host_alarm(1); assert(bells == 2);
+
+    /* The complete PPI state transition itself emits the final tone request.
+       The linked integration smoke separately exercises its timer-gate path. */
+    calls = 0; frequency = duration = 0;
+    FreqT2 = 1000; PpiState = FALSE; T2State = FALSE;
+    PpiCounting = 0; FreqPpi = 0; LastPpi = 0;
+    BeepLastFreq = BeepLastDuration = 0;
+    ticks = 1000; ET2TicCount = 999;
+    HostPpiState(3);
+    assert(calls == 1 && frequency == 1000 && duration == INFINITE);
     return 0;
 }
