@@ -62,19 +62,17 @@ continuous until a hot guest reboot repeats the sequence.
   reset was removed before delivery: it would erase the very endpoint state
   needed for a cold first tone.
 
-- P15 closes the remaining product-level difference from MyNES without
-  changing Lib/Common.  MyNES naturally submits core samples before audible
-  music; SoftPC had submitted no PCM at all until the first guest speaker
-  command.  Compat now queues one silent fixed block once after creating its
-  Audio stream and uses the public flush contract to wait only until the
-  endpoint accepts that block, never for playback completion.  The first guest
-  tone therefore encounters an already exercised endpoint without Compat
-  knowing Lib's private delivery batch size.  The ordinary speaker worker
-  remains the sole guest PCM producer, no periodic polling or new platform
-  path is added, and the preserved mirror stays unchanged.  The first-tone
-  and first-delivery proofs explicitly distinguish the accepted silent prelude
-  from the later non-silent 439Hz block.  After rebuilding every test target,
-  x64 121/121 (219.34 s) and x86 121/121 (203.35 s) pass.  Physical cold-boot
+- P15's one-time startup prelude is retired: owner reproduction proved it did
+  not repair cold first-use playback.  P16 instead makes Compat's existing
+  sole PC-speaker producer continuously submit either the requested square
+  wave or silence through the same bounded Audio FIFO.  This mirrors the only
+  demonstrated MyNES distinction—its APU is naturally a continuous PCM
+  source—without changing Lib/Common, adding a worker, queue, timer, polling
+  path, public API or preserved-mirror diff.  Zero frequency is ordinary zero
+  PCM, and finite requests atomically return the one latest request to silence
+  only when no newer guest transition superseded them.  Focused x64/x86 tests
+  prove the initial silent delivery, first 439Hz delivery, real two-run
+  PIT/PPI-to-Lib handoff and failure/reset boundaries.  Physical cold-boot
   audibility remains the outstanding owner acceptance condition.
 
 - S8 P4 correctly converged the cold-reset Timer2 gate to original PPI state,

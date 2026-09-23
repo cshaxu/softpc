@@ -4,11 +4,12 @@
 #include <assert.h>
 
 struct audio_stream_platform {
-    lib_bool primed;
+    lib_bool delivered_silence;
     lib_bool delivered_non_silent_pcm;
 };
 
 static audio_stream_platform first_platform;
+static base_sync_event *startup_silence;
 static base_sync_event *first_delivery;
 static lib_u32 delivery_count;
 
@@ -39,13 +40,14 @@ lib_status audio_stream_platform_enqueue(audio_stream_platform *platform,
         if (samples[index] < 0) saw_negative = LIB_TRUE;
     }
     if (saw_positive == LIB_FALSE && saw_negative == LIB_FALSE) {
-        assert(platform->primed == LIB_FALSE);
-        platform->primed = LIB_TRUE;
+        if (platform->delivered_silence == LIB_FALSE) {
+            platform->delivered_silence = LIB_TRUE;
+            assert(base_sync_event_signal(startup_silence) == LIB_STATUS_OK);
+        }
         *out_accepted_frames = frame_count;
         return LIB_STATUS_OK;
     }
-    assert(platform->primed != LIB_FALSE && saw_positive != LIB_FALSE &&
-        saw_negative != LIB_FALSE);
+    assert(saw_positive != LIB_FALSE && saw_negative != LIB_FALSE);
     platform->delivered_non_silent_pcm = LIB_TRUE;
     ++delivery_count;
     *out_accepted_frames = frame_count;
@@ -89,14 +91,18 @@ int main(void)
 {
     assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET,
         &first_delivery) == LIB_STATUS_OK);
+    assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET,
+        &startup_silence) == LIB_STATUS_OK);
     assert(softpc_platform_audio_start() == LIB_STATUS_OK);
-    assert(first_platform.primed != LIB_FALSE);
+    assert(base_sync_event_wait(startup_silence, 1000u) ==
+        BASE_SYNC_WAIT_SIGNALED);
     softpc_standalone_audio_set_tone(439u, INFINITE);
     assert(base_sync_event_wait(first_delivery, 1000u) ==
         BASE_SYNC_WAIT_SIGNALED);
     assert(delivery_count != 0u &&
         first_platform.delivered_non_silent_pcm != LIB_FALSE);
     softpc_platform_audio_shutdown();
+    base_sync_event_destroy(startup_silence);
     base_sync_event_destroy(first_delivery);
     return 0;
 }

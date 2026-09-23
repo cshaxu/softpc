@@ -5,8 +5,10 @@
 #include <assert.h>
 
 static base_sync_event *first_submission;
+static base_sync_event *startup_silence;
+static base_sync_event *release_startup_silence;
 static unsigned enqueue_count;
-static lib_bool primed;
+static lib_bool silence_seen;
 
 static lib_status fake_audio_create(const lib_audio_stream_options *options,
     lib_audio_stream **out_stream)
@@ -31,13 +33,18 @@ static lib_status fake_audio_enqueue(lib_audio_stream *stream,
         if (samples[index] < 0) saw_negative = LIB_TRUE;
     }
     if (saw_positive == LIB_FALSE && saw_negative == LIB_FALSE) {
-        assert(primed == LIB_FALSE);
-        primed = LIB_TRUE;
+        if (silence_seen != LIB_FALSE) {
+            *out_accepted = 0u;
+            return LIB_STATUS_IO_ERROR;
+        }
+        silence_seen = LIB_TRUE;
         *out_accepted = frame_count;
+        assert(base_sync_event_signal(startup_silence) == LIB_STATUS_OK);
+        assert(base_sync_event_wait(release_startup_silence, 1000u) ==
+            BASE_SYNC_WAIT_SIGNALED);
         return LIB_STATUS_OK;
     }
-    assert(primed != LIB_FALSE && saw_positive != LIB_FALSE &&
-        saw_negative != LIB_FALSE);
+    assert(saw_positive != LIB_FALSE && saw_negative != LIB_FALSE);
     ++enqueue_count;
     if (enqueue_count == 1u) {
         *out_accepted = frame_count;
@@ -95,13 +102,21 @@ int main(void)
 {
     assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET,
         &first_submission) == LIB_STATUS_OK);
+    assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET,
+        &startup_silence) == LIB_STATUS_OK);
+    assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET,
+        &release_startup_silence) == LIB_STATUS_OK);
     assert(softpc_platform_audio_start() == LIB_STATUS_OK);
-    assert(primed != LIB_FALSE);
+    assert(base_sync_event_wait(startup_silence, 1000u) ==
+        BASE_SYNC_WAIT_SIGNALED);
     softpc_standalone_audio_set_tone(439u, INFINITE);
+    assert(base_sync_event_signal(release_startup_silence) == LIB_STATUS_OK);
     assert(base_sync_event_wait(first_submission, 1000u) ==
         BASE_SYNC_WAIT_SIGNALED);
     assert(enqueue_count >= 1u);
     softpc_platform_audio_shutdown();
+    base_sync_event_destroy(release_startup_silence);
+    base_sync_event_destroy(startup_silence);
     base_sync_event_destroy(first_submission);
     return 0;
 }
