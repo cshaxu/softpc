@@ -71,8 +71,10 @@ continuous until a hot guest reboot repeats the sequence.
   tone therefore encounters an already exercised endpoint without Compat
   knowing Lib's private delivery batch size.  The ordinary speaker worker
   remains the sole guest PCM producer, no periodic polling or new platform
-  path is added, and the preserved mirror stays unchanged.  Focused x64/x86
-  audio tests and x64/x86 restart-boot integration pass; physical cold-boot
+  path is added, and the preserved mirror stays unchanged.  The first-tone
+  and first-delivery proofs explicitly distinguish the accepted silent prelude
+  from the later non-silent 439Hz block.  After rebuilding every test target,
+  x64 121/121 (219.34 s) and x86 121/121 (203.35 s) pass.  Physical cold-boot
   audibility remains the outstanding owner acceptance condition.
 
 - S8 P4 correctly converged the cold-reset Timer2 gate to original PPI state,

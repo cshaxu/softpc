@@ -268,8 +268,10 @@ wait only until the backend accepts it, not until it finishes playing.  This
 does not rely on Lib's private delivery batch size.  The guest speaker still
 has exactly one Compat PCM producer and one Lib worker; there is no guest-time
 change, polling loop, second output path, Lib/Common change, or
-preserved-mirror modification.  Dual-width focused Audio and restart-boot
-tests pass; cold-boot audible acceptance remains required before S8 may close.
+preserved-mirror modification.  The first-tone and first-delivery proofs first
+observe that silent block, then require a later non-silent 439Hz delivery.
+After every test target was rebuilt, x64 121/121 and x86 121/121 pass;
+cold-boot audible acceptance remains required before S8 may close.
 
 T closure requires separate original-request/ledger/changed-path audit and
 owner acceptance. XP sound-card implementation remains future separately

@@ -6,6 +6,7 @@
 
 static base_sync_event *first_submission;
 static unsigned enqueue_count;
+static lib_bool primed;
 
 static lib_status fake_audio_create(const lib_audio_stream_options *options,
     lib_audio_stream **out_stream)
@@ -29,7 +30,14 @@ static lib_status fake_audio_enqueue(lib_audio_stream *stream,
         if (samples[index] > 0) saw_positive = LIB_TRUE;
         if (samples[index] < 0) saw_negative = LIB_TRUE;
     }
-    assert(saw_positive != LIB_FALSE && saw_negative != LIB_FALSE);
+    if (saw_positive == LIB_FALSE && saw_negative == LIB_FALSE) {
+        assert(primed == LIB_FALSE);
+        primed = LIB_TRUE;
+        *out_accepted = frame_count;
+        return LIB_STATUS_OK;
+    }
+    assert(primed != LIB_FALSE && saw_positive != LIB_FALSE &&
+        saw_negative != LIB_FALSE);
     ++enqueue_count;
     if (enqueue_count == 1u) {
         *out_accepted = frame_count;
@@ -88,6 +96,7 @@ int main(void)
     assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET,
         &first_submission) == LIB_STATUS_OK);
     assert(softpc_platform_audio_start() == LIB_STATUS_OK);
+    assert(primed != LIB_FALSE);
     softpc_standalone_audio_set_tone(439u, INFINITE);
     assert(base_sync_event_wait(first_submission, 1000u) ==
         BASE_SYNC_WAIT_SIGNALED);
