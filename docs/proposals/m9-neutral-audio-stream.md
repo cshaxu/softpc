@@ -239,9 +239,12 @@ produces a 439Hz request, Compat's sole worker produces PCM, the Audio FIFO
 accepts it, and the first `waveOutWrite` succeeds.  This rules out a second
 producer, guest timing, and a missed gate transition as the remaining cause.
 
-P5 therefore makes the neutral Win32 endpoint constructor establish the same
-empty baseline as the existing `clear` operation: after `waveOutOpen`, it uses
-the existing reset path before headers are prepared or the stream is published.
+P6 first established that a neutral Win32 endpoint requires an initial reset,
+but placed it before header preparation.  The owner then reported that a cold
+boot was still silent while a later warm reset worked, proving that this was
+not equivalent to the existing `clear` path.  P7 moves the same reset to after
+all headers are prepared and before the stream is published, exactly matching
+the reset state MyNES establishes after its completed stream creation.
 Later `AUDIO.COM` executions already follow a prior `clear/reset`, which
 explains the owner-observed first-versus-later distinction.  This is a Lib
 endpoint invariant, not a SoftPC first-tone exception: no public API, worker,

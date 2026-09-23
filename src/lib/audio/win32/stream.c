@@ -71,6 +71,24 @@ static lib_status audio_stream_prepare(audio_stream_platform *platform)
     return LIB_STATUS_OK;
 }
 
+/* Create failure has no published owner, so release every acquired resource. */
+static void audio_stream_discard(audio_stream_platform *platform)
+{
+    lib_u32 index;
+
+    for (index = 0u; index < AUDIO_STREAM_SLOT_COUNT; ++index) {
+        audio_stream_slot *slot = &platform->slots[index];
+
+        if (slot->prepared != LIB_FALSE)
+            (void)lib_win32_wave_out_unprepare_header(platform->output,
+                &slot->header, (lib_win32_uint)sizeof(slot->header));
+    }
+    (void)lib_win32_wave_out_close(platform->output);
+    (void)lib_win32_close_handle(platform->interruption);
+    (void)lib_win32_close_handle(platform->completion);
+    lib_release(platform);
+}
+
 lib_status audio_stream_platform_create(const lib_audio_stream_options *options,
     audio_stream_platform **out_platform)
 {
@@ -115,18 +133,15 @@ lib_status audio_stream_platform_create(const lib_audio_stream_options *options,
         lib_release(platform);
         return status;
     }
-    /* A new endpoint starts in the same empty state as a cleared endpoint. */
-    status = audio_stream_platform_clear(platform);
-    if (status != LIB_STATUS_OK) {
-        (void)lib_win32_wave_out_close(platform->output);
-        (void)lib_win32_close_handle(platform->interruption);
-        (void)lib_win32_close_handle(platform->completion);
-        lib_release(platform);
-        return status;
-    }
     status = audio_stream_prepare(platform);
     if (status != LIB_STATUS_OK) {
-        (void)audio_stream_platform_destroy(&platform);
+        audio_stream_discard(platform);
+        return status;
+    }
+    /* Match clear: headers are prepared before the endpoint enters its idle state. */
+    status = audio_stream_platform_clear(platform);
+    if (status != LIB_STATUS_OK) {
+        audio_stream_discard(platform);
         return status;
     }
     *out_platform = platform;

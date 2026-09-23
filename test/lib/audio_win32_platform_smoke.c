@@ -50,6 +50,7 @@ static lib_win32_mmresult fake_write(lib_win32_wave_output output,
 
 static lib_win32_mmresult fake_reset(lib_win32_wave_output output)
 {
+    if (reset_calls == 0u) assert(prepare_calls == 4u);
     ++reset_calls;
     assert(output != LIB_NULL);
     return reset_result;
@@ -182,12 +183,12 @@ int main(void)
     reset_fake();
     prepare_result = 1u;
     assert(audio_stream_platform_create(&options, &platform) == LIB_STATUS_IO_ERROR);
-    assert(platform == LIB_NULL && reset_calls == 2u && close_calls == 1u);
+    assert(platform == LIB_NULL && reset_calls == 0u && close_calls == 1u);
     reset_fake();
     reset_result = 1u;
     assert(audio_stream_platform_create(&options, &platform) == LIB_STATUS_IO_ERROR);
-    assert(platform == LIB_NULL && reset_calls == 1u && prepare_calls == 0u &&
-        close_calls == 1u && close_handle_calls == 2u);
+    assert(platform == LIB_NULL && reset_calls == 1u && prepare_calls == 4u &&
+        unprepare_calls == 4u && close_calls == 1u && close_handle_calls == 2u);
     reset_fake();
     assert(audio_stream_platform_create(&options, &platform) == LIB_STATUS_OK);
     write_result = 1u;

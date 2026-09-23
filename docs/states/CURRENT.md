@@ -34,9 +34,11 @@ continuous until a hot guest reboot repeats the sequence.
   but owner reproduction afterward disproves it as the first-use playback
   cause.  An owner-run trace now proves the entire first `AUDIO.COM` handoff:
   Timer2/PPI produces 439Hz, Compat's sole worker produces PCM, Audio accepts
-  it, and the first `waveOutWrite` succeeds.  P5 establishes a general Win32
-  Audio constructor invariant: an endpoint is reset to the same empty state as
-  an existing `clear` before it is published.  Later tones already had such a
+  it, and the first `waveOutWrite` succeeds.  P6 established the need for a
+  general Win32 Audio constructor reset, but its pre-header placement was not
+  equivalent to a later `clear`: the owner still reproduced cold-boot silence.
+  P7 moves that same reset after headers are prepared and before publication,
+  matching the completed-stream reset used by MyNES. Later tones already had such a
   reset, explaining the first-versus-later distinction without a SoftPC
   exception.  Public Audio ABI, topology and original mirror remain unchanged;
   focused fake/native-thread proofs pass on x64/x86.  Owner desktop audibility
