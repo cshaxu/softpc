@@ -1,4 +1,5 @@
 #include "core/machine/machine.h"
+#include "core/compat/devices/snapshot.h"
 #include "../lib/cleanup.h"
 
 #include <assert.h>
@@ -7,6 +8,7 @@
 #include "insignia.h"
 #include "host_def.h"
 #include "ios.h"
+#include "timer.h"
 
 extern ULONG FreqT2;
 extern BOOL PpiState;
@@ -34,16 +36,21 @@ int main(void)
     const char *path = "softpc-sound-smoke.img";
     softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
+    softpc_device_pit_state pit;
 
     make_boot_disk(path);
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_device_snapshot_capture_pit(&pit));
+    assert(pit.counter[2].gate == GATE_SIGNAL_LOW);
 
     /* The original PPI port controls timer-2 gate and speaker data.
        Software enables the speaker through original ppi.c.  The original
        PIT callback then presents its waveform through the standalone host
        contract; no standalone device state is synthesized here. */
     outb(PPI_GENERAL, 0x03u);
+    assert(softpc_device_snapshot_capture_pit(&pit));
+    assert(pit.counter[2].gate == GATE_SIGNAL_RISE);
     assert(PpiState == TRUE);
     assert(T2State == TRUE);
     host_timer2_waveform(0, 596u, 597u, 0, 1);

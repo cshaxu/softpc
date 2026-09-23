@@ -231,6 +231,25 @@ while `nt_sound.c` is `+0/-30` relative to the preceding accepted baseline.
 Focused state, machine/PPI and Audio failure tests pass on both widths.  The
 owner still performs the audible fresh-run confirmation before S8 closes.
 
+P4 finds the remaining first-use defect below Lib Audio and below the original
+PPI state machine. During a cold reset, original `timer_post()` has already
+opened PIT channel 2 by the time Standalone installs its host Timer2 callback;
+PPI is nevertheless reset to port `0x61=0`, whose bit 0 owns that gate. The
+old installation call only told the host sink that the channel was open, so a
+first guest tone could start before its PPI enable transition and be missed.
+The Standalone Compat installation boundary now invokes its existing
+`timer_gate(TIMER2_REG, GATE_SIGNAL_LOW)` contract instead. It synchronizes
+the actual PIT gate and existing host sink to the same PPI-reset state without
+altering preserved source, guest timing, Lib Audio, or any public interface.
+
+The focused integration proof captures the real PIT state after a cold reset
+and after the first PPI `0x03` write, asserting low then rising gate state;
+the existing test continues through waveform, stop and reset behavior. The old
+installation sequence fails this assertion deterministically. Focused
+PIT/sound/checkpoint tests and the non-desktop product regression pass on
+x64/x86. Physical audibility remains an owner desktop check because managed
+automation has no `waveOut` device.
+
 T closure requires separate original-request/ledger/changed-path audit and
 owner acceptance. XP sound-card implementation remains future separately
 admitted work; it is not silently folded into the existing mirror-rebase queue.

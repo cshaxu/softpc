@@ -73,7 +73,7 @@ static void softpc_standalone_timer_gate(io_addr port, half_word value)
 void softpc_platform_install_timer2_sound_gate(void)
 {
     timer_gate_func = softpc_standalone_timer_gate;
-    softpc_standalone_sound_timer2_gate(GATE_SIGNAL_RISE);
+    timer_gate(TIMER2_REG, GATE_SIGNAL_LOW);
 }
 
 #ifdef _WIN32

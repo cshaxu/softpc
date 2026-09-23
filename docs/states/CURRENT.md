@@ -17,7 +17,7 @@ continuous until a hot guest reboot repeats the sequence.
 | Non-goals | No Common/App/x86/snapshot/configuration change; no guest sound card, DMA, IRQ, OPL/MIDI, volume policy, guest timing change, platform-specific Compat API or net increase in the OpenNT mirror diff. Linux remains unsupported. |
 | Reference Baseline | SoftPC executor `4157e918` after owner-accepted T81 S7. MyNES `b48e57f` remains the unchanged shared Audio baseline. |
 | Candidate Proposal | [Neutral audio](../proposals/m9-neutral-audio-stream.md) |
-| Files And ABI Surface | `core/compat/audio.c`, the preserved `core/softpc.new/base/keymouse/ppi.c`, its existing host sound endpoint and focused Core tests. Touch Lib only if a demonstrable Audio contract defect, rather than a PC-speaker ownership defect, is the root cause. Public Audio ABI and MyNES-shared code remain unchanged unless the same test proves a general defect. |
+| Files And ABI Surface | `core/compat/audio.c`, `core/compat/platform.c`, the preserved `core/softpc.new/base/keymouse/ppi.c`, their existing host sound endpoint and focused Core tests. Touch Lib only if a demonstrable Audio contract defect, rather than a PC-speaker ownership defect, is the root cause. Public Audio ABI and MyNES-shared code remain unchanged unless the same test proves a general defect. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation and source research policy; shared Lib strict C11/package rules. |
 | Verification | Trace all original `LazyBeep` transitions, Compat tone requests, Audio FIFO submissions, native waveOut completion/reset operations and guest-reset state. Add a deterministic start/stop sequence test at the owning boundary; then run focused Audio/Compat tests, strict C11/package builds, background regression, manifests/DAG/governance on x64/x86. |
 | Expected Markers | Exactly one Compat square-wave producer and one Audio delivery worker remain; standalone PPI writes use the original NTVDM complete post-gate state transition; no periodic readiness polling, product WinMM vocabulary or net-increased original-mirror diff appears. |
@@ -29,6 +29,17 @@ continuous until a hot guest reboot repeats the sequence.
 | Similar-Issue Sweep | Search all `softpc_standalone_audio_set_tone`, Audio create/clear/cancel/shutdown calls, original `LazyBeep` init/reset paths and all potential first-use output paths. Retain only the single Compat producer and the single Audio worker; record every hit's disposition. |
 
 ## Current Technical Baseline
+
+- S8 P4 traces the owner-provided `AUDIO.COM` sequence to the real cause:
+  original `timer_post()` opens PIT channel 2 before Standalone installs its
+  host gate callback, whereas the original PPI reset state is port `0x61=0`.
+  Compat had then mirrored that stale open state only to the host sound sink.
+  The existing installation boundary now uses the existing `timer_gate()`
+  contract to converge PIT channel 2 and the host sink to low.  This is a
+  one-line Compat replacement, leaves the OpenNT mirror and public Audio ABI
+  unchanged, and preserves one original PPI/PIT state owner plus one Compat
+  producer/Audio worker.  The focused first-tone/PIT/PPI/checkpoint proofs
+  and the 114-test non-desktop regression pass on x64 and x86.
 
 - T81 S8 P1 restored eager neutral-stream creation before the Compat speaker
   task and removed the lazy-create wrapper. Its lifecycle tests passed, but the
