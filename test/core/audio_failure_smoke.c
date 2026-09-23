@@ -19,6 +19,7 @@ static lib_u32 last_frame_count;
 static lib_i16 first_sample[2];
 static char event_storage[2];
 static char task_storage;
+static void test_request_stop(void);
 
 static lib_status fake_stream_create(const lib_audio_stream_options *options,
     lib_audio_stream **stream)
@@ -78,6 +79,7 @@ static lib_status fake_enqueue(lib_audio_stream *stream, const lib_i16 *samples,
     last_frame_count = frames;
     ++enqueues;
     if (enqueues <= 2u) first_sample[enqueues - 1u] = samples[0];
+    if (scenario == 3 && enqueues == 1u) test_request_stop();
     if (scenario == 1) {
         *accepted = 0u;
         return LIB_STATUS_IO_ERROR;
@@ -179,6 +181,9 @@ static lib_status fake_signal(base_sync_event *event)
 #undef base_sync_mutex_destroy
 #undef base_sync_mutex_create
 
+static void test_request_stop(void)
+{ softpc_speaker_write_request(0u, 0u); }
+
 int main(void)
 {
     initialization_step = stream_create_step = task_create_step = 0u;
@@ -233,5 +238,13 @@ int main(void)
     softpc_speaker_worker(NULL, NULL);
     assert(enqueues == 1u && last_frame_count == 48u && clears == 0u &&
         flushes == 1u && waits == 2u);
+
+    scenario = 3;
+    clears = flushes = enqueues = waits = writable_waits = 0u;
+    softpc_speaker_request.frequency = 440u;
+    softpc_speaker_request.duration = INFINITE;
+    ++softpc_speaker_request.generation;
+    softpc_speaker_worker(NULL, NULL);
+    assert(enqueues == 1u && clears == 0u && flushes == 1u && waits == 2u);
     return 0;
 }

@@ -157,7 +157,9 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
 
             softpc_speaker_read_request(&request);
             if (request.frequency == 0u) {
-                if (stream != NULL) (void)lib_audio_stream_clear(stream);
+                /* A normal gate-off ends synthesis; it must not reset the
+                   native queue and discard PCM that was already accepted. */
+                if (stream != NULL) (void)lib_audio_stream_flush(stream);
                 break;
             }
             if (request.duration != INFINITE) {

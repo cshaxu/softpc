@@ -30,6 +30,16 @@ continuous until a hot guest reboot repeats the sequence.
 
 ## Current Technical Baseline
 
+- P11 identifies a SoftPC-only stop-semantics defect: after an ordinary
+  `LazyBeep(..., INFINITE)` transition, PPI gate-off reached Compat as
+  frequency zero and called `lib_audio_stream_clear()`.  That invokes native
+  queue reset and can discard the first accepted PCM before a cold endpoint
+  has rendered it.  Normal gate-off now flushes the existing producer FIFO
+  without resetting native output; only genuine delivery failures retain
+  cancellation.  A deterministic Core test injects a stop immediately after
+  the first accepted block and proves flush, not clear.  Lib/Common and the
+  preserved mirror remain unchanged.
+
 - S8 P4 correctly converged the cold-reset Timer2 gate to original PPI state,
   but owner reproduction afterward disproves it as the first-use playback
   cause.  An owner-run trace now proves the entire first `AUDIO.COM` handoff:
