@@ -56,6 +56,18 @@ continuous until a hot guest reboot repeats the sequence.
   The focused Core proof covers the formerly lost start/stop sequence as well
   as finite tones, delivery failure and lifecycle reuse on x64/x86.
 
+- P14 tightens that same one-producer handoff rather than adding an endpoint
+  workaround.  Every physical silent-to-tone transition supersedes unplayed
+  PCM from its preceding silent state: the sole Compat speaker worker clears
+  the existing Audio stream, restarts phase at the transition, and then emits
+  the newest onset.  It also re-reads the latest request after every accepted
+  block, so a later stop or frequency change cannot remain hidden behind an
+  earlier infinite request.  The normal path still has one request state, one
+  Compat PCM producer and one Lib Audio worker; Lib/Common and the preserved
+  mirror remain unchanged.  Focused x64/x86 tests and full x64/x86 regression
+  pass (116/116 on each width).  Physical cold-boot audibility remains the
+  outstanding owner acceptance condition.
+
 - S8 P4 correctly converged the cold-reset Timer2 gate to original PPI state,
   but owner reproduction disproved it as the first-use playback cause.  An
   owner-run trace proves the first `AUDIO.COM` handoff reaches 439Hz,

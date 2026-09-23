@@ -88,8 +88,7 @@ static void softpc_speaker_write_request(ULONG frequency, ULONG duration)
 {
     if (softpc_speaker_request_lock != NULL)
         base_sync_mutex_lock(softpc_speaker_request_lock);
-    if (frequency != 0u && softpc_speaker_request.frequency == 0u &&
-        softpc_speaker_onset_pending == LIB_FALSE) {
+    if (frequency != 0u && softpc_speaker_request.frequency == 0u) {
         softpc_speaker_onset.frequency = frequency;
         softpc_speaker_onset.duration = duration;
         softpc_speaker_onset.generation = softpc_speaker_request.generation + 1u;
@@ -209,6 +208,16 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
                 if (stream != NULL) (void)lib_audio_stream_flush(stream);
                 break;
             }
+            if (onset_pending != LIB_FALSE) {
+                /* A new physical speaker tone supersedes any unsounded PCM
+                   left by its preceding silent state.  Perform this only in
+                   the sole Audio caller before synthesizing its first block. */
+                if (lib_audio_stream_clear(stream) != LIB_STATUS_OK) {
+                    softpc_speaker_write_request(0u, 0u);
+                    break;
+                }
+                phase = 0u;
+            }
             if (request.duration != INFINITE) {
                 status = softpc_speaker_submit_finite(stream, &request,
                     onset_pending == LIB_FALSE, &phase);
@@ -231,10 +240,23 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
             }
             if (status == LIB_STATUS_LIMIT_EXCEEDED &&
                 lib_audio_stream_wait_writable(stream) !=
-                    LIB_STATUS_OK) {
+                LIB_STATUS_OK) {
                 softpc_speaker_write_request(0u, 0u);
                 (void)lib_audio_stream_clear(stream);
                 break;
+            }
+            /* Audio FIFO space is the only blocking point in this producer.
+               Re-read the single guest-owned tone state before another PCM
+               block, so a PPI gate/frequency transition cannot leave this
+               worker synthesizing an obsolete continuous tone. */
+            softpc_speaker_read_request(&current);
+            if (current.generation != request.generation) {
+                if (current.frequency == 0u) {
+                    (void)lib_audio_stream_flush(stream);
+                    break;
+                }
+                request = current;
+                phase = 0u;
             }
         }
     }

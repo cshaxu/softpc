@@ -254,6 +254,16 @@ real threaded Compat proof covers a fresh first request reaching its first PCM
 submission on both widths.  Physical audibility remains an owner desktop
 check because managed automation has no usable `waveOut` device.
 
+P14 keeps the remaining repair entirely in the SoftPC speaker adapter.  A real
+zero-to-nonzero speaker transition replaces any unplayed PCM made while the
+speaker was silent.  The existing sole producer observes that transition,
+clears the existing stream before its first block, starts the waveform at
+phase zero, and reconciles the newest request after each accepted block.  This
+is a state replacement rule for every PC-speaker onset, not a first-run
+exception, timer change, endpoint retry loop, extra queue, or Lib/Common API
+change.  Focused and full dual-width tests pass; cold-boot audible acceptance
+remains required before S8 may close.
+
 T closure requires separate original-request/ledger/changed-path audit and
 owner acceptance. XP sound-card implementation remains future separately
 admitted work; it is not silently folded into the existing mirror-rebase queue.

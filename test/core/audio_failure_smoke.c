@@ -110,6 +110,10 @@ static lib_status fake_wait_writable(lib_audio_stream *stream)
 {
     assert(stream == (lib_audio_stream *)1);
     ++writable_waits;
+    if (scenario == 4 && writable_waits == 1u) {
+        test_request_stop();
+        return LIB_STATUS_OK;
+    }
     if (scenario == 2 && writable_waits == 1u) return LIB_STATUS_OK;
     return LIB_STATUS_IO_ERROR;
 }
@@ -236,7 +240,7 @@ int main(void)
     assert(softpc_speaker_request.frequency == 100u &&
         softpc_speaker_request.duration == 1u && signals == 1u);
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 1u && last_frame_count == 48u && clears == 0u &&
+    assert(enqueues == 1u && last_frame_count == 48u && clears == 1u &&
         flushes == 1u && waits == 2u);
 
     scenario = 3;
@@ -254,9 +258,25 @@ int main(void)
     softpc_speaker_request.frequency = 0u;
     softpc_speaker_request.duration = 0u;
     softpc_speaker_onset_pending = LIB_FALSE;
+    softpc_standalone_audio_set_tone(220u, INFINITE);
+    softpc_standalone_audio_set_tone(0u, 0u);
     softpc_standalone_audio_set_tone(440u, INFINITE);
+    assert(softpc_speaker_onset.frequency == 440u);
     softpc_standalone_audio_set_tone(0u, 0u);
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 1u && clears == 0u && flushes == 1u && waits == 2u);
+    assert(enqueues == 1u && clears == 1u && flushes == 1u && waits == 2u);
+
+    /* A PPI gate-off can arrive while the producer is waiting for an Audio
+       FIFO slot.  It must end the current continuous tone rather than let
+       the stale request synthesize another block after that wait. */
+    scenario = 4;
+    clears = flushes = enqueues = waits = writable_waits = 0u;
+    softpc_speaker_request.frequency = 440u;
+    softpc_speaker_request.duration = INFINITE;
+    ++softpc_speaker_request.generation;
+    softpc_speaker_onset_pending = LIB_FALSE;
+    softpc_speaker_worker(NULL, NULL);
+    assert(enqueues == 5u && clears == 0u && flushes == 1u &&
+        writable_waits == 1u && waits == 2u);
     return 0;
 }
