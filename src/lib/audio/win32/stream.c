@@ -115,6 +115,15 @@ lib_status audio_stream_platform_create(const lib_audio_stream_options *options,
         lib_release(platform);
         return status;
     }
+    /* A new endpoint starts in the same empty state as a cleared endpoint. */
+    status = audio_stream_platform_clear(platform);
+    if (status != LIB_STATUS_OK) {
+        (void)lib_win32_wave_out_close(platform->output);
+        (void)lib_win32_close_handle(platform->interruption);
+        (void)lib_win32_close_handle(platform->completion);
+        lib_release(platform);
+        return status;
+    }
     status = audio_stream_prepare(platform);
     if (status != LIB_STATUS_OK) {
         (void)audio_stream_platform_destroy(&platform);

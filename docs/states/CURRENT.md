@@ -30,17 +30,17 @@ continuous until a hot guest reboot repeats the sequence.
 
 ## Current Technical Baseline
 
-- S8 P4 traces the owner-provided `AUDIO.COM` sequence to the real cause:
-  original `timer_post()` opens PIT channel 2 before Standalone installs its
-  host gate callback, whereas the original PPI reset state is port `0x61=0`.
-  Compat had then mirrored that stale open state only to the host sound sink.
-  The existing installation boundary now uses the existing `timer_gate()`
-  contract to converge PIT channel 2 and the host sink to low.  This is a
-  one-line Compat replacement, leaves the OpenNT mirror and public Audio ABI
-  unchanged, and preserves one original PPI/PIT state owner plus one Compat
-  producer/Audio worker. The focused proof now issues `AUDIO.COM`'s actual
-  Timer2 mode/divisor and PPI writes; it, the PIT/PPI/checkpoint proofs and
-  the 114-test non-desktop regression pass on x64 and x86.
+- S8 P4 correctly converged the cold-reset Timer2 gate to original PPI state,
+  but owner reproduction afterward disproves it as the first-use playback
+  cause.  An owner-run trace now proves the entire first `AUDIO.COM` handoff:
+  Timer2/PPI produces 439Hz, Compat's sole worker produces PCM, Audio accepts
+  it, and the first `waveOutWrite` succeeds.  P5 establishes a general Win32
+  Audio constructor invariant: an endpoint is reset to the same empty state as
+  an existing `clear` before it is published.  Later tones already had such a
+  reset, explaining the first-versus-later distinction without a SoftPC
+  exception.  Public Audio ABI, topology and original mirror remain unchanged;
+  focused fake/native-thread proofs pass on x64/x86.  Owner desktop audibility
+  remains the pending criterion because managed automation has no `waveOut`.
 
 - T81 S8 P1 restored eager neutral-stream creation before the Compat speaker
   task and removed the lazy-create wrapper. Its lifecycle tests passed, but the

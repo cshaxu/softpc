@@ -231,25 +231,25 @@ while `nt_sound.c` is `+0/-30` relative to the preceding accepted baseline.
 Focused state, machine/PPI and Audio failure tests pass on both widths.  The
 owner still performs the audible fresh-run confirmation before S8 closes.
 
-P4 finds the remaining first-use defect below Lib Audio and below the original
-PPI state machine. During a cold reset, original `timer_post()` has already
-opened PIT channel 2 by the time Standalone installs its host Timer2 callback;
-PPI is nevertheless reset to port `0x61=0`, whose bit 0 owns that gate. The
-old installation call only told the host sink that the channel was open, so a
-first guest tone could start before its PPI enable transition and be missed.
-The Standalone Compat installation boundary now invokes its existing
-`timer_gate(TIMER2_REG, GATE_SIGNAL_LOW)` contract instead. It synchronizes
-the actual PIT gate and existing host sink to the same PPI-reset state without
-altering preserved source, guest timing, Lib Audio, or any public interface.
+P4 corrected the cold-reset Timer2 gate to match the original PPI reset state;
+it remains a valid initialization invariant, but the owner reproduced silence
+afterward, so it is not the first-use playback cause.  The resulting trace of
+the owner's first `AUDIO.COM` run proves the complete existing path: Timer2/PPI
+produces a 439Hz request, Compat's sole worker produces PCM, the Audio FIFO
+accepts it, and the first `waveOutWrite` succeeds.  This rules out a second
+producer, guest timing, and a missed gate transition as the remaining cause.
 
-The focused integration proof captures the real PIT state after a cold reset,
-then issues `AUDIO.COM`'s exact Timer2 mode/divisor and PPI `0x03` writes. It
-asserts low then rising gate state and verifies the resulting first tone,
-before continuing through stop and reset behavior. The old installation
-sequence fails the initial-gate assertion deterministically. Focused
-PIT/sound/checkpoint tests and the non-desktop product regression pass on
-x64/x86. Physical audibility remains an owner desktop check because managed
-automation has no `waveOut` device.
+P5 therefore makes the neutral Win32 endpoint constructor establish the same
+empty baseline as the existing `clear` operation: after `waveOutOpen`, it uses
+the existing reset path before headers are prepared or the stream is published.
+Later `AUDIO.COM` executions already follow a prior `clear/reset`, which
+explains the owner-observed first-versus-later distinction.  This is a Lib
+endpoint invariant, not a SoftPC first-tone exception: no public API, worker,
+polling loop, guest timing, or preserved-mirror source changes.  The Win32
+fake backend proves create/reset failure cleanup and normal initial reset; the
+real threaded Compat proof covers a fresh first request reaching its first PCM
+submission on both widths.  Physical audibility remains an owner desktop
+check because managed automation has no usable `waveOut` device.
 
 T closure requires separate original-request/ledger/changed-path audit and
 owner acceptance. XP sound-card implementation remains future separately

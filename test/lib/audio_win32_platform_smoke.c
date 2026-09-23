@@ -145,7 +145,8 @@ int main(void)
 
     reset_fake();
     assert(audio_stream_platform_create(&options, &platform) == LIB_STATUS_OK);
-    assert(open_calls == 1u && prepare_calls == 4u && create_event_calls == 2u);
+    assert(open_calls == 1u && prepare_calls == 4u && reset_calls == 1u &&
+        create_event_calls == 2u);
     ((lib_win32_wave_callback)(lib_iptr)open_callback)(platform->output,
         LIB_WIN32_WOM_DONE, open_instance, 0u, 0u);
     assert(set_event_calls == 1u);
@@ -181,7 +182,12 @@ int main(void)
     reset_fake();
     prepare_result = 1u;
     assert(audio_stream_platform_create(&options, &platform) == LIB_STATUS_IO_ERROR);
-    assert(platform == LIB_NULL && reset_calls == 1u && close_calls == 1u);
+    assert(platform == LIB_NULL && reset_calls == 2u && close_calls == 1u);
+    reset_fake();
+    reset_result = 1u;
+    assert(audio_stream_platform_create(&options, &platform) == LIB_STATUS_IO_ERROR);
+    assert(platform == LIB_NULL && reset_calls == 1u && prepare_calls == 0u &&
+        close_calls == 1u && close_handle_calls == 2u);
     reset_fake();
     assert(audio_stream_platform_create(&options, &platform) == LIB_STATUS_OK);
     write_result = 1u;
