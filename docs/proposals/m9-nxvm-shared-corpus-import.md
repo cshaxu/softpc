@@ -91,6 +91,11 @@ are derived from, and validate, SoftPC's actual corpus; this necessarily
 retains Audio and the approved test correction rather than copying stale
 external hashes.
 
+SoftPC adopts NXVM's `test/lib` suite-owned aggregate build target and its
+correct cleanup-helper ownership wording. SoftPC retains its more precise
+Lib Audio worker/WASAPI ownership wording. The six local manifests are then
+regenerated together from that final corpus.
+
 ## S1 frozen audit
 
 The reference is NXVM `d485a54e`. Its six shared directories have no working
