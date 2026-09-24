@@ -13,24 +13,24 @@ x86/debug + x86/xasm32      shared debugger/assembly contracts
                          |
                  injected existing driver callbacks
                          v
-src/core/machine                     SoftPC input/frame/debug/backend adaptation
+src/app-softpc/machine               SoftPC input/frame/debug/backend adaptation
                          |
-src/core/compat                 original host callbacks and ABI support
+src/app-softpc/compat                original host callbacks and ABI support
                          |
-src/core/softpc.new         original CPU, controllers, renderer and firmware
+src/app-softpc/softpc.new            original CPU, controllers, renderer and firmware
 
 Lib supplies shared platform mechanics to the owning consumers.
 No app -> Compat/MVDM edge; only composition -> VM; no VM/Compat -> app edge.
 ```
 
-`core/softpc.new` is the repository-owned selected recovered-machine layout.
+`app-softpc/softpc.new` is the repository-owned selected recovered-machine layout.
 It retains original relative paths and names for every included file so T14 can
 compare them with the read-only OpenNT reference. It is a selected source
 subset: wholly host-specific NT endpoint files may be absent when a standalone
 host endpoint replaces that contract. Narrow compiler, declaration, calling-ABI
 and pointer-representation corrections may be direct, source-visible diffs at
 the affected point when they remain mechanical and introduce no machine policy.
-`core/compat/` owns original host callbacks, host resources and port ABI adaptations,
+`app-softpc/compat/` owns original host callbacks, host resources and port ABI adaptations,
 but no product machine lifecycle/configuration or guest-visible device state.
 `common/session` is the sole owner of the product-neutral control queue,
 desired/actual reduction, prompt scheduling and dispatch order. It receives
@@ -38,7 +38,7 @@ the SoftPC CLI and machine adapter as injected callbacks; it does not parse
 configuration or interpret machine internals. `common/ui` is the sole owner
 of the monitor logical Console, broker, raw VM Console and Window/KVM
 instances; it receives only copied product policy and returns copied events.
-`app/` owns configuration, entity assembly and the SoftPC CLI/hotkey binding.
+`app-softpc/product/` owns configuration, entity assembly and the SoftPC CLI/hotkey binding.
 Within app, command owns CLI/debug semantics, keyboard owns hotkey semantics,
 and composition creates the entities, wires their callbacks into Common
 session, runs it and performs teardown. Main validates arguments/configuration.
@@ -50,8 +50,8 @@ so referenced objects can be released safely before the machine itself.
 UI teardown stops the broker and unbinds output before joining KVM producers;
 failure preserves UI and remaining callback dependencies. App treats that failure
 as terminal rather than releasing Session beneath a live producer.
-Only app/composition.c consumes core/machine/vm_interface.h; no app source consumes Compat or
-the original mirror. `core/machine/` owns the concrete machine backend, initialization/reset/teardown
+Only product/composition.c consumes machine/vm_interface.h; no product source consumes Compat or
+the original mirror. `app-softpc/machine/` owns the concrete machine backend, initialization/reset/teardown
 sequence, driver, frame/input conversion and debugger request preflight.
 Its implementation calls Compat and the original machine while its
 public interface exposes only copied options and Common/Lib contracts.
@@ -71,10 +71,10 @@ or guest-version-specific identity correction is involved.
 
 Core is only a source grouping of Machine, Compat and softpc.new, not a new
 runtime layer. The relocation preserves the original mirror byte-for-byte.
-Only the original device target privately searches src/core for its existing
+Only the original device target privately searches src/app-softpc for its existing
 compat/... includes. App and shared components acquire no additional include root.
 The preserved-corpus spelling in Coding Rules and historical evidence refers
-to this same corpus at its current core/softpc.new location.
+to this same corpus at its current app-softpc/softpc.new location.
 
 These are ownership boundaries, not six mandatory forwarding layers. Device
 I/O follows original MVDM host callbacks into Compat and then Lib storage;

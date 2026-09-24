@@ -1,5 +1,0 @@
-/* Fixed machine firmware: the standalone resource port loads these directly
-   from the executable instead of depending on the process working directory. */
-101 RCDATA "../core/softpc.new/roms/bios1.rom"
-102 RCDATA "../core/softpc.new/roms/bios4.rom"
-103 RCDATA "../core/softpc.new/roms/v7vga.rom"

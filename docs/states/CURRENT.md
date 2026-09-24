@@ -2,30 +2,29 @@
 
 ## Current Work
 
-T83 S1 is reopened only to replace the owner-provided package snapshot with a
-newly created state image.  The accepted CRLF mirror repair remains intact;
-this P adds no code, configuration, or executable change.
+T83 S3 is active: centralize the selected C-VID declarations and repair the
+two `cga.c` BIOS channel-2 pointer definitions without changing behavior.
 
-## M9 T83 S1 Packet
+## M9 T83 S3 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner directs the still-active T83 S1 to add the newly created package `snapshot` after its CRLF P1 delivery. |
-| Objective | Preserve the accepted CRLF mirror repair and replace only the tracked package snapshot with the owner's current state image. |
-| Non-goals | No token, behavior, ABI, source-selection, Compat, VM, Lib, Common, x86, test, NTVDM64, OpenNT, INI, guest-media policy, semantic mirror-diff, or executable change. No adoption of the ten NTVDM64-only paths. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner admits T83 S2 and S3, directing that each completed S receives a self-contained closure audit and an owner-authorized corrective P when that audit discovers an in-scope gap. |
+| Objective | Select one existing C-VID declaration header for `setReadPointers` and `setWritePointers`, and make `cga.c` BIOS channel-2 pointer definitions match their existing `video.h` declarations. |
+| Non-goals | No mode-handler conditionals, WOW instrumentation, CCPU lifecycle import, SAS-video branch, wrapper, runtime object, behavior, configuration, media or ABI policy change. |
 | Reference Baseline | SoftPC `b44942f3`; OpenNT `5e4619ab6`; NTVDM64 `52e330bdf` is read-only comparison context only. |
 | Candidate Proposal | [Three-mirror conformance](../proposals/m9-three-mirror-conformance.md) |
-| Files And ABI Surface | `assets/binary/snapshot` only. No interface changes. |
+| Files And ABI Surface | Existing selected C-VID header and `src/app-softpc/softpc.new/base/video/cga.c`, focused evidence and rebuilt package EXEs. No public interface or behavior change. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules; preserved-mirror direct-diff policy. |
-| Verification | Record replacement size and SHA-256; confirm only `snapshot` is a package payload change; run diff/documentation gates. Existing P1 x64/x86 builds and 116/116 suites remain valid because no executable or source changes. |
-| Expected Markers | `snapshot` is 18,387,571 bytes with SHA-256 `28A605291D12946D2F775B0220CF033BA47E4660A9D1491DFC78B4B0820D2B8E`; no other package payload changes. |
-| Asset Needs | Commit the owner-provided `snapshot`; preserve `softpc.ini`, both EXEs, and every other asset. |
-| Reporting Requirements | Report the old/new snapshot size and new SHA-256, tracked-path accounting, and gates; explicitly state that builds/tests were not rerun because this P changes no executable or source. |
-| Stop Conditions | Any modified package path beyond `snapshot`, unexpected INI/EXE change, or unreadable replacement image stops implementation for owner direction. |
-| Exit Criteria | One complete snapshot-only P is pushed; checksum/size and clean worktree are proven; T83 remains open for owner acceptance. |
-| Original Owner Request | Reopen S1 and include the newly made snapshot in a P; EXEs do not need rebuilding. |
-| Similar-Issue Sweep | Review every `assets/binary` change; the sole admitted payload change is the owner-provided `snapshot`. |
+| Verification | Direct OpenNT diff, x64/x86 clean Release builds and background CTest, focused C-VID/video smoke, documentation governance and `git diff --check`. |
+| Expected Markers | One C-VID declaration site; both `cga.c` definitions agree with `video.h`; no guest-visible behavior change. |
+| Asset Needs | Refresh only the two package EXEs; preserve owner `softpc.ini`, snapshot and guest media. |
+| Reporting Requirements | Report declaration/definition diff, focused and dual-width evidence, EXE hashes/links, closure-audit findings and any corrective P. |
+| Stop Conditions | Any behavior-affecting source diff, declaration owner ambiguity, unexpected package payload change or failed build/test stops implementation. |
+| Exit Criteria | One complete S3 implementation P is pushed after self-review and closure audit; both package EXEs are rebuilt and linked. |
+| Original Owner Request | Admit and execute S2 and S3; self-audit every completed S, admit an in-scope corrective P if needed, compile both EXEs, test, commit, push and report diffs and EXE links. |
+| Similar-Issue Sweep | Search selected C-VID consumers and pointer declarations for duplicate selector declarations and mismatched channel-2 definitions. |
 
 ## Current Technical Baseline
 

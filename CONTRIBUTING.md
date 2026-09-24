@@ -15,7 +15,7 @@ and subdirectories such as `build/x86/` for additional toolchains. The only
 user-facing deliverables are `assets/binary/softpc32.exe`,
 `assets/binary/softpc64.exe`, and their adjacent `softpc.ini`. Reusable guest
 media belongs in `assets/media/`. The fixed original ROMs remain embedded from
-`src/core/softpc.new/roms/`; the package has no external-ROM directory.
+`src/app-softpc/softpc.new/roms/`; the package has no external-ROM directory.
 
 `assets/binary/softpc.ini` is user-owned configuration and is never an
 agent build or packaging output. Owner changes to it ship with the current

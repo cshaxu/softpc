@@ -14,7 +14,7 @@ vehicle for copying NTVDM64 fixes.
 ## Frozen comparison roots
 
 ```text
-SoftPC:  src/core/softpc.new @ 07c53c9c
+SoftPC:  src/app-softpc/softpc.new @ 07c53c9c
 NTVDM64: O:/repos.hobby/ntvdm64/src/mvdm/softpc.new @ 52e330bdf
 OpenNT:  O:/repos.external/opennt-src-2/nt/private/mvdm/softpc.new @ 5e4619ab6
 ```
@@ -111,3 +111,102 @@ No source, test or executable changes accompany P2, so the P1 dual-width
 build and 116/116 background CTest evidence remains the applicable runnable
 proof.  P2 verifies its checksum, package-path scope, documentation governance
 and `git diff --check`, then waits for owner acceptance with T83 still open.
+
+## Candidate S2 — Multi-application SoftPC source and test layout repair
+
+This is a proposed structural task, not an admitted task and not authority for
+the active S1 packet.  Its input is the owner-relocated SoftPC product tree:
+
+```text
+src/app-softpc/
+  product/
+  machine/
+  compat/
+  softpc.new/
+```
+
+The task repairs every product build reference, include spelling, source-owner
+gate, manifest path, test registration and documentation reference that still
+names the former `src/app/` or `src/core/` layout.  It preserves byte content
+of `softpc.new`, keeps the existing target topology and changes no guest,
+machine, Common, Lib, x86, configuration or package behavior.
+
+Product tests are organized by the production owner they primarily prove:
+
+```text
+test/app-softpc/
+  unit/product/
+  unit/machine/
+  unit/compat/
+  unit/softpc.new/
+  integration/
+```
+
+A test that needs an assembled Product, Machine, Compat, Common or recovered
+machine flow belongs in `integration/`; it must not be placed into a unit
+directory merely because it happens to include one owner header.  This avoids
+the previous misleading `machine` umbrella: Machine, Compat and the recovered
+mirror retain independently reviewable unit suites.
+
+Repository-wide static build and architecture gates are not runnable App
+behavior tests and do not belong below `test/app-softpc/`.  Following NXVM's
+root-build pattern, move the existing product-only CMake scripts from
+`test/checks/` to `tools/checks/`; root `CMakeLists.txt` registers them.  The
+shared `src/lib`, `src/common`, `src/x86` and matching test packages retain
+their own corpus/manifest checks exactly where they are now.
+
+The task must use Git-recognized relocations, remove every former product path
+from active root CMake and active static gates, and must not introduce a
+compatibility include root, duplicate source tree, forwarding header, or
+second target route.  It verifies a clean x64/x86 Release configure/build,
+the background CTest presets, root build-ownership and product-boundary
+negative cases, the shared six-package corpus checks, and a finite search for
+former active path spellings.  The accounting distinguishes owner relocations
+from any content edit and proves the recovered mirror's bytes are unchanged.
+
+## Candidate S3 — Central C-VID declaration boundary and `cga.c` conformance
+
+This is a proposed narrow port-ABI task, not an admitted task.  It addresses
+the first class of semantic three-mirror difference: OpenNT's historical
+unprototyped C-VID declarations, which NTVDM64 repaired locally in multiple
+video source files.
+
+The task introduces no wrapper, no new runtime object and no behavior branch.
+It selects one existing C-VID interface header as the sole direct declaration
+boundary for the already-used selectors:
+
+```c
+IMPORT void setReadPointers IPT1(IUH, readset);
+IMPORT void setWritePointers IPT0();
+```
+
+`base/video/cga.c` then makes the definitions of its two BIOS channel-2 write
+pointers exactly match their existing public declarations in `base/inc/video.h`:
+
+```c
+GLOBAL VOID (*bios_ch2_byte_wrt_fn)
+    IPT2(ULONG, ch_attr, ULONG, ch_addr);
+GLOBAL VOID (*bios_ch2_word_wrt_fn)
+    IPT2(ULONG, ch_attr, ULONG, ch_addr);
+```
+
+The selected C-VID header is included by its current consumers.  No local
+copy of the selector declarations is added to `cga.c`; the task must not
+create a new generic header solely for two declarations.  The completed state
+therefore has one C-VID ABI declaration site, while `video.h` remains the sole
+owner of the two global pointer declarations.
+
+The scope is deliberately limited to this `cga.c` conformance repair.  It does
+not yet import NTVDM64's mode-handler conditional compilation from
+`egawrtm0.c`/`egwrtm12.c`, WOW instrumentation from `c_xfer.c`, the broad CCPU
+debug lifecycle patch, or any SAS-video product branch.  Those changes have
+different product/port assumptions and require separate proof.
+
+Verification is a direct OpenNT diff showing only the required declaration
+correction in `cga.c` plus the selected pre-existing C-VID header; compile the
+actual `CPU_40_STYLE + C_VID` source selection for x86 and x64; run focused
+video/C-VID smoke coverage and the background product suites on both widths.
+The mirror ledger records the exact added/removed lines and why the small
+source-visible declaration diff is necessary.  The acceptance condition is
+unchanged guest-visible behavior with compiler-checked agreement among the
+declaration, definition and assignments of both pointer variables.

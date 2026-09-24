@@ -4,7 +4,9 @@ The current source tree is:
 
 ```text
 src/
-  core/
+  app-softpc/
+    product/
+      main.c, config.c, command.c, composition.c, keyboard.c, firmware.rc
     softpc.new/
     compat/
       original host callback C/H files and port ABI support
@@ -20,8 +22,6 @@ src/
     debug/       imported x86 debug corpus over the optional machine adapter
   lib/{types,base,console,console-broker,storage,audio,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
-  app/
-    main.c, config.c, command.c, composition.c, keyboard.c, firmware.rc
 ```
 
 Directories appear only in their admitted migration task.
@@ -49,7 +49,7 @@ platform headers. Compiler selection for atomic primitives remains permitted.
 Other components' `win32/` and `linux/` directories are implementation-only.
 Cross-component declarations belong in root `*_interface.h` files, never in
 platform directories or root headers forwarding to platform implementation.
-`core/softpc.new` contains the selected repository-owned recovered-source
+`app-softpc/softpc.new` contains the selected repository-owned recovered-source
 subset moved from the former baseline tree. Every retained path and name
 permits a direct T14-ledger comparison with the selected read-only OpenNT
 reference. Wholly host-specific original endpoint files may be intentionally
@@ -59,17 +59,17 @@ firmware only. Historical object,
 library, and other compiler intermediate files are forbidden. Narrow,
 mechanical compiler, declaration, calling-ABI, and pointer-representation
 corrections live as reviewable source diffs at their affected points. Generated
-transformed C/H files are not build inputs. `core/compat` owns original host
-callbacks and larger functional adaptations. `core/machine` owns the injected SoftPC
+transformed C/H files are not build inputs. `app-softpc/compat` owns original host
+callbacks and larger functional adaptations. `app-softpc/machine` owns the injected SoftPC
 driver, guest-input/frame conversion, debug adaptation and diagnostic trace.
-`app` owns configuration, entity assembly and product CLI/hotkey policy.
+`app-softpc/product` owns configuration, entity assembly and product CLI/hotkey policy.
 `command` owns monitor/debug state and command callbacks; `keyboard` owns
 hotkey interpretation and input sequences. `composition` installs their one
 Common provider and coordinates request admission without interpreting input.
 It owns entity assembly, event wiring, the blocking session run and teardown,
 without a separate state machine, command table or debugger. Main loads config.
-Only app/composition.c may include core/machine/vm_interface.h; no app file may include Compat
-or MVDM, and no other app file may include VM. VM's public header exposes only
+Only product/composition.c may include machine/vm_interface.h; no product file may include Compat
+or MVDM, and no other product file may include VM. VM's public header exposes only
 copied options, opaque identity and existing Common/Lib contracts. Compat
 does not depend on app, VM or Common. Historical same-name replacement headers
 remain isolated; no generic compat wrapper layer is retained. `common/machine` owns the one generic
@@ -85,19 +85,18 @@ mapping, lifecycle, or hotkey meaning.
 
 ## Build Output Layout
 
-Product tests are classified by ownership: test/app covers configuration,
-commands and key policy; test/core covers the concrete machine, compatibility
-host and devices; test/integration covers composed worker, command, snapshot,
+Product tests are classified by ownership: test/app-softpc/unit/product covers configuration,
+commands and key policy; test/app-softpc/unit/{machine,compat,softpc.new} covers concrete
+machine, compatibility host and recovered-mirror units; test/app-softpc/integration covers composed worker, command, snapshot,
 frame and package flows. Historical CTest labels remain execution selectors,
 not a claim that every test labelled unit is isolated. Product fixtures and
-checks live beside their owner: test/integration/machine_fixture.c/h is the
+checks live beside their owner: test/app-softpc/integration/machine_fixture.c/h is the
 single product driver/Common assembly fixture, snapshot orchestration is in
-test/integration, and product static gates are in test/checks. No test/unit or
-test/support directory remains. Test execution is summarized in test/README.md.
+test/app-softpc/integration, and product static gates are in tools/checks. Test execution is summarized in test/README.md.
 The reusable test/lib, test/common and test/x86 packages are not destinations
 for product-owned fixtures.
 
-Root CMake assigns all `src/core/machine/*.c` to `softpc-vm`; other targets link it
+Root CMake assigns all `src/app-softpc/machine/*.c` to `softpc-vm`; other targets link it
 instead of copying its implementation list. The original machine OBJECT
 groups remain intact. The build-ownership gate checks actual target source
 membership and VM completeness at configure time; its negative tests reject
@@ -115,7 +114,7 @@ children of it (for example `build/x86/`). The only user-facing package is
 `softpc.ini`. That INI may use absolute paths or paths relative to
 `assets/binary/`; the supplied default uses `../media/`. Reusable guest media
 belongs in `assets/media/`. The fixed original ROM set remains embedded from
-its source-mirror location `src/core/softpc.new/roms/`; no external-ROM asset
+its source-mirror location `src/app-softpc/softpc.new/roms/`; no external-ROM asset
 contract exists.
 Repository-root executables and sibling `build-*` directories are forbidden.
 

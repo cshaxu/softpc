@@ -29,7 +29,7 @@ directory.  This includes CMake/Ninja metadata, generated sources, test
 executables, diagnostics, and temporary test media. The user-facing package is
 only `assets/binary/`; reusable boot media is in `assets/media/`. The
 selected original ROMs are embedded from
-`src/core/softpc.new/roms/`; `assets/roms/` does not exist. Do not
+`src/app-softpc/softpc.new/roms/`; `assets/roms/` does not exist. Do not
 create sibling `build-*` directories or place generated executables at the
 repository root. Build the VM, then set the fixed machine defaults in the
 adjacent `assets/binary/softpc.ini`:
@@ -115,17 +115,17 @@ presets; see [test execution](docs/design/CODING.md#build-output-layout).
 
 - `assets/readme/` — owner-provided current product screenshots used by this
   README; they are documentation assets, not guest media or runtime inputs.
-- `src/core/softpc.new/` — recovered original SoftPC machine, including the
+- `src/app-softpc/softpc.new/` — recovered original SoftPC machine, including the
   embedded selected BIOS/VGA/CMOS ROM inputs, retained in its historical tree.
-- `src/core/softpc.new/` may contain narrow, reviewable compiler/host-ABI
+- `src/app-softpc/softpc.new/` may contain narrow, reviewable compiler/host-ABI
   source diffs at the affected point; it contains no new machine policy.
-- `src/core/compat/` — original SoftPC host callbacks, media/video surfaces and ABI support.
-- `src/core/machine/` — SoftPC backend adaptation to the existing Common machine contract.
-- `src/app/` — configuration, product CLI/hotkey policy and entity assembly;
+- `src/app-softpc/compat/` — original SoftPC host callbacks, media/video surfaces and ABI support.
+- `src/app-softpc/machine/` — SoftPC backend adaptation to the existing Common machine contract.
+- `src/app-softpc/product/` — configuration, product CLI/hotkey policy and entity assembly;
   only main consumes the VM public interface.
 - `src/common/` — shared machine executor, session control, UI composition and debug/xasm32.
 - `src/lib/` — shared platform mechanics; unchanged by the app/VM/Compat refactor.
-- `test/unit/`, `test/integration/`, `test/support/` — self-contained unit,
+- `test/unit/`, `test/app-softpc/integration/`, `test/support/` — self-contained unit,
   fixed-package integration, and shared/diagnostic test support respectively.
 
 The standalone core never accepts a product-shell callback or selector
