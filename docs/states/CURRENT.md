@@ -2,7 +2,30 @@
 
 ## Current Work
 
-No implementation subtask is active.
+T83 S1 restores only OpenNT CRLF bytes for the twelve selected mirror files
+whose normalized contents already match.  It is a raw-byte provenance repair;
+it does not alter machine logic or adopt NTVDM64 code.
+
+## M9 T83 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner admits T83 S1 to repair the audited SoftPC/OpenNT CRLF-only differences. |
+| Objective | Restore the exact OpenNT raw bytes for the frozen twelve-file CRLF-only set, reducing non-semantic mirror diff without changing content. |
+| Non-goals | No token, behavior, ABI, source-selection, Compat, VM, Lib, Common, x86, test, NTVDM64, OpenNT, INI, media, or semantic mirror-diff change. No adoption of the ten NTVDM64-only paths. |
+| Reference Baseline | SoftPC `07c53c9c`; OpenNT `5e4619ab6`; NTVDM64 `52e330bdf` is read-only comparison context only. |
+| Candidate Proposal | [Three-mirror conformance](../proposals/m9-three-mirror-conformance.md) |
+| Files And ABI Surface | The twelve `src/core/softpc.new` paths enumerated in the proposal plus their exact `.gitattributes` checkout rules. No interface changes. |
+| Applicable Rules | Execution, Architecture, Coding and Documentation rules; preserved-mirror direct-diff policy. |
+| Verification | Per-file raw SHA-256 equality to OpenNT; exhaustive normalized CRLF-only enumeration; mirror audit; x64/x86 Release builds and background CTest; diff/documentation gates. |
+| Expected Markers | Twelve listed raw hashes equal OpenNT; no remaining SoftPC selected path differs only by CRLF/LF; semantic-difference ledger is otherwise unchanged. |
+| Asset Needs | Refresh only `softpc32.exe` and `softpc64.exe`; preserve owner INI and all guest media. |
+| Reporting Requirements | Before mutation report the frozen twelve paths and expected +/−/net source accounting. After delivery report exact raw-hash results, remaining normalized-only count, code accounting and build/test evidence. |
+| Stop Conditions | Any normalized content mismatch, raw-copy token change, unavailable reference file, or changed build/test outcome stops implementation for owner direction. |
+| Exit Criteria | All twelve paths equal OpenNT raw bytes; the normalized-only set is empty; required dual-width verification passes; one complete P is pushed; worktree is clean except owner changes; delivery waits for owner acceptance. |
+| Original Owner Request | Admit a T task and first repair CRLF differences. |
+| Similar-Issue Sweep | Enumerate every selected mirror path by raw and CRLF-normalized SHA-256; each hit is either in the frozen twelve-file set or remains a semantic divergence outside S1. |
 
 ## Current Technical Baseline
 

@@ -5,3 +5,18 @@ src/x86/** text eol=lf
 test/lib/** text eol=lf
 test/common/** text eol=lf
 test/x86/** text eol=lf
+
+# The preserved OpenNT mirror is compared as a checkout artifact.  These
+# content-identical files retain their original CRLF bytes on every checkout.
+src/core/softpc.new/base/ccpu386/c_bsic.c text eol=crlf
+src/core/softpc.new/base/ccpu386/c_prot.c text eol=crlf
+src/core/softpc.new/base/ccpu386/c_seg.c text eol=crlf
+src/core/softpc.new/base/ccpu386/c_tsksw.c text eol=crlf
+src/core/softpc.new/base/ccpu386/in.c text eol=crlf
+src/core/softpc.new/base/ccpu386/jmp.c text eol=crlf
+src/core/softpc.new/base/ccpu386/mov.c text eol=crlf
+src/core/softpc.new/base/ccpu386/out.c text eol=crlf
+src/core/softpc.new/base/inc/egavideo.h text eol=crlf
+src/core/softpc.new/base/inc/gfx_upd.h text eol=crlf
+src/core/softpc.new/base/system/illegalp.c text eol=crlf
+src/core/softpc.new/base/video/ega_vide.c text eol=crlf
