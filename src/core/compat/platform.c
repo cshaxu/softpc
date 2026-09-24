@@ -63,19 +63,6 @@ static lib_u64 softpc_executor_pacing_frequency;
 #endif
 
 
-static void softpc_standalone_timer_gate(io_addr port, half_word value)
-{
-    SWTMR_gate(port, value);
-    if (port == TIMER2_REG)
-        softpc_standalone_sound_timer2_gate(value);
-}
-
-void softpc_platform_install_timer2_sound_gate(void)
-{
-    timer_gate_func = softpc_standalone_timer_gate;
-    timer_gate(TIMER2_REG, GATE_SIGNAL_LOW);
-}
-
 #ifdef _WIN32
 /* Original timestrb.c documents a host alarm of roughly 20 Hz.  The timer
    queue callback only marks the CCPU event pending; host_timer_event() stays
@@ -620,13 +607,6 @@ void host_set_hw_int(void)
        whereas CCPU's CPU_INT_TYPE hardware-interrupt enum is value two.
        Keep the machine port on the executor ABI rather than the PIC macro. */
     ++softpc_hardware_interrupts;
-    if (getenv("SOFTPC_TIMER_TRACE") != NULL &&
-        (softpc_hardware_interrupts % 20ul) == 0ul)
-    {
-        fprintf(stderr, "softpc PIC->CCPU interrupt=%lu\n",
-                softpc_hardware_interrupts);
-        fflush(stderr);
-    }
     c_cpu_interrupt((CPU_INT_TYPE)2, 0);
 }
 
@@ -653,20 +633,10 @@ IU32 depth;
 
 void host_timer_event(void)
 {
-    static unsigned long softpc_timer_events;
-
     /* Preserve the machine-facing portion of the original nt_timer heartbeat.
        Product scheduling (WOW, DEM, console switching and NT worker threads)
        is deliberately absent; these calls advance only restored devices and
        the standalone DIB renderer. */
-    ++softpc_timer_events;
-    if (getenv("SOFTPC_TIMER_TRACE") != NULL &&
-        (softpc_timer_events % 20ul) == 0ul)
-    {
-        fprintf(stderr, "softpc timer heartbeat=%lu graphics=%d\n",
-                softpc_timer_events, softpc_platform_presentation_is_graphics());
-        fflush(stderr);
-    }
     host_graphics_tick();
     /* quick_ev.c calibrates the original CCPU time-to-jump conversion from
        this host heartbeat.  It is machine timing support, not a frontend

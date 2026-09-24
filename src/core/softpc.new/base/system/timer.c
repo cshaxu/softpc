@@ -2847,7 +2847,7 @@ void	timer_post IFN0()
     /* enable gates on all timer channels */
     timer_gate(TIMER0_REG,GATE_SIGNAL_RISE);	/* start timer 1 going... */
     timer_gate(TIMER1_REG,GATE_SIGNAL_RISE);
-    timer_gate(TIMER2_REG,GATE_SIGNAL_RISE);
+    timer_gate(TIMER2_REG,GATE_SIGNAL_LOW);
 
     timer_outb(TIMER_MODE_REG,0x36);
     timer_outb(TIMER0_REG,0);

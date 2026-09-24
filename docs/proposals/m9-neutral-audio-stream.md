@@ -48,8 +48,8 @@ Win3.x/Win95 sound-card playback is explicitly not this T's exit criterion.
 - Types owns only scalar and external SDK declaration wrappers. Add `lib_i16`
   and the necessary `types/win32/audio.h` declarations, not audio policy.
 - Audio may depend on Types and public Base synchronization if actually needed;
-  it cannot import another component's platform implementation. WinMM linkage
-  belongs to Audio, never Types or all consumers.
+  it cannot import another component's platform implementation. Windows COM
+  linkage belongs to Audio, never Types or all consumers.
 - Root `audio/stream_interface.h` is the public boundary; `stream.h` is private.
   Platform implementations in `audio/win32` and `audio/linux` expose the same
   private function shapes. No native/private/internal suffix or wrapper object
@@ -89,8 +89,8 @@ invalid counts/pointers and size multiplication overflow are rejected before
 modification. Mono 48 kHz serves NES without imposing NES concepts on Lib.
 
 Audio accepts copied ordered prefixes into one fixed private FIFO. Its worker
-submits practical private batches to the four-slot WinMM leaf; the producer sees
-FIFO admission, never slot accounting. `flush` is the explicit finite-sound
+submits practical private batches to one worker-owned shared WASAPI endpoint;
+the producer sees FIFO admission, never endpoint-buffer accounting. `flush` is the explicit finite-sound
 boundary: it delivers a remaining sub-batch tail in order before returning.
 `clear` is the explicit discard boundary. No dynamic growth or caller-memory
 retention exists.
@@ -108,10 +108,13 @@ be attempted. OS playback completion means buffer ownership returned, not
 proof that a physical speaker was audible. Successful clear cannot retract
 samples already heard or eliminate downstream hardware latency.
 
-Win32 uses waveOut with fixed prepared buffers and no application callback.
-Native completion flags govern reuse. Reset/close ordering and partial prepare
-failure must be proven with an injected backend and a real native smoke.
-No unchecked reuse/unprepare/free while a block is still submitted.
+Win32 creates, uses and releases its shared WASAPI endpoint on the sole Audio
+delivery worker, which also owns COM initialization. Endpoint creation is not a
+machine-creation prerequisite: a native failure becomes the stream's explicit
+I/O result, while the package remains able to run without host audio. Endpoint
+events govern writable space; queued batches may span multiple endpoint buffers
+without truncation. Reset/close ordering and first/reuse delivery must be proven
+with a real native smoke.
 If the bounded FIFO/worker design cannot meet those contracts, stop and revise
 the design with the owner rather than adding a second queue or hidden thread.
 
@@ -129,7 +132,7 @@ deletions and net separately for production, tests/build and docs at each S.
 | S5 | Use the finished stream at the existing SoftPC PC-speaker presentation boundary | 3-6 Core Compat/test/build files; production +100..180/-40..90; tests/build +80..160/-0..20 | Win3.1/DOS PC-speaker handoff, state/clear/shutdown proof and audible owner test |
 | S6 | Close the Common Session Window-creation admission gap: a missing Window may be created only after a RUNNING completion; paused state may retain but never synthesize a Window | 2-3 Common/test/docs files; production +2..8/-0..4; tests +20..50/-0..10 | State matrix proves INIT, STOPPED, RESET_COMPLETED/PAUSED and ERROR never create a missing Window for either display mode; existing paused Window retention remains unchanged |
 | S7 | Owner-revised before an executor commit: adopt the MyNES `b48e57f` Audio source/test corpus and reconnect the one SoftPC Compat PC-speaker producer through its FIFO/flush contract | 10-14 Lib/Core/test/build/docs files; production +20..140/-80..220; tests +20..120/-20..140 | Exact shared-corpus code hash comparison except the documented upstream-stale README and derived manifests, finite-tail/failure proof, dual-width strict C11/background regression and audible `AUDIO.COM` acceptance |
-| S8 | Investigate and repair owner-observed first-use PC-speaker silence/discontinuity after S7; retain one Compat producer and one Audio worker | 2-5 Core/test/docs files; production +5..50/-0..30; tests +30..120/-0..20 | Deterministic fresh/repeated/reset tone handoff proof, dual-width strict C11/background regression and package artifacts |
+| S8 | Investigate owner-observed first-use PC-speaker silence/discontinuity after S7. Replace only the Windows endpoint leaf with a worker-owned event-driven shared WASAPI endpoint that preserves package startup when no endpoint is available | 5-9 Lib/Core/test/build/docs files; production +180..330/-120..220; tests +40..180/-40..150 | Native first/reuse endpoint acceptance, exact guest handoff proof, strict dual-width builds/background regression and package EXEs for owner comparison |
 
 The owner has approved automatic sequential admission of S2--S5. Each
 code-changing S builds x86/x64 EXEs, runs focused and
@@ -231,13 +234,18 @@ while `nt_sound.c` is `+0/-30` relative to the preceding accepted baseline.
 Focused state, machine/PPI and Audio failure tests pass on both widths.  The
 owner still performs the audible fresh-run confirmation before S8 closes.
 
-P4 corrected the cold-reset Timer2 gate to match the original PPI reset state;
-it remains a valid initialization invariant, but the owner reproduced silence
-afterward, so it is not the first-use playback cause.  The resulting trace of
-the owner's first `AUDIO.COM` run proves the complete existing path: Timer2/PPI
-produces a 439Hz request, Compat's sole worker produces PCM, the Audio FIFO
-accepts it, and the first `waveOutWrite` succeeds.  This rules out a second
-producer, guest timing, and a missed gate transition as the remaining cause.
+P18 corrects the actual first-use cause: the original reset sequence raised
+Timer2 while PPI's reset record still said its gate was low. The first guest
+`0 -> 1` PPI transition was consequently delivered to a running Timer2 and
+treated as a gate loss, which immediately replaced the just-programmed 439Hz
+waveform with indefinite high (silence). A later reset had the inverse error:
+`ppi_init()` cleared the port register but retained its prior gate-memory bit,
+so it could suppress the required next rise. Timer2 now initializes low and
+PPI initializes its gate memory low in the same reset contract. The focused
+boot-sector proof uses the exact `AUDIO.COM` PIT/PPI setup order and verifies
+non-silent Lib PCM on first boot, reset reuse, and a continuous executor slice
+on both widths. The obsolete Compat gate hook is removed: PPI's original
+`HostPpiState()` remains the sole presentation transition.
 
 P6 first established that a neutral Win32 endpoint requires an initial reset,
 but placed it before header preparation.  The owner then reported that a cold

@@ -2,33 +2,42 @@
 
 ## Current Work
 
-T81 S8 investigates and repairs the observed first-use PC-speaker playback
-instability after the owner accepted S7's canonical Audio import: the first
-`AUDIO.COM` run is silent, the second is discontinuous, and later runs are
-continuous until a hot guest reboot repeats the sequence.
+T81 S8 corrects the initial WASAPI experiment: the Audio delivery worker now
+owns COM and the endpoint lifecycle, so endpoint availability cannot make
+machine creation fail.
 
 ## M9 T81 S8 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepted S7's original product behavior and its canonical Audio corpus import, then reported the repeatable first-use symptom. Owner admits S8, delegates investigation and repair authority, does not require a manual test gate before an executor delivery, and permanently authorizes an original-mirror repair only when it reduces the total OpenNT mirror diff. |
-| Objective | Establish one deterministic PC-speaker start/stop handoff so the first eligible guest tone is submitted and rendered like later tones, without product polling or a second producer/delivery path. |
-| Non-goals | No Common/App/x86/snapshot/configuration change; no guest sound card, DMA, IRQ, OPL/MIDI, volume policy, guest timing change, platform-specific Compat API or net increase in the OpenNT mirror diff. Linux remains unsupported. |
-| Reference Baseline | SoftPC executor `4157e918` after owner-accepted T81 S7. MyNES `b48e57f` remains the unchanged shared Audio baseline. |
+| Admission And Approval | Owner rejects a rollback and requires a correct WASAPI implementation that does not flash-exit. The initial experiment created an endpoint on the machine-creation thread, then used it from the worker and propagated creation failure as VM creation failure. Owner also approves the narrowly demonstrated Timer2/PPI reset-state repair in the preserved mirror. |
+| Objective | Keep one event-driven shared WASAPI endpoint, but create/use/release it on the Audio delivery worker. Machine creation establishes only the neutral FIFO/cancellation object; endpoint failure is observable through that stream, not fatal to package startup. |
+| Non-goals | No Common/App/x86 change, no Core mirror/configuration change merely to select an audio endpoint, and no guest sound card, DMA, IRQ, OPL/MIDI, volume policy, guest timing change, product polling or second producer/delivery path. Linux remains unsupported. |
+| Reference Baseline | Current S8 Compat handoff evidence and the rejected first WASAPI attempt. MyNES remains read-only comparison material. |
 | Candidate Proposal | [Neutral audio](../proposals/m9-neutral-audio-stream.md) |
-| Files And ABI Surface | `core/compat/audio.c`, `core/compat/platform.c`, the preserved `core/softpc.new/base/keymouse/ppi.c`, their existing host sound endpoint and focused Core tests. Touch Lib only if a demonstrable Audio contract defect, rather than a PC-speaker ownership defect, is the root cause. Public Audio ABI and MyNES-shared code remain unchanged unless the same test proves a general defect. |
+| Files And ABI Surface | `lib/types/win32/audio.h`, `lib/audio/{stream.h,stream.c,win32/stream.c}`, the two Timer2/PPI reset lines in `core/softpc.new`, Audio linkage/tests/manifests and this proposal/current record. Public `lib_audio_stream_*`, FIFO and one-worker shape remain unchanged. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation and source research policy; shared Lib strict C11/package rules. |
-| Verification | Trace all original `LazyBeep` transitions, Compat tone requests, Audio FIFO submissions, native waveOut completion/reset operations and guest-reset state. Add a deterministic start/stop sequence test at the owning boundary; then run focused Audio/Compat tests, strict C11/package builds, background regression, manifests/DAG/governance on x64/x86. |
-| Expected Markers | Exactly one Compat square-wave producer and one Audio delivery worker remain; standalone PPI writes use the original NTVDM complete post-gate state transition; no periodic readiness polling, product WinMM vocabulary or net-increased original-mirror diff appears. |
+| Verification | Prove native endpoint attachment and first/reuse consumption when an endpoint exists; separately prove endpoint failure does not terminate either package. Run focused Audio/Compat tests and package-launch checks on x86/x64 before any owner test. |
+| Expected Markers | Exactly one Compat square-wave producer and one Audio delivery worker remain. The worker owns one COM apartment and one shared render client; no periodic readiness polling, product Windows-audio vocabulary, Core mirror change or public ABI change appears. |
 | Asset Needs | Refresh the two package EXEs. Existing owner media may be read for diagnosis but is never modified, staged or committed. |
 | Reporting Requirements | Report the observed causal chain, why it reproduces after hot reset, production/test additions, deletions and net, all similar-path dispositions, exact automated results and artifact hashes. |
-| Stop Conditions | The only reproducible correction requires a guest-timing change or a net-increased original-mirror diff; a native output callback must enter product code; a platform-specific Compat API would be needed; or the symptom cannot be isolated from user media. |
-| Exit Criteria | A deterministic focused proof covers a fresh first tone, stop, repeated tone and guest reset boundary; the repair preserves one producer/worker topology and public Audio ABI; dual-width required gates pass. T81 remains open for its separate ledger audit. |
+| Stop Conditions | WASAPI requires a public Audio API change, product callback, product polling, second worker/queue or conversion policy outside Audio. In that case retain no partial leaf and report the evidence. |
+| Exit Criteria | The worker-owned leaf compiles/tests strictly on both widths, both package launchers stay alive through the startup observation window, and focused first/reuse guest handoff proofs pass. T81 remains open pending owner audible acceptance. |
 | Original Owner Request | Build neutral src/lib/audio and test/lib/audio first, then later connect SoftPC speaker and eventually separately study XP sound-card support. |
-| Similar-Issue Sweep | Search all `softpc_standalone_audio_set_tone`, Audio create/clear/cancel/shutdown calls, original `LazyBeep` init/reset paths and all potential first-use output paths. Retain only the single Compat producer and the single Audio worker; record every hit's disposition. |
+| Similar-Issue Sweep | Search all Audio endpoint calls for cross-thread COM ownership and all creation failures that can escape as machine creation failure. Retain one production leaf and one delivery worker. |
 
 ## Current Technical Baseline
+
+- P17 replaces the failed cross-thread WASAPI experiment. `lib_audio_stream`
+  still creates one neutral FIFO and worker during machine setup, but the worker
+  alone initializes COM, creates/starts/stops/releases the default shared
+  render endpoint and waits for its event. Thus no endpoint is not a machine
+  creation failure; it becomes the stream's explicit I/O result. The Windows
+  leaf accepts a whole Audio batch across as many endpoint buffers as needed,
+  never reports a partial batch as successfully delivered. x64/x86 native
+  first/reuse probes and package-alive checks pass; audible owner confirmation
+  remains required before S8 closes.
 
 - P11 identifies a SoftPC-only stop-semantics defect: after an ordinary
   `LazyBeep(..., INFINITE)` transition, PPI gate-off reached Compat as
@@ -75,13 +84,16 @@ continuous until a hot guest reboot repeats the sequence.
   PIT/PPI-to-Lib handoff and failure/reset boundaries.  Physical cold-boot
   audibility remains the outstanding owner acceptance condition.
 
-- S8 P4 correctly converged the cold-reset Timer2 gate to original PPI state,
-  but owner reproduction disproved it as the first-use playback cause.  An
-  owner-run trace proves the first `AUDIO.COM` handoff reaches 439Hz,
-  non-silent PCM and successful `waveOutWrite`; it rules out a missing producer
-  or Lib output event.  The former P6--P10 endpoint-readiness theory was then
-  disproved by the same cold-boot symptom and is retired by P12.  The remaining
-  correction is P11's SoftPC-only queue-drain behavior.
+- S8 P18 corrects the demonstrated Timer2/PPI reset-state defect. `timer_post()`
+  had raised Timer2 while PPI reset state recorded its gate as low; the first
+  `AUDIO.COM` rise was therefore interpreted as a gate loss and immediately
+  replaced its 439Hz waveform with silence. On later resets, `ppi_init()` reset
+  the port value but retained its prior gate-memory bit, producing the inverse
+  mismatch. Timer2 now starts low and PPI initialization resets that bit low as
+  well. The real guest instruction order reaches non-silent Lib PCM on first
+  boot, after reset, and in a continuous executor slice on both host widths.
+  The obsolete Compat Timer2 hook is removed; PPI's existing original
+  `HostPpiState()` transition is the sole sound-state path.
 
 - T81 S8 P1 restored eager neutral-stream creation before the Compat speaker
   task and removed the lazy-create wrapper. Its lifecycle tests passed, but the

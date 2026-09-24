@@ -204,7 +204,6 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
        before reset(), so no old IRQ1 reaches the new boot image. */
     softpc_ccpu_lifecycle_clear_pending_interrupts();
     softpc_platform_set_boot_clock(0);
-    softpc_platform_install_timer2_sound_gate();
     if (!softpc_platform_executor_ready()) return SOFTPC_MACHINE_IO_ERROR;
     machine->reset = 1;
     return SOFTPC_MACHINE_OK;

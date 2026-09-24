@@ -15,6 +15,11 @@
 #ifdef _WIN32
 #include <windows.h>
 
+extern BOOL PpiState;
+extern ULONG FreqT2;
+extern BOOL T2State;
+extern ULONG BeepLastFreq;
+extern ULONG BeepLastDuration;
 /* This smoke links the real Core, Compat and Lib Audio worker.  Only the
    final platform leaf is replaced so it records actual Lib delivery for two
    complete AUDIO.COM-equivalent runs without opening a host audio device. */
@@ -29,6 +34,11 @@ static lib_bool audio_probe_first_positive;
 static lib_bool audio_probe_first_negative;
 static lib_bool audio_probe_second_positive;
 static lib_bool audio_probe_second_negative;
+static volatile LONG audio_probe_program_first_delivery;
+static volatile LONG audio_probe_program_second_delivery;
+static volatile LONG audio_probe_program_first_frames;
+static volatile LONG audio_probe_program_second_frames;
+static volatile LONG audio_probe_program_fast_frames;
 
 lib_status audio_stream_platform_create(const lib_audio_stream_options *options,
     audio_stream_platform **out_platform)
@@ -39,6 +49,15 @@ lib_status audio_stream_platform_create(const lib_audio_stream_options *options,
     *out_platform = &audio_probe_platform;
     return LIB_STATUS_OK;
 }
+
+lib_status audio_stream_platform_worker_attach(audio_stream_platform *platform)
+{
+    assert(platform == &audio_probe_platform);
+    return LIB_STATUS_OK;
+}
+
+void audio_stream_platform_worker_detach(audio_stream_platform *platform)
+{ assert(platform == &audio_probe_platform); }
 
 lib_status audio_stream_platform_enqueue(audio_stream_platform *platform,
     const lib_i16 *samples, lib_u32 frame_count, lib_u32 *accepted)
@@ -74,6 +93,16 @@ lib_status audio_stream_platform_enqueue(audio_stream_platform *platform,
         }
         (void)InterlockedIncrement(&audio_probe_second_delivery);
     }
+    if (non_silent != LIB_FALSE && phase == 3) {
+        (void)InterlockedIncrement(&audio_probe_program_first_delivery);
+        (void)InterlockedAdd(&audio_probe_program_first_frames, (LONG)frame_count);
+    }
+    if (non_silent != LIB_FALSE && phase == 4) {
+        (void)InterlockedIncrement(&audio_probe_program_second_delivery);
+        (void)InterlockedAdd(&audio_probe_program_second_frames, (LONG)frame_count);
+    }
+    if (non_silent != LIB_FALSE && phase == 5)
+        (void)InterlockedAdd(&audio_probe_program_fast_frames, (LONG)frame_count);
     *accepted = frame_count;
     return LIB_STATUS_OK;
 }
@@ -118,21 +147,38 @@ static void audio_probe_run_audio_com(void)
     outb(TIMER2_REG, 0x0au);
     outb(PPI_GENERAL, 0x03u);
 }
+
+/* This is AUDIO.COM's tone setup: program Timer 2 to 439Hz, enable the PPI
+   speaker gate, then hold that state. */
+static void audio_probe_execute_audio_com(softpc_machine *machine,
+    lib_bool yield_host)
+{
+    DWORD deadline = GetTickCount() + 3000u;
+
+    while ((LONG)(GetTickCount() - deadline) < 0) {
+        assert(softpc_machine_run(machine, 5000u) == SOFTPC_MACHINE_OK);
+        if (PpiState != FALSE) return;
+        if (yield_host != LIB_FALSE) Sleep(1u);
+    }
+    assert(!"AUDIO.COM did not enable its PPI speaker gate");
+}
+
 #endif
 
-extern ULONG FreqT2;
-extern BOOL PpiState;
-extern BOOL T2State;
-extern ULONG BeepLastFreq;
-extern ULONG BeepLastDuration;
 extern void host_timer2_waveform(int delay, ULONG loclocks, ULONG hiclocks,
     int lohi, int repeat);
 
 static void make_boot_disk(const char *path)
 {
+    static const unsigned char program[] = {
+        0xb0u,0xb6u,0xe6u,0x43u,0xb8u,0x98u,0x0au,0xe6u,
+        0x42u,0x88u,0xe0u,0xe6u,0x42u,0xe4u,0x61u,0x0cu,
+        0x03u,0xe6u,0x61u,0xebu,0xfeu
+    };
     unsigned char sector[512] = { 0 };
     FILE *file = fopen(path, "wb");
     assert(file != NULL);
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u;
     sector[511] = 0xaau;
     assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
@@ -147,6 +193,7 @@ int main(void)
     softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     softpc_device_pit_state pit;
+    softpc_device_ppi_state ppi;
 
     make_boot_disk(path);
     /* The production VM starts Compat's host-audio sink around the recovered
@@ -156,7 +203,36 @@ int main(void)
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     assert(softpc_device_snapshot_capture_pit(&pit));
-    assert(pit.counter[2].gate == GATE_SIGNAL_LOW);
+    softpc_device_snapshot_capture_ppi(&ppi);
+    assert(ppi.register_value == 0u);
+    assert(ppi.gate_2_was_low != 0u);
+
+#ifdef _WIN32
+    /* Both executions are the actual DOS fixture program, not direct calls
+       to the presentation boundary. */
+    InterlockedExchange(&audio_probe_phase, 3);
+    audio_probe_execute_audio_com(machine, LIB_TRUE);
+    audio_probe_wait_for_blocks(&audio_probe_program_first_delivery);
+    assert(InterlockedCompareExchange(&audio_probe_program_first_delivery, 0, 0) != 0);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    InterlockedExchange(&audio_probe_phase, 4);
+    audio_probe_execute_audio_com(machine, LIB_TRUE);
+    audio_probe_wait_for_blocks(&audio_probe_program_second_delivery);
+    assert(InterlockedCompareExchange(&audio_probe_program_second_delivery, 0, 0) != 0);
+    assert(InterlockedCompareExchange(&audio_probe_program_first_frames, 0, 0) * 4 >=
+        InterlockedCompareExchange(&audio_probe_program_second_frames, 0, 0) * 3);
+    assert(InterlockedCompareExchange(&audio_probe_program_second_frames, 0, 0) * 4 >=
+        InterlockedCompareExchange(&audio_probe_program_first_frames, 0, 0) * 3);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+
+    /* The production executor runs continuous slices.  It must not need this
+       test's cooperative yield for the existing Audio producer to deliver a
+       complete guest tone. */
+    InterlockedExchange(&audio_probe_phase, 5);
+    audio_probe_execute_audio_com(machine, LIB_FALSE);
+    Sleep(250u);
+    assert(InterlockedCompareExchange(&audio_probe_program_fast_frames, 0, 0) >= 2048);
+#endif
 
     /* These are AUDIO.COM's PIT writes: channel 2, square wave, divisor
        0x0a98. The later PPI write is therefore its first guest-visible gate

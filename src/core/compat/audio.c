@@ -28,12 +28,6 @@ void host_disable_timer2_sound(void)
     softpc_speaker_cancel_onset();
 }
 
-void softpc_standalone_sound_timer2_gate(unsigned char value)
-{
-    T2State = value != GATE_SIGNAL_LOW;
-    PlaySound(FALSE);
-}
-
 #define SOFTPC_SPEAKER_MIN_HZ 10ul
 #define SOFTPC_SPEAKER_MAX_HZ 20000ul
 #define SOFTPC_SPEAKER_SAMPLE_RATE 48000u
@@ -105,6 +99,18 @@ static void softpc_speaker_cancel_onset(void)
 {
     if (softpc_speaker_request_lock != NULL)
         base_sync_mutex_lock(softpc_speaker_request_lock);
+    softpc_speaker_onset_pending = LIB_FALSE;
+    if (softpc_speaker_request_lock != NULL)
+        base_sync_mutex_unlock(softpc_speaker_request_lock);
+}
+
+static void softpc_speaker_stop_request(void)
+{
+    if (softpc_speaker_request_lock != NULL)
+        base_sync_mutex_lock(softpc_speaker_request_lock);
+    softpc_speaker_request.frequency = 0u;
+    softpc_speaker_request.duration = 0u;
+    ++softpc_speaker_request.generation;
     softpc_speaker_onset_pending = LIB_FALSE;
     if (softpc_speaker_request_lock != NULL)
         base_sync_mutex_unlock(softpc_speaker_request_lock);
@@ -210,40 +216,49 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
         if (base_sync_event_reset(softpc_speaker_wake) != LIB_STATUS_OK) break;
         for (;;) {
             softpc_speaker_tone request;
+            softpc_speaker_tone current;
             lib_bool onset_pending;
             lib_status status;
             lib_u32 accepted;
 
             onset_pending = softpc_speaker_take_request(&request);
+            if (request.frequency == 0u) {
+                /* A normal gate-off ends synthesis, but never retracts PCM
+                   already accepted by the single Audio delivery stream. */
+                (void)lib_audio_stream_flush(stream);
+                break;
+            }
             if (request.frequency != 0u && request.duration != INFINITE) {
                 status = softpc_speaker_submit_finite(stream, &request,
                     onset_pending == LIB_FALSE, &phase);
                 if (status != LIB_STATUS_OK) {
-                    softpc_speaker_write_request(0u, 0u);
-                    (void)lib_audio_stream_clear(stream);
+                    softpc_speaker_stop_request();
                     break;
                 }
                 softpc_speaker_complete_finite(&request);
-                continue;
+                break;
             }
             status = softpc_speaker_submit(stream, request.frequency,
                 SOFTPC_SPEAKER_BLOCK_FRAMES, &phase, &accepted);
             if (status != LIB_STATUS_OK && status != LIB_STATUS_LIMIT_EXCEEDED)
             {
-                softpc_speaker_write_request(0u, 0u);
-                (void)lib_audio_stream_clear(stream);
+                softpc_speaker_stop_request();
                 break;
             }
             if (status == LIB_STATUS_LIMIT_EXCEEDED &&
                 lib_audio_stream_wait_writable(stream) !=
                 LIB_STATUS_OK) {
-                softpc_speaker_write_request(0u, 0u);
-                (void)lib_audio_stream_clear(stream);
+                softpc_speaker_stop_request();
                 break;
             }
-            /* Each block re-reads the single guest-owned request.  Zero is
-               silence, not a second producer: this keeps the endpoint paced
-               through the same bounded Audio FIFO used by a real tone. */
+            softpc_speaker_read_request(&current);
+            if (current.generation != request.generation) {
+                if (current.frequency == 0u) {
+                    (void)lib_audio_stream_flush(stream);
+                    break;
+                }
+                phase = 0u;
+            }
         }
     }
 }
@@ -280,18 +295,7 @@ lib_status softpc_platform_audio_start(void)
         softpc_speaker_stop = NULL;
         goto fail_stream;
     }
-    /* The worker owns the sole device-paced stream from this point. */
-    status = base_sync_event_signal(softpc_speaker_wake);
-    if (status != LIB_STATUS_OK) {
-        (void)base_sync_task_destroy(softpc_speaker_task);
-        softpc_speaker_task = NULL;
-        base_sync_event_destroy(softpc_speaker_wake);
-        base_sync_event_destroy(softpc_speaker_stop);
-        softpc_speaker_wake = NULL;
-        softpc_speaker_stop = NULL;
-        goto fail_stream;
-    }
-    return status;
+    return LIB_STATUS_OK;
 
 fail_stream:
     base_sync_mutex_destroy(softpc_speaker_request_lock);

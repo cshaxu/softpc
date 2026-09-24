@@ -7,6 +7,5 @@
  * original device callback only updates its tone request. */
 lib_status softpc_platform_audio_start(void);
 void softpc_platform_audio_shutdown(void);
-void softpc_standalone_sound_timer2_gate(unsigned char value);
 
 #endif

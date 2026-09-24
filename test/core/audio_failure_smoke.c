@@ -221,7 +221,7 @@ int main(void)
     clears = flushes = enqueues = waits = writable_waits = 0u;
     last_frame_count = 0u;
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 5u && clears == 1u && flushes == 0u && waits == 2u);
+    assert(enqueues == 5u && clears == 0u && flushes == 0u && waits == 2u);
 
     scenario = 1;
     clears = flushes = enqueues = waits = writable_waits = 0u;
@@ -230,7 +230,7 @@ int main(void)
     softpc_speaker_request.duration = INFINITE;
     ++softpc_speaker_request.generation;
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 1u && clears == 1u && flushes == 0u && waits == 2u);
+    assert(enqueues == 1u && clears == 0u && flushes == 0u && waits == 2u);
 
     scenario = 2;
     clears = flushes = enqueues = waits = writable_waits = 0u;
@@ -239,7 +239,7 @@ int main(void)
     softpc_speaker_request.duration = INFINITE;
     ++softpc_speaker_request.generation;
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 2u && clears == 1u && flushes == 0u && waits == 2u &&
+    assert(enqueues == 2u && clears == 0u && flushes == 0u && waits == 2u &&
         first_sample[0] == 12000 && first_sample[1] == -12000);
 
     scenario = 0;
@@ -250,7 +250,7 @@ int main(void)
     assert(softpc_speaker_request.frequency == 100u &&
         softpc_speaker_request.duration == 1u && signals == 1u);
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 5u && last_frame_count == 512u && clears == 1u &&
+    assert(enqueues == 1u && last_frame_count == 48u && clears == 0u &&
         flushes == 1u && waits == 2u);
 
     scenario = 3;
@@ -259,7 +259,7 @@ int main(void)
     softpc_speaker_request.duration = INFINITE;
     ++softpc_speaker_request.generation;
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 5u && clears == 1u && flushes == 0u && waits == 2u);
+    assert(enqueues == 1u && clears == 0u && flushes == 1u && waits == 2u);
 
     /* A PPI start and its following gate-off can occur before a new worker
        has run.  The onset must still reach the existing PCM producer once. */
@@ -274,7 +274,7 @@ int main(void)
     assert(softpc_speaker_onset.frequency == 440u);
     softpc_standalone_audio_set_tone(0u, 0u);
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 5u && clears == 1u && flushes == 0u && waits == 2u);
+    assert(enqueues == 1u && clears == 0u && flushes == 1u && waits == 2u);
 
     /* A PPI gate-off can arrive while the producer is waiting for an Audio
        FIFO slot.  It must end the current continuous tone rather than let
@@ -286,7 +286,7 @@ int main(void)
     ++softpc_speaker_request.generation;
     softpc_speaker_onset_pending = LIB_FALSE;
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 6u && clears == 1u && flushes == 0u &&
-        writable_waits == 2u && waits == 2u);
+    assert(enqueues == 5u && clears == 0u && flushes == 1u &&
+        writable_waits == 1u && waits == 2u);
     return 0;
 }

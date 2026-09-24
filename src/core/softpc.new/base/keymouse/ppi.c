@@ -198,6 +198,7 @@ void ppi_init IFN0()
 		io_connect_port(i, PPI_ADAPTOR, IO_READ_WRITE);
 
     ppi_register = 0x00;
+    gate_2_was_low = TRUE;
 }
 
 GLOBAL void
