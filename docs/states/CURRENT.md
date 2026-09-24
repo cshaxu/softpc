@@ -2,29 +2,12 @@
 
 ## Current Work
 
-T83 S3 is active: centralize the selected C-VID declarations and repair the
-two `cga.c` BIOS channel-2 pointer definitions without changing behavior.
+No implementation subtask is active.
+Open task awaiting owner: T83.
 
-## M9 T83 S3 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner admits T83 S2 and S3, directing that each completed S receives a self-contained closure audit and an owner-authorized corrective P when that audit discovers an in-scope gap. |
-| Objective | Select one existing C-VID declaration header for `setReadPointers` and `setWritePointers`, and make `cga.c` BIOS channel-2 pointer definitions match their existing `video.h` declarations. |
-| Non-goals | No mode-handler conditionals, WOW instrumentation, CCPU lifecycle import, SAS-video branch, wrapper, runtime object, behavior, configuration, media or ABI policy change. |
-| Reference Baseline | SoftPC `b44942f3`; OpenNT `5e4619ab6`; NTVDM64 `52e330bdf` is read-only comparison context only. |
-| Candidate Proposal | [Three-mirror conformance](../proposals/m9-three-mirror-conformance.md) |
-| Files And ABI Surface | Existing selected C-VID header and `src/app-softpc/softpc.new/base/video/cga.c`, focused evidence and rebuilt package EXEs. No public interface or behavior change. |
-| Applicable Rules | Execution, Architecture, Coding and Documentation rules; preserved-mirror direct-diff policy. |
-| Verification | Direct OpenNT diff, x64/x86 clean Release builds and background CTest, focused C-VID/video smoke, documentation governance and `git diff --check`. |
-| Expected Markers | One C-VID declaration site; both `cga.c` definitions agree with `video.h`; no guest-visible behavior change. |
-| Asset Needs | Refresh only the two package EXEs; preserve owner `softpc.ini`, snapshot and guest media. |
-| Reporting Requirements | Report declaration/definition diff, focused and dual-width evidence, EXE hashes/links, closure-audit findings and any corrective P. |
-| Stop Conditions | Any behavior-affecting source diff, declaration owner ambiguity, unexpected package payload change or failed build/test stops implementation. |
-| Exit Criteria | One complete S3 implementation P is pushed after self-review and closure audit; both package EXEs are rebuilt and linked. |
-| Original Owner Request | Admit and execute S2 and S3; self-audit every completed S, admit an in-scope corrective P if needed, compile both EXEs, test, commit, push and report diffs and EXE links. |
-| Similar-Issue Sweep | Search selected C-VID consumers and pointer declarations for duplicate selector declarations and mismatched channel-2 definitions. |
+T83 S3 delivered the selected C-VID declaration boundary and the matching
+`cga.c` BIOS channel-2 pointer definitions. [S3 closure audit](../history/M9-T83-S3-cvid-closure-audit.md)
+records the executor self-review. T83 remains open pending owner acceptance.
 
 ## Current Technical Baseline
 

@@ -148,8 +148,8 @@ static half_word Rf_cursor_loc_low = 0;
 
 CGA_GLOBS	CGA_GLOBALS;
 
-GLOBAL VOID (*bios_ch2_byte_wrt_fn)();
-GLOBAL VOID (*bios_ch2_word_wrt_fn)();
+GLOBAL VOID (*bios_ch2_byte_wrt_fn) IPT2(ULONG, ch_attr, ULONG, ch_addr);
+GLOBAL VOID (*bios_ch2_word_wrt_fn) IPT2(ULONG, ch_attr, ULONG, ch_addr);
 
 GLOBAL IU8 *cga_screen_buf = 0;
 

@@ -100,6 +100,9 @@ struct	VideoVector	{
 
 extern	struct	VideoVector	Video;
 
+IMPORT void setReadPointers IPT1(IUH, readset);
+IMPORT void setWritePointers IPT0();
+
 #define	getVideolatches()	(*(Video.GetVideolatches))()
 #define	getVideorplane()	(*(Video.GetVideorplane))()
 #define	getVideowplane()	(*(Video.GetVideowplane))()
