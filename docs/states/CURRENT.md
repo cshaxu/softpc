@@ -2,28 +2,29 @@
 
 ## Current Work
 
-T82 S1 has delivered the NXVM six-component non-Audio audit. T82 remains open
-awaiting owner decisions on NXVM's stale manifests and the retained SoftPC x86
-command-body policy; no shared production code has been modified.
+T82 S1 has delivered the NXVM six-component non-Audio audit. Owner requires
+strict non-Audio source/test convergence, imports NXVM Base process discovery
+for SoftPC's adjacent-INI lookup, and treats manifests as derived verification
+data. S2 is not yet admitted; no shared production code has been modified.
 
 ## M9 T82 S1 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | New |
-| Admission And Approval | Owner directly admits T82 to audit NXVM's six shared components and prepare an exact import excluding Audio. |
+| Admission And Approval | Owner directly admits T82 to audit NXVM's six shared components and prepare an exact import excluding Audio. Owner subsequently requires strict equality for every non-Audio source/test path, approves importing Base process discovery for the existing SoftPC INI lookup, and approves replacing the SoftPC x86 command shim with NXVM's direct Types source. |
 | Objective | Freeze the actual NXVM six-directory content, compare every non-Audio shared path with SoftPC, and produce an import/retention/blocker ledger with a minimal S-task plan. |
-| Non-goals | No source import yet; no Audio source/test/build/document import; no Core, Compat, VM, App, package INI, guest media, public ABI, product behavior or NXVM worktree modification. |
+| Non-goals | No source import in S1; no Audio source/test/API behavior import; no Core, Compat, VM, package INI, guest media, public ABI, product behavior or NXVM worktree modification. S2 may make only the admitted App config use of imported Base process discovery. |
 | Reference Baseline | SoftPC `cdeb5448`; NXVM HEAD `d485a54e` plus the actual read-only six-directory working contents recorded by this S. |
 | Candidate Proposal | [NXVM shared-corpus import readiness](../proposals/m9-nxvm-shared-corpus-import.md) |
-| Files And ABI Surface | This packet, proposal and T82 S1 evidence only. Future source scope is restricted to `src/{lib,common,x86}` and `test/{lib,common,x86}`, excluding Audio paths. |
+| Files And ABI Surface | This packet and proposal only for S1. Future source scope is `src/{lib,common,x86}` and `test/{lib,common,x86}`, excluding Audio paths; S2 additionally owns `src/app/config.c` and its direct test coverage solely for the imported Base INI-directory call. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules; shared strict-C11/package/DAG requirements. |
 | Verification | Enumerate paths, compare hashes/content/diffs, inspect CMake dependency/link contracts and run documentation governance. No product build is claimed necessary for docs-only S1. |
-| Expected Markers | One complete six-directory ledger; every non-Audio difference has a disposition; Audio paths are explicitly excluded; no source file changes. |
+| Expected Markers | One complete six-directory ledger; every non-Audio source/test path is planned for exact equality, Audio paths are explicitly excluded, and derived manifests have one exact-path proof; S1 has no source file changes. |
 | Asset Needs | None. No package binary, INI or media update. |
 | Reporting Requirements | Report the frozen NXVM reference state, exact/equivalent/blocked path counts, import ordering, estimated per-S file/line bands and any required owner decision. |
-| Stop Conditions | A candidate requires product adaptation, public ABI change, Audio import, NXVM runtime dependency, or cannot be classified from source/build evidence. Stop that candidate and report it rather than creating a SoftPC fork. |
-| Exit Criteria | Ledger and proposal are complete, documentation gates pass, current worktree remains source-clean, and owner has the S2 admission decision. |
+| Stop Conditions | A candidate requires a product adaptation other than S2's approved Base INI-directory call, a public ABI change, Audio import, NXVM runtime dependency, or cannot be classified from source/build evidence. Stop that candidate and report it rather than creating a SoftPC fork. |
+| Exit Criteria | Ledger and revised strict-convergence proposal are complete, documentation gates pass, current worktree remains source-clean, and owner has the S2 admission decision. |
 | Original Owner Request | Audit NXVM six components and prepare import of every component except Audio. |
 | Similar-Issue Sweep | Search all six directory manifests/CMake files for Audio reachability, product-relative paths, cross-component include violations and language-standard deviations. |
 
