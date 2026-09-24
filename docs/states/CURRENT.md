@@ -2,34 +2,20 @@
 
 ## Current Work
 
-T82 S2 imports the complete non-Audio Lib/Common/x86 source/test corpus from
-NXVM, including Base executable-directory discovery, and uses that imported
-capability for SoftPC's existing adjacent-INI lookup. Audio remains SoftPC's
-retained corpus. The owner approves preserving SoftPC's correct x86 raw-CRT
-negative test and its derived manifest until NXVM takes that one-line test fix.
-
-## M9 T82 S2 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner admits S2 after accepting S1's strict non-Audio convergence plan, and clarifies that the intended scope is a whole six-directory import: every non-Audio Lib, Common, x86 and matching test path enters together. Owner clarifies that SoftPC must not import or alter Audio: NXVM independently adopts SoftPC Audio. Owner then approves retaining SoftPC's correct `memcpy()` raw-CRT negative probe and its derived x86 test manifest because NXVM's `lib_memory_copy()` probe cannot test the stated rejection. The approved product adaptation remains only SoftPC's existing adjacent-INI lookup through imported Base process discovery. |
-| Objective | Import every selected non-Audio Lib/Common/x86/test path from NXVM `d485a54e`, except the owner-approved correct x86 negative-test pair; retain and validate SoftPC Audio; import Base process discovery; and replace the direct Win32 executable-directory call in SoftPC App with that neutral contract without changing the resulting `softpc.ini` path or media resolution. |
-| Non-goals | No Audio source, Types Audio declaration, Audio build/test/document behavior, Core, Compat, VM, package INI, media, or NXVM worktree modification. No product behavior change beyond using the same resulting adjacent-INI path. Mixed Audio/non-Audio build and evidence files receive only necessary surgical reconciliation; a full Audio convergence is not admitted. |
-| Reference Baseline | SoftPC `df9d1cf8`; NXVM `d485a54e`, with its six shared directories recorded clean in S1. |
-| Candidate Proposal | [NXVM shared-corpus import readiness](../proposals/m9-nxvm-shared-corpus-import.md) |
-| Files And ABI Surface | Selected non-Audio `src/{lib,common,x86}/**` and `test/{lib,common,x86}/**` paths, including imported `base/process` and platform declarations; Audio-owned portions of mixed Lib files remain excluded. `src/app/config.c` and its focused test coverage may change solely to call `base_process_executable_directory()` before appending `softpc.ini`. Public shared interfaces follow the exact imported corpus; no product ABI changes are admitted. |
-| Applicable Rules | Execution, Architecture, Coding and Documentation rules; shared strict-C11/package/DAG requirements. |
-| Verification | Exact selected-path comparator before/after, standalone strict-C11 Lib/Common/x86 suites on x64/x86, focused executable-directory/INI-path proof, product background regression on x64/x86, shared DAG/manifests as applicable, and documentation governance. Desktop tests remain excluded unless explicitly reserved. |
-| Expected Markers | All imported non-Audio shared paths are byte-equal to NXVM; the one correct raw-CRT negative-test pair and Audio-only mixed paths are explicit retained differences; all six local manifests validate their actual selected corpora; `app_get_config_path()` has one Base process call and preserves output behavior. |
-| Asset Needs | Refresh only package `softpc32.exe` and `softpc64.exe`; preserve owner INI and all media. |
-| Reporting Requirements | Before implementation report actual selected path list and source/test line estimate. At delivery report exact changed-path and +/-/net code accounting, excluded Audio disposition, exact-path proof, builds/tests and package links. |
-| Stop Conditions | An imported non-Audio path requires a product adaptation beyond the approved App directory call; an Audio-owned mixed section is required for successful build; public ABI/product behavior changes; NXVM becomes a build/runtime dependency; or exact source cannot compile without a local fork. Stop and report rather than making a SoftPC variant. |
-| Exit Criteria | All imported paths match NXVM; the approved x86 negative-test pair and Audio-only mixed paths are the complete retained-difference ledger; all six manifests validate; App preserves adjacent `softpc.ini` discovery; admitted tests/builds pass on both widths; one complete P is pushed; worktree is clean except owner changes; and delivery awaits owner acceptance before a task-level convergence audit. |
-| Original Owner Request | Audit NXVM six components and prepare import of every component except Audio. |
-| Similar-Issue Sweep | Enumerate every Audio-related Lib/test/build path to prove exclusion; scan imported Base process consumers and all App executable-directory lookups to prevent a duplicate direct Win32 implementation; scan all six source/test roots for retired `lib_c_*` spellings and duplicate retained source paths. |
+No implementation subtask is active.
 
 ## Current Technical Baseline
+
+- T82 closes after owner acceptance of S2. The six shared directories have
+  220 paths: 214 content paths are byte-identical to NXVM's current worktree;
+  the only six differences are local `MANIFEST.sha256` revision/hash records.
+  Base process discovery now owns executable-directory lookup and App appends
+  the unchanged `softpc.ini` filename. S2 P1/P2 are `2ef228f8`/`0448fa4f`;
+  x64 and x86 builds passed, each background suite passed 116/116 before the
+  manifest-only P2, and the final dual-width manifest/corpus/negative checks
+  passed. Package EXEs remain from P1; INI, media, Core, Compat and VM are
+  unchanged. [T82 audit](../history/M9-T82-completion-audit.md) records the
+  complete changed-path and difference ledger.
 
 - S7 shares one internal write algorithm; ordinary write flushes on success,
   nonempty DIRECT fill flushes once even after partial failure, preserving the
@@ -180,6 +166,7 @@ negative test and its derived manifest until NXVM takes that one-line test fix.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T82 | S1/S2 complete; owner accepts the six-component convergence. | [Audit](../history/M9-T82-completion-audit.md) |
 | T81 | S1--S8 complete; owner accepted cold first-run `AUDIO.COM` playback; neutral Audio and the PC-speaker handoff close. | [Audit](../history/M9-T81-completion-audit.md) |
 | T80 | S1--S7 complete under approved scopes; owner acceptance and separate whole-task audit close the task. | [Audit](../history/M9-T80-completion-audit.md) |
 | T79 | S1 investigation and S2 repair complete; owner testing passed and closure approved. | [Audit](../history/M9-T79-completion-audit.md) |
