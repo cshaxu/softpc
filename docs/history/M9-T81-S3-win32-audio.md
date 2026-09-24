@@ -9,7 +9,7 @@ Core, App or x86; it adds no Lib worker, software ring, callback, polling
 thread, guest device or Linux playback implementation.
 
 The executor delivery is `d8830b53`, pushed to `origin/main`. The retained
-design is [the neutral Audio proposal](../proposals/m9-neutral-audio-stream.md).
+design is [the neutral Audio proposal](M9-T81-neutral-audio-stream-proposal.md).
 
 ## Actual design and review
 

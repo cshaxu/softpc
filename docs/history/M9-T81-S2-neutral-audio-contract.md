@@ -9,7 +9,7 @@ or add a producer thread, software ring or guest-device route.
 
 The executor delivery is `fbfa9437`, pushed to `origin/main` before this
 coordinator review. The retained plan is
-[the active proposal](../proposals/m9-neutral-audio-stream.md).
+[the retained proposal](M9-T81-neutral-audio-stream-proposal.md).
 
 ## Actual-Change Review
 
