@@ -83,11 +83,8 @@ extern void vga_split_graph_update(void);
 extern void vga_ac_outb(io_addr port, half_word value);
 
 extern EVID_WRT_POINTERS c_ev_write_ptr;
-extern void write_byte_ev_glue(IU32 offset, IU8 value);
-extern void write_word_ev_glue(IU32 offset, IU16 value);
 static IU32 writer_offset, writer_value;
 
-/* Selected legacy calls use default argument promotions (IPT2 expands to ()). */
 static void capture_byte_write(IU32 offset, IU32 value)
 {
     writer_offset = offset;

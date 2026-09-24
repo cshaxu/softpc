@@ -119,6 +119,10 @@ IMPORT VOID vga_func_12 IPT0();
 IMPORT VOID init_vga_dac IPT1( int, table );
 #endif
 
+/* SOFTPC_PORT_ABI: BIOS video dispatch calls the selected EGA service with
+ * its original page/column/row contract. */
+IMPORT void ega_read_dot IPT3(int, page, int, col, int, row);
+
 #if defined(NTVDM) && defined(MONITOR)
 
 #define F8x14    0

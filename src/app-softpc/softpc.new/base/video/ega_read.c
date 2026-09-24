@@ -379,9 +379,6 @@ READ_POINTERS Glue_reads =
 
 #ifdef C_VID
 /* C_Evid glue */
-extern read_byte_ev_glue IPT1(IU32, eaOff);
-extern read_word_ev_glue IPT1(IU32, eaOff);
-extern read_str_fwd_ev_glue IPT3(IU8 *, dest, IU32, eaOff, IU32, count);
 READ_POINTERS Glue_reads = 
 {
 	read_byte_ev_glue,

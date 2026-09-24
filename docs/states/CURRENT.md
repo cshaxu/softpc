@@ -2,7 +2,30 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T83.
+T83 S6 is active: centralize the selected C-VID glue declarations and the EGA
+dot-read declaration as narrow source-visible ABI corrections. No code change
+has been made during the admission audit.
+
+## M9 T83 S6 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | The owner admitted S6 on 2026-09-24 as the next unused T83 subtask and requested a read-only verification of three reported C-VID/EGA declaration defects before implementation. |
+| Objective | Give the selected `CPU_40_STYLE + C_VID` read/write glue functions one typed C-VID ABI declaration boundary, and declare `ega_read_dot()` in the public EGA-video header used by its caller and implementation. |
+| Non-goals | No generated C-VID rule change; no function, table order, machine policy, guest-visible behavior, Compat/App change, NTVDM64 write, NXVM import, user INI, media, or new test fixture. |
+| Reference Baseline | SoftPC `b1d5ece6`; read-only comparison material: current NTVDM64 worktree at `8e8ccf468` plus its uncommitted declaration-only observations. |
+| Candidate Proposal | [T83 S6 C-VID ABI declaration audit](../proposals/m9-t83-s6-cvid-abi-declarations.md). |
+| Files And ABI Surface | `src/app-softpc/softpc.new/base/inc/cpu_vid.h`, `base/video/ega_read.c`, `base/video/ega_writ.c`, `base/inc/egavideo.h`, and the duplicate-declaration consumer `test/app-softpc/unit/machine/vga_frame_smoke.c`; the existing C-VID `ev_glue.c` bodies and `ega_vide.c` body are contract references, not behavior-change targets. |
+| Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, and `DOCUMENT.md`; the recovered-source exception permits only a narrow mechanical declaration/calling-ABI correction with a local reason marker and x86/x64 evidence. |
+| Verification | Before edit: finite declaration sweep and header ownership audit. After edit: declaration sweep rejects local duplicate C-VID glue externs, focused C-VID/EGA build proof, dual Release builds, prescribed background x64/x86 CTest runs, documentation governance, and diff hygiene. |
+| Expected Markers | One local `SOFTPC_PORT_ABI` marker at the shared C-VID declaration boundary and one at the `egavideo.h` declaration; no marker in a duplicate local declaration. |
+| Asset Needs | No asset mutation. Build products may refresh only `assets/binary/softpc32.exe` and `assets/binary/softpc64.exe`; all disposable output stays under ignored `build/`. |
+| Reporting Requirements | Report exact changed-path/line ledger, all declaration-sweep hits and dispositions, x64/x86 build and test results, EXE hashes/links, commit/push, and the read-only NTVDM64 adoption handoff. |
+| Stop Conditions | Stop before implementation if a required declaration must cross a non-C-VID boundary, changes a function/table ABI beyond the selected build, alters machine behavior, or the finite sweep exposes a distinct contract requiring owner scope revision. |
+| Exit Criteria | Each selected glue function has one exact shared declaration consumed by its EGA table user; `ega_read_dot()` is declared once in `egavideo.h`; no targeted local extern survives; all scoped hits are dispositioned; required dual-width evidence and self-review pass; one complete P is committed and pushed. |
+| Original Owner Request | “准入一个S6，先检查这些反馈…确认后给我一个总结。” The three reports cover C-VID reads, `fill_word_ev_glue` width, and `ega_read_dot()` header ownership. |
+| Similar-Issue Sweep | Search every C/H file under `src/app-softpc/softpc.new` and `test/app-softpc` for all nine selected C-VID glue names and `ega_read_dot`; classify definitions, shared declarations, local declarations, table consumers, and alternative-host uses. Extend only for an identical duplicate declaration in the selected C-VID ABI surface; otherwise record a receiver. |
 
 ## Current Technical Baseline
 
