@@ -1,7 +1,7 @@
+#include "lib/types/types_interface.h"
 #include "command.h"
 
 #include <assert.h>
-#include <string.h>
 
 typedef struct command_case { const char *text; } command_case;
 static const command_case commands[] = {
@@ -11,17 +11,17 @@ static const command_case commands[] = {
 static app_lifecycle_request expected(app_monitor_state state,
     const char *command)
 {
-    if (!strcmp(command, "start"))
+    if (!lib_text_compare(command, "start"))
         return state == APP_MONITOR_STOPPED ?
             APP_LIFECYCLE_REQUEST_START : APP_LIFECYCLE_REQUEST_NONE;
-    if (!strcmp(command, "pause"))
+    if (!lib_text_compare(command, "pause"))
         return state == APP_MONITOR_RUNNING ? APP_LIFECYCLE_REQUEST_PAUSE :
             APP_LIFECYCLE_REQUEST_NONE;
-    if (!strcmp(command, "resume"))
+    if (!lib_text_compare(command, "resume"))
         return state == APP_MONITOR_PAUSED ? APP_LIFECYCLE_REQUEST_RESUME :
             APP_LIFECYCLE_REQUEST_NONE;
-    if (!strcmp(command, "reset")) return APP_LIFECYCLE_REQUEST_RESET;
-    if (!strcmp(command, "stop"))
+    if (!lib_text_compare(command, "reset")) return APP_LIFECYCLE_REQUEST_RESET;
+    if (!lib_text_compare(command, "stop"))
         return state == APP_MONITOR_RUNNING || state == APP_MONITOR_PAUSED ?
             APP_LIFECYCLE_REQUEST_STOP : APP_LIFECYCLE_REQUEST_NONE;
     assert(0); return APP_LIFECYCLE_REQUEST_NONE;
@@ -29,9 +29,9 @@ static app_lifecycle_request expected(app_monitor_state state,
 
 static void assert_blank_line(const char *text)
 {
-    size_t length = strlen(text);
+    lib_size length = lib_text_length(text);
     assert(length >= 4u);
-    assert(!strcmp(text + length - 4u, "\r\n\r\n"));
+    assert(!lib_text_compare(text + length - 4u, "\r\n\r\n"));
 }
 
 static void arm(app_command_session *session, const char *outcome)
@@ -40,7 +40,7 @@ static void arm(app_command_session *session, const char *outcome)
     app_command_session_note_monitor_current(session, 1, &effect);
     assert(effect.arm_prompt);
     if (outcome != NULL) {
-        assert(strstr(effect.text, outcome) != NULL);
+        assert(lib_text_find_substring(effect.text, outcome) != NULL);
         assert_blank_line(effect.text);
     }
     /* Readiness is a level; repeated observations cannot consume a prompt
@@ -82,10 +82,10 @@ static void complete(app_command_session *session, app_monitor_state *state,
 
 static void run_matrix(void)
 {
-    size_t state_index;
+    lib_size state_index;
     for (state_index = APP_MONITOR_STOPPED; state_index <= APP_MONITOR_RUNNING;
          ++state_index) {
-        size_t command_index;
+        lib_size command_index;
         for (command_index = 0u; command_index < sizeof(commands) / sizeof(commands[0]);
              ++command_index) {
             app_command_session session;
@@ -160,69 +160,69 @@ int main(void)
     test_raw_route_discards_running_outcome();
     test_error_returns_monitor_transaction();
     app_command_session_initialize(&session, COMMON_SESSION_DISPLAY_WINDOW);
-    assert(strstr(app_command_hotkey_help(),
+    assert(lib_text_find_substring(app_command_hotkey_help(),
         "While the guest is running:") != NULL);
-    assert(strstr(app_command_hotkey_help(),
+    assert(lib_text_find_substring(app_command_hotkey_help(),
         "Ctrl+Alt+T     send Alt+Tab to the guest\r\n") != NULL);
     app_command_session_open(&session, &effect);
-    assert(strstr(effect.text, "cold-reset and run the machine") != NULL);
-    assert(strstr(effect.text, "save <file>") != NULL);
-    assert(strstr(effect.text, "load <file>") != NULL);
-    assert(strstr(effect.text, app_command_hotkey_help()) != NULL);
+    assert(lib_text_find_substring(effect.text, "cold-reset and run the machine") != NULL);
+    assert(lib_text_find_substring(effect.text, "save <file>") != NULL);
+    assert(lib_text_find_substring(effect.text, "load <file>") != NULL);
+    assert(lib_text_find_substring(effect.text, app_command_hotkey_help()) != NULL);
     app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
         "floppy eject", &effect);
     assert(effect.action == APP_COMMAND_ACTION_EJECT_FLOPPY);
     app_command_session_complete_floppy(&session, effect.action, 1, &effect);
-    assert(strstr(effect.text, "Floppy ejected") != NULL);
+    assert(lib_text_find_substring(effect.text, "Floppy ejected") != NULL);
     assert_blank_line(effect.text);
     arm(&session, NULL);
     app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
         "floppy insert direct Mixed-Case.img", &effect);
     assert(effect.action == APP_COMMAND_ACTION_INSERT_FLOPPY);
     assert(effect.media_mode == LIB_STORAGE_MEDIUM_DIRECT);
-    assert(!strcmp(effect.path, "Mixed-Case.img"));
+    assert(!lib_text_compare(effect.path, "Mixed-Case.img"));
     arm(&session, NULL);
     app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
         "floppy insert readonly ReadOnly.img", &effect);
     assert(effect.action == APP_COMMAND_ACTION_INSERT_FLOPPY);
     assert(effect.media_mode == LIB_STORAGE_MEDIUM_READONLY);
-    assert(!strcmp(effect.path, "ReadOnly.img"));
+    assert(!lib_text_compare(effect.path, "ReadOnly.img"));
     arm(&session, NULL);
     app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
         "floppy insert overlay Overlay.img", &effect);
     assert(effect.action == APP_COMMAND_ACTION_INSERT_FLOPPY);
     assert(effect.media_mode == LIB_STORAGE_MEDIUM_OVERLAY);
-    assert(!strcmp(effect.path, "Overlay.img"));
+    assert(!lib_text_compare(effect.path, "Overlay.img"));
     arm(&session, NULL);
     app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
         "floppy insert Mixed-Case.img", &effect);
-    assert(strstr(effect.text, "Usage: floppy insert <readonly|direct|overlay> <image> | eject") != NULL);
+    assert(lib_text_find_substring(effect.text, "Usage: floppy insert <readonly|direct|overlay> <image> | eject") != NULL);
     assert_blank_line(effect.text);
     app_command_session_submit_line(&session, APP_MONITOR_RUNNING,
         "save setup-before-failure.spcs", &effect);
     assert(effect.action == APP_COMMAND_ACTION_SAVE_STATE);
-    assert(!strcmp(effect.path, "setup-before-failure.spcs"));
+    assert(!lib_text_compare(effect.path, "setup-before-failure.spcs"));
     app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
         "load setup-before-failure.spcs", &effect);
     assert(effect.action == APP_COMMAND_ACTION_LOAD_STATE);
     app_command_session_submit_line(&session, APP_MONITOR_PAUSED,
         "save state.spcs", &effect);
     assert(effect.action == APP_COMMAND_ACTION_SAVE_STATE);
-    assert(!strcmp(effect.path, "state.spcs"));
+    assert(!lib_text_compare(effect.path, "state.spcs"));
     arm(&session, NULL);
     app_command_session_submit_line(&session, APP_MONITOR_RUNNING,
         "load state.spcs", &effect);
-    assert(strstr(effect.text, "stop it before load") != NULL);
+    assert(lib_text_find_substring(effect.text, "stop it before load") != NULL);
     assert_blank_line(effect.text);
     arm(&session, NULL);
     app_command_session_reject_line(&session, &effect);
-    assert(strstr(effect.text, "Command is too long.") != NULL);
+    assert(lib_text_find_substring(effect.text, "Command is too long.") != NULL);
     assert_blank_line(effect.text);
     assert(app_command_session_take_request(&session) == APP_LIFECYCLE_REQUEST_NONE);
     arm(&session, NULL);
     app_command_session_submit_line(&session, APP_MONITOR_STOPPED,
         "unknown", &effect);
-    assert(strstr(effect.text, "Unknown command.") != NULL);
+    assert(lib_text_find_substring(effect.text, "Unknown command.") != NULL);
     assert_blank_line(effect.text);
     arm(&session, NULL);
     app_command_session_submit_line(&session, APP_MONITOR_STOPPED, "", &effect);

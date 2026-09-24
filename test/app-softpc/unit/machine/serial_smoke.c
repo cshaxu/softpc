@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "cleanup.h"
 
@@ -50,11 +51,11 @@ int main(void)
     /* The original UART remains the controller.  Exercise the recovered
        host edge independently: fixed-profile COM1 is connected, has no
        synthetic input and accepts/flushes output without an NT driver. */
-    host_com_ioctl(0, HOST_COM_MODEM, (intptr_t)&modem);
+    host_com_ioctl(0, HOST_COM_MODEM, (lib_iptr)&modem);
     assert((modem & (HOST_COM_MODEM_CTS | HOST_COM_MODEM_DSR |
         HOST_COM_MODEM_RLSD)) == (HOST_COM_MODEM_CTS | HOST_COM_MODEM_DSR |
         HOST_COM_MODEM_RLSD));
-    host_com_ioctl(0, HOST_COM_INPUT_READY, (intptr_t)&input_ready);
+    host_com_ioctl(0, HOST_COM_INPUT_READY, (lib_iptr)&input_ready);
     assert(!input_ready);
     host_com_read(0, &received, &error_mask);
     assert(error_mask == HOST_COM_NO_DATA);

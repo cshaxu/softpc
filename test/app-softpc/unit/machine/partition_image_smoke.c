@@ -1,9 +1,9 @@
+#include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>
-#include <string.h>
 
 /* This image deliberately has one physical disk only.  Its MBR contains a
  * primary partition and an extended partition whose EBR describes a logical
@@ -26,7 +26,7 @@ static void softpc_partition_put_le32(unsigned char *target,
 static void softpc_partition_entry(unsigned char *entry,
     unsigned char type, unsigned long start_lba, unsigned long sectors)
 {
-    memset(entry, 0, 16u);
+    lib_memory_set(entry, 0, 16u);
     entry[0] = 0x80u;
     entry[4] = type;
     softpc_partition_put_le32(entry + 8u, start_lba);
@@ -52,8 +52,8 @@ static void softpc_partition_write_image(const char *path)
         0xa0u, 0x02u, 0x06u, 0xa2u, 0x01u, 0x05u, 0xebu, 0xfeu
     };
 
-    memset(image, 0, sizeof(image));
-    memcpy(mbr, boot_program, sizeof(boot_program));
+    lib_memory_set(image, 0, sizeof(image));
+    lib_memory_copy(mbr, boot_program, sizeof(boot_program));
     softpc_partition_entry(mbr + 0x1beu, 0x06u, 1u, 16u);
     softpc_partition_entry(mbr + 0x1ceu, 0x05u, 17u, 32u);
     mbr[510] = 0x55u;

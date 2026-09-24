@@ -1,3 +1,5 @@
+#include "../time.h"
+#include "lib/types/types_interface.h"
 #include "machine_fixture.h"
 #include "common/session/control.h"
 #include "common/machine/input_queue.h"
@@ -5,8 +7,6 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -29,7 +29,7 @@ typedef struct runtime_completion_probe {
 } runtime_completion_probe;
 
 static void runtime_state_probe_receive(void *opaque, common_machine_state state,
-    uint32_t run_generation)
+    lib_u32 run_generation)
 {
     runtime_completion_probe *probe = (runtime_completion_probe *)opaque;
     (void)state;
@@ -38,8 +38,8 @@ static void runtime_state_probe_receive(void *opaque, common_machine_state state
     (void)InterlockedIncrement(&probe->state_facts);
 }
 
-static void runtime_frame_probe_receive(void *opaque, uint32_t sequence,
-    int graphics, uint32_t run_generation)
+static void runtime_frame_probe_receive(void *opaque, lib_u32 sequence,
+    int graphics, lib_u32 run_generation)
 {
     runtime_completion_probe *probe = (runtime_completion_probe *)opaque;
     (void)sequence;
@@ -52,11 +52,11 @@ static void runtime_frame_probe_receive(void *opaque, uint32_t sequence,
 static int runtime_wait(common_machine *runtime,
     common_machine_state expected)
 {
-    DWORD deadline = GetTickCount() + 5000u;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + 5000u;
     do {
         if (common_machine_state_get(runtime) == expected) return 1;
-        Sleep(10u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(10u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
 }
 
@@ -70,7 +70,7 @@ int main(void)
     softpc_machine_fixture fixture = { 0 };
     common_machine *runtime;
     common_machine_frame *frame;
-    uint32_t first_run;
+    lib_u32 first_run;
     runtime_completion_probe completion_probe = { 0 };
 
     options.floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY;
@@ -128,11 +128,11 @@ int main(void)
     assert(common_machine_start(runtime));
     first_run = common_machine_run_generation(runtime);
     assert(first_run != 0u);
-    Sleep(150u);
-    frame = (common_machine_frame *)calloc(1u, sizeof(*frame));
+    softpc_test_sleep_milliseconds(150u);
+    frame = (common_machine_frame *)lib_allocate_zero(1u, sizeof(*frame));
     assert(frame != NULL);
     {
-        DWORD deadline = GetTickCount() + 5000u;
+        lib_u64 deadline = softpc_test_clock_milliseconds() + 5000u;
         int cursor_seen = 0;
         do {
             /* A copied presentation frame is deliberately non-blocking.
@@ -149,8 +149,8 @@ int main(void)
                 cursor_seen = 1;
                 break;
             }
-            Sleep(10u);
-        } while ((LONG)(GetTickCount() - deadline) < 0);
+            softpc_test_sleep_milliseconds(10u);
+        } while (softpc_test_clock_milliseconds() < deadline);
         /* Original nt_graph's Console cursor endpoint must reach the copied
            frame.  Both outer frontends consume this value without reading a
            controller register or a guest-memory pointer. */
@@ -163,12 +163,12 @@ int main(void)
     assert(common_machine_published_frame_run_generation(runtime) == first_run);
     assert(frame->sequence != 0u);
     {
-        uint32_t stable_sequence = frame->sequence;
+        lib_u32 stable_sequence = frame->sequence;
         LONG stable_state_facts;
         /* An unchanged text screen is not an executor heartbeat.  Repeated
            publication would flood the app control FIFO and starve Console
            raw input behind redundant frame completions. */
-        Sleep(150u);
+        softpc_test_sleep_milliseconds(150u);
         assert(common_machine_copy_published_frame(runtime, frame,
             common_machine_run_generation(runtime)));
         assert(frame->sequence == stable_sequence);
@@ -176,7 +176,7 @@ int main(void)
            additional lifecycle completions while the machine stays running. */
         stable_state_facts = InterlockedCompareExchange(
             &completion_probe.state_facts, 0, 0);
-        Sleep(150u);
+        softpc_test_sleep_milliseconds(150u);
         assert(InterlockedCompareExchange(&completion_probe.state_facts, 0, 0) ==
             stable_state_facts);
     }
@@ -207,7 +207,7 @@ int main(void)
     assert(common_machine_stop(runtime));
     assert(runtime_wait(runtime, COMMON_MACHINE_STOPPED));
     assert(common_machine_set_removable_media(runtime, NULL, LIB_STORAGE_MEDIUM_OVERLAY));
-    free(frame);
+    lib_release(frame);
     softpc_machine_fixture_destroy(&fixture);
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));

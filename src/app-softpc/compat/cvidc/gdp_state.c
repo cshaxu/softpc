@@ -1,10 +1,8 @@
+#include "lib/types/types_interface.h"
 #include "insignia.h"
 #include "evid_c.h"
 #include "gdp_state.h"
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
 
 extern IHP Gdp;
 
@@ -17,18 +15,18 @@ extern IHP Gdp;
 
 typedef struct softpc_gdp_slot_record {
     unsigned int original_offset;
-    size_t native_width;
+    lib_size native_width;
     void *storage;
 } softpc_gdp_slot_record;
 
 typedef struct softpc_gdp_state {
-    uint32_t magic;
+    lib_u32 magic;
     unsigned int count;
     unsigned int capacity;
     softpc_gdp_slot_record *slots;
 } softpc_gdp_state;
 
-static size_t softpc_gdp_vga_native_offset(unsigned int original_offset)
+static lib_size softpc_gdp_vga_native_offset(unsigned int original_offset)
 {
     switch (original_offset) {
     case 1280u: return offsetof(struct VGAGLOBALSETTINGS, latches);
@@ -76,13 +74,13 @@ static size_t softpc_gdp_vga_native_offset(unsigned int original_offset)
     case 1430u: return offsetof(struct VGAGLOBALSETTINGS, wrmode);
     case 1431u: return offsetof(struct VGAGLOBALSETTINGS, chain);
     case 1432u: return offsetof(struct VGAGLOBALSETTINGS, wrstate);
-    default: return (size_t)-1;
+    default: return (lib_size)-1;
     }
 }
 
 void *softpc_gdp_create(void)
 {
-    softpc_gdp_state *state = (softpc_gdp_state *)calloc(1u, sizeof(*state));
+    softpc_gdp_state *state = (softpc_gdp_state *)lib_allocate_zero(1u, sizeof(*state));
 
     if (state != NULL) state->magic = SOFTPC_GDP_MAGIC;
     return state;
@@ -94,10 +92,10 @@ void softpc_gdp_destroy(void *value)
     unsigned int index;
 
     if (state == NULL || state->magic != SOFTPC_GDP_MAGIC) return;
-    for (index = 0u; index < state->count; ++index) free(state->slots[index].storage);
-    free(state->slots);
+    for (index = 0u; index < state->count; ++index) lib_release(state->slots[index].storage);
+    lib_release(state->slots);
     state->magic = 0u;
-    free(state);
+    lib_release(state);
 }
 
 void softpc_gdp_destroy_global(void)
@@ -107,7 +105,7 @@ void softpc_gdp_destroy_global(void)
 }
 
 void *softpc_gdp_slot(const void *value, unsigned int original_offset,
-    size_t native_width)
+    lib_size native_width)
 {
     softpc_gdp_state *state = (softpc_gdp_state *)value;
     softpc_gdp_slot_record *slot;
@@ -123,7 +121,7 @@ void *softpc_gdp_slot(const void *value, unsigned int original_offset,
     if (state->count == state->capacity) {
         unsigned int new_capacity = state->capacity == 0u
             ? SOFTPC_GDP_INITIAL_SLOT_CAPACITY : state->capacity * 2u;
-        softpc_gdp_slot_record *new_slots = (softpc_gdp_slot_record *)realloc(
+        softpc_gdp_slot_record *new_slots = (softpc_gdp_slot_record *)lib_reallocate(
             state->slots, new_capacity * sizeof(*new_slots));
 
         if (new_slots == NULL) return NULL;
@@ -131,7 +129,7 @@ void *softpc_gdp_slot(const void *value, unsigned int original_offset,
         state->capacity = new_capacity;
     }
     slot = &state->slots[state->count];
-    slot->storage = calloc(1u, native_width);
+    slot->storage = lib_allocate_zero(1u, native_width);
     if (slot->storage == NULL) return NULL;
     slot->original_offset = original_offset;
     slot->native_width = native_width;
@@ -140,11 +138,11 @@ void *softpc_gdp_slot(const void *value, unsigned int original_offset,
 }
 
 void *softpc_gdp_rule_slot(void *state, unsigned int original_offset,
-    size_t native_width)
+    lib_size native_width)
 {
-    size_t member_offset = softpc_gdp_vga_native_offset(original_offset);
+    lib_size member_offset = softpc_gdp_vga_native_offset(original_offset);
 
-    if (member_offset != (size_t)-1) {
+    if (member_offset != (lib_size)-1) {
         void *vga = softpc_gdp_slot(state, 1280u,
             sizeof(struct VGAGLOBALSETTINGS));
         if (vga == NULL) return NULL;
@@ -153,8 +151,8 @@ void *softpc_gdp_rule_slot(void *state, unsigned int original_offset,
     return softpc_gdp_slot(state, original_offset, native_width);
 }
 
-void *softpc_gdp_rule_address(void *state, uintptr_t original_address,
-    size_t native_width)
+void *softpc_gdp_rule_address(void *state, lib_uptr original_address,
+    lib_size native_width)
 {
     /* All source-derived GDP offsets fit below 4 KiB.  Generated C-VID rules
      * also carry native framebuffer and callback pointers in registers, which

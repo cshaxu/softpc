@@ -1,9 +1,9 @@
+#include "lib/types/types_interface.h"
 #include "command.h"
 #include "lib/storage/file_interface.h"
 
 #include <ctype.h>
 #include <stdio.h>
-#include <string.h>
 
 static const char HELP_COMMANDS[] =
     "Insignia SoftPC\r\n"
@@ -29,9 +29,9 @@ static const char HELP_HOTKEYS[] =
     "  Ctrl+Alt+T     send Alt+Tab to the guest\r\n"
     "  Ctrl+Alt+M     release captured mouse\r\n";
 
-static void clear(app_command_effect *e) { memset(e, 0, sizeof(*e)); }
+static void clear(app_command_effect *e) { lib_memory_set(e, 0, sizeof(*e)); }
 static void text(app_command_effect *e, const char *s) { (void)snprintf(e->text, sizeof(e->text), "%s", s); }
-static void message(char *out, size_t capacity, const char *value)
+static void message(char *out, lib_size capacity, const char *value)
 {
     (void)snprintf(out, capacity, "%s\r\n\r\n", value);
 }
@@ -58,7 +58,7 @@ static char *trim(char *s)
     char *e;
     while (*s && isspace((unsigned char)*s))
         ++s;
-    e = s + strlen(s);
+    e = s + lib_text_length(s);
     while (e != s && isspace((unsigned char)e[-1]))
         --e;
     *e = 0;
@@ -74,11 +74,11 @@ static void lower(char *s)
 }
 static int floppy_mode(const char *text, lib_storage_medium_mode *out)
 {
-    if (!strcmp(text, "readonly"))
+    if (!lib_text_compare(text, "readonly"))
         *out = LIB_STORAGE_MEDIUM_READONLY;
-    else if (!strcmp(text, "direct"))
+    else if (!lib_text_compare(text, "direct"))
         *out = LIB_STORAGE_MEDIUM_DIRECT;
-    else if (!strcmp(text, "overlay"))
+    else if (!lib_text_compare(text, "overlay"))
         *out = LIB_STORAGE_MEDIUM_OVERLAY;
     else
         return 0;
@@ -102,7 +102,7 @@ static void lifecycle(app_command_session *s, app_monitor_state state,
         reject(s, e, "Machine state transition is in progress.");
         return;
     }
-    if (!strcmp(c, "start"))
+    if (!lib_text_compare(c, "start"))
     {
         if (state == APP_MONITOR_STOPPED)
         {
@@ -111,25 +111,25 @@ static void lifecycle(app_command_session *s, app_monitor_state state,
         else
             reject(s, e, state == APP_MONITOR_PAUSED ? "Machine is paused; use resume, reset, or stop." : "Machine is already running; use pause, reset, or stop.");
     }
-    else if (!strcmp(c, "pause"))
+    else if (!lib_text_compare(c, "pause"))
     {
         if (state == APP_MONITOR_RUNNING)
             accept(s, APP_LIFECYCLE_REQUEST_PAUSE);
         else
             reject(s, e, state == APP_MONITOR_PAUSED ? "Machine is paused; use resume, reset, or stop." : "Machine is stopped; use start or reset.");
     }
-    else if (!strcmp(c, "resume"))
+    else if (!lib_text_compare(c, "resume"))
     {
         if (state == APP_MONITOR_PAUSED)
             accept(s, APP_LIFECYCLE_REQUEST_RESUME);
         else
             reject(s, e, state == APP_MONITOR_RUNNING ? "Machine is already running; use pause, reset, or stop." : "Machine is stopped; use start or reset.");
     }
-    else if (!strcmp(c, "reset"))
+    else if (!lib_text_compare(c, "reset"))
     {
         accept(s, APP_LIFECYCLE_REQUEST_RESET);
     }
-    else if (!strcmp(c, "stop"))
+    else if (!lib_text_compare(c, "stop"))
     {
         if (state == APP_MONITOR_RUNNING || state == APP_MONITOR_PAUSED)
         {
@@ -150,12 +150,12 @@ static void snapshot(app_command_session *s, app_monitor_state state,
         reject(s, effect, "Machine state transition is in progress.");
         return;
     }
-    if (*path == '\0' || strlen(path) >= sizeof(effect->path))
+    if (*path == '\0' || lib_text_length(path) >= sizeof(effect->path))
     {
-        reject(s, effect, !strcmp(command, "save") ? "Usage: save <file>" : "Usage: load <file>");
+        reject(s, effect, !lib_text_compare(command, "save") ? "Usage: save <file>" : "Usage: load <file>");
         return;
     }
-    if (!strcmp(command, "save"))
+    if (!lib_text_compare(command, "save"))
     {
         if (state != APP_MONITOR_RUNNING && state != APP_MONITOR_PAUSED)
         {
@@ -173,12 +173,12 @@ static void snapshot(app_command_session *s, app_monitor_state state,
         }
         effect->action = APP_COMMAND_ACTION_LOAD_STATE;
     }
-    memcpy(effect->path, path, strlen(path) + 1u);
+    lib_memory_copy(effect->path, path, lib_text_length(path) + 1u);
 }
 
 void app_command_session_initialize(app_command_session *s, common_session_display display)
 {
-    memset(s, 0, sizeof(*s));
+    lib_memory_set(s, 0, sizeof(*s));
     s->display = display;
 }
 const char *app_command_hotkey_help(void) { return HELP_HOTKEYS; }
@@ -197,14 +197,14 @@ void app_command_session_submit_line(app_command_session *s, app_monitor_state s
                                      const char *line, app_command_effect *e)
 {
     char b[APP_COMMAND_TEXT_CAPACITY], *c, *a, *p, *mode;
-    size_t n;
+    lib_size n;
     clear(e);
-    if (!line || (n = strlen(line)) >= sizeof(b))
+    if (!line || (n = lib_text_length(line)) >= sizeof(b))
     {
         reject(s, e, line ? "Command is too long." : "Unknown command.");
         return;
     }
-    memcpy(b, line, n + 1);
+    lib_memory_copy(b, line, n + 1);
     c = trim(b);
     a = c;
     while (*a && !isspace((unsigned char)*a))
@@ -218,18 +218,18 @@ void app_command_session_submit_line(app_command_session *s, app_monitor_state s
         prompt(s);
         return;
     }
-    if (!strcmp(c, "help"))
+    if (!lib_text_compare(c, "help"))
     {
         help(e);
         prompt(s);
         return;
     }
-    if (!strcmp(c, "exit"))
+    if (!lib_text_compare(c, "exit"))
     {
         e->exit_requested = 1;
         return;
     }
-    if (!strcmp(c, "debug") && !*a)
+    if (!lib_text_compare(c, "debug") && !*a)
     {
         e->action = APP_COMMAND_ACTION_DEBUG;
         prompt(s);
@@ -242,12 +242,12 @@ void app_command_session_submit_line(app_command_session *s, app_monitor_state s
         reject(s, e, "Machine has failed; exit and restart SoftPC.");
         return;
     }
-    if (!strcmp(c, "save") || !strcmp(c, "load"))
+    if (!lib_text_compare(c, "save") || !lib_text_compare(c, "load"))
     {
         snapshot(s, state, c, a, e);
         return;
     }
-    if (strcmp(c, "floppy"))
+    if (lib_text_compare(c, "floppy"))
     {
         lifecycle(s, state, c, e);
         return;
@@ -259,12 +259,12 @@ void app_command_session_submit_line(app_command_session *s, app_monitor_state s
         *p++ = 0;
     p = trim(p);
     lower(a);
-    if (!strcmp(a, "eject") && !*p)
+    if (!lib_text_compare(a, "eject") && !*p)
     {
         e->action = APP_COMMAND_ACTION_EJECT_FLOPPY;
         e->media_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     }
-    else if (!strcmp(a, "insert") && *p)
+    else if (!lib_text_compare(a, "insert") && *p)
     {
         mode = p;
         while (*p && !isspace((unsigned char)*p))
@@ -273,10 +273,10 @@ void app_command_session_submit_line(app_command_session *s, app_monitor_state s
             *p++ = '\0';
         p = trim(p);
         lower(mode);
-        if (*p && strlen(p) < sizeof(e->path) && floppy_mode(mode, &e->media_mode))
+        if (*p && lib_text_length(p) < sizeof(e->path) && floppy_mode(mode, &e->media_mode))
         {
             e->action = APP_COMMAND_ACTION_INSERT_FLOPPY;
-            memcpy(e->path, p, strlen(p) + 1u);
+            lib_memory_copy(e->path, p, lib_text_length(p) + 1u);
         }
         else
             reject(s, e, "Usage: floppy insert <readonly|direct|overlay> <image> | eject");
@@ -742,7 +742,7 @@ lib_status app_command_initialize(app_command_context *command,
 {
     if (command == NULL || machine == NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
-    memset(command, 0, sizeof(*command));
+    lib_memory_set(command, 0, sizeof(*command));
     command->machine = machine;
     app_command_session_initialize(&command->session, display);
     return x86_debug_create(&command->debug);

@@ -1,10 +1,9 @@
+#include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 static void softpc_machine_smoke_note(const char *name)
 {
@@ -52,7 +51,7 @@ static void write_int16_boot_image(const char *path)
         0x30u, 0xe4u, 0xcdu, 0x16u, 0x88u, 0xe0u, 0xa2u,
         0x00u, 0x05u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -70,7 +69,7 @@ static void write_int1d_boot_image(const char *path)
     unsigned char program[] = {
         0xcdu, 0x1du, 0xc6u, 0x06u, 0x00u, 0x05u, 0x1du, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -86,7 +85,7 @@ static void write_int75_boot_image(const char *path)
     unsigned char program[] = {
         0xcdu, 0x75u, 0xc6u, 0x06u, 0x00u, 0x05u, 0x75u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -102,7 +101,7 @@ static void write_int15_memory_boot_image(const char *path)
     unsigned char program[] = {
         0xb4u, 0x88u, 0xcdu, 0x15u, 0xa3u, 0x00u, 0x05u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -141,9 +140,9 @@ static void write_int15_block_move_boot_image(const char *path)
     unsigned char target_descriptor[] = {
         0xffu, 0xffu, 0x00u, 0x00u, 0x10u, 0x92u, 0x00u, 0x00u
     };
-    memcpy(sector, program, sizeof(program));
-    memcpy(sector + 0x100u, source_descriptor, sizeof(source_descriptor));
-    memcpy(sector + 0x108u, target_descriptor, sizeof(target_descriptor));
+    lib_memory_copy(sector, program, sizeof(program));
+    lib_memory_copy(sector + 0x100u, source_descriptor, sizeof(source_descriptor));
+    lib_memory_copy(sector + 0x108u, target_descriptor, sizeof(target_descriptor));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -171,7 +170,7 @@ static void write_a20_boot_image(const char *path)
         0xb0u, 0x33u, 0x26u, 0xc6u, 0x06u, 0x10u, 0x05u, 0x33u,
         0xa0u, 0x00u, 0x05u, 0xa2u, 0x04u, 0x05u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -188,7 +187,7 @@ static void write_int16_ascii_boot_image(const char *path)
         0xc6u, 0x06u, 0x01u, 0x05u, 0x55u, 0xebu, 0xfeu,
         0x30u, 0xe4u, 0xcdu, 0x16u, 0xa2u, 0x00u, 0x05u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -206,7 +205,7 @@ static void write_irq1_int16_boot_image(const char *path)
         0xfbu, 0x90u, 0x30u, 0xe4u, 0xcdu, 0x16u, 0x88u, 0xe0u,
         0xa2u, 0x00u, 0x05u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -224,7 +223,7 @@ static void write_int16_check_boot_image(const char *path)
         0xb4u, 0x01u, 0xcdu, 0x16u, 0x30u, 0xe4u, 0xcdu, 0x16u,
         0x88u, 0xe0u, 0xa2u, 0x00u, 0x05u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -242,7 +241,7 @@ static void write_timer_boot_image(const char *path)
         0xb0u, 0x12u, 0xe6u, 0x40u, 0xe4u, 0x40u, 0xa2u, 0x00u,
         0x05u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -260,7 +259,7 @@ static void write_cmos_boot_image(const char *path)
         0x00u, 0x05u, 0xb0u, 0x14u, 0xe6u, 0x70u, 0xe4u,
         0x71u, 0xa2u, 0x01u, 0x05u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -277,7 +276,7 @@ static void write_text_boot_image(const char *path)
         0xb8u, 0x00u, 0xb8u, 0x8eu, 0xc0u, 0x26u, 0xc7u, 0x06u,
         0x00u, 0x00u, 0x56u, 0x07u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -298,7 +297,7 @@ static void write_int10_boot_image(const char *path)
         0xcdu, 0x10u,
         0xb4u, 0x0eu, 0xb0u, 0x56u, 0xcdu, 0x10u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -317,7 +316,7 @@ static void write_int10_mode_cursor_boot_image(const char *path)
         0xb4u, 0x03u, 0xcdu, 0x10u, 0x88u, 0xf0u, 0xa2u, 0x02u,
         0x05u, 0x88u, 0xd0u, 0xa2u, 0x03u, 0x05u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -333,7 +332,7 @@ static void write_int12_boot_image(const char *path)
     unsigned char program[] = {
         0xcdu, 0x12u, 0xa3u, 0x00u, 0x05u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -349,7 +348,7 @@ static void write_int11_boot_image(const char *path)
     unsigned char program[] = {
         0xcdu, 0x11u, 0xa3u, 0x00u, 0x05u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -368,7 +367,7 @@ static void write_int1a_boot_image(const char *path)
         0xcdu, 0x1au, 0x89u, 0x16u, 0x00u, 0x05u, 0x89u, 0x0eu,
         0x02u, 0x05u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -388,7 +387,7 @@ static void write_int1a_tick_boot_image(const char *path)
         0x40u, 0xfbu, 0xb4u, 0x00u, 0xcdu, 0x1au, 0x89u, 0x16u,
         0x00u, 0x05u, 0xebu, 0xf6u
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -407,7 +406,7 @@ static void write_hdd_pio_boot_image(const char *path)
         0x42u, 0xb0u, 0x20u, 0xeeu, 0xbau, 0xf0u, 0x01u,
         0xedu, 0xa3u, 0x00u, 0x05u, 0xebu, 0xfeu
     };
-    memcpy(image, program, sizeof(program));
+    lib_memory_copy(image, program, sizeof(program));
     image[510] = 0x55u; image[511] = 0xaau;
     image[512] = 0x5au;
     file = fopen(path, "wb");
@@ -433,7 +432,7 @@ static void write_int13_boot_image(const char *path, unsigned char drive,
     program[11] = drive;
     lba = (unsigned int)head * (drive < 0x80u ? 18u : 63u) +
         (unsigned int)sector - 1u;
-    memcpy(image, program, sizeof(program));
+    lib_memory_copy(image, program, sizeof(program));
     image[510] = 0x55u; image[511] = 0xaau;
     image[lba * 512u] = marker;
     bytes = (lba + 1u) * 512u;
@@ -458,7 +457,7 @@ static void write_hdd_pio_write_boot_image(const char *path)
         0xbeu, 0x00u, 0x7du, 0xb9u, 0x00u, 0x01u, 0xfcu, 0xf3u,
         0x6fu, 0xebu, 0xfeu
     };
-    memcpy(image, program, sizeof(program));
+    lib_memory_copy(image, program, sizeof(program));
     image[0x100u] = 0x5au;
     image[0x101u] = 0xa5u;
     image[510] = 0x55u; image[511] = 0xaau;
@@ -479,7 +478,7 @@ static void write_hdd_identify_boot_image(const char *path)
         0xedu, 0xe2u, 0xfdu, 0xedu, 0xa3u, 0x02u, 0x05u, 0xebu,
         0xfeu
     };
-    memcpy(image, program, sizeof(program));
+    lib_memory_copy(image, program, sizeof(program));
     image[510] = 0x55u; image[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -500,7 +499,7 @@ static void write_int13_multi_boot_image(const char *path, unsigned char drive,
         0x00u, 0x08u, 0xa2u, 0x01u, 0x05u, 0xebu, 0xfeu
     };
     program[11] = drive;
-    memcpy(image, program, sizeof(program));
+    lib_memory_copy(image, program, sizeof(program));
     image[510] = 0x55u; image[511] = 0xaau;
     image[1u * 512u] = first_marker;
     image[2u * 512u] = second_marker;
@@ -512,7 +511,7 @@ static void write_int13_multi_boot_image(const char *path, unsigned char drive,
 
 static void write_int13_360k_boot_image(const char *path)
 {
-    unsigned char *image = calloc(1u, 368640u);
+    unsigned char *image = lib_allocate_zero(1u, 368640u);
     FILE *file;
     /* Read CHS 0/1/1.  On 360 KiB media this is LBA 9, not LBA 18. */
     unsigned char program[] = {
@@ -521,14 +520,14 @@ static void write_int13_360k_boot_image(const char *path)
         0x13u, 0xa0u, 0x00u, 0x06u, 0xa2u, 0x00u, 0x05u, 0xebu, 0xfeu
     };
     assert(image != NULL);
-    memcpy(image, program, sizeof(program));
+    lib_memory_copy(image, program, sizeof(program));
     image[510] = 0x55u; image[511] = 0xaau;
     image[9u * 512u] = 0x74u;
     file = fopen(path, "wb");
     assert(file != NULL);
     assert(fwrite(image, 1u, 368640u, file) == 368640u);
     assert(fclose(file) == 0);
-    free(image);
+    lib_release(image);
 }
 
 static void write_int13_bpb_hdd_boot_image(const char *path)
@@ -541,7 +540,7 @@ static void write_int13_bpb_hdd_boot_image(const char *path)
         0xb6u, 0x01u, 0xb2u, 0x80u, 0xbbu, 0x00u, 0x06u, 0xcdu,
         0x13u, 0xa0u, 0x00u, 0x06u, 0xa2u, 0x00u, 0x05u, 0xebu, 0xfeu
     };
-    memcpy(image, program, sizeof(program));
+    lib_memory_copy(image, program, sizeof(program));
     image[446u + 4u] = 0x06u;
     image[446u + 8u] = 1u;
     image[446u + 12u] = 63u;
@@ -558,7 +557,7 @@ static void write_int13_bpb_hdd_boot_image(const char *path)
 static void write_int13_high_segment_hdd_boot_image(const char *path)
 {
     enum { target_lba = 308, target_offset = 0x1f9 };
-    unsigned char *image = calloc(1u, (target_lba + 1u) * 512u);
+    unsigned char *image = lib_allocate_zero(1u, (target_lba + 1u) * 512u);
     FILE *file;
     /* Read a high LBA to 0070:125a and expose the byte at +01f9h. */
     unsigned char program[] = {
@@ -569,7 +568,7 @@ static void write_int13_high_segment_hdd_boot_image(const char *path)
         0x00u, 0x05u, 0xebu, 0xfeu
     };
     assert(image != NULL);
-    memcpy(image, program, sizeof(program));
+    lib_memory_copy(image, program, sizeof(program));
     image[510u] = 0x55u; image[511u] = 0xaau;
     image[target_lba * 512u + target_offset] = 0x5au;
     file = fopen(path, "wb");
@@ -577,7 +576,7 @@ static void write_int13_high_segment_hdd_boot_image(const char *path)
     assert(fwrite(image, 1u, (target_lba + 1u) * 512u, file) ==
         (target_lba + 1u) * 512u);
     assert(fclose(file) == 0);
-    free(image);
+    lib_release(image);
 }
 
 static void write_int13_reset_boot_image(const char *path)
@@ -589,7 +588,7 @@ static void write_int13_reset_boot_image(const char *path)
         0x30u, 0xe4u, 0xcdu, 0x13u, 0xc6u, 0x06u, 0x00u,
         0x05u, 0x76u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -609,7 +608,7 @@ static void write_int13_write_boot_image(const char *path)
         0x00u, 0xb2u, 0x00u, 0xbbu, 0x00u, 0x06u, 0xcdu,
         0x13u, 0xebu, 0xfeu
     };
-    memcpy(image, program, sizeof(program));
+    lib_memory_copy(image, program, sizeof(program));
     image[510] = 0x55u; image[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -626,7 +625,7 @@ static void write_int13_parameters_boot_image(const char *path)
         0xb4u, 0x08u, 0xcdu, 0x13u, 0x88u, 0xc8u, 0xa2u, 0x00u,
         0x05u, 0x88u, 0xf0u, 0xa2u, 0x01u, 0x05u, 0xebu, 0xfeu
     };
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);
@@ -662,7 +661,7 @@ static void await_boot_probe(softpc_machine *machine)
 }
 
 static void run_boot_image(const char *path, int floppy, unsigned char expected,
-    uint64_t instruction_budget)
+    lib_u64 instruction_budget)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char marker = 0;
@@ -1028,7 +1027,7 @@ static void run_int1a_boot_image(const char *path)
         sizeof(bda_ticks)) == SOFTPC_MACHINE_OK);
     /* The original time_of_day BOP derives the response from the host clock
        and refreshes the BDA; it does not return the test's earlier 1234h. */
-    assert(memcmp(ticks, bda_ticks, sizeof(ticks)) == 0);
+    assert(lib_memory_compare(ticks, bda_ticks, sizeof(ticks)) == 0);
     softpc_machine_destroy(machine);
 }
 

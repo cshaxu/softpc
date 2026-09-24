@@ -1,9 +1,8 @@
+#include "lib/types/types_interface.h"
 #include "insignia.h"
 #include "cfpu_def.h"
 
 #include <assert.h>
-#include <stddef.h>
-#include <string.h>
 
 int main(void)
 {
@@ -28,17 +27,17 @@ int main(void)
     for (i = 0; i < sizeof(singles) / sizeof(singles[0]); ++i) {
         FP32 fp32;
         FP64 fp64;
-        memcpy(&fp32, &singles[i], sizeof(fp32));
-        memcpy(&fp64, &doubles[i], sizeof(fp64));
+        lib_memory_copy(&fp32, &singles[i], sizeof(fp32));
+        lib_memory_copy(&fp64, &doubles[i], sizeof(fp64));
         assert(fp32.sign == signs[i] && fp32.exp == single_exponents[i]);
         assert(fp32.mant == single_mantissas[i]);
         assert(fp64.hiword.sign == signs[i] && fp64.hiword.exp == double_exponents[i]);
         assert(fp64.hiword.mant_hi == double_mantissas[i] && fp64.mant_lo == 0);
     }
-    memcpy(&fp80, extended, sizeof(extended));
+    lib_memory_copy(&fp80, extended, sizeof(extended));
     assert(fp80.sign_exp.sign == 1 && fp80.sign_exp.exp == 16383);
     assert(fp80.mant_hi == 0xc0000000u && fp80.mant_lo == 0);
-    memcpy(&i64, integer, sizeof(i64));
+    lib_memory_copy(&i64, integer, sizeof(i64));
     assert(i64.low_word == 0x12345678u && i64.high_word == -2);
     return 0;
 }

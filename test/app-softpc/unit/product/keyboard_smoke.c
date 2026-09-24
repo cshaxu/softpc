@@ -1,6 +1,6 @@
+#include "lib/types/types_interface.h"
 #include "product/keyboard.h"
 #include <assert.h>
-#include <string.h>
 
 /* Fake only the machine input boundary; use the real App dispatcher/matcher. */
 struct common_machine {
@@ -61,7 +61,7 @@ int main(void)
         if (registry.entries[i].key == 'T') {
             assert(registry.entries[i].modifiers ==
                 (KVM_HOTKEY_MODIFIER_CONTROL | KVM_HOTKEY_MODIFIER_ALT));
-            assert(!strcmp(registry.entries[i].identifier, "send-alt-tab"));
+            assert(!lib_text_compare(registry.entries[i].identifier, "send-alt-tab"));
             ++found;
         }
     }

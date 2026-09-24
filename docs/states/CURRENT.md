@@ -2,14 +2,12 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T83.
-
-T83 S3 delivered the selected C-VID declaration boundary and the matching
-`cga.c` BIOS channel-2 pointer definitions. [S3 closure audit](../history/M9-T83-S3-cvid-closure-audit.md)
-records the executor self-review. T83 remains open pending owner acceptance.
+No implementation subtask is active. Open task awaiting owner: T83.
 
 ## Current Technical Baseline
+
+- The completed T83 App Types/Base convergence covers 109 tracked non-mirror App files; 54 direct Types consumers migrated and four mirror-shared Compat ABI bridge headers remain. Both Release builds and their full CTest runs pass. EXE hashes and the full ledger are in [the S4 audit](../history/M9-T83-S4-lib-types-base-closure-audit.md).
+
 
 - T82 closes after owner acceptance of S2. The six shared directories have
   220 paths: 214 content paths are byte-identical to NXVM's current worktree;

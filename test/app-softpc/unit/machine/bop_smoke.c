@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "cleanup.h"
 
@@ -192,8 +193,8 @@ int main(void)
             timer_low, sizeof(timer_low)) == SOFTPC_MACHINE_OK);
         assert(softpc_machine_read_physical(machine, SOFTPC_TIMER_HIGH_BDA,
             timer_high, sizeof(timer_high)) == SOFTPC_MACHINE_OK);
-        assert(memcmp(timer_low, expected_low, sizeof(timer_low)) == 0);
-        assert(memcmp(timer_high, expected_high, sizeof(timer_high)) == 0);
+        assert(lib_memory_compare(timer_low, expected_low, sizeof(timer_low)) == 0);
+        assert(lib_memory_compare(timer_high, expected_high, sizeof(timer_high)) == 0);
     }
 
     /* BOP 18 is original ROM BASIC fallback firmware, unlike product

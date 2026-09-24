@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 #include "snapshot_stream.h"
 
 lib_status softpc_snapshot_stream_write_bytes(softpc_snapshot_bytes_write write,
@@ -15,7 +16,7 @@ lib_status softpc_snapshot_stream_read_bytes(softpc_snapshot_bytes_read read,
 }
 
 lib_status softpc_snapshot_stream_write_u16(softpc_snapshot_bytes_write write,
-    void *context, uint16_t value)
+    void *context, lib_u16 value)
 {
     const lib_u8 bytes[2] = { (lib_u8)value, (lib_u8)(value >> 8u) };
     return softpc_snapshot_stream_write_bytes(write, context, bytes,
@@ -23,7 +24,7 @@ lib_status softpc_snapshot_stream_write_u16(softpc_snapshot_bytes_write write,
 }
 
 lib_status softpc_snapshot_stream_write_u32(softpc_snapshot_bytes_write write,
-    void *context, uint32_t value)
+    void *context, lib_u32 value)
 {
     const lib_u8 bytes[4] = { (lib_u8)value, (lib_u8)(value >> 8u),
         (lib_u8)(value >> 16u), (lib_u8)(value >> 24u) };
@@ -32,7 +33,7 @@ lib_status softpc_snapshot_stream_write_u32(softpc_snapshot_bytes_write write,
 }
 
 lib_status softpc_snapshot_stream_write_u64(softpc_snapshot_bytes_write write,
-    void *context, uint64_t value)
+    void *context, lib_u64 value)
 {
     lib_u8 bytes[8];
     unsigned index;
@@ -44,7 +45,7 @@ lib_status softpc_snapshot_stream_write_u64(softpc_snapshot_bytes_write write,
 }
 
 lib_status softpc_snapshot_stream_read_u16(softpc_snapshot_bytes_read read,
-    void *context, uint16_t *out_value)
+    void *context, lib_u16 *out_value)
 {
     lib_u8 bytes[2];
     lib_status status;
@@ -53,12 +54,12 @@ lib_status softpc_snapshot_stream_read_u16(softpc_snapshot_bytes_read read,
     status = softpc_snapshot_stream_read_bytes(read, context, bytes,
         sizeof(bytes));
     if (status == LIB_STATUS_OK)
-        *out_value = (uint16_t)bytes[0] | ((uint16_t)bytes[1] << 8u);
+        *out_value = (lib_u16)bytes[0] | ((lib_u16)bytes[1] << 8u);
     return status;
 }
 
 lib_status softpc_snapshot_stream_read_u32(softpc_snapshot_bytes_read read,
-    void *context, uint32_t *out_value)
+    void *context, lib_u32 *out_value)
 {
     lib_u8 bytes[4];
     lib_status status;
@@ -67,16 +68,16 @@ lib_status softpc_snapshot_stream_read_u32(softpc_snapshot_bytes_read read,
     status = softpc_snapshot_stream_read_bytes(read, context, bytes,
         sizeof(bytes));
     if (status == LIB_STATUS_OK)
-        *out_value = (uint32_t)bytes[0] | ((uint32_t)bytes[1] << 8u) |
-            ((uint32_t)bytes[2] << 16u) | ((uint32_t)bytes[3] << 24u);
+        *out_value = (lib_u32)bytes[0] | ((lib_u32)bytes[1] << 8u) |
+            ((lib_u32)bytes[2] << 16u) | ((lib_u32)bytes[3] << 24u);
     return status;
 }
 
 lib_status softpc_snapshot_stream_read_u64(softpc_snapshot_bytes_read read,
-    void *context, uint64_t *out_value)
+    void *context, lib_u64 *out_value)
 {
     lib_u8 bytes[8];
-    uint64_t value = 0u;
+    lib_u64 value = 0u;
     lib_status status;
     unsigned index;
 
@@ -85,13 +86,13 @@ lib_status softpc_snapshot_stream_read_u64(softpc_snapshot_bytes_read read,
         sizeof(bytes));
     if (status != LIB_STATUS_OK) return status;
     for (index = 0u; index < sizeof(bytes); ++index)
-        value |= (uint64_t)bytes[index] << (index * 8u);
+        value |= (lib_u64)bytes[index] << (index * 8u);
     *out_value = value;
     return LIB_STATUS_OK;
 }
 
 lib_status softpc_snapshot_stream_write_u32_array(
-    softpc_snapshot_bytes_write write, void *context, const uint32_t *values,
+    softpc_snapshot_bytes_write write, void *context, const lib_u32 *values,
     lib_size count)
 {
     lib_size index;
@@ -105,7 +106,7 @@ lib_status softpc_snapshot_stream_write_u32_array(
 }
 
 lib_status softpc_snapshot_stream_read_u32_array(
-    softpc_snapshot_bytes_read read, void *context, uint32_t *values,
+    softpc_snapshot_bytes_read read, void *context, lib_u32 *values,
     lib_size count)
 {
     lib_size index;

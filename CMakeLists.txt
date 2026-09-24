@@ -545,7 +545,7 @@ set_tests_properties(softpc-command-provider-smoke PROPERTIES LABELS "unit" TIME
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 add_executable(softpc-x87-layout-smoke test/app-softpc/unit/machine/x87_layout_smoke.c)
 target_include_directories(softpc-x87-layout-smoke PRIVATE
-    src/app-softpc/softpc.new/host/inc src/app-softpc/softpc.new/base/inc)
+    src src/app-softpc/softpc.new/host/inc src/app-softpc/softpc.new/base/inc)
 target_compile_definitions(softpc-x87-layout-smoke PRIVATE LITTLEND SOFTPC_STANDALONE)
 add_test(NAME softpc-x87-layout-smoke COMMAND softpc-x87-layout-smoke)
 set_tests_properties(softpc-x87-layout-smoke PROPERTIES LABELS "unit")
@@ -571,6 +571,12 @@ set_tests_properties(softpc-keyboard-smoke PROPERTIES LABELS "unit")
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tools/checks/standalone_source_boundary.cmake")
+add_test(NAME softpc-lib-types-base-convergence
+    COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
+        "${CMAKE_SOURCE_DIR}/tools/checks/lib_types_base_convergence.cmake")
+add_test(NAME softpc-lib-types-base-convergence-negative
+    COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
+        "${CMAKE_SOURCE_DIR}/tools/checks/lib_types_base_convergence_negative.cmake")
 add_test(NAME softpc-kvm-naming
     COMMAND "${CMAKE_COMMAND}" "-DKVM_NAMING_ROOT=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/src/lib/verify_kvm_naming.cmake")
@@ -726,6 +732,8 @@ endforeach()
 set_tests_properties(softpc-documentation-governance PROPERTIES LABELS "governance")
 
 add_executable(softpc-package-smoke test/app-softpc/integration/package_smoke.c)
+target_include_directories(softpc-package-smoke PRIVATE src)
+target_link_libraries(softpc-package-smoke PRIVATE base)
 add_dependencies(softpc-package-smoke softpcvm)
 target_compile_definitions(softpc-package-smoke PRIVATE
     SOFTPC_PACKAGE_DIRECTORY="${SOFTPC_OUTPUT_DIRECTORY}"

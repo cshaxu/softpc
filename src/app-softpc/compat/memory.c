@@ -1,9 +1,9 @@
+#include "lib/types/types_interface.h"
 #include "insignia.h"
 #include "host_def.h"
 #include "host_gen.h"
 #include "platform.h"
 
-#include <stdlib.h>
 
 #include "cpu4.h"
 #include "sas.h"
@@ -16,14 +16,14 @@ static sys_addr softpc_ram_size;
 
 UTINY *host_sas_init(sys_addr size)
 {
-    softpc_ram = (UTINY *)calloc((size_t)size + NOWRAP_PROTECTION, 1u);
+    softpc_ram = (UTINY *)lib_allocate_zero((lib_size)size + NOWRAP_PROTECTION, 1u);
     softpc_ram_size = softpc_ram == NULL ? 0 : size;
     return softpc_ram;
 }
 
 UTINY *host_sas_term(void)
 {
-    free(softpc_ram);
+    lib_release(softpc_ram);
     softpc_ram = NULL;
     softpc_ram_size = 0;
     return NULL;

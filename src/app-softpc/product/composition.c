@@ -1,10 +1,10 @@
+#include "lib/types/types_interface.h"
 #include "composition.h"
 #include "keyboard.h"
 #include "machine/vm_interface.h"
 #include "common/ui/ui_interface.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 
 /* Adapt the provider's one context and reserve the same command admission
  * boundary for keyboard-derived requests. Product meaning stays in keyboard. */

@@ -1,9 +1,9 @@
+#include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>
-#include <string.h>
 
 #include "insignia.h"
 #include "host_def.h"
@@ -41,7 +41,7 @@ static void verify_rejected_interrupt(softpc_machine *machine)
     assert(c_getESP() == sp && c_getEFLAGS() == flags);
     assert(softpc_machine_read_physical(machine, stack, after,
         sizeof(after)) == SOFTPC_MACHINE_OK);
-    assert(memcmp(before, after, sizeof(before)) == 0);
+    assert(lib_memory_compare(before, after, sizeof(before)) == 0);
 
     /* A stale CPU request must also survive the actual instruction loop.
        The boot program is parked on JMP $, with interrupts enabled. */
@@ -80,8 +80,8 @@ int main(void)
     unsigned char marker = 0;
     unsigned char ticks[4] = { 0, 0, 0, 0 };
     half_word reset_command = 0xfeu;
-    uint16_t cs = 0u;
-    uint32_t eip = 0u;
+    lib_u16 cs = 0u;
+    lib_u32 eip = 0u;
     unsigned char program[] = {
         /* Re-enter the same boot sector through a nonzero CS. */
         0xeau, 0x10u, 0x00u, 0xc0u, 0x07u,
@@ -101,7 +101,7 @@ int main(void)
     softpc_machine *machine = NULL;
     FILE *file;
 
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     assert(file != NULL);

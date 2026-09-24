@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 /*
  * Standalone carrier for the original nt_lpt.c host state machine.
  *
@@ -11,9 +12,7 @@
 #include "host_def.h"
 #include "platform.h"
 
-#include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 
 #include "xt.h"
 #include "host_lpt.h"
@@ -53,11 +52,11 @@ int softpc_device_snapshot_capture_parallel_host(
             (lpt->active && lpt->buffer == NULL))
             return FALSE;
         if (lpt->bytes_in_buffer != 0)
-            memcpy(state->port[adapter].buffer, lpt->buffer,
-                (size_t)lpt->bytes_in_buffer);
+            lib_memory_copy(state->port[adapter].buffer, lpt->buffer,
+                (lib_size)lpt->bytes_in_buffer);
         if (lpt->bytes_in_buffer < KBUFFER_SIZE)
-            memset(state->port[adapter].buffer + lpt->bytes_in_buffer, 0,
-                KBUFFER_SIZE - (size_t)lpt->bytes_in_buffer);
+            lib_memory_set(state->port[adapter].buffer + lpt->bytes_in_buffer, 0,
+                KBUFFER_SIZE - (lib_size)lpt->bytes_in_buffer);
         state->port[adapter].port_status = lpt->port_status;
         state->port[adapter].inactive_counter = lpt->inactive_counter;
         state->port[adapter].inactive_trigger = lpt->inactive_trigger;
@@ -90,12 +89,12 @@ int softpc_device_snapshot_restore_parallel_host(
             return FALSE;
         buffer[adapter] = NULL;
         if (state->port[adapter].active) {
-            buffer[adapter] = (byte *)malloc(KBUFFER_SIZE);
+            buffer[adapter] = (byte *)lib_allocate(KBUFFER_SIZE);
             if (buffer[adapter] == NULL) {
-                while (--adapter >= 0) free(buffer[adapter]);
+                while (--adapter >= 0) lib_release(buffer[adapter]);
                 return FALSE;
             }
-            memcpy(buffer[adapter], state->port[adapter].buffer, KBUFFER_SIZE);
+            lib_memory_copy(buffer[adapter], state->port[adapter].buffer, KBUFFER_SIZE);
         }
     }
     for (adapter = 0; adapter < NUM_PARALLEL_PORTS; ++adapter) {
@@ -119,16 +118,16 @@ int softpc_device_snapshot_restore_parallel_host(
 int softpc_host_lpt_set_output_path(int adapter, const char *path)
 {
     HOST_LPT *lpt;
-    size_t length;
+    lib_size length;
     if (adapter < 0 || adapter >= NUM_PARALLEL_PORTS) return FALSE;
     lpt = &host_lpt[adapter];
     if (path == 0) {
         lpt->output_path[0] = '\0';
         return TRUE;
     }
-    length = strlen(path);
+    length = lib_text_length(path);
     if (length >= sizeof(lpt->output_path)) return FALSE;
-    memcpy(lpt->output_path, path, length + 1u);
+    lib_memory_copy(lpt->output_path, path, length + 1u);
     return TRUE;
 }
 
@@ -141,8 +140,8 @@ static boolean flush_buffer(int adapter)
     HOST_LPT *lpt = &host_lpt[adapter];
     if (!lpt->active) return FALSE;
     if (lpt->output != 0 && lpt->bytes_in_buffer != 0 &&
-        (fwrite(lpt->buffer, 1u, (size_t)lpt->bytes_in_buffer,
-            lpt->output) != (size_t)lpt->bytes_in_buffer ||
+        (fwrite(lpt->buffer, 1u, (lib_size)lpt->bytes_in_buffer,
+            lpt->output) != (lib_size)lpt->bytes_in_buffer ||
         fflush(lpt->output) != 0)) return FALSE;
     lpt->bytes_in_buffer = 0;
     return TRUE;
@@ -155,12 +154,12 @@ static SHORT host_lpt_open(int adapter, boolean direct_access)
     lpt = &host_lpt[adapter];
     if (direct_access && lpt->no_device_attached) return FALSE;
     if (lpt->active) return TRUE;
-    lpt->buffer = (byte *)malloc(KBUFFER_SIZE);
+    lpt->buffer = (byte *)lib_allocate(KBUFFER_SIZE);
     if (lpt->buffer == NULL) return FALSE;
     if (lpt->output_path[0] != '\0') {
         lpt->output = fopen(lpt->output_path, "ab");
         if (lpt->output == NULL) {
-            free(lpt->buffer);
+            lib_release(lpt->buffer);
             lpt->buffer = NULL;
             return FALSE;
         }
@@ -187,7 +186,7 @@ void host_lpt_close(int adapter)
         fclose(lpt->output);
         lpt->output = NULL;
     }
-    free(lpt->buffer);
+    lib_release(lpt->buffer);
     lpt->buffer = NULL;
     lpt->bytes_in_buffer = 0;
     lpt->active = FALSE;

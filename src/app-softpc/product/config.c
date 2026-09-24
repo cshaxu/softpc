@@ -1,17 +1,16 @@
+#include "lib/types/types_interface.h"
 #include "config.h"
 #include "lib/base/process_interface.h"
 #include "lib/storage/file_interface.h"
 
 #include <ctype.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 static char *app_trim(char *text)
 {
     char *end;
     while (*text != '\0' && isspace((unsigned char)*text)) ++text;
-    end = text + strlen(text);
+    end = text + lib_text_length(text);
     while (end != text && isspace((unsigned char)end[-1])) --end;
     *end = '\0';
     if (*text == '"' && end > text + 1 && end[-1] == '"') {
@@ -23,19 +22,19 @@ static char *app_trim(char *text)
 
 static int app_copy_value(char *target, const char *value)
 {
-    size_t length = strlen(value);
+    lib_size length = lib_text_length(value);
     if (length >= SOFTPC_CONFIG_PATH_MAX) return 0;
-    memcpy(target, value, length + 1u);
+    lib_memory_copy(target, value, length + 1u);
     return 1;
 }
 
 static int app_parse_media_mode(const char *value, lib_storage_medium_mode *out)
 {
-    if (strcmp(value, "readonly") == 0)
+    if (lib_text_compare(value, "readonly") == 0)
         *out = LIB_STORAGE_MEDIUM_READONLY;
-    else if (strcmp(value, "direct") == 0)
+    else if (lib_text_compare(value, "direct") == 0)
         *out = LIB_STORAGE_MEDIUM_DIRECT;
-    else if (strcmp(value, "overlay") == 0)
+    else if (lib_text_compare(value, "overlay") == 0)
         *out = LIB_STORAGE_MEDIUM_OVERLAY;
     else return 0;
     return 1;
@@ -43,13 +42,13 @@ static int app_parse_media_mode(const char *value, lib_storage_medium_mode *out)
 
 int app_get_config_path(char *path)
 {
-    size_t length;
+    lib_size length;
 
     if (base_process_executable_directory(path, SOFTPC_CONFIG_PATH_MAX) !=
         LIB_STATUS_OK) return 0;
-    length = strlen(path);
+    length = lib_text_length(path);
     if (length + sizeof("\\softpc.ini") > SOFTPC_CONFIG_PATH_MAX) return 0;
-    memcpy(path + length, "\\softpc.ini", sizeof("\\softpc.ini"));
+    lib_memory_copy(path + length, "\\softpc.ini", sizeof("\\softpc.ini"));
     return 1;
 }
 
@@ -65,8 +64,8 @@ int app_resolve_image_path(char *path, const char *config_path)
     const char *separator;
     const char *forward_separator;
     char resolved[SOFTPC_CONFIG_PATH_MAX];
-    size_t directory_length;
-    size_t image_length;
+    lib_size directory_length;
+    lib_size image_length;
 
     if (path[0] == '\0' || app_path_is_absolute(path)) return 1;
     separator = strrchr(config_path, '\\');
@@ -75,11 +74,11 @@ int app_resolve_image_path(char *path, const char *config_path)
         (separator == NULL || forward_separator > separator))
         separator = forward_separator;
     if (separator == NULL) return 0;
-    directory_length = (size_t)(separator - config_path) + 1u;
-    image_length = strlen(path);
+    directory_length = (lib_size)(separator - config_path) + 1u;
+    image_length = lib_text_length(path);
     if (directory_length + image_length >= sizeof(resolved)) return 0;
-    memcpy(resolved, config_path, directory_length);
-    memcpy(resolved + directory_length, path, image_length + 1u);
+    lib_memory_copy(resolved, config_path, directory_length);
+    lib_memory_copy(resolved + directory_length, path, image_length + 1u);
     return app_copy_value(path, resolved);
 }
 
@@ -87,19 +86,19 @@ int app_load_startup_config(const char *path,
     app_startup_config *config)
 {
     void *owned = NULL;
-    size_t byte_count;
+    lib_size byte_count;
     char *contents;
     char *line;
     if (lib_storage_file_read_owned(path, 64u * 1024u, &owned, &byte_count) !=
         LIB_STATUS_OK) return 0;
-    contents = malloc(byte_count + 1u);
+    contents = lib_allocate(byte_count + 1u);
     if (contents == NULL) {
-        free(owned);
+        lib_release(owned);
         return 0;
     }
-    memcpy(contents, owned, byte_count);
+    lib_memory_copy(contents, owned, byte_count);
     contents[byte_count] = '\0';
-    free(owned);
+    lib_release(owned);
     line = contents;
     while (line != NULL && *line != '\0') {
         char *next = strpbrk(line, "\r\n");
@@ -115,9 +114,9 @@ int app_load_startup_config(const char *path,
         /* Delimit the current record before scanning it.  Scanning the
            unsplit buffer lets a leading comment consume an '=' from a later
            setting and silently discard that setting. */
-        equals = strchr(line, '=');
-        comment = strchr(line, '#');
-        semicolon = strchr(line, ';');
+        equals = lib_text_find_character(line, '=');
+        comment = lib_text_find_character(line, '#');
+        semicolon = lib_text_find_character(line, ';');
         if (semicolon != NULL && (comment == NULL || semicolon < comment))
             comment = semicolon;
         if (comment != NULL) *comment = '\0';
@@ -132,41 +131,41 @@ int app_load_startup_config(const char *path,
             line = next;
             continue;
         }
-        if (strcmp(key, "memory_mb") == 0) {
+        if (lib_text_compare(key, "memory_mb") == 0) {
             char *end;
             unsigned long mib = strtoul(value, &end, 10);
             if (*end != '\0' || mib == 0u || mib > 4095u) goto invalid;
-            config->memory_bytes = (uint32_t)(mib * 1024u * 1024u);
-        } else if (strcmp(key, "floppy") == 0) {
+            config->memory_bytes = (lib_u32)(mib * 1024u * 1024u);
+        } else if (lib_text_compare(key, "floppy") == 0) {
             if (!app_copy_value(config->floppy_path, value)) goto invalid;
-        } else if (strcmp(key, "hard_disk") == 0) {
+        } else if (lib_text_compare(key, "hard_disk") == 0) {
             if (!app_copy_value(config->hard_disk_path, value)) goto invalid;
-        } else if (strcmp(key, "serial_output") == 0) {
+        } else if (lib_text_compare(key, "serial_output") == 0) {
             if (!app_copy_value(config->serial_output_path, value)) goto invalid;
-        } else if (strcmp(key, "printer_output") == 0) {
+        } else if (lib_text_compare(key, "printer_output") == 0) {
             if (!app_copy_value(config->printer_output_path, value)) goto invalid;
-        } else if (strcmp(key, "display") == 0) {
-            if (strcmp(value, "console") == 0)
+        } else if (lib_text_compare(key, "display") == 0) {
+            if (lib_text_compare(value, "console") == 0)
                 config->presentation = COMMON_SESSION_DISPLAY_CONSOLE;
-            else if (strcmp(value, "window") == 0)
+            else if (lib_text_compare(value, "window") == 0)
                 config->presentation = COMMON_SESSION_DISPLAY_WINDOW;
             else goto invalid;
-        } else if (strcmp(key, "console_control") == 0) {
-            if (strcmp(value, "0") == 0) config->console_control = 0;
-            else if (strcmp(value, "1") == 0) config->console_control = 1;
+        } else if (lib_text_compare(key, "console_control") == 0) {
+            if (lib_text_compare(value, "0") == 0) config->console_control = 0;
+            else if (lib_text_compare(value, "1") == 0) config->console_control = 1;
             else goto invalid;
-        } else if (strcmp(key, "floppy_mode") == 0) {
+        } else if (lib_text_compare(key, "floppy_mode") == 0) {
             if (!app_parse_media_mode(value, &config->floppy_mode))
                 goto invalid;
-        } else if (strcmp(key, "hard_disk_mode") == 0) {
+        } else if (lib_text_compare(key, "hard_disk_mode") == 0) {
             if (!app_parse_media_mode(value, &config->hard_disk_mode))
                 goto invalid;
         } else goto invalid;
         line = next;
     }
-    free(contents);
+    lib_release(contents);
     return 1;
 invalid:
-    free(contents);
+    lib_release(contents);
     return 0;
 }

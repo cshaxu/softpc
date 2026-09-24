@@ -1,3 +1,4 @@
+#include "../../time.h"
 #ifndef SOFTPC_TEST_CLEANUP_H
 #define SOFTPC_TEST_CLEANUP_H
 
@@ -9,11 +10,11 @@
 #include <windows.h>
 static int softpc_test_remove_image(const char *path)
 {
-    DWORD deadline = GetTickCount() + 1000u;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + 1000u;
     do {
         if (remove(path) == 0) return 1;
-        Sleep(10u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(10u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
 }
 #else

@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "compat/ccpu/abi.h"
 #include "compat/ccpu/lifecycle.h"
@@ -9,8 +10,6 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "insignia.h"
 #include "host_def.h"
@@ -76,30 +75,30 @@ static void record_event(long param);
 
 typedef struct checkpoint_byte_stream {
     unsigned char *bytes;
-    size_t byte_count;
-    size_t capacity;
-    size_t offset;
+    lib_size byte_count;
+    lib_size capacity;
+    lib_size offset;
 } checkpoint_byte_stream;
 
 static lib_status checkpoint_write_bytes(void *context,
     const lib_u8 *bytes, lib_size byte_count)
 {
     checkpoint_byte_stream *stream = context;
-    size_t required;
+    lib_size required;
     unsigned char *replacement;
 
     if (stream == NULL || (byte_count != 0u && bytes == NULL) ||
-        byte_count > (size_t)-1 - stream->byte_count)
+        byte_count > (lib_size)-1 - stream->byte_count)
         return LIB_STATUS_INVALID_ARGUMENT;
     required = stream->byte_count + byte_count;
     if (required > stream->capacity) {
-        replacement = realloc(stream->bytes, required);
+        replacement = lib_reallocate(stream->bytes, required);
         if (replacement == NULL) return LIB_STATUS_NO_MEMORY;
         stream->bytes = replacement;
         stream->capacity = required;
     }
     if (byte_count != 0u)
-        memcpy(stream->bytes + stream->byte_count, bytes, byte_count);
+        lib_memory_copy(stream->bytes + stream->byte_count, bytes, byte_count);
     stream->byte_count = required;
     return LIB_STATUS_OK;
 }
@@ -114,7 +113,7 @@ static lib_status checkpoint_read_bytes(void *context, lib_u8 *bytes,
         byte_count > stream->byte_count - stream->offset)
         return LIB_STATUS_INVALID_ARGUMENT;
     if (byte_count != 0u)
-        memcpy(bytes, stream->bytes + stream->offset, byte_count);
+        lib_memory_copy(bytes, stream->bytes + stream->offset, byte_count);
     stream->offset += byte_count;
     return LIB_STATUS_OK;
 }
@@ -437,14 +436,14 @@ static void verify_snapshot_archive(void)
         image.ccpu.tlb.entries[0][0].linear_page);
     assert(decoded.fpu.control == image.ccpu.fpu.control);
     assert(decoded.sas.memory_bytes == image.ccpu.sas.memory_bytes);
-    assert(memcmp(decoded.memory, image.ccpu.memory,
+    assert(lib_memory_compare(decoded.memory, image.ccpu.memory,
         image.ccpu.sas.memory_bytes) == 0);
-    assert(memcmp(decoded.page_types, image.ccpu.page_types,
+    assert(lib_memory_compare(decoded.page_types, image.ccpu.page_types,
         image.ccpu.sas.page_type_bytes) == 0);
-    assert(memcmp(decoded.tlb_page_index, image.ccpu.tlb_page_index,
+    assert(lib_memory_compare(decoded.tlb_page_index, image.ccpu.tlb_page_index,
         SOFTPC_CCPU_FAST_TLB_PAGE_COUNT) == 0);
     softpc_ccpu_archive_dispose(&decoded);
-    free(stream.bytes);
+    lib_release(stream.bytes);
 
     assert(softpc_device_archive_write(image.ccpu.devices,
         checkpoint_write_bytes, &device_stream) == LIB_STATUS_OK);
@@ -463,11 +462,11 @@ static void verify_snapshot_archive(void)
     assert(softpc_device_archive_write(decoded_devices,
         checkpoint_write_bytes, &device_round_trip) == LIB_STATUS_OK);
     assert(device_round_trip.byte_count == device_stream.byte_count);
-    assert(memcmp(device_round_trip.bytes, device_stream.bytes,
+    assert(lib_memory_compare(device_round_trip.bytes, device_stream.bytes,
         device_stream.byte_count) == 0);
     softpc_device_archive_dispose(decoded_devices);
-    free(device_round_trip.bytes);
-    free(device_stream.bytes);
+    lib_release(device_round_trip.bytes);
+    lib_release(device_stream.bytes);
 
     assert(softpc_snapshot_image_write(&image, checkpoint_write_bytes,
         &image_stream) == LIB_STATUS_OK);
@@ -489,10 +488,10 @@ static void verify_snapshot_archive(void)
     assert(decoded_image.ccpu.valid != 0);
     assert(decoded_image.entry.halted == image.entry.halted);
     assert(decoded_image.entry.trap == image.entry.trap);
-    assert(memcmp(decoded_image.ccpu.memory, image.ccpu.memory,
+    assert(lib_memory_compare(decoded_image.ccpu.memory, image.ccpu.memory,
         image.ccpu.sas.memory_bytes) == 0);
     softpc_snapshot_image_dispose(&decoded_image);
-    free(image_stream.bytes);
+    lib_release(image_stream.bytes);
 
     c_setEAX(0u);
     c_setEIP(0u);
@@ -614,9 +613,9 @@ static void verify_controller_archives(void)
     outb(DMA_FLA_PAGE_REG, 0u);
     assert(softpc_device_snapshot_restore_dma(&dma_saved));
     softpc_device_snapshot_capture_dma(&dma_restored);
-    assert(memcmp(dma_restored.base_address[0][2],
+    assert(lib_memory_compare(dma_restored.base_address[0][2],
         dma_saved.base_address[0][2], 2u) == 0);
-    assert(memcmp(dma_restored.base_count[0][2],
+    assert(lib_memory_compare(dma_restored.base_count[0][2],
         dma_saved.base_count[0][2], 2u) == 0);
     assert(dma_restored.page[1] == dma_saved.page[1]);
 
@@ -640,7 +639,7 @@ static void verify_controller_archives(void)
     outb(0x1f3u, 0u);
     assert(softpc_device_snapshot_restore_hdd(&hdd_saved));
     assert(softpc_device_snapshot_capture_hdd(&hdd_restored));
-    assert(memcmp(hdd_restored.taskfile, hdd_saved.taskfile,
+    assert(lib_memory_compare(hdd_restored.taskfile, hdd_saved.taskfile,
         sizeof(hdd_saved.taskfile)) == 0);
 
     outb(0x61u, 0x01u);
@@ -665,8 +664,8 @@ static void verify_controller_archives(void)
     assert(softpc_device_snapshot_restore_serial_host(&serial_host_saved));
     assert(softpc_device_snapshot_capture_serial_controller(&serial_restored));
     assert(softpc_device_snapshot_capture_serial_host(&serial_host_restored));
-    assert(memcmp(&serial_restored, &serial_saved, sizeof(serial_saved)) == 0);
-    assert(memcmp(&serial_host_restored, &serial_host_saved,
+    assert(lib_memory_compare(&serial_restored, &serial_saved, sizeof(serial_saved)) == 0);
+    assert(lib_memory_compare(&serial_host_restored, &serial_host_saved,
         sizeof(serial_host_saved)) == 0);
 
     outb(0x378u, 0x5au);
@@ -680,9 +679,9 @@ static void verify_controller_archives(void)
     assert(softpc_device_snapshot_restore_parallel_host(&parallel_host_saved));
     assert(softpc_device_snapshot_capture_parallel_controller(&parallel_restored));
     assert(softpc_device_snapshot_capture_parallel_host(&parallel_host_restored));
-    assert(memcmp(&parallel_restored, &parallel_saved,
+    assert(lib_memory_compare(&parallel_restored, &parallel_saved,
         sizeof(parallel_saved)) == 0);
-    assert(memcmp(&parallel_host_restored, &parallel_host_saved,
+    assert(lib_memory_compare(&parallel_host_restored, &parallel_host_saved,
         sizeof(parallel_host_saved)) == 0);
 
     assert(softpc_host_com_set_output_path(0, "snapshot-external-com.log"));
@@ -716,14 +715,14 @@ static void verify_controller_archives(void)
     outb(MOUSE_PORT_3, 0x91u);
     outb(MOUSE_PORT_1, 0xa5u);
     outb(MOUSE_PORT_2, 0x10u);
-    memset(&mouse_saved, 0, sizeof(mouse_saved));
+    lib_memory_set(&mouse_saved, 0, sizeof(mouse_saved));
     assert(softpc_device_snapshot_capture_inport_mouse(&mouse_saved));
     outb(MOUSE_PORT_0, 0x80u);
     mouse_send(-1, 1, 0, 1);
     assert(softpc_device_snapshot_restore_inport_mouse(&mouse_saved));
-    memset(&mouse_restored, 0, sizeof(mouse_restored));
+    lib_memory_set(&mouse_restored, 0, sizeof(mouse_restored));
     assert(softpc_device_snapshot_capture_inport_mouse(&mouse_restored));
-    assert(memcmp(&mouse_restored, &mouse_saved, sizeof(mouse_saved)) == 0);
+    assert(lib_memory_compare(&mouse_restored, &mouse_saved, sizeof(mouse_saved)) == 0);
     mouse_restored.test_state = 4;
     assert(!softpc_device_snapshot_restore_inport_mouse(&mouse_restored));
     inb(MOUSE_PORT_1, &value);
@@ -732,23 +731,23 @@ static void verify_controller_archives(void)
     /* The DOS INT 33h driver has state distinct from the InPort adapter.
        Prove both its absent state and a restored installed state. */
     /* The driver is normally absent until guest MOUSE.COM installs it. */
-    memset(&dos_mouse_inactive, 0, sizeof(dos_mouse_inactive));
+    lib_memory_set(&dos_mouse_inactive, 0, sizeof(dos_mouse_inactive));
     assert(softpc_device_snapshot_capture_dos_mouse(&dos_mouse_inactive));
     assert(!dos_mouse_inactive.initialized);
 
     mouse_driver_initialisation();
-    memset(&dos_mouse_saved, 0, sizeof(dos_mouse_saved));
+    lib_memory_set(&dos_mouse_saved, 0, sizeof(dos_mouse_saved));
     assert(softpc_device_snapshot_capture_dos_mouse(&dos_mouse_saved));
     assert(dos_mouse_saved.initialized);
     mouse_driver_termination();
     /* Restore owns reconstruction of the archived driver instance. */
     assert(softpc_device_snapshot_restore_dos_mouse(&dos_mouse_saved));
-    memset(&dos_mouse_restored, 0, sizeof(dos_mouse_restored));
+    lib_memory_set(&dos_mouse_restored, 0, sizeof(dos_mouse_restored));
     assert(softpc_device_snapshot_capture_dos_mouse(&dos_mouse_restored));
-    assert(memcmp(&dos_mouse_restored, &dos_mouse_saved,
+    assert(lib_memory_compare(&dos_mouse_restored, &dos_mouse_saved,
         sizeof(dos_mouse_saved)) == 0);
     assert(softpc_device_snapshot_restore_dos_mouse(&dos_mouse_inactive));
-    memset(&dos_mouse_restored, 0, sizeof(dos_mouse_restored));
+    lib_memory_set(&dos_mouse_restored, 0, sizeof(dos_mouse_restored));
     assert(softpc_device_snapshot_capture_dos_mouse(&dos_mouse_restored));
     assert(!dos_mouse_restored.initialized);
 
@@ -765,7 +764,7 @@ static void verify_controller_archives(void)
     DAC[7].red = DAC[7].green = DAC[7].blue = 0u;
     assert(softpc_device_snapshot_restore_video_memory(&video_memory_saved));
     assert(softpc_device_snapshot_capture_video_memory(&video_memory_restored));
-    assert(memcmp(&video_memory_restored, &video_memory_saved,
+    assert(lib_memory_compare(&video_memory_restored, &video_memory_saved,
         sizeof(video_memory_saved)) == 0);
 
     /* Controller bytes and the C-VID latches must be replayed through the
@@ -793,7 +792,7 @@ static void verify_controller_archives(void)
         &video_controller_saved));
     assert(softpc_device_snapshot_capture_video_controller(
         &video_controller_restored));
-    assert(memcmp(&video_controller_restored, &video_controller_saved,
+    assert(lib_memory_compare(&video_controller_restored, &video_controller_saved,
         sizeof(video_controller_saved)) == 0);
     video_controller_restored.dac_component = 3u;
     assert(!softpc_device_snapshot_restore_video_controller(
@@ -805,14 +804,14 @@ static void verify_controller_archives(void)
     insert_code_into_6805_buf(0x1eu);
     outb(0x64u, 0x60u);
     outb(0x60u, 0x25u);
-    memset(&keyboard_saved, 0, sizeof(keyboard_saved));
+    lib_memory_set(&keyboard_saved, 0, sizeof(keyboard_saved));
     assert(softpc_device_snapshot_capture_keyboard(&keyboard_saved));
     outb(0x64u, 0xadu);
     insert_code_into_6805_buf(0x30u);
     assert(softpc_device_snapshot_restore_keyboard(&keyboard_saved));
-    memset(&keyboard_restored, 0, sizeof(keyboard_restored));
+    lib_memory_set(&keyboard_restored, 0, sizeof(keyboard_restored));
     assert(softpc_device_snapshot_capture_keyboard(&keyboard_restored));
-    assert(memcmp(&keyboard_restored, &keyboard_saved,
+    assert(lib_memory_compare(&keyboard_restored, &keyboard_saved,
         sizeof(keyboard_saved)) == 0);
     keyboard_restored.fifo_count = 49;
     assert(!softpc_device_snapshot_restore_keyboard(&keyboard_restored));

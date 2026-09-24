@@ -1,8 +1,8 @@
+#include "lib/types/types_interface.h"
 #include "insignia.h"
 #include "host_def.h"
 #include "platform.h"
 
-#include <string.h>
 
 #include "xt.h"
 #include "bios.h"
@@ -179,7 +179,7 @@ static int softpc_gfi_format(softpc_gfi_image_drive *drive,
         count > drive->sectors || cylinder >= drive->cylinders ||
         head >= drive->heads)
         return 0;
-    memset(filler, get_c3_filler(command), sector_bytes);
+    lib_memory_set(filler, get_c3_filler(command), sector_bytes);
     for (index = 0u; index < count; ++index) {
         unsigned int sector;
         unsigned long offset;
@@ -309,18 +309,18 @@ int softpc_platform_floppy_attach(const char *path, lib_storage_medium_mode mode
     softpc_gfi_image_drive *drive = &softpc_gfi_drives[0];
     softpc_gfi_image_drive candidate = {0};
     softpc_gfi_image_drive retired;
-    size_t bytes;
+    lib_size bytes;
     if (mode > LIB_STORAGE_MEDIUM_OVERLAY) return 0;
     /* A request can name the current attachment.  Keep it in place: Windows
        need not permit a second open of the same file, and there is no
        replacement to commit.  The original GFI vectors still need their
        normal installation. */
     if (path != NULL && drive->medium != NULL && drive->mode == mode &&
-        strcmp(drive->path, path) == 0) {
+        lib_text_compare(drive->path, path) == 0) {
         softpc_gfi_install(0);
         return 1;
     }
-    if (path != NULL && strlen(path) >= sizeof(candidate.path)) return 0;
+    if (path != NULL && lib_text_length(path) >= sizeof(candidate.path)) return 0;
     if (path != NULL && (lib_storage_medium_open(path, mode, &candidate.medium) !=
             LIB_STATUS_OK ||
         (bytes = lib_storage_medium_byte_count(candidate.medium)) > LONG_MAX ||
@@ -330,7 +330,7 @@ int softpc_platform_floppy_attach(const char *path, lib_storage_medium_mode mode
     }
     if (path != NULL) {
         candidate.mode = mode;
-        memcpy(candidate.path, path, strlen(path) + 1u);
+        lib_memory_copy(candidate.path, path, lib_text_length(path) + 1u);
     }
     /* Initial media selects the physical profile once. Eject and later
        images change media geometry, never the installed drive capability. */
@@ -352,7 +352,7 @@ int softpc_platform_floppy_attach(const char *path, lib_storage_medium_mode mode
 void softpc_platform_floppy_detach(void)
 {
     lib_storage_medium_destroy(&softpc_gfi_drives[0].medium);
-    memset(softpc_gfi_drives, 0, sizeof(softpc_gfi_drives));
+    lib_memory_set(softpc_gfi_drives, 0, sizeof(softpc_gfi_drives));
     (void)gfi_empty_active(C_FLOPPY_A_DEVICE, TRUE, NULL);
 }
 
@@ -401,7 +401,7 @@ lib_status softpc_floppy_media_restore(unsigned slot, const char *path,
     lib_status status;
     if (slot >= MAX_DISKETTES || replacement == NULL || cylinder > 255u ||
         mode > LIB_STORAGE_MEDIUM_OVERLAY ||
-        (path != NULL && strlen(path) >= sizeof(softpc_gfi_drives[slot].path)))
+        (path != NULL && lib_text_length(path) >= sizeof(softpc_gfi_drives[slot].path)))
         return LIB_STATUS_INVALID_ARGUMENT;
     /* This product exposes only drive A through the GFI attach route. An
        absent archive slot for any other controller position is a no-op; it
@@ -421,13 +421,13 @@ lib_status softpc_floppy_media_restore(unsigned slot, const char *path,
         *replacement = NULL;
         (void)lib_storage_medium_destroy(&retired);
         drive->mode = mode;
-        memcpy(drive->path, path, strlen(path) + 1u);
+        lib_memory_copy(drive->path, path, lib_text_length(path) + 1u);
         if (drive->medium == NULL || !softpc_gfi_geometry(
             (long)lib_storage_medium_byte_count(drive->medium), drive))
             return LIB_STATUS_INVALID_ARGUMENT;
         softpc_gfi_install((UTINY)slot);
     } else if (drive->medium == NULL || drive->mode != mode ||
-        strcmp(drive->path, path) != 0) {
+        lib_text_compare(drive->path, path) != 0) {
         return LIB_STATUS_INVALID_ARGUMENT;
     }
     drive->cylinder = cylinder;

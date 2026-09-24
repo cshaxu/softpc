@@ -1,7 +1,7 @@
+#include "../../lib/types/types_interface.h"
 #ifndef SOFTPC_PLATFORM_H
 #define SOFTPC_PLATFORM_H
 
-#include <stdint.h>
 #include "lib/storage/medium_interface.h"
 
 /* Host support used by the machine bootstrap and VM adapter. Implementations
@@ -37,11 +37,11 @@ void softpc_platform_bind_reset_host_functions(void);
 void softpc_platform_executor_event(void);
 char *softpc_platform_floppy_config_value(void);
 int softpc_platform_presentation_is_graphics(void);
-int softpc_platform_presentation_state(uint32_t *, uint32_t *);
+int softpc_platform_presentation_state(lib_u32 *, lib_u32 *);
 int softpc_platform_presentation_text_extent(unsigned long *, unsigned long *);
 int softpc_platform_presentation_cursor(long *, long *,
     unsigned long *);
-int softpc_platform_presentation_fonts(uint8_t *, uint8_t *,
+int softpc_platform_presentation_fonts(lib_u8 *, lib_u8 *,
     unsigned long *, unsigned long *);
 
 #endif

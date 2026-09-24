@@ -1,9 +1,10 @@
+#include "../../time.h"
+#include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>
-#include <string.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -51,7 +52,7 @@ int main(void)
     softpc_machine_set_heartbeat(machine, 1);
     worker = CreateThread(NULL, 0u, softpc_lifecycle_run, machine, 0u, NULL);
     assert(worker != NULL);
-    Sleep(200u);
+    softpc_test_sleep_milliseconds(200u);
     softpc_machine_request_stop(machine);
     assert(WaitForSingleObject(worker, 5000u) == WAIT_OBJECT_0);
     assert(InterlockedCompareExchange(&softpc_lifecycle_result, 0, 0) ==

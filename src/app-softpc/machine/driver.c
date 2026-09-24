@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 #include "machine/driver.h"
 #include "input.h"
 #include "machine/trace.h"
@@ -8,8 +9,6 @@
 #include "lib/types/atomic.h"
 
 #include <windows.h>
-#include <stdlib.h>
-#include <string.h>
 
 /* Traditional PC glyph approximation belongs to this machine adapter, not Lib. */
 static const lib_u16 vm_driver_pc_glyphs[256] = {
@@ -317,9 +316,9 @@ static lib_status vm_driver_copy_graphics(vm_driver *driver,
     if (!softpc_machine_presentation_take_dirty(driver->machine, &left, &top,
             &right, &bottom)) return LIB_STATUS_OK;
     row_stride = (width + 3u) & ~3u;
-    memset(&frame->window, 0, lib_offsetof(kvm_window_frame, image.pixels));
+    lib_memory_set(&frame->window, 0, lib_offsetof(kvm_window_frame, image.pixels));
     for (row = 0u; row < height; ++row)
-        memcpy(frame->window.image.pixels + row * width,
+        lib_memory_copy(frame->window.image.pixels + row * width,
             (const lib_u8 *)bits + row * row_stride, width);
     dib = (const BITMAPINFO *)info;
     for (palette_index = 0u; palette_index < KVM_WINDOW_GRAPHICS_PALETTE_ENTRIES;
@@ -359,7 +358,7 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
     if (columns > KVM_TEXT_COLUMNS || rows > KVM_TEXT_ROWS)
         return LIB_STATUS_UNSUPPORTED;
     if (stride < columns) return LIB_STATUS_INVALID_ARGUMENT;
-    memset(&frame->window, 0, lib_offsetof(kvm_window_frame, text) +
+    lib_memory_set(&frame->window, 0, lib_offsetof(kvm_window_frame, text) +
         sizeof(frame->window.text));
     for (lib_size index = 0u; index < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++index)
         frame->window.text.base.cells[index] = (kvm_text_cell){ ' ', 0u, 7u, 0u };
@@ -371,8 +370,8 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
     for (text_row = 0u; text_row < rows; ++text_row) {
         lib_u32 text_column;
         for (text_column = 0u; text_column < columns; ++text_column) {
-            size_t source = ((size_t)text_row * stride + text_column) * cell_bytes;
-            size_t destination = (size_t)text_row * KVM_TEXT_COLUMNS + text_column;
+            lib_size source = ((lib_size)text_row * stride + text_column) * cell_bytes;
+            lib_size destination = (lib_size)text_row * KVM_TEXT_COLUMNS + text_column;
             lib_u8 attribute = cell_bytes >= 2u ? cells[source + 1u] : 7u;
             frame->window.text.base.cells[destination] = (kvm_text_cell){
                 cells[source], attribute_select && (attribute & 0x08u) ? 1u : 0u,
@@ -408,8 +407,8 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
     vm_driver_cursor_shape(&frame->window.text.base, cursor_size);
     frame->window.text.base.cursor_visible = column >= 0 && row >= 0;
     frame->window.text.base.cursor_phase = 1u;
-    memcpy(frame->characters.primary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
-    memcpy(frame->characters.secondary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
+    lib_memory_copy(frame->characters.primary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
+    lib_memory_copy(frame->characters.secondary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
     return LIB_STATUS_OK;
 }
 
@@ -532,7 +531,7 @@ lib_status vm_driver_create(vm_driver **out_driver,
     vm_driver *driver;
     if (out_driver == NULL || machine == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_driver = NULL;
-    driver = calloc(1u, sizeof(*driver));
+    driver = lib_allocate_zero(1u, sizeof(*driver));
     if (driver == NULL) return LIB_STATUS_NO_MEMORY;
     driver->machine = machine;
     *out_driver = driver;
@@ -544,7 +543,7 @@ void vm_driver_destroy(vm_driver *driver)
     if (driver == NULL) return;
     softpc_snapshot_image_dispose(&driver->captured_image);
     softpc_snapshot_image_dispose(&driver->staged_image);
-    free(driver);
+    lib_release(driver);
 }
 
 void vm_driver_describe(vm_driver *driver,

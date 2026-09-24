@@ -1,0 +1,35 @@
+# App-SoftPC consumers must use the public Types/Base contracts where they
+# exist. The preserved SoftPC mirror is intentionally outside this check.
+if(NOT DEFINED SOFTPC_SOURCE_DIR)
+    message(FATAL_ERROR "SOFTPC_SOURCE_DIR is required")
+endif()
+
+set(roots "src/app-softpc" "test/app-softpc")
+foreach(root IN LISTS roots)
+    file(GLOB_RECURSE sources "${SOFTPC_SOURCE_DIR}/${root}/*.[ch]")
+    foreach(source IN LISTS sources)
+        file(RELATIVE_PATH relative "${SOFTPC_SOURCE_DIR}" "${source}")
+        if(relative MATCHES "^src/app-softpc/softpc[.]new/")
+            continue()
+        endif()
+        # These port-ABI headers are included by preserved mirror translation
+        # units. Keeping their original vocabulary avoids adding a Lib include
+        # dependency to that excluded build graph.
+        if(relative MATCHES "^src/app-softpc/compat/(ccpu/snapshot[.]h|cvidc/(gdp_rule_access|gdp_state)[.]h|devices/snapshot[.]h)$")
+            continue()
+        endif()
+        file(READ "${source}" contents)
+        if(contents MATCHES "#[ \\t]*include[ \\t]*<(stdint|stddef|stdlib|string)[.]h>")
+            message(FATAL_ERROR "Lib Types convergence: direct standard header in ${relative}")
+        endif()
+        if(contents MATCHES "(^|[^A-Za-z0-9_])(u?int(8|16|32|64)_t|size_t|intptr_t|uintptr_t)([^A-Za-z0-9_]|$)")
+            message(FATAL_ERROR "Lib Types convergence: direct scalar type in ${relative}")
+        endif()
+        if(contents MATCHES "(^|[^A-Za-z0-9_])(malloc|calloc|realloc|free|memset|memcpy|memmove|memcmp|memchr|strlen|strcmp|strncmp|strchr|strstr|strtok|strcpy)[ \\t\\r\\n]*\\(")
+            message(FATAL_ERROR "Lib Types convergence: direct memory/text service in ${relative}")
+        endif()
+        if(contents MATCHES "(^|[^A-Za-z0-9_])(GetTickCount|Sleep)[ \\t\\r\\n]*\\(")
+            message(FATAL_ERROR "Lib Base convergence: direct clock/sleep service in ${relative}")
+        endif()
+    endforeach()
+endforeach()

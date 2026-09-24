@@ -1,40 +1,41 @@
+#include "../time.h"
+#include "lib/types/types_interface.h"
 #include "machine_fixture.h"
 #include "../unit/machine/cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>
-#include <string.h>
 
 #ifdef _WIN32
 #include <windows.h>
 
 static int runtime_input_wait_for_byte(softpc_machine *machine,
-    uint32_t address, uint8_t expected, DWORD deadline, uint8_t *observed)
+    lib_u32 address, lib_u8 expected, lib_u64 deadline, lib_u8 *observed)
 {
-    uint8_t value = 0u;
+    lib_u8 value = 0u;
 
     do {
         if (softpc_machine_read_physical(machine, address, &value,
                 sizeof(value)) == SOFTPC_MACHINE_OK && value >= expected)
             return 1;
-        Sleep(1u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(1u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     if (observed != NULL) *observed = value;
     return 0;
 }
 
 static int runtime_input_wait_for_state(common_machine *runtime,
-    common_machine_state expected, DWORD deadline)
+    common_machine_state expected, lib_u64 deadline)
 {
     do {
         if (common_machine_state_get(runtime) == expected) return 1;
-        Sleep(1u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(1u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
 }
 
-static int runtime_input_enqueue_key(common_machine *runtime, uint16_t scan,
-    lib_u32 key, uint8_t pressed)
+static int runtime_input_enqueue_key(common_machine *runtime, lib_u16 scan,
+    lib_u32 key, lib_u8 pressed)
 {
     kvm_input_event event = { 0 };
 
@@ -53,7 +54,7 @@ int main(void)
        increments 0500h, acknowledges the original PIC, and returns. This
        observes input across the standalone queue -> original controller ->
        PIC -> CCPU path without mistaking typematic output for stale input. */
-    static const uint8_t boot_code[] = {
+    static const lib_u8 boot_code[] = {
         0xfau, 0x31u, 0xc0u, 0x8eu, 0xd8u,
         0xc6u, 0x06u, 0x01u, 0x05u, 0x55u,
         0xb8u, 0x1au, 0x7cu, 0xa3u, 0x24u, 0x00u,
@@ -64,17 +65,17 @@ int main(void)
         0xfeu, 0x06u, 0x00u, 0x05u,
         0xb0u, 0x20u, 0xe6u, 0x20u, 0xcfu
     };
-    uint8_t sector[512] = { 0 };
+    lib_u8 sector[512] = { 0 };
     FILE *image = NULL;
     softpc_machine_options options = { image_path, NULL };
     softpc_machine *machine = NULL;
     softpc_machine_fixture fixture = { 0 };
     common_machine *runtime;
-    DWORD deadline;
-    uint8_t delivered = 0u;
-    uint8_t stale_input = 0u;
+    lib_u64 deadline;
+    lib_u8 delivered = 0u;
+    lib_u8 stale_input = 0u;
 
-    memcpy(sector, boot_code, sizeof(boot_code));
+    lib_memory_copy(sector, boot_code, sizeof(boot_code));
     sector[510] = 0x55u;
     sector[511] = 0xaau;
     image = fopen(image_path, "wb");
@@ -90,8 +91,8 @@ int main(void)
     runtime = fixture.machine;
     assert(common_machine_start(runtime));
     assert(runtime_input_wait_for_byte(machine, 0x501u, 0x55u,
-        GetTickCount() + 5000u, NULL));
-    Sleep(250u);
+        softpc_test_clock_milliseconds() + 5000u, NULL));
+    softpc_test_sleep_milliseconds(250u);
     assert(softpc_machine_read_physical(machine, 0x500u, &delivered,
         sizeof(delivered)) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x502u, &stale_input,
@@ -100,7 +101,7 @@ int main(void)
 
     assert(runtime_input_enqueue_key(runtime, 0x1du, KVM_KEY_CONTROL, 1u));
     assert(runtime_input_enqueue_key(runtime, 0x1du, KVM_KEY_CONTROL, 0u));
-    deadline = GetTickCount() + 1000u;
+    deadline = softpc_test_clock_milliseconds() + 1000u;
     assert(runtime_input_wait_for_byte(machine, 0x502u, 0x01u, deadline,
         &delivered));
     assert(common_machine_state_get(runtime) == COMMON_MACHINE_RUNNING);
@@ -112,11 +113,11 @@ int main(void)
        records cannot make this assertion flaky. */
     assert(common_machine_pause(runtime));
     assert(runtime_input_wait_for_state(runtime, COMMON_MACHINE_PAUSED,
-        GetTickCount() + 5000u));
+        softpc_test_clock_milliseconds() + 5000u));
     assert(!runtime_input_enqueue_key(runtime, 0x1du, KVM_KEY_CONTROL, 0u));
     assert(common_machine_stop(runtime));
     assert(runtime_input_wait_for_state(runtime, COMMON_MACHINE_STOPPED,
-        GetTickCount() + 5000u));
+        softpc_test_clock_milliseconds() + 5000u));
     /* Guest RAM survives a reset. Clear the boot marker while stopped, so
        the next wait proves that the next cold run reached this boot sector
        rather than observing the prior run's retained 55h. */
@@ -127,8 +128,8 @@ int main(void)
         sizeof(stale_input)) == SOFTPC_MACHINE_OK);
     assert(common_machine_start(runtime));
     assert(runtime_input_wait_for_byte(machine, 0x501u, 0x55u,
-        GetTickCount() + 5000u, NULL));
-    Sleep(250u);
+        softpc_test_clock_milliseconds() + 5000u, NULL));
+    softpc_test_sleep_milliseconds(250u);
     assert(softpc_machine_read_physical(machine, 0x502u, &stale_input,
         sizeof(stale_input)) == SOFTPC_MACHINE_OK);
     assert(stale_input == 0u);

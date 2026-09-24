@@ -1,10 +1,10 @@
+#include "lib/types/types_interface.h"
 #include "product/composition.h"
 #include "machine/driver.h"
 
 #include <windows.h>
 #include <assert.h>
 #include <stdio.h>
-#include <string.h>
 
 static lib_status execute_x86(common_machine *machine,
     const common_machine_debug_lease *lease, const x86_debug_request *request,
@@ -95,7 +95,7 @@ static void memory_word(common_machine *machine, const common_machine_debug_leas
 {
     x86_debug_request request = {
         .operation = X86_DEBUG_WRITE_LINEAR, .address = address, .bytes = 4u };
-    memcpy(request.data, &value, 4u);
+    lib_memory_copy(request.data, &value, 4u);
     (void)access(machine, lease, request);
 }
 
@@ -106,7 +106,7 @@ static void synchronous_access(common_machine *machine, const common_machine_deb
     x86_debug_response after;
     const lib_u32 ids[] = { X86_DEBUG_EIP, X86_DEBUG_EFLAGS, X86_DEBUG_CS, X86_DEBUG_SS, X86_DEBUG_DS,
         X86_DEBUG_ES, X86_DEBUG_FS, X86_DEBUG_GS, X86_DEBUG_CR2, X86_DEBUG_CR3 };
-    size_t index;
+    lib_size index;
     lib_u32 old, cr0 = before.cpu.cr0, cr3 = before.cpu.cr3;
     x86_debug_request request = { .operation = X86_DEBUG_READ_REGISTER };
     const struct { lib_size request_size, capacity; } invalid_shapes[] = {
@@ -131,7 +131,7 @@ static void synchronous_access(common_machine *machine, const common_machine_deb
     }
     after = access(machine, lease,
         (x86_debug_request){ .operation = X86_DEBUG_GET_CPU_SNAPSHOT });
-    assert(memcmp(&before.cpu, &after.cpu, sizeof(before.cpu)) == 0);
+    assert(lib_memory_compare(&before.cpu, &after.cpu, sizeof(before.cpu)) == 0);
     old = reg(machine, lease, X86_DEBUG_DS);
     setreg(machine, lease, X86_DEBUG_DS, 0x1234u);
     after = access(machine, lease,
@@ -335,20 +335,20 @@ static void command_matrix(common_machine *machine, common_machine_debug_lease *
     setreg(machine, lease, X86_DEBUG_ECX, 4u);
     for (i = 0; i < sizeof(commands)/sizeof(commands[0]); ++i) {
         submit(provider, COMMON_SESSION_MACHINE_PAUSED, commands[i].line, &result);
-        assert(!strstr(debug_text(&result), "failed") && !strstr(debug_text(&result), "unsupported"));
-        assert(strstr(debug_text(&result), commands[i].contains));
+        assert(!lib_text_find_substring(debug_text(&result), "failed") && !lib_text_find_substring(debug_text(&result), "unsupported"));
+        assert(lib_text_find_substring(debug_text(&result), commands[i].contains));
         assert(result.request == COMMON_SESSION_REQUEST_NONE);
     }
     bytes = access(machine, lease, (x86_debug_request){
         .operation = X86_DEBUG_READ_LINEAR, .address = 0xb50u, .bytes = 4u });
-    assert(memcmp(bytes.data, "\x12\x34\x56\x56", 4u) == 0);
+    assert(lib_memory_compare(bytes.data, "\x12\x34\x56\x56", 4u) == 0);
     assert(remove("debug-cli-transfer.bin") == 0);
     bytes = access(machine, lease, (x86_debug_request){
         .operation = X86_DEBUG_READ_LINEAR, .address = 0xb40u, .bytes = 2u });
     assert(bytes.data[0] == 0x90 && bytes.data[1] == 0xf8);
     submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xd 0 1000", &result);
-    assert(result.detail != NULL && strlen(result.detail) > 16384u);
-    assert(strstr(result.detail, "L00000FF0") != NULL);
+    assert(result.detail != NULL && lib_text_length(result.detail) > 16384u);
+    assert(lib_text_find_substring(result.detail, "L00000FF0") != NULL);
     /* Invalid watch/register/plan requests cannot dispatch execution. */
     submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xw w nonsense", &result);
     assert(result.request == COMMON_SESSION_REQUEST_NONE);
@@ -423,7 +423,7 @@ static void watchpoints(common_machine *machine, common_machine_debug_lease *lea
         provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_RUNNING,
             COMMON_SESSION_MACHINE_PAUSED, &output);
         provider->note_monitor_current(provider->context, LIB_TRUE, &output);
-        assert(strstr(debug_text(&output), "Watch-") && strstr(debug_text(&output), " hit:"));
+        assert(lib_text_find_substring(debug_text(&output), "Watch-") && lib_text_find_substring(debug_text(&output), " hit:"));
         assert(output.request == COMMON_SESSION_REQUEST_NONE);
         if (kind == X86_DEBUG_WATCH_EXECUTE) {
             /* T from the just-hit execute watch must execute, not re-hit. */
@@ -451,7 +451,7 @@ static void watchpoints(common_machine *machine, common_machine_debug_lease *lea
         .operation = X86_DEBUG_GET_EXECUTION_RESULT });
     assert(!value.observation.watch_hit && value.observation.count == 1u);
     submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xw u", &output);
-    assert(strstr(debug_text(&output), "All watch points removed"));
+    assert(lib_text_find_substring(debug_text(&output), "All watch points removed"));
     /* XT receives its observation through the same copied result, not a sink. */
     setreg(machine, lease, X86_DEBUG_EIP, 0x800u);
     submit(provider, COMMON_SESSION_MACHINE_PAUSED, "xt", &output);
@@ -460,7 +460,7 @@ static void watchpoints(common_machine *machine, common_machine_debug_lease *lea
     provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_RUNNING,
         COMMON_SESSION_MACHINE_PAUSED, &output);
     provider->note_monitor_current(provider->context, LIB_TRUE, &output);
-    assert(strstr(debug_text(&output), "Write: Lin=00000a00"));
+    assert(lib_text_find_substring(debug_text(&output), "Write: Lin=00000a00"));
     assert(common_machine_debug_acquire(machine, lease) == LIB_STATUS_OK);
 }
 
@@ -481,7 +481,7 @@ static void access_boundaries(common_machine *machine, common_machine_debug_leas
     unsigned i;
     x86_debug_request write = { .operation = X86_DEBUG_WRITE_LINEAR,
         .address = 0x800u, .bytes = sizeof(program) };
-    memcpy(write.data, program, sizeof(program));
+    lib_memory_copy(write.data, program, sizeof(program));
     (void)access(machine, lease, write);
     /* Exactly representable: check both operand observation and integer roundtrip. */
     memory_word(machine, lease, 0xa00u, 0x1234u);
@@ -503,7 +503,7 @@ static void access_boundaries(common_machine *machine, common_machine_debug_leas
             x86_debug_response bytes = access(machine, lease,
                 (x86_debug_request){ .operation = X86_DEBUG_READ_LINEAR,
                     .address = 0xa10u, .bytes = 8u });
-            memcpy(&stored, bytes.data, sizeof(stored));
+            lib_memory_copy(&stored, bytes.data, sizeof(stored));
             /* Both the observation and arithmetic must preserve this exact integer. */
             assert(value.observation.accesses[0].data == stored);
             assert(stored == 0x0000123400001234ull);
@@ -593,17 +593,17 @@ static void x87_values(common_machine *machine, common_machine_debug_lease *leas
             formats[i].opcode,formats[i].store,0x20,0x0a};
         x86_debug_response result;
         write.address = 0xa00u; write.bytes = formats[i].bytes;
-        memcpy(write.data, formats[i].value, write.bytes);
+        lib_memory_copy(write.data, formats[i].value, write.bytes);
         (void)access(machine, lease, write);
         write.address = 0x800u; write.bytes = sizeof(program);
-        memcpy(write.data, program, sizeof(program));
+        lib_memory_copy(write.data, program, sizeof(program));
         (void)access(machine, lease, write);
         setreg(machine, lease, X86_DEBUG_EIP, 0x800u);
         run_plan(machine, lease, events, trace, 0x800u + sizeof(program), 3u);
         result = access(machine, lease, (x86_debug_request){
             .operation = X86_DEBUG_READ_LINEAR, .address = 0xa20u,
             .bytes = formats[i].bytes });
-        assert(memcmp(result.data, formats[i].value, formats[i].bytes) == 0);
+        assert(lib_memory_compare(result.data, formats[i].value, formats[i].bytes) == 0);
     }
     trace.instruction_count = 4u;
     for (i = 0; i < sizeof(arithmetic) / sizeof(arithmetic[0]); ++i) {
@@ -621,20 +621,20 @@ static void x87_values(common_machine *machine, common_machine_debug_lease *leas
             length = sizeof(program); instructions = 5u;
         }
         write.bytes = sizeof(double); write.address = 0xa00u;
-        memcpy(write.data, &operands[0], write.bytes);
+        lib_memory_copy(write.data, &operands[0], write.bytes);
         (void)access(machine, lease, write);
         write.address = 0xa10u;
-        memcpy(write.data, &operands[1], write.bytes);
+        lib_memory_copy(write.data, &operands[1], write.bytes);
         (void)access(machine, lease, write);
         write.address = 0x800u; write.bytes = length;
-        memcpy(write.data, program, write.bytes);
+        lib_memory_copy(write.data, program, write.bytes);
         (void)access(machine, lease, write);
         setreg(machine, lease, X86_DEBUG_EIP, 0x800u);
         trace.instruction_count = instructions;
         run_plan(machine, lease, events, trace, 0x800u + length, instructions);
         result = access(machine, lease, (x86_debug_request){
             .operation = X86_DEBUG_READ_LINEAR, .address = 0xa20u, .bytes = 8u });
-        memcpy(&actual, result.data, sizeof(actual));
+        lib_memory_copy(&actual, result.data, sizeof(actual));
         assert(actual == arithmetic[i].expected);
     }
 }
@@ -674,11 +674,11 @@ static void x87_rounding(common_machine *machine, common_machine_debug_lease *le
                 program[10] = width == 1u ? 0xdb : 0xdf;
                 program[11] = width == 2u ? 0x3e : 0x1e;
                 write.address = 0xa00u; write.bytes = sizeof(double);
-                memcpy(write.data, &input[index], sizeof(double));
+                lib_memory_copy(write.data, &input[index], sizeof(double));
                 (void)access(machine, lease, write);
                 memory_word(machine, lease, 0xa10u, (unsigned short)(0x37fu | (mode << 10)));
                 write.address = 0x800u; write.bytes = sizeof(program);
-                memcpy(write.data, program, sizeof(program));
+                lib_memory_copy(write.data, program, sizeof(program));
                 (void)access(machine, lease, write);
                 setreg(machine, lease, X86_DEBUG_EIP, 0x800u);
                 trace.instruction_count = 5u;
@@ -722,9 +722,9 @@ static void trace_cli(common_machine *machine, common_machine_debug_lease *lease
             provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_RUNNING,
                 COMMON_SESSION_MACHINE_PAUSED, &result);
             provider->note_monitor_current(provider->context, LIB_TRUE, &result);
-            assert(strstr(debug_text(&result), kind ? "EAX=" : "AX=") != NULL);
-            assert((strstr(debug_text(&result), "EIP=") != NULL) == (kind != 0u));
-            assert(strstr(result.text, "Machine paused.") != NULL);
+            assert(lib_text_find_substring(debug_text(&result), kind ? "EAX=" : "AX=") != NULL);
+            assert((lib_text_find_substring(debug_text(&result), "EIP=") != NULL) == (kind != 0u));
+            assert(lib_text_find_substring(result.text, "Machine paused.") != NULL);
             assert(result.request == (index == 0u ? COMMON_SESSION_REQUEST_RESUME :
                 COMMON_SESSION_REQUEST_NONE));
         }
@@ -745,8 +745,8 @@ static void trace_cli(common_machine *machine, common_machine_debug_lease *lease
         provider->note_runtime(provider->context, COMMON_SESSION_MACHINE_RUNNING,
             COMMON_SESSION_MACHINE_PAUSED, &result);
         provider->note_monitor_current(provider->context, LIB_TRUE, &result);
-        assert(strstr(debug_text(&result), "instructions executed before the break point."));
-        assert(strstr(debug_text(&result), "EAX=") && strstr(debug_text(&result), "EIP=00000701"));
+        assert(lib_text_find_substring(debug_text(&result), "instructions executed before the break point."));
+        assert(lib_text_find_substring(debug_text(&result), "EAX=") && lib_text_find_substring(debug_text(&result), "EIP=00000701"));
         assert(result.request == (index == 0u ? COMMON_SESSION_REQUEST_RESUME :
             COMMON_SESSION_REQUEST_NONE));
     }
@@ -806,7 +806,7 @@ int main(void)
     lib_u32 saved_eax;
     const common_session_machine_state inactive[] = {
         COMMON_SESSION_MACHINE_INIT, COMMON_SESSION_MACHINE_STOPPED };
-    size_t index;
+    lib_size index;
     assert(events.paused && events.running && events.stopped);
     sector[510] = 0x55; sector[511] = 0xaa;
     file = fopen(path, "wb");
@@ -832,12 +832,12 @@ int main(void)
         for (unsigned index = 0; index < sizeof(rejected) / sizeof(rejected[0]); ++index) {
             submit(&provider, COMMON_SESSION_MACHINE_ERROR, rejected[index], &result);
             assert(result.request == COMMON_SESSION_REQUEST_NONE);
-            assert(strstr(result.text, "Machine has failed;") != NULL);
+            assert(lib_text_find_substring(result.text, "Machine has failed;") != NULL);
             provider.note_monitor_current(&commands, LIB_TRUE, &result);
-            assert(result.arm_prompt && strcmp(result.prompt, "SoftPC> ") == 0);
+            assert(result.arm_prompt && lib_text_compare(result.prompt, "SoftPC> ") == 0);
         }
         submit(&provider, COMMON_SESSION_MACHINE_ERROR, "help", &result);
-        assert(strstr(result.text, "Insignia SoftPC") != NULL);
+        assert(lib_text_find_substring(result.text, "Insignia SoftPC") != NULL);
     }
     /* Exercise the actual composed provider, not a second hotkey dispatcher. */
     assert(provider.context == &commands && provider.open == app_command_provider_open);
@@ -857,11 +857,11 @@ int main(void)
         submit(&provider, inactive[index], "debug", &result);
         assert(commands.debug_active && result.request == COMMON_SESSION_REQUEST_NONE);
         provider.note_monitor_current(&commands, LIB_TRUE, &result);
-        assert(result.arm_prompt && strcmp(result.prompt, "-") == 0);
+        assert(result.arm_prompt && lib_text_compare(result.prompt, "-") == 0);
         submit(&provider, inactive[index], "?", &result);
-        assert(strstr(debug_text(&result), "assemble") != NULL);
+        assert(lib_text_find_substring(debug_text(&result), "assemble") != NULL);
         submit(&provider, inactive[index], "r", &result);
-        assert(strstr(debug_text(&result), "must be paused") != NULL && commands.debug_active);
+        assert(lib_text_find_substring(debug_text(&result), "must be paused") != NULL && commands.debug_active);
         submit(&provider, inactive[index], "q", &result);
         assert(!commands.debug_active && common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
     }
@@ -871,7 +871,7 @@ int main(void)
         COMMON_SESSION_MACHINE_RESET_COMPLETED, &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "debug", &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "r", &result);
-    assert(strstr(debug_text(&result), "AX=") != NULL && strstr(debug_text(&result), "failed") == NULL);
+    assert(lib_text_find_substring(debug_text(&result), "AX=") != NULL && lib_text_find_substring(debug_text(&result), "failed") == NULL);
     assert(common_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
     synchronous_access(machine, &lease);
     assert(execute_x86(machine, &lease,
@@ -880,7 +880,7 @@ int main(void)
     saved_eax = value.value;
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "r ax", &result);
     provider.note_monitor_current(&commands, LIB_TRUE, &result);
-    assert(result.arm_prompt && strcmp(result.prompt, ":") == 0);
+    assert(result.arm_prompt && lib_text_compare(result.prompt, ":") == 0);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "1234", &result);
     assert(execute_x86(machine, &lease,
         &(x86_debug_request){ .operation = X86_DEBUG_READ_REGISTER,
@@ -891,22 +891,22 @@ int main(void)
             .register_id = X86_DEBUG_EAX, .address = saved_eax }, &value) == LIB_STATUS_OK);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "e 0:500 12 34", &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "d 0:500", &result);
-    assert(strstr(debug_text(&result), "12 34") != NULL);
+    assert(lib_text_find_substring(debug_text(&result), "12 34") != NULL);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "u f000:fff0", &result);
-    assert(strstr(debug_text(&result), "F000:FFF0") != NULL);
+    assert(lib_text_find_substring(debug_text(&result), "F000:FFF0") != NULL);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "a 0:510", &result);
     provider.note_monitor_current(&commands, LIB_TRUE, &result);
-    assert(result.arm_prompt && strcmp(result.prompt, "0000:0510 ") == 0);
+    assert(result.arm_prompt && lib_text_compare(result.prompt, "0000:0510 ") == 0);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "nop", &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "", &result);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "d 0:510", &result);
-    assert(strstr(debug_text(&result), "90") != NULL);
+    assert(lib_text_find_substring(debug_text(&result), "90") != NULL);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "i 60", &result);
-    assert(strstr(debug_text(&result), "unsupported") == NULL && strstr(debug_text(&result), "failed") == NULL);
+    assert(lib_text_find_substring(debug_text(&result), "unsupported") == NULL && lib_text_find_substring(debug_text(&result), "failed") == NULL);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "xd ffffffff 1", &result);
     /* With A20 wrapping enabled this is the last ROM byte, not an invalid
      * host pointer. The original SAS bus, not host RAM bounds, decides. */
-    assert(strstr(debug_text(&result), "failed") == NULL);
+    assert(lib_text_find_substring(debug_text(&result), "failed") == NULL);
     assert(provider.handle_hotkey(&commands, COMMON_SESSION_MACHINE_PAUSED,
         "pause-toggle", &result));
     assert(commands.debug_active && result.request == COMMON_SESSION_REQUEST_RESUME);
@@ -919,7 +919,7 @@ int main(void)
     provider.note_runtime(&commands, COMMON_SESSION_MACHINE_PAUSED,
         COMMON_SESSION_MACHINE_RUNNING, &result);
     submit(&provider, COMMON_SESSION_MACHINE_RUNNING, "r", &result);
-    assert(strstr(debug_text(&result), "must be paused") != NULL && commands.debug_active);
+    assert(lib_text_find_substring(debug_text(&result), "must be paused") != NULL && commands.debug_active);
     submit(&provider, COMMON_SESSION_MACHINE_RUNNING, "q", &result);
     submit(&provider, COMMON_SESSION_MACHINE_RUNNING, "debug", &result);
     assert(commands.debug_active && common_machine_state_get(machine) == COMMON_MACHINE_RUNNING);
@@ -933,7 +933,7 @@ int main(void)
     assert(execute_x86(machine, &lease,
         &(x86_debug_request){0}, &value) == LIB_STATUS_INVALID_STATE);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED, "r", &result);
-    assert(strstr(debug_text(&result), "AX=") != NULL);
+    assert(lib_text_find_substring(debug_text(&result), "AX=") != NULL);
     assert(common_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
     /* mov word [0600],1234; mov word [0602],5678; jmp $ */
     execution_plans(machine, &lease, &events);
@@ -976,7 +976,7 @@ int main(void)
     wait_for(events.stopped);
     submit(&provider, COMMON_SESSION_MACHINE_STOPPED, "q", &result);
     provider.note_monitor_current(&commands, LIB_TRUE, &result);
-    assert(result.arm_prompt && strcmp(result.prompt, "SoftPC> ") == 0);
+    assert(result.arm_prompt && lib_text_compare(result.prompt, "SoftPC> ") == 0);
     /* Product commands use the actual provider, Common rendezvous and VM
        archive; only the test owns these two disposable files. */
     assert(common_machine_start(machine));
@@ -988,18 +988,18 @@ int main(void)
     provider.note_runtime(&commands, COMMON_SESSION_MACHINE_RUNNING,
         COMMON_SESSION_MACHINE_PAUSED, &result);
     provider.note_monitor_current(&commands, LIB_TRUE, &result);
-    assert(result.arm_prompt && strstr(result.text, "Machine saved and paused.") != NULL);
+    assert(result.arm_prompt && lib_text_find_substring(result.text, "Machine saved and paused.") != NULL);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED,
         "save debug-commands-smoke.spcs", &result);
-    assert(result.arm_prompt && strcmp(result.prompt, "SoftPC> ") == 0 &&
-        strstr(result.text, "Machine saved and paused.") != NULL);
+    assert(result.arm_prompt && lib_text_compare(result.prompt, "SoftPC> ") == 0 &&
+        lib_text_find_substring(result.text, "Machine saved and paused.") != NULL);
     assert(common_machine_stop(machine));
     wait_for(events.stopped);
     provider.note_runtime(&commands, COMMON_SESSION_MACHINE_PAUSED,
         COMMON_SESSION_MACHINE_STOPPED, &result);
     submit(&provider, COMMON_SESSION_MACHINE_STOPPED,
         "load missing-snapshot.spcs", &result);
-    assert(strstr(result.text, "Cannot load machine state.") != NULL &&
+    assert(lib_text_find_substring(result.text, "Cannot load machine state.") != NULL &&
         !result.arm_prompt);
     submit(&provider, COMMON_SESSION_MACHINE_STOPPED,
         "load debug-commands-smoke.spcs", &result);
@@ -1008,7 +1008,7 @@ int main(void)
     provider.note_runtime(&commands, COMMON_SESSION_MACHINE_STOPPED,
         COMMON_SESSION_MACHINE_PAUSED, &result);
     provider.note_monitor_current(&commands, LIB_TRUE, &result);
-    assert(result.arm_prompt && strstr(result.text, "Machine loaded and paused.") != NULL);
+    assert(result.arm_prompt && lib_text_find_substring(result.text, "Machine loaded and paused.") != NULL);
     assert(common_machine_resume(machine));
     wait_for(events.running);
     provider.note_runtime(&commands, COMMON_SESSION_MACHINE_PAUSED,

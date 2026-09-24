@@ -1,10 +1,9 @@
+#include "lib/types/types_interface.h"
 #include "trace.h"
 #include "lib/storage/file_interface.h"
 
 #include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <windows.h>
 
 static char vm_trace_path[MAX_PATH];
@@ -63,11 +62,11 @@ void vm_trace(const char *format, ...)
     va_copy(copied_arguments, arguments);
     length = vsnprintf(NULL, 0u, format, copied_arguments);
     va_end(copied_arguments);
-    if (length < 0 || (text = malloc((size_t)length + 3u)) == NULL) {
+    if (length < 0 || (text = lib_allocate((lib_size)length + 3u)) == NULL) {
         va_end(arguments);
         return;
     }
-    (void)vsnprintf(text, (size_t)length + 1u, format, arguments);
+    (void)vsnprintf(text, (lib_size)length + 1u, format, arguments);
     va_end(arguments);
     text[length] = '\r';
     text[length + 1] = '\n';
@@ -78,5 +77,5 @@ void vm_trace(const char *format, ...)
             (lib_size)length + 2u);
         (void)lib_storage_file_writer_close(writer);
     }
-    free(text);
+    lib_release(text);
 }

@@ -1,6 +1,7 @@
+#include "../time.h"
+#include "lib/types/types_interface.h"
 #include <ctype.h>
 #include <stdio.h>
-#include <string.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -25,7 +26,7 @@ static char *trim(char *text)
 {
     char *end;
     while (*text != '\0' && isspace((unsigned char)*text)) ++text;
-    end = text + strlen(text);
+    end = text + lib_text_length(text);
     while (end != text && isspace((unsigned char)end[-1])) --end;
     *end = '\0';
     return text;
@@ -41,11 +42,11 @@ static int is_below(const char *candidate, const char *root)
 {
     char full_candidate[MAX_PATH];
     char full_root[MAX_PATH];
-    size_t root_length;
+    lib_size root_length;
 
     if (!absolute_path(candidate, full_candidate, sizeof(full_candidate)) ||
         !absolute_path(root, full_root, sizeof(full_root))) return 0;
-    root_length = strlen(full_root);
+    root_length = lib_text_length(full_root);
     if (root_length != 0u && full_root[root_length - 1u] != '\\') {
         if (root_length + 1u >= sizeof(full_root)) return 0;
         full_root[root_length++] = '\\';
@@ -55,7 +56,7 @@ static int is_below(const char *candidate, const char *root)
 }
 
 static int resolve_package_value(const char *value, char *resolved,
-    size_t capacity)
+    lib_size capacity)
 {
     int length;
     if ((value[0] == '\\' || value[0] == '/') ||
@@ -64,7 +65,7 @@ static int resolve_package_value(const char *value, char *resolved,
         length = snprintf(resolved, capacity, "%s", value);
     else length = snprintf(resolved, capacity, "%s\\%s",
         SOFTPC_PACKAGE_DIRECTORY, value);
-    return length > 0 && (size_t)length < capacity;
+    return length > 0 && (lib_size)length < capacity;
 }
 
 static int verify_fixed_ini(void)
@@ -81,26 +82,26 @@ static int verify_fixed_ini(void)
     file = fopen(ini_path, "r");
     if (file == NULL) return 0;
     while (fgets(line, sizeof(line), file) != NULL) {
-        char *equals = strchr(line, '=');
+        char *equals = lib_text_find_character(line, '=');
         char *key;
         char *value;
-        char *comment = strchr(line, ';');
+        char *comment = lib_text_find_character(line, ';');
         if (comment != NULL) *comment = '\0';
         if (equals == NULL) continue;
         *equals = '\0';
         key = trim(line);
         value = trim(equals + 1);
-        if (strcmp(key, "floppy") == 0) {
+        if (lib_text_compare(key, "floppy") == 0) {
             if (!resolve_package_value(value, floppy, sizeof(floppy))) valid = 0;
-        } else if (strcmp(key, "hard_disk") == 0) {
+        } else if (lib_text_compare(key, "hard_disk") == 0) {
             if (!resolve_package_value(value, hard_disk, sizeof(hard_disk))) valid = 0;
-        } else if ((strcmp(key, "floppy_mode") == 0 ||
-            strcmp(key, "hard_disk_mode") == 0) &&
-            strcmp(value, "overlay") != 0 && strcmp(value, "readonly") != 0 &&
-            strcmp(value, "direct") != 0) {
+        } else if ((lib_text_compare(key, "floppy_mode") == 0 ||
+            lib_text_compare(key, "hard_disk_mode") == 0) &&
+            lib_text_compare(value, "overlay") != 0 && lib_text_compare(value, "readonly") != 0 &&
+            lib_text_compare(value, "direct") != 0) {
             valid = 0;
-        } else if (strcmp(key, "display") == 0) {
-            package_window_display = strcmp(value, "window") == 0;
+        } else if (lib_text_compare(key, "display") == 0) {
+            package_window_display = lib_text_compare(value, "window") == 0;
         }
     }
     fclose(file);
@@ -142,7 +143,7 @@ static int package_send_key(HANDLE input, WORD virtual_key, WORD scan_code,
 
 static int package_send_text(HANDLE input, const char *text)
 {
-    size_t index;
+    lib_size index;
     if (input == INVALID_HANDLE_VALUE || text == NULL) return 0;
     for (index = 0u; text[index] != '\0'; ++index) {
         CHAR character = text[index];
@@ -192,11 +193,11 @@ static int package_screen_contains(HANDLE output, const char *needle)
     }
     CloseHandle(output);
     text[read] = '\0';
-    memcpy(package_last_screen, text, read + 1u);
+    lib_memory_copy(package_last_screen, text, read + 1u);
     package_last_screen_width =
         (DWORD)(info.srWindow.Right - info.srWindow.Left + 1);
     package_last_screen_length = read;
-    return strstr(text, needle) != NULL;
+    return lib_text_find_substring(text, needle) != NULL;
 }
 
 static void package_report_last_screen(void)
@@ -218,39 +219,39 @@ static void package_report_last_screen(void)
 static int package_wait_for_text(HANDLE output, const char *needle,
     DWORD timeout_ms)
 {
-    DWORD deadline = GetTickCount() + timeout_ms;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + timeout_ms;
     do {
         if (package_screen_contains(output, needle)) return 1;
-        Sleep(20u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(20u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
 }
 
 static int package_wait_for_dos_prompt(HANDLE output, DWORD timeout_ms)
 {
-    DWORD deadline = GetTickCount() + timeout_ms;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + timeout_ms;
     do {
         if (package_screen_contains(output, "A:\\>") ||
             package_screen_contains(output, "C:\\>")) return 1;
-        Sleep(20u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(20u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
 }
 
 static int package_wait_for_absent_dos_prompt(HANDLE output, DWORD timeout_ms)
 {
-    DWORD deadline = GetTickCount() + timeout_ms;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + timeout_ms;
     do {
         if (!package_screen_contains(output, "A:\\>") &&
             !package_screen_contains(output, "C:\\>")) return 1;
-        Sleep(20u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(20u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
 }
 
 static int package_wait_debug_prompt(HANDLE output)
 {
-    DWORD deadline = GetTickCount() + 5000u;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + 5000u;
     do {
         CONSOLE_SCREEN_BUFFER_INFO info;
         COORD position;
@@ -262,19 +263,19 @@ static int package_wait_debug_prompt(HANDLE output)
             if (ReadConsoleOutputCharacterA(output, &character, 1u, position, &read) &&
                 read == 1u && character == '-') return 1;
         }
-        Sleep(20u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(20u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
 }
 
 static int package_wait_for_absent_text(HANDLE output, const char *needle,
     DWORD timeout_ms)
 {
-    DWORD deadline = GetTickCount() + timeout_ms;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + timeout_ms;
     do {
         if (!package_screen_contains(output, needle)) return 1;
-        Sleep(20u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(20u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
 }
 
@@ -286,13 +287,13 @@ static BOOL CALLBACK package_find_window(HWND window, LPARAM opaque)
     char name[64];
     GetWindowThreadProcessId(window, &process);
     if (process == probe->process && GetClassNameA(window, name, sizeof(name)) &&
-        strcmp(name, "LibKvmWindow") == 0) probe->window = window;
+        lib_text_compare(name, "LibKvmWindow") == 0) probe->window = window;
     return TRUE;
 }
 
 static int package_wait_window(DWORD process, const char *state)
 {
-    DWORD deadline = GetTickCount() + 10000u;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + 10000u;
     HWND observed = NULL;
     int visible = 0;
     char title[128] = { 0 };
@@ -304,11 +305,11 @@ static int package_wait_window(DWORD process, const char *state)
         title[0] = '\0';
         if (observed != NULL) GetWindowTextA(observed, title, sizeof(title));
         if (state == NULL && probe.window == NULL) return 1;
-        if (state != NULL && visible && strstr(title, state))
+        if (state != NULL && visible && lib_text_find_substring(title, state))
             return SendMessageTimeoutA(probe.window, WM_NULL, 0, 0,
                 SMTO_ABORTIFHUNG, 1000u, NULL) != 0;
-        Sleep(20u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(20u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     fprintf(stderr, "package Window timeout: expected=%s exists=%d visible=%d title=%s\n",
         state == NULL ? "absent" : state, observed != NULL, visible, title);
     return 0;
@@ -364,7 +365,7 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
 {
     HANDLE input = INVALID_HANDLE_VALUE;
     HANDLE output = INVALID_HANDLE_VALUE;
-    DWORD deadline;
+    lib_u64 deadline;
     int stage = 0;
     int success = 0;
 
@@ -372,11 +373,11 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
     if (out_error != NULL) *out_error = ERROR_SUCCESS;
     if (process == NULL) return 0;
     (void)FreeConsole();
-    deadline = GetTickCount() + 5000u;
+    deadline = softpc_test_clock_milliseconds() + 5000u;
     do {
         if (AttachConsole(process->dwProcessId)) break;
-        Sleep(20u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(20u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     if (GetConsoleCP() == 0u) { stage = 1; goto done; }
     /* Hide only our Console, not the child's first KVM ShowWindow call. */
     ShowWindow(GetConsoleWindow(), SW_HIDE);
@@ -401,7 +402,7 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
             font.dwFontSize.Y = 8;
             font.FontFamily = FF_MODERN;
             font.FontWeight = FW_NORMAL;
-            memcpy(font.FaceName, L"Consolas", sizeof(L"Consolas"));
+            lib_memory_copy(font.FaceName, L"Consolas", sizeof(L"Consolas"));
             if (!SetCurrentConsoleFontEx(output, FALSE, &font)) { stage = 21; goto done; }
             maximum = GetLargestConsoleWindowSize(output);
             if (maximum.X < 80 || maximum.Y < 25) { stage = 21; goto done; }
@@ -481,7 +482,7 @@ int main(int argc, char **argv)
     DWORD error = ERROR_SUCCESS;
     int stage = 0;
 
-    package_compact_console = argc == 2 && strcmp(argv[1], "--compact-console") == 0;
+    package_compact_console = argc == 2 && lib_text_compare(argv[1], "--compact-console") == 0;
     if (argc != 1 && !package_compact_console) return 1;
 
     if (!verify_fixed_ini()) {

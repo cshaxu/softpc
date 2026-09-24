@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 #include "input.h"
 #include <windows.h>
 
@@ -57,5 +58,5 @@ int vm_keyboard_inject_machine_event(softpc_machine *machine,
         copy.dwControlKeyState |= ENHANCED_KEY;
     key_number = KeyMsgToKeyCode(&copy);
     return key_number != 0u && softpc_machine_key_number(machine, key_number,
-        (uint8_t)!copy.bKeyDown) == SOFTPC_MACHINE_OK;
+        (lib_u8)!copy.bKeyDown) == SOFTPC_MACHINE_OK;
 }

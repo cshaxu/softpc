@@ -1,7 +1,8 @@
+#include "../time.h"
+#include "lib/types/types_interface.h"
 #include "machine_fixture.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -22,16 +23,16 @@ typedef struct runtime_frame_probe {
 
 static int wait_for_state(common_machine *runtime, common_machine_state state)
 {
-    DWORD deadline = GetTickCount() + 10000u;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + 10000u;
     do {
         if (common_machine_state_get(runtime) == state) return 1;
-        Sleep(10u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(10u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
 }
 
-static void receive_frame(void *opaque, uint32_t sequence, int graphics,
-    uint32_t run_generation)
+static void receive_frame(void *opaque, lib_u32 sequence, int graphics,
+    lib_u32 run_generation)
 {
     runtime_frame_probe *probe = (runtime_frame_probe *)opaque;
     (void)graphics;
@@ -42,18 +43,18 @@ static void receive_frame(void *opaque, uint32_t sequence, int graphics,
 }
 
 static int wait_for_frame_of_run(const runtime_frame_probe *probe,
-    uint32_t run_generation, uint32_t after_sequence)
+    lib_u32 run_generation, lib_u32 after_sequence)
 {
-    DWORD deadline = GetTickCount() + 10000u;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + 10000u;
     do {
-        uint32_t sequence = (uint32_t)InterlockedCompareExchange(
+        lib_u32 sequence = (lib_u32)InterlockedCompareExchange(
             (volatile LONG *)&probe->last_sequence, 0, 0);
-        uint32_t generation = (uint32_t)InterlockedCompareExchange(
+        lib_u32 generation = (lib_u32)InterlockedCompareExchange(
             (volatile LONG *)&probe->last_generation, 0, 0);
         if (generation == run_generation && sequence > after_sequence)
             return 1;
-        Sleep(10u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(10u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
 }
 
@@ -62,13 +63,13 @@ static int wait_for_frame_of_run(const runtime_frame_probe *probe,
  * this installed image; CS merely leaving F000 is not an adequate proxy. */
 static int frame_has_dos_prompt(const common_machine_frame *frame)
 {
-    uint32_t row;
+    lib_u32 row;
 
     if (frame == NULL || frame->window.valid == 0u || frame->window.graphics != 0u)
         return 0;
     for (row = 0u; row < frame->window.text.base.text_rows; ++row) {
         const kvm_text_cell *line = &frame->window.text.base.cells[row * KVM_TEXT_COLUMNS];
-        uint32_t column;
+        lib_u32 column;
 
         for (column = 0u; column + 3u < frame->window.text.base.text_columns; ++column) {
             if ((line[column].glyph_index == 'C' || line[column].glyph_index == 'c') &&
@@ -83,7 +84,7 @@ static int frame_has_dos_prompt(const common_machine_frame *frame)
 static void report_last_frame(common_machine *runtime)
 {
     common_machine_frame frame;
-    uint32_t row;
+    lib_u32 row;
 
     if (!common_machine_copy_published_frame(runtime, &frame,
             common_machine_run_generation(runtime))) return;
@@ -94,11 +95,11 @@ static void report_last_frame(common_machine *runtime)
     if (frame.window.graphics != 0u) return;
     for (row = 0u; row < frame.window.text.base.text_rows; ++row) {
         char line[KVM_TEXT_COLUMNS + 1u];
-        uint32_t column;
+        lib_u32 column;
         int nonblank = 0;
 
         for (column = 0u; column < frame.window.text.base.text_columns; ++column) {
-            uint8_t c = frame.window.text.base.cells[row * KVM_TEXT_COLUMNS + column].glyph_index;
+            lib_u8 c = frame.window.text.base.cells[row * KVM_TEXT_COLUMNS + column].glyph_index;
             line[column] = c >= 0x20u && c < 0x7fu ? (char)c : ' ';
             if (line[column] != ' ') nonblank = 1;
         }
@@ -110,20 +111,20 @@ static void report_last_frame(common_machine *runtime)
 static int wait_for_dos_prompt(common_machine *runtime, DWORD timeout_ms)
 {
     common_machine_frame frame;
-    DWORD deadline = GetTickCount() + timeout_ms;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + timeout_ms;
 
     do {
         if (common_machine_copy_published_frame(runtime, &frame,
                 common_machine_run_generation(runtime)) && frame_has_dos_prompt(&frame))
             return 1;
-        Sleep(10u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(10u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
 }
 
 static int run_reaches_post_bios(common_machine *runtime,
-    runtime_frame_probe *probe, uint32_t run_generation,
-    uint32_t prior_sequence)
+    runtime_frame_probe *probe, lib_u32 run_generation,
+    lib_u32 prior_sequence)
 {
     if (!wait_for_state(runtime, COMMON_MACHINE_RUNNING)) goto failed;
     /* This is deliberately stronger than an executor/IP check: a new cold
@@ -145,10 +146,10 @@ failed:
 
 static int enter_windows(common_machine *runtime)
 {
-    const uint32_t keys[] = { 'W', 'I', 'N', KVM_KEY_ENTER };
-    const uint32_t scans[] = { 0x11u, 0x17u, 0x31u, 0x1cu };
-    common_machine_frame *frame = calloc(1u, sizeof(*frame));
-    DWORD deadline;
+    const lib_u32 keys[] = { 'W', 'I', 'N', KVM_KEY_ENTER };
+    const lib_u32 scans[] = { 0x11u, 0x17u, 0x31u, 0x1cu };
+    common_machine_frame *frame = lib_allocate_zero(1u, sizeof(*frame));
+    lib_u64 deadline;
     int graphics = 0, running = 1;
     if (frame == NULL) return 0;
     for (unsigned index = 0; index < 4u; ++index) {
@@ -157,13 +158,13 @@ static int enter_windows(common_machine *runtime)
         event.data.key.key = keys[index];
         event.data.key.scan_code = scans[index];
         event.data.key.pressed = 1u;
-        if (!common_machine_enqueue_input(runtime, &event)) { free(frame); return 0; }
+        if (!common_machine_enqueue_input(runtime, &event)) { lib_release(frame); return 0; }
         event.data.key.pressed = 0u;
-        if (!common_machine_enqueue_input(runtime, &event)) { free(frame); return 0; }
+        if (!common_machine_enqueue_input(runtime, &event)) { lib_release(frame); return 0; }
     }
     /* Observe through startup, not merely its first splash frame. The fixed
        installed image remains overlay-only and the normal executor owns time. */
-    deadline = GetTickCount() + 15000u;
+    deadline = softpc_test_clock_milliseconds() + 15000u;
     do {
         if (common_machine_state_get(runtime) != COMMON_MACHINE_RUNNING) {
             running = 0;
@@ -172,9 +173,9 @@ static int enter_windows(common_machine *runtime)
         if (common_machine_copy_published_frame(runtime, frame,
                 common_machine_run_generation(runtime)) && frame->window.graphics)
             graphics = frame->window.image.width == 640u && frame->window.image.height == 480u;
-        Sleep(10u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
-    free(frame);
+        softpc_test_sleep_milliseconds(10u);
+    } while (softpc_test_clock_milliseconds() < deadline);
+    lib_release(frame);
     return running && graphics;
 }
 
@@ -192,14 +193,14 @@ static int tap_key(common_machine *runtime, lib_u32 key, lib_u32 scan)
 {
     if (!send_key(runtime, key, scan, 1) || !send_key(runtime, key, scan, 0))
         return 0;
-    Sleep(50u);
+    softpc_test_sleep_milliseconds(50u);
     return 1;
 }
 
 static int wait_for_mode(common_machine *runtime, int graphics, lib_u32 after)
 {
-    common_machine_frame *frame = calloc(1u, sizeof(*frame));
-    DWORD deadline = GetTickCount() + 10000u;
+    common_machine_frame *frame = lib_allocate_zero(1u, sizeof(*frame));
+    lib_u64 deadline = softpc_test_clock_milliseconds() + 10000u;
     int matched = 0;
     if (frame == NULL) return 0;
     do {
@@ -210,9 +211,9 @@ static int wait_for_mode(common_machine *runtime, int graphics, lib_u32 after)
             matched = 1;
             break;
         }
-        Sleep(10u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
-    free(frame);
+        softpc_test_sleep_milliseconds(10u);
+    } while (softpc_test_clock_milliseconds() < deadline);
+    lib_release(frame);
     return matched;
 }
 
@@ -234,7 +235,7 @@ static int type_command(common_machine *runtime, const char *text)
 
 static int prompt_roundtrip(common_machine *runtime, int windowed)
 {
-    common_machine_frame *frame = calloc(1u, sizeof(*frame));
+    common_machine_frame *frame = lib_allocate_zero(1u, sizeof(*frame));
     int succeeded = 0;
     if (frame == NULL) return 0;
     /* Program Manager File/Run, through the ordinary machine input queue. */
@@ -242,11 +243,11 @@ static int prompt_roundtrip(common_machine *runtime, int windowed)
         !tap_key(runtime, 'F', 0x21) ||
         !send_key(runtime, KVM_KEY_ALT, 0x38, 0) ||
         !tap_key(runtime, 'R', 0x13)) goto done;
-    Sleep(300u);
+    softpc_test_sleep_milliseconds(300u);
     if (!common_machine_copy_published_frame(runtime, frame,
             common_machine_run_generation(runtime)) ||
         !type_command(runtime, windowed ? "DOSPMPTW.PIF" : "DOSPRMPT.PIF")) goto done;
-    Sleep(2000u);
+    softpc_test_sleep_milliseconds(2000u);
     if (!wait_for_mode(runtime, windowed, frame->sequence)) goto done;
     for (unsigned i = 0; i < 6u; ++i) {
         if (!common_machine_copy_published_frame(runtime, frame,
@@ -257,19 +258,19 @@ static int prompt_roundtrip(common_machine *runtime, int windowed)
             !send_key(runtime, KVM_KEY_ALT, 0x38, 0) ||
             !wait_for_mode(runtime, windowed ^ ((i & 1u) == 0u), prior)) goto done;
         /* Let rendering/input continue after the first mode notification. */
-        Sleep(1000u);
+        softpc_test_sleep_milliseconds(1000u);
         if (common_machine_state_get(runtime) != COMMON_MACHINE_RUNNING) goto done;
         if (!type_command(runtime, "CLS")) goto done;
     }
     if (!common_machine_copy_published_frame(runtime, frame,
             common_machine_run_generation(runtime)) ||
         !type_command(runtime, "EXIT")) goto done;
-    Sleep(2000u);
+    softpc_test_sleep_milliseconds(2000u);
     if (!wait_for_mode(runtime, 1, frame->sequence)) goto done;
     succeeded = 1;
 done:
     if (!succeeded) report_last_frame(runtime);
-    free(frame);
+    lib_release(frame);
     return succeeded;
 }
 
@@ -279,8 +280,8 @@ int main(void)
     softpc_machine *machine = NULL;
     softpc_machine_fixture fixture = { 0 };
     common_machine *runtime;
-    uint32_t generation;
-    uint32_t sequence;
+    lib_u32 generation;
+    lib_u32 sequence;
     unsigned int cycle;
     runtime_frame_probe frame_probe = { 0 };
 
@@ -298,7 +299,7 @@ int main(void)
     REQUIRE(generation != 0u);
     REQUIRE(run_reaches_post_bios(runtime, &frame_probe,
         generation, 0u));
-    sequence = (uint32_t)InterlockedCompareExchange(
+    sequence = (lib_u32)InterlockedCompareExchange(
         &frame_probe.last_sequence, 0, 0);
 
     /* Monitor `stop` normally arrives after pause has returned Current
@@ -314,7 +315,7 @@ int main(void)
         REQUIRE(generation != 0u);
         REQUIRE(run_reaches_post_bios(runtime, &frame_probe,
             generation, sequence));
-        sequence = (uint32_t)InterlockedCompareExchange(
+        sequence = (lib_u32)InterlockedCompareExchange(
             &frame_probe.last_sequence, 0, 0);
     }
 

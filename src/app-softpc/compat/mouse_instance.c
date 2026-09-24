@@ -1,8 +1,8 @@
+#include "lib/types/types_interface.h"
 #include "insignia.h"
 #include "host_def.h"
 #include "virtual.h"
 
-#include <stdlib.h>
 
 /* One standalone machine has one original mouse-driver instance payload. */
 static IHP softpc_instance_data;
@@ -15,8 +15,8 @@ NIDDB_TM_CALLBACK terminate_callback;
     UNUSED(terminate_callback);
     if (size <= 0)
         return NULL;
-    free(softpc_instance_data);
-    softpc_instance_data = calloc(1u, (size_t)size);
+    lib_release(softpc_instance_data);
+    softpc_instance_data = lib_allocate_zero(1u, (lib_size)size);
     if (softpc_instance_data != NULL && create_callback != NULL)
         (*create_callback)(&softpc_instance_data);
     return &softpc_instance_data;
@@ -27,6 +27,6 @@ void NIDDB_Deallocate_Instance_Data(handle)
 {
     if (handle == NULL)
         return;
-    free(*handle);
+    lib_release(*handle);
     *handle = NULL;
 }

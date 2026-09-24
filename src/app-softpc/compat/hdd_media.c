@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 #include "insignia.h"
 #include "host_def.h"
 #include "platform.h"
@@ -29,7 +30,7 @@ const CHAR *softpc_hdd_media_config_path(unsigned int index)
 static int softpc_hdd_attach_media(softpc_disk_media *media, const char *path,
                                    lib_storage_medium_mode mode)
 {
-    size_t bytes;
+    lib_size bytes;
 
     media->medium = NULL;
     media->mode = mode;
@@ -37,13 +38,13 @@ static int softpc_hdd_attach_media(softpc_disk_media *media, const char *path,
     media->path[0] = '\0';
     if (path == NULL)
         return 1;
-    if (strlen(path) >= sizeof(media->path)) return 0;
+    if (lib_text_length(path) >= sizeof(media->path)) return 0;
     if (lib_storage_medium_open(path, mode, &media->medium) !=
         LIB_STATUS_OK) return 0;
     bytes = lib_storage_medium_byte_count(media->medium);
     if (bytes < SOFTPC_DISK_SECTOR_BYTES) goto attach_failed;
     media->total_sectors = (IU32)(bytes / SOFTPC_DISK_SECTOR_BYTES);
-    memcpy(media->path, path, strlen(path) + 1u);
+    lib_memory_copy(media->path, path, lib_text_length(path) + 1u);
     return 1;
 attach_failed:
     lib_storage_medium_destroy(&media->medium);
@@ -102,14 +103,14 @@ int *sectors;
 }
 
 static softpc_disk_media *softpc_hdd_transfer(int driveid, int offset,
-    int sectors, size_t *bytes)
+    int sectors, lib_size *bytes)
 {
     softpc_disk_media *media;
     if (driveid < 0 || driveid >= 2 || offset < 0 || sectors < 0)
         return NULL;
     media = &softpc_hdd_media[driveid];
-    *bytes = (size_t)sectors * SOFTPC_DISK_SECTOR_BYTES;
-    if (media->medium == NULL || (IU32)offset > media->total_sectors * SOFTPC_DISK_SECTOR_BYTES || *bytes > (size_t)(media->total_sectors * SOFTPC_DISK_SECTOR_BYTES - (IU32)offset))
+    *bytes = (lib_size)sectors * SOFTPC_DISK_SECTOR_BYTES;
+    if (media->medium == NULL || (IU32)offset > media->total_sectors * SOFTPC_DISK_SECTOR_BYTES || *bytes > (lib_size)(media->total_sectors * SOFTPC_DISK_SECTOR_BYTES - (IU32)offset))
         return NULL;
     return media;
 }
@@ -120,10 +121,10 @@ int offset;
 int sectors;
 char *buffer;
 {
-    size_t bytes;
+    lib_size bytes;
     softpc_disk_media *media = softpc_hdd_transfer(driveid, offset, sectors, &bytes);
     if (media == NULL) return 0;
-    if (lib_storage_medium_read_at(media->medium, (size_t)offset, buffer,
+    if (lib_storage_medium_read_at(media->medium, (lib_size)offset, buffer,
             bytes) != LIB_STATUS_OK)
         return 0;
     return 1;
@@ -135,10 +136,10 @@ int offset;
 int sectors;
 char *buffer;
 {
-    size_t bytes;
+    lib_size bytes;
     softpc_disk_media *media = softpc_hdd_transfer(driveid, offset, sectors, &bytes);
     if (media == NULL) return 0;
-    if (lib_storage_medium_write_at(media->medium, (size_t)offset, buffer,
+    if (lib_storage_medium_write_at(media->medium, (lib_size)offset, buffer,
             bytes) != LIB_STATUS_OK)
         return 0;
     return 1;
@@ -165,7 +166,7 @@ lib_status softpc_hdd_media_restore(unsigned slot, const char *path,
     lib_status status;
     softpc_disk_media *media;
     if (slot >= 2u || replacement == NULL || mode > LIB_STORAGE_MEDIUM_OVERLAY ||
-        (path != NULL && strlen(path) >= sizeof(softpc_hdd_media[slot].path)))
+        (path != NULL && lib_text_length(path) >= sizeof(softpc_hdd_media[slot].path)))
         return LIB_STATUS_INVALID_ARGUMENT;
     media = &softpc_hdd_media[slot];
     if (path == NULL) {
@@ -184,10 +185,10 @@ lib_status softpc_hdd_media_restore(unsigned slot, const char *path,
         media->mode = mode;
         media->total_sectors = (IU32)(lib_storage_medium_byte_count(media->medium) /
             SOFTPC_DISK_SECTOR_BYTES);
-        memcpy(media->path, path, strlen(path) + 1u);
+        lib_memory_copy(media->path, path, lib_text_length(path) + 1u);
         return LIB_STATUS_OK;
     }
-    if (media->medium == NULL || media->mode != mode || strcmp(media->path, path) != 0)
+    if (media->medium == NULL || media->mode != mode || lib_text_compare(media->path, path) != 0)
         return LIB_STATUS_INVALID_ARGUMENT;
     return LIB_STATUS_OK;
 }

@@ -1,3 +1,4 @@
+#include "../../time.h"
 #include <assert.h>
 
 #include <windows.h>
@@ -12,7 +13,7 @@ int main(void)
     IUH elapsed;
 
     host_q_write_timestamp(&before);
-    Sleep(20u);
+    softpc_test_sleep_milliseconds(20u);
     host_q_write_timestamp(&after);
     elapsed = host_q_timestamp_diff(&before, &after);
 

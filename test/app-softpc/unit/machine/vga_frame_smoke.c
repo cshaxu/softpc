@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "machine/driver.h"
 #include "cleanup.h"
@@ -138,15 +139,15 @@ static void verify_text_stride(void)
         now_width = visible;
         set_chars_per_line(visible);
         set_offset_per_line(pitch * 2);
-        memset(cells, 0xcc, sizeof(expected));
-        memset(expected, 0xcc, sizeof(expected));
+        lib_memory_set(cells, 0xcc, sizeof(expected));
+        lib_memory_set(expected, 0xcc, sizeof(expected));
         for (int row = 0; row < count; ++row)
-            memcpy(expected + ((row + 1) * 80 + x) * cell_size,
+            lib_memory_copy(expected + ((row + 1) * 80 + x) * cell_size,
                 source + (row * pitch + x) * cell_size, width * cell_size);
         /* The real painter receives pixels; destination row deliberately != 0. */
         nt_text(x * cell_size, x * get_pix_char_width(),
             get_host_char_height(), width * 2, count);
-        assert(memcmp(cells, expected, sizeof(expected)) == 0);
+        assert(lib_memory_compare(cells, expected, sizeof(expected)) == 0);
     }
     set_screen_ptr(saved_source);
     set_chars_per_line(saved_columns);
@@ -245,7 +246,7 @@ static void verify_panning_refresh(void)
         EGA_planes[i] = (unsigned char)(i & 1 ? 0x33 : 0x55);
     attribute_controller.horizontal_pel_panning.as.abyte = 0;
     nt_ega_hi_graph_std(0, 0, 0, 2, 1);
-    memcpy(unpanned, sc.ConsoleBufInfo.lpBitMap, sizeof(unpanned));
+    lib_memory_copy(unpanned, sc.ConsoleBufInfo.lpBitMap, sizeof(unpanned));
     attribute_controller.address.as_bfld.index_state = 0;
     setVideodirty_total(0);
     vga_ac_outb(0x3c0, 0x33);
@@ -258,7 +259,7 @@ static void verify_panning_refresh(void)
     assert(getVideodirty_total() == 0);
     nt_ega_hi_graph_std(0, 0, 0, 1, 1);
     /* One pel selects pixels 1..8, including the following plane byte. */
-    assert(memcmp(sc.ConsoleBufInfo.lpBitMap, unpanned + 1, 8) == 0);
+    assert(lib_memory_compare(sc.ConsoleBufInfo.lpBitMap, unpanned + 1, 8) == 0);
     setVideodirty_total(0);
     vga_ac_outb(0x3c0, 0x30);
     vga_ac_outb(0x3c0, attribute_controller.mode_control.as.abyte ^ 0x20);
@@ -296,9 +297,9 @@ static void verify_panning_pixels(void)
         set_screen_split(yscale - 1);
         attribute_controller.horizontal_pel_panning.as.abyte = 0;
         painters[p](address, 0, 0, 1, 1);
-        memcpy(expected, surface, 8 * xscale);
+        lib_memory_copy(expected, surface, 8 * xscale);
         painters[p](wrap ? 0 : 1, 0, 0, 1, 1);
-        memcpy(expected + 8 * xscale, surface, 8 * xscale);
+        lib_memory_copy(expected + 8 * xscale, surface, 8 * xscale);
         for (pan = 0; pan < 8; ++pan)
         for (split = 0; split < 2; ++split)
         for (row = 0; row < 2; ++row) {
@@ -307,7 +308,7 @@ static void verify_panning_pixels(void)
             attribute_controller.horizontal_pel_panning.as.abyte = pan;
             painters[p](address, 0, row, 1, 1);
             for (i = 0; i < yscale; ++i)
-                assert(memcmp(surface + (row * yscale + i) * sc.PC_W_Width,
+                assert(lib_memory_compare(surface + (row * yscale + i) * sc.PC_W_Width,
                     expected + shift * xscale, 8 * xscale) == 0);
         }
     }
@@ -323,8 +324,8 @@ static void verify_ega_dirty_alignment(void)
     struct attribute_controller saved_ac = attribute_controller;
     void (*saved_paint)() = paint_screen;
     unsigned char *surface = sc.ConsoleBufInfo.lpBitMap;
-    size_t size = (size_t)sc.PC_W_Width * sc.PC_W_Height;
-    unsigned char *complete = malloc(size);
+    lib_size size = (lib_size)sc.PC_W_Width * sc.PC_W_Height;
+    unsigned char *complete = lib_allocate(size);
     int offset, i, stride, split, bank, scale, pan;
     int saved_split = EGA_GRAPH.screen_split.as_word;
     int saved_bank = extensions_controller.ram_bank_select.as_bfld.counter_bank_enable;
@@ -364,7 +365,7 @@ static void verify_ega_dirty_alignment(void)
         set_screen_split(2 * scale - 1);
         set_screen_start(origin);
         /* Independent row/address oracle, still using the real painter. */
-        memset(surface, 0xa5, size);
+        lib_memory_set(surface, 0xa5, size);
         for (i = 0; i < 4; ++i) {
             int address = (split % 2 && i >= 2 ? (i - 2) * stride :
                 origin + i * stride) % plane_limit;
@@ -374,14 +375,14 @@ static void verify_ega_dirty_alignment(void)
             if (first < columns)
                 (*paint_screen)(0, first * 8, i, columns - first, 1);
         }
-        memcpy(complete, surface, size);
-        memset(surface, 0xa5, size);
-        memset(video_copy, 1, 0x8000);
+        lib_memory_copy(complete, surface, size);
+        lib_memory_set(surface, 0xa5, size);
+        lib_memory_set(video_copy, 1, 0x8000);
         setVideodirty_total(20001);
         update();
-        if (memcmp(complete, surface, size) != 0)
+        if (lib_memory_compare(complete, surface, size) != 0)
             fprintf(stderr, "EGA full/oracle mismatch route %d stride %d residue %d\n", split, stride, offset);
-        assert(memcmp(complete, surface, size) == 0);
+        assert(lib_memory_compare(complete, surface, size) == 0);
         for (i = 0; i < columns * 4; ++i) {
             int row = i / columns;
             int address = ((split % 2 && row >= 2 ? (row - 2) * stride :
@@ -391,19 +392,19 @@ static void verify_ega_dirty_alignment(void)
                     split, stride, offset, address);
             assert(video_copy[address >> 2] == 0);
         }
-        memset(surface, 0xa5, size);
-        memset(video_copy, 1, 0x8000);
+        lib_memory_set(surface, 0xa5, size);
+        lib_memory_set(video_copy, 1, 0x8000);
         setVideodirty_low(0);
         setVideodirty_high(0x7fff);
         setVideodirty_total(1);
         update();
-        if (memcmp(complete, surface, size) != 0) {
-            size_t p = 0;
+        if (lib_memory_compare(complete, surface, size) != 0) {
+            lib_size p = 0;
             while (complete[p] == surface[p]) ++p;
             fprintf(stderr, "EGA dirty/full mismatch route %d stride %d residue %d, pixel %zu: %u/%u, height %d\n",
                 split, stride, offset, p, complete[p], surface[p], get_screen_height());
         }
-        assert(memcmp(complete, surface, size) == 0);
+        assert(lib_memory_compare(complete, surface, size) == 0);
         /* A lone terminal group must not disappear through floor division;
            nor may clearing a shared row mark lose its next-row coverage. */
         for (i = 0; i < 8; ++i) {
@@ -411,7 +412,7 @@ static void verify_ega_dirty_alignment(void)
             int address = ((split % 2 && row >= 2 ? (row - 2) * stride :
                 origin + row * stride) + (i % 2 ? columns - 1 : 0)) % plane_limit;
             EGA_planes[address * (split >= 4 ? 1 : 4)] ^= 0xff;
-            memset(video_copy, 0, 0x8000);
+            lib_memory_set(video_copy, 0, 0x8000);
             video_copy[address >> 2] = 1;
             setVideodirty_low(address >> 2);
             setVideodirty_high(address >> 2);
@@ -421,13 +422,13 @@ static void verify_ega_dirty_alignment(void)
                 fprintf(stderr, "EGA uncleared sparse mark route %d stride %d residue %d address %d\n",
                     split, stride, offset, address);
             assert(video_copy[address >> 2] == 0);
-            memcpy(complete, surface, size);
+            lib_memory_copy(complete, surface, size);
             setVideodirty_total(20001);
             update();
-            if (memcmp(complete, surface, size) != 0)
+            if (lib_memory_compare(complete, surface, size) != 0)
                 fprintf(stderr, "EGA sparse/full mismatch route %d stride %d residue %d address %d\n",
                     split, stride, offset, address);
-            assert(memcmp(complete, surface, size) == 0);
+            assert(lib_memory_compare(complete, surface, size) == 0);
         }
     }
     }
@@ -436,7 +437,7 @@ static void verify_ega_dirty_alignment(void)
     attribute_controller = saved_ac;
     set_screen_split(saved_split);
     extensions_controller.ram_bank_select.as_bfld.counter_bank_enable = saved_bank;
-    free(complete);
+    lib_release(complete);
 }
 
 typedef struct {
@@ -449,8 +450,8 @@ static void check_paint(const painter_probe *p, unsigned char *guard,
     int expected_h)
 {
     int dx, dy;
-    size_t size = (size_t)sc.PC_W_Width * sc.PC_W_Height;
-    memset(guard, 0xa5, size + 32u);
+    lib_size size = (lib_size)sc.PC_W_Width * sc.PC_W_Height;
+    lib_memory_set(guard, 0xa5, size + 32u);
     p->paint(offset, x, y, width, height);
     for (dy = 0; dy < sc.PC_W_Height; ++dy)
         for (dx = 0; dx < sc.PC_W_Width; ++dx) {
@@ -458,7 +459,7 @@ static void check_paint(const painter_probe *p, unsigned char *guard,
                 dx >= x * p->x_pixels && dy >= y * p->y_pixels &&
                 dx < x * p->x_pixels + expected_w * p->width_pixels &&
                 dy < y * p->y_pixels + expected_h * p->y_pixels;
-            assert(guard[16u + (size_t)dy * sc.PC_W_Width + dx] ==
+            assert(guard[16u + (lib_size)dy * sc.PC_W_Width + dx] ==
                 (inside ? 0 : 0xa5));
         }
     for (dx = 0; dx < 16; ++dx) {
@@ -479,12 +480,12 @@ static void verify_painter_bounds(void)
         { nt_v7vga_hi_graph_std, 1, 1, 1, 1 }
     };
     void *saved = sc.ConsoleBufInfo.lpBitMap;
-    size_t size = (size_t)sc.PC_W_Width * sc.PC_W_Height;
-    unsigned char *guard = malloc(size + 32u);
-    size_t i;
+    lib_size size = (lib_size)sc.PC_W_Width * sc.PC_W_Height;
+    unsigned char *guard = lib_allocate(size + 32u);
+    lib_size i;
     assert(guard != NULL);
     nt_init_ega_lo_graph();
-    memset(EGA_planes, 0, 4u * EGA_PLANE_SIZE);
+    lib_memory_set(EGA_planes, 0, 4u * EGA_PLANE_SIZE);
     sc.ConsoleBufInfo.lpBitMap = guard + 16u;
     for (i = 0; i < sizeof(painters) / sizeof(painters[0]); ++i) {
         const painter_probe *p = &painters[i];
@@ -506,7 +507,7 @@ static void verify_painter_bounds(void)
         check_paint(p, guard, capacity, 0, 0, 1, 1, 0, 0);
     }
     sc.ConsoleBufInfo.lpBitMap = saved;
-    free(guard);
+    lib_release(guard);
 }
 
 static void make_boot_disk(const char *path)
@@ -534,7 +535,7 @@ static void verify_driver_geometry(softpc_machine *machine)
     };
     vm_driver *adapter = NULL;
     common_machine_driver driver;
-    common_machine_frame *frame = malloc(sizeof(*frame));
+    common_machine_frame *frame = lib_allocate(sizeof(*frame));
     unsigned index, pass;
     assert(frame != NULL);
     assert(vm_driver_create(&adapter, machine) == LIB_STATUS_OK);
@@ -543,8 +544,8 @@ static void verify_driver_geometry(softpc_machine *machine)
     for (index = 0; index < sizeof(modes) / sizeof(modes[0]); ++index) {
         const void *bits;
         const void *info;
-        uint32_t width, height;
-        int32_t left, top, right, bottom;
+        lib_u32 width, height;
+        lib_i32 left, top, right, bottom;
         SMALL_RECT rect;
         c_setAH(modes[index] >= 0x60 ? 0x6f : 0);
         c_setAL(modes[index] >= 0x60 ? 5 : (unsigned char)modes[index]);
@@ -554,7 +555,7 @@ static void verify_driver_geometry(softpc_machine *machine)
         host_timer_event();
         assert(Currently_emulated_video_mode == modes[index]);
         if (modes[index] == 3) {
-            memset(frame, 0xa5, sizeof(*frame));
+            lib_memory_set(frame, 0xa5, sizeof(*frame));
             assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
             assert(frame->window.valid && !frame->window.graphics);
             assert(frame->window.text.base.text_columns == 80u &&
@@ -621,7 +622,7 @@ static void verify_driver_geometry(softpc_machine *machine)
             }
             {
                 const void *surface;
-                uint32_t columns, rows, stride, cell_bytes;
+                lib_u32 columns, rows, stride, cell_bytes;
                 unsigned saved_select = get_attrib_font_select();
                 assert(softpc_machine_presentation_text(machine, &surface,
                     &columns, &rows, &stride, &cell_bytes));
@@ -649,7 +650,7 @@ static void verify_driver_geometry(softpc_machine *machine)
             assert(map[0xb3]==0x2502 && map[0xc4]==0x2500);
             assert(map[0xda]==0x250c && map[0xdb]==0x2588);
             assert(map[0x82]==0xe9 && map[0xff]==0xa0);
-            assert(memcmp(map, frame->characters.secondary,
+            assert(lib_memory_compare(map, frame->characters.secondary,
                 sizeof(frame->characters.primary)) == 0);
             continue;
         }
@@ -694,12 +695,12 @@ static void verify_driver_geometry(softpc_machine *machine)
                 frame->window.image.width, frame->window.image.height);
         assert(frame->window.image.width == width && frame->window.image.height == height);
         assert(frame->window.image.stride == width);
-        assert(memcmp(frame->window.image.pixels, bits, width * height) == 0);
+        assert(lib_memory_compare(frame->window.image.pixels, bits, width * height) == 0);
         rect.Left = (SHORT)(width / 2u); rect.Right = (SHORT)(width - 1u);
         assert(softpc_standalone_dib_damage(&rect));
         assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
         assert(frame->window.image.width == width);
-        assert(memcmp(frame->window.image.pixels, bits, width * height) == 0);
+        assert(lib_memory_compare(frame->window.image.pixels, bits, width * height) == 0);
         /* A graphics route with no complete dirty frame must publish nothing.
            It must never substitute the text surface: restoration relies on
            this same rule while the indexed painter is being rebuilt. */
@@ -713,7 +714,7 @@ static void verify_driver_geometry(softpc_machine *machine)
             assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
             assert(frame->window.image.palette[0] == ((lib_u32)colour.peRed << 16u |
                 (lib_u32)colour.peGreen << 8u | colour.peBlue));
-            assert(memcmp(frame->window.image.pixels, bits, width * height) == 0);
+            assert(lib_memory_compare(frame->window.image.pixels, bits, width * height) == 0);
             assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
             colour.peRed ^= 0xffu;
             softpc_standalone_dib_set_palette_entries(&colour, 1u);
@@ -721,7 +722,7 @@ static void verify_driver_geometry(softpc_machine *machine)
         }
     }
     vm_driver_destroy(adapter);
-    free(frame);
+    lib_release(frame);
 }
 
 static void verify_snapshot_rebuilds_graphics_surface(softpc_machine *machine)
@@ -730,8 +731,8 @@ static void verify_snapshot_rebuilds_graphics_surface(softpc_machine *machine)
     softpc_device_video_controller_state captured;
     const void *bits;
     const void *info;
-    uint32_t width;
-    uint32_t height;
+    lib_u32 width;
+    lib_u32 height;
     unsigned reset;
     unsigned saved_char_height;
     unsigned saved_offset;
@@ -889,9 +890,9 @@ static void verify_snapshot_video_writes(softpc_machine *machine)
             assert(softpc_device_snapshot_capture_video_controller(&saved));
             assert(saved.sequencer[2] == (mask ? 5 : 15));
             assert(saved.graphics[4] == mode);
-            memset(EGA_planes, 0, sizeof(expected));
+            lib_memory_set(EGA_planes, 0, sizeof(expected));
             write_byte_ev_glue(0xa0000, 0xa5);
-            memcpy(expected, EGA_planes, sizeof(expected));
+            lib_memory_copy(expected, EGA_planes, sizeof(expected));
             if (mode == 0 && mask == 0)
                 for (plane = 0; plane < sizeof(expected); ++plane)
                     assert(expected[plane] == 0xa5);
@@ -910,7 +911,7 @@ static void verify_snapshot_video_writes(softpc_machine *machine)
             assert(getVideoread_mapped_plane() == mode);
             assert(sequencer.extensions_control.as.abyte ==
                 saved.sequencer_extension_control);
-            memset(EGA_planes, 0, sizeof(expected));
+            lib_memory_set(EGA_planes, 0, sizeof(expected));
             write_byte_ev_glue(0xa0000, 0xa5);
             for (plane = 0; plane < sizeof(expected); ++plane)
                 assert(EGA_planes[plane] == expected[plane]);
@@ -930,8 +931,8 @@ int main(void)
     softpc_machine *machine = NULL;
     const void *bits = NULL;
     const void *info = NULL;
-    uint32_t width = 0;
-    uint32_t height = 0;
+    lib_u32 width = 0;
+    lib_u32 height = 0;
 
     make_boot_disk(path);
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
@@ -974,8 +975,8 @@ int main(void)
     {
         unsigned char font[256u * 16u];
         unsigned char secondary_font[256u * 16u];
-        uint32_t font_height = 0;
-        uint32_t attribute_font_select = 0;
+        lib_u32 font_height = 0;
+        lib_u32 attribute_font_select = 0;
         unsigned int row;
         unsigned int populated = 0;
         assert(softpc_machine_presentation_fonts(machine, font,
@@ -1057,10 +1058,10 @@ int main(void)
         &height));
     assert(width == 1024u && height == 768u);
     {
-        int32_t left;
-        int32_t top;
-        int32_t right;
-        int32_t bottom;
+        lib_i32 left;
+        lib_i32 top;
+        lib_i32 right;
+        lib_i32 bottom;
 
         while (softpc_machine_presentation_take_dirty(machine, &left, &top,
             &right, &bottom)) {
@@ -1112,10 +1113,10 @@ int main(void)
         &height));
     assert(width == 640u && height == 480u);
     {
-        int32_t left;
-        int32_t top;
-        int32_t right;
-        int32_t bottom;
+        lib_i32 left;
+        lib_i32 top;
+        lib_i32 right;
+        lib_i32 bottom;
         unsigned char *surface = (unsigned char *)bits;
 
         while (softpc_machine_presentation_take_dirty(machine, &left, &top,
@@ -1159,10 +1160,10 @@ int main(void)
     assert(width == 800u && height == 600u);
     verify_painter_bounds();
     {
-        int32_t left;
-        int32_t top;
-        int32_t right;
-        int32_t bottom;
+        lib_i32 left;
+        lib_i32 top;
+        lib_i32 right;
+        lib_i32 bottom;
         unsigned char *surface = (unsigned char *)bits;
 
         while (softpc_machine_presentation_take_dirty(machine, &left, &top,
@@ -1185,10 +1186,10 @@ int main(void)
        DIB entries; simply copying DAC[] would leave index zero black here. */
     {
         const softpc_test_dib_info *dib = (const softpc_test_dib_info *)info;
-        int32_t left;
-        int32_t top;
-        int32_t right;
-        int32_t bottom;
+        lib_i32 left;
+        lib_i32 top;
+        lib_i32 right;
+        lib_i32 bottom;
         set_256_colour_mode(FALSE);
         set_colour_select(FALSE);
         set_top_pixel_pad(0);
@@ -1213,8 +1214,8 @@ int main(void)
            retain stale red/white entries after programming blue/yellow. */
         assert(softpc_machine_presentation_take_dirty(machine, &left, &top,
             &right, &bottom));
-        assert(left == 0 && top == 0 && right == (int32_t)width - 1 &&
-            bottom == (int32_t)height - 1);
+        assert(left == 0 && top == 0 && right == (lib_i32)width - 1 &&
+            bottom == (lib_i32)height - 1);
     }
     verify_ega_dirty_alignment();
     verify_panning_refresh();

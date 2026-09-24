@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 #include "machine.h"
 #include "compat/ccpu/lifecycle.h"
 #include "compat/ccpu/abi.h"
@@ -8,8 +9,6 @@
 #include "lib/storage/medium_interface.h"
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 /* CCPU's standalone executor entry points.  The wrapper intentionally calls
  * the core directly instead of the historical host shim. */
@@ -72,44 +71,44 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
         !softpc_machine_media_exists(options->floppy_path) ||
         !softpc_machine_media_exists(options->hard_disk_path))
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    machine = calloc(1u, sizeof(*machine));
+    machine = lib_allocate_zero(1u, sizeof(*machine));
     if (machine == NULL) return SOFTPC_MACHINE_IO_ERROR;
     machine->options = *options;
     if (options->floppy_path != NULL) {
-        size_t length = strlen(options->floppy_path);
+        lib_size length = lib_text_length(options->floppy_path);
         if (length >= sizeof(machine->floppy_path)) {
-            free(machine);
+            lib_release(machine);
             return SOFTPC_MACHINE_INVALID_ARGUMENT;
         }
-        memcpy(machine->floppy_path, options->floppy_path, length + 1u);
+        lib_memory_copy(machine->floppy_path, options->floppy_path, length + 1u);
         machine->options.floppy_path = machine->floppy_path;
     }
     if (options->hard_disk_path != NULL) {
-        size_t length = strlen(options->hard_disk_path);
+        lib_size length = lib_text_length(options->hard_disk_path);
         if (length >= sizeof(machine->hard_disk_path)) {
-            free(machine);
+            lib_release(machine);
             return SOFTPC_MACHINE_INVALID_ARGUMENT;
         }
-        memcpy(machine->hard_disk_path, options->hard_disk_path, length + 1u);
+        lib_memory_copy(machine->hard_disk_path, options->hard_disk_path, length + 1u);
         machine->options.hard_disk_path = machine->hard_disk_path;
     }
     if (options->serial_output_path != NULL) {
-        size_t length = strlen(options->serial_output_path);
+        lib_size length = lib_text_length(options->serial_output_path);
         if (length >= sizeof(machine->serial_output_path)) {
-            free(machine);
+            lib_release(machine);
             return SOFTPC_MACHINE_INVALID_ARGUMENT;
         }
-        memcpy(machine->serial_output_path, options->serial_output_path,
+        lib_memory_copy(machine->serial_output_path, options->serial_output_path,
             length + 1u);
         machine->options.serial_output_path = machine->serial_output_path;
     }
     if (options->printer_output_path != NULL) {
-        size_t length = strlen(options->printer_output_path);
+        lib_size length = lib_text_length(options->printer_output_path);
         if (length >= sizeof(machine->printer_output_path)) {
-            free(machine);
+            lib_release(machine);
             return SOFTPC_MACHINE_INVALID_ARGUMENT;
         }
-        memcpy(machine->printer_output_path, options->printer_output_path,
+        lib_memory_copy(machine->printer_output_path, options->printer_output_path,
             length + 1u);
         machine->options.printer_output_path = machine->printer_output_path;
     }
@@ -117,13 +116,13 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
         machine->options.serial_output_path) ||
         !softpc_host_lpt_set_output_path(0,
             machine->options.printer_output_path)) {
-        free(machine);
+        lib_release(machine);
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     }
     machine->memory_bytes = options->memory_bytes == 0u ?
         SOFTPC_FIXED_RAM_BYTES : (unsigned long)options->memory_bytes;
     if (machine->memory_bytes < SOFTPC_MINIMUM_RAM_BYTES) {
-        free(machine);
+        lib_release(machine);
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     }
     *machine_out = machine;
@@ -209,10 +208,10 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     return SOFTPC_MACHINE_OK;
 }
 
-uint32_t softpc_machine_memory_bytes(const softpc_machine *machine)
+lib_u32 softpc_machine_memory_bytes(const softpc_machine *machine)
 {
     if (machine == NULL || machine->memory_bytes > UINT32_MAX) return 0u;
-    return (uint32_t)machine->memory_bytes;
+    return (lib_u32)machine->memory_bytes;
 }
 
 lib_status softpc_machine_prepare_media(softpc_machine *machine,
@@ -232,13 +231,13 @@ lib_status softpc_machine_prepare_media(softpc_machine *machine,
         status = softpc_media_archive_attachment(archive, 2u, &hard_disk_path,
             &hard_disk_mode);
     if (status != LIB_STATUS_OK ||
-        (floppy_path != NULL && strlen(floppy_path) >= sizeof(machine->floppy_path)) ||
-        (hard_disk_path != NULL && strlen(hard_disk_path) >= sizeof(machine->hard_disk_path)))
+        (floppy_path != NULL && lib_text_length(floppy_path) >= sizeof(machine->floppy_path)) ||
+        (hard_disk_path != NULL && lib_text_length(hard_disk_path) >= sizeof(machine->hard_disk_path)))
         return status == LIB_STATUS_OK ? LIB_STATUS_LIMIT_EXCEEDED : status;
     if (floppy_path == NULL) machine->floppy_path[0] = '\0';
-    else memcpy(machine->floppy_path, floppy_path, strlen(floppy_path) + 1u);
+    else lib_memory_copy(machine->floppy_path, floppy_path, lib_text_length(floppy_path) + 1u);
     if (hard_disk_path == NULL) machine->hard_disk_path[0] = '\0';
-    else memcpy(machine->hard_disk_path, hard_disk_path, strlen(hard_disk_path) + 1u);
+    else lib_memory_copy(machine->hard_disk_path, hard_disk_path, lib_text_length(hard_disk_path) + 1u);
     machine->options.floppy_path = machine->floppy_path[0] == '\0' ? NULL :
         machine->floppy_path;
     machine->options.hard_disk_path = machine->hard_disk_path[0] == '\0' ? NULL :
@@ -249,7 +248,7 @@ lib_status softpc_machine_prepare_media(softpc_machine *machine,
 }
 
 softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,
-    uint8_t scan_code)
+    lib_u8 scan_code)
 {
     if (machine == NULL || !machine->reset)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
@@ -258,7 +257,7 @@ softpc_machine_result softpc_machine_key_scancode(softpc_machine *machine,
 }
 
 softpc_machine_result softpc_machine_key_number(softpc_machine *machine,
-    uint8_t key_number, uint8_t released)
+    lib_u8 key_number, lib_u8 released)
 {
     if (machine == NULL || !machine->reset || key_number == 0u)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
@@ -267,7 +266,7 @@ softpc_machine_result softpc_machine_key_number(softpc_machine *machine,
 }
 
 softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,
-    int32_t delta_x, int32_t delta_y, uint8_t left_down, uint8_t right_down)
+    lib_i32 delta_x, lib_i32 delta_y, lib_u8 left_down, lib_u8 right_down)
 {
     if (machine == NULL || !machine->reset)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
@@ -282,11 +281,11 @@ softpc_machine_result softpc_machine_mouse_input(softpc_machine *machine,
 softpc_machine_result softpc_machine_set_floppy(softpc_machine *machine,
     const char *path, lib_storage_medium_mode mode)
 {
-    size_t length;
+    lib_size length;
     if (machine == NULL || mode > LIB_STORAGE_MEDIUM_OVERLAY)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     if (path != NULL) {
-        length = strlen(path);
+        length = lib_text_length(path);
         if (length >= sizeof(machine->floppy_path) ||
             (!machine->hardware_initialized && !softpc_machine_media_exists(path)))
             return SOFTPC_MACHINE_INVALID_ARGUMENT;
@@ -296,7 +295,7 @@ softpc_machine_result softpc_machine_set_floppy(softpc_machine *machine,
         return SOFTPC_MACHINE_IO_ERROR;
     if (path == NULL) machine->floppy_path[0] = '\0';
     else {
-        memcpy(machine->floppy_path, path, length + 1u);
+        lib_memory_copy(machine->floppy_path, path, length + 1u);
     }
     machine->options.floppy_path = machine->floppy_path[0] == '\0' ?
         NULL : machine->floppy_path;
@@ -305,7 +304,7 @@ softpc_machine_result softpc_machine_set_floppy(softpc_machine *machine,
 }
 
 softpc_machine_result softpc_machine_read_physical(const softpc_machine *machine,
-    uint32_t address, void *buffer, uint32_t bytes)
+    lib_u32 address, void *buffer, lib_u32 bytes)
 {
     if (machine == NULL || buffer == NULL || !machine->reset || bytes == 0u)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
@@ -315,7 +314,7 @@ softpc_machine_result softpc_machine_read_physical(const softpc_machine *machine
 }
 
 softpc_machine_result softpc_machine_write_physical(softpc_machine *machine,
-    uint32_t address, const void *buffer, uint32_t bytes)
+    lib_u32 address, const void *buffer, lib_u32 bytes)
 {
     if (machine == NULL || buffer == NULL || !machine->reset || bytes == 0u)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
@@ -325,7 +324,7 @@ softpc_machine_result softpc_machine_write_physical(softpc_machine *machine,
 }
 
 softpc_machine_result softpc_machine_run(softpc_machine *machine,
-    uint64_t instruction_budget)
+    lib_u64 instruction_budget)
 {
     if (machine == NULL || !machine->reset || instruction_budget == 0u)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
@@ -391,21 +390,21 @@ void softpc_machine_set_executor_callback(softpc_machine *machine,
 }
 
 softpc_machine_result softpc_machine_instruction_pointer(
-    const softpc_machine *machine, uint16_t *cs, uint32_t *eip)
+    const softpc_machine *machine, lib_u16 *cs, lib_u32 *eip)
 {
     if (machine == NULL || cs == NULL || eip == NULL || !machine->reset)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    *cs = (uint16_t)c_getCS();
-    *eip = (uint32_t)c_getEIP();
+    *cs = (lib_u16)c_getCS();
+    *eip = (lib_u32)c_getEIP();
     return SOFTPC_MACHINE_OK;
 }
 
 softpc_machine_result softpc_machine_instruction_address(
-    const softpc_machine *machine, uint32_t *address)
+    const softpc_machine *machine, lib_u32 *address)
 {
     if (machine == NULL || address == NULL || !machine->reset)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
-    *address = (uint32_t)(c_getCS_BASE() + c_getEIP());
+    *address = (lib_u32)(c_getCS_BASE() + c_getEIP());
     return SOFTPC_MACHINE_OK;
 }
 
@@ -416,7 +415,7 @@ int softpc_machine_presentation_is_graphics(const softpc_machine *machine)
 }
 
 int softpc_machine_presentation_state(const softpc_machine *machine,
-    uint32_t *mode_type_out, uint32_t *screen_state_out)
+    lib_u32 *mode_type_out, lib_u32 *screen_state_out)
 {
     if (machine == NULL || !machine->reset || mode_type_out == NULL ||
         screen_state_out == NULL) return 0;
@@ -424,7 +423,7 @@ int softpc_machine_presentation_state(const softpc_machine *machine,
 }
 
 int softpc_machine_presentation_take_dirty(const softpc_machine *machine,
-    int32_t *left, int32_t *top, int32_t *right, int32_t *bottom)
+    lib_i32 *left, lib_i32 *top, lib_i32 *right, lib_i32 *bottom)
 {
     long native_left;
     long native_top;
@@ -433,16 +432,16 @@ int softpc_machine_presentation_take_dirty(const softpc_machine *machine,
     if (machine == NULL || !machine->reset || left == NULL || top == NULL ||
         right == NULL || bottom == NULL || !softpc_standalone_dib_take_dirty(
             &native_left, &native_top, &native_right, &native_bottom)) return 0;
-    *left = (int32_t)native_left;
-    *top = (int32_t)native_top;
-    *right = (int32_t)native_right;
-    *bottom = (int32_t)native_bottom;
+    *left = (lib_i32)native_left;
+    *top = (lib_i32)native_top;
+    *right = (lib_i32)native_right;
+    *bottom = (lib_i32)native_bottom;
     return 1;
 }
 
 int softpc_machine_presentation_dib(const softpc_machine *machine,
-    const void **bits_out, const void **info_out, uint32_t *width_out,
-    uint32_t *height_out)
+    const void **bits_out, const void **info_out, lib_u32 *width_out,
+    lib_u32 *height_out)
 {
     unsigned long width;
     unsigned long height;
@@ -450,14 +449,14 @@ int softpc_machine_presentation_dib(const softpc_machine *machine,
         width_out == NULL || height_out == NULL ||
         !softpc_standalone_dib_surface(bits_out, info_out, &width, &height))
         return 0;
-    *width_out = (uint32_t)width;
-    *height_out = (uint32_t)height;
+    *width_out = (lib_u32)width;
+    *height_out = (lib_u32)height;
     return 1;
 }
 
 int softpc_machine_presentation_text(const softpc_machine *machine,
-    const void **cells_out, uint32_t *columns_out, uint32_t *rows_out,
-    uint32_t *stride_out, uint32_t *cell_bytes_out)
+    const void **cells_out, lib_u32 *columns_out, lib_u32 *rows_out,
+    lib_u32 *stride_out, lib_u32 *cell_bytes_out)
 {
     unsigned long columns;
     unsigned long rows;
@@ -468,15 +467,15 @@ int softpc_machine_presentation_text(const softpc_machine *machine,
         cell_bytes_out == NULL || !softpc_standalone_text_surface(cells_out,
             &columns, &rows, &stride, &cell_bytes) ||
         !softpc_platform_presentation_text_extent(&columns, &rows)) return 0;
-    *columns_out = (uint32_t)columns;
-    *rows_out = (uint32_t)rows;
-    *stride_out = (uint32_t)stride;
-    *cell_bytes_out = (uint32_t)cell_bytes;
+    *columns_out = (lib_u32)columns;
+    *rows_out = (lib_u32)rows;
+    *stride_out = (lib_u32)stride;
+    *cell_bytes_out = (lib_u32)cell_bytes;
     return 1;
 }
 
 int softpc_machine_presentation_cursor(const softpc_machine *machine,
-    int32_t *column_out, int32_t *row_out, uint32_t *size_out)
+    lib_i32 *column_out, lib_i32 *row_out, lib_u32 *size_out)
 {
     long column;
     long row;
@@ -484,15 +483,15 @@ int softpc_machine_presentation_cursor(const softpc_machine *machine,
     if (machine == NULL || !machine->reset || column_out == NULL ||
         row_out == NULL || size_out == NULL ||
         !softpc_platform_presentation_cursor(&column, &row, &size)) return 0;
-    *column_out = (int32_t)column;
-    *row_out = (int32_t)row;
-    *size_out = (uint32_t)size;
+    *column_out = (lib_i32)column;
+    *row_out = (lib_i32)row;
+    *size_out = (lib_u32)size;
     return 1;
 }
 
 int softpc_machine_presentation_fonts(const softpc_machine *machine,
-    uint8_t primary[256u * 16u], uint8_t secondary[256u * 16u],
-    uint32_t *height_out, uint32_t *attribute_select_out)
+    lib_u8 primary[256u * 16u], lib_u8 secondary[256u * 16u],
+    lib_u32 *height_out, lib_u32 *attribute_select_out)
 {
     unsigned long height;
     unsigned long attribute_select;
@@ -501,8 +500,8 @@ int softpc_machine_presentation_fonts(const softpc_machine *machine,
         secondary == NULL || height_out == NULL || attribute_select_out == NULL ||
         !softpc_platform_presentation_fonts(primary, secondary, &height,
             &attribute_select)) return 0;
-    *height_out = (uint32_t)height;
-    *attribute_select_out = (uint32_t)attribute_select;
+    *height_out = (lib_u32)height;
+    *attribute_select_out = (lib_u32)attribute_select;
     return 1;
 }
 
@@ -521,7 +520,7 @@ void softpc_machine_destroy(softpc_machine *machine)
         softpc_gdp_destroy_global();
         sas_term();
     }
-    free(machine);
+    lib_release(machine);
 }
 
 const char *softpc_machine_result_name(softpc_machine_result result)

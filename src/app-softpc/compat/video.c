@@ -1,10 +1,9 @@
+#include "lib/types/types_interface.h"
 #include "insignia.h"
 #include "host_def.h"
 #include "platform.h"
 #include "devices/snapshot.h"
 
-#include <stdint.h>
-#include <string.h>
 
 #include "gmi.h"
 #include "xt.h"
@@ -35,12 +34,12 @@ int softpc_platform_presentation_is_graphics(void)
     return sc.ModeType == GRAPHICS;
 }
 
-int softpc_platform_presentation_state(uint32_t *mode_type_out,
-    uint32_t *screen_state_out)
+int softpc_platform_presentation_state(lib_u32 *mode_type_out,
+    lib_u32 *screen_state_out)
 {
     if (mode_type_out == NULL || screen_state_out == NULL) return 0;
-    *mode_type_out = (uint32_t)sc.ModeType;
-    *screen_state_out = (uint32_t)sc.ScreenState;
+    *mode_type_out = (lib_u32)sc.ModeType;
+    *screen_state_out = (lib_u32)sc.ScreenState;
     return 1;
 }
 
@@ -72,7 +71,7 @@ int softpc_platform_presentation_text_extent(unsigned long *columns_out,
     return 1;
 }
 
-int softpc_platform_presentation_fonts(uint8_t *primary, uint8_t *secondary,
+int softpc_platform_presentation_fonts(lib_u8 *primary, lib_u8 *secondary,
                                        unsigned long *height_out, unsigned long *attribute_select_out)
 {
     static const unsigned long font_offsets[8] = {
@@ -89,8 +88,8 @@ int softpc_platform_presentation_fonts(uint8_t *primary, uint8_t *secondary,
     height = get_char_height();
     font = (unsigned long)get_prim_font_index() & 7u;
     secondary_font = (unsigned long)get_sec_font_index() & 7u;
-    memset(primary, 0, 256u * 16u);
-    memset(secondary, 0, 256u * 16u);
+    lib_memory_set(primary, 0, 256u * 16u);
+    lib_memory_set(secondary, 0, 256u * 16u);
     *height_out = height;
     *attribute_select_out = get_attrib_font_select() ? 1u : 0u;
     /* Preserve unsupported metadata for the receiving frame validator. No
@@ -133,11 +132,11 @@ int softpc_device_snapshot_capture_video_memory(
         sizeof(state->plane) != 4u * EGA_PLANE_SIZE ||
         SOFTPC_DEVICE_VIDEO_DAC_COUNT != VGA_DAC_SIZE)
         return 0;
-    memcpy(state->plane, EGA_planes, sizeof(state->plane));
+    lib_memory_copy(state->plane, EGA_planes, sizeof(state->plane));
     for (index = 0u; index < SOFTPC_DEVICE_VIDEO_DAC_COUNT; ++index) {
-        state->dac[index][0] = (uint8_t)DAC[index].red;
-        state->dac[index][1] = (uint8_t)DAC[index].green;
-        state->dac[index][2] = (uint8_t)DAC[index].blue;
+        state->dac[index][0] = (lib_u8)DAC[index].red;
+        state->dac[index][1] = (lib_u8)DAC[index].green;
+        state->dac[index][2] = (lib_u8)DAC[index].blue;
     }
     return 1;
 }
@@ -152,7 +151,7 @@ int softpc_device_snapshot_restore_video_memory(
         sizeof(state->plane) != 4u * EGA_PLANE_SIZE ||
         SOFTPC_DEVICE_VIDEO_DAC_COUNT != VGA_DAC_SIZE)
         return 0;
-    memcpy(EGA_planes, state->plane, sizeof(state->plane));
+    lib_memory_copy(EGA_planes, state->plane, sizeof(state->plane));
     for (index = 0u; index < SOFTPC_DEVICE_VIDEO_DAC_COUNT; ++index) {
         DAC[index].red = (half_word)state->dac[index][0];
         DAC[index].green = (half_word)state->dac[index][1];

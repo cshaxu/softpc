@@ -1,7 +1,6 @@
+#include "lib/types/types_interface.h"
 #include <windows.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "insignia.h"
 #include "host_def.h"
@@ -57,7 +56,7 @@ static void softpc_standalone_dib_record_palette(void)
         SOFTPC_DIB_PALETTE_HISTORY;
 
     if (softpc_dib_info == NULL) return;
-    memcpy(softpc_dib_palette_history[slot], softpc_dib_info->bmiColors,
+    lib_memory_copy(softpc_dib_palette_history[slot], softpc_dib_info->bmiColors,
         sizeof(softpc_dib_palette_history[slot]));
     softpc_dib_palette_history_count++;
     if (getenv("SOFTPC_PALETTE_TRACE") != NULL) {
@@ -122,8 +121,8 @@ PBYTE textBuffer;
 
 int softpc_standalone_dib_init(void)
 {
-    size_t info_bytes;
-    size_t bitmap_bytes;
+    lib_size info_bytes;
+    lib_size bitmap_bytes;
 
     if (softpc_dib_bits != NULL) {
         if (softpc_dib_info == NULL || textBuffer == NULL) return 0;
@@ -134,11 +133,11 @@ int softpc_standalone_dib_init(void)
     info_bytes = sizeof(BITMAPINFOHEADER) +
         SOFTPC_DIB_COLOURS * sizeof(RGBQUAD);
     bitmap_bytes = SOFTPC_DIB_MAX_WIDTH * SOFTPC_DIB_MAX_HEIGHT;
-    softpc_dib_info = (BITMAPINFO *)calloc(1u, info_bytes);
-    softpc_dib_bits = (unsigned char *)calloc(1u, bitmap_bytes);
+    softpc_dib_info = (BITMAPINFO *)lib_allocate_zero(1u, info_bytes);
+    softpc_dib_bits = (unsigned char *)lib_allocate_zero(1u, bitmap_bytes);
     if (softpc_dib_info == NULL || softpc_dib_bits == NULL) {
-        free(softpc_dib_info);
-        free(softpc_dib_bits);
+        lib_release(softpc_dib_info);
+        lib_release(softpc_dib_bits);
         softpc_dib_info = NULL;
         softpc_dib_bits = NULL;
         return 0;
@@ -156,7 +155,7 @@ int softpc_standalone_dib_init(void)
     sc.PC_W_Width = SOFTPC_DIB_MAX_WIDTH;
     sc.PC_W_Height = SOFTPC_DIB_MAX_HEIGHT;
     if (textBuffer == NULL)
-        textBuffer = (PBYTE)calloc(SOFTPC_TEXT_STORAGE_COLUMNS *
+        textBuffer = (PBYTE)lib_allocate_zero(SOFTPC_TEXT_STORAGE_COLUMNS *
             SOFTPC_TEXT_STORAGE_ROWS, SOFTPC_TEXT_CELL_BYTES);
     if (textBuffer == NULL) return 0;
     DIBData = (char *)softpc_dib_bits;
@@ -188,7 +187,7 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info)
         (DWORD)(((unsigned long)width + 3u) & ~3u) * (DWORD)height;
     softpc_dib_width = (unsigned long)width;
     softpc_dib_height = (unsigned long)height;
-    memset(softpc_dib_bits, 0, (size_t)softpc_dib_info->bmiHeader.biSizeImage);
+    lib_memory_set(softpc_dib_bits, 0, (lib_size)softpc_dib_info->bmiHeader.biSizeImage);
 
     sc.ConsoleBufInfo.lpBitMap = softpc_dib_bits;
     sc.ConsoleBufInfo.lpBitMapInfo = painter_info;
@@ -200,7 +199,7 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info)
     sc.ScreenBufHandle = (HANDLE)softpc_dib_bits;
     sc.ActiveOutputBufferHandle = sc.ScreenBufHandle;
     sc.BitmapLastLine = (char *)softpc_dib_bits +
-        ((size_t)height - 1u) * (((size_t)width + 3u) & ~(size_t)3u);
+        ((lib_size)height - 1u) * (((lib_size)width + 3u) & ~(lib_size)3u);
     DIBData = (char *)softpc_dib_bits;
     MonoDIB = painter_info;
     CGADIB = painter_info;

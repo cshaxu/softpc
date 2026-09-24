@@ -1,3 +1,4 @@
+#include "../../../lib/types/types_interface.h"
 #ifndef SOFTPC_CCPU_ARCHIVE_H
 #define SOFTPC_CCPU_ARCHIVE_H
 
@@ -18,9 +19,9 @@ typedef struct softpc_ccpu_archive {
     softpc_ccpu_tlb_state tlb;
     softpc_ccpu_fpu_state fpu;
     softpc_ccpu_sas_state sas;
-    uint8_t *memory;
-    uint8_t *page_types;
-    uint8_t *tlb_page_index;
+    lib_u8 *memory;
+    lib_u8 *page_types;
+    lib_u8 *tlb_page_index;
     softpc_device_archive *devices;
     int valid;
 } softpc_ccpu_archive;

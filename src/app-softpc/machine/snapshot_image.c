@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 #include "snapshot.h"
 
 #include "compat/devices/archive.h"
@@ -98,7 +99,7 @@ lib_status softpc_snapshot_image_write(const softpc_snapshot_image *image,
     if (status == LIB_STATUS_OK && image->ccpu.sas.memory_bytes > UINT32_MAX)
         status = LIB_STATUS_LIMIT_EXCEEDED;
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u32(write,
-        context, (uint32_t)image->ccpu.sas.memory_bytes);
+        context, (lib_u32)image->ccpu.sas.memory_bytes);
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u64(write,
         context, core.count);
     if (status == LIB_STATUS_OK) status = softpc_ccpu_archive_write_core(
@@ -112,9 +113,9 @@ lib_status softpc_snapshot_image_write(const softpc_snapshot_image *image,
     if (status == LIB_STATUS_OK) status = softpc_media_archive_write(
         image->media, write, context);
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u32(write,
-        context, (uint32_t)image->entry.halted);
+        context, (lib_u32)image->entry.halted);
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u32(write,
-        context, (uint32_t)image->entry.trap);
+        context, (lib_u32)image->entry.trap);
     return status;
 }
 

@@ -1,7 +1,6 @@
+#include "lib/types/types_interface.h"
 #include "product/config.h"
 #include "lib/storage/file_interface.h"
-#include <stdlib.h>
-#include <string.h>
 #ifdef NDEBUG
 #undef NDEBUG
 #endif
@@ -12,11 +11,11 @@ lib_status lib_storage_file_read_owned(const char *path, lib_size limit,
     void **bytes, lib_size *count)
 {
     (void)path;
-    *count = strlen(input);
+    *count = lib_text_length(input);
     assert(*count <= limit);
-    *bytes = malloc(*count + 1u);
+    *bytes = lib_allocate(*count + 1u);
     assert(*bytes != NULL);
-    memcpy(*bytes, input, *count + 1u);
+    lib_memory_copy(*bytes, input, *count + 1u);
     return LIB_STATUS_OK;
 }
 
@@ -30,7 +29,7 @@ int main(void)
         "memory_mb=32\ndisplay=window\nconsole_control=0\n"
         "floppy_mode=readonly\nhard_disk_mode=readonly\n";
     assert(app_load_startup_config("unused", &config));
-    assert(strcmp(config.floppy_path, "disk.img") == 0);
+    assert(lib_text_compare(config.floppy_path, "disk.img") == 0);
     assert(config.memory_bytes == 32u * 1024u * 1024u);
     assert(config.presentation == COMMON_SESSION_DISPLAY_WINDOW);
     assert(config.console_control == 0);
@@ -51,12 +50,12 @@ int main(void)
     input = "unknown=1";
     assert(!app_load_startup_config("unused", &config));
     assert(app_resolve_image_path(path, "C:/test/softpc.ini"));
-    assert(strcmp(path, "C:/test/disk.img") == 0);
+    assert(lib_text_compare(path, "C:/test/disk.img") == 0);
     assert(app_resolve_image_path(path, "D:/else/softpc.ini"));
-    assert(strcmp(path, "C:/test/disk.img") == 0);
+    assert(lib_text_compare(path, "C:/test/disk.img") == 0);
     path[0] = '\0';
     assert(app_resolve_image_path(path, "no-directory"));
     assert(app_get_config_path(path));
-    assert(strstr(path, "softpc.ini") != NULL);
+    assert(lib_text_find_substring(path, "softpc.ini") != NULL);
     return 0;
 }

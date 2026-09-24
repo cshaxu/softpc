@@ -1,7 +1,7 @@
+#include "lib/types/types_interface.h"
 #include "keyboard.h"
 
 #include "common/machine/machine_interface.h"
-#include <string.h>
 
 int app_keyboard_deliver_input(void *context, const kvm_input_event *event)
 {
@@ -76,24 +76,24 @@ lib_bool app_keyboard_handle_hotkey(common_machine *machine,
     *out = (common_session_command_result) { 0 };
     if (identifier == NULL) return LIB_FALSE;
     name = (const char *)identifier;
-    if (strcmp(name, "pause-toggle") == 0) {
+    if (lib_text_compare(name, "pause-toggle") == 0) {
         request = state == COMMON_SESSION_MACHINE_PAUSED ?
             COMMON_SESSION_REQUEST_RESUME : COMMON_SESSION_REQUEST_PAUSE;
         out->request = request;
         return LIB_TRUE;
     }
-    if (strcmp(name, "release-window-mouse") == 0) {
+    if (lib_text_compare(name, "release-window-mouse") == 0) {
         out->release_window_mouse = LIB_TRUE;
         return LIB_TRUE;
     }
     if (state != COMMON_SESSION_MACHINE_RUNNING) return LIB_TRUE;
-    if (strcmp(name, "send-ctrl-alt-del") == 0)
+    if (lib_text_compare(name, "send-ctrl-alt-del") == 0)
         return app_keyboard_submit_ctrl_alt_del(machine,
             app_keyboard_deliver_input) != 0;
-    if (strcmp(name, "send-alt-enter") == 0)
+    if (lib_text_compare(name, "send-alt-enter") == 0)
         return app_keyboard_submit_alt_key(machine,
             app_keyboard_deliver_input, 0x1cu, KVM_KEY_ENTER) != 0;
-    if (strcmp(name, "send-alt-tab") == 0)
+    if (lib_text_compare(name, "send-alt-tab") == 0)
         return app_keyboard_submit_alt_key(machine,
             app_keyboard_deliver_input, 0x0fu, KVM_KEY_TAB) != 0;
     return LIB_TRUE;

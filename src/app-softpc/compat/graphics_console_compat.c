@@ -1,5 +1,5 @@
+#include "lib/types/types_interface.h"
 #include <windows.h>
-#include <string.h>
 
 #include "insignia.h"
 #include "host_def.h"
@@ -94,7 +94,7 @@ BOOL softpc_compat_get_console_buffer_info(HANDLE output,
 {
     UNUSED(output);
     if (info == NULL) return FALSE;
-    memset(info, 0, sizeof(*info));
+    lib_memory_set(info, 0, sizeof(*info));
     info->dwSize = softpc_compat_console_size;
     info->dwMaximumWindowSize = softpc_compat_console_size;
     info->srWindow = softpc_compat_console_window;

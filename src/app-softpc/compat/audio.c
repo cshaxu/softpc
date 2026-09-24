@@ -2,6 +2,7 @@
 #include "host_def.h"
 #include "audio.h"
 #include "timer.h"
+#include "lib/base/clock_interface.h"
 #include "lib/base/sync_interface.h"
 #include "lib/audio/stream_interface.h"
 #include <stdio.h>
@@ -15,7 +16,9 @@ extern void PlaySound(BOOL pulsed_ppi);
 
 ULONG GetPerfCounter(VOID)
 {
-    return (ULONG)(GetTickCount() * 10u);
+    lib_u64 milliseconds = 0u;
+    if (base_clock_milliseconds(&milliseconds) != LIB_STATUS_OK) return 0u;
+    return (ULONG)(milliseconds * 10u);
 }
 
 static void softpc_speaker_cancel_onset(void);

@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 /*
  * Historical CCPU fast-BOP host contract.
  *
@@ -10,7 +11,6 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
 
 void EDL_fast_bop(unsigned long immediate)
 {

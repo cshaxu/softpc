@@ -1,8 +1,8 @@
+#include "lib/types/types_interface.h"
 #include "insignia.h"
 #include "host_def.h"
 #include "platform.h"
 
-#include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -275,14 +275,14 @@ char value;
 unsigned int size;
 {
     if (address != NULL)
-        memset(address, (unsigned char)value, size);
+        lib_memory_set(address, (unsigned char)value, size);
 }
 
 void memfill(unsigned char data, unsigned char *first, unsigned char *last)
 {
     if (first != NULL && last >= first)
-        memset(first, data,
-               (size_t)(last - first) + 1u);
+        lib_memory_set(first, data,
+               (lib_size)(last - first) + 1u);
 }
 
 void fwd_word_fill(unsigned short data, unsigned char *destination, int count)
@@ -395,11 +395,11 @@ int binary;
 
     if (name == NULL || destination == 0 || maximum <= 0)
         return 0L;
-    if (strcmp(name, "bios1.rom") == 0)
+    if (lib_text_compare(name, "bios1.rom") == 0)
         identifier = 101;
-    else if (strcmp(name, "bios4.rom") == 0)
+    else if (lib_text_compare(name, "bios4.rom") == 0)
         identifier = 102;
-    else if (strcmp(name, "v7vga.rom") == 0)
+    else if (lib_text_compare(name, "v7vga.rom") == 0)
         identifier = 103;
     else
         return 0L;
@@ -411,7 +411,7 @@ int binary;
         return 0L;
     if (bytes > (DWORD)maximum)
         bytes = (DWORD)maximum;
-    memcpy((void *)destination, LockResource(loaded), (size_t)bytes);
+    lib_memory_copy((void *)destination, LockResource(loaded), (lib_size)bytes);
     return (long)bytes;
 #else
     UNUSED(name);

@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 /* Run real App composition, Session, command provider and machine worker.
  * Fake only UI: no native Console, boot or second failure boundary. */
 #include "product/composition.h"
@@ -5,8 +6,6 @@
 #include "../unit/machine/cleanup.h"
 #include <assert.h>
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <setjmp.h>
 
 struct common_ui { common_ui_options options; };
@@ -52,7 +51,7 @@ lib_status common_ui_request_monitor_line(common_ui *ui)
     assert(ui == &surface && ++requests == 1u);
     if (scenario == 0u || scenario == 3u) {
         event.kind = COMMON_UI_EVENT_MONITOR_LINE;
-        memcpy(event.value.line.text, "exit", 5u);
+        lib_memory_copy(event.value.line.text, "exit", 5u);
         event.value.line.length = 4u;
     } else if (scenario == 1u) {
         event.kind = COMMON_UI_EVENT_CONSOLE_FAILED;
@@ -68,7 +67,7 @@ lib_status common_ui_request_monitor_line(common_ui *ui)
 lib_status common_ui_write_monitor(common_ui *ui, const char *text)
 {
     assert(ui == &surface);
-    if (strstr(text, "input failed") || strstr(text, "delivery failed")) ++reported;
+    if (lib_text_find_substring(text, "input failed") || lib_text_find_substring(text, "delivery failed")) ++reported;
     return LIB_STATUS_OK;
 }
 
@@ -98,7 +97,7 @@ int main(void)
     assert(file != NULL);
     assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
     assert(fclose(file) == 0);
-    strcpy(config.floppy_path, path);
+    lib_text_copy(config.floppy_path, path);
     config.presentation = COMMON_SESSION_DISPLAY_WINDOW;
     for (scenario = 0u; scenario < 3u; ++scenario) {
         requests = destroyed = reported = 0u;

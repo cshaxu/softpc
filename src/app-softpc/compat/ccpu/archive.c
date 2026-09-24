@@ -1,31 +1,30 @@
+#include "lib/types/types_interface.h"
 #include "archive.h"
 #include "../devices/archive.h"
 
-#include <stdlib.h>
-#include <string.h>
 
 static int softpc_ccpu_archive_allocate(softpc_ccpu_archive *archive,
-    uint32_t memory_bytes, uint32_t page_type_bytes)
+    lib_u32 memory_bytes, lib_u32 page_type_bytes)
 {
-    uint8_t *memory;
-    uint8_t *page_types;
-    uint8_t *tlb_page_index;
+    lib_u8 *memory;
+    lib_u8 *page_types;
+    lib_u8 *tlb_page_index;
 
     if (archive->memory != NULL && archive->sas.memory_bytes == memory_bytes &&
         archive->sas.page_type_bytes == page_type_bytes)
         return 1;
-    memory = malloc(memory_bytes);
-    page_types = malloc(page_type_bytes);
-    tlb_page_index = malloc(SOFTPC_CCPU_FAST_TLB_PAGE_COUNT);
+    memory = lib_allocate(memory_bytes);
+    page_types = lib_allocate(page_type_bytes);
+    tlb_page_index = lib_allocate(SOFTPC_CCPU_FAST_TLB_PAGE_COUNT);
     if (memory == NULL || page_types == NULL || tlb_page_index == NULL) {
-        free(memory);
-        free(page_types);
-        free(tlb_page_index);
+        lib_release(memory);
+        lib_release(page_types);
+        lib_release(tlb_page_index);
         return 0;
     }
-    free(archive->memory);
-    free(archive->page_types);
-    free(archive->tlb_page_index);
+    lib_release(archive->memory);
+    lib_release(archive->page_types);
+    lib_release(archive->tlb_page_index);
     softpc_device_archive_dispose(archive->devices);
     archive->devices = NULL;
     archive->memory = memory;
@@ -37,9 +36,9 @@ static int softpc_ccpu_archive_allocate(softpc_ccpu_archive *archive,
 void softpc_ccpu_archive_dispose(softpc_ccpu_archive *archive)
 {
     if (archive == NULL) return;
-    free(archive->memory);
-    free(archive->page_types);
-    free(archive->tlb_page_index);
+    lib_release(archive->memory);
+    lib_release(archive->page_types);
+    lib_release(archive->tlb_page_index);
     softpc_device_archive_dispose(archive->devices);
     *archive = (softpc_ccpu_archive){0};
 }
@@ -50,7 +49,7 @@ int softpc_ccpu_archive_capture(softpc_ccpu_archive *archive)
 
     if (archive == NULL) return 0;
     archive->valid = 0;
-    memset(&sas, 0, sizeof(sas));
+    lib_memory_set(&sas, 0, sizeof(sas));
     softpc_ccpu_snapshot_capture_sas(&sas, NULL, 0u, NULL, 0u);
     if (sas.memory_bytes == 0u || sas.page_type_bytes == 0u ||
         !softpc_ccpu_archive_allocate(archive, sas.memory_bytes,
@@ -95,7 +94,7 @@ int softpc_ccpu_archive_restore(const softpc_ccpu_archive *archive)
 
 #define SNAPSHOT_WRITE(value) do { \
     if ((status = softpc_snapshot_stream_write_u32(write, context, \
-            (uint32_t)(value))) != LIB_STATUS_OK) return status; \
+            (lib_u32)(value))) != LIB_STATUS_OK) return status; \
 } while (0)
 #define SNAPSHOT_READ(value) do { \
     if ((status = softpc_snapshot_stream_read_u32(read, context, \

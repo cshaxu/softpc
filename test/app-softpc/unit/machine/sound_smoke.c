@@ -1,3 +1,4 @@
+#include "../../time.h"
 #include "machine/machine.h"
 #include "compat/audio.h"
 #include "compat/devices/snapshot.h"
@@ -113,7 +114,7 @@ lib_status audio_stream_platform_wait_writable(audio_stream_platform *platform)
     /* 1024 mono frames at 48kHz take about 21ms.  This keeps the real Lib
        worker under the same bounded four-slot backpressure it sees at WaveOut
        instead of letting a fake endpoint drain all PCM immediately. */
-    Sleep(20u);
+    softpc_test_sleep_milliseconds(20u);
     return LIB_STATUS_OK;
 }
 
@@ -133,10 +134,10 @@ lib_status audio_stream_platform_destroy(audio_stream_platform **platform)
 
 static void audio_probe_wait_for_blocks(volatile LONG *delivered)
 {
-    DWORD deadline = GetTickCount() + 2000u;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + 2000u;
     while (InterlockedCompareExchange(delivered, 0, 0) < 3 &&
-        (LONG)(GetTickCount() - deadline) < 0)
-        Sleep(1u);
+        softpc_test_clock_milliseconds() < deadline)
+        softpc_test_sleep_milliseconds(1u);
     assert(InterlockedCompareExchange(delivered, 0, 0) >= 3);
 }
 
@@ -153,12 +154,12 @@ static void audio_probe_run_audio_com(void)
 static void audio_probe_execute_audio_com(softpc_machine *machine,
     lib_bool yield_host)
 {
-    DWORD deadline = GetTickCount() + 3000u;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + 3000u;
 
-    while ((LONG)(GetTickCount() - deadline) < 0) {
+    while (softpc_test_clock_milliseconds() < deadline) {
         assert(softpc_machine_run(machine, 5000u) == SOFTPC_MACHINE_OK);
         if (PpiState != FALSE) return;
-        if (yield_host != LIB_FALSE) Sleep(1u);
+        if (yield_host != LIB_FALSE) softpc_test_sleep_milliseconds(1u);
     }
     assert(!"AUDIO.COM did not enable its PPI speaker gate");
 }
@@ -230,7 +231,7 @@ int main(void)
        complete guest tone. */
     InterlockedExchange(&audio_probe_phase, 5);
     audio_probe_execute_audio_com(machine, LIB_FALSE);
-    Sleep(250u);
+    softpc_test_sleep_milliseconds(250u);
     assert(InterlockedCompareExchange(&audio_probe_program_fast_frames, 0, 0) >= 2048);
 #endif
 

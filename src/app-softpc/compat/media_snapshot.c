@@ -1,7 +1,6 @@
+#include "lib/types/types_interface.h"
 #include "media_snapshot.h"
 
-#include <stdlib.h>
-#include <string.h>
 
 enum { MEDIA_SLOTS = 4, MEDIA_BLOCK_BYTES = 4096 };
 
@@ -85,7 +84,7 @@ static void hash_add(media_hash *h, const lib_u8 *bytes, lib_size count)
     while (count != 0) {
         lib_size n = 64u - h->used;
         if (n > count) n = count;
-        memcpy(h->block + h->used, bytes, n);
+        lib_memory_copy(h->block + h->used, bytes, n);
         h->used += (unsigned)n; bytes += n; count -= n;
         if (h->used == 64) { hash_block(h); h->used = 0; }
     }
@@ -97,10 +96,10 @@ static void hash_end(media_hash *h, lib_u8 digest[32])
     unsigned i;
     h->block[h->used++] = 0x80;
     if (h->used > 56) {
-        memset(h->block + h->used, 0, 64u - h->used);
+        lib_memory_set(h->block + h->used, 0, 64u - h->used);
         hash_block(h); h->used = 0;
     }
-    memset(h->block + h->used, 0, 56u - h->used);
+    lib_memory_set(h->block + h->used, 0, 56u - h->used);
     for (i=0; i<8; ++i) h->block[63u-i] = (lib_u8)(bits >> (i*8u));
     hash_block(h);
     for (i=0; i<32; ++i)
@@ -130,7 +129,7 @@ static lib_status verify_base(const media_slot *slot, lib_storage_medium *base)
         offset += count;
     }
     hash_end(&hash, digest);
-    return memcmp(digest, slot->digest, sizeof(digest)) == 0 ?
+    return lib_memory_compare(digest, slot->digest, sizeof(digest)) == 0 ?
         LIB_STATUS_OK : LIB_STATUS_INVALID_ARGUMENT;
 }
 
@@ -143,10 +142,10 @@ void softpc_media_archive_dispose(softpc_media_archive **archive)
         media_page *page = slot->pages;
         while (page != NULL) {
             media_page *next = page->next;
-            free(page); page = next;
+            lib_release(page); page = next;
         }
     }
-    free(*archive); *archive = NULL;
+    lib_release(*archive); *archive = NULL;
 }
 
 static lib_status capture_slot(media_slot *slot, const softpc_media_view *view)
@@ -160,10 +159,10 @@ static lib_status capture_slot(media_slot *slot, const softpc_media_view *view)
     lib_status status = LIB_STATUS_OK;
 
     if (source == NULL) return LIB_STATUS_OK;
-    if (view->path == NULL || strlen(view->path) >= sizeof(slot->path))
+    if (view->path == NULL || lib_text_length(view->path) >= sizeof(slot->path))
         return LIB_STATUS_INVALID_ARGUMENT;
     slot->present = 1; slot->mode = view->mode; slot->cylinder = view->cylinder;
-    memcpy(slot->path, view->path, strlen(view->path) + 1u);
+    lib_memory_copy(slot->path, view->path, lib_text_length(view->path) + 1u);
     size = lib_storage_medium_byte_count(source); slot->size = size;
     if (view->mode == LIB_STORAGE_MEDIUM_OVERLAY) {
         if (view->path == NULL) return LIB_STATUS_INVALID_ARGUMENT;
@@ -184,11 +183,11 @@ static lib_status capture_slot(media_slot *slot, const softpc_media_view *view)
         if (base != NULL) {
             status = lib_storage_medium_read_at(source, offset, effective, count);
             if (status != LIB_STATUS_OK) break;
-            if (memcmp(original, effective, count) != 0) {
-                media_page *page = calloc(1, sizeof(*page));
+            if (lib_memory_compare(original, effective, count) != 0) {
+                media_page *page = lib_allocate_zero(1, sizeof(*page));
                 if (page == NULL) { status = LIB_STATUS_NO_MEMORY; break; }
                 page->offset = offset; page->count = (lib_u32)count;
-                memcpy(page->bytes, effective, count);
+                lib_memory_copy(page->bytes, effective, count);
                 *tail = page; tail = &page->next; ++slot->page_count;
             }
         }
@@ -208,7 +207,7 @@ lib_status softpc_media_archive_capture(softpc_media_archive **archive)
     lib_status status = LIB_STATUS_OK;
     unsigned i;
     if (archive == NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    result = calloc(1, sizeof(*result));
+    result = lib_allocate_zero(1, sizeof(*result));
     if (result == NULL) return LIB_STATUS_NO_MEMORY;
     for (i=0; i<MEDIA_SLOTS && status == LIB_STATUS_OK; ++i) {
         softpc_media_view view;
@@ -236,9 +235,9 @@ lib_status softpc_media_archive_write(const softpc_media_archive *archive,
         if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u64(write, context, slot->size);
         if (status == LIB_STATUS_OK) status = write(context, slot->digest, sizeof(slot->digest));
         if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u32(write,
-            context, (lib_u32)strlen(slot->path));
+            context, (lib_u32)lib_text_length(slot->path));
         if (status == LIB_STATUS_OK) status = write(context,
-            (const lib_u8 *)slot->path, strlen(slot->path));
+            (const lib_u8 *)slot->path, lib_text_length(slot->path));
         if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u64(write, context, slot->page_count);
         for (page=slot->pages; page != NULL && status == LIB_STATUS_OK; page=page->next) {
             status = softpc_snapshot_stream_write_u64(write, context, page->offset);
@@ -257,7 +256,7 @@ lib_status softpc_media_archive_read(softpc_media_archive **archive,
     unsigned i;
     if (archive == NULL || read == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     status = LIB_STATUS_OK;
-    result = calloc(1, sizeof(*result));
+    result = lib_allocate_zero(1, sizeof(*result));
     if (result == NULL) return LIB_STATUS_NO_MEMORY;
     for (i=0; i<MEDIA_SLOTS && status == LIB_STATUS_OK; ++i) {
         media_slot *slot = &result->slots[i];
@@ -302,7 +301,7 @@ lib_status softpc_media_archive_read(softpc_media_archive **archive,
                 bytes != (slot->size-offset < MEDIA_BLOCK_BYTES ? slot->size-offset : MEDIA_BLOCK_BYTES)) {
                 status = LIB_STATUS_INVALID_ARGUMENT; break;
             }
-            page = calloc(1, sizeof(*page));
+            page = lib_allocate_zero(1, sizeof(*page));
             if (page == NULL) { status = LIB_STATUS_NO_MEMORY; break; }
             page->offset = offset; page->count = bytes;
             *tail = page; tail = &page->next; previous = offset;
@@ -319,7 +318,7 @@ static lib_bool media_same_path(const media_slot *slot,
     const softpc_media_view *view)
 {
     return view->medium != NULL && view->path != NULL &&
-        strcmp(slot->path, view->path) == 0;
+        lib_text_compare(slot->path, view->path) == 0;
 }
 
 static lib_status media_apply_pages(const media_slot *slot,

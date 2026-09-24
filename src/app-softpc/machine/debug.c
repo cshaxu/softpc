@@ -1,9 +1,9 @@
+#include "lib/types/types_interface.h"
 #include "machine/debug.h"
 #include "compat/ccpu/abi.h"
 #include "compat/platform.h"
 #include "x86/debug/protocol_interface.h"
 
-#include <string.h>
 
 extern void inb(unsigned short port, unsigned char *value);
 extern void outb(unsigned short port, unsigned char value);
@@ -183,7 +183,7 @@ lib_status softpc_machine_debug(softpc_machine *machine, softpc_debug_state *sta
     if (machine == NULL || state == NULL || request == NULL || result == NULL ||
         request->bytes > X86_DEBUG_BYTES)
         return LIB_STATUS_INVALID_ARGUMENT;
-    memset(result, 0, sizeof(*result));
+    lib_memory_set(result, 0, sizeof(*result));
     switch (request->operation) {
     case X86_DEBUG_READ_REGISTER:
     case X86_DEBUG_WRITE_REGISTER:
@@ -231,7 +231,7 @@ lib_status softpc_machine_debug(softpc_machine *machine, softpc_debug_state *sta
             ((lib_u32)request->segment << 4u) + request->offset : request->address;
         write = request->operation == X86_DEBUG_WRITE_REAL ||
             request->operation == X86_DEBUG_WRITE_LINEAR;
-        if (write) memcpy(result->data, request->data, request->bytes);
+        if (write) lib_memory_copy(result->data, request->data, request->bytes);
         if (!softpc_machine_debug_memory(address, result->data, request->bytes, write))
             return LIB_STATUS_INVALID_ARGUMENT;
         result->bytes = request->bytes;

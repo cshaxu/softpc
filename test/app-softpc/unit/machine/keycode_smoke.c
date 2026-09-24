@@ -1,5 +1,5 @@
+#include "lib/types/types_interface.h"
 #include <assert.h>
-#include <string.h>
 
 #include <windows.h>
 
@@ -13,7 +13,7 @@ static void check_original_table(unsigned count, DWORD flags, DWORD expected)
     for (scan = 0; scan < count; ++scan) {
         KEY_EVENT_RECORD event;
         BYTE key;
-        memset(&event, 0, sizeof(event));
+        lib_memory_set(&event, 0, sizeof(event));
         event.wVirtualScanCode = (WORD)scan;
         event.dwControlKeyState = flags;
         key = KeyMsgToKeyCode(&event);
@@ -38,7 +38,7 @@ static BYTE app_keycode(WORD scan_code, DWORD control_state)
 {
     KEY_EVENT_RECORD event;
 
-    memset(&event, 0, sizeof(event));
+    lib_memory_set(&event, 0, sizeof(event));
     event.wVirtualScanCode = scan_code;
     event.dwControlKeyState = control_state;
     return KeyMsgToKeyCode(&event);

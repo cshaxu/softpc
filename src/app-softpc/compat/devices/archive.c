@@ -1,10 +1,8 @@
+#include "lib/types/types_interface.h"
 #include "archive.h"
 #include "snapshot.h"
 
 #include <limits.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "insignia.h"
 #include "host_def.h"
@@ -74,7 +72,7 @@ unsigned long *callback_id;
 softpc_device_archive *
 softpc_device_archive_create(void)
 {
-    return (softpc_device_archive *)calloc(1, sizeof(softpc_device_archive));
+    return (softpc_device_archive *)lib_allocate_zero(1, sizeof(softpc_device_archive));
 }
 
 LOCAL Q_CALLBACK_FN
@@ -107,7 +105,7 @@ unsigned long required;
     Q_EVENT_SNAPSHOT_ENTRY *replacement;
 
     if (required <= *capacity) return TRUE;
-    replacement = (Q_EVENT_SNAPSHOT_ENTRY *)realloc(*entries,
+    replacement = (Q_EVENT_SNAPSHOT_ENTRY *)lib_reallocate(*entries,
         required * sizeof(*replacement));
     if (replacement == NULL) return FALSE;
     *entries = replacement;
@@ -120,9 +118,9 @@ softpc_device_archive_dispose(archive)
 softpc_device_archive *archive;
 {
     if (archive == NULL) return;
-    free(archive->quick_entries);
-    free(archive->tick_entries);
-    free(archive);
+    lib_release(archive->quick_entries);
+    lib_release(archive->tick_entries);
+    lib_release(archive);
 }
 
 int
@@ -227,26 +225,26 @@ typedef struct softpc_device_wire_field {
     { (lib_size)offsetof(type, member), \
       (lib_size)(sizeof(((type *)0)->member) / sizeof(element_type)), field_kind }
 #define DEVICE_U8(type, member) \
-    DEVICE_WIRE_FIELD(type, member, SOFTPC_DEVICE_WIRE_U8, uint8_t)
+    DEVICE_WIRE_FIELD(type, member, SOFTPC_DEVICE_WIRE_U8, lib_u8)
 #define DEVICE_U16(type, member) \
-    DEVICE_WIRE_FIELD(type, member, SOFTPC_DEVICE_WIRE_U16, uint16_t)
+    DEVICE_WIRE_FIELD(type, member, SOFTPC_DEVICE_WIRE_U16, lib_u16)
 #define DEVICE_U32(type, member) \
-    DEVICE_WIRE_FIELD(type, member, SOFTPC_DEVICE_WIRE_U32, uint32_t)
+    DEVICE_WIRE_FIELD(type, member, SOFTPC_DEVICE_WIRE_U32, lib_u32)
 #define DEVICE_U64(type, member) \
-    DEVICE_WIRE_FIELD(type, member, SOFTPC_DEVICE_WIRE_U64, uint64_t)
+    DEVICE_WIRE_FIELD(type, member, SOFTPC_DEVICE_WIRE_U64, lib_u64)
 
 static lib_status
 device_write_map(const void *object, const softpc_device_wire_field *fields,
     lib_size field_count, softpc_snapshot_bytes_write write, void *context)
 {
-    const uint8_t *base = (const uint8_t *)object;
+    const lib_u8 *base = (const lib_u8 *)object;
     lib_size field_index;
 
     if (object == NULL || fields == NULL || write == NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     for (field_index = 0u; field_index < field_count; ++field_index) {
         const softpc_device_wire_field *field = &fields[field_index];
-        const uint8_t *bytes = base + field->offset;
+        const lib_u8 *bytes = base + field->offset;
         lib_size index;
         lib_status status;
 
@@ -259,20 +257,20 @@ device_write_map(const void *object, const softpc_device_wire_field *fields,
         for (index = 0u; index < field->count; ++index) {
             switch (field->kind) {
             case SOFTPC_DEVICE_WIRE_U16: {
-                uint16_t value;
-                memcpy(&value, bytes + index * sizeof(value), sizeof(value));
+                lib_u16 value;
+                lib_memory_copy(&value, bytes + index * sizeof(value), sizeof(value));
                 status = softpc_snapshot_stream_write_u16(write, context, value);
                 break;
             }
             case SOFTPC_DEVICE_WIRE_U32: {
-                uint32_t value;
-                memcpy(&value, bytes + index * sizeof(value), sizeof(value));
+                lib_u32 value;
+                lib_memory_copy(&value, bytes + index * sizeof(value), sizeof(value));
                 status = softpc_snapshot_stream_write_u32(write, context, value);
                 break;
             }
             case SOFTPC_DEVICE_WIRE_U64: {
-                uint64_t value;
-                memcpy(&value, bytes + index * sizeof(value), sizeof(value));
+                lib_u64 value;
+                lib_memory_copy(&value, bytes + index * sizeof(value), sizeof(value));
                 status = softpc_snapshot_stream_write_u64(write, context, value);
                 break;
             }
@@ -289,14 +287,14 @@ static lib_status
 device_read_map(void *object, const softpc_device_wire_field *fields,
     lib_size field_count, softpc_snapshot_bytes_read read, void *context)
 {
-    uint8_t *base = (uint8_t *)object;
+    lib_u8 *base = (lib_u8 *)object;
     lib_size field_index;
 
     if (object == NULL || fields == NULL || read == NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
     for (field_index = 0u; field_index < field_count; ++field_index) {
         const softpc_device_wire_field *field = &fields[field_index];
-        uint8_t *bytes = base + field->offset;
+        lib_u8 *bytes = base + field->offset;
         lib_size index;
         lib_status status;
 
@@ -309,21 +307,21 @@ device_read_map(void *object, const softpc_device_wire_field *fields,
         for (index = 0u; index < field->count; ++index) {
             switch (field->kind) {
             case SOFTPC_DEVICE_WIRE_U16: {
-                uint16_t value;
+                lib_u16 value;
                 status = softpc_snapshot_stream_read_u16(read, context, &value);
-                memcpy(bytes + index * sizeof(value), &value, sizeof(value));
+                lib_memory_copy(bytes + index * sizeof(value), &value, sizeof(value));
                 break;
             }
             case SOFTPC_DEVICE_WIRE_U32: {
-                uint32_t value;
+                lib_u32 value;
                 status = softpc_snapshot_stream_read_u32(read, context, &value);
-                memcpy(bytes + index * sizeof(value), &value, sizeof(value));
+                lib_memory_copy(bytes + index * sizeof(value), &value, sizeof(value));
                 break;
             }
             case SOFTPC_DEVICE_WIRE_U64: {
-                uint64_t value;
+                lib_u64 value;
                 status = softpc_snapshot_stream_read_u64(read, context, &value);
-                memcpy(bytes + index * sizeof(value), &value, sizeof(value));
+                lib_memory_copy(bytes + index * sizeof(value), &value, sizeof(value));
                 break;
             }
             default:
@@ -680,7 +678,7 @@ device_write_queue(const softpc_device_archive *archive,
     lib_status status;
 #define QUEUE_U32(value) do { \
     if ((unsigned long)(value) > UINT32_MAX) return LIB_STATUS_INVALID_ARGUMENT; \
-    status = softpc_snapshot_stream_write_u32(write, context, (uint32_t)(value)); \
+    status = softpc_snapshot_stream_write_u32(write, context, (lib_u32)(value)); \
     if (status != LIB_STATUS_OK) return status; \
 } while (0)
     QUEUE_U32(state->next_quick_handle); QUEUE_U32(state->next_tick_handle);
@@ -709,7 +707,7 @@ device_read_queue(softpc_device_archive *archive, softpc_snapshot_bytes_read rea
     void *context)
 {
     Q_EVENT_SNAPSHOT_STATE *state = &archive->events;
-    uint32_t value;
+    lib_u32 value;
     unsigned long index;
     lib_status status;
 #define READ_QUEUE_U32(target) do { \

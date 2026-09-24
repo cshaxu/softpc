@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 /* Test the private archive and real Storage without a CPU or media emulator. */
 #include "../../../../src/app-softpc/compat/media_snapshot.c"
 #include <assert.h>
@@ -24,7 +25,7 @@ static lib_status replace(unsigned slot, const char *path,
     }
     if (*replacement == NULL)
         return views[slot].medium != NULL && views[slot].mode == mode &&
-            strcmp(views[slot].path, path) == 0 ? LIB_STATUS_OK :
+            lib_text_compare(views[slot].path, path) == 0 ? LIB_STATUS_OK :
             LIB_STATUS_INVALID_ARGUMENT;
     assert(views[slot].medium == NULL);
     ++install_count[slot];
@@ -34,7 +35,7 @@ static lib_status replace(unsigned slot, const char *path,
     status = lib_storage_medium_destroy(&retired);
     if (status != LIB_STATUS_OK) return status;
     views[slot].mode = mode;
-    memcpy(view_paths[slot], path, strlen(path) + 1u);
+    lib_memory_copy(view_paths[slot], path, lib_text_length(path) + 1u);
     views[slot].path = view_paths[slot];
     return LIB_STATUS_OK;
 }
@@ -58,14 +59,14 @@ static lib_status write_bytes(void *context, const lib_u8 *bytes, lib_size count
 {
     bytes_stream *s = context;
     if (count > sizeof(s->bytes)-s->count) return LIB_STATUS_LIMIT_EXCEEDED;
-    memcpy(s->bytes+s->count, bytes, count); s->count += count;
+    lib_memory_copy(s->bytes+s->count, bytes, count); s->count += count;
     return LIB_STATUS_OK;
 }
 static lib_status read_bytes(void *context, lib_u8 *bytes, lib_size count)
 {
     bytes_stream *s = context;
     if (count > s->count-s->position) return LIB_STATUS_IO_ERROR;
-    memcpy(bytes, s->bytes+s->position, count); s->position += count;
+    lib_memory_copy(bytes, s->bytes+s->position, count); s->position += count;
     return LIB_STATUS_OK;
 }
 
@@ -73,7 +74,7 @@ static void attach(unsigned slot, const char *path, lib_storage_medium_mode mode
 {
     assert(lib_storage_medium_destroy(&views[slot].medium) == LIB_STATUS_OK);
     views[slot] = (softpc_media_view){NULL,NULL,mode,0};
-    memcpy(view_paths[slot], path, strlen(path) + 1u);
+    lib_memory_copy(view_paths[slot], path, lib_text_length(path) + 1u);
     views[slot].path = view_paths[slot];
     assert(lib_storage_medium_open(path, mode, &views[slot].medium) == LIB_STATUS_OK);
 }
@@ -93,11 +94,11 @@ static void check_sha256(void)
     hash_add(&h,(const lib_u8 *)"a",1);
     hash_add(&h,(const lib_u8 *)"bc",2);
     hash_end(&h,digest);
-    assert(memcmp(digest,expected,32)==0);
-    h=hash_begin(); memset(a,'a',sizeof(a));
+    assert(lib_memory_compare(digest,expected,32)==0);
+    h=hash_begin(); lib_memory_set(a,'a',sizeof(a));
     for (unsigned i=0;i<1000;++i) hash_add(&h,a,sizeof(a));
     hash_end(&h,digest);
-    assert(memcmp(digest,long_expected,32)==0);
+    assert(lib_memory_compare(digest,long_expected,32)==0);
 }
 
 int main(void)
@@ -137,7 +138,7 @@ int main(void)
         lib_u8 digest[32];
         assert(stream.count==17662u);
         hash_add(&hash,stream.bytes,stream.count); hash_end(&hash,digest);
-        assert(memcmp(digest,expected,sizeof(digest))==0);
+        assert(lib_memory_compare(digest,expected,sizeof(digest))==0);
     }
     assert(softpc_media_archive_read(&decoded,read_bytes,&stream)==LIB_STATUS_OK);
     assert(stream.position==stream.count);
@@ -148,10 +149,10 @@ int main(void)
     assert(softpc_media_archive_restore(decoded)==LIB_STATUS_OK);
     assert(views[0].cylinder==37);
     for(slot=0;slot<4;slot+=2) {
-        memset(base,0,sizeof(base)); memset(base+4090,0x41+slot,12);
-        memset(base+8192,0x51+slot,512);
+        lib_memory_set(base,0,sizeof(base)); lib_memory_set(base+4090,0x41+slot,12);
+        lib_memory_set(base+8192,0x51+slot,512);
         assert(lib_storage_medium_read_at(views[slot].medium,0,data,sizeof(data))==LIB_STATUS_OK);
-        assert(memcmp(base,data,sizeof(base))==0);
+        assert(lib_memory_compare(base,data,sizeof(base))==0);
     }
     softpc_media_archive_dispose(&decoded);
     /* Every truncation in the media payload fails without exposing partial state. */
@@ -166,7 +167,7 @@ int main(void)
     }
     /* Slot 0's first page follows its fixed fields, copied path and count. */
     {
-        lib_size first = 4u + 4u + 4u + 8u + 32u + 4u + strlen(path) + 8u;
+        lib_size first = 4u + 4u + 4u + 8u + 32u + 4u + lib_text_length(path) + 8u;
         stream.bytes[first]=1; stream.position=0;
         assert(softpc_media_archive_read(&decoded,read_bytes,&stream)!=LIB_STATUS_OK);
         stream.bytes[first]=0;
@@ -182,7 +183,7 @@ int main(void)
     for(slot=0;slot<4;slot+=2) assert(lib_storage_medium_destroy(&views[slot].medium)==LIB_STATUS_OK);
     file=fopen(path,"rb"); assert(file!=NULL);
     assert(fread(data,1,sizeof(data),file)==sizeof(data)); assert(fclose(file)==0);
-    memset(base,0,sizeof(base)); assert(memcmp(base,data,sizeof(base))==0);
+    lib_memory_set(base,0,sizeof(base)); assert(lib_memory_compare(base,data,sizeof(base))==0);
 
     /* Empty overlay, readonly, and exclusive direct sources use the same codec. */
     for(unsigned mode=0;mode<=LIB_STORAGE_MEDIUM_OVERLAY;++mode) {
@@ -209,8 +210,8 @@ int main(void)
             assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
             attach(0,path,(lib_storage_medium_mode)live_mode);
             attach(2,second_path,(lib_storage_medium_mode)live_mode);
-            memset(detach_count,0,sizeof(detach_count));
-            memset(install_count,0,sizeof(install_count));
+            lib_memory_set(detach_count,0,sizeof(detach_count));
+            lib_memory_set(install_count,0,sizeof(install_count));
             assert(softpc_media_archive_prepare(saved)==LIB_STATUS_OK);
             assert(detach_count[0]==0 && detach_count[2]==0);
             assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
@@ -233,7 +234,7 @@ int main(void)
     attach(2,path,LIB_STORAGE_MEDIUM_DIRECT);
     assert(softpc_media_archive_prepare(saved)==LIB_STATUS_OK);
     assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
-    assert(strcmp(views[0].path,path)==0 && strcmp(views[2].path,second_path)==0);
+    assert(lib_text_compare(views[0].path,path)==0 && lib_text_compare(views[2].path,second_path)==0);
     softpc_media_archive_dispose(&saved);
 
     /* Preparation has no retained verifier: a fresh direct target can open
@@ -260,7 +261,7 @@ int main(void)
         const char *attachment;
         lib_storage_medium_mode mode;
         assert(softpc_media_archive_attachment(saved,0u,&attachment,&mode)==LIB_STATUS_OK);
-        assert(strcmp(attachment,path)==0 && mode==LIB_STORAGE_MEDIUM_DIRECT);
+        assert(lib_text_compare(attachment,path)==0 && mode==LIB_STORAGE_MEDIUM_DIRECT);
     }
     assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
     assert(views[0].mode==LIB_STORAGE_MEDIUM_DIRECT);
@@ -296,10 +297,10 @@ int main(void)
     assert(softpc_media_archive_capture(&saved)==LIB_STATUS_OK);
     assert(softpc_media_archive_prepare(saved)==LIB_STATUS_OK);
     assert(softpc_media_archive_restore(saved)==LIB_STATUS_OK);
-    assert(strcmp(views[2].path,second_path)==0 &&
+    assert(lib_text_compare(views[2].path,second_path)==0 &&
         views[2].mode==LIB_STORAGE_MEDIUM_OVERLAY);
     assert(lib_storage_medium_read_at(views[2].medium,4096,data,512)==LIB_STATUS_OK);
-    memset(base,0x9c,512); assert(memcmp(base,data,512)==0);
+    lib_memory_set(base,0x9c,512); assert(lib_memory_compare(base,data,512)==0);
     softpc_media_archive_dispose(&saved);
     assert(lib_storage_medium_destroy(&views[0].medium)==LIB_STATUS_OK);
     assert(lib_storage_medium_destroy(&views[2].medium)==LIB_STATUS_OK);

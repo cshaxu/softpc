@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 /*
  * Standalone carrier for the original nt_com.c host contract.
  *
@@ -17,7 +18,6 @@
 #include "compat/devices/snapshot.h"
 
 #include <stdio.h>
-#include <string.h>
 
 #define SOFTPC_COM_PORTS 4
 #define SOFTPC_COM_QUEUE_SIZE 256
@@ -121,15 +121,15 @@ static HOST_COM *host_com_port(int adapter)
 int softpc_host_com_set_output_path(int adapter, const char *path)
 {
     HOST_COM *port = host_com_port(adapter);
-    size_t length;
+    lib_size length;
     if (port == 0) return FALSE;
     if (path == 0) {
         port->output_path[0] = '\0';
         return TRUE;
     }
-    length = strlen(path);
+    length = lib_text_length(path);
     if (length >= sizeof(port->output_path)) return FALSE;
-    memcpy(port->output_path, path, length + 1u);
+    lib_memory_copy(port->output_path, path, length + 1u);
     return TRUE;
 }
 
@@ -251,7 +251,7 @@ char value;
 void host_com_ioctl(adapter, request, argument)
 int adapter;
 int request;
-intptr_t argument;
+lib_iptr argument;
 {
     HOST_COM *port = host_com_port(adapter);
     if (port == 0) return;

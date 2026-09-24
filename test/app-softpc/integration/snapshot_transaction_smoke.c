@@ -1,3 +1,5 @@
+#include "../time.h"
+#include "lib/types/types_interface.h"
 #include "machine/driver.h"
 #include "machine/snapshot.h"
 #include "compat/ccpu/archive.h"
@@ -6,8 +8,6 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -39,12 +39,12 @@ static lib_status snapshot_write(void *opaque, const lib_u8 *bytes,
         return LIB_STATUS_INVALID_ARGUMENT;
     required = stream->count + byte_count;
     if (required > stream->capacity) {
-        replacement = realloc(stream->bytes, required);
+        replacement = lib_reallocate(stream->bytes, required);
         if (replacement == NULL) return LIB_STATUS_NO_MEMORY;
         stream->bytes = replacement;
         stream->capacity = required;
     }
-    if (byte_count != 0u) memcpy(stream->bytes + stream->count, bytes, byte_count);
+    if (byte_count != 0u) lib_memory_copy(stream->bytes + stream->count, bytes, byte_count);
     stream->count = required;
     return LIB_STATUS_OK;
 }
@@ -56,7 +56,7 @@ static lib_status snapshot_read(void *opaque, lib_u8 *bytes,
     if (stream == NULL || (bytes == NULL && byte_count != 0u) ||
         stream->offset > stream->count || byte_count > stream->count - stream->offset)
         return LIB_STATUS_INVALID_ARGUMENT;
-    if (byte_count != 0u) memcpy(bytes, stream->bytes + stream->offset, byte_count);
+    if (byte_count != 0u) lib_memory_copy(bytes, stream->bytes + stream->offset, byte_count);
     stream->offset += byte_count;
     return LIB_STATUS_OK;
 }
@@ -100,11 +100,11 @@ static lib_status snapshot_file_read(void *opaque, lib_u8 *bytes,
 static lib_bool wait_for_state(common_machine *machine,
     common_machine_state expected)
 {
-    DWORD deadline = GetTickCount() + 5000u;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + 5000u;
     do {
         if (common_machine_state_get(machine) == expected) return LIB_TRUE;
-        Sleep(10u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(10u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     return LIB_FALSE;
 }
 
@@ -123,7 +123,7 @@ static lib_bool snapshot_write_media(const char *path)
     FILE *file;
 
     if (path == NULL) return LIB_FALSE;
-    memcpy(sector, program, sizeof(program));
+    lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
     file = fopen(path, "wb");
     if (file == NULL) return LIB_FALSE;
@@ -131,7 +131,7 @@ static lib_bool snapshot_write_media(const char *path)
         fclose(file);
         return LIB_FALSE;
     }
-    memset(sector, 0, sizeof(sector));
+    lib_memory_set(sector, 0, sizeof(sector));
     for (unsigned i = 1; i < 17; ++i)
         if (fwrite(sector, 1u, sizeof(sector), file) != sizeof(sector)) {
             fclose(file); return LIB_FALSE;
@@ -168,7 +168,7 @@ static lib_bool snapshot_media_bytes(lib_bool write, lib_bool later)
                     return LIB_FALSE;
             } else if (view.cylinder != 37u) return LIB_FALSE;
         }
-        memset(bytes, later ? 0x99 : value, sizeof(bytes));
+        lib_memory_set(bytes, later ? 0x99 : value, sizeof(bytes));
         if (write) {
             if (lib_storage_medium_write_at(view.medium, later ? 4096 : 8192,
                     bytes, sizeof(bytes)) != LIB_STATUS_OK) return LIB_FALSE;
@@ -188,7 +188,7 @@ static lib_bool snapshot_media_bytes(lib_bool write, lib_bool later)
 
 static lib_bool snapshot_has_pixels(common_machine *machine, lib_u8 colour)
 {
-    common_machine_frame *frame = calloc(1, sizeof(*frame));
+    common_machine_frame *frame = lib_allocate_zero(1, sizeof(*frame));
     lib_bool found = LIB_FALSE;
     if (frame == NULL) return LIB_FALSE;
     if (common_machine_copy_published_frame(machine, frame,
@@ -198,17 +198,17 @@ static lib_bool snapshot_has_pixels(common_machine *machine, lib_u8 colour)
         for (i = 0; i < frame->window.image.height * frame->window.image.stride; ++i)
             if (frame->window.image.pixels[i] != colour) { found = LIB_FALSE; break; }
     }
-    free(frame);
+    lib_release(frame);
     return found;
 }
 
 static lib_bool snapshot_wait_for_pixels(common_machine *machine, lib_u8 colour)
 {
-    DWORD deadline = GetTickCount() + 10000u;
+    lib_u64 deadline = softpc_test_clock_milliseconds() + 10000u;
     do {
         if (snapshot_has_pixels(machine, colour)) return LIB_TRUE;
-        Sleep(10u);
-    } while ((LONG)(GetTickCount() - deadline) < 0);
+        softpc_test_sleep_milliseconds(10u);
+    } while (softpc_test_clock_milliseconds() < deadline);
     return LIB_FALSE;
 }
 
@@ -271,13 +271,13 @@ static int snapshot_run_transaction(void)
         assert(softpc_ccpu_archive_capture(&observed));
         /* A restored image must reach Common's pause rendezvous before an
            executor tick can advance guest state. */
-        assert(memcmp(&expected.ccpu.registers, &observed.registers,
+        assert(lib_memory_compare(&expected.ccpu.registers, &observed.registers,
             sizeof(observed.registers)) == 0);
-        assert(memcmp(&expected.ccpu.execution, &observed.execution,
+        assert(lib_memory_compare(&expected.ccpu.execution, &observed.execution,
             sizeof(observed.execution)) == 0);
-        assert(memcmp(expected.ccpu.memory, observed.memory,
+        assert(lib_memory_compare(expected.ccpu.memory, observed.memory,
             observed.sas.memory_bytes) == 0);
-        assert(memcmp(expected.ccpu.page_types, observed.page_types,
+        assert(lib_memory_compare(expected.ccpu.page_types, observed.page_types,
             observed.sas.page_type_bytes) == 0);
         softpc_ccpu_archive_dispose(&observed);
     }
@@ -326,8 +326,8 @@ static int snapshot_run_transaction(void)
     vm_driver_destroy(driver);
     softpc_machine_destroy(product);
     softpc_snapshot_image_dispose(&expected);
-    free(stream.bytes);
-    free(retained.bytes);
+    lib_release(stream.bytes);
+    lib_release(retained.bytes);
     assert(remove(path) == 0);
     return 0;
 }
@@ -459,15 +459,15 @@ static int snapshot_run_load(const char *startup_media_path, const char *snapsho
 int main(int argc, char **argv)
 {
     if (argc == 1) return snapshot_run_transaction();
-    if (argc == 4 && strcmp(argv[1], "save") == 0)
+    if (argc == 4 && lib_text_compare(argv[1], "save") == 0)
         return snapshot_run_save(argv[2], argv[3], LIB_FALSE);
-    if (argc == 4 && strcmp(argv[1], "save-empty") == 0)
+    if (argc == 4 && lib_text_compare(argv[1], "save-empty") == 0)
         return snapshot_run_save(argv[2], argv[3], LIB_TRUE);
-    if (argc == 4 && strcmp(argv[1], "load") == 0)
+    if (argc == 4 && lib_text_compare(argv[1], "load") == 0)
         return snapshot_run_load(argv[2], argv[3], LIB_TRUE, LIB_FALSE);
-    if (argc == 4 && strcmp(argv[1], "load-empty") == 0)
+    if (argc == 4 && lib_text_compare(argv[1], "load-empty") == 0)
         return snapshot_run_load(argv[2], argv[3], LIB_TRUE, LIB_TRUE);
-    if (argc == 4 && strcmp(argv[1], "load-mismatch") == 0)
+    if (argc == 4 && lib_text_compare(argv[1], "load-mismatch") == 0)
         return snapshot_run_load(argv[2], argv[3], LIB_FALSE, LIB_FALSE);
     fprintf(stderr, "usage: %s [save|load media snapshot]\n", argv[0]);
     return 1;
