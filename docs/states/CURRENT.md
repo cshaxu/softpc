@@ -2,8 +2,30 @@
 
 ## Current Work
 
-No implementation subtask is active. T81 is closed after owner acceptance of
-first-run PC-speaker playback. The queue remains unadmitted.
+T82 S1 has delivered the NXVM six-component non-Audio audit. T82 remains open
+awaiting owner decisions on NXVM's stale manifests and the retained SoftPC x86
+command-body policy; no shared production code has been modified.
+
+## M9 T82 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner directly admits T82 to audit NXVM's six shared components and prepare an exact import excluding Audio. |
+| Objective | Freeze the actual NXVM six-directory content, compare every non-Audio shared path with SoftPC, and produce an import/retention/blocker ledger with a minimal S-task plan. |
+| Non-goals | No source import yet; no Audio source/test/build/document import; no Core, Compat, VM, App, package INI, guest media, public ABI, product behavior or NXVM worktree modification. |
+| Reference Baseline | SoftPC `cdeb5448`; NXVM HEAD `d485a54e` plus the actual read-only six-directory working contents recorded by this S. |
+| Candidate Proposal | [NXVM shared-corpus import readiness](../proposals/m9-nxvm-shared-corpus-import.md) |
+| Files And ABI Surface | This packet, proposal and T82 S1 evidence only. Future source scope is restricted to `src/{lib,common,x86}` and `test/{lib,common,x86}`, excluding Audio paths. |
+| Applicable Rules | Execution, Architecture, Coding and Documentation rules; shared strict-C11/package/DAG requirements. |
+| Verification | Enumerate paths, compare hashes/content/diffs, inspect CMake dependency/link contracts and run documentation governance. No product build is claimed necessary for docs-only S1. |
+| Expected Markers | One complete six-directory ledger; every non-Audio difference has a disposition; Audio paths are explicitly excluded; no source file changes. |
+| Asset Needs | None. No package binary, INI or media update. |
+| Reporting Requirements | Report the frozen NXVM reference state, exact/equivalent/blocked path counts, import ordering, estimated per-S file/line bands and any required owner decision. |
+| Stop Conditions | A candidate requires product adaptation, public ABI change, Audio import, NXVM runtime dependency, or cannot be classified from source/build evidence. Stop that candidate and report it rather than creating a SoftPC fork. |
+| Exit Criteria | Ledger and proposal are complete, documentation gates pass, current worktree remains source-clean, and owner has the S2 admission decision. |
+| Original Owner Request | Audit NXVM six components and prepare import of every component except Audio. |
+| Similar-Issue Sweep | Search all six directory manifests/CMake files for Audio reachability, product-relative paths, cross-component include violations and language-standard deviations. |
 
 ## Current Technical Baseline
 
