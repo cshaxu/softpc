@@ -2,17 +2,16 @@
 #include "lib/types/win32/sync.h"
 #include "lib/console/binding_interface.h"
 #include <assert.h>
-#include <string.h>
 
 static HANDLE entered, finish_read, delivered;
-static unsigned lines, flushes;
+static lib_u32 lines, flushes;
 static BOOL WINAPI read_line(HANDLE h, LPVOID bytes, DWORD capacity, LPDWORD count, LPVOID p)
 {
     (void)h; (void)p;
     assert(capacity >= 9);
     SetEvent(entered);
     assert(WaitForSingleObject(finish_read, 5000) == WAIT_OBJECT_0);
-    memcpy(bytes, "partial\r\n", 9); *count = 9;
+    lib_memory_copy(bytes, "partial\r\n", 9); *count = 9;
     return TRUE;
 }
 static BOOL WINAPI cancel_read(HANDLE h, LPOVERLAPPED p)
@@ -40,7 +39,7 @@ static void receive(void *p, const lib_console_event *e)
 {
     (void)p;
     assert(e->kind == LIB_CONSOLE_EVENT_COOKED_LINE);
-    assert(strcmp(e->value.line.text, "partial") == 0);
+    assert(lib_text_compare(e->value.line.text, "partial") == 0);
     ++lines;
     SetEvent(delivered);
 }

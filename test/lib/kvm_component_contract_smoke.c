@@ -1,19 +1,18 @@
 #include "lib/kvm-base/worker_interface.h"
 
 #include <assert.h>
-#include <string.h>
 
 typedef struct component_probe {
-    unsigned int input_count;
-    unsigned int failure_count;
+    lib_u32 input_count;
+    lib_u32 failure_count;
     lib_u64 last_identity;
     lib_status last_failure;
     kvm_event_type last_type;
     char last_hotkey[KVM_HOTKEY_IDENTIFIER_CAPACITY];
-    int accept_input;
+    lib_i32 accept_input;
 } component_probe;
 
-static int component_probe_input(void *opaque, const kvm_input_event *event)
+static lib_i32 component_probe_input(void *opaque, const kvm_input_event *event)
 {
     component_probe *probe = (component_probe *)opaque;
     if (probe == LIB_NULL || event == LIB_NULL || !probe->accept_input) return 0;
@@ -21,7 +20,7 @@ static int component_probe_input(void *opaque, const kvm_input_event *event)
     probe->last_identity = event->source_identity;
     probe->last_type = event->type;
     if (event->type == KVM_EVENT_HOTKEY)
-        memcpy(probe->last_hotkey, event->data.hotkey.identifier,
+        lib_memory_copy(probe->last_hotkey, event->data.hotkey.identifier,
             sizeof(probe->last_hotkey));
     return 1;
 }
@@ -29,7 +28,7 @@ static int component_probe_input(void *opaque, const kvm_input_event *event)
 /* Leaf policy belongs after kvm-base attribution and matching. This test probe
  * models frozen Window delivery: regular matcher output succeeds but does not
  * enter the application sink; registered hotkeys still do. */
-static int component_probe_hotkeys_only(void *opaque, const kvm_input_event *event)
+static lib_i32 component_probe_hotkeys_only(void *opaque, const kvm_input_event *event)
 {
     return event != LIB_NULL && event->type != KVM_EVENT_HOTKEY ? 1 :
         component_probe_input(opaque, event);
@@ -63,10 +62,10 @@ int main(void)
     kvm_component_control control = { 0xabcdef01u,
         { 0 } };
     kvm_component_control taken;
-    atomic_uint_fast64_t identity_next;
+    lib_atomic_u64 identity_next;
     kvm_hotkey_registry hotkeys;
     lib_u64 identity;
-    unsigned int index;
+    lib_u32 index;
 
     probe.accept_input = 1;
     kvm_hotkey_registry_initialize(&hotkeys);
@@ -100,7 +99,7 @@ int main(void)
     for (index = 0u; index < sizeof(control.payload); ++index)
         control.payload[index] = (lib_u8)index;
     assert(kvm_component_enqueue_control(&second, &control) == LIB_STATUS_OK);
-    memset(control.payload, 0xff, sizeof(control.payload));
+    lib_memory_set(control.payload, 0xff, sizeof(control.payload));
     assert(kvm_component_mailboxes_take_control(&second.mailboxes, &taken));
     assert(taken.kind == LIB_UINT32_MAX);
     for (index = 0u; index < sizeof(taken.payload); ++index)
@@ -109,14 +108,15 @@ int main(void)
 
     /* Source identity is a single non-repeating epoch: issuing the final
        representable value permanently exhausts it instead of wrapping. */
-    atomic_init(&identity_next, UINT64_MAX - 1u);
+    identity_next = LIB_UINT64_MAX - 1u;
     assert(kvm_component_allocate_source_identity(&identity_next, &identity) ==
-        LIB_STATUS_OK && identity == UINT64_MAX - 1u);
+        LIB_STATUS_OK && identity == LIB_UINT64_MAX - 1u);
     assert(kvm_component_allocate_source_identity(&identity_next, &identity) ==
-        LIB_STATUS_OK && identity == UINT64_MAX);
+        LIB_STATUS_OK && identity == LIB_UINT64_MAX);
     assert(kvm_component_allocate_source_identity(&identity_next, &identity) ==
         LIB_STATUS_LIMIT_EXCEEDED);
-    assert(atomic_load_explicit(&identity_next, memory_order_relaxed) == 0u);
+    assert(lib_atomic_u64_load_explicit(&identity_next,
+        LIB_MEMORY_ORDER_RELAXED) == 0u);
 
     event.type = KVM_EVENT_KEY;
     event.data.key.key = 'A';
@@ -160,7 +160,7 @@ int main(void)
     assert(kvm_component_emit_to(&first, &event, component_probe_hotkeys_only,
         &probe, LIB_TRUE));
     assert(probe.input_count == 1u && probe.last_type == KVM_EVENT_HOTKEY);
-    assert(strcmp(probe.last_hotkey, "pause-toggle") == 0);
+    assert(lib_text_compare(probe.last_hotkey, "pause-toggle") == 0);
     assert(probe.last_identity == first.source_identity);
     event.data.key.key = 'X';
     event.data.key.scan_code = 0x2du;

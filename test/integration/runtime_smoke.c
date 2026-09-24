@@ -1,7 +1,7 @@
 #include "machine_fixture.h"
 #include "common/session/control.h"
 #include "common/machine/input_queue.h"
-#include "../lib/cleanup.h"
+#include "../core/cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>

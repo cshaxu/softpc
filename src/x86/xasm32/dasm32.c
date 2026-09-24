@@ -3,8 +3,6 @@
 #include "x86/xasm32/dasm32.h"
 #include "x86/xasm32/xasm32_interface.h"
 
-typedef lib_u8 t_dasm_prefix;
-
 typedef struct dasm32_context dasm32_context;
 
 typedef void (*dasm32_handler)(dasm32_context *);
@@ -21,7 +19,7 @@ struct dasm32_context
     char dmovsreg[0x100], doverds[0x100], doverss[0x100];
     char dimmoff8[0x100], dimmoff16[0x100], dimmsign[0x100];
     lib_u8 flagmem, flaglock;
-    t_dasm_prefix prefix_oprsize, prefix_addrsize;
+    lib_u8 prefix_oprsize, prefix_addrsize;
     lib_u8 cr;
     lib_u64 cimm;
     lib_u8 iop;
@@ -71,7 +69,7 @@ struct dasm32_context
 /* Every disassembly field is an owned fixed array in dasm32_context or local scope. */
 #define DASM_FORMAT_ARRAY(buffer, ...)                                             \
     do {                                                                            \
-        int dasm_format_result = lib_c_snprintf((buffer), sizeof(buffer),          \
+        lib_i32 dasm_format_result = lib_c_snprintf((buffer), sizeof(buffer),          \
             __VA_ARGS__);                                                           \
         if (dasm_format_result < 0 ||                                               \
             (lib_size)dasm_format_result >= sizeof(buffer)) {                     \
@@ -83,7 +81,7 @@ struct dasm32_context
  * arrays, `sizeof(str)` there is only pointer width. */
 #define DASM_FORMAT_CONTEXT_TEXT(buffer, ...)                                      \
     do {                                                                            \
-        int dasm_format_result = lib_c_snprintf((buffer), XASM32_TEXT_CAPACITY,          \
+        lib_i32 dasm_format_result = lib_c_snprintf((buffer), XASM32_TEXT_CAPACITY,          \
             __VA_ARGS__);                                                           \
         if (dasm_format_result < 0 ||                                               \
             (lib_size)dasm_format_result >= XASM32_TEXT_CAPACITY) {                \
@@ -6771,7 +6769,7 @@ static dasm32_handler const dtable_0f[0x100] = {
     [0xff] = UndefinedOpcode,
 };
 
-static lib_u8 dasm32_execute(dasm32_context *dasmContext, char *stmt, lib_u8 *rcode, int flag32)
+static lib_u8 dasm32_execute(dasm32_context *dasmContext, char *stmt, lib_u8 *rcode, lib_bool flag32)
 {
     lib_size i;
     lib_u8 opcode, oldiop;
@@ -6817,7 +6815,7 @@ static lib_u8 dasm32_execute(dasm32_context *dasmContext, char *stmt, lib_u8 *rc
     return iop;
 }
 
-lib_u8 dasm32(char *stmt, lib_u8 *rcode, int flag32)
+lib_u8 dasm32(char *stmt, lib_u8 *rcode, lib_bool flag32)
 {
     dasm32_context local_context;
 

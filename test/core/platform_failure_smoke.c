@@ -2,7 +2,7 @@
 #include "core/machine/machine.h"
 #include <assert.h>
 #include <stdio.h>
-#include "../lib/cleanup.h"
+#include "cleanup.h"
 
 static int fail_event, fail_timer, fail_wait, fake_timer, fail_delete;
 static unsigned wait_calls, timer_calls;

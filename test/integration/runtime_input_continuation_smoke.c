@@ -1,5 +1,5 @@
 #include "machine_fixture.h"
-#include "../lib/cleanup.h"
+#include "../core/cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>

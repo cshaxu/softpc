@@ -1,7 +1,7 @@
 #include "config.h"
+#include "lib/base/process_interface.h"
 #include "lib/storage/file_interface.h"
 
-#include <windows.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,21 +43,13 @@ static int app_parse_media_mode(const char *value, lib_storage_medium_mode *out)
 
 int app_get_config_path(char *path)
 {
-    DWORD length = GetModuleFileNameA(NULL, path, SOFTPC_CONFIG_PATH_MAX);
-    char *separator;
-    char *forward_separator;
+    size_t length;
 
-    if (length == 0u || length >= SOFTPC_CONFIG_PATH_MAX) return 0;
-    separator = strrchr(path, '\\');
-    forward_separator = strrchr(path, '/');
-    if (forward_separator != NULL &&
-        (separator == NULL || forward_separator > separator))
-        separator = forward_separator;
-    if (separator == NULL) return 0;
-    if ((size_t)(separator - path) + sizeof("softpc.ini") >=
-        SOFTPC_CONFIG_PATH_MAX)
-        return 0;
-    memcpy(separator + 1, "softpc.ini", sizeof("softpc.ini"));
+    if (base_process_executable_directory(path, SOFTPC_CONFIG_PATH_MAX) !=
+        LIB_STATUS_OK) return 0;
+    length = strlen(path);
+    if (length + sizeof("\\softpc.ini") > SOFTPC_CONFIG_PATH_MAX) return 0;
+    memcpy(path + length, "\\softpc.ini", sizeof("\\softpc.ini"));
     return 1;
 }
 

@@ -1,5 +1,5 @@
 #include "core/machine/machine.h"
-#include "../lib/cleanup.h"
+#include "cleanup.h"
 
 #include <assert.h>
 #include <errno.h>

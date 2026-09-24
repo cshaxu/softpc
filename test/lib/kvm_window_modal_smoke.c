@@ -1,6 +1,5 @@
 #include <windows.h>
 #include <assert.h>
-#include <string.h>
 #include <stdio.h>
 #include "lib/kvm-window/window_interface.h"
 
@@ -27,7 +26,7 @@ static BOOL CALLBACK find_window(HWND w, LPARAM unused)
         target = w;
     return TRUE;
 }
-static int input(void *p, const kvm_input_event *e)
+static lib_i32 input(void *p, const kvm_input_event *e)
 {
     (void)p;
     if (e->type == KVM_EVENT_SOURCE_RETIRED) {
@@ -55,7 +54,7 @@ int main(void)
     ticked = CreateEventA(NULL, TRUE, FALSE, NULL);
     HANDLE guard = CreateThread(NULL, 0, watchdog, NULL, 0, NULL);
     assert(entered && exited && retired && done && ticked && guard);
-    for (unsigned i = 0; i < sizeof(commands)/sizeof(commands[0]); ++i) {
+    for (lib_u32 i = 0; i < sizeof(commands)/sizeof(commands[0]); ++i) {
         kvm_window *w = NULL;
         kvm_window_options o = { 0 };
         char title[128];
@@ -77,7 +76,7 @@ int main(void)
         assert(kvm_window_set_title(w, "modal-after") == LIB_STATUS_OK);
         assert(SendMessageTimeoutW(target, WM_NULL, 0, 0, SMTO_ABORTIFHUNG, 3000, &result));
         GetWindowTextA(target, title, sizeof(title));
-        assert(strcmp(title, "modal-after") == 0);
+        assert(lib_text_compare(title, "modal-after") == 0);
         /* STOP must unwind the nested loop without an external cancel/Enter. */
         assert(kvm_window_destroy(w)==LIB_STATUS_OK);
         assert(WaitForSingleObject(exited, 0) == WAIT_OBJECT_0);

@@ -2,14 +2,13 @@
 #include "lib/types/win32/sync.h"
 #include "lib/console/binding_interface.h"
 #include <assert.h>
-#include <string.h>
 
 static const char *input;
-static unsigned chunk = 7, reads, cancel_at;
+static lib_u32 chunk = 7, reads, cancel_at;
 static HANDLE stop;
 static BOOL WINAPI read_chunk(HANDLE h, LPVOID bytes, DWORD capacity, LPDWORD count, LPVOID p)
 {
-    unsigned n = 0;
+    lib_u32 n = 0;
     (void)h; (void)p;
     while (input[n] && n < capacity && n < chunk) {
         ((char *)bytes)[n] = input[n];
@@ -19,19 +18,19 @@ static BOOL WINAPI read_chunk(HANDLE h, LPVOID bytes, DWORD capacity, LPDWORD co
     if (++reads == cancel_at) SetEvent(stop);
     return TRUE;
 }
-static unsigned palette_attempts, palette_sets, writes;
-static int partial_write;
-static int text_result=1;
+static lib_u32 palette_attempts, palette_sets, writes;
+static lib_i32 partial_write;
+static lib_i32 text_result=1;
 static DWORD text_written=1;
 static BOOL WINAPI text_write(HANDLE h,LPCVOID text,DWORD n,LPDWORD written,LPVOID r)
 { (void)h;(void)text;(void)r;*written=n==0 ? 0 : text_written;return text_result; }
-static int palette_query_ok, palette_set_ok, cursor_ok = 1;
+static lib_i32 palette_query_ok, palette_set_ok, cursor_ok = 1;
 static WCHAR first_cell;
 static WORD first_attribute;
 static COORD buffer_size={80,25};
 static SMALL_RECT viewport={0,0,79,24};
 static BOOL WINAPI screen_info(HANDLE h, PCONSOLE_SCREEN_BUFFER_INFO p)
-{ (void)h; memset(p, 0, sizeof(*p)); p->dwSize=buffer_size; p->srWindow=viewport; return TRUE; }
+{ (void)h; lib_memory_set(p, 0, sizeof(*p)); p->dwSize=buffer_size; p->srWindow=viewport; return TRUE; }
 static BOOL WINAPI set_viewport(HANDLE h,BOOL absolute,const SMALL_RECT *rect)
 { (void)h; assert(absolute); viewport=*rect; return TRUE; }
 static BOOL WINAPI resize_buffer(HANDLE h,COORD size)
@@ -56,7 +55,7 @@ static BOOL WINAPI cursor_info(HANDLE h, const CONSOLE_CURSOR_INFO *p)
 { (void)h; last_cursor=*p; return cursor_ok; }
 static BOOL WINAPI cursor_position(HANDLE h, COORD p)
 { (void)h; (void)p; return cursor_ok; }
-static unsigned readers_started, mode_sets;
+static lib_u32 readers_started, mode_sets;
 static BOOL WINAPI set_mode(HANDLE h, DWORD mode) { (void)h; (void)mode; ++mode_sets; return TRUE; }
 static BOOL WINAPI flush_input(HANDLE h) { (void)h; return TRUE; }
 static HANDLE WINAPI start_reader(LPSECURITY_ATTRIBUTES a, SIZE_T size,
@@ -94,7 +93,7 @@ static HANDLE WINAPI start_reader(LPSECURITY_ATTRIBUTES a, SIZE_T size,
 #define lib_win32_set_console_cursor_position cursor_position
 #include "lib/console-broker/win32/console.c"
 
-static unsigned delivered;
+static lib_u32 delivered;
 static lib_console_event received;
 static void receive(void *p, const lib_console_event *event)
 { (void)p; received=*event; ++delivered; }
@@ -137,8 +136,8 @@ int main(void)
     assert(lib_console_bind_generation(b.console,1)==LIB_STATUS_OK);
     b.generation=1; b.mode=CONSOLE_BROKER_COOKED_LINES;
     stop=b.stop_event=CreateEventA(NULL,TRUE,FALSE,NULL); assert(stop);
-    for (unsigned n=1022;n<=1024;++n) {
-        memset(line,'x',n); strcpy(line+n,"\r\nhelp\r\n"); input=line;
+    for (lib_u32 n=1022;n<=1024;++n) {
+        lib_memory_set(line,'x',n); lib_text_copy(line+n,"\r\nhelp\r\n"); input=line;
         for (chunk=1;chunk<=1023;chunk+=1022) {
             input=line; delivered=0;
             console_broker_reader(&b);
@@ -147,16 +146,16 @@ int main(void)
             assert(received.value.line.length==(n>1023 ? 0 : n));
             console_broker_reader(&b);
             assert(delivered==2 && received.kind==LIB_CONSOLE_EVENT_COOKED_LINE);
-            assert(strcmp(received.value.line.text,"help")==0);
+            assert(lib_text_compare(received.value.line.text,"help")==0);
         }
     }
-    memset(line,'x',2048);strcpy(line+2048,"\r\n");input=line;
+    lib_memory_set(line,'x',2048);lib_text_copy(line+2048,"\r\n");input=line;
     reads=0;cancel_at=2;chunk=7;delivered=0;
     console_broker_reader(&b);assert(delivered==0);ResetEvent(stop);cancel_at=0;
     assert(base_sync_mutex_create(&b.output_lock)==LIB_STATUS_OK);
     assert(base_sync_mutex_create(&b.transaction_lock)==LIB_STATUS_OK);b.output=(HANDLE)1;
     f.columns=80;f.rows=25;f.text[0]=0x2588;f.palette[0]=1;
-    for(int i=0;i<2;++i) assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+    for(lib_i32 i=0;i<2;++i) assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
     assert(first_cell==0x2588 && writes==1 && palette_attempts==2);
     palette_query_ok=1;
     assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
@@ -178,8 +177,8 @@ int main(void)
     f.cursor_visible=1; f.cursor_top=9; f.cursor_bottom=8;
     assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
     assert(last_cursor.dwSize==100 && last_cursor.bVisible);
-    for (int axis=0;axis<2;++axis) {
-        unsigned before=writes;
+    for (lib_i32 axis=0;axis<2;++axis) {
+        lib_u32 before=writes;
         if (axis==0) buffer_size.Y=24;
         else buffer_size.X=40;
         assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
@@ -193,12 +192,12 @@ int main(void)
     assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_IO_ERROR);
     cursor_ok=1;
     assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
-    unsigned previous_writes=writes;
-    assert(console_broker_backend_write_bound(&b,b.console,2,"x",1)==LIB_STATUS_NOT_CURRENT);
+    lib_u32 previous_writes=writes;
+    assert(console_broker_backend_write_bound(&b,b.console,2,"x",1)==LIB_STATUS_OK);
     assert(console_broker_backend_write_bound(&b,b.console,1,"",0)==LIB_STATUS_OK);
     assert(b.previous_columns==80 && b.previous_rows==25);
     assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==0 && writes==previous_writes);
-    for (int scenario=0;scenario<3;++scenario) {
+    for (lib_i32 scenario=0;scenario<3;++scenario) {
         text_result=scenario!=2; text_written=scenario==1 ? 0 : 1;
         assert(console_broker_backend_write_bound(&b,b.console,1,"x",1)==
             (scenario==0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR));
@@ -207,32 +206,32 @@ int main(void)
         assert(writes==++previous_writes && b.previous_columns==80);
     }
     /* Failed B can partly overwrite A: retrying A must not hit the old cache. */
-    for (int failure=1;failure<=5;++failure) {
+    for (lib_i32 failure=1;failure<=5;++failure) {
         partial_write=failure; f.text[0]='B';
         assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_IO_ERROR);
         assert(!b.previous_columns && !b.previous_rows);
-        unsigned attempted=writes;
+        lib_u32 attempted=writes;
         partial_write=0; f.text[0]=0x2588;
         assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
         assert(writes==attempted+1 && b.previous_columns==80);
     }
-    for (unsigned attribute=0;attribute<256;++attribute) {
+    for (lib_u32 attribute=0;attribute<256;++attribute) {
         f.foreground[0]=attribute & 15u; f.background[0]=attribute >> 4;
         assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
         assert(first_attribute==attribute);
-        unsigned completed=writes;
+        lib_u32 completed=writes;
         assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
         assert(writes==completed);
     }
     base_sync_mutex_destroy(b.transaction_lock);base_sync_mutex_destroy(b.output_lock);CloseHandle(stop);lib_console_release(b.console);
     cooked_restore();
     /* Disposal must not restore native mode a second time. */
-    console_broker_backend *disposed=calloc(1,sizeof(*disposed));
+    console_broker_backend *disposed=lib_allocate_zero(1,sizeof(*disposed));
     disposed->input=disposed->output=INVALID_HANDLE_VALUE;
     assert(base_sync_mutex_create(&disposed->output_lock)==LIB_STATUS_OK);
     assert(base_sync_mutex_create(&disposed->transaction_lock)==LIB_STATUS_OK);
     assert(console_broker_backend_deactivate(disposed,NULL)==LIB_STATUS_OK);
-    unsigned restored=mode_sets;
+    lib_u32 restored=mode_sets;
     console_broker_backend_destroy(disposed);
     assert(mode_sets==restored);
     return 0;

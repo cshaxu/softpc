@@ -2,7 +2,7 @@
  * Fake only UI: no native Console, boot or second failure boundary. */
 #include "app/composition.h"
 #include "common/ui/ui_interface.h"
-#include "../lib/cleanup.h"
+#include "../core/cleanup.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>

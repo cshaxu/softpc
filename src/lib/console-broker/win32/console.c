@@ -54,7 +54,7 @@ static lib_win32_colorref console_broker_colorref_from_rgb(lib_u32 rgb)
     return lib_win32_rgb((rgb >> 16u) & 0xffu, (rgb >> 8u) & 0xffu, rgb & 0xffu);
 }
 
-static int console_broker_ensure_text_surface(console_broker_backend *backend)
+static lib_bool console_broker_ensure_text_surface(console_broker_backend *backend)
 {
     lib_win32_handle output = backend->output;
     lib_win32_console_screen_buffer_info info;
@@ -560,7 +560,7 @@ lib_status console_broker_backend_write_bound(console_broker_backend *backend,
     if (backend->console != expected_console ||
         backend->generation != expected_generation) {
         console_broker_backend_unlock_output(backend);
-        return LIB_STATUS_NOT_CURRENT;
+        return LIB_STATUS_OK;
     }
     {
         /* A partial write can change cells even when the API reports failure. */
@@ -589,7 +589,7 @@ lib_status console_broker_backend_write_text_frame_bound(console_broker_backend 
     if (backend->console != expected_console ||
         backend->generation != expected_generation) {
         console_broker_backend_unlock_output(backend);
-        return LIB_STATUS_NOT_CURRENT;
+        return LIB_STATUS_OK;
     }
     if (lib_memory_compare(frame->palette, backend->previous_palette,
             sizeof(frame->palette)) != 0) {

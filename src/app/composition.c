@@ -9,7 +9,7 @@
 /* Adapt the provider's one context and reserve the same command admission
  * boundary for keyboard-derived requests. Product meaning stays in keyboard. */
 static lib_bool app_composition_hotkey(void *opaque,
-    common_session_machine_state state, const char *identifier,
+    common_session_machine_state state, const lib_u8 *identifier,
     common_session_command_result *out)
 {
     app_command_context *command = opaque;

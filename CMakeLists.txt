@@ -333,7 +333,7 @@ enable_testing()
 add_executable(softpc-machine-smoke test/core/machine_smoke.c)
 add_executable(softpc-config-smoke test/app/config_smoke.c src/app/config.c)
 target_include_directories(softpc-config-smoke PRIVATE src)
-target_link_libraries(softpc-config-smoke PRIVATE types)
+target_link_libraries(softpc-config-smoke PRIVATE types base)
 add_test(NAME softpc-config-smoke COMMAND softpc-config-smoke)
 set_tests_properties(softpc-config-smoke PROPERTIES LABELS "unit")
 add_test(NAME softpc-product-boundary-negative COMMAND ${CMAKE_COMMAND}

@@ -58,8 +58,12 @@ change merely to make a shared file fit.
 | S5 | Reconcile derived manifests and Audio-carved mixed CMake/README/verifier files; add one exact non-Audio path comparator, not a second source copy. | 8--14 build/docs/check paths; estimate +100..220/-30..120. | Six-package isolated build/test, no forbidden dependency edge and exact non-Audio comparator pass. |
 | S6 | Perform task-level path ledger audit and byte-identity proof for all adopted non-Audio files; report all deliberate retained differences and close only after owner package acceptance. | Docs/build evidence only unless an S1 ledger item proves otherwise. | Dual-width regression, six-package proof, closure ledger and owner acceptance. |
 
-Each implementation S is separately admitted after its predecessor is accepted.
-No S may silently fold an NXVM Audio change into a non-Audio import.
+The owner revises this sequence at S2 admission: Types convergence and the
+direct x86 vocabulary rewrite are one dependency-closed import, so S2 imports
+all selected non-Audio Lib/Common/x86 source and test paths together. The
+former S3 and S4 source-import scopes are subsumed; S5 remains the mixed
+build/evidence reconciliation step and S6 remains the task-level audit. No S
+may silently fold an NXVM Audio change into a non-Audio import.
 
 ## Acceptance ledger
 
@@ -73,6 +77,19 @@ No S may silently fold an NXVM Audio change into a non-Audio import.
 
 No Linux runtime, NNES/MyNES product acceptance, new Audio behavior or claim of
 future NXVM worktree stability is implied by this task.
+
+## S2 approved retained-difference disposition
+
+The owner approves retaining SoftPC's `test/x86/verify_negative.cmake` probe
+and the matching `test/x86/MANIFEST.sha256` entry. NXVM `d485a54e` uses
+`lib_memory_copy()` in a test that is meant to prove raw CRT rejection; that
+wrapper is valid Lib Types vocabulary and therefore cannot fail the verifier.
+SoftPC's existing `memcpy()` probe correctly proves the gate. This is the sole
+non-Audio source/test difference outside mixed Audio-bearing Lib files and is
+to be returned to NXVM as a one-line test correction. All six SoftPC manifests
+are derived from, and validate, SoftPC's actual corpus; this necessarily
+retains Audio and the approved test correction rather than copying stale
+external hashes.
 
 ## S1 frozen audit
 

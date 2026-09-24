@@ -1,6 +1,6 @@
 #include "core/machine/machine.h"
 #include "core/machine/driver.h"
-#include "../lib/cleanup.h"
+#include "cleanup.h"
 #include "insignia.h"
 #include "host_def.h"
 #include "xt.h"

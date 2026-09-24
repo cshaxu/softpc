@@ -2,31 +2,32 @@
 
 ## Current Work
 
-T82 S1 has delivered the NXVM six-component non-Audio audit. Owner requires
-strict non-Audio source/test convergence, imports NXVM Base process discovery
-for SoftPC's adjacent-INI lookup, and treats manifests as derived verification
-data. S2 is not yet admitted; no shared production code has been modified.
+T82 S2 imports the complete non-Audio Lib/Common/x86 source/test corpus from
+NXVM, including Base executable-directory discovery, and uses that imported
+capability for SoftPC's existing adjacent-INI lookup. Audio remains SoftPC's
+retained corpus. The owner approves preserving SoftPC's correct x86 raw-CRT
+negative test and its derived manifest until NXVM takes that one-line test fix.
 
-## M9 T82 S1 Packet
+## M9 T82 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner directly admits T82 to audit NXVM's six shared components and prepare an exact import excluding Audio. Owner subsequently requires strict equality for every non-Audio source/test path, approves importing Base process discovery for the existing SoftPC INI lookup, and approves replacing the SoftPC x86 command shim with NXVM's direct Types source. |
-| Objective | Freeze the actual NXVM six-directory content, compare every non-Audio shared path with SoftPC, and produce an import/retention/blocker ledger with a minimal S-task plan. |
-| Non-goals | No source import in S1; no Audio source/test/API behavior import; no Core, Compat, VM, package INI, guest media, public ABI, product behavior or NXVM worktree modification. S2 may make only the admitted App config use of imported Base process discovery. |
-| Reference Baseline | SoftPC `cdeb5448`; NXVM HEAD `d485a54e` plus the actual read-only six-directory working contents recorded by this S. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner admits S2 after accepting S1's strict non-Audio convergence plan, and clarifies that the intended scope is a whole six-directory import: every non-Audio Lib, Common, x86 and matching test path enters together. Owner clarifies that SoftPC must not import or alter Audio: NXVM independently adopts SoftPC Audio. Owner then approves retaining SoftPC's correct `memcpy()` raw-CRT negative probe and its derived x86 test manifest because NXVM's `lib_memory_copy()` probe cannot test the stated rejection. The approved product adaptation remains only SoftPC's existing adjacent-INI lookup through imported Base process discovery. |
+| Objective | Import every selected non-Audio Lib/Common/x86/test path from NXVM `d485a54e`, except the owner-approved correct x86 negative-test pair; retain and validate SoftPC Audio; import Base process discovery; and replace the direct Win32 executable-directory call in SoftPC App with that neutral contract without changing the resulting `softpc.ini` path or media resolution. |
+| Non-goals | No Audio source, Types Audio declaration, Audio build/test/document behavior, Core, Compat, VM, package INI, media, or NXVM worktree modification. No product behavior change beyond using the same resulting adjacent-INI path. Mixed Audio/non-Audio build and evidence files receive only necessary surgical reconciliation; a full Audio convergence is not admitted. |
+| Reference Baseline | SoftPC `df9d1cf8`; NXVM `d485a54e`, with its six shared directories recorded clean in S1. |
 | Candidate Proposal | [NXVM shared-corpus import readiness](../proposals/m9-nxvm-shared-corpus-import.md) |
-| Files And ABI Surface | This packet and proposal only for S1. Future source scope is `src/{lib,common,x86}` and `test/{lib,common,x86}`, excluding Audio paths; S2 additionally owns `src/app/config.c` and its direct test coverage solely for the imported Base INI-directory call. |
+| Files And ABI Surface | Selected non-Audio `src/{lib,common,x86}/**` and `test/{lib,common,x86}/**` paths, including imported `base/process` and platform declarations; Audio-owned portions of mixed Lib files remain excluded. `src/app/config.c` and its focused test coverage may change solely to call `base_process_executable_directory()` before appending `softpc.ini`. Public shared interfaces follow the exact imported corpus; no product ABI changes are admitted. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules; shared strict-C11/package/DAG requirements. |
-| Verification | Enumerate paths, compare hashes/content/diffs, inspect CMake dependency/link contracts and run documentation governance. No product build is claimed necessary for docs-only S1. |
-| Expected Markers | One complete six-directory ledger; every non-Audio source/test path is planned for exact equality, Audio paths are explicitly excluded, and derived manifests have one exact-path proof; S1 has no source file changes. |
-| Asset Needs | None. No package binary, INI or media update. |
-| Reporting Requirements | Report the frozen NXVM reference state, exact/equivalent/blocked path counts, import ordering, estimated per-S file/line bands and any required owner decision. |
-| Stop Conditions | A candidate requires a product adaptation other than S2's approved Base INI-directory call, a public ABI change, Audio import, NXVM runtime dependency, or cannot be classified from source/build evidence. Stop that candidate and report it rather than creating a SoftPC fork. |
-| Exit Criteria | Ledger and revised strict-convergence proposal are complete, documentation gates pass, current worktree remains source-clean, and owner has the S2 admission decision. |
+| Verification | Exact selected-path comparator before/after, standalone strict-C11 Lib/Common/x86 suites on x64/x86, focused executable-directory/INI-path proof, product background regression on x64/x86, shared DAG/manifests as applicable, and documentation governance. Desktop tests remain excluded unless explicitly reserved. |
+| Expected Markers | All imported non-Audio shared paths are byte-equal to NXVM; the one correct raw-CRT negative-test pair and Audio-only mixed paths are explicit retained differences; all six local manifests validate their actual selected corpora; `app_get_config_path()` has one Base process call and preserves output behavior. |
+| Asset Needs | Refresh only package `softpc32.exe` and `softpc64.exe`; preserve owner INI and all media. |
+| Reporting Requirements | Before implementation report actual selected path list and source/test line estimate. At delivery report exact changed-path and +/-/net code accounting, excluded Audio disposition, exact-path proof, builds/tests and package links. |
+| Stop Conditions | An imported non-Audio path requires a product adaptation beyond the approved App directory call; an Audio-owned mixed section is required for successful build; public ABI/product behavior changes; NXVM becomes a build/runtime dependency; or exact source cannot compile without a local fork. Stop and report rather than making a SoftPC variant. |
+| Exit Criteria | All imported paths match NXVM; the approved x86 negative-test pair and Audio-only mixed paths are the complete retained-difference ledger; all six manifests validate; App preserves adjacent `softpc.ini` discovery; admitted tests/builds pass on both widths; one complete P is pushed; worktree is clean except owner changes; and delivery awaits owner acceptance before a task-level convergence audit. |
 | Original Owner Request | Audit NXVM six components and prepare import of every component except Audio. |
-| Similar-Issue Sweep | Search all six directory manifests/CMake files for Audio reachability, product-relative paths, cross-component include violations and language-standard deviations. |
+| Similar-Issue Sweep | Enumerate every Audio-related Lib/test/build path to prove exclusion; scan imported Base process consumers and all App executable-directory lookups to prevent a duplicate direct Win32 implementation; scan all six source/test roots for retired `lib_c_*` spellings and duplicate retained source paths. |
 
 ## Current Technical Baseline
 

@@ -87,7 +87,7 @@ typedef struct common_session_command_provider {
     /* Product-owned hotkeys may request a neutral lifecycle action, release
      * Window capture, or inject product input through their own adapter. */
     lib_bool (*handle_hotkey)(void *context, common_session_machine_state state,
-        const char *identifier, common_session_command_result *out_result);
+        const lib_u8 *identifier, common_session_command_result *out_result);
 } common_session_command_provider;
 
 typedef struct common_session_options {
@@ -105,15 +105,15 @@ lib_status common_session_create(common_session **out_session,
     const common_session_options *options);
 lib_status common_session_bind_ui(common_session *session, common_ui *ui);
 lib_status common_session_destroy(common_session *session);
-int common_session_run(common_session *session);
+lib_i32 common_session_run(common_session *session);
 
 /* These are the only async entry points. UI and machine adapters enqueue
  * copied facts; neither calls the reducer or product command provider. */
-int common_session_enqueue_ui_event(void *context,
+lib_i32 common_session_enqueue_ui_event(void *context,
     const common_ui_event *event);
-int common_session_enqueue_runtime_completed(common_session *session,
+lib_i32 common_session_enqueue_runtime_completed(common_session *session,
     common_session_machine_state state, lib_u32 run_generation);
-int common_session_enqueue_frame_completed(common_session *session,
+lib_i32 common_session_enqueue_frame_completed(common_session *session,
     lib_u32 sequence, lib_bool graphics, lib_u32 run_generation);
 
 #endif

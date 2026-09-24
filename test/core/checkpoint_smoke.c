@@ -5,7 +5,7 @@
 #include "core/compat/devices/snapshot.h"
 #include "core/machine/snapshot.h"
 #include "core/compat/platform.h"
-#include "../lib/cleanup.h"
+#include "cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>

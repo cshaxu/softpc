@@ -3,14 +3,13 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#include <string.h>
 
 typedef struct kvm_capture {
     kvm_input_event events[128];
-    unsigned int count;
+    lib_u32 count;
 } kvm_capture;
 
-static int kvm_capture_event(void *opaque, const kvm_input_event *event)
+static lib_i32 kvm_capture_event(void *opaque, const kvm_input_event *event)
 {
     kvm_capture *capture = (kvm_capture *)opaque;
     if (capture == NULL || event == NULL || capture->count == 128u) return 0;
@@ -20,7 +19,7 @@ static int kvm_capture_event(void *opaque, const kvm_input_event *event)
 
 int main(void)
 {
-    kvm_window_frame *frame = calloc(1u, sizeof(*frame));
+    kvm_window_frame *frame = lib_allocate_zero(1u, sizeof(*frame));
     kvm_hotkey_registry registry;
     kvm_hotkey_matcher matcher;
     kvm_capture capture = { 0 };
@@ -62,7 +61,7 @@ int main(void)
     assert(kvm_hotkey_matcher_submit(&matcher, &event, kvm_capture_event,
         &capture, LIB_TRUE));
     assert(capture.count == 1u && capture.events[0].type == KVM_EVENT_HOTKEY);
-    assert(strcmp(capture.events[0].data.hotkey.identifier,
+    assert(lib_text_compare((const char *)capture.events[0].data.hotkey.identifier,
         "pause-toggle") == 0);
     /* Auto-repeat, then a second press while Ctrl/Alt stay held. Neither
        operation may forget the outstanding modifier breaks. */
@@ -159,7 +158,7 @@ int main(void)
     kvm_hotkey_matcher_initialize(&matcher, &registry);
     event.data.key.key = KVM_KEY_CONTROL; event.data.key.scan_code = 0x1d;
     event.data.key.modifiers = 1;
-    for (unsigned i = 0; i != 100; ++i)
+    for (lib_u32 i = 0; i != 100; ++i)
         assert(kvm_hotkey_matcher_submit(&matcher, &event, kvm_capture_event, &capture, LIB_TRUE));
     assert(matcher.held_count == 1 && capture.count == 0);
     event.data.key.key = KVM_KEY_ALT; event.data.key.scan_code = 0x38;
@@ -174,18 +173,18 @@ int main(void)
     kvm_hotkey_matcher_initialize(&matcher, &registry);
     event.data.key.key = 'P';
     event.data.key.modifiers = KVM_HOTKEY_MODIFIER_CONTROL | KVM_HOTKEY_MODIFIER_ALT;
-    for (unsigned i = 0; i < 64; ++i) {
+    for (lib_u32 i = 0; i < 64; ++i) {
         event.data.key.scan_code = (lib_u16)(i + 1);
         assert(kvm_hotkey_matcher_submit(&matcher, &event, kvm_capture_event, &capture, LIB_TRUE));
     }
     assert(matcher.held_count == 64 && capture.count == 64);
     event.data.key.pressed = 0;
-    for (unsigned i = 0; i < 64; ++i) {
+    for (lib_u32 i = 0; i < 64; ++i) {
         event.data.key.scan_code = (lib_u16)(i + 1);
         assert(kvm_hotkey_matcher_submit(&matcher, &event, kvm_capture_event, &capture, LIB_TRUE));
     }
     assert(matcher.held_count == 0 && capture.count == 64);
     kvm_hotkey_matcher_discard(&matcher);
-    free(frame);
+    lib_release(frame);
     return 0;
 }

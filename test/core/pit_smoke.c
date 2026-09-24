@@ -1,6 +1,6 @@
 #include "core/machine/machine.h"
 #include "core/compat/devices/snapshot.h"
-#include "../lib/cleanup.h"
+#include "cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>

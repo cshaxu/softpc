@@ -1,11 +1,10 @@
 #include "lib/types/win32/console.h"
 #include "lib/types/win32/sync.h"
 #include <assert.h>
-#include <string.h>
 #include <stdio.h>
 #include "lib/base/sync_interface.h"
 
-static unsigned mutex_creates, fail_mutex, live_mutexes;
+static lib_u32 mutex_creates, fail_mutex, live_mutexes;
 static lib_status create_mutex(base_sync_mutex **out)
 {
     if (++mutex_creates == fail_mutex) { *out = NULL; return LIB_STATUS_NO_MEMORY; }
@@ -21,8 +20,8 @@ static void destroy_mutex(base_sync_mutex *mutex)
 
 /* Native display I/O, deterministic reader/startup failures. The test owns a
  * hidden Console; it never changes the developer's Console or its input. */
-static int fail_allocate, fail_select, fail_reader, fail_query, fail_restore;
-static int fail_viewport, ignore_viewport;
+static lib_i32 fail_allocate, fail_select, fail_reader, fail_query, fail_restore;
+static lib_i32 fail_viewport, ignore_viewport;
 static BOOL WINAPI set_viewport(HANDLE output, BOOL absolute, const SMALL_RECT *rect)
 {
     if (fail_viewport) { fail_viewport = 0; return FALSE; }
@@ -93,7 +92,7 @@ static void snapshot(display_snapshot *s)
     COORD size = {120, 30}, origin = {0, 0};
     SMALL_RECT region = {0, 0, 119, 29};
     assert(output != INVALID_HANDLE_VALUE);
-    memset(s, 0, sizeof(*s));
+    lib_memory_set(s, 0, sizeof(*s));
     s->info.cbSize = sizeof(s->info);
     assert(GetConsoleScreenBufferInfoEx(output, &s->info));
     assert(GetConsoleCursorInfo(output, &s->cursor));
@@ -106,10 +105,10 @@ static void snapshot(display_snapshot *s)
 static void expect_display(const display_snapshot *expected)
 {
     display_snapshot actual;
-    static unsigned checkpoint;
+    static lib_u32 checkpoint;
     snapshot(&actual);
     ++checkpoint;
-    if (memcmp(&actual, expected, sizeof(actual)) != 0) {
+    if (lib_memory_compare(&actual, expected, sizeof(actual)) != 0) {
         fprintf(stderr, "display checkpoint %u: size %d,%d/%d,%d cursor %d,%d/%d,%d viewport %d,%d,%d,%d/%d,%d,%d,%d cells=%d palette=%d cursor-style=%d mode=%lu/%lu\n",
             checkpoint, actual.info.dwSize.X, actual.info.dwSize.Y,
             expected->info.dwSize.X, expected->info.dwSize.Y,
@@ -117,14 +116,14 @@ static void expect_display(const display_snapshot *expected)
             expected->info.dwCursorPosition.X, expected->info.dwCursorPosition.Y,
             actual.info.srWindow.Left, actual.info.srWindow.Top, actual.info.srWindow.Right, actual.info.srWindow.Bottom,
             expected->info.srWindow.Left, expected->info.srWindow.Top, expected->info.srWindow.Right, expected->info.srWindow.Bottom,
-            memcmp(actual.cells, expected->cells, sizeof(actual.cells)),
-            memcmp(actual.info.ColorTable, expected->info.ColorTable, sizeof(actual.info.ColorTable)),
-            memcmp(&actual.cursor, &expected->cursor, sizeof(actual.cursor)), actual.mode, expected->mode);
+            lib_memory_compare(actual.cells, expected->cells, sizeof(actual.cells)),
+            lib_memory_compare(actual.info.ColorTable, expected->info.ColorTable, sizeof(actual.info.ColorTable)),
+            lib_memory_compare(&actual.cursor, &expected->cursor, sizeof(actual.cursor)), actual.mode, expected->mode);
     }
-    assert(memcmp(&actual, expected, sizeof(actual)) == 0);
+    assert(lib_memory_compare(&actual, expected, sizeof(actual)) == 0);
 }
 
-static void check_frame_extent(short columns, short rows, int scrolled)
+static void check_frame_extent(lib_i16 columns, lib_i16 rows, lib_i32 scrolled)
 {
     console_broker *broker = NULL;
     lib_console *cooked, *raw;
@@ -147,8 +146,8 @@ static void check_frame_extent(short columns, short rows, int scrolled)
     assert(SetConsoleWindowInfo(broker->backend->output, TRUE, &viewport));
     assert(GetConsoleScreenBufferInfo(broker->backend->output, &before));
     frame.columns = 80; frame.rows = 25; frame.font_height = 16;
-    for (unsigned i=0; i<80u*25u; ++i) frame.text[i]='#';
-    for (int round = 0; round < 3; ++round) {
+    for (lib_u32 i=0; i<80u*25u; ++i) frame.text[i]='#';
+    for (lib_i32 round = 0; round < 3; ++round) {
         assert(console_broker_replace(broker, cooked, raw, CONSOLE_BROKER_RAW_EVENTS) == 0);
         assert(SetConsoleWindowInfo(broker->backend->output, TRUE, &viewport));
         if (round == 0 && !scrolled && rows == 13) {
@@ -161,8 +160,8 @@ static void check_frame_extent(short columns, short rows, int scrolled)
         }
         {
             CONSOLE_SCREEN_BUFFER_INFO raw_before;
-            int width = viewport.Right - viewport.Left + 1;
-            int height = viewport.Bottom - viewport.Top + 1;
+            lib_i32 width = viewport.Right - viewport.Left + 1;
+            lib_i32 height = viewport.Bottom - viewport.Top + 1;
             assert(GetConsoleScreenBufferInfo(broker->backend->output, &raw_before));
             assert(console_broker_ensure_text_surface(broker->backend));
             assert(GetConsoleScreenBufferInfo(broker->backend->output, &actual));
@@ -177,19 +176,19 @@ static void check_frame_extent(short columns, short rows, int scrolled)
         region = (SMALL_RECT){0, 0, 79, 24};
         assert(ReadConsoleOutputW(broker->backend->output, cells, cells_size, origin, &region));
         assert(region.Left == 0 && region.Top == 0 && region.Right == 79 && region.Bottom == 24);
-        for (unsigned i = 0; i < 80 * 25; ++i) assert(cells[i].Char.UnicodeChar == '#');
+        for (lib_u32 i = 0; i < 80 * 25; ++i) assert(cells[i].Char.UnicodeChar == '#');
         assert(console_broker_replace(broker, raw, cooked, CONSOLE_BROKER_COOKED_LINES) == 0);
         assert(GetConsoleScreenBufferInfo(broker->backend->output, &actual));
         if (actual.dwSize.X != before.dwSize.X || actual.dwSize.Y != before.dwSize.Y)
             fprintf(stderr, "extent %d,%d round %d: restored %d,%d expected %d,%d\n",
                 columns, rows, round, actual.dwSize.X, actual.dwSize.Y, before.dwSize.X, before.dwSize.Y);
         assert(actual.dwSize.X == before.dwSize.X && actual.dwSize.Y == before.dwSize.Y);
-        if (memcmp(&actual.srWindow, &before.srWindow, sizeof(actual.srWindow)) != 0)
+        if (lib_memory_compare(&actual.srWindow, &before.srWindow, sizeof(actual.srWindow)) != 0)
             fprintf(stderr, "viewport %d,%d round %d: %d,%d,%d,%d expected %d,%d,%d,%d\n",
                 columns, rows, round, actual.srWindow.Left, actual.srWindow.Top,
                 actual.srWindow.Right, actual.srWindow.Bottom, before.srWindow.Left,
                 before.srWindow.Top, before.srWindow.Right, before.srWindow.Bottom);
-        assert(memcmp(&actual.srWindow, &before.srWindow, sizeof(actual.srWindow)) == 0);
+        assert(lib_memory_compare(&actual.srWindow, &before.srWindow, sizeof(actual.srWindow)) == 0);
     }
     assert(console_broker_destroy(broker) == 0);
     lib_console_release(raw); lib_console_release(cooked);
@@ -242,7 +241,7 @@ int main(void)
         assert(WriteConsoleOutputCharacterA(broker->backend->output, "wide history", 12, marker, &written));
         assert(written == 12);
     }
-    assert(lib_console_write_text(cooked, "history\r\nSoftPC> start\r\n", 24) == 0);
+    assert(lib_console_write_text(cooked, "history\r\nMonitor> start\r\n", 25) == 0);
     snapshot(&before);
 
     /* Allocation failure happens in prepare, before any old reader/display changes. */
@@ -251,7 +250,7 @@ int main(void)
     expect_display(&before);
     assert(broker->current == cooked && !broker->broken);
     /* Both switch failure and reader failure restore the old display. */
-    for (int failure = 0; failure < 3; ++failure) {
+    for (lib_i32 failure = 0; failure < 3; ++failure) {
         fail_select = failure == 0;
         fail_reader = failure == 1;
         fail_query = failure == 2;
@@ -262,13 +261,13 @@ int main(void)
     frame.columns = 80; frame.rows = 25; frame.font_height = 16;
     frame.cursor_row = 23; frame.cursor_column = 7;
     frame.cursor_bottom = 15; /* intentionally hidden */
-    for (unsigned i=0; i<80u*25u; ++i) frame.text[i]='#';
-    for (unsigned i = 0; i < 80 * 25; ++i) {
+    for (lib_u32 i=0; i<80u*25u; ++i) frame.text[i]='#';
+    for (lib_u32 i = 0; i < 80 * 25; ++i) {
         frame.foreground[i] = 14;
         frame.background[i] = 1;
     }
     frame.palette[1] = 0x123456;
-    for (int round = 0; round < 3; ++round) {
+    for (lib_i32 round = 0; round < 3; ++round) {
         assert(console_broker_replace(broker, cooked, raw, CONSOLE_BROKER_RAW_EVENTS) == 0);
         assert(lib_console_write_text_frame(raw, &frame) == 0);
         snapshot(&raw_display);
@@ -284,11 +283,12 @@ int main(void)
         assert(console_broker_replace(broker, raw, cooked, CONSOLE_BROKER_COOKED_LINES) == 0);
         expect_display(&before);
     }
-    assert(lib_console_write_text(cooked, "ok\r\n\r\nSoftPC> ", 14) == 0);
+    assert(lib_console_write_text(cooked, "ok\r\n\r\nMonitor> ", 15) == 0);
     snapshot(&after);
-    assert(after.info.dwCursorPosition.X == 8);
+    /* "Monitor> " is nine cells wide; the cursor is the next cell. */
+    assert(after.info.dwCursorPosition.X == 9);
     assert(after.info.dwCursorPosition.Y == before.info.dwCursorPosition.Y + 2);
-    for (unsigned x = 2; x < 80; ++x)
+    for (lib_u32 x = 2; x < 80; ++x)
         assert(after.cells[before.info.dwCursorPosition.Y * 120 + x].Char.UnicodeChar == ' ');
     /* Same-mode binding does not clear text, move the cursor or switch screens. */
     assert(console_broker_replace(broker, cooked, other, CONSOLE_BROKER_COOKED_LINES) == 0);
