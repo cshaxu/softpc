@@ -96,3 +96,18 @@ source edit; report the discrepancy instead.
   `289AD608ED1CE84048450FC1012FD20080E6E966A0E0CFB28B517662CAC64E0B`.
 - Background CTest passed 116/116 on x64 (246.40 s) and 116/116 on x86
   (255.17 s).  Documentation governance and `git diff --check` pass.
+
+## S1 P2 — Owner snapshot refresh
+
+After P1, the owner reopened the still-unclosed S1 solely to replace the
+tracked package `assets/binary/snapshot` with a newly created state image.
+This is a package-fixture update, not a change to the CRLF repair or a new
+snapshot-format claim.  The replacement is 18,387,571 bytes with SHA-256
+`28A605291D12946D2F775B0220CF033BA47E4660A9D1491DFC78B4B0820D2B8E`;
+the preceding tracked snapshot was 18,395,778 bytes.  Its owner-controlled
+`softpc.ini`, both EXEs, and every other package payload remain unchanged.
+
+No source, test or executable changes accompany P2, so the P1 dual-width
+build and 116/116 background CTest evidence remains the applicable runnable
+proof.  P2 verifies its checksum, package-path scope, documentation governance
+and `git diff --check`, then waits for owner acceptance with T83 still open.

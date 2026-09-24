@@ -2,30 +2,30 @@
 
 ## Current Work
 
-T83 S1 restores only OpenNT CRLF bytes for the twelve selected mirror files
-whose normalized contents already match.  It is a raw-byte provenance repair;
-it does not alter machine logic or adopt NTVDM64 code.
+T83 S1 is reopened only to replace the owner-provided package snapshot with a
+newly created state image.  The accepted CRLF mirror repair remains intact;
+this P adds no code, configuration, or executable change.
 
 ## M9 T83 S1 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | New |
-| Admission And Approval | Owner admits T83 S1 to repair the audited SoftPC/OpenNT CRLF-only differences. |
-| Objective | Restore the exact OpenNT raw bytes for the frozen twelve-file CRLF-only set, reducing non-semantic mirror diff without changing content. |
-| Non-goals | No token, behavior, ABI, source-selection, Compat, VM, Lib, Common, x86, test, NTVDM64, OpenNT, INI, media, or semantic mirror-diff change. No adoption of the ten NTVDM64-only paths. |
-| Reference Baseline | SoftPC `07c53c9c`; OpenNT `5e4619ab6`; NTVDM64 `52e330bdf` is read-only comparison context only. |
+| Admission And Approval | Owner directs the still-active T83 S1 to add the newly created package `snapshot` after its CRLF P1 delivery. |
+| Objective | Preserve the accepted CRLF mirror repair and replace only the tracked package snapshot with the owner's current state image. |
+| Non-goals | No token, behavior, ABI, source-selection, Compat, VM, Lib, Common, x86, test, NTVDM64, OpenNT, INI, guest-media policy, semantic mirror-diff, or executable change. No adoption of the ten NTVDM64-only paths. |
+| Reference Baseline | SoftPC `b44942f3`; OpenNT `5e4619ab6`; NTVDM64 `52e330bdf` is read-only comparison context only. |
 | Candidate Proposal | [Three-mirror conformance](../proposals/m9-three-mirror-conformance.md) |
-| Files And ABI Surface | The twelve `src/core/softpc.new` paths enumerated in the proposal plus their exact `.gitattributes` checkout rules. No interface changes. |
+| Files And ABI Surface | `assets/binary/snapshot` only. No interface changes. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules; preserved-mirror direct-diff policy. |
-| Verification | Per-file raw SHA-256 equality to OpenNT; exhaustive normalized CRLF-only enumeration; mirror audit; x64/x86 Release builds and background CTest; diff/documentation gates. |
-| Expected Markers | Twelve listed raw hashes equal OpenNT; no remaining SoftPC selected path differs only by CRLF/LF; semantic-difference ledger is otherwise unchanged. |
-| Asset Needs | Refresh only `softpc32.exe` and `softpc64.exe`; preserve owner INI and all guest media. |
-| Reporting Requirements | Before mutation report the frozen twelve paths and expected +/−/net source accounting. After delivery report exact raw-hash results, remaining normalized-only count, code accounting and build/test evidence. |
-| Stop Conditions | Any normalized content mismatch, raw-copy token change, unavailable reference file, or changed build/test outcome stops implementation for owner direction. |
-| Exit Criteria | All twelve paths equal OpenNT raw bytes; the normalized-only set is empty; required dual-width verification passes; one complete P is pushed; worktree is clean except owner changes; delivery waits for owner acceptance. |
-| Original Owner Request | Admit a T task and first repair CRLF differences. |
-| Similar-Issue Sweep | Enumerate every selected mirror path by raw and CRLF-normalized SHA-256; each hit is either in the frozen twelve-file set or remains a semantic divergence outside S1. |
+| Verification | Record replacement size and SHA-256; confirm only `snapshot` is a package payload change; run diff/documentation gates. Existing P1 x64/x86 builds and 116/116 suites remain valid because no executable or source changes. |
+| Expected Markers | `snapshot` is 18,387,571 bytes with SHA-256 `28A605291D12946D2F775B0220CF033BA47E4660A9D1491DFC78B4B0820D2B8E`; no other package payload changes. |
+| Asset Needs | Commit the owner-provided `snapshot`; preserve `softpc.ini`, both EXEs, and every other asset. |
+| Reporting Requirements | Report the old/new snapshot size and new SHA-256, tracked-path accounting, and gates; explicitly state that builds/tests were not rerun because this P changes no executable or source. |
+| Stop Conditions | Any modified package path beyond `snapshot`, unexpected INI/EXE change, or unreadable replacement image stops implementation for owner direction. |
+| Exit Criteria | One complete snapshot-only P is pushed; checksum/size and clean worktree are proven; T83 remains open for owner acceptance. |
+| Original Owner Request | Reopen S1 and include the newly made snapshot in a P; EXEs do not need rebuilding. |
+| Similar-Issue Sweep | Review every `assets/binary` change; the sole admitted payload change is the owner-provided `snapshot`. |
 
 ## Current Technical Baseline
 
