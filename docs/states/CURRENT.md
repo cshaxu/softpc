@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 T84 S2 audit is complete and awaiting owner review; T84 remains open.
+M9 T84 S3 audit is complete and awaiting owner review; T84 remains open.
 
 Owner defers the pre-existing x86 BIOS[0x52] null-dispatch fault to
 [TODO](TODO.md) on 2026-09-25; no CPU/BOP repair belongs to S1.
@@ -10,10 +10,12 @@ The 80x50 implementation builds on both widths; final background regression
 passes 120/120 on x64 and x86. The deferred fault is not claimed repaired.
 See the [S1 evidence](../proposals/m9-kvm-text-80x50.md#s1-implementation-audit).
 T84 S1 is owner-accepted and closed. Executor P1 `503d6632`, delivery
-review P2 `dc9c34ce`, and S1 acceptance P3 `39366670` are pushed. S2 audited
-the complete task against the original request without product-code changes;
-its only finding was the now-restored required S1 history record. T84 still
-awaits the owner's separate closure decision.
+review P2 `dc9c34ce`, and S1 acceptance P3 `39366670` are pushed. Owner
+accepts S2's document-only whole-task audit and admits S3 on 2026-09-25.
+S3 inspected NXVM's six shared component roots read-only. All source roots and
+five of six complete roots are byte-identical; the only divergence is the
+Audio-only native-test replacement recorded in the active proposal. It does
+not alter the accepted T84 capacity delivery or imply T84 closure.
 The established S1 evidence confirms 24 paths,
 production +19/-11 and tests +108/-19, no mirror/INI/media change, matching
 dual-EXE hashes and the seven-member coverage ledger. Both Release builds,
@@ -257,23 +259,23 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
   routine mirror baseline, while OpenNT remains lineage evidence;
   [record](../history/M9-Td-S19-xp-baseline-proposal-refresh.md).
 
-## M9 T84 S2 Packet
+## M9 T84 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts/closes S1 and admits S2 on 2026-09-25. |
-| Objective | Audit complete T84 80x50 delivery against the original request, changed-path ledger, ownership/contract boundaries and recorded verification; prepare truthful T-level closure evidence without closing T84. |
-| Non-goals | No product-code, test-behavior, ABI, mirror, snapshot, media, configuration or external-repository change; no repair of the deferred BOP fault. |
-| Reference Baseline | S1 delivery/acceptance `503d6632`/`dc9c34ce`/`39366670`; original implementation comparison baseline `9fbf7369`. |
+| Admission And Approval | Owner accepts S2's audit and admits S3 on 2026-09-25. |
+| Objective | Read-only audit NXVM's current `src/lib`, `src/common`, `src/x86`, `test/lib`, `test/common` and `test/x86` against SoftPC's corresponding six components; report exact divergence, manifest state, dependency/boundary implications and a safe follow-up decision. |
+| Non-goals | No SoftPC production/test behavior, ABI, mirror, snapshot, media, configuration, build artifact or external-repository change; no import, merge, manifest rewrite, NXVM checkout change or deferred BOP repair. |
+| Reference Baseline | SoftPC `bf1c0a96`; NXVM current checked-out worktree revision and status captured at audit start. |
 | Candidate Proposal | [80x50 design and plan](../proposals/m9-kvm-text-80x50.md) |
-| Files And ABI Surface | Review the 24 S1 changed paths: four production C/H paths, nine test C paths, four manifests, three design/state/proposal documents, two EXEs and README; verify no omitted App/Compat/mirror/INI/media path. |
+| Files And ABI Surface | The six shared component roots and their manifests/readmes/CMake boundary files only. SoftPC and NXVM application, machine/product, package, media and build-output paths are out of scope. |
 | Applicable Rules | AGENTS.md; Execution, Documentation, Architecture and Coding authorities; Product UI; shared corpus boundaries. |
-| Verification | Reproduce Git path/numstat/patch ledger from `9fbf7369`; map all seven frozen coverage members to changed source and focused/full evidence; verify current HEAD/remote/worktree, manifests/DAG/docs gates and artifact hashes; inspect no changed path bypasses declared ownership. |
-| Expected Markers | Exactly 24 S1 changed paths with all required capacity/extent semantics evidenced; 80x22/25/43/50 accepted; 81 columns/51 rows rejected; status 80x25; 50-to-25 clearing proven; BOP fault accurately deferred to TODO. |
-| Asset Needs | No asset refresh. Preserve existing accepted EXEs, INI, snapshots and guest media. |
-| Reporting Requirements | Write a T-level requirement/path/verification ledger; enumerate every changed file, purpose and added/deleted/net lines, documentation/manifests/artifacts separately; disclose exclusions, deferred BOP risk and whether any closure condition remains for owner decision. |
-| Stop Conditions | Stop on a scope contradiction, missing/altered S1 evidence, unexpected changed path, untracked worktree change, required new product repair or unresolved audit discrepancy. The pre-existing x86 BOP crash remains owner-deferred in TODO. |
-| Exit Criteria | S2 audit record is committed/pushed with a complete T84 ledger and clean worktree; owner then decides T84 closure. |
+| Verification | Record both Git heads/statuses; enumerate each six-root path set and byte/content differences; verify manifests independently in each worktree when available; inspect CMake target/dependency boundaries and direct include differences; run no external build or product binary. |
+| Expected Markers | A finite six-root ledger with identical, SoftPC-only, NXVM-only and differing paths; every difference classified as content, manifest/revision, test, contract, build boundary or unrelated uncommitted work; no claim that an uncommitted NXVM state is a stable import baseline. |
+| Asset Needs | None. Preserve SoftPC package EXEs, INI, snapshots and guest media. |
+| Reporting Requirements | Commit/push a concise audit record naming both revisions, worktree states, counts, every semantic difference and its proposed receiver; separately state whether a later import can be byte-for-byte, must wait for NXVM commit, or requires an owner design decision. |
+| Stop Conditions | Stop on unavailable NXVM worktree, uncertain component-root mapping, a proposed write to NXVM, a required product change, or a discrepancy that cannot be classified from source evidence. The pre-existing x86 BOP crash remains owner-deferred in TODO. |
+| Exit Criteria | S3 audit record is committed/pushed with a clean SoftPC worktree and an evidence-backed import recommendation. Owner decides any subsequent import or T84 closure. |
 | Original Owner Request | 收口T83，准入T84进行kvm-*组件的文本帧容量升级 80x50。此前要求 Lib、Common 和 App-SoftPC 正确接通。 |
-| Similar-Issue Sweep | Re-run the S1 capacity-constant universe and confirm each hit's recorded disposition remains valid; search for untracked 25-row capacity owners, direct text-frame consumers, alternate raw-Console writes, and changed-path ownership bypasses. |
+| Similar-Issue Sweep | Compare each component's source, tests, manifests, CMake entrypoint, README and verification scripts; search for renamed/missing roots, private platform leakage, changed public interfaces, duplicate implementation paths and non-manifest tracked files. |

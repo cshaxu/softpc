@@ -46,6 +46,14 @@ actual-change and requirement audit, dispose of task-owned scratch, and prepare
 T84 closure evidence for owner approval. It does not close T84 itself. No
 speculative second implementation or new state machine is planned.
 
+S3 is owner-admitted after S2: inspect the latest NXVM worktree's six shared
+roots (`src/lib`, `src/common`, `src/x86`, `test/lib`, `test/common`,
+`test/x86`) read-only against SoftPC. It is an import-readiness audit only:
+capture revisions and uncommitted state, compare all component content and
+contracts, and report whether a later byte-identical import is safe. It must
+not edit NXVM, import changes, rebuild packages or reinterpret T84's accepted
+80x50 delivery.
+
 ## S2 whole-task audit
 
 S2 compares the complete accepted delivery `39366670` with implementation
@@ -119,6 +127,55 @@ The pre-existing intermittent x86 `BIOS[0x52]` null dispatch remains deferred
 in TODO by owner instruction. It reproduced on unchanged `9fbf7369` and is
 not attributed to the 80x50 work. It is the only open risk recorded by this
 audit; it is not silently masked and it is not a T84 code change.
+
+## S3 NXVM six-component audit
+
+Audit timestamp: 2026-09-25. SoftPC baseline is `bf1c0a96`; NXVM is checked
+out at `735d155a9c47cde4a34d6fdcaf452ffe8e39f6ac`. NXVM has uncommitted changes
+only under its MyNES documentation and default INI. Its six shared roots are
+clean, so the following comparison is against their checked-out content, not
+against NXVM's whole (otherwise dirty) worktree. The most recent NXVM commit
+touching a shared root is `b7cbb30a9` (2026-09-25).
+
+Content SHA-256 comparison produces this finite ledger:
+
+- `src/lib`: 109 files in each repository; all 109 are identical.
+- `src/common`: 23 files in each repository; all 23 are identical.
+- `src/x86`: 14 files in each repository; all 14 are identical.
+- `test/common`: 20 files in each repository; all 20 are identical.
+- `test/x86`: 10 files in each repository; all 10 are identical.
+- `test/lib`: 51 files in each repository; 48 are identical. `CMakeLists.txt`
+  and `MANIFEST.sha256` differ only because SoftPC owns
+  `audio_native_smoke.c` while NXVM owns `audio_win32_platform_smoke.c`.
+
+Thus 224 of the 227 files in each shared-root set have a byte-identical
+counterpart; there are no source-component differences and no missing
+non-audio component. Both
+repositories' Lib/Common/x86 source and test manifests verify, and NXVM's Lib
+component DAG plus Common/x86 corpus checks pass. No build or product binary
+was run for this read-only audit.
+
+### The one semantic difference
+
+NXVM commit `b7cbb30a9` replaces the physical WASAPI loopback probe with a
+deterministic adapter test. SoftPC's `audio_native_smoke.c` links the public
+Audio stream to an actual default endpoint and capture loopback, waits on real
+time, and intentionally skips when RDP or the host exposes no usable endpoint.
+NXVM's replacement compiles the same production `audio/win32/stream.c` into a
+test translation unit after substituting only its Win32 calls. It deterministically
+checks format creation, mono/stereo rates, PCM delivery, cancellation, wait
+outcomes, every initialization failure and balanced resource release. It links
+Types/Base rather than the public `audio` target; `audio_stream_smoke.c` remains
+the separate public-stream contract test.
+
+This is not a second production implementation and does not alter Audio API or
+runtime behavior. It is a better unit-test seam because it does not depend on a
+physical device, mixer, RDP endpoint, wall-clock deadline or audible signal.
+It is nevertheless an Audio-only test-policy choice. S3 does not import it:
+the six roots are not fully byte-identical until an owner admits a follow-up
+that replaces SoftPC's physical probe with NXVM's deterministic one and then
+updates SoftPC's test manifest. All non-Audio content is already eligible for
+literal import with no change.
 
 ## Frozen coverage ledger and exit evidence
 
