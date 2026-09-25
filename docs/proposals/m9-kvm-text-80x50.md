@@ -275,7 +275,8 @@ Both Release package targets build.  Full hidden-background CTest passes
 desktop-labelled tests.  Shared sources and tests compile as C11 with
 `-Wall -Wextra -Wpedantic -Werror`; the six manifests, Lib DAG/Linux contract,
 Common/x86 corpus and negative verifiers all pass.  `git diff --check` passes.
-The delivery awaits owner manual verification before S5/T84 closure.
+Owner accepted S5 after manual verification on 2026-09-25. Executor
+`e2b81d70` is pushed; S5 is closed and T84 remains open.
 
 - x86 SHA256: `F1E748E86FF800ACF4C1BE8FF75B675BC4995CD3FC39752B948D5D32620E8658`
 - x64 SHA256: `840347402647A6F4988DCC16A4B22E6E5FF853D5E15E7C78A26331DB74410856`
