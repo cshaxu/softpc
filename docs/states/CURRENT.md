@@ -231,3 +231,6 @@ No implementation subtask is active. Open task awaiting owner: T83.
   implementation task or T number is allocated.
 - M9 Td S18: T71 closure, TODO retirement and floppy-identification candidate;
   [record](../history/M9-Td-S18-t71-closure-and-floppy-queue.md).
+- M9 Td S19: refreshes the unadmitted XP candidate so XP SP1 is its intended
+  routine mirror baseline, while OpenNT remains lineage evidence;
+  [record](../history/M9-Td-S19-xp-baseline-proposal-refresh.md).
