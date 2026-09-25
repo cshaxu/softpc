@@ -2,19 +2,20 @@
 
 ## Current Work
 
-M9 T84 S1 is delivered for owner verification; T84 remains open.
+M9 T84 remains open; no implementation S is active.
 
 Owner defers the pre-existing x86 BIOS[0x52] null-dispatch fault to
 [TODO](TODO.md) on 2026-09-25; no CPU/BOP repair belongs to S1.
 The 80x50 implementation builds on both widths; final background regression
 passes 120/120 on x64 and x86. The deferred fault is not claimed repaired.
 See the [S1 evidence](../proposals/m9-kvm-text-80x50.md#s1-implementation-audit).
-Executor P1 `503d6632` is pushed. Actual-change review confirms 24 paths,
+T84 S1 is owner-accepted and closed. Executor P1 `503d6632` and delivery
+review P2 `dc9c34ce` are pushed. Actual-change review confirms 24 paths,
 production +19/-11 and tests +108/-19, no mirror/INI/media change, matching
 dual-EXE hashes and the seven-member coverage ledger. Both Release builds,
 full background 120/120 and delivery rechecks 18/18 pass per width.
-Five desktop tests per width remain excluded. Await owner verification;
-no S1/T84 closure or S2 admission is claimed.
+Five desktop tests per width remain excluded. Owner reports manual acceptance
+on 2026-09-25. S2 remains planned but unadmitted; no T84 closure is claimed.
 
 ## Current Technical Baseline
 
@@ -257,7 +258,7 @@ no S1/T84 closure or S2 admission is claimed.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | New |
-| Admission And Approval | Owner closes T83 and admits T84 for 80x50 text-frame capacity. |
+| Admission And Approval | Owner closes T83 and admits T84 for 80x50 text-frame capacity; owner accepts S1 on 2026-09-25. |
 | Objective | Deliver bounded 1..80-column, 1..50-row text frames through Lib KVM/Console, Common and App-SoftPC. |
 | Non-goals | No dynamic frame ownership, wider columns, new font format, guest mode hacks, snapshot format changes, external repository edits, or mirror algorithm changes. |
 | Reference Baseline | SoftPC `1abcb0f2`, accepted T83 S6 production. |
@@ -268,7 +269,7 @@ no S1/T84 closure or S2 admission is claimed.
 | Expected Markers | 80x22/25/43/50 accepted; 81 columns and 51 rows rejected without publication; 50-to-25 clears old rows; default status remains 80x25; fixed stride 80. |
 | Asset Needs | Refresh both package EXEs after verification; preserve INI, snapshots and guest media. Disposable fixtures remain under task-owned build children. |
 | Reporting Requirements | Before/after scope and added/deleted/net code ledger; exact focused/regression results, exclusions, commits and two EXE links. At T delivery, report every changed file against the admitted baseline, its purpose, detailed reviewable diff and per-file added/deleted/net lines; separately account for documents, manifests and binary artifacts, with full commit/diff references for owner acceptance. |
-| Stop Conditions | Stop on required mirror algorithm or snapshot format change, inconsistent producer geometry, necessary public ownership redesign, or unresolved verification failure. |
-| Exit Criteria | S1 implementation and tests pass on both widths; complete P committed/pushed and dual EXEs delivered for owner testing. T closure requires whole-task review and owner acceptance. |
+| Stop Conditions | Stop on required mirror algorithm or snapshot format change, inconsistent producer geometry, necessary public ownership redesign, or unresolved verification failure. The pre-existing x86 BOP crash is owner-deferred in TODO, not repaired here. |
+| Exit Criteria | S1 is closed: implementation/tests pass, P1/P2 are pushed and owner reports manual acceptance. T closure still requires S2 whole-task review and owner acceptance. |
 | Original Owner Request | 收口T83，准入T84进行kvm-*组件的文本帧容量升级 80x50。此前要求 Lib、Common 和 App-SoftPC 正确接通。 |
 | Similar-Issue Sweep | Classify every 25/50/2000/4000 and text-capacity use as storage bound, active extent, default layout, font/pixel geometry or test fixture; retain intentional defaults and repair capacity assumptions across the complete frame chain. |

@@ -79,8 +79,9 @@ format change stops implementation for a separate scope decision.
 Status update, 2026-09-25: owner directs recording the pre-existing BOP fault
 in [TODO](../states/TODO.md) and not repairing it now. That delivery blocker
 is lifted; the investigation and earlier blocked status below are retained as
-evidence. Owner authorizes S1 build/test/commit/push delivery, then waits for
-manual verification. No S1/T84 closure is claimed. The deferred fault is not fixed.
+evidence. Owner accepts S1 after P1/P2 delivery and manual verification.
+S1 is closed; T84 remains open because S2's whole-task review is unadmitted.
+The deferred fault is not fixed.
 
 P1 `503d6632` is pushed. Coordinator actual-change review checks all 24 paths
 against the seven-member coverage ledger and original scope; no production
@@ -214,7 +215,8 @@ Artifacts:
 - x86 SHA256: `E25D3DBBF2281EB0B8C9049A5406290E4272C0334DD027831FD154D56EFCC0E8`
 - x64 SHA256: `F42C8BB536094FC4FE9BEFB7333CE9A164C8D3CC0103CB99DBE24C395089D8C4`
 
-T84 remains open for owner acceptance and planned S2 whole-task review.
+Owner accepted S1 on 2026-09-25. T84 remains open for its planned but
+unadmitted S2 whole-task review.
 
 ### Binary footprint comparison
 
