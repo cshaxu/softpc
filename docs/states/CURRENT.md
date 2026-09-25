@@ -2,8 +2,10 @@
 
 ## Current Work
 
-M9 T84 S4 is active: read-only diff and quality audit of NXVM's six shared
-components in preparation for a separately approved next import.
+M9 T84 S4 is complete: the read-only NXVM six-component diff and quality audit
+is recorded in [its intake ledger](../history/M9-T84-S4-nxvm-six-component-audit.md).
+T84 remains open; S5 is reserved but not admitted, awaiting the owner's choice
+on the test-root portability policy and any next import.
 
 Owner defers the pre-existing x86 BIOS[0x52] null-dispatch fault to
 [TODO](TODO.md) on 2026-09-25; no CPU/BOP repair belongs to S1.
@@ -265,23 +267,23 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
   routine mirror baseline, while OpenNT remains lineage evidence;
   [record](../history/M9-Td-S19-xp-baseline-proposal-refresh.md).
 
-## M9 T84 S4 Packet
+## M9 T84 S5 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits S4 on 2026-09-25 after accepting S3, and requests a code-diff and overall-quality audit before any next shared-component import. |
-| Objective | Read-only compare SoftPC and NXVM across `src/lib`, `src/common`, `src/x86`, `test/lib`, `test/common`, and `test/x86`; publish a finite per-path difference ledger, quality findings and import dispositions. |
-| Non-goals | No source/test/API/ABI/build/manifest edit in either repository; no NXVM write; no product behavior claim; no next import, build, EXE refresh or task closure. |
-| Reference Baseline | SoftPC `99f199a4`; NXVM HEAD and worktree status recorded at audit start. S3's admitted shared baseline is NXVM `b7cbb30a9`; later NXVM edits must be classified, not silently adopted. |
-| Candidate Proposal | [T84 80x50 design and retained audit record](../proposals/m9-kvm-text-80x50.md) |
-| Files And ABI Surface | Read-only six shared roots and their manifests/CMake/README/verifier entrypoints. No ABI surface may change in S4. |
-| Applicable Rules | AGENTS.md; Execution, Documentation, Architecture and Coding authorities; shared corpus boundaries and source-research policy. |
-| Verification | Reproducible file/hash inventory and Git diff against NXVM committed and uncommitted states; inspect changed production/test paths and relevant dependency/build gates; run SoftPC documentation governance and whitespace checks after recording. |
-| Expected Markers | Audit record states exact path counts, added/removed/net lines by component, ownership/boundary findings, each difference's disposition (`candidate`, `reject`, `defer`, or `already covered`), and no source/build artifact diff. |
+| Admission And Approval | Not admitted. The owner must choose the test-root portability policy before authorizing S5. |
+| Objective | Await a separately approved next import after the completed S4 intake audit. |
+| Non-goals | No work, source/test/API/ABI/build/manifest edit in either repository, NXVM write, product behavior claim, build or EXE refresh before admission. |
+| Reference Baseline | SoftPC `2059bdac`; NXVM clean `1e86b8e7ad6470ab8651a21eb89ed72b3db0c6ab`; prior exact import base `b7cbb30a9`. |
+| Candidate Proposal | [T84 retained design record](../proposals/m9-kvm-text-80x50.md); [S4 intake ledger](../history/M9-T84-S4-nxvm-six-component-audit.md). |
+| Files And ABI Surface | Read-only six shared roots and their manifests/CMake/README/verifier entrypoints. |
+| Applicable Rules | AGENTS.md; Execution, Documentation, Architecture and Coding authorities; shared-corpus boundaries and source-research policy. |
+| Verification | On admission, use S4's frozen ledger as the intake baseline and run the task-specific verification plan. |
+| Expected Markers | An owner-approved import plan with explicit test-root ownership and Audio disposition. |
 | Asset Needs | None. Preserve package EXEs, INI, snapshots and guest media. |
-| Reporting Requirements | Report NXVM revision/status, SoftPC baseline, six-root inventory, production versus test/build/doc deltas, code-quality findings, duplicate/second-path scan, public-contract changes, recommended bounded follow-up S tasks and explicit non-imports. |
-| Stop Conditions | Stop before any repository write outside SoftPC task documentation; stop and report if source provenance, license, external dependency, ABI break, product behavior change or unbounded rewrite is required. |
-| Exit Criteria | Pushed audit record and documentation state pass governance/whitespace gates; no product/shared code or artifacts changed; owner receives an import-ready ledger and decides any follow-up S admission. |
+| Reporting Requirements | Before implementation, report selected NXVM revision, included paths, public layout effects, test-root policy and explicit non-imports. |
+| Stop Conditions | Do not start implementation without owner admission; stop before an unapproved Audio source import or test-root boundary decision. |
+| Exit Criteria | Defined only by the next admitted S packet. |
 | Original Owner Request | 准入S4，对nxvm的6组件进行一次代码diff审计和总体质量审计，准备下一轮导入。 |
-| Similar-Issue Sweep | Compare all six roots, manifests, CMake entrypoints, README/verifiers and dependency declarations; search changed code for platform leakage, raw native types, duplicate paths, public-contract drift, C11 violations, dead code and test-only production seams. |
+| Similar-Issue Sweep | Reuse S4's all-six-root ledger and extend it only for the chosen import revision. |
