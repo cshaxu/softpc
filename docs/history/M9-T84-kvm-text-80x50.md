@@ -211,6 +211,7 @@ post-build worktree comparison therefore shows those later NXVM edits as
 differences; they are not silently imported by this task. S3's exactness claim
 is specifically against the admitted commit `b7cbb30a9`, whose sole
 SoftPC/NXVM difference was the four-file Audio test substitution now removed.
+The owner accepts S3 on 2026-09-25; T84 remains open.
 
 ## Frozen coverage ledger and exit evidence
 
@@ -267,7 +268,7 @@ regression attribution, not admission to change the original CPU algorithm.
 ### Bounded text capacity implementation
 
 Baseline: `9fbf7369`; owner request and frozen coverage ledger are in the
-[proposal](../proposals/m9-kvm-text-80x50.md). This is S1 evidence, not T closure.
+[design record](M9-T84-kvm-text-80x50.md). This is S1 evidence, not T closure.
 
 ### Actual implementation and ownership
 
@@ -450,7 +451,7 @@ Remaining changed paths:
   clearing instead of a universal 25-row minimum.
 - `docs/design/UI.md`: +4/-0, net +4; records capacity, fixed stride,
   independent status default and explicit unsupported results.
-- `docs/proposals/m9-kvm-text-80x50.md`: P1 +219/-0; implementation review,
+- `docs/history/M9-T84-kvm-text-80x50.md`: P1 +219/-0; implementation review,
   verification failures and this ledger. P2 adds the delivery review record.
 - `docs/states/CURRENT.md`: P1 +9/-1; delivery status and full file/diff
   reporting. P2 updates that status to pushed and awaiting owner verification.

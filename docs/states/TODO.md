@@ -6,4 +6,4 @@
   Owner explicitly defers repair on 2026-09-25. Admission condition: a separate
   owner-admitted CPU/BOP investigation, capturing guest instruction bytes,
   CS:EIP and reset context before choosing a repair; do not mask it with a
-  no-op handler. Evidence: [T84 investigation](../proposals/m9-kvm-text-80x50.md#verification).
+  no-op handler. Evidence: [T84 investigation](../history/M9-T84-kvm-text-80x50.md#verification).

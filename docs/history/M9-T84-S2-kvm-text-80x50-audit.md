@@ -16,7 +16,7 @@ S1 record restores traceability without changing delivery behavior.
 Relative to `9fbf7369`, S1 changes exactly 24 paths: production C/H +19/-11,
 test C +108/-19, four manifests, documentation/README and two EXEs. The full
 per-file ledger, coverage and artifact hashes remain in the
-[T84 proposal](../proposals/m9-kvm-text-80x50.md#per-file-review-ledger).
+[T84 design record](M9-T84-kvm-text-80x50.md#per-file-review-ledger).
 Recorded evidence is dual Release builds, serial background 120/120 on x64 and
 x86, and 18/18 delivery rechecks per width. S2 re-ran documentation, manifest,
 corpus/DAG/naming and whitespace gates. Desktop/Linux/manual 50-row guest
