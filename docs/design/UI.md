@@ -141,6 +141,10 @@ by the runtime. It sends normalized keyboard and mouse records to the runtime
 queue. It never decodes guest VRAM, locks a SoftPC device, waits for the
 executor, or executes a guest instruction on the KVM worker thread.
 
+Text frames support 1--80 columns and 1--50 rows with fixed 80-cell storage
+stride. Active dimensions drive output; the monitor status page stays 80x25.
+Unsupported extents fail explicitly instead of being silently clipped.
+
 For text frames, cursor position, shape, and enabled state are copied frame
 data. The native VM Console/Terminal owns its own blink behavior. `kvm-window`
 draws the corresponding guest cursor and owns a 250 ms Window-local blink

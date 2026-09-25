@@ -582,7 +582,25 @@ static void verify_driver_geometry(softpc_machine *machine)
                 now_width = 81;
                 assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
                 now_width = saved_width;
-                now_height = 50;
+                {
+                    const unsigned text_rows[] = {22, 25, 43, 50, 25, 50};
+                    for (unsigned row_mode = 0; row_mode < sizeof(text_rows)/sizeof(text_rows[0]); ++row_mode) {
+                        const void *surface;
+                        lib_u32 columns, rows, stride, cell_bytes;
+                        now_height = text_rows[row_mode];
+                        assert(softpc_machine_presentation_text(machine, &surface,
+                            &columns, &rows, &stride, &cell_bytes));
+                        unsigned char *last = (unsigned char *)surface +
+                            ((rows - 1u) * stride + 79u) * cell_bytes;
+                        unsigned char saved = *last;
+                        *last = 'Z';
+                        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
+                        assert(frame->window.text.base.text_rows == rows &&
+                            frame->window.text.base.cells[(rows - 1u) * 80u + 79u].glyph_index == 'Z');
+                        *last = saved;
+                    }
+                }
+                now_height = 51;
                 assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
                 now_height = 0;
                 assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
@@ -606,7 +624,8 @@ static void verify_driver_geometry(softpc_machine *machine)
                 set_mode_change_required(TRUE);
                 assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
                 set_mode_change_required(FALSE);
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
+                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
+                assert(frame->window.text.base.text_rows == 50u);
                 now_height = saved_rows;
                 {
                     byte *saved_planes = EGA_planes;

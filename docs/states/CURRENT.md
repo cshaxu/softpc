@@ -4,6 +4,14 @@
 
 M9 T84 S1 is active.
 
+Owner defers the pre-existing x86 BIOS[0x52] null-dispatch fault to
+[TODO](TODO.md) on 2026-09-25; no CPU/BOP repair belongs to S1.
+The 80x50 implementation builds on both widths; final background regression
+passes 120/120 on x64 and x86. The deferred fault is not claimed repaired.
+See the [S1 evidence](../proposals/m9-kvm-text-80x50.md#s1-implementation-audit).
+Owner authorizes S1 build/test/commit/push delivery on 2026-09-25, followed
+by manual verification. No S1/T84 closure or S2 admission is claimed.
+
 ## Current Technical Baseline
 
 - Owner closes T83 after S1--S6 delivery and admits T84 for bounded 80x50
@@ -255,7 +263,7 @@ M9 T84 S1 is active.
 | Verification | Boundary and mode-transition matrix, last-cell/cursor/dirty/resize/native-write failure tests; Common forwarding and App producer tests; both Release builds and background regression; six manifests/DAG and documentation gate. |
 | Expected Markers | 80x22/25/43/50 accepted; 81 columns and 51 rows rejected without publication; 50-to-25 clears old rows; default status remains 80x25; fixed stride 80. |
 | Asset Needs | Refresh both package EXEs after verification; preserve INI, snapshots and guest media. Disposable fixtures remain under task-owned build children. |
-| Reporting Requirements | Before/after scope and added/deleted/net code ledger; exact focused/regression results, exclusions, commits and two EXE links. |
+| Reporting Requirements | Before/after scope and added/deleted/net code ledger; exact focused/regression results, exclusions, commits and two EXE links. At T delivery, report every changed file against the admitted baseline, its purpose, detailed reviewable diff and per-file added/deleted/net lines; separately account for documents, manifests and binary artifacts, with full commit/diff references for owner acceptance. |
 | Stop Conditions | Stop on required mirror algorithm or snapshot format change, inconsistent producer geometry, necessary public ownership redesign, or unresolved verification failure. |
 | Exit Criteria | S1 implementation and tests pass on both widths; complete P committed/pushed and dual EXEs delivered for owner testing. T closure requires whole-task review and owner acceptance. |
 | Original Owner Request | 收口T83，准入T84进行kvm-*组件的文本帧容量升级 80x50。此前要求 Lib、Common 和 App-SoftPC 正确接通。 |
