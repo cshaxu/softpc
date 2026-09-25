@@ -2,20 +2,24 @@
 
 ## Current Work
 
-M9 T84 remains open; no implementation S is active.
+M9 T84 S2 audit is complete and awaiting owner review; T84 remains open.
 
 Owner defers the pre-existing x86 BIOS[0x52] null-dispatch fault to
 [TODO](TODO.md) on 2026-09-25; no CPU/BOP repair belongs to S1.
 The 80x50 implementation builds on both widths; final background regression
 passes 120/120 on x64 and x86. The deferred fault is not claimed repaired.
 See the [S1 evidence](../proposals/m9-kvm-text-80x50.md#s1-implementation-audit).
-T84 S1 is owner-accepted and closed. Executor P1 `503d6632` and delivery
-review P2 `dc9c34ce` are pushed. Actual-change review confirms 24 paths,
+T84 S1 is owner-accepted and closed. Executor P1 `503d6632`, delivery
+review P2 `dc9c34ce`, and S1 acceptance P3 `39366670` are pushed. S2 audited
+the complete task against the original request without product-code changes;
+its only finding was the now-restored required S1 history record. T84 still
+awaits the owner's separate closure decision.
+The established S1 evidence confirms 24 paths,
 production +19/-11 and tests +108/-19, no mirror/INI/media change, matching
 dual-EXE hashes and the seven-member coverage ledger. Both Release builds,
 full background 120/120 and delivery rechecks 18/18 pass per width.
 Five desktop tests per width remain excluded. Owner reports manual acceptance
-on 2026-09-25. S2 remains planned but unadmitted; no T84 closure is claimed.
+on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 
 ## Current Technical Baseline
 
@@ -253,23 +257,23 @@ on 2026-09-25. S2 remains planned but unadmitted; no T84 closure is claimed.
   routine mirror baseline, while OpenNT remains lineage evidence;
   [record](../history/M9-Td-S19-xp-baseline-proposal-refresh.md).
 
-## M9 T84 S1 Packet
+## M9 T84 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner closes T83 and admits T84 for 80x50 text-frame capacity; owner accepts S1 on 2026-09-25. |
-| Objective | Deliver bounded 1..80-column, 1..50-row text frames through Lib KVM/Console, Common and App-SoftPC. |
-| Non-goals | No dynamic frame ownership, wider columns, new font format, guest mode hacks, snapshot format changes, external repository edits, or mirror algorithm changes. |
-| Reference Baseline | SoftPC `1abcb0f2`, accepted T83 S6 production. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner accepts/closes S1 and admits S2 on 2026-09-25. |
+| Objective | Audit complete T84 80x50 delivery against the original request, changed-path ledger, ownership/contract boundaries and recorded verification; prepare truthful T-level closure evidence without closing T84. |
+| Non-goals | No product-code, test-behavior, ABI, mirror, snapshot, media, configuration or external-repository change; no repair of the deferred BOP fault. |
+| Reference Baseline | S1 delivery/acceptance `503d6632`/`dc9c34ce`/`39366670`; original implementation comparison baseline `9fbf7369`. |
 | Candidate Proposal | [80x50 design and plan](../proposals/m9-kvm-text-80x50.md) |
-| Files And ABI Surface | Lib KVM and Console frame capacities/consumers; broker raw surface; Common status/comparison consumers; App-SoftPC frame adapter and associated tests/manifests. |
+| Files And ABI Surface | Review the 24 S1 changed paths: four production C/H paths, nine test C paths, four manifests, three design/state/proposal documents, two EXEs and README; verify no omitted App/Compat/mirror/INI/media path. |
 | Applicable Rules | AGENTS.md; Execution, Documentation, Architecture and Coding authorities; Product UI; shared corpus boundaries. |
-| Verification | Boundary and mode-transition matrix, last-cell/cursor/dirty/resize/native-write failure tests; Common forwarding and App producer tests; both Release builds and background regression; six manifests/DAG and documentation gate. |
-| Expected Markers | 80x22/25/43/50 accepted; 81 columns and 51 rows rejected without publication; 50-to-25 clears old rows; default status remains 80x25; fixed stride 80. |
-| Asset Needs | Refresh both package EXEs after verification; preserve INI, snapshots and guest media. Disposable fixtures remain under task-owned build children. |
-| Reporting Requirements | Before/after scope and added/deleted/net code ledger; exact focused/regression results, exclusions, commits and two EXE links. At T delivery, report every changed file against the admitted baseline, its purpose, detailed reviewable diff and per-file added/deleted/net lines; separately account for documents, manifests and binary artifacts, with full commit/diff references for owner acceptance. |
-| Stop Conditions | Stop on required mirror algorithm or snapshot format change, inconsistent producer geometry, necessary public ownership redesign, or unresolved verification failure. The pre-existing x86 BOP crash is owner-deferred in TODO, not repaired here. |
-| Exit Criteria | S1 is closed: implementation/tests pass, P1/P2 are pushed and owner reports manual acceptance. T closure still requires S2 whole-task review and owner acceptance. |
+| Verification | Reproduce Git path/numstat/patch ledger from `9fbf7369`; map all seven frozen coverage members to changed source and focused/full evidence; verify current HEAD/remote/worktree, manifests/DAG/docs gates and artifact hashes; inspect no changed path bypasses declared ownership. |
+| Expected Markers | Exactly 24 S1 changed paths with all required capacity/extent semantics evidenced; 80x22/25/43/50 accepted; 81 columns/51 rows rejected; status 80x25; 50-to-25 clearing proven; BOP fault accurately deferred to TODO. |
+| Asset Needs | No asset refresh. Preserve existing accepted EXEs, INI, snapshots and guest media. |
+| Reporting Requirements | Write a T-level requirement/path/verification ledger; enumerate every changed file, purpose and added/deleted/net lines, documentation/manifests/artifacts separately; disclose exclusions, deferred BOP risk and whether any closure condition remains for owner decision. |
+| Stop Conditions | Stop on a scope contradiction, missing/altered S1 evidence, unexpected changed path, untracked worktree change, required new product repair or unresolved audit discrepancy. The pre-existing x86 BOP crash remains owner-deferred in TODO. |
+| Exit Criteria | S2 audit record is committed/pushed with a complete T84 ledger and clean worktree; owner then decides T84 closure. |
 | Original Owner Request | 收口T83，准入T84进行kvm-*组件的文本帧容量升级 80x50。此前要求 Lib、Common 和 App-SoftPC 正确接通。 |
-| Similar-Issue Sweep | Classify every 25/50/2000/4000 and text-capacity use as storage bound, active extent, default layout, font/pixel geometry or test fixture; retain intentional defaults and repair capacity assumptions across the complete frame chain. |
+| Similar-Issue Sweep | Re-run the S1 capacity-constant universe and confirm each hit's recorded disposition remains valid; search for untracked 25-row capacity owners, direct text-frame consumers, alternate raw-Console writes, and changed-path ownership bypasses. |

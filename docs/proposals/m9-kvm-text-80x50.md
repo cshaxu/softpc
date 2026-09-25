@@ -41,9 +41,84 @@ Preliminary estimate: 10--18 production files, +80--180/-50--140 lines;
 8--14 test/build files, +180--350/-40--100 lines. These are estimates and will
 be replaced with Git counts; mechanical renames are counted explicitly.
 
-S2 is planned: after owner testing, perform the whole-task actual-change and
-requirement audit, dispose of task-owned scratch, and close T84 with owner
-approval. No speculative second implementation or new state machine is planned.
+S2 is admitted after owner acceptance of S1: perform the whole-task
+actual-change and requirement audit, dispose of task-owned scratch, and prepare
+T84 closure evidence for owner approval. It does not close T84 itself. No
+speculative second implementation or new state machine is planned.
+
+## S2 whole-task audit
+
+S2 compares the complete accepted delivery `39366670` with implementation
+baseline `9fbf7369`; it makes no product-code change. The audit found one
+governance omission only: S1 had evidence in this proposal but no matching
+`docs/history/M9-T84-S1-*` record, which prevented a valid continuation packet
+from passing the documentation gate. The new history record states only the
+already accepted S1 facts. It does not change S1 scope, verification or the
+T84 closure decision.
+
+### Requirement and ownership audit
+
+1. `kvm_text_frame_validate()` remains the single shared acceptance boundary:
+   zero dimensions are invalid and extents beyond 80 columns or 50 rows are
+   unsupported. It retains fixed 80-cell row stride. No consumer infers an
+   active extent from storage capacity.
+2. `kvm-window` derives text surface height from active rows and font height;
+   it retains existing decoded-pixel comparison and cursor handling. No second
+   25-row surface or renderer remains.
+3. `kvm-console` converts all bounded stored cells, but forwards active rows
+   to logical Console. Logical Console validates only the active rectangle
+   before its broker sink receives it.
+4. The Win32 raw-Console broker creates/validates at least the frame's active
+   height, never shrinks an existing surface, and clears all visible rows
+   within the 50-row capacity before acknowledging a replacement frame. Thus
+   50-to-25 removes stale lower rows without making an ordinary 25-row status
+   page enlarge a Terminal to 50 rows.
+5. Common's graphics status page explicitly remains 80x25. It is a raw VM
+   Console status surface, not the cooked monitor; storage is initialized
+   blank through capacity solely so stale data cannot be retained.
+6. App-SoftPC's existing Compat surface and driver already use committed
+   active geometry, fixed 80-cell stride and 80x50 capacity. Its source checks
+   accept 50 and reject 51 without a compensating conversion path.
+
+The capacity sweep covers `KVM_TEXT_ROWS`, `LIB_CONSOLE_TEXT_ROWS`, literal
+80x25/2000/1999 uses and `text_rows` throughout Lib, Common, App-SoftPC and
+their test roots. Remaining fixed 25-row occurrences are intentional default
+fixtures, the explicit Common status page, or native display-test fixtures.
+The original Core mirror's `VIDEO_PAGE_SIZE` is a distinct historical host
+definition and was neither made a KVM owner nor changed. Test uses of cell
+1999 intentionally validate an in-range cell in smaller frames; no production
+loop uses it as a capacity limit. No alternate raw-Console writer, hidden
+25-row capacity, App/Compat workaround or original-mirror modification was
+found.
+
+### Complete delivery accounting
+
+The accepted implementation has exactly 24 changed paths relative to
+`9fbf7369`: four production C/H paths (+19/-11, net +8), nine test C paths
+(+108/-19, net +89), four manifests, four design/state/proposal documents,
+the Lib README and two rebuilt EXEs. This is +401/-54 across all textual paths
+plus binary artifacts. The per-file ledger above lists every path and purpose;
+no source path is added, deleted or renamed. In particular, there is no CMake,
+INI, guest-media, snapshot-format, x86-source or original Core-mirror change.
+The x86 EXE's apparent tracked size increase is a toolchain rebuild artifact
+except for the separately measured 512-byte capacity increment; x64 size is
+unchanged.
+
+### Evidence and remaining limitation
+
+The recorded S1 final serial background evidence is 120/120 on both widths
+(x64 371.65 seconds, x86 373.98 seconds), followed by dual-width 18/18
+delivery rechecks. Both Release builds passed. S2 reran the six affected
+source/test manifests (four total), Lib component DAG/naming/corpus boundaries,
+documentation governance and `git diff --check`; all pass. S2 does not rerun
+product tests because it changes documentation only. The five desktop tests
+per width, Linux runtime and manual real-guest 50-row-mode exercise remain
+explicit exclusions.
+
+The pre-existing intermittent x86 `BIOS[0x52]` null dispatch remains deferred
+in TODO by owner instruction. It reproduced on unchanged `9fbf7369` and is
+not attributed to the 80x50 work. It is the only open risk recorded by this
+audit; it is not silently masked and it is not a T84 code change.
 
 ## Frozen coverage ledger and exit evidence
 
