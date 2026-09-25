@@ -213,6 +213,22 @@ is specifically against the admitted commit `b7cbb30a9`, whose sole
 SoftPC/NXVM difference was the four-file Audio test substitution now removed.
 The owner accepts S3 on 2026-09-25; T84 remains open.
 
+## S4 admission — NXVM six-component diff and quality audit
+
+S4 is a read-only intake audit. Its frozen universe is every regular file in
+SoftPC and NXVM's `src/lib`, `src/common`, `src/x86`, `test/lib`,
+`test/common`, and `test/x86`, plus each root's manifest, CMake entrypoint,
+README and verifier. For every difference, the audit records the path, file
+class, committed versus uncommitted NXVM source, line delta where meaningful,
+public-contract effect, quality/boundary result and one disposition:
+`candidate`, `reject`, `defer`, or `already covered`. Matching files are
+counted by root rather than listed individually.
+
+The audit does not import, build, alter a manifest or modify NXVM. It must keep
+the previously admitted `b7cbb30a9` Audio-test import distinct from NXVM's
+later worktree edits. It ends with a bounded follow-up proposal only; owner
+approval remains required before any candidate is copied.
+
 ## Frozen coverage ledger and exit evidence
 
 Each member below must finish with a source disposition and focused test proof:
@@ -268,7 +284,7 @@ regression attribution, not admission to change the original CPU algorithm.
 ### Bounded text capacity implementation
 
 Baseline: `9fbf7369`; owner request and frozen coverage ledger are in the
-[design record](M9-T84-kvm-text-80x50.md). This is S1 evidence, not T closure.
+[proposal](../proposals/m9-kvm-text-80x50.md). This is S1 evidence, not T closure.
 
 ### Actual implementation and ownership
 
@@ -451,7 +467,7 @@ Remaining changed paths:
   clearing instead of a universal 25-row minimum.
 - `docs/design/UI.md`: +4/-0, net +4; records capacity, fixed stride,
   independent status default and explicit unsupported results.
-- `docs/history/M9-T84-kvm-text-80x50.md`: P1 +219/-0; implementation review,
+- `docs/proposals/m9-kvm-text-80x50.md`: P1 +219/-0; implementation review,
   verification failures and this ledger. P2 adds the delivery review record.
 - `docs/states/CURRENT.md`: P1 +9/-1; delivery status and full file/diff
   reporting. P2 updates that status to pushed and awaiting owner verification.

@@ -23,7 +23,7 @@ changed by +108/-19 (net +89).  No original Core mirror, INI, guest media,
 snapshot format, build-system path or public interface beyond the jointly
 rebuilt text-frame capacities changed.  The full changed-path ledger,
 coverage mapping, artifact hashes and documented exclusions are retained in
-[the T84 design record](M9-T84-kvm-text-80x50.md#s1-implementation-audit).
+[the T84 proposal](../proposals/m9-kvm-text-80x50.md#s1-implementation-audit).
 
 ## Verification and limits
 
