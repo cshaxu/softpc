@@ -2,15 +2,19 @@
 
 ## Current Work
 
-M9 T84 S1 is active.
+M9 T84 S1 is delivered for owner verification; T84 remains open.
 
 Owner defers the pre-existing x86 BIOS[0x52] null-dispatch fault to
 [TODO](TODO.md) on 2026-09-25; no CPU/BOP repair belongs to S1.
 The 80x50 implementation builds on both widths; final background regression
 passes 120/120 on x64 and x86. The deferred fault is not claimed repaired.
 See the [S1 evidence](../proposals/m9-kvm-text-80x50.md#s1-implementation-audit).
-Owner authorizes S1 build/test/commit/push delivery on 2026-09-25, followed
-by manual verification. No S1/T84 closure or S2 admission is claimed.
+Executor P1 `503d6632` is pushed. Actual-change review confirms 24 paths,
+production +19/-11 and tests +108/-19, no mirror/INI/media change, matching
+dual-EXE hashes and the seven-member coverage ledger. Both Release builds,
+full background 120/120 and delivery rechecks 18/18 pass per width.
+Five desktop tests per width remain excluded. Await owner verification;
+no S1/T84 closure or S2 admission is claimed.
 
 ## Current Technical Baseline
 

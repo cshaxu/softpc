@@ -82,6 +82,12 @@ is lifted; the investigation and earlier blocked status below are retained as
 evidence. Owner authorizes S1 build/test/commit/push delivery, then waits for
 manual verification. No S1/T84 closure is claimed. The deferred fault is not fixed.
 
+P1 `503d6632` is pushed. Coordinator actual-change review checks all 24 paths
+against the seven-member coverage ledger and original scope; no production
+or test edits follow P1. This P2 records delivery/review only, not acceptance.
+The package hashes still match the verified artifacts; INI/media and mirror
+remain unchanged. S2 and T closure await the owner.
+
 Diagnostic continuation: export baseline9fbf7369 sources into ignored
 `build/t84-baseline/`, build only x86 runtime-smoke, and compare its failure
 with the modified build. Executor owns cleanup. No guest media is imported;
@@ -275,10 +281,10 @@ Remaining changed paths:
   clearing instead of a universal 25-row minimum.
 - `docs/design/UI.md`: +4/-0, net +4; records capacity, fixed stride,
   independent status default and explicit unsupported results.
-- `docs/proposals/m9-kvm-text-80x50.md`: implementation review, verification
-  failures and this ledger; no runtime effect. Its final line count is pending.
-- `docs/states/CURRENT.md`: current delivery status and owner-required full
-  file/diff reporting; its final line count is pending.
+- `docs/proposals/m9-kvm-text-80x50.md`: P1 +219/-0; implementation review,
+  verification failures and this ledger. P2 adds the delivery review record.
+- `docs/states/CURRENT.md`: P1 +9/-1; delivery status and full file/diff
+  reporting. P2 updates that status to pushed and awaiting owner verification.
 - `docs/states/TODO.md`: +7/-4, net +3; records the owner-deferred existing
   x86 BOP crash and its separate investigation admission condition.
 - `src/lib/MANIFEST.sha256`: +4/-4, net 0; hashes for the three changed Lib
