@@ -2,6 +2,18 @@
 
 ## Current Work
 
+M9 T84 S6 is delivered for owner verification. It closes the admitted product
+host-boundary defects without changing Lib, Common, x86, the Core mirror, user
+INI, snapshots or media: parallel output retains only an unconfirmed suffix on
+short writes; parallel snapshot validation completes before allocation; audio
+teardown propagates failure through the App/VM lifetime boundary; quoted INI
+paths retain `#`/`;`; and the obsolete permanent VM trace path is deleted.
+Focused injected cases, both Release packages and hidden-background CTest all
+pass 121/121 on each width. The final x86 SHA-256 is
+`566CD3F1922C6F0F6427DE4B307E3E974562ABB3478CC4C8DD6D05BBA6275D8F`; x64 is
+`8885A1C99E98CEEB623A644ED50B2CDE87EB4314161F59D88E0B9F014B22DF1B`.
+The executor commit is pending; T84 remains open until owner acceptance.
+
 M9 T84 S5 is owner-accepted and closed: NXVM's complete six-component
 shared corpus, including Audio, was imported from clean `057d8c9aa5`; the generic
 test helper is now at the owner-approved shared `test/register.cmake` location.
@@ -273,23 +285,23 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
   routine mirror baseline, while OpenNT remains lineage evidence;
   [record](../history/M9-Td-S19-xp-baseline-proposal-refresh.md).
 
-## M9 T84 S5 Packet
+## M9 T84 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves the import on 2026-09-25 and accepts S5 closure after manual verification. |
-| Objective | Copy NXVM clean `057d8c9aa5`'s Lib/Common/x86 source and matching tests into SoftPC, with the owner-approved `test/register.cmake` relocation; build, test, commit and push for owner verification. |
-| Non-goals | No NXVM write; no Core mirror, Compat, VM, App product-logic, INI, snapshot or guest-media edit except source-compatible receiver adjustments proven necessary by the imported public layout. |
-| Reference Baseline | SoftPC `75f74fe8`; NXVM clean `057d8c9aa5edde1bda794a03fb77d07fc8b67bba`; previous S4 audit baseline `1e86b8e7`. |
-| Candidate Proposal | [T84 retained design record](../proposals/m9-kvm-text-80x50.md); [S4 intake ledger](../history/M9-T84-S4-nxvm-six-component-audit.md). |
-| Files And ABI Surface | `src/lib`, `src/common`, `src/x86`, `test/lib`, `test/common`, `test/x86`, and the shared test helper `test/register.cmake`; corresponding CMake, README and manifests. `lib_bool` becomes `lib_u8`, so copied frame layouts require a complete rebuild. |
-| Applicable Rules | AGENTS.md; Execution, Documentation, Architecture and Coding authorities; shared-corpus boundaries and source-research policy. |
-| Verification | Exact path/hash ledger against NXVM after the approved helper relocation; strict standalone six-root C11 builds, both product Release builds, focused affected suites, background CTest, all manifests/DAG/corpus/negative/documentation gates. |
-| Expected Markers | No residual six-root source/test difference from NXVM except documented manifest provenance or the approved helper relocation, and no second Audio path. |
-| Asset Needs | None. Preserve package EXEs, INI, snapshots and guest media. |
-| Reporting Requirements | Report actual add/delete/net by source/test/docs/build, exact remaining difference ledger, public layout effects, dual EXE hashes, test counts and exclusions. |
-| Stop Conditions | Stop if the imported layouts require a nontrivial Core/Compat/VM/App semantic change, if an exact source conflict lacks an owner-approved policy, or if tests expose a product regression. |
-| Exit Criteria | Met: `e2b81d70` is pushed; dual builds/tests and all shared gates pass, the worktree is clean, and owner accepted manual verification. T84 remains open. |
-| Original Owner Request | 准入S4，对nxvm的6组件进行一次代码diff审计和总体质量审计，准备下一轮导入。 |
-| Similar-Issue Sweep | Reuse S4's all-six-root ledger and extend it only for the chosen import revision. |
+| Admission And Approval | Owner admits the post-S5 product-quality repair on 2026-09-25. |
+| Objective | Close the audited LPT buffering/snapshot, audio-shutdown, INI lexical and stale-trace defects using the existing product ownership paths. |
+| Non-goals | No six-component source/test change, Core mirror edit, guest-visible device redesign, new queue/retry/state machine, guest media or user-INI edit. |
+| Reference Baseline | SoftPC `7a69abe1`; S5 shared import `e2b81d70`. |
+| Candidate Proposal | [T84 retained design record](../proposals/m9-kvm-text-80x50.md#s6-admission--product-host-boundary-failure-closure). |
+| Files And ABI Surface | `src/app-softpc/{compat,machine,product}`, product tests/CMake and task documentation. `softpc_platform_audio_shutdown` and `vm_destroy` may return `lib_status` only within the App/VM boundary. |
+| Applicable Rules | AGENTS.md; Execution, Documentation, Architecture and Coding authorities; shared-corpus and original-mirror boundaries. |
+| Verification | Focused injected LPT/audio/config cases; x86/x64 Release packages and full background CTest; documentation, manifest, boundary and whitespace gates. |
+| Expected Markers | Failed LPT output cannot overflow/replay accepted bytes; malformed parallel snapshots cannot install partial state; failed audio join keeps VM admission closed; quoted paths retain comment-marker characters; no always-on trace path remains. |
+| Asset Needs | None. Preserve package EXEs except refreshed binaries, user INI, snapshots and guest media. |
+| Reporting Requirements | Report actual production/test/docs add/delete/net, changed-path ledger, similar-issue dispositions, package hashes, test counts and exclusions. |
+| Stop Conditions | Stop for any required Lib/Common/mirror semantic change, incompatible public product API expansion, or regression in focused/full tests. |
+| Exit Criteria | All five defect classes are fixed and tested; dual-width packages/background suites and gates pass; one complete executor commit is pushed; coordinator reviews actual changes; worktree is clean. T84 remains open pending owner acceptance. |
+| Original Owner Request | 准入一个新S修复以上问题。 |
+| Similar-Issue Sweep | Search all standalone CRT output buffers, snapshot restore allocators, process-global worker teardown paths, product configuration lexical scans and task-era always-on diagnostics; record every production hit and disposition. |

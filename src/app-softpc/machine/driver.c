@@ -1,7 +1,6 @@
 #include "lib/types/types_interface.h"
 #include "machine/driver.h"
 #include "input.h"
-#include "machine/trace.h"
 #include "machine/debug.h"
 #include "machine/snapshot.h"
 #include "compat/ccpu/lifecycle.h"
@@ -97,57 +96,24 @@ lib_status vm_create(const vm_options *options, vm_driver **out_driver)
     if (status == LIB_STATUS_OK)
         status = vm_driver_create(out_driver, machine);
     if (status == LIB_STATUS_OK) return status;
-    softpc_platform_audio_shutdown();
+    if (softpc_platform_audio_shutdown() != LIB_STATUS_OK)
+        return LIB_STATUS_IO_ERROR;
     softpc_machine_destroy(machine);
 failed:
     lib_atomic_flag_clear_explicit(&vm_owned, LIB_MEMORY_ORDER_RELEASE);
     return status;
 }
 
-void vm_destroy(vm_driver *driver)
+lib_status vm_destroy(vm_driver *driver)
 {
-    if (driver == NULL) return;
-    softpc_platform_audio_shutdown();
+    lib_status status;
+    if (driver == NULL) return LIB_STATUS_OK;
+    status = softpc_platform_audio_shutdown();
+    if (status != LIB_STATUS_OK) return status;
     softpc_machine_destroy(driver->machine);
     vm_driver_destroy(driver);
     lib_atomic_flag_clear_explicit(&vm_owned, LIB_MEMORY_ORDER_RELEASE);
-}
-
-static void vm_driver_trace_frame(void *opaque, const common_machine_frame *frame)
-{
-    vm_driver *driver = (vm_driver *)opaque;
-    static lib_u32 prior_mode = UINT32_MAX;
-    static lib_u32 prior_screen = UINT32_MAX;
-    static lib_u32 prior_graphics = UINT32_MAX;
-    static lib_u32 prior_columns = UINT32_MAX;
-    static lib_u32 prior_rows = UINT32_MAX;
-    static lib_u32 prior_width = UINT32_MAX;
-    static lib_u32 prior_height = UINT32_MAX;
-    lib_u32 mode = 0u;
-    lib_u32 screen = 0u;
-    lib_u32 columns, rows, width, height;
-    const kvm_window_frame *window;
-
-    if (driver == NULL || frame == NULL || !vm_trace_enabled()) return;
-    window = &frame->window;
-    columns = window->graphics ? 0u : window->text.base.text_columns;
-    rows = window->graphics ? 0u : window->text.base.text_rows;
-    width = window->graphics ? window->image.width : 0u;
-    height = window->graphics ? window->image.height : 0u;
-    (void)softpc_machine_presentation_state(driver->machine, &mode, &screen);
-    if (prior_mode == mode && prior_screen == screen &&
-        prior_graphics == window->graphics &&
-        prior_columns == columns && prior_rows == rows &&
-        prior_width == width && prior_height == height)
-        return;
-    vm_trace("softpc prompt frame=%lu mode=%lu state=%lu graphics=%lu text=%ux%u dib=%ux%u",
-        (unsigned long)frame->sequence, (unsigned long)mode,
-        (unsigned long)screen, (unsigned long)window->graphics,
-        (unsigned)columns, (unsigned)rows,
-        (unsigned)width, (unsigned)height);
-    prior_mode = mode; prior_screen = screen; prior_graphics = window->graphics;
-    prior_columns = columns; prior_rows = rows;
-    prior_width = width; prior_height = height;
+    return LIB_STATUS_OK;
 }
 
 void vm_driver_cursor_shape(kvm_text_frame *frame, lib_u32 percent)
@@ -567,5 +533,4 @@ void vm_driver_describe(vm_driver *driver,
     out_driver->take_debug_stop = vm_driver_take_debug_stop;
     out_driver->cancel_debug = vm_driver_cancel_debug;
     out_driver->write_state = vm_driver_write_state;
-    out_driver->frame_published = vm_driver_trace_frame;
 }

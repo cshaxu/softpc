@@ -100,7 +100,7 @@ int main(void)
         BASE_SYNC_WAIT_SIGNALED);
     assert(delivery_count != 0u &&
         first_platform.delivered_non_silent_pcm != LIB_FALSE);
-    softpc_platform_audio_shutdown();
+    assert(softpc_platform_audio_shutdown() == LIB_STATUS_OK);
     base_sync_event_destroy(first_delivery);
     return 0;
 }

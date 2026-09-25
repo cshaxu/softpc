@@ -15,6 +15,9 @@ static unsigned event_create_count;
 static unsigned stream_create_step;
 static unsigned task_create_step;
 static unsigned signals;
+static unsigned task_destroys;
+static unsigned stream_destroys;
+static int shutdown_failure;
 static int scenario;
 static lib_u32 last_frame_count;
 static lib_i16 first_sample[2];
@@ -74,6 +77,27 @@ static lib_status fake_task_create(base_sync_task_entry function, void *context,
     task_create_step = ++initialization_step;
     *task = (base_sync_task *)&task_storage;
     return LIB_STATUS_OK;
+}
+
+static lib_status fake_task_destroy(base_sync_task *task)
+{
+    assert(task == (base_sync_task *)&task_storage);
+    ++task_destroys;
+    return shutdown_failure ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
+}
+
+static lib_status fake_stream_destroy(lib_audio_stream **stream)
+{
+    assert(stream != NULL && *stream == (lib_audio_stream *)1);
+    ++stream_destroys;
+    *stream = NULL;
+    return LIB_STATUS_OK;
+}
+
+static void fake_event_destroy(base_sync_event *event)
+{
+    assert(event == NULL || event == (base_sync_event *)1 ||
+        event == (base_sync_event *)2);
 }
 
 static lib_status fake_enqueue(lib_audio_stream *stream, const lib_i16 *samples,
@@ -165,25 +189,31 @@ static lib_status fake_signal(base_sync_event *event)
 #define lib_audio_stream_flush fake_flush
 #define lib_audio_stream_wait_writable fake_wait_writable
 #define lib_audio_stream_cancel_wait fake_cancel_wait
+#define lib_audio_stream_destroy fake_stream_destroy
 #define base_sync_mutex_create fake_mutex_create
 #define base_sync_mutex_destroy fake_mutex_destroy
 #define base_sync_mutex_lock fake_mutex_lock
 #define base_sync_mutex_unlock fake_mutex_unlock
 #define base_sync_event_create fake_event_create
 #define base_sync_task_create fake_task_create
+#define base_sync_task_destroy fake_task_destroy
 #define base_sync_wait_any fake_wait
 #define base_sync_event_reset fake_reset
 #define base_sync_event_signal fake_signal
+#define base_sync_event_destroy fake_event_destroy
 #include "compat/audio.c"
+#undef base_sync_event_destroy
 #undef base_sync_event_signal
 #undef base_sync_event_reset
 #undef base_sync_wait_any
 #undef base_sync_task_create
+#undef base_sync_task_destroy
 #undef base_sync_event_create
 #undef lib_audio_stream_clear
 #undef lib_audio_stream_flush
 #undef lib_audio_stream_wait_writable
 #undef lib_audio_stream_cancel_wait
+#undef lib_audio_stream_destroy
 #undef lib_audio_stream_create
 #undef lib_audio_stream_enqueue
 #undef base_sync_mutex_unlock
@@ -288,5 +318,20 @@ int main(void)
     softpc_speaker_worker(NULL, NULL);
     assert(enqueues == 5u && clears == 0u && flushes == 1u &&
         writable_waits == 1u && waits == 2u);
+
+    softpc_speaker_task = (base_sync_task *)&task_storage;
+    softpc_speaker_stop = (base_sync_event *)1;
+    softpc_speaker_wake = (base_sync_event *)2;
+    softpc_speaker_request_lock = (base_sync_mutex *)1;
+    softpc_speaker_stream = (lib_audio_stream *)1;
+    shutdown_failure = 1;
+    task_destroys = stream_destroys = 0u;
+    assert(softpc_platform_audio_shutdown() == LIB_STATUS_IO_ERROR);
+    assert(softpc_speaker_task != NULL && softpc_speaker_stream != NULL &&
+        task_destroys == 1u && stream_destroys == 0u);
+    shutdown_failure = 0;
+    assert(softpc_platform_audio_shutdown() == LIB_STATUS_OK);
+    assert(softpc_speaker_task == NULL && softpc_speaker_stream == NULL &&
+        task_destroys == 2u && stream_destroys == 1u);
     return 0;
 }

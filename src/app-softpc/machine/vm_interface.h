@@ -20,9 +20,7 @@ typedef struct vm_options {
    failed create releases admission. Destroy releases it only after resource
    disposal, and must be called after Common has joined the executor. */
 lib_status vm_create(const vm_options *options, vm_driver **out_driver);
-void vm_destroy(vm_driver *driver);
+lib_status vm_destroy(vm_driver *driver);
 void vm_driver_describe(vm_driver *driver, common_machine_driver *out_driver);
-/* Reset the existing opt-in diagnostic output before startup. */
-void vm_trace_reset(void);
 
 #endif

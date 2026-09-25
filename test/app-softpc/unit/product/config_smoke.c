@@ -35,6 +35,11 @@ int main(void)
     assert(config.console_control == 0);
     assert(config.floppy_mode == LIB_STORAGE_MEDIUM_READONLY);
     assert(config.hard_disk_mode == LIB_STORAGE_MEDIUM_READONLY);
+    input = "hard_disk=\"disk#one;two.img\" # comment\n";
+    assert(app_load_startup_config("unused", &config));
+    assert(lib_text_compare(config.hard_disk_path, "disk#one;two.img") == 0);
+    input = "# commented=setting\n; another=setting\n";
+    assert(app_load_startup_config("unused", &config));
     input = "floppy_mode=direct\nhard_disk_mode=readonly\ndisplay=console\nconsole_control=1\n";
     assert(app_load_startup_config("unused", &config));
     assert(config.floppy_mode == LIB_STORAGE_MEDIUM_DIRECT);

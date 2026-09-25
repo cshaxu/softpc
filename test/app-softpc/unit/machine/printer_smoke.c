@@ -8,6 +8,21 @@
 #include "insignia.h"
 #include "host_def.h"
 #include "ios.h"
+#include "compat/devices/snapshot.h"
+
+static void check_parallel_snapshot_rejection(void)
+{
+    softpc_device_parallel_host_state state = { 0 };
+
+    state.port[0].bytes_in_buffer = 1;
+    assert(!softpc_device_snapshot_restore_parallel_host(&state));
+    state.port[0].bytes_in_buffer = 0;
+    state.port[0].active = 1;
+    assert(!softpc_device_snapshot_restore_parallel_host(&state));
+    state.port[0].flush_threshold = 1020;
+    assert(softpc_device_snapshot_restore_parallel_host(&state));
+    host_lpt_close_all();
+}
 
 static void make_boot_disk(const char *path)
 {
@@ -30,6 +45,7 @@ int main(void)
     softpc_machine *machine = NULL;
     half_word status = 0u;
 
+    check_parallel_snapshot_rejection();
     make_boot_disk(path);
     assert(remove(output_path) == 0 || errno == ENOENT);
     options.printer_output_path = output_path;

@@ -296,7 +296,7 @@ int main(void)
     assert(BeepLastDuration == 0u);
 
     softpc_machine_destroy(machine);
-    softpc_platform_audio_shutdown();
+    assert(softpc_platform_audio_shutdown() == LIB_STATUS_OK);
     assert(softpc_test_remove_image(path));
     return 0;
 }

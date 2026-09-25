@@ -281,6 +281,63 @@ Owner accepted S5 after manual verification on 2026-09-25. Executor
 - x86 SHA256: `F1E748E86FF800ACF4C1BE8FF75B675BC4995CD3FC39752B948D5D32620E8658`
 - x64 SHA256: `840347402647A6F4988DCC16A4B22E6E5FF853D5E15E7C78A26331DB74410856`
 
+## S6 admission — product host-boundary failure closure
+
+Owner admits S6 on 2026-09-25 after the post-S5 read-only quality audit.
+The work closes five related product-boundary defects without changing the
+shared six-component corpus or the preserved `softpc.new` mirror:
+
+1. Make the standalone LPT sink safe after partial/failed CRT writes: never
+   append beyond its fixed buffer, and never replay a prefix known accepted by
+   `fwrite`.
+2. Validate the whole parallel-host snapshot state before allocating or
+   replacing any live port; reject invalid inactive/pending and threshold
+   combinations and release every provisional allocation on failure.
+3. Return the existing audio shutdown result through the VM/App ownership
+   chain.  A failed worker join retains all callback-owned state and keeps the
+   singleton admission closed; a completed shutdown may release its machine
+   even if native stream disposal reports an error.
+4. Recognize `#` and `;` only outside quoted INI values.
+5. Remove the always-on T28 prompt trace and its stale repository-relative
+   output path.  It is no longer an acceptance input or a product feature.
+
+The implementation must use the existing ownership paths, fixed LPT buffer,
+audio task and product terminal-cleanup rule.  It must not add a second printer
+queue, retry worker, configuration parser, trace switch, Lib/Common change,
+mirror diff, or guest-media mutation.
+
+Focused tests cover LPT partial/failure capacity and snapshot invalid-state
+rejection, audio join failure ownership, and quoted INI comment markers.
+Run both Release package builds, their focused tests and the complete
+background CTest suites on x64/x86, all documentation/manifest/boundary gates,
+and whitespace checking.  Report production/test/docs add/remove/net counts,
+the actual changed-path ledger, package hashes, test counts and exclusions.
+
+### S6 delivery evidence
+
+- Parallel output now preserves only the unconfirmed suffix after a short CRT
+  write, uses overlap-safe movement, and refuses a further byte when that
+  suffix occupies the fixed buffer. A successful full write is never replayed
+  merely because the subsequent flush fails.
+- Parallel snapshot restore validates every serialized port before allocating
+  any replacement buffer; inactive buffered data and invalid active thresholds
+  are rejected without partially installing state.
+- Audio worker/stream teardown has one result path: failed join or stream
+  disposal retains the live dependency and prevents VM admission from opening.
+  The App reports the terminal teardown failure after its normal Common
+  lifetime has ended.
+- The INI scanner recognizes `#` and `;` only outside quotes. The permanent
+  repository trace hook and its two source files are removed rather than kept
+  as a dormant alternate path.
+- Actual text change, including the required S5 history repair: application
+  production +80/-154 (net -74), build/checks +14/-3 (net +11), tests +140/-7
+  (net +133), documentation +106/-16 (net +90): total +340/-180 (net +160).
+  Two package binaries are refreshed. The task adds no Lib/Common/x86/Core-mirror source,
+  user configuration, snapshot or media change.
+- Final Release builds and hidden-background CTest pass 121/121 on x64
+  (265.78s) and x86 (265.42s). Focused parallel-failure smoke and documentation
+  governance also pass on both widths; desktop-labelled tests remain excluded.
+
 ## Frozen coverage ledger and exit evidence
 
 Each member below must finish with a source disposition and focused test proof:

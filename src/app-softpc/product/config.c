@@ -28,6 +28,17 @@ static int app_copy_value(char *target, const char *value)
     return 1;
 }
 
+static char *app_find_comment(char *text)
+{
+    int quoted = 0;
+
+    for (; *text != '\0'; ++text) {
+        if (*text == '"') quoted = !quoted;
+        else if (!quoted && (*text == '#' || *text == ';')) return text;
+    }
+    return NULL;
+}
+
 static int app_parse_media_mode(const char *value, lib_storage_medium_mode *out)
 {
     if (lib_text_compare(value, "readonly") == 0)
@@ -106,7 +117,6 @@ int app_load_startup_config(const char *path,
         char *value;
         char *equals;
         char *comment;
-        char *semicolon;
         if (next != NULL) {
             *next++ = '\0';
             while (*next == '\r' || *next == '\n') ++next;
@@ -114,12 +124,9 @@ int app_load_startup_config(const char *path,
         /* Delimit the current record before scanning it.  Scanning the
            unsplit buffer lets a leading comment consume an '=' from a later
            setting and silently discard that setting. */
-        equals = lib_text_find_character(line, '=');
-        comment = lib_text_find_character(line, '#');
-        semicolon = lib_text_find_character(line, ';');
-        if (semicolon != NULL && (comment == NULL || semicolon < comment))
-            comment = semicolon;
+        comment = app_find_comment(line);
         if (comment != NULL) *comment = '\0';
+        equals = lib_text_find_character(line, '=');
         if (equals == NULL) {
             line = next;
             continue;

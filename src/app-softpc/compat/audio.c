@@ -318,8 +318,10 @@ void softpc_standalone_audio_set_tone(ULONG frequency, ULONG duration)
     if (softpc_speaker_wake != NULL) base_sync_event_signal(softpc_speaker_wake);
 }
 
-void softpc_platform_audio_shutdown(void)
+lib_status softpc_platform_audio_shutdown(void)
 {
+    lib_status status;
+
     if (softpc_speaker_task != NULL)
     {
         /* wait_writable blocks on native completion, not the task cancel
@@ -330,26 +332,32 @@ void softpc_platform_audio_shutdown(void)
         if (stream != NULL) (void)lib_audio_stream_cancel_wait(stream);
         base_sync_event_signal(softpc_speaker_stop);
         base_sync_event_signal(softpc_speaker_wake);
-        if (base_sync_task_destroy(softpc_speaker_task) != LIB_STATUS_OK) {
+        status = base_sync_task_destroy(softpc_speaker_task);
+        if (status != LIB_STATUS_OK) {
             fputs("softpcvm: cannot join audio worker\n", stderr);
-            return; /* Retain its global events until a successful join. */
+            return status; /* Retain global resources until a successful join. */
         }
         softpc_speaker_task = NULL;
+    }
+    if (softpc_speaker_stream != NULL) {
+        status = lib_audio_stream_destroy(&softpc_speaker_stream);
+        if (status != LIB_STATUS_OK) {
+            fputs("softpcvm: cannot close audio stream\n", stderr);
+            return status; /* The stream documents retryable ownership. */
+        }
     }
     base_sync_event_destroy(softpc_speaker_wake);
     base_sync_event_destroy(softpc_speaker_stop);
     softpc_speaker_wake = NULL;
     softpc_speaker_stop = NULL;
     softpc_speaker_write_request(0u, 0u);
-    if (softpc_speaker_stream != NULL &&
-        lib_audio_stream_destroy(&softpc_speaker_stream) != LIB_STATUS_OK)
-        fputs("softpcvm: cannot close audio stream\n", stderr);
     base_sync_mutex_destroy(softpc_speaker_request_lock);
     softpc_speaker_request_lock = NULL;
+    return LIB_STATUS_OK;
 }
 #else
 void softpc_standalone_audio_set_tone(ULONG frequency, ULONG duration)
 { UNUSED(frequency); UNUSED(duration); }
 lib_status softpc_platform_audio_start(void) { return LIB_STATUS_OK; }
-void softpc_platform_audio_shutdown(void) {}
+lib_status softpc_platform_audio_shutdown(void) { return LIB_STATUS_OK; }
 #endif

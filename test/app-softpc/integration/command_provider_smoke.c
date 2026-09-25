@@ -774,11 +774,11 @@ static void check_vm_owner(const char *path)
         assert(vm_create(&options, &first) == LIB_STATUS_OK);
         assert(vm_create(&options, &second) == LIB_STATUS_INVALID_STATE);
         assert(second == NULL);
-        vm_destroy(second); /* Null cleanup must not release the live owner. */
+        assert(vm_destroy(second) == LIB_STATUS_OK); /* Null cleanup must not release the live owner. */
         assert(vm_create(&invalid, &second) == LIB_STATUS_INVALID_STATE);
         vm_driver_describe(first, &driver);
         assert(driver.reset(driver.context));
-        vm_destroy(first);
+        assert(vm_destroy(first) == LIB_STATUS_OK);
         first = NULL;
     }
 }

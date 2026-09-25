@@ -92,7 +92,7 @@ int main(void)
     assert(base_sync_event_wait(first_submission, 1000u) ==
         BASE_SYNC_WAIT_SIGNALED);
     assert(enqueue_count >= 1u);
-    softpc_platform_audio_shutdown();
+    assert(softpc_platform_audio_shutdown() == LIB_STATUS_OK);
     base_sync_event_destroy(first_submission);
     return 0;
 }

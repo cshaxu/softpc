@@ -496,7 +496,7 @@ endforeach()
 
 # Product provider registration has one policy-free composition boundary.
 file(READ "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/composition.c" composition_source)
-if(NOT composition_source MATCHES "if \\(common_machine_shutdown\\(machine_runtime\\) != LIB_STATUS_OK\\) \\{[^}]*exit\\(EXIT_FAILURE\\);[^}]*\\}[ \t\r\n]+if \\(common_ui_destroy\\(ui\\) != LIB_STATUS_OK\\) \\{[^}]*exit\\(EXIT_FAILURE\\);[^}]*\\}[ \t\r\n]+\\(void\\)common_session_destroy\\(session\\);[ \t\r\n]+app_command_dispose\\(&commands\\);[ \t\r\n]+common_machine_destroy\\(machine_runtime\\);[ \t\r\n]+vm_destroy\\(machine_driver\\);")
+if(NOT composition_source MATCHES "if \\(common_machine_shutdown\\(machine_runtime\\) != LIB_STATUS_OK\\) \\{[^}]*exit\\(EXIT_FAILURE\\);[^}]*\\}[ \t\r\n]+if \\(common_ui_destroy\\(ui\\) != LIB_STATUS_OK\\) \\{[^}]*exit\\(EXIT_FAILURE\\);[^}]*\\}[ \t\r\n]+\\(void\\)common_session_destroy\\(session\\);[ \t\r\n]+app_command_dispose\\(&commands\\);[ \t\r\n]+common_machine_destroy\\(machine_runtime\\);[ \t\r\n]+if \\(vm_destroy\\(machine_driver\\) != LIB_STATUS_OK\\) \\{[^}]*exit\\(EXIT_FAILURE\\);[^}]*\\}")
     message(FATAL_ERROR "Composition must quiesce callbacks before ordered consumer teardown")
 endif()
 if(composition_source MATCHES "strcmp|x86_debug_|pause-toggle|send-ctrl-alt-del|send-alt-enter")

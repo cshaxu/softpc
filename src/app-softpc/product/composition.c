@@ -84,7 +84,6 @@ lib_status app_composition_run(const app_startup_config *config)
     common_session *session = NULL;
     lib_status result;
 
-    vm_trace_reset();
     options.floppy_path = config->floppy_path[0] == '\0' ? NULL : config->floppy_path;
     options.hard_disk_path = config->hard_disk_path[0] == '\0' ? NULL : config->hard_disk_path;
     options.memory_bytes = config->memory_bytes;
@@ -154,6 +153,9 @@ done:
     (void)common_session_destroy(session);
     app_command_dispose(&commands);
     common_machine_destroy(machine_runtime);
-    vm_destroy(machine_driver);
+    if (vm_destroy(machine_driver) != LIB_STATUS_OK) {
+        fputs("softpcvm: cannot destroy audio worker\n", stderr);
+        exit(EXIT_FAILURE); /* VM admission stays closed beneath a live worker. */
+    }
     return result;
 }

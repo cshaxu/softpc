@@ -68,8 +68,7 @@ add_library(softpc-vm OBJECT
     src/app-softpc/machine/debug.c
     src/app-softpc/machine/debug_memory.c
     src/app-softpc/machine/snapshot.c
-    src/app-softpc/machine/snapshot_image.c
-    src/app-softpc/machine/trace.c)
+    src/app-softpc/machine/snapshot_image.c)
 target_include_directories(softpc-vm PUBLIC src)
 target_compile_definitions(softpc-vm PRIVATE _CRT_SECURE_NO_WARNINGS
     SOFTPC_STANDALONE=1 SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
@@ -387,6 +386,18 @@ target_include_directories(softpc-printer-smoke PRIVATE
 add_test(NAME softpc-printer-smoke COMMAND softpc-printer-smoke)
 set_tests_properties(softpc-printer-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_executable(softpc-parallel-failure-smoke
+    test/app-softpc/unit/machine/parallel_failure_smoke.c)
+target_link_libraries(softpc-parallel-failure-smoke PRIVATE softpc-vm)
+target_include_directories(softpc-parallel-failure-smoke PRIVATE src src/app-softpc
+    $<TARGET_PROPERTY:softpc-machine-compat,INCLUDE_DIRECTORIES>)
+target_compile_definitions(softpc-parallel-failure-smoke PRIVATE
+    $<TARGET_PROPERTY:softpc-machine-compat,COMPILE_DEFINITIONS>)
+set_target_properties(softpc-parallel-failure-smoke PROPERTIES
+    C_STANDARD 90 C_EXTENSIONS ON)
+add_test(NAME softpc-parallel-failure-smoke COMMAND softpc-parallel-failure-smoke)
+set_tests_properties(softpc-parallel-failure-smoke PROPERTIES LABELS "unit" TIMEOUT 15
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 add_executable(softpc-sound-smoke test/app-softpc/unit/machine/sound_smoke.c)
 target_link_libraries(softpc-sound-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-sound-smoke PRIVATE

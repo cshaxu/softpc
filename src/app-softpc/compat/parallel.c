@@ -85,8 +85,15 @@ int softpc_device_snapshot_restore_parallel_host(
             state->port[adapter].no_device_attached < 0 ||
             state->port[adapter].no_device_attached > 1 ||
             state->port[adapter].bytes_in_buffer < 0 ||
-            state->port[adapter].bytes_in_buffer > KBUFFER_SIZE)
+            state->port[adapter].bytes_in_buffer > KBUFFER_SIZE ||
+            (!state->port[adapter].active &&
+                state->port[adapter].bytes_in_buffer != 0) ||
+            (state->port[adapter].active &&
+                (state->port[adapter].flush_threshold <= 0 ||
+                 state->port[adapter].flush_threshold > KBUFFER_SIZE)))
             return FALSE;
+    }
+    for (adapter = 0; adapter < NUM_PARALLEL_PORTS; ++adapter) {
         buffer[adapter] = NULL;
         if (state->port[adapter].active) {
             buffer[adapter] = (byte *)lib_allocate(KBUFFER_SIZE);
@@ -138,11 +145,24 @@ int softpc_host_lpt_set_output_path(int adapter, const char *path)
 static boolean flush_buffer(int adapter)
 {
     HOST_LPT *lpt = &host_lpt[adapter];
+    lib_size written;
+
     if (!lpt->active) return FALSE;
-    if (lpt->output != 0 && lpt->bytes_in_buffer != 0 &&
-        (fwrite(lpt->buffer, 1u, (lib_size)lpt->bytes_in_buffer,
-            lpt->output) != (lib_size)lpt->bytes_in_buffer ||
-        fflush(lpt->output) != 0)) return FALSE;
+    if (lpt->output != 0 && lpt->bytes_in_buffer != 0) {
+        written = fwrite(lpt->buffer, 1u, (lib_size)lpt->bytes_in_buffer,
+            lpt->output);
+        if (written != 0u && written < (lib_size)lpt->bytes_in_buffer) {
+            lib_memory_move(lpt->buffer, lpt->buffer + written,
+                (lib_size)lpt->bytes_in_buffer - written);
+            lpt->bytes_in_buffer -= (int)written;
+            return FALSE;
+        }
+        if (written != (lib_size)lpt->bytes_in_buffer) return FALSE;
+        /* fwrite accepted the whole buffer.  A later flush failure has no
+           replay-safe prefix, so do not send those bytes twice. */
+        lpt->bytes_in_buffer = 0;
+        return fflush(lpt->output) == 0;
+    }
     lpt->bytes_in_buffer = 0;
     return TRUE;
 }
@@ -235,6 +255,17 @@ byte value;
         return FALSE;
     }
     lpt = &host_lpt[adapter];
+    /* A failed flush retains its unconfirmed tail. Never append past the
+       fixed host buffer while that tail still occupies it. */
+    if (lpt->bytes_in_buffer >= lpt->flush_threshold &&
+        !flush_buffer(adapter)) {
+        lpt->port_status = HOST_LPT_BUSY;
+        return FALSE;
+    }
+    if (lpt->bytes_in_buffer >= KBUFFER_SIZE) {
+        lpt->port_status = HOST_LPT_BUSY;
+        return FALSE;
+    }
     lpt->buffer[lpt->bytes_in_buffer++] = value;
     if (lpt->bytes_in_buffer >= lpt->flush_threshold &&
         !flush_buffer(adapter)) {
