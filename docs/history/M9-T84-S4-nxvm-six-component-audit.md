@@ -94,17 +94,14 @@ are derivative of their classified source/test changes.
   `xasm32/{aasm32.c,dasm32.c}`, and the seven changed `test/x86` paths.  These
   are the same predicate normalization at x86 call sites plus the S7 label
   repair; they keep the existing DOS/x86 command behavior.
-- **Conditionally reject as currently located — `test/lib/register.cmake` and
-  the three test CMake entrypoints.**  The 26-line registration helper removes
-  duplicate CMake functions, but `test/common` and `test/x86` now include a
-  file under `test/lib`.  That is clean only if all three test roots are one
-  inseparable source package.  It breaks the previously useful property that
-  `test/common` or `test/x86` can be copied and configured with only its own
-  matching root plus production dependencies.  Before exact import, choose
-  one policy: retain the small duplicated registration functions to keep the
-  three test components independently portable, or formally define one
-  combined test-support component outside `test/lib`.  Do not import a hidden
-  reverse test dependency by accident.
+- **Candidate with an owner-approved path correction — `test/lib/register.cmake`
+  and the three test CMake entrypoints.**  The 26-line registration helper
+  removes duplicate CMake functions, but its present `test/lib` location makes
+  `test/common` and `test/x86` depend on a sibling component.  The owner
+  selects the cleaner common-test-support exception: move it to
+  `test/register.cmake`, and make all three roots include that shared location.
+  The next import must perform the same path move in the shared corpus; it
+  must not preserve a hidden reverse dependency or reintroduce three copies.
 
 The explicit path lists above cover every changed production path.  The
 remaining changed test paths in each listed test root are mechanical call-site
@@ -147,7 +144,6 @@ normalization or registration support.
   `debug_linear_smoke.c`, `debug_output_smoke.c`,
   `xasm32/xasm32_bounds_smoke.c`, `xasm32/xasm32_contract_smoke.c`, and
   `xasm32/xasm32_smoke.c`.
-
 ## Overall quality and boundary result
 
 NXVM's current package entrypoints select strict C11, no compiler extensions,
@@ -161,22 +157,22 @@ Machine path retains one executor and one request slot; the changed Audio path
 retains one worker/FIFO; the xasm repair retains one parser/assembler path.
 No second implementation or product-specific dependency was found.
 
-The only material quality reservation is the test-registration ownership
-above.  There is also a deliberate import boundary: Lib copied frames are
+The test-registration ownership is resolved by the owner-approved shared
+`test/register.cmake` exception above.  There is also a deliberate import boundary: Lib copied frames are
 documented as in-process values rather than a stable serialized ABI.  That
 is correct, but means the S8 predicate layout change must rebuild SoftPC App,
 VM and Compat receivers together with all six imported roots.
 
 ## Recommended next admission
 
-Do not admit a single undifferentiated copy.  First settle the three-test-root
-portability policy.  If independent roots remain required, ask NXVM for a
-shared correction and then import the resulting **non-Audio atomic bundle**:
-S7 Machine request repair, S7 xasm label repair, S8 predicate normalization,
-their exact tests/CMake/manifests/READMEs, and all receiving SoftPC builds in
-one S task.  Keep the four S7 Audio source/test paths deferred until the
-separate Audio convergence owner accepts them.  This preserves a single shared
-corpus instead of creating a SoftPC-only fork.
+Do not admit a single undifferentiated copy.  The next shared import first
+relocates the one generic registration helper to `test/register.cmake`, then
+imports the resulting **non-Audio atomic bundle**: S7 Machine request repair,
+S7 xasm label repair, S8 predicate normalization, their exact
+tests/CMake/manifests/READMEs, and all receiving SoftPC builds in one S task.
+Keep the four S7 Audio source/test paths deferred until the separate Audio
+convergence owner accepts them.  This preserves a single shared corpus instead
+of creating a SoftPC-only fork.
 
 Verification performed here is read-only: SHA-256 root inventories, committed
 Git/path/line-delta comparison, direct public-header and SoftPC receiver
