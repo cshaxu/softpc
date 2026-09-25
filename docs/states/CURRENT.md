@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 T84 S6 is delivered for owner verification. It closes the admitted product
+M9 T84 S6 is owner-accepted and closed. It closes the admitted product
 host-boundary defects without changing Lib, Common, x86, the Core mirror, user
 INI, snapshots or media: parallel output retains only an unconfirmed suffix on
 short writes; parallel snapshot validation completes before allocation; audio
@@ -12,7 +12,7 @@ Focused injected cases, both Release packages and hidden-background CTest all
 pass 121/121 on each width. The final x86 SHA-256 is
 `566CD3F1922C6F0F6427DE4B307E3E974562ABB3478CC4C8DD6D05BBA6275D8F`; x64 is
 `8885A1C99E98CEEB623A644ED50B2CDE87EB4314161F59D88E0B9F014B22DF1B`.
-The executor commit is pending; T84 remains open until owner acceptance.
+Executor `13b4aef3` is pushed. T84 remains open for later owner direction.
 
 M9 T84 S5 is owner-accepted and closed: NXVM's complete six-component
 shared corpus, including Audio, was imported from clean `057d8c9aa5`; the generic

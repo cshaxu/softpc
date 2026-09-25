@@ -315,6 +315,9 @@ the actual changed-path ledger, package hashes, test counts and exclusions.
 
 ### S6 delivery evidence
 
+Owner manually accepted S6 on 2026-09-25. Executor `13b4aef3` is pushed;
+this acceptance closes S6 only and leaves T84 open.
+
 - Parallel output now preserves only the unconfirmed suffix after a short CRT
   write, uses overlap-safe movement, and refuses a further byte when that
   suffix occupies the fixed buffer. A successful full write is never replayed
