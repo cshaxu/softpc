@@ -2,9 +2,13 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T83.
+M9 T84 S1 is active.
 
 ## Current Technical Baseline
+
+- Owner closes T83 after S1--S6 delivery and admits T84 for bounded 80x50
+  text frames. [T83 completion audit](../history/M9-T83-completion-audit.md)
+  preserves scope and verification; this admission changes documents only.
 
 - T83 S6 is owner-accepted and closed. The selected C-VID glue ABI is declared
   once in `cpu_vid.h`; EGA dot-read is declared once in `egavideo.h`. Both
@@ -173,6 +177,7 @@ No implementation subtask is active. Open task awaiting owner: T83.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T83 | S1--S6 complete; owner approves task closure. | [Audit](../history/M9-T83-completion-audit.md) |
 | T82 | S1/S2 complete; owner accepts the six-component convergence. | [Audit](../history/M9-T82-completion-audit.md) |
 | T81 | S1--S8 complete; owner accepted cold first-run `AUDIO.COM` playback; neutral Audio and the PC-speaker handoff close. | [Audit](../history/M9-T81-completion-audit.md) |
 | T80 | S1--S7 complete under approved scopes; owner acceptance and separate whole-task audit close the task. | [Audit](../history/M9-T80-completion-audit.md) |
@@ -234,3 +239,24 @@ No implementation subtask is active. Open task awaiting owner: T83.
 - M9 Td S19: refreshes the unadmitted XP candidate so XP SP1 is its intended
   routine mirror baseline, while OpenNT remains lineage evidence;
   [record](../history/M9-Td-S19-xp-baseline-proposal-refresh.md).
+
+## M9 T84 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner closes T83 and admits T84 for 80x50 text-frame capacity. |
+| Objective | Deliver bounded 1..80-column, 1..50-row text frames through Lib KVM/Console, Common and App-SoftPC. |
+| Non-goals | No dynamic frame ownership, wider columns, new font format, guest mode hacks, snapshot format changes, external repository edits, or mirror algorithm changes. |
+| Reference Baseline | SoftPC `1abcb0f2`, accepted T83 S6 production. |
+| Candidate Proposal | [80x50 design and plan](../proposals/m9-kvm-text-80x50.md) |
+| Files And ABI Surface | Lib KVM and Console frame capacities/consumers; broker raw surface; Common status/comparison consumers; App-SoftPC frame adapter and associated tests/manifests. |
+| Applicable Rules | AGENTS.md; Execution, Documentation, Architecture and Coding authorities; Product UI; shared corpus boundaries. |
+| Verification | Boundary and mode-transition matrix, last-cell/cursor/dirty/resize/native-write failure tests; Common forwarding and App producer tests; both Release builds and background regression; six manifests/DAG and documentation gate. |
+| Expected Markers | 80x22/25/43/50 accepted; 81 columns and 51 rows rejected without publication; 50-to-25 clears old rows; default status remains 80x25; fixed stride 80. |
+| Asset Needs | Refresh both package EXEs after verification; preserve INI, snapshots and guest media. Disposable fixtures remain under task-owned build children. |
+| Reporting Requirements | Before/after scope and added/deleted/net code ledger; exact focused/regression results, exclusions, commits and two EXE links. |
+| Stop Conditions | Stop on required mirror algorithm or snapshot format change, inconsistent producer geometry, necessary public ownership redesign, or unresolved verification failure. |
+| Exit Criteria | S1 implementation and tests pass on both widths; complete P committed/pushed and dual EXEs delivered for owner testing. T closure requires whole-task review and owner acceptance. |
+| Original Owner Request | 收口T83，准入T84进行kvm-*组件的文本帧容量升级 80x50。此前要求 Lib、Common 和 App-SoftPC 正确接通。 |
+| Similar-Issue Sweep | Classify every 25/50/2000/4000 and text-capacity use as storage bound, active extent, default layout, font/pixel geometry or test fixture; retain intentional defaults and repair capacity assumptions across the complete frame chain. |
