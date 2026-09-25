@@ -2,7 +2,9 @@
 
 ## Current Work
 
-M9 T84 S3 audit is complete and awaiting owner review; T84 remains open.
+M9 T84 S3 implementation is complete and awaits owner verification: NXVM's
+deterministic Win32 Audio adapter test replaces SoftPC's physical endpoint
+probe, with no production Audio change.
 
 Owner defers the pre-existing x86 BIOS[0x52] null-dispatch fault to
 [TODO](TODO.md) on 2026-09-25; no CPU/BOP repair belongs to S1.
@@ -13,9 +15,18 @@ T84 S1 is owner-accepted and closed. Executor P1 `503d6632`, delivery
 review P2 `dc9c34ce`, and S1 acceptance P3 `39366670` are pushed. Owner
 accepts S2's document-only whole-task audit and admits S3 on 2026-09-25.
 S3 inspected NXVM's six shared component roots read-only. All source roots and
-five of six complete roots are byte-identical; the only divergence is the
-Audio-only native-test replacement recorded in the active proposal. It does
-not alter the accepted T84 capacity delivery or imply T84 closure.
+five of six complete roots are byte-identical. Owner approves importing the
+sole Audio-only test divergence from NXVM verbatim: its deterministic Win32
+adapter test replaces SoftPC's physical loopback probe. Production Audio and
+the accepted T84 capacity delivery remain unchanged; no T84 closure is implied.
+S3 imports NXVM shared commit `b7cbb30a9` exactly: test/build +220/-212
+(net +8), production +0/-0. Both Release packages build, focused Audio tests
+pass on both widths, and background CTest passes x64 120/120 (250.98s) and
+x86 120/120 (249.05s). Six manifests, Lib DAG, Common/x86 corpus and
+documentation governance pass. NXVM later acquired uncommitted shared-root
+edits; they are not part of this admitted import. S3 awaits owner verification.
+Refreshed packages: x86 `FEA84DEF15C2A25DC962579087D60F5DC94E11B9E46A792E13B3C3B60408D8A5`,
+x64 `0EC6096600E1702CE92751F4AEE1BC16C5FD009FF4E6D2DF537A97774672148F`.
 The established S1 evidence confirms 24 paths,
 production +19/-11 and tests +108/-19, no mirror/INI/media change, matching
 dual-EXE hashes and the seven-member coverage ledger. Both Release builds,
@@ -264,18 +275,18 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts S2's audit and admits S3 on 2026-09-25. |
-| Objective | Read-only audit NXVM's current `src/lib`, `src/common`, `src/x86`, `test/lib`, `test/common` and `test/x86` against SoftPC's corresponding six components; report exact divergence, manifest state, dependency/boundary implications and a safe follow-up decision. |
-| Non-goals | No SoftPC production/test behavior, ABI, mirror, snapshot, media, configuration, build artifact or external-repository change; no import, merge, manifest rewrite, NXVM checkout change or deferred BOP repair. |
+| Admission And Approval | Owner accepts S2's audit, admits S3 on 2026-09-25, then approves the exact NXVM Audio-test import within S3. |
+| Objective | Replace SoftPC's physical Win32 Audio loopback probe with NXVM commit `b7cbb30a9`'s deterministic adapter test verbatim; restore six-root byte identity while preserving all production behavior. |
+| Non-goals | No production Audio/API/ABI, Core mirror, snapshot, media, configuration, external-repository or unrelated shared-component change; no physical-device test replacement, NXVM checkout write or deferred BOP repair. |
 | Reference Baseline | SoftPC `bf1c0a96`; NXVM current checked-out worktree revision and status captured at audit start. |
 | Candidate Proposal | [80x50 design and plan](../proposals/m9-kvm-text-80x50.md) |
-| Files And ABI Surface | The six shared component roots and their manifests/readmes/CMake boundary files only. SoftPC and NXVM application, machine/product, package, media and build-output paths are out of scope. |
+| Files And ABI Surface | `test/lib/audio_native_smoke.c` is replaced by `audio_win32_platform_smoke.c`; `test/lib/CMakeLists.txt` and `test/lib/MANIFEST.sha256` adopt NXVM bytes. No public production interface changes. |
 | Applicable Rules | AGENTS.md; Execution, Documentation, Architecture and Coding authorities; Product UI; shared corpus boundaries. |
-| Verification | Record both Git heads/statuses; enumerate each six-root path set and byte/content differences; verify manifests independently in each worktree when available; inspect CMake target/dependency boundaries and direct include differences; run no external build or product binary. |
-| Expected Markers | A finite six-root ledger with identical, SoftPC-only, NXVM-only and differing paths; every difference classified as content, manifest/revision, test, contract, build boundary or unrelated uncommitted work; no claim that an uncommitted NXVM state is a stable import baseline. |
-| Asset Needs | None. Preserve SoftPC package EXEs, INI, snapshots and guest media. |
-| Reporting Requirements | Commit/push a concise audit record naming both revisions, worktree states, counts, every semantic difference and its proposed receiver; separately state whether a later import can be byte-for-byte, must wait for NXVM commit, or requires an owner design decision. |
-| Stop Conditions | Stop on unavailable NXVM worktree, uncertain component-root mapping, a proposed write to NXVM, a required product change, or a discrepancy that cannot be classified from source evidence. The pre-existing x86 BOP crash remains owner-deferred in TODO. |
-| Exit Criteria | S3 audit record is committed/pushed with a clean SoftPC worktree and an evidence-backed import recommendation. Owner decides any subsequent import or T84 closure. |
+| Verification | Confirm imported bytes hash-identical to NXVM; build x64/x86 Release; run `library.audio_stream` and deterministic `library.audio_win32_platform`, then both background presets; verify all six roots, manifests, DAG/corpus and documentation gate. |
+| Expected Markers | One removed and one added test source plus two exact metadata edits; `audio_win32_platform` has no default endpoint, mixer, wall-clock or audible-signal dependency; all six roots match the admitted NXVM shared commit `b7cbb30a9`. |
+| Asset Needs | Refresh both package EXEs after verification; preserve INI, snapshots and guest media. |
+| Reporting Requirements | Report exact added/deleted/net test/build/doc lines, the source/test owner, NXVM hash comparison, x64/x86 focused/background evidence, EXE hashes and exclusions. |
+| Stop Conditions | Stop on a production-source diff, an import that is not byte-identical to NXVM, test behavior requiring a host endpoint, a failed dual-width test/gate, or any required NXVM write. The pre-existing x86 BOP crash remains owner-deferred in TODO. |
+| Exit Criteria | Imported test, CMake and manifest are byte-identical to NXVM; dual-width build/focused/background evidence and gates pass; P is pushed with clean worktree. Owner then decides S3/T84 closure. |
 | Original Owner Request | 收口T83，准入T84进行kvm-*组件的文本帧容量升级 80x50。此前要求 Lib、Common 和 App-SoftPC 正确接通。 |
 | Similar-Issue Sweep | Compare each component's source, tests, manifests, CMake entrypoint, README and verification scripts; search for renamed/missing roots, private platform leakage, changed public interfaces, duplicate implementation paths and non-manifest tracked files. |

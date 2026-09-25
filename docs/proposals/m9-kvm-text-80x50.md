@@ -171,11 +171,46 @@ the separate public-stream contract test.
 This is not a second production implementation and does not alter Audio API or
 runtime behavior. It is a better unit-test seam because it does not depend on a
 physical device, mixer, RDP endpoint, wall-clock deadline or audible signal.
-It is nevertheless an Audio-only test-policy choice. S3 does not import it:
-the six roots are not fully byte-identical until an owner admits a follow-up
-that replaces SoftPC's physical probe with NXVM's deterministic one and then
-updates SoftPC's test manifest. All non-Audio content is already eligible for
-literal import with no change.
+It is nevertheless an Audio-only test-policy choice. The owner approves its
+verbatim import within S3 on 2026-09-25: replace the physical probe, update its
+CMake target and manifest, then prove dual-width behavior and six-root identity.
+No Audio production source or public interface changes.
+
+### S3 implementation evidence
+
+SoftPC imports the four files from NXVM shared commit `b7cbb30a9` verbatim:
+`test/lib/audio_native_smoke.c` is deleted; the 216-line
+`audio_win32_platform_smoke.c` replaces it; `test/lib/CMakeLists.txt` switches
+the test target from public `audio` to the deterministic `types`/`base`
+translation unit; and `test/lib/MANIFEST.sha256` records the corresponding
+hashes. The imported source SHA-256 is
+`5D38A50BB3E55D85301C052F33721C2B3D0F1541772A371239D2BA407BA14C85`; the
+complete test-lib manifest SHA-256 is
+`8A9AA8CC5150CA41881C84FCCA1487D54C72E11E5D4AEE24C436DA4519434A1F` in both
+repositories at that pinned shared revision.
+
+Production C/H: +0/-0. Test/build source: +220/-212, net +8 (one 208-line
+physical probe removed; one 216-line deterministic adapter test added; the
+CMake and manifest substitutions account for the remaining eight changed
+lines). No Core, Compat, VM, App, public API, ABI, INI, media or snapshot
+change is present.
+
+The focused `library.audio_stream` and `library.audio_win32_platform` tests
+pass on both x64 and x86. Full background CTest passes x64 120/120 (250.98 s)
+and x86 120/120 (249.05 s); desktop tests remain excluded and no native
+endpoint or Linux runtime claim is made. Both package builds complete.
+x86 package SHA-256 is
+`FEA84DEF15C2A25DC962579087D60F5DC94E11B9E46A792E13B3C3B60408D8A5`; x64
+package SHA-256 is
+`0EC6096600E1702CE92751F4AEE1BC16C5FD009FF4E6D2DF537A97774672148F`.
+All six source/test manifests, Lib DAG, Common corpus, x86 corpus and
+documentation governance pass.
+
+NXVM received uncommitted shared-root edits after the S3 audit baseline. A
+post-build worktree comparison therefore shows those later NXVM edits as
+differences; they are not silently imported by this task. S3's exactness claim
+is specifically against the admitted commit `b7cbb30a9`, whose sole
+SoftPC/NXVM difference was the four-file Audio test substitution now removed.
 
 ## Frozen coverage ledger and exit evidence
 
