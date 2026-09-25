@@ -39,7 +39,7 @@ static void runtime_state_probe_receive(void *opaque, common_machine_state state
 }
 
 static void runtime_frame_probe_receive(void *opaque, lib_u32 sequence,
-    int graphics, lib_u32 run_generation)
+    lib_bool graphics, lib_u32 run_generation)
 {
     runtime_completion_probe *probe = (runtime_completion_probe *)opaque;
     (void)sequence;

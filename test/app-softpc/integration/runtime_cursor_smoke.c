@@ -25,7 +25,7 @@ int main(void)
         frame.text.base.cells[7 * KVM_TEXT_COLUMNS + 3].foreground = 1;
         frame.text.base.text_palette[1] = 0xffffff;
         frame.text.font['A' * 16 + heights[h] - 1] = 0xff;
-        int valid = 0;
+        lib_bool valid = LIB_FALSE;
         kvm_window_rect changed;
         assert(kvm_window_render_frame(&frame, pixels, width, height, &valid, &changed));
         assert(pixels[((7 + 1) * heights[h] - 1) * width + 3 * 8] == 0xffffff);

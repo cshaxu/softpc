@@ -2,10 +2,15 @@
 
 ## Current Work
 
-M9 T84 S4 is complete: the read-only NXVM six-component diff and quality audit
-is recorded in [its intake ledger](../history/M9-T84-S4-nxvm-six-component-audit.md).
-T84 remains open; S5 is reserved but not admitted, awaiting the owner's choice
-on the test-root portability policy and any next import.
+M9 T84 S5 is delivered pending owner verification: NXVM's complete six-component
+shared corpus, including Audio, was imported from clean `057d8c9aa5`; the generic
+test helper is now at the owner-approved shared `test/register.cmake` location.
+All six roots and that helper are byte-identical to NXVM. The `lib_bool` ABI change
+required a complete dual-width rebuild and six narrow SoftPC callback/test receiver
+adjustments; it did not add a product behavior branch.
+Both Release packages and both background CTest suites pass 120/120. Refreshed
+x86 `F1E748E86FF800ACF4C1BE8FF75B675BC4995CD3FC39752B948D5D32620E8658`,
+x64 `840347402647A6F4988DCC16A4B22E6E5FF853D5E15E7C78A26331DB74410856`.
 
 Owner defers the pre-existing x86 BIOS[0x52] null-dispatch fault to
 [TODO](TODO.md) on 2026-09-25; no CPU/BOP repair belongs to S1.
@@ -272,18 +277,18 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Not admitted. The owner must choose the test-root portability policy before authorizing S5. |
-| Objective | Await a separately approved next import after the completed S4 intake audit. |
-| Non-goals | No work, source/test/API/ABI/build/manifest edit in either repository, NXVM write, product behavior claim, build or EXE refresh before admission. |
-| Reference Baseline | SoftPC `2059bdac`; NXVM clean `1e86b8e7ad6470ab8651a21eb89ed72b3db0c6ab`; prior exact import base `b7cbb30a9`. |
+| Admission And Approval | Owner approves complete six-component import, including Audio, on 2026-09-25. |
+| Objective | Copy NXVM clean `057d8c9aa5`'s Lib/Common/x86 source and matching tests into SoftPC, with the owner-approved `test/register.cmake` relocation; build, test, commit and push for owner verification. |
+| Non-goals | No NXVM write; no Core mirror, Compat, VM, App product-logic, INI, snapshot or guest-media edit except source-compatible receiver adjustments proven necessary by the imported public layout. |
+| Reference Baseline | SoftPC `75f74fe8`; NXVM clean `057d8c9aa5edde1bda794a03fb77d07fc8b67bba`; previous S4 audit baseline `1e86b8e7`. |
 | Candidate Proposal | [T84 retained design record](../proposals/m9-kvm-text-80x50.md); [S4 intake ledger](../history/M9-T84-S4-nxvm-six-component-audit.md). |
-| Files And ABI Surface | Read-only six shared roots and their manifests/CMake/README/verifier entrypoints. |
+| Files And ABI Surface | `src/lib`, `src/common`, `src/x86`, `test/lib`, `test/common`, `test/x86`, and the shared test helper `test/register.cmake`; corresponding CMake, README and manifests. `lib_bool` becomes `lib_u8`, so copied frame layouts require a complete rebuild. |
 | Applicable Rules | AGENTS.md; Execution, Documentation, Architecture and Coding authorities; shared-corpus boundaries and source-research policy. |
-| Verification | On admission, use S4's frozen ledger as the intake baseline and run the task-specific verification plan. |
-| Expected Markers | An owner-approved import plan with explicit test-root ownership and Audio disposition. |
+| Verification | Exact path/hash ledger against NXVM after the approved helper relocation; strict standalone six-root C11 builds, both product Release builds, focused affected suites, background CTest, all manifests/DAG/corpus/negative/documentation gates. |
+| Expected Markers | No residual six-root source/test difference from NXVM except documented manifest provenance or the approved helper relocation, and no second Audio path. |
 | Asset Needs | None. Preserve package EXEs, INI, snapshots and guest media. |
-| Reporting Requirements | Before implementation, report selected NXVM revision, included paths, public layout effects, test-root policy and explicit non-imports. |
-| Stop Conditions | Do not start implementation without owner admission; stop before an unapproved Audio source import or test-root boundary decision. |
-| Exit Criteria | Defined only by the next admitted S packet. |
+| Reporting Requirements | Report actual add/delete/net by source/test/docs/build, exact remaining difference ledger, public layout effects, dual EXE hashes, test counts and exclusions. |
+| Stop Conditions | Stop if the imported layouts require a nontrivial Core/Compat/VM/App semantic change, if an exact source conflict lacks an owner-approved policy, or if tests expose a product regression. |
+| Exit Criteria | Pushed import and delivery record; clean worktree; dual builds/tests and all shared gates pass; owner receives both EXEs for verification. |
 | Original Owner Request | 准入S4，对nxvm的6组件进行一次代码diff审计和总体质量审计，准备下一轮导入。 |
 | Similar-Issue Sweep | Reuse S4's all-six-root ledger and extend it only for the chosen import revision. |

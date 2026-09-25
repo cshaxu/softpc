@@ -31,7 +31,7 @@ static int wait_for_state(common_machine *runtime, common_machine_state state)
     return 0;
 }
 
-static void receive_frame(void *opaque, lib_u32 sequence, int graphics,
+static void receive_frame(void *opaque, lib_u32 sequence, lib_bool graphics,
     lib_u32 run_generation)
 {
     runtime_frame_probe *probe = (runtime_frame_probe *)opaque;

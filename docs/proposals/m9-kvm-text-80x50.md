@@ -229,6 +229,57 @@ the previously admitted `b7cbb30a9` Audio-test import distinct from NXVM's
 later worktree edits. It ends with a bounded follow-up proposal only; owner
 approval remains required before any candidate is copied.
 
+## S5 admission — complete NXVM six-component import
+
+The owner approves importing NXVM clean revision
+`057d8c9aa5edde1bda794a03fb77d07fc8b67bba` on 2026-09-25.  This replaces the
+earlier non-Audio intake boundary: Lib Audio production and its deterministic
+tests are included with Lib/Common/x86 and all three test roots.  The selected
+source universe is `src/lib`, `src/common`, `src/x86`, `test/lib`,
+`test/common`, `test/x86`, plus the owner-approved generic test-support file
+`test/register.cmake`.
+
+NXVM's former `test/lib/register.cmake` must be relocated to
+`test/register.cmake`, and all three test CMake roots must include the shared
+parent location.  This is a deliberate test-infrastructure exception, not a
+new product component or a `test/common -> test/lib` dependency.  Apply the
+same relocation to both shared corpora and update test manifests.
+
+The import includes NXVM's one-byte `lib_bool` contract.  Copied KVM/Console
+frame layouts may therefore change; rebuild every SoftPC receiver from source.
+Do not retain a legacy Audio path, partial predicate ABI, or alternative test
+registration implementation.  Core mirror, Compat, VM, App semantics, INI,
+snapshots and guest media remain outside scope unless compilation proves a
+strictly source-compatible receiver adjustment necessary.  That condition
+stops the task for separate review.
+
+Verify exact shared-root inventory, strict standalone C11 package builds,
+both product Release builds, focused Machine/Audio/xasm/KVM tests, full
+background CTest on x64/x86, six manifests, Lib DAG, Common/x86 corpus and
+negative gates, documentation governance and whitespace.  Report actual
+per-category line deltas, any residual difference and both package hashes.
+
+### S5 delivery evidence
+
+All six roots and `test/register.cmake` now compare byte-for-byte with NXVM
+`057d8c9aa5edde1bda794a03fb77d07fc8b67bba`: no changed file and no
+one-sided path.  The imported shared corpus changes 104 paths, +1177/-1006
+(net +171).  The only SoftPC-specific source work is six receiver adjustments
+for the imported one-byte `lib_bool` callback/layout contract, +40/-36
+(net +4); they preserve existing boolean behavior and add no alternate path.
+With documentation, the text total is +1261/-1056 (net +205), plus refreshed
+dual-architecture EXEs.
+
+Both Release package targets build.  Full hidden-background CTest passes
+120/120 on x64 (235.80s) and 120/120 on x86 (229.96s), excluding the existing
+desktop-labelled tests.  Shared sources and tests compile as C11 with
+`-Wall -Wextra -Wpedantic -Werror`; the six manifests, Lib DAG/Linux contract,
+Common/x86 corpus and negative verifiers all pass.  `git diff --check` passes.
+The delivery awaits owner manual verification before S5/T84 closure.
+
+- x86 SHA256: `F1E748E86FF800ACF4C1BE8FF75B675BC4995CD3FC39752B948D5D32620E8658`
+- x64 SHA256: `840347402647A6F4988DCC16A4B22E6E5FF853D5E15E7C78A26331DB74410856`
+
 ## Frozen coverage ledger and exit evidence
 
 Each member below must finish with a source disposition and focused test proof:

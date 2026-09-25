@@ -23,7 +23,8 @@ static void check_sequence(common_machine *machine, kvm_key key, lib_u32 scan)
     const kvm_key keys[] = { KVM_KEY_CONTROL, KVM_KEY_ALT, KVM_KEY_ALT,
         key, key, KVM_KEY_ALT };
     const lib_u32 scans[] = { 0x1du, 0x38u, 0x38u, scan, scan, 0x38u };
-    const lib_bool pressed[] = { 0, 0, 1, 1, 0, 0 };
+    const lib_bool pressed[] = { LIB_FALSE, LIB_FALSE, LIB_TRUE, LIB_TRUE,
+        LIB_FALSE, LIB_FALSE };
     assert(machine->count == 6u && machine->attempts == 6u);
     for (unsigned i = 0; i < 6u; ++i) {
         const kvm_input_event *event = &machine->events[i];
@@ -35,11 +36,14 @@ static void check_sequence(common_machine *machine, kvm_key key, lib_u32 scan)
     }
 }
 
-static int matched(void *context, const kvm_input_event *event)
+static lib_bool matched(void *context, const kvm_input_event *event)
 {
     common_machine *machine = context;
     common_session_command_result result;
-    if (event->type != KVM_EVENT_HOTKEY) { ++machine->ordinary; return 1; }
+    if (event->type != KVM_EVENT_HOTKEY) {
+        ++machine->ordinary;
+        return LIB_TRUE;
+    }
     ++machine->hotkeys;
     return app_keyboard_handle_hotkey(machine, COMMON_SESSION_MACHINE_RUNNING,
         event->data.hotkey.identifier, &result);

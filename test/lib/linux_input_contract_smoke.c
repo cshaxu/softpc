@@ -1,11 +1,10 @@
 #include "lib/types/test.h"
-#include "lib/types/file.h"
 #include "lib/kvm-base/input_interface.h"
 #include "lib/kvm-base/linux/input.h"
 
 static kvm_input_event received;
-static lib_i32 capture(void *context, const kvm_input_event *event)
-{ (void)context; received = *event; return 1; }
+static lib_bool capture(void *context, const kvm_input_event *event)
+{ (void)context; received = *event; return LIB_TRUE; }
 int main(void)
 {
     kvm_keyboard_normalizer state = { 0 };
