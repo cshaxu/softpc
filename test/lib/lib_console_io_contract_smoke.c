@@ -32,13 +32,11 @@ static lib_win32_char_info captured_cells[80u * 50u];
 static lib_win32_small_rect captured_region;
 static lib_win32_coord buffer_size={80,30};
 static lib_win32_small_rect viewport={0,0,79,29};
-static lib_bool reject_viewport;
+static lib_bool reject_resize, ignore_resize;
 static lib_win32_bool LIB_WIN32_WINAPI screen_info(lib_win32_handle h, lib_win32_console_screen_buffer_info *p)
 { (void)h; lib_memory_set(p, 0, sizeof(*p)); p->dwSize=buffer_size; p->srWindow=viewport; return LIB_WIN32_TRUE; }
-static lib_win32_bool LIB_WIN32_WINAPI set_viewport(lib_win32_handle h,lib_win32_bool absolute,const lib_win32_small_rect *rect)
-{ (void)h; lib_test_assert(absolute); if(reject_viewport) return LIB_WIN32_FALSE; viewport=*rect; return LIB_WIN32_TRUE; }
 static lib_win32_bool LIB_WIN32_WINAPI resize_buffer(lib_win32_handle h,lib_win32_coord size)
-{ (void)h; buffer_size=size; return LIB_WIN32_TRUE; }
+{ (void)h; if(reject_resize) return LIB_WIN32_FALSE; if(!ignore_resize) buffer_size=size; return LIB_WIN32_TRUE; }
 static lib_win32_bool LIB_WIN32_WINAPI palette_get(lib_win32_handle h, lib_win32_console_screen_buffer_infoex *p)
 { (void)h; (void)p; ++palette_attempts; return palette_query_ok; }
 static lib_win32_bool LIB_WIN32_WINAPI palette_set(lib_win32_handle h, lib_win32_console_screen_buffer_infoex *p)
@@ -85,8 +83,6 @@ static lib_win32_handle LIB_WIN32_WINAPI start_reader(lib_win32_lpsecurity_attri
 #define lib_win32_get_console_screen_buffer_info screen_info
 #undef lib_win32_set_console_screen_buffer_size
 #define lib_win32_set_console_screen_buffer_size resize_buffer
-#undef lib_win32_set_console_window_info
-#define lib_win32_set_console_window_info set_viewport
 #undef lib_win32_get_console_screen_buffer_info_ex
 #define lib_win32_get_console_screen_buffer_info_ex palette_get
 #undef lib_win32_set_console_screen_buffer_info_ex
@@ -170,7 +166,7 @@ int main(void)
     palette_set_ok=1;
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
     lib_test_assert(b.previous_palette[0]==1 && palette_sets==2);
-    lib_test_assert(buffer_size.Y==30); /* Palette must precede surface preparation. */
+    lib_test_assert(buffer_size.Y==25); /* Palette must precede surface preparation. */
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
     lib_test_assert(palette_sets==2);
     /* Native approximation consumes the already normalized scanline range. */
@@ -231,7 +227,7 @@ int main(void)
         lib_test_assert(writes==completed);
     }
     /* Taller modes reach the last cell; shrinking clears old lower rows
-     * while preserving the native viewport and normal 25-row startup. */
+     * without tying raw output to the native viewport. */
     {
         const lib_u16 rows[] = {22u,25u,43u,50u,25u,50u};
         const lib_u16 write_rows[] = {25u,25u,43u,50u,50u,50u};
@@ -247,13 +243,26 @@ int main(void)
                     lib_test_assert(captured_cells[row*80u+col].Char.UnicodeChar==' ');
         }
     }
-    viewport.Bottom=24; reject_viewport=1;
+    /* A smaller, scrolled viewport must not limit full-frame storage. */
+    viewport=(lib_win32_small_rect){7,3,46,15};
+    buffer_size=(lib_win32_coord){120,60};
+    f.rows=50; f.text[80u*50u-1u]='Q';
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+    lib_test_assert(buffer_size.X==120 && buffer_size.Y==60);
+    lib_test_assert(viewport.Left==7 && viewport.Top==3 && viewport.Right==46 && viewport.Bottom==15);
+    lib_test_assert(captured_cells[80u*50u-1u].Char.UnicodeChar=='Q');
+    /* Only backing-store failure or incomplete growth is an error. */
+    buffer_size=(lib_win32_coord){40,13}; reject_resize=LIB_TRUE;
     lib_u32 completed=writes;
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_IO_ERROR);
     lib_test_assert(writes==completed);
-    reject_viewport=0;
+    reject_resize=LIB_FALSE; ignore_resize=LIB_TRUE;
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_IO_ERROR);
+    lib_test_assert(writes==completed);
+    ignore_resize=LIB_FALSE;
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
-    lib_test_assert(viewport.Bottom==49);
+    lib_test_assert(buffer_size.X==80 && buffer_size.Y==50);
+    lib_test_assert(viewport.Left==7 && viewport.Top==3 && viewport.Right==46 && viewport.Bottom==15);
     base_sync_mutex_destroy(b.transaction_lock);base_sync_mutex_destroy(b.output_lock);lib_win32_close_handle(stop);lib_console_release(b.console);
     cooked_restore();
     /* Disposal must not restore native mode a second time. */

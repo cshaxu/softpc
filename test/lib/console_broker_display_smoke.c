@@ -22,12 +22,12 @@ static void destroy_mutex(base_sync_mutex *mutex)
 /* Native display I/O, deterministic reader/startup failures. The test owns a
  * hidden Console; it never changes the developer's Console or its input. */
 static lib_i32 fail_allocate, fail_select, fail_reader, fail_query, fail_restore;
-static lib_i32 fail_viewport, ignore_viewport;
-static lib_win32_bool LIB_WIN32_WINAPI set_viewport(lib_win32_handle output, lib_win32_bool absolute, const lib_win32_small_rect *rect)
+static lib_i32 fail_resize, ignore_resize;
+static lib_win32_bool LIB_WIN32_WINAPI resize_buffer(lib_win32_handle output, lib_win32_coord size)
 {
-    if (fail_viewport) { fail_viewport = 0; return LIB_WIN32_FALSE; }
-    if (ignore_viewport) { ignore_viewport = 0; return LIB_WIN32_TRUE; }
-    return lib_win32_set_console_window_info(output, absolute, rect);
+    if (fail_resize) { fail_resize = 0; return LIB_WIN32_FALSE; }
+    if (ignore_resize) { ignore_resize = 0; return LIB_WIN32_TRUE; }
+    return lib_win32_set_console_screen_buffer_size(output, size);
 }
 static lib_win32_bool LIB_WIN32_WINAPI query_display(lib_win32_handle output, lib_win32_console_screen_buffer_infoex *info)
 {
@@ -70,8 +70,8 @@ static lib_win32_hwnd LIB_WIN32_WINAPI no_foreground(void) { return LIB_NULL; }
 #define lib_win32_get_console_screen_buffer_info_ex query_display
 #undef lib_win32_set_console_screen_buffer_info_ex
 #define lib_win32_set_console_screen_buffer_info_ex restore_display
-#undef lib_win32_set_console_window_info
-#define lib_win32_set_console_window_info set_viewport
+#undef lib_win32_set_console_screen_buffer_size
+#define lib_win32_set_console_screen_buffer_size resize_buffer
 #define base_sync_mutex_create create_mutex
 #define base_sync_mutex_destroy destroy_mutex
 #include "lib/console-broker/win32/console.c"
@@ -152,23 +152,21 @@ static void check_frame_extent(lib_i16 columns, lib_i16 rows, lib_i32 scrolled)
         lib_test_assert(console_broker_replace(broker, cooked, raw, CONSOLE_BROKER_RAW_EVENTS) == 0);
         lib_test_assert(lib_win32_set_console_window_info(broker->backend->output, LIB_WIN32_TRUE, &viewport));
         if (round == 0 && !scrolled && rows == 13) {
-            fail_viewport = 1;
+            fail_resize = 1;
             lib_test_assert(!console_broker_ensure_text_surface(broker->backend, 25u));
-            lib_test_assert(fail_viewport == 0);
-            ignore_viewport = 1;
+            lib_test_assert(fail_resize == 0);
+            ignore_resize = 1;
             lib_test_assert(!console_broker_ensure_text_surface(broker->backend, 25u));
-            lib_test_assert(ignore_viewport == 0);
+            lib_test_assert(ignore_resize == 0);
         }
         {
             lib_win32_console_screen_buffer_info raw_before;
-            lib_i32 width = viewport.Right - viewport.Left + 1;
-            lib_i32 height = viewport.Bottom - viewport.Top + 1;
             lib_test_assert(lib_win32_get_console_screen_buffer_info(broker->backend->output, &raw_before));
             lib_test_assert(console_broker_ensure_text_surface(broker->backend, 25u));
             lib_test_assert(lib_win32_get_console_screen_buffer_info(broker->backend->output, &actual));
-            lib_test_assert(actual.srWindow.Left == 0 && actual.srWindow.Top == 0);
-            lib_test_assert(actual.srWindow.Right + 1 == (width < 80 ? 80 : width));
-            lib_test_assert(actual.srWindow.Bottom + 1 == (height < 25 ? 25 : height));
+            lib_test_assert(lib_memory_compare(&actual.srWindow, &raw_before.srWindow,
+                sizeof(actual.srWindow)) == 0);
+            lib_test_assert(actual.dwSize.X >= 80 && actual.dwSize.Y >= 25);
             lib_test_assert(actual.dwSize.X >= raw_before.dwSize.X);
             lib_test_assert(actual.dwSize.Y >= raw_before.dwSize.Y);
         }

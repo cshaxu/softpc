@@ -1,5 +1,60 @@
 # Bounded 80x50 KVM text frames
 
+## S8 shared Console convergence
+
+NXVM has independently prepared a raw-Console repair: an undersized or
+scrolled viewport must not reject a complete frame when the backing screen
+buffer can store it. Its preserved patch correctly separates backing capacity
+from native viewport geometry, but its proposed output extent derives from the
+backing buffer height. That would make a 25-row frame write 50 rows whenever a
+host already has a tall backing buffer, undoing SoftPC S7's steady-frame
+repair.
+
+S8 therefore combines the two independent rules rather than importing either
+implementation wholesale:
+
+1. Surface preparation ensures only backing capacity: width is at least 80 and
+   height is at least the active frame row count. It never calls
+   `SetConsoleWindowInfo`, so the host retains its font, visible rectangle and
+   scroll position. A failed or ineffective backing growth remains I/O failure.
+2. Frame output remains S7's completed-content rule:
+   `max(active rows, prior committed rows)`. It clears only a confirmed former
+   tail and is never based on backing-buffer or viewport height.
+
+The change has no public ABI and no product-policy branch. The focused fake
+proves all four axes together: a short scrolled viewport is unchanged; full
+80x50 cells still reach backing storage; failed and ignored backing growth do
+not acknowledge a frame; and the S7 22/25/43/50/25/50 tail-clearing matrix
+remains exact. The native broker smoke continues to cover raw/cooked screen
+handoff. This is the canonical implementation for NXVM to adopt after its S3
+lands, rather than a permanent divergent patch.
+
+### S8 execution evidence
+
+`console_broker_ensure_text_surface()` now has one responsibility: grow and
+verify backing storage to the active frame extent. It no longer reads, moves or
+resizes `srWindow`; therefore no raw-frame presentation operation can change a
+Terminal's visible rectangle, font fit or scroll position. The existing S7
+write rule is deliberately untouched: output covers only the active frame and
+one previously committed tail when that tail is larger.
+
+The fake contract smoke preserves a `40x13` viewport at `(7,3)` over a
+`120x60` buffer, writes the last cell of an 80x50 frame, and confirms both the
+viewport and buffer stay intact. It also rejects both a failed buffer-grow call
+and a native call that reports success without applying the requested size.
+The native broker display smoke now verifies that preparation leaves its
+configured viewport byte-for-byte unchanged while growing storage as needed.
+
+Counted C/H paths against S7 `5d7b2619`: production `+7/-31` (net `-24`);
+tests `+34/-27` (net `+7`); combined `+41/-58` (net `-17`). There is no new
+source file, API, product branch, Common/App/Core change or original-mirror
+diff. The x86 package shrinks by 730 bytes and x64 by 722 bytes. Focused
+Console smokes pass on both widths. Complete hidden-background regression
+passes x64 121/121 (247.54 s) and x86 121/121 (225.86 s); the standard five
+desktop-labelled cases remain excluded there, while the self-owned hidden
+native Console smoke passed in each focused run. Lib/test manifests,
+documentation governance and whitespace checks pass.
+
 ## Request and admitted design
 
 Owner: "收口T83，准入T84进行kvm-*组件的文本帧容量升级 80x50".

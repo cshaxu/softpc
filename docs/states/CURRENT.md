@@ -285,23 +285,23 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
   routine mirror baseline, while OpenNT remains lineage evidence;
   [record](../history/M9-Td-S19-xp-baseline-proposal-refresh.md).
 
-## M9 T84 S7 Packet
+## M9 T84 S8 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits the investigation on 2026-09-25 and approves the bounded Console-broker repair on 2026-09-25. |
-| Objective | Restore steady 25-row raw-frame output without losing the required 50-to-25 tail clearing; no coordinate correction. |
-| Non-goals | No Common, App, Core-mirror, configuration, guest-media or cursor-coordinate/API change; no Terminal-specific branch. |
-| Reference Baseline | SoftPC `f7243f64`; S6 executor `13b4aef3`; NXVM shared corpus comparison clean at admission. |
-| Candidate Proposal | [T84 S7 cursor-position investigation](../proposals/m9-kvm-text-80x50.md#s7-admission--dos-startup-cursor-position-investigation). |
-| Files And ABI Surface | `src/lib/console-broker/win32/console.c` and its focused Lib smoke tests only; no public ABI change. |
+| Admission And Approval | Owner admits this shared Console convergence task on 2026-09-25, after S7 delivery `5d7b2619`. |
+| Objective | Merge NXVM's capacity-only raw Console surface rule with SoftPC S7's frame-owned tail-clearing rule, retaining both without a second output path. |
+| Non-goals | No Common, App, Core-mirror, configuration, guest-media or public API change; no Terminal-specific branch, font scaling or forced viewport resize. |
+| Reference Baseline | SoftPC `5d7b2619`; NXVM's read-only preserved Console S3 patch at `build/t538-s1/s3-preserved.patch`. |
+| Candidate Proposal | [T84 S8 shared Console convergence](../proposals/m9-kvm-text-80x50.md#s8-shared-console-convergence). |
+| Files And ABI Surface | `src/lib/console-broker/win32/console.c`, its two focused Lib smokes, manifests and task documents only; no public ABI change. |
 | Applicable Rules | AGENTS.md; Execution, Documentation, Architecture and Coding authorities; shared-corpus and original-mirror boundaries. |
-| Verification | Focused broker fake: a 30-row host writes steady 25-row frames as 25 rows, while 50-to-25 clears exactly the former 50-row coverage; native broker smoke, dual-width build/background regression and documentation gates. |
-| Expected Markers | Raw-frame write extent is `max(current rows, prior committed rows)`, bounded by the existing 50-row capacity, never host viewport height. |
+| Verification | Focused broker fake: smaller/scrolled viewport preserves its rectangle while backing storage accepts the full frame; rejected/ignored backing growth fails; a 30-row host writes steady 25-row frames as 25 rows, while 50-to-25 clears exactly the former 50-row coverage. Then native broker smoke, dual-width build/background regression and documentation gates. |
+| Expected Markers | Backing storage grows to `max(existing, 80 x active rows)` without changing the viewport; raw-frame write extent remains `max(current rows, prior committed rows)`, bounded by the existing 50-row capacity. |
 | Asset Needs | None. Do not start interactive desktop tests or alter package configuration/media. |
 | Reporting Requirements | Report original-vs-current output extent, changed-path add/remove/net count, focused matrix and adjacent Console output-extent disposition. |
-| Stop Conditions | Stop if restoring the fixed 25-row steady output conflicts with required 50-row tail clearing, or if any public/API, Common or Core change becomes necessary. |
-| Exit Criteria | The bounded Lib repair and focused matrix pass on both widths; required build/regression/gates pass; package EXEs and manifests are refreshed; actual review is recorded and worktree is clean. T84 remains open pending owner direction. |
-| Original Owner Request | 启入一个新的S任务，调研找出根源，为什么Soft PC里面的DOS启动以后，光标不在正确的位置上，比原有的位置多了一行，是lib的问题还是我们app的问题。 |
-| Similar-Issue Sweep | Inspect every text-cursor row/column conversion and Console/Window cursor consumer in the active data path; classify each as source, transport, rendering or unrelated monitor behavior. |
+| Stop Conditions | Stop if preserving host viewport conflicts with complete backing-frame storage, tail clearing, existing raw/cooked handoff, or if any public/API, Common or Core change becomes necessary. |
+| Exit Criteria | Capacity-only surface preparation and S7 tail-clearing matrix pass on both widths; required build/regression/gates pass; package EXEs and manifests are refreshed; actual review is recorded and worktree is clean. T84 remains open pending owner direction. |
+| Original Owner Request | 你把nxvm的console的修复来进来：准入一个新的S任务，合并这两console的修复。完成后给我汇报。 |
+| Similar-Issue Sweep | Inspect every raw text surface operation and output-extent calculation in the broker; classify viewport mutation, buffer growth, cache reset and native failure paths. |
