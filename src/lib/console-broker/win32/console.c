@@ -55,7 +55,7 @@ static lib_win32_colorref console_broker_colorref_from_rgb(lib_u32 rgb)
 }
 
 static lib_bool console_broker_ensure_text_surface(console_broker_backend *backend,
-    lib_u16 rows, lib_win32_short *write_rows)
+    lib_u16 rows)
 {
     lib_win32_handle output = backend->output;
     lib_win32_console_screen_buffer_info info;
@@ -96,8 +96,6 @@ static lib_bool console_broker_ensure_text_surface(console_broker_backend *backe
     }
     /* Success means visible cells, not only backing storage. An unsupported
      * host size must fail instead of reporting a silently clipped surface. */
-    *write_rows = height < (lib_win32_short)LIB_CONSOLE_TEXT_ROWS ?
-        height : (lib_win32_short)LIB_CONSOLE_TEXT_ROWS;
     return lib_win32_get_console_screen_buffer_info(output, &info) &&
         info.dwSize.X >= required.X && info.dwSize.Y >= required.Y &&
         info.srWindow.Left == 0 && info.srWindow.Top == 0 &&
@@ -616,12 +614,17 @@ lib_status console_broker_backend_write_text_frame_bound(console_broker_backend 
     }
     /* Palette application can also change native buffer/viewport geometry.
      * Establish the write surface after that operation, never before it. */
-    if (!console_broker_ensure_text_surface(backend, frame->rows, &size.Y)) {
+    if (!console_broker_ensure_text_surface(backend, frame->rows)) {
         console_broker_backend_unlock_output(backend);
         return LIB_STATUS_IO_ERROR;
     }
-    /* Clear the visible bounded surface, including rows left by a taller
-     * frame. Capacity alone must not enlarge a normal 25-row viewport. */
+    /* Clear only this frame plus a possible tail written by the prior frame.
+     * Host viewport height is not frame content: a 30-row Terminal must not
+     * turn every 25-row DOS frame into a 30-row terminal update. */
+    if (backend->previous_rows > frame->rows)
+        size.Y = (lib_win32_short)backend->previous_rows;
+    else
+        size.Y = (lib_win32_short)frame->rows;
     region.Bottom = size.Y - 1;
     if (backend->previous_columns != frame->columns ||
         backend->previous_rows != frame->rows ||

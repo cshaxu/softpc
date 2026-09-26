@@ -341,6 +341,114 @@ this acceptance closes S6 only and leaves T84 open.
   (265.78s) and x86 (265.42s). Focused parallel-failure smoke and documentation
   governance also pass on both widths; desktop-labelled tests remain excluded.
 
+## S7 admission — DOS startup cursor-position investigation
+
+The owner reports that, after DOS starts, its cursor appears one row below the
+expected original position. S7 is deliberately read-only: trace the copied
+cursor value from the original text/video producer through SoftPC VM and Common
+to the KVM Window and raw Console consumers. The inquiry must distinguish a
+guest-frame cursor from the cooked monitor's native cursor and must not invent
+a compensating `-1` at any layer.
+
+The deliverable is a causal ledger naming the first divergent row, the affected
+presenter(s), and a smallest justified repair owner. It also classifies adjacent
+cursor conversions so a follow-up repair can be uniform rather than scenario
+specific. No source, package, configuration, media, manifest or test change is
+authorized. If source inspection cannot prove the origin, stop and request a
+bounded, user-coordinated reproduction rather than disturb the desktop.
+
+### S7 investigation result
+
+The first static candidate was the Win32 `CONSOLE_SCREEN_BUFFER_INFOEX`
+rectangle conversion. It is not a valid repair: the existing native display
+smoke proves that passing the saved `srWindow` unchanged makes a 30-row cooked
+viewport restore as 29 rows. The broker's explicit right/bottom conversion is
+therefore required by the actual setter behavior and must remain. No source
+change has been retained from that rejected hypothesis.
+
+The source ledger still proves that the guest cursor `(x, y)` is passed
+unchanged through Compat, VM, Common and both KVM consumers; no `+1` or `-1`
+coordinate conversion exists in that chain. The Window path is a same-frame
+control and remains correct. The remaining inquiry must distinguish an
+incorrect native cursor coordinate from a native Console viewport/cursor
+rendering observation with a bounded runtime probe; it must not guess a
+coordinate correction from source inspection alone.
+
+The owner-supplied Windows Terminal capture confirms that the visible cursor is
+on the following *guest* row, rather than merely above a larger host viewport.
+A disposable x64 package probe was therefore run through the shipping raw
+Console route: after cold boot and again after `cls` followed by `dir`, it read
+the active native buffer and cursor and required the cursor to be immediately
+after the final `A:\\>` or `C:\\>` on the same row. Both observations passed.
+This excludes the copied guest-coordinate chain for the tested Conhost route,
+but does not reproduce the Windows Terminal rendering observation. The probe
+was removed: it is not a suitable permanent regression until it can reproduce
+the reported host-specific failure.
+
+A second disposable ConPTY probe then exercised the actual x64 package through
+`start` and `dir`, and captured its terminal stream. Its final cursor operation
+was the absolute `CSI 23;5H`: row 23, column 5, immediately after the DOS
+prompt. A minimal 80-column `WriteConsoleOutputW` plus
+`SetConsoleCursorPosition` control case likewise emitted the requested absolute
+coordinate. This rejects the proposed delayed-wrap explanation as well. No
+product layer has yet been shown to publish a wrong coordinate; the supplied
+Windows Terminal rendering remains unreproduced by the native Console and
+ConPTY protocol observations, so S7 must not apply a speculative coordinate
+shift.
+
+### S7 approved bounded repair
+
+Comparison with pre-S1 raw Console behavior identifies one justified output
+boundary change: before S1, every normal DOS frame wrote exactly 25 rows. S1
+correctly added 50-row capacity, but selected each write extent from the host
+viewport height (bounded at 50). Consequently a 30-row terminal receives five
+extra blank rows for every unchanged 25-row DOS frame. The cursor value itself
+remains correct, but this changes the terminal update shape relative to the
+previous product behavior.
+
+The repair stays entirely in the Win32 Console broker. Surface establishment
+continues to ensure the active frame is visible and never shrinks a host
+viewport. The native write extent instead becomes the larger of the current
+frame row count and the prior successfully committed frame row count. Thus a
+steady 25-row frame writes 25 rows regardless of a taller Terminal viewport;
+a 50-to-25 transition writes 50 rows once and clears only the old tail. The
+existing fixed 50-row storage remains the bound. This neither changes a cursor
+coordinate nor introduces terminal detection, product policy, a second output
+path or a public API.
+
+### S7 execution evidence
+
+The broker now has one output-extent rule: after surface preparation, write
+`max(frame.rows, previous committed rows)`. `previous_rows` is reset on every
+native partial-write, raw text-write or surface-replacement invalidation, so it
+never claims an unconfirmed tail. The committed current row count then becomes
+the sole next-frame tail bound. The surface/viewport rule remains independent:
+it guarantees that the active frame is visible but does not dictate how much
+frame data is sent to a host.
+
+The focused fake starts with an 80x30 host buffer and viewport. It proves a
+steady 80x25 frame writes exactly rows 0--24, and the active matrix
+`22,25,43,50,25,50` writes `25,25,43,50,50,50`; every row outside the active
+frame and inside that one prior-coverage tail is blank. The native display
+smoke was adjusted only for the removed private helper output parameter and
+still proves viewport restoration/failure behavior.
+
+Similar-output sweep searched every Win32 `WriteConsoleOutputW` call and every
+`previous_rows` producer/reset in the broker. This is the sole raw text-frame
+write path. The cooked text writer invalidates the same cache before its direct
+CRT output; activation, native shrink and failed/clipped frame writes reset it.
+No Window, Common, App or Core presenter has a competing host-row-derived
+write extent.
+
+Counted C/H changes are production `+9/-6` (net `+3`) and tests `+10/-9` (net
+`+1`): combined `+19/-15`, net `+4`. The retained comment states the one
+non-obvious boundary distinction. Manifests, task documents and refreshed
+dual-width packages are tracked separately. Focused x64 tests pass 2/2;
+background CTest passes x64 121/121 (215.37 s) and x86 121/121 (270.27 s),
+with desktop-labelled tests excluded. Documentation governance and whitespace
+checks pass. Manual Windows Terminal confirmation remains the owner acceptance
+step; S7 and T84 stay open until then.
+
 ## Frozen coverage ledger and exit evidence
 
 Each member below must finish with a source disposition and focused test proof:

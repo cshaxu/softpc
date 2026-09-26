@@ -30,8 +30,8 @@ static lib_win32_wchar first_cell;
 static lib_win32_word first_attribute;
 static lib_win32_char_info captured_cells[80u * 50u];
 static lib_win32_small_rect captured_region;
-static lib_win32_coord buffer_size={80,25};
-static lib_win32_small_rect viewport={0,0,79,24};
+static lib_win32_coord buffer_size={80,30};
+static lib_win32_small_rect viewport={0,0,79,29};
 static lib_bool reject_viewport;
 static lib_win32_bool LIB_WIN32_WINAPI screen_info(lib_win32_handle h, lib_win32_console_screen_buffer_info *p)
 { (void)h; lib_memory_set(p, 0, sizeof(*p)); p->dwSize=buffer_size; p->srWindow=viewport; return LIB_WIN32_TRUE; }
@@ -163,13 +163,14 @@ int main(void)
     f.columns=80;f.rows=25;f.text[0]=0x2588;f.palette[0]=1;
     for(lib_i32 i=0;i<2;++i) lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
     lib_test_assert(first_cell==0x2588 && writes==1 && palette_attempts==2);
+    lib_test_assert(captured_region.Bottom==24);
     palette_query_ok=1;
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
     lib_test_assert(b.previous_palette[0]==0 && palette_sets==1);
     palette_set_ok=1;
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
     lib_test_assert(b.previous_palette[0]==1 && palette_sets==2);
-    lib_test_assert(buffer_size.Y==25); /* Palette must precede surface preparation. */
+    lib_test_assert(buffer_size.Y==30); /* Palette must precede surface preparation. */
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
     lib_test_assert(palette_sets==2);
     /* Native approximation consumes the already normalized scanline range. */
@@ -233,14 +234,15 @@ int main(void)
      * while preserving the native viewport and normal 25-row startup. */
     {
         const lib_u16 rows[] = {22u,25u,43u,50u,25u,50u};
+        const lib_u16 write_rows[] = {25u,25u,43u,50u,50u,50u};
         for (lib_size i=0;i<sizeof(rows)/sizeof(rows[0]);++i) {
             f.rows=rows[i];
             lib_memory_set(f.text,0,sizeof(f.text));
             f.text[(lib_size)f.rows*80u-1u]='Z';
             lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
             lib_test_assert(captured_cells[(lib_size)f.rows*80u-1u].Char.UnicodeChar=='Z');
-            lib_test_assert(captured_region.Bottom>=f.rows-1);
-            for (lib_u32 row=f.rows;row<=(lib_u32)captured_region.Bottom;++row)
+            lib_test_assert(captured_region.Bottom==(lib_win32_short)(write_rows[i]-1u));
+            for (lib_u32 row=f.rows;row<write_rows[i];++row)
                 for (lib_u32 col=0;col<80u;++col)
                     lib_test_assert(captured_cells[row*80u+col].Char.UnicodeChar==' ');
         }

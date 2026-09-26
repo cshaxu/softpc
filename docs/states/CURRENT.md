@@ -285,23 +285,23 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
   routine mirror baseline, while OpenNT remains lineage evidence;
   [record](../history/M9-Td-S19-xp-baseline-proposal-refresh.md).
 
-## M9 T84 S6 Packet
+## M9 T84 S7 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits the post-S5 product-quality repair on 2026-09-25. |
-| Objective | Close the audited LPT buffering/snapshot, audio-shutdown, INI lexical and stale-trace defects using the existing product ownership paths. |
-| Non-goals | No six-component source/test change, Core mirror edit, guest-visible device redesign, new queue/retry/state machine, guest media or user-INI edit. |
-| Reference Baseline | SoftPC `7a69abe1`; S5 shared import `e2b81d70`. |
-| Candidate Proposal | [T84 retained design record](../proposals/m9-kvm-text-80x50.md#s6-admission--product-host-boundary-failure-closure). |
-| Files And ABI Surface | `src/app-softpc/{compat,machine,product}`, product tests/CMake and task documentation. `softpc_platform_audio_shutdown` and `vm_destroy` may return `lib_status` only within the App/VM boundary. |
+| Admission And Approval | Owner admits the investigation on 2026-09-25 and approves the bounded Console-broker repair on 2026-09-25. |
+| Objective | Restore steady 25-row raw-frame output without losing the required 50-to-25 tail clearing; no coordinate correction. |
+| Non-goals | No Common, App, Core-mirror, configuration, guest-media or cursor-coordinate/API change; no Terminal-specific branch. |
+| Reference Baseline | SoftPC `f7243f64`; S6 executor `13b4aef3`; NXVM shared corpus comparison clean at admission. |
+| Candidate Proposal | [T84 S7 cursor-position investigation](../proposals/m9-kvm-text-80x50.md#s7-admission--dos-startup-cursor-position-investigation). |
+| Files And ABI Surface | `src/lib/console-broker/win32/console.c` and its focused Lib smoke tests only; no public ABI change. |
 | Applicable Rules | AGENTS.md; Execution, Documentation, Architecture and Coding authorities; shared-corpus and original-mirror boundaries. |
-| Verification | Focused injected LPT/audio/config cases; x86/x64 Release packages and full background CTest; documentation, manifest, boundary and whitespace gates. |
-| Expected Markers | Failed LPT output cannot overflow/replay accepted bytes; malformed parallel snapshots cannot install partial state; failed audio join keeps VM admission closed; quoted paths retain comment-marker characters; no always-on trace path remains. |
-| Asset Needs | None. Preserve package EXEs except refreshed binaries, user INI, snapshots and guest media. |
-| Reporting Requirements | Report actual production/test/docs add/delete/net, changed-path ledger, similar-issue dispositions, package hashes, test counts and exclusions. |
-| Stop Conditions | Stop for any required Lib/Common/mirror semantic change, incompatible public product API expansion, or regression in focused/full tests. |
-| Exit Criteria | All five defect classes are fixed and tested; dual-width packages/background suites and gates pass; one complete executor commit is pushed; coordinator reviews actual changes; worktree is clean. T84 remains open pending owner acceptance. |
-| Original Owner Request | 准入一个新S修复以上问题。 |
-| Similar-Issue Sweep | Search all standalone CRT output buffers, snapshot restore allocators, process-global worker teardown paths, product configuration lexical scans and task-era always-on diagnostics; record every production hit and disposition. |
+| Verification | Focused broker fake: a 30-row host writes steady 25-row frames as 25 rows, while 50-to-25 clears exactly the former 50-row coverage; native broker smoke, dual-width build/background regression and documentation gates. |
+| Expected Markers | Raw-frame write extent is `max(current rows, prior committed rows)`, bounded by the existing 50-row capacity, never host viewport height. |
+| Asset Needs | None. Do not start interactive desktop tests or alter package configuration/media. |
+| Reporting Requirements | Report original-vs-current output extent, changed-path add/remove/net count, focused matrix and adjacent Console output-extent disposition. |
+| Stop Conditions | Stop if restoring the fixed 25-row steady output conflicts with required 50-row tail clearing, or if any public/API, Common or Core change becomes necessary. |
+| Exit Criteria | The bounded Lib repair and focused matrix pass on both widths; required build/regression/gates pass; package EXEs and manifests are refreshed; actual review is recorded and worktree is clean. T84 remains open pending owner direction. |
+| Original Owner Request | 启入一个新的S任务，调研找出根源，为什么Soft PC里面的DOS启动以后，光标不在正确的位置上，比原有的位置多了一行，是lib的问题还是我们app的问题。 |
+| Similar-Issue Sweep | Inspect every text-cursor row/column conversion and Console/Window cursor consumer in the active data path; classify each as source, transport, rendering or unrelated monitor behavior. |
