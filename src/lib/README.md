@@ -221,11 +221,11 @@ Clipped native success is incomplete output and returns IO_ERROR.
 Surface size is established after palette application, which can change native
 buffer geometry; output does not rely on a precondition invalidated by metadata.
 Text frames hold at most 80x50 cells with a fixed 80-cell row stride; active
-dimensions, not capacity, determine the image. Raw output grows the viewport
-to at least 80 columns and the frame's active rows without shrinking either
-existing dimension or backing storage. Lower visible rows left by a taller
-frame are cleared within the 50-row capacity. Final queried geometry covers that
-target; a rejected or silently clipped resize returns IO_ERROR, not success.
+dimensions, not capacity, determine the image. Raw output grows only backing
+storage to at least 80 columns and the frame's active rows; it preserves the
+host viewport, font fit and scroll position. Lower rows left by a taller frame
+are cleared within the 50-row capacity. A failed or silently ineffective backing
+resize returns IO_ERROR, not success.
 The broker alone sequences deactivation, including failed initial activation.
 Backend disposal frees inactive resources without repeating mode restoration
 or reader retirement. KVM Console disposal similarly follows its worker's sink

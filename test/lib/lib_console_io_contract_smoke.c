@@ -243,6 +243,44 @@ int main(void)
                     lib_test_assert(captured_cells[row*80u+col].Char.UnicodeChar==' ');
         }
     }
+    /* A partial 50-to-25 clear invalidates the cached cells, but retrying
+     * must still cover the former tail rather than leaving old characters. */
+    f.rows=50; lib_memory_set(f.text,0,sizeof(f.text)); f.text[80u*50u-1u]='T';
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+    f.rows=25; lib_memory_set(f.text,0,sizeof(f.text)); f.text[80u*25u-1u]='S';
+    partial_write=2;
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_IO_ERROR);
+    lib_test_assert(!b.previous_columns && !b.previous_rows && b.coverage_rows==50);
+    lib_u32 attempted=writes;
+    partial_write=0;
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+    lib_test_assert(writes==attempted+1 && captured_region.Bottom==49 && b.coverage_rows==25);
+    for (lib_u32 row=25u;row<50u;++row)
+        for (lib_u32 col=0u;col<80u;++col)
+            lib_test_assert(captured_cells[row*80u+col].Char.UnicodeChar==' ');
+    /* An external backing-store shrink can happen even when 25 rows still
+     * fit. Clamp the retained tail before choosing the native write extent. */
+    f.rows=50; lib_memory_set(f.text,0,sizeof(f.text)); f.text[80u*50u-1u]='X';
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+    buffer_size=(lib_win32_coord){80,30};
+    f.rows=25; lib_memory_set(f.text,0,sizeof(f.text)); f.text[80u*25u-1u]='Y';
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+    lib_test_assert(b.previous_columns==80 && b.previous_rows==25 && b.coverage_rows==25);
+    lib_test_assert(captured_region.Bottom==29);
+    buffer_size=(lib_win32_coord){120,60};
+    /* A direct stream write invalidates copied cells but cannot discard the
+     * tail that the following shorter frame must clear. */
+    f.rows=50; lib_memory_set(f.text,0,sizeof(f.text)); f.text[80u*50u-1u]='V';
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+    text_result=1; text_written=1;
+    lib_test_assert(console_broker_backend_write_bound(&b,b.console,1,"x",1)==LIB_STATUS_OK);
+    lib_test_assert(!b.previous_columns && !b.previous_rows && b.coverage_rows==50);
+    f.rows=25; lib_memory_set(f.text,0,sizeof(f.text)); f.text[80u*25u-1u]='W';
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+    lib_test_assert(captured_region.Bottom==49 && b.coverage_rows==25);
+    for (lib_u32 row=25u;row<50u;++row)
+        for (lib_u32 col=0u;col<80u;++col)
+            lib_test_assert(captured_cells[row*80u+col].Char.UnicodeChar==' ');
     /* A smaller, scrolled viewport must not limit full-frame storage. */
     viewport=(lib_win32_small_rect){7,3,46,15};
     buffer_size=(lib_win32_coord){120,60};

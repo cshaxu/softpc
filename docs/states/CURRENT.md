@@ -290,18 +290,18 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits this shared Console convergence task on 2026-09-25, after S7 delivery `5d7b2619`. |
-| Objective | Merge NXVM's capacity-only raw Console surface rule with SoftPC S7's frame-owned tail-clearing rule, retaining both without a second output path. |
-| Non-goals | No Common, App, Core-mirror, configuration, guest-media or public API change; no Terminal-specific branch, font scaling or forced viewport resize. |
+| Admission And Approval | Owner admits this shared Console convergence task on 2026-09-25, after S7 delivery `5d7b2619`, and reopens it for P2 on 2026-09-25 to retain tail coverage across partial native frame writes. |
+| Objective | Merge NXVM's capacity-only raw Console surface rule with SoftPC S7's frame-owned tail-clearing rule, retaining both without a second output path; distinguish an invalid completed-frame cache from the native rows a retry must overwrite. |
+| Non-goals | No Common, App, Core-mirror, configuration, guest-media or public API change; no Terminal-specific branch, font scaling, forced viewport resize or second rendering path. |
 | Reference Baseline | SoftPC `5d7b2619`; NXVM's read-only preserved Console S3 patch at `build/t538-s1/s3-preserved.patch`. |
 | Candidate Proposal | [T84 S8 shared Console convergence](../proposals/m9-kvm-text-80x50.md#s8-shared-console-convergence). |
-| Files And ABI Surface | `src/lib/console-broker/win32/console.c`, its two focused Lib smokes, manifests and task documents only; no public ABI change. |
+| Files And ABI Surface | `src/lib/console-broker/win32/console.c`, `src/lib/README.md`, its two focused Lib smokes, manifests and task documents only; no public ABI change. |
 | Applicable Rules | AGENTS.md; Execution, Documentation, Architecture and Coding authorities; shared-corpus and original-mirror boundaries. |
-| Verification | Focused broker fake: smaller/scrolled viewport preserves its rectangle while backing storage accepts the full frame; rejected/ignored backing growth fails; a 30-row host writes steady 25-row frames as 25 rows, while 50-to-25 clears exactly the former 50-row coverage. Then native broker smoke, dual-width build/background regression and documentation gates. |
-| Expected Markers | Backing storage grows to `max(existing, 80 x active rows)` without changing the viewport; raw-frame write extent remains `max(current rows, prior committed rows)`, bounded by the existing 50-row capacity. |
+| Verification | Focused broker fake: smaller/scrolled viewport preserves its rectangle while backing storage accepts the full frame; rejected/ignored backing growth fails; a 30-row host writes steady 25-row frames as 25 rows; 50-to-25 clears exactly the former 50-row coverage; a partial 50-to-25 native write retries through row 50 before reducing confirmed coverage; and an external 50-to-30 backing shrink with a 25-row next frame clamps retry coverage to row 30. Then native broker smoke, dual-width build/background regression and documentation gates. |
+| Expected Markers | Backing storage grows to `max(existing, 80 x active rows)` without changing the viewport. A completed-frame cache may invalidate, but a private coverage extent survives a partial native frame write; raw output always spans `max(current rows, prior coverage rows)`. |
 | Asset Needs | None. Do not start interactive desktop tests or alter package configuration/media. |
 | Reporting Requirements | Report original-vs-current output extent, changed-path add/remove/net count, focused matrix and adjacent Console output-extent disposition. |
-| Stop Conditions | Stop if preserving host viewport conflicts with complete backing-frame storage, tail clearing, existing raw/cooked handoff, or if any public/API, Common or Core change becomes necessary. |
-| Exit Criteria | Capacity-only surface preparation and S7 tail-clearing matrix pass on both widths; required build/regression/gates pass; package EXEs and manifests are refreshed; actual review is recorded and worktree is clean. T84 remains open pending owner direction. |
+| Stop Conditions | Stop if preserving host viewport conflicts with complete backing-frame storage, tail clearing, failure retry, existing raw/cooked handoff, or if any public/API, Common or Core change becomes necessary. |
+| Exit Criteria | Capacity-only surface preparation, exact tail clearing and partial-write retry matrix pass on both widths; required build/regression/gates pass; package EXEs and manifests are refreshed; actual review is recorded and worktree is clean. T84 remains open pending owner direction. |
 | Original Owner Request | 你把nxvm的console的修复来进来：准入一个新的S任务，合并这两console的修复。完成后给我汇报。 |
 | Similar-Issue Sweep | Inspect every raw text surface operation and output-extent calculation in the broker; classify viewport mutation, buffer growth, cache reset and native failure paths. |

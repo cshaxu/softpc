@@ -55,6 +55,43 @@ desktop-labelled cases remain excluded there, while the self-owned hidden
 native Console smoke passed in each focused run. Lib/test manifests,
 documentation governance and whitespace checks pass.
 
+### S8 P2 failure-retry closure
+
+Review of S8 P1 found that `previous_rows` was serving two incompatible roles:
+it both identified a fully committed frame and selected the old tail to clear.
+Invalidating it before a partial 50-to-25 native write correctly prevented a
+stale cache hit, but incorrectly discarded the required 50-row retry extent.
+
+P2 adds one private `coverage_rows` field. `previous_columns` and
+`previous_rows` remain the completed-frame cache and are zeroed before a native
+frame write. `coverage_rows` instead records the highest row that an attempted
+or completed frame may have changed. A retry writes
+`max(frame rows, coverage rows)`; only a complete native write reduces that
+coverage to the active frame height. On every surface query, if native backing
+storage was externally shrunk, surface preparation invalidates the completed
+cache and clamps coverage to rows that still physically exist, rather than
+inventing a lost tail. This check is deliberately independent of whether the
+next frame needs a resize.
+
+The existing test now performs a complete 50-row frame, injects a partial
+50-to-25 write, verifies cache invalidation with retained 50-row coverage, and
+requires the successful retry to write through row 50 and blank rows 26--50.
+It also shrinks the native backing store from 50 to 30 while a 25-row frame
+still fits, proving that the next write covers only 30 rows and succeeds.
+The Lib README now accurately says backing storage grows while the viewport,
+font fit and scroll position remain host-owned. No API, component boundary or
+second rendering path is added.
+
+P2 counted code paths against S8 P1 `b8c1ed3f`: production `+24/-10` (net
+`+14`) and tests `+38/-0` (net `+38`), combined `+62/-10` (net `+52`). The
+extra field is two bytes per broker instance; x86 package size is unchanged
+and x64 grows 512 bytes from the compiler's layout/output. Both Release builds
+pass. Hidden-background regression passes x64 121/121 (301.17 s) and x86
+121/121 (251.51 s); the two focused Console smokes, including the hidden native
+Console display case, pass on both widths. Lib/test manifests, documentation
+governance and whitespace checks pass. No user configuration or guest media is
+changed.
+
 ## Request and admitted design
 
 Owner: "收口T83，准入T84进行kvm-*组件的文本帧容量升级 80x50".
