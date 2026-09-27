@@ -119,6 +119,46 @@ only makes that actually entered the guest queue receive synthetic breaks, and
 the ledger is then cleared. The reset itself is not guest input, product focus
 policy or a new lifecycle path.
 
+### S9 delivery review — source-local input reset
+
+Implementation preserves the existing one-way ownership model.  Window emits
+the semantic reset after native focus/application loss and, when freezing,
+after mouse-button release but before ordinary input starts being filtered.
+The Win32 raw Console reader requests focus records and emits the same reset on
+focus loss.  Broker replacement and destruction reset the old bound source
+after its reader is quiescent and before its binding is invalidated.  Each leaf
+also clears only its own normalizer, matcher and mouse baseline.
+
+Common Session is the sole consumer with guest-key knowledge: it sends
+`INPUT_RESET` through the existing source-retirement ledger release.  Thus it
+creates breaks only for makes that were actually delivered from that source;
+withheld hotkey prefixes and another source's keys are untouched.  Repeated
+native notifications are idempotent.  No host-focus policy, input queue,
+thread, object, product API, VM, Compat or Core code was added.
+
+The related-path sweep covered Window `WM_KILLFOCUS`, `WM_ACTIVATEAPP`, mouse
+capture loss and freeze; raw Console focus records and broker handoff/destruction;
+all matcher/normalizer discard paths; and Session source retirement/ledger
+release.  Window and raw Console are reset producers; Session is the only
+ledger consumer; capture loss alone remains a mouse-only cleanup because it
+does not mean keyboard focus was lost.
+
+Production C/H paths: +92/-11, net +81 across Session and Lib.  Test C/H
+paths: +90/-21, net +69.  Manifests, the UI contract and both generated EXEs
+are excluded from those source counts.  The modest net addition is the one new
+semantic event and its three source producers; the broker shares a single
+reset helper for activation, handoff and destruction rather than duplicating
+delivery logic.
+
+Both Release packages were rebuilt.  Serial hidden-background regression
+passes x64 121/121 (121.58s) and x86 121/121 (123.78s); serial execution is
+intentional because the layout self-test owns a scratch fixture.  Focused
+coverage proves Window focus/freeze ordering, raw Console reset/handoff,
+source-scoped Session releases and idempotence.  Lib/Common manifests, Lib's
+component DAG, documentation governance and whitespace gates pass.  Five
+desktop tests remain excluded from the background run; no user configuration
+or guest media changed.
+
 No App, VM, Compat, Core, user configuration, media or public product API
 changes are admitted. The likely source scope is KVM event/component private
 interfaces, Window and Console adapters, the Win32 Console input record wrapper,

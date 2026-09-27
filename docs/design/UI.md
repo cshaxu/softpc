@@ -267,13 +267,14 @@ only its own binding. Native relative input bypasses pointer acceleration;
 absolute input retains the device's coordinate-range limitation. Public copied
 integer delta events and product hotkey policy do not change.
 
-Freezing a Window is a guest-input boundary, not a registered-hotkey boundary:
-its native key transitions still pass through the source-local matcher. A
-matched `kvm_HOTKEY` reaches SoftPC; all ordinary key/text/mouse output is
-silently discarded and is never buffered for resume. A frozen-origin cached
-make remains ineligible for ordinary replay after unfreeze, but can still
-complete a hotkey. This is not make/break balancing: cross-freeze releases
-still obey the current per-event frozen filter, without synthetic cleanup.
+Freezing a Window is a guest-input boundary, not a registered-hotkey boundary.
+On the actual unfrozen-to-frozen transition it first releases content mouse
+state and emits a source input reset, then begins filtering ordinary
+key/text/mouse output. The Session releases only guest keys it previously
+recorded from that source; withheld or consumed hotkey prefixes never become
+synthetic guest breaks. New frozen key transitions still pass through the
+source-local matcher, so a matched `kvm_HOTKEY` reaches SoftPC, while ordinary
+output is silently discarded and never buffered for resume.
 While paused, SoftPC
 accepts current-run hotkeys and monitor lines as product control input, but it
 must consume guest-input-producing hotkeys before they can enter the VM input
