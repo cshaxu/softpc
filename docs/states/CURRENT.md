@@ -11,13 +11,14 @@ and hidden-background CTest pass 121/121 on x64 and x86. Executor P1
 `b8c1ed3f` and P2 `b79769c1` are pushed. T84 remains open for later owner
 direction. [S8 closure](../history/M9-T84-S8-console-convergence-closure.md).
 
-M9 T84 S9 is active. It restores source-local key balance after a KVM producer
-loses host focus or freezes, by sending one semantic input-state reset to the
-existing Common Session delivered-key ledger. It does not expose host focus as
-product policy or add a second input queue. Executor P1 passed serial
-hidden-background regression 121/121 on both x64 and x86. P2 adds direct
-Win32-loss-to-Session and rejected-reset coverage without changing production
-code or package EXEs; S9 awaits owner verification.
+M9 T84 S9 is owner-accepted and closed. It restores source-local key balance
+after a KVM producer loses host focus or freezes through one semantic reset and
+the existing Common Session delivered-key ledger. P1 `3186afcd` delivers the
+behavior; P2 `40da7d00` adds direct native-loss and rejected-reset coverage.
+Serial hidden-background CTest passes 122/122 on x64 and x86. Package EXEs
+remain the accepted P1 artifacts. [S9 closure](../history/M9-T84-S9-input-reset-closure.md).
+
+No implementation subtask is active. Open task awaiting owner: T84.
 
 M9 T84 S6 is owner-accepted and closed. It closes the admitted product
 host-boundary defects without changing Lib, Common, x86, the Core mirror, user
@@ -46,7 +47,6 @@ Owner defers the pre-existing x86 BIOS[0x52] null-dispatch fault to
 [TODO](TODO.md) on 2026-09-25; no CPU/BOP repair belongs to S1.
 The 80x50 implementation builds on both widths; final background regression
 passes 120/120 on x64 and x86. The deferred fault is not claimed repaired.
-See the [S1 evidence](../proposals/m9-kvm-text-80x50.md#s1-implementation-audit).
 T84 S1 is owner-accepted and closed. Executor P1 `503d6632`, delivery
 review P2 `dc9c34ce`, and S1 acceptance P3 `39366670` are pushed. Owner
 accepts S2's document-only whole-task audit and admits S3 on 2026-09-25.
@@ -234,27 +234,6 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
   wake race; its bounded schedule proof does not certify all interleavings.
 - TODO remains empty under the owner's tracking policy, not proof of universal
   correctness. Queue candidates are unadmitted.
-
-## M9 T84 S9 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner directs closure of accepted S8 and admits this next S on 2026-09-27: modify, build, test, commit and push, then wait for verification. |
-| Objective | Prevent stuck guest key state when KVM Window or raw KVM Console can no longer observe releases, using one semantic source input-state reset and the existing Session delivered-key ledger. |
-| Non-goals | No raw host-focus event in App/Common, no App/VM/Compat/Core change, no new input queue/thread/object, no guest mapper change, no configuration/media change and no product focus policy change. |
-| Reference Baseline | S8 executor `b79769c1`. |
-| Candidate Proposal | [T84 KVM text and input work](../proposals/m9-kvm-text-80x50.md#s9-admitted-design--kvm-source-input-state-reset). |
-| Files And ABI Surface | Private KVM event/component interfaces, KVM Window/Console adapters, Win32 Console record wrapper, Common Session dispatch, focused tests/manifests/documents. Public product API remains unchanged. |
-| Applicable Rules | AGENTS.md; Execution, Documentation, Architecture, Coding and Product UI authorities; shared-corpus rules. |
-| Verification | Unit proof for focus loss, broker handoff, freeze ordering, normalizer/hotkey cleanup, delivered-only synthetic breaks and stale-source rejection; focused Lib/Common tests, both Release packages, hidden-background x64/x86 CTest, manifests/DAG/corpus/documentation/whitespace gates. |
-| Expected Markers | A source reset clears only its local capture/normalizer/matcher state; Session emits breaks only for keys it recorded as delivered from that source. |
-| Asset Needs | None. Do not start interactive desktop tests or alter package configuration/media. |
-| Reporting Requirements | Report original/new event route, changed production/test add/remove/net counts, focused matrix, similar-issue sweep and dual-package hashes. |
-| Stop Conditions | Stop for a required public API, new queue/thread/object, guest mapping change, inability to order freeze mouse release before filtering, or a failing existing raw/cooked handoff contract. |
-| Exit Criteria | One owner-local reset route covers Window focus/application loss, freeze and Console focus/handoff; all required verification passes; P is pushed, actual review is recorded and worktree is clean. T84 remains open pending owner verification. |
-| Original Owner Request | 收口已有s任务保证工作区干净 然后准入新s任务进行修改 编译测试提交推送后等我验证 |
-| Similar-Issue Sweep | Inspect every KVM source-retirement/focus/freeze path, normalizer/hotkey discard path and Session source-ledger release path; classify each as reset producer, existing consumer or unrelated lifecycle boundary. |
 
 ## Recent M9 Closures
 
