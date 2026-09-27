@@ -92,6 +92,48 @@ Console display case, pass on both widths. Lib/test manifests, documentation
 governance and whitespace checks pass. No user configuration or guest media is
 changed.
 
+The owner accepted S8 on 2026-09-27. Its closure record is
+[M9 T84 S8 Console convergence](../history/M9-T84-S8-console-convergence-closure.md);
+T84 remains open.
+
+## S9 admitted design — KVM source input-state reset
+
+A KVM source can lose the host transition that balances an already delivered
+guest key: the user may press Alt in the guest, move focus elsewhere, and
+release Alt outside that source. Sending a raw host-focus event upward would
+leak platform policy into App/Common. Releasing every key locally is also
+wrong: source-local hotkey state includes withheld and consumed keys that the
+machine never received.
+
+S9 therefore adds one copied KVM semantic event, `INPUT_RESET`: this source
+can no longer guarantee its physical input state. KVM Window produces it on
+native focus/application loss and before entering frozen state. Raw KVM Console
+produces it when the native Console reports focus loss and when the broker
+confirms a reader handoff. The source clears its normalizer, hotkey and mouse
+baseline. Any held mouse buttons are emitted as the existing zero-button
+transition before that reset where ordinary input is still admissible.
+
+Common Session already owns the authoritative delivered-key ledger. It routes
+`INPUT_RESET` through the existing source-release path used by source retirement:
+only makes that actually entered the guest queue receive synthetic breaks, and
+the ledger is then cleared. The reset itself is not guest input, product focus
+policy or a new lifecycle path.
+
+No App, VM, Compat, Core, user configuration, media or public product API
+changes are admitted. The likely source scope is KVM event/component private
+interfaces, Window and Console adapters, the Win32 Console input record wrapper,
+Session dispatch, their unit smokes, manifests and task documents. The initial
+estimate is production +60/-15 lines and tests +120/-10 lines; final counted
+Git deltas replace it.
+
+The focused proof must cover Window focus loss, freeze ordering, raw Console
+focus records and broker handoff; normalizer/hotkey cleanup; only delivered
+keys being released; and no stale-source guest break. Both Release packages,
+focused tests, full hidden-background CTest, manifests/component gates and
+documentation governance are required. Desktop tests remain excluded from the
+background suite. A required public API, an added queue/thread/object, or a
+need to alter guest keyboard mapping stops this S for owner review.
+
 ## Request and admitted design
 
 Owner: "收口T83，准入T84进行kvm-*组件的文本帧容量升级 80x50".

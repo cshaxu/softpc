@@ -2,6 +2,20 @@
 
 ## Current Work
 
+M9 T84 S8 is owner-accepted and closed. It converges raw Console backing-store
+preparation with exact frame-owned output coverage: native viewport, font fit
+and scroll position remain host-owned; steady 25-row output writes 25 rows;
+former tails remain covered across partial writes and are clamped after an
+external backing-store shrink. Both Release packages, focused Console tests
+and hidden-background CTest pass 121/121 on x64 and x86. Executor P1
+`b8c1ed3f` and P2 `b79769c1` are pushed. T84 remains open for later owner
+direction. [S8 closure](../history/M9-T84-S8-console-convergence-closure.md).
+
+M9 T84 S9 is active. It restores source-local key balance after a KVM producer
+loses host focus or freezes, by sending one semantic input-state reset to the
+existing Common Session delivered-key ledger. It does not expose host focus as
+product policy or add a second input queue.
+
 M9 T84 S6 is owner-accepted and closed. It closes the admitted product
 host-boundary defects without changing Lib, Common, x86, the Core mirror, user
 INI, snapshots or media: parallel output retains only an unconfirmed suffix on
@@ -218,6 +232,27 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 - TODO remains empty under the owner's tracking policy, not proof of universal
   correctness. Queue candidates are unadmitted.
 
+## M9 T84 S9 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner directs closure of accepted S8 and admits this next S on 2026-09-27: modify, build, test, commit and push, then wait for verification. |
+| Objective | Prevent stuck guest key state when KVM Window or raw KVM Console can no longer observe releases, using one semantic source input-state reset and the existing Session delivered-key ledger. |
+| Non-goals | No raw host-focus event in App/Common, no App/VM/Compat/Core change, no new input queue/thread/object, no guest mapper change, no configuration/media change and no product focus policy change. |
+| Reference Baseline | S8 executor `b79769c1`. |
+| Candidate Proposal | [T84 KVM text and input work](../proposals/m9-kvm-text-80x50.md#s9-admitted-design--kvm-source-input-state-reset). |
+| Files And ABI Surface | Private KVM event/component interfaces, KVM Window/Console adapters, Win32 Console record wrapper, Common Session dispatch, focused tests/manifests/documents. Public product API remains unchanged. |
+| Applicable Rules | AGENTS.md; Execution, Documentation, Architecture, Coding and Product UI authorities; shared-corpus rules. |
+| Verification | Unit proof for focus loss, broker handoff, freeze ordering, normalizer/hotkey cleanup, delivered-only synthetic breaks and stale-source rejection; focused Lib/Common tests, both Release packages, hidden-background x64/x86 CTest, manifests/DAG/corpus/documentation/whitespace gates. |
+| Expected Markers | A source reset clears only its local capture/normalizer/matcher state; Session emits breaks only for keys it recorded as delivered from that source. |
+| Asset Needs | None. Do not start interactive desktop tests or alter package configuration/media. |
+| Reporting Requirements | Report original/new event route, changed production/test add/remove/net counts, focused matrix, similar-issue sweep and dual-package hashes. |
+| Stop Conditions | Stop for a required public API, new queue/thread/object, guest mapping change, inability to order freeze mouse release before filtering, or a failing existing raw/cooked handoff contract. |
+| Exit Criteria | One owner-local reset route covers Window focus/application loss, freeze and Console focus/handoff; all required verification passes; P is pushed, actual review is recorded and worktree is clean. T84 remains open pending owner verification. |
+| Original Owner Request | 收口已有s任务保证工作区干净 然后准入新s任务进行修改 编译测试提交推送后等我验证 |
+| Similar-Issue Sweep | Inspect every KVM source-retirement/focus/freeze path, normalizer/hotkey discard path and Session source-ledger release path; classify each as reset producer, existing consumer or unrelated lifecycle boundary. |
+
 ## Recent M9 Closures
 
 | Task | Closure | Evidence |
@@ -284,24 +319,3 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 - M9 Td S19: refreshes the unadmitted XP candidate so XP SP1 is its intended
   routine mirror baseline, while OpenNT remains lineage evidence;
   [record](../history/M9-Td-S19-xp-baseline-proposal-refresh.md).
-
-## M9 T84 S8 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner admits this shared Console convergence task on 2026-09-25, after S7 delivery `5d7b2619`, and reopens it for P2 on 2026-09-25 to retain tail coverage across partial native frame writes. |
-| Objective | Merge NXVM's capacity-only raw Console surface rule with SoftPC S7's frame-owned tail-clearing rule, retaining both without a second output path; distinguish an invalid completed-frame cache from the native rows a retry must overwrite. |
-| Non-goals | No Common, App, Core-mirror, configuration, guest-media or public API change; no Terminal-specific branch, font scaling, forced viewport resize or second rendering path. |
-| Reference Baseline | SoftPC `5d7b2619`; NXVM's read-only preserved Console S3 patch at `build/t538-s1/s3-preserved.patch`. |
-| Candidate Proposal | [T84 S8 shared Console convergence](../proposals/m9-kvm-text-80x50.md#s8-shared-console-convergence). |
-| Files And ABI Surface | `src/lib/console-broker/win32/console.c`, `src/lib/README.md`, its two focused Lib smokes, manifests and task documents only; no public ABI change. |
-| Applicable Rules | AGENTS.md; Execution, Documentation, Architecture and Coding authorities; shared-corpus and original-mirror boundaries. |
-| Verification | Focused broker fake: smaller/scrolled viewport preserves its rectangle while backing storage accepts the full frame; rejected/ignored backing growth fails; a 30-row host writes steady 25-row frames as 25 rows; 50-to-25 clears exactly the former 50-row coverage; a partial 50-to-25 native write retries through row 50 before reducing confirmed coverage; and an external 50-to-30 backing shrink with a 25-row next frame clamps retry coverage to row 30. Then native broker smoke, dual-width build/background regression and documentation gates. |
-| Expected Markers | Backing storage grows to `max(existing, 80 x active rows)` without changing the viewport. A completed-frame cache may invalidate, but a private coverage extent survives a partial native frame write; raw output always spans `max(current rows, prior coverage rows)`. |
-| Asset Needs | None. Do not start interactive desktop tests or alter package configuration/media. |
-| Reporting Requirements | Report original-vs-current output extent, changed-path add/remove/net count, focused matrix and adjacent Console output-extent disposition. |
-| Stop Conditions | Stop if preserving host viewport conflicts with complete backing-frame storage, tail clearing, failure retry, existing raw/cooked handoff, or if any public/API, Common or Core change becomes necessary. |
-| Exit Criteria | Capacity-only surface preparation, exact tail clearing and partial-write retry matrix pass on both widths; required build/regression/gates pass; package EXEs and manifests are refreshed; actual review is recorded and worktree is clean. T84 remains open pending owner direction. |
-| Original Owner Request | 你把nxvm的console的修复来进来：准入一个新的S任务，合并这两console的修复。完成后给我汇报。 |
-| Similar-Issue Sweep | Inspect every raw text surface operation and output-extent calculation in the broker; classify viewport mutation, buffer growth, cache reset and native failure paths. |
