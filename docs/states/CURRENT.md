@@ -18,7 +18,10 @@ behavior; P2 `40da7d00` adds direct native-loss and rejected-reset coverage.
 Serial hidden-background CTest passes 122/122 on x64 and x86. Package EXEs
 remain the accepted P1 artifacts. [S9 closure](../history/M9-T84-S9-input-reset-closure.md).
 
-No implementation subtask is active. Open task awaiting owner: T84.
+M9 T84 S10 is active. It synchronizes complete `test/lib` and `test/common`
+from read-only NXVM commit `0c71110b0`, including deletion of the short-lived
+Common-private Window reset test in favor of the canonical Lib-owner coverage.
+No production path or package artifact is in scope.
 
 M9 T84 S6 is owner-accepted and closed. It closes the admitted product
 host-boundary defects without changing Lib, Common, x86, the Core mirror, user
@@ -234,6 +237,27 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
   wake race; its bounded schedule proof does not certify all interleavings.
 - TODO remains empty under the owner's tracking policy, not proof of universal
   correctness. Queue candidates are unadmitted.
+
+## M9 T84 S10 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner directs an exact test-corpus import from NXVM commit `0c71110b0`, including deletions, audit, dual-width compilation/testing, push and S closure on 2026-09-27. |
+| Objective | Make SoftPC `test/lib` and `test/common` byte-identical to the named NXVM reference tree. |
+| Non-goals | No `src/` change, no package/configuration/media/snapshot change, no NXVM write, and no product behavior or API change. |
+| Reference Baseline | SoftPC `19e853c0`; NXVM `0c71110b0714fffee3ef8c40bb352ee3dd71ee40`, read-only. |
+| Candidate Proposal | [T84 shared test-corpus sync](../proposals/m9-t84-shared-test-corpus-sync.md). |
+| Files And ABI Surface | Only `test/lib`, `test/common`, their manifests/CMake registration and task records; no production ABI surface. |
+| Applicable Rules | AGENTS.md; Execution, Documentation, Architecture and Coding authorities; shared-corpus rules. |
+| Verification | Exact path/hash ledger; focused affected tests and compilation on x64/x86; serial hidden-background x64/x86 CTest; manifests, Lib DAG, documentation governance and whitespace gates. |
+| Expected Markers | 71 reference paths equal 71 SoftPC paths after import; native reset coverage belongs to Lib-owner tests and Common tests include no Lib implementation path. |
+| Asset Needs | None. Do not start desktop tests or alter package configuration/media. |
+| Reporting Requirements | Report reference provenance, all eight audited paths, actual test/build added/removed/net lines, exact-tree result and dual-width evidence. |
+| Stop Conditions | A source mismatch outside the two admitted test roots, a required production change, or an existing-test failure requires owner direction. |
+| Exit Criteria | Complete import including deletion is pushed; post-import two-tree comparison is exact; required verification and actual review pass; S10 is closed and worktree clean. |
+| Original Owner Request | SoftPC 请从 `0c71110b0` 同步完整 `test/lib`、`test/common`，包含删除项。重开旧的S任务，审计diff，并追加P任务导入后，编译测试，并收口提交推送 |
+| Similar-Issue Sweep | Enumerate every path in both roots at the named reference, classify missing/changed paths, and reject any residual SoftPC-only or NXVM-only path after import. |
 
 ## Recent M9 Closures
 

@@ -109,6 +109,7 @@ static void check_input_reset(void)
     event.type = KVM_EVENT_KEY;
     event.data.key.pressed = LIB_TRUE;
     dispatch(&q, &event, &c);
+    lib_test_assert(c.makes == 3u && q.pressed_count == 1u);
     event.type = KVM_EVENT_INPUT_RESET;
     lib_test_assert(common_session_dispatch_input(&q, &event,
         COMMON_SESSION_MACHINE_PAUSED, receive, &c));
