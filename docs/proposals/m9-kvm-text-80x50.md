@@ -166,6 +166,23 @@ Session dispatch, their unit smokes, manifests and task documents. The initial
 estimate is production +60/-15 lines and tests +120/-10 lines; final counted
 Git deltas replace it.
 
+### S9 P2 test closure
+
+P2 changes tests and test registration only; production code, package EXEs and
+the event contract remain exactly as delivered by P1.  The new Common smoke
+uses the actual Window procedure with `WM_KILLFOCUS` and
+`WM_ACTIVATEAPP(FALSE)`, then follows the emitted reset through Session to the
+guest sink.  It proves one previously delivered make receives one break, and
+repeated native loss notifications produce no duplicate break.  The existing
+Lib admission smoke now makes the reset sink reject delivery: the component
+reports its existing terminal I/O failure, clears the matcher, rejects later
+ordinary input, and a subsequent retirement does not report a second failure.
+
+This intentionally tests `INPUT_RESET` and `SOURCE_RETIRED` together without
+collapsing them.  Reset is recoverable source-state cleanup; retirement is the
+final source-lifetime event.  They share the Session delivered-key release
+routine, but only retirement prevents any future source input.
+
 The focused proof must cover Window focus loss, freeze ordering, raw Console
 focus records and broker handoff; normalizer/hotkey cleanup; only delivered
 keys being released; and no stale-source guest break. Both Release packages,

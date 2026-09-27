@@ -15,8 +15,9 @@ M9 T84 S9 is active. It restores source-local key balance after a KVM producer
 loses host focus or freezes, by sending one semantic input-state reset to the
 existing Common Session delivered-key ledger. It does not expose host focus as
 product policy or add a second input queue. Executor P1 passed serial
-hidden-background regression 121/121 on both x64 and x86 and awaits owner
-verification.
+hidden-background regression 121/121 on both x64 and x86. P2 adds direct
+Win32-loss-to-Session and rejected-reset coverage without changing production
+code or package EXEs; S9 awaits owner verification.
 
 M9 T84 S6 is owner-accepted and closed. It closes the admitted product
 host-boundary defects without changing Lib, Common, x86, the Core mirror, user

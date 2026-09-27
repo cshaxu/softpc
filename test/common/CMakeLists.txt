@@ -37,6 +37,7 @@ shared_register_test(common composition common-ui console-broker base)
 if(WIN32)
     shared_register_test(common common_machine common-machine)
     target_sources(common-test-common_machine PRIVATE machine_fixture.c)
+    shared_register_test(common window_input_reset common-session kvm-window)
 endif()
 
 foreach(check IN ITEMS manifest corpus)
