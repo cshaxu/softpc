@@ -20,16 +20,11 @@
       "displayName": "MinGW GCC x86 release",
       "generator": "MinGW Makefiles",
       "binaryDir": "${sourceDir}/build/mingw-gcc-x86-release",
-      "environment": {
-        "SOFTPC_I686_BIN": "D:/programs/msys64/mingw32/bin",
-        "SOFTPC_I686_GCC": "D:/programs/msys64/mingw32/bin/i686-w64-mingw32-gcc.exe",
-        "PATH": "D:/programs/msys64/mingw32/bin;$penv{PATH}"
-      },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG",
         "CMAKE_EXE_LINKER_FLAGS": "-static -static-libgcc",
-        "CMAKE_C_COMPILER": "$env{SOFTPC_I686_GCC}",
+        "CMAKE_C_COMPILER": "gcc",
         "SOFTPC_ARTIFACT_ARCHITECTURE": "x86"
       }
     }

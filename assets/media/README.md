@@ -11,5 +11,5 @@ disposable copy.
 
 This directory contains guest media only. The selected original BIOS, VGA ROM,
 and CMOS inputs remain source-mirror resources under
-`src/mvdm/softpc.new/roms/`, are embedded at build time, and have no
+`src/app-softpc/softpc.new/roms/`, are embedded at build time, and have no
 `assets/roms/` runtime equivalent.

@@ -24,7 +24,26 @@ Common-private Window reset smoke in favor of canonical Lib-owner coverage.
 P1 `bbdc1d68` passes exact 71-path equality and serial x64/x86 background
 CTest 121/121. [S10 closure](../history/M9-T84-S10-shared-test-corpus-sync-closure.md).
 
-No implementation subtask is active. Open task awaiting owner: T84.
+## M9 T84 S11 Packet
+
+| Field | Required record |
+|---|---|
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner asks for a fresh-user Quick Start that can clone, build and run SoftPC quickly. |
+| Objective | Make the checked-in x64 package and source-build route discoverable and remove private x86 toolchain paths from CMake presets. |
+| Non-goals | No runtime/source behavior, package INI, media, release automation, Linux product support, automatic installer or tool downloader change. |
+| Reference Baseline | `0e59f84d` (T84 S10 P2), clean tracked worktree. |
+| Candidate Proposal | [Quick Start for a fresh Windows checkout](../proposals/m9-t84-quick-start.md). |
+| Files And ABI Surface | `README.md`, `CMakePresets.json`, `assets/media/README.md`, this packet and closure evidence only; no C/C++ ABI surface. |
+| Applicable Rules | `docs/rules/EXECUTION.md`, `DOCUMENT.md`, `ARCHITECTURE.md`, `CODING.md`; user package configuration remains untouched. |
+| Verification | Fresh x64 build-tree configure/package build; x86-preset-equivalent configure with real x86 toolchain PATH; documentation governance, whitespace and changed-path review. |
+| Expected Markers | No `D:/programs`, `SOFTPC_I686_BIN` or `SOFTPC_I686_GCC` in presets; root README has direct-run and UCRT64 build routes. |
+| Asset Needs | Read-only use of tracked package/media; no configuration, guest-media or primary-package artifact write. |
+| Reporting Requirements | Report changed path count and +/−/net documentation/CMake lines; distinguish fresh-clone x64 package proof from optional x86 configuration proof. |
+| Stop Conditions | Stop if a portable preset cannot select an x86 compiler through a normal MINGW32 shell, if a clean x64 package build requires untracked inputs, or if a change would alter the user INI/media. |
+| Exit Criteria | A newcomer has concise run/build/test instructions, fresh source package proof passes, no hard-coded developer toolchain path remains, and the complete P is reviewed, pushed and recorded. |
+| Original Owner Request | "如果现在是一个新的用户，直接从 Git 上面下载这个 SoftPC 项目，他能很快地就编译跑通，还是需要一些额外的配置。我希望就是把整个项目的 Quick Start 做起来，可以让人快速地在他自己的电脑上编译并且跑通。" |
+| Similar-Issue Sweep | Search build docs/presets for personal paths, obsolete toolchain variables, stale source-layout names and stale media source paths; retain only current, documented routes. |
 
 M9 T84 S6 is owner-accepted and closed. It closes the admitted product
 host-boundary defects without changing Lib, Common, x86, the Core mirror, user

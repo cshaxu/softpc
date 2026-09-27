@@ -22,7 +22,69 @@ Windows 3.1 Program Manager desktop.
 
 ![Windows 3.1 Program Manager in SoftPC](assets/readme/windows31-desktop.png)
 
-## Build and run
+## Quick start
+
+### Run the bundled package
+
+On 64-bit Windows, clone the repository and run the checked-in package; no
+compiler or extra download is required for this route:
+
+```powershell
+git clone https://github.com/cshaxu/softpc.git
+Set-Location softpc
+.\assets\binary\softpc64.exe
+```
+
+The default adjacent `softpc.ini` safely attaches the bundled Windows 3.1
+image through an in-memory overlay. At the monitor prompt, enter `start` to
+boot it. Do not move the executable away from its adjacent INI, or alter the
+INI merely to try the bundled machine.
+
+### Build from source
+
+The supported source-build environment is the [MSYS2 UCRT64
+shell](https://www.msys2.org/). Install MSYS2, open **MSYS2 UCRT64**, and run:
+
+```sh
+pacman -Syu
+# Restart the UCRT64 shell if MSYS2 asks you to do so, then run:
+pacman -S --needed git mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-cmake
+git clone https://github.com/cshaxu/softpc.git
+cd softpc
+cmake --preset mingw-gcc-x64-release
+cmake --build --preset package-x64 --parallel
+./assets/binary/softpc64.exe
+```
+
+The first command may request that MSYS2 itself be updated and the shell
+restarted before package installation continues. The resulting package is
+still `assets/binary/softpc64.exe`, beside the user-owned `softpc.ini`.
+
+To run the background regression suite instead of launching the VM:
+
+```sh
+cmake --build --preset tests-x64 --parallel
+ctest --preset test-x64
+```
+
+### Optional 32-bit package
+
+Open **MSYS2 MINGW32** rather than UCRT64, install its toolchain and CMake,
+then use the existing x86 presets:
+
+```sh
+pacman -S --needed git mingw-w64-i686-toolchain mingw-w64-i686-cmake
+git clone https://github.com/cshaxu/softpc.git
+cd softpc
+cmake --preset mingw-gcc-x86-release
+cmake --build --preset package-x86 --parallel
+./assets/binary/softpc32.exe
+```
+
+The shell selects the matching GCC through `PATH`; no personal drive path or
+repository-specific toolchain variable is required.
+
+## Build and package details
 
 All generated build state belongs under the repository's single `build/`
 directory.  This includes CMake/Ninja metadata, generated sources, test
@@ -31,8 +93,8 @@ only `assets/binary/`; reusable boot media is in `assets/media/`. The
 selected original ROMs are embedded from
 `src/app-softpc/softpc.new/roms/`; `assets/roms/` does not exist. Do not
 create sibling `build-*` directories or place generated executables at the
-repository root. Build the VM, then set the fixed machine defaults in the
-adjacent `assets/binary/softpc.ini`:
+repository root. The fixed machine defaults are in the adjacent
+`assets/binary/softpc.ini`:
 
 ```text
 cmake --preset mingw-gcc-x64-release
@@ -40,28 +102,18 @@ cmake --build --preset package-x64 --parallel
 assets/binary/softpc64.exe
 ```
 
-The CMake build supports both 32-bit and 64-bit Windows hosts.  A 32-bit
-build requires a real i686 MinGW toolchain (including its Windows import and
-CRT libraries), for example:
-
-```text
-$env:SOFTPC_I686_BIN = "<i686 MinGW bin directory>"
-$env:SOFTPC_I686_GCC = "$env:SOFTPC_I686_BIN/i686-w64-mingw32-gcc.exe"
-cmake --preset mingw-gcc-x86-release
-cmake --build --preset package-x86 --parallel
-```
-
 The x86 configure writes `assets/binary/softpc32.exe`; the native x64
 configure writes `assets/binary/softpc64.exe`. Both use the same adjacent
 `softpc.ini`.
 
 Run a width's complete regression with `cmake --build --preset tests-x64` then
-`ctest --preset test-x64`, or the corresponding `x86` presets after setting
-the two x86 toolchain variables. The presets validate that the selected
-compiler pointer width and package architecture agree.
+`ctest --preset test-x64`, or the corresponding `x86` presets from the
+matching MSYS2 MINGW32 shell. The presets validate that the selected compiler
+pointer width and package architecture agree.
 
-`softpc.ini` has seven `key=value` keys: `memory_mb`, `floppy`, `hard_disk`,
-`display` (`console` or `window`), `floppy_mode`, and `hard_disk_mode`. Both media keys may be
+`softpc.ini` configures memory, optional floppy/hard-disk media and attachment
+modes, display, Console control, and optional serial/printer endpoints.
+`display` is `console` or `window`. Both media keys may be
 set together, creating fixed `A:` and `C:` slots; the machine boots `A:`
 first, then `C:`. The launchers accept no command-line parameters and always
 load the `softpc.ini` beside themselves; relative image paths are relative to
@@ -123,7 +175,8 @@ presets; see [test execution](docs/design/CODING.md#build-output-layout).
 - `src/app-softpc/machine/` — SoftPC backend adaptation to the existing Common machine contract.
 - `src/app-softpc/product/` — configuration, product CLI/hotkey policy and entity assembly;
   only main consumes the VM public interface.
-- `src/common/` — shared machine executor, session control, UI composition and debug/xasm32.
+- `src/common/` — shared machine executor, session control and UI composition.
+- `src/x86/` — optional shared x86 debugger and assembly/disassembly components.
 - `src/lib/` — shared platform mechanics; unchanged by the app/VM/Compat refactor.
 - `test/unit/`, `test/app-softpc/integration/`, `test/support/` — self-contained unit,
   fixed-package integration, and shared/diagnostic test support respectively.
