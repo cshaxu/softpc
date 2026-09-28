@@ -85,6 +85,76 @@ extern void vga_ac_outb(io_addr port, half_word value);
 extern EVID_WRT_POINTERS c_ev_write_ptr;
 static IU32 writer_offset, writer_value;
 
+static void verify_pointer_update_pixels(void)
+{
+    BITMAPINFO painter = { 0 };
+    void *surface;
+    void *info;
+    const unsigned char *pixels;
+    unsigned long width, height;
+    unsigned char saved_pattern[256];
+    const sys_addr pattern = 0;
+    const unsigned long stride = 64u;
+    long left, top, right, bottom;
+    PALETTEENTRY palette = { 0 };
+
+    painter.bmiHeader.biSize = sizeof(painter.bmiHeader);
+    painter.bmiHeader.biWidth = 64;
+    painter.bmiHeader.biHeight = -48;
+    painter.bmiHeader.biPlanes = 1;
+    painter.bmiHeader.biBitCount = 8;
+    assert(softpc_standalone_dib_bind(&painter));
+    assert(softpc_standalone_dib_surface(&surface, &info, &width, &height));
+    pixels = surface;
+    lib_memory_copy(saved_pattern, EGA_planes + pattern, sizeof(saved_pattern));
+    /* Transparent mask except one white pixel, sufficient to distinguish
+       pointer drawing from its unchanged desktop background. */
+    lib_memory_set(EGA_planes + pattern, 0xff, 128u);
+    lib_memory_set(EGA_planes + pattern + 128u, 0, 128u);
+    EGA_planes[pattern] = 0x7fu;
+    EGA_planes[pattern + 128u] = 0x80u;
+    lib_memory_set(sc.ConsoleBufInfo.lpBitMap, 0x35, stride * height);
+    softpc_standalone_dib_invalidate_all();
+
+    /* Exercise the real V7 callbacks and their enclosing host transaction;
+       checking the buffer before end_update misses the overwrite regression. */
+    host_start_update();
+    (*paint_v7ptr)(pattern, (word)4, (word)5);
+    host_end_update();
+    assert(pixels[5u * stride + 4u] == 0xffu);
+    assert(pixels[5u * stride + 5u] == 0x35u);
+    assert(sc.ConsoleBufInfo.lpBitMap == surface);
+    assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+
+    host_start_update();
+    (*clear_v7ptr)((word)4, (word)5);
+    (*paint_v7ptr)(pattern, (word)8, (word)6);
+    host_end_update();
+    assert(pixels[5u * stride + 4u] == 0x35u);
+    assert(pixels[6u * stride + 8u] == 0xffu);
+    assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    assert(left == 4 && top == 5 && right == 39 && bottom == 37);
+    softpc_standalone_dib_set_palette_entries(&palette, 1);
+    assert(pixels[6u * stride + 8u] == 0xffu);
+
+    /* Standalone callback damage follows the same completion path. */
+    (*clear_v7ptr)((word)8, (word)6);
+    assert(pixels[6u * stride + 8u] == 0x35u);
+    (*paint_v7ptr)(pattern, (word)63, (word)47);
+    assert(pixels[47u * stride + 63u] == 0xffu);
+    (*clear_v7ptr)((word)63, (word)47);
+    assert(pixels[47u * stride + 63u] == 0x35u);
+
+    /* Rebinding invalidates the saved pointer background. */
+    (*paint_v7ptr)(pattern, (word)4, (word)5);
+    assert(softpc_standalone_dib_bind(&painter));
+    lib_memory_set(sc.ConsoleBufInfo.lpBitMap, 0x62, stride * height);
+    softpc_standalone_dib_invalidate_all();
+    (*clear_v7ptr)((word)4, (word)5);
+    assert(pixels[5u * stride + 4u] == 0x62u);
+    lib_memory_copy(EGA_planes + pattern, saved_pattern, sizeof(saved_pattern));
+}
+
 static void capture_byte_write(IU32 offset, IU32 value)
 {
     writer_offset = offset;
@@ -1242,6 +1312,7 @@ int main(void)
     verify_snapshot_video_writes(machine);
     verify_preserved_v7_modes();
     verify_display_stride();
+    verify_pointer_update_pixels();
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     return 0;

@@ -46,6 +46,7 @@ static void verify_mono_dib_translation(void)
     assert(softpc_standalone_dib_surface(&surface, &surface_info, &width, &height));
     assert(surface_info != &info && width == 9u && height == 1u);
     pixels = (const unsigned char *)surface;
+    assert(binding.lpBitMap != surface);
     assert(pixels[0] == 1u && pixels[1] == 0u && pixels[7] == 0u &&
         pixels[8] == 1u);
     assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
@@ -153,6 +154,9 @@ int main(void)
     unsigned long index;
 
     assert(softpc_standalone_dib_init());
+    verify_mono_dib_translation();
+    verify_dib_update_transaction();
+    /* Rebind indexed -> mono -> indexed without losing either contract. */
     verify_mono_dib_translation();
     verify_dib_update_transaction();
     assert(softpc_standalone_text_surface(&surface, &columns, &rows, &stride,

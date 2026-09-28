@@ -17,7 +17,8 @@ int softpc_standalone_dib_surface(const void **bits_out, const void **info_out,
     unsigned long *width_out, unsigned long *height_out);
 /* Bind the DIB allocated by original nt_graph::CreateSpcDIB to standalone
  * pixel storage.  The original header remains the painter contract; a
- * separate 8-bit indexed header is published to the frontend. */
+ * separate 8-bit indexed header is published to the frontend. Indexed writers
+ * share its pixels; packed mono writers use conversion storage. */
 int softpc_standalone_dib_bind(PBITMAPINFO painter_info);
 /* Every host display update uses this one transaction boundary. A bind or
  * damage update remains private until the matching outer end. */

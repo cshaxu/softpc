@@ -107,6 +107,9 @@ static BOOL softpc_standalone_dib_copy_pending(void)
         softpc_dib_painter_bits == NULL || softpc_dib_width == 0u ||
         softpc_dib_height == 0u || softpc_dib_painter_stride == 0u)
         return FALSE;
+    /* Indexed painters and the V7 pointer already share the output surface.
+       Copying a second background over it would erase the composed pointer. */
+    if (softpc_dib_painter_bits_per_pixel == 8u) return TRUE;
     left = softpc_dib_pending_dirty.Left;
     top = softpc_dib_pending_dirty.Top;
     right = softpc_dib_pending_dirty.Right;
@@ -125,12 +128,8 @@ static BOOL softpc_standalone_dib_copy_pending(void)
             (lib_size)row * output_stride;
         for (column = (unsigned long)left; column <= (unsigned long)right;
             ++column) {
-            if (softpc_dib_painter_bits_per_pixel == 1u) {
-                destination[column] = (source[column >> 3u] &
-                    (unsigned char)(0x80u >> (column & 7u))) != 0u ? 1u : 0u;
-            } else {
-                destination[column] = source[column];
-            }
+            destination[column] = (source[column >> 3u] &
+                (unsigned char)(0x80u >> (column & 7u))) != 0u ? 1u : 0u;
         }
     }
     return TRUE;
@@ -211,7 +210,7 @@ int softpc_standalone_dib_init(void)
         textBuffer = (PBYTE)lib_allocate_zero(SOFTPC_TEXT_STORAGE_COLUMNS *
             SOFTPC_TEXT_STORAGE_ROWS, SOFTPC_TEXT_CELL_BYTES);
     if (textBuffer == NULL) return 0;
-    DIBData = (char *)softpc_dib_painter_bits;
+    DIBData = (char *)softpc_dib_bits;
     MonoDIB = softpc_dib_info;
     CGADIB = softpc_dib_info;
     EGADIB = softpc_dib_info;
@@ -248,18 +247,19 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info)
     lib_memory_set(softpc_dib_painter_bits, 0,
         (lib_size)softpc_dib_painter_stride * (lib_size)height);
 
-    sc.ConsoleBufInfo.lpBitMap = softpc_dib_painter_bits;
+    sc.ConsoleBufInfo.lpBitMap = bits_per_pixel == 8 ? softpc_dib_bits :
+        softpc_dib_painter_bits;
     sc.ConsoleBufInfo.lpBitMapInfo = painter_info;
     sc.ConsoleBufInfo.dwUsage = DIB_PAL_COLORS;
     /* nt_ega.c/nt_vga.c retain the original console-buffer guard before
        writing a dirty rectangle.  In the detached host the DIB allocation is
        the buffer; preserve a non-NULL identity for that guard instead of
        accidentally making every original paint request a no-op. */
-    sc.ScreenBufHandle = (HANDLE)softpc_dib_painter_bits;
+    sc.ScreenBufHandle = (HANDLE)sc.ConsoleBufInfo.lpBitMap;
     sc.ActiveOutputBufferHandle = sc.ScreenBufHandle;
-    sc.BitmapLastLine = (char *)softpc_dib_painter_bits +
+    DIBData = (char *)sc.ConsoleBufInfo.lpBitMap;
+    sc.BitmapLastLine = DIBData +
         ((lib_size)height - 1u) * softpc_dib_painter_stride;
-    DIBData = (char *)softpc_dib_painter_bits;
     MonoDIB = painter_info;
     CGADIB = painter_info;
     EGADIB = painter_info;

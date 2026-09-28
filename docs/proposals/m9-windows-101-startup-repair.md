@@ -209,3 +209,81 @@ The owner reports successful testing and approves S1 closure on 2026-09-28.
 [S1 closure](../history/M9-T85-S1-windows-101-startup-repair.md) records the
 whole-S accounting and accepted evidence. T85 remains open without an active S;
 this proposal is retained until separate task-level closure.
+
+## S2: indexed DIB pointer regression
+
+Owner reports the repository Win3.1 image has no visible mouse pointer. A
+headless reproduction confirms consumed InPort movement but no cursor pixels.
+S1 P1 split painter and published buffers for every format; the V7 compositor
+still writes the published indexed buffer, which end_update then overwrites.
+S1's click-response proof did not verify pointer visibility and missed this.
+
+Keep the original single indexed surface for 8-bit painters and V7 composition.
+Only packed 1-bit input needs a distinct conversion buffer. Select storage by
+the existing pixel format at bind, not OS identity; skip conversion when source
+is already indexed. No extra cursor cache, redraw loop, API or device change.
+Expected production scope: dib_surface.c and its private header comment,
+roughly +15--30/-15--30; product test additions roughly 80--130 lines.
+
+Finite ledger: indexed writer aliasing; pointer paint/move/clear at actual
+update completion; palette-only preservation; mono translation and mono/indexed
+rebind; headless Win3.1 visible movement; Win1.01 retained mono; dual builds and
+background regression. Each must have recorded proof before delivery. Scan
+DIBData, lpBitMap and published-surface users for the same ownership defect.
+No change to the InPort repair, shared corpus, original mirror or snapshot ABI.
+S2 remains open until owner acceptance after complete pushed delivery.
+
+### S2 implementation and proof
+
+The regression is introduced by S1 P1 `fc74d65e`, not the subsequent InPort
+repair. A red test invoking the actual V7 paint callback inside the real
+host_start_update/host_end_update pair fails after completion: its white
+pointer pixel is overwritten. The same test passes with indexed storage
+restored to a single surface. No pointer redraw/cache or callback change is
+needed. Conversion remains only for the packed mono format.
+
+Counted C/H changes against `aa719ce5`: dib_surface.c +11/-11;
+dib_surface.h +2/-1; vga_frame_smoke.c +71/-0;
+text_console_compat_smoke.c +4/-0. Production +13/-12 (net +1), tests
++75/-0 (net +75), combined +88/-12 (net +76). The allocation count, device
+state, snapshot layout and public APIs are unchanged.
+
+Focused proof covers pointer appearance after completed update, move/old-area
+restoration, hide, bottom/right clipping, palette-only update, generation
+invalidation on rebind, and indexed/mono/indexed format switches. Both widths
+pass the four focused DIB/VGA/mouse/checkpoint tests. Actual headless Win3.1
+frames on x64 and x86 visibly contain the moved arrow; InPort mode 09h and
+latched movement confirm the original guest-input path. Win1.01 x64 retains
+its 640x400 mono desktop and visible arrow. These are copied-frame observations,
+not a claim of new native capture/RDP testing.
+
+Similar-issue sweep command:
+`rg -l 'softpc_standalone_dib_surface|DIBData|ConsoleBufInfo.lpBitMap' src/app-softpc --glob '*.c'`.
+All eight production files are accounted for: dib_surface.c selects/owns
+storage; graphics_console_compat.c hands out that selected pointer; original
+nt_graph.c/nt_cga.c/nt_ega.c/nt_vga.c draw through the bound native bitmap;
+v7_pointer.c composites the indexed surface; machine.c only reads it for
+publication. Indexed painters and compositor now target the same pixels.
+Mono retains the original packed writer plus one conversion at update end.
+No owner bypass or guest-version condition is introduced. Regression tests
+permanently exercise the shared-writer invariant and completion, rather than
+only inspecting memory before the point where the defect occurred.
+
+Built delivery candidates: x86 SHA-256
+`B13CD6242C69B479609F61EA1E4DCCDAD6A956BD65812DF511E72E6093956DDF`;
+x64 SHA-256
+`A3D6DAD0702FFDF9E11D71ADEC7D149BA70865D18B775D107B455636476D123F`.
+Owner acceptance is pending; this is not S2 or T85 closure.
+
+Final serial background regression passes x64 121/121 (163.92s) and x86
+121/121 (135.71s), including snapshot tests and shared manifests/ownership
+gates. Five native desktop cases per width remain excluded. Both Release
+EXEs are rebuilt; the external x64 copy is hash-identical. Whitespace and
+documentation governance pass. Four disposable S2/recheck media copies are
+removed after probe exit; bounded logs/captures remain for pending acceptance.
+User INI, repository media and the accepted external guest installation are
+unchanged. An initial x64 link was blocked by the running test EXE; only that
+identified process was stopped under standing owner authorization and the
+complete build then passed. Scratch x86 probe linking used the actual generated
+x86 toolchain after correcting an initial PATH/compiler-selection mismatch;
+no product build configuration was changed.
