@@ -31,7 +31,26 @@ build, real 32-bit MinGW configuration, marker sweep, whitespace and
 documentation governance. No product source, INI, media, snapshot or package
 EXE change is retained. [S11 closure](../history/M9-T84-S11-quick-start-closure.md).
 
-No implementation subtask is active. Open task awaiting owner: T84.
+## M9 T84 S12 Packet
+
+| Field | Required record |
+|---|---|
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approves importing the committed NXVM orphan-release shared Lib fix. |
+| Objective | Synchronize the source-local unmatched-release contract: consume it without delivery or pending-key replay. |
+| Non-goals | No new state/API/event, Common/App/Core/product-policy change, INI/media/snapshot/package configuration change, or independent SoftPC behavior branch. |
+| Reference Baseline | SoftPC `e5952875`; read-only NXVM `572293efc`, clean worktree. |
+| Candidate Proposal | [NXVM source-local orphan-release import](../proposals/m9-t84-s12-nxvm-orphan-release-import.md). |
+| Files And ABI Surface | Exact five shared files named in the proposal plus task documentation; public API/ABI unchanged. |
+| Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, `DOCUMENT.md`; shared corpus remains NXVM-identical. |
+| Verification | Exact Lib/Test corpus comparison; focused lifetime smoke; x64/x86 Release packages and serial background CTest; manifests, Lib DAG, documentation and whitespace gates. |
+| Expected Markers | `hotkey.c` consumes unmatched break without sink call; test proves no replay and both native input adapters; manifests match NXVM. |
+| Asset Needs | None. Builds may refresh package EXEs only; user INI and guest media are untouched. |
+| Reporting Requirements | Report actual production/test +/−/net lines, changed paths, exact-corpus result, dual-width build/test evidence and EXE hashes. |
+| Stop Conditions | Stop if the selected five paths no longer match a clean committed NXVM baseline, an API/state expansion is needed, or compilation reveals a non-shared product dependency. |
+| Exit Criteria | Exact import, all named validation passes, complete P is pushed, and owner receives delivery report for acceptance. |
+| Original Owner Request | "可以了 准入s任务导入！" |
+| Similar-Issue Sweep | Confirm every unmatched-release dispatch shares the one matcher transition; verify both Window and Console adapters use it, rather than adding leaf-local drops. |
 
 M9 T84 S6 is owner-accepted and closed. It closes the admitted product
 host-boundary defects without changing Lib, Common, x86, the Core mirror, user
