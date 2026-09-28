@@ -293,4 +293,7 @@ diff confirms the four C/H changes and counts above, two evidence/status
 documents and two EXEs. Format selection occurs once at the existing binding;
 the V7 writer stays unchanged and mono conversion remains covered. The shared
 six roots, original mirror, repository media and INI compare unchanged against
-`aa719ce5`. S2 is delivered for owner testing, not closed.
+`aa719ce5`. This was the delivery checkpoint before owner testing.
+
+Owner accepts and closes S2 on 2026-09-28; see the
+[S2 closure](../history/M9-T85-S2-indexed-pointer-repair.md). T85 remains open.

@@ -55,35 +55,14 @@ the separately authorized, backed-up test-HDD replacement.
 [S1 closure](../history/M9-T85-S1-windows-101-startup-repair.md) records the
 whole-S path counts, acceptance, retained artifacts and verification limits.
 
-## M9 T85 S2 Packet
+No implementation subtask is active. Open task awaiting owner: T85.
 
-| Field | Required record |
-|---|---|
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner admits S2 to repair the reproduced Win3.1 invisible-pointer regression, build/test/commit/push and await manual acceptance. |
-| Objective | Preserve V7 pointer pixels through the Compat display update while retaining S1 mono translation. |
-| Non-goals | No guest-version detection, InPort change, original-mirror edit, shared-corpus change, snapshot-format change or user-media/configuration mutation. |
-| Reference Baseline | Accepted S1 closure aa719ce5; repository-installed Win3.1 image and verified Win1.01 disposable installation. |
-| Candidate Proposal | [Windows 1.01 startup diagnosis and repair](../proposals/m9-windows-101-startup-repair.md). |
-| Files And ABI Surface | Compat DIB storage/binding and private contract comments; existing product DIB regression test. No new public API. |
-| Applicable Rules | Execution, Architecture, Coding and Document rules; design/CODING.md, ARCHITECTURE.md and UI.md. |
-| Verification | Red/green real pointer-callback pixel assertions; mono/indexed rebind and update tests; headless real guests; Release x64/x86 builds and serial background suites; docs/whitespace/ownership gates. |
-| Expected Markers | Indexed painters and V7 compositor share storage; mono source remains distinct; completed output retains pointer, move clears old pixels, hide restores background. |
-| Asset Needs | Use disposable media/probes in ignored build/t85-inport; per-run five-minute/16-MiB trace budget; executor stops owned processes. Refresh both package EXEs and the previously authorized external x64 copy only. |
-| Reporting Requirements | Before/after C/H counts, actual changed paths, causal evidence, tests and EXE hashes; wait for owner verification. |
-| Stop Conditions | Broader device/shared API change or need to modify guest media/configuration requires separate approval. |
-| Exit Criteria | Win3.1 pointer is visibly present and moves; Win1.01 mono still works; regression green, complete P pushed, worktree clean, owner acceptance pending. |
-| Original Owner Request | "转入一个S2…专门修复这个…编译测试提交推送等待我验证". |
-| Similar-Issue Sweep | Inspect all DIBData/native bitmap/published-surface writers and update callers; prove no writer targets storage overwritten by a later same-format copy. |
-
-S2 P1 `8c15e893` is pushed and actual-change reviewed, awaiting owner acceptance.
-Only Compat DIB binding/conversion and product tests change: production
-+13/-12 (net +1), tests +75/-0. A new real V7 callback test fails on S1 and
-passes after repair. Headless Win3.1 x86/x64 published frames visibly retain
-the moved pointer; Win1.01 x64 mono rendering still works. Release builds and
-serial background suites pass 121/121 per width; desktop cases are excluded.
-Both package EXEs and the external x64 copy are refreshed; no user media,
-INI, shared corpus, original mirror or snapshot ABI changes. S2/T85 stay open.
+M9 T85 S2 is owner-accepted and closed on 2026-09-28. P1 `8c15e893`
+repairs indexed DIB ownership; P2 `f8fe3df8` records actual-change review.
+Both Release builds and serial background suites pass 121/121 per width.
+The owner accepts the mouse regression repair. T85 remains open; the next
+Windows 1.01 color question is read-only investigation, not implementation.
+[S2 closure](../history/M9-T85-S2-indexed-pointer-repair.md).
 
 M9 T84 S6 is owner-accepted and closed. It closes the admitted product
 host-boundary defects without changing Lib, Common, x86, the Core mirror, user
