@@ -43,7 +43,26 @@ output/input correctness and fresh-checkout usability. The task-level ledger
 and retained boundary/deferral dispositions are in the
 [T84 completion audit](../history/M9-T84-completion-audit.md).
 
-No implementation subtask is active.
+## M9 T85 S1 Packet
+
+| Field | Required record |
+|---|---|
+| Identifier Mode | New |
+| Admission And Approval | Owner admits a new task to investigate and repair Windows 1.01 startup using the supplied Win95 asset directory. |
+| Objective | Locate and repair the first causal contract failure that prevents `win` from reaching an interactive Windows 1.01 session. |
+| Non-goals | No guest-version-specific branch, user INI/HDD/snapshot mutation, speculative Core rewrite, or Lib/Common/x86 change without new approval. |
+| Reference Baseline | SoftPC `4a6aca27`; supplied read-only reproduction inputs `O:\assets\softpc-win95\softpc.ini` and `hdd.img`. |
+| Candidate Proposal | [Windows 1.01 startup diagnosis and repair](../proposals/m9-windows-101-startup-repair.md). |
+| Files And ABI Surface | Initial diagnosis is documentation/build-scratch only. A later causal repair is limited to its proven owner; public ABI is unchanged unless separately approved. |
+| Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, `DOCUMENT.md`, and `docs/design/UI.md`. |
+| Verification | Disposable reproduction, bounded causal evidence, focused owner test, dual Release builds, serial background x64/x86 CTest, docs/whitespace/applicable mirror gates. |
+| Expected Markers | Reproducer retains supplied media; trace identifies a first failed owner boundary; no Windows-1.01 policy string or product branch appears. |
+| Asset Needs | Read supplied asset inputs only. Any disposable overlay/copy is under `build/`; after each repair refresh standard dual EXEs and copy x64 to `O:\assets\softpc-win95\softpc64.exe`. |
+| Reporting Requirements | Report repro result, observed causal chain, ownership choice, actual C/H +/−/net counts, changed paths, test evidence, and all three EXE hashes/copy status. |
+| Stop Conditions | Stop for owner direction if evidence requires guest-specific behavior, a functional mirror diff, Lib/Common/x86 API change, or cannot distinguish hang from expected guest work within the bounded trace. |
+| Exit Criteria | Reproducible interactive Windows 1.01 startup, causal owner-local repair, dual-width validation, refreshed package/copy deliverables, pushed P and owner delivery report. |
+| Original Owner Request | "调查和修复为什么无法启动 windows 1.01" with the specified asset-directory test and build-copy requirement. |
+| Similar-Issue Sweep | After identifying the failed contract, inspect all uses of that owner-local transition for the same invalid assumption and cover each disposition in focused proof. |
 
 M9 T84 S6 is owner-accepted and closed. It closes the admitted product
 host-boundary defects without changing Lib, Common, x86, the Core mirror, user

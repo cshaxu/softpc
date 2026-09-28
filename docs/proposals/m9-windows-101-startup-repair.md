@@ -53,6 +53,28 @@ not a tracked repository asset; no supplied INI or media is rewritten.
 - Verify `git diff --check`, documentation governance, and every applicable
   component/mirror gate.
 
+## S1 diagnosis and owner-local repair
+
+The bounded Windows 1.01 run identified the first failed contract at the
+Compat DIB handoff.  The original mono painter creates a `640x400x1` DIB;
+the detached Compat buffer accepted only 8-bit painters and therefore left
+the KVM Window with its initial blank surface.  This is a general source
+pixel-format mismatch, not a Windows-version policy.
+
+S1 retains the original painter header and gives it source-format staging
+storage.  Compat publishes its existing 8-bit indexed surface after
+translating the completed dirty rectangle from the original 1-bit packed
+pixels.  The original Core remains unmodified, and the established 8-bit
+painters retain their direct byte-copy path.  The focused proof includes a
+9-pixel mono row, verifying the first bit of a second source byte as well as
+the published dirty rectangle.
+
+The disposable normal-process probe starts the supplied configuration, sends
+`start` and `win` through the real Console, and captures the KVM Window.
+It reached the interactive MS-DOS Executive at a 640x400 client size.  The
+probe, trace, copied media and capture remain only under `build/` and are not
+repository inputs.
+
 ## Completion condition
 
 The original repro reaches an observable interactive Windows 1.01 state using

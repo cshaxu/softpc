@@ -25,8 +25,11 @@
 
 static BITMAPINFO *softpc_dib_info;
 static unsigned char *softpc_dib_bits;
+static unsigned char *softpc_dib_painter_bits;
 static unsigned long softpc_dib_width;
 static unsigned long softpc_dib_height;
+static unsigned long softpc_dib_painter_stride;
+static unsigned long softpc_dib_painter_bits_per_pixel;
 static SMALL_RECT softpc_dib_dirty;
 static int softpc_dib_dirty_valid;
 static SMALL_RECT softpc_dib_pending_dirty;
@@ -48,6 +51,8 @@ static void softpc_standalone_dib_set_default_geometry(void)
     softpc_dib_info->bmiHeader.biClrUsed = SOFTPC_DIB_COLOURS;
     softpc_dib_width = SOFTPC_DIB_MAX_WIDTH;
     softpc_dib_height = SOFTPC_DIB_MAX_HEIGHT;
+    softpc_dib_painter_stride = SOFTPC_DIB_MAX_WIDTH;
+    softpc_dib_painter_bits_per_pixel = 8u;
 }
 
 static void softpc_standalone_dib_record_palette(void)
@@ -89,6 +94,48 @@ static BOOL softpc_standalone_dib_merge(SMALL_RECT *target, int *valid,
     return TRUE;
 }
 
+static BOOL softpc_standalone_dib_copy_pending(void)
+{
+    long left;
+    long top;
+    long right;
+    long bottom;
+    unsigned long output_stride;
+    long row;
+
+    if (!softpc_dib_pending_dirty_valid || softpc_dib_bits == NULL ||
+        softpc_dib_painter_bits == NULL || softpc_dib_width == 0u ||
+        softpc_dib_height == 0u || softpc_dib_painter_stride == 0u)
+        return FALSE;
+    left = softpc_dib_pending_dirty.Left;
+    top = softpc_dib_pending_dirty.Top;
+    right = softpc_dib_pending_dirty.Right;
+    bottom = softpc_dib_pending_dirty.Bottom;
+    if (left < 0) left = 0;
+    if (top < 0) top = 0;
+    if (right >= (long)softpc_dib_width) right = (long)softpc_dib_width - 1;
+    if (bottom >= (long)softpc_dib_height) bottom = (long)softpc_dib_height - 1;
+    if (right < left || bottom < top) return FALSE;
+    output_stride = (softpc_dib_width + 3u) & ~3u;
+    for (row = top; row <= bottom; ++row) {
+        unsigned long column;
+        const unsigned char *source = softpc_dib_painter_bits +
+            (lib_size)row * softpc_dib_painter_stride;
+        unsigned char *destination = softpc_dib_bits +
+            (lib_size)row * output_stride;
+        for (column = (unsigned long)left; column <= (unsigned long)right;
+            ++column) {
+            if (softpc_dib_painter_bits_per_pixel == 1u) {
+                destination[column] = (source[column >> 3u] &
+                    (unsigned char)(0x80u >> (column & 7u))) != 0u ? 1u : 0u;
+            } else {
+                destination[column] = source[column];
+            }
+        }
+    }
+    return TRUE;
+}
+
 /* In the original Win32 host, SetPaletteEntries followed by
    SetConsolePalette repaints an indexed console DIB even when its pixel
    bytes have not changed.  The standalone frontend instead publishes a
@@ -125,7 +172,8 @@ int softpc_standalone_dib_init(void)
     lib_size bitmap_bytes;
 
     if (softpc_dib_bits != NULL) {
-        if (softpc_dib_info == NULL || textBuffer == NULL) return 0;
+        if (softpc_dib_info == NULL || softpc_dib_painter_bits == NULL ||
+            textBuffer == NULL) return 0;
         if (softpc_dib_width == 0u || softpc_dib_height == 0u)
             softpc_standalone_dib_set_default_geometry();
         return 1;
@@ -135,11 +183,16 @@ int softpc_standalone_dib_init(void)
     bitmap_bytes = SOFTPC_DIB_MAX_WIDTH * SOFTPC_DIB_MAX_HEIGHT;
     softpc_dib_info = (BITMAPINFO *)lib_allocate_zero(1u, info_bytes);
     softpc_dib_bits = (unsigned char *)lib_allocate_zero(1u, bitmap_bytes);
-    if (softpc_dib_info == NULL || softpc_dib_bits == NULL) {
+    softpc_dib_painter_bits = (unsigned char *)lib_allocate_zero(1u,
+        bitmap_bytes);
+    if (softpc_dib_info == NULL || softpc_dib_bits == NULL ||
+        softpc_dib_painter_bits == NULL) {
         lib_release(softpc_dib_info);
         lib_release(softpc_dib_bits);
+        lib_release(softpc_dib_painter_bits);
         softpc_dib_info = NULL;
         softpc_dib_bits = NULL;
+        softpc_dib_painter_bits = NULL;
         return 0;
     }
     softpc_standalone_dib_set_default_geometry();
@@ -158,7 +211,7 @@ int softpc_standalone_dib_init(void)
         textBuffer = (PBYTE)lib_allocate_zero(SOFTPC_TEXT_STORAGE_COLUMNS *
             SOFTPC_TEXT_STORAGE_ROWS, SOFTPC_TEXT_CELL_BYTES);
     if (textBuffer == NULL) return 0;
-    DIBData = (char *)softpc_dib_bits;
+    DIBData = (char *)softpc_dib_painter_bits;
     MonoDIB = softpc_dib_info;
     CGADIB = softpc_dib_info;
     EGADIB = softpc_dib_info;
@@ -178,29 +231,35 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info)
     if (height < 0) height = -height;
     bits_per_pixel = (int)painter_info->bmiHeader.biBitCount;
     if (width <= 0 || height <= 0 || width > (int)SOFTPC_DIB_MAX_WIDTH ||
-        height > (int)SOFTPC_DIB_MAX_HEIGHT || bits_per_pixel != 8) return 0;
+        height > (int)SOFTPC_DIB_MAX_HEIGHT || (bits_per_pixel != 1 &&
+        bits_per_pixel != 8)) return 0;
 
     softpc_dib_info->bmiHeader.biWidth = width;
     softpc_dib_info->bmiHeader.biHeight = -height;
-    softpc_dib_info->bmiHeader.biBitCount = (WORD)bits_per_pixel;
+    softpc_dib_info->bmiHeader.biBitCount = 8;
     softpc_dib_info->bmiHeader.biSizeImage =
         (DWORD)(((unsigned long)width + 3u) & ~3u) * (DWORD)height;
     softpc_dib_width = (unsigned long)width;
     softpc_dib_height = (unsigned long)height;
+    softpc_dib_painter_bits_per_pixel = (unsigned long)bits_per_pixel;
+    softpc_dib_painter_stride = (((unsigned long)width *
+        softpc_dib_painter_bits_per_pixel + 31u) & ~31u) / 8u;
     lib_memory_set(softpc_dib_bits, 0, (lib_size)softpc_dib_info->bmiHeader.biSizeImage);
+    lib_memory_set(softpc_dib_painter_bits, 0,
+        (lib_size)softpc_dib_painter_stride * (lib_size)height);
 
-    sc.ConsoleBufInfo.lpBitMap = softpc_dib_bits;
+    sc.ConsoleBufInfo.lpBitMap = softpc_dib_painter_bits;
     sc.ConsoleBufInfo.lpBitMapInfo = painter_info;
     sc.ConsoleBufInfo.dwUsage = DIB_PAL_COLORS;
     /* nt_ega.c/nt_vga.c retain the original console-buffer guard before
        writing a dirty rectangle.  In the detached host the DIB allocation is
        the buffer; preserve a non-NULL identity for that guard instead of
        accidentally making every original paint request a no-op. */
-    sc.ScreenBufHandle = (HANDLE)softpc_dib_bits;
+    sc.ScreenBufHandle = (HANDLE)softpc_dib_painter_bits;
     sc.ActiveOutputBufferHandle = sc.ScreenBufHandle;
-    sc.BitmapLastLine = (char *)softpc_dib_bits +
-        ((lib_size)height - 1u) * (((lib_size)width + 3u) & ~(lib_size)3u);
-    DIBData = (char *)softpc_dib_bits;
+    sc.BitmapLastLine = (char *)softpc_dib_painter_bits +
+        ((lib_size)height - 1u) * softpc_dib_painter_stride;
+    DIBData = (char *)softpc_dib_painter_bits;
     MonoDIB = painter_info;
     CGADIB = painter_info;
     EGADIB = painter_info;
@@ -234,6 +293,10 @@ void softpc_standalone_dib_end_update(void)
     --softpc_dib_update_depth;
     if (softpc_dib_update_depth != 0u || !softpc_dib_pending_dirty_valid)
         return;
+    if (!softpc_standalone_dib_copy_pending()) {
+        softpc_dib_pending_dirty_valid = 0;
+        return;
+    }
     /* The frame consumer may not have observed the preceding completed
        update yet.  Keep its damage too: the DIB contains the latest pixels,
        while this rectangle describes every changed part of that latest

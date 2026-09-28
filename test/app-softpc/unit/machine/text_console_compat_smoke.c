@@ -18,6 +18,40 @@ static unsigned char attribute_at(const unsigned char *cells,
     return cells[(row * stride + column) * cell_bytes + 1u];
 }
 
+static void verify_mono_dib_translation(void)
+{
+    BITMAPINFO info = { 0 };
+    CONSOLE_GRAPHICS_BUFFER_INFO binding = { 0 };
+    SMALL_RECT rect = { 0, 0, 8, 0 };
+    const void *surface;
+    const void *surface_info;
+    const unsigned char *pixels;
+    unsigned long width;
+    unsigned long height;
+    long left;
+    long top;
+    long right;
+    long bottom;
+
+    info.bmiHeader.biSize = sizeof(info.bmiHeader);
+    info.bmiHeader.biWidth = 9;
+    info.bmiHeader.biHeight = -1;
+    info.bmiHeader.biPlanes = 1;
+    info.bmiHeader.biBitCount = 1;
+    binding.lpBitMapInfo = &info;
+    assert(softpc_compat_create_graphics_buffer(&binding) != INVALID_HANDLE_VALUE);
+    ((unsigned char *)binding.lpBitMap)[0] = 0x80u;
+    ((unsigned char *)binding.lpBitMap)[1] = 0x80u;
+    assert(softpc_standalone_dib_damage(&rect));
+    assert(softpc_standalone_dib_surface(&surface, &surface_info, &width, &height));
+    assert(surface_info != &info && width == 9u && height == 1u);
+    pixels = (const unsigned char *)surface;
+    assert(pixels[0] == 1u && pixels[1] == 0u && pixels[7] == 0u &&
+        pixels[8] == 1u);
+    assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    assert(left == 0 && top == 0 && right == 8 && bottom == 0);
+}
+
 static void verify_dib_update_transaction(void)
 {
     BITMAPINFO info;
@@ -119,6 +153,7 @@ int main(void)
     unsigned long index;
 
     assert(softpc_standalone_dib_init());
+    verify_mono_dib_translation();
     verify_dib_update_transaction();
     assert(softpc_standalone_text_surface(&surface, &columns, &rows, &stride,
         &cell_bytes));
