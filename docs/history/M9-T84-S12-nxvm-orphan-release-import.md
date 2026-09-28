@@ -1,4 +1,7 @@
-# NXVM source-local orphan-release import
+# M9 T84 S12 — NXVM source-local orphan-release import
+
+The owner accepted S12 on 2026-09-27. Executor P1 `b8c0f5fb` is pushed to
+`origin/main`; this record retains its admitted scope and verification.
 
 ## Objective
 
