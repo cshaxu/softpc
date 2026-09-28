@@ -43,35 +43,19 @@ output/input correctness and fresh-checkout usability. The task-level ledger
 and retained boundary/deferral dispositions are in the
 [T84 completion audit](../history/M9-T84-completion-audit.md).
 
-## M9 T85 S1 Packet
+## T85 Awaiting Owner Direction
 
-| Field | Required record |
-|---|---|
-| Identifier Mode | New |
-| Admission And Approval | Owner admits Windows 1.01 startup repair and explicitly extends S1 to faithful, minimal InPort device repair and locating a compatible Windows 1.01 driver. |
-| Objective | Locate and repair the first causal contract failure that prevents `win` from reaching an interactive Windows 1.01 session. |
-| Non-goals | No guest-version-specific branch, user INI/HDD/snapshot mutation, speculative Core rewrite, or Lib/Common/x86 change without new approval. |
-| Reference Baseline | SoftPC `4a6aca27`; supplied read-only reproduction inputs `O:\assets\softpc-win95\softpc.ini` and `hdd.img`. |
-| Candidate Proposal | [Windows 1.01 startup diagnosis and repair](../proposals/m9-windows-101-startup-repair.md). |
-| Files And ABI Surface | Delivered Compat mono surface repair; approved follow-up at original mouse.c, existing quick-event/snapshot contracts and product tests. No shared component change or second device implementation. |
-| Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, `DOCUMENT.md`, and `docs/design/UI.md`. |
-| Verification | Disposable reproduction, bounded causal evidence, focused owner test, dual Release builds, serial background x64/x86 CTest, docs/whitespace/applicable mirror gates. |
-| Expected Markers | Reproducer retains supplied media; trace identifies a first failed owner boundary; no Windows-1.01 policy string or product branch appears. |
-| Asset Needs | Read supplied asset inputs only. Any disposable overlay/copy is under `build/`; after each repair refresh standard dual EXEs and copy x64 to `O:\assets\softpc-win95\softpc64.exe`. |
-| Reporting Requirements | Report repro result, observed causal chain, ownership choice, actual C/H +/−/net counts, changed paths, test evidence, and all three EXE hashes/copy status. |
-| Stop Conditions | Stop for guest-specific behavior, mirror changes beyond the explicitly approved InPort owner, shared API changes, or unverified third-party redistribution. Driver research/testing is isolated and does not modify supplied media. |
-| Exit Criteria | Reproducible interactive Windows 1.01 startup, causal owner-local repair, dual-width validation, refreshed package/copy deliverables, pushed P and owner delivery report. |
-| Original Owner Request | "调查和修复为什么无法启动 windows 1.01"; follow-up: "我要求正确修复我们的inport模拟硬件 但不得过度复杂化 尽可能贴合softpc原始代码实现" and "你帮我找到鼠标驱动 配合修正的鼠标模拟以及win101". |
-| Similar-Issue Sweep | After identifying the failed contract, inspect all uses of that owner-local transition for the same invalid assumption and cover each disposition in focused proof. |
+M9 T85 S1 is owner-accepted and closed on 2026-09-28. P1 `fc74d65e`
+repairs mono-painter publication; P2 `ee62ad01` repairs InPort scheduling and
+snapshot ownership; P3 `9d102563` records delivery review. Both Release
+packages and background suites pass 121/121 per width; cross-width snapshot
+tests pass. The owner accepts the updated-driver guest installation after
+the separately authorized, backed-up test-HDD replacement.
 
-S1 InPort follow-up is delivered in pushed P2 `ee62ad01`. Real updated-driver
-Windows 1.01 movement/click and Windows 3.1 menu input have been observed in
-disposable headless probes; both final background suites pass 121/121. The repair
-adds real timer state to the device archive and changes its wire layout. Owner
-explicitly approves the new format without old-snapshot compatibility. Both EXEs
-are built and the external x64 EXE is refreshed. The proposal records exact
-driver provenance, test limits, hashes and final +/- counts. S1 and T85 remain
-open for delivery review and owner acceptance; no closure is claimed.
+No implementation subtask is active. Open task awaiting owner: T85.
+No S2 is admitted.
+[S1 closure](../history/M9-T85-S1-windows-101-startup-repair.md) records the
+whole-S path counts, acceptance, retained artifacts and verification limits.
 
 M9 T84 S6 is owner-accepted and closed. It closes the admitted product
 host-boundary defects without changing Lib, Common, x86, the Core mirror, user

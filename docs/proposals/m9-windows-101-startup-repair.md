@@ -177,7 +177,7 @@ x64/external: `9A01E522D40E9FF199133C62990248E516D8133D812F4E6577BA09BCF865130C`
 P2 `ee62ad01` is committed and pushed. Coordinator actual-change review confirms
 the ten-path delivery matches the admitted scope: five product/test C/H files,
 three governance/evidence documents and two EXEs. Shared corpora and user media,
-INI and snapshots are unchanged. S1/T85 stay open for owner acceptance.
+INI and snapshots are unchanged at that delivery checkpoint.
 
 Similar-issue sweep: all `mouse_init` calls remain in the original BIOS reset
 sequence after queue reset; mode writes, input injection, HOLD, device reset
@@ -195,3 +195,17 @@ The original repro reaches an observable interactive Windows 1.01 state using
 the supplied configuration, the repair has one owner and no guest-version
 special case, package/copy deliverables are refreshed, and all admitted
 verification evidence is recorded for owner acceptance.
+
+## S1 owner acceptance
+
+After delivery the owner explicitly requested replacing the external test HDD
+and EXE. The original HDD was backed up before copying the tested updated-driver
+installation; both destination hashes matched their sources. INI and snapshots
+were not modified. This later authorization supersedes the original read-only
+media restriction only for that external test delivery, not repository media
+or third-party redistribution. The updated installation is under C:\WINDOWS.
+
+The owner reports successful testing and approves S1 closure on 2026-09-28.
+[S1 closure](../history/M9-T85-S1-windows-101-startup-repair.md) records the
+whole-S accounting and accepted evidence. T85 remains open without an active S;
+this proposal is retained until separate task-level closure.
