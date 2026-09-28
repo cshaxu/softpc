@@ -287,3 +287,10 @@ identified process was stopped under standing owner authorization and the
 complete build then passed. Scratch x86 probe linking used the actual generated
 x86 toolchain after correcting an initial PATH/compiler-selection mismatch;
 no product build configuration was changed.
+
+P1 `8c15e893` is pushed. Coordinator review of the actual committed eight-path
+diff confirms the four C/H changes and counts above, two evidence/status
+documents and two EXEs. Format selection occurs once at the existing binding;
+the V7 writer stays unchanged and mono conversion remains covered. The shared
+six roots, original mirror, repository media and INI compare unchanged against
+`aa719ce5`. S2 is delivered for owner testing, not closed.

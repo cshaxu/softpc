@@ -76,7 +76,7 @@ whole-S path counts, acceptance, retained artifacts and verification limits.
 | Original Owner Request | "转入一个S2…专门修复这个…编译测试提交推送等待我验证". |
 | Similar-Issue Sweep | Inspect all DIBData/native bitmap/published-surface writers and update callers; prove no writer targets storage overwritten by a later same-format copy. |
 
-S2 is implemented and verified, pending pushed delivery and owner acceptance.
+S2 P1 `8c15e893` is pushed and actual-change reviewed, awaiting owner acceptance.
 Only Compat DIB binding/conversion and product tests change: production
 +13/-12 (net +1), tests +75/-0. A new real V7 callback test fails on S1 and
 passes after repair. Headless Win3.1 x86/x64 published frames visibly retain
