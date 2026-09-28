@@ -64,9 +64,9 @@ and retained boundary/deferral dispositions are in the
 | Original Owner Request | "调查和修复为什么无法启动 windows 1.01"; follow-up: "我要求正确修复我们的inport模拟硬件 但不得过度复杂化 尽可能贴合softpc原始代码实现" and "你帮我找到鼠标驱动 配合修正的鼠标模拟以及win101". |
 | Similar-Issue Sweep | After identifying the failed contract, inspect all uses of that owner-local transition for the same invalid assumption and cover each disposition in focused proof. |
 
-S1 InPort follow-up is implemented and being prepared for P2 delivery. Real updated-driver
+S1 InPort follow-up is delivered in pushed P2 `ee62ad01`. Real updated-driver
 Windows 1.01 movement/click and Windows 3.1 menu input have been observed in
-disposable headless probes; both final background suites pass 121/121. The draft
+disposable headless probes; both final background suites pass 121/121. The repair
 adds real timer state to the device archive and changes its wire layout. Owner
 explicitly approves the new format without old-snapshot compatibility. Both EXEs
 are built and the external x64 EXE is refreshed. The proposal records exact

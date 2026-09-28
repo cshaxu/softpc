@@ -174,7 +174,10 @@ unchanged. Standard dual EXEs are rebuilt; the external
 `O:\assets\softpc-win95\softpc64.exe` matches the x64 package byte-for-byte.
 SHA-256 x86: `1C1D2CA700AE823FC0FDC0DD60A4B364E0E4C16CA24600312D77FBA3A23955C8`;
 x64/external: `9A01E522D40E9FF199133C62990248E516D8133D812F4E6577BA09BCF865130C`.
-Delivery still requires the final P push and owner acceptance; S1/T85 stay open.
+P2 `ee62ad01` is committed and pushed. Coordinator actual-change review confirms
+the ten-path delivery matches the admitted scope: five product/test C/H files,
+three governance/evidence documents and two EXEs. Shared corpora and user media,
+INI and snapshots are unchanged. S1/T85 stay open for owner acceptance.
 
 Similar-issue sweep: all `mouse_init` calls remain in the original BIOS reset
 sequence after queue reset; mode writes, input injection, HOLD, device reset
