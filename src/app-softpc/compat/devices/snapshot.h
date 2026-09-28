@@ -62,7 +62,8 @@ enum {
     SOFTPC_DEVICE_QUEUE_SERIAL_RECEIVE,
     SOFTPC_DEVICE_QUEUE_SERIAL_SEND,
     SOFTPC_DEVICE_QUEUE_PRINTER_OUT,
-    SOFTPC_DEVICE_QUEUE_PRINTER_OUT_ACK
+    SOFTPC_DEVICE_QUEUE_PRINTER_OUT_ACK,
+    SOFTPC_DEVICE_QUEUE_MOUSE_TIMER
 };
 
 /*
@@ -261,8 +262,9 @@ typedef struct softpc_device_inport_mouse_state {
     int32_t delta_x, delta_y;
     uint16_t data_1, data_2, status;
     uint16_t last_button_left, last_button_right;
-    uint16_t mode, address, test_data;
-    int32_t startup_interrupt_bursts, id_toggle, test_state;
+    uint16_t mode, address;
+    uint32_t timer_handle;
+    int32_t id_toggle;
 } softpc_device_inport_mouse_state;
 
 int softpc_device_snapshot_capture_inport_mouse(

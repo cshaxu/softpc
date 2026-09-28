@@ -381,6 +381,8 @@ static void verify_snapshot_archive(void)
     checkpoint_byte_stream image_stream = {0};
     unsigned char readback[2];
     half_word cmos_value;
+    softpc_device_inport_mouse_state mouse_before, mouse_after;
+    softpc_device_pic_state mouse_pic;
 
     assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_write_physical(probe.machine, 0x1004u, directory,
@@ -406,6 +408,10 @@ static void verify_snapshot_archive(void)
     assert(softpc_snapshot_image_capture(&image, &entry) == LIB_STATUS_IO_ERROR);
     assert(event_count == 0u);
     q_event_init();
+    outb(MOUSE_PORT_0, 0x87u);
+    outb(MOUSE_PORT_1, 0x11u);
+    assert(softpc_device_snapshot_capture_inport_mouse(&mouse_before));
+    assert(mouse_before.timer_handle != 0u);
     /* Host drive identity is independent of the empty media archive. CMOS
        is intentionally not its source: this simulates a non-default empty A. */
     assert(softpc_machine_set_floppy(probe.machine, NULL, LIB_STORAGE_MEDIUM_OVERLAY) == SOFTPC_MACHINE_OK);
@@ -464,6 +470,16 @@ static void verify_snapshot_archive(void)
     assert(device_round_trip.byte_count == device_stream.byte_count);
     assert(lib_memory_compare(device_round_trip.bytes, device_stream.bytes,
         device_stream.byte_count) == 0);
+    outb(MOUSE_PORT_0, 0x87u);
+    assert(softpc_device_archive_restore(decoded_devices));
+    assert(softpc_device_snapshot_capture_inport_mouse(&mouse_after));
+    assert(mouse_after.timer_handle == mouse_before.timer_handle);
+    assert(mouse_after.mode == 0x11u);
+    c_cpu_q_ev_set_count(0);
+    dispatch_q_event();
+    assert(softpc_device_snapshot_capture_pic(&mouse_pic));
+    assert(mouse_pic.adapter[1].count[1] == 1);
+    outb(MOUSE_PORT_0, 0x87u);
     softpc_device_archive_dispose(decoded_devices);
     lib_release(device_round_trip.bytes);
     lib_release(device_stream.bytes);
@@ -706,15 +722,13 @@ static void verify_controller_archives(void)
     dispatch_q_event();
     softpc_device_archive_dispose(parallel_archive);
 
-    /* Preserve the original InPort's unconsumed relative motion, selected
-       register and one-shot diagnostic handshake without replaying port I/O.
+    /* Preserve the InPort's held movement and selected register without
+       replaying port I/O.
        The DOS INT 33h driver is deliberately a separate future receiver. */
-    mouse_send(11, -7, 1, 0);
     outb(MOUSE_PORT_0, 0x87u);
+    mouse_send(11, -7, 1, 0);
     outb(MOUSE_PORT_1, 0x30u);
-    outb(MOUSE_PORT_3, 0x91u);
-    outb(MOUSE_PORT_1, 0xa5u);
-    outb(MOUSE_PORT_2, 0x10u);
+    outb(MOUSE_PORT_0, INTERNAL_DATA1_REG);
     lib_memory_set(&mouse_saved, 0, sizeof(mouse_saved));
     assert(softpc_device_snapshot_capture_inport_mouse(&mouse_saved));
     outb(MOUSE_PORT_0, 0x80u);
@@ -723,10 +737,10 @@ static void verify_controller_archives(void)
     lib_memory_set(&mouse_restored, 0, sizeof(mouse_restored));
     assert(softpc_device_snapshot_capture_inport_mouse(&mouse_restored));
     assert(lib_memory_compare(&mouse_restored, &mouse_saved, sizeof(mouse_saved)) == 0);
-    mouse_restored.test_state = 4;
+    mouse_restored.id_toggle = 4;
     assert(!softpc_device_snapshot_restore_inport_mouse(&mouse_restored));
     inb(MOUSE_PORT_1, &value);
-    assert(value == 0xa5u);
+    assert(value == 11u);
 
     /* The DOS INT 33h driver has state distinct from the InPort adapter.
        Prove both its absent state and a restored installed state. */

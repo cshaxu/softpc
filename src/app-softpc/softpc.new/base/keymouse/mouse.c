@@ -61,6 +61,7 @@ static char SccsID[]="@(#)mouse.c	1.17+ 07/10/95 Copyright Insignia Solutions Lt
 #include "trace.h"
 #include "video.h"
 #include "mouse.h"
+#include "quick_ev.h"
 #include "compat/devices/snapshot.h"
 #include "mouse_io.h"
 
@@ -90,19 +91,47 @@ static half_word
                  mouse_mode_reg          = 0, /* mode register 		*/
 		 address_reg       = 0; /* address pointer register	*/
 
-static int
-		loadsainterrupts = 5;
-/* count of how many times we will send bursts of interrupts to please Windows, per reset */
+/* T85: one original quick event models the InPort timer, not driver-specific
+ * interrupt bursts. Device state and scheduling stay with this controller. */
+static q_ev_handle mouse_timer = 0;
 
 
 static int mouse_inb_toggle = 0;
 
-/* Windows 3.1's Microsoft MOUSE.DRV probes an InPort before it enables
- * IRQ9: OUT 23Fh,91h; OUT 23Dh,A5h; OUT 23Eh,10h; IN 23Dh.  The test
- * register affects that one diagnostic transfer only; it must not turn the
- * normal data/mode port into a permanent loopback device. */
-static int mouse_test_state = 0;
-static half_word mouse_test_data = 0;
+LOCAL unsigned long mouse_period IFN0()
+{
+    static const unsigned long periods[] = { 0, 33333, 20000, 10000, 5000 };
+    unsigned int rate = mouse_mode_reg & 7;
+
+    return (mouse_mode_reg & 0x10) && rate <= 4 ? periods[rate] : 0;
+}
+
+LOCAL void mouse_timer_tick IFN1(long, unused)
+{
+    unsigned long period = mouse_period();
+
+    UNUSED(unused);
+    mouse_timer = 0;
+    if (period == 0) return;
+    if (!(mouse_mode_reg & HOLD))
+        ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT, 1);
+    mouse_timer = add_q_event_t(mouse_timer_tick, period, 0);
+}
+
+int softpc_device_snapshot_encode_mouse_callback(callback, callback_id)
+Q_CALLBACK_FN callback;
+unsigned long *callback_id;
+{
+    if (callback != mouse_timer_tick || callback_id == NULL) return FALSE;
+    *callback_id = SOFTPC_DEVICE_QUEUE_MOUSE_TIMER;
+    return TRUE;
+}
+
+Q_CALLBACK_FN softpc_device_snapshot_decode_mouse_callback(callback_id)
+unsigned long callback_id;
+{
+    return callback_id == SOFTPC_DEVICE_QUEUE_MOUSE_TIMER ? mouse_timer_tick : NULL;
+}
 
 int
 softpc_device_snapshot_capture_inport_mouse(state)
@@ -120,10 +149,8 @@ softpc_device_inport_mouse_state *state;
     state->last_button_right = last_button_right;
     state->mode = mouse_mode_reg;
     state->address = address_reg;
-    state->test_data = mouse_test_data;
-    state->startup_interrupt_bursts = loadsainterrupts;
+    state->timer_handle = (uint32_t)mouse_timer;
     state->id_toggle = mouse_inb_toggle;
-    state->test_state = mouse_test_state;
     return TRUE;
 }
 
@@ -138,9 +165,8 @@ const softpc_device_inport_mouse_state *state;
         (state->last_button_right != 0 && state->last_button_right != 1) ||
         state->delta_x < -128 || state->delta_x > 127 ||
         state->delta_y < -128 || state->delta_y > 127 ||
-        state->startup_interrupt_bursts < 0 ||
-        (state->id_toggle != 0 && state->id_toggle != 1) ||
-        state->test_state < 0 || state->test_state > 3)
+        state->timer_handle >= 0xffff ||
+        (state->id_toggle != 0 && state->id_toggle != 1))
         return FALSE;
     button_left = state->button_left;
     button_right = state->button_right;
@@ -153,21 +179,15 @@ const softpc_device_inport_mouse_state *state;
     last_button_right = state->last_button_right;
     mouse_mode_reg = state->mode;
     address_reg = state->address;
-    mouse_test_data = state->test_data;
-    loadsainterrupts = state->startup_interrupt_bursts;
+    mouse_timer = state->timer_handle;
     mouse_inb_toggle = state->id_toggle;
-    mouse_test_state = state->test_state;
     return TRUE;
 }
 
 void mouse_inb IFN2(io_addr, port, half_word *, value)
 {
+    *value = 0xff;
     if (port == MOUSE_PORT_1) {		/* data register */
-	if (mouse_test_state == 3) {
-	    *value = mouse_test_data;
-	    mouse_test_state = 0;
-	    return;
-	}
 
 	/*
 	 * Internal registers
@@ -239,12 +259,6 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 	 */
 
 	if (port == MOUSE_PORT_1) {	/* data register */
-		if (mouse_test_state == 1) {
-			mouse_test_data = value;
-			mouse_test_state = 2;
-			return;
-		}
-
 		/*
 		 * Out to Mode register
 		 */
@@ -314,43 +328,10 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 				ica_clear_int(AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT);
 				break;
 
-	/*
-	 * In the following cases the application code is expecting to see
-	 * interrupts at the requested rate. However in practice this is only
-	 * required during initialisation(mouse_mode_reg = 0), and then a short burst
-	 * appears to be sufficient. The 15 interupts generated comes from 
-	 * tests with the "WINDOWS" package, which receives about 15 during
-	 * initialising, but is happy as long as it gets more than 3. The delay
-	 * is necessary otherwise the interupts are generated before the 
-	 * application starts looking for them.
-
-	 * Mark 2 bodge:
-	   Windows 1.02 needs the burst of interrupts to occur even when mouse_mode_reg != 0,
-	   but Windows 2.03 needs them not to keep happening even when it asks for them.
-	   So now there's a counter called loadsainterrupts set to 5 on resets, which is
-	   how many bursts will be allowed. This makes both Windows work.
-	 */  
 			case 0x1: /* 30 Hz */
 			case 0x2: /* 50 Hz */
 			case 0x3: /* 100 Hz */
 			case 0x4: /* 200 Hz */
-/* used to be if mouse_mode_reg == 0 too, removed to make Windows 1.02 work */
-			    if( (value & 0x10) && loadsainterrupts > 0)	
-			    {
-				loadsainterrupts--;
-#ifndef PROD
-				if (io_verbose & MOUSE_VERBOSE) {
-					sprintf(buff, "mouse_outb() : Loadsainterrupts"); trace(buff,DUMP_NONE);
-				}
-#endif
-				/*
-				** AT version is asking for a 100 interrupts.
-				** The AT ica does not handle delayed ints so
-				** the IRET has been modified to not allow an
-				** int to go off before the next instruction.
-				*/
-				ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER,AT_CPU_MOUSE_INT,100);
-			     }
 				break;
 			case 0x5: /* reserved */
 #ifndef PROD
@@ -365,7 +346,8 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 					sprintf(buff, "mouse_outb() : INTR hi"); trace(buff,DUMP_NONE);
 				}
 #endif
-				ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER,AT_CPU_MOUSE_INT,1);
+				if (value & 0x10)
+					ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER,AT_CPU_MOUSE_INT,1);
 				break;
 			case 0x7: /* externally controlled */
 				break;
@@ -379,7 +361,20 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 				break;
 
 			}
+		/* HOLD changes do not restart the free-running timer. */
+		if ((mouse_mode_reg ^ value) & 0x17) {
+			if (mouse_timer != 0) delete_q_event(mouse_timer);
+			mouse_timer = 0;
+		}
 		mouse_mode_reg = value;
+		if (mouse_timer == 0 && mouse_period() != 0)
+			mouse_timer = add_q_event_t(mouse_timer_tick, mouse_period(), 0);
+		if (!(value & 0x18))
+			ica_clear_int(AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT);
+		else if ((value & 0x08) && !(value & HOLD) &&
+			(delta_x || delta_y || button_left != last_button_left ||
+			button_right != last_button_right))
+			ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT, 1);
 
 		/*
 	 	 * Interface control register
@@ -396,25 +391,17 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 		}
 
 	}
-	else if (port == MOUSE_PORT_3)	/* InPort test register */
-	{
-		mouse_test_state = (value == 0x91) ? 1 : 0;
-	}
-	else if (port == MOUSE_PORT_2)	/* completes the diagnostic transfer */
-	{
-		if (mouse_test_state == 2 && value == 0x10)
-			mouse_test_state = 3;
-		else
-			mouse_test_state = 0;
-	}
 	else if(port == MOUSE_PORT_0)	/* address pointer register */
 	{
-	    mouse_test_state = 0;
 	    if (value & 0x80)  /* is it  a reset */
 	    {
+		if (mouse_timer != 0) delete_q_event(mouse_timer);
+		mouse_timer = 0;
 		mouse_mode_reg = 0;
-		mouse_test_data = 0;
-		loadsainterrupts = 5;	/* lets Windows initialise its mouse happily */
+		delta_x = delta_y = 0;
+		data1_reg = data2_reg = mouse_status_reg = 0;
+		last_button_left = button_left;
+		last_button_right = button_right;
 		address_reg = value & 0x7F;	/* clear reset bit*/
 		ica_clear_int( AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT );
 	    }
@@ -455,7 +442,8 @@ int	Delta_x,Delta_y,left,right;
 
 		button_left = left;
 		button_right = right;
-		ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER,AT_CPU_MOUSE_INT,1);
+		if ((mouse_mode_reg & 0x08) && !(mouse_mode_reg & HOLD))
+			ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER,AT_CPU_MOUSE_INT,1);
 	}
 }
 
@@ -481,8 +469,10 @@ void mouse_init IFN0()
 #endif
 
     mouse_inb_toggle = 0;
-	mouse_test_state = 0;
-	mouse_test_data = 0;
+    /* Cold initialization follows q_event_init: no old handle remains valid. */
+    mouse_timer = 0;
+    button_left = button_right = 0;
+    mouse_outb(MOUSE_PORT_0, 0x80);
 
     io_define_inb(MOUSE_ADAPTOR, mouse_inb);
     io_define_outb(MOUSE_ADAPTOR, mouse_outb);

@@ -1,5 +1,16 @@
 # MVDM / OpenNT 当前差异账本
 
+### T85 S1 InPort 增量
+
+`base/keymouse/mouse.c` 相对 P1 新增 70、删除 80 行；相对
+OpenNT 原文件为 +123/-44（包含既有设备快照边界）。它删除旧有限次
+Windows IRQ burst 和后加的 8255 总线探测回显，以原 quick-event 调度
+实现 InPort 定时器，并补中断使能、复位处理。下文 T61 的“支持 Win31
+探测传输”是历史描述，不再作为该回显正确性的依据。真实更新版
+Win1.01 驱动及 Win3.1 菜单输入已有探针证据；owner 明确批准快照采用
+新格式、不兼容旧格式。S/T 尚未收口。范围、来源和验证见
+[T85 proposal](../../../proposals/m9-windows-101-startup-repair.md)。
+
 ### T70 S10 显示初始化修复
 
 相对 S10 调研提交 `6541e43`，`base/video/vga_mode.c` +3/-2，

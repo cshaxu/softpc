@@ -9,6 +9,13 @@
 #include "bios.h"
 #include "ios.h"
 #include "mouse.h"
+#include "quick_ev.h"
+#include "compat/devices/snapshot.h"
+#include "compat/devices/archive.h"
+
+extern int softpc_device_snapshot_encode_mouse_callback(
+    Q_CALLBACK_FN callback, unsigned long *callback_id);
+extern void c_cpu_q_ev_set_count(unsigned long count);
 
 extern void com_outb IPT2(io_addr, port, half_word, value);
 
@@ -71,35 +78,31 @@ int main(void)
     inb(MOUSE_PORT_2, &value);
     assert(value == 0x10u);
 
-    /* Exact Microsoft InPort loopback handshake issued by Windows 3.1's
-       MOUSE.DRV before it commits to the IRQ9 controller path. */
+    /* 8255 Bus Mouse probing must not make an InPort falsely identify as
+       the other adapter. Its +2 ID and +3 unused port are not writable. */
+    outb(MOUSE_PORT_0, 0x80u);
     outb(MOUSE_PORT_3, 0x91u);
     outb(MOUSE_PORT_1, 0xa5u);
     outb(MOUSE_PORT_2, 0x10u);
     inb(MOUSE_PORT_1, &value);
-    assert(value == 0xa5u);
-    /* The diagnostic is one transfer, not an alternate controller mode. */
+    assert(value != 0xa5u);
     outb(MOUSE_PORT_0, 0x07u);
     outb(MOUSE_PORT_1, 0x09u);
     inb(MOUSE_PORT_1, &value);
     assert(value == 0x09u);
     outb(MOUSE_PORT_0, 0x80u);
 
-    /* Reset and select the original mode register, then round-trip it. */
-    /* Windows 3.1's installed Microsoft MOUSE.DRV resets the card, selects
-       mode register 7 and enables the Microsoft InPort base mode (10h).
-       Its IRQ handler then raises HOLD to 30h before reading status/X/Y.
-       Exercise that real driver protocol, not merely the older 20h hold
-       sequence. */
+    /* Data interrupts use bit 3. Timer enable alone with rate zero must not
+       turn every host input into an IRQ. */
     outb(MOUSE_PORT_0, 0x87u);
-    outb(MOUSE_PORT_1, 0x10u);
+    outb(MOUSE_PORT_1, 0x09u);
     inb(MOUSE_PORT_1, &value);
-    assert(value == 0x10u);
+    assert(value == 0x09u);
     assert(softpc_machine_mouse_input(machine, 5, -3, 1u, 0u) ==
         SOFTPC_MACHINE_OK);
-    outb(MOUSE_PORT_1, 0x30u);
+    outb(MOUSE_PORT_1, 0x29u);
     inb(MOUSE_PORT_1, &value);
-    assert(value == 0x30u);
+    assert(value == 0x29u);
 
     /* The public port reaches the original adapter; its hold transition
        latches relative movement and button state in the original registers. */
@@ -117,12 +120,12 @@ int main(void)
        the guest raises HOLD.  Preserve this original device fact explicitly:
        two ingress calls before one HOLD become one latched relative record. */
     outb(MOUSE_PORT_0, 0x87u);
-    outb(MOUSE_PORT_1, 0x10u);
+    outb(MOUSE_PORT_1, 0x09u);
     assert(softpc_machine_mouse_input(machine, 3, 4, 1u, 0u) ==
         SOFTPC_MACHINE_OK);
     assert(softpc_machine_mouse_input(machine, 5, 6, 1u, 0u) ==
         SOFTPC_MACHINE_OK);
-    outb(MOUSE_PORT_1, 0x30u);
+    outb(MOUSE_PORT_1, 0x29u);
     outb(MOUSE_PORT_0, INTERNAL_DATA1_REG);
     inb(MOUSE_PORT_1, &value);
     assert(value == 8u);
@@ -136,6 +139,8 @@ int main(void)
        cursor. */
     assert(softpc_machine_mouse_input(machine, 1, 0, 1u, 0u) ==
         SOFTPC_MACHINE_OK);
+    outb(MOUSE_PORT_0, 7u);
+    outb(MOUSE_PORT_1, 0x09u);
     assert(softpc_machine_run(machine, 6000u) == SOFTPC_MACHINE_OK);
     {
         unsigned char marker = 0u;
@@ -144,6 +149,77 @@ int main(void)
         assert(marker == 0xa5u);
     }
 
+    /* One timer survives HOLD/repeated mode writes and snapshot restoration;
+       disabling or resetting removes it. No finite startup burst counter. */
+    {
+        softpc_device_inport_mouse_state state, held;
+        softpc_device_archive *archive = softpc_device_archive_create();
+        unsigned rate;
+        assert(archive != NULL);
+        for (rate = 1; rate <= 4; ++rate) {
+            outb(MOUSE_PORT_0, 0x87u);
+            outb(MOUSE_PORT_1, 0x10u | rate);
+            assert(softpc_device_snapshot_capture_inport_mouse(&state));
+            assert(state.timer_handle != 0);
+            outb(MOUSE_PORT_1, 0x30u | rate);
+            assert(softpc_device_snapshot_capture_inport_mouse(&held));
+            assert(held.timer_handle == state.timer_handle);
+            assert(softpc_device_archive_capture(archive));
+            outb(MOUSE_PORT_1, 0u);
+            assert(softpc_device_archive_restore(archive));
+            assert(softpc_device_snapshot_capture_inport_mouse(&held));
+            assert(held.timer_handle == state.timer_handle);
+            outb(MOUSE_PORT_1, 0u);
+            assert(softpc_device_snapshot_capture_inport_mouse(&held));
+            assert(held.timer_handle == 0);
+        }
+        softpc_device_archive_dispose(archive);
+    }
+    /* Isolate the existing quick-event queue after guest execution. Verify
+       actual scheduled periods/recurrence, not just a nonzero handle. */
+    {
+        static const unsigned long periods[] = {33333, 20000, 10000, 5000};
+        Q_EVENT_SNAPSHOT_STATE queue;
+        Q_EVENT_SNAPSHOT_ENTRY entry;
+        softpc_device_pic_state pic;
+        unsigned rate;
+        q_event_init();
+        tic_event_init();
+        mouse_init();
+        for (rate = 1; rate <= 4; ++rate) {
+            outb(MOUSE_PORT_0, 0x87u);
+            outb(MOUSE_PORT_1, 0x10u | rate);
+            assert(q_event_snapshot_capture(&queue, &entry, 1, NULL, 0,
+                softpc_device_snapshot_encode_mouse_callback));
+            assert(queue.quick_entries == 1);
+            assert(entry.original_time == periods[rate - 1]);
+            assert(entry.callback_id == SOFTPC_DEVICE_QUEUE_MOUSE_TIMER);
+            c_cpu_q_ev_set_count(0);
+            dispatch_q_event();
+            assert(softpc_device_snapshot_capture_pic(&pic));
+            assert(pic.adapter[1].count[1] == 1);
+            outb(MOUSE_PORT_1, 0x30u | rate);
+            c_cpu_q_ev_set_count(0);
+            dispatch_q_event();
+            assert(softpc_device_snapshot_capture_pic(&pic));
+            assert(pic.adapter[1].count[1] == 0); /* HOLD suppresses IRQ. */
+            outb(MOUSE_PORT_1, 0x10u | rate);
+            c_cpu_q_ev_set_count(0);
+            dispatch_q_event();
+            assert(softpc_device_snapshot_capture_pic(&pic));
+            assert(pic.adapter[1].count[1] == 1); /* Still periodic. */
+        }
+        outb(MOUSE_PORT_0, 0x87u);
+        mouse_send(2, -2, 1, 0);
+        assert(softpc_device_snapshot_capture_pic(&pic));
+        assert(pic.adapter[1].count[1] == 0); /* Disabled data IRQ. */
+        outb(MOUSE_PORT_1, 0x08u);
+        assert(softpc_device_snapshot_capture_pic(&pic));
+        assert(pic.adapter[1].count[1] == 1);
+        outb(MOUSE_PORT_0, 0x87u);
+        q_event_snapshot_measure(&queue);
+        assert(queue.quick_entries == 0);
+    }
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     return 0;

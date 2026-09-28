@@ -71,9 +71,120 @@ the published dirty rectangle.
 
 The disposable normal-process probe starts the supplied configuration, sends
 `start` and `win` through the real Console, and captures the KVM Window.
-It reached the interactive MS-DOS Executive at a 640x400 client size.  The
+It reached the displayed MS-DOS Executive at a 640x400 client size. Mouse
+interaction was not verified by that capture. The
 probe, trace, copied media and capture remain only under `build/` and are not
 repository inputs.
+
+## Owner-approved InPort completion
+
+The owner requests correct InPort hardware semantics, minimum complexity and
+maximum reuse of the original SoftPC implementation, together with locating
+an appropriate Windows 1.01 mouse driver. This extends S1 beyond its delivered
+graphics repair; it does not claim that the original interaction criterion
+was already met.
+
+The existing guest driver uses the earlier 8255 Bus Mouse interface, not
+InPort. Microsoft KB Q28502 documents a replacement MOUSE.DRV for Windows
+1.01 distributed on Microsoft Mouse setup media. A later setup-disk driver
+is a research candidate until its binary protocol and guest use are verified.
+No downloaded driver is a repository fixture or redistributable package asset;
+the original user disk remains unchanged and testing uses a disposable copy.
+
+The admitted device boundary is the existing mouse.c owner, its original
+quick-event scheduler, the existing snapshot callback/field mapping and
+product-owned tests. Functional mirror changes for these InPort semantics
+are explicitly within the owner's requested hardware repair. No Bus Mouse
+emulation, guest-version detection, alternate input route or Lib/Common/x86
+change is admitted. Keep original formatting and register dispatch, removing
+the invented bus-probe handshake rather than expanding it.
+
+Finite verification ledger: (1) identity/index and unsupported bus probe;
+(2) signed movement, buttons and HOLD; (3) data/timer interrupt gating and
+30/50/100/200 Hz scheduling; (4) reset and snapshot timer ownership;
+(5) updated-driver Windows 1.01 movement/click; (6) existing product regression
+and dual builds. Each member needs evidence before interaction is claimed.
+Initial estimate is 5--8 production/test paths, approximately +150--250 and
+-100--180 C/H lines; this is an estimate, not a target or permission to rewrite.
+Disposable traces are bounded to one five-minute run and 16 MiB per trace,
+owned by this task under build/t85-inport; stop owned probe processes after
+each run and remove obsolete scratch after recording results.
+
+### InPort implementation verification
+
+The implementation replaces the finite Windows-specific IRQ burst counter with one
+existing quick event at 30/50/100/200 Hz. It preserves the original indexed
+registers, signed deltas, button/HOLD latching and IRQ9 route, gates data IRQs
+by their enable bit, and removes the invented 8255 Bus Mouse probe echo.
+No additional thread, device model or shared-component change is introduced.
+The private archive registers the timer callback and stores its queue handle.
+The owner explicitly approves changing the snapshot format without old-format
+compatibility. The device wire layout removes the obsolete probe/burst fields
+and records the timer handle; new snapshots remain identical across x86/x64.
+Existing old-format snapshots must be recreated. No version discriminator or
+compatibility fallback is added.
+
+Verified research driver: Microsoft Mouse 6.24 setup disk `MOUSE.DRV`, 3358
+bytes, SHA-256
+`8573C81A7ED76C043C722DB5DDC445B5B836D12096303FCA7F8E1EF6DFA05B32`.
+Its MREADME.DOC explicitly instructs Windows 1.01 users to replace the Setup
+disk's driver and reinstall. [Microsoft KB Q28502](https://msarchive.pcjs.org/kb/Q28502/)
+independently documents the original driver's missing InPort support.
+The [PCjs Microsoft Mouse archive](https://www.pcjs.org/software/pcx86/dev/mouse/microsoft/6.xx/)
+contains the setup disk; this is provenance, not a redistribution-license claim.
+Local research binaries remain outside Git in the OS temporary directory.
+
+The supplied HDD combines installation sources and installed outputs:
+its root MSDOS.EXE is the one-byte installed placeholder, not the 41904-byte
+Build-disk source. Reusing it as installation input caused Setup's generic
+space error. The disposable installation used the original Build-disk source
+from the [PCjs Win1.01 archive](https://www.pcjs.org/software/pcx86/sys/windows/1.01/ega/),
+without changing the supplied HDD. This is not diagnosed as corrupt installed
+Windows, and no guest-file-specific emulator workaround was added.
+
+Verification ledger:
+
+- Identity and unsupported bus probe, signed input/buttons/HOLD, reset and
+  data IRQ delivery: extended `softpc-mouse-smoke` on both widths.
+- Timer rates/recurrence and HOLD suppression: inspect the actual quick-event
+  queue and dispatch its callbacks; no sleeps or startup burst assumption.
+- Timer ownership: capture/restore the device archive while HOLD is active;
+  checkpoint testing also serializes/deserializes an active timer, restores
+  its handle/mode, and proves that its next callback generates IRQ9. Both
+  widths pass. New-format cross-process x64→x86 and x86→x64 snapshot
+  tests pass; these are not evidence of old-format compatibility.
+- Real Windows 1.01 x64: install updated driver using real DOS/Setup in a
+  disposable HDD, then inject input through Common Machine. Cursor moves;
+  clicking A: changes directory; clicking File opens its menu. Captures are
+  task-local `before.bmp` and `menu-click.bmp`.
+- Real Windows 1.01 x86: same installed copy boots; movement/click reaches A:
+  and the guest displays its expected no-floppy error (that run has no floppy).
+  This is a click result, not a successful floppy access or menu-open claim.
+- Real Windows 3.1 x64: disposable installed-media copy boots; mouse click
+  opens Program Manager's Options menu. No guest driver replacement there.
+- Release packages build on both widths. Final hidden-background CTest passes
+  121/121 on x64 (124.02s) and x86 (122.86s). The five desktop tests per width
+  are excluded; no Linux or physical mouse automation is claimed.
+
+Final C/H scope is five files: mouse.c +70/-80, snapshot.h +5/-3,
+archive.c +9/-6, mouse_smoke.c +92/-16, checkpoint_smoke.c +22/-8.
+Production +84/-89 (net -5); tests +114/-24 (net +90); combined net +85.
+All probe processes have exited; original media and user configuration remain
+unchanged. Standard dual EXEs are rebuilt; the external
+`O:\assets\softpc-win95\softpc64.exe` matches the x64 package byte-for-byte.
+SHA-256 x86: `1C1D2CA700AE823FC0FDC0DD60A4B364E0E4C16CA24600312D77FBA3A23955C8`;
+x64/external: `9A01E522D40E9FF199133C62990248E516D8133D812F4E6577BA09BCF865130C`.
+Delivery still requires the final P push and owner acceptance; S1/T85 stay open.
+
+Similar-issue sweep: all `mouse_init` calls remain in the original BIOS reset
+sequence after queue reset; mode writes, input injection, HOLD, device reset
+and timer callback are the only controller IRQ/scheduling sites. The old
+`loadsainterrupts` and invented test-state/data have no remaining production
+references. DOS INT33 is a separate driver, not a second InPort implementation.
+The archive callback registry is updated with one semantic ID, never a host
+function address. Win3.1's real driver includes its own InPort ID path, confirmed
+by read-only driver inspection and actual menu response; the removed 8255 echo
+is not required to preserve that path. No guest-version predicate was added.
 
 ## Completion condition
 

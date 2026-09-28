@@ -48,21 +48,30 @@ and retained boundary/deferral dispositions are in the
 | Field | Required record |
 |---|---|
 | Identifier Mode | New |
-| Admission And Approval | Owner admits a new task to investigate and repair Windows 1.01 startup using the supplied Win95 asset directory. |
+| Admission And Approval | Owner admits Windows 1.01 startup repair and explicitly extends S1 to faithful, minimal InPort device repair and locating a compatible Windows 1.01 driver. |
 | Objective | Locate and repair the first causal contract failure that prevents `win` from reaching an interactive Windows 1.01 session. |
 | Non-goals | No guest-version-specific branch, user INI/HDD/snapshot mutation, speculative Core rewrite, or Lib/Common/x86 change without new approval. |
 | Reference Baseline | SoftPC `4a6aca27`; supplied read-only reproduction inputs `O:\assets\softpc-win95\softpc.ini` and `hdd.img`. |
 | Candidate Proposal | [Windows 1.01 startup diagnosis and repair](../proposals/m9-windows-101-startup-repair.md). |
-| Files And ABI Surface | Initial diagnosis is documentation/build-scratch only. A later causal repair is limited to its proven owner; public ABI is unchanged unless separately approved. |
+| Files And ABI Surface | Delivered Compat mono surface repair; approved follow-up at original mouse.c, existing quick-event/snapshot contracts and product tests. No shared component change or second device implementation. |
 | Applicable Rules | `docs/rules/EXECUTION.md`, `ARCHITECTURE.md`, `CODING.md`, `DOCUMENT.md`, and `docs/design/UI.md`. |
 | Verification | Disposable reproduction, bounded causal evidence, focused owner test, dual Release builds, serial background x64/x86 CTest, docs/whitespace/applicable mirror gates. |
 | Expected Markers | Reproducer retains supplied media; trace identifies a first failed owner boundary; no Windows-1.01 policy string or product branch appears. |
 | Asset Needs | Read supplied asset inputs only. Any disposable overlay/copy is under `build/`; after each repair refresh standard dual EXEs and copy x64 to `O:\assets\softpc-win95\softpc64.exe`. |
 | Reporting Requirements | Report repro result, observed causal chain, ownership choice, actual C/H +/−/net counts, changed paths, test evidence, and all three EXE hashes/copy status. |
-| Stop Conditions | Stop for owner direction if evidence requires guest-specific behavior, a functional mirror diff, Lib/Common/x86 API change, or cannot distinguish hang from expected guest work within the bounded trace. |
+| Stop Conditions | Stop for guest-specific behavior, mirror changes beyond the explicitly approved InPort owner, shared API changes, or unverified third-party redistribution. Driver research/testing is isolated and does not modify supplied media. |
 | Exit Criteria | Reproducible interactive Windows 1.01 startup, causal owner-local repair, dual-width validation, refreshed package/copy deliverables, pushed P and owner delivery report. |
-| Original Owner Request | "调查和修复为什么无法启动 windows 1.01" with the specified asset-directory test and build-copy requirement. |
+| Original Owner Request | "调查和修复为什么无法启动 windows 1.01"; follow-up: "我要求正确修复我们的inport模拟硬件 但不得过度复杂化 尽可能贴合softpc原始代码实现" and "你帮我找到鼠标驱动 配合修正的鼠标模拟以及win101". |
 | Similar-Issue Sweep | After identifying the failed contract, inspect all uses of that owner-local transition for the same invalid assumption and cover each disposition in focused proof. |
+
+S1 InPort follow-up is implemented and being prepared for P2 delivery. Real updated-driver
+Windows 1.01 movement/click and Windows 3.1 menu input have been observed in
+disposable headless probes; both final background suites pass 121/121. The draft
+adds real timer state to the device archive and changes its wire layout. Owner
+explicitly approves the new format without old-snapshot compatibility. Both EXEs
+are built and the external x64 EXE is refreshed. The proposal records exact
+driver provenance, test limits, hashes and final +/- counts. S1 and T85 remain
+open for delivery review and owner acceptance; no closure is claimed.
 
 M9 T84 S6 is owner-accepted and closed. It closes the admitted product
 host-boundary defects without changing Lib, Common, x86, the Core mirror, user

@@ -54,6 +54,8 @@ extern int softpc_device_snapshot_encode_serial_callback();
 extern Q_CALLBACK_FN softpc_device_snapshot_decode_serial_callback();
 extern int softpc_device_snapshot_encode_parallel_callback();
 extern Q_CALLBACK_FN softpc_device_snapshot_decode_parallel_callback();
+extern int softpc_device_snapshot_encode_mouse_callback();
+extern Q_CALLBACK_FN softpc_device_snapshot_decode_mouse_callback();
 
 LOCAL int
 encode_callback(callback, callback_id)
@@ -66,7 +68,8 @@ unsigned long *callback_id;
         softpc_device_snapshot_encode_fdisk_callback(callback, callback_id) ||
         softpc_device_snapshot_encode_keyboard_callback(callback, callback_id) ||
         softpc_device_snapshot_encode_serial_callback(callback, callback_id) ||
-        softpc_device_snapshot_encode_parallel_callback(callback, callback_id);
+        softpc_device_snapshot_encode_parallel_callback(callback, callback_id) ||
+        softpc_device_snapshot_encode_mouse_callback(callback, callback_id);
 }
 
 softpc_device_archive *
@@ -93,7 +96,9 @@ unsigned long callback_id;
     if (callback != NULL) return callback;
     callback = softpc_device_snapshot_decode_serial_callback(callback_id);
     if (callback != NULL) return callback;
-    return softpc_device_snapshot_decode_parallel_callback(callback_id);
+    callback = softpc_device_snapshot_decode_parallel_callback(callback_id);
+    if (callback != NULL) return callback;
+    return softpc_device_snapshot_decode_mouse_callback(callback_id);
 }
 
 LOCAL int
@@ -454,10 +459,8 @@ static const softpc_device_wire_field inport_mouse_fields[] = {
     DEVICE_U16(softpc_device_inport_mouse_state, last_button_right),
     DEVICE_U16(softpc_device_inport_mouse_state, mode),
     DEVICE_U16(softpc_device_inport_mouse_state, address),
-    DEVICE_U16(softpc_device_inport_mouse_state, test_data),
-    DEVICE_U32(softpc_device_inport_mouse_state, startup_interrupt_bursts),
-    DEVICE_U32(softpc_device_inport_mouse_state, id_toggle),
-    DEVICE_U32(softpc_device_inport_mouse_state, test_state)
+    DEVICE_U32(softpc_device_inport_mouse_state, timer_handle),
+    DEVICE_U32(softpc_device_inport_mouse_state, id_toggle)
 };
 
 static const softpc_device_wire_field keyboard_fields[] = {
