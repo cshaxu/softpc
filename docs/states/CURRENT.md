@@ -37,7 +37,13 @@ an API or state expansion. P1 `b8c0f5fb` passes exact `src/lib` (109-path) and
 `test/lib` (51-path) equality, focused lifetime proof, Release builds and
 serial background CTest 121/121 on x64 and x86. [S12 closure](../history/M9-T84-S12-nxvm-orphan-release-import.md).
 
-No implementation subtask is active. Open task awaiting owner: T84.
+M9 T84 is owner-accepted and closed. Its twelve accepted S deliveries cover
+the bounded 80x50 KVM route, subsequent shared-corpus convergence, raw Console
+output/input correctness and fresh-checkout usability. The task-level ledger
+and retained boundary/deferral dispositions are in the
+[T84 completion audit](../history/M9-T84-completion-audit.md).
+
+No implementation subtask is active.
 
 M9 T84 S6 is owner-accepted and closed. It closes the admitted product
 host-boundary defects without changing Lib, Common, x86, the Core mirror, user
@@ -258,6 +264,7 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T84 | S1--S12 complete; owner approves task closure. | [Audit](../history/M9-T84-completion-audit.md) |
 | T83 | S1--S6 complete; owner approves task closure. | [Audit](../history/M9-T83-completion-audit.md) |
 | T82 | S1/S2 complete; owner accepts the six-component convergence. | [Audit](../history/M9-T82-completion-audit.md) |
 | T81 | S1--S8 complete; owner accepted cold first-run `AUDIO.COM` playback; neutral Audio and the PC-speaker handoff close. | [Audit](../history/M9-T81-completion-audit.md) |
