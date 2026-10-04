@@ -55,7 +55,7 @@ the separately authorized, backed-up test-HDD replacement.
 [S1 closure](../history/M9-T85-S1-windows-101-startup-repair.md) records the
 whole-S path counts, acceptance, retained artifacts and verification limits.
 
-T85 S3 is verified and awaiting pushed delivery/owner acceptance. The 219-file
+T85 S3 P1 cec8a3dc is pushed, verified and awaiting owner acceptance. The 219-file
 NXVM shared subset plus test/register.cmake is byte-identical; eight local x86
 packaging files retain debug/xasm32-only scope. Both Release builds pass.
 x86 background passes 121/121; x64 passes 120/121 initially, with the sole

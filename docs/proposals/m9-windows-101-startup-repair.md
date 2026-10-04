@@ -63,6 +63,16 @@ Package hashes remain unchanged after successful incremental builds:
 x86 B13CD6242C69B479609F61EA1E4DCCDAD6A956BD65812DF511E72E6093956DDF;
 x64 A3D6DAD0702FFDF9E11D71ADEC7D149BA70865D18B775D107B455636476D123F.
 
+Coordinator actual-change review after pushed P1 cec8a3dc confirms five paths:
+three governance records and two test-package files. The production tree and
+EXEs are unchanged; the imported scheduling lines/hash match upstream exactly.
+Review of the original request against the finite ledger confirms no omitted
+selected-file difference, and no excluded chip/Core/board implementation was
+imported. All eight package exceptions have their subset-only responsibility
+above. NXVM's pinned revision and clean shared roots were rechecked. Final
+documentation governance passes; only the owner's existing INI and snapshot
+remain dirty. S3 is delivered for owner acceptance; T85 stays open.
+
 ## Product observation
 
 With `O:\assets\softpc-win95\softpc.ini` and its selected `hdd.img`, a
