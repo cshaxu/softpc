@@ -71,7 +71,8 @@ selected-file difference, and no excluded chip/Core/board implementation was
 imported. All eight package exceptions have their subset-only responsibility
 above. NXVM's pinned revision and clean shared roots were rechecked. Final
 documentation governance passes; only the owner's existing INI and snapshot
-remain dirty. S3 is delivered for owner acceptance; T85 stays open.
+remain dirty. Owner accepts and closes S3 on 2026-10-04; T85 stays open.
+[S3 closure](../history/M9-T85-S3-nxvm-shared-subset-sync.md) records acceptance.
 
 ## Product observation
 

@@ -55,33 +55,17 @@ the separately authorized, backed-up test-HDD replacement.
 [S1 closure](../history/M9-T85-S1-windows-101-startup-repair.md) records the
 whole-S path counts, acceptance, retained artifacts and verification limits.
 
-T85 S3 P1 cec8a3dc is pushed, verified and awaiting owner acceptance. The 219-file
+T85 S3 is owner-accepted and closed on 2026-10-04. P1 cec8a3dc and review
+P2 a6a777d1 are pushed. The 219-file
 NXVM shared subset plus test/register.cmake is byte-identical; eight local x86
 packaging files retain debug/xasm32-only scope. Both Release builds pass.
 x86 background passes 121/121; x64 passes 120/121 initially, with the sole
 documentation-record ordering failure corrected and its rerun passing 1/1.
 No production change; EXEs retain accepted S2 hashes. T85 remains open.
 
-## M9 T85 S3 Packet
+[S3 closure](../history/M9-T85-S3-nxvm-shared-subset-sync.md).
 
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner admits subset import on 2026-10-04, excluding NXVM's newly extracted chips/Core/board/product capabilities. |
-| Objective | Keep the existing shared implementation and test subset byte-identical to pinned NXVM; import its modal-test serialization. |
-| Non-goals | No new x86 engine/devices/boards, runtime changes, mouse repair, media changes or T closure. |
-| Reference Baseline | SoftPC a8e91e44; NXVM 9240a3041f8298bc8b166848e3aed6db2ea542ac, shared roots clean. |
-| Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S3 subset ledger. |
-| Files And ABI Surface | test/lib/CMakeLists.txt and its manifest; governance records. No public ABI change. Eight x86 package metadata files retain local subset scope. |
-| Applicable Rules | Execution, documentation, architecture, coding and source/research authorities and their linked governance skills. |
-| Verification | Exact-byte subset comparison; dual Release builds and serial background CTest; inspect generated RUN_SERIAL property without running desktop tests; documentation gate and diff check. |
-| Expected Markers | All 219 selected shared files and test/register.cmake identical; eight documented x86 packaging exceptions; no new chip/core/board files. |
-| Asset Needs | Existing package EXEs rebuilt/verified; owner INI and unrelated snapshot left untouched and unstaged. Safety review blocked INI inclusion due to earlier owner exclusion; do not bypass it. No guest execution or media mutation. |
-| Reporting Requirements | Before/after production and test line counts, subset/exception accounting, test evidence and dual EXE links. |
-| Stop Conditions | Unexpected runtime/source difference, upstream selected-tree drift, new dependency or unexplained test failure. |
-| Exit Criteria | Complete P committed/pushed after verification and actual-change review; await owner acceptance, keep T85 open. |
-| Original Owner Request | Append S to open T; import useful differing NXVM six-component subset, omit added x86 chips/Core/Product, guarantee exact equality within selected subset. |
-| Similar-Issue Sweep | Compare all existing six-root paths plus shared test/register.cmake; classify every differing path as exact import or explicitly retained subset metadata. |
+No implementation subtask is active. Open task awaiting owner: T85.
 
 M9 T85 S2 is owner-accepted and closed on 2026-09-28. P1 `8c15e893`
 repairs indexed DIB ownership; P2 `f8fe3df8` records actual-change review.
