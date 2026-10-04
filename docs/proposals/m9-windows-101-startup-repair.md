@@ -1,5 +1,68 @@
 # Windows 1.01 startup diagnosis and repair
 
+## S3: owner-admitted NXVM subset synchronization
+
+Owner request (2026-10-04): append an S to the open T and import the useful
+NXVM six-component subset, excluding new x86 chips/Core/Product capabilities;
+the selected shared subset must remain byte-identical.
+
+Pinned source: NXVM 9240a3041f8298bc8b166848e3aed6db2ea542ac. Its six roots
+are clean. Existing shared provenance/notices are preserved; this imports only
+two test scheduling lines and their manifest hash, no new external code or
+license claim. NXVM stays read-only and is never a build/runtime dependency.
+
+Finite ledger: SoftPC's 227 existing six-root paths are the frozen universe.
+The 219 exact-shared paths comprise all src/lib (109), src/common (23),
+test/lib (51), test/common (20), plus ten src/x86 and six test/x86 files.
+The shared test/register.cmake helper is also exact. Before import only
+test/lib/CMakeLists.txt and its manifest differ within that subset.
+
+Eight explicit local packaging exceptions remain: src/x86/{CMakeLists.txt,
+README.md,verify_corpus.cmake,MANIFEST.sha256} and test/x86/{CMakeLists.txt,
+README.md,verify_negative.cmake,MANIFEST.sha256}. They describe/build/check
+the existing debug/xasm32-only package, not NXVM's expanded package. Their
+manifests must remain valid for local contents, not claim missing chip files.
+NXVM-only 120 source-package and 375 test-package files are excluded. All
+existing C/H tool and test contents are exact; no parallel implementation.
+
+Implementation: import RUN_SERIAL for library.kvm_window_modal verbatim and
+its manifest. Estimate: test/build +2/-0, production +0/-0. Verify selected
+byte equality, existing manifests/DAG, generated serialization property,
+dual Release packages and serial background tests. Desktop interaction and
+RDP mouse investigation are not acceptance claims. Await owner after delivery.
+
+### S3 delivery evidence
+
+Actual test/build +2/-0 (net +2), manifest +1/-1, production +0/-0,
+using git diff --numstat a8e91e44 -- src test. Both Release trees successfully
+configure/build softpcvm and tests. Generated CTest files on both widths and
+the x64 CTest JSON listing confirm RUN_SERIAL TRUE and the retained desktop
+label. Exact SHA-256 checks pass for all 219 selected paths and the helper.
+All 495 NXVM-only files stay excluded; existing tool/test C/H files are exact.
+No new state, interface or implementation path is added.
+
+Serial x86 background regression passes 121/121 (144.52 seconds). x64 passes
+120/121 (205.19 seconds); its only failure was a document-record ordering error: prematurely
+creating an S3 history filename made the active-packet gate expect S4.
+The uncommitted premature record was removed and its evidence retained here;
+no governance rule or checker was weakened. The failed x64 check reruns 1/1
+successfully (0.22 seconds), and x86 governance recheck also passes 1/1.
+Thus every background case has a passing result; this is not a claim that
+the first x64 full invocation passed. All six manifests and DAG/corpus gates
+pass in both suites. Whitespace and final documentation gates pass.
+Five native desktop tests per width remain excluded; no RDP/Linux runtime
+qualification is claimed. No new trace/media/scratch tree was created.
+
+The owner's pre-existing INI edit (display=window) and modified snapshot stay
+unmodified and unstaged. Safety review rejected including the INI based on an
+earlier owner exclusion; this delivery does not override that restriction. The earlier
+owner-requested RDP escape report is now in TODO with suspected Lib ownership,
+unconfirmed cause and diagnostic admission conditions, not a repair claim.
+
+Package hashes remain unchanged after successful incremental builds:
+x86 B13CD6242C69B479609F61EA1E4DCCDAD6A956BD65812DF511E72E6093956DDF;
+x64 A3D6DAD0702FFDF9E11D71ADEC7D149BA70865D18B775D107B455636476D123F.
+
 ## Product observation
 
 With `O:\assets\softpc-win95\softpc.ini` and its selected `hdd.img`, a
