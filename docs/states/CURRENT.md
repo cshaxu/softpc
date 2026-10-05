@@ -2,35 +2,35 @@
 
 ## Current Work
 
-M9 T85 S9 is active: remove the private no-op x86 Core bus lifecycle.
-S8 delivery is complete; owner authorizes continuation without intermediate
-manual acceptance. Owner now authorizes S10 immediately after S9 delivery;
-stop after S10 for owner testing.
-S7 remains verified awaiting owner testing: IBM PC import and test ownership.
-T85 remains open; S6 delivered verification remains recorded without inferred
-manual acceptance.
+M9 T85 S10 is active: bounded IBM PC ownership and dead-test cleanup.
+S9 executor P1 03c979c7 is pushed and actual-change reviewed: nine paths match
+the packet, production +0/-23 and test build +2/-2; dual Release and focused
+8/8 per width, background 443/443 per width pass. No SoftPC runtime or public
+ABI change. Proceed under owner authorization; wait for testing after S10.
+S8/S7 and other earlier deliveries do not acquire unreported manual acceptance.
+T85 remains open. Original owner INI/snapshot are preserved and excluded.
 
-## M9 T85 S9 Packet
+## M9 T85 S10 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner authorizes S9 and then S10 without intermediate testing; each independently builds/tests/commits/pushes, wait only after S10. |
-| Objective | Delete private validation-only bus initialize and empty finalize, their declarations and callers; retain real port ownership and failure cleanup. |
-| Non-goals | No public ABI, CPU/chip protocol, Lib/Common/IBM PC/SoftPC implementation change, replacement abstraction or owner asset rewrite. IBM PC test link order may be corrected without runtime changes. |
-| Reference Baseline | Pushed 3537e87a; S8 verified delivery, manual acceptance not inferred. Original owner INI/snapshot remain excluded. |
-| Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S8--S10 ledger and S9 brief. |
-| Files And ABI Surface | x86/core machine.c, machine.h, port_interface.c and source manifest; two IBM PC test link-order lines and test manifest; task documents and rebuilt dual EXEs. Private declarations only; no public ABI change. |
-| Applicable Rules | Execution, Documentation, Architecture, Coding and shared governance skills; strict shared C11 and eight-package inward boundaries. |
-| Verification | Dual Release builds pass after correcting two test link lists; focused 8/8 per width; serial background x64 443/443 (501.37s), x86 443/443 (302.89s); source/test manifests, x86 corpus, documentation gate and diff check pass. Desktop excluded; no Linux claim. |
-| Expected Markers | Removed private symbols have no source/test callers; port initialization, registry rollback and finalization remain; creation failures and device teardown order unchanged. |
-| Asset Needs | Standard dual EXEs only; no media, desktop automation or external asset copy. |
-| Reporting Requirements | Tracked production/test path counts and added/removed/net lines, focused/full results and retained owner changes. |
-| Stop Conditions | Resource/state responsibility in the removed functions, external ABI consumer, unexplained failed test or required scope expansion stops delivery. |
-| Exit Criteria | Bounded deletion and sweep verified; dual builds/tests pass, complete executor P pushed and actual-change reviewed; proceed to S10, T remains open. |
-| Original Owner Request | 请你继续执行，完成S8以后继续走S9。每一个S呢你都要编译测试提交推送，不需要等我验收，我只在S9完成后来验收。 |
-| Similar-Issue Sweep | All bus lifecycle declarations/callers, constructor admission and port resources; inspect other empty functions without deleting protocol handlers or widening CPU interfaces. |
-| Scratch And Cleanup | Existing ignored width build caches and bounded build/CTest logs only; preserve build/output and owner assets. |
+| Admission And Approval | Owner approves IBM PC optimization and explicitly directs S10 immediately after S9; independent build/test/commit/push, wait after S10. |
+| Objective | Preserve UI callback ownership on cleanup failure; embed executor atomics in control; use disk slot arrays only; disposition all 54 dormant C/H paths. |
+| Non-goals | No Lib/Common/x86/SoftPC runtime or mirror change, new state machine/worker/recovery object, disk protocol change, weakened assertions or owner asset rewrite. |
+| Reference Baseline | Pushed S9 03c979c7, reviewed nine changed paths; owner INI/snapshot remain excluded. |
+| Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S10 pre-change audit and 54-path ledger. |
+| Files And ABI Surface | IBM PC product/composition, private machine control/executor/lifecycle/disk consumers; existing composition/executor tests, test registration and dormant paths; manifests/README/task documents and dual EXEs. Opaque public machine and current product contracts unchanged; remove unused test-only executor allocation header. |
+| Applicable Rules | Execution, Documentation, Architecture, Coding and shared governance skills; shared strict C11 and inward-only source/test package boundaries. |
+| Verification | Pending dual Release builds; UI failure/ownership and embedded reset/stop tests; 25 newly registered tests per width; full serial background regression, IBM PC manifests/corpus/test ownership and documentation/diff gates. Desktop excluded, no Linux claim. |
+| Expected Markers | Failed UI destroy retains dependencies; successful releases clear existing owning pointers; atomics keep memory order without allocation; slot-zero aliases and removed-header references absent; every frozen dormant path has disposition and proof. |
+| Asset Needs | Standard dual EXEs only; bounded decoder output in existing ignored width caches; no guest media or desktop use. |
+| Reporting Requirements | Production and test/build tracked paths, added/removed/net lines; per-path test disposition, focused/full evidence, artifact hashes and original owner changes. |
+| Stop Conditions | Required outside-layer dependency, new runtime semantics, unexplained test failure or scope expansion stops delivery; do not delete a failing test merely to pass. |
+| Exit Criteria | All ledger members proven; dual builds/regression and gates pass; complete executor P pushed and actual changes reviewed; wait for owner testing, T stays open. |
+| Original Owner Request | 批准新的s任务进行以上各项优化，一个解决common，一个解决x86，一个处理ibmpc！ S9完成以后不要停下来了，你把S10完成以后再等我。 |
+| Similar-Issue Sweep | UI creation/binding/destruction failure exits; all executor state and disk aliases; registered source plus actual object-header closure for every tracked IBM PC C/H path. |
+| Scratch And Cleanup | Existing ignored width caches retained; remove bounded generated decoder JSON after verification; preserve build/output and original owner assets. |
 
 S8 replaces only whole-frame invalidation with the existing valid markers:
 one production C path +2/-2, net zero; two existing tests +27/-0. Combined
