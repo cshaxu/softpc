@@ -34,6 +34,10 @@ Imported x86 production bytes match frozen NXVM except README/manifest.
 PC-dependent tests and unused helpers are explicitly excluded in the proposal.
 Dual EXEs are refreshed; owner INI/snapshot changes remain outside delivery.
 Final evidence and qualification limits are recorded in the S6 proposal.
+Executor P1 `376f9278` is pushed. Coordinator actual-change review confirms
+281 delivered paths match the packet, with no App/Core/IBM PC source, Common
+runtime, NXVM or owner configuration/media change. Both EXE hashes remain the
+verified values. S6 awaits owner acceptance; it and T85 are not closed.
 
 S5 remains verified awaiting owner acceptance; admitting S6 does not infer
 an unreported manual-test result or undo its delivery.

@@ -182,6 +182,14 @@ equality with NXVM is not claimed: its owner must separately adopt local test
 ownership/Types cleanup and S5. S6 is ready for owner testing, not closed; T85
 remains open.
 
+Executor P1 `376f9278` is pushed to origin/main. Coordinator review checks its
+actual 281 paths against the admitted scope, original request, finite ledger,
+test evidence and boundaries. Existing runtime changes are limited to the four
+Types vocabulary macros; Common/App/Core and original mirror are unchanged.
+No IBM PC or NXVM file is delivered. The package hashes still match final proof.
+Only the owner's pre-existing INI and snapshot changes remain in the worktree.
+This review accepts delivery for testing, not owner acceptance or S/T closure.
+
 ## S5: minimal Audio repair extension
 
 Owner request: 我们的原则永远是减少复杂度而不是增加复杂度。第三项否决。
