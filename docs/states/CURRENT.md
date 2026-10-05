@@ -39,7 +39,10 @@ publication remain unchanged. The finite reader/driver sweep found no ungated
 read or additional implementation. Standard x86/x64 EXEs are rebuilt; original
 owner INI/snapshot remain unchanged and excluded. The intermittent native x86
 shutdown-test timing is recorded, not hidden or repaired by this optimization.
-S8 awaits its pushed delivery review and owner testing; S9/S10 remain inactive.
+Executor P1 9fed40d1 is pushed. Coordinator actual-change review confirms the
+eleven delivered paths, exact code accounting and unchanged artifact hashes;
+only original excluded owner INI/snapshot edits remain in the worktree.
+S8 awaits owner testing; it is not closed. S9/S10 remain inactive and T85 open.
 
 S7 imports all 126 IBM PC production paths byte-identically and owns 269 test
 paths. All 51 prior PC exclusions are dispositioned: 45 reachable paths return,

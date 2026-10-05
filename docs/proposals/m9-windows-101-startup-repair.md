@@ -110,6 +110,20 @@ manifests/documents/artifacts: production +2/-2, net zero; tests +27/-0;
 combined +29/-2, net +27. The existing valid/generation contract is the sole
 authority; no second cache, frame path or worker is introduced.
 
+### S8 delivery actual-change review
+
+Executor P1 9fed40d1 is pushed to origin/main. Switching to coordinator review,
+git show --stat/numstat and the actual three C-path diffs confirm all eleven
+delivered paths match S8: one runtime helper, two existing tests, two manifests,
+task/admission and diagnostic records, and dual EXEs. No Lib/x86/IBM PC/App
+implementation or ABI changes are included. The preserved original request
+maps to S8 complete delivery and inactive admitted S9/S10, not three completed
+steps. Tests, sweep, excluded desktop/Linux qualifications and failed attempts
+are explicitly recorded. EXE and owner asset hashes remain unchanged after
+testing; no owned test/debugger process or new scratch remains. Git has only
+the original excluded owner INI/snapshot edits. Coordinator review accepts
+the bounded delivery for owner testing, not S8/S7/T85 closure or S9 activation.
+
 ## S7: IBM PC corpus and PC-test ownership
 
 Owner admits on 2026-10-05: 很好。准入一个Ｓ，把ibmpc的2个src和test组件也导入了吧，然后正确实现边界；原来在core的被删除的测试，是不是该挪进ibmpc的test，如果没有重复的话？
