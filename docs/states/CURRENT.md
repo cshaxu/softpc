@@ -37,7 +37,12 @@ imported source/tests. Existing Lib/Common/x86/App/Core production is unchanged;
 IBM PC and the shared x86 Core are absent from SoftPC's EXE link inputs.
 The [S7 ledger](../etc/evidence/m9-t85-s7-ibmpc-import-ledger.md) records exact
 scope, local adaptation, failed/interrupted attempts and final qualification.
-P delivery/review remains pending; S7 awaits owner testing and T85 stays open.
+Executor P1 `8a967acf` is pushed. Coordinator actual-change review confirms
+the 413 delivered paths match the packet and exclusion ledger, all 126 source
+paths remain exact, no existing production/API/runtime link changes, and the
+dual regression/architecture results recorded above. Owned scratch is removed;
+only the two preexisting owner INI/snapshot changes remain. S7 awaits owner
+testing and T85 stays open; delivery is not an S/T closure.
 
 S6 P1 376f9278 and P2 45a461a2 are delivered: dual Release/background
 282/282 each; isolated Lib/Common/x86 48/48, 20/20, 167/167.

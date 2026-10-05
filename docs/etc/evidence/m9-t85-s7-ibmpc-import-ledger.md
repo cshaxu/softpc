@@ -176,3 +176,20 @@ x64 599651F6E95F9A8F05131FCE5E552DCD2FBCC9EC24DF3D3E9D75EA5F35DF3E71.
 Both are rebuilt; x64 bytes remain identical to the baseline. Owner INI and
 snapshot changes stay outside delivery. Owned scratch logs/builds are removed
 after this evidence summary; reusable root configurations remain.
+
+## Actual-change delivery review
+
+Executor P1 8a967acf is committed and pushed. The coordinator reviewed its
+actual 413 paths against the original owner request and packet: 126 source
+paths, 269 test paths and 18 existing build/check/test/document/artifact paths.
+Existing src/lib, src/common, src/x86 and src/app-softpc have no changed path.
+Three x86 test files change only assertion vocabulary; shared tools add the
+fourth inward layer and exit/abort probes. IBM PC production matches frozen
+NXVM and does not become SoftPC's execution backend. All 51 former exclusions
+and 38 omitted upstream paths have explicit dispositions above.
+Counts, full-suite results, link inputs, PE widths and artifact hashes agree
+with the actual delivery. No tests borrow another test suite; no App-profile
+or runtime external-checkout dependency is imported. Owned scratch has been
+removed, and all task-owned changes are committed; the two preexisting owner
+INI/snapshot edits remain untouched. Await owner testing; neither S7 nor T85
+is closed by this review.
