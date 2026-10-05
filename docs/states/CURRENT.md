@@ -2,12 +2,15 @@
 
 ## Current Work
 
-M9 T85 S10 is verified: IBM PC ownership and dead-test cleanup awaits delivery
-and owner testing. Production eleven C/H paths +71/-91, net -20; test/build
+M9 T85 S10 is delivered and verified, awaiting owner testing. Executor P1
+f97ecbea is pushed; coordinator actual-change review confirms all 48 paths
+match the packet and frozen ledger. Production eleven C/H paths +71/-91, net -20; test/build
 31 paths +106/-7511, net -7405. Dual full Release and focused 27/27 per width
 pass; serial background x64 468/468 (275.11s), x86 468/468 (254.56s).
 All 234 retained IBM PC test C/H paths enter each width's compiler closure.
 No Lib/Common/x86/SoftPC runtime change; EXEs retain the S9 hashes.
+Owned decoder scratch is removed. Only the original excluded owner INI and
+snapshot edits remain; no new task-owned dirty path. S10/T85 are not closed.
 S9 executor P1 03c979c7 is pushed and actual-change reviewed: nine paths match
 the packet, production +0/-23 and test build +2/-2; dual Release and focused
 8/8 per width, background 443/443 per width pass. No SoftPC runtime or public

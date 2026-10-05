@@ -259,6 +259,29 @@ existing ignored build caches and build/output remain. Complete executor P
 must be pushed and actual Git changes independently reviewed before handoff.
 S10 awaits owner testing; T85 remains open and no later S is admitted.
 
+### S10 coordinator actual-change review
+
+Executor P1 f97ecbea is pushed. The coordinator re-read the original owner
+request, current packet and shared governance rules, then reviewed actual
+git show/diff output rather than accepting the executor summary. All 48 paths
+match the recorded scope; there are zero outside-packet paths. The eleven
+production diffs preserve atomic memory orders and disk slot ownership, remove
+only the independent executor allocation, and retain callback/driver dependencies
+until successful destruction. Existing status classification and opaque product
+ABI remain. The 28 test deletions match the finite dormant ledger; 25 retained
+executables keep their original assertions, and retained test/header closure
+is complete. Existing composition/executor assertions remain with new failure
+proof. No timeout or assertion is weakened, and no inward package gains an
+outer dependency. Source/test manifests and corpus verification pass again
+against the pushed revision; actual code counts match the ledger.
+
+The dual Release/focused/background evidence covers the admitted change,
+not desktop/RDP or a guest running on the imported IBM PC executor. SoftPC
+runtime linkage and both EXE hashes are unchanged. Six bounded JSON outputs
+are removed. Git status contains only original owner INI/snapshot edits,
+excluded under the recorded asset decision. Delivery is ready for owner testing;
+neither S10 nor T85 is closed and no next S is admitted.
+
 ### S8 implementation and finite sweep
 
 Runtime change: machine.c +2/-2, net zero. Existing tests: Machine native
