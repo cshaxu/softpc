@@ -2,33 +2,34 @@
 
 ## Current Work
 
-M9 T85 S8 is verified for delivery, awaiting owner testing:
-Common published-frame invalidation simplification.
-S9/x86 and S10/IBM PC are admitted follow-ons, not active.
+M9 T85 S9 is active: remove the private no-op x86 Core bus lifecycle.
+S8 delivery is complete; owner authorizes continuation without intermediate
+manual acceptance. Owner now authorizes S10 immediately after S9 delivery;
+stop after S10 for owner testing.
 S7 remains verified awaiting owner testing: IBM PC import and test ownership.
 T85 remains open; S6 delivered verification remains recorded without inferred
 manual acceptance.
 
-## M9 T85 S8 Packet
+## M9 T85 S9 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits three serial shared-package optimization S tasks; S8/Common activates, S9/x86 and S10/IBM PC remain planned. |
-| Objective | Remove whole-frame zeroing from invalidation using existing valid/generation gates; preserve restart and first-frame semantics. |
-| Non-goals | No new frame state/cache/API, initial-allocation change, Lib/x86/IBM PC/SoftPC backend change or owner asset rewrite. |
-| Reference Baseline | Pushed 2a5747a2; prior S7 delivery remains awaiting owner testing. Owner INI/snapshot remain excluded. |
-| Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S8--S10 finite ledger and S8 brief. |
-| Files And ABI Surface | Common Machine implementation and existing Machine smoke/fixture, corresponding manifests, task documents and dual EXEs. No public ABI change. |
+| Admission And Approval | Owner authorizes S9 and then S10 without intermediate testing; each independently builds/tests/commits/pushes, wait only after S10. |
+| Objective | Delete private validation-only bus initialize and empty finalize, their declarations and callers; retain real port ownership and failure cleanup. |
+| Non-goals | No public ABI, CPU/chip protocol, Lib/Common/IBM PC/SoftPC implementation change, replacement abstraction or owner asset rewrite. IBM PC test link order may be corrected without runtime changes. |
+| Reference Baseline | Pushed 3537e87a; S8 verified delivery, manual acceptance not inferred. Original owner INI/snapshot remain excluded. |
+| Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S8--S10 ledger and S9 brief. |
+| Files And ABI Surface | x86/core machine.c, machine.h, port_interface.c and source manifest; two IBM PC test link-order lines and test manifest; task documents and rebuilt dual EXEs. Private declarations only; no public ABI change. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding and shared governance skills; strict shared C11 and eight-package inward boundaries. |
-| Verification | Dual Release and focused Machine 2/2 per width pass; serial background x64 443/443 (339.83s), final x86 443/443 (330.08s). First x86 442/443 and isolated shutdown timeout are retained in proposal/TODO; three retries pass and final full run passes. Common manifests/corpus and documentation checks pass. Five desktop cases excluded per width; no Linux claim. |
-| Expected Markers | Both slots invalidated under existing lock; identical first text republishes after reset; unavailable output cannot expose prior frame; rejected copies leave caller unchanged. |
+| Verification | Dual Release builds pass after correcting two test link lists; focused 8/8 per width; serial background x64 443/443 (501.37s), x86 443/443 (302.89s); source/test manifests, x86 corpus, documentation gate and diff check pass. Desktop excluded; no Linux claim. |
+| Expected Markers | Removed private symbols have no source/test callers; port initialization, registry rollback and finalization remain; creation failures and device teardown order unchanged. |
 | Asset Needs | Standard dual EXEs only; no media, desktop automation or external asset copy. |
 | Reporting Requirements | Tracked production/test path counts and added/removed/net lines, focused/full results and retained owner changes. |
-| Stop Conditions | Ungated invalid-frame read, incomplete valid driver output, unexplained failed test or required scope expansion stops delivery. |
-| Exit Criteria | Sweep and focused/full proof recorded, self-reviewed P committed/pushed and actual-change reviewed; wait for owner testing, T remains open. |
-| Original Owner Request | 批准新的s任务进行以上各项优化，一个解决common，一个解决x86，一个处理ibmpc！ |
-| Similar-Issue Sweep | Common frame invalidation/read/comparison and product/shared copy_frame drivers; distinguish initial allocation from invalidation. |
+| Stop Conditions | Resource/state responsibility in the removed functions, external ABI consumer, unexplained failed test or required scope expansion stops delivery. |
+| Exit Criteria | Bounded deletion and sweep verified; dual builds/tests pass, complete executor P pushed and actual-change reviewed; proceed to S10, T remains open. |
+| Original Owner Request | 请你继续执行，完成S8以后继续走S9。每一个S呢你都要编译测试提交推送，不需要等我验收，我只在S9完成后来验收。 |
+| Similar-Issue Sweep | All bus lifecycle declarations/callers, constructor admission and port resources; inspect other empty functions without deleting protocol handlers or widening CPU interfaces. |
 | Scratch And Cleanup | Existing ignored width build caches and bounded build/CTest logs only; preserve build/output and owner assets. |
 
 S8 replaces only whole-frame invalidation with the existing valid markers:
@@ -42,7 +43,8 @@ shutdown-test timing is recorded, not hidden or repaired by this optimization.
 Executor P1 9fed40d1 is pushed. Coordinator actual-change review confirms the
 eleven delivered paths, exact code accounting and unchanged artifact hashes;
 only original excluded owner INI/snapshot edits remain in the worktree.
-S8 awaits owner testing; it is not closed. S9/S10 remain inactive and T85 open.
+Owner now authorizes direct S9 continuation without intermediate testing.
+S8 delivery is complete, manual acceptance not inferred; T85 remains open.
 
 S7 imports all 126 IBM PC production paths byte-identically and owns 269 test
 paths. All 51 prior PC exclusions are dispositioned: 45 reachable paths return,

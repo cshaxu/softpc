@@ -2,12 +2,19 @@
 
 ## S8--S10: shared-package simplification
 
+Continuation instruction on 2026-10-05: 请你继续执行，完成S8以后继续走S9。每一个S呢你都要编译测试提交推送，不需要等我验收，我只在S9完成后来验收。
+This replaces the intermediate manual-test gate: S8 delivery permits S9;
+The owner subsequently updates: S9完成以后不要停下来了，你把S10完成以后再等我。
+Proceed from S9 to S10 after independent delivery/review; wait only after S10.
+T85 remains open.
+
 Original owner request: 批准新的s任务进行以上各项优化，一个解决common，一个解决x86，一个处理ibmpc！
 
 Baseline: pushed 2a5747a2. Three serial owner-admitted steps follow the
 read-only eight-package audit; only S8 is active. Each step delivers dual
 Release builds, focused proof, serial background regression, manifests/DAG,
-actual-change review and a pushed P before waiting for owner testing.
+actual-change review and a pushed P. Manual-test timing follows the current
+continuation instruction above; earlier delivery facts remain historical.
 Earlier S5/S6/S7 manual acceptance is not inferred. NXVM, Lib, SoftPC mirror,
 guest media and existing status-classification policy remain unchanged.
 Owner INI/snapshot remain untouched and excluded under the prior asset decision.
@@ -50,6 +57,150 @@ the existing Machine smoke for identical first text after reset and a reset
 without a ready frame, preserving the destination on rejected copy. Stop if
 any consumer reads invalid storage or a valid driver output is incomplete.
 Sweep all Common frame readers/writers and product/shared copy_frame drivers.
+
+### S9 brief and pre-change audit
+
+Full-build correction: deleting the no-op exposed two IBM PC tests that linked
+the Core static archive before its board consumers. Both widths failed with
+unresolved port-route symbols. Reverse those two existing link lists, +2/-2,
+and refresh the test manifest. Do not restore dummy lifecycle calls or change
+production library dependencies to mask this test composition error.
+
+Baseline 3537e87a. Remove only the private bus initialize/finalize functions
+in port_interface.c, two declarations in machine.h, the constructor check
+and destructor call in machine.c. Estimate three production paths, +0/-20--25;
+Initially no test/build logic change was expected; the full-build correction
+above adds two link-order substitutions. Source/test manifests and task
+documents are updated.
+The constructor already owns a nonnull zero-allocated machine with inactive
+firmware operation, so the validation cannot fail; finalize has no side effects.
+Retain core_machine_port_initialize, allocation injection, registration rollback
+and core_machine_port_finalize. Do not replace deleted calls with new helpers.
+
+Finite universe: both definitions, both private declarations and the sole
+constructor/destructor calls; rg bus_initialize/bus_finalize across src/test
+must find no remaining hits after deletion. Review constructor initialization
+and resource-owning failure exits, bus routing and port registry consumers.
+Existing neutral-link, configuration, attachment-phases, RAM-port-context,
+memory-device-registration and stopped-lifecycle cases provide focused proof;
+full background regression also covers IBM PC callers. No new test framework
+or static policy is needed to prove absent symbols.
+
+The empty-function sweep also finds operandless disassembly handlers: these
+participate in dispatch and are not resource lifecycle wrappers. KBC repeat
+discards a queue result but performs work. CPU execution finalize is an existing
+chip execution interface used by independent CPU tests, outside this private
+Core bus deletion; no chip interface is changed. This is a bounded S9 cleanup,
+not a claim that every no-op across x86 can be deleted.
+
+### S9 verified delivery
+
+Actual production: machine.c +0/-5, machine.h +0/-2, port_interface.c +0/-16;
+three code paths +0/-23, net -23. Test build: one path +2/-2, net zero.
+No replacement state, allocation or lifecycle entry is introduced. All removed
+symbol references are absent; actual port registration, cleanup and allocation
+failure behavior remain. Dual full Release builds pass after the documented
+initial link failures. Focused eight cases pass per width; serial background
+x64 443/443 in 501.37s and x86 443/443 in 302.89s, desktop excluded.
+Source/test manifests, x86 dependency gate, documentation gate and diff check
+pass. SoftPC EXEs are verified rebuilt/up-to-date with unchanged hashes:
+x86 9B32C0C5D8F0AEAD062B326E930D0BD9A658E0C7CCFE5C521990AFADF163C98B;
+x64 516F8545678A2EED03F711E0B41F5D8D9D1CC644AAD2FDCDCA74C946B3984E20.
+The shared x86 Core is not a SoftPC runtime input. Owner INI/snapshot hashes
+remain unchanged; these preexisting excluded edits are not part of delivery.
+No Linux, RDP or desktop qualification is inferred. Proceed to S10 only after
+the complete executor P is pushed and its actual changes reviewed.
+
+### S10 brief and pre-change audit
+
+The owner authorizes direct continuation after S9 delivery; no code is changed
+before activating its packet. Preserve Lib/Common, SoftPC and the shared CPU.
+
+Production: keep the existing status classification. Check UI destruction
+before releasing Session/Machine, retain the existing ui pointer on failed
+binding cleanup, and clear successfully released pointers before later teardown
+can fail. No retry object or alternate lifetime is introduced. Embed the two
+executor atomics in private control, retaining the existing atomic operations
+and memory order; delete only allocating lifecycle and its public test-only
+header. Remove slot-zero disk union aliases; use the existing arrays everywhere.
+Estimate 10 production paths, +30--55/-70--100 (net -20--70); test/build
+changes +75--120/-7,520--7,560, principally removal of dormant material.
+
+Frozen dormant universe: 262 tracked IBM PC C/H paths, 208 in actual GCC
+object dependency closure, 54 outside. Quoted-include consumers and CMake
+registrations were searched repository-wide before disposition. Of those 54,
+retain 25 executable tests and their protected bootstrap header: board-level
+fault delivery, privilege and paging tests differ from inward CPU-unit tests;
+three bounded decoder inventories retain their counts and write only into the
+width build directory. Delete 25 helpers with no retained consumer (1,027
+lines), two unregistered historical timing generators (6,435 lines), and the
+41-line obsolete debugger test. Both generators require absent
+cpu_timing_manifest_metadata_catalog.inc; recreating that historical catalog
+is not a simplification. The debugger test calls removed set_trace/clear_trace
+and reads the removed data.flagTrace representation. Current registered
+machine/debug_budget_smoke.c tests trace counts, plan cancellation and completion
+using the current API; do not revive obsolete machine construction or APIs.
+
+Every frozen member follows. Completion requires compiling/executing all newly
+registered cases in both widths, proving no retained include names a removed
+helper, and recomputing C/H dependency closure. A failed new test is not silently
+deleted or weakened. Full background regression and manifests/DAG/docs gate
+must pass. No desktop or Linux acceptance is claimed.
+
+- Keep/register: `board-common/composition/core_machine_80186_decoder_inventory_runner.c`.
+- Keep/register: `board-common/composition/core_machine_80286_decoder_inventory_runner.c`.
+- Keep/register: `board-common/composition/core_machine_80286_protected_mode_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_80386_decoder_inventory_runner.c`.
+- Keep/register: `board-common/composition/core_machine_call_gate_privilege_entry_board_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_fs_gs_stack_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_legacy_alu_s2_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_legacy_lock_s1_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_movx_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_operand_address_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_protected_16_call_gate_board_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_protected_16_external_board_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_protected_16_gate_board_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_protected_16_outer_board_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_protected_16_outer_iret_board_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_protected_ud_delivery_s1_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_real_exception_final_s1_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_real_ud_delivery_s1_smoke.c`.
+- Keep/register: `board-common/composition/core_machine_segment_selector_smoke.c`.
+- Keep/register: `board-common/composition/cpu_fault_diagnostic_smoke.c`.
+- Keep/register: `board-common/composition/cpu_fpu_profile_closure_smoke.c`.
+- Keep/register: `board-common/composition/cpu_fpu_profile_smoke.c`.
+- Keep/register: `board-common/composition/machine_fpu_escape_smoke.c`.
+- Keep/register: `board-common/composition/machine_protected_privilege_board_smoke.c`.
+- Keep/register: `board-common/composition/machine_task_switch32_paging_smoke.c`.
+- Keep/register: `board-common/composition/support/protected_16_bootstrap_fixture.h`.
+- Remove: `board-at/boot_fixture.c` (12 lines).
+- Remove: `board-at/boot_fixture.h` (7 lines).
+- Remove: `board-at/command_fixture.h` (34 lines).
+- Remove: `board-at/state_fixture.c` (38 lines).
+- Remove: `board-at/state_fixture.h` (9 lines).
+- Remove: `board-common/boot_fixture.c` (86 lines).
+- Remove: `board-common/boot_fixture.h` (33 lines).
+- Remove: `board-common/cmos_fixture.c` (39 lines).
+- Remove: `board-common/cmos_fixture.h` (11 lines).
+- Remove: `board-common/composition/machine_80186_timing_manifest_runner.c` (1943 lines).
+- Remove: `board-common/composition/machine_8086_timing_manifest_runner.c` (4492 lines).
+- Remove: `board-common/composition_fixture.c` (168 lines).
+- Remove: `board-common/composition_fixture.h` (77 lines).
+- Remove: `board-common/controller_fixture.c` (113 lines).
+- Remove: `board-common/controller_fixture.h` (33 lines).
+- Remove: `board-common/kbc_state_fixture.c` (19 lines).
+- Remove: `board-common/kbc_state_fixture.h` (9 lines).
+- Remove: `board-common/video_topology_fixture.c` (10 lines).
+- Remove: `board-common/video_topology_fixture.h` (7 lines).
+- Remove: `board-xt/boot_fixture.c` (13 lines).
+- Remove: `board-xt/boot_fixture.h` (9 lines).
+- Remove: `machine/composition/vm_debug_authority_smoke.c` (41 lines).
+- Remove: `machine/support/common_machine_fixture.h` (98 lines).
+- Remove: `machine/support/guest_display.h` (53 lines).
+- Remove: `machine/support/guest_input.h` (57 lines).
+- Remove: `machine/support/media.h` (26 lines).
+- Remove: `machine/support/selection.h` (10 lines).
+- Remove: `machine/support/vm_presentation_capture.h` (56 lines).
 
 ### S8 implementation and finite sweep
 
