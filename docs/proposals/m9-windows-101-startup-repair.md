@@ -371,3 +371,107 @@ six roots, original mirror, repository media and INI compare unchanged against
 
 Owner accepts and closes S2 on 2026-09-28; see the
 [S2 closure](../history/M9-T85-S2-indexed-pointer-repair.md). T85 remains open.
+
+## S4: DOS idle CPU observation and root-cause research
+
+Original owner request: 准入一个S任务，对cpu占用的现象进行观测、记录，然后对根因进行调研。
+
+Diagnostic extension admitted on 2026-10-04; its executable contract is the
+S4 packet in CURRENT. No optimization is admitted. Expected retained changes
+are documents only, with production +0/-0 and unchanged accepted packages.
+
+Finite coverage ledger: (1) provenance and confirmed DOS prompt; (2) settled
+x64/x86 process and thread CPU; (3) original idle enable and keyboard call
+sites; (4) pacing; (5) HLT, pending quick events and event wake ownership;
+(6) publication/presentation contribution; (7) bounded follow-up design and
+measurement limits. Each entry must receive evidence or an explicit unresolved
+disposition. Headless Core/Common evidence cannot stand in for a native Window
+measurement. The supplied approximate 96-percent observation is owner evidence,
+not an independently reproduced result.
+
+Initial source evidence: standalone compilation does not define NTVDM;
+idetect.c initializes ienabled to zero and all detection calls return while
+disabled; no production idle_ctl/IDLE_ctl caller was found. The original host
+contract describes blocking until interesting activity, whereas Compat only
+yields. Separately, pacing spins through yield for sub-millisecond remainder.
+These are candidates, not a measured division of CPU cost. No root cause is
+declared experimentally confirmed yet.
+
+### S4 observation checkpoint
+
+The existing accepted-S2 headless probes exercise the actual VM driver,
+Common executor and original DOS machine, without creating a native presenter.
+S3 changed no production code. Probe SHA-256: x64
+`A9507A5B82E66B600D770D87AE24BB3F098CBC955679F70637065EFE34D0C6AD`;
+x86 `22CE5CDAB1C2456A0DDDE99BC0BA51E7132ECC01B8A8D0BC24215BA41E9227FF`.
+The probes were built on 2026-09-28; they are not the package EXEs, and no
+fresh build or native Window benchmark is claimed. Source medium SHA-256 is
+`2DE4B03A68B1E1AC23D482C3A3402726A853A8520B7ACC370DB694053DFFA3A4`.
+Each run used its own disposable media copy; originals were never passed to
+the probe's direct writer. Both runs printed RUNNING state and C:\\> before
+sampling, settled ten seconds, then sampled three two-second intervals.
+
+| Headless machine | Interval CPU, one logical core = 100 percent | Mean | Private memory |
+| --- | --- | --- | --- |
+| x64 | 95.53, 100.10, 96.19 | 97.27 | 24.23 MiB |
+| x86 | 93.37, 100.09, 96.87 | 96.78 | 24.47 MiB |
+
+The slightly over-100 samples reflect OS CPU accounting and wall-clock
+measurement granularity, not more than one executor. x64's hottest thread
+contributes 94.75/99.32/96.19 percent; x86's contributes
+93.37/98.53/96.09 percent. Other threads are approximately zero, with isolated
+0.78-percent increments. Both processes exit normally (code zero); their
+disposable images are removed. This reproduces high idle CPU without native
+Window or Console painting; presenters are not a necessary cause. It does not
+measure their additional cost in a complete product.
+
+A separate x64 run, after the measurement runs, was attached read-only by GDB
+for two stack checkpoints. One executor stack is ccpu.constprop ->
+c_cpu_simulate -> softpc_machine_run -> vm_driver_run -> common_machine_worker
+-> base_sync_platform_main. Another has d_mem above that same chain. Main is
+sleeping in the probe and native pool workers are waiting. Runtime reads show
+ienabled = 0, pacing_enabled = 1 and pacing_instructions = 24032271. No variable
+was changed and no guest function was invoked. Debugger pauses are excluded
+from the CPU sample intervals. An earlier x86 attach lacked useful unwind
+frames and is not used as function-level attribution.
+
+### S4 cause ledger and follow-up boundary
+
+1. Provenance/prompt: measured using the hashes and real text frames above.
+2. Process/thread CPU: measured on both widths; reproduced at approximately
+   one core even without a presenter. Native package measurement remains
+   separate owner evidence, not an independently replicated benchmark.
+3. Idle: runtime-disabled detection is confirmed, not only inferred. Search
+   `rg -n 'IDLE_ctl|idle_ctl' src test` finds definitions/declarations only.
+   Original keyboard wait/status loops call IDLE_poll/IDLE_waitio and timer.c
+   calls IDLE_tick, but idetect returns while disabled. Enabling alone still
+   leaves Compat host_release_timeslice as yield rather than original blocking
+   semantics. This is an incomplete host idle integration, not a Lib defect.
+4. Pacing: runtime enabled; platform.c checks every 1024 instructions against
+   a one-million-instruction-per-second target. Its sub-millisecond remainder
+   repeatedly yields and queries the clock. This is a separate CPU candidate;
+   the two stack checkpoints do not quantify its time share. No percentage
+   attribution or causal A/B optimization result is claimed.
+5. HLT/events: c_main.c drains pending clock/input work and quick events before
+   waiting; it waits only with zero interrupt map and zero quick-event count.
+   Compat has one auto-reset event, 50-ms host-clock signaling and VM stop/input
+   signaling. BIOS input may use nested host_simulate, so idle waiting must
+   preserve original continuation and dispatch wake work rather than treating
+   it as a snapshot-safe boundary. Full lock/quick-event timing qualification
+   belongs to a separately admitted repair, not this observation result.
+6. Frames: Common compares copied text before publication and calls the sink
+   after releasing frame_lock. No presenter exists in this measured fixture;
+   no evidence supports changing rendering cadence to solve the reproduced
+   executor consumption.
+7. Follow-up: minimally enable/reset original idle detection in the product
+   initialization owner and implement its existing host callback's wait using
+   existing wake resources in Compat. Do not add a second executor/clock,
+   change Lib/Common, or sleep every guest instruction. Qualify keyboard,
+   mouse, pause/stop/reset, quick events, timer/audio/serial and snapshots;
+   measure latency and idle CPU before claiming 1--2 percent. Address pacing
+   separately only if a function-level profile shows remaining significance.
+
+All ledger entries have measured/source evidence or explicit qualification
+limits. No repair is implemented, no media/INI/package changes are made, and
+tracked production/test code is +0/-0, net zero. The observation report is
+ready for owner review; S4/T85 are not declared closed.

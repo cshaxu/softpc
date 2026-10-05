@@ -65,7 +65,36 @@ No production change; EXEs retain accepted S2 hashes. T85 remains open.
 
 [S3 closure](../history/M9-T85-S3-nxvm-shared-subset-sync.md).
 
-No implementation subtask is active. Open task awaiting owner: T85.
+T85 S4 is active: observe DOS-prompt CPU use and investigate its causes;
+no runtime optimization is admitted. T85 remains open.
+
+S4 checkpoint: confirmed DOS-prompt headless CPU averages x64 97.27 percent
+and x86 96.78 percent of one core, overwhelmingly on one executor thread.
+Separate x64 debugger observation confirms ienabled=0 and pacing_enabled=1.
+The [proposal](../proposals/m9-windows-101-startup-repair.md) records probe
+hashes, samples, call stacks, source ledger and limits. No native presenter
+benchmark or optimized-runtime result is claimed; production remains unchanged.
+
+## M9 T85 S4 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner admits CPU observation, recording and root-cause research on 2026-10-04; optimization requires later approval. |
+| Objective | Establish an idle CPU baseline, identify expensive threads and distinguish guest polling, pacing and presentation work. |
+| Non-goals | No production changes, new idle policy, fixed execution-loop sleep, timer changes or shared-corpus changes. |
+| Reference Baseline | Accepted T85 S3 HEAD ccce64ee; preserve owner INI and snapshot changes. |
+| Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S4 diagnostic extension. |
+| Files And ABI Surface | CURRENT and existing proposal; ignored probes/logs under build/t85-s4-cpu; no ABI changes. |
+| Applicable Rules | Documentation reading set, Execution/Document rules and linked skills; architecture/coding authorities govern disposable probes. |
+| Verification | Confirm DOS prompt before sampling; settle 10 seconds, then three 2-second process/thread intervals per width; one logical core = 100 percent. Separate headless and native UI evidence. Documentation gate and diff check; unchanged production needs no new EXE or regression claim. |
+| Expected Markers | Prompt, sample intervals, binary hashes, call-site ledger and explicit evidence limits; no probe in production. |
+| Asset Needs | Original media read-only; use owned disposable copy or overlay. Per-run budget 120 seconds, total logs 10 MiB, ignored scratch build/t85-s4-cpu; executor owns process/media cleanup and retains summary in proposal. Preserve package INI and snapshots. |
+| Reporting Requirements | Separate measurements from inference; report smallest follow-up design and zero production added/deleted/net lines. |
+| Stop Conditions | Wrong guest state, unavailable instrumentation, unowned process/media or need for runtime-semantic change: stop that experiment and report. |
+| Exit Criteria | Evidence-backed observation and bounded cause ledger reviewed against actual changes; no optimization claim; owner decides repair. |
+| Original Owner Request | 准入一个S任务，对cpu占用的现象进行观测、记录，然后对根因进行调研。 |
+| Similar-Issue Sweep | Original idle enable/poll/wait, pacing, HLT/quick-event waits, input/control/timer wake and frame publication; dispositions without implicit repair. |
 
 M9 T85 S2 is owner-accepted and closed on 2026-09-28. P1 `8c15e893`
 repairs indexed DIB ownership; P2 `f8fe3df8` records actual-change review.
