@@ -18,8 +18,12 @@ src/
     session/     neutral control FIFO, reduction and UI dispatch
     machine/     generic executor, lifecycle/input queues and frame publication
   x86/
+    core/        shared CPU executor and neutral machine construction
+    chips/       shared x86/PC device implementations
     xasm32/      imported x86 assembly/disassembly corpus
     debug/       imported x86 debug corpus over the optional machine adapter
+  ibmpc/{board-common,board-at,board-xt,machine,product}/
+    shared PC construction and product adaptation, not SoftPC's executor
   lib/{types,base,console,console-broker,storage,audio,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
 ```
@@ -31,13 +35,14 @@ live in test/common, never src/common/test. Lib tests and their fixtures live
 in test/lib. x86 source owns its own manifest/build/DAG and never becomes a
 Common dependency. test/x86 owns architecture protocols and CLI/assembly tests;
 it owns a minimal injected-driver fixture rather than borrowing test/common.
-The six source/test directories serve x86 products; src/common, src/lib,
+The eight source/test directories add src/ibmpc and test/ibmpc as the outer
+PC-specific layer. The six inner directories serve x86 products; src/common, src/lib,
 test/common and test/lib alone serve neutral products. Each suite has its own
 CMake entry and manifest. Product tests remain outside the shared suites.
-All six shared source/test packages select C11 with extensions disabled, in
+All eight shared source/test packages select C11 with extensions disabled, in
 both standalone and embedded builds. GNU/Clang shared builds use
 -Wall -Wextra -Wpedantic -Werror. This owner-approved shared-corpus baseline
-supersedes the general standalone C17 rule only for these six directories;
+supersedes the general standalone C17 rule only for these eight directories;
 App/Core retain their existing language settings. Package-local build settings
 do not propagate warning policy or a new language requirement into the product.
 Only Lib provides the underlying platform implementation.

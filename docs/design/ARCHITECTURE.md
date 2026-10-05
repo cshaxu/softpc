@@ -185,7 +185,11 @@ importing product's adapters or firmware. Common source and tests build without
 x86. Each test package owns its fixtures; it may consume inward production
 APIs but never another package's tests or an outer package. Generic test tools
 live directly in test/. Architecture protocols and CLI assertions remain in
-test/x86; PC assembly checks belong to the separate IBM PC receiver.
+test/x86; PC assembly checks belong to src/ibmpc and test/ibmpc. This fourth
+layer consumes inward production APIs only and owns its own test fixtures.
+SoftPC imports/builds it without replacing its original execution backend or
+linking IBM PC Product into the SoftPC executable. The complete PC import set
+adds these two directories to the reusable inner six-directory set.
 
 SoftPC's checked-in `lib/` corpus is the shared-library source of truth. NXVM
 adopts it exactly; no runtime or build dependency crosses repositories.

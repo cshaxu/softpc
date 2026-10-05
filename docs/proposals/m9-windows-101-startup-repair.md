@@ -1,5 +1,79 @@
 # Windows 1.01 startup diagnosis and repair
 
+## S7: IBM PC corpus and PC-test ownership
+
+Owner admits on 2026-10-05: 很好。准入一个Ｓ，把ibmpc的2个src和test组件也导入了吧，然后正确实现边界；原来在core的被删除的测试，是不是该挪进ibmpc的test，如果没有重复的话？
+
+Freeze read-only NXVM ebdb40098dfaa7b2bcc0f294d52e3f19dafd6629 and SoftPC
+45a461a2. Import src/ibmpc to the same local path, preserving retained Neko
+copyright notices (2012-2014/2012-2026), with no new licensing claim. The source
+contains C/H and build/documentation only; synthetic test ROMs are generated
+from test-owned bytes, not imported third-party firmware. No external checkout
+is a build/runtime dependency and NXVM is never modified.
+
+Estimate: src/ibmpc 126 files, 117 C/H and 13,396 C/H lines; test/ibmpc
+255 files, 248 C/H and 52,824 C/H lines, plus at most 9,026 lines from the
+51 prior PC exclusions. Local edits are ownership/registration, Types vocabulary
+and duplicate-test removal, not product behavior. The imported PC implementation
+remains unconnected to SoftPC's original executor. Lib/Common/x86 remain usable
+with IBM PC absent. Test packages consume inward production interfaces only;
+none borrows another suite's C/H. Shared generic checking remains directly in test/.
+
+Finite convergence universe: every upstream IBM PC source/test path and each
+S6 excluded path. Dispositions are unchanged production import, retained local
+test/packaging adaptation, PC-owned test/fixture relocation, exact duplicated
+scenario eliminated with named coverage owner, or unused helper omitted after
+recursive registered-source closure. Record source/destination and proof for
+each member in the final manifests and explicit exception ledger. Completion
+requires no undispositioned member, inward source/test gates, independent IBM
+PC build/test without other test suites, and dual product regression.
+
+Pre-import audit confirms borrowed x86 Core fixture sources and quoted includes
+in upstream test/ibmpc, and a repeated protected-IRET scenario include. Retain
+board/PIC assertions; the independent x86 protected-IRET test owns duplicate
+CPU-only scenarios. Former excluded files have no byte-identical namesake in
+upstream test/ibmpc; same-named boot/composition/video helpers are not assumed
+equivalent. Registered source/include closure and scenario review determine
+which helpers and cases return, not blanket restoration or filename matching.
+
+S7 boundary refinement: upstream test/ibmpc also carries 38 unregistered
+App-profile integrations/support paths and timing qualification runners.
+They cannot enter a reusable inner package. Their upstream owner is retained,
+not replaced with fake product behavior or silently counted as passing tests.
+The finite per-path dispositions, including all 51 S6 exclusions, are in the
+[S7 import ledger](../etc/evidence/m9-t85-s7-ibmpc-import-ledger.md).
+All 126 production paths remain byte-identical to the frozen reference.
+
+### S7 verified delivery
+
+Actual source import: 126 files, 117 C/H, +13,396/-0 lines. Final IBM PC test
+corpus: 269 files, 262 C/H and 50,069 C/H lines. Forty-five formerly excluded
+paths are reachable and restored, six unused helpers omitted; 38 unique PC
+cases are registered. Seven local support headers replace foreign-suite
+borrowing, not CPU executors or complete CPU test programs. Protected IRET
+duplicate invocation is removed while distinct real-mode/PIC coverage stays.
+The expanded Types gate also corrects four raw exit calls in three x86 test
+files (+5/-4) using the existing assertion, without a new Lib API.
+
+Tracked source/test/build against 45a461a2: production +13,396/-0; tests
++50,074/-4; build/check/attributes +1,113/-6. Combined +64,583/-10,
+net +64,573. Documents, manifests and EXEs are excluded from these code counts.
+Retained upstream IBM PC test C/H adaptation is +812/-874, net -62;
+imports/returning paths are distinguished in the ledger, not mislabeled as
+new product implementation. Existing six-component production and SoftPC
+machine/Compat/mirror are unchanged. Both EXE link inputs exclude IBM PC
+Product and shared x86 Core; SoftPC retains its original executor.
+
+Independent IBM PC x64 Release 161/161 (115.07s), final background x64 443/443
+(161.57s), x86 443/443 (237.47s) pass. Eight manifests, source/build DAG and
+test Types/ownership probes pass. Five desktop cases per width are excluded;
+there is no Linux execution, IBM PC product boot or user manual acceptance
+claim. Final PE architecture is 0x14c/0x8664. EXE SHA-256:
+x86 68C7318C0A43682AB44E745721ACBEB4C55C72B4E27C48F4C9265B21B03A960D;
+x64 599651F6E95F9A8F05131FCE5E552DCD2FBCC9EC24DF3D3E9D75EA5F35DF3E71.
+Owner INI/snapshot edits are preserved and excluded. S7 awaits owner testing;
+T85 remains open.
+
 ## S6: six-component dependency cleanup and full x86 import
 
 Owner admits S6 on 2026-10-05 and explicitly excludes changes to NXVM and

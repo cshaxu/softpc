@@ -2,42 +2,47 @@
 
 ## Current Work
 
-M9 T85 S6 is verified awaiting owner testing: six-component inward-only
-source/test boundaries. T85 remains open.
+M9 T85 S7 is verified for delivery: IBM PC source/test import and PC-test ownership.
+T85 remains open; S6 delivered verification remains recorded without inferred
+manual acceptance.
 
-## M9 T85 S6 Packet
+## M9 T85 S7 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits all boundary cleanup and full x86 import, limiting edits to SoftPC's six packages; NXVM IBM PC is explicitly excluded. |
-| Objective | Import complete x86 production corpus and independently owned tests; remove outward and cross-test-package dependencies. |
-| Non-goals | No IBM PC import/edit, SoftPC Core replacement, Audio rollback, user configuration/media edit or new product behavior. |
-| Reference Baseline | SoftPC pushed 2dc7e79e; read-only NXVM 946f7a737205b0952e6a6c9081138f0b12761bc7 with clean shared roots. Owner INI/snapshot preserved and excluded. |
-| Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S6 finite import ledger. |
-| Files And ABI Surface | src/x86, test/x86, test/lib and test/common build/check packaging; Types file vocabulary aliases used by existing test I/O; generic test helpers, design/README/manifests and dual EXEs. Existing product-facing ABI unchanged. |
-| Applicable Rules | Execution, Documentation, Architecture, Coding and source-research policy; shared governance skills; C11; inward-only production dependencies and owner-local tests. |
-| Verification | Final dual Release builds pass; x64/x86 background CTest 282/282 each. Isolated x64 Lib/Common/x86 suites pass 48/48, 20/20, 167/167 with outer sources and foreign tests absent. Six manifests, source DAG, negative boundary probes and documentation governance pass. Five desktop cases per width are excluded. |
-| Expected Markers | No test/ibmpc dependency; no test suite borrows another suite's source; S5 Audio preserved; no new SoftPC executor. |
-| Asset Needs | Refresh only standard dual EXEs; no external test media or native desktop automation. |
-| Reporting Requirements | Report imported versus locally rewritten code, files, added/removed/net lines, excluded PC-owned cases and dual EXE links. |
-| Stop Conditions | Unknown source provenance, product hookup, IBM PC edits or unexplained failed verification stop delivery. |
-| Exit Criteria | Frozen-member disposition complete, independent and product proofs pass, P committed/pushed; wait for owner testing. |
-| Original Owner Request | 准入一个s任务完成这些全部清理。你只管我们这里的六个组件；NXVM那边我会让他另行处理。 |
-| Similar-Issue Sweep | All six source/test include and CMake edges; recursive test fixture closure; generic helpers versus test-package borrowing. |
-| Scratch And Cleanup | Ignored build/t85-s6-shared only; twenty-minute cold-build budget (fresh 32-bit cache), ten-minute per test/suite budget, bounded build logs, no raw media/desktop traces; cleanup after retained summary. |
+| Admission And Approval | Owner admits src/ibmpc and test/ibmpc import, correct inward boundaries, and relocation/deduplication of previously excluded PC-dependent Core tests. NXVM stays read-only. |
+| Objective | Establish the fourth shared layer and independently owned IBM PC tests; restore unique PC-composition coverage without cross-suite borrowing. |
+| Non-goals | No SoftPC CPU/backend replacement, IBM PC product launch, new firmware/media, six-component runtime redesign or user INI/snapshot change. |
+| Reference Baseline | SoftPC pushed 45a461a2; read-only NXVM ebdb40098dfaa7b2bcc0f294d52e3f19dafd6629 with clean admitted roots. Owner INI/snapshot remain excluded. |
+| Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S7 eight-package and prior-exclusion ledger. |
+| Files And ABI Surface | src/ibmpc and test/ibmpc; test/x86 ownership cleanup if required, shared test tools, root test registration/LF attributes, design/README/manifests and dual EXEs. Existing SoftPC public ABI unchanged. |
+| Applicable Rules | Execution, Documentation, Architecture, Coding, source-research policy and shared governance skills; shared C11; Lib then Common then x86 then IBM PC; tests own fixtures. |
+| Verification | Independent IBM PC Release x64 161/161; final background x64 443/443 (161.57s), x86 443/443 (237.47s); eight manifests/DAG and Types/ownership negative probes pass. Dual Release PE widths and product link audit pass; five desktop cases per width excluded, no Linux execution claim. |
+| Expected Markers | Inner production/tests never require IBM PC; no cross-test-package source; unique PC cases retained once; SoftPC still uses its original executor. |
+| Asset Needs | Refresh only standard dual EXEs; synthetic in-code fixtures only, no guest media or native desktop automation. |
+| Reporting Requirements | Before/after production/test files and added/removed/net lines; imported versus local changes; every former S6 excluded case mapped to retained, deduplicated or unused disposition. |
+| Stop Conditions | Unknown provenance, unexplained failed tests, original-mirror/runtime policy changes or required third-party firmware stop delivery. |
+| Exit Criteria | Finite import/exclusion ledger complete; independent and product gates pass; P committed/pushed; wait for owner testing, T remains open. |
+| Original Owner Request | 很好。准入一个Ｓ，把ibmpc的2个src和test组件也导入了吧，然后正确实现边界；原来在core的被删除的测试，是不是该挪进ibmpc的test，如果没有重复的话？ |
+| Similar-Issue Sweep | Eight source/test layers; include/link/build/fixture closure and duplicate scenario registrations; all 51 prior excluded paths and all upstream IBM PC members. |
+| Scratch And Cleanup | Ignored build/t85-s7-ibmpc only; thirty-minute cold build budget, ten-minute per test/suite budget, bounded logs; remove owned scratch after evidence summary, preserve reusable root builds/build/output and owner configuration/media. |
 
-Actual source/test/build diff: +88,046/-22, net +88,024. This includes
-81 newly imported production paths (+43,497 lines); existing Lib production
-adds only four Types file aliases. No Common runtime or App/Core change.
-Imported x86 production bytes match frozen NXVM except README/manifest.
-PC-dependent tests and unused helpers are explicitly excluded in the proposal.
-Dual EXEs are refreshed; owner INI/snapshot changes remain outside delivery.
-Final evidence and qualification limits are recorded in the S6 proposal.
-Executor P1 `376f9278` is pushed. Coordinator actual-change review confirms
-281 delivered paths match the packet, with no App/Core/IBM PC source, Common
-runtime, NXVM or owner configuration/media change. Both EXE hashes remain the
-verified values. S6 awaits owner acceptance; it and T85 are not closed.
+S7 imports all 126 IBM PC production paths byte-identically and owns 269 test
+paths. All 51 prior PC exclusions are dispositioned: 45 reachable paths return,
+six unused helpers remain omitted; 38 unique PC cases return. The retained
+suite has no cross-test-package source dependency; duplicate protected IRET
+remains owned once by x86. Code/build +64,583/-10, net +64,573, principally
+imported source/tests. Existing Lib/Common/x86/App/Core production is unchanged;
+IBM PC and the shared x86 Core are absent from SoftPC's EXE link inputs.
+The [S7 ledger](../etc/evidence/m9-t85-s7-ibmpc-import-ledger.md) records exact
+scope, local adaptation, failed/interrupted attempts and final qualification.
+P delivery/review remains pending; S7 awaits owner testing and T85 stays open.
+
+S6 P1 376f9278 and P2 45a461a2 are delivered: dual Release/background
+282/282 each; isolated Lib/Common/x86 48/48, 20/20, 167/167.
+[Delivery handoff](../history/M9-T85-S6-shared-boundary-delivery.md).
+New S7 admission does not fabricate a manual-test acceptance or close S6/T85.
 
 S5 remains verified awaiting owner acceptance; admitting S6 does not infer
 an unreported manual-test result or undo its delivery.

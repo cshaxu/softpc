@@ -18,7 +18,7 @@ static core_machine_debug_cpu_snapshot vm86_iret_capture(const core_machine *mac
     core_machine_debug_cpu_snapshot snapshot = {0};
     if (core_machine_debug_capture_cpu_snapshot(machine,
             CORE_MACHINE_CPU_SNAPSHOT_CURRENT, &snapshot) != LIB_STATUS_OK)
-        exit(EXIT_FAILURE);
+        lib_test_assert(LIB_FALSE);
     return snapshot;
 }
 

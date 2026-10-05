@@ -26,7 +26,7 @@ check_source("#include <windows.h>" "header bypasses Types")
 check_source("void f(void) { SetEvent(0); }" "function/macro bypasses Types")
 foreach(call IN ITEMS AllocConsole FreeConsole FillConsoleOutputCharacterW
         CallWindowProcW EnumWindows InitializeCriticalSection ReleaseSemaphore
-        TerminateProcess puts fputs fputc rewind tmpfile)
+        TerminateProcess puts fputs fputc rewind tmpfile exit abort)
     check_source("void f(void) { ${call}(0); }" "function/macro bypasses Types")
 endforeach()
 check_source("#include \"lib/types/win32/test.h\"\nlib_win32_input_record *record;\nconst lib_win32_raw_input_device *device;\nlib_win32_uint *count;\n/* PINPUT_RECORD */\nconst char *text = \"PUINT\";" "")
