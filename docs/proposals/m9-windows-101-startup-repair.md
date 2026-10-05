@@ -11,7 +11,7 @@ T85 remains open.
 Original owner request: 批准新的s任务进行以上各项优化，一个解决common，一个解决x86，一个处理ibmpc！
 
 Baseline: pushed 2a5747a2. Three serial owner-admitted steps follow the
-read-only eight-package audit; only S8 is active. Each step delivers dual
+read-only eight-package audit; S8/S9 are delivered and S10 is active. Each step delivers dual
 Release builds, focused proof, serial background regression, manifests/DAG,
 actual-change review and a pushed P. Manual-test timing follows the current
 continuation instruction above; earlier delivery facts remain historical.
@@ -119,7 +119,12 @@ before activating its packet. Preserve Lib/Common, SoftPC and the shared CPU.
 Production: keep the existing status classification. Check UI destruction
 before releasing Session/Machine, retain the existing ui pointer on failed
 binding cleanup, and clear successfully released pointers before later teardown
-can fail. No retry object or alternate lifetime is introduced. Embed the two
+can fail. The same owner-local sweep found machine-binding rollback ignoring
+Common Machine destruction failure and then releasing its driver. Apply the
+same rule there: retain the two existing owning pointers only when destruction
+fails, prove it with the existing failure fixture, and release after a successful
+shutdown. This adds roughly six production lines and 25 test lines, not a new
+state or recovery loop. No retry object or alternate lifetime is introduced. Embed the two
 executor atomics in private control, retaining the existing atomic operations
 and memory order; delete only allocating lifecycle and its public test-only
 header. Remove slot-zero disk union aliases; use the existing arrays everywhere.
@@ -201,6 +206,58 @@ must pass. No desktop or Linux acceptance is claimed.
 - Remove: `machine/support/media.h` (26 lines).
 - Remove: `machine/support/selection.h` (10 lines).
 - Remove: `machine/support/vm_presentation_capture.h` (56 lines).
+
+### S10 implementation and finite sweep
+
+Production is eleven C/H paths, +71/-91, net -20: composition.c +21/-5;
+control.c +9/-11; control.h +12/-3; executor_state.c +1/-25;
+executor_state_interface.h +0/-16; lifecycle.h +0/-1; machine.c +8/-8;
+machine_devices.c +6/-6; machine_info.c +6/-6; machine_private.h +4/-6;
+runner.c +4/-4. No Lib/Common/x86/App/mirror production change is present.
+The two atomics retain their acquire/release/acq-rel operations. Disk changes
+only replace the slot-zero aliases with their existing array entries.
+Product clears owning pointers after successful destruction; UI failure keeps
+Session/Machine/driver alive, and failed machine-binding cleanup keeps the
+Common Machine and its driver. No new state object or automatic retry exists.
+Common Session destroy currently has no failure path; no speculative model is
+added for it. Existing status classification remains unchanged.
+
+Test/build is 31 paths, +106/-7511, net -7405: CMakeLists.txt +33/-0;
+executor_state_smoke.c +12/-7; composition_smoke.c +61/-1; the 28 frozen
+dead paths +0/-7503. Documents/manifests/artifacts are excluded. The existing
+composition fixture proves UI destroy failure, failed UI binding plus cleanup
+failure, and failed Machine binding plus cleanup failure retain dependencies
+and release them once on a later successful destroy. The executor test keeps
+the old assertions and adds repeated start/reset/stop coverage.
+
+The frozen 54-path ledger is fulfilled: 26 retained paths are compiled and
+the 25 executable cases pass on both widths without source/assertion changes;
+28 proven dormant paths are removed. Actual GCC object dependency files show
+234/234 retained C/H paths in each width's test/ibmpc closure, zero outside.
+Repository searches find no removed private executor allocation/header, disk
+alias or deleted helper-path reference in retained source/build files. Existing
+trace-plan and instruction-timing suites remain registered. Decoder inventory
+outputs are bounded build-local JSON, not runtime or semantic/timing proof.
+Focused background tests pass x64 27/27 in 21.46s and x86 27/27 in 4.24s.
+Both full Release builds pass. Serial background regression passes x64
+468/468 in 275.11s and x86 468/468 in 254.56s; no S10 attempt failed.
+Five desktop cases per width are excluded. Source/test manifests, corpus/DAG,
+test ownership/Types gates, documentation gate and diff check pass. No desktop,
+Linux or RDP claim is inferred. Earlier S8 intermittent native shutdown timing
+remains in TODO; this pass does not prove that debt repaired.
+
+S10 retained delivery comprises 48 tracked paths: 42 code/build paths and six
+README/manifest/task-document paths. Combined code +177/-7602, net -7425;
+most reduction is dormant test material, not SoftPC runtime footprint. Both
+standard EXEs are built/up-to-date and byte-identical to S9: x86 3505512 bytes,
+SHA-256 9B32C0C5D8F0AEAD062B326E930D0BD9A658E0C7CCFE5C521990AFADF163C98B;
+x64 3098361 bytes, SHA-256
+516F8545678A2EED03F711E0B41F5D8D9D1CC644AAD2FDCDCA74C946B3984E20.
+IBM PC Machine/Product is not linked into SoftPC. Original owner INI/snapshot
+are unchanged and excluded. Generated decoder JSON is removed after testing;
+existing ignored build caches and build/output remain. Complete executor P
+must be pushed and actual Git changes independently reviewed before handoff.
+S10 awaits owner testing; T85 remains open and no later S is admitted.
 
 ### S8 implementation and finite sweep
 

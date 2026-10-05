@@ -2,7 +2,12 @@
 
 ## Current Work
 
-M9 T85 S10 is active: bounded IBM PC ownership and dead-test cleanup.
+M9 T85 S10 is verified: IBM PC ownership and dead-test cleanup awaits delivery
+and owner testing. Production eleven C/H paths +71/-91, net -20; test/build
+31 paths +106/-7511, net -7405. Dual full Release and focused 27/27 per width
+pass; serial background x64 468/468 (275.11s), x86 468/468 (254.56s).
+All 234 retained IBM PC test C/H paths enter each width's compiler closure.
+No Lib/Common/x86/SoftPC runtime change; EXEs retain the S9 hashes.
 S9 executor P1 03c979c7 is pushed and actual-change reviewed: nine paths match
 the packet, production +0/-23 and test build +2/-2; dual Release and focused
 8/8 per width, background 443/443 per width pass. No SoftPC runtime or public
@@ -16,20 +21,20 @@ T85 remains open. Original owner INI/snapshot are preserved and excluded.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner approves IBM PC optimization and explicitly directs S10 immediately after S9; independent build/test/commit/push, wait after S10. |
-| Objective | Preserve UI callback ownership on cleanup failure; embed executor atomics in control; use disk slot arrays only; disposition all 54 dormant C/H paths. |
+| Objective | Preserve UI callback and machine-driver ownership on composition cleanup failure; embed executor atomics in control; use disk slot arrays only; disposition all 54 dormant C/H paths. |
 | Non-goals | No Lib/Common/x86/SoftPC runtime or mirror change, new state machine/worker/recovery object, disk protocol change, weakened assertions or owner asset rewrite. |
 | Reference Baseline | Pushed S9 03c979c7, reviewed nine changed paths; owner INI/snapshot remain excluded. |
 | Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S10 pre-change audit and 54-path ledger. |
 | Files And ABI Surface | IBM PC product/composition, private machine control/executor/lifecycle/disk consumers; existing composition/executor tests, test registration and dormant paths; manifests/README/task documents and dual EXEs. Opaque public machine and current product contracts unchanged; remove unused test-only executor allocation header. |
 | Applicable Rules | Execution, Documentation, Architecture, Coding and shared governance skills; shared strict C11 and inward-only source/test package boundaries. |
-| Verification | Pending dual Release builds; UI failure/ownership and embedded reset/stop tests; 25 newly registered tests per width; full serial background regression, IBM PC manifests/corpus/test ownership and documentation/diff gates. Desktop excluded, no Linux claim. |
+| Verification | Dual full Release and focused 27/27 per width pass; serial background x64 468/468 in 275.11s, x86 468/468 in 254.56s. IBM PC source/test manifests, corpus/DAG, Types/test ownership and documentation/diff gates pass; compiler closure 234/234 per width. Five desktop cases per width excluded; no Linux/RDP claim. |
 | Expected Markers | Failed UI destroy retains dependencies; successful releases clear existing owning pointers; atomics keep memory order without allocation; slot-zero aliases and removed-header references absent; every frozen dormant path has disposition and proof. |
 | Asset Needs | Standard dual EXEs only; bounded decoder output in existing ignored width caches; no guest media or desktop use. |
 | Reporting Requirements | Production and test/build tracked paths, added/removed/net lines; per-path test disposition, focused/full evidence, artifact hashes and original owner changes. |
 | Stop Conditions | Required outside-layer dependency, new runtime semantics, unexplained test failure or scope expansion stops delivery; do not delete a failing test merely to pass. |
 | Exit Criteria | All ledger members proven; dual builds/regression and gates pass; complete executor P pushed and actual changes reviewed; wait for owner testing, T stays open. |
 | Original Owner Request | 批准新的s任务进行以上各项优化，一个解决common，一个解决x86，一个处理ibmpc！ S9完成以后不要停下来了，你把S10完成以后再等我。 |
-| Similar-Issue Sweep | UI creation/binding/destruction failure exits; all executor state and disk aliases; registered source plus actual object-header closure for every tracked IBM PC C/H path. |
+| Similar-Issue Sweep | UI and machine creation/binding/destruction failure exits; all executor state and disk aliases; registered source plus actual object-header closure for every tracked IBM PC C/H path. |
 | Scratch And Cleanup | Existing ignored width caches retained; remove bounded generated decoder JSON after verification; preserve build/output and original owner assets. |
 
 S8 replaces only whole-frame invalidation with the existing valid markers:

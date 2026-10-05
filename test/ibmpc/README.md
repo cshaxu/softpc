@@ -18,7 +18,10 @@ original assertions and independent source/test manifest, DAG and negative
 probes. test/x86 remains the owner of chip, neutral Core and Debug/xasm32
 regressions and does not consume this outer package. Protected IRET assertions
 remain there once; this suite retains its distinct real-mode/PIC composition.
-Unregistered upstream App-profile integrations and timing qualification tools
-are not reusable IBM PC units and are excluded from this corpus. The frozen
-import/disposition ledger is in the importing project's T85 S7 evidence.
+Distinct board exception/paging regressions and three bounded decoder
+inventories are registered. Unused helper clusters, two historical timing
+generators lacking their catalog, and an obsolete trace-API test are removed;
+current trace-plan coverage remains in machine/debug_budget_smoke.c.
+The frozen import/disposition ledgers are in the importing project's T85
+S7 evidence and S10 proposal. Decoder JSON stays in the suite build directory.
 No product boot coverage is substituted by these units.
