@@ -18,6 +18,7 @@
 #include "timestmp.h"
 #include "timeval.h"
 #include "timer.h"
+#include "idetect.h"
 #include "keyboard.h"
 #include "gmi.h"
 #include "gfx_upd.h"
@@ -199,8 +200,8 @@ void softpc_platform_pace_instruction(void)
 #endif
 }
 
-/* Called only from the standalone CCPU HLT path after both pending sources
- * have been checked.  The auto-reset event avoids a polling spin: either the
+/* Used by CCPU HLT and original keyboard idle after pending sources have
+ * been checked. The auto-reset event avoids a polling spin: either the
  * original host timer or frontend input wakes this executor immediately. */
 void softpc_platform_wait_for_executor_event(void)
 {
@@ -238,6 +239,10 @@ void softpc_platform_set_boot_clock(int active)
 
 void softpc_platform_set_runtime_heartbeat(int enabled)
 {
+    /* Only continuous execution may park in the original keyboard idle path.
+       Reset it at run entry; finite instruction-budget runs stay bounded. */
+    IDLE_ctl(enabled);
+    if (enabled) IDLE_init();
 #ifdef _WIN32
     lib_u64 now;
     lib_u64 units_per_second;
@@ -306,14 +311,22 @@ void memset4(unsigned int data, unsigned int *destination, unsigned int count)
 #define SOFTPC_VGA_ADAPTER 5u
 
 
-/* Original idetect.c calls this only after it has classified repeated failed
-   keyboard polls as guest idle.  Yield the host quantum without sleeping or
-   advancing machine time; this is the same outer scheduling primitive NXVM
-   uses for a core that has no productive work. */
+/* Original idetect.c owns the idle decision. Keep pending work on its normal
+   CCPU dispatch path; a signal between this check and wait remains latched in
+   the auto-reset event. Timer/input/control producers all signal this event. */
 void host_release_timeslice(void)
 {
 #ifdef _WIN32
-    base_sync_yield();
+    if (!softpc_ccpu_instruction_budget_active &&
+        !softpc_platform_has_pending_executor_event()) {
+        lib_u64 before, after, frequency;
+        lib_status clock_status = base_clock_monotonic_counter(&before, &frequency);
+        softpc_platform_wait_for_executor_event();
+        /* Idle is not a credit for faster guest execution after wake. */
+        if (clock_status == LIB_STATUS_OK && softpc_executor_pacing_enabled &&
+            base_clock_monotonic_counter(&after, &frequency) == LIB_STATUS_OK)
+            softpc_executor_pacing_origin += after - before;
+    }
 #endif
 }
 

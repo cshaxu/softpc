@@ -31,6 +31,12 @@ static int wait_for_state(common_machine *runtime, common_machine_state state)
     return 0;
 }
 
+static ULONGLONG cpu_ticks(const FILETIME *kernel, const FILETIME *user)
+{
+    return (((ULONGLONG)kernel->dwHighDateTime << 32) | kernel->dwLowDateTime) +
+        (((ULONGLONG)user->dwHighDateTime << 32) | user->dwLowDateTime);
+}
+
 static void receive_frame(void *opaque, lib_u32 sequence, lib_bool graphics,
     lib_u32 run_generation)
 {
@@ -299,6 +305,22 @@ int main(void)
     REQUIRE(generation != 0u);
     REQUIRE(run_reaches_post_bios(runtime, &frame_probe,
         generation, 0u));
+    {
+        FILETIME created, exited, kernel, user;
+        ULONGLONG before;
+        /* A copied prompt alone cannot prove idle: a busy CCPU can draw it.
+           Allow the original heuristic to settle, then bound CPU time, not
+           host speed. 25 percent leaves generous CI margin above idle. */
+        softpc_test_sleep_milliseconds(1000u);
+        REQUIRE(GetProcessTimes(GetCurrentProcess(), &created, &exited, &kernel, &user));
+        before = cpu_ticks(&kernel, &user);
+        softpc_test_sleep_milliseconds(2000u);
+        REQUIRE(GetProcessTimes(GetCurrentProcess(), &created, &exited, &kernel, &user));
+        fprintf(stderr, "DOS idle CPU: %.2f ms over 2000 ms\n",
+            (double)(cpu_ticks(&kernel, &user) - before) / 10000.0);
+        REQUIRE(cpu_ticks(&kernel, &user) - before < 5000000u);
+        REQUIRE(common_machine_state_get(runtime) == COMMON_MACHINE_RUNNING);
+    }
     sequence = (lib_u32)InterlockedCompareExchange(
         &frame_probe.last_sequence, 0, 0);
 

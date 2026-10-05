@@ -65,35 +65,42 @@ No production change; EXEs retain accepted S2 hashes. T85 remains open.
 
 [S3 closure](../history/M9-T85-S3-nxvm-shared-subset-sync.md).
 
-T85 S4 is active: observe DOS-prompt CPU use and investigate its causes;
-no runtime optimization is admitted. T85 remains open.
+T85 S4 is active: observe and repair DOS-prompt idle CPU use. Owner approves
+implementation within S4 on 2026-10-04. T85 remains open.
 
-S4 checkpoint: confirmed DOS-prompt headless CPU averages x64 97.27 percent
+S4 observation checkpoint: confirmed DOS-prompt headless CPU averages x64 97.27 percent
 and x86 96.78 percent of one core, overwhelmingly on one executor thread.
 Separate x64 debugger observation confirms ienabled=0 and pacing_enabled=1.
 The [proposal](../proposals/m9-windows-101-startup-repair.md) records probe
 hashes, samples, call stacks, source ledger and limits. No native presenter
-benchmark or optimized-runtime result is claimed; production remains unchanged.
+benchmark was claimed at that checkpoint. The subsequently admitted repair
+is implemented and ready for owner verification: final headless idle averages
+x64 0.26 percent and x86 below CPU-accounting resolution. Both Release builds
+and final background suites pass 121/121 per width. The proposal retains an
+earlier x86 roundtrip failure, three focused passing reruns and the final
+serial passing suite; its cause is not asserted resolved by rerunning.
+Production is +20/-7 (net +13), tests +56/-0, combined code net +69.
+Owner INI and snapshot edits remain uncommitted and preserved. S4/T85 stay open.
 
 ## M9 T85 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits CPU observation, recording and root-cause research on 2026-10-04; optimization requires later approval. |
-| Objective | Establish an idle CPU baseline, identify expensive threads and distinguish guest polling, pacing and presentation work. |
-| Non-goals | No production changes, new idle policy, fixed execution-loop sleep, timer changes or shared-corpus changes. |
+| Admission And Approval | Owner first admits observation, then explicitly requests repair and self-testing within S4 on 2026-10-04. |
+| Objective | Restore original idle detection and event-backed host waiting, compare idle CPU before/after and verify lifecycle/input correctness. |
+| Non-goals | No fixed execution-loop sleep, original-mirror changes, timer cadence changes, guest-specific idle conditions or Lib/Common/x86 changes. Preserve pacing rate/algorithm; exclude actual idle wait duration from its wall-clock origin to avoid catch-up acceleration. |
 | Reference Baseline | Accepted T85 S3 HEAD ccce64ee; preserve owner INI and snapshot changes. |
 | Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S4 diagnostic extension. |
-| Files And ABI Surface | CURRENT and existing proposal; ignored probes/logs under build/t85-s4-cpu; no ABI changes. |
+| Files And ABI Surface | Compat platform.c and product-owned tests; existing runtime heartbeat/host callback contracts; no public ABI change; dual package EXEs and task documents. |
 | Applicable Rules | Documentation reading set, Execution/Document rules and linked skills; architecture/coding authorities govern disposable probes. |
-| Verification | Confirm DOS prompt before sampling; settle 10 seconds, then three 2-second process/thread intervals per width; one logical core = 100 percent. Separate headless and native UI evidence. Documentation gate and diff check; unchanged production needs no new EXE or regression claim. |
+| Verification | Dual Release builds, focused pending-event/wait-failure tests, DOS prompt settled 10 seconds then three 2-second CPU samples per width; input echo, pause/resume/stop/reset and snapshot tests, both full background presets; separate native desktop limits. Documentation gate and diff check. |
 | Expected Markers | Prompt, sample intervals, binary hashes, call-site ledger and explicit evidence limits; no probe in production. |
 | Asset Needs | Original media read-only; use owned disposable copy or overlay. Per-run budget 120 seconds, total logs 10 MiB, ignored scratch build/t85-s4-cpu; executor owns process/media cleanup and retains summary in proposal. Preserve package INI and snapshots. |
-| Reporting Requirements | Separate measurements from inference; report smallest follow-up design and zero production added/deleted/net lines. |
+| Reporting Requirements | Before/after CPU, measured responsiveness/lifecycle outcomes, source/test added/deleted/net lines, dual EXE hashes/links and actual-change review. |
 | Stop Conditions | Wrong guest state, unavailable instrumentation, unowned process/media or need for runtime-semantic change: stop that experiment and report. |
-| Exit Criteria | Evidence-backed observation and bounded cause ledger reviewed against actual changes; no optimization claim; owner decides repair. |
-| Original Owner Request | 准入一个S任务，对cpu占用的现象进行观测、记录，然后对根因进行调研。 |
+| Exit Criteria | Evidence-backed idle reduction with focused and background verification passing, complete pushed delivery and owner acceptance; do not promise 1--2 percent without measurement. |
+| Original Owner Request | 准入一个S任务，对cpu占用的现象进行观测、记录，然后对根因进行调研。追加：请你在当前S内修复，然后自行测试看看是否解决。 |
 | Similar-Issue Sweep | Original idle enable/poll/wait, pacing, HLT/quick-event waits, input/control/timer wake and frame publication; dispositions without implicit repair. |
 
 M9 T85 S2 is owner-accepted and closed on 2026-09-28. P1 `8c15e893`

@@ -1,10 +1,12 @@
 #include <windows.h>
 #include "machine/machine.h"
+#include "lib/base/sync_interface.h"
 #include <assert.h>
 #include <stdio.h>
 #include "cleanup.h"
 
 static int fail_event, fail_timer, fail_wait, fake_timer, fail_delete;
+static int signal_on_wait;
 static unsigned wait_calls, timer_calls;
 static unsigned delete_calls;
 static WAITORTIMERCALLBACK saved_tick;
@@ -41,6 +43,11 @@ static DWORD WINAPI wait_event(HANDLE event, DWORD timeout)
 {
     ++wait_calls;
     assert(timeout == INFINITE);
+    if (signal_on_wait) {
+        signal_on_wait = 0;
+        base_sync_sleep_milliseconds(20u); /* Deliberate test-only idle duration. */
+        assert(SetEvent(event)); /* Signal after the idle pending check. */
+    }
     if (fail_wait) {
         assert(wait_calls == 1u); /* Never retry an immediately failed HLT. */
         return WAIT_FAILED;
@@ -88,6 +95,33 @@ int main(void)
     assert(SetEvent(softpc_executor_event));
     softpc_platform_wait_for_executor_event();
     assert(wait_calls == 1u && softpc_platform_executor_ready());
+
+    /* Idle shares HLT's event/failure owner, but must not park over queued
+       input/clock records or turn a finite CPU slice into an infinite wait. */
+    softpc_platform_request_executor_wake();
+    host_release_timeslice();
+    assert(wait_calls == 1u);
+    assert(softpc_platform_consume_executor_wake());
+    InterlockedExchange(&softpc_clock_pending_ticks, 1);
+    host_release_timeslice();
+    assert(wait_calls == 1u);
+    assert(softpc_platform_consume_clock_tick());
+    softpc_ccpu_instruction_budget_active = TRUE;
+    host_release_timeslice();
+    assert(wait_calls == 1u);
+    softpc_ccpu_instruction_budget_active = FALSE;
+    assert(SetEvent(softpc_executor_event));
+    host_release_timeslice();
+    assert(wait_calls == 2u && softpc_platform_executor_ready());
+    softpc_platform_set_runtime_heartbeat(1);
+    {
+        lib_u64 origin = softpc_executor_pacing_origin;
+        signal_on_wait = 1;
+        host_release_timeslice();
+        assert(softpc_executor_pacing_origin > origin);
+    }
+    assert(wait_calls == 3u && signal_on_wait == 0);
+    softpc_platform_set_runtime_heartbeat(0);
 
     /* Capture freezes only the producer. Do not clear accepted ticks or the
        wake endpoint. Fake native callbacks make the join ordering deterministic. */

@@ -475,3 +475,84 @@ All ledger entries have measured/source evidence or explicit qualification
 limits. No repair is implemented, no media/INI/package changes are made, and
 tracked production/test code is +0/-0, net zero. The observation report is
 ready for owner review; S4/T85 are not declared closed.
+
+### S4 repair admission and implementation
+
+Owner adds: 请你在当前S内修复，然后自行测试看看是否解决。
+This explicitly supersedes the diagnostic-only restriction on 2026-10-04;
+the active packet records the repair boundary. The source change stays in
+Compat platform.c: the existing continuous-run heartbeat enables/initializes
+original idle detection and disables it on run exit. Finite-budget CPU calls
+remain nonblocking. Original idle classification, guest interrupts, host-clock
+period, frame publication, original mirror and shared six corpora are unchanged.
+
+host_release_timeslice checks pending input/control/clock work and otherwise
+waits on the existing auto-reset executor event through the HLT wait/failure
+owner. A signal between checking and blocking is retained. Actual idle wait
+duration is excluded from the existing governor's wall-clock origin so idle
+cannot accumulate catch-up execution credit; its rate/check interval/algorithm
+are unchanged. No new thread, event, idle heuristic or recovery state exists.
+
+Permanent tests extend platform_failure_smoke for pending input/clock bypass,
+finite-budget bypass, native idle wait, the check-to-wait signal race and pacing
+origin adjustment. HLT continues to cover the same native wait-failure unwind.
+The real DOS restart/Win3.1 roundtrip test also bounds prompt CPU to less than
+25 percent of one core over two seconds after heuristic settling; this generous
+regression ceiling is not the measured product performance target.
+
+The first scratch relink omitted the embedded firmware resource and did not
+remain at a valid RUNNING DOS prompt. Its samples and shutdown timeout are
+discarded, not attributed to the repair. After linking the exact existing VM
+objects and firmware resource, both probes confirm RUNNING DOS and sample
+0.00/0.00/0.00 percent per width (OS accounting resolution), versus prior means
+97.27/96.78 percent. This means below sampling resolution, not literally zero
+work or a native Window benchmark. x64 stack reads now show ienabled=1,
+i_counter=12 and keyboard_io -> idetect -> host_release_timeslice -> native
+WaitForSingleObject. Original 50-ms host events continue to wake that path.
+Further final-build evidence is recorded before complete delivery.
+
+### S4 final delivery evidence and actual-change review
+
+Final probes use the final production code, the exact existing seven VM
+objects and embedded firmware. x64 SHA-256 is
+0EE4B624C8B1F030D34EBCE64BF359D86720F4F08DC222DD90AABFE34DCAA068;
+x86 is A7208CC153E452FFD9CC2B4F137E79BB012251733607EF02BFAAE31E3D1DE49C.
+After verified RUNNING DOS prompt and ten seconds settling, three two-second
+samples are x64 0.00/0.78/0.00 percent (mean 0.26), x86 0.00/0.00/0.00
+(below accounting resolution). Private memory is 24.22/24.39 MiB respectively.
+Both probes exit zero; disposable media and owned processes are cleaned up.
+These are headless product-core measurements, not a full native Window CPU
+benchmark or a new desktop/RDP input-latency qualification.
+
+Both final Release builds pass. Final x64 background CTest passes 121/121
+in 105.22 seconds; final serial x86 passes 121/121 in 145.74 seconds.
+An earlier final-code parallel x86 run failed the existing Win3.1 windowed
+DOS-prompt roundtrip (120/121); independent focused repeats then pass three
+times, followed by the full serial pass. No timeout or assertion was weakened.
+The intermittent failure's cause is unproven; it is retained rather than
+declared fixed by repetition. Earlier direct-Sleep test code failed the Types
+boundary gate and was corrected to the existing Base test sleep before final
+verification. Five native desktop tests per width remain excluded.
+
+The finite similar-issue sweep confirms that original idle counters and call
+sites remain unchanged; run entry/exit controls their existing enable switch;
+finite-budget calls cannot block; pending input/control/clock work bypasses
+waiting; the existing auto-reset event retains check-to-wait signals; native
+wait failure retains the existing executor termination owner. HLT, quick-event
+dispatch, timer cadence, frame publication and pacing rate/check interval are
+unchanged. Only actual idle duration shifts the pacing origin. Existing
+background input, lifecycle and snapshot regressions pass; no claim is made
+that every device workload or native desktop interleaving was tested.
+
+Actual source/test diff: platform.c +20/-7 (net +13); platform failure tests
++34/-0; runtime restart tests +22/-0. Total code +76/-7 (net +69). There is no
+new API, state object, thread, event, mirror diff or shared-corpus change.
+Two package EXEs and the two task documents are the other retained paths.
+Final EXE SHA-256: x86
+CDAD3C003A9136962FFB60127BD94BAD7F213E99EAA91844AA0C676CDB76CF6F;
+x64 2586446090C690A956FD701AE13F02988C50E75B3CF75ED08C82ECFB0D0AF02F.
+Original owner request, admitted scope and actual diff were reviewed together:
+the high idle CPU is reproduced and substantially reduced without fixed-loop
+sleep, Lib/Common changes or an original-mirror behavior branch. Owner-owned
+INI and snapshot modifications are preserved but excluded from this delivery.
+Implementation is ready for owner testing; neither S4 nor T85 is closed.
