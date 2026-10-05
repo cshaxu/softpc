@@ -11,7 +11,8 @@ T85 remains open.
 Original owner request: 批准新的s任务进行以上各项优化，一个解决common，一个解决x86，一个处理ibmpc！
 
 Baseline: pushed 2a5747a2. Three serial owner-admitted steps follow the
-read-only eight-package audit; S8/S9 are delivered and S10 is active. Each step delivers dual
+read-only eight-package audit; S8/S9 are delivered and S10 is owner-accepted
+and closed. T85 remains open without an active S. Each step delivers dual
 Release builds, focused proof, serial background regression, manifests/DAG,
 actual-change review and a pushed P. Manual-test timing follows the current
 continuation instruction above; earlier delivery facts remain historical.
@@ -281,6 +282,17 @@ runtime linkage and both EXE hashes are unchanged. Six bounded JSON outputs
 are removed. Git status contains only original owner INI/snapshot edits,
 excluded under the recorded asset decision. Delivery is ready for owner testing;
 neither S10 nor T85 is closed and no next S is admitted.
+
+### S10 owner acceptance
+
+Owner states: 验收通过 收口s10 保持t开放。
+S10 closes after the pushed implementation f97ecbea, actual-change review
+a51bf19b, dual-width evidence and complete frozen ledger are checked against
+the admitted request. The [closure record](../history/M9-T85-S10-ibmpc-simplification-closure.md)
+retains the results and limits. This closure changes documents only; production,
+tests, EXEs, configuration and media remain unchanged. T85 stays open without
+an active S; earlier steps acquire no unreported acceptance, and no next S is
+admitted. Queue and TODO are unchanged.
 
 ### S8 implementation and finite sweep
 
