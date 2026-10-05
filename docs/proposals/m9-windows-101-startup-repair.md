@@ -1,5 +1,115 @@
 # Windows 1.01 startup diagnosis and repair
 
+## S8--S10: shared-package simplification
+
+Original owner request: 批准新的s任务进行以上各项优化，一个解决common，一个解决x86，一个处理ibmpc！
+
+Baseline: pushed 2a5747a2. Three serial owner-admitted steps follow the
+read-only eight-package audit; only S8 is active. Each step delivers dual
+Release builds, focused proof, serial background regression, manifests/DAG,
+actual-change review and a pushed P before waiting for owner testing.
+Earlier S5/S6/S7 manual acceptance is not inferred. NXVM, Lib, SoftPC mirror,
+guest media and existing status-classification policy remain unchanged.
+Owner INI/snapshot remain untouched and excluded under the prior asset decision.
+
+Finite ledger and ownership:
+
+1. S8/Common: invalidate frame slots by existing valid markers/generation,
+   not whole-buffer zeroing. Keep initial zero allocation, driver complete-frame
+   contract, frame lock, no-frame readiness and text comparison. Estimate
+   production +2/-2; existing tests +20--40/-0.
+2. S9/x86: remove private validation-only bus initialize and empty finalize,
+   declarations and constructor/destructor calls. Real port ownership remains.
+   Estimate production net -20--25; no public ABI change.
+3. S10/IBM PC: honor UI destruction failure before releasing callback targets;
+   test ordering and retained ownership with the existing composition fixture.
+4. S10/IBM PC: embed two executor-state atomics in existing private control;
+   preserve ordering/run/reset semantics, remove allocation and public test-only
+   lifecycle rather than inventing a shared object.
+5. S10/IBM PC: remove private slot-0 disk union aliases and use arrays; keep
+   floppy and fixed-disk protocol differences.
+6. S10/IBM PC: disposition all 54 C/H paths outside registered test closure,
+   registering distinct viable coverage or deleting proven unused/repeated
+   helpers. No blanket removal or passing-test claim for unexecuted material.
+
+S10 production estimate: 8--15 paths, +30--70/-80--140 lines, subject to its
+pre-activation audit. Estimate dormant-test dispositions separately then.
+Do not delete lib_status classification as if it were behavior-neutral.
+Count production and test/build additions/removals/net separately, excluding
+documents/manifests/artifacts. Reuse existing ignored build caches; no trace
+or guest media required. Desktop tests excluded; no Linux/RDP qualification.
+Completion requires a proof/receiver for every ledger member, no new framework,
+object or worker, and owner acceptance before S closure; T stays open.
+
+### S8 brief
+
+Publication reads require generation and window.valid. Text comparison rejects
+an invalid previous frame; staging is marked invalid before the complete-frame
+driver call. Replace only the two whole-buffer invalidation writes. Extend
+the existing Machine smoke for identical first text after reset and a reset
+without a ready frame, preserving the destination on rejected copy. Stop if
+any consumer reads invalid storage or a valid driver output is incomplete.
+Sweep all Common frame readers/writers and product/shared copy_frame drivers.
+
+### S8 implementation and finite sweep
+
+Runtime change: machine.c +2/-2, net zero. Existing tests: Machine native
+smoke +8/-0 and scripted Machine wait/publication smoke +19/-0, net +27.
+No fixture, API, state, synchronization primitive or allocation is added.
+The script proves both slots retain inactive payload while becoming invalid,
+generation-zero and current-run copy rejection preserve the captured result,
+no-ready output does not publish, and identical complete text after restart
+publishes with sequence wrap still skipping zero. Native reset separately
+confirms identical text is published for the new generation.
+
+Sweep commands: rg frame_buffers/invalidate_published_frame in src/common;
+rg copy_frame assignments in src and test. The sole invalidation helper serves
+cold/reset entry and successful state restoration. Initial zero allocation and
+final release retain their distinct resource responsibilities. Publish clears
+staging validity; previous text comparison rejects invalid state before reading
+metadata; public copy requires generation and valid before copying payload.
+All production readers are therefore gated; no ungated frame-buffer path found.
+SoftPC driver initializes complete active text/graphics extents and maps before
+successful publication; IBM PC driver copies a complete existing publication
+or leaves staging invalid. Neither production driver depends on cleared inactive
+pixels. Common scripted/native, x86 debug and product command-provider fixtures
+either return complete frames, leave invalid, or delegate to that same driver.
+They are test owners, not additional production frame authorities.
+
+The first admission gate rejected missing S7 history for identifier progression;
+the S7 delivery handoff records its existing pushed evidence without fabricating
+acceptance. The corrected documentation gate and both Common manifests pass.
+Both Release builds pass with strict shared C11 flags. Focused Common Machine
+tests pass 2/2 per width. x64 serial background regression passes 443/443 in
+339.83 seconds. The first x86 run passes 442/443 in 332.00 seconds: the native
+presentation-shutdown smoke exceeds its unchanged 10-second limit; an isolated
+retry also times out, followed by three passing retries (0.22/0.17/0.16 seconds).
+Do not erase those attempts or report the first full run as passing.
+The fixture never starts/restores the guest; GDB confirms its cold-run
+breakpoint is not reached and the fixture completes normally under debugging.
+A separate shutdown checkpoint observes the Audio worker in native COM setup;
+this is diagnostic context, not proof that COM caused either timeout.
+No timeout/test behavior or Lib code is changed. The second serial x86 full
+run passes 443/443 in 330.08 seconds, including shutdown in 0.08 seconds.
+The intermittent native integration timing is retained in TODO, not claimed
+repaired by S8. Five desktop cases per width are excluded; no Linux claim.
+Common manifests/corpus and documentation governance pass. S8 is verified
+for delivery and awaits owner testing; S9/S10 remain inactive and T85 open.
+
+Artifacts: assets/binary/softpc32.exe is PE 14C, 3,505,512 bytes, SHA256
+9B32C0C5D8F0AEAD062B326E930D0BD9A658E0C7CCFE5C521990AFADF163C98B;
+softpc64.exe is PE 8664, 3,098,361 bytes, SHA256
+516F8545678A2EED03F711E0B41F5D8D9D1CC644AAD2FDCDCA74C946B3984E20.
+Owner INI/snapshot hashes remain respectively
+403B1E1B8B728FB83F2BBF18FF08CBF5696F20A87F580D75CAAD482905FFD8AA and
+E332309C19B5CD9337AB9121638B4314E2F70A80684F4DDE2F34504FCD5C3383.
+Existing ignored build caches are reused; no new diagnostic source, trace,
+guest image or desktop process is retained. Debugger/test processes exit.
+Count method: git diff --numstat on the three admitted C paths, excluding
+manifests/documents/artifacts: production +2/-2, net zero; tests +27/-0;
+combined +29/-2, net +27. The existing valid/generation contract is the sole
+authority; no second cache, frame path or worker is introduced.
+
 ## S7: IBM PC corpus and PC-test ownership
 
 Owner admits on 2026-10-05: 很好。准入一个Ｓ，把ibmpc的2个src和test组件也导入了吧，然后正确实现边界；原来在core的被删除的测试，是不是该挪进ibmpc的test，如果没有重复的话？

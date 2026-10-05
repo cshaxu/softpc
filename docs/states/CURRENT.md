@@ -2,31 +2,44 @@
 
 ## Current Work
 
-M9 T85 S7 is verified for delivery: IBM PC source/test import and PC-test ownership.
+M9 T85 S8 is verified for delivery, awaiting owner testing:
+Common published-frame invalidation simplification.
+S9/x86 and S10/IBM PC are admitted follow-ons, not active.
+S7 remains verified awaiting owner testing: IBM PC import and test ownership.
 T85 remains open; S6 delivered verification remains recorded without inferred
 manual acceptance.
 
-## M9 T85 S7 Packet
+## M9 T85 S8 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits src/ibmpc and test/ibmpc import, correct inward boundaries, and relocation/deduplication of previously excluded PC-dependent Core tests. NXVM stays read-only. |
-| Objective | Establish the fourth shared layer and independently owned IBM PC tests; restore unique PC-composition coverage without cross-suite borrowing. |
-| Non-goals | No SoftPC CPU/backend replacement, IBM PC product launch, new firmware/media, six-component runtime redesign or user INI/snapshot change. |
-| Reference Baseline | SoftPC pushed 45a461a2; read-only NXVM ebdb40098dfaa7b2bcc0f294d52e3f19dafd6629 with clean admitted roots. Owner INI/snapshot remain excluded. |
-| Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S7 eight-package and prior-exclusion ledger. |
-| Files And ABI Surface | src/ibmpc and test/ibmpc; test/x86 ownership cleanup if required, shared test tools, root test registration/LF attributes, design/README/manifests and dual EXEs. Existing SoftPC public ABI unchanged. |
-| Applicable Rules | Execution, Documentation, Architecture, Coding, source-research policy and shared governance skills; shared C11; Lib then Common then x86 then IBM PC; tests own fixtures. |
-| Verification | Independent IBM PC Release x64 161/161; final background x64 443/443 (161.57s), x86 443/443 (237.47s); eight manifests/DAG and Types/ownership negative probes pass. Dual Release PE widths and product link audit pass; five desktop cases per width excluded, no Linux execution claim. |
-| Expected Markers | Inner production/tests never require IBM PC; no cross-test-package source; unique PC cases retained once; SoftPC still uses its original executor. |
-| Asset Needs | Refresh only standard dual EXEs; synthetic in-code fixtures only, no guest media or native desktop automation. |
-| Reporting Requirements | Before/after production/test files and added/removed/net lines; imported versus local changes; every former S6 excluded case mapped to retained, deduplicated or unused disposition. |
-| Stop Conditions | Unknown provenance, unexplained failed tests, original-mirror/runtime policy changes or required third-party firmware stop delivery. |
-| Exit Criteria | Finite import/exclusion ledger complete; independent and product gates pass; P committed/pushed; wait for owner testing, T remains open. |
-| Original Owner Request | 很好。准入一个Ｓ，把ibmpc的2个src和test组件也导入了吧，然后正确实现边界；原来在core的被删除的测试，是不是该挪进ibmpc的test，如果没有重复的话？ |
-| Similar-Issue Sweep | Eight source/test layers; include/link/build/fixture closure and duplicate scenario registrations; all 51 prior excluded paths and all upstream IBM PC members. |
-| Scratch And Cleanup | Ignored build/t85-s7-ibmpc only; thirty-minute cold build budget, ten-minute per test/suite budget, bounded logs; remove owned scratch after evidence summary, preserve reusable root builds/build/output and owner configuration/media. |
+| Admission And Approval | Owner admits three serial shared-package optimization S tasks; S8/Common activates, S9/x86 and S10/IBM PC remain planned. |
+| Objective | Remove whole-frame zeroing from invalidation using existing valid/generation gates; preserve restart and first-frame semantics. |
+| Non-goals | No new frame state/cache/API, initial-allocation change, Lib/x86/IBM PC/SoftPC backend change or owner asset rewrite. |
+| Reference Baseline | Pushed 2a5747a2; prior S7 delivery remains awaiting owner testing. Owner INI/snapshot remain excluded. |
+| Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S8--S10 finite ledger and S8 brief. |
+| Files And ABI Surface | Common Machine implementation and existing Machine smoke/fixture, corresponding manifests, task documents and dual EXEs. No public ABI change. |
+| Applicable Rules | Execution, Documentation, Architecture, Coding and shared governance skills; strict shared C11 and eight-package inward boundaries. |
+| Verification | Dual Release and focused Machine 2/2 per width pass; serial background x64 443/443 (339.83s), final x86 443/443 (330.08s). First x86 442/443 and isolated shutdown timeout are retained in proposal/TODO; three retries pass and final full run passes. Common manifests/corpus and documentation checks pass. Five desktop cases excluded per width; no Linux claim. |
+| Expected Markers | Both slots invalidated under existing lock; identical first text republishes after reset; unavailable output cannot expose prior frame; rejected copies leave caller unchanged. |
+| Asset Needs | Standard dual EXEs only; no media, desktop automation or external asset copy. |
+| Reporting Requirements | Tracked production/test path counts and added/removed/net lines, focused/full results and retained owner changes. |
+| Stop Conditions | Ungated invalid-frame read, incomplete valid driver output, unexplained failed test or required scope expansion stops delivery. |
+| Exit Criteria | Sweep and focused/full proof recorded, self-reviewed P committed/pushed and actual-change reviewed; wait for owner testing, T remains open. |
+| Original Owner Request | 批准新的s任务进行以上各项优化，一个解决common，一个解决x86，一个处理ibmpc！ |
+| Similar-Issue Sweep | Common frame invalidation/read/comparison and product/shared copy_frame drivers; distinguish initial allocation from invalidation. |
+| Scratch And Cleanup | Existing ignored width build caches and bounded build/CTest logs only; preserve build/output and owner assets. |
+
+S8 replaces only whole-frame invalidation with the existing valid markers:
+one production C path +2/-2, net zero; two existing tests +27/-0. Combined
+code +29/-2, net +27, excluding manifests/documents/artifacts. Initial zero
+allocation, generation/locking, complete-frame driver contract and first-frame
+publication remain unchanged. The finite reader/driver sweep found no ungated
+read or additional implementation. Standard x86/x64 EXEs are rebuilt; original
+owner INI/snapshot remain unchanged and excluded. The intermittent native x86
+shutdown-test timing is recorded, not hidden or repaired by this optimization.
+S8 awaits its pushed delivery review and owner testing; S9/S10 remain inactive.
 
 S7 imports all 126 IBM PC production paths byte-identically and owns 269 test
 paths. All 51 prior PC exclusions are dispositioned: 45 reachable paths return,
