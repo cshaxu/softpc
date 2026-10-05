@@ -556,3 +556,13 @@ the high idle CPU is reproduced and substantially reduced without fixed-loop
 sleep, Lib/Common changes or an original-mirror behavior branch. Owner-owned
 INI and snapshot modifications are preserved but excluded from this delivery.
 Implementation is ready for owner testing; neither S4 nor T85 is closed.
+
+### S4 owner acceptance
+
+Owner states: 非常好，收口S4，验收通过，保持T开放。然后队列任务列一下。
+S4 closes on 2026-10-04 after review of pushed observation P1 1bc02185 and
+repair P2 a841b5d3 against the admitted request and evidence. The
+[closure record](../history/M9-T85-S4-dos-idle-cpu-repair.md) preserves
+verification limits and changed-path accounting. T85 remains open without an
+active S. Queue order and deferred TODO items are unchanged; no new task is
+admitted by listing them. Closure changes documents only, not the tested EXEs.
