@@ -9,6 +9,7 @@ set(raw_constants
 set(raw_calls
     "assert|malloc|calloc|realloc|free|memset|memcpy|memmove|memcmp|memchr|strlen|strcmp|strchr|strstr|strtok|fopen|fclose|fread|fwrite|fflush|fprintf|printf|snprintf|remove|sysconf|mmap|mprotect|munmap|Create[A-Z][A-Za-z0-9_]*|Set[A-Z][A-Za-z0-9_]*|Get[A-Z][A-Za-z0-9_]*|WaitFor[A-Z][A-Za-z0-9_]*|CloseHandle|Sleep|ResetEvent|TryEnterCriticalSection|Interlocked[A-Za-z0-9_]*|Virtual[A-Za-z0-9_]*")
 string(APPEND raw_calls "|AllocConsole|FreeConsole|FillConsoleOutputCharacterW|CallWindowProcW|EnumWindows|InitializeCriticalSection|ReleaseSemaphore|TerminateProcess")
+string(APPEND raw_calls "|puts|fputs|putchar|fputc|perror|fseek|ftell|rewind|feof|ferror|sscanf|fscanf|tmpfile")
 
 foreach(root IN LISTS TEST_ROOTS)
     get_filename_component(root "${root}" ABSOLUTE)

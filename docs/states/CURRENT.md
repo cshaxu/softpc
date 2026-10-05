@@ -2,31 +2,42 @@
 
 ## Current Work
 
-M9 T85 S5 is verified, awaiting owner acceptance: minimal Audio wait handling.
+M9 T85 S6 is verified awaiting owner testing: six-component inward-only
+source/test boundaries. T85 remains open.
 
-## M9 T85 S5 Packet
+## M9 T85 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves the minimal existing-return-value solution on 2026-10-05. |
-| Objective | Handle Audio idle wait failure and failed native-wait cancellation; clarify existing mouse/status-page limits. |
-| Non-goals | No Session notification redesign, new state/API/thread/recovery loop, platform rewrite, guest or mirror change. |
-| Reference Baseline | Pushed 8361c1bf; owner INI and snapshot changes remain untouched and excluded. |
-| Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S5 extension. |
-| Files And ABI Surface | audio/stream.c, existing Audio smoke, KVM Console/Common READMEs, three manifests, task documents and dual EXEs; no ABI change. |
-| Applicable Rules | Execution, Documentation, Architecture and Coding rules; shared governance skills; shared C11 and owner-local lifecycle. |
-| Verification | Both Release builds pass; Audio fault smoke passes 20 repeats per width; background CTest passes x64 121/121 (253.74 s), x86 121/121 (153.84 s). Five desktop tests per width excluded. |
-| Expected Markers | Existing failure field and worker detach/join remain sole owners; no added product-specific branch. |
-| Asset Needs | Refresh only assets/binary/softpc32.exe and softpc64.exe; no media/config changes. |
-| Reporting Requirements | Separate production/test/document added, removed and net lines; report actual files and dual EXEs. |
-| Stop Conditions | New state, API, recovery policy or scope expansion requires renewed owner review. |
-| Exit Criteria | Focused and background tests pass per width, manifests/governance pass, complete P pushed; await owner acceptance. |
-| Original Owner Request | 我们的原则永远是减少复杂度而不是增加复杂度。第三项否决。修复一二的逻辑和四五的契约说明。可以，那就按这个方案走。你现在开始执行。 |
-| Similar-Issue Sweep | Review all Audio worker waits and cancel-before-join calls; retain distinct native interruption semantics. Session redesign explicitly rejected. |
-| Scratch And Cleanup | Ignored build/t85-s5-audio logs only, 10-minute run budget, no raw traces/media; remove scratch after evidence summary. |
+| Admission And Approval | Owner admits all boundary cleanup and full x86 import, limiting edits to SoftPC's six packages; NXVM IBM PC is explicitly excluded. |
+| Objective | Import complete x86 production corpus and independently owned tests; remove outward and cross-test-package dependencies. |
+| Non-goals | No IBM PC import/edit, SoftPC Core replacement, Audio rollback, user configuration/media edit or new product behavior. |
+| Reference Baseline | SoftPC pushed 2dc7e79e; read-only NXVM 946f7a737205b0952e6a6c9081138f0b12761bc7 with clean shared roots. Owner INI/snapshot preserved and excluded. |
+| Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S6 finite import ledger. |
+| Files And ABI Surface | src/x86, test/x86, test/lib and test/common build/check packaging; Types file vocabulary aliases used by existing test I/O; generic test helpers, design/README/manifests and dual EXEs. Existing product-facing ABI unchanged. |
+| Applicable Rules | Execution, Documentation, Architecture, Coding and source-research policy; shared governance skills; C11; inward-only production dependencies and owner-local tests. |
+| Verification | Final dual Release builds pass; x64/x86 background CTest 282/282 each. Isolated x64 Lib/Common/x86 suites pass 48/48, 20/20, 167/167 with outer sources and foreign tests absent. Six manifests, source DAG, negative boundary probes and documentation governance pass. Five desktop cases per width are excluded. |
+| Expected Markers | No test/ibmpc dependency; no test suite borrows another suite's source; S5 Audio preserved; no new SoftPC executor. |
+| Asset Needs | Refresh only standard dual EXEs; no external test media or native desktop automation. |
+| Reporting Requirements | Report imported versus locally rewritten code, files, added/removed/net lines, excluded PC-owned cases and dual EXE links. |
+| Stop Conditions | Unknown source provenance, product hookup, IBM PC edits or unexplained failed verification stop delivery. |
+| Exit Criteria | Frozen-member disposition complete, independent and product proofs pass, P committed/pushed; wait for owner testing. |
+| Original Owner Request | 准入一个s任务完成这些全部清理。你只管我们这里的六个组件；NXVM那边我会让他另行处理。 |
+| Similar-Issue Sweep | All six source/test include and CMake edges; recursive test fixture closure; generic helpers versus test-package borrowing. |
+| Scratch And Cleanup | Ignored build/t85-s6-shared only; twenty-minute cold-build budget (fresh 32-bit cache), ten-minute per test/suite budget, bounded build logs, no raw media/desktop traces; cleanup after retained summary. |
 
-Actual code: stream.c +19/-10 (net +9), existing Audio smoke +42/-1
+Actual source/test/build diff: +88,046/-22, net +88,024. This includes
+81 newly imported production paths (+43,497 lines); existing Lib production
+adds only four Types file aliases. No Common runtime or App/Core change.
+Imported x86 production bytes match frozen NXVM except README/manifest.
+PC-dependent tests and unused helpers are explicitly excluded in the proposal.
+Dual EXEs are refreshed; owner INI/snapshot changes remain outside delivery.
+Final evidence and qualification limits are recorded in the S6 proposal.
+
+S5 remains verified awaiting owner acceptance; admitting S6 does not infer
+an unreported manual-test result or undo its delivery.
+Actual S5 code: stream.c +19/-10 (net +9), existing Audio smoke +42/-1
 (net +41); combined +61/-11 (net +50). Two component README changes add
 10 lines; three manifest hashes are refreshed. No Common runtime, x86,
 App/Core, public ABI or mirror change. Dual EXEs are refreshed; owner INI and

@@ -4,7 +4,7 @@ This package selects C11 without extensions in standalone and embedded builds.
 GNU/Clang builds enable -Wall -Wextra -Wpedantic -Werror in this package only.
 
 Keep the six directories `src/lib`, `src/common`, `src/x86`, `test/lib`,
-`test/common`, `test/x86` and shared `test/register.cmake` together.
+`test/common`, `test/x86` and the shared CMake tools directly in `test/` together.
 Each test package has its own CMake entry
 and manifest; no importing-product sources, configuration, firmware or images
 are required. Lib and Common can instead use their four-directory neutral set.
@@ -18,9 +18,16 @@ ctest --test-dir build/x86-tests --output-on-failure
 Coverage: DOS/X command transcripts, full register values, real/linear memory
 boundaries and failures, assembly/disassembly bytes, source manifest/DAG and
 negative probes. On Windows, `debug_machine` also exercises the real Common
-executor/paused lease through the neutral `test/common/machine_fixture` and an
-x86-owned fake protocol. It preserves the original register and CLI assertions
-without duplicating the fixture's thread loop or neutral lifecycle scenarios.
+executor/paused lease through a minimal x86-owned injected driver and protocol.
+No fixture or CMake target comes from test/common or test/ibmpc.
+
+Independent chip and Core tests are imported from NXVM with existing Types
+stdio aliases in place of direct CRT names; assertions and expected output are
+unchanged. PC-composition tests and their transitive fixtures are deliberately
+excluded, not rewritten with copied board logic. The frozen upstream path
+dispositions are recorded in the T85 S6 proposal. This package alone configures
+and runs with the three production roots and shared test tools, without other
+test packages or IBM PC. Lib/Common likewise need only their inward sources.
 
 All x86 tests are headless. Native-thread coverage is Windows-only; the other
 tests remain portable. Assertions are enabled in Release builds. This suite

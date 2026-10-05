@@ -30,7 +30,7 @@ Its independent source verification lives with the Common corpus; unit tests
 live in test/common, never src/common/test. Lib tests and their fixtures live
 in test/lib. x86 source owns its own manifest/build/DAG and never becomes a
 Common dependency. test/x86 owns architecture protocols and CLI/assembly tests;
-it reuses the neutral test/common fake-machine fixture, not another runner.
+it owns a minimal injected-driver fixture rather than borrowing test/common.
 The six source/test directories serve x86 products; src/common, src/lib,
 test/common and test/lib alone serve neutral products. Each suite has its own
 CMake entry and manifest. Product tests remain outside the shared suites.

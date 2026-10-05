@@ -1,5 +1,187 @@
 # Windows 1.01 startup diagnosis and repair
 
+## S6: six-component dependency cleanup and full x86 import
+
+Owner admits S6 on 2026-10-05 and explicitly excludes changes to NXVM and
+IBM PC. Freeze NXVM 946f7a737205b0952e6a6c9081138f0b12761bc7 (shared roots
+clean) against SoftPC 2dc7e79e. Import src/x86's complete Core/chip/tool corpus,
+not a new SoftPC executor. Preserve existing notices, including Neko's retained
+CPU copyright; this shared-owner import makes no new licensing claim. No third-
+party binary, firmware or guest medium enters the task.
+
+Finite ledger: every upstream src/x86 path is imported unchanged except owned
+documentation/manifest packaging; every upstream test/x86 path is either an
+independent imported test/helper, retained packaging adjusted here, or an
+explicit IBM-PC-owned exclusion. Recursive include closure identifies 40 C/H
+paths requiring PC fixtures. They are not replaced by copies of PC behavior.
+The final exclusion list and registered independent cases are recorded before
+delivery. Lib/Common runtime implementations retain S5 code; Lib Types adds
+four file vocabulary aliases for owner-local tests, and test packaging becomes local.
+
+Lib/Common/x86 tests depend on their own fixtures and permitted inward production
+APIs only. Generic checking and registration are sibling test utilities, not
+borrowing another component's suite. x86 Debug retains a real Common executor
+integration check using its own minimal injected driver, not another executor.
+Static negative probes and standalone builds with other test suites absent
+prove the boundary. Existing Common unit mocks already isolate their owners and
+are retained; real lower production primitives are not duplicated into mocks.
+
+Estimate: 81 new production paths / 43,497 lines; upstream's 221 new test paths
+/ 52,930 lines are an upper bound before PC-owned exclusions. Local fixture,
+build/check and contract cleanup is expected to be hundreds, not thousands,
+of rewritten lines. Product wiring and existing public contracts do not change.
+Both Release packages and background tests are mandatory. No simultaneous
+NXVM delivery or six-root byte equality is claimed: NXVM must adopt these test
+boundaries and the retained S5 Audio fix separately. S5 acceptance remains open.
+
+### S6 implementation and accounting
+
+The 95-path source package retains upstream bytes except README/manifest.
+The test package retains 180 of 231 upstream paths; the 51-path receiver list
+below includes all excluded PC consumers and now-unused helpers. No IBM PC
+implementation, board fake, alternate SoftPC executor or product hookup is
+introduced. Generic utilities are test/register.cmake, verify_types_boundary,
+types_boundary_selftest, verify_test_boundaries and test_boundaries_selftest
+(all CMake files directly in test/). Each suite scans only its own directory.
+
+Git staged numstat against 2dc7e79e: production C/H +43,501/-0 across 82 paths;
+test C/H +44,006/-9 across 173 paths; build/check +539/-13 across ten paths.
+Total source/test/build +88,046/-22, net +88,024. README/manifest accounting is
+separate (+329/-57 across nine paths at implementation checkpoint). Against
+the filtered upstream tests, local C/H adaptation is +648/-553, net +95 across
+105 paths: Types aliases, unused limits include removal and the minimal Debug
+driver. Imported functionality is therefore distinguished from local rewriting.
+
+The two generic Types checker files move out of test/lib; their final sweep
+also rejects direct puts/fputs/temporary-stream calls missed by the old gate. Existing
+Common fixtures remain Common-owned; x86's minimal native fixture only supplies
+the real Common executor with callbacks/events needed by the Debug integration.
+Manual upstream test targets now also retain assertions in Release. No test
+assertion, expected result or timeout is weakened to pass the import.
+
+The first x86 cache regeneration selected the host-width compiler; the audit
+rejected that configuration, and an explicit architecture setting rejected the
+cached width mismatch. The corrected cold 32-bit build then failed because the
+resource compiler filename was not present. Selecting the installed windres.exe
+fixes local configuration; neither failure is a product-code defect. Only final
+successful builds/tests count toward delivery. No source preset workaround is
+introduced. Full-suite and isolated evidence is recorded after completion.
+
+### S6 upstream PC-owned exclusions
+
+The following 40 upstream C/H paths are not imported. Direct IBM PC consumers
+and their transitive fixture users belong to NXVM's separate test/ibmpc cleanup;
+the owner directs that receiver to handle them independently. This is explicit
+coverage exclusion, not a claim that those PC scenarios were retested here.
+
+- `test/x86/chips/cpu/machine_idt_privilege_pic_board_smoke.c`
+- `test/x86/chips/cpu/machine_outer_iret_pic_board_smoke.c`
+- `test/x86/chips/cpu/machine_protected_data_pic_board_smoke.c`
+- `test/x86/chips/cpu/machine_protected_far_pic_board_smoke.c`
+- `test/x86/chips/cpu/machine_task_switch16_pic_board_smoke.c`
+- `test/x86/chips/cpu/support/protected_pic_board_fixture.h`
+- `test/x86/core/construction_fixture.h`
+- `test/x86/core/core_machine_ega_registration_transaction_smoke.c`
+- `test/x86/core/core_machine_fpu_8087_smoke.c`
+- `test/x86/core/core_machine_pic_phase_s2_smoke.c`
+- `test/x86/core/core_machine_ram_create_smoke.c`
+- `test/x86/core/core_machine_rom_route_transaction_smoke.c`
+- `test/x86/core/dma_route_rollback_smoke.c`
+- `test/x86/core/kbc_controller_fixture.c`
+- `test/x86/core/machine_board_binding_identity_smoke.c`
+- `test/x86/core/machine_checked_memory_smoke.c`
+- `test/x86/core/machine_competition_80386_s1_smoke.c`
+- `test/x86/core/machine_cpu_reset_identity_smoke.c`
+- `test/x86/core/machine_explicit_time_s4_smoke.c`
+- `test/x86/core/machine_firmware_capability_smoke.c`
+- `test/x86/core/machine_fpu_interface_s65_smoke.c`
+- `test/x86/core/machine_instance_smoke.c`
+- `test/x86/core/machine_instruction_timing_ledger_smoke.c`
+- `test/x86/core/machine_legacy_timing_normalization_s2_smoke.c`
+- `test/x86/core/machine_reset_rom_alias_smoke.c`
+- `test/x86/core/machine_retirement_observation_s3_smoke.c`
+- `test/x86/core/machine_scheduler_smoke.c`
+- `test/x86/core/machine_t359_s2_timing_smoke.c`
+- `test/x86/core/machine_t359_s3_timing_smoke.c`
+- `test/x86/core/machine_timeline_s2_smoke.c`
+- `test/x86/core/machine_transaction_lifecycle_s4_smoke.c`
+- `test/x86/core/machine_transaction_s2_smoke.c`
+- `test/x86/core/plan_core_fixture.c`
+- `test/x86/core/plan_core_fixture.h`
+- `test/x86/core/planar_parity_fixture.c`
+- `test/x86/core/planar_parity_fixture.h`
+- `test/x86/core/port_assembly_core_smoke.c`
+- `test/x86/core/port_assembly_fixture.c`
+- `test/x86/core/port_assembly_fixture.h`
+- `test/x86/core/xt_ppi_controller_fixture.c`
+
+Eleven additional upstream helpers have no remaining independent test consumer
+after the PC-owned cases are excluded. They are also excluded rather than
+retained as dead test code:
+
+- `test/x86/core/boot_fixture.c`
+- `test/x86/core/boot_fixture.h`
+- `test/x86/core/bus_fixture.h`
+- `test/x86/core/composition_fixture.c`
+- `test/x86/core/composition_fixture.h`
+- `test/x86/core/memory_registration_fixture.c`
+- `test/x86/core/memory_registration_fixture.h`
+- `test/x86/core/time_fixture.c`
+- `test/x86/core/time_fixture.h`
+- `test/x86/core/video_topology_fixture.c`
+- `test/x86/core/video_topology_fixture.h`
+
+Thus the excluded set is 51 paths; the imported test manifest names all retained
+members. The closure check uses generated CMake target source lists plus
+recursive quoted includes, not only a grep for IBM PC in the top-level tests.
+
+104 independent imported test files used direct stdio. Those declarations and
+calls are mechanically replaced by Types/file aliases, preserving
+stdout/stderr, formats and assertions. An unused limits.h include is removed.
+The wider checker found two existing Lib test files using tmpfile/rewind and
+test-only fseek/ftell shims. Four Types macros now name those standard functions;
+there is no added runtime implementation, platform wrapper, state or ABI.
+No test warning gate is weakened. The upstream legacy CPU-source and Debug
+formatting warning exceptions are retained and explicitly documented.
+
+### S6 final verification and delivery
+
+Final Release builds use the installed GNU MinGW x64 MSVCRT and x86 UCRT
+toolchains, not the discarded host-width x86 configuration. PE machine values
+are 0x8664 and 0x14C respectively. Background CTest passes 282/282 on x64
+(318.34 seconds) and x86 (254.29 seconds), including product lifecycle, real
+DOS/Win3.1 restart, snapshot and existing Audio contract coverage. Five native
+desktop cases per width are deliberately excluded; no desktop/RDP or Linux
+runtime qualification is claimed. Tests run in the background without GUI use.
+
+Independent staged builds contain only each suite, required inward production
+roots and the five shared CMake utilities. No test/ibmpc, product source or
+foreign test package exists in them. Final x64 suites pass Lib 48/48 (314.99
+seconds), Common 20/20 (73.99 seconds) and x86 167/167 (41.24 seconds).
+The full product builds additionally verify these shared cases on x86.
+All six manifests, source DAGs, test ownership/Types gates and their negative
+probes pass. Documentation governance and whitespace checks pass.
+
+The earlier full x64 checkpoint overlapped the final Types cleanup and therefore
+failed three Types/manifest checks on a changing tree; it is invalidated, not
+counted as final proof. Both final suites above use the completed tree. No
+assertion, timeout or expected value was weakened. Source x86 byte comparison
+against the frozen read-only upstream has zero differing imported files except
+README/manifest. Product link command inspection confirms neither EXE links
+the newly imported Core/chip archives: SoftPC still has its original executor.
+
+Final package SHA-256:
+
+- x86: FBEE52ECBFC1EC859F9B077B6EE0C9647A76F41EA6BB5A2287D1EA56C3194D76
+- x64: 599651F6E95F9A8F05131FCE5E552DCD2FBCC9EC24DF3D3E9D75EA5F35DF3E71
+
+Owned scratch logs/copies are removed after this summary; reusable root build
+caches remain. No NXVM file, IBM PC component, user INI/snapshot or guest medium
+is modified or delivered. S5 Audio behavior is retained. Complete six-root byte
+equality with NXVM is not claimed: its owner must separately adopt local test
+ownership/Types cleanup and S5. S6 is ready for owner testing, not closed; T85
+remains open.
+
 ## S5: minimal Audio repair extension
 
 Owner request: 我们的原则永远是减少复杂度而不是增加复杂度。第三项否决。

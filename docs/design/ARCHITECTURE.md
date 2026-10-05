@@ -182,8 +182,10 @@ six-directory set is src/lib, src/common, src/x86,
 test/lib, test/common, test/x86. The neutral four-directory subset excludes x86
 entirely. Each corpus/suite owns its build and manifest; none may require an
 importing product's adapters or firmware. Common source and tests build without
-x86. The x86 test package may reuse Common's neutral fake-machine fixture;
-architecture protocols and CLI assertions remain in test/x86.
+x86. Each test package owns its fixtures; it may consume inward production
+APIs but never another package's tests or an outer package. Generic test tools
+live directly in test/. Architecture protocols and CLI assertions remain in
+test/x86; PC assembly checks belong to the separate IBM PC receiver.
 
 SoftPC's checked-in `lib/` corpus is the shared-library source of truth. NXVM
 adopts it exactly; no runtime or build dependency crosses repositories.
