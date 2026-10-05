@@ -31,6 +31,9 @@ Actual code: stream.c +19/-10 (net +9), existing Audio smoke +42/-1
 10 lines; three manifest hashes are refreshed. No Common runtime, x86,
 App/Core, public ABI or mirror change. Dual EXEs are refreshed; owner INI and
 snapshot edits are preserved outside this delivery. See proposal S5 evidence.
+Executor P1 `23990ab2` is pushed. Coordinator actual-change review confirms
+the eleven delivered paths match the packet, no prohibited boundary change,
+and unchanged EXE hashes after verification. S5 awaits owner testing; not closed.
 
 M9 T84 S8 is owner-accepted and closed. It converges raw Console backing-store
 preparation with exact frame-owned output coverage: native viewport, font fit
