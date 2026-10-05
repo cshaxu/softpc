@@ -1,5 +1,59 @@
 # Windows 1.01 startup diagnosis and repair
 
+## S5: minimal Audio repair extension
+
+Owner request: 我们的原则永远是减少复杂度而不是增加复杂度。第三项否决。
+修复一二的逻辑和四五的契约说明。可以，那就按这个方案走。你现在开始执行。
+
+The frozen four-item ledger is: idle wait failure uses existing failure and
+detach; failed native cancellation returns before join and retains ownership;
+Console mouse documents fixed 8x16 logical scaling; graphical status text
+documents printable ASCII and fixed 80x25 output. The first two require fault
+injection in the existing Audio smoke; the last two are documentation-only.
+Session notification redesign is rejected and is not an implementation item.
+No new API, state, object, thread or recovery loop is allowed. Production net
+estimate is 10-20 lines in stream.c; tests and documentation are counted separately.
+Both Release packages and background suites are required before delivery;
+owner acceptance, not executor verification, closes S5.
+
+### S5 implementation evidence
+
+One production owner remains: audio/stream.c. The existing first-failure helper
+now signals existing producer/control waiters, replacing duplicated attach-failure
+signals. Idle waits continue only on SIGNALED, exit normally on CANCELLED and
+latch IO_ERROR then detach on other results. Destroy checks native cancellation
+before joining; failure retains the whole stream. A retry after worker disposal
+does not cancel an already detached worker again. There is no added state/API,
+allocation, task, retry policy or platform implementation.
+
+The existing Audio test injects idle wait failure, checks a flush returns
+IO_ERROR, joins the worker and confirms a single idle wait and no PCM submission.
+Native cancellation failure leaves the blocked worker/platform owned; a later
+successful cancellation completes destroy without delivering the cancelled batch.
+Existing PCM accepted-prefix, flush, clear and native-wait tests still pass.
+Focused Audio smoke passes 20 consecutive runs per width. Both Release builds
+pass. Background CTest: x64 121/121 in 253.74 s; x86 121/121 in 153.84 s.
+Five desktop tests per width are excluded; no listening or new RDP proof claimed.
+An initial test build used incorrect wait-enum names; those were corrected to
+the existing FAULT/TIMED_OUT vocabulary before all final builds/tests.
+
+The finite sweep covers Audio idle/native/producer/control waits and teardown:
+native LIMIT_EXCEEDED retains its existing interruption meaning; producer and
+clear/flush waits already inspect results; clear already checks native cancel;
+destroy now does too. Ordinary event wake failures are not expanded into a new
+recovery model. Session notification redesign remains expressly rejected.
+README text agrees with actual Console cell-difference scaling and status-frame
+construction; neither behavior changes. All four admitted items are covered.
+
+Reproducible accounting: git diff --numstat 8361c1bf -- src test.
+Production +19/-10 (net +9), tests +42/-1 (net +41); code total +61/-11
+(net +50). Component READMEs add 10 lines; three manifests change four entries.
+The other retained paths are the two task documents and dual package EXEs.
+x86 SHA-256: 7446EFFD24961DE265E8C56FE0A6806A1B2BCB076CF7FDAA35F2A55C5F3FCDC4.
+x64 SHA-256: 3251B1DBC8FE2C4B4979C17D84EAC18D91CCFB5973FC1F76D11E247AFDA6488E.
+Owner INI/snapshot changes remain untouched and excluded. S5 awaits owner
+acceptance; T85 stays open. Task-owned logs are summarized here before cleanup.
+
 ## S3: owner-admitted NXVM subset synchronization
 
 Owner request (2026-10-04): append an S to the open T and import the useful

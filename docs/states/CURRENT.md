@@ -2,8 +2,35 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T85.
+M9 T85 S5 is verified, awaiting owner acceptance: minimal Audio wait handling.
+
+## M9 T85 S5 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approves the minimal existing-return-value solution on 2026-10-05. |
+| Objective | Handle Audio idle wait failure and failed native-wait cancellation; clarify existing mouse/status-page limits. |
+| Non-goals | No Session notification redesign, new state/API/thread/recovery loop, platform rewrite, guest or mirror change. |
+| Reference Baseline | Pushed 8361c1bf; owner INI and snapshot changes remain untouched and excluded. |
+| Candidate Proposal | [T85 proposal](../proposals/m9-windows-101-startup-repair.md), S5 extension. |
+| Files And ABI Surface | audio/stream.c, existing Audio smoke, KVM Console/Common READMEs, three manifests, task documents and dual EXEs; no ABI change. |
+| Applicable Rules | Execution, Documentation, Architecture and Coding rules; shared governance skills; shared C11 and owner-local lifecycle. |
+| Verification | Both Release builds pass; Audio fault smoke passes 20 repeats per width; background CTest passes x64 121/121 (253.74 s), x86 121/121 (153.84 s). Five desktop tests per width excluded. |
+| Expected Markers | Existing failure field and worker detach/join remain sole owners; no added product-specific branch. |
+| Asset Needs | Refresh only assets/binary/softpc32.exe and softpc64.exe; no media/config changes. |
+| Reporting Requirements | Separate production/test/document added, removed and net lines; report actual files and dual EXEs. |
+| Stop Conditions | New state, API, recovery policy or scope expansion requires renewed owner review. |
+| Exit Criteria | Focused and background tests pass per width, manifests/governance pass, complete P pushed; await owner acceptance. |
+| Original Owner Request | 我们的原则永远是减少复杂度而不是增加复杂度。第三项否决。修复一二的逻辑和四五的契约说明。可以，那就按这个方案走。你现在开始执行。 |
+| Similar-Issue Sweep | Review all Audio worker waits and cancel-before-join calls; retain distinct native interruption semantics. Session redesign explicitly rejected. |
+| Scratch And Cleanup | Ignored build/t85-s5-audio logs only, 10-minute run budget, no raw traces/media; remove scratch after evidence summary. |
+
+Actual code: stream.c +19/-10 (net +9), existing Audio smoke +42/-1
+(net +41); combined +61/-11 (net +50). Two component README changes add
+10 lines; three manifest hashes are refreshed. No Common runtime, x86,
+App/Core, public ABI or mirror change. Dual EXEs are refreshed; owner INI and
+snapshot edits are preserved outside this delivery. See proposal S5 evidence.
 
 M9 T84 S8 is owner-accepted and closed. It converges raw Console backing-store
 preparation with exact frame-owned output coverage: native viewport, font fit
@@ -78,7 +105,7 @@ disclosed, not diagnosed by repetition. Production +20/-7, tests +56/-0:
 combined code net +69. No shared-corpus or original-mirror change.
 [S4 closure](../history/M9-T85-S4-dos-idle-cpu-repair.md) retains acceptance,
 actual-change review and limits. Owner INI/snapshot edits remain preserved.
-T85 stays open; no S is active and no next S is admitted.
+T85 stays open; S5 is subsequently admitted above.
 
 M9 T85 S2 is owner-accepted and closed on 2026-09-28. P1 `8c15e893`
 repairs indexed DIB ownership; P2 `f8fe3df8` records actual-change review.
