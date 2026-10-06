@@ -9,6 +9,9 @@ Dual full Release builds pass; focused 28/28 plus PC timeline 1/1 each;
 serial background x64 469/469 (460.53s), x86 469/469 (327.16s).
 Five desktop tests per width are excluded. EXEs retain accepted hashes.
 Owner INI edit ships unchanged; original snapshot remains untouched/excluded.
+Implementation P1 b45b2180 is pushed. Independent actual-change review confirms
+all 43 delivered units, the exact committed 843-path corpus and unchanged
+source/API/EXEs; only the preexisting owner snapshot edit remains uncommitted.
 T85 remains open; no S11/manual or earlier unreported acceptance is inferred.
 [S11 delivery](../proposals/m9-windows-101-startup-repair.md#s11-verified-delivery).
 

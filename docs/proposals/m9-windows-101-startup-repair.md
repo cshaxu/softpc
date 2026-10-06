@@ -159,6 +159,24 @@ and no duplicate implementation is retained. The four test ownership gates
 and Types boundary pass; Lib dependency and Common/x86/IBM PC source gates pass.
 There is no test-to-sibling-test or inward-to-outer dependency.
 
+### S11 actual-change review
+
+Executor P1 b45b218019061c1956ce0f60a1435cc285d0e377 is pushed to origin/main.
+The coordinator re-reads its actual Git diff and the original admitted request:
+all 43 rename-aware delivery units are accounted for (forty shared test/metadata
+units, two task documents, one existing owner INI edit). Committed Git trees
+are exact across all 843 shared paths, including deletions; no source/API,
+package EXE, product test, mirror or snapshot diff enters this P. The INI edit
+is only the owner's preexisting display setting; its bytes are unchanged.
+The code ledger is independently recalculated from 8124e551 to P1 and remains
++1430/-122, net +1308, in thirty-two test/build units. Eight manifests/DAG,
+focused 28/28 plus PC timeline 1/1 and background 469/469 per width supply the
+recorded receivers. Generic helper and build warning contracts are unchanged.
+Original owner snapshot remains uncommitted and untouched; no task-owned
+scratch or unstaged payload remains. This P2 changes only these task records,
+not the tested source, tests or binaries. Documentation and diff gates pass;
+S11 awaits owner validation and T85 remains open. No acceptance is fabricated.
+
 ## S8--S10: shared-package simplification
 
 Continuation instruction on 2026-10-05: 请你继续执行，完成S8以后继续走S9。每一个S呢你都要编译测试提交推送，不需要等我验收，我只在S9完成后来验收。
