@@ -1,5 +1,164 @@
 # Windows 1.01 startup diagnosis and repair
 
+## S11 eight-package test corpus synchronization
+
+Original owner request: 准入一个s来导入.
+Owner admits T85 S11 after the read-only import audit; T85 remains open.
+Baseline is SoftPC 8124e551 and NXVM 43e9700e6cde167cd228faec3f2ae87ca496e151
+from https://github.com/cshaxu/nxvm.git. The eight upstream packages are clean
+at admission. Existing repository-maintained shared code and notices are
+preserved; this imports no new third-party firmware, media or license terms.
+NXVM remains read-only reference, never a build/runtime dependency.
+
+The frozen ledger covers all paths in src/{lib,common,x86,ibmpc} and
+test/{lib,common,x86,ibmpc}. Each path must either remain byte-identical,
+be copied exactly from that immutable revision, relocate to its upstream
+owner with git mv, or be removed because the upstream inventory removes it.
+Completion requires exact path sets and byte hashes in all eight roots,
+not just matching manifests or tracked modification names.
+
+Pre-change audit: all four production roots are already exact, +0/-0.
+Tests have 34 changed existing paths, six added paths and five removed paths;
+five additions/removals are relocations, not discarded coverage. Decoder
+inventories move from IBM PC to x86 unchanged; entry-plan and FPU tests also
+move inward and use x86-owned fixtures. One timeline test separates neutral
+scheduling proof from retained PC composition proof. Other test changes add
+resource-failure, copied-value, boundary and lifecycle coverage to existing
+tests, with C11 and strict warning settings unchanged. Direct directory diff
+estimate, including documents/manifests and counting cross-root moves twice:
++2493/-1174, net +1319. Final accounting separates code from metadata and
+recognizes relocations. No product semantic change is intended or authorized.
+
+Verification: exact eight-root identity; eight manifests and dependency gates;
+test Types and inward ownership; dual full Release builds, focused changed
+test executables and serial background suites. Five desktop tests remain
+excluded. No Linux runtime or imported IBM PC guest-runtime claim is made.
+Shared test tools directly in test/ are unchanged semantically; their CRLF/LF
+checkout difference is not a new helper design or dependency.
+
+Preserve owner INI bytes and ship its existing edit per current Execution
+Rules. The preexisting owner snapshot remains untouched and excluded;
+builds may refresh only existing dual EXEs. Final delivery records actual
+changes, failures/reruns and bounded generated-file cleanup, commits/pushes
+one complete P, then reviews the actual diff and waits for owner acceptance.
+
+### S11 implementation and similar-issue review
+
+All eight roots match the pinned upstream blobs, 843/843, including their
+complete path inventories: source Lib 109, Common 23, x86 95, IBM PC 125;
+tests Lib 49, Common 20, x86 186, IBM PC 236. No source path changed.
+Five test relocations use git mv; three decoder inventories are R100,
+entry-plan R096 and FPU R097. The new standalone timeline test retains the
+previous scheduling assertions while PC timeline composition remains in its
+original package. No test fixture crosses sibling test-package boundaries.
+Eight manifests, four test ownership gates, test Types, Lib direct-edge map
+and Common/x86/IBM PC source corpus gates pass.
+
+Actual git diff --cached --numstat with rename detection counts 32 code/build
+units, +1430/-122, net +1308; eight additional README/manifest units are
+metadata. Forty rename-aware units correspond to 45 old/new paths. The
+pre-change +2493/-1174 estimate counted cross-root moves twice and included
+metadata; it is not a measure of runtime complexity or footprint. Runtime
+source/API, the original mirror and product code remain +0/-0.
+
+The first build attempts began before CMake generation completed and used
+stale Makefiles referring to relocated IBM PC decoder files. They failed on
+missing source paths, not on imported C semantics. Both configure processes
+then completed successfully (generation 198.5/194.0 seconds); only subsequent
+builds count as qualification. No source workaround, restored duplicate,
+test-limit change or weakened assertion is made. Early test enumeration during
+generation is not acceptance evidence. The already built changed Lib cases
+pass 5/5 on each width; remaining full-build/regression evidence follows.
+
+### S11 verified delivery
+
+Both regenerated full Release builds pass. Focused selection passes 28/28
+per width (Lib five, Common four, x86 sixteen, IBM PC three); the retained
+PC timeline composition test also passes separately 1/1 per width, making
+29 distinct changed-case proofs. Serial background test-x64 passes 469/469
+in 460.53 seconds and test-x86 469/469 in 327.16 seconds; the architectures
+run concurrently in separate build trees. No runtime test fails or retries,
+no timeout/assertion is weakened, and five desktop cases remain excluded.
+The first stale-Makefile build failures above remain disclosed. No Linux,
+RDP or imported IBM PC guest-runtime qualification is inferred.
+
+Six owned decoder JSON outputs are removed after tests; existing ignored
+build caches are retained. Production remains unchanged and the dual package
+EXEs retain the S10 hashes. Owner INI bytes are unchanged and its existing
+one-line display edit ships per Execution Rules; the original snapshot is
+unchanged and excluded. Eight-package identity is checked against immutable
+upstream Git blobs, not only its mutable checkout. All 843 paths and all
+eight manifests match. No shared source, App, mirror, generic test helper or
+product test is altered. The delivery ledger below records all forty
+rename-aware test/metadata units and their receivers.
+Delivery awaits owner testing; S11 and T85 are not closed.
+The first final documentation check rejected an S11 history file because
+history identifiers denote closed subtasks. Its unclosed delivery ledger is
+kept here instead, the premature history file is removed, and the unchanged
+governance gate passes. This correction does not alter tested code or EXEs.
+
+### S11 changed-unit ledger and ownership
+
+Thirty-four existing files change, five files relocate inward with git mv,
+and one timeline test is added: forty rename-aware units, forty-five old/new
+paths. Eight README/manifest units are metadata. Thirty-two code/build units
+are +1430/-122, net +1308 (git diff --cached --numstat, rename detection).
+The raw pre-change per-directory estimate +2493/-1174, net +1319, counted
+moves twice and included metadata. It does not describe runtime footprint.
+
+Lib six code units, +198/-3, net +195:
+
+- kvm_component_contract_smoke.c: copied publication/source and rejected admission.
+- kvm_mailbox_selection_smoke.c: terminal admission retains accepted FIFO/frame state.
+- linux_wait_contract_smoke.c and linux_wait_fakes.h: existing Base sleep/yield entry.
+- storage_file_writer_binary_smoke.c: stream modes, locks and resource replacement.
+- types_contract_smoke.c: overlap, bounded comparison and text utility contracts.
+- MANIFEST.sha256 and README.md: exact upstream metadata, separately counted.
+
+Common four code units, +313/-12, net +301:
+
+- common_machine_smoke.c: published-frame run-generation queries.
+- composition_smoke.c: create failure cleanup and copied monitor/control events.
+- session_frame_smoke.c: complete publication copy and invalid-frame rejection.
+- session_monitor_smoke.c: lifecycle dispatch, invalid inputs and creation cleanup.
+- MANIFEST.sha256 and README.md: exact upstream metadata, separately counted.
+
+x86 seventeen code/build units, +710/-11, net +699:
+
+- CMakeLists.txt: register relocated cases and the neutral timeline test.
+- chips/cpu/core_machine_80186_decoder_inventory_runner.c: R100 from IBM PC.
+- chips/cpu/core_machine_80286_decoder_inventory_runner.c: R100 from IBM PC.
+- chips/cpu/core_machine_80386_decoder_inventory_runner.c: R100 from IBM PC.
+- chips/cpu/cpu_contract_smoke.c: profile/timing bounds and shutdown consumption.
+- chips/hdc/hdc_contract_smoke.c: DMA completion/abort boundaries.
+- chips/kbc8042/controller_contract_smoke.c: configuration and serial delivery.
+- chips/pic8259/pic_contract_smoke.c: copied register capture.
+- chips/video/compaq_cecg_s9_smoke.c: invalid configuration retains chip state.
+- core/machine_attachment_phases_smoke.c: deadline and bounded progress admission.
+- core/machine_debug_smoke.c: code/memory/watch observation contracts.
+- core/machine_entry_plan_smoke.c: R096; replaces outward fixture with Core calls.
+- core/machine_fpu_interface_s65_smoke.c: R097; x86-owned fixture and profile queries.
+- core/machine_memory_device_registration_s16_smoke.c: DMA failure release and A20.
+- core/machine_rational_clock_smoke.c: source deadline conversion and overflow.
+- core/neutral_link.c: time, route ownership/rollback and firmware boundary proofs.
+- core/timeline_smoke.c: neutral scheduling order/capacity/cancellation owner.
+- MANIFEST.sha256 and README.md: exact upstream metadata, separately counted.
+
+IBM PC five code/build units, +209/-96, net +113:
+
+- CMakeLists.txt: remove registrations moved to x86, not their coverage.
+- board-at/assembly_smoke.c: copied descriptor/profile configuration.
+- core/machine_timeline_s2_smoke.c: retains PC timeline composition proof;
+  neutral assertions move into x86/core/timeline_smoke.c.
+- machine/construction_smoke.c: identity-preserving memory and media lifecycle.
+- machine/preparation_smoke.c: preparation failure and owned single/split ROM bytes.
+- MANIFEST.sha256 and README.md: exact upstream metadata, separately counted.
+
+All five old IBM PC locations are absent, their x86 receivers are registered,
+and no duplicate implementation is retained. The four test ownership gates
+and Types boundary pass; Lib dependency and Common/x86/IBM PC source gates pass.
+There is no test-to-sibling-test or inward-to-outer dependency.
+
 ## S8--S10: shared-package simplification
 
 Continuation instruction on 2026-10-05: 请你继续执行，完成S8以后继续走S9。每一个S呢你都要编译测试提交推送，不需要等我验收，我只在S9完成后来验收。
