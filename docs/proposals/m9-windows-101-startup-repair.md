@@ -220,6 +220,48 @@ delivery is recorded in the S12 closure evidence. The final current-NXVM
 comparison against `9ab7ed6b9a067ded717d7f75c138ac5be896ad18` remains exact
 for all eight roots and `test/register.cmake`.
 
+## S13 command-provider and presentation-shutdown investigation
+
+Owner admits a bounded reproduction-and-repair task for the prior deferred
+product shutdown observations. The two records become one investigation because
+the command-provider test ends through the same machine/UI teardown route as
+the presentation-shutdown test; they remain independently reported so one
+passing route cannot hide the other.
+
+Before any production edit, run each test repeatedly in isolation and in the
+background suite on both widths, with bounded stage/owner observation. The
+question is whether the delay belongs to the fixture, the executor stop/join,
+UI/broker shutdown, or native Audio setup/teardown. The existing cancellation,
+stop and join owner is the only permitted repair location. Do not add polling,
+increase a timeout, insert a sleep, or make a second shutdown path.
+
+If neither record reproduces under the bounded matrix and source review finds
+no pending wait lacking an existing completion/cancellation owner, retire the
+records as requested. If it reproduces, retain a minimal traced regression,
+repair the identified owner, run dual-width focused and full background tests,
+and account for every matching shutdown wait in a similar-issue sweep. Native
+desktop tests remain out of scope.
+
+### S13 disposition
+
+No fault reproduced. Each smoke ran ten isolated repetitions and then fifty
+additional isolated repetitions on each width: 60 command-provider and 60
+presentation-shutdown executions on x64, and the same 120 executions on x86.
+All 240 executions passed under their unchanged 45-second and 10-second limits.
+The longest observed x64 pass was about 1.6 seconds for command-provider and
+1.4 seconds for presentation shutdown; the x86 long run finished its final
+presentation shutdown in 0.65 seconds.
+
+Source review found no second shutdown owner or uncompleted wait in scope.
+`common_machine_shutdown()` signals both command and resume before joining the
+executor; the product Audio owner cancels its native writable wait before its
+own join; and presentation-shutdown's fake UI fixture starts no native
+presentation worker. No timeout was relaxed and no retry, polling, delay, ABI,
+production source, package or shared-corpus change was made. The two original
+TODO records are therefore retired under the owner's stated condition. The
+complete evidence and similar-wait sweep are retained in
+[S13 closure](../history/M9-T85-S13-shutdown-stall-investigation.md).
+
 ## S11 eight-package test corpus synchronization
 
 Original owner request: 准入一个s来导入.

@@ -2,12 +2,9 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T85. S12 is
-owner-accepted and closed:
-the eight shared roots and `test/register.cmake` are exact to current NXVM
-`9ab7ed6b9a067ded717d7f75c138ac5be896ad18`; full background qualification
-passes on both widths. P6 republishes the owner-approved package INI and both
-clean-first rebuilt executables. See the [S12 closure](../history/M9-T85-S12-eight-package-refresh.md).
+No implementation subtask is active. Open task awaiting owner: T85. S13
+retired two unconfirmed shutdown observations after bounded dual-width
+reproduction and lifecycle-owner review.
 
 ## S12 delivery baseline
 
