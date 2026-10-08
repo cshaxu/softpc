@@ -132,6 +132,34 @@ validation; this record does not close S12 or T85.
 P1 `1f7383f4` contains the complete corpus import, qualification records and
 refreshed dual package executables.
 
+## S13 parallel shared-test isolation
+
+Admission follows full parallel (`-j8`) qualification: the shared registration
+helper gives many independently launched tests the same working directory, so
+fixed relative media fixtures can collide or contend for a file lease. Also,
+the native Console display smoke correctly creates its own Console, but still
+assumes that every host can expose a 120×30 viewport; a host whose maximum
+visible height is 29 fails an environment assertion instead of testing restore
+semantics.
+
+The repair is deliberately test-only. `shared_register_test()` will configure
+one unique existing working directory per target. This removes the shared
+filesystem namespace while preserving all executable and test ownership. The
+three tests that create/operate a real native Console or Window will use the
+same CTest resource lock; no unrelated test will become serial. The Console
+smoke will determine a legal viewport from the created Console's capabilities,
+then compare restoration of that legal state rather than require a particular
+host font/display geometry. It must retain the existing failure-injection and
+history assertions.
+
+Expected change is roughly 20–35 net test/CMake lines in
+`test/register.cmake`, `test/lib/CMakeLists.txt` and
+`test/lib/console_broker_display_smoke.c`, plus the Lib test manifest. No
+`src/` path, public interface, product package or guest asset is authorized to
+change. Qualification is fresh dual-width configuration, focused Console
+display execution, and full x64/x86 `ctest -j8`; a passing serial run alone is
+insufficient.
+
 ## S11 eight-package test corpus synchronization
 
 Original owner request: 准入一个s来导入.

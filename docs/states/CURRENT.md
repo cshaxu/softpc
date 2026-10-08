@@ -6,7 +6,21 @@ M9 T85 S12 has completed its clean-corpus implementation and dual-width
 qualification. All eight shared source/test packages plus the three shared
 test helper scripts are byte-exact to clean NXVM `a397b925c`; package builds
 and full background CTest pass 479/479 on x64 and x86. Delivery P1
-`1f7383f4` is pushed; S12 and T85 remain open awaiting owner validation.
+`1f7383f4` is pushed and awaits owner validation. M9 T85 S13 is admitted for
+parallel-test isolation only; no production component, API or product behavior
+is in scope.
+
+## M9 T85 S13 Packet
+
+| Field | Required record |
+| --- | --- |
+| Admission And Approval | Owner directs a minimal shared-test repair after full `-j8` qualification exposed working-directory contention and native-desktop assumptions. |
+| Objective | Make concurrent shared tests independent without serializing unrelated tests; make the native Console smoke verify restoration against the host's actual supported viewport. |
+| Scope | `test/register.cmake`, `test/lib/CMakeLists.txt`, `test/lib/console_broker_display_smoke.c`, affected test manifest and task record only. |
+| Non-goals | No `src/` production change, product behavior/API change, fixed timeout/sleep workaround, broad `RUN_SERIAL`, or host-resolution requirement. |
+| Design | Give each `shared_register_test()` target its own configured working directory. Apply one CTest resource lock only to the desktop-owning Console/Window smokes. Retain concurrent execution for all other tests. Derive Console readback/restore extents from the actual supported buffer/viewport rather than asserting a 120×30 terminal. |
+| Verification | Clean reconfigure; x64/x86 `ctest -j8` full suite; focused native Console display smoke on both widths; manifests/boundary checks; package builds. Report concurrency result and actual diff. |
+| Exit Criteria | No shared artifact collision, no unsupported viewport assertion, no production delta, all qualifications pass, then commit/push and await owner validation. |
 
 ## M9 T85 S12 Packet
 
