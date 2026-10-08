@@ -212,6 +212,14 @@ CPU/FPU/Core targets are not in SoftPC's product link closure (`softpcvm`
 links `x86-debug`, not `x86-core`); the two generated EXEs were therefore
 restored unchanged rather than committed as timestamp-only churn.
 
+P6 closure: the owner later explicitly requested a clean-first rebuild and
+publication of both package executables, and explicitly included the
+owner-edited `assets/binary/softpc.ini`. The two package builds completed and
+relinked `softpc32.exe` and `softpc64.exe`; this owner-authorized artifact
+delivery is recorded in the S12 closure evidence. The final current-NXVM
+comparison against `9ab7ed6b9a067ded717d7f75c138ac5be896ad18` remains exact
+for all eight roots and `test/register.cmake`.
+
 ## S11 eight-package test corpus synchronization
 
 Original owner request: 准入一个s来导入.

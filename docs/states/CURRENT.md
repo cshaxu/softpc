@@ -2,36 +2,12 @@
 
 ## Current Work
 
-M9 T85 S12 continues as P5. The owner admits a complete eight-package refresh
-from clean NXVM `8d7022ea85a3c656713f588db4ba1d9b2498a873`, with dual-width
-full-repository qualification and rebuilt x86/x64 packages. The frozen
-source is read-only; its two uncommitted MyNES EXEs are outside scope. The
-former S12 P4 test-isolation delivery remains pushed at `c6413911`; this
-continuation must preserve that behavior while making the shared registration
-helper LF-canonical.
-
-## M9 T85 S12 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner directs: “可以，准入S任务完成本次导入和全repo测试验收（包括新发布2个exe)”。 This is S12 P5 because S12 remains the one active subtask. |
-| Objective | Import the eight shared packages from frozen clean NXVM `8d7022ea`; retain the verified P4 test-isolation behavior; canonicalize the shared registration helper as LF; qualify the full repository on x64/x86; publish refreshed packages. |
-| Scope | Every path in `src/{lib,common,x86,ibmpc}` and `test/{lib,common,x86,ibmpc}`, `test/register.cmake`, component manifests, and the minimal `.gitattributes` helper rule. |
-| Non-goals | No NXVM product/CMake module import, no MyNES artifact, no App/Core/Compat/mirror adaptation, no local shared-source fork, no user INI/media/snapshot mutation, and no behavior/API invention. |
-| Reference Baseline | SoftPC `c6413911`; clean NXVM shared corpus at `8d7022ea85a3c656713f588db4ba1d9b2498a873`. |
-| Candidate Proposal | [S12 P5 latest eight-package import](../proposals/m9-windows-101-startup-repair.md#s12-p5-latest-eight-package-import-and-full-qualification) |
-| Files And ABI Surface | All eight roots, registration helper and manifests. X86 internal API evolves; no product-facing interface or App receiver changes are authorized. |
-| Applicable Rules | Task Reading Set, current Architecture/Coding/Execution/Document rules, and existing shared test ownership/manifests. |
-| Design | Copy the frozen component roots as complete corpora. Copy `test/register.cmake` exactly after applying the narrowly scoped LF rule; do not copy NXVM's whole `.gitattributes`, because its private App path exceptions are not SoftPC policy. New optional X86 board callbacks retain their built-in FPU fallback when the identical IBM PC board leaves them null. |
-| Verification | Frozen raw path/SHA-256 ledger is exact: 109/23/95/125 source and 49/20/196/235 test paths by component; clean x64/x86 package builds; all background repository tests pass 479/479 on x64 (74.29 seconds) and x86 (224.21 seconds). Native desktop tests remain excluded because no desktop interval was reserved. The sole root-level fixed-fixture collision found under concurrent x64 execution is explicitly `RUN_SERIAL`; no shared production/test corpus was locally changed. |
-| Expected Markers | All eight roots and `test/register.cmake` byte-exact to frozen NXVM source; `.gitattributes` makes the helper LF; no product receiver change; every enabled test executable is built and passes on both widths. |
-| Asset Needs | Rebuild only `assets/binary/softpc32.exe` and `assets/binary/softpc64.exe` if their link closure changes; here it does not, so retain the accepted binaries. Preserve user-owned INI, snapshots and guest media. |
-| Reporting Requirements | Report frozen source cleanliness, exact path/hash ledger, production/test added/removed/net lines, background and desktop results separately, package hashes, pushed P and coordinator review; then await owner validation. |
-| Stop Conditions | Frozen source changes, a shared source requires an App/Core/Compat adaptation, a component boundary fails, a background test fails, a desktop suite lacks an owner-reserved desktop interval, or package build fails. |
-| Exit Criteria | Complete exact import, LF-canonical shared helper, dual package builds, passing applicable full tests, manifest/governance/boundary proof, refreshed dual EXEs, complete pushed P and review. |
-| Original Owner Request | 可以，准入S任务完成本次导入和全repo测试验收（包括新发布2个exe)。 |
-| Similar-Issue Sweep | Compare every frozen path in the eight roots plus shared registration; audit all new X86 receiver references outside X86 and all positive test build edges for outward product dependencies. |
+No implementation subtask is active. Open task awaiting owner: T85. S12 is
+owner-accepted and closed:
+the eight shared roots and `test/register.cmake` are exact to current NXVM
+`9ab7ed6b9a067ded717d7f75c138ac5be896ad18`; full background qualification
+passes on both widths. P6 republishes the owner-approved package INI and both
+clean-first rebuilt executables. See the [S12 closure](../history/M9-T85-S12-eight-package-refresh.md).
 
 ## S12 delivery baseline
 
