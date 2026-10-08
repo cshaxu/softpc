@@ -29,6 +29,10 @@ and full background CTest pass 479/479 on x64 and x86. Delivery P1
 | Original Owner Request | 没关系，没关系，你可以准入一个新的 S 任务，把 NXVM 的所有有差异的部分导入进来，然后再跑这个测试，四个测试。 |
 | Similar-Issue Sweep | Every frozen shared path and changed CPU/control/test receiver; decode/address/stack/arithmetic negative gates, reset/NMI/shutdown tests and complete inward test ownership. No second SoftPC executor/device owner. |
 
+The owner subsequently accepts the newer `assets/binary/snapshot` as an owned
+delivery artifact. It replaces the older package snapshot without changing
+source or configuration.
+
 ## S11 delivered baseline
 
 All 843 paths match pinned NXVM 43e9700e exactly. Production +0/-0;
