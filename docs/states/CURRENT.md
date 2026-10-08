@@ -2,7 +2,35 @@
 
 ## Current Work
 
-M9 T85 S11 is verified, awaiting owner testing: NXVM eight-package sync.
+M9 T85 S12 has completed its clean-corpus implementation and dual-width
+qualification. All eight shared source/test packages plus the three shared
+test helper scripts are byte-exact to clean NXVM `a397b925c`; package builds
+and full background CTest pass 479/479 on x64 and x86. The delivery P is being
+recorded and pushed; S12 and T85 remain open awaiting owner validation.
+
+## M9 T85 S12 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner explicitly directs: “直接原样导入八组件吧，完成以后编译测试提交推送后等我验证，跑全量测试。” NXVM remains read-only. |
+| Objective | Exactly import all eight shared source/test packages from clean NXVM HEAD `a397b925c48b629908869d295dfd97316acb6b8f`; qualify test/lib, test/common, test/x86, test/ibmpc independently on both widths. |
+| Non-goals | No original SoftPC CPU/device replacement, App/Core or mirror change, Lib/Common private fork, guest media/config/snapshot edit, upstream write, desktop testing or invented manual acceptance. |
+| Reference Baseline | SoftPC `4c36853c`; prior exact corpus `43e9700e`; NXVM clean HEAD `a397b925c48b629908869d295dfd97316acb6b8f`, verified with no uncommitted changes before copying. |
+| Candidate Proposal | [S12 synchronization](../proposals/m9-windows-101-startup-repair.md#s12-current-nxvm-corpus-refresh-and-four-suite-verification) |
+| Files And ABI Surface | All files below src/{lib,common,x86,ibmpc}, test/{lib,common,x86,ibmpc}, plus shared test registration/boundary scripts required by those packages. Exact final path/count ledger is measured from the clean upstream tree. x86 CPU internals and IBM PC media-release semantics evolve; SoftPC runtime links neither shared Core nor IBM PC. |
+| Applicable Rules | Task Reading Set and current Architecture/Coding/Execution/Document rules and their shared governance skills; source-research policy and exact shared corpus boundary. |
+| Verification | Stable path/hash ledger confirms zero differences from frozen `a397b925c`; full dual Release package builds and background CTest pass 479/479 on x64 and x86. Labels: Lib 33, Common 14, x86 176 and IBM PC 176. Native desktop tests remain excluded by the presets. |
+| Expected Markers | All eight roots exact to frozen upstream; four distinct suite results per width, no production fallback or weakened assertions; desktop excluded. |
+| Asset Needs | Existing build trees and owned decoder/negative-test outputs. Preserve existing INI/media/snapshot; refresh the two package EXEs after successful builds. |
+| Reporting Requirements | Pre/post changed-path and added/removed/net counts separately for production and tests, clean upstream revision and fingerprint, actual import review, four-suite and full regression results, EXE links, pushed P; wait for owner. |
+| Stop Conditions | Upstream revision changes during copy, invalid manifest/license provenance, outward dependency, need for App/mirror integration or local shared shim, failed verification requiring an unapproved behavior change. |
+| Exit Criteria | Exact import and qualification are complete. Record/push the complete P and independent actual-diff review, then wait for owner validation; no automatic T closure. |
+| Original Owner Request | 没关系，没关系，你可以准入一个新的 S 任务，把 NXVM 的所有有差异的部分导入进来，然后再跑这个测试，四个测试。 |
+| Similar-Issue Sweep | Every frozen shared path and changed CPU/control/test receiver; decode/address/stack/arithmetic negative gates, reset/NMI/shutdown tests and complete inward test ownership. No second SoftPC executor/device owner. |
+
+## S11 delivered baseline
+
 All 843 paths match pinned NXVM 43e9700e exactly. Production +0/-0;
 32 test/build units +1430/-122, net +1308, with five inward relocations.
 Dual full Release builds pass; focused 28/28 plus PC timeline 1/1 each;
@@ -14,27 +42,6 @@ all 43 delivered units, the exact committed 843-path corpus and unchanged
 source/API/EXEs; only the preexisting owner snapshot edit remains uncommitted.
 T85 remains open; no S11/manual or earlier unreported acceptance is inferred.
 [S11 delivery](../proposals/m9-windows-101-startup-repair.md#s11-verified-delivery).
-
-## M9 T85 S11 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner: 准入一个s来导入. Authorized import follows the eight-package audit; no upstream writes. |
-| Objective | Match all eight shared source/test packages to immutable NXVM 43e9700e6cde167cd228faec3f2ae87ca496e151, including moved/deleted tests. |
-| Non-goals | No production/API/behavior change, new feature, mirror/App change, guest-media or snapshot rewrite, upstream modification or desktop interaction. |
-| Reference Baseline | SoftPC 8124e551; clean upstream eight-package tree at NXVM 43e9700e. Existing owner INI/snapshot edits predate S11. |
-| Candidate Proposal | [S11 import ledger](../proposals/m9-windows-101-startup-repair.md#s11-eight-package-test-corpus-synchronization) |
-| Files And ABI Surface | Four source packages remain identical; four test packages synchronize 45 changed paths including five relocations and one new timeline test. No ABI change. |
-| Applicable Rules | Documentation guide, Execution/Architecture/Coding/Document rules, current Architecture/Source Layout, source-research policy and their shared governance skills. |
-| Verification | Exact eight-package inventories and byte hashes; manifests/DAG/Types/test ownership; dual full Release builds; focused imported tests and serial background test-x64/test-x86; documentation and diff checks. |
-| Expected Markers | All eight packages exact, production +0/-0, passing dual background and focused checks; desktop excluded. |
-| Asset Needs | Refresh existing dual package EXEs if changed. Preserve owner INI bytes and ship its existing edit under Execution Rules; preserve/exclude preexisting snapshot. No new guest media. |
-| Reporting Requirements | Before/after path and line accounting, relocation classification, exact corpus identity, test limits, EXE links, pushed complete P and actual-change review. |
-| Stop Conditions | Upstream identity drift, production mismatch, outward test dependency, changed product behavior, unknown provenance or failing acceptance. Do not compensate with local shared patches or weakened tests. |
-| Exit Criteria | Exact import, verification, complete commit/push and independent actual-diff review; then wait for owner validation, not automatic S/T closure. |
-| Original Owner Request | 准入一个s来导入 |
-| Similar-Issue Sweep | Inventory every shared path, test registration, five relocations and their inward fixtures; verify no dependency on NXVM/App or another test package. |
 
 S10 implementation f97ecbea and actual-change review a51bf19b are pushed.
 All 48 delivered paths match its finite ledger: production +71/-91 (net -20),

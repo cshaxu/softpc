@@ -80,7 +80,10 @@ static lib_i32 vm86_delivery_expect_prepublication(cpu_instruction_fixture *stat
     core_machine_cpu_execution_refresh(&state->execution);
     after = state->cpu;
     lib_memory_copy(stack_after, state->memory + VM86_STACK_TOP - 40u, sizeof(stack_after));
-    return state->execution.stop_requested && state->fault.valid &&
+    return core_machine_cpu_is_shutdown(&state->execution) &&
+        !state->execution.stop_requested && !state->fault.valid &&
+        state->delivered_exception.valid &&
+        state->delivered_exception.exception_mask == VCPUINS_EXCEPT_SHUTDOWN &&
         lib_memory_compare(&before, &after, sizeof(before)) == 0 &&
         lib_memory_compare(stack_before, stack_after, sizeof(stack_before)) == 0;
 }
@@ -196,7 +199,7 @@ static lib_bool vm86_state_delivery(lib_u8 vector, const lib_u8 *code,
         frame[error_frame ? 1u : 0u] == (trap ? 1u : 0u) &&
         frame[error_frame ? 2u : 1u] == 0x200u &&
         frame[error_frame ? 3u : 2u] == (VCPU_EFLAGS_VM | VCPU_EFLAGS_IF |
-            (trap ? VCPU_EFLAGS_TF : 0u) | (breakpoint ? VCPU_EFLAGS_RF : 0u)) &&
+            (trap ? VCPU_EFLAGS_TF : VCPU_EFLAGS_RF)) &&
         frame[error_frame ? 4u : 3u] == 0x1234u &&
         frame[error_frame ? 5u : 4u] == 0x300u &&
         frame[error_frame ? 6u : 5u] == 0x500u &&
@@ -211,12 +214,12 @@ static lib_bool vm86_state_nmi(lib_bool masked)
     const lib_u8 nop = 0x90u;
     if (!vm86_delivery_prepare(&state, 2u)) return LIB_FALSE;
     state.memory[0x2000u] = nop;
-    state.cpu.data.flagNMI = LIB_TRUE;
-    state.cpu.data.flagMaskNMI = masked;
+    state.execution.nmi_pending = LIB_TRUE;
+    state.execution.nmi_masked = masked;
     core_machine_cpu_execution_refresh(&state.execution);
     if (!masked) core_machine_cpu_execution_refresh(&state.execution);
     return !state.execution.stop_requested && !state.fault.valid &&
-        state.cpu.data.flagNMI == masked &&
+        state.execution.nmi_pending == masked &&
         state.cpu.data.eip == (masked ? 1u : 0x101u) &&
         state.cpu.data.cs.selector == (masked ? 0x200u : 8u) &&
         state.cpu.data.esp == (masked ? 0x1234u : VM86_STACK_TOP - 36u);

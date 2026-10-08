@@ -13,10 +13,16 @@ static lib_i32 control_run(cpu_instruction_fixture *fixture,
 static lib_i32 control_fault(cpu_instruction_fixture *fixture,
     const lib_u8 *code, lib_u8 bytes, lib_u32 exception, t_cpu *after)
 {
-    (void)cpu_instruction_run(fixture, code, bytes, after);
+    const lib_status status = cpu_instruction_run(fixture, code, bytes, after);
+
     if (fixture->execution.cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386 &&
-        (fixture->cpu.data.cr0 & VCPU_CR0_PE) != 0u &&
-        exception == VCPUINS_EXCEPT_GP) exception = VCPUINS_EXCEPT_DF;
+        (fixture->cpu.data.cr0 & VCPU_CR0_PE) != 0u) {
+        return status == LIB_STATUS_OK &&
+            core_machine_cpu_is_shutdown(&fixture->execution) &&
+            !fixture->fault.valid && fixture->delivered_exception.valid &&
+            fixture->delivered_exception.exception_mask ==
+                VCPUINS_EXCEPT_SHUTDOWN;
+    }
     return fixture->execution.stop_requested && fixture->fault.valid &&
         (fixture->fault.exception_mask & exception) != 0u;
 }
@@ -128,11 +134,17 @@ static lib_i32 control_test_msw(void)
         lib_u32 image = 0x11223344u;
 
         cpu_instruction_prepare(&fixture, profiles[profile]);
+        fixture.cpu.data.eax = 0xdead0000u;
+        before = fixture.cpu;
+        if (!control_run(&fixture, smsw, sizeof(smsw), &after) ||
+            after.data.eax != (profile == 0u ? 0xdeadfff0u : 0xdead0000u) ||
+            after.data.cr0 != 0u || after.data.eflags != before.data.eflags) return 0;
+        cpu_instruction_prepare(&fixture, profiles[profile]);
         control_seed(&fixture);
         fixture.cpu.data.cr0 = 0x00a5000du;
         before = fixture.cpu;
         if (!control_run(&fixture, smsw, sizeof(smsw), &after) ||
-            after.data.eax != 0xdead000du || after.data.cr0 !=
+            after.data.eax != (profile == 0u ? 0xdeadfffdu : 0xdead000du) || after.data.cr0 !=
             before.data.cr0 || after.data.eflags != before.data.eflags) return 0;
         cpu_instruction_prepare(&fixture, profiles[profile]);
         control_seed(&fixture);
@@ -142,7 +154,13 @@ static lib_i32 control_test_msw(void)
         if (!control_run(&fixture, lmsw, sizeof(lmsw), &after) ||
             !control_state_equal(&before, &after) || after.data.cr0 !=
             0x00a5000du) return 0;
-        cpu_instruction_prepare(&fixture, CORE_MACHINE_CPU_PROFILE_80386);
+        fixture.cpu.data.eip = 0u;
+        before = fixture.cpu;
+        if (!control_run(&fixture, smsw, sizeof(smsw), &after) ||
+            after.data.eax != (profile == 0u ? 0xdeadfffdu : 0xdead000du) ||
+            after.data.cr0 != before.data.cr0 || after.data.eflags != before.data.eflags)
+            return 0;
+        cpu_instruction_prepare(&fixture, profiles[profile]);
         control_seed(&fixture);
         fixture.cpu.data.cr0 = 0x00a5000cu;
         lib_memory_copy(fixture.memory + 0x0400u, &image, sizeof(image));
@@ -150,8 +168,8 @@ static lib_i32 control_test_msw(void)
         if (!control_run(&fixture, smsw_memory, sizeof(smsw_memory), &after) ||
             !control_state_equal(&before, &after)) return 0;
         lib_memory_copy(&image, fixture.memory + 0x0400u, sizeof(image));
-        if (image != 0x1122000cu) return 0;
-        cpu_instruction_prepare(&fixture, CORE_MACHINE_CPU_PROFILE_80386);
+        if (image != (profile == 0u ? 0x1122fffcu : 0x1122000cu)) return 0;
+        cpu_instruction_prepare(&fixture, profiles[profile]);
         control_seed(&fixture);
         fixture.cpu.data.cr0 = 0x00a50000u;
         image = 0x1122000cu;
@@ -498,16 +516,17 @@ static lib_i32 control_test_interrupt_control_storage(void)
                     expected = opcode == 0xf4u ? before.data.eflags :
                         (before.data.eflags & ~VCPU_EFLAGS_IF) |
                         (opcode == 0xfbu ? VCPU_EFLAGS_IF : 0u);
-                    status = cpu_instruction_run(&fixture, code, bytes, &after);
                     if (rejected) {
+                        status = cpu_instruction_run(&fixture, code, bytes, &after);
                         if (status != LIB_STATUS_INTERNAL_ERROR || !fixture.fault.valid ||
-                            (fixture.fault.exception_mask & VCPUINS_EXCEPT_UD) == 0u ||
+                            (fixture.fault.exception_mask & (profile == 0u ?
+                                VCPUINS_EXCEPT_UD : VCPUINS_EXCEPT_CE)) == 0u ||
                             lib_memory_compare(&before, &after, sizeof(before)) != 0) {
                             lib_c_printf("CLI-STI storage profile=%zu form=%zu lock=%u opcode=%x status=%u fault=%x\n",
                                 profile, form, lock, opcode, status, fixture.fault.exception_mask);
                             return 0;
                         }
-                    } else if (status != LIB_STATUS_OK || fixture.fault.valid ||
+                    } else if ((status = cpu_instruction_run(&fixture, code, bytes, &after)) != LIB_STATUS_OK || fixture.fault.valid ||
                         after.data.eip != bytes || after.data.eflags != expected ||
                         after.data.flagHalt != (opcode == 0xf4u) ||
                         !control_cli_sti_storage_preserved(&before, &after)) {

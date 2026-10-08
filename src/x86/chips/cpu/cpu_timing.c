@@ -130,7 +130,13 @@ static lib_i32 core_machine_cpu_timing_try(core_machine_cpu_execution_context *c
 {
     lib_u64 ticks;
 
+    context->timing_result.retirement_origin =
+        CORE_MACHINE_RETIREMENT_TIMING_ORIGIN_UNATTRIBUTED;
     if (evaluate == LIB_NULL || !evaluate(context, &ticks)) return 0;
+    if (context->timing_result.retirement_origin ==
+        CORE_MACHINE_RETIREMENT_TIMING_ORIGIN_L2_CONTROL_MODEL) {
+        origin = CORE_MACHINE_RETIREMENT_TIMING_ORIGIN_L2_CONTROL_MODEL;
+    }
     result->ticks = ticks;
     result->retirement_origin = origin;
     context->timing_result.retirement_origin = origin;
@@ -220,7 +226,7 @@ static lib_i32 core_machine_cpu_timing_apply_8086_lock(core_machine_cpu_executio
     data = &context->instructions->data;
     if (!core_machine_cpu_timing_has_8086_lock_prefix(data) ||
         result->source_timing_unallocated) return 1;
-    if (result->ticks > UINT64_MAX - 2u) return 0;
+    if (result->ticks > LIB_UINT64_MAX - 2u) return 0;
     result->ticks += 2u;
     return 1;
 }
@@ -301,7 +307,9 @@ lib_i32 core_machine_cpu_timing_select(core_machine_cpu_execution_context *conte
     result.key_id = context->timing_result.form_id;
     result.formula_inputs = core_machine_cpu_timing_formula_inputs(context);
     if (result.retirement_origin ==
-        CORE_MACHINE_RETIREMENT_TIMING_ORIGIN_CONTROL_STACK) {
+            CORE_MACHINE_RETIREMENT_TIMING_ORIGIN_CONTROL_STACK ||
+        result.retirement_origin ==
+            CORE_MACHINE_RETIREMENT_TIMING_ORIGIN_L2_CONTROL_MODEL) {
         result.formula_inputs |= CORE_MACHINE_CPU_TIMING_INPUT_CONTROL;
     }
     result.source_timing_unallocated = context->timing_result.source_timing_unallocated;

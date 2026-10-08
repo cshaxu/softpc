@@ -275,8 +275,8 @@ lib_status vm_machine_hdd_replace_bytes(t_hdd *hdd, const void *bytes,
     return vm_machine_hdd_install_medium(hdd, candidate, raw_byte_count,
         virtual_byte_count, cylinders, LIB_FALSE);
 }
-static lib_status vm_machine_hdd_insert_medium(t_hdd *hdd,
-    const char *file_name, lib_storage_medium_mode mode)
+lib_status vm_machine_hdd_insert(t_hdd *hdd, const char *file_name,
+    lib_storage_medium_mode mode)
 {
     lib_size raw_byte_count;
     lib_size virtual_byte_count;
@@ -300,21 +300,18 @@ static lib_status vm_machine_hdd_insert_medium(t_hdd *hdd,
     return vm_machine_hdd_install_medium(hdd, candidate, raw_byte_count,
         virtual_byte_count, cylinders, mode == LIB_STORAGE_MEDIUM_READONLY);
 }
-lib_status vm_machine_hdd_insert(t_hdd *hdd, const char *file_name,
-    lib_storage_medium_mode mode)
-{
-    return vm_machine_hdd_insert_medium(hdd, file_name, mode);
-}
 lib_status vm_machine_hdd_remove(t_hdd *hdd) {
+    lib_status status;
+
     if (hdd == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    lib_storage_medium_destroy(&hdd->connect.medium);
+    status = lib_storage_medium_destroy(&hdd->connect.medium);
     hdd->connect.flagDiskExist = LIB_FALSE;
     hdd->connect.flagReadOnly = LIB_FALSE;
     hdd->connect.raw_byte_count = 0u;
     hdd->connect.virtual_byte_count = 0u;
     hdd->connect.geometry_cylinders = 0u;
     ++hdd->connect.media_generation;
-    return LIB_STATUS_OK;
+    return status;
 }
 
 lib_status vm_machine_hdd_set_geometry(t_hdd *hdd, lib_u32 cylinders,

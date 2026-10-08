@@ -84,7 +84,10 @@ static lib_i32 bit_test_immediate_and_memory(void)
                 &after) != LIB_STATUS_OK || state.fault.valid ||
             cpu_instruction_read(&state, 0x4002u, &read, 2u,
                 CORE_MACHINE_CPU_MEMORY_ACCESS_DATA, LIB_FALSE, LIB_FALSE) !=
-                LIB_STATUS_OK || read != 1u ||
+                LIB_STATUS_OK || read != 0u ||
+            cpu_instruction_read(&state, 0x4000u, &read, 2u,
+                CORE_MACHINE_CPU_MEMORY_ACCESS_DATA, LIB_FALSE, LIB_FALSE) !=
+                LIB_STATUS_OK || read != 0x8001u ||
             X86_CPU_BIT_IS_SET(after.data.eflags, VCPU_EFLAGS_CF)) return 0;
 
         state.cpu.data.eip = 0u;
@@ -98,7 +101,10 @@ static lib_i32 bit_test_immediate_and_memory(void)
             state.fault.valid ||
             cpu_instruction_read(&state, 0x400cu, &fourth, 4u,
                 CORE_MACHINE_CPU_MEMORY_ACCESS_DATA, LIB_FALSE, LIB_FALSE) !=
-                LIB_STATUS_OK || fourth != 2u ||
+                LIB_STATUS_OK || fourth != 0u ||
+            cpu_instruction_read(&state, 0x4008u, &third, 4u,
+                CORE_MACHINE_CPU_MEMORY_ACCESS_DATA, LIB_FALSE, LIB_FALSE) !=
+                LIB_STATUS_OK || third != 2u ||
             X86_CPU_BIT_IS_SET(after.data.eflags, VCPU_EFLAGS_CF)) return 0;
     }
     {
@@ -188,20 +194,14 @@ static lib_i32 bit_test_rejection(void)
     for (index = 0u; index < 3u; ++index) {
         cpu_operand_probe_fixture fixture;
         cpu_instruction_fixture *state = &fixture.instruction;
-        t_cpu after;
         const lib_u8 *code = index == 2u ? invalid_ba : bt_memory;
         lib_u8 bytes = index == 2u ? sizeof(invalid_ba) : sizeof(bt_memory);
 
         cpu_operand_probe_prepare(&fixture, profiles[index]);
         state->cpu.data.eflags = VCPU_EFLAGS_ZF;
         state->cpu.data.ecx = 0xaabbccddu;
-        state->cpu.data.idtr.limit = 0x17u;
-        if (cpu_instruction_run(state, code, bytes, &after) !=
-                LIB_STATUS_INTERNAL_ERROR || !state->fault.valid ||
-            !X86_CPU_BIT_IS_SET(state->fault.exception_mask, VCPUINS_EXCEPT_UD) ||
-            fixture.operand_reads != 0u || fixture.operand_writes != 0u ||
-            after.data.ecx != 0xaabbccddu ||
-            after.data.eflags != VCPU_EFLAGS_ZF || after.data.eip != 0u) return 0;
+        if (!cpu_instruction_expect_real_fault(state, code, bytes, 6u) ||
+            fixture.operand_reads != 0u || fixture.operand_writes != 0u) return 0;
     }
     return 1;
 }

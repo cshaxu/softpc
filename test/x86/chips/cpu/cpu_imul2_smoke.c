@@ -19,8 +19,8 @@ static lib_i32 imul_forms(void)
         const lib_i64 product = (lib_i64)lhs * (lib_i64)rhs;
         const lib_u32 expected = (lib_u32)product;
         const lib_i32 overflows = width ?
-            (product > INT32_MAX || product < INT32_MIN) :
-            (product > INT16_MAX || product < INT16_MIN);
+            (product > LIB_INT32_MAX || product < LIB_INT32_MIN) :
+            (product > LIB_INT16_MAX || product < LIB_INT16_MIN);
         lib_i32 failed = 0;
 
         cpu_instruction_prepare(&state, CORE_MACHINE_CPU_PROFILE_80386);
@@ -68,20 +68,12 @@ static lib_i32 imul_profile(void)
     for (index = 0u; index < 2u; ++index) {
         cpu_operand_probe_fixture fixture;
         cpu_instruction_fixture *state = &fixture.instruction;
-        t_cpu after;
 
         cpu_operand_probe_prepare(&fixture, profiles[index]);
         state->cpu.data.ecx = 0xaabbccddu;
         state->cpu.data.eflags = VCPU_EFLAGS_CF | VCPU_EFLAGS_OF;
-        state->cpu.data.idtr.limit = 0x17u;
-        if (cpu_instruction_run(state, code, sizeof(code), &after) !=
-                LIB_STATUS_INTERNAL_ERROR || !state->fault.valid ||
-            !X86_CPU_BIT_IS_SET(state->fault.exception_mask,
-                VCPUINS_EXCEPT_UD) || fixture.operand_reads != 0u ||
-            fixture.operand_writes != 0u ||
-            after.data.ecx != 0xaabbccddu ||
-            after.data.eflags != (VCPU_EFLAGS_CF | VCPU_EFLAGS_OF) ||
-            after.data.eip != 0u) return 0;
+        if (!cpu_instruction_expect_real_fault(state, code, sizeof(code), 6u) ||
+            fixture.operand_reads != 0u || fixture.operand_writes != 0u) return 0;
     }
     return 1;
 }

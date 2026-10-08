@@ -78,13 +78,16 @@ static lib_i32 far_expect_protected_fault(cpu_instruction_fixture *state,
 {
     t_cpu after;
 
+    (void)exception;
     state->cpu.data.idtr.limit = 0x17u;
     state->cpu.data.eip = 0u;
     lib_memory_copy(state->memory + state->cpu.data.cs.base, code, bytes);
     core_machine_cpu_execution_refresh(&state->execution);
     after = state->cpu;
-    return state->execution.stop_requested && state->fault.valid &&
-        (state->fault.exception_mask & exception) != 0u &&
+    return core_machine_cpu_is_shutdown(&state->execution) &&
+        !state->execution.stop_requested && !state->fault.valid &&
+        state->delivered_exception.valid &&
+        state->delivered_exception.exception_mask == VCPUINS_EXCEPT_SHUTDOWN &&
         after.data.eip == before->data.eip && after.data.esp == before->data.esp &&
         after.data.eflags == before->data.eflags &&
         after.data.cs.selector == before->data.cs.selector &&
@@ -325,10 +328,18 @@ static lib_i32 far_test_real_mode(core_machine_cpu_profile profile)
     if (!far_step(&state, indirect_jump, sizeof(indirect_jump), &after) ||
         after.data.cs.selector != 0x100u || after.data.cs.base != 0x1000u) return 0;
     cpu_instruction_prepare(&state, profile);
-    lib_memory_copy(state.memory + 0xfffeu, (const lib_u8[]){0u,0u}, 2u);
+    /* Separate DS from CS so wrapped pointer bytes cannot alias the opcode.
+     * Early CPUs wrap the second word; 286/386 reject the full four-byte span. */
+    state.cpu.data.ds.base = 0x10000u;
+    lib_memory_copy(state.memory + 0x1fffeu, (const lib_u8[]){0u,0u}, 2u);
     lib_memory_copy(state.memory + 0x10000u, (const lib_u8[]){0u,2u}, 2u);
-    if (!far_step(&state, indirect_jump_boundary, sizeof(indirect_jump_boundary), &after) ||
-        after.data.cs.selector != 0x200u || after.data.cs.base != 0x2000u) return 0;
+    if (profile < CORE_MACHINE_CPU_PROFILE_80286) {
+        if (!far_step(&state, indirect_jump_boundary, sizeof(indirect_jump_boundary), &after) ||
+            after.data.cs.selector != 0x200u || after.data.cs.base != 0x2000u) return 0;
+    } else {
+        if (!cpu_instruction_expect_real_fault(&state, indirect_jump_boundary,
+                sizeof(indirect_jump_boundary), 13u)) return 0;
+    }
     cpu_instruction_prepare(&state, profile);
     state.cpu.data.esp = 0x8000u;
     lib_memory_copy(state.memory + 0x0100u, (const lib_u8[]){0u,0u,0u,1u}, 4u);
@@ -340,16 +351,10 @@ static lib_i32 far_test_real_mode(core_machine_cpu_profile profile)
     if (state.execution.stop_requested || state.fault.valid ||
         after.data.cs.selector != 0u || after.data.sp != 0x8000u) return 0;
     cpu_instruction_prepare(&state, profile);
-    /* T337_REAL_UD_TERMINAL_CPU_OWNER: no IVT is installed in this CPU fixture. */
-    state.cpu.data.idtr.limit = 0x17u;
     for (index = 0u; index < sizeof(reserved) / sizeof(reserved[0]); ++index) {
-        const t_cpu before = state.cpu;
-        if (cpu_instruction_run(&state, reserved[index], sizeof(reserved[index]), &after) !=
-                LIB_STATUS_INTERNAL_ERROR || !state.fault.valid ||
-            (state.fault.exception_mask & VCPUINS_EXCEPT_UD) == 0u ||
-            lib_memory_compare(&before.data, &after.data, sizeof(before.data)) != 0) return 0;
+        if (!cpu_instruction_expect_real_fault(&state, reserved[index],
+                sizeof(reserved[index]), 6u)) return 0;
         cpu_instruction_prepare(&state, profile);
-        state.cpu.data.idtr.limit = 0x17u;
     }
     return 1;
 }

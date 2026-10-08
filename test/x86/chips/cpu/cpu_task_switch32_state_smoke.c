@@ -400,8 +400,11 @@ static lib_bool task32_expect(task32_case test_case)
         TASK32_B_BASE : TASK32_A_BASE) + 0x1cu,
         sizeof(outgoing));
     if (test_case == TASK32_LOCK_DIRECT || test_case == TASK32_LOCK_INDIRECT)
-        return fixture.fault.valid &&
-            (fixture.fault.exception_mask & VCPUINS_EXCEPT_UD) != 0u &&
+        /* UD/GP/DF entries are absent: the failed GP pair reaches DF. */
+        return core_machine_cpu_is_shutdown(&fixture.execution) &&
+            !fixture.fault.valid && fixture.delivered_exception.valid &&
+            fixture.delivered_exception.exception_mask == VCPUINS_EXCEPT_SHUTDOWN &&
+            fixture.delivered_exception.exception_code == 0u &&
             after.data.tr.selector == 0x28u && after.data.eax == 0x11111111u &&
             after.data.ecx == 0x22222222u && after.data.edx == 0x33333333u &&
             after.data.ebx == 0x44444444u && after.data.esp == 0x55550000u &&
@@ -462,8 +465,96 @@ static lib_bool task32_expect(task32_case test_case)
     return LIB_FALSE;
 }
 
+static lib_bool task32_test_published_fault_context(void)
+{
+    cpu_instruction_fixture fixture;
+    const lib_u8 gp_gate[] = {0x80u,1u,8u,0u,0u,0x86u,0u,0u};
+    lib_u8 step;
+    lib_u32 outgoing_ip = 0u;
+
+    task32_prepare(&fixture, TASK32_DEBUG_TRAP);
+    lib_memory_set(fixture.memory + TASK32_IDT_BASE + 8u, 0, 8u);
+    lib_memory_copy(fixture.memory + TASK32_IDT_BASE + 13u * 8u,
+        gp_gate, sizeof(gp_gate));
+    for (step = 0u; step < 21u; ++step)
+        core_machine_cpu_execution_refresh(&fixture.execution);
+    if (fixture.execution.stop_requested || fixture.cpu.data.tr.selector != 0x28u ||
+        fixture.cpu.data.eip != 48u) return LIB_FALSE;
+    core_machine_cpu_execution_refresh(&fixture.execution);
+    lib_memory_copy(&outgoing_ip, fixture.memory + TASK32_A_BASE + 0x20u,
+        sizeof(outgoing_ip));
+    if (fixture.execution.stop_requested || fixture.fault.valid ||
+        !fixture.delivered_exception.valid ||
+        fixture.delivered_exception.exception_mask != VCPUINS_EXCEPT_GP ||
+        fixture.delivered_exception.exception_code != 0x0bu ||
+        fixture.delivered_exception.point.eip != 0x100u ||
+        fixture.delivered_exception.point.byte_count != 0u ||
+        fixture.delivered_exception.eax != 0xa1a12222u ||
+        fixture.delivered_exception.esp != 0x8000u ||
+        fixture.cpu.data.tr.selector != 0x30u || fixture.cpu.data.eip != 0x180u ||
+        fixture.cpu.data.esp != 0x7ff8u || outgoing_ip != 53u ||
+        (fixture.cpu.data.dr6 & 0x00008000u) == 0u) {
+        lib_c_fprintf(lib_c_stderr, "Published task fault point=%x mask=%x code=%x tr=%x ip=%x sp=%x old-ip=%x\n",
+            fixture.delivered_exception.point.eip,
+            fixture.delivered_exception.exception_mask,
+            fixture.delivered_exception.exception_code,
+            fixture.cpu.data.tr.selector, fixture.cpu.data.eip,
+            fixture.cpu.data.esp, outgoing_ip);
+        return LIB_FALSE;
+    }
+    return LIB_TRUE;
+}
+
+static lib_bool task32_test_completion_flags(void)
+{
+    static const task32_case cases[] = {TASK32_DIRECT, TASK32_NESTED_CALL,
+        TASK32_NESTED_GATE_CALL, TASK32_GATE_JMP, TASK32_NESTED_CALL};
+    lib_size index;
+    lib_u8 bits, step;
+    lib_u32 failures = 0u;
+
+    for (index = 0u; index < sizeof(cases) / sizeof(cases[0]); ++index)
+    for (bits = 0u; bits < 16u; ++bits) {
+        cpu_instruction_fixture fixture;
+        const lib_u32 incoming = 2u | ((bits & 4u) ? VCPU_EFLAGS_RF : 0u) |
+            ((bits & 8u) ? VCPU_EFLAGS_TF : 0u);
+        const lib_u32 expected = incoming |
+            (index == 1u || index == 2u || index == 4u ? VCPU_EFLAGS_NT : 0u);
+
+        task32_prepare(&fixture, cases[index]);
+        if (index == 4u) {
+            const lib_u8 gate[] = {0u,0u,0x30u,0u,0u,0x85u,0u,0u};
+
+            fixture.memory[TASK32_CODE_BASE + 48u] = 0xcdu;
+            fixture.memory[TASK32_CODE_BASE + 49u] = 0x20u;
+            lib_memory_copy(fixture.memory + TASK32_IDT_BASE + 0x100u,
+                gate, sizeof(gate));
+            fixture.cpu.data.idtr.limit = 0x107u;
+        }
+        for (step = 0u; step < 21u; ++step)
+            core_machine_cpu_execution_refresh(&fixture.execution);
+        if (fixture.execution.stop_requested || fixture.cpu.data.eip != 48u ||
+            fixture.cpu.data.tr.selector != 0x28u) return LIB_FALSE;
+        fixture.cpu.data.eflags = 2u | ((bits & 1u) ? VCPU_EFLAGS_RF : 0u) |
+            ((bits & 2u) ? VCPU_EFLAGS_TF : 0u);
+        lib_memory_copy(fixture.memory + TASK32_B_BASE + 0x24u,
+            &incoming, sizeof(incoming));
+        core_machine_cpu_execution_refresh(&fixture.execution);
+        if (fixture.execution.stop_requested || fixture.fault.valid ||
+            fixture.delivered_exception.valid ||
+            fixture.cpu.data.tr.selector != 0x30u || fixture.cpu.data.eip != 0x100u ||
+            fixture.cpu.data.eflags != expected || fixture.execution.debug_trap_pending)
+            ++failures;
+    }
+    lib_c_printf("Task completion RF/TF cases=80 failures=%u\n",
+        (unsigned)failures);
+    return failures == 0u;
+}
+
 int main(void)
 {
+    if (!task32_test_published_fault_context()) return 1;
+    if (!task32_test_completion_flags()) return 1;
     static const task32_case cases[] = {
         TASK32_DIRECT, TASK32_OPERAND32, TASK32_INDIRECT16, TASK32_INDIRECT32,
         TASK32_INDIRECT_ADDRESS32, TASK32_INDIRECT_OPERAND_ADDRESS32,

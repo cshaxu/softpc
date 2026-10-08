@@ -1,5 +1,16 @@
 # Long-Term Review Ledger
 
+- TODO(Medium): Diagnose product command-provider and presentation-shutdown
+  hangs observed while qualifying T85 S12. Both unchanged product link paths
+  time out on x64/x86 (45 seconds and 10 seconds); isolated unsandboxed x86
+  repeats both failures. Command-provider reaches its final snapshot/load/
+  resume/stop sequence; the delayed teardown stage is not proven. Shared
+  component suites all pass and product EXE bytes remain unchanged. Owner:
+  App integration/native worker teardown. Admission condition: a separate
+  bounded investigation identifying the delayed worker/stage before any
+  timeout, synchronization or native Audio change. Do not infer that the
+  existing S8 COM observation establishes this failure's cause.
+
 - TODO(Medium): Diagnose intermittent x86 presentation-shutdown smoke timing.
   During T85 S8, the unchanged 10-second integration limit expires in a full
   run and an isolated retry; the next three retries pass in 0.22/0.17/0.16

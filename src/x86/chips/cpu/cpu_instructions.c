@@ -21,13 +21,19 @@ static void core_machine_cpu_diagnostic_publish_snapshot(
     snapshot.valid = 1;
     snapshot.exception_mask = instructions->data.except;
     snapshot.exception_code = instructions->data.excode;
-    snapshot.point.cs = instructions->data.oldcpu.data.cs.selector;
-    snapshot.point.cs_base = instructions->data.oldcpu.data.cs.base;
-    snapshot.point.eip = instructions->data.oldcpu.data.eip;
-    snapshot.point.linear_pc = instructions->data.linear;
-    snapshot.point.byte_count = (lib_u8)instructions->data.oplen;
-    lib_memory_copy(snapshot.point.bytes, instructions->data.opcodes,
-        sizeof(snapshot.point.bytes));
+    snapshot.point.cs = cpu->data.cs.selector;
+    snapshot.point.cs_base = cpu->data.cs.base;
+    snapshot.point.eip = cpu->data.eip;
+    snapshot.point.linear_pc = cpu->data.cs.base + cpu->data.eip;
+    if (cpu->data.cs.selector == instructions->data.oldcpu.data.cs.selector &&
+        cpu->data.cs.base == instructions->data.oldcpu.data.cs.base &&
+        cpu->data.eip == instructions->data.oldcpu.data.eip &&
+        cpu->data.tr.selector == instructions->data.oldcpu.data.tr.selector &&
+        cpu->data.cr3 == instructions->data.oldcpu.data.cr3) {
+        snapshot.point.byte_count = (lib_u8)instructions->data.oplen;
+        lib_memory_copy(snapshot.point.bytes, instructions->data.opcodes,
+            sizeof(snapshot.point.bytes));
+    }
     snapshot.eax = cpu->data.eax;
     snapshot.ebx = cpu->data.ebx;
     snapshot.ecx = cpu->data.ecx;
@@ -99,6 +105,7 @@ static void core_machine_cpu_execution_raise_exception(
 #define _SetExcept_BR(n) core_machine_cpu_execution_raise_exception(context, VCPUINS_EXCEPT_BR, (n))
 #define _SetExcept_TS(n) core_machine_cpu_execution_raise_exception(context, VCPUINS_EXCEPT_TS, (n))
 #define _SetExcept_NM(n) core_machine_cpu_execution_raise_exception(context, VCPUINS_EXCEPT_NM, (n))
+#define _SetExcept_DF(n) core_machine_cpu_execution_raise_exception(context, VCPUINS_EXCEPT_DF, (n))
 #define _SetExcept_MF(n) core_machine_cpu_execution_raise_exception(context, VCPUINS_EXCEPT_MF, (n))
 #define _SetExcept_FPU_UNSUPPORTED(n) core_machine_cpu_execution_raise_exception(context, VCPUINS_EXCEPT_FPU_UNSUPPORTED, (n))
 #define _SetExcept_CE(n) core_machine_cpu_execution_raise_exception(context, VCPUINS_EXCEPT_CE, (n))
@@ -122,10 +129,8 @@ static void _debug_record_watchpoint(
     core_machine_cpu_execution_request_debug_pause(context);
 }
 
-/* The FLAGS image and a FLAGS load are distinct architectural operations, but
- * share one profile-owned set of defined 16-bit fields. An undefined bit is
- * canonicalized to zero in Core; that is a deterministic implementation
- * value, not a claim about a processor's externally observable bit image. */
+/* Incoming writable fields remain canonical; an outgoing FLAGS image also
+ * carries the family's fixed bits. Reserved image bits are not stored state. */
 static lib_u16 _e_real_flags_defined_mask(
     const core_machine_cpu_execution_context *context)
 {
@@ -146,8 +151,11 @@ static lib_u16 _e_real_flags_load_16(
 static lib_u16 _e_real_flags_image_16(
     const core_machine_cpu_execution_context *context, lib_u16 flags)
 {
-    return X86_CPU_MASK_U16((flags &
-        _e_real_flags_defined_mask(context)) | 0x02u);
+    const lib_u16 fixed = context != LIB_NULL &&
+        (core_machine_cpu_profile_has_8086_semantics(context->cpu_profile) ||
+         context->cpu_profile == CORE_MACHINE_CPU_PROFILE_80186) ? 0xf000u : 0u;
+
+    return X86_CPU_MASK_U16(_e_real_flags_load_16(context, flags) | fixed);
 }
 
 static lib_u32 _e_eflags_load(
@@ -212,7 +220,7 @@ static lib_i32 _kma_is_reset_vector_fetch(
         return 0;
     }
     return physical >= reset_vector &&
-        physical <= UINT32_MAX - (lib_u32)(bytes - 1u);
+        physical <= LIB_UINT32_MAX - (lib_u32)(bytes - 1u);
 }
 
 /* read content from physical */
@@ -394,7 +402,8 @@ static lib_u32 _kma_physical_linear(core_machine_cpu_execution_context *context,
 static lib_u32 _kma_linear_logical(core_machine_cpu_execution_context *context, t_cpu_data_sreg *rsreg, lib_u32 offset, lib_u8 byte, lib_u8 write, lib_u8 vpl, lib_u8 force)
 {
     lib_u32 linear;
-    lib_u32 upper, lower;
+    lib_u32 upper;
+    lib_u64 lower;
     CPU_TRACE_CALL_BEGIN("_kma_linear_logical");
     switch (rsreg->sregtype)
     {
@@ -441,7 +450,7 @@ static lib_u32 _kma_linear_logical(core_machine_cpu_execution_context *context, 
         }
         if (rsreg->seg.data.expdown)
         {
-            lower = rsreg->limit + 1;
+            lower = (lib_u64)rsreg->limit + 1u;
             upper = rsreg->seg.data.big ? 0xffffffff : 0x0000ffff;
         }
         else
@@ -501,7 +510,7 @@ static lib_u32 _kma_linear_logical(core_machine_cpu_execution_context *context, 
         }
         if (rsreg->seg.data.expdown)
         {
-            lower = rsreg->limit + 1;
+            lower = (lib_u64)rsreg->limit + 1u;
             upper = rsreg->seg.data.big ? 0xffffffff : 0x0000ffff;
         }
         else
@@ -522,7 +531,8 @@ static lib_u32 _kma_linear_logical(core_machine_cpu_execution_context *context, 
     case SREG_IDTR:
         CPU_TRACE_BLOCK_BEGIN("sregtype(SREG_IDTR)");
         lower = 0x00000000;
-        upper = rsreg->limit;
+        upper = context->cpu_profile < CORE_MACHINE_CPU_PROFILE_80286 ?
+            0x03ffu : rsreg->limit;
         CPU_TRACE_BLOCK_END;
         break;
     case SREG_LDTR:
@@ -556,12 +566,8 @@ static lib_u32 _kma_linear_logical(core_machine_cpu_execution_context *context, 
     default:
         CPU_TRACE_IMPOSSIBLE_RETURN_ZERO;
     }
-    /* Real-address data accesses may use 32-bit offsets on an 80386. */
-    if (!_IsProtected && rsreg->sregtype == SREG_DATA && byte != 0u) {
-        lower = 0x00000000;
-        upper = 0xffffffff;
-    }
-    linear = rsreg->base + offset;
+    linear = (rsreg->sregtype == SREG_IDTR &&
+        context->cpu_profile < CORE_MACHINE_CPU_PROFILE_80286 ? 0u : rsreg->base) + offset;
     if (offset < lower || offset > upper || (byte != 0u &&
         (lib_u32)(byte - 1u) > upper - offset))
     {
@@ -571,10 +577,6 @@ static lib_u32 _kma_linear_logical(core_machine_cpu_execution_context *context, 
         case SREG_STACK:
             CPU_TRACE_BLOCK_BEGIN("sregtype(SREG_STACK)");
             if (!_IsProtected &&
-                context->cpu_profile == CORE_MACHINE_CPU_PROFILE_80386)
-                CPU_TRACE_CHECK_RETURN_ZERO(core_machine_cpu_execution_raise_exception(
-                    context, VCPUINS_EXCEPT_SHUTDOWN, 0u));
-            else if (!_IsProtected &&
                 context->cpu_profile == CORE_MACHINE_CPU_PROFILE_80286)
                 CPU_TRACE_CHECK_RETURN_ZERO(_SetExcept_GP(0));
             else CPU_TRACE_CHECK_RETURN_ZERO(_SetExcept_SS(0));
@@ -856,30 +858,6 @@ static void _kma_test_access(core_machine_cpu_execution_context *context, t_cpu_
 }
 
 /* general memory accessing */
-static void _m_read_ref(core_machine_cpu_execution_context *context, lib_uptr ref, lib_uptr rdata, lib_u8 byte)
-{
-    CPU_TRACE_CALL_BEGIN("_m_read_ref");
-    /* _m_write_ref allows in-module reads only */
-    if (ref < (lib_uptr)(&cpu_state) && ref >= (lib_uptr)(&cpu_state) + sizeof(t_cpu) &&
-        ref < (lib_uptr)(&instruction_state) && ref >= (lib_uptr)(&instruction_state) + sizeof(t_cpuins))
-    {
-        CPU_TRACE_IMPOSSIBLE_RETURN;
-    }
-    CPU_TRACE_CHECK_RETURN(_kma_read_ref(context, ref, rdata, byte));
-    CPU_TRACE_CALL_END;
-}
-static void _m_write_ref(core_machine_cpu_execution_context *context, lib_uptr ref, lib_uptr rdata, lib_u8 byte)
-{
-    CPU_TRACE_CALL_BEGIN("_m_write_ref");
-    /* _m_write_ref allows in-module writes only */
-    if (ref < (lib_uptr)(&cpu_state) && ref >= (lib_uptr)(&cpu_state) + sizeof(t_cpu) &&
-        ref < (lib_uptr)(&instruction_state) && ref >= (lib_uptr)(&instruction_state) + sizeof(t_cpuins))
-    {
-        CPU_TRACE_IMPOSSIBLE_RETURN;
-    }
-    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, ref, rdata, byte));
-    CPU_TRACE_CALL_END;
-}
 static void _m_read_logical(core_machine_cpu_execution_context *context, t_cpu_data_sreg *rsreg, lib_u32 offset, lib_uptr rdata, lib_u8 byte)
 {
     CPU_TRACE_CALL_BEGIN("_m_read_logical");
@@ -914,7 +892,29 @@ static void _m_read_rm(core_machine_cpu_execution_context *context, lib_u8 byte)
     if (instruction_state.data.flagMem)
         CPU_TRACE_CHECK_RETURN(_m_read_logical(context, instruction_state.data.mrm.rsreg, instruction_state.data.mrm.offset, X86_CPU_REFERENCE_OF(instruction_state.data.crm), byte));
     else
-        CPU_TRACE_CHECK_RETURN(_m_read_ref(context, instruction_state.data.rrm, X86_CPU_REFERENCE_OF(instruction_state.data.crm), byte));
+        CPU_TRACE_CHECK_RETURN(_kma_read_ref(context, instruction_state.data.rrm, X86_CPU_REFERENCE_OF(instruction_state.data.crm), byte));
+    CPU_TRACE_CALL_END;
+}
+/* Validate the whole logical operand before either scalar transfer. Keep the
+ * original bus phases and the sole early-family segment-wrap policy. */
+static void _m_read_pair(core_machine_cpu_execution_context *context,
+    lib_u8 first, lib_u8 second)
+{
+    lib_u64 low;
+    const lib_bool wraps = _kma_real_legacy_segment_wrap(context,
+        instruction_state.data.mrm.offset, first + second);
+    CPU_TRACE_CALL_BEGIN("_m_read_pair");
+    CPU_TRACE_CHECK_RETURN(_m_test_logical(context,
+        instruction_state.data.mrm.rsreg, instruction_state.data.mrm.offset,
+        first + second, 0));
+    CPU_TRACE_CHECK_RETURN(_m_read_rm(context, first));
+    low = instruction_state.data.crm;
+    instruction_state.data.mrm.offset += first;
+    if (wraps)
+        instruction_state.data.mrm.offset =
+            X86_CPU_MASK_U16(instruction_state.data.mrm.offset);
+    CPU_TRACE_CHECK_RETURN(_m_read_rm(context, second));
+    instruction_state.data.crm = low | (instruction_state.data.crm << (first * 8u));
     CPU_TRACE_CALL_END;
 }
 static void _m_write_rm(core_machine_cpu_execution_context *context, lib_u8 byte)
@@ -923,7 +923,7 @@ static void _m_write_rm(core_machine_cpu_execution_context *context, lib_u8 byte
     if (instruction_state.data.flagMem)
         CPU_TRACE_CHECK_RETURN(_m_write_logical(context, instruction_state.data.mrm.rsreg, instruction_state.data.mrm.offset, X86_CPU_REFERENCE_OF(instruction_state.data.crm), byte));
     else
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rrm, X86_CPU_REFERENCE_OF(instruction_state.data.crm), byte));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rrm, X86_CPU_REFERENCE_OF(instruction_state.data.crm), byte));
     CPU_TRACE_CALL_END;
 }
 
@@ -935,7 +935,8 @@ static void _ksa_read_idt(core_machine_cpu_execution_context *context, lib_u8 in
     if (!_GetCR0_PE)
     {
         CPU_TRACE_BLOCK_BEGIN("CR0_PE(0)");
-        if (X86_CPU_MASK_U16(intid * 4 + 3) > X86_CPU_MASK_U16(cpu_state.data.idtr.limit))
+        if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286 &&
+            X86_CPU_MASK_U16(intid * 4 + 3) > X86_CPU_MASK_U16(cpu_state.data.idtr.limit))
             CPU_TRACE_IMPOSSIBLE_RETURN;
         CPU_TRACE_CHECK_RETURN(_kma_read_logical(context, &cpu_state.data.idtr, (intid * 4), rdata, 4, 0x00, 0));
         CPU_TRACE_BLOCK_END;
@@ -1480,7 +1481,17 @@ static void _s_read_cs(core_machine_cpu_execution_context *context, lib_u32 offs
         context->memory_access_provenance;
     lib_u32 linear = cpu_state.data.cs.base + offset;
     lib_u32 prefetch_offset;
+    lib_u32 instruction_offset = offset - instruction_state.data.receip;
+    lib_u8 length_limit = context->cpu_profile == CORE_MACHINE_CPU_PROFILE_80286 ?
+        10u : context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386 ? 15u : 0u;
     CPU_TRACE_CALL_BEGIN("_s_read_cs");
+    if (context->cpu_profile < CORE_MACHINE_CPU_PROFILE_80286)
+        instruction_offset = X86_CPU_MASK_U16(instruction_offset);
+    if (length_limit != 0u && (lib_u64)instruction_offset + byte > length_limit) {
+        if (context->cpu_profile == CORE_MACHINE_CPU_PROFILE_80286)
+            CPU_TRACE_CHECK_RETURN(_SetExcept_UD(0));
+        CPU_TRACE_CHECK_RETURN(_SetExcept_GP(0));
+    }
     if (context->prefetch_valid && linear >= context->prefetch_linear &&
         (prefetch_offset = linear - context->prefetch_linear) <=
             context->prefetch_count && byte <= context->prefetch_count -
@@ -1493,6 +1504,13 @@ static void _s_read_cs(core_machine_cpu_execution_context *context, lib_u32 offs
             _GetCPL, 1);
     }
     context->memory_access_provenance = previous;
+    if (!instruction_state.data.except &&
+        (lib_u64)instruction_offset + byte <= sizeof(instruction_state.data.opcodes)) {
+        lib_memory_copy(instruction_state.data.opcodes + instruction_offset,
+            (const void *)rdata, byte);
+        if (instruction_state.data.oplen < instruction_offset + byte)
+            instruction_state.data.oplen = instruction_offset + byte;
+    }
     CPU_TRACE_CALL_END;
 }
 static void _s_read_ss(core_machine_cpu_execution_context *context, lib_u32 offset, lib_uptr rdata, lib_u8 byte)
@@ -1596,14 +1614,16 @@ static void _s_test_ss_push(core_machine_cpu_execution_context *context, lib_u8 
     {
     case 2:
         CPU_TRACE_BLOCK_BEGIN("StackSize(2)");
-        if (cpu_state.data.sp && cpu_state.data.sp < byte)
+        if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286 &&
+            cpu_state.data.sp && cpu_state.data.sp < byte)
             CPU_TRACE_CHECK_RETURN(_SetExcept_SS(0));
         CPU_TRACE_CHECK_RETURN(_m_test_access(context, &cpu_state.data.ss, X86_CPU_MASK_U16(cpu_state.data.sp - byte), byte, 1));
         CPU_TRACE_BLOCK_END;
         break;
     case 4:
         CPU_TRACE_BLOCK_BEGIN("StackSize(4)");
-        if (cpu_state.data.esp && cpu_state.data.esp < byte)
+        if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286 &&
+            cpu_state.data.esp && cpu_state.data.esp < byte)
             CPU_TRACE_CHECK_RETURN(_SetExcept_SS(0));
         CPU_TRACE_CHECK_RETURN(_m_test_access(context, &cpu_state.data.ss, X86_CPU_MASK_U32(cpu_state.data.esp - byte), byte, 1));
         CPU_TRACE_BLOCK_END;
@@ -1614,6 +1634,39 @@ static void _s_test_ss_push(core_machine_cpu_execution_context *context, lib_u8 
     }
     CPU_TRACE_CALL_END;
 }
+/* Ordinary instruction admission checks segments only. Page/provider effects
+ * stay ordered at the scalar transfer; inner gates retain translated probes. */
+static void _s_test_ss_frame(core_machine_cpu_execution_context *context,
+    lib_u8 width, lib_u16 elements, lib_u16 allocation, lib_bool write)
+{
+    const lib_u32 mask = _GetStackSize == 2 ? 0xffffu : 0xffffffffu;
+    lib_u32 stack = cpu_state.data.esp & mask;
+    lib_u16 index;
+
+    CPU_TRACE_CALL_BEGIN("_s_test_ss_frame");
+    for (index = 0u; index < elements; ++index)
+    {
+        if (write)
+        {
+            if (_IsProtected && stack && stack < width)
+                CPU_TRACE_CHECK_RETURN(_SetExcept_SS(0));
+            stack = (stack - width) & mask;
+        }
+        CPU_TRACE_CHECK_RETURN(_m_test_logical(context, &cpu_state.data.ss,
+            stack, width, write));
+        if (!write) stack = (stack + width) & mask;
+    }
+    if (_IsProtected && allocation)
+    {
+        if (stack && stack < allocation)
+            CPU_TRACE_CHECK_RETURN(_SetExcept_SS(0));
+        stack = (stack - allocation) & mask;
+        CPU_TRACE_CHECK_RETURN(_m_test_logical(context, &cpu_state.data.ss,
+            stack, 0u, LIB_TRUE));
+    }
+    CPU_TRACE_CALL_END;
+}
+
 static void _s_test_stack_frame_16(core_machine_cpu_execution_context *context,
     t_cpu_data_sreg *stack, lib_u16 sp, lib_u8 words,
     lib_u8 cpl)
@@ -1907,33 +1960,6 @@ static void _s_load_gs(core_machine_cpu_execution_context *context, lib_u16 newg
     CPU_TRACE_CHECK_RETURN(_s_load_sreg(context, &cpu_state.data.gs, newgs));
     CPU_TRACE_CALL_END;
 }
-static void _s_test_eip(core_machine_cpu_execution_context *context)
-{
-    CPU_TRACE_CALL_BEGIN("_s_test_eip");
-    CPU_TRACE_CHECK_RETURN(_kma_test_logical(context, &cpu_state.data.cs,
-        cpu_state.data.eip, 0x01, 0, _GetCPL, 1));
-    CPU_TRACE_CALL_END;
-}
-static void _s_test_esp(core_machine_cpu_execution_context *context)
-{
-    lib_u32 cesp;
-    CPU_TRACE_CALL_BEGIN("_s_test_esp");
-    switch (_GetStackSize)
-    {
-    case 2:
-        cesp = X86_CPU_MASK_U16(cpu_state.data.esp);
-        break;
-    case 4:
-        cesp = X86_CPU_MASK_U32(cpu_state.data.esp);
-        break;
-    default:
-        CPU_TRACE_IMPOSSIBLE_RETURN;
-        break;
-    }
-    CPU_TRACE_CHECK_RETURN(_m_test_logical(context, &cpu_state.data.ss, cesp, 0x00, 0));
-    CPU_TRACE_CALL_END;
-}
-
 /* portid accessing unit */
 /* kernel portid accessing */
 _______todo _kpa_test_iomap(core_machine_cpu_execution_context *context, lib_u16 portid, lib_u8 byte)
@@ -1952,7 +1978,7 @@ _______todo _kpa_test_iomap(core_machine_cpu_execution_context *context, lib_u16
         cpu_state.data.tr.sys.type != VCPU_DESC_SYS_TYPE_TSS_32_BUSY) {
         CPU_TRACE_CHECK_RETURN(_SetExcept_GP(0));
     }
-    if (X86_CPU_MASK_U32(portid) + byte > (lib_u32)UINT16_MAX + 1u) {
+    if (X86_CPU_MASK_U32(portid) + byte > (lib_u32)LIB_UINT16_MAX + 1u) {
         CPU_TRACE_CHECK_RETURN(_SetExcept_GP(0));
     }
     if (cpu_state.data.tr.limit < 0x67u) {
@@ -2006,20 +2032,20 @@ static void _p_input(core_machine_cpu_execution_context *context, lib_u16 portid
     case 1:
         CPU_TRACE_BLOCK_BEGIN("byte(1)");
         octet = (lib_u8)value;
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, rdata,
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, rdata,
                                              X86_CPU_REFERENCE_OF(octet), 1));
         CPU_TRACE_BLOCK_END;
         break;
     case 2:
         CPU_TRACE_BLOCK_BEGIN("byte(2)");
         word = (lib_u16)value;
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, rdata,
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, rdata,
                                              X86_CPU_REFERENCE_OF(word), 2));
         CPU_TRACE_BLOCK_END;
         break;
     case 4:
         CPU_TRACE_BLOCK_BEGIN("byte(4)");
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, rdata,
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, rdata,
                                              X86_CPU_REFERENCE_OF(value), 4));
         CPU_TRACE_BLOCK_END;
         break;
@@ -2044,21 +2070,21 @@ static void _p_output(core_machine_cpu_execution_context *context, lib_u16 porti
     {
     case 1:
         CPU_TRACE_BLOCK_BEGIN("byte(1)");
-        CPU_TRACE_CHECK_RETURN(_m_read_ref(context, rdata,
+        CPU_TRACE_CHECK_RETURN(_kma_read_ref(context, rdata,
                                             X86_CPU_REFERENCE_OF(octet), 1));
         value = octet;
         CPU_TRACE_BLOCK_END;
         break;
     case 2:
         CPU_TRACE_BLOCK_BEGIN("byte(2)");
-        CPU_TRACE_CHECK_RETURN(_m_read_ref(context, rdata,
+        CPU_TRACE_CHECK_RETURN(_kma_read_ref(context, rdata,
                                             X86_CPU_REFERENCE_OF(word), 2));
         value = word;
         CPU_TRACE_BLOCK_END;
         break;
     case 4:
         CPU_TRACE_BLOCK_BEGIN("byte(4)");
-        CPU_TRACE_CHECK_RETURN(_m_read_ref(context, rdata,
+        CPU_TRACE_CHECK_RETURN(_kma_read_ref(context, rdata,
                                             X86_CPU_REFERENCE_OF(value), 4));
         CPU_TRACE_BLOCK_END;
         break;
@@ -2111,7 +2137,7 @@ static lib_u8 _kdf_check_prefix(core_machine_cpu_execution_context *context, lib
 static void _kdf_skip(core_machine_cpu_execution_context *context, lib_u8 byte)
 {
     CPU_TRACE_CALL_BEGIN("_kdf_skip");
-    if (cpu_state.data.cs.seg.exec.defsize)
+    if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286)
         CPU_TRACE_CHECK_RETURN(cpu_state.data.eip += byte);
     else
         CPU_TRACE_CHECK_RETURN(cpu_state.data.eip = X86_CPU_MASK_U16(
@@ -2701,7 +2727,7 @@ static void _kdf_modrm_with_mod_quirk(core_machine_cpu_execution_context *contex
             CPU_TRACE_BLOCK_END;
             break;
         }
-        CPU_TRACE_CHECK_RETURN(_m_read_ref(context, instruction_state.data.rrm, X86_CPU_REFERENCE_OF(instruction_state.data.crm), rmbyte));
+        CPU_TRACE_CHECK_RETURN(_kma_read_ref(context, instruction_state.data.rrm, X86_CPU_REFERENCE_OF(instruction_state.data.crm), rmbyte));
         CPU_TRACE_BLOCK_END;
     }
     if (!regbyte)
@@ -2815,7 +2841,7 @@ static void _kdf_modrm_with_mod_quirk(core_machine_cpu_execution_context *contex
             CPU_TRACE_BLOCK_END;
             break;
         }
-        CPU_TRACE_CHECK_RETURN(_m_read_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.cr), regbyte));
+        CPU_TRACE_CHECK_RETURN(_kma_read_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.cr), regbyte));
     }
     CPU_TRACE_CALL_END;
 }
@@ -3359,7 +3385,7 @@ static void _ser_call_far_call_gate_32(core_machine_cpu_execution_context *conte
     newcs_cache = cpu_state.data.cs;
     CPU_TRACE_CHECK_RETURN(_ksa_prepare_code_sreg(context, newcs, target_cpl,
         &newcs_cache, &code_desc));
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &newcs_cache,
+    CPU_TRACE_CHECK_RETURN(_kma_test_logical(context, &newcs_cache,
         X86_CPU_MASK_U32(_GetDescGate_Offset(gate_desc)), 1u, 0,
         target_cpl, 1));
     if (target_cpl < oldcpl) {
@@ -3480,7 +3506,7 @@ static void _ser_call_far_call_gate(core_machine_cpu_execution_context *context,
     newcs_cache = cpu_state.data.cs;
     CPU_TRACE_CHECK_RETURN(_ksa_prepare_code_sreg(context, newcs, target_cpl,
         &newcs_cache, &code_desc));
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &newcs_cache,
+    CPU_TRACE_CHECK_RETURN(_kma_test_logical(context, &newcs_cache,
         X86_CPU_MASK_U16(_GetDescGate_Offset(gate_desc)), 1u, 0,
         target_cpl, 1));
     if (target_cpl < oldcpl) {
@@ -3613,10 +3639,11 @@ static void _ser_int_real(core_machine_cpu_execution_context *context, lib_u8 in
     CPU_TRACE_CALL_BEGIN("_ser_int_real");
     if (_IsProtected)
         CPU_TRACE_IMPOSSIBLE_RETURN;
-    if (X86_CPU_MASK_U16(intid * 4 + 3) > X86_CPU_MASK_U16(cpu_state.data.idtr.limit))
+    if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286 &&
+        X86_CPU_MASK_U16(intid * 4 + 3) > X86_CPU_MASK_U16(cpu_state.data.idtr.limit))
     {
         CPU_TRACE_BLOCK_BEGIN("intid(>idtr.limit)");
-        CPU_TRACE_CHECK_RETURN(_SetExcept_GP(0));
+        CPU_TRACE_CHECK_RETURN(_SetExcept_DF(0));
         CPU_TRACE_BLOCK_END;
     }
     switch (byte)
@@ -3628,6 +3655,7 @@ static void _ser_int_real(core_machine_cpu_execution_context *context, lib_u8 in
         CPU_TRACE_CHECK_RETURN(_kec_push(context, X86_CPU_REFERENCE_OF(oldflags), 2));
         _ClrEFLAGS_IF;
         _ClrEFLAGS_TF;
+        _ClrEFLAGS_RF;
         CPU_TRACE_CHECK_RETURN(_kec_push(context, X86_CPU_REFERENCE_OF(oldcs), 2));
         CPU_TRACE_CHECK_RETURN(_kec_push(context, X86_CPU_REFERENCE_OF(cpu_state.data.ip), 2));
         CPU_TRACE_BLOCK_END;
@@ -3637,12 +3665,13 @@ static void _ser_int_real(core_machine_cpu_execution_context *context, lib_u8 in
         CPU_TRACE_CHECK_RETURN(_s_test_ss_push(context, 12));
         {
             lib_u32 frame_flags =
-                _e_real_flags_image_16(context, cpu_state.data.flags);
+                (cpu_state.data.eflags & ~VCPU_EFLAGS_RESERVED) | 0x02u;
             CPU_TRACE_CHECK_RETURN(_kec_push(context,
                 X86_CPU_REFERENCE_OF(frame_flags), 4));
         }
         _ClrEFLAGS_IF;
         _ClrEFLAGS_TF;
+        _ClrEFLAGS_RF;
         CPU_TRACE_CHECK_RETURN(_kec_push(context, X86_CPU_REFERENCE_OF(oldcs), 4));
         CPU_TRACE_CHECK_RETURN(_kec_push(context, X86_CPU_REFERENCE_OF(cpu_state.data.eip), 4));
         CPU_TRACE_BLOCK_END;
@@ -3655,14 +3684,14 @@ static void _ser_int_real(core_machine_cpu_execution_context *context, lib_u8 in
     }
     CPU_TRACE_CHECK_RETURN(_s_read_idt(context, intid, X86_CPU_REFERENCE_OF(vector)));
     cip = X86_CPU_MASK_U16(vector);
-    CPU_TRACE_CHECK_RETURN(_s_test_cs(context, cip, 0x01));
+    /* The word target belongs to the CS reloaded below, not the old cache. */
     cpu_state.data.eip = cip;
     CPU_TRACE_CHECK_RETURN(_s_load_cs(context, X86_CPU_MASK_U16(vector >> 16)));
     CPU_TRACE_CALL_END;
 }
 static lib_u16 _ser_idt_error_code(lib_u8 intid)
 {
-    /* All currently admitted IDT validation is a synchronous CPU event. */
+    /* Entry wrappers add EXT for failed hardware/exception delivery. */
     return X86_CPU_MASK_U16(intid * 8u + 2u);
 }
 static void _ser_int_protected_16(core_machine_cpu_execution_context *context,
@@ -3731,7 +3760,7 @@ static void _ser_int_protected_16(core_machine_cpu_execution_context *context,
     newcs_cache = cpu_state.data.cs;
     CPU_TRACE_CHECK_RETURN(_ksa_prepare_code_sreg(context, newcs, target_cpl,
         &newcs_cache, &code_desc));
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &newcs_cache,
+    CPU_TRACE_CHECK_RETURN(_kma_test_logical(context, &newcs_cache,
         X86_CPU_MASK_U16(_GetDescGate_Offset(gate_desc)), 1u, 0,
         target_cpl, 1));
     frame_words = (lib_u8)(3u + (error_frame ? 1u : 0u));
@@ -3798,6 +3827,8 @@ static void _ser_int_protected_16(core_machine_cpu_execution_context *context,
     cpu_state.data.ip = X86_CPU_MASK_U16(_GetDescGate_Offset(gate_desc));
     if (interrupt_gate) _ClrEFLAGS_IF;
     _ClrEFLAGS_TF;
+    _ClrEFLAGS_NT;
+    _ClrEFLAGS_RF;
     CPU_TRACE_CALL_END;
 }
 static void _ser_int_protected_32_outer(core_machine_cpu_execution_context *context,
@@ -3902,7 +3933,7 @@ static void _ser_int_protected_32_outer(core_machine_cpu_execution_context *cont
     newcs_cache = cpu_state.data.cs;
     CPU_TRACE_CHECK_RETURN(_ksa_prepare_code_sreg(context, newcs, target_cpl,
         &newcs_cache, &code_desc));
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &newcs_cache,
+    CPU_TRACE_CHECK_RETURN(_kma_test_logical(context, &newcs_cache,
         X86_CPU_MASK_U32(_GetDescGate_Offset(gate_desc)), 1u, 0,
         target_cpl, 1));
     newss_cache = cpu_state.data.ss;
@@ -3945,6 +3976,8 @@ static void _ser_int_protected_32_outer(core_machine_cpu_execution_context *cont
     cpu_state.data.eip = X86_CPU_MASK_U32(_GetDescGate_Offset(gate_desc));
     if (interrupt_gate) _ClrEFLAGS_IF;
     _ClrEFLAGS_TF;
+    _ClrEFLAGS_NT;
+    _ClrEFLAGS_RF;
     CPU_TRACE_CALL_END;
 }
 static void _ser_int_protected_32_same(core_machine_cpu_execution_context *context,
@@ -3996,7 +4029,7 @@ static void _ser_int_protected_32_same(core_machine_cpu_execution_context *conte
     newcs_cache = cpu_state.data.cs;
     CPU_TRACE_CHECK_RETURN(_ksa_prepare_code_sreg(context, newcs, oldcpl,
         &newcs_cache, &code_desc));
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &newcs_cache,
+    CPU_TRACE_CHECK_RETURN(_kma_test_logical(context, &newcs_cache,
         X86_CPU_MASK_U32(_GetDescGate_Offset(gate_desc)), 1u, 0,
         oldcpl, 1));
     CPU_TRACE_CHECK_RETURN(_s_test_ss_push(context, error_frame ? 16u : 12u));
@@ -4013,6 +4046,8 @@ static void _ser_int_protected_32_same(core_machine_cpu_execution_context *conte
     cpu_state.data.eip = X86_CPU_MASK_U32(_GetDescGate_Offset(gate_desc));
     if (interrupt_gate) _ClrEFLAGS_IF;
     _ClrEFLAGS_TF;
+    _ClrEFLAGS_NT;
+    _ClrEFLAGS_RF;
     CPU_TRACE_CALL_END;
 }
 static void _ser_int_protected(core_machine_cpu_execution_context *context,
@@ -4055,6 +4090,11 @@ static void _ser_int_protected(core_machine_cpu_execution_context *context,
     case VCPU_DESC_SYS_TYPE_TASKGATE:
         CPU_TRACE_CHECK_RETURN(_ser_task_gate_descriptor(context, gate_desc,
             _ser_idt_error_code(intid), software_origin, LIB_TRUE));
+        if (flagext) {
+            const lib_u32 error = instruction_state.data.excode;
+            CPU_TRACE_CHECK_RETURN(_kec_push(context, X86_CPU_REFERENCE_OF(error),
+                cpu_state.data.tr.sys.type == VCPU_DESC_SYS_TYPE_TSS_16_BUSY ? 2u : 4u));
+        }
         break;
     default:
         CPU_TRACE_CHECK_RETURN(_SetExcept_GP(_ser_idt_error_code(intid)));
@@ -4136,7 +4176,7 @@ static void _ser_ret_far_outer(core_machine_cpu_execution_context *context,
     newcs_cache = cpu_state.data.cs;
     CPU_TRACE_CHECK_RETURN(_ksa_prepare_code_sreg(context, newcs, target_cpl,
         &newcs_cache, &code_desc));
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &newcs_cache,
+    CPU_TRACE_CHECK_RETURN(_kma_test_logical(context, &newcs_cache,
         neweip, 1u, 0, target_cpl, 1));
     CPU_TRACE_CHECK_RETURN(_s_write_xdt(context, newss,
         X86_CPU_REFERENCE_OF(ss_desc)));
@@ -4253,7 +4293,7 @@ static void _ser_jmp_far_call_gate(core_machine_cpu_execution_context *context,
     newcs_cache = cpu_state.data.cs;
     CPU_TRACE_CHECK_RETURN(_ksa_prepare_code_sreg(context, target_selector,
         cpl, &newcs_cache, &code_desc));
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &newcs_cache,
+    CPU_TRACE_CHECK_RETURN(_kma_test_logical(context, &newcs_cache,
         gate32 ? X86_CPU_MASK_U32(_GetDescGate_Offset(gate_desc)) :
         X86_CPU_MASK_U16(_GetDescGate_Offset(gate_desc)), 1u, 0, cpl, 1));
     CPU_TRACE_CHECK_RETURN(_s_write_xdt(context, target_selector,
@@ -4415,7 +4455,7 @@ static void _s_task_validate_code_selector(
         CPU_TRACE_CHECK_RETURN(_SetExcept_NP(selector & 0xfffcu));
     }
     _s_task_cache_descriptor(out_cache, selector, descriptor, SREG_CODE);
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, out_cache, eip, 1u,
+    CPU_TRACE_CHECK_RETURN(_kma_test_logical(context, out_cache, eip, 1u,
         LIB_FALSE, 0u, LIB_TRUE));
     CPU_TRACE_CALL_END;
 }
@@ -4788,10 +4828,12 @@ static void _ser_task_transition_tss_plan(
     cpu_state.data.tr = newtr;
     if (new_is_32) cpu_state.data.dr7 &= ~VCPU_DR7_LOCAL_ENABLE_MASK;
     _SetCR0_TS;
+    if (new_is_32 && X86_CPU_GET_LSB(debug_trap)) cpu_state.data.dr6 |= VCPU_DR6_BT;
+    context->instruction_task_checkpoint = cpu_state;
+    context->instruction_task_switched = LIB_TRUE;
     if (new_is_32 && X86_CPU_GET_LSB(debug_trap)) {
         t_cpu trap_cpu = cpu_state;
 
-        cpu_state.data.dr6 |= VCPU_DR6_BT;
         CPU_TRACE_CHECK_RETURN(_e_except_n(context, 0x01u, _GetOperandSize));
         if (context->diagnostic_provider != LIB_NULL &&
             context->diagnostic_provider->record_delivered_exception != LIB_NULL) {
@@ -4976,6 +5018,8 @@ static void _ser_task_transition_tss(core_machine_cpu_execution_context *context
     newtr.sys.type = VCPU_DESC_SYS_TYPE_TSS_16_BUSY;
     cpu_state.data.tr = newtr;
     _SetCR0_TS;
+    context->instruction_task_checkpoint = cpu_state;
+    context->instruction_task_switched = LIB_TRUE;
     CPU_TRACE_CALL_END;
 }
 
@@ -5011,13 +5055,26 @@ static void _ser_task_return_tss(core_machine_cpu_execution_context *context)
 static void _e_push(core_machine_cpu_execution_context *context, lib_uptr rdata, lib_u8 byte)
 {
     CPU_TRACE_CALL_BEGIN("_e_push");
+    if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286 &&
+        !_IsProtected && (_GetStackSize == 2 ? cpu_state.data.sp :
+            cpu_state.data.esp) == 1u)
+    {
+        lib_u8 index = 0u;
+        lib_u8 opcode;
+        while (index < instruction_state.data.oplen &&
+            _kdf_check_prefix(context, instruction_state.data.opcodes[index])) ++index;
+        opcode = index < instruction_state.data.oplen ?
+            instruction_state.data.opcodes[index] : 0u;
+        if (opcode == 0x9cu || (context->cpu_profile ==
+            CORE_MACHINE_CPU_PROFILE_80386 &&
+            ((opcode >= 0x50u && opcode <= 0x57u) || opcode == 0x68u ||
+            opcode == 0x6au || opcode == 0x06u || opcode == 0x0eu ||
+            opcode == 0x16u || opcode == 0x1eu || opcode == 0xffu ||
+            opcode == 0x0fu)))
+            CPU_TRACE_CHECK_RETURN(core_machine_cpu_execution_raise_exception(
+                context, VCPUINS_EXCEPT_SHUTDOWN, 0u));
+    }
     CPU_TRACE_CHECK_RETURN(_kec_push(context, rdata, byte));
-    CPU_TRACE_CALL_END;
-}
-static void _e_pop(core_machine_cpu_execution_context *context, lib_uptr rdata, lib_u8 byte)
-{
-    CPU_TRACE_CALL_BEGIN("_e_pop");
-    CPU_TRACE_CHECK_RETURN(_kec_pop(context, rdata, byte));
     CPU_TRACE_CALL_END;
 }
 static void _e_call_far(core_machine_cpu_execution_context *context, lib_u16 newcs, lib_u32 neweip, lib_u8 byte)
@@ -5128,6 +5185,15 @@ _______todo _e_int_n(core_machine_cpu_execution_context *context, lib_u8 intid, 
     }
     CPU_TRACE_CALL_END;
 }
+static void _e_external_entry_error(core_machine_cpu_execution_context *context)
+{
+    if (instruction_state.data.except == VCPUINS_EXCEPT_GP ||
+        instruction_state.data.except == VCPUINS_EXCEPT_NP ||
+        instruction_state.data.except == VCPUINS_EXCEPT_SS ||
+        instruction_state.data.except == VCPUINS_EXCEPT_TS)
+        instruction_state.data.excode |= 1u;
+}
+
 _______todo _e_intr_n(core_machine_cpu_execution_context *context,
     lib_u8 intid, lib_u8 byte, lib_u8 external_origin)
 {
@@ -5143,9 +5209,10 @@ _______todo _e_intr_n(core_machine_cpu_execution_context *context,
         CPU_TRACE_BLOCK_BEGIN("!Real");
         if (!external_origin)
             CPU_TRACE_CHECK_RETURN(_SetExcept_UD(0));
-        else
-            CPU_TRACE_CHECK_RETURN(_ser_int_protected(context, intid, byte,
-                LIB_FALSE, LIB_FALSE));
+        else {
+            _ser_int_protected(context, intid, byte, LIB_FALSE, LIB_FALSE);
+            _e_external_entry_error(context);
+        }
         CPU_TRACE_BLOCK_END;
     }
     CPU_TRACE_CALL_END;
@@ -5153,26 +5220,35 @@ _______todo _e_intr_n(core_machine_cpu_execution_context *context,
 static lib_u8 _e_exception_has_error_code(lib_u8 exid)
 {
     return exid == 0x08u || exid == 0x0au || exid == 0x0bu ||
-        exid == 0x0cu || exid == 0x0du || exid == 0x0eu || exid == 0x11u;
+        exid == 0x0cu || exid == 0x0du || exid == 0x0eu;
 }
 
 _______todo _e_except_n(core_machine_cpu_execution_context *context, lib_u8 exid, lib_u8 byte)
 {
+    lib_u32 oldflags = cpu_state.data.eflags;
+
     CPU_TRACE_CALL_BEGIN("_e_except_n");
-    instruction_state.data.except &= ~(1 << exid);
+    /* Fault images set RF; the rollback checkpoint and trap images do not.
+     * Gate entry clears live RF, while task entry loads the incoming TSS. */
+    if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386 &&
+        X86_CPU_BIT_IS_SET(instruction_state.data.except, UINT32_C(1) << exid) &&
+        exid != 0x08u && exid != 0x09u) _SetEFLAGS_RF;
+    instruction_state.data.except &= ~(UINT32_C(1) << exid);
     if (!_GetCR0_PE)
     {
         CPU_TRACE_BLOCK_BEGIN("Real");
-        CPU_TRACE_CHECK_RETURN(_ser_int_real(context, exid, byte));
+        _ser_int_real(context, exid, byte);
         CPU_TRACE_BLOCK_END;
     }
     else
     {
         CPU_TRACE_BLOCK_BEGIN("!Real");
-        CPU_TRACE_CHECK_RETURN(_ser_int_protected(context, exid, byte,
-            LIB_FALSE, _e_exception_has_error_code(exid)));
+        _ser_int_protected(context, exid, byte,
+            LIB_FALSE, _e_exception_has_error_code(exid));
+        _e_external_entry_error(context);
         CPU_TRACE_BLOCK_END;
     }
+    if (instruction_state.data.except) cpu_state.data.eflags = oldflags;
     CPU_TRACE_CALL_END;
 }
 static void _ser_iret_protected_outer(core_machine_cpu_execution_context *context,
@@ -5204,6 +5280,7 @@ static void _ser_iret_protected_outer(core_machine_cpu_execution_context *contex
     {
     case 2:
         CPU_TRACE_CHECK_RETURN(_s_test_ss_pop(context, 10u));
+        flags_mask |= 0xffff0000u;
         CPU_TRACE_CHECK_RETURN(_s_peek_ss_pop(context, 0u,
             X86_CPU_REFERENCE_OF(neweip), 2u));
         selector = 0u;
@@ -5274,7 +5351,7 @@ static void _ser_iret_protected_outer(core_machine_cpu_execution_context *contex
     newcs_cache = cpu_state.data.cs;
     CPU_TRACE_CHECK_RETURN(_ksa_prepare_code_sreg(context, newcs, newcpl,
         &newcs_cache, &code_desc));
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &newcs_cache, neweip,
+    CPU_TRACE_CHECK_RETURN(_kma_test_logical(context, &newcs_cache, neweip,
         1u, 0, newcpl, 1));
     newss_cache = cpu_state.data.ss;
     CPU_TRACE_CHECK_RETURN(_ksa_prepare_stack_sreg(context, newss, newcpl,
@@ -5299,7 +5376,7 @@ static void _ser_iret_protected_same(core_machine_cpu_execution_context *context
 {
     lib_u16 newcs;
     lib_u32 neweip;
-    lib_u32 neweflags;
+    lib_u32 neweflags = 0u;
     lib_u32 selector;
     lib_u32 mask = VCPU_EFLAGS_RESERVED;
     lib_u64 code_desc;
@@ -5353,7 +5430,7 @@ static void _ser_iret_protected_same(core_machine_cpu_execution_context *context
     newcs_cache = cpu_state.data.cs;
     CPU_TRACE_CHECK_RETURN(_ksa_prepare_code_sreg(context, newcs, cpl,
         &newcs_cache, &code_desc));
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &newcs_cache, neweip,
+    CPU_TRACE_CHECK_RETURN(_kma_test_logical(context, &newcs_cache, neweip,
         1u, 0, cpl, 1));
     if (cpl) {
         mask |= VCPU_EFLAGS_IOPL | VCPU_EFLAGS_VM;
@@ -5476,6 +5553,8 @@ _______todo _e_iret(core_machine_cpu_execution_context *context, lib_u8 byte)
     lib_u32 mask = VCPU_EFLAGS_RESERVED;
     t_cpu_data_sreg ccs = cpu_state.data.cs;
     CPU_TRACE_CALL_BEGIN("_e_iret");
+    if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286)
+        context->nmi_in_service = LIB_FALSE;
     if (!_GetCR0_PE)
     {
         CPU_TRACE_BLOCK_BEGIN("Real");
@@ -5515,6 +5594,8 @@ _______todo _e_iret(core_machine_cpu_execution_context *context, lib_u8 byte)
         cpu_state.data.eip = neweip;
         cpu_state.data.eflags = _e_eflags_load(context,
             (neweflags & ~mask) | (cpu_state.data.eflags & mask));
+        if (context->cpu_profile < CORE_MACHINE_CPU_PROFILE_80186)
+            context->interrupt_shadow = CPU_INTERRUPT_SHADOW_INTR;
         CPU_TRACE_BLOCK_END;
     }
     else
@@ -5743,12 +5824,12 @@ static void _e_load_far(core_machine_cpu_execution_context *context, t_cpu_data_
     {
     case 2:
         CPU_TRACE_BLOCK_BEGIN("byte(2)");
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, rdest, X86_CPU_REFERENCE_OF(offset), 2));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, rdest, X86_CPU_REFERENCE_OF(offset), 2));
         CPU_TRACE_BLOCK_END;
         break;
     case 4:
         CPU_TRACE_BLOCK_BEGIN("byte(4)");
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, rdest, X86_CPU_REFERENCE_OF(offset), 4));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, rdest, X86_CPU_REFERENCE_OF(offset), 4));
         CPU_TRACE_BLOCK_END;
         break;
     default:
@@ -5757,8 +5838,6 @@ static void _e_load_far(core_machine_cpu_execution_context *context, t_cpu_data_
         CPU_TRACE_BLOCK_END;
         break;
     }
-    if (rsreg->sregtype == SREG_STACK)
-        instruction_state.data.flagMaskInt = LIB_TRUE;
     CPU_TRACE_CALL_END;
 }
 static void _e_pop_sreg(core_machine_cpu_execution_context *context,
@@ -5796,8 +5875,9 @@ static void _e_pop_sreg(core_machine_cpu_execution_context *context,
         CPU_TRACE_IMPOSSIBLE_RETURN;
         break;
     }
-    if (rsreg->sregtype == SREG_STACK)
-        instruction_state.data.flagMaskInt = LIB_TRUE;
+    if (rsreg->sregtype == SREG_STACK ||
+        context->cpu_profile < CORE_MACHINE_CPU_PROFILE_80186)
+        context->interrupt_shadow = CPU_INTERRUPT_SHADOW_SEGMENT;
     CPU_TRACE_CALL_END;
 }
 static void _e_loopcc(core_machine_cpu_execution_context *context, lib_i8 csrc, lib_u8 condition)
@@ -6583,7 +6663,7 @@ static void _a_div(core_machine_cpu_execution_context *context, lib_u64 csrc, li
     case 16:
         CPU_TRACE_BLOCK_BEGIN("bit(16)");
         instruction_state.data.bit = 16;
-        instruction_state.data.opr1 = X86_CPU_MASK_U32((cpu_state.data.dx << 16) | cpu_state.data.ax);
+        instruction_state.data.opr1 = X86_CPU_MASK_U32(((lib_u32)cpu_state.data.dx << 16) | cpu_state.data.ax);
         instruction_state.data.opr2 = X86_CPU_MASK_U16(csrc);
         if (!instruction_state.data.opr2)
         {
@@ -6608,7 +6688,7 @@ static void _a_div(core_machine_cpu_execution_context *context, lib_u64 csrc, li
             }
             CPU_TRACE_BLOCK_END;
         }
-        instruction_state.data.result = (cpu_state.data.dx << 16) | cpu_state.data.ax;
+        instruction_state.data.result = ((lib_u32)cpu_state.data.dx << 16) | cpu_state.data.ax;
         CPU_TRACE_BLOCK_END;
         break;
     case 32:
@@ -6696,7 +6776,7 @@ static void _a_idiv(core_machine_cpu_execution_context *context, lib_u64 csrc, l
     case 16:
         CPU_TRACE_BLOCK_BEGIN("bit(16)");
         instruction_state.data.bit = 16;
-        instruction_state.data.opr1 = X86_CPU_MASK_U32((lib_i32)((cpu_state.data.dx << 16) | cpu_state.data.ax));
+        instruction_state.data.opr1 = X86_CPU_MASK_U32((lib_i32)(((lib_u32)cpu_state.data.dx << 16) | cpu_state.data.ax));
         instruction_state.data.opr2 = X86_CPU_MASK_U16((lib_i16)csrc);
         if (!instruction_state.data.opr2)
         {
@@ -6829,7 +6909,8 @@ static void _a_imul3(core_machine_cpu_execution_context *context, lib_u64 csrc1,
         instruction_state.data.bit = 32;
         instruction_state.data.opr1 = (lib_i32)csrc1;
         instruction_state.data.opr2 = (lib_i8)csrc2;
-        cdest = X86_CPU_MASK_U64((lib_i32)instruction_state.data.opr1 * (lib_i8)instruction_state.data.opr2);
+        cdest = X86_CPU_MASK_U64((lib_i64)(lib_i32)instruction_state.data.opr1 *
+            (lib_i64)(lib_i8)instruction_state.data.opr2);
         instruction_state.data.result = X86_CPU_MASK_U32(cdest);
         if (X86_CPU_MASK_U64(cdest) != X86_CPU_MASK_U64((lib_i32)instruction_state.data.result))
         {
@@ -7058,13 +7139,13 @@ static void _a_rcl(core_machine_cpu_execution_context *context, lib_u64 cdest, l
     case 8:
         CPU_TRACE_BLOCK_BEGIN("bit(8)");
         count = _a_shift_rotate_count(context, csrc);
+        instruction_state.data.opr2 = count;
         if (!core_machine_cpu_profile_has_8086_semantics(context->cpu_profile))
             count %= 9;
         instruction_state.data.bit = 8;
         instruction_state.data.opr1 = X86_CPU_MASK_U8(cdest);
-        instruction_state.data.opr2 = count;
         instruction_state.data.result = instruction_state.data.opr1;
-        if (count == 0)
+        if (instruction_state.data.opr2 == 0)
             break;
         while (count)
         {
@@ -7083,13 +7164,13 @@ static void _a_rcl(core_machine_cpu_execution_context *context, lib_u64 cdest, l
     case 16:
         CPU_TRACE_BLOCK_BEGIN("bit(16)");
         count = _a_shift_rotate_count(context, csrc);
+        instruction_state.data.opr2 = count;
         if (!core_machine_cpu_profile_has_8086_semantics(context->cpu_profile))
             count %= 17;
         instruction_state.data.bit = 16;
         instruction_state.data.opr1 = X86_CPU_MASK_U16(cdest);
-        instruction_state.data.opr2 = count;
         instruction_state.data.result = instruction_state.data.opr1;
-        if (count == 0)
+        if (instruction_state.data.opr2 == 0)
             break;
         while (count)
         {
@@ -7112,7 +7193,7 @@ static void _a_rcl(core_machine_cpu_execution_context *context, lib_u64 cdest, l
         instruction_state.data.opr1 = X86_CPU_MASK_U32(cdest);
         instruction_state.data.opr2 = count;
         instruction_state.data.result = instruction_state.data.opr1;
-        if (count == 0)
+        if (instruction_state.data.opr2 == 0)
             break;
         while (count)
         {
@@ -7146,13 +7227,13 @@ static void _a_rcr(core_machine_cpu_execution_context *context, lib_u64 cdest, l
     case 8:
         CPU_TRACE_BLOCK_BEGIN("bit(8)");
         count = _a_shift_rotate_count(context, csrc);
+        instruction_state.data.opr2 = count;
         if (!core_machine_cpu_profile_has_8086_semantics(context->cpu_profile))
             count %= 9;
         instruction_state.data.bit = 8;
         instruction_state.data.opr1 = X86_CPU_MASK_U8(cdest);
-        instruction_state.data.opr2 = count;
         instruction_state.data.result = instruction_state.data.opr1;
-        if (count == 0)
+        if (instruction_state.data.opr2 == 0)
             break;
         if (instruction_state.data.opr2 == 1)
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_OF,
@@ -7171,13 +7252,13 @@ static void _a_rcr(core_machine_cpu_execution_context *context, lib_u64 cdest, l
     case 16:
         CPU_TRACE_BLOCK_BEGIN("bit(16)");
         count = _a_shift_rotate_count(context, csrc);
+        instruction_state.data.opr2 = count;
         if (!core_machine_cpu_profile_has_8086_semantics(context->cpu_profile))
             count %= 17;
         instruction_state.data.bit = 16;
         instruction_state.data.opr1 = X86_CPU_MASK_U16(cdest);
-        instruction_state.data.opr2 = count;
         instruction_state.data.result = instruction_state.data.opr1;
-        if (count == 0)
+        if (instruction_state.data.opr2 == 0)
             break;
         if (instruction_state.data.opr2 == 1)
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_OF,
@@ -7200,7 +7281,7 @@ static void _a_rcr(core_machine_cpu_execution_context *context, lib_u64 cdest, l
         instruction_state.data.opr1 = X86_CPU_MASK_U32(cdest);
         instruction_state.data.opr2 = count;
         instruction_state.data.result = instruction_state.data.opr1;
-        if (count == 0)
+        if (instruction_state.data.opr2 == 0)
             break;
         if (instruction_state.data.opr2 == 1)
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_OF,
@@ -7248,7 +7329,7 @@ static void _a_shl(core_machine_cpu_execution_context *context, lib_u64 cdest, l
         if (instruction_state.data.opr2 == 1)
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_OF,
                           ((!!X86_CPU_GET_MSB_8(instruction_state.data.result)) ^ _GetEFLAGS_CF));
-        else
+        else if (instruction_state.data.opr2 != 0)
             instruction_state.data.udf |= VCPU_EFLAGS_OF;
         if (instruction_state.data.opr2 != 0)
         {
@@ -7273,7 +7354,7 @@ static void _a_shl(core_machine_cpu_execution_context *context, lib_u64 cdest, l
         if (instruction_state.data.opr2 == 1)
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_OF,
                           ((!!X86_CPU_GET_MSB_16(instruction_state.data.result)) ^ _GetEFLAGS_CF));
-        else
+        else if (instruction_state.data.opr2 != 0)
             instruction_state.data.udf |= VCPU_EFLAGS_OF;
         if (instruction_state.data.opr2 != 0)
         {
@@ -7298,7 +7379,7 @@ static void _a_shl(core_machine_cpu_execution_context *context, lib_u64 cdest, l
         if (instruction_state.data.opr2 == 1)
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_OF,
                           ((!!X86_CPU_GET_MSB_32(instruction_state.data.result)) ^ _GetEFLAGS_CF));
-        else
+        else if (instruction_state.data.opr2 != 0)
             instruction_state.data.udf |= VCPU_EFLAGS_OF;
         if (instruction_state.data.opr2 != 0)
         {
@@ -7340,7 +7421,7 @@ static void _a_shr(core_machine_cpu_execution_context *context, lib_u64 cdest, l
         }
         if (instruction_state.data.opr2 == 1)
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_OF, (!!X86_CPU_GET_MSB_8(instruction_state.data.opr1)));
-        else
+        else if (instruction_state.data.opr2 != 0)
             instruction_state.data.udf |= VCPU_EFLAGS_OF;
         if (instruction_state.data.opr2 != 0)
         {
@@ -7364,7 +7445,7 @@ static void _a_shr(core_machine_cpu_execution_context *context, lib_u64 cdest, l
         }
         if (instruction_state.data.opr2 == 1)
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_OF, (!!X86_CPU_GET_MSB_16(instruction_state.data.opr1)));
-        else
+        else if (instruction_state.data.opr2 != 0)
             instruction_state.data.udf |= VCPU_EFLAGS_OF;
         if (instruction_state.data.opr2 != 0)
         {
@@ -7388,7 +7469,7 @@ static void _a_shr(core_machine_cpu_execution_context *context, lib_u64 cdest, l
         }
         if (instruction_state.data.opr2 == 1)
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_OF, (!!X86_CPU_GET_MSB_32(instruction_state.data.opr1)));
-        else
+        else if (instruction_state.data.opr2 != 0)
             instruction_state.data.udf |= VCPU_EFLAGS_OF;
         if (instruction_state.data.opr2 != 0)
         {
@@ -7410,8 +7491,7 @@ static void _a_shr(core_machine_cpu_execution_context *context, lib_u64 cdest, l
 static void _a_sar(core_machine_cpu_execution_context *context, lib_u64 cdest, lib_u8 csrc, lib_u8 bit)
 {
     lib_u8 count;
-    lib_u8 tempcf;
-    CPU_TRACE_CALL_BEGIN("_a_shr");
+    CPU_TRACE_CALL_BEGIN("_a_sar");
     count = _a_shift_rotate_count(context, csrc);
     instruction_state.data.opr2 = count;
     switch (bit)
@@ -7425,13 +7505,13 @@ static void _a_sar(core_machine_cpu_execution_context *context, lib_u64 cdest, l
         while (count)
         {
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_CF, (!!X86_CPU_GET_LSB_U8(instruction_state.data.result)));
-            tempcf = X86_CPU_GET_MSB_8(instruction_state.data.result);
-            instruction_state.data.result = X86_CPU_MASK_U8((lib_i8)instruction_state.data.result >> 1);
+            instruction_state.data.result = X86_CPU_MASK_U8((instruction_state.data.result >> 1) |
+                (instruction_state.data.result & X86_CPU_MSB_8));
             count--;
         }
         if (instruction_state.data.opr2 == 1)
             _ClrEFLAGS_OF;
-        else
+        else if (instruction_state.data.opr2 != 0)
             instruction_state.data.udf |= VCPU_EFLAGS_OF;
         if (instruction_state.data.opr2 != 0)
         {
@@ -7451,12 +7531,13 @@ static void _a_sar(core_machine_cpu_execution_context *context, lib_u64 cdest, l
         while (count)
         {
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_CF, (!!X86_CPU_GET_LSB_U16(instruction_state.data.result)));
-            instruction_state.data.result = X86_CPU_MASK_U16((lib_i16)instruction_state.data.result >> 1);
+            instruction_state.data.result = X86_CPU_MASK_U16((instruction_state.data.result >> 1) |
+                (instruction_state.data.result & X86_CPU_MSB_16));
             count--;
         }
         if (instruction_state.data.opr2 == 1)
             _ClrEFLAGS_OF;
-        else
+        else if (instruction_state.data.opr2 != 0)
             instruction_state.data.udf |= VCPU_EFLAGS_OF;
         if (instruction_state.data.opr2 != 0)
         {
@@ -7476,12 +7557,13 @@ static void _a_sar(core_machine_cpu_execution_context *context, lib_u64 cdest, l
         while (count)
         {
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_CF, (!!X86_CPU_GET_LSB_U32(instruction_state.data.result)));
-            instruction_state.data.result = X86_CPU_MASK_U32((lib_i32)instruction_state.data.result >> 1);
+            instruction_state.data.result = X86_CPU_MASK_U32((instruction_state.data.result >> 1) |
+                (instruction_state.data.result & X86_CPU_MSB_32));
             count--;
         }
         if (instruction_state.data.opr2 == 1)
             _ClrEFLAGS_OF;
-        else
+        else if (instruction_state.data.opr2 != 0)
             instruction_state.data.udf |= VCPU_EFLAGS_OF;
         if (instruction_state.data.opr2 != 0)
         {
@@ -8323,7 +8405,7 @@ static void ADD_RM8_R8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -8346,7 +8428,7 @@ static void ADD_RM32_R32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_add(context, instruction_state.data.crm, instruction_state.data.cr, 16));
@@ -8364,12 +8446,12 @@ static void ADD_R8_RM8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_add(context, instruction_state.data.cr, instruction_state.data.crm, 8));
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 1));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 1));
     CPU_TRACE_CALL_END;
 }
 static void ADD_R32_RM32(core_machine_cpu_execution_context *context)
@@ -8381,15 +8463,15 @@ static void ADD_R32_RM32(core_machine_cpu_execution_context *context)
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, _GetOperandSize, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_a_add(context, instruction_state.data.cr, instruction_state.data.crm, _GetOperandSize * 8));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_add(context, instruction_state.data.cr, instruction_state.data.crm, 16));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 2));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -8402,7 +8484,7 @@ static void ADD_AL_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_add(context, cpu_state.data.al, instruction_state.data.cimm, 8));
@@ -8438,7 +8520,7 @@ static void ADD_EAX_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_add(context, cpu_state.data.ax, instruction_state.data.cimm, 16));
         cpu_state.data.ax = X86_CPU_MASK_U16(instruction_state.data.result);
@@ -8455,7 +8537,7 @@ static void PUSH_ES(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     xs_sel = cpu_state.data.es.selector;
     CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(xs_sel), _GetOperandSize));
@@ -8470,7 +8552,7 @@ static void POP_ES(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_e_pop_sreg(context, &cpu_state.data.es,
         _GetOperandSize));
@@ -8485,7 +8567,7 @@ static void OR_RM8_R8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -8508,7 +8590,7 @@ static void OR_RM32_R32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_or(context, instruction_state.data.crm, instruction_state.data.cr, 16));
@@ -8526,12 +8608,12 @@ static void OR_R8_RM8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_or(context, instruction_state.data.cr, instruction_state.data.crm, 8));
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 1));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 1));
     CPU_TRACE_CALL_END;
 }
 static void OR_R32_RM32(core_machine_cpu_execution_context *context)
@@ -8543,15 +8625,15 @@ static void OR_R32_RM32(core_machine_cpu_execution_context *context)
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, _GetOperandSize, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_a_or(context, instruction_state.data.cr, instruction_state.data.crm, _GetOperandSize * 8));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_or(context, instruction_state.data.cr, instruction_state.data.crm, 16));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 2));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -8564,7 +8646,7 @@ static void OR_AL_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_or(context, cpu_state.data.al, instruction_state.data.cimm, 8));
@@ -8600,7 +8682,7 @@ static void OR_EAX_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_or(context, cpu_state.data.ax, instruction_state.data.cimm, 16));
         cpu_state.data.ax = X86_CPU_MASK_U16(instruction_state.data.result);
@@ -8617,7 +8699,7 @@ static void PUSH_CS(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     xs_sel = cpu_state.data.cs.selector;
     CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(xs_sel), _GetOperandSize));
@@ -8635,9 +8717,9 @@ static void POP_CS(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
-    CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(xs_sel), _GetOperandSize));
+    CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(xs_sel), _GetOperandSize));
     CPU_TRACE_CHECK_RETURN(_s_load_cs(context, X86_CPU_MASK_U16(xs_sel)));
     CPU_TRACE_CALL_END;
 }
@@ -8679,7 +8761,7 @@ static void ADC_RM8_R8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -8702,7 +8784,7 @@ static void ADC_RM32_R32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_adc(context, instruction_state.data.crm, instruction_state.data.cr, 16));
@@ -8720,12 +8802,12 @@ static void ADC_R8_RM8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_adc(context, instruction_state.data.cr, instruction_state.data.crm, 8));
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 1));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 1));
     CPU_TRACE_CALL_END;
 }
 static void ADC_R32_RM32(core_machine_cpu_execution_context *context)
@@ -8737,15 +8819,15 @@ static void ADC_R32_RM32(core_machine_cpu_execution_context *context)
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, _GetOperandSize, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_a_adc(context, instruction_state.data.cr, instruction_state.data.crm, _GetOperandSize * 8));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_adc(context, instruction_state.data.cr, instruction_state.data.crm, 16));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 2));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -8758,7 +8840,7 @@ static void ADC_AL_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_adc(context, cpu_state.data.al, instruction_state.data.cimm, 8));
@@ -8794,7 +8876,7 @@ static void ADC_EAX_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_adc(context, cpu_state.data.ax, instruction_state.data.cimm, 16));
         cpu_state.data.ax = X86_CPU_MASK_U16(instruction_state.data.result);
@@ -8811,7 +8893,7 @@ static void PUSH_SS(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     xs_sel = cpu_state.data.ss.selector;
     CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(xs_sel), _GetOperandSize));
@@ -8826,7 +8908,7 @@ static void POP_SS(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_e_pop_sreg(context, &cpu_state.data.ss,
         _GetOperandSize));
@@ -8841,7 +8923,7 @@ static void SBB_RM8_R8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -8864,7 +8946,7 @@ static void SBB_RM32_R32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_sbb(context, instruction_state.data.crm, instruction_state.data.cr, 16));
@@ -8882,12 +8964,12 @@ static void SBB_R8_RM8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_sbb(context, instruction_state.data.cr, instruction_state.data.crm, 8));
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 1));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 1));
     CPU_TRACE_CALL_END;
 }
 static void SBB_R32_RM32(core_machine_cpu_execution_context *context)
@@ -8899,15 +8981,15 @@ static void SBB_R32_RM32(core_machine_cpu_execution_context *context)
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, _GetOperandSize, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_a_sbb(context, instruction_state.data.cr, instruction_state.data.crm, _GetOperandSize * 8));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_sbb(context, instruction_state.data.cr, instruction_state.data.crm, 16));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 2));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -8920,7 +9002,7 @@ static void SBB_AL_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_sbb(context, cpu_state.data.al, instruction_state.data.cimm, 8));
@@ -8956,7 +9038,7 @@ static void SBB_EAX_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_sbb(context, cpu_state.data.ax, instruction_state.data.cimm, 16));
         cpu_state.data.ax = X86_CPU_MASK_U16(instruction_state.data.result);
@@ -8973,7 +9055,7 @@ static void PUSH_DS(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     xs_sel = cpu_state.data.ds.selector;
     CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(xs_sel), _GetOperandSize));
@@ -8988,7 +9070,7 @@ static void POP_DS(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_e_pop_sreg(context, &cpu_state.data.ds,
         _GetOperandSize));
@@ -9003,7 +9085,7 @@ static void AND_RM8_R8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -9026,7 +9108,7 @@ static void AND_RM32_R32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_and(context, instruction_state.data.crm, instruction_state.data.cr, 16));
@@ -9044,12 +9126,12 @@ static void AND_R8_RM8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_and(context, instruction_state.data.cr, instruction_state.data.crm, 8));
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 1));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 1));
     CPU_TRACE_CALL_END;
 }
 static void AND_R32_RM32(core_machine_cpu_execution_context *context)
@@ -9061,15 +9143,15 @@ static void AND_R32_RM32(core_machine_cpu_execution_context *context)
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, _GetOperandSize, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_a_and(context, instruction_state.data.cr, instruction_state.data.crm, _GetOperandSize * 8));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_and(context, instruction_state.data.cr, instruction_state.data.crm, 16));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 2));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -9082,7 +9164,7 @@ static void AND_AL_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_and(context, cpu_state.data.al, instruction_state.data.cimm, 8));
@@ -9118,7 +9200,7 @@ static void AND_EAX_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_and(context, cpu_state.data.ax, instruction_state.data.cimm, 16));
         cpu_state.data.ax = X86_CPU_MASK_U16(instruction_state.data.result);
@@ -9136,7 +9218,7 @@ static void PREFIX_ES(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         instruction_state.data.roverds = &cpu_state.data.es;
         instruction_state.data.roverss = &cpu_state.data.es;
     }
@@ -9149,7 +9231,7 @@ static void DAA(core_machine_cpu_execution_context *context)
     if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386)
         _adv;
     else
-        cpu_state.data.ip++;
+        _adv;
     if (((cpu_state.data.al & 0x0f) > 0x09) || _GetEFLAGS_AF)
     {
         cpu_state.data.al += 0x06;
@@ -9181,7 +9263,7 @@ static void SUB_RM8_R8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -9204,7 +9286,7 @@ static void SUB_RM32_R32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_sub(context, instruction_state.data.crm, instruction_state.data.cr, 16));
@@ -9222,12 +9304,12 @@ static void SUB_R8_RM8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_sub(context, instruction_state.data.cr, instruction_state.data.crm, 8));
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 1));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 1));
     CPU_TRACE_CALL_END;
 }
 static void SUB_R32_RM32(core_machine_cpu_execution_context *context)
@@ -9239,15 +9321,15 @@ static void SUB_R32_RM32(core_machine_cpu_execution_context *context)
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, _GetOperandSize, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_a_sub(context, instruction_state.data.cr, instruction_state.data.crm, _GetOperandSize * 8));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_sub(context, instruction_state.data.cr, instruction_state.data.crm, 16));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 2));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -9260,7 +9342,7 @@ static void SUB_AL_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_sub(context, cpu_state.data.al, instruction_state.data.cimm, 8));
@@ -9296,7 +9378,7 @@ static void SUB_EAX_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_sub(context, cpu_state.data.ax, instruction_state.data.cimm, 16));
         cpu_state.data.ax = X86_CPU_MASK_U16(instruction_state.data.result);
@@ -9314,7 +9396,7 @@ static void PREFIX_CS(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         instruction_state.data.roverds = &cpu_state.data.cs;
         instruction_state.data.roverss = &cpu_state.data.cs;
     }
@@ -9327,7 +9409,7 @@ static void DAS(core_machine_cpu_execution_context *context)
     if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386)
         _adv;
     else
-        cpu_state.data.ip++;
+        _adv;
     if (((cpu_state.data.al & 0x0f) > 0x09) || _GetEFLAGS_AF)
     {
         cpu_state.data.al -= 0x06;
@@ -9359,7 +9441,7 @@ static void XOR_RM8_R8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -9382,7 +9464,7 @@ static void XOR_RM32_R32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_xor(context, instruction_state.data.crm, instruction_state.data.cr, 16));
@@ -9400,12 +9482,12 @@ static void XOR_R8_RM8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_xor(context, instruction_state.data.cr, instruction_state.data.crm, 8));
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 1));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 1));
     CPU_TRACE_CALL_END;
 }
 static void XOR_R32_RM32(core_machine_cpu_execution_context *context)
@@ -9417,15 +9499,15 @@ static void XOR_R32_RM32(core_machine_cpu_execution_context *context)
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, _GetOperandSize, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_a_xor(context, instruction_state.data.cr, instruction_state.data.crm, _GetOperandSize * 8));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_xor(context, instruction_state.data.cr, instruction_state.data.crm, 16));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 2));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -9438,7 +9520,7 @@ static void XOR_AL_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_xor(context, cpu_state.data.al, instruction_state.data.cimm, 8));
@@ -9474,7 +9556,7 @@ static void XOR_EAX_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_xor(context, cpu_state.data.ax, instruction_state.data.cimm, 16));
         cpu_state.data.ax = X86_CPU_MASK_U16(instruction_state.data.result);
@@ -9492,7 +9574,7 @@ static void PREFIX_SS(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         instruction_state.data.roverds = &cpu_state.data.ss;
         instruction_state.data.roverss = &cpu_state.data.ss;
     }
@@ -9507,7 +9589,7 @@ static void AAA(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     if (((cpu_state.data.al & 0x0f) > 0x09) || _GetEFLAGS_AF)
     {
@@ -9534,7 +9616,7 @@ static void CMP_RM8_R8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -9553,7 +9635,7 @@ static void CMP_RM32_R32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_cmp(context, instruction_state.data.crm, instruction_state.data.cr, 16));
@@ -9569,7 +9651,7 @@ static void CMP_R8_RM8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -9588,7 +9670,7 @@ static void CMP_R32_RM32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_cmp(context, instruction_state.data.cr, instruction_state.data.crm, 16));
@@ -9604,7 +9686,7 @@ static void CMP_AL_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_cmp(context, cpu_state.data.al, instruction_state.data.cimm, 8));
@@ -9637,7 +9719,7 @@ static void CMP_EAX_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_cmp(context, cpu_state.data.ax, instruction_state.data.cimm, 16));
     }
@@ -9654,7 +9736,7 @@ static void PREFIX_DS(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         instruction_state.data.roverds = &cpu_state.data.ds;
         instruction_state.data.roverss = &cpu_state.data.ds;
     }
@@ -9669,7 +9751,7 @@ static void AAS(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     if (((cpu_state.data.al & 0x0f) > 0x09) || _GetEFLAGS_AF)
     {
@@ -9714,7 +9796,7 @@ static void INC_EAX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_inc(context, cpu_state.data.ax, 16));
         cpu_state.data.ax = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -9747,7 +9829,7 @@ static void INC_ECX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_inc(context, cpu_state.data.cx, 16));
         cpu_state.data.cx = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -9780,7 +9862,7 @@ static void INC_EDX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_inc(context, cpu_state.data.dx, 16));
         cpu_state.data.dx = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -9813,7 +9895,7 @@ static void INC_EBX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_inc(context, cpu_state.data.bx, 16));
         cpu_state.data.bx = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -9846,7 +9928,7 @@ static void INC_ESP(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_inc(context, cpu_state.data.sp, 16));
         cpu_state.data.sp = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -9879,7 +9961,7 @@ static void INC_EBP(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_inc(context, cpu_state.data.bp, 16));
         cpu_state.data.bp = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -9912,7 +9994,7 @@ static void INC_ESI(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_inc(context, cpu_state.data.si, 16));
         cpu_state.data.si = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -9945,7 +10027,7 @@ static void INC_EDI(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_inc(context, cpu_state.data.di, 16));
         cpu_state.data.di = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -9978,7 +10060,7 @@ static void DEC_EAX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_dec(context, cpu_state.data.ax, 16));
         cpu_state.data.ax = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -10011,7 +10093,7 @@ static void DEC_ECX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_dec(context, cpu_state.data.cx, 16));
         cpu_state.data.cx = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -10044,7 +10126,7 @@ static void DEC_EDX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_dec(context, cpu_state.data.dx, 16));
         cpu_state.data.dx = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -10077,7 +10159,7 @@ static void DEC_EBX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_dec(context, cpu_state.data.bx, 16));
         cpu_state.data.bx = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -10110,7 +10192,7 @@ static void DEC_ESP(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_dec(context, cpu_state.data.sp, 16));
         cpu_state.data.sp = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -10143,7 +10225,7 @@ static void DEC_EBP(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_dec(context, cpu_state.data.bp, 16));
         cpu_state.data.bp = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -10176,7 +10258,7 @@ static void DEC_ESI(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_dec(context, cpu_state.data.si, 16));
         cpu_state.data.si = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -10209,7 +10291,7 @@ static void DEC_EDI(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_a_dec(context, cpu_state.data.di, 16));
         cpu_state.data.di = X86_CPU_MASK_U16(instruction_state.data.result);
     }
@@ -10240,7 +10322,7 @@ static void PUSH_EAX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(cpu_state.data.ax), 2));
     }
     CPU_TRACE_CALL_END;
@@ -10270,7 +10352,7 @@ static void PUSH_ECX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(cpu_state.data.cx), 2));
     }
     CPU_TRACE_CALL_END;
@@ -10300,7 +10382,7 @@ static void PUSH_EDX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(cpu_state.data.dx), 2));
     }
     CPU_TRACE_CALL_END;
@@ -10330,7 +10412,7 @@ static void PUSH_EBX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(cpu_state.data.bx), 2));
     }
     CPU_TRACE_CALL_END;
@@ -10360,7 +10442,7 @@ static void PUSH_ESP(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         /* 8086/8088 and 80186/80188 expose the decremented SP when SP is
          * the PUSH source.  The 80286 changes this one observable case to
          * push the pre-instruction value. */
@@ -10401,7 +10483,7 @@ static void PUSH_EBP(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(cpu_state.data.bp), 2));
     }
     CPU_TRACE_CALL_END;
@@ -10431,7 +10513,7 @@ static void PUSH_ESI(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(cpu_state.data.si), 2));
     }
     CPU_TRACE_CALL_END;
@@ -10461,7 +10543,7 @@ static void PUSH_EDI(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(cpu_state.data.di), 2));
     }
     CPU_TRACE_CALL_END;
@@ -10476,12 +10558,12 @@ static void POP_EAX(core_machine_cpu_execution_context *context)
         {
         case 2:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ax), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ax), 2));
             CPU_TRACE_BLOCK_END;
             break;
         case 4:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.eax), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.eax), 4));
             CPU_TRACE_BLOCK_END;
             break;
         default:
@@ -10491,8 +10573,8 @@ static void POP_EAX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ax), 2));
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ax), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -10506,12 +10588,12 @@ static void POP_ECX(core_machine_cpu_execution_context *context)
         {
         case 2:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.cx), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.cx), 2));
             CPU_TRACE_BLOCK_END;
             break;
         case 4:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ecx), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ecx), 4));
             CPU_TRACE_BLOCK_END;
             break;
         default:
@@ -10521,8 +10603,8 @@ static void POP_ECX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.cx), 2));
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.cx), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -10536,12 +10618,12 @@ static void POP_EDX(core_machine_cpu_execution_context *context)
         {
         case 2:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.dx), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.dx), 2));
             CPU_TRACE_BLOCK_END;
             break;
         case 4:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.edx), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.edx), 4));
             CPU_TRACE_BLOCK_END;
             break;
         default:
@@ -10551,8 +10633,8 @@ static void POP_EDX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.dx), 2));
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.dx), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -10566,12 +10648,12 @@ static void POP_EBX(core_machine_cpu_execution_context *context)
         {
         case 2:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.bx), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.bx), 2));
             CPU_TRACE_BLOCK_END;
             break;
         case 4:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ebx), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ebx), 4));
             CPU_TRACE_BLOCK_END;
             break;
         default:
@@ -10581,8 +10663,8 @@ static void POP_EBX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.bx), 2));
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.bx), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -10596,12 +10678,12 @@ static void POP_ESP(core_machine_cpu_execution_context *context)
         {
         case 2:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.sp), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.sp), 2));
             CPU_TRACE_BLOCK_END;
             break;
         case 4:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.esp), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.esp), 4));
             CPU_TRACE_BLOCK_END;
             break;
         default:
@@ -10611,8 +10693,8 @@ static void POP_ESP(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.sp), 2));
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.sp), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -10626,12 +10708,12 @@ static void POP_EBP(core_machine_cpu_execution_context *context)
         {
         case 2:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.bp), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.bp), 2));
             CPU_TRACE_BLOCK_END;
             break;
         case 4:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ebp), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ebp), 4));
             CPU_TRACE_BLOCK_END;
             break;
         default:
@@ -10641,8 +10723,8 @@ static void POP_EBP(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.bp), 2));
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.bp), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -10656,12 +10738,12 @@ static void POP_ESI(core_machine_cpu_execution_context *context)
         {
         case 2:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.si), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.si), 2));
             CPU_TRACE_BLOCK_END;
             break;
         case 4:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.esi), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.esi), 4));
             CPU_TRACE_BLOCK_END;
             break;
         default:
@@ -10671,8 +10753,8 @@ static void POP_ESI(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.si), 2));
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.si), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -10686,12 +10768,12 @@ static void POP_EDI(core_machine_cpu_execution_context *context)
         {
         case 2:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.di), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.di), 2));
             CPU_TRACE_BLOCK_END;
             break;
         case 4:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.edi), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.edi), 4));
             CPU_TRACE_BLOCK_END;
             break;
         default:
@@ -10701,8 +10783,8 @@ static void POP_EDI(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.di), 2));
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.di), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -10713,6 +10795,18 @@ static void PUSHA(core_machine_cpu_execution_context *context)
     if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80186)
     {
         _adv;
+        if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286 &&
+            !_IsProtected)
+        {
+            cesp = _GetStackSize == 2 ? cpu_state.data.sp : cpu_state.data.esp;
+            if (cesp == 1u || cesp == 3u || cesp == 5u)
+                CPU_TRACE_CHECK_RETURN(core_machine_cpu_execution_raise_exception(
+                    context, VCPUINS_EXCEPT_SHUTDOWN, 0u));
+            if (cesp >= 7u && cesp <= 15u && (cesp & 1u))
+                CPU_TRACE_CHECK_RETURN(_SetExcept_GP(0));
+        }
+        CPU_TRACE_CHECK_RETURN(_s_test_ss_frame(context, _GetOperandSize,
+            8u, 0u, LIB_TRUE));
         switch (_GetOperandSize)
         {
         case 2:
@@ -10757,30 +10851,32 @@ static void POPA(core_machine_cpu_execution_context *context)
     if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80186)
     {
         _adv;
+        CPU_TRACE_CHECK_RETURN(_s_test_ss_frame(context, _GetOperandSize,
+            8u, 0u, LIB_FALSE));
         switch (_GetOperandSize)
         {
         case 2:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.di), 2));
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.si), 2));
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.bp), 2));
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cesp), 2));
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.bx), 2));
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.dx), 2));
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.cx), 2));
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ax), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.di), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.si), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.bp), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cesp), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.bx), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.dx), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.cx), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ax), 2));
             CPU_TRACE_BLOCK_END;
             break;
         case 4:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.edi), 4));
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.esi), 4));
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ebp), 4));
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cesp), 4));
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ebx), 4));
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.edx), 4));
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ecx), 4));
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.eax), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.edi), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.esi), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ebp), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cesp), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ebx), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.edx), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ecx), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.eax), 4));
             CPU_TRACE_BLOCK_END;
             break;
         default:
@@ -10811,11 +10907,9 @@ static void BOUND_R16_M16_16(core_machine_cpu_execution_context *context)
         case 2:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
             a16 = (lib_i16)instruction_state.data.cr;
-            CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
+            CPU_TRACE_CHECK_RETURN(_m_read_pair(context, 2, 2));
             l16 = (lib_i16)instruction_state.data.crm;
-            instruction_state.data.mrm.offset += 2;
-            CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
-            u16 = (lib_i16)instruction_state.data.crm;
+            u16 = (lib_i16)(instruction_state.data.crm >> 16u);
             if (a16 < l16 || a16 > u16)
                 CPU_TRACE_CHECK_RETURN(_SetExcept_BR(0));
             CPU_TRACE_BLOCK_END;
@@ -10823,11 +10917,9 @@ static void BOUND_R16_M16_16(core_machine_cpu_execution_context *context)
         case 4:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
             a32 = (lib_i32)instruction_state.data.cr;
-            CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 4));
+            CPU_TRACE_CHECK_RETURN(_m_read_pair(context, 4, 4));
             l32 = (lib_i32)instruction_state.data.crm;
-            instruction_state.data.mrm.offset += 4;
-            CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 4));
-            u32 = (lib_i32)instruction_state.data.crm;
+            u32 = (lib_i32)(instruction_state.data.crm >> 32u);
             if (a32 < l32 || a32 > u32)
                 CPU_TRACE_CHECK_RETURN(_SetExcept_BR(0));
             CPU_TRACE_BLOCK_END;
@@ -10945,7 +11037,7 @@ static void IMUL_R32_RM32_I32(core_machine_cpu_execution_context *context)
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_d_imm(context, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_a_imul3(context, instruction_state.data.crm, instruction_state.data.cimm, _GetOperandSize * 8));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
     }
     else
         UndefinedOpcode(context);
@@ -10977,7 +11069,7 @@ static void IMUL_R32_RM32_I8(core_machine_cpu_execution_context *context)
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
         CPU_TRACE_CHECK_RETURN(_a_imul3(context, instruction_state.data.crm, instruction_state.data.cimm, ((_GetOperandSize * 8 + 8) >> 1)));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
     }
     else
         UndefinedOpcode(context);
@@ -11208,7 +11300,7 @@ static void JO_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1, _GetEFLAGS_OF));
@@ -11223,7 +11315,7 @@ static void JNO_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1, !_GetEFLAGS_OF));
@@ -11238,7 +11330,7 @@ static void JC_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1, _GetEFLAGS_CF));
@@ -11253,7 +11345,7 @@ static void JNC_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1, !_GetEFLAGS_CF));
@@ -11268,7 +11360,7 @@ static void JZ_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1, _GetEFLAGS_ZF));
@@ -11283,7 +11375,7 @@ static void JNZ_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1, !_GetEFLAGS_ZF));
@@ -11298,7 +11390,7 @@ static void JNA_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1,
@@ -11314,7 +11406,7 @@ static void JA_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1,
@@ -11330,7 +11422,7 @@ static void JS_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1, _GetEFLAGS_SF));
@@ -11345,7 +11437,7 @@ static void JNS_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1, !_GetEFLAGS_SF));
@@ -11361,7 +11453,7 @@ static void JP_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1, _GetEFLAGS_PF));
@@ -11377,7 +11469,7 @@ static void JNP_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1, !_GetEFLAGS_PF));
@@ -11392,7 +11484,7 @@ static void JL_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1, (_GetEFLAGS_SF != _GetEFLAGS_OF)));
@@ -11407,7 +11499,7 @@ static void JNL_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1, (_GetEFLAGS_SF == _GetEFLAGS_OF)));
@@ -11422,7 +11514,7 @@ static void JNG_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1,
@@ -11438,7 +11530,7 @@ static void JG_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1,
@@ -11454,7 +11546,7 @@ static void INS_80(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 1));
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
@@ -11595,7 +11687,7 @@ static void INS_81(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 2));
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
@@ -11737,7 +11829,7 @@ static void INS_83(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 2));
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
@@ -11814,7 +11906,7 @@ static void TEST_RM8_R8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -11833,8 +11925,8 @@ static void TEST_RM32_R32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        _d_modrm(context, 2, 2);
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         _a_test(context, instruction_state.data.crm, instruction_state.data.cr, 16);
     }
@@ -11849,11 +11941,11 @@ static void XCHG_RM8_R8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), 1));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), 1));
     instruction_state.data.crm = instruction_state.data.cr;
     CPU_TRACE_CHECK_RETURN(_m_write_rm(context, 1));
     CPU_TRACE_CALL_END;
@@ -11866,16 +11958,16 @@ static void XCHG_RM32_R32(core_machine_cpu_execution_context *context)
         _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, _GetOperandSize, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), _GetOperandSize));
         instruction_state.data.crm = instruction_state.data.cr;
         CPU_TRACE_CHECK_RETURN(_m_write_rm(context, _GetOperandSize));
     }
     else
     {
-        cpu_state.data.ip++;
-        _d_modrm(context, 2, 2);
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), 2));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), 2));
         instruction_state.data.crm = instruction_state.data.cr;
         CPU_TRACE_CHECK_RETURN(_m_write_rm(context, 2));
     }
@@ -11890,7 +11982,7 @@ static void MOV_RM8_R8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     instruction_state.data.crm = instruction_state.data.cr;
@@ -11909,8 +12001,8 @@ static void MOV_RM32_R32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        _d_modrm(context, 2, 2);
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         instruction_state.data.crm = instruction_state.data.cr;
         CPU_TRACE_CHECK_RETURN(_m_write_rm(context, 2));
     }
@@ -11925,11 +12017,11 @@ static void MOV_R8_RM8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 1, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), 1));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), 1));
     CPU_TRACE_CALL_END;
 }
 static void MOV_R32_RM32(core_machine_cpu_execution_context *context)
@@ -11940,14 +12032,14 @@ static void MOV_R32_RM32(core_machine_cpu_execution_context *context)
         _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, _GetOperandSize, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), _GetOperandSize));
     }
     else
     {
-        cpu_state.data.ip++;
-        _d_modrm(context, 2, 2);
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_d_modrm(context, 2, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), 2));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -11960,7 +12052,7 @@ static void MOV_RM16_SREG(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm_sreg(context, 2));
     instruction_state.data.crm = instruction_state.data.rmovsreg->selector;
@@ -11978,12 +12070,12 @@ static void LEA_R32_M32(core_machine_cpu_execution_context *context)
         {
         case 2:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-            CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.mrm.offset), 2));
+            CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.mrm.offset), 2));
             CPU_TRACE_BLOCK_END;
             break;
         case 4:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-            CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.mrm.offset), 4));
+            CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.mrm.offset), 4));
             CPU_TRACE_BLOCK_END;
             break;
         default:
@@ -11993,9 +12085,9 @@ static void LEA_R32_M32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        _d_modrm_ea(context, 2, 2);
-        _m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.mrm.offset), 2);
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_d_modrm_ea(context, 2, 2));
+        _kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.mrm.offset), 2);
     }
     CPU_TRACE_CALL_END;
 }
@@ -12009,7 +12101,7 @@ static void MOV_SREG_RM16(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm_sreg(context, 2));
     }
     if (instruction_state.data.rmovsreg->sregtype == SREG_CODE)
@@ -12017,8 +12109,9 @@ static void MOV_SREG_RM16(core_machine_cpu_execution_context *context)
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
     CPU_TRACE_CHECK_RETURN(_s_load_sreg(context, instruction_state.data.rmovsreg,
         X86_CPU_MASK_U16(instruction_state.data.crm)));
-    if (instruction_state.data.rmovsreg->sregtype == SREG_STACK)
-        instruction_state.data.flagMaskInt = LIB_TRUE;
+    if (instruction_state.data.rmovsreg->sregtype == SREG_STACK ||
+        context->cpu_profile < CORE_MACHINE_CPU_PROFILE_80186)
+        context->interrupt_shadow = CPU_INTERRUPT_SHADOW_SEGMENT;
     CPU_TRACE_CALL_END;
 }
 static void INS_8F(core_machine_cpu_execution_context *context)
@@ -12038,7 +12131,7 @@ static void INS_8F(core_machine_cpu_execution_context *context)
         {
         case 0: /* POP_RM32 */
             CPU_TRACE_BLOCK_BEGIN("POP_RM32");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context,
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context,
                 X86_CPU_REFERENCE_OF(value), _GetOperandSize));
             CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, _GetOperandSize));
             instruction_state.data.crm = value;
@@ -12087,7 +12180,7 @@ static void INS_8F(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_s_read_cs(context, cpu_state.data.ip,
             X86_CPU_REFERENCE_OF(modrm), 1));
         if (instruction_state.data.flagLock)
@@ -12096,7 +12189,7 @@ static void INS_8F(core_machine_cpu_execution_context *context)
         {
         case 0: /* POP_RM16 */
             CPU_TRACE_BLOCK_BEGIN("POP_RM16");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context,
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context,
                 X86_CPU_REFERENCE_OF(value), 2));
             CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 2));
             instruction_state.data.crm = value;
@@ -12153,7 +12246,7 @@ static void NOP(core_machine_cpu_execution_context *context)
         _adv;
     }
     else
-        cpu_state.data.ip++;
+        _adv;
     CPU_TRACE_CALL_END;
 }
 static void XCHG_ECX_EAX(core_machine_cpu_execution_context *context)
@@ -12186,7 +12279,7 @@ static void XCHG_ECX_EAX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         instruction_state.data.cr = cpu_state.data.ax;
         cpu_state.data.ax = cpu_state.data.cx;
         cpu_state.data.cx = X86_CPU_MASK_U16(instruction_state.data.cr);
@@ -12223,7 +12316,7 @@ static void XCHG_EDX_EAX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         instruction_state.data.cr = cpu_state.data.ax;
         cpu_state.data.ax = cpu_state.data.dx;
         cpu_state.data.dx = X86_CPU_MASK_U16(instruction_state.data.cr);
@@ -12260,7 +12353,7 @@ static void XCHG_EBX_EAX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         instruction_state.data.cr = cpu_state.data.ax;
         cpu_state.data.ax = cpu_state.data.bx;
         cpu_state.data.bx = X86_CPU_MASK_U16(instruction_state.data.cr);
@@ -12298,7 +12391,7 @@ static void XCHG_ESP_EAX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         instruction_state.data.cr = cpu_state.data.ax;
         cpu_state.data.ax = cpu_state.data.sp;
         cpu_state.data.sp = X86_CPU_MASK_U16(instruction_state.data.cr);
@@ -12335,7 +12428,7 @@ static void XCHG_EBP_EAX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         instruction_state.data.cr = cpu_state.data.ax;
         cpu_state.data.ax = cpu_state.data.bp;
         cpu_state.data.bp = X86_CPU_MASK_U16(instruction_state.data.cr);
@@ -12372,7 +12465,7 @@ static void XCHG_ESI_EAX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         instruction_state.data.cr = cpu_state.data.ax;
         cpu_state.data.ax = cpu_state.data.si;
         cpu_state.data.si = X86_CPU_MASK_U16(instruction_state.data.cr);
@@ -12409,7 +12502,7 @@ static void XCHG_EDI_EAX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         instruction_state.data.cr = cpu_state.data.ax;
         cpu_state.data.ax = cpu_state.data.di;
         cpu_state.data.di = X86_CPU_MASK_U16(instruction_state.data.cr);
@@ -12437,7 +12530,7 @@ static void CBW(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         cpu_state.data.ax = (lib_i8)cpu_state.data.al;
     }
     CPU_TRACE_CALL_END;
@@ -12463,7 +12556,7 @@ static void CWD(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         if (cpu_state.data.ax & 0x8000)
             cpu_state.data.dx = 0xffff;
         else
@@ -12504,8 +12597,8 @@ static void CALL_PTR16_32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        _d_imm(context, 4);
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_d_imm(context, 4));
         neweip = X86_CPU_MASK_U16(instruction_state.data.cimm);
         newcs = X86_CPU_MASK_U16(instruction_state.data.cimm >> 16);
         _e_call_far(context, newcs, neweip, 2);
@@ -12575,9 +12668,9 @@ static void PUSHF(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         ceflags = _e_real_flags_image_16(context, cpu_state.data.flags);
-        _e_push(context, X86_CPU_REFERENCE_OF(ceflags), 2);
+        CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(ceflags), 2));
     }
     CPU_TRACE_CALL_END;
 }
@@ -12599,13 +12692,13 @@ static void POPF(core_machine_cpu_execution_context *context)
                 {
                 case 2:
                     CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-                    CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(ceflags), 2));
+                    CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(ceflags), 2));
                     mask |= 0xffff0000;
                     CPU_TRACE_BLOCK_END;
                     break;
                 case 4:
                     CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-                    CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(ceflags), 4));
+                    CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(ceflags), 4));
                     mask |= VCPU_EFLAGS_VM;
                     CPU_TRACE_BLOCK_END;
                     break;
@@ -12623,13 +12716,13 @@ static void POPF(core_machine_cpu_execution_context *context)
                 {
                 case 2:
                     CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-                    CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(ceflags), 2));
+                    CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(ceflags), 2));
                     mask |= (0xffff0000 | VCPU_EFLAGS_IOPL);
                     CPU_TRACE_BLOCK_END;
                     break;
                 case 4:
                     CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-                    CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(ceflags), 4));
+                    CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(ceflags), 4));
                     mask |= (VCPU_EFLAGS_VM | VCPU_EFLAGS_RF | VCPU_EFLAGS_IOPL);
                     CPU_TRACE_BLOCK_END;
                     break;
@@ -12646,12 +12739,6 @@ static void POPF(core_machine_cpu_execution_context *context)
         else
         {
             CPU_TRACE_BLOCK_BEGIN("V86");
-            if (instruction_state.data.prefix_oprsize)
-            {
-                CPU_TRACE_BLOCK_BEGIN("prefix_oprsize(1)");
-                CPU_TRACE_CHECK_RETURN(_SetExcept_GP(0));
-                CPU_TRACE_BLOCK_END;
-            }
             if (_GetEFLAGS_IOPL == 0x03)
             {
                 CPU_TRACE_BLOCK_BEGIN("EFLAGS_IOPL(3)");
@@ -12659,13 +12746,13 @@ static void POPF(core_machine_cpu_execution_context *context)
                 {
                 case 2:
                     CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-                    CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(ceflags), 2));
+                    CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(ceflags), 2));
                     mask |= (0xffff0000 | VCPU_EFLAGS_IOPL);
                     CPU_TRACE_BLOCK_END;
                     break;
                 case 4:
                     CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-                    CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(ceflags), 4));
+                    CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(ceflags), 4));
                     mask |= (VCPU_EFLAGS_VM | VCPU_EFLAGS_RF | VCPU_EFLAGS_IOPL);
                     CPU_TRACE_BLOCK_END;
                     break;
@@ -12688,9 +12775,21 @@ static void POPF(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(ceflags), 2));
-        cpu_state.data.eflags = _e_eflags_load(context, ceflags);
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(ceflags), 2));
+        mask = 0u;
+        if (context->cpu_profile == CORE_MACHINE_CPU_PROFILE_80286)
+        {
+            if (!_GetCR0_PE)
+                mask = VCPU_EFLAGS_NT | VCPU_EFLAGS_IOPL;
+            else
+            {
+                if (_GetCPL != 0u) mask |= VCPU_EFLAGS_IOPL;
+                if (_GetCPL > _GetEFLAGS_IOPL) mask |= VCPU_EFLAGS_IF;
+            }
+        }
+        cpu_state.data.eflags = _e_eflags_load(context,
+            (ceflags & ~mask) | (cpu_state.data.eflags & mask));
     }
     CPU_TRACE_CALL_END;
 }
@@ -12705,7 +12804,7 @@ static void SAHF(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     cpu_state.data.eflags = (cpu_state.data.ah & mask) | (cpu_state.data.eflags & ~mask);
     CPU_TRACE_CALL_END;
@@ -12719,7 +12818,7 @@ static void LAHF(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     cpu_state.data.ah = X86_CPU_MASK_U8(cpu_state.data.flags) | 0x02u;
     CPU_TRACE_CALL_END;
@@ -12733,7 +12832,7 @@ static void MOV_AL_MOFFS8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_moffs(context, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -12763,7 +12862,7 @@ static void MOV_EAX_MOFFS32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_moffs(context, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         cpu_state.data.ax = X86_CPU_MASK_U16(instruction_state.data.crm);
@@ -12779,7 +12878,7 @@ static void MOV_MOFFS8_AL(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_moffs(context, 1));
     instruction_state.data.result = cpu_state.data.al;
@@ -12811,7 +12910,7 @@ static void MOV_MOFFS32_EAX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_moffs(context, 2));
         instruction_state.data.crm = cpu_state.data.ax;
         CPU_TRACE_CHECK_RETURN(_m_write_rm(context, 2));
@@ -12870,7 +12969,7 @@ static void MOVSB(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
             _m_movs(context, 1);
         else
@@ -12938,7 +13037,7 @@ static void MOVSW(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
             _m_movs(context, 2);
         else
@@ -13010,7 +13109,7 @@ static void CMPSB(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
             _a_cmps(context, 8);
         else
@@ -13084,7 +13183,7 @@ static void CMPSW(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
             _a_cmps(context, 16);
         else
@@ -13111,7 +13210,7 @@ static void TEST_AL_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_a_test(context, cpu_state.data.al, instruction_state.data.cimm, 8));
@@ -13145,7 +13244,7 @@ static void TEST_EAX_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         CPU_TRACE_CHECK_RETURN(_a_test(context, cpu_state.data.ax, instruction_state.data.cimm, 16));
     }
@@ -13203,7 +13302,7 @@ static void STOSB(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
             _m_stos(context, 1);
         else
@@ -13271,7 +13370,7 @@ static void STOSW(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
             _m_stos(context, 2);
         else
@@ -13339,7 +13438,7 @@ static void LODSB(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
             _m_lods(context, 1);
         else
@@ -13407,7 +13506,7 @@ static void LODSW(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
             _m_lods(context, 2);
         else
@@ -13479,7 +13578,7 @@ static void SCASB(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
             _a_scas(context, 8);
         else
@@ -13553,7 +13652,7 @@ static void SCASW(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
             _a_scas(context, 16);
         else
@@ -13580,7 +13679,7 @@ static void MOV_AL_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     cpu_state.data.al = X86_CPU_MASK_U8(instruction_state.data.cimm);
@@ -13595,7 +13694,7 @@ static void MOV_CL_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     cpu_state.data.cl = X86_CPU_MASK_U8(instruction_state.data.cimm);
@@ -13610,7 +13709,7 @@ static void MOV_DL_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     cpu_state.data.dl = X86_CPU_MASK_U8(instruction_state.data.cimm);
@@ -13625,7 +13724,7 @@ static void MOV_BL_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     cpu_state.data.bl = X86_CPU_MASK_U8(instruction_state.data.cimm);
@@ -13640,7 +13739,7 @@ static void MOV_AH_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     cpu_state.data.ah = X86_CPU_MASK_U8(instruction_state.data.cimm);
@@ -13655,7 +13754,7 @@ static void MOV_CH_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     cpu_state.data.ch = X86_CPU_MASK_U8(instruction_state.data.cimm);
@@ -13670,7 +13769,7 @@ static void MOV_DH_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     cpu_state.data.dh = X86_CPU_MASK_U8(instruction_state.data.cimm);
@@ -13685,7 +13784,7 @@ static void MOV_BH_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     cpu_state.data.bh = X86_CPU_MASK_U8(instruction_state.data.cimm);
@@ -13713,7 +13812,7 @@ static void MOV_EAX_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         cpu_state.data.ax = X86_CPU_MASK_U16(instruction_state.data.cimm);
     }
@@ -13741,7 +13840,7 @@ static void MOV_ECX_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         cpu_state.data.cx = X86_CPU_MASK_U16(instruction_state.data.cimm);
     }
@@ -13769,7 +13868,7 @@ static void MOV_EDX_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         cpu_state.data.dx = X86_CPU_MASK_U16(instruction_state.data.cimm);
     }
@@ -13797,7 +13896,7 @@ static void MOV_EBX_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         cpu_state.data.bx = X86_CPU_MASK_U16(instruction_state.data.cimm);
     }
@@ -13825,7 +13924,7 @@ static void MOV_ESP_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         cpu_state.data.sp = X86_CPU_MASK_U16(instruction_state.data.cimm);
     }
@@ -13853,7 +13952,7 @@ static void MOV_EBP_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         cpu_state.data.bp = X86_CPU_MASK_U16(instruction_state.data.cimm);
     }
@@ -13881,7 +13980,7 @@ static void MOV_ESI_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         cpu_state.data.si = X86_CPU_MASK_U16(instruction_state.data.cimm);
     }
@@ -13909,7 +14008,7 @@ static void MOV_EDI_I32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         cpu_state.data.di = X86_CPU_MASK_U16(instruction_state.data.cimm);
     }
@@ -13927,7 +14026,7 @@ static void INS_C0(core_machine_cpu_execution_context *context)
         }
         else
         {
-            cpu_state.data.ip++;
+            _adv;
         }
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 1));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -13996,7 +14095,7 @@ static void INS_C1(core_machine_cpu_execution_context *context)
         }
         else
         {
-            cpu_state.data.ip++;
+            _adv;
         }
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, _GetOperandSize));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
@@ -14065,8 +14164,8 @@ static void RET_I16(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        _d_imm(context, 2);
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         _e_ret_near(context, X86_CPU_MASK_U16(instruction_state.data.cimm), 2);
     }
     CPU_TRACE_CALL_END;
@@ -14081,7 +14180,7 @@ static void RET(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_e_ret_near(context, 0, 2));
     }
     CPU_TRACE_CALL_END;
@@ -14096,7 +14195,7 @@ static void LES_R32_M16_32(core_machine_cpu_execution_context *context)
         _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm_ea(context, _GetOperandSize,
             _GetOperandSize));
-        CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_m_read_pair(context, _GetOperandSize, 2));
         switch (_GetOperandSize)
         {
         case 2:
@@ -14109,20 +14208,16 @@ static void LES_R32_M16_32(core_machine_cpu_execution_context *context)
             CPU_TRACE_IMPOSSIBLE_RETURN;
             break;
         }
-        instruction_state.data.mrm.offset += _GetOperandSize;
-        CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
-        selector = X86_CPU_MASK_U16(instruction_state.data.crm);
+        selector = X86_CPU_MASK_U16(instruction_state.data.crm >> (_GetOperandSize * 8u));
         CPU_TRACE_CHECK_RETURN(_e_load_far(context, &cpu_state.data.es, instruction_state.data.rr, selector, offset, _GetOperandSize));
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm_ea(context, 2, 2));
-        CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
+        CPU_TRACE_CHECK_RETURN(_m_read_pair(context, 2, 2));
         offset = X86_CPU_MASK_U16(instruction_state.data.crm);
-        instruction_state.data.mrm.offset += 2;
-        CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
-        selector = X86_CPU_MASK_U16(instruction_state.data.crm);
+        selector = X86_CPU_MASK_U16(instruction_state.data.crm >> (2 * 8u));
         CPU_TRACE_CHECK_RETURN(_e_load_far(context, &cpu_state.data.es, instruction_state.data.rr, selector, offset, 2));
     }
     CPU_TRACE_CALL_END;
@@ -14137,7 +14232,7 @@ static void LDS_R32_M16_32(core_machine_cpu_execution_context *context)
         _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm_ea(context, _GetOperandSize,
             _GetOperandSize));
-        CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_m_read_pair(context, _GetOperandSize, 2));
         switch (_GetOperandSize)
         {
         case 2:
@@ -14150,20 +14245,16 @@ static void LDS_R32_M16_32(core_machine_cpu_execution_context *context)
             CPU_TRACE_IMPOSSIBLE_RETURN;
             break;
         }
-        instruction_state.data.mrm.offset += _GetOperandSize;
-        CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
-        selector = X86_CPU_MASK_U16(instruction_state.data.crm);
+        selector = X86_CPU_MASK_U16(instruction_state.data.crm >> (_GetOperandSize * 8u));
         CPU_TRACE_CHECK_RETURN(_e_load_far(context, &cpu_state.data.ds, instruction_state.data.rr, selector, offset, _GetOperandSize));
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm_ea(context, 2, 2));
-        CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
+        CPU_TRACE_CHECK_RETURN(_m_read_pair(context, 2, 2));
         offset = X86_CPU_MASK_U16(instruction_state.data.crm);
-        instruction_state.data.mrm.offset += 2;
-        CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
-        selector = X86_CPU_MASK_U16(instruction_state.data.crm);
+        selector = X86_CPU_MASK_U16(instruction_state.data.crm >> (2 * 8u));
         CPU_TRACE_CHECK_RETURN(_e_load_far(context, &cpu_state.data.ds, instruction_state.data.rr, selector, offset, 2));
     }
     CPU_TRACE_CALL_END;
@@ -14177,7 +14268,7 @@ static void INS_C6(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 1));
     switch (instruction_state.data.cr)
@@ -14288,7 +14379,7 @@ static void INS_C7(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 2));
         switch (instruction_state.data.cr)
         {
@@ -14360,6 +14451,16 @@ static void ENTER(core_machine_cpu_execution_context *context)
          * 255.  The later 80286/80386 architecture limits it to 0--31. */
         if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286)
             level %= 32;
+        CPU_TRACE_CHECK_RETURN(_s_test_ss_frame(context, _GetOperandSize,
+            (lib_u16)1u + level, size, LIB_TRUE));
+        data = _GetOperandSize == 2 ? cpu_state.data.bp : cpu_state.data.ebp;
+        for (i = 1u; i < level; ++i)
+        {
+            data = _GetOperandSize == 2 ? X86_CPU_MASK_U16(data - 2u) :
+                X86_CPU_MASK_U32(data - 4u);
+            CPU_TRACE_CHECK_RETURN(_m_test_logical(context, &cpu_state.data.ss,
+                data, _GetOperandSize, LIB_FALSE));
+        }
         switch (_GetOperandSize)
         {
         case 2:
@@ -14376,18 +14477,7 @@ static void ENTER(core_machine_cpu_execution_context *context)
             CPU_TRACE_IMPOSSIBLE_RETURN;
             break;
         }
-        switch (_GetStackSize)
-        {
-        case 2:
-            temp = cpu_state.data.sp;
-            break;
-        case 4:
-            temp = cpu_state.data.esp;
-            break;
-        default:
-            CPU_TRACE_IMPOSSIBLE_RETURN;
-            break;
-        }
+        temp = cpu_state.data.esp;
         if (level)
         {
             CPU_TRACE_BLOCK_BEGIN("level(!0)");
@@ -14398,50 +14488,16 @@ static void ENTER(core_machine_cpu_execution_context *context)
                 {
                 case 2:
                     CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-                    switch (_GetStackSize)
-                    {
-                    case 2:
-                        CPU_TRACE_BLOCK_BEGIN("StackSize(2)");
-                        cpu_state.data.bp -= 2;
-                        CPU_TRACE_CHECK_RETURN(_s_read_ss(context, cpu_state.data.bp, X86_CPU_REFERENCE_OF(data), 2));
-                        CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(data), 2));
-                        CPU_TRACE_BLOCK_END;
-                        break;
-                    case 4:
-                        CPU_TRACE_BLOCK_BEGIN("StackSize(4)");
-                        cpu_state.data.ebp -= 2;
-                        CPU_TRACE_CHECK_RETURN(_s_read_ss(context, cpu_state.data.ebp, X86_CPU_REFERENCE_OF(data), 2));
-                        CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(data), 2));
-                        CPU_TRACE_BLOCK_END;
-                        break;
-                    default:
-                        CPU_TRACE_IMPOSSIBLE_RETURN;
-                        break;
-                    }
+                    cpu_state.data.bp -= 2;
+                    CPU_TRACE_CHECK_RETURN(_s_read_ss(context, cpu_state.data.bp, X86_CPU_REFERENCE_OF(data), 2));
+                    CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(data), 2));
                     CPU_TRACE_BLOCK_END;
                     break;
                 case 4:
                     CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-                    switch (_GetStackSize)
-                    {
-                    case 2:
-                        CPU_TRACE_BLOCK_BEGIN("StackSize(2)");
-                        cpu_state.data.bp -= 4;
-                        CPU_TRACE_CHECK_RETURN(_s_read_ss(context, cpu_state.data.bp, X86_CPU_REFERENCE_OF(data), 4));
-                        CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(data), 4));
-                        CPU_TRACE_BLOCK_END;
-                        break;
-                    case 4:
-                        CPU_TRACE_BLOCK_BEGIN("StackSize(4)");
-                        cpu_state.data.ebp -= 4;
-                        CPU_TRACE_CHECK_RETURN(_s_read_ss(context, cpu_state.data.ebp, X86_CPU_REFERENCE_OF(data), 4));
-                        CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(data), 4));
-                        CPU_TRACE_BLOCK_END;
-                        break;
-                    default:
-                        CPU_TRACE_IMPOSSIBLE_RETURN;
-                        break;
-                    }
+                    cpu_state.data.ebp -= 4;
+                    CPU_TRACE_CHECK_RETURN(_s_read_ss(context, cpu_state.data.ebp, X86_CPU_REFERENCE_OF(data), 4));
+                    CPU_TRACE_CHECK_RETURN(_e_push(context, X86_CPU_REFERENCE_OF(data), 4));
                     CPU_TRACE_BLOCK_END;
                     break;
                 default:
@@ -14524,14 +14580,8 @@ static void LEAVE(core_machine_cpu_execution_context *context)
             CPU_TRACE_IMPOSSIBLE_RETURN;
             break;
         }
-        if (!_IsProtected && stack > 0x0000ffff)
-        {
-            CPU_TRACE_BLOCK_BEGIN("Protected(0),ebp(>0000ffff)");
-            CPU_TRACE_CHECK_RETURN(_SetExcept_GP(0));
-            CPU_TRACE_BLOCK_END;
-        }
         CPU_TRACE_CHECK_RETURN(_m_test_logical(context, &cpu_state.data.ss,
-            stack, _GetOperandSize, 1));
+            stack, _GetOperandSize, 0));
         switch (_GetStackSize)
         {
         case 2:
@@ -14548,12 +14598,12 @@ static void LEAVE(core_machine_cpu_execution_context *context)
         {
         case 2:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.bp), 2));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.bp), 2));
             CPU_TRACE_BLOCK_END;
             break;
         case 4:
             CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-            CPU_TRACE_CHECK_RETURN(_e_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ebp), 4));
+            CPU_TRACE_CHECK_RETURN(_kec_pop(context, X86_CPU_REFERENCE_OF(cpu_state.data.ebp), 4));
             CPU_TRACE_BLOCK_END;
             break;
         default:
@@ -14576,8 +14626,8 @@ static void RETF_I16(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        _d_imm(context, 2);
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         _e_ret_far(context, X86_CPU_MASK_U16(instruction_state.data.cimm), 2);
     }
     CPU_TRACE_CALL_END;
@@ -14592,7 +14642,7 @@ static void RETF(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_e_ret_far(context, 0, 2));
     }
     CPU_TRACE_CALL_END;
@@ -14608,7 +14658,7 @@ static void INT3(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         _e_int_n(context, 0x03, _GetOperandSize);
     }
     CPU_TRACE_CALL_END;
@@ -14625,8 +14675,8 @@ static void INT_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        _d_imm(context, 1);
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
         _e_int_n(context, (lib_u8)instruction_state.data.cimm, 2);
     }
     CPU_TRACE_CALL_END;
@@ -14642,7 +14692,7 @@ static void INTO(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         if (_GetEFLAGS_OF)
             _e_int_n(context, 0x04, _GetOperandSize);
     }
@@ -14658,7 +14708,7 @@ static void IRET(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_e_iret(context, 2));
     }
     CPU_TRACE_CALL_END;
@@ -14672,7 +14722,7 @@ static void INS_D0(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -14785,7 +14835,7 @@ static void INS_D1(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         switch (instruction_state.data.cr)
@@ -14848,7 +14898,7 @@ static void INS_D2(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -14961,7 +15011,7 @@ static void INS_D3(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         switch (instruction_state.data.cr)
@@ -15026,8 +15076,8 @@ static void AAM(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        _d_imm(context, 1);
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     }
     base = X86_CPU_MASK_U8(instruction_state.data.cimm);
     if (base == 0)
@@ -15054,8 +15104,8 @@ static void AAD(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        _d_imm(context, 1);
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     }
     base = X86_CPU_MASK_U8(instruction_state.data.cimm);
     cpu_state.data.al = X86_CPU_MASK_U8(cpu_state.data.al + (cpu_state.data.ah * base));
@@ -15076,7 +15126,7 @@ static void XLAT(core_machine_cpu_execution_context *context)
         {
         case 2:
             CPU_TRACE_BLOCK_BEGIN("AddressSize(2)");
-            CPU_TRACE_CHECK_RETURN(_m_read_logical(context, instruction_state.data.roverds, (cpu_state.data.bx + cpu_state.data.al), X86_CPU_REFERENCE_OF(cpu_state.data.al), 1));
+            CPU_TRACE_CHECK_RETURN(_m_read_logical(context, instruction_state.data.roverds, X86_CPU_MASK_U16(cpu_state.data.bx + cpu_state.data.al), X86_CPU_REFERENCE_OF(cpu_state.data.al), 1));
             CPU_TRACE_BLOCK_END;
             break;
         case 4:
@@ -15091,8 +15141,8 @@ static void XLAT(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        CPU_TRACE_CHECK_RETURN(_m_read_logical(context, instruction_state.data.roverds, (cpu_state.data.bx + cpu_state.data.al), X86_CPU_REFERENCE_OF(cpu_state.data.al), 1));
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_m_read_logical(context, instruction_state.data.roverds, X86_CPU_MASK_U16(cpu_state.data.bx + cpu_state.data.al), X86_CPU_REFERENCE_OF(cpu_state.data.al), 1));
     }
     CPU_TRACE_CALL_END;
 }
@@ -15105,7 +15155,7 @@ static void LOOPNZ_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_loopcc(context, (lib_i8)instruction_state.data.cimm, !_GetEFLAGS_ZF));
@@ -15120,7 +15170,7 @@ static void LOOPZ_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_loopcc(context, (lib_i8)instruction_state.data.cimm, _GetEFLAGS_ZF));
@@ -15135,7 +15185,7 @@ static void LOOP_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_loopcc(context, (lib_i8)instruction_state.data.cimm, 1));
@@ -15165,8 +15215,8 @@ static void JCXZ_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        _d_imm(context, 1);
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
         _e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1, !cpu_state.data.cx);
     }
     CPU_TRACE_CALL_END;
@@ -15180,7 +15230,7 @@ static void IN_AL_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_p_input(context, X86_CPU_MASK_U8(instruction_state.data.cimm), X86_CPU_REFERENCE_OF(cpu_state.data.al), 1));
@@ -15213,7 +15263,7 @@ static void IN_EAX_I8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
         CPU_TRACE_CHECK_RETURN(_p_input(context, X86_CPU_MASK_U8(instruction_state.data.cimm), X86_CPU_REFERENCE_OF(cpu_state.data.ax), 2));
     }
@@ -15228,7 +15278,7 @@ static void OUT_I8_AL(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_p_output(context, X86_CPU_MASK_U8(instruction_state.data.cimm), X86_CPU_REFERENCE_OF(cpu_state.data.al), 1));
@@ -15261,7 +15311,7 @@ static void OUT_I8_EAX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
         CPU_TRACE_CHECK_RETURN(_p_output(context,
             X86_CPU_MASK_U8(instruction_state.data.cimm),
@@ -15299,7 +15349,7 @@ static void CALL_REL32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         CPU_TRACE_CHECK_RETURN(_e_call_near(context, X86_CPU_MASK_U16(cpu_state.data.ip + (lib_i16)instruction_state.data.cimm), 2));
     }
@@ -15316,8 +15366,8 @@ static void JMP_REL32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
-        _d_imm(context, 2);
+        _adv;
+        CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         _e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 2, 1);
     }
     CPU_TRACE_CALL_END;
@@ -15357,7 +15407,7 @@ static void JMP_PTR16_32(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
         neweip = (lib_u16)instruction_state.data.cimm;
         CPU_TRACE_CHECK_RETURN(_d_imm(context, 2));
@@ -15375,7 +15425,7 @@ static void JMP_REL8(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_imm(context, 1));
     CPU_TRACE_CHECK_RETURN(_e_jcc(context, X86_CPU_MASK_U32(instruction_state.data.cimm), 1, 1));
@@ -15390,7 +15440,7 @@ static void IN_AL_DX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_p_input(context, cpu_state.data.dx, X86_CPU_REFERENCE_OF(cpu_state.data.al), 1));
     CPU_TRACE_CALL_END;
@@ -15420,7 +15470,7 @@ static void IN_EAX_DX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_p_input(context, cpu_state.data.dx, X86_CPU_REFERENCE_OF(cpu_state.data.ax), 2));
     }
     CPU_TRACE_CALL_END;
@@ -15434,7 +15484,7 @@ static void OUT_DX_AL(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_p_output(context, cpu_state.data.dx, X86_CPU_REFERENCE_OF(cpu_state.data.al), 1));
     CPU_TRACE_CALL_END;
@@ -15465,7 +15515,7 @@ static void OUT_DX_EAX(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_p_output(context, cpu_state.data.dx,
             X86_CPU_REFERENCE_OF(cpu_state.data.ax), 2));
     }
@@ -15609,7 +15659,7 @@ static void PREFIX_REPNZ(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         instruction_state.data.prefix_rep = PREFIX_REP_REPZNZ;
     }
     CPU_TRACE_CALL_END;
@@ -15624,7 +15674,7 @@ static void PREFIX_REPZ(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         instruction_state.data.prefix_rep = PREFIX_REP_REPZ;
     }
     CPU_TRACE_CALL_END;
@@ -15653,7 +15703,7 @@ static void CMC(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         cpu_state.data.eflags ^= VCPU_EFLAGS_CF;
     }
     CPU_TRACE_CALL_END;
@@ -15667,7 +15717,7 @@ static void INS_F6(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -15787,7 +15837,7 @@ static void INS_F7(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 2));
         CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
         switch (instruction_state.data.cr)
@@ -15854,7 +15904,7 @@ static void CLC(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         _ClrEFLAGS_CF;
     }
     CPU_TRACE_CALL_END;
@@ -15869,7 +15919,7 @@ static void STC(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         _SetEFLAGS_CF;
     }
     CPU_TRACE_CALL_END;
@@ -15877,7 +15927,7 @@ static void STC(core_machine_cpu_execution_context *context)
 static void CLI(core_machine_cpu_execution_context *context)
 {
     CPU_TRACE_CALL_BEGIN("CLI");
-    if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386)
+    if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286)
     {
         _adv;
         if (!_GetCR0_PE)
@@ -15909,7 +15959,7 @@ static void CLI(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         _ClrEFLAGS_IF;
     }
     CPU_TRACE_CALL_END;
@@ -15917,7 +15967,7 @@ static void CLI(core_machine_cpu_execution_context *context)
 static void STI(core_machine_cpu_execution_context *context)
 {
     CPU_TRACE_CALL_BEGIN("STI");
-    if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386)
+    if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286)
     {
         _adv;
         if (!_GetCR0_PE)
@@ -15949,10 +15999,10 @@ static void STI(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         _SetEFLAGS_IF;
     }
-    instruction_state.data.flagMaskInt = LIB_TRUE;
+    context->interrupt_shadow = CPU_INTERRUPT_SHADOW_INTR;
     CPU_TRACE_CALL_END;
 }
 static void CLD(core_machine_cpu_execution_context *context)
@@ -15965,7 +16015,7 @@ static void CLD(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         _ClrEFLAGS_DF;
     }
     CPU_TRACE_CALL_END;
@@ -15980,7 +16030,7 @@ static void STD(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         _SetEFLAGS_DF;
     }
     CPU_TRACE_CALL_END;
@@ -15994,7 +16044,7 @@ static void INS_FE(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
@@ -16099,11 +16149,12 @@ static void INS_FF(core_machine_cpu_execution_context *context)
                 CPU_TRACE_CHECK_RETURN(UndefinedOpcode(context));
                 CPU_TRACE_BLOCK_END;
             }
-            CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
-            neweip = (lib_u32)instruction_state.data.crm;
-            instruction_state.data.mrm.offset += _GetOperandSize;
-            CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
-            newcs = X86_CPU_MASK_U16(instruction_state.data.crm);
+            CPU_TRACE_CHECK_RETURN(_m_read_pair(context, _GetOperandSize, 2));
+            neweip = _GetOperandSize == 2 ?
+                X86_CPU_MASK_U16(instruction_state.data.crm) :
+                X86_CPU_MASK_U32(instruction_state.data.crm);
+            newcs = X86_CPU_MASK_U16(instruction_state.data.crm >> (_GetOperandSize * 8u));
+            instruction_state.data.crm = newcs;
             CPU_TRACE_CHECK_RETURN(_e_call_far(context, newcs, neweip, _GetOperandSize));
             CPU_TRACE_BLOCK_END;
             break;
@@ -16126,11 +16177,12 @@ static void INS_FF(core_machine_cpu_execution_context *context)
                 CPU_TRACE_CHECK_RETURN(UndefinedOpcode(context));
                 CPU_TRACE_BLOCK_END;
             }
-            CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
-            neweip = (lib_u32)instruction_state.data.crm;
-            instruction_state.data.mrm.offset += _GetOperandSize;
-            CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
-            newcs = X86_CPU_MASK_U16(instruction_state.data.crm);
+            CPU_TRACE_CHECK_RETURN(_m_read_pair(context, _GetOperandSize, 2));
+            neweip = _GetOperandSize == 2 ?
+                X86_CPU_MASK_U16(instruction_state.data.crm) :
+                X86_CPU_MASK_U32(instruction_state.data.crm);
+            newcs = X86_CPU_MASK_U16(instruction_state.data.crm >> (_GetOperandSize * 8u));
+            instruction_state.data.crm = newcs;
             CPU_TRACE_CHECK_RETURN(_e_jmp_far(context, newcs, neweip, _GetOperandSize));
             CPU_TRACE_BLOCK_END;
             break;
@@ -16155,7 +16207,7 @@ static void INS_FF(core_machine_cpu_execution_context *context)
     }
     else
     {
-        cpu_state.data.ip++;
+        _adv;
         CPU_TRACE_CHECK_RETURN(_s_read_cs(context, cpu_state.data.eip, X86_CPU_REFERENCE_OF(modrm), 1));
         switch (_GetModRM_REG(modrm))
         {
@@ -16196,11 +16248,10 @@ static void INS_FF(core_machine_cpu_execution_context *context)
                 CPU_TRACE_CHECK_RETURN(UndefinedOpcode(context));
                 CPU_TRACE_BLOCK_END;
             }
-            CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
+            CPU_TRACE_CHECK_RETURN(_m_read_pair(context, 2, 2));
             neweip = (lib_u16)instruction_state.data.crm;
-            instruction_state.data.mrm.offset += 2;
-            CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
-            newcs = X86_CPU_MASK_U16(instruction_state.data.crm);
+            newcs = X86_CPU_MASK_U16(instruction_state.data.crm >> (2 * 8u));
+            instruction_state.data.crm = newcs;
             CPU_TRACE_CHECK_RETURN(_e_call_far(context, newcs, neweip, 2));
             CPU_TRACE_BLOCK_END;
             break;
@@ -16223,11 +16274,10 @@ static void INS_FF(core_machine_cpu_execution_context *context)
                 CPU_TRACE_CHECK_RETURN(UndefinedOpcode(context));
                 CPU_TRACE_BLOCK_END;
             }
-            CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
+            CPU_TRACE_CHECK_RETURN(_m_read_pair(context, 2, 2));
             neweip = (lib_u16)instruction_state.data.crm;
-            instruction_state.data.mrm.offset += 2;
-            CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
-            newcs = X86_CPU_MASK_U16(instruction_state.data.crm);
+            newcs = X86_CPU_MASK_U16(instruction_state.data.crm >> (2 * 8u));
+            instruction_state.data.crm = newcs;
             CPU_TRACE_CHECK_RETURN(_e_jmp_far(context, newcs, neweip, 2));
             CPU_TRACE_BLOCK_END;
             break;
@@ -16449,12 +16499,9 @@ static void _d_bit_rmimm(core_machine_cpu_execution_context *context, lib_u8 reg
         }
         else
         {
-            if (instruction_state.data.flagMem)
-                instruction_state.data.mrm.offset += 2 *
-                    (X86_CPU_MASK_U8(instruction_state.data.cimm) / 16);
             bitoperand = (X86_CPU_MASK_U16(instruction_state.data.cimm) % 16);
         }
-        CPU_TRACE_CHECK_RETURN(instruction_state.data.cimm = X86_CPU_MASK_U16((1 << bitoperand)));
+        CPU_TRACE_CHECK_RETURN(instruction_state.data.cimm = X86_CPU_MASK_U16((1u << bitoperand)));
         CPU_TRACE_BLOCK_END;
         break;
     case 4:
@@ -16466,7 +16513,7 @@ static void _d_bit_rmimm(core_machine_cpu_execution_context *context, lib_u8 reg
             if (bitoff32 >= 0)
                 instruction_state.data.mrm.offset += 4 * (bitoff32 / 32);
             else
-                instruction_state.data.mrm.offset += 4 * ((bitoff32 - 31) / 32);
+                instruction_state.data.mrm.offset += 4 * (((lib_i64)bitoff32 - 31) / 32);
             bitoperand = ((lib_u32)bitoff32) % 32;
             CPU_TRACE_BLOCK_END;
         }
@@ -16476,12 +16523,9 @@ static void _d_bit_rmimm(core_machine_cpu_execution_context *context, lib_u8 reg
         }
         else
         {
-            if (instruction_state.data.flagMem)
-                instruction_state.data.mrm.offset += 4 *
-                    (X86_CPU_MASK_U8(instruction_state.data.cimm) / 32);
             bitoperand = (X86_CPU_MASK_U32(instruction_state.data.cimm) % 32);
         }
-        CPU_TRACE_CHECK_RETURN(instruction_state.data.cimm = X86_CPU_MASK_U32((1 << bitoperand)));
+        CPU_TRACE_CHECK_RETURN(instruction_state.data.cimm = X86_CPU_MASK_U32((1u << bitoperand)));
         CPU_TRACE_BLOCK_END;
         break;
     default:
@@ -16490,6 +16534,10 @@ static void _d_bit_rmimm(core_machine_cpu_execution_context *context, lib_u8 reg
         CPU_TRACE_BLOCK_END;
         break;
     }
+    /* Bit-string displacement is part of EA formation, not operand-span wrap. */
+    if (instruction_state.data.flagMem && _GetAddressSize == 2)
+        instruction_state.data.mrm.offset =
+            X86_CPU_MASK_U16(instruction_state.data.mrm.offset);
     CPU_TRACE_CALL_END;
 }
 
@@ -16536,7 +16584,7 @@ static void _a_bscc(core_machine_cpu_execution_context *context, lib_u64 csrc, l
         else
         {
             _ClrEFLAGS_ZF;
-            while (!X86_CPU_BIT_IS_SET(instruction_state.data.opr1, X86_CPU_MASK_U64(1 << temp)))
+            while (!X86_CPU_BIT_IS_SET(instruction_state.data.opr1, X86_CPU_MASK_U64(UINT64_C(1) << temp)))
             {
                 if (forward)
                     temp++;
@@ -16555,7 +16603,7 @@ static void _a_bscc(core_machine_cpu_execution_context *context, lib_u64 csrc, l
         else
         {
             _ClrEFLAGS_ZF;
-            while (!X86_CPU_BIT_IS_SET(instruction_state.data.opr1, X86_CPU_MASK_U64(1 << temp)))
+            while (!X86_CPU_BIT_IS_SET(instruction_state.data.opr1, X86_CPU_MASK_U64(UINT64_C(1) << temp)))
             {
                 if (forward)
                     temp++;
@@ -16671,6 +16719,10 @@ static void _a_shld(core_machine_cpu_execution_context *context, lib_u64 cdest, 
     }
     if (count > bit)
     {
+        instruction_state.data.bit = bit;
+        instruction_state.data.opr1 = bit == 16u ? X86_CPU_MASK_U16(cdest) : X86_CPU_MASK_U32(cdest);
+        instruction_state.data.opr2 = bit == 16u ? X86_CPU_MASK_U16(csrc) : X86_CPU_MASK_U32(csrc);
+        instruction_state.data.result = instruction_state.data.opr1;
         /* bad parameters */
         /* dest is undefined */
         /* cf, of, sf, zf, af, pf are undefined */
@@ -16689,16 +16741,16 @@ static void _a_shld(core_machine_cpu_execution_context *context, lib_u64 cdest, 
             instruction_state.data.result = instruction_state.data.opr1;
             flagcf = !!X86_CPU_GET_MSB_16(instruction_state.data.result);
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_CF,
-                          X86_CPU_BIT_IS_SET(instruction_state.data.result, X86_CPU_MASK_U64(1 << (bit - count))));
+                          X86_CPU_BIT_IS_SET(instruction_state.data.result, X86_CPU_MASK_U64(UINT64_C(1) << (bit - count))));
             for (i = (lib_i32)(bit - 1); i >= (lib_i32)count; --i)
             {
-                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr1, X86_CPU_MASK_U64(1 << (i - count)));
-                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(1 << i), flagbit);
+                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr1, X86_CPU_MASK_U64(UINT64_C(1) << (i - count)));
+                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(UINT64_C(1) << i), flagbit);
             }
             for (i = (lib_i32)(count - 1); i >= 0; --i)
             {
-                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr2, X86_CPU_MASK_U64(1 << (i - count + bit)));
-                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(1 << i), flagbit);
+                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr2, X86_CPU_MASK_U64(UINT64_C(1) << (i - count + bit)));
+                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(UINT64_C(1) << i), flagbit);
             }
             if (count == 1)
                 X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_OF,
@@ -16715,16 +16767,16 @@ static void _a_shld(core_machine_cpu_execution_context *context, lib_u64 cdest, 
             instruction_state.data.result = instruction_state.data.opr1;
             flagcf = !!X86_CPU_GET_MSB_32(instruction_state.data.result);
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_CF,
-                          X86_CPU_BIT_IS_SET(instruction_state.data.result, X86_CPU_MASK_U64(1 << (bit - count))));
+                          X86_CPU_BIT_IS_SET(instruction_state.data.result, X86_CPU_MASK_U64(UINT64_C(1) << (bit - count))));
             for (i = (lib_i32)(bit - 1); i >= (lib_i32)count; --i)
             {
-                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr1, X86_CPU_MASK_U64(1 << (i - count)));
-                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(1 << i), flagbit);
+                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr1, X86_CPU_MASK_U64(UINT64_C(1) << (i - count)));
+                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(UINT64_C(1) << i), flagbit);
             }
             for (i = (lib_i32)(count - 1); i >= 0; --i)
             {
-                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr2, X86_CPU_MASK_U64(1 << (i - count + bit)));
-                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(1 << i), flagbit);
+                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr2, X86_CPU_MASK_U64(UINT64_C(1) << (i - count + bit)));
+                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(UINT64_C(1) << i), flagbit);
             }
             if (count == 1)
                 X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_OF,
@@ -16741,6 +16793,9 @@ static void _a_shld(core_machine_cpu_execution_context *context, lib_u64 cdest, 
         }
         CPU_TRACE_CHECK_RETURN(_kaf_set_flags(context, SHLD_FLAG));
         instruction_state.data.udf |= VCPU_EFLAGS_AF;
+        if (count == bit)
+            instruction_state.data.udf |= VCPU_EFLAGS_OF | VCPU_EFLAGS_SF |
+                VCPU_EFLAGS_ZF | VCPU_EFLAGS_AF | VCPU_EFLAGS_CF | VCPU_EFLAGS_PF;
     }
     CPU_TRACE_CALL_END;
 }
@@ -16758,6 +16813,10 @@ static void _a_shrd(core_machine_cpu_execution_context *context, lib_u64 cdest, 
     }
     if (count > bit)
     {
+        instruction_state.data.bit = bit;
+        instruction_state.data.opr1 = bit == 16u ? X86_CPU_MASK_U16(cdest) : X86_CPU_MASK_U32(cdest);
+        instruction_state.data.opr2 = bit == 16u ? X86_CPU_MASK_U16(csrc) : X86_CPU_MASK_U32(csrc);
+        instruction_state.data.result = instruction_state.data.opr1;
         /* bad parameters */
         /* dest is undefined */
         /* cf, of, sf, zf, af, pf are undefined */
@@ -16776,16 +16835,16 @@ static void _a_shrd(core_machine_cpu_execution_context *context, lib_u64 cdest, 
             instruction_state.data.result = instruction_state.data.opr1;
             flagcf = !!X86_CPU_GET_MSB_16(instruction_state.data.result);
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_CF,
-                          X86_CPU_BIT_IS_SET(instruction_state.data.result, X86_CPU_MASK_U64(1 << (count - 1))));
+                          X86_CPU_BIT_IS_SET(instruction_state.data.result, X86_CPU_MASK_U64(UINT64_C(1) << (count - 1))));
             for (i = 0; i <= (lib_i32)(bit - count - 1); ++i)
             {
-                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr1, X86_CPU_MASK_U64(1 << (i + count)));
-                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(1 << i), flagbit);
+                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr1, X86_CPU_MASK_U64(UINT64_C(1) << (i + count)));
+                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(UINT64_C(1) << i), flagbit);
             }
             for (i = (lib_i32)(bit - count); i <= (lib_i32)(bit - 1); ++i)
             {
-                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr2, X86_CPU_MASK_U64(1 << (i + count - bit)));
-                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(1 << i), flagbit);
+                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr2, X86_CPU_MASK_U64(UINT64_C(1) << (i + count - bit)));
+                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(UINT64_C(1) << i), flagbit);
             }
             if (count == 1)
                 X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_OF,
@@ -16802,16 +16861,16 @@ static void _a_shrd(core_machine_cpu_execution_context *context, lib_u64 cdest, 
             instruction_state.data.result = instruction_state.data.opr1;
             flagcf = !!X86_CPU_GET_MSB_32(instruction_state.data.result);
             X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_CF,
-                          X86_CPU_BIT_IS_SET(instruction_state.data.result, X86_CPU_MASK_U64(1 << (count - 1))));
+                          X86_CPU_BIT_IS_SET(instruction_state.data.result, X86_CPU_MASK_U64(UINT64_C(1) << (count - 1))));
             for (i = 0; i <= (lib_i32)(bit - count - 1); ++i)
             {
-                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr1, X86_CPU_MASK_U64(1 << (i + count)));
-                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(1 << i), flagbit);
+                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr1, X86_CPU_MASK_U64(UINT64_C(1) << (i + count)));
+                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(UINT64_C(1) << i), flagbit);
             }
             for (i = (lib_i32)(bit - count); i <= (lib_i32)(bit - 1); ++i)
             {
-                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr2, X86_CPU_MASK_U64(1 << (i + count - bit)));
-                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(1 << i), flagbit);
+                flagbit = X86_CPU_BIT_IS_SET(instruction_state.data.opr2, X86_CPU_MASK_U64(UINT64_C(1) << (i + count - bit)));
+                X86_CPU_BIT_MAKE(instruction_state.data.result, X86_CPU_MASK_U64(UINT64_C(1) << i), flagbit);
             }
             if (count == 1)
                 X86_CPU_BIT_MAKE(cpu_state.data.eflags, VCPU_EFLAGS_OF,
@@ -16828,6 +16887,9 @@ static void _a_shrd(core_machine_cpu_execution_context *context, lib_u64 cdest, 
         }
         CPU_TRACE_CHECK_RETURN(_kaf_set_flags(context, SHRD_FLAG));
         instruction_state.data.udf |= VCPU_EFLAGS_AF;
+        if (count == bit)
+            instruction_state.data.udf |= VCPU_EFLAGS_OF | VCPU_EFLAGS_SF |
+                VCPU_EFLAGS_ZF | VCPU_EFLAGS_AF | VCPU_EFLAGS_CF | VCPU_EFLAGS_PF;
     }
     CPU_TRACE_CALL_END;
 }
@@ -16870,6 +16932,7 @@ static void INS_0F_00(core_machine_cpu_execution_context *context)
         case 2: /* LLDT_RM16 */
             CPU_TRACE_BLOCK_BEGIN("LLDT_RM16");
             CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 2));
+            if (_GetCPL) CPU_TRACE_CHECK_RETURN(_SetExcept_GP(0));
             CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
             CPU_TRACE_CHECK_RETURN(_s_load_ldtr(context, X86_CPU_MASK_U16(instruction_state.data.crm)));
             CPU_TRACE_BLOCK_END;
@@ -16877,6 +16940,7 @@ static void INS_0F_00(core_machine_cpu_execution_context *context)
         case 3: /* LTR_RM16 */
             CPU_TRACE_BLOCK_BEGIN("LTR_RM16");
             CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 2));
+            if (_GetCPL) CPU_TRACE_CHECK_RETURN(_SetExcept_GP(0));
             CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
             CPU_TRACE_CHECK_RETURN(_s_load_tr(context, X86_CPU_MASK_U16(instruction_state.data.crm)));
             CPU_TRACE_BLOCK_END;
@@ -17003,20 +17067,18 @@ static void INS_0F_01(core_machine_cpu_execution_context *context)
         break;
     case 2: /* LGDT_M32_16 */
         CPU_TRACE_BLOCK_BEGIN("LGDT_M32_16");
-        if (_IsProtected && (_GetEFLAGS_VM || _GetCPL))
+        if (_GetCPL)
             CPU_TRACE_CHECK_RETURN(_SetExcept_GP(0));
         CPU_TRACE_CHECK_RETURN(_d_modrm_table_memory(context, modrm));
-        CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
+        CPU_TRACE_CHECK_RETURN(_m_read_pair(context, 2, 4));
         limit = X86_CPU_MASK_U16(instruction_state.data.crm);
-        instruction_state.data.mrm.offset += 2;
-        CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 4));
         switch (_GetOperandSize)
         {
         case 2:
-            base = X86_CPU_MASK_U24(instruction_state.data.crm);
+            base = X86_CPU_MASK_U24(instruction_state.data.crm >> 16u);
             break;
         case 4:
-            base = X86_CPU_MASK_U32(instruction_state.data.crm);
+            base = X86_CPU_MASK_U32(instruction_state.data.crm >> 16u);
             break;
         default:
             CPU_TRACE_IMPOSSIBLE_RETURN;
@@ -17027,20 +17089,18 @@ static void INS_0F_01(core_machine_cpu_execution_context *context)
         break;
     case 3: /* LIDT_M32_16 */
         CPU_TRACE_BLOCK_BEGIN("LIDT_M32_16");
-        if (_IsProtected && (_GetEFLAGS_VM || _GetCPL))
+        if (_GetCPL)
             CPU_TRACE_CHECK_RETURN(_SetExcept_GP(0));
         CPU_TRACE_CHECK_RETURN(_d_modrm_table_memory(context, modrm));
-        CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
+        CPU_TRACE_CHECK_RETURN(_m_read_pair(context, 2, 4));
         limit = X86_CPU_MASK_U16(instruction_state.data.crm);
-        instruction_state.data.mrm.offset += 2;
-        CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 4));
         switch (_GetOperandSize)
         {
         case 2:
-            base = X86_CPU_MASK_U24(instruction_state.data.crm);
+            base = X86_CPU_MASK_U24(instruction_state.data.crm >> 16u);
             break;
         case 4:
-            base = X86_CPU_MASK_U32(instruction_state.data.crm);
+            base = X86_CPU_MASK_U32(instruction_state.data.crm >> 16u);
             break;
         default:
             CPU_TRACE_IMPOSSIBLE_RETURN;
@@ -17053,6 +17113,8 @@ static void INS_0F_01(core_machine_cpu_execution_context *context)
         CPU_TRACE_BLOCK_BEGIN("SMSW_RM16");
         CPU_TRACE_CHECK_RETURN(_d_modrm(context, 0, 2));
         instruction_state.data.crm = X86_CPU_MASK_U16(cpu_state.data.cr0);
+        if (context->cpu_profile == CORE_MACHINE_CPU_PROFILE_80286)
+            instruction_state.data.crm = (instruction_state.data.crm & 0x000fu) | 0xfff0u;
         CPU_TRACE_CHECK_RETURN(_m_write_rm(context, 2));
         CPU_TRACE_BLOCK_END;
         break;
@@ -17144,13 +17206,13 @@ static void LAR_R32_RM32(core_machine_cpu_execution_context *context)
                 case 2:
                     CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
                     descriptor = (X86_CPU_MASK_U16(descriptor >> 32) & 0xff00);
-                    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(descriptor), 2));
+                    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(descriptor), 2));
                     CPU_TRACE_BLOCK_END;
                     break;
                 case 4:
                     CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
                     descriptor = (X86_CPU_MASK_U32(descriptor >> 32) & 0x00ffff00);
-                    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(descriptor), 4));
+                    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(descriptor), 4));
                     CPU_TRACE_BLOCK_END;
                     break;
                 default:
@@ -17239,12 +17301,12 @@ static void LSL_R32_RM32(core_machine_cpu_execution_context *context)
                 {
                 case 2:
                     CPU_TRACE_BLOCK_BEGIN("OperandSize(2)");
-                    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(limit), 2));
+                    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(limit), 2));
                     CPU_TRACE_BLOCK_END;
                     break;
                 case 4:
                     CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-                    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(limit), 4));
+                    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(limit), 4));
                     CPU_TRACE_BLOCK_END;
                     break;
                 default:
@@ -17309,7 +17371,7 @@ static void MOV_R32_CR(core_machine_cpu_execution_context *context)
     {
         CPU_TRACE_CHECK_RETURN(UndefinedOpcode(context));
     }
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rrm, X86_CPU_REFERENCE_OF(instruction_state.data.cr), 4));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rrm, X86_CPU_REFERENCE_OF(instruction_state.data.cr), 4));
     CPU_TRACE_CALL_END;
 }
 static void MOV_R32_DR(core_machine_cpu_execution_context *context)
@@ -17324,7 +17386,7 @@ static void MOV_R32_DR(core_machine_cpu_execution_context *context)
         CPU_TRACE_BLOCK_END;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm_dreg(context));
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rrm, X86_CPU_REFERENCE_OF(instruction_state.data.cr), 4));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rrm, X86_CPU_REFERENCE_OF(instruction_state.data.cr), 4));
     CPU_TRACE_CALL_END;
 }
 static void MOV_CR_R32(core_machine_cpu_execution_context *context)
@@ -17370,7 +17432,7 @@ static void MOV_DR_R32(core_machine_cpu_execution_context *context)
         CPU_TRACE_BLOCK_END;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm_dreg(context));
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), 4));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), 4));
     CPU_TRACE_CALL_END;
 }
 static void MOV_R32_TR(core_machine_cpu_execution_context *context)
@@ -17385,7 +17447,7 @@ static void MOV_R32_TR(core_machine_cpu_execution_context *context)
         CPU_TRACE_BLOCK_END;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm_treg(context));
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rrm, X86_CPU_REFERENCE_OF(instruction_state.data.cr), 4));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rrm, X86_CPU_REFERENCE_OF(instruction_state.data.cr), 4));
     CPU_TRACE_CALL_END;
 }
 static void MOV_TR_R32(core_machine_cpu_execution_context *context)
@@ -17400,7 +17462,7 @@ static void MOV_TR_R32(core_machine_cpu_execution_context *context)
         CPU_TRACE_BLOCK_END;
     }
     CPU_TRACE_CHECK_RETURN(_d_modrm_treg(context));
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), 4));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), 4));
     CPU_TRACE_CALL_END;
 }
 _______todo WRMSR(core_machine_cpu_execution_context *context)
@@ -17839,7 +17901,7 @@ static void IMUL_R32_RM32(core_machine_cpu_execution_context *context)
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, _GetOperandSize, _GetOperandSize));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
     CPU_TRACE_CHECK_RETURN(_a_imul2(context, instruction_state.data.cr, instruction_state.data.crm, _GetOperandSize * 8));
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
     CPU_TRACE_CALL_END;
 }
 static void LSS_R32_M16_32(core_machine_cpu_execution_context *context)
@@ -17850,7 +17912,7 @@ static void LSS_R32_M16_32(core_machine_cpu_execution_context *context)
     _adv;
     CPU_TRACE_CHECK_RETURN(_d_modrm_ea(context, _GetOperandSize,
         _GetOperandSize));
-    CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
+    CPU_TRACE_CHECK_RETURN(_m_read_pair(context, _GetOperandSize, 2));
     switch (_GetOperandSize)
     {
     case 2:
@@ -17863,9 +17925,7 @@ static void LSS_R32_M16_32(core_machine_cpu_execution_context *context)
         CPU_TRACE_IMPOSSIBLE_RETURN;
         break;
     }
-    instruction_state.data.mrm.offset += _GetOperandSize;
-    CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
-    selector = X86_CPU_MASK_U16(instruction_state.data.crm);
+    selector = X86_CPU_MASK_U16(instruction_state.data.crm >> (_GetOperandSize * 8u));
     CPU_TRACE_CHECK_RETURN(_e_load_far(context, &cpu_state.data.ss, instruction_state.data.rr, selector, offset, _GetOperandSize));
     CPU_TRACE_CALL_END;
 }
@@ -17888,7 +17948,7 @@ static void LFS_R32_M16_32(core_machine_cpu_execution_context *context)
     _adv;
     CPU_TRACE_CHECK_RETURN(_d_modrm_ea(context, _GetOperandSize,
         _GetOperandSize));
-    CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
+    CPU_TRACE_CHECK_RETURN(_m_read_pair(context, _GetOperandSize, 2));
     switch (_GetOperandSize)
     {
     case 2:
@@ -17901,9 +17961,7 @@ static void LFS_R32_M16_32(core_machine_cpu_execution_context *context)
         CPU_TRACE_IMPOSSIBLE_RETURN;
         break;
     }
-    instruction_state.data.mrm.offset += _GetOperandSize;
-    CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
-    selector = X86_CPU_MASK_U16(instruction_state.data.crm);
+    selector = X86_CPU_MASK_U16(instruction_state.data.crm >> (_GetOperandSize * 8u));
     CPU_TRACE_CHECK_RETURN(_e_load_far(context, &cpu_state.data.fs, instruction_state.data.rr, selector, offset, _GetOperandSize));
     CPU_TRACE_CALL_END;
 }
@@ -17916,7 +17974,7 @@ static void LGS_R32_M16_32(core_machine_cpu_execution_context *context)
     _adv;
     CPU_TRACE_CHECK_RETURN(_d_modrm_ea(context, _GetOperandSize,
         _GetOperandSize));
-    CPU_TRACE_CHECK_RETURN(_m_read_rm(context, _GetOperandSize));
+    CPU_TRACE_CHECK_RETURN(_m_read_pair(context, _GetOperandSize, 2));
     switch (_GetOperandSize)
     {
     case 2:
@@ -17929,9 +17987,7 @@ static void LGS_R32_M16_32(core_machine_cpu_execution_context *context)
         CPU_TRACE_IMPOSSIBLE_RETURN;
         break;
     }
-    instruction_state.data.mrm.offset += _GetOperandSize;
-    CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
-    selector = X86_CPU_MASK_U16(instruction_state.data.crm);
+    selector = X86_CPU_MASK_U16(instruction_state.data.crm >> (_GetOperandSize * 8u));
     CPU_TRACE_CHECK_RETURN(_e_load_far(context, &cpu_state.data.gs, instruction_state.data.rr, selector, offset, _GetOperandSize));
     CPU_TRACE_CALL_END;
 }
@@ -17942,7 +17998,7 @@ static void MOVZX_R32_RM8(core_machine_cpu_execution_context *context)
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, _GetOperandSize, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
     instruction_state.data.crm = (lib_u8)instruction_state.data.crm;
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), _GetOperandSize));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), _GetOperandSize));
     CPU_TRACE_CALL_END;
 }
 static void MOVZX_R32_RM16(core_machine_cpu_execution_context *context)
@@ -17952,7 +18008,7 @@ static void MOVZX_R32_RM16(core_machine_cpu_execution_context *context)
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, _GetOperandSize, 2));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
     instruction_state.data.crm = (lib_u16)instruction_state.data.crm;
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), _GetOperandSize));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), _GetOperandSize));
     CPU_TRACE_CALL_END;
 }
 static void INS_0F_BA(core_machine_cpu_execution_context *context)
@@ -18046,7 +18102,7 @@ static void BSF_R32_RM32(core_machine_cpu_execution_context *context)
     if (!_GetEFLAGS_ZF)
     {
         CPU_TRACE_BLOCK_BEGIN("EFLAGS_ZF(0)");
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
         CPU_TRACE_BLOCK_END;
     }
     CPU_TRACE_CALL_END;
@@ -18062,7 +18118,7 @@ static void BSR_R32_RM32(core_machine_cpu_execution_context *context)
     if (!_GetEFLAGS_ZF)
     {
         CPU_TRACE_BLOCK_BEGIN("EFLAGS_ZF(0)");
-        CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
+        CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.result), _GetOperandSize));
         CPU_TRACE_BLOCK_END;
     }
     CPU_TRACE_CALL_END;
@@ -18074,7 +18130,7 @@ static void MOVSX_R32_RM8(core_machine_cpu_execution_context *context)
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, _GetOperandSize, 1));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 1));
     instruction_state.data.crm = (lib_i8)instruction_state.data.crm;
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), _GetOperandSize));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), _GetOperandSize));
     CPU_TRACE_CALL_END;
 }
 static void MOVSX_R32_RM16(core_machine_cpu_execution_context *context)
@@ -18084,7 +18140,7 @@ static void MOVSX_R32_RM16(core_machine_cpu_execution_context *context)
     CPU_TRACE_CHECK_RETURN(_d_modrm(context, _GetOperandSize, 2));
     CPU_TRACE_CHECK_RETURN(_m_read_rm(context, 2));
     instruction_state.data.crm = (lib_i16)instruction_state.data.crm;
-    CPU_TRACE_CHECK_RETURN(_m_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), _GetOperandSize));
+    CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(instruction_state.data.crm), _GetOperandSize));
     CPU_TRACE_CALL_END;
 }
 
@@ -18107,8 +18163,10 @@ static void ExecInit(core_machine_cpu_execution_context *context)
         context->prefetch_linear || instruction_state.data.linear -
         context->prefetch_linear >= context->prefetch_count) {
         lib_u8 prefetch_bytes = context->prefetch_capacity;
+        lib_u32 page_bytes = _GetPageSize - _GetLinear_Offset(instruction_state.data.linear);
 
         core_machine_cpu_execution_invalidate_prefetch(context);
+        if (prefetch_bytes > page_bytes) prefetch_bytes = (lib_u8)page_bytes;
         if (cpu_state.data.eip <= cpu_state.data.cs.limit &&
             (lib_u64)cpu_state.data.cs.limit - cpu_state.data.eip + 1u <
                 prefetch_bytes) {
@@ -18126,21 +18184,16 @@ static void ExecInit(core_machine_cpu_execution_context *context)
             context->prefetch_valid = LIB_TRUE;
         }
     }
+    instruction_state.data.oplen = 0u;
+    lib_memory_set(instruction_state.data.opcodes, 0, sizeof(instruction_state.data.opcodes));
     if (context->prefetch_valid && instruction_state.data.linear >=
         context->prefetch_linear && instruction_state.data.linear -
         context->prefetch_linear < context->prefetch_count) {
         lib_u8 available = context->prefetch_count -
             (lib_u8)(instruction_state.data.linear - context->prefetch_linear);
-        lib_memory_set(instruction_state.data.opcodes, 0, 15u);
         lib_memory_copy(instruction_state.data.opcodes, context->prefetch_bytes +
             (instruction_state.data.linear - context->prefetch_linear), available);
-    }
-    if (instruction_state.data.except) {
-        instruction_state.data.oplen = 0;
-    }
-    else
-    {
-        instruction_state.data.oplen = 15;
+        instruction_state.data.oplen = available;
     }
 
     instruction_state.data.flagLock = LIB_FALSE;
@@ -18153,7 +18206,6 @@ static void ExecInit(core_machine_cpu_execution_context *context)
     instruction_state.data.source_lsl_granularity_valid = LIB_FALSE;
     instruction_state.data.source_lsl_page_granular = LIB_FALSE;
     instruction_state.data.flagInsLoop = LIB_FALSE;
-    instruction_state.data.flagMaskInt = LIB_FALSE;
     instruction_state.data.bit = 0;
     instruction_state.data.opr1 = 0;
     instruction_state.data.opr2 = 0;
@@ -18163,6 +18215,7 @@ static void ExecInit(core_machine_cpu_execution_context *context)
     instruction_state.data.mrm.offset = 0u;
     context->debug_tf_before = _GetEFLAGS_TF;
     context->debug_rf_before = _GetEFLAGS_RF;
+    context->instruction_task_switched = LIB_FALSE;
     if (context->diagnostic_provider != LIB_NULL &&
         context->diagnostic_provider->record_instruction != LIB_NULL)
     {
@@ -18199,11 +18252,22 @@ lib_u8 core_machine_cpu_execution_preview_lexeme(
     preview.preview_mode = LIB_TRUE;
     ExecInit(&preview);
     if (preview_instructions.data.except) return LIB_FALSE;
-    return core_machine_cpu_instruction_lexeme_scan_with_options(
-        preview_instructions.data.opcodes,
-        (lib_u8)sizeof(preview_instructions.data.opcodes),
-        preview.cpu_profile, preview_cpu.data.cs.seg.exec.defsize,
-        preview.cpu_80386_cr_mov_ignores_mod, out_lexeme);
+    for (;;) {
+        lib_u8 byte;
+        lib_u32 offset;
+
+        if (core_machine_cpu_instruction_lexeme_scan_with_options(
+                preview_instructions.data.opcodes, preview_instructions.data.oplen,
+                preview.cpu_profile, preview_cpu.data.cs.seg.exec.defsize,
+                preview.cpu_80386_cr_mov_ignores_mod, out_lexeme)) return LIB_TRUE;
+        if (preview_instructions.data.oplen >= sizeof(preview_instructions.data.opcodes))
+            return LIB_FALSE;
+        offset = preview_instructions.data.receip + preview_instructions.data.oplen;
+        if (preview.cpu_profile < CORE_MACHINE_CPU_PROFILE_80286)
+            offset = X86_CPU_MASK_U16(offset);
+        _s_read_cs(&preview, offset, (lib_uptr)&byte, 1u);
+        if (preview_instructions.data.except) return LIB_FALSE;
+    }
 }
 
 static lib_u32 _debug_breakpoint_address(lib_u8 index,
@@ -18238,13 +18302,14 @@ static lib_u8 _debug_breakpoint_length(lib_u8 length)
 }
 
 static lib_u32 _debug_match_instruction_breakpoint(
-    core_machine_cpu_execution_context *context)
+    core_machine_cpu_execution_context *context, lib_u32 *matched)
 {
     lib_u32 enabled = 0u;
     lib_u8 index;
 
+    *matched = 0u;
     if (context->cpu_profile < CORE_MACHINE_CPU_PROFILE_80386 ||
-        context->debug_rf_before) return 0u;
+        context->debug_rf_before || context->debug_segment_shadow_before) return 0u;
     for (index = 0u; index < 4u; ++index) {
         lib_u32 control = (cpu_state.data.dr7 >> (16u + index * 4u)) &
             0x0fu;
@@ -18252,6 +18317,7 @@ static lib_u32 _debug_match_instruction_breakpoint(
         if ((control & 3u) != 0u || (control >> 2u) != 0u ||
             _debug_breakpoint_address(index, &cpu_state) !=
                 instruction_state.data.linear) continue;
+        *matched |= (lib_u32)1u << index;
         if (_debug_breakpoint_enabled(index, &cpu_state)) {
             enabled |= (lib_u32)1u << index;
         }
@@ -18260,12 +18326,13 @@ static lib_u32 _debug_match_instruction_breakpoint(
 }
 
 static lib_u32 _debug_match_data_breakpoint(
-    core_machine_cpu_execution_context *context)
+    core_machine_cpu_execution_context *context, lib_u32 *matched)
 {
     lib_u32 enabled = 0u;
     lib_u8 index;
     lib_u16 access_index;
 
+    *matched = 0u;
     if (context->cpu_profile < CORE_MACHINE_CPU_PROFILE_80386) return 0u;
     for (access_index = 0u; access_index < instruction_state.data.msize;
         ++access_index) {
@@ -18289,6 +18356,7 @@ static lib_u32 _debug_match_data_breakpoint(
             first = access->linear;
             last = first + access->byte - 1u;
             if (last < address || first >= address + length) continue;
+            *matched |= (lib_u32)1u << index;
             if (_debug_breakpoint_enabled(index, &cpu_state)) {
                 enabled |= (lib_u32)1u << index;
             }
@@ -18310,15 +18378,22 @@ static void _debug_complete_instruction(
     core_machine_cpu_execution_context *context, lib_u8 opcode)
 {
     lib_u32 cause;
+    lib_u32 matched = 0u;
 
     if (instruction_state.data.except) return;
-    cause = _debug_match_data_breakpoint(context);
-    /* An interrupt gate can clear TF while completing the instruction.  A
-     * single-step trap is pending only when tracing remained enabled at the
-     * architectural completion boundary. */
-    if (context->debug_tf_before && _GetEFLAGS_TF) cause |= VCPU_DR6_BS;
+    cause = context->interrupt_shadow == CPU_INTERRUPT_SHADOW_SEGMENT ?
+        0u : _debug_match_data_breakpoint(context, &matched);
+    if (cause != 0u) cpu_state.data.dr6 |= matched;
+    /* INT/INTO and task entry suppress the outgoing instruction's step trap;
+     * ordinary completion uses TF sampled before execution, including POPF. */
+    if (context->debug_tf_before && !context->instruction_task_switched &&
+        context->interrupt_shadow != CPU_INTERRUPT_SHADOW_SEGMENT &&
+        opcode != 0xccu && opcode != 0xcdu && !(opcode == 0xceu &&
+            X86_CPU_BIT_IS_SET(instruction_state.data.oldcpu.data.eflags,
+                VCPU_EFLAGS_OF))) cause |= VCPU_DR6_BS;
     _debug_schedule_trap(context, cause);
-    if (context->debug_rf_before && opcode != 0xcfu) _ClrEFLAGS_RF;
+    if (context->debug_rf_before && opcode != 0xcfu && opcode != 0x9du &&
+        !context->instruction_task_switched) _ClrEFLAGS_RF;
 }
 
 static void _debug_deliver_trap(core_machine_cpu_execution_context *context)
@@ -18326,7 +18401,8 @@ static void _debug_deliver_trap(core_machine_cpu_execution_context *context)
     t_cpu trap_cpu;
     lib_u32 cause;
 
-    if (!context->debug_trap_pending) return;
+    if (!context->debug_trap_pending ||
+        context->interrupt_shadow == CPU_INTERRUPT_SHADOW_SEGMENT) return;
     cause = context->debug_trap_cause;
     context->debug_trap_pending = LIB_FALSE;
     context->debug_trap_cause = 0u;
@@ -18346,249 +18422,157 @@ static void _debug_deliver_trap(core_machine_cpu_execution_context *context)
     }
     ExecFinal(context);
 }
-static lib_u8 _e_is_contributory_exception(lib_u32 exception)
+static lib_u8 _e_exception_vector(core_machine_cpu_execution_context *context,
+    lib_u32 exception)
 {
-    return exception == VCPUINS_EXCEPT_TS || exception == VCPUINS_EXCEPT_NP ||
-        exception == VCPUINS_EXCEPT_SS || exception == VCPUINS_EXCEPT_GP;
-}
-/* Real-mode final delivery has one rollback and diagnostic boundary.  The
- * vector remains an architectural property of the producer; this helper owns
- * only the common fault-state restoration around IVT delivery. */
-static lib_u8 _e_final_deliver_real_exception(
-    core_machine_cpu_execution_context *context, const t_cpu *fault_cpu,
-    lib_u8 exception_vector)
-{
-    lib_u32 original_except;
-    lib_u32 original_excode;
+    const lib_u32 supported = VCPUINS_EXCEPT_DE | VCPUINS_EXCEPT_DB |
+        VCPUINS_EXCEPT_BR | VCPUINS_EXCEPT_UD | VCPUINS_EXCEPT_NM |
+        VCPUINS_EXCEPT_DF | VCPUINS_EXCEPT_09 | VCPUINS_EXCEPT_TS |
+        VCPUINS_EXCEPT_NP | VCPUINS_EXCEPT_SS | VCPUINS_EXCEPT_GP |
+        VCPUINS_EXCEPT_PF | VCPUINS_EXCEPT_MF;
+    lib_u8 vector;
 
-    CPU_TRACE_CALL_BEGIN("_e_final_deliver_real_exception");
-    original_except = instruction_state.data.except;
-    original_excode = instruction_state.data.excode;
-    cpu_state = *fault_cpu;
-    _e_except_n(context, exception_vector, _GetOperandSize);
-    if (instruction_state.data.except) {
-        cpu_state = *fault_cpu;
-        instruction_state.data.except = original_except;
-        instruction_state.data.excode = original_excode;
-        CPU_TRACE_CALL_END;
-        return LIB_FALSE;
+    if ((exception & supported) == 0u) return 0xffu;
+    for (vector = 0u; vector <= 16u; ++vector) {
+        if (exception != (UINT32_C(1) << vector)) continue;
+        /* Earlier chips have no protected-mode delivery or vectors 8-16,
+         * except the 8087 WAIT-error interface, which reports #MF through
+         * the real-mode vector-16 table.  A strict unsupported-op diagnostic
+         * is not hardware INT 6. */
+        if (context->cpu_profile < CORE_MACHINE_CPU_PROFILE_80286 &&
+            (X86_CPU_BIT_IS_SET(cpu_state.data.cr0, VCPU_CR0_PE) ||
+             (vector >= 8u && exception != VCPUINS_EXCEPT_MF)))
+            return 0xffu;
+        if (context->cpu_profile < CORE_MACHINE_CPU_PROFILE_80186 &&
+            vector >= 5u && exception != VCPUINS_EXCEPT_MF)
+            return 0xffu;
+        if (context->cpu_profile < CORE_MACHINE_CPU_PROFILE_80386 &&
+            vector == 14u) return 0xffu;
+        if (!X86_CPU_BIT_IS_SET(cpu_state.data.cr0, VCPU_CR0_PE) &&
+            (vector == 9u || vector == 10u || vector == 11u || vector == 14u))
+            return 0xffu;
+        return vector;
     }
-    if (context->diagnostic_provider != LIB_NULL &&
-        context->diagnostic_provider->record_delivered_exception != LIB_NULL) {
-        instruction_state.data.except = original_except;
-        instruction_state.data.excode = original_excode;
-        core_machine_cpu_diagnostic_publish_snapshot(
-            context->diagnostic_provider->record_delivered_exception,
-            context->diagnostic_context, fault_cpu, &instruction_state);
-        instruction_state.data.except = 0u;
-    }
-    CPU_TRACE_CALL_END;
-    return LIB_TRUE;
+    return 0xffu;
 }
 
 static void _e_mark_instruction_fault_delivered(
     core_machine_cpu_execution_context *context)
 {
-    if (context != LIB_NULL && context->instruction_in_progress) {
+    if (context != LIB_NULL && context->instruction_in_progress)
         context->instruction_fault_delivered = LIB_TRUE;
-    }
 }
 
 static void ExecFinal(core_machine_cpu_execution_context *context)
 {
     t_cpu fault_cpu;
-    lib_u32 original_except;
-    lib_u32 original_excode;
-    lib_u8 exception_vector;
-    lib_u8 exception_deliverable;
-    if (instruction_state.data.flagInsLoop)
-    {
+    const lib_u32 next_eip = cpu_state.data.eip;
+    lib_u32 active, code, secondary, secondary_code;
+    lib_u8 vector;
+
+    if (instruction_state.data.flagInsLoop) {
         cpu_state.data.cs = instruction_state.data.oldcpu.data.cs;
         cpu_state.data.eip = instruction_state.data.oldcpu.data.eip;
     }
-    if (instruction_state.data.except)
-    {
-        fault_cpu = instruction_state.data.oldcpu;
-        if (instruction_state.data.except == VCPUINS_EXCEPT_SHUTDOWN) {
+    if (!instruction_state.data.except) return;
+    fault_cpu = context->instruction_task_switched ?
+        context->instruction_task_checkpoint : instruction_state.data.oldcpu;
+    active = instruction_state.data.except;
+    code = instruction_state.data.excode;
+    if (active == VCPUINS_EXCEPT_DB) fault_cpu.data.dr6 = cpu_state.data.dr6;
+    if (active == VCPUINS_EXCEPT_PF) fault_cpu.data.cr2 = cpu_state.data.cr2;
+
+    for (;;) {
+        if (active == VCPUINS_EXCEPT_SHUTDOWN) {
             cpu_state = fault_cpu;
+            instruction_state.data.except = active;
+            instruction_state.data.excode = code;
             if (context->diagnostic_provider != LIB_NULL &&
-                context->diagnostic_provider->record_delivered_exception != LIB_NULL) {
+                context->diagnostic_provider->record_delivered_exception != LIB_NULL)
                 core_machine_cpu_diagnostic_publish_snapshot(
                     context->diagnostic_provider->record_delivered_exception,
                     context->diagnostic_context, &fault_cpu, &instruction_state);
-            }
             core_machine_cpu_execution_request_shutdown(context);
-            core_machine_cpu_execution_request_stop(context);
-            if (context->instruction_in_progress)
-                context->instruction_fault_delivered = LIB_TRUE;
-            return;
-        }
-        if (instruction_state.data.except == VCPUINS_EXCEPT_DB) {
-            fault_cpu.data.dr6 = cpu_state.data.dr6;
-            fault_cpu.data.eflags |= VCPU_EFLAGS_RF;
-        }
-        if (X86_CPU_BIT_IS_SET(instruction_state.data.except, VCPUINS_EXCEPT_PF))
-        {
-            fault_cpu.data.cr2 = cpu_state.data.cr2;
-        }
-        exception_vector = 0u;
-        exception_deliverable = LIB_FALSE;
-        if (instruction_state.data.except == VCPUINS_EXCEPT_DE) {
-            exception_vector = 0x00u;
-            exception_deliverable = LIB_TRUE;
-        }
-        else if (instruction_state.data.except == VCPUINS_EXCEPT_DB) {
-            exception_vector = 0x01u;
-            exception_deliverable = LIB_TRUE;
-        }
-        else if (instruction_state.data.except == VCPUINS_EXCEPT_GP) {
-            exception_vector = 0x0du;
-            exception_deliverable = LIB_TRUE;
-        }
-        else if (instruction_state.data.except == VCPUINS_EXCEPT_UD) {
-            exception_vector = 0x06u;
-            exception_deliverable = LIB_TRUE;
-        }
-        else if (instruction_state.data.except == VCPUINS_EXCEPT_NM) {
-            exception_vector = 0x07u;
-            exception_deliverable = LIB_TRUE;
-        }
-        else if (instruction_state.data.except == VCPUINS_EXCEPT_BR) {
-            exception_vector = 0x05u;
-            exception_deliverable = LIB_TRUE;
-        }
-        else if (instruction_state.data.except == VCPUINS_EXCEPT_NP) {
-            exception_vector = 0x0bu;
-            exception_deliverable = LIB_TRUE;
-        }
-        else if (instruction_state.data.except == VCPUINS_EXCEPT_SS &&
-            context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286) {
-            exception_vector = 0x0cu;
-            exception_deliverable = LIB_TRUE;
-        }
-        else if (instruction_state.data.except == VCPUINS_EXCEPT_TS &&
-            context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286) {
-            exception_vector = 0x0au;
-            exception_deliverable = LIB_TRUE;
-        }
-        else if (instruction_state.data.except == VCPUINS_EXCEPT_PF) {
-            exception_vector = 0x0eu;
-            exception_deliverable = LIB_TRUE;
-        }
-        else if (instruction_state.data.except == VCPUINS_EXCEPT_MF) {
-            exception_vector = 0x10u;
-            exception_deliverable = LIB_TRUE;
-        }
-        if (X86_CPU_BIT_IS_SET(fault_cpu.data.cr0, VCPU_CR0_PE) &&
-            exception_deliverable) {
-            original_except = instruction_state.data.except;
-            original_excode = instruction_state.data.excode;
-            cpu_state = fault_cpu;
-            _e_except_n(context, exception_vector, _GetOperandSize);
-            if (!instruction_state.data.except) {
-                if (context->diagnostic_provider != LIB_NULL &&
-                    context->diagnostic_provider->record_delivered_exception !=
-                        LIB_NULL) {
-                    instruction_state.data.except = original_except;
-                    instruction_state.data.excode = original_excode;
-                    core_machine_cpu_diagnostic_publish_snapshot(
-                        context->diagnostic_provider->record_delivered_exception,
-                        context->diagnostic_context, &fault_cpu,
-                        &instruction_state);
-                    instruction_state.data.except = 0u;
-                }
-                if (original_except == VCPUINS_EXCEPT_DB) _ClrEFLAGS_RF;
-                _e_mark_instruction_fault_delivered(context);
-                return;
-            }
-            cpu_state = fault_cpu;
-            if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386 &&
-                _e_is_contributory_exception(original_except) &&
-                _e_is_contributory_exception(instruction_state.data.except)) {
-                instruction_state.data.except = VCPUINS_EXCEPT_DF;
-                instruction_state.data.excode = 0u;
-                _e_except_n(context, 0x08u, _GetOperandSize);
-                if (!instruction_state.data.except) {
-                    if (context->diagnostic_provider != LIB_NULL &&
-                        context->diagnostic_provider->record_delivered_exception !=
-                            LIB_NULL) {
-                        instruction_state.data.except = VCPUINS_EXCEPT_DF;
-                        instruction_state.data.excode = 0u;
-                        core_machine_cpu_diagnostic_publish_snapshot(
-                            context->diagnostic_provider->record_delivered_exception,
-                            context->diagnostic_context, &fault_cpu,
-                            &instruction_state);
-                        instruction_state.data.except = 0u;
-                    }
-                    _e_mark_instruction_fault_delivered(context);
-                    return;
-                }
-                /* The CPU enters shutdown. Platform reset policy consumes the
-                 * event without changing CPU exception production. */
-                core_machine_cpu_execution_request_shutdown(context);
-                cpu_state = fault_cpu;
-                instruction_state.data.except = VCPUINS_EXCEPT_DF;
-                instruction_state.data.excode = 0u;
-            }
-            else {
-                instruction_state.data.except = original_except;
-                instruction_state.data.excode = original_excode;
-            }
-        }
-
-        if (!X86_CPU_BIT_IS_SET(fault_cpu.data.cr0, VCPU_CR0_PE) &&
-            (instruction_state.data.except == VCPUINS_EXCEPT_DE ||
-             instruction_state.data.except == VCPUINS_EXCEPT_DB ||
-             instruction_state.data.except == VCPUINS_EXCEPT_PF ||
-             instruction_state.data.except == VCPUINS_EXCEPT_MF ||
-             instruction_state.data.except == VCPUINS_EXCEPT_UD) &&
-            _e_final_deliver_real_exception(context, &fault_cpu,
-                exception_vector)) {
             _e_mark_instruction_fault_delivered(context);
             return;
         }
-
-        if (!X86_CPU_BIT_IS_SET(fault_cpu.data.cr0, VCPU_CR0_PE) &&
-            X86_CPU_BIT_IS_SET(instruction_state.data.except, VCPUINS_EXCEPT_BR) &&
-            _e_final_deliver_real_exception(context, &fault_cpu, 0x05u)) {
-            _e_mark_instruction_fault_delivered(context);
-            return;
-        }
-
-        if (!X86_CPU_BIT_IS_SET(fault_cpu.data.cr0, VCPU_CR0_PE) &&
-            X86_CPU_BIT_IS_SET(instruction_state.data.except, VCPUINS_EXCEPT_NM) &&
-            _e_final_deliver_real_exception(context, &fault_cpu, 0x07u)) {
-            _e_mark_instruction_fault_delivered(context);
-            return;
-        }
-
-        if (!X86_CPU_BIT_IS_SET(fault_cpu.data.cr0, VCPU_CR0_PE) &&
-            X86_CPU_BIT_IS_SET(instruction_state.data.except, VCPUINS_EXCEPT_GP) &&
-            _e_final_deliver_real_exception(context, &fault_cpu, 0x0du)) {
-            _e_mark_instruction_fault_delivered(context);
-            return;
-        }
-
-        if (context->diagnostic_provider != LIB_NULL &&
-            context->diagnostic_provider->record_fault != LIB_NULL)
-        {
-            core_machine_cpu_diagnostic_publish_snapshot(
-                context->diagnostic_provider->record_fault,
-                context->diagnostic_context, &fault_cpu, &instruction_state);
-        }
+        vector = _e_exception_vector(context, active);
+        if (vector == 0xffu) break;
         cpu_state = fault_cpu;
-        core_machine_cpu_execution_request_stop(context);
+        if (active == VCPUINS_EXCEPT_DE &&
+            context->cpu_profile < CORE_MACHINE_CPU_PROFILE_80186)
+            cpu_state.data.eip = next_eip;
+        instruction_state.data.except = active;
+        instruction_state.data.excode = code;
+        /* Exceptions do not inherit the interrupted instruction's override.
+         * Protected entry selects its own gate/TSS width. */
+        _e_except_n(context, vector, 2u);
+        if (!instruction_state.data.except) {
+            instruction_state.data.except = active;
+            instruction_state.data.excode = code;
+            if (context->diagnostic_provider != LIB_NULL &&
+                context->diagnostic_provider->record_delivered_exception != LIB_NULL)
+                core_machine_cpu_diagnostic_publish_snapshot(
+                    context->diagnostic_provider->record_delivered_exception,
+                    context->diagnostic_context, &fault_cpu, &instruction_state);
+            instruction_state.data.except = 0u;
+            _e_mark_instruction_fault_delivered(context);
+            return;
+        }
+        secondary = instruction_state.data.except;
+        secondary_code = instruction_state.data.excode;
+        if (context->instruction_task_switched)
+            fault_cpu = context->instruction_task_checkpoint;
+        if (secondary == VCPUINS_EXCEPT_PF)
+            fault_cpu.data.cr2 = cpu_state.data.cr2;
+        if (secondary == VCPUINS_EXCEPT_SHUTDOWN) {
+            active = secondary;
+            code = secondary_code;
+            continue;
+        }
+        /* A failed provider is not an architectural second exception. */
+        if (_e_exception_vector(context, secondary) == 0xffu) {
+            active = secondary;
+            code = secondary_code;
+            break;
+        }
+        if (active == VCPUINS_EXCEPT_DF) {
+            active = VCPUINS_EXCEPT_SHUTDOWN;
+            code = 0u;
+            continue;
+        }
+        if (cpu_exception_requires_double_fault(context->cpu_profile, active, secondary)) {
+            active = VCPUINS_EXCEPT_DF;
+            code = 0u;
+        } else {
+            active = secondary;
+            code = secondary_code;
+        }
     }
+    cpu_state = fault_cpu;
+    instruction_state.data.except = active;
+    instruction_state.data.excode = code;
+    if (context->diagnostic_provider != LIB_NULL &&
+        context->diagnostic_provider->record_fault != LIB_NULL)
+        core_machine_cpu_diagnostic_publish_snapshot(
+            context->diagnostic_provider->record_fault,
+            context->diagnostic_context, &fault_cpu, &instruction_state);
+    core_machine_cpu_execution_request_stop(context);
 }
 static void ExecIns(core_machine_cpu_execution_context *context)
 {
     lib_u8 opcode = 0;
     lib_u32 debug_cause;
+    lib_u32 debug_matches;
 
     ExecInit(context);
-    debug_cause = _debug_match_instruction_breakpoint(context);
+    if (instruction_state.data.except) {
+        ExecFinal(context);
+        return;
+    }
+    debug_cause = _debug_match_instruction_breakpoint(context, &debug_matches);
     if (debug_cause != 0u) {
-        cpu_state.data.dr6 |= debug_cause;
+        cpu_state.data.dr6 |= debug_matches;
         instruction_state.data.except = VCPUINS_EXCEPT_DB;
         ExecFinal(context);
         return;
@@ -18604,8 +18588,6 @@ static void ExecIns(core_machine_cpu_execution_context *context)
             break;
         }
         CPU_TRACE_CHECK_BREAK(ExecCpuInstruction(instruction_state.connect.insTable[opcode]));
-        CPU_TRACE_CHECK_BREAK(_s_test_eip(context));
-        CPU_TRACE_CHECK_BREAK(_s_test_esp(context));
         CPU_TRACE_CALL_END;
     } while (_kdf_check_prefix(context, opcode));
     _debug_complete_instruction(context, opcode);
@@ -18619,25 +18601,52 @@ static void ExecIns(core_machine_cpu_execution_context *context)
 static void ExecInt(core_machine_cpu_execution_context *context)
 {
     lib_u8 intr = 0x00;
+    lib_status acknowledge_status;
+    const lib_bool debug_first =
+        context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286;
+
+    if (context->stop_requested) return;
+    if (cpu_state.data.flagHalt) {
+        const lib_bool nmi_ready =
+            context->interrupt_shadow != CPU_INTERRUPT_SHADOW_SEGMENT &&
+            !context->nmi_masked && !context->nmi_in_service && context->nmi_pending;
+        const lib_bool intr_ready =
+            context->interrupt_shadow == CPU_INTERRUPT_SHADOW_NONE && _GetEFLAGS_IF &&
+            context->bus->interrupt_pending(context->bus_context);
+        /* A queued step trap cannot wake HALT. Recheck delivery inputs after
+         * the accepted wake, since handler entry can itself produce an edge. */
+        if (!nmi_ready && !intr_ready) return;
+        cpu_state.data.flagHalt = LIB_FALSE;
+    }
+    if (debug_first) _debug_deliver_trap(context);
+    if (context->stop_requested) return;
     /* hardware interrupt handler */
-    if (!instruction_state.data.flagMaskInt && !cpu_state.data.flagMaskNMI &&
-        cpu_state.data.flagNMI)
+    if (context->interrupt_shadow != CPU_INTERRUPT_SHADOW_SEGMENT &&
+        !context->nmi_masked && !context->nmi_in_service && context->nmi_pending)
     {
+        context->nmi_pending = LIB_FALSE;
+        context->nmi_in_service =
+            context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286;
         ExecInit(context);
         _e_intr_n(context, 0x02, _GetOperandSize, LIB_TRUE);
         if (!instruction_state.data.except) {
             cpu_state.data.flagHalt = LIB_FALSE;
-            cpu_state.data.flagNMI = LIB_FALSE;
         }
+        else context->nmi_pending = LIB_TRUE;
         ExecFinal(context);
     }
-    _debug_deliver_trap(context);
     if (context->stop_requested) return;
-    if (!instruction_state.data.flagMaskInt && _GetEFLAGS_IF &&
+    if (context->interrupt_shadow == CPU_INTERRUPT_SHADOW_NONE && _GetEFLAGS_IF &&
         context->bus->interrupt_pending(context->bus_context))
     {
-        if (context->bus->acknowledge_interrupt(context->bus_context,
-                &intr) != LIB_STATUS_OK) return;
+        acknowledge_status = context->bus->acknowledge_interrupt(
+            context->bus_context, &intr);
+        if (acknowledge_status != LIB_STATUS_OK) {
+            ExecInit(context);
+            _SetExcept_CE((lib_u32)acknowledge_status);
+            ExecFinal(context);
+            return;
+        }
         ExecInit(context);
         _e_intr_n(context, intr, _GetOperandSize, LIB_TRUE);
         if (!instruction_state.data.except) {
@@ -18646,6 +18655,7 @@ static void ExecInt(core_machine_cpu_execution_context *context)
         }
         ExecFinal(context);
     }
+    if (!context->stop_requested && !debug_first) _debug_deliver_trap(context);
 }
 
 /* external interface */
@@ -19210,6 +19220,14 @@ void core_machine_cpu_execution_reset(
     context->debug_trap_pending = LIB_FALSE;
     context->debug_tf_before = LIB_FALSE;
     context->debug_rf_before = LIB_FALSE;
+    context->instruction_task_switched = LIB_FALSE;
+    context->interrupt_shadow = CPU_INTERRUPT_SHADOW_NONE;
+    context->debug_segment_shadow_before = LIB_FALSE;
+    context->nmi_in_service = LIB_FALSE;
+    context->nmi_masked = LIB_FALSE;
+    context->nmi_pending = LIB_FALSE;
+    context->shutdown_state = CPU_SHUTDOWN_NONE;
+    context->shutdown_requested = LIB_FALSE;
     context->debug_trap_cause = 0u;
     context->instruction_in_progress = LIB_FALSE;
     context->instruction_fault_delivered = LIB_FALSE;
@@ -19218,8 +19236,38 @@ void core_machine_cpu_execution_refresh(
     core_machine_cpu_execution_context *context)
 {
     context->instruction_fault_delivered = LIB_FALSE;
+    if (core_machine_cpu_is_shutdown(context)) {
+        /* Shutdown admits NMI, not instructions, INTR or pending debug traps. */
+        if (context->shutdown_state == CPU_SHUTDOWN_RESET_ONLY ||
+            context->nmi_masked || context->nmi_in_service || !context->nmi_pending)
+            return;
+        context->nmi_pending = LIB_FALSE;
+        ExecInit(context);
+        _e_intr_n(context, 0x02u, 2u, LIB_TRUE);
+        if (!instruction_state.data.except) {
+            context->shutdown_state = CPU_SHUTDOWN_NONE;
+            context->shutdown_requested = LIB_FALSE;
+            context->nmi_in_service = LIB_TRUE;
+            cpu_state.data.flagHalt = LIB_FALSE;
+            /* Entry alone is not a retired instruction; Core starts the NMI
+             * handler in the next execution round through this existing outcome. */
+            context->instruction_fault_delivered = LIB_TRUE;
+        } else if (_e_exception_vector(context, instruction_state.data.except) == 0xffu &&
+            instruction_state.data.except != VCPUINS_EXCEPT_SHUTDOWN) {
+            ExecFinal(context);
+        } else {
+            /* The 286 requires RESET after unsuccessful shutdown-NMI service. */
+            if (context->cpu_profile == CORE_MACHINE_CPU_PROFILE_80286)
+                context->shutdown_state = CPU_SHUTDOWN_RESET_ONLY;
+            instruction_state.data.except = 0u;
+        }
+        return;
+    }
     if (!cpu_state.data.flagHalt)
     {
+        context->debug_segment_shadow_before =
+            context->interrupt_shadow == CPU_INTERRUPT_SHADOW_SEGMENT;
+        context->interrupt_shadow = CPU_INTERRUPT_SHADOW_NONE;
         context->instruction_in_progress = LIB_TRUE;
         ExecIns(context);
         context->instruction_in_progress = LIB_FALSE;

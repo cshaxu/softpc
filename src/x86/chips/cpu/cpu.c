@@ -124,18 +124,18 @@ lib_bool core_machine_cpu_is_halted(const core_machine_cpu_execution_context *co
 void core_machine_cpu_set_nmi_mask(core_machine_cpu_execution_context *context,
     lib_bool masked)
 {
-    cpu_state.data.flagMaskNMI = masked ? LIB_TRUE : LIB_FALSE;
+    context->nmi_masked = masked;
 }
 
 lib_bool core_machine_cpu_nmi_is_masked(const core_machine_cpu_execution_context *context)
 {
-    return cpu_state.data.flagMaskNMI != 0u;
+    return context->nmi_masked;
 }
 
 lib_bool core_machine_cpu_request_nmi(core_machine_cpu_execution_context *context)
 {
-    if (cpu_state.data.flagMaskNMI) return LIB_FALSE;
-    cpu_state.data.flagNMI = LIB_TRUE;
+    if (context->nmi_masked) return LIB_FALSE;
+    context->nmi_pending = LIB_TRUE;
     return LIB_TRUE;
 }
 
@@ -367,7 +367,7 @@ static lib_u32 core_machine_cpu_reset_code_base(
     case CORE_MACHINE_CPU_PROFILE_8086:
     case CORE_MACHINE_CPU_PROFILE_8088:
     case CORE_MACHINE_CPU_PROFILE_80186:
-        return 0x000f0000u;
+        return 0x000ffff0u;
     case CORE_MACHINE_CPU_PROFILE_80286:
         return 0x00ff0000u;
     case CORE_MACHINE_CPU_PROFILE_DEFAULT:
@@ -399,6 +399,12 @@ void core_machine_cpu_execution_context_initialize(
     context->debug_trap_pending = LIB_FALSE;
     context->debug_tf_before = LIB_FALSE;
     context->debug_rf_before = LIB_FALSE;
+    context->instruction_task_switched = LIB_FALSE;
+    context->interrupt_shadow = CPU_INTERRUPT_SHADOW_NONE;
+    context->debug_segment_shadow_before = LIB_FALSE;
+    context->nmi_in_service = LIB_FALSE;
+    context->nmi_masked = LIB_FALSE;
+    context->nmi_pending = LIB_FALSE;
     context->debug_trap_cause = 0u;
     context->preview_mode = LIB_FALSE;
     context->memory_access_provenance = CORE_MACHINE_CPU_MEMORY_ACCESS_DATA;
@@ -478,8 +484,15 @@ void core_machine_cpu_state_initialize(
         context->reset_requested = LIB_FALSE;
         context->shutdown_requested = LIB_FALSE;
         context->debug_trap_pending = LIB_FALSE;
+        context->shutdown_state = CPU_SHUTDOWN_NONE;
         context->debug_tf_before = LIB_FALSE;
         context->debug_rf_before = LIB_FALSE;
+        context->instruction_task_switched = LIB_FALSE;
+        context->interrupt_shadow = CPU_INTERRUPT_SHADOW_NONE;
+        context->debug_segment_shadow_before = LIB_FALSE;
+        context->nmi_in_service = LIB_FALSE;
+        context->nmi_masked = LIB_FALSE;
+        context->nmi_pending = LIB_FALSE;
         context->debug_trap_cause = 0u;
         context->prefetch_count = 0u;
         context->prefetch_capacity = context->cpu_profile ==
@@ -495,6 +508,8 @@ void core_machine_cpu_state_initialize(
 void core_machine_cpu_state_reset(core_machine_cpu_execution_context *context) {
     if (context == LIB_NULL || context->cpu == LIB_NULL ||
         context->instructions == LIB_NULL) return;
+    const lib_bool early = core_machine_cpu_profile_has_8086_semantics(
+        context->cpu_profile) || context->cpu_profile == CORE_MACHINE_CPU_PROFILE_80186;
     context->source_repeat_active = LIB_FALSE;
     context->source_repeat_cs = 0u;
     context->source_repeat_eip = 0u;
@@ -518,7 +533,7 @@ void core_machine_cpu_state_reset(core_machine_cpu_execution_context *context) {
         context->prefetch_reservation_count = 0u;
     }
 
-    cpu_state.data.eip = 0x0000fff0;
+    cpu_state.data.eip = early ? 0u : 0x0000fff0u;
     cpu_state.data.eflags = 0x00000002;
     /* Intel 80386 PRM 10.1 defines DH=3 after RESET# for the 386DX.
      * The selected zero revision keeps the documented device identifier
@@ -528,13 +543,13 @@ void core_machine_cpu_state_reset(core_machine_cpu_execution_context *context) {
 
     cpu_state.data.cs.base = core_machine_cpu_reset_code_base(context->cpu_profile);
     cpu_state.data.cs.dpl = 0u;
-    cpu_state.data.cs.limit = LIB_UINT32_MAX;
+    cpu_state.data.cs.limit = 0xffffu;
     cpu_state.data.cs.seg.accessed = LIB_TRUE;
     cpu_state.data.cs.seg.executable = LIB_TRUE;
     cpu_state.data.cs.seg.exec.conform = LIB_FALSE;
     cpu_state.data.cs.seg.exec.defsize = LIB_FALSE;
     cpu_state.data.cs.seg.exec.readable = LIB_TRUE;
-    cpu_state.data.cs.selector = 0xf000;
+    cpu_state.data.cs.selector = early ? 0xffffu : 0xf000u;
     cpu_state.data.cs.sregtype = SREG_CODE;
     cpu_state.data.cs.flagValid = LIB_TRUE;
 
@@ -697,7 +712,16 @@ lib_u8 core_machine_cpu_execution_consume_reset_request(
 void core_machine_cpu_execution_request_shutdown(
     core_machine_cpu_execution_context *context)
 {
-    if (context != LIB_NULL) context->shutdown_requested = LIB_TRUE;
+    if (context != LIB_NULL) {
+        context->shutdown_requested = LIB_TRUE;
+        if (context->shutdown_state == CPU_SHUTDOWN_NONE)
+            context->shutdown_state = CPU_SHUTDOWN_WAITING;
+    }
+}
+lib_bool core_machine_cpu_is_shutdown(
+    const core_machine_cpu_execution_context *context)
+{
+    return context != LIB_NULL && context->shutdown_state != CPU_SHUTDOWN_NONE;
 }
 lib_u8 core_machine_cpu_execution_consume_shutdown_request(
     core_machine_cpu_execution_context *context)

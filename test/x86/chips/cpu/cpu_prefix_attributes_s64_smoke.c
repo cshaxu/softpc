@@ -307,6 +307,8 @@ static lib_i32 prefix_attributes_s64_test_attributes_and_lock(void)
     if (!failed) {
         byte_image = 0x6du;
         other_byte = 0x2bu;
+        /* Retained PE-clear cache, not an implicit 67h segment extension. */
+        state.chip.cpu.data.ds.limit = 0xffffffffu;
         state.chip.cpu.data.eax = 0xaabbcc00u;
         state.chip.cpu.data.esi = 0x00010100u;
         before = state.chip.cpu;
@@ -340,6 +342,7 @@ static lib_i32 prefix_attributes_s64_test_attributes_and_lock(void)
     if (!failed) {
         byte_image = 0x22u;
         other_byte = 0x33u;
+        state.chip.cpu.data.ds.limit = 0xffffffffu;
         state.chip.cpu.data.eax = 0xaabbcc6du;
         state.chip.cpu.data.esi = 0x00010100u;
         before = state.chip.cpu;
@@ -414,9 +417,12 @@ static lib_i32 prefix_attributes_s64_test_attributes_and_lock(void)
         before = state.chip.cpu;
         failed |= !prefix_attributes_s64_preflight_ud(&state) || !prefix_attributes_s64_run(&state, lock_read,
             sizeof(lock_read), 1u, &after, &diagnostic, &status) ||
-            status != LIB_STATUS_INTERNAL_ERROR || !diagnostic.valid ||
-            !X86_CPU_BIT_IS_SET(diagnostic.exception_mask,
-                VCPUINS_EXCEPT_UD) || !prefix_attributes_s64_cpu_same(&before,
+            status != LIB_STATUS_OK || diagnostic.valid ||
+            !core_machine_cpu_is_shutdown(&state.chip.execution) ||
+            state.chip.execution.stop_requested ||
+            !state.chip.delivered_exception.valid ||
+            state.chip.delivered_exception.exception_mask != VCPUINS_EXCEPT_SHUTDOWN ||
+            !prefix_attributes_s64_cpu_same(&before,
                     &after) || prefix_attributes_s64_read(&state, 0x0100u,
                         &image, sizeof(image)) !=
                 LIB_STATUS_OK || image != 0x55667788u;
@@ -449,12 +455,23 @@ static lib_i32 prefix_attributes_s64_test_attributes_and_lock(void)
                     &state);
                 if (!failed) {
                     before = state.chip.cpu;
+                    if (profiles[profile] == CORE_MACHINE_CPU_PROFILE_80186) {
+                        if (!cpu_instruction_expect_real_fault(&state.chip,
+                                forms[form], (lib_u8)lengths[form], 6u)) return 0;
+                        continue;
+                    }
                     failed |= !prefix_attributes_s64_preflight_ud(&state) || !prefix_attributes_s64_run(&state, forms[form],
                         lengths[form], 1u, &after, &diagnostic, &status) ||
-                        status != LIB_STATUS_INTERNAL_ERROR ||
-                        !diagnostic.valid ||
-                        !X86_CPU_BIT_IS_SET(diagnostic.exception_mask,
-                            VCPUINS_EXCEPT_UD) ||
+                        (profiles[profile] == CORE_MACHINE_CPU_PROFILE_80286 ?
+                            (status != LIB_STATUS_OK || diagnostic.valid ||
+                                !core_machine_cpu_is_shutdown(&state.chip.execution) ||
+                                state.chip.execution.stop_requested ||
+                                !state.chip.delivered_exception.valid ||
+                                state.chip.delivered_exception.exception_mask !=
+                                    VCPUINS_EXCEPT_SHUTDOWN) :
+                            (status != LIB_STATUS_INTERNAL_ERROR || !diagnostic.valid ||
+                                !X86_CPU_BIT_IS_SET(diagnostic.exception_mask,
+                                    VCPUINS_EXCEPT_UD))) ||
                         !prefix_attributes_s64_cpu_same(&before, &after);
                 }
 
@@ -496,9 +513,11 @@ static lib_i32 prefix_attributes_s64_test_lock_group_legality(void)
                 &image, sizeof(image)) != LIB_STATUS_OK ||
                 !prefix_attributes_s64_preflight_ud(&state) || !prefix_attributes_s64_run(&state,
                     forms[form], lengths[form], 1u, &after, &diagnostic,
-                    &status) || status != LIB_STATUS_INTERNAL_ERROR ||
-                !diagnostic.valid || !X86_CPU_BIT_IS_SET(
-                    diagnostic.exception_mask, VCPUINS_EXCEPT_UD) ||
+                    &status) || status != LIB_STATUS_OK || diagnostic.valid ||
+                !core_machine_cpu_is_shutdown(&state.chip.execution) ||
+                state.chip.execution.stop_requested ||
+                !state.chip.delivered_exception.valid ||
+                state.chip.delivered_exception.exception_mask != VCPUINS_EXCEPT_SHUTDOWN ||
                 !prefix_attributes_s64_cpu_same(&before, &after) ||
                 prefix_attributes_s64_read(&state, 0x0100u, &image, sizeof(image)) !=
                     LIB_STATUS_OK || image != 0x1234u;
@@ -591,6 +610,7 @@ static lib_i32 prefix_attributes_s64_test_repeated_width_prefixes(void)
     failed = !prefix_attributes_s64_prepare(CORE_MACHINE_CPU_PROFILE_80386,
         &state);
     if (!failed) {
+        state.chip.cpu.data.ds.limit = 0xffffffffu;
         state.chip.cpu.data.eax = 0xaabbcc00u;
         state.chip.cpu.data.esi = 0x00010100u;
         before = state.chip.cpu;

@@ -1,5 +1,134 @@
 # Windows 1.01 startup diagnosis and repair
 
+## S12 current NXVM corpus refresh and four-suite verification
+
+Original owner request: 没关系，没关系，你可以准入一个新的 S 任务，把 NXVM 的所有有差异的部分导入进来，然后再跑这个测试，四个测试。
+Baseline: SoftPC `4c36853c`; NXVM https://github.com/cshaxu/nxvm.git at clean
+`a397b925c48b629908869d295dfd97316acb6b8f`. The owner supersedes the former
+dirty capture with a complete byte-exact eight-package import from this clean
+revision. Record an ordered path/SHA-256 fingerprint and eight manifest hashes
+before and after copying. The upstream tree is a copy source only, never a
+build/runtime dependency. Existing shared notices and source provenance are
+preserved; no new guest assets or license terms enter scope. S11's completed
+technical delivery is archived for this owner-directed continuation, without
+claiming manual acceptance.
+
+Pre-import scope is every path beneath src/{lib,common,x86,ibmpc} and
+test/{lib,common,x86,ibmpc}, plus their shared test registration/boundary
+scripts. The exact count is measured from the clean revision before delivery.
+Reviewed x86 changes cover CPU reset-visible state, resident shutdown, NMI and
+interrupt shadows, exception delivery, decode/address/stack/host-arithmetic
+safety and source-backed timing. IBM PC distinguishes ending the host run from
+injecting a guest stop and now proves media release on close failure. Test
+fixtures and positive/negative gates accompany those contracts. They affect the
+shared emulator only: SoftPC continues to link its original CPU/device
+implementation, plus existing x86 debug/xasm32 tools. No shared Core/IBM PC
+executor is linked into SoftPC's product.
+
+Pre-change estimate, metadata excluded: production eleven units approximately
++1108/-958, net +150; tests/build approximately +6200/-1850, net +4350.
+This is exact import, not a local simplification or second hardware owner.
+Recalculate against the frozen bytes before final accounting; upstream work
+can change until captured, so do not treat this estimate as a final result.
+
+Finite ledger: every frozen path has one of unchanged-exact, import-exact,
+new-upstream-path or upstream-deletion dispositions. Receiver is its package
+manifest, inward dependency gate, strict dual build and full package test suite;
+changed CPU classes additionally have decode/address/stack/arithmetic and
+interrupt/shutdown tests. Completion requires path sets and raw byte hashes
+for all eight packages, not only matching manifest declarations. No local shim,
+variant, weakened assertion or second production path is authorized.
+
+Verification uses existing dual Release trees after configuration fully ends.
+Run four explicit suites per width, excluding desktop: Lib, Common, x86,
+IBM PC. Then run the product background regressions without rerunning shared
+cases unnecessarily. Record desktop exclusions, Windows fake-platform versus
+real platform limits and any failure; do not disguise failed verification with
+retries. Existing EXEs are rebuilt/up-to-date; snapshot, INI and guest media
+remain untouched. Preserve preexisting worktree changes. The ignored frozen
+corpus, generated decoder JSON and owned negative-gate scratch are bounded and
+removed after recording final fingerprint and review. Delivery commits/pushes
+implementation and actual-change review, then waits for owner validation.
+
+### S12 qualified frozen payload and incomplete latest-source delivery
+
+The initial stable capture contains 853 files, 8,366,652 bytes. Its SHA-256
+fingerprint is 73E8664B28374C814796A979510A1F6BED0A3ED2440B9BEB1BB668D434FC7CE8
+over sorted path, space, uppercase raw-file SHA-256 lines joined by LF with
+one trailing LF. Before/after upstream and copied hashes match. Eight manifests
+and source/test inward dependency gates pass. Four unchanged roots are Lib and
+Common source/tests; 13 source/metadata and 156 test/build/metadata paths import
+exactly. Ten new test/check paths are included, no path is deleted. Actual
+code accounting: eleven production units +1108/-958, net +150; 154 test/build
+units +6201/-1852, net +4349. Four changed manifests are excluded from code.
+No App, original mirror, generic helper, user configuration or media changes.
+
+Both full Release builds pass. The first x64 build cannot open several output
+test EXEs. No active matching process or read-only attribute is observed; a
+single-target serial relink succeeds, then the unchanged full build succeeds.
+The transient file availability cause is not established. No source workaround
+or weakened test is used. Shared suite results are individually reported:
+
+| Suite | x64 | x86 |
+| --- | --- | --- |
+| Lib | 48/48 | 48/48 |
+| Common | 20/20 | 20/20 |
+| x86 | 182/182 | 182/182 |
+| IBM PC | 181/181 | 181/181 |
+
+These are 431 distinct background cases per width. Five native desktop cases
+are excluded. Supplemental product regression passes 45/47 per width, not
+47/47: command-provider hits its existing 45-second limit after load/resume/
+stop activity, and presentation-shutdown hits its existing 10-second limit.
+Isolated unsandboxed x86 diagnostics repeat both failures, so neither concurrent
+load nor sandbox confinement is an established explanation. The four shared
+suites, product source and final product EXEs are unaffected; the link inputs
+contain no x86 Core/CPU or IBM PC archive. Existing teardown debt remains,
+with command-provider added as an observation needing a separate investigation.
+No overall product-regression pass or failure fix is claimed.
+
+Final upstream comparison discovers two later changes outside the initial
+frozen ledger: test/lib/console_broker_display_smoke.c and its manifest. The
+new native Console test is compiled on both widths, but remains desktop-owned.
+Its source SHA-256 is 06FFDD7CA51F58D92DB7B1F9B1538F140CE558D70F4C0C17D90761C8E50B9AB1;
+upstream's manifest does not match it. Three subsequent validations confirm
+the mismatch. A temporary exact copy is withdrawn from the worktree/frozen
+payload to avoid retaining an invalid corpus; no local manifest fork is made.
+Initial Lib bytes and the eight valid manifests are restored. The latest
+mutable NXVM corpus therefore cannot yet be reported fully synchronized.
+S12 stops before committing/pushing a complete P and awaits upstream manifest
+repair or an explicit owner choice of delivery boundary. All tested initial
+payload changes remain staged, owner snapshot remains untouched, and T85 stays
+open. The bounded frozen source is retained for continuation, not a build input.
+
+### S12 clean-corpus delivery
+
+The owner subsequently replaced the mutable capture with clean NXVM commit
+`a397b925c48b629908869d295dfd97316acb6b8f`. Every path below the eight
+declared source/test roots, plus `test/register.cmake`,
+`test/verify_test_boundaries.cmake` and `test/verify_types_boundary.cmake`,
+was copied from that immutable commit. A recursive path-and-SHA-256 comparison
+was zero-difference immediately after the copy and again after qualification.
+The two files which later differ from NXVM's *working tree* are uncommitted
+upstream edits made after this capture; they are not part of the frozen commit
+or this delivery.
+
+Actual import accounting against SoftPC `4c36853c`, excluding package EXEs and
+task records, is production +1512/-1252 (net +260) across 41 files and tests
++6699/-2307 (net +4392) across 174 files: +8211/-3559, net +4652, across 215
+shared paths. This is a corpus replacement, not a SoftPC-local implementation
+branch. User configuration, guest media and the preexisting snapshot edit are
+preserved outside the commit.
+
+Both package builds complete: `package-x64` and `package-x86`. Full background
+CTest passes on both widths, 479/479 each, including Lib 33, Common 14, x86
+176 and IBM PC 176 labelled cases. Native desktop tests remain excluded by the
+presets. The package preset deliberately builds the deliverable only; the test
+presets build every registered test executable before CTest, so no registered
+case is skipped for a missing binary. The refreshed `softpc64.exe` and
+`softpc32.exe` are delivery artifacts. S12 remains open pending owner manual
+validation; this record does not close S12 or T85.
+
 ## S11 eight-package test corpus synchronization
 
 Original owner request: 准入一个s来导入.

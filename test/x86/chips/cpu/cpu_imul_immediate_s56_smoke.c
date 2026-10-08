@@ -87,16 +87,10 @@ static lib_i32 imul_expect_ud(core_machine_cpu_profile profile,
     const lib_u8 *code, lib_u8 bytes)
 {
     cpu_instruction_fixture state;
-    t_cpu before, after;
 
     cpu_instruction_prepare(&state, profile);
     imul_seed(&state.cpu);
-    state.cpu.data.idtr.limit = 0x17u;
-    before = state.cpu;
-    return cpu_instruction_run(&state, code, bytes, &after) ==
-            LIB_STATUS_INTERNAL_ERROR && state.fault.valid &&
-        X86_CPU_BIT_IS_SET(state.fault.exception_mask, VCPUINS_EXCEPT_UD) &&
-        lib_memory_compare(&before, &after, sizeof(before)) == 0;
+    return cpu_instruction_expect_real_fault(&state, code, bytes, 6u);
 }
 
 static lib_i32 imul_test_defaults(void)
@@ -372,13 +366,65 @@ static lib_i32 imul_test_synthetic_ss_limit(void)
     state.cpu.data.ebp = 0x10u;
     state.cpu.data.ss.limit = 0x0fu;
     before = state.cpu;
-    return cpu_instruction_run(&state, code, sizeof(code), &after) ==
-            LIB_STATUS_INTERNAL_ERROR && state.fault.valid &&
-        X86_CPU_BIT_IS_SET(state.fault.exception_mask, VCPUINS_EXCEPT_DF) &&
+    return cpu_instruction_run(&state, code, sizeof(code), &after) == LIB_STATUS_OK &&
+        core_machine_cpu_is_shutdown(&state.execution) && !state.execution.stop_requested &&
+        !state.fault.valid && state.delivered_exception.valid &&
+        state.delivered_exception.exception_mask == VCPUINS_EXCEPT_SHUTDOWN &&
         after.data.eip == 0u && after.data.eax == before.data.eax &&
         imul_nonparticipants_same(&before, &after) &&
         after.data.eflags == before.data.eflags &&
         imul_sregs_same(&before, &after);
+}
+
+static lib_bool imul_test_dword_byte_extremes(void)
+{
+    static const lib_u32 sources[] = {
+        0u, 1u, 0xffffffffu, 0x40000000u, 0x7fffffffu, 0x80000000u
+    };
+    static const lib_i8 multipliers[] = {-128, -1, 0, 1, 4, 127};
+    lib_u8 source_index, multiplier_index, memory, alias;
+
+    for (source_index = 0u; source_index < sizeof(sources) / sizeof(sources[0]); ++source_index)
+    for (multiplier_index = 0u; multiplier_index < sizeof(multipliers); ++multiplier_index)
+    for (memory = 0u; memory < 2u; ++memory)
+    for (alias = 0u; alias < (memory ? 1u : 2u); ++alias) {
+        const lib_u32 source = sources[source_index];
+        const lib_i64 signed_source = source & 0x80000000u ?
+            (lib_i64)source - INT64_C(4294967296) : (lib_i64)source;
+        const lib_i64 product = signed_source * multipliers[multiplier_index];
+        const lib_u32 expected = (lib_u32)product;
+        const lib_bool overflow = product < -INT64_C(2147483648) ||
+            product > INT64_C(2147483647);
+        lib_u8 code[8] = {0x66u, 0x6bu};
+        lib_u8 bytes = 2u;
+        cpu_instruction_fixture state;
+        t_cpu before, after;
+        lib_u32 source_after = 0u;
+
+        code[bytes++] = memory ? 0x06u : alias ? 0xc0u : 0xc1u;
+        if (memory) { code[bytes++] = 0u; code[bytes++] = 0x40u; }
+        code[bytes++] = (lib_u8)multipliers[multiplier_index];
+        cpu_instruction_prepare(&state, CORE_MACHINE_CPU_PROFILE_80386);
+        imul_seed(&state.cpu);
+        state.cpu.data.ecx = source;
+        if (alias) state.cpu.data.eax = source;
+        before = state.cpu;
+        if (memory && cpu_instruction_write(&state, 0x4000u, &source,
+                4u, CORE_MACHINE_CPU_MEMORY_ACCESS_DATA) != LIB_STATUS_OK)
+            return LIB_FALSE;
+        if (cpu_instruction_run(&state, code, bytes, &after) != LIB_STATUS_OK ||
+                state.fault.valid || after.data.eip != bytes ||
+                after.data.eax != expected ||
+                !!(after.data.eflags & VCPU_EFLAGS_CF) != overflow ||
+                !!(after.data.eflags & VCPU_EFLAGS_OF) != overflow ||
+                !imul_nonparticipants_same(&before, &after) ||
+                !imul_nonarithmetic_flags_same(&before, &after) ||
+                !imul_sregs_same(&before, &after)) return LIB_FALSE;
+        if (memory && (cpu_instruction_read(&state, 0x4000u, &source_after,
+                4u, CORE_MACHINE_CPU_MEMORY_ACCESS_DATA, LIB_FALSE, LIB_FALSE) !=
+                    LIB_STATUS_OK || source_after != source)) return LIB_FALSE;
+    }
+    return LIB_TRUE;
 }
 
 lib_i32 main(void)
@@ -391,7 +437,7 @@ lib_i32 main(void)
         !imul_test_defaults() || !imul_test_attributes_and_rejects() ||
         !imul_test_memory_forms() || !imul_test_segments() ||
         !imul_test_67_sib_ss() || !imul_test_vm86() ||
-        !imul_test_synthetic_ss_limit()) return 1;
+        !imul_test_synthetic_ss_limit() || !imul_test_dword_byte_extremes()) return 1;
     lib_c_printf("M5:T539:S31:CPU-IMUL-IMMEDIATE:OK\n");
     return 0;
 }
